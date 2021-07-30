@@ -7,6 +7,7 @@ import java.util.function.Supplier;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.control.Control;
 import javafx.scene.control.Label;
@@ -221,6 +222,7 @@ public class MultiMergeEntries extends SplitPane {
         } else {
             fieldEditorCell = new TextField();
         }
+        fieldEditorCell.setPadding(new Insets(10, 0, 10, 0));
         VBox.setVgrow(fieldEditorCell, Priority.ALWAYS);
         FieldRow newRow = new FieldRow(fieldHeader.getChildren().size(), fieldEditorCell, field);
         fieldRows.put(field, newRow);
@@ -295,7 +297,8 @@ public class MultiMergeEntries extends SplitPane {
             // cell.setBorder(new Bor);
             if (isMultiLine) {
                 DiffHighlightingEllipsingTextFlow buttonText = new DiffHighlightingEllipsingTextFlow(value);
-                buttonText.getChildren().add(new Text(value));
+                buttonText.getChildren().addAll(DiffHighlighting.generateDiffHighlighting(entryEditorField.getText(), value, " "));
+                // buttonText.getChildren().add(new Text(value));
                 // buttonText.maxWidthProperty().bind(((Region) supplierHeader.getChildren().get(columnIndex)).widthProperty());
                 // buttonText.maxHeightProperty().bind(entryEditorField.heightProperty());
                 buttonText.maxWidthProperty().bind(cellButton.widthProperty());
@@ -306,6 +309,13 @@ public class MultiMergeEntries extends SplitPane {
                 buttonTooltip.prefWidthProperty().bind(cellButton.widthProperty());
                 buttonTooltip.setTextAlignment(TextAlignment.LEFT);
                 cellButton.setTooltip(buttonTooltip);
+
+                /*
+                entryEditorField.textProperty().addListener((observable, oldValue, newValue) -> {
+                    buttonText.getChildren().remove(0, buttonText.getChildren().size());
+                    buttonText.getChildren().addAll(DiffHighlighting.generateDiffHighlighting(newValue, buttonText.getFullText(), " "));
+                });
+                */
             } else {
                 cellButton.setText(value);
             }
@@ -326,13 +336,6 @@ public class MultiMergeEntries extends SplitPane {
                 }
             }
             cellButton.setToggleGroup(toggleGroup);
-
-            entryEditorField.textProperty().addListener(new ChangeListener<String>() {
-                @Override
-                public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-                    // highlight text
-                }
-            });
 
             if (field.equals(StandardField.DOI)) {
                 Button doiButton = IconTheme.JabRefIcons.LOOKUP_IDENTIFIER.asButton();
