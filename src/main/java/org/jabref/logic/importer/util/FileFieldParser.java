@@ -15,7 +15,6 @@ import org.slf4j.LoggerFactory;
 public class FileFieldParser {
     private static final Logger LOGGER = LoggerFactory.getLogger(FileFieldParser.class);
 
-
     public static List<LinkedFile> parse(String value) {
         List<LinkedFile> files = new ArrayList<>();
 
@@ -32,7 +31,6 @@ public class FileFieldParser {
                 return files;
             }
         }
-
 
         List<String> linkedFileData = new ArrayList<>();
         StringBuilder sb = new StringBuilder();
