@@ -52,30 +52,30 @@ class JournalAbbreviationsViewModelTabTest {
         return Stream.of(
                 // Mixed abbreviations
                 Arguments.of(
-                        List.of(new String[]{"testFile1Entries.csv", "Test Entry;TE" + NEWLINE + ""},
-                                new String[]{"testFile3Entries.csv", "Abbreviations;Abb;A" + NEWLINE + "Test Entry;TE" + NEWLINE + "MoreEntries;ME;M" + NEWLINE + ""},
-                                new String[]{"testFile4Entries.csv", "Abbreviations;Abb" + NEWLINE + "Test Entry;TE;T" + NEWLINE + "MoreEntries;ME;M" + NEWLINE + "Entry;E" + NEWLINE + ""},
-                                new String[]{"testFile5Entries.csv", "Abbreviations;Abb" + NEWLINE + "Test Entry;TE;T" + NEWLINE + "Test Entry;TE" + NEWLINE + "MoreEntries;ME;M" + NEWLINE + "EntryEntry;EE" + NEWLINE + ""}),
+                        List.of(List.of("testFile1Entries.csv", "Test Entry;TE" + NEWLINE + ""),
+                                 List.of("testFile3Entries.csv", "Abbreviations;Abb;A" + NEWLINE + "Test Entry;TE" + NEWLINE + "MoreEntries;ME;M" + NEWLINE + ""),
+                                 List.of("testFile4Entries.csv", "Abbreviations;Abb" + NEWLINE + "Test Entry;TE;T" + NEWLINE + "MoreEntries;ME;M" + NEWLINE + "Entry;E" + NEWLINE + ""),
+                                 List.of("testFile5Entries.csv", "Abbreviations;Abb" + NEWLINE + "Test Entry;TE;T" + NEWLINE + "Test Entry;TE" + NEWLINE + "MoreEntries;ME;M" + NEWLINE + "EntryEntry;EE" + NEWLINE + "")),
                         List.of(
                                 List.of("Abbreviations;Abb;Abb", "Test Entry;TE;T", "MoreEntries;ME;M", "JabRefTestEntry;JTE;JTE"),
                                 List.of("EntryEntry;EE;EE", "Abbreviations;Abb;Abb", "Test Entry;TE;T", "SomeOtherEntry;SOE;SOE"))),
 
                 // No shortest unique abbreviations
                 Arguments.of(
-                        List.of(new String[]{"testFile1Entries.csv", "Test Entry;TE" + NEWLINE + ""},
-                                new String[]{"testFile3Entries.csv", "Abbreviations;Abb" + NEWLINE + "Test Entry;TE" + NEWLINE + "MoreEntries;ME" + NEWLINE + ""},
-                                new String[]{"testFile4Entries.csv", "Abbreviations;Abb" + NEWLINE + "Test Entry;TE" + NEWLINE + "MoreEntries;ME" + NEWLINE + "Entry;E" + NEWLINE + ""},
-                                new String[]{"testFile5Entries.csv", "Abbreviations;Abb" + NEWLINE + "Test Entry;TE" + NEWLINE + "Test Entry;TE" + NEWLINE + "MoreEntries;ME" + NEWLINE + "EntryEntry;EE" + NEWLINE + ""}),
+                        List.of(List.of("testFile1Entries.csv", "Test Entry;TE" + NEWLINE + ""),
+                                List.of("testFile3Entries.csv", "Abbreviations;Abb" + NEWLINE + "Test Entry;TE" + NEWLINE + "MoreEntries;ME" + NEWLINE + ""),
+                                List.of("testFile4Entries.csv", "Abbreviations;Abb" + NEWLINE + "Test Entry;TE" + NEWLINE + "MoreEntries;ME" + NEWLINE + "Entry;E" + NEWLINE + ""),
+                                List.of("testFile5Entries.csv", "Abbreviations;Abb" + NEWLINE + "Test Entry;TE" + NEWLINE + "Test Entry;TE" + NEWLINE + "MoreEntries;ME" + NEWLINE + "EntryEntry;EE" + NEWLINE + "")),
                         List.of(
                                 List.of("Abbreviations;Abb;Abb", "Test Entry;TE;TE", "MoreEntries;ME;ME", "JabRefTestEntry;JTE;JTE"),
-                                List.of("EntryEntry;EE;EE", "Abbreviations;Abb;Abb", "Test Entry;TE;TE", "SomeOtherEntry;SOE;SOE"))),
+                               List.of("EntryEntry;EE;EE", "Abbreviations;Abb;Abb", "Test Entry;TE;TE", "SomeOtherEntry;SOE;SOE"))),
 
                 // Shortest unique abbreviations
                 Arguments.of(
-                        List.of(new String[]{"testFile1Entries.csv", "Test Entry;TE;T" + NEWLINE + ""},
-                                new String[]{"testFile3Entries.csv", "Abbreviations;Abb;A" + NEWLINE + "Test Entry;TE;T" + NEWLINE + "MoreEntries;ME;M" + NEWLINE + ""},
-                                new String[]{"testFile4Entries.csv", "Abbreviations;Abb;A" + NEWLINE + "Test Entry;TE;T" + NEWLINE + "MoreEntries;ME;M" + NEWLINE + "Entry;En;E" + NEWLINE + ""},
-                                new String[]{"testFile5Entries.csv", "Abbreviations;Abb;A" + NEWLINE + "Test Entry;TE;T" + NEWLINE + "Test Entry;TE;T" + NEWLINE + "MoreEntries;ME;M" + NEWLINE + "EntryEntry;EE" + NEWLINE + ""}),
+                        List.of(List.of("testFile1Entries.csv", "Test Entry;TE;T" + NEWLINE + ""),
+                                List.of("testFile3Entries.csv", "Abbreviations;Abb;A" + NEWLINE + "Test Entry;TE;T" + NEWLINE + "MoreEntries;ME;M" + NEWLINE + ""),
+                                List.of("testFile4Entries.csv", "Abbreviations;Abb;A" + NEWLINE + "Test Entry;TE;T" + NEWLINE + "MoreEntries;ME;M" + NEWLINE + "Entry;En;E" + NEWLINE + ""),
+                                List.of("testFile5Entries.csv", "Abbreviations;Abb;A" + NEWLINE + "Test Entry;TE;T" + NEWLINE + "Test Entry;TE;T" + NEWLINE + "MoreEntries;ME;M" + NEWLINE + "EntryEntry;EE" + NEWLINE + "")),
                         List.of(
                                 List.of("Abbreviations;Abb;A", "Test Entry;TE;T", "MoreEntries;ME;M", "JabRefTestEntry;JTE;JTE"),
                                 List.of("EntryEntry;EE;EE", "Abbreviations;Abb;A", "Test Entry;TE;T", "SomeOtherEntry;SOE;SOE")))
@@ -105,14 +105,14 @@ class JournalAbbreviationsViewModelTabTest {
 
     @ParameterizedTest
     @MethodSource("provideTestFiles")
-    void testInitialWithSavedFilesIncrementsFilesCounter(List<String[]> testFiles) throws IOException {
+    void testInitialWithSavedFilesIncrementsFilesCounter(List<List<String>> testFiles) throws IOException {
         addFourTestFileToViewModelAndPreferences(testFiles);
         assertEquals(4, viewModel.journalFilesProperty().size());
     }
 
     @ParameterizedTest
     @MethodSource("provideTestFiles")
-    void testRemoveDuplicatesWhenReadingFiles(List<String[]> testFiles) throws IOException {
+    void testRemoveDuplicatesWhenReadingFiles(List<List<String>> testFiles) throws IOException {
         addFourTestFileToViewModelAndPreferences(testFiles);
         viewModel.selectLastJournalFile();
 
@@ -131,7 +131,7 @@ class JournalAbbreviationsViewModelTabTest {
 
     @ParameterizedTest
     @MethodSource("provideTestFiles")
-    void addDuplicatedFileResultsInErrorDialog(List<String[]> testFiles) throws IOException {
+    void addDuplicatedFileResultsInErrorDialog(List<List<String>> testFiles) throws IOException {
         when(dialogService.showFileSaveDialog(any())).thenReturn(Optional.of(createTestFile(testFiles.get(0))));
         viewModel.addNewFile();
         viewModel.addNewFile();
@@ -140,7 +140,7 @@ class JournalAbbreviationsViewModelTabTest {
 
     @ParameterizedTest
     @MethodSource("provideTestFiles")
-    void testOpenDuplicatedFileResultsInAnException(List<String[]> testFiles) throws IOException {
+    void testOpenDuplicatedFileResultsInAnException(List<List<String>> testFiles) throws IOException {
         when(dialogService.showFileOpenDialog(any())).thenReturn(Optional.of(createTestFile(testFiles.get(0))));
         viewModel.openFile();
         viewModel.openFile();
@@ -149,7 +149,7 @@ class JournalAbbreviationsViewModelTabTest {
 
     @ParameterizedTest
     @MethodSource("provideTestFiles")
-    void testSelectLastJournalFileSwitchesFilesAndTheirAbbreviations(List<String[]> testFiles) throws IOException {
+    void testSelectLastJournalFileSwitchesFilesAndTheirAbbreviations(List<List<String>> testFiles) throws IOException {
         when(dialogService.showFileSaveDialog(any())).thenReturn(Optional.of(emptyTestFile));
         viewModel.addNewFile();
         viewModel.selectLastJournalFile();
@@ -163,7 +163,7 @@ class JournalAbbreviationsViewModelTabTest {
 
     @ParameterizedTest
     @MethodSource("provideTestFiles")
-    void testOpenValidFileContainsTheSpecificEntryAndEnoughAbbreviations(List<String[]> testFiles) throws IOException {
+    void testOpenValidFileContainsTheSpecificEntryAndEnoughAbbreviations(List<List<String>> testFiles) throws IOException {
         Abbreviation testAbbreviation = new Abbreviation("Test Entry", "TE");
         when(dialogService.showFileSaveDialog(any())).thenReturn(Optional.of(createTestFile(testFiles.get(1))));
         viewModel.addNewFile();
@@ -176,7 +176,7 @@ class JournalAbbreviationsViewModelTabTest {
 
     @ParameterizedTest
     @MethodSource("provideTestFiles")
-    void testRemoveLastListSetsCurrentFileAndCurrentAbbreviationToNull(List<String[]> testFiles) throws IOException {
+    void testRemoveLastListSetsCurrentFileAndCurrentAbbreviationToNull(List<List<String>> testFiles) throws IOException {
         when(dialogService.showFileSaveDialog(any())).thenReturn(Optional.of(createTestFile(testFiles.get(0))));
         viewModel.addNewFile();
         viewModel.removeCurrentFile();
@@ -189,7 +189,7 @@ class JournalAbbreviationsViewModelTabTest {
 
     @ParameterizedTest
     @MethodSource("provideTestFiles")
-    void testMixedFileUsage(List<String[]> testFiles) throws IOException {
+    void testMixedFileUsage(List<List<String>> testFiles) throws IOException {
         Abbreviation testAbbreviation = new Abbreviation("Entry", "E");
         Abbreviation testAbbreviation2 = new Abbreviation("EntryEntry", "EE");
 
@@ -246,8 +246,8 @@ class JournalAbbreviationsViewModelTabTest {
 
     @ParameterizedTest
     @MethodSource("provideTestFiles")
-    void testCurrentFilePropertyChangeActiveFile(List<String[]> testFiles) throws IOException {
-        for (String[] testFile : testFiles) {
+    void testCurrentFilePropertyChangeActiveFile(List<List<String>> testFiles) throws IOException {
+        for (List<String> testFile : testFiles) {
             when(dialogService.showFileSaveDialog(any())).thenReturn(Optional.of(createTestFile(testFile)));
             viewModel.addNewFile();
         }
@@ -278,7 +278,7 @@ class JournalAbbreviationsViewModelTabTest {
 
     @ParameterizedTest
     @MethodSource("provideTestFiles")
-    void testAddAbbreviationIncludesAbbreviationsInAbbreviationList(List<String[]> testFiles) throws IOException {
+    void testAddAbbreviationIncludesAbbreviationsInAbbreviationList(List<List<String>> testFiles) throws IOException {
         when(dialogService.showFileSaveDialog(any())).thenReturn(Optional.of(createTestFile(testFiles.get(2))));
         viewModel.addNewFile();
         when(dialogService.showFileSaveDialog(any())).thenReturn(Optional.of(createTestFile(testFiles.get(3))));
@@ -293,7 +293,7 @@ class JournalAbbreviationsViewModelTabTest {
 
     @ParameterizedTest
     @MethodSource("provideTestFiles")
-    void testAddDuplicatedAbbreviationResultsInException(List<String[]> testFiles) throws IOException {
+    void testAddDuplicatedAbbreviationResultsInException(List<List<String>> testFiles) throws IOException {
         when(dialogService.showFileSaveDialog(any())).thenReturn(Optional.of(createTestFile(testFiles.get(1))));
         viewModel.addNewFile();
         viewModel.selectLastJournalFile();
@@ -316,7 +316,7 @@ class JournalAbbreviationsViewModelTabTest {
 
     @ParameterizedTest
     @MethodSource("provideTestFiles")
-    void testEditAbbreviationIncludesNewAbbreviationInAbbreviationsList(List<String[]> testFiles) throws IOException {
+    void testEditAbbreviationIncludesNewAbbreviationInAbbreviationsList(List<List<String>> testFiles) throws IOException {
         when(dialogService.showFileSaveDialog(any())).thenReturn(Optional.of(createTestFile(testFiles.get(2))));
         viewModel.addNewFile();
         when(dialogService.showFileSaveDialog(any())).thenReturn(Optional.of(createTestFile(testFiles.get(3))));
@@ -340,7 +340,7 @@ class JournalAbbreviationsViewModelTabTest {
 
     @ParameterizedTest
     @MethodSource("provideTestFiles")
-    void testEditAbbreviationToExistingOneResultsInException(List<String[]> testFiles) throws IOException {
+    void testEditAbbreviationToExistingOneResultsInException(List<List<String>> testFiles) throws IOException {
         when(dialogService.showFileSaveDialog(any())).thenReturn(Optional.of(createTestFile(testFiles.get(1))));
         viewModel.addNewFile();
         viewModel.selectLastJournalFile();
@@ -356,7 +356,7 @@ class JournalAbbreviationsViewModelTabTest {
 
     @ParameterizedTest
     @MethodSource("provideTestFiles")
-    void testEditAbbreviationToEmptyNameResultsInException(List<String[]> testFiles) throws IOException {
+    void testEditAbbreviationToEmptyNameResultsInException(List<List<String>> testFiles) throws IOException {
         when(dialogService.showFileSaveDialog(any())).thenReturn(Optional.of(createTestFile(testFiles.get(1))));
         viewModel.addNewFile();
         viewModel.selectLastJournalFile();
@@ -370,7 +370,7 @@ class JournalAbbreviationsViewModelTabTest {
 
     @ParameterizedTest
     @MethodSource("provideTestFiles")
-    void testEditAbbreviationToEmptyAbbreviationResultsInException(List<String[]> testFiles) throws IOException {
+    void testEditAbbreviationToEmptyAbbreviationResultsInException(List<List<String>> testFiles) throws IOException {
         when(dialogService.showFileSaveDialog(any())).thenReturn(Optional.of(createTestFile(testFiles.get(1))));
         viewModel.addNewFile();
         viewModel.selectLastJournalFile();
@@ -384,7 +384,7 @@ class JournalAbbreviationsViewModelTabTest {
 
     @ParameterizedTest
     @MethodSource("provideTestFiles")
-    void testSaveAbbreviationsToFilesCreatesNewFilesWithWrittenAbbreviations(List<String[]> testFiles, List<List<String>> testEntries) throws Exception {
+    void testSaveAbbreviationsToFilesCreatesNewFilesWithWrittenAbbreviations(List<List<String>> testFiles, List<List<String>> testEntries) throws Exception {
         Path testFile4Entries = createTestFile(testFiles.get(2));
         Path testFile5EntriesWithDuplicate = createTestFile(testFiles.get(3));
 
@@ -420,7 +420,7 @@ class JournalAbbreviationsViewModelTabTest {
 
     @ParameterizedTest
     @MethodSource("provideTestFiles")
-    void testSaveExternalFilesListToPreferences(List<String[]> testFiles) throws IOException {
+    void testSaveExternalFilesListToPreferences(List<List<String>> testFiles) throws IOException {
         addFourTestFileToViewModelAndPreferences(testFiles);
         verify(preferencesService).storeJournalAbbreviationPreferences(any());
     }
@@ -441,9 +441,9 @@ class JournalAbbreviationsViewModelTabTest {
                  .set(viewModel.abbreviationsProperty().get(viewModel.abbreviationsCountProperty().get() - 1));
     }
 
-    private void addFourTestFileToViewModelAndPreferences(List<String[]> testFiles) throws IOException {
-        for (String[] testFile : testFiles) {
-            when(dialogService.showFileSaveDialog(any())).thenReturn(Optional.of(createTestFile(testFile[0], testFile[1])));
+    private void addFourTestFileToViewModelAndPreferences(List<List<String>> testFiles) throws IOException {
+        for (List<String> testFile : testFiles) {
+            when(dialogService.showFileSaveDialog(any())).thenReturn(Optional.of(createTestFile(testFile.get(0), testFile.get(1))));
             viewModel.addNewFile();
         }
         viewModel.storeSettings();
@@ -455,7 +455,7 @@ class JournalAbbreviationsViewModelTabTest {
         return file;
     }
 
-    private Path createTestFile(String[] testFile) throws IOException {
-        return createTestFile(testFile[0], testFile[1]);
+    private Path createTestFile(List<String> testFile) throws IOException {
+        return createTestFile(testFile.get(0), testFile.get(1));
     }
 }
