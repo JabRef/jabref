@@ -7,33 +7,20 @@ import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.Objects;
-import java.util.Optional;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
-import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.ParserResult;
-import org.jabref.logic.importer.fetcher.DoiFetcher;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.OS;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.xmp.EncryptedPdfsNotSupportedException;
 import org.jabref.logic.xmp.XmpUtilReader;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
-import org.jabref.model.entry.field.StandardField;
-import org.jabref.model.entry.identifier.DOI;
-import org.jabref.model.entry.types.EntryType;
-import org.jabref.model.entry.types.StandardEntryType;
-import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
-import com.google.common.base.Strings;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
 
