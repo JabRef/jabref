@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -13,6 +14,8 @@ import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.util.GrobidService;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.StandardFileType;
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.util.FileHelper;
 
 /**
@@ -58,7 +61,9 @@ public class GrobidPdfMetadataImporter extends Importer {
     public ParserResult importDatabase(Path filePath, Charset defaultEncoding) {
         Objects.requireNonNull(filePath);
         try {
-            return new ParserResult(grobidService.processPDF(filePath, importFormatPreferences));
+            List<BibEntry> result = grobidService.processPDF(filePath, importFormatPreferences);
+            result.forEach(entry -> entry.addFile(new LinkedFile("", filePath.toAbsolutePath(), "PDF")));
+            return new ParserResult(result);
         } catch (Exception exception) {
             return ParserResult.fromError(exception);
         }
