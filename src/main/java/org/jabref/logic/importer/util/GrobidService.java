@@ -85,6 +85,8 @@ public class GrobidService {
         }
 
         BibtexParser parser = new BibtexParser(importFormatPreferences, new DummyFileUpdateMonitor());
-        return parser.parseEntries(httpResponse);
+        List<BibEntry> result = parser.parseEntries(httpResponse);
+        result.stream().forEach((entry) -> entry.setCitationKey(""));
+        return result;
     }
 }
