@@ -8,6 +8,7 @@ import java.util.Optional;
 
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParseException;
+import org.jabref.logic.importer.fetcher.GrobidCitationFetcher;
 import org.jabref.logic.importer.fileformat.GrobidPdfMetadataImporterTest;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
@@ -32,7 +33,7 @@ public class GrobidServiceTest {
 
     @BeforeAll
     public static void setup() {
-        grobidService = new GrobidService("http://office:8070");
+        grobidService = new GrobidService(GrobidCitationFetcher.GROBID_URL);
         importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(importFormatPreferences.getKeywordSeparator()).thenReturn(',');
     }
