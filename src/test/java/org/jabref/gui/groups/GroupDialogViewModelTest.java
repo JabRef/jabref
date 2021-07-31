@@ -1,7 +1,5 @@
 package org.jabref.gui.groups;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
@@ -27,6 +25,7 @@ class GroupDialogViewModelTest {
     private GroupDialogViewModel viewModel;
     private Path temporaryFolder;
     private BibDatabaseContext bibDatabaseContext;
+    private final MetaData metaData = mock(MetaData.class);
 
     @BeforeEach
     void setUp(@TempDir Path temporaryFolder) throws Exception {
@@ -41,8 +40,6 @@ class GroupDialogViewModelTest {
         when(preferencesService.getKeywordDelimiter()).thenReturn(',');
         when(preferencesService.getUser()).thenReturn("MockedUser");
 
-        MetaData metaData = mock(MetaData.class);
-        when(metaData.getLatexFileDirectory(any(String.class))).thenReturn(Optional.empty());
         bibDatabaseContext.setMetaData(metaData);
 
         viewModel = new GroupDialogViewModel(dialogService, bibDatabaseContext, preferencesService, group, GroupDialogHeader.SUBGROUP);
@@ -51,7 +48,10 @@ class GroupDialogViewModelTest {
     @Test
     void validateExistingAbsolutePath() throws Exception {
         var anAuxFile = temporaryFolder.resolve("auxfile.aux").toAbsolutePath();
+
         Files.createFile(anAuxFile);
+        when(metaData.getLatexFileDirectory(any(String.class))).thenReturn(Optional.of(temporaryFolder));
+
         viewModel.texGroupFilePathProperty().setValue(anAuxFile.toString());
         assertTrue(viewModel.texGroupFilePathValidatonStatus().isValid());
     }
@@ -61,5 +61,17 @@ class GroupDialogViewModelTest {
         var notAnAuxFile = temporaryFolder.resolve("notanauxfile.aux").toAbsolutePath();
         viewModel.texGroupFilePathProperty().setValue(notAnAuxFile.toString());
         assertFalse(viewModel.texGroupFilePathValidatonStatus().isValid());
+    }
+
+    @Test
+    void validateExistingRelativePath() throws Exception {
+        var anAuxFile = Path.of("auxfile.aux");
+
+        // The file needs to exist
+        Files.createFile(temporaryFolder.resolve(anAuxFile));
+        when(metaData.getLatexFileDirectory(any(String.class))).thenReturn(Optional.of(temporaryFolder));
+
+        viewModel.texGroupFilePathProperty().setValue(anAuxFile.toString());
+        assertTrue(viewModel.texGroupFilePathValidatonStatus().isValid());
     }
 }
