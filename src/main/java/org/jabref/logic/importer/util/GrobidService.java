@@ -1,17 +1,13 @@
 package org.jabref.logic.importer.util;
 
 import java.io.IOException;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.time.Duration;
 import java.util.List;
 
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.fileformat.BibtexParser;
-import org.jabref.logic.net.URLDownload;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
@@ -56,13 +52,14 @@ public class GrobidService {
      * @throws IOException if an I/O excecption during the call ocurred or no BibTeX entry could be determiend
      */
     public String processCitation(String rawCitation, ConsolidateCitations consolidateCitations) throws IOException {
-        rawCitation = URLEncoder.encode(rawCitation, StandardCharsets.UTF_8);
-        URLDownload urlDownload = new URLDownload(grobidServerURL
-                + "/api/processCitation");
-        urlDownload.setConnectTimeout(Duration.ofSeconds(5));
-        urlDownload.addHeader("Accept", MediaTypes.APPLICATION_BIBTEX);
-        urlDownload.setPostData("citations=" + rawCitation + "&consolidateCitations=" + consolidateCitations);
-        String httpResponse = urlDownload.asString();
+        Connection.Response response = Jsoup.connect(grobidServerURL + "/api/processCitation")
+                .header("Accept", MediaTypes.APPLICATION_BIBTEX)
+                .data("citations", rawCitation)
+                .data("consolidateCitations", String.valueOf(consolidateCitations.getCode()))
+                .method(Connection.Method.POST)
+                .ignoreContentType(true)
+                .execute();
+        String httpResponse = response.body();
 
         if (httpResponse == null || httpResponse.equals("@misc{-1,\n  author = {}\n}\n")) { // This filters empty BibTeX entries
             throw new IOException("The GROBID server response does not contain anything.");
@@ -76,6 +73,7 @@ public class GrobidService {
                 .header("Accept", MediaTypes.APPLICATION_BIBTEX)
                 .data("input", filePath.toString(), Files.newInputStream(filePath))
                 .method(Connection.Method.POST)
+                .ignoreContentType(true)
                 .execute();
 
         String httpResponse = response.body();
@@ -85,6 +83,8 @@ public class GrobidService {
         }
 
         BibtexParser parser = new BibtexParser(importFormatPreferences, new DummyFileUpdateMonitor());
-        return parser.parseEntries(httpResponse);
+        List<BibEntry> result = parser.parseEntries(httpResponse);
+        result.stream().forEach((entry) -> entry.setCitationKey(""));
+        return result;
     }
 }
