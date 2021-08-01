@@ -2,12 +2,13 @@
 <style xmlns="http://purl.org/net/xbiblio/csl" class="note" version="1.0" initialize-with="." page-range-format="expanded" demote-non-dropping-particle="sort-only" default-locale="en-GB">
   <!-- This style was edited with the Visual CSL Editor (https://editor.citationstyles.org/visualEditor/) -->
   <info>
-    <title>Institut français d'archéologie orientale (English)</title>
+    <title>Institut français d'archéologie orientale - Egyptology (English)</title>
     <title-short>IFAO (EN)</title-short>
     <id>http://www.zotero.org/styles/institut-francais-darcheologie-orientale-en</id>
     <link href="http://www.zotero.org/styles/institut-francais-darcheologie-orientale-en" rel="self"/>
     <link href="http://www.zotero.org/styles/institut-francais-darcheologie-orientale" rel="template"/>
-    <link href="https://www.ifao.egnet.net/uploads/publications/normes/IFAO_publications_normes_bibliographiques_pub_egypto_2020_angl.pdf" rel="documentation"/>
+    <link href="https://www.ifao.egnet.net/publications/publier/normes-ed/" rel="documentation"/>
+    <link href="https://www.ifao.egnet.net/uploads/publications/normes/IFAO_publications_normes_bibliographiques_pub_egypto_2021_angl.pdf" rel="documentation"/>
     <author>
       <name>Nicolas Souchon</name>
       <email>souchon.nicolas.ns@gmail.com</email>
@@ -15,7 +16,7 @@
     <category citation-format="note"/>
     <category field="history"/>
     <summary>Style sheet for the archeological and egyptological publications of the Institut français d'archéologie orientale</summary>
-    <updated>2020-06-14T11:55:42+00:00</updated>
+    <updated>2021-07-11T09:27:26+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="en">
@@ -30,7 +31,7 @@
   </locale>
   <macro name="title">
     <choose>
-      <if type="book" match="any">
+      <if type="book manuscript" match="any">
         <text variable="title" font-style="italic"/>
       </if>
       <else>
@@ -98,7 +99,7 @@
     <text variable="archive" text-case="capitalize-first"/>
   </macro>
   <macro name="archive-location">
-    <text variable="archive_location" text-case="lowercase"/>
+    <text variable="archive_location"/>
   </macro>
   <macro name="collection-number">
     <number variable="collection-number"/>
@@ -222,60 +223,54 @@
       <if match="any" variable="title-short">
         <text macro="title-short"/>
       </if>
-      <else-if match="any" variable="author">
+      <else-if match="any" variable="author editor">
         <group delimiter="&#160;">
-          <text macro="author-short"/>
           <choose>
-            <if match="any" variable="original-date">
-              <group delimiter="&#160;">
-                <text macro="original-date"/>
-                <group delimiter="&#160;" prefix="(" suffix=")">
-                  <text term="edition" form="short"/>
-                  <text macro="issued-year"/>
-                </group>
-              </group>
+            <if match="any" variable="author">
+              <text macro="author-short"/>
             </if>
-            <else-if match="any" variable="status">
-              <group>
-                <text macro="status" prefix="(" suffix=")"/>
-                <text macro="year-suffix"/>
-              </group>
-            </else-if>
             <else>
-              <group>
-                <text macro="issued-year"/>
-                <text macro="year-suffix"/>
-              </group>
+              <text macro="editor-short"/>
             </else>
           </choose>
-        </group>
-      </else-if>
-      <else-if match="any" variable="editor">
-        <group delimiter="&#160;">
-          <text macro="editor-short"/>
-          <choose>
-            <if match="any" variable="original-date">
-              <group delimiter="&#160;">
-                <text macro="original-date"/>
-                <group delimiter="&#160;" prefix="(" suffix=")">
-                  <text term="edition" form="short"/>
-                  <text macro="issued-year"/>
-                </group>
-              </group>
-            </if>
-            <else-if match="any" variable="status">
-              <group>
-                <text macro="status" prefix="(" suffix=")"/>
-                <text macro="year-suffix"/>
-              </group>
-            </else-if>
-            <else>
-              <group>
-                <text macro="issued-year"/>
-                <text macro="year-suffix"/>
-              </group>
-            </else>
-          </choose>
+          <group>
+            <choose>
+              <if type="entry-dictionary entry-encyclopedia" match="any">
+                <choose>
+                  <if match="any" variable="status">
+                    <text macro="status"/>
+                  </if>
+                  <else>
+                    <text macro="issued-year"/>
+                  </else>
+                </choose>
+              </if>
+              <else>
+                <choose>
+                  <if match="any" variable="original-date">
+                    <group delimiter="&#160;">
+                      <text macro="original-date"/>
+                      <group delimiter="&#160;" prefix="(" suffix=")">
+                        <text term="edition" form="short"/>
+                        <text macro="issued-year"/>
+                      </group>
+                    </group>
+                  </if>
+                  <else-if match="any" variable="status">
+                    <group>
+                      <text macro="status" prefix="(" suffix=")"/>
+                    </group>
+                  </else-if>
+                  <else>
+                    <group>
+                      <text macro="issued-year"/>
+                    </group>
+                  </else>
+                </choose>
+              </else>
+            </choose>
+            <text macro="year-suffix"/>
+          </group>
         </group>
       </else-if>
       <else-if type="entry-dictionary entry-encyclopedia" match="any">
@@ -307,10 +302,10 @@
     <text variable="event-place"/>
   </macro>
   <macro name="event-date">
-    <date delimiter=" " variable="event-date">
+    <date delimiter="" variable="event-date">
       <date-part name="day"/>
-      <date-part name="month"/>
-      <date-part name="year" range-delimiter="-"/>
+      <date-part name="month" form="short" prefix=" "/>
+      <date-part name="year" range-delimiter="-" prefix=" "/>
     </date>
   </macro>
   <macro name="container-author">
@@ -474,11 +469,9 @@
           <else-if type="manuscript" match="any">
             <group delimiter=", ">
               <text macro="author"/>
-              <group delimiter="&#160;">
-                <text macro="title"/>
-                <text macro="issued-year" prefix="(" suffix=")"/>
-              </group>
+              <text macro="title"/>
               <text macro="genre"/>
+              <text macro="issued-year"/>
               <text macro="archive"/>
               <text macro="archive-location"/>
             </group>
@@ -528,10 +521,7 @@
             <group delimiter=", ">
               <text macro="author"/>
               <text macro="container-title"/>
-              <group delimiter="&#160;">
-                <text term="online"/>
-                <text macro="genre"/>
-              </group>
+              <text macro="genre"/>
               <text macro="URL"/>
               <choose>
                 <if match="any" variable="issued">
@@ -570,14 +560,8 @@
             <choose>
               <if type="webpage post-weblog" match="none">
                 <group delimiter=", ">
-                  <group delimiter="&#160;" prefix="[" suffix="]">
-                    <text term="available at" suffix=":"/>
-                    <text macro="archive"/>
-                  </group>
-                  <group delimiter="&#160;">
-                    <text macro="URL"/>
-                    <text macro="accessed"/>
-                  </group>
+                  <text macro="URL"/>
+                  <text macro="accessed"/>
                 </group>
               </if>
             </choose>
