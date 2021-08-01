@@ -75,7 +75,7 @@ public class GrobidServiceTest {
         BibEntry be0 = response.get(0);
         assertEquals(Optional.of("Lastname, Firstname"), be0.getField(StandardField.AUTHOR));
         assertEquals(Optional.of("Paper Title"), be0.getField(StandardField.TITLE));
-        assertEquals(Optional.of("2014-10-5"), be0.getField(StandardField.DATE));
+        assertEquals(Optional.of("2014-10-05"), be0.getField(StandardField.DATE));
     }
 
 }
