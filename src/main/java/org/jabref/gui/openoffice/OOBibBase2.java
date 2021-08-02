@@ -199,15 +199,8 @@ class OOBibBase2 {
      */
     OOResult<XTextCursor, OOError> getUserCursorForTextInsertion(XTextDocument doc, String title) {
 
-        XTextCursor cursor;
         // Get the cursor positioned by the user.
-        try {
-            cursor = UnoCursor.getViewCursor(doc).orElse(null);
-        } catch (RuntimeException ex) {
-            return OOResult.error(new OOError(title,
-                                              Localization.lang("Could not get the cursor."),
-                                              ex));
-        }
+        XTextCursor cursor = UnoCursor.getViewCursor(doc).orElse(null);
 
         // Check for crippled XTextViewCursor
         Objects.requireNonNull(cursor);
