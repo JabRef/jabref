@@ -3,6 +3,7 @@ package org.jabref.gui.commonfxcontrols;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ListProperty;
 import javafx.collections.ListChangeListener;
@@ -25,6 +26,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.field.Field;
 
 import com.airhacks.afterburner.views.ViewLoader;
+import com.tobiasdiez.easybind.EasyBind;
 
 public class SaveOrderConfigPanel extends VBox {
 
@@ -32,6 +34,7 @@ public class SaveOrderConfigPanel extends VBox {
     @FXML private RadioButton exportInTableOrder;
     @FXML private RadioButton exportInOriginalOrder;
     @FXML private GridPane sortCriterionList;
+    @FXML private Button addButton;
 
     private SaveOrderConfigPanelViewModel viewModel;
 
@@ -137,6 +140,15 @@ public class SaveOrderConfigPanel extends VBox {
                                  label.setText(String.valueOf(GridPane.getRowIndex(item) + 1));
                              }
                          });
+    }
+
+    public void setCriteriaLimit(int limit) {
+        addButton.disableProperty().unbind();
+        addButton.disableProperty().bind(
+                Bindings.createBooleanBinding(
+                        () -> viewModel.sortCriteriaProperty().size() >= limit || !exportInSpecifiedOrder.selectedProperty().get(),
+                        viewModel.sortCriteriaProperty().sizeProperty(),
+                        exportInSpecifiedOrder.selectedProperty()));
     }
 
     @FXML

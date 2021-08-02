@@ -44,5 +44,6 @@ public class ImportExportTab extends AbstractPreferenceTabView<ImportExportTabVi
         exportOrderPanel.saveInSpecifiedOrderProperty().bindBidirectional(viewModel.saveInSpecifiedOrderProperty());
         exportOrderPanel.sortableFieldsProperty().bind(viewModel.sortableFieldsProperty());
         exportOrderPanel.sortCriteriaProperty().bindBidirectional(viewModel.sortCriteriaProperty());
+        exportOrderPanel.setCriteriaLimit(3);
     }
 }

@@ -35,7 +35,7 @@
             <Insets left="30.0"/>
         </padding>
     </GridPane>
-    <Button onAction="#addCriterion" styleClass="icon-button" disable="${!exportInSpecifiedOrder.selected}"
+    <Button fx:id="addButton" onAction="#addCriterion" styleClass="icon-button" disable="${!exportInSpecifiedOrder.selected}"
             maxWidth="450.0" prefWidth="450.0">
         <graphic>
             <JabRefIconView glyph="ADD_NOBOX"/>
