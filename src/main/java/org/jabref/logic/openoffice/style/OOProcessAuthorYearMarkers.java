@@ -64,6 +64,9 @@ class OOProcessAuthorYearMarkers {
             String citationKey = citedKey.citationKey;
 
             List<String> clashingKeys = normCitMarkerToClachingKeys.putIfAbsent(normCitMarker, new ArrayList<>(1));
+            if (clashingKeys == null) {
+                clashingKeys = normCitMarkerToClachingKeys.get(normCitMarker);
+            }
             if (!clashingKeys.contains(citationKey)) {
                 // First appearance of citationKey, add to list.
                 clashingKeys.add(citationKey);
