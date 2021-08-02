@@ -136,6 +136,18 @@ class FileFieldParserTest {
                 Arguments.of(
                         Collections.singletonList(new LinkedFile("desc", Path.of("file.pdf"), "PDF")),
                         "desc:file.pdf:PDF:asdf"
+                ),
+
+                // url
+                Arguments.of(
+                         Collections.singletonList(new LinkedFile(new URL("https://books.google.de/"), "")),
+                         "https://books.google.de/"
+                ),
+
+                // url as file
+                Arguments.of(
+                             Collections.singletonList(new LinkedFile("", new URL("http://ceur-ws.org/Vol-438"), "URL")),
+                             ":http\\://ceur-ws.org/Vol-438:URL"
                 )
         );
     }

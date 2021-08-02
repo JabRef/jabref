@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<style xmlns="http://purl.org/net/xbiblio/csl" version="1.0" default-locale="en-US">
+  <info>
+    <title>Journal of International Studies</title>
+    <title-short>JIS</title-short>
+    <id>http://www.zotero.org/styles/journal-of-international-studies</id>
+    <link href="http://www.zotero.org/styles/journal-of-international-studies" rel="self"/>
+    <link href="http://www.zotero.org/styles/apa" rel="independent-parent"/>
+    <link href="https://www.jois.eu/?en_instructions-for-authors,4" rel="documentation"/>
+    <category citation-format="author-date"/>
+    <category field="social_science"/>
+    <issn>2071-8330</issn>
+    <eissn>2306-3483</eissn>
+    <updated>2021-07-30T08:34:00+00:00</updated>
+    <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
+  </info>
+</style>
