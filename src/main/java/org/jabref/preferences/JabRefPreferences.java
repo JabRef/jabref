@@ -2016,11 +2016,11 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public SaveOrderConfig getExportSaveOrder() {
-        LinkedList<SaveOrderConfig.SortCriterion> sortCriteria = new LinkedList<>(List.of(
+        List<SaveOrderConfig.SortCriterion> sortCriteria = List.of(
                 new SaveOrderConfig.SortCriterion(FieldFactory.parseField(get(EXPORT_PRIMARY_SORT_FIELD)), getBoolean(EXPORT_PRIMARY_SORT_DESCENDING)),
                 new SaveOrderConfig.SortCriterion(FieldFactory.parseField(get(EXPORT_SECONDARY_SORT_FIELD)), getBoolean(EXPORT_SECONDARY_SORT_DESCENDING)),
                 new SaveOrderConfig.SortCriterion(FieldFactory.parseField(get(EXPORT_TERTIARY_SORT_FIELD)), getBoolean(EXPORT_TERTIARY_SORT_DESCENDING))
-        ));
+        );
 
         return new SaveOrderConfig(
                 SaveOrderConfig.OrderType.fromBooleans(getBoolean(EXPORT_IN_SPECIFIED_ORDER), getBoolean(EXPORT_IN_ORIGINAL_ORDER)),
