@@ -158,9 +158,17 @@ public class MultiMergeEntriesView extends BaseDialog<BibEntry> {
         if (column.isLoadingProperty().getValue()) {
             ProgressIndicator progressIndicator = new ProgressIndicator(-1);
             progressIndicator.setPrefHeight(20);
+            progressIndicator.setMinHeight(Control.USE_PREF_SIZE);
+            progressIndicator.setMaxHeight(Control.USE_PREF_SIZE);
             header.setGraphic(progressIndicator);
             progressIndicator.visibleProperty().bind(column.isLoadingProperty());
         }
+
+        column.isLoadingProperty().addListener((obs, oldValue, newValue) -> {
+            if (!newValue) {
+                header.setGraphic(null);
+            }
+        });
 
         return header;
     }
