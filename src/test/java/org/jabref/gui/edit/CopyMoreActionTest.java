@@ -40,6 +40,7 @@ public class CopyMoreActionTest {
     private BibEntry entry;
     private List<String> titles = new ArrayList<String>();
     private List<String> keys = new ArrayList<String>();
+    private List<String> dois = new ArrayList<String>();
 
     @BeforeEach
     public void setUp() {
@@ -53,6 +54,7 @@ public class CopyMoreActionTest {
                 .withCitationKey("abc");
         titles.add(title);
         keys.add("abc");
+        dois.add("10.1145/3377811.3380330");
     }
 
     @Test
@@ -164,5 +166,55 @@ public class CopyMoreActionTest {
         verify(clipBoardManager, times(1)).setContent(copiedKeys);
         verify(dialogService, times(1)).notify(Localization.lang("Copied '%0' to clipboard.",
                 JabRefDialogService.shortenDialogMessage(copiedKeys)));
+    }
+
+    @Test
+    public void testExecuteCopyDoiWithNoDoi() {
+        BibEntry entryWithNoDoi = (BibEntry) entry.clone();
+        entryWithNoDoi.clearField(StandardField.DOI);
+        ObservableList<BibEntry> entriesWithNoDois = FXCollections.observableArrayList(entryWithNoDoi);
+        BibDatabaseContext databaseContext = new BibDatabaseContext(new BibDatabase(entriesWithNoDois));
+
+        when(stateManager.getActiveDatabase()).thenReturn(Optional.ofNullable(databaseContext));
+        when(stateManager.getSelectedEntries()).thenReturn(entriesWithNoDois);
+        copyMoreAction = new CopyMoreAction(StandardActions.COPY_DOI, dialogService, stateManager, clipBoardManager, preferencesService);
+        copyMoreAction.execute();
+
+        verify(clipBoardManager, times(0)).setContent(any(String.class));
+        verify(dialogService, times(1)).notify(Localization.lang("None of the selected entries have DOIs."));
+    }
+
+    @Test
+    public void testExecuteCopyDoiOnPartialSuccess() {
+        BibEntry entryWithNoDoi = (BibEntry) entry.clone();
+        entryWithNoDoi.clearField(StandardField.DOI);
+        ObservableList<BibEntry> mixedEntries = FXCollections.observableArrayList(entryWithNoDoi, entry);
+        BibDatabaseContext databaseContext = new BibDatabaseContext(new BibDatabase(mixedEntries));
+
+        when(stateManager.getActiveDatabase()).thenReturn(Optional.ofNullable(databaseContext));
+        when(stateManager.getSelectedEntries()).thenReturn(mixedEntries);
+        copyMoreAction = new CopyMoreAction(StandardActions.COPY_DOI, dialogService, stateManager, clipBoardManager, preferencesService);
+        copyMoreAction.execute();
+
+        String copiedDois = String.join("\n", dois);
+        verify(clipBoardManager, times(1)).setContent(copiedDois);
+        verify(dialogService, times(1)).notify(Localization.lang("Warning: %0 out of %1 entries have undefined DOIs.",
+                Integer.toString(mixedEntries.size() - titles.size()), Integer.toString(mixedEntries.size())));
+    }
+
+    @Test
+    public void testExecuteCopyDoiOnSuccess() {
+        ObservableList<BibEntry> entriesWithDois = FXCollections.observableArrayList(entry);
+        BibDatabaseContext databaseContext = new BibDatabaseContext(new BibDatabase(entriesWithDois));
+
+        when(stateManager.getActiveDatabase()).thenReturn(Optional.ofNullable(databaseContext));
+        when(stateManager.getSelectedEntries()).thenReturn(entriesWithDois);
+        copyMoreAction = new CopyMoreAction(StandardActions.COPY_DOI, dialogService, stateManager, clipBoardManager, preferencesService);
+        copyMoreAction.execute();
+
+        String copiedDois = String.join("\n", dois);
+        verify(clipBoardManager, times(1)).setContent(copiedDois);
+        verify(dialogService, times(1)).notify(Localization.lang("Copied '%0' to clipboard.",
+                JabRefDialogService.shortenDialogMessage(copiedDois)));
     }
 }

@@ -1,5 +1,7 @@
 package org.jabref.model.search.rules;
 
+import java.util.EnumSet;
+
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
@@ -16,7 +18,7 @@ public class GrammarBasedSearchRuleTest {
 
     @Test
     void applyRuleMatchesSingleTermWithRegex() {
-        GrammarBasedSearchRule searchRule = new GrammarBasedSearchRule(true, true);
+        GrammarBasedSearchRule searchRule = new GrammarBasedSearchRule(EnumSet.of(SearchRules.SearchFlags.CASE_SENSITIVE, SearchRules.SearchFlags.REGULAR_EXPRESSION));
 
         String query = "M[a-z]+e";
         assertTrue(searchRule.validateSearchStrings(query));
@@ -25,7 +27,7 @@ public class GrammarBasedSearchRuleTest {
 
     @Test
     void applyRuleDoesNotMatchSingleTermWithRegex() {
-        GrammarBasedSearchRule searchRule = new GrammarBasedSearchRule(true, true);
+        GrammarBasedSearchRule searchRule = new GrammarBasedSearchRule(EnumSet.of(SearchRules.SearchFlags.CASE_SENSITIVE, SearchRules.SearchFlags.REGULAR_EXPRESSION));
 
         String query = "M[0-9]+e";
         assertTrue(searchRule.validateSearchStrings(query));

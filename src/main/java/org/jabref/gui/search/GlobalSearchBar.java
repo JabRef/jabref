@@ -80,6 +80,7 @@ public class GlobalSearchBar extends HBox {
     private final CustomTextField searchField = SearchTextField.create();
     private final ToggleButton caseSensitiveButton;
     private final ToggleButton regularExpressionButton;
+    private final ToggleButton fulltextButton;
     // private final Button searchModeButton;
     private final Tooltip searchFieldTooltip = new Tooltip();
     private final Label currentResults = new Label("");
@@ -123,12 +124,14 @@ public class GlobalSearchBar extends HBox {
 
         regularExpressionButton = IconTheme.JabRefIcons.REG_EX.asToggleButton();
         caseSensitiveButton = IconTheme.JabRefIcons.CASE_SENSITIVE.asToggleButton();
+        fulltextButton = IconTheme.JabRefIcons.FULLTEXT.asToggleButton();
         // searchModeButton = new Button();
         initSearchModifierButtons();
 
         BooleanBinding focusedOrActive = searchField.focusedProperty()
                                                     .or(regularExpressionButton.focusedProperty())
                                                     .or(caseSensitiveButton.focusedProperty())
+                                                    .or(fulltextButton.focusedProperty())
                                                     .or(searchField.textProperty()
                                                                    .isNotEmpty());
 
@@ -136,8 +139,10 @@ public class GlobalSearchBar extends HBox {
         regularExpressionButton.visibleProperty().bind(focusedOrActive);
         caseSensitiveButton.visibleProperty().unbind();
         caseSensitiveButton.visibleProperty().bind(focusedOrActive);
+        fulltextButton.visibleProperty().unbind();
+        fulltextButton.visibleProperty().bind(focusedOrActive);
 
-        StackPane modifierButtons = new StackPane(new HBox(regularExpressionButton, caseSensitiveButton));
+        StackPane modifierButtons = new StackPane(new HBox(regularExpressionButton, caseSensitiveButton, fulltextButton));
         modifierButtons.setAlignment(Pos.CENTER);
         searchField.setRight(new HBox(searchField.getRight(), modifierButtons));
         searchField.getStyleClass().add("search-field");
@@ -191,6 +196,15 @@ public class GlobalSearchBar extends HBox {
         initSearchModifierButton(caseSensitiveButton);
         caseSensitiveButton.setOnAction(event -> {
             searchPreferences = searchPreferences.withCaseSensitive(caseSensitiveButton.isSelected());
+            preferencesService.storeSearchPreferences(searchPreferences);
+            performSearch();
+        });
+
+        fulltextButton.setSelected(searchPreferences.isFulltext());
+        fulltextButton.setTooltip(new Tooltip(Localization.lang("Fulltext search")));
+        initSearchModifierButton(fulltextButton);
+        fulltextButton.setOnAction(event -> {
+            searchPreferences = searchPreferences.withFulltext(fulltextButton.isSelected());
             preferencesService.storeSearchPreferences(searchPreferences);
             performSearch();
         });
@@ -251,7 +265,7 @@ public class GlobalSearchBar extends HBox {
             return;
         }
 
-        SearchQuery searchQuery = new SearchQuery(this.searchField.getText(), searchPreferences.isCaseSensitive(), searchPreferences.isRegularExpression());
+        SearchQuery searchQuery = new SearchQuery(this.searchField.getText(), searchPreferences.getSearchFlags());
         if (!searchQuery.isValid()) {
             informUserAboutInvalidSearchQuery();
             return;

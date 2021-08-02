@@ -1,5 +1,7 @@
 package org.jabref.model.search.rules;
 
+import java.util.EnumSet;
+
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
@@ -17,10 +19,10 @@ public class ContainBasedSearchRuleTest {
     @Test
     public void testBasicSearchParsing() {
         BibEntry be = makeBibtexEntry();
-        ContainBasedSearchRule bsCaseSensitive = new ContainBasedSearchRule(true);
-        ContainBasedSearchRule bsCaseInsensitive = new ContainBasedSearchRule(false);
-        RegexBasedSearchRule bsCaseSensitiveRegexp = new RegexBasedSearchRule(true);
-        RegexBasedSearchRule bsCaseInsensitiveRegexp = new RegexBasedSearchRule(false);
+        ContainBasedSearchRule bsCaseSensitive = new ContainBasedSearchRule(EnumSet.of(SearchRules.SearchFlags.CASE_SENSITIVE, SearchRules.SearchFlags.REGULAR_EXPRESSION));
+        ContainBasedSearchRule bsCaseInsensitive = new ContainBasedSearchRule(EnumSet.of(SearchRules.SearchFlags.REGULAR_EXPRESSION));
+        RegexBasedSearchRule bsCaseSensitiveRegexp = new RegexBasedSearchRule(EnumSet.of(SearchRules.SearchFlags.CASE_SENSITIVE, SearchRules.SearchFlags.REGULAR_EXPRESSION));
+        RegexBasedSearchRule bsCaseInsensitiveRegexp = new RegexBasedSearchRule(EnumSet.of(SearchRules.SearchFlags.REGULAR_EXPRESSION));
 
         String query = "marine 2001 shields";
 
