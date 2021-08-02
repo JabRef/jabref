@@ -20,7 +20,7 @@ plugins {
 
     id 'org.openjfx.javafxplugin' version '0.0.10'
 
-    id 'org.beryx.jlink' version '2.24.0'
+    id 'org.beryx.jlink' version '2.24.1'
 
     // nicer test outputs during running and completion
     // Homepage: https://github.com/radarsh/gradle-test-logger-plugin
@@ -123,15 +123,15 @@ dependencies {
     implementation group: 'org.apache.commons', name: 'commons-csv', version: '1.8'
     implementation 'com.h2database:h2-mvstore:1.4.200'
 
-    implementation group: 'org.apache.tika', name: 'tika-core', version: '1.27'
+    implementation group: 'org.apache.tika', name: 'tika-core', version: '2.0.0'
 
     // required for reading write-protected PDFs - see https://github.com/JabRef/jabref/pull/942#issuecomment-209252635
     implementation 'org.bouncycastle:bcprov-jdk15on:1.69'
 
     implementation 'commons-cli:commons-cli:1.4'
 
-    implementation 'org.libreoffice:libreoffice:7.1.4'
-    implementation 'org.libreoffice:unoloader:7.1.4'
+    implementation 'org.libreoffice:libreoffice:7.1.5'
+    implementation 'org.libreoffice:unoloader:7.1.5'
 
     implementation 'io.github.java-diff-utils:java-diff-utils:4.10'
     implementation 'info.debatty:java-string-similarity:2.0.0'
@@ -176,7 +176,7 @@ dependencies {
     implementation 'org.controlsfx:controlsfx:11.1.0'
 
     implementation 'org.jsoup:jsoup:1.14.1'
-    implementation 'com.konghq:unirest-java:3.11.11'
+    implementation 'com.konghq:unirest-java:3.11.12'
 
     implementation 'org.slf4j:slf4j-api:2.0.0-alpha2'
     implementation group: 'org.apache.logging.log4j', name: 'log4j-jcl', version: '3.0.0-SNAPSHOT'
@@ -212,14 +212,14 @@ dependencies {
     testRuntimeOnly 'org.junit.vintage:junit-vintage-engine:5.7.2'
     testImplementation 'org.junit.platform:junit-platform-launcher:1.7.2'
 
-    testImplementation 'net.bytebuddy:byte-buddy-parent:1.11.6'
+    testImplementation 'net.bytebuddy:byte-buddy-parent:1.11.8'
     testRuntimeOnly group: 'org.apache.logging.log4j', name: 'log4j-core', version: '3.0.0-SNAPSHOT'
     testRuntimeOnly group: 'org.apache.logging.log4j', name: 'log4j-jul', version: '3.0.0-SNAPSHOT'
     testImplementation 'org.mockito:mockito-core:3.11.2'
     testImplementation 'org.xmlunit:xmlunit-core:2.8.2'
     testImplementation 'org.xmlunit:xmlunit-matchers:2.8.2'
-    testRuntimeOnly 'com.tngtech.archunit:archunit-junit5-engine:0.20.0'
-    testImplementation 'com.tngtech.archunit:archunit-junit5-api:0.20.0'
+    testRuntimeOnly 'com.tngtech.archunit:archunit-junit5-engine:0.20.1'
+    testImplementation 'com.tngtech.archunit:archunit-junit5-api:0.20.1'
     testImplementation "org.testfx:testfx-core:4.0.17-alpha-SNAPSHOT"
     testImplementation "org.testfx:testfx-junit5:4.0.17-alpha-SNAPSHOT"
     testImplementation "org.hamcrest:hamcrest-library:2.2"
