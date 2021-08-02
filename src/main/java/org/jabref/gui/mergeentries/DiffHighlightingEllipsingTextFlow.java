@@ -18,12 +18,13 @@ public class DiffHighlightingEllipsingTextFlow extends TextFlow {
 
     private ObservableList<Node> allChildren = FXCollections.observableArrayList();
     private ChangeListener sizeChangeListener = (observableValue, number, t1) -> adjustText();
+    private ListChangeListener<Node> listChangeListener = this::adjustChildren;
 
-    private String fullText;
+    private final String fullText;
 
     public DiffHighlightingEllipsingTextFlow(String fullText) {
         this.fullText = fullText;
-        allChildren.addListener((ListChangeListener<Node>) this::adjustChildren);
+        allChildren.addListener(listChangeListener);
         widthProperty().addListener(sizeChangeListener);
         heightProperty().addListener(sizeChangeListener);
         adjustText();
@@ -46,6 +47,9 @@ public class DiffHighlightingEllipsingTextFlow extends TextFlow {
     }
 
     private void adjustText() {
+        if (allChildren.size() == 0) {
+            return;
+        }
         // remove listeners
         widthProperty().removeListener(sizeChangeListener);
         heightProperty().removeListener(sizeChangeListener);
@@ -103,10 +107,22 @@ public class DiffHighlightingEllipsingTextFlow extends TextFlow {
         heightProperty().addListener(sizeChangeListener);
     }
 
+    public void highlightDiffTo(String s) {
+        allChildren.removeListener(listChangeListener);
+        allChildren.clear();
+        if (s != null && !s.equals(fullText)) {
+            allChildren.addAll(DiffHighlighting.generateDiffHighlighting(fullText, s, " "));
+        } else {
+            allChildren.addAll(new Text(fullText));
+        }
+        adjustText();
+        allChildren.addListener(listChangeListener);
+    }
+
     private String ellipseString(String s) {
         int spacePos = s.lastIndexOf(' ');
         if (spacePos < 0) {
-            return getEllipsisString();
+            return "";
         }
         return s.substring(0, spacePos) + getEllipsisString();
     }
@@ -125,9 +141,5 @@ public class DiffHighlightingEllipsingTextFlow extends TextFlow {
 
     public String getFullText() {
         return fullText;
-    }
-
-    public void setFullText(String fullText) {
-        this.fullText = fullText;
     }
 }
