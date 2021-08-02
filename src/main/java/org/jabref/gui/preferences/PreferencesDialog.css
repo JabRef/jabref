@@ -76,3 +76,7 @@
 .code-area .context-menu .menu-item .label {
     -fx-padding: 2;
 }
+
+.ikonli-font-icon {
+    -fx-icon-color: -fx-text-base-color;
+}
