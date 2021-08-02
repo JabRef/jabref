@@ -33,8 +33,7 @@ class BibDatabaseContextTest {
     void getFileDirectoriesWithEmptyDbParent() {
         BibDatabaseContext database = new BibDatabaseContext();
         database.setDatabasePath(Path.of("biblio.bib"));
-        assertEquals(Collections.singletonList(currentWorkingDir),
-                database.getFileDirectories(fileDirPrefs));
+        assertEquals(Collections.singletonList(currentWorkingDir), database.getFileDirectories(fileDirPrefs));
     }
 
     @Test
@@ -43,8 +42,7 @@ class BibDatabaseContextTest {
 
         BibDatabaseContext database = new BibDatabaseContext();
         database.setDatabasePath(file);
-        assertEquals(Collections.singletonList(currentWorkingDir.resolve(file.getParent())),
-                database.getFileDirectories(fileDirPrefs));
+        assertEquals(Collections.singletonList(currentWorkingDir.resolve(file.getParent())), database.getFileDirectories(fileDirPrefs));
     }
 
     @Test
@@ -53,8 +51,7 @@ class BibDatabaseContextTest {
 
         BibDatabaseContext database = new BibDatabaseContext();
         database.setDatabasePath(file);
-        assertEquals(Collections.singletonList(currentWorkingDir.resolve(file.getParent())),
-                database.getFileDirectories(fileDirPrefs));
+        assertEquals(Collections.singletonList(currentWorkingDir.resolve(file.getParent())), database.getFileDirectories(fileDirPrefs));
     }
 
     @Test
@@ -63,8 +60,7 @@ class BibDatabaseContextTest {
 
         BibDatabaseContext database = new BibDatabaseContext();
         database.setDatabasePath(file);
-        assertEquals(Collections.singletonList(currentWorkingDir.resolve(file.getParent())),
-                database.getFileDirectories(fileDirPrefs));
+        assertEquals(Collections.singletonList(currentWorkingDir.resolve(file.getParent())), database.getFileDirectories(fileDirPrefs));
     }
 
     @Test
@@ -115,5 +111,29 @@ class BibDatabaseContextTest {
 
         BibDatabaseContext bibDatabaseContext = new BibDatabaseContext(db);
         assertEquals(BibDatabaseMode.BIBLATEX, bibDatabaseContext.getMode());
+    }
+
+    @Test
+    void testGetFullTextIndexPathWhenPathIsNull() {
+        BibDatabaseContext bibDatabaseContext = new BibDatabaseContext();
+        bibDatabaseContext.setDatabasePath(null);
+
+        Path expectedPath = BibDatabaseContext.getFulltextIndexBasePath().resolve("unsaved");
+        Path actualPath = bibDatabaseContext.getFulltextIndexPath();
+
+        assertEquals(expectedPath, actualPath);
+    }
+
+    @Test
+    void testGetFullTextIndexPathWhenPathIsNotNull() {
+        Path existingPath = Path.of("some_path.bib");
+
+        BibDatabaseContext bibDatabaseContext = new BibDatabaseContext();
+        bibDatabaseContext.setDatabasePath(existingPath);
+
+        Path expectedPath = BibDatabaseContext.getFulltextIndexBasePath().resolve(existingPath.hashCode() + "");
+        Path actualPath = bibDatabaseContext.getFulltextIndexPath();
+
+        assertEquals(expectedPath, actualPath);
     }
 }

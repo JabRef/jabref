@@ -1,6 +1,7 @@
 package org.jabref.gui;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -43,8 +44,11 @@ import org.jabref.logic.autosaveandbackup.AutosaveManager;
 import org.jabref.logic.autosaveandbackup.BackupManager;
 import org.jabref.logic.citationstyle.CitationStyleCache;
 import org.jabref.logic.importer.ParserResult;
+import org.jabref.logic.importer.util.FileFieldParser;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.pdf.FileAnnotationCache;
+import org.jabref.logic.pdf.search.indexing.IndexingTaskManager;
+import org.jabref.logic.pdf.search.indexing.PdfIndexer;
 import org.jabref.logic.search.SearchQuery;
 import org.jabref.logic.shared.DatabaseLocation;
 import org.jabref.logic.util.UpdateField;
@@ -56,10 +60,13 @@ import org.jabref.model.database.event.BibDatabaseContextChangedEvent;
 import org.jabref.model.database.event.EntriesAddedEvent;
 import org.jabref.model.database.event.EntriesRemovedEvent;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.event.EntriesEventSource;
 import org.jabref.model.entry.event.EntryChangedEvent;
+import org.jabref.model.entry.event.FieldChangedEvent;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.preferences.PreferencesService;
 
 import com.google.common.eventbus.Subscribe;
@@ -101,6 +108,8 @@ public class LibraryTab extends Tab {
     // initializing it so we prevent NullPointerException
     private BackgroundTask<ParserResult> dataLoadingTask = BackgroundTask.wrap(() -> null);
 
+    private IndexingTaskManager indexingTaskManager = new IndexingTaskManager(Globals.TASK_EXECUTOR);
+
     public LibraryTab(JabRefFrame frame,
                       PreferencesService preferencesService,
                       BibDatabaseContext bibDatabaseContext,
@@ -125,6 +134,7 @@ public class LibraryTab extends Tab {
         setupAutoCompletion();
 
         this.getDatabase().registerListener(new SearchListener());
+        this.getDatabase().registerListener(new IndexUpdateListener());
         this.getDatabase().registerListener(new EntriesRemovedListener());
 
         // ensure that at each addition of a new entry, the entry is added to the groups interface
@@ -332,6 +342,8 @@ public class LibraryTab extends Tab {
             textProperty().setValue(tabTitle.toString());
             setTooltip(new Tooltip(toolTipText.toString()));
         });
+
+        indexingTaskManager.updateDatabaseName(tabTitle.toString());
     }
 
     private List<String> collectAllDatabasePaths() {
@@ -845,5 +857,64 @@ public class LibraryTab extends Tab {
             // IMO only used to update the status (found X entries)
             DefaultTaskExecutor.runInJavaFXThread(() -> frame.getGlobalSearchBar().performSearch());
         }
+    }
+
+    private class IndexUpdateListener {
+
+        public IndexUpdateListener() {
+            try {
+                indexingTaskManager.addToIndex(PdfIndexer.of(bibDatabaseContext, preferencesService.getFilePreferences()), bibDatabaseContext);
+            } catch (IOException e) {
+                LOGGER.error("Cannot access lucene index", e);
+            }
+        }
+
+        @Subscribe
+        public void listen(EntriesAddedEvent addedEntryEvent) {
+            try {
+                PdfIndexer pdfIndexer = PdfIndexer.of(bibDatabaseContext, preferencesService.getFilePreferences());
+                for (BibEntry addedEntry : addedEntryEvent.getBibEntries()) {
+                    indexingTaskManager.addToIndex(pdfIndexer, addedEntry, bibDatabaseContext);
+                }
+            } catch (IOException e) {
+                LOGGER.error("Cannot access lucene index", e);
+            }
+        }
+
+        @Subscribe
+        public void listen(EntriesRemovedEvent removedEntriesEvent) {
+            try {
+                PdfIndexer pdfIndexer = PdfIndexer.of(bibDatabaseContext, preferencesService.getFilePreferences());
+                for (BibEntry removedEntry : removedEntriesEvent.getBibEntries()) {
+                    indexingTaskManager.removeFromIndex(pdfIndexer, removedEntry);
+                }
+            } catch (IOException e) {
+                LOGGER.error("Cannot access lucene index", e);
+            }
+        }
+
+        @Subscribe
+        public void listen(FieldChangedEvent fieldChangedEvent) {
+            if (fieldChangedEvent.getField().equals(StandardField.FILE)) {
+                List<LinkedFile> oldFileList = FileFieldParser.parse(fieldChangedEvent.getOldValue());
+                List<LinkedFile> newFileList = FileFieldParser.parse(fieldChangedEvent.getNewValue());
+
+                List<LinkedFile> addedFiles = new ArrayList<>(newFileList);
+                addedFiles.remove(oldFileList);
+                List<LinkedFile> removedFiles = new ArrayList<>(oldFileList);
+                removedFiles.remove(newFileList);
+
+                try {
+                    indexingTaskManager.addToIndex(PdfIndexer.of(bibDatabaseContext, preferencesService.getFilePreferences()), fieldChangedEvent.getBibEntry(), addedFiles, bibDatabaseContext);
+                    indexingTaskManager.removeFromIndex(PdfIndexer.of(bibDatabaseContext, preferencesService.getFilePreferences()), fieldChangedEvent.getBibEntry(), removedFiles);
+                } catch (IOException e) {
+                    LOGGER.warn("I/O error when writing lucene index", e);
+                }
+            }
+        }
+    }
+
+    public IndexingTaskManager getIndexingTaskManager() {
+        return indexingTaskManager;
     }
 }

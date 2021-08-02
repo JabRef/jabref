@@ -1,6 +1,7 @@
 package org.jabref.gui.groups;
 
 import java.util.EnumMap;
+import java.util.EnumSet;
 
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -21,6 +22,8 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.groups.AbstractGroup;
 import org.jabref.model.groups.GroupHierarchyType;
+import org.jabref.model.search.rules.SearchRules;
+import org.jabref.model.search.rules.SearchRules.SearchFlags;
 import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
@@ -124,8 +127,24 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
         keywordGroupRegex.selectedProperty().bindBidirectional(viewModel.keywordGroupRegexProperty());
 
         searchGroupSearchTerm.textProperty().bindBidirectional(viewModel.searchGroupSearchTermProperty());
-        searchGroupCaseSensitive.selectedProperty().bindBidirectional(viewModel.searchGroupCaseSensitiveProperty());
-        searchGroupRegex.selectedProperty().bindBidirectional(viewModel.searchGroupRegexProperty());
+        searchGroupCaseSensitive.selectedProperty().addListener((observable, oldValue, newValue) -> {
+            EnumSet<SearchFlags> searchFlags = viewModel.searchFlagsProperty().get();
+            if (newValue) {
+                searchFlags.add(SearchRules.SearchFlags.CASE_SENSITIVE);
+            } else {
+                searchFlags.remove(SearchRules.SearchFlags.CASE_SENSITIVE);
+            }
+            viewModel.searchFlagsProperty().set(searchFlags);
+        });
+        searchGroupRegex.selectedProperty().addListener((observable, oldValue, newValue) -> {
+            EnumSet<SearchFlags> searchFlags = viewModel.searchFlagsProperty().get();
+            if (newValue) {
+                searchFlags.add(SearchRules.SearchFlags.REGULAR_EXPRESSION);
+            } else {
+                searchFlags.remove(SearchRules.SearchFlags.REGULAR_EXPRESSION);
+            }
+            viewModel.searchFlagsProperty().set(searchFlags);
+        });
 
         autoGroupKeywordsOption.selectedProperty().bindBidirectional(viewModel.autoGroupKeywordsOptionProperty());
         autoGroupKeywordsField.textProperty().bindBidirectional(viewModel.autoGroupKeywordsFieldProperty());

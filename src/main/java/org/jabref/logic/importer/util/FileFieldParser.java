@@ -9,13 +9,27 @@ import java.util.List;
 
 import org.jabref.model.entry.LinkedFile;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class FileFieldParser {
+    private static final Logger LOGGER = LoggerFactory.getLogger(FileFieldParser.class);
 
     public static List<LinkedFile> parse(String value) {
         List<LinkedFile> files = new ArrayList<>();
 
         if ((value == null) || value.trim().isEmpty()) {
             return files;
+        }
+
+        if (LinkedFile.isOnlineLink(value.trim())) {
+            // needs to be modifiable
+            try {
+                return List.of(new LinkedFile(new URL(value), ""));
+            } catch (MalformedURLException e) {
+                LOGGER.error("invalid url", e);
+                return files;
+            }
         }
 
         List<String> linkedFileData = new ArrayList<>();
