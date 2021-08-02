@@ -35,23 +35,13 @@ public class FileTabViewModel implements PreferenceTabViewModel {
     private final ListProperty<NewLineSeparator> newLineSeparatorListProperty = new SimpleListProperty<>();
     private final ObjectProperty<NewLineSeparator> selectedNewLineSeparatorProperty = new SimpleObjectProperty<>();
     private final BooleanProperty alwaysReformatBibProperty = new SimpleBooleanProperty();
-
-    // SaveOrderConfigPanel
-    private final BooleanProperty exportInOriginalProperty = new SimpleBooleanProperty();
-    private final BooleanProperty exportInTableOrderProperty = new SimpleBooleanProperty();
-    private final BooleanProperty exportInSpecifiedOrderProperty = new SimpleBooleanProperty();
-    private final ListProperty<Field> sortableFieldsProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
-    private final ListProperty<SortCriterionViewModel> sortCriteriaProperty = new SimpleListProperty<>(FXCollections.observableArrayList(new LinkedList<>()));
-
     private final BooleanProperty autosaveLocalLibraries = new SimpleBooleanProperty();
 
     private final PreferencesService preferences;
-    private final SaveOrderConfig initialExportOrder;
     private final ImportExportPreferences initialImportExportPreferences;
 
     FileTabViewModel(PreferencesService preferences) {
         this.preferences = preferences;
-        this.initialExportOrder = preferences.getExportSaveOrder();
         this.initialImportExportPreferences = preferences.getImportExportPreferences();
     }
 
@@ -67,20 +57,6 @@ public class FileTabViewModel implements PreferenceTabViewModel {
         selectedNewLineSeparatorProperty.setValue(initialImportExportPreferences.getNewLineSeparator());
 
         alwaysReformatBibProperty.setValue(initialImportExportPreferences.shouldAlwaysReformatOnSave());
-
-        switch (initialExportOrder.getOrderType()) {
-            case SPECIFIED -> exportInSpecifiedOrderProperty.setValue(true);
-            case ORIGINAL -> exportInOriginalProperty.setValue(true);
-            case TABLE -> exportInTableOrderProperty.setValue(true);
-        }
-
-        List<Field> fieldNames = new ArrayList<>(FieldFactory.getCommonFields());
-        fieldNames.sort(Comparator.comparing(Field::getDisplayName));
-
-        sortableFieldsProperty.addAll(fieldNames);
-        sortCriteriaProperty.addAll(initialExportOrder.getSortCriteria().stream()
-                                                      .map(SortCriterionViewModel::new)
-                                                      .collect(Collectors.toList()));
 
         autosaveLocalLibraries.setValue(preferences.shouldAutosave());
     }
@@ -100,11 +76,6 @@ public class FileTabViewModel implements PreferenceTabViewModel {
                 initialImportExportPreferences.getLastExportExtension(),
                 initialImportExportPreferences.getExportWorkingDirectory());
         preferences.storeImportExportPreferences(newImportExportPreferences);
-
-        SaveOrderConfig newSaveOrderConfig = new SaveOrderConfig(
-                SaveOrderConfig.OrderType.fromBooleans(exportInSpecifiedOrderProperty.getValue(), exportInTableOrderProperty.getValue()),
-                new LinkedList<>(sortCriteriaProperty.stream().map(SortCriterionViewModel::getCriterion).toList()));
-        preferences.storeExportSaveOrder(newSaveOrderConfig);
 
         preferences.storeShouldAutosave(autosaveLocalLibraries.getValue());
     }
@@ -146,27 +117,5 @@ public class FileTabViewModel implements PreferenceTabViewModel {
     // Autosave
     public BooleanProperty autosaveLocalLibrariesProperty() {
         return autosaveLocalLibraries;
-    }
-
-    // SaveOrderConfigPanel
-
-    public BooleanProperty saveInOriginalProperty() {
-        return exportInOriginalProperty;
-    }
-
-    public BooleanProperty saveInTableOrderProperty() {
-        return exportInTableOrderProperty;
-    }
-
-    public BooleanProperty saveInSpecifiedOrderProperty() {
-        return exportInSpecifiedOrderProperty;
-    }
-
-    public ListProperty<Field> sortableFieldsProperty() {
-        return sortableFieldsProperty;
-    }
-
-    public ListProperty<SortCriterionViewModel> sortCriteriaProperty() {
-        return sortCriteriaProperty;
     }
 }

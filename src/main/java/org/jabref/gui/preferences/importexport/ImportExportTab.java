@@ -4,6 +4,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.TextField;
 
+import org.jabref.gui.commonfxcontrols.SaveOrderConfigPanel;
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.preferences.PreferencesTab;
 import org.jabref.logic.l10n.Localization;
@@ -15,6 +16,8 @@ public class ImportExportTab extends AbstractPreferenceTabView<ImportExportTabVi
     @FXML private CheckBox generateNewKeyOnImport;
     @FXML private CheckBox useCustomDOI;
     @FXML private TextField useCustomDOIName;
+
+    @FXML private SaveOrderConfigPanel exportOrderPanel;
 
     public ImportExportTab() {
         ViewLoader.view(this)
@@ -35,5 +38,11 @@ public class ImportExportTab extends AbstractPreferenceTabView<ImportExportTabVi
         useCustomDOIName.disableProperty().bind(useCustomDOI.selectedProperty().not());
 
         generateNewKeyOnImport.selectedProperty().bindBidirectional(viewModel.generateKeyOnImportProperty());
+
+        exportOrderPanel.saveInOriginalProperty().bindBidirectional(viewModel.saveInOriginalProperty());
+        exportOrderPanel.saveInTableOrderProperty().bindBidirectional(viewModel.saveInTableOrderProperty());
+        exportOrderPanel.saveInSpecifiedOrderProperty().bindBidirectional(viewModel.saveInSpecifiedOrderProperty());
+        exportOrderPanel.sortableFieldsProperty().bind(viewModel.sortableFieldsProperty());
+        exportOrderPanel.sortCriteriaProperty().bindBidirectional(viewModel.sortCriteriaProperty());
     }
 }

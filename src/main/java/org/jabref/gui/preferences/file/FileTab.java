@@ -31,8 +31,6 @@ public class FileTab extends AbstractPreferenceTabView<FileTabViewModel> impleme
     @FXML private ComboBox<NewLineSeparator> newLineSeparator;
     @FXML private CheckBox alwaysReformatBib;
 
-    @FXML private SaveOrderConfigPanel exportOrderPanel;
-
     @FXML private CheckBox autosaveLocalLibraries;
     @FXML private Button autosaveLocalLibrariesHelp;
 
@@ -56,12 +54,6 @@ public class FileTab extends AbstractPreferenceTabView<FileTabViewModel> impleme
         newLineSeparator.itemsProperty().bind(viewModel.newLineSeparatorListProperty());
         newLineSeparator.valueProperty().bindBidirectional(viewModel.selectedNewLineSeparatorProperty());
         alwaysReformatBib.selectedProperty().bindBidirectional(viewModel.alwaysReformatBibProperty());
-
-        exportOrderPanel.saveInOriginalProperty().bindBidirectional(viewModel.saveInOriginalProperty());
-        exportOrderPanel.saveInTableOrderProperty().bindBidirectional(viewModel.saveInTableOrderProperty());
-        exportOrderPanel.saveInSpecifiedOrderProperty().bindBidirectional(viewModel.saveInSpecifiedOrderProperty());
-        exportOrderPanel.sortableFieldsProperty().bind(viewModel.sortableFieldsProperty());
-        exportOrderPanel.sortCriteriaProperty().bindBidirectional(viewModel.sortCriteriaProperty());
 
         autosaveLocalLibraries.selectedProperty().bindBidirectional(viewModel.autosaveLocalLibrariesProperty());
 
