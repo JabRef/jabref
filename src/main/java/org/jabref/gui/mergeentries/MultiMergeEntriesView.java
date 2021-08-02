@@ -227,7 +227,6 @@ public class MultiMergeEntriesView extends BaseDialog<BibEntry> {
 
         public Cell(String content, Field field, int columnIndex) {
             this.content = content;
-            setAlignment(Pos.CENTER);
 
             FieldRow row = fieldRows.get(field);
 
@@ -248,10 +247,6 @@ public class MultiMergeEntriesView extends BaseDialog<BibEntry> {
 
             // Text
             DiffHighlightingEllipsingTextFlow buttonText = new DiffHighlightingEllipsingTextFlow(content);
-            fieldBinding = viewModel.mergedEntryProperty().get()
-                     .getFieldBinding(field).asOrdinary();
-            fieldBinding.subscribe(buttonText::highlightDiffTo);
-            buttonText.highlightDiffTo(viewModel.mergedEntryProperty().get().getField(field).orElse(""));
 
             buttonText.maxWidthProperty().bind(widthProperty());
             buttonText.maxHeightProperty().bind(heightProperty());
@@ -268,6 +263,10 @@ public class MultiMergeEntriesView extends BaseDialog<BibEntry> {
             if (row.toggleGroup.getSelectedToggle() == null) {
                 cellButton.setSelected(true);
             }
+
+            fieldBinding = viewModel.mergedEntryProperty().get()
+                                    .getFieldBinding(field).asOrdinary();
+            fieldBinding.subscribe(buttonText::highlightDiffTo);
 
             if (field.equals(StandardField.DOI)) {
                 Button doiButton = IconTheme.JabRefIcons.LOOKUP_IDENTIFIER.asButton();

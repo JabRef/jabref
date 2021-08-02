@@ -8,7 +8,6 @@ import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.text.Text;
-import javafx.scene.text.TextAlignment;
 import javafx.scene.text.TextFlow;
 
 @DefaultProperty("children")
@@ -28,7 +27,6 @@ public class DiffHighlightingEllipsingTextFlow extends TextFlow {
         allChildren.addListener(listChangeListener);
         widthProperty().addListener(sizeChangeListener);
         heightProperty().addListener(sizeChangeListener);
-        adjustText();
     }
 
     @Override
@@ -38,12 +36,10 @@ public class DiffHighlightingEllipsingTextFlow extends TextFlow {
 
     private void adjustChildren(ListChangeListener.Change<? extends Node> change) {
         while (change.next()) {
-            if (change.wasRemoved()) {
-                super.getChildren().remove(change.getFrom(), change.getTo());
-            } else if (change.wasAdded()) {
-                super.getChildren().addAll(change.getFrom(), change.getAddedSubList());
-            }
+            super.getChildren().clear();
+            super.getChildren().addAll(allChildren);
         }
+        super.autosize();
         adjustText();
     }
 
@@ -109,18 +105,12 @@ public class DiffHighlightingEllipsingTextFlow extends TextFlow {
     }
 
     public void highlightDiffTo(String s) {
-        allChildren.removeListener(listChangeListener);
         allChildren.clear();
-        super.getChildren().clear();
         if (s != null && !s.equals(fullText)) {
             allChildren.addAll(DiffHighlighting.generateDiffHighlighting(fullText, s, " "));
         } else {
             allChildren.addAll(new Text(fullText));
         }
-        super.getChildren().addAll(allChildren);
-        allChildren.addListener(listChangeListener);
-        super.autosize();
-        adjustText();
     }
 
     private String ellipseString(String s) {
