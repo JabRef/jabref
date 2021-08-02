@@ -8,6 +8,7 @@ import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.text.Text;
+import javafx.scene.text.TextAlignment;
 import javafx.scene.text.TextFlow;
 
 @DefaultProperty("children")
@@ -110,13 +111,16 @@ public class DiffHighlightingEllipsingTextFlow extends TextFlow {
     public void highlightDiffTo(String s) {
         allChildren.removeListener(listChangeListener);
         allChildren.clear();
+        super.getChildren().clear();
         if (s != null && !s.equals(fullText)) {
             allChildren.addAll(DiffHighlighting.generateDiffHighlighting(fullText, s, " "));
         } else {
             allChildren.addAll(new Text(fullText));
         }
-        adjustText();
+        super.getChildren().addAll(allChildren);
         allChildren.addListener(listChangeListener);
+        super.autosize();
+        adjustText();
     }
 
     private String ellipseString(String s) {

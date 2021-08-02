@@ -22,9 +22,9 @@ import org.jabref.model.entry.field.Field;
 
 public class MultiMergeEntriesViewModel extends AbstractViewModel {
 
-    private ListProperty<Entry> entries = new SimpleListProperty<>(FXCollections.observableArrayList());
+    private final ListProperty<Entry> entries = new SimpleListProperty<>(FXCollections.observableArrayList());
 
-    private ObjectProperty<BibEntry> mergedEntry = new SimpleObjectProperty<>(new BibEntry());
+    private final ObjectProperty<BibEntry> mergedEntry = new SimpleObjectProperty<>(new BibEntry());
 
     public void addSource(Entry entryColumn) {
         if (!entryColumn.isLoading.getValue()) {

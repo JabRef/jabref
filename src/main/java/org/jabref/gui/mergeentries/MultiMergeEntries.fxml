@@ -9,6 +9,7 @@
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.VBox?>
 
+<?import javafx.scene.layout.Region?>
 <DialogPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
             fx:controller="org.jabref.gui.mergeentries.MultiMergeEntriesView"
             prefHeight="500.0" prefWidth="800.0">
@@ -16,10 +17,10 @@
     <content>
         <SplitPane dividerPositions="0.1, 0.6, 0.3">
             <VBox>
-                <Label text="Supplier" prefHeight="${topScrollPane.height}" VBox.vgrow="NEVER">
+                <Region prefHeight="${topScrollPane.height}" VBox.vgrow="NEVER">
                     <minHeight><Control fx:constant="USE_PREF_SIZE" /></minHeight>
                     <maxHeight><Control fx:constant="USE_PREF_SIZE" /></maxHeight>
-                </Label>
+                </Region>
                 <ScrollPane fx:id="leftScrollPane" hbarPolicy="NEVER" vbarPolicy="NEVER" VBox.vgrow="ALWAYS">
                     <VBox fx:id="fieldHeader"/>
                 </ScrollPane>
@@ -29,11 +30,11 @@
                     <HBox fx:id="supplierHeader" />
                 </ScrollPane>
                 <ScrollPane fx:id="centerScrollPane" vbarPolicy="NEVER" VBox.vgrow="ALWAYS">
-                    <GridPane fx:id="optionsGrid" />
+                    <GridPane fx:id="optionsGrid" styleClass="grid-pane"/>
                 </ScrollPane>
             </VBox>
-            <VBox>
-                <Label text="Entry" prefHeight="${topScrollPane.height}" VBox.vgrow="NEVER">
+            <VBox alignment="TOP_CENTER">
+                <Label text="%Merged Entry" prefHeight="${topScrollPane.height}" textAlignment="CENTER" VBox.vgrow="NEVER">
                     <minHeight><Control fx:constant="USE_PREF_SIZE" /></minHeight>
                     <maxHeight><Control fx:constant="USE_PREF_SIZE" /></maxHeight>
                 </Label>

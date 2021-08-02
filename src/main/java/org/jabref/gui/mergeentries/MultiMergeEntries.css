@@ -1,0 +1,41 @@
+.text-changed {
+    -fx-fill: darkgreen;
+}
+
+.text-added {
+    -fx-fill: #54A3F2;
+}
+
+.text-removed {
+    -fx-fill: #FA5B68;
+}
+
+.label {
+    -fx-padding: 10, 10, 10, 10;
+}
+
+.grid-pane {
+    -fx-spacing: 10;
+}
+
+.toggle-button {
+    -fx-start-margin: 10;
+    -fx-end-margin: 10;
+}
+
+.text-area, .text-field{
+    -fx-border-insets: 10;
+}
+
+.text-field {
+    -fx-background-insets: 10;
+    -fx-padding: 10;
+}
+
+.text-area:focused .content {
+    -fx-background-color: transparent, white, transparent, white;
+}
+
+.text-area .content {
+    -fx-background-color: transparent, white, transparent, white;
+}
