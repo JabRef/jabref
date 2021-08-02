@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<style xmlns="http://purl.org/net/xbiblio/csl" class="note" version="1.0" demote-non-dropping-particle="display-and-sort" page-range-format="expanded" default-locale="nb-NO">
+<style xmlns="http://purl.org/net/xbiblio/csl" class="note" version="1.0" demote-non-dropping-particle="sort-only" page-range-format="expanded" default-locale="nb-NO">
   <info>
     <title>Norsk henvisningsstandard for rettsvitenskapelige tekster (Norsk - Bokmål)</title>
     <title-short>Norsk rettsvitenskap</title-short>
@@ -18,7 +18,7 @@
     <category citation-format="note"/>
     <category field="law"/>
     <summary>Norwegian legal citation style based on "Veiledning for henvisninger i juridiske tekster" (February 2019).</summary>
-    <updated>2021-06-08T10:53:00+00:00</updated>
+    <updated>2021-07-01T15:10:00+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="nb-NO">
@@ -38,6 +38,8 @@
       <term name="edition">utgave</term>
       <term name="edition" form="short">utg.</term>
       <term name="volume">bind</term>
+      <term name="page">side</term>
+      <term name="page" form="short">s.</term>
     </terms>
   </locale>
   <macro name="type-sorting">
@@ -102,7 +104,7 @@
   </macro>
   <macro name="title">
     <choose>
-      <if type="chapter article-journal article-newspaper article-magazine" match="any">
+      <if type="chapter article-journal article-newspaper article-magazine post-weblog" match="any">
         <text quotes="true" variable="title"/>
       </if>
       <else-if type="legislation">
@@ -201,21 +203,15 @@
     </choose>
   </macro>
   <macro name="DOI">
-    <choose>
-      <if variable="DOI" match="none">
-        <text prefix=", " variable="URL"/>
-      </if>
-      <else>
-        <text prefix=". DOI: https://doi.org/" variable="DOI"/>
-      </else>
-    </choose>
+    <text prefix=". DOI: https://doi.org/" variable="DOI"/>
   </macro>
   <macro name="nor-case">
     <choose>
       <if variable="container-title" match="any">
         <text variable="container-title"/>
         <text prefix=" " variable="volume"/>
-        <text prefix=" s. " variable="page"/>
+        <text prefix=" " suffix=" " term="page" form="short"/>
+        <text variable="page"/>
         <text prefix=" (" suffix=")" variable="title-short"/>
       </if>
       <else-if variable="number" match="any">
@@ -253,7 +249,7 @@
     <layout delimiter="; ">
       <group delimiter=" ">
         <choose>
-          <if type="book thesis chapter article-journal article-newspaper article-magazine personal_communication" match="any">
+          <if type="book thesis chapter article-journal article-newspaper article-magazine post-weblog personal_communication" match="any">
             <text macro="author-short"/>
             <text macro="issued"/>
           </if>
@@ -290,12 +286,13 @@
             <text prefix=", " macro="title"/>
             <text prefix=" " font-style="italic" variable="container-title"/>
             <text prefix=" " macro="issued"/>
-            <text prefix=" s. " variable="page"/>
+            <text prefix=" " suffix=" " term="page" form="short"/>
+            <text variable="page"/>
             <text macro="DOI"/>
             <text prefix=" " macro="retrieved-from"/>
           </group>
         </if>
-        <else-if type="article-newspaper article-magazine" match="any">
+        <else-if type="article-newspaper article-magazine post-weblog" match="any">
           <group suffix=".">
             <text macro="author-full"/>
             <text prefix=", " macro="title"/>
@@ -321,6 +318,7 @@
             <text macro="edition-short"/>
             <text prefix=", " variable="publisher"/>
             <text prefix=" " macro="issued-no-parenthesis"/>
+            <text macro="DOI"/>
           </group>
         </else-if>
         <else-if type="chapter paper-conference" match="any">
@@ -333,8 +331,15 @@
             <text macro="edition-short"/>
             <text prefix=", " variable="publisher"/>
             <text prefix=" " macro="issued-no-parenthesis"/>
-            <text prefix=", " variable="URL"/>
-            <text prefix=" " macro="accessed-date"/>
+            <choose>
+              <if variable="DOI" match="any">
+                <text prefix=". DOI: https://doi.org/" variable="DOI"/>
+              </if>
+              <else-if variable="URL" match="any">
+                <text prefix=", " variable="URL"/>
+                <text macro="accessed-date"/>
+              </else-if>
+            </choose>
           </group>
         </else-if>
         <else-if type="legislation bill" match="any">
