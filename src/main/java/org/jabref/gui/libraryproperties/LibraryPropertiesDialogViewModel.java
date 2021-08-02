@@ -170,7 +170,7 @@ public class LibraryPropertiesDialogViewModel {
 
         SaveOrderConfig newSaveOrderConfig = new SaveOrderConfig(
                 SaveOrderConfig.OrderType.fromBooleans(saveInSpecifiedOrderProperty.getValue(), saveInOriginalProperty.getValue()),
-                new LinkedList<>(sortCriteriaProperty.stream().map(SortCriterionViewModel::getCriterion).toList()));
+                sortCriteriaProperty.stream().map(SortCriterionViewModel::getCriterion).toList());
 
         if (!newSaveOrderConfig.equals(initialSaveOrderConfig)) {
             if (newSaveOrderConfig.equals(SaveOrderConfig.getDefaultSaveOrder())) {

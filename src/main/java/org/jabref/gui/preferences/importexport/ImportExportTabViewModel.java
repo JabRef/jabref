@@ -2,7 +2,6 @@ package org.jabref.gui.preferences.importexport;
 
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -35,7 +34,7 @@ public class ImportExportTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty exportInTableOrderProperty = new SimpleBooleanProperty();
     private final BooleanProperty exportInSpecifiedOrderProperty = new SimpleBooleanProperty();
     private final ListProperty<Field> sortableFieldsProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
-    private final ListProperty<SortCriterionViewModel> sortCriteriaProperty = new SimpleListProperty<>(FXCollections.observableArrayList(new LinkedList<>()));
+    private final ListProperty<SortCriterionViewModel> sortCriteriaProperty = new SimpleListProperty<>(FXCollections.observableArrayList(new ArrayList<>()));
 
     private final PreferencesService preferencesService;
     private final DOIPreferences initialDOIPreferences;
@@ -81,7 +80,7 @@ public class ImportExportTabViewModel implements PreferenceTabViewModel {
 
         SaveOrderConfig newSaveOrderConfig = new SaveOrderConfig(
                 SaveOrderConfig.OrderType.fromBooleans(exportInSpecifiedOrderProperty.getValue(), exportInTableOrderProperty.getValue()),
-                new LinkedList<>(sortCriteriaProperty.stream().map(SortCriterionViewModel::getCriterion).toList()));
+                sortCriteriaProperty.stream().map(SortCriterionViewModel::getCriterion).toList());
         preferencesService.storeExportSaveOrder(newSaveOrderConfig);
 
     }

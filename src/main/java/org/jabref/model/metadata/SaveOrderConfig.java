@@ -1,7 +1,6 @@
 package org.jabref.model.metadata;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 
@@ -48,14 +47,14 @@ public class SaveOrderConfig {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SaveOrderConfig.class);
 
-    private final LinkedList<SortCriterion> sortCriteria = new LinkedList<>();
+    private final List<SortCriterion> sortCriteria = new ArrayList<>();
     private OrderType orderType;
 
     public SaveOrderConfig() {
         this.orderType = OrderType.ORIGINAL;
     }
 
-    public SaveOrderConfig(OrderType orderType, LinkedList<SortCriterion> sortCriteria) {
+    public SaveOrderConfig(OrderType orderType, List<SortCriterion> sortCriteria) {
         this.orderType = orderType;
         this.sortCriteria.addAll(sortCriteria);
     }
@@ -81,7 +80,7 @@ public class SaveOrderConfig {
         }
 
         for (int index = 1; index < data.size(); index = index + 2) {
-            sortCriteria.addLast(new SortCriterion(FieldFactory.parseField(data.get(index)), data.get(index + 1)));
+            sortCriteria.add(new SortCriterion(FieldFactory.parseField(data.get(index)), data.get(index + 1)));
         }
     }
 
@@ -99,7 +98,7 @@ public class SaveOrderConfig {
         return orderType;
     }
 
-    public LinkedList<SortCriterion> getSortCriteria() {
+    public List<SortCriterion> getSortCriteria() {
         return sortCriteria;
     }
 
