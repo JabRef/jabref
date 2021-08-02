@@ -1,5 +1,6 @@
 package org.jabref.gui.search;
 
+import java.util.EnumSet;
 import java.util.List;
 
 import javafx.scene.text.Text;
@@ -8,6 +9,8 @@ import javafx.stage.Stage;
 
 import org.jabref.gui.search.rules.describer.ContainsAndRegexBasedSearchRuleDescriber;
 import org.jabref.gui.util.TooltipTextUtil;
+import org.jabref.model.search.rules.SearchRules;
+import org.jabref.model.search.rules.SearchRules.SearchFlags;
 import org.jabref.testutils.category.GUITest;
 
 import org.junit.jupiter.api.Test;
@@ -32,7 +35,7 @@ class ContainsAndRegexBasedSearchRuleDescriberTest {
                 TooltipTextUtil.createText("This search contains entries in which any field contains the term "),
                 TooltipTextUtil.createText("test", TooltipTextUtil.TextType.BOLD),
                 TooltipTextUtil.createText(" (case insensitive). "));
-        TextFlow description = new ContainsAndRegexBasedSearchRuleDescriber(false, false, query).getDescription();
+        TextFlow description = new ContainsAndRegexBasedSearchRuleDescriber(EnumSet.noneOf(SearchFlags.class), query).getDescription();
 
         TextFlowEqualityHelper.assertEquals(expectedTexts, description);
     }
@@ -46,7 +49,7 @@ class ContainsAndRegexBasedSearchRuleDescriberTest {
                 TooltipTextUtil.createText(" and "),
                 TooltipTextUtil.createText("b", TooltipTextUtil.TextType.BOLD),
                 TooltipTextUtil.createText(" (case insensitive). "));
-        TextFlow description = new ContainsAndRegexBasedSearchRuleDescriber(false, false, query).getDescription();
+        TextFlow description = new ContainsAndRegexBasedSearchRuleDescriber(EnumSet.noneOf(SearchFlags.class), query).getDescription();
 
         TextFlowEqualityHelper.assertEquals(expectedTexts, description);
     }
@@ -60,7 +63,7 @@ class ContainsAndRegexBasedSearchRuleDescriberTest {
                 TooltipTextUtil.createText(" and "),
                 TooltipTextUtil.createText("b", TooltipTextUtil.TextType.BOLD),
                 TooltipTextUtil.createText(" (case insensitive). "));
-        TextFlow description = new ContainsAndRegexBasedSearchRuleDescriber(false, true, query).getDescription();
+        TextFlow description = new ContainsAndRegexBasedSearchRuleDescriber(EnumSet.of(SearchRules.SearchFlags.REGULAR_EXPRESSION), query).getDescription();
 
         TextFlowEqualityHelper.assertEquals(expectedTexts, description);
     }
@@ -74,7 +77,7 @@ class ContainsAndRegexBasedSearchRuleDescriberTest {
                 TooltipTextUtil.createText(" and "),
                 TooltipTextUtil.createText("b", TooltipTextUtil.TextType.BOLD),
                 TooltipTextUtil.createText(" (case sensitive). "));
-        TextFlow description = new ContainsAndRegexBasedSearchRuleDescriber(true, true, query).getDescription();
+        TextFlow description = new ContainsAndRegexBasedSearchRuleDescriber(EnumSet.of(SearchRules.SearchFlags.CASE_SENSITIVE, SearchRules.SearchFlags.REGULAR_EXPRESSION), query).getDescription();
 
         TextFlowEqualityHelper.assertEquals(expectedTexts, description);
     }
@@ -88,7 +91,7 @@ class ContainsAndRegexBasedSearchRuleDescriberTest {
                 TooltipTextUtil.createText(" and "),
                 TooltipTextUtil.createText("b", TooltipTextUtil.TextType.BOLD),
                 TooltipTextUtil.createText(" (case sensitive). "));
-        TextFlow description = new ContainsAndRegexBasedSearchRuleDescriber(true, false, query).getDescription();
+        TextFlow description = new ContainsAndRegexBasedSearchRuleDescriber(EnumSet.of(SearchRules.SearchFlags.CASE_SENSITIVE), query).getDescription();
 
         TextFlowEqualityHelper.assertEquals(expectedTexts, description);
     }

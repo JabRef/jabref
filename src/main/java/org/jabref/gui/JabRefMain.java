@@ -1,6 +1,12 @@
 package org.jabref.gui;
 
+import java.io.File;
+import java.io.IOException;
 import java.net.Authenticator;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Comparator;
 
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -20,6 +26,7 @@ import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.remote.client.RemoteClient;
 import org.jabref.logic.util.OS;
 import org.jabref.migrations.PreferencesMigrations;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.preferences.JabRefPreferences;
 import org.jabref.preferences.PreferencesService;
@@ -58,6 +65,8 @@ public class JabRefMain extends Application {
             Globals.startBackgroundTasks();
 
             applyPreferences(preferences);
+
+            clearOldSearchIndices();
 
             try {
                 // Process arguments
@@ -137,6 +146,26 @@ public class JabRefMain extends Application {
         ProxyRegisterer.register(proxyPreferences);
         if (proxyPreferences.isUseProxy() && proxyPreferences.isUseAuthentication()) {
             Authenticator.setDefault(new ProxyAuthenticator());
+        }
+    }
+
+    private static void clearOldSearchIndices() {
+        Path currentIndexPath = BibDatabaseContext.getFulltextIndexBasePath();
+        Path appData = currentIndexPath.getParent();
+
+        try (DirectoryStream<Path> stream = Files.newDirectoryStream(appData)) {
+            for (Path path : stream) {
+                if (Files.isDirectory(path) && !path.equals(currentIndexPath)) {
+                    LOGGER.info("Deleting out-of-date fulltext search index at {}.", path);
+                    Files.walk(path)
+                         .sorted(Comparator.reverseOrder())
+                         .map(Path::toFile)
+                         .forEach(File::delete);
+
+                }
+            }
+        } catch (IOException e) {
+            LOGGER.error("Could not access app-directory at {}", appData, e);
         }
     }
 }

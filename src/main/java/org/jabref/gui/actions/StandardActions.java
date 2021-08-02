@@ -30,6 +30,7 @@ public enum StandardActions implements Action {
     DELETE(Localization.lang("Delete"), IconTheme.JabRefIcons.DELETE_ENTRY),
     DELETE_ENTRY(Localization.lang("Delete Entry"), IconTheme.JabRefIcons.DELETE_ENTRY, KeyBinding.DELETE_ENTRY),
     SEND_AS_EMAIL(Localization.lang("Send as email"), IconTheme.JabRefIcons.EMAIL),
+    REBUILD_FULLTEXT_SEARCH_INDEX(Localization.lang("Rebuild fulltext search index"), IconTheme.JabRefIcons.FILE),
     OPEN_EXTERNAL_FILE(Localization.lang("Open file"), IconTheme.JabRefIcons.FILE, KeyBinding.OPEN_FILE),
     OPEN_URL(Localization.lang("Open URL or DOI"), IconTheme.JabRefIcons.WWW, KeyBinding.OPEN_URL_OR_DOI),
     SEARCH_SHORTSCIENCE(Localization.lang("Search ShortScience")),
