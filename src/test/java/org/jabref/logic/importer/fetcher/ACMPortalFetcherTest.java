@@ -50,14 +50,7 @@ class ACMPortalFetcherTest {
                         .withField(StandardField.TITLE, "The relationship of code churn and architectural violations in the open source software JabRef")
                         .withField(StandardField.URL, "https://doi.org/10.1145/3129790.3129810")
                         .withField(StandardField.PAGETOTAL, "7")
-                        .withField(StandardField.PAGES, "152–158"),
-                new BibEntry(StandardEntryType.Book)
-                        .withField(StandardField.YEAR, "2016")
-                        .withField(StandardField.TITLE, "Proceedings of the 2016 24th ACM SIGSOFT International Symposium on Foundations of Software Engineering")
-                        .withField(StandardField.LOCATION, "Seattle, WA, USA")
-                        .withField(StandardField.ISBN, "9781450342186")
-                        .withField(StandardField.PUBLISHER, "Association for Computing Machinery")
-                        .withField(StandardField.ADDRESS, "New York, NY, USA")
+                        .withField(StandardField.PAGES, "152–158")
         );
 
         List<BibEntry> fetchedEntries = fetcher.performSearch("The relationship of code churn and architectural violations in the open source software JabRef");
