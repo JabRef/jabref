@@ -13,7 +13,7 @@ import org.jabref.model.openoffice.style.CitationType;
 import org.jabref.model.openoffice.uno.NoDocumentException;
 
 /**
- *  How and what is encoded in a mark names.
+ *  How and what is encoded in reference mark names under JabRef 5.2.
  *
  *  - pageInfo does not appear here. It is not encoded in the mark name.
  */
