@@ -36,6 +36,11 @@ import com.sun.star.text.XTextRange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Backend52, Codec52 and OODataModel.JabRef52 refer to the mode of storage, encoding and
+ * what-is-stored in the document under JabRef version 5.2. These basically did not change up to
+ * JabRef 5.4.
+ */
 public class Backend52 {
     private static final Logger LOGGER = LoggerFactory.getLogger(Backend52.class);
     public final OODataModel dataModel;
