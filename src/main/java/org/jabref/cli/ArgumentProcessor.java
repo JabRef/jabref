@@ -2,13 +2,17 @@ package org.jabref.cli;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
+import java.util.Vector;
 import java.util.prefs.BackingStoreException;
 
 import org.jabref.gui.Globals;
@@ -24,6 +28,7 @@ import org.jabref.logic.exporter.Exporter;
 import org.jabref.logic.exporter.ExporterFactory;
 import org.jabref.logic.exporter.SavePreferences;
 import org.jabref.logic.exporter.TemplateExporter;
+import org.jabref.logic.exporter.XmpPdfExporter;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportException;
 import org.jabref.logic.importer.ImportFormatReader;
@@ -49,6 +54,8 @@ import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.DummyFileUpdateMonitor;
+import org.jabref.model.util.FileHelper;
+import org.jabref.preferences.FilePreferences;
 import org.jabref.preferences.SearchPreferences;
 
 import com.google.common.base.Throwables;
@@ -215,6 +222,12 @@ public class ArgumentProcessor {
             automaticallySetFileLinks(loaded);
         }
 
+        if (cli.isWriteXMPtoPdf()) {
+            if (!loaded.isEmpty()) {
+                writeXMPtoPdf(loaded, cli.getWriteXMPtoPdf(), Globals.prefs.getDefaultEncoding(), Globals.prefs.getXmpPreferences(), Globals.prefs.getFilePreferences());
+            }
+        }
+
         if (cli.isFileExport()) {
             if (!loaded.isEmpty()) {
                 exportFile(loaded, cli.getFileExport().split(","));
@@ -239,6 +252,88 @@ public class ArgumentProcessor {
         return loaded;
     }
 
+    private void writeXMPtoPdf(List<ParserResult> loaded, String filesAndCitekeys, Charset encoding, XmpPreferences xmpPreferences, FilePreferences filePreferences) {
+        if (loaded.isEmpty()) {
+            LOGGER.error("The write xmp option depends on a valid import option.");
+            return;
+        }
+        ParserResult pr = loaded.get(loaded.size() - 1);
+        BibDatabaseContext databaseContext = pr.getDatabaseContext();
+        BibDatabase dataBase = pr.getDatabase();
+
+        XmpPdfExporter xmpPdfExporter = new XmpPdfExporter(xmpPreferences);
+
+        if ("all".equals(filesAndCitekeys)) {
+            for (BibEntry entry : dataBase.getEntries()) {
+                writeXMPtoPDFsOfEntry(databaseContext, entry.getCitationKey().orElse("<no cite key defined>"), entry, encoding, filePreferences, xmpPdfExporter);
+            }
+            return;
+        }
+
+        Vector<String> citeKeys = new Vector<>();
+        Vector<String> pdfs = new Vector<>();
+        for (String fileOrCiteKey : filesAndCitekeys.split(",")) {
+            if (fileOrCiteKey.toLowerCase(Locale.ROOT).endsWith(".pdf")) {
+                pdfs.add(fileOrCiteKey);
+            } else {
+                citeKeys.add(fileOrCiteKey);
+            }
+        }
+
+        writeXMPtoPdfByCitekey(databaseContext, dataBase, citeKeys, encoding, filePreferences, xmpPdfExporter);
+        writeXMPtoPdfByFileNames(databaseContext, dataBase, pdfs, encoding, filePreferences, xmpPdfExporter);
+
+    }
+
+    private void writeXMPtoPDFsOfEntry(BibDatabaseContext databaseContext, String citeKey, BibEntry entry, Charset encoding, FilePreferences filePreferences, XmpPdfExporter xmpPdfExporter) {
+        try {
+            if (xmpPdfExporter.exportToAllFilesOfEntry(databaseContext, encoding, filePreferences, entry, Arrays.asList(entry))) {
+                LOGGER.info(String.format("Successfully written XMP metadata on at least one linked file of %s", citeKey));
+            } else {
+                LOGGER.error(String.format("Cannot write XMP metadata on any linked files of %s. Make sure there is at least one linked file and the path is correct.", citeKey));
+            }
+        } catch (Exception e) {
+            LOGGER.error(String.format("Failed writing XMP metadata on a linked file of %s.", citeKey));
+        }
+    }
+
+    private void writeXMPtoPdfByCitekey(BibDatabaseContext databaseContext, BibDatabase dataBase, Vector<String> citeKeys, Charset encoding, FilePreferences filePreferences, XmpPdfExporter xmpPdfExporter) {
+        for (String citeKey : citeKeys) {
+            List<BibEntry> bibEntryList = dataBase.getEntriesByCitationKey(citeKey);
+            if (bibEntryList.isEmpty()) {
+                LOGGER.error(String.format("Skipped - Cannot find %s in library.", citeKey));
+                continue;
+            }
+            for (BibEntry entry : bibEntryList) {
+                writeXMPtoPDFsOfEntry(databaseContext, citeKey, entry, encoding, filePreferences, xmpPdfExporter);
+            }
+        }
+    }
+
+    private void writeXMPtoPdfByFileNames(BibDatabaseContext databaseContext, BibDatabase dataBase, Vector<String> fileNames, Charset encoding, FilePreferences filePreferences, XmpPdfExporter xmpPdfExporter) {
+        for (String fileName : fileNames) {
+            Path filePath = Path.of(fileName);
+            if (!filePath.isAbsolute()) {
+                filePath = FileHelper.find(fileName, databaseContext.getFileDirectories(filePreferences)).orElse(FileHelper.find(fileName, Arrays.asList(Path.of("").toAbsolutePath())).orElse(filePath));
+            }
+            if (Files.exists(filePath)) {
+                try {
+                    if (xmpPdfExporter.exportToFileByPath(databaseContext, dataBase, encoding, filePreferences, filePath)) {
+                        LOGGER.info(String.format("Successfully written XMP metadata of at least one entry to %s", fileName));
+                    } else {
+                        LOGGER.error(String.format("File %s is not linked to any entry in database.", fileName));
+                    }
+                } catch (IOException e) {
+                    LOGGER.error("Error accessing files.", fileName);
+                } catch (Exception e) {
+                    LOGGER.error(String.format("Error writing entry to %s.", fileName));
+                }
+            } else {
+                LOGGER.error(String.format("Skipped - PDF %s does not exist", fileName));
+            }
+        }
+    }
+
     private boolean exportMatches(List<ParserResult> loaded) {
         String[] data = cli.getExportMatches().split(",");
         String searchTerm = data[0].replace("\\$", " "); // enables blanks within the search term:
@@ -248,8 +343,7 @@ public class ArgumentProcessor {
         BibDatabase dataBase = pr.getDatabase();
 
         SearchPreferences searchPreferences = Globals.prefs.getSearchPreferences();
-        SearchQuery query = new SearchQuery(searchTerm, searchPreferences.isCaseSensitive(),
-                searchPreferences.isRegularExpression());
+        SearchQuery query = new SearchQuery(searchTerm, searchPreferences.getSearchFlags());
         List<BibEntry> matches = new DatabaseSearcher(query, dataBase).getMatches();
 
         // export matches

@@ -36,7 +36,7 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v2
         with:
-          java-version: 14
+          java-version: 16
           distribution: 'adopt'
       - uses: actions/cache@v2
         name: Restore gradle cache

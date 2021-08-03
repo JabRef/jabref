@@ -12,7 +12,7 @@
     <category citation-format="author-date"/>
     <category field="social_science"/>
     <eissn>1961-9162</eissn>
-    <updated>2021-05-28T07:12:35+00:00</updated>
+    <updated>2021-06-01T16:10:30+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="fr">
@@ -39,20 +39,14 @@
     </names>
   </macro>
   <macro name="author-cite">
-    <choose>
-      <if variable="author">
-        <names variable="author">
-          <name form="short" and="text" delimiter-precedes-last="never" sort-separator=" " font-style="normal"/>
-          <et-al font-style="italic"/>
-        </names>
-      </if>
-      <else-if variable="editor">
-        <names variable="editor">
-          <name form="short" and="text" name-as-sort-order="all" delimiter-precedes-last="never" sort-separator=" " font-style="normal"/>
-          <et-al font-style="italic"/>
-        </names>
-      </else-if>
-    </choose>
+    <names variable="author">
+      <name form="short" and="text" delimiter-precedes-last="never" sort-separator=" " font-style="normal"/>
+      <et-al font-style="italic"/>
+      <substitute>
+        <names variable="editor translator"/>
+        <text variable="title"/>
+      </substitute>
+    </names>
   </macro>
   <macro name="editor">
     <names variable="editor">
@@ -163,9 +157,9 @@
         </choose>
       </if>
       <else-if type="article-journal article-magazine" match="any">
-        <group font-style="normal" delimiter=" ">
+        <group font-style="normal" delimiter=" " suffix=", ">
           <text macro="volume"/>
-          <text macro="issue" prefix="(" suffix=")"/>
+          <text macro="issue"/>
         </group>
       </else-if>
     </choose>
@@ -182,8 +176,8 @@
   </macro>
   <macro name="issue">
     <choose>
-      <if is-numeric="issue">
-        <text variable="issue"/>
+      <if is-numeric="volume">
+        <text variable="issue" prefix="(" suffix=")"/>
       </if>
       <else>
         <text variable="issue"/>

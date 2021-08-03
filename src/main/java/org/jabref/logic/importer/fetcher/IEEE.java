@@ -14,7 +14,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import org.jabref.gui.preferences.customization.CustomizationTabViewModel;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.FulltextFetcher;
@@ -31,7 +30,6 @@ import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.entry.types.StandardEntryType;
-import org.jabref.preferences.PreferencesService;
 
 import kong.unirest.json.JSONArray;
 import kong.unirest.json.JSONObject;
@@ -61,18 +59,18 @@ public class IEEE implements FulltextFetcher, PagedSearchBasedParserFetcher {
     private static final String TEST_URL_WITHOUT_API_KEY = "https://ieeexploreapi.ieee.org/api/v1/search/articles?max_records=0&apikey=";
 
     private final ImportFormatPreferences importFormatPreferences;
-    private final PreferencesService preferencesService;
 
-    public IEEE(PreferencesService preferencesService) {
-        this.preferencesService = Objects.requireNonNull(preferencesService);
-        this.importFormatPreferences = preferencesService.getImportFormatPreferences();
+    private IEEEQueryTransformer transformer;
+
+    public IEEE(ImportFormatPreferences preferences) {
+        this.preferences = Objects.requireNonNull(preferences);
         CustomizationTabViewModel.registerApiKeyCustom(this.getName(), TEST_URL_WITHOUT_API_KEY);
     }
 
     /**
      * @implNote <a href="https://developer.ieee.org/docs/read/Metadata_API_responses">documentation</a>
      */
-    private static BibEntry parseJsonRespone(JSONObject jsonEntry, Character keywordSeparator) {
+    private static BibEntry parseJsonResponse(JSONObject jsonEntry, Character keywordSeparator) {
         BibEntry entry = new BibEntry();
 
         switch (jsonEntry.optString("content_type")) {
@@ -212,8 +210,24 @@ public class IEEE implements FulltextFetcher, PagedSearchBasedParserFetcher {
                 JSONArray results = jsonObject.getJSONArray("articles");
                 for (int i = 0; i < results.length(); i++) {
                     JSONObject jsonEntry = results.getJSONObject(i);
-                    BibEntry entry = parseJsonRespone(jsonEntry, importFormatPreferences.getKeywordSeparator());
-                    entries.add(entry);
+                    BibEntry entry = parseJsonResponse(jsonEntry, preferences.getKeywordSeparator());
+                    boolean addEntry;
+                    // In case entry has no year, add it
+                    // In case an entry has a year, check if its in the year range
+                    // The implementation uses some Java 8 Optional magic to implement that
+                    if (entry.hasField(StandardField.YEAR)) {
+                        addEntry = entry.getField(StandardField.YEAR).filter(year -> {
+                            Integer yearAsInteger = Integer.valueOf(year);
+                            return
+                                    transformer.getStartYear().map(startYear -> yearAsInteger >= startYear).orElse(true) &&
+                                            transformer.getEndYear().map(endYear -> yearAsInteger <= endYear).orElse(true);
+                        }).map(x -> true).orElse(false);
+                    } else {
+                        addEntry = true;
+                    }
+                    if (addEntry) {
+                        entries.add(entry);
+                    }
                 }
             }
 
@@ -247,7 +261,9 @@ public class IEEE implements FulltextFetcher, PagedSearchBasedParserFetcher {
 
     @Override
     public URL getURLForQuery(QueryNode luceneQuery, int pageNumber) throws URISyntaxException, MalformedURLException, FetcherException {
-        IEEEQueryTransformer transformer = new IEEEQueryTransformer();
+        // transformer is stored globally, because we need to filter out the bib entries by the year manually
+        // the transformer stores the min and max year
+        transformer = new IEEEQueryTransformer();
         String transformedQuery = transformer.transformLuceneQuery(luceneQuery).orElse("");
         URIBuilder uriBuilder = new URIBuilder("https://ieeexploreapi.ieee.org/api/v1/search/articles");
         uriBuilder.addParameter("apikey", getApiKey());

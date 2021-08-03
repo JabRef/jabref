@@ -16,7 +16,7 @@ Chosen option: "Keep study as DTO and use transformators", because comes out bes
 
 ## Pros and Cons of the Options
 
-### Keep study as DTO and use transformators
+### Keep study as DTO and use transformers
 
 * Good, because no need for custom serialization
 * Good, because deactivated fetchers can be documented (important for traceable Searching (SLRs))

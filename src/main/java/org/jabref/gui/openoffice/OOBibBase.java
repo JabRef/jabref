@@ -36,6 +36,8 @@ import org.jabref.logic.openoffice.style.OOPreFormatter;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.openoffice.uno.CreationException;
+import org.jabref.model.openoffice.uno.NoDocumentException;
 
 import com.sun.star.awt.Point;
 import com.sun.star.beans.IllegalTypeException;
