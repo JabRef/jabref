@@ -9,7 +9,7 @@ import java.util.Optional;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.fetcher.GrobidCitationFetcher;
-import org.jabref.logic.importer.fileformat.GrobidPdfMetadataImporterTest;
+import org.jabref.logic.importer.fileformat.PdfGrobidImporterTest;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.testutils.category.FetcherTest;
@@ -69,7 +69,7 @@ public class GrobidServiceTest {
 
     @Test
     public void processPdfTest() throws IOException, ParseException, URISyntaxException {
-        Path file = Path.of(GrobidPdfMetadataImporterTest.class.getResource("LNCS-minimal.pdf").toURI());
+        Path file = Path.of(PdfGrobidImporterTest.class.getResource("LNCS-minimal.pdf").toURI());
         List<BibEntry> response = grobidService.processPDF(file, importFormatPreferences);
         assertEquals(1, response.size());
         BibEntry be0 = response.get(0);
