@@ -9,6 +9,7 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 
 import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.gui.maintable.BibEntryTableViewModel;
@@ -54,8 +55,10 @@ public class SpecialFieldColumn extends MainTableColumn<Optional<SpecialFieldVal
         if (specialField == SpecialField.RANKING) {
             MainTableColumnFactory.setExactWidth(this, SpecialFieldsPreferences.COLUMN_RANKING_WIDTH);
             this.setResizable(false);
+            //System.out.println(1);
             new OptionalValueTableCellFactory<BibEntryTableViewModel, SpecialFieldValueViewModel>()
-                    .withGraphicIfPresent(this::createSpecialRating)
+                    .withGraphic(this::createSpecialRating)
+                    //.withGraphic(this::createSpecialRating)
                     .install(this);
         } else {
             MainTableColumnFactory.setExactWidth(this, ColumnPreferences.ICON_COLUMN_WIDTH);
@@ -89,9 +92,26 @@ public class SpecialFieldColumn extends MainTableColumn<Optional<SpecialFieldVal
         this.setSortable(true);
     }
 
-    private Rating createSpecialRating(BibEntryTableViewModel entry, SpecialFieldValueViewModel value) {
+    //private Rating createSpecialRating(BibEntryTableViewModel entry, SpecialFieldValueViewModel value) {
+    private Rating createSpecialRating(BibEntryTableViewModel entry, Optional<SpecialFieldValueViewModel> value) {
         Rating ranking = new Rating();
-        ranking.setRating(value.getValue().toRating());
+        //ranking.setRating(value.getValue().toRating());
+
+        if (value.isPresent()) {
+            ranking.setRating(value.get().getValue().toRating());
+        } else {
+            //System.out.println(value.get());
+            ranking.setRating(0);
+        }
+
+        ranking.addEventFilter(MouseEvent.MOUSE_CLICKED, event -> {
+            if (event.getButton().equals(MouseButton.PRIMARY) && event.getClickCount() == 2) {
+                System.out.println(1);
+                ranking.setRating(0);
+                event.consume();
+            }
+        });
+
         EasyBind.subscribe(ranking.ratingProperty(), rating ->
                 new SpecialFieldViewModel(SpecialField.RANKING, preferencesService, undoManager)
                         .setSpecialFieldValue(entry.getEntry(), SpecialFieldValue.getRating(rating.intValue())));

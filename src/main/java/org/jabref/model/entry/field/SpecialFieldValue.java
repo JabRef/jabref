@@ -39,6 +39,7 @@ public enum SpecialFieldValue {
 
     public static SpecialFieldValue getRating(int ranking) {
         return switch (ranking) {
+            case 0 -> CLEAR_RANK;
             case 1 -> RANK_1;
             case 2 -> RANK_2;
             case 3 -> RANK_3;
