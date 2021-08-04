@@ -55,10 +55,9 @@ public class SpecialFieldColumn extends MainTableColumn<Optional<SpecialFieldVal
         if (specialField == SpecialField.RANKING) {
             MainTableColumnFactory.setExactWidth(this, SpecialFieldsPreferences.COLUMN_RANKING_WIDTH);
             this.setResizable(false);
-            //System.out.println(1);
             new OptionalValueTableCellFactory<BibEntryTableViewModel, SpecialFieldValueViewModel>()
+                    //modify:withGraphicIfPresent -> withGraphic, uninitialized Star also executes this::createSpecialRating
                     .withGraphic(this::createSpecialRating)
-                    //.withGraphic(this::createSpecialRating)
                     .install(this);
         } else {
             MainTableColumnFactory.setExactWidth(this, ColumnPreferences.ICON_COLUMN_WIDTH);
@@ -91,22 +90,18 @@ public class SpecialFieldColumn extends MainTableColumn<Optional<SpecialFieldVal
 
         this.setSortable(true);
     }
-
-    //private Rating createSpecialRating(BibEntryTableViewModel entry, SpecialFieldValueViewModel value) {
+    //Use Optional to handle uninitialized Star
     private Rating createSpecialRating(BibEntryTableViewModel entry, Optional<SpecialFieldValueViewModel> value) {
         Rating ranking = new Rating();
-        //ranking.setRating(value.getValue().toRating());
-
+        // Uninitialized Star is set to 0
         if (value.isPresent()) {
             ranking.setRating(value.get().getValue().toRating());
         } else {
-            //System.out.println(value.get());
             ranking.setRating(0);
         }
-
+        // When the left mouse button is double-clicked, Star is cleared
         ranking.addEventFilter(MouseEvent.MOUSE_CLICKED, event -> {
             if (event.getButton().equals(MouseButton.PRIMARY) && event.getClickCount() == 2) {
-                System.out.println(1);
                 ranking.setRating(0);
                 event.consume();
             }
