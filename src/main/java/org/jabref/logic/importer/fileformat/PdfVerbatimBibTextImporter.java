@@ -87,7 +87,7 @@ public class PdfVerbatimBibTextImporter extends Importer {
 
     @Override
     public String getName() {
-        return "PdfVerbatimBibTextImporter";
+        return "PdfVerbatimBibText";
     }
 
     @Override
