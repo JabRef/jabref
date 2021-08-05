@@ -40,14 +40,14 @@ import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotationFileAttachme
 import org.apache.pdfbox.text.PDFTextStripper;
 
 /**
- * PdfContentImporter imports a verbatim BibTeX entry from the first page of the PDF.
+ * PdfEmbeddedBibFileImporter imports an embedded Bib-File from the PDF.
  */
-public class PdfEmbeddedBibTeXImporter extends Importer {
+public class PdfEmbeddedBibFileImporter extends Importer {
 
     private final ImportFormatPreferences importFormatPreferences;
     private final BibtexParser bibtexParser;
 
-    public PdfEmbeddedBibTeXImporter(ImportFormatPreferences importFormatPreferences) {
+    public PdfEmbeddedBibFileImporter(ImportFormatPreferences importFormatPreferences) {
         this.importFormatPreferences = importFormatPreferences;
         bibtexParser = new BibtexParser(importFormatPreferences, new DummyFileUpdateMonitor());
     }
@@ -60,21 +60,21 @@ public class PdfEmbeddedBibTeXImporter extends Importer {
     @Override
     public ParserResult importDatabase(BufferedReader reader) throws IOException {
         Objects.requireNonNull(reader);
-        throw new UnsupportedOperationException("PdfEmbeddedBibTeXImporter does not support importDatabase(BufferedReader reader)."
+        throw new UnsupportedOperationException("PdfEmbeddedBibFileImporter does not support importDatabase(BufferedReader reader)."
                 + "Instead use importDatabase(Path filePath, Charset defaultEncoding).");
     }
 
     @Override
     public ParserResult importDatabase(String data) throws IOException {
         Objects.requireNonNull(data);
-        throw new UnsupportedOperationException("PdfEmbeddedBibTeXImporter does not support importDatabase(String data)."
+        throw new UnsupportedOperationException("PdfEmbeddedBibFileImporter does not support importDatabase(String data)."
                 + "Instead use importDatabase(Path filePath, Charset defaultEncoding).");
     }
 
     @Override
     public ParserResult importDatabase(Path filePath, Charset defaultEncoding) {
         try (PDDocument document = XmpUtilReader.loadWithAutomaticDecryption(filePath)) {
-            return new ParserResult(getEmbeddedBibTeXEntries(document));
+            return new ParserResult(getEmbeddedBibFileEntries(document));
         } catch (EncryptedPdfsNotSupportedException e) {
             return ParserResult.fromErrorMessage(Localization.lang("Decryption not supported."));
         } catch (IOException | ParseException e) {
@@ -87,13 +87,12 @@ public class PdfEmbeddedBibTeXImporter extends Importer {
      * Adapted from https://svn.apache.org/repos/asf/pdfbox/trunk/examples/src/main/java/org/apache/pdfbox/examples/pdmodel/ExtractEmbeddedFiles.javaj
      */
 
-    private List<BibEntry> getEmbeddedBibTeXEntries(PDDocument document) throws IOException, ParseException {
+    private List<BibEntry> getEmbeddedBibFileEntries(PDDocument document) throws IOException, ParseException {
         List<BibEntry> allParsedEntries = new ArrayList<>();
         PDDocumentNameDictionary nameDictionary = document.getDocumentCatalog().getNames();
         PDEmbeddedFilesNameTreeNode efTree = nameDictionary.getEmbeddedFiles();
         if (efTree != null) {
             Map<String, PDComplexFileSpecification> names = efTree.getNames();
-            System.out.println("Found files: " + names.keySet().toString());
             if (names != null) {
                 allParsedEntries.addAll(extractAndParseFiles(names));
             } else {
@@ -108,7 +107,6 @@ public class PdfEmbeddedBibTeXImporter extends Importer {
         for (PDPage page : document.getPages()) {
             for (PDAnnotation annotation : page.getAnnotations()) {
                 if (annotation instanceof PDAnnotationFileAttachment) {
-                    System.out.println("Found embedded file: " + annotation.getContents());
                     PDAnnotationFileAttachment annotationFileAttachment = (PDAnnotationFileAttachment) annotation;
                     PDComplexFileSpecification fileSpec = (PDComplexFileSpecification) annotationFileAttachment.getFile();
                     allParsedEntries.addAll(extractAndParseFile(getEmbeddedFile(fileSpec)));
@@ -159,7 +157,7 @@ public class PdfEmbeddedBibTeXImporter extends Importer {
 
     @Override
     public String getName() {
-        return "PDFembeddedbibtex";
+        return "PDFembeddedbibfile";
     }
 
     @Override
@@ -169,7 +167,7 @@ public class PdfEmbeddedBibTeXImporter extends Importer {
 
     @Override
     public String getDescription() {
-        return "PdfEmbeddedBibTeXImporter imports an embedded BibTeX entry from the PDF.";
+        return "PdfEmbeddedBibFileImporter imports an embedded Bib-File from the PDF.";
     }
 
 }
