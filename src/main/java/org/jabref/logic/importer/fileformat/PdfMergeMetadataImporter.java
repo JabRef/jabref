@@ -83,22 +83,24 @@ public class PdfMergeMetadataImporter extends Importer {
         if (candidates.isEmpty()) {
             return new ParserResult();
         }
+        List<BibEntry> fetchedCandidates = new ArrayList<>();
         for (BibEntry candidate : candidates) {
             if (candidate.hasField(StandardField.DOI)) {
                 try {
-                    new DoiFetcher(importFormatPreferences).performSearchById(candidate.getField(StandardField.DOI).get()).ifPresent((fromDoi) -> candidates.add(0, fromDoi));
+                    new DoiFetcher(importFormatPreferences).performSearchById(candidate.getField(StandardField.DOI).get()).ifPresent((fromDoi) -> fetchedCandidates.add(fromDoi));
                 } catch (FetcherException e) {
                     LOGGER.error("Fetching failed for DOI \"{}\".", candidate.getField(StandardField.DOI).get(), e);
                 }
             }
             if (candidate.hasField(StandardField.ISBN)) {
                 try {
-                    new IsbnFetcher(importFormatPreferences).performSearchById(candidate.getField(StandardField.ISBN).get()).ifPresent((fromISBN) -> candidates.add(0, fromISBN));
+                    new IsbnFetcher(importFormatPreferences).performSearchById(candidate.getField(StandardField.ISBN).get()).ifPresent((fromISBN) -> fetchedCandidates.add(fromISBN));
                 } catch (FetcherException e) {
                     LOGGER.error("Fetching failed for ISBN \"{}\".", candidate.getField(StandardField.ISBN).get(), e);
                 }
             }
         }
+        candidates.addAll(0, fetchedCandidates);
         BibEntry entry = new BibEntry();
         for (BibEntry candidate : candidates) {
             if (BibEntry.DEFAULT_TYPE.equals(entry.getType())) {
