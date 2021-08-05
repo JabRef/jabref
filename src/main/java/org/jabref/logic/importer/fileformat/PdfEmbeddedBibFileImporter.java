@@ -123,7 +123,6 @@ public class PdfEmbeddedBibFileImporter extends Importer {
     }
 
     private List<BibEntry> extractAndParseFile(PDEmbeddedFile embeddedFile) throws IOException, ParseException {
-        System.out.println(new String(embeddedFile.toByteArray(), StandardCharsets.UTF_8));
         return bibtexParser.parseEntries(embeddedFile.createInputStream());
     }
 
