@@ -1,7 +1,5 @@
 package org.jabref.logic.importer.fetcher.transformers;
 
-import org.jabref.model.strings.StringUtil;
-
 public class CollectionOfComputerScienceBibliographiesQueryTransformer extends AbstractQueryTransformer {
 
     @Override
@@ -31,7 +29,7 @@ public class CollectionOfComputerScienceBibliographiesQueryTransformer extends A
 
     @Override
     protected String handleJournal(String journalTitle) {
-        return StringUtil.quoteStringIfSpaceIsContained(journalTitle);
+        return quoteStringIfSpaceIsContained(journalTitle);
     }
 
     @Override

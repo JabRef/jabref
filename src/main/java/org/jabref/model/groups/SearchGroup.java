@@ -1,11 +1,9 @@
 package org.jabref.model.groups;
 
-import java.util.EnumSet;
 import java.util.Objects;
 
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.search.GroupSearchQuery;
-import org.jabref.model.search.rules.SearchRules.SearchFlags;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,9 +17,10 @@ public class SearchGroup extends AbstractGroup {
     private static final Logger LOGGER = LoggerFactory.getLogger(SearchGroup.class);
     private final GroupSearchQuery query;
 
-    public SearchGroup(String name, GroupHierarchyType context, String searchExpression, EnumSet<SearchFlags> searchFlags) {
+    public SearchGroup(String name, GroupHierarchyType context, String searchExpression, boolean caseSensitive,
+                       boolean isRegEx) {
         super(name, context);
-        this.query = new GroupSearchQuery(searchExpression, searchFlags);
+        this.query = new GroupSearchQuery(searchExpression, caseSensitive, isRegEx);
     }
 
     public String getSearchExpression() {
@@ -39,7 +38,8 @@ public class SearchGroup extends AbstractGroup {
         SearchGroup other = (SearchGroup) o;
         return getName().equals(other.getName())
                 && getSearchExpression().equals(other.getSearchExpression())
-                && (getSearchFlags().equals(other.getSearchFlags()))
+                && (isCaseSensitive() == other.isCaseSensitive())
+                && (isRegularExpression() == other.isRegularExpression())
                 && (getHierarchicalContext() == other.getHierarchicalContext());
     }
 
@@ -48,14 +48,11 @@ public class SearchGroup extends AbstractGroup {
         return query.isMatch(entry);
     }
 
-    public EnumSet<SearchFlags> getSearchFlags() {
-        return query.getSearchFlags();
-    }
-
     @Override
     public AbstractGroup deepCopy() {
         try {
-            return new SearchGroup(getName(), getHierarchicalContext(), getSearchExpression(), getSearchFlags());
+            return new SearchGroup(getName(), getHierarchicalContext(), getSearchExpression(), isCaseSensitive(),
+                    isRegularExpression());
         } catch (Throwable t) {
             // this should never happen, because the constructor obviously
             // succeeded in creating _this_ instance!
@@ -65,6 +62,14 @@ public class SearchGroup extends AbstractGroup {
         }
     }
 
+    public boolean isCaseSensitive() {
+        return query.isCaseSensitive();
+    }
+
+    public boolean isRegularExpression() {
+        return query.isRegularExpression();
+    }
+
     @Override
     public boolean isDynamic() {
         return true;
@@ -72,6 +77,6 @@ public class SearchGroup extends AbstractGroup {
 
     @Override
     public int hashCode() {
-        return Objects.hash(getName(), getHierarchicalContext(), getSearchExpression(), getSearchFlags());
+        return Objects.hash(getName(), getHierarchicalContext(), getSearchExpression(), isCaseSensitive(), isRegularExpression());
     }
 }

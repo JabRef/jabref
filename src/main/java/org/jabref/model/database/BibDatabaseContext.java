@@ -9,18 +9,12 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.jabref.architecture.AllowedToUseLogic;
-import org.jabref.gui.LibraryTab;
 import org.jabref.logic.shared.DatabaseLocation;
 import org.jabref.logic.shared.DatabaseSynchronizer;
 import org.jabref.logic.util.CoarseChangeFilter;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.metadata.MetaData;
-import org.jabref.model.pdf.search.SearchFieldConstants;
 import org.jabref.preferences.FilePreferences;
-
-import net.harawata.appdirs.AppDirsFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Represents everything related to a BIB file. <p> The entries are stored in BibDatabase, the other data in MetaData
@@ -29,17 +23,13 @@ import org.slf4j.LoggerFactory;
 @AllowedToUseLogic("because it needs access to shared database features")
 public class BibDatabaseContext {
 
-    public static final String SEARCH_INDEX_BASE_PATH = "JabRef";
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(LibraryTab.class);
-
     private final BibDatabase database;
     private MetaData metaData;
 
     /**
      * The path where this database was last saved to.
      */
-    private Path path;
+    private Optional<Path> path;
 
     private DatabaseSynchronizer dbmsSynchronizer;
     private CoarseChangeFilter dbmsListener;
@@ -57,6 +47,7 @@ public class BibDatabaseContext {
         this.database = Objects.requireNonNull(database);
         this.metaData = Objects.requireNonNull(metaData);
         this.location = DatabaseLocation.LOCAL;
+        this.path = Optional.empty();
     }
 
     public BibDatabaseContext(BibDatabase database, MetaData metaData, Path path) {
@@ -66,7 +57,7 @@ public class BibDatabaseContext {
     public BibDatabaseContext(BibDatabase database, MetaData metaData, Path path, DatabaseLocation location) {
         this(database, metaData);
         Objects.requireNonNull(location);
-        this.path = path;
+        this.path = Optional.ofNullable(path);
 
         if (location == DatabaseLocation.LOCAL) {
             convertToLocalDatabase();
@@ -82,7 +73,7 @@ public class BibDatabaseContext {
     }
 
     public void setDatabasePath(Path file) {
-        this.path = file;
+        this.path = Optional.ofNullable(file);
     }
 
     /**
@@ -91,11 +82,11 @@ public class BibDatabaseContext {
      * @return Optional of the relevant Path, or Optional.empty() if none is defined.
      */
     public Optional<Path> getDatabasePath() {
-        return Optional.ofNullable(path);
+        return path;
     }
 
     public void clearDatabasePath() {
-        this.path = null;
+        this.path = Optional.empty();
     }
 
     public BibDatabase getDatabase() {
@@ -200,6 +191,14 @@ public class BibDatabaseContext {
         this.location = DatabaseLocation.SHARED;
     }
 
+    @Override
+    public String toString() {
+        return "BibDatabaseContext{" +
+                "path=" + path +
+                ", location=" + location +
+                '}';
+    }
+
     public void convertToLocalDatabase() {
         if (Objects.nonNull(dbmsListener) && (location == DatabaseLocation.SHARED)) {
             dbmsListener.unregisterListener(dbmsSynchronizer);
@@ -211,31 +210,5 @@ public class BibDatabaseContext {
 
     public List<BibEntry> getEntries() {
         return database.getEntries();
-    }
-
-    public static Path getFulltextIndexBasePath() {
-        return Path.of(AppDirsFactory.getInstance().getUserDataDir(SEARCH_INDEX_BASE_PATH, SearchFieldConstants.VERSION, "org.jabref"));
-    }
-
-    public Path getFulltextIndexPath() {
-        Path appData = getFulltextIndexBasePath();
-
-        if (getDatabasePath().isPresent()) {
-            LOGGER.info("Index path for {} is {}", getDatabasePath().get(), appData.toString());
-            return appData.resolve(String.valueOf(this.getDatabasePath().get().hashCode()));
-        }
-
-        return appData.resolve("unsaved");
-    }
-
-    @Override
-    public String toString() {
-        return "BibDatabaseContext{" +
-                "metaData=" + metaData +
-                ", mode=" + getMode() +
-                ", databasePath=" + getDatabasePath() +
-                ", biblatexMode=" + isBiblatexMode() +
-                ", fulltextIndexPath=" + getFulltextIndexPath() +
-                '}';
     }
 }

@@ -84,47 +84,47 @@ public class TooltipTextUtilTest {
     }
 
     @Test
-    public void transformTextToHtmlStringBold() {
+    public void transformTextToHTMLStringBold() {
         Text text = TooltipTextUtil.createText(testText, TooltipTextUtil.TextType.BOLD);
-        String htmlString = TooltipTextUtil.textToHtmlString(text);
+        String htmlString = TooltipTextUtil.textToHTMLString(text);
         String expectedString = "<b>" + testText + "</b>";
 
         assertEquals(expectedString, htmlString);
     }
 
     @Test
-    public void transformTextToHtmlStringItalic() {
+    public void transformTextToHTMLStringItalic() {
         Text text = TooltipTextUtil.createText(testText, TooltipTextUtil.TextType.ITALIC);
-        String htmlString = TooltipTextUtil.textToHtmlString(text);
+        String htmlString = TooltipTextUtil.textToHTMLString(text);
         String expectedString = "<i>" + testText + "</i>";
 
         assertEquals(expectedString, htmlString);
     }
 
     @Test
-    public void transformTextToHtmlStringMonospaced() {
+    public void transformTextToHTMLStringMonospaced() {
         Text text = TooltipTextUtil.createText(testText, TooltipTextUtil.TextType.MONOSPACED);
-        String htmlString = TooltipTextUtil.textToHtmlString(text);
-        String expectedString = "<tt>" + testText + "</tt>";
+        String htmlString = TooltipTextUtil.textToHTMLString(text);
+        String expectedString = "<kbd>" + testText + "</kbd>";
 
         assertEquals(expectedString, htmlString);
     }
 
     @Test
-    public void transformTextToHtmlStringMonospacedBold() {
+    public void transformTextToHTMLStringMonospacedBold() {
         Text text = TooltipTextUtil.createText(testText, TooltipTextUtil.TextType.MONOSPACED);
         text.getStyleClass().add("tooltip-text-bold");
-        String htmlString = TooltipTextUtil.textToHtmlString(text);
-        String expectedString = "<b><tt>" + testText + "</tt></b>";
+        String htmlString = TooltipTextUtil.textToHTMLString(text);
+        String expectedString = "<b><kbd>" + testText + "</kbd></b>";
 
         assertEquals(expectedString, htmlString);
     }
 
     @Test
-    public void transformTextToHtmlStringWithLinebreaks() {
+    public void transformTextToHTMLStringWithLinebreaks() {
         String testText = "this\nis a\ntest text";
         Text text = TooltipTextUtil.createText(testText, TooltipTextUtil.TextType.NORMAL);
-        String htmlString = TooltipTextUtil.textToHtmlString(text);
+        String htmlString = TooltipTextUtil.textToHTMLString(text);
         String expectedString = "this<br>is a<br>test text";
 
         assertEquals(expectedString, htmlString);

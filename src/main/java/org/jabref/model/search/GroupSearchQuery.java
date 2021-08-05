@@ -1,22 +1,22 @@
 package org.jabref.model.search;
 
-import java.util.EnumSet;
 import java.util.Objects;
 
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.search.rules.SearchRule;
 import org.jabref.model.search.rules.SearchRules;
-import org.jabref.model.search.rules.SearchRules.SearchFlags;
 
 public class GroupSearchQuery implements SearchMatcher {
 
     private final String query;
-    private final EnumSet<SearchFlags> searchFlags;
+    private final boolean caseSensitive;
+    private final boolean regularExpression;
     private final SearchRule rule;
 
-    public GroupSearchQuery(String query, EnumSet<SearchFlags> searchFlags) {
+    public GroupSearchQuery(String query, boolean caseSensitive, boolean regularExpression) {
         this.query = Objects.requireNonNull(query);
-        this.searchFlags = searchFlags;
+        this.caseSensitive = caseSensitive;
+        this.regularExpression = regularExpression;
         this.rule = Objects.requireNonNull(getSearchRule());
     }
 
@@ -32,11 +32,11 @@ public class GroupSearchQuery implements SearchMatcher {
     }
 
     private SearchRule getSearchRule() {
-        return SearchRules.getSearchRuleByQuery(query, searchFlags);
+        return SearchRules.getSearchRuleByQuery(query, caseSensitive, regularExpression);
     }
 
     private String getCaseSensitiveDescription() {
-        if (searchFlags.contains(SearchRules.SearchFlags.CASE_SENSITIVE)) {
+        if (caseSensitive) {
             return "case sensitive";
         } else {
             return "case insensitive";
@@ -44,7 +44,7 @@ public class GroupSearchQuery implements SearchMatcher {
     }
 
     private String getRegularExpressionDescription() {
-        if (searchFlags.contains(SearchRules.SearchFlags.REGULAR_EXPRESSION)) {
+        if (regularExpression) {
             return "regular expression";
         } else {
             return "plain text";
@@ -59,7 +59,11 @@ public class GroupSearchQuery implements SearchMatcher {
         return query;
     }
 
-    public EnumSet<SearchFlags> getSearchFlags() {
-        return searchFlags;
+    public boolean isCaseSensitive() {
+        return caseSensitive;
+    }
+
+    public boolean isRegularExpression() {
+        return regularExpression;
     }
 }

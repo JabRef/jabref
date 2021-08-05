@@ -1236,7 +1236,3 @@ TextFlow * {
 .fontsizeSpinner{
     -fx-pref-width: 5em;
 }
-
-.text-field:invalid {
-    -fx-background-color: rgba(240, 128, 128, 0.5);
-}

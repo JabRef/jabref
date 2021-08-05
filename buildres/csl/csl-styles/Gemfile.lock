@@ -20,7 +20,7 @@ GIT
 GEM
   remote: https://rubygems.org/
   specs:
-    addressable (2.8.0)
+    addressable (2.7.0)
       public_suffix (>= 2.0.2, < 5.0)
     citeproc (1.0.10)
       namae (~> 1.0)
@@ -47,10 +47,10 @@ GEM
       ruby-progressbar (~> 1.4)
     git_diff (0.4.3)
     hashdiff (0.3.7)
-    mini_portile2 (2.5.1)
+    mini_portile2 (2.5.0)
     multipart-post (2.1.1)
     namae (1.0.2)
-    nokogiri (1.11.4)
+    nokogiri (1.11.1)
       mini_portile2 (~> 2.5.0)
       racc (~> 1.4)
     octokit (4.20.0)

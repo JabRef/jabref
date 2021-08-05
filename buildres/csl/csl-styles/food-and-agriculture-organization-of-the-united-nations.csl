@@ -14,13 +14,13 @@
     </author>
     <contributor>
       <name>Julian Plummer</name>
-      <email>julian.plummer@gmail.com</email>
+      <email>Julian.Plummer@fao.org</email>
     </contributor>
     <category citation-format="author-date"/>
     <category field="science"/>
     <category field="social_science"/>
     <summary>This style is created to meet the citation and bibliographical requirements of FAOSTYLE, and has been tested with Zotero and Mendeley. Last update: March 2017.</summary>
-    <updated>2021-06-07T23:29:39+02:00</updated>
+    <updated>2017-03-10T01:12:03+01:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <!-- Locale settings for English. Settings for other languages could be added later to this section. -->
@@ -50,8 +50,7 @@
   </macro>
   <macro name="author">
     <names variable="author">
-      <name and="symbol" delimiter-precedes-et-al="never" delimiter-precedes-last="never" initialize-with="." name-as-sort-order="all"/>
-      <et-al font-style="italic"/>
+      <name and="symbol" delimiter-precedes-last="never" initialize-with="." name-as-sort-order="all"/>
       <label form="short" prefix=", "/>
       <substitute>
         <names variable="editor"/>
@@ -117,20 +116,6 @@
       <text variable="URL"/>
     </group>
   </macro>
-  <macro name="DOI-or-available-at">
-    <!-- If DOI exists, then DOI is shown as: https://doi.org/DOI. If DOI doesn't exist, then "also available at URL" is shown. -->
-    <choose>
-      <if variable="DOI">
-        <text variable="DOI" prefix="https://doi.org/"/>
-      </if>
-      <else>
-        <group delimiter=" " prefix="(" suffix=").">
-          <text term="available at"/>
-          <text variable="URL"/>
-        </group>
-      </else>
-    </choose>
-  </macro>
   <macro name="number_of_pages-label">
     <!-- 1 p. / x pp. -->
     <group delimiter=" ">
@@ -151,7 +136,7 @@
     </layout>
   </citation>
   <!-- bibliography -->
-  <bibliography entry-spacing="0" et-al-min="8" et-al-use-first="7">
+  <bibliography entry-spacing="0">
     <sort>
       <key macro="author"/>
       <key variable="issued"/>
@@ -178,12 +163,12 @@
                 <text macro="editor"/>
                 <group>
                   <text variable="collection-title"/>
-                  <text variable="collection-number" prefix=" "/>
+                  <text variable="collection-number" prefix=" No. "/>
                   <!-- Mendeley doesn't offer a "Series Number / Report Number" field. "No. xxx" must be put in "Series" field. -->
                 </group>
                 <text macro="publisher-and-place" suffix="."/>
                 <text macro="number_of_pages-label"/>
-                <text macro="DOI-or-available-at"/>
+                <text macro="Available-at"/>
               </if>
               <else-if type="chapter report" match="any">
                 <!-- book section and report -->
@@ -201,9 +186,9 @@
                 </group>
                 <group>
                   <text variable="collection-title"/>
-                  <text variable="collection-number" prefix=" "/>
+                  <text variable="collection-number" prefix=" No. "/>
                   <!-- "Series Number" field for book section in Zotero. -->
-                  <text variable="number" prefix=" "/>
+                  <text variable="number" prefix=" No. "/>
                   <!-- "Report Number" field for report in Zotero. -->
                   <!-- Mendeley doesn't offer a "Series Number / Report Number" field. "No. xxx" must be put in "Series" field. -->
                 </group>
@@ -211,7 +196,7 @@
                   <text macro="publisher-and-place"/>
                   <text macro="number_of_pages-label"/>
                 </group>
-                <text macro="DOI-or-available-at"/>
+                <text macro="Available-at"/>
               </else-if>
               <else-if type="article-journal">
                 <!-- paper journal article -->
@@ -222,7 +207,15 @@
                   <text variable="issue" prefix="(" suffix=")"/>
                   <text variable="page" prefix=": "/>
                 </group>
-                <text macro="DOI-or-available-at"/>
+                <choose>
+                  <!-- If DOI exists, then DOI is shown as: https://doi.org/DOI . If DOI doesn't exist, then "also available at URL" is shown. -->
+                  <if variable="DOI">
+                    <text variable="DOI" prefix="https://doi.org/"/>
+                  </if>
+                  <else>
+                    <text macro="Available-at"/>
+                  </else>
+                </choose>
               </else-if>
               <else-if type="article-magazine">
                 <!-- magazine and online-only journal article -->
@@ -277,7 +270,7 @@
                 <text variable="title" font-style="italic"/>
                 <text macro="publisher-and-place"/>
                 <text variable="genre" prefix=" (" suffix=")"/>
-                <text macro="DOI-or-available-at"/>
+                <text macro="Available-at"/>
               </else-if>
               <else-if type="song motion_picture article" match="any">
                 <!-- audio recording, film, and video recording in Zotero; film and computer program in Mendeley -->
@@ -336,7 +329,7 @@
                   <date form="text" variable="issued" prefix=", "/>
                   <text variable="publisher-place" prefix=", "/>
                 </group>
-                <text macro="DOI-or-available-at"/>
+                <text macro="Available-at"/>
               </else-if>
               <else>
                 <!-- other item types -->

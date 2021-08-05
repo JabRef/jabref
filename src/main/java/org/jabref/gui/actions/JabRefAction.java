@@ -1,5 +1,6 @@
 package org.jabref.gui.actions;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import javafx.beans.binding.Bindings;
@@ -76,9 +77,10 @@ class JabRefAction extends org.controlsfx.control.action.Action {
     }
 
     private void trackUserActionSource(String actionName, Sources source) {
-        Globals.getTelemetryClient().ifPresent(telemetryClient -> telemetryClient.trackEvent(
-                actionName,
-                Map.of("Source", source.toString()),
-                Map.of()));
+        Map<String, String> properties = new HashMap<>();
+        Map<String, Double> measurements = new HashMap<>();
+        properties.put("Source", source.toString());
+
+        Globals.getTelemetryClient().ifPresent(telemetryClient -> telemetryClient.trackEvent(actionName, properties, measurements));
     }
 }

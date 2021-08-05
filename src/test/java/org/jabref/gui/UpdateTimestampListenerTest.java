@@ -24,9 +24,6 @@ class UpdateTimestampListenerTest {
     private PreferencesService preferencesMock;
     private TimestampPreferences timestampPreferencesMock;
 
-    private final String baseDate = "2000-1-1";
-    private final String newDate = "2000-1-2";
-
     @BeforeEach
     void setUp() {
         database = new BibDatabase();
@@ -42,6 +39,9 @@ class UpdateTimestampListenerTest {
 
     @Test
     void updateTimestampEnabled() {
+        final String baseDate = "2000-1-1";
+        final String newDate = "2000-1-2";
+
         final boolean includeTimestamp = true;
 
         when(timestampPreferencesMock.now()).thenReturn(newDate);
@@ -60,6 +60,9 @@ class UpdateTimestampListenerTest {
 
     @Test
     void updateTimestampDisabled() {
+        final String baseDate = "2000-1-1";
+        final String newDate = "2000-1-2";
+
         final boolean includeTimestamp = false;
 
         when(timestampPreferencesMock.now()).thenReturn(newDate);

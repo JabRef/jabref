@@ -1,7 +1,5 @@
 package org.jabref.logic.importer.fetcher.transformers;
 
-import org.jabref.model.strings.StringUtil;
-
 /**
  * Default query transformer without any boolean operators
  */
@@ -24,16 +22,16 @@ public class DefaultQueryTransformer extends YearAndYearRangeByFilteringQueryTra
 
     @Override
     protected String handleAuthor(String author) {
-        return StringUtil.quoteStringIfSpaceIsContained(author);
+        return quoteStringIfSpaceIsContained(author);
     }
 
     @Override
     protected String handleTitle(String title) {
-        return StringUtil.quoteStringIfSpaceIsContained(title);
+        return quoteStringIfSpaceIsContained(title);
     }
 
     @Override
     protected String handleJournal(String journalTitle) {
-        return StringUtil.quoteStringIfSpaceIsContained(journalTitle);
+        return quoteStringIfSpaceIsContained(journalTitle);
     }
 }

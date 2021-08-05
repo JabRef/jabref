@@ -22,11 +22,8 @@ public class JournalEditorViewModel extends AbstractEditorViewModel {
             return;
         }
 
-        // Ignore brackets when matching abbreviations.
-        final String name = StringUtil.ignoreCurlyBracket(text.get());
-
-        if (journalAbbreviationRepository.isKnownName(name)) {
-            Optional<String> nextAbbreviation = journalAbbreviationRepository.getNextAbbreviation(name);
+        if (journalAbbreviationRepository.isKnownName(text.get())) {
+            Optional<String> nextAbbreviation = journalAbbreviationRepository.getNextAbbreviation(text.get());
 
             if (nextAbbreviation.isPresent()) {
                 text.set(nextAbbreviation.get());

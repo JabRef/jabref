@@ -36,15 +36,12 @@ public interface SearchBasedFetcher extends WebFetcher {
         if (searchQuery.isBlank()) {
             return Collections.emptyList();
         }
-
         SyntaxParser parser = new StandardSyntaxParser();
-        QueryNode queryNode;
+
         try {
-            queryNode = parser.parse(searchQuery, NO_EXPLICIT_FIELD);
+            return this.performSearch(parser.parse(searchQuery, NO_EXPLICIT_FIELD));
         } catch (QueryNodeParseException e) {
             throw new FetcherException("An error occurred when parsing the query");
         }
-
-        return this.performSearch(queryNode);
     }
 }

@@ -1,6 +1,5 @@
 package org.jabref.logic.openoffice;
 
-import org.jabref.logic.openoffice.style.OOBibStyle;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 

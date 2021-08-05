@@ -27,6 +27,7 @@ public class SuggestionProviders {
     }
 
     public SuggestionProvider<?> getForField(Field field) {
+
         if (isEmpty || !autoCompletePreferences.getCompleteFields().contains(field)) {
             return new EmptySuggestionProvider();
         }

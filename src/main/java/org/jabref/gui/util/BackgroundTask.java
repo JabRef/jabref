@@ -64,7 +64,7 @@ public abstract class BackgroundTask<V> {
     public static BackgroundTask<Void> wrap(Runnable runnable) {
         return new BackgroundTask<>() {
             @Override
-            protected Void call() {
+            protected Void call() throws Exception {
                 runnable.run();
                 return null;
             }

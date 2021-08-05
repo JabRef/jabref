@@ -6,7 +6,6 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Locale;
-import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.Objects;
 import java.util.Optional;
@@ -119,18 +118,17 @@ public class Localization {
     }
 
     /**
-     * Helper function to create a Map from the key/value pairs of a bundle.
+     * Helper function to create a HashMap from the key/value pairs of a bundle.
      *
      * @param baseBundle JabRef language bundle with keys and values for translations.
      * @return Lookup map for the baseBundle.
      */
-    private static Map<String, String> createLookupMap(ResourceBundle baseBundle) {
+    private static HashMap<String, String> createLookupMap(ResourceBundle baseBundle) {
         final ArrayList<String> baseKeys = Collections.list(baseBundle.getKeys());
         return new HashMap<>(baseKeys.stream().collect(
                 Collectors.toMap(
-                        // not required to unescape content, because that is already done by the ResourceBundle itself
-                        key -> key,
-                        key -> baseBundle.getString(key))
+                        key -> new LocalizationKey(key).getTranslationValue(),
+                        key -> new LocalizationKey(baseBundle.getString(key)).getTranslationValue())
         ));
     }
 
@@ -159,9 +157,9 @@ public class Localization {
      */
     private static class LocalizationBundle extends ResourceBundle {
 
-        private final Map<String, String> lookup;
+        private final HashMap<String, String> lookup;
 
-        LocalizationBundle(Map<String, String> lookupMap) {
+        LocalizationBundle(HashMap<String, String> lookupMap) {
             lookup = lookupMap;
         }
 

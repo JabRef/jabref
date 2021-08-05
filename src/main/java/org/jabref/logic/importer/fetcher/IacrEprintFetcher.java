@@ -77,7 +77,7 @@ public class IacrEprintFetcher implements IdBasedFetcher {
         if (bibtexCitationHtml.contains("No such report found")) {
             throw new FetcherException(Localization.lang("No results found."));
         }
-        String actualEntry = getRequiredValueBetween("<pre>", "</pre>", bibtexCitationHtml);
+        String actualEntry = getRequiredValueBetween("<PRE>", "</PRE>", bibtexCitationHtml);
 
         try {
             return BibtexParser.singleFromString(actualEntry, prefs, new DummyFileUpdateMonitor());

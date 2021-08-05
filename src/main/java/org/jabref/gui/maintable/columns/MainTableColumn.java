@@ -13,6 +13,7 @@ public class MainTableColumn<T> extends TableColumn<BibEntryTableViewModel, T> {
 
     public MainTableColumn(MainTableColumnModel model) {
         this.model = model;
+        this.setVisible(this.model.getVisibleStatus());
 
         BindingsHelper.bindBidirectional(
                 this.widthProperty(),

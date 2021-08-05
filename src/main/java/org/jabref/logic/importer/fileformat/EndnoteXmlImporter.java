@@ -32,12 +32,10 @@ import org.jabref.logic.importer.fileformat.endnote.Dates;
 import org.jabref.logic.importer.fileformat.endnote.ElectronicResourceNum;
 import org.jabref.logic.importer.fileformat.endnote.Isbn;
 import org.jabref.logic.importer.fileformat.endnote.Keywords;
-import org.jabref.logic.importer.fileformat.endnote.Label;
 import org.jabref.logic.importer.fileformat.endnote.Notes;
 import org.jabref.logic.importer.fileformat.endnote.Number;
 import org.jabref.logic.importer.fileformat.endnote.Pages;
 import org.jabref.logic.importer.fileformat.endnote.PdfUrls;
-import org.jabref.logic.importer.fileformat.endnote.Publisher;
 import org.jabref.logic.importer.fileformat.endnote.Record;
 import org.jabref.logic.importer.fileformat.endnote.RefType;
 import org.jabref.logic.importer.fileformat.endnote.RelatedUrls;
@@ -54,7 +52,6 @@ import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.IEEETranEntryType;
 import org.jabref.model.entry.types.StandardEntryType;
@@ -167,7 +164,6 @@ public class EndnoteXmlImporter extends Importer implements Parser {
             case "electronic article" -> IEEETranEntryType.Electronic;
             case "book section" -> StandardEntryType.InBook;
             case "book" -> StandardEntryType.Book;
-            case "report" -> StandardEntryType.Report;
             // case "journal article" -> StandardEntryType.Article;
             default -> StandardEntryType.Article;
         };
@@ -182,7 +178,7 @@ public class EndnoteXmlImporter extends Importer implements Parser {
         Optional.ofNullable(record.getTitles())
                 .map(Titles::getTitle)
                 .map(Title::getStyle)
-                .map(this::mergeStyleContents)
+                .map(Style::getContent)
                 .ifPresent(value -> entry.setField(StandardField.TITLE, clean(value)));
         Optional.ofNullable(record.getTitles())
                 .map(Titles::getSecondaryTitle)
@@ -226,14 +222,6 @@ public class EndnoteXmlImporter extends Importer implements Parser {
                 .map(ElectronicResourceNum::getStyle)
                 .map(Style::getContent)
                 .ifPresent(doi -> entry.setField(StandardField.DOI, doi.trim()));
-        Optional.ofNullable(record.getPublisher())
-                .map(Publisher::getStyle)
-                .map(Style::getContent)
-                .ifPresent(value -> entry.setField(StandardField.PUBLISHER, value));
-        Optional.ofNullable(record.getLabel())
-                .map(Label::getStyle)
-                .map(Style::getContent)
-                .ifPresent(value -> entry.setField(new UnknownField("endnote-label"), value));
 
         return entry;
     }
@@ -269,10 +257,6 @@ public class EndnoteXmlImporter extends Importer implements Parser {
                            .flatMap(url -> url.getUrl().stream())
                            .flatMap(url -> OptionalUtil.toStream(getUrlValue(url)))
                            .findFirst();
-    }
-
-    private String mergeStyleContents(List<Style> styles) {
-        return styles.stream().map(Style::getContent).collect(Collectors.joining());
     }
 
     private Optional<String> getUrlValue(Url url) {

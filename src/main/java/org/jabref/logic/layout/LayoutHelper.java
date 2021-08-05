@@ -188,7 +188,7 @@ public class LayoutHelper {
         }
     }
 
-    private void parse() throws IOException {
+    private void parse() throws IOException, StringIndexOutOfBoundsException {
         skipWhitespace();
 
         int c;
@@ -254,15 +254,11 @@ public class LayoutHelper {
 
                 if (name.isEmpty()) {
                     StringBuilder lastFive = new StringBuilder(10);
-                    if (parsedEntries.isEmpty()) {
-                        lastFive.append("unknown");
-                    } else {
-                        for (StringInt entry : parsedEntries.subList(Math.max(0, parsedEntries.size() - 6),
-                                parsedEntries.size() - 1)) {
-                            lastFive.append(entry.s);
-                        }
+                    for (StringInt entry : parsedEntries.subList(Math.max(0, parsedEntries.size() - 6),
+                            parsedEntries.size() - 1)) {
+                        lastFive.append(entry.s);
                     }
-                    throw new IOException(
+                    throw new StringIndexOutOfBoundsException(
                             "Backslash parsing error near \'" + lastFive.toString().replace("\n", " ") + '\'');
                 }
 

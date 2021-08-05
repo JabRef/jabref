@@ -1,7 +1,6 @@
 package org.jabref.logic.search;
 
 import java.util.Collections;
-import java.util.EnumSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -19,7 +18,6 @@ import org.jabref.model.search.rules.SearchRules;
 import org.jabref.model.search.rules.SentenceAnalyzer;
 
 public class SearchQuery implements SearchMatcher {
-
     /**
      * The mode of escaping special characters in regular expressions
      */
@@ -58,13 +56,15 @@ public class SearchQuery implements SearchMatcher {
     }
 
     private final String query;
-    private EnumSet<SearchRules.SearchFlags> searchFlags;
+    private final boolean caseSensitive;
+    private final boolean regularExpression;
     private final SearchRule rule;
 
-    public SearchQuery(String query, EnumSet<SearchRules.SearchFlags> searchFlags) {
+    public SearchQuery(String query, boolean caseSensitive, boolean regularExpression) {
         this.query = Objects.requireNonNull(query);
-        this.searchFlags = searchFlags;
-        this.rule = SearchRules.getSearchRuleByQuery(query, searchFlags);
+        this.caseSensitive = caseSensitive;
+        this.regularExpression = regularExpression;
+        this.rule = SearchRules.getSearchRuleByQuery(query, caseSensitive, regularExpression);
     }
 
     @Override
@@ -86,7 +86,7 @@ public class SearchQuery implements SearchMatcher {
     }
 
     private String getCaseSensitiveDescription() {
-        if (searchFlags.contains(SearchRules.SearchFlags.CASE_SENSITIVE)) {
+        if (isCaseSensitive()) {
             return "case sensitive";
         } else {
             return "case insensitive";
@@ -94,7 +94,7 @@ public class SearchQuery implements SearchMatcher {
     }
 
     private String getRegularExpressionDescription() {
-        if (searchFlags.contains(SearchRules.SearchFlags.REGULAR_EXPRESSION)) {
+        if (isRegularExpression()) {
             return "regular expression";
         } else {
             return "plain text";
@@ -109,7 +109,7 @@ public class SearchQuery implements SearchMatcher {
     }
 
     private String getLocalizedCaseSensitiveDescription() {
-        if (searchFlags.contains(SearchRules.SearchFlags.CASE_SENSITIVE)) {
+        if (isCaseSensitive()) {
             return Localization.lang("case sensitive");
         } else {
             return Localization.lang("case insensitive");
@@ -117,7 +117,7 @@ public class SearchQuery implements SearchMatcher {
     }
 
     private String getLocalizedRegularExpressionDescription() {
-        if (searchFlags.contains(SearchRules.SearchFlags.REGULAR_EXPRESSION)) {
+        if (isRegularExpression()) {
             return Localization.lang("regular expression");
         } else {
             return Localization.lang("plain text");
@@ -137,15 +137,19 @@ public class SearchQuery implements SearchMatcher {
         return query;
     }
 
-    public EnumSet<SearchRules.SearchFlags> getSearchFlags() {
-        return searchFlags;
+    public boolean isCaseSensitive() {
+        return caseSensitive;
+    }
+
+    public boolean isRegularExpression() {
+        return regularExpression;
     }
 
     /**
      * Returns a list of words this query searches for. The returned strings can be a regular expression.
      */
     public List<String> getSearchWords() {
-        if (searchFlags.contains(SearchRules.SearchFlags.REGULAR_EXPRESSION)) {
+        if (isRegularExpression()) {
             return Collections.singletonList(getQuery());
         } else {
             // Parses the search query for valid words and returns a list these words.
@@ -178,13 +182,13 @@ public class SearchQuery implements SearchMatcher {
 
         // compile the words to a regular expression in the form (w1)|(w2)|(w3)
         Stream<String> joiner = words.stream();
-        if (!searchFlags.contains(SearchRules.SearchFlags.REGULAR_EXPRESSION)) {
+        if (!regularExpression) {
             // Reformat string when we are looking for a literal match
             joiner = joiner.map(escapeMode::format);
         }
         String searchPattern = joiner.collect(Collectors.joining(")|(", "(", ")"));
 
-        if (searchFlags.contains(SearchRules.SearchFlags.CASE_SENSITIVE)) {
+        if (caseSensitive) {
             return Optional.of(Pattern.compile(searchPattern));
         } else {
             return Optional.of(Pattern.compile(searchPattern, Pattern.CASE_INSENSITIVE));

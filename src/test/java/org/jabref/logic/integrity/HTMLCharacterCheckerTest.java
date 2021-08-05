@@ -17,10 +17,11 @@ public class HTMLCharacterCheckerTest {
     private final BibEntry entry = new BibEntry();
 
     @Test
-    void testSettingNullThrowsNPE() {
-        assertThrows(
+    void fieldNullValueCheck() {
+        Exception exception = assertThrows(
                 NullPointerException.class,
-                () -> entry.setField(StandardField.AUTHOR, null)
+                () -> entry.setField(StandardField.AUTHOR, null),
+                "field value must not be null"
         );
     }
 
@@ -59,4 +60,5 @@ public class HTMLCharacterCheckerTest {
         entry.setField(StandardField.JOURNAL, "&Auml;rling Str&ouml;m for &#8211; &#x2031;");
         assertEquals(List.of(new IntegrityMessage("HTML encoded character found", entry, StandardField.JOURNAL)), checker.check(entry));
     }
+
 }

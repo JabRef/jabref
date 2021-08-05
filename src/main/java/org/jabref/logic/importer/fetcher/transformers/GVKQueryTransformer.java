@@ -48,10 +48,10 @@ public class GVKQueryTransformer extends YearRangeByFilteringQueryTransformer {
     }
 
     @Override
-    protected Optional<String> handleUnFieldedTerm(String term) {
+    protected String handleUnFieldedTerm(String term) {
         // all does not search in full-text
         // Other option is txt: but this does not search in meta data
-        return Optional.of(createKeyValuePair("pica.all", term, "="));
+        return createKeyValuePair("pica.all", term, "=");
     }
 
     @Override

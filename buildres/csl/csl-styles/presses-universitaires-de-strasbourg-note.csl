@@ -17,7 +17,7 @@
     <category field="generic-base"/>
     <summary>Style for the Presses Universitaires de Strasbourg, 
       according to 2019 guidelines for authors.</summary>
-    <updated>2021-06-02T00:00:00+00:00</updated>
+    <updated>2019-11-19T00:00:00+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <!-- ===================================================================== -->
@@ -134,6 +134,7 @@
             <text term="close-quote" suffix=", "/>
             <choose>
               <if type="article-journal article-magazine article-newspaper" match="none">
+                <!-- <text term="in" text-case="capitalize-first" suffix="&#8239;: "/> -->
                 <text term="in" suffix=" "/>
               </if>
             </choose>
@@ -150,7 +151,7 @@
             <choose>
               <if variable="container-title">
                 <text variable="container-title" font-style="italic"/>
-                <text value=", "/>
+                <text value=","/>
               </if>
               <else>
                 <text variable="event" font-style="italic"/>
@@ -339,7 +340,7 @@
         </group>
       </if>
       <else>
-        <text variable="edition" text-case="capitalize-first"/>
+        <text variable="edition" text-case="capitalize-first" suffix="."/>
       </else>
     </choose>
   </macro>
@@ -465,8 +466,7 @@
     <choose>
       <if variable="URL">
         <group>
-          <!-- <text term="available at" suffix="&#8239;: " text-case="capitalize-first"/> -->
-          <text term="available at" suffix="&#8239;: "/>
+          <text term="available at" suffix="&#8239;: " text-case="capitalize-first"/>
           <text variable="URL"/>
         </group>
       </if>
@@ -500,10 +500,10 @@
   <!-- === Citation reference layout macros ================================ -->
   <!-- Standard citation reference layout -->
   <macro name="citation-reference-normal">
-    <group delimiter=", ">
+    <group delimiter=". ">
       <text macro="responsability" suffix=","/>
       <group delimiter=" ">
-        <group>
+        <group delimiter=". ">
           <text macro="title"/>
           <!-- volume : used for books and monographs (a volume of a multivolume book)-->
           <text macro="volume"/>
@@ -516,6 +516,7 @@
       <!-- secondary-responsability : used for patent inventors and translators -->
       <!--  <text macro="secondary-responsability"/> -->
       <group delimiter=", ">
+        <!-- <group delimiter=". "> -->
         <group delimiter=", ">
           <!-- <group delimiter="&#8239;: "> -->
           <group delimiter=", ">
@@ -555,8 +556,8 @@
   </macro>
   <!-- In case of Op.cit / art.cité -->
   <macro name="citation-reference-subsequent">
-    <group>
-      <text macro="responsability" suffix=", "/>
+    <group delimiter=". ">
+      <text macro="responsability" suffix=","/>
       <choose>
         <if type="paper-conference speech chapter article-journal article-magazine article-newspaper post-weblog post webpage broadcast" match="any">
           <choose>
@@ -573,7 +574,7 @@
             </if>
             <else>
               <text variable="title" form="short" font-style="italic"/>
-              <text value=", "/>
+              <text value=","/>
               <choose>
                 <if variable="locator">
                   <text value="op.&#160;cit." font-style="italic" suffix=", "/>
@@ -587,7 +588,7 @@
         </if>
         <else>
           <text variable="title" font-style="italic"/>
-          <text value=", "/>
+          <text value=","/>
           <choose>
             <if variable="locator">
               <text value="op.&#160;cit." font-style="italic" suffix=", "/>
@@ -608,7 +609,7 @@
   <!-- ===================================================================== -->
   <!-- === Bibliography reference layout macro ============================= -->
   <macro name="bibliography-reference">
-    <group delimiter=", ">
+    <group delimiter=", " suffix=".">
       <text macro="responsability"/>
       <group delimiter=" ">
         <group delimiter=". ">

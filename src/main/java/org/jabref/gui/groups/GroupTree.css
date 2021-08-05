@@ -102,18 +102,8 @@
     -fx-translate-x: -0.4em;
 }
 
-#addNewGroup:active {
-    -fx-border-width: 0px;
-    -fx-background-color: -jr-theme;
-    -fx-padding: 0.5em;
-    -fx-text-fill: -jr-white;
-}
-
-#addNewGroup:inactive {
-    -fx-border-width: 0px;
-    -fx-background-color: -jr-icon-background-active;
-    -fx-padding: 0.5em;
-    -fx-text-fill:-jr-black;
+#newGroupButton {
+    -fx-padding: 0.1em 1.5em 0.1em 1.5em;
 }
 
 #groupFilterBar {
@@ -124,9 +114,5 @@
 }
 
 #groupFilterBar .glyph-icon {
-    -fx-font-size: 2em;
-}
-
-#groupBar .glyph-icon {
     -fx-font-size: 2em;
 }

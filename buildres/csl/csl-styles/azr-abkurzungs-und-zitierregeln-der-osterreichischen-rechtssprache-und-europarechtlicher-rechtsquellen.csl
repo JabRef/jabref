@@ -306,14 +306,7 @@
           <text variable="title" suffix=" "/>
           <text variable="URL" suffix=" "/>
           <text variable="locator" prefix="(" suffix="), "/>
-          <choose>
-            <if variable="issued">
-              <date variable="issued" prefix="(Stand " suffix=")" form="numeric"/>
-            </if>
-            <else>
-              <date variable="accessed" prefix="(aufgerufen am " suffix=")" form="numeric"/>
-            </else>
-          </choose>
+          <date variable="accessed" prefix="(aufgerufen am " suffix=")" form="numeric"/>
         </else-if>
         <else>
           <group delimiter=", ">
@@ -473,14 +466,7 @@
           <text variable="title" suffix=" "/>
           <text variable="URL" suffix=" "/>
           <text variable="locator" prefix="(" suffix="), "/>
-          <choose>
-            <if variable="issued">
-              <date variable="issued" prefix="(Stand " suffix=")" form="numeric"/>
-            </if>
-            <else>
-              <date variable="accessed" prefix="(aufgerufen am " suffix=")" form="numeric"/>
-            </else>
-          </choose>
+          <date variable="accessed" prefix="(aufgerufen am " suffix=")" form="numeric"/>
         </else-if>
         <else>
           <group delimiter=", ">

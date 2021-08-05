@@ -2,7 +2,6 @@ package org.jabref.model.pdf;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
 
@@ -37,15 +36,5 @@ public class FileAnnotationTest {
         String dateString = "gsdfgwergsdf";
         LocalDateTime date = FileAnnotation.extractModifiedTime(dateString);
         assertTrue(ChronoUnit.SECONDS.between(LocalDateTime.now(), date) <= 1);
-    }
-
-    @Test
-    public void testAbbreviateAnnotationName() {
-        final FileAnnotation fileAnnotation = new FileAnnotation("John Robertson",
-                LocalDateTime.of(2020, 4, 18, 17, 10), 1,
-                "this is an annotation that is very long and goes over the character limit of 45",
-                FileAnnotationType.FREETEXT, Optional.empty());
-
-        assertEquals("this is an annotation that is very long and g...", fileAnnotation.toString());
     }
 }

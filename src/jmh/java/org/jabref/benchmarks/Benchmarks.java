@@ -3,7 +3,6 @@ package org.jabref.benchmarks;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
-import java.util.EnumSet;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
@@ -29,7 +28,6 @@ import org.jabref.model.groups.GroupHierarchyType;
 import org.jabref.model.groups.KeywordGroup;
 import org.jabref.model.groups.WordKeywordGroup;
 import org.jabref.model.metadata.MetaData;
-import org.jabref.model.search.rules.SearchRules.SearchFlags;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.preferences.JabRefPreferences;
 
@@ -95,14 +93,14 @@ public class Benchmarks {
     @Benchmark
     public List<BibEntry> search() {
         // FIXME: Reuse SearchWorker here
-        SearchQuery searchQuery = new SearchQuery("Journal Title 500", EnumSet.noneOf(SearchFlags.class));
+        SearchQuery searchQuery = new SearchQuery("Journal Title 500", false, false);
         return database.getEntries().stream().filter(searchQuery::isMatch).collect(Collectors.toList());
     }
 
     @Benchmark
     public List<BibEntry> parallelSearch() {
         // FIXME: Reuse SearchWorker here
-        SearchQuery searchQuery = new SearchQuery("Journal Title 500", EnumSet.noneOf(SearchFlags.class));
+        SearchQuery searchQuery = new SearchQuery("Journal Title 500", false, false);
         return database.getEntries().parallelStream().filter(searchQuery::isMatch).collect(Collectors.toList());
     }
 

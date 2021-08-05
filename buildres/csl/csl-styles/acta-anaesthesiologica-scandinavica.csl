@@ -157,8 +157,6 @@
     <layout>
       <group delimiter=". " suffix=". ">
         <text variable="citation-number"/>
-      <text variable="citation-number" suffix=". "/>
-      <group delimiter=". " suffix=". ">
         <text macro="author"/>
         <text macro="title"/>
       </group>

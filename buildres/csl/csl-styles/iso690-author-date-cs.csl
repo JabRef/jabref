@@ -103,7 +103,7 @@
         </choose>
       </if>
       <else>
-        <text term="anonymous" form="short" text-case="capitalize-first"/>
+        <text term="anonymous" form="short" text-case="uppercase"/>
       </else>
     </choose>
   </macro>
@@ -135,7 +135,7 @@
         </names>
       </if>
       <else>
-        <text term="anonymous" form="short" text-case="capitalize-first"/>
+        <text term="anonymous" form="short" text-case="uppercase"/>
       </else>
     </choose>
   </macro>
@@ -163,7 +163,7 @@
         </choose>
       </if>
       <else>
-        <text term="anonymous" text-case="capitalize-first"/>
+        <text term="anonymous" text-case="uppercase"/>
       </else>
     </choose>
   </macro>
@@ -506,10 +506,7 @@
             <text macro="title"/>
             <text macro="genre"/>
             <text macro="edition"/>
-            <group delimiter=" ">
-              <text macro="publisher-info"/>
-              <text macro="accessed"/>
-            </group>
+            <text macro="accessed"/>
             <text macro="collection"/>
             <text macro="isbn"/>
           </group>
@@ -586,10 +583,11 @@
           <text macro="url"/>
         </else-if>
         <else-if type="webpage">
-          <group suffix=". ">
-            <text macro="title"/>
-            <text macro="publisher-info" prefix=". "/>
-            <text macro="accessed" prefix=" "/>
+          <group delimiter=". " suffix=". ">
+            <group delimiter=" ">
+              <text macro="title"/>
+              <text macro="accessed"/>
+            </group>
           </group>
           <text macro="url"/>
         </else-if>
