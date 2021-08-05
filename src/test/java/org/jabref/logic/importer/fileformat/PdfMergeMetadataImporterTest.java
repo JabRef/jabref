@@ -10,6 +10,7 @@ import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.StandardEntryType;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -57,15 +58,32 @@ class PdfMergeMetadataImporterTest {
         Path file = Path.of(PdfMergeMetadataImporterTest.class.getResource("mixedMetadata.pdf").toURI());
         List<BibEntry> result = importer.importDatabase(file, StandardCharsets.UTF_8).getDatabase().getEntries();
 
-        BibEntry expected = new BibEntry(StandardEntryType.Article);
-        expected.setCitationKey("jabreftext2021");
-        expected.setField(StandardField.AUTHOR, "Donald Knuth");
-        expected.setField(StandardField.FILE, ":" + file.toAbsolutePath().toString() + ":" + StandardFileType.PDF.getName());
+        // From DOI (contained in embedded bib file)
+        BibEntry expected = new BibEntry(StandardEntryType.Book);
+        expected.setCitationKey("Burd_2011");
+        expected.setField(StandardField.AUTHOR, "Barry Burd");
+        expected.setField(StandardField.TITLE, "Java{\\textregistered} For Dummies{\\textregistered}");
+        expected.setField(StandardField.PUBLISHER, "Wiley Publishing, Inc.");
+        expected.setField(StandardField.YEAR, "2011");
+        expected.setField(StandardField.AUTHOR, "Barry Burd");
+        expected.setField(StandardField.MONTH, "jul");
+        expected.setField(StandardField.DOI, "10.1002/9781118257517");
+
+        // From ISBN (contained on first page verbatim bib entry)
+        expected.setField(StandardField.DATE, "2018-01-01");
+        expected.setField(new UnknownField("ean"), "9780134685991");
+        expected.setField(StandardField.ISBN, "0134685997");
+        expected.setField(StandardField.URL, "https://www.ebook.de/de/product/28983211/joshua_bloch_effective_java.html");
+
+        // From embedded bib file
+        expected.setField(StandardField.COMMENT, "From embedded bib");
+
+        // From first page verbatim bib entry
         expected.setField(StandardField.JOURNAL, "Some Journal");
-        expected.setField(StandardField.TITLE, "Knuth: Computers and Typesetting");
-        expected.setField(StandardField.URL, "http://www-cs-faculty.stanford.edu/\\~{}uno/abcde.html");
         expected.setField(StandardField.VOLUME, "1");
-        expected.setField(StandardField.YEAR, "2021");
+
+        // From merge
+        expected.setField(StandardField.FILE, ":" + file.toAbsolutePath().toString() + ":" + StandardFileType.PDF.getName());
 
         assertEquals(Collections.singletonList(expected), result);
     }

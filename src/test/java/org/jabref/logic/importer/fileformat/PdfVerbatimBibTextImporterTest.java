@@ -62,6 +62,7 @@ class PdfVerbatimBibTextImporterTest {
         expected.setField(StandardField.VOLUME, "1");
         expected.setField(StandardField.JOURNAL, "Some Journal");
         expected.setField(StandardField.YEAR, "2021");
+        expected.setField(StandardField.ISBN, "0134685997");
         expected.setFiles(Collections.singletonList(new LinkedFile("", file.toAbsolutePath(), "PDF")));
 
         List<BibEntry> resultSecondImport = importer.importDatabase(file, StandardCharsets.UTF_8).getDatabase().getEntries();

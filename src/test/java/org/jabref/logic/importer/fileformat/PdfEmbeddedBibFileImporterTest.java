@@ -56,9 +56,10 @@ class PdfEmbeddedBibFileImporterTest {
 
         BibEntry expected = new BibEntry(StandardEntryType.Misc);
         expected.setCitationKey("jabreftext2021");
-        expected.setField(StandardField.AUTHOR, "Donald Knuth");
-        expected.setField(StandardField.TITLE, "Knuth: Computers and Typesetting");
-        expected.setField(StandardField.URL, "http://www-cs-faculty.stanford.edu/\\~{}uno/abcde.html");
+        expected.setField(StandardField.AUTHOR, "Someone embedded");
+        expected.setField(StandardField.TITLE, "I like beds");
+        expected.setField(StandardField.DOI, "10.1002/9781118257517");
+        expected.setField(StandardField.COMMENT, "From embedded bib");
 
         assertEquals(Collections.singletonList(expected), result);
     }
