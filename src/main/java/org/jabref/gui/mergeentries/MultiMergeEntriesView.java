@@ -34,6 +34,7 @@ import javafx.scene.text.TextAlignment;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.BindingsHelper;
+import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.bibtex.FieldContentFormatterPreferences;
 import org.jabref.logic.importer.FetcherException;
@@ -232,64 +233,67 @@ public class MultiMergeEntriesView extends BaseDialog<BibEntry> {
         public Cell(String content, Field field, int columnIndex) {
             this.content = content;
 
-            FieldRow row = fieldRows.get(field);
+            DefaultTaskExecutor.runInJavaFXThread(() -> {
 
-            prefWidthProperty().bind(((Region) supplierHeader.getChildren().get(columnIndex)).widthProperty());
-            setMinWidth(Control.USE_PREF_SIZE);
-            setMaxWidth(Control.USE_PREF_SIZE);
-            prefHeightProperty().bind(((Region) fieldEditor.getChildren().get(row.rowIndex)).heightProperty());
-            setMinHeight(Control.USE_PREF_SIZE);
-            setMaxHeight(Control.USE_PREF_SIZE);
+                FieldRow row = fieldRows.get(field);
 
-            // Button
-            ToggleButton cellButton = new ToggleButton();
-            cellButton.prefHeightProperty().bind(heightProperty());
-            cellButton.setMinHeight(Control.USE_PREF_SIZE);
-            cellButton.setMaxHeight(Control.USE_PREF_SIZE);
-            getChildren().add(cellButton);
-            HBox.setHgrow(cellButton, Priority.ALWAYS);
+                prefWidthProperty().bind(((Region) supplierHeader.getChildren().get(columnIndex)).widthProperty());
+                setMinWidth(Control.USE_PREF_SIZE);
+                setMaxWidth(Control.USE_PREF_SIZE);
+                prefHeightProperty().bind(((Region) fieldEditor.getChildren().get(row.rowIndex)).heightProperty());
+                setMinHeight(Control.USE_PREF_SIZE);
+                setMaxHeight(Control.USE_PREF_SIZE);
 
-            // Text
-            DiffHighlightingEllipsingTextFlow buttonText = new DiffHighlightingEllipsingTextFlow(content);
+                // Button
+                ToggleButton cellButton = new ToggleButton();
+                cellButton.prefHeightProperty().bind(heightProperty());
+                cellButton.setMinHeight(Control.USE_PREF_SIZE);
+                cellButton.setMaxHeight(Control.USE_PREF_SIZE);
+                getChildren().add(cellButton);
+                HBox.setHgrow(cellButton, Priority.ALWAYS);
 
-            buttonText.maxWidthProperty().bind(widthProperty());
-            buttonText.maxHeightProperty().bind(heightProperty());
-            cellButton.setGraphic(buttonText);
+                // Text
+                DiffHighlightingEllipsingTextFlow buttonText = new DiffHighlightingEllipsingTextFlow(content);
 
-            // Tooltip
-            Tooltip buttonTooltip = new Tooltip(content);
-            buttonTooltip.setWrapText(true);
-            buttonTooltip.prefWidthProperty().bind(widthProperty());
-            buttonTooltip.setTextAlignment(TextAlignment.LEFT);
-            cellButton.setTooltip(buttonTooltip);
+                buttonText.maxWidthProperty().bind(widthProperty());
+                buttonText.maxHeightProperty().bind(heightProperty());
+                cellButton.setGraphic(buttonText);
 
-            cellButton.setToggleGroup(row.toggleGroup);
-            if (row.toggleGroup.getSelectedToggle() == null) {
-                cellButton.setSelected(true);
-            }
+                // Tooltip
+                Tooltip buttonTooltip = new Tooltip(content);
+                buttonTooltip.setWrapText(true);
+                buttonTooltip.prefWidthProperty().bind(widthProperty());
+                buttonTooltip.setTextAlignment(TextAlignment.LEFT);
+                cellButton.setTooltip(buttonTooltip);
 
-            fieldBinding = viewModel.mergedEntryProperty().get()
-                                    .getFieldBinding(field).asOrdinary();
-            fieldBinding.subscribe(buttonText::highlightDiffTo);
+                cellButton.setToggleGroup(row.toggleGroup);
+                if (row.toggleGroup.getSelectedToggle() == null) {
+                    cellButton.setSelected(true);
+                }
 
-            if (field.equals(StandardField.DOI)) {
-                Button doiButton = IconTheme.JabRefIcons.LOOKUP_IDENTIFIER.asButton();
-                HBox.setHgrow(doiButton, Priority.NEVER);
-                getChildren().add(doiButton);
+                fieldBinding = viewModel.mergedEntryProperty().get()
+                                        .getFieldBinding(field).asOrdinary();
+                fieldBinding.subscribe(buttonText::highlightDiffTo);
 
-                doiButton.setOnAction(event -> {
-                    DoiFetcher doiFetcher = new DoiFetcher(importFormatPreferences);
-                    doiButton.setDisable(true);
-                    addSource(Localization.lang("From DOI"), () -> {
-                        try {
-                            return doiFetcher.performSearchById(content).get();
-                        } catch (FetcherException | NoSuchElementException e) {
-                            LOGGER.warn("Failed to fetch BibEntry for DOI {}", content, e);
-                            return null;
-                        }
+                if (field.equals(StandardField.DOI)) {
+                    Button doiButton = IconTheme.JabRefIcons.LOOKUP_IDENTIFIER.asButton();
+                    HBox.setHgrow(doiButton, Priority.NEVER);
+                    getChildren().add(doiButton);
+
+                    doiButton.setOnAction(event -> {
+                        DoiFetcher doiFetcher = new DoiFetcher(importFormatPreferences);
+                        doiButton.setDisable(true);
+                        addSource(Localization.lang("From DOI"), () -> {
+                            try {
+                                return doiFetcher.performSearchById(content).get();
+                            } catch (FetcherException | NoSuchElementException e) {
+                                LOGGER.warn("Failed to fetch BibEntry for DOI {}", content, e);
+                                return null;
+                            }
+                        });
                     });
-                });
-            }
+                }
+            });
         }
 
         public String getContent() {
