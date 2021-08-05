@@ -4,15 +4,20 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
+import org.jabref.gui.DefaultInjector;
+import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
+import org.jabref.logic.importer.fetcher.DoiFetcher;
 import org.jabref.logic.importer.fetcher.GrobidCitationFetcher;
+import org.jabref.logic.importer.fetcher.IsbnFetcher;
 import org.jabref.logic.importer.util.FileFieldParser;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.xmp.XmpPreferences;
@@ -21,14 +26,21 @@ import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * PdfEmbeddedBibFileImporter imports an embedded Bib-File from the PDF.
  */
 public class PdfMergeMetadataImporter extends Importer {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultInjector.class);
+
     private final List<Importer> metadataImporters;
+    private final ImportFormatPreferences importFormatPreferences;
 
     public PdfMergeMetadataImporter(ImportFormatPreferences importFormatPreferences, XmpPreferences xmpPreferences) {
+        this.importFormatPreferences = importFormatPreferences;
         this.metadataImporters = List.of(
                 new PdfGrobidImporter(GrobidCitationFetcher.GROBID_URL, importFormatPreferences),
                 new PdfEmbeddedBibFileImporter(importFormatPreferences),
@@ -59,20 +71,41 @@ public class PdfMergeMetadataImporter extends Importer {
 
     @Override
     public ParserResult importDatabase(Path filePath, Charset defaultEncoding) throws IOException {
-        BibEntry entry = new BibEntry();
-        boolean foundMetadata = false;
+        List<BibEntry> candidates = new ArrayList<>();
+
         for (Importer metadataImporter : metadataImporters) {
             List<BibEntry> extractedEntries = metadataImporter.importDatabase(filePath, defaultEncoding).getDatabase().getEntries();
             if (extractedEntries.size() == 0) {
                 continue;
             }
-            foundMetadata = true;
-            BibEntry extractedMainEntry = extractedEntries.get(0);
+            candidates.add(extractedEntries.get(0));
+        }
+        if (candidates.isEmpty()) {
+            return new ParserResult();
+        }
+        for (BibEntry candidate : candidates) {
+            if (candidate.hasField(StandardField.DOI)) {
+                try {
+                    new DoiFetcher(importFormatPreferences).performSearchById(candidate.getField(StandardField.DOI).get()).ifPresent((fromDoi) -> candidates.add(0, fromDoi));
+                } catch (FetcherException e) {
+                    LOGGER.error("Fetching failed for DOI \"{}\".", candidate.getField(StandardField.DOI).get(), e);
+                }
+            }
+            if (candidate.hasField(StandardField.ISBN)) {
+                try {
+                    new IsbnFetcher(importFormatPreferences).performSearchById(candidate.getField(StandardField.ISBN).get()).ifPresent((fromISBN) -> candidates.add(0, fromISBN));
+                } catch (FetcherException e) {
+                    LOGGER.error("Fetching failed for ISBN \"{}\".", candidate.getField(StandardField.ISBN).get(), e);
+                }
+            }
+        }
+        BibEntry entry = new BibEntry();
+        for (BibEntry candidate : candidates) {
             if (BibEntry.DEFAULT_TYPE.equals(entry.getType())) {
-                entry.setType(extractedMainEntry.getType());
+                entry.setType(candidate.getType());
             }
             Set<Field> presentFields = entry.getFields();
-            for (Map.Entry<Field, String> fieldEntry : extractedMainEntry.getFieldMap().entrySet()) {
+            for (Map.Entry<Field, String> fieldEntry : candidate.getFieldMap().entrySet()) {
                 // Don't merge FILE fields that point to a stored file as we set that to filePath anyway.
                 // Nevertheless, retain online links.
                 if (StandardField.FILE.equals(fieldEntry.getKey()) &&
@@ -84,9 +117,6 @@ public class PdfMergeMetadataImporter extends Importer {
                     entry.setField(fieldEntry.getKey(), fieldEntry.getValue());
                 }
             }
-        }
-        if (!foundMetadata) {
-            return new ParserResult();
         }
 
         entry.addFile(new LinkedFile("", filePath, StandardFileType.PDF.getName()));
