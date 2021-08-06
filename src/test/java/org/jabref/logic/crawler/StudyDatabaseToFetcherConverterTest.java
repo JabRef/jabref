@@ -48,7 +48,6 @@ class StudyDatabaseToFetcherConverterTest {
         when(savePreferences.takeMetadataSaveOrderInAccount()).thenReturn(true);
         when(importFormatPreferences.getKeywordSeparator()).thenReturn(',');
         when(importFormatPreferences.getFieldContentFormatterPreferences()).thenReturn(new FieldContentFormatterPreferences());
-        when(importFormatPreferences.isKeywordSyncEnabled()).thenReturn(false);
         when(importFormatPreferences.getEncoding()).thenReturn(StandardCharsets.UTF_8);
         entryTypesManager = new BibEntryTypesManager();
         gitHandler = mock(SlrGitHandler.class, Answers.RETURNS_DEFAULTS);
@@ -59,8 +58,8 @@ class StudyDatabaseToFetcherConverterTest {
         Path studyDefinition = tempRepositoryDirectory.resolve("study.yml");
         copyTestStudyDefinitionFileIntoDirectory(studyDefinition);
 
-        StudyRepository studyRepository = new StudyRepository(tempRepositoryDirectory, gitHandler, preferencesService, new DummyFileUpdateMonitor(), savePreferences, timestampPreferences, entryTypesManager);
-        StudyDatabaseToFetcherConverter converter = new StudyDatabaseToFetcherConverter(studyRepository.getActiveLibraryEntries(), preferencesService);
+        StudyRepository studyRepository = new StudyRepository(tempRepositoryDirectory, gitHandler, preferencesService.getImportFormatPreferences(), new DummyFileUpdateMonitor(), savePreferences, timestampPreferences, entryTypesManager);
+        StudyDatabaseToFetcherConverter converter = new StudyDatabaseToFetcherConverter(studyRepository.getActiveLibraryEntries(), preferencesService.getImportFormatPreferences());
         List<SearchBasedFetcher> result = converter.getActiveFetchers();
 
         Assertions.assertEquals(2, result.size());

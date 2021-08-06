@@ -11,9 +11,11 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.jabref.gui.preferences.customization.CustomizationTabViewModel;
+import org.jabref.gui.Globals;
+import org.jabref.gui.preferences.importexport.ImportExportTabViewModel;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.FetcherException;
+import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.PagedSearchBasedParserFetcher;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.fetcher.transformers.SpringerQueryTransformer;
@@ -26,7 +28,6 @@ import org.jabref.model.entry.Month;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
-import org.jabref.preferences.PreferencesService;
 
 import kong.unirest.json.JSONArray;
 import kong.unirest.json.JSONObject;
@@ -49,11 +50,11 @@ public class SpringerFetcher implements PagedSearchBasedParserFetcher {
     // Springer query using the parameter 'q=doi:10.1007/s11276-008-0131-4s=1' will respond faster
     private static final String TEST_URL_WITHOUT_API_KEY = "https://api.springernature.com/meta/v1/json?q=doi:10.1007/s11276-008-0131-4s=1&p=1&api_key=";
 
-    private final PreferencesService preferences;
+    private final ImportFormatPreferences preferences;
 
-    public SpringerFetcher(PreferencesService preferences) {
+    public SpringerFetcher(ImportFormatPreferences preferences) {
         this.preferences = Objects.requireNonNull(preferences);
-        CustomizationTabViewModel.registerApiKeyCustom(this.getName(), TEST_URL_WITHOUT_API_KEY);
+        ImportExportTabViewModel.registerApiKeyCustom(this.getName(), TEST_URL_WITHOUT_API_KEY);
     }
 
     /**
@@ -173,14 +174,9 @@ public class SpringerFetcher implements PagedSearchBasedParserFetcher {
         return Optional.of(HelpFile.FETCHER_SPRINGER);
     }
 
-    /**
-     * Gets springer api key, use key if it customized it in the preferences, otherwise use the default
-     *
-     * @return Springer API Key
-     */
     private String getApiKey() {
         String apiKey = API_KEY;
-        CustomApiKeyPreferences apiKeyPreferences = preferences.getCustomApiKeyPreferences(getName());
+        CustomApiKeyPreferences apiKeyPreferences = Globals.prefs.getCustomApiKeyPreferences(getName());
         if (apiKeyPreferences != null && apiKeyPreferences.shouldUseCustom()) {
             apiKey = apiKeyPreferences.getCustomApiKey();
         }
@@ -211,7 +207,7 @@ public class SpringerFetcher implements PagedSearchBasedParserFetcher {
         complexSearchQuery.getTitlePhrases().forEach(title -> searchTerms.add("title:" + title));
         complexSearchQuery.getJournal().ifPresent(journal -> searchTerms.add("journal:" + journal));
         // Since Springer API does not support year range search, we ignore formYear and toYear and use "singleYear" only
-        complexSearchQuery.getSingleYear().ifPresent(year -> searchTerms.add("date:" + year.toString() + "*"));
+        complexSearchQuery.getSingleYear().ifPresent(year -> searchTerms.add("date:" + year + "*"));
         searchTerms.addAll(complexSearchQuery.getDefaultFieldPhrases());
         return String.join(" AND ", searchTerms);
     }

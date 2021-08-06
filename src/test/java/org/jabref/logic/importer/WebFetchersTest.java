@@ -13,7 +13,6 @@ import org.jabref.logic.importer.fetcher.IsbnViaEbookDeFetcher;
 import org.jabref.logic.importer.fetcher.IsbnViaOttoBibFetcher;
 import org.jabref.logic.importer.fetcher.JstorFetcher;
 import org.jabref.logic.importer.fetcher.MrDLibFetcher;
-import org.jabref.preferences.PreferencesService;
 
 import io.github.classgraph.ClassGraph;
 import io.github.classgraph.ClassInfoList;
@@ -27,16 +26,13 @@ import static org.mockito.Mockito.when;
 
 class WebFetchersTest {
 
-    private PreferencesService preferencesService;
     private ImportFormatPreferences importFormatPreferences;
-    private final ClassGraph classGraph = new ClassGraph().enableAllInfo().whitelistPackages("org.jabref");
+    private final ClassGraph classGraph = new ClassGraph().enableAllInfo().acceptPackages("org.jabref");
 
     @BeforeEach
     void setUp() throws Exception {
-        preferencesService = mock(PreferencesService.class);
         importFormatPreferences = mock(ImportFormatPreferences.class);
         FieldContentFormatterPreferences fieldContentFormatterPreferences = mock(FieldContentFormatterPreferences.class);
-        when(preferencesService.getImportFormatPreferences()).thenReturn(importFormatPreferences);
         when(importFormatPreferences.getFieldContentFormatterPreferences()).thenReturn(fieldContentFormatterPreferences);
     }
 
@@ -80,7 +76,7 @@ class WebFetchersTest {
 
     @Test
     void getSearchBasedFetchersReturnsAllFetcherDerivingFromSearchBasedFetcher() throws Exception {
-        Set<SearchBasedFetcher> searchBasedFetchers = WebFetchers.getSearchBasedFetchers(preferencesService);
+        Set<SearchBasedFetcher> searchBasedFetchers = WebFetchers.getSearchBasedFetchers(importFormatPreferences);
         try (ScanResult scanResult = classGraph.scan()) {
             ClassInfoList controlClasses = scanResult.getClassesImplementing(SearchBasedFetcher.class.getCanonicalName());
             Set<Class<?>> expected = new HashSet<>(controlClasses.loadClasses());
@@ -104,7 +100,7 @@ class WebFetchersTest {
 
     @Test
     void getFullTextFetchersReturnsAllFetcherDerivingFromFullTextFetcher() throws Exception {
-        Set<FulltextFetcher> fullTextFetchers = WebFetchers.getFullTextFetchers(preferencesService);
+        Set<FulltextFetcher> fullTextFetchers = WebFetchers.getFullTextFetchers(importFormatPreferences);
 
         try (ScanResult scanResult = classGraph.scan()) {
             ClassInfoList controlClasses = scanResult.getClassesImplementing(FulltextFetcher.class.getCanonicalName());

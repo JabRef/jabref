@@ -4,9 +4,9 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.Optional;
 
+import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.preferences.PreferencesService;
 import org.jabref.support.DisabledOnCIServer;
 import org.jabref.testutils.category.FetcherTest;
 
@@ -25,8 +25,8 @@ public class SpringerLinkTest {
 
     @BeforeEach
     public void setUp() {
-        PreferencesService preferencesService = mock(PreferencesService.class);
-        finder = new SpringerLink(preferencesService);
+        ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class);
+        finder = new SpringerLink();
         entry = new BibEntry();
     }
 

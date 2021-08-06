@@ -18,9 +18,13 @@ public class ImportFormatPreferences {
     private final XmpPreferences xmpPreferences;
     private final boolean keywordSyncEnabled;
 
-    public ImportFormatPreferences(Set<CustomImporter> customImportList, Charset encoding, Character keywordSeparator,
+    public ImportFormatPreferences(Set<CustomImporter> customImportList,
+                                   Charset encoding,
+                                   Character keywordSeparator,
                                    CitationKeyPatternPreferences citationKeyPatternPreferences,
-                                   FieldContentFormatterPreferences fieldContentFormatterPreferences, XmpPreferences xmpPreferences, boolean keywordSyncEnabled) {
+                                   FieldContentFormatterPreferences fieldContentFormatterPreferences,
+                                   XmpPreferences xmpPreferences,
+                                   boolean keywordSyncEnabled) {
         this.customImportList = customImportList;
         this.encoding = encoding;
         this.keywordSeparator = keywordSeparator;
@@ -55,16 +59,14 @@ public class ImportFormatPreferences {
     }
 
     public ImportFormatPreferences withEncoding(Charset newEncoding) {
-        return new ImportFormatPreferences(customImportList, newEncoding, keywordSeparator, citationKeyPatternPreferences,
-                fieldContentFormatterPreferences, xmpPreferences, keywordSyncEnabled);
-    }
-
-    /**
-     * @deprecated importer should not keyword synchronization; this is a post-import action
-     */
-    @Deprecated
-    public boolean isKeywordSyncEnabled() {
-        return keywordSyncEnabled;
+        return new ImportFormatPreferences(
+                customImportList,
+                newEncoding,
+                keywordSeparator,
+                citationKeyPatternPreferences,
+                fieldContentFormatterPreferences,
+                xmpPreferences,
+                keywordSyncEnabled);
     }
 
     public XmpPreferences getXmpPreferences() {

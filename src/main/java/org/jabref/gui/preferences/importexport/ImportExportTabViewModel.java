@@ -20,6 +20,7 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 
+import org.jabref.gui.DialogService;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.logic.importer.importsettings.ImportSettingsPreferences;
 import org.jabref.logic.l10n.Localization;
@@ -47,7 +48,8 @@ public class ImportExportTabViewModel implements PreferenceTabViewModel {
     private final DOIPreferences initialDOIPreferences;
     private final ImportSettingsPreferences initialImportSettingsPreferences;
 
-    public ImportExportTabViewModel(PreferencesService preferencesService) {
+    public ImportExportTabViewModel(PreferencesService preferencesService, DialogService dialogService) {
+        this.dialogService = dialogService;
         this.preferencesService = preferencesService;
         this.initialImportSettingsPreferences = preferencesService.getImportSettingsPreferences();
         this.initialDOIPreferences = preferencesService.getDOIPreferences();

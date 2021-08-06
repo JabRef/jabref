@@ -14,6 +14,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import org.jabref.gui.Globals;
+import org.jabref.gui.preferences.importexport.ImportExportTabViewModel;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.FulltextFetcher;
@@ -63,8 +65,8 @@ public class IEEE implements FulltextFetcher, PagedSearchBasedParserFetcher {
     private IEEEQueryTransformer transformer;
 
     public IEEE(ImportFormatPreferences preferences) {
-        this.preferences = Objects.requireNonNull(preferences);
-        CustomizationTabViewModel.registerApiKeyCustom(this.getName(), TEST_URL_WITHOUT_API_KEY);
+        this.importFormatPreferences = Objects.requireNonNull(preferences);
+        ImportExportTabViewModel.registerApiKeyCustom(this.getName(), TEST_URL_WITHOUT_API_KEY);
     }
 
     /**
@@ -210,18 +212,18 @@ public class IEEE implements FulltextFetcher, PagedSearchBasedParserFetcher {
                 JSONArray results = jsonObject.getJSONArray("articles");
                 for (int i = 0; i < results.length(); i++) {
                     JSONObject jsonEntry = results.getJSONObject(i);
-                    BibEntry entry = parseJsonResponse(jsonEntry, preferences.getKeywordSeparator());
+                    BibEntry entry = parseJsonResponse(jsonEntry, importFormatPreferences.getKeywordSeparator());
                     boolean addEntry;
                     // In case entry has no year, add it
                     // In case an entry has a year, check if its in the year range
                     // The implementation uses some Java 8 Optional magic to implement that
                     if (entry.hasField(StandardField.YEAR)) {
                         addEntry = entry.getField(StandardField.YEAR).filter(year -> {
-                            Integer yearAsInteger = Integer.valueOf(year);
+                            int yearAsInteger = Integer.parseInt(year);
                             return
                                     transformer.getStartYear().map(startYear -> yearAsInteger >= startYear).orElse(true) &&
                                             transformer.getEndYear().map(endYear -> yearAsInteger <= endYear).orElse(true);
-                        }).map(x -> true).orElse(false);
+                        }).isPresent();
                     } else {
                         addEntry = true;
                     }
@@ -252,7 +254,7 @@ public class IEEE implements FulltextFetcher, PagedSearchBasedParserFetcher {
      */
     private String getApiKey() {
         String apiKey = API_KEY;
-        CustomApiKeyPreferences apiKeyPreferences = preferencesService.getCustomApiKeyPreferences(getName());
+        CustomApiKeyPreferences apiKeyPreferences = Globals.prefs.getCustomApiKeyPreferences(getName());
         if (apiKeyPreferences != null && apiKeyPreferences.shouldUseCustom()) {
             apiKey = apiKeyPreferences.getCustomApiKey();
         }

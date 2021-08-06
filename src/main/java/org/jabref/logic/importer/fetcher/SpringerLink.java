@@ -5,13 +5,13 @@ import java.net.URL;
 import java.util.Objects;
 import java.util.Optional;
 
+import org.jabref.gui.Globals;
 import org.jabref.logic.importer.FulltextFetcher;
 import org.jabref.logic.preferences.CustomApiKeyPreferences;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
-import org.jabref.preferences.PreferencesService;
 
 import kong.unirest.HttpResponse;
 import kong.unirest.JsonNode;
@@ -34,20 +34,12 @@ public class SpringerLink implements FulltextFetcher {
     private static final String CONTENT_HOST = "link.springer.com";
     private static final String NAME = "Springer";
 
-    private final PreferencesService preferences;
-
-    public SpringerLink(PreferencesService preferences) {
-        this.preferences = Objects.requireNonNull(preferences);
+    public SpringerLink() {
     }
 
-    /**
-     * Gets springer api key, use key if it customized it in the preferences, otherwise use the default
-     *
-     * @return Springer API Key
-     */
     private String getApiKey() {
         String apiKey = API_KEY;
-        CustomApiKeyPreferences apiKeyPreferences = preferences.getCustomApiKeyPreferences(NAME);
+        CustomApiKeyPreferences apiKeyPreferences = Globals.prefs.getCustomApiKeyPreferences(NAME);
         if (apiKeyPreferences != null && apiKeyPreferences.shouldUseCustom()) {
             apiKey = apiKeyPreferences.getCustomApiKey();
         }
@@ -61,7 +53,7 @@ public class SpringerLink implements FulltextFetcher {
         // Try unique DOI first
         Optional<DOI> doi = entry.getField(StandardField.DOI).flatMap(DOI::parse);
 
-        if (!doi.isPresent()) {
+        if (doi.isEmpty()) {
             return Optional.empty();
         }
         // Available in catalog?

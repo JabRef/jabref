@@ -101,7 +101,6 @@ class CrawlerTest {
         when(savePreferences.getEncoding()).thenReturn(Charset.defaultCharset());
         when(importFormatPreferences.getKeywordSeparator()).thenReturn(',');
         when(importFormatPreferences.getFieldContentFormatterPreferences()).thenReturn(new FieldContentFormatterPreferences());
-        when(importFormatPreferences.isKeywordSyncEnabled()).thenReturn(false);
         when(importFormatPreferences.getEncoding()).thenReturn(StandardCharsets.UTF_8);
         entryTypesManager = new BibEntryTypesManager();
     }

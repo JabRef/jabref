@@ -5,21 +5,21 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.logic.importer.WebFetchers;
 import org.jabref.model.study.StudyDatabase;
-import org.jabref.preferences.PreferencesService;
 
 /**
  * Converts library entries from the given study into their corresponding fetchers.
  */
 class StudyDatabaseToFetcherConverter {
     private final List<StudyDatabase> libraryEntries;
-    private final PreferencesService preferencesService;
+    private final ImportFormatPreferences importFormatPreferences;
 
-    public StudyDatabaseToFetcherConverter(List<StudyDatabase> libraryEntries, PreferencesService preferencesService) {
+    public StudyDatabaseToFetcherConverter(List<StudyDatabase> libraryEntries, ImportFormatPreferences importFormatPreferences) {
         this.libraryEntries = libraryEntries;
-        this.preferencesService = preferencesService;
+        this.importFormatPreferences = importFormatPreferences;
     }
 
     /**
@@ -53,10 +53,10 @@ class StudyDatabaseToFetcherConverter {
      * @return An instance of the fetcher defined by the library entry.
      */
     private SearchBasedFetcher createFetcherFromLibraryEntry(StudyDatabase studyDatabase) {
-        Set<SearchBasedFetcher> searchBasedFetchers = WebFetchers.getSearchBasedFetchers(preferencesService);
+        Set<SearchBasedFetcher> searchBasedFetchers = WebFetchers.getSearchBasedFetchers(importFormatPreferences);
         String libraryNameFromFetcher = studyDatabase.getName();
         return searchBasedFetchers.stream()
-                                  .filter(searchBasedFetcher -> searchBasedFetcher.getName().toLowerCase().equals(libraryNameFromFetcher.toLowerCase()))
+                                  .filter(searchBasedFetcher -> searchBasedFetcher.getName().equalsIgnoreCase(libraryNameFromFetcher))
                                   .findAny()
                                   .orElse(null);
     }
