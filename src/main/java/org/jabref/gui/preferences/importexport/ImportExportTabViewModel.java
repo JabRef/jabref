@@ -1,5 +1,10 @@
 package org.jabref.gui.preferences.importexport;
 
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
@@ -12,14 +17,17 @@ import javax.net.ssl.SSLSocketFactory;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ListProperty;
+import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 
+import org.jabref.gui.commonfxcontrols.SortCriterionViewModel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.logic.importer.importsettings.ImportSettingsPreferences;
@@ -27,6 +35,9 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.preferences.CustomApiKeyPreferences;
 import org.jabref.logic.preferences.DOIPreferences;
+import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.FieldFactory;
+import org.jabref.model.metadata.SaveOrderConfig;
 import org.jabref.preferences.PreferencesService;
 
 public class ImportExportTabViewModel implements PreferenceTabViewModel {
@@ -37,6 +48,13 @@ public class ImportExportTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty useCustomDOIProperty = new SimpleBooleanProperty();
     private final StringProperty useCustomDOINameProperty = new SimpleStringProperty("");
 
+    // SaveOrderConfigPanel
+    private final BooleanProperty exportInOriginalProperty = new SimpleBooleanProperty();
+    private final BooleanProperty exportInTableOrderProperty = new SimpleBooleanProperty();
+    private final BooleanProperty exportInSpecifiedOrderProperty = new SimpleBooleanProperty();
+    private final ListProperty<Field> sortableFieldsProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
+    private final ListProperty<SortCriterionViewModel> sortCriteriaProperty = new SimpleListProperty<>(FXCollections.observableArrayList(new ArrayList<>()));
+
     private final ListProperty<CustomApiKeyPreferences> customApiKeyPreferencesListProperty = new SimpleListProperty<>();
     private final ObjectProperty<CustomApiKeyPreferences> selectedCustomApiKeyPreferencesProperty = new SimpleObjectProperty<>();
     private final BooleanProperty useCustomApiKeyProperty = new SimpleBooleanProperty();
@@ -44,15 +62,16 @@ public class ImportExportTabViewModel implements PreferenceTabViewModel {
 
     private final DialogService dialogService;
     private final PreferencesService preferencesService;
-
     private final DOIPreferences initialDOIPreferences;
     private final ImportSettingsPreferences initialImportSettingsPreferences;
+    private final SaveOrderConfig initialExportOrder;
 
     public ImportExportTabViewModel(PreferencesService preferencesService, DialogService dialogService) {
         this.dialogService = dialogService;
         this.preferencesService = preferencesService;
         this.initialImportSettingsPreferences = preferencesService.getImportSettingsPreferences();
         this.initialDOIPreferences = preferencesService.getDOIPreferences();
+        this.initialExportOrder = preferencesService.getExportSaveOrder();
     }
 
     public static void registerApiKeyCustom(String key, String testUrlWithoutApiKey) {
@@ -68,6 +87,20 @@ public class ImportExportTabViewModel implements PreferenceTabViewModel {
         generateKeyOnImportProperty.setValue(initialImportSettingsPreferences.generateNewKeyOnImport());
         useCustomDOIProperty.setValue(initialDOIPreferences.isUseCustom());
         useCustomDOINameProperty.setValue(initialDOIPreferences.getDefaultBaseURI());
+
+        switch (initialExportOrder.getOrderType()) {
+            case SPECIFIED -> exportInSpecifiedOrderProperty.setValue(true);
+            case ORIGINAL -> exportInOriginalProperty.setValue(true);
+            case TABLE -> exportInTableOrderProperty.setValue(true);
+        }
+
+        List<Field> fieldNames = new ArrayList<>(FieldFactory.getCommonFields());
+        fieldNames.sort(Comparator.comparing(Field::getDisplayName));
+
+        sortableFieldsProperty.addAll(fieldNames);
+        sortCriteriaProperty.addAll(initialExportOrder.getSortCriteria().stream()
+                                                      .map(SortCriterionViewModel::new)
+                                                      .collect(Collectors.toList()));
 
         // API keys
         ArrayList<CustomApiKeyPreferences> customApiKeyPreferencesList = new ArrayList<>();
@@ -86,6 +119,11 @@ public class ImportExportTabViewModel implements PreferenceTabViewModel {
         preferencesService.storeDOIPreferences(new DOIPreferences(
                 useCustomDOIProperty.getValue(),
                 useCustomDOINameProperty.getValue().trim()));
+
+        SaveOrderConfig newSaveOrderConfig = new SaveOrderConfig(
+                SaveOrderConfig.OrderType.fromBooleans(exportInSpecifiedOrderProperty.getValue(), exportInTableOrderProperty.getValue()),
+                sortCriteriaProperty.stream().map(SortCriterionViewModel::getCriterion).toList());
+        preferencesService.storeExportSaveOrder(newSaveOrderConfig);
 
         // API keys
         selectedCustomApiKeyPreferencesProperty.get().shouldUseCustomKey(useCustomApiKeyProperty.get());
@@ -109,6 +147,28 @@ public class ImportExportTabViewModel implements PreferenceTabViewModel {
 
     public StringProperty useCustomDOINameProperty() {
         return this.useCustomDOINameProperty;
+    }
+
+    // SaveOrderConfigPanel
+
+    public BooleanProperty saveInOriginalProperty() {
+        return exportInOriginalProperty;
+    }
+
+    public BooleanProperty saveInTableOrderProperty() {
+        return exportInTableOrderProperty;
+    }
+
+    public BooleanProperty saveInSpecifiedOrderProperty() {
+        return exportInSpecifiedOrderProperty;
+    }
+
+    public ListProperty<Field> sortableFieldsProperty() {
+        return sortableFieldsProperty;
+    }
+
+    public ListProperty<SortCriterionViewModel> sortCriteriaProperty() {
+        return sortCriteriaProperty;
     }
 
     public ListProperty<CustomApiKeyPreferences> customApiKeyPrefsProperty() {
@@ -159,5 +219,4 @@ public class ImportExportTabViewModel implements PreferenceTabViewModel {
             dialogService.showErrorDialogAndWait(Localization.lang("Check %0 API Key Setting", apiKeyName), Localization.lang("Connection failed!"));
         }
     }
-
 }

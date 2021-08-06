@@ -103,7 +103,7 @@ public interface PreferencesService {
 
     String getUser();
 
-    SaveOrderConfig loadExportSaveOrder();
+    SaveOrderConfig getExportSaveOrder();
 
     void storeExportSaveOrder(SaveOrderConfig config);
 
