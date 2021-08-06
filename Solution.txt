@@ -1,0 +1,38 @@
+Main problems:
+
+If jabref does display multiple messages in a short time, these messages will be stacked and played one by one. This is confusing because snackBar still displays an outdated message. For example, if you cycle quickly in a preview style.
+
+Preliminary ideas:
+A simple solution is to stack messages in an already displayed snackBar, separated by new lines, and extend the display time of the snackBar to the time when only the last message should be displayed.
+Another solution is to have multiple snackBar views. Every time we add a new snackBar, all the old snackbars will move upward and the new snackBar will rebound. Unfortunately, the current snackBar implementation (jfxsnackbar) cannot achieve this because it uses only one view, as shown in the following code segment:
+Anyway, this is the way to push snackBar:
+The idea is to add messages to message queues. Each queue has a shutdown timer, display all messages in different lines, add new messages at the end, and delete timeout messages at the beginning.
+Previously, the snackBar component could only display one message at a time, while the quickly created messages would be displayed in order and outdated because there was a recent message waiting to be displayed.
+
+Solution:
+The change allows the snackBar to display multiple messages in the same component, each on a different line.
+Changes to be made in this requisition:
+Increase / reset snackBar timeout when adding new messages
+√ add a maximum limit to the number of messages displayed simultaneously in the snackBar
+When old messages expire, gradually delete them from the snackBar
+Repair #7340.
+Changes in changelog.md are described in a way that ordinary users can understand (if applicable)
+Tests created for change (if applicable)
+√ manually test the changed function when running jabref (always required)
+√ screenshot added in PR description (for UI change)
+√ check the document: is the information available and up-to-date? If no problem is created, then https://github.com/JabRef/user-documentation/issues Or, better yet, submit a pull request to the document repository.
+
+One solution to new message queue by @EduRibeiro00:
+
+if (currEvent == null) {
+            snackbarMsgs.clear();
+            snackbarMsgs.add(message);
+            currSnackbarLayout = new JFXSnackbarLayout(message);
+            statusLine.fireEvent(new SnackbarEvent(currSnackbarLayout, TOAST_MESSAGE_DISPLAY_TIME));
+        } else if (currSnackbarLayout != null) {
+            snackbarMsgs.add(message);
+            while (snackbarMsgs.size() > MAX_TOASTS_DISPLAYED) {
+                snackbarMsgs.poll();
+            }
+            currSnackbarLayout.setToast(String.join("\n\n", snackbarMsgs));
+        }
