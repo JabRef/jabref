@@ -54,6 +54,7 @@ public class ChangeEntryTypeMenu {
     public ContextMenu getChangeEntryTypePopupMenu(BibEntry entry, BibDatabaseContext bibDatabaseContext, CountingUndoManager undoManager) {
         ContextMenu menu = new ContextMenu();
         populateComplete(menu.getItems(), entry, bibDatabaseContext, undoManager);
+        menu.deleteAccelerateor();
         return menu;
     }
 
