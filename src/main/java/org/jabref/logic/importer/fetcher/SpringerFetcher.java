@@ -7,7 +7,6 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -15,7 +14,6 @@ import org.jabref.gui.Globals;
 import org.jabref.gui.preferences.importexport.ImportExportTabViewModel;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.FetcherException;
-import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.PagedSearchBasedParserFetcher;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.fetcher.transformers.SpringerQueryTransformer;
@@ -50,10 +48,7 @@ public class SpringerFetcher implements PagedSearchBasedParserFetcher {
     // Springer query using the parameter 'q=doi:10.1007/s11276-008-0131-4s=1' will respond faster
     private static final String TEST_URL_WITHOUT_API_KEY = "https://api.springernature.com/meta/v1/json?q=doi:10.1007/s11276-008-0131-4s=1&p=1&api_key=";
 
-    private final ImportFormatPreferences preferences;
-
-    public SpringerFetcher(ImportFormatPreferences preferences) {
-        this.preferences = Objects.requireNonNull(preferences);
+    public SpringerFetcher() {
         ImportExportTabViewModel.registerApiKeyCustom(this.getName(), TEST_URL_WITHOUT_API_KEY);
     }
 

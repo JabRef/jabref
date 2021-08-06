@@ -10,7 +10,6 @@ import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
-import org.jabref.preferences.PreferencesService;
 import org.jabref.testutils.category.FetcherTest;
 
 import kong.unirest.json.JSONObject;
@@ -21,7 +20,6 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.mock;
 
 @FetcherTest
 class SpringerFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSearchFetcherTest {
@@ -30,8 +28,7 @@ class SpringerFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSear
 
     @BeforeEach
     void setUp() {
-        PreferencesService preferencesService = mock(PreferencesService.class);
-        fetcher = new SpringerFetcher(preferencesService);
+        fetcher = new SpringerFetcher();
     }
 
     @Test
@@ -87,13 +84,13 @@ class SpringerFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSear
     @Test
     @Disabled("Year search is currently broken, because the API returns mutliple years.")
     @Override
-    public void supportsYearSearch() throws Exception {
+    public void supportsYearSearch() {
     }
 
     @Test
     @Disabled("Year range search is not natively supported by the API, but can be emulated by multiple single year searches.")
     @Override
-    public void supportsYearRangeSearch() throws Exception {
+    public void supportsYearRangeSearch() {
     }
 
     @Test

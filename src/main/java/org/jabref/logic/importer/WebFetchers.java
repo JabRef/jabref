@@ -96,7 +96,7 @@ public class WebFetchers {
         set.add(new ACMPortalFetcher());
         // set.add(new GoogleScholar(importFormatPreferences));
         set.add(new DBLPFetcher(importFormatPreferences));
-        set.add(new SpringerFetcher(importFormatPreferences));
+        set.add(new SpringerFetcher());
         set.add(new CrossRef());
         set.add(new CiteSeer());
         set.add(new DOAJFetcher(importFormatPreferences));

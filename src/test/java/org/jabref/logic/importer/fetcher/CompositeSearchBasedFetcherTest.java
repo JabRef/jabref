@@ -14,7 +14,6 @@ import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.preferences.PreferencesService;
 import org.jabref.support.DisabledOnCIServer;
 import org.jabref.testutils.category.FetcherTest;
 
@@ -90,12 +89,9 @@ public class CompositeSearchBasedFetcherTest {
      * @return A stream of Arguments wrapping set of fetchers.
      */
     static Stream<Arguments> performSearchParameters() {
-        PreferencesService preferencesService = mock(PreferencesService.class);
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class);
         when(importFormatPreferences.getFieldContentFormatterPreferences())
                 .thenReturn(mock(FieldContentFormatterPreferences.class));
-        when(preferencesService.getImportFormatPreferences())
-                .thenReturn(importFormatPreferences);
         List<Set<SearchBasedFetcher>> fetcherParameters = new ArrayList<>();
         List<SearchBasedFetcher> list = new ArrayList<>();
 
@@ -107,11 +103,11 @@ public class CompositeSearchBasedFetcherTest {
         list.add(new ZbMATH(importFormatPreferences));
         list.add(new GoogleScholar(importFormatPreferences));
         list.add(new DBLPFetcher(importFormatPreferences));
-        list.add(new SpringerFetcher(preferencesService));
+        list.add(new SpringerFetcher());
         list.add(new CrossRef());
         list.add(new CiteSeer());
         list.add(new DOAJFetcher(importFormatPreferences));
-        list.add(new IEEE(preferencesService));
+        list.add(new IEEE(importFormatPreferences));
         /* Disabled due to an issue regarding comparison: Title fields of the entries that otherwise are equivalent differ
          * due to different JAXBElements.
          */
