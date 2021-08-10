@@ -1,6 +1,9 @@
 package org.jabref.gui.mergeentries;
 
+import java.util.List;
+
 import javafx.beans.DefaultProperty;
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
@@ -9,6 +12,8 @@ import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
+
+import com.tobiasdiez.easybind.EasyObservableValue;
 
 @DefaultProperty("children")
 public class DiffHighlightingEllipsingTextFlow extends TextFlow {
@@ -21,12 +26,20 @@ public class DiffHighlightingEllipsingTextFlow extends TextFlow {
     private ListChangeListener<Node> listChangeListener = this::adjustChildren;
 
     private final String fullText;
+    private final EasyObservableValue<String> comparisonString;
+    private final ObjectProperty<MergeEntries.DiffMode> diffMode;
 
-    public DiffHighlightingEllipsingTextFlow(String fullText) {
+    public DiffHighlightingEllipsingTextFlow(String fullText, EasyObservableValue<String> comparisonString, ObjectProperty<MergeEntries.DiffMode> diffMode) {
         this.fullText = fullText;
         allChildren.addListener(listChangeListener);
         widthProperty().addListener(sizeChangeListener);
         heightProperty().addListener(sizeChangeListener);
+
+        this.comparisonString = comparisonString;
+        this.diffMode = diffMode;
+        comparisonString.addListener((obs, oldValue, newValue) -> highlightDiff());
+        diffMode.addListener((obs, oldValue, newValue) -> highlightDiff());
+        highlightDiff();
     }
 
     @Override
@@ -104,13 +117,29 @@ public class DiffHighlightingEllipsingTextFlow extends TextFlow {
         heightProperty().addListener(sizeChangeListener);
     }
 
-    public void highlightDiffTo(String s) {
+    public void highlightDiff() {
         allChildren.clear();
-        if (s != null && !s.equals(fullText)) {
-            allChildren.addAll(DiffHighlighting.generateDiffHighlighting(fullText, s, " "));
+        if (comparisonString.get() != null && !comparisonString.get().equals(fullText)) {
+            final List<Text> highlightedText;
+            switch (diffMode.getValue()) {
+                case PLAIN:
+                    highlightedText = List.of(new Text(fullText));
+                    break;
+                case WORD:
+                    highlightedText = DiffHighlighting.generateDiffHighlighting(fullText, comparisonString.get(), " ");
+                    break;
+                case CHARACTER:
+                    highlightedText = DiffHighlighting.generateDiffHighlighting(fullText, comparisonString.get(), "");
+                    break;
+                default:
+                    throw new UnsupportedOperationException("Not implemented " + diffMode.getValue());
+            }
+                allChildren.addAll(highlightedText);
         } else {
             allChildren.addAll(new Text(fullText));
         }
+        super.autosize();
+        adjustText();
     }
 
     private String ellipseString(String s) {

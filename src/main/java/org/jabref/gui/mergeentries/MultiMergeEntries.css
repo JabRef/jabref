@@ -10,26 +10,15 @@
     -fx-fill: #FA5B68;
 }
 
-.label {
-    -fx-padding: 10, 10, 10, 10;
-}
-
 .grid-pane {
-    -fx-spacing: 10;
+    -fx-hgap: 10;
+    -fx-vgap: 10;
 }
 
 .toggle-button {
-    -fx-start-margin: 10;
-    -fx-end-margin: 10;
-}
-
-.text-area, .text-field{
-    -fx-border-insets: 10;
-}
-
-.text-field {
-    -fx-background-insets: 10;
-    -fx-padding: 10;
+    -fx-border-insets: 0;
+    -fx-background-insets: 0;
+    -fx-border-image-insets: 0;
 }
 
 .text-area:focused .content {
@@ -38,4 +27,8 @@
 
 .text-area .content {
     -fx-background-color: transparent, white, transparent, white;
+}
+
+.box {
+    -fx-spacing: 10;
 }

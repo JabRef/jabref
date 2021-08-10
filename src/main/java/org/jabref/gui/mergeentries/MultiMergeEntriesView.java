@@ -1,16 +1,19 @@
 package org.jabref.gui.mergeentries;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.function.Supplier;
 
+import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.MapChangeListener;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Control;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressIndicator;
@@ -36,17 +39,17 @@ import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.TaskExecutor;
-import org.jabref.logic.bibtex.FieldContentFormatterPreferences;
 import org.jabref.logic.importer.FetcherException;
-import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.fetcher.DoiFetcher;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.preferences.JabRefPreferences;
 
 import com.airhacks.afterburner.views.ViewLoader;
+import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.EasyObservableValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -69,19 +72,19 @@ public class MultiMergeEntriesView extends BaseDialog<BibEntry> {
     @FXML private ScrollPane rightScrollPane;
     @FXML private VBox fieldEditor;
 
+    @FXML private ComboBox<MergeEntries.DiffMode> diffMode;
+
     private final ToggleGroup headerToggleGroup = new ToggleGroup();
     private final HashMap<Field, FieldRow> fieldRows = new HashMap<>();
 
     private final MultiMergeEntriesViewModel viewModel;
-    private final FieldContentFormatterPreferences fieldContentFormatterPreferences;
-    private final ImportFormatPreferences importFormatPreferences;
     private final TaskExecutor taskExecutor;
 
-    public MultiMergeEntriesView(FieldContentFormatterPreferences fieldContentFormatterPreferences,
-                                 ImportFormatPreferences importFormatPreferences,
+    private final JabRefPreferences preferences;
+
+    public MultiMergeEntriesView(JabRefPreferences preferences,
                                  TaskExecutor taskExecutor) {
-        this.fieldContentFormatterPreferences = fieldContentFormatterPreferences;
-        this.importFormatPreferences = importFormatPreferences;
+        this.preferences = preferences;
         this.taskExecutor = taskExecutor;
 
         viewModel = new MultiMergeEntriesViewModel();
@@ -119,6 +122,20 @@ public class MultiMergeEntriesView extends BaseDialog<BibEntry> {
         topScrollPane.hvalueProperty().bindBidirectional(centerScrollPane.hvalueProperty());
         leftScrollPane.vvalueProperty().bindBidirectional(centerScrollPane.vvalueProperty());
         rightScrollPane.vvalueProperty().bindBidirectional(centerScrollPane.vvalueProperty());
+
+        fillDiffModes();
+    }
+
+    private void fillDiffModes() {
+        diffMode.setItems(FXCollections.observableList(List.of(MergeEntries.DiffMode.PLAIN, MergeEntries.DiffMode.WORD, MergeEntries.DiffMode.CHARACTER)));
+        MergeEntries.DiffMode diffModePref = preferences.getMergeDiffMode()
+                                                          .flatMap(MergeEntries.DiffMode::parse)
+                                                          .orElse(MergeEntries.DiffMode.WORD);
+        diffMode.setValue(diffModePref);
+
+        EasyBind.subscribe(this.diffMode.valueProperty(), mode -> {
+            preferences.storeMergeDiffMode(mode.name());
+        });
     }
 
     private void addColumn(MultiMergeEntriesViewModel.Entry entryColumn) {
@@ -220,15 +237,12 @@ public class MultiMergeEntriesView extends BaseDialog<BibEntry> {
         if (field.equals(StandardField.DOI)) {
             return false;
         }
-        return FieldFactory.isMultiLineField(field, fieldContentFormatterPreferences.getNonWrappableFields());
+        return FieldFactory.isMultiLineField(field, preferences.getFieldContentParserPreferences().getNonWrappableFields());
     }
 
     private class Cell extends HBox {
 
         private final String content;
-
-        // Reference needs to be kept, since java garbage collection would otherwise destroy the subscription
-        @SuppressWarnings("FieldCanBeLocal") private EasyObservableValue<String> fieldBinding;
 
         public Cell(String content, Field field, int columnIndex) {
             this.content = content;
@@ -250,10 +264,11 @@ public class MultiMergeEntriesView extends BaseDialog<BibEntry> {
                 cellButton.setMinHeight(Control.USE_PREF_SIZE);
                 cellButton.setMaxHeight(Control.USE_PREF_SIZE);
                 getChildren().add(cellButton);
+                cellButton.maxWidthProperty().bind(widthProperty());
                 HBox.setHgrow(cellButton, Priority.ALWAYS);
 
                 // Text
-                DiffHighlightingEllipsingTextFlow buttonText = new DiffHighlightingEllipsingTextFlow(content);
+                DiffHighlightingEllipsingTextFlow buttonText = new DiffHighlightingEllipsingTextFlow(content, viewModel.mergedEntryProperty().get().getFieldBinding(field).asOrdinary(), diffMode.valueProperty());
 
                 buttonText.maxWidthProperty().bind(widthProperty());
                 buttonText.maxHeightProperty().bind(heightProperty());
@@ -271,17 +286,17 @@ public class MultiMergeEntriesView extends BaseDialog<BibEntry> {
                     cellButton.setSelected(true);
                 }
 
-                fieldBinding = viewModel.mergedEntryProperty().get()
-                                        .getFieldBinding(field).asOrdinary();
-                fieldBinding.subscribe(buttonText::highlightDiffTo);
-
                 if (field.equals(StandardField.DOI)) {
                     Button doiButton = IconTheme.JabRefIcons.LOOKUP_IDENTIFIER.asButton();
                     HBox.setHgrow(doiButton, Priority.NEVER);
+                    doiButton.prefHeightProperty().bind(cellButton.heightProperty());
+                    doiButton.setMinHeight(Control.USE_PREF_SIZE);
+                    doiButton.setMaxHeight(Control.USE_PREF_SIZE);
+
                     getChildren().add(doiButton);
 
                     doiButton.setOnAction(event -> {
-                        DoiFetcher doiFetcher = new DoiFetcher(importFormatPreferences);
+                        DoiFetcher doiFetcher = new DoiFetcher(preferences.getImportFormatPreferences());
                         doiButton.setDisable(true);
                         addSource(Localization.lang("From DOI"), () -> {
                             try {
@@ -327,10 +342,8 @@ public class MultiMergeEntriesView extends BaseDialog<BibEntry> {
             if (isMultiLine) {
                 fieldEditorCell = new TextArea();
                 ((TextArea) fieldEditorCell).setWrapText(true);
-                fieldEditorCell.getStyleClass().add("text-area");
             } else {
                 fieldEditorCell = new TextField();
-                fieldEditorCell.getStyleClass().add("text-field");
             }
 
             addRow(field);
@@ -376,7 +389,6 @@ public class MultiMergeEntriesView extends BaseDialog<BibEntry> {
 
             // setup header label
             Label fieldHeaderLabel = new Label(field.getDisplayName());
-            fieldHeaderLabel.getStyleClass().add("label");
             fieldHeaderLabel.prefHeightProperty().bind(fieldEditorCell.heightProperty());
             fieldHeaderLabel.setMaxWidth(Control.USE_PREF_SIZE);
             fieldHeaderLabel.setMinWidth(Control.USE_PREF_SIZE);
