@@ -4,7 +4,6 @@ import java.nio.charset.Charset;
 
 import javax.inject.Inject;
 
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
@@ -82,32 +81,25 @@ public class LibraryPropertiesDialogView extends BaseDialog<Void> {
         saveOrderConfigPanel.saveInOriginalProperty().bindBidirectional(viewModel.saveInOriginalProperty());
         saveOrderConfigPanel.saveInTableOrderProperty().bindBidirectional(viewModel.saveInTableOrderProperty());
         saveOrderConfigPanel.saveInSpecifiedOrderProperty().bindBidirectional(viewModel.saveInSpecifiedOrderProperty());
-        saveOrderConfigPanel.primarySortFieldsProperty().bind(viewModel.primarySortFieldsProperty());
-        saveOrderConfigPanel.secondarySortFieldsProperty().bind(viewModel.secondarySortFieldsProperty());
-        saveOrderConfigPanel.tertiarySortFieldsProperty().bind(viewModel.tertiarySortFieldsProperty());
-        saveOrderConfigPanel.savePrimaryDescPropertySelected().bindBidirectional(viewModel.savePrimaryDescPropertySelected());
-        saveOrderConfigPanel.saveSecondaryDescPropertySelected().bindBidirectional(viewModel.saveSecondaryDescPropertySelected());
-        saveOrderConfigPanel.saveTertiaryDescPropertySelected().bindBidirectional(viewModel.saveTertiaryDescPropertySelected());
-        saveOrderConfigPanel.savePrimarySortSelectedValueProperty().bindBidirectional(viewModel.savePrimarySortSelectedValueProperty());
-        saveOrderConfigPanel.saveSecondarySortSelectedValueProperty().bindBidirectional(viewModel.saveSecondarySortSelectedValueProperty());
-        saveOrderConfigPanel.saveTertiarySortSelectedValueProperty().bindBidirectional(viewModel.saveTertiarySortSelectedValueProperty());
+        saveOrderConfigPanel.sortableFieldsProperty().bind(viewModel.sortableFieldsProperty());
+        saveOrderConfigPanel.sortCriteriaProperty().bindBidirectional(viewModel.sortCriteriaProperty());
 
         fieldFormatterCleanupsPanel.cleanupsDisableProperty().bindBidirectional(viewModel.cleanupsDisableProperty());
         fieldFormatterCleanupsPanel.cleanupsProperty().bindBidirectional(viewModel.cleanupsProperty());
     }
 
     @FXML
-    public void browseGeneralFileDirectory(ActionEvent event) {
+    public void browseGeneralFileDirectory() {
         viewModel.browseGeneralDir();
     }
 
     @FXML
-    public void browseUserSpecificFileDirectory(ActionEvent event) {
+    public void browseUserSpecificFileDirectory() {
         viewModel.browseUserDir();
     }
 
     @FXML
-    void browseLatexFileDirectory(ActionEvent event) {
+    void browseLatexFileDirectory() {
         viewModel.browseLatexDir();
     }
 }

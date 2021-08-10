@@ -120,7 +120,7 @@ dependencies {
     implementation 'org.apache.pdfbox:fontbox:2.0.24'
     implementation 'org.apache.pdfbox:xmpbox:2.0.24'
 
-    implementation group: 'org.apache.commons', name: 'commons-csv', version: '1.8'
+    implementation group: 'org.apache.commons', name: 'commons-csv', version: '1.9.0'
     implementation 'com.h2database:h2-mvstore:1.4.200'
 
     implementation group: 'org.apache.tika', name: 'tika-core', version: '2.0.0'
@@ -169,7 +169,7 @@ dependencies {
     implementation 'de.saxsys:mvvmfx-validation:1.9.0-SNAPSHOT'
     implementation 'de.saxsys:mvvmfx:1.8.0'
     implementation 'com.tobiasdiez:easybind:2.2'
-    implementation 'org.fxmisc.flowless:flowless:0.6.4'
+    implementation 'org.fxmisc.flowless:flowless:0.6.5'
     implementation 'org.fxmisc.richtext:richtextfx:0.10.6'
     implementation group: 'org.glassfish.hk2.external', name: 'jakarta.inject', version: '2.6.1'
     implementation 'com.jfoenix:jfoenix:9.0.10'
@@ -212,7 +212,7 @@ dependencies {
     testRuntimeOnly 'org.junit.vintage:junit-vintage-engine:5.7.2'
     testImplementation 'org.junit.platform:junit-platform-launcher:1.7.2'
 
-    testImplementation 'net.bytebuddy:byte-buddy-parent:1.11.8'
+    testImplementation 'net.bytebuddy:byte-buddy-parent:1.11.9'
     testRuntimeOnly group: 'org.apache.logging.log4j', name: 'log4j-core', version: '3.0.0-SNAPSHOT'
     testRuntimeOnly group: 'org.apache.logging.log4j', name: 'log4j-jul', version: '3.0.0-SNAPSHOT'
     testImplementation 'org.mockito:mockito-core:3.11.2'
@@ -224,7 +224,7 @@ dependencies {
     testImplementation "org.testfx:testfx-junit5:4.0.17-alpha-SNAPSHOT"
     testImplementation "org.hamcrest:hamcrest-library:2.2"
 
-    checkstyle 'com.puppycrawl.tools:checkstyle:8.44'
+    checkstyle 'com.puppycrawl.tools:checkstyle:8.45'
     xjc group: 'org.glassfish.jaxb', name: 'jaxb-xjc', version: '2.3.3'
 }
 
