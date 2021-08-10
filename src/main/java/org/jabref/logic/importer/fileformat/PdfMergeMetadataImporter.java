@@ -39,12 +39,12 @@ public class PdfMergeMetadataImporter extends Importer {
     private final List<Importer> metadataImporters;
     private final ImportFormatPreferences importFormatPreferences;
 
-    public PdfMergeMetadataImporter(ImportFormatPreferences importFormatPreferences, XmpPreferences xmpPreferences) {
+    public PdfMergeMetadataImporter(ImportFormatPreferences importFormatPreferences) {
         this.importFormatPreferences = importFormatPreferences;
         this.metadataImporters = List.of(
                 new PdfGrobidImporter(GrobidCitationFetcher.GROBID_URL, importFormatPreferences),
                 new PdfEmbeddedBibFileImporter(importFormatPreferences),
-                new PdfXmpImporter(xmpPreferences),
+                new PdfXmpImporter(importFormatPreferences.getXmpPreferences()),
                 new PdfVerbatimBibTextImporter(importFormatPreferences),
                 new PdfContentImporter(importFormatPreferences)
         );

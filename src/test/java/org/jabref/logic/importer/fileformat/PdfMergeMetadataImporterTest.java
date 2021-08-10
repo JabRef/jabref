@@ -31,8 +31,7 @@ class PdfMergeMetadataImporterTest {
     void setUp() {
         importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(importFormatPreferences.getFieldContentFormatterPreferences().getNonWrappableFields()).thenReturn(List.of());
-        xmpPreferences = mock(XmpPreferences.class);
-        importer = new PdfMergeMetadataImporter(importFormatPreferences, xmpPreferences);
+        importer = new PdfMergeMetadataImporter(importFormatPreferences);
     }
 
     @Test
