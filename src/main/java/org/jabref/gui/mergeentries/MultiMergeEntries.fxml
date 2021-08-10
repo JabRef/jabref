@@ -36,7 +36,7 @@
                     </ScrollPane>
                 </VBox>
                <VBox alignment="TOP_CENTER">
-                    <Label text="%Merged Entry" prefHeight="${topScrollPane.height}" alignment="TOP_CENTER" VBox.vgrow="NEVER">
+                    <Label text="%Merged entry" prefHeight="${topScrollPane.height}" alignment="TOP_CENTER" VBox.vgrow="NEVER">
                         <minHeight><Control fx:constant="USE_PREF_SIZE" /></minHeight>
                         <maxHeight><Control fx:constant="USE_PREF_SIZE" /></maxHeight>
                    </Label>
@@ -46,7 +46,7 @@
                 </VBox>
             </SplitPane>
             <HBox styleClass="box">
-                <Label text="%Diff mode" prefHeight="${diffMode.height}"/>
+                <Label text="%Show diff" prefHeight="${diffMode.height}"/>
                 <ComboBox fx:id="diffMode"/>
             </HBox>
         </VBox>
