@@ -64,28 +64,27 @@ public class DiffHighlightingEllipsingTextFlow extends TextFlow {
         widthProperty().removeListener(sizeChangeListener);
         heightProperty().removeListener(sizeChangeListener);
 
-        removeUntilTextFits();
-        fillUntilOverflowing();
-        ellipseUntilTextFits();
+        if (removeUntilTextFits() && fillUntilOverflowing()) {
+            ellipseUntilTextFits();
+        }
 
         widthProperty().addListener(sizeChangeListener);
         heightProperty().addListener(sizeChangeListener);
     }
 
-    private void removeUntilTextFits() {
+    private boolean removeUntilTextFits() {
         while (getHeight() > getMaxHeight() || getWidth() > getMaxWidth()) {
             if (super.getChildren().isEmpty()) {
                 // nothing fits
-                widthProperty().addListener(sizeChangeListener);
-                heightProperty().addListener(sizeChangeListener);
-                return;
+                return false;
             }
             super.getChildren().remove(super.getChildren().size() - 1);
             super.autosize();
         }
+        return true;
     }
 
-    private void fillUntilOverflowing() {
+    private boolean fillUntilOverflowing() {
         while (getHeight() <= getMaxHeight() && getWidth() <= getMaxWidth()) {
             if (super.getChildren().size() == allChildren.size()) {
                 if (allChildren.size() > 0) {
@@ -96,9 +95,7 @@ public class DiffHighlightingEllipsingTextFlow extends TextFlow {
                         ((Text) lastChildAsShown).setText(((Text) lastChild).getText());
                     } else {
                         // nothing to fill the space with
-                        widthProperty().addListener(sizeChangeListener);
-                        heightProperty().addListener(sizeChangeListener);
-                        return;
+                        return false;
                     }
                 }
             } else {
@@ -106,16 +103,15 @@ public class DiffHighlightingEllipsingTextFlow extends TextFlow {
             }
             super.autosize();
         }
+        return true;
     }
 
-    private void ellipseUntilTextFits() {
+    private boolean ellipseUntilTextFits() {
         while (getHeight() > getMaxHeight() || getWidth() > getMaxWidth()) {
             Node lastChildAsShown = super.getChildren().remove(super.getChildren().size() - 1);
             while (getEllipsisString().equals(((Text) lastChildAsShown).getText())) {
                 if (super.getChildren().size() == 0) {
-                    widthProperty().addListener(sizeChangeListener);
-                    heightProperty().addListener(sizeChangeListener);
-                    return;
+                    return false;
                 }
                 lastChildAsShown = super.getChildren().remove(super.getChildren().size() - 1);
             }
@@ -123,11 +119,12 @@ public class DiffHighlightingEllipsingTextFlow extends TextFlow {
                 Text shortenedChild = new Text(ellipseString(((Text) lastChildAsShown).getText()));
                 super.getChildren().add(shortenedChild);
             } else {
-                // don't know what to do with anything else. Leave without adding listeners
-                return;
+                // don't know what to do with anything else
+                return false;
             }
             super.autosize();
         }
+        return true;
     }
 
     public void highlightDiff() {
