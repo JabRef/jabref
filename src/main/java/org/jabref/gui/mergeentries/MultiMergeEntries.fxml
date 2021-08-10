@@ -40,7 +40,7 @@
                         <minHeight><Control fx:constant="USE_PREF_SIZE" /></minHeight>
                         <maxHeight><Control fx:constant="USE_PREF_SIZE" /></maxHeight>
                    </Label>
-                    <ScrollPane fx:id="rightScrollPane" hbarPolicy="NEVER" VBox.vgrow="ALWAYS">
+                    <ScrollPane fx:id="rightScrollPane" hbarPolicy="NEVER" VBox.vgrow="ALWAYS" fitToWidth="true">
                         <VBox fx:id="fieldEditor" styleClass="box"/>
                     </ScrollPane>
                 </VBox>
