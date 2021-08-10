@@ -63,6 +63,16 @@ public class DiffHighlightingEllipsingTextFlow extends TextFlow {
         // remove listeners
         widthProperty().removeListener(sizeChangeListener);
         heightProperty().removeListener(sizeChangeListener);
+
+        removeUntilTextFits();
+        fillUntilOverflowing();
+        ellipseUntilTextFits();
+
+        widthProperty().addListener(sizeChangeListener);
+        heightProperty().addListener(sizeChangeListener);
+    }
+
+    private void removeUntilTextFits() {
         while (getHeight() > getMaxHeight() || getWidth() > getMaxWidth()) {
             if (super.getChildren().isEmpty()) {
                 // nothing fits
@@ -73,6 +83,9 @@ public class DiffHighlightingEllipsingTextFlow extends TextFlow {
             super.getChildren().remove(super.getChildren().size() - 1);
             super.autosize();
         }
+    }
+
+    private void fillUntilOverflowing() {
         while (getHeight() <= getMaxHeight() && getWidth() <= getMaxWidth()) {
             if (super.getChildren().size() == allChildren.size()) {
                 if (allChildren.size() > 0) {
@@ -93,7 +106,9 @@ public class DiffHighlightingEllipsingTextFlow extends TextFlow {
             }
             super.autosize();
         }
-        // ellipse the last text as much as necessary
+    }
+
+    private void ellipseUntilTextFits() {
         while (getHeight() > getMaxHeight() || getWidth() > getMaxWidth()) {
             Node lastChildAsShown = super.getChildren().remove(super.getChildren().size() - 1);
             while (getEllipsisString().equals(((Text) lastChildAsShown).getText())) {
@@ -113,8 +128,6 @@ public class DiffHighlightingEllipsingTextFlow extends TextFlow {
             }
             super.autosize();
         }
-        widthProperty().addListener(sizeChangeListener);
-        heightProperty().addListener(sizeChangeListener);
     }
 
     public void highlightDiff() {
