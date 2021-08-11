@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Queue;
 
 import org.jabref.gui.util.BackgroundTask;
+import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabase;
@@ -39,27 +40,30 @@ public class IndexingTaskManager extends BackgroundTask<Void> {
     private void enqueueTask(BackgroundTask<Void> task) {
         task.onFinished(() -> {
             this.progressProperty().unbind();
+            this.messageProperty().unbind();
             this.updateProgress(1, 1);
             taskQueue.poll(); // This is the task that just finished
             if (!taskQueue.isEmpty()) {
                 BackgroundTask<Void> nextTask = taskQueue.poll();
                 nextTask.executeWith(taskExecutor);
                 this.progressProperty().bind(nextTask.progressProperty());
+                this.messageProperty().bind(nextTask.messageProperty());
             }
         });
         taskQueue.add(task);
         if (taskQueue.size() == 1) {
             task.executeWith(taskExecutor);
             this.progressProperty().bind(task.progressProperty());
+            this.messageProperty().bind(task.messageProperty());
         }
     }
 
-    public void createIndex(PdfIndexer indexer, BibDatabase database, BibDatabaseContext context) {
+    public void createIndex(PdfIndexer indexer) {
         enqueueTask(new BackgroundTask<Void>() {
             @Override
             protected Void call() throws Exception {
                 this.updateProgress(-1, 1);
-                indexer.createIndex(database, context);
+                indexer.createIndex();
                 return null;
             }
         });
@@ -70,7 +74,21 @@ public class IndexingTaskManager extends BackgroundTask<Void> {
             @Override
             protected Void call() throws Exception {
                 this.updateProgress(-1, 1);
-                indexer.addToIndex(databaseContext);
+                final int numFiles = databaseContext.getEntries().stream().map(BibEntry::getFiles).map(List::size).mapToInt(Integer::intValue).sum();
+
+                int progressCounter = 0;
+                this.updateProgress(0, numFiles);
+                this.updateMessage(Localization.lang("%0 of %1 files added to the index", 0, numFiles));
+
+                for (BibEntry entry : databaseContext.getEntries()) {
+                    for (LinkedFile file : entry.getFiles()) {
+                        indexer.addToIndex(entry, file, databaseContext);
+                        progressCounter++;
+                        final int lambdaProgressCounter = progressCounter;
+                        this.updateProgress(lambdaProgressCounter, numFiles);
+                        this.updateMessage(Localization.lang("%0 of %1 files added to the index", lambdaProgressCounter, numFiles));
+                    }
+                }
                 return null;
             }
         });
@@ -81,7 +99,19 @@ public class IndexingTaskManager extends BackgroundTask<Void> {
             @Override
             protected Void call() throws Exception {
                 this.updateProgress(-1, 1);
-                indexer.addToIndex(entry, databaseContext);
+                final int numFiles = entry.getFiles().size();
+
+                int progressCounter = 0;
+                this.updateProgress(0, numFiles);
+                this.updateMessage(Localization.lang("%0 of %1 files added to the index", 0, numFiles));
+
+                for (LinkedFile file : entry.getFiles()) {
+                    indexer.addToIndex(entry, file, databaseContext);
+                    progressCounter++;
+                    final int lambdaProgressCounter = progressCounter;
+                    this.updateProgress(lambdaProgressCounter, numFiles);
+                    this.updateMessage(Localization.lang("%0 of %1 files added to the index", lambdaProgressCounter, numFiles));
+                }
                 return null;
             }
         });
@@ -91,8 +121,11 @@ public class IndexingTaskManager extends BackgroundTask<Void> {
         enqueueTask(new BackgroundTask<Void>() {
             @Override
             protected Void call() throws Exception {
-                this.updateProgress(-1, 1);
+                this.updateProgress(0, 1);
+                this.updateMessage(Localization.lang("%0 of %1 files added to the index", 0, 1));
                 indexer.addToIndex(entry, linkedFiles, databaseContext);
+                this.updateProgress(1, 1);
+                this.updateMessage(Localization.lang("%0 of %1 files added to the index", 1, 1));
                 return null;
             }
         });
@@ -121,6 +154,6 @@ public class IndexingTaskManager extends BackgroundTask<Void> {
     }
 
     public void updateDatabaseName(String name) {
-        this.updateMessage(name);
+        this.titleProperty().set(Localization.lang("Indexing for %0", name));
     }
 }

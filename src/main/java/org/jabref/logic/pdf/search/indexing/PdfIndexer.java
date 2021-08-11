@@ -58,13 +58,8 @@ public class PdfIndexer {
     /**
      * Adds all PDF files linked to an entry in the database to new Lucene search index. Any previous state of the
      * Lucene search index will be deleted!
-     *
-     * @param database a bibtex database to link the pdf files to
      */
-    public void createIndex(BibDatabase database, BibDatabaseContext context) {
-        this.databaseContext = context;
-        final ObservableList<BibEntry> entries = database.getEntries();
-
+    public void createIndex() {
         // Create new index by creating IndexWriter but not writing anything.
         try {
             IndexWriter indexWriter = new IndexWriter(directoryToIndex, new IndexWriterConfig(new EnglishStemAnalyzer()).setOpenMode(IndexWriterConfig.OpenMode.CREATE));
@@ -72,8 +67,6 @@ public class PdfIndexer {
         } catch (IOException e) {
             LOGGER.warn("Could not create new Index!", e);
         }
-        // Re-use existing facilities for writing the actual entries
-        entries.stream().filter(entry -> !entry.getFiles().isEmpty()).forEach(this::writeToIndex);
     }
 
     public void addToIndex(BibDatabaseContext databaseContext) {
