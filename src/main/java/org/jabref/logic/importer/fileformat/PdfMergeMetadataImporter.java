@@ -20,7 +20,6 @@ import org.jabref.logic.importer.fetcher.GrobidCitationFetcher;
 import org.jabref.logic.importer.fetcher.IsbnFetcher;
 import org.jabref.logic.importer.util.FileFieldParser;
 import org.jabref.logic.util.StandardFileType;
-import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.Field;
