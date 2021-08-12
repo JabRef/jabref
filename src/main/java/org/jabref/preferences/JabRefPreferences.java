@@ -1141,43 +1141,6 @@ public class JabRefPreferences implements PreferencesService {
         putStringList(CLEANUP_FORMATTERS, cleanupPreset.getFormatterCleanups().getAsStringList(OS.NEWLINE));
     }
 
-    @Override
-    public void storeExportSaveOrder(SaveOrderConfig config) {
-        putBoolean(EXPORT_PRIMARY_SORT_DESCENDING, config.getSortCriteria().get(0).descending);
-        putBoolean(EXPORT_SECONDARY_SORT_DESCENDING, config.getSortCriteria().get(1).descending);
-        putBoolean(EXPORT_TERTIARY_SORT_DESCENDING, config.getSortCriteria().get(2).descending);
-        putBoolean(EXPORT_IN_ORIGINAL_ORDER, config.saveInOriginalOrder());
-        putBoolean(EXPORT_IN_SPECIFIED_ORDER, config.saveInSpecifiedOrder());
-
-        put(EXPORT_PRIMARY_SORT_FIELD, config.getSortCriteria().get(0).field.getName());
-        put(EXPORT_SECONDARY_SORT_FIELD, config.getSortCriteria().get(1).field.getName());
-        put(EXPORT_TERTIARY_SORT_FIELD, config.getSortCriteria().get(2).field.getName());
-    }
-
-    private SaveOrderConfig loadTableSaveOrder() {
-        SaveOrderConfig config = new SaveOrderConfig();
-
-        updateMainTableColumns();
-        List<MainTableColumnModel> sortOrder = createMainTableColumnSortOrder();
-
-        for (var column : sortOrder) {
-            boolean descending = (column.getSortType() == SortType.DESCENDING);
-            config.getSortCriteria().add(new SaveOrderConfig.SortCriterion(
-                                                                           FieldFactory.parseField(column.getQualifier()),
-                                                                           descending));
-        }
-
-        return config;
-    }
-
-    @Override
-    public SaveOrderConfig loadExportSaveOrder() {
-        return new SaveOrderConfig(getBoolean(EXPORT_IN_ORIGINAL_ORDER), getBoolean(EXPORT_IN_SPECIFIED_ORDER),
-                new SaveOrderConfig.SortCriterion(FieldFactory.parseField(get(EXPORT_PRIMARY_SORT_FIELD)), getBoolean(EXPORT_PRIMARY_SORT_DESCENDING)),
-                new SaveOrderConfig.SortCriterion(FieldFactory.parseField(get(EXPORT_SECONDARY_SORT_FIELD)), getBoolean(EXPORT_SECONDARY_SORT_DESCENDING)),
-                new SaveOrderConfig.SortCriterion(FieldFactory.parseField(get(EXPORT_TERTIARY_SORT_FIELD)), getBoolean(EXPORT_TERTIARY_SORT_DESCENDING)));
-    }
-
     public String getOrCreateUserId() {
         Optional<String> userId = getAsOptional(USER_ID);
         if (userId.isPresent()) {
@@ -1354,7 +1317,6 @@ public class JabRefPreferences implements PreferencesService {
                 getBoolean(BIBLATEX_DEFAULT_MODE) ? BibDatabaseMode.BIBLATEX : BibDatabaseMode.BIBTEX,
                 getBoolean(WARN_ABOUT_DUPLICATES_IN_INSPECTION),
                 getBoolean(CONFIRM_DELETE),
-                getBoolean(ALLOW_INTEGER_EDITION_BIBTEX),
                 getBoolean(MEMORY_STICK_MODE),
                 getBoolean(SHOW_ADVANCED_HINTS));
     }
@@ -1365,7 +1327,6 @@ public class JabRefPreferences implements PreferencesService {
         putBoolean(BIBLATEX_DEFAULT_MODE, (preferences.getDefaultBibDatabaseMode() == BibDatabaseMode.BIBLATEX));
         putBoolean(WARN_ABOUT_DUPLICATES_IN_INSPECTION, preferences.isWarnAboutDuplicatesInInspection());
         putBoolean(CONFIRM_DELETE, preferences.shouldConfirmDelete());
-        putBoolean(ALLOW_INTEGER_EDITION_BIBTEX, preferences.shouldAllowIntegerEditionBibtex());
         putBoolean(MEMORY_STICK_MODE, preferences.isMemoryStickMode());
         putBoolean(SHOW_ADVANCED_HINTS, preferences.shouldShowAdvancedHints());
     }
@@ -1597,6 +1558,7 @@ public class JabRefPreferences implements PreferencesService {
                 getBoolean(SHOW_LATEX_CITATIONS),
                 getBoolean(DEFAULT_SHOW_SOURCE),
                 getBoolean(VALIDATE_IN_ENTRY_EDITOR),
+                getBoolean(ALLOW_INTEGER_EDITION_BIBTEX),
                 getDouble(ENTRY_EDITOR_HEIGHT));
     }
 
@@ -1609,6 +1571,7 @@ public class JabRefPreferences implements PreferencesService {
         putBoolean(SHOW_LATEX_CITATIONS, preferences.shouldShowLatexCitationsTab());
         putBoolean(DEFAULT_SHOW_SOURCE, preferences.showSourceTabByDefault());
         putBoolean(VALIDATE_IN_ENTRY_EDITOR, preferences.shouldEnableValidation());
+        putBoolean(ALLOW_INTEGER_EDITION_BIBTEX, preferences.shouldAllowIntegerEditionBibtex());
         putDouble(ENTRY_EDITOR_HEIGHT, preferences.getDividerPosition());
     }
 
@@ -2051,12 +2014,55 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     @Override
+    public SaveOrderConfig getExportSaveOrder() {
+        List<SaveOrderConfig.SortCriterion> sortCriteria = List.of(
+                new SaveOrderConfig.SortCriterion(FieldFactory.parseField(get(EXPORT_PRIMARY_SORT_FIELD)), getBoolean(EXPORT_PRIMARY_SORT_DESCENDING)),
+                new SaveOrderConfig.SortCriterion(FieldFactory.parseField(get(EXPORT_SECONDARY_SORT_FIELD)), getBoolean(EXPORT_SECONDARY_SORT_DESCENDING)),
+                new SaveOrderConfig.SortCriterion(FieldFactory.parseField(get(EXPORT_TERTIARY_SORT_FIELD)), getBoolean(EXPORT_TERTIARY_SORT_DESCENDING))
+        );
+
+        return new SaveOrderConfig(
+                SaveOrderConfig.OrderType.fromBooleans(getBoolean(EXPORT_IN_SPECIFIED_ORDER), getBoolean(EXPORT_IN_ORIGINAL_ORDER)),
+                sortCriteria
+        );
+    }
+
+    @Override
+    public void storeExportSaveOrder(SaveOrderConfig config) {
+        putBoolean(EXPORT_IN_ORIGINAL_ORDER, config.getOrderType() == SaveOrderConfig.OrderType.ORIGINAL);
+        putBoolean(EXPORT_IN_SPECIFIED_ORDER, config.getOrderType() == SaveOrderConfig.OrderType.SPECIFIED);
+
+        put(EXPORT_PRIMARY_SORT_FIELD, config.getSortCriteria().get(0).field.getName());
+        put(EXPORT_SECONDARY_SORT_FIELD, config.getSortCriteria().get(1).field.getName());
+        put(EXPORT_TERTIARY_SORT_FIELD, config.getSortCriteria().get(2).field.getName());
+        putBoolean(EXPORT_PRIMARY_SORT_DESCENDING, config.getSortCriteria().get(0).descending);
+        putBoolean(EXPORT_SECONDARY_SORT_DESCENDING, config.getSortCriteria().get(1).descending);
+        putBoolean(EXPORT_TERTIARY_SORT_DESCENDING, config.getSortCriteria().get(2).descending);
+    }
+
+    private SaveOrderConfig loadTableSaveOrder() {
+        SaveOrderConfig config = new SaveOrderConfig();
+
+        updateMainTableColumns();
+        List<MainTableColumnModel> sortOrder = createMainTableColumnSortOrder();
+
+        for (var column : sortOrder) {
+            boolean descending = (column.getSortType() == SortType.DESCENDING);
+            config.getSortCriteria().add(new SaveOrderConfig.SortCriterion(
+                    FieldFactory.parseField(column.getQualifier()),
+                    descending));
+        }
+
+        return config;
+    }
+
+    @Override
     public SavePreferences getSavePreferencesForExport() {
         Boolean saveInOriginalOrder = this.getBoolean(EXPORT_IN_ORIGINAL_ORDER);
         SaveOrderConfig saveOrder = null;
         if (!saveInOriginalOrder) {
             if (this.getBoolean(EXPORT_IN_SPECIFIED_ORDER)) {
-                saveOrder = this.loadExportSaveOrder();
+                saveOrder = this.getExportSaveOrder();
             } else {
                 saveOrder = this.loadTableSaveOrder();
             }

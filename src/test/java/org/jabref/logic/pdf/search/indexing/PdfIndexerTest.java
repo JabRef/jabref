@@ -61,6 +61,38 @@ public class PdfIndexerTest {
     }
 
     @Test
+    public void dontIndexNonPdf() throws IOException {
+        // given
+        BibEntry entry = new BibEntry(StandardEntryType.PhdThesis);
+        entry.setFiles(Collections.singletonList(new LinkedFile("Example Thesis", "thesis-example.pdf", StandardFileType.AUX.getName())));
+        database.insertEntry(entry);
+
+        // when
+        indexer.createIndex(database, context);
+
+        // then
+        try (IndexReader reader = DirectoryReader.open(new NIOFSDirectory(context.getFulltextIndexPath()))) {
+            assertEquals(0, reader.numDocs());
+        }
+    }
+
+    @Test
+    public void dontIndexOnlineLinks() throws IOException {
+        // given
+        BibEntry entry = new BibEntry(StandardEntryType.PhdThesis);
+        entry.setFiles(Collections.singletonList(new LinkedFile("Example Thesis", "https://raw.githubusercontent.com/JabRef/jabref/main/src/test/resources/pdfs/thesis-example.pdf", StandardFileType.PDF.getName())));
+        database.insertEntry(entry);
+
+        // when
+        indexer.createIndex(database, context);
+
+        // then
+        try (IndexReader reader = DirectoryReader.open(new NIOFSDirectory(context.getFulltextIndexPath()))) {
+            assertEquals(0, reader.numDocs());
+        }
+    }
+
+    @Test
     public void exampleThesisIndexWithKey() throws IOException {
         // given
         BibEntry entry = new BibEntry(StandardEntryType.PhdThesis);
