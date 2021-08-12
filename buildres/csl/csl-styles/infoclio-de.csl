@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <style xmlns="http://purl.org/net/xbiblio/csl" class="note" default-locale="de-CH" version="1.0" name-delimiter="; " delimiter-precedes-last="always" delimiter-precedes-et-al="never">
   <info>
-    <title>infoclio.ch (German - Switzerland)</title>
+    <title>infoclio.ch (Deutsch - Schweiz)</title>
     <id>http://www.zotero.org/styles/infoclio-de</id>
     <link href="http://www.zotero.org/styles/infoclio-de" rel="self"/>
     <link href="http://www.zotero.org/styles/infoclio-fr-smallcaps" rel="template"/>
@@ -60,7 +60,7 @@
       </choose>
     </layout>
   </citation>
-  <bibliography>
+  <bibliography hanging-indent="true">
     <sort>
       <key macro="creator" names-min="3" names-use-first="3"/>
       <key variable="issued" sort="descending"/>
@@ -292,7 +292,7 @@
   </macro>
   <macro name="alt-publisher">
     <choose>
-      <if type="book chapter paper-conference entry-dictionary entry-encyclopedia" match="none">
+      <if type="thesis report song motion_picture broadcast" match="any">
         <!-- university for theses,
              institution for reports,
              label for songs,

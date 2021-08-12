@@ -22,10 +22,12 @@ abstract class JournalAbbreviationConverter extends DefaultTask {
         def targetFile = outputDir.file("journalList.mv").get().asFile
         targetFile.delete()
         MVStore.open(targetFile.toString()).withCloseable { store ->
+
             MVMap<String, String> fullToAbbreviation = store.openMap("FullToAbbreviation")
             MVMap<String, String> abbreviationToFull = store.openMap("AbbreviationToFull")
 
             inputDir.getAsFileTree().filter({ File f -> f.name.endsWith(".csv") }).getFiles().each { file ->
+
                 def abbreviations = JournalAbbreviationLoader.readJournalListFromFile(file.toPath())
                 fullToAbbreviation.putAll(
                         abbreviations

@@ -15,7 +15,6 @@ import javafx.scene.input.ClipboardContent;
 
 import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
-import org.jabref.gui.Globals;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.actions.SimpleCommand;
@@ -28,6 +27,7 @@ import org.jabref.logic.util.FileType;
 import org.jabref.logic.util.OS;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.preferences.PreferencesService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,21 +46,25 @@ public class ExportToClipboardAction extends SimpleCommand {
     private final ExporterFactory exporterFactory;
     private final ClipBoardManager clipBoardManager;
     private final TaskExecutor taskExecutor;
+    private final PreferencesService preferences;
 
-    public ExportToClipboardAction(JabRefFrame frame, DialogService dialogService, ExporterFactory exporterFactory, ClipBoardManager clipBoardManager, TaskExecutor taskExecutor) {
+    public ExportToClipboardAction(JabRefFrame frame, DialogService dialogService, ExporterFactory exporterFactory, ClipBoardManager clipBoardManager, TaskExecutor taskExecutor, PreferencesService prefs) {
         this.frame = frame;
         this.dialogService = dialogService;
         this.exporterFactory = exporterFactory;
         this.clipBoardManager = clipBoardManager;
         this.taskExecutor = taskExecutor;
+        this.preferences = prefs;
     }
 
-    public ExportToClipboardAction(LibraryTab panel, DialogService dialogService, ExporterFactory exporterFactory, ClipBoardManager clipBoardManager, TaskExecutor taskExecutor) {
+    public ExportToClipboardAction(LibraryTab panel, DialogService dialogService, ExporterFactory exporterFactory, ClipBoardManager clipBoardManager, TaskExecutor taskExecutor, PreferencesService prefs) {
         this.panel = panel;
         this.dialogService = dialogService;
         this.exporterFactory = exporterFactory;
         this.clipBoardManager = clipBoardManager;
         this.taskExecutor = taskExecutor;
+        this.preferences = prefs;
+
     }
 
     @Override
@@ -81,7 +85,7 @@ public class ExportToClipboardAction extends SimpleCommand {
 
         // Find default choice, if any
         Exporter defaultChoice = exporters.stream()
-                                          .filter(exporter -> exporter.getName().equals(Globals.prefs.getImportExportPreferences().getLastExportExtension()))
+                                          .filter(exporter -> exporter.getName().equals(preferences.getImportExportPreferences().getLastExportExtension()))
                                           .findAny()
                                           .orElse(null);
 
@@ -102,12 +106,12 @@ public class ExportToClipboardAction extends SimpleCommand {
         // Set the global variable for this database's file directory before exporting,
         // so formatters can resolve linked files correctly.
         // (This is an ugly hack!)
-        Globals.prefs.fileDirForDatabase = panel.getBibDatabaseContext()
-                                                .getFileDirectories(Globals.prefs.getFilePreferences());
+        preferences.storeFileDirforDatabase(panel.getBibDatabaseContext()
+                                                .getFileDirectories(preferences.getFilePreferences()));
 
         // Add chosen export type to last used preference, to become default
-        Globals.prefs.storeImportExportPreferences(
-                Globals.prefs.getImportExportPreferences().withLastExportExtension(exporter.getName()));
+        preferences.storeImportExportPreferences(
+               preferences.getImportExportPreferences().withLastExportExtension(exporter.getName()));
 
         Path tmp = null;
         try {
@@ -122,7 +126,7 @@ public class ExportToClipboardAction extends SimpleCommand {
                     panel.getBibDatabaseContext()
                          .getMetaData()
                          .getEncoding()
-                         .orElse(Globals.prefs.getDefaultEncoding()),
+                         .orElse(preferences.getDefaultEncoding()),
                     entries);
             // Read the file and put the contents on the clipboard:
 
@@ -159,7 +163,7 @@ public class ExportToClipboardAction extends SimpleCommand {
         try (BufferedReader reader = Files.newBufferedReader(tmp, panel.getBibDatabaseContext()
                                                                        .getMetaData()
                                                                        .getEncoding()
-                                                                       .orElse(Globals.prefs.getDefaultEncoding()))) {
+                                                                       .orElse(preferences.getDefaultEncoding()))) {
             return reader.lines().collect(Collectors.joining(OS.NEWLINE));
         }
     }

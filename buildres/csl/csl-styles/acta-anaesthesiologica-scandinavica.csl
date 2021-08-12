@@ -155,9 +155,13 @@
   </citation>
   <bibliography second-field-align="flush">
     <layout>
+      <group delimiter=". " suffix=". ">
+        <text variable="citation-number"/>
       <text variable="citation-number" suffix=". "/>
-      <text macro="author" suffix="."/>
-      <text macro="title" suffix="." prefix=" "/>
+      <group delimiter=". " suffix=". ">
+        <text macro="author"/>
+        <text macro="title"/>
+      </group>
       <choose>
         <if type="bill book graphic legal_case legislation motion_picture report song" match="any">
           <group prefix=" " delimiter=" ">

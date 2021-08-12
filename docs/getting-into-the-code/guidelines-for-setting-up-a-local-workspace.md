@@ -4,8 +4,8 @@ This guide explains how to set up your environment for development of JabRef. It
 
 ```text
 The most important step is to configure your IDE.
-In case you know how to install JDK15 with JavaFX support and to fork JabRef's code,
-        please scroll down to the IDE setup.
+In case you know how to install JDK 16 with JavaFX support and to fork JabRef's code,
+please scroll down to the IDE setup.
 ```
 
 For a complete step-by-step guide for Linux using IntelliJ IDEA as the IDE, have a look at the following video instructions:
@@ -16,13 +16,13 @@ For a complete step-by-step guide for Linux using IntelliJ IDEA as the IDE, have
 
 This section list the prerequisites you need to get started to develop JabRef. After this section, you are ready to get the code.
 
-### Java Development Kit 15
+### Java Development Kit 16
 
-A working Java \(Develoment Kit\) 15 installation with Java FX support is required. In the command line \(terminal in Linux, cmd in Windows\) run `javac -version` and make sure that the reported version is Java 15 \(e.g `javac 15`\). If `javac` is not found or a wrong version is reported, check your `PATH` environment variable, your `JAVA_HOME` environment variable or install the most recent JDK.
+A working Java \(Develoment Kit\) 16 installation with Java FX support is required. In the command line \(terminal in Linux, cmd in Windows\) run `javac -version` and make sure that the reported version is Java 16 \(e.g., `javac 16`\). If `javac` is not found or a wrong version is reported, check your `PATH` environment variable, your `JAVA_HOME` environment variable or install the most recent JDK.
 
-[JavaFX is not part of the default JDK any more](https://www.reddit.com/r/java/comments/82qm9x/javafx_will_be_removed_from_the_java_jdk_in_jdk_11/), it needs to be installed separately if not using a special JDK. ~~We recommend to setup the full Liberica JDK including JavaFX. You can get it from~~ [~~https://bell-sw.com/pages/downloads/?version=java-15&package=jdk-full~~](https://bell-sw.com/pages/downloads/?version=java-15&package=jdk-full)~~. On Windows, you can execute `choco install libericajdkfull` \(requires~~ [~~installation of chocolatey - a package manager for Windows~~](https://chocolatey.org/install)~~\).~~ \(Liberica JDK 15 does not include the Java compiler properly any more\)
+[JavaFX is not part of the default JDK any more](https://www.reddit.com/r/java/comments/82qm9x/javafx_will_be_removed_from_the_java_jdk_in_jdk_11/), it needs to be installed separately if not using a special JDK.
 
-Download and install the JDK from [https://jdk.java.net/](https://jdk.java.net/). Afterwards, download the "jmods" JavaFX 15 zip archive from [https://gluonhq.com/products/javafx/](https://gluonhq.com/products/javafx/) and put the `.jmod` files into `C:\Program Files\OpenJDK\jdk-15\jmods`.
+Download and install the JDK from [https://jdk.java.net/](https://jdk.java.net/). Afterwards, download the "jmods" JavaFX 16 zip archive from [https://gluonhq.com/products/javafx/](https://gluonhq.com/products/javafx/) and put the `.jmod` files into `C:\Program Files\OpenJDK\jdk-16\jmods`.
 
 ### GitHub Account
 
@@ -64,7 +64,7 @@ We recommend to install IntelliJ IDEA using [JetBrains Toolbox App](https://www.
 
 On Ubuntu Linux, you can follow the [documentation from the Ubuntu Community](https://help.ubuntu.com/community/EclipseIDE#Download_Eclipse) or the [step-by-step guideline from Krizna](https://www.krizna.com/ubuntu/install-eclipse-in-ubuntu-12-04/) to install Eclipse. On Windows, download it from [www.eclipse.org](http://www.eclipse.org/downloads/) and run the installer.
 
-Eclipse JEE 2020-09 or newer is required. For Eclipse 2020-09 you need to install [Java 15 Support](https://marketplace.eclipse.org/content/java-15-support-eclipse-2020-09-417).
+Eclipse JEE 2020-12 or newer is required.
 
 ### Other Tooling
 
@@ -92,7 +92,7 @@ This section explains how you get the JabRef code onto your machine in a form al
 
 ## Configure your IDE
 
-These steps are very important. They allow you to focus on the content and ensure that the code formatting always goes well. Did you know that [IntelliJ allows for reformatting selected code](https://www.jetbrains.com/help/idea/reformat-and-rearrange-code.html#reformat_code) if you press Ctrl+Alt+L?
+These steps are very important. They allow you to focus on the content and ensure that the code formatting always goes well. Did you know that [IntelliJ allows for reformatting selected code](https://www.jetbrains.com/help/idea/reformat-and-rearrange-code.html#reformat_code) if you press Ctrl + Alt + L?
 
 ### Configuration of IntelliJ IDEA
 
@@ -102,19 +102,17 @@ To configure IntelliJ IDEA for developing JabRef, you should first ensure that y
 
 * Navigate to **File \| Settings \| Plugins \| Installed** and check that you have the _Gradle_ and _Gradle Extension_ enabled.
 
-After that, you can open `jabref/build.gradle` as a project. It is crucial that Java 15 is used consistently for the JabRef project which includes ensuring the right settings for your project structure, Gradle build, and run configurations.
+After that, you can open `jabref/build.gradle` as a project. It is crucial that Java 16 is used consistently for the JabRef project which includes ensuring the right settings for your project structure, Gradle build, and run configurations.
 
-Ensure you have a Java 15 SDK configured by navigating to **File \| Project Structure \| Platform Settings \| SDKs**. If you don't have one, add a new Java JDK and point it to the location of a JDK 15.  
-![Project Settings](../.gitbook/assets/intellij-choose-jdk-adoptopenjdk-on-windows-project-settings.png)
+Ensure you have a Java 16 SDK configured by navigating to **File \| Project Structure \| Platform Settings \| SDKs**. If you don't have one, add a new Java JDK and point it to the location of a JDK 16. ![Project Settings](../.gitbook/assets/intellij-choose-jdk-adoptopenjdk-on-windows-project-settings.png)
 
-Navigate to **File \| Project Structure \| Project** and ensure that the projects' SDK is Java 15  
-![Use JDK 15 as project SDK](../.gitbook/assets/intellij-choose-jdk15-project-default.png)
+Navigate to **File \| Project Structure \| Project** and ensure that the projects' SDK is Java 16 ![Use JDK 16 as project SDK](../.gitbook/assets/intellij-choose-jdk15-project-default.png)
 
 Navigate to **File \| Settings \| Build, Execution, Deployment \| Build Tools \| Gradle** and select the "Project SDK" as the Gradle JVM at the bottom.
 
 To prepare IntelliJ's build system two additional steps are required:
 
-* Navigate to **File \| Settings \| Build, Execution, Deployment \| Compiler \| Java Compiler**, and under "Override compiler parameters per-module" add \(\[+\]\) the following compiler arguments for the `JabRef.main` module:
+* Navigate to **File \| Settings \| Build, Execution, Deployment \| Compiler \| Java Compiler**, and under "Override compiler parameters per-module" add \(\[+\]\) the following compiler arguments for the `JabRef.main` module. Otherwise, you will get: `java: package com.sun.javafx.scene.control is not visible (package com.sun.javafx.scene.control is declared in module javafx.controls, which does not export it to module org.jabref)`
 
   ```text
    --add-exports=javafx.controls/com.sun.javafx.scene.control=org.jabref
@@ -127,7 +125,7 @@ To prepare IntelliJ's build system two additional steps are required:
 
 To have autoformat working properly in the context of line wrapping, "Wrap at right margin" has to be disabled as shown below. Details are found in [IntelliJ issue 240517](https://youtrack.jetbrains.com/issue/IDEA-240517).
 
-![Disable wrapping at right margin to prevent JavaDoc to be wrapped](../.gitbook/assets/intellij-wrap-at-right-margin%20%284%29%20%284%29%20%284%29.png)
+![](../.gitbook/assets/intellij-wrap-at-right-margin%20%284%29%20%284%29%20%284%29%20%281%29.png)
 
 #### Using Gradle from within IntelliJ IDEA
 
@@ -146,8 +144,6 @@ After that a new entry called "jabref \[run\]" will appear in the run configurat
 
 #### Using IntelliJ's internal build system
 
-**Note that these steps do not work on IntelliJ 2020.x.**. You have to keep using gradle for executing tasks. See [IDEA-249391](https://youtrack.jetbrains.com/issue/IDEA-249391) for details.
-
 You should use IntelliJ IDEA's internal build system for compiling and running JabRef during development, because it is usually more responsive. Thereby, **it's important** that you understand that JabRef relies on generated sources which are only build through Gradle. Therefore, to build or update these dependencies you need to run the `assemble` Gradle task at least once.
 
 To use IntelliJ IDEA's internal build system when you build JabRef through **Build \| Build Project** or use the provided "JabRef Main" run configuration, ensure that
@@ -155,9 +151,20 @@ To use IntelliJ IDEA's internal build system when you build JabRef through **Bui
 * In **File \| Settings \| Build, Execution, Deployment \| Build Tools \| Gradle** the setting "Build and run using" and "Test using" is set to "IntelliJ IDEA".
 * Ignore the Gradle project "buildSrc" by clicking the button **Select Project Data To Import** in the Gradle Tool Window and unchecking the folder "buildSrc".
 
-  ![Ignore the Gradle project &quot;buildSrc&quot;](../.gitbook/assets/intellij-gradle-config-ignore-buildSrc%20%282%29%20%282%29%20%282%29%20%283%29.png)
+  ![Ignore the Gradle project &quot;buildSrc&quot;](../.gitbook/assets/intellij-gradle-config-ignore-buildSrc%20%282%29%20%282%29%20%282%29%20%283%29%20%283%29%20%286%29%20%284%29.png)
 
-* Delete `org.jabref.gui.logging.plugins.Log4jPlugins` \(location: `generated\org\jabref\gui\logging\plugins\Log4jPlugins.java`\). Otherwise, you will see following error:
+* Add `src-gen` as root:
+  1. Right click on the project "jabref".
+  2. Select "Open Module Settings"
+  3. Expand "JabRef"
+  4. Select "main"
+  5. Select tab "Sources"
+  6. Click "+ Add Content Root"
+  7. Select the `src-gen` directory
+  8. Click "OK". When expanding "main", "java" should have been selected as source
+  9. Click "OK" to save the changes
+* In case the above step does not work, run with gradle, import gradle project again, and try again.
+* Delete `org.jabref.gui.logging.plugins.Log4jPlugins` \(location: `src-gen/main/java/org/jabref/gui/logging/plugins/Log4jPlugins.java`\). Otherwise, you will see following error:
 
   ```text
   Error:java: Unable to create Plugin Service Class org.jabref.gui.logging.plugins.Log4jPlugins
@@ -171,7 +178,9 @@ To use IntelliJ IDEA's internal build system when you build JabRef through **Bui
 
 Essentially, you now have the best of both worlds: You can run Gradle tasks using the Gradle Tool Window and unless you haven't made changes to input files that generate sources, you can compile and run with IntelliJ's faster internal build system.
 
-In case all steps are followed, and there are still issues with `SearchBaseVisitor` \(e.g., `Error:(16, 25) java: package org.jabref.search does not exist`\), you have to delete `generated\org\jabref\gui\logging\plugins\Log4jPlugins.java`. This is independent of having enabled or disabled Annotation Processing \(see above at "Enable Annotation Processing"\).
+In case all steps are followed, and there are still issues with `SearchBaseVisitor` \(e.g., `Error:(16, 25) java: package org.jabref.search does not exist`\), you have to delete `src\main\generated\org\jabref\gui\logging\plugins\Log4jPlugins.java`. This is independent of having enabled or disabled Annotation Processing \(see above at "Enable Annotation Processing"\).
+
+~~Note that the above steps might not work on IntelliJ 2020.x.\*\*. You have to keep using gradle for executing tasks. See~~ [~~IDEA-249391~~](https://youtrack.jetbrains.com/issue/IDEA-249391) ~~for details.~~
 
 #### Using JabRef's code style
 
@@ -192,7 +201,7 @@ Finally, ensure that the checkstyle configuration file is in place:
 4. Click "Browse" and choose `config/checkstyle/checkstyle.xml`
 5. Click "Next" and "Finish"
 6. Activate the CheckStyle configuration file by ticking it in the list
-7. Ensure that the [latest CheckStyle version](https://checkstyle.org/releasenotes.html) is selected \(8.36 or higher\). 8.36 is required for Java 15.
+7. Ensure that the [latest CheckStyle version](https://checkstyle.org/releasenotes.html) is selected \(8.36 or higher\). 8.43 is required for Java 16.
 8. Set the "Scan Scope" to "Only Java sources \(including tests\)
 9. Save settings by clicking "OK"
 10. Your configuration should now look like this:
@@ -214,7 +223,7 @@ Make sure your Eclipse installation us up to date.
 4. Create a run/debug configuration for the main class `org.jabref.gui.JabRefLauncher` and/or for `org.jabref.gui.JabRefMain` \(both can be used equivalently\)
    * Remark: The run/debug configuration needs to be added by right clicking the class \(e.g. JabRefLauncher or JabRefMain\) otherwise it will not work.
 
-     ![Creating the run/debug configuration by right clicking on the class](../.gitbook/assets/eclipse-create-run-config%20%281%29%20%283%29%20%283%29%20%284%29%20%284%29.png)
+     ![Creating the run/debug configuration by right clicking on the class](../.gitbook/assets/eclipse-create-run-config%20%281%29%20%283%29%20%283%29%20%284%29%20%284%29%20%283%29%20%285%29.png)
 
    * In the tab "Arguments" of the run/debug configuration, enter the following runtime VM arguments:
 
@@ -253,7 +262,7 @@ Got it running? GREAT! You are ready to lurk the code and contribute to JabRef. 
 
 ### Java installation
 
-An indication that `JAVA_HOME` is not correctly set or no JDK 15 is installed is following error message:
+An indication that `JAVA_HOME` is not correctly set or no JDK 16 is installed is following error message:
 
 ```text
 compileJava FAILED
@@ -271,18 +280,24 @@ Another indication is following output
 java.lang.UnsupportedClassVersionError: org/javamodularity/moduleplugin/ModuleSystemPlugin has been compiled by a more recent version of the Java Runtime (class file version 55.0), this version of the Java Runtime only recognizes class file versions up to 52.0
 ```
 
-### Problems with generated source files
+### Issues with generated source files
 
-In rare cases you might encounter problems due to out-dated automatically generated source files. Running `./gradlew clean` deletes these old copies. Do not forget to run at least `./gradlew eclipse` or `./gradlew build` afterwards to regenerate the source files.
+In rare cases you might encounter problems due to out-dated automatically generated source files. Running `./gradlew clean` deletes these old copies. Do not forget to run at least `./gradlew eclipse` or `./gradlew build` afterwards to regenerate the source files. \`\`
 
-### Problems with openjfx libraries in local maven repository
+### Issues with `buildSrc`
+
+1. Open the context menu of `buildSrc`.
+2. Select "Load/Unload modules".
+3. Unload `jabRef.buildSrc`.
+
+### Issues with openjfx libraries in local maven repository
 
 There might be problems with building if you have openjfx libraries in local maven repository, resulting in errors like this:
 
 ```text
- > Could not find javafx-fxml-15-mac.jar (org.openjfx:javafx-fxml:15).
+ > Could not find javafx-fxml-16-mac.jar (org.openjfx:javafx-fxml:16).
      Searched in the following locations:
-         file:<your local maven repository path>/repository/org/openjfx/javafx-fxml/15/javafx-fxml-15-mac.jar
+         file:<your local maven repository path>/repository/org/openjfx/javafx-fxml/16/javafx-fxml-16-mac.jar
 ```
 
 As a workaround, you can remove all local openjfx artifacts by deleting the whole openjfx folder from specified location.

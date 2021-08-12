@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" demote-non-dropping-particle="never" default-locale="cs-CZ">
   <info>
-    <title>ISO-690 (author-date, Czech)</title>
+    <title>ISO-690 (author-date, Čeština)</title>
     <id>http://www.zotero.org/styles/iso690-author-date-cs</id>
     <link href="http://www.zotero.org/styles/iso690-author-date-cs" rel="self"/>
     <link href="http://www.zotero.org/styles/iso690-author-date-en" rel="template"/>
@@ -103,7 +103,7 @@
         </choose>
       </if>
       <else>
-        <text term="anonymous" form="short" text-case="uppercase"/>
+        <text term="anonymous" form="short" text-case="capitalize-first"/>
       </else>
     </choose>
   </macro>
@@ -135,7 +135,7 @@
         </names>
       </if>
       <else>
-        <text term="anonymous" form="short" text-case="uppercase"/>
+        <text term="anonymous" form="short" text-case="capitalize-first"/>
       </else>
     </choose>
   </macro>
@@ -163,7 +163,7 @@
         </choose>
       </if>
       <else>
-        <text term="anonymous" text-case="uppercase"/>
+        <text term="anonymous" text-case="capitalize-first"/>
       </else>
     </choose>
   </macro>
@@ -506,7 +506,10 @@
             <text macro="title"/>
             <text macro="genre"/>
             <text macro="edition"/>
-            <text macro="accessed"/>
+            <group delimiter=" ">
+              <text macro="publisher-info"/>
+              <text macro="accessed"/>
+            </group>
             <text macro="collection"/>
             <text macro="isbn"/>
           </group>
@@ -583,11 +586,10 @@
           <text macro="url"/>
         </else-if>
         <else-if type="webpage">
-          <group delimiter=". " suffix=". ">
-            <group delimiter=" ">
-              <text macro="title"/>
-              <text macro="accessed"/>
-            </group>
+          <group suffix=". ">
+            <text macro="title"/>
+            <text macro="publisher-info" prefix=". "/>
+            <text macro="accessed" prefix=" "/>
           </group>
           <text macro="url"/>
         </else-if>

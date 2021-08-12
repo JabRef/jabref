@@ -15,7 +15,7 @@
     <issn>0022-1198</issn>
     <eissn>1556-4029</eissn>
     <summary>JFS style - Vancouver superscript with old et-al rules and slightly different punctuation</summary>
-    <updated>2020-02-10T11:15:10+00:00</updated>
+    <updated>2021-01-08T08:43:12+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <macro name="author">
@@ -39,9 +39,7 @@
         <text variable="publisher-place"/>
         <text variable="publisher"/>
       </group>
-      <date variable="issued">
-        <date-part name="year"/>
-      </date>
+      <text macro="year-date"/>
     </group>
   </macro>
   <macro name="access">
@@ -60,18 +58,6 @@
       </else-if>
     </choose>
   </macro>
-  <macro name="journal-title">
-    <choose>
-      <if type="article-journal article-magazine" match="any">
-        <group suffix=" ">
-          <text variable="container-title" form="short" strip-periods="true"/>
-        </group>
-      </if>
-      <else>
-        <text variable="container-title" suffix=". " form="short"/>
-      </else>
-    </choose>
-  </macro>
   <macro name="title">
     <text variable="title"/>
   </macro>
@@ -88,6 +74,11 @@
       </else>
     </choose>
   </macro>
+  <macro name="year-date">
+    <date variable="issued">
+      <date-part name="year"/>
+    </date>
+  </macro>
   <citation collapse="citation-number">
     <sort>
       <key variable="citation-number"/>
@@ -100,42 +91,50 @@
     <layout suffix=".">
       <text variable="citation-number" suffix=". "/>
       <text macro="author"/>
-      <text macro="title" suffix=". "/>
-      <choose>
-        <if type="bill book graphic legal_case legislation motion_picture report song" match="any">
-          <group delimiter=" ">
-            <text macro="edition"/>
-            <text macro="publisher"/>
-          </group>
-        </if>
-        <else-if type="chapter paper-conference" match="any">
-          <group delimiter=". ">
-            <group delimiter=": ">
-              <text term="in" text-case="capitalize-first"/>
-              <text macro="editor"/>
+      <group delimiter=". ">
+        <text macro="title"/>
+        <choose>
+          <if type="bill book graphic legal_case legislation motion_picture report song" match="any">
+            <group delimiter=" ">
+              <text macro="edition"/>
+              <text macro="publisher"/>
             </group>
-            <text variable="container-title"/>
-            <group delimiter=";">
-              <text macro="publisher" prefix=" "/>
-              <text variable="page"/>
+          </if>
+          <else-if type="chapter paper-conference" match="any">
+            <group delimiter=". ">
+              <group delimiter=": ">
+                <text term="in" text-case="capitalize-first"/>
+                <text macro="editor"/>
+              </group>
+              <text variable="container-title"/>
+              <group delimiter=";">
+                <text macro="publisher" prefix=" "/>
+                <text variable="page"/>
+              </group>
             </group>
-          </group>
-        </else-if>
-        <else>
-          <text macro="journal-title"/>
-          <group delimiter=";">
-            <date variable="issued">
-              <date-part name="year"/>
-            </date>
-            <group>
-              <text variable="volume"/>
-              <text variable="issue" prefix="(" suffix=")"/>
-              <text variable="page" prefix=":"/>
+          </else-if>
+          <else-if type="article-magazine article-journal" match="any">
+            <group delimiter=" ">
+              <text variable="container-title" form="short" strip-periods="true"/>
+              <group delimiter=";">
+                <text macro="year-date"/>
+                <group>
+                  <text variable="volume"/>
+                  <text variable="issue" prefix="(" suffix=")"/>
+                  <text variable="page" prefix=":"/>
+                </group>
+              </group>
             </group>
-          </group>
-        </else>
-      </choose>
-      <text macro="access" prefix=". "/>
+          </else-if>
+          <else>
+            <group delimiter=". ">
+              <text variable="container-title"/>
+              <text macro="year-date"/>
+            </group>
+          </else>
+        </choose>
+        <text macro="access"/>
+      </group>
     </layout>
   </bibliography>
 </style>

@@ -44,14 +44,16 @@ import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.openoffice.OOBibStyle;
 import org.jabref.logic.openoffice.OpenOfficeFileSearch;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
-import org.jabref.logic.openoffice.StyleLoader;
 import org.jabref.logic.openoffice.UndefinedParagraphFormatException;
+import org.jabref.logic.openoffice.style.OOBibStyle;
+import org.jabref.logic.openoffice.style.StyleLoader;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.openoffice.uno.CreationException;
+import org.jabref.model.openoffice.uno.NoDocumentException;
 import org.jabref.preferences.PreferencesService;
 
 import com.sun.star.beans.IllegalTypeException;
@@ -83,6 +85,7 @@ public class OpenOfficePanel {
     private final Button pushEntriesAdvanced = new Button(Localization.lang("Cite special"));
     private final Button update;
     private final Button merge = new Button(Localization.lang("Merge citations"));
+    private final Button unmerge = new Button(Localization.lang("Separate citations"));
     private final Button manageCitations = new Button(Localization.lang("Manage citations"));
     private final Button exportCitations = new Button(Localization.lang("Export cited"));
     private final Button settingsB = new Button(Localization.lang("Settings"));
@@ -239,6 +242,21 @@ public class OpenOfficePanel {
                 LOGGER.warn("Problem combining cite markers", ex);
             }
         });
+
+        unmerge.setMaxWidth(Double.MAX_VALUE);
+        unmerge.setTooltip(new Tooltip(Localization.lang("Separate merged citations")));
+        unmerge.setOnAction(e -> {
+            try {
+                ooBase.unCombineCiteMarkers(getBaseList(), style);
+            } catch (UndefinedCharacterFormatException ex) {
+                reportUndefinedCharacterFormat(ex);
+            } catch (com.sun.star.lang.IllegalArgumentException | UnknownPropertyException | PropertyVetoException |
+                     CreationException | NoSuchElementException | WrappedTargetException | IOException |
+                     BibEntryNotFoundException ex) {
+                LOGGER.warn("Problem uncombining cite markers", ex);
+            }
+        });
+
         ContextMenu settingsMenu = createSettingsPopup();
         settingsB.setMaxWidth(Double.MAX_VALUE);
         settingsB.setContextMenu(settingsMenu);
@@ -258,6 +276,7 @@ public class OpenOfficePanel {
         pushEntriesAdvanced.setDisable(true);
         update.setDisable(true);
         merge.setDisable(true);
+        unmerge.setDisable(true);
         manageCitations.setDisable(true);
         exportCitations.setDisable(true);
 
@@ -271,7 +290,7 @@ public class OpenOfficePanel {
         flow.setHgap(4);
         flow.setPrefWrapLength(200);
         flow.getChildren().addAll(setStyleFile, pushEntries, pushEntriesInt);
-        flow.getChildren().addAll(pushEntriesAdvanced, pushEntriesEmpty, merge);
+        flow.getChildren().addAll(pushEntriesAdvanced, pushEntriesEmpty, merge, unmerge);
         flow.getChildren().addAll(manageCitations, exportCitations, settingsB);
 
         vbox.setFillWidth(true);
@@ -422,6 +441,7 @@ public class OpenOfficePanel {
             pushEntriesAdvanced.setDisable(false);
             update.setDisable(false);
             merge.setDisable(false);
+            unmerge.setDisable(false);
             manageCitations.setDisable(false);
             exportCitations.setDisable(false);
         });

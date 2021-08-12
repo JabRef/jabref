@@ -18,7 +18,7 @@
     <category field="social_science"/>
     <issn>1619-7623</issn>
     <eissn>2199-9201</eissn>
-    <updated>2019-10-02T14:08:38+00:00</updated>
+    <updated>2021-02-24T13:32:59+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="de">
@@ -41,7 +41,7 @@
   </locale>
   <macro name="editor">
     <names variable="editor" delimiter="; ">
-      <name delimiter="; " and="text"/>
+      <name and="text" delimiter-precedes-last="never"/>
       <label form="short" prefix=" (" suffix=")"/>
     </names>
   </macro>
@@ -71,12 +71,12 @@
   <macro name="access">
     <choose>
       <if variable="DOI">
-        <text variable="DOI" prefix="DOI: "/>
+        <text variable="DOI" prefix="https://doi.org/"/>
       </if>
       <else>
         <choose>
           <if type="webpage post post-weblog" match="any">
-            <group delimiter=", ">
+            <group delimiter=", " suffix=".">
               <group>
                 <text term="available at" text-case="capitalize-first" suffix=" "/>
                 <text variable="URL"/>
@@ -225,7 +225,7 @@
       <key variable="title"/>
       <key variable="issued"/>
     </sort>
-    <layout suffix=".">
+    <layout>
       <group delimiter=" " suffix=".">
         <choose>
           <if type="chapter paper-conference" match="any">
@@ -251,7 +251,7 @@
         <text macro="container-title" font-style="normal"/>
         <text macro="edition"/>
         <text macro="genre"/>
-        <group delimiter=", ">
+        <group delimiter=", " suffix=".">
           <text macro="publisher"/>
           <group delimiter=", " prefix="(" suffix=")">
             <text variable="collection-title"/>
@@ -259,9 +259,9 @@
           <text macro="locator"/>
           <text macro="published-date"/>
           <text macro="pages"/>
-          <text macro="access"/>
         </group>
       </group>
+      <text macro="access" prefix=". "/>
     </layout>
   </bibliography>
 </style>

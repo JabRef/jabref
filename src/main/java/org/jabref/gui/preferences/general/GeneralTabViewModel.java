@@ -2,6 +2,7 @@ package org.jabref.gui.preferences.general;
 
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 import javafx.beans.property.BooleanProperty;
@@ -13,6 +14,7 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
+import javafx.collections.transformation.SortedList;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
@@ -38,7 +40,6 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty confirmDeleteProperty = new SimpleBooleanProperty();
     private final BooleanProperty memoryStickModeProperty = new SimpleBooleanProperty();
     private final BooleanProperty collectTelemetryProperty = new SimpleBooleanProperty();
-    private final BooleanProperty allowIntegerEditionProperty = new SimpleBooleanProperty();
     private final BooleanProperty showAdvancedHintsProperty = new SimpleBooleanProperty();
     private final BooleanProperty markOwnerProperty = new SimpleBooleanProperty();
     private final StringProperty markOwnerNameProperty = new SimpleStringProperty("");
@@ -66,7 +67,7 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
     }
 
     public void setValues() {
-        languagesListProperty.setValue(FXCollections.observableArrayList(Language.values()));
+        languagesListProperty.setValue(new SortedList<>(FXCollections.observableArrayList(Language.values()), Comparator.comparing(Language::getDisplayName)));
         selectedLanguageProperty.setValue(preferencesService.getLanguage());
 
         encodingsListProperty.setValue(FXCollections.observableArrayList(Encodings.getCharsets()));
@@ -77,7 +78,6 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
 
         inspectionWarningDuplicateProperty.setValue(initialGeneralPreferences.isWarnAboutDuplicatesInInspection());
         confirmDeleteProperty.setValue(initialGeneralPreferences.shouldConfirmDelete());
-        allowIntegerEditionProperty.setValue(initialGeneralPreferences.shouldAllowIntegerEditionBibtex());
         memoryStickModeProperty.setValue(initialGeneralPreferences.isMemoryStickMode());
         collectTelemetryProperty.setValue(initialTelemetryPreferences.shouldCollectTelemetry());
         showAdvancedHintsProperty.setValue(initialGeneralPreferences.shouldShowAdvancedHints());
@@ -109,7 +109,6 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
                 selectedBiblatexModeProperty.getValue(),
                 inspectionWarningDuplicateProperty.getValue(),
                 confirmDeleteProperty.getValue(),
-                allowIntegerEditionProperty.getValue(),
                 memoryStickModeProperty.getValue(),
                 showAdvancedHintsProperty.getValue()));
 
@@ -174,10 +173,6 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
 
     public BooleanProperty collectTelemetryProperty() {
         return this.collectTelemetryProperty;
-    }
-
-    public BooleanProperty allowIntegerEditionProperty() {
-        return this.allowIntegerEditionProperty;
     }
 
     public BooleanProperty showAdvancedHintsProperty() {

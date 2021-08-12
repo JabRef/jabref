@@ -7,6 +7,7 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import org.jabref.logic.importer.fetcher.ACMPortalFetcher;
 import org.jabref.logic.importer.fetcher.ACS;
 import org.jabref.logic.importer.fetcher.ApsFetcher;
 import org.jabref.logic.importer.fetcher.ArXiv;
@@ -92,8 +93,7 @@ public class WebFetchers {
         set.add(new AstrophysicsDataSystem(importFormatPreferences));
         set.add(new MathSciNet(importFormatPreferences));
         set.add(new ZbMATH(importFormatPreferences));
-        // see https://github.com/JabRef/jabref/issues/5804
-        // set.add(new ACMPortalFetcher(importFormatPreferences));
+        set.add(new ACMPortalFetcher());
         // set.add(new GoogleScholar(importFormatPreferences));
         set.add(new DBLPFetcher(importFormatPreferences));
         set.add(new SpringerFetcher());
@@ -140,6 +140,7 @@ public class WebFetchers {
         set.add(new IsbnFetcher(importFormatPreferences));
         set.add(new MathSciNet(importFormatPreferences));
         set.add(new CrossRef());
+        set.add(new ZbMATH(importFormatPreferences));
         return set;
     }
 

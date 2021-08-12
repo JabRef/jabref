@@ -22,6 +22,7 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.StateManager;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.maintable.columns.FieldColumn;
@@ -57,12 +58,14 @@ public class MainTableColumnFactory {
     private final CellFactory cellFactory;
     private final UndoManager undoManager;
     private final DialogService dialogService;
+    private final StateManager stateManager;
 
     public MainTableColumnFactory(BibDatabaseContext database,
                                   PreferencesService preferencesService,
                                   ExternalFileTypes externalFileTypes,
                                   UndoManager undoManager,
-                                  DialogService dialogService) {
+                                  DialogService dialogService,
+                                  StateManager stateManager) {
         this.database = Objects.requireNonNull(database);
         this.preferencesService = Objects.requireNonNull(preferencesService);
         this.columnPreferences = preferencesService.getColumnPreferences();
@@ -70,6 +73,7 @@ public class MainTableColumnFactory {
         this.dialogService = dialogService;
         this.cellFactory = new CellFactory(externalFileTypes, preferencesService, undoManager);
         this.undoManager = undoManager;
+        this.stateManager = stateManager;
     }
 
     public List<TableColumn<BibEntryTableViewModel, ?>> createColumns() {
@@ -207,7 +211,7 @@ public class MainTableColumnFactory {
      * Creates a clickable icons column for DOIs, URLs, URIs and EPrints.
      */
     private TableColumn<BibEntryTableViewModel, Map<Field, String>> createIdentifierColumn(MainTableColumnModel columnModel) {
-        return new LinkedIdentifierColumn(columnModel, cellFactory, database, dialogService);
+        return new LinkedIdentifierColumn(columnModel, cellFactory, database, dialogService, preferencesService, stateManager);
     }
 
     /**

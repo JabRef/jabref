@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <style xmlns="http://purl.org/net/xbiblio/csl" version="1.0" class="note" demote-non-dropping-particle="sort-only" default-locale="fr-FR" page-range-format="expanded">
   <info>
-    <title>Revue Archéologique (French)</title>
+    <title>Revue Archéologique (Français)</title>
     <id>http://www.zotero.org/styles/revue-archeologique</id>
     <link href="http://www.zotero.org/styles/revue-archeologique" rel="self"/>
     <link href="https://www.puf.com/sites/default/files/kcfinder/files/Recommandationsauxauteurs.pdf" rel="documentation"/>
@@ -213,7 +213,7 @@
             <else-if type="entry-dictionary entry-encyclopedia" match="any">
               <group delimiter=", ">
                 <text macro="title" quotes="true"/>
-                <text variable="title" form="short" font-style="italic"/>
+                <text variable="container-title" form="short" font-style="italic"/>
                 <group delimiter="&#160;">
                   <label variable="volume" form="short"/>
                   <text variable="volume"/>

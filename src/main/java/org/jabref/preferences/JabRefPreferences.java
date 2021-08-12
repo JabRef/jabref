@@ -76,6 +76,7 @@ import org.jabref.logic.exporter.TemplateExporter;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.fetcher.DoiFetcher;
 import org.jabref.logic.importer.fileformat.CustomImporter;
+import org.jabref.logic.importer.importsettings.ImportSettingsPreferences;
 import org.jabref.logic.journals.JournalAbbreviationPreferences;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Language;
@@ -86,7 +87,8 @@ import org.jabref.logic.layout.format.FileLinkPreferences;
 import org.jabref.logic.layout.format.NameFormatterPreferences;
 import org.jabref.logic.net.ProxyPreferences;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
-import org.jabref.logic.openoffice.StyleLoader;
+import org.jabref.logic.openoffice.style.StyleLoader;
+import org.jabref.logic.preferences.DOIPreferences;
 import org.jabref.logic.preferences.OwnerPreferences;
 import org.jabref.logic.preferences.TimestampPreferences;
 import org.jabref.logic.preview.PreviewLayout;
@@ -201,6 +203,9 @@ public class JabRefPreferences implements PreferencesService {
     public static final String SHOW_ADVANCED_HINTS = "showAdvancedHints";
     public static final String DEFAULT_ENCODING = "defaultEncoding";
 
+    public static final String BASE_DOI_URI = "baseDOIURI";
+    public static final String USE_CUSTOM_DOI_URI = "useCustomDOIURI";
+
     public static final String USE_OWNER = "useOwner";
     public static final String DEFAULT_OWNER = "defaultOwner";
     public static final String OVERWRITE_OWNER = "overwriteOwner";
@@ -231,6 +236,9 @@ public class JabRefPreferences implements PreferencesService {
     public static final String SEARCH_DISPLAY_MODE = "searchDisplayMode";
     public static final String SEARCH_CASE_SENSITIVE = "caseSensitiveSearch";
     public static final String SEARCH_REG_EXP = "regExpSearch";
+    public static final String SEARCH_FULLTEXT = "fulltextSearch";
+
+    public static final String GENERATE_KEY_ON_IMPORT = "generateKeyOnImport";
 
     // Currently, it is not possible to specify defaults for specific entry types
     // When this should be made possible, the code to inspect is org.jabref.gui.preferences.CitationKeyPatternPrefTab.storeSettings() -> LabelPattern keypatterns = getCiteKeyPattern(); etc
@@ -407,6 +415,7 @@ public class JabRefPreferences implements PreferencesService {
     private SidePanePreferences sidePanePreferences;
     private Theme globalTheme;
     private Set<CustomImporter> customImporters;
+    private String userName;
 
     // The constructor is made private to enforce this as a singleton class:
     private JabRefPreferences() {
@@ -430,6 +439,9 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(SEARCH_DISPLAY_MODE, SearchDisplayMode.FILTER.toString());
         defaults.put(SEARCH_CASE_SENSITIVE, Boolean.FALSE);
         defaults.put(SEARCH_REG_EXP, Boolean.FALSE);
+        defaults.put(SEARCH_FULLTEXT, Boolean.TRUE);
+
+        defaults.put(GENERATE_KEY_ON_IMPORT, Boolean.TRUE);
 
         defaults.put(PUSH_TEXMAKER_PATH, JabRefDesktop.getNativeDesktop().detectProgramPath("texmaker", "Texmaker"));
         defaults.put(PUSH_WINEDT_PATH, JabRefDesktop.getNativeDesktop().detectProgramPath("WinEdt", "WinEdt Team\\WinEdt"));
@@ -443,6 +455,9 @@ public class JabRefPreferences implements PreferencesService {
 
         // Set DOI to be the default ID entry generator
         defaults.put(ID_ENTRY_GENERATOR, DoiFetcher.NAME);
+
+        defaults.put(USE_CUSTOM_DOI_URI, Boolean.FALSE);
+        defaults.put(BASE_DOI_URI, "https://doi.org");
 
         if (OS.OS_X) {
             defaults.put(FONT_FAMILY, "SansSerif");
@@ -764,10 +779,16 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public String getUser() {
+        if (StringUtil.isNotBlank(userName)) {
+            return userName;
+        }
+
         try {
-            return get(DEFAULT_OWNER) + '-' + InetAddress.getLocalHost().getHostName();
+            userName = get(DEFAULT_OWNER) + '-' + InetAddress.getLocalHost().getHostName();
+            return userName;
         } catch (UnknownHostException ex) {
-            LOGGER.debug("Hostname not found.", ex);
+            LOGGER.error("Hostname not found. Please go to https://docs.jabref.org/ to find possible " +
+                    "problem resolution", ex);
             return get(DEFAULT_OWNER);
         }
     }
@@ -1030,10 +1051,16 @@ public class JabRefPreferences implements PreferencesService {
         }
     }
 
-    private FileLinkPreferences getFileLinkPreferences() {
+    @Override
+    public FileLinkPreferences getFileLinkPreferences() {
         return new FileLinkPreferences(
                 get(MAIN_FILE_DIRECTORY), // REALLY HERE?
                 fileDirForDatabase);
+    }
+
+    @Override
+    public void storeFileDirforDatabase(List<Path> dirs) {
+        this.fileDirForDatabase = dirs;
     }
 
     @Override
@@ -1112,40 +1139,6 @@ public class JabRefPreferences implements PreferencesService {
         }
 
         putStringList(CLEANUP_FORMATTERS, cleanupPreset.getFormatterCleanups().getAsStringList(OS.NEWLINE));
-    }
-
-    @Override
-    public void storeExportSaveOrder(SaveOrderConfig config) {
-        putBoolean(EXPORT_PRIMARY_SORT_DESCENDING, config.getSortCriteria().get(0).descending);
-        putBoolean(EXPORT_SECONDARY_SORT_DESCENDING, config.getSortCriteria().get(1).descending);
-        putBoolean(EXPORT_TERTIARY_SORT_DESCENDING, config.getSortCriteria().get(2).descending);
-        putBoolean(EXPORT_IN_ORIGINAL_ORDER, config.saveInOriginalOrder());
-        putBoolean(EXPORT_IN_SPECIFIED_ORDER, config.saveInSpecifiedOrder());
-
-        put(EXPORT_PRIMARY_SORT_FIELD, config.getSortCriteria().get(0).field.getName());
-        put(EXPORT_SECONDARY_SORT_FIELD, config.getSortCriteria().get(1).field.getName());
-        put(EXPORT_TERTIARY_SORT_FIELD, config.getSortCriteria().get(2).field.getName());
-    }
-
-    private SaveOrderConfig loadTableSaveOrder() {
-        SaveOrderConfig config = new SaveOrderConfig();
-
-        updateMainTableColumns();
-        List<MainTableColumnModel> sortOrder = createMainTableColumnSortOrder();
-
-        sortOrder.forEach(column -> config.getSortCriteria().add(new SaveOrderConfig.SortCriterion(
-                FieldFactory.parseField(column.getQualifier()),
-                column.getSortType().toString())));
-
-        return config;
-    }
-
-    @Override
-    public SaveOrderConfig loadExportSaveOrder() {
-        return new SaveOrderConfig(getBoolean(EXPORT_IN_ORIGINAL_ORDER), getBoolean(EXPORT_IN_SPECIFIED_ORDER),
-                new SaveOrderConfig.SortCriterion(FieldFactory.parseField(get(EXPORT_PRIMARY_SORT_FIELD)), getBoolean(EXPORT_PRIMARY_SORT_DESCENDING)),
-                new SaveOrderConfig.SortCriterion(FieldFactory.parseField(get(EXPORT_SECONDARY_SORT_FIELD)), getBoolean(EXPORT_SECONDARY_SORT_DESCENDING)),
-                new SaveOrderConfig.SortCriterion(FieldFactory.parseField(get(EXPORT_TERTIARY_SORT_FIELD)), getBoolean(EXPORT_TERTIARY_SORT_DESCENDING)));
     }
 
     public String getOrCreateUserId() {
@@ -1324,7 +1317,6 @@ public class JabRefPreferences implements PreferencesService {
                 getBoolean(BIBLATEX_DEFAULT_MODE) ? BibDatabaseMode.BIBLATEX : BibDatabaseMode.BIBTEX,
                 getBoolean(WARN_ABOUT_DUPLICATES_IN_INSPECTION),
                 getBoolean(CONFIRM_DELETE),
-                getBoolean(ALLOW_INTEGER_EDITION_BIBTEX),
                 getBoolean(MEMORY_STICK_MODE),
                 getBoolean(SHOW_ADVANCED_HINTS));
     }
@@ -1335,7 +1327,6 @@ public class JabRefPreferences implements PreferencesService {
         putBoolean(BIBLATEX_DEFAULT_MODE, (preferences.getDefaultBibDatabaseMode() == BibDatabaseMode.BIBLATEX));
         putBoolean(WARN_ABOUT_DUPLICATES_IN_INSPECTION, preferences.isWarnAboutDuplicatesInInspection());
         putBoolean(CONFIRM_DELETE, preferences.shouldConfirmDelete());
-        putBoolean(ALLOW_INTEGER_EDITION_BIBTEX, preferences.shouldAllowIntegerEditionBibtex());
         putBoolean(MEMORY_STICK_MODE, preferences.isMemoryStickMode());
         putBoolean(SHOW_ADVANCED_HINTS, preferences.shouldShowAdvancedHints());
     }
@@ -1352,6 +1343,19 @@ public class JabRefPreferences implements PreferencesService {
     public void storeTelemetryPreferences(TelemetryPreferences preferences) {
         putBoolean(COLLECT_TELEMETRY, preferences.shouldCollectTelemetry());
         putBoolean(ALREADY_ASKED_TO_COLLECT_TELEMETRY, !preferences.shouldAskToCollectTelemetry()); // mind the !
+    }
+
+    @Override
+    public DOIPreferences getDOIPreferences() {
+        return new DOIPreferences(
+                getBoolean(USE_CUSTOM_DOI_URI),
+                get(BASE_DOI_URI));
+    }
+
+    @Override
+    public void storeDOIPreferences(DOIPreferences preferences) {
+        putBoolean(USE_CUSTOM_DOI_URI, preferences.isUseCustom());
+        put(BASE_DOI_URI, preferences.getDefaultBaseURI());
     }
 
     @Override
@@ -1554,6 +1558,7 @@ public class JabRefPreferences implements PreferencesService {
                 getBoolean(SHOW_LATEX_CITATIONS),
                 getBoolean(DEFAULT_SHOW_SOURCE),
                 getBoolean(VALIDATE_IN_ENTRY_EDITOR),
+                getBoolean(ALLOW_INTEGER_EDITION_BIBTEX),
                 getDouble(ENTRY_EDITOR_HEIGHT));
     }
 
@@ -1566,6 +1571,7 @@ public class JabRefPreferences implements PreferencesService {
         putBoolean(SHOW_LATEX_CITATIONS, preferences.shouldShowLatexCitationsTab());
         putBoolean(DEFAULT_SHOW_SOURCE, preferences.showSourceTabByDefault());
         putBoolean(VALIDATE_IN_ENTRY_EDITOR, preferences.shouldEnableValidation());
+        putBoolean(ALLOW_INTEGER_EDITION_BIBTEX, preferences.shouldAllowIntegerEditionBibtex());
         putDouble(ENTRY_EDITOR_HEIGHT, preferences.getDividerPosition());
     }
 
@@ -2008,12 +2014,55 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     @Override
+    public SaveOrderConfig getExportSaveOrder() {
+        List<SaveOrderConfig.SortCriterion> sortCriteria = List.of(
+                new SaveOrderConfig.SortCriterion(FieldFactory.parseField(get(EXPORT_PRIMARY_SORT_FIELD)), getBoolean(EXPORT_PRIMARY_SORT_DESCENDING)),
+                new SaveOrderConfig.SortCriterion(FieldFactory.parseField(get(EXPORT_SECONDARY_SORT_FIELD)), getBoolean(EXPORT_SECONDARY_SORT_DESCENDING)),
+                new SaveOrderConfig.SortCriterion(FieldFactory.parseField(get(EXPORT_TERTIARY_SORT_FIELD)), getBoolean(EXPORT_TERTIARY_SORT_DESCENDING))
+        );
+
+        return new SaveOrderConfig(
+                SaveOrderConfig.OrderType.fromBooleans(getBoolean(EXPORT_IN_SPECIFIED_ORDER), getBoolean(EXPORT_IN_ORIGINAL_ORDER)),
+                sortCriteria
+        );
+    }
+
+    @Override
+    public void storeExportSaveOrder(SaveOrderConfig config) {
+        putBoolean(EXPORT_IN_ORIGINAL_ORDER, config.getOrderType() == SaveOrderConfig.OrderType.ORIGINAL);
+        putBoolean(EXPORT_IN_SPECIFIED_ORDER, config.getOrderType() == SaveOrderConfig.OrderType.SPECIFIED);
+
+        put(EXPORT_PRIMARY_SORT_FIELD, config.getSortCriteria().get(0).field.getName());
+        put(EXPORT_SECONDARY_SORT_FIELD, config.getSortCriteria().get(1).field.getName());
+        put(EXPORT_TERTIARY_SORT_FIELD, config.getSortCriteria().get(2).field.getName());
+        putBoolean(EXPORT_PRIMARY_SORT_DESCENDING, config.getSortCriteria().get(0).descending);
+        putBoolean(EXPORT_SECONDARY_SORT_DESCENDING, config.getSortCriteria().get(1).descending);
+        putBoolean(EXPORT_TERTIARY_SORT_DESCENDING, config.getSortCriteria().get(2).descending);
+    }
+
+    private SaveOrderConfig loadTableSaveOrder() {
+        SaveOrderConfig config = new SaveOrderConfig();
+
+        updateMainTableColumns();
+        List<MainTableColumnModel> sortOrder = createMainTableColumnSortOrder();
+
+        for (var column : sortOrder) {
+            boolean descending = (column.getSortType() == SortType.DESCENDING);
+            config.getSortCriteria().add(new SaveOrderConfig.SortCriterion(
+                    FieldFactory.parseField(column.getQualifier()),
+                    descending));
+        }
+
+        return config;
+    }
+
+    @Override
     public SavePreferences getSavePreferencesForExport() {
         Boolean saveInOriginalOrder = this.getBoolean(EXPORT_IN_ORIGINAL_ORDER);
         SaveOrderConfig saveOrder = null;
         if (!saveInOriginalOrder) {
             if (this.getBoolean(EXPORT_IN_SPECIFIED_ORDER)) {
-                saveOrder = this.loadExportSaveOrder();
+                saveOrder = this.getExportSaveOrder();
             } else {
                 saveOrder = this.loadTableSaveOrder();
             }
@@ -2491,7 +2540,8 @@ public class JabRefPreferences implements PreferencesService {
         return new SearchPreferences(
                 searchDisplayMode,
                 getBoolean(SEARCH_CASE_SENSITIVE),
-                getBoolean(SEARCH_REG_EXP));
+                getBoolean(SEARCH_REG_EXP),
+                getBoolean(SEARCH_FULLTEXT));
     }
 
     @Override
@@ -2499,6 +2549,7 @@ public class JabRefPreferences implements PreferencesService {
         put(SEARCH_DISPLAY_MODE, Objects.requireNonNull(preferences.getSearchDisplayMode()).toString());
         putBoolean(SEARCH_CASE_SENSITIVE, preferences.isCaseSensitive());
         putBoolean(SEARCH_REG_EXP, preferences.isRegularExpression());
+        putBoolean(SEARCH_FULLTEXT, preferences.isFulltext());
     }
 
     //*************************************************************************************************************
@@ -2654,5 +2705,21 @@ public class JabRefPreferences implements PreferencesService {
         putStringList(PROTECTED_TERMS_DISABLED_EXTERNAL, preferences.getDisabledExternalTermLists());
         putStringList(PROTECTED_TERMS_ENABLED_INTERNAL, preferences.getEnabledInternalTermLists());
         putStringList(PROTECTED_TERMS_DISABLED_INTERNAL, preferences.getDisabledInternalTermLists());
+    }
+
+    //*************************************************************************************************************
+    // Import preferences
+    //*************************************************************************************************************
+
+    @Override
+    public void storeImportSettingsPreferences(ImportSettingsPreferences preferences) {
+        putBoolean(GENERATE_KEY_ON_IMPORT, preferences.generateNewKeyOnImport());
+    }
+
+    @Override
+    public ImportSettingsPreferences getImportSettingsPreferences() {
+        return new ImportSettingsPreferences(
+                getBoolean(GENERATE_KEY_ON_IMPORT)
+        );
     }
 }

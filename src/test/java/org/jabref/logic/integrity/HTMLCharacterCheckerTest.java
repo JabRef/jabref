@@ -9,11 +9,20 @@ import org.jabref.model.entry.field.StandardField;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class HTMLCharacterCheckerTest {
 
     private final HTMLCharacterChecker checker = new HTMLCharacterChecker();
     private final BibEntry entry = new BibEntry();
+
+    @Test
+    void testSettingNullThrowsNPE() {
+        assertThrows(
+                NullPointerException.class,
+                () -> entry.setField(StandardField.AUTHOR, null)
+        );
+    }
 
     @Test
     void titleAcceptsNonHTMLEncodedCharacters() {
@@ -50,5 +59,4 @@ public class HTMLCharacterCheckerTest {
         entry.setField(StandardField.JOURNAL, "&Auml;rling Str&ouml;m for &#8211; &#x2031;");
         assertEquals(List.of(new IntegrityMessage("HTML encoded character found", entry, StandardField.JOURNAL)), checker.check(entry));
     }
-
 }

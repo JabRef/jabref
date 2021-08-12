@@ -1,6 +1,9 @@
 {
     "ignorePatterns": [
         {
+            "pattern": "baeldung.com"
+        },
+        {
             "pattern": "^CONTRIBUTING\\.md"
         },
         {
@@ -20,6 +23,12 @@
         },
         {
             "pattern": "^http://purl\\.org/net/bibteXMP"
+        },
+        {
+            "pattern": "tldrlegal.com"
+        },
+        {
+            "pattern": "^https://www\\.slant\\.co/"
         },
         {
             "pattern": "^http://localhost"

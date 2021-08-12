@@ -9,7 +9,7 @@ import javafx.beans.property.StringProperty;
 import javafx.scene.Node;
 
 import org.jabref.gui.icon.IconTheme;
-import org.jabref.logic.openoffice.OOBibStyle;
+import org.jabref.logic.openoffice.style.OOBibStyle;
 
 public class StyleSelectItemViewModel {
 

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" demote-non-dropping-particle="sort-only" default-locale="en-US" page-range-format="expanded">
+<style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" demote-non-dropping-particle="sort-only" page-range-format="expanded" default-locale="en-US">
   <info>
     <title>Muscle &amp; Nerve</title>
     <id>http://www.zotero.org/styles/muscle-and-nerve</id>
@@ -8,14 +8,13 @@
     <link href="https://onlinelibrary.wiley.com/page/journal/10974598/homepage/forauthors.html" rel="documentation"/>
     <author>
       <name>Patrick O'Brien, PhD</name>
-      <uri>https://twitter.com/patobrien333/</uri>
     </author>
     <category citation-format="numeric"/>
     <category field="medicine"/>
     <category field="biology"/>
     <issn>0148-639X</issn>
     <eissn>1097-4598</eissn>
-    <updated>2019-01-08T16:34:19+00:00</updated>
+    <updated>2021-03-10T16:09:20+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <macro name="editor">
@@ -39,33 +38,18 @@
   </macro>
   <macro name="access">
     <choose>
-      <if type="article-journal">
+      <if type="webpage post post-weblog">
         <group delimiter=". ">
-          <group delimiter=": ">
-            <text value="Published online"/>
-            <date form="text" date-parts="year-month-day" variable="issued"/>
+          <text variable="URL"/>
+          <group delimiter=" ">
+            <text term="accessed" text-case="capitalize-first"/>
+            <date form="text" variable="accessed"/>
           </group>
-          <text variable="DOI" prefix="DOI: "/>
         </group>
       </if>
-      <else-if type="article-newspaper" match="none">
-        <choose>
-          <if variable="URL">
-            <group delimiter=". ">
-              <text variable="URL"/>
-              <choose>
-                <if type="webpage">
-                  <date variable="issued" prefix="Published " form="text"/>
-                </if>
-              </choose>
-              <group delimiter=" ">
-                <text term="accessed" text-case="capitalize-first"/>
-                <date form="text" variable="accessed"/>
-              </group>
-            </group>
-          </if>
-        </choose>
-      </else-if>
+      <else>
+        <text variable="DOI" prefix="https://doi.org/"/>
+      </else>
     </choose>
   </macro>
   <macro name="title">
@@ -215,9 +199,9 @@
         </else-if>
         <else>
           <text macro="editor" prefix=" " suffix="."/>
-          <group prefix=" " suffix=".">
-            <text variable="container-title" strip-periods="false" font-style="normal"/>
-            <group delimiter="; " prefix=" ">
+          <group delimiter=":" prefix=" " suffix=".">
+            <text variable="container-title" form="short" strip-periods="true" font-style="italic"/>
+            <group delimiter=";" prefix=" ">
               <choose>
                 <if variable="issue volume" match="any">
                   <date variable="issued">
@@ -231,9 +215,9 @@
                   </date>
                 </else>
               </choose>
-              <text variable="volume" font-weight="bold"/>
+              <text variable="volume" font-weight="normal"/>
             </group>
-            <text variable="page" prefix=":"/>
+            <text variable="page"/>
           </group>
         </else>
       </choose>
