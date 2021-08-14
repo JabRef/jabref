@@ -82,16 +82,18 @@ public class PdfEmbeddedBibFileImporter extends Importer {
     private List<BibEntry> getEmbeddedBibFileEntries(PDDocument document) throws IOException, ParseException {
         List<BibEntry> allParsedEntries = new ArrayList<>();
         PDDocumentNameDictionary nameDictionary = document.getDocumentCatalog().getNames();
-        PDEmbeddedFilesNameTreeNode efTree = nameDictionary.getEmbeddedFiles();
-        if (efTree != null) {
-            Map<String, PDComplexFileSpecification> names = efTree.getNames();
-            if (names != null) {
-                allParsedEntries.addAll(extractAndParseFiles(names));
-            } else {
-                List<PDNameTreeNode<PDComplexFileSpecification>> kids = efTree.getKids();
-                for (PDNameTreeNode<PDComplexFileSpecification> node : kids) {
-                    names = node.getNames();
+        if (nameDictionary != null) {
+            PDEmbeddedFilesNameTreeNode efTree = nameDictionary.getEmbeddedFiles();
+            if (efTree != null) {
+                Map<String, PDComplexFileSpecification> names = efTree.getNames();
+                if (names != null) {
                     allParsedEntries.addAll(extractAndParseFiles(names));
+                } else {
+                    List<PDNameTreeNode<PDComplexFileSpecification>> kids = efTree.getKids();
+                    for (PDNameTreeNode<PDComplexFileSpecification> node : kids) {
+                        names = node.getNames();
+                        allParsedEntries.addAll(extractAndParseFiles(names));
+                    }
                 }
             }
         }
