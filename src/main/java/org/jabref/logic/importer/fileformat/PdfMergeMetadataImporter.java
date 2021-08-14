@@ -8,9 +8,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 
 import org.jabref.gui.DefaultInjector;
+import org.jabref.logic.importer.EntryBasedFetcher;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.Importer;
@@ -20,10 +22,12 @@ import org.jabref.logic.importer.fetcher.GrobidCitationFetcher;
 import org.jabref.logic.importer.fetcher.IsbnFetcher;
 import org.jabref.logic.importer.util.FileFieldParser;
 import org.jabref.logic.util.StandardFileType;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.preferences.FilePreferences;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -139,4 +143,36 @@ public class PdfMergeMetadataImporter extends Importer {
         return "PdfMergeMetadataImporter imports metadata from a PDF using multiple strategies and merging the result.";
     }
 
+    public static class EntryBasedFetcherWrapper extends PdfMergeMetadataImporter implements EntryBasedFetcher {
+
+        private static final Logger LOGGER = LoggerFactory.getLogger(DefaultInjector.class);
+        private final FilePreferences filePreferences;
+        private final BibDatabaseContext databaseContext;
+        private final Charset defaultEncoding;
+
+        public EntryBasedFetcherWrapper(ImportFormatPreferences importFormatPreferences, FilePreferences filePreferences, BibDatabaseContext context, Charset defaultEncoding) {
+            super(importFormatPreferences);
+            this.filePreferences = filePreferences;
+            this.databaseContext = context;
+            this.defaultEncoding = defaultEncoding;
+        }
+
+        @Override
+        public List<BibEntry> performSearch(BibEntry entry) throws FetcherException {
+            for (LinkedFile file : entry.getFiles()) {
+                Optional<Path> filePath = file.findIn(databaseContext, filePreferences);
+                if (filePath.isPresent()) {
+                    try {
+                        ParserResult result = importDatabase(filePath.get(), defaultEncoding);
+                        if (!result.isEmpty()) {
+                            return result.getDatabase().getEntries();
+                        }
+                    } catch (IOException e) {
+                        LOGGER.error("Cannot read \"{}\"", filePath.get(), e);
+                    }
+                }
+            }
+            return List.of();
+        }
+    }
 }
