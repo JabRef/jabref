@@ -39,6 +39,7 @@ import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.TaskExecutor;
+import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.fetcher.DoiFetcher;
 import org.jabref.logic.l10n.Localization;
@@ -128,6 +129,9 @@ public class MultiMergeEntriesView extends BaseDialog<BibEntry> {
 
     private void fillDiffModes() {
         diffMode.setItems(FXCollections.observableList(List.of(MergeEntries.DiffMode.PLAIN, MergeEntries.DiffMode.WORD, MergeEntries.DiffMode.CHARACTER)));
+        new ViewModelListCellFactory<MergeEntries.DiffMode>()
+                .withText(MergeEntries.DiffMode::getDisplayText)
+                .install(diffMode);
         MergeEntries.DiffMode diffModePref = preferences.getMergeDiffMode()
                                                           .flatMap(MergeEntries.DiffMode::parse)
                                                           .orElse(MergeEntries.DiffMode.WORD);
