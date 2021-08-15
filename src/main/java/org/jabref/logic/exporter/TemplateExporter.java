@@ -197,7 +197,6 @@ public class TemplateExporter extends Exporter {
         Objects.requireNonNull(databaseContext);
         Objects.requireNonNull(entries);
 
-
         Charset encodingToUse = StandardCharsets.UTF_8;
         if (encoding != null) {
             encodingToUse = encoding;
