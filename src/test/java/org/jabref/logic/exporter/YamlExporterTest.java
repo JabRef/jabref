@@ -115,7 +115,6 @@ public class YamlExporterTest {
             .withField(StandardField.URL, "http://example.com")
             .withField(StandardField.DATE, "2020-10-14");
 
-
         Path file = tempFile.resolve("RandomFileName");
         Files.createFile(file);
         yamlExporter.export(databaseContext, file, StandardCharsets.UTF_8, Collections.singletonList(entry));
@@ -144,7 +143,6 @@ public class YamlExporterTest {
             .withField(StandardField.URL, "http://example.com")
             .withField(StandardField.DATE, "2020-10-14");
 
-
         Path file = tempFile.resolve("RandomFileName");
         Files.createFile(file);
         yamlExporter.export(databaseContext, file, null, Collections.singletonList(entry));
@@ -172,7 +170,6 @@ public class YamlExporterTest {
             .withField(StandardField.TITLE, "細雪")
             .withField(StandardField.URL, "http://example.com")
             .withField(StandardField.DATE, "2020-10-14");
-
 
         Path file = tempFile.resolve("RandomFileName");
         Files.createFile(file);
