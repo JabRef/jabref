@@ -1,13 +1,13 @@
 .text-changed {
-    -fx-fill: darkgreen;
+    -fx-fill: -jr-orange;
 }
 
 .text-added {
-    -fx-fill: #54A3F2;
+    -fx-fill: -jr-green;
 }
 
 .text-removed {
-    -fx-fill: #FA5B68;
+    -fx-fill: -jr-red;
 }
 
 .grid-pane {
@@ -19,14 +19,6 @@
     -fx-border-insets: 0;
     -fx-background-insets: 0;
     -fx-border-image-insets: 0;
-}
-
-.text-area:focused .content {
-    -fx-background-color: transparent, white, transparent, white;
-}
-
-.text-area .content {
-    -fx-background-color: transparent, white, transparent, white;
 }
 
 .box {

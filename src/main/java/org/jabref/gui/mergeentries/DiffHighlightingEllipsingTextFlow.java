@@ -117,6 +117,7 @@ public class DiffHighlightingEllipsingTextFlow extends TextFlow {
             }
             if (lastChildAsShown instanceof Text && ((Text) lastChildAsShown).getText().length() > 0) {
                 Text shortenedChild = new Text(ellipseString(((Text) lastChildAsShown).getText()));
+                shortenedChild.getStyleClass().addAll(lastChildAsShown.getStyleClass());
                 super.getChildren().add(shortenedChild);
             } else {
                 // don't know what to do with anything else
@@ -133,7 +134,9 @@ public class DiffHighlightingEllipsingTextFlow extends TextFlow {
             final List<Text> highlightedText;
             switch (diffMode.getValue()) {
                 case PLAIN:
-                    highlightedText = List.of(new Text(fullText));
+                    Text text = new Text(fullText);
+                    text.getStyleClass().add("text-unchanged");
+                    highlightedText = List.of(text);
                     break;
                 case WORD:
                     highlightedText = DiffHighlighting.generateDiffHighlighting(fullText, comparisonString.get(), " ");
@@ -146,7 +149,9 @@ public class DiffHighlightingEllipsingTextFlow extends TextFlow {
             }
                 allChildren.addAll(highlightedText);
         } else {
-            allChildren.addAll(new Text(fullText));
+            Text text = new Text(fullText);
+            text.getStyleClass().add("text-unchanged");
+            allChildren.addAll(text);
         }
         super.autosize();
         adjustText();
