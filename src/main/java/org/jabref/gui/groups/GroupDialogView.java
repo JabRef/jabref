@@ -253,7 +253,6 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
         ikonGridView.getItems().addAll(allOf(MaterialDesignY.class));
         ikonGridView.getItems().addAll(allOf(MaterialDesignZ.class));
 
-        //create Scene
         Scene scene = new Scene(ikonGridView);
         scene.setCursor(Cursor.CLOSED_HAND);
 
@@ -277,11 +276,11 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
                 setGraphic(null);
             } else {
                 FontIcon fontIcon = FontIcon.of(ikon);
-                setGraphic(fontIcon);
                 fontIcon.getStyleClass().setAll("font-icon");
+                fontIcon.setIconSize(22);
+                //fontIcon.setStyle("-fx-background-color: #ffffff; -fx-background-radius: 15; -fx-border-radius: 15; -fx-border-width: 0; -fx-padding: 10; -fx-pref-width: 145; -fx-max-width: 145; -fx-pref-height: 130; -fx-max-height: 130; -fx-effect: dropshadow(three-pass-box, #93948d, 10, 0, 0, 0);");
+                setGraphic(fontIcon);
 
-                // setText(ikon.getDescription());
-                // setStyle("-fx-background-color: #ffffff; -fx-background-radius: 15; -fx-border-radius: 15; -fx-border-width: 0; -fx-padding: 10; -fx-pref-width: 145; -fx-max-width: 145; -fx-max-width: 145; -fx-pref-height: 130; -fx-max-height: 130; -fx-effect: dropshadow(three-pass-box, #93948d, 10, 0, 0, 0);");
                 setOnMouseClicked(event -> {
                     iconField.textProperty().setValue(String.valueOf(fontIcon.getIconCode()));
                     Stage stage = (Stage) this.getGridView().getScene().getWindow();
