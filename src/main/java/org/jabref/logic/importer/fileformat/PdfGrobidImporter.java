@@ -21,19 +21,19 @@ import org.jabref.model.util.FileHelper;
 /**
  * Wraps the GrobidService function to be used as an Importer.
  */
-public class GrobidPdfMetadataImporter extends Importer {
+public class PdfGrobidImporter extends Importer {
 
     private final GrobidService grobidService;
     private final ImportFormatPreferences importFormatPreferences;
 
-    public GrobidPdfMetadataImporter(String grobidServerURL, ImportFormatPreferences importFormatPreferences) {
+    public PdfGrobidImporter(String grobidServerURL, ImportFormatPreferences importFormatPreferences) {
         this.grobidService = new GrobidService(grobidServerURL);
         this.importFormatPreferences = importFormatPreferences;
     }
 
     @Override
     public String getName() {
-        return Localization.lang("Grobid PDF metadata");
+        return "Grobid";
     }
 
     @Override
@@ -45,7 +45,7 @@ public class GrobidPdfMetadataImporter extends Importer {
     public ParserResult importDatabase(BufferedReader reader) throws IOException {
         Objects.requireNonNull(reader);
         throw new UnsupportedOperationException(
-                "PdfXmpImporter does not support importDatabase(BufferedReader reader)."
+                "PdfGrobidImporter does not support importDatabase(BufferedReader reader)."
                         + "Instead use importDatabase(Path filePath, Charset defaultEncoding).");
     }
 
@@ -53,7 +53,7 @@ public class GrobidPdfMetadataImporter extends Importer {
     public ParserResult importDatabase(String data) throws IOException {
         Objects.requireNonNull(data);
         throw new UnsupportedOperationException(
-                "PdfXmpImporter does not support importDatabase(String data)."
+                "PdfGrobidImporter does not support importDatabase(String data)."
                         + "Instead use importDatabase(Path filePath, Charset defaultEncoding).");
     }
 

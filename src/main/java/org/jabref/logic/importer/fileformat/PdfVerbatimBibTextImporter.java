@@ -25,13 +25,13 @@ import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
 
 /**
- * PdfFirstPageImporter imports a verbatim BibTeX entry from the first page of the PDF.
+ * This importer imports a verbatim BibTeX entry from the first page of the PDF.
  */
-public class PdfFirstPageImporter extends Importer {
+public class PdfVerbatimBibTextImporter extends Importer {
 
     private final ImportFormatPreferences importFormatPreferences;
 
-    public PdfFirstPageImporter(ImportFormatPreferences importFormatPreferences) {
+    public PdfVerbatimBibTextImporter(ImportFormatPreferences importFormatPreferences) {
         this.importFormatPreferences = importFormatPreferences;
     }
 
@@ -43,14 +43,14 @@ public class PdfFirstPageImporter extends Importer {
     @Override
     public ParserResult importDatabase(BufferedReader reader) throws IOException {
         Objects.requireNonNull(reader);
-        throw new UnsupportedOperationException("PdfFirstPageImporter does not support importDatabase(BufferedReader reader)."
+        throw new UnsupportedOperationException("PdfVerbatimBibTextImporter does not support importDatabase(BufferedReader reader)."
                 + "Instead use importDatabase(Path filePath, Charset defaultEncoding).");
     }
 
     @Override
     public ParserResult importDatabase(String data) throws IOException {
         Objects.requireNonNull(data);
-        throw new UnsupportedOperationException("PdfFirstPageImporter does not support importDatabase(String data)."
+        throw new UnsupportedOperationException("PdfVerbatimBibTextImporter does not support importDatabase(String data)."
                 + "Instead use importDatabase(Path filePath, Charset defaultEncoding).");
     }
 
@@ -87,7 +87,7 @@ public class PdfFirstPageImporter extends Importer {
 
     @Override
     public String getName() {
-        return "PDFfirstpage";
+        return "PdfVerbatimBibText";
     }
 
     @Override
@@ -97,7 +97,7 @@ public class PdfFirstPageImporter extends Importer {
 
     @Override
     public String getDescription() {
-        return "PdfFirstPageImporter imports a verbatim BibTeX entry from the first page of the PDF.";
+        return "PdfVerbatimBibTextImporter imports a verbatim BibTeX entry from the first page of the PDF.";
     }
 
 }

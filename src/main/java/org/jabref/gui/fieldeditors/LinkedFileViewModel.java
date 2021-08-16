@@ -41,7 +41,7 @@ import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.externalfiles.LinkedFileHandler;
 import org.jabref.logic.importer.fetcher.GrobidCitationFetcher;
-import org.jabref.logic.importer.fileformat.GrobidPdfMetadataImporter;
+import org.jabref.logic.importer.fileformat.PdfGrobidImporter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.util.io.FileNameUniqueness;
@@ -542,7 +542,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
         linkedFile.findIn(databaseContext, preferences.getFilePreferences()).ifPresent(filePath -> {
             MultiMergeEntriesView dialog = new MultiMergeEntriesView(preferences, taskExecutor);
             dialog.addSource(Localization.lang("Entry"), entry);
-            dialog.addSource("Grobid", () -> new GrobidPdfMetadataImporter(GrobidCitationFetcher.GROBID_URL, preferences.getImportFormatPreferences()).importDatabase(filePath, preferences.getDefaultEncoding()).getDatabase().getEntries().get(0));
+            dialog.addSource("Grobid", () -> new PdfGrobidImporter(GrobidCitationFetcher.GROBID_URL, preferences.getImportFormatPreferences()).importDatabase(filePath, preferences.getDefaultEncoding()).getDatabase().getEntries().get(0));
             // to be added once #7947 is merged
             // dialog.addSource(Localization.lang("Embedded"), () -> new GrobidPdfMetadataImporter(preferences.getImportFormatPreferences()).importDatabase(filePath, preferences.getDefaultEncoding()).getDatabase().getEntries().get(0));
             // dialog.addSource(Localization.lang("XMP metadata"), () -> new GrobidPdfMetadataImporter(preferences.getImportFormatPreferences()).importDatabase(filePath, preferences.getDefaultEncoding()).getDatabase().getEntries().get(0));

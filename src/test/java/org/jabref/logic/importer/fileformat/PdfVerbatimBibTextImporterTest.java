@@ -20,16 +20,16 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-class PdfFirstPageImporterTest {
+class PdfVerbatimBibTextImporterTest {
 
-    private PdfFirstPageImporter importer;
+    private PdfVerbatimBibTextImporter importer;
     private ImportFormatPreferences importFormatPreferences;
 
     @BeforeEach
     void setUp() {
         importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(importFormatPreferences.getFieldContentFormatterPreferences().getNonWrappableFields()).thenReturn(List.of());
-        importer = new PdfFirstPageImporter(importFormatPreferences);
+        importer = new PdfVerbatimBibTextImporter(importFormatPreferences);
     }
 
     @Test
@@ -39,20 +39,20 @@ class PdfFirstPageImporterTest {
 
     @Test
     void testGetDescription() {
-        assertEquals("PdfFirstPageImporter imports a verbatim BibTeX entry from the first page of the PDF.",
+        assertEquals("PdfVerbatimBibTextImporter imports a verbatim BibTeX entry from the first page of the PDF.",
                      importer.getDescription());
     }
 
     @Test
     void doesNotHandleEncryptedPdfs() throws Exception {
-        Path file = Path.of(PdfFirstPageImporter.class.getResource("/pdfs/encrypted.pdf").toURI());
+        Path file = Path.of(PdfVerbatimBibTextImporter.class.getResource("/pdfs/encrypted.pdf").toURI());
         List<BibEntry> result = importer.importDatabase(file, StandardCharsets.UTF_8).getDatabase().getEntries();
         assertEquals(Collections.emptyList(), result);
     }
 
     @Test
     void importTwiceWorksAsExpected() throws Exception {
-        Path file = Path.of(PdfFirstPageImporterTest.class.getResource("mixedMetadata.pdf").toURI());
+        Path file = Path.of(PdfVerbatimBibTextImporterTest.class.getResource("mixedMetadata.pdf").toURI());
         List<BibEntry> result = importer.importDatabase(file, StandardCharsets.UTF_8).getDatabase().getEntries();
 
         BibEntry expected = new BibEntry(StandardEntryType.Article);
@@ -62,6 +62,7 @@ class PdfFirstPageImporterTest {
         expected.setField(StandardField.VOLUME, "1");
         expected.setField(StandardField.JOURNAL, "Some Journal");
         expected.setField(StandardField.YEAR, "2021");
+        expected.setField(StandardField.ISBN, "0134685997");
         expected.setFiles(Collections.singletonList(new LinkedFile("", file.toAbsolutePath(), "PDF")));
 
         List<BibEntry> resultSecondImport = importer.importDatabase(file, StandardCharsets.UTF_8).getDatabase().getEntries();

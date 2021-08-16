@@ -23,16 +23,16 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class GrobidPdfMetadataImporterTest {
+public class PdfGrobidImporterTest {
 
-    private GrobidPdfMetadataImporter importer;
+    private PdfGrobidImporter importer;
     private ImportFormatPreferences importFormatPreferences;
 
     @BeforeEach
     public void setUp() {
         importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(importFormatPreferences.getKeywordSeparator()).thenReturn(',');
-        importer = new GrobidPdfMetadataImporter(GrobidCitationFetcher.GROBID_URL, importFormatPreferences);
+        importer = new PdfGrobidImporter(GrobidCitationFetcher.GROBID_URL, importFormatPreferences);
     }
 
     @Test
@@ -42,7 +42,7 @@ public class GrobidPdfMetadataImporterTest {
 
     @Test
     public void testImportEntries() throws URISyntaxException {
-        Path file = Path.of(GrobidPdfMetadataImporterTest.class.getResource("LNCS-minimal.pdf").toURI());
+        Path file = Path.of(PdfGrobidImporterTest.class.getResource("LNCS-minimal.pdf").toURI());
         List<BibEntry> bibEntries = importer.importDatabase(file, StandardCharsets.UTF_8).getDatabase().getEntries();
 
         assertEquals(1, bibEntries.size());
@@ -54,13 +54,13 @@ public class GrobidPdfMetadataImporterTest {
 
     @Test
     public void testIsRecognizedFormat() throws IOException, URISyntaxException {
-        Path file = Path.of(GrobidPdfMetadataImporterTest.class.getResource("annotated.pdf").toURI());
+        Path file = Path.of(PdfGrobidImporterTest.class.getResource("annotated.pdf").toURI());
         assertTrue(importer.isRecognizedFormat(file, StandardCharsets.UTF_8));
     }
 
     @Test
     public void testIsRecognizedFormatReject() throws IOException, URISyntaxException {
-        Path file = Path.of(GrobidPdfMetadataImporterTest.class.getResource("BibtexImporter.examples.bib").toURI());
+        Path file = Path.of(PdfGrobidImporterTest.class.getResource("BibtexImporter.examples.bib").toURI());
         assertFalse(importer.isRecognizedFormat(file, StandardCharsets.UTF_8));
     }
 
