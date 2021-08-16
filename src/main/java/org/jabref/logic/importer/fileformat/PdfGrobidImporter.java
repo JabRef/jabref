@@ -33,7 +33,7 @@ public class PdfGrobidImporter extends Importer {
 
     @Override
     public String getName() {
-        return Localization.lang("Grobid");
+        return "Grobid";
     }
 
     @Override
