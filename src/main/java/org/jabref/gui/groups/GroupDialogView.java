@@ -107,7 +107,11 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
     private final ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
     private final GroupDialogViewModel viewModel;
 
-    public GroupDialogView(DialogService dialogService, BibDatabaseContext currentDatabase, PreferencesService preferencesService, AbstractGroup editedGroup, GroupDialogHeader groupDialogHeader) {
+    public GroupDialogView(DialogService dialogService,
+                           BibDatabaseContext currentDatabase,
+                           PreferencesService preferencesService,
+                           AbstractGroup editedGroup,
+                           GroupDialogHeader groupDialogHeader) {
         viewModel = new GroupDialogViewModel(dialogService, currentDatabase, preferencesService, editedGroup, groupDialogHeader);
 
         ViewLoader.view(this)
@@ -128,6 +132,7 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
         getDialogPane().getButtonTypes().setAll(ButtonType.OK, ButtonType.CANCEL);
 
         final Button confirmDialogButton = (Button) getDialogPane().lookupButton(ButtonType.OK);
+        confirmDialogButton.disableProperty().bind(viewModel.validationStatus().validProperty().not());
         // handle validation before closing dialog and calling resultConverter
         confirmDialogButton.addEventFilter(ActionEvent.ACTION, viewModel::validationHandler);
     }
@@ -205,10 +210,6 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
             validationVisualizer.initVisualization(viewModel.texGroupFilePathValidatonStatus(), texGroupFilePath);
             nameField.requestFocus();
         });
-
-        // Binding to the button throws a NPE, since it doesn't exist yet. Working around.
-        viewModel.validationStatus().validProperty().addListener((obs, _oldValue, validationStatus) ->
-                getDialogPane().lookupButton(ButtonType.OK).setDisable(!validationStatus));
     }
 
     @FXML
@@ -278,7 +279,6 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
                 FontIcon fontIcon = FontIcon.of(ikon);
                 fontIcon.getStyleClass().setAll("font-icon");
                 fontIcon.setIconSize(22);
-                //fontIcon.setStyle("-fx-background-color: #ffffff; -fx-background-radius: 15; -fx-border-radius: 15; -fx-border-width: 0; -fx-padding: 10; -fx-pref-width: 145; -fx-max-width: 145; -fx-pref-height: 130; -fx-max-height: 130; -fx-effect: dropshadow(three-pass-box, #93948d, 10, 0, 0, 0);");
                 setGraphic(fontIcon);
 
                 setOnMouseClicked(event -> {
