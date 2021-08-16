@@ -56,7 +56,7 @@ public class PdfIndexerTest {
 
         // then
         try (IndexReader reader = DirectoryReader.open(new NIOFSDirectory(context.getFulltextIndexPath()))) {
-            assertEquals(1, reader.numDocs());
+            assertEquals(33, reader.numDocs());
         }
     }
 
@@ -73,7 +73,7 @@ public class PdfIndexerTest {
 
         // then
         try (IndexReader reader = DirectoryReader.open(new NIOFSDirectory(context.getFulltextIndexPath()))) {
-            assertEquals(1, reader.numDocs());
+            assertEquals(33, reader.numDocs());
         }
     }
 
@@ -105,7 +105,7 @@ public class PdfIndexerTest {
         indexer.createIndex(database, context);
         // index actually exists
         try (IndexReader reader = DirectoryReader.open(new NIOFSDirectory(context.getFulltextIndexPath()))) {
-            assertEquals(1, reader.numDocs());
+            assertEquals(33, reader.numDocs());
         }
 
         // when
@@ -128,7 +128,7 @@ public class PdfIndexerTest {
 
         // index with first entry
         try (IndexReader reader = DirectoryReader.open(new NIOFSDirectory(context.getFulltextIndexPath()))) {
-            assertEquals(1, reader.numDocs());
+            assertEquals(33, reader.numDocs());
         }
 
         BibEntry metadata = new BibEntry(StandardEntryType.Article);
@@ -140,7 +140,7 @@ public class PdfIndexerTest {
 
         // then
         try (IndexReader reader = DirectoryReader.open(new NIOFSDirectory(context.getFulltextIndexPath()))) {
-            assertEquals(2, reader.numDocs());
+            assertEquals(34, reader.numDocs());
         }
     }
 }

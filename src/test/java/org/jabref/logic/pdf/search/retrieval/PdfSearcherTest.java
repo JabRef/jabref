@@ -61,7 +61,7 @@ public class PdfSearcherTest {
     @Test
     public void searchForTest() throws IOException, ParseException {
         PdfSearchResults result = search.search("test", 10);
-        assertEquals(2, result.numSearchResults());
+        assertEquals(8, result.numSearchResults());
     }
 
     @Test
@@ -79,7 +79,7 @@ public class PdfSearcherTest {
     @Test
     public void searchForSecond() throws IOException, ParseException {
         PdfSearchResults result = search.search("second", 10);
-        assertEquals(2, result.numSearchResults());
+        assertEquals(4, result.numSearchResults());
     }
 
     @Test
