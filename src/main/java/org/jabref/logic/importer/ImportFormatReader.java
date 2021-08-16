@@ -175,20 +175,25 @@ public class ImportFormatReader {
     public UnknownFormatImport importUnknownFormat(Path filePath, TimestampPreferences timestampPreferences, FileUpdateMonitor fileMonitor) throws ImportException {
         Objects.requireNonNull(filePath);
 
-        // First, see if it is a BibTeX file:
         try {
-            ParserResult parserResult = OpenDatabase.loadDatabase(filePath, importFormatPreferences, timestampPreferences, fileMonitor);
-            if (parserResult.getDatabase().hasEntries() || !parserResult.getDatabase().hasNoStrings()) {
-                parserResult.setFile(filePath.toFile());
-                return new UnknownFormatImport(ImportFormatReader.BIBTEX_FORMAT, parserResult);
+            UnknownFormatImport unknownFormatImport = importUnknownFormat(importer -> importer.importDatabase(filePath, importFormatPreferences.getEncoding()), importer -> importer.isRecognizedFormat(filePath, importFormatPreferences.getEncoding()));
+            unknownFormatImport.parserResult.setFile(filePath.toFile());
+            return unknownFormatImport;
+        } catch (ImportException e) {
+            // If all importers fail, try to read the file as BibTeX
+            try {
+                ParserResult parserResult = OpenDatabase.loadDatabase(filePath, importFormatPreferences, timestampPreferences, fileMonitor);
+                if (parserResult.getDatabase().hasEntries() || !parserResult.getDatabase().hasNoStrings()) {
+                    parserResult.setFile(filePath.toFile());
+                    return new UnknownFormatImport(ImportFormatReader.BIBTEX_FORMAT, parserResult);
+                } else {
+                    throw new ImportException(Localization.lang("Could not find a suitable import format."));
+                }
+            } catch (IOException ignore) {
+                // Ignored
+                throw new ImportException(Localization.lang("Could not find a suitable import format."));
             }
-        } catch (IOException ignore) {
-            // Ignored
         }
-
-        UnknownFormatImport unknownFormatImport = importUnknownFormat(importer -> importer.importDatabase(filePath, importFormatPreferences.getEncoding()), importer -> importer.isRecognizedFormat(filePath, importFormatPreferences.getEncoding()));
-        unknownFormatImport.parserResult.setFile(filePath.toFile());
-        return unknownFormatImport;
     }
 
     /**
