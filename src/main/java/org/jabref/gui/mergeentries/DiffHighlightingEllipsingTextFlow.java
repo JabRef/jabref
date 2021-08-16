@@ -48,10 +48,8 @@ public class DiffHighlightingEllipsingTextFlow extends TextFlow {
     }
 
     private void adjustChildren(ListChangeListener.Change<? extends Node> change) {
-        while (change.next()) {
-            super.getChildren().clear();
-            super.getChildren().addAll(allChildren);
-        }
+        super.getChildren().clear();
+        super.getChildren().addAll(allChildren);
         super.autosize();
         adjustText();
     }
@@ -108,21 +106,16 @@ public class DiffHighlightingEllipsingTextFlow extends TextFlow {
 
     private boolean ellipseUntilTextFits() {
         while (getHeight() > getMaxHeight() || getWidth() > getMaxWidth()) {
-            Node lastChildAsShown = super.getChildren().remove(super.getChildren().size() - 1);
-            while (getEllipsisString().equals(((Text) lastChildAsShown).getText())) {
-                if (super.getChildren().size() == 0) {
+            Text lastChildAsShown = (Text) super.getChildren().remove(super.getChildren().size() - 1);
+            while (getEllipsisString().equals(lastChildAsShown.getText()) || "".equals(lastChildAsShown.getText())) {
+                if (super.getChildren().isEmpty()) {
                     return false;
                 }
-                lastChildAsShown = super.getChildren().remove(super.getChildren().size() - 1);
+                lastChildAsShown = (Text) super.getChildren().remove(super.getChildren().size() - 1);
             }
-            if (lastChildAsShown instanceof Text && ((Text) lastChildAsShown).getText().length() > 0) {
-                Text shortenedChild = new Text(ellipseString(((Text) lastChildAsShown).getText()));
-                shortenedChild.getStyleClass().addAll(lastChildAsShown.getStyleClass());
-                super.getChildren().add(shortenedChild);
-            } else {
-                // don't know what to do with anything else
-                return false;
-            }
+            Text shortenedChild = new Text(ellipseString(lastChildAsShown.getText()));
+            shortenedChild.getStyleClass().addAll(lastChildAsShown.getStyleClass());
+            super.getChildren().add(shortenedChild);
             super.autosize();
         }
         return true;
@@ -139,19 +132,19 @@ public class DiffHighlightingEllipsingTextFlow extends TextFlow {
                     highlightedText = List.of(text);
                     break;
                 case WORD:
-                    highlightedText = DiffHighlighting.generateDiffHighlighting(fullText, comparisonString.get(), " ");
+                    highlightedText = DiffHighlighting.generateDiffHighlighting(comparisonString.get(), fullText, " ");
                     break;
                 case CHARACTER:
-                    highlightedText = DiffHighlighting.generateDiffHighlighting(fullText, comparisonString.get(), "");
+                    highlightedText = DiffHighlighting.generateDiffHighlighting(comparisonString.get(), fullText, "");
                     break;
                 default:
                     throw new UnsupportedOperationException("Not implemented " + diffMode.getValue());
             }
-                allChildren.addAll(highlightedText);
+            allChildren.addAll(highlightedText);
         } else {
             Text text = new Text(fullText);
             text.getStyleClass().add("text-unchanged");
-            allChildren.addAll(text);
+            allChildren.add(text);
         }
         super.autosize();
         adjustText();
@@ -159,8 +152,8 @@ public class DiffHighlightingEllipsingTextFlow extends TextFlow {
 
     private String ellipseString(String s) {
         int spacePos = s.lastIndexOf(' ');
-        if (spacePos < 0) {
-            return "";
+        if (spacePos <= 0) {
+            return getEllipsisString();
         }
         return s.substring(0, spacePos) + getEllipsisString();
     }

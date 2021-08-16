@@ -271,6 +271,7 @@ public class MultiMergeEntriesView extends BaseDialog<BibEntry> {
                 cellButton.prefHeightProperty().bind(heightProperty());
                 cellButton.setMinHeight(Control.USE_PREF_SIZE);
                 cellButton.setMaxHeight(Control.USE_PREF_SIZE);
+                cellButton.setGraphicTextGap(0);
                 getChildren().add(cellButton);
                 cellButton.maxWidthProperty().bind(widthProperty());
                 HBox.setHgrow(cellButton, Priority.ALWAYS);
@@ -278,8 +279,8 @@ public class MultiMergeEntriesView extends BaseDialog<BibEntry> {
                 // Text
                 DiffHighlightingEllipsingTextFlow buttonText = new DiffHighlightingEllipsingTextFlow(content, viewModel.mergedEntryProperty().get().getFieldBinding(field).asOrdinary(), diffMode.valueProperty());
 
-                buttonText.maxWidthProperty().bind(widthProperty());
-                buttonText.maxHeightProperty().bind(heightProperty());
+                buttonText.maxWidthProperty().bind(widthProperty().add(-10));
+                buttonText.maxHeightProperty().bind(heightProperty().add(-10));
                 cellButton.setGraphic(buttonText);
 
                 // Tooltip
