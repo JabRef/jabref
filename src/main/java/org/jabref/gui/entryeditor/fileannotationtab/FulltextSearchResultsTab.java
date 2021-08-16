@@ -50,13 +50,9 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
         PdfSearchResults searchResults = stateManager.activeSearchQueryProperty().get().get().getRule().getFulltextResults(stateManager.activeSearchQueryProperty().get().get().getQuery(), entry);
         StringBuilder content = new StringBuilder();
 
-        content.append("<p>");
         if (searchResults.numSearchResults() == 0) {
-            content.append(Localization.lang("No search matches."));
-        } else {
-            content.append(Localization.lang("Search results"));
+            content.append("<p>" + Localization.lang("No search matches.") + "</p>");
         }
-        content.append("</p>");
 
         for (SearchResult searchResult : searchResults.getSearchResults()) {
             content.append("<p>");
