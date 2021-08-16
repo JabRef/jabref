@@ -251,6 +251,10 @@ public class MultiMergeEntriesView extends BaseDialog<BibEntry> {
         public Cell(String content, Field field, int columnIndex) {
             this.content = content;
 
+            /*
+            If this is not explicitly done on the JavaFX thread, the bindings to the text fields don't work properly.
+            The text only shows up after one text in that same row is selected by the user.
+             */
             DefaultTaskExecutor.runInJavaFXThread(() -> {
 
                 FieldRow row = fieldRows.get(field);
