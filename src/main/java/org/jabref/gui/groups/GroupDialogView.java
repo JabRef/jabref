@@ -4,9 +4,9 @@ import java.util.EnumMap;
 import java.util.EnumSet;
 
 import javafx.application.Platform;
+import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.geometry.Insets;
 import javafx.scene.Cursor;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -15,11 +15,7 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.ColorPicker;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.RadioButton;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.Tab;
-import javafx.scene.control.TabPane;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
@@ -37,6 +33,8 @@ import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
+import org.controlsfx.control.GridCell;
+import org.controlsfx.control.GridView;
 import org.kordamp.ikonli.Ikon;
 import org.kordamp.ikonli.javafx.FontIcon;
 import org.kordamp.ikonli.materialdesign2.MaterialDesignA;
@@ -225,39 +223,38 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
 
     @FXML
     private void openIconPicker() {
-        System.out.println("clicking the icon picker button");
+        GridView<Ikon> ikonGridView = new GridView<>(FXCollections.observableArrayList());
+        ikonGridView.setCellFactory(gridView -> new IkonliCell());
 
-        TabPane tabPane = new TabPane();
-
-        tabPane.getTabs().add(new IconTab(MaterialDesignA.class, allOf(MaterialDesignA.class)));
-        tabPane.getTabs().add(new IconTab(MaterialDesignB.class, allOf(MaterialDesignB.class)));
-        tabPane.getTabs().add(new IconTab(MaterialDesignC.class, allOf(MaterialDesignC.class)));
-        tabPane.getTabs().add(new IconTab(MaterialDesignD.class, allOf(MaterialDesignD.class)));
-        tabPane.getTabs().add(new IconTab(MaterialDesignE.class, allOf(MaterialDesignE.class)));
-        tabPane.getTabs().add(new IconTab(MaterialDesignF.class, allOf(MaterialDesignF.class)));
-        tabPane.getTabs().add(new IconTab(MaterialDesignG.class, allOf(MaterialDesignG.class)));
-        tabPane.getTabs().add(new IconTab(MaterialDesignH.class, allOf(MaterialDesignH.class)));
-        tabPane.getTabs().add(new IconTab(MaterialDesignI.class, allOf(MaterialDesignI.class)));
-        tabPane.getTabs().add(new IconTab(MaterialDesignJ.class, allOf(MaterialDesignJ.class)));
-        tabPane.getTabs().add(new IconTab(MaterialDesignK.class, allOf(MaterialDesignK.class)));
-        tabPane.getTabs().add(new IconTab(MaterialDesignL.class, allOf(MaterialDesignL.class)));
-        tabPane.getTabs().add(new IconTab(MaterialDesignM.class, allOf(MaterialDesignM.class)));
-        tabPane.getTabs().add(new IconTab(MaterialDesignN.class, allOf(MaterialDesignN.class)));
-        tabPane.getTabs().add(new IconTab(MaterialDesignO.class, allOf(MaterialDesignO.class)));
-        tabPane.getTabs().add(new IconTab(MaterialDesignP.class, allOf(MaterialDesignP.class)));
-        tabPane.getTabs().add(new IconTab(MaterialDesignQ.class, allOf(MaterialDesignQ.class)));
-        tabPane.getTabs().add(new IconTab(MaterialDesignR.class, allOf(MaterialDesignR.class)));
-        tabPane.getTabs().add(new IconTab(MaterialDesignS.class, allOf(MaterialDesignS.class)));
-        tabPane.getTabs().add(new IconTab(MaterialDesignT.class, allOf(MaterialDesignT.class)));
-        tabPane.getTabs().add(new IconTab(MaterialDesignU.class, allOf(MaterialDesignU.class)));
-        tabPane.getTabs().add(new IconTab(MaterialDesignV.class, allOf(MaterialDesignV.class)));
-        tabPane.getTabs().add(new IconTab(MaterialDesignW.class, allOf(MaterialDesignW.class)));
-        tabPane.getTabs().add(new IconTab(MaterialDesignX.class, allOf(MaterialDesignX.class)));
-        tabPane.getTabs().add(new IconTab(MaterialDesignY.class, allOf(MaterialDesignY.class)));
-        tabPane.getTabs().add(new IconTab(MaterialDesignZ.class, allOf(MaterialDesignZ.class)));
+        ikonGridView.getItems().addAll(allOf(MaterialDesignA.class));
+        ikonGridView.getItems().addAll(allOf(MaterialDesignB.class));
+        ikonGridView.getItems().addAll(allOf(MaterialDesignC.class));
+        ikonGridView.getItems().addAll(allOf(MaterialDesignD.class));
+        ikonGridView.getItems().addAll(allOf(MaterialDesignE.class));
+        ikonGridView.getItems().addAll(allOf(MaterialDesignF.class));
+        ikonGridView.getItems().addAll(allOf(MaterialDesignG.class));
+        ikonGridView.getItems().addAll(allOf(MaterialDesignH.class));
+        ikonGridView.getItems().addAll(allOf(MaterialDesignI.class));
+        ikonGridView.getItems().addAll(allOf(MaterialDesignJ.class));
+        ikonGridView.getItems().addAll(allOf(MaterialDesignK.class));
+        ikonGridView.getItems().addAll(allOf(MaterialDesignL.class));
+        ikonGridView.getItems().addAll(allOf(MaterialDesignM.class));
+        ikonGridView.getItems().addAll(allOf(MaterialDesignN.class));
+        ikonGridView.getItems().addAll(allOf(MaterialDesignO.class));
+        ikonGridView.getItems().addAll(allOf(MaterialDesignP.class));
+        ikonGridView.getItems().addAll(allOf(MaterialDesignQ.class));
+        ikonGridView.getItems().addAll(allOf(MaterialDesignR.class));
+        ikonGridView.getItems().addAll(allOf(MaterialDesignS.class));
+        ikonGridView.getItems().addAll(allOf(MaterialDesignT.class));
+        ikonGridView.getItems().addAll(allOf(MaterialDesignU.class));
+        ikonGridView.getItems().addAll(allOf(MaterialDesignV.class));
+        ikonGridView.getItems().addAll(allOf(MaterialDesignW.class));
+        ikonGridView.getItems().addAll(allOf(MaterialDesignX.class));
+        ikonGridView.getItems().addAll(allOf(MaterialDesignY.class));
+        ikonGridView.getItems().addAll(allOf(MaterialDesignZ.class));
 
         //create Scene
-        Scene scene = new Scene(tabPane);
+        Scene scene = new Scene(ikonGridView);
         scene.setCursor(Cursor.CLOSED_HAND);
 
         Stage stage = new Stage();
@@ -271,34 +268,26 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
         stage.show();
     }
 
-    private class IconTab extends Tab {
-        private IconTab(Class<? extends Ikon> iconFontClass, EnumSet<? extends Ikon> enumSet) {
-            super(iconFontClass.getSimpleName());
-            setClosable(false);
-            GridPane pane = new GridPane();
+    public class IkonliCell extends GridCell<Ikon> {
+        @Override
+        protected void updateItem(Ikon ikon, boolean empty) {
+            super.updateItem(ikon, empty);
+            if (empty || ikon == null) {
+                setText(null);
+                setGraphic(null);
+            } else {
+                FontIcon fontIcon = FontIcon.of(ikon);
+                setGraphic(fontIcon);
+                fontIcon.getStyleClass().setAll("font-icon");
 
-            int column = 0;
-            int row = 0;
-            int index = 0;
-            for (Ikon value : enumSet) {
-                FontIcon icon = FontIcon.of(value);
-                icon.getStyleClass().setAll("font-icon");
-                Button button = new Button();
-                button.setGraphic(icon);
-                button.setOnAction(event -> {
-                    iconField.textProperty().setValue(String.valueOf(icon.getIconCode()));
-                    Stage stage = (Stage) button.getScene().getWindow();
+                // setText(ikon.getDescription());
+                // setStyle("-fx-background-color: #ffffff; -fx-background-radius: 15; -fx-border-radius: 15; -fx-border-width: 0; -fx-padding: 10; -fx-pref-width: 145; -fx-max-width: 145; -fx-max-width: 145; -fx-pref-height: 130; -fx-max-height: 130; -fx-effect: dropshadow(three-pass-box, #93948d, 10, 0, 0, 0);");
+                setOnMouseClicked(event -> {
+                    iconField.textProperty().setValue(String.valueOf(fontIcon.getIconCode()));
+                    Stage stage = (Stage) this.getGridView().getScene().getWindow();
                     stage.close();
                 });
-                pane.add(button, column++, row);
-                GridPane.setMargin(button, new Insets(10, 10, 10, 10));
-                if (++index % 10 == 0) {
-                    column = 0;
-                    row++;
-                }
             }
-            ScrollPane scrollPane = new ScrollPane(pane);
-            setContent(scrollPane);
         }
     }
 }
