@@ -47,7 +47,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
@@ -81,9 +81,9 @@ public class MultiMergeEntriesView extends BaseDialog<BibEntry> {
     private final MultiMergeEntriesViewModel viewModel;
     private final TaskExecutor taskExecutor;
 
-    private final JabRefPreferences preferences;
+    private final PreferencesService preferences;
 
-    public MultiMergeEntriesView(JabRefPreferences preferences,
+    public MultiMergeEntriesView(PreferencesService preferences,
                                  TaskExecutor taskExecutor) {
         this.preferences = preferences;
         this.taskExecutor = taskExecutor;

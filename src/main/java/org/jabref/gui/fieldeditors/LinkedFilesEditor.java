@@ -174,14 +174,20 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
 
         Button writeXMPMetadata = IconTheme.JabRefIcons.IMPORT.asButton();
         writeXMPMetadata.setTooltip(new Tooltip(Localization.lang("Write BibTeXEntry as XMP metadata to PDF.")));
-        writeXMPMetadata.visibleProperty().bind(linkedFile.canWriteXMPMetadataProperty());
+        writeXMPMetadata.visibleProperty().bind(linkedFile.isOfflinePdfProperty());
         writeXMPMetadata.setOnAction(event -> linkedFile.writeXMPMetadata());
         writeXMPMetadata.getStyleClass().setAll("icon-button");
+
+        Button parsePdfMetadata = IconTheme.JabRefIcons.FILE_SEARCH.asButton();
+        parsePdfMetadata.setTooltip(new Tooltip(Localization.lang("Parse Metadata from PDF.")));
+        parsePdfMetadata.visibleProperty().bind(linkedFile.isOfflinePdfProperty());
+        parsePdfMetadata.setOnAction(event -> linkedFile.parsePdfMetadataAndShowMergeDialog());
+        parsePdfMetadata.getStyleClass().setAll("icon-button");
 
         HBox container = new HBox(10);
         container.setPrefHeight(Double.NEGATIVE_INFINITY);
 
-        container.getChildren().addAll(acceptAutoLinkedFile, info, writeXMPMetadata);
+        container.getChildren().addAll(acceptAutoLinkedFile, info, writeXMPMetadata, parsePdfMetadata);
 
         return container;
     }
