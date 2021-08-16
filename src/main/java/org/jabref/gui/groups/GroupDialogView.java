@@ -1,18 +1,13 @@
 package org.jabref.gui.groups;
 
-import java.io.IOException;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
 import java.util.EnumMap;
 import java.util.EnumSet;
 
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.scene.Cursor;
-import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
@@ -24,17 +19,11 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.icon.JabRefIconView;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.IconValidationDecorator;
 import org.jabref.gui.util.ViewModelListCellFactory;
@@ -50,8 +39,6 @@ import com.airhacks.afterburner.views.ViewLoader;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 import org.kordamp.ikonli.Ikon;
 import org.kordamp.ikonli.javafx.FontIcon;
-import java.util.EnumSet;
-import static java.util.EnumSet.allOf;
 import org.kordamp.ikonli.materialdesign2.MaterialDesignA;
 import org.kordamp.ikonli.materialdesign2.MaterialDesignB;
 import org.kordamp.ikonli.materialdesign2.MaterialDesignC;
@@ -79,13 +66,14 @@ import org.kordamp.ikonli.materialdesign2.MaterialDesignX;
 import org.kordamp.ikonli.materialdesign2.MaterialDesignY;
 import org.kordamp.ikonli.materialdesign2.MaterialDesignZ;
 
+import static java.util.EnumSet.allOf;
+
 public class GroupDialogView extends BaseDialog<AbstractGroup> {
 
     // Basic Settings
     @FXML private TextField nameField;
     @FXML private TextField descriptionField;
     @FXML private TextField iconField;
-    @FXML private Button openIconPicker;
     @FXML private ColorPicker colorField;
     @FXML private ComboBox<GroupHierarchyType> hierarchicalContextCombo;
 
@@ -221,13 +209,8 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
         });
 
         // Binding to the button throws a NPE, since it doesn't exist yet. Working around.
-        viewModel.validationStatus().validProperty().addListener((obs, _oldValue, validationStatus) -> {
-            if (validationStatus) {
-                getDialogPane().lookupButton(ButtonType.OK).setDisable(false);
-            } else {
-                getDialogPane().lookupButton(ButtonType.OK).setDisable(true);
-            }
-        });
+        viewModel.validationStatus().validProperty().addListener((obs, _oldValue, validationStatus) ->
+                getDialogPane().lookupButton(ButtonType.OK).setDisable(!validationStatus));
     }
 
     @FXML
@@ -241,7 +224,7 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
     }
 
     @FXML
-    private void openIconPicker(ActionEvent event) throws Exception {
+    private void openIconPicker() {
         System.out.println("clicking the icon picker button");
 
         TabPane tabPane = new TabPane();
@@ -289,7 +272,7 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
     }
 
     private class IconTab extends Tab {
-        private IconTab(Class<? extends Ikon> iconFontClass, EnumSet<? extends Ikon> enumSet) throws Exception {
+        private IconTab(Class<? extends Ikon> iconFontClass, EnumSet<? extends Ikon> enumSet) {
             super(iconFontClass.getSimpleName());
             setClosable(false);
             GridPane pane = new GridPane();
@@ -302,13 +285,10 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
                 icon.getStyleClass().setAll("font-icon");
                 Button button = new Button();
                 button.setGraphic(icon);
-                button.setOnAction(new EventHandler<ActionEvent>() {
-                    @Override
-                    public void handle(ActionEvent event) {
-                        iconField.textProperty().setValue(String.valueOf(icon.getIconCode()));
-                        Stage stage = (Stage) button.getScene().getWindow();
-                        stage.close();
-                    }
+                button.setOnAction(event -> {
+                    iconField.textProperty().setValue(String.valueOf(icon.getIconCode()));
+                    Stage stage = (Stage) button.getScene().getWindow();
+                    stage.close();
                 });
                 pane.add(button, column++, row);
                 GridPane.setMargin(button, new Insets(10, 10, 10, 10));
@@ -321,5 +301,4 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
             setContent(scrollPane);
         }
     }
-
 }
