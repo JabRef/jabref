@@ -15,6 +15,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We added a fulltext search feature. [#2838](https://github.com/JabRef/jabref/pull/2838)
 - We improved the deduction of bib-entries from imported fulltext pdfs. [#7947](https://github.com/JabRef/jabref/pull/7947)
 - We added unprotect_terms to the list of bracketed pattern modifiers [#7826](https://github.com/JabRef/jabref/pull/7960)
+- We added a dialog that allows to parse metadata from linked pdfs. [#7929](https://github.com/JabRef/jabref/pull/7929)
 
 ### Changed
 
