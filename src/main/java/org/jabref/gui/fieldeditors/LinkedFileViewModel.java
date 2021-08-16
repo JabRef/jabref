@@ -542,10 +542,10 @@ public class LinkedFileViewModel extends AbstractViewModel {
         linkedFile.findIn(databaseContext, preferences.getFilePreferences()).ifPresent(filePath -> {
             MultiMergeEntriesView dialog = new MultiMergeEntriesView(preferences, taskExecutor);
             dialog.addSource(Localization.lang("Entry"), entry);
-            dialog.addSource(Localization.lang("Grobid"), () -> new GrobidPdfMetadataImporter(GrobidCitationFetcher.GROBID_URL, preferences.getImportFormatPreferences()).importDatabase(filePath, preferences.getDefaultEncoding()).getDatabase().getEntries().get(0));
+            dialog.addSource("Grobid", () -> new GrobidPdfMetadataImporter(GrobidCitationFetcher.GROBID_URL, preferences.getImportFormatPreferences()).importDatabase(filePath, preferences.getDefaultEncoding()).getDatabase().getEntries().get(0));
             // to be added once #7947 is merged
             // dialog.addSource(Localization.lang("Embedded"), () -> new GrobidPdfMetadataImporter(preferences.getImportFormatPreferences()).importDatabase(filePath, preferences.getDefaultEncoding()).getDatabase().getEntries().get(0));
-            // dialog.addSource(Localization.lang("XMP"), () -> new GrobidPdfMetadataImporter(preferences.getImportFormatPreferences()).importDatabase(filePath, preferences.getDefaultEncoding()).getDatabase().getEntries().get(0));
+            // dialog.addSource(Localization.lang("XMP metadata"), () -> new GrobidPdfMetadataImporter(preferences.getImportFormatPreferences()).importDatabase(filePath, preferences.getDefaultEncoding()).getDatabase().getEntries().get(0));
             // dialog.addSource(Localization.lang("Verbatim"), () -> new GrobidPdfMetadataImporter(preferences.getImportFormatPreferences()).importDatabase(filePath, preferences.getDefaultEncoding()).getDatabase().getEntries().get(0));
             // dialog.addSource(Localization.lang("Content"), () -> new GrobidPdfMetadataImporter(preferences.getImportFormatPreferences()).importDatabase(filePath, preferences.getDefaultEncoding()).getDatabase().getEntries().get(0));
             dialog.showAndWait().ifPresent(newEntry -> {
