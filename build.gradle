@@ -178,7 +178,7 @@ dependencies {
     implementation 'org.jsoup:jsoup:1.14.2'
     implementation 'com.konghq:unirest-java:3.11.12'
 
-    implementation 'org.slf4j:slf4j-api:2.0.0-alpha2'
+    implementation 'org.slf4j:slf4j-api:2.0.0-alpha4'
     implementation group: 'org.apache.logging.log4j', name: 'log4j-jcl', version: '3.0.0-SNAPSHOT'
     implementation group: 'org.apache.logging.log4j', name: 'log4j-slf4j18-impl', version: '3.0.0-SNAPSHOT'
     implementation group: 'org.apache.logging.log4j', name: 'log4j-plugins', version: '3.0.0-SNAPSHOT'
