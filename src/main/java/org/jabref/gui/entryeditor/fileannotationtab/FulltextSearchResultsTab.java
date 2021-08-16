@@ -23,6 +23,8 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
 
     private final WebView webView;
 
+    private BibEntry entry;
+
     public FulltextSearchResultsTab(StateManager stateManager, Theme theme, FilePreferences filePreferences) {
         this.stateManager = stateManager;
         this.filePreferences = filePreferences;
@@ -32,6 +34,7 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
         setContent(webView);
         webView.getEngine().getLoadWorker().stateProperty().addListener(new OpenHyperlinksInExternalBrowser(webView));
         setText(Localization.lang("Search results"));
+        this.stateManager.activeSearchQueryProperty().addListener((observable, oldValue, newValue) -> bindToEntry(entry));
     }
 
     @Override
@@ -44,7 +47,8 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
 
     @Override
     protected void bindToEntry(BibEntry entry) {
-        if (!shouldShow(entry)) {
+        this.entry = entry;
+        if (!shouldShow(entry) || entry == null) {
             return;
         }
         PdfSearchResults searchResults = stateManager.activeSearchQueryProperty().get().get().getRule().getFulltextResults(stateManager.activeSearchQueryProperty().get().get().getQuery(), entry);
