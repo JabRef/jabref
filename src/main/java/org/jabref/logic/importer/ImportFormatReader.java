@@ -2,6 +2,7 @@ package org.jabref.logic.importer;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -47,7 +48,7 @@ public class ImportFormatReader {
      * All import formats.
      * Sorted accordingly to {@link Importer#compareTo}, which defaults to alphabetically by the name
      */
-    private final SortedSet<Importer> formats = new TreeSet<>();
+    private final List<Importer> formats = new ArrayList<>();
 
     private ImportFormatPreferences importFormatPreferences;
 
@@ -56,8 +57,6 @@ public class ImportFormatReader {
 
         formats.clear();
 
-        formats.add(new BiblioscapeImporter());
-        formats.add(new BibtexImporter(importFormatPreferences, fileMonitor));
         formats.add(new BibTeXMLImporter());
         formats.add(new CopacImporter());
         formats.add(new EndnoteImporter(importFormatPreferences));
@@ -78,6 +77,8 @@ public class ImportFormatReader {
         formats.add(new RepecNepImporter(importFormatPreferences));
         formats.add(new RisImporter());
         formats.add(new SilverPlatterImporter());
+        formats.add(new BiblioscapeImporter());
+        formats.add(new BibtexImporter(importFormatPreferences, fileMonitor));
 
         // Get custom import formats
         formats.addAll(importFormatPreferences.getCustomImportList());
@@ -119,26 +120,26 @@ public class ImportFormatReader {
      * All importers.
      * <p>
      * <p>
-     * Elements are in default order.
+     * Elements are sorted by name.
      * </p>
      *
      * @return all custom importers, elements are of type InputFormat
      */
     public SortedSet<Importer> getImportFormats() {
-        return this.formats;
+        return new TreeSet<>(this.formats);
     }
 
     /**
      * Human readable list of all known import formats (name and CLI Id).
      * <p>
-     * <p>List is in default-order.</p>
+     * <p>List is sorted by importer name.</p>
      *
      * @return human readable list of all known import formats
      */
     public String getImportFormatList() {
         StringBuilder sb = new StringBuilder();
 
-        for (Importer imFo : formats) {
+        for (Importer imFo : getImportFormats()) {
             int pad = Math.max(0, 14 - imFo.getName().length());
             sb.append("  ");
             sb.append(imFo.getName());
@@ -212,7 +213,7 @@ public class ImportFormatReader {
         String bestFormatName = null;
 
         // Cycle through all importers:
-        for (Importer imFo : getImportFormats()) {
+        for (Importer imFo : formats) {
             try {
                 if (!isRecognizedFormat.apply(imFo)) {
                     continue;
