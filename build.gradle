@@ -207,12 +207,12 @@ dependencies {
 
     implementation group: 'net.harawata', name: 'appdirs', version: '1.2.1'
 
-    testImplementation 'io.github.classgraph:classgraph:4.8.110'
+    testImplementation 'io.github.classgraph:classgraph:4.8.112'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.7.2'
     testRuntimeOnly 'org.junit.vintage:junit-vintage-engine:5.7.2'
     testImplementation 'org.junit.platform:junit-platform-launcher:1.7.2'
 
-    testImplementation 'net.bytebuddy:byte-buddy-parent:1.11.9'
+    testImplementation 'net.bytebuddy:byte-buddy-parent:1.11.12'
     testRuntimeOnly group: 'org.apache.logging.log4j', name: 'log4j-core', version: '3.0.0-SNAPSHOT'
     testRuntimeOnly group: 'org.apache.logging.log4j', name: 'log4j-jul', version: '3.0.0-SNAPSHOT'
     testImplementation 'org.mockito:mockito-core:3.11.2'
@@ -224,7 +224,7 @@ dependencies {
     testImplementation "org.testfx:testfx-junit5:4.0.17-alpha-SNAPSHOT"
     testImplementation "org.hamcrest:hamcrest-library:2.2"
 
-    checkstyle 'com.puppycrawl.tools:checkstyle:8.45'
+    checkstyle 'com.puppycrawl.tools:checkstyle:8.45.1'
     xjc group: 'org.glassfish.jaxb', name: 'jaxb-xjc', version: '2.3.3'
 }
 
