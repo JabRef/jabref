@@ -10,6 +10,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.MapChangeListener;
 import javafx.fxml.FXML;
+import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
@@ -280,7 +281,7 @@ public class MultiMergeEntriesView extends BaseDialog<BibEntry> {
                 DiffHighlightingEllipsingTextFlow buttonText = new DiffHighlightingEllipsingTextFlow(content, viewModel.mergedEntryProperty().get().getFieldBinding(field).asOrdinary(), diffMode.valueProperty());
 
                 buttonText.maxWidthProperty().bind(widthProperty().add(-10));
-                buttonText.maxHeightProperty().bind(heightProperty().add(-10));
+                buttonText.maxHeightProperty().bind(heightProperty());
                 cellButton.setGraphic(buttonText);
 
                 // Tooltip

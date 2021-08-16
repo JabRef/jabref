@@ -153,7 +153,7 @@ public class DiffHighlightingEllipsingTextFlow extends TextFlow {
     private String ellipseString(String s) {
         int spacePos = s.lastIndexOf(' ');
         if (spacePos <= 0) {
-            return getEllipsisString();
+            return "";
         }
         return s.substring(0, spacePos) + getEllipsisString();
     }
