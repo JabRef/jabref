@@ -10,20 +10,15 @@ import java.util.Map;
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.util.StandardFileType;
-import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
-import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.StandardEntryType;
 
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import com.google.common.collect.ImmutableMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -128,9 +123,15 @@ public class CffImporter extends Importer {
     public boolean isRecognizedFormat(BufferedReader reader) throws IOException {
 
         ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
-        CffFormat citation = mapper.readValue(reader, CffFormat.class);
+        CffFormat citation;
 
-        if (citation != null) {
+        try {
+            citation = mapper.readValue(reader, CffFormat.class);
+        } catch (IOException e) {
+            return false;
+        }
+
+        if (citation != null && citation.vals.get("title") != null) {
             return true;
         } else {
             return false;
@@ -147,6 +148,7 @@ public class CffImporter extends Importer {
         hm.put("url", StandardField.URL);
         hm.put("abstract", StandardField.ABSTRACT);
         hm.put("message", StandardField.COMMENT);
+        hm.put("date-released", StandardField.DATE);
 
         return hm;
     }
