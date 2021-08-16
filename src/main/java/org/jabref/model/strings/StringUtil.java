@@ -738,4 +738,17 @@ public class StringUtil {
     public static String ignoreCurlyBracket(String title) {
         return isNotBlank(title) ? title.replace("{", "").replace("}", "") : title;
     }
+
+    /**
+     * Encloses the given string with " if there is a space contained
+     *
+     * @return Returns a string
+     */
+    public static String quoteStringIfSpaceIsContained(String string) {
+        if (string.contains(" ")) {
+            return "\"" + string + "\"";
+        } else {
+            return string;
+        }
+    }
 }

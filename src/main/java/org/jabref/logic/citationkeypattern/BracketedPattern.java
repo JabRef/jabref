@@ -201,7 +201,7 @@ public class BracketedPattern {
             expandedPattern = getFieldValue(entry, fieldParts.get(0), keywordDelimiter, database);
             if (fieldParts.size() > 1) {
                 // apply modifiers:
-                expandedPattern = applyModifiers(expandedPattern, fieldParts, 1);
+                expandedPattern = applyModifiers(expandedPattern, fieldParts, 1, expandBracketContent(keywordDelimiter, entry, database));
             }
             return expandedPattern;
         };
@@ -243,7 +243,8 @@ public class BracketedPattern {
     }
 
     /**
-     * Returns the content enclosed between brackets, including enclosed quotes, and excluding the enclosing brackets.
+     * Returns the content enclosed between brackets, including enclosed quotes, and excluding the paired enclosing brackets.
+     * There may be brackets in it.
      * Intended to be used by {@link BracketedPattern#expandBrackets(String, Character, BibEntry, BibDatabase)} when a [
      * is encountered, and has been consumed, by the {@code StringTokenizer}.
      *
@@ -254,13 +255,25 @@ public class BracketedPattern {
     private static String contentBetweenBrackets(StringTokenizer tokenizer, final String pattern) {
         StringBuilder bracketContent = new StringBuilder();
         boolean foundClosingBracket = false;
-        // make sure to read until the next ']'
+        int subBrackets = 0;
+        // make sure to read until the paired ']'
         while (tokenizer.hasMoreTokens() && !foundClosingBracket) {
             String token = tokenizer.nextToken();
             // If the beginning of a quote is found, append the content
             switch (token) {
                 case "\"" -> appendQuote(bracketContent, tokenizer);
-                case "]" -> foundClosingBracket = true;
+                case "]" -> {
+                    if (subBrackets == 0) {
+                        foundClosingBracket = true;
+                    } else {
+                        subBrackets--;
+                        bracketContent.append(token);
+                    }
+                }
+                case "[" -> {
+                    subBrackets++;
+                    bracketContent.append(token);
+                }
                 default -> bracketContent.append(token);
             }
         }
@@ -426,7 +439,7 @@ public class BracketedPattern {
             } else if ("shorttitleINI".equals(pattern)) {
                 return keepLettersAndDigitsOnly(
                         applyModifiers(getTitleWordsWithSpaces(3, entry.getResolvedFieldOrAlias(StandardField.TITLE, database).orElse("")),
-                                Collections.singletonList("abbr"), 0));
+                                Collections.singletonList("abbr"), 0, Function.identity()));
             } else if ("veryshorttitle".equals(pattern)) {
                 return getTitleWords(1,
                         removeSmallWords(entry.getResolvedFieldOrAlias(StandardField.TITLE, database).orElse("")));
@@ -532,9 +545,10 @@ public class BracketedPattern {
      * @param label  The generated label.
      * @param parts  String array containing the modifiers.
      * @param offset The number of initial items in the modifiers array to skip.
+     * @param expandBracketContent a function to expand the content in the parentheses.
      * @return The modified label.
      */
-    static String applyModifiers(final String label, final List<String> parts, final int offset) {
+    static String applyModifiers(final String label, final List<String> parts, final int offset, Function<String, String> expandBracketContent) {
         String resultingLabel = label;
         for (int j = offset; j < parts.size(); j++) {
             String modifier = parts.get(j);
@@ -557,7 +571,7 @@ public class BracketedPattern {
                 } else if (!modifier.isEmpty() && (modifier.length() >= 2) && (modifier.charAt(0) == '(') && modifier.endsWith(")")) {
                     // Alternate text modifier in parentheses. Should be inserted if the label is empty
                     if (label.isEmpty() && (modifier.length() > 2)) {
-                        resultingLabel = modifier.substring(1, modifier.length() - 1);
+                        resultingLabel = expandBrackets(modifier.substring(1, modifier.length() - 1), expandBracketContent);
                     }
                 } else {
                     LOGGER.warn("Key generator warning: unknown modifier '{}'.", modifier);

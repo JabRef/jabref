@@ -186,7 +186,7 @@
               </choose>
             </group>
             <group delimiter=": ">
-              <text variable="volume"/>
+              <text variable="volume" font-weight="bold"/>
               <text variable="page"/>
             </group>
           </group>

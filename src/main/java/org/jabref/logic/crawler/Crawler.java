@@ -4,8 +4,9 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 
-import org.jabref.logic.crawler.git.GitHandler;
+import org.jabref.logic.exporter.SaveException;
 import org.jabref.logic.exporter.SavePreferences;
+import org.jabref.logic.git.SlrGitHandler;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.preferences.TimestampPreferences;
@@ -29,11 +30,9 @@ public class Crawler {
     /**
      * Creates a crawler for retrieving studies from E-Libraries
      *
-     * @param studyDefinitionFile The path to the study definition file that contains the list of targeted E-Libraries
-     *                            and used cross-library queries
+     * @param studyRepositoryRoot The path to the study repository
      */
-    public Crawler(Path studyDefinitionFile, GitHandler gitHandler, FileUpdateMonitor fileUpdateMonitor, ImportFormatPreferences importFormatPreferences, SavePreferences savePreferences, TimestampPreferences timestampPreferences, BibEntryTypesManager bibEntryTypesManager) throws IllegalArgumentException, IOException, ParseException, GitAPIException {
-        Path studyRepositoryRoot = studyDefinitionFile.getParent();
+    public Crawler(Path studyRepositoryRoot, SlrGitHandler gitHandler, ImportFormatPreferences importFormatPreferences, SavePreferences savePreferences, TimestampPreferences timestampPreferences, BibEntryTypesManager bibEntryTypesManager, FileUpdateMonitor fileUpdateMonitor) throws IllegalArgumentException, IOException, ParseException {
         studyRepository = new StudyRepository(studyRepositoryRoot, gitHandler, importFormatPreferences, fileUpdateMonitor, savePreferences, timestampPreferences, bibEntryTypesManager);
         StudyDatabaseToFetcherConverter studyDatabaseToFetcherConverter = new StudyDatabaseToFetcherConverter(studyRepository.getActiveLibraryEntries(), importFormatPreferences);
         this.studyFetcher = new StudyFetcher(studyDatabaseToFetcherConverter.getActiveFetchers(), studyRepository.getSearchQueryStrings());
@@ -43,9 +42,17 @@ public class Crawler {
      * This methods performs the crawling of the active libraries defined in the study definition file.
      * This method also persists the results in the same folder the study definition file is stored in.
      *
+     * The whole process works as follows:
+     * <ol>
+     *     <li>Then the search is executed</li>
+     *     <li>The repository changes to the search branch</li>
+     *     <li>Afterwards, the results are persisted on the search branch.</li>
+     *     <li>Finally, the changes are merged into the work branch</li>
+     * </ol>
+     *
      * @throws IOException Thrown if a problem occurred during the persistence of the result.
      */
-    public void performCrawl() throws IOException, GitAPIException {
+    public void performCrawl() throws IOException, GitAPIException, SaveException {
         List<QueryResult> results = studyFetcher.crawl();
         studyRepository.persist(results);
     }
