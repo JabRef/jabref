@@ -64,6 +64,7 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
             Path resolvedPath = linkedFile.findIn(stateManager.getActiveDatabase().get(), filePreferences).orElse(Path.of(searchResult.getPath()));
             String link = "<a href=" + resolvedPath.toAbsolutePath().toString() + ">" + searchResult.getPath() + "</a>";
             content.append(Localization.lang("Found match in %0", link));
+            content.append("<p>On page " + searchResult.getPageNumber() + "</p>");
             content.append("</p><p>");
             content.append(searchResult.getHtml());
             content.append("</p>");

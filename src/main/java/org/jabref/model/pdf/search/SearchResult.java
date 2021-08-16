@@ -17,12 +17,15 @@ import org.apache.lucene.search.highlight.TextFragment;
 
 import static org.jabref.model.pdf.search.SearchFieldConstants.CONTENT;
 import static org.jabref.model.pdf.search.SearchFieldConstants.MODIFIED;
+import static org.jabref.model.pdf.search.SearchFieldConstants.PAGE_NUMBER;
 import static org.jabref.model.pdf.search.SearchFieldConstants.PATH;
 
 public final class SearchResult {
 
     private final String path;
     private final String content;
+
+    private final int pageNumber;
     private final long modified;
 
     private final float luceneScore;
@@ -31,6 +34,7 @@ public final class SearchResult {
     public SearchResult(IndexSearcher searcher, Query query, ScoreDoc scoreDoc) throws IOException {
         this.path = getFieldContents(searcher, scoreDoc, PATH);
         this.content = getFieldContents(searcher, scoreDoc, CONTENT);
+        this.pageNumber = Integer.parseInt(getFieldContents(searcher, scoreDoc, PAGE_NUMBER));
         this.modified = Long.parseLong(getFieldContents(searcher, scoreDoc, MODIFIED));
         this.luceneScore = scoreDoc.score;
 
@@ -79,5 +83,9 @@ public final class SearchResult {
 
     public String getHtml() {
         return html;
+    }
+
+    public int getPageNumber() {
+        return pageNumber;
     }
 }
