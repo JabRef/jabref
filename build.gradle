@@ -175,7 +175,7 @@ dependencies {
     implementation 'com.jfoenix:jfoenix:9.0.10'
     implementation 'org.controlsfx:controlsfx:11.1.0'
 
-    implementation 'org.jsoup:jsoup:1.14.1'
+    implementation 'org.jsoup:jsoup:1.14.2'
     implementation 'com.konghq:unirest-java:3.11.12'
 
     implementation 'org.slf4j:slf4j-api:2.0.0-alpha2'
