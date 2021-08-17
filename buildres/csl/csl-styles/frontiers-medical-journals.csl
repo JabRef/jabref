@@ -132,7 +132,7 @@
             <date variable="issued" prefix=" (" suffix=")">
               <date-part name="year"/>
             </date>
-            <text variable="volume" font-weight="bold" suffix=":"/>
+            <text variable="volume" suffix=":"/>
           </group>
           <text variable="page" suffix="."/>
         </else>
