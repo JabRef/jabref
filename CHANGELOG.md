@@ -28,6 +28,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 ### Fixed
 
 - We fixed an issue when checking for a new version when JabRef is used behind a corporate proxy. [#7884](https://github.com/JabRef/jabref/issues/7884)
+- We fixed some icons that were drawn in the wrong color when JabRef used a custom theme. [#7853](https://github.com/JabRef/jabref/issues/7853)
 - We fixed an issue where the `Aux file` on `Edit group` doesn't support relative sub-directories path to import. [#7719](https://github.com/JabRef/jabref/issues/7719).
 - We fixed an issue where it was impossible to add or modify groups. [#7912](https://github.com/JabRef/jabref/pull/793://github.com/JabRef/jabref/pull/7921)
 - We fixed an issue where exported entries from a Citavi bib containing URLs could not be imported [#7892](https://github.com/JabRef/jabref/issues/7882)

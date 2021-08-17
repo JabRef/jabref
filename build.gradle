@@ -147,7 +147,7 @@ dependencies {
     implementation group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-yaml', version: '2.12.4'
     implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.12.4'
 
-    implementation group: 'org.mariadb.jdbc', name: 'mariadb-java-client', version: '2.7.3'
+    implementation group: 'org.mariadb.jdbc', name: 'mariadb-java-client', version: '2.7.4'
 
     implementation 'org.postgresql:postgresql:42.2.23'
 
@@ -175,10 +175,10 @@ dependencies {
     implementation 'com.jfoenix:jfoenix:9.0.10'
     implementation 'org.controlsfx:controlsfx:11.1.0'
 
-    implementation 'org.jsoup:jsoup:1.14.1'
+    implementation 'org.jsoup:jsoup:1.14.2'
     implementation 'com.konghq:unirest-java:3.11.12'
 
-    implementation 'org.slf4j:slf4j-api:2.0.0-alpha2'
+    implementation 'org.slf4j:slf4j-api:2.0.0-alpha4'
     implementation group: 'org.apache.logging.log4j', name: 'log4j-jcl', version: '3.0.0-SNAPSHOT'
     implementation group: 'org.apache.logging.log4j', name: 'log4j-slf4j18-impl', version: '3.0.0-SNAPSHOT'
     implementation group: 'org.apache.logging.log4j', name: 'log4j-plugins', version: '3.0.0-SNAPSHOT'
@@ -207,7 +207,7 @@ dependencies {
 
     implementation group: 'net.harawata', name: 'appdirs', version: '1.2.1'
 
-    testImplementation 'io.github.classgraph:classgraph:4.8.112'
+    testImplementation 'io.github.classgraph:classgraph:4.8.114'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.7.2'
     testRuntimeOnly 'org.junit.vintage:junit-vintage-engine:5.7.2'
     testImplementation 'org.junit.platform:junit-platform-launcher:1.7.2'
