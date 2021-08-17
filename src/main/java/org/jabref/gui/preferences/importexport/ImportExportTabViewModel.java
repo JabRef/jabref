@@ -1,15 +1,13 @@
 package org.jabref.gui.preferences.importexport;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.stream.Collectors;
-
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.stream.Collectors;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
@@ -17,18 +15,16 @@ import javax.net.ssl.SSLSocketFactory;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ListProperty;
-import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 
-import org.jabref.gui.commonfxcontrols.SortCriterionViewModel;
 import org.jabref.gui.DialogService;
+import org.jabref.gui.commonfxcontrols.SortCriterionViewModel;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.logic.importer.importsettings.ImportSettingsPreferences;
 import org.jabref.logic.l10n.Localization;
@@ -42,9 +38,9 @@ import org.jabref.preferences.PreferencesService;
 
 public class ImportExportTabViewModel implements PreferenceTabViewModel {
 
-    private final BooleanProperty generateKeyOnImportProperty = new SimpleBooleanProperty();
-
     private final static Map<String, String> API_KEY_NAME_URL = new TreeMap<>();
+
+    private final BooleanProperty generateKeyOnImportProperty = new SimpleBooleanProperty();
     private final BooleanProperty useCustomDOIProperty = new SimpleBooleanProperty();
     private final StringProperty useCustomDOINameProperty = new SimpleStringProperty("");
 
