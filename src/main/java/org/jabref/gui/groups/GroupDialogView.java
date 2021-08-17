@@ -273,7 +273,7 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
 
         GridView<Ikon> ikonGridView = new GridView<>(FXCollections.observableArrayList());
         ikonGridView.setCellFactory(gridView -> new IkonliCell());
-        ikonGridView.setPrefWidth(540);
+        ikonGridView.setPrefWidth(520);
         ikonGridView.setPrefHeight(400);
         ikonGridView.setHorizontalCellSpacing(4);
         ikonGridView.setVerticalCellSpacing(4);
@@ -284,6 +284,8 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
 
         PopOver popOver = new PopOver(vBox);
         popOver.setDetachable(false);
+        popOver.setArrowSize(0);
+        popOver.setCornerRadius(0);
         popOver.setTitle("Icon picker");
         popOver.show(iconPickerButton);
     }
