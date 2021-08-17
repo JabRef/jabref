@@ -2,6 +2,7 @@ package org.jabref.gui.groups;
 
 import java.util.EnumMap;
 import java.util.EnumSet;
+import java.util.ServiceLoader;
 
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -27,6 +28,7 @@ import javafx.scene.paint.Color;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.icon.JabrefIconProvider;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.IconValidationDecorator;
 import org.jabref.gui.util.ViewModelListCellFactory;
@@ -45,35 +47,8 @@ import org.controlsfx.control.GridView;
 import org.controlsfx.control.PopOver;
 import org.controlsfx.control.textfield.CustomTextField;
 import org.kordamp.ikonli.Ikon;
+import org.kordamp.ikonli.IkonProvider;
 import org.kordamp.ikonli.javafx.FontIcon;
-import org.kordamp.ikonli.materialdesign2.MaterialDesignA;
-import org.kordamp.ikonli.materialdesign2.MaterialDesignB;
-import org.kordamp.ikonli.materialdesign2.MaterialDesignC;
-import org.kordamp.ikonli.materialdesign2.MaterialDesignD;
-import org.kordamp.ikonli.materialdesign2.MaterialDesignE;
-import org.kordamp.ikonli.materialdesign2.MaterialDesignF;
-import org.kordamp.ikonli.materialdesign2.MaterialDesignG;
-import org.kordamp.ikonli.materialdesign2.MaterialDesignH;
-import org.kordamp.ikonli.materialdesign2.MaterialDesignI;
-import org.kordamp.ikonli.materialdesign2.MaterialDesignJ;
-import org.kordamp.ikonli.materialdesign2.MaterialDesignK;
-import org.kordamp.ikonli.materialdesign2.MaterialDesignL;
-import org.kordamp.ikonli.materialdesign2.MaterialDesignM;
-import org.kordamp.ikonli.materialdesign2.MaterialDesignN;
-import org.kordamp.ikonli.materialdesign2.MaterialDesignO;
-import org.kordamp.ikonli.materialdesign2.MaterialDesignP;
-import org.kordamp.ikonli.materialdesign2.MaterialDesignQ;
-import org.kordamp.ikonli.materialdesign2.MaterialDesignR;
-import org.kordamp.ikonli.materialdesign2.MaterialDesignS;
-import org.kordamp.ikonli.materialdesign2.MaterialDesignT;
-import org.kordamp.ikonli.materialdesign2.MaterialDesignU;
-import org.kordamp.ikonli.materialdesign2.MaterialDesignV;
-import org.kordamp.ikonli.materialdesign2.MaterialDesignW;
-import org.kordamp.ikonli.materialdesign2.MaterialDesignX;
-import org.kordamp.ikonli.materialdesign2.MaterialDesignY;
-import org.kordamp.ikonli.materialdesign2.MaterialDesignZ;
-
-import static java.util.EnumSet.allOf;
 
 public class GroupDialogView extends BaseDialog<AbstractGroup> {
 
@@ -237,32 +212,11 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
         ObservableList<Ikon> ikonList = FXCollections.observableArrayList();
         FilteredList<Ikon> filteredList = new FilteredList<>(ikonList);
 
-        ikonList.addAll(allOf(MaterialDesignA.class));
-        ikonList.addAll(allOf(MaterialDesignB.class));
-        ikonList.addAll(allOf(MaterialDesignC.class));
-        ikonList.addAll(allOf(MaterialDesignD.class));
-        ikonList.addAll(allOf(MaterialDesignE.class));
-        ikonList.addAll(allOf(MaterialDesignF.class));
-        ikonList.addAll(allOf(MaterialDesignG.class));
-        ikonList.addAll(allOf(MaterialDesignI.class));
-        ikonList.addAll(allOf(MaterialDesignJ.class));
-        ikonList.addAll(allOf(MaterialDesignH.class));
-        ikonList.addAll(allOf(MaterialDesignK.class));
-        ikonList.addAll(allOf(MaterialDesignL.class));
-        ikonList.addAll(allOf(MaterialDesignM.class));
-        ikonList.addAll(allOf(MaterialDesignN.class));
-        ikonList.addAll(allOf(MaterialDesignO.class));
-        ikonList.addAll(allOf(MaterialDesignP.class));
-        ikonList.addAll(allOf(MaterialDesignQ.class));
-        ikonList.addAll(allOf(MaterialDesignR.class));
-        ikonList.addAll(allOf(MaterialDesignS.class));
-        ikonList.addAll(allOf(MaterialDesignT.class));
-        ikonList.addAll(allOf(MaterialDesignU.class));
-        ikonList.addAll(allOf(MaterialDesignV.class));
-        ikonList.addAll(allOf(MaterialDesignW.class));
-        ikonList.addAll(allOf(MaterialDesignX.class));
-        ikonList.addAll(allOf(MaterialDesignY.class));
-        ikonList.addAll(allOf(MaterialDesignZ.class));
+        for (IkonProvider provider : ServiceLoader.load(IkonProvider.class.getModule().getLayer(), IkonProvider.class)) {
+            if (provider.getClass() != JabrefIconProvider.class) {
+                ikonList.addAll(EnumSet.allOf(provider.getIkon()));
+            }
+        }
 
         CustomTextField searchBox = new CustomTextField();
         searchBox.setPromptText(Localization.lang("Search") + "...");
