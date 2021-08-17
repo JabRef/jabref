@@ -10,6 +10,7 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 import org.jabref.logic.citationkeypattern.AbstractCitationKeyPattern;
 import org.jabref.logic.citationkeypattern.DatabaseCitationKeyPattern;
@@ -496,9 +497,10 @@ class BibtexDatabaseWriterTest {
 
     @Test
     void writeSaveOrderConfig() throws Exception {
-        SaveOrderConfig saveOrderConfig = new SaveOrderConfig(false, true, new SaveOrderConfig.SortCriterion(StandardField.AUTHOR, false),
-                new SaveOrderConfig.SortCriterion(StandardField.YEAR, true),
-                new SaveOrderConfig.SortCriterion(StandardField.ABSTRACT, false));
+        SaveOrderConfig saveOrderConfig = new SaveOrderConfig(SaveOrderConfig.OrderType.SPECIFIED,
+                List.of(new SaveOrderConfig.SortCriterion(StandardField.AUTHOR, false),
+                        new SaveOrderConfig.SortCriterion(StandardField.YEAR, true),
+                        new SaveOrderConfig.SortCriterion(StandardField.ABSTRACT, false)));
         metaData.setSaveOrderConfig(saveOrderConfig);
 
         databaseWriter.savePartOfDatabase(bibtexContext, Collections.emptyList());
@@ -557,10 +559,10 @@ class BibtexDatabaseWriterTest {
 
     @Test
     void writeEntriesSorted() throws Exception {
-        SaveOrderConfig saveOrderConfig = new SaveOrderConfig(false, true,
-                new SaveOrderConfig.SortCriterion(StandardField.AUTHOR, false),
-                new SaveOrderConfig.SortCriterion(StandardField.YEAR, true),
-                new SaveOrderConfig.SortCriterion(StandardField.ABSTRACT, false));
+        SaveOrderConfig saveOrderConfig = new SaveOrderConfig(SaveOrderConfig.OrderType.SPECIFIED,
+                List.of(new SaveOrderConfig.SortCriterion(StandardField.AUTHOR, false),
+                        new SaveOrderConfig.SortCriterion(StandardField.YEAR, true),
+                        new SaveOrderConfig.SortCriterion(StandardField.ABSTRACT, false)));
         metaData.setSaveOrderConfig(saveOrderConfig);
 
         BibEntry firstEntry = new BibEntry();

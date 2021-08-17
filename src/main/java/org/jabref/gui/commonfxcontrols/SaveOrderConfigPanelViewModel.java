@@ -1,34 +1,52 @@
 package org.jabref.gui.commonfxcontrols;
 
+import java.util.Collections;
+
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ListProperty;
-import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleListProperty;
-import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.metadata.SaveOrderConfig;
 
 public class SaveOrderConfigPanelViewModel {
-
-    private final ListProperty<Field> primarySortFieldsProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
-    private final ListProperty<Field> secondarySortFieldsProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
-    private final ListProperty<Field> tertiarySortFieldsProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
-
-    private final BooleanProperty savePrimaryDescPropertySelected = new SimpleBooleanProperty();
-    private final BooleanProperty saveSecondaryDescPropertySelected = new SimpleBooleanProperty();
-    private final BooleanProperty saveTertiaryDescPropertySelected = new SimpleBooleanProperty();
-
-    private final ObjectProperty<Field> savePrimarySortSelectedValueProperty = new SimpleObjectProperty<>(null);
-    private final ObjectProperty<Field> saveSecondarySortSelectedValueProperty = new SimpleObjectProperty<>(null);
-    private final ObjectProperty<Field> saveTertiarySortSelectedValueProperty = new SimpleObjectProperty<>(null);
 
     private final BooleanProperty saveInOriginalProperty = new SimpleBooleanProperty();
     private final BooleanProperty saveInTableOrderProperty = new SimpleBooleanProperty();
     private final BooleanProperty saveInSpecifiedOrderProperty = new SimpleBooleanProperty();
 
+    private final ListProperty<Field> sortableFieldsProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
+    private final ListProperty<SortCriterionViewModel> selectedSortCriteriaProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
+
     public SaveOrderConfigPanelViewModel() {
+    }
+
+    public void addCriterion() {
+        selectedSortCriteriaProperty.add(new SortCriterionViewModel(new SaveOrderConfig.SortCriterion()));
+    }
+
+    public void removeCriterion(SortCriterionViewModel sortCriterionViewModel) {
+        selectedSortCriteriaProperty.remove(sortCriterionViewModel);
+    }
+
+    public void moveCriterionUp(SortCriterionViewModel sortCriterionViewModel) {
+        if (selectedSortCriteriaProperty.contains(sortCriterionViewModel)) {
+            int index = selectedSortCriteriaProperty.indexOf(sortCriterionViewModel);
+            if (index > 0) {
+                Collections.swap(selectedSortCriteriaProperty, index - 1, index);
+            }
+        }
+    }
+
+    public void moveCriterionDown(SortCriterionViewModel sortCriterionViewModel) {
+        if (selectedSortCriteriaProperty.contains(sortCriterionViewModel)) {
+            int index = selectedSortCriteriaProperty.indexOf(sortCriterionViewModel);
+            if (index >= 0 && index < selectedSortCriteriaProperty.size() - 1) {
+                Collections.swap(selectedSortCriteriaProperty, index + 1, index);
+            }
+        }
     }
 
     public BooleanProperty saveInOriginalProperty() {
@@ -43,39 +61,11 @@ public class SaveOrderConfigPanelViewModel {
         return saveInSpecifiedOrderProperty;
     }
 
-    public ListProperty<Field> primarySortFieldsProperty() {
-        return primarySortFieldsProperty;
+    public ListProperty<Field> sortableFieldsProperty() {
+        return sortableFieldsProperty;
     }
 
-    public ListProperty<Field> secondarySortFieldsProperty() {
-        return secondarySortFieldsProperty;
-    }
-
-    public ListProperty<Field> tertiarySortFieldsProperty() {
-        return tertiarySortFieldsProperty;
-    }
-
-    public ObjectProperty<Field> savePrimarySortSelectedValueProperty() {
-        return savePrimarySortSelectedValueProperty;
-    }
-
-    public ObjectProperty<Field> saveSecondarySortSelectedValueProperty() {
-        return saveSecondarySortSelectedValueProperty;
-    }
-
-    public ObjectProperty<Field> saveTertiarySortSelectedValueProperty() {
-        return saveTertiarySortSelectedValueProperty;
-    }
-
-    public BooleanProperty savePrimaryDescPropertySelected() {
-        return savePrimaryDescPropertySelected;
-    }
-
-    public BooleanProperty saveSecondaryDescPropertySelected() {
-        return saveSecondaryDescPropertySelected;
-    }
-
-    public BooleanProperty saveTertiaryDescPropertySelected() {
-        return saveTertiaryDescPropertySelected;
+    public ListProperty<SortCriterionViewModel> sortCriteriaProperty() {
+        return selectedSortCriteriaProperty;
     }
 }
