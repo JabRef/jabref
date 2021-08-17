@@ -41,7 +41,7 @@
                     <Label text="%Icon"/>
                     <HBox>
                         <TextField fx:id="iconField"/>
-                        <Button fx:id="iconPickerButton" onAction="#openIconPicker" styleClass="icon-button">
+                        <Button fx:id="iconPickerButton" onAction="#openIconPicker" styleClass="icon-button,narrow">
                             <graphic>
                                 <JabRefIconView glyph="SELECT_ICONS"/>
                             </graphic>

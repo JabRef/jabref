@@ -18,7 +18,12 @@ import javafx.scene.control.ColorPicker;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.Border;
+import javafx.scene.layout.BorderStroke;
+import javafx.scene.layout.BorderStrokeStyle;
+import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.icon.IconTheme;
@@ -270,10 +275,12 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
         ikonGridView.setCellFactory(gridView -> new IkonliCell());
         ikonGridView.setPrefWidth(540);
         ikonGridView.setPrefHeight(400);
+        ikonGridView.setHorizontalCellSpacing(4);
+        ikonGridView.setVerticalCellSpacing(4);
         ikonGridView.setItems(filteredList);
 
         VBox vBox = new VBox(10, searchBox, ikonGridView);
-        vBox.setPadding(new Insets(10, 10, 10, 10));
+        vBox.setPadding(new Insets(10));
 
         PopOver popOver = new PopOver(vBox);
         popOver.setDetachable(false);
@@ -294,6 +301,8 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
                 fontIcon.setIconSize(22);
                 setGraphic(fontIcon);
                 setAlignment(Pos.BASELINE_CENTER);
+                setPadding(new Insets(1));
+                setBorder(new Border(new BorderStroke(Color.BLACK, BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderStroke.THIN)));
 
                 setOnMouseClicked(event -> {
                     iconField.textProperty().setValue(String.valueOf(fontIcon.getIconCode()));

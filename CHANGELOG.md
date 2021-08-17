@@ -14,6 +14,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We added the option to copy the DOI of an entry directly from the context menu copy submenu. [#7826](https://github.com/JabRef/jabref/issues/7826)
 - We added a fulltext search feature. [#2838](https://github.com/JabRef/jabref/pull/2838)
 - We added unprotect_terms to the list of bracketed pattern modifiers [#7826](https://github.com/JabRef/jabref/pull/7960)
+- We added an icon picker in group edit dialog. [#6142](https://github.com/JabRef/jabref/issues/6142)
 
 ### Changed
 
@@ -150,7 +151,6 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We added a feature that allows the user to choose whether to trust the target site when unable to find a valid certification path from the file download site. [#7616](https://github.com/JabRef/jabref/issues/7616)
 - We added a feature that allows the user to open all linked files of multiple selected entries by "Open file" option. [#6966](https://github.com/JabRef/jabref/issues/6966)
 - We added a keybinding preset for new entries. [#7705](https://github.com/JabRef/jabref/issues/7705)
-- We added an icon picker in group edit dialog that fills out the text field for generating icons automatically. [#6142](https://github.com/JabRef/jabref/issues/6142)
 - We added a select all button for the library import function. [#7786](https://github.com/JabRef/jabref/issues/7786)
 - We added a search feature for journal abbreviations. [#7804](https://github.com/JabRef/jabref/pull/7804)
 - We added auto-key-generation progress to the background task list. [#7267](https://github.com/JabRef/jabref/issues/72)
