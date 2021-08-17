@@ -5,10 +5,12 @@ import java.util.EnumSet;
 
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.Cursor;
-import javafx.scene.Scene;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
@@ -16,10 +18,10 @@ import javafx.scene.control.ColorPicker;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
-import javafx.stage.Stage;
-import javafx.stage.StageStyle;
+import javafx.scene.layout.VBox;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.IconValidationDecorator;
 import org.jabref.gui.util.ViewModelListCellFactory;
@@ -35,6 +37,8 @@ import com.airhacks.afterburner.views.ViewLoader;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 import org.controlsfx.control.GridCell;
 import org.controlsfx.control.GridView;
+import org.controlsfx.control.PopOver;
+import org.controlsfx.control.textfield.CustomTextField;
 import org.kordamp.ikonli.Ikon;
 import org.kordamp.ikonli.javafx.FontIcon;
 import org.kordamp.ikonli.materialdesign2.MaterialDesignA;
@@ -72,6 +76,7 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
     @FXML private TextField nameField;
     @FXML private TextField descriptionField;
     @FXML private TextField iconField;
+    @FXML private Button iconPickerButton;
     @FXML private ColorPicker colorField;
     @FXML private ComboBox<GroupHierarchyType> hierarchicalContextCombo;
 
@@ -224,48 +229,56 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
 
     @FXML
     private void openIconPicker() {
+        ObservableList<Ikon> ikonList = FXCollections.observableArrayList();
+        FilteredList<Ikon> filteredList = new FilteredList<>(ikonList);
+
+        ikonList.addAll(allOf(MaterialDesignA.class));
+        ikonList.addAll(allOf(MaterialDesignB.class));
+        ikonList.addAll(allOf(MaterialDesignC.class));
+        ikonList.addAll(allOf(MaterialDesignD.class));
+        ikonList.addAll(allOf(MaterialDesignE.class));
+        ikonList.addAll(allOf(MaterialDesignF.class));
+        ikonList.addAll(allOf(MaterialDesignG.class));
+        ikonList.addAll(allOf(MaterialDesignI.class));
+        ikonList.addAll(allOf(MaterialDesignJ.class));
+        ikonList.addAll(allOf(MaterialDesignH.class));
+        ikonList.addAll(allOf(MaterialDesignK.class));
+        ikonList.addAll(allOf(MaterialDesignL.class));
+        ikonList.addAll(allOf(MaterialDesignM.class));
+        ikonList.addAll(allOf(MaterialDesignN.class));
+        ikonList.addAll(allOf(MaterialDesignO.class));
+        ikonList.addAll(allOf(MaterialDesignP.class));
+        ikonList.addAll(allOf(MaterialDesignQ.class));
+        ikonList.addAll(allOf(MaterialDesignR.class));
+        ikonList.addAll(allOf(MaterialDesignS.class));
+        ikonList.addAll(allOf(MaterialDesignT.class));
+        ikonList.addAll(allOf(MaterialDesignU.class));
+        ikonList.addAll(allOf(MaterialDesignV.class));
+        ikonList.addAll(allOf(MaterialDesignW.class));
+        ikonList.addAll(allOf(MaterialDesignX.class));
+        ikonList.addAll(allOf(MaterialDesignY.class));
+        ikonList.addAll(allOf(MaterialDesignZ.class));
+
+        CustomTextField searchBox = new CustomTextField();
+        searchBox.setPromptText(Localization.lang("Search") + "...");
+        searchBox.setLeft(IconTheme.JabRefIcons.SEARCH.getGraphicNode());
+        searchBox.textProperty().addListener((obs, oldValue, newValue) ->
+                filteredList.setPredicate(ikon -> newValue.isEmpty() || ikon.getDescription().toLowerCase()
+                                                                            .contains(newValue.toLowerCase())));
+
         GridView<Ikon> ikonGridView = new GridView<>(FXCollections.observableArrayList());
         ikonGridView.setCellFactory(gridView -> new IkonliCell());
+        ikonGridView.setPrefWidth(540);
+        ikonGridView.setPrefHeight(400);
+        ikonGridView.setItems(filteredList);
 
-        ikonGridView.getItems().addAll(allOf(MaterialDesignA.class));
-        ikonGridView.getItems().addAll(allOf(MaterialDesignB.class));
-        ikonGridView.getItems().addAll(allOf(MaterialDesignC.class));
-        ikonGridView.getItems().addAll(allOf(MaterialDesignD.class));
-        ikonGridView.getItems().addAll(allOf(MaterialDesignE.class));
-        ikonGridView.getItems().addAll(allOf(MaterialDesignF.class));
-        ikonGridView.getItems().addAll(allOf(MaterialDesignG.class));
-        ikonGridView.getItems().addAll(allOf(MaterialDesignH.class));
-        ikonGridView.getItems().addAll(allOf(MaterialDesignI.class));
-        ikonGridView.getItems().addAll(allOf(MaterialDesignJ.class));
-        ikonGridView.getItems().addAll(allOf(MaterialDesignK.class));
-        ikonGridView.getItems().addAll(allOf(MaterialDesignL.class));
-        ikonGridView.getItems().addAll(allOf(MaterialDesignM.class));
-        ikonGridView.getItems().addAll(allOf(MaterialDesignN.class));
-        ikonGridView.getItems().addAll(allOf(MaterialDesignO.class));
-        ikonGridView.getItems().addAll(allOf(MaterialDesignP.class));
-        ikonGridView.getItems().addAll(allOf(MaterialDesignQ.class));
-        ikonGridView.getItems().addAll(allOf(MaterialDesignR.class));
-        ikonGridView.getItems().addAll(allOf(MaterialDesignS.class));
-        ikonGridView.getItems().addAll(allOf(MaterialDesignT.class));
-        ikonGridView.getItems().addAll(allOf(MaterialDesignU.class));
-        ikonGridView.getItems().addAll(allOf(MaterialDesignV.class));
-        ikonGridView.getItems().addAll(allOf(MaterialDesignW.class));
-        ikonGridView.getItems().addAll(allOf(MaterialDesignX.class));
-        ikonGridView.getItems().addAll(allOf(MaterialDesignY.class));
-        ikonGridView.getItems().addAll(allOf(MaterialDesignZ.class));
+        VBox vBox = new VBox(10, searchBox, ikonGridView);
+        vBox.setPadding(new Insets(10, 10, 10, 10));
 
-        Scene scene = new Scene(ikonGridView);
-        scene.setCursor(Cursor.CLOSED_HAND);
-
-        Stage stage = new Stage();
-        stage.initStyle(StageStyle.UNDECORATED);
-        stage.setX(700);
-        stage.setY(550);
-        stage.setTitle("Icon Picker");
-        stage.setScene(scene);
-        stage.setWidth(512);
-        stage.setHeight(400);
-        stage.show();
+        PopOver popOver = new PopOver(vBox);
+        popOver.setDetachable(false);
+        popOver.setTitle("Icon picker");
+        popOver.show(iconPickerButton);
     }
 
     public class IkonliCell extends GridCell<Ikon> {
@@ -280,11 +293,12 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
                 fontIcon.getStyleClass().setAll("font-icon");
                 fontIcon.setIconSize(22);
                 setGraphic(fontIcon);
+                setAlignment(Pos.BASELINE_CENTER);
 
                 setOnMouseClicked(event -> {
                     iconField.textProperty().setValue(String.valueOf(fontIcon.getIconCode()));
-                    Stage stage = (Stage) this.getGridView().getScene().getWindow();
-                    stage.close();
+                    PopOver stage = (PopOver) this.getGridView().getParent().getScene().getWindow();
+                    stage.hide();
                 });
             }
         }
