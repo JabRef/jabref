@@ -1,5 +1,6 @@
 package org.jabref.gui.entryeditor.fileannotationtab;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -7,36 +8,57 @@ import java.util.List;
 import java.util.Map;
 
 import javafx.geometry.Orientation;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Separator;
 import javafx.scene.control.Tooltip;
+import javafx.scene.input.MouseButton;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 
+import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.actions.ActionFactory;
+import org.jabref.gui.actions.StandardActions;
+import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.entryeditor.EntryEditorTab;
-import org.jabref.gui.util.Theme;
+import org.jabref.gui.maintable.OpenExternalFileAction;
+import org.jabref.gui.maintable.OpenFolderAction;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.pdf.search.PdfSearchResults;
 import org.jabref.model.pdf.search.SearchResult;
 import org.jabref.model.search.rules.SearchRules;
-import org.jabref.preferences.FilePreferences;
+import org.jabref.preferences.PreferencesService;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class FulltextSearchResultsTab extends EntryEditorTab {
 
-    private final StateManager stateManager;
-    private final FilePreferences filePreferences;
+    private static final Logger LOGGER = LoggerFactory.getLogger(FulltextSearchResultsTab.class);
 
+    private final StateManager stateManager;
+    private final PreferencesService preferencesService;
+    private final DialogService dialogService;
+    private final ActionFactory actionFactory;
+
+    private final ScrollPane scrollPane;
     private final TextFlow content;
 
     private BibEntry entry;
 
-    public FulltextSearchResultsTab(StateManager stateManager, Theme theme, FilePreferences filePreferences) {
+    public FulltextSearchResultsTab(StateManager stateManager, PreferencesService preferencesService, DialogService dialogService) {
         this.stateManager = stateManager;
-        this.filePreferences = filePreferences;
+        this.preferencesService = preferencesService;
+        this.dialogService = dialogService;
+        this.actionFactory = new ActionFactory(preferencesService.getKeyBindingRepository());
+
         content = new TextFlow();
-        setContent(content);
+        scrollPane = new ScrollPane(content);
+        scrollPane.setFitToWidth(true);
+        setContent(scrollPane);
         setText(Localization.lang("Search results"));
         this.stateManager.activeSearchQueryProperty().addListener((observable, oldValue, newValue) -> bindToEntry(entry));
     }
@@ -63,26 +85,59 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
             content.getChildren().add(new Text(Localization.lang("No search matches.")));
         }
 
+        // Iterate through files with search hits
         for (Map.Entry<String, HashMap<Integer, List<SearchResult>>> resultsPath : searchResults.getSearchResultsByPathAndPage().entrySet()) {
-            LinkedFile linkedFile = new LinkedFile("", Path.of(resultsPath.getKey()), "pdf");
-            Text fileLinkText = new Text(resultsPath.getKey() + "\n"); // tooltip with absolute path?
-            Path resolvedPath = linkedFile.findIn(stateManager.getActiveDatabase().get(), filePreferences).orElse(Path.of(resultsPath.getKey()));
-            Tooltip fileLinkTooltip = new Tooltip(resolvedPath.toAbsolutePath().toString());
-            Tooltip.install(fileLinkText, fileLinkTooltip);
-            content.getChildren().add(fileLinkText);
+            content.getChildren().addAll(createFileLink(resultsPath.getKey()), lineSeparator());
+
+            // Iterate through pages (within file) with search hits
             for (Map.Entry<Integer, List<SearchResult>> resultsPage : resultsPath.getValue().entrySet()) {
-                Text pageLinkText = new Text(Localization.lang("Page %0", resultsPage.getKey()) + "\n"); // tooltip with absolute path?
-                content.getChildren().add(pageLinkText);
+                Text pageLinkText = new Text(Localization.lang("Page %0", resultsPage.getKey()) + System.lineSeparator()); // tooltip with absolute path?
+                content.getChildren().addAll(pageLinkText, lineSeparator());
+
+                // Iterate through search hits (within file within page)
                 for (SearchResult searchResult : resultsPage.getValue()) {
                     for (String resultTextHtml : searchResult.getResultStringsHtml()) {
                         content.getChildren().addAll(highlightResultString(resultTextHtml));
-                        Separator hitSeparator = new Separator(Orientation.HORIZONTAL);
-                        hitSeparator.prefWidthProperty().bind(content.widthProperty());
-                        content.getChildren().add(hitSeparator);
+                        content.getChildren().add(lineSeparator());
                     }
                 }
             }
         }
+    }
+
+    private Text createFileLink(String pathToFile) {
+        LinkedFile linkedFile = new LinkedFile("", Path.of(pathToFile), "pdf");
+        Text fileLinkText = new Text(pathToFile + System.lineSeparator());
+        ContextMenu fileContextMenu = getFileContextMenu(linkedFile);
+        Path resolvedPath = linkedFile.findIn(stateManager.getActiveDatabase().get(), preferencesService.getFilePreferences()).orElse(Path.of(pathToFile));
+        Tooltip fileLinkTooltip = new Tooltip(resolvedPath.toAbsolutePath().toString());
+        Tooltip.install(fileLinkText, fileLinkTooltip);
+        fileLinkText.setOnMouseClicked(event -> {
+            if (MouseButton.PRIMARY.equals(event.getButton())) {
+                try {
+                    JabRefDesktop.openBrowser(resolvedPath.toUri());
+                } catch (IOException e) {
+                    LOGGER.error("Cannot open {}.", resolvedPath.toString(), e);
+                }
+            } else {
+                fileContextMenu.show(fileLinkText, event.getScreenX(), event.getScreenY());
+            }
+        });
+        return fileLinkText;
+    }
+
+    private ContextMenu getFileContextMenu(LinkedFile file) {
+        ContextMenu fileContextMenu = new ContextMenu();
+        fileContextMenu.getItems().add(actionFactory.createMenuItem(StandardActions.OPEN_FOLDER, new OpenFolderAction(dialogService, stateManager, preferencesService, entry, file)));
+        fileContextMenu.getItems().add(actionFactory.createMenuItem(StandardActions.OPEN_EXTERNAL_FILE, new OpenExternalFileAction(dialogService, stateManager, preferencesService)));
+        return fileContextMenu;
+    }
+
+    private Separator lineSeparator() {
+        Separator lineSeparator = new Separator(Orientation.HORIZONTAL);
+        lineSeparator.prefWidthProperty().bind(content.widthProperty());
+        lineSeparator.setPrefHeight(15);
+        return lineSeparator;
     }
 
     private List<Text> highlightResultString(String htmlHighlightedResult) {
