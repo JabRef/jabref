@@ -130,42 +130,41 @@ public class Backend52 {
     }
 
     /**
-     *  We have circular dependency here: backend uses
-     *  class from ...
+     * @param markName Reference mark name
      */
-    public CitationGroup readCitationGroupFromDocumentOrThrow(XTextDocument doc, String refMarkName)
+    public CitationGroup readCitationGroupFromDocumentOrThrow(XTextDocument doc, String markName)
         throws
         WrappedTargetException,
         NoDocumentException {
 
-        Optional<Codec52.ParsedMarkName> optionalParsed = Codec52.parseMarkName(refMarkName);
+        Optional<Codec52.ParsedMarkName> optionalParsed = Codec52.parseMarkName(markName);
         Codec52.ParsedMarkName parsed = optionalParsed.orElseThrow(
             throw new IllegalArgumentException("readCitationGroupFromDocumentOrThrow:"
-                                               + " found unparsable referenceMarkName"));
+                                               + " found unparsable reference mark name"));
 
         List<Citation> citations = (parsed.citationKeys.stream()
                                     .map(Citation::new)
                                     .collect(Collectors.toList()));
 
-        Optional<OOText> pageInfo = (UnoUserDefinedProperty.getStringValue(doc, refMarkName)
+        Optional<OOText> pageInfo = (UnoUserDefinedProperty.getStringValue(doc, markName)
                                      .map(OOText::fromString));
         pageInfo = PageInfo.normalizePageInfo(pageInfo);
 
         setPageInfoInDataInitial(citations, pageInfo);
 
-        Optional<NamedRange> namedRange = citationStorageManager.nrmGetFromDocument(doc, refMarkName);
+        Optional<NamedRange> namedRange = citationStorageManager.nrmGetFromDocument(doc, markName);
 
         if (namedRange.isEmpty()) {
             throw new IllegalArgumentException("readCitationGroupFromDocumentOrThrow:"
-                                               + " referenceMarkName is not in the document");
+                                               + " reference mark name is not in the document");
         }
 
-        CitationGroupId cgid = new CitationGroupId(refMarkName);
+        CitationGroupId cgid = new CitationGroupId(markName);
         CitationGroup cg = new CitationGroup(OODataModel.JabRef52,
                                              cgid,
                                              parsed.citationType,
                                              citations,
-                                             Optional.of(refMarkName));
+                                             Optional.of(markName));
         this.cgidToNamedRange.put(cgid, namedRange.get());
         return cg;
     }
