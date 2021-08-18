@@ -64,6 +64,7 @@ public class IndexingTaskManager extends BackgroundTask<Void> {
             if (!isRunning) {
                 isRunning = true;
                 this.executeWith(taskExecutor);
+                showToUser(false);
             }
         }
     }
