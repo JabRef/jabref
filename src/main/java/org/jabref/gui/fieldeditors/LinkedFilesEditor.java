@@ -23,6 +23,7 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.text.Text;
 
 import org.jabref.gui.DialogService;
@@ -162,6 +163,7 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
         progressIndicator.visibleProperty().bind(linkedFile.downloadOngoingProperty());
 
         HBox info = new HBox(8);
+        HBox.setHgrow(info, Priority.ALWAYS);
         info.setStyle("-fx-padding: 0.5em 0 0.5em 0;"); // To align with buttons below which also have 0.5em padding
         info.getChildren().setAll(icon, link, desc, progressIndicator);
 
