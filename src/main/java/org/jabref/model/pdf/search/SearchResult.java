@@ -1,6 +1,10 @@
 package org.jabref.model.pdf.search;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import org.jabref.model.entry.BibEntry;
 
@@ -22,6 +26,10 @@ import static org.jabref.model.pdf.search.SearchFieldConstants.PATH;
 
 public final class SearchResult {
 
+    public static final String HIGHLIGHTING_TAG = "JabRef_String_Highlight";
+    public static final String HIGHLIGHTING_PRE_TAG = "<" + HIGHLIGHTING_TAG + ">";
+    public static final String HIGHLIGHTING_POST_TAG = "</" + HIGHLIGHTING_TAG + ">";
+
     private final String path;
     private final String content;
 
@@ -29,7 +37,7 @@ public final class SearchResult {
     private final long modified;
 
     private final float luceneScore;
-    private String html;
+    private List<String> resultStringsHtml;
 
     public SearchResult(IndexSearcher searcher, Query query, ScoreDoc scoreDoc) throws IOException {
         this.path = getFieldContents(searcher, scoreDoc, PATH);
@@ -40,16 +48,12 @@ public final class SearchResult {
 
         TokenStream stream = new EnglishStemAnalyzer().tokenStream(CONTENT, content);
 
-        Highlighter highlighter = new Highlighter(new SimpleHTMLFormatter(), new QueryScorer(query));
+        Highlighter highlighter = new Highlighter(new SimpleHTMLFormatter(HIGHLIGHTING_PRE_TAG, HIGHLIGHTING_POST_TAG), new QueryScorer(query));
         try {
-
             TextFragment[] frags = highlighter.getBestTextFragments(stream, content, true, 10);
-            this.html = "";
-            for (TextFragment frag : frags) {
-                html += "<p>" + frag.toString() + "</p>";
-            }
+            this.resultStringsHtml = Arrays.stream(frags).map(TextFragment::toString).collect(Collectors.toList());
         } catch (InvalidTokenOffsetsException e) {
-            this.html = "";
+            this.resultStringsHtml = List.of();
         }
     }
 
@@ -81,8 +85,8 @@ public final class SearchResult {
         return luceneScore;
     }
 
-    public String getHtml() {
-        return html;
+    public List<String> getResultStringsHtml() {
+        return resultStringsHtml;
     }
 
     public int getPageNumber() {

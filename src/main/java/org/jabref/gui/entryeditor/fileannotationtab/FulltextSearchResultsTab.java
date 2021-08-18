@@ -1,12 +1,18 @@
 package org.jabref.gui.entryeditor.fileannotationtab;
 
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-import javafx.scene.web.WebView;
+import javafx.geometry.Orientation;
+import javafx.scene.control.Separator;
+import javafx.scene.text.Text;
+import javafx.scene.text.TextFlow;
 
 import org.jabref.gui.StateManager;
 import org.jabref.gui.entryeditor.EntryEditorTab;
-import org.jabref.gui.util.OpenHyperlinksInExternalBrowser;
 import org.jabref.gui.util.Theme;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
@@ -21,18 +27,15 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
     private final StateManager stateManager;
     private final FilePreferences filePreferences;
 
-    private final WebView webView;
+    private final TextFlow content;
 
     private BibEntry entry;
 
     public FulltextSearchResultsTab(StateManager stateManager, Theme theme, FilePreferences filePreferences) {
         this.stateManager = stateManager;
         this.filePreferences = filePreferences;
-        webView = new WebView();
-        setTheme(theme);
-        webView.getEngine().loadContent(wrapHTML("<p>" + Localization.lang("Search results") + "</p>"));
-        setContent(webView);
-        webView.getEngine().getLoadWorker().stateProperty().addListener(new OpenHyperlinksInExternalBrowser(webView));
+        content = new TextFlow();
+        setContent(content);
         setText(Localization.lang("Search results"));
         this.stateManager.activeSearchQueryProperty().addListener((observable, oldValue, newValue) -> bindToEntry(entry));
     }
@@ -52,32 +55,50 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
             return;
         }
         PdfSearchResults searchResults = stateManager.activeSearchQueryProperty().get().get().getRule().getFulltextResults(stateManager.activeSearchQueryProperty().get().get().getQuery(), entry);
-        StringBuilder content = new StringBuilder();
+
+        content.getChildren().clear();
 
         if (searchResults.numSearchResults() == 0) {
-            content.append("<p>" + Localization.lang("No search matches.") + "</p>");
+            content.getChildren().add(new Text(Localization.lang("No search matches.")));
         }
 
-        for (SearchResult searchResult : searchResults.getSearchResults()) {
-            content.append("<p>");
-            LinkedFile linkedFile = new LinkedFile("just for link", Path.of(searchResult.getPath()), "pdf");
-            Path resolvedPath = linkedFile.findIn(stateManager.getActiveDatabase().get(), filePreferences).orElse(Path.of(searchResult.getPath()));
-            String link = "<a href=" + resolvedPath.toAbsolutePath().toString() + ">" + searchResult.getPath() + "</a>";
-            content.append(Localization.lang("Found match in %0", link));
-            content.append("<p>On page " + searchResult.getPageNumber() + "</p>");
-            content.append("</p><p>");
-            content.append(searchResult.getHtml());
-            content.append("</p>");
+        for (Map.Entry<String, HashMap<Integer, List<SearchResult>>> resultsPath : searchResults.getSearchResultsByPathAndPage().entrySet()) {
+            LinkedFile linkedFile = new LinkedFile("", Path.of(resultsPath.getKey()), "pdf");
+            Text fileLinkText = new Text(resultsPath.getKey() + "\n"); // tooltip with absolute path?
+            content.getChildren().add(fileLinkText);
+            for (Map.Entry<Integer, List<SearchResult>> resultsPage : resultsPath.getValue().entrySet()) {
+                Text pageLinkText = new Text(Localization.lang("Page %0", resultsPage.getKey()) + "\n"); // tooltip with absolute path?
+                content.getChildren().add(pageLinkText);
+                for (SearchResult searchResult : resultsPage.getValue()) {
+                    for (String resultTextHtml : searchResult.getResultStringsHtml()) {
+                        content.getChildren().addAll(highlightResultString(resultTextHtml));
+                        Separator hitSeparator = new Separator(Orientation.HORIZONTAL);
+                        hitSeparator.prefWidthProperty().bind(content.widthProperty());
+                        content.getChildren().add(hitSeparator);
+                    }
+                }
+            }
+        }
+    }
+
+    private List<Text> highlightResultString(String htmlHighlightedResult) {
+        List<Text> highlightedResultsStrings = new ArrayList<>();
+
+        for (String fragment : htmlHighlightedResult.split(SearchResult.HIGHLIGHTING_PRE_TAG)) {
+            String[] splitPost = fragment.split(SearchResult.HIGHLIGHTING_POST_TAG);
+            if (splitPost.length > 2) {
+                throw new IllegalArgumentException("More than one POST_TAG for a PRE_TAG");
+            }
+            if (splitPost.length == 1) {
+                highlightedResultsStrings.add(new Text(splitPost[0]));
+            } else {
+                Text highlightedText = new Text(splitPost[0]);
+                highlightedText.setStyle("-fx-fill: -jr-green;");
+                highlightedResultsStrings.add(highlightedText);
+                highlightedResultsStrings.add(new Text(splitPost[1]));
+            }
         }
 
-        webView.getEngine().loadContent(wrapHTML(content.toString()));
-    }
-
-    private String wrapHTML(String content) {
-        return "<html><body id=\"previewBody\"><div id=\"content\">" + content + "</div></body></html>";
-    }
-
-    public void setTheme(Theme theme) {
-        theme.getAdditionalStylesheet().ifPresent(location -> webView.getEngine().setUserStyleSheetLocation(location));
+        return highlightedResultsStrings;
     }
 }

@@ -2,6 +2,7 @@ package org.jabref.model.pdf.search;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 
 public final class PdfSearchResults {
@@ -24,6 +25,25 @@ public final class PdfSearchResults {
 
     public List<SearchResult> getSearchResults() {
         return this.searchResults;
+    }
+
+    public HashMap<String, HashMap<Integer, List<SearchResult>>> getSearchResultsByPathAndPage() {
+        HashMap<String, HashMap<Integer, List<SearchResult>>> resultsByPathAndPage = new HashMap<>();
+        for (SearchResult result : searchResults) {
+            HashMap<Integer, List<SearchResult>> resultsByPage;
+            if (resultsByPathAndPage.containsKey(result.getPath())) {
+                resultsByPage = resultsByPathAndPage.get(result.getPath());
+            } else {
+                resultsByPage = new HashMap<>();
+                resultsByPathAndPage.put(result.getPath(), resultsByPage);
+            }
+            if (resultsByPage.containsKey(result.getPageNumber())) {
+                resultsByPage.get(result.getPageNumber()).add(result);
+            } else {
+                resultsByPage.put(result.getPageNumber(), List.of(result));
+            }
+        }
+        return resultsByPathAndPage;
     }
 
     public int numSearchResults() {
