@@ -124,22 +124,16 @@ public class DiffHighlightingEllipsingTextFlow extends TextFlow {
     public void highlightDiff() {
         allChildren.clear();
         if (comparisonString.get() != null && !comparisonString.get().equals(fullText)) {
-            final List<Text> highlightedText;
-            switch (diffMode.getValue()) {
-                case PLAIN:
+            final List<Text> highlightedText = switch (diffMode.getValue()) {
+                case PLAIN -> {
                     Text text = new Text(fullText);
                     text.getStyleClass().add("text-unchanged");
-                    highlightedText = List.of(text);
-                    break;
-                case WORD:
-                    highlightedText = DiffHighlighting.generateDiffHighlighting(comparisonString.get(), fullText, " ");
-                    break;
-                case CHARACTER:
-                    highlightedText = DiffHighlighting.generateDiffHighlighting(comparisonString.get(), fullText, "");
-                    break;
-                default:
-                    throw new UnsupportedOperationException("Not implemented " + diffMode.getValue());
-            }
+                    yield List.of(text);
+                }
+                case WORD -> DiffHighlighting.generateDiffHighlighting(comparisonString.get(), fullText, " ");
+                case CHARACTER -> DiffHighlighting.generateDiffHighlighting(comparisonString.get(), fullText, "");
+                default -> throw new UnsupportedOperationException("Not implemented " + diffMode.getValue());
+            };
             allChildren.addAll(highlightedText);
         } else {
             Text text = new Text(fullText);
