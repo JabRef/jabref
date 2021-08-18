@@ -14,6 +14,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Control;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressIndicator;
@@ -282,6 +283,8 @@ public class MultiMergeEntriesView extends BaseDialog<BibEntry> {
                 buttonText.maxWidthProperty().bind(widthProperty().add(-10));
                 buttonText.maxHeightProperty().bind(heightProperty());
                 cellButton.setGraphic(buttonText);
+                cellButton.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+                cellButton.setContentDisplay(ContentDisplay.CENTER);
 
                 // Tooltip
                 Tooltip buttonTooltip = new Tooltip(content);
