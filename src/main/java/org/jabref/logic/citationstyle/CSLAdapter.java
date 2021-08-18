@@ -3,6 +3,7 @@ package org.jabref.logic.citationstyle;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
@@ -124,10 +125,10 @@ public class CSLAdapter {
         }
 
         @Override
-        public String[] getIds() {
+        public Collection<String> getIds() {
             return data.stream()
                        .map(entry -> entry.getCitationKey().orElse(""))
-                       .toArray(String[]::new);
+                       .toList();
         }
     }
 }

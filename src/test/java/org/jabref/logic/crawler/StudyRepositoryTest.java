@@ -2,6 +2,7 @@ package org.jabref.logic.crawler;
 
 import java.io.IOException;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -14,9 +15,9 @@ import org.jabref.logic.bibtex.FieldContentFormatterPreferences;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPattern;
-import org.jabref.logic.crawler.git.GitHandler;
 import org.jabref.logic.database.DatabaseMerger;
 import org.jabref.logic.exporter.SavePreferences;
+import org.jabref.logic.git.SlrGitHandler;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.preferences.TimestampPreferences;
 import org.jabref.logic.util.io.FileUtil;
@@ -53,7 +54,7 @@ class StudyRepositoryTest {
     @TempDir
     Path tempRepositoryDirectory;
     StudyRepository studyRepository;
-    GitHandler gitHandler = mock(GitHandler.class, Answers.RETURNS_DEFAULTS);
+    SlrGitHandler gitHandler = mock(SlrGitHandler.class, Answers.RETURNS_DEFAULTS);
     String hashCodeQuantum = String.valueOf("Quantum".hashCode());
     String hashCodeCloudComputing = String.valueOf("Cloud Computing".hashCode());
     String hashCodeSoftwareEngineering = String.valueOf("\"Software Engineering\"".hashCode());
@@ -79,6 +80,7 @@ class StudyRepositoryTest {
         when(savePreferences.getSaveOrder()).thenReturn(new SaveOrderConfig());
         when(savePreferences.getEncoding()).thenReturn(null);
         when(savePreferences.takeMetadataSaveOrderInAccount()).thenReturn(true);
+        when(savePreferences.getEncoding()).thenReturn(Charset.defaultCharset());
         when(savePreferences.getCitationKeyPatternPreferences()).thenReturn(citationKeyPatternPreferences);
         when(importFormatPreferences.getKeywordSeparator()).thenReturn(',');
         when(importFormatPreferences.getFieldContentFormatterPreferences()).thenReturn(new FieldContentFormatterPreferences());
