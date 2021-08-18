@@ -6,8 +6,8 @@ import javafx.scene.web.WebView;
 
 import org.jabref.gui.StateManager;
 import org.jabref.gui.entryeditor.EntryEditorTab;
+import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.OpenHyperlinksInExternalBrowser;
-import org.jabref.gui.util.Theme;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
@@ -23,11 +23,12 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
 
     private final WebView webView;
 
-    public FulltextSearchResultsTab(StateManager stateManager, Theme theme, FilePreferences filePreferences) {
+    public FulltextSearchResultsTab(StateManager stateManager, ThemeManager themeManager, FilePreferences filePreferences) {
         this.stateManager = stateManager;
         this.filePreferences = filePreferences;
+
         webView = new WebView();
-        setTheme(theme);
+        themeManager.installCss(webView.getEngine());
         webView.getEngine().loadContent(wrapHTML("<p>" + Localization.lang("Search results") + "</p>"));
         setContent(webView);
         webView.getEngine().getLoadWorker().stateProperty().addListener(new OpenHyperlinksInExternalBrowser(webView));
@@ -62,7 +63,7 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
             content.append("<p>");
             LinkedFile linkedFile = new LinkedFile("just for link", Path.of(searchResult.getPath()), "pdf");
             Path resolvedPath = linkedFile.findIn(stateManager.getActiveDatabase().get(), filePreferences).orElse(Path.of(searchResult.getPath()));
-            String link = "<a href=" + resolvedPath.toAbsolutePath().toString() + ">" + searchResult.getPath() + "</a>";
+            String link = "<a href=" + resolvedPath.toAbsolutePath() + ">" + searchResult.getPath() + "</a>";
             content.append(Localization.lang("Found match in %0", link));
             content.append("</p><p>");
             content.append(searchResult.getHtml());
@@ -74,9 +75,5 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
 
     private String wrapHTML(String content) {
         return "<html><body id=\"previewBody\"><div id=\"content\">" + content + "</div></body></html>";
-    }
-
-    public void setTheme(Theme theme) {
-        theme.getAdditionalStylesheet().ifPresent(location -> webView.getEngine().setUserStyleSheetLocation(location));
     }
 }
