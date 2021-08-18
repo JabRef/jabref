@@ -1,5 +1,6 @@
 package org.jabref.logic.openoffice.backend;
 
+import java.lang.StringBuilder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -106,11 +107,11 @@ public class Backend52 {
         if (pageInfoThrash.isEmpty()) {
             return Optional.empty(); // "Backend52: found no unused pageInfo data";
         }
-        String msg =
-            "Backend52: found unused pageInfo data, with names listed below.\n"
-            + "In LibreOffice you may remove these in [File]/[Properties]/[Custom Properties]\n";
-        msg += "" + String.join("\n", pageInfoThrash) + "";
-        return Optional.of(msg);
+
+        StringBuilder msg = new StringBuilder("Backend52: found unused pageInfo data, with names listed below.\n");
+        msg.append("In LibreOffice you may remove these in [File]/[Properties]/[Custom Properties]\n");
+        msg.append(String.join("\n", pageInfoThrash));
+        return Optional.of(msg.toString());
     }
 
     private static void setPageInfoInDataInitial(List<Citation> citations, Optional<OOText> pageInfo) {
