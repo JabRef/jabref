@@ -107,7 +107,7 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
 
     private Text createFileLink(String pathToFile) {
         LinkedFile linkedFile = new LinkedFile("", Path.of(pathToFile), "pdf");
-        Text fileLinkText = new Text(pathToFile + System.lineSeparator());
+        Text fileLinkText = new Text(Localization.lang("Found match in %0", pathToFile) + System.lineSeparator());
         ContextMenu fileContextMenu = getFileContextMenu(linkedFile);
         Path resolvedPath = linkedFile.findIn(stateManager.getActiveDatabase().get(), preferencesService.getFilePreferences()).orElse(Path.of(pathToFile));
         Tooltip fileLinkTooltip = new Tooltip(resolvedPath.toAbsolutePath().toString());
