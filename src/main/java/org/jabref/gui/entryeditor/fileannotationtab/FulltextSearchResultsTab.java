@@ -8,6 +8,7 @@ import java.util.Map;
 
 import javafx.geometry.Orientation;
 import javafx.scene.control.Separator;
+import javafx.scene.control.Tooltip;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 
@@ -65,6 +66,9 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
         for (Map.Entry<String, HashMap<Integer, List<SearchResult>>> resultsPath : searchResults.getSearchResultsByPathAndPage().entrySet()) {
             LinkedFile linkedFile = new LinkedFile("", Path.of(resultsPath.getKey()), "pdf");
             Text fileLinkText = new Text(resultsPath.getKey() + "\n"); // tooltip with absolute path?
+            Path resolvedPath = linkedFile.findIn(stateManager.getActiveDatabase().get(), filePreferences).orElse(Path.of(resultsPath.getKey()));
+            Tooltip fileLinkTooltip = new Tooltip(resolvedPath.toAbsolutePath().toString());
+            Tooltip.install(fileLinkText, fileLinkTooltip);
             content.getChildren().add(fileLinkText);
             for (Map.Entry<Integer, List<SearchResult>> resultsPage : resultsPath.getValue().entrySet()) {
                 Text pageLinkText = new Text(Localization.lang("Page %0", resultsPage.getKey()) + "\n"); // tooltip with absolute path?
