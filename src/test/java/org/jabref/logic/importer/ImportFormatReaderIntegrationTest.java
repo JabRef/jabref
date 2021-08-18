@@ -5,6 +5,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import org.jabref.logic.preferences.TimestampPreferences;
@@ -31,6 +32,7 @@ class ImportFormatReaderIntegrationTest {
         reader = new ImportFormatReader();
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(importFormatPreferences.getEncoding()).thenReturn(StandardCharsets.UTF_8);
+        when(importFormatPreferences.getCustomImportList()).thenReturn(Set.of());
         when(timestampPreferences.getTimestampField()).then(invocation -> StandardField.TIMESTAMP);
         reader.resetImportFormats(importFormatPreferences, mock(XmpPreferences.class), new DummyFileUpdateMonitor());
     }
