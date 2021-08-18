@@ -59,12 +59,11 @@ class PdfMergeMetadataImporterTest {
 
         // From DOI (contained in embedded bib file)
         BibEntry expected = new BibEntry(StandardEntryType.Book);
-        expected.setCitationKey("Burd_2011");
-        expected.setField(StandardField.AUTHOR, "Barry Burd");
-        expected.setField(StandardField.TITLE, "Java{\\textregistered} For Dummies{\\textregistered}");
-        expected.setField(StandardField.PUBLISHER, "Wiley Publishing, Inc.");
-        expected.setField(StandardField.YEAR, "2011");
-        expected.setField(StandardField.AUTHOR, "Barry Burd");
+        expected.setCitationKey("9780134685991");
+        expected.setField(StandardField.AUTHOR, "Bloch, Joshua");
+        expected.setField(StandardField.TITLE, "Effective Java");
+        expected.setField(StandardField.PUBLISHER, "Addison Wesley");
+        expected.setField(StandardField.YEAR, "2018");
         expected.setField(StandardField.MONTH, "jul");
         expected.setField(StandardField.DOI, "10.1002/9781118257517");
 
