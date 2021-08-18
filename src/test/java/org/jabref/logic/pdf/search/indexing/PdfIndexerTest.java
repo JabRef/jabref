@@ -70,7 +70,8 @@ public class PdfIndexerTest {
         database.insertEntry(entry);
 
         // when
-        indexer.createIndex(database, context);
+        indexer.createIndex();
+        indexer.addToIndex(context);
 
         // then
         try (IndexReader reader = DirectoryReader.open(new NIOFSDirectory(context.getFulltextIndexPath()))) {
@@ -86,7 +87,8 @@ public class PdfIndexerTest {
         database.insertEntry(entry);
 
         // when
-        indexer.createIndex(database, context);
+        indexer.createIndex();
+        indexer.addToIndex(context);
 
         // then
         try (IndexReader reader = DirectoryReader.open(new NIOFSDirectory(context.getFulltextIndexPath()))) {
