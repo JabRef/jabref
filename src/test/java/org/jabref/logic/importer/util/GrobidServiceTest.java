@@ -46,13 +46,17 @@ public class GrobidServiceTest {
         String[] responseRows = response.split("\n");
         assertNotNull(response);
         assertEquals('@', response.charAt(0));
-        assertTrue(responseRows[1].contains("author") && responseRows[1].contains("Derwing, T and Rossiter, M"));
-        assertTrue(responseRows[2].contains("title") && responseRows[2].contains("Teaching native speakers"));
+        assertTrue(responseRows[1].contains("author") && responseRows[1].contains("Derwing, Tracey and Rossiter, Marian and Munro, Murray"));
+        assertTrue(responseRows[2].contains("title") && responseRows[2].contains("Teaching Native Speakers to Listen to Foreign-accented Speech"));
         assertTrue(responseRows[3].contains("journal") && responseRows[3].contains("Journal of Multilingual and Multicultural"));
-        assertTrue(responseRows[4].contains("date") && responseRows[4].contains("2002"));
-        assertTrue(responseRows[5].contains("pages") && responseRows[5].contains("245--259"));
-        assertTrue(responseRows[6].contains("volume") && responseRows[6].contains("23"));
-        assertTrue(responseRows[7].contains("number") && responseRows[7].contains("4"));
+        assertTrue(responseRows[4].contains("publisher") && responseRows[4].contains("Informa UK Limited"));
+        assertTrue(responseRows[5].contains("date") && responseRows[5].contains("2002-09"));
+        assertTrue(responseRows[6].contains("year") && responseRows[6].contains("2002"));
+        assertTrue(responseRows[7].contains("month") && responseRows[7].contains("9"));
+        assertTrue(responseRows[8].contains("pages") && responseRows[8].contains("245-259"));
+        assertTrue(responseRows[9].contains("volume") && responseRows[9].contains("23"));
+        assertTrue(responseRows[10].contains("number") && responseRows[10].contains("4"));
+        assertTrue(responseRows[11].contains("doi") && responseRows[11].contains("10.1080/01434630208666468"));
     }
 
     @Test
