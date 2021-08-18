@@ -138,11 +138,10 @@ public class Backend52 {
         NoDocumentException {
 
         Optional<Codec52.ParsedMarkName> optionalParsed = Codec52.parseMarkName(refMarkName);
-        if (optionalParsed.isEmpty()) {
+        Codec52.ParsedMarkName parsed = optionalParsed.orElseThrow(
             throw new IllegalArgumentException("readCitationGroupFromDocumentOrThrow:"
-                                               + " found unparsable referenceMarkName");
-        }
-        Codec52.ParsedMarkName parsed = optionalParsed.get();
+                                               + " found unparsable referenceMarkName"));
+
         List<Citation> citations = (parsed.citationKeys.stream()
                                     .map(Citation::new)
                                     .collect(Collectors.toList()));
