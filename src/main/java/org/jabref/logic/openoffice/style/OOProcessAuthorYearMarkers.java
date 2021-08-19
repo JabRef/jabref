@@ -110,8 +110,8 @@ class OOProcessAuthorYearMarkers {
      */
     private static void setIsFirstAppearanceOfSourceInCitations(CitationGroups cgs) {
         Set<String> seenBefore = new HashSet<>();
-        for (CitationGroup cg : cgs.getCitationGroupsInGlobalOrder()) {
-            for (Citation cit : cg.getCitationsInLocalOrder()) {
+        for (CitationGroup group : cgs.getCitationGroupsInGlobalOrder()) {
+            for (Citation cit : group.getCitationsInLocalOrder()) {
                 String currentKey = cit.citationKey;
                 if (!seenBefore.contains(currentKey)) {
                     cit.setIsFirstAppearanceOfSource(true);
@@ -145,17 +145,17 @@ class OOProcessAuthorYearMarkers {
         // Mark first appearance of each citationKey
         setIsFirstAppearanceOfSourceInCitations(cgs);
 
-        for (CitationGroup cg : cgs.getCitationGroupsInGlobalOrder()) {
+        for (CitationGroup group : cgs.getCitationGroupsInGlobalOrder()) {
 
-            final boolean inParenthesis = (cg.citationType == CitationType.AUTHORYEAR_PAR);
+            final boolean inParenthesis = (group.citationType == CitationType.AUTHORYEAR_PAR);
             final NonUniqueCitationMarker strictlyUnique = NonUniqueCitationMarker.THROWS;
 
-            List<Citation> cits = cg.getCitationsInLocalOrder();
+            List<Citation> cits = group.getCitationsInLocalOrder();
             List<CitationMarkerEntry> citationMarkerEntries = OOListUtil.map(cits, e -> e);
             OOText citMarker = style.createCitationMarker(citationMarkerEntries,
                                                           inParenthesis,
                                                           strictlyUnique);
-            cg.setCitationMarker(Optional.of(citMarker));
+            group.setCitationMarker(Optional.of(citMarker));
         }
     }
 
