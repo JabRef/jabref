@@ -36,6 +36,9 @@ public class ImportExportTabViewModel implements PreferenceTabViewModel {
     private final ListProperty<Field> sortableFieldsProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final ListProperty<SortCriterionViewModel> sortCriteriaProperty = new SimpleListProperty<>(FXCollections.observableArrayList(new ArrayList<>()));
 
+    private final BooleanProperty grobidEnabledProperty = new SimpleBooleanProperty();
+    private final StringProperty grobidURLProperty = new SimpleStringProperty("");
+
     private final PreferencesService preferencesService;
     private final DOIPreferences initialDOIPreferences;
     private final ImportSettingsPreferences initialImportSettingsPreferences;
@@ -67,12 +70,15 @@ public class ImportExportTabViewModel implements PreferenceTabViewModel {
         sortCriteriaProperty.addAll(initialExportOrder.getSortCriteria().stream()
                                                       .map(SortCriterionViewModel::new)
                                                       .collect(Collectors.toList()));
+
+        grobidEnabledProperty.setValue(initialImportSettingsPreferences.isGrobidEnabled());
+        grobidURLProperty.setValue(initialImportSettingsPreferences.getGrobidURL());
     }
 
     @Override
     public void storeSettings() {
         preferencesService.storeImportSettingsPreferences(new ImportSettingsPreferences(
-                generateKeyOnImportProperty.getValue()));
+                generateKeyOnImportProperty.getValue(), grobidEnabledProperty.getValue(), grobidURLProperty.getValue()));
 
         preferencesService.storeDOIPreferences(new DOIPreferences(
                 useCustomDOIProperty.getValue(),
@@ -117,5 +123,13 @@ public class ImportExportTabViewModel implements PreferenceTabViewModel {
 
     public ListProperty<SortCriterionViewModel> sortCriteriaProperty() {
         return sortCriteriaProperty;
+    }
+
+    public BooleanProperty grobidEnabledProperty() {
+        return grobidEnabledProperty;
+    }
+
+    public StringProperty grobidURLProperty() {
+        return grobidURLProperty;
     }
 }
