@@ -64,7 +64,7 @@ public class Backend52 {
     public List<String> getJabRefReferenceMarkNames(XTextDocument doc)
         throws
         NoDocumentException {
-        List<String> allNames = this.citationStorageManager.nrmGetUsedNames(doc);
+        List<String> allNames = this.citationStorageManager.getUsedNames(doc);
         return Codec52.filterIsJabRefReferenceMarkName(allNames);
     }
 
@@ -147,7 +147,7 @@ public class Backend52 {
 
         setPageInfoInDataInitial(citations, pageInfo);
 
-        NamedRange namedRange = (citationStorageManager.nrmGetFromDocument(doc, markName)
+        NamedRange namedRange = (citationStorageManager.getNamedRangeFromDocument(doc, markName)
                                  .orElseThrow(IllegalArgumentException::new));
 
         CitationGroupId groupId = new CitationGroupId(markName);
@@ -201,7 +201,7 @@ public class Backend52 {
          * the citation keys and citation type in the name of the reference mark. The name of the reference mark
          * has to be unique in the document.
          */
-        String markName = Codec52.getUniqueMarkName(new HashSet<>(citationStorageManager.nrmGetUsedNames(doc)),
+        String markName = Codec52.getUniqueMarkName(new HashSet<>(citationStorageManager.getUsedNames(doc)),
                                                     citationKeys,
                                                     citationType);
 
@@ -240,11 +240,11 @@ public class Backend52 {
          * Apply to document
          */
         boolean withoutBrackets = (citationType == CitationType.INVISIBLE_CIT);
-        NamedRange namedRange = this.citationStorageManager.nrmCreate(doc,
-                                                                      markName,
-                                                                      position,
-                                                                      insertSpaceAfter,
-                                                                      withoutBrackets);
+        NamedRange namedRange = this.citationStorageManager.createNamedRange(doc,
+                                                                             markName,
+                                                                             position,
+                                                                             insertSpaceAfter,
+                                                                             withoutBrackets);
 
         switch (dataModel) {
             case JabRef52:
@@ -330,8 +330,8 @@ public class Backend52 {
         NoDocumentException,
         NotRemoveableException {
         NamedRange namedRange = getNamedRangeOrThrow(group);
-        String refMarkName = namedRange.nrGetRangeName();
-        namedRange.nrRemoveFromDocument(doc);
+        String refMarkName = namedRange.getRangeName();
+        namedRange.removeFromDocument(doc);
         UnoUserDefinedProperty.removeIfExists(doc, refMarkName);
         this.cgidToNamedRange.remove(group.groupId);
     }
@@ -345,7 +345,7 @@ public class Backend52 {
         WrappedTargetException {
 
         NamedRange namedRange = getNamedRangeOrThrow(group);
-        return namedRange.nrGetMarkRange(doc);
+        return namedRange.getMarkRange(doc);
     }
 
     /**
@@ -357,7 +357,7 @@ public class Backend52 {
         NoDocumentException,
         WrappedTargetException {
         NamedRange namedRange = getNamedRangeOrThrow(group);
-        return namedRange.nrGetRawCursor(doc);
+        return namedRange.getRawCursor(doc);
     }
 
     /**
@@ -370,7 +370,7 @@ public class Backend52 {
         CreationException {
 
         NamedRange namedRange = getNamedRangeOrThrow(group);
-        return namedRange.nrGetFillCursor(doc);
+        return namedRange.getFillCursor(doc);
     }
 
     /** To be called after getFillCursorForCitationGroup */
@@ -379,7 +379,7 @@ public class Backend52 {
         NoDocumentException,
         WrappedTargetException {
         NamedRange namedRange = getNamedRangeOrThrow(group);
-        namedRange.nrCleanFillCursor(doc);
+        namedRange.cleanFillCursor(doc);
     }
 
     public List<CitationEntry> getCitationEntries(XTextDocument doc, CitationGroups cgs)

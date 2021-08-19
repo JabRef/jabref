@@ -10,23 +10,32 @@ import com.sun.star.text.XTextCursor;
 import com.sun.star.text.XTextDocument;
 import com.sun.star.text.XTextRange;
 
+/**
+ * NamedRange (with NamedRangeManager) attempts to provide a common interface for working with
+ * reference mark based and bookmark based text ranges to be used as locations to fill with citation
+ * markers. LibreOffice supports name-based lookup and listing names for both (hence the name).
+ *
+ * Note: currently only implemented for refence marks (in NamedRangeReferenceMark and
+ *       NamedRangeManagerReferenceMark). 
+ * 
+ */
 public interface NamedRange {
 
-    String nrGetRangeName();
+    String getRangeName();
 
     /**
      * @return Optional.empty if the mark is missing from the document.
      */
-    Optional<XTextRange> nrGetMarkRange(XTextDocument doc)
+    Optional<XTextRange> getMarkRange(XTextDocument doc)
         throws
         NoDocumentException,
         WrappedTargetException;
 
     /**
      * Cursor for the reference marks as is, not prepared for filling, but does not need
-     * nrCleanFillCursor either.
+     * cleanFillCursor either.
      */
-    Optional<XTextCursor> nrGetRawCursor(XTextDocument doc)
+    Optional<XTextCursor> getRawCursor(XTextDocument doc)
         throws
         NoDocumentException,
         WrappedTargetException;
@@ -34,9 +43,9 @@ public interface NamedRange {
     /**
      * Get a cursor for filling in text.
      *
-     * Must be followed by nrCleanFillCursor()
+     * Must be followed by cleanFillCursor()
      */
-    XTextCursor nrGetFillCursor(XTextDocument doc)
+    XTextCursor getFillCursor(XTextDocument doc)
         throws
         NoDocumentException,
         WrappedTargetException,
@@ -47,7 +56,7 @@ public interface NamedRange {
      * single character, leave the left bracket.
      *
      */
-    void nrCleanFillCursor(XTextDocument doc)
+    void cleanFillCursor(XTextDocument doc)
         throws
         NoDocumentException,
         WrappedTargetException;
@@ -55,7 +64,7 @@ public interface NamedRange {
     /**
      *  Note: create is in NamedRangeManager
      */
-    void nrRemoveFromDocument(XTextDocument doc)
+    void removeFromDocument(XTextDocument doc)
         throws
         WrappedTargetException,
         NoDocumentException;

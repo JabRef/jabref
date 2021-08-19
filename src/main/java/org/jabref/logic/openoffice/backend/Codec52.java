@@ -51,29 +51,21 @@ class Codec52 {
      * Integer representation was written into the document in JabRef52, keep it for compatibility.
      */
     private static CitationType citationTypeFromInt(int i) {
-        switch (i) {
-            case 1:
-                return CitationType.AUTHORYEAR_PAR;
-            case 2:
-                return CitationType.AUTHORYEAR_INTEXT;
-            case 3:
-                return CitationType.INVISIBLE_CIT;
-            default:
-                throw new IllegalArgumentException("Invalid CitationType code");
-        }
+        return switch (i) {
+            case 1 -> CitationType.AUTHORYEAR_PAR;
+            case 2 -> CitationType.AUTHORYEAR_INTEXT;
+            case 3 -> CitationType.INVISIBLE_CIT;
+            default -> throw new IllegalArgumentException("Invalid CitationType code");
+        };
     }
 
     private static int citationTypeToInt(CitationType i) {
-        switch (i) {
-            case AUTHORYEAR_PAR:
-                return 1;
-            case AUTHORYEAR_INTEXT:
-                return 2;
-            case INVISIBLE_CIT:
-                return 3;
-            default:
-                throw new IllegalArgumentException("Invalid CitationType");
-        }
+        return switch (i) {
+            case AUTHORYEAR_PAR -> 1;
+            case AUTHORYEAR_INTEXT -> 2;
+            case INVISIBLE_CIT -> 3;
+            default -> throw new IllegalArgumentException("Invalid CitationType");
+        };
     }
 
     /**
@@ -92,7 +84,7 @@ class Codec52 {
                                            List<String> citationKeys,
                                            CitationType citationType) {
 
-        String citationKeysPart =  String.join(",", citationKeys);
+        String citationKeysPart = String.join(",", citationKeys);
 
         int i = 0;
         int citTypeCode = citationTypeToInt(citationType);
