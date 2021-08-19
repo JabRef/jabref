@@ -287,7 +287,7 @@ public class Backend52 {
 
                 // Try to do something of the pageInfos.
                 String singlePageInfo = (pageInfos.stream()
-                                         .filter(pi -> pi.isPresent())
+                                         .filter(Optional::isPresent)
                                          .map(pi -> OOText.toString(pi.get()))
                                          .distinct()
                                          .collect(Collectors.joining("; ")));
