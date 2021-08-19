@@ -77,25 +77,27 @@ class Codec52 {
     }
 
     /**
-     * Produce a reference mark name for JabRef for the given citation key and citationType that
+     * Produce a reference mark name for JabRef for the given citationType and list citation keys that
      * does not yet appear among the reference marks of the document.
      *
-     * @param bibtexKey The citation key.
+     * @param usedNames    Reference mark names already in use.
+     * @param citationKeys Identifies the cited sources.
      * @param citationType Encodes the effect of withText and inParenthesis options.
      *
-     * The first occurrence of bibtexKey gets no serial number, the second gets 0, the third 1 ...
+     * The first occurrence of citationKeys gets no serial number, the second gets 0, the third 1 ...
      *
      * Or the first unused in this series, after removals.
      */
     public static String getUniqueMarkName(Set<String> usedNames,
-                                           String bibtexKey,
+                                           List<String> citationKeys,
                                            CitationType citationType) {
 
+        String citationKeysPart = citationKeys.stream().collect(Collectors.joining(","));
         int i = 0;
         int citTypeCode = citationTypeToInt(citationType);
-        String name = BIB_CITATION + '_' + citTypeCode + '_' + bibtexKey;
+        String name = BIB_CITATION + '_' + citTypeCode + '_' + citationKeysPart;
         while (usedNames.contains(name)) {
-            name = BIB_CITATION + i + '_' + citTypeCode + '_' + bibtexKey;
+            name = BIB_CITATION + i + '_' + citTypeCode + '_' + citationKeysPart;
             i++;
         }
         return name;

@@ -162,12 +162,19 @@ public class Backend52 {
     }
 
     /**
-     *  Create a reference mark with the given name, at the end of position.
+     *  Create a reference mark at the end of {@code position} in the document.
      *
      *  On return {@code position} is collapsed, and is after the inserted space, or at the end of
      *  the reference mark.
      *
+     *  @param citationKeys Keys to be cited.
+     *
+     *  @param pageInfos An optional pageInfo for each citation key.
+     *                   Backend52 only uses and stores the last pageInfo,
+     *                   all others should be Optional.empty()
+     *
      *  @param position Collapsed to its end.
+     *
      *  @param insertSpaceAfter We insert a space after the mark, that carries on format of
      *                          characters from the original position.
      */
@@ -190,12 +197,16 @@ public class Backend52 {
             throw new IllegalArgumentException();
         }
 
-        // Get a new refMarkName
-        Set<String> usedNames = new HashSet<>(this.citationStorageManager.nrmGetUsedNames(doc));
-        String xkey = (citationKeys.stream().collect(Collectors.joining(",")));
-        String refMarkName = Codec52.getUniqueMarkName(usedNames, xkey, citationType);
+        /*
+         * Backend52 uses reference marks to (1) mark the location of the citation in the text and (2) to encode
+         * the citation keys and citation type in the name of the reference mark. The name of the reference mark
+         * has to be unique in the document.
+         */
+        String markName = Codec52.getUniqueMarkName(new HashSet<>(citationStorageManager.nrmGetUsedNames(doc)),
+                                                    citationKeys,
+                                                    citationType);
 
-        CitationGroupId groupId = new CitationGroupId(refMarkName);
+        CitationGroupId groupId = new CitationGroupId(markName);
 
         final int nCitations = citationKeys.size();
         final int last = nCitations - 1;
@@ -231,7 +242,7 @@ public class Backend52 {
          */
         boolean withoutBrackets = (citationType == CitationType.INVISIBLE_CIT);
         NamedRange namedRange =
-            this.citationStorageManager.nrmCreate(doc, refMarkName, position, insertSpaceAfter,
+            this.citationStorageManager.nrmCreate(doc, markName, position, insertSpaceAfter,
                                                   withoutBrackets);
 
         switch (dataModel) {
@@ -240,15 +251,15 @@ public class Backend52 {
 
             if (pageInfo.isPresent()) {
                 String pageInfoString = OOText.toString(pageInfo.get());
-                UnoUserDefinedProperty.setStringProperty(doc, refMarkName, pageInfoString);
+                UnoUserDefinedProperty.setStringProperty(doc, markName, pageInfoString);
             } else {
                 // do not inherit from trash
-                UnoUserDefinedProperty.removeIfExists(doc, refMarkName);
+                UnoUserDefinedProperty.removeIfExists(doc, markName);
             }
             CitationGroup group = new CitationGroup(OODataModel.JabRef52,
                                                     groupId,
                                                     citationType, citations,
-                                                    Optional.of(refMarkName));
+                                                    Optional.of(markName));
             this.cgidToNamedRange.put(groupId, namedRange);
             return group;
         default:
