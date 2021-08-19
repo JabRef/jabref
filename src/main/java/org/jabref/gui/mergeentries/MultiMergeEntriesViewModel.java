@@ -26,6 +26,8 @@ public class MultiMergeEntriesViewModel extends AbstractViewModel {
 
     private final ObjectProperty<BibEntry> mergedEntry = new SimpleObjectProperty<>(new BibEntry());
 
+    private final ListProperty<String> failedSuppliers = new SimpleListProperty<>(FXCollections.observableArrayList());
+
     public void addSource(Entry entryColumn) {
         if (!entryColumn.isLoading.getValue()) {
             updateFields(entryColumn.entry.get());
@@ -33,6 +35,9 @@ public class MultiMergeEntriesViewModel extends AbstractViewModel {
             entryColumn.isLoading.addListener((observable, oldValue, newValue) -> {
                 if (!newValue) {
                     updateFields(entryColumn.entry.get());
+                    if (entryColumn.entryProperty().get() == null) {
+                        failedSuppliers.add(entryColumn.titleProperty().get());
+                    }
                 }
             });
         }
@@ -40,6 +45,9 @@ public class MultiMergeEntriesViewModel extends AbstractViewModel {
     }
 
     public void updateFields(BibEntry entry) {
+        if (entry == null) {
+            return;
+        }
         for (Map.Entry<Field, String> fieldEntry : entry.getFieldMap().entrySet()) {
             // make sure there is a row for the field
             if (!mergedEntry.get().getFieldsObservable().containsKey(fieldEntry.getKey())) {
@@ -61,6 +69,10 @@ public class MultiMergeEntriesViewModel extends AbstractViewModel {
 
     public ObjectProperty<BibEntry> mergedEntryProperty() {
         return mergedEntry;
+    }
+
+    public ListProperty<String> failedSuppliersProperty() {
+        return failedSuppliers;
     }
 
     public static class Entry {

@@ -9,6 +9,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.BiPredicate;
+import java.util.function.Supplier;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
@@ -40,6 +41,8 @@ import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.externalfiles.LinkedFileHandler;
+import org.jabref.logic.importer.Importer;
+import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fetcher.GrobidCitationFetcher;
 import org.jabref.logic.importer.fileformat.PdfContentImporter;
 import org.jabref.logic.importer.fileformat.PdfEmbeddedBibFileImporter;
@@ -546,15 +549,29 @@ public class LinkedFileViewModel extends AbstractViewModel {
         linkedFile.findIn(databaseContext, preferences.getFilePreferences()).ifPresent(filePath -> {
             MultiMergeEntriesView dialog = new MultiMergeEntriesView(preferences, taskExecutor);
             dialog.addSource(Localization.lang("Entry"), entry);
-            dialog.addSource("Grobid", () -> new PdfGrobidImporter(GrobidCitationFetcher.GROBID_URL, preferences.getImportFormatPreferences()).importDatabase(filePath, preferences.getDefaultEncoding()).getDatabase().getEntries().get(0));
-            dialog.addSource(Localization.lang("Embedded"), () -> new PdfEmbeddedBibFileImporter(preferences.getImportFormatPreferences()).importDatabase(filePath, preferences.getDefaultEncoding()).getDatabase().getEntries().get(0));
-            dialog.addSource(Localization.lang("XMP metadata"), () -> new PdfXmpImporter(preferences.getXmpPreferences()).importDatabase(filePath, preferences.getDefaultEncoding()).getDatabase().getEntries().get(0));
-            dialog.addSource(Localization.lang("Verbatim"), () -> new PdfVerbatimBibTextImporter(preferences.getImportFormatPreferences()).importDatabase(filePath, preferences.getDefaultEncoding()).getDatabase().getEntries().get(0));
-            dialog.addSource(Localization.lang("Content"), () -> new PdfContentImporter(preferences.getImportFormatPreferences()).importDatabase(filePath, preferences.getDefaultEncoding()).getDatabase().getEntries().get(0));
+            dialog.addSource("Grobid", wrapImporterToSupplier(new PdfGrobidImporter(GrobidCitationFetcher.GROBID_URL, preferences.getImportFormatPreferences()), filePath));
+            dialog.addSource(Localization.lang("Embedded"), wrapImporterToSupplier(new PdfEmbeddedBibFileImporter(preferences.getImportFormatPreferences()), filePath));
+            dialog.addSource(Localization.lang("XMP metadata"), wrapImporterToSupplier(new PdfXmpImporter(preferences.getXmpPreferences()), filePath));
+            dialog.addSource(Localization.lang("Verbatim"), wrapImporterToSupplier(new PdfVerbatimBibTextImporter(preferences.getImportFormatPreferences()), filePath));
+            dialog.addSource(Localization.lang("Content"), wrapImporterToSupplier(new PdfContentImporter(preferences.getImportFormatPreferences()), filePath));
             dialog.showAndWait().ifPresent(newEntry -> {
                 databaseContext.getDatabase().removeEntry(entry);
                 databaseContext.getDatabase().insertEntry(newEntry);
             });
         });
+    }
+
+    private Supplier<BibEntry> wrapImporterToSupplier(Importer importer, Path filePath) {
+        return () -> {
+            try {
+                ParserResult parserResult = importer.importDatabase(filePath, preferences.getDefaultEncoding());
+                if (parserResult.isInvalid() || parserResult.isEmpty() || !parserResult.getDatabase().hasEntries()) {
+                    return null;
+                }
+                return parserResult.getDatabase().getEntries().get(0);
+            } catch (IOException e) {
+                return null;
+            }
+        };
     }
 }

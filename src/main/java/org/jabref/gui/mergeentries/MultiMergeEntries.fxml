@@ -45,6 +45,7 @@
                     </ScrollPane>
                 </VBox>
             </SplitPane>
+            <Label fx:id="failedSuppliers"/>
             <HBox styleClass="box">
                 <Label text="%Show diff" prefHeight="${diffMode.height}"/>
                 <ComboBox fx:id="diffMode"/>

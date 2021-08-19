@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
@@ -74,6 +75,7 @@ public class MultiMergeEntriesView extends BaseDialog<BibEntry> {
     @FXML private ScrollPane rightScrollPane;
     @FXML private VBox fieldEditor;
 
+    @FXML private Label failedSuppliers;
     @FXML private ComboBox<MergeEntries.DiffMode> diffMode;
 
     private final ToggleGroup headerToggleGroup = new ToggleGroup();
@@ -124,6 +126,10 @@ public class MultiMergeEntriesView extends BaseDialog<BibEntry> {
         topScrollPane.hvalueProperty().bindBidirectional(centerScrollPane.hvalueProperty());
         leftScrollPane.vvalueProperty().bindBidirectional(centerScrollPane.vvalueProperty());
         rightScrollPane.vvalueProperty().bindBidirectional(centerScrollPane.vvalueProperty());
+
+        viewModel.failedSuppliersProperty().addListener((obs, oldValue, newValue) -> {
+            failedSuppliers.setText(viewModel.failedSuppliersProperty().get().isEmpty() ? "" : Localization.lang("Could not extract Metadata from: %0", viewModel.failedSuppliersProperty().stream().collect(Collectors.joining(", "))));
+        });
 
         fillDiffModes();
     }
@@ -190,6 +196,11 @@ public class MultiMergeEntriesView extends BaseDialog<BibEntry> {
         column.isLoadingProperty().addListener((obs, oldValue, newValue) -> {
             if (!newValue) {
                 header.setGraphic(null);
+                if (column.entryProperty().get() == null) {
+                    header.setMinWidth(0);
+                    header.setMaxWidth(0);
+                    header.setVisible(false);
+                }
             }
         });
 
