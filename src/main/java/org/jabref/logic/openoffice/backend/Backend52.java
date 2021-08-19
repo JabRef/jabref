@@ -286,19 +286,19 @@ public class Backend52 {
                                                                   Backend52::getPageInfoFromData);
 
                 // Try to do something of the pageInfos.
-                String cgPageInfo = (pageInfos.stream()
-                                     .filter(pi -> pi.isPresent())
-                                     .map(pi -> OOText.toString(pi.get()))
-                                     .distinct()
-                                     .collect(Collectors.joining("; ")));
+                String singlePageInfo = (pageInfos.stream()
+                                         .filter(pi -> pi.isPresent())
+                                         .map(pi -> OOText.toString(pi.get()))
+                                         .distinct()
+                                         .collect(Collectors.joining("; ")));
 
                 int totalCitations = (joinableGroup.stream()
                                       .map(CitationGroup::numberOfCitations)
                                       .mapToInt(Integer::intValue).sum());
-                if ("".equals(cgPageInfo)) {
-                    cgPageInfo = null;
+                if ("".equals(singlePageInfo)) {
+                    singlePageInfo = null;
                 }
-                return OODataModel.fakePageInfos(cgPageInfo, totalCitations);
+                return OODataModel.fakePageInfos(singlePageInfo, totalCitations);
 
             case JabRef60:
                 return (joinableGroup.stream()
