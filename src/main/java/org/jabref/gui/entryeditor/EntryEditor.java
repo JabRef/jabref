@@ -45,6 +45,7 @@ import org.jabref.logic.TypedBibEntry;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.EntryBasedFetcher;
 import org.jabref.logic.importer.WebFetchers;
+import org.jabref.logic.importer.fileformat.PdfMergeMetadataImporter;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
@@ -360,6 +361,22 @@ public class EntryEditor extends BorderPane {
             fetcherMenuItem.setOnAction(event -> fetchAndMerge(fetcher));
             fetcherMenu.getItems().add(fetcherMenuItem);
         }
+        // Treat the PdfMergeMetadataImporter separately since if the use never accepted or disabled grobid, we ask to enable it
+        MenuItem pdfMergeMetadataImporterMenuItem = new MenuItem("PDFmergemetadata");
+        pdfMergeMetadataImporterMenuItem.setOnAction(event -> {
+            if (!preferencesService.getImportSettingsPreferences().isGrobidEnabled() && !preferencesService.getImportSettingsPreferences().isGrobidOptOut()) {
+                boolean confirmGrobidUsage = dialogService.showConfirmationDialogWithOptOutAndWait(
+                        "Remote services",
+                        "Allow sending PDF files and raw citation strings to a JabRef online service (Grobid) to determine Metadata",
+                        "Use other importers instead",
+                        (optOut) -> preferencesService.storeImportSettingsPreferences(preferencesService.getImportSettingsPreferences().withGrobidOptOut(optOut))
+                );
+                preferencesService.storeImportSettingsPreferences(preferencesService.getImportSettingsPreferences().withGrobidEnabled(confirmGrobidUsage));
+            }
+            PdfMergeMetadataImporter.EntryBasedFetcherWrapper pdfMergeMetadataImporter= new PdfMergeMetadataImporter.EntryBasedFetcherWrapper(preferencesService.getImportSettingsPreferences(), preferencesService.getImportFormatPreferences(), preferencesService.getFilePreferences(), databaseContext, preferencesService.getDefaultEncoding());
+            fetchAndMerge(pdfMergeMetadataImporter);
+        });
+        fetcherMenu.getItems().add(pdfMergeMetadataImporterMenuItem);
         fetcherButton.setOnMouseClicked(event -> fetcherMenu.show(fetcherButton, Side.RIGHT, 0, 0));
     }
 

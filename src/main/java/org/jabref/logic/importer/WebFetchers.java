@@ -146,7 +146,6 @@ public class WebFetchers {
         set.add(new MathSciNet(importFormatPreferences));
         set.add(new CrossRef());
         set.add(new ZbMATH(importFormatPreferences));
-        set.add(new PdfMergeMetadataImporter.EntryBasedFetcherWrapper(importSettingsPreferences, importFormatPreferences, filePreferences, databaseContext, defaultEncoding));
         return set;
     }
 
