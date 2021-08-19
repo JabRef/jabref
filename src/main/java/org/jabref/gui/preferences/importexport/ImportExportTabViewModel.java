@@ -78,7 +78,7 @@ public class ImportExportTabViewModel implements PreferenceTabViewModel {
     @Override
     public void storeSettings() {
         preferencesService.storeImportSettingsPreferences(new ImportSettingsPreferences(
-                generateKeyOnImportProperty.getValue(), grobidEnabledProperty.getValue(), grobidURLProperty.getValue()));
+                generateKeyOnImportProperty.getValue(), grobidEnabledProperty.getValue(), preferencesService.getImportSettingsPreferences().isGrobidOptOut(), grobidURLProperty.getValue()));
 
         preferencesService.storeDOIPreferences(new DOIPreferences(
                 useCustomDOIProperty.getValue(),
