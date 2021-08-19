@@ -264,8 +264,10 @@ public class Backend52 {
                                                     Optional.of(markName));
             this.cgidToNamedRange.put(groupId, namedRange);
             return group;
+        case JabRef60:
+            throw new IllegalStateException("createCitationGroup for JabRef60 is not implemented yet");
         default:
-            throw new IllegalStateException("Backend52 requires JabRef52 dataModel");
+            throw new IllegalStateException("Unhandled dataModel in Backend52.createCitationGroup");
         }
     }
 
