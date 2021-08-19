@@ -1,6 +1,5 @@
 package org.jabref.logic.openoffice.backend;
 
-import java.lang.StringBuilder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
