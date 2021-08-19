@@ -208,12 +208,12 @@ public class Backend52 {
 
         CitationGroupId groupId = new CitationGroupId(markName);
 
-        final int nCitations = citationKeys.size();
-        final int last = nCitations - 1;
+        final int numberOfCitations = citationKeys.size();
+        final int last = numberOfCitations - 1;
 
         // Build citations, add pageInfo to each citation
-        List<Citation> citations = new ArrayList<>(nCitations);
-        for (int i = 0; i < nCitations; i++) {
+        List<Citation> citations = new ArrayList<>(numberOfCitations);
+        for (int i = 0; i < numberOfCitations; i++) {
             Citation cit = new Citation(citationKeys.get(i));
             citations.add(cit);
 
@@ -288,13 +288,13 @@ public class Backend52 {
                                  .distinct()
                                  .collect(Collectors.joining("; ")));
 
-            int nCitations = (joinableGroup.stream()
-                              .map(CitationGroup::numberOfCitations)
-                              .mapToInt(Integer::intValue).sum());
+            int totalCitations = (joinableGroup.stream()
+                                  .map(CitationGroup::numberOfCitations)
+                                  .mapToInt(Integer::intValue).sum());
             if ("".equals(cgPageInfo)) {
                 cgPageInfo = null;
             }
-            return OODataModel.fakePageInfos(cgPageInfo, nCitations);
+            return OODataModel.fakePageInfos(cgPageInfo, totalCitations);
 
         case JabRef60:
             return (joinableGroup.stream()
