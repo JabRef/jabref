@@ -52,27 +52,27 @@ class Codec52 {
      */
     private static CitationType citationTypeFromInt(int i) {
         switch (i) {
-        case 1:
-            return CitationType.AUTHORYEAR_PAR;
-        case 2:
-            return CitationType.AUTHORYEAR_INTEXT;
-        case 3:
-            return CitationType.INVISIBLE_CIT;
-        default:
-            throw new IllegalArgumentException("Invalid CitationType code");
+            case 1:
+                return CitationType.AUTHORYEAR_PAR;
+            case 2:
+                return CitationType.AUTHORYEAR_INTEXT;
+            case 3:
+                return CitationType.INVISIBLE_CIT;
+            default:
+                throw new IllegalArgumentException("Invalid CitationType code");
         }
     }
 
     private static int citationTypeToInt(CitationType i) {
         switch (i) {
-        case AUTHORYEAR_PAR:
-            return 1;
-        case AUTHORYEAR_INTEXT:
-            return 2;
-        case INVISIBLE_CIT:
-            return 3;
-        default:
-            throw new IllegalArgumentException("Invalid CitationType");
+            case AUTHORYEAR_PAR:
+                return 1;
+            case AUTHORYEAR_INTEXT:
+                return 2;
+            case INVISIBLE_CIT:
+                return 3;
+            default:
+                throw new IllegalArgumentException("Invalid CitationType");
         }
     }
 

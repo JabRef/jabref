@@ -219,21 +219,21 @@ public class Backend52 {
 
             Optional<OOText> pageInfo = PageInfo.normalizePageInfo(pageInfos.get(i));
             switch (dataModel) {
-            case JabRef52:
-                if (i == last) {
-                    cit.setPageInfo(pageInfo);
-                } else {
-                    if (pageInfo.isPresent()) {
-                        LOGGER.warn("dataModel JabRef52"
-                                    + " only supports pageInfo for the last citation of a group");
+                case JabRef52:
+                    if (i == last) {
+                        cit.setPageInfo(pageInfo);
+                    } else {
+                        if (pageInfo.isPresent()) {
+                            LOGGER.warn("dataModel JabRef52"
+                                        + " only supports pageInfo for the last citation of a group");
+                        }
                     }
-                }
-                break;
-            case JabRef60:
-                cit.setPageInfo(pageInfo);
-                break;
-            default:
-                throw new IllegalStateException("Unhandled dataModel in Backend52.createCitationGroup");
+                    break;
+                case JabRef60:
+                    cit.setPageInfo(pageInfo);
+                    break;
+                default:
+                    throw new IllegalStateException("Unhandled dataModel in Backend52.createCitationGroup");
             }
         }
 
@@ -248,26 +248,26 @@ public class Backend52 {
                                                                       withoutBrackets);
 
         switch (dataModel) {
-        case JabRef52:
-            Optional<OOText> pageInfo = PageInfo.normalizePageInfo(pageInfos.get(last));
+            case JabRef52:
+                Optional<OOText> pageInfo = PageInfo.normalizePageInfo(pageInfos.get(last));
 
-            if (pageInfo.isPresent()) {
-                String pageInfoString = OOText.toString(pageInfo.get());
-                UnoUserDefinedProperty.setStringProperty(doc, markName, pageInfoString);
-            } else {
-                // do not inherit from trash
-                UnoUserDefinedProperty.removeIfExists(doc, markName);
-            }
-            CitationGroup group = new CitationGroup(OODataModel.JabRef52,
-                                                    groupId,
-                                                    citationType, citations,
-                                                    Optional.of(markName));
-            this.cgidToNamedRange.put(groupId, namedRange);
-            return group;
-        case JabRef60:
-            throw new IllegalStateException("createCitationGroup for JabRef60 is not implemented yet");
-        default:
-            throw new IllegalStateException("Unhandled dataModel in Backend52.createCitationGroup");
+                if (pageInfo.isPresent()) {
+                    String pageInfoString = OOText.toString(pageInfo.get());
+                    UnoUserDefinedProperty.setStringProperty(doc, markName, pageInfoString);
+                } else {
+                    // do not inherit from trash
+                    UnoUserDefinedProperty.removeIfExists(doc, markName);
+                }
+                CitationGroup group = new CitationGroup(OODataModel.JabRef52,
+                                                        groupId,
+                                                        citationType, citations,
+                                                        Optional.of(markName));
+                this.cgidToNamedRange.put(groupId, namedRange);
+                return group;
+            case JabRef60:
+                throw new IllegalStateException("createCitationGroup for JabRef60 is not implemented yet");
+            default:
+                throw new IllegalStateException("Unhandled dataModel in Backend52.createCitationGroup");
         }
     }
 
@@ -280,33 +280,33 @@ public class Backend52 {
     public static List<Optional<OOText>>
     combinePageInfosCommon(OODataModel dataModel, List<CitationGroup> joinableGroup) {
         switch (dataModel) {
-        case JabRef52:
-            // collect to cgPageInfos
-            List<Optional<OOText>> cgPageInfos = OOListUtil.map(joinableGroup,
-                                                                Backend52::getPageInfoFromData);
+            case JabRef52:
+                // collect to cgPageInfos
+                List<Optional<OOText>> cgPageInfos = OOListUtil.map(joinableGroup,
+                                                                    Backend52::getPageInfoFromData);
 
-            // Try to do something of the cgPageInfos.
-            String cgPageInfo = (cgPageInfos.stream()
-                                 .filter(pi -> pi.isPresent())
-                                 .map(pi -> OOText.toString(pi.get()))
-                                 .distinct()
-                                 .collect(Collectors.joining("; ")));
+                // Try to do something of the cgPageInfos.
+                String cgPageInfo = (cgPageInfos.stream()
+                                     .filter(pi -> pi.isPresent())
+                                     .map(pi -> OOText.toString(pi.get()))
+                                     .distinct()
+                                     .collect(Collectors.joining("; ")));
 
-            int totalCitations = (joinableGroup.stream()
-                                  .map(CitationGroup::numberOfCitations)
-                                  .mapToInt(Integer::intValue).sum());
-            if ("".equals(cgPageInfo)) {
-                cgPageInfo = null;
-            }
-            return OODataModel.fakePageInfos(cgPageInfo, totalCitations);
+                int totalCitations = (joinableGroup.stream()
+                                      .map(CitationGroup::numberOfCitations)
+                                      .mapToInt(Integer::intValue).sum());
+                if ("".equals(cgPageInfo)) {
+                    cgPageInfo = null;
+                }
+                return OODataModel.fakePageInfos(cgPageInfo, totalCitations);
 
-        case JabRef60:
-            return (joinableGroup.stream()
-                    .flatMap(group -> (group.citationsInStorageOrder.stream()
-                                       .map(Citation::getPageInfo)))
-                    .collect(Collectors.toList()));
-        default:
-            throw new IllegalArgumentException("unhandled dataModel here");
+            case JabRef60:
+                return (joinableGroup.stream()
+                        .flatMap(group -> (group.citationsInStorageOrder.stream()
+                                           .map(Citation::getPageInfo)))
+                        .collect(Collectors.toList()));
+            default:
+                throw new IllegalArgumentException("unhandled dataModel here");
         }
     }
 
@@ -389,29 +389,29 @@ public class Backend52 {
         NoDocumentException {
 
         switch (dataModel) {
-        case JabRef52:
-            // One context per CitationGroup: Backend52 (DataModel.JabRef52)
-            // For DataModel.JabRef60 (Backend60) we need one context per Citation
-            List<CitationEntry> citations = new ArrayList<>(cgs.numberOfCitationGroups());
-            for (CitationGroup group : cgs.getCitationGroupsUnordered()) {
-                String name = group.groupId.citationGroupIdAsString();
-                XTextCursor cursor = (this
-                                      .getRawCursorForCitationGroup(group, doc)
-                                      .orElseThrow(IllegalStateException::new));
-                String context = GetContext.getCursorStringWithContext(cursor, 30, 30, true);
-                Optional<String> pageInfo = (group.numberOfCitations() > 0
-                                             ? (getPageInfoFromData(group)
-                                                .map(e -> OOText.toString(e)))
-                                             : Optional.empty());
-                CitationEntry entry = new CitationEntry(name, context, pageInfo);
-                citations.add(entry);
-            }
-            return citations;
-        case JabRef60:
-            // xx
-            throw new IllegalStateException("getCitationEntries for JabRef60 is not implemented yet");
-        default:
-            throw new IllegalStateException("getCitationEntries: unhandled dataModel ");
+            case JabRef52:
+                // One context per CitationGroup: Backend52 (DataModel.JabRef52)
+                // For DataModel.JabRef60 (Backend60) we need one context per Citation
+                List<CitationEntry> citations = new ArrayList<>(cgs.numberOfCitationGroups());
+                for (CitationGroup group : cgs.getCitationGroupsUnordered()) {
+                    String name = group.groupId.citationGroupIdAsString();
+                    XTextCursor cursor = (this
+                                          .getRawCursorForCitationGroup(group, doc)
+                                          .orElseThrow(IllegalStateException::new));
+                    String context = GetContext.getCursorStringWithContext(cursor, 30, 30, true);
+                    Optional<String> pageInfo = (group.numberOfCitations() > 0
+                                                 ? (getPageInfoFromData(group)
+                                                    .map(e -> OOText.toString(e)))
+                                                 : Optional.empty());
+                    CitationEntry entry = new CitationEntry(name, context, pageInfo);
+                    citations.add(entry);
+                }
+                return citations;
+            case JabRef60:
+                // xx
+                throw new IllegalStateException("getCitationEntries for JabRef60 is not implemented yet");
+            default:
+                throw new IllegalStateException("getCitationEntries: unhandled dataModel ");
         }
     }
 
@@ -426,21 +426,21 @@ public class Backend52 {
         WrappedTargetException {
 
         switch (dataModel) {
-        case JabRef52:
-            for (CitationEntry entry : citationEntries) {
-                Optional<OOText> pageInfo = entry.getPageInfo().map(OOText::fromString);
-                pageInfo = PageInfo.normalizePageInfo(pageInfo);
-                if (pageInfo.isPresent()) {
-                    String name = entry.getRefMarkName();
-                    UnoUserDefinedProperty.setStringProperty(doc, name, pageInfo.get().toString());
+            case JabRef52:
+                for (CitationEntry entry : citationEntries) {
+                    Optional<OOText> pageInfo = entry.getPageInfo().map(OOText::fromString);
+                    pageInfo = PageInfo.normalizePageInfo(pageInfo);
+                    if (pageInfo.isPresent()) {
+                        String name = entry.getRefMarkName();
+                        UnoUserDefinedProperty.setStringProperty(doc, name, pageInfo.get().toString());
+                    }
                 }
-            }
-            break;
-        case JabRef60:
-            // xx
-            throw new IllegalStateException("applyCitationEntries for JabRef60 is not implemented yet");
-        default:
-            throw new IllegalStateException("applyCitationEntries: unhandled dataModel ");
+                break;
+            case JabRef60:
+                // xx
+                throw new IllegalStateException("applyCitationEntries for JabRef60 is not implemented yet");
+            default:
+                throw new IllegalStateException("applyCitationEntries: unhandled dataModel ");
         }
     }
 
