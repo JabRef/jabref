@@ -92,7 +92,8 @@ class Codec52 {
                                            List<String> citationKeys,
                                            CitationType citationType) {
 
-        String citationKeysPart = citationKeys.stream().collect(Collectors.joining(","));
+        String citationKeysPart =  String.join(",", citationKeys);
+
         int i = 0;
         int citTypeCode = citationTypeToInt(citationType);
         String name = BIB_CITATION + '_' + citTypeCode + '_' + citationKeysPart;
