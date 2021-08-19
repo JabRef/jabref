@@ -79,7 +79,7 @@ public class Backend52 {
                                                        List<String> citationGroupNames) {
 
         // Collect unused jabrefPropertyNames
-        Set<String> citationGroupNamesSet = citationGroupNames.stream().collect(Collectors.toSet());
+        Set<String> citationGroupNamesSet = new HashSet<>(citationGroupNames);
 
         List<String> pageInfoThrash = new ArrayList<>();
         List<String> jabrefPropertyNames =
