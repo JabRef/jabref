@@ -187,7 +187,7 @@ public class Backend52 {
 
         Objects.requireNonNull(pageInfos);
         if (pageInfos.size() != citationKeys.size()) {
-            throw new IllegalArgumentException("pageInfos.size != citationKeys.size");
+            throw new IllegalArgumentException();
         }
 
         // Get a new refMarkName
