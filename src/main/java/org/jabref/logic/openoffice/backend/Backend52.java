@@ -148,8 +148,8 @@ public class Backend52 {
 
         setPageInfoInDataInitial(citations, pageInfo);
 
-        Optional<NamedRange> namedRange = (citationStorageManager.nrmGetFromDocument(doc, markName)
-                                           .orElseThrow(IllegalArgumentException::new));
+        NamedRange namedRange = (citationStorageManager.nrmGetFromDocument(doc, markName)
+                                 .orElseThrow(IllegalArgumentException::new));
 
         CitationGroupId groupId = new CitationGroupId(markName);
         CitationGroup cg = new CitationGroup(OODataModel.JabRef52,
@@ -157,8 +157,8 @@ public class Backend52 {
                                              parsed.citationType,
                                              citations,
                                              Optional.of(markName));
-        this.cgidToNamedRange.put(groupId, namedRange.get());
         return cg;
+        this.cgidToNamedRange.put(groupId, namedRange);
     }
 
     /**
