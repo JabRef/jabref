@@ -549,10 +549,10 @@ public class LinkedFileViewModel extends AbstractViewModel {
         linkedFile.findIn(databaseContext, preferences.getFilePreferences()).ifPresent(filePath -> {
             MultiMergeEntriesView dialog = new MultiMergeEntriesView(preferences, taskExecutor);
             dialog.addSource(Localization.lang("Entry"), entry);
-            dialog.addSource("Grobid", wrapImporterToSupplier(new PdfGrobidImporter(GrobidCitationFetcher.GROBID_URL, preferences.getImportFormatPreferences()), filePath));
-            dialog.addSource(Localization.lang("Embedded"), wrapImporterToSupplier(new PdfEmbeddedBibFileImporter(preferences.getImportFormatPreferences()), filePath));
-            dialog.addSource(Localization.lang("XMP metadata"), wrapImporterToSupplier(new PdfXmpImporter(preferences.getXmpPreferences()), filePath));
             dialog.addSource(Localization.lang("Verbatim"), wrapImporterToSupplier(new PdfVerbatimBibTextImporter(preferences.getImportFormatPreferences()), filePath));
+            dialog.addSource(Localization.lang("Embedded"), wrapImporterToSupplier(new PdfEmbeddedBibFileImporter(preferences.getImportFormatPreferences()), filePath));
+            dialog.addSource("Grobid", wrapImporterToSupplier(new PdfGrobidImporter(GrobidCitationFetcher.GROBID_URL, preferences.getImportFormatPreferences()), filePath));
+            dialog.addSource(Localization.lang("XMP metadata"), wrapImporterToSupplier(new PdfXmpImporter(preferences.getXmpPreferences()), filePath));
             dialog.addSource(Localization.lang("Content"), wrapImporterToSupplier(new PdfContentImporter(preferences.getImportFormatPreferences()), filePath));
             dialog.showAndWait().ifPresent(newEntry -> {
                 databaseContext.getDatabase().removeEntry(entry);
