@@ -241,9 +241,11 @@ public class Backend52 {
          * Apply to document
          */
         boolean withoutBrackets = (citationType == CitationType.INVISIBLE_CIT);
-        NamedRange namedRange =
-            this.citationStorageManager.nrmCreate(doc, markName, position, insertSpaceAfter,
-                                                  withoutBrackets);
+        NamedRange namedRange = this.citationStorageManager.nrmCreate(doc,
+                                                                      markName,
+                                                                      position,
+                                                                      insertSpaceAfter,
+                                                                      withoutBrackets);
 
         switch (dataModel) {
         case JabRef52:
