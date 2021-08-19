@@ -78,7 +78,6 @@ public class Backend52 {
     private List<String> findUnusedJabrefPropertyNames(XTextDocument doc,
                                                        List<String> citationGroupNames) {
 
-        // Collect unused jabrefPropertyNames
         Set<String> citationGroupNamesSet = new HashSet<>(citationGroupNames);
 
         List<String> pageInfoThrash = new ArrayList<>();
@@ -104,7 +103,7 @@ public class Backend52 {
         List<String> pageInfoThrash =
             this.findUnusedJabrefPropertyNames(doc, this.getJabRefReferenceMarkNames(doc));
         if (pageInfoThrash.isEmpty()) {
-            return Optional.empty(); // "Backend52: found no unused pageInfo data";
+            return Optional.empty();
         }
 
         StringBuilder msg = new StringBuilder("Backend52: found unused pageInfo data, with names listed below.\n");
