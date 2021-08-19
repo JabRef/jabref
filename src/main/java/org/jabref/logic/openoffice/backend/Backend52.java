@@ -281,12 +281,12 @@ public class Backend52 {
     combinePageInfosCommon(OODataModel dataModel, List<CitationGroup> joinableGroup) {
         switch (dataModel) {
             case JabRef52:
-                // collect to cgPageInfos
-                List<Optional<OOText>> cgPageInfos = OOListUtil.map(joinableGroup,
-                                                                    Backend52::getPageInfoFromData);
+                // collect to pageInfos
+                List<Optional<OOText>> pageInfos = OOListUtil.map(joinableGroup,
+                                                                  Backend52::getPageInfoFromData);
 
-                // Try to do something of the cgPageInfos.
-                String cgPageInfo = (cgPageInfos.stream()
+                // Try to do something of the pageInfos.
+                String cgPageInfo = (pageInfos.stream()
                                      .filter(pi -> pi.isPresent())
                                      .map(pi -> OOText.toString(pi.get()))
                                      .distinct()
