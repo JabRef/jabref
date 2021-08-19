@@ -11,6 +11,7 @@ import java.util.Optional;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
+import org.jabref.logic.importer.importsettings.ImportSettingsPreferences;
 import org.jabref.logic.importer.util.GrobidService;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.BibEntry;
@@ -25,8 +26,8 @@ public class PdfGrobidImporter extends Importer {
     private final GrobidService grobidService;
     private final ImportFormatPreferences importFormatPreferences;
 
-    public PdfGrobidImporter(String grobidServerURL, ImportFormatPreferences importFormatPreferences) {
-        this.grobidService = new GrobidService(grobidServerURL);
+    public PdfGrobidImporter(ImportSettingsPreferences importSettingsPreferences, ImportFormatPreferences importFormatPreferences) {
+        this.grobidService = new GrobidService(importSettingsPreferences);
         this.importFormatPreferences = importFormatPreferences;
     }
 
