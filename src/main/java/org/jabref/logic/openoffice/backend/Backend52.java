@@ -136,10 +136,7 @@ public class Backend52 {
         WrappedTargetException,
         NoDocumentException {
 
-        Optional<Codec52.ParsedMarkName> optionalParsed = Codec52.parseMarkName(markName);
-        Codec52.ParsedMarkName parsed = optionalParsed.orElseThrow(
-            throw new IllegalArgumentException("readCitationGroupFromDocumentOrThrow:"
-                                               + " found unparsable reference mark name"));
+        Codec52.ParsedMarkName parsed = Codec52.parseMarkName(markName).orElseThrow(IllegalArgumentException::new);
 
         List<Citation> citations = (parsed.citationKeys.stream()
                                     .map(Citation::new)
@@ -151,12 +148,8 @@ public class Backend52 {
 
         setPageInfoInDataInitial(citations, pageInfo);
 
-        Optional<NamedRange> namedRange = citationStorageManager.nrmGetFromDocument(doc, markName);
-
-        if (namedRange.isEmpty()) {
-            throw new IllegalArgumentException("readCitationGroupFromDocumentOrThrow:"
-                                               + " reference mark name is not in the document");
-        }
+        Optional<NamedRange> namedRange = (citationStorageManager.nrmGetFromDocument(doc, markName)
+                                           .orElseThrow(IllegalArgumentException::new));
 
         CitationGroupId cgid = new CitationGroupId(markName);
         CitationGroup cg = new CitationGroup(OODataModel.JabRef52,
