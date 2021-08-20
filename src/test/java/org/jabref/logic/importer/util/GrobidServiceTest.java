@@ -12,12 +12,14 @@ import org.jabref.logic.importer.fetcher.GrobidCitationFetcher;
 import org.jabref.logic.importer.fileformat.PdfGrobidImporterTest;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.testutils.category.FetcherTest;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.mockito.Answers;
 
+import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -38,37 +40,36 @@ public class GrobidServiceTest {
     }
 
     @Test
-    public void processValidCitationTest() throws IOException {
-        String expectedResponse =
-                "@article{-1,\n" +
-                "  author = {Derwing, Tracey and Rossiter, Marian and Munro, Murray},\n" +
-                "  title = {Teaching Native Speakers to Listen to Foreign-accented Speech},\n" +
-                "  journal = {Journal of Multilingual and Multicultural Development},\n" +
-                "  publisher = {Informa UK Limited},\n" +
-                "  date = {2002-09},\n" +
-                "  year = {2002},\n" +
-                "  month = {9},\n" +
-                "  pages = {245-259},\n" +
-                "  volume = {23},\n" +
-                "  number = {4},\n" +
-                "  doi = {10.1080/01434630208666468}\n" +
-                "}\n";
-        String response = grobidService.processCitation("Derwing, T. M., Rossiter, M. J., & Munro, " +
+    public void processValidCitationTest() throws IOException, ParseException {
+        BibEntry exampleBibEntry = new BibEntry(StandardEntryType.Article).withCitationKey("-1")
+                                                                                    .withField(StandardField.AUTHOR, "Derwing, Tracey and Rossiter, Marian and Munro, Murray")
+                                                                                    .withField(StandardField.TITLE, "Teaching Native Speakers to Listen to Foreign-accented Speech")
+                                                                                    .withField(StandardField.JOURNAL, "Journal of Multilingual and Multicultural Development")
+                                                                                    .withField(StandardField.DOI, "10.1080/01434630208666468")
+                                                                                    .withField(StandardField.DATE, "2002-09")
+                                                                                    .withField(StandardField.YEAR, "2002")
+                                                                                    .withField(StandardField.MONTH, "9")
+                                                                                    .withField(StandardField.PAGES, "245-259")
+                                                                                    .withField(StandardField.VOLUME, "23")
+                                                                                    .withField(StandardField.PUBLISHER, "Informa UK Limited")
+                                                                                    .withField(StandardField.NUMBER, "4");
+        Optional<BibEntry> response = grobidService.processCitation("Derwing, T. M., Rossiter, M. J., & Munro, " +
                 "M. J. (2002). Teaching native speakers to listen to foreign-accented speech. " +
-                "Journal of Multilingual and Multicultural Development, 23(4), 245-259.", GrobidService.ConsolidateCitations.WITH_METADATA);
-        assertEquals(expectedResponse, response);
+                "Journal of Multilingual and Multicultural Development, 23(4), 245-259.", importFormatPreferences, GrobidService.ConsolidateCitations.WITH_METADATA);
+        assertTrue(response.isPresent());
+        assertEquals(exampleBibEntry, response.get());
     }
 
     @Test
-    public void processEmptyStringTest() throws IOException {
-        String response = grobidService.processCitation(" ", GrobidService.ConsolidateCitations.WITH_METADATA);
+    public void processEmptyStringTest() throws IOException, ParseException {
+        Optional<BibEntry> response = grobidService.processCitation(" ", importFormatPreferences, GrobidService.ConsolidateCitations.WITH_METADATA);
         assertNotNull(response);
-        assertEquals("", response);
+        assertTrue(response.isEmpty());
     }
 
     @Test
     public void processInvalidCitationTest() {
-        assertThrows(IOException.class, () -> grobidService.processCitation("iiiiiiiiiiiiiiiiiiiiiiii", GrobidService.ConsolidateCitations.WITH_METADATA));
+        assertThrows(IOException.class, () -> grobidService.processCitation("iiiiiiiiiiiiiiiiiiiiiiii", importFormatPreferences, GrobidService.ConsolidateCitations.WITH_METADATA));
     }
 
     @Test

@@ -8,12 +8,14 @@ import java.util.stream.Stream;
 
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.util.GrobidService;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.testutils.category.FetcherTest;
 
+import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -116,9 +118,9 @@ public class GrobidCitationFetcherTest {
     }
 
     @Test
-    public void performSearchThrowsExceptionInCaseOfConnectionIssues() throws IOException {
+    public void performSearchThrowsExceptionInCaseOfConnectionIssues() throws IOException, ParseException {
         GrobidService grobidServiceMock = mock(GrobidService.class);
-        when(grobidServiceMock.processCitation(anyString(), any())).thenThrow(new SocketTimeoutException("Timeout"));
+        when(grobidServiceMock.processCitation(anyString(), any(), any())).thenThrow(new SocketTimeoutException("Timeout"));
         grobidCitationFetcher = new GrobidCitationFetcher(importFormatPreferences, grobidServiceMock);
 
         assertThrows(FetcherException.class, () -> {
