@@ -1,8 +1,5 @@
 package org.jabref.logic.openoffice.backend;
 
-import org.jabref.model.openoffice.uno.NoDocumentException;
-
-import com.sun.star.lang.WrappedTargetException;
 import com.sun.star.text.XTextCursor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,10 +31,7 @@ public class GetContext {
     public static String getCursorStringWithContext(XTextCursor cursor,
                                                     int charBefore,
                                                     int charAfter,
-                                                    boolean htmlMarkup)
-        throws
-        WrappedTargetException,
-        NoDocumentException {
+                                                    boolean htmlMarkup) {
 
         String citPart = cursor.getString();
 
