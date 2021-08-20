@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.ScrollPane;
@@ -61,6 +62,7 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
         content = new TextFlow();
         scrollPane = new ScrollPane(content);
         scrollPane.setFitToWidth(true);
+        content.setPadding(new Insets(10));
         setContent(scrollPane);
         setText(Localization.lang("Search results"));
         this.stateManager.activeSearchQueryProperty().addListener((observable, oldValue, newValue) -> bindToEntry(entry));
@@ -102,7 +104,7 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
                 // Iterate through search hits (within file within page)
                 for (SearchResult searchResult : resultsPage.getValue()) {
                     for (String resultTextHtml : searchResult.getContentResultStringsHtml()) {
-                        content.getChildren().addAll(TooltipTextUtil.createTextsFromHtml(resultTextHtml));
+                        content.getChildren().addAll(TooltipTextUtil.createTextsFromHtml(resultTextHtml.replaceAll("</b> <b>", " ")));
                         content.getChildren().add(lineSeparator());
                     }
                     if (!searchResult.getAnnotationsResultStringsHtml().isEmpty()) {
@@ -111,7 +113,7 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
                         content.getChildren().add(annotationsText);
                     }
                     for (String resultTextHtml : searchResult.getAnnotationsResultStringsHtml()) {
-                        content.getChildren().addAll(TooltipTextUtil.createTextsFromHtml(resultTextHtml));
+                        content.getChildren().addAll(TooltipTextUtil.createTextsFromHtml(resultTextHtml.replaceAll("</b> <b>", " ")));
                         content.getChildren().add(lineSeparator());
                     }
                 }
