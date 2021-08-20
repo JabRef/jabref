@@ -137,7 +137,7 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
     }
 
     private Text createPageLink(int pageNumber) {
-        Text pageLink = new Text(System.lineSeparator() + Localization.lang("On page %0", pageNumber) + System.lineSeparator() + System.lineSeparator()); // tooltip with absolute path?
+        Text pageLink = new Text(System.lineSeparator() + Localization.lang("On page %0", pageNumber) + System.lineSeparator() + System.lineSeparator());
         pageLink.setStyle("-fx-font-style: italic; -fx-font-weight: bold;");
         return pageLink;
     }
