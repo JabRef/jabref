@@ -46,7 +46,6 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
     private final DialogService dialogService;
     private final ActionFactory actionFactory;
 
-    private final ScrollPane scrollPane;
     private final TextFlow content;
 
     private BibEntry entry;
@@ -60,7 +59,7 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
         this.actionFactory = new ActionFactory(preferencesService.getKeyBindingRepository());
 
         content = new TextFlow();
-        scrollPane = new ScrollPane(content);
+        ScrollPane scrollPane = new ScrollPane(content);
         scrollPane.setFitToWidth(true);
         content.setPadding(new Insets(10));
         setContent(scrollPane);

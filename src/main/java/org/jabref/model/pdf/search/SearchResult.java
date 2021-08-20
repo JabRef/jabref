@@ -27,8 +27,6 @@ import static org.jabref.model.pdf.search.SearchFieldConstants.PATH;
 public final class SearchResult {
 
     private final String path;
-    private final String content;
-    private final String annotations;
 
     private final int pageNumber;
     private final long modified;
@@ -39,11 +37,12 @@ public final class SearchResult {
 
     public SearchResult(IndexSearcher searcher, Query query, ScoreDoc scoreDoc) throws IOException {
         this.path = getFieldContents(searcher, scoreDoc, PATH);
-        this.content = getFieldContents(searcher, scoreDoc, CONTENT);
-        this.annotations = getFieldContents(searcher, scoreDoc, ANNOTATIONS);
         this.pageNumber = Integer.parseInt(getFieldContents(searcher, scoreDoc, PAGE_NUMBER));
         this.modified = Long.parseLong(getFieldContents(searcher, scoreDoc, MODIFIED));
         this.luceneScore = scoreDoc.score;
+
+        String content = getFieldContents(searcher, scoreDoc, CONTENT);
+        String annotations = getFieldContents(searcher, scoreDoc, ANNOTATIONS);
 
         Highlighter highlighter = new Highlighter(new SimpleHTMLFormatter("<b>", "</b>"), new QueryScorer(query));
 
@@ -78,10 +77,6 @@ public final class SearchResult {
 
     public String getPath() {
         return path;
-    }
-
-    public String getContent() {
-        return content;
     }
 
     public long getModified() {
