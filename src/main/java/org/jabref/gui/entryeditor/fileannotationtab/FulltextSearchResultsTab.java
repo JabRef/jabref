@@ -98,13 +98,12 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
 
             // Iterate through pages (within file) with search hits
             for (Map.Entry<Integer, List<SearchResult>> resultsPage : resultsPath.getValue().entrySet()) {
-                content.getChildren().addAll(createPageLink(resultsPage.getKey()), lineSeparator());
 
                 // Iterate through search hits (within file within page)
                 for (SearchResult searchResult : resultsPage.getValue()) {
                     for (String resultTextHtml : searchResult.getContentResultStringsHtml()) {
                         content.getChildren().addAll(TooltipTextUtil.createTextsFromHtml(resultTextHtml.replaceAll("</b> <b>", " ")));
-                        content.getChildren().add(lineSeparator());
+                        content.getChildren().addAll(new Text(System.lineSeparator()), lineSeparator(0.8), createPageLink(resultsPage.getKey()));
                     }
                     if (!searchResult.getAnnotationsResultStringsHtml().isEmpty()) {
                         Text annotationsText = new Text(System.lineSeparator() + Localization.lang("Found matches in Annotations:") + System.lineSeparator() + System.lineSeparator());
@@ -113,7 +112,7 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
                     }
                     for (String resultTextHtml : searchResult.getAnnotationsResultStringsHtml()) {
                         content.getChildren().addAll(TooltipTextUtil.createTextsFromHtml(resultTextHtml.replaceAll("</b> <b>", " ")));
-                        content.getChildren().add(lineSeparator());
+                        content.getChildren().addAll(new Text(System.lineSeparator()), lineSeparator(0.8), createPageLink(resultsPage.getKey()));
                     }
                 }
             }
@@ -144,7 +143,7 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
     }
 
     private Text createPageLink(int pageNumber) {
-        Text pageLink = new Text(System.lineSeparator() + Localization.lang("On page %0", pageNumber) + System.lineSeparator() + System.lineSeparator());
+        Text pageLink = new Text(Localization.lang("On page %0", pageNumber) + System.lineSeparator() + System.lineSeparator());
         pageLink.setStyle("-fx-font-style: italic; -fx-font-weight: bold;");
 
         pageLink.setOnMouseClicked(event -> {
@@ -165,8 +164,12 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
     }
 
     private Separator lineSeparator() {
+        return lineSeparator(1.0);
+    }
+
+    private Separator lineSeparator(double widthMultiplier) {
         Separator lineSeparator = new Separator(Orientation.HORIZONTAL);
-        lineSeparator.prefWidthProperty().bind(content.widthProperty());
+        lineSeparator.prefWidthProperty().bind(content.widthProperty().multiply(widthMultiplier));
         lineSeparator.setPrefHeight(15);
         return lineSeparator;
     }
