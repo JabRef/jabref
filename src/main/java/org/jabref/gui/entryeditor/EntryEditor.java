@@ -35,6 +35,7 @@ import org.jabref.gui.entryeditor.fileannotationtab.FulltextSearchResultsTab;
 import org.jabref.gui.externalfiles.ExternalFilesEntryLinker;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.help.HelpAction;
+import org.jabref.gui.importer.fetcher.GrobidOptInDialog;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.menus.ChangeEntryTypeMenu;
 import org.jabref.gui.mergeentries.FetchAndMergeEntry;
@@ -358,25 +359,19 @@ public class EntryEditor extends BorderPane {
         ContextMenu fetcherMenu = new ContextMenu();
         for (EntryBasedFetcher fetcher : WebFetchers.getEntryBasedFetchers(preferencesService.getImportSettingsPreferences(), preferencesService.getImportFormatPreferences(), preferencesService.getFilePreferences(), databaseContext, preferencesService.getDefaultEncoding())) {
             MenuItem fetcherMenuItem = new MenuItem(fetcher.getName());
-            fetcherMenuItem.setOnAction(event -> fetchAndMerge(fetcher));
+            if (fetcher instanceof PdfMergeMetadataImporter.EntryBasedFetcherWrapper) {
+                // Handle Grobid Opt-In in case of the PdfMergeMetadataImporter
+                fetcherMenuItem.setOnAction(event -> {
+                    GrobidOptInDialog.showAndWaitIfUserIsUndecided(dialogService);
+                    PdfMergeMetadataImporter.EntryBasedFetcherWrapper pdfMergeMetadataImporter = new PdfMergeMetadataImporter.EntryBasedFetcherWrapper(preferencesService.getImportSettingsPreferences(), preferencesService.getImportFormatPreferences(), preferencesService.getFilePreferences(), databaseContext, preferencesService.getDefaultEncoding());
+                    fetchAndMerge(pdfMergeMetadataImporter);
+                });
+            } else {
+                fetcherMenuItem.setOnAction(event -> fetchAndMerge(fetcher));
+            }
             fetcherMenu.getItems().add(fetcherMenuItem);
         }
-        // Treat the PdfMergeMetadataImporter separately since if the use never accepted or disabled grobid, we ask to enable it
-        MenuItem pdfMergeMetadataImporterMenuItem = new MenuItem("PDFmergemetadata");
-        pdfMergeMetadataImporterMenuItem.setOnAction(event -> {
-            if (!preferencesService.getImportSettingsPreferences().isGrobidEnabled() && !preferencesService.getImportSettingsPreferences().isGrobidOptOut()) {
-                boolean confirmGrobidUsage = dialogService.showConfirmationDialogWithOptOutAndWait(
-                        "Remote services",
-                        "Allow sending PDF files and raw citation strings to a JabRef online service (Grobid) to determine Metadata",
-                        "Use other importers instead",
-                        (optOut) -> preferencesService.storeImportSettingsPreferences(preferencesService.getImportSettingsPreferences().withGrobidOptOut(optOut))
-                );
-                preferencesService.storeImportSettingsPreferences(preferencesService.getImportSettingsPreferences().withGrobidEnabled(confirmGrobidUsage));
-            }
-            PdfMergeMetadataImporter.EntryBasedFetcherWrapper pdfMergeMetadataImporter= new PdfMergeMetadataImporter.EntryBasedFetcherWrapper(preferencesService.getImportSettingsPreferences(), preferencesService.getImportFormatPreferences(), preferencesService.getFilePreferences(), databaseContext, preferencesService.getDefaultEncoding());
-            fetchAndMerge(pdfMergeMetadataImporter);
-        });
-        fetcherMenu.getItems().add(pdfMergeMetadataImporterMenuItem);
+
         fetcherButton.setOnMouseClicked(event -> fetcherMenu.show(fetcherButton, Side.RIGHT, 0, 0));
     }
 

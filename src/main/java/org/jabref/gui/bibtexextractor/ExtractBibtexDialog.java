@@ -46,18 +46,7 @@ public class ExtractBibtexDialog extends BaseDialog<Void> {
 
         buttonParse = (Button) getDialogPane().lookupButton(parseButtonType);
         buttonParse.setTooltip(new Tooltip((Localization.lang("Starts the extraction and adds the resulting entries to the currently opened database"))));
-        buttonParse.setOnAction(event -> {
-            if (!preferencesService.getImportSettingsPreferences().isGrobidEnabled() && !preferencesService.getImportSettingsPreferences().isGrobidOptOut()) {
-                boolean confirmGrobidUsage = dialogService.showConfirmationDialogWithOptOutAndWait(
-                        "Remote services",
-                        "Allow sending PDF files and raw citation strings to a JabRef online service (Grobid) to determine Metadata",
-                        "Use BibTeX parser instead",
-                        this::optOutOfGrobid
-                );
-                preferencesService.storeImportSettingsPreferences(preferencesService.getImportSettingsPreferences().withGrobidEnabled(confirmGrobidUsage));
-            }
-            viewModel.startParsing();
-        });
+        buttonParse.setOnAction((event) -> viewModel.startParsing());
         buttonParse.disableProperty().bind(viewModel.inputTextProperty().isEmpty());
     }
 
@@ -66,9 +55,5 @@ public class ExtractBibtexDialog extends BaseDialog<Void> {
         BibDatabaseContext database = stateManager.getActiveDatabase().orElseThrow(() -> new NullPointerException("Database null"));
         this.viewModel = new BibtexExtractorViewModel(database, dialogService, preferencesService, fileUpdateMonitor, taskExecutor, undoManager, stateManager);
         input.textProperty().bindBidirectional(viewModel.inputTextProperty());
-    }
-
-    private void optOutOfGrobid(boolean optOut) {
-        preferencesService.storeImportSettingsPreferences(preferencesService.getImportSettingsPreferences().withGrobidOptOut(optOut));
     }
 }

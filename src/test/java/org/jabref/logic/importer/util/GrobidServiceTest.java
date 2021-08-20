@@ -29,7 +29,7 @@ import static org.mockito.Mockito.when;
 public class GrobidServiceTest {
 
     private static GrobidService grobidService;
-    private static ImportSettingsPreferences importSettingsPreferences = new ImportSettingsPreferences(false, true, "http://grobid.jabref.org:8070");
+    private static ImportSettingsPreferences importSettingsPreferences = new ImportSettingsPreferences(false, true, false, "http://grobid.jabref.org:8070");
     private static ImportFormatPreferences importFormatPreferences;
 
     @BeforeAll
@@ -74,7 +74,7 @@ public class GrobidServiceTest {
 
     @Test
     public void failsWhenGrobidDisabled() {
-        assertThrows(UnsupportedOperationException.class, () -> new GrobidService(new ImportSettingsPreferences(false, false, "http://grobid.jabref.org:8070")));
+        assertThrows(UnsupportedOperationException.class, () -> new GrobidService(new ImportSettingsPreferences(false, false, false, "http://grobid.jabref.org:8070")));
     }
 
     @Test
