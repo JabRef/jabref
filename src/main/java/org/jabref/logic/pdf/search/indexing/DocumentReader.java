@@ -126,7 +126,7 @@ public final class DocumentReader {
     }
 
     private static String mergeLines(String text) {
-        return text.replaceAll("-\n", "").replaceAll("([^\\.])\n", "$1 ");
+        return text.replaceAll("\\-\n", "").replaceAll("([^\\.])\n", "$1 ");
     }
 
     private void addContentIfNotEmpty(PDDocument pdfDocument, Document newDocument, int pageNumber) {
