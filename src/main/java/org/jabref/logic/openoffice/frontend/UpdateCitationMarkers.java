@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-import org.jabref.logic.JabRefException;
 import org.jabref.logic.openoffice.style.OOBibStyle;
 import org.jabref.model.openoffice.ootext.OOText;
 import org.jabref.model.openoffice.ootext.OOTextIntoOO;
@@ -16,10 +15,7 @@ import org.jabref.model.openoffice.uno.NoDocumentException;
 
 import com.sun.star.beans.IllegalTypeException;
 import com.sun.star.beans.NotRemoveableException;
-import com.sun.star.beans.PropertyExistException;
 import com.sun.star.beans.PropertyVetoException;
-import com.sun.star.beans.UnknownPropertyException;
-import com.sun.star.container.NoSuchElementException;
 import com.sun.star.lang.WrappedTargetException;
 import com.sun.star.text.XTextCursor;
 import com.sun.star.text.XTextDocument;
@@ -32,6 +28,10 @@ import org.slf4j.LoggerFactory;
 public class UpdateCitationMarkers {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(UpdateCitationMarkers.class);
+
+    private UpdateCitationMarkers() {
+        /**/
+    }
 
     /**
      * Visit each reference mark in referenceMarkNames, overwrite its
@@ -48,33 +48,29 @@ public class UpdateCitationMarkers {
     public static void applyNewCitationMarkers(XTextDocument doc, OOFrontend fr, OOBibStyle style)
         throws
         NoDocumentException,
-        UnknownPropertyException,
         CreationException,
-        WrappedTargetException,
-        PropertyVetoException,
-        NoSuchElementException,
-        JabRefException {
+        WrappedTargetException {
 
         CitationGroups citationGroups = fr.citationGroups;
 
-        for (CitationGroup cg : citationGroups.getCitationGroupsUnordered()) {
+        for (CitationGroup group : citationGroups.getCitationGroupsUnordered()) {
 
-            boolean withText = (cg.citationType != CitationType.INVISIBLE_CIT);
-            Optional<OOText> marker = cg.getCitationMarker();
+            boolean withText = (group.citationType != CitationType.INVISIBLE_CIT);
+            Optional<OOText> marker = group.getCitationMarker();
 
             if (!marker.isPresent()) {
                 LOGGER.warn("applyNewCitationMarkers: no marker for {}",
-                            cg.cgid.citationGroupIdAsString());
+                            group.groupId.citationGroupIdAsString());
                 continue;
             }
 
             if (withText && marker.isPresent()) {
 
-                XTextCursor cursor = fr.getFillCursorForCitationGroup(doc, cg);
+                XTextCursor cursor = fr.getFillCursorForCitationGroup(doc, group);
 
                 fillCitationMarkInCursor(doc, cursor, marker.get(), withText, style);
 
-                fr.cleanFillCursorForCitationGroup(doc, cg);
+                fr.cleanFillCursorForCitationGroup(doc, group);
             }
 
         }
@@ -85,11 +81,8 @@ public class UpdateCitationMarkers {
                                                 OOText citationText,
                                                 boolean withText,
                                                 OOBibStyle style)
-    throws
-        UnknownPropertyException,
-        PropertyVetoException,
+        throws
         WrappedTargetException,
-        NoSuchElementException,
         CreationException,
         IllegalArgumentException {
 
@@ -135,37 +128,33 @@ public class UpdateCitationMarkers {
                                                   OOBibStyle style,
                                                   boolean insertSpaceAfter)
         throws
-        UnknownPropertyException,
         NotRemoveableException,
-        PropertyExistException,
-        PropertyVetoException,
         WrappedTargetException,
         PropertyVetoException,
         IllegalArgumentException,
         CreationException,
         NoDocumentException,
-        IllegalTypeException,
-        NoSuchElementException {
+        IllegalTypeException {
 
         Objects.requireNonNull(pageInfos);
         if (pageInfos.size() != citationKeys.size()) {
             throw new IllegalArgumentException("pageInfos.size != citationKeys.size");
         }
-        CitationGroup cg = fr.createCitationGroup(doc,
-                                                  citationKeys,
-                                                  pageInfos,
-                                                  citationType,
-                                                  position,
-                                                  insertSpaceAfter);
+        CitationGroup group = fr.createCitationGroup(doc,
+                                                     citationKeys,
+                                                     pageInfos,
+                                                     citationType,
+                                                     position,
+                                                     insertSpaceAfter);
 
         final boolean withText = citationType.withText();
 
         if (withText) {
-            XTextCursor c2 = fr.getFillCursorForCitationGroup(doc, cg);
+            XTextCursor fillCursor = fr.getFillCursorForCitationGroup(doc, group);
 
-            UpdateCitationMarkers.fillCitationMarkInCursor(doc, c2, citationText, withText, style);
+            UpdateCitationMarkers.fillCitationMarkInCursor(doc, fillCursor, citationText, withText, style);
 
-            fr.cleanFillCursorForCitationGroup(doc, cg);
+            fr.cleanFillCursorForCitationGroup(doc, group);
         }
         position.collapseToEnd();
     }

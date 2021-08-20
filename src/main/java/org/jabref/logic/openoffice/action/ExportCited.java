@@ -13,12 +13,14 @@ import org.jabref.model.openoffice.style.CitedKey;
 import org.jabref.model.openoffice.style.CitedKeys;
 import org.jabref.model.openoffice.uno.NoDocumentException;
 
-import com.sun.star.beans.UnknownPropertyException;
-import com.sun.star.container.NoSuchElementException;
 import com.sun.star.lang.WrappedTargetException;
 import com.sun.star.text.XTextDocument;
 
 public class ExportCited {
+
+    private ExportCited() {
+        /**/
+    }
 
     public static class GenerateDatabaseResult {
         /**
@@ -47,8 +49,6 @@ public class ExportCited {
     public static GenerateDatabaseResult generateDatabase(XTextDocument doc, List<BibDatabase> databases)
         throws
         NoDocumentException,
-        NoSuchElementException,
-        UnknownPropertyException,
         WrappedTargetException {
 
         OOFrontend fr = new OOFrontend(doc);

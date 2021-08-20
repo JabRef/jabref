@@ -2,7 +2,6 @@ package org.jabref.logic.openoffice.action;
 
 import java.util.List;
 
-import org.jabref.logic.JabRefException;
 import org.jabref.logic.openoffice.frontend.OOFrontend;
 import org.jabref.logic.openoffice.frontend.UpdateCitationMarkers;
 import org.jabref.logic.openoffice.style.OOBibStyle;
@@ -17,17 +16,17 @@ import org.jabref.model.openoffice.uno.UnoScreenRefresh;
 
 import com.sun.star.beans.IllegalTypeException;
 import com.sun.star.beans.NotRemoveableException;
-import com.sun.star.beans.PropertyExistException;
 import com.sun.star.beans.PropertyVetoException;
-import com.sun.star.beans.UnknownPropertyException;
-import com.sun.star.container.NoSuchElementException;
 import com.sun.star.lang.WrappedTargetException;
 import com.sun.star.text.XTextCursor;
 import com.sun.star.text.XTextDocument;
 import com.sun.star.text.XTextRange;
-import com.sun.star.util.InvalidStateException;
 
 public class EditSeparate {
+
+    private EditSeparate() {
+        /**/
+    }
 
     public static boolean separateCitations(XTextDocument doc,
                                             OOFrontend fr,
@@ -36,14 +35,9 @@ public class EditSeparate {
         throws
         CreationException,
         IllegalTypeException,
-        InvalidStateException,
-        JabRefException,
         NoDocumentException,
-        NoSuchElementException,
         NotRemoveableException,
-        PropertyExistException,
         PropertyVetoException,
-        UnknownPropertyException,
         WrappedTargetException,
         com.sun.star.lang.IllegalArgumentException {
 
@@ -61,19 +55,19 @@ public class EditSeparate {
         try {
             UnoScreenRefresh.lockControllers(doc);
 
-            for (CitationGroup cg : cgs) {
+            for (CitationGroup group : cgs) {
 
                 XTextRange range1 = (fr
-                                     .getMarkRange(doc, cg)
+                                     .getMarkRange(doc, group)
                                      .orElseThrow(IllegalStateException::new));
                 XTextCursor textCursor = range1.getText().createTextCursorByRange(range1);
 
-                List<Citation> cits = cg.citationsInStorageOrder;
+                List<Citation> cits = group.citationsInStorageOrder;
                 if (cits.size() <= 1) {
                     continue;
                 }
 
-                fr.removeCitationGroup(cg, doc);
+                fr.removeCitationGroup(group, doc);
                 // Now we own the content of cits
 
                 // Create a citation group for each citation.
@@ -86,7 +80,7 @@ public class EditSeparate {
                                                                      doc,
                                                                      List.of(cit.citationKey),
                                                                      List.of(cit.getPageInfo()),
-                                                                     cg.citationType,
+                                                                     group.citationType,
                                                                      OOText.fromString(cit.citationKey),
                                                                      textCursor,
                                                                      style,

@@ -189,135 +189,135 @@ public class OOTextIntoOO {
 
             // Handle tags:
             switch (tagName) {
-            case "b":
-                formatStack.pushLayer(setCharWeight(FontWeight.BOLD));
-                expectEnd.push("/" + tagName);
-                break;
-            case "i":
-            case "em":
-                formatStack.pushLayer(setCharPosture(FontSlant.ITALIC));
-                expectEnd.push("/" + tagName);
-                break;
-            case "smallcaps":
-                formatStack.pushLayer(setCharCaseMap(CaseMap.SMALLCAPS));
-                expectEnd.push("/" + tagName);
-                break;
-            case "sup":
-                formatStack.pushLayer(setSuperScript(formatStack));
-                expectEnd.push("/" + tagName);
-                break;
-            case "sub":
-                formatStack.pushLayer(setSubScript(formatStack));
-                expectEnd.push("/" + tagName);
-                break;
-            case "u":
-                formatStack.pushLayer(setCharUnderline(FontUnderline.SINGLE));
-                expectEnd.push("/" + tagName);
-                break;
-            case "s":
-                formatStack.pushLayer(setCharStrikeout(FontStrikeout.SINGLE));
-                expectEnd.push("/" + tagName);
-                break;
-            case "/p":
-                // nop
-                break;
-            case "p":
-                insertParagraphBreak(text, cursor);
-                cursor.collapseToEnd();
-                for (OOPair<String, String> pair : attributes) {
-                    String key = pair.a;
-                    String value = pair.b;
-                    switch (key) {
-                    case "oo:ParaStyleName":
-                        // <p oo:ParaStyleName="Standard">
-                        if (StringUtil.isNullOrEmpty(value)) {
-                            LOGGER.debug(String.format("oo:ParaStyleName inherited"));
-                        } else {
-                            if (setParagraphStyle(cursor, value)) {
-                                // Presumably tested already:
-                                LOGGER.debug(String.format("oo:ParaStyleName=\"%s\" failed", value));
-                            }
+                case "b":
+                    formatStack.pushLayer(setCharWeight(FontWeight.BOLD));
+                    expectEnd.push("/" + tagName);
+                    break;
+                case "i":
+                case "em":
+                    formatStack.pushLayer(setCharPosture(FontSlant.ITALIC));
+                    expectEnd.push("/" + tagName);
+                    break;
+                case "smallcaps":
+                    formatStack.pushLayer(setCharCaseMap(CaseMap.SMALLCAPS));
+                    expectEnd.push("/" + tagName);
+                    break;
+                case "sup":
+                    formatStack.pushLayer(setSuperScript(formatStack));
+                    expectEnd.push("/" + tagName);
+                    break;
+                case "sub":
+                    formatStack.pushLayer(setSubScript(formatStack));
+                    expectEnd.push("/" + tagName);
+                    break;
+                case "u":
+                    formatStack.pushLayer(setCharUnderline(FontUnderline.SINGLE));
+                    expectEnd.push("/" + tagName);
+                    break;
+                case "s":
+                    formatStack.pushLayer(setCharStrikeout(FontStrikeout.SINGLE));
+                    expectEnd.push("/" + tagName);
+                    break;
+                case "/p":
+                    // nop
+                    break;
+                case "p":
+                    insertParagraphBreak(text, cursor);
+                    cursor.collapseToEnd();
+                    for (OOPair<String, String> pair : attributes) {
+                        String key = pair.a;
+                        String value = pair.b;
+                        switch (key) {
+                            case "oo:ParaStyleName":
+                                // <p oo:ParaStyleName="Standard">
+                                if (StringUtil.isNullOrEmpty(value)) {
+                                    LOGGER.debug(String.format("oo:ParaStyleName inherited"));
+                                } else {
+                                    if (setParagraphStyle(cursor, value)) {
+                                        // Presumably tested already:
+                                        LOGGER.debug(String.format("oo:ParaStyleName=\"%s\" failed", value));
+                                    }
+                                }
+                                break;
+                            default:
+                                LOGGER.warn(String.format("Unexpected attribute '%s' for <%s>", key, tagName));
+                                break;
                         }
-                        break;
-                    default:
-                        LOGGER.warn(String.format("Unexpected attribute '%s' for <%s>", key, tagName));
-                        break;
                     }
-                }
-                break;
-            case "oo:referenceToPageNumberOfReferenceMark":
-                for (OOPair<String, String> pair : attributes) {
-                    String key = pair.a;
-                    String value = pair.b;
-                    switch (key) {
-                    case "target":
-                        UnoCrossRef.insertReferenceToPageNumberOfReferenceMark(doc, value, cursor);
-                        break;
-                    default:
-                        LOGGER.warn(String.format("Unexpected attribute '%s' for <%s>", key, tagName));
-                        break;
-                    }
-                }
-                break;
-            case "tt":
-                // Note: "Example" names a character style in LibreOffice.
-                formatStack.pushLayer(setCharStyleName("Example"));
-                expectEnd.push("/" + tagName);
-                break;
-            case "span":
-                List<OOPair<String, Object>> settings = new ArrayList<>();
-                for (OOPair<String, String> pair : attributes) {
-                    String key = pair.a;
-                    String value = pair.b;
-                    switch (key) {
-                    case "oo:CharStyleName":
-                        // <span oo:CharStyleName="Standard">
-                        settings.addAll(setCharStyleName(value));
-                        break;
-                    case "lang":
-                        // <span lang="zxx">
-                        // <span lang="en-US">
-                        settings.addAll(setCharLocale(value));
-                        break;
-                    case "style":
-                        // HTML-style small-caps
-                        if ("font-variant: small-caps".equals(value)) {
-                            settings.addAll(setCharCaseMap(CaseMap.SMALLCAPS));
-                            break;
+                    break;
+                case "oo:referenceToPageNumberOfReferenceMark":
+                    for (OOPair<String, String> pair : attributes) {
+                        String key = pair.a;
+                        String value = pair.b;
+                        switch (key) {
+                            case "target":
+                                UnoCrossRef.insertReferenceToPageNumberOfReferenceMark(doc, value, cursor);
+                                break;
+                            default:
+                                LOGGER.warn(String.format("Unexpected attribute '%s' for <%s>", key, tagName));
+                                break;
                         }
-                        LOGGER.warn(String.format("Unexpected value %s for attribute '%s' for <%s>",
-                                                  value, key, tagName));
-                        break;
-                    default:
-                        LOGGER.warn(String.format("Unexpected attribute '%s' for <%s>", key, tagName));
-                        break;
                     }
-                }
-                formatStack.pushLayer(settings);
-                expectEnd.push("/" + tagName);
-                break;
-            case "/b":
-            case "/i":
-            case "/em":
-            case "/tt":
-            case "/smallcaps":
-            case "/sup":
-            case "/sub":
-            case "/u":
-            case "/s":
-            case "/span":
-                formatStack.popLayer();
-                String expected = expectEnd.pop();
-                if (!tagName.equals(expected)) {
-                    LOGGER.warn(String.format("expected '<%s>', found '<%s>' after '%s'",
-                                              expected,
-                                              tagName,
-                                              currentSubstring));
-                }
-                break;
-            default:
-                LOGGER.warn(String.format("ignoring unknown tag '<%s>'", tagName));
-                break;
+                    break;
+                case "tt":
+                    // Note: "Example" names a character style in LibreOffice.
+                    formatStack.pushLayer(setCharStyleName("Example"));
+                    expectEnd.push("/" + tagName);
+                    break;
+                case "span":
+                    List<OOPair<String, Object>> settings = new ArrayList<>();
+                    for (OOPair<String, String> pair : attributes) {
+                        String key = pair.a;
+                        String value = pair.b;
+                        switch (key) {
+                            case "oo:CharStyleName":
+                                // <span oo:CharStyleName="Standard">
+                                settings.addAll(setCharStyleName(value));
+                                break;
+                            case "lang":
+                                // <span lang="zxx">
+                                // <span lang="en-US">
+                                settings.addAll(setCharLocale(value));
+                                break;
+                            case "style":
+                                // HTML-style small-caps
+                                if ("font-variant: small-caps".equals(value)) {
+                                    settings.addAll(setCharCaseMap(CaseMap.SMALLCAPS));
+                                    break;
+                                }
+                                LOGGER.warn(String.format("Unexpected value %s for attribute '%s' for <%s>",
+                                                          value, key, tagName));
+                                break;
+                            default:
+                                LOGGER.warn(String.format("Unexpected attribute '%s' for <%s>", key, tagName));
+                                break;
+                        }
+                    }
+                    formatStack.pushLayer(settings);
+                    expectEnd.push("/" + tagName);
+                    break;
+                case "/b":
+                case "/i":
+                case "/em":
+                case "/tt":
+                case "/smallcaps":
+                case "/sup":
+                case "/sub":
+                case "/u":
+                case "/s":
+                case "/span":
+                    formatStack.popLayer();
+                    String expected = expectEnd.pop();
+                    if (!tagName.equals(expected)) {
+                        LOGGER.warn(String.format("expected '<%s>', found '<%s>' after '%s'",
+                                                  expected,
+                                                  tagName,
+                                                  currentSubstring));
+                    }
+                    break;
+                default:
+                    LOGGER.warn(String.format("ignoring unknown tag '<%s>'", tagName));
+                    break;
             }
 
             piv = tagMatcher.end();
