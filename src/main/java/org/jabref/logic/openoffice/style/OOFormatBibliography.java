@@ -168,8 +168,8 @@ public class OOFormatBibliography {
 
         List<CitationGroup> citationGroups = new ArrayList<>();
         for (CitationPath p : ck.getCitationPaths()) {
-            CitationGroupId cgid = p.group;
-            Optional<CitationGroup> cg = cgs.getCitationGroup(cgid);
+            CitationGroupId groupId = p.group;
+            Optional<CitationGroup> cg = cgs.getCitationGroup(groupId);
             if (cg.isEmpty()) {
                 throw new IllegalStateException();
             }

@@ -114,7 +114,7 @@ public class CitationGroups {
         if (globalOrder.isEmpty()) {
             throw new IllegalStateException("getCitationGroupsInGlobalOrder: not ordered yet");
         }
-        return OOListUtil.map(globalOrder.get(), cgid -> citationGroupsUnordered.get(cgid));
+        return OOListUtil.map(globalOrder.get(), groupId -> citationGroupsUnordered.get(groupId));
     }
 
     /**
@@ -132,8 +132,8 @@ public class CitationGroups {
 
         // Propagate to each CitationGroup
         int i = 0;
-        for (CitationGroupId cgid : globalOrder) {
-            citationGroupsUnordered.get(cgid).setIndexInGlobalOrder(Optional.of(i));
+        for (CitationGroupId groupId : globalOrder) {
+            citationGroupsUnordered.get(groupId).setIndexInGlobalOrder(Optional.of(i));
             i++;
         }
     }
@@ -161,7 +161,7 @@ public class CitationGroups {
             int storageIndexInGroup = 0;
             for (Citation cit : cg.citationsInStorageOrder) {
                 String key = cit.citationKey;
-                CitationPath path = new CitationPath(cg.cgid, storageIndexInGroup);
+                CitationPath path = new CitationPath(cg.groupId, storageIndexInGroup);
                 if (res.containsKey(key)) {
                     res.get(key).addPath(path, cit);
                 } else {
@@ -185,7 +185,7 @@ public class CitationGroups {
             for (int i : cg.getLocalOrder()) {
                 Citation cit = cg.citationsInStorageOrder.get(i);
                 String citationKey = cit.citationKey;
-                CitationPath path = new CitationPath(cg.cgid, i);
+                CitationPath path = new CitationPath(cg.groupId, i);
                 if (res.containsKey(citationKey)) {
                     res.get(citationKey).addPath(path, cit);
                 } else {
@@ -257,8 +257,8 @@ public class CitationGroups {
      * Query by CitationGroupId
      */
 
-    public Optional<CitationGroup> getCitationGroup(CitationGroupId cgid) {
-        CitationGroup cg = citationGroupsUnordered.get(cgid);
+    public Optional<CitationGroup> getCitationGroup(CitationGroupId groupId) {
+        CitationGroup cg = citationGroupsUnordered.get(groupId);
         return Optional.ofNullable(cg);
     }
 
@@ -279,15 +279,15 @@ public class CitationGroups {
      */
 
     public void afterCreateCitationGroup(CitationGroup cg) {
-        citationGroupsUnordered.put(cg.cgid, cg);
+        citationGroupsUnordered.put(cg.groupId, cg);
 
         globalOrder = Optional.empty();
         bibliography = Optional.empty();
     }
 
     public void afterRemoveCitationGroup(CitationGroup cg) {
-        citationGroupsUnordered.remove(cg.cgid);
-        globalOrder.map(l -> l.remove(cg.cgid));
+        citationGroupsUnordered.remove(cg.groupId);
+        globalOrder.map(l -> l.remove(cg.groupId));
 
         bibliography = Optional.empty();
     }

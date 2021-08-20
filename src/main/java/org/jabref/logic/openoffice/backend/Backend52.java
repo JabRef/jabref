@@ -151,13 +151,13 @@ public class Backend52 {
         Optional<NamedRange> namedRange = (citationStorageManager.nrmGetFromDocument(doc, markName)
                                            .orElseThrow(IllegalArgumentException::new));
 
-        CitationGroupId cgid = new CitationGroupId(markName);
+        CitationGroupId groupId = new CitationGroupId(markName);
         CitationGroup cg = new CitationGroup(OODataModel.JabRef52,
-                                             cgid,
+                                             groupId,
                                              parsed.citationType,
                                              citations,
                                              Optional.of(markName));
-        this.cgidToNamedRange.put(cgid, namedRange.get());
+        this.cgidToNamedRange.put(groupId, namedRange.get());
         return cg;
     }
 
@@ -195,7 +195,7 @@ public class Backend52 {
         String xkey = (citationKeys.stream().collect(Collectors.joining(",")));
         String refMarkName = Codec52.getUniqueMarkName(usedNames, xkey, citationType);
 
-        CitationGroupId cgid = new CitationGroupId(refMarkName);
+        CitationGroupId groupId = new CitationGroupId(refMarkName);
 
         final int nCitations = citationKeys.size();
         final int last = nCitations - 1;
@@ -246,10 +246,10 @@ public class Backend52 {
                 UnoUserDefinedProperty.removeIfExists(doc, refMarkName);
             }
             CitationGroup cg = new CitationGroup(OODataModel.JabRef52,
-                                                 cgid,
+                                                 groupId,
                                                  citationType, citations,
                                                  Optional.of(refMarkName));
-            this.cgidToNamedRange.put(cgid, namedRange);
+            this.cgidToNamedRange.put(groupId, namedRange);
             return cg;
         default:
             throw new IllegalStateException("Backend52 requires JabRef52 dataModel");
@@ -303,7 +303,7 @@ public class Backend52 {
     }
 
     private NamedRange getNamedRangeOrThrow(CitationGroup cg) {
-        NamedRange namedRange = this.cgidToNamedRange.get(cg.cgid);
+        NamedRange namedRange = this.cgidToNamedRange.get(cg.groupId);
         if (namedRange == null) {
             throw new IllegalStateException("getNamedRange: could not lookup namedRange");
         }
@@ -319,7 +319,7 @@ public class Backend52 {
         String refMarkName = namedRange.nrGetRangeName();
         namedRange.nrRemoveFromDocument(doc);
         UnoUserDefinedProperty.removeIfExists(doc, refMarkName);
-        this.cgidToNamedRange.remove(cg.cgid);
+        this.cgidToNamedRange.remove(cg.groupId);
     }
 
     /**
@@ -379,7 +379,7 @@ public class Backend52 {
             // For DataModel.JabRef60 (Backend60) we need one context per Citation
             List<CitationEntry> citations = new ArrayList<>(cgs.numberOfCitationGroups());
             for (CitationGroup cg : cgs.getCitationGroupsUnordered()) {
-                String name = cg.cgid.citationGroupIdAsString();
+                String name = cg.groupId.citationGroupIdAsString();
                 XTextCursor cursor = (this
                                       .getRawCursorForCitationGroup(cg, doc)
                                       .orElseThrow(IllegalStateException::new));
