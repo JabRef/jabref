@@ -8,6 +8,7 @@ import java.util.Collection;
 import java.util.Set;
 import java.util.stream.Stream;
 
+import org.jabref.logic.importer.importsettings.ImportSettingsPreferences;
 import org.jabref.logic.preferences.TimestampPreferences;
 import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.entry.field.StandardField;
@@ -34,7 +35,7 @@ class ImportFormatReaderIntegrationTest {
         when(importFormatPreferences.getEncoding()).thenReturn(StandardCharsets.UTF_8);
         when(importFormatPreferences.getCustomImportList()).thenReturn(Set.of());
         when(timestampPreferences.getTimestampField()).then(invocation -> StandardField.TIMESTAMP);
-        reader.resetImportFormats(importFormatPreferences, mock(XmpPreferences.class), new DummyFileUpdateMonitor());
+        reader.resetImportFormats(mock(ImportSettingsPreferences.class), importFormatPreferences, mock(XmpPreferences.class), new DummyFileUpdateMonitor());
     }
 
     @ParameterizedTest

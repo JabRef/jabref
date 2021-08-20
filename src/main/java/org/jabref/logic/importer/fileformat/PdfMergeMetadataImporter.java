@@ -18,8 +18,8 @@ import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fetcher.DoiFetcher;
-import org.jabref.logic.importer.fetcher.GrobidCitationFetcher;
 import org.jabref.logic.importer.fetcher.IsbnFetcher;
+import org.jabref.logic.importer.importsettings.ImportSettingsPreferences;
 import org.jabref.logic.importer.util.FileFieldParser;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabaseContext;
@@ -42,15 +42,16 @@ public class PdfMergeMetadataImporter extends Importer {
     private final List<Importer> metadataImporters;
     private final ImportFormatPreferences importFormatPreferences;
 
-    public PdfMergeMetadataImporter(ImportFormatPreferences importFormatPreferences) {
+    public PdfMergeMetadataImporter(ImportSettingsPreferences importSettingsPreferences, ImportFormatPreferences importFormatPreferences) {
         this.importFormatPreferences = importFormatPreferences;
-        this.metadataImporters = List.of(
-                new PdfGrobidImporter(GrobidCitationFetcher.GROBID_URL, importFormatPreferences),
-                new PdfEmbeddedBibFileImporter(importFormatPreferences),
-                new PdfXmpImporter(importFormatPreferences.getXmpPreferences()),
-                new PdfVerbatimBibTextImporter(importFormatPreferences),
-                new PdfContentImporter(importFormatPreferences)
-        );
+        this.metadataImporters = new ArrayList<>();
+        this.metadataImporters.add(new PdfVerbatimBibTextImporter(importFormatPreferences));
+        this.metadataImporters.add(new PdfEmbeddedBibFileImporter(importFormatPreferences));
+        if (importSettingsPreferences.isGrobidEnabled()) {
+            this.metadataImporters.add(new PdfGrobidImporter(importSettingsPreferences, importFormatPreferences));
+        }
+        this.metadataImporters.add(new PdfXmpImporter(importFormatPreferences.getXmpPreferences()));
+        this.metadataImporters.add(new PdfContentImporter(importFormatPreferences));
     }
 
     @Override
@@ -150,8 +151,8 @@ public class PdfMergeMetadataImporter extends Importer {
         private final BibDatabaseContext databaseContext;
         private final Charset defaultEncoding;
 
-        public EntryBasedFetcherWrapper(ImportFormatPreferences importFormatPreferences, FilePreferences filePreferences, BibDatabaseContext context, Charset defaultEncoding) {
-            super(importFormatPreferences);
+        public EntryBasedFetcherWrapper(ImportSettingsPreferences importSettingsPreferences, ImportFormatPreferences importFormatPreferences, FilePreferences filePreferences, BibDatabaseContext context, Charset defaultEncoding) {
+            super(importSettingsPreferences, importFormatPreferences);
             this.filePreferences = filePreferences;
             this.databaseContext = context;
             this.defaultEncoding = defaultEncoding;

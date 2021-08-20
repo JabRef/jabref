@@ -38,6 +38,7 @@ public class PdfSearcherTest {
         when(context.getFileDirectories(Mockito.any())).thenReturn(Collections.singletonList(Path.of("src/test/resources/pdfs")));
         when(context.getFulltextIndexPath()).thenReturn(indexDir);
         when(context.getDatabase()).thenReturn(database);
+        when(context.getEntries()).thenReturn(database.getEntries());
         BibEntry examplePdf = new BibEntry(StandardEntryType.Article);
         examplePdf.setFiles(Collections.singletonList(new LinkedFile("Example Entry", "example.pdf", StandardFileType.PDF.getName())));
         database.insertEntry(examplePdf);
@@ -55,7 +56,8 @@ public class PdfSearcherTest {
         PdfIndexer indexer = PdfIndexer.of(context, filePreferences);
         search = PdfSearcher.of(context);
 
-        indexer.createIndex(database, context);
+        indexer.createIndex();
+        indexer.addToIndex(context);
     }
 
     @Test
