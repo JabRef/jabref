@@ -130,9 +130,8 @@ class Codec52 {
      * @param names The list to be filtered.
      */
     public static List<String> filterIsJabRefReferenceMarkName(List<String> names) {
-        return (names
-                .stream()
-                .filter(Codec52::isJabRefReferenceMarkName)
-                .collect(Collectors.toList()));
+        return (names.stream()
+                     .filter(Codec52::isJabRefReferenceMarkName)
+                     .collect(Collectors.toList()));
     }
 }
