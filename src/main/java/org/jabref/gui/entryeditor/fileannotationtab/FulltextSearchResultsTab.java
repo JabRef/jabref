@@ -2,7 +2,6 @@ package org.jabref.gui.entryeditor.fileannotationtab;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,6 +23,7 @@ import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.entryeditor.EntryEditorTab;
 import org.jabref.gui.maintable.OpenExternalFileAction;
 import org.jabref.gui.maintable.OpenFolderAction;
+import org.jabref.gui.util.TooltipTextUtil;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
@@ -96,7 +96,7 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
                 // Iterate through search hits (within file within page)
                 for (SearchResult searchResult : resultsPage.getValue()) {
                     for (String resultTextHtml : searchResult.getContentResultStringsHtml()) {
-                        content.getChildren().addAll(highlightResultString(resultTextHtml));
+                        content.getChildren().addAll(TooltipTextUtil.createTextsFromHtml(resultTextHtml));
                         content.getChildren().add(lineSeparator());
                     }
                     if (!searchResult.getAnnotationsResultStringsHtml().isEmpty()) {
@@ -105,7 +105,7 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
                         content.getChildren().add(annotationsText);
                     }
                     for (String resultTextHtml : searchResult.getAnnotationsResultStringsHtml()) {
-                        content.getChildren().addAll(highlightResultString(resultTextHtml));
+                        content.getChildren().addAll(TooltipTextUtil.createTextsFromHtml(resultTextHtml));
                         content.getChildren().add(lineSeparator());
                     }
                 }
@@ -154,26 +154,5 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
         lineSeparator.prefWidthProperty().bind(content.widthProperty());
         lineSeparator.setPrefHeight(15);
         return lineSeparator;
-    }
-
-    private List<Text> highlightResultString(String htmlHighlightedResult) {
-        List<Text> highlightedResultsStrings = new ArrayList<>();
-
-        for (String fragment : htmlHighlightedResult.split(SearchResult.HIGHLIGHTING_PRE_TAG)) {
-            String[] splitPost = fragment.split(SearchResult.HIGHLIGHTING_POST_TAG);
-            if (splitPost.length > 2) {
-                throw new IllegalArgumentException("More than one POST_TAG for a PRE_TAG");
-            }
-            if (splitPost.length == 1) {
-                highlightedResultsStrings.add(new Text(splitPost[0]));
-            } else {
-                Text highlightedText = new Text(splitPost[0]);
-                highlightedText.setStyle("-fx-fill: -jr-green;");
-                highlightedResultsStrings.add(highlightedText);
-                highlightedResultsStrings.add(new Text(splitPost[1]));
-            }
-        }
-
-        return highlightedResultsStrings;
     }
 }

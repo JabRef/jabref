@@ -287,15 +287,15 @@
     -fx-font-size: 1em;
 }
 
-.tooltip > TextFlow > .tooltip-text-bold {
+TextFlow > .tooltip-text-bold {
     -fx-font-weight: bold;
 }
 
-.tooltip > TextFlow > .tooltip-text-italic {
+TextFlow > .tooltip-text-italic {
     -fx-font-style: italic;
 }
 
-.tooltip > TextFlow > .tooltip-text-monospaced {
+TextFlow > .tooltip-text-monospaced {
     -fx-font-family: monospace;
 }
 

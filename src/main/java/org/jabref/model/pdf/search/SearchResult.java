@@ -26,10 +26,6 @@ import static org.jabref.model.pdf.search.SearchFieldConstants.PATH;
 
 public final class SearchResult {
 
-    public static final String HIGHLIGHTING_TAG = "JabRef_String_Highlight";
-    public static final String HIGHLIGHTING_PRE_TAG = "<" + HIGHLIGHTING_TAG + ">";
-    public static final String HIGHLIGHTING_POST_TAG = "</" + HIGHLIGHTING_TAG + ">";
-
     private final String path;
     private final String content;
     private final String annotations;
@@ -49,7 +45,7 @@ public final class SearchResult {
         this.modified = Long.parseLong(getFieldContents(searcher, scoreDoc, MODIFIED));
         this.luceneScore = scoreDoc.score;
 
-        Highlighter highlighter = new Highlighter(new SimpleHTMLFormatter(HIGHLIGHTING_PRE_TAG, HIGHLIGHTING_POST_TAG), new QueryScorer(query));
+        Highlighter highlighter = new Highlighter(new SimpleHTMLFormatter("<b>", "</b>"), new QueryScorer(query));
 
         TokenStream contentStream = new EnglishStemAnalyzer().tokenStream(CONTENT, content);
         try {
