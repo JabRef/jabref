@@ -18,6 +18,7 @@ import org.apache.lucene.search.highlight.QueryScorer;
 import org.apache.lucene.search.highlight.SimpleHTMLFormatter;
 import org.apache.lucene.search.highlight.TextFragment;
 
+import static org.jabref.model.pdf.search.SearchFieldConstants.ANNOTATIONS;
 import static org.jabref.model.pdf.search.SearchFieldConstants.CONTENT;
 import static org.jabref.model.pdf.search.SearchFieldConstants.MODIFIED;
 import static org.jabref.model.pdf.search.SearchFieldConstants.PAGE_NUMBER;
@@ -31,28 +32,39 @@ public final class SearchResult {
 
     private final String path;
     private final String content;
+    private final String annotations;
 
     private final int pageNumber;
     private final long modified;
 
     private final float luceneScore;
-    private List<String> resultStringsHtml;
+    private List<String> contentResultStringsHtml;
+    private List<String> annotationsResultStringsHtml;
 
     public SearchResult(IndexSearcher searcher, Query query, ScoreDoc scoreDoc) throws IOException {
         this.path = getFieldContents(searcher, scoreDoc, PATH);
         this.content = getFieldContents(searcher, scoreDoc, CONTENT);
+        this.annotations = getFieldContents(searcher, scoreDoc, ANNOTATIONS);
         this.pageNumber = Integer.parseInt(getFieldContents(searcher, scoreDoc, PAGE_NUMBER));
         this.modified = Long.parseLong(getFieldContents(searcher, scoreDoc, MODIFIED));
         this.luceneScore = scoreDoc.score;
 
-        TokenStream stream = new EnglishStemAnalyzer().tokenStream(CONTENT, content);
-
         Highlighter highlighter = new Highlighter(new SimpleHTMLFormatter(HIGHLIGHTING_PRE_TAG, HIGHLIGHTING_POST_TAG), new QueryScorer(query));
+
+        TokenStream contentStream = new EnglishStemAnalyzer().tokenStream(CONTENT, content);
         try {
-            TextFragment[] frags = highlighter.getBestTextFragments(stream, content, true, 10);
-            this.resultStringsHtml = Arrays.stream(frags).map(TextFragment::toString).collect(Collectors.toList());
+            TextFragment[] frags = highlighter.getBestTextFragments(contentStream, content, true, 10);
+            this.contentResultStringsHtml = Arrays.stream(frags).map(TextFragment::toString).collect(Collectors.toList());
         } catch (InvalidTokenOffsetsException e) {
-            this.resultStringsHtml = List.of();
+            this.contentResultStringsHtml = List.of();
+        }
+
+        TokenStream annotationStream = new EnglishStemAnalyzer().tokenStream(ANNOTATIONS, annotations);
+        try {
+            TextFragment[] frags = highlighter.getBestTextFragments(annotationStream, annotations, true, 10);
+            this.annotationsResultStringsHtml = Arrays.stream(frags).map(TextFragment::toString).collect(Collectors.toList());
+        } catch (InvalidTokenOffsetsException e) {
+            this.annotationsResultStringsHtml = List.of();
         }
     }
 
@@ -84,8 +96,12 @@ public final class SearchResult {
         return luceneScore;
     }
 
-    public List<String> getResultStringsHtml() {
-        return resultStringsHtml;
+    public List<String> getContentResultStringsHtml() {
+        return contentResultStringsHtml;
+    }
+
+    public List<String> getAnnotationsResultStringsHtml() {
+        return annotationsResultStringsHtml;
     }
 
     public int getPageNumber() {

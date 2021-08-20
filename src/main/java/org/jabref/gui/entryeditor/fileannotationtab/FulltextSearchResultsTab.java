@@ -95,7 +95,16 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
 
                 // Iterate through search hits (within file within page)
                 for (SearchResult searchResult : resultsPage.getValue()) {
-                    for (String resultTextHtml : searchResult.getResultStringsHtml()) {
+                    for (String resultTextHtml : searchResult.getContentResultStringsHtml()) {
+                        content.getChildren().addAll(highlightResultString(resultTextHtml));
+                        content.getChildren().add(lineSeparator());
+                    }
+                    if (!searchResult.getAnnotationsResultStringsHtml().isEmpty()) {
+                        Text annotationsText = new Text(System.lineSeparator() + Localization.lang("Found matches in Annotations:") + System.lineSeparator() + System.lineSeparator());
+                        annotationsText.setStyle("-fx-font-style: italic;");
+                        content.getChildren().add(annotationsText);
+                    }
+                    for (String resultTextHtml : searchResult.getAnnotationsResultStringsHtml()) {
                         content.getChildren().addAll(highlightResultString(resultTextHtml));
                         content.getChildren().add(lineSeparator());
                     }

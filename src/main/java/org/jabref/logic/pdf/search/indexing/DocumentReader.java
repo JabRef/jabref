@@ -125,6 +125,10 @@ public final class DocumentReader {
         return !(StringUtil.isNullOrEmpty(value));
     }
 
+    private static String mergeLines(String text) {
+        return text.replaceAll("-\n", "").replaceAll("([^\\.])\n", "$1 ");
+    }
+
     private void addContentIfNotEmpty(PDDocument pdfDocument, Document newDocument, int pageNumber) {
         try {
             PDFTextStripper pdfTextStripper = new PDFTextStripper();
@@ -134,18 +138,12 @@ public final class DocumentReader {
 
             String pdfContent = pdfTextStripper.getText(pdfDocument);
             if (StringUtil.isNotBlank(pdfContent)) {
-                pdfContent = pdfContent.replaceAll("-\n", "");
-                pdfContent = pdfContent.replaceAll("([^\\.])\n", "$1 ");
-                newDocument.add(new TextField(CONTENT, pdfContent, Field.Store.YES));
+                newDocument.add(new TextField(CONTENT, mergeLines(pdfContent), Field.Store.YES));
             }
             PDPage page = pdfDocument.getPage(pageNumber);
-            for (PDAnnotation annotation : page.getAnnotations(annotation -> {
-                if (annotation.getContents() == null) {
-                    return false;
-                }
-                return annotation.getSubtype().equals("Text") || annotation.getSubtype().equals("Highlight");
-            })) {
-                newDocument.add(new TextField(ANNOTATIONS, annotation.getContents(), Field.Store.YES));
+            List<String> annotations = page.getAnnotations().stream().filter((annotation) -> annotation.getContents() != null).map(PDAnnotation::getContents).collect(Collectors.toList());
+            if (annotations.size() > 0) {
+                newDocument.add(new TextField(ANNOTATIONS, annotations.stream().collect(Collectors.joining("\n")), Field.Store.YES));
             }
         } catch (IOException e) {
             LOGGER.info("Could not read contents of PDF document \"{}\"", pdfDocument.toString(), e);
