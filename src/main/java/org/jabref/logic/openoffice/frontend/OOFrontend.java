@@ -35,19 +35,14 @@ import org.jabref.model.openoffice.util.OOVoidResult;
 
 import com.sun.star.beans.IllegalTypeException;
 import com.sun.star.beans.NotRemoveableException;
-import com.sun.star.beans.PropertyExistException;
 import com.sun.star.beans.PropertyVetoException;
-import com.sun.star.beans.UnknownPropertyException;
-import com.sun.star.container.NoSuchElementException;
 import com.sun.star.lang.WrappedTargetException;
 import com.sun.star.text.XTextCursor;
 import com.sun.star.text.XTextDocument;
 import com.sun.star.text.XTextRange;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class OOFrontend {
-    private static final Logger LOGGER = LoggerFactory.getLogger(OOFrontend.class);
+
     public final Backend52 backend;
     public final CitationGroups citationGroups;
 
@@ -86,10 +81,9 @@ public class OOFrontend {
         NoDocumentException {
 
         Map<CitationGroupId, CitationGroup> citationGroups = new HashMap<>();
-        for (int i = 0; i < citationGroupNames.size(); i++) {
-            final String name = citationGroupNames.get(i);
-            CitationGroup cg = backend.readCitationGroupFromDocumentOrThrow(doc, name);
-            citationGroups.put(cg.cgid, cg);
+        for (String name : citationGroupNames) {
+            CitationGroup group = backend.readCitationGroupFromDocumentOrThrow(doc, name);
+            citationGroups.put(group.groupId, group);
         }
         return citationGroups;
     }
@@ -117,11 +111,11 @@ public class OOFrontend {
         WrappedTargetException {
 
         List<RangeSortEntry<CitationGroup>> sortables = new ArrayList<>();
-        for (CitationGroup cg : citationGroups.getCitationGroupsUnordered()) {
+        for (CitationGroup group : citationGroups.getCitationGroupsUnordered()) {
             XTextRange range = (this
-                                .getMarkRange(doc, cg)
+                                .getMarkRange(doc, group)
                                 .orElseThrow(IllegalStateException::new));
-            sortables.add(new RangeSortEntry<>(range, 0, cg));
+            sortables.add(new RangeSortEntry<>(range, 0, group));
         }
 
         /*
@@ -150,9 +144,7 @@ public class OOFrontend {
         for (List<RangeSortEntry<CitationGroup>> partition : partitions.getPartitions()) {
 
             int indexInPartition = 0;
-            for (int i = 0; i < partition.size(); i++) {
-                RangeSortEntry<CitationGroup> sortable = partition.get(i);
-                XTextRange aRange = sortable.getRange();
+            for (RangeSortEntry<CitationGroup> sortable : partition) {
                 sortable.setIndexInPosition(indexInPartition++);
                 if (mapFootnotesToFootnoteMarks) {
                     Optional<XTextRange> footnoteMarkRange =
@@ -183,18 +175,15 @@ public class OOFrontend {
                                                                 FunctionalTextViewCursor fcursor)
         throws
         WrappedTargetException,
-        NoDocumentException,
-        JabRefException {
+        NoDocumentException {
 
         List<RangeSortable<CitationGroup>> sortables = createVisualSortInput(doc, mapFootnotesToFootnoteMarks);
 
         List<RangeSortable<CitationGroup>> sorted = RangeSortVisual.visualSort(sortables, doc, fcursor);
 
-        List<CitationGroup> result = (sorted.stream()
-                                      .map(RangeSortable<CitationGroup>::getContent)
-                                      .collect(Collectors.toList()));
-
-        return result;
+        return (sorted.stream()
+                .map(RangeSortable<CitationGroup>::getContent)
+                .collect(Collectors.toList()));
     }
 
     /**
@@ -240,7 +229,6 @@ public class OOFrontend {
         NoDocumentException,
         WrappedTargetException,
         NotRemoveableException,
-        PropertyExistException,
         PropertyVetoException,
         IllegalTypeException {
 
@@ -248,44 +236,38 @@ public class OOFrontend {
         if (pageInfos.size() != citationKeys.size()) {
             throw new IllegalArgumentException("pageInfos.size != citationKeys.size");
         }
-        CitationGroup cg = backend.createCitationGroup(doc,
-                                                       citationKeys,
-                                                       pageInfos,
-                                                       citationType,
-                                                       position,
-                                                       insertSpaceAfter);
+        CitationGroup group = backend.createCitationGroup(doc,
+                                                          citationKeys,
+                                                          pageInfos,
+                                                          citationType,
+                                                          position,
+                                                          insertSpaceAfter);
 
-        this.citationGroups.afterCreateCitationGroup(cg);
-        return cg;
+        this.citationGroups.afterCreateCitationGroup(group);
+        return group;
     }
 
     /**
-     * Remove {@code cg} both from the document and notify {@code citationGroups}
+     * Remove {@code group} both from the document and notify {@code citationGroups}
      */
-    public void removeCitationGroup(CitationGroup cg, XTextDocument doc)
+    public void removeCitationGroup(CitationGroup group, XTextDocument doc)
         throws
         WrappedTargetException,
         NoDocumentException,
-        NoSuchElementException,
-        NotRemoveableException,
-        PropertyExistException,
-        IllegalTypeException {
+        NotRemoveableException {
 
-        backend.removeCitationGroup(cg, doc);
-        this.citationGroups.afterRemoveCitationGroup(cg);
+        backend.removeCitationGroup(group, doc);
+        this.citationGroups.afterRemoveCitationGroup(group);
     }
 
     public void removeCitationGroups(List<CitationGroup> cgs, XTextDocument doc)
         throws
         WrappedTargetException,
         NoDocumentException,
-        NoSuchElementException,
-        NotRemoveableException,
-        PropertyExistException,
-        IllegalTypeException {
+        NotRemoveableException {
 
-        for (CitationGroup cg : cgs) {
-            removeCitationGroup(cg, doc);
+        for (CitationGroup group : cgs) {
+            removeCitationGroup(group, doc);
         }
     }
 
@@ -295,31 +277,30 @@ public class OOFrontend {
      * @return Optional.empty() if the reference mark is missing.
      *
      */
-    public Optional<XTextRange> getMarkRange(XTextDocument doc, CitationGroup cg)
+    public Optional<XTextRange> getMarkRange(XTextDocument doc, CitationGroup group)
         throws
         NoDocumentException,
         WrappedTargetException {
-        return backend.getMarkRange(cg, doc);
+        return backend.getMarkRange(group, doc);
     }
 
-    public XTextCursor getFillCursorForCitationGroup(XTextDocument doc, CitationGroup cg)
+    public XTextCursor getFillCursorForCitationGroup(XTextDocument doc, CitationGroup group)
         throws
         NoDocumentException,
         WrappedTargetException,
         CreationException {
-        return backend.getFillCursorForCitationGroup(cg, doc);
+        return backend.getFillCursorForCitationGroup(group, doc);
     }
 
     /**
      * Remove brackets added by getFillCursorForCitationGroup.
      */
-    public void cleanFillCursorForCitationGroup(XTextDocument doc, CitationGroup cg)
+    public void cleanFillCursorForCitationGroup(XTextDocument doc, CitationGroup group)
         throws
         NoDocumentException,
-        WrappedTargetException,
-        CreationException {
+        WrappedTargetException {
 
-        backend.cleanFillCursorForCitationGroup(cg, doc);
+        backend.cleanFillCursorForCitationGroup(group, doc);
     }
 
     /**
@@ -335,11 +316,11 @@ public class OOFrontend {
         List<RangeForOverlapCheck<CitationGroupId>> result =
             new ArrayList<>(citationGroups.numberOfCitationGroups());
 
-        for (CitationGroup cg : citationGroups.getCitationGroupsUnordered()) {
-            XTextRange range = this.getMarkRange(doc, cg).orElseThrow(IllegalStateException::new);
-            String description = cg.cgid.citationGroupIdAsString();
+        for (CitationGroup group : citationGroups.getCitationGroupsUnordered()) {
+            XTextRange range = this.getMarkRange(doc, group).orElseThrow(IllegalStateException::new);
+            String description = group.groupId.citationGroupIdAsString();
             result.add(new RangeForOverlapCheck<>(range,
-                                                  cg.cgid,
+                                                  group.groupId,
                                                   RangeForOverlapCheck.REFERENCE_MARK_KIND,
                                                   description));
         }
@@ -364,10 +345,7 @@ public class OOFrontend {
         return result;
     }
 
-    public List<RangeForOverlapCheck<CitationGroupId>> viewCursorRanges(XTextDocument doc)
-        throws
-        NoDocumentException,
-        WrappedTargetException {
+    public List<RangeForOverlapCheck<CitationGroupId>> viewCursorRanges(XTextDocument doc) {
 
         List<RangeForOverlapCheck<CitationGroupId>> result = new ArrayList<>();
 
@@ -394,10 +372,7 @@ public class OOFrontend {
      *        ranges.
      */
     public List<RangeForOverlapCheck<CitationGroupId>>
-    footnoteMarkRanges(XTextDocument doc, List<RangeForOverlapCheck<CitationGroupId>> citationRanges)
-        throws
-        NoDocumentException,
-        WrappedTargetException {
+    footnoteMarkRanges(XTextDocument doc, List<RangeForOverlapCheck<CitationGroupId>> citationRanges) {
 
         // We partition by XText and use a single range from
         // each partition to get at the corresponding footnotemark range.
@@ -432,7 +407,7 @@ public class OOFrontend {
 
     static String rangeOverlapsToMessage(List<RangeOverlap<RangeForOverlapCheck<CitationGroupId>>> overlaps) {
 
-        if (overlaps.size() == 0) {
+        if (overlaps.isEmpty()) {
             return "(*no overlaps*)";
         }
 
@@ -443,9 +418,9 @@ public class OOFrontend {
                                    .collect(Collectors.joining(", ")));
             msg.append(
                 switch (overlap.kind) {
-                case EQUAL_RANGE -> Localization.lang("Found identical ranges");
-                case OVERLAP -> Localization.lang("Found overlapping ranges");
-                case TOUCH -> Localization.lang("Found touching ranges");
+                    case EQUAL_RANGE -> Localization.lang("Found identical ranges");
+                    case OVERLAP -> Localization.lang("Found overlapping ranges");
+                    case TOUCH -> Localization.lang("Found touching ranges");
                 });
             msg.append(": ");
             msg.append(listOfRanges);
@@ -483,7 +458,7 @@ public class OOFrontend {
                                           ranges,
                                           requireSeparation);
 
-        if (overlaps.size() == 0) {
+        if (overlaps.isEmpty()) {
             return OOVoidResult.ok();
         }
         return OOVoidResult.error(new JabRefException("Found overlapping or touching ranges",
@@ -513,7 +488,7 @@ public class OOFrontend {
         List<RangeOverlap<RangeForOverlapCheck<CitationGroupId>>> overlaps =
             RangeOverlapWithin.findOverlappingRanges(doc, ranges, requireSeparation, reportAtMost);
 
-        if (overlaps.size() == 0) {
+        if (overlaps.isEmpty()) {
             return OOVoidResult.ok();
         }
         return OOVoidResult.error(new JabRefException("Found overlapping or touching ranges",
@@ -552,7 +527,6 @@ public class OOFrontend {
      */
     public List<CitationEntry> getCitationEntries(XTextDocument doc)
         throws
-        UnknownPropertyException,
         WrappedTargetException,
         NoDocumentException {
         return this.backend.getCitationEntries(doc, citationGroups);
@@ -560,13 +534,9 @@ public class OOFrontend {
 
     public void applyCitationEntries(XTextDocument doc, List<CitationEntry> citationEntries)
         throws
-        UnknownPropertyException,
-        NotRemoveableException,
-        PropertyExistException,
         PropertyVetoException,
         IllegalTypeException,
         IllegalArgumentException,
-        NoDocumentException,
         WrappedTargetException {
         this.backend.applyCitationEntries(doc, citationEntries);
     }
@@ -574,13 +544,12 @@ public class OOFrontend {
     public void imposeGlobalOrder(XTextDocument doc, FunctionalTextViewCursor fcursor)
         throws
         WrappedTargetException,
-        NoDocumentException,
-        JabRefException {
+        NoDocumentException {
 
         boolean mapFootnotesToFootnoteMarks = true;
         List<CitationGroup> sortedCitationGroups =
             getVisuallySortedCitationGroups(doc, mapFootnotesToFootnoteMarks, fcursor);
-        List<CitationGroupId> sortedCitationGroupIds = OOListUtil.map(sortedCitationGroups, cg -> cg.cgid);
+        List<CitationGroupId> sortedCitationGroupIds = OOListUtil.map(sortedCitationGroups, group -> group.groupId);
         citationGroups.setGlobalOrder(sortedCitationGroupIds);
     }
 }

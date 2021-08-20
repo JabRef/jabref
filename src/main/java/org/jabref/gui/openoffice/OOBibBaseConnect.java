@@ -25,15 +25,11 @@ import com.sun.star.lang.XComponent;
 import com.sun.star.lang.XMultiComponentFactory;
 import com.sun.star.text.XTextDocument;
 import com.sun.star.uno.XComponentContext;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Establish connection to a document opened in OpenOffice or LibreOffice.
  */
 class OOBibBaseConnect {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(OOBibBaseConnect.class);
 
     /* variables  */
     private final DialogService dialogService;

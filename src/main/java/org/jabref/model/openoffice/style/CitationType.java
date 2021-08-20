@@ -11,8 +11,8 @@ public enum CitationType {
 
     public boolean inParenthesis() {
         return switch (this) {
-        case AUTHORYEAR_PAR, INVISIBLE_CIT -> true;
-        case AUTHORYEAR_INTEXT -> false;
+            case AUTHORYEAR_PAR, INVISIBLE_CIT -> true;
+            case AUTHORYEAR_INTEXT -> false;
         };
     }
 
