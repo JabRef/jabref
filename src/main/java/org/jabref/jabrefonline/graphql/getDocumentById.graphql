@@ -1,7 +1,27 @@
-query getDocumentById($id: ID!) {
-	getUserDocumentRaw(id: $id) {
-	type
-    citationKey
-    fields { field, value }
+query getDocumentById($userDocumentId: ID!) {
+	userDocument(id: $userDocumentId){
+  id
+  citationKeys
+  lastModified
+  added
+  title
+  subtitle
+  titleAddon
+  abstract
+  authors {
+    ... on Person {
+      name
+      id
+    }
+    ... on Organization {
+      id
+      name
+    }
   }
+  note
+  languages
+  publicationState
+  keywords
+
+}
 }

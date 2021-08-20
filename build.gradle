@@ -384,7 +384,11 @@ task generateJournalAbbreviationList(type: JournalAbbreviationConverter) {
     outputDir = file("src/main/resources/journals")
 }
 
+
 apollo {
+    //  ./gradlew generateApolloSources
+    // ./gradlew downloadApolloSchema --endpoint="https://jabref-dev.azurewebsites.net/api" --schema="src/main/java/org/jabref/jabrefonline/graphql/schema.json"
+
   schemaFile = file("src/main/java/org/jabref/jabrefonline/graphql/schema.json")
   graphqlSourceDirectorySet.srcDirs += "src/main/java/org/jabref/jabrefonline/graphql/"
   graphqlSourceDirectorySet.excludes = ["schema.json"]
