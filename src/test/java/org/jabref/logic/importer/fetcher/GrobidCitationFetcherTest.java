@@ -118,9 +118,9 @@ public class GrobidCitationFetcherTest {
     }
 
     @Test
-    public void performSearchThrowsExceptionInCaseOfConnectionIssues() throws IOException {
+    public void performSearchThrowsExceptionInCaseOfConnectionIssues() throws IOException, ParseException {
         GrobidService grobidServiceMock = mock(GrobidService.class);
-        when(grobidServiceMock.processCitation(anyString(), any())).thenThrow(new SocketTimeoutException("Timeout"));
+        when(grobidServiceMock.processCitation(anyString(), any(), any())).thenThrow(new SocketTimeoutException("Timeout"));
         grobidCitationFetcher = new GrobidCitationFetcher(importFormatPreferences, grobidServiceMock);
 
         assertThrows(FetcherException.class, () -> {
