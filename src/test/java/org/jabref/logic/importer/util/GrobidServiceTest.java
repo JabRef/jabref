@@ -12,6 +12,7 @@ import org.jabref.logic.importer.fetcher.GrobidCitationFetcher;
 import org.jabref.logic.importer.fileformat.PdfGrobidImporterTest;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.testutils.category.FetcherTest;
 
 import org.junit.jupiter.api.BeforeAll;
@@ -39,36 +40,36 @@ public class GrobidServiceTest {
     }
 
     @Test
-    public void processValidCitationTest() throws IOException {
-        String response = grobidService.processCitation("Derwing, T. M., Rossiter, M. J., & Munro, " +
+    public void processValidCitationTest() throws IOException, ParseException {
+        BibEntry exampleBibEntry = new BibEntry(StandardEntryType.Article).withCitationKey("-1")
+                                                                                    .withField(StandardField.AUTHOR, "Derwing, Tracey and Rossiter, Marian and Munro, Murray")
+                                                                                    .withField(StandardField.TITLE, "Teaching Native Speakers to Listen to Foreign-accented Speech")
+                                                                                    .withField(StandardField.JOURNAL, "Journal of Multilingual and Multicultural Development")
+                                                                                    .withField(StandardField.DOI, "10.1080/01434630208666468")
+                                                                                    .withField(StandardField.DATE, "2002-09")
+                                                                                    .withField(StandardField.YEAR, "2002")
+                                                                                    .withField(StandardField.MONTH, "9")
+                                                                                    .withField(StandardField.PAGES, "245-259")
+                                                                                    .withField(StandardField.VOLUME, "23")
+                                                                                    .withField(StandardField.PUBLISHER, "Informa UK Limited")
+                                                                                    .withField(StandardField.NUMBER, "4");
+        Optional<BibEntry> response = grobidService.processCitation("Derwing, T. M., Rossiter, M. J., & Munro, " +
                 "M. J. (2002). Teaching native speakers to listen to foreign-accented speech. " +
-                "Journal of Multilingual and Multicultural Development, 23(4), 245-259.", GrobidService.ConsolidateCitations.WITH_METADATA);
-        String[] responseRows = response.split("\n");
-        assertNotNull(response);
-        assertEquals('@', response.charAt(0));
-        assertTrue(responseRows[1].contains("author") && responseRows[1].contains("Derwing, Tracey and Rossiter, Marian and Munro, Murray"));
-        assertTrue(responseRows[2].contains("title") && responseRows[2].contains("Teaching Native Speakers to Listen to Foreign-accented Speech"));
-        assertTrue(responseRows[3].contains("journal") && responseRows[3].contains("Journal of Multilingual and Multicultural"));
-        assertTrue(responseRows[4].contains("publisher") && responseRows[4].contains("Informa UK Limited"));
-        assertTrue(responseRows[5].contains("date") && responseRows[5].contains("2002-09"));
-        assertTrue(responseRows[6].contains("year") && responseRows[6].contains("2002"));
-        assertTrue(responseRows[7].contains("month") && responseRows[7].contains("9"));
-        assertTrue(responseRows[8].contains("pages") && responseRows[8].contains("245-259"));
-        assertTrue(responseRows[9].contains("volume") && responseRows[9].contains("23"));
-        assertTrue(responseRows[10].contains("number") && responseRows[10].contains("4"));
-        assertTrue(responseRows[11].contains("doi") && responseRows[11].contains("10.1080/01434630208666468"));
+                "Journal of Multilingual and Multicultural Development, 23(4), 245-259.", importFormatPreferences, GrobidService.ConsolidateCitations.WITH_METADATA);
+        assertTrue(response.isPresent());
+        assertEquals(exampleBibEntry, response.get());
     }
 
     @Test
-    public void processEmptyStringTest() throws IOException {
-        String response = grobidService.processCitation(" ", GrobidService.ConsolidateCitations.WITH_METADATA);
+    public void processEmptyStringTest() throws IOException, ParseException {
+        Optional<BibEntry> response = grobidService.processCitation(" ", importFormatPreferences, GrobidService.ConsolidateCitations.WITH_METADATA);
         assertNotNull(response);
-        assertEquals("", response);
+        assertEquals(Optional.empty(), response);
     }
 
     @Test
     public void processInvalidCitationTest() {
-        assertThrows(IOException.class, () -> grobidService.processCitation("iiiiiiiiiiiiiiiiiiiiiiii", GrobidService.ConsolidateCitations.WITH_METADATA));
+        assertThrows(IOException.class, () -> grobidService.processCitation("iiiiiiiiiiiiiiiiiiiiiiii", importFormatPreferences, GrobidService.ConsolidateCitations.WITH_METADATA));
     }
 
     @Test
