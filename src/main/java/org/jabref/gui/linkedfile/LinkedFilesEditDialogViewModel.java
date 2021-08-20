@@ -133,7 +133,6 @@ public class LinkedFilesEditDialogViewModel extends AbstractViewModel {
             try {
                 return new LinkedFile(description.getValue(), new URL(link.getValue()), fileType);
             } catch (MalformedURLException e) {
-                //ignore
                 return new LinkedFile(description.getValue(), link.getValue(), fileType);
             }
         }
