@@ -20,6 +20,7 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.desktop.JabRefDesktop;
+import org.jabref.gui.documentviewer.DocumentViewerView;
 import org.jabref.gui.entryeditor.EntryEditorTab;
 import org.jabref.gui.maintable.OpenExternalFileAction;
 import org.jabref.gui.maintable.OpenFolderAction;
@@ -49,6 +50,8 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
 
     private BibEntry entry;
 
+    private DocumentViewerView documentViewerView;
+
     public FulltextSearchResultsTab(StateManager stateManager, PreferencesService preferencesService, DialogService dialogService) {
         this.stateManager = stateManager;
         this.preferencesService = preferencesService;
@@ -73,10 +76,13 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
 
     @Override
     protected void bindToEntry(BibEntry entry) {
-        this.entry = entry;
         if (!shouldShow(entry) || entry == null) {
             return;
         }
+        if (!entry.equals(this.entry)) {
+            documentViewerView = new DocumentViewerView();
+        }
+        this.entry = entry;
         PdfSearchResults searchResults = stateManager.activeSearchQueryProperty().get().get().getRule().getFulltextResults(stateManager.activeSearchQueryProperty().get().get().getQuery(), entry);
 
         content.getChildren().clear();
@@ -139,6 +145,14 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
     private Text createPageLink(int pageNumber) {
         Text pageLink = new Text(System.lineSeparator() + Localization.lang("On page %0", pageNumber) + System.lineSeparator() + System.lineSeparator());
         pageLink.setStyle("-fx-font-style: italic; -fx-font-weight: bold;");
+
+        pageLink.setOnMouseClicked(event -> {
+            if (MouseButton.PRIMARY.equals(event.getButton())) {
+                documentViewerView.gotoPage(pageNumber);
+                documentViewerView.setLiveMode(false);
+                documentViewerView.show();
+            }
+        });
         return pageLink;
     }
 
