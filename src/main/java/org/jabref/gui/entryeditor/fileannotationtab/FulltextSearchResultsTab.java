@@ -91,8 +91,7 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
 
             // Iterate through pages (within file) with search hits
             for (Map.Entry<Integer, List<SearchResult>> resultsPage : resultsPath.getValue().entrySet()) {
-                Text pageLinkText = new Text(Localization.lang("Page %0", resultsPage.getKey()) + System.lineSeparator()); // tooltip with absolute path?
-                content.getChildren().addAll(pageLinkText, lineSeparator());
+                content.getChildren().addAll(createPageLink(resultsPage.getKey()), lineSeparator());
 
                 // Iterate through search hits (within file within page)
                 for (SearchResult searchResult : resultsPage.getValue()) {
@@ -107,7 +106,9 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
 
     private Text createFileLink(String pathToFile) {
         LinkedFile linkedFile = new LinkedFile("", Path.of(pathToFile), "pdf");
-        Text fileLinkText = new Text(Localization.lang("Found match in %0", pathToFile) + System.lineSeparator());
+        Text fileLinkText = new Text(Localization.lang("Found match in %0", pathToFile) + System.lineSeparator() + System.lineSeparator());
+        fileLinkText.setStyle("-fx-font-weight: bold;");
+
         ContextMenu fileContextMenu = getFileContextMenu(linkedFile);
         Path resolvedPath = linkedFile.findIn(stateManager.getActiveDatabase().get(), preferencesService.getFilePreferences()).orElse(Path.of(pathToFile));
         Tooltip fileLinkTooltip = new Tooltip(resolvedPath.toAbsolutePath().toString());
@@ -124,6 +125,12 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
             }
         });
         return fileLinkText;
+    }
+
+    private Text createPageLink(int pageNumber) {
+        Text pageLink = new Text(System.lineSeparator() + Localization.lang("On page %0", pageNumber) + System.lineSeparator() + System.lineSeparator()); // tooltip with absolute path?
+        pageLink.setStyle("-fx-font-style: italic; -fx-font-weight: bold;");
+        return pageLink;
     }
 
     private ContextMenu getFileContextMenu(LinkedFile file) {
