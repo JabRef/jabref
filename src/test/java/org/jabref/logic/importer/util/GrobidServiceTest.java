@@ -64,7 +64,7 @@ public class GrobidServiceTest {
     public void processEmptyStringTest() throws IOException, ParseException {
         Optional<BibEntry> response = grobidService.processCitation(" ", importFormatPreferences, GrobidService.ConsolidateCitations.WITH_METADATA);
         assertNotNull(response);
-        assertTrue(response.isEmpty());
+        assertEquals(Optional.empty(), response);
     }
 
     @Test
