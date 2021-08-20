@@ -17,7 +17,6 @@ public class GetDocumentByIdQ {
 
     void start() {
 
-
         // First, create an `ApolloClient`
         // Replace the serverUrl with your GraphQL endpoint
         ApolloClient apolloClient = ApolloClient.builder()

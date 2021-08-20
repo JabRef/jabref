@@ -1,12 +1,5 @@
 mutation addUserDocument($addUserDocumentInput: AddUserDocumentInput!) {
   addUserDocument(input: $addUserDocumentInput) {
-    citationKeys
-    title
-    authors {
-      ... on Person {
-        id
-        name
-      }
-    }
+    id
   }
 }
