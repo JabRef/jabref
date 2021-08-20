@@ -12,9 +12,9 @@ import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.OS;
-import org.jabref.model.JabRefStringConstants;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.push.PushToApplicationConstants;
 import org.jabref.preferences.PreferencesService;
 import org.jabref.preferences.PushToApplicationPreferences;
 
@@ -23,7 +23,7 @@ import org.slf4j.LoggerFactory;
 
 public class PushToEmacs extends AbstractPushToApplication implements PushToApplication {
 
-    public static final String NAME = JabRefStringConstants.EMACS;
+    public static final String NAME = PushToApplicationConstants.EMACS;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PushToEmacs.class);
 

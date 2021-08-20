@@ -3,12 +3,12 @@ package org.jabref.gui.push;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIcon;
-import org.jabref.model.JabRefStringConstants;
+import org.jabref.model.push.PushToApplicationConstants;
 import org.jabref.preferences.PreferencesService;
 
 public class PushToTeXstudio extends AbstractPushToApplication implements PushToApplication {
 
-    public static final String NAME = JabRefStringConstants.TEXSTUDIO;
+    public static final String NAME = PushToApplicationConstants.TEXSTUDIO;
 
     public PushToTeXstudio(DialogService dialogService, PreferencesService preferencesService) {
         super(dialogService, preferencesService);
