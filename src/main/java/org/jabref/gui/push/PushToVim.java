@@ -11,6 +11,7 @@ import org.jabref.gui.JabRefExecutorService;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.model.JabRefStringConstants;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.PreferencesService;
@@ -21,7 +22,7 @@ import org.slf4j.LoggerFactory;
 
 public class PushToVim extends AbstractPushToApplication implements PushToApplication {
 
-    public static final String NAME = "Vim";
+    public static final String NAME = JabRefStringConstants.VIM;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PushToVim.class);
 

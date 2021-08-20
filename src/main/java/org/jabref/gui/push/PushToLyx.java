@@ -13,6 +13,7 @@ import org.jabref.gui.JabRefExecutorService;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.model.JabRefStringConstants;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.PreferencesService;
@@ -23,7 +24,7 @@ import org.slf4j.LoggerFactory;
 
 public class PushToLyx extends AbstractPushToApplication implements PushToApplication {
 
-    public static final String NAME = "LyX/Kile";
+    public static final String NAME = JabRefStringConstants.LYX;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PushToLyx.class);
 
