@@ -51,12 +51,6 @@ import org.jabref.gui.maintable.MainTableNameFormatPreferences.AbbreviationStyle
 import org.jabref.gui.maintable.MainTableNameFormatPreferences.DisplayStyle;
 import org.jabref.gui.maintable.MainTablePreferences;
 import org.jabref.gui.mergeentries.MergeEntries;
-import org.jabref.gui.push.PushToEmacs;
-import org.jabref.gui.push.PushToLyx;
-import org.jabref.gui.push.PushToTeXstudio;
-import org.jabref.gui.push.PushToTexmaker;
-import org.jabref.gui.push.PushToVim;
-import org.jabref.gui.push.PushToWinEdt;
 import org.jabref.gui.search.SearchDisplayMode;
 import org.jabref.gui.specialfields.SpecialFieldsPreferences;
 import org.jabref.gui.util.Theme;
@@ -111,6 +105,7 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.EntryTypeFactory;
 import org.jabref.model.metadata.SaveOrderConfig;
+import org.jabref.model.push.PushToApplicationConstants;
 import org.jabref.model.strings.StringUtil;
 
 import org.slf4j.Logger;
@@ -236,6 +231,7 @@ public class JabRefPreferences implements PreferencesService {
     public static final String SEARCH_DISPLAY_MODE = "searchDisplayMode";
     public static final String SEARCH_CASE_SENSITIVE = "caseSensitiveSearch";
     public static final String SEARCH_REG_EXP = "regExpSearch";
+    public static final String SEARCH_FULLTEXT = "fulltextSearch";
 
     public static final String GENERATE_KEY_ON_IMPORT = "generateKeyOnImport";
 
@@ -438,6 +434,7 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(SEARCH_DISPLAY_MODE, SearchDisplayMode.FILTER.toString());
         defaults.put(SEARCH_CASE_SENSITIVE, Boolean.FALSE);
         defaults.put(SEARCH_REG_EXP, Boolean.FALSE);
+        defaults.put(SEARCH_FULLTEXT, Boolean.TRUE);
 
         defaults.put(GENERATE_KEY_ON_IMPORT, Boolean.TRUE);
 
@@ -1139,43 +1136,6 @@ public class JabRefPreferences implements PreferencesService {
         putStringList(CLEANUP_FORMATTERS, cleanupPreset.getFormatterCleanups().getAsStringList(OS.NEWLINE));
     }
 
-    @Override
-    public void storeExportSaveOrder(SaveOrderConfig config) {
-        putBoolean(EXPORT_PRIMARY_SORT_DESCENDING, config.getSortCriteria().get(0).descending);
-        putBoolean(EXPORT_SECONDARY_SORT_DESCENDING, config.getSortCriteria().get(1).descending);
-        putBoolean(EXPORT_TERTIARY_SORT_DESCENDING, config.getSortCriteria().get(2).descending);
-        putBoolean(EXPORT_IN_ORIGINAL_ORDER, config.saveInOriginalOrder());
-        putBoolean(EXPORT_IN_SPECIFIED_ORDER, config.saveInSpecifiedOrder());
-
-        put(EXPORT_PRIMARY_SORT_FIELD, config.getSortCriteria().get(0).field.getName());
-        put(EXPORT_SECONDARY_SORT_FIELD, config.getSortCriteria().get(1).field.getName());
-        put(EXPORT_TERTIARY_SORT_FIELD, config.getSortCriteria().get(2).field.getName());
-    }
-
-    private SaveOrderConfig loadTableSaveOrder() {
-        SaveOrderConfig config = new SaveOrderConfig();
-
-        updateMainTableColumns();
-        List<MainTableColumnModel> sortOrder = createMainTableColumnSortOrder();
-
-        for (var column : sortOrder) {
-            boolean descending = (column.getSortType() == SortType.DESCENDING);
-            config.getSortCriteria().add(new SaveOrderConfig.SortCriterion(
-                                                                           FieldFactory.parseField(column.getQualifier()),
-                                                                           descending));
-        }
-
-        return config;
-    }
-
-    @Override
-    public SaveOrderConfig loadExportSaveOrder() {
-        return new SaveOrderConfig(getBoolean(EXPORT_IN_ORIGINAL_ORDER), getBoolean(EXPORT_IN_SPECIFIED_ORDER),
-                new SaveOrderConfig.SortCriterion(FieldFactory.parseField(get(EXPORT_PRIMARY_SORT_FIELD)), getBoolean(EXPORT_PRIMARY_SORT_DESCENDING)),
-                new SaveOrderConfig.SortCriterion(FieldFactory.parseField(get(EXPORT_SECONDARY_SORT_FIELD)), getBoolean(EXPORT_SECONDARY_SORT_DESCENDING)),
-                new SaveOrderConfig.SortCriterion(FieldFactory.parseField(get(EXPORT_TERTIARY_SORT_FIELD)), getBoolean(EXPORT_TERTIARY_SORT_DESCENDING)));
-    }
-
     public String getOrCreateUserId() {
         Optional<String> userId = getAsOptional(USER_ID);
         if (userId.isPresent()) {
@@ -1352,7 +1312,6 @@ public class JabRefPreferences implements PreferencesService {
                 getBoolean(BIBLATEX_DEFAULT_MODE) ? BibDatabaseMode.BIBLATEX : BibDatabaseMode.BIBTEX,
                 getBoolean(WARN_ABOUT_DUPLICATES_IN_INSPECTION),
                 getBoolean(CONFIRM_DELETE),
-                getBoolean(ALLOW_INTEGER_EDITION_BIBTEX),
                 getBoolean(MEMORY_STICK_MODE),
                 getBoolean(SHOW_ADVANCED_HINTS));
     }
@@ -1363,7 +1322,6 @@ public class JabRefPreferences implements PreferencesService {
         putBoolean(BIBLATEX_DEFAULT_MODE, (preferences.getDefaultBibDatabaseMode() == BibDatabaseMode.BIBLATEX));
         putBoolean(WARN_ABOUT_DUPLICATES_IN_INSPECTION, preferences.isWarnAboutDuplicatesInInspection());
         putBoolean(CONFIRM_DELETE, preferences.shouldConfirmDelete());
-        putBoolean(ALLOW_INTEGER_EDITION_BIBTEX, preferences.shouldAllowIntegerEditionBibtex());
         putBoolean(MEMORY_STICK_MODE, preferences.isMemoryStickMode());
         putBoolean(SHOW_ADVANCED_HINTS, preferences.shouldShowAdvancedHints());
     }
@@ -1595,6 +1553,7 @@ public class JabRefPreferences implements PreferencesService {
                 getBoolean(SHOW_LATEX_CITATIONS),
                 getBoolean(DEFAULT_SHOW_SOURCE),
                 getBoolean(VALIDATE_IN_ENTRY_EDITOR),
+                getBoolean(ALLOW_INTEGER_EDITION_BIBTEX),
                 getDouble(ENTRY_EDITOR_HEIGHT));
     }
 
@@ -1607,6 +1566,7 @@ public class JabRefPreferences implements PreferencesService {
         putBoolean(SHOW_LATEX_CITATIONS, preferences.shouldShowLatexCitationsTab());
         putBoolean(DEFAULT_SHOW_SOURCE, preferences.showSourceTabByDefault());
         putBoolean(VALIDATE_IN_ENTRY_EDITOR, preferences.shouldEnableValidation());
+        putBoolean(ALLOW_INTEGER_EDITION_BIBTEX, preferences.shouldAllowIntegerEditionBibtex());
         putDouble(ENTRY_EDITOR_HEIGHT, preferences.getDividerPosition());
     }
 
@@ -1781,12 +1741,12 @@ public class JabRefPreferences implements PreferencesService {
     @Override
     public PushToApplicationPreferences getPushToApplicationPreferences() {
         Map<String, String> applicationCommands = new HashMap<>();
-        applicationCommands.put(PushToEmacs.NAME, get(PUSH_EMACS_PATH));
-        applicationCommands.put(PushToLyx.NAME, get(PUSH_LYXPIPE));
-        applicationCommands.put(PushToTexmaker.NAME, get(PUSH_TEXMAKER_PATH));
-        applicationCommands.put(PushToTeXstudio.NAME, get(PUSH_TEXSTUDIO_PATH));
-        applicationCommands.put(PushToVim.NAME, get(PUSH_VIM));
-        applicationCommands.put(PushToWinEdt.NAME, get(PUSH_WINEDT_PATH));
+        applicationCommands.put(PushToApplicationConstants.EMACS, get(PUSH_EMACS_PATH));
+        applicationCommands.put(PushToApplicationConstants.LYX, get(PUSH_LYXPIPE));
+        applicationCommands.put(PushToApplicationConstants.TEXMAKER, get(PUSH_TEXMAKER_PATH));
+        applicationCommands.put(PushToApplicationConstants.TEXSTUDIO, get(PUSH_TEXSTUDIO_PATH));
+        applicationCommands.put(PushToApplicationConstants.VIM, get(PUSH_VIM));
+        applicationCommands.put(PushToApplicationConstants.WIN_EDT, get(PUSH_WINEDT_PATH));
 
         return new PushToApplicationPreferences(
                 applicationCommands,
@@ -1797,12 +1757,12 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public void storePushToApplicationPreferences(PushToApplicationPreferences preferences) {
-        put(PUSH_EMACS_PATH, preferences.getPushToApplicationCommandPaths().get(PushToEmacs.NAME));
-        put(PUSH_LYXPIPE, preferences.getPushToApplicationCommandPaths().get(PushToLyx.NAME));
-        put(PUSH_TEXMAKER_PATH, preferences.getPushToApplicationCommandPaths().get(PushToTexmaker.NAME));
-        put(PUSH_TEXSTUDIO_PATH, preferences.getPushToApplicationCommandPaths().get(PushToTeXstudio.NAME));
-        put(PUSH_VIM, preferences.getPushToApplicationCommandPaths().get(PushToVim.NAME));
-        put(PUSH_WINEDT_PATH, preferences.getPushToApplicationCommandPaths().get(PushToWinEdt.NAME));
+        put(PUSH_EMACS_PATH, preferences.getPushToApplicationCommandPaths().get(PushToApplicationConstants.EMACS));
+        put(PUSH_LYXPIPE, preferences.getPushToApplicationCommandPaths().get(PushToApplicationConstants.LYX));
+        put(PUSH_TEXMAKER_PATH, preferences.getPushToApplicationCommandPaths().get(PushToApplicationConstants.TEXMAKER));
+        put(PUSH_TEXSTUDIO_PATH, preferences.getPushToApplicationCommandPaths().get(PushToApplicationConstants.TEXSTUDIO));
+        put(PUSH_VIM, preferences.getPushToApplicationCommandPaths().get(PushToApplicationConstants.VIM));
+        put(PUSH_WINEDT_PATH, preferences.getPushToApplicationCommandPaths().get(PushToApplicationConstants.WIN_EDT));
 
         put(PUSH_EMACS_ADDITIONAL_PARAMETERS, preferences.getEmacsArguments());
         put(PUSH_VIM_SERVER, preferences.getVimServer());
@@ -2049,12 +2009,55 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     @Override
+    public SaveOrderConfig getExportSaveOrder() {
+        List<SaveOrderConfig.SortCriterion> sortCriteria = List.of(
+                new SaveOrderConfig.SortCriterion(FieldFactory.parseField(get(EXPORT_PRIMARY_SORT_FIELD)), getBoolean(EXPORT_PRIMARY_SORT_DESCENDING)),
+                new SaveOrderConfig.SortCriterion(FieldFactory.parseField(get(EXPORT_SECONDARY_SORT_FIELD)), getBoolean(EXPORT_SECONDARY_SORT_DESCENDING)),
+                new SaveOrderConfig.SortCriterion(FieldFactory.parseField(get(EXPORT_TERTIARY_SORT_FIELD)), getBoolean(EXPORT_TERTIARY_SORT_DESCENDING))
+        );
+
+        return new SaveOrderConfig(
+                SaveOrderConfig.OrderType.fromBooleans(getBoolean(EXPORT_IN_SPECIFIED_ORDER), getBoolean(EXPORT_IN_ORIGINAL_ORDER)),
+                sortCriteria
+        );
+    }
+
+    @Override
+    public void storeExportSaveOrder(SaveOrderConfig config) {
+        putBoolean(EXPORT_IN_ORIGINAL_ORDER, config.getOrderType() == SaveOrderConfig.OrderType.ORIGINAL);
+        putBoolean(EXPORT_IN_SPECIFIED_ORDER, config.getOrderType() == SaveOrderConfig.OrderType.SPECIFIED);
+
+        put(EXPORT_PRIMARY_SORT_FIELD, config.getSortCriteria().get(0).field.getName());
+        put(EXPORT_SECONDARY_SORT_FIELD, config.getSortCriteria().get(1).field.getName());
+        put(EXPORT_TERTIARY_SORT_FIELD, config.getSortCriteria().get(2).field.getName());
+        putBoolean(EXPORT_PRIMARY_SORT_DESCENDING, config.getSortCriteria().get(0).descending);
+        putBoolean(EXPORT_SECONDARY_SORT_DESCENDING, config.getSortCriteria().get(1).descending);
+        putBoolean(EXPORT_TERTIARY_SORT_DESCENDING, config.getSortCriteria().get(2).descending);
+    }
+
+    private SaveOrderConfig loadTableSaveOrder() {
+        SaveOrderConfig config = new SaveOrderConfig();
+
+        updateMainTableColumns();
+        List<MainTableColumnModel> sortOrder = createMainTableColumnSortOrder();
+
+        for (var column : sortOrder) {
+            boolean descending = (column.getSortType() == SortType.DESCENDING);
+            config.getSortCriteria().add(new SaveOrderConfig.SortCriterion(
+                    FieldFactory.parseField(column.getQualifier()),
+                    descending));
+        }
+
+        return config;
+    }
+
+    @Override
     public SavePreferences getSavePreferencesForExport() {
         Boolean saveInOriginalOrder = this.getBoolean(EXPORT_IN_ORIGINAL_ORDER);
         SaveOrderConfig saveOrder = null;
         if (!saveInOriginalOrder) {
             if (this.getBoolean(EXPORT_IN_SPECIFIED_ORDER)) {
-                saveOrder = this.loadExportSaveOrder();
+                saveOrder = this.getExportSaveOrder();
             } else {
                 saveOrder = this.loadTableSaveOrder();
             }
@@ -2532,7 +2535,8 @@ public class JabRefPreferences implements PreferencesService {
         return new SearchPreferences(
                 searchDisplayMode,
                 getBoolean(SEARCH_CASE_SENSITIVE),
-                getBoolean(SEARCH_REG_EXP));
+                getBoolean(SEARCH_REG_EXP),
+                getBoolean(SEARCH_FULLTEXT));
     }
 
     @Override
@@ -2540,6 +2544,7 @@ public class JabRefPreferences implements PreferencesService {
         put(SEARCH_DISPLAY_MODE, Objects.requireNonNull(preferences.getSearchDisplayMode()).toString());
         putBoolean(SEARCH_CASE_SENSITIVE, preferences.isCaseSensitive());
         putBoolean(SEARCH_REG_EXP, preferences.isRegularExpression());
+        putBoolean(SEARCH_FULLTEXT, preferences.isFulltext());
     }
 
     //*************************************************************************************************************

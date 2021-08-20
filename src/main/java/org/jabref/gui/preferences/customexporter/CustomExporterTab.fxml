@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<fx:root spacing="10.0" type="VBox"
+         xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+         fx:controller="org.jabref.gui.preferences.customexporter.CustomExporterTab">
+
+    <Label styleClass="titleHeader" text="%Custom export formats"/>
+
+    <TableView fx:id="exporterTable">
+        <columns>
+            <TableColumn fx:id="nameColumn" text="%Export name"/>
+            <TableColumn fx:id="layoutColumn" text="%Main layout file"/>
+            <TableColumn fx:id="extensionColumn" text="%Extension"/>
+        </columns>
+        <columnResizePolicy>
+            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+        </columnResizePolicy>
+    </TableView>
+
+    <HBox alignment="BASELINE_RIGHT" spacing="10.0">
+        <Button onAction="#add" text="%Add" prefWidth="80.0"/>
+        <Button onAction="#modify" text="%Modify" prefWidth="80.0"/>
+        <Button onAction="#remove" text="%Remove" prefWidth="80.0"/>
+    </HBox>
+</fx:root>

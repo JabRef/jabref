@@ -16,7 +16,7 @@
     <category citation-format="note"/>
     <category field="humanities"/>
     <summary>AIPI Style used in Civiltà Italiana series by Cesati (Italian), based on Ius Ecclesiae style and University of Bologna style, with added support for manuscripts and archive documents.</summary>
-    <updated>2021-03-22T00:00:00+01:00</updated>
+    <updated>2021-06-27T17:00:00+01:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="it">
@@ -252,11 +252,11 @@
     <layout prefix="" suffix="." delimiter="; ">
       <choose>
         <if position="ibid-with-locator">
-          <text term="ibid" form="short" text-case="lowercase"/>
+          <text term="ibid" form="short"/>
           <text macro="pageref" prefix=", "/>
         </if>
         <else-if position="ibid">
-          <text term="ibid" form="long" text-case="lowercase" font-style="italic"/>
+          <text term="ibid" form="long" font-style="italic"/>
         </else-if>
         <else-if position="subsequent">
           <group delimiter=", ">

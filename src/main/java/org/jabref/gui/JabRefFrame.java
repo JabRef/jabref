@@ -106,8 +106,11 @@ import org.jabref.gui.preview.CopyCitationAction;
 import org.jabref.gui.push.PushToApplicationAction;
 import org.jabref.gui.push.PushToApplicationsManager;
 import org.jabref.gui.search.GlobalSearchBar;
+import org.jabref.gui.search.RebuildFulltextSearchIndexAction;
 import org.jabref.gui.shared.ConnectToSharedDatabaseCommand;
 import org.jabref.gui.shared.PullChangesFromSharedAction;
+import org.jabref.gui.slr.ExistingStudySearchAction;
+import org.jabref.gui.slr.StartNewStudyAction;
 import org.jabref.gui.specialfields.SpecialFieldMenuItemFactory;
 import org.jabref.gui.texparser.ParseLatexAction;
 import org.jabref.gui.undo.CountingUndoManager;
@@ -813,13 +816,15 @@ public class JabRefFrame extends BorderPane {
 
                 new SeparatorMenuItem(),
 
-                factory.createMenuItem(StandardActions.SEND_AS_EMAIL, new SendAsEMailAction(dialogService, prefs, stateManager)),
-                pushToApplicationMenuItem
-                // Disabled until PR #7126 can be merged
-                // new SeparatorMenuItem(),
-                // factory.createMenuItem(StandardActions.START_SYSTEMATIC_LITERATURE_REVIEW,
-                //        new StartLiteratureReviewAction(this, Globals.getFileUpdateMonitor(), prefs.getWorkingDir(),
-                //                taskExecutor, prefs, prefs.getImportFormatPreferences(), prefs.getSavePreferences()))
+                factory.createMenuItem(StandardActions.SEND_AS_EMAIL, new SendAsEMailAction(dialogService, this.prefs, stateManager)),
+                pushToApplicationMenuItem,
+                new SeparatorMenuItem(),
+                factory.createMenuItem(StandardActions.START_NEW_STUDY, new StartNewStudyAction(this, Globals.getFileUpdateMonitor(), Globals.TASK_EXECUTOR, prefs)),
+                factory.createMenuItem(StandardActions.SEARCH_FOR_EXISTING_STUDY, new ExistingStudySearchAction(this, Globals.getFileUpdateMonitor(), Globals.TASK_EXECUTOR, prefs)),
+
+                new SeparatorMenuItem(),
+
+                factory.createMenuItem(StandardActions.REBUILD_FULLTEXT_SEARCH_INDEX, new RebuildFulltextSearchIndexAction(stateManager, this::getCurrentLibraryTab, dialogService, prefs.getFilePreferences()))
         );
 
         SidePaneComponent webSearch = sidePaneManager.getComponent(SidePaneType.WEB_SEARCH);

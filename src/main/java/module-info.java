@@ -95,12 +95,12 @@ open module org.jabref {
     requires flexmark.util.ast;
     requires flexmark.util.data;
     requires com.h2database.mvstore;
-    requires lucene.queryparser;
-    requires lucene.core;
+    requires lucene;
     requires org.eclipse.jgit;
     requires com.fasterxml.jackson.databind;
     requires com.fasterxml.jackson.dataformat.yaml;
     requires com.fasterxml.jackson.datatype.jsr310;
+    requires net.harawata.appdirs;
 
     // custom module name for the apollo shadow jar under libs
     requires com.customapollo.thirdparty.apollo;

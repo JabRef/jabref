@@ -1,15 +1,14 @@
 name: Mark stale issues and pull requests
 
 on:
-  schedule:
-  - cron: "20 19 * * *"
+  workflow_dispatch:
 
 jobs:
   stale:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/stale@v3
+    - uses: actions/stale@v4
       with:
         repo-token: ${{ secrets.GITHUB_TOKEN }}
         days-before-stale: 180

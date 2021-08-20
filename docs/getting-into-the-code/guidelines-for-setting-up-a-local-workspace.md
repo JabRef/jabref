@@ -18,7 +18,7 @@ This section list the prerequisites you need to get started to develop JabRef. A
 
 ### Java Development Kit 16
 
-A working Java \(Develoment Kit\) 16 installation with Java FX support is required. In the command line \(terminal in Linux, cmd in Windows\) run `javac -version` and make sure that the reported version is Java 16 \(e.g `javac 16`\). If `javac` is not found or a wrong version is reported, check your `PATH` environment variable, your `JAVA_HOME` environment variable or install the most recent JDK.
+A working Java \(Develoment Kit\) 16 installation with Java FX support is required. In the command line \(terminal in Linux, cmd in Windows\) run `javac -version` and make sure that the reported version is Java 16 \(e.g., `javac 16`\). If `javac` is not found or a wrong version is reported, check your `PATH` environment variable, your `JAVA_HOME` environment variable or install the most recent JDK.
 
 [JavaFX is not part of the default JDK any more](https://www.reddit.com/r/java/comments/82qm9x/javafx_will_be_removed_from_the_java_jdk_in_jdk_11/), it needs to be installed separately if not using a special JDK.
 
@@ -106,7 +106,7 @@ After that, you can open `jabref/build.gradle` as a project. It is crucial that 
 
 Ensure you have a Java 16 SDK configured by navigating to **File \| Project Structure \| Platform Settings \| SDKs**. If you don't have one, add a new Java JDK and point it to the location of a JDK 16. ![Project Settings](../.gitbook/assets/intellij-choose-jdk-adoptopenjdk-on-windows-project-settings.png)
 
-Navigate to **File \| Project Structure \| Project** and ensure that the projects' SDK is Java 16 ![Use JDK 15 as project SDK](../.gitbook/assets/intellij-choose-jdk15-project-default.png)
+Navigate to **File \| Project Structure \| Project** and ensure that the projects' SDK is Java 16 ![Use JDK 16 as project SDK](../.gitbook/assets/intellij-choose-jdk15-project-default.png)
 
 Navigate to **File \| Settings \| Build, Execution, Deployment \| Build Tools \| Gradle** and select the "Project SDK" as the Gradle JVM at the bottom.
 
@@ -201,7 +201,7 @@ Finally, ensure that the checkstyle configuration file is in place:
 4. Click "Browse" and choose `config/checkstyle/checkstyle.xml`
 5. Click "Next" and "Finish"
 6. Activate the CheckStyle configuration file by ticking it in the list
-7. Ensure that the [latest CheckStyle version](https://checkstyle.org/releasenotes.html) is selected \(8.36 or higher\). 8.36 is required for Java 15.
+7. Ensure that the [latest CheckStyle version](https://checkstyle.org/releasenotes.html) is selected \(8.36 or higher\). 8.43 is required for Java 16.
 8. Set the "Scan Scope" to "Only Java sources \(including tests\)
 9. Save settings by clicking "OK"
 10. Your configuration should now look like this:

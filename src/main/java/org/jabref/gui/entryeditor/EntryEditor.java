@@ -31,6 +31,7 @@ import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.citationkeypattern.GenerateCitationKeySingleAction;
 import org.jabref.gui.entryeditor.fileannotationtab.FileAnnotationTab;
+import org.jabref.gui.entryeditor.fileannotationtab.FulltextSearchResultsTab;
 import org.jabref.gui.externalfiles.ExternalFilesEntryLinker;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.help.HelpAction;
@@ -267,6 +268,8 @@ public class EntryEditor extends BorderPane {
         // LaTeX citations tab
         entryEditorTabs.add(new LatexCitationsTab(databaseContext, preferencesService, taskExecutor, dialogService));
 
+        entryEditorTabs.add(new FulltextSearchResultsTab(stateManager, preferencesService.getTheme(), preferencesService.getFilePreferences()));
+
         return entryEditorTabs;
     }
 
@@ -352,7 +355,7 @@ public class EntryEditor extends BorderPane {
 
         // Add menu for fetching bibliographic information
         ContextMenu fetcherMenu = new ContextMenu();
-        for (EntryBasedFetcher fetcher : WebFetchers.getEntryBasedFetchers(preferencesService.getImportFormatPreferences())) {
+        for (EntryBasedFetcher fetcher : WebFetchers.getEntryBasedFetchers(preferencesService.getImportFormatPreferences(), preferencesService.getFilePreferences(), databaseContext, preferencesService.getDefaultEncoding())) {
             MenuItem fetcherMenuItem = new MenuItem(fetcher.getName());
             fetcherMenuItem.setOnAction(event -> fetchAndMerge(fetcher));
             fetcherMenu.getItems().add(fetcherMenuItem);
