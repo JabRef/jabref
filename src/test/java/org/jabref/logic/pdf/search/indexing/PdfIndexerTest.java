@@ -41,6 +41,7 @@ public class PdfIndexerTest {
         when(context.getFileDirectories(Mockito.any())).thenReturn(Collections.singletonList(Path.of("src/test/resources/pdfs")));
         when(context.getFulltextIndexPath()).thenReturn(indexDir);
         when(context.getDatabase()).thenReturn(database);
+        when(context.getEntries()).thenReturn(database.getEntries());
         this.indexer = PdfIndexer.of(context, filePreferences);
     }
 
@@ -52,7 +53,8 @@ public class PdfIndexerTest {
         database.insertEntry(entry);
 
         // when
-        indexer.createIndex(database, context);
+        indexer.createIndex();
+        indexer.addToIndex(context);
 
         // then
         try (IndexReader reader = DirectoryReader.open(new NIOFSDirectory(context.getFulltextIndexPath()))) {
@@ -68,7 +70,8 @@ public class PdfIndexerTest {
         database.insertEntry(entry);
 
         // when
-        indexer.createIndex(database, context);
+        indexer.createIndex();
+        indexer.addToIndex(context);
 
         // then
         try (IndexReader reader = DirectoryReader.open(new NIOFSDirectory(context.getFulltextIndexPath()))) {
@@ -84,7 +87,8 @@ public class PdfIndexerTest {
         database.insertEntry(entry);
 
         // when
-        indexer.createIndex(database, context);
+        indexer.createIndex();
+        indexer.addToIndex(context);
 
         // then
         try (IndexReader reader = DirectoryReader.open(new NIOFSDirectory(context.getFulltextIndexPath()))) {
@@ -101,7 +105,8 @@ public class PdfIndexerTest {
         database.insertEntry(entry);
 
         // when
-        indexer.createIndex(database, context);
+        indexer.createIndex();
+        indexer.addToIndex(context);
 
         // then
         try (IndexReader reader = DirectoryReader.open(new NIOFSDirectory(context.getFulltextIndexPath()))) {
@@ -118,7 +123,8 @@ public class PdfIndexerTest {
         database.insertEntry(entry);
 
         // when
-        indexer.createIndex(database, context);
+        indexer.createIndex();
+        indexer.addToIndex(context);
 
         // then
         try (IndexReader reader = DirectoryReader.open(new NIOFSDirectory(context.getFulltextIndexPath()))) {
@@ -134,7 +140,8 @@ public class PdfIndexerTest {
         entry.setFiles(Collections.singletonList(new LinkedFile("Example Thesis", "thesis-example.pdf", StandardFileType.PDF.getName())));
         database.insertEntry(entry);
 
-        indexer.createIndex(database, context);
+        indexer.createIndex();
+        indexer.addToIndex(context);
         // index actually exists
         try (IndexReader reader = DirectoryReader.open(new NIOFSDirectory(context.getFulltextIndexPath()))) {
             assertEquals(1, reader.numDocs());
@@ -156,7 +163,8 @@ public class PdfIndexerTest {
         exampleThesis.setCitationKey("ExampleThesis2017");
         exampleThesis.setFiles(Collections.singletonList(new LinkedFile("Example Thesis", "thesis-example.pdf", StandardFileType.PDF.getName())));
         database.insertEntry(exampleThesis);
-        indexer.createIndex(database, context);
+        indexer.createIndex();
+        indexer.addToIndex(context);
 
         // index with first entry
         try (IndexReader reader = DirectoryReader.open(new NIOFSDirectory(context.getFulltextIndexPath()))) {
