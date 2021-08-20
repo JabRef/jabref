@@ -40,23 +40,24 @@ public class GrobidServiceTest {
 
     @Test
     public void processValidCitationTest() throws IOException {
+        String expectedResponse =
+                "@article{-1,\n" +
+                "  author = {Derwing, Tracey and Rossiter, Marian and Munro, Murray},\n" +
+                "  title = {Teaching Native Speakers to Listen to Foreign-accented Speech},\n" +
+                "  journal = {Journal of Multilingual and Multicultural Development},\n" +
+                "  publisher = {Informa UK Limited},\n" +
+                "  date = {2002-09},\n" +
+                "  year = {2002},\n" +
+                "  month = {9},\n" +
+                "  pages = {245-259},\n" +
+                "  volume = {23},\n" +
+                "  number = {4},\n" +
+                "  doi = {10.1080/01434630208666468}\n" +
+                "}\n";
         String response = grobidService.processCitation("Derwing, T. M., Rossiter, M. J., & Munro, " +
                 "M. J. (2002). Teaching native speakers to listen to foreign-accented speech. " +
                 "Journal of Multilingual and Multicultural Development, 23(4), 245-259.", GrobidService.ConsolidateCitations.WITH_METADATA);
-        String[] responseRows = response.split("\n");
-        assertNotNull(response);
-        assertEquals('@', response.charAt(0));
-        assertTrue(responseRows[1].contains("author") && responseRows[1].contains("Derwing, Tracey and Rossiter, Marian and Munro, Murray"));
-        assertTrue(responseRows[2].contains("title") && responseRows[2].contains("Teaching Native Speakers to Listen to Foreign-accented Speech"));
-        assertTrue(responseRows[3].contains("journal") && responseRows[3].contains("Journal of Multilingual and Multicultural"));
-        assertTrue(responseRows[4].contains("publisher") && responseRows[4].contains("Informa UK Limited"));
-        assertTrue(responseRows[5].contains("date") && responseRows[5].contains("2002-09"));
-        assertTrue(responseRows[6].contains("year") && responseRows[6].contains("2002"));
-        assertTrue(responseRows[7].contains("month") && responseRows[7].contains("9"));
-        assertTrue(responseRows[8].contains("pages") && responseRows[8].contains("245-259"));
-        assertTrue(responseRows[9].contains("volume") && responseRows[9].contains("23"));
-        assertTrue(responseRows[10].contains("number") && responseRows[10].contains("4"));
-        assertTrue(responseRows[11].contains("doi") && responseRows[11].contains("10.1080/01434630208666468"));
+        assertEquals(expectedResponse, response);
     }
 
     @Test
