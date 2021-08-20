@@ -43,7 +43,6 @@ import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.externalfiles.LinkedFileHandler;
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
-import org.jabref.logic.importer.fetcher.GrobidCitationFetcher;
 import org.jabref.logic.importer.fileformat.PdfContentImporter;
 import org.jabref.logic.importer.fileformat.PdfEmbeddedBibFileImporter;
 import org.jabref.logic.importer.fileformat.PdfGrobidImporter;
@@ -551,7 +550,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
             dialog.addSource(Localization.lang("Entry"), entry);
             dialog.addSource(Localization.lang("Verbatim"), wrapImporterToSupplier(new PdfVerbatimBibTextImporter(preferences.getImportFormatPreferences()), filePath));
             dialog.addSource(Localization.lang("Embedded"), wrapImporterToSupplier(new PdfEmbeddedBibFileImporter(preferences.getImportFormatPreferences()), filePath));
-            dialog.addSource("Grobid", wrapImporterToSupplier(new PdfGrobidImporter(GrobidCitationFetcher.GROBID_URL, preferences.getImportFormatPreferences()), filePath));
+            dialog.addSource("Grobid", wrapImporterToSupplier(new PdfGrobidImporter(preferences.getImportSettingsPreferences(), preferences.getImportFormatPreferences()), filePath));
             dialog.addSource(Localization.lang("XMP metadata"), wrapImporterToSupplier(new PdfXmpImporter(preferences.getXmpPreferences()), filePath));
             dialog.addSource(Localization.lang("Content"), wrapImporterToSupplier(new PdfContentImporter(preferences.getImportFormatPreferences()), filePath));
             dialog.showAndWait().ifPresent(newEntry -> {
