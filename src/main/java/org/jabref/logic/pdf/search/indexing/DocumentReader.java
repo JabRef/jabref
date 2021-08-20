@@ -134,6 +134,8 @@ public final class DocumentReader {
 
             String pdfContent = pdfTextStripper.getText(pdfDocument);
             if (StringUtil.isNotBlank(pdfContent)) {
+                pdfContent = pdfContent.replaceAll("-\n", "");
+                pdfContent = pdfContent.replaceAll("([^\\.])\n", "$1 ");
                 newDocument.add(new TextField(CONTENT, pdfContent, Field.Store.YES));
             }
             PDPage page = pdfDocument.getPage(pageNumber);
