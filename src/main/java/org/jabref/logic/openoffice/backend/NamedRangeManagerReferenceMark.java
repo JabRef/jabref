@@ -16,25 +16,25 @@ import com.sun.star.text.XTextDocument;
 public class NamedRangeManagerReferenceMark implements NamedRangeManager {
 
     @Override
-    public NamedRange nrmCreate(XTextDocument doc,
-                                String refMarkName,
-                                XTextCursor position,
-                                boolean insertSpaceAfter,
-                                boolean withoutBrackets)
+    public NamedRange createNamedRange(XTextDocument doc,
+                                       String refMarkName,
+                                       XTextCursor position,
+                                       boolean insertSpaceAfter,
+                                       boolean withoutBrackets)
         throws
         CreationException {
         return NamedRangeReferenceMark.create(doc, refMarkName, position, insertSpaceAfter, withoutBrackets);
     }
 
     @Override
-    public List<String> nrmGetUsedNames(XTextDocument doc)
+    public List<String> getUsedNames(XTextDocument doc)
         throws
         NoDocumentException {
         return UnoReferenceMark.getListOfNames(doc);
     }
 
     @Override
-    public Optional<NamedRange> nrmGetFromDocument(XTextDocument doc, String refMarkName)
+    public Optional<NamedRange> getNamedRangeFromDocument(XTextDocument doc, String refMarkName)
         throws
         NoDocumentException,
         WrappedTargetException {

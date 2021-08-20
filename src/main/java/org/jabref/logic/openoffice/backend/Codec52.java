@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 import org.jabref.model.openoffice.style.CitationType;
 
 /**
- *  How and what is encoded in a mark names.
+ *  How and what is encoded in reference mark names under JabRef 5.2.
  *
  *  - pageInfo does not appear here. It is not encoded in the mark name.
  */
@@ -51,51 +51,46 @@ class Codec52 {
      * Integer representation was written into the document in JabRef52, keep it for compatibility.
      */
     private static CitationType citationTypeFromInt(int i) {
-        switch (i) {
-        case 1:
-            return CitationType.AUTHORYEAR_PAR;
-        case 2:
-            return CitationType.AUTHORYEAR_INTEXT;
-        case 3:
-            return CitationType.INVISIBLE_CIT;
-        default:
-            throw new IllegalArgumentException("Invalid CitationType code");
-        }
+        return switch (i) {
+            case 1 -> CitationType.AUTHORYEAR_PAR;
+            case 2 -> CitationType.AUTHORYEAR_INTEXT;
+            case 3 -> CitationType.INVISIBLE_CIT;
+            default -> throw new IllegalArgumentException("Invalid CitationType code");
+        };
     }
 
     private static int citationTypeToInt(CitationType i) {
-        switch (i) {
-        case AUTHORYEAR_PAR:
-            return 1;
-        case AUTHORYEAR_INTEXT:
-            return 2;
-        case INVISIBLE_CIT:
-            return 3;
-        default:
-            throw new IllegalArgumentException("Invalid CitationType");
-        }
+        return switch (i) {
+            case AUTHORYEAR_PAR -> 1;
+            case AUTHORYEAR_INTEXT -> 2;
+            case INVISIBLE_CIT -> 3;
+            default -> throw new IllegalArgumentException("Invalid CitationType");
+        };
     }
 
     /**
-     * Produce a reference mark name for JabRef for the given citation key and citationType that
+     * Produce a reference mark name for JabRef for the given citationType and list citation keys that
      * does not yet appear among the reference marks of the document.
      *
-     * @param bibtexKey The citation key.
+     * @param usedNames    Reference mark names already in use.
+     * @param citationKeys Identifies the cited sources.
      * @param citationType Encodes the effect of withText and inParenthesis options.
      *
-     * The first occurrence of bibtexKey gets no serial number, the second gets 0, the third 1 ...
+     * The first occurrence of citationKeys gets no serial number, the second gets 0, the third 1 ...
      *
      * Or the first unused in this series, after removals.
      */
     public static String getUniqueMarkName(Set<String> usedNames,
-                                           String bibtexKey,
+                                           List<String> citationKeys,
                                            CitationType citationType) {
+
+        String citationKeysPart = String.join(",", citationKeys);
 
         int i = 0;
         int citTypeCode = citationTypeToInt(citationType);
-        String name = BIB_CITATION + '_' + citTypeCode + '_' + bibtexKey;
+        String name = BIB_CITATION + '_' + citTypeCode + '_' + citationKeysPart;
         while (usedNames.contains(name)) {
-            name = BIB_CITATION + i + '_' + citTypeCode + '_' + bibtexKey;
+            name = BIB_CITATION + i + '_' + citTypeCode + '_' + citationKeysPart;
             i++;
         }
         return name;
@@ -135,9 +130,8 @@ class Codec52 {
      * @param names The list to be filtered.
      */
     public static List<String> filterIsJabRefReferenceMarkName(List<String> names) {
-        return (names
-                .stream()
-                .filter(Codec52::isJabRefReferenceMarkName)
-                .collect(Collectors.toList()));
+        return (names.stream()
+                     .filter(Codec52::isJabRefReferenceMarkName)
+                     .collect(Collectors.toList()));
     }
 }

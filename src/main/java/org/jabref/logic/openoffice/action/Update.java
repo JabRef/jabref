@@ -2,7 +2,6 @@ package org.jabref.logic.openoffice.action;
 
 import java.util.List;
 
-import org.jabref.logic.JabRefException;
 import org.jabref.logic.openoffice.frontend.OOFrontend;
 import org.jabref.logic.openoffice.frontend.UpdateBibliography;
 import org.jabref.logic.openoffice.frontend.UpdateCitationMarkers;
@@ -14,9 +13,6 @@ import org.jabref.model.openoffice.uno.CreationException;
 import org.jabref.model.openoffice.uno.NoDocumentException;
 import org.jabref.model.openoffice.uno.UnoScreenRefresh;
 
-import com.sun.star.beans.PropertyVetoException;
-import com.sun.star.beans.UnknownPropertyException;
-import com.sun.star.container.NoSuchElementException;
 import com.sun.star.lang.WrappedTargetException;
 import com.sun.star.text.XTextDocument;
 
@@ -24,6 +20,10 @@ import com.sun.star.text.XTextDocument;
  * Update document: citation marks and bibliography
  */
 public class Update {
+
+    private Update() {
+        /**/
+    }
 
     /**
      * @return the list of unresolved citation keys
@@ -37,11 +37,7 @@ public class Update {
                                                boolean alwaysAddCitedOnPages)
         throws
         CreationException,
-        JabRefException,
         NoDocumentException,
-        NoSuchElementException,
-        PropertyVetoException,
-        UnknownPropertyException,
         WrappedTargetException,
         com.sun.star.lang.IllegalArgumentException {
 
@@ -64,8 +60,8 @@ public class Update {
                                                          style,
                                                          alwaysAddCitedOnPages);
             }
-            List<String> result = fr.citationGroups.getUnresolvedKeys();
-            return result;
+
+            return fr.citationGroups.getUnresolvedKeys();
         } finally {
             if (useLockControllers && UnoScreenRefresh.hasControllersLocked(doc)) {
                 UnoScreenRefresh.unlockControllers(doc);
@@ -103,11 +99,7 @@ public class Update {
                                                    SyncOptions syncOptions)
         throws
         CreationException,
-        JabRefException,
         NoDocumentException,
-        NoSuchElementException,
-        PropertyVetoException,
-        UnknownPropertyException,
         WrappedTargetException,
         com.sun.star.lang.IllegalArgumentException {
 
@@ -129,11 +121,7 @@ public class Update {
                                               SyncOptions syncOptions)
         throws
         CreationException,
-        JabRefException,
         NoDocumentException,
-        NoSuchElementException,
-        PropertyVetoException,
-        UnknownPropertyException,
         WrappedTargetException,
         com.sun.star.lang.IllegalArgumentException {
 
