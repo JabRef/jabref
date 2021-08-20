@@ -42,9 +42,9 @@ public class ImportExportTabViewModel implements PreferenceTabViewModel {
     private final PreferencesReadWriteService<ImportSettingsPreferences> importSettingsPreferences;
     private final SaveOrderConfig initialExportOrder;
 
-    public ImportExportTabViewModel(PreferencesService preferencesService) {
+    public ImportExportTabViewModel(PreferencesService preferencesService, PreferencesReadWriteService<ImportSettingsPreferences> importSettingsPreferences) {
         this.preferencesService = preferencesService;
-        this.importSettingsPreferences = preferencesService.getReadWriteImportSettingsPreferences();
+        this.importSettingsPreferences = importSettingsPreferences;
         this.initialDOIPreferences = preferencesService.getDOIPreferences();
         this.initialExportOrder = preferencesService.getExportSaveOrder();
     }
