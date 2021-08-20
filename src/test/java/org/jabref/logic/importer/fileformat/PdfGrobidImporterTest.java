@@ -26,12 +26,11 @@ import static org.mockito.Mockito.when;
 public class PdfGrobidImporterTest {
 
     private PdfGrobidImporter importer;
-    private ImportSettingsPreferences importSettingsPreferences;
     private ImportFormatPreferences importFormatPreferences;
 
     @BeforeEach
     public void setUp() {
-        importSettingsPreferences = mock(ImportSettingsPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        ImportSettingsPreferences importSettingsPreferences = mock(ImportSettingsPreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(importSettingsPreferences.isGrobidEnabled()).thenReturn(true);
         when(importSettingsPreferences.getGrobidURL()).thenReturn("http://grobid.jabref.org:8070");
         importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);

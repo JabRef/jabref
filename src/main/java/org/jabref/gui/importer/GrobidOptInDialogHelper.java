@@ -1,4 +1,4 @@
-package org.jabref.gui.importer.fetcher;
+package org.jabref.gui.importer;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.Globals;
@@ -10,7 +10,7 @@ import org.jabref.preferences.PreferencesService;
  * due to data privacy concerns.
  * To make users aware of the feature, we ask each time before querrying Grobid, giving the option to opt-out.
  */
-public class GrobidOptInDialog {
+public class GrobidOptInDialogHelper {
 
     /**
      * If Grobid is not enabled but the user has not expicitly opted-out of Grobid, we ask for permission to send data

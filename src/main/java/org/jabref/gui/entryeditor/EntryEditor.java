@@ -35,7 +35,7 @@ import org.jabref.gui.entryeditor.fileannotationtab.FulltextSearchResultsTab;
 import org.jabref.gui.externalfiles.ExternalFilesEntryLinker;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.help.HelpAction;
-import org.jabref.gui.importer.fetcher.GrobidOptInDialog;
+import org.jabref.gui.importer.GrobidOptInDialogHelper;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.menus.ChangeEntryTypeMenu;
 import org.jabref.gui.mergeentries.FetchAndMergeEntry;
@@ -362,7 +362,7 @@ public class EntryEditor extends BorderPane {
             if (fetcher instanceof PdfMergeMetadataImporter.EntryBasedFetcherWrapper) {
                 // Handle Grobid Opt-In in case of the PdfMergeMetadataImporter
                 fetcherMenuItem.setOnAction(event -> {
-                    GrobidOptInDialog.showAndWaitIfUserIsUndecided(dialogService);
+                    GrobidOptInDialogHelper.showAndWaitIfUserIsUndecided(dialogService);
                     PdfMergeMetadataImporter.EntryBasedFetcherWrapper pdfMergeMetadataImporter = new PdfMergeMetadataImporter.EntryBasedFetcherWrapper(preferencesService.getImportSettingsPreferences(), preferencesService.getImportFormatPreferences(), preferencesService.getFilePreferences(), databaseContext, preferencesService.getDefaultEncoding());
                     fetchAndMerge(pdfMergeMetadataImporter);
                 });

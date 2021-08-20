@@ -24,12 +24,11 @@ import static org.mockito.Mockito.when;
 class PdfMergeMetadataImporterTest {
 
     private PdfMergeMetadataImporter importer;
-    private ImportSettingsPreferences importSettingsPreferences;
     private ImportFormatPreferences importFormatPreferences;
 
     @BeforeEach
     void setUp() {
-        importSettingsPreferences = mock(ImportSettingsPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        ImportSettingsPreferences importSettingsPreferences = mock(ImportSettingsPreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(importSettingsPreferences.isGrobidEnabled()).thenReturn(true);
         when(importSettingsPreferences.getGrobidURL()).thenReturn("http://grobid.jabref.org:8070");
         importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
