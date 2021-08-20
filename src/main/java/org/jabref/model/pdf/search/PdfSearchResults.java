@@ -40,7 +40,9 @@ public final class PdfSearchResults {
             if (resultsByPage.containsKey(result.getPageNumber())) {
                 resultsByPage.get(result.getPageNumber()).add(result);
             } else {
-                resultsByPage.put(result.getPageNumber(), List.of(result));
+                List<SearchResult> pageResults = new ArrayList();
+                pageResults.add(result);
+                resultsByPage.put(result.getPageNumber(), pageResults);
             }
         }
         return resultsByPathAndPage;
