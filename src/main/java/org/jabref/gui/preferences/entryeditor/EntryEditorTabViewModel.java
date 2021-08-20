@@ -25,6 +25,7 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty acceptRecommendationsProperty = new SimpleBooleanProperty();
     private final BooleanProperty enableLatexCitationsTabProperty = new SimpleBooleanProperty();
     private final BooleanProperty enableValidationProperty = new SimpleBooleanProperty();
+    private final BooleanProperty allowIntegerEditionProperty = new SimpleBooleanProperty();
     private final BooleanProperty enableAutoCompleteProperty = new SimpleBooleanProperty();
     private final StringProperty autoCompleteFieldsProperty = new SimpleStringProperty();
     private final BooleanProperty autoCompleteFirstLastProperty = new SimpleBooleanProperty();
@@ -59,6 +60,7 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
         acceptRecommendationsProperty.setValue(initialEntryEditorPreferences.isMrdlibAccepted());
         enableLatexCitationsTabProperty.setValue(initialEntryEditorPreferences.shouldShowLatexCitationsTab());
         enableValidationProperty.setValue(initialEntryEditorPreferences.shouldEnableValidation());
+        allowIntegerEditionProperty.setValue(initialEntryEditorPreferences.shouldAllowIntegerEditionBibtex());
 
         enableAutoCompleteProperty.setValue(initialAutoCompletePreferences.shouldAutoComplete());
         autoCompleteFieldsProperty.setValue(initialAutoCompletePreferences.getCompleteNamesAsString());
@@ -88,6 +90,7 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
                 enableLatexCitationsTabProperty.getValue(),
                 defaultSourceProperty.getValue(),
                 enableValidationProperty.getValue(),
+                allowIntegerEditionProperty.getValue(),
                 initialEntryEditorPreferences.getDividerPosition()));
 
         // default
@@ -149,6 +152,10 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
 
     public BooleanProperty enableValidationProperty() {
         return enableValidationProperty;
+    }
+
+    public BooleanProperty allowIntegerEditionProperty() {
+        return this.allowIntegerEditionProperty;
     }
 
     public BooleanProperty enableAutoCompleteProperty() {
