@@ -2711,15 +2711,39 @@ public class JabRefPreferences implements PreferencesService {
     // Import preferences
     //*************************************************************************************************************
 
-    @Override
     public void storeImportSettingsPreferences(ImportSettingsPreferences preferences) {
         putBoolean(GENERATE_KEY_ON_IMPORT, preferences.generateNewKeyOnImport());
     }
 
-    @Override
     public ImportSettingsPreferences getImportSettingsPreferences() {
         return new ImportSettingsPreferences(
                 getBoolean(GENERATE_KEY_ON_IMPORT)
         );
+    }
+
+    @Override
+    public PreferencesReadService<ImportSettingsPreferences> getReadImportSettingsPreferences() {
+        return new PreferencesReadService<ImportSettingsPreferences>() {
+            @Override
+            public ImportSettingsPreferences load() {
+                return getImportSettingsPreferences();
+            }
+        };
+    }
+
+    @Override
+    public PreferencesReadWriteService<ImportSettingsPreferences> getReadWriteImportSettingsPreferences() {
+        return new PreferencesReadWriteService<ImportSettingsPreferences>() {
+
+            @Override
+            public void store(ImportSettingsPreferences preferences) {
+                storeImportSettingsPreferences(preferences);
+            }
+
+            @Override
+            public ImportSettingsPreferences load() {
+                return getImportSettingsPreferences();
+            }
+        };
     }
 }

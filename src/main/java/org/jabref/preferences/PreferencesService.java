@@ -299,9 +299,9 @@ public interface PreferencesService {
 
     void storeCustomImportFormats(Set<CustomImporter> customImporters);
 
-    ImportSettingsPreferences getImportSettingsPreferences();
+    PreferencesReadService<ImportSettingsPreferences> getReadImportSettingsPreferences();
 
-    void storeImportSettingsPreferences(ImportSettingsPreferences preferences);
+    PreferencesReadWriteService<ImportSettingsPreferences> getReadWriteImportSettingsPreferences();
 
     //*************************************************************************************************************
     // Preview preferences

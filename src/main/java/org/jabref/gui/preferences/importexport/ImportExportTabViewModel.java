@@ -20,6 +20,7 @@ import org.jabref.logic.preferences.DOIPreferences;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.metadata.SaveOrderConfig;
+import org.jabref.preferences.PreferencesReadWriteService;
 import org.jabref.preferences.PreferencesService;
 
 public class ImportExportTabViewModel implements PreferenceTabViewModel {
@@ -38,19 +39,19 @@ public class ImportExportTabViewModel implements PreferenceTabViewModel {
 
     private final PreferencesService preferencesService;
     private final DOIPreferences initialDOIPreferences;
-    private final ImportSettingsPreferences initialImportSettingsPreferences;
+    private final PreferencesReadWriteService<ImportSettingsPreferences> importSettingsPreferences;
     private final SaveOrderConfig initialExportOrder;
 
     public ImportExportTabViewModel(PreferencesService preferencesService) {
         this.preferencesService = preferencesService;
-        this.initialImportSettingsPreferences = preferencesService.getImportSettingsPreferences();
+        this.importSettingsPreferences = preferencesService.getReadWriteImportSettingsPreferences();
         this.initialDOIPreferences = preferencesService.getDOIPreferences();
         this.initialExportOrder = preferencesService.getExportSaveOrder();
     }
 
     @Override
     public void setValues() {
-        generateKeyOnImportProperty.setValue(initialImportSettingsPreferences.generateNewKeyOnImport());
+        generateKeyOnImportProperty.setValue(importSettingsPreferences.load().generateNewKeyOnImport());
         useCustomDOIProperty.setValue(initialDOIPreferences.isUseCustom());
         useCustomDOINameProperty.setValue(initialDOIPreferences.getDefaultBaseURI());
 
@@ -71,7 +72,7 @@ public class ImportExportTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public void storeSettings() {
-        preferencesService.storeImportSettingsPreferences(new ImportSettingsPreferences(
+        importSettingsPreferences.store(new ImportSettingsPreferences(
                 generateKeyOnImportProperty.getValue()));
 
         preferencesService.storeDOIPreferences(new DOIPreferences(
