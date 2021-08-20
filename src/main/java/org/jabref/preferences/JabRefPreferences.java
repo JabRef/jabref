@@ -51,12 +51,6 @@ import org.jabref.gui.maintable.MainTableNameFormatPreferences.AbbreviationStyle
 import org.jabref.gui.maintable.MainTableNameFormatPreferences.DisplayStyle;
 import org.jabref.gui.maintable.MainTablePreferences;
 import org.jabref.gui.mergeentries.MergeEntries;
-import org.jabref.gui.push.PushToEmacs;
-import org.jabref.gui.push.PushToLyx;
-import org.jabref.gui.push.PushToTeXstudio;
-import org.jabref.gui.push.PushToTexmaker;
-import org.jabref.gui.push.PushToVim;
-import org.jabref.gui.push.PushToWinEdt;
 import org.jabref.gui.search.SearchDisplayMode;
 import org.jabref.gui.specialfields.SpecialFieldsPreferences;
 import org.jabref.gui.util.Theme;
@@ -111,6 +105,7 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.EntryTypeFactory;
 import org.jabref.model.metadata.SaveOrderConfig;
+import org.jabref.model.push.PushToApplicationConstants;
 import org.jabref.model.strings.StringUtil;
 
 import org.slf4j.Logger;
@@ -1746,12 +1741,12 @@ public class JabRefPreferences implements PreferencesService {
     @Override
     public PushToApplicationPreferences getPushToApplicationPreferences() {
         Map<String, String> applicationCommands = new HashMap<>();
-        applicationCommands.put(PushToEmacs.NAME, get(PUSH_EMACS_PATH));
-        applicationCommands.put(PushToLyx.NAME, get(PUSH_LYXPIPE));
-        applicationCommands.put(PushToTexmaker.NAME, get(PUSH_TEXMAKER_PATH));
-        applicationCommands.put(PushToTeXstudio.NAME, get(PUSH_TEXSTUDIO_PATH));
-        applicationCommands.put(PushToVim.NAME, get(PUSH_VIM));
-        applicationCommands.put(PushToWinEdt.NAME, get(PUSH_WINEDT_PATH));
+        applicationCommands.put(PushToApplicationConstants.EMACS, get(PUSH_EMACS_PATH));
+        applicationCommands.put(PushToApplicationConstants.LYX, get(PUSH_LYXPIPE));
+        applicationCommands.put(PushToApplicationConstants.TEXMAKER, get(PUSH_TEXMAKER_PATH));
+        applicationCommands.put(PushToApplicationConstants.TEXSTUDIO, get(PUSH_TEXSTUDIO_PATH));
+        applicationCommands.put(PushToApplicationConstants.VIM, get(PUSH_VIM));
+        applicationCommands.put(PushToApplicationConstants.WIN_EDT, get(PUSH_WINEDT_PATH));
 
         return new PushToApplicationPreferences(
                 applicationCommands,
@@ -1762,12 +1757,12 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public void storePushToApplicationPreferences(PushToApplicationPreferences preferences) {
-        put(PUSH_EMACS_PATH, preferences.getPushToApplicationCommandPaths().get(PushToEmacs.NAME));
-        put(PUSH_LYXPIPE, preferences.getPushToApplicationCommandPaths().get(PushToLyx.NAME));
-        put(PUSH_TEXMAKER_PATH, preferences.getPushToApplicationCommandPaths().get(PushToTexmaker.NAME));
-        put(PUSH_TEXSTUDIO_PATH, preferences.getPushToApplicationCommandPaths().get(PushToTeXstudio.NAME));
-        put(PUSH_VIM, preferences.getPushToApplicationCommandPaths().get(PushToVim.NAME));
-        put(PUSH_WINEDT_PATH, preferences.getPushToApplicationCommandPaths().get(PushToWinEdt.NAME));
+        put(PUSH_EMACS_PATH, preferences.getPushToApplicationCommandPaths().get(PushToApplicationConstants.EMACS));
+        put(PUSH_LYXPIPE, preferences.getPushToApplicationCommandPaths().get(PushToApplicationConstants.LYX));
+        put(PUSH_TEXMAKER_PATH, preferences.getPushToApplicationCommandPaths().get(PushToApplicationConstants.TEXMAKER));
+        put(PUSH_TEXSTUDIO_PATH, preferences.getPushToApplicationCommandPaths().get(PushToApplicationConstants.TEXSTUDIO));
+        put(PUSH_VIM, preferences.getPushToApplicationCommandPaths().get(PushToApplicationConstants.VIM));
+        put(PUSH_WINEDT_PATH, preferences.getPushToApplicationCommandPaths().get(PushToApplicationConstants.WIN_EDT));
 
         put(PUSH_EMACS_ADDITIONAL_PARAMETERS, preferences.getEmacsArguments());
         put(PUSH_VIM_SERVER, preferences.getVimServer());
