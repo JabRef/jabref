@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.jabref.gui.LibraryTab;
@@ -40,6 +41,9 @@ import static org.jabref.model.pdf.search.SearchFieldConstants.PATH;
 public final class DocumentReader {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LibraryTab.class);
+
+    private static final Pattern HYPHEN_LINEBREAK_PATTERN = Pattern.compile("\\-\n");
+    private static final Pattern LINEBREAK_WITHOUT_PERIOD_PATTERN = Pattern.compile("([^\\\\.])\\n");
 
     private final BibEntry entry;
     private final FilePreferences filePreferences;
@@ -125,8 +129,9 @@ public final class DocumentReader {
         return !(StringUtil.isNullOrEmpty(value));
     }
 
-    private static String mergeLines(String text) {
-        return text.replaceAll("\\-\n", "").replaceAll("([^\\.])\n", "$1 ");
+    public static String mergeLines(String text) {
+        String mergedHyphenNewlines = HYPHEN_LINEBREAK_PATTERN.matcher(text).replaceAll("");
+        return LINEBREAK_WITHOUT_PERIOD_PATTERN.matcher(mergedHyphenNewlines).replaceAll("$1 ");
     }
 
     private void addContentIfNotEmpty(PDDocument pdfDocument, Document newDocument, int pageNumber) {

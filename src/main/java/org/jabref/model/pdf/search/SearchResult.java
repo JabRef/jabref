@@ -46,16 +46,14 @@ public final class SearchResult {
 
         Highlighter highlighter = new Highlighter(new SimpleHTMLFormatter("<b>", "</b>"), new QueryScorer(query));
 
-        TokenStream contentStream = new EnglishStemAnalyzer().tokenStream(CONTENT, content);
-        try {
+        try (TokenStream contentStream = new EnglishStemAnalyzer().tokenStream(CONTENT, content)) {
             TextFragment[] frags = highlighter.getBestTextFragments(contentStream, content, true, 10);
             this.contentResultStringsHtml = Arrays.stream(frags).map(TextFragment::toString).collect(Collectors.toList());
         } catch (InvalidTokenOffsetsException e) {
             this.contentResultStringsHtml = List.of();
         }
 
-        TokenStream annotationStream = new EnglishStemAnalyzer().tokenStream(ANNOTATIONS, annotations);
-        try {
+        try (TokenStream annotationStream = new EnglishStemAnalyzer().tokenStream(ANNOTATIONS, annotations)) {
             TextFragment[] frags = highlighter.getBestTextFragments(annotationStream, annotations, true, 10);
             this.annotationsResultStringsHtml = Arrays.stream(frags).map(TextFragment::toString).collect(Collectors.toList());
         } catch (InvalidTokenOffsetsException e) {

@@ -79,7 +79,7 @@ public class OpenExternalFileAction extends SimpleCommand {
                 // ask the user when detecting # of files > FILES_LIMIT
                 if (linkedFileViewModelList.size() > FILES_LIMIT) {
                     boolean continueOpening = dialogService.showConfirmationDialogAndWait(Localization.lang("Opening large number of files"),
-                            Localization.lang("You are about to open %0 files. Continue?", Integer.toString(linkedFileViewModelList.size())),
+                            Localization.lang("You are about to open %0 files. Continue?", linkedFileViewModelList.size()),
                             Localization.lang("Continue"), Localization.lang("Cancel"));
                     if (!continueOpening) {
                         return;
