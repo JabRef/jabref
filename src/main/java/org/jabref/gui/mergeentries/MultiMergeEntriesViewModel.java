@@ -22,26 +22,26 @@ import org.jabref.model.entry.field.Field;
 
 public class MultiMergeEntriesViewModel extends AbstractViewModel {
 
-    private final ListProperty<Entry> entries = new SimpleListProperty<>(FXCollections.observableArrayList());
+    private final ListProperty<EntrySource> entries = new SimpleListProperty<>(FXCollections.observableArrayList());
 
     private final ObjectProperty<BibEntry> mergedEntry = new SimpleObjectProperty<>(new BibEntry());
 
     private final ListProperty<String> failedSuppliers = new SimpleListProperty<>(FXCollections.observableArrayList());
 
-    public void addSource(Entry entryColumn) {
-        if (!entryColumn.isLoading.getValue()) {
-            updateFields(entryColumn.entry.get());
+    public void addSource(EntrySource entrySource) {
+        if (!entrySource.isLoading.getValue()) {
+            updateFields(entrySource.entry.get());
         } else {
-            entryColumn.isLoading.addListener((observable, oldValue, newValue) -> {
+            entrySource.isLoading.addListener((observable, oldValue, newValue) -> {
                 if (!newValue) {
-                    updateFields(entryColumn.entry.get());
-                    if (entryColumn.entryProperty().get() == null) {
-                        failedSuppliers.add(entryColumn.titleProperty().get());
+                    updateFields(entrySource.entry.get());
+                    if (entrySource.entryProperty().get() == null) {
+                        failedSuppliers.add(entrySource.titleProperty().get());
                     }
                 }
             });
         }
-        entries.add(entryColumn);
+        entries.add(entrySource);
     }
 
     public void updateFields(BibEntry entry) {
@@ -63,7 +63,7 @@ public class MultiMergeEntriesViewModel extends AbstractViewModel {
         return mergedEntry.get();
     }
 
-    public ListProperty<Entry> entriesProperty() {
+    public ListProperty<EntrySource> entriesProperty() {
         return entries;
     }
 
@@ -75,12 +75,12 @@ public class MultiMergeEntriesViewModel extends AbstractViewModel {
         return failedSuppliers;
     }
 
-    public static class Entry {
+    public static class EntrySource {
         private final StringProperty title = new SimpleStringProperty("");
         private final ObjectProperty<BibEntry> entry = new SimpleObjectProperty<>();
         private final BooleanProperty isLoading = new SimpleBooleanProperty(false);
 
-        public Entry(String title, Supplier<BibEntry> entrySupplier, TaskExecutor taskExecutor) {
+        public EntrySource(String title, Supplier<BibEntry> entrySupplier, TaskExecutor taskExecutor) {
             this.title.set(title);
             isLoading.set(true);
 
@@ -92,7 +92,7 @@ public class MultiMergeEntriesViewModel extends AbstractViewModel {
                           .executeWith(taskExecutor);
         }
 
-        public Entry(String title, BibEntry entry) {
+        public EntrySource(String title, BibEntry entry) {
             this.title.set(title);
             this.entry.set(entry);
         }

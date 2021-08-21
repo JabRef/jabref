@@ -101,11 +101,11 @@ public class MultiMergeEntriesView extends BaseDialog<BibEntry> {
         this.getDialogPane().getButtonTypes().setAll(ButtonType.CANCEL, mergeEntries);
         this.setResultConverter(viewModel::resultConverter);
 
-        viewModel.entriesProperty().addListener((ListChangeListener<MultiMergeEntriesViewModel.Entry>) c -> {
+        viewModel.entriesProperty().addListener((ListChangeListener<MultiMergeEntriesViewModel.EntrySource>) c -> {
             while (c.next()) {
                 if (c.wasAdded()) {
-                    for (MultiMergeEntriesViewModel.Entry entryColumn : c.getAddedSubList()) {
-                        addColumn(entryColumn);
+                    for (MultiMergeEntriesViewModel.EntrySource entrySourceColumn : c.getAddedSubList()) {
+                        addColumn(entrySourceColumn);
                     }
                 }
             }
@@ -149,10 +149,10 @@ public class MultiMergeEntriesView extends BaseDialog<BibEntry> {
         });
     }
 
-    private void addColumn(MultiMergeEntriesViewModel.Entry entryColumn) {
+    private void addColumn(MultiMergeEntriesViewModel.EntrySource entrySourceColumn) {
         // add header
         int columnIndex = supplierHeader.getChildren().size();
-        ToggleButton header = generateEntryHeader(entryColumn, columnIndex);
+        ToggleButton header = generateEntryHeader(entrySourceColumn, columnIndex);
         header.getStyleClass().add("toggle-button");
         HBox.setHgrow(header, Priority.ALWAYS);
         supplierHeader.getChildren().add(header);
@@ -165,20 +165,20 @@ public class MultiMergeEntriesView extends BaseDialog<BibEntry> {
         constraint.prefWidthProperty().bind(header.widthProperty());
         optionsGrid.getColumnConstraints().add(constraint);
 
-        if (!entryColumn.isLoadingProperty().getValue()) {
-            writeBibEntryToColumn(entryColumn, columnIndex);
+        if (!entrySourceColumn.isLoadingProperty().getValue()) {
+            writeBibEntryToColumn(entrySourceColumn, columnIndex);
         } else {
             header.setDisable(true);
-            entryColumn.isLoadingProperty().addListener((observable, oldValue, newValue) -> {
-                if (!newValue && entryColumn.entryProperty().get() != null) {
-                    writeBibEntryToColumn(entryColumn, columnIndex);
+            entrySourceColumn.isLoadingProperty().addListener((observable, oldValue, newValue) -> {
+                if (!newValue && entrySourceColumn.entryProperty().get() != null) {
+                    writeBibEntryToColumn(entrySourceColumn, columnIndex);
                     header.setDisable(false);
                 }
             });
         }
     }
 
-    private ToggleButton generateEntryHeader(MultiMergeEntriesViewModel.Entry column, int columnIndex) {
+    private ToggleButton generateEntryHeader(MultiMergeEntriesViewModel.EntrySource column, int columnIndex) {
         ToggleButton header = new ToggleButton();
         header.setToggleGroup(headerToggleGroup);
         header.textProperty().bind(column.titleProperty());
@@ -210,11 +210,11 @@ public class MultiMergeEntriesView extends BaseDialog<BibEntry> {
     /**
      * Adds ToggleButtons for all fields that are set for this BibEntry
      *
-     * @param entryColumn the entry to write
+     * @param entrySourceColumn the entry to write
      * @param columnIndex the index of the column to write this entry to
      */
-    private void writeBibEntryToColumn(MultiMergeEntriesViewModel.Entry entryColumn, int columnIndex) {
-        for (Map.Entry<Field, String> entry : entryColumn.entryProperty().get().getFieldsObservable().entrySet()) {
+    private void writeBibEntryToColumn(MultiMergeEntriesViewModel.EntrySource entrySourceColumn, int columnIndex) {
+        for (Map.Entry<Field, String> entry : entrySourceColumn.entryProperty().get().getFieldsObservable().entrySet()) {
             Field key = entry.getKey();
             String value = entry.getValue();
             Cell cell = new Cell(value, key, columnIndex);
@@ -340,11 +340,11 @@ public class MultiMergeEntriesView extends BaseDialog<BibEntry> {
     }
 
     public void addSource(String title, BibEntry entry) {
-        viewModel.addSource(new MultiMergeEntriesViewModel.Entry(title, entry));
+        viewModel.addSource(new MultiMergeEntriesViewModel.EntrySource(title, entry));
     }
 
     public void addSource(String title, Supplier<BibEntry> supplier) {
-        viewModel.addSource(new MultiMergeEntriesViewModel.Entry(title, supplier, taskExecutor));
+        viewModel.addSource(new MultiMergeEntriesViewModel.EntrySource(title, supplier, taskExecutor));
     }
 
     private class FieldRow {
