@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.SortedSet;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
@@ -357,13 +358,25 @@ public class EntryEditor extends BorderPane {
 
         // Add menu for fetching bibliographic information
         ContextMenu fetcherMenu = new ContextMenu();
-        for (EntryBasedFetcher fetcher : WebFetchers.getEntryBasedFetchers(preferencesService.getImportSettingsPreferences(), preferencesService.getImportFormatPreferences(), preferencesService.getFilePreferences(), databaseContext, preferencesService.getDefaultEncoding())) {
+        SortedSet<EntryBasedFetcher> entryBasedFetchers = WebFetchers.getEntryBasedFetchers(
+                preferencesService.getImportSettingsPreferences(),
+                preferencesService.getImportFormatPreferences(),
+                preferencesService.getFilePreferences(),
+                databaseContext,
+                preferencesService.getDefaultEncoding());
+        for (EntryBasedFetcher fetcher : entryBasedFetchers) {
             MenuItem fetcherMenuItem = new MenuItem(fetcher.getName());
             if (fetcher instanceof PdfMergeMetadataImporter.EntryBasedFetcherWrapper) {
                 // Handle Grobid Opt-In in case of the PdfMergeMetadataImporter
                 fetcherMenuItem.setOnAction(event -> {
                     GrobidOptInDialogHelper.showAndWaitIfUserIsUndecided(dialogService);
-                    PdfMergeMetadataImporter.EntryBasedFetcherWrapper pdfMergeMetadataImporter = new PdfMergeMetadataImporter.EntryBasedFetcherWrapper(preferencesService.getImportSettingsPreferences(), preferencesService.getImportFormatPreferences(), preferencesService.getFilePreferences(), databaseContext, preferencesService.getDefaultEncoding());
+                    PdfMergeMetadataImporter.EntryBasedFetcherWrapper pdfMergeMetadataImporter =
+                            new PdfMergeMetadataImporter.EntryBasedFetcherWrapper(
+                                    preferencesService.getImportSettingsPreferences(),
+                                    preferencesService.getImportFormatPreferences(),
+                                    preferencesService.getFilePreferences(),
+                                    databaseContext,
+                                    preferencesService.getDefaultEncoding());
                     fetchAndMerge(pdfMergeMetadataImporter);
                 });
             } else {
