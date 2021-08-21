@@ -27,25 +27,18 @@ public final class PdfSearchResults {
         return this.searchResults;
     }
 
-    public HashMap<String, HashMap<Integer, List<SearchResult>>> getSearchResultsByPathAndPage() {
-        HashMap<String, HashMap<Integer, List<SearchResult>>> resultsByPathAndPage = new HashMap<>();
+    public HashMap<String, List<SearchResult>> getSearchResultsByPath() {
+        HashMap<String, List<SearchResult>> resultsByPath = new HashMap<>();
         for (SearchResult result : searchResults) {
-            HashMap<Integer, List<SearchResult>> resultsByPage;
-            if (resultsByPathAndPage.containsKey(result.getPath())) {
-                resultsByPage = resultsByPathAndPage.get(result.getPath());
+            if (resultsByPath.containsKey(result.getPath())) {
+                resultsByPath.get(result.getPath()).add(result);
             } else {
-                resultsByPage = new HashMap<>();
-                resultsByPathAndPage.put(result.getPath(), resultsByPage);
-            }
-            if (resultsByPage.containsKey(result.getPageNumber())) {
-                resultsByPage.get(result.getPageNumber()).add(result);
-            } else {
-                List<SearchResult> pageResults = new ArrayList();
-                pageResults.add(result);
-                resultsByPage.put(result.getPageNumber(), pageResults);
+                List<SearchResult> resultsForPath = new ArrayList<>();
+                resultsForPath.add(result);
+                resultsByPath.put(result.getPath(), resultsForPath);
             }
         }
-        return resultsByPathAndPage;
+        return resultsByPath;
     }
 
     public int numSearchResults() {

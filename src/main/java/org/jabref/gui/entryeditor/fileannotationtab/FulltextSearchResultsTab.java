@@ -2,7 +2,6 @@ package org.jabref.gui.entryeditor.fileannotationtab;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -93,27 +92,23 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
         }
 
         // Iterate through files with search hits
-        for (Map.Entry<String, HashMap<Integer, List<SearchResult>>> resultsPath : searchResults.getSearchResultsByPathAndPage().entrySet()) {
-            content.getChildren().addAll(createFileLink(resultsPath.getKey()), lineSeparator());
+        for (Map.Entry<String, List<SearchResult>> resultsForPath : searchResults.getSearchResultsByPath().entrySet()) {
+            content.getChildren().addAll(createFileLink(resultsForPath.getKey()), lineSeparator());
 
             // Iterate through pages (within file) with search hits
-            for (Map.Entry<Integer, List<SearchResult>> resultsPage : resultsPath.getValue().entrySet()) {
-
-                // Iterate through search hits (within file within page)
-                for (SearchResult searchResult : resultsPage.getValue()) {
-                    for (String resultTextHtml : searchResult.getContentResultStringsHtml()) {
-                        content.getChildren().addAll(TooltipTextUtil.createTextsFromHtml(resultTextHtml.replaceAll("</b> <b>", " ")));
-                        content.getChildren().addAll(new Text(System.lineSeparator()), lineSeparator(0.8), createPageLink(resultsPage.getKey()));
-                    }
-                    if (!searchResult.getAnnotationsResultStringsHtml().isEmpty()) {
-                        Text annotationsText = new Text(System.lineSeparator() + Localization.lang("Found matches in Annotations:") + System.lineSeparator() + System.lineSeparator());
-                        annotationsText.setStyle("-fx-font-style: italic;");
-                        content.getChildren().add(annotationsText);
-                    }
-                    for (String resultTextHtml : searchResult.getAnnotationsResultStringsHtml()) {
-                        content.getChildren().addAll(TooltipTextUtil.createTextsFromHtml(resultTextHtml.replaceAll("</b> <b>", " ")));
-                        content.getChildren().addAll(new Text(System.lineSeparator()), lineSeparator(0.8), createPageLink(resultsPage.getKey()));
-                    }
+            for (SearchResult searchResult : resultsForPath.getValue()) {
+                for (String resultTextHtml : searchResult.getContentResultStringsHtml()) {
+                    content.getChildren().addAll(TooltipTextUtil.createTextsFromHtml(resultTextHtml.replaceAll("</b> <b>", " ")));
+                    content.getChildren().addAll(new Text(System.lineSeparator()), lineSeparator(0.8), createPageLink(searchResult.getPageNumber()));
+                }
+                if (!searchResult.getAnnotationsResultStringsHtml().isEmpty()) {
+                    Text annotationsText = new Text(System.lineSeparator() + Localization.lang("Found matches in Annotations:") + System.lineSeparator() + System.lineSeparator());
+                    annotationsText.setStyle("-fx-font-style: italic;");
+                    content.getChildren().add(annotationsText);
+                }
+                for (String resultTextHtml : searchResult.getAnnotationsResultStringsHtml()) {
+                    content.getChildren().addAll(TooltipTextUtil.createTextsFromHtml(resultTextHtml.replaceAll("</b> <b>", " ")));
+                    content.getChildren().addAll(new Text(System.lineSeparator()), lineSeparator(0.8), createPageLink(searchResult.getPageNumber()));
                 }
             }
         }
