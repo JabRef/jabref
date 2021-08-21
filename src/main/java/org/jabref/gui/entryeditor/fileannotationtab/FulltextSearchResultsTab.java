@@ -77,7 +77,7 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
 
     @Override
     protected void bindToEntry(BibEntry entry) {
-        if (!shouldShow(entry) || entry == null) {
+        if (entry == null || !shouldShow(entry)) {
             return;
         }
         if (!entry.equals(this.entry)) {
