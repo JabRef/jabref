@@ -234,6 +234,9 @@ public class JabRefPreferences implements PreferencesService {
     public static final String SEARCH_FULLTEXT = "fulltextSearch";
 
     public static final String GENERATE_KEY_ON_IMPORT = "generateKeyOnImport";
+    public static final String GROBID_ENABLED = "grobidEnabled";
+    public static final String GROBID_OPT_OUT = "grobidOptOut";
+    public static final String GROBID_URL = "grobidURL";
 
     // Currently, it is not possible to specify defaults for specific entry types
     // When this should be made possible, the code to inspect is org.jabref.gui.preferences.CitationKeyPatternPrefTab.storeSettings() -> LabelPattern keypatterns = getCiteKeyPattern(); etc
@@ -437,6 +440,9 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(SEARCH_FULLTEXT, Boolean.TRUE);
 
         defaults.put(GENERATE_KEY_ON_IMPORT, Boolean.TRUE);
+        defaults.put(GROBID_ENABLED, Boolean.FALSE);
+        defaults.put(GROBID_OPT_OUT, Boolean.FALSE);
+        defaults.put(GROBID_URL, "http://grobid.jabref.org:8070");
 
         defaults.put(PUSH_TEXMAKER_PATH, JabRefDesktop.getNativeDesktop().detectProgramPath("texmaker", "Texmaker"));
         defaults.put(PUSH_WINEDT_PATH, JabRefDesktop.getNativeDesktop().detectProgramPath("WinEdt", "WinEdt Team\\WinEdt"));
@@ -2709,12 +2715,18 @@ public class JabRefPreferences implements PreferencesService {
     @Override
     public void storeImportSettingsPreferences(ImportSettingsPreferences preferences) {
         putBoolean(GENERATE_KEY_ON_IMPORT, preferences.generateNewKeyOnImport());
+        putBoolean(GROBID_ENABLED, preferences.isGrobidEnabled());
+        putBoolean(GROBID_OPT_OUT, preferences.isGrobidOptOut());
+        put(GROBID_URL, preferences.getGrobidURL());
     }
 
     @Override
     public ImportSettingsPreferences getImportSettingsPreferences() {
         return new ImportSettingsPreferences(
-                getBoolean(GENERATE_KEY_ON_IMPORT)
+                getBoolean(GENERATE_KEY_ON_IMPORT),
+                getBoolean(GROBID_ENABLED),
+                getBoolean(GROBID_OPT_OUT),
+                get(GROBID_URL)
         );
     }
 }

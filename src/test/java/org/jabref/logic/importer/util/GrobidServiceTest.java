@@ -8,8 +8,8 @@ import java.util.Optional;
 
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParseException;
-import org.jabref.logic.importer.fetcher.GrobidCitationFetcher;
 import org.jabref.logic.importer.fileformat.PdfGrobidImporterTest;
+import org.jabref.logic.importer.importsettings.ImportSettingsPreferences;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
@@ -30,11 +30,12 @@ import static org.mockito.Mockito.when;
 public class GrobidServiceTest {
 
     private static GrobidService grobidService;
+    private static ImportSettingsPreferences importSettingsPreferences = new ImportSettingsPreferences(false, true, false, "http://grobid.jabref.org:8070");
     private static ImportFormatPreferences importFormatPreferences;
 
     @BeforeAll
     public static void setup() {
-        grobidService = new GrobidService(GrobidCitationFetcher.GROBID_URL);
+        grobidService = new GrobidService(importSettingsPreferences);
         importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(importFormatPreferences.getKeywordSeparator()).thenReturn(',');
     }
@@ -70,6 +71,12 @@ public class GrobidServiceTest {
     @Test
     public void processInvalidCitationTest() {
         assertThrows(IOException.class, () -> grobidService.processCitation("iiiiiiiiiiiiiiiiiiiiiiii", importFormatPreferences, GrobidService.ConsolidateCitations.WITH_METADATA));
+    }
+
+    @Test
+    public void failsWhenGrobidDisabled() {
+        ImportSettingsPreferences importSettingsWithGrobidDisabled = importSettingsPreferences.withGrobidEnabled(false);
+        assertThrows(UnsupportedOperationException.class, () -> new GrobidService(importSettingsWithGrobidDisabled));
     }
 
     @Test
