@@ -37,8 +37,7 @@ public class OpenFolderAction extends SimpleCommand {
                             databaseContext,
                             Globals.TASK_EXECUTOR,
                             dialogService,
-                            preferencesService.getXmpPreferences(),
-                            preferencesService.getFilePreferences(),
+                            preferencesService,
                             ExternalFileTypes.getInstance()
                     );
                     linkedFileViewModel.openFolder();

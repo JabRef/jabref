@@ -54,8 +54,7 @@ public class OpenExternalFileAction extends SimpleCommand {
                             databaseContext,
                             Globals.TASK_EXECUTOR,
                             dialogService,
-                            preferencesService.getXmpPreferences(),
-                            preferencesService.getFilePreferences(),
+                            preferencesService,
                             ExternalFileTypes.getInstance());
 
                     linkedFileViewModelList.add(linkedFileViewModel);
