@@ -39,7 +39,14 @@
             <HBox spacing="10.0">
                 <VBox HBox.hgrow="ALWAYS">
                     <Label text="%Icon"/>
-                    <TextField fx:id="iconField"/>
+                    <HBox>
+                        <TextField fx:id="iconField"/>
+                        <Button fx:id="iconPickerButton" onAction="#openIconPicker" styleClass="icon-button,narrow">
+                            <graphic>
+                                <JabRefIconView glyph="SELECT_ICONS"/>
+                            </graphic>
+                        </Button>
+                    </HBox>
                 </VBox>
                 <VBox layoutX="10.0" layoutY="10.0" minWidth="130.0" maxWidth="130.0" prefWidth="130.0">
                     <Label text="%Color"/>

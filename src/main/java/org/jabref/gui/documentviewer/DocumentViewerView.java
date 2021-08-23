@@ -30,6 +30,7 @@ public class DocumentViewerView extends BaseDialog<Void> {
     @FXML private ComboBox<LinkedFile> fileChoice;
     @FXML private BorderPane mainPane;
     @FXML private ToggleButton modeLive;
+    @FXML private ToggleButton modeLock;
     @FXML private TextField currentPage;
     @FXML private Label maxPages;
 
@@ -64,6 +65,7 @@ public class DocumentViewerView extends BaseDialog<Void> {
 
     private void setupModeButtons() {
         viewModel.liveModeProperty().bind(modeLive.selectedProperty());
+        modeLock.selectedProperty().bind(modeLive.selectedProperty().not());
     }
 
     private void setupScrollbar() {
@@ -101,6 +103,14 @@ public class DocumentViewerView extends BaseDialog<Void> {
         });
         viewModel.currentPageProperty().bindBidirectional(viewer.currentPageProperty());
         mainPane.setCenter(viewer);
+    }
+
+    public void setLiveMode(boolean liveMode) {
+        modeLive.setSelected(liveMode);
+    }
+
+    public void gotoPage(int pageNumber) {
+        viewModel.showPage(pageNumber);
     }
 
     public void nextPage(ActionEvent actionEvent) {

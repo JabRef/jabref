@@ -1,4 +1,4 @@
-package org.jabref.gui.preferences.importer;
+package org.jabref.gui.preferences.customimporter;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -16,7 +16,7 @@ import org.jabref.logic.l10n.Localization;
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
 
-public class ImportCustomizationTab extends AbstractPreferenceTabView<ImportCustomizationTabViewModel> implements PreferencesTab {
+public class CustomImporterTab extends AbstractPreferenceTabView<CustomImporterTabViewModel> implements PreferencesTab {
 
     @FXML private TableView<ImporterViewModel> importerTable;
     @FXML private TableColumn<ImporterViewModel, String> nameColumn;
@@ -24,7 +24,7 @@ public class ImportCustomizationTab extends AbstractPreferenceTabView<ImportCust
     @FXML private TableColumn<ImporterViewModel, String> basePathColumn;
     @FXML private Button addButton;
 
-    public ImportCustomizationTab() {
+    public CustomImporterTab() {
         ViewLoader.view(this)
                   .root(this)
                   .load();
@@ -37,7 +37,7 @@ public class ImportCustomizationTab extends AbstractPreferenceTabView<ImportCust
 
     @FXML
     private void initialize() {
-        viewModel = new ImportCustomizationTabViewModel(preferencesService, dialogService);
+        viewModel = new CustomImporterTabViewModel(preferencesService, dialogService);
 
         importerTable.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         importerTable.itemsProperty().bind(viewModel.importersProperty());

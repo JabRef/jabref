@@ -1,4 +1,4 @@
-package org.jabref.gui.preferences.exporter;
+package org.jabref.gui.preferences.customexporter;
 
 import javax.inject.Inject;
 
@@ -16,7 +16,7 @@ import org.jabref.logic.l10n.Localization;
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
 
-public class ExportCustomizationTab extends AbstractPreferenceTabView<ExportCustomizationTabViewModel> implements PreferencesTab {
+public class CustomExporterTab extends AbstractPreferenceTabView<CustomExporterTabViewModel> implements PreferencesTab {
 
     @FXML private TableView<ExporterViewModel> exporterTable;
     @FXML private TableColumn<ExporterViewModel, String> nameColumn;
@@ -25,7 +25,7 @@ public class ExportCustomizationTab extends AbstractPreferenceTabView<ExportCust
 
     @Inject private JournalAbbreviationRepository repository;
 
-    public ExportCustomizationTab() {
+    public CustomExporterTab() {
         ViewLoader.view(this)
                   .root(this)
                   .load();
@@ -38,7 +38,7 @@ public class ExportCustomizationTab extends AbstractPreferenceTabView<ExportCust
 
     @FXML
     private void initialize() {
-        viewModel = new ExportCustomizationTabViewModel(preferencesService, dialogService, repository);
+        viewModel = new CustomExporterTabViewModel(preferencesService, dialogService, repository);
 
         exporterTable.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         exporterTable.itemsProperty().bind(viewModel.exportersProperty());
