@@ -39,50 +39,50 @@ class OOError extends JabRefException {
      * Conversions from exception caught
      */
 
-    public static OOError from(JabRefException ex) {
+    public static OOError from(JabRefException err) {
         return new OOError(
             Localization.lang("JabRefException"),
-            ex.getLocalizedMessage(),
-            ex);
+            err.getLocalizedMessage(),
+            err);
     }
 
     // For DisposedException
-    public static OOError from(DisposedException ex) {
+    public static OOError from(DisposedException err) {
         return new OOError(
             Localization.lang("Connection lost"),
             Localization.lang("Connection to OpenOffice/LibreOffice has been lost."
                               + " Please make sure OpenOffice/LibreOffice is running,"
                               + " and try to reconnect."),
-            ex);
+            err);
     }
 
     // For NoDocumentException
-    public static OOError from(NoDocumentException ex) {
+    public static OOError from(NoDocumentException err) {
         return new OOError(
             Localization.lang("Not connected to document"),
             Localization.lang("Not connected to any Writer document."
                               + " Please make sure a document is open,"
                               + " and use the 'Select Writer document' button"
                               + " to connect to it."),
-            ex);
+            err);
     }
 
     // For NoDocumentFoundException
-    public static OOError from(NoDocumentFoundException ex) {
+    public static OOError from(NoDocumentFoundException err) {
         return new OOError(
             Localization.lang("No Writer documents found"),
             Localization.lang("Could not connect to any Writer document."
                               + " Please make sure a document is open"
                               + " before using the 'Select Writer document' button"
                               + " to connect to it."),
-            ex);
+            err);
     }
 
-    public static OOError fromMisc(Exception ex) {
+    public static OOError fromMisc(Exception err) {
         return new OOError(
             "Exception",
-            ex.getMessage(),
-            ex);
+            err.getMessage(),
+            err);
     }
 
     /*

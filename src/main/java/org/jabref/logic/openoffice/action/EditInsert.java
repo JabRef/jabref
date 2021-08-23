@@ -56,7 +56,7 @@ public class EditInsert {
      * @param pageInfo A single pageInfo for a list of entries. This is what we get from the GUI.
      */
     public static void insertCitationGroup(XTextDocument doc,
-                                           OOFrontend fr,
+                                           OOFrontend frontend,
                                            XTextCursor cursor,
                                            List<BibEntry> entries,
                                            BibDatabase database,
@@ -98,7 +98,7 @@ public class EditInsert {
 
         try {
             UnoScreenRefresh.lockControllers(doc);
-            UpdateCitationMarkers.createAndFillCitationGroup(fr,
+            UpdateCitationMarkers.createAndFillCitationGroup(frontend,
                                                              doc,
                                                              citationKeys,
                                                              pageInfos,
