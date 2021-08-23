@@ -196,17 +196,6 @@ public class Backend52 {
             throw new IllegalArgumentException();
         }
 
-        /*
-         * Backend52 uses reference marks to (1) mark the location of the citation in the text and (2) to encode
-         * the citation keys and citation type in the name of the reference mark. The name of the reference mark
-         * has to be unique in the document.
-         */
-        String markName = Codec52.getUniqueMarkName(new HashSet<>(citationStorageManager.getUsedNames(doc)),
-                                                    citationKeys,
-                                                    citationType);
-
-        CitationGroupId groupId = new CitationGroupId(markName);
-
         final int numberOfCitations = citationKeys.size();
         final int last = numberOfCitations - 1;
 
@@ -235,6 +224,17 @@ public class Backend52 {
                     throw new IllegalStateException("Unhandled dataModel in Backend52.createCitationGroup");
             }
         }
+
+        /*
+         * Backend52 uses reference marks to (1) mark the location of the citation in the text and (2) to encode
+         * the citation keys and citation type in the name of the reference mark. The name of the reference mark
+         * has to be unique in the document.
+         */
+        final String markName = Codec52.getUniqueMarkName(new HashSet<>(citationStorageManager.getUsedNames(doc)),
+                                                          citationKeys,
+                                                          citationType);
+
+        final CitationGroupId groupId = new CitationGroupId(markName);
 
         /*
          * Apply to document

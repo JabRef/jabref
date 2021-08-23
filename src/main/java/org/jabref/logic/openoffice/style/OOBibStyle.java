@@ -284,20 +284,20 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
         }
     }
 
-    private void readFormatFile(Reader in) throws IOException {
+    private void readFormatFile(Reader input) throws IOException {
 
         // First read all the contents of the file:
-        StringBuilder sb = new StringBuilder();
-        int c;
-        while ((c = in.read()) != -1) {
-            sb.append((char) c);
+        StringBuilder stringBuilder = new StringBuilder();
+        int chr;
+        while ((chr = input.read()) != -1) {
+            stringBuilder.append((char) chr);
         }
 
         // Store a local copy for viewing
-        localCopy = sb.toString();
+        localCopy = stringBuilder.toString();
 
         // Break into separate lines:
-        String[] lines = sb.toString().split("\n");
+        String[] lines = stringBuilder.toString().split("\n");
         BibStyleMode mode = BibStyleMode.NONE;
 
         for (String line1 : lines) {
@@ -379,11 +379,12 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
         if ((index > 0) && (index < (line.length() - 1))) {
 
             try {
-                String formatString = line.substring(index + 1);
+                final String typeName = line.substring(0, index);
+                final String formatString = line.substring(index + 1);
                 Layout layout = new LayoutHelper(new StringReader(formatString), this.prefs).getLayoutFromText();
-                EntryType type = EntryTypeFactory.parse(line.substring(0, index));
+                EntryType type = EntryTypeFactory.parse(typeName);
 
-                if (!isDefaultLayoutPresent && line.substring(0, index).equals(OOBibStyle.DEFAULT_MARK)) {
+                if (!isDefaultLayoutPresent && OOBibStyle.DEFAULT_MARK.equals(typeName)) {
                     isDefaultLayoutPresent = true;
                     defaultBibLayout = layout;
                 } else {
@@ -430,11 +431,11 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
     }
 
     public Layout getReferenceFormat(EntryType type) {
-        Layout l = bibLayout.get(type);
-        if (l == null) {
+        Layout layout = bibLayout.get(type);
+        if (layout == null) {
             return defaultBibLayout;
         } else {
-            return l;
+            return layout;
         }
     }
 
@@ -544,12 +545,12 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) {
+    public boolean equals(Object object) {
+        if (this == object) {
             return true;
         }
-        if (o instanceof OOBibStyle) {
-            OOBibStyle otherStyle = (OOBibStyle) o;
+        if (object instanceof OOBibStyle) {
+            OOBibStyle otherStyle = (OOBibStyle) object;
             return Objects.equals(path, otherStyle.path)
                     && Objects.equals(name, otherStyle.name)
                     && Objects.equals(citProperties, otherStyle.citProperties)
@@ -693,8 +694,8 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
         return OOBibStyleGetNumCitationMarker.getNumCitationMarkerForBibliography(this, entry);
     }
 
-    public OOText getNormalizedCitationMarker(CitationMarkerNormEntry ce) {
-        return OOBibStyleGetCitationMarker.getNormalizedCitationMarker(this, ce, Optional.empty());
+    public OOText getNormalizedCitationMarker(CitationMarkerNormEntry entry) {
+        return OOBibStyleGetCitationMarker.getNormalizedCitationMarker(this, entry, Optional.empty());
     }
 
     /**
@@ -771,10 +772,6 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
      */
     public String getGroupedNumbersSeparator() {
         return getStringCitProperty(OOBibStyle.GROUPED_NUMBERS_SEPARATOR);
-    }
-
-    private boolean getBooleanProperty(String propName) {
-        return (Boolean) properties.get(propName);
     }
 
     private String getStringProperty(String propName) {
@@ -923,12 +920,9 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
         OOBibStyle style = this;
         OOText title = style.getReferenceHeaderText();
         String parStyle = style.getReferenceHeaderParagraphFormat();
-        if (parStyle != null) {
-            title = OOFormat.paragraph(title, parStyle);
-        } else {
-            title = OOFormat.paragraph(title);
-        }
-        return title;
+        return (parStyle == null
+                ? OOFormat.paragraph(title)
+                : OOFormat.paragraph(title, parStyle));
     }
 
 }

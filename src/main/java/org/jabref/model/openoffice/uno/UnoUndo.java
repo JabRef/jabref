@@ -25,17 +25,17 @@ public class UnoUndo {
      * document's undo stack is left in an inconsistent state.
      */
     public static void enterUndoContext(XTextDocument doc, String title) {
-        Optional<XUndoManager> um = getXUndoManager(doc);
-        if (um.isPresent()) {
-            um.get().enterUndoContext(title);
+        Optional<XUndoManager> undoManager = getXUndoManager(doc);
+        if (undoManager.isPresent()) {
+            undoManager.get().enterUndoContext(title);
         }
     }
 
     public static void leaveUndoContext(XTextDocument doc) {
-        Optional<XUndoManager> um = getXUndoManager(doc);
-        if (um.isPresent()) {
+        Optional<XUndoManager> undoManager = getXUndoManager(doc);
+        if (undoManager.isPresent()) {
             try {
-                um.get().leaveUndoContext();
+                undoManager.get().leaveUndoContext();
             } catch (InvalidStateException ex) {
                 throw new IllegalStateException("leaveUndoContext reported InvalidStateException");
             }

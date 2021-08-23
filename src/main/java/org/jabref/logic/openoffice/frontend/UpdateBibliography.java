@@ -40,7 +40,7 @@ public class UpdateBibliography {
      * Rebuilds the bibliography.
      */
     public static void rebuildBibTextSection(XTextDocument doc,
-                                             OOFrontend fr,
+                                             OOFrontend frontend,
                                              CitedKeys bibliography,
                                              OOBibStyle style,
                                              boolean alwaysAddCitedOnPages)
@@ -52,7 +52,7 @@ public class UpdateBibliography {
         clearBibTextSectionContent2(doc);
 
         populateBibTextSection(doc,
-                               fr,
+                               frontend,
                                bibliography,
                                style,
                                alwaysAddCitedOnPages);
@@ -105,7 +105,7 @@ public class UpdateBibliography {
      * Assumes the section named BIB_SECTION_NAME exists.
      */
     private static void populateBibTextSection(XTextDocument doc,
-                                               OOFrontend fr,
+                                               OOFrontend frontend,
                                                CitedKeys bibliography,
                                                OOBibStyle style,
                                                boolean alwaysAddCitedOnPages)
@@ -121,7 +121,7 @@ public class UpdateBibliography {
 
         // emit the title of the bibliography
         OOTextIntoOO.removeDirectFormatting(cursor);
-        OOText bibliographyText = OOFormatBibliography.formatBibliography(fr.citationGroups,
+        OOText bibliographyText = OOFormatBibliography.formatBibliography(frontend.citationGroups,
                                                                           bibliography,
                                                                           style,
                                                                           alwaysAddCitedOnPages);

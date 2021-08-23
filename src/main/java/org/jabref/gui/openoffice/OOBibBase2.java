@@ -151,12 +151,12 @@ class OOBibBase2 {
      *
      * ******************************************************/
 
-    void showDialog(OOError ex) {
-        ex.showErrorDialog(dialogService);
+    void showDialog(OOError err) {
+        err.showErrorDialog(dialogService);
     }
 
-    void showDialog(String title, OOError ex) {
-        ex.setTitle(title).showErrorDialog(dialogService);
+    void showDialog(String title, OOError err) {
+        err.setTitle(title).showErrorDialog(dialogService);
     }
 
     OOVoidResult<OOError> collectResults(String title, List<OOVoidResult<OOError>> results) {
@@ -185,8 +185,8 @@ class OOBibBase2 {
 
     @SafeVarargs
     final boolean testDialog(String title, OOVoidResult<OOError>... results) {
-        List<OOVoidResult<OOError>> rs = Arrays.asList(results);
-        return testDialog(collectResults(title, rs));
+        List<OOVoidResult<OOError>> resultList = Arrays.asList(results);
+        return testDialog(collectResults(title, resultList));
     }
 
     /*
@@ -232,16 +232,16 @@ class OOBibBase2 {
         return result.mapError(detail -> new OOError(title, messageOnFailureToObtain));
     }
 
-    private static OOVoidResult<OOError> checkRangeOverlaps(XTextDocument doc, OOFrontend fr) {
+    private static OOVoidResult<OOError> checkRangeOverlaps(XTextDocument doc, OOFrontend frontend) {
         final String title = "checkRangeOverlaps";
         boolean requireSeparation = false;
         int maxReportedOverlaps = 10;
         try {
-            return (fr.checkRangeOverlaps(doc,
-                                          new ArrayList<>(),
-                                          requireSeparation,
-                                          maxReportedOverlaps)
-                    .mapError(OOError::from));
+            return (frontend.checkRangeOverlaps(doc,
+                                                new ArrayList<>(),
+                                                requireSeparation,
+                                                maxReportedOverlaps)
+                           .mapError(OOError::from));
         } catch (NoDocumentException ex) {
             return OOVoidResult.error(OOError.from(ex).setTitle(title));
         } catch (WrappedTargetException ex) {
@@ -249,18 +249,18 @@ class OOBibBase2 {
         }
     }
 
-    private static OOVoidResult<OOError> checkRangeOverlapsWithCursor(XTextDocument doc, OOFrontend fr) {
+    private static OOVoidResult<OOError> checkRangeOverlapsWithCursor(XTextDocument doc, OOFrontend frontend) {
         final String title = "checkRangeOverlapsWithCursor";
 
         List<RangeForOverlapCheck<CitationGroupId>> userRanges;
-        userRanges = fr.viewCursorRanges(doc);
+        userRanges = frontend.viewCursorRanges(doc);
 
         boolean requireSeparation = false;
         OOVoidResult<JabRefException> res;
         try {
-            res = fr.checkRangeOverlapsWithCursor(doc,
-                                                  userRanges,
-                                                  requireSeparation);
+            res = frontend.checkRangeOverlapsWithCursor(doc,
+                                                       userRanges,
+                                                       requireSeparation);
         } catch (NoDocumentException ex) {
             return OOVoidResult.error(OOError.from(ex).setTitle(title));
         } catch (WrappedTargetException ex) {
@@ -588,18 +588,17 @@ class OOBibBase2 {
         }
         XTextDocument doc = odoc.get();
 
-        OOResult<OOFrontend, OOError> ofr = getFrontend(doc);
-        if (testDialog(title, ofr.asVoidResult())) {
+        OOResult<OOFrontend, OOError> frontend = getFrontend(doc);
+        if (testDialog(title, frontend.asVoidResult())) {
             return;
         }
-        OOFrontend fr = ofr.get();
 
         OOResult<XTextCursor, OOError> cursor = getUserCursorForTextInsertion(doc, title);
         if (testDialog(title, cursor.asVoidResult())) {
             return;
         }
 
-        if (testDialog(title, checkRangeOverlapsWithCursor(doc, fr))) {
+        if (testDialog(title, checkRangeOverlapsWithCursor(doc, frontend.get()))) {
             return;
         }
 
@@ -635,7 +634,7 @@ class OOBibBase2 {
             UnoUndo.enterUndoContext(doc, "Insert citation");
 
             EditInsert.insertCitationGroup(doc,
-                                           fr,
+                                           frontend.get(),
                                            cursor.get(),
                                            entries,
                                            database,
@@ -695,8 +694,8 @@ class OOBibBase2 {
         try {
             UnoUndo.enterUndoContext(doc, "Merge citations");
 
-            OOFrontend fr = new OOFrontend(doc);
-            boolean madeModifications = EditMerge.mergeCitationGroups(doc, fr, style);
+            OOFrontend frontend = new OOFrontend(doc);
+            boolean madeModifications = EditMerge.mergeCitationGroups(doc, frontend, style);
             if (madeModifications) {
                 UnoCrossRef.refresh(doc);
                 Update.SyncOptions syncOptions = new Update.SyncOptions(databases);
@@ -752,8 +751,8 @@ class OOBibBase2 {
         try {
             UnoUndo.enterUndoContext(doc, "Separate citations");
 
-            OOFrontend fr = new OOFrontend(doc);
-            boolean madeModifications = EditSeparate.separateCitations(doc, fr, databases, style);
+            OOFrontend frontend = new OOFrontend(doc);
+            boolean madeModifications = EditSeparate.separateCitations(doc, frontend, databases, style);
             if (madeModifications) {
                 UnoCrossRef.refresh(doc);
                 Update.SyncOptions syncOptions = new Update.SyncOptions(databases);
@@ -881,8 +880,8 @@ class OOBibBase2 {
                 return;
             }
 
-            OOFrontend fr = new OOFrontend(doc);
-            if (testDialog(title, checkRangeOverlaps(doc, fr))) {
+            OOFrontend frontend = new OOFrontend(doc);
+            if (testDialog(title, checkRangeOverlaps(doc, frontend))) {
                 return;
             }
 
@@ -895,7 +894,7 @@ class OOBibBase2 {
                     .setUpdateBibliography(true)
                     .setAlwaysAddCitedOnPages(this.alwaysAddCitedOnPages);
 
-                unresolvedKeys = Update.synchronizeDocument(doc, fr, style, fcursor.get(), syncOptions);
+                unresolvedKeys = Update.synchronizeDocument(doc, frontend, style, fcursor.get(), syncOptions);
 
             } finally {
                 UnoUndo.leaveUndoContext(doc);

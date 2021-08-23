@@ -40,7 +40,7 @@ public class EditMerge {
     /*
      * @return true if modified document
      */
-    public static boolean mergeCitationGroups(XTextDocument doc, OOFrontend fr, OOBibStyle style)
+    public static boolean mergeCitationGroups(XTextDocument doc, OOFrontend frontend, OOBibStyle style)
         throws
         CreationException,
         IllegalArgumentException,
@@ -50,12 +50,12 @@ public class EditMerge {
         PropertyVetoException,
         WrappedTargetException {
 
-        boolean madeModifications = false;
+        boolean madeModifications;
 
         try {
             UnoScreenRefresh.lockControllers(doc);
 
-            List<JoinableGroupData> joinableGroups = EditMerge.scan(doc, fr);
+            List<JoinableGroupData> joinableGroups = EditMerge.scan(doc, frontend);
 
             for (JoinableGroupData joinableGroupData : joinableGroups) {
 
@@ -66,9 +66,9 @@ public class EditMerge {
                                                .collect(Collectors.toList()));
 
                 CitationType citationType = cgs.get(0).citationType;
-                List<Optional<OOText>> pageInfos = fr.backend.combinePageInfos(cgs);
+                List<Optional<OOText>> pageInfos = frontend.backend.combinePageInfos(cgs);
 
-                fr.removeCitationGroups(cgs, doc);
+                frontend.removeCitationGroups(cgs, doc);
                 XTextCursor textCursor = joinableGroupData.groupCursor;
                 textCursor.setString(""); // Also remove the spaces between.
 
@@ -76,7 +76,7 @@ public class EditMerge {
 
                 /* insertSpaceAfter: no, it is already there (or could be) */
                 boolean insertSpaceAfter = false;
-                UpdateCitationMarkers.createAndFillCitationGroup(fr,
+                UpdateCitationMarkers.createAndFillCitationGroup(frontend,
                                                                  doc,
                                                                  citationKeys,
                                                                  pageInfos,
@@ -226,7 +226,7 @@ public class EditMerge {
             couldExpand = thisCharCursor.goRight((short) 1, true);
             String thisChar = thisCharCursor.getString();
             thisCharCursor.collapseToEnd();
-            if (thisChar.isEmpty() || thisChar.equals("\n") || !thisChar.trim().isEmpty()) {
+            if (thisChar.isEmpty() || "\n".equals(thisChar) || !thisChar.trim().isEmpty()) {
                 couldExpand = false;
                 if (!thisChar.isEmpty()) {
                     thisCharCursor.goLeft((short) 1, false);
@@ -290,13 +290,13 @@ public class EditMerge {
     /**
      *  Scan the document for joinable groups. Return those found.
      */
-    private static List<JoinableGroupData> scan(XTextDocument doc, OOFrontend fr)
+    private static List<JoinableGroupData> scan(XTextDocument doc, OOFrontend frontend)
         throws
         NoDocumentException,
         WrappedTargetException {
         List<JoinableGroupData> result = new ArrayList<>();
 
-        List<CitationGroup> cgs = fr.getCitationGroupsSortedWithinPartitions(doc, false /* mapFootnotesToFootnoteMarks */);
+        List<CitationGroup> cgs = frontend.getCitationGroupsSortedWithinPartitions(doc, false /* mapFootnotesToFootnoteMarks */);
         if (cgs.isEmpty()) {
             return result;
         }
@@ -305,7 +305,7 @@ public class EditMerge {
 
         for (CitationGroup group : cgs) {
 
-            XTextRange currentRange = (fr.getMarkRange(doc, group)
+            XTextRange currentRange = (frontend.getMarkRange(doc, group)
                                        .orElseThrow(IllegalStateException::new));
 
             /*
