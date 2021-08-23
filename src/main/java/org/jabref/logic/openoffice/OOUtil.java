@@ -127,13 +127,13 @@ public class OOUtil {
         List<Formatting> formatting = new ArrayList<>();
         // We need to extract formatting. Use a simple regexp search iteration:
         int piv = 0;
-        Matcher m = OOUtil.HTML_TAG.matcher(lText);
-        while (m.find()) {
-            String currentSubstring = lText.substring(piv, m.start());
+        Matcher matcher = OOUtil.HTML_TAG.matcher(lText);
+        while (matcher.find()) {
+            String currentSubstring = lText.substring(piv, matcher.start());
             if (!currentSubstring.isEmpty()) {
                 OOUtil.insertTextAtCurrentLocation(text, cursor, currentSubstring, formatting);
             }
-            String tag = m.group();
+            String tag = matcher.group();
             // Handle tags:
             if ("<b>".equals(tag)) {
                 formatting.add(Formatting.BOLD);
@@ -169,7 +169,7 @@ public class OOUtil {
                 formatting.remove(Formatting.STRIKEOUT);
             }
 
-            piv = m.end();
+            piv = matcher.end();
         }
 
         if (piv < lText.length()) {
@@ -276,10 +276,9 @@ public class OOUtil {
         cursor.collapseToEnd();
     }
 
-    public static Object getProperty(Object o, String property)
+    public static Object getProperty(Object object, String property)
             throws UnknownPropertyException, WrappedTargetException {
-        XPropertySet props = UnoRuntime.queryInterface(
-                XPropertySet.class, o);
+        XPropertySet props = UnoRuntime.queryInterface(XPropertySet.class, object);
         return props.getPropertyValue(property);
     }
 }

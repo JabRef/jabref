@@ -35,14 +35,14 @@ class NamedRangeReferenceMark implements NamedRange {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(NamedRangeReferenceMark.class);
 
-    private String id; /* reference mark name */
+    private String rangeId; /* reference mark name */
 
-    private NamedRangeReferenceMark(String id) {
-        this.id = id;
+    private NamedRangeReferenceMark(String rangeId) {
+        this.rangeId = rangeId;
     }
 
     String getId() {
-        return id;
+        return rangeId;
     }
 
     /**
@@ -156,7 +156,7 @@ class NamedRangeReferenceMark implements NamedRange {
 
     @Override
     public String getRangeName() {
-        return id;
+        return rangeId;
     }
 
     /**
@@ -217,8 +217,6 @@ class NamedRangeReferenceMark implements NamedRange {
 
         String name = this.getRangeName();
 
-        final String left = NamedRangeReferenceMark.REFERENCE_MARK_LEFT_BRACKET;
-        final String right = NamedRangeReferenceMark.REFERENCE_MARK_RIGHT_BRACKET;
         final boolean debugThisFun = false;
 
         XTextCursor full = null;
@@ -279,6 +277,8 @@ class NamedRangeReferenceMark implements NamedRange {
         beta.goRight((short) (fullText.length() - 2), true);
         LOGGER.debug("getFillCursor: beta(1) covers '{}'", beta.getString());
 
+        final String left = NamedRangeReferenceMark.REFERENCE_MARK_LEFT_BRACKET;
+        final String right = NamedRangeReferenceMark.REFERENCE_MARK_RIGHT_BRACKET;
         final short rightLength = (short) right.length();
         if (fullText.startsWith(left) && fullText.endsWith(right)) {
             beta.setString("");
@@ -345,7 +345,6 @@ class NamedRangeReferenceMark implements NamedRange {
      */
     public static void checkFillCursor(XTextCursor cursor) {
         final String left = REFERENCE_MARK_LEFT_BRACKET;
-        final String right = REFERENCE_MARK_RIGHT_BRACKET;
 
         XTextCursor alpha = cursor.getText().createTextCursorByRange(cursor);
         alpha.collapseToStart();
@@ -364,6 +363,7 @@ class NamedRangeReferenceMark implements NamedRange {
             }
         }
 
+        final String right = REFERENCE_MARK_RIGHT_BRACKET;
         final short rightLength = (short) right.length();
         if (rightLength > 0) {
             omega.goRight(rightLength, true);
@@ -395,27 +395,26 @@ class NamedRangeReferenceMark implements NamedRange {
         // removeBracketsFromEmpty is intended to force removal if we are working on an "Empty citation" (INVISIBLE_CIT).
         final boolean removeBracketsFromEmpty = false;
 
-        final String left = REFERENCE_MARK_LEFT_BRACKET;
-        final String right = REFERENCE_MARK_RIGHT_BRACKET;
-        final short leftLength = (short) left.length();
-        final short rightLength = (short) right.length();
-
         String name = this.getRangeName();
 
         XTextCursor full = this.getRawCursor(doc).orElseThrow(IllegalStateException::new);
         final String fullText = full.getString();
-        final int fullTextLength = fullText.length();
 
+        final String left = REFERENCE_MARK_LEFT_BRACKET;
         if (!fullText.startsWith(left)) {
             String msg = String.format("cleanFillCursor: (%s) does not start with REFERENCE_MARK_LEFT_BRACKET", name);
             throw new IllegalStateException(msg);
         }
 
+        final String right = REFERENCE_MARK_RIGHT_BRACKET;
         if (!fullText.endsWith(right)) {
             String msg = String.format("cleanFillCursor: (%s) does not end with REFERENCE_MARK_RIGHT_BRACKET", name);
             throw new IllegalStateException(msg);
         }
 
+        final int fullTextLength = fullText.length();
+        final short leftLength = (short) left.length();
+        final short rightLength = (short) right.length();
         final int contentLength = (fullTextLength - (leftLength + rightLength));
         if (contentLength < 0) {
             String msg = String.format("cleanFillCursor: length(%s) < 0", name);

@@ -29,7 +29,7 @@ public class EditSeparate {
     }
 
     public static boolean separateCitations(XTextDocument doc,
-                                            OOFrontend fr,
+                                            OOFrontend frontend,
                                             List<BibDatabase> databases,
                                             OOBibStyle style)
         throws
@@ -47,17 +47,17 @@ public class EditSeparate {
         // decide the visually last Citation in the group. Unless the
         // style changed since refresh this is the last on the screen
         // as well.
-        fr.citationGroups.lookupCitations(databases);
-        fr.citationGroups.imposeLocalOrder(OOProcess.comparatorForMulticite(style));
+        frontend.citationGroups.lookupCitations(databases);
+        frontend.citationGroups.imposeLocalOrder(OOProcess.comparatorForMulticite(style));
 
-        List<CitationGroup> cgs = fr.citationGroups.getCitationGroupsUnordered();
+        List<CitationGroup> cgs = frontend.citationGroups.getCitationGroupsUnordered();
 
         try {
             UnoScreenRefresh.lockControllers(doc);
 
             for (CitationGroup group : cgs) {
 
-                XTextRange range1 = (fr
+                XTextRange range1 = (frontend
                                      .getMarkRange(doc, group)
                                      .orElseThrow(IllegalStateException::new));
                 XTextCursor textCursor = range1.getText().createTextCursorByRange(range1);
@@ -67,7 +67,7 @@ public class EditSeparate {
                     continue;
                 }
 
-                fr.removeCitationGroup(group, doc);
+                frontend.removeCitationGroup(group, doc);
                 // Now we own the content of cits
 
                 // Create a citation group for each citation.
@@ -76,7 +76,7 @@ public class EditSeparate {
                     boolean insertSpaceAfter = (i != last);
                     Citation cit = cits.get(i);
 
-                    UpdateCitationMarkers.createAndFillCitationGroup(fr,
+                    UpdateCitationMarkers.createAndFillCitationGroup(frontend,
                                                                      doc,
                                                                      List.of(cit.citationKey),
                                                                      List.of(cit.getPageInfo()),

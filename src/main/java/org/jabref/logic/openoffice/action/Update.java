@@ -29,7 +29,7 @@ public class Update {
      * @return the list of unresolved citation keys
      */
     private static List<String> updateDocument(XTextDocument doc,
-                                               OOFrontend fr,
+                                               OOFrontend frontend,
                                                List<BibDatabase> databases,
                                                OOBibStyle style,
                                                FunctionalTextViewCursor fcursor,
@@ -43,25 +43,25 @@ public class Update {
 
         final boolean useLockControllers = true;
 
-        fr.imposeGlobalOrder(doc, fcursor);
-        OOProcess.produceCitationMarkers(fr.citationGroups, databases, style);
+        frontend.imposeGlobalOrder(doc, fcursor);
+        OOProcess.produceCitationMarkers(frontend.citationGroups, databases, style);
 
         try {
             if (useLockControllers) {
                 UnoScreenRefresh.lockControllers(doc);
             }
 
-            UpdateCitationMarkers.applyNewCitationMarkers(doc, fr, style);
+            UpdateCitationMarkers.applyNewCitationMarkers(doc, frontend, style);
 
             if (doUpdateBibliography) {
                 UpdateBibliography.rebuildBibTextSection(doc,
-                                                         fr,
-                                                         fr.citationGroups.getBibliography().get(),
+                                                         frontend,
+                                                         frontend.citationGroups.getBibliography().get(),
                                                          style,
                                                          alwaysAddCitedOnPages);
             }
 
-            return fr.citationGroups.getUnresolvedKeys();
+            return frontend.citationGroups.getUnresolvedKeys();
         } finally {
             if (useLockControllers && UnoScreenRefresh.hasControllersLocked(doc)) {
                 UnoScreenRefresh.unlockControllers(doc);
@@ -93,7 +93,7 @@ public class Update {
     }
 
     public static List<String> synchronizeDocument(XTextDocument doc,
-                                                   OOFrontend fr,
+                                                   OOFrontend frontend,
                                                    OOBibStyle style,
                                                    FunctionalTextViewCursor fcursor,
                                                    SyncOptions syncOptions)
@@ -104,7 +104,7 @@ public class Update {
         com.sun.star.lang.IllegalArgumentException {
 
         return Update.updateDocument(doc,
-                                     fr,
+                                     frontend,
                                      syncOptions.databases,
                                      style,
                                      fcursor,
@@ -125,9 +125,9 @@ public class Update {
         WrappedTargetException,
         com.sun.star.lang.IllegalArgumentException {
 
-        OOFrontend fr = new OOFrontend(doc);
+        OOFrontend frontend = new OOFrontend(doc);
 
-        return Update.synchronizeDocument(doc, fr, style, fcursor, syncOptions);
+        return Update.synchronizeDocument(doc, frontend, style, fcursor, syncOptions);
     }
 
 }
