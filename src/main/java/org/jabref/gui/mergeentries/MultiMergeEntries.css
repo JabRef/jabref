@@ -1,0 +1,28 @@
+.text-changed {
+    -fx-fill: -jr-orange;
+}
+
+.text-added {
+    -fx-fill: -jr-green;
+}
+
+.text-removed {
+    -fx-fill: -jr-red;
+}
+
+.grid-pane {
+    -fx-hgap: 10;
+    -fx-vgap: 10;
+}
+
+.toggle-button {
+    -fx-border-insets: 0;
+    -fx-background-insets: 0;
+    -fx-border-image-insets: 0;
+    -fx-padding: 0;
+    -fx-background-radius: 0;
+}
+
+.box {
+    -fx-spacing: 10;
+}

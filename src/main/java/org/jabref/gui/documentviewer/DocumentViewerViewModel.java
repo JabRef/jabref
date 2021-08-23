@@ -123,6 +123,10 @@ public class DocumentViewerViewModel extends AbstractViewModel {
         return liveMode;
     }
 
+    public void showPage(int pageNumber) {
+        currentPage.set(pageNumber);
+    }
+
     public void showNextPage() {
         currentPage.set(getCurrentPage() + 1);
     }
