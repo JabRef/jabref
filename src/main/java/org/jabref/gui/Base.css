@@ -272,6 +272,10 @@
     -fx-fill: -fx-text-base-color;
 }
 
+.ikonli-font-icon {
+    -fx-icon-color: -fx-text-base-color;
+}
+
 .tooltip {
     -fx-background-color: -jr-tooltip-bg;
     -fx-opacity: 95%;
@@ -283,15 +287,15 @@
     -fx-font-size: 1em;
 }
 
-.tooltip > TextFlow > .tooltip-text-bold {
+TextFlow > .tooltip-text-bold {
     -fx-font-weight: bold;
 }
 
-.tooltip > TextFlow > .tooltip-text-italic {
+TextFlow > .tooltip-text-italic {
     -fx-font-style: italic;
 }
 
-.tooltip > TextFlow > .tooltip-text-monospaced {
+TextFlow > .tooltip-text-monospaced {
     -fx-font-family: monospace;
 }
 
@@ -859,10 +863,12 @@
     -fx-padding: 0.3em 0.9em 0.3em 0.9em;
 }
 
-.sidePaneComponentHeader .glyph-icon {
+.sidePaneComponentHeader .glyph-icon,
+.sidePaneComponentHeader .ikonli-font-icon {
     -fx-fill: -jr-sidepane-header-color;
     -fx-text-fill: -jr-sidepane-header-color;
     -fx-font-size: 16px;
+    -fx-icon-color: -jr-theme-text;
 }
 
 .mainMenu {
@@ -938,10 +944,12 @@
     -fx-border-width: 0;
 }
 
-.mainToolbar .glyph-icon {
+.mainToolbar .glyph-icon,
+.mainToolbar .ikonli-font-icon {
     -fx-font-size: 1.7em;
     -fx-fill: -jr-theme-text;
     -fx-text-fill: -jr-theme-text;
+    -fx-icon-color: -jr-theme-text;
 }
 
 .mainToolbar .search-field {

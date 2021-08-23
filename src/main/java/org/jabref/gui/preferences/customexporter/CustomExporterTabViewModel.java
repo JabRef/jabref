@@ -1,4 +1,4 @@
-package org.jabref.gui.preferences.exporter;
+package org.jabref.gui.preferences.customexporter;
 
 import java.util.List;
 import java.util.Optional;
@@ -16,7 +16,7 @@ import org.jabref.logic.exporter.TemplateExporter;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.preferences.PreferencesService;
 
-public class ExportCustomizationTabViewModel implements PreferenceTabViewModel {
+public class CustomExporterTabViewModel implements PreferenceTabViewModel {
 
     private final ListProperty<ExporterViewModel> exporters = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final ListProperty<ExporterViewModel> selectedExporters = new SimpleListProperty<>(FXCollections.observableArrayList());
@@ -25,7 +25,7 @@ public class ExportCustomizationTabViewModel implements PreferenceTabViewModel {
     private final DialogService dialogService;
     private final JournalAbbreviationRepository repository;
 
-    public ExportCustomizationTabViewModel(PreferencesService preferences, DialogService dialogService, JournalAbbreviationRepository repository) {
+    public CustomExporterTabViewModel(PreferencesService preferences, DialogService dialogService, JournalAbbreviationRepository repository) {
         this.preferences = preferences;
         this.dialogService = dialogService;
         this.repository = repository;
