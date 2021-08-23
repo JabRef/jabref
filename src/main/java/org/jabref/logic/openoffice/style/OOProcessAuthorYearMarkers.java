@@ -88,8 +88,8 @@ class OOProcessAuthorYearMarkers {
             // according to their order in clashingKeys.
             int nextUniqueLetter = 'a';
             for (String citationKey : clashingKeys) {
-                String ul = String.valueOf((char) nextUniqueLetter);
-                sortedCitedKeys.get(citationKey).setUniqueLetter(Optional.of(ul));
+                String uniqueLetter = String.valueOf((char) nextUniqueLetter);
+                sortedCitedKeys.get(citationKey).setUniqueLetter(Optional.of(uniqueLetter));
                 nextUniqueLetter++;
             }
         }

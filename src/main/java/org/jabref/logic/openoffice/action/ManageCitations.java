@@ -21,8 +21,8 @@ public class ManageCitations {
         throws
         NoDocumentException,
         WrappedTargetException {
-        OOFrontend fr = new OOFrontend(doc);
-        return fr.getCitationEntries(doc);
+        OOFrontend frontend = new OOFrontend(doc);
+        return frontend.getCitationEntries(doc);
     }
 
     public static void applyCitationEntries(XTextDocument doc, List<CitationEntry> citationEntries)
@@ -32,7 +32,7 @@ public class ManageCitations {
         IllegalTypeException,
         WrappedTargetException,
         IllegalArgumentException {
-        OOFrontend fr = new OOFrontend(doc);
-        fr.applyCitationEntries(doc, citationEntries);
+        OOFrontend frontend = new OOFrontend(doc);
+        frontend.applyCitationEntries(doc, citationEntries);
     }
 }

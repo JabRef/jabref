@@ -51,8 +51,8 @@ public class ExportCited {
         NoDocumentException,
         WrappedTargetException {
 
-        OOFrontend fr = new OOFrontend(doc);
-        CitedKeys cks = fr.citationGroups.getCitedKeysUnordered();
+        OOFrontend frontend = new OOFrontend(doc);
+        CitedKeys cks = frontend.citationGroups.getCitedKeysUnordered();
         cks.lookupInDatabases(databases);
 
         List<String> unresolvedKeys = new ArrayList<>();

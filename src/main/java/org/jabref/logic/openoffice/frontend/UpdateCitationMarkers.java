@@ -40,18 +40,18 @@ public class UpdateCitationMarkers {
      * After each fillCitationMarkInCursor call check if we lost the
      * BIB_SECTION_NAME bookmark and recreate it if we did.
      *
-     * @param fr
+     * @param frontend
      *
      * @param style Bibliography style to use.
      *
      */
-    public static void applyNewCitationMarkers(XTextDocument doc, OOFrontend fr, OOBibStyle style)
+    public static void applyNewCitationMarkers(XTextDocument doc, OOFrontend frontend, OOBibStyle style)
         throws
         NoDocumentException,
         CreationException,
         WrappedTargetException {
 
-        CitationGroups citationGroups = fr.citationGroups;
+        CitationGroups citationGroups = frontend.citationGroups;
 
         for (CitationGroup group : citationGroups.getCitationGroupsUnordered()) {
 
@@ -66,11 +66,11 @@ public class UpdateCitationMarkers {
 
             if (withText && marker.isPresent()) {
 
-                XTextCursor cursor = fr.getFillCursorForCitationGroup(doc, group);
+                XTextCursor cursor = frontend.getFillCursorForCitationGroup(doc, group);
 
                 fillCitationMarkInCursor(doc, cursor, marker.get(), withText, style);
 
-                fr.cleanFillCursorForCitationGroup(doc, group);
+                frontend.cleanFillCursorForCitationGroup(doc, group);
             }
 
         }
@@ -118,7 +118,7 @@ public class UpdateCitationMarkers {
      *             coming after. But is not wanted when we recreate a
      *             reference mark.
      */
-    public static void createAndFillCitationGroup(OOFrontend fr,
+    public static void createAndFillCitationGroup(OOFrontend frontend,
                                                   XTextDocument doc,
                                                   List<String> citationKeys,
                                                   List<Optional<OOText>> pageInfos,
@@ -140,21 +140,21 @@ public class UpdateCitationMarkers {
         if (pageInfos.size() != citationKeys.size()) {
             throw new IllegalArgumentException("pageInfos.size != citationKeys.size");
         }
-        CitationGroup group = fr.createCitationGroup(doc,
-                                                     citationKeys,
-                                                     pageInfos,
-                                                     citationType,
-                                                     position,
-                                                     insertSpaceAfter);
+        CitationGroup group = frontend.createCitationGroup(doc,
+                                                           citationKeys,
+                                                           pageInfos,
+                                                           citationType,
+                                                           position,
+                                                           insertSpaceAfter);
 
         final boolean withText = citationType.withText();
 
         if (withText) {
-            XTextCursor fillCursor = fr.getFillCursorForCitationGroup(doc, group);
+            XTextCursor fillCursor = frontend.getFillCursorForCitationGroup(doc, group);
 
             UpdateCitationMarkers.fillCitationMarkInCursor(doc, fillCursor, citationText, withText, style);
 
-            fr.cleanFillCursorForCitationGroup(doc, group);
+            frontend.cleanFillCursorForCitationGroup(doc, group);
         }
         position.collapseToEnd();
     }

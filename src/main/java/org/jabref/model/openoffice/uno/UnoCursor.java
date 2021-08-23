@@ -39,7 +39,7 @@ public class UnoCursor {
         return Optional.of(markAnchor.getText().createTextCursorByRange(markAnchor));
     }
 
-    public static XTextCursor createTextCursorByRange(XTextRange r) {
-        return r.getText().createTextCursorByRange(r);
+    public static XTextCursor createTextCursorByRange(XTextRange range) {
+        return range.getText().createTextCursorByRange(range);
     }
 }

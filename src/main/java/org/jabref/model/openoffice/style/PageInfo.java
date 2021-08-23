@@ -19,7 +19,7 @@ public class PageInfo {
         }
         String str = OOText.toString(optionalText.get());
         String trimmed = str.trim();
-        if (trimmed.equals("")) {
+        if ("".equals(trimmed)) {
             return Optional.empty();
         }
         return Optional.of(OOText.fromString(trimmed));

@@ -291,20 +291,20 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
         }
     }
 
-    private void readFormatFile(Reader in) throws IOException {
+    private void readFormatFile(Reader input) throws IOException {
 
         // First read all the contents of the file:
-        StringBuilder sb = new StringBuilder();
-        int c;
-        while ((c = in.read()) != -1) {
-            sb.append((char) c);
+        StringBuilder stringBuilder = new StringBuilder();
+        int chr;
+        while ((chr = input.read()) != -1) {
+            stringBuilder.append((char) chr);
         }
 
         // Store a local copy for viewing
-        localCopy = sb.toString();
+        localCopy = stringBuilder.toString();
 
         // Break into separate lines:
-        String[] lines = sb.toString().split("\n");
+        String[] lines = stringBuilder.toString().split("\n");
         BibStyleMode mode = BibStyleMode.NONE;
 
         for (String line1 : lines) {
@@ -386,11 +386,12 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
         if ((index > 0) && (index < (line.length() - 1))) {
 
             try {
-                String formatString = line.substring(index + 1);
+                final String typeName = line.substring(0, index);
+                final String formatString = line.substring(index + 1);
                 Layout layout = new LayoutHelper(new StringReader(formatString), this.prefs).getLayoutFromText();
-                EntryType type = EntryTypeFactory.parse(line.substring(0, index));
+                EntryType type = EntryTypeFactory.parse(typeName);
 
-                if (!isDefaultLayoutPresent && line.substring(0, index).equals(OOBibStyle.DEFAULT_MARK)) {
+                if (!isDefaultLayoutPresent && OOBibStyle.DEFAULT_MARK.equals(typeName)) {
                     isDefaultLayoutPresent = true;
                     defaultBibLayout = layout;
                 } else {
@@ -437,11 +438,11 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
     }
 
     public Layout getReferenceFormat(EntryType type) {
-        Layout l = bibLayout.get(type);
-        if (l == null) {
+        Layout layout = bibLayout.get(type);
+        if (layout == null) {
             return defaultBibLayout;
         } else {
-            return l;
+            return layout;
         }
     }
 
@@ -464,7 +465,7 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
         // Sort the numbers:
         List<Integer> lNum = new ArrayList<>(number);
         Collections.sort(lNum);
-        StringBuilder sb = new StringBuilder(bracketBefore);
+        StringBuilder stringBuilder = new StringBuilder(bracketBefore);
         int combineFrom = -1;
         int written = 0;
         for (int i = 0; i < lNum.size(); i++) {
@@ -476,9 +477,9 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
                 } else {
                     // Add single entry:
                     if (i > 0) {
-                        sb.append(getStringCitProperty(CITATION_SEPARATOR));
+                        stringBuilder.append(getStringCitProperty(CITATION_SEPARATOR));
                     }
-                    sb.append(lNum.get(i) > 0 ? String.valueOf(lNum.get(i)) : OOBibStyle.UNDEFINED_CITATION_MARKER);
+                    stringBuilder.append(lNum.get(i) > 0 ? String.valueOf(lNum.get(i)) : OOBibStyle.UNDEFINED_CITATION_MARKER);
                     written++;
                 }
             } else {
@@ -486,20 +487,20 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
                 // Check if it ends here:
                 if ((i == (lNum.size() - 1)) || (lNum.get(i + 1) != (i1 + 1))) {
                     if (written > 0) {
-                        sb.append(getStringCitProperty(CITATION_SEPARATOR));
+                        stringBuilder.append(getStringCitProperty(CITATION_SEPARATOR));
                     }
                     if ((minGroupingCount > 0) && (((i1 + 1) - combineFrom) >= minGroupingCount)) {
-                        sb.append(combineFrom);
-                        sb.append(getStringCitProperty(GROUPED_NUMBERS_SEPARATOR));
-                        sb.append(i1);
+                        stringBuilder.append(combineFrom);
+                        stringBuilder.append(getStringCitProperty(GROUPED_NUMBERS_SEPARATOR));
+                        stringBuilder.append(i1);
                         written++;
                     } else {
                         // Either we should never group, or there aren't enough
                         // entries in this case to group. Output all:
                         for (int jj = combineFrom; jj <= i1; jj++) {
-                            sb.append(jj);
+                            stringBuilder.append(jj);
                             if (jj < i1) {
-                                sb.append(getStringCitProperty(CITATION_SEPARATOR));
+                                stringBuilder.append(getStringCitProperty(CITATION_SEPARATOR));
                             }
                             written++;
                         }
@@ -509,8 +510,8 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
                 // If it doesn't end here, just keep iterating.
             }
         }
-        sb.append(bracketAfter);
-        return sb.toString();
+        stringBuilder.append(bracketAfter);
+        return stringBuilder.toString();
     }
     /* end_old */
 
@@ -591,13 +592,13 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
      */
     private void group(List<BibEntry> entries, String[] uniquefiers, int from, int to) {
         String separator = getStringCitProperty(UNIQUEFIER_SEPARATOR);
-        StringBuilder sb = new StringBuilder(uniquefiers[from]);
+        StringBuilder stringBuilder = new StringBuilder(uniquefiers[from]);
         for (int i = from + 1; i <= to; i++) {
-            sb.append(separator);
-            sb.append(uniquefiers[i]);
+            stringBuilder.append(separator);
+            stringBuilder.append(uniquefiers[i]);
             entries.set(i, null);
         }
-        uniquefiers[from] = sb.toString();
+        uniquefiers[from] = stringBuilder.toString();
     }
     /* end_old */
 
@@ -622,7 +623,7 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
         String citationSeparator = getStringCitProperty(CITATION_SEPARATOR); // The String to separate citations from each other.
         String yearField = getStringCitProperty(YEAR_FIELD); // The bibtex field providing the year, e.g. "year".
         String andString = getStringCitProperty(AUTHOR_LAST_SEPARATOR); // The String to add between the two last author names, e.g. " & ".
-        StringBuilder sb = new StringBuilder(startBrace);
+        StringBuilder stringBuilder = new StringBuilder(startBrace);
         for (int j = 0; j < entries.size(); j++) {
             BibEntry currentEntry = entries.get(j);
 
@@ -632,7 +633,7 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
             }
 
             if (j > 0) {
-                sb.append(citationSeparator);
+                stringBuilder.append(citationSeparator);
             }
 
             BibDatabase currentDatabase = database.get(currentEntry);
@@ -641,17 +642,17 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
 
             String author = getCitationMarkerField(currentEntry, currentDatabase, authorField);
             String authorString = createAuthorList(author, maxAuthors, andString, yearSep);
-            sb.append(authorString);
+            stringBuilder.append(authorString);
             String year = getCitationMarkerField(currentEntry, currentDatabase, yearField);
             if (year != null) {
-                sb.append(year);
+                stringBuilder.append(year);
             }
             if ((uniquifiers != null) && (uniquifiers[j] != null)) {
-                sb.append(uniquifiers[j]);
+                stringBuilder.append(uniquifiers[j]);
             }
         }
-        sb.append(endBrace);
-        return sb.toString();
+        stringBuilder.append(endBrace);
+        return stringBuilder.toString();
     }
     /* end_old */
 
@@ -681,7 +682,7 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
             // Use the default one if no explicit separator for text is defined
             andString = getStringCitProperty(AUTHOR_LAST_SEPARATOR);
         }
-        StringBuilder sb = new StringBuilder();
+        StringBuilder stringBuilder = new StringBuilder();
         for (int i = 0; i < entries.size(); i++) {
             BibEntry currentEntry = entries.get(i);
 
@@ -695,22 +696,22 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
             int maxAuthors = unlimA > 0 ? unlimA : maxA;
 
             if (i > 0) {
-                sb.append(citationSeparator);
+                stringBuilder.append(citationSeparator);
             }
             String author = getCitationMarkerField(currentEntry, currentDatabase, authorField);
             String authorString = createAuthorList(author, maxAuthors, andString, yearSep);
-            sb.append(authorString);
-            sb.append(startBrace);
+            stringBuilder.append(authorString);
+            stringBuilder.append(startBrace);
             String year = getCitationMarkerField(currentEntry, currentDatabase, yearField);
             if (year != null) {
-                sb.append(year);
+                stringBuilder.append(year);
             }
             if ((uniquefiers != null) && (uniquefiers[i] != null)) {
-                sb.append(uniquefiers[i]);
+                stringBuilder.append(uniquefiers[i]);
             }
-            sb.append(endBrace);
+            stringBuilder.append(endBrace);
         }
-        return sb.toString();
+        return stringBuilder.toString();
 
     }
     /* end_old */
@@ -757,15 +758,15 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
      * @return The author name, or an empty String if inapplicable.
      */
     private String getAuthorLastName(AuthorList al, int number) {
-        StringBuilder sb = new StringBuilder();
+        StringBuilder stringBuilder = new StringBuilder();
 
         if (al.getNumberOfAuthors() > number) {
             Author a = al.getAuthor(number);
-            a.getVon().filter(von -> !von.isEmpty()).ifPresent(von -> sb.append(von).append(' '));
-            sb.append(a.getLast().orElse(""));
+            a.getVon().filter(von -> !von.isEmpty()).ifPresent(von -> stringBuilder.append(von).append(' '));
+            stringBuilder.append(a.getLast().orElse(""));
         }
 
-        return sb.toString();
+        return stringBuilder.toString();
     }
     /* end_old */
 
@@ -896,12 +897,12 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) {
+    public boolean equals(Object object) {
+        if (this == object) {
             return true;
         }
-        if (o instanceof OOBibStyle) {
-            OOBibStyle otherStyle = (OOBibStyle) o;
+        if (object instanceof OOBibStyle) {
+            OOBibStyle otherStyle = (OOBibStyle) object;
             return Objects.equals(path, otherStyle.path)
                     && Objects.equals(name, otherStyle.name)
                     && Objects.equals(citProperties, otherStyle.citProperties)
@@ -923,28 +924,28 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
         String etAlString = getStringCitProperty(ET_AL_STRING); //  The String to represent authors that are not mentioned, e.g. " et al."
         String authorSep = getStringCitProperty(AUTHOR_SEPARATOR); // The String to add between author names except the last two, e.g. ", ".
         String oxfordComma = getStringCitProperty(OXFORD_COMMA); // The String to put after the second to last author in case of three or more authors
-        StringBuilder sb = new StringBuilder();
+        StringBuilder stringBuilder = new StringBuilder();
         AuthorList al = AuthorList.parse(author);
         if (!al.isEmpty()) {
-            sb.append(getAuthorLastName(al, 0));
+            stringBuilder.append(getAuthorLastName(al, 0));
         }
         if ((al.getNumberOfAuthors() > 1) && ((al.getNumberOfAuthors() <= maxAuthors) || (maxAuthors < 0))) {
             int j = 1;
             while (j < (al.getNumberOfAuthors() - 1)) {
-                sb.append(authorSep);
-                sb.append(getAuthorLastName(al, j));
+                stringBuilder.append(authorSep);
+                stringBuilder.append(getAuthorLastName(al, j));
                 j++;
             }
             if (al.getNumberOfAuthors() > 2) {
-                sb.append(oxfordComma);
+                stringBuilder.append(oxfordComma);
             }
-            sb.append(andString);
-            sb.append(getAuthorLastName(al, al.getNumberOfAuthors() - 1));
+            stringBuilder.append(andString);
+            stringBuilder.append(getAuthorLastName(al, al.getNumberOfAuthors() - 1));
         } else if (al.getNumberOfAuthors() > maxAuthors) {
-            sb.append(etAlString);
+            stringBuilder.append(etAlString);
         }
-        sb.append(yearSep);
-        return sb.toString();
+        stringBuilder.append(yearSep);
+        return stringBuilder.toString();
     }
     /* end_old */
 
@@ -1078,8 +1079,8 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
         return OOBibStyleGetNumCitationMarker.getNumCitationMarkerForBibliography(this, entry);
     }
 
-    public OOText getNormalizedCitationMarker(CitationMarkerNormEntry ce) {
-        return OOBibStyleGetCitationMarker.getNormalizedCitationMarker(this, ce, Optional.empty());
+    public OOText getNormalizedCitationMarker(CitationMarkerNormEntry entry) {
+        return OOBibStyleGetCitationMarker.getNormalizedCitationMarker(this, entry, Optional.empty());
     }
 
     /**
@@ -1156,10 +1157,6 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
      */
     public String getGroupedNumbersSeparator() {
         return getStringCitProperty(OOBibStyle.GROUPED_NUMBERS_SEPARATOR);
-    }
-
-    private boolean getBooleanProperty(String propName) {
-        return (Boolean) properties.get(propName);
     }
 
     private String getStringProperty(String propName) {
@@ -1308,12 +1305,9 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
         OOBibStyle style = this;
         OOText title = style.getReferenceHeaderText();
         String parStyle = style.getReferenceHeaderParagraphFormat();
-        if (parStyle != null) {
-            title = OOFormat.paragraph(title, parStyle);
-        } else {
-            title = OOFormat.paragraph(title);
-        }
-        return title;
+        return (parStyle == null
+                ? OOFormat.paragraph(title)
+                : OOFormat.paragraph(title, parStyle));
     }
 
 }
