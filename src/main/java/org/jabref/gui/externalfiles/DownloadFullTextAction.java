@@ -144,8 +144,7 @@ public class DownloadFullTextAction extends SimpleCommand {
                     databaseContext,
                     Globals.TASK_EXECUTOR,
                     dialogService,
-                    preferences.getXmpPreferences(),
-                    preferences.getFilePreferences(),
+                    preferences,
                     ExternalFileTypes.getInstance());
 
             onlineFile.download();

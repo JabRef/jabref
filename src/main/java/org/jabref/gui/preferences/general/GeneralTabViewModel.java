@@ -40,7 +40,6 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty confirmDeleteProperty = new SimpleBooleanProperty();
     private final BooleanProperty memoryStickModeProperty = new SimpleBooleanProperty();
     private final BooleanProperty collectTelemetryProperty = new SimpleBooleanProperty();
-    private final BooleanProperty allowIntegerEditionProperty = new SimpleBooleanProperty();
     private final BooleanProperty showAdvancedHintsProperty = new SimpleBooleanProperty();
     private final BooleanProperty markOwnerProperty = new SimpleBooleanProperty();
     private final StringProperty markOwnerNameProperty = new SimpleStringProperty("");
@@ -79,7 +78,6 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
 
         inspectionWarningDuplicateProperty.setValue(initialGeneralPreferences.isWarnAboutDuplicatesInInspection());
         confirmDeleteProperty.setValue(initialGeneralPreferences.shouldConfirmDelete());
-        allowIntegerEditionProperty.setValue(initialGeneralPreferences.shouldAllowIntegerEditionBibtex());
         memoryStickModeProperty.setValue(initialGeneralPreferences.isMemoryStickMode());
         collectTelemetryProperty.setValue(initialTelemetryPreferences.shouldCollectTelemetry());
         showAdvancedHintsProperty.setValue(initialGeneralPreferences.shouldShowAdvancedHints());
@@ -111,7 +109,6 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
                 selectedBiblatexModeProperty.getValue(),
                 inspectionWarningDuplicateProperty.getValue(),
                 confirmDeleteProperty.getValue(),
-                allowIntegerEditionProperty.getValue(),
                 memoryStickModeProperty.getValue(),
                 showAdvancedHintsProperty.getValue()));
 
@@ -176,10 +173,6 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
 
     public BooleanProperty collectTelemetryProperty() {
         return this.collectTelemetryProperty;
-    }
-
-    public BooleanProperty allowIntegerEditionProperty() {
-        return this.allowIntegerEditionProperty;
     }
 
     public BooleanProperty showAdvancedHintsProperty() {

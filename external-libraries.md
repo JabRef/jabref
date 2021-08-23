@@ -488,7 +488,7 @@ License: Apache-2.0
 
 1. `gradlew dependencies > build\dependencies.txt`
 2. Manually edit depedencies.txt to contain the tree of "compileClasspath" and "implementation" only. Otherwise, libraries such as "Apache Commons Lang 3" are missed.
-3. (on WSL) `sed 's/[^a-z]*//' < build/dependencies.txt | sort | uniq > build/dependencies-for-external-libraries.txt`
+3. (on WSL) `sed 's/[^a-z]*//' < build/dependencies.txt | sed "s/\(.*\) .*/\1/" | grep -v "\->" | sort | uniq > build/dependencies-for-external-libraries.txt`
 
 ```text
 com.fasterxml.jackson.core:jackson-annotations:2.12.3
