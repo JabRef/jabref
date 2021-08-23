@@ -8,12 +8,13 @@ import org.jabref.model.entry.field.Field;
 public class EntryEditorPreferences {
 
     private final Map<String, Set<Field>> entryEditorTabList;
-    private boolean shouldOpenOnNewEntry;
+    private final boolean shouldOpenOnNewEntry;
     private final boolean shouldShowRecommendationsTab;
     private final boolean isMrdlibAccepted;
     private final boolean shouldShowLatexCitationsTab;
-    private boolean showSourceTabByDefault;
-    private boolean enableValidation;
+    private final boolean showSourceTabByDefault;
+    private final boolean enableValidation;
+    private final boolean allowIntegerEditionBibtex;
     private double dividerPosition;
 
     public EntryEditorPreferences(Map<String, Set<Field>> entryEditorTabList,
@@ -23,6 +24,7 @@ public class EntryEditorPreferences {
                                   boolean shouldShowLatexCitationsTab,
                                   boolean showSourceTabByDefault,
                                   boolean enableValidation,
+                                  boolean allowIntegerEditionBibtex,
                                   double dividerPosition) {
 
         this.entryEditorTabList = entryEditorTabList;
@@ -32,6 +34,7 @@ public class EntryEditorPreferences {
         this.shouldShowLatexCitationsTab = shouldShowLatexCitationsTab;
         this.showSourceTabByDefault = showSourceTabByDefault;
         this.enableValidation = enableValidation;
+        this.allowIntegerEditionBibtex = allowIntegerEditionBibtex;
         this.dividerPosition = dividerPosition;
     }
 
@@ -61,6 +64,10 @@ public class EntryEditorPreferences {
 
     public boolean shouldEnableValidation() {
         return enableValidation;
+    }
+
+    public boolean shouldAllowIntegerEditionBibtex() {
+        return allowIntegerEditionBibtex;
     }
 
     public double getDividerPosition() {

@@ -1,4 +1,4 @@
-package org.jabref.gui.preferences.importer;
+package org.jabref.gui.preferences.customimporter;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -25,9 +25,9 @@ import org.jabref.preferences.PreferencesService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ImportCustomizationTabViewModel implements PreferenceTabViewModel {
+public class CustomImporterTabViewModel implements PreferenceTabViewModel {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ImportCustomizationTabViewModel.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(CustomImporterTabViewModel.class);
 
     private final ListProperty<ImporterViewModel> importers = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final ListProperty<ImporterViewModel> selectedImporters = new SimpleListProperty<>(FXCollections.observableArrayList());
@@ -35,7 +35,7 @@ public class ImportCustomizationTabViewModel implements PreferenceTabViewModel {
     private final PreferencesService preferences;
     private final DialogService dialogService;
 
-    public ImportCustomizationTabViewModel(PreferencesService preferences, DialogService dialogService) {
+    public CustomImporterTabViewModel(PreferencesService preferences, DialogService dialogService) {
         this.preferences = preferences;
         this.dialogService = dialogService;
     }
@@ -54,6 +54,7 @@ public class ImportCustomizationTabViewModel implements PreferenceTabViewModel {
                                                       .map(ImporterViewModel::getLogic)
                                                       .collect(Collectors.toSet()));
         Globals.IMPORT_FORMAT_READER.resetImportFormats(
+                preferences.getImportSettingsPreferences(),
                 preferences.getImportFormatPreferences(),
                 preferences.getXmpPreferences(),
                 Globals.getFileUpdateMonitor());
