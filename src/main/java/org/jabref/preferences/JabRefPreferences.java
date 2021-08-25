@@ -27,6 +27,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.UUID;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.InvalidPreferencesFormatException;
 import java.util.prefs.Preferences;
@@ -2711,39 +2713,16 @@ public class JabRefPreferences implements PreferencesService {
     // Import preferences
     //*************************************************************************************************************
 
-    public void storeImportSettingsPreferences(ImportSettingsPreferences preferences) {
-        putBoolean(GENERATE_KEY_ON_IMPORT, preferences.generateNewKeyOnImport());
+    @Override
+    public Consumer<ImportSettingsPreferences> storeImportSettingsPreferences() {
+        return (preferences) ->
+                putBoolean(GENERATE_KEY_ON_IMPORT, preferences.generateNewKeyOnImport());
     }
 
-    public ImportSettingsPreferences getImportSettingsPreferences() {
-        return new ImportSettingsPreferences(
+    @Override
+    public Supplier<ImportSettingsPreferences> supplyImportSettingsPreferences() {
+        return () -> new ImportSettingsPreferences(
                 getBoolean(GENERATE_KEY_ON_IMPORT)
         );
-    }
-
-    @Override
-    public PreferencesReadService<ImportSettingsPreferences> getReadImportSettingsPreferences() {
-        return new PreferencesReadService<ImportSettingsPreferences>() {
-            @Override
-            public ImportSettingsPreferences load() {
-                return getImportSettingsPreferences();
-            }
-        };
-    }
-
-    @Override
-    public PreferencesReadWriteService<ImportSettingsPreferences> getReadWriteImportSettingsPreferences() {
-        return new PreferencesReadWriteService<ImportSettingsPreferences>() {
-
-            @Override
-            public void store(ImportSettingsPreferences preferences) {
-                storeImportSettingsPreferences(preferences);
-            }
-
-            @Override
-            public ImportSettingsPreferences load() {
-                return getImportSettingsPreferences();
-            }
-        };
     }
 }

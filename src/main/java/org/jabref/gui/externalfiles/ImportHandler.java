@@ -173,7 +173,7 @@ public class ImportHandler {
                 preferencesService.getTimestampPreferences());
 
         // Generate citation keys
-        if (preferencesService.getReadImportSettingsPreferences().load().generateNewKeyOnImport()) {
+        if (preferencesService.supplyImportSettingsPreferences().get().generateNewKeyOnImport()) {
             generateKeys(entries);
         }
 
