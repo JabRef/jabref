@@ -17,6 +17,7 @@ import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.StandardEntryType;
 
 import com.fasterxml.jackson.annotation.JsonAnySetter;
@@ -95,14 +96,23 @@ public class CffImporter extends Importer {
         ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
         CffFormat citation = mapper.readValue(reader, CffFormat.class);
         HashMap<Field, String> entryMap = new HashMap<Field, String>();
+        StandardEntryType entryType = StandardEntryType.Software;
 
+        // Map CFF fields to JabRef Fields
         HashMap<String, StandardField> fieldMap = getFieldMappings();
         for (Map.Entry<String, String> property : citation.vals.entrySet()) {
             if (fieldMap.containsKey(property.getKey())) {
                 entryMap.put(fieldMap.get(property.getKey()), property.getValue());
+            } else if (property.getKey().equals("type")) {
+                if (property.getValue().equals("dataset")) {
+                    entryType = StandardEntryType.Dataset;
+                }
+            } else {
+                entryMap.put(new UnknownField(property.getKey()), property.getValue());
             }
         }
 
+        // Translate CFF author format to JabRef author format
         String authorStr = IntStream.range(0, citation.authors.size())
                         .mapToObj(citation.authors::get)
                         .map((author) -> author.vals)
@@ -112,9 +122,9 @@ public class CffImporter extends Importer {
                                         vals.get("family-names"), vals.get("name-suffix")))
                         .collect(AuthorList.collect())
                         .getAsFirstLastNamesWithAnd();
-
         entryMap.put(StandardField.AUTHOR, authorStr);
 
+        // Select DOI to keep
         if (entryMap.get(StandardField.DOI) == null && citation.ids != null) {
             List<CffIdentifier> doiIds = IntStream.range(0, citation.ids.size())
                             .mapToObj(citation.ids::get)
@@ -125,6 +135,7 @@ public class CffImporter extends Importer {
             }
         }
 
+        // Select SWHID to keep
         if (citation.ids != null) {
             List<String> swhIds = IntStream.range(0, citation.ids.size())
                                            .mapToObj(citation.ids::get)
@@ -145,7 +156,7 @@ public class CffImporter extends Importer {
             }
         }
 
-        BibEntry entry = new BibEntry(StandardEntryType.Software);
+        BibEntry entry = new BibEntry(entryType);
         entry.setField(entryMap);
 
         List<BibEntry> entriesList = new ArrayList<BibEntry>();

@@ -11,6 +11,8 @@ import java.util.Optional;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.field.UnknownField;
+import org.jabref.model.entry.types.StandardEntryType;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -66,7 +68,7 @@ public class CffImporterTest {
     }
 
     @Test
-    public void testImportEntries() throws IOException, URISyntaxException {
+    public void testImportEntriesBasic() throws IOException, URISyntaxException {
         Path file = Path.of(CffImporterTest.class.getResource("CffImporterTestValid.cff").toURI());
         List<BibEntry> bibEntries = importer.importDatabase(file, StandardCharsets.UTF_8).getDatabase().getEntries();
         BibEntry entry = bibEntries.get(0);
@@ -82,5 +84,123 @@ public class CffImporterTest {
         assertEquals(entry.getField(StandardField.LICENSE), Optional.of("MIT"));
         assertEquals(entry.getField(StandardField.VERSION), Optional.of("1.0"));
 
+    }
+
+    @Test
+    public void testImportEntriesMultipleAuthors() throws IOException, URISyntaxException {
+        Path file = Path.of(CffImporterTest.class.getResource("CffImporterTestValidMultAuthors.cff").toURI());
+        List<BibEntry> bibEntries = importer.importDatabase(file, StandardCharsets.UTF_8).getDatabase().getEntries();
+        BibEntry entry = bibEntries.get(0);
+
+        assertEquals(entry.getField(StandardField.AUTHOR), Optional.of("Joe van Smith and Bob Jones, Jr."));
+        assertEquals(entry.getField(StandardField.TITLE), Optional.of("Test"));
+        assertEquals(entry.getField(StandardField.URL), Optional.of("www.google.com"));
+        assertEquals(entry.getField(StandardField.REPOSITORY), Optional.of("www.github.com"));
+        assertEquals(entry.getField(StandardField.DOI), Optional.of("10.0000/TEST"));
+        assertEquals(entry.getField(StandardField.DATE), Optional.of("2000-07-02"));
+        assertEquals(entry.getField(StandardField.COMMENT), Optional.of("Test entry."));
+        assertEquals(entry.getField(StandardField.ABSTRACT), Optional.of("Test abstract."));
+        assertEquals(entry.getField(StandardField.LICENSE), Optional.of("MIT"));
+        assertEquals(entry.getField(StandardField.VERSION), Optional.of("1.0"));
+
+    }
+
+    @Test
+    public void testImportEntriesSwhIdSelect1() throws IOException, URISyntaxException {
+        Path file = Path.of(CffImporterTest.class.getResource("CffImporterTestValidSwhIdSelect1.cff").toURI());
+        List<BibEntry> bibEntries = importer.importDatabase(file, StandardCharsets.UTF_8).getDatabase().getEntries();
+        BibEntry entry = bibEntries.get(0);
+
+        assertEquals(entry.getField(StandardField.AUTHOR), Optional.of("Joe van Smith and Bob Jones, Jr."));
+        assertEquals(entry.getField(StandardField.TITLE), Optional.of("Test"));
+        assertEquals(entry.getField(StandardField.URL), Optional.of("www.google.com"));
+        assertEquals(entry.getField(StandardField.REPOSITORY), Optional.of("www.github.com"));
+        assertEquals(entry.getField(StandardField.DOI), Optional.of("10.0000/TEST"));
+        assertEquals(entry.getField(StandardField.DATE), Optional.of("2000-07-02"));
+        assertEquals(entry.getField(StandardField.COMMENT), Optional.of("Test entry."));
+        assertEquals(entry.getField(StandardField.ABSTRACT), Optional.of("Test abstract."));
+        assertEquals(entry.getField(StandardField.LICENSE), Optional.of("MIT"));
+        assertEquals(entry.getField(StandardField.VERSION), Optional.of("1.0"));
+        assertEquals(entry.getField(StandardField.SWHID), Optional.of("swh:1:rel:22ece559cc7cc2364edc5e5593d63ae8bd229f9f"));
+
+    }
+
+    @Test
+    public void testImportEntriesSwhIdSelect2() throws IOException, URISyntaxException {
+        Path file = Path.of(CffImporterTest.class.getResource("CffImporterTestValidSwhIdSelect2.cff").toURI());
+        List<BibEntry> bibEntries = importer.importDatabase(file, StandardCharsets.UTF_8).getDatabase().getEntries();
+        BibEntry entry = bibEntries.get(0);
+
+        assertEquals(entry.getField(StandardField.AUTHOR), Optional.of("Joe van Smith and Bob Jones, Jr."));
+        assertEquals(entry.getField(StandardField.TITLE), Optional.of("Test"));
+        assertEquals(entry.getField(StandardField.URL), Optional.of("www.google.com"));
+        assertEquals(entry.getField(StandardField.REPOSITORY), Optional.of("www.github.com"));
+        assertEquals(entry.getField(StandardField.DOI), Optional.of("10.0000/TEST"));
+        assertEquals(entry.getField(StandardField.DATE), Optional.of("2000-07-02"));
+        assertEquals(entry.getField(StandardField.COMMENT), Optional.of("Test entry."));
+        assertEquals(entry.getField(StandardField.ABSTRACT), Optional.of("Test abstract."));
+        assertEquals(entry.getField(StandardField.LICENSE), Optional.of("MIT"));
+        assertEquals(entry.getField(StandardField.VERSION), Optional.of("1.0"));
+        assertEquals(entry.getField(StandardField.SWHID), Optional.of("swh:1:cnt:94a9ed024d3859793618152ea559a168bbcbb5e2"));
+
+    }
+
+    @Test
+    public void testImportEntriesDataset() throws IOException, URISyntaxException {
+        Path file = Path.of(CffImporterTest.class.getResource("CffImporterTestDataset.cff").toURI());
+        List<BibEntry> bibEntries = importer.importDatabase(file, StandardCharsets.UTF_8).getDatabase().getEntries();
+        BibEntry entry = bibEntries.get(0);
+
+        assertEquals(entry.getField(StandardField.AUTHOR), Optional.of("Joe van Smith and Bob Jones, Jr."));
+        assertEquals(entry.getField(StandardField.TITLE), Optional.of("Test"));
+        assertEquals(entry.getField(StandardField.URL), Optional.of("www.google.com"));
+        assertEquals(entry.getField(StandardField.REPOSITORY), Optional.of("www.github.com"));
+        assertEquals(entry.getField(StandardField.DOI), Optional.of("10.0000/TEST"));
+        assertEquals(entry.getField(StandardField.DATE), Optional.of("2000-07-02"));
+        assertEquals(entry.getField(StandardField.COMMENT), Optional.of("Test entry."));
+        assertEquals(entry.getField(StandardField.ABSTRACT), Optional.of("Test abstract."));
+        assertEquals(entry.getField(StandardField.LICENSE), Optional.of("MIT"));
+        assertEquals(entry.getField(StandardField.VERSION), Optional.of("1.0"));
+
+        assertEquals(entry.getType(), StandardEntryType.Dataset);
+
+    }
+
+    @Test
+    public void testImportEntriesDoiSelect() throws IOException, URISyntaxException {
+        Path file = Path.of(CffImporterTest.class.getResource("CffImporterTestDoiSelect.cff").toURI());
+        List<BibEntry> bibEntries = importer.importDatabase(file, StandardCharsets.UTF_8).getDatabase().getEntries();
+        BibEntry entry = bibEntries.get(0);
+
+        assertEquals(entry.getField(StandardField.AUTHOR), Optional.of("Joe van Smith and Bob Jones, Jr."));
+        assertEquals(entry.getField(StandardField.TITLE), Optional.of("Test"));
+        assertEquals(entry.getField(StandardField.URL), Optional.of("www.google.com"));
+        assertEquals(entry.getField(StandardField.REPOSITORY), Optional.of("www.github.com"));
+        assertEquals(entry.getField(StandardField.DOI), Optional.of("10.0000/TEST"));
+        assertEquals(entry.getField(StandardField.DATE), Optional.of("2000-07-02"));
+        assertEquals(entry.getField(StandardField.COMMENT), Optional.of("Test entry."));
+        assertEquals(entry.getField(StandardField.ABSTRACT), Optional.of("Test abstract."));
+        assertEquals(entry.getField(StandardField.LICENSE), Optional.of("MIT"));
+        assertEquals(entry.getField(StandardField.VERSION), Optional.of("1.0"));
+
+    }
+
+    @Test
+    public void testImportEntriesUnknownFields() throws IOException, URISyntaxException {
+        Path file = Path.of(CffImporterTest.class.getResource("CffImporterTestUnknownFields.cff").toURI());
+        List<BibEntry> bibEntries = importer.importDatabase(file, StandardCharsets.UTF_8).getDatabase().getEntries();
+        BibEntry entry = bibEntries.get(0);
+
+        assertEquals(entry.getField(StandardField.AUTHOR), Optional.of("Joe van Smith"));
+        assertEquals(entry.getField(StandardField.TITLE), Optional.of("Test"));
+        assertEquals(entry.getField(StandardField.URL), Optional.of("www.google.com"));
+        assertEquals(entry.getField(StandardField.REPOSITORY), Optional.of("www.github.com"));
+        assertEquals(entry.getField(StandardField.DOI), Optional.of("10.0000/TEST"));
+        assertEquals(entry.getField(StandardField.DATE), Optional.of("2000-07-02"));
+        assertEquals(entry.getField(StandardField.COMMENT), Optional.of("Test entry."));
+        assertEquals(entry.getField(StandardField.ABSTRACT), Optional.of("Test abstract."));
+        assertEquals(entry.getField(StandardField.LICENSE), Optional.of("MIT"));
+        assertEquals(entry.getField(StandardField.VERSION), Optional.of("1.0"));
+        assertEquals(entry.getField(new UnknownField("commit")), Optional.of("10ad"));
     }
 }
