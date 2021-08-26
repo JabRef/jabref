@@ -1,6 +1,9 @@
 package org.jabref.model.pdf.search;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import org.jabref.model.entry.BibEntry;
 
@@ -15,37 +18,46 @@ import org.apache.lucene.search.highlight.QueryScorer;
 import org.apache.lucene.search.highlight.SimpleHTMLFormatter;
 import org.apache.lucene.search.highlight.TextFragment;
 
+import static org.jabref.model.pdf.search.SearchFieldConstants.ANNOTATIONS;
 import static org.jabref.model.pdf.search.SearchFieldConstants.CONTENT;
 import static org.jabref.model.pdf.search.SearchFieldConstants.MODIFIED;
+import static org.jabref.model.pdf.search.SearchFieldConstants.PAGE_NUMBER;
 import static org.jabref.model.pdf.search.SearchFieldConstants.PATH;
 
 public final class SearchResult {
 
     private final String path;
-    private final String content;
+
+    private final int pageNumber;
     private final long modified;
 
     private final float luceneScore;
-    private String html;
+    private List<String> contentResultStringsHtml;
+    private List<String> annotationsResultStringsHtml;
 
     public SearchResult(IndexSearcher searcher, Query query, ScoreDoc scoreDoc) throws IOException {
         this.path = getFieldContents(searcher, scoreDoc, PATH);
-        this.content = getFieldContents(searcher, scoreDoc, CONTENT);
+        this.pageNumber = Integer.parseInt(getFieldContents(searcher, scoreDoc, PAGE_NUMBER));
         this.modified = Long.parseLong(getFieldContents(searcher, scoreDoc, MODIFIED));
         this.luceneScore = scoreDoc.score;
 
-        TokenStream stream = new EnglishStemAnalyzer().tokenStream(CONTENT, content);
+        String content = getFieldContents(searcher, scoreDoc, CONTENT);
+        String annotations = getFieldContents(searcher, scoreDoc, ANNOTATIONS);
 
-        Highlighter highlighter = new Highlighter(new SimpleHTMLFormatter(), new QueryScorer(query));
-        try {
+        Highlighter highlighter = new Highlighter(new SimpleHTMLFormatter("<b>", "</b>"), new QueryScorer(query));
 
-            TextFragment[] frags = highlighter.getBestTextFragments(stream, content, true, 10);
-            this.html = "";
-            for (TextFragment frag : frags) {
-                html += "<p>" + frag.toString() + "</p>";
-            }
+        try (TokenStream contentStream = new EnglishStemAnalyzer().tokenStream(CONTENT, content)) {
+            TextFragment[] frags = highlighter.getBestTextFragments(contentStream, content, true, 10);
+            this.contentResultStringsHtml = Arrays.stream(frags).map(TextFragment::toString).collect(Collectors.toList());
         } catch (InvalidTokenOffsetsException e) {
-            this.html = "";
+            this.contentResultStringsHtml = List.of();
+        }
+
+        try (TokenStream annotationStream = new EnglishStemAnalyzer().tokenStream(ANNOTATIONS, annotations)) {
+            TextFragment[] frags = highlighter.getBestTextFragments(annotationStream, annotations, true, 10);
+            this.annotationsResultStringsHtml = Arrays.stream(frags).map(TextFragment::toString).collect(Collectors.toList());
+        } catch (InvalidTokenOffsetsException e) {
+            this.annotationsResultStringsHtml = List.of();
         }
     }
 
@@ -65,10 +77,6 @@ public final class SearchResult {
         return path;
     }
 
-    public String getContent() {
-        return content;
-    }
-
     public long getModified() {
         return modified;
     }
@@ -77,7 +85,15 @@ public final class SearchResult {
         return luceneScore;
     }
 
-    public String getHtml() {
-        return html;
+    public List<String> getContentResultStringsHtml() {
+        return contentResultStringsHtml;
+    }
+
+    public List<String> getAnnotationsResultStringsHtml() {
+        return annotationsResultStringsHtml;
+    }
+
+    public int getPageNumber() {
+        return pageNumber;
     }
 }

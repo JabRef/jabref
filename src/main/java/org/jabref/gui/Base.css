@@ -287,15 +287,15 @@
     -fx-font-size: 1em;
 }
 
-.tooltip > TextFlow > .tooltip-text-bold {
+TextFlow > .tooltip-text-bold {
     -fx-font-weight: bold;
 }
 
-.tooltip > TextFlow > .tooltip-text-italic {
+TextFlow > .tooltip-text-italic {
     -fx-font-style: italic;
 }
 
-.tooltip > TextFlow > .tooltip-text-monospaced {
+TextFlow > .tooltip-text-monospaced {
     -fx-font-family: monospace;
 }
 
@@ -979,11 +979,13 @@
 .mainToolbar .search-field .toggle-button .glyph-icon {
     -fx-fill: derive(-jr-search-text, 80%);
     -fx-text-fill: derive(-jr-search-text, 80%);
+    -fx-icon-color: derive(-jr-search-text, 80%);
 }
 
 .mainToolbar .search-field .toggle-button:selected .glyph-icon {
     -fx-fill: -jr-search-text;
     -fx-text-fill: -jr-search-text;
+    -fx-icon-color: -jr-search-text;
 }
 
 /* search text */

@@ -1,5 +1,7 @@
 package org.jabref.gui.linkedfile;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
@@ -125,7 +127,16 @@ public class LinkedFilesEditDialogViewModel extends AbstractViewModel {
     }
 
     public LinkedFile getNewLinkedFile() {
-        return new LinkedFile(description.getValue(), Path.of(link.getValue()), monadicSelectedExternalFileType.getValue().map(ExternalFileType::toString).orElse(""));
+        String fileType = monadicSelectedExternalFileType.getValue().map(ExternalFileType::toString).orElse("");
+
+        if (LinkedFile.isOnlineLink(link.getValue())) {
+            try {
+                return new LinkedFile(description.getValue(), new URL(link.getValue()), fileType);
+            } catch (MalformedURLException e) {
+                return new LinkedFile(description.getValue(), link.getValue(), fileType);
+            }
+        }
+        return new LinkedFile(description.getValue(), Path.of(link.getValue()), fileType);
     }
 
     private String relativize(Path filePath) {

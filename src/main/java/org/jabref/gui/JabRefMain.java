@@ -124,7 +124,7 @@ public class JabRefMain extends Application {
         Globals.journalAbbreviationRepository = JournalAbbreviationLoader.loadRepository(preferences.getJournalAbbreviationPreferences());
 
         // Build list of Import and Export formats
-        Globals.IMPORT_FORMAT_READER.resetImportFormats(preferences.getImportFormatPreferences(),
+        Globals.IMPORT_FORMAT_READER.resetImportFormats(preferences.getImportSettingsPreferences(), preferences.getImportFormatPreferences(),
                 preferences.getXmpPreferences(), Globals.getFileUpdateMonitor());
         Globals.entryTypesManager.addCustomOrModifiedTypes(preferences.getBibEntryTypes(BibDatabaseMode.BIBTEX),
                 preferences.getBibEntryTypes(BibDatabaseMode.BIBLATEX));

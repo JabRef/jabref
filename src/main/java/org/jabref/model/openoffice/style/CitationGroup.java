@@ -19,7 +19,7 @@ public class CitationGroup {
     /*
      * Identifies this citation group.
      */
-    public final CitationGroupId cgid;
+    public final CitationGroupId groupId;
 
     /*
      * The core data, stored in the document:
@@ -60,12 +60,12 @@ public class CitationGroup {
     private Optional<OOText> citationMarker;
 
     public CitationGroup(OODataModel dataModel,
-                         CitationGroupId cgid,
+                         CitationGroupId groupId,
                          CitationType citationType,
                          List<Citation> citationsInStorageOrder,
                          Optional<String> referenceMarkNameForLinking) {
         this.dataModel = dataModel;
-        this.cgid = cgid;
+        this.groupId = groupId;
         this.citationType = citationType;
         this.citationsInStorageOrder = Collections.unmodifiableList(citationsInStorageOrder);
         this.localOrder = OOListUtil.makeIndices(citationsInStorageOrder.size());

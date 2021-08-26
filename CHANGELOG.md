@@ -15,7 +15,9 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We added a fulltext search feature. [#2838](https://github.com/JabRef/jabref/pull/2838)
 - We improved the deduction of bib-entries from imported fulltext pdfs. [#7947](https://github.com/JabRef/jabref/pull/7947)
 - We added unprotect_terms to the list of bracketed pattern modifiers [#7826](https://github.com/JabRef/jabref/pull/7960)
+- We added a dialog that allows to parse metadata from linked pdfs. [#7929](https://github.com/JabRef/jabref/pull/7929)
 - We added an icon picker in group edit dialog. [#6142](https://github.com/JabRef/jabref/issues/6142)
+- We added a preference to Opt-In to JabRef's online metadata extraction service (Grobid) usage. [8002](https://github.com/JabRef/jabref/pull/8002)
 
 ### Changed
 
@@ -28,11 +30,13 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 
 ### Fixed
 
+- We fixed an issue where an exception ocurred when a linked online file was edited in the entry editor [#8008](https://github.com/JabRef/jabref/issues/8008)
 - We fixed an issue when checking for a new version when JabRef is used behind a corporate proxy. [#7884](https://github.com/JabRef/jabref/issues/7884)
 - We fixed some icons that were drawn in the wrong color when JabRef used a custom theme. [#7853](https://github.com/JabRef/jabref/issues/7853)
 - We fixed an issue where the `Aux file` on `Edit group` doesn't support relative sub-directories path to import. [#7719](https://github.com/JabRef/jabref/issues/7719).
 - We fixed an issue where it was impossible to add or modify groups. [#7912](https://github.com/JabRef/jabref/pull/793://github.com/JabRef/jabref/pull/7921)
 - We fixed an issue where exported entries from a Citavi bib containing URLs could not be imported [#7892](https://github.com/JabRef/jabref/issues/7882)
+- We fixed an issue where the icons in the search bar had the same color, toggled as well as untoggled. [#8014](https://github.com/JabRef/jabref/pull/8014)
 
 ### Removed
 

@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.function.Consumer;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import javafx.beans.property.BooleanProperty;
@@ -29,7 +28,7 @@ public class ImportExportTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty generateKeyOnImportProperty = new SimpleBooleanProperty();
 
     private final BooleanProperty useCustomDOIProperty = new SimpleBooleanProperty();
-    private final StringProperty useCustomDOINameProperty = new SimpleStringProperty("");
+    private final StringProperty useCustomDOINameProperty = new SimpleStringProperty();
 
     // SaveOrderConfigPanel
     private final BooleanProperty exportInOriginalProperty = new SimpleBooleanProperty();
@@ -38,23 +37,24 @@ public class ImportExportTabViewModel implements PreferenceTabViewModel {
     private final ListProperty<Field> sortableFieldsProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final ListProperty<SortCriterionViewModel> sortCriteriaProperty = new SimpleListProperty<>(FXCollections.observableArrayList(new ArrayList<>()));
 
+    private final BooleanProperty grobidEnabledProperty = new SimpleBooleanProperty();
+    private final StringProperty grobidURLProperty = new SimpleStringProperty();
+
     private final PreferencesService preferencesService;
     private final DOIPreferences initialDOIPreferences;
-    private final Supplier<ImportSettingsPreferences> importSettingsSupplier;
-    private final Consumer<ImportSettingsPreferences> importSettingsRetainer;
+    private final ImportSettingsPreferences initialImportSettingsPreferences;
     private final SaveOrderConfig initialExportOrder;
 
     public ImportExportTabViewModel(PreferencesService preferencesService) {
         this.preferencesService = preferencesService;
-        this.importSettingsSupplier = preferencesService.importSettingsPreferencesSupplier();
-        this.importSettingsRetainer = preferencesService.importSettingsPreferencesRetainer();
+        this.initialImportSettingsPreferences = preferencesService.importSettingsPreferencesSupplier().get();
         this.initialDOIPreferences = preferencesService.getDOIPreferences();
         this.initialExportOrder = preferencesService.getExportSaveOrder();
     }
 
     @Override
     public void setValues() {
-        generateKeyOnImportProperty.setValue(importSettingsSupplier.get().generateNewKeyOnImport());
+        generateKeyOnImportProperty.setValue(initialImportSettingsPreferences.generateNewKeyOnImport());
         useCustomDOIProperty.setValue(initialDOIPreferences.isUseCustom());
         useCustomDOINameProperty.setValue(initialDOIPreferences.getDefaultBaseURI());
 
@@ -71,12 +71,15 @@ public class ImportExportTabViewModel implements PreferenceTabViewModel {
         sortCriteriaProperty.addAll(initialExportOrder.getSortCriteria().stream()
                                                       .map(SortCriterionViewModel::new)
                                                       .collect(Collectors.toList()));
+
+        grobidEnabledProperty.setValue(initialImportSettingsPreferences.isGrobidEnabled());
+        grobidURLProperty.setValue(initialImportSettingsPreferences.getGrobidURL());
     }
 
     @Override
     public void storeSettings() {
-        importSettingsRetainer.accept(new ImportSettingsPreferences(
-                generateKeyOnImportProperty.getValue()));
+        preferencesService.importSettingsPreferencesRetainer().accept(new ImportSettingsPreferences(
+                generateKeyOnImportProperty.getValue(), grobidEnabledProperty.getValue(), initialImportSettingsPreferences.isGrobidOptOut(), grobidURLProperty.getValue()));
 
         preferencesService.storeDOIPreferences(new DOIPreferences(
                 useCustomDOIProperty.getValue(),
@@ -121,5 +124,13 @@ public class ImportExportTabViewModel implements PreferenceTabViewModel {
 
     public ListProperty<SortCriterionViewModel> sortCriteriaProperty() {
         return sortCriteriaProperty;
+    }
+
+    public BooleanProperty grobidEnabledProperty() {
+        return grobidEnabledProperty;
+    }
+
+    public StringProperty grobidURLProperty() {
+        return grobidURLProperty;
     }
 }
