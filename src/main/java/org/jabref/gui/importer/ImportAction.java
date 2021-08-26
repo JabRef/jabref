@@ -129,7 +129,7 @@ public class ImportAction {
                         frame.getDialogService().notify(Localization.lang("Importing in unknown format") + "...");
                     });
                     // This import method never throws an IOException:
-                    imports.add(Globals.IMPORT_FORMAT_READER.importUnknownFormat(filename,prefs.getTimestampPreferences(),Globals.getFileUpdateMonitor()));
+                    imports.add(Globals.IMPORT_FORMAT_READER.importUnknownFormat(filename, prefs.getTimestampPreferences(), Globals.getFileUpdateMonitor()));
                 } else {
                     DefaultTaskExecutor.runAndWaitInJavaFXThread(() -> {
                         if (importer.get() instanceof PdfGrobidImporter

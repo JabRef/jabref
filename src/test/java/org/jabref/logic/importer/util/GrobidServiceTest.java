@@ -35,7 +35,7 @@ public class GrobidServiceTest {
 
     @BeforeAll
     public static void setup() {
-        grobidService = new GrobidService(importSettingsPreferences);
+        grobidService = new GrobidService(() -> importSettingsPreferences);
         importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(importFormatPreferences.getKeywordSeparator()).thenReturn(',');
     }
@@ -43,17 +43,17 @@ public class GrobidServiceTest {
     @Test
     public void processValidCitationTest() throws IOException, ParseException {
         BibEntry exampleBibEntry = new BibEntry(StandardEntryType.Article).withCitationKey("-1")
-                                                                                    .withField(StandardField.AUTHOR, "Derwing, Tracey and Rossiter, Marian and Munro, Murray")
-                                                                                    .withField(StandardField.TITLE, "Teaching Native Speakers to Listen to Foreign-accented Speech")
-                                                                                    .withField(StandardField.JOURNAL, "Journal of Multilingual and Multicultural Development")
-                                                                                    .withField(StandardField.DOI, "10.1080/01434630208666468")
-                                                                                    .withField(StandardField.DATE, "2002-09")
-                                                                                    .withField(StandardField.YEAR, "2002")
-                                                                                    .withField(StandardField.MONTH, "9")
-                                                                                    .withField(StandardField.PAGES, "245-259")
-                                                                                    .withField(StandardField.VOLUME, "23")
-                                                                                    .withField(StandardField.PUBLISHER, "Informa UK Limited")
-                                                                                    .withField(StandardField.NUMBER, "4");
+                                                                          .withField(StandardField.AUTHOR, "Derwing, Tracey and Rossiter, Marian and Munro, Murray")
+                                                                          .withField(StandardField.TITLE, "Teaching Native Speakers to Listen to Foreign-accented Speech")
+                                                                          .withField(StandardField.JOURNAL, "Journal of Multilingual and Multicultural Development")
+                                                                          .withField(StandardField.DOI, "10.1080/01434630208666468")
+                                                                          .withField(StandardField.DATE, "2002-09")
+                                                                          .withField(StandardField.YEAR, "2002")
+                                                                          .withField(StandardField.MONTH, "9")
+                                                                          .withField(StandardField.PAGES, "245-259")
+                                                                          .withField(StandardField.VOLUME, "23")
+                                                                          .withField(StandardField.PUBLISHER, "Informa UK Limited")
+                                                                          .withField(StandardField.NUMBER, "4");
         Optional<BibEntry> response = grobidService.processCitation("Derwing, T. M., Rossiter, M. J., & Munro, " +
                 "M. J. (2002). Teaching native speakers to listen to foreign-accented speech. " +
                 "Journal of Multilingual and Multicultural Development, 23(4), 245-259.", importFormatPreferences, GrobidService.ConsolidateCitations.WITH_METADATA);
@@ -76,7 +76,7 @@ public class GrobidServiceTest {
     @Test
     public void failsWhenGrobidDisabled() {
         ImportSettingsPreferences importSettingsWithGrobidDisabled = importSettingsPreferences.withGrobidEnabled(false);
-        assertThrows(UnsupportedOperationException.class, () -> new GrobidService(importSettingsWithGrobidDisabled));
+        assertThrows(UnsupportedOperationException.class, () -> new GrobidService(() -> importSettingsWithGrobidDisabled));
     }
 
     @Test

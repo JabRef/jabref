@@ -66,7 +66,7 @@ class WebFetchersTest {
 
     @Test
     void getEntryBasedFetchersReturnsAllFetcherDerivingFromEntryBasedFetcher() throws Exception {
-        Set<EntryBasedFetcher> idFetchers = WebFetchers.getEntryBasedFetchers(mock(ImportSettingsPreferences.class), importFormatPreferences, mock(FilePreferences.class), mock(BibDatabaseContext.class), Charset.defaultCharset());
+        Set<EntryBasedFetcher> idFetchers = WebFetchers.getEntryBasedFetchers(() -> mock(ImportSettingsPreferences.class), importFormatPreferences, mock(FilePreferences.class), mock(BibDatabaseContext.class), Charset.defaultCharset());
 
         try (ScanResult scanResult = classGraph.scan()) {
             ClassInfoList controlClasses = scanResult.getClassesImplementing(EntryBasedFetcher.class.getCanonicalName());

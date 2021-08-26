@@ -30,7 +30,7 @@ class ImportFormatReaderTestParameterless {
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(importFormatPreferences.getEncoding()).thenReturn(StandardCharsets.UTF_8);
         when(importFormatPreferences.getCustomImportList()).thenReturn(Set.of());
-        reader.resetImportFormats(mock(ImportSettingsPreferences.class), importFormatPreferences, mock(XmpPreferences.class), fileMonitor);
+        reader.resetImportFormats(() -> mock(ImportSettingsPreferences.class), importFormatPreferences, mock(XmpPreferences.class), fileMonitor);
     }
 
     @Test

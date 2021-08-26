@@ -35,7 +35,7 @@ class ImportFormatReaderIntegrationTest {
         when(importFormatPreferences.getEncoding()).thenReturn(StandardCharsets.UTF_8);
         when(importFormatPreferences.getCustomImportList()).thenReturn(Set.of());
         when(timestampPreferences.getTimestampField()).then(invocation -> StandardField.TIMESTAMP);
-        reader.resetImportFormats(mock(ImportSettingsPreferences.class), importFormatPreferences, mock(XmpPreferences.class), new DummyFileUpdateMonitor());
+        reader.resetImportFormats(() -> mock(ImportSettingsPreferences.class), importFormatPreferences, mock(XmpPreferences.class), new DummyFileUpdateMonitor());
     }
 
     @ParameterizedTest
