@@ -301,9 +301,9 @@ public interface PreferencesService {
 
     void storeCustomImportFormats(Set<CustomImporter> customImporters);
 
-    Supplier<ImportSettingsPreferences> supplyImportSettingsPreferences();
+    Supplier<ImportSettingsPreferences> importSettingsPreferencesSupplier();
 
-    Consumer<ImportSettingsPreferences> storeImportSettingsPreferences();
+    Consumer<ImportSettingsPreferences> importSettingsPreferencesRetainer();
 
     //*************************************************************************************************************
     // Preview preferences

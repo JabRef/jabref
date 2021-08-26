@@ -41,13 +41,13 @@ public class ImportExportTabViewModel implements PreferenceTabViewModel {
     private final PreferencesService preferencesService;
     private final DOIPreferences initialDOIPreferences;
     private final Supplier<ImportSettingsPreferences> importSettingsSupplier;
-    private final Consumer<ImportSettingsPreferences> importSettingsConsumer;
+    private final Consumer<ImportSettingsPreferences> importSettingsRetainer;
     private final SaveOrderConfig initialExportOrder;
 
     public ImportExportTabViewModel(PreferencesService preferencesService) {
         this.preferencesService = preferencesService;
-        this.importSettingsSupplier = preferencesService.supplyImportSettingsPreferences();
-        this.importSettingsConsumer = preferencesService.storeImportSettingsPreferences();
+        this.importSettingsSupplier = preferencesService.importSettingsPreferencesSupplier();
+        this.importSettingsRetainer = preferencesService.importSettingsPreferencesRetainer();
         this.initialDOIPreferences = preferencesService.getDOIPreferences();
         this.initialExportOrder = preferencesService.getExportSaveOrder();
     }
@@ -75,7 +75,7 @@ public class ImportExportTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public void storeSettings() {
-        importSettingsConsumer.accept(new ImportSettingsPreferences(
+        importSettingsRetainer.accept(new ImportSettingsPreferences(
                 generateKeyOnImportProperty.getValue()));
 
         preferencesService.storeDOIPreferences(new DOIPreferences(

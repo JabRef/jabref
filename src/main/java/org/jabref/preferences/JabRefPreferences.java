@@ -2716,13 +2716,13 @@ public class JabRefPreferences implements PreferencesService {
     //*************************************************************************************************************
 
     @Override
-    public Consumer<ImportSettingsPreferences> storeImportSettingsPreferences() {
+    public Consumer<ImportSettingsPreferences> importSettingsPreferencesRetainer() {
         return (preferences) ->
                 putBoolean(GENERATE_KEY_ON_IMPORT, preferences.generateNewKeyOnImport());
     }
 
     @Override
-    public Supplier<ImportSettingsPreferences> supplyImportSettingsPreferences() {
+    public Supplier<ImportSettingsPreferences> importSettingsPreferencesSupplier() {
         return () -> new ImportSettingsPreferences(
                 getBoolean(GENERATE_KEY_ON_IMPORT)
         );
