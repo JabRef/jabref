@@ -9,6 +9,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.TimerTask;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import javafx.application.Platform;
@@ -287,23 +289,24 @@ public class JabRefFrame extends BorderPane {
         });
     }
 
-    private void initShowTrackingNotification() {
-        if (Globals.prefs.getTelemetryPreferences().shouldAskToCollectTelemetry()) {
+    private void initShowTrackingNotification(Supplier<TelemetryPreferences> preferencesSupplier,
+                                              Consumer<TelemetryPreferences> preferencesRetainer) {
+        if (preferencesSupplier.get().shouldAskToCollectTelemetry()) {
             JabRefExecutorService.INSTANCE.submit(new TimerTask() {
 
                 @Override
                 public void run() {
-                    DefaultTaskExecutor.runInJavaFXThread(JabRefFrame.this::showTrackingNotification);
+                    DefaultTaskExecutor.runInJavaFXThread(() -> showTrackingNotification(preferencesSupplier, preferencesRetainer));
                 }
             }, 60000); // run in one minute
         }
     }
 
-    private void showTrackingNotification() {
-        TelemetryPreferences telemetryPreferences = Globals.prefs.getTelemetryPreferences();
+    private void showTrackingNotification(Supplier<TelemetryPreferences> preferencesSupplier,
+                                          Consumer<TelemetryPreferences> preferencesRetainer) {
+        TelemetryPreferences telemetryPreferences = preferencesSupplier.get();
         boolean shouldCollect = telemetryPreferences.shouldCollectTelemetry();
-
-        if (!telemetryPreferences.shouldCollectTelemetry()) {
+        if (!shouldCollect) {
             shouldCollect = dialogService.showConfirmationDialogAndWait(
                     Localization.lang("Telemetry: Help make JabRef better"),
                     Localization.lang("To improve the user experience, we would like to collect anonymous statistics on the features you use. We will only record what features you access and how often you do it. We will neither collect any personal data nor the content of bibliographic items. If you choose to allow data collection, you can later disable it via Options -> Preferences -> General."),
@@ -311,8 +314,8 @@ public class JabRefFrame extends BorderPane {
                     Localization.lang("Don't share"));
         }
 
-        Globals.prefs.storeTelemetryPreferences(telemetryPreferences.withCollectTelemetry(shouldCollect)
-                                                                    .withAskToCollectTelemetry(false));
+        preferencesRetainer.accept(telemetryPreferences.withCollectTelemetry(shouldCollect)
+                                                       .withAskToCollectTelemetry(false));
     }
 
     /**
@@ -634,7 +637,7 @@ public class JabRefFrame extends BorderPane {
                     libraryTab.textProperty());
             mainStage.titleProperty().bind(windowTitle);
         });
-        initShowTrackingNotification();
+        initShowTrackingNotification(prefs.telemetryPreferencesSupplier(), prefs.telemetryPreferencesRetainer());
     }
 
     /**

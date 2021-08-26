@@ -61,7 +61,7 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         this.dialogService = dialogService;
         this.preferencesService = preferencesService;
         this.initialGeneralPreferences = preferencesService.getGeneralPreferences();
-        this.initialTelemetryPreferences = preferencesService.getTelemetryPreferences();
+        this.initialTelemetryPreferences = preferencesService.telemetryPreferencesSupplier().get();
         this.initialOwnerPreferences = preferencesService.getOwnerPreferences();
         this.initialTimestampPreferences = preferencesService.getTimestampPreferences();
     }
@@ -112,7 +112,7 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
                 memoryStickModeProperty.getValue(),
                 showAdvancedHintsProperty.getValue()));
 
-        preferencesService.storeTelemetryPreferences(
+        preferencesService.telemetryPreferencesRetainer().accept(
                 initialTelemetryPreferences.withCollectTelemetry(collectTelemetryProperty.getValue()));
 
         preferencesService.storeOwnerPreferences(new OwnerPreferences(

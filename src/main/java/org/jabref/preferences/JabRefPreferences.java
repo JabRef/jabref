@@ -1334,17 +1334,19 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     @Override
-    public TelemetryPreferences getTelemetryPreferences() {
-        return new TelemetryPreferences(
+    public Supplier<TelemetryPreferences> telemetryPreferencesSupplier() {
+        return () -> new TelemetryPreferences(
                 getBoolean(COLLECT_TELEMETRY),
                 !getBoolean(ALREADY_ASKED_TO_COLLECT_TELEMETRY) // mind the !
         );
     }
 
     @Override
-    public void storeTelemetryPreferences(TelemetryPreferences preferences) {
-        putBoolean(COLLECT_TELEMETRY, preferences.shouldCollectTelemetry());
-        putBoolean(ALREADY_ASKED_TO_COLLECT_TELEMETRY, !preferences.shouldAskToCollectTelemetry()); // mind the !
+    public Consumer<TelemetryPreferences> telemetryPreferencesRetainer() {
+        return (preferences) -> {
+            putBoolean(COLLECT_TELEMETRY, preferences.shouldCollectTelemetry());
+            putBoolean(ALREADY_ASKED_TO_COLLECT_TELEMETRY, !preferences.shouldAskToCollectTelemetry()); // mind the !
+        };
     }
 
     @Override

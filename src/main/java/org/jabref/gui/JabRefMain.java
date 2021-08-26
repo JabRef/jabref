@@ -62,7 +62,7 @@ public class JabRefMain extends Application {
 
             configureProxy(preferences.getProxyPreferences());
 
-            Globals.startBackgroundTasks();
+            Globals.startBackgroundTasks(preferences.telemetryPreferencesSupplier());
 
             applyPreferences(preferences);
 
