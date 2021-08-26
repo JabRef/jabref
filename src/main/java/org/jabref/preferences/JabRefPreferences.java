@@ -190,7 +190,6 @@ public class JabRefPreferences implements PreferencesService {
     public static final String AUTO_ASSIGN_GROUP = "autoAssignGroup";
     public static final String DISPLAY_GROUP_COUNT = "displayGroupCount";
     public static final String EXTRA_FILE_COLUMNS = "extraFileColumns";
-    public static final String OVERRIDE_DEFAULT_FONT_SIZE = "overrideDefaultFontSize";
     public static final String MAIN_FONT_SIZE = "mainFontSize";
 
     public static final String RECENT_DATABASES = "recentDatabases";
@@ -414,7 +413,7 @@ public class JabRefPreferences implements PreferencesService {
     private Theme globalTheme;
     private Set<CustomImporter> customImporters;
     private String userName;
-
+    private AppearancePreferences appearancePreferences;
     // The constructor is made private to enforce this as a singleton class:
     private JabRefPreferences() {
         try {
@@ -1991,15 +1990,21 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public AppearancePreferences getAppearancePreferences() {
-        return new AppearancePreferences(
+        if (appearancePreferences != null) {
+            return appearancePreferences;
+        }
+        String OVERRIDE_DEFAULT_FONT_SIZE = "overrideDefaultFontSize";
+        appearancePreferences = new AppearancePreferences(
                 getBoolean(OVERRIDE_DEFAULT_FONT_SIZE),
                 getInt(MAIN_FONT_SIZE),
                 getTheme());
+        EasyBind.subscribe(appearancePreferences.shouldOverrideDefaultFontSizeProperty(), newValue -> putBoolean(OVERRIDE_DEFAULT_FONT_SIZE, newValue));
+
+        return appearancePreferences;
     }
 
     @Override
     public void storeAppearancePreference(AppearancePreferences preferences) {
-        putBoolean(OVERRIDE_DEFAULT_FONT_SIZE, preferences.shouldOverrideDefaultFontSize());
         putInt(MAIN_FONT_SIZE, preferences.getMainFontSize());
         put(FX_THEME, preferences.getTheme().getCssPathString());
     }
