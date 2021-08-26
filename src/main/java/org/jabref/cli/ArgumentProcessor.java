@@ -151,7 +151,7 @@ public class ArgumentProcessor {
                 // * means "guess the format":
                 System.out.println(Localization.lang("Importing in unknown format") + ": " + file);
 
-                ImportFormatReader.UnknownFormatImport importResult = Globals.IMPORT_FORMAT_READER.importUnknownFormat(file, Globals.prefs.getTimestampPreferences(), new DummyFileUpdateMonitor());
+                ImportFormatReader.UnknownFormatImport importResult = Globals.IMPORT_FORMAT_READER.importUnknownFormat(file, new DummyFileUpdateMonitor());
 
                 System.out.println(Localization.lang("Format used") + ": " + importResult.format);
                 return Optional.of(importResult.parserResult);
@@ -413,9 +413,18 @@ public class ArgumentProcessor {
                 // BIB files to open. Other files, and files that could not be opened
                 // as bib, we try to import instead.
                 boolean bibExtension = aLeftOver.toLowerCase(Locale.ENGLISH).endsWith("bib");
+
                 ParserResult pr = new ParserResult();
                 if (bibExtension) {
-                    pr = OpenDatabase.loadDatabase(aLeftOver, Globals.prefs.getImportFormatPreferences(), Globals.prefs.getTimestampPreferences(), Globals.getFileUpdateMonitor());
+                    try {
+                        pr = OpenDatabase.loadDatabase(
+                                Path.of(aLeftOver),
+                                Globals.prefs.getImportFormatPreferences(),
+                                Globals.getFileUpdateMonitor());
+                    } catch (IOException ex) {
+                        pr = ParserResult.fromError(ex);
+                        LOGGER.error(Localization.lang("Error opening file") + " '" + aLeftOver + "'", ex);
+                    }
                 }
 
                 if (!bibExtension || (pr.isEmpty())) {

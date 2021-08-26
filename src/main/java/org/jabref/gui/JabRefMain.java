@@ -78,7 +78,7 @@ public class JabRefMain extends Application {
                 }
 
                 // If not, start GUI
-                new JabRefGUI(mainStage, argumentProcessor.getParserResults(), argumentProcessor.isBlank());
+                new JabRefGUI(mainStage, argumentProcessor.getParserResults(), argumentProcessor.isBlank(), preferences);
             } catch (ParseException e) {
                 LOGGER.error("Problem parsing arguments", e);
 
