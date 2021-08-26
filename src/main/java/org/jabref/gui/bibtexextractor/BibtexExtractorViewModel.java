@@ -3,6 +3,7 @@ package org.jabref.gui.bibtexextractor;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 
 import javax.swing.undo.UndoManager;
 
@@ -17,7 +18,9 @@ import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.importer.FetcherException;
+import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.fetcher.GrobidCitationFetcher;
+import org.jabref.logic.importer.importsettings.ImportSettingsPreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -33,7 +36,8 @@ public class BibtexExtractorViewModel {
 
     private final StringProperty inputTextProperty = new SimpleStringProperty("");
     private final DialogService dialogService;
-    private final PreferencesService preferencesService;
+    private final Supplier<ImportSettingsPreferences> importSettingsPreferencesSupplier;
+    private final ImportFormatPreferences importFormatPreferences;
     private final TaskExecutor taskExecutor;
     private final ImportHandler importHandler;
 
@@ -46,7 +50,8 @@ public class BibtexExtractorViewModel {
                                     StateManager stateManager) {
 
         this.dialogService = dialogService;
-        this.preferencesService = preferencesService;
+        this.importSettingsPreferencesSupplier = preferencesService.importSettingsPreferencesSupplier();
+        this.importFormatPreferences = preferencesService.getImportFormatPreferences();
         this.taskExecutor = taskExecutor;
         this.importHandler = new ImportHandler(
                 bibdatabaseContext,
@@ -62,7 +67,7 @@ public class BibtexExtractorViewModel {
     }
 
     public void startParsing() {
-        if (preferencesService.getImportSettingsPreferences().isGrobidEnabled()) {
+        if (importSettingsPreferencesSupplier.get().isGrobidEnabled()) {
             parseUsingGrobid();
         } else {
             parseUsingBibtexExtractor();
@@ -76,7 +81,7 @@ public class BibtexExtractorViewModel {
     }
 
     private void parseUsingGrobid() {
-        GrobidCitationFetcher grobidCitationFetcher = new GrobidCitationFetcher(preferencesService.getImportSettingsPreferences(), preferencesService.getImportFormatPreferences());
+        GrobidCitationFetcher grobidCitationFetcher = new GrobidCitationFetcher(importSettingsPreferencesSupplier, importFormatPreferences);
         BackgroundTask.wrap(() -> grobidCitationFetcher.performSearch(inputTextProperty.getValue()))
                       .onRunning(() -> dialogService.notify(Localization.lang("Your text is being parsed...")))
                       .onFailure((e) -> {

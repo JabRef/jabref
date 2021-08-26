@@ -7,6 +7,7 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.Importer;
@@ -26,8 +27,8 @@ public class PdfGrobidImporter extends Importer {
     private final GrobidService grobidService;
     private final ImportFormatPreferences importFormatPreferences;
 
-    public PdfGrobidImporter(ImportSettingsPreferences importSettingsPreferences, ImportFormatPreferences importFormatPreferences) {
-        this.grobidService = new GrobidService(importSettingsPreferences);
+    public PdfGrobidImporter(Supplier<ImportSettingsPreferences> importSettingsPreferencesSupplier, ImportFormatPreferences importFormatPreferences) {
+        this.grobidService = new GrobidService(importSettingsPreferencesSupplier);
         this.importFormatPreferences = importFormatPreferences;
     }
 

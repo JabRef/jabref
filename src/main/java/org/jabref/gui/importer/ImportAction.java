@@ -118,17 +118,29 @@ public class ImportAction {
                 if (importer.isEmpty()) {
                     // Unknown format:
                     DefaultTaskExecutor.runAndWaitInJavaFXThread(() -> {
-                        if (fileIsPdf(filename) && GrobidOptInDialogHelper.showAndWaitIfUserIsUndecided(frame.getDialogService())) {
-                            Globals.IMPORT_FORMAT_READER.resetImportFormats(prefs.getImportSettingsPreferences(), prefs.getImportFormatPreferences(), prefs.getXmpPreferences(), Globals.getFileUpdateMonitor());
+                        if (fileIsPdf(filename) && GrobidOptInDialogHelper.showAndWaitIfUserIsUndecided(
+                                frame.getDialogService(), prefs.importSettingsPreferencesSupplier(), prefs.importSettingsPreferencesRetainer())) {
+                            Globals.IMPORT_FORMAT_READER.resetImportFormats(
+                                    prefs.importSettingsPreferencesSupplier(),
+                                    prefs.getImportFormatPreferences(),
+                                    prefs.getXmpPreferences(),
+                                    Globals.getFileUpdateMonitor());
                         }
                         frame.getDialogService().notify(Localization.lang("Importing in unknown format") + "...");
                     });
                     // This import method never throws an IOException:
-                    imports.add(Globals.IMPORT_FORMAT_READER.importUnknownFormat(filename, prefs.getTimestampPreferences(), Globals.getFileUpdateMonitor()));
+                    imports.add(Globals.IMPORT_FORMAT_READER.importUnknownFormat(filename,prefs.getTimestampPreferences(),Globals.getFileUpdateMonitor()));
                 } else {
                     DefaultTaskExecutor.runAndWaitInJavaFXThread(() -> {
-                        if (importer.get() instanceof PdfGrobidImporter || importer.get() instanceof PdfMergeMetadataImporter && GrobidOptInDialogHelper.showAndWaitIfUserIsUndecided(frame.getDialogService())) {
-                                Globals.IMPORT_FORMAT_READER.resetImportFormats(prefs.getImportSettingsPreferences(), prefs.getImportFormatPreferences(), prefs.getXmpPreferences(), Globals.getFileUpdateMonitor());
+                        if (importer.get() instanceof PdfGrobidImporter
+                                || importer.get() instanceof PdfMergeMetadataImporter
+                                && GrobidOptInDialogHelper.showAndWaitIfUserIsUndecided(
+                                frame.getDialogService(), prefs.importSettingsPreferencesSupplier(), prefs.importSettingsPreferencesRetainer())) {
+                            Globals.IMPORT_FORMAT_READER.resetImportFormats(
+                                    prefs.importSettingsPreferencesSupplier(),
+                                    prefs.getImportFormatPreferences(),
+                                    prefs.getXmpPreferences(),
+                                    Globals.getFileUpdateMonitor());
                         }
                         frame.getDialogService().notify(Localization.lang("Importing in %0 format", importer.get().getName()) + "...");
                     });

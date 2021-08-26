@@ -5,6 +5,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParseException;
@@ -41,11 +42,11 @@ public class GrobidService {
         }
     }
 
-    private final ImportSettingsPreferences importSettingsPreferences;
+    private final Supplier<ImportSettingsPreferences> importSettingsPreferencesSupplier;
 
-    public GrobidService(ImportSettingsPreferences importSettingsPreferences) {
-        this.importSettingsPreferences = importSettingsPreferences;
-        if (!importSettingsPreferences.isGrobidEnabled()) {
+    public GrobidService(Supplier<ImportSettingsPreferences> importSettingsPreferencesSupplier) {
+        this.importSettingsPreferencesSupplier = importSettingsPreferencesSupplier;
+        if (!importSettingsPreferencesSupplier.get().isGrobidEnabled()) {
             throw new UnsupportedOperationException("Grobid was used but not enabled.");
         }
     }
@@ -57,7 +58,7 @@ public class GrobidService {
      * @throws IOException if an I/O excecption during the call ocurred or no BibTeX entry could be determiend
      */
     public Optional<BibEntry> processCitation(String rawCitation, ImportFormatPreferences importFormatPreferences, ConsolidateCitations consolidateCitations) throws IOException, ParseException {
-        Connection.Response response = Jsoup.connect(importSettingsPreferences.getGrobidURL() + "/api/processCitation")
+        Connection.Response response = Jsoup.connect(importSettingsPreferencesSupplier.get().getGrobidURL() + "/api/processCitation")
                 .header("Accept", MediaTypes.APPLICATION_BIBTEX)
                 .data("citations", rawCitation)
                 .data("consolidateCitations", String.valueOf(consolidateCitations.getCode()))
@@ -75,7 +76,7 @@ public class GrobidService {
     }
 
     public List<BibEntry> processPDF(Path filePath, ImportFormatPreferences importFormatPreferences) throws IOException, ParseException {
-        Connection.Response response = Jsoup.connect(importSettingsPreferences.getGrobidURL() + "/api/processHeaderDocument")
+        Connection.Response response = Jsoup.connect(importSettingsPreferencesSupplier.get().getGrobidURL() + "/api/processHeaderDocument")
                 .header("Accept", MediaTypes.APPLICATION_BIBTEX)
                 .data("input", filePath.toString(), Files.newInputStream(filePath))
                 .method(Connection.Method.POST)

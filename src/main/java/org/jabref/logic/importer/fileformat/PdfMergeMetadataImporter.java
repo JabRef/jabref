@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Supplier;
 
 import org.jabref.gui.DefaultInjector;
 import org.jabref.logic.importer.EntryBasedFetcher;
@@ -42,13 +43,13 @@ public class PdfMergeMetadataImporter extends Importer {
     private final List<Importer> metadataImporters;
     private final ImportFormatPreferences importFormatPreferences;
 
-    public PdfMergeMetadataImporter(ImportSettingsPreferences importSettingsPreferences, ImportFormatPreferences importFormatPreferences) {
+    public PdfMergeMetadataImporter(Supplier<ImportSettingsPreferences> importSettingsPreferencesSupplier, ImportFormatPreferences importFormatPreferences) {
         this.importFormatPreferences = importFormatPreferences;
         this.metadataImporters = new ArrayList<>();
         this.metadataImporters.add(new PdfVerbatimBibTextImporter(importFormatPreferences));
         this.metadataImporters.add(new PdfEmbeddedBibFileImporter(importFormatPreferences));
-        if (importSettingsPreferences.isGrobidEnabled()) {
-            this.metadataImporters.add(new PdfGrobidImporter(importSettingsPreferences, importFormatPreferences));
+        if (importSettingsPreferencesSupplier.get().isGrobidEnabled()) {
+            this.metadataImporters.add(new PdfGrobidImporter(importSettingsPreferencesSupplier, importFormatPreferences));
         }
         this.metadataImporters.add(new PdfXmpImporter(importFormatPreferences.getXmpPreferences()));
         this.metadataImporters.add(new PdfContentImporter(importFormatPreferences));
@@ -151,8 +152,8 @@ public class PdfMergeMetadataImporter extends Importer {
         private final BibDatabaseContext databaseContext;
         private final Charset defaultEncoding;
 
-        public EntryBasedFetcherWrapper(ImportSettingsPreferences importSettingsPreferences, ImportFormatPreferences importFormatPreferences, FilePreferences filePreferences, BibDatabaseContext context, Charset defaultEncoding) {
-            super(importSettingsPreferences, importFormatPreferences);
+        public EntryBasedFetcherWrapper(Supplier<ImportSettingsPreferences> importSettingsPreferencesSupplier, ImportFormatPreferences importFormatPreferences, FilePreferences filePreferences, BibDatabaseContext context, Charset defaultEncoding) {
+            super(importSettingsPreferencesSupplier, importFormatPreferences);
             this.filePreferences = filePreferences;
             this.databaseContext = context;
             this.defaultEncoding = defaultEncoding;

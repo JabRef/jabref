@@ -8,6 +8,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.function.Supplier;
 
 import org.jabref.logic.importer.fileformat.BibTeXMLImporter;
 import org.jabref.logic.importer.fileformat.BiblioscapeImporter;
@@ -52,7 +53,7 @@ public class ImportFormatReader {
 
     private ImportFormatPreferences importFormatPreferences;
 
-    public void resetImportFormats(ImportSettingsPreferences importSettingsPreferences, ImportFormatPreferences newImportFormatPreferences, XmpPreferences xmpPreferences, FileUpdateMonitor fileMonitor) {
+    public void resetImportFormats(Supplier<ImportSettingsPreferences> importSettingsPreferencesSupplier, ImportFormatPreferences newImportFormatPreferences, XmpPreferences xmpPreferences, FileUpdateMonitor fileMonitor) {
         this.importFormatPreferences = newImportFormatPreferences;
 
         formats.clear();
@@ -68,12 +69,12 @@ public class ImportFormatReader {
         formats.add(new ModsImporter(importFormatPreferences));
         formats.add(new MsBibImporter());
         formats.add(new OvidImporter());
-        formats.add(new PdfMergeMetadataImporter(importSettingsPreferences, importFormatPreferences));
+        formats.add(new PdfMergeMetadataImporter(importSettingsPreferencesSupplier, importFormatPreferences));
         formats.add(new PdfVerbatimBibTextImporter(importFormatPreferences));
         formats.add(new PdfContentImporter(importFormatPreferences));
         formats.add(new PdfEmbeddedBibFileImporter(importFormatPreferences));
-        if (importSettingsPreferences.isGrobidEnabled()) {
-            formats.add(new PdfGrobidImporter(importSettingsPreferences, importFormatPreferences));
+        if (importSettingsPreferencesSupplier.get().isGrobidEnabled()) {
+            formats.add(new PdfGrobidImporter(importSettingsPreferencesSupplier, importFormatPreferences));
         }
         formats.add(new PdfXmpImporter(xmpPreferences));
         formats.add(new RepecNepImporter(importFormatPreferences));

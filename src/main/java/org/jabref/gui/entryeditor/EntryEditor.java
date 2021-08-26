@@ -359,7 +359,7 @@ public class EntryEditor extends BorderPane {
         // Add menu for fetching bibliographic information
         ContextMenu fetcherMenu = new ContextMenu();
         SortedSet<EntryBasedFetcher> entryBasedFetchers = WebFetchers.getEntryBasedFetchers(
-                preferencesService.getImportSettingsPreferences(),
+                preferencesService.importSettingsPreferencesSupplier(),
                 preferencesService.getImportFormatPreferences(),
                 preferencesService.getFilePreferences(),
                 databaseContext,
@@ -369,10 +369,12 @@ public class EntryEditor extends BorderPane {
             if (fetcher instanceof PdfMergeMetadataImporter.EntryBasedFetcherWrapper) {
                 // Handle Grobid Opt-In in case of the PdfMergeMetadataImporter
                 fetcherMenuItem.setOnAction(event -> {
-                    GrobidOptInDialogHelper.showAndWaitIfUserIsUndecided(dialogService);
+                    GrobidOptInDialogHelper.showAndWaitIfUserIsUndecided(dialogService,
+                            preferencesService.importSettingsPreferencesSupplier(),
+                            preferencesService.importSettingsPreferencesRetainer());
                     PdfMergeMetadataImporter.EntryBasedFetcherWrapper pdfMergeMetadataImporter =
                             new PdfMergeMetadataImporter.EntryBasedFetcherWrapper(
-                                    preferencesService.getImportSettingsPreferences(),
+                                    preferencesService.importSettingsPreferencesSupplier(),
                                     preferencesService.getImportFormatPreferences(),
                                     preferencesService.getFilePreferences(),
                                     databaseContext,

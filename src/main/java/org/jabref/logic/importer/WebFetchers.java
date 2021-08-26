@@ -7,6 +7,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.function.Supplier;
 
 import org.jabref.logic.importer.fetcher.ACMPortalFetcher;
 import org.jabref.logic.importer.fetcher.ACS;
@@ -138,7 +139,7 @@ public class WebFetchers {
     /**
      * @return sorted set containing entry based fetchers
      */
-    public static SortedSet<EntryBasedFetcher> getEntryBasedFetchers(ImportSettingsPreferences importSettingsPreferences, ImportFormatPreferences importFormatPreferences, FilePreferences filePreferences, BibDatabaseContext databaseContext, Charset defaultEncoding) {
+    public static SortedSet<EntryBasedFetcher> getEntryBasedFetchers(Supplier<ImportSettingsPreferences> importSettingsPreferencesSupplier, ImportFormatPreferences importFormatPreferences, FilePreferences filePreferences, BibDatabaseContext databaseContext, Charset defaultEncoding) {
         SortedSet<EntryBasedFetcher> set = new TreeSet<>(Comparator.comparing(WebFetcher::getName));
         set.add(new AstrophysicsDataSystem(importFormatPreferences));
         set.add(new DoiFetcher(importFormatPreferences));
@@ -146,7 +147,7 @@ public class WebFetchers {
         set.add(new MathSciNet(importFormatPreferences));
         set.add(new CrossRef());
         set.add(new ZbMATH(importFormatPreferences));
-        set.add(new PdfMergeMetadataImporter.EntryBasedFetcherWrapper(importSettingsPreferences, importFormatPreferences, filePreferences, databaseContext, defaultEncoding));
+        set.add(new PdfMergeMetadataImporter.EntryBasedFetcherWrapper(importSettingsPreferencesSupplier, importFormatPreferences, filePreferences, databaseContext, defaultEncoding));
         return set;
     }
 

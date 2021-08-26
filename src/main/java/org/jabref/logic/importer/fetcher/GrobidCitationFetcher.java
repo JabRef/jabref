@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import org.jabref.logic.importer.FetcherException;
@@ -27,8 +28,8 @@ public class GrobidCitationFetcher implements SearchBasedFetcher {
     private ImportFormatPreferences importFormatPreferences;
     private GrobidService grobidService;
 
-    public GrobidCitationFetcher(ImportSettingsPreferences importSettingsPreferences, ImportFormatPreferences importFormatPreferences) {
-        this(importFormatPreferences, new GrobidService(importSettingsPreferences));
+    public GrobidCitationFetcher(Supplier<ImportSettingsPreferences> importSettingsPreferencesSupplier, ImportFormatPreferences importFormatPreferences) {
+        this(importFormatPreferences, new GrobidService(importSettingsPreferencesSupplier));
     }
 
     GrobidCitationFetcher(ImportFormatPreferences importFormatPreferences, GrobidService grobidService) {
