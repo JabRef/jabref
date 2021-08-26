@@ -259,8 +259,6 @@ public interface PreferencesService {
 
     AppearancePreferences getAppearancePreferences();
 
-    void storeAppearancePreference(AppearancePreferences preferences);
-
     //*************************************************************************************************************
     // File preferences
     //*************************************************************************************************************
