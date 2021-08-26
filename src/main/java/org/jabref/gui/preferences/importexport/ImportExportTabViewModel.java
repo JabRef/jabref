@@ -3,7 +3,6 @@ package org.jabref.gui.preferences.importexport;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import javafx.beans.property.BooleanProperty;
