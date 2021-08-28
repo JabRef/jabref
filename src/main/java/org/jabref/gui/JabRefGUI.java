@@ -288,7 +288,7 @@ public class JabRefGUI {
                         preferencesService.getImportFormatPreferences(),
                         Globals.getFileUpdateMonitor());
             } catch (IOException ex) {
-                LOGGER.error(Localization.lang("Error opening file") + " '" + dbFile + "'", ex);
+                LOGGER.error("Error opening file '{}'", dbFile, ex);
                 parsedDatabase = ParserResult.fromError(ex);
             }
             bibDatabases.add(parsedDatabase);

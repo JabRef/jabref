@@ -427,7 +427,7 @@ public class ArgumentProcessor {
                                 Globals.getFileUpdateMonitor());
                     } catch (IOException ex) {
                         pr = ParserResult.fromError(ex);
-                        LOGGER.error(Localization.lang("Error opening file") + " '" + aLeftOver + "'", ex);
+                        LOGGER.error("Error opening file '{}'", aLeftOver, ex);
                     }
                 }
 

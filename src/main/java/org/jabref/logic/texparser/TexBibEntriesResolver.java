@@ -11,7 +11,6 @@ import java.util.stream.Stream;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.OpenDatabase;
 import org.jabref.logic.importer.ParserResult;
-import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.texparser.Citation;
@@ -21,7 +20,6 @@ import org.jabref.model.util.FileUpdateMonitor;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 
 public class TexBibEntriesResolver {
 
@@ -49,7 +47,7 @@ public class TexBibEntriesResolver {
                     try {
                         return OpenDatabase.loadDatabase(path, importFormatPreferences, fileMonitor).getDatabase();
                     } catch (IOException e) {
-                        LOGGER.error(Localization.lang("Error opening file") + "{}", path, e);
+                        LOGGER.error("Error opening file '{}'", path, e);
                         return ParserResult.fromError(e).getDatabase();
                     }
                 }));

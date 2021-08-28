@@ -91,10 +91,10 @@ public class OpenDatabaseAction extends SimpleCommand {
      */
     private Path getInitialDirectory() {
         if (frame.getBasePanelCount() == 0) {
-            return Globals.prefs.getWorkingDir();
+            return preferencesService.getWorkingDir();
         } else {
             Optional<Path> databasePath = frame.getCurrentLibraryTab().getBibDatabaseContext().getDatabasePath();
-            return databasePath.map(Path::getParent).orElse(Globals.prefs.getWorkingDir());
+            return databasePath.map(Path::getParent).orElse(preferencesService.getWorkingDir());
         }
     }
 
@@ -191,7 +191,7 @@ public class OpenDatabaseAction extends SimpleCommand {
                     Globals.getFileUpdateMonitor());
         } catch (IOException e) {
             result = ParserResult.fromError(e);
-            LOGGER.error(Localization.lang("Error opening file") + " '" + fileToLoad + "'", e);
+            LOGGER.error("Error opening file '{}'", fileToLoad, e);
         }
 
         if (result.getDatabase().isShared()) {
