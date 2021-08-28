@@ -590,7 +590,7 @@ public class ArgumentProcessor {
                     preferencesService.clear(key.trim());
                     System.out.println(Localization.lang("Resetting preference key '%0'", key.trim()));
                 } catch (IllegalArgumentException e) {
-                    System.out.println(Localization.lang(e.getMessage()));
+                    System.out.println(e.getMessage());
                 }
             }
         }

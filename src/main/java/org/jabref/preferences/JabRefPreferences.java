@@ -945,7 +945,7 @@ public class JabRefPreferences implements PreferencesService {
         if (hasKey(keyTrimmed)) {
             remove(keyTrimmed);
         } else {
-            throw new IllegalArgumentException(String.format("Unknown preference key '%s'", keyTrimmed));
+            throw new IllegalArgumentException("Unknown preference key");
         }
     }
 
