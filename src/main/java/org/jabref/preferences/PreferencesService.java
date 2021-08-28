@@ -112,6 +112,8 @@ public interface PreferencesService {
 
     void clear() throws BackingStoreException;
 
+    void clear(String key) throws IllegalArgumentException;
+
     void flush();
 
     List<BibEntryType> getBibEntryTypes(BibDatabaseMode mode);

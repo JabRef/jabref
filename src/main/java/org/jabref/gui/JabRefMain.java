@@ -70,7 +70,7 @@ public class JabRefMain extends Application {
 
             try {
                 // Process arguments
-                ArgumentProcessor argumentProcessor = new ArgumentProcessor(arguments, ArgumentProcessor.Mode.INITIAL_START);
+                ArgumentProcessor argumentProcessor = new ArgumentProcessor(arguments, ArgumentProcessor.Mode.INITIAL_START, preferences);
                 // Check for running JabRef
                 if (!handleMultipleAppInstances(arguments) || argumentProcessor.shouldShutDown()) {
                     Platform.exit();
