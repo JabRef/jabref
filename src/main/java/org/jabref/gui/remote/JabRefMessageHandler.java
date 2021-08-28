@@ -8,6 +8,7 @@ import org.jabref.cli.ArgumentProcessor;
 import org.jabref.gui.JabRefGUI;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.remote.server.MessageHandler;
+import org.jabref.preferences.PreferencesService;
 
 import org.apache.commons.cli.ParseException;
 import org.slf4j.Logger;
@@ -17,9 +18,9 @@ public class JabRefMessageHandler implements MessageHandler {
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefMessageHandler.class);
 
     @Override
-    public void handleCommandLineArguments(String[] message) {
+    public void handleCommandLineArguments(String[] message, PreferencesService preferencesService) {
         try {
-            ArgumentProcessor argumentProcessor = new ArgumentProcessor(message, ArgumentProcessor.Mode.REMOTE_START);
+            ArgumentProcessor argumentProcessor = new ArgumentProcessor(message, ArgumentProcessor.Mode.REMOTE_START, preferencesService);
 
             List<ParserResult> loaded = argumentProcessor.getParserResults();
             for (int i = 0; i < loaded.size(); i++) {
