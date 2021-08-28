@@ -107,7 +107,7 @@ public class CffImporter extends Importer {
                 if (property.getValue().equals("dataset")) {
                     entryType = StandardEntryType.Dataset;
                 }
-            } else {
+            } else if (getUnmappedFields().contains(property.getKey())) {
                 entryMap.put(new UnknownField(property.getKey()), property.getValue());
             }
         }
@@ -197,5 +197,16 @@ public class CffImporter extends Importer {
         hm.put("date-released", StandardField.DATE);
         hm.put("keywords", StandardField.KEYWORDS);
         return hm;
+    }
+
+    private List<String> getUnmappedFields() {
+        List<String> fields = new ArrayList<String>();
+
+        fields.add("commit");
+        fields.add("license-url");
+        fields.add("repository-code");
+        fields.add("repository-artifact");
+
+        return fields;
     }
 }

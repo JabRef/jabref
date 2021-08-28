@@ -6,7 +6,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.BibEntry;
@@ -73,17 +72,9 @@ public class CffImporterTest {
         List<BibEntry> bibEntries = importer.importDatabase(file, StandardCharsets.UTF_8).getDatabase().getEntries();
         BibEntry entry = bibEntries.get(0);
 
-        assertEquals(entry.getField(StandardField.AUTHOR), Optional.of("Joe van Smith"));
-        assertEquals(entry.getField(StandardField.TITLE), Optional.of("Test"));
-        assertEquals(entry.getField(StandardField.URL), Optional.of("www.google.com"));
-        assertEquals(entry.getField(StandardField.REPOSITORY), Optional.of("www.github.com"));
-        assertEquals(entry.getField(StandardField.DOI), Optional.of("10.0000/TEST"));
-        assertEquals(entry.getField(StandardField.DATE), Optional.of("2000-07-02"));
-        assertEquals(entry.getField(StandardField.COMMENT), Optional.of("Test entry."));
-        assertEquals(entry.getField(StandardField.ABSTRACT), Optional.of("Test abstract."));
-        assertEquals(entry.getField(StandardField.LICENSE), Optional.of("MIT"));
-        assertEquals(entry.getField(StandardField.VERSION), Optional.of("1.0"));
+        BibEntry expected = getPopulatedEntry().withField(StandardField.AUTHOR, "Joe van Smith");
 
+        assertEquals(entry, expected);
     }
 
     @Test
@@ -92,16 +83,9 @@ public class CffImporterTest {
         List<BibEntry> bibEntries = importer.importDatabase(file, StandardCharsets.UTF_8).getDatabase().getEntries();
         BibEntry entry = bibEntries.get(0);
 
-        assertEquals(entry.getField(StandardField.AUTHOR), Optional.of("Joe van Smith and Bob Jones, Jr."));
-        assertEquals(entry.getField(StandardField.TITLE), Optional.of("Test"));
-        assertEquals(entry.getField(StandardField.URL), Optional.of("www.google.com"));
-        assertEquals(entry.getField(StandardField.REPOSITORY), Optional.of("www.github.com"));
-        assertEquals(entry.getField(StandardField.DOI), Optional.of("10.0000/TEST"));
-        assertEquals(entry.getField(StandardField.DATE), Optional.of("2000-07-02"));
-        assertEquals(entry.getField(StandardField.COMMENT), Optional.of("Test entry."));
-        assertEquals(entry.getField(StandardField.ABSTRACT), Optional.of("Test abstract."));
-        assertEquals(entry.getField(StandardField.LICENSE), Optional.of("MIT"));
-        assertEquals(entry.getField(StandardField.VERSION), Optional.of("1.0"));
+        BibEntry expected = getPopulatedEntry();
+
+        assertEquals(entry, expected);
 
     }
 
@@ -111,18 +95,9 @@ public class CffImporterTest {
         List<BibEntry> bibEntries = importer.importDatabase(file, StandardCharsets.UTF_8).getDatabase().getEntries();
         BibEntry entry = bibEntries.get(0);
 
-        assertEquals(entry.getField(StandardField.AUTHOR), Optional.of("Joe van Smith and Bob Jones, Jr."));
-        assertEquals(entry.getField(StandardField.TITLE), Optional.of("Test"));
-        assertEquals(entry.getField(StandardField.URL), Optional.of("www.google.com"));
-        assertEquals(entry.getField(StandardField.REPOSITORY), Optional.of("www.github.com"));
-        assertEquals(entry.getField(StandardField.DOI), Optional.of("10.0000/TEST"));
-        assertEquals(entry.getField(StandardField.DATE), Optional.of("2000-07-02"));
-        assertEquals(entry.getField(StandardField.COMMENT), Optional.of("Test entry."));
-        assertEquals(entry.getField(StandardField.ABSTRACT), Optional.of("Test abstract."));
-        assertEquals(entry.getField(StandardField.LICENSE), Optional.of("MIT"));
-        assertEquals(entry.getField(StandardField.VERSION), Optional.of("1.0"));
-        assertEquals(entry.getField(StandardField.SWHID), Optional.of("swh:1:rel:22ece559cc7cc2364edc5e5593d63ae8bd229f9f"));
+        BibEntry expected = getPopulatedEntry().withField(StandardField.SWHID, "swh:1:rel:22ece559cc7cc2364edc5e5593d63ae8bd229f9f");
 
+        assertEquals(entry, expected);
     }
 
     @Test
@@ -131,18 +106,9 @@ public class CffImporterTest {
         List<BibEntry> bibEntries = importer.importDatabase(file, StandardCharsets.UTF_8).getDatabase().getEntries();
         BibEntry entry = bibEntries.get(0);
 
-        assertEquals(entry.getField(StandardField.AUTHOR), Optional.of("Joe van Smith and Bob Jones, Jr."));
-        assertEquals(entry.getField(StandardField.TITLE), Optional.of("Test"));
-        assertEquals(entry.getField(StandardField.URL), Optional.of("www.google.com"));
-        assertEquals(entry.getField(StandardField.REPOSITORY), Optional.of("www.github.com"));
-        assertEquals(entry.getField(StandardField.DOI), Optional.of("10.0000/TEST"));
-        assertEquals(entry.getField(StandardField.DATE), Optional.of("2000-07-02"));
-        assertEquals(entry.getField(StandardField.COMMENT), Optional.of("Test entry."));
-        assertEquals(entry.getField(StandardField.ABSTRACT), Optional.of("Test abstract."));
-        assertEquals(entry.getField(StandardField.LICENSE), Optional.of("MIT"));
-        assertEquals(entry.getField(StandardField.VERSION), Optional.of("1.0"));
-        assertEquals(entry.getField(StandardField.SWHID), Optional.of("swh:1:cnt:94a9ed024d3859793618152ea559a168bbcbb5e2"));
+        BibEntry expected = getPopulatedEntry().withField(StandardField.SWHID, "swh:1:cnt:94a9ed024d3859793618152ea559a168bbcbb5e2");
 
+        assertEquals(entry, expected);
     }
 
     @Test
@@ -151,19 +117,10 @@ public class CffImporterTest {
         List<BibEntry> bibEntries = importer.importDatabase(file, StandardCharsets.UTF_8).getDatabase().getEntries();
         BibEntry entry = bibEntries.get(0);
 
-        assertEquals(entry.getField(StandardField.AUTHOR), Optional.of("Joe van Smith and Bob Jones, Jr."));
-        assertEquals(entry.getField(StandardField.TITLE), Optional.of("Test"));
-        assertEquals(entry.getField(StandardField.URL), Optional.of("www.google.com"));
-        assertEquals(entry.getField(StandardField.REPOSITORY), Optional.of("www.github.com"));
-        assertEquals(entry.getField(StandardField.DOI), Optional.of("10.0000/TEST"));
-        assertEquals(entry.getField(StandardField.DATE), Optional.of("2000-07-02"));
-        assertEquals(entry.getField(StandardField.COMMENT), Optional.of("Test entry."));
-        assertEquals(entry.getField(StandardField.ABSTRACT), Optional.of("Test abstract."));
-        assertEquals(entry.getField(StandardField.LICENSE), Optional.of("MIT"));
-        assertEquals(entry.getField(StandardField.VERSION), Optional.of("1.0"));
+        BibEntry expected = getPopulatedEntry();
+        expected.setType(StandardEntryType.Dataset);
 
-        assertEquals(entry.getType(), StandardEntryType.Dataset);
-
+        assertEquals(entry, expected);
     }
 
     @Test
@@ -172,17 +129,9 @@ public class CffImporterTest {
         List<BibEntry> bibEntries = importer.importDatabase(file, StandardCharsets.UTF_8).getDatabase().getEntries();
         BibEntry entry = bibEntries.get(0);
 
-        assertEquals(entry.getField(StandardField.AUTHOR), Optional.of("Joe van Smith and Bob Jones, Jr."));
-        assertEquals(entry.getField(StandardField.TITLE), Optional.of("Test"));
-        assertEquals(entry.getField(StandardField.URL), Optional.of("www.google.com"));
-        assertEquals(entry.getField(StandardField.REPOSITORY), Optional.of("www.github.com"));
-        assertEquals(entry.getField(StandardField.DOI), Optional.of("10.0000/TEST"));
-        assertEquals(entry.getField(StandardField.DATE), Optional.of("2000-07-02"));
-        assertEquals(entry.getField(StandardField.COMMENT), Optional.of("Test entry."));
-        assertEquals(entry.getField(StandardField.ABSTRACT), Optional.of("Test abstract."));
-        assertEquals(entry.getField(StandardField.LICENSE), Optional.of("MIT"));
-        assertEquals(entry.getField(StandardField.VERSION), Optional.of("1.0"));
+        BibEntry expected = getPopulatedEntry();
 
+        assertEquals(entry, expected);
     }
 
     @Test
@@ -191,16 +140,26 @@ public class CffImporterTest {
         List<BibEntry> bibEntries = importer.importDatabase(file, StandardCharsets.UTF_8).getDatabase().getEntries();
         BibEntry entry = bibEntries.get(0);
 
-        assertEquals(entry.getField(StandardField.AUTHOR), Optional.of("Joe van Smith"));
-        assertEquals(entry.getField(StandardField.TITLE), Optional.of("Test"));
-        assertEquals(entry.getField(StandardField.URL), Optional.of("www.google.com"));
-        assertEquals(entry.getField(StandardField.REPOSITORY), Optional.of("www.github.com"));
-        assertEquals(entry.getField(StandardField.DOI), Optional.of("10.0000/TEST"));
-        assertEquals(entry.getField(StandardField.DATE), Optional.of("2000-07-02"));
-        assertEquals(entry.getField(StandardField.COMMENT), Optional.of("Test entry."));
-        assertEquals(entry.getField(StandardField.ABSTRACT), Optional.of("Test abstract."));
-        assertEquals(entry.getField(StandardField.LICENSE), Optional.of("MIT"));
-        assertEquals(entry.getField(StandardField.VERSION), Optional.of("1.0"));
-        assertEquals(entry.getField(new UnknownField("commit")), Optional.of("10ad"));
+        BibEntry expected = getPopulatedEntry().withField(new UnknownField("commit"), "10ad");
+
+        assertEquals(entry, expected);
+    }
+
+    public BibEntry getPopulatedEntry() {
+        BibEntry entry = new BibEntry();
+        entry.setType(StandardEntryType.Software);
+
+        entry.setField(StandardField.AUTHOR, "Joe van Smith and Bob Jones, Jr.");
+        entry.setField(StandardField.TITLE, "Test");
+        entry.setField(StandardField.URL, "www.google.com");
+        entry.setField(StandardField.REPOSITORY, "www.github.com");
+        entry.setField(StandardField.DOI, "10.0000/TEST");
+        entry.setField(StandardField.DATE, "2000-07-02");
+        entry.setField(StandardField.COMMENT, "Test entry.");
+        entry.setField(StandardField.ABSTRACT, "Test abstract.");
+        entry.setField(StandardField.LICENSE, "MIT");
+        entry.setField(StandardField.VERSION, "1.0");
+
+        return entry;
     }
 }

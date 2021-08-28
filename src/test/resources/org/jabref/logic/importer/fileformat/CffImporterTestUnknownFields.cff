@@ -1,15 +1,19 @@
 # YAML 1.2
 ---
 abstract: "Test abstract."
-authors: 
+authors:
   -
     family-names: Smith
     given-names: Joe
     name-particle: van
+  -
+    family-names: Jones
+    given-names: Bob
+    name-suffix: Jr.
 cff-version: "1.1.0"
 date-released: 2000-07-02
 doi: "10.0000/TEST"
-identifiers: 
+identifiers:
 license: MIT
 message: "Test entry."
 title: Test
