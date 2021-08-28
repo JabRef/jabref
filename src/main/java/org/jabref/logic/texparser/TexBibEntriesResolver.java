@@ -19,8 +19,9 @@ import org.jabref.model.texparser.LatexBibEntriesResolverResult;
 import org.jabref.model.texparser.LatexParserResult;
 import org.jabref.model.util.FileUpdateMonitor;
 
-import org.mariadb.jdbc.internal.logging.Logger;
-import org.mariadb.jdbc.internal.logging.LoggerFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 public class TexBibEntriesResolver {
 
@@ -48,7 +49,7 @@ public class TexBibEntriesResolver {
                     try {
                         return OpenDatabase.loadDatabase(path, importFormatPreferences, fileMonitor).getDatabase();
                     } catch (IOException e) {
-                        LOGGER.error(Localization.lang("Error opening file") + " '" + path + "'", e);
+                        LOGGER.error(Localization.lang("Error opening file") + "{}", path, e);
                         return ParserResult.fromError(e).getDatabase();
                     }
                 }));
