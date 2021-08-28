@@ -50,6 +50,7 @@ public class CffImporter extends Importer {
         return "Importer for the CFF format. Is only used to cite software, one entry per file.";
     }
 
+    // POJO classes for yaml data
     private static class CffFormat {
         private HashMap<String, String> vals = new HashMap<String, String>();
 
