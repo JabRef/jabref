@@ -8,11 +8,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
-import javafx.collections.ObservableList;
-
 import org.jabref.gui.LibraryTab;
 import org.jabref.logic.util.StandardFileType;
-import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
@@ -59,13 +56,8 @@ public class PdfIndexer {
     /**
      * Adds all PDF files linked to an entry in the database to new Lucene search index. Any previous state of the
      * Lucene search index will be deleted!
-     *
-     * @param database a bibtex database to link the pdf files to
      */
-    public void createIndex(BibDatabase database, BibDatabaseContext context) {
-        this.databaseContext = context;
-        final ObservableList<BibEntry> entries = database.getEntries();
-
+    public void createIndex() {
         // Create new index by creating IndexWriter but not writing anything.
         try {
             IndexWriter indexWriter = new IndexWriter(directoryToIndex, new IndexWriterConfig(new EnglishStemAnalyzer()).setOpenMode(IndexWriterConfig.OpenMode.CREATE));
@@ -73,8 +65,6 @@ public class PdfIndexer {
         } catch (IOException e) {
             LOGGER.warn("Could not create new Index!", e);
         }
-        // Re-use existing facilities for writing the actual entries
-        entries.stream().filter(entry -> !entry.getFiles().isEmpty()).forEach(this::writeToIndex);
     }
 
     public void addToIndex(BibDatabaseContext databaseContext) {
@@ -220,12 +210,12 @@ public class PdfIndexer {
                 // if there is no index yet, don't need to check anything!
             }
             // If no document was found, add the new one
-            Optional<Document> document = new DocumentReader(entry, filePreferences).readLinkedPdf(this.databaseContext, linkedFile);
-            if (document.isPresent()) {
+            Optional<List<Document>> pages = new DocumentReader(entry, filePreferences).readLinkedPdf(this.databaseContext, linkedFile);
+            if (pages.isPresent()) {
                 IndexWriter indexWriter = new IndexWriter(directoryToIndex,
                         new IndexWriterConfig(
                                 new EnglishStemAnalyzer()).setOpenMode(IndexWriterConfig.OpenMode.CREATE_OR_APPEND));
-                indexWriter.addDocument(document.get());
+                indexWriter.addDocuments(pages.get());
                 indexWriter.commit();
                 indexWriter.close();
             }

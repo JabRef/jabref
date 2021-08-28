@@ -19,6 +19,9 @@ public class ImportExportTab extends AbstractPreferenceTabView<ImportExportTabVi
 
     @FXML private SaveOrderConfigPanel exportOrderPanel;
 
+    @FXML private CheckBox grobidEnabled;
+    @FXML private TextField grobidURL;
+
     public ImportExportTab() {
         ViewLoader.view(this)
                   .root(this)
@@ -45,5 +48,9 @@ public class ImportExportTab extends AbstractPreferenceTabView<ImportExportTabVi
         exportOrderPanel.sortableFieldsProperty().bind(viewModel.sortableFieldsProperty());
         exportOrderPanel.sortCriteriaProperty().bindBidirectional(viewModel.sortCriteriaProperty());
         exportOrderPanel.setCriteriaLimit(3);
+
+        grobidEnabled.selectedProperty().bindBidirectional(viewModel.grobidEnabledProperty());
+        grobidURL.textProperty().bindBidirectional(viewModel.grobidURLProperty());
+        grobidURL.disableProperty().bind(grobidEnabled.selectedProperty().not());
     }
 }

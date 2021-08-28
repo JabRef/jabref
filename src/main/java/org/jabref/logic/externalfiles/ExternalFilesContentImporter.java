@@ -7,20 +7,27 @@ import java.nio.file.Path;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.OpenDatabase;
 import org.jabref.logic.importer.ParserResult;
-import org.jabref.logic.importer.fileformat.PdfContentImporter;
+import org.jabref.logic.importer.fileformat.PdfMergeMetadataImporter;
 import org.jabref.logic.importer.fileformat.PdfXmpImporter;
+import org.jabref.logic.importer.importsettings.ImportSettingsPreferences;
 import org.jabref.model.util.FileUpdateMonitor;
 
 public class ExternalFilesContentImporter {
 
+    private final ImportSettingsPreferences importSettingsPreferences;
     private final ImportFormatPreferences importFormatPreferences;
 
-    public ExternalFilesContentImporter(ImportFormatPreferences importFormatPreferences) {
+    public ExternalFilesContentImporter(ImportSettingsPreferences importSettingsPreferences, ImportFormatPreferences importFormatPreferences) {
+        this.importSettingsPreferences = importSettingsPreferences;
         this.importFormatPreferences = importFormatPreferences;
     }
 
     public ParserResult importPDFContent(Path file) {
-        return new PdfContentImporter(importFormatPreferences).importDatabase(file, StandardCharsets.UTF_8);
+        try {
+            return new PdfMergeMetadataImporter(importSettingsPreferences, importFormatPreferences).importDatabase(file, StandardCharsets.UTF_8);
+        } catch (IOException e) {
+           return ParserResult.fromError(e);
+        }
     }
 
     public ParserResult importXMPContent(Path file) {

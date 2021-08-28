@@ -24,12 +24,12 @@ class OOProcessCitationKeyMarkers {
 
         cgs.createPlainBibliographySortedByComparator(OOProcess.AUTHOR_YEAR_TITLE_COMPARATOR);
 
-        for (CitationGroup cg : cgs.getCitationGroupsInGlobalOrder()) {
+        for (CitationGroup group : cgs.getCitationGroupsInGlobalOrder()) {
             String citMarker =
                 style.getCitationGroupMarkupBefore()
-                + String.join(",", OOListUtil.map(cg.getCitationsInLocalOrder(), Citation::getCitationKey))
+                + String.join(",", OOListUtil.map(group.getCitationsInLocalOrder(), Citation::getCitationKey))
                 + style.getCitationGroupMarkupAfter();
-            cg.setCitationMarker(Optional.of(OOText.fromString(citMarker)));
+            group.setCitationMarker(Optional.of(OOText.fromString(citMarker)));
         }
     }
 }
