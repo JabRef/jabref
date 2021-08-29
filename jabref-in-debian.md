@@ -37,7 +37,7 @@ In the following, libraries needing packaging are tracked.
   - Resulting package: https://packages.debian.org/sid/citation-style-language-locales
 - [ ] CSL styles - citeproc-java
   - [ ] close https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=841020
-  - [ ] Switch to pure-java implementation https://github.com/JabRef/jabref/pull/5997
+  - [x] Switch to pure-java implementation https://github.com/JabRef/jabref/pull/5997
   - [ ] depends on [jbibtex](https://github.com/jbibtex/jbibtex) - https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=888087
 - [x] packaging of [LGoodDatePicker](https://github.com/LGoodDatePicker/LGoodDatePicker): https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=847591
 - [x] <s>packaging of https://github.com/JabRef/org.jabref.gui.customjfx.support - or</s> including an OpenJDK fix (https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=872619)
