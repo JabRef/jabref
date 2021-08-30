@@ -1339,8 +1339,10 @@ class BibtexParserTest {
 
         Optional<SaveOrderConfig> saveOrderConfig = result.getMetaData().getSaveOrderConfig();
 
-        assertEquals(new SaveOrderConfig(false, true, new SaveOrderConfig.SortCriterion(StandardField.AUTHOR, false),
-                        new SaveOrderConfig.SortCriterion(StandardField.YEAR, true), new SaveOrderConfig.SortCriterion(StandardField.ABSTRACT, false)),
+        assertEquals(new SaveOrderConfig(SaveOrderConfig.OrderType.SPECIFIED, List.of(
+                new SaveOrderConfig.SortCriterion(StandardField.AUTHOR, false),
+                new SaveOrderConfig.SortCriterion(StandardField.YEAR, true),
+                new SaveOrderConfig.SortCriterion(StandardField.ABSTRACT, false))),
                 saveOrderConfig.get());
     }
 

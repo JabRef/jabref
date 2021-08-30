@@ -35,7 +35,8 @@ class ZbMATHTest {
         donaldsonEntry.setCitationKey("zbMATH03800580");
         donaldsonEntry.setField(StandardField.AUTHOR, "S. K. {Donaldson}");
         donaldsonEntry.setField(StandardField.JOURNAL, "Journal of Differential Geometry");
-        donaldsonEntry.setField(StandardField.ISSN, "0022-040X; 1945-743X/e");
+        donaldsonEntry.setField(StandardField.DOI, "10.4310/jdg/1214437665");
+        donaldsonEntry.setField(StandardField.ISSN, "0022-040X");
         donaldsonEntry.setField(StandardField.LANGUAGE, "English");
         donaldsonEntry.setField(StandardField.KEYWORDS, "57N13 57R10 53C05 58J99 57R65");
         donaldsonEntry.setField(StandardField.PAGES, "279--315");

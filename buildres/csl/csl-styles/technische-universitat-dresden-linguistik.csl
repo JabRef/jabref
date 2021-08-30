@@ -16,7 +16,7 @@
     <category field="linguistics"/>
     <category field="literature"/>
     <summary>Zitierstil entsprechend den Vorgaben der linguistischen Professuren am Institut für Germanistik der Technischen Universität Dresden. Der Stil orientiert sich an den Richtlinien von 'Deutsche Sprache: Zeitschrift für Theorie Praxis Dokumentation', hg. vom IDS Mannheim</summary>
-    <updated>2020-04-24T11:56:46+00:00</updated>
+    <updated>2021-07-19T08:34:39+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="de">
@@ -27,6 +27,11 @@
     </terms>
   </locale>
   <macro name="creator-year-long">
+    <choose>
+      <if match="none" variable="author editor">
+        <text value="o. A." suffix=" "/>
+      </if>
+    </choose>
     <group delimiter=" ">
       <names variable="author">
         <name delimiter="/" name-as-sort-order="all"/>
@@ -82,19 +87,19 @@
     </group>
   </macro>
   <macro name="page-range">
-    <group delimiter=" ">
+    <group delimiter=" " suffix=".">
       <text term="page" form="short"/>
       <text variable="page"/>
     </group>
   </macro>
   <macro name="online-url">
-    <group delimiter=": ">
-      <text term="online" text-case="capitalize-first"/>
+    <group delimiter=" ">
       <text variable="URL"/>
+      <date form="numeric" variable="accessed" prefix="(letzter Zugriff " suffix=")"/>
     </group>
   </macro>
   <macro name="container-title-volume">
-    <group delimiter=" ">
+    <group delimiter=" " suffix=",">
       <text variable="container-title"/>
       <text variable="volume"/>
       <text variable="issue" prefix="(" suffix=")"/>
@@ -126,36 +131,39 @@
     </sort>
     <layout>
       <group delimiter=". " suffix=".">
-        <group delimiter=": ">
-          <text macro="creator-year-long"/>
-          <text variable="title"/>
+        <group delimiter=" ">
+          <text macro="creator-year-long" suffix=":"/>
+          <text variable="title" strip-periods="false" font-variant="normal"/>
         </group>
         <choose>
           <if type="book" match="any">
             <group delimiter=". ">
+              <text macro="collection-title-number"/>
               <text macro="edition"/>
               <text macro="publication-place-publisher"/>
-              <text macro="collection-title-number"/>
             </group>
           </if>
           <else-if type="article-journal article-magazine article-newspaper" match="any">
-            <group delimiter=", ">
+            <group delimiter=" ">
               <group delimiter=": ">
                 <text term="in" text-case="capitalize-first"/>
                 <text macro="container-title-volume"/>
               </group>
               <text macro="page-range"/>
+              <text variable="DOI" strip-periods="false" prefix="doi:"/>
             </group>
           </else-if>
           <else-if type="chapter" match="any">
             <group delimiter=". ">
               <text macro="editor-container-title"/>
+              <text macro="collection-title-number"/>
               <text macro="edition"/>
               <text macro="publication-place-publisher"/>
               <text macro="page-range"/>
-              <text macro="collection-title-number"/>
+              <text variable="DOI" prefix="doi:"/>
             </group>
           </else-if>
+          <else-if type="dataset" match="any"/>
           <else>
             <group delimiter=". ">
               <choose>

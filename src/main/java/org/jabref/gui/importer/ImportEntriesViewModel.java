@@ -152,8 +152,7 @@ public class ImportEntriesViewModel extends AbstractViewModel {
                             databaseContext,
                             taskExecutor,
                             dialogService,
-                            preferences.getXmpPreferences(),
-                            filePreferences,
+                            preferences,
                             ExternalFileTypes.getInstance());
                     linkedFileViewModel.download();
                 }

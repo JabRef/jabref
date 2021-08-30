@@ -425,11 +425,17 @@ public class MergeEntries extends BorderPane {
 
     public enum DiffMode {
 
-        PLAIN,
-        WORD,
-        CHARACTER,
-        WORD_SYMMETRIC,
-        CHARACTER_SYMMETRIC;
+        PLAIN(Localization.lang("None")),
+        WORD(Localization.lang("Word by word")),
+        CHARACTER(Localization.lang("Character by character")),
+        WORD_SYMMETRIC(Localization.lang("Symmetric word by word")),
+        CHARACTER_SYMMETRIC(Localization.lang("Symmetric character by character"));
+
+        private final String text;
+
+        DiffMode(String text) {
+            this.text = text;
+        }
 
         public static Optional<DiffMode> parse(String name) {
             try {
@@ -437,6 +443,10 @@ public class MergeEntries extends BorderPane {
             } catch (IllegalArgumentException e) {
                 return Optional.empty();
             }
+        }
+
+        public String getDisplayText() {
+            return text;
         }
     }
 
