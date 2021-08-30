@@ -5,7 +5,6 @@ import java.nio.file.Path;
 import java.util.Set;
 
 import org.jabref.logic.importer.importsettings.ImportSettingsPreferences;
-import org.jabref.logic.preferences.TimestampPreferences;
 import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
@@ -22,7 +21,6 @@ class ImportFormatReaderTestParameterless {
 
     private ImportFormatReader reader;
     private final FileUpdateMonitor fileMonitor = new DummyFileUpdateMonitor();
-    private final TimestampPreferences timestampPreferences = mock(TimestampPreferences.class);
 
     @BeforeEach
     void setUp() {
@@ -36,12 +34,12 @@ class ImportFormatReaderTestParameterless {
     @Test
     void importUnknownFormatThrowsExceptionIfNoMatchingImporterWasFound() throws Exception {
         Path file = Path.of(ImportFormatReaderTestParameterless.class.getResource("fileformat/emptyFile.xml").toURI());
-        assertThrows(ImportException.class, () -> reader.importUnknownFormat(file, timestampPreferences, fileMonitor));
+        assertThrows(ImportException.class, () -> reader.importUnknownFormat(file, fileMonitor));
     }
 
     @Test
     void importUnknownFormatThrowsExceptionIfPathIsNull() throws Exception {
-        assertThrows(NullPointerException.class, () -> reader.importUnknownFormat(null, timestampPreferences, fileMonitor));
+        assertThrows(NullPointerException.class, () -> reader.importUnknownFormat(null, fileMonitor));
     }
 
     @Test

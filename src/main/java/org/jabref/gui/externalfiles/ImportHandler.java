@@ -59,8 +59,7 @@ public class ImportHandler {
         this.linker = new ExternalFilesEntryLinker(externalFileTypes, preferencesService.getFilePreferences(), database);
         this.contentImporter = new ExternalFilesContentImporter(
                 preferencesService.getImportSettingsPreferences(),
-                preferencesService.getImportFormatPreferences(),
-                preferencesService.getTimestampPreferences());
+                preferencesService.getImportFormatPreferences());
         this.undoManager = undoManager;
     }
 

@@ -70,15 +70,15 @@ public class JabRefMain extends Application {
 
             try {
                 // Process arguments
-                ArgumentProcessor argumentProcessor = new ArgumentProcessor(arguments, ArgumentProcessor.Mode.INITIAL_START);
+                ArgumentProcessor argumentProcessor = new ArgumentProcessor(arguments, ArgumentProcessor.Mode.INITIAL_START, preferences);
                 // Check for running JabRef
-                if (!handleMultipleAppInstances(arguments) || argumentProcessor.shouldShutDown()) {
+                if (!handleMultipleAppInstances(arguments, preferences) || argumentProcessor.shouldShutDown()) {
                     Platform.exit();
                     return;
                 }
 
                 // If not, start GUI
-                new JabRefGUI(mainStage, argumentProcessor.getParserResults(), argumentProcessor.isBlank());
+                new JabRefGUI(mainStage, argumentProcessor.getParserResults(), argumentProcessor.isBlank(), preferences);
             } catch (ParseException e) {
                 LOGGER.error("Problem parsing arguments", e);
 
@@ -97,8 +97,8 @@ public class JabRefMain extends Application {
         Globals.shutdownThreadPools();
     }
 
-    private static boolean handleMultipleAppInstances(String[] args) {
-        RemotePreferences remotePreferences = Globals.prefs.getRemotePreferences();
+    private static boolean handleMultipleAppInstances(String[] args, PreferencesService preferences) {
+        RemotePreferences remotePreferences = preferences.getRemotePreferences();
         if (remotePreferences.useRemoteServer()) {
             // Try to contact already running JabRef
             RemoteClient remoteClient = new RemoteClient(remotePreferences.getPort());
@@ -113,7 +113,7 @@ public class JabRefMain extends Application {
                 }
             } else {
                 // We are alone, so we start the server
-                Globals.REMOTE_LISTENER.openAndStart(new JabRefMessageHandler(), remotePreferences.getPort());
+                Globals.REMOTE_LISTENER.openAndStart(new JabRefMessageHandler(), remotePreferences.getPort(), preferences);
             }
         }
         return true;

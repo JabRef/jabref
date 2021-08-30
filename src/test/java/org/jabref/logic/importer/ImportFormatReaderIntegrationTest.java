@@ -9,9 +9,7 @@ import java.util.Set;
 import java.util.stream.Stream;
 
 import org.jabref.logic.importer.importsettings.ImportSettingsPreferences;
-import org.jabref.logic.preferences.TimestampPreferences;
 import org.jabref.logic.xmp.XmpPreferences;
-import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -26,7 +24,6 @@ import static org.mockito.Mockito.when;
 class ImportFormatReaderIntegrationTest {
 
     private ImportFormatReader reader;
-    private TimestampPreferences timestampPreferences = mock(TimestampPreferences.class);
 
     @BeforeEach
     void setUp() {
@@ -34,7 +31,6 @@ class ImportFormatReaderIntegrationTest {
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(importFormatPreferences.getEncoding()).thenReturn(StandardCharsets.UTF_8);
         when(importFormatPreferences.getCustomImportList()).thenReturn(Set.of());
-        when(timestampPreferences.getTimestampField()).then(invocation -> StandardField.TIMESTAMP);
         reader.resetImportFormats(mock(ImportSettingsPreferences.class), importFormatPreferences, mock(XmpPreferences.class), new DummyFileUpdateMonitor());
     }
 
@@ -42,7 +38,7 @@ class ImportFormatReaderIntegrationTest {
     @MethodSource("importFormats")
     void testImportUnknownFormat(String resource, String format, int count) throws Exception {
         Path file = Path.of(ImportFormatReaderIntegrationTest.class.getResource(resource).toURI());
-        ImportFormatReader.UnknownFormatImport unknownFormat = reader.importUnknownFormat(file, timestampPreferences, new DummyFileUpdateMonitor());
+        ImportFormatReader.UnknownFormatImport unknownFormat = reader.importUnknownFormat(file, new DummyFileUpdateMonitor());
         assertEquals(count, unknownFormat.parserResult.getDatabase().getEntryCount());
     }
 
@@ -57,7 +53,7 @@ class ImportFormatReaderIntegrationTest {
     @MethodSource("importFormats")
     void testImportUnknownFormatFromString(String resource, String format, int count) throws Exception {
         Path file = Path.of(ImportFormatReaderIntegrationTest.class.getResource(resource).toURI());
-        String data = new String(Files.readAllBytes(file), StandardCharsets.UTF_8);
+        String data = Files.readString(file);
         assertEquals(count, reader.importUnknownFormat(data).parserResult.getDatabase().getEntries().size());
     }
 

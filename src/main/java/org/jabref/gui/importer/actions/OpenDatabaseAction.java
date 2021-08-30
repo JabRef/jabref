@@ -1,5 +1,6 @@
 package org.jabref.gui.importer.actions;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.sql.SQLException;
@@ -90,10 +91,10 @@ public class OpenDatabaseAction extends SimpleCommand {
      */
     private Path getInitialDirectory() {
         if (frame.getBasePanelCount() == 0) {
-            return Globals.prefs.getWorkingDir();
+            return preferencesService.getWorkingDir();
         } else {
             Optional<Path> databasePath = frame.getCurrentLibraryTab().getBibDatabaseContext().getDatabasePath();
-            return databasePath.map(Path::getParent).orElse(Globals.prefs.getWorkingDir());
+            return databasePath.map(Path::getParent).orElse(preferencesService.getWorkingDir());
         }
     }
 
@@ -177,14 +178,21 @@ public class OpenDatabaseAction extends SimpleCommand {
 
         dialogService.notify(Localization.lang("Opening") + ": '" + file + "'");
 
-        Globals.prefs.setWorkingDirectory(fileToLoad.getParent());
+        preferencesService.setWorkingDirectory(fileToLoad.getParent());
 
         if (BackupManager.backupFileDiffers(fileToLoad)) {
             BackupUIManager.showRestoreBackupDialog(dialogService, fileToLoad);
         }
 
-        ParserResult result = OpenDatabase.loadDatabase(fileToLoad.toString(),
-                Globals.prefs.getImportFormatPreferences(), Globals.prefs.getTimestampPreferences(), Globals.getFileUpdateMonitor());
+        ParserResult result;
+        try {
+            result = OpenDatabase.loadDatabase(fileToLoad,
+                    preferencesService.getImportFormatPreferences(),
+                    Globals.getFileUpdateMonitor());
+        } catch (IOException e) {
+            result = ParserResult.fromError(e);
+            LOGGER.error("Error opening file '{}'", fileToLoad, e);
+        }
 
         if (result.getDatabase().isShared()) {
             try {

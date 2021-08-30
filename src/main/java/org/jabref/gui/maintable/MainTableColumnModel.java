@@ -67,7 +67,7 @@ public class MainTableColumnModel {
                     return type;
                 }
             }
-            LOGGER.warn(Localization.lang("Column type %0 is unknown.", text));
+            LOGGER.warn("Column type '{}' is unknown.", text);
             return NORMALFIELD;
         }
     }

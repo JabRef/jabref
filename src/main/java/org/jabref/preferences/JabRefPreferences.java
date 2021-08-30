@@ -419,7 +419,7 @@ public class JabRefPreferences implements PreferencesService {
     private JabRefPreferences() {
         try {
             if (new File("jabref.xml").exists()) {
-                importPreferences("jabref.xml");
+                importPreferences(Path.of("jabref.xml"));
             }
         } catch (JabRefException e) {
             LOGGER.warn("Could not import preferences from jabref.xml: " + e.getMessage(), e);
@@ -881,7 +881,7 @@ public class JabRefPreferences implements PreferencesService {
         prefs.putDouble(key, value);
     }
 
-    public void remove(String key) {
+    private void remove(String key) {
         prefs.remove(key);
     }
 
@@ -934,8 +934,19 @@ public class JabRefPreferences implements PreferencesService {
         new SharedDatabasePreferences().clear();
     }
 
-    public void clear(String key) {
-        prefs.remove(key);
+    /**
+     * Removes the given key from the preferences.
+     *
+     * @throws IllegalArgumentException if the key does not exist
+     */
+    @Override
+    public void deleteKey(String key) throws IllegalArgumentException {
+        String keyTrimmed = key.trim();
+        if (hasKey(keyTrimmed)) {
+            remove(keyTrimmed);
+        } else {
+            throw new IllegalArgumentException("Unknown preference key");
+        }
     }
 
     /**
@@ -1035,13 +1046,9 @@ public class JabRefPreferences implements PreferencesService {
     /**
      * Imports Preferences from an XML file.
      *
-     * @param filename String File to import from
+     * @param file Path of file to import from
      * @throws JabRefException thrown if importing the preferences failed due to an InvalidPreferencesFormatException or an IOException
      */
-    public void importPreferences(String filename) throws JabRefException {
-        importPreferences(Path.of(filename));
-    }
-
     @Override
     public void importPreferences(Path file) throws JabRefException {
         try (InputStream is = Files.newInputStream(file)) {
