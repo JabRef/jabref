@@ -7,9 +7,11 @@ import java.util.stream.Collectors;
 
 import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ReadOnlyListProperty;
 import javafx.beans.property.ReadOnlyListWrapper;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -17,6 +19,7 @@ import javafx.collections.ObservableMap;
 import javafx.concurrent.Task;
 import javafx.scene.Node;
 
+import org.jabref.gui.maintable.BibEntryTableViewModel;
 import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.gui.util.DialogWindowState;
 import org.jabref.gui.util.OptionalObjectProperty;
@@ -56,6 +59,9 @@ public class StateManager {
     private final EasyBinding<Boolean> anyTaskRunning = EasyBind.reduce(backgroundTasks, tasks -> tasks.anyMatch(Task::isRunning));
     private final EasyBinding<Double> tasksProgress = EasyBind.reduce(backgroundTasks, tasks -> tasks.filter(Task::isRunning).mapToDouble(Task::getProgress).average().orElse(1));
     private final ObservableMap<String, DialogWindowState> dialogWindowStates = FXCollections.observableHashMap();
+    private final BooleanProperty globalSearch =  new SimpleBooleanProperty();
+    private final ObservableMap<BibDatabaseContext, ObservableList<BibEntryTableViewModel>>  globalSearchResults = FXCollections.observableHashMap();
+
 
     public StateManager() {
         activeGroups.bind(Bindings.valueAt(selectedGroups, activeDatabase.orElse(null)));
@@ -81,8 +87,20 @@ public class StateManager {
         searchResultMap.put(database, resultSize);
     }
 
+    public void setGlobalSearchResults(BibDatabaseContext database, ObservableList<BibEntryTableViewModel> entries) {
+        globalSearchResults.put(database, entries);
+    }
+
     public IntegerProperty getSearchResultSize() {
         return searchResultMap.getOrDefault(activeDatabase.getValue().orElse(new BibDatabaseContext()), new SimpleIntegerProperty(0));
+    }
+
+    public ObservableMap<BibDatabaseContext, ObservableList<BibEntryTableViewModel>> getGlobalSearchResults(){
+       return globalSearchResults;
+    }
+
+    public ObservableList<BibEntryTableViewModel> getSearchResult(BibDatabaseContext ctx){
+        return globalSearchResults.get(ctx);
     }
 
     public ReadOnlyListProperty<GroupTreeNode> activeGroupProperty() {
@@ -126,6 +144,14 @@ public class StateManager {
 
     public void setSearchQuery(SearchQuery searchQuery) {
         activeSearchQuery.setValue(Optional.of(searchQuery));
+    }
+
+    public void setGlobalSearchActive(boolean active) {
+        globalSearch.setValue(active);
+    }
+
+    public boolean isGlobalSearchActive() {
+        return globalSearch.get();
     }
 
     public OptionalObjectProperty<Node> focusOwnerProperty() {

@@ -51,8 +51,12 @@ public class MainTableDataModel {
         IntegerProperty resultSize = new SimpleIntegerProperty();
         resultSize.bind(Bindings.size(entriesFiltered));
         stateManager.setActiveSearchResultSize(context, resultSize);
+        stateManager.setActiveSearchResultSize(context, resultSize);
         // We need to wrap the list since otherwise sorting in the table does not work
         entriesSorted = new SortedList<>(entriesFiltered);
+        //TODO: Refactor to a new data model
+        stateManager.setGlobalSearchResults(context, entriesFiltered);
+
         groupViewMode = preferencesService.getGroupViewMode();
 
     }

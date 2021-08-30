@@ -593,8 +593,18 @@ public class JabRefFrame extends BorderPane {
         // Subscribe to the search
         EasyBind.subscribe(stateManager.activeSearchQueryProperty(),
                 query -> {
+                    if(stateManager.isGlobalSearchActive()) {
+
+                        for(var library: getLibraryTabs()) {
+                            library.setCurrentSearchQuery(query);
+
+                        }
+                    }else {
+
+
                     if (getCurrentLibraryTab() != null) {
                         getCurrentLibraryTab().setCurrentSearchQuery(query);
+                    }
                     }
                 });
 

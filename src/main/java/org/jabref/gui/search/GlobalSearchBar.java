@@ -81,6 +81,7 @@ public class GlobalSearchBar extends HBox {
     private final ToggleButton caseSensitiveButton;
     private final ToggleButton regularExpressionButton;
     private final ToggleButton fulltextButton;
+    private final ToggleButton globalModeButton;
     // private final Button searchModeButton;
     private final Tooltip searchFieldTooltip = new Tooltip();
     private final Label currentResults = new Label("");
@@ -125,6 +126,7 @@ public class GlobalSearchBar extends HBox {
         regularExpressionButton = IconTheme.JabRefIcons.REG_EX.asToggleButton();
         caseSensitiveButton = IconTheme.JabRefIcons.CASE_SENSITIVE.asToggleButton();
         fulltextButton = IconTheme.JabRefIcons.FULLTEXT.asToggleButton();
+        globalModeButton = IconTheme.JabRefIcons.GLOBAL_SEARCH.asToggleButton();
         // searchModeButton = new Button();
         initSearchModifierButtons();
 
@@ -177,6 +179,15 @@ public class GlobalSearchBar extends HBox {
             searchQuery.ifPresent(query -> {
                 updateResults(this.stateManager.getSearchResultSize().intValue(), SearchDescribers.getSearchDescriberFor(query).getDescription(),
                         query.isGrammarBasedSearch());
+
+
+
+                for( var db:  this.stateManager.getOpenDatabases() ) {
+
+                    var result = this.stateManager.getSearchResult(db);
+                  LOGGER.debug("DB: {} and search results {}", db.getDatabasePath(), result);
+                }
+
             });
         });
     }
@@ -208,6 +219,13 @@ public class GlobalSearchBar extends HBox {
             preferencesService.storeSearchPreferences(searchPreferences);
             performSearch();
         });
+
+        globalModeButton.setOnAction(evt-> {
+            this.stateManager.setGlobalSearchActive(true);
+            performSearch();
+
+        });
+
 
         // ToDo: Reimplement searchMode (searchModeButton)
         /* searchModeButton.setText(searchPreferences.getSearchDisplayMode().getDisplayName());
