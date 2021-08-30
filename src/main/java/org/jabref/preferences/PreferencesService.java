@@ -112,7 +112,7 @@ public interface PreferencesService {
 
     void clear() throws BackingStoreException;
 
-    void clear(String key) throws IllegalArgumentException;
+    void deleteKey(String key) throws IllegalArgumentException;
 
     void flush();
 

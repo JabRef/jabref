@@ -587,7 +587,7 @@ public class ArgumentProcessor {
             String[] keys = value.split(",");
             for (String key : keys) {
                 try {
-                    preferencesService.clear(key.trim());
+                    preferencesService.deleteKey(key.trim());
                     System.out.println(Localization.lang("Resetting preference key '%0'", key.trim()));
                 } catch (IllegalArgumentException e) {
                     System.out.println(e.getMessage());

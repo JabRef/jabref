@@ -881,7 +881,7 @@ public class JabRefPreferences implements PreferencesService {
         prefs.putDouble(key, value);
     }
 
-    public void remove(String key) {
+    private void remove(String key) {
         prefs.remove(key);
     }
 
@@ -935,12 +935,12 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     /**
-     * Clear all preferences.
+     * Removes the given key from the preferences.
      *
      * @throws IllegalArgumentException if the key does not exist
      */
     @Override
-    public void clear(String key) throws IllegalArgumentException {
+    public void deleteKey(String key) throws IllegalArgumentException {
         String keyTrimmed = key.trim();
         if (hasKey(keyTrimmed)) {
             remove(keyTrimmed);
