@@ -116,7 +116,7 @@
 }
 
 .mainToolbar .search-field .toggle-button:selected .glyph-icon {
-	-fx-fill: -jr-icon-active;
-	-fx-text-fill: -jr-icon-active;
-	-fx-icon-color: -jr-icon-active;
+	-fx-fill: derive(-fx-light-text-color, 80%);;
+	-fx-text-fill: derive(-fx-light-text-color, 80%);
+	-fx-icon-color: derive(-fx-light-text-color, 80%);
 }
