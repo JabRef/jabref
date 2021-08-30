@@ -125,7 +125,7 @@ public class ProtectedTermsTabViewModel implements PreferenceTabViewModel {
 
         String fileName = file.getLocation();
         try {
-            JabRefDesktop.openExternalFileAnyFormat(new BibDatabaseContext(), fileName, termsFileType);
+            JabRefDesktop.openExternalFileAnyFormat(new BibDatabaseContext(), preferences, fileName, termsFileType);
         } catch (IOException e) {
             LOGGER.warn("Problem open protected terms file editor", e);
         }
