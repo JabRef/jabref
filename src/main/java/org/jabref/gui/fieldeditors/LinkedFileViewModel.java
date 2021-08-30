@@ -28,6 +28,7 @@ import javafx.scene.control.ButtonType;
 
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
+import org.jabref.gui.Globals;
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.externalfiles.FileDownloadTask;
 import org.jabref.gui.externalfiletype.ExternalFileType;
@@ -40,6 +41,7 @@ import org.jabref.gui.mergeentries.MultiMergeEntriesView;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.TaskExecutor;
+import org.jabref.logic.exporter.EmbeddedBibFilePdfExporter;
 import org.jabref.logic.externalfiles.LinkedFileHandler;
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
@@ -397,8 +399,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
         });
     }
 
-    public void writeXMPMetadata() {
-        // Localization.lang("Writing XMP metadata...")
+    public void writeMetadataToPdf() {
         BackgroundTask<Void> writeTask = BackgroundTask.wrap(() -> {
             Optional<Path> file = linkedFile.findIn(databaseContext, preferences.getFilePreferences());
             if (file.isEmpty()) {
@@ -407,6 +408,9 @@ public class LinkedFileViewModel extends AbstractViewModel {
             } else {
                 try {
                     XmpUtilWriter.writeXmp(file.get(), entry, databaseContext.getDatabase(), preferences.getXmpPreferences());
+
+                    EmbeddedBibFilePdfExporter embeddedBibExporter = new EmbeddedBibFilePdfExporter(preferences.getDefaultBibDatabaseMode(), Globals.entryTypesManager, preferences.getFieldWriterPreferences());
+                    embeddedBibExporter.exportToFileByPath(databaseContext, databaseContext.getDatabase(), preferences.getDefaultEncoding(), preferences.getFilePreferences(), file.get());
                 } catch (IOException | TransformerException ex) {
                     // TODO: Print error message
                     // Localization.lang("Error while writing") + " '" + file.toString() + "': " + ex;
@@ -414,8 +418,6 @@ public class LinkedFileViewModel extends AbstractViewModel {
             }
             return null;
         });
-
-        // Localization.lang("Finished writing XMP metadata.")
 
         // TODO: Show progress
         taskExecutor.execute(writeTask);

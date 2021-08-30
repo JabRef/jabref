@@ -1,6 +1,5 @@
 package org.jabref.gui.exporter;
 
-import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -8,8 +7,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
-import javax.xml.transform.TransformerException;
 
 import javafx.application.Platform;
 import javafx.geometry.Insets;
