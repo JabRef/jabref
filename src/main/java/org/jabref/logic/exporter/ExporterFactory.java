@@ -11,6 +11,8 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.xmp.XmpPreferences;
+import org.jabref.model.database.BibDatabaseMode;
+import org.jabref.model.entry.BibEntryTypesManager;
 
 public class ExporterFactory {
 
@@ -28,7 +30,11 @@ public class ExporterFactory {
     }
 
     public static ExporterFactory create(List<TemplateExporter> customFormats,
-                                         LayoutFormatterPreferences layoutPreferences, SavePreferences savePreferences, XmpPreferences xmpPreferences) {
+                                         LayoutFormatterPreferences layoutPreferences,
+                                         SavePreferences savePreferences,
+                                         XmpPreferences xmpPreferences,
+                                         BibDatabaseMode bibDatabaseMode,
+                                         BibEntryTypesManager entryTypesManager) {
 
         List<Exporter> exporters = new ArrayList<>();
 
@@ -59,6 +65,7 @@ public class ExporterFactory {
         exporters.add(new ModsExporter());
         exporters.add(new XmpExporter(xmpPreferences));
         exporters.add(new XmpPdfExporter(xmpPreferences));
+        exporters.add(new EmbeddedBibFilePdfExporter(bibDatabaseMode, entryTypesManager, savePreferences.getFieldWriterPreferences()));
 
         // Now add custom export formats
         exporters.addAll(customFormats);
