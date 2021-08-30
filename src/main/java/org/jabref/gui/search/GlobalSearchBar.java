@@ -178,14 +178,12 @@ public class GlobalSearchBar extends HBox {
         EasyBind.subscribe(this.stateManager.activeSearchQueryProperty(), searchQuery -> {
             searchQuery.ifPresent(query -> {
                 updateResults(this.stateManager.getSearchResultSize().intValue(), SearchDescribers.getSearchDescriberFor(query).getDescription(),
-                        query.isGrammarBasedSearch());
+                              query.isGrammarBasedSearch());
 
-
-
-                for( var db:  this.stateManager.getOpenDatabases() ) {
+                for (var db : this.stateManager.getOpenDatabases()) {
 
                     var result = this.stateManager.getSearchResult(db);
-                  LOGGER.debug("DB: {} and search results {}", db.getDatabasePath(), result);
+                    LOGGER.debug("DB: {} and search results {}", db.getDatabasePath(), result);
                 }
 
             });

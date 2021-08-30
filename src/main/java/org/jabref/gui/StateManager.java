@@ -19,7 +19,6 @@ import javafx.collections.ObservableMap;
 import javafx.concurrent.Task;
 import javafx.scene.Node;
 
-import org.jabref.gui.maintable.BibEntryTableViewModel;
 import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.gui.util.DialogWindowState;
 import org.jabref.gui.util.OptionalObjectProperty;
@@ -60,7 +59,7 @@ public class StateManager {
     private final EasyBinding<Double> tasksProgress = EasyBind.reduce(backgroundTasks, tasks -> tasks.filter(Task::isRunning).mapToDouble(Task::getProgress).average().orElse(1));
     private final ObservableMap<String, DialogWindowState> dialogWindowStates = FXCollections.observableHashMap();
     private final BooleanProperty globalSearch =  new SimpleBooleanProperty();
-    private final ObservableMap<BibDatabaseContext, ObservableList<BibEntryTableViewModel>>  globalSearchResults = FXCollections.observableHashMap();
+    private final ObservableMap<BibDatabaseContext, List<BibEntry>>  globalSearchResults = FXCollections.observableHashMap();
 
 
     public StateManager() {
@@ -87,19 +86,19 @@ public class StateManager {
         searchResultMap.put(database, resultSize);
     }
 
-    public void setGlobalSearchResults(BibDatabaseContext database, ObservableList<BibEntryTableViewModel> entries) {
-        globalSearchResults.put(database, entries);
+    public void setGlobalSearchResults(BibDatabaseContext database, List<BibEntry> list) {
+        globalSearchResults.put(database, list);
     }
 
     public IntegerProperty getSearchResultSize() {
         return searchResultMap.getOrDefault(activeDatabase.getValue().orElse(new BibDatabaseContext()), new SimpleIntegerProperty(0));
     }
 
-    public ObservableMap<BibDatabaseContext, ObservableList<BibEntryTableViewModel>> getGlobalSearchResults(){
+    public ObservableMap<BibDatabaseContext, List<BibEntry>> getGlobalSearchResults(){
        return globalSearchResults;
     }
 
-    public ObservableList<BibEntryTableViewModel> getSearchResult(BibDatabaseContext ctx){
+    public List<BibEntry> getSearchResult(BibDatabaseContext ctx){
         return globalSearchResults.get(ctx);
     }
 
