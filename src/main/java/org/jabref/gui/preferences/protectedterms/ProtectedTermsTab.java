@@ -4,11 +4,14 @@ import javax.inject.Inject;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.ContextMenu;
-import javafx.scene.control.MenuItem;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.CheckBoxTableCell;
 
+import org.jabref.gui.Globals;
+import org.jabref.gui.actions.ActionFactory;
+import org.jabref.gui.actions.SimpleCommand;
+import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.preferences.PreferencesTab;
@@ -76,37 +79,24 @@ public class ProtectedTermsTab extends AbstractPreferenceTabView<ProtectedTermsT
         new ValueTableCellFactory<ProtectedTermsListItemModel, Boolean>()
                 .withGraphic(none -> IconTheme.JabRefIcons.REMOVE.getGraphicNode())
                 .withTooltip(none -> Localization.lang("Remove protected terms file"))
-                .withOnMouseClickedEvent((item, none) -> event -> viewModel.removeFile(item))
+                .withOnMouseClickedEvent((item, none) -> event -> viewModel.removeList(item))
                 .install(filesTableDeleteColumn);
 
         filesTable.itemsProperty().set(viewModel.termsFilesProperty());
     }
 
     private ContextMenu createContextMenu(ProtectedTermsListItemModel file) {
-        MenuItem edit = new MenuItem(Localization.lang("Edit"));
-        edit.setOnAction(event -> viewModel.edit(file));
-        MenuItem show = new MenuItem(Localization.lang("View"));
-        show.setOnAction(event -> viewModel.displayContent(file));
-        MenuItem remove = new MenuItem(Localization.lang("Remove"));
-        remove.setOnAction(event -> viewModel.removeFile(file));
-        MenuItem reload = new MenuItem(Localization.lang("Reload"));
-        reload.setOnAction(event -> viewModel.reloadFile(file));
+        ActionFactory factory = new ActionFactory(Globals.getKeyPrefs());
+        ContextMenu contextMenu = new ContextMenu();
+        contextMenu.getItems().addAll(
+                factory.createMenuItem(StandardActions.EDIT_LIST, new ProtectedTermsTab.ContextAction(StandardActions.EDIT_LIST, file)),
+                factory.createMenuItem(StandardActions.VIEW_LIST, new ProtectedTermsTab.ContextAction(StandardActions.VIEW_LIST, file)),
+                factory.createMenuItem(StandardActions.REMOVE_LIST, new ProtectedTermsTab.ContextAction(StandardActions.REMOVE_LIST, file)),
+                factory.createMenuItem(StandardActions.RELOAD_LIST, new ProtectedTermsTab.ContextAction(StandardActions.RELOAD_LIST, file))
+        );
+        contextMenu.getItems().forEach(item -> item.setGraphic(null));
+        contextMenu.getStyleClass().add("context-menu");
 
-        // Enable/disable context menu items
-        if (file.getTermsList().isInternalList()) {
-            edit.setDisable(true);
-            show.setDisable(false);
-            remove.setDisable(true);
-            reload.setDisable(true);
-        } else {
-            edit.setDisable(false);
-            show.setDisable(false);
-            remove.setDisable(false);
-            reload.setDisable(false);
-        }
-
-        final ContextMenu contextMenu = new ContextMenu();
-        contextMenu.getItems().addAll(edit, show, remove, reload);
         return contextMenu;
     }
 
@@ -118,5 +108,32 @@ public class ProtectedTermsTab extends AbstractPreferenceTabView<ProtectedTermsT
     @FXML
     private void createNewFile() {
         viewModel.createNewFile();
+    }
+
+    private class ContextAction extends SimpleCommand {
+
+        private final StandardActions command;
+        private final ProtectedTermsListItemModel itemModel;
+
+        public ContextAction(StandardActions command, ProtectedTermsListItemModel itemModel) {
+            this.command = command;
+            this.itemModel = itemModel;
+
+            this.executable.bind(BindingsHelper.constantOf(
+                    switch (command) {
+                        case EDIT_LIST, REMOVE_LIST, RELOAD_LIST -> !itemModel.getTermsList().isInternalList();
+                        default -> true;
+                    }));
+        }
+
+        @Override
+        public void execute() {
+            switch (command) {
+                case EDIT_LIST -> viewModel.edit(itemModel);
+                case VIEW_LIST -> viewModel.displayContent(itemModel);
+                case REMOVE_LIST -> viewModel.removeList(itemModel);
+                case RELOAD_LIST -> viewModel.reloadList(itemModel);
+            }
+        }
     }
 }

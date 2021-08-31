@@ -10,6 +10,10 @@ import java.util.Optional;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.collections.FXCollections;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.DialogPane;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TextArea;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.desktop.JabRefDesktop;
@@ -102,7 +106,7 @@ public class ProtectedTermsTabViewModel implements PreferenceTabViewModel {
                      });
     }
 
-    public void removeFile(ProtectedTermsListItemModel itemModel) {
+    public void removeList(ProtectedTermsListItemModel itemModel) {
         ProtectedTermsList list = itemModel.getTermsList();
         if (!list.isInternalList() && dialogService.showConfirmationDialogAndWait(Localization.lang("Remove protected terms file"),
                 Localization.lang("Are you sure you want to remove the protected terms file?"),
@@ -136,13 +140,21 @@ public class ProtectedTermsTabViewModel implements PreferenceTabViewModel {
 
     public void displayContent(ProtectedTermsListItemModel itemModel) {
         ProtectedTermsList list = itemModel.getTermsList();
-        dialogService.showInformationDialogAndWait(
-                list.getDescription() + " - " + list.getLocation(),
-                list.getTermListing()
-        );
+        TextArea listingView = new TextArea(list.getTermListing());
+        listingView.setEditable(false);
+
+        ScrollPane scrollPane = new ScrollPane();
+        scrollPane.setFitToHeight(true);
+        scrollPane.setFitToWidth(true);
+        scrollPane.setContent(listingView);
+
+        DialogPane dialogPane = new DialogPane();
+        dialogPane.setContent(scrollPane);
+
+        dialogService.showCustomDialogAndWait(list.getDescription() + " - " + list.getLocation(), dialogPane, ButtonType.OK);
     }
 
-    public void reloadFile(ProtectedTermsListItemModel oldItemModel) {
+    public void reloadList(ProtectedTermsListItemModel oldItemModel) {
         ProtectedTermsList oldList = oldItemModel.getTermsList();
         try {
             ProtectedTermsList newList = ProtectedTermsLoader.readProtectedTermsListFromFile(new File(oldList.getLocation()), oldList.isEnabled());
