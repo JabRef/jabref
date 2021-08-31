@@ -25,12 +25,12 @@ import com.airhacks.afterburner.views.ViewLoader;
  * Dialog for managing term list files.
  */
 public class ProtectedTermsTab extends AbstractPreferenceTabView<ProtectedTermsTabViewModel> implements PreferencesTab {
-    @FXML private TableView<ProtectedTermsList> filesTable;
-    @FXML private TableColumn<ProtectedTermsList, Boolean> filesTableEnabledColumn;
-    @FXML private TableColumn<ProtectedTermsList, String> filesTableDescriptionColumn;
-    @FXML private TableColumn<ProtectedTermsList, String> filesTableFileColumn;
-    @FXML private TableColumn<ProtectedTermsList, Boolean> filesTableEditColumn;
-    @FXML private TableColumn<ProtectedTermsList, Boolean> filesTableDeleteColumn;
+    @FXML private TableView<ProtectedTermsListItemModel> filesTable;
+    @FXML private TableColumn<ProtectedTermsListItemModel, Boolean> filesTableEnabledColumn;
+    @FXML private TableColumn<ProtectedTermsListItemModel, String> filesTableDescriptionColumn;
+    @FXML private TableColumn<ProtectedTermsListItemModel, String> filesTableFileColumn;
+    @FXML private TableColumn<ProtectedTermsListItemModel, Boolean> filesTableEditColumn;
+    @FXML private TableColumn<ProtectedTermsListItemModel, Boolean> filesTableDeleteColumn;
 
     @Inject private ProtectedTermsLoader termsLoader;
 
@@ -49,36 +49,40 @@ public class ProtectedTermsTab extends AbstractPreferenceTabView<ProtectedTermsT
     public void initialize() {
         viewModel = new ProtectedTermsTabViewModel(termsLoader, dialogService, preferencesService);
 
-        filesTable.itemsProperty().bind(viewModel.termsFilesProperty());
-        new ViewModelTableRowFactory<ProtectedTermsList>()
+        new ViewModelTableRowFactory<ProtectedTermsListItemModel>()
                 .withContextMenu(this::createContextMenu)
                 .install(filesTable);
-        filesTableEnabledColumn.setCellValueFactory(data -> BindingsHelper.constantOf(data.getValue().isEnabled()));
         filesTableEnabledColumn.setCellFactory(CheckBoxTableCell.forTableColumn(filesTableEnabledColumn));
-        filesTableDescriptionColumn.setCellValueFactory(data -> BindingsHelper.constantOf(data.getValue().getDescription()));
+        filesTableEnabledColumn.setCellValueFactory(data -> data.getValue().enabledProperty());
+        filesTableDescriptionColumn.setCellValueFactory(data -> BindingsHelper.constantOf(data.getValue().getTermsList().getDescription()));
+
         filesTableFileColumn.setCellValueFactory(data -> {
-            ProtectedTermsList list = data.getValue();
+            ProtectedTermsList list = data.getValue().getTermsList();
             if (list.isInternalList()) {
                 return BindingsHelper.constantOf(Localization.lang("Internal list"));
             } else {
-                return BindingsHelper.constantOf(data.getValue().getLocation());
+                return BindingsHelper.constantOf(list.getLocation());
             }
         });
+
         filesTableEditColumn.setCellValueFactory(data -> BindingsHelper.constantOf(true));
+
         filesTableDeleteColumn.setCellValueFactory(data -> BindingsHelper.constantOf(true));
 
-        new ValueTableCellFactory<ProtectedTermsList, Boolean>()
+        new ValueTableCellFactory<ProtectedTermsListItemModel, Boolean>()
                 .withGraphic(none -> IconTheme.JabRefIcons.EDIT.getGraphicNode())
-                .withOnMouseClickedEvent((file, none) -> event -> viewModel.edit(file))
+                .withOnMouseClickedEvent((item, none) -> event -> viewModel.edit(item))
                 .install(filesTableEditColumn);
-        new ValueTableCellFactory<ProtectedTermsList, Boolean>()
+        new ValueTableCellFactory<ProtectedTermsListItemModel, Boolean>()
                 .withGraphic(none -> IconTheme.JabRefIcons.REMOVE.getGraphicNode())
                 .withTooltip(none -> Localization.lang("Remove protected terms file"))
-                .withOnMouseClickedEvent((file, none) -> event -> viewModel.removeFile(file))
+                .withOnMouseClickedEvent((item, none) -> event -> viewModel.removeFile(item))
                 .install(filesTableDeleteColumn);
+
+        filesTable.itemsProperty().set(viewModel.termsFilesProperty());
     }
 
-    private ContextMenu createContextMenu(ProtectedTermsList file) {
+    private ContextMenu createContextMenu(ProtectedTermsListItemModel file) {
         MenuItem edit = new MenuItem(Localization.lang("Edit"));
         edit.setOnAction(event -> viewModel.edit(file));
         MenuItem show = new MenuItem(Localization.lang("View"));
@@ -89,7 +93,7 @@ public class ProtectedTermsTab extends AbstractPreferenceTabView<ProtectedTermsT
         reload.setOnAction(event -> viewModel.reloadFile(file));
 
         // Enable/disable context menu items
-        if (file.isInternalList()) {
+        if (file.getTermsList().isInternalList()) {
             edit.setDisable(true);
             show.setDisable(false);
             remove.setDisable(true);

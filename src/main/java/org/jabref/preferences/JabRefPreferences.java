@@ -2708,6 +2708,10 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public ProtectedTermsPreferences getProtectedTermsPreferences() {
+        if (Objects.nonNull(protectedTermsPreferences)) {
+            return protectedTermsPreferences;
+        }
+
         protectedTermsPreferences = Objects.requireNonNullElseGet(protectedTermsPreferences, () -> new ProtectedTermsPreferences(
                 getStringList(PROTECTED_TERMS_ENABLED_INTERNAL),
                 getStringList(PROTECTED_TERMS_ENABLED_EXTERNAL),
@@ -2729,6 +2733,10 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public ImporterPreferences getImporterPreferences() {
+        if (Objects.nonNull(importerPreferences)) {
+            return importerPreferences;
+        }
+
         importerPreferences = Objects.requireNonNullElseGet(importerPreferences, () -> new ImporterPreferences(
                 getBoolean(GENERATE_KEY_ON_IMPORT),
                 getBoolean(GROBID_ENABLED),
