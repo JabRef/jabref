@@ -91,33 +91,19 @@ public class ImportHandler {
 
                     try {
                         if (FileUtil.isPDFFile(file)) {
+                            var pdfImporterResult = contentImporter.importPDFContent(file);
+                            List<BibEntry> pdfEntriesInFile = pdfImporterResult.getDatabase().getEntries();
 
-                            var xmpParserResult = contentImporter.importXMPContent(file);
-                            List<BibEntry> xmpEntriesInFile = xmpParserResult.getDatabase().getEntries();
-
-                            if (xmpParserResult.hasWarnings()) {
-                                addResultToList(file, false, Localization.lang("Error reading XMP content: %0", xmpParserResult.getErrorMessage()));
+                            if (pdfImporterResult.hasWarnings()) {
+                                addResultToList(file, false, Localization.lang("Error reading PDF content: %0", pdfImporterResult.getErrorMessage()));
                             }
 
-                            // First try xmp import, if empty try pdf import, otherwise create empty entry
-                            if (!xmpEntriesInFile.isEmpty()) {
-                                entriesToAdd = xmpEntriesInFile;
-                                addResultToList(file, true, Localization.lang("Importing using XMP data..."));
+                            if (!pdfEntriesInFile.isEmpty()) {
+                                entriesToAdd = pdfEntriesInFile;
+                                addResultToList(file, true, Localization.lang("Importing using extracted PDF data"));
                             } else {
-                                var pdfImporterResult = contentImporter.importPDFContent(file);
-                                List<BibEntry> pdfEntriesInFile = pdfImporterResult.getDatabase().getEntries();
-
-                                if (pdfImporterResult.hasWarnings()) {
-                                    addResultToList(file, false, Localization.lang("Error reading PDF content: %0", pdfImporterResult.getErrorMessage()));
-                                }
-
-                                if (!pdfEntriesInFile.isEmpty()) {
-                                    entriesToAdd = pdfEntriesInFile;
-                                    addResultToList(file, true, Localization.lang("Importing using extracted PDF data"));
-                                } else {
-                                    entriesToAdd = Collections.singletonList(createEmptyEntryWithLink(file));
-                                    addResultToList(file, false, Localization.lang("No metadata found. Creating empty entry with file link"));
-                                }
+                                entriesToAdd = Collections.singletonList(createEmptyEntryWithLink(file));
+                                addResultToList(file, false, Localization.lang("No metadata found. Creating empty entry with file link"));
                             }
                         } else if (FileUtil.isBibFile(file)) {
                             var bibtexParserResult = contentImporter.importFromBibFile(file, fileUpdateMonitor);

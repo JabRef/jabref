@@ -220,7 +220,7 @@ public class PdfIndexer {
                 indexWriter.close();
             }
         } catch (IOException e) {
-            LOGGER.warn("Could not add the document to the index!", e);
+            LOGGER.warn("Could not add the document {} to the index!", linkedFile.getLink(), e);
         }
     }
 }
