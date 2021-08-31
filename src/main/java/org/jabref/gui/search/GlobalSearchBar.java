@@ -192,6 +192,7 @@ public class GlobalSearchBar extends HBox {
             searchQuery.ifPresent(query -> {
                 updateResults(this.stateManager.getSearchResultSize().intValue(), SearchDescribers.getSearchDescriberFor(query).getDescription(),
                               query.isGrammarBasedSearch());
+                updateGlobalSearchResults();
 
             });
         });
@@ -297,13 +298,18 @@ public class GlobalSearchBar extends HBox {
             informUserAboutInvalidSearchQuery();
             return;
         }
+        stateManager.setSearchQuery(searchQuery);
 
+
+    }
+
+    private void updateGlobalSearchResults() {
         if (stateManager.isGlobalSearchActive()) {
             BibDatabaseContext context = new BibDatabaseContext();
 
             for (var db : this.stateManager.getOpenDatabases()) {
 
-                List<BibEntry> result = db.getEntries().stream().filter(entry -> isMatched(stateManager.activeGroupProperty(), Optional.of(searchQuery), entry))
+                List<BibEntry> result = db.getEntries().stream().filter(entry -> isMatched(stateManager.activeGroupProperty(), stateManager.activeSearchQueryProperty().get(), entry))
                                           .map(s -> {
                                               var newEntry = s.withField(new UnknownField("library"), db.getDatabasePath().map(Path::toString).orElse("adf"));
                                               return newEntry;
@@ -316,7 +322,6 @@ public class GlobalSearchBar extends HBox {
             stateManager.globalSearchDlg.addEntriesToBibContext(context);
 
         }
-        //stateManager.setSearchQuery(searchQuery);
 
     }
 
