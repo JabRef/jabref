@@ -143,8 +143,6 @@ public interface PreferencesService {
 
     GeneralPreferences getGeneralPreferences();
 
-    void storeGeneralPreferences(GeneralPreferences preferences);
-
     TelemetryPreferences getTelemetryPreferences();
 
     void storeTelemetryPreferences(TelemetryPreferences preferences);

@@ -48,8 +48,8 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty addModificationDateProperty = new SimpleBooleanProperty();
 
     private final DialogService dialogService;
+    private final GeneralPreferences generalPreferences;
     private final PreferencesService preferencesService;
-    private final GeneralPreferences initialGeneralPreferences;
     private final TelemetryPreferences initialTelemetryPreferences;
     private final OwnerPreferences initialOwnerPreferences;
     private final TimestampPreferences initialTimestampPreferences;
@@ -57,10 +57,10 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
     private List<String> restartWarning = new ArrayList<>();
 
     @SuppressWarnings("ReturnValueIgnored")
-    public GeneralTabViewModel(DialogService dialogService, PreferencesService preferencesService) {
+    public GeneralTabViewModel(DialogService dialogService, PreferencesService preferencesService, GeneralPreferences generalPreferences) {
         this.dialogService = dialogService;
+        this.generalPreferences = generalPreferences;
         this.preferencesService = preferencesService;
-        this.initialGeneralPreferences = preferencesService.getGeneralPreferences();
         this.initialTelemetryPreferences = preferencesService.getTelemetryPreferences();
         this.initialOwnerPreferences = preferencesService.getOwnerPreferences();
         this.initialTimestampPreferences = preferencesService.getTimestampPreferences();
@@ -71,16 +71,16 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         selectedLanguageProperty.setValue(preferencesService.getLanguage());
 
         encodingsListProperty.setValue(FXCollections.observableArrayList(Encodings.getCharsets()));
-        selectedEncodingProperty.setValue(initialGeneralPreferences.getDefaultEncoding());
+        selectedEncodingProperty.setValue(generalPreferences.getDefaultEncoding());
 
         bibliographyModeListProperty.setValue(FXCollections.observableArrayList(BibDatabaseMode.values()));
-        selectedBiblatexModeProperty.setValue(initialGeneralPreferences.getDefaultBibDatabaseMode());
+        selectedBiblatexModeProperty.setValue(generalPreferences.getDefaultBibDatabaseMode());
 
-        inspectionWarningDuplicateProperty.setValue(initialGeneralPreferences.isWarnAboutDuplicatesInInspection());
-        confirmDeleteProperty.setValue(initialGeneralPreferences.shouldConfirmDelete());
-        memoryStickModeProperty.setValue(initialGeneralPreferences.isMemoryStickMode());
+        inspectionWarningDuplicateProperty.setValue(generalPreferences.warnAboutDuplicatesInInspection());
+        confirmDeleteProperty.setValue(generalPreferences.shouldConfirmDelete());
+        memoryStickModeProperty.setValue(generalPreferences.isMemoryStickMode());
         collectTelemetryProperty.setValue(initialTelemetryPreferences.shouldCollectTelemetry());
-        showAdvancedHintsProperty.setValue(initialGeneralPreferences.shouldShowAdvancedHints());
+        showAdvancedHintsProperty.setValue(generalPreferences.shouldShowAdvancedHints());
 
         markOwnerProperty.setValue(initialOwnerPreferences.isUseOwner());
         markOwnerNameProperty.setValue(initialOwnerPreferences.getDefaultOwner());
@@ -98,19 +98,18 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
             restartWarning.add(Localization.lang("Changed language") + ": " + newLanguage.getDisplayName());
         }
 
-        if (initialGeneralPreferences.isMemoryStickMode() && !memoryStickModeProperty.getValue()) {
+        if (generalPreferences.isMemoryStickMode() && !memoryStickModeProperty.getValue()) {
             dialogService.showInformationDialogAndWait(Localization.lang("Memory stick mode"),
                     Localization.lang("To disable the memory stick mode"
                             + " rename or remove the jabref.xml file in the same folder as JabRef."));
         }
 
-        preferencesService.storeGeneralPreferences(new GeneralPreferences(
-                selectedEncodingProperty.getValue(),
-                selectedBiblatexModeProperty.getValue(),
-                inspectionWarningDuplicateProperty.getValue(),
-                confirmDeleteProperty.getValue(),
-                memoryStickModeProperty.getValue(),
-                showAdvancedHintsProperty.getValue()));
+        generalPreferences.setDefaultEncoding(selectedEncodingProperty.getValue());
+        generalPreferences.setDefaultBibDatabaseMode(selectedBiblatexModeProperty.getValue());
+        generalPreferences.setWarnAboutDuplicatesInInspection(inspectionWarningDuplicateProperty.getValue());
+        generalPreferences.setConfirmDelete(confirmDeleteProperty.getValue());
+        generalPreferences.setMemoryStickMode(memoryStickModeProperty.getValue());
+        generalPreferences.setShowAdvancedHints(showAdvancedHintsProperty.getValue());
 
         preferencesService.storeTelemetryPreferences(
                 initialTelemetryPreferences.withCollectTelemetry(collectTelemetryProperty.getValue()));
