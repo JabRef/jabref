@@ -257,7 +257,7 @@ public class LibraryTab extends Tab {
             autoSaver.registerListener(new AutosaveUiManager(this));
         }
 
-        BackupManager.start(this.bibDatabaseContext, Globals.entryTypesManager, Globals.prefs);
+        BackupManager.start(this.bibDatabaseContext, Globals.entryTypesManager, preferencesService);
     }
 
     private boolean isDatabaseReadyForAutoSave(BibDatabaseContext context) {
