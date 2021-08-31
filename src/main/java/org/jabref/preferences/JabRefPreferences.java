@@ -1325,21 +1325,22 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public GeneralPreferences getGeneralPreferences() {
-        if (generalPreferences == null) {
-            generalPreferences = new GeneralPreferences(
-                    getDefaultEncoding(),
-                    getBoolean(BIBLATEX_DEFAULT_MODE) ? BibDatabaseMode.BIBLATEX : BibDatabaseMode.BIBTEX,
-                    getBoolean(WARN_ABOUT_DUPLICATES_IN_INSPECTION),
-                    getBoolean(CONFIRM_DELETE),
-                    getBoolean(MEMORY_STICK_MODE),
-                    getBoolean(SHOW_ADVANCED_HINTS));
-            EasyBind.subscribe(generalPreferences.defaultEncodingProperty(), newValue -> put(DEFAULT_ENCODING, newValue.name()));
-            EasyBind.subscribe(generalPreferences.defaultBibDatabaseModeProperty(), newValue -> putBoolean(BIBLATEX_DEFAULT_MODE, (newValue == BibDatabaseMode.BIBLATEX)));
-            EasyBind.subscribe(generalPreferences.isWarnAboutDuplicatesInInspectionProperty(), newValue -> putBoolean(WARN_ABOUT_DUPLICATES_IN_INSPECTION, newValue));
-            EasyBind.subscribe(generalPreferences.confirmDeleteProperty(), newValue -> putBoolean(CONFIRM_DELETE, newValue));
-            EasyBind.subscribe(generalPreferences.memoryStickModeProperty(), newValue -> putBoolean(MEMORY_STICK_MODE, newValue));
-            EasyBind.subscribe(generalPreferences.showAdvancedHintsProperty(), newValue -> putBoolean(SHOW_ADVANCED_HINTS, newValue));
+        if (Objects.nonNull(generalPreferences)) {
+            return generalPreferences;
         }
+        generalPreferences = new GeneralPreferences(
+                getDefaultEncoding(),
+                getBoolean(BIBLATEX_DEFAULT_MODE) ? BibDatabaseMode.BIBLATEX : BibDatabaseMode.BIBTEX,
+                getBoolean(WARN_ABOUT_DUPLICATES_IN_INSPECTION),
+                getBoolean(CONFIRM_DELETE),
+                getBoolean(MEMORY_STICK_MODE),
+                getBoolean(SHOW_ADVANCED_HINTS));
+        EasyBind.subscribe(generalPreferences.defaultEncodingProperty(), newValue -> put(DEFAULT_ENCODING, newValue.name()));
+        EasyBind.subscribe(generalPreferences.defaultBibDatabaseModeProperty(), newValue -> putBoolean(BIBLATEX_DEFAULT_MODE, (newValue == BibDatabaseMode.BIBLATEX)));
+        EasyBind.subscribe(generalPreferences.isWarnAboutDuplicatesInInspectionProperty(), newValue -> putBoolean(WARN_ABOUT_DUPLICATES_IN_INSPECTION, newValue));
+        EasyBind.subscribe(generalPreferences.confirmDeleteProperty(), newValue -> putBoolean(CONFIRM_DELETE, newValue));
+        EasyBind.subscribe(generalPreferences.memoryStickModeProperty(), newValue -> putBoolean(MEMORY_STICK_MODE, newValue));
+        EasyBind.subscribe(generalPreferences.showAdvancedHintsProperty(), newValue -> putBoolean(SHOW_ADVANCED_HINTS, newValue));
         return generalPreferences;
     }
 
