@@ -27,7 +27,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We merged the barely used ImportSettingsTab and the CustomizationTab in the preferences into one single tab and moved the option to allow Integers in Edition Fields in Bibtex-Mode to the EntryEditor tab. [#7849](https://github.com/JabRef/jabref/pull/7849)
 - We moved the export order in the preferences from `File` to `Import and Export`. [#7935](https://github.com/JabRef/jabref/pull/7935)
 - We reworked the export order in the preferences and the save order in the library preferences. You can now set more than three sort criteria in your library preferences. [#7935](https://github.com/JabRef/jabref/pull/7935)
-- The metadata-to-pdf actions now also embedd the bibfile to the PDF. [#8037](https://github.com/JabRef/jabref/pull/8037)
+- The metadata-to-pdf actions now also embeds the bibfile to the PDF. [#8037](https://github.com/JabRef/jabref/pull/8037)
 
 ### Fixed
 
