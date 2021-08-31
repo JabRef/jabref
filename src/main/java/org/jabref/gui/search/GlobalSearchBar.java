@@ -46,6 +46,8 @@ import org.jabref.gui.groups.GroupViewMode;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.keyboard.KeyBindingRepository;
+import org.jabref.gui.maintable.MainTable;
+import org.jabref.gui.maintable.MainTableDataModel;
 import org.jabref.gui.search.rules.describer.SearchDescribers;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.DefaultTaskExecutor;
@@ -53,6 +55,7 @@ import org.jabref.gui.util.IconValidationDecorator;
 import org.jabref.gui.util.TooltipTextUtil;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.search.SearchQuery;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.Author;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.groups.GroupTreeNode;
@@ -291,16 +294,22 @@ public class GlobalSearchBar extends HBox {
             informUserAboutInvalidSearchQuery();
             return;
         }
+        stateManager.setSearchQuery(searchQuery);
 
 
-        if(true) {
-            stateManager.setSearchQuery(searchQuery);
+        if(stateManager.isGlobalSearchActive()) {
+            BibDatabaseContext context = new BibDatabaseContext();
 
             for (var db : this.stateManager.getOpenDatabases()) {
 
-               var result = db.getEntries().stream().filter(x-> isMatched(stateManager.activeGroupProperty(), stateManager.activeSearchQueryProperty().get(), x)).collect(Collectors.toList());
+               var result = db.getEntries().stream().filter(entry-> isMatched(stateManager.activeGroupProperty(), stateManager.activeSearchQueryProperty().get(), entry)).collect(Collectors.toList());
                LOGGER.debug("DB: {} and number found {}", db.getDatabasePath(), result.size());
+               context.getDatabase().insertEntries(result);
             }
+
+            MainTableDataModel model = new MainTableDataModel(context, preferencesService, stateManager);
+            MainTable m = new  MainTable(model, null, context, preferencesService, null, stateManager, null, null);
+
 
 
         }
