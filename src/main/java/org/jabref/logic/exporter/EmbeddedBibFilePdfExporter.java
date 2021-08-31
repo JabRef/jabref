@@ -63,7 +63,7 @@ public class EmbeddedBibFilePdfExporter extends Exporter {
     }
 
     private void embedBibTex(String bibTeX, Path file, Charset encoding) throws IOException {
-        if (!Files.exists(file) || !StandardFileType.PDF.getExtensions().contains(FileUtil.getFileExtension(file).get())) {
+        if (!Files.exists(file) || !StandardFileType.PDF.getExtensions().contains(FileUtil.getFileExtension(file).orElse(""))) {
             return;
         }
         try (PDDocument document = PDDocument.load(file.toFile())) {
