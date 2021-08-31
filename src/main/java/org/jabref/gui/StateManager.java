@@ -59,7 +59,6 @@ public class StateManager {
     private final EasyBinding<Double> tasksProgress = EasyBind.reduce(backgroundTasks, tasks -> tasks.filter(Task::isRunning).mapToDouble(Task::getProgress).average().orElse(1));
     private final ObservableMap<String, DialogWindowState> dialogWindowStates = FXCollections.observableHashMap();
     private final BooleanProperty globalSearch =  new SimpleBooleanProperty();
-    private final ObservableMap<BibDatabaseContext, List<BibEntry>>  globalSearchResults = FXCollections.observableHashMap();
 
 
     public StateManager() {
@@ -86,20 +85,8 @@ public class StateManager {
         searchResultMap.put(database, resultSize);
     }
 
-    public void setGlobalSearchResults(BibDatabaseContext database, List<BibEntry> list) {
-        globalSearchResults.put(database, list);
-    }
-
     public IntegerProperty getSearchResultSize() {
         return searchResultMap.getOrDefault(activeDatabase.getValue().orElse(new BibDatabaseContext()), new SimpleIntegerProperty(0));
-    }
-
-    public ObservableMap<BibDatabaseContext, List<BibEntry>> getGlobalSearchResults(){
-       return globalSearchResults;
-    }
-
-    public List<BibEntry> getSearchResult(BibDatabaseContext ctx){
-        return globalSearchResults.get(ctx);
     }
 
     public ReadOnlyListProperty<GroupTreeNode> activeGroupProperty() {

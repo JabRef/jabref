@@ -2,8 +2,6 @@ package org.jabref.gui.maintable;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
-
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
@@ -56,7 +54,6 @@ public class MainTableDataModel {
         // We need to wrap the list since otherwise sorting in the table does not work
         entriesSorted = new SortedList<>(entriesFiltered);
         //TODO: Refactor
-        stateManager.setGlobalSearchResults(context, entriesFiltered.stream().map(BibEntryTableViewModel::getEntry).collect(Collectors.toList()));
 
         groupViewMode = preferencesService.getGroupViewMode();
 

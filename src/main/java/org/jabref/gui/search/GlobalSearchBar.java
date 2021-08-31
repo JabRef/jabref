@@ -5,10 +5,12 @@ import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
+import java.util.stream.Collectors;
 
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
+import javafx.collections.ObservableList;
 import javafx.css.PseudoClass;
 import javafx.event.Event;
 import javafx.geometry.Insets;
@@ -40,6 +42,7 @@ import org.jabref.gui.autocompleter.AutoCompleteFirstNameMode;
 import org.jabref.gui.autocompleter.AutoCompletionTextInputBinding;
 import org.jabref.gui.autocompleter.PersonNameStringConverter;
 import org.jabref.gui.autocompleter.SuggestionProvider;
+import org.jabref.gui.groups.GroupViewMode;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.keyboard.KeyBindingRepository;
@@ -51,6 +54,10 @@ import org.jabref.gui.util.TooltipTextUtil;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.search.SearchQuery;
 import org.jabref.model.entry.Author;
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.groups.GroupTreeNode;
+import org.jabref.model.search.matchers.MatcherSet;
+import org.jabref.model.search.matchers.MatcherSets;
 import org.jabref.preferences.PreferencesService;
 import org.jabref.preferences.SearchPreferences;
 
@@ -92,11 +99,14 @@ public class GlobalSearchBar extends HBox {
 
     private SearchPreferences searchPreferences;
 
+    private final GroupViewMode groupViewMode;
+
     public GlobalSearchBar(JabRefFrame frame, StateManager stateManager, PreferencesService preferencesService) {
         super();
         this.stateManager = stateManager;
         this.preferencesService = preferencesService;
         this.searchPreferences = preferencesService.getSearchPreferences();
+        groupViewMode = preferencesService.getGroupViewMode();
 
         this.searchField.disableProperty().bind(needsDatabase(stateManager).not());
 
@@ -144,7 +154,7 @@ public class GlobalSearchBar extends HBox {
         fulltextButton.visibleProperty().unbind();
         fulltextButton.visibleProperty().bind(focusedOrActive);
 
-        StackPane modifierButtons = new StackPane(new HBox(regularExpressionButton, caseSensitiveButton, fulltextButton));
+        StackPane modifierButtons = new StackPane(new HBox(regularExpressionButton, caseSensitiveButton, fulltextButton, globalModeButton));
         modifierButtons.setAlignment(Pos.CENTER);
         searchField.setRight(new HBox(searchField.getRight(), modifierButtons));
         searchField.getStyleClass().add("search-field");
@@ -180,11 +190,6 @@ public class GlobalSearchBar extends HBox {
                 updateResults(this.stateManager.getSearchResultSize().intValue(), SearchDescribers.getSearchDescriberFor(query).getDescription(),
                               query.isGrammarBasedSearch());
 
-                for (var db : this.stateManager.getOpenDatabases()) {
-
-                    var result = this.stateManager.getSearchResult(db);
-                    LOGGER.debug("DB: {} and search results {}", db.getDatabasePath(), result);
-                }
 
             });
         });
@@ -286,8 +291,50 @@ public class GlobalSearchBar extends HBox {
             informUserAboutInvalidSearchQuery();
             return;
         }
-        stateManager.setSearchQuery(searchQuery);
+
+
+        if(true) {
+            stateManager.setSearchQuery(searchQuery);
+
+            for (var db : this.stateManager.getOpenDatabases()) {
+
+               var result = db.getEntries().stream().filter(x-> isMatched(stateManager.activeGroupProperty(), stateManager.activeSearchQueryProperty().get(), x)).collect(Collectors.toList());
+               LOGGER.debug("DB: {} and number found {}", db.getDatabasePath(), result.size());
+            }
+
+
+        }
     }
+
+    private boolean isMatched(ObservableList<GroupTreeNode> groups, Optional<SearchQuery> query, BibEntry entry) {
+        return isMatchedByGroup(groups, entry) && isMatchedBySearch(query, entry);
+    }
+
+    private boolean isMatchedBySearch(Optional<SearchQuery> query, BibEntry entry) {
+        return query.map(matcher -> matcher.isMatch(entry))
+                    .orElse(true);
+    }
+
+    private boolean isMatchedByGroup(ObservableList<GroupTreeNode> groups, BibEntry entry) {
+        return createGroupMatcher(groups)
+                .map(matcher -> matcher.isMatch(entry))
+                .orElse(true);
+    }
+
+    private Optional<MatcherSet> createGroupMatcher(List<GroupTreeNode> selectedGroups) {
+        if ((selectedGroups == null) || selectedGroups.isEmpty()) {
+            // No selected group, show all entries
+            return Optional.empty();
+        }
+
+        final MatcherSet searchRules = MatcherSets.build(groupViewMode == GroupViewMode.INTERSECTION ? MatcherSets.MatcherType.AND : MatcherSets.MatcherType.OR);
+
+        for (GroupTreeNode node : selectedGroups) {
+            searchRules.addRule(node.getSearchMatcher());
+        }
+        return Optional.of(searchRules);
+    }
+
 
     private boolean validRegex() {
         try {
