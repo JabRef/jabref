@@ -228,7 +228,7 @@ public class ArgumentProcessor {
         }
 
         if (cli.isWriteXMPtoPdf() && cli.isEmbeddBibfileInPdf() || cli.isWriteMetadatatoPdf() && (cli.isWriteXMPtoPdf() || cli.isEmbeddBibfileInPdf())) {
-            LOGGER.error("Give only one of [writeXMPtoPdf, embeddBibfileInPdf, writeMetadatatoPdf]");
+            System.err.println("Give only one of [writeXMPtoPdf, embeddBibfileInPdf, writeMetadatatoPdf]");
         }
 
         if (cli.isWriteMetadatatoPdf() || cli.isWriteXMPtoPdf() || cli.isEmbeddBibfileInPdf()) {
@@ -308,16 +308,16 @@ public class ArgumentProcessor {
         try {
             if (writeXMP) {
                 if (xmpPdfExporter.exportToAllFilesOfEntry(databaseContext, encoding, filePreferences, entry, List.of(entry))) {
-                    LOGGER.info(String.format("Successfully written XMP metadata on at least one linked file of %s", citeKey));
+                    System.out.println(String.format("Successfully written XMP metadata on at least one linked file of %s", citeKey));
                 } else {
-                    LOGGER.error(String.format("Cannot write XMP metadata on any linked files of %s. Make sure there is at least one linked file and the path is correct.", citeKey));
+                    System.err.println(String.format("Cannot write XMP metadata on any linked files of %s. Make sure there is at least one linked file and the path is correct.", citeKey));
                 }
             }
             if (embeddBibfile) {
                 if (embeddedBibFilePdfExporter.exportToAllFilesOfEntry(databaseContext, encoding, filePreferences, entry, List.of(entry))) {
-                    LOGGER.info(String.format("Successfully embedded metadata on at least one linked file of %s", citeKey));
+                    System.out.println(String.format("Successfully embedded metadata on at least one linked file of %s", citeKey));
                 } else {
-                    LOGGER.error(String.format("Cannot embedd metadata on any linked files of %s. Make sure there is at least one linked file and the path is correct.", citeKey));
+                    System.out.println(String.format("Cannot embedd metadata on any linked files of %s. Make sure there is at least one linked file and the path is correct.", citeKey));
                 }
             }
         } catch (Exception e) {
@@ -329,7 +329,7 @@ public class ArgumentProcessor {
         for (String citeKey : citeKeys) {
             List<BibEntry> bibEntryList = dataBase.getEntriesByCitationKey(citeKey);
             if (bibEntryList.isEmpty()) {
-                LOGGER.error(String.format("Skipped - Cannot find %s in library.", citeKey));
+                System.err.println(String.format("Skipped - Cannot find %s in library.", citeKey));
                 continue;
             }
             for (BibEntry entry : bibEntryList) {
@@ -348,16 +348,16 @@ public class ArgumentProcessor {
                 try {
                     if (writeXMP) {
                         if (xmpPdfExporter.exportToFileByPath(databaseContext, dataBase, encoding, filePreferences, filePath)) {
-                            LOGGER.info(String.format("Successfully written XMP metadata of at least one entry to %s", fileName));
+                            System.out.println(String.format("Successfully written XMP metadata of at least one entry to %s", fileName));
                         } else {
-                            LOGGER.error(String.format("File %s is not linked to any entry in database.", fileName));
+                            System.out.println(String.format("File %s is not linked to any entry in database.", fileName));
                         }
                     }
                     if (embeddBibfile) {
                         if (embeddedBibFilePdfExporter.exportToFileByPath(databaseContext, dataBase, encoding, filePreferences, filePath)) {
-                            LOGGER.info(String.format("Successfully embedded XMP metadata of at least one entry to %s", fileName));
+                            System.out.println(String.format("Successfully embedded XMP metadata of at least one entry to %s", fileName));
                         } else {
-                            LOGGER.error(String.format("File %s is not linked to any entry in database.", fileName));
+                            System.out.println(String.format("File %s is not linked to any entry in database.", fileName));
                         }
                     }
                 } catch (IOException e) {
