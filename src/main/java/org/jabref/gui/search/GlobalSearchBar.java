@@ -1,6 +1,7 @@
 package org.jabref.gui.search;
 
 import java.lang.reflect.Field;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
@@ -56,6 +57,7 @@ import org.jabref.logic.search.SearchQuery;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.Author;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.search.matchers.MatcherSet;
 import org.jabref.model.search.matchers.MatcherSets;
@@ -165,10 +167,9 @@ public class GlobalSearchBar extends HBox {
         HBox.setHgrow(searchField, Priority.ALWAYS);
 
         regexValidator = new FunctionBasedValidator<>(
-                searchField.textProperty(),
-                query -> !(regularExpressionButton.isSelected() && !validRegex()),
-                ValidationMessage.error(Localization.lang("Invalid regular expression"))
-        );
+                                                      searchField.textProperty(),
+                                                      query -> !(regularExpressionButton.isSelected() && !validRegex()),
+                                                      ValidationMessage.error(Localization.lang("Invalid regular expression")));
         ControlsFxVisualizer visualizer = new ControlsFxVisualizer();
         visualizer.setDecoration(new IconValidationDecorator(Pos.CENTER_LEFT));
         Platform.runLater(() -> visualizer.initVisualization(regexValidator.getValidationStatus(), searchField));
@@ -179,20 +180,18 @@ public class GlobalSearchBar extends HBox {
 
         Timer searchTask = FxTimer.create(java.time.Duration.ofMillis(SEARCH_DELAY), this::performSearch);
         BindingsHelper.bindBidirectional(
-                stateManager.activeSearchQueryProperty(),
-                searchField.textProperty(),
-                searchTerm -> {
-                    // Async update
-                    searchTask.restart();
-                },
-                query -> setSearchTerm(query.map(SearchQuery::getQuery).orElse(""))
-        );
+                                         stateManager.activeSearchQueryProperty(),
+                                         searchField.textProperty(),
+                                         searchTerm -> {
+                                             // Async update
+                                             searchTask.restart();
+                                         },
+                                         query -> setSearchTerm(query.map(SearchQuery::getQuery).orElse("")));
 
         EasyBind.subscribe(this.stateManager.activeSearchQueryProperty(), searchQuery -> {
             searchQuery.ifPresent(query -> {
                 updateResults(this.stateManager.getSearchResultSize().intValue(), SearchDescribers.getSearchDescriberFor(query).getDescription(),
                               query.isGrammarBasedSearch());
-
 
             });
         });
@@ -226,12 +225,11 @@ public class GlobalSearchBar extends HBox {
             performSearch();
         });
 
-        globalModeButton.setOnAction(evt-> {
+        globalModeButton.setOnAction(evt -> {
             this.stateManager.setGlobalSearchActive(true);
             performSearch();
 
         });
-
 
         // ToDo: Reimplement searchMode (searchModeButton)
         /* searchModeButton.setText(searchPreferences.getSearchDisplayMode().getDisplayName());
@@ -295,29 +293,26 @@ public class GlobalSearchBar extends HBox {
             return;
         }
 
-        if(stateManager.isGlobalSearchActive()) {
+        if (stateManager.isGlobalSearchActive()) {
             BibDatabaseContext context = new BibDatabaseContext();
 
             for (var db : this.stateManager.getOpenDatabases()) {
 
                 List<BibEntry> result = db.getEntries().stream().filter(entry -> isMatched(stateManager.activeGroupProperty(), Optional.of(searchQuery), entry))
-                    //.map(s->s = s.withField(new UnknownField("library"),db.getDatabasePath().map(Path::toString).orElse("")))
-                    .collect(Collectors.toList());
+                                          .map(s -> {
+                                              var newEntry = s.withField(new UnknownField("library"), db.getDatabasePath().map(Path::toString).orElse(""));
+                                              return newEntry;
+                                          })
+                                          .collect(Collectors.toList());
                 LOGGER.debug("DB: {} and number found {}", db.getDatabasePath(), result.size());
 
-               context.getDatabase().insertEntries(result);
-
-
+                context.getDatabase().insertEntries(result);
             }
 
             this.stateManager.globalSearchDlg.showMainTable(context);
 
-
-
         }
         //stateManager.setSearchQuery(searchQuery);
-
-
 
     }
 
@@ -332,8 +327,8 @@ public class GlobalSearchBar extends HBox {
 
     private boolean isMatchedByGroup(ObservableList<GroupTreeNode> groups, BibEntry entry) {
         return createGroupMatcher(groups)
-                .map(matcher -> matcher.isMatch(entry))
-                .orElse(true);
+                                         .map(matcher -> matcher.isMatch(entry))
+                                         .orElse(true);
     }
 
     private Optional<MatcherSet> createGroupMatcher(List<GroupTreeNode> selectedGroups) {
@@ -349,7 +344,6 @@ public class GlobalSearchBar extends HBox {
         }
         return Optional.of(searchRules);
     }
-
 
     private boolean validRegex() {
         try {
@@ -373,9 +367,9 @@ public class GlobalSearchBar extends HBox {
     public void setAutoCompleter(SuggestionProvider<Author> searchCompleter) {
         if (preferencesService.getAutoCompletePreferences().shouldAutoComplete()) {
             AutoCompletionTextInputBinding<Author> autoComplete = AutoCompletionTextInputBinding.autoComplete(searchField,
-                    searchCompleter::provideSuggestions,
-                    new PersonNameStringConverter(false, false, AutoCompleteFirstNameMode.BOTH),
-                    new AppendPersonNamesStrategy());
+                                                                                                              searchCompleter::provideSuggestions,
+                                                                                                              new PersonNameStringConverter(false, false, AutoCompleteFirstNameMode.BOTH),
+                                                                                                              new AppendPersonNamesStrategy());
             AutoCompletePopup<Author> popup = getPopup(autoComplete);
             popup.setSkin(new SearchPopupSkin<>(popup));
         }

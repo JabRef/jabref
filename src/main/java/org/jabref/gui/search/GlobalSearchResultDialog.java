@@ -8,7 +8,6 @@ import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.keyboard.KeyBindingRepository;
-import org.jabref.gui.maintable.MainTable;
 import org.jabref.gui.maintable.MainTableColumnModel;
 import org.jabref.gui.maintable.MainTableDataModel;
 import org.jabref.gui.maintable.columns.FieldColumn;
@@ -41,10 +40,10 @@ public class GlobalSearchResultDialog {
     void showMainTable(BibDatabaseContext ctx) {
         MainTableDataModel model = new MainTableDataModel(ctx, preferencesService, stateManager);
 
-        MainTable m = new MainTable(model, libraryTab, ctx, preferencesService, dialogService, stateManager, externalFileTypes, keybindingRepo);
+        SearchResultsTable m = new SearchResultsTable(model, ctx, preferencesService, libraryTab, dialogService, stateManager, externalFileTypes, keybindingRepo);
 
-         m.getColumns().add(0, libColumn);
-       // m.getColumns().add(0,);
+        m.getColumns().add(0, libColumn);
+        // m.getColumns().add(0,);
 
         DialogPane pane = new DialogPane();
         pane.setContent(m);
