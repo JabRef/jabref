@@ -677,8 +677,7 @@ public class LibraryTab extends Tab {
      */
     private void saveDividerLocation(Number position) {
         if (mode == BasePanelMode.SHOWING_EDITOR) {
-            preferencesService.storeEntryEditorPreferences(
-                    preferencesService.getEntryEditorPreferences().withDividerPosition(position.doubleValue()));
+            preferencesService.getEntryEditorPreferences().setDividerPosition(position.doubleValue());
         }
     }
 

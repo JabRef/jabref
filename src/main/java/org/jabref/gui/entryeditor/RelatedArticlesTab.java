@@ -66,7 +66,7 @@ public class RelatedArticlesTab extends EntryEditorTab {
         progress.setMaxSize(100, 100);
 
         MrDLibFetcher fetcher = new MrDLibFetcher(preferencesService.getLanguage().name(),
-                Globals.BUILD_INFO.version, preferencesService);
+                Globals.BUILD_INFO.version, preferencesService.getMrDlibPreferences());
         BackgroundTask
                 .wrap(() -> fetcher.performSearch(entry))
                 .onRunning(() -> progress.setVisible(true))
@@ -211,8 +211,9 @@ public class RelatedArticlesTab extends EntryEditorTab {
         vb.setSpacing(10);
 
         button.setOnAction(event -> {
+            preferences.setIsMrdlibAccepted(true);
+
             MrDlibPreferences mrDlibPreferences = preferencesService.getMrDlibPreferences();
-            mrDlibPreferences.setAcceptRecommendations(true);
             mrDlibPreferences.setSendLanguage(cbLanguage.isSelected());
             mrDlibPreferences.setSendOs(cbOS.isSelected());
             mrDlibPreferences.setSendTimezone(cbTimezone.isSelected());

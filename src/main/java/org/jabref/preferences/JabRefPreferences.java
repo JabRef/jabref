@@ -410,15 +410,17 @@ public class JabRefPreferences implements PreferencesService {
     private Map<String, Set<Field>> entryEditorTabList;
     private List<MainTableColumnModel> mainTableColumns;
     private List<MainTableColumnModel> mainTableColumnSortOrder;
-    private PreviewPreferences previewPreferences;
-    private SidePanePreferences sidePanePreferences;
     private Theme globalTheme;
     private Set<CustomImporter> customImporters;
     private String userName;
+
+    private PreviewPreferences previewPreferences;
+    private SidePanePreferences sidePanePreferences;
     private AppearancePreferences appearancePreferences;
     private ImporterPreferences importerPreferences;
     private ProtectedTermsPreferences protectedTermsPreferences;
     private MrDlibPreferences mrDlibPreferences;
+    private EntryEditorPreferences entryEditorPreferences;
 
     // The constructor is made private to enforce this as a singleton class:
     private JabRefPreferences() {
@@ -1452,8 +1454,7 @@ public class JabRefPreferences implements PreferencesService {
      *
      * @return a list of defined tabs
      */
-    @Override
-    public Map<String, Set<Field>> getEntryEditorTabList() {
+    private Map<String, Set<Field>> getEntryEditorTabList() {
         if (entryEditorTabList == null) {
             updateEntryEditorTabList();
         }
@@ -1463,8 +1464,7 @@ public class JabRefPreferences implements PreferencesService {
     /**
      * Reloads the list of the currently defined tabs  in the entry editor from scratch to cache
      */
-    @Override
-    public void updateEntryEditorTabList() {
+    private void updateEntryEditorTabList() {
         Map<String, Set<Field>> tabs = new LinkedHashMap<>();
         int i = 0;
         String name;
@@ -1493,8 +1493,7 @@ public class JabRefPreferences implements PreferencesService {
      *
      * @param customTabs a map of tab names and the corresponding set of fields to be displayed in
      */
-    @Override
-    public void storeEntryEditorTabList(Map<String, Set<Field>> customTabs) {
+    private void storeEntryEditorTabList(Map<String, Set<Field>> customTabs) {
         String[] names = customTabs.keySet().toArray(String[]::new);
         String[] fields = customTabs.values().stream()
                                     .map(set -> set.stream()
@@ -1564,7 +1563,11 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public EntryEditorPreferences getEntryEditorPreferences() {
-        return new EntryEditorPreferences(getEntryEditorTabList(),
+        if (Objects.nonNull(entryEditorPreferences)) {
+            return entryEditorPreferences;
+        }
+
+        entryEditorPreferences = new EntryEditorPreferences(getEntryEditorTabList(),
                 getBoolean(AUTO_OPEN_FORM),
                 getBoolean(SHOW_RECOMMENDATIONS),
                 getBoolean(ACCEPT_RECOMMENDATIONS),
@@ -1573,19 +1576,18 @@ public class JabRefPreferences implements PreferencesService {
                 getBoolean(VALIDATE_IN_ENTRY_EDITOR),
                 getBoolean(ALLOW_INTEGER_EDITION_BIBTEX),
                 getDouble(ENTRY_EDITOR_HEIGHT));
-    }
 
-    @Override
-    public void storeEntryEditorPreferences(EntryEditorPreferences preferences) {
-        storeEntryEditorTabList(preferences.getEntryEditorTabList());
-        putBoolean(AUTO_OPEN_FORM, preferences.shouldOpenOnNewEntry());
-        putBoolean(SHOW_RECOMMENDATIONS, preferences.shouldShowRecommendationsTab());
-        putBoolean(ACCEPT_RECOMMENDATIONS, preferences.isMrdlibAccepted());
-        putBoolean(SHOW_LATEX_CITATIONS, preferences.shouldShowLatexCitationsTab());
-        putBoolean(DEFAULT_SHOW_SOURCE, preferences.showSourceTabByDefault());
-        putBoolean(VALIDATE_IN_ENTRY_EDITOR, preferences.shouldEnableValidation());
-        putBoolean(ALLOW_INTEGER_EDITION_BIBTEX, preferences.shouldAllowIntegerEditionBibtex());
-        putDouble(ENTRY_EDITOR_HEIGHT, preferences.getDividerPosition());
+        EasyBind.subscribe(entryEditorPreferences.entryEditorTabListProperty(), this::storeEntryEditorTabList);
+        EasyBind.subscribe(entryEditorPreferences.shouldOpenOnNewEntryProperty(), newValue -> putBoolean(AUTO_OPEN_FORM, newValue));
+        EasyBind.subscribe(entryEditorPreferences.shouldShowRecommendationsTabProperty(), newValue -> putBoolean(SHOW_RECOMMENDATIONS, newValue));
+        EasyBind.subscribe(entryEditorPreferences.isMrdlibAcceptedProperty(), newValue -> putBoolean(ACCEPT_RECOMMENDATIONS, newValue));
+        EasyBind.subscribe(entryEditorPreferences.shouldShowLatexCitationsTabProperty(), newValue -> putBoolean(SHOW_LATEX_CITATIONS, newValue));
+        EasyBind.subscribe(entryEditorPreferences.showSourceTabByDefaultProperty(), newValue -> putBoolean(DEFAULT_SHOW_SOURCE, newValue));
+        EasyBind.subscribe(entryEditorPreferences.enableValidationProperty(), newValue -> putBoolean(VALIDATE_IN_ENTRY_EDITOR, newValue));
+        EasyBind.subscribe(entryEditorPreferences.allowIntegerEditionBibtexProperty(), newValue -> putBoolean(ALLOW_INTEGER_EDITION_BIBTEX, newValue));
+        EasyBind.subscribe(entryEditorPreferences.dividerPositionProperty(), newValue -> putDouble(ENTRY_EDITOR_HEIGHT, newValue.doubleValue()));
+
+        return entryEditorPreferences;
     }
 
     //*************************************************************************************************************
