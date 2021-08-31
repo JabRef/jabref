@@ -26,7 +26,7 @@ public class GlobalSearchResultDialog {
     private final FieldColumn libColumn;
 
     public GlobalSearchResultDialog(BibDatabaseContext context, PreferencesService preferencesService, StateManager stateManager, ExternalFileTypes externalFileTypes, KeyBindingRepository repo, LibraryTab tab, DialogService dialogService) {
-        this.context = context;
+        this.context = new BibDatabaseContext();
         this.preferencesService = preferencesService;
         this.stateManager = stateManager;
         this.externalFileTypes = externalFileTypes;
@@ -37,18 +37,22 @@ public class GlobalSearchResultDialog {
 
     }
 
-    void showMainTable(BibDatabaseContext ctx) {
-        MainTableDataModel model = new MainTableDataModel(ctx, preferencesService, stateManager);
+    void showMainTable() {
 
-        SearchResultsTable m = new SearchResultsTable(model, ctx, preferencesService, libraryTab, dialogService, stateManager, externalFileTypes, keybindingRepo);
+        MainTableDataModel model = new MainTableDataModel(context, preferencesService, stateManager);
+        SearchResultsTable m = new SearchResultsTable(model, context, preferencesService, libraryTab, dialogService, stateManager, externalFileTypes, keybindingRepo);
 
         m.getColumns().add(0, libColumn);
-        // m.getColumns().add(0,);
 
         DialogPane pane = new DialogPane();
         pane.setContent(m);
 
-        dialogService.showCustomDialogAndWait("Global search", pane, ButtonType.OK);
-        m.getColumns().remove(libColumn);
+        dialogService.showCustomDialog("Global search", pane, ButtonType.OK);
+    }
+
+    void addEntriesToBibContext(BibDatabaseContext ctx) {
+        var tbremoved = this.context.getDatabase().getEntries();
+        this.context.getDatabase().removeEntries(tbremoved);
+        this.context.getDatabase().insertEntries(ctx.getEntries());
     }
 }

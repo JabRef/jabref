@@ -195,6 +195,7 @@ public class GlobalSearchBar extends HBox {
 
             });
         });
+
     }
 
     private void initSearchModifierButtons() {
@@ -227,6 +228,8 @@ public class GlobalSearchBar extends HBox {
 
         globalModeButton.setOnAction(evt -> {
             this.stateManager.setGlobalSearchActive(true);
+            this.stateManager.globalSearchDlg.showMainTable();
+
             performSearch();
 
         });
@@ -300,7 +303,7 @@ public class GlobalSearchBar extends HBox {
 
                 List<BibEntry> result = db.getEntries().stream().filter(entry -> isMatched(stateManager.activeGroupProperty(), Optional.of(searchQuery), entry))
                                           .map(s -> {
-                                              var newEntry = s.withField(new UnknownField("library"), db.getDatabasePath().map(Path::toString).orElse(""));
+                                              var newEntry = s.withField(new UnknownField("library"), db.getDatabasePath().map(Path::toString).orElse("adf"));
                                               return newEntry;
                                           })
                                           .collect(Collectors.toList());
@@ -308,8 +311,7 @@ public class GlobalSearchBar extends HBox {
 
                 context.getDatabase().insertEntries(result);
             }
-
-            this.stateManager.globalSearchDlg.showMainTable(context);
+            stateManager.globalSearchDlg.addEntriesToBibContext(context);
 
         }
         //stateManager.setSearchQuery(searchQuery);

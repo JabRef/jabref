@@ -30,6 +30,7 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 import javafx.util.Duration;
@@ -63,6 +64,7 @@ import org.slf4j.LoggerFactory;
  * advised to rather create a new sub class of {@link FXDialog}.
  */
 public class JabRefDialogService implements DialogService {
+
     // Snackbar dialog maximum size
     public static final int DIALOG_SIZE_LIMIT = 300;
 
@@ -270,6 +272,20 @@ public class JabRefDialogService implements DialogService {
         alert.initOwner(mainWindow);
         preferences.getTheme().installCss(alert.getDialogPane().getScene());
         return alert.showAndWait();
+    }
+
+    @Override
+    public void showCustomDialog(String title, DialogPane contentPane,
+                                 ButtonType... buttonTypes) {
+        FXDialog alert = new FXDialog(AlertType.NONE, title);
+        alert.initModality(Modality.NONE);
+        alert.setDialogPane(contentPane);
+        alert.getButtonTypes().setAll(buttonTypes);
+        alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
+        alert.setResizable(true);
+        alert.initOwner(mainWindow);
+        preferences.getTheme().installCss(alert.getDialogPane().getScene());
+        alert.show();
     }
 
     @Override
