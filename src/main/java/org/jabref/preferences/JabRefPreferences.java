@@ -68,9 +68,9 @@ import org.jabref.logic.cleanup.FieldFormatterCleanups;
 import org.jabref.logic.exporter.SavePreferences;
 import org.jabref.logic.exporter.TemplateExporter;
 import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.fetcher.DoiFetcher;
 import org.jabref.logic.importer.fileformat.CustomImporter;
-import org.jabref.logic.importer.importsettings.ImportSettingsPreferences;
 import org.jabref.logic.journals.JournalAbbreviationPreferences;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Language;
@@ -416,6 +416,7 @@ public class JabRefPreferences implements PreferencesService {
     private Set<CustomImporter> customImporters;
     private String userName;
     private AppearancePreferences appearancePreferences;
+    private ImporterPreferences importerPreferences;
 
     // The constructor is made private to enforce this as a singleton class:
     private JabRefPreferences() {
@@ -2722,24 +2723,23 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     //*************************************************************************************************************
-    // Import preferences
+    // Importer preferences
     //*************************************************************************************************************
 
     @Override
-    public void storeImportSettingsPreferences(ImportSettingsPreferences preferences) {
-        putBoolean(GENERATE_KEY_ON_IMPORT, preferences.generateNewKeyOnImport());
-        putBoolean(GROBID_ENABLED, preferences.isGrobidEnabled());
-        putBoolean(GROBID_OPT_OUT, preferences.isGrobidOptOut());
-        put(GROBID_URL, preferences.getGrobidURL());
-    }
-
-    @Override
-    public ImportSettingsPreferences getImportSettingsPreferences() {
-        return new ImportSettingsPreferences(
+    public ImporterPreferences getImporterPreferences() {
+        importerPreferences = Objects.requireNonNullElseGet(importerPreferences, () -> new ImporterPreferences(
                 getBoolean(GENERATE_KEY_ON_IMPORT),
                 getBoolean(GROBID_ENABLED),
                 getBoolean(GROBID_OPT_OUT),
                 get(GROBID_URL)
-        );
+        ));
+
+        EasyBind.subscribe(importerPreferences.generateNewKeyOnImportProperty(), newValue -> putBoolean(GENERATE_KEY_ON_IMPORT, newValue));
+        EasyBind.subscribe(importerPreferences.grobidEnabledProperty(), newValue -> putBoolean(GROBID_ENABLED, newValue));
+        EasyBind.subscribe(importerPreferences.grobidOptOutProperty(), newValue -> putBoolean(GROBID_OPT_OUT, newValue));
+        EasyBind.subscribe(importerPreferences.grobidURLProperty(), newValue -> put(GROBID_URL, newValue));
+
+        return importerPreferences;
     }
 }

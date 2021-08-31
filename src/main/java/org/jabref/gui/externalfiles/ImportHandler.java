@@ -58,7 +58,7 @@ public class ImportHandler {
 
         this.linker = new ExternalFilesEntryLinker(externalFileTypes, preferencesService.getFilePreferences(), database);
         this.contentImporter = new ExternalFilesContentImporter(
-                preferencesService.getImportSettingsPreferences(),
+                preferencesService.getImporterPreferences(),
                 preferencesService.getImportFormatPreferences());
         this.undoManager = undoManager;
     }
@@ -175,7 +175,7 @@ public class ImportHandler {
                 preferencesService.getTimestampPreferences());
 
         // Generate citation keys
-        if (preferencesService.getImportSettingsPreferences().generateNewKeyOnImport()) {
+        if (preferencesService.getImporterPreferences().isGenerateNewKeyOnImport()) {
             generateKeys(entries);
         }
 
@@ -185,8 +185,7 @@ public class ImportHandler {
 
     private void addToGroups(List<BibEntry> entries, Collection<GroupTreeNode> groups) {
         for (GroupTreeNode node : groups) {
-            if (node.getGroup() instanceof GroupEntryChanger) {
-                GroupEntryChanger entryChanger = (GroupEntryChanger) node.getGroup();
+            if (node.getGroup() instanceof GroupEntryChanger entryChanger) {
                 List<FieldChange> undo = entryChanger.add(entries);
                 // TODO: Add undo
                 // if (!undo.isEmpty()) {
