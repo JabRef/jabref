@@ -104,7 +104,7 @@ public class WriteMetadataToPdfAction extends SimpleCommand {
             } else {
                 boolean confirm = dialogService.showConfirmationDialogAndWait(
                         Localization.lang("Write metadata to PDF files"),
-                        Localization.lang("Write metadata to all PDFs in current library?"));
+                        Localization.lang("Write metadata for all PDFs in current library?"));
                 if (confirm) {
                     shouldContinue = false;
                     return;
