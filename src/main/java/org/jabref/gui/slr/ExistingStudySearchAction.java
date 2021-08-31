@@ -125,8 +125,6 @@ public class ExistingStudySearchAction extends SimpleCommand {
      * @return Path of current panel database directory or the standard working directory
      */
     private Path getInitialDirectory(Path standardWorkingDirectory) {
-        return stateManager.getActiveDatabase().map(database -> database.getDatabasePath().map(Path::getParent)
-                                                                        .orElse(standardWorkingDirectory))
-                           .orElse(standardWorkingDirectory);
+        return stateManager.getActiveDatabase().flatMap(database -> database.getDatabasePath().map(Path::getParent)).orElse(standardWorkingDirectory);
     }
 }
