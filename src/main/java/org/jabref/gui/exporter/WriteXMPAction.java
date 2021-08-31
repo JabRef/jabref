@@ -30,6 +30,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.xmp.XmpUtilWriter;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.preferences.PreferencesService;
 
 import static org.jabref.gui.actions.ActionHelper.needsDatabase;
 
@@ -37,6 +38,7 @@ public class WriteXMPAction extends SimpleCommand {
 
     private final StateManager stateManager;
     private final DialogService dialogService;
+    private final PreferencesService preferencesService;
 
     private OptionsDialog optionsDialog;
 
@@ -48,9 +50,10 @@ public class WriteXMPAction extends SimpleCommand {
     private int entriesChanged;
     private int errors;
 
-    public WriteXMPAction(StateManager stateManager, DialogService dialogService) {
+    public WriteXMPAction(StateManager stateManager, DialogService dialogService, PreferencesService preferencesService) {
         this.stateManager = stateManager;
         this.dialogService = dialogService;
+        this.preferencesService = preferencesService;
 
         this.executable.bind(needsDatabase(stateManager));
     }
@@ -111,7 +114,7 @@ public class WriteXMPAction extends SimpleCommand {
             // Make a list of all PDFs linked from this entry:
             List<Path> files = entry.getFiles().stream()
                                     .filter(file -> file.getFileType().equalsIgnoreCase("pdf"))
-                                    .map(file -> file.findIn(stateManager.getActiveDatabase().get(), Globals.prefs.getFilePreferences()))
+                                    .map(file -> file.findIn(stateManager.getActiveDatabase().get(), preferencesService.getFilePreferences()))
                                     .filter(Optional::isPresent)
                                     .map(Optional::get)
                                     .collect(Collectors.toList());
@@ -127,7 +130,7 @@ public class WriteXMPAction extends SimpleCommand {
                 for (Path file : files) {
                     if (Files.exists(file)) {
                         try {
-                            XmpUtilWriter.writeXmp(file, entry, database, Globals.prefs.getXmpPreferences());
+                            XmpUtilWriter.writeXmp(file, entry, database, preferencesService.getXmpPreferences());
                             Platform.runLater(
                                     () -> optionsDialog.getProgressArea().appendText("  " + Localization.lang("OK") + ".\n"));
                             entriesChanged++;

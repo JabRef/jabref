@@ -608,14 +608,12 @@ public class JabRefFrame extends BorderPane {
          * cut/paste/copy operations would some times occur in the wrong tab.
          */
         EasyBind.subscribe(tabbedPane.getSelectionModel().selectedItemProperty(), tab -> {
-            if ((tab == null) || (!(tab instanceof LibraryTab))) {
+            if (!(tab instanceof LibraryTab libraryTab)) {
                 stateManager.setSelectedEntries(Collections.emptyList());
                 mainStage.titleProperty().unbind();
                 mainStage.setTitle(FRAME_TITLE);
                 return;
             }
-
-            LibraryTab libraryTab = (LibraryTab) tab;
 
             // Poor-mans binding to global state
             stateManager.setSelectedEntries(libraryTab.getSelectedEntries());
@@ -812,7 +810,7 @@ public class JabRefFrame extends BorderPane {
 
                 new SeparatorMenuItem(),
 
-                factory.createMenuItem(StandardActions.WRITE_XMP, new WriteXMPAction(stateManager, dialogService)),
+                factory.createMenuItem(StandardActions.WRITE_XMP, new WriteXMPAction(stateManager, dialogService, prefs)),
                 factory.createMenuItem(StandardActions.COPY_LINKED_FILES, new CopyFilesAction(dialogService, prefs, stateManager)),
 
                 new SeparatorMenuItem(),
