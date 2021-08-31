@@ -418,6 +418,7 @@ public class JabRefPreferences implements PreferencesService {
     private AppearancePreferences appearancePreferences;
     private ImporterPreferences importerPreferences;
     private ProtectedTermsPreferences protectedTermsPreferences;
+    private MrDlibPreferences mrDlibPreferences;
 
     // The constructor is made private to enforce this as a singleton class:
     private JabRefPreferences() {
@@ -2681,19 +2682,22 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public MrDlibPreferences getMrDlibPreferences() {
-        return new MrDlibPreferences(
+        if (Objects.nonNull(mrDlibPreferences)) {
+            return mrDlibPreferences;
+        }
+
+        mrDlibPreferences = new MrDlibPreferences(
                 getBoolean(ACCEPT_RECOMMENDATIONS),
                 getBoolean(SEND_LANGUAGE_DATA),
                 getBoolean(SEND_OS_DATA),
                 getBoolean(SEND_TIMEZONE_DATA));
-    }
 
-    @Override
-    public void storeMrDlibPreferences(MrDlibPreferences preferences) {
-        putBoolean(ACCEPT_RECOMMENDATIONS, preferences.shouldAcceptRecommendations());
-        putBoolean(SEND_LANGUAGE_DATA, preferences.shouldSendLanguage());
-        putBoolean(SEND_OS_DATA, preferences.shouldSendOs());
-        putBoolean(SEND_TIMEZONE_DATA, preferences.shouldSendTimezone());
+        EasyBind.subscribe(mrDlibPreferences.acceptRecommendationsProperty(), newValue -> putBoolean(ACCEPT_RECOMMENDATIONS, newValue));
+        EasyBind.subscribe(mrDlibPreferences.sendLanguageProperty(), newValue -> putBoolean(SEND_LANGUAGE_DATA, newValue));
+        EasyBind.subscribe(mrDlibPreferences.sendOsProperty(), newValue -> putBoolean(SEND_OS_DATA, newValue));
+        EasyBind.subscribe(mrDlibPreferences.sendTimezoneProperty(), newValue -> putBoolean(SEND_TIMEZONE_DATA, newValue));
+
+        return mrDlibPreferences;
     }
 
     @Override

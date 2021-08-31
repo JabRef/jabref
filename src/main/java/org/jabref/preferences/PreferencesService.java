@@ -371,8 +371,6 @@ public interface PreferencesService {
 
     MrDlibPreferences getMrDlibPreferences();
 
-    void storeMrDlibPreferences(MrDlibPreferences preferences);
-
     String getIdBasedFetcherForEntryGenerator();
 
     void storeIdBasedFetcherForEntryGenerator(String fetcherName);

@@ -211,11 +211,11 @@ public class RelatedArticlesTab extends EntryEditorTab {
         vb.setSpacing(10);
 
         button.setOnAction(event -> {
-            preferencesService.storeMrDlibPreferences(new MrDlibPreferences(
-                    true,
-                    cbLanguage.isSelected(),
-                    cbOS.isSelected(),
-                    cbTimezone.isSelected()));
+            MrDlibPreferences mrDlibPreferences = preferencesService.getMrDlibPreferences();
+            mrDlibPreferences.setAcceptRecommendations(true);
+            mrDlibPreferences.setSendLanguage(cbLanguage.isSelected());
+            mrDlibPreferences.setSendOs(cbOS.isSelected());
+            mrDlibPreferences.setSendTimezone(cbTimezone.isSelected());
 
             dialogService.showWarningDialogAndWait(Localization.lang("Restart"), Localization.lang("Please restart JabRef for preferences to take effect."));
             setContent(getRelatedArticlesPane(entry));
