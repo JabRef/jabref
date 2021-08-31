@@ -72,8 +72,7 @@ modularity.disableEffectiveArgumentsAdjustment()
 sourceSets {
     main {
         java {
-            // src-gen reasoning: https://stackoverflow.com/a/64612308/873282
-            srcDirs = ["src/main/java", "src-gen/main/java"]
+            srcDirs = ["src/main/java", "src/main/generated"]
         }
         resources {
             srcDirs = ["src/main/java", "src/main/resources"]
@@ -270,7 +269,6 @@ task checkOutdatedDependencies(dependsOn: dependencyUpdates) {
 
 clean {
     delete "src/main/generated"
-    delete "src-gen"
 }
 
 processResources {
@@ -319,8 +317,8 @@ tasks.register("generateBstGrammarSource", JavaExec) {
     description = 'Generates BstLexer.java and BstParser.java from the Bst.g grammar file using antlr3.'
 
     inputs.dir('src/main/antlr3/org/jabref/bst/')
-    outputs.dir("src-gen/main/java/org/jabref/logic/bst/")
-    args = ["-o", "src-gen/main/java/org/jabref/logic/bst/" , "$projectDir/src/main/antlr3/org/jabref/bst/Bst.g" ]
+    outputs.dir("src/main/generated/org/jabref/logic/bst/")
+    args = ["-o", "src/main/generated/org/jabref/logic/bst/" , "$projectDir/src/main/antlr3/org/jabref/bst/Bst.g" ]
 }
 
 tasks.register("generateSearchGrammarSource", JavaExec) {
@@ -330,8 +328,8 @@ tasks.register("generateSearchGrammarSource", JavaExec) {
     description = "Generates java files for Search.g antlr4."
 
     inputs.dir("src/main/antlr4/org/jabref/search/")
-    outputs.dir("src-gen/main/java/org/jabref/search/")
-    args  = ["-o","src-gen/main/java/org/jabref/search" , "-visitor", "-no-listener", "-package", "org.jabref.search", "$projectDir/src/main/antlr4/org/jabref/search/Search.g4"]
+    outputs.dir("src/main/generated/org/jabref/search/")
+    args  = ["-o","src/main/generated/org/jabref/search" , "-visitor", "-no-listener", "-package", "org.jabref.search", "$projectDir/src/main/antlr4/org/jabref/search/Search.g4"]
 }
 
 task generateMedlineSource(type: XjcTask) {
@@ -339,7 +337,7 @@ task generateMedlineSource(type: XjcTask) {
     description = "Generates java files for the medline importer."
 
     schemaFile = "src/main/resources/xjc/medline/medline.xsd"
-    outputDirectory = "src-gen/main/java"
+    outputDirectory = "src/main/generated"
     javaPackage = "org.jabref.logic.importer.fileformat.medline"
 }
 
@@ -348,7 +346,7 @@ task generateBibtexmlSource(type: XjcTask) {
     description = "Generates java files for the bibtexml importer."
 
     schemaFile = "src/main/resources/xjc/bibtexml/bibtexml.xsd"
-    outputDirectory = "src-gen/main/java/"
+    outputDirectory = "src/main/generated/"
     javaPackage = "org.jabref.logic.importer.fileformat.bibtexml"
 }
 
@@ -357,7 +355,7 @@ task generateEndnoteSource(type: XjcTask) {
     description = "Generates java files for the endnote importer."
 
     schemaFile = "src/main/resources/xjc/endnote/endnote.xsd"
-    outputDirectory = "src-gen/main/java/"
+    outputDirectory = "src/main/generated/"
     javaPackage = "org.jabref.logic.importer.fileformat.endnote"
 }
 
@@ -367,7 +365,7 @@ task generateModsSource(type: XjcTask) {
 
     schemaFile = "src/main/resources/xjc/mods/mods-3-7.xsd"
     bindingFile = "src/main/resources/xjc/mods/mods-binding.xjb"
-    outputDirectory = "src-gen/main/java"
+    outputDirectory = "src/main/generated"
     javaPackage = "org.jabref.logic.importer.fileformat.mods"
     arguments = '-npa'
 }
@@ -391,7 +389,7 @@ compileJava {
     options.compilerArgs << "-Xlint:none"
     dependsOn "generateSource"
 
-    options.annotationProcessorGeneratedSourcesDirectory = file("src-gen/main/java")
+    options.annotationProcessorGeneratedSourcesDirectory = file("src/main/generated")
 
     moduleOptions {
         // TODO: Remove access to internal api
