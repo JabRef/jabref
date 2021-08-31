@@ -31,7 +31,7 @@ public class GlobalSearchResultDialog {
         this.externalFileTypes = externalFileTypes;
         this.undoManager = undoManager;
         this.dialogService = dialogService;
-        this.libColumn = new FieldColumn(MainTableColumnModel.parse("field:library"));
+        this.libColumn = new FieldColumn(MainTableColumnModel.parse("field:customlib"));
 
     }
 

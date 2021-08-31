@@ -1,6 +1,5 @@
 package org.jabref.gui;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -311,17 +310,9 @@ public class LibraryTab extends Tab {
             }
 
             // Unique path fragment
-            List<String> uniquePathParts = FileUtil.uniquePathSubstrings(collectAllDatabasePaths());
-            Optional<String> uniquePathPart = uniquePathParts.stream()
-                                                             .filter(part -> databasePath.toString().contains(part)
-                                                                     && !part.equals(fileName) && part.contains(File.separator))
-                                                             .findFirst();
-            if (uniquePathPart.isPresent()) {
-                String uniquePath = uniquePathPart.get();
-                // remove filename
-                uniquePath = uniquePath.substring(0, uniquePath.lastIndexOf(File.separator));
-                tabTitle.append(" \u2013 ").append(uniquePath);
-            }
+            Optional<String> uniquePathPart = FileUtil.getUniquePathFragment(collectAllDatabasePaths(), databasePath);
+            uniquePathPart.ifPresent(part -> tabTitle.append(" \u2013 ").append(part));
+
         } else {
             if (databaseLocation == DatabaseLocation.LOCAL) {
                 tabTitle.append(Localization.lang("untitled"));

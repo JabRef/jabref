@@ -1,7 +1,6 @@
 package org.jabref.gui.search;
 
 import java.lang.reflect.Field;
-import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
@@ -54,6 +53,7 @@ import org.jabref.gui.util.IconValidationDecorator;
 import org.jabref.gui.util.TooltipTextUtil;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.search.SearchQuery;
+import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.Author;
 import org.jabref.model.entry.BibEntry;
@@ -312,7 +312,7 @@ public class GlobalSearchBar extends HBox {
 
                 List<BibEntry> result = db.getEntries().stream().filter(entry -> isMatched(stateManager.activeGroupProperty(), stateManager.activeSearchQueryProperty().get(), entry))
                                           .map(s -> {
-                                              var newEntry = s.withField(new UnknownField("library"), db.getDatabasePath().map(Path::toString).orElse("adf"));
+                                              BibEntry newEntry = s.withField(new UnknownField("customlib"), FileUtil.getBaseName(db.getDatabasePath().orElse(null)));
                                               return newEntry;
                                           })
                                           .collect(Collectors.toList());
