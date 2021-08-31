@@ -8,10 +8,8 @@ import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableView;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
-import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.maintable.BibEntryTableViewModel;
 import org.jabref.gui.maintable.MainTable;
 import org.jabref.gui.maintable.MainTableColumnFactory;
@@ -25,25 +23,22 @@ import org.jabref.preferences.PreferencesService;
 public class SearchResultsTable extends TableView<BibEntryTableViewModel> {
 
     private final DialogService dialogService;
-    private final LibraryTab libraryTab;
     private final BibDatabaseContext database;
     private final MainTableDataModel model;
 
     public SearchResultsTable(MainTableDataModel model,
                      BibDatabaseContext database,
                      PreferencesService preferencesService,
-                     LibraryTab libraryTab,
+                     UndoManager undoManager,
                      DialogService dialogService,
                      StateManager stateManager,
-                     ExternalFileTypes externalFileTypes,
-                     KeyBindingRepository keyBindingRepository) {
+                     ExternalFileTypes externalFileTypes) {
         super();
 
-        this.libraryTab = libraryTab;
+
         this.dialogService = dialogService;
         this.database = Objects.requireNonNull(database);
         this.model = model;
-        UndoManager undoManager = libraryTab.getUndoManager();
         MainTablePreferences mainTablePreferences = preferencesService.getMainTablePreferences();
 
 
@@ -52,7 +47,7 @@ public class SearchResultsTable extends TableView<BibEntryTableViewModel> {
                                          database,
                                          preferencesService,
                                          externalFileTypes,
-                                         libraryTab.getUndoManager(),
+                                         undoManager,
                                          dialogService,
                                          stateManager).createColumns());
 

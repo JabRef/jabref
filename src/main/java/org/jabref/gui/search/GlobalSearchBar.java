@@ -104,6 +104,7 @@ public class GlobalSearchBar extends HBox {
 
     private final GroupViewMode groupViewMode;
 
+
     public GlobalSearchBar(JabRefFrame frame, StateManager stateManager, PreferencesService preferencesService) {
         super();
         this.stateManager = stateManager;
@@ -158,6 +159,7 @@ public class GlobalSearchBar extends HBox {
         fulltextButton.visibleProperty().unbind();
         fulltextButton.visibleProperty().bind(focusedOrActive);
         globalModeButton.visibleProperty().bind(focusedOrActive);
+
 
         StackPane modifierButtons = new StackPane(new HBox(regularExpressionButton, caseSensitiveButton, fulltextButton, globalModeButton));
         modifierButtons.setAlignment(Pos.CENTER);
@@ -229,7 +231,7 @@ public class GlobalSearchBar extends HBox {
 
         globalModeButton.setOnAction(evt -> {
             this.stateManager.setGlobalSearchActive(true);
-            this.stateManager.globalSearchDlg.showMainTable();
+            this.stateManager.getGlobalSearchDialog().showMainTable();
 
             performSearch();
 
@@ -300,7 +302,6 @@ public class GlobalSearchBar extends HBox {
         }
         stateManager.setSearchQuery(searchQuery);
 
-
     }
 
     private void updateGlobalSearchResults() {
@@ -319,7 +320,7 @@ public class GlobalSearchBar extends HBox {
 
                 context.getDatabase().insertEntries(result);
             }
-            stateManager.globalSearchDlg.addEntriesToBibContext(context);
+            this.stateManager.getGlobalSearchDialog().addEntriesToBibContext(context);
 
         }
 

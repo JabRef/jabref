@@ -1,13 +1,13 @@
 package org.jabref.gui.search;
 
+import javax.swing.undo.UndoManager;
+
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.DialogPane;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
-import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.maintable.MainTableColumnModel;
 import org.jabref.gui.maintable.MainTableDataModel;
 import org.jabref.gui.maintable.columns.FieldColumn;
@@ -19,19 +19,17 @@ public class GlobalSearchResultDialog {
     private final ExternalFileTypes externalFileTypes;
     private final PreferencesService preferencesService;
     private final StateManager stateManager;
-    private final KeyBindingRepository keybindingRepo;
     private final BibDatabaseContext context;
-    private final LibraryTab libraryTab;
     private final DialogService dialogService;
     private final FieldColumn libColumn;
+    private final UndoManager undoManager;
 
-    public GlobalSearchResultDialog(BibDatabaseContext context, PreferencesService preferencesService, StateManager stateManager, ExternalFileTypes externalFileTypes, KeyBindingRepository repo, LibraryTab tab, DialogService dialogService) {
+    public GlobalSearchResultDialog(PreferencesService preferencesService, StateManager stateManager, ExternalFileTypes externalFileTypes, UndoManager undoManager, DialogService dialogService) {
         this.context = new BibDatabaseContext();
         this.preferencesService = preferencesService;
         this.stateManager = stateManager;
         this.externalFileTypes = externalFileTypes;
-        this.keybindingRepo = repo;
-        this.libraryTab = tab;
+        this.undoManager = undoManager;
         this.dialogService = dialogService;
         this.libColumn = new FieldColumn(MainTableColumnModel.parse("field:library"));
 
@@ -40,7 +38,7 @@ public class GlobalSearchResultDialog {
     void showMainTable() {
 
         MainTableDataModel model = new MainTableDataModel(context, preferencesService, stateManager);
-        SearchResultsTable m = new SearchResultsTable(model, context, preferencesService, libraryTab, dialogService, stateManager, externalFileTypes, keybindingRepo);
+        SearchResultsTable m = new SearchResultsTable(model, context, preferencesService, undoManager, dialogService, stateManager, externalFileTypes);
 
         m.getColumns().add(0, libColumn);
 
