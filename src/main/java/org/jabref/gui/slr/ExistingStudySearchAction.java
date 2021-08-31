@@ -7,6 +7,7 @@ import java.util.Optional;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefFrame;
+import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
 import org.jabref.gui.util.BackgroundTask;
@@ -38,19 +39,26 @@ public class ExistingStudySearchAction extends SimpleCommand {
     private final FileUpdateMonitor fileUpdateMonitor;
     private final TaskExecutor taskExecutor;
     private final PreferencesService preferencesService;
-    private final ImportFormatPreferences importFormatPreferneces;
+    private final StateManager stateManager;
+    private final ImportFormatPreferences importFormatPreferences;
     private final SavePreferences savePreferences;
     // This can be either populated before crawl is called or is populated in the call using the directory dialog. This is helpful if the directory is selected in a previous dialog/UI element
 
-    public ExistingStudySearchAction(JabRefFrame frame, FileUpdateMonitor fileUpdateMonitor, TaskExecutor taskExecutor, PreferencesService preferencesService) {
+    public ExistingStudySearchAction(JabRefFrame frame,
+                                     FileUpdateMonitor fileUpdateMonitor,
+                                     TaskExecutor taskExecutor,
+                                     PreferencesService preferencesService,
+                                     StateManager stateManager) {
         this.frame = frame;
         this.dialogService = frame.getDialogService();
         this.fileUpdateMonitor = fileUpdateMonitor;
-        this.workingDirectory = getInitialDirectory(preferencesService.getWorkingDir());
         this.taskExecutor = taskExecutor;
         this.preferencesService = preferencesService;
-        this.importFormatPreferneces = preferencesService.getImportFormatPreferences();
+        this.stateManager = stateManager;
+        this.importFormatPreferences = preferencesService.getImportFormatPreferences();
         this.savePreferences = preferencesService.getSavePreferences();
+
+        this.workingDirectory = getInitialDirectory(preferencesService.getWorkingDir());
     }
 
     @Override
@@ -83,7 +91,7 @@ public class ExistingStudySearchAction extends SimpleCommand {
         }
         final Crawler crawler;
         try {
-            crawler = new Crawler(studyDirectory, new SlrGitHandler(studyDirectory), importFormatPreferneces, savePreferences, preferencesService.getTimestampPreferences(), new BibEntryTypesManager(), fileUpdateMonitor);
+            crawler = new Crawler(studyDirectory, new SlrGitHandler(studyDirectory), importFormatPreferences, savePreferences, preferencesService.getTimestampPreferences(), new BibEntryTypesManager(), fileUpdateMonitor);
         } catch (IOException | ParseException e) {
             LOGGER.error("Error during reading of study definition file.", e);
             dialogService.showErrorDialogAndWait(Localization.lang("Error during reading of study definition file."), e);
@@ -99,7 +107,7 @@ public class ExistingStudySearchAction extends SimpleCommand {
                           dialogService.showErrorDialogAndWait(Localization.lang("Error during persistence of crawling results."), e);
                       })
                       .onSuccess(unused -> {
-                          new OpenDatabaseAction(frame, preferencesService, dialogService).openFile(Path.of(studyDirectory.toString(), "studyResult.bib"), true);
+                          new OpenDatabaseAction(frame, preferencesService, dialogService, stateManager).openFile(Path.of(studyDirectory.toString(), "studyResult.bib"), true);
                           // If  finished reset command object for next use
                           studyDirectory = null;
                       })
@@ -117,11 +125,6 @@ public class ExistingStudySearchAction extends SimpleCommand {
      * @return Path of current panel database directory or the standard working directory
      */
     private Path getInitialDirectory(Path standardWorkingDirectory) {
-        if (frame.getBasePanelCount() == 0) {
-            return standardWorkingDirectory;
-        } else {
-            Optional<Path> databasePath = frame.getCurrentLibraryTab().getBibDatabaseContext().getDatabasePath();
-            return databasePath.map(Path::getParent).orElse(standardWorkingDirectory);
-        }
+        return stateManager.getActiveDatabase().flatMap(database -> database.getDatabasePath().map(Path::getParent)).orElse(standardWorkingDirectory);
     }
 }

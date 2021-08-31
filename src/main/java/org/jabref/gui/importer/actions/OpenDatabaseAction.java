@@ -18,6 +18,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.Globals;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.LibraryTab;
+import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.dialogs.BackupUIManager;
 import org.jabref.gui.shared.SharedDatabaseUIManager;
@@ -51,12 +52,14 @@ public class OpenDatabaseAction extends SimpleCommand {
 
     private final JabRefFrame frame;
     private final PreferencesService preferencesService;
+    private final StateManager stateManager;
     private final DialogService dialogService;
 
-    public OpenDatabaseAction(JabRefFrame frame, PreferencesService preferencesService, DialogService dialogService) {
+    public OpenDatabaseAction(JabRefFrame frame, PreferencesService preferencesService, DialogService dialogService, StateManager stateManager) {
         this.frame = frame;
         this.preferencesService = preferencesService;
         this.dialogService = dialogService;
+        this.stateManager = stateManager;
     }
 
     /**
@@ -168,7 +171,7 @@ public class OpenDatabaseAction extends SimpleCommand {
 
         BackgroundTask<ParserResult> backgroundTask = BackgroundTask.wrap(() -> loadDatabase(file));
         LibraryTab.Factory libraryTabFactory = new LibraryTab.Factory();
-        LibraryTab newTab = libraryTabFactory.createLibraryTab(frame, preferencesService, file, backgroundTask);
+        LibraryTab newTab = libraryTabFactory.createLibraryTab(frame, preferencesService, stateManager, file, backgroundTask);
 
         backgroundTask.onFinished(() -> trackOpenNewDatabase(newTab));
     }
