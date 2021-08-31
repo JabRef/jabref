@@ -9,7 +9,6 @@ import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.OpenDatabase;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.PdfMergeMetadataImporter;
-import org.jabref.logic.importer.importsettings.ImportSettingsPreferences;
 import org.jabref.model.util.FileUpdateMonitor;
 
 public class ExternalFilesContentImporter {
