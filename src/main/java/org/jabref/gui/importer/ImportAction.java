@@ -1,6 +1,5 @@
 package org.jabref.gui.importer;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -133,7 +132,7 @@ public class ImportAction {
                         frame.getDialogService().notify(Localization.lang("Importing in %0 format", importer.get().getName()) + "...");
                     });
                     // Specific importer:
-                    ParserResult pr = importer.get().importDatabase(filename, Globals.prefs.getDefaultEncoding());
+                    ParserResult pr = importer.get().importDatabase(filename, prefs.getDefaultEncoding());
                     imports.add(new ImportFormatReader.UnknownFormatImport(importer.get().getName(), pr));
                 }
             } catch (ImportException | IOException e) {
@@ -165,7 +164,7 @@ public class ImportAction {
                 new DatabaseMerger(prefs.getKeywordDelimiter()).mergeMetaData(
                         result.getMetaData(),
                         parserResult.getMetaData(),
-                        importResult.parserResult.getFile().map(File::getName).orElse("unknown"),
+                        importResult.parserResult.getPath().map(path -> path.getFileName().toString()).orElse("unknown"),
                         parserResult.getDatabase().getEntries());
             }
             // TODO: collect errors into ParserResult, because they are currently ignored (see caller of this method)

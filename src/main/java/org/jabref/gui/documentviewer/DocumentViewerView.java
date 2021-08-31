@@ -21,6 +21,7 @@ import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.LinkedFile;
+import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
 
@@ -36,6 +37,8 @@ public class DocumentViewerView extends BaseDialog<Void> {
 
     @Inject private StateManager stateManager;
     @Inject private TaskExecutor taskExecutor;
+    @Inject private PreferencesService preferencesService;
+
     private DocumentViewerControl viewer;
     private DocumentViewerViewModel viewModel;
 
@@ -54,7 +57,7 @@ public class DocumentViewerView extends BaseDialog<Void> {
 
     @FXML
     private void initialize() {
-        viewModel = new DocumentViewerViewModel(stateManager);
+        viewModel = new DocumentViewerViewModel(stateManager, preferencesService);
 
         setupViewer();
         setupScrollbar();

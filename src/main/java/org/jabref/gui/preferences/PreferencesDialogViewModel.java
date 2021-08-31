@@ -173,7 +173,8 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
         LayoutFormatterPreferences layoutPreferences = preferences.getLayoutFormatterPreferences(Globals.journalAbbreviationRepository);
         SavePreferences savePreferences = preferences.getSavePreferencesForExport();
         XmpPreferences xmpPreferences = preferences.getXmpPreferences();
-        Globals.exportFactory = ExporterFactory.create(customExporters, layoutPreferences, savePreferences, xmpPreferences);
+        Globals.exportFactory = ExporterFactory.create(customExporters, layoutPreferences, savePreferences,
+                xmpPreferences, preferences.getDefaultBibDatabaseMode(), Globals.entryTypesManager);
 
         ExternalApplicationsPreferences externalApplicationsPreferences = preferences.getExternalApplicationsPreferences();
         PushToApplicationsManager manager = frame.getPushToApplicationsManager();
