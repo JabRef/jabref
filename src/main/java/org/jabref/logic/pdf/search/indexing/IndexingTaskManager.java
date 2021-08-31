@@ -39,7 +39,7 @@ public class IndexingTaskManager extends BackgroundTask<Void> {
             isRunning = true;
         }
         updateProgress();
-        while (!taskQueue.isEmpty()) {
+        while (!taskQueue.isEmpty() && !isCanceled()) {
             taskQueue.poll().run();
             numOfIndexedFiles++;
             updateProgress();
