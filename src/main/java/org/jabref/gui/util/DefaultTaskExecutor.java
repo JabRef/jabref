@@ -154,7 +154,7 @@ public class DefaultTaskExecutor implements TaskExecutor {
                         cancel();
                     }
                 });
-                onCancelledProperty().addListener((observable, oldValue, newValue) -> task.cancel());
+                setOnCancelled(event -> task.cancel());
             }
 
             @Override
