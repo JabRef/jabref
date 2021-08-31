@@ -32,6 +32,7 @@ import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
 import org.jabref.gui.maintable.MainTable;
 import org.jabref.gui.maintable.MainTableDataModel;
+import org.jabref.gui.search.GlobalSearchResultDialog;
 import org.jabref.gui.specialfields.SpecialFieldDatabaseChangeListener;
 import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.undo.NamedCompound;
@@ -108,7 +109,7 @@ public class LibraryTab extends Tab {
     // initializing it so we prevent NullPointerException
     private BackgroundTask<ParserResult> dataLoadingTask = BackgroundTask.wrap(() -> null);
 
-    private IndexingTaskManager indexingTaskManager = new IndexingTaskManager(Globals.TASK_EXECUTOR);
+    private final IndexingTaskManager indexingTaskManager = new IndexingTaskManager(Globals.TASK_EXECUTOR);
 
     public LibraryTab(JabRefFrame frame,
                       PreferencesService preferencesService,
@@ -126,6 +127,8 @@ public class LibraryTab extends Tab {
 
         this.sidePaneManager = frame.getSidePaneManager();
         this.tableModel = new MainTableDataModel(getBibDatabaseContext(), preferencesService, Globals.stateManager);
+
+        Globals.stateManager.globalSearchDlg = new GlobalSearchResultDialog(bibDatabaseContext, preferencesService, Globals.stateManager, externalFileTypes, Globals.getKeyPrefs(), this, this.dialogService);
 
         citationStyleCache = new CitationStyleCache(bibDatabaseContext);
         annotationCache = new FileAnnotationCache(bibDatabaseContext, preferencesService.getFilePreferences());

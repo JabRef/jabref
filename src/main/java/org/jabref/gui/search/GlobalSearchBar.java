@@ -46,8 +46,6 @@ import org.jabref.gui.groups.GroupViewMode;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.keyboard.KeyBindingRepository;
-import org.jabref.gui.maintable.MainTable;
-import org.jabref.gui.maintable.MainTableDataModel;
 import org.jabref.gui.search.rules.describer.SearchDescribers;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.DefaultTaskExecutor;
@@ -147,6 +145,7 @@ public class GlobalSearchBar extends HBox {
                                                     .or(regularExpressionButton.focusedProperty())
                                                     .or(caseSensitiveButton.focusedProperty())
                                                     .or(fulltextButton.focusedProperty())
+                                                    .or(globalModeButton.focusedProperty())
                                                     .or(searchField.textProperty()
                                                                    .isNotEmpty());
 
@@ -156,6 +155,7 @@ public class GlobalSearchBar extends HBox {
         caseSensitiveButton.visibleProperty().bind(focusedOrActive);
         fulltextButton.visibleProperty().unbind();
         fulltextButton.visibleProperty().bind(focusedOrActive);
+        globalModeButton.visibleProperty().bind(focusedOrActive);
 
         StackPane modifierButtons = new StackPane(new HBox(regularExpressionButton, caseSensitiveButton, fulltextButton, globalModeButton));
         modifierButtons.setAlignment(Pos.CENTER);
@@ -294,25 +294,31 @@ public class GlobalSearchBar extends HBox {
             informUserAboutInvalidSearchQuery();
             return;
         }
-        stateManager.setSearchQuery(searchQuery);
-
 
         if(stateManager.isGlobalSearchActive()) {
             BibDatabaseContext context = new BibDatabaseContext();
 
             for (var db : this.stateManager.getOpenDatabases()) {
 
-               var result = db.getEntries().stream().filter(entry-> isMatched(stateManager.activeGroupProperty(), stateManager.activeSearchQueryProperty().get(), entry)).collect(Collectors.toList());
-               LOGGER.debug("DB: {} and number found {}", db.getDatabasePath(), result.size());
+                List<BibEntry> result = db.getEntries().stream().filter(entry -> isMatched(stateManager.activeGroupProperty(), Optional.of(searchQuery), entry))
+                    //.map(s->s = s.withField(new UnknownField("library"),db.getDatabasePath().map(Path::toString).orElse("")))
+                    .collect(Collectors.toList());
+                LOGGER.debug("DB: {} and number found {}", db.getDatabasePath(), result.size());
+
                context.getDatabase().insertEntries(result);
+
+
             }
 
-            MainTableDataModel model = new MainTableDataModel(context, preferencesService, stateManager);
-            MainTable m = new  MainTable(model, null, context, preferencesService, null, stateManager, null, null);
+            this.stateManager.globalSearchDlg.showMainTable(context);
 
 
 
         }
+        //stateManager.setSearchQuery(searchQuery);
+
+
+
     }
 
     private boolean isMatched(ObservableList<GroupTreeNode> groups, Optional<SearchQuery> query, BibEntry entry) {
