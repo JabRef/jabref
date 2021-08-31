@@ -378,6 +378,4 @@ public interface PreferencesService {
     void storeIdBasedFetcherForEntryGenerator(String fetcherName);
 
     ProtectedTermsPreferences getProtectedTermsPreferences();
-
-    void storeProtectedTermsPreferences(ProtectedTermsPreferences preferences);
 }

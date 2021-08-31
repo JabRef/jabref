@@ -417,6 +417,7 @@ public class JabRefPreferences implements PreferencesService {
     private String userName;
     private AppearancePreferences appearancePreferences;
     private ImporterPreferences importerPreferences;
+    private ProtectedTermsPreferences protectedTermsPreferences;
 
     // The constructor is made private to enforce this as a singleton class:
     private JabRefPreferences() {
@@ -2707,19 +2708,19 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public ProtectedTermsPreferences getProtectedTermsPreferences() {
-        return new ProtectedTermsPreferences(
+        protectedTermsPreferences = Objects.requireNonNullElseGet(protectedTermsPreferences, () -> new ProtectedTermsPreferences(
                 getStringList(PROTECTED_TERMS_ENABLED_INTERNAL),
                 getStringList(PROTECTED_TERMS_ENABLED_EXTERNAL),
                 getStringList(PROTECTED_TERMS_DISABLED_INTERNAL),
-                getStringList(PROTECTED_TERMS_DISABLED_EXTERNAL));
-    }
+                getStringList(PROTECTED_TERMS_DISABLED_EXTERNAL)
+        ));
 
-    @Override
-    public void storeProtectedTermsPreferences(ProtectedTermsPreferences preferences) {
-        putStringList(PROTECTED_TERMS_ENABLED_EXTERNAL, preferences.getEnabledExternalTermLists());
-        putStringList(PROTECTED_TERMS_DISABLED_EXTERNAL, preferences.getDisabledExternalTermLists());
-        putStringList(PROTECTED_TERMS_ENABLED_INTERNAL, preferences.getEnabledInternalTermLists());
-        putStringList(PROTECTED_TERMS_DISABLED_INTERNAL, preferences.getDisabledInternalTermLists());
+        EasyBind.subscribe(protectedTermsPreferences.enabledExternalTermListsProperty(), newValue -> putStringList(PROTECTED_TERMS_ENABLED_EXTERNAL, newValue));
+        EasyBind.subscribe(protectedTermsPreferences.disabledExternalTermListsProperty(), newValue -> putStringList(PROTECTED_TERMS_DISABLED_EXTERNAL, newValue));
+        EasyBind.subscribe(protectedTermsPreferences.enabledInternalTermListsProperty(), newValue -> putStringList(PROTECTED_TERMS_ENABLED_INTERNAL, newValue));
+        EasyBind.subscribe(protectedTermsPreferences.disabledInternalTermListsProperty(), newValue -> putStringList(PROTECTED_TERMS_DISABLED_INTERNAL, newValue));
+
+        return protectedTermsPreferences;
     }
 
     //*************************************************************************************************************

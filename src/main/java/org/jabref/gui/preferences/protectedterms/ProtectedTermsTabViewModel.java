@@ -36,6 +36,7 @@ public class ProtectedTermsTabViewModel implements PreferenceTabViewModel {
     private final ListProperty<ProtectedTermsList> termsFilesProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final PreferencesService preferences;
     private final DialogService dialogService;
+    private final ProtectedTermsPreferences protectedTermsPreferences;
 
     public ProtectedTermsTabViewModel(ProtectedTermsLoader termsLoader,
                                       DialogService dialogService,
@@ -43,6 +44,7 @@ public class ProtectedTermsTabViewModel implements PreferenceTabViewModel {
         this.termsLoader = termsLoader;
         this.dialogService = dialogService;
         this.preferences = preferences;
+        this.protectedTermsPreferences = preferences.getProtectedTermsPreferences();
     }
 
     @Override
@@ -72,14 +74,12 @@ public class ProtectedTermsTabViewModel implements PreferenceTabViewModel {
             }
         }
 
-        ProtectedTermsPreferences newPreferences = new ProtectedTermsPreferences(
-                enabledInternalList,
-                enabledExternalList,
-                disabledInternalList,
-                disabledExternalList);
+        protectedTermsPreferences.setEnabledInternalTermLists(enabledInternalList);
+        protectedTermsPreferences.setEnabledExternalTermLists(enabledExternalList);
+        protectedTermsPreferences.setDisabledInternalTermLists(disabledInternalList);
+        protectedTermsPreferences.setDisabledExternalTermLists(disabledExternalList);
 
-        preferences.storeProtectedTermsPreferences(newPreferences);
-        termsLoader.update(newPreferences);
+        termsLoader.update(protectedTermsPreferences);
     }
 
     public void addFile() {
