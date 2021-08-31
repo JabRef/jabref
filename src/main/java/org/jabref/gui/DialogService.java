@@ -174,7 +174,7 @@ public interface DialogService {
      *
      *
      */
-    void showCustomDialog(String title, DialogPane contentPane, ButtonType... buttonTypes);
+    void showNonModalCustomDialogAndWait(String title, DialogPane contentPane, ButtonType... buttonTypes);
 
     /**
      * This will create and display a new dialog of the specified

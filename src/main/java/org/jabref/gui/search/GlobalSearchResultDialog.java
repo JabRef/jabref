@@ -45,7 +45,7 @@ public class GlobalSearchResultDialog {
         DialogPane pane = new DialogPane();
         pane.setContent(m);
 
-        dialogService.showCustomDialog("Global search", pane, ButtonType.OK);
+        dialogService.showNonModalCustomDialogAndWait("Global search", pane, ButtonType.OK);
     }
 
     void addEntriesToBibContext(BibDatabaseContext ctx) {

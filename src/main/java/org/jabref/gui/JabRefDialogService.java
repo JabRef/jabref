@@ -275,7 +275,7 @@ public class JabRefDialogService implements DialogService {
     }
 
     @Override
-    public void showCustomDialog(String title, DialogPane contentPane,
+    public void showNonModalCustomDialogAndWait(String title, DialogPane contentPane,
                                  ButtonType... buttonTypes) {
         FXDialog alert = new FXDialog(AlertType.NONE, title);
         alert.initModality(Modality.NONE);
@@ -285,7 +285,7 @@ public class JabRefDialogService implements DialogService {
         alert.setResizable(true);
         alert.initOwner(mainWindow);
         preferences.getTheme().installCss(alert.getDialogPane().getScene());
-        alert.show();
+        alert.showAndWait();
     }
 
     @Override
