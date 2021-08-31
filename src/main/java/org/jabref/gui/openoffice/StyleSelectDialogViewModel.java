@@ -96,7 +96,7 @@ public class StyleSelectDialogViewModel {
         OOBibStyle style = selectedItem.getValue().getStyle();
         Optional<ExternalFileType> type = ExternalFileTypes.getInstance().getExternalFileTypeByExt("jstyle");
         try {
-            JabRefDesktop.openExternalFileAnyFormat(new BibDatabaseContext(), style.getPath(), type);
+            JabRefDesktop.openExternalFileAnyFormat(new BibDatabaseContext(), preferencesService, style.getPath(), type);
         } catch (IOException e) {
             dialogService.showErrorDialogAndWait(e);
         }
