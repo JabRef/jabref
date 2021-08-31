@@ -395,8 +395,8 @@ public class EntryEditor extends BorderPane {
     public void setFocusToField(Field field) {
         DefaultTaskExecutor.runInJavaFXThread(() -> {
             for (Tab tab : tabbed.getTabs()) {
-                if ((tab instanceof FieldsEditorTab fieldsEditorTab) && ((FieldsEditorTab) tab).getShownFields()
-                                                                                               .contains(field)) {
+                if ((tab instanceof FieldsEditorTab fieldsEditorTab) && fieldsEditorTab.getShownFields()
+                                                                                     .contains(field)) {
                     tabbed.getSelectionModel().select(tab);
                     fieldsEditorTab.requestFocus(field);
                 }
