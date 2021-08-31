@@ -8,7 +8,6 @@ import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.OpenDatabase;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.PdfMergeMetadataImporter;
-import org.jabref.logic.importer.fileformat.PdfXmpImporter;
 import org.jabref.logic.importer.importsettings.ImportSettingsPreferences;
 import org.jabref.model.util.FileUpdateMonitor;
 
@@ -28,10 +27,6 @@ public class ExternalFilesContentImporter {
         } catch (IOException e) {
            return ParserResult.fromError(e);
         }
-    }
-
-    public ParserResult importXMPContent(Path file) {
-        return new PdfXmpImporter(importFormatPreferences.getXmpPreferences()).importDatabase(file, StandardCharsets.UTF_8);
     }
 
     public ParserResult importFromBibFile(Path bibFile, FileUpdateMonitor fileUpdateMonitor) throws IOException {
