@@ -132,7 +132,9 @@ public class JabRefMain extends Application {
                 preferences.getCustomExportFormats(Globals.journalAbbreviationRepository),
                 preferences.getLayoutFormatterPreferences(Globals.journalAbbreviationRepository),
                 preferences.getSavePreferencesForExport(),
-                preferences.getXmpPreferences());
+                preferences.getXmpPreferences(),
+                preferences.getDefaultBibDatabaseMode(),
+                Globals.entryTypesManager);
 
         // Initialize protected terms loader
         Globals.protectedTermsLoader = new ProtectedTermsLoader(preferences.getProtectedTermsPreferences());
