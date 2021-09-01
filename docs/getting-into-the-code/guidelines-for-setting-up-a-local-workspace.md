@@ -155,16 +155,7 @@ To use IntelliJ IDEA's internal build system when you build JabRef through **Bui
 
   ![Ignore the Gradle project &quot;buildSrc&quot;](../.gitbook/assets/intellij-gradle-config-ignore-buildSrc%20%282%29%20%282%29%20%282%29%20%283%29%20%283%29%20%286%29%20%284%29.png)
 
-* Add `src-gen` as root:
-   1. Right click on the project "jabref".
-   2. Select "Open Module Settings"
-   3. Expand "JabRef"
-   4. Select "main"
-   5. Select tab "Sources"
-   6. Click "+ Add Content Root"
-   7. Select the `src-gen` directory
-   8. Click "OK". When expanding "main", "java" should have been selected as source
-   9. Click "OK" to save the changes
+* Add `src-gen` as root: 1. Right click on the project "jabref". 2. Select "Open Module Settings" 3. Expand "JabRef" 4. Select "main" 5. Select tab "Sources" 6. Click "+ Add Content Root" 7. Select the `src-gen` directory 8. Click "OK". When expanding "main", "java" should have been selected as source 9. Click "OK" to save the changes
 * In case the above step does not work, run with gradle, import gradle project again, and try again.
 * Delete `org.jabref.gui.logging.plugins.Log4jPlugins` \(location: `src-gen/main/java/org/jabref/gui/logging/plugins/Log4jPlugins.java`\). Otherwise, you will see following error:
 
@@ -256,6 +247,22 @@ Make sure your Eclipse installation us up to date.
 5. Optional: Install the [e\(fx\)clipse plugin](http://www.eclipse.org/efxclipse/index.html) from the Eclipse marketplace: 1. Help -&gt; Eclipse Marketplace... -&gt; Search tab 2. Enter "e\(fx\)clipse" in the search dialogue 3. Click "Go" 4. Click "Install" button next to the plugin 5. Click "Finish"
 6. Now you can build and run/debug the application by either using "JabRefLauncher" or "JabRefMain". This is the recommended way, since the application starts quite fast.
 
+### Localization Test Configuration \(IDEA\)
+
+TODO
+
+### Localization Test Configuration \(Eclipse\)
+
+To run the `LocalizationConsistencyTest`  you need to add some extra module information:  Right-click on the file -&gt; "Run/Debug as JUnit test".  Go to the Run/debug configuration created for that file and in the arguments tab under VM-configurations add:
+
+```text
+--add-exports javafx.graphics/com.sun.javafx.application=ALL-UNNAMED
+--add-exports javafx.graphics/com.sun.javafx.stage=ALL-UNNAMED
+--add-exports javafx.graphics/com.sun.javafx.stage=com.jfoenix
+```
+
+Now the test will run.
+
 ## Final comments
 
 Got it running? GREAT! You are ready to lurk the code and contribute to JabRef. Please make sure to also read our [contribution guide](https://github.com/JabRef/jabref/blob/master/CONTRIBUTING.md).
@@ -303,7 +310,7 @@ java.lang.module.FindException: Module org.jsoup not found, required by org.jabr
 
 This can include different modules.
 
-1. Go to File -> Invalidate caches...
+1. Go to File -&gt; Invalidate caches...
 2. Check "Clear file system cache and Local History".
 3. Check "Clear VCS Log caches and indexes".
 4. Uncheck the others.
@@ -324,9 +331,7 @@ As a workaround, you can remove all local openjfx artifacts by deleting the whol
 
 ### Issues with `JournalAbbreviationLoader`
 
-In case of a NPE at `Files.copy` at `org.jabref.logic.journals.JournalAbbreviationLoader.loadRepository(JournalAbbreviationLoader.java:30) ~[classes/:?]`,
-invalidate caches and restart IntelliJ.
-Then, Build -> Rebuild Project.
+In case of a NPE at `Files.copy` at `org.jabref.logic.journals.JournalAbbreviationLoader.loadRepository(JournalAbbreviationLoader.java:30) ~[classes/:?]`, invalidate caches and restart IntelliJ. Then, Build -&gt; Rebuild Project.
 
 If that does not help:
 
@@ -335,3 +340,4 @@ If that does not help:
 3. Delete all non-versioned items: `git clean -xdf`. This really destroys data
 4. Execute `./gradlew run`
 5. Start IntelliJ and try again.
+
