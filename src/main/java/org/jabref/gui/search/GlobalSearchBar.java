@@ -244,6 +244,7 @@ public class GlobalSearchBar extends HBox {
             globalSearchResultDialog = new GlobalSearchResultDialog(ExternalFileTypes.getInstance(), undoManager);
             performSearch();
             globalSearchResultDialog.updateSearch();
+            globalSearchResultDialog.showAndWait();
             this.stateManager.setGlobalSearchActive(false);
         });
     }

@@ -19,16 +19,14 @@ public class GlobalSearchResultDialogViewModel {
     }
 
     public void updateSearch() {
-        if (stateManager.isGlobalSearchActive()) {
-            BibDatabaseContext resultContext = new BibDatabaseContext();
-            for (BibDatabaseContext dbContext : this.stateManager.getOpenDatabases()) {
-                List<BibEntry> result = dbContext.getEntries().stream()
-                                                 .filter(entry -> isMatchedBySearch(stateManager.activeSearchQueryProperty().get(), entry))
-                                                 .collect(Collectors.toList());
-                resultContext.getDatabase().insertEntries(result);
-            }
-            this.addEntriesToBibContext(resultContext);
+        BibDatabaseContext resultContext = new BibDatabaseContext();
+        for (BibDatabaseContext dbContext : this.stateManager.getOpenDatabases()) {
+            List<BibEntry> result = dbContext.getEntries().stream()
+                                             .filter(entry -> isMatchedBySearch(stateManager.activeSearchQueryProperty().get(), entry))
+                                             .collect(Collectors.toList());
+            resultContext.getDatabase().insertEntries(result);
         }
+        this.addEntriesToBibContext(resultContext);
     }
 
     private void addEntriesToBibContext(BibDatabaseContext context) {
@@ -40,5 +38,9 @@ public class GlobalSearchResultDialogViewModel {
     private boolean isMatchedBySearch(Optional<SearchQuery> query, BibEntry entry) {
         return query.map(matcher -> matcher.isMatch(entry))
                     .orElse(true);
+    }
+
+    public BibDatabaseContext getSearchDatabaseContext() {
+        return searchDatabaseContext;
     }
 }
