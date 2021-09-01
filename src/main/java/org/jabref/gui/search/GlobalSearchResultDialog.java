@@ -12,23 +12,22 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.DialogPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
-
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.groups.GroupViewMode;
+import org.jabref.gui.maintable.BibEntryTableViewModel;
 import org.jabref.gui.maintable.MainTableColumnModel;
-import org.jabref.gui.maintable.MainTableColumnModel.Type;
 import org.jabref.gui.maintable.MainTableDataModel;
 import org.jabref.gui.maintable.columns.FieldColumn;
 import org.jabref.gui.maintable.columns.SpecialFieldColumn;
 import org.jabref.gui.preview.PreviewViewer;
+import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.search.SearchQuery;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.search.matchers.MatcherSet;
 import org.jabref.model.search.matchers.MatcherSets;
@@ -58,7 +57,7 @@ public class GlobalSearchResultDialog {
         this.dialogService = dialogService;
 
         this.groupViewMode = preferencesService.getGroupViewMode();
-        this.libColumn = new FieldColumn(new MainTableColumnModel(Type.NORMALFIELD, LIBRARY_NAME_FIELD));
+        this.libColumn = new FieldColumn(MainTableColumnModel.parse("field:library"));
         this.preview = new PreviewViewer(context, dialogService, stateManager);
         preview.setTheme(preferencesService.getTheme());
         preview.setLayout(preferencesService.getPreviewPreferences().getCurrentPreviewStyle());
@@ -72,10 +71,6 @@ public class GlobalSearchResultDialog {
             for (BibDatabaseContext dbContext : this.stateManager.getOpenDatabases()) {
 
                 List<BibEntry> result = dbContext.getEntries().stream().filter(entry -> isMatched(stateManager.activeGroupProperty(), stateManager.activeSearchQueryProperty().get(), entry))
-                                                 .map(currEntry -> {
-                                                     BibEntry newEntry = currEntry.withField(new UnknownField(GlobalSearchResultDialog.LIBRARY_NAME_FIELD), FileUtil.getBaseName(dbContext.getDatabasePath().orElse(null)));
-                                                     return newEntry;
-                                                 })
                                                  .collect(Collectors.toList());
 
                 resultDbContext.getDatabase().insertEntries(result);
@@ -88,6 +83,10 @@ public class GlobalSearchResultDialog {
 
         MainTableDataModel model = new MainTableDataModel(context, preferencesService, stateManager);
         SearchResultsTable researchTable = new SearchResultsTable(model, context, preferencesService, undoManager, dialogService, stateManager, externalFileTypes);
+
+        new ValueTableCellFactory<BibEntryTableViewModel, String>()
+            .withText(text -> FileUtil.getBaseName(text))
+            .install(libColumn);
 
         researchTable.getColumns().add(0, libColumn);
         researchTable.getColumns().removeIf(col -> col instanceof SpecialFieldColumn);
@@ -149,4 +148,5 @@ public class GlobalSearchResultDialog {
         }
         return Optional.of(searchRules);
     }
+
 }
