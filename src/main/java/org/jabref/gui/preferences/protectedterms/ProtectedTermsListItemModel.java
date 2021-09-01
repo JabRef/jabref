@@ -1,6 +1,8 @@
 package org.jabref.gui.preferences.protectedterms;
 
 import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.ReadOnlyBooleanProperty;
+import javafx.beans.property.ReadOnlyBooleanWrapper;
 import javafx.beans.property.ReadOnlyStringProperty;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -28,6 +30,10 @@ public class ProtectedTermsListItemModel {
 
     public ReadOnlyStringProperty locationProperty() {
         return new ReadOnlyStringWrapper(termsList.getLocation());
+    }
+
+    public ReadOnlyBooleanProperty internalProperty() {
+        return new ReadOnlyBooleanWrapper(termsList.isInternalList());
     }
 
     public BooleanProperty enabledProperty() {

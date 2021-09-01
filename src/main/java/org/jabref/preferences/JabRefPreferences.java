@@ -33,6 +33,7 @@ import java.util.prefs.Preferences;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import javafx.beans.InvalidationListener;
 import javafx.scene.control.TableColumn.SortType;
 
 import org.jabref.gui.Globals;
@@ -2725,17 +2726,21 @@ public class JabRefPreferences implements PreferencesService {
             return protectedTermsPreferences;
         }
 
-        protectedTermsPreferences = Objects.requireNonNullElseGet(protectedTermsPreferences, () -> new ProtectedTermsPreferences(
+        protectedTermsPreferences = new ProtectedTermsPreferences(
                 getStringList(PROTECTED_TERMS_ENABLED_INTERNAL),
                 getStringList(PROTECTED_TERMS_ENABLED_EXTERNAL),
                 getStringList(PROTECTED_TERMS_DISABLED_INTERNAL),
                 getStringList(PROTECTED_TERMS_DISABLED_EXTERNAL)
-        ));
+        );
 
-        EasyBind.subscribe(protectedTermsPreferences.enabledExternalTermListsProperty(), newValue -> putStringList(PROTECTED_TERMS_ENABLED_EXTERNAL, newValue));
-        EasyBind.subscribe(protectedTermsPreferences.disabledExternalTermListsProperty(), newValue -> putStringList(PROTECTED_TERMS_DISABLED_EXTERNAL, newValue));
-        EasyBind.subscribe(protectedTermsPreferences.enabledInternalTermListsProperty(), newValue -> putStringList(PROTECTED_TERMS_ENABLED_INTERNAL, newValue));
-        EasyBind.subscribe(protectedTermsPreferences.disabledInternalTermListsProperty(), newValue -> putStringList(PROTECTED_TERMS_DISABLED_INTERNAL, newValue));
+        protectedTermsPreferences.getEnabledExternalTermLists().addListener((InvalidationListener) change ->
+                putStringList(PROTECTED_TERMS_ENABLED_EXTERNAL, protectedTermsPreferences.getEnabledExternalTermLists()));
+        protectedTermsPreferences.getDisabledExternalTermLists().addListener((InvalidationListener) change ->
+                putStringList(PROTECTED_TERMS_DISABLED_EXTERNAL, protectedTermsPreferences.getDisabledExternalTermLists()));
+        protectedTermsPreferences.getEnabledInternalTermLists().addListener((InvalidationListener) change ->
+                putStringList(PROTECTED_TERMS_ENABLED_INTERNAL, protectedTermsPreferences.getEnabledInternalTermLists()));
+        protectedTermsPreferences.getDisabledInternalTermLists().addListener((InvalidationListener) change ->
+                putStringList(PROTECTED_TERMS_DISABLED_INTERNAL, protectedTermsPreferences.getDisabledInternalTermLists()));
 
         return protectedTermsPreferences;
     }
@@ -2750,12 +2755,12 @@ public class JabRefPreferences implements PreferencesService {
             return importerPreferences;
         }
 
-        importerPreferences = Objects.requireNonNullElseGet(importerPreferences, () -> new ImporterPreferences(
+        importerPreferences = new ImporterPreferences(
                 getBoolean(GENERATE_KEY_ON_IMPORT),
                 getBoolean(GROBID_ENABLED),
                 getBoolean(GROBID_OPT_OUT),
                 get(GROBID_URL)
-        ));
+        );
 
         EasyBind.subscribe(importerPreferences.generateNewKeyOnImportProperty(), newValue -> putBoolean(GENERATE_KEY_ON_IMPORT, newValue));
         EasyBind.subscribe(importerPreferences.grobidEnabledProperty(), newValue -> putBoolean(GROBID_ENABLED, newValue));

@@ -12,6 +12,7 @@ import java.util.TreeSet;
 import org.jabref.logic.importer.fileformat.BibTeXMLImporter;
 import org.jabref.logic.importer.fileformat.BiblioscapeImporter;
 import org.jabref.logic.importer.fileformat.BibtexImporter;
+import org.jabref.logic.importer.fileformat.CffImporter;
 import org.jabref.logic.importer.fileformat.CopacImporter;
 import org.jabref.logic.importer.fileformat.EndnoteImporter;
 import org.jabref.logic.importer.fileformat.EndnoteXmlImporter;
@@ -77,6 +78,7 @@ public class ImportFormatReader {
         formats.add(new RepecNepImporter(importFormatPreferences));
         formats.add(new RisImporter());
         formats.add(new SilverPlatterImporter());
+        formats.add(new CffImporter());
         formats.add(new BiblioscapeImporter());
         formats.add(new BibtexImporter(importFormatPreferences, fileMonitor));
 

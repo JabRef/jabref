@@ -2,6 +2,7 @@ package org.jabref.gui.preferences.protectedterms;
 
 import javax.inject.Inject;
 
+import javafx.beans.property.ReadOnlyBooleanWrapper;
 import javafx.fxml.FXML;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.TableColumn;
@@ -68,16 +69,17 @@ public class ProtectedTermsTab extends AbstractPreferenceTabView<ProtectedTermsT
             }
         });
 
-        filesTableEditColumn.setCellValueFactory(data -> BindingsHelper.constantOf(true));
-
-        filesTableDeleteColumn.setCellValueFactory(data -> BindingsHelper.constantOf(true));
-
+        filesTableEditColumn.setCellValueFactory(data -> data.getValue().internalProperty().not());
         new ValueTableCellFactory<ProtectedTermsListItemModel, Boolean>()
                 .withGraphic(none -> IconTheme.JabRefIcons.EDIT.getGraphicNode())
+                .withVisibleExpression(ReadOnlyBooleanWrapper::new)
                 .withOnMouseClickedEvent((item, none) -> event -> viewModel.edit(item))
                 .install(filesTableEditColumn);
+
+        filesTableDeleteColumn.setCellValueFactory(data -> data.getValue().internalProperty().not());
         new ValueTableCellFactory<ProtectedTermsListItemModel, Boolean>()
-                .withGraphic(none -> IconTheme.JabRefIcons.REMOVE.getGraphicNode())
+                .withGraphic(none -> IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode())
+                .withVisibleExpression(ReadOnlyBooleanWrapper::new)
                 .withTooltip(none -> Localization.lang("Remove protected terms file"))
                 .withOnMouseClickedEvent((item, none) -> event -> viewModel.removeList(item))
                 .install(filesTableDeleteColumn);
