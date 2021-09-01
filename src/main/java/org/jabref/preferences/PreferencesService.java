@@ -147,8 +147,6 @@ public interface PreferencesService {
 
     DOIPreferences getDOIPreferences();
 
-    void storeDOIPreferences(DOIPreferences preferences);
-
     OwnerPreferences getOwnerPreferences();
 
     void storeOwnerPreferences(OwnerPreferences preferences);

@@ -408,6 +408,7 @@ public class JabRefPreferences implements PreferencesService {
     private Language language;
     private GeneralPreferences generalPreferences;
     private TelemetryPreferences telemetryPreferences;
+    private DOIPreferences doiPreferences;
     private GlobalCitationKeyPattern globalCitationKeyPattern;
     private Map<String, Set<Field>> entryEditorTabList;
     private List<MainTableColumnModel> mainTableColumns;
@@ -1361,15 +1362,15 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public DOIPreferences getDOIPreferences() {
-        return new DOIPreferences(
+        if (Objects.nonNull(doiPreferences)) {
+            return doiPreferences;
+        }
+        doiPreferences = new DOIPreferences(
                 getBoolean(USE_CUSTOM_DOI_URI),
                 get(BASE_DOI_URI));
-    }
-
-    @Override
-    public void storeDOIPreferences(DOIPreferences preferences) {
-        putBoolean(USE_CUSTOM_DOI_URI, preferences.isUseCustom());
-        put(BASE_DOI_URI, preferences.getDefaultBaseURI());
+        EasyBind.subscribe(doiPreferences.useCustomProperty(), newValue -> putBoolean(USE_CUSTOM_DOI_URI, newValue));
+        EasyBind.subscribe(doiPreferences.defaultBaseURIProperty(), newValue -> put(BASE_DOI_URI, newValue));
+        return doiPreferences;
     }
 
     @Override
