@@ -27,8 +27,7 @@ In the following, libraries needing packaging are tracked.
 - [ ] packaging of [latex2unicode](https://github.com/tomtung/latex2unicode): https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=858809
   - [ ] depends on packaging of [fastparse](https://github.com/lihaoyi/fastparse): https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=858810
   - [x] depends on packaging of [sbt](https://github.com/sbt/sbt): https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=855304
-- [ ] packaging of [pgjdbc-ng](http://impossibl.github.io/pgjdbc-ng/): Obsolete: We use `org.postgresql.Driver`
-- [ ] packaging of [java-diff-utils](https://github.com/bkromhout/java-diff-utils/). Need some more work due to licensing issues. See https://github.com/bkromhout/java-diff-utils/pull/4. The token is currently @koppor
+- [ ] packaging of [java-diff-utils](https://github.com/java-diff-utils/java-diff-utils).
 - [x] CSL styles - styles: https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=841018 
   - [x] https://github.com/citation-style-language/styles/issues/2372 needs to be solved
   - Resulting package: https://packages.debian.org/sid/citation-style-language-styles
@@ -39,6 +38,7 @@ In the following, libraries needing packaging are tracked.
   - [ ] close https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=841020
   - [x] Switch to pure-java implementation https://github.com/JabRef/jabref/pull/5997
   - [ ] depends on [jbibtex](https://github.com/jbibtex/jbibtex) - https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=888087
+    - depends on https://packages.debian.org/source/jackson-core and https://packages.debian.org/source/jackson-databind
 - [x] packaging of [LGoodDatePicker](https://github.com/LGoodDatePicker/LGoodDatePicker): https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=847591
 - [x] <s>packaging of https://github.com/JabRef/org.jabref.gui.customjfx.support - or</s> including an OpenJDK fix (https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=872619)
 
