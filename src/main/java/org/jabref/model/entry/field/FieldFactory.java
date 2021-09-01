@@ -146,10 +146,7 @@ public class FieldFactory {
     }
 
     /**
-     * These are the fields JabRef always displays as default {@link org.jabref.preferences.JabRefPreferences#setCutomTabNameDefaultValues()}
-     *
-     * A user can change them. The change is currently stored in the preferences only and not explicitly exposed as
-     * separate preferences object
+     * These are the fields JabRef always displays as default
      */
     public static List<Field> getDefaultGeneralFields() {
         List<Field> defaultGeneralFields = new ArrayList<>(Arrays.asList(StandardField.DOI, StandardField.CROSSREF, StandardField.KEYWORDS, StandardField.EPRINT, StandardField.URL, StandardField.FILE, StandardField.GROUPS, StandardField.OWNER, StandardField.TIMESTAMP));
