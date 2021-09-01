@@ -314,13 +314,11 @@ public class GlobalSearchBar extends HBox {
 
     public void setAutoCompleter(SuggestionProvider<Author> searchCompleter) {
         if (preferencesService.getAutoCompletePreferences().shouldAutoComplete()) {
-            AutoCompletionTextInputBinding<Author> autoComplete = AutoCompletionTextInputBinding.autoComplete(searchField,
-                                                                                                              searchCompleter::provideSuggestions,                                                                                       new AppendPersonNamesStrategy());
+            AutoCompletionTextInputBinding<Author> autoComplete = AutoCompletionTextInputBinding.autoComplete(searchField,searchCompleter::provideSuggestions,                                                                                       new AppendPersonNamesStrategy());
             AutoCompletePopup<Author> popup = getPopup(autoComplete);
             popup.setSkin(new SearchPopupSkin<>(popup));
         }
     }
-
     /**
      * The popup has private access in {@link AutoCompletionBinding}, so we use reflection to access it.
      */

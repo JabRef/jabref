@@ -64,7 +64,7 @@ public class SearchPreferences {
         if (isFulltext()) {
             searchFlags.add(SearchRules.SearchFlags.FULLTEXT);
         }
-        if(isKeepSearchStrng()) {
+        if (isKeepSearchStrng()) {
             searchFlags.add(SearchRules.SearchFlags.KEEP_SEARCH_STRING);
         }
         return searchFlags;
