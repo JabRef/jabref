@@ -51,18 +51,18 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
     private final GeneralPreferences generalPreferences;
     private final PreferencesService preferencesService;
     private final TelemetryPreferences telemetryPreferences;
-    private final OwnerPreferences initialOwnerPreferences;
+    private final OwnerPreferences ownerPreferences;
     private final TimestampPreferences initialTimestampPreferences;
 
     private List<String> restartWarning = new ArrayList<>();
 
     @SuppressWarnings("ReturnValueIgnored")
-    public GeneralTabViewModel(DialogService dialogService, PreferencesService preferencesService, GeneralPreferences generalPreferences, TelemetryPreferences telemetryPreferences) {
+    public GeneralTabViewModel(DialogService dialogService, PreferencesService preferencesService, GeneralPreferences generalPreferences, TelemetryPreferences telemetryPreferences, OwnerPreferences ownerPreferences) {
         this.dialogService = dialogService;
         this.generalPreferences = generalPreferences;
         this.preferencesService = preferencesService;
         this.telemetryPreferences = telemetryPreferences;
-        this.initialOwnerPreferences = preferencesService.getOwnerPreferences();
+        this.ownerPreferences = ownerPreferences;
         this.initialTimestampPreferences = preferencesService.getTimestampPreferences();
     }
 
@@ -82,9 +82,9 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         collectTelemetryProperty.setValue(telemetryPreferences.shouldCollectTelemetry());
         showAdvancedHintsProperty.setValue(generalPreferences.shouldShowAdvancedHints());
 
-        markOwnerProperty.setValue(initialOwnerPreferences.isUseOwner());
-        markOwnerNameProperty.setValue(initialOwnerPreferences.getDefaultOwner());
-        markOwnerOverwriteProperty.setValue(initialOwnerPreferences.isOverwriteOwner());
+        markOwnerProperty.setValue(ownerPreferences.isUseOwner());
+        markOwnerNameProperty.setValue(ownerPreferences.getDefaultOwner());
+        markOwnerOverwriteProperty.setValue(ownerPreferences.isOverwriteOwner());
 
         addCreationDateProperty.setValue(initialTimestampPreferences.shouldAddCreationDate());
         addModificationDateProperty.setValue(initialTimestampPreferences.shouldAddModificationDate());
@@ -113,10 +113,9 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
 
         telemetryPreferences.setCollectTelemetry(collectTelemetryProperty.getValue());
 
-        preferencesService.storeOwnerPreferences(new OwnerPreferences(
-                markOwnerProperty.getValue(),
-                markOwnerNameProperty.getValue().trim(),
-                markOwnerOverwriteProperty.getValue()));
+        ownerPreferences.setUseOwner(markOwnerProperty.getValue());
+        ownerPreferences.setDefaultOwner(markOwnerNameProperty.getValue());
+        ownerPreferences.setOverwriteOwner(markOwnerOverwriteProperty.getValue());
 
         preferencesService.storeTimestampPreferences(new TimestampPreferences(
                 addCreationDateProperty.getValue(),

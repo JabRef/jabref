@@ -409,6 +409,7 @@ public class JabRefPreferences implements PreferencesService {
     private GeneralPreferences generalPreferences;
     private TelemetryPreferences telemetryPreferences;
     private DOIPreferences doiPreferences;
+    private OwnerPreferences ownerPreferences;
     private GlobalCitationKeyPattern globalCitationKeyPattern;
     private Map<String, Set<Field>> entryEditorTabList;
     private List<MainTableColumnModel> mainTableColumns;
@@ -1375,17 +1376,17 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public OwnerPreferences getOwnerPreferences() {
-        return new OwnerPreferences(
+        if (Objects.nonNull(ownerPreferences)) {
+            return ownerPreferences;
+        }
+        ownerPreferences = new OwnerPreferences(
                 getBoolean(USE_OWNER),
                 get(DEFAULT_OWNER),
                 getBoolean(OVERWRITE_OWNER));
-    }
-
-    @Override
-    public void storeOwnerPreferences(OwnerPreferences preferences) {
-        putBoolean(USE_OWNER, preferences.isUseOwner());
-        put(DEFAULT_OWNER, preferences.getDefaultOwner());
-        putBoolean(OVERWRITE_OWNER, preferences.isOverwriteOwner());
+        EasyBind.subscribe(ownerPreferences.useOwnerProperty(), newValue -> putBoolean(USE_OWNER, newValue));
+        EasyBind.subscribe(ownerPreferences.defaultOwnerProperty(), newValue -> put(DEFAULT_OWNER, newValue));
+        EasyBind.subscribe(ownerPreferences.overwriteOwnerProperty(), newValue -> putBoolean(OVERWRITE_OWNER, newValue));
+        return ownerPreferences;
     }
 
     @Override

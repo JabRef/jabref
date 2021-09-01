@@ -149,8 +149,6 @@ public interface PreferencesService {
 
     OwnerPreferences getOwnerPreferences();
 
-    void storeOwnerPreferences(OwnerPreferences preferences);
-
     TimestampPreferences getTimestampPreferences();
 
     void storeTimestampPreferences(TimestampPreferences preferences);
