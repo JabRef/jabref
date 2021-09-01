@@ -181,19 +181,11 @@ public interface PreferencesService {
     // EntryEditorPreferences
     //*************************************************************************************************************
 
-    Map<String, Set<Field>> getEntryEditorTabList();
-
-    void updateEntryEditorTabList();
-
     Map<String, Set<Field>> getDefaultTabNamesAndFields();
 
     List<Field> getAllDefaultTabFieldNames();
 
-    void storeEntryEditorTabList(Map<String, Set<Field>> customTabsMap);
-
     EntryEditorPreferences getEntryEditorPreferences();
-
-    void storeEntryEditorPreferences(EntryEditorPreferences preferences);
 
     //*************************************************************************************************************
     // Network preferences
@@ -371,13 +363,9 @@ public interface PreferencesService {
 
     MrDlibPreferences getMrDlibPreferences();
 
-    void storeMrDlibPreferences(MrDlibPreferences preferences);
-
     String getIdBasedFetcherForEntryGenerator();
 
     void storeIdBasedFetcherForEntryGenerator(String fetcherName);
 
     ProtectedTermsPreferences getProtectedTermsPreferences();
-
-    void storeProtectedTermsPreferences(ProtectedTermsPreferences preferences);
 }

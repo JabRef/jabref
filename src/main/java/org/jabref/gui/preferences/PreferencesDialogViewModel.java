@@ -163,7 +163,6 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
      */
     private void updateAfterPreferenceChanges() {
         // Reload internal preferences cache
-        preferences.updateEntryEditorTabList();
         preferences.updateGlobalCitationKeyPattern();
         preferences.updateMainTableColumns();
 
