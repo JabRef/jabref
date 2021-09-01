@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.ButtonType?>
+<?import javafx.scene.control.DialogPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.VBox?>
+
+
+<DialogPane prefHeight="417.0" prefWidth="513.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jabref.gui.search.GlobalSearchResultDialog">>
+   <content>
+      <BorderPane prefHeight="200.0" prefWidth="200.0">
+         <top>
+            <TableView fx:id="resultsTable" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+              <columns>
+                <TableColumn prefWidth="75.0" text="C1" />
+                <TableColumn prefWidth="75.0" text="C2" />
+              </columns>
+            </TableView>
+         </top>
+         <bottom>
+            <VBox fx:id="previewContainer" prefHeight="90.0" prefWidth="665.0" BorderPane.alignment="CENTER" />
+         </bottom>
+      </BorderPane>
+   </content>
+   <buttonTypes>
+      <ButtonType fx:constant="OK" />
+   </buttonTypes>
+</DialogPane>

@@ -7,11 +7,15 @@ import java.util.stream.Collectors;
 import javax.swing.undo.UndoManager;
 
 import javafx.collections.ObservableList;
+import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.Dialog;
 import javafx.scene.control.DialogPane;
+import javafx.scene.control.TableView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
+
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
@@ -33,7 +37,7 @@ import org.jabref.model.search.matchers.MatcherSet;
 import org.jabref.model.search.matchers.MatcherSets;
 import org.jabref.preferences.PreferencesService;
 
-public class GlobalSearchResultDialog {
+public class GlobalSearchResultDialog extends Dialog<Void> {
 
     public static String LIBRARY_NAME_FIELD = "Library_Name";
 
@@ -47,6 +51,9 @@ public class GlobalSearchResultDialog {
     private final GroupViewMode groupViewMode;
 
     private final PreviewViewer preview;
+
+    @FXML private TableView<BibEntryTableViewModel> resultsTable;
+    @FXML private VBox vbox;
 
     public GlobalSearchResultDialog(PreferencesService preferencesService, StateManager stateManager, ExternalFileTypes externalFileTypes, UndoManager undoManager, DialogService dialogService) {
         this.context = new BibDatabaseContext();
