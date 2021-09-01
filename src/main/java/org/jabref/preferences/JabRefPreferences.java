@@ -1036,8 +1036,7 @@ public class JabRefPreferences implements PreferencesService {
         try (OutputStream os = Files.newOutputStream(file)) {
             prefs.exportSubtree(os);
         } catch (BackingStoreException | IOException ex) {
-            throw new JabRefException("Could not export preferences",
-                    ex);
+            throw new JabRefException("Could not export preferences", Localization.lang("Could not export preferences"), ex);
         }
     }
 
@@ -1052,7 +1051,7 @@ public class JabRefPreferences implements PreferencesService {
         try (InputStream is = Files.newInputStream(file)) {
             Preferences.importPreferences(is);
         } catch (InvalidPreferencesFormatException | IOException ex) {
-            throw new JabRefException("Could not import preferences", ex);
+            throw new JabRefException("Could not import preferences", Localization.lang("Could not import preferences"), ex);
         }
     }
 
