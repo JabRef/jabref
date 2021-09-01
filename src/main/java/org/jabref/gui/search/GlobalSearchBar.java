@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
+
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
@@ -242,7 +243,6 @@ public class GlobalSearchBar extends HBox {
             preferencesService.storeSearchPreferences(searchPreferences);
             performSearch();
         });
-
     }
 
     private void initSearchModifierButton(ButtonBase searchButton) {
@@ -291,10 +291,7 @@ public class GlobalSearchBar extends HBox {
             return;
         }
         stateManager.setSearchQuery(searchQuery);
-
     }
-
-
 
     private boolean validRegex() {
         try {
