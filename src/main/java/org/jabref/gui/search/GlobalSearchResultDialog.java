@@ -9,9 +9,11 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.maintable.MainTableColumnModel;
+import org.jabref.gui.maintable.MainTableColumnModel.Type;
 import org.jabref.gui.maintable.MainTableDataModel;
 import org.jabref.gui.maintable.columns.FieldColumn;
 import org.jabref.gui.maintable.columns.SpecialFieldColumn;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.preferences.PreferencesService;
 
@@ -25,6 +27,8 @@ public class GlobalSearchResultDialog {
     private final FieldColumn libColumn;
     private final UndoManager undoManager;
 
+    public static String LIBRARY_NAME_FIELD = "Library_Name";
+
     public GlobalSearchResultDialog(PreferencesService preferencesService, StateManager stateManager, ExternalFileTypes externalFileTypes, UndoManager undoManager, DialogService dialogService) {
         this.context = new BibDatabaseContext();
         this.preferencesService = preferencesService;
@@ -32,7 +36,7 @@ public class GlobalSearchResultDialog {
         this.externalFileTypes = externalFileTypes;
         this.undoManager = undoManager;
         this.dialogService = dialogService;
-        this.libColumn = new FieldColumn(MainTableColumnModel.parse("field:customlib"));
+        this.libColumn = new FieldColumn(new MainTableColumnModel(Type.NORMALFIELD, LIBRARY_NAME_FIELD));
     }
 
     void showMainTable() {
@@ -46,7 +50,7 @@ public class GlobalSearchResultDialog {
         DialogPane pane = new DialogPane();
         pane.setContent(researchTable);
 
-        dialogService.showNonModalCustomDialogAndWait("Global search", pane, ButtonType.OK);
+        dialogService.showNonModalCustomDialogAndWait(Localization.lang("Global search"), pane, ButtonType.OK);
     }
 
     void addEntriesToBibContext(BibDatabaseContext ctx) {

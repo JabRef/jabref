@@ -106,9 +106,7 @@ public class GlobalSearchBar extends HBox {
     private SearchPreferences searchPreferences;
 
     private final GroupViewMode groupViewMode;
-
     private final GlobalSearchResultDialog globalSearchDialog;
-
 
     public GlobalSearchBar(JabRefFrame frame, StateManager stateManager, PreferencesService preferencesService, CountingUndoManager undoManager, DialogService dialogService) {
         super();
@@ -127,7 +125,6 @@ public class GlobalSearchBar extends HBox {
         searchFieldTooltip.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
         searchFieldTooltip.setMaxHeight(10);
         updateHintVisibility();
-
 
         globalSearchDialog = new GlobalSearchResultDialog(preferencesService, stateManager, ExternalFileTypes.getInstance(), undoManager, dialogService);
 
@@ -305,7 +302,7 @@ public class GlobalSearchBar extends HBox {
 
                 List<BibEntry> result = db.getEntries().stream().filter(entry -> isMatched(stateManager.activeGroupProperty(), stateManager.activeSearchQueryProperty().get(), entry))
                                           .map(s -> {
-                                              BibEntry newEntry = s.withField(new UnknownField("customlib"), FileUtil.getBaseName(db.getDatabasePath().orElse(null)));
+                                              BibEntry newEntry = s.withField(new UnknownField(GlobalSearchResultDialog.LIBRARY_NAME_FIELD), FileUtil.getBaseName(db.getDatabasePath().orElse(null)));
                                               return newEntry;
                                           })
                                           .collect(Collectors.toList());
