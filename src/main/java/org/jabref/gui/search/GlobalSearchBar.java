@@ -235,6 +235,7 @@ public class GlobalSearchBar extends HBox {
         });
 
         globalModeButton.disableProperty().bindBidirectional(stateManager.globalSearchPropery());
+        globalModeButton.setTooltip(new Tooltip(Localization.lang("Global search")));
         initSearchModifierButton(globalModeButton);
         globalModeButton.setOnAction(evt -> {
             this.stateManager.setGlobalSearchActive(true);
