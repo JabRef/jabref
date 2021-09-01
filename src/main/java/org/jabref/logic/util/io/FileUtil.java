@@ -110,7 +110,7 @@ public class FileUtil {
 
         String fileName = databasePath.getFileName().toString();
 
-        var uniquePathParts = uniquePathSubstrings(paths);
+        List<String> uniquePathParts = uniquePathSubstrings(paths);
         return uniquePathParts.stream()
                               .filter(part -> databasePath.toString().contains(part)
                                               && !part.equals(fileName) && part.contains(File.separator))
