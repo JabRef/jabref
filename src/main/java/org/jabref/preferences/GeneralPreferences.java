@@ -1,7 +1,6 @@
 package org.jabref.preferences;
 
 import java.nio.charset.Charset;
-import java.util.stream.Stream;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;

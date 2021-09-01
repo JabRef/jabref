@@ -1423,69 +1423,6 @@ public class JabRefPreferences implements PreferencesService {
     //*************************************************************************************************************
 
     /**
-     * Creates a list of defined tabs in the entry editor from cache
-     *
-     * @return a list of defined tabs
-     */
-    private Map<String, Set<Field>> getEntryEditorTabList() {
-        if (entryEditorTabList == null) {
-            updateEntryEditorTabList();
-        }
-        return entryEditorTabList;
-    }
-
-    /**
-     * Reloads the list of the currently defined tabs  in the entry editor from scratch to cache
-     */
-    private void updateEntryEditorTabList() {
-        Map<String, Set<Field>> tabs = new LinkedHashMap<>();
-        int i = 0;
-        String name;
-        if (hasKey(CUSTOM_TAB_NAME + 0)) {
-            // The user has modified from the default values:
-            while (hasKey(CUSTOM_TAB_NAME + i)) {
-                name = get(CUSTOM_TAB_NAME + i);
-                Set<Field> entry = FieldFactory.parseFieldList(get(CUSTOM_TAB_FIELDS + i));
-                tabs.put(name, entry);
-                i++;
-            }
-        } else {
-            // Nothing set, so we use the default values:
-            while (get(CUSTOM_TAB_NAME + "_def" + i) != null) {
-                name = get(CUSTOM_TAB_NAME + "_def" + i);
-                Set<Field> entry = FieldFactory.parseFieldList(get(CUSTOM_TAB_FIELDS + "_def" + i));
-                tabs.put(name, entry);
-                i++;
-            }
-        }
-        entryEditorTabList = tabs;
-    }
-
-    /**
-     * Stores the defined tabs and corresponding fields in the preferences.
-     *
-     * @param customTabs a map of tab names and the corresponding set of fields to be displayed in
-     */
-    private void storeEntryEditorTabList(Map<String, Set<Field>> customTabs) {
-        String[] names = customTabs.keySet().toArray(String[]::new);
-        String[] fields = customTabs.values().stream()
-                                    .map(set -> set.stream()
-                                                   .map(Field::getName)
-                                                   .collect(Collectors.joining(STRINGLIST_DELIMITER.toString())))
-                                    .toArray(String[]::new);
-
-        for (int i = 0; i < customTabs.size(); i++) {
-            put(CUSTOM_TAB_NAME + i, names[i]);
-            put(CUSTOM_TAB_FIELDS + i, fields[i]);
-        }
-
-        purgeSeries(CUSTOM_TAB_NAME, customTabs.size());
-        purgeSeries(CUSTOM_TAB_FIELDS, customTabs.size());
-
-        updateEntryEditorTabList();
-    }
-
-    /**
      * Get a Map of default tab names to default tab fields.
      *
      * @return A map of keys with tab names and a set of corresponding fields
@@ -1540,7 +1477,28 @@ public class JabRefPreferences implements PreferencesService {
             return entryEditorPreferences;
         }
 
-        entryEditorPreferences = new EntryEditorPreferences(getEntryEditorTabList(),
+        Map<String, Set<Field>> tabs = new LinkedHashMap<>();
+        int i = 0;
+        String name;
+        if (hasKey(CUSTOM_TAB_NAME + 0)) {
+            // The user has modified from the default values:
+            while (hasKey(CUSTOM_TAB_NAME + i)) {
+                name = get(CUSTOM_TAB_NAME + i);
+                Set<Field> entry = FieldFactory.parseFieldList(get(CUSTOM_TAB_FIELDS + i));
+                tabs.put(name, entry);
+                i++;
+            }
+        } else {
+            // Nothing set, so we use the default values:
+            while (get(CUSTOM_TAB_NAME + "_def" + i) != null) {
+                name = get(CUSTOM_TAB_NAME + "_def" + i);
+                Set<Field> entry = FieldFactory.parseFieldList(get(CUSTOM_TAB_FIELDS + "_def" + i));
+                tabs.put(name, entry);
+                i++;
+            }
+        }
+
+        entryEditorPreferences = new EntryEditorPreferences(tabs,
                 getBoolean(AUTO_OPEN_FORM),
                 getBoolean(SHOW_RECOMMENDATIONS),
                 getBoolean(ACCEPT_RECOMMENDATIONS),
@@ -1550,7 +1508,6 @@ public class JabRefPreferences implements PreferencesService {
                 getBoolean(ALLOW_INTEGER_EDITION_BIBTEX),
                 getDouble(ENTRY_EDITOR_HEIGHT));
 
-        EasyBind.subscribe(entryEditorPreferences.entryEditorTabListProperty(), this::storeEntryEditorTabList);
         EasyBind.subscribe(entryEditorPreferences.shouldOpenOnNewEntryProperty(), newValue -> putBoolean(AUTO_OPEN_FORM, newValue));
         EasyBind.subscribe(entryEditorPreferences.shouldShowRecommendationsTabProperty(), newValue -> putBoolean(SHOW_RECOMMENDATIONS, newValue));
         EasyBind.subscribe(entryEditorPreferences.isMrdlibAcceptedProperty(), newValue -> putBoolean(ACCEPT_RECOMMENDATIONS, newValue));
@@ -1560,6 +1517,22 @@ public class JabRefPreferences implements PreferencesService {
         EasyBind.subscribe(entryEditorPreferences.allowIntegerEditionBibtexProperty(), newValue -> putBoolean(ALLOW_INTEGER_EDITION_BIBTEX, newValue));
         EasyBind.subscribe(entryEditorPreferences.dividerPositionProperty(), newValue -> putDouble(ENTRY_EDITOR_HEIGHT, newValue.doubleValue()));
 
+        EasyBind.subscribe(entryEditorPreferences.entryEditorTabListProperty(), newValue -> {
+            String[] names = newValue.keySet().toArray(String[]::new);
+            String[] fields = newValue.values().stream()
+                    .map(set -> set.stream()
+                            .map(Field::getName)
+                            .collect(Collectors.joining(STRINGLIST_DELIMITER.toString())))
+                    .toArray(String[]::new);
+
+            for (int j = 0; j < newValue.size(); j++) {
+                put(CUSTOM_TAB_NAME + j, names[j]);
+                put(CUSTOM_TAB_FIELDS + j, fields[j]);
+            }
+
+            purgeSeries(CUSTOM_TAB_NAME, newValue.size());
+            purgeSeries(CUSTOM_TAB_FIELDS, newValue.size());
+        });
         return entryEditorPreferences;
     }
 
