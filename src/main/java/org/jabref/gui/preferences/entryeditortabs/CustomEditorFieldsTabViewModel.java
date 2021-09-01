@@ -3,6 +3,7 @@ package org.jabref.gui.preferences.entryeditortabs;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
@@ -14,6 +15,7 @@ import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
+import org.jabref.preferences.JabRefPreferences;
 import org.jabref.preferences.PreferencesService;
 
 public class CustomEditorFieldsTabViewModel implements PreferenceTabViewModel {
@@ -43,10 +45,20 @@ public class CustomEditorFieldsTabViewModel implements PreferenceTabViewModel {
         StringBuilder sb = new StringBuilder();
 
         // Fill with customized vars
+        int i = 0;
         for (Map.Entry<String, Set<Field>> tab : tabNamesAndFields.entrySet()) {
-            sb.append(tab.getKey());
+            String key = tab.getKey();
+            if (key.equals(preferences.getDefaults().get(JabRefPreferences.CUSTOM_TAB_NAME + "_def" + i))) {
+                key = Localization.lang(key);
+            }
+            Set<Field> fields = tab.getValue();
+            if (fields.equals(FieldFactory.parseFieldList((String) preferences.getDefaults().get(JabRefPreferences.CUSTOM_TAB_FIELDS + "_def" + i)))) {
+                fields = fields.stream().map(Field::getName).map(Localization::lang).map(FieldFactory::parseField).collect(Collectors.toSet());
+            }
+            i++;
+            sb.append(key);
             sb.append(':');
-            sb.append(FieldFactory.serializeFieldsList(tab.getValue()));
+            sb.append(FieldFactory.serializeFieldsList(fields));
             sb.append('\n');
         }
         fieldsProperty.set(sb.toString());
@@ -57,6 +69,7 @@ public class CustomEditorFieldsTabViewModel implements PreferenceTabViewModel {
         Map<String, Set<Field>> customTabsMap = new LinkedHashMap<>();
         String[] lines = fieldsProperty.get().split("\n");
 
+        int i = 0;
         for (String line : lines) {
             String[] parts = line.split(":");
             if (parts.length != 2) {
@@ -78,8 +91,17 @@ public class CustomEditorFieldsTabViewModel implements PreferenceTabViewModel {
                                 "# { } ( ) ~ , ^ & - \" ' ` ʹ \\"));
                 return;
             }
+            String key = parts[0];
+            if (key.equals(Localization.lang((String) preferences.getDefaults().get(JabRefPreferences.CUSTOM_TAB_NAME + "_def" + i)))) {
+                key = (String) preferences.getDefaults().get(JabRefPreferences.CUSTOM_TAB_NAME + "_def" + i);
+            }
+            Set<Field> fields = FieldFactory.parseFieldList(parts[1]);
+            if (fields.equals(FieldFactory.parseFieldList(Localization.lang((String) preferences.getDefaults().get(JabRefPreferences.CUSTOM_TAB_FIELDS + "_def" + i))))) {
+                fields = FieldFactory.parseFieldList((String) preferences.getDefaults().get(JabRefPreferences.CUSTOM_TAB_FIELDS + "_def" + i));
+            }
 
-            customTabsMap.put(parts[0], FieldFactory.parseFieldList(parts[1]));
+            customTabsMap.put(key, fields);
+            i++;
         }
 
         entryEditorPreferences.setEntryEditorTabList(customTabsMap);

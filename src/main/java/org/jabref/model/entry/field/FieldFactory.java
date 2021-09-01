@@ -146,7 +146,7 @@ public class FieldFactory {
     }
 
     /**
-     * These are the fields JabRef always displays as default {@link org.jabref.preferences.JabRefPreferences#setLanguageDependentDefaultValues()}
+     * These are the fields JabRef always displays as default {@link org.jabref.preferences.JabRefPreferences#setCutomTabNameDefaultValues()}
      *
      * A user can change them. The change is currently stored in the preferences only and not explicitly exposed as
      * separate preferences object
