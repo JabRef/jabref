@@ -1,7 +1,7 @@
 # YAML 1.2
 ---
 abstract: "Test abstract."
-authors: 
+authors:
   -
     family-names: Smith
     given-names: Joe
@@ -12,8 +12,8 @@ authors:
     name-suffix: Jr.
 cff-version: "1.1.0"
 date-released: 2000-07-02
-identifiers: 
-  - 
+identifiers:
+  -
     type: doi
     value: "10.0000/TEST"
 license: MIT

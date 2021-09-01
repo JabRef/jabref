@@ -46,8 +46,8 @@ public class CffImporterTest {
 
     @Test
     public void testGetDescription() {
-        assertEquals("Importer for the CFF format. Is only used to cite software, one "
-                + "entry per file.", importer.getDescription());
+        assertEquals("Importer for the CFF format. Is only used to cite software, one entry per file.",
+                importer.getDescription());
     }
 
     @Test

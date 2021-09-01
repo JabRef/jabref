@@ -23,11 +23,8 @@ import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class CffImporter extends Importer {
-    private static final Logger LOGGER = LoggerFactory.getLogger(CffImporter.class);
 
     @Override
     public String getName() {
@@ -51,7 +48,7 @@ public class CffImporter extends Importer {
 
     // POJO classes for yaml data
     private static class CffFormat {
-        private HashMap<String, String> vals = new HashMap<String, String>();
+        private final HashMap<String, String> values = new HashMap<>();
 
         @JsonProperty("authors")
         private List<CffAuthor> authors;
@@ -64,19 +61,19 @@ public class CffImporter extends Importer {
 
         @JsonAnySetter
         private void setValues(String key, String value) {
-            vals.put(key, value);
+            values.put(key, value);
         }
     }
 
     private static class CffAuthor {
-        private HashMap<String, String> vals = new HashMap<String, String>();
+        private final HashMap<String, String> values = new HashMap<>();
 
         public CffAuthor() {
         }
 
         @JsonAnySetter
         private void setValues(String key, String value) {
-            vals.put(key, value);
+            values.put(key, value);
         }
 
     }
@@ -95,12 +92,12 @@ public class CffImporter extends Importer {
     public ParserResult importDatabase(BufferedReader reader) throws IOException {
         ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
         CffFormat citation = mapper.readValue(reader, CffFormat.class);
-        HashMap<Field, String> entryMap = new HashMap<Field, String>();
+        HashMap<Field, String> entryMap = new HashMap<>();
         StandardEntryType entryType = StandardEntryType.Software;
 
         // Map CFF fields to JabRef Fields
         HashMap<String, StandardField> fieldMap = getFieldMappings();
-        for (Map.Entry<String, String> property : citation.vals.entrySet()) {
+        for (Map.Entry<String, String> property : citation.values.entrySet()) {
             if (fieldMap.containsKey(property.getKey())) {
                 entryMap.put(fieldMap.get(property.getKey()), property.getValue());
             } else if (property.getKey().equals("type")) {
@@ -114,7 +111,7 @@ public class CffImporter extends Importer {
 
         // Translate CFF author format to JabRef author format
         String authorStr = citation.authors.stream()
-                        .map((author) -> author.vals)
+                        .map((author) -> author.values)
                         .map((vals) -> vals.get("name") != null ?
                                 new Author(vals.get("name"), "", "", "", "") :
                                 new Author(vals.get("given-names"), null, vals.get("name-particle"),
@@ -156,7 +153,7 @@ public class CffImporter extends Importer {
         BibEntry entry = new BibEntry(entryType);
         entry.setField(entryMap);
 
-        List<BibEntry> entriesList = new ArrayList<BibEntry>();
+        List<BibEntry> entriesList = new ArrayList<>();
         entriesList.add(entry);
 
         return new ParserResult(entriesList);
@@ -170,14 +167,14 @@ public class CffImporter extends Importer {
 
         try {
             citation = mapper.readValue(reader, CffFormat.class);
-            return citation != null && citation.vals.get("title") != null;
+            return citation != null && citation.values.get("title") != null;
         } catch (IOException e) {
             return false;
         }
     }
 
     private HashMap<String, StandardField> getFieldMappings() {
-        HashMap<String, StandardField> fieldMappings = new HashMap<String, StandardField>();
+        HashMap<String, StandardField> fieldMappings = new HashMap<>();
         fieldMappings.put("title", StandardField.TITLE);
         fieldMappings.put("version", StandardField.VERSION);
         fieldMappings.put("doi", StandardField.DOI);
@@ -192,7 +189,7 @@ public class CffImporter extends Importer {
     }
 
     private List<String> getUnmappedFields() {
-        List<String> fields = new ArrayList<String>();
+        List<String> fields = new ArrayList<>();
 
         fields.add("commit");
         fields.add("license-url");

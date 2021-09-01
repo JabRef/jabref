@@ -1,7 +1,7 @@
 # YAML 1.2
 ---
 abstract: "Test abstract."
-authors: 
+authors:
   -
     family-names: Smith
     given-names: Joe
@@ -13,11 +13,11 @@ authors:
 cff-version: "1.1.0"
 date-released: 2000-07-02
 doi: "10.0000/TEST"
-identifiers: 
-  - 
+identifiers:
+  -
     type: swh
     value: "swh:1:cnt:94a9ed024d3859793618152ea559a168bbcbb5e2"
-  - 
+  -
     type: swh
     value: "swh:1:rel:22ece559cc7cc2364edc5e5593d63ae8bd229f9f"
 license: MIT
