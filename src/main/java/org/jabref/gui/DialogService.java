@@ -288,5 +288,4 @@ public interface DialogService {
      * @return the selected file or an empty {@link Optional} if no file has been selected
      */
     Optional<Path> showFileOpenFromArchiveDialog(Path archivePath) throws IOException;
-
 }
