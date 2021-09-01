@@ -56,6 +56,7 @@ public class GlobalSearchResultDialog {
 
     public void doGlobalSearch() {
         if (stateManager.isGlobalSearchActive()) {
+
             BibDatabaseContext resultDbContext = new BibDatabaseContext();
 
             for (BibDatabaseContext dbContext : this.stateManager.getOpenDatabases()) {
@@ -67,7 +68,7 @@ public class GlobalSearchResultDialog {
                                                  })
                                                  .collect(Collectors.toList());
 
-                context.getDatabase().insertEntries(result);
+                resultDbContext.getDatabase().insertEntries(result);
             }
             this.addEntriesToBibContext(resultDbContext);
         }
@@ -87,7 +88,7 @@ public class GlobalSearchResultDialog {
         return dialogService.showNonModalCustomDialogAndWait(Localization.lang("Global search"), pane, ButtonType.OK);
     }
 
-    public void addEntriesToBibContext(BibDatabaseContext ctx) {
+    private void addEntriesToBibContext(BibDatabaseContext ctx) {
         List<BibEntry> tbremoved = this.context.getDatabase().getEntries();
         this.context.getDatabase().removeEntries(tbremoved);
         this.context.getDatabase().insertEntries(ctx.getEntries());

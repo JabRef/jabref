@@ -11,7 +11,7 @@ public class SearchPreferences {
     private final SearchDisplayMode searchDisplayMode;
     private final EnumSet<SearchFlags> searchFlags;
 
-    public SearchPreferences(SearchDisplayMode searchDisplayMode, boolean isCaseSensitive, boolean isRegularExpression, boolean isFulltext) {
+    public SearchPreferences(SearchDisplayMode searchDisplayMode, boolean isCaseSensitive, boolean isRegularExpression, boolean isFulltext, boolean isKeepSearchString) {
         this.searchDisplayMode = searchDisplayMode;
         searchFlags = EnumSet.noneOf(SearchFlags.class);
         if (isCaseSensitive) {
@@ -23,6 +23,10 @@ public class SearchPreferences {
         if (isFulltext) {
             searchFlags.add(SearchFlags.FULLTEXT);
         }
+        if(isKeepSearchString) {
+            searchFlags.add(SearchFlags.KEEP_SEARCH_STRING);
+        }
+
     }
 
     public SearchPreferences(SearchDisplayMode searchDisplayMode, EnumSet<SearchFlags> searchFlags) {
@@ -46,6 +50,10 @@ public class SearchPreferences {
         return searchFlags.contains(SearchFlags.FULLTEXT);
     }
 
+    public boolean isKeepSearchStrng() {
+        return searchFlags.contains(SearchFlags.KEEP_SEARCH_STRING);
+    }
+
     public EnumSet<SearchFlags> getSearchFlags() {
         EnumSet<SearchFlags> searchFlags = EnumSet.noneOf(SearchFlags.class);
         if (isCaseSensitive()) {
@@ -57,22 +65,29 @@ public class SearchPreferences {
         if (isFulltext()) {
             searchFlags.add(SearchRules.SearchFlags.FULLTEXT);
         }
+        if(isKeepSearchStrng()) {
+            searchFlags.add(SearchRules.SearchFlags.KEEP_SEARCH_STRING);
+        }
         return searchFlags;
     }
 
     public SearchPreferences withSearchDisplayMode(SearchDisplayMode newSearchDisplayMode) {
-        return new SearchPreferences(newSearchDisplayMode, isCaseSensitive(), isRegularExpression(), isFulltext());
+        return new SearchPreferences(newSearchDisplayMode, isCaseSensitive(), isRegularExpression(), isFulltext(), isKeepSearchStrng());
     }
 
     public SearchPreferences withCaseSensitive(boolean newCaseSensitive) {
-        return new SearchPreferences(searchDisplayMode, newCaseSensitive, isRegularExpression(), isFulltext());
+        return new SearchPreferences(searchDisplayMode, newCaseSensitive, isRegularExpression(), isFulltext(), isKeepSearchStrng());
     }
 
     public SearchPreferences withRegularExpression(boolean newRegularExpression) {
-        return new SearchPreferences(searchDisplayMode, isCaseSensitive(), newRegularExpression, isFulltext());
+        return new SearchPreferences(searchDisplayMode, isCaseSensitive(), newRegularExpression, isFulltext(), isKeepSearchStrng());
     }
 
     public SearchPreferences withFulltext(boolean newFulltext) {
-        return new SearchPreferences(searchDisplayMode, isCaseSensitive(), isRegularExpression(), newFulltext);
+        return new SearchPreferences(searchDisplayMode, isCaseSensitive(), isRegularExpression(), newFulltext, isKeepSearchStrng());
+    }
+
+    public SearchPreferences withKeepSearchString(boolean newKeepSearchString) {
+        return new SearchPreferences(searchDisplayMode, isCaseSensitive(), isRegularExpression(), isFulltext(), newKeepSearchString);
     }
 }

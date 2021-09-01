@@ -593,10 +593,16 @@ public class JabRefFrame extends BorderPane {
 
         // Subscribe to the search
         EasyBind.subscribe(stateManager.activeSearchQueryProperty(),
-                query -> {
-                    if (getCurrentLibraryTab() != null) {
-                        getCurrentLibraryTab().setCurrentSearchQuery(query);
-                    }
+                           query -> {
+                               if (prefs.getSearchPreferences().isKeepSearchStrng()) {
+                                   for (LibraryTab tab : getLibraryTabs()) {
+                                       tab.setCurrentSearchQuery(query);
+                                   }
+                               } else {
+                                   if (getCurrentLibraryTab() != null) {
+                                       getCurrentLibraryTab().setCurrentSearchQuery(query);
+                                   }
+                               }
                 });
 
         // Wait for the scene to be created, otherwise focusOwnerProperty is not provided
