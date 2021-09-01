@@ -104,6 +104,7 @@ public class ExternalTabViewModel implements PreferenceTabViewModel {
 
     public void storeSettings() {
         String newSubject = eMailReferenceSubjectProperty.getValue();
+        // @ADR(23)
         if (!newSubject.equals(Localization.lang((String) preferences.getDefaults().get(JabRefPreferences.EMAIL_SUBJECT)))) {
             // If the field is the same as the Localized Default, the user did not change it, so let's save the default
             // so it can be Localized again next time the view is shown (maybe in another language).
