@@ -229,9 +229,13 @@ public class GlobalSearchBar extends HBox {
             performSearch();
         });
 
+        stateManager.globalSearchPropery().bind(globalModeButton.selectedProperty());
+
         globalModeButton.setOnAction(evt -> {
-            this.stateManager.setGlobalSearchActive(true);
-            this.stateManager.getGlobalSearchDialog().showMainTable();
+
+            if (stateManager.isGlobalSearchActive()) {
+                this.stateManager.getGlobalSearchDialog().showMainTable();
+            }
 
             performSearch();
 

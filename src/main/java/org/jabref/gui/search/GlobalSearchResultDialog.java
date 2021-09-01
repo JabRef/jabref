@@ -11,6 +11,7 @@ import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.maintable.MainTableColumnModel;
 import org.jabref.gui.maintable.MainTableDataModel;
 import org.jabref.gui.maintable.columns.FieldColumn;
+import org.jabref.gui.maintable.columns.SpecialFieldColumn;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.preferences.PreferencesService;
 
@@ -41,6 +42,7 @@ public class GlobalSearchResultDialog {
         SearchResultsTable m = new SearchResultsTable(model, context, preferencesService, undoManager, dialogService, stateManager, externalFileTypes);
 
         m.getColumns().add(0, libColumn);
+        m.getColumns().removeIf(col -> col instanceof SpecialFieldColumn);
 
         DialogPane pane = new DialogPane();
         pane.setContent(m);

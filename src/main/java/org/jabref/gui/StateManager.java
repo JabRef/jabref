@@ -137,6 +137,10 @@ public class StateManager {
         globalSearch.setValue(active);
     }
 
+    public BooleanProperty globalSearchPropery() {
+        return globalSearch;
+    }
+
     public boolean isGlobalSearchActive() {
         return globalSearch.get();
     }

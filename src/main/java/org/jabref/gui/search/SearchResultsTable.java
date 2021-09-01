@@ -1,7 +1,5 @@
 package org.jabref.gui.search;
 
-import java.util.Objects;
-
 import javax.swing.undo.UndoManager;
 
 import javafx.scene.control.SelectionMode;
@@ -22,10 +20,6 @@ import org.jabref.preferences.PreferencesService;
 
 public class SearchResultsTable extends TableView<BibEntryTableViewModel> {
 
-    private final DialogService dialogService;
-    private final BibDatabaseContext database;
-    private final MainTableDataModel model;
-
     public SearchResultsTable(MainTableDataModel model,
                      BibDatabaseContext database,
                      PreferencesService preferencesService,
@@ -35,12 +29,7 @@ public class SearchResultsTable extends TableView<BibEntryTableViewModel> {
                      ExternalFileTypes externalFileTypes) {
         super();
 
-
-        this.dialogService = dialogService;
-        this.database = Objects.requireNonNull(database);
-        this.model = model;
         MainTablePreferences mainTablePreferences = preferencesService.getMainTablePreferences();
-
 
         this.getColumns().addAll(
                                  new MainTableColumnFactory(
