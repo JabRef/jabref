@@ -5,7 +5,8 @@
     <id>http://www.zotero.org/styles/journal-of-paleontology</id>
     <link href="http://www.zotero.org/styles/journal-of-paleontology" rel="self"/>
     <link href="http://www.zotero.org/styles/journal-of-vertebrate-paleontology" rel="template"/>
-    <link href="http://www.journalofpaleontology.org/instructions.htm" rel="documentation"/>
+    <link href="https://www.cambridge.org/core/journals/journal-of-paleontology/information/instructions-contributors" rel="documentation"/>
+    <link href="https://www.cambridge.org/core/services/aop-file-manager/file/5c94f7029ab84c5f086928bb" rel="documentation"/>
     <author>
       <name>Martin R. Smith</name>
       <email>martins@gmail.com</email>
@@ -15,7 +16,7 @@
     <category field="biology"/>
     <issn>0022-3360</issn>
     <eissn>1937-2337</eissn>
-    <updated>2019-03-05T08:19:38+00:00</updated>
+    <updated>2021-08-12T08:51:54+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale>
@@ -32,8 +33,8 @@
   </macro>
   <macro name="editor">
     <names variable="editor">
-      <name sort-separator=" " initialize-with="." and="text" delimiter=", "/>
-      <label form="short" prefix=" (" suffix=")"/>
+      <name and="text" initialize-with="." name-as-sort-order="all"/>
+      <label form="short" prefix=", "/>
     </names>
   </macro>
   <macro name="author-short">
@@ -73,8 +74,8 @@
   </macro>
   <macro name="publisher">
     <group delimiter=", ">
-      <text variable="publisher"/>
       <text variable="publisher-place"/>
+      <text variable="publisher"/>
     </group>
   </macro>
   <macro name="container-title">
@@ -83,7 +84,7 @@
         <text variable="container-title"/>
       </if>
       <else>
-        <text variable="container-title" suffix="."/>
+        <text variable="container-title" text-case="title"/>
       </else>
     </choose>
   </macro>
@@ -150,50 +151,55 @@
               <text macro="editor" prefix=" (" suffix=")"/>
             </group>
             <text prefix=" " suffix=", " macro="publisher"/>
-            <choose>
-              <if variable="number-of-pages">
-                <text variable="number-of-pages"/>
-              </if>
-              <else>
-                <text variable="page"/>
-              </else>
-            </choose>
-            <text term="page" form="short"/>
+            <group delimiter=" ">
+              <text variable="number-of-pages"/>
+              <label plural="never" variable="number-of-pages" form="short"/>
+            </group>
           </if>
           <else-if type="thesis" match="any">
-            <text variable="title" suffix=": "/>
-            <group delimiter=", ">
-              <text variable="genre"/>
+            <group delimiter=": ">
+              <group delimiter=" ">
+                <text variable="title"/>
+                <text variable="genre" prefix="[" suffix="]"/>
+              </group>
               <text macro="publisher"/>
-              <text variable="number-of-pages"/>
             </group>
-            <text term="page" form="short"/>
+            <group>
+              <text variable="number-of-pages"/>
+              <label plural="never" variable="number-of-pages" form="short"/>
+            </group>
           </else-if>
           <else-if type="chapter" match="any">
-            <group delimiter=" ">
-              <text variable="title" suffix="; "/>
-              <text term="page" form="short" suffix=". "/>
-              <text variable="page" suffix=". "/>
-              <text term="in" text-case="capitalize-first" font-style="italic"/>
-              <text macro="editor" suffix=","/>
-              <group delimiter=", ">
-                <text macro="container-title" text-case="title"/>
-                <text variable="collection-title" prefix=". "/>
-                <text macro="edition"/>
+            <group delimiter=", ">
+              <text variable="title"/>
+              <group delimiter=" ">
+                <text term="in" font-style="italic"/>
+                <text macro="editor" suffix=","/>
               </group>
-              <group delimiter=". ">
-                <choose>
-                  <if is-numeric="volume">
-                    <group delimiter=" ">
-                      <label variable="volume" form="short"/>
-                      <number variable="volume" suffix="."/>
-                    </group>
-                  </if>
-                  <else>
-                    <text variable="volume" suffix="."/>
-                  </else>
-                </choose>
-                <text macro="publisher"/>
+              <group delimiter=": ">
+                <group delimiter=", ">
+                  <text macro="container-title" text-case="title"/>
+                  <text variable="collection-title"/>
+                  <choose>
+                    <if is-numeric="volume">
+                      <group delimiter=" ">
+                        <label variable="volume" form="short"/>
+                        <number variable="volume" suffix="."/>
+                      </group>
+                    </if>
+                    <else>
+                      <text variable="volume" suffix="."/>
+                    </else>
+                  </choose>
+                  <text macro="edition"/>
+                </group>
+                <group delimiter=". ">
+                  <text macro="publisher"/>
+                </group>
+              </group>
+              <group delimiter=" ">
+                <label variable="page" form="short"/>
+                <text variable="page"/>
               </group>
             </group>
           </else-if>
