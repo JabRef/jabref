@@ -109,6 +109,7 @@ public class SendAsEMailAction extends SimpleCommand {
         mailTo = mailTo.concat("&Subject=");
         String subject = preferencesService.getExternalApplicationsPreferences().getEmailSubject();
         if (subject.equals(preferencesService.getDefaults().get(JabRefPreferences.EMAIL_SUBJECT))) {
+            // we need to call with a variable instead of a fixed string as we store the unlocalized string (ADR-0023)
             subject = Localization.lang(subject);
         }
         mailTo = mailTo.concat(subject);
