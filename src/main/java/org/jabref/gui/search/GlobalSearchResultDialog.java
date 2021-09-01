@@ -1,5 +1,7 @@
 package org.jabref.gui.search;
 
+import java.util.Optional;
+
 import javax.swing.undo.UndoManager;
 
 import javafx.scene.control.ButtonType;
@@ -39,7 +41,7 @@ public class GlobalSearchResultDialog {
         this.libColumn = new FieldColumn(new MainTableColumnModel(Type.NORMALFIELD, LIBRARY_NAME_FIELD));
     }
 
-    void showMainTable() {
+    Optional<ButtonType> showMainTable() {
 
         MainTableDataModel model = new MainTableDataModel(context, preferencesService, stateManager);
         SearchResultsTable researchTable = new SearchResultsTable(model, context, preferencesService, undoManager, dialogService, stateManager, externalFileTypes);
@@ -50,7 +52,7 @@ public class GlobalSearchResultDialog {
         DialogPane pane = new DialogPane();
         pane.setContent(researchTable);
 
-        dialogService.showNonModalCustomDialogAndWait(Localization.lang("Global search"), pane, ButtonType.OK);
+        return dialogService.showNonModalCustomDialogAndWait(Localization.lang("Global search"), pane, ButtonType.OK);
     }
 
     void addEntriesToBibContext(BibDatabaseContext ctx) {

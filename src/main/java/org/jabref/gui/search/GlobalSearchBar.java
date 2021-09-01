@@ -17,6 +17,8 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBase;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
@@ -94,7 +96,7 @@ public class GlobalSearchBar extends HBox {
     private final ToggleButton caseSensitiveButton;
     private final ToggleButton regularExpressionButton;
     private final ToggleButton fulltextButton;
-    private final ToggleButton globalModeButton;
+    private final Button globalModeButton;
     // private final Button searchModeButton;
     private final Tooltip searchFieldTooltip = new Tooltip();
     private final Label currentResults = new Label("");
@@ -146,7 +148,7 @@ public class GlobalSearchBar extends HBox {
         regularExpressionButton = IconTheme.JabRefIcons.REG_EX.asToggleButton();
         caseSensitiveButton = IconTheme.JabRefIcons.CASE_SENSITIVE.asToggleButton();
         fulltextButton = IconTheme.JabRefIcons.FULLTEXT.asToggleButton();
-        globalModeButton = IconTheme.JabRefIcons.GLOBAL_SEARCH.asToggleButton();
+        globalModeButton = IconTheme.JabRefIcons.GLOBAL_SEARCH.asButton();
         initSearchModifierButtons();
 
         BooleanBinding focusedOrActive = searchField.focusedProperty()
@@ -163,9 +165,8 @@ public class GlobalSearchBar extends HBox {
         caseSensitiveButton.visibleProperty().bind(focusedOrActive);
         fulltextButton.visibleProperty().unbind();
         fulltextButton.visibleProperty().bind(focusedOrActive);
-        globalModeButton.visibleProperty().bind(focusedOrActive);
 
-        StackPane modifierButtons = new StackPane(new HBox(regularExpressionButton, caseSensitiveButton, fulltextButton, globalModeButton));
+        StackPane modifierButtons = new StackPane(new HBox(regularExpressionButton, caseSensitiveButton, fulltextButton, globalModeButton ));
         modifierButtons.setAlignment(Pos.CENTER);
         searchField.setRight(new HBox(searchField.getRight(), modifierButtons));
         searchField.getStyleClass().add("search-field");
@@ -233,19 +234,18 @@ public class GlobalSearchBar extends HBox {
             performSearch();
         });
 
-        stateManager.globalSearchPropery().bind(globalModeButton.selectedProperty());
-
+        globalModeButton.disableProperty().bindBidirectional(stateManager.globalSearchPropery());
+        initSearchModifierButton(globalModeButton);
         globalModeButton.setOnAction(evt -> {
-
-            if (stateManager.isGlobalSearchActive()) {
-                this.globalSearchDialog.showMainTable();
-            }
+            this.stateManager.setGlobalSearchActive(true);
             performSearch();
 
+            this.globalSearchDialog.showMainTable();
+            this.stateManager.setGlobalSearchActive(false);
         });
     }
 
-    private void initSearchModifierButton(ToggleButton searchButton) {
+    private void initSearchModifierButton(ButtonBase searchButton) {
         searchButton.setCursor(Cursor.DEFAULT);
         searchButton.setMinHeight(28);
         searchButton.setMaxHeight(28);
