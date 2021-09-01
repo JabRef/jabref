@@ -410,6 +410,8 @@ public class JabRefPreferences implements PreferencesService {
     private TelemetryPreferences telemetryPreferences;
     private DOIPreferences doiPreferences;
     private OwnerPreferences ownerPreferences;
+    private TimestampPreferences timestampPreferences;
+
     private GlobalCitationKeyPattern globalCitationKeyPattern;
     private Map<String, Set<Field>> entryEditorTabList;
     private List<MainTableColumnModel> mainTableColumns;
@@ -1391,18 +1393,19 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public TimestampPreferences getTimestampPreferences() {
-        return new TimestampPreferences(
+        if (Objects.nonNull(timestampPreferences)) {
+            return timestampPreferences;
+        }
+        timestampPreferences = new TimestampPreferences(
                 getBoolean(ADD_CREATION_DATE),
                 getBoolean(ADD_MODIFICATION_DATE),
                 getBoolean(UPDATE_TIMESTAMP),
                 FieldFactory.parseField(get(TIME_STAMP_FIELD)),
                 get(TIME_STAMP_FORMAT));
-    }
 
-    @Override
-    public void storeTimestampPreferences(TimestampPreferences preferences) {
-        putBoolean(ADD_CREATION_DATE, preferences.shouldAddCreationDate());
-        putBoolean(ADD_MODIFICATION_DATE, preferences.shouldAddModificationDate());
+        EasyBind.subscribe(timestampPreferences.addCreationDateProperty(), newValue -> putBoolean(ADD_CREATION_DATE, newValue));
+        EasyBind.subscribe(timestampPreferences.addModificationDateProperty(), newValue -> putBoolean(ADD_MODIFICATION_DATE, newValue));
+        return timestampPreferences;
     }
 
     //*************************************************************************************************************

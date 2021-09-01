@@ -151,8 +151,6 @@ public interface PreferencesService {
 
     TimestampPreferences getTimestampPreferences();
 
-    void storeTimestampPreferences(TimestampPreferences preferences);
-
     //*************************************************************************************************************
     // GroupsPreferences
     //*************************************************************************************************************
