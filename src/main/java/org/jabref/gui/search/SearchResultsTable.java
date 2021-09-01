@@ -53,15 +53,11 @@ public class SearchResultsTable extends TableView<BibEntryTableViewModel> {
         }
 
         this.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-
         this.setItems(model.getEntriesFilteredAndSorted());
-
         // Enable sorting
         model.getEntriesFilteredAndSorted().comparatorProperty().bind(this.comparatorProperty());
 
         this.getStylesheets().add(MainTable.class.getResource("MainTable.css").toExternalForm());
-
-
         database.getDatabase().registerListener(this);
     }
 }

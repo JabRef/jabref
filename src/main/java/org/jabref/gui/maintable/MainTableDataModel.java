@@ -2,6 +2,7 @@ package org.jabref.gui.maintable;
 
 import java.util.List;
 import java.util.Optional;
+
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
@@ -53,10 +54,7 @@ public class MainTableDataModel {
         stateManager.setActiveSearchResultSize(context, resultSize);
         // We need to wrap the list since otherwise sorting in the table does not work
         entriesSorted = new SortedList<>(entriesFiltered);
-        //TODO: Refactor
-
         groupViewMode = preferencesService.getGroupViewMode();
-
     }
 
     private boolean isMatched(ObservableList<GroupTreeNode> groups, Optional<SearchQuery> query, BibEntryTableViewModel entry) {

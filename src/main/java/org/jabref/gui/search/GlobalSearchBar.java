@@ -118,7 +118,7 @@ public class GlobalSearchBar extends HBox {
 
         groupViewMode = preferencesService.getGroupViewMode();
 
-        this.searchField.disableProperty().bind(needsDatabase(stateManager).not());
+        searchField.disableProperty().bind(needsDatabase(stateManager).not());
 
         // fits the standard "found x entries"-message thus hinders the searchbar to jump around while searching if the frame width is too small
         currentResults.setPrefWidth(150);
@@ -129,7 +129,7 @@ public class GlobalSearchBar extends HBox {
         updateHintVisibility();
 
 
-       this.globalSearchDialog = new GlobalSearchResultDialog(preferencesService, stateManager, ExternalFileTypes.getInstance(), undoManager, dialogService);
+        globalSearchDialog = new GlobalSearchResultDialog(preferencesService, stateManager, ExternalFileTypes.getInstance(), undoManager, dialogService);
 
         KeyBindingRepository keyBindingRepository = Globals.getKeyPrefs();
         searchField.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
@@ -243,27 +243,9 @@ public class GlobalSearchBar extends HBox {
             if (stateManager.isGlobalSearchActive()) {
                 this.globalSearchDialog.showMainTable();
             }
-
             performSearch();
 
         });
-
-        // ToDo: Reimplement searchMode (searchModeButton)
-        /* searchModeButton.setText(searchPreferences.getSearchDisplayMode().getDisplayName());
-        searchModeButton.setTooltip(new Tooltip(searchPreferences.getSearchDisplayMode().getToolTipText()));
-        searchModeButton.setOnAction(event -> {
-            SearchDisplayMode searchDisplayMode = searchPreferences.getSearchDisplayMode();
-            int nextSearchMode = (searchDisplayMode.ordinal() + 1) % SearchDisplayMode.values().length;
-            searchDisplayMode = SearchDisplayMode.values()[nextSearchMode];
-
-            searchPreferences = searchPreferences..withSearchDisplayMode(searchDisplayMode);
-            preferencesService.storeSearchPreferences(searchPreferences);
-
-            searchModeButton.setText(searchDisplayMode.getDisplayName());
-            searchModeButton.setTooltip(new Tooltip(searchDisplayMode.getToolTipText()));
-
-            performSearch();
-        }); */
     }
 
     private void initSearchModifierButton(ToggleButton searchButton) {

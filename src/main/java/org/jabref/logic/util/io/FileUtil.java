@@ -118,7 +118,6 @@ public class FileUtil {
                               .map(part -> part.substring(0, part.lastIndexOf(File.separator)));
     }
 
-
     /**
      * Creates the minimal unique path substring for each file among multiple file paths.
      *

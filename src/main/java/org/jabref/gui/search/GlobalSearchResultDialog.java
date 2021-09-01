@@ -33,19 +33,18 @@ public class GlobalSearchResultDialog {
         this.undoManager = undoManager;
         this.dialogService = dialogService;
         this.libColumn = new FieldColumn(MainTableColumnModel.parse("field:customlib"));
-
     }
 
     void showMainTable() {
 
         MainTableDataModel model = new MainTableDataModel(context, preferencesService, stateManager);
-        SearchResultsTable m = new SearchResultsTable(model, context, preferencesService, undoManager, dialogService, stateManager, externalFileTypes);
+        SearchResultsTable researchTable = new SearchResultsTable(model, context, preferencesService, undoManager, dialogService, stateManager, externalFileTypes);
 
-        m.getColumns().add(0, libColumn);
-        m.getColumns().removeIf(col -> col instanceof SpecialFieldColumn);
+        researchTable.getColumns().add(0, libColumn);
+        researchTable.getColumns().removeIf(col -> col instanceof SpecialFieldColumn);
 
         DialogPane pane = new DialogPane();
-        pane.setContent(m);
+        pane.setContent(researchTable);
 
         dialogService.showNonModalCustomDialogAndWait("Global search", pane, ButtonType.OK);
     }
