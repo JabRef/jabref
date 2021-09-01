@@ -149,9 +149,11 @@ class LocalizationConsistencyTest {
     @Test
     void localizationParameterMustIncludeAString() throws IOException {
         // Must start or end with "
-        // Localization.lang("test"), Localization.lang("test" + var), Localization.lang(var + "test")
+        // Good: Localization.lang("Problem downloading from %1", address)
+        // Good: Localization.lang("test")
+        // Bad: Localization.lang("test" + var)
+        // Bad: Localization.lang(var + "test")
         // TODO: Localization.lang(var1 + "test" + var2) not covered
-        // Localization.lang("Problem downloading from %1", address)
         Set<LocalizationEntry> keys = LocalizationParser.findLocalizationParametersStringsInJavaFiles(LocalizationBundleForTest.LANG);
         for (LocalizationEntry e : keys) {
             assertTrue(e.getKey().startsWith("\"") || e.getKey().endsWith("\""), "Illegal localization parameter found. Must include a String with potential concatenation or replacement parameters. Illegal parameter: Localization.lang(" + e.getKey());
