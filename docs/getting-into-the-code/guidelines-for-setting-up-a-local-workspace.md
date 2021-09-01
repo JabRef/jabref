@@ -292,6 +292,24 @@ In rare cases you might encounter problems due to out-dated automatically genera
 2. Select "Load/Unload modules".
 3. Unload `jabRef.buildSrc`.
 
+### Issue with "Module org.jsoup" not found, required by org.jabref
+
+Following error message appears:
+
+```text
+Error occurred during initialization of boot layer
+java.lang.module.FindException: Module org.jsoup not found, required by org.jabref
+```
+
+This can include different modules.
+
+1. Go to File -> Invalidate caches...
+2. Check "Clear file system cache and Local History".
+3. Check "Clear VCS Log caches and indexes".
+4. Uncheck the others.
+5. Click on "Invalidate and Restart".
+6. After IntelliJ restarted, you have to do the "buildSrc", "Log4JAppender", and "src-gen" steps again.
+
 ### Issues with openjfx libraries in local maven repository
 
 There might be problems with building if you have openjfx libraries in local maven repository, resulting in errors like this:
