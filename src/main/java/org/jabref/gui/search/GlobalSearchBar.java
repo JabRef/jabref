@@ -143,7 +143,6 @@ public class GlobalSearchBar extends HBox {
                                                     .or(regularExpressionButton.focusedProperty())
                                                     .or(caseSensitiveButton.focusedProperty())
                                                     .or(fulltextButton.focusedProperty())
-                                                    .or(globalModeButton.focusedProperty())
                                                     .or(keepSearchString.focusedProperty())
                                                     .or(searchField.textProperty()
                                                                    .isNotEmpty());
@@ -157,7 +156,7 @@ public class GlobalSearchBar extends HBox {
         keepSearchString.visibleProperty().unbind();
         keepSearchString.visibleProperty().bind(focusedOrActive);
 
-        StackPane modifierButtons = new StackPane(new HBox(regularExpressionButton, caseSensitiveButton, fulltextButton, globalModeButton, keepSearchString));
+        StackPane modifierButtons = new StackPane(new HBox(regularExpressionButton, caseSensitiveButton, fulltextButton, keepSearchString));
         modifierButtons.setAlignment(Pos.CENTER);
         searchField.setRight(new HBox(searchField.getRight(), modifierButtons));
         searchField.getStyleClass().add("search-field");
@@ -172,7 +171,7 @@ public class GlobalSearchBar extends HBox {
         visualizer.setDecoration(new IconValidationDecorator(Pos.CENTER_LEFT));
         Platform.runLater(() -> visualizer.initVisualization(regexValidator.getValidationStatus(), searchField));
 
-        this.getChildren().addAll(searchField, currentResults);
+        this.getChildren().addAll(searchField, globalModeButton, currentResults);
         this.setSpacing(4.0);
         this.setAlignment(Pos.CENTER_LEFT);
 
@@ -225,7 +224,7 @@ public class GlobalSearchBar extends HBox {
         });
 
         globalModeButton.disableProperty().bindBidirectional(stateManager.globalSearchPropery());
-        globalModeButton.setTooltip(new Tooltip(Localization.lang("Global search")));
+        globalModeButton.setTooltip(new Tooltip(Localization.lang("Search across libraries in a new window")));
         initSearchModifierButton(globalModeButton);
         globalModeButton.setOnAction(evt -> {
             this.stateManager.setGlobalSearchActive(true);

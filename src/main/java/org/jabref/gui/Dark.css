@@ -109,7 +109,7 @@
 }
 
 .mainToolbar .search-field .button .glyph-icon {
-	-fx-fill: derive(-fx-light-text-color, 80%);
+    -fx-fill: derive(-fx-light-text-color, 80%);
     -fx-text-fill: derive(-fx-light-text-color, 80%);
     -fx-icon-color: derive(-fx-light-text-color, 80%);
 }
@@ -125,5 +125,3 @@
     -fx-text-fill: derive(-fx-light-text-color, 80%);
     -fx-icon-color: derive(-fx-light-text-color, 80%);
 }
-
-	
