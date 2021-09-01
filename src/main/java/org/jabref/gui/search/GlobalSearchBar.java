@@ -39,7 +39,9 @@ import org.jabref.gui.Globals;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.autocompleter.AppendPersonNamesStrategy;
+import org.jabref.gui.autocompleter.AutoCompleteFirstNameMode;
 import org.jabref.gui.autocompleter.AutoCompletionTextInputBinding;
+import org.jabref.gui.autocompleter.PersonNameStringConverter;
 import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.icon.IconTheme;
@@ -312,7 +314,10 @@ public class GlobalSearchBar extends HBox {
 
     public void setAutoCompleter(SuggestionProvider<Author> searchCompleter) {
         if (preferencesService.getAutoCompletePreferences().shouldAutoComplete()) {
-            AutoCompletionTextInputBinding<Author> autoComplete = AutoCompletionTextInputBinding.autoComplete(searchField, searchCompleter::provideSuggestions, new AppendPersonNamesStrategy());
+            AutoCompletionTextInputBinding<Author> autoComplete = AutoCompletionTextInputBinding.autoComplete(searchField,
+                                                                                                              searchCompleter::provideSuggestions,
+                                                                                                              new PersonNameStringConverter(false, false, AutoCompleteFirstNameMode.BOTH),
+                                                                                                              new AppendPersonNamesStrategy());
             AutoCompletePopup<Author> popup = getPopup(autoComplete);
             popup.setSkin(new SearchPopupSkin<>(popup));
         }
