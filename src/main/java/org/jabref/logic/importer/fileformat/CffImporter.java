@@ -7,7 +7,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
@@ -114,8 +113,7 @@ public class CffImporter extends Importer {
         }
 
         // Translate CFF author format to JabRef author format
-        String authorStr = IntStream.range(0, citation.authors.size())
-                        .mapToObj(citation.authors::get)
+        String authorStr = citation.authors.stream()
                         .map((author) -> author.vals)
                         .map((vals) -> vals.get("name") != null ?
                                 new Author(vals.get("name"), "", "", "", "") :
@@ -127,8 +125,7 @@ public class CffImporter extends Importer {
 
         // Select DOI to keep
         if (entryMap.get(StandardField.DOI) == null && citation.ids != null) {
-            List<CffIdentifier> doiIds = IntStream.range(0, citation.ids.size())
-                            .mapToObj(citation.ids::get)
+            List<CffIdentifier> doiIds = citation.ids.stream()
                             .filter(id -> id.type.equals("doi"))
                             .collect(Collectors.toList());
             if (doiIds.size() == 1) {
@@ -138,8 +135,7 @@ public class CffImporter extends Importer {
 
         // Select SWHID to keep
         if (citation.ids != null) {
-            List<String> swhIds = IntStream.range(0, citation.ids.size())
-                                           .mapToObj(citation.ids::get)
+            List<String> swhIds = citation.ids.stream()
                                            .filter(id -> id.type.equals("swh"))
                                            .map(id -> id.value)
                                            .collect(Collectors.toList());
@@ -174,30 +170,25 @@ public class CffImporter extends Importer {
 
         try {
             citation = mapper.readValue(reader, CffFormat.class);
+            return citation != null && citation.vals.get("title") != null;
         } catch (IOException e) {
-            return false;
-        }
-
-        if (citation != null && citation.vals.get("title") != null) {
-            return true;
-        } else {
             return false;
         }
     }
 
     private HashMap<String, StandardField> getFieldMappings() {
-        HashMap<String, StandardField> hm = new HashMap<String, StandardField>();
-        hm.put("title", StandardField.TITLE);
-        hm.put("version", StandardField.VERSION);
-        hm.put("doi", StandardField.DOI);
-        hm.put("license", StandardField.LICENSE);
-        hm.put("repository", StandardField.REPOSITORY);
-        hm.put("url", StandardField.URL);
-        hm.put("abstract", StandardField.ABSTRACT);
-        hm.put("message", StandardField.COMMENT);
-        hm.put("date-released", StandardField.DATE);
-        hm.put("keywords", StandardField.KEYWORDS);
-        return hm;
+        HashMap<String, StandardField> fieldMappings = new HashMap<String, StandardField>();
+        fieldMappings.put("title", StandardField.TITLE);
+        fieldMappings.put("version", StandardField.VERSION);
+        fieldMappings.put("doi", StandardField.DOI);
+        fieldMappings.put("license", StandardField.LICENSE);
+        fieldMappings.put("repository", StandardField.REPOSITORY);
+        fieldMappings.put("url", StandardField.URL);
+        fieldMappings.put("abstract", StandardField.ABSTRACT);
+        fieldMappings.put("message", StandardField.COMMENT);
+        fieldMappings.put("date-released", StandardField.DATE);
+        fieldMappings.put("keywords", StandardField.KEYWORDS);
+        return fieldMappings;
     }
 
     private List<String> getUnmappedFields() {
