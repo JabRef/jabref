@@ -7,8 +7,11 @@ import java.util.stream.Collectors;
 import javax.swing.undo.UndoManager;
 
 import javafx.collections.ObservableList;
+import javafx.geometry.Pos;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.DialogPane;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.VBox;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
@@ -19,6 +22,7 @@ import org.jabref.gui.maintable.MainTableColumnModel.Type;
 import org.jabref.gui.maintable.MainTableDataModel;
 import org.jabref.gui.maintable.columns.FieldColumn;
 import org.jabref.gui.maintable.columns.SpecialFieldColumn;
+import org.jabref.gui.preview.PreviewViewer;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.search.SearchQuery;
 import org.jabref.logic.util.io.FileUtil;
@@ -43,6 +47,8 @@ public class GlobalSearchResultDialog {
     private final UndoManager undoManager;
     private final GroupViewMode groupViewMode;
 
+    private final PreviewViewer preview;
+
     public GlobalSearchResultDialog(PreferencesService preferencesService, StateManager stateManager, ExternalFileTypes externalFileTypes, UndoManager undoManager, DialogService dialogService) {
         this.context = new BibDatabaseContext();
         this.preferencesService = preferencesService;
@@ -53,6 +59,9 @@ public class GlobalSearchResultDialog {
 
         this.groupViewMode = preferencesService.getGroupViewMode();
         this.libColumn = new FieldColumn(new MainTableColumnModel(Type.NORMALFIELD, LIBRARY_NAME_FIELD));
+        this.preview = new PreviewViewer(context, dialogService, stateManager);
+        preview.setTheme(preferencesService.getTheme());
+        preview.setLayout(preferencesService.getPreviewPreferences().getCurrentPreviewStyle());
     }
 
     public void doGlobalSearch() {
@@ -82,9 +91,26 @@ public class GlobalSearchResultDialog {
 
         researchTable.getColumns().add(0, libColumn);
         researchTable.getColumns().removeIf(col -> col instanceof SpecialFieldColumn);
+        researchTable.getSelectionModel().selectFirst();
 
+        VBox vbox = new VBox(preview);
+        vbox.setPrefWidth(665.0);
+        vbox.setPrefHeight(90);
+
+        BorderPane mainPane = new BorderPane();
+        mainPane.setBottom(vbox);
+        mainPane.setAlignment(vbox, Pos.CENTER);
+        mainPane.setTop(researchTable);
         DialogPane pane = new DialogPane();
-        pane.setContent(researchTable);
+        pane.setContent(mainPane);
+
+        researchTable.getSelectionModel().selectedItemProperty().addListener((obs, old, newValue) -> {
+            if (newValue != null) {
+                preview.setEntry(newValue.getEntry());
+            } else {
+                preview.setEntry(old.getEntry());
+            }
+        });
 
         return dialogService.showNonModalCustomDialogAndWait(Localization.lang("Global search"), pane, ButtonType.OK);
     }
