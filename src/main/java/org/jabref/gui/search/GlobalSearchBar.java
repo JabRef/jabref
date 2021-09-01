@@ -57,7 +57,6 @@ import org.jabref.model.entry.Author;
 import org.jabref.preferences.PreferencesService;
 import org.jabref.preferences.SearchPreferences;
 
-import com.tobiasdiez.easybind.EasyBind;
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
 import de.saxsys.mvvmfx.utils.validation.Validator;
@@ -185,14 +184,14 @@ public class GlobalSearchBar extends HBox {
                                          },
                                          query -> setSearchTerm(query.map(SearchQuery::getQuery).orElse("")));
 
-        EasyBind.subscribe(this.stateManager.activeSearchQueryProperty(), searchQuery -> {
-            searchQuery.ifPresent(query -> {
-                updateResults(this.stateManager.getSearchResultSize().intValue(), SearchDescribers.getSearchDescriberFor(query).getDescription(),
-                              query.isGrammarBasedSearch());
-                globalSearchDialog.doGlobalSearch();
-            });
-        });
+        this.stateManager.activeSearchQueryProperty().addListener((obs, oldvalue, newValue) -> newValue.ifPresent(this::updateSearchResultsForQuery));
+        this.stateManager.activeDatabaseProperty().addListener((obs, oldValue, newValue) -> stateManager.activeSearchQueryProperty().get().ifPresent(this::updateSearchResultsForQuery));
+    }
 
+    private void updateSearchResultsForQuery(SearchQuery query) {
+        updateResults(this.stateManager.getSearchResultSize().intValue(), SearchDescribers.getSearchDescriberFor(query).getDescription(),
+                      query.isGrammarBasedSearch());
+        globalSearchDialog.doGlobalSearch();
     }
 
     private void initSearchModifierButtons() {
