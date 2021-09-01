@@ -92,19 +92,31 @@ public class CustomEditorFieldsTabViewModel implements PreferenceTabViewModel {
                 return;
             }
             String key = parts[0];
-            if (key.equals(Localization.lang((String) preferences.getDefaults().get(JabRefPreferences.CUSTOM_TAB_NAME + "_def" + i)))) {
-                key = (String) preferences.getDefaults().get(JabRefPreferences.CUSTOM_TAB_NAME + "_def" + i);
+            String defaultKey = (String) preferences.getDefaults().get(JabRefPreferences.CUSTOM_TAB_NAME + "_def" + i);
+            if (key.equals(Localization.lang(defaultKey))) {
+                key = defaultKey;
             }
             Set<Field> fields = FieldFactory.parseFieldList(parts[1]);
-            if (fields.equals(FieldFactory.parseFieldList(Localization.lang((String) preferences.getDefaults().get(JabRefPreferences.CUSTOM_TAB_FIELDS + "_def" + i))))) {
-                fields = FieldFactory.parseFieldList((String) preferences.getDefaults().get(JabRefPreferences.CUSTOM_TAB_FIELDS + "_def" + i));
+            Set<Field> defaultFields = FieldFactory.parseFieldList((String) preferences.getDefaults().get(JabRefPreferences.CUSTOM_TAB_FIELDS + "_def" + i));
+            Set<Field> defaultLocalizedFields = defaultFields.stream().map(Field::getName).map(Localization::lang).map(fieldName -> FieldFactory.parseField(fieldName)).collect(Collectors.toSet());
+            if (fields.equals(defaultLocalizedFields)) {
+                fields = defaultFields;
             }
-
             customTabsMap.put(key, fields);
             i++;
         }
 
         entryEditorPreferences.setEntryEditorTabList(customTabsMap);
+    }
+
+    /**
+     * This method is not meant to be used. It only makes sure the Localization keys used as Defaults in CUSTOM_TAB_NAME
+     * are used once and therefore do not show up in LocalizationConsistencyTest
+     */
+    private void makeDefaultFieldNamesNotObsoleteLocalizationFields() {
+        Localization.lang("Abstract");
+        Localization.lang("Comments");
+        Localization.lang("References");
     }
 
     public StringProperty fieldsProperty() {
