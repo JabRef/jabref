@@ -25,7 +25,6 @@ import org.jabref.logic.preferences.OwnerPreferences;
 import org.jabref.logic.preferences.TimestampPreferences;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.preferences.GeneralPreferences;
-import org.jabref.preferences.PreferencesService;
 import org.jabref.preferences.TelemetryPreferences;
 
 public class GeneralTabViewModel implements PreferenceTabViewModel {
@@ -49,7 +48,6 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
 
     private final DialogService dialogService;
     private final GeneralPreferences generalPreferences;
-    private final PreferencesService preferencesService;
     private final TelemetryPreferences telemetryPreferences;
     private final OwnerPreferences ownerPreferences;
     private final TimestampPreferences timestampPreferences;
@@ -57,10 +55,9 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
     private List<String> restartWarning = new ArrayList<>();
 
     @SuppressWarnings("ReturnValueIgnored")
-    public GeneralTabViewModel(DialogService dialogService, PreferencesService preferencesService, GeneralPreferences generalPreferences, TelemetryPreferences telemetryPreferences, OwnerPreferences ownerPreferences, TimestampPreferences timestampPreferences) {
+    public GeneralTabViewModel(DialogService dialogService, GeneralPreferences generalPreferences, TelemetryPreferences telemetryPreferences, OwnerPreferences ownerPreferences, TimestampPreferences timestampPreferences) {
         this.dialogService = dialogService;
         this.generalPreferences = generalPreferences;
-        this.preferencesService = preferencesService;
         this.telemetryPreferences = telemetryPreferences;
         this.ownerPreferences = ownerPreferences;
         this.timestampPreferences = timestampPreferences;
@@ -68,7 +65,7 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
 
     public void setValues() {
         languagesListProperty.setValue(new SortedList<>(FXCollections.observableArrayList(Language.values()), Comparator.comparing(Language::getDisplayName)));
-        selectedLanguageProperty.setValue(preferencesService.getLanguage());
+        selectedLanguageProperty.setValue(generalPreferences.getLanguage());
 
         encodingsListProperty.setValue(FXCollections.observableArrayList(Encodings.getCharsets()));
         selectedEncodingProperty.setValue(generalPreferences.getDefaultEncoding());
@@ -92,8 +89,8 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
 
     public void storeSettings() {
         Language newLanguage = selectedLanguageProperty.getValue();
-        if (newLanguage != preferencesService.getLanguage()) {
-            preferencesService.setLanguage(newLanguage);
+        if (newLanguage != generalPreferences.getLanguage()) {
+            generalPreferences.setLanguage(newLanguage);
             Localization.setLanguage(newLanguage);
             restartWarning.add(Localization.lang("Changed language") + ": " + newLanguage.getDisplayName());
         }

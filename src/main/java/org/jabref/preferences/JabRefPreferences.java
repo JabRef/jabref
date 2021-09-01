@@ -405,7 +405,6 @@ public class JabRefPreferences implements PreferencesService {
     /**
      * Cache variables
      */
-    private Language language;
     private GeneralPreferences generalPreferences;
     private TelemetryPreferences telemetryPreferences;
     private DOIPreferences doiPreferences;
@@ -1276,33 +1275,6 @@ public class JabRefPreferences implements PreferencesService {
     //*************************************************************************************************************
 
     @Override
-    public Language getLanguage() {
-        if (language == null) {
-            updateLanguage();
-        }
-        return language;
-    }
-
-    private void updateLanguage() {
-        String languageId = get(LANGUAGE);
-        language = Stream.of(Language.values())
-                         .filter(language -> language.getId().equalsIgnoreCase(languageId))
-                         .findFirst()
-                         .orElse(Language.ENGLISH);
-    }
-
-    @Override
-    public void setLanguage(Language language) {
-        Language oldLanguage = getLanguage();
-        put(LANGUAGE, language.getId());
-        if (language != oldLanguage) {
-            // Update any defaults that might be language dependent:
-            setCutomTabNameDefaultValues();
-        }
-        updateLanguage();
-    }
-
-    @Override
     public Charset getDefaultEncoding() {
         return Charset.forName(get(DEFAULT_ENCODING));
     }
@@ -1326,13 +1298,21 @@ public class JabRefPreferences implements PreferencesService {
         if (Objects.nonNull(generalPreferences)) {
             return generalPreferences;
         }
+        String languageId = get(LANGUAGE);
+        Language language = Stream.of(Language.values())
+                .filter(lang -> lang.getId().equalsIgnoreCase(languageId))
+                .findFirst()
+                .orElse(Language.ENGLISH);
+
         generalPreferences = new GeneralPreferences(
+                language,
                 getDefaultEncoding(),
                 getBoolean(BIBLATEX_DEFAULT_MODE) ? BibDatabaseMode.BIBLATEX : BibDatabaseMode.BIBTEX,
                 getBoolean(WARN_ABOUT_DUPLICATES_IN_INSPECTION),
                 getBoolean(CONFIRM_DELETE),
                 getBoolean(MEMORY_STICK_MODE),
                 getBoolean(SHOW_ADVANCED_HINTS));
+        EasyBind.subscribe(generalPreferences.languageProperty(), newValue -> put(LANGUAGE, newValue.getId()));
         EasyBind.subscribe(generalPreferences.defaultEncodingProperty(), newValue -> put(DEFAULT_ENCODING, newValue.name()));
         EasyBind.subscribe(generalPreferences.defaultBibDatabaseModeProperty(), newValue -> putBoolean(BIBLATEX_DEFAULT_MODE, (newValue == BibDatabaseMode.BIBLATEX)));
         EasyBind.subscribe(generalPreferences.isWarnAboutDuplicatesInInspectionProperty(), newValue -> putBoolean(WARN_ABOUT_DUPLICATES_IN_INSPECTION, newValue));
