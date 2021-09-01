@@ -700,7 +700,18 @@ public class JabRefPreferences implements PreferencesService {
         // set default theme
         defaults.put(FX_THEME, Theme.BASE_CSS);
 
-        setCutomTabNameDefaultValues();
+        // Entry editor tab 0:
+        defaults.put(CUSTOM_TAB_NAME + "_def0", "General");
+        String fieldNames = FieldFactory.getDefaultGeneralFields().stream().map(Field::getName).collect(Collectors.joining(STRINGLIST_DELIMITER.toString()));
+        defaults.put(CUSTOM_TAB_FIELDS + "_def0", fieldNames);
+
+        // Entry editor tab 1:
+        defaults.put(CUSTOM_TAB_FIELDS + "_def1", StandardField.ABSTRACT.getName());
+        defaults.put(CUSTOM_TAB_NAME + "_def1", "Abstract");
+
+        // Entry editor tab 2: Comments Field - used for research comments, etc.
+        defaults.put(CUSTOM_TAB_FIELDS + "_def2", StandardField.COMMENT.getName());
+        defaults.put(CUSTOM_TAB_NAME + "_def2", "Comments");
     }
 
     /**
@@ -798,21 +809,6 @@ public class JabRefPreferences implements PreferencesService {
                     "problem resolution", ex);
             return get(DEFAULT_OWNER);
         }
-    }
-
-    public void setCutomTabNameDefaultValues() {
-        // Entry editor tab 0:
-        defaults.put(CUSTOM_TAB_NAME + "_def0", "General");
-        String fieldNames = FieldFactory.getDefaultGeneralFields().stream().map(Field::getName).collect(Collectors.joining(STRINGLIST_DELIMITER.toString()));
-        defaults.put(CUSTOM_TAB_FIELDS + "_def0", fieldNames);
-
-        // Entry editor tab 1:
-        defaults.put(CUSTOM_TAB_FIELDS + "_def1", StandardField.ABSTRACT.getName());
-        defaults.put(CUSTOM_TAB_NAME + "_def1", "Abstract");
-
-        // Entry editor tab 2: Comments Field - used for research comments, etc.
-        defaults.put(CUSTOM_TAB_FIELDS + "_def2", StandardField.COMMENT.getName());
-        defaults.put(CUSTOM_TAB_NAME + "_def2", "Comments");
     }
 
     /**
