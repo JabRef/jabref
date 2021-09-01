@@ -75,7 +75,6 @@ import org.jabref.logic.importer.fileformat.CustomImporter;
 import org.jabref.logic.journals.JournalAbbreviationPreferences;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Language;
-import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.layout.TextBasedPreviewLayout;
 import org.jabref.logic.layout.format.FileLinkPreferences;
@@ -441,12 +440,6 @@ public class JabRefPreferences implements PreferencesService {
 
         // load user preferences
         prefs = PREFS_NODE;
-
-        // Since some of the preference settings themselves use localized strings, we cannot set the language after
-        // the initialization of the preferences in main
-        // Otherwise that language framework will be instantiated and more importantly, statically initialized preferences
-        // like the SearchDisplayMode will never be translated.
-        Localization.setLanguage(getLanguage());
 
         defaults.put(SEARCH_DISPLAY_MODE, SearchDisplayMode.FILTER.toString());
         defaults.put(SEARCH_CASE_SENSITIVE, Boolean.FALSE);
@@ -1050,7 +1043,7 @@ public class JabRefPreferences implements PreferencesService {
         try (OutputStream os = Files.newOutputStream(file)) {
             prefs.exportSubtree(os);
         } catch (BackingStoreException | IOException ex) {
-            throw new JabRefException("Could not export preferences", Localization.lang("Could not export preferences"), ex);
+            throw new JabRefException("Could not export preferences", ex);
         }
     }
 
@@ -1065,7 +1058,7 @@ public class JabRefPreferences implements PreferencesService {
         try (InputStream is = Files.newInputStream(file)) {
             Preferences.importPreferences(is);
         } catch (InvalidPreferencesFormatException | IOException ex) {
-            throw new JabRefException("Could not import preferences", Localization.lang("Could not import preferences"), ex);
+            throw new JabRefException("Could not import preferences", ex);
         }
     }
 

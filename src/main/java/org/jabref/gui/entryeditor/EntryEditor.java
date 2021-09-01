@@ -257,10 +257,9 @@ public class EntryEditor extends BorderPane {
                 key = Localization.lang(key);
             }
             Set<Field> fields = tab.getValue();
-            if (fields.equals(FieldFactory.parseFieldList((String) preferencesService.getDefaults().get(JabRefPreferences.CUSTOM_TAB_FIELDS + "_def" + i)))) {
+            if (fields.equals(FieldFactory.parseFieldList((String) Objects.requireNonNullElse(preferencesService.getDefaults().get(JabRefPreferences.CUSTOM_TAB_FIELDS + "_def" + i), "")))) {
                 fields = fields.stream().map(Field::getName).map(Localization::lang).map(FieldFactory::parseField).collect(Collectors.toSet());
             }
-            i++;
             entryEditorTabs.add(new UserDefinedFieldsTab(key, fields, databaseContext, libraryTab.getSuggestionProviders(), undoManager, dialogService, preferencesService, stateManager, Globals.entryTypesManager, ExternalFileTypes.getInstance(), Globals.TASK_EXECUTOR, Globals.journalAbbreviationRepository));
             i++;
         }

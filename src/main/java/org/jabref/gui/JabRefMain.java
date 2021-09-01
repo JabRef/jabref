@@ -56,6 +56,7 @@ public class JabRefMain extends Application {
 
             // Init preferences
             final JabRefPreferences preferences = JabRefPreferences.getInstance();
+            Localization.setLanguage(preferences.getLanguage());
             Globals.prefs = preferences;
             // Perform migrations
             PreferencesMigrations.runMigrations();
