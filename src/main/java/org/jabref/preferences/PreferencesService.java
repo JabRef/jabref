@@ -145,8 +145,6 @@ public interface PreferencesService {
 
     TelemetryPreferences getTelemetryPreferences();
 
-    void storeTelemetryPreferences(TelemetryPreferences preferences);
-
     DOIPreferences getDOIPreferences();
 
     void storeDOIPreferences(DOIPreferences preferences);

@@ -50,18 +50,18 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
     private final DialogService dialogService;
     private final GeneralPreferences generalPreferences;
     private final PreferencesService preferencesService;
-    private final TelemetryPreferences initialTelemetryPreferences;
+    private final TelemetryPreferences telemetryPreferences;
     private final OwnerPreferences initialOwnerPreferences;
     private final TimestampPreferences initialTimestampPreferences;
 
     private List<String> restartWarning = new ArrayList<>();
 
     @SuppressWarnings("ReturnValueIgnored")
-    public GeneralTabViewModel(DialogService dialogService, PreferencesService preferencesService, GeneralPreferences generalPreferences) {
+    public GeneralTabViewModel(DialogService dialogService, PreferencesService preferencesService, GeneralPreferences generalPreferences, TelemetryPreferences telemetryPreferences) {
         this.dialogService = dialogService;
         this.generalPreferences = generalPreferences;
         this.preferencesService = preferencesService;
-        this.initialTelemetryPreferences = preferencesService.getTelemetryPreferences();
+        this.telemetryPreferences = telemetryPreferences;
         this.initialOwnerPreferences = preferencesService.getOwnerPreferences();
         this.initialTimestampPreferences = preferencesService.getTimestampPreferences();
     }
@@ -79,7 +79,7 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         inspectionWarningDuplicateProperty.setValue(generalPreferences.warnAboutDuplicatesInInspection());
         confirmDeleteProperty.setValue(generalPreferences.shouldConfirmDelete());
         memoryStickModeProperty.setValue(generalPreferences.isMemoryStickMode());
-        collectTelemetryProperty.setValue(initialTelemetryPreferences.shouldCollectTelemetry());
+        collectTelemetryProperty.setValue(telemetryPreferences.shouldCollectTelemetry());
         showAdvancedHintsProperty.setValue(generalPreferences.shouldShowAdvancedHints());
 
         markOwnerProperty.setValue(initialOwnerPreferences.isUseOwner());
@@ -111,8 +111,7 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         generalPreferences.setMemoryStickMode(memoryStickModeProperty.getValue());
         generalPreferences.setShowAdvancedHints(showAdvancedHintsProperty.getValue());
 
-        preferencesService.storeTelemetryPreferences(
-                initialTelemetryPreferences.withCollectTelemetry(collectTelemetryProperty.getValue()));
+        telemetryPreferences.setCollectTelemetry(collectTelemetryProperty.getValue());
 
         preferencesService.storeOwnerPreferences(new OwnerPreferences(
                 markOwnerProperty.getValue(),

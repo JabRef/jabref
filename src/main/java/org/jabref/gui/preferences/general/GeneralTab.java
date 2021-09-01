@@ -54,7 +54,7 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> i
     }
 
     public void initialize() {
-        this.viewModel = new GeneralTabViewModel(dialogService, preferencesService, preferencesService.getGeneralPreferences());
+        this.viewModel = new GeneralTabViewModel(dialogService, preferencesService, preferencesService.getGeneralPreferences(), preferencesService.getTelemetryPreferences());
 
         new ViewModelListCellFactory<Language>()
                 .withText(Language::getDisplayName)

@@ -1,30 +1,39 @@
 package org.jabref.preferences;
 
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+
 public class TelemetryPreferences {
-    private boolean collectTelemetry;
-    private boolean askToCollectTelemetry;
+    private BooleanProperty collectTelemetry;
+    private BooleanProperty askToCollectTelemetry;
 
     public TelemetryPreferences(boolean shouldCollectTelemetry,
                                 boolean shouldAskToCollectTelemetry) {
-        this.collectTelemetry = shouldCollectTelemetry;
-        this.askToCollectTelemetry = shouldAskToCollectTelemetry;
+        this.collectTelemetry = new SimpleBooleanProperty(shouldCollectTelemetry);
+        this.askToCollectTelemetry = new SimpleBooleanProperty(shouldAskToCollectTelemetry);
     }
 
     public boolean shouldCollectTelemetry() {
+        return collectTelemetry.get();
+    }
+
+    public BooleanProperty collectTelemetryProperty() {
         return collectTelemetry;
     }
 
-    public TelemetryPreferences withCollectTelemetry(boolean shouldCollectTelemetry) {
-        this.collectTelemetry = shouldCollectTelemetry;
-        return this;
+    public void setCollectTelemetry(boolean collectTelemetry) {
+        this.collectTelemetry.set(collectTelemetry);
     }
 
     public boolean shouldAskToCollectTelemetry() {
+        return askToCollectTelemetry.get();
+    }
+
+    public BooleanProperty askToCollectTelemetryProperty() {
         return askToCollectTelemetry;
     }
 
-    public TelemetryPreferences withAskToCollectTelemetry(boolean shouldAskToCollectTelemetry) {
-        this.askToCollectTelemetry = shouldAskToCollectTelemetry;
-        return this;
+    public void setAskToCollectTelemetry(boolean askToCollectTelemetry) {
+        this.askToCollectTelemetry.set(askToCollectTelemetry);
     }
 }

@@ -407,6 +407,7 @@ public class JabRefPreferences implements PreferencesService {
      */
     private Language language;
     private GeneralPreferences generalPreferences;
+    private TelemetryPreferences telemetryPreferences;
     private GlobalCitationKeyPattern globalCitationKeyPattern;
     private Map<String, Set<Field>> entryEditorTabList;
     private List<MainTableColumnModel> mainTableColumns;
@@ -1346,16 +1347,16 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public TelemetryPreferences getTelemetryPreferences() {
-        return new TelemetryPreferences(
+        if (Objects.nonNull(telemetryPreferences)) {
+            return telemetryPreferences;
+        }
+        telemetryPreferences = new TelemetryPreferences(
                 getBoolean(COLLECT_TELEMETRY),
                 !getBoolean(ALREADY_ASKED_TO_COLLECT_TELEMETRY) // mind the !
         );
-    }
-
-    @Override
-    public void storeTelemetryPreferences(TelemetryPreferences preferences) {
-        putBoolean(COLLECT_TELEMETRY, preferences.shouldCollectTelemetry());
-        putBoolean(ALREADY_ASKED_TO_COLLECT_TELEMETRY, !preferences.shouldAskToCollectTelemetry()); // mind the !
+        EasyBind.subscribe(telemetryPreferences.collectTelemetryProperty(), newValue -> putBoolean(COLLECT_TELEMETRY, newValue));
+        EasyBind.subscribe(telemetryPreferences.askToCollectTelemetryProperty(), newValue -> putBoolean(ALREADY_ASKED_TO_COLLECT_TELEMETRY, !newValue));
+        return telemetryPreferences;
     }
 
     @Override
