@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import javax.inject.Inject;
 import javax.swing.undo.UndoManager;
 
 import javafx.fxml.FXML;
@@ -38,10 +39,8 @@ public class GlobalSearchResultDialog extends Dialog<Void> {
     public static String LIBRARY_NAME_FIELD = "Library_Name";
 
     private final ExternalFileTypes externalFileTypes;
-    private final PreferencesService preferencesService;
-    private final StateManager stateManager;
+
     private final BibDatabaseContext context;
-    private final DialogService dialogService;
     private final FieldColumn libColumn;
     private final UndoManager undoManager;
     private final GroupViewMode groupViewMode;
@@ -49,27 +48,28 @@ public class GlobalSearchResultDialog extends Dialog<Void> {
     private final PreviewViewer preview;
 
     @FXML private TableView<BibEntryTableViewModel> resultsTable;
-    @FXML private VBox vbox;
+    @FXML private VBox previewContainer;
 
-    public GlobalSearchResultDialog(PreferencesService preferencesService, StateManager stateManager, ExternalFileTypes externalFileTypes, UndoManager undoManager, DialogService dialogService) {
+    @Inject private PreferencesService preferencesService;
+    @Inject private StateManager stateManager;
+    @Inject private DialogService dialogService;
+
+    public GlobalSearchResultDialog(ExternalFileTypes externalFileTypes, UndoManager undoManager) {
         this.context = new BibDatabaseContext();
-        this.preferencesService = preferencesService;
-        this.stateManager = stateManager;
+
         this.externalFileTypes = externalFileTypes;
         this.undoManager = undoManager;
-        this.dialogService = dialogService;
 
-        this.groupViewMode = preferencesService.getGroupViewMode();
         this.libColumn = new FieldColumn(MainTableColumnModel.parse("field:library"));
         this.preview = new PreviewViewer(context, dialogService, stateManager);
         preview.setTheme(preferencesService.getTheme());
         preview.setLayout(preferencesService.getPreviewPreferences().getCurrentPreviewStyle());
     }
 
-
     @FXML
     private void initialize() {
 
+        previewContainer.getChildren().add(preview);
 
     }
 
@@ -95,8 +95,8 @@ public class GlobalSearchResultDialog extends Dialog<Void> {
         SearchResultsTable researchTable = new SearchResultsTable(model, context, preferencesService, undoManager, dialogService, stateManager, externalFileTypes);
 
         new ValueTableCellFactory<BibEntryTableViewModel, String>()
-            .withText(text -> FileUtil.getBaseName(text))
-            .install(libColumn);
+                                                                   .withText(text -> FileUtil.getBaseName(text))
+                                                                   .install(libColumn);
 
         researchTable.getColumns().add(0, libColumn);
         researchTable.getColumns().removeIf(col -> col instanceof SpecialFieldColumn);
@@ -130,12 +130,9 @@ public class GlobalSearchResultDialog extends Dialog<Void> {
         this.context.getDatabase().insertEntries(ctx.getEntries());
     }
 
-
     private boolean isMatchedBySearch(Optional<SearchQuery> query, BibEntry entry) {
         return query.map(matcher -> matcher.isMatch(entry))
                     .orElse(true);
     }
-
-
 
 }

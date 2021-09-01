@@ -115,7 +115,7 @@ public class GlobalSearchBar extends HBox {
         searchFieldTooltip.setMaxHeight(10);
         updateHintVisibility();
 
-        globalSearchDialog = new GlobalSearchResultDialog(preferencesService, stateManager, ExternalFileTypes.getInstance(), undoManager, dialogService);
+        globalSearchDialog = new GlobalSearchResultDialog(ExternalFileTypes.getInstance(), undoManager);
 
         KeyBindingRepository keyBindingRepository = Globals.getKeyPrefs();
         searchField.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
