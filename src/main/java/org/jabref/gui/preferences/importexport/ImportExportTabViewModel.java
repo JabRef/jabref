@@ -40,22 +40,22 @@ public class ImportExportTabViewModel implements PreferenceTabViewModel {
     private final StringProperty grobidURLProperty = new SimpleStringProperty("");
 
     private final PreferencesService preferencesService;
-    private final DOIPreferences initialDOIPreferences;
+    private final DOIPreferences doiPreferences;
     private final ImporterPreferences importerPreferences;
     private final SaveOrderConfig initialExportOrder;
 
-    public ImportExportTabViewModel(PreferencesService preferencesService) {
+    public ImportExportTabViewModel(PreferencesService preferencesService, DOIPreferences doiPreferences) {
         this.preferencesService = preferencesService;
         this.importerPreferences = preferencesService.getImporterPreferences();
-        this.initialDOIPreferences = preferencesService.getDOIPreferences();
+        this.doiPreferences = doiPreferences;
         this.initialExportOrder = preferencesService.getExportSaveOrder();
     }
 
     @Override
     public void setValues() {
         generateKeyOnImportProperty.setValue(importerPreferences.isGenerateNewKeyOnImport());
-        useCustomDOIProperty.setValue(initialDOIPreferences.isUseCustom());
-        useCustomDOINameProperty.setValue(initialDOIPreferences.getDefaultBaseURI());
+        useCustomDOIProperty.setValue(doiPreferences.isUseCustom());
+        useCustomDOINameProperty.setValue(doiPreferences.getDefaultBaseURI());
 
         switch (initialExportOrder.getOrderType()) {
             case SPECIFIED -> exportInSpecifiedOrderProperty.setValue(true);
@@ -82,15 +82,13 @@ public class ImportExportTabViewModel implements PreferenceTabViewModel {
         importerPreferences.setGrobidOptOut(importerPreferences.isGrobidOptOut());
         importerPreferences.setGrobidURL(grobidURLProperty.getValue());
 
-        preferencesService.storeDOIPreferences(new DOIPreferences(
-                useCustomDOIProperty.getValue(),
-                useCustomDOINameProperty.getValue().trim()));
+        doiPreferences.setUseCustom(useCustomDOIProperty.get());
+        doiPreferences.setDefaultBaseURI(useCustomDOINameProperty.getValue().trim());
 
         SaveOrderConfig newSaveOrderConfig = new SaveOrderConfig(
                 SaveOrderConfig.OrderType.fromBooleans(exportInSpecifiedOrderProperty.getValue(), exportInTableOrderProperty.getValue()),
                 sortCriteriaProperty.stream().map(SortCriterionViewModel::getCriterion).toList());
         preferencesService.storeExportSaveOrder(newSaveOrderConfig);
-
     }
 
     public BooleanProperty generateKeyOnImportProperty() {

@@ -143,23 +143,13 @@ public interface PreferencesService {
 
     GeneralPreferences getGeneralPreferences();
 
-    void storeGeneralPreferences(GeneralPreferences preferences);
-
     TelemetryPreferences getTelemetryPreferences();
-
-    void storeTelemetryPreferences(TelemetryPreferences preferences);
 
     DOIPreferences getDOIPreferences();
 
-    void storeDOIPreferences(DOIPreferences preferences);
-
     OwnerPreferences getOwnerPreferences();
 
-    void storeOwnerPreferences(OwnerPreferences preferences);
-
     TimestampPreferences getTimestampPreferences();
-
-    void storeTimestampPreferences(TimestampPreferences preferences);
 
     //*************************************************************************************************************
     // GroupsPreferences

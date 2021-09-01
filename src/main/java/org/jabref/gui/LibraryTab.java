@@ -665,8 +665,7 @@ public class LibraryTab extends Tab {
                     okButton,
                     cancelButton,
                     Localization.lang("Do not ask again"),
-                    optOut -> preferencesService.storeGeneralPreferences(
-                            preferencesService.getGeneralPreferences().withConfirmDelete(!optOut)));
+                    optOut -> preferencesService.getGeneralPreferences().setConfirmDelete(!optOut));
         } else {
             return true;
         }

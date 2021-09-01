@@ -312,8 +312,8 @@ public class JabRefFrame extends BorderPane {
                     Localization.lang("Don't share"));
         }
 
-        prefs.storeTelemetryPreferences(telemetryPreferences.withCollectTelemetry(shouldCollect)
-                                                                    .withAskToCollectTelemetry(false));
+        telemetryPreferences.setCollectTelemetry(shouldCollect);
+        telemetryPreferences.setAskToCollectTelemetry(false);
     }
 
     /**
