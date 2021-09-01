@@ -306,7 +306,6 @@ public class GlobalSearchBar extends HBox {
                                               return newEntry;
                                           })
                                           .collect(Collectors.toList());
-                LOGGER.debug("DB: {} and number found {}", db.getDatabasePath(), result.size());
 
                 context.getDatabase().insertEntries(result);
             }

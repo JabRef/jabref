@@ -19,6 +19,8 @@ import org.jabref.preferences.PreferencesService;
 
 public class GlobalSearchResultDialog {
 
+    public static String LIBRARY_NAME_FIELD = "Library_Name";
+
     private final ExternalFileTypes externalFileTypes;
     private final PreferencesService preferencesService;
     private final StateManager stateManager;
@@ -26,8 +28,6 @@ public class GlobalSearchResultDialog {
     private final DialogService dialogService;
     private final FieldColumn libColumn;
     private final UndoManager undoManager;
-
-    public static String LIBRARY_NAME_FIELD = "Library_Name";
 
     public GlobalSearchResultDialog(PreferencesService preferencesService, StateManager stateManager, ExternalFileTypes externalFileTypes, UndoManager undoManager, DialogService dialogService) {
         this.context = new BibDatabaseContext();
