@@ -45,11 +45,11 @@ public class CitedKeys {
     }
 
     void numberCitedKeysInCurrentOrder() {
-        int i = 1;
+        int index = 1;
         for (CitedKey ck : data.values()) {
             if (ck.getLookupResult().isPresent()) {
-                ck.setNumber(Optional.of(i));
-                i++;
+                ck.setNumber(Optional.of(index));
+                index++;
             } else {
                 // Unresolved citations do not get a number.
                 ck.setNumber(Optional.empty());
