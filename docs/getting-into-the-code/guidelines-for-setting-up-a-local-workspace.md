@@ -155,7 +155,18 @@ To use IntelliJ IDEA's internal build system when you build JabRef through **Bui
 
   ![Ignore the Gradle project &quot;buildSrc&quot;](../.gitbook/assets/intellij-gradle-config-ignore-buildSrc%20%282%29%20%282%29%20%282%29%20%283%29%20%283%29%20%286%29%20%284%29.png)
 
-* Add `src-gen` as root: 1. Right click on the project "jabref". 2. Select "Open Module Settings" 3. Expand "JabRef" 4. Select "main" 5. Select tab "Sources" 6. Click "+ Add Content Root" 7. Select the `src-gen` directory 8. Click "OK". When expanding "main", "java" should have been selected as source 9. Click "OK" to save the changes
+* Add `src-gen` as root: 
+
+  1. Right click on the project "jabref".  
+  2. Select "Open Module Settings"  
+  3. Expand "JabRef"  
+  4. Select "main"  
+  5. Select tab "Sources"  
+  6. Click "+ Add Content Root"  
+  7. Select the `src-gen` directory  
+  8. Click "OK". When expanding "main", "java" should have been selected as source  
+  9. Click "OK" to save the changes
+
 * In case the above step does not work, run with gradle, import gradle project again, and try again.
 * Delete `org.jabref.gui.logging.plugins.Log4jPlugins` \(location: `src-gen/main/java/org/jabref/gui/logging/plugins/Log4jPlugins.java`\). Otherwise, you will see following error:
 
@@ -249,7 +260,14 @@ Make sure your Eclipse installation us up to date.
 
 ### Localization Test Configuration \(IDEA\)
 
-TODO
+In the run configuration, at the "VM options" \(the box below the java version\), following content needs to be present:
+
+`-ea  
+--add-exports=javafx.controls/com.sun.javafx.scene.control=org.jabref  
+--add-exports=org.controlsfx.controls/impl.org.controlsfx.skin=org.jabref  
+--add-exports javafx.graphics/com.sun.javafx.application=ALL-UNNAMED  
+--add-exports javafx.graphics/com.sun.javafx.stage=ALL-UNNAMED  
+--add-exports javafx.graphics/com.sun.javafx.stage=com.jfoenix`
 
 ### Localization Test Configuration \(Eclipse\)
 
@@ -261,7 +279,7 @@ To run the `LocalizationConsistencyTest`  you need to add some extra module info
 --add-exports javafx.graphics/com.sun.javafx.stage=com.jfoenix
 ```
 
-Now the test will run.
+Now the test will run, there is a "Build and run" section. In the 
 
 ## Final comments
 
