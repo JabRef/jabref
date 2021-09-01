@@ -34,6 +34,7 @@ import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 
 import org.jabref.gui.ClipBoardManager;
+import org.jabref.gui.DialogService;
 import org.jabref.gui.Globals;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.StateManager;
@@ -42,11 +43,13 @@ import org.jabref.gui.autocompleter.AutoCompleteFirstNameMode;
 import org.jabref.gui.autocompleter.AutoCompletionTextInputBinding;
 import org.jabref.gui.autocompleter.PersonNameStringConverter;
 import org.jabref.gui.autocompleter.SuggestionProvider;
+import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.groups.GroupViewMode;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.search.rules.describer.SearchDescribers;
+import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.IconValidationDecorator;
@@ -104,12 +107,15 @@ public class GlobalSearchBar extends HBox {
 
     private final GroupViewMode groupViewMode;
 
+    private final GlobalSearchResultDialog globalSearchDialog;
 
-    public GlobalSearchBar(JabRefFrame frame, StateManager stateManager, PreferencesService preferencesService) {
+
+    public GlobalSearchBar(JabRefFrame frame, StateManager stateManager, PreferencesService preferencesService, CountingUndoManager undoManager, DialogService dialogService) {
         super();
         this.stateManager = stateManager;
         this.preferencesService = preferencesService;
         this.searchPreferences = preferencesService.getSearchPreferences();
+
         groupViewMode = preferencesService.getGroupViewMode();
 
         this.searchField.disableProperty().bind(needsDatabase(stateManager).not());
@@ -121,6 +127,9 @@ public class GlobalSearchBar extends HBox {
         searchFieldTooltip.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
         searchFieldTooltip.setMaxHeight(10);
         updateHintVisibility();
+
+
+       this.globalSearchDialog = new GlobalSearchResultDialog(preferencesService, stateManager, ExternalFileTypes.getInstance(), undoManager, dialogService);
 
         KeyBindingRepository keyBindingRepository = Globals.getKeyPrefs();
         searchField.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
@@ -141,7 +150,6 @@ public class GlobalSearchBar extends HBox {
         caseSensitiveButton = IconTheme.JabRefIcons.CASE_SENSITIVE.asToggleButton();
         fulltextButton = IconTheme.JabRefIcons.FULLTEXT.asToggleButton();
         globalModeButton = IconTheme.JabRefIcons.GLOBAL_SEARCH.asToggleButton();
-        // searchModeButton = new Button();
         initSearchModifierButtons();
 
         BooleanBinding focusedOrActive = searchField.focusedProperty()
@@ -159,7 +167,6 @@ public class GlobalSearchBar extends HBox {
         fulltextButton.visibleProperty().unbind();
         fulltextButton.visibleProperty().bind(focusedOrActive);
         globalModeButton.visibleProperty().bind(focusedOrActive);
-
 
         StackPane modifierButtons = new StackPane(new HBox(regularExpressionButton, caseSensitiveButton, fulltextButton, globalModeButton));
         modifierButtons.setAlignment(Pos.CENTER);
@@ -234,7 +241,7 @@ public class GlobalSearchBar extends HBox {
         globalModeButton.setOnAction(evt -> {
 
             if (stateManager.isGlobalSearchActive()) {
-                this.stateManager.getGlobalSearchDialog().showMainTable();
+                this.globalSearchDialog.showMainTable();
             }
 
             performSearch();
@@ -324,10 +331,8 @@ public class GlobalSearchBar extends HBox {
 
                 context.getDatabase().insertEntries(result);
             }
-            this.stateManager.getGlobalSearchDialog().addEntriesToBibContext(context);
-
+          this.globalSearchDialog.addEntriesToBibContext(context);
         }
-
     }
 
     private boolean isMatched(ObservableList<GroupTreeNode> groups, Optional<SearchQuery> query, BibEntry entry) {

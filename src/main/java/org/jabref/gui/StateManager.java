@@ -19,7 +19,6 @@ import javafx.collections.ObservableMap;
 import javafx.concurrent.Task;
 import javafx.scene.Node;
 
-import org.jabref.gui.search.GlobalSearchResultDialog;
 import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.gui.util.DialogWindowState;
 import org.jabref.gui.util.OptionalObjectProperty;
@@ -60,7 +59,6 @@ public class StateManager {
     private final EasyBinding<Double> tasksProgress = EasyBind.reduce(backgroundTasks, tasks -> tasks.filter(Task::isRunning).mapToDouble(Task::getProgress).average().orElse(1));
     private final ObservableMap<String, DialogWindowState> dialogWindowStates = FXCollections.observableHashMap();
     private final BooleanProperty globalSearch = new SimpleBooleanProperty();
-    private GlobalSearchResultDialog globalSearchResultDialog;
 
     public StateManager() {
         activeGroups.bind(Bindings.valueAt(selectedGroups, activeDatabase.orElse(null)));
@@ -175,14 +173,5 @@ public class StateManager {
 
     public void setDialogWindowState(String className, DialogWindowState state) {
         dialogWindowStates.put(className, state);
-    }
-
-    public GlobalSearchResultDialog getGlobalSearchDialog() {
-        return this.globalSearchResultDialog;
-    }
-
-    public void setGlobalSearchDialog(GlobalSearchResultDialog globalSearchResultDialog) {
-        this.globalSearchResultDialog = globalSearchResultDialog;
-
     }
 }

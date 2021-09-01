@@ -106,7 +106,6 @@ import org.jabref.gui.preview.CopyCitationAction;
 import org.jabref.gui.push.PushToApplicationAction;
 import org.jabref.gui.push.PushToApplicationsManager;
 import org.jabref.gui.search.GlobalSearchBar;
-import org.jabref.gui.search.GlobalSearchResultDialog;
 import org.jabref.gui.search.RebuildFulltextSearchIndexAction;
 import org.jabref.gui.shared.ConnectToSharedDatabaseCommand;
 import org.jabref.gui.shared.PullChangesFromSharedAction;
@@ -181,8 +180,8 @@ public class JabRefFrame extends BorderPane {
         this.dialogService = new JabRefDialogService(mainStage, this, prefs);
         this.stateManager = Globals.stateManager;
         this.pushToApplicationsManager = new PushToApplicationsManager(dialogService, stateManager, prefs);
-        this.globalSearchBar = new GlobalSearchBar(this, stateManager, prefs);
         this.undoManager = Globals.undoManager;
+        this.globalSearchBar = new GlobalSearchBar(this, stateManager, prefs, undoManager, dialogService);
         this.fileHistory = new FileHistoryMenu(prefs, dialogService, getOpenDatabaseAction());
         this.taskExecutor = Globals.TASK_EXECUTOR;
         this.setOnKeyTyped(key -> {
@@ -595,10 +594,8 @@ public class JabRefFrame extends BorderPane {
         // Subscribe to the search
         EasyBind.subscribe(stateManager.activeSearchQueryProperty(),
                 query -> {
-
                     if (getCurrentLibraryTab() != null) {
                         getCurrentLibraryTab().setCurrentSearchQuery(query);
-
                     }
                 });
 
@@ -626,8 +623,6 @@ public class JabRefFrame extends BorderPane {
 
             // Update search autocompleter with information for the correct database:
             libraryTab.updateSearchManager();
-
-            stateManager.setGlobalSearchDialog(new GlobalSearchResultDialog(prefs, stateManager, ExternalFileTypes.getInstance(), undoManager, dialogService));
 
             libraryTab.getUndoManager().postUndoRedoEvent();
             libraryTab.getMainTable().requestFocus();
