@@ -6,7 +6,6 @@ import java.util.stream.Collectors;
 
 import javax.swing.undo.UndoManager;
 
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.control.ButtonType;
@@ -32,9 +31,6 @@ import org.jabref.logic.search.SearchQuery;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.groups.GroupTreeNode;
-import org.jabref.model.search.matchers.MatcherSet;
-import org.jabref.model.search.matchers.MatcherSets;
 import org.jabref.preferences.PreferencesService;
 
 public class GlobalSearchResultDialog extends Dialog<Void> {
@@ -70,6 +66,13 @@ public class GlobalSearchResultDialog extends Dialog<Void> {
         preview.setLayout(preferencesService.getPreviewPreferences().getCurrentPreviewStyle());
     }
 
+
+    @FXML
+    private void initialize() {
+
+
+    }
+
     public void doGlobalSearch() {
         if (stateManager.isGlobalSearchActive()) {
 
@@ -77,7 +80,7 @@ public class GlobalSearchResultDialog extends Dialog<Void> {
 
             for (BibDatabaseContext dbContext : this.stateManager.getOpenDatabases()) {
 
-                List<BibEntry> result = dbContext.getEntries().stream().filter(entry -> isMatched(stateManager.activeGroupProperty(), stateManager.activeSearchQueryProperty().get(), entry))
+                List<BibEntry> result = dbContext.getEntries().stream().filter(entry -> isMatchedBySearch(stateManager.activeSearchQueryProperty().get(), entry))
                                                  .collect(Collectors.toList());
 
                 resultDbContext.getDatabase().insertEntries(result);
@@ -127,33 +130,12 @@ public class GlobalSearchResultDialog extends Dialog<Void> {
         this.context.getDatabase().insertEntries(ctx.getEntries());
     }
 
-    private boolean isMatched(ObservableList<GroupTreeNode> groups, Optional<SearchQuery> query, BibEntry entry) {
-        return isMatchedByGroup(groups, entry) && isMatchedBySearch(query, entry);
-    }
 
     private boolean isMatchedBySearch(Optional<SearchQuery> query, BibEntry entry) {
         return query.map(matcher -> matcher.isMatch(entry))
                     .orElse(true);
     }
 
-    private boolean isMatchedByGroup(ObservableList<GroupTreeNode> groups, BibEntry entry) {
-        return createGroupMatcher(groups)
-                                         .map(matcher -> matcher.isMatch(entry))
-                                         .orElse(true);
-    }
 
-    private Optional<MatcherSet> createGroupMatcher(List<GroupTreeNode> selectedGroups) {
-        if ((selectedGroups == null) || selectedGroups.isEmpty()) {
-            // No selected group, show all entries
-            return Optional.empty();
-        }
-
-        final MatcherSet searchRules = MatcherSets.build(groupViewMode == GroupViewMode.INTERSECTION ? MatcherSets.MatcherType.AND : MatcherSets.MatcherType.OR);
-
-        for (GroupTreeNode node : selectedGroups) {
-            searchRules.addRule(node.getSearchMatcher());
-        }
-        return Optional.of(searchRules);
-    }
 
 }
