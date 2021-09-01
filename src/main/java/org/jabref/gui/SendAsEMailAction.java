@@ -19,6 +19,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.preferences.JabRefPreferences;
 import org.jabref.preferences.PreferencesService;
 
 import org.slf4j.Logger;
@@ -106,7 +107,11 @@ public class SendAsEMailAction extends SimpleCommand {
 
         String mailTo = "?Body=".concat(rawEntries.getBuffer().toString());
         mailTo = mailTo.concat("&Subject=");
-        mailTo = mailTo.concat(preferencesService.getExternalApplicationsPreferences().getEmailSubject());
+        String subject = preferencesService.getExternalApplicationsPreferences().getEmailSubject();
+        if (subject.equals(preferencesService.getDefaults().get(JabRefPreferences.EMAIL_SUBJECT))) {
+            subject = Localization.lang(subject);
+        }
+        mailTo = mailTo.concat(subject);
         for (String path : attachments) {
             mailTo = mailTo.concat("&Attachment=\"").concat(path);
             mailTo = mailTo.concat("\"");

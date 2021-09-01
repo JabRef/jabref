@@ -23,6 +23,7 @@ import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.preferences.ExternalApplicationsPreferences;
+import org.jabref.preferences.JabRefPreferences;
 import org.jabref.preferences.PreferencesService;
 import org.jabref.preferences.PushToApplicationPreferences;
 
@@ -81,7 +82,11 @@ public class ExternalTabViewModel implements PreferenceTabViewModel {
     }
 
     public void setValues() {
-        eMailReferenceSubjectProperty.setValue(initialPreferences.getEmailSubject());
+        String subject = initialPreferences.getEmailSubject();
+        if (subject.equals(preferences.getDefaults().get(JabRefPreferences.EMAIL_SUBJECT))) {
+            subject = Localization.lang(subject);
+        }
+        eMailReferenceSubjectProperty.setValue(subject);
         autoOpenAttachedFoldersProperty.setValue(initialPreferences.shouldAutoOpenEmailAttachmentsFolder());
 
         pushToApplicationsListProperty.setValue(
@@ -98,6 +103,12 @@ public class ExternalTabViewModel implements PreferenceTabViewModel {
     }
 
     public void storeSettings() {
+        String newSubject = eMailReferenceSubjectProperty.getValue();
+        if (!newSubject.equals(Localization.lang((String) preferences.getDefaults().get(JabRefPreferences.EMAIL_SUBJECT)))) {
+            // If the field is the same as the Localized Default, the user did not change it, so let's save the default
+            // so it can be Localized again next time the view is shown (maybe in another language).
+            newSubject = (String) preferences.getDefaults().get(JabRefPreferences.EMAIL_SUBJECT);
+        }
         preferences.storeExternalApplicationsPreferences(new ExternalApplicationsPreferences(
                 eMailReferenceSubjectProperty.getValue(),
                 autoOpenAttachedFoldersProperty.getValue(),

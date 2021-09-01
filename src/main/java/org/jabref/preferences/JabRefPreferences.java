@@ -629,7 +629,7 @@ public class JabRefPreferences implements PreferencesService {
         // Currently, JabRef does not escape them
         defaults.put(KEY_GEN_FIRST_LETTER_A, Boolean.TRUE);
         defaults.put(KEY_GEN_ALWAYS_ADD_LETTER, Boolean.FALSE);
-        defaults.put(EMAIL_SUBJECT, Localization.lang("References"));
+        defaults.put(EMAIL_SUBJECT, "References");
         defaults.put(OPEN_FOLDERS_OF_ATTACHED_FILES, Boolean.FALSE);
         defaults.put(ALLOW_FILE_AUTO_OPEN_BROWSE, Boolean.TRUE);
         defaults.put(WEB_SEARCH_VISIBLE, Boolean.TRUE);
@@ -807,7 +807,6 @@ public class JabRefPreferences implements PreferencesService {
         // Entry editor tab 2: Comments Field - used for research comments, etc.
         defaults.put(CUSTOM_TAB_FIELDS + "_def2", StandardField.COMMENT.getName());
         defaults.put(CUSTOM_TAB_NAME + "_def2", Localization.lang("Comments"));
-
         defaults.put(EMAIL_SUBJECT, Localization.lang("References"));
     }
 
@@ -1038,7 +1037,7 @@ public class JabRefPreferences implements PreferencesService {
         try (OutputStream os = Files.newOutputStream(file)) {
             prefs.exportSubtree(os);
         } catch (BackingStoreException | IOException ex) {
-            throw new JabRefException("Could not export preferences", Localization.lang("Could not export preferences"),
+            throw new JabRefException("Could not export preferences",
                     ex);
         }
     }
@@ -1054,8 +1053,7 @@ public class JabRefPreferences implements PreferencesService {
         try (InputStream is = Files.newInputStream(file)) {
             Preferences.importPreferences(is);
         } catch (InvalidPreferencesFormatException | IOException ex) {
-            throw new JabRefException("Could not import preferences", Localization.lang("Could not import preferences"),
-                    ex);
+            throw new JabRefException("Could not import preferences", ex);
         }
     }
 
