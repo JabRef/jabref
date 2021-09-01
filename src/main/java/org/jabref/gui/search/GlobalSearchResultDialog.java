@@ -121,5 +121,4 @@ public class GlobalSearchResultDialog {
         }
         return Optional.of(searchRules);
     }
-
 }
