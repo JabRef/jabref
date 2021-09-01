@@ -71,6 +71,14 @@ class JavaLocalizationEntryParser {
         return languageKey;
     }
 
+    /**
+     * Determines the content between each
+     *   `Localization.lang("` and `")`
+     * or between
+     *   `Localization.menuTitle"` and `")`
+     *
+     * as list of Strings
+     */
     public static List<String> getLocalizationParameter(String content, LocalizationBundleForTest type) {
         List<String> result = new ArrayList<>();
 
