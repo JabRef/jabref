@@ -6,6 +6,8 @@ import java.util.Optional;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
+import javax.swing.undo.UndoManager;
+
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
@@ -34,7 +36,6 @@ import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 
 import org.jabref.gui.ClipBoardManager;
-import org.jabref.gui.DialogService;
 import org.jabref.gui.Globals;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.StateManager;
@@ -85,7 +86,7 @@ public class GlobalSearchBar extends HBox {
     private final ToggleButton caseSensitiveButton;
     private final ToggleButton regularExpressionButton;
     private final ToggleButton fulltextButton;
-    private final Button globalModeButton;
+    private final Button openGlobalSearchButton;
     private final ToggleButton keepSearchString;
     // private final Button searchModeButton;
     private final Tooltip searchFieldTooltip = new Tooltip();
@@ -94,16 +95,18 @@ public class GlobalSearchBar extends HBox {
     private final StateManager stateManager;
     private final PreferencesService preferencesService;
     private final Validator regexValidator;
+    private final UndoManager undoManager;
 
     private SearchPreferences searchPreferences;
 
-    private final GlobalSearchResultDialog globalSearchDialog;
+    private GlobalSearchResultDialog globalSearchResultDialog;
 
-    public GlobalSearchBar(JabRefFrame frame, StateManager stateManager, PreferencesService preferencesService, CountingUndoManager undoManager, DialogService dialogService) {
+    public GlobalSearchBar(JabRefFrame frame, StateManager stateManager, PreferencesService preferencesService, CountingUndoManager undoManager) {
         super();
         this.stateManager = stateManager;
         this.preferencesService = preferencesService;
         this.searchPreferences = preferencesService.getSearchPreferences();
+        this.undoManager = undoManager;
 
         searchField.disableProperty().bind(needsDatabase(stateManager).not());
 
@@ -114,8 +117,6 @@ public class GlobalSearchBar extends HBox {
         searchFieldTooltip.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
         searchFieldTooltip.setMaxHeight(10);
         updateHintVisibility();
-
-        globalSearchDialog = new GlobalSearchResultDialog(ExternalFileTypes.getInstance(), undoManager);
 
         KeyBindingRepository keyBindingRepository = Globals.getKeyPrefs();
         searchField.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
@@ -135,7 +136,7 @@ public class GlobalSearchBar extends HBox {
         regularExpressionButton = IconTheme.JabRefIcons.REG_EX.asToggleButton();
         caseSensitiveButton = IconTheme.JabRefIcons.CASE_SENSITIVE.asToggleButton();
         fulltextButton = IconTheme.JabRefIcons.FULLTEXT.asToggleButton();
-        globalModeButton = IconTheme.JabRefIcons.OPEN_GLOBAL_SEARCH.asButton();
+        openGlobalSearchButton = IconTheme.JabRefIcons.OPEN_GLOBAL_SEARCH.asButton();
         keepSearchString = IconTheme.JabRefIcons.KEEP_SEARCH_STRING.asToggleButton();
 
         initSearchModifierButtons();
@@ -172,7 +173,7 @@ public class GlobalSearchBar extends HBox {
         visualizer.setDecoration(new IconValidationDecorator(Pos.CENTER_LEFT));
         Platform.runLater(() -> visualizer.initVisualization(regexValidator.getValidationStatus(), searchField));
 
-        this.getChildren().addAll(searchField, globalModeButton, currentResults);
+        this.getChildren().addAll(searchField, openGlobalSearchButton, currentResults);
         this.setSpacing(4.0);
         this.setAlignment(Pos.CENTER_LEFT);
 
@@ -193,7 +194,9 @@ public class GlobalSearchBar extends HBox {
     private void updateSearchResultsForQuery(SearchQuery query) {
         updateResults(this.stateManager.getSearchResultSize().intValue(), SearchDescribers.getSearchDescriberFor(query).getDescription(),
                       query.isGrammarBasedSearch());
-        globalSearchDialog.doGlobalSearch();
+        if (globalSearchResultDialog != null) {
+            globalSearchResultDialog.updateSearch();
+        }
     }
 
     private void initSearchModifierButtons() {
@@ -224,17 +227,6 @@ public class GlobalSearchBar extends HBox {
             performSearch();
         });
 
-        globalModeButton.disableProperty().bindBidirectional(stateManager.globalSearchPropery());
-        globalModeButton.setTooltip(new Tooltip(Localization.lang("Search across libraries in a new window")));
-        initSearchModifierButton(globalModeButton);
-        globalModeButton.setOnAction(evt -> {
-            this.stateManager.setGlobalSearchActive(true);
-            performSearch();
-
-            this.globalSearchDialog.showMainTable();
-            this.stateManager.setGlobalSearchActive(false);
-        });
-
         keepSearchString.setSelected(searchPreferences.isKeepSearchStrng());
         keepSearchString.setTooltip(new Tooltip(Localization.lang("Keep search string across libraries")));
         initSearchModifierButton(keepSearchString);
@@ -242,6 +234,17 @@ public class GlobalSearchBar extends HBox {
             searchPreferences = searchPreferences.withKeepSearchString(keepSearchString.isSelected());
             preferencesService.storeSearchPreferences(searchPreferences);
             performSearch();
+        });
+
+        openGlobalSearchButton.disableProperty().bindBidirectional(stateManager.globalSearchPropery());
+        openGlobalSearchButton.setTooltip(new Tooltip(Localization.lang("Search across libraries in a new window")));
+        initSearchModifierButton(openGlobalSearchButton);
+        openGlobalSearchButton.setOnAction(evt -> {
+            this.stateManager.setGlobalSearchActive(true);
+            globalSearchResultDialog = new GlobalSearchResultDialog(ExternalFileTypes.getInstance(), undoManager);
+            performSearch();
+            globalSearchResultDialog.updateSearch();
+            this.stateManager.setGlobalSearchActive(false);
         });
     }
 
