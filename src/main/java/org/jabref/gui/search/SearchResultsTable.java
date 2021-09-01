@@ -52,7 +52,7 @@ public class SearchResultsTable extends TableView<BibEntryTableViewModel> {
             this.setColumnResizePolicy(new SmartConstrainedResizePolicy());
         }
 
-        this.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+        this.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
         this.setItems(model.getEntriesFilteredAndSorted());
         // Enable sorting
         model.getEntriesFilteredAndSorted().comparatorProperty().bind(this.comparatorProperty());
