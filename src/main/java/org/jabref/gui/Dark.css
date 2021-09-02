@@ -108,6 +108,11 @@
     -fx-background-color: -jr-background;
 }
 
+.mainToolbar .search-field .button .glyph-icon {
+    -fx-fill: derive(-fx-light-text-color, 80%);
+    -fx-text-fill: derive(-fx-light-text-color, 80%);
+    -fx-icon-color: derive(-fx-light-text-color, 80%);
+}
 
 .mainToolbar .search-field .toggle-button .glyph-icon {
     -fx-fill: -jr-search-text;

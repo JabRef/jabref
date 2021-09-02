@@ -32,16 +32,16 @@ class Codec52 {
      */
     public static class ParsedMarkName {
         /**  "", "0", "1" ... */
-        public final String i;
+        public final String index;
         /** in-text-citation type */
         public final CitationType citationType;
         /** Citation keys embedded in the reference mark. */
         public final List<String> citationKeys;
 
-        ParsedMarkName(String i, CitationType citationType, List<String> citationKeys) {
-            Objects.requireNonNull(i);
+        ParsedMarkName(String index, CitationType citationType, List<String> citationKeys) {
+            Objects.requireNonNull(index);
             Objects.requireNonNull(citationKeys);
-            this.i = i;
+            this.index = index;
             this.citationType = citationType;
             this.citationKeys = citationKeys;
         }
@@ -50,8 +50,8 @@ class Codec52 {
     /**
      * Integer representation was written into the document in JabRef52, keep it for compatibility.
      */
-    private static CitationType citationTypeFromInt(int i) {
-        return switch (i) {
+    private static CitationType citationTypeFromInt(int code) {
+        return switch (code) {
             case 1 -> CitationType.AUTHORYEAR_PAR;
             case 2 -> CitationType.AUTHORYEAR_INTEXT;
             case 3 -> CitationType.INVISIBLE_CIT;
@@ -59,8 +59,8 @@ class Codec52 {
         };
     }
 
-    private static int citationTypeToInt(CitationType i) {
-        return switch (i) {
+    private static int citationTypeToInt(CitationType type) {
+        return switch (type) {
             case AUTHORYEAR_PAR -> 1;
             case AUTHORYEAR_INTEXT -> 2;
             case INVISIBLE_CIT -> 3;
@@ -86,12 +86,12 @@ class Codec52 {
 
         String citationKeysPart = String.join(",", citationKeys);
 
-        int i = 0;
+        int index = 0;
         int citTypeCode = citationTypeToInt(citationType);
         String name = BIB_CITATION + '_' + citTypeCode + '_' + citationKeysPart;
         while (usedNames.contains(name)) {
-            name = BIB_CITATION + i + '_' + citTypeCode + '_' + citationKeysPart;
-            i++;
+            name = BIB_CITATION + index + '_' + citTypeCode + '_' + citationKeysPart;
+            index++;
         }
         return name;
     }
@@ -110,10 +110,10 @@ class Codec52 {
         }
 
         List<String> keys = Arrays.asList(citeMatcher.group(3).split(","));
-        String i = citeMatcher.group(1);
+        String index = citeMatcher.group(1);
         int citTypeCode = Integer.parseInt(citeMatcher.group(2));
         CitationType citationType = citationTypeFromInt(citTypeCode);
-        return (Optional.of(new Codec52.ParsedMarkName(i, citationType, keys)));
+        return (Optional.of(new Codec52.ParsedMarkName(index, citationType, keys)));
     }
 
     /**

@@ -233,6 +233,8 @@ public class JabRefPreferences implements PreferencesService {
     public static final String SEARCH_CASE_SENSITIVE = "caseSensitiveSearch";
     public static final String SEARCH_REG_EXP = "regExpSearch";
     public static final String SEARCH_FULLTEXT = "fulltextSearch";
+    public static final String SEARCH_KEEP_SEARCH_STRING = "keepSearchString";
+    public static final String SEARCH_KEEP_GLOBAL_WINDOW_ON_TOP = "keepOnTop";
 
     public static final String GENERATE_KEY_ON_IMPORT = "generateKeyOnImport";
     public static final String GROBID_ENABLED = "grobidEnabled";
@@ -444,6 +446,8 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(SEARCH_CASE_SENSITIVE, Boolean.FALSE);
         defaults.put(SEARCH_REG_EXP, Boolean.FALSE);
         defaults.put(SEARCH_FULLTEXT, Boolean.TRUE);
+        defaults.put(SEARCH_KEEP_SEARCH_STRING, Boolean.FALSE);
+        defaults.put(SEARCH_KEEP_GLOBAL_WINDOW_ON_TOP, Boolean.TRUE);
 
         defaults.put(GENERATE_KEY_ON_IMPORT, Boolean.TRUE);
         defaults.put(GROBID_ENABLED, Boolean.FALSE);
@@ -2506,7 +2510,9 @@ public class JabRefPreferences implements PreferencesService {
                 searchDisplayMode,
                 getBoolean(SEARCH_CASE_SENSITIVE),
                 getBoolean(SEARCH_REG_EXP),
-                getBoolean(SEARCH_FULLTEXT));
+                getBoolean(SEARCH_FULLTEXT),
+                getBoolean(SEARCH_KEEP_SEARCH_STRING),
+                getBoolean(SEARCH_KEEP_GLOBAL_WINDOW_ON_TOP));
     }
 
     @Override
@@ -2515,6 +2521,8 @@ public class JabRefPreferences implements PreferencesService {
         putBoolean(SEARCH_CASE_SENSITIVE, preferences.isCaseSensitive());
         putBoolean(SEARCH_REG_EXP, preferences.isRegularExpression());
         putBoolean(SEARCH_FULLTEXT, preferences.isFulltext());
+        putBoolean(SEARCH_KEEP_SEARCH_STRING, preferences.isKeepSearchString());
+        putBoolean(SEARCH_KEEP_GLOBAL_WINDOW_ON_TOP, preferences.isKeepWindowOnTop());
     }
 
     //*************************************************************************************************************

@@ -156,27 +156,27 @@ To use IntelliJ IDEA's internal build system when you build JabRef through **Bui
   ![Ignore the Gradle project &quot;buildSrc&quot;](../.gitbook/assets/intellij-gradle-config-ignore-buildSrc%20%282%29%20%282%29%20%282%29%20%283%29%20%283%29%20%286%29%20%284%29.png)
 
 * Add `src-gen` as root:
-   1. Right click on the project "jabref".
-   2. Select "Open Module Settings"
-   3. Expand "JabRef"
-   4. Select "main"
-   5. Select tab "Sources"
-   6. Click "+ Add Content Root"
-   7. Select the `src-gen` directory
-   8. Click "OK". When expanding "main", "java" should have been selected as source
-   9. Click "OK" to save the changes
+  1. Right click on the project "jabref".  
+  2. Select "Open Module Settings"  
+  3. Expand "JabRef"  
+  4. Select "main"  
+  5. Select tab "Sources"  
+  6. Click "+ Add Content Root"  
+  7. Select the `src-gen` directory  
+  8. Click "OK". When expanding "main", "java" should have been selected as source  
+  9. Click "OK" to save the changes
 * In case the above step does not work, run with gradle, import gradle project again, and try again.
-* Delete `org.jabref.gui.logging.plugins.Log4jPlugins` \(location: `src-gen/main/java/org/jabref/gui/logging/plugins/Log4jPlugins.java`\). Otherwise, you will see following error:
+* Delete `org.jabref.gui.logging.plugins.Log4jPlugins` \(location: `src-gen/main/java/org/jabref/gui/logging/plugins/Log4jPlugins.java`\).   Hint: You can use Ctrl+Shift+N to search for the name `Log4jPlugins`.  After opening the file, you can use Alt+F1 and then Enter to focus the file in the project explorer. Then press Del and confirm with Enter. -- In case you find two files, delete both files.   If the class is not deleted, you will see following error:
 
-  ```text
-  Error:java: Unable to create Plugin Service Class org.jabref.gui.logging.plugins.Log4jPlugins
-  ```
+```text
+Error:java: Unable to create Plugin Service Class org.jabref.gui.logging.plugins.Log4jPlugins
+```
 
-  or following error:
+or following error:
 
-  ```text
-  Error:(16, 25) java: package org.jabref.search does not exist
-  ```
+```text
+Error:(16, 25) java: package org.jabref.search does not exist
+```
 
 Essentially, you now have the best of both worlds: You can run Gradle tasks using the Gradle Tool Window and unless you haven't made changes to input files that generate sources, you can compile and run with IntelliJ's faster internal build system.
 
@@ -225,7 +225,7 @@ Make sure your Eclipse installation us up to date.
 4. Create a run/debug configuration for the main class `org.jabref.gui.JabRefLauncher` and/or for `org.jabref.gui.JabRefMain` \(both can be used equivalently\)
    * Remark: The run/debug configuration needs to be added by right clicking the class \(e.g. JabRefLauncher or JabRefMain\) otherwise it will not work.
 
-     ![Creating the run/debug configuration by right clicking on the class](../.gitbook/assets/eclipse-create-run-config%20%281%29%20%283%29%20%283%29%20%284%29%20%284%29%20%283%29%20%285%29.png)
+     ![Creating the run/debug configuration by right clicking on the class](../.gitbook/assets/eclipse-create-run-config%20%281%29%20%283%29%20%283%29%20%284%29%20%284%29%20%283%29%20%282%29.png)
 
    * In the tab "Arguments" of the run/debug configuration, enter the following runtime VM arguments:
 
@@ -256,6 +256,31 @@ Make sure your Eclipse installation us up to date.
 5. Optional: Install the [e\(fx\)clipse plugin](http://www.eclipse.org/efxclipse/index.html) from the Eclipse marketplace: 1. Help -&gt; Eclipse Marketplace... -&gt; Search tab 2. Enter "e\(fx\)clipse" in the search dialogue 3. Click "Go" 4. Click "Install" button next to the plugin 5. Click "Finish"
 6. Now you can build and run/debug the application by either using "JabRefLauncher" or "JabRefMain". This is the recommended way, since the application starts quite fast.
 
+### Localization Test Configuration \(IDEA\)
+
+In the run configuration, there is a "Build and run" section. At the "VM options" \(the box below the java version\), following content needs to be present:
+
+```text
+-ea
+--add-exports=javafx.controls/com.sun.javafx.scene.control=org.jabref  
+--add-exports=org.controlsfx.controls/impl.org.controlsfx.skin=org.jabref  
+--add-exports javafx.graphics/com.sun.javafx.application=ALL-UNNAMED  
+--add-exports javafx.graphics/com.sun.javafx.stage=ALL-UNNAMED  
+--add-exports javafx.graphics/com.sun.javafx.stage=com.jfoenix
+```
+
+Now the test will run.
+
+### Localization Test Configuration \(Eclipse\)
+
+To run the `LocalizationConsistencyTest` you need to add some extra module information: Right-click on the file -&gt; "Run/Debug as JUnit test". Go to the Run/debug configuration created for that file and in the arguments tab under VM-configurations add:
+
+```text
+--add-exports javafx.graphics/com.sun.javafx.application=ALL-UNNAMED
+--add-exports javafx.graphics/com.sun.javafx.stage=ALL-UNNAMED
+--add-exports javafx.graphics/com.sun.javafx.stage=com.jfoenix
+```
+
 ## Final comments
 
 Got it running? GREAT! You are ready to lurk the code and contribute to JabRef. Please make sure to also read our [contribution guide](https://github.com/JabRef/jabref/blob/master/CONTRIBUTING.md).
@@ -284,7 +309,7 @@ java.lang.UnsupportedClassVersionError: org/javamodularity/moduleplugin/ModuleSy
 
 ### Issues with generated source files
 
-In rare cases you might encounter problems due to out-dated automatically generated source files. Running `./gradlew clean` deletes these old copies. Do not forget to run at least `./gradlew eclipse` or `./gradlew build` afterwards to regenerate the source files. \`\`
+In rare cases you might encounter problems due to out-dated automatically generated source files. Running `./gradlew clean` deletes these old copies. Do not forget to run at least `./gradlew eclipse` or `./gradlew build` afterwards to regenerate the source files.
 
 ### Issues with `buildSrc`
 
@@ -303,7 +328,7 @@ java.lang.module.FindException: Module org.jsoup not found, required by org.jabr
 
 This can include different modules.
 
-1. Go to File -> Invalidate caches...
+1. Go to File -&gt; Invalidate caches...
 2. Check "Clear file system cache and Local History".
 3. Check "Clear VCS Log caches and indexes".
 4. Uncheck the others.
@@ -324,9 +349,7 @@ As a workaround, you can remove all local openjfx artifacts by deleting the whol
 
 ### Issues with `JournalAbbreviationLoader`
 
-In case of a NPE at `Files.copy` at `org.jabref.logic.journals.JournalAbbreviationLoader.loadRepository(JournalAbbreviationLoader.java:30) ~[classes/:?]`,
-invalidate caches and restart IntelliJ.
-Then, Build -> Rebuild Project.
+In case of a NPE at `Files.copy` at `org.jabref.logic.journals.JournalAbbreviationLoader.loadRepository(JournalAbbreviationLoader.java:30) ~[classes/:?]`, invalidate caches and restart IntelliJ. Then, Build -&gt; Rebuild Project.
 
 If that does not help:
 
@@ -335,3 +358,12 @@ If that does not help:
 3. Delete all non-versioned items: `git clean -xdf`. This really destroys data
 4. Execute `./gradlew run`
 5. Start IntelliJ and try again.
+
+### Issue with org/jabref/build/JournalAbbreviationConverter$\_convert\_closure1$\_closure2.class is a duplicate but no duplicate handling strategy has been set
+
+After changing the contents of `build.gradle`, on might get following error:
+
+`Entry org/jabref/build/JournalAbbreviationConverter$_convert_closure1$_closure2.class is a duplicate but no duplicate handling strategy has been set.`
+
+Currently, no "real" solution is known. One has to start from scratch \(`git clean -xdf`, ...\).
+
