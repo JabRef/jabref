@@ -9,6 +9,7 @@ import java.util.Set;
 import java.util.WeakHashMap;
 import java.util.function.Consumer;
 
+import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.scene.web.WebEngine;
 
@@ -180,13 +181,15 @@ public class ThemeManager {
     private void updateAdditionalCss(Scene scene) {
         AppearancePreferences appearance = preferencesService.getAppearancePreferences();
 
-        List<String> stylesheets = scene.getStylesheets();
-        if (stylesheets.size() > 1) {
-            stylesheets.remove(1);
-        }
+        Platform.runLater(() -> {
+            List<String> stylesheets = scene.getStylesheets();
+            if (stylesheets.size() > 1) {
+                stylesheets.remove(1);
+            }
 
-        appearance.getTheme().getAdditionalStylesheet().ifPresent(
-                styleSheet -> stylesheets.add(1, styleSheet.getSceneStylesheet().toExternalForm()));
+            appearance.getTheme().getAdditionalStylesheet().ifPresent(
+                    styleSheet -> stylesheets.add(1, styleSheet.getSceneStylesheet().toExternalForm()));
+        });
 
         if (appearance.shouldOverrideDefaultFontSize()) {
             scene.getRoot().setStyle("-fx-font-size: " + appearance.getMainFontSize() + "pt;");
