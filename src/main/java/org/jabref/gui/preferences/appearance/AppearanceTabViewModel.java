@@ -113,10 +113,10 @@ public class AppearanceTabViewModel implements PreferenceTabViewModel {
         }
 
         appearancePreferences.setShouldOverrideDefaultFontSize(fontOverrideProperty.getValue());
-        appearancePreferences.setMainFontSize(newFontSize);
+        appearancePreferences.setMainFontSize(Integer.parseInt(fontSizeProperty.getValue()));
         appearancePreferences.setTheme(newTheme);
 
-        preferences.updateTheme();
+        themeManager.updateTheme();
     }
 
     public ValidationStatus fontSizeValidationStatus() {
