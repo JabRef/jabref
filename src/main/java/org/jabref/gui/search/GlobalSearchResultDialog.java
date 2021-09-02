@@ -6,6 +6,7 @@ import javax.swing.undo.UndoManager;
 import javafx.fxml.FXML;
 import javafx.scene.control.SplitPane;
 import javafx.stage.Modality;
+import javafx.stage.Stage;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
@@ -43,8 +44,9 @@ public class GlobalSearchResultDialog extends BaseDialog<Void> {
         ViewLoader.view(this)
                   .load()
                   .setAsDialogPane(this);
-
         initModality(Modality.NONE);
+        Stage stage = (Stage) getDialogPane().getScene().getWindow();
+        stage.setAlwaysOnTop(true);
     }
 
     @FXML
