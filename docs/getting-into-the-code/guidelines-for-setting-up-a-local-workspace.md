@@ -155,7 +155,7 @@ To use IntelliJ IDEA's internal build system when you build JabRef through **Bui
 
   ![Ignore the Gradle project &quot;buildSrc&quot;](../.gitbook/assets/intellij-gradle-config-ignore-buildSrc%20%282%29%20%282%29%20%282%29%20%283%29%20%283%29%20%286%29%20%284%29.png)
 
-* Add `src-gen` as root: 
+* Add `src-gen` as root:
 
   1. Right click on the project "jabref".  
   2. Select "Open Module Settings"  
@@ -262,12 +262,14 @@ Make sure your Eclipse installation us up to date.
 
 In the run configuration, at the "VM options" \(the box below the java version\), following content needs to be present:
 
-`-ea  
+```text
+-ea
 --add-exports=javafx.controls/com.sun.javafx.scene.control=org.jabref  
 --add-exports=org.controlsfx.controls/impl.org.controlsfx.skin=org.jabref  
 --add-exports javafx.graphics/com.sun.javafx.application=ALL-UNNAMED  
 --add-exports javafx.graphics/com.sun.javafx.stage=ALL-UNNAMED  
---add-exports javafx.graphics/com.sun.javafx.stage=com.jfoenix`
+--add-exports javafx.graphics/com.sun.javafx.stage=com.jfoenix
+```
 
 ### Localization Test Configuration \(Eclipse\)
 
@@ -309,7 +311,7 @@ java.lang.UnsupportedClassVersionError: org/javamodularity/moduleplugin/ModuleSy
 
 ### Issues with generated source files
 
-In rare cases you might encounter problems due to out-dated automatically generated source files. Running `./gradlew clean` deletes these old copies. Do not forget to run at least `./gradlew eclipse` or `./gradlew build` afterwards to regenerate the source files. \`\`
+In rare cases you might encounter problems due to out-dated automatically generated source files. Running `./gradlew clean` deletes these old copies. Do not forget to run at least `./gradlew eclipse` or `./gradlew build` afterwards to regenerate the source files.
 
 ### Issues with `buildSrc`
 
@@ -359,11 +361,11 @@ If that does not help:
 4. Execute `./gradlew run`
 5. Start IntelliJ and try again.
 
-### Issue with org/jabref/build/JournalAbbreviationConverter$\_convert\_closure1$\_closure2.class is a duplicate but no duplicate handling strategy has been set.
+### Issue with org/jabref/build/JournalAbbreviationConverter$\_convert\_closure1$\_closure2.class is a duplicate but no duplicate handling strategy has been set
 
-After changing the contents of build.gradle, on may geht following error:
+After changing the contents of `build.gradle`, on might get following error:
 
 `Entry org/jabref/build/JournalAbbreviationConverter$_convert_closure1$_closure2.class is a duplicate but no duplicate handling strategy has been set.`
 
-Currently, no "real" solution is known. One has to start from scratch \(git clean, ...\).
+Currently, no "real" solution is known. One has to start from scratch \(`git clean -xdf`, ...\).
 
