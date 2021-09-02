@@ -41,7 +41,7 @@ public class AppearanceTabViewModel implements PreferenceTabViewModel {
     private final DialogService dialogService;
     private final PreferencesService preferences;
     private final ThemeManager themeManager;
-    private final AppearancePreferences initialAppearancePreferences;
+    private final AppearancePreferences appearancePreferences;
 
     private final Validator fontSizeValidator;
     private final Validator customPathToThemeValidator;
@@ -52,7 +52,7 @@ public class AppearanceTabViewModel implements PreferenceTabViewModel {
         this.dialogService = dialogService;
         this.preferences = preferences;
         this.themeManager = themeManager;
-        this.initialAppearancePreferences = preferences.getAppearancePreferences();
+        this.appearancePreferences = preferences.getAppearancePreferences();
 
         fontSizeValidator = new FunctionBasedValidator<>(
                 fontSizeProperty,
@@ -79,10 +79,10 @@ public class AppearanceTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public void setValues() {
-        fontOverrideProperty.setValue(initialAppearancePreferences.shouldOverrideDefaultFontSize());
-        fontSizeProperty.setValue(String.valueOf(initialAppearancePreferences.getMainFontSize()));
+        fontOverrideProperty.setValue(appearancePreferences.shouldOverrideDefaultFontSize());
+        fontSizeProperty.setValue(String.valueOf(appearancePreferences.getMainFontSize()));
 
-        Theme currentTheme = initialAppearancePreferences.getTheme();
+        Theme currentTheme = appearancePreferences.getTheme();
         if (currentTheme.getType() == Theme.Type.DEFAULT) {
             themeLightProperty.setValue(true);
             themeDarkProperty.setValue(false);
@@ -101,7 +101,7 @@ public class AppearanceTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public void storeSettings() {
-        if (initialAppearancePreferences.shouldOverrideDefaultFontSize() != fontOverrideProperty.getValue()) {
+        if (appearancePreferences.shouldOverrideDefaultFontSize() != fontOverrideProperty.getValue()) {
             restartWarnings.add(Localization.lang("Override font settings"));
         }
 
@@ -112,13 +112,11 @@ public class AppearanceTabViewModel implements PreferenceTabViewModel {
             newTheme = Theme.custom(customPathToThemeProperty.getValue());
         }
 
-        AppearancePreferences newAppearancePreferences = new AppearancePreferences(
-                fontOverrideProperty.getValue(),
-                Integer.parseInt(fontSizeProperty.getValue()),
-                newTheme);
+        appearancePreferences.setShouldOverrideDefaultFontSize(fontOverrideProperty.getValue());
+        appearancePreferences.setMainFontSize(newFontSize);
+        appearancePreferences.setTheme(newTheme);
 
-        preferences.storeAppearancePreference(newAppearancePreferences);
-        themeManager.updateTheme();
+        preferences.updateTheme();
     }
 
     public ValidationStatus fontSizeValidationStatus() {

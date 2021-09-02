@@ -98,7 +98,7 @@ public class LinkedIdentifierColumn extends MainTableColumn<Map<Field, String>> 
                     cellFactory.getTableIcon(field));
             menuItem.setOnAction(event -> {
                 try {
-                    JabRefDesktop.openExternalViewer(database, values.get(field), field);
+                    JabRefDesktop.openExternalViewer(database, preferences, values.get(field), field);
                 } catch (IOException e) {
                     dialogService.showErrorDialogAndWait(Localization.lang("Unable to open link."), e);
                 }

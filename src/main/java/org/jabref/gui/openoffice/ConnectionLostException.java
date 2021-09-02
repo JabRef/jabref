@@ -5,7 +5,7 @@ package org.jabref.gui.openoffice;
  */
 class ConnectionLostException extends RuntimeException {
 
-    public ConnectionLostException(String s) {
-        super(s);
+    public ConnectionLostException(String msg) {
+        super(msg);
     }
 }

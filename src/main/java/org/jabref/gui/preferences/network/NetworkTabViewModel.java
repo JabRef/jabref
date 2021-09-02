@@ -145,7 +145,7 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
         });
 
         if (newRemotePreferences.useRemoteServer()) {
-            Globals.REMOTE_LISTENER.openAndStart(new JabRefMessageHandler(), initialRemotePreferences.getPort());
+            Globals.REMOTE_LISTENER.openAndStart(new JabRefMessageHandler(), initialRemotePreferences.getPort(), preferences);
         } else {
             Globals.REMOTE_LISTENER.stop();
         }
