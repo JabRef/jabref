@@ -1,6 +1,5 @@
 package org.jabref.gui.importer;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -118,22 +117,22 @@ public class ImportAction {
                 if (importer.isEmpty()) {
                     // Unknown format:
                     DefaultTaskExecutor.runAndWaitInJavaFXThread(() -> {
-                        if (fileIsPdf(filename) && GrobidOptInDialogHelper.showAndWaitIfUserIsUndecided(frame.getDialogService())) {
-                            Globals.IMPORT_FORMAT_READER.resetImportFormats(prefs.getImportSettingsPreferences(), prefs.getImportFormatPreferences(), prefs.getXmpPreferences(), Globals.getFileUpdateMonitor());
+                        if (fileIsPdf(filename) && GrobidOptInDialogHelper.showAndWaitIfUserIsUndecided(frame.getDialogService(), prefs.getImporterPreferences())) {
+                            Globals.IMPORT_FORMAT_READER.resetImportFormats(prefs.getImporterPreferences(), prefs.getImportFormatPreferences(), prefs.getXmpPreferences(), Globals.getFileUpdateMonitor());
                         }
                         frame.getDialogService().notify(Localization.lang("Importing in unknown format") + "...");
                     });
                     // This import method never throws an IOException:
-                    imports.add(Globals.IMPORT_FORMAT_READER.importUnknownFormat(filename, prefs.getTimestampPreferences(), Globals.getFileUpdateMonitor()));
+                    imports.add(Globals.IMPORT_FORMAT_READER.importUnknownFormat(filename, Globals.getFileUpdateMonitor()));
                 } else {
                     DefaultTaskExecutor.runAndWaitInJavaFXThread(() -> {
-                        if (importer.get() instanceof PdfGrobidImporter || importer.get() instanceof PdfMergeMetadataImporter && GrobidOptInDialogHelper.showAndWaitIfUserIsUndecided(frame.getDialogService())) {
-                                Globals.IMPORT_FORMAT_READER.resetImportFormats(prefs.getImportSettingsPreferences(), prefs.getImportFormatPreferences(), prefs.getXmpPreferences(), Globals.getFileUpdateMonitor());
+                        if (importer.get() instanceof PdfGrobidImporter || importer.get() instanceof PdfMergeMetadataImporter && GrobidOptInDialogHelper.showAndWaitIfUserIsUndecided(frame.getDialogService(), prefs.getImporterPreferences())) {
+                                Globals.IMPORT_FORMAT_READER.resetImportFormats(prefs.getImporterPreferences(), prefs.getImportFormatPreferences(), prefs.getXmpPreferences(), Globals.getFileUpdateMonitor());
                         }
                         frame.getDialogService().notify(Localization.lang("Importing in %0 format", importer.get().getName()) + "...");
                     });
                     // Specific importer:
-                    ParserResult pr = importer.get().importDatabase(filename, Globals.prefs.getDefaultEncoding());
+                    ParserResult pr = importer.get().importDatabase(filename, prefs.getDefaultEncoding());
                     imports.add(new ImportFormatReader.UnknownFormatImport(importer.get().getName(), pr));
                 }
             } catch (ImportException | IOException e) {
@@ -165,7 +164,7 @@ public class ImportAction {
                 new DatabaseMerger(prefs.getKeywordDelimiter()).mergeMetaData(
                         result.getMetaData(),
                         parserResult.getMetaData(),
-                        importResult.parserResult.getFile().map(File::getName).orElse("unknown"),
+                        importResult.parserResult.getPath().map(path -> path.getFileName().toString()).orElse("unknown"),
                         parserResult.getDatabase().getEntries());
             }
             // TODO: collect errors into ParserResult, because they are currently ignored (see caller of this method)

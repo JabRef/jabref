@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.jabref.logic.importer.ImportFormatPreferences;
-import org.jabref.logic.importer.importsettings.ImportSettingsPreferences;
+import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
@@ -30,12 +30,12 @@ public class PdfGrobidImporterTest {
 
     @BeforeEach
     public void setUp() {
-        ImportSettingsPreferences importSettingsPreferences = mock(ImportSettingsPreferences.class, Answers.RETURNS_DEEP_STUBS);
-        when(importSettingsPreferences.isGrobidEnabled()).thenReturn(true);
-        when(importSettingsPreferences.getGrobidURL()).thenReturn("http://grobid.jabref.org:8070");
+        ImporterPreferences importerPreferences = mock(ImporterPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        when(importerPreferences.isGrobidEnabled()).thenReturn(true);
+        when(importerPreferences.getGrobidURL()).thenReturn("http://grobid.jabref.org:8070");
         importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(importFormatPreferences.getKeywordSeparator()).thenReturn(',');
-        importer = new PdfGrobidImporter(importSettingsPreferences, importFormatPreferences);
+        importer = new PdfGrobidImporter(importerPreferences, importFormatPreferences);
     }
 
     @Test

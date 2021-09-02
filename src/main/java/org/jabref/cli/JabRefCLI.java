@@ -151,8 +151,18 @@ public class JabRefCLI {
         return cl.hasOption("writeXMPtoPdf");
     }
 
-    public String getWriteXMPtoPdf() {
-        return cl.getOptionValue("writeXMPtoPdf");
+    public boolean isEmbeddBibfileInPdf() {
+        return cl.hasOption("embeddBibfileInPdf");
+    }
+
+    public boolean isWriteMetadatatoPdf() {
+        return cl.hasOption("writeMetadatatoPdf");
+    }
+
+    public String getWriteMetadatatoPdf() {
+        return cl.hasOption("writeMetadatatoPdf") ? cl.getOptionValue("writeMetadatatoPdf") :
+                cl.hasOption("writeXMPtoPdf") ? cl.getOptionValue("writeXMPtoPdf") :
+                cl.hasOption("embeddBibfileInPdf") ? cl.getOptionValue("embeddBibfileInPdf") : null;
     }
 
     private static Options getOptions() {
@@ -251,9 +261,25 @@ public class JabRefCLI {
                 .build());
 
         options.addOption(Option
-                .builder("w")
+                .builder()
                 .longOpt("writeXMPtoPdf")
                 .desc(String.format("%s: '%s'", Localization.lang("Write BibTeXEntry as XMP metadata to PDF."), "-w pathToMyOwnPaper.pdf"))
+                .hasArg()
+                .argName("CITEKEY1[,CITEKEY2][,CITEKEYn] | PDF1[,PDF2][,PDFn] | all")
+                .build());
+
+        options.addOption(Option
+                .builder()
+                .longOpt("embeddBibfileInPdf")
+                .desc(String.format("%s: '%s'", Localization.lang("Embedd BibTeXEntry in PDF."), "-w pathToMyOwnPaper.pdf"))
+                .hasArg()
+                .argName("CITEKEY1[,CITEKEY2][,CITEKEYn] | PDF1[,PDF2][,PDFn] | all")
+                .build());
+
+        options.addOption(Option
+                .builder("w")
+                .longOpt("writeMetadatatoPdf")
+                .desc(String.format("%s: '%s'", Localization.lang("Write BibTeXEntry as metadata to PDF."), "-w pathToMyOwnPaper.pdf"))
                 .hasArg()
                 .argName("CITEKEY1[,CITEKEY2][,CITEKEYn] | PDF1[,PDF2][,PDFn] | all")
                 .build());

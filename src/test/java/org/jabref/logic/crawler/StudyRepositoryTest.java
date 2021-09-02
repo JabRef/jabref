@@ -95,7 +95,7 @@ class StudyRepositoryTest {
     void providePathToNonExistentRepositoryThrowsException() {
         Path nonExistingRepositoryDirectory = tempRepositoryDirectory.resolve(NON_EXISTING_DIRECTORY);
 
-        assertThrows(IOException.class, () -> new StudyRepository(nonExistingRepositoryDirectory, gitHandler, importFormatPreferences, new DummyFileUpdateMonitor(), savePreferences, timestampPreferences, entryTypesManager));
+        assertThrows(IOException.class, () -> new StudyRepository(nonExistingRepositoryDirectory, gitHandler, importFormatPreferences, new DummyFileUpdateMonitor(), savePreferences, entryTypesManager));
     }
 
     /**
@@ -175,7 +175,7 @@ class StudyRepositoryTest {
 
     private StudyRepository getTestStudyRepository() throws Exception {
         setUpTestStudyDefinitionFile();
-        studyRepository = new StudyRepository(tempRepositoryDirectory, gitHandler, importFormatPreferences, new DummyFileUpdateMonitor(), savePreferences, timestampPreferences, entryTypesManager);
+        studyRepository = new StudyRepository(tempRepositoryDirectory, gitHandler, importFormatPreferences, new DummyFileUpdateMonitor(), savePreferences, entryTypesManager);
         return studyRepository;
     }
 

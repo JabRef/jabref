@@ -41,7 +41,7 @@ public class AppearanceTabViewModel implements PreferenceTabViewModel {
 
     private final DialogService dialogService;
     private final PreferencesService preferences;
-    private final AppearancePreferences initialAppearancePreferences;
+    private final AppearancePreferences appearancePreferences;
 
     private final Validator fontSizeValidator;
     private final Validator customPathToThemeValidator;
@@ -51,7 +51,7 @@ public class AppearanceTabViewModel implements PreferenceTabViewModel {
     public AppearanceTabViewModel(DialogService dialogService, PreferencesService preferences) {
         this.dialogService = dialogService;
         this.preferences = preferences;
-        this.initialAppearancePreferences = preferences.getAppearancePreferences();
+        this.appearancePreferences = preferences.getAppearancePreferences();
 
         fontSizeValidator = new FunctionBasedValidator<>(
                 fontSizeProperty,
@@ -78,10 +78,10 @@ public class AppearanceTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public void setValues() {
-        fontOverrideProperty.setValue(initialAppearancePreferences.shouldOverrideDefaultFontSize());
-        fontSizeProperty.setValue(String.valueOf(initialAppearancePreferences.getMainFontSize()));
+        fontOverrideProperty.setValue(appearancePreferences.shouldOverrideDefaultFontSize());
+        fontSizeProperty.setValue(String.valueOf(appearancePreferences.getMainFontSize()));
 
-        Theme currentTheme = initialAppearancePreferences.getTheme();
+        Theme currentTheme = appearancePreferences.getTheme();
         if (currentTheme.getType() == Theme.Type.LIGHT) {
             themeLightProperty.setValue(true);
             themeDarkProperty.setValue(false);
@@ -100,35 +100,34 @@ public class AppearanceTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public void storeSettings() {
-        if (initialAppearancePreferences.shouldOverrideDefaultFontSize() != fontOverrideProperty.getValue()) {
+        if (appearancePreferences.shouldOverrideDefaultFontSize() != fontOverrideProperty.getValue()) {
             restartWarnings.add(Localization.lang("Override font settings"));
         }
 
         int newFontSize = Integer.parseInt(fontSizeProperty.getValue());
-        if (initialAppearancePreferences.getMainFontSize() != newFontSize) {
+        if (appearancePreferences.getMainFontSize() != newFontSize) {
             restartWarnings.add(Localization.lang("Override font size"));
         }
 
-        Theme newTheme = initialAppearancePreferences.getTheme();
-        if (themeLightProperty.getValue() && initialAppearancePreferences.getTheme().getType() != Theme.Type.LIGHT) {
+        Theme newTheme = appearancePreferences.getTheme();
+        if (themeLightProperty.getValue() && appearancePreferences.getTheme().getType() != Theme.Type.LIGHT) {
             restartWarnings.add(Localization.lang("Theme changed to light theme."));
             newTheme = new Theme("", preferences);
-        } else if (themeDarkProperty.getValue() && initialAppearancePreferences.getTheme().getType() != Theme.Type.DARK) {
+        } else if (themeDarkProperty.getValue() && appearancePreferences.getTheme().getType() != Theme.Type.DARK) {
             restartWarnings.add(Localization.lang("Theme changed to dark theme."));
             newTheme = new Theme(EMBEDDED_DARK_THEME_CSS, preferences);
         } else if (themeCustomProperty.getValue() &&
-                (!initialAppearancePreferences.getTheme().getCssPathString()
-                                              .equalsIgnoreCase(customPathToThemeProperty.getValue())
-                        || initialAppearancePreferences.getTheme().getType() != Theme.Type.CUSTOM)) {
+                (!appearancePreferences.getTheme().getCssPathString()
+                                       .equalsIgnoreCase(customPathToThemeProperty.getValue())
+                        || appearancePreferences.getTheme().getType() != Theme.Type.CUSTOM)) {
             restartWarnings.add(Localization.lang("Theme changed to a custom theme:") + " "
                     + customPathToThemeProperty().getValue());
             newTheme = new Theme(customPathToThemeProperty.getValue(), preferences);
         }
 
-        preferences.storeAppearancePreference(new AppearancePreferences(
-                fontOverrideProperty.getValue(),
-                newFontSize,
-                newTheme));
+        appearancePreferences.setShouldOverrideDefaultFontSize(fontOverrideProperty.getValue());
+        appearancePreferences.setMainFontSize(newFontSize);
+        appearancePreferences.setTheme(newTheme);
 
         preferences.updateTheme();
     }

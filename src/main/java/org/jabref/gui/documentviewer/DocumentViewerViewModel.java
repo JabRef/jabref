@@ -18,10 +18,10 @@ import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 
 import org.jabref.gui.AbstractViewModel;
-import org.jabref.gui.Globals;
 import org.jabref.gui.StateManager;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
+import org.jabref.preferences.PreferencesService;
 
 import com.tobiasdiez.easybind.EasyBind;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -33,14 +33,16 @@ public class DocumentViewerViewModel extends AbstractViewModel {
     private static final Logger LOGGER = LoggerFactory.getLogger(DocumentViewerViewModel.class);
 
     private final StateManager stateManager;
+    private final PreferencesService preferencesService;
     private final ObjectProperty<DocumentViewModel> currentDocument = new SimpleObjectProperty<>();
     private final ListProperty<LinkedFile> files = new SimpleListProperty<>();
     private final BooleanProperty liveMode = new SimpleBooleanProperty();
     private final ObjectProperty<Integer> currentPage = new SimpleObjectProperty<>();
     private final IntegerProperty maxPages = new SimpleIntegerProperty();
 
-    public DocumentViewerViewModel(StateManager stateManager) {
+    public DocumentViewerViewModel(StateManager stateManager, PreferencesService preferencesService) {
         this.stateManager = Objects.requireNonNull(stateManager);
+        this.preferencesService = Objects.requireNonNull(preferencesService);
 
         this.stateManager.getSelectedEntries().addListener((ListChangeListener<? super BibEntry>) c -> {
             // Switch to currently selected entry in live mode
@@ -57,10 +59,8 @@ public class DocumentViewerViewModel extends AbstractViewModel {
         });
 
         // we need to wrap this in run later so that the max pages number is correctly shown
-        Platform.runLater(() -> {
-            maxPages.bindBidirectional(
-                EasyBind.wrapNullable(currentDocument).selectProperty(DocumentViewModel::maxPagesProperty));
-        });
+        Platform.runLater(() -> maxPages.bindBidirectional(
+            EasyBind.wrapNullable(currentDocument).selectProperty(DocumentViewModel::maxPagesProperty)));
         setCurrentEntries(this.stateManager.getSelectedEntries());
     }
 
@@ -113,9 +113,9 @@ public class DocumentViewerViewModel extends AbstractViewModel {
 
     public void switchToFile(LinkedFile file) {
         if (file != null) {
-            stateManager.getActiveDatabase().ifPresent(database ->
-                    file.findIn(database, Globals.prefs.getFilePreferences())
-                        .ifPresent(this::setCurrentDocument));
+            stateManager.getActiveDatabase()
+                        .flatMap(database -> file.findIn(database, preferencesService.getFilePreferences()))
+                        .ifPresent(this::setCurrentDocument);
         }
     }
 
