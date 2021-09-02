@@ -337,6 +337,8 @@ public class IconTheme {
         PROTECT_STRING(MaterialDesignC.CODE_BRACES),
         SELECT_ICONS(MaterialDesignA.APPS),
         KEEP_SEARCH_STRING(MaterialDesignE.EARTH),
+        KEEP_ON_TOP(MaterialDesignP.PIN),
+        KEEP_ON_TOP_OFF(MaterialDesignP.PIN_OFF_OUTLINE),
         OPEN_GLOBAL_SEARCH(MaterialDesignO.OPEN_IN_NEW);
 
         private final JabRefIcon icon;
