@@ -194,7 +194,7 @@ public class GlobalSearchBar extends HBox {
     private void updateSearchResultsForQuery(SearchQuery query) {
         updateResults(this.stateManager.getSearchResultSize().intValue(), SearchDescribers.getSearchDescriberFor(query).getDescription(),
                       query.isGrammarBasedSearch());
-        if (globalSearchResultDialog != null) {
+        if ((globalSearchResultDialog != null) && stateManager.isGlobalSearchActive()) {
             globalSearchResultDialog.updateSearch();
         }
     }
