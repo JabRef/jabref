@@ -260,7 +260,8 @@ Make sure your Eclipse installation us up to date.
 
 ### Localization Test Configuration \(IDEA\)
 
-In the run configuration, at the "VM options" \(the box below the java version\), following content needs to be present:
+In the run configuration, there is a "Build and run" section.
+At the "VM options" \(the box below the java version\), following content needs to be present:
 
 ```text
 -ea
@@ -271,6 +272,8 @@ In the run configuration, at the "VM options" \(the box below the java version\)
 --add-exports javafx.graphics/com.sun.javafx.stage=com.jfoenix
 ```
 
+Now the test will run.
+
 ### Localization Test Configuration \(Eclipse\)
 
 To run the `LocalizationConsistencyTest`  you need to add some extra module information:  Right-click on the file -&gt; "Run/Debug as JUnit test".  Go to the Run/debug configuration created for that file and in the arguments tab under VM-configurations add:
@@ -280,8 +283,6 @@ To run the `LocalizationConsistencyTest`  you need to add some extra module info
 --add-exports javafx.graphics/com.sun.javafx.stage=ALL-UNNAMED
 --add-exports javafx.graphics/com.sun.javafx.stage=com.jfoenix
 ```
-
-Now the test will run, there is a "Build and run" section. In the 
 
 ## Final comments
 
