@@ -7,11 +7,9 @@ import java.util.stream.Collectors;
 
 import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
-import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ReadOnlyListProperty;
 import javafx.beans.property.ReadOnlyListWrapper;
-import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -58,7 +56,6 @@ public class StateManager {
     private final EasyBinding<Boolean> anyTaskRunning = EasyBind.reduce(backgroundTasks, tasks -> tasks.anyMatch(Task::isRunning));
     private final EasyBinding<Double> tasksProgress = EasyBind.reduce(backgroundTasks, tasks -> tasks.filter(Task::isRunning).mapToDouble(Task::getProgress).average().orElse(1));
     private final ObservableMap<String, DialogWindowState> dialogWindowStates = FXCollections.observableHashMap();
-    private final BooleanProperty globalSearch = new SimpleBooleanProperty();
 
     public StateManager() {
         activeGroups.bind(Bindings.valueAt(selectedGroups, activeDatabase.orElse(null)));
@@ -129,18 +126,6 @@ public class StateManager {
 
     public void setSearchQuery(SearchQuery searchQuery) {
         activeSearchQuery.setValue(Optional.of(searchQuery));
-    }
-
-    public void setGlobalSearchActive(boolean active) {
-        globalSearch.setValue(active);
-    }
-
-    public BooleanProperty globalSearchPropery() {
-        return globalSearch;
-    }
-
-    public boolean isGlobalSearchActive() {
-        return globalSearch.get();
     }
 
     public OptionalObjectProperty<Node> focusOwnerProperty() {

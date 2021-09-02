@@ -11,6 +11,8 @@ import javax.swing.undo.UndoManager;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.css.PseudoClass;
 import javafx.event.Event;
 import javafx.geometry.Insets;
@@ -99,6 +101,7 @@ public class GlobalSearchBar extends HBox {
 
     private SearchPreferences searchPreferences;
 
+    private final BooleanProperty globalSearchActive = new SimpleBooleanProperty(false);
     private GlobalSearchResultDialog globalSearchResultDialog;
 
     public GlobalSearchBar(JabRefFrame frame, StateManager stateManager, PreferencesService preferencesService, CountingUndoManager undoManager) {
@@ -194,7 +197,7 @@ public class GlobalSearchBar extends HBox {
     private void updateSearchResultsForQuery(SearchQuery query) {
         updateResults(this.stateManager.getSearchResultSize().intValue(), SearchDescribers.getSearchDescriberFor(query).getDescription(),
                       query.isGrammarBasedSearch());
-        if ((globalSearchResultDialog != null) && stateManager.isGlobalSearchActive()) {
+        if ((globalSearchResultDialog != null) && globalSearchActive.getValue()) {
             globalSearchResultDialog.updateSearch();
         }
     }
@@ -236,16 +239,16 @@ public class GlobalSearchBar extends HBox {
             performSearch();
         });
 
-        openGlobalSearchButton.disableProperty().bindBidirectional(stateManager.globalSearchPropery());
+        openGlobalSearchButton.disableProperty().bindBidirectional(globalSearchActive);
         openGlobalSearchButton.setTooltip(new Tooltip(Localization.lang("Search across libraries in a new window")));
         initSearchModifierButton(openGlobalSearchButton);
         openGlobalSearchButton.setOnAction(evt -> {
-            this.stateManager.setGlobalSearchActive(true);
+            globalSearchActive.setValue(true);
             globalSearchResultDialog = new GlobalSearchResultDialog(ExternalFileTypes.getInstance(), undoManager);
             performSearch();
             globalSearchResultDialog.updateSearch();
             globalSearchResultDialog.showAndWait();
-            this.stateManager.setGlobalSearchActive(false);
+            globalSearchActive.setValue(false);
         });
     }
 
