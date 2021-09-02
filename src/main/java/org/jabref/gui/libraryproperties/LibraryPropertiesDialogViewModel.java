@@ -85,7 +85,7 @@ public class LibraryPropertiesDialogViewModel {
         encodingDisableProperty.setValue(isShared); // the encoding of shared database is always UTF-8
         protectDisableProperty.setValue(isShared);
 
-        selectedEncodingPropety.setValue(initialMetaData.getEncoding().orElse(preferences.getDefaultEncoding()));
+        selectedEncodingPropety.setValue(initialMetaData.getEncoding().orElse(preferences.getGeneralPreferences().getDefaultEncoding()));
         selectedDatabaseModeProperty.setValue(initialMetaData.getMode().orElse(BibDatabaseMode.BIBLATEX));
         generalFileDirectoryProperty.setValue(initialMetaData.getDefaultFileDirectory().orElse("").trim());
         userSpecificFileDirectoryProperty.setValue(initialMetaData.getUserFileDirectory(preferences.getUser()).orElse("").trim());

@@ -41,6 +41,6 @@ public class CheckForNewEntryTypesAction implements GUIPostOpenAction {
     }
 
     private BibDatabaseMode getBibDatabaseModeFromParserResult(ParserResult parserResult) {
-        return parserResult.getMetaData().getMode().orElse(Globals.prefs.getDefaultBibDatabaseMode());
+        return parserResult.getMetaData().getMode().orElse(Globals.prefs.getGeneralPreferences().getDefaultBibDatabaseMode());
     }
 }

@@ -11,13 +11,16 @@ import org.jabref.logic.importer.fileformat.PdfMergeMetadataImporter;
 import org.jabref.logic.importer.fileformat.PdfXmpImporter;
 import org.jabref.logic.importer.importsettings.ImportSettingsPreferences;
 import org.jabref.model.util.FileUpdateMonitor;
+import org.jabref.preferences.GeneralPreferences;
 
 public class ExternalFilesContentImporter {
 
+    private final GeneralPreferences generalPreferences;
     private final ImportSettingsPreferences importSettingsPreferences;
     private final ImportFormatPreferences importFormatPreferences;
 
-    public ExternalFilesContentImporter(ImportSettingsPreferences importSettingsPreferences, ImportFormatPreferences importFormatPreferences) {
+    public ExternalFilesContentImporter(GeneralPreferences generalPreferences, ImportSettingsPreferences importSettingsPreferences, ImportFormatPreferences importFormatPreferences) {
+        this.generalPreferences = generalPreferences;
         this.importSettingsPreferences = importSettingsPreferences;
         this.importFormatPreferences = importFormatPreferences;
     }
@@ -35,6 +38,6 @@ public class ExternalFilesContentImporter {
     }
 
     public ParserResult importFromBibFile(Path bibFile, FileUpdateMonitor fileUpdateMonitor) throws IOException {
-        return OpenDatabase.loadDatabase(bibFile, importFormatPreferences, fileUpdateMonitor);
+        return OpenDatabase.loadDatabase(bibFile, generalPreferences, importFormatPreferences, fileUpdateMonitor);
     }
 }

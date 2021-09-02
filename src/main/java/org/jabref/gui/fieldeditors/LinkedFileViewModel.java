@@ -563,7 +563,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
     private Supplier<BibEntry> wrapImporterToSupplier(Importer importer, Path filePath) {
         return () -> {
             try {
-                ParserResult parserResult = importer.importDatabase(filePath, preferences.getDefaultEncoding());
+                ParserResult parserResult = importer.importDatabase(filePath, preferences.getGeneralPreferences().getDefaultEncoding());
                 if (parserResult.isInvalid() || parserResult.isEmpty() || !parserResult.getDatabase().hasEntries()) {
                     return null;
                 }

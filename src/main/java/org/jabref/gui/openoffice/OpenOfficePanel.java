@@ -133,7 +133,7 @@ public class OpenOfficePanel {
 
         loader = new StyleLoader(ooPrefs,
                                  preferencesService.getLayoutFormatterPreferences(Globals.journalAbbreviationRepository),
-                                 preferencesService.getDefaultEncoding());
+                                 preferencesService.getGeneralPreferences().getDefaultEncoding());
 
         initPanel();
     }

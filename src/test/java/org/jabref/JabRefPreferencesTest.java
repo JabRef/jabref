@@ -17,7 +17,7 @@ class JabRefPreferencesTest {
     @BeforeEach
     void setUp() {
         prefs = mock(JabRefPreferences.class);
-        when(prefs.getDefaultEncoding()).thenReturn(StandardCharsets.UTF_8);
+        when(prefs.getGeneralPreferences().getDefaultEncoding()).thenReturn(StandardCharsets.UTF_8);
     }
 
     // FIXME: This test is not testing anything. prefs.getDefaultEncoding() will always return StandardCharsets.UTF_8

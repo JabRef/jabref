@@ -16,7 +16,6 @@ public class SavePreferences {
     private final boolean reformatFile;
     private boolean saveInOriginalOrder;
     private SaveOrderConfig saveOrder;
-    private Charset encoding;
     private boolean makeBackup;
     private DatabaseSaveType saveType;
     private boolean takeMetadataSaveOrderInAccount;
@@ -25,7 +24,6 @@ public class SavePreferences {
 
     private SavePreferences(Boolean saveInOriginalOrder,
                             SaveOrderConfig saveOrder,
-                            Charset encoding,
                             Boolean makeBackup,
                             DatabaseSaveType saveType,
                             Boolean takeMetadataSaveOrderInAccount,
@@ -35,7 +33,6 @@ public class SavePreferences {
 
         this.saveInOriginalOrder = saveInOriginalOrder;
         this.saveOrder = saveOrder;
-        this.encoding = encoding;
         this.makeBackup = makeBackup;
         this.saveType = saveType;
         this.takeMetadataSaveOrderInAccount = takeMetadataSaveOrderInAccount;
@@ -46,7 +43,6 @@ public class SavePreferences {
 
     public SavePreferences(Boolean saveInOriginalOrder,
                            SaveOrderConfig saveOrder,
-                           Charset encoding,
                            DatabaseSaveType saveType,
                            Boolean takeMetadataSaveOrderInAccount,
                            Boolean reformatFile,
@@ -55,7 +51,6 @@ public class SavePreferences {
 
         this(saveInOriginalOrder,
                 saveOrder,
-                encoding,
                 true,
                 saveType,
                 takeMetadataSaveOrderInAccount,
@@ -102,15 +97,6 @@ public class SavePreferences {
      */
     public SavePreferences withMakeBackup(Boolean newMakeBackup) {
         this.makeBackup = newMakeBackup;
-        return this;
-    }
-
-    public Charset getEncoding() {
-        return encoding;
-    }
-
-    public SavePreferences withEncoding(Charset newEncoding) {
-        this.encoding = newEncoding;
         return this;
     }
 

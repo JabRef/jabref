@@ -42,18 +42,21 @@ import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.model.metadata.SaveOrderConfig;
 import org.jabref.model.strings.StringUtil;
+import org.jabref.preferences.GeneralPreferences;
 
 public abstract class BibDatabaseWriter {
 
     private static final Pattern REFERENCE_PATTERN = Pattern.compile("(#[A-Za-z]+#)"); // Used to detect string references in strings
     protected final Writer writer;
-    protected final SavePreferences preferences;
+    protected final GeneralPreferences generalPreferences;
+    protected final SavePreferences savePreferences;
     protected final List<FieldChange> saveActionsFieldChanges = new ArrayList<>();
     protected final BibEntryTypesManager entryTypesManager;
 
-    public BibDatabaseWriter(Writer writer, SavePreferences preferences, BibEntryTypesManager entryTypesManager) {
+    public BibDatabaseWriter(Writer writer, GeneralPreferences generalPreferences, SavePreferences savePreferences, BibEntryTypesManager entryTypesManager) {
         this.writer = Objects.requireNonNull(writer);
-        this.preferences = preferences;
+        this.generalPreferences = generalPreferences;
+        this.savePreferences = savePreferences;
         this.entryTypesManager = entryTypesManager;
     }
 
@@ -175,8 +178,8 @@ public abstract class BibDatabaseWriter {
         Set<BibEntryType> typesToWrite = new TreeSet<>();
 
         // Some file formats write something at the start of the file (like the encoding)
-        if (preferences.getSaveType() != SavePreferences.DatabaseSaveType.PLAIN_BIBTEX) {
-            writePrelogue(bibDatabaseContext, preferences.getEncoding());
+        if (savePreferences.getSaveType() != SavePreferences.DatabaseSaveType.PLAIN_BIBTEX) {
+            writePrelogue(bibDatabaseContext, generalPreferences.getDefaultEncoding());
         }
 
         // Write preamble if there is one.
@@ -186,10 +189,10 @@ public abstract class BibDatabaseWriter {
         writeStrings(bibDatabaseContext.getDatabase());
 
         // Write database entries.
-        List<BibEntry> sortedEntries = getSortedEntries(bibDatabaseContext, entries, preferences);
+        List<BibEntry> sortedEntries = getSortedEntries(bibDatabaseContext, entries, savePreferences);
         List<FieldChange> saveActionChanges = applySaveActions(sortedEntries, bibDatabaseContext.getMetaData());
         saveActionsFieldChanges.addAll(saveActionChanges);
-        if (preferences.getCitationKeyPatternPreferences().shouldGenerateCiteKeysBeforeSaving()) {
+        if (savePreferences.getCitationKeyPatternPreferences().shouldGenerateCiteKeysBeforeSaving()) {
             List<FieldChange> keyChanges = generateCitationKeys(bibDatabaseContext, sortedEntries);
             saveActionsFieldChanges.addAll(keyChanges);
         }
@@ -207,9 +210,9 @@ public abstract class BibDatabaseWriter {
             writeEntry(entry, bibDatabaseContext.getMode());
         }
 
-        if (preferences.getSaveType() != SavePreferences.DatabaseSaveType.PLAIN_BIBTEX) {
+        if (savePreferences.getSaveType() != SavePreferences.DatabaseSaveType.PLAIN_BIBTEX) {
             // Write meta data.
-            writeMetaData(bibDatabaseContext.getMetaData(), preferences.getCitationKeyPatternPreferences().getKeyPattern());
+            writeMetaData(bibDatabaseContext.getMetaData(), savePreferences.getCitationKeyPatternPreferences().getKeyPattern());
 
             // Write type definitions, if any:
             writeEntryTypeDefinitions(typesToWrite);
@@ -320,7 +323,7 @@ public abstract class BibDatabaseWriter {
      */
     protected List<FieldChange> generateCitationKeys(BibDatabaseContext databaseContext, List<BibEntry> entries) {
         List<FieldChange> changes = new ArrayList<>();
-        CitationKeyGenerator keyGenerator = new CitationKeyGenerator(databaseContext, preferences.getCitationKeyPatternPreferences());
+        CitationKeyGenerator keyGenerator = new CitationKeyGenerator(databaseContext, savePreferences.getCitationKeyPatternPreferences());
         for (BibEntry bes : entries) {
             Optional<String> oldKey = bes.getCitationKey();
             if (StringUtil.isBlank(oldKey)) {

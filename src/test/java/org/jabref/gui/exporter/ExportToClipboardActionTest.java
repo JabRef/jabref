@@ -99,7 +99,7 @@ public class ExportToClipboardActionTest {
 
         when(importExportPrefs.getLastExportExtension()).thenReturn("HTML");
         when(preferences.getImportExportPreferences()).thenReturn(importExportPrefs);
-        when(preferences.getDefaultEncoding()).thenReturn(StandardCharsets.UTF_8);
+        when(preferences.getGeneralPreferences().getDefaultEncoding()).thenReturn(StandardCharsets.UTF_8);
         when(libraryTab.getSelectedEntries()).thenReturn(selectedEntries);
         when(libraryTab.getBibDatabaseContext()).thenReturn(databaseContext);
         when(databaseContext.getFileDirectories(preferences.getFilePreferences())).thenReturn(new ArrayList<>(Arrays.asList(Path.of("path"))));

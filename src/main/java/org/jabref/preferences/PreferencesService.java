@@ -98,8 +98,6 @@ public interface PreferencesService {
 
     SavePreferences getSavePreferences();
 
-    Charset getDefaultEncoding();
-
     String getUser();
 
     SaveOrderConfig getExportSaveOrder();
@@ -138,8 +136,6 @@ public interface PreferencesService {
     Language getLanguage();
 
     void setLanguage(Language language);
-
-    BibDatabaseMode getDefaultBibDatabaseMode();
 
     GeneralPreferences getGeneralPreferences();
 

@@ -110,7 +110,7 @@ public class ExportCommand extends SimpleCommand {
                                  .getBibDatabaseContext()
                                  .getMetaData()
                                  .getEncoding()
-                                 .orElse(preferences.getDefaultEncoding()),
+                                 .orElse(preferences.getGeneralPreferences().getDefaultEncoding()),
                             finEntries);
                     return null; // can not use BackgroundTask.wrap(Runnable) because Runnable.run() can't throw Exceptions
                 })
