@@ -17,6 +17,9 @@ class JavaLocalizationEntryParser {
     private static final String QUOTATION_PLACEHOLDER = "QUOTATIONPLACEHOLDER";
     private static final Pattern QUOTATION_SYMBOL_PATTERN = Pattern.compile(QUOTATION_PLACEHOLDER);
 
+    /**
+     * Parses the content in the String of the Localization.lang call
+     */
     public static List<String> getLanguageKeysInString(String content, LocalizationBundleForTest type) {
         List<String> parameters = getLocalizationParameter(content, type);
 

@@ -20,6 +20,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import com.github.javaparser.ast.expr.Expression;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -88,7 +89,7 @@ class LocalizationConsistencyTest {
 
     @Test
     void languageKeysShouldNotContainUnderscoresForSpaces() throws IOException {
-        final List<LocalizationEntry> quotedEntries = LocalizationParser
+        final List<LocalizationParser.LocalizationLangCallData> quotedEntries = LocalizationParser
                 .findLocalizationParametersStringsInJavaFiles(LocalizationBundleForTest.LANG)
                 .stream()
                 .filter(key -> key.getKey().contains("\\_"))
@@ -98,13 +99,13 @@ class LocalizationConsistencyTest {
                         "Please correct the following entries:\n" +
                         quotedEntries
                                 .stream()
-                                .map(key -> String.format("\n%s (%s)\n", key.getKey(), key.getPath()))
+                                .map(key -> String.format("\n%s (%s)\n", key.getKey(), key.path()))
                                 .collect(Collectors.toList()));
     }
 
     @Test
     void languageKeysShouldNotContainHtmlBrAndHtmlP() throws IOException {
-        final List<LocalizationEntry> entriesWithHtml = LocalizationParser
+        final List<LocalizationParser.LocalizationLangCallData> entriesWithHtml = LocalizationParser
                 .findLocalizationParametersStringsInJavaFiles(LocalizationBundleForTest.LANG)
                 .stream()
                 .filter(key -> key.getKey().contains("<br>") || key.getKey().contains("<p>"))
@@ -114,7 +115,7 @@ class LocalizationConsistencyTest {
                         "Please correct the following entries:\n" +
                         entriesWithHtml
                                 .stream()
-                                .map(key -> String.format("\n%s (%s)\n", key.getKey(), key.getPath()))
+                                .map(key -> String.format("\n%s (%s)\n", key.getKey(), key.path()))
                                 .collect(Collectors.toList()));
     }
 
@@ -154,15 +155,23 @@ class LocalizationConsistencyTest {
         // Bad: Localization.lang("test" + var)
         // Bad: Localization.lang(var + "test")
         // TODO: Localization.lang(var1 + "test" + var2) not covered
-        Set<LocalizationEntry> keys = LocalizationParser.findLocalizationParametersStringsInJavaFiles(LocalizationBundleForTest.LANG);
-        for (LocalizationEntry e : keys) {
-            assertTrue(e.getKey().startsWith("\"") || e.getKey().endsWith("\""), "Illegal localization parameter found. Must include a String with potential concatenation or replacement parameters. Illegal parameter: Localization.lang(" + e.getKey());
-        }
+        Set<LocalizationParser.LocalizationLangCallData> keys = LocalizationParser.findLocalizationParametersStringsInJavaFiles(LocalizationBundleForTest.LANG);
+        Set<LocalizationParser.LocalizationLangCallData> menuKkeys = LocalizationParser.findLocalizationParametersStringsInJavaFiles(LocalizationBundleForTest.MENU);
+        Set<LocalizationParser.LocalizationLangCallData> allKeys = new HashSet<>(keys);
+        allKeys.addAll(menuKkeys);
+        for (LocalizationParser.LocalizationLangCallData data : allKeys) {
+            assertTrue(callDataIsValid(data), "Illegal localization parameter found. Must be a string or reference ADR-0023" + data.firstArgument().toString());
 
-        keys = LocalizationParser.findLocalizationParametersStringsInJavaFiles(LocalizationBundleForTest.MENU);
-        for (LocalizationEntry e : keys) {
-            assertTrue(e.getKey().startsWith("\"") || e.getKey().endsWith("\""), "Illegal localization parameter found. Must include a String with potential concatenation or replacement parameters. Illegal parameter: Localization.lang(" + e.getKey());
         }
+    }
+
+    private boolean callDataIsValid(LocalizationParser.LocalizationLangCallData data) {
+        if (!data.firstArgument().isCharLiteralExpr()) {
+            // Typically, it should be a string
+            // There is the exception with ADR-0023
+            return data.comment().map(comment -> comment.contains("ADR-0023") || comment.contains("@ADR(23)")).orElse(false);
+        }
+        return true;
     }
 
     private static Language[] installedLanguages() {
