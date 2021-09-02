@@ -169,9 +169,9 @@ public class GlobalSearchBar extends HBox {
         HBox.setHgrow(searchField, Priority.ALWAYS);
 
         regexValidator = new FunctionBasedValidator<>(
-                                                      searchField.textProperty(),
-                                                      query -> !(regularExpressionButton.isSelected() && !validRegex()),
-                                                      ValidationMessage.error(Localization.lang("Invalid regular expression")));
+                searchField.textProperty(),
+                query -> !(regularExpressionButton.isSelected() && !validRegex()),
+                ValidationMessage.error(Localization.lang("Invalid regular expression")));
         ControlsFxVisualizer visualizer = new ControlsFxVisualizer();
         visualizer.setDecoration(new IconValidationDecorator(Pos.CENTER_LEFT));
         Platform.runLater(() -> visualizer.initVisualization(regexValidator.getValidationStatus(), searchField));
@@ -182,13 +182,13 @@ public class GlobalSearchBar extends HBox {
 
         Timer searchTask = FxTimer.create(java.time.Duration.ofMillis(SEARCH_DELAY), this::performSearch);
         BindingsHelper.bindBidirectional(
-                                         stateManager.activeSearchQueryProperty(),
-                                         searchField.textProperty(),
-                                         searchTerm -> {
-                                             // Async update
-                                             searchTask.restart();
-                                         },
-                                         query -> setSearchTerm(query.map(SearchQuery::getQuery).orElse("")));
+                stateManager.activeSearchQueryProperty(),
+                searchField.textProperty(),
+                searchTerm -> {
+                    // Async update
+                    searchTask.restart();
+                },
+                query -> setSearchTerm(query.map(SearchQuery::getQuery).orElse("")));
 
         this.stateManager.activeSearchQueryProperty().addListener((obs, oldvalue, newValue) -> newValue.ifPresent(this::updateSearchResultsForQuery));
         this.stateManager.activeDatabaseProperty().addListener((obs, oldValue, newValue) -> stateManager.activeSearchQueryProperty().get().ifPresent(this::updateSearchResultsForQuery));
@@ -196,7 +196,7 @@ public class GlobalSearchBar extends HBox {
 
     private void updateSearchResultsForQuery(SearchQuery query) {
         updateResults(this.stateManager.getSearchResultSize().intValue(), SearchDescribers.getSearchDescriberFor(query).getDescription(),
-                      query.isGrammarBasedSearch());
+                query.isGrammarBasedSearch());
         if ((globalSearchResultDialog != null) && globalSearchActive.getValue()) {
             globalSearchResultDialog.updateSearch();
         }
@@ -233,7 +233,7 @@ public class GlobalSearchBar extends HBox {
         keepSearchString.setSelected(searchPreferences.isKeepSearchString());
         keepSearchString.setTooltip(new Tooltip(Localization.lang("Keep search string across libraries")));
         initSearchModifierButton(keepSearchString);
-        keepSearchString.setOnAction(evt-> {
+        keepSearchString.setOnAction(evt -> {
             searchPreferences = searchPreferences.withKeepSearchString(keepSearchString.isSelected());
             preferencesService.storeSearchPreferences(searchPreferences);
             performSearch();
@@ -322,9 +322,9 @@ public class GlobalSearchBar extends HBox {
     public void setAutoCompleter(SuggestionProvider<Author> searchCompleter) {
         if (preferencesService.getAutoCompletePreferences().shouldAutoComplete()) {
             AutoCompletionTextInputBinding<Author> autoComplete = AutoCompletionTextInputBinding.autoComplete(searchField,
-                                                                                                              searchCompleter::provideSuggestions,
-                                                                                                              new PersonNameStringConverter(false, false, AutoCompleteFirstNameMode.BOTH),
-                                                                                                              new AppendPersonNamesStrategy());
+                    searchCompleter::provideSuggestions,
+                    new PersonNameStringConverter(false, false, AutoCompleteFirstNameMode.BOTH),
+                    new AppendPersonNamesStrategy());
             AutoCompletePopup<Author> popup = getPopup(autoComplete);
             popup.setSkin(new SearchPopupSkin<>(popup));
         }

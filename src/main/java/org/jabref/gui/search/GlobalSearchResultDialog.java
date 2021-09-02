@@ -49,7 +49,6 @@ public class GlobalSearchResultDialog extends BaseDialog<Void> {
                   .load()
                   .setAsDialogPane(this);
         initModality(Modality.NONE);
-
     }
 
     @FXML

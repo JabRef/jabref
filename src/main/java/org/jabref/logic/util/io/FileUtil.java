@@ -113,7 +113,7 @@ public class FileUtil {
         List<String> uniquePathParts = uniquePathSubstrings(paths);
         return uniquePathParts.stream()
                               .filter(part -> databasePath.toString().contains(part)
-                                              && !part.equals(fileName) && part.contains(File.separator))
+                                      && !part.equals(fileName) && part.contains(File.separator))
                               .findFirst()
                               .map(part -> part.substring(0, part.lastIndexOf(File.separator)));
     }

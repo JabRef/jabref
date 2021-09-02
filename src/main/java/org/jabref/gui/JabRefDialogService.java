@@ -63,7 +63,6 @@ import org.slf4j.LoggerFactory;
  * advised to rather create a new sub class of {@link FXDialog}.
  */
 public class JabRefDialogService implements DialogService {
-
     // Snackbar dialog maximum size
     public static final int DIALOG_SIZE_LIMIT = 300;
 

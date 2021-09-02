@@ -21,24 +21,23 @@ import org.jabref.preferences.PreferencesService;
 public class SearchResultsTable extends TableView<BibEntryTableViewModel> {
 
     public SearchResultsTable(MainTableDataModel model,
-                     BibDatabaseContext database,
-                     PreferencesService preferencesService,
-                     UndoManager undoManager,
-                     DialogService dialogService,
-                     StateManager stateManager,
-                     ExternalFileTypes externalFileTypes) {
+                              BibDatabaseContext database,
+                              PreferencesService preferencesService,
+                              UndoManager undoManager,
+                              DialogService dialogService,
+                              StateManager stateManager,
+                              ExternalFileTypes externalFileTypes) {
         super();
 
         MainTablePreferences mainTablePreferences = preferencesService.getMainTablePreferences();
 
-        this.getColumns().addAll(
-                                 new MainTableColumnFactory(
-                                         database,
-                                         preferencesService,
-                                         externalFileTypes,
-                                         undoManager,
-                                         dialogService,
-                                         stateManager).createColumns());
+        this.getColumns().addAll(new MainTableColumnFactory(
+                database,
+                preferencesService,
+                externalFileTypes,
+                undoManager,
+                dialogService,
+                stateManager).createColumns());
 
         this.getSortOrder().clear();
         mainTablePreferences.getColumnPreferences().getColumnSortOrder().forEach(columnModel ->
