@@ -18,7 +18,8 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We added unprotect_terms to the list of bracketed pattern modifiers [#7826](https://github.com/JabRef/jabref/pull/7960)
 - We added a dialog that allows to parse metadata from linked pdfs. [#7929](https://github.com/JabRef/jabref/pull/7929)
 - We added an icon picker in group edit dialog. [#6142](https://github.com/JabRef/jabref/issues/6142)
-- We added a preference to Opt-In to JabRef's online metadata extraction service (Grobid) usage. [8002](https://github.com/JabRef/jabref/pull/8002)
+- We added a preference to Opt-In to JabRef's online metadata extraction service (Grobid) usage. [#8002](https://github.com/JabRef/jabref/pull/8002)
+- We readded the possibility to display the search results of all databases ("Global Search"). It is shown in a separate window. [#4096](https://github.com/JabRef/jabref/issues/4096)
 
 ### Changed
 
