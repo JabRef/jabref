@@ -14,7 +14,7 @@
     <category field="social_science"/>
     <issn>0883-7066</issn>
     <eissn>1099-1727</eissn>
-    <updated>2021-07-30T12:42:58+00:00</updated>
+    <updated>2021-08-17T08:41:36+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <macro name="editor-translator">
@@ -118,7 +118,7 @@
       <text variable="locator"/>
     </group>
   </macro>
-  <citation disambiguate-add-year-suffix="true" collapse="year">
+  <citation disambiguate-add-year-suffix="true">
     <sort>
       <key macro="issued"/>
       <key macro="author"/>
@@ -131,7 +131,7 @@
       </group>
     </layout>
   </citation>
-  <bibliography hanging-indent="true" entry-spacing="0" line-spacing="2">
+  <bibliography entry-spacing="0" hanging-indent="true">
     <sort>
       <key macro="author" names-min="1" names-use-first="1"/>
       <key macro="author-count" names-min="3" names-use-first="3"/>

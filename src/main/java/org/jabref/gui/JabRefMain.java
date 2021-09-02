@@ -56,6 +56,7 @@ public class JabRefMain extends Application {
 
             // Init preferences
             final JabRefPreferences preferences = JabRefPreferences.getInstance();
+            Localization.setLanguage(preferences.getGeneralPreferences().getLanguage());
             Globals.prefs = preferences;
             // Perform migrations
             PreferencesMigrations.runMigrations();
@@ -124,7 +125,7 @@ public class JabRefMain extends Application {
         Globals.journalAbbreviationRepository = JournalAbbreviationLoader.loadRepository(preferences.getJournalAbbreviationPreferences());
 
         // Build list of Import and Export formats
-        Globals.IMPORT_FORMAT_READER.resetImportFormats(preferences.getImportSettingsPreferences(), preferences.getImportFormatPreferences(),
+        Globals.IMPORT_FORMAT_READER.resetImportFormats(preferences.getImporterPreferences(), preferences.getImportFormatPreferences(),
                 preferences.getXmpPreferences(), Globals.getFileUpdateMonitor());
         Globals.entryTypesManager.addCustomOrModifiedTypes(preferences.getBibEntryTypes(BibDatabaseMode.BIBTEX),
                 preferences.getBibEntryTypes(BibDatabaseMode.BIBLATEX));
@@ -132,7 +133,9 @@ public class JabRefMain extends Application {
                 preferences.getCustomExportFormats(Globals.journalAbbreviationRepository),
                 preferences.getLayoutFormatterPreferences(Globals.journalAbbreviationRepository),
                 preferences.getSavePreferencesForExport(),
-                preferences.getXmpPreferences());
+                preferences.getXmpPreferences(),
+                preferences.getDefaultBibDatabaseMode(),
+                Globals.entryTypesManager);
 
         // Initialize protected terms loader
         Globals.protectedTermsLoader = new ProtectedTermsLoader(preferences.getProtectedTermsPreferences());

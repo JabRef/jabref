@@ -48,10 +48,13 @@ import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.EntryBasedFetcher;
 import org.jabref.logic.importer.WebFetchers;
 import org.jabref.logic.importer.fileformat.PdfMergeMetadataImporter;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.util.FileUpdateMonitor;
+import org.jabref.preferences.JabRefPreferences;
 import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
@@ -247,8 +250,18 @@ public class EntryEditor extends BorderPane {
         entryEditorTabs.add(new OtherFieldsTab(databaseContext, libraryTab.getSuggestionProviders(), undoManager, dialogService, preferencesService, stateManager, Globals.entryTypesManager, ExternalFileTypes.getInstance(), Globals.TASK_EXECUTOR, Globals.journalAbbreviationRepository));
 
         // General fields from preferences
+        int i = 0;
         for (Map.Entry<String, Set<Field>> tab : entryEditorPreferences.getEntryEditorTabList().entrySet()) {
-            entryEditorTabs.add(new UserDefinedFieldsTab(tab.getKey(), tab.getValue(), databaseContext, libraryTab.getSuggestionProviders(), undoManager, dialogService, preferencesService, stateManager, Globals.entryTypesManager, ExternalFileTypes.getInstance(), Globals.TASK_EXECUTOR, Globals.journalAbbreviationRepository));
+            String key = tab.getKey();
+            if (key.equals(preferencesService.getDefaults().get(JabRefPreferences.CUSTOM_TAB_NAME + "_def" + i))) {
+                key = Localization.lang(key);
+            }
+            Set<Field> fields = tab.getValue();
+            if (fields.equals(FieldFactory.parseFieldList((String) Objects.requireNonNullElse(preferencesService.getDefaults().get(JabRefPreferences.CUSTOM_TAB_FIELDS + "_def" + i), "")))) {
+                fields = fields.stream().map(Field::getName).map(Localization::lang).map(FieldFactory::parseField).collect(Collectors.toSet());
+            }
+            entryEditorTabs.add(new UserDefinedFieldsTab(key, fields, databaseContext, libraryTab.getSuggestionProviders(), undoManager, dialogService, preferencesService, stateManager, Globals.entryTypesManager, ExternalFileTypes.getInstance(), Globals.TASK_EXECUTOR, Globals.journalAbbreviationRepository));
+            i++;
         }
 
         // Special tabs
@@ -359,7 +372,7 @@ public class EntryEditor extends BorderPane {
         // Add menu for fetching bibliographic information
         ContextMenu fetcherMenu = new ContextMenu();
         SortedSet<EntryBasedFetcher> entryBasedFetchers = WebFetchers.getEntryBasedFetchers(
-                preferencesService.getImportSettingsPreferences(),
+                preferencesService.getImporterPreferences(),
                 preferencesService.getImportFormatPreferences(),
                 preferencesService.getFilePreferences(),
                 databaseContext,
@@ -369,10 +382,10 @@ public class EntryEditor extends BorderPane {
             if (fetcher instanceof PdfMergeMetadataImporter.EntryBasedFetcherWrapper) {
                 // Handle Grobid Opt-In in case of the PdfMergeMetadataImporter
                 fetcherMenuItem.setOnAction(event -> {
-                    GrobidOptInDialogHelper.showAndWaitIfUserIsUndecided(dialogService);
+                    GrobidOptInDialogHelper.showAndWaitIfUserIsUndecided(dialogService, preferencesService.getImporterPreferences());
                     PdfMergeMetadataImporter.EntryBasedFetcherWrapper pdfMergeMetadataImporter =
                             new PdfMergeMetadataImporter.EntryBasedFetcherWrapper(
-                                    preferencesService.getImportSettingsPreferences(),
+                                    preferencesService.getImporterPreferences(),
                                     preferencesService.getImportFormatPreferences(),
                                     preferencesService.getFilePreferences(),
                                     databaseContext,
@@ -395,8 +408,8 @@ public class EntryEditor extends BorderPane {
     public void setFocusToField(Field field) {
         DefaultTaskExecutor.runInJavaFXThread(() -> {
             for (Tab tab : tabbed.getTabs()) {
-                if ((tab instanceof FieldsEditorTab) && ((FieldsEditorTab) tab).getShownFields().contains(field)) {
-                    FieldsEditorTab fieldsEditorTab = (FieldsEditorTab) tab;
+                if ((tab instanceof FieldsEditorTab fieldsEditorTab) && fieldsEditorTab.getShownFields()
+                                                                                     .contains(field)) {
                     tabbed.getSelectionModel().select(tab);
                     fieldsEditorTab.requestFocus(field);
                 }

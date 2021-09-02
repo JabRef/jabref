@@ -4,11 +4,14 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+
 import org.jabref.model.entry.field.Field;
 
 public class TimestampPreferences {
-    private final boolean addCreationDate;
-    private final boolean addModificationDate;
+    private final BooleanProperty addCreationDate;
+    private final BooleanProperty addModificationDate;
 
     // These are old preferences. They are used for migration only.
     private final boolean updateTimestamp;
@@ -16,8 +19,8 @@ public class TimestampPreferences {
     private final String timestampFormat;
 
     public TimestampPreferences(boolean addCreationDate, boolean modifyTimestamp, boolean updateTimestamp, Field timestampField, String timestampFormat) {
-        this.addCreationDate = addCreationDate;
-        this.addModificationDate = modifyTimestamp;
+        this.addCreationDate = new SimpleBooleanProperty(addCreationDate);
+        this.addModificationDate = new SimpleBooleanProperty(modifyTimestamp);
         this.updateTimestamp = updateTimestamp;
         this.timestampField = timestampField;
         this.timestampFormat = timestampFormat;
@@ -29,11 +32,27 @@ public class TimestampPreferences {
     }
 
     public boolean shouldAddCreationDate() {
+        return addCreationDate.get();
+    }
+
+    public BooleanProperty addCreationDateProperty() {
         return addCreationDate;
     }
 
+    public void setAddCreationDate(boolean addCreationDate) {
+        this.addCreationDate.set(addCreationDate);
+    }
+
     public boolean shouldAddModificationDate() {
+        return addModificationDate.get();
+    }
+
+    public BooleanProperty addModificationDateProperty() {
         return addModificationDate;
+    }
+
+    public void setAddModificationDate(boolean addModificationDate) {
+        this.addModificationDate.set(addModificationDate);
     }
 
     /**

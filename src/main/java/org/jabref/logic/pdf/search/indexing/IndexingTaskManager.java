@@ -39,7 +39,7 @@ public class IndexingTaskManager extends BackgroundTask<Void> {
             isRunning = true;
         }
         updateProgress();
-        while (!taskQueue.isEmpty()) {
+        while (!taskQueue.isEmpty() && !isCanceled()) {
             taskQueue.poll().run();
             numOfIndexedFiles++;
             updateProgress();
@@ -82,7 +82,7 @@ public class IndexingTaskManager extends BackgroundTask<Void> {
     }
 
     public void addToIndex(PdfIndexer indexer, BibEntry entry, BibDatabaseContext databaseContext) {
-        addToIndex(indexer, entry, entry.getFiles(), databaseContext);
+        enqueueTask(() -> addToIndex(indexer, entry, entry.getFiles(), databaseContext));
     }
 
     public void addToIndex(PdfIndexer indexer, BibEntry entry, List<LinkedFile> linkedFiles, BibDatabaseContext databaseContext) {
@@ -98,7 +98,7 @@ public class IndexingTaskManager extends BackgroundTask<Void> {
     }
 
     public void removeFromIndex(PdfIndexer indexer, BibEntry entry) {
-        removeFromIndex(indexer, entry, entry.getFiles());
+        enqueueTask(() -> removeFromIndex(indexer, entry, entry.getFiles()));
     }
 
     public void updateDatabaseName(String name) {

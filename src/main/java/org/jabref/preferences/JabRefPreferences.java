@@ -33,6 +33,7 @@ import java.util.prefs.Preferences;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import javafx.beans.InvalidationListener;
 import javafx.scene.control.TableColumn.SortType;
 
 import org.jabref.gui.Globals;
@@ -68,13 +69,12 @@ import org.jabref.logic.cleanup.FieldFormatterCleanups;
 import org.jabref.logic.exporter.SavePreferences;
 import org.jabref.logic.exporter.TemplateExporter;
 import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.fetcher.DoiFetcher;
 import org.jabref.logic.importer.fileformat.CustomImporter;
-import org.jabref.logic.importer.importsettings.ImportSettingsPreferences;
 import org.jabref.logic.journals.JournalAbbreviationPreferences;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Language;
-import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.layout.TextBasedPreviewLayout;
 import org.jabref.logic.layout.format.FileLinkPreferences;
@@ -108,6 +108,7 @@ import org.jabref.model.metadata.SaveOrderConfig;
 import org.jabref.model.push.PushToApplicationConstants;
 import org.jabref.model.strings.StringUtil;
 
+import com.tobiasdiez.easybind.EasyBind;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -404,16 +405,27 @@ public class JabRefPreferences implements PreferencesService {
     /**
      * Cache variables
      */
-    private Language language;
+    private GeneralPreferences generalPreferences;
+    private TelemetryPreferences telemetryPreferences;
+    private DOIPreferences doiPreferences;
+    private OwnerPreferences ownerPreferences;
+    private TimestampPreferences timestampPreferences;
+
     private GlobalCitationKeyPattern globalCitationKeyPattern;
     private Map<String, Set<Field>> entryEditorTabList;
     private List<MainTableColumnModel> mainTableColumns;
     private List<MainTableColumnModel> mainTableColumnSortOrder;
-    private PreviewPreferences previewPreferences;
-    private SidePanePreferences sidePanePreferences;
     private Theme globalTheme;
     private Set<CustomImporter> customImporters;
     private String userName;
+
+    private PreviewPreferences previewPreferences;
+    private SidePanePreferences sidePanePreferences;
+    private AppearancePreferences appearancePreferences;
+    private ImporterPreferences importerPreferences;
+    private ProtectedTermsPreferences protectedTermsPreferences;
+    private MrDlibPreferences mrDlibPreferences;
+    private EntryEditorPreferences entryEditorPreferences;
 
     // The constructor is made private to enforce this as a singleton class:
     private JabRefPreferences() {
@@ -427,12 +439,6 @@ public class JabRefPreferences implements PreferencesService {
 
         // load user preferences
         prefs = PREFS_NODE;
-
-        // Since some of the preference settings themselves use localized strings, we cannot set the language after
-        // the initialization of the preferences in main
-        // Otherwise that language framework will be instantiated and more importantly, statically initialized preferences
-        // like the SearchDisplayMode will never be translated.
-        Localization.setLanguage(getLanguage());
 
         defaults.put(SEARCH_DISPLAY_MODE, SearchDisplayMode.FILTER.toString());
         defaults.put(SEARCH_CASE_SENSITIVE, Boolean.FALSE);
@@ -694,7 +700,18 @@ public class JabRefPreferences implements PreferencesService {
         // set default theme
         defaults.put(FX_THEME, Theme.BASE_CSS);
 
-        setLanguageDependentDefaultValues();
+        // Entry editor tab 0:
+        defaults.put(CUSTOM_TAB_NAME + "_def0", "General");
+        String fieldNames = FieldFactory.getDefaultGeneralFields().stream().map(Field::getName).collect(Collectors.joining(STRINGLIST_DELIMITER.toString()));
+        defaults.put(CUSTOM_TAB_FIELDS + "_def0", fieldNames);
+
+        // Entry editor tab 1:
+        defaults.put(CUSTOM_TAB_FIELDS + "_def1", StandardField.ABSTRACT.getName());
+        defaults.put(CUSTOM_TAB_NAME + "_def1", "Abstract");
+
+        // Entry editor tab 2: Comments Field - used for research comments, etc.
+        defaults.put(CUSTOM_TAB_FIELDS + "_def2", StandardField.COMMENT.getName());
+        defaults.put(CUSTOM_TAB_NAME + "_def2", "Comments");
     }
 
     /**
@@ -792,21 +809,6 @@ public class JabRefPreferences implements PreferencesService {
                     "problem resolution", ex);
             return get(DEFAULT_OWNER);
         }
-    }
-
-    public void setLanguageDependentDefaultValues() {
-        // Entry editor tab 0:
-        defaults.put(CUSTOM_TAB_NAME + "_def0", Localization.lang("General"));
-        String fieldNames = FieldFactory.getDefaultGeneralFields().stream().map(Field::getName).collect(Collectors.joining(STRINGLIST_DELIMITER.toString()));
-        defaults.put(CUSTOM_TAB_FIELDS + "_def0", fieldNames);
-
-        // Entry editor tab 1:
-        defaults.put(CUSTOM_TAB_FIELDS + "_def1", StandardField.ABSTRACT.getName());
-        defaults.put(CUSTOM_TAB_NAME + "_def1", Localization.lang("Abstract"));
-
-        // Entry editor tab 2: Comments Field - used for research comments, etc.
-        defaults.put(CUSTOM_TAB_FIELDS + "_def2", StandardField.COMMENT.getName());
-        defaults.put(CUSTOM_TAB_NAME + "_def2", Localization.lang("Comments"));
     }
 
     /**
@@ -1036,7 +1038,7 @@ public class JabRefPreferences implements PreferencesService {
         try (OutputStream os = Files.newOutputStream(file)) {
             prefs.exportSubtree(os);
         } catch (BackingStoreException | IOException ex) {
-            throw new JabRefException("Could not export preferences", Localization.lang("Could not export preferences"), ex);
+            throw new JabRefException("Could not export preferences", ex);
         }
     }
 
@@ -1051,7 +1053,7 @@ public class JabRefPreferences implements PreferencesService {
         try (InputStream is = Files.newInputStream(file)) {
             Preferences.importPreferences(is);
         } catch (InvalidPreferencesFormatException | IOException ex) {
-            throw new JabRefException("Could not import preferences", Localization.lang("Could not import preferences"), ex);
+            throw new JabRefException("Could not import preferences", ex);
         }
     }
 
@@ -1269,33 +1271,6 @@ public class JabRefPreferences implements PreferencesService {
     //*************************************************************************************************************
 
     @Override
-    public Language getLanguage() {
-        if (language == null) {
-            updateLanguage();
-        }
-        return language;
-    }
-
-    private void updateLanguage() {
-        String languageId = get(LANGUAGE);
-        language = Stream.of(Language.values())
-                         .filter(language -> language.getId().equalsIgnoreCase(languageId))
-                         .findFirst()
-                         .orElse(Language.ENGLISH);
-    }
-
-    @Override
-    public void setLanguage(Language language) {
-        Language oldLanguage = getLanguage();
-        put(LANGUAGE, language.getId());
-        if (language != oldLanguage) {
-            // Update any defaults that might be language dependent:
-            setLanguageDependentDefaultValues();
-        }
-        updateLanguage();
-    }
-
-    @Override
     public Charset getDefaultEncoding() {
         return Charset.forName(get(DEFAULT_ENCODING));
     }
@@ -1316,81 +1291,90 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public GeneralPreferences getGeneralPreferences() {
-        return new GeneralPreferences(
+        if (Objects.nonNull(generalPreferences)) {
+            return generalPreferences;
+        }
+        String languageId = get(LANGUAGE);
+        Language language = Stream.of(Language.values())
+                .filter(lang -> lang.getId().equalsIgnoreCase(languageId))
+                .findFirst()
+                .orElse(Language.ENGLISH);
+
+        generalPreferences = new GeneralPreferences(
+                language,
                 getDefaultEncoding(),
                 getBoolean(BIBLATEX_DEFAULT_MODE) ? BibDatabaseMode.BIBLATEX : BibDatabaseMode.BIBTEX,
                 getBoolean(WARN_ABOUT_DUPLICATES_IN_INSPECTION),
                 getBoolean(CONFIRM_DELETE),
                 getBoolean(MEMORY_STICK_MODE),
                 getBoolean(SHOW_ADVANCED_HINTS));
-    }
-
-    @Override
-    public void storeGeneralPreferences(GeneralPreferences preferences) {
-        put(DEFAULT_ENCODING, preferences.getDefaultEncoding().name());
-        putBoolean(BIBLATEX_DEFAULT_MODE, (preferences.getDefaultBibDatabaseMode() == BibDatabaseMode.BIBLATEX));
-        putBoolean(WARN_ABOUT_DUPLICATES_IN_INSPECTION, preferences.isWarnAboutDuplicatesInInspection());
-        putBoolean(CONFIRM_DELETE, preferences.shouldConfirmDelete());
-        putBoolean(MEMORY_STICK_MODE, preferences.isMemoryStickMode());
-        putBoolean(SHOW_ADVANCED_HINTS, preferences.shouldShowAdvancedHints());
+        EasyBind.subscribe(generalPreferences.languageProperty(), newValue -> put(LANGUAGE, newValue.getId()));
+        EasyBind.subscribe(generalPreferences.defaultEncodingProperty(), newValue -> put(DEFAULT_ENCODING, newValue.name()));
+        EasyBind.subscribe(generalPreferences.defaultBibDatabaseModeProperty(), newValue -> putBoolean(BIBLATEX_DEFAULT_MODE, (newValue == BibDatabaseMode.BIBLATEX)));
+        EasyBind.subscribe(generalPreferences.isWarnAboutDuplicatesInInspectionProperty(), newValue -> putBoolean(WARN_ABOUT_DUPLICATES_IN_INSPECTION, newValue));
+        EasyBind.subscribe(generalPreferences.confirmDeleteProperty(), newValue -> putBoolean(CONFIRM_DELETE, newValue));
+        EasyBind.subscribe(generalPreferences.memoryStickModeProperty(), newValue -> putBoolean(MEMORY_STICK_MODE, newValue));
+        EasyBind.subscribe(generalPreferences.showAdvancedHintsProperty(), newValue -> putBoolean(SHOW_ADVANCED_HINTS, newValue));
+        return generalPreferences;
     }
 
     @Override
     public TelemetryPreferences getTelemetryPreferences() {
-        return new TelemetryPreferences(
+        if (Objects.nonNull(telemetryPreferences)) {
+            return telemetryPreferences;
+        }
+        telemetryPreferences = new TelemetryPreferences(
                 getBoolean(COLLECT_TELEMETRY),
                 !getBoolean(ALREADY_ASKED_TO_COLLECT_TELEMETRY) // mind the !
         );
-    }
-
-    @Override
-    public void storeTelemetryPreferences(TelemetryPreferences preferences) {
-        putBoolean(COLLECT_TELEMETRY, preferences.shouldCollectTelemetry());
-        putBoolean(ALREADY_ASKED_TO_COLLECT_TELEMETRY, !preferences.shouldAskToCollectTelemetry()); // mind the !
+        EasyBind.subscribe(telemetryPreferences.collectTelemetryProperty(), newValue -> putBoolean(COLLECT_TELEMETRY, newValue));
+        EasyBind.subscribe(telemetryPreferences.askToCollectTelemetryProperty(), newValue -> putBoolean(ALREADY_ASKED_TO_COLLECT_TELEMETRY, !newValue));
+        return telemetryPreferences;
     }
 
     @Override
     public DOIPreferences getDOIPreferences() {
-        return new DOIPreferences(
+        if (Objects.nonNull(doiPreferences)) {
+            return doiPreferences;
+        }
+        doiPreferences = new DOIPreferences(
                 getBoolean(USE_CUSTOM_DOI_URI),
                 get(BASE_DOI_URI));
-    }
-
-    @Override
-    public void storeDOIPreferences(DOIPreferences preferences) {
-        putBoolean(USE_CUSTOM_DOI_URI, preferences.isUseCustom());
-        put(BASE_DOI_URI, preferences.getDefaultBaseURI());
+        EasyBind.subscribe(doiPreferences.useCustomProperty(), newValue -> putBoolean(USE_CUSTOM_DOI_URI, newValue));
+        EasyBind.subscribe(doiPreferences.defaultBaseURIProperty(), newValue -> put(BASE_DOI_URI, newValue));
+        return doiPreferences;
     }
 
     @Override
     public OwnerPreferences getOwnerPreferences() {
-        return new OwnerPreferences(
+        if (Objects.nonNull(ownerPreferences)) {
+            return ownerPreferences;
+        }
+        ownerPreferences = new OwnerPreferences(
                 getBoolean(USE_OWNER),
                 get(DEFAULT_OWNER),
                 getBoolean(OVERWRITE_OWNER));
-    }
-
-    @Override
-    public void storeOwnerPreferences(OwnerPreferences preferences) {
-        putBoolean(USE_OWNER, preferences.isUseOwner());
-        put(DEFAULT_OWNER, preferences.getDefaultOwner());
-        putBoolean(OVERWRITE_OWNER, preferences.isOverwriteOwner());
+        EasyBind.subscribe(ownerPreferences.useOwnerProperty(), newValue -> putBoolean(USE_OWNER, newValue));
+        EasyBind.subscribe(ownerPreferences.defaultOwnerProperty(), newValue -> put(DEFAULT_OWNER, newValue));
+        EasyBind.subscribe(ownerPreferences.overwriteOwnerProperty(), newValue -> putBoolean(OVERWRITE_OWNER, newValue));
+        return ownerPreferences;
     }
 
     @Override
     public TimestampPreferences getTimestampPreferences() {
-        return new TimestampPreferences(
+        if (Objects.nonNull(timestampPreferences)) {
+            return timestampPreferences;
+        }
+        timestampPreferences = new TimestampPreferences(
                 getBoolean(ADD_CREATION_DATE),
                 getBoolean(ADD_MODIFICATION_DATE),
                 getBoolean(UPDATE_TIMESTAMP),
                 FieldFactory.parseField(get(TIME_STAMP_FIELD)),
                 get(TIME_STAMP_FORMAT));
-    }
 
-    @Override
-    public void storeTimestampPreferences(TimestampPreferences preferences) {
-        putBoolean(ADD_CREATION_DATE, preferences.shouldAddCreationDate());
-        putBoolean(ADD_MODIFICATION_DATE, preferences.shouldAddModificationDate());
+        EasyBind.subscribe(timestampPreferences.addCreationDateProperty(), newValue -> putBoolean(ADD_CREATION_DATE, newValue));
+        EasyBind.subscribe(timestampPreferences.addModificationDateProperty(), newValue -> putBoolean(ADD_MODIFICATION_DATE, newValue));
+        return timestampPreferences;
     }
 
     //*************************************************************************************************************
@@ -1437,72 +1421,6 @@ public class JabRefPreferences implements PreferencesService {
     //*************************************************************************************************************
     // EntryEditorPreferences
     //*************************************************************************************************************
-
-    /**
-     * Creates a list of defined tabs in the entry editor from cache
-     *
-     * @return a list of defined tabs
-     */
-    @Override
-    public Map<String, Set<Field>> getEntryEditorTabList() {
-        if (entryEditorTabList == null) {
-            updateEntryEditorTabList();
-        }
-        return entryEditorTabList;
-    }
-
-    /**
-     * Reloads the list of the currently defined tabs  in the entry editor from scratch to cache
-     */
-    @Override
-    public void updateEntryEditorTabList() {
-        Map<String, Set<Field>> tabs = new LinkedHashMap<>();
-        int i = 0;
-        String name;
-        if (hasKey(CUSTOM_TAB_NAME + 0)) {
-            // The user has modified from the default values:
-            while (hasKey(CUSTOM_TAB_NAME + i)) {
-                name = get(CUSTOM_TAB_NAME + i);
-                Set<Field> entry = FieldFactory.parseFieldList(get(CUSTOM_TAB_FIELDS + i));
-                tabs.put(name, entry);
-                i++;
-            }
-        } else {
-            // Nothing set, so we use the default values:
-            while (get(CUSTOM_TAB_NAME + "_def" + i) != null) {
-                name = get(CUSTOM_TAB_NAME + "_def" + i);
-                Set<Field> entry = FieldFactory.parseFieldList(get(CUSTOM_TAB_FIELDS + "_def" + i));
-                tabs.put(name, entry);
-                i++;
-            }
-        }
-        entryEditorTabList = tabs;
-    }
-
-    /**
-     * Stores the defined tabs and corresponding fields in the preferences.
-     *
-     * @param customTabs a map of tab names and the corresponding set of fields to be displayed in
-     */
-    @Override
-    public void storeEntryEditorTabList(Map<String, Set<Field>> customTabs) {
-        String[] names = customTabs.keySet().toArray(String[]::new);
-        String[] fields = customTabs.values().stream()
-                                    .map(set -> set.stream()
-                                                   .map(Field::getName)
-                                                   .collect(Collectors.joining(STRINGLIST_DELIMITER.toString())))
-                                    .toArray(String[]::new);
-
-        for (int i = 0; i < customTabs.size(); i++) {
-            put(CUSTOM_TAB_NAME + i, names[i]);
-            put(CUSTOM_TAB_FIELDS + i, fields[i]);
-        }
-
-        purgeSeries(CUSTOM_TAB_NAME, customTabs.size());
-        purgeSeries(CUSTOM_TAB_FIELDS, customTabs.size());
-
-        updateEntryEditorTabList();
-    }
 
     /**
      * Get a Map of default tab names to default tab fields.
@@ -1555,7 +1473,32 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public EntryEditorPreferences getEntryEditorPreferences() {
-        return new EntryEditorPreferences(getEntryEditorTabList(),
+        if (Objects.nonNull(entryEditorPreferences)) {
+            return entryEditorPreferences;
+        }
+
+        Map<String, Set<Field>> tabs = new LinkedHashMap<>();
+        int i = 0;
+        String name;
+        if (hasKey(CUSTOM_TAB_NAME + 0)) {
+            // The user has modified from the default values:
+            while (hasKey(CUSTOM_TAB_NAME + i)) {
+                name = get(CUSTOM_TAB_NAME + i);
+                Set<Field> entry = FieldFactory.parseFieldList(get(CUSTOM_TAB_FIELDS + i));
+                tabs.put(name, entry);
+                i++;
+            }
+        } else {
+            // Nothing set, so we use the default values:
+            while (get(CUSTOM_TAB_NAME + "_def" + i) != null) {
+                name = get(CUSTOM_TAB_NAME + "_def" + i);
+                Set<Field> entry = FieldFactory.parseFieldList(get(CUSTOM_TAB_FIELDS + "_def" + i));
+                tabs.put(name, entry);
+                i++;
+            }
+        }
+
+        entryEditorPreferences = new EntryEditorPreferences(tabs,
                 getBoolean(AUTO_OPEN_FORM),
                 getBoolean(SHOW_RECOMMENDATIONS),
                 getBoolean(ACCEPT_RECOMMENDATIONS),
@@ -1564,19 +1507,33 @@ public class JabRefPreferences implements PreferencesService {
                 getBoolean(VALIDATE_IN_ENTRY_EDITOR),
                 getBoolean(ALLOW_INTEGER_EDITION_BIBTEX),
                 getDouble(ENTRY_EDITOR_HEIGHT));
-    }
 
-    @Override
-    public void storeEntryEditorPreferences(EntryEditorPreferences preferences) {
-        storeEntryEditorTabList(preferences.getEntryEditorTabList());
-        putBoolean(AUTO_OPEN_FORM, preferences.shouldOpenOnNewEntry());
-        putBoolean(SHOW_RECOMMENDATIONS, preferences.shouldShowRecommendationsTab());
-        putBoolean(ACCEPT_RECOMMENDATIONS, preferences.isMrdlibAccepted());
-        putBoolean(SHOW_LATEX_CITATIONS, preferences.shouldShowLatexCitationsTab());
-        putBoolean(DEFAULT_SHOW_SOURCE, preferences.showSourceTabByDefault());
-        putBoolean(VALIDATE_IN_ENTRY_EDITOR, preferences.shouldEnableValidation());
-        putBoolean(ALLOW_INTEGER_EDITION_BIBTEX, preferences.shouldAllowIntegerEditionBibtex());
-        putDouble(ENTRY_EDITOR_HEIGHT, preferences.getDividerPosition());
+        EasyBind.subscribe(entryEditorPreferences.shouldOpenOnNewEntryProperty(), newValue -> putBoolean(AUTO_OPEN_FORM, newValue));
+        EasyBind.subscribe(entryEditorPreferences.shouldShowRecommendationsTabProperty(), newValue -> putBoolean(SHOW_RECOMMENDATIONS, newValue));
+        EasyBind.subscribe(entryEditorPreferences.isMrdlibAcceptedProperty(), newValue -> putBoolean(ACCEPT_RECOMMENDATIONS, newValue));
+        EasyBind.subscribe(entryEditorPreferences.shouldShowLatexCitationsTabProperty(), newValue -> putBoolean(SHOW_LATEX_CITATIONS, newValue));
+        EasyBind.subscribe(entryEditorPreferences.showSourceTabByDefaultProperty(), newValue -> putBoolean(DEFAULT_SHOW_SOURCE, newValue));
+        EasyBind.subscribe(entryEditorPreferences.enableValidationProperty(), newValue -> putBoolean(VALIDATE_IN_ENTRY_EDITOR, newValue));
+        EasyBind.subscribe(entryEditorPreferences.allowIntegerEditionBibtexProperty(), newValue -> putBoolean(ALLOW_INTEGER_EDITION_BIBTEX, newValue));
+        EasyBind.subscribe(entryEditorPreferences.dividerPositionProperty(), newValue -> putDouble(ENTRY_EDITOR_HEIGHT, newValue.doubleValue()));
+
+        EasyBind.subscribe(entryEditorPreferences.entryEditorTabListProperty(), newValue -> {
+            String[] names = newValue.keySet().toArray(String[]::new);
+            String[] fields = newValue.values().stream()
+                    .map(set -> set.stream()
+                            .map(Field::getName)
+                            .collect(Collectors.joining(STRINGLIST_DELIMITER.toString())))
+                    .toArray(String[]::new);
+
+            for (int j = 0; j < newValue.size(); j++) {
+                put(CUSTOM_TAB_NAME + j, names[j]);
+                put(CUSTOM_TAB_FIELDS + j, fields[j]);
+            }
+
+            purgeSeries(CUSTOM_TAB_NAME, newValue.size());
+            purgeSeries(CUSTOM_TAB_FIELDS, newValue.size());
+        });
+        return entryEditorPreferences;
     }
 
     //*************************************************************************************************************
@@ -1987,17 +1944,21 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public AppearancePreferences getAppearancePreferences() {
-        return new AppearancePreferences(
+        if (appearancePreferences != null) {
+            return appearancePreferences;
+        }
+
+        appearancePreferences = new AppearancePreferences(
                 getBoolean(OVERRIDE_DEFAULT_FONT_SIZE),
                 getInt(MAIN_FONT_SIZE),
-                getTheme());
-    }
+                getTheme()
+        );
 
-    @Override
-    public void storeAppearancePreference(AppearancePreferences preferences) {
-        putBoolean(OVERRIDE_DEFAULT_FONT_SIZE, preferences.shouldOverrideDefaultFontSize());
-        putInt(MAIN_FONT_SIZE, preferences.getMainFontSize());
-        put(FX_THEME, preferences.getTheme().getCssPathString());
+        EasyBind.subscribe(appearancePreferences.shouldOverrideDefaultFontSizeProperty(), newValue -> putBoolean(OVERRIDE_DEFAULT_FONT_SIZE, newValue));
+        EasyBind.subscribe(appearancePreferences.mainFontSizeProperty(), newValue -> putInt(MAIN_FONT_SIZE, newValue));
+        EasyBind.subscribe(appearancePreferences.themeProperty(), newValue -> put(FX_THEME, newValue.getCssPathString()));
+
+        return appearancePreferences;
     }
 
     //*************************************************************************************************************
@@ -2669,19 +2630,22 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public MrDlibPreferences getMrDlibPreferences() {
-        return new MrDlibPreferences(
+        if (Objects.nonNull(mrDlibPreferences)) {
+            return mrDlibPreferences;
+        }
+
+        mrDlibPreferences = new MrDlibPreferences(
                 getBoolean(ACCEPT_RECOMMENDATIONS),
                 getBoolean(SEND_LANGUAGE_DATA),
                 getBoolean(SEND_OS_DATA),
                 getBoolean(SEND_TIMEZONE_DATA));
-    }
 
-    @Override
-    public void storeMrDlibPreferences(MrDlibPreferences preferences) {
-        putBoolean(ACCEPT_RECOMMENDATIONS, preferences.shouldAcceptRecommendations());
-        putBoolean(SEND_LANGUAGE_DATA, preferences.shouldSendLanguage());
-        putBoolean(SEND_OS_DATA, preferences.shouldSendOs());
-        putBoolean(SEND_TIMEZONE_DATA, preferences.shouldSendTimezone());
+        EasyBind.subscribe(mrDlibPreferences.acceptRecommendationsProperty(), newValue -> putBoolean(ACCEPT_RECOMMENDATIONS, newValue));
+        EasyBind.subscribe(mrDlibPreferences.sendLanguageProperty(), newValue -> putBoolean(SEND_LANGUAGE_DATA, newValue));
+        EasyBind.subscribe(mrDlibPreferences.sendOsProperty(), newValue -> putBoolean(SEND_OS_DATA, newValue));
+        EasyBind.subscribe(mrDlibPreferences.sendTimezoneProperty(), newValue -> putBoolean(SEND_TIMEZONE_DATA, newValue));
+
+        return mrDlibPreferences;
     }
 
     @Override
@@ -2696,40 +2660,51 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public ProtectedTermsPreferences getProtectedTermsPreferences() {
-        return new ProtectedTermsPreferences(
+        if (Objects.nonNull(protectedTermsPreferences)) {
+            return protectedTermsPreferences;
+        }
+
+        protectedTermsPreferences = new ProtectedTermsPreferences(
                 getStringList(PROTECTED_TERMS_ENABLED_INTERNAL),
                 getStringList(PROTECTED_TERMS_ENABLED_EXTERNAL),
                 getStringList(PROTECTED_TERMS_DISABLED_INTERNAL),
-                getStringList(PROTECTED_TERMS_DISABLED_EXTERNAL));
-    }
+                getStringList(PROTECTED_TERMS_DISABLED_EXTERNAL)
+        );
 
-    @Override
-    public void storeProtectedTermsPreferences(ProtectedTermsPreferences preferences) {
-        putStringList(PROTECTED_TERMS_ENABLED_EXTERNAL, preferences.getEnabledExternalTermLists());
-        putStringList(PROTECTED_TERMS_DISABLED_EXTERNAL, preferences.getDisabledExternalTermLists());
-        putStringList(PROTECTED_TERMS_ENABLED_INTERNAL, preferences.getEnabledInternalTermLists());
-        putStringList(PROTECTED_TERMS_DISABLED_INTERNAL, preferences.getDisabledInternalTermLists());
+        protectedTermsPreferences.getEnabledExternalTermLists().addListener((InvalidationListener) change ->
+                putStringList(PROTECTED_TERMS_ENABLED_EXTERNAL, protectedTermsPreferences.getEnabledExternalTermLists()));
+        protectedTermsPreferences.getDisabledExternalTermLists().addListener((InvalidationListener) change ->
+                putStringList(PROTECTED_TERMS_DISABLED_EXTERNAL, protectedTermsPreferences.getDisabledExternalTermLists()));
+        protectedTermsPreferences.getEnabledInternalTermLists().addListener((InvalidationListener) change ->
+                putStringList(PROTECTED_TERMS_ENABLED_INTERNAL, protectedTermsPreferences.getEnabledInternalTermLists()));
+        protectedTermsPreferences.getDisabledInternalTermLists().addListener((InvalidationListener) change ->
+                putStringList(PROTECTED_TERMS_DISABLED_INTERNAL, protectedTermsPreferences.getDisabledInternalTermLists()));
+
+        return protectedTermsPreferences;
     }
 
     //*************************************************************************************************************
-    // Import preferences
+    // Importer preferences
     //*************************************************************************************************************
 
     @Override
-    public void storeImportSettingsPreferences(ImportSettingsPreferences preferences) {
-        putBoolean(GENERATE_KEY_ON_IMPORT, preferences.generateNewKeyOnImport());
-        putBoolean(GROBID_ENABLED, preferences.isGrobidEnabled());
-        putBoolean(GROBID_OPT_OUT, preferences.isGrobidOptOut());
-        put(GROBID_URL, preferences.getGrobidURL());
-    }
+    public ImporterPreferences getImporterPreferences() {
+        if (Objects.nonNull(importerPreferences)) {
+            return importerPreferences;
+        }
 
-    @Override
-    public ImportSettingsPreferences getImportSettingsPreferences() {
-        return new ImportSettingsPreferences(
+        importerPreferences = new ImporterPreferences(
                 getBoolean(GENERATE_KEY_ON_IMPORT),
                 getBoolean(GROBID_ENABLED),
                 getBoolean(GROBID_OPT_OUT),
                 get(GROBID_URL)
         );
+
+        EasyBind.subscribe(importerPreferences.generateNewKeyOnImportProperty(), newValue -> putBoolean(GENERATE_KEY_ON_IMPORT, newValue));
+        EasyBind.subscribe(importerPreferences.grobidEnabledProperty(), newValue -> putBoolean(GROBID_ENABLED, newValue));
+        EasyBind.subscribe(importerPreferences.grobidOptOutProperty(), newValue -> putBoolean(GROBID_OPT_OUT, newValue));
+        EasyBind.subscribe(importerPreferences.grobidURLProperty(), newValue -> put(GROBID_URL, newValue));
+
+        return importerPreferences;
     }
 }

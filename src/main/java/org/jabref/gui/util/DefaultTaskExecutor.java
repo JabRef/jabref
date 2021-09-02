@@ -127,6 +127,7 @@ public class DefaultTaskExecutor implements TaskExecutor {
      */
     @Override
     public void shutdown() {
+        stateManager.getBackgroundTasks().stream().filter(task -> !task.isDone()).forEach(Task::cancel);
         executor.shutdownNow();
         scheduledExecutor.shutdownNow();
         throttlers.forEach((throttler, aVoid) -> throttler.shutdown());
@@ -153,6 +154,7 @@ public class DefaultTaskExecutor implements TaskExecutor {
                         cancel();
                     }
                 });
+                setOnCancelled(event -> task.cancel());
             }
 
             @Override
