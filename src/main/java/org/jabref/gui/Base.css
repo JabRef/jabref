@@ -960,7 +960,6 @@ TextFlow > .tooltip-text-monospaced {
     -fx-fill: -jr-search-text;
 }
 
-
 .mainToolbar .search-field .button .glyph-icon {
     -fx-fill: -jr-search-text;
     -fx-text-fill: -jr-search-text;
