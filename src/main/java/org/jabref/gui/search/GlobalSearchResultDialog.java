@@ -4,6 +4,7 @@ import javax.inject.Inject;
 import javax.swing.undo.UndoManager;
 
 import javafx.fxml.FXML;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.SplitPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -27,6 +28,7 @@ import com.airhacks.afterburner.views.ViewLoader;
 public class GlobalSearchResultDialog extends BaseDialog<Void> {
 
     @FXML private SplitPane container;
+    @FXML private CheckBox keepOnTop;
 
     private final ExternalFileTypes externalFileTypes;
     private final UndoManager undoManager;
@@ -45,13 +47,17 @@ public class GlobalSearchResultDialog extends BaseDialog<Void> {
                   .load()
                   .setAsDialogPane(this);
         initModality(Modality.NONE);
-        Stage stage = (Stage) getDialogPane().getScene().getWindow();
-        stage.setAlwaysOnTop(true);
+
     }
 
     @FXML
     private void initialize() {
-        viewModel = new GlobalSearchResultDialogViewModel(stateManager);
+        if (preferencesService.getSearchPreferences().isKeepWindowOnTop()) {
+            Stage stage = (Stage) getDialogPane().getScene().getWindow();
+            stage.setAlwaysOnTop(true);
+        }
+
+        viewModel = new GlobalSearchResultDialogViewModel(stateManager, preferencesService);
 
         PreviewViewer previewViewer = new PreviewViewer(viewModel.getSearchDatabaseContext(), dialogService, stateManager);
         previewViewer.setTheme(preferencesService.getTheme());
@@ -59,8 +65,8 @@ public class GlobalSearchResultDialog extends BaseDialog<Void> {
 
         FieldColumn fieldColumn = new FieldColumn(MainTableColumnModel.parse("field:library"));
         new ValueTableCellFactory<BibEntryTableViewModel, String>()
-                .withText(FileUtil::getBaseName)
-                .install(fieldColumn);
+                                                                   .withText(FileUtil::getBaseName)
+                                                                   .install(fieldColumn);
 
         MainTableDataModel model = new MainTableDataModel(viewModel.getSearchDatabaseContext(), preferencesService, stateManager);
         SearchResultsTable resultsTable = new SearchResultsTable(model, viewModel.getSearchDatabaseContext(), preferencesService, undoManager, dialogService, stateManager, externalFileTypes);
@@ -75,6 +81,7 @@ public class GlobalSearchResultDialog extends BaseDialog<Void> {
             }
         });
 
+        keepOnTop.selectedProperty().bindBidirectional(viewModel.keepOnTop());
         container.getItems().addAll(resultsTable, previewViewer);
     }
 

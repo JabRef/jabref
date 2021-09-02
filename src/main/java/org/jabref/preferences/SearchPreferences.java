@@ -10,9 +10,11 @@ public class SearchPreferences {
 
     private final SearchDisplayMode searchDisplayMode;
     private final EnumSet<SearchFlags> searchFlags;
+    private final boolean keepWindowOnTop;
 
-    public SearchPreferences(SearchDisplayMode searchDisplayMode, boolean isCaseSensitive, boolean isRegularExpression, boolean isFulltext, boolean isKeepSearchString) {
+    public SearchPreferences(SearchDisplayMode searchDisplayMode, boolean isCaseSensitive, boolean isRegularExpression, boolean isFulltext, boolean isKeepSearchString, boolean keepWindowOnTop) {
         this.searchDisplayMode = searchDisplayMode;
+        this.keepWindowOnTop = keepWindowOnTop;
         searchFlags = EnumSet.noneOf(SearchFlags.class);
         if (isCaseSensitive) {
             searchFlags.add(SearchFlags.CASE_SENSITIVE);
@@ -28,9 +30,10 @@ public class SearchPreferences {
         }
     }
 
-    public SearchPreferences(SearchDisplayMode searchDisplayMode, EnumSet<SearchFlags> searchFlags) {
+    public SearchPreferences(SearchDisplayMode searchDisplayMode, EnumSet<SearchFlags> searchFlags, boolean keepWindowOnTop) {
         this.searchDisplayMode = searchDisplayMode;
         this.searchFlags = searchFlags;
+        this.keepWindowOnTop = keepWindowOnTop;
     }
 
     public SearchDisplayMode getSearchDisplayMode() {
@@ -49,8 +52,12 @@ public class SearchPreferences {
         return searchFlags.contains(SearchFlags.FULLTEXT);
     }
 
-    public boolean isKeepSearchStrng() {
+    public boolean isKeepSearchString() {
         return searchFlags.contains(SearchFlags.KEEP_SEARCH_STRING);
+    }
+
+    public boolean isKeepWindowOnTop() {
+        return keepWindowOnTop;
     }
 
     public EnumSet<SearchFlags> getSearchFlags() {
@@ -64,29 +71,33 @@ public class SearchPreferences {
         if (isFulltext()) {
             searchFlags.add(SearchRules.SearchFlags.FULLTEXT);
         }
-        if (isKeepSearchStrng()) {
+        if (isKeepSearchString()) {
             searchFlags.add(SearchRules.SearchFlags.KEEP_SEARCH_STRING);
         }
         return searchFlags;
     }
 
     public SearchPreferences withSearchDisplayMode(SearchDisplayMode newSearchDisplayMode) {
-        return new SearchPreferences(newSearchDisplayMode, isCaseSensitive(), isRegularExpression(), isFulltext(), isKeepSearchStrng());
+        return new SearchPreferences(newSearchDisplayMode, isCaseSensitive(), isRegularExpression(), isFulltext(), isKeepSearchString(), isKeepWindowOnTop());
     }
 
     public SearchPreferences withCaseSensitive(boolean newCaseSensitive) {
-        return new SearchPreferences(searchDisplayMode, newCaseSensitive, isRegularExpression(), isFulltext(), isKeepSearchStrng());
+        return new SearchPreferences(searchDisplayMode, newCaseSensitive, isRegularExpression(), isFulltext(), isKeepSearchString(), isKeepWindowOnTop());
     }
 
     public SearchPreferences withRegularExpression(boolean newRegularExpression) {
-        return new SearchPreferences(searchDisplayMode, isCaseSensitive(), newRegularExpression, isFulltext(), isKeepSearchStrng());
+        return new SearchPreferences(searchDisplayMode, isCaseSensitive(), newRegularExpression, isFulltext(), isKeepSearchString(), isKeepWindowOnTop());
     }
 
     public SearchPreferences withFulltext(boolean newFulltext) {
-        return new SearchPreferences(searchDisplayMode, isCaseSensitive(), isRegularExpression(), newFulltext, isKeepSearchStrng());
+        return new SearchPreferences(searchDisplayMode, isCaseSensitive(), isRegularExpression(), newFulltext, isKeepSearchString(), isKeepWindowOnTop());
     }
 
     public SearchPreferences withKeepSearchString(boolean newKeepSearchString) {
-        return new SearchPreferences(searchDisplayMode, isCaseSensitive(), isRegularExpression(), isFulltext(), newKeepSearchString);
+        return new SearchPreferences(searchDisplayMode, isCaseSensitive(), isRegularExpression(), isFulltext(), newKeepSearchString, isKeepWindowOnTop());
+    }
+
+    public SearchPreferences withKeepGlobalSearchDialogOnTop(boolean keepWindowOnTop) {
+        return new SearchPreferences(searchDisplayMode, isCaseSensitive(), isRegularExpression(), isFulltext(), isKeepSearchString(), keepWindowOnTop);
     }
 }

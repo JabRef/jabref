@@ -4,18 +4,35 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+
 import org.jabref.gui.StateManager;
 import org.jabref.logic.search.SearchQuery;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.SearchPreferences;
+
+import com.tobiasdiez.easybind.EasyBind;
 
 public class GlobalSearchResultDialogViewModel {
 
     private final StateManager stateManager;
     private final BibDatabaseContext searchDatabaseContext = new BibDatabaseContext();
+    private final BooleanProperty keepOnTop = new SimpleBooleanProperty();
+    private SearchPreferences searchPreferences;
 
-    public GlobalSearchResultDialogViewModel(StateManager stateManager) {
+    public GlobalSearchResultDialogViewModel(StateManager stateManager, PreferencesService preferencesService) {
         this.stateManager = stateManager;
+        searchPreferences = preferencesService.getSearchPreferences();
+
+        keepOnTop.set(searchPreferences.isKeepWindowOnTop());
+
+        EasyBind.subscribe(this.keepOnTop, selected -> {
+            searchPreferences = searchPreferences.withKeepGlobalSearchDialogOnTop(selected);
+            preferencesService.storeSearchPreferences(searchPreferences);
+        });
     }
 
     public void updateSearch() {
@@ -42,5 +59,9 @@ public class GlobalSearchResultDialogViewModel {
 
     public BibDatabaseContext getSearchDatabaseContext() {
         return searchDatabaseContext;
+    }
+
+    public BooleanProperty keepOnTop() {
+        return this.keepOnTop;
     }
 }

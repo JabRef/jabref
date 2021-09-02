@@ -227,7 +227,7 @@ public class GlobalSearchBar extends HBox {
             performSearch();
         });
 
-        keepSearchString.setSelected(searchPreferences.isKeepSearchStrng());
+        keepSearchString.setSelected(searchPreferences.isKeepSearchString());
         keepSearchString.setTooltip(new Tooltip(Localization.lang("Keep search string across libraries")));
         initSearchModifierButton(keepSearchString);
         keepSearchString.setOnAction(evt-> {
