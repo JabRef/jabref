@@ -21,10 +21,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import com.github.javaparser.ast.expr.BinaryExpr;
-import com.github.javaparser.ast.expr.CastExpr;
 import com.github.javaparser.ast.expr.Expression;
-import com.github.javaparser.ast.expr.MethodCallExpr;
-import com.github.javaparser.ast.expr.NameExpr;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -164,8 +161,12 @@ class LocalizationConsistencyTest {
         Set<LocalizationParser.LocalizationLangCallData> allKeys = new HashSet<>(keys);
         allKeys.addAll(menuKeys);
         for (LocalizationParser.LocalizationLangCallData data : allKeys) {
-            assertTrue(callDataIsValid(data), "Illegal localization parameter found. Must be a string or reference ADR-0023: \"" + data.firstArgument().toString() + "\"");
-
+            assertTrue(callDataIsValid(data),
+                    String.format("Illegal localization parameter found at \"%s\".\nPath: %s %s\nMust be a string or reference ADR-0023: \"%s\"\n",
+                            data.firstArgument().getParentNode().map(node -> node.toString()).orElse("?"),
+                            data.path(),
+                            data.firstArgument().getTokenRange().get().getBegin().getRange().get(),
+                            data.firstArgument()));
         }
     }
 
@@ -191,20 +192,7 @@ class LocalizationConsistencyTest {
         if (expression instanceof BinaryExpr binaryExpr) {
             return expressionIsValid(binaryExpr.getLeft(), commentReferencesAdr23) && expressionIsValid(binaryExpr.getRight(), commentReferencesAdr23);
         }
-        if (expression instanceof CastExpr castExpr) {
-            return expressionIsValid(castExpr.getExpression(), commentReferencesAdr23);
-        }
-        if (expression instanceof MethodCallExpr methodCallExpr) {
-            return methodCallExpr.getScope()
-                                 .filter(scope -> scope.isMethodCallExpr())
-                                 // we don't check the scope name, just method to be called
-                                 .map(scope -> scope.asMethodCallExpr().getNameAsString().equals("getDefaults"))
-                                 .orElse(false);
-        }
-        if (expression instanceof NameExpr nameExpr) {
-            return nameExpr.getNameAsString().equals("subject");
-        }
-        return false;
+        return commentReferencesAdr23;
     }
 
     private static Language[] installedLanguages() {

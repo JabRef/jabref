@@ -31,6 +31,7 @@ import com.github.javaparser.ParseProblemException;
 import com.github.javaparser.ParserConfiguration;
 import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.CompilationUnit;
+import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
@@ -198,18 +199,16 @@ public class LocalizationParser {
             methodCallExpr.getScope().ifPresent(scope -> {
                 if (methodCallExpr.getNameAsString().equals("lang")) {
                     Expression firstArgument = methodCallExpr.getArguments().get(0);
-                    AtomicReference<Optional> comment = new AtomicReference<>(Optional.empty());
-                    if (methodCallExpr.getComment().isPresent()) {
-                        comment.set(Optional.of(methodCallExpr.getComment().get().getContent()));
-                    } else {
-                        methodCallExpr.getParentNode().ifPresent(node -> {
-                            node.getComment().ifPresent(parentcomment -> {
-                                        comment.set(Optional.of(parentcomment.getContent()));
-                                    }
-                            );
-                        });
+                    Optional<String> comment = Optional.empty();
+                    Optional<Node> node = Optional.of(methodCallExpr);
+                    // go up the AST until there is no element or we found a comment
+                    while (node.isPresent() && !node.get().getComment().isPresent()) {
+                        node = node.get().getParentNode();
                     }
-                    collector.add(new LocalizationLangCallData(path, firstArgument, comment.get()));
+                    if (node.isPresent()) {
+                        comment = Optional.of(node.get().getComment().get().getContent());
+                    }
+                    collector.add(new LocalizationLangCallData(path, firstArgument, comment));
                 }
             });
         }
