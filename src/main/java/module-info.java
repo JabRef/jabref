@@ -87,7 +87,7 @@ open module org.jabref {
     requires org.apache.commons.lang3;
     requires org.antlr.antlr4.runtime;
     requires flowless;
-    requires tika.core;
+    requires org.apache.tika.core;
 
     requires flexmark;
     requires flexmark.ext.gfm.strikethrough;

@@ -18,7 +18,7 @@ This section list the prerequisites you need to get started to develop JabRef. A
 
 ### Java Development Kit 16
 
-A working Java \(Develoment Kit\) 16 installation with Java FX support is required. In the command line \(terminal in Linux, cmd in Windows\) run `javac -version` and make sure that the reported version is Java 16 \(e.g., `javac 16`\). If `javac` is not found or a wrong version is reported, check your `PATH` environment variable, your `JAVA_HOME` environment variable or install the most recent JDK.
+A working Java \(Development Kit\) 16 installation with Java FX support is required. In the command line \(terminal in Linux, cmd in Windows\) run `javac -version` and make sure that the reported version is Java 16 \(e.g., `javac 16`\). If `javac` is not found or a wrong version is reported, check your `PATH` environment variable, your `JAVA_HOME` environment variable or install the most recent JDK.
 
 [JavaFX is not part of the default JDK any more](https://www.reddit.com/r/java/comments/82qm9x/javafx_will_be_removed_from_the_java_jdk_in_jdk_11/), it needs to be installed separately if not using a special JDK.
 
@@ -119,6 +119,8 @@ To prepare IntelliJ's build system two additional steps are required:
    --add-exports=org.controlsfx.controls/impl.org.controlsfx.skin=org.jabref
   ```
 
+  Note that you need to focus another UI element before pressing OK. Otherwise, the setting will be empty.
+
 * Enable annotation processors by navigating to **File \| Settings \| Build, Execution, Deployment \| Compiler \| Annotation processors** and check "Enable annotation processing"
 
   ![Enable annotation processing](../.gitbook/assets/intellij-enable-annotation-processing.png)
@@ -144,7 +146,7 @@ After that a new entry called "jabref \[run\]" will appear in the run configurat
 
 #### Using IntelliJ's internal build system
 
-You should use IntelliJ IDEA's internal build system for compiling and running JabRef during development, because it is usually more responsive. Thereby, **it's important** that you understand that JabRef relies on generated sources which are only build through Gradle. Therefore, to build or update these dependencies you need to run the `assemble` Gradle task at least once.
+You should use IntelliJ IDEA's internal build system for compiling and running JabRef during development, because it is usually more responsive. Thereby, **it is important** that you understand that JabRef relies on generated sources which are only build through Gradle. Therefore, to build or update these dependencies you need to run the `assemble` Gradle task at least once.
 
 To use IntelliJ IDEA's internal build system when you build JabRef through **Build \| Build Project** or use the provided "JabRef Main" run configuration, ensure that
 
@@ -153,16 +155,18 @@ To use IntelliJ IDEA's internal build system when you build JabRef through **Bui
 
   ![Ignore the Gradle project &quot;buildSrc&quot;](../.gitbook/assets/intellij-gradle-config-ignore-buildSrc%20%282%29%20%282%29%20%282%29%20%283%29%20%283%29%20%286%29%20%284%29.png)
 
-* Add `src-gen` as root:
-  1. Right click on the project "jabref".
-  2. Select "Open Module Settings"
-  3. Expand "JabRef"
-  4. Select "main"
-  5. Select tab "Sources"
-  6. Click "+ Add Content Root"
-  7. Select the `src-gen` directory
-  8. Click "OK". When expanding "main", "java" should have been selected as source
+* Add `src-gen` as root: 
+
+  1. Right click on the project "jabref".  
+  2. Select "Open Module Settings"  
+  3. Expand "JabRef"  
+  4. Select "main"  
+  5. Select tab "Sources"  
+  6. Click "+ Add Content Root"  
+  7. Select the `src-gen` directory  
+  8. Click "OK". When expanding "main", "java" should have been selected as source  
   9. Click "OK" to save the changes
+
 * In case the above step does not work, run with gradle, import gradle project again, and try again.
 * Delete `org.jabref.gui.logging.plugins.Log4jPlugins` \(location: `src-gen/main/java/org/jabref/gui/logging/plugins/Log4jPlugins.java`\). Otherwise, you will see following error:
 
@@ -254,6 +258,29 @@ Make sure your Eclipse installation us up to date.
 5. Optional: Install the [e\(fx\)clipse plugin](http://www.eclipse.org/efxclipse/index.html) from the Eclipse marketplace: 1. Help -&gt; Eclipse Marketplace... -&gt; Search tab 2. Enter "e\(fx\)clipse" in the search dialogue 3. Click "Go" 4. Click "Install" button next to the plugin 5. Click "Finish"
 6. Now you can build and run/debug the application by either using "JabRefLauncher" or "JabRefMain". This is the recommended way, since the application starts quite fast.
 
+### Localization Test Configuration \(IDEA\)
+
+In the run configuration, at the "VM options" \(the box below the java version\), following content needs to be present:
+
+`-ea  
+--add-exports=javafx.controls/com.sun.javafx.scene.control=org.jabref  
+--add-exports=org.controlsfx.controls/impl.org.controlsfx.skin=org.jabref  
+--add-exports javafx.graphics/com.sun.javafx.application=ALL-UNNAMED  
+--add-exports javafx.graphics/com.sun.javafx.stage=ALL-UNNAMED  
+--add-exports javafx.graphics/com.sun.javafx.stage=com.jfoenix`
+
+### Localization Test Configuration \(Eclipse\)
+
+To run the `LocalizationConsistencyTest`  you need to add some extra module information:  Right-click on the file -&gt; "Run/Debug as JUnit test".  Go to the Run/debug configuration created for that file and in the arguments tab under VM-configurations add:
+
+```text
+--add-exports javafx.graphics/com.sun.javafx.application=ALL-UNNAMED
+--add-exports javafx.graphics/com.sun.javafx.stage=ALL-UNNAMED
+--add-exports javafx.graphics/com.sun.javafx.stage=com.jfoenix
+```
+
+Now the test will run, there is a "Build and run" section. In the 
+
 ## Final comments
 
 Got it running? GREAT! You are ready to lurk the code and contribute to JabRef. Please make sure to also read our [contribution guide](https://github.com/JabRef/jabref/blob/master/CONTRIBUTING.md).
@@ -290,6 +317,24 @@ In rare cases you might encounter problems due to out-dated automatically genera
 2. Select "Load/Unload modules".
 3. Unload `jabRef.buildSrc`.
 
+### Issue with "Module org.jsoup" not found, required by org.jabref
+
+Following error message appears:
+
+```text
+Error occurred during initialization of boot layer
+java.lang.module.FindException: Module org.jsoup not found, required by org.jabref
+```
+
+This can include different modules.
+
+1. Go to File -&gt; Invalidate caches...
+2. Check "Clear file system cache and Local History".
+3. Check "Clear VCS Log caches and indexes".
+4. Uncheck the others.
+5. Click on "Invalidate and Restart".
+6. After IntelliJ restarted, you have to do the "buildSrc", "Log4JAppender", and "src-gen" steps again.
+
 ### Issues with openjfx libraries in local maven repository
 
 There might be problems with building if you have openjfx libraries in local maven repository, resulting in errors like this:
@@ -301,4 +346,24 @@ There might be problems with building if you have openjfx libraries in local mav
 ```
 
 As a workaround, you can remove all local openjfx artifacts by deleting the whole openjfx folder from specified location.
+
+### Issues with `JournalAbbreviationLoader`
+
+In case of a NPE at `Files.copy` at `org.jabref.logic.journals.JournalAbbreviationLoader.loadRepository(JournalAbbreviationLoader.java:30) ~[classes/:?]`, invalidate caches and restart IntelliJ. Then, Build -&gt; Rebuild Project.
+
+If that does not help:
+
+1. Save/Commit all your work
+2. Close IntelliJ
+3. Delete all non-versioned items: `git clean -xdf`. This really destroys data
+4. Execute `./gradlew run`
+5. Start IntelliJ and try again.
+
+### Issue with org/jabref/build/JournalAbbreviationConverter$\_convert\_closure1$\_closure2.class is a duplicate but no duplicate handling strategy has been set.
+
+After changing the contents of build.gradle, on may geht following error:
+
+`Entry org/jabref/build/JournalAbbreviationConverter$_convert_closure1$_closure2.class is a duplicate but no duplicate handling strategy has been set.`
+
+Currently, no "real" solution is known. One has to start from scratch \(git clean, ...\).
 

@@ -10,6 +10,7 @@ import java.util.stream.Stream;
 import org.jabref.gui.groups.GroupSidePane;
 import org.jabref.gui.importer.fetcher.WebSearchPane;
 import org.jabref.gui.openoffice.OpenOfficeSidePanel;
+import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
 import org.jabref.preferences.PreferencesService;
 
@@ -23,13 +24,13 @@ public class SidePaneManager {
     private final List<SidePaneComponent> visibleComponents = new LinkedList<>();
     private final PreferencesService preferencesService;
 
-    public SidePaneManager(PreferencesService preferencesService, JabRefFrame frame, DialogService dialogService, StateManager stateManager) {
+    public SidePaneManager(PreferencesService preferencesService, JabRefFrame frame, TaskExecutor taskExecutor, DialogService dialogService, StateManager stateManager) {
         this.preferencesService = preferencesService;
         this.sidePane = new SidePane();
 
         OpenOfficePreferences openOfficePreferences = preferencesService.getOpenOfficePreferences();
         Stream.of(
-                new GroupSidePane(this, preferencesService, dialogService),
+                new GroupSidePane(this, taskExecutor, stateManager, preferencesService, dialogService),
                 new WebSearchPane(this, preferencesService, dialogService, stateManager),
                 new OpenOfficeSidePanel(this, preferencesService, frame))
               .forEach(pane -> components.put(pane.getType(), pane));

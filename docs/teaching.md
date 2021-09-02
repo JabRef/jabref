@@ -46,7 +46,7 @@ In short, the contribution is **reviewed by two JabRef developers**. Typically, 
 
 GitHub describes that in their page [Understanding the GitHub flow](https://guides.github.com/introduction/flow/):
 
-[![GitHub flow](.gitbook/assets/github-flow%20%281%29.png)](https://github.com/JabRef/jabref/tree/ed275b62fe7dac57a086e43802e36deb93c63e31/docs/images/github-flow.png)
+[![GitHub flow](.gitbook/assets/github-flow.png)](https://github.com/JabRef/jabref/tree/ed275b62fe7dac57a086e43802e36deb93c63e31/docs/images/github-flow.png)
 
 ## Process for Java newcomers
 
