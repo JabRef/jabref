@@ -20,7 +20,11 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import com.github.javaparser.ast.expr.BinaryExpr;
+import com.github.javaparser.ast.expr.CastExpr;
 import com.github.javaparser.ast.expr.Expression;
+import com.github.javaparser.ast.expr.MethodCallExpr;
+import com.github.javaparser.ast.expr.NameExpr;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -156,22 +160,51 @@ class LocalizationConsistencyTest {
         // Bad: Localization.lang(var + "test")
         // TODO: Localization.lang(var1 + "test" + var2) not covered
         Set<LocalizationParser.LocalizationLangCallData> keys = LocalizationParser.findLocalizationParametersStringsInJavaFiles(LocalizationBundleForTest.LANG);
-        Set<LocalizationParser.LocalizationLangCallData> menuKkeys = LocalizationParser.findLocalizationParametersStringsInJavaFiles(LocalizationBundleForTest.MENU);
+        Set<LocalizationParser.LocalizationLangCallData> menuKeys = LocalizationParser.findLocalizationParametersStringsInJavaFiles(LocalizationBundleForTest.MENU);
         Set<LocalizationParser.LocalizationLangCallData> allKeys = new HashSet<>(keys);
-        allKeys.addAll(menuKkeys);
+        allKeys.addAll(menuKeys);
         for (LocalizationParser.LocalizationLangCallData data : allKeys) {
-            assertTrue(callDataIsValid(data), "Illegal localization parameter found. Must be a string or reference ADR-0023" + data.firstArgument().toString());
+            assertTrue(callDataIsValid(data), "Illegal localization parameter found. Must be a string or reference ADR-0023: \"" + data.firstArgument().toString() + "\"");
 
         }
     }
 
     private boolean callDataIsValid(LocalizationParser.LocalizationLangCallData data) {
-        if (!data.firstArgument().isCharLiteralExpr()) {
-            // Typically, it should be a string
-            // There is the exception with ADR-0023
-            return data.comment().map(comment -> comment.contains("ADR-0023") || comment.contains("@ADR(23)")).orElse(false);
+        Expression firstArgument = data.firstArgument();
+        Boolean commentReferencesAdr23 = commentReferencesAdr23(data);
+        return expressionIsValid(firstArgument, commentReferencesAdr23);
+    }
+
+    /**
+     * Typically, it should be a string
+     *
+     * There is the exception with ADR-0023
+     */
+    private Boolean commentReferencesAdr23(LocalizationParser.LocalizationLangCallData data) {
+        return data.comment().map(comment -> comment.contains("ADR-0023") || comment.contains("@ADR(23)")).orElse(false);
+    }
+
+    private boolean expressionIsValid(Expression expression, Boolean commentReferencesAdr23) {
+        if (expression.isStringLiteralExpr()) {
+            return true;
         }
-        return true;
+        if (expression instanceof BinaryExpr binaryExpr) {
+            return expressionIsValid(binaryExpr.getLeft(), commentReferencesAdr23) && expressionIsValid(binaryExpr.getRight(), commentReferencesAdr23);
+        }
+        if (expression instanceof CastExpr castExpr) {
+            return expressionIsValid(castExpr.getExpression(), commentReferencesAdr23);
+        }
+        if (expression instanceof MethodCallExpr methodCallExpr) {
+            return methodCallExpr.getScope()
+                                 .filter(scope -> scope.isMethodCallExpr())
+                                 // we don't check the scope name, just method to be called
+                                 .map(scope -> scope.asMethodCallExpr().getNameAsString().equals("getDefaults"))
+                                 .orElse(false);
+        }
+        if (expression instanceof NameExpr nameExpr) {
+            return nameExpr.getNameAsString().equals("subject");
+        }
+        return false;
     }
 
     private static Language[] installedLanguages() {
