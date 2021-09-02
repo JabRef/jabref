@@ -131,10 +131,9 @@ public class CitationGroups {
         this.globalOrder = Optional.of(globalOrder);
 
         // Propagate to each CitationGroup
-        int i = 0;
-        for (CitationGroupId groupId : globalOrder) {
+        for (int i = 0; i < globalOrder.size(); i++) {
+            CitationGroupId groupId = globalOrder.get(i);
             citationGroupsUnordered.get(groupId).setIndexInGlobalOrder(Optional.of(i));
-            i++;
         }
     }
 

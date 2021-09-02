@@ -4,7 +4,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.Set;
 
-import org.jabref.logic.importer.importsettings.ImportSettingsPreferences;
 import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
@@ -30,7 +29,7 @@ class ImportFormatReaderTestParameterless {
         when(generalPreferences.getDefaultEncoding()).thenReturn(StandardCharsets.UTF_8);
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(importFormatPreferences.getCustomImportList()).thenReturn(Set.of());
-        reader.resetImportFormats(mock(ImportSettingsPreferences.class), generalPreferences, importFormatPreferences, mock(XmpPreferences.class), fileMonitor);
+        reader.resetImportFormats(mock(ImporterPreferences.class), generalPreferences, importFormatPreferences, mock(XmpPreferences.class), fileMonitor);
     }
 
     @Test

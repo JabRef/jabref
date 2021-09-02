@@ -16,10 +16,10 @@ import org.jabref.logic.importer.EntryBasedFetcher;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.Importer;
+import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fetcher.DoiFetcher;
 import org.jabref.logic.importer.fetcher.IsbnFetcher;
-import org.jabref.logic.importer.importsettings.ImportSettingsPreferences;
 import org.jabref.logic.importer.util.FileFieldParser;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabaseContext;
@@ -42,13 +42,13 @@ public class PdfMergeMetadataImporter extends Importer {
     private final List<Importer> metadataImporters;
     private final ImportFormatPreferences importFormatPreferences;
 
-    public PdfMergeMetadataImporter(ImportSettingsPreferences importSettingsPreferences, ImportFormatPreferences importFormatPreferences) {
+    public PdfMergeMetadataImporter(ImporterPreferences importerPreferences, ImportFormatPreferences importFormatPreferences) {
         this.importFormatPreferences = importFormatPreferences;
         this.metadataImporters = new ArrayList<>();
         this.metadataImporters.add(new PdfVerbatimBibTextImporter(importFormatPreferences));
         this.metadataImporters.add(new PdfEmbeddedBibFileImporter(importFormatPreferences));
-        if (importSettingsPreferences.isGrobidEnabled()) {
-            this.metadataImporters.add(new PdfGrobidImporter(importSettingsPreferences, importFormatPreferences));
+        if (importerPreferences.isGrobidEnabled()) {
+            this.metadataImporters.add(new PdfGrobidImporter(importerPreferences, importFormatPreferences));
         }
         this.metadataImporters.add(new PdfXmpImporter(importFormatPreferences.getXmpPreferences()));
         this.metadataImporters.add(new PdfContentImporter(importFormatPreferences));
@@ -91,14 +91,14 @@ public class PdfMergeMetadataImporter extends Importer {
         for (BibEntry candidate : candidates) {
             if (candidate.hasField(StandardField.DOI)) {
                 try {
-                    new DoiFetcher(importFormatPreferences).performSearchById(candidate.getField(StandardField.DOI).get()).ifPresent((fromDoi) -> fetchedCandidates.add(fromDoi));
+                    new DoiFetcher(importFormatPreferences).performSearchById(candidate.getField(StandardField.DOI).get()).ifPresent(fetchedCandidates::add);
                 } catch (FetcherException e) {
                     LOGGER.error("Fetching failed for DOI \"{}\".", candidate.getField(StandardField.DOI).get(), e);
                 }
             }
             if (candidate.hasField(StandardField.ISBN)) {
                 try {
-                    new IsbnFetcher(importFormatPreferences).performSearchById(candidate.getField(StandardField.ISBN).get()).ifPresent((fromISBN) -> fetchedCandidates.add(fromISBN));
+                    new IsbnFetcher(importFormatPreferences).performSearchById(candidate.getField(StandardField.ISBN).get()).ifPresent(fetchedCandidates::add);
                 } catch (FetcherException e) {
                     LOGGER.error("Fetching failed for ISBN \"{}\".", candidate.getField(StandardField.ISBN).get(), e);
                 }
@@ -115,7 +115,7 @@ public class PdfMergeMetadataImporter extends Importer {
                 // Don't merge FILE fields that point to a stored file as we set that to filePath anyway.
                 // Nevertheless, retain online links.
                 if (StandardField.FILE.equals(fieldEntry.getKey()) &&
-                        !FileFieldParser.parse(fieldEntry.getValue()).stream().anyMatch((linkedFile) -> linkedFile.isOnlineLink())) {
+                        FileFieldParser.parse(fieldEntry.getValue()).stream().noneMatch(LinkedFile::isOnlineLink)) {
                     continue;
                 }
                 // Only overwrite non-present fields
@@ -151,8 +151,8 @@ public class PdfMergeMetadataImporter extends Importer {
         private final BibDatabaseContext databaseContext;
         private final Charset defaultEncoding;
 
-        public EntryBasedFetcherWrapper(ImportSettingsPreferences importSettingsPreferences, ImportFormatPreferences importFormatPreferences, FilePreferences filePreferences, BibDatabaseContext context, Charset defaultEncoding) {
-            super(importSettingsPreferences, importFormatPreferences);
+        public EntryBasedFetcherWrapper(ImporterPreferences importerPreferences, ImportFormatPreferences importFormatPreferences, FilePreferences filePreferences, BibDatabaseContext context, Charset defaultEncoding) {
+            super(importerPreferences, importFormatPreferences);
             this.filePreferences = filePreferences;
             this.databaseContext = context;
             this.defaultEncoding = defaultEncoding;

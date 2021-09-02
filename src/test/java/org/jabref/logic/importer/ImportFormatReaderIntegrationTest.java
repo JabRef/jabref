@@ -8,7 +8,6 @@ import java.util.Collection;
 import java.util.Set;
 import java.util.stream.Stream;
 
-import org.jabref.logic.importer.importsettings.ImportSettingsPreferences;
 import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
@@ -33,7 +32,7 @@ class ImportFormatReaderIntegrationTest {
         when(importFormatPreferences.getCustomImportList()).thenReturn(Set.of());
         GeneralPreferences generalPreferences = mock(GeneralPreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(generalPreferences.getDefaultEncoding()).thenReturn(StandardCharsets.UTF_8);
-        reader.resetImportFormats(mock(ImportSettingsPreferences.class), generalPreferences, importFormatPreferences, mock(XmpPreferences.class), new DummyFileUpdateMonitor());
+        reader.resetImportFormats(mock(ImporterPreferences.class), generalPreferences, importFormatPreferences, mock(XmpPreferences.class), new DummyFileUpdateMonitor());
     }
 
     @ParameterizedTest
