@@ -2,9 +2,10 @@ package org.jabref.gui.collab;
 
 import javafx.scene.Node;
 
-import org.jabref.gui.JabRefGUI;
+import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.preview.PreviewViewer;
+import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableInsertEntries;
 import org.jabref.logic.l10n.Localization;
@@ -16,11 +17,19 @@ class EntryAddChangeViewModel extends DatabaseChangeViewModel {
 
     private final BibEntry entry;
     private final PreferencesService preferencesService;
+    private final DialogService dialogService;
     private final StateManager stateManager;
+    private final ThemeManager themeManager;
 
-    public EntryAddChangeViewModel(BibEntry entry, PreferencesService preferencesService, StateManager stateManager) {
+    public EntryAddChangeViewModel(BibEntry entry,
+                                   PreferencesService preferencesService,
+                                   DialogService dialogService,
+                                   StateManager stateManager,
+                                   ThemeManager themeManager) {
         super();
+        this.dialogService = dialogService;
         this.preferencesService = preferencesService;
+        this.themeManager = themeManager;
         this.stateManager = stateManager;
         this.name = entry.getCitationKey()
                          .map(key -> Localization.lang("Added entry") + ": '" + key + '\'')
@@ -36,7 +45,7 @@ class EntryAddChangeViewModel extends DatabaseChangeViewModel {
 
     @Override
     public Node description() {
-        PreviewViewer previewViewer = new PreviewViewer(new BibDatabaseContext(), JabRefGUI.getMainFrame().getDialogService(), stateManager);
+        PreviewViewer previewViewer = new PreviewViewer(new BibDatabaseContext(), dialogService, stateManager, themeManager);
         previewViewer.setLayout(preferencesService.getPreviewPreferences().getCurrentPreviewStyle());
         previewViewer.setEntry(entry);
         return previewViewer;

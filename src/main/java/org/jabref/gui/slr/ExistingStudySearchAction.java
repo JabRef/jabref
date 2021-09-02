@@ -10,6 +10,7 @@ import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
+import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.gui.util.TaskExecutor;
@@ -40,6 +41,7 @@ public class ExistingStudySearchAction extends SimpleCommand {
     private final TaskExecutor taskExecutor;
     private final PreferencesService preferencesService;
     private final StateManager stateManager;
+    private final ThemeManager themeManager;
     private final ImportFormatPreferences importFormatPreferences;
     private final SavePreferences savePreferences;
     // This can be either populated before crawl is called or is populated in the call using the directory dialog. This is helpful if the directory is selected in a previous dialog/UI element
@@ -48,13 +50,15 @@ public class ExistingStudySearchAction extends SimpleCommand {
                                      FileUpdateMonitor fileUpdateMonitor,
                                      TaskExecutor taskExecutor,
                                      PreferencesService preferencesService,
-                                     StateManager stateManager) {
+                                     StateManager stateManager,
+                                     ThemeManager themeManager) {
         this.frame = frame;
         this.dialogService = frame.getDialogService();
         this.fileUpdateMonitor = fileUpdateMonitor;
         this.taskExecutor = taskExecutor;
         this.preferencesService = preferencesService;
         this.stateManager = stateManager;
+        this.themeManager = themeManager;
         this.importFormatPreferences = preferencesService.getImportFormatPreferences();
         this.savePreferences = preferencesService.getSavePreferences();
 
@@ -107,7 +111,7 @@ public class ExistingStudySearchAction extends SimpleCommand {
                           dialogService.showErrorDialogAndWait(Localization.lang("Error during persistence of crawling results."), e);
                       })
                       .onSuccess(unused -> {
-                          new OpenDatabaseAction(frame, preferencesService, dialogService, stateManager).openFile(Path.of(studyDirectory.toString(), "studyResult.bib"), true);
+                          new OpenDatabaseAction(frame, preferencesService, dialogService, stateManager, themeManager).openFile(Path.of(studyDirectory.toString(), "studyResult.bib"), true);
                           // If  finished reset command object for next use
                           studyDirectory = null;
                       })

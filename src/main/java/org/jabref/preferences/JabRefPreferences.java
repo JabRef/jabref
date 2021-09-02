@@ -1999,7 +1999,7 @@ public class JabRefPreferences implements PreferencesService {
         appearancePreferences = new AppearancePreferences(
                 getBoolean(OVERRIDE_DEFAULT_FONT_SIZE),
                 getInt(MAIN_FONT_SIZE),
-                new Theme(getTheme(FX_THEME))
+                new Theme(get(FX_THEME))
         );
 
         EasyBind.subscribe(appearancePreferences.shouldOverrideDefaultFontSizeProperty(), newValue -> putBoolean(OVERRIDE_DEFAULT_FONT_SIZE, newValue));
