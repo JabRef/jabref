@@ -169,14 +169,6 @@ public interface DialogService {
     void showCustomDialog(BaseDialog<?> dialog);
 
     /**
-     * This will create and display a new dialog showing a custom {@link DialogPane}
-     * and using custom {@link ButtonType}s.
-     *
-     *
-     */
-    Optional<ButtonType> showNonModalCustomDialogAndWait(String title, DialogPane contentPane, ButtonType... buttonTypes);
-
-    /**
      * This will create and display a new dialog of the specified
      * {@link Alert.AlertType} but with user defined buttons as optional
      * {@link ButtonType}s.

@@ -30,7 +30,6 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 import javafx.util.Duration;
@@ -265,20 +264,6 @@ public class JabRefDialogService implements DialogService {
     public Optional<ButtonType> showCustomDialogAndWait(String title, DialogPane contentPane,
                                                         ButtonType... buttonTypes) {
         FXDialog alert = new FXDialog(AlertType.NONE, title);
-        alert.setDialogPane(contentPane);
-        alert.getButtonTypes().setAll(buttonTypes);
-        alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
-        alert.setResizable(true);
-        alert.initOwner(mainWindow);
-        preferences.getTheme().installCss(alert.getDialogPane().getScene());
-        return alert.showAndWait();
-    }
-
-    @Override
-    public Optional<ButtonType> showNonModalCustomDialogAndWait(String title, DialogPane contentPane,
-                                 ButtonType... buttonTypes) {
-        FXDialog alert = new FXDialog(AlertType.NONE, title);
-        alert.initModality(Modality.NONE);
         alert.setDialogPane(contentPane);
         alert.getButtonTypes().setAll(buttonTypes);
         alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
