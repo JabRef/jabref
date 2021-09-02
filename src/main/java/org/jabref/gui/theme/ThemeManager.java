@@ -181,12 +181,10 @@ public class ThemeManager {
     private void updateAdditionalCss(Scene scene) {
         AppearancePreferences appearance = preferencesService.getAppearancePreferences();
 
+        List<String> stylesheets = scene.getStylesheets();
         Platform.runLater(() -> {
-            List<String> stylesheets = scene.getStylesheets();
-            if (stylesheets.size() > 1) {
-                stylesheets.remove(1);
-            }
-
+            stylesheets.clear();
+            stylesheets.add(baseStyleSheet.getSceneStylesheet().toExternalForm());
             appearance.getTheme().getAdditionalStylesheet().ifPresent(
                     styleSheet -> stylesheets.add(1, styleSheet.getSceneStylesheet().toExternalForm()));
         });
