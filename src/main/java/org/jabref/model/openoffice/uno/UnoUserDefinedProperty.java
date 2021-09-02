@@ -61,8 +61,8 @@ public class UnoUserDefinedProperty {
             throw new java.lang.IllegalArgumentException("getting UserDefinedProperties as XPropertySet failed");
         }
         try {
-            String v = propertySet.get().getPropertyValue(property).toString();
-            return Optional.ofNullable(v);
+            String value = propertySet.get().getPropertyValue(property).toString();
+            return Optional.ofNullable(value);
         } catch (UnknownPropertyException ex) {
             return Optional.empty();
         }

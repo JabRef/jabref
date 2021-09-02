@@ -5,25 +5,25 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 
 import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.OpenDatabase;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.PdfMergeMetadataImporter;
-import org.jabref.logic.importer.importsettings.ImportSettingsPreferences;
 import org.jabref.model.util.FileUpdateMonitor;
 
 public class ExternalFilesContentImporter {
 
-    private final ImportSettingsPreferences importSettingsPreferences;
+    private final ImporterPreferences importerPreferences;
     private final ImportFormatPreferences importFormatPreferences;
 
-    public ExternalFilesContentImporter(ImportSettingsPreferences importSettingsPreferences, ImportFormatPreferences importFormatPreferences) {
-        this.importSettingsPreferences = importSettingsPreferences;
+    public ExternalFilesContentImporter(ImporterPreferences importerPreferences, ImportFormatPreferences importFormatPreferences) {
+        this.importerPreferences = importerPreferences;
         this.importFormatPreferences = importFormatPreferences;
     }
 
     public ParserResult importPDFContent(Path file) {
         try {
-            return new PdfMergeMetadataImporter(importSettingsPreferences, importFormatPreferences).importDatabase(file, StandardCharsets.UTF_8);
+            return new PdfMergeMetadataImporter(importerPreferences, importFormatPreferences).importDatabase(file, StandardCharsets.UTF_8);
         } catch (IOException e) {
            return ParserResult.fromError(e);
         }

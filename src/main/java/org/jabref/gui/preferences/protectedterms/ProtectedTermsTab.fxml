@@ -6,6 +6,7 @@
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
+<?import org.jabref.gui.icon.JabRefIconView?>
 <fx:root spacing="10.0" type="VBox"
          xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
          fx:controller="org.jabref.gui.preferences.protectedterms.ProtectedTermsTab">
@@ -24,8 +25,16 @@
             <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
         </columnResizePolicy>
     </TableView>
-    <HBox spacing="10.0">
-        <Button text="%Add protected terms file" onAction="#addFile"/>
-        <Button text="%New protected terms file" onAction="#createNewFile"/>
+    <HBox alignment="BASELINE_RIGHT" spacing="10.0">
+        <Button text="%Add protected terms file" onAction="#addFile">
+            <graphic>
+                <JabRefIconView glyph="OPEN_LIST"/>
+            </graphic>
+        </Button>
+        <Button text="%New protected terms file" onAction="#createNewFile">
+            <graphic>
+                <JabRefIconView glyph="ADD_NOBOX"/>
+            </graphic>
+        </Button>
     </HBox>
 </fx:root>

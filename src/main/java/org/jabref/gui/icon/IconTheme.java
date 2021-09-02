@@ -235,6 +235,7 @@ public class IconTheme {
         QUALITY_ASSURED(MaterialDesignC.CERTIFICATE),
         QUALITY(MaterialDesignC.CERTIFICATE),
         OPEN(MaterialDesignF.FOLDER_OUTLINE),
+        OPEN_LIST(MaterialDesignF.FOLDER_OPEN_OUTLINE),
         ADD_ROW(MaterialDesignS.SERVER_PLUS),
         REMOVE_ROW(MaterialDesignS.SERVER_MINUS),
         PICTURE(MaterialDesignF.FILE_IMAGE),

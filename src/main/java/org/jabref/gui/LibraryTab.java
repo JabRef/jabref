@@ -656,8 +656,7 @@ public class LibraryTab extends Tab {
                     okButton,
                     cancelButton,
                     Localization.lang("Do not ask again"),
-                    optOut -> preferencesService.storeGeneralPreferences(
-                            preferencesService.getGeneralPreferences().withConfirmDelete(!optOut)));
+                    optOut -> preferencesService.getGeneralPreferences().setConfirmDelete(!optOut));
         } else {
             return true;
         }
@@ -668,8 +667,7 @@ public class LibraryTab extends Tab {
      */
     private void saveDividerLocation(Number position) {
         if (mode == BasePanelMode.SHOWING_EDITOR) {
-            preferencesService.storeEntryEditorPreferences(
-                    preferencesService.getEntryEditorPreferences().withDividerPosition(position.doubleValue()));
+            preferencesService.getEntryEditorPreferences().setDividerPosition(position.doubleValue());
         }
     }
 

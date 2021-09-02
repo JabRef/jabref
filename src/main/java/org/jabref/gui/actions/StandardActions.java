@@ -173,7 +173,12 @@ public enum StandardActions implements Action {
     OPEN_FORUM(Localization.lang("Online help forum"), Localization.lang("Online help forum"), IconTheme.JabRefIcons.FORUM),
     ERROR_CONSOLE(Localization.lang("View event log"), Localization.lang("Display all error messages")),
     SEARCH_FOR_UPDATES(Localization.lang("Check for updates")),
-    ABOUT(Localization.lang("About JabRef"), Localization.lang("About JabRef"));
+    ABOUT(Localization.lang("About JabRef"), Localization.lang("About JabRef")),
+
+    EDIT_LIST(Localization.lang("Edit"), IconTheme.JabRefIcons.EDIT),
+    VIEW_LIST(Localization.lang("View"), IconTheme.JabRefIcons.FILE),
+    REMOVE_LIST(Localization.lang("Remove"), IconTheme.JabRefIcons.REMOVE),
+    RELOAD_LIST(Localization.lang("Reload"), IconTheme.JabRefIcons.REFRESH);
 
     private final String text;
     private final String description;
