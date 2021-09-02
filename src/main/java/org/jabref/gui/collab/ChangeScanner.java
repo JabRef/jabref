@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.jabref.gui.StateManager;
 import org.jabref.logic.bibtex.comparator.BibDatabaseDiff;
 import org.jabref.logic.bibtex.comparator.BibEntryDiff;
 import org.jabref.logic.bibtex.comparator.BibStringDiff;
@@ -23,10 +24,12 @@ public class ChangeScanner {
     private static final Logger LOGGER = LoggerFactory.getLogger(ChangeScanner.class);
     private final BibDatabaseContext database;
     private final PreferencesService preferencesService;
+    private final StateManager stateManager;
 
-    public ChangeScanner(BibDatabaseContext database, PreferencesService preferencesService) {
+    public ChangeScanner(BibDatabaseContext database, PreferencesService preferencesService, StateManager stateManager) {
         this.database = database;
         this.preferencesService = preferencesService;
+        this.stateManager = stateManager;
     }
 
     public List<DatabaseChangeViewModel> scanForChanges() {
@@ -40,7 +43,7 @@ public class ChangeScanner {
             // Parse the modified file
             // Important: apply all post-load actions
             ImportFormatPreferences importFormatPreferences = preferencesService.getImportFormatPreferences();
-            ParserResult result = OpenDatabase.loadDatabase(database.getDatabasePath().get(), importFormatPreferences, preferencesService.getTimestampPreferences(), new DummyFileUpdateMonitor());
+            ParserResult result = OpenDatabase.loadDatabase(database.getDatabasePath().get(), importFormatPreferences, new DummyFileUpdateMonitor());
             BibDatabaseContext databaseOnDisk = result.getDatabaseContext();
 
             // Start looking at changes.
@@ -77,7 +80,7 @@ public class ChangeScanner {
 
     private DatabaseChangeViewModel createBibEntryDiff(BibEntryDiff diff) {
         if (diff.getOriginalEntry() == null) {
-            return new EntryAddChangeViewModel(diff.getNewEntry());
+            return new EntryAddChangeViewModel(diff.getNewEntry(), preferencesService, stateManager);
         }
 
         if (diff.getNewEntry() == null) {

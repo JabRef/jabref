@@ -249,6 +249,8 @@ public class GlobalSearchBar extends HBox {
     }
 
     public void performSearch() {
+
+        LOGGER.debug("Flags: {}", searchPreferences.getSearchFlags());
         LOGGER.debug("Run search " + searchField.getText());
 
         // An empty search field should cause the search to be cleared.

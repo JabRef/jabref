@@ -7,9 +7,9 @@ import java.util.List;
 import java.util.Optional;
 
 import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.fileformat.BibtexParser;
-import org.jabref.logic.importer.importsettings.ImportSettingsPreferences;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
@@ -41,11 +41,11 @@ public class GrobidService {
         }
     }
 
-    private final ImportSettingsPreferences importSettingsPreferences;
+    private final ImporterPreferences importerPreferences;
 
-    public GrobidService(ImportSettingsPreferences importSettingsPreferences) {
-        this.importSettingsPreferences = importSettingsPreferences;
-        if (!importSettingsPreferences.isGrobidEnabled()) {
+    public GrobidService(ImporterPreferences importerPreferences) {
+        this.importerPreferences = importerPreferences;
+        if (!importerPreferences.isGrobidEnabled()) {
             throw new UnsupportedOperationException("Grobid was used but not enabled.");
         }
     }
@@ -57,7 +57,7 @@ public class GrobidService {
      * @throws IOException if an I/O excecption during the call ocurred or no BibTeX entry could be determiend
      */
     public Optional<BibEntry> processCitation(String rawCitation, ImportFormatPreferences importFormatPreferences, ConsolidateCitations consolidateCitations) throws IOException, ParseException {
-        Connection.Response response = Jsoup.connect(importSettingsPreferences.getGrobidURL() + "/api/processCitation")
+        Connection.Response response = Jsoup.connect(importerPreferences.getGrobidURL() + "/api/processCitation")
                 .header("Accept", MediaTypes.APPLICATION_BIBTEX)
                 .data("citations", rawCitation)
                 .data("consolidateCitations", String.valueOf(consolidateCitations.getCode()))
@@ -75,7 +75,7 @@ public class GrobidService {
     }
 
     public List<BibEntry> processPDF(Path filePath, ImportFormatPreferences importFormatPreferences) throws IOException, ParseException {
-        Connection.Response response = Jsoup.connect(importSettingsPreferences.getGrobidURL() + "/api/processHeaderDocument")
+        Connection.Response response = Jsoup.connect(importerPreferences.getGrobidURL() + "/api/processHeaderDocument")
                 .header("Accept", MediaTypes.APPLICATION_BIBTEX)
                 .data("input", filePath.toString(), Files.newInputStream(filePath))
                 .method(Connection.Method.POST)
@@ -91,7 +91,7 @@ public class GrobidService {
 
         BibtexParser parser = new BibtexParser(importFormatPreferences, new DummyFileUpdateMonitor());
         List<BibEntry> result = parser.parseEntries(httpResponse);
-        result.stream().forEach((entry) -> entry.setCitationKey(""));
+        result.forEach((entry) -> entry.setCitationKey(""));
         return result;
     }
 }

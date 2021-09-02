@@ -979,11 +979,13 @@ TextFlow > .tooltip-text-monospaced {
 .mainToolbar .search-field .toggle-button .glyph-icon {
     -fx-fill: derive(-jr-search-text, 80%);
     -fx-text-fill: derive(-jr-search-text, 80%);
+    -fx-icon-color: derive(-jr-search-text, 80%);
 }
 
 .mainToolbar .search-field .toggle-button:selected .glyph-icon {
     -fx-fill: -jr-search-text;
     -fx-text-fill: -jr-search-text;
+    -fx-icon-color: -jr-search-text;
 }
 
 /* search text */

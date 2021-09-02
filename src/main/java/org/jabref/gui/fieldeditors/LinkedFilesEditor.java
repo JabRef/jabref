@@ -175,17 +175,17 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
         acceptAutoLinkedFile.setOnAction(event -> linkedFile.acceptAsLinked());
         acceptAutoLinkedFile.getStyleClass().setAll("icon-button");
 
-        Button writeXMPMetadata = IconTheme.JabRefIcons.IMPORT.asButton();
-        writeXMPMetadata.setTooltip(new Tooltip(Localization.lang("Write BibTeXEntry as XMP metadata to PDF.")));
-        writeXMPMetadata.visibleProperty().bind(linkedFile.isOfflinePdfProperty());
-        writeXMPMetadata.setOnAction(event -> linkedFile.writeXMPMetadata());
-        writeXMPMetadata.getStyleClass().setAll("icon-button");
+        Button writeMetadataToPdf = IconTheme.JabRefIcons.IMPORT.asButton();
+        writeMetadataToPdf.setTooltip(new Tooltip(Localization.lang("Write BibTeXEntry metadata to PDF.")));
+        writeMetadataToPdf.visibleProperty().bind(linkedFile.isOfflinePdfProperty());
+        writeMetadataToPdf.setOnAction(event -> linkedFile.writeMetadataToPdf());
+        writeMetadataToPdf.getStyleClass().setAll("icon-button");
 
         Button parsePdfMetadata = IconTheme.JabRefIcons.FILE_SEARCH.asButton();
         parsePdfMetadata.setTooltip(new Tooltip(Localization.lang("Parse Metadata from PDF.")));
         parsePdfMetadata.visibleProperty().bind(linkedFile.isOfflinePdfProperty());
         parsePdfMetadata.setOnAction(event -> {
-            GrobidOptInDialogHelper.showAndWaitIfUserIsUndecided(dialogService);
+            GrobidOptInDialogHelper.showAndWaitIfUserIsUndecided(dialogService, preferencesService.getImporterPreferences());
             linkedFile.parsePdfMetadataAndShowMergeDialog();
         });
         parsePdfMetadata.getStyleClass().setAll("icon-button");
@@ -193,7 +193,7 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
         HBox container = new HBox(10);
         container.setPrefHeight(Double.NEGATIVE_INFINITY);
 
-        container.getChildren().addAll(acceptAutoLinkedFile, info, writeXMPMetadata, parsePdfMetadata);
+        container.getChildren().addAll(acceptAutoLinkedFile, info, writeMetadataToPdf, parsePdfMetadata);
 
         return container;
     }

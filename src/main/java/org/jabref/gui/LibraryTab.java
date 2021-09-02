@@ -84,6 +84,7 @@ public class LibraryTab extends Tab {
     private final ExternalFileTypes externalFileTypes;
     private final DialogService dialogService;
     private final PreferencesService preferencesService;
+    private final StateManager stateManager;
     private final BooleanProperty changedProperty = new SimpleBooleanProperty(false);
     private final BooleanProperty nonUndoableChangeProperty = new SimpleBooleanProperty(false);
     private BibDatabaseContext bibDatabaseContext;
@@ -112,6 +113,7 @@ public class LibraryTab extends Tab {
 
     public LibraryTab(JabRefFrame frame,
                       PreferencesService preferencesService,
+                      StateManager stateManager,
                       BibDatabaseContext bibDatabaseContext,
                       ExternalFileTypes externalFileTypes) {
         this.frame = Objects.requireNonNull(frame);
@@ -120,12 +122,13 @@ public class LibraryTab extends Tab {
         this.undoManager = frame.getUndoManager();
         this.dialogService = frame.getDialogService();
         this.preferencesService = Objects.requireNonNull(preferencesService);
+        this.stateManager = Objects.requireNonNull(stateManager);
 
         bibDatabaseContext.getDatabase().registerListener(this);
         bibDatabaseContext.getMetaData().registerListener(this);
 
         this.sidePaneManager = frame.getSidePaneManager();
-        this.tableModel = new MainTableDataModel(getBibDatabaseContext(), preferencesService, Globals.stateManager);
+        this.tableModel = new MainTableDataModel(getBibDatabaseContext(), preferencesService, stateManager);
 
         citationStyleCache = new CitationStyleCache(bibDatabaseContext);
         annotationCache = new FileAnnotationCache(bibDatabaseContext, preferencesService.getFilePreferences());
@@ -148,7 +151,7 @@ public class LibraryTab extends Tab {
 
         Platform.runLater(() -> {
             EasyBind.subscribe(changedProperty, this::updateTabTitle);
-            Globals.stateManager.getOpenDatabases().addListener((ListChangeListener<BibDatabaseContext>) c ->
+            stateManager.getOpenDatabases().addListener((ListChangeListener<BibDatabaseContext>) c ->
                     updateTabTitle(changedProperty.getValue()));
         });
     }
@@ -201,7 +204,7 @@ public class LibraryTab extends Tab {
 
         feedData(context);
         // a temporary workaround to update groups pane
-        Globals.stateManager.activeDatabaseProperty().bind(
+        stateManager.activeDatabaseProperty().bind(
                 EasyBind.map(frame.getTabbedPane().getSelectionModel().selectedItemProperty(),
                         selectedTab -> Optional.ofNullable(selectedTab)
                                                .filter(tab -> tab instanceof LibraryTab)
@@ -224,7 +227,7 @@ public class LibraryTab extends Tab {
         bibDatabaseContext.getDatabase().registerListener(this);
         bibDatabaseContext.getMetaData().registerListener(this);
 
-        this.tableModel = new MainTableDataModel(getBibDatabaseContext(), preferencesService, Globals.stateManager);
+        this.tableModel = new MainTableDataModel(getBibDatabaseContext(), preferencesService, stateManager);
         citationStyleCache = new CitationStyleCache(bibDatabaseContext);
         annotationCache = new FileAnnotationCache(bibDatabaseContext, preferencesService.getFilePreferences());
 
@@ -245,7 +248,7 @@ public class LibraryTab extends Tab {
 
         Platform.runLater(() -> {
             EasyBind.subscribe(changedProperty, this::updateTabTitle);
-            Globals.stateManager.getOpenDatabases().addListener((ListChangeListener<BibDatabaseContext>) c ->
+            stateManager.getOpenDatabases().addListener((ListChangeListener<BibDatabaseContext>) c ->
                     updateTabTitle(changedProperty.getValue()));
         });
 
@@ -254,7 +257,7 @@ public class LibraryTab extends Tab {
             autoSaver.registerListener(new AutosaveUiManager(this));
         }
 
-        BackupManager.start(this.bibDatabaseContext, Globals.entryTypesManager, Globals.prefs);
+        BackupManager.start(this.bibDatabaseContext, Globals.entryTypesManager, preferencesService);
     }
 
     private boolean isDatabaseReadyForAutoSave(BibDatabaseContext context) {
@@ -348,11 +351,11 @@ public class LibraryTab extends Tab {
 
     private List<String> collectAllDatabasePaths() {
         List<String> list = new ArrayList<>();
-        Globals.stateManager.getOpenDatabases().stream()
-                            .map(BibDatabaseContext::getDatabasePath)
-                            .forEachOrdered(pathOptional -> pathOptional.ifPresentOrElse(
-                                    path -> list.add(path.toAbsolutePath().toString()),
-                                    () -> list.add("")));
+        stateManager.getOpenDatabases().stream()
+                    .map(BibDatabaseContext::getDatabasePath)
+                    .forEachOrdered(pathOptional -> pathOptional.ifPresentOrElse(
+                            path -> list.add(path.toAbsolutePath().toString()),
+                            () -> list.add("")));
         return list;
     }
 
@@ -480,12 +483,12 @@ public class LibraryTab extends Tab {
                 bibDatabaseContext,
                 preferencesService,
                 dialogService,
-                Globals.stateManager,
+                stateManager,
                 externalFileTypes,
                 Globals.getKeyPrefs());
 
         // Add the listener that binds selection to state manager (TODO: should be replaced by proper JavaFX binding as soon as table is implemented in JavaFX)
-        mainTable.addSelectionListener(listEvent -> Globals.stateManager.setSelectedEntries(mainTable.getSelectedEntries()));
+        mainTable.addSelectionListener(listEvent -> stateManager.setSelectedEntries(mainTable.getSelectedEntries()));
 
         // Update entry editor and preview according to selected entries
         mainTable.addSelectionListener(event -> mainTable.getSelectedEntries()
@@ -662,8 +665,7 @@ public class LibraryTab extends Tab {
                     okButton,
                     cancelButton,
                     Localization.lang("Do not ask again"),
-                    optOut -> preferencesService.storeGeneralPreferences(
-                            preferencesService.getGeneralPreferences().withConfirmDelete(!optOut)));
+                    optOut -> preferencesService.getGeneralPreferences().setConfirmDelete(!optOut));
         } else {
             return true;
         }
@@ -674,8 +676,7 @@ public class LibraryTab extends Tab {
      */
     private void saveDividerLocation(Number position) {
         if (mode == BasePanelMode.SHOWING_EDITOR) {
-            preferencesService.storeEntryEditorPreferences(
-                    preferencesService.getEntryEditorPreferences().withDividerPosition(position.doubleValue()));
+            preferencesService.getEntryEditorPreferences().setDividerPosition(position.doubleValue());
         }
     }
 
@@ -750,7 +751,7 @@ public class LibraryTab extends Tab {
 
     public void resetChangeMonitorAndChangePane() {
         changeMonitor.ifPresent(DatabaseChangeMonitor::unregister);
-        changeMonitor = Optional.of(new DatabaseChangeMonitor(bibDatabaseContext, Globals.getFileUpdateMonitor(), Globals.TASK_EXECUTOR, preferencesService));
+        changeMonitor = Optional.of(new DatabaseChangeMonitor(bibDatabaseContext, Globals.getFileUpdateMonitor(), Globals.TASK_EXECUTOR, preferencesService, stateManager));
 
         changePane = new DatabaseChangePane(splitPane, bibDatabaseContext, changeMonitor.get());
 
@@ -796,11 +797,11 @@ public class LibraryTab extends Tab {
     }
 
     public static class Factory {
-        public LibraryTab createLibraryTab(JabRefFrame frame, PreferencesService preferencesService, Path file, BackgroundTask<ParserResult> dataLoadingTask) {
+        public LibraryTab createLibraryTab(JabRefFrame frame, PreferencesService preferencesService, StateManager stateManager, Path file, BackgroundTask<ParserResult> dataLoadingTask) {
             BibDatabaseContext context = new BibDatabaseContext();
             context.setDatabasePath(file);
 
-            LibraryTab newTab = new LibraryTab(frame, preferencesService, context, ExternalFileTypes.getInstance());
+            LibraryTab newTab = new LibraryTab(frame, preferencesService, stateManager, context, ExternalFileTypes.getInstance());
             newTab.setDataLoadingTask(dataLoadingTask);
 
             dataLoadingTask.onRunning(newTab::onDatabaseLoadingStarted)
@@ -823,7 +824,7 @@ public class LibraryTab extends Tab {
 
             // Automatically add new entries to the selected group (or set of groups)
             if (preferencesService.getGroupsPreferences().shouldAutoAssignGroup()) {
-                Globals.stateManager.getSelectedGroup(bibDatabaseContext).forEach(
+                stateManager.getSelectedGroup(bibDatabaseContext).forEach(
                         selectedGroup -> selectedGroup.addEntriesToGroup(addedEntriesEvent.getBibEntries()));
             }
         }

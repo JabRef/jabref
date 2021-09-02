@@ -359,7 +359,7 @@ public class EntryEditor extends BorderPane {
         // Add menu for fetching bibliographic information
         ContextMenu fetcherMenu = new ContextMenu();
         SortedSet<EntryBasedFetcher> entryBasedFetchers = WebFetchers.getEntryBasedFetchers(
-                preferencesService.getImportSettingsPreferences(),
+                preferencesService.getImporterPreferences(),
                 preferencesService.getImportFormatPreferences(),
                 preferencesService.getFilePreferences(),
                 databaseContext,
@@ -369,10 +369,10 @@ public class EntryEditor extends BorderPane {
             if (fetcher instanceof PdfMergeMetadataImporter.EntryBasedFetcherWrapper) {
                 // Handle Grobid Opt-In in case of the PdfMergeMetadataImporter
                 fetcherMenuItem.setOnAction(event -> {
-                    GrobidOptInDialogHelper.showAndWaitIfUserIsUndecided(dialogService);
+                    GrobidOptInDialogHelper.showAndWaitIfUserIsUndecided(dialogService, preferencesService.getImporterPreferences());
                     PdfMergeMetadataImporter.EntryBasedFetcherWrapper pdfMergeMetadataImporter =
                             new PdfMergeMetadataImporter.EntryBasedFetcherWrapper(
-                                    preferencesService.getImportSettingsPreferences(),
+                                    preferencesService.getImporterPreferences(),
                                     preferencesService.getImportFormatPreferences(),
                                     preferencesService.getFilePreferences(),
                                     databaseContext,
@@ -395,8 +395,8 @@ public class EntryEditor extends BorderPane {
     public void setFocusToField(Field field) {
         DefaultTaskExecutor.runInJavaFXThread(() -> {
             for (Tab tab : tabbed.getTabs()) {
-                if ((tab instanceof FieldsEditorTab) && ((FieldsEditorTab) tab).getShownFields().contains(field)) {
-                    FieldsEditorTab fieldsEditorTab = (FieldsEditorTab) tab;
+                if ((tab instanceof FieldsEditorTab fieldsEditorTab) && fieldsEditorTab.getShownFields()
+                                                                                     .contains(field)) {
                     tabbed.getSelectionModel().select(tab);
                     fieldsEditorTab.requestFocus(field);
                 }

@@ -62,7 +62,7 @@ public class BibtexExtractorViewModel {
     }
 
     public void startParsing() {
-        if (preferencesService.getImportSettingsPreferences().isGrobidEnabled()) {
+        if (preferencesService.getImporterPreferences().isGrobidEnabled()) {
             parseUsingGrobid();
         } else {
             parseUsingBibtexExtractor();
@@ -76,7 +76,7 @@ public class BibtexExtractorViewModel {
     }
 
     private void parseUsingGrobid() {
-        GrobidCitationFetcher grobidCitationFetcher = new GrobidCitationFetcher(preferencesService.getImportSettingsPreferences(), preferencesService.getImportFormatPreferences());
+        GrobidCitationFetcher grobidCitationFetcher = new GrobidCitationFetcher(preferencesService.getImporterPreferences(), preferencesService.getImportFormatPreferences());
         BackgroundTask.wrap(() -> grobidCitationFetcher.performSearch(inputTextProperty.getValue()))
                       .onRunning(() -> dialogService.notify(Localization.lang("Your text is being parsed...")))
                       .onFailure((e) -> {
