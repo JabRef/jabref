@@ -61,7 +61,8 @@ public class ExportCommand extends SimpleCommand {
                                                         .sorted(Comparator.comparing(Exporter::getName))
                                                         .collect(Collectors.toList());
 
-        Globals.exportFactory = ExporterFactory.create(customExporters, layoutPreferences, savePreferences, xmpPreferences);
+        Globals.exportFactory = ExporterFactory.create(customExporters, layoutPreferences, savePreferences,
+                xmpPreferences, preferences.getDefaultBibDatabaseMode(), Globals.entryTypesManager);
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                 .addExtensionFilter(FileFilterConverter.exporterToExtensionFilter(exporters))
                 .withDefaultExtension(preferences.getImportExportPreferences().getLastExportExtension())

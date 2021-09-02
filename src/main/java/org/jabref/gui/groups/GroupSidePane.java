@@ -11,13 +11,13 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.SidePaneComponent;
 import org.jabref.gui.SidePaneManager;
 import org.jabref.gui.SidePaneType;
+import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.Action;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.preferences.PreferencesService;
-
-import com.airhacks.afterburner.views.ViewLoader;
 
 /**
  * The groups side pane.
@@ -26,11 +26,15 @@ public class GroupSidePane extends SidePaneComponent {
 
     private final PreferencesService preferences;
     private final DialogService dialogService;
+    private final TaskExecutor taskExecutor;
+    private final StateManager stateManager;
     private final Button intersectionUnionToggle = IconTheme.JabRefIcons.GROUP_INTERSECTION.asButton();
 
-    public GroupSidePane(SidePaneManager manager, PreferencesService preferences, DialogService dialogService) {
+    public GroupSidePane(SidePaneManager manager, TaskExecutor taskExecutor, StateManager stateManager, PreferencesService preferences, DialogService dialogService) {
         super(manager, IconTheme.JabRefIcons.TOGGLE_GROUPS, Localization.lang("Groups"));
         this.preferences = preferences;
+        this.taskExecutor = taskExecutor;
+        this.stateManager = stateManager;
         this.dialogService = dialogService;
     }
 
@@ -83,9 +87,7 @@ public class GroupSidePane extends SidePaneComponent {
 
     @Override
     protected Node createContentPane() {
-        return ViewLoader.view(GroupTreeView.class)
-                         .load()
-                         .getView();
+        return new GroupTreeView(taskExecutor, stateManager, preferences, dialogService);
     }
 
     @Override

@@ -105,7 +105,7 @@ public class MainTableColumnFactory {
                         if (field instanceof SpecialField) {
                             columns.add(createSpecialFieldColumn(column));
                         } else {
-                            LOGGER.warn(Localization.lang("Special field type %0 is unknown. Using normal column type.", column.getQualifier()));
+                            LOGGER.warn("Special field type '{}' is unknown. Using normal column type.", column.getQualifier());
                             columns.add(createFieldColumn(column));
                         }
                     }

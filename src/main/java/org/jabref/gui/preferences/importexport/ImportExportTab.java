@@ -34,7 +34,7 @@ public class ImportExportTab extends AbstractPreferenceTabView<ImportExportTabVi
     }
 
     public void initialize() {
-        this.viewModel = new ImportExportTabViewModel(preferencesService);
+        this.viewModel = new ImportExportTabViewModel(preferencesService, preferencesService.getDOIPreferences());
 
         useCustomDOI.selectedProperty().bindBidirectional(viewModel.useCustomDOIProperty());
         useCustomDOIName.textProperty().bindBidirectional(viewModel.useCustomDOINameProperty());
