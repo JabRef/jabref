@@ -10,8 +10,8 @@ import java.util.stream.Stream;
 
 import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.util.DummyFileUpdateMonitor;
-
 import org.jabref.preferences.GeneralPreferences;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;

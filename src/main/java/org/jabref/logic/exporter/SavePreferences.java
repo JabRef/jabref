@@ -1,7 +1,5 @@
 package org.jabref.logic.exporter;
 
-import java.nio.charset.Charset;
-
 import org.jabref.logic.bibtex.FieldWriterPreferences;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.model.metadata.SaveOrderConfig;

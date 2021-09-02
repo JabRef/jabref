@@ -2,7 +2,6 @@ package org.jabref.logic.crawler;
 
 import java.net.URL;
 import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.List;
 

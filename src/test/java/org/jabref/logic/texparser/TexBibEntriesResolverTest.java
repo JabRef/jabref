@@ -14,8 +14,8 @@ import org.jabref.model.texparser.LatexBibEntriesResolverResult;
 import org.jabref.model.texparser.LatexParserResult;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
-
 import org.jabref.preferences.GeneralPreferences;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Answers;

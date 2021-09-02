@@ -1,6 +1,5 @@
 package org.jabref.preferences;
 
-import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;

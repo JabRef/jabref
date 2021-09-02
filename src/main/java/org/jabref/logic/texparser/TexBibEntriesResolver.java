@@ -17,8 +17,8 @@ import org.jabref.model.texparser.Citation;
 import org.jabref.model.texparser.LatexBibEntriesResolverResult;
 import org.jabref.model.texparser.LatexParserResult;
 import org.jabref.model.util.FileUpdateMonitor;
-
 import org.jabref.preferences.GeneralPreferences;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

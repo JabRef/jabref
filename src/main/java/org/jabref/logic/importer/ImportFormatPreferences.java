@@ -1,6 +1,5 @@
 package org.jabref.logic.importer;
 
-import java.nio.charset.Charset;
 import java.util.Set;
 
 import org.jabref.logic.bibtex.FieldContentFormatterPreferences;

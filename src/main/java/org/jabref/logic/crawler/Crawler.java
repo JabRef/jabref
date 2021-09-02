@@ -13,9 +13,9 @@ import org.jabref.logic.preferences.TimestampPreferences;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.study.QueryResult;
 import org.jabref.model.util.FileUpdateMonitor;
+import org.jabref.preferences.GeneralPreferences;
 
 import org.eclipse.jgit.api.errors.GitAPIException;
-import org.jabref.preferences.GeneralPreferences;
 
 /**
  * This class provides a service for SLR support by conducting an automated search and persistance
