@@ -64,15 +64,7 @@ jobs:
         with:
           java-version: 16
           distribution: 'adopt'
-      - name: Restore gradle cache
-        uses: actions/cache@v2
-        with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle7x-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle7x-
+          cache: 'gradle'
       - name: Setup OSX key chain on OSX
         if: matrix.os == 'macos-latest'
         uses: apple-actions/import-codesign-certs@v1
