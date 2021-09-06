@@ -16,7 +16,7 @@ plugins {
 
     id 'com.github.ben-manes.versions' version '0.39.0'
 
-    id 'org.javamodularity.moduleplugin' version '1.8.8'
+    id 'org.javamodularity.moduleplugin' version '1.8.9'
 
     id 'org.openjfx.javafxplugin' version '0.0.10'
 
