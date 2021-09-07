@@ -15,7 +15,6 @@ import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.maintable.BibEntryTableViewModel;
 import org.jabref.gui.maintable.MainTableColumnModel;
-import org.jabref.gui.maintable.MainTableDataModel;
 import org.jabref.gui.maintable.columns.FieldColumn;
 import org.jabref.gui.maintable.columns.SpecialFieldColumn;
 import org.jabref.gui.preview.PreviewViewer;
@@ -53,17 +52,19 @@ public class GlobalSearchResultDialog extends BaseDialog<Void> {
 
     @FXML
     private void initialize() {
-        viewModel = new GlobalSearchResultDialogViewModel(stateManager, preferencesService);
+        viewModel = new GlobalSearchResultDialogViewModel(preferencesService);
 
         PreviewViewer previewViewer = new PreviewViewer(viewModel.getSearchDatabaseContext(), dialogService, stateManager);
         previewViewer.setTheme(preferencesService.getTheme());
         previewViewer.setLayout(preferencesService.getPreviewPreferences().getCurrentPreviewStyle());
 
-        FieldColumn fieldColumn = new FieldColumn(MainTableColumnModel.parse("field:library"));
+        //TODO: Create a special column
+        FieldColumn fieldColumn = new FieldColumn(MainTableColumnModel.parse("customLibrary"));
         new ValueTableCellFactory<BibEntryTableViewModel, String>().withText(FileUtil::getBaseName)
                                                                    .install(fieldColumn);
+        fieldColumn.setCellValueFactory(param -> param.getValue().getBibDatabaseContextPath());
 
-        MainTableDataModel model = new MainTableDataModel(viewModel.getSearchDatabaseContext(), preferencesService, stateManager);
+        SearchResultsTableDataModel model = new SearchResultsTableDataModel(viewModel.getSearchDatabaseContext(), preferencesService, stateManager);
         SearchResultsTable resultsTable = new SearchResultsTable(model, viewModel.getSearchDatabaseContext(), preferencesService, undoManager, dialogService, stateManager, externalFileTypes);
         resultsTable.getColumns().add(0, fieldColumn);
         resultsTable.getColumns().removeIf(col -> col instanceof SpecialFieldColumn);
@@ -82,13 +83,7 @@ public class GlobalSearchResultDialog extends BaseDialog<Void> {
         EasyBind.subscribe(viewModel.keepOnTop(), value -> {
             Stage stage = (Stage) getDialogPane().getScene().getWindow();
             stage.setAlwaysOnTop(value);
-            keepOnTop.setGraphic(value
-                    ? IconTheme.JabRefIcons.KEEP_ON_TOP.getGraphicNode()
-                    : IconTheme.JabRefIcons.KEEP_ON_TOP_OFF.getGraphicNode());
+            keepOnTop.setGraphic(value ? IconTheme.JabRefIcons.KEEP_ON_TOP.getGraphicNode() : IconTheme.JabRefIcons.KEEP_ON_TOP_OFF.getGraphicNode());
         });
-    }
-
-    public void updateSearch() {
-        viewModel.updateSearch();
     }
 }

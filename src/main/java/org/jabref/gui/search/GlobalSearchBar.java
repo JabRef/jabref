@@ -197,9 +197,6 @@ public class GlobalSearchBar extends HBox {
     private void updateSearchResultsForQuery(SearchQuery query) {
         updateResults(this.stateManager.getSearchResultSize().intValue(), SearchDescribers.getSearchDescriberFor(query).getDescription(),
                 query.isGrammarBasedSearch());
-        if ((globalSearchResultDialog != null) && globalSearchActive.getValue()) {
-            globalSearchResultDialog.updateSearch();
-        }
     }
 
     private void initSearchModifierButtons() {
@@ -246,7 +243,6 @@ public class GlobalSearchBar extends HBox {
             globalSearchActive.setValue(true);
             globalSearchResultDialog = new GlobalSearchResultDialog(ExternalFileTypes.getInstance(), undoManager);
             performSearch();
-            globalSearchResultDialog.updateSearch();
             globalSearchResultDialog.showAndWait();
             globalSearchActive.setValue(false);
         });

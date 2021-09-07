@@ -11,7 +11,6 @@ import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.maintable.BibEntryTableViewModel;
 import org.jabref.gui.maintable.MainTable;
 import org.jabref.gui.maintable.MainTableColumnFactory;
-import org.jabref.gui.maintable.MainTableDataModel;
 import org.jabref.gui.maintable.MainTablePreferences;
 import org.jabref.gui.maintable.SmartConstrainedResizePolicy;
 import org.jabref.gui.maintable.columns.MainTableColumn;
@@ -20,7 +19,7 @@ import org.jabref.preferences.PreferencesService;
 
 public class SearchResultsTable extends TableView<BibEntryTableViewModel> {
 
-    public SearchResultsTable(MainTableDataModel model,
+    public SearchResultsTable(SearchResultsTableDataModel model,
                               BibDatabaseContext database,
                               PreferencesService preferencesService,
                               UndoManager undoManager,

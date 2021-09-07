@@ -19,7 +19,7 @@ public class MainTableFieldValueFormatter {
     private final AbbreviationStyle abbreviationStyle;
     private final BibDatabase bibDatabase;
 
-    MainTableFieldValueFormatter(PreferencesService preferences, BibDatabaseContext bibDatabaseContext) {
+    public MainTableFieldValueFormatter(PreferencesService preferences, BibDatabaseContext bibDatabaseContext) {
         MainTableNameFormatPreferences nameFormatPreferences = preferences.getMainTableNameFormatPreferences();
         this.displayStyle = nameFormatPreferences.getDisplayStyle();
         this.abbreviationStyle = nameFormatPreferences.getAbbreviationStyle();
@@ -36,7 +36,7 @@ public class MainTableFieldValueFormatter {
      */
     public String formatFieldsValues(final OrFields fields, final BibEntry entry) {
         for (Field field : fields) {
-            if (field.getProperties().contains(FieldProperty.PERSON_NAMES) && displayStyle != DisplayStyle.AS_IS) {
+            if (field.getProperties().contains(FieldProperty.PERSON_NAMES) && (displayStyle != DisplayStyle.AS_IS)) {
                 Optional<String> name = entry.getResolvedFieldOrAlias(field, bibDatabase);
 
                 if (name.isPresent()) {
@@ -69,7 +69,7 @@ public class MainTableFieldValueFormatter {
 
         if (((displayStyle == DisplayStyle.FIRSTNAME_LASTNAME)
                 || (displayStyle == DisplayStyle.LASTNAME_FIRSTNAME))
-                && abbreviationStyle == AbbreviationStyle.LASTNAME_ONLY) {
+                && (abbreviationStyle == AbbreviationStyle.LASTNAME_ONLY)) {
             return authors.latexFree().getAsLastNames(false);
         }
 
