@@ -20,7 +20,6 @@ import org.jabref.gui.maintable.MainTableFieldValueFormatter;
 import org.jabref.logic.search.SearchQuery;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.preferences.PreferencesService;
 
 import com.tobiasdiez.easybind.EasyBind;
@@ -41,15 +40,14 @@ public class SearchResultsTableDataModel {
         List<BibEntryTableViewModel> models = new ArrayList<>();
         for (BibDatabaseContext context : stateManager.getOpenDatabases()) {
             ObservableList<BibEntry> entriesForDb = context.getDatabase().getEntries();
-            List<BibEntryTableViewModel> viewModelForDb = EasyBind.mapBacked(entriesForDb, entry -> new BibEntryTableViewModel(entry, bibdatabasecontext, fieldValueFormatter));
+            List<BibEntryTableViewModel> viewModelForDb = EasyBind.mapBacked(entriesForDb, entry -> new BibEntryTableViewModel(entry, context, fieldValueFormatter));
 
             models.addAll(viewModelForDb);
         }
         ObservableList<BibEntryTableViewModel> entriesViewModel = FXCollections.observableArrayList(models);
 
         entriesFiltered = new FilteredList<>(entriesViewModel);
-
-        entriesFiltered.predicateProperty().bind(EasyBind.map(stateManager.activeSearchQueryProperty(),(query)->entry->isMatchedBySearch(query,entry);));
+        entriesFiltered.predicateProperty().bind(EasyBind.map(stateManager.activeSearchQueryProperty(), (query) -> entry -> isMatchedBySearch(query, entry)));
 
         IntegerProperty resultSize = new SimpleIntegerProperty();
         resultSize.bind(Bindings.size(entriesFiltered));
