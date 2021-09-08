@@ -1,6 +1,5 @@
 package org.jabref.gui.search;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -34,14 +33,12 @@ public class SearchResultsTableDataModel {
         this.bibDatabaseContext = bibDatabaseContext;
         this.fieldValueFormatter = new SimpleObjectProperty<>(new MainTableFieldValueFormatter(preferencesService, bibDatabaseContext));
 
-        List<BibEntryTableViewModel> models = new ArrayList<>();
+        ObservableList<BibEntryTableViewModel> entriesViewModel = FXCollections.observableArrayList();
         for (BibDatabaseContext context : stateManager.getOpenDatabases()) {
             ObservableList<BibEntry> entriesForDb = context.getDatabase().getEntries();
             List<BibEntryTableViewModel> viewModelForDb = EasyBind.mapBacked(entriesForDb, entry -> new BibEntryTableViewModel(entry, context, fieldValueFormatter));
-
-            models.addAll(viewModelForDb);
+            entriesViewModel.addAll(viewModelForDb);
         }
-        ObservableList<BibEntryTableViewModel> entriesViewModel = FXCollections.observableArrayList(models);
 
         entriesFiltered = new FilteredList<>(entriesViewModel);
         entriesFiltered.predicateProperty().bind(EasyBind.map(stateManager.activeSearchQueryProperty(), (query) -> entry -> isMatchedBySearch(query, entry)));
