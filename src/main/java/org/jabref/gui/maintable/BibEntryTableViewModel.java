@@ -14,6 +14,7 @@ import javafx.beans.Observable;
 import javafx.beans.binding.Binding;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.ReadOnlyStringWrapper;
+import javafx.beans.property.StringProperty;
 import javafx.beans.value.ObservableValue;
 
 import org.jabref.gui.specialfields.SpecialFieldValueViewModel;
@@ -56,18 +57,18 @@ public class BibEntryTableViewModel {
 
     private static EasyBinding<Map<Field, String>> createLinkedIdentifiersBinding(BibEntry entry) {
         return EasyBind.combine(
-                                entry.getFieldBinding(StandardField.URL),
-                                entry.getFieldBinding(StandardField.DOI),
-                                entry.getFieldBinding(StandardField.URI),
-                                entry.getFieldBinding(StandardField.EPRINT),
-                                (url, doi, uri, eprint) -> {
-                                    Map<Field, String> identifiers = new HashMap<>();
-                                    url.ifPresent(value -> identifiers.put(StandardField.URL, value));
-                                    doi.ifPresent(value -> identifiers.put(StandardField.DOI, value));
-                                    uri.ifPresent(value -> identifiers.put(StandardField.URI, value));
-                                    eprint.ifPresent(value -> identifiers.put(StandardField.EPRINT, value));
-                                    return identifiers;
-                                });
+                entry.getFieldBinding(StandardField.URL),
+                entry.getFieldBinding(StandardField.DOI),
+                entry.getFieldBinding(StandardField.URI),
+                entry.getFieldBinding(StandardField.EPRINT),
+                (url, doi, uri, eprint) -> {
+                    Map<Field, String> identifiers = new HashMap<>();
+                    url.ifPresent(value -> identifiers.put(StandardField.URL, value));
+                    doi.ifPresent(value -> identifiers.put(StandardField.DOI, value));
+                    uri.ifPresent(value -> identifiers.put(StandardField.URI, value));
+                    eprint.ifPresent(value -> identifiers.put(StandardField.EPRINT, value));
+                    return identifiers;
+                });
     }
 
     public BibEntry getEntry() {
@@ -76,11 +77,13 @@ public class BibEntryTableViewModel {
 
     private static Binding<List<AbstractGroup>> createMatchedGroupsBinding(BibDatabaseContext database, BibEntry entry) {
         return new UiThreadBinding<>(EasyBind.combine(entry.getFieldBinding(StandardField.GROUPS), database.getMetaData().groupsBinding(),
-                                                      (a, b) -> database.getMetaData().getGroups().map(groupTreeNode -> groupTreeNode.getMatchingGroups(entry).stream()
-                                                                                                                                     .map(GroupTreeNode::getGroup)
-                                                                                                                                     .filter(Predicate.not(Predicate.isEqual(groupTreeNode.getGroup())))
-                                                                                                                                     .collect(Collectors.toList()))
-                                                                        .orElse(Collections.emptyList())));
+                (a, b) ->
+                        database.getMetaData().getGroups().map(groupTreeNode ->
+                                groupTreeNode.getMatchingGroups(entry).stream()
+                                             .map(GroupTreeNode::getGroup)
+                                             .filter(Predicate.not(Predicate.isEqual(groupTreeNode.getGroup())))
+                                             .collect(Collectors.toList()))
+                                .orElse(Collections.emptyList())));
     }
 
     public OptionalBinding<String> getField(Field field) {
@@ -119,13 +122,14 @@ public class BibEntryTableViewModel {
         ArrayList<Observable> observables = new ArrayList<>(List.of(entry.getObservables()));
         observables.add(fieldValueFormatter);
 
-        value = Bindings.createStringBinding(() -> fieldValueFormatter.getValue().formatFieldsValues(fields, entry),
-                                             observables.toArray(Observable[]::new));
+        value = Bindings.createStringBinding(() ->
+                        fieldValueFormatter.getValue().formatFieldsValues(fields, entry),
+                observables.toArray(Observable[]::new));
         fieldValues.put(fields, value);
         return value;
     }
 
-    public ObservableValue<String> getBibDatabaseContextPath() {
+    public StringProperty bibDatabaseContextProperty(){
         return new ReadOnlyStringWrapper(bibDatabaseContext.getDatabasePath().map(Path::toString).orElse(""));
     }
 }

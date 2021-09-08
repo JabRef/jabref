@@ -36,12 +36,11 @@ public class SearchResultsTableDataModel {
     public SearchResultsTableDataModel(BibDatabaseContext bibDatabaseContext, PreferencesService preferencesService, StateManager stateManager) {
         this.preferencesService = preferencesService;
         this.bibDatabaseContext = bibDatabaseContext;
-        this.fieldValueFormatter = new SimpleObjectProperty<>(
-                                                              new MainTableFieldValueFormatter(preferencesService, bibDatabaseContext));
+        this.fieldValueFormatter = new SimpleObjectProperty<>(new MainTableFieldValueFormatter(preferencesService, bibDatabaseContext));
 
         List<BibEntryTableViewModel> models = new ArrayList<>();
-        for (BibDatabaseContext bibdatabasecontext : stateManager.getOpenDatabases()) {
-            ObservableList<BibEntry> entriesForDb = bibdatabasecontext.getDatabase().getEntries();
+        for (BibDatabaseContext context : stateManager.getOpenDatabases()) {
+            ObservableList<BibEntry> entriesForDb = context.getDatabase().getEntries();
             List<BibEntryTableViewModel> viewModelForDb = EasyBind.mapBacked(entriesForDb, entry -> new BibEntryTableViewModel(entry, bibdatabasecontext, fieldValueFormatter));
 
             models.addAll(viewModelForDb);
@@ -49,8 +48,8 @@ public class SearchResultsTableDataModel {
         ObservableList<BibEntryTableViewModel> entriesViewModel = FXCollections.observableArrayList(models);
 
         entriesFiltered = new FilteredList<>(entriesViewModel);
-        entriesFiltered.predicateProperty().bind(
-                                                 EasyBind.combine(stateManager.activeGroupProperty(), stateManager.activeSearchQueryProperty(), (groups, query) -> entry -> isMatched(groups, query, entry)));
+
+        entriesFiltered.predicateProperty().bind(EasyBind.map(stateManager.activeSearchQueryProperty(),(query)->entry->isMatchedBySearch(query,entry);));
 
         IntegerProperty resultSize = new SimpleIntegerProperty();
         resultSize.bind(Bindings.size(entriesFiltered));
@@ -59,9 +58,6 @@ public class SearchResultsTableDataModel {
         entriesSorted = new SortedList<>(entriesFiltered);
     }
 
-    private boolean isMatched(ObservableList<GroupTreeNode> groups, Optional<SearchQuery> query, BibEntryTableViewModel entry) {
-        return isMatchedBySearch(query, entry);
-    }
 
     private boolean isMatchedBySearch(Optional<SearchQuery> query, BibEntryTableViewModel entry) {
         return query.map(matcher -> matcher.isMatch(entry.getEntry()))
