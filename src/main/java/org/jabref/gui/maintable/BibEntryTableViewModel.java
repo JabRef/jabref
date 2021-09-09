@@ -129,7 +129,7 @@ public class BibEntryTableViewModel {
         return value;
     }
 
-    public StringProperty bibDatabaseContextProperty(){
+    public StringProperty bibDatabaseContextProperty() {
         return new ReadOnlyStringWrapper(bibDatabaseContext.getDatabasePath().map(Path::toString).orElse(""));
     }
 }

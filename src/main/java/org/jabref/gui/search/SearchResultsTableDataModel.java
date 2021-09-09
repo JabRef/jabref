@@ -47,7 +47,6 @@ public class SearchResultsTableDataModel {
         entriesSorted = new SortedList<>(entriesFiltered);
     }
 
-
     private boolean isMatchedBySearch(Optional<SearchQuery> query, BibEntryTableViewModel entry) {
         return query.map(matcher -> matcher.isMatch(entry.getEntry()))
                     .orElse(true);
