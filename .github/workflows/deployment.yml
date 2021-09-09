@@ -23,7 +23,8 @@ env:
   AstrophysicsDataSystemAPIKey: ${{ secrets.AstrophysicsDataSystemAPIKey }}
   IEEEAPIKey: ${{ secrets.IEEEAPIKey }}
   OSXCERT: ${{ secrets.OSX_SIGNING_CERT }}
-  GRADLE_OPTS: -Xmx2g -XX:MaxMetaspaceSize=512m -Dorg.gradle.daemon=false -Dorg.gradle.vfs.watch=false
+  GRADLE_OPTS: -Xmx4g -Dorg.gradle.daemon=false -Dorg.gradle.vfs.watch=false
+  JAVA_OPTS: -Xmx4g
 
 jobs:
   build:
