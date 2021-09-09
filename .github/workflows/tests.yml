@@ -11,6 +11,7 @@ env:
   SpringerNatureAPIKey: ${{ secrets.SpringerNatureAPIKey }}
   AstrophysicsDataSystemAPIKey: ${{ secrets.AstrophysicsDataSystemAPIKey }}
   IEEEAPIKey: ${{ secrets.IEEEAPIKey }}
+  GRADLE_OPTS: -Xmx2g -XX:MaxMetaspaceSize=512m
 
 jobs:
   checkstyle:
