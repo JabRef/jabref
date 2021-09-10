@@ -183,8 +183,8 @@ public class JabRefFrame extends BorderPane {
         this.themeManager = Globals.getThemeManager();
         this.dialogService = new JabRefDialogService(mainStage, this, themeManager);
         this.pushToApplicationsManager = new PushToApplicationsManager(dialogService, stateManager, prefs);
-        this.globalSearchBar = new GlobalSearchBar(this, stateManager, prefs);
         this.undoManager = Globals.undoManager;
+        this.globalSearchBar = new GlobalSearchBar(this, stateManager, prefs, undoManager);
         this.fileHistory = new FileHistoryMenu(prefs, dialogService, getOpenDatabaseAction());
         this.taskExecutor = Globals.TASK_EXECUTOR;
         this.setOnKeyTyped(key -> {
@@ -597,8 +597,14 @@ public class JabRefFrame extends BorderPane {
         // Subscribe to the search
         EasyBind.subscribe(stateManager.activeSearchQueryProperty(),
                 query -> {
-                    if (getCurrentLibraryTab() != null) {
-                        getCurrentLibraryTab().setCurrentSearchQuery(query);
+                    if (prefs.getSearchPreferences().isKeepSearchString()) {
+                        for (LibraryTab tab : getLibraryTabs()) {
+                            tab.setCurrentSearchQuery(query);
+                        }
+                    } else {
+                        if (getCurrentLibraryTab() != null) {
+                            getCurrentLibraryTab().setCurrentSearchQuery(query);
+                        }
                     }
                 });
 

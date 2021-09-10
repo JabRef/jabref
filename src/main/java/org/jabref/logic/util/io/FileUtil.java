@@ -106,6 +106,18 @@ public class FileUtil {
         return path.resolveSibling(path.getFileName() + extension);
     }
 
+    public static Optional<String> getUniquePathFragment(List<String> paths, Path databasePath) {
+
+        String fileName = databasePath.getFileName().toString();
+
+        List<String> uniquePathParts = uniquePathSubstrings(paths);
+        return uniquePathParts.stream()
+                              .filter(part -> databasePath.toString().contains(part)
+                                      && !part.equals(fileName) && part.contains(File.separator))
+                              .findFirst()
+                              .map(part -> part.substring(0, part.lastIndexOf(File.separator)));
+    }
+
     /**
      * Creates the minimal unique path substring for each file among multiple file paths.
      *

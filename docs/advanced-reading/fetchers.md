@@ -11,9 +11,17 @@ Fetchers are the implementation of the [search using online services](https://do
 | [Springer Nature](https://docs.jabref.org/collect/import-using-online-bibliographic-database#springer) | [Springer Nature API Portal](https://dev.springernature.com/) | `SpringerNatureAPIKey` | 5000 calls/day |
 | [Zentralblatt Math](https://www.zbmath.org/) | \(none\) | \(none\) | Depending on the current network |
 
-"Depending on the current network" means that it depends whether your request is routed through a network having paid access. For instance, some universities have subscriptions to MathSciNet.
+"Depending on the current network" means that it depends on whether your request is routed through a network having paid access. For instance, some universities have subscriptions to MathSciNet.
 
-On Windows, you have to log-off and log-on to let IntelliJ know about the environment variable change. Execute the gradle task "processResources" in the group "others" within IntelliJ to ensure the values have been correctly written. Now, the fetcher tests should run without issues.
+On Windows, you have to log off and log on to let IntelliJ know about the environment variable change. Execute the gradle task `processResources` in the group "others" within IntelliJ to ensure the values have been correctly written. Now, the fetcher tests should run without issues.
+
+JabRef supports different kinds of fetchers:
+
+* `EntryBasedFetcher`: Completes an existing bibliographic entry with information retrieved by the fetcher
+* `FulltextFetcher`: Searches for a PDF for an exiting bibliography entry
+* `SearchBasedFetcher`: Searches providers using a given query and returns a set of \(new\) bibliography entry. The user-facing side is implemented in the UI described at [https://docs.jabref.org/collect/import-using-online-bibliographic-database](https://docs.jabref.org/collect/import-using-online-bibliographic-database).
+
+There are more fetchers supported by JabRef. Investigate the package `org.jabref.logic.importer`. Another possibility is to investigate the inheritance relation of `WebFetcher` \(Ctrl+H in IntelliJ\).
 
 ## Fulltext Fetchers
 
@@ -23,11 +31,11 @@ On Windows, you have to log-off and log-on to let IntelliJ know about the enviro
 
 ### Trust Levels
 
-* SOURCE \(highest\): definitive URL for a particular paper
-* PUBLISHER: any publisher library
-* PREPRINT: any preprint library that might include non final publications of a paper
-* META\_SEARCH: meta search engines
-* UNKNOWN \(lowest\): anything else not fitting the above categories
+* `SOURCE` \(highest\): definitive URL for a particular paper
+* `PUBLISHER`: any publisher library
+* `PREPRINT`: any preprint library that might include non final publications of a paper
+* `META_SEARCH`: meta search engines
+* `UNKNOWN` \(lowest\): anything else not fitting the above categories
 
 ### Current trust levels
 
