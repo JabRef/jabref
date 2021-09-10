@@ -17,6 +17,7 @@ import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.maintable.BibEntryTableViewModel;
 import org.jabref.gui.maintable.columns.SpecialFieldColumn;
 import org.jabref.gui.preview.PreviewViewer;
+import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.logic.l10n.Localization;
@@ -37,6 +38,7 @@ public class GlobalSearchResultDialog extends BaseDialog<Void> {
     @Inject private PreferencesService preferencesService;
     @Inject private StateManager stateManager;
     @Inject private DialogService dialogService;
+    @Inject private ThemeManager themeManager;
 
     private GlobalSearchResultDialogViewModel viewModel;
 
@@ -54,8 +56,7 @@ public class GlobalSearchResultDialog extends BaseDialog<Void> {
     private void initialize() {
         viewModel = new GlobalSearchResultDialogViewModel(preferencesService);
 
-        PreviewViewer previewViewer = new PreviewViewer(viewModel.getSearchDatabaseContext(), dialogService, stateManager);
-        previewViewer.setTheme(preferencesService.getTheme());
+        PreviewViewer previewViewer = new PreviewViewer(viewModel.getSearchDatabaseContext(), dialogService, stateManager, themeManager);
         previewViewer.setLayout(preferencesService.getPreviewPreferences().getCurrentPreviewStyle());
 
         TableColumn<BibEntryTableViewModel, String> fieldColumn = new TableColumn<>(Localization.lang("Library"));
