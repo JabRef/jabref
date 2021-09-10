@@ -35,15 +35,16 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(ApplicationExtension.class)
 class ThemeManagerTest {
-    private Path tempFolder;
-    private PreferencesService preferencesService;
 
-    private static final String testCssData = "data:text/css;charset=utf-8;base64,LyogQmlibGF0ZXggU291cmNlIENvZGUgKi8KLmNvZGUtYXJlYSAudGV4dCB7CiAgICAtZngtZm9udC1mYW1pbHk6IG1vbm9zcGFjZTsKfQ==";
-    private static final String testCssContent = """
+    private static final String TEST_CSS_DATA = "data:text/css;charset=utf-8;base64,LyogQmlibGF0ZXggU291cmNlIENvZGUgKi8KLmNvZGUtYXJlYSAudGV4dCB7CiAgICAtZngtZm9udC1mYW1pbHk6IG1vbm9zcGFjZTsKfQ==";
+    private static final String TEST_CSS_CONTENT = """
             /* Biblatex Source Code */
             .code-area .text {
                 -fx-font-family: monospace;
             }""";
+
+    private Path tempFolder;
+    private PreferencesService preferencesService;
 
     @BeforeEach
     void setUp(@TempDir Path tempFolder) {
@@ -54,7 +55,7 @@ class ThemeManagerTest {
     @Test
     public void themeManagerUsesProvidedTheme() throws IOException {
         Path testCss = tempFolder.resolve("test.css");
-        Files.writeString(testCss, testCssContent, StandardOpenOption.CREATE);
+        Files.writeString(testCss, TEST_CSS_CONTENT, StandardOpenOption.CREATE);
         when(preferencesService.getAppearancePreferences()).thenReturn(
                 new AppearancePreferences(false, 0, new Theme(testCss.toString())));
 
@@ -66,7 +67,7 @@ class ThemeManagerTest {
                                                                  .getAdditionalStylesheet()
                                                                  .map(StyleSheet::getWebEngineStylesheet);
         assertTrue(cssLocationBeforeDeletion.isPresent(), "expected custom theme location to be available");
-        assertEquals(testCssData, cssLocationBeforeDeletion.get());
+        assertEquals(TEST_CSS_DATA, cssLocationBeforeDeletion.get());
     }
 
     @Test
@@ -74,7 +75,7 @@ class ThemeManagerTest {
         /* Create a temporary custom theme that is just a small snippet of CSS. There is no CSS
          validation (at the moment) but by making a valid CSS block we don't preclude adding validation later */
         Path testCss = tempFolder.resolve("test.css");
-        Files.writeString(testCss, testCssContent, StandardOpenOption.CREATE);
+        Files.writeString(testCss, TEST_CSS_CONTENT, StandardOpenOption.CREATE);
         when(preferencesService.getAppearancePreferences()).thenReturn(
                 new AppearancePreferences(false, 0, new Theme(testCss.toString())));
 
@@ -88,7 +89,7 @@ class ThemeManagerTest {
                                                                               .getAdditionalStylesheet()
                                                                               .map(StyleSheet::getWebEngineStylesheet);
         assertTrue(cssLocationAfterDeletion.isPresent(), "expected custom theme location to be available");
-        assertEquals(testCssData, cssLocationAfterDeletion.get());
+        assertEquals(TEST_CSS_DATA, cssLocationAfterDeletion.get());
     }
 
     /**
@@ -112,14 +113,14 @@ class ThemeManagerTest {
                                                                           .getAdditionalStylesheet(),
                 "didn't expect additional stylesheet to be available because it didn't exist when theme was created");
 
-        Files.writeString(testCss, testCssContent, StandardOpenOption.CREATE);
+        Files.writeString(testCss, TEST_CSS_CONTENT, StandardOpenOption.CREATE);
 
         // ActiveTheme should provide an additionalStylesheet after the file was created
         Optional<String> cssLocationAfterFileCreated = themeManagerCreatedBeforeFileExists.getActiveTheme()
                                                                                 .getAdditionalStylesheet()
                                                                                 .map(StyleSheet::getWebEngineStylesheet);
         assertTrue(cssLocationAfterFileCreated.isPresent(), "expected custom theme location to be available");
-        assertEquals(testCssData, cssLocationAfterFileCreated.get());
+        assertEquals(TEST_CSS_DATA, cssLocationAfterFileCreated.get());
     }
 
     @Test
@@ -166,7 +167,7 @@ class ThemeManagerTest {
         when(scene.getRoot()).thenReturn(mock(Parent.class));
 
         Path testCss = tempFolder.resolve("reload.css");
-        Files.writeString(testCss, testCssContent, StandardOpenOption.CREATE);
+        Files.writeString(testCss, TEST_CSS_CONTENT, StandardOpenOption.CREATE);
         when(preferencesService.getAppearancePreferences()).thenReturn(new AppearancePreferences(false, 0, new Theme(testCss.toString())));
 
         ThemeManager themeManager = new ThemeManager(preferencesService, new DummyFileUpdateMonitor(), Runnable::run);
@@ -180,7 +181,7 @@ class ThemeManagerTest {
     @Test
     public void installThemeOnWebEngine() throws IOException {
         Path testCss = tempFolder.resolve("reload.css");
-        Files.writeString(testCss, testCssContent, StandardOpenOption.CREATE);
+        Files.writeString(testCss, TEST_CSS_CONTENT, StandardOpenOption.CREATE);
         when(preferencesService.getAppearancePreferences()).thenReturn(new AppearancePreferences(false, 0, new Theme(testCss.toString())));
 
         ThemeManager themeManager = new ThemeManager(preferencesService, new DummyFileUpdateMonitor(), Runnable::run);
@@ -195,7 +196,7 @@ class ThemeManagerTest {
         });
 
         try {
-            assertEquals(webEngineStyleSheetLocation.get(), testCssData);
+            assertEquals(webEngineStyleSheetLocation.get(), TEST_CSS_DATA);
         } catch (InterruptedException | ExecutionException e) {
             fail(e);
         }
@@ -208,7 +209,7 @@ class ThemeManagerTest {
     @Test
     public void liveReloadCssDataUrl() throws IOException, InterruptedException {
         Path testCss = tempFolder.resolve("reload.css");
-        Files.writeString(testCss, testCssContent, StandardOpenOption.CREATE);
+        Files.writeString(testCss, TEST_CSS_CONTENT, StandardOpenOption.CREATE);
         when(preferencesService.getAppearancePreferences()).thenReturn(new AppearancePreferences(false, 0, new Theme(testCss.toString())));
 
         final ThemeManager themeManager;
