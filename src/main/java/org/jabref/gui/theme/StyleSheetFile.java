@@ -125,6 +125,6 @@ final class StyleSheetFile extends StyleSheet {
 
     @Override
     public String toString() {
-        return "StyleSheetFile{" + getSceneStylesheet() + "}";
+        return "StyleSheet{" + getSceneStylesheet() + "}";
     }
 }

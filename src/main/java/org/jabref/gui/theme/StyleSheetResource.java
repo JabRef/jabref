@@ -27,6 +27,6 @@ final class StyleSheetResource extends StyleSheet {
 
     @Override
     public String toString() {
-        return "StyleSheetResource{" + getSceneStylesheet() + "}";
+        return "StyleSheet{" + getSceneStylesheet() + "}";
     }
 }

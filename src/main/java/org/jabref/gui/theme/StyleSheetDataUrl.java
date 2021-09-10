@@ -30,6 +30,6 @@ public class StyleSheetDataUrl extends StyleSheet {
 
     @Override
     public String toString() {
-        return "StyleSheetDataUrl{" + getSceneStylesheet() + "}";
+        return "StyleSheet{" + getSceneStylesheet() + "}";
     }
 }

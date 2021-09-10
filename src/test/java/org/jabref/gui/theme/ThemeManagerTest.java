@@ -5,20 +5,23 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.web.WebEngine;
 
 import org.jabref.gui.util.DefaultFileUpdateMonitor;
-import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.preferences.AppearancePreferences;
 import org.jabref.preferences.PreferencesService;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.condition.EnabledOnOs;
-import org.junit.jupiter.api.condition.OS;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Mockito;
@@ -35,6 +38,13 @@ class ThemeManagerTest {
     private Path tempFolder;
     private PreferencesService preferencesService;
 
+    private static final String testCssData = "data:text/css;charset=utf-8;base64,LyogQmlibGF0ZXggU291cmNlIENvZGUgKi8KLmNvZGUtYXJlYSAudGV4dCB7CiAgICAtZngtZm9udC1mYW1pbHk6IG1vbm9zcGFjZTsKfQ==";
+    private static final String testCssContent = """
+            /* Biblatex Source Code */
+            .code-area .text {
+                -fx-font-family: monospace;
+            }""";
+
     @BeforeEach
     void setUp(@TempDir Path tempFolder) {
         this.tempFolder = tempFolder;
@@ -42,135 +52,163 @@ class ThemeManagerTest {
     }
 
     @Test
+    public void themeManagerUsesProvidedTheme() throws IOException {
+        Path testCss = tempFolder.resolve("test.css");
+        Files.writeString(testCss, testCssContent, StandardOpenOption.CREATE);
+        when(preferencesService.getAppearancePreferences()).thenReturn(
+                new AppearancePreferences(false, 0, new Theme(testCss.toString())));
+
+        ThemeManager themeManager = new ThemeManager(preferencesService, new DummyFileUpdateMonitor(), Runnable::run);
+
+        assertEquals(Theme.Type.CUSTOM, themeManager.getActiveTheme().getType());
+        assertEquals(testCss.toString(), themeManager.getActiveTheme().getName());
+        Optional<String> cssLocationBeforeDeletion = themeManager.getActiveTheme()
+                                                                 .getAdditionalStylesheet()
+                                                                 .map(StyleSheet::getWebEngineStylesheet);
+        assertTrue(cssLocationBeforeDeletion.isPresent(), "expected custom theme location to be available");
+        assertEquals(testCssData, cssLocationBeforeDeletion.get());
+    }
+
+    @Test
     public void customThemeAvailableEvenWhenDeleted() throws IOException {
         /* Create a temporary custom theme that is just a small snippet of CSS. There is no CSS
          validation (at the moment) but by making a valid CSS block we don't preclude adding validation later */
         Path testCss = tempFolder.resolve("test.css");
-        Files.writeString(testCss,
-                "/* Biblatex Source Code */\n" +
-                        ".code-area .text {\n" +
-                        "    -fx-font-family: monospace;\n" +
-                        "}", StandardOpenOption.CREATE);
-        when(preferencesService.getAppearancePreferences()).thenReturn(new AppearancePreferences(false, 0, new Theme(testCss.toString())));
+        Files.writeString(testCss, testCssContent, StandardOpenOption.CREATE);
+        when(preferencesService.getAppearancePreferences()).thenReturn(
+                new AppearancePreferences(false, 0, new Theme(testCss.toString())));
 
-        // This is detected as a custom theme:
-        ThemeManager themeManager = new ThemeManager(preferencesService, new DummyFileUpdateMonitor(), Runnable::run);
-        assertEquals(Theme.Type.CUSTOM, themeManager.getActiveTheme().getType());
-        assertEquals(testCss.toString(), themeManager.getActiveTheme().getName());
-        assertTrue(themeManager.getActiveTheme().getAdditionalStylesheet().isPresent());
-
-        String testCssLocation1 = themeManager.getActiveTheme().getAdditionalStylesheet().get().getWebEngineStylesheet();
-        assertTrue(StringUtil.isNotBlank(testCssLocation1), "expected custom theme location to be available");
-        assertEquals(
-                "data:text/css;charset=utf-8;base64,LyogQmlibGF0ZXggU291cmNlIENvZGUgKi8KLmNvZGUtYXJlYSAudGV4dCB7CiAgICAtZngtZm9udC1mYW1pbHk6IG1vbm9zcGFjZTsKfQ==",
-                testCssLocation1);
+        // ActiveTheme should provide the additionalStylesheet that was created before
+        ThemeManager themeManagerCreatedBeforeFileDeleted = new ThemeManager(preferencesService, new DummyFileUpdateMonitor(), Runnable::run);
 
         Files.delete(testCss);
 
-        // Consumer passed to additionalStylesheet() should still return the data url even though file is deleted.
-        // It shouldn't matter whether the file existed at the time the Theme object was created (before or after)
+        // ActiveTheme should keep the additionalStylesheet in memory and provide it
+        Optional<String> cssLocationAfterDeletion = themeManagerCreatedBeforeFileDeleted.getActiveTheme()
+                                                                              .getAdditionalStylesheet()
+                                                                              .map(StyleSheet::getWebEngineStylesheet);
+        assertTrue(cssLocationAfterDeletion.isPresent(), "expected custom theme location to be available");
+        assertEquals(testCssData, cssLocationAfterDeletion.get());
+    }
 
-        String testCssLocation2 = themeManager.getActiveTheme().getAdditionalStylesheet().get().getWebEngineStylesheet();
-        assertTrue(StringUtil.isNotBlank(testCssLocation2), "expected custom theme location to be available");
-        assertEquals(
-                "data:text/css;charset=utf-8;base64,LyogQmlibGF0ZXggU291cmNlIENvZGUgKi8KLmNvZGUtYXJlYSAudGV4dCB7CiAgICAtZngtZm9udC1mYW1pbHk6IG1vbm9zcGFjZTsKfQ==",
-                testCssLocation2);
+    /**
+     * This test was orinially part of a more complex test. After a major refactor and simplification of the theme
+     * subsystem, it was decided to drop this functionality in particular, as there is no use case for it and removing
+     * this does simplify the implementation of the theme system.
+     * See https://github.com/JabRef/jabref/pull/7336#issuecomment-874267375
+     *
+     * @throws IOException when the testfile cannot be created
+     */
+    @Disabled
+    @Test
+    public void customThemeBecomesAvailableAfterFileIsCreated() throws IOException {
+        Path testCss = tempFolder.resolve("test.css");
+        when(preferencesService.getAppearancePreferences()).thenReturn(
+                new AppearancePreferences(false, 0, new Theme(testCss.toString())));
 
-        when(preferencesService.getAppearancePreferences()).thenReturn(new AppearancePreferences(false, 0, new Theme(testCss.toString())));
-        ThemeManager themeManagerCreatedWhenAlreadyMissing = new ThemeManager(preferencesService, new DummyFileUpdateMonitor(), Runnable::run);
-        assertEquals(Theme.Type.CUSTOM, themeManager.getActiveTheme().getType());
-        assertEquals(testCss.toString(), themeManager.getActiveTheme().getName());
-        assertEquals(Optional.empty(), themeManagerCreatedWhenAlreadyMissing.getActiveTheme().getAdditionalStylesheet(),
+        // ActiveTheme should provide no additionalStylesheet when no file exists
+        ThemeManager themeManagerCreatedBeforeFileExists = new ThemeManager(preferencesService, new DummyFileUpdateMonitor(), Runnable::run);
+        assertEquals(Optional.empty(), themeManagerCreatedBeforeFileExists.getActiveTheme()
+                                                                          .getAdditionalStylesheet(),
                 "didn't expect additional stylesheet to be available because it didn't exist when theme was created");
 
-        // Check that the consumer is called once more, if the file is restored
-        Files.writeString(testCss,
-                "/* Biblatex Source Code */\n" +
-                        ".code-area .text {\n" +
-                        "    -fx-font-family: monospace;\n" +
-                        "}", StandardOpenOption.CREATE);
+        Files.writeString(testCss, testCssContent, StandardOpenOption.CREATE);
 
-        String testCssLocation3 = themeManager.getActiveTheme().getAdditionalStylesheet().get().getWebEngineStylesheet();
-        assertTrue(StringUtil.isNotBlank(testCssLocation3), "expected custom theme location to be available");
-        assertEquals(
-                "data:text/css;charset=utf-8;base64,LyogQmlibGF0ZXggU291cmNlIENvZGUgKi8KLmNvZGUtYXJlYSAudGV4dCB7CiAgICAtZngtZm9udC1mYW1pbHk6IG1vbm9zcGFjZTsKfQ==",
-                testCssLocation3);
-
-        assertTrue(themeManagerCreatedWhenAlreadyMissing.getActiveTheme().getAdditionalStylesheet().isPresent(),
-                "expected custom theme to be available");
-        String testCssLocation4 = themeManagerCreatedWhenAlreadyMissing.getActiveTheme().getAdditionalStylesheet().get().getWebEngineStylesheet();
-        assertTrue(StringUtil.isNotBlank(testCssLocation4), "expected custom theme location to be available");
-        assertEquals(
-                "data:text/css;charset=utf-8;base64,LyogQmlibGF0ZXggU291cmNlIENvZGUgKi8KLmNvZGUtYXJlYSAudGV4dCB7CiAgICAtZngtZm9udC1mYW1pbHk6IG1vbm9zcGFjZTsKfQ==",
-                testCssLocation4);
+        // ActiveTheme should provide an additionalStylesheet after the file was created
+        Optional<String> cssLocationAfterFileCreated = themeManagerCreatedBeforeFileExists.getActiveTheme()
+                                                                                .getAdditionalStylesheet()
+                                                                                .map(StyleSheet::getWebEngineStylesheet);
+        assertTrue(cssLocationAfterFileCreated.isPresent(), "expected custom theme location to be available");
+        assertEquals(testCssData, cssLocationAfterFileCreated.get());
     }
 
     @Test
     public void largeCustomThemeNotHeldInMemory() throws IOException {
-
         /* Create a temporary custom theme that is just a large comment over 48 kilobytes in size. There is no CSS
         validation (at the moment) but by making a valid CSS comment we don't preclude adding validation later */
-        Path testCss = tempFolder.resolve("test.css");
-        Files.createFile(testCss);
-        Files.writeString(testCss, "/* ", StandardOpenOption.CREATE);
+        Path largeCssTestFile = tempFolder.resolve("test.css");
+        Files.createFile(largeCssTestFile);
+        Files.writeString(largeCssTestFile, "/* ", StandardOpenOption.CREATE);
         final String testString = "ALL WORK AND NO PLAY MAKES JACK A DULL BOY\n";
         for (int i = 0; i <= (48000 / testString.length()); i++) {
-            Files.writeString(testCss, testString, StandardOpenOption.APPEND);
+            Files.writeString(largeCssTestFile, testString, StandardOpenOption.APPEND);
         }
-        Files.writeString(testCss, " */", StandardOpenOption.APPEND);
-        when(preferencesService.getAppearancePreferences()).thenReturn(new AppearancePreferences(false, 0, new Theme(testCss.toString())));
+        Files.writeString(largeCssTestFile, " */", StandardOpenOption.APPEND);
+        when(preferencesService.getAppearancePreferences()).thenReturn(
+                new AppearancePreferences(false, 0, new Theme(largeCssTestFile.toString())));
 
-        // This is detected as a custom theme:
+        // ActiveTheme should provide the large additionalStylesheet that was created before
         ThemeManager themeManager = new ThemeManager(preferencesService, new DummyFileUpdateMonitor(), Runnable::run);
-        assertEquals(Theme.Type.CUSTOM, themeManager.getActiveTheme().getType());
-        assertEquals(testCss.toString(), themeManager.getActiveTheme().getName());
+        Optional<String> cssLocationBeforeRemoved = themeManager.getActiveTheme()
+                                                        .getAdditionalStylesheet()
+                                                        .map(StyleSheet::getWebEngineStylesheet);
+        assertTrue(cssLocationBeforeRemoved.isPresent(), "expected custom theme location to be available");
+        assertTrue(cssLocationBeforeRemoved.get().startsWith("file:"), "expected large custom theme to be a file");
 
-        Optional<String> testCssLocation1 = themeManager.getActiveTheme().getAdditionalStylesheet().map(StyleSheet::getWebEngineStylesheet);
-        assertTrue(testCssLocation1.isPresent(), "expected custom theme location to be available");
-        assertTrue(testCssLocation1.get().startsWith("file:"), "expected large custom theme to be a file");
+        Files.move(largeCssTestFile, largeCssTestFile.resolveSibling("renamed.css"));
 
-        Files.move(testCss, testCss.resolveSibling("renamed.css"));
-
-        // additionalStylesheet() will no longer offer the deleted stylesheet, because it's not been held in memory
-
+        // getAdditionalStylesheet() should no longer offer the deleted stylesheet as it is not been held in memory
         assertEquals(Optional.empty(), themeManager.getActiveTheme().getAdditionalStylesheet(),
                 "didn't expect additional stylesheet after css was deleted");
 
-        ThemeManager themeCreatedWhenAlreadyMissing = new ThemeManager(preferencesService, new DummyFileUpdateMonitor(), Runnable::run);
-        assertEquals(Theme.Type.CUSTOM, themeManager.getActiveTheme().getType());
-        assertEquals(testCss.toString(), themeManager.getActiveTheme().getName());
-        assertEquals(Optional.empty(), themeCreatedWhenAlreadyMissing.getActiveTheme().getAdditionalStylesheet(),
-                "didn't expect additional stylesheet to be available because it didn't exist when theme was created");
+        Files.move(largeCssTestFile.resolveSibling("renamed.css"), largeCssTestFile);
 
         // Check that it is available once more, if the file is restored
-
-        Files.move(testCss.resolveSibling("renamed.css"), testCss);
-
-        Optional<String> testCssLocation2 = themeManager.getActiveTheme().getAdditionalStylesheet().map(StyleSheet::getWebEngineStylesheet);
-        assertTrue(testCssLocation2.isPresent(), "expected custom theme location to be available");
-        assertTrue(testCssLocation2.get().startsWith("file:"), "expected large custom theme to be a file");
-
-        Optional<String> testCssLocation3 = themeCreatedWhenAlreadyMissing.getActiveTheme().getAdditionalStylesheet().map(StyleSheet::getWebEngineStylesheet);
-        assertTrue(testCssLocation3.isPresent(), "expected custom theme location to be available");
-        assertTrue(testCssLocation3.get().startsWith("file:"), "expected large custom theme to be a file");
+        Optional<String> cssLocationAfterFileIsRestored = themeManager.getActiveTheme().getAdditionalStylesheet().map(StyleSheet::getWebEngineStylesheet);
+        assertTrue(cssLocationAfterFileIsRestored.isPresent(), "expected custom theme location to be available");
+        assertTrue(cssLocationAfterFileIsRestored.get().startsWith("file:"), "expected large custom theme to be a file");
     }
 
-    /*
-     TODO this test works great on a local Windows development machine, but currently fails in the github CI pipeline.
-            Investigate why, and when resolved remove the @EnabledOnOs annotation that limits this test
+    @Test
+    public void installThemeOnScene() throws IOException {
+        Scene scene = mock(Scene.class);
+        when(scene.getStylesheets()).thenReturn(FXCollections.observableArrayList());
+        when(scene.getRoot()).thenReturn(mock(Parent.class));
+
+        Path testCss = tempFolder.resolve("reload.css");
+        Files.writeString(testCss, testCssContent, StandardOpenOption.CREATE);
+        when(preferencesService.getAppearancePreferences()).thenReturn(new AppearancePreferences(false, 0, new Theme(testCss.toString())));
+
+        ThemeManager themeManager = new ThemeManager(preferencesService, new DummyFileUpdateMonitor(), Runnable::run);
+
+        themeManager.installCss(scene);
+
+        assertEquals(2, scene.getStylesheets().size());
+        assertTrue(scene.getStylesheets().contains(testCss.toUri().toURL().toExternalForm()));
+    }
+
+    @Test
+    public void installThemeOnWebEngine() throws IOException {
+        Path testCss = tempFolder.resolve("reload.css");
+        Files.writeString(testCss, testCssContent, StandardOpenOption.CREATE);
+        when(preferencesService.getAppearancePreferences()).thenReturn(new AppearancePreferences(false, 0, new Theme(testCss.toString())));
+
+        ThemeManager themeManager = new ThemeManager(preferencesService, new DummyFileUpdateMonitor(), Runnable::run);
+
+        CompletableFuture<String> webEngineStyleSheetLocation = new CompletableFuture<>();
+
+        Platform.runLater(() -> {
+            WebEngine webEngine = new WebEngine();
+            themeManager.installCss(webEngine);
+
+            webEngineStyleSheetLocation.complete(webEngine.getUserStyleSheetLocation());
+        });
+
+        try {
+            assertEquals(webEngineStyleSheetLocation.get(), testCssData);
+        } catch (InterruptedException | ExecutionException e) {
+            fail(e);
+        }
+    }
+
+    /**
+     * Because of concurrency issues we have to choose some arbitrary number of msecs to wait for the watch service to
+     * start up and for the changed css to reload.
      */
     @Test
-    @EnabledOnOs(OS.WINDOWS)
     public void liveReloadCssDataUrl() throws IOException, InterruptedException {
-
-        /* Create a temporary custom theme that is just a small snippet of CSS. There is no CSS
-         validation (at the moment) but by making a valid CSS block we don't preclude adding validation later */
         Path testCss = tempFolder.resolve("reload.css");
-        Files.writeString(testCss,
-                "/* Biblatex Source Code */\n" +
-                        ".code-area .text {\n" +
-                        "    -fx-font-family: monospace;\n" +
-                        "}", StandardOpenOption.CREATE);
+        Files.writeString(testCss, testCssContent, StandardOpenOption.CREATE);
         when(preferencesService.getAppearancePreferences()).thenReturn(new AppearancePreferences(false, 0, new Theme(testCss.toString())));
 
         final ThemeManager themeManager;
@@ -178,23 +216,18 @@ class ThemeManagerTest {
         DefaultFileUpdateMonitor fileUpdateMonitor = null;
         Thread thread = null;
         try {
-
             fileUpdateMonitor = new DefaultFileUpdateMonitor();
             thread = new Thread(fileUpdateMonitor);
             thread.start();
 
-            themeManager = new ThemeManager(preferencesService, fileUpdateMonitor, Runnable::run);
-            assertEquals(Theme.Type.CUSTOM, themeManager.getActiveTheme().getType());
-            assertEquals(testCss.toString(), themeManager.getActiveTheme().getName());
+            // Wait for the watch service to start
+            Thread.sleep(500);
 
-            Optional<String> testCssLocation1 = themeManager.getActiveTheme().getAdditionalStylesheet().map(StyleSheet::getWebEngineStylesheet);
-            assertTrue(testCssLocation1.isPresent(), "expected custom theme location to be available");
-            assertEquals(
-                    "data:text/css;charset=utf-8;base64,LyogQmlibGF0ZXggU291cmNlIENvZGUgKi8KLmNvZGUtYXJlYSAudGV4dCB7CiAgICAtZngtZm9udC1mYW1pbHk6IG1vbm9zcGFjZTsKfQ==",
-                    testCssLocation1.get());
+            themeManager = new ThemeManager(preferencesService, fileUpdateMonitor, Runnable::run);
 
             Scene scene = mock(Scene.class);
             when(scene.getStylesheets()).thenReturn(FXCollections.observableArrayList());
+            when(scene.getRoot()).thenReturn(mock(Parent.class));
 
             try {
                 themeManager.installCss(scene);
@@ -202,15 +235,14 @@ class ThemeManagerTest {
                 fail("Possible mocking issue due to NPE in installCss", ex);
             }
 
-            Thread.sleep(2000);
+            Files.writeString(testCss, """
+                    /* And now for something slightly different */
+                    .code-area .text {
+                        -fx-font-family: serif;
+                    }""", StandardOpenOption.CREATE);
 
-            Files.writeString(testCss,
-                    "/* And now for something slightly different */\n" +
-                            ".code-area .text {\n" +
-                            "    -fx-font-family: serif;\n" +
-                            "}", StandardOpenOption.CREATE);
-
-            Thread.sleep(2000);
+            // Wait for the stylesheet to be reloaded
+            Thread.sleep(500);
         } finally {
             if (fileUpdateMonitor != null) {
                 fileUpdateMonitor.shutdown();
