@@ -1,46 +1,75 @@
 package org.jabref.gui.logging;
 
-import org.jabref.gui.util.DefaultTaskExecutor;
-import org.jabref.logic.logging.LogMessages;
+import java.util.Locale;
 
-import org.apache.logging.log4j.core.Filter;
-import org.apache.logging.log4j.core.LogEvent;
-import org.apache.logging.log4j.core.appender.AbstractAppender;
-import org.apache.logging.log4j.core.config.Property;
-import org.apache.logging.log4j.core.impl.MutableLogEvent;
-import org.apache.logging.log4j.plugins.Plugin;
-import org.apache.logging.log4j.plugins.PluginFactory;
+import org.tinylog.Level;
+import org.tinylog.format.MessageFormatter;
+import org.tinylog.provider.ContextProvider;
+import org.tinylog.provider.LoggingProvider;
+import org.tinylog.provider.NopContextProvider;
 
-@Plugin(name = "GuiAppender", category = "Core", elementType = "appender", printObject = true)
-@SuppressWarnings("unused") // class is indirectly constructed by log4j
-public class GuiAppender extends AbstractAppender {
+public class GuiAppender implements LoggingProvider {
 
-    private GuiAppender(String name, Filter filter, boolean ignoreExceptions, Property[] properties) {
-        super(name, filter, null, ignoreExceptions, properties);
-    }
 
-    @PluginFactory
-    public static <B extends GuiAppender.Builder<B>> B newBuilder() {
-        return new GuiAppender.Builder<B>().asBuilder();
-    }
-
-    /**
-     * The log event will be forwarded to the {@link LogMessages} archive.
-     */
     @Override
-    public void append(LogEvent event) {
+    public ContextProvider getContextProvider() {
+        return new NopContextProvider();
+    }
+
+    @Override
+    public Level getMinimumLevel() {
+        return Level.INFO;
+    }
+
+    @Override
+    public Level getMinimumLevel(String tag) {
+        return Level.INFO;
+    }
+
+    @Override
+    public boolean isEnabled(int depth, String tag, Level level) {
+        return level.ordinal() >= Level.INFO.ordinal();
+    }
+
+
+    @Override
+    public void shutdown() {
+        // Nothing to do
+    }
+
+    private void log(Throwable exception, String message, Object[] arguments) {
+        StringBuilder builder = new StringBuilder();
+        if (message != null) {
+            builder.append(new MessageFormatter(Locale.ENGLISH).format(message, arguments));
+        }
+        if (exception != null) {
+            if (builder.length() > 0) {
+                builder.append(": ");
+            }
+            builder.append(exception);
+        }
+        System.out.println(builder);
+    }
+
+    @Override
+    public void log(int depth, String tag, Level level, Throwable exception, MessageFormatter formatter, Object obj, Object... arguments) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void log(String loggerClassName, String tag, Level level, Throwable exception, MessageFormatter formatter, Object obj, Object... arguments) {
+        // TODO Auto-generated method stub
+
+    }
+
+
+    /*
+      The log event will be forwarded to the {@link LogMessages} archive.
+
+    public void append(LoggingEvent event) {
         // We need to make a copy as instances of LogEvent are reused by log4j
-        MutableLogEvent copy = new MutableLogEvent();
-        copy.initFrom(event);
         DefaultTaskExecutor.runInJavaFXThread(() -> LogMessages.getInstance().add(copy));
     }
-
-    public static class Builder<B extends GuiAppender.Builder<B>> extends AbstractAppender.Builder<B>
-            implements org.apache.logging.log4j.plugins.util.Builder<GuiAppender> {
-
-        @Override
-        public GuiAppender build() {
-            return new GuiAppender(this.getName(), this.getFilter(), this.isIgnoreExceptions(), this.getPropertyArray());
-        }
-    }
+*/
 }

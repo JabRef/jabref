@@ -38,12 +38,11 @@ open module org.jabref {
 
     // Logging
     requires org.slf4j;
-    requires org.apache.logging.log4j;
-    requires org.apache.logging.log4j.core;
-    requires org.apache.logging.log4j.plugins;
+
+    requires org.tinylog.api;
+    requires org.tinylog.api.slf4j;
     requires applicationinsights.logging.log4j2;
-    provides org.apache.logging.log4j.plugins.processor.PluginService
-            with org.jabref.gui.logging.plugins.Log4jPlugins;
+
 
     // Preferences and XML
     requires java.prefs;

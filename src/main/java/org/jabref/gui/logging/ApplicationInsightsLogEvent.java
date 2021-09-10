@@ -23,26 +23,28 @@ package org.jabref.gui.logging;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import com.microsoft.applicationinsights.internal.common.ApplicationInsightsEvent;
 import com.microsoft.applicationinsights.internal.logger.InternalLogger;
 import com.microsoft.applicationinsights.telemetry.SeverityLevel;
-import org.apache.logging.log4j.core.LogEvent;
-import org.apache.logging.log4j.spi.StandardLevel;
+import org.slf4j.MDC;
+import org.slf4j.event.Level;
+import org.slf4j.event.LoggingEvent;
 
 // TODO: Remove this copy as soon as the one included in AI is compatible with log4j 3
 public final class ApplicationInsightsLogEvent extends ApplicationInsightsEvent {
 
-    private LogEvent logEvent;
+    private final LoggingEvent logEvent;
 
-    public ApplicationInsightsLogEvent(LogEvent logEvent) {
+    public ApplicationInsightsLogEvent(LoggingEvent logEvent) {
         this.logEvent = logEvent;
     }
 
     @Override
     public String getMessage() {
         String message = this.logEvent.getMessage() != null ?
-                this.logEvent.getMessage().getFormattedMessage() :
+                this.logEvent.getMessage() :
                 "Log4j Trace";
 
         return message;
@@ -50,7 +52,7 @@ public final class ApplicationInsightsLogEvent extends ApplicationInsightsEvent 
 
     @Override
     public boolean isException() {
-        return this.logEvent.getThrown() != null;
+        return this.logEvent.getThrowable() != null;
     }
 
     @Override
@@ -58,7 +60,7 @@ public final class ApplicationInsightsLogEvent extends ApplicationInsightsEvent 
         Exception exception = null;
 
         if (isException()) {
-            Throwable throwable = this.logEvent.getThrown();
+            Throwable throwable = this.logEvent.getThrowable();
             exception = throwable instanceof Exception ? (Exception) throwable : new Exception(throwable);
         }
 
@@ -68,21 +70,20 @@ public final class ApplicationInsightsLogEvent extends ApplicationInsightsEvent 
     @Override
     public Map<String, String> getCustomParameters() {
 
-        Map<String, String> metaData = new HashMap<String, String>();
+        Map<String, String> metaData = new HashMap<>();
 
-        metaData.put("SourceType", "Log4j");
+        metaData.put("SourceType", "slf4j");
 
         addLogEventProperty("LoggerName", logEvent.getLoggerName(), metaData);
         addLogEventProperty("LoggingLevel", logEvent.getLevel() != null ? logEvent.getLevel().name() : null, metaData);
         addLogEventProperty("ThreadName", logEvent.getThreadName(), metaData);
-        addLogEventProperty("TimeStamp", getFormattedDate(logEvent.getTimeMillis()), metaData);
+        addLogEventProperty("TimeStamp", getFormattedDate(logEvent.getTimeStamp()), metaData);
 
         if (isException()) {
             addLogEventProperty("Logger Message", getMessage(), metaData);
         }
 
-        if (logEvent.isIncludeLocation()) {
-            StackTraceElement stackTraceElement = logEvent.getSource();
+           for(StackTraceElement stackTraceElement : logEvent.getThrowable().getStackTrace()) {
 
             addLogEventProperty("ClassName", stackTraceElement.getClassName(), metaData);
             addLogEventProperty("FileName", stackTraceElement.getFileName(), metaData);
@@ -90,7 +91,7 @@ public final class ApplicationInsightsLogEvent extends ApplicationInsightsEvent 
             addLogEventProperty("LineNumber", String.valueOf(stackTraceElement.getLineNumber()), metaData);
         }
 
-        for (Map.Entry<String, String> entry : logEvent.getContextData().toMap().entrySet()) {
+        for (Entry<String,String> entry : MDC.getMDCAdapter().getCopyOfContextMap().entrySet()) {
             addLogEventProperty(entry.getKey(), entry.getValue(), metaData);
         }
 
@@ -102,11 +103,9 @@ public final class ApplicationInsightsLogEvent extends ApplicationInsightsEvent 
 
     @Override
     public SeverityLevel getNormalizedSeverityLevel() {
-        int log4jLevelAsInt = logEvent.getLevel().intLevel();
+        Level logEventLevel = logEvent.getLevel();
 
-        switch (StandardLevel.getStandardLevel(log4jLevelAsInt)) {
-            case FATAL:
-                return SeverityLevel.Critical;
+        switch (logEventLevel) {
 
             case ERROR:
                 return SeverityLevel.Error;
@@ -119,11 +118,10 @@ public final class ApplicationInsightsLogEvent extends ApplicationInsightsEvent 
 
             case TRACE:
             case DEBUG:
-            case ALL:
                 return SeverityLevel.Verbose;
 
             default:
-                InternalLogger.INSTANCE.error("Unknown Log4j v2 option, %d, using TRACE level as default", log4jLevelAsInt);
+                InternalLogger.INSTANCE.error("Unknown slf4joption, %d, using TRACE level as default", logEventLevel);
                 return SeverityLevel.Verbose;
         }
     }
