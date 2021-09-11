@@ -69,11 +69,11 @@ public class EmbeddedBibFilePdfExporter extends Exporter {
         try (PDDocument document = PDDocument.load(file.toFile())) {
             PDDocumentNameDictionary nameDictionary = document.getDocumentCatalog().getNames();
             PDEmbeddedFilesNameTreeNode efTree;
-            Map names;
+            Map<String, PDComplexFileSpecification> names;
 
             if (nameDictionary == null) {
                 efTree = new PDEmbeddedFilesNameTreeNode();
-                names = new HashMap();
+                names = new HashMap<>();
                 nameDictionary = new PDDocumentNameDictionary(document.getDocumentCatalog());
                 nameDictionary.setEmbeddedFiles(efTree);
                 document.getDocumentCatalog().setNames(nameDictionary);
