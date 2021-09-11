@@ -40,7 +40,7 @@ public class GuiAppender implements LoggingProvider {
     private void log(Throwable exception, String message, Object[] arguments) {
         StringBuilder builder = new StringBuilder();
         if (message != null) {
-            builder.append(new MessageFormatter(Locale.ENGLISH).format(message, arguments));
+            builder.append(new AdvancedMesageFormatter(Locale.ENGLISH).format(message, arguments));
         }
         if (exception != null) {
             if (builder.length() > 0) {
