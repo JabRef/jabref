@@ -36,6 +36,10 @@ plugs:
     interface: system-files
     write:
     - /etc/chromium/native-messaging-hosts/org.jabref.jabref.json
+    
+layout:
+  /usr/share/libdrm:
+    bind: $SNAP/gnome-platform/usr/share/libdrm
 
 apps:
   jabref:
