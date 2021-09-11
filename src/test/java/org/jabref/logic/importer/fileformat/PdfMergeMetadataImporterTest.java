@@ -67,6 +67,7 @@ class PdfMergeMetadataImporterTest {
         expected.setField(StandardField.TITLE, "Effective Java");
         expected.setField(StandardField.PUBLISHER, "Addison Wesley");
         expected.setField(StandardField.YEAR, "2018");
+        expected.setField(StandardField.MONTH, "jul");
         expected.setField(StandardField.DOI, "10.1002/9781118257517");
 
         // From ISBN (contained on first page verbatim bib entry)
