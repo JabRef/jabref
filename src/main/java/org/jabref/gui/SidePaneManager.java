@@ -1,6 +1,7 @@
 package org.jabref.gui;
 
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -115,7 +116,7 @@ public class SidePaneManager {
      * so that we show components at the preferred position next time.
      */
     private void updatePreferredPositions() {
-        Map<SidePaneType, Integer> preferredPositions = preferencesService.getSidePanePreferences().getPreferredPositions();
+        Map<SidePaneType, Integer> preferredPositions = new HashMap<>(preferencesService.getSidePanePreferences().getPreferredPositions());
 
         // Use the currently shown positions of all visible components
         int index = 0;
@@ -123,7 +124,7 @@ public class SidePaneManager {
             preferredPositions.put(comp.getType(), index);
             index++;
         }
-        preferencesService.storeSidePanePreferences(preferencesService.getSidePanePreferences().withPreferredPositions(preferredPositions));
+        preferencesService.getSidePanePreferences().setPreferredPositions(preferredPositions);
     }
 
     /**

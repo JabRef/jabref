@@ -2,58 +2,74 @@ package org.jabref.preferences;
 
 import java.util.Map;
 
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableMap;
+
 import org.jabref.gui.SidePaneType;
 
 public class SidePanePreferences {
-    private boolean webSearchPaneVisible;
+    private final BooleanProperty webSearchPaneVisible;
     // private final boolean openOfficePaneVisible;
-    private boolean groupsPaneVisible;
-    private Map<SidePaneType, Integer> preferredPositions;
-    private int webSearchFetcherSelected;
+    private final BooleanProperty groupsPaneVisible;
+    private final ObservableMap<SidePaneType, Integer> preferredPositions;
+    private final IntegerProperty webSearchFetcherSelected;
 
     public SidePanePreferences(boolean webSearchPaneVisible,
                                boolean groupsPaneVisible,
                                Map<SidePaneType, Integer> preferredPositions,
                                int webSearchFetcherSelected) {
-        this.webSearchPaneVisible = webSearchPaneVisible;
-        this.groupsPaneVisible = groupsPaneVisible;
-        this.preferredPositions = preferredPositions;
-        this.webSearchFetcherSelected = webSearchFetcherSelected;
+        this.webSearchPaneVisible = new SimpleBooleanProperty(webSearchPaneVisible);
+        this.groupsPaneVisible = new SimpleBooleanProperty(groupsPaneVisible);
+        this.preferredPositions = FXCollections.observableMap(preferredPositions);
+        this.webSearchFetcherSelected = new SimpleIntegerProperty(webSearchFetcherSelected);
     }
 
     public boolean isWebSearchPaneVisible() {
+        return webSearchPaneVisible.get();
+    }
+
+    public BooleanProperty webSearchPaneVisibleProperty() {
         return webSearchPaneVisible;
     }
 
-    public SidePanePreferences withWebSearchPaneVisible(boolean webSearchPaneVisible) {
-        this.webSearchPaneVisible = webSearchPaneVisible;
-        return this;
+    public void setWebSearchPaneVisible(boolean webSearchPaneVisible) {
+        this.webSearchPaneVisible.set(webSearchPaneVisible);
     }
 
     public boolean isGroupsPaneVisible() {
+        return groupsPaneVisible.get();
+    }
+
+    public BooleanProperty groupsPaneVisibleProperty() {
         return groupsPaneVisible;
     }
 
-    public SidePanePreferences withGroupsPaneVisible(boolean groupsPaneVisible) {
-        this.groupsPaneVisible = groupsPaneVisible;
-        return this;
+    public void setGroupsPaneVisible(boolean groupsPaneVisible) {
+        this.groupsPaneVisible.set(groupsPaneVisible);
     }
 
-    public Map<SidePaneType, Integer> getPreferredPositions() {
+    public ObservableMap<SidePaneType, Integer> getPreferredPositions() {
         return preferredPositions;
     }
 
-    public SidePanePreferences withPreferredPositions(Map<SidePaneType, Integer> preferredPositions) {
-        this.preferredPositions = preferredPositions;
-        return this;
+    public void setPreferredPositions(Map<SidePaneType, Integer> positions) {
+        preferredPositions.clear();
+        preferredPositions.putAll(positions);
     }
 
     public int getWebSearchFetcherSelected() {
+        return webSearchFetcherSelected.get();
+    }
+
+    public IntegerProperty webSearchFetcherSelectedProperty() {
         return webSearchFetcherSelected;
     }
 
-    public SidePanePreferences withWebSearchFetcherSelected(int webSearchFetcherSelected) {
-        this.webSearchFetcherSelected = webSearchFetcherSelected;
-        return this;
+    public void setWebSearchFetcherSelected(int webSearchFetcherSelected) {
+        this.webSearchFetcherSelected.set(webSearchFetcherSelected);
     }
 }

@@ -2454,28 +2454,23 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public SidePanePreferences getSidePanePreferences() {
-        if (this.sidePanePreferences == null) {
-            updateSidePanePreferences();
+        if (Objects.nonNull(sidePanePreferences)) {
+            return sidePanePreferences;
         }
-        return this.sidePanePreferences;
-    }
 
-    void updateSidePanePreferences() {
-        this.sidePanePreferences = new SidePanePreferences(
+        sidePanePreferences = new SidePanePreferences(
                 getBoolean(WEB_SEARCH_VISIBLE),
                 getBoolean(GROUP_SIDEPANE_VISIBLE),
                 getSidePanePreferredPositions(),
                 getInt(SELECTED_FETCHER_INDEX));
-    }
 
-    @Override
-    public void storeSidePanePreferences(SidePanePreferences preferences) {
-        putBoolean(WEB_SEARCH_VISIBLE, preferences.isWebSearchPaneVisible());
-        putBoolean(GROUP_SIDEPANE_VISIBLE, preferences.isGroupsPaneVisible());
-        storeSidePanePreferredPositions(preferences.getPreferredPositions());
-        putInt(SELECTED_FETCHER_INDEX, preferences.getWebSearchFetcherSelected());
+        EasyBind.subscribe(sidePanePreferences.webSearchPaneVisibleProperty(), newValue -> putBoolean(WEB_SEARCH_VISIBLE, newValue));
+        EasyBind.subscribe(sidePanePreferences.groupsPaneVisibleProperty(), newValue -> putBoolean(GROUP_SIDEPANE_VISIBLE, newValue));
+        sidePanePreferences.getPreferredPositions().addListener((InvalidationListener) listener ->
+                storeSidePanePreferredPositions(sidePanePreferences.getPreferredPositions()));
+        EasyBind.subscribe(sidePanePreferences.webSearchFetcherSelectedProperty(), newValue -> putInt(SELECTED_FETCHER_INDEX, newValue));
 
-        this.sidePanePreferences = preferences;
+        return sidePanePreferences;
     }
 
     private Map<SidePaneType, Integer> getSidePanePreferredPositions() {

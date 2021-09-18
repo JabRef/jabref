@@ -51,12 +51,12 @@ public class GroupSidePane extends SidePaneComponent {
 
     @Override
     public void beforeClosing() {
-        preferences.storeSidePanePreferences(preferences.getSidePanePreferences().withGroupsPaneVisible(false));
+        preferences.getSidePanePreferences().setGroupsPaneVisible(false);
     }
 
     @Override
     public void afterOpening() {
-        preferences.storeSidePanePreferences(preferences.getSidePanePreferences().withGroupsPaneVisible(true));
+        preferences.getSidePanePreferences().setGroupsPaneVisible(true);
         setGraphicsAndTooltipForButton(preferences.getGroupViewMode());
     }
 
