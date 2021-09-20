@@ -37,10 +37,10 @@ public class SearchGroup extends AbstractGroup {
             return false;
         }
         SearchGroup other = (SearchGroup) o;
-        return getName().equals(other.getName())
-                && getSearchExpression().equals(other.getSearchExpression())
-                && (getSearchFlags().equals(other.getSearchFlags()))
-                && (getHierarchicalContext() == other.getHierarchicalContext());
+        return Objects.equals(getName(), other.getName())
+               && Objects.equals(getHierarchicalContext(), other.getHierarchicalContext())
+               && Objects.equals(getSearchExpression(), other.getSearchExpression())
+               && Objects.equals(getSearchFlags(), other.getSearchFlags());
     }
 
     @Override
@@ -63,6 +63,11 @@ public class SearchGroup extends AbstractGroup {
                     + "Please report this on https://github.com/JabRef/jabref/issues", t);
             return null;
         }
+    }
+
+    @Override
+    public String toString() {
+        return "SearchGroup [query=" + query + ", name=" + name + ", searchFlags=" + getSearchFlags() + ",  context=" + context + ", color=" + color + ", isExpanded=" + isExpanded + ", description=" + description + ", iconName=" + iconName + "]";
     }
 
     @Override
