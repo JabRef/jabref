@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
+import javax.swing.undo.UndoManager;
+
 import org.jabref.gui.groups.GroupSidePane;
 import org.jabref.gui.importer.fetcher.WebSearchPane;
 import org.jabref.gui.openoffice.OpenOfficeSidePanel;
@@ -25,7 +27,7 @@ public class SidePaneManager {
     private final List<SidePaneComponent> visibleComponents = new LinkedList<>();
     private final PreferencesService preferencesService;
 
-    public SidePaneManager(PreferencesService preferencesService, JabRefFrame frame, TaskExecutor taskExecutor, DialogService dialogService, StateManager stateManager) {
+    public SidePaneManager(PreferencesService preferencesService, TaskExecutor taskExecutor, DialogService dialogService, StateManager stateManager, UndoManager undoManager) {
         this.preferencesService = preferencesService;
         this.sidePane = new SidePane();
 
@@ -33,7 +35,7 @@ public class SidePaneManager {
         Stream.of(
                 new GroupSidePane(this, taskExecutor, stateManager, preferencesService, dialogService),
                 new WebSearchPane(this, preferencesService, dialogService, stateManager),
-                new OpenOfficeSidePanel(this, preferencesService, frame))
+                new OpenOfficeSidePanel(this, preferencesService, dialogService, stateManager, undoManager))
               .forEach(pane -> components.put(pane.getType(), pane));
 
         if (preferencesService.getSidePanePreferences().isGroupsPaneVisible()) {

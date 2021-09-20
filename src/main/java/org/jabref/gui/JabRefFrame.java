@@ -566,7 +566,7 @@ public class JabRefFrame extends BorderPane {
     }
 
     public void init() {
-        sidePaneManager = new SidePaneManager(prefs, this, taskExecutor, dialogService, stateManager);
+        sidePaneManager = new SidePaneManager(prefs, taskExecutor, dialogService, stateManager, undoManager);
         sidePane = sidePaneManager.getPane();
 
         tabbedPane = new TabPane();
