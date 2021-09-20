@@ -106,13 +106,14 @@ public class OpenOfficePanel {
     public OpenOfficePanel(PreferencesService preferencesService,
                            OpenOfficePreferences ooPrefs,
                            KeyBindingRepository keyBindingRepository,
+                           TaskExecutor taskExecutor,
                            DialogService dialogService,
                            StateManager stateManager,
                            UndoManager undoManager) {
         ActionFactory factory = new ActionFactory(keyBindingRepository);
         this.ooPrefs = ooPrefs;
         this.preferencesService = preferencesService;
-        this.taskExecutor = Globals.TASK_EXECUTOR;
+        this.taskExecutor = taskExecutor;
         this.dialogService = dialogService;
         this.stateManager = stateManager;
         this.undoManager = undoManager;

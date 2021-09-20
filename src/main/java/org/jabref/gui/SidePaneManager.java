@@ -35,7 +35,7 @@ public class SidePaneManager {
         Stream.of(
                 new GroupSidePane(this, taskExecutor, stateManager, preferencesService, dialogService),
                 new WebSearchPane(this, preferencesService, dialogService, stateManager),
-                new OpenOfficeSidePanel(this, preferencesService, dialogService, stateManager, undoManager))
+                new OpenOfficeSidePanel(this, taskExecutor, preferencesService, dialogService, stateManager, undoManager))
               .forEach(pane -> components.put(pane.getType(), pane));
 
         if (preferencesService.getSidePanePreferences().isGroupsPaneVisible()) {
@@ -188,5 +188,19 @@ public class SidePaneManager {
             int pos2 = preferredPositions.getOrDefault(comp2.getType(), 0);
             return Integer.compare(pos1, pos2);
         }
+    }
+
+    public static SidePaneComponent parse(SidePaneType type,
+                                          SidePaneManager sidePaneManager,
+                                          PreferencesService preferencesService,
+                                          TaskExecutor taskExecutor,
+                                          DialogService dialogService,
+                                          StateManager stateManager,
+                                          UndoManager undoManager) {
+        return switch (type) {
+            case GROUPS -> new GroupSidePane(sidePaneManager, taskExecutor, stateManager, preferencesService, dialogService);
+            case WEB_SEARCH -> new WebSearchPane(sidePaneManager, preferencesService, dialogService, stateManager);
+            case OPEN_OFFICE -> new OpenOfficeSidePanel(sidePaneManager, taskExecutor, preferencesService, dialogService, stateManager, undoManager);
+        };
     }
 }
