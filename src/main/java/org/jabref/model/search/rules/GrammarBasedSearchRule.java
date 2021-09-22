@@ -1,6 +1,7 @@
 package org.jabref.model.search.rules;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Objects;
@@ -51,7 +52,7 @@ public class GrammarBasedSearchRule implements SearchRule {
 
     private ParseTree tree;
     private String query;
-    private List<SearchResult> searchResults;
+    private List<SearchResult> searchResults = new ArrayList<>();
 
     private final BibDatabaseContext databaseContext;
 
@@ -99,7 +100,7 @@ public class GrammarBasedSearchRule implements SearchRule {
         tree = parser.start();
         this.query = query;
 
-        if (!searchFlags.contains(SearchRules.SearchFlags.FULLTEXT) || databaseContext == null) {
+        if (!searchFlags.contains(SearchRules.SearchFlags.FULLTEXT) || (databaseContext == null)) {
             return;
         }
         try {
