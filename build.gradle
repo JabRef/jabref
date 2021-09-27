@@ -210,7 +210,7 @@ dependencies {
     testImplementation 'io.github.classgraph:classgraph:4.8.116'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.7.2'
     testRuntimeOnly 'org.junit.vintage:junit-vintage-engine:5.7.2'
-    testImplementation 'org.junit.platform:junit-platform-launcher:1.7.2'
+    testImplementation 'org.junit.platform:junit-platform-launcher:1.8.1'
 
     testImplementation 'net.bytebuddy:byte-buddy-parent:1.11.15'
     testRuntimeOnly group: 'org.apache.logging.log4j', name: 'log4j-core', version: '3.0.0-SNAPSHOT'
