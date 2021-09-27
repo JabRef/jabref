@@ -48,9 +48,13 @@ class CleanupWorkerTest {
     private final CleanupPreset emptyPreset = new CleanupPreset(EnumSet.noneOf(CleanupPreset.CleanupStep.class));
     private CleanupWorker worker;
 
+    // Ensure that the folder stays the same for all tests. By default @TempDir creates a new folder for each usage
+    Path bibFolder;
+
     @BeforeEach
     void setUp(@TempDir Path bibFolder) throws IOException {
 
+        this.bibFolder = bibFolder;
         Path path = bibFolder.resolve("ARandomlyNamedFolder");
         Files.createDirectory(path);
         File pdfFolder = path.toFile();
@@ -232,7 +236,7 @@ class CleanupWorkerTest {
     }
 
     @Test
-    void cleanupRelativePathsConvertAbsoluteToRelativePath(@TempDir Path bibFolder) throws IOException {
+    void cleanupRelativePathsConvertAbsoluteToRelativePath() throws IOException {
         CleanupPreset preset = new CleanupPreset(CleanupPreset.CleanupStep.MAKE_PATHS_RELATIVE);
 
         Path path = bibFolder.resolve("AnotherRandomlyNamedFile");
@@ -247,7 +251,7 @@ class CleanupWorkerTest {
     }
 
     @Test
-    void cleanupRenamePdfRenamesRelativeFile(@TempDir Path bibFolder) throws IOException {
+    void cleanupRenamePdfRenamesRelativeFile() throws IOException {
         CleanupPreset preset = new CleanupPreset(CleanupPreset.CleanupStep.RENAME_PDF);
 
         Path path = bibFolder.resolve("AnotherRandomlyNamedFile.tmp");
