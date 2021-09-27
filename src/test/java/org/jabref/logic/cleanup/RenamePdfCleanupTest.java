@@ -31,7 +31,7 @@ class RenamePdfCleanupTest {
     private RenamePdfCleanup cleanup;
 
     // Ensure that the folder stays the same for all tests. By default @TempDir creates a new folder for each usage
-    Path testFolder;
+    private Path testFolder;
 
     @BeforeEach
     void setUp(@TempDir Path testFolder) {
