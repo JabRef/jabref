@@ -83,7 +83,7 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
     private final CustomLocalDragboard localDragboard;
     private ListProperty<PreviewLayout> dragSourceList = null;
     private ObjectProperty<MultipleSelectionModel<PreviewLayout>> dragSourceSelectionModel = null;
-    private List<String> restartWarning = new ArrayList<>();
+    private final List<String> restartWarning = new ArrayList<>();
 
     public PreviewTabViewModel(DialogService dialogService, PreferencesService preferences, TaskExecutor taskExecutor, StateManager stateManager) {
         this.dialogService = dialogService;
