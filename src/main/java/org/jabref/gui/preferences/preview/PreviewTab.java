@@ -127,7 +127,6 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> i
         availableListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         availableListView.selectionModelProperty().getValue().selectedItemProperty().addListener((observable, oldValue, newValue) -> viewModel.setPreviewLayout(newValue));
 
-
         chosenListView.itemsProperty().bindBidirectional(viewModel.chosenListProperty());
         viewModel.chosenSelectionModelProperty().setValue(chosenListView.getSelectionModel());
         new ViewModelListCellFactory<PreviewLayout>()
@@ -140,7 +139,6 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> i
         chosenListView.setOnKeyTyped(event -> jumpToSearchKey(chosenListView, event));
         chosenListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         chosenListView.selectionModelProperty().getValue().selectedItemProperty().addListener((observable, oldValue, newValue) -> viewModel.setPreviewLayout(newValue));
-
 
         toRightButton.disableProperty().bind(viewModel.availableSelectionModelProperty().getValue().selectedItemProperty().isNull());
 
