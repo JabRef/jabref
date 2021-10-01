@@ -59,8 +59,7 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
                     try {
                         Path path = Path.of(mainFileDirectoryProperty.getValue());
                         return (Files.exists(path) && Files.isDirectory(path));
-                    }
-                    catch(InvalidPathException ex) {
+                    } catch (InvalidPathException ex) {
                         return false;
                     }
                 },
