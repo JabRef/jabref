@@ -7,6 +7,7 @@ import javax.inject.Inject;
 
 import javafx.application.Platform;
 import javafx.beans.property.ListProperty;
+import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
@@ -26,6 +27,7 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
+import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.preferences.PreferencesTab;
 import org.jabref.gui.preview.PreviewViewer;
@@ -39,6 +41,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
+import org.controlsfx.control.textfield.CustomTextField;
 import org.fxmisc.richtext.CodeArea;
 import org.fxmisc.richtext.LineNumberFactory;
 
@@ -55,6 +58,7 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> i
     @FXML private Button resetDefaultButton;
     @FXML private Tab previewTab;
     @FXML private CodeArea editArea;
+    @FXML private CustomTextField searchBox;
 
     @Inject private StateManager stateManager;
 
@@ -62,6 +66,7 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> i
 
     private long lastKeyPressTime;
     private String listSearchTerm;
+    private FilteredList<PreviewLayout> filteredPreviews;
 
     private final ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
 
@@ -99,7 +104,12 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> i
     }
 
     public void initialize() {
+        searchBox.setPromptText(Localization.lang("Search") + "...");
+        searchBox.setLeft(IconTheme.JabRefIcons.SEARCH.getGraphicNode());
+
         this.viewModel = new PreviewTabViewModel(dialogService, preferencesService, taskExecutor, stateManager);
+
+        filteredPreviews = new FilteredList<>(viewModel.availableListProperty());
 
         lastKeyPressTime = System.currentTimeMillis();
 
@@ -115,7 +125,7 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> i
 
         showAsTabCheckBox.selectedProperty().bindBidirectional(viewModel.showAsExtraTabProperty());
 
-        availableListView.itemsProperty().bindBidirectional(viewModel.availableListProperty());
+        availableListView.setItems(this.filteredPreviews);
         viewModel.availableSelectionModelProperty().setValue(availableListView.getSelectionModel());
         new ViewModelListCellFactory<PreviewLayout>()
                 .withText(PreviewLayout::getDisplayName)
@@ -167,6 +177,10 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> i
             if (!newValue) {
                 viewModel.refreshPreview();
             }
+        });
+
+        searchBox.textProperty().addListener((observable, previousText, searchTerm) -> {
+            filteredPreviews.setPredicate(preview -> searchTerm.isEmpty() || preview.containsCaseIndependent(searchTerm));
         });
 
         readOnlyLabel.visibleProperty().bind(viewModel.selectedIsEditableProperty().not());
