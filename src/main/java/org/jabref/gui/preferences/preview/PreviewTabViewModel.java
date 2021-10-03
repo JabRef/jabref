@@ -92,13 +92,6 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
         this.localDragboard = stateManager.getLocalDragboard();
         initialPreviewPreferences = preferences.getPreviewPreferences();
 
-        sourceTextProperty.addListener((observable, oldValue, newValue) -> {
-            var currentLayout = getCurrentLayout();
-            if (currentLayout instanceof TextBasedPreviewLayout) {
-                ((TextBasedPreviewLayout) currentLayout).setText(sourceTextProperty.getValue().replace("\n", "__NEWLINE__"));
-            }
-        });
-
         chosenListValidator = new FunctionBasedValidator<>(
                 chosenListProperty,
                 input -> !chosenListProperty.getValue().isEmpty(),
@@ -173,24 +166,6 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
                                     .orElse(chosenListProperty.getValue().stream().filter(layout -> layout.getName().equals(name))
                                                               .findAny()
                                                               .orElse(null));
-    }
-
-    private PreviewLayout getCurrentLayout() {
-        if (!chosenSelectionModelProperty.getValue().getSelectedItems().isEmpty()) {
-            return chosenSelectionModelProperty.getValue().getSelectedItems().get(0);
-
-        }
-
-        if (!chosenListProperty.getValue().isEmpty()) {
-            return chosenListProperty.getValue().get(0);
-        }
-
-        PreviewLayout layout = findLayoutByName(TextBasedPreviewLayout.NAME);
-        if (layout == null) {
-            layout = initialPreviewPreferences.getTextBasedPreviewLayout();
-        }
-
-        return layout;
     }
 
     /**

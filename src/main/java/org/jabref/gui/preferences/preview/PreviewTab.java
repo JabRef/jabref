@@ -160,7 +160,8 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> i
         ((PreviewViewer) previewTab.getContent()).setEntry(TestEntry.getTestEntry());
 
         EasyBind.subscribe(viewModel.layoutProperty(), value -> ((PreviewViewer) previewTab.getContent()).setLayout(value));
-        previewTab.getContent().visibleProperty().bind(viewModel.chosenSelectionModelProperty().getValue().selectedItemProperty().isNotNull());
+        previewTab.getContent().visibleProperty().bind(viewModel.chosenSelectionModelProperty().getValue().selectedItemProperty().isNotNull()
+                                                       .or(viewModel.availableSelectionModelProperty().getValue().selectedItemProperty().isNotNull()));
         ((PreviewViewer) previewTab.getContent()).setTheme(preferencesService.getTheme());
 
         editArea.clear();
@@ -168,7 +169,9 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> i
         editArea.setContextMenu(contextMenu);
         editArea.visibleProperty().bind(viewModel.chosenSelectionModelProperty().getValue().selectedItemProperty().isNotNull()
                                         .or(viewModel.availableSelectionModelProperty().getValue().selectedItemProperty().isNotNull()));
-        viewModel.sourceTextProperty().addListener((observable, oldValue, newValue) -> editArea.replaceText(newValue));
+        viewModel.sourceTextProperty().addListener((observable, oldValue, newValue) -> {
+            editArea.replaceText(newValue);
+        });
         editArea.textProperty().addListener((observable, oldValue, newValue) -> {
             viewModel.sourceTextProperty().setValue(newValue);
             editArea.setStyleSpans(0, viewModel.computeHighlighting(newValue));
