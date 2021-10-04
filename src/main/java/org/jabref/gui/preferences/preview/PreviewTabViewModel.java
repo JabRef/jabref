@@ -462,7 +462,7 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
         return success;
     }
 
-    public FilteredList<PreviewLayout> getFilteredPreviews(){
+    public FilteredList<PreviewLayout> getFilteredPreviews() {
         return this.filteredPreviews;
     }
 
