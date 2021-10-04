@@ -17,7 +17,6 @@ public interface PreviewLayout {
     String getName();
 
     default boolean containsCaseIndependent(String searchTerm) {
-        searchTerm = searchTerm.toLowerCase(Locale.ROOT);
-        return this.getDisplayName().toLowerCase(Locale.ROOT).contains(searchTerm);
+        return this.getDisplayName().toLowerCase(Locale.ROOT).contains(searchTerm.toLowerCase(Locale.ROOT));
     }
 }
