@@ -17,6 +17,7 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
+import javafx.collections.transformation.FilteredList;
 import javafx.scene.control.MultipleSelectionModel;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.DragEvent;
@@ -85,6 +86,8 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
     private ObjectProperty<MultipleSelectionModel<PreviewLayout>> dragSourceSelectionModel = null;
     private final List<String> restartWarning = new ArrayList<>();
 
+    private final FilteredList<PreviewLayout> filteredPreviews = new FilteredList<>(this.availableListProperty());
+
     public PreviewTabViewModel(DialogService dialogService, PreferencesService preferences, TaskExecutor taskExecutor, StateManager stateManager) {
         this.dialogService = dialogService;
         this.preferences = preferences;
@@ -102,6 +105,7 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
                         )
                 )
         );
+
     }
 
     public BooleanProperty showAsExtraTabProperty() {
@@ -458,6 +462,10 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
         return success;
     }
 
+    public FilteredList<PreviewLayout> getFilteredPreviews(){
+        return this.filteredPreviews;
+    }
+
     public ListProperty<PreviewLayout> availableListProperty() {
         return availableListProperty;
     }
@@ -484,5 +492,9 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
 
     public StringProperty sourceTextProperty() {
         return sourceTextProperty;
+    }
+
+    public void setFilterPredicate(String searchTerm) {
+        this.filteredPreviews.setPredicate(preview -> searchTerm.isEmpty() || preview.containsCaseIndependent(searchTerm));
     }
 }

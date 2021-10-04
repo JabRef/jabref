@@ -7,7 +7,6 @@ import javax.inject.Inject;
 
 import javafx.application.Platform;
 import javafx.beans.property.ListProperty;
-import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
@@ -66,7 +65,6 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> i
 
     private long lastKeyPressTime;
     private String listSearchTerm;
-    private FilteredList<PreviewLayout> filteredPreviews;
 
     private final ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
 
@@ -109,8 +107,6 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> i
 
         this.viewModel = new PreviewTabViewModel(dialogService, preferencesService, taskExecutor, stateManager);
 
-        filteredPreviews = new FilteredList<>(viewModel.availableListProperty());
-
         lastKeyPressTime = System.currentTimeMillis();
 
         ActionFactory factory = new ActionFactory(Globals.getKeyPrefs());
@@ -125,7 +121,7 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> i
 
         showAsTabCheckBox.selectedProperty().bindBidirectional(viewModel.showAsExtraTabProperty());
 
-        availableListView.setItems(this.filteredPreviews);
+        availableListView.setItems(viewModel.getFilteredPreviews());
         viewModel.availableSelectionModelProperty().setValue(availableListView.getSelectionModel());
         new ViewModelListCellFactory<PreviewLayout>()
                 .withText(PreviewLayout::getDisplayName)
@@ -183,7 +179,7 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> i
         });
 
         searchBox.textProperty().addListener((observable, previousText, searchTerm) -> {
-            filteredPreviews.setPredicate(preview -> searchTerm.isEmpty() || preview.containsCaseIndependent(searchTerm));
+            viewModel.setFilterPredicate(searchTerm);
         });
 
         readOnlyLabel.visibleProperty().bind(viewModel.selectedIsEditableProperty().not());
