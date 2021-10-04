@@ -6,7 +6,6 @@ import javax.inject.Inject;
 
 import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyStringWrapper;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar.ButtonData;
@@ -206,27 +205,20 @@ public class CustomizeEntryTypeDialogView extends BaseDialog<Void> {
     }
 
     private void handleOnDragDropped(TableRow<FieldViewModel> row, FieldViewModel originalItem, DragEvent event) {
-        boolean success = false;
-
-        ObservableList<FieldViewModel> items = fields.itemsProperty().get();
 
         if (localDragboard.hasType(FieldViewModel.class)) {
             FieldViewModel field = localDragboard.getValue(FieldViewModel.class);
-            int draggedIdx = 0;
-            for (int i = 0; i < items.size(); i++) {
-                if (items.get(i).equals(field)) {
-                    draggedIdx = i;
-                    field = items.get(i);
-                    break;
-                }
-            }
-            int thisIdx = items.indexOf(originalItem);
-            items.set(draggedIdx, originalItem);
-            items.set(thisIdx, field);
-            success = true;
-        }
+            fields.getItems().remove(field);
 
-        event.setDropCompleted(success);
+            if (row.isEmpty()) {
+                fields.getItems().add(field);
+            } else {
+                // decide based on drop position whether to add the element before or after
+                int offset = event.getY() > (row.getHeight() / 2) ? 1 : 0;
+                fields.getItems().add(row.getIndex() + offset, field);
+            }
+        }
+        event.setDropCompleted(true);
         event.consume();
     }
 
