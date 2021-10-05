@@ -95,4 +95,17 @@ public class DoiCleanupTest {
         assertEquals(expected, input);
     }
 
+    @Test
+    void cleanupDoiJustNote() {
+
+        BibEntry input = new BibEntry()
+                .withField(StandardField.NOTE, "https://doi.org/10.1145/2594455");
+
+        DoiCleanup cleanup = new DoiCleanup();
+        cleanup.cleanup(input);
+
+        assertEquals(expected, input);
+    }
+
+
 }
