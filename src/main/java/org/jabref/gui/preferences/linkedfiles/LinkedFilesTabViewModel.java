@@ -1,6 +1,7 @@
 package org.jabref.gui.preferences.linkedfiles;
 
 import java.nio.file.Files;
+import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 
 import javafx.beans.property.BooleanProperty;
@@ -55,8 +56,12 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
         mainFileDirValidator = new FunctionBasedValidator<>(
                 mainFileDirectoryProperty,
                 input -> {
-                    Path path = Path.of(mainFileDirectoryProperty.getValue());
-                    return (Files.exists(path) && Files.isDirectory(path));
+                    try {
+                        Path path = Path.of(mainFileDirectoryProperty.getValue());
+                        return (Files.exists(path) && Files.isDirectory(path));
+                    } catch (InvalidPathException ex) {
+                        return false;
+                    }
                 },
                 ValidationMessage.error(String.format("%s > %s > %s %n %n %s",
                         Localization.lang("File"),
