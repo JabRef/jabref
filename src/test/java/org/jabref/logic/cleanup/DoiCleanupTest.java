@@ -107,5 +107,19 @@ public class DoiCleanupTest {
         assertEquals(expected, input);
     }
 
+    @Test
+    void cleanupDoiJustEe() {
+
+        UnknownField unknownField = new UnknownField("ee");
+
+        BibEntry input = new BibEntry()
+                .withField(unknownField, "https://doi.org/10.1145/2594455");
+
+
+        DoiCleanup cleanup = new DoiCleanup();
+        cleanup.cleanup(input);
+
+        assertEquals(expected, input);
+    }
 
 }
