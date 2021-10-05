@@ -62,7 +62,6 @@ public class CustomizeEntryTypeDialogView extends BaseDialog<Void> {
     @FXML private Button addNewEntryTypeButton;
     @FXML private Button addNewFieldButton;
 
-
     @Inject private PreferencesService preferencesService;
     @Inject private StateManager stateManager;
     @Inject private DialogService dialogService;
@@ -183,12 +182,14 @@ public class CustomizeEntryTypeDialogView extends BaseDialog<Void> {
               .setOnDragDetected(this::handleOnDragDetected)
               .setOnDragDropped(this::handleOnDragDropped)
               .setOnDragOver(this::handleOnDragOver)
+              .setOnDragExited(this::handleOnDragExited)
               .install(fields);
 }
 
-    private void handleOnDragOver(FieldViewModel originalItem, DragEvent event) {
+    private void handleOnDragOver(TableRow<FieldViewModel> row, FieldViewModel originalItem, DragEvent event) {
         if ((event.getGestureSource() != originalItem) && event.getDragboard().hasContent(DragAndDropDataFormats.FIELD)) {
             event.acceptTransferModes(TransferMode.MOVE);
+            ControlHelper.setDroppingPseudoClasses(row, event);
         }
     }
 
@@ -220,6 +221,10 @@ public class CustomizeEntryTypeDialogView extends BaseDialog<Void> {
         }
         event.setDropCompleted(true);
         event.consume();
+    }
+
+    private void handleOnDragExited(TableRow<FieldViewModel> row, FieldViewModel fieldViewModel, DragEvent dragEvent) {
+        ControlHelper.removeDroppingPseudoClasses(row);
     }
 
     @FXML
