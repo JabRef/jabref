@@ -50,4 +50,26 @@ public class DoiCleanupTest {
         assertEquals(expected, input);
     }
 
+    @Test
+    void cleanupDoiEntryDoiFieldsWithoutHttp() {
+
+        UnknownField unknownField = new UnknownField("ee");
+
+        BibEntry input = new BibEntry()
+                .withField(StandardField.DOI, "10.1145/2594455")
+                .withField(StandardField.NOTE, "This is a random note to this Doi")
+                .withField(unknownField, "This is a random ee field for this Doi");
+
+        BibEntry output = new BibEntry()
+                .withField(StandardField.DOI, "10.1145/2594455")
+                .withField(StandardField.NOTE, "This is a random note to this Doi")
+                .withField(unknownField, "This is a random ee field for this Doi");
+
+        DoiCleanup cleanup = new DoiCleanup();
+        cleanup.cleanup(input);
+
+        assertEquals(output, input);
+    }
+
+
 }
