@@ -3,6 +3,7 @@ package org.jabref.logic.cleanup;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 
+import org.jabref.model.entry.field.UnknownField;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -23,6 +24,24 @@ public class DoiCleanupTest {
 
         BibEntry input = new BibEntry()
                 .withField(StandardField.DOI, "10.1145/2594455");
+
+
+        DoiCleanup cleanup = new DoiCleanup();
+        cleanup.cleanup(input);
+
+        assertEquals(expected, input);
+    }
+
+    @Test
+    void cleanupDoiEntryJustDoiAllEntries() {
+
+        UnknownField unknownField = new UnknownField("ee");
+
+        BibEntry input = new BibEntry()
+                .withField(StandardField.DOI, "10.1145/2594455")
+                .withField(StandardField.URL, "https://doi.org/10.1145/2594455")
+                .withField(StandardField.NOTE, "https://doi.org/10.1145/2594455")
+                .withField(unknownField, "https://doi.org/10.1145/2594455");
 
 
         DoiCleanup cleanup = new DoiCleanup();
