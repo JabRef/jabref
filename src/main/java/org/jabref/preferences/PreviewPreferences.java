@@ -50,7 +50,10 @@ public class PreviewPreferences {
     }
 
     public PreviewLayout getCurrentPreviewStyle() {
-        return getPreviewCycle().get(getPreviewCyclePosition());
+        if (previewCycle.size() > 0) {
+            return previewCycle.get(previewCyclePosition);
+        }
+        return getTextBasedPreviewLayout();
     }
 
     public LayoutFormatterPreferences getLayoutFormatterPreferences() {
@@ -58,7 +61,7 @@ public class PreviewPreferences {
     }
 
     public PreviewLayout getTextBasedPreviewLayout() {
-        return new TextBasedPreviewLayout(getPreviewStyle(), getLayoutFormatterPreferences());
+        return new TextBasedPreviewLayout(previewStyle, getLayoutFormatterPreferences());
     }
 
     public boolean showPreviewAsExtraTab() {
