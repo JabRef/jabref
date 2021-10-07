@@ -40,11 +40,7 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.control.skin.TabPaneSkin;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.TransferMode;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.Region;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 
@@ -86,10 +82,8 @@ import org.jabref.gui.help.AboutAction;
 import org.jabref.gui.help.ErrorConsoleAction;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.help.SearchForUpdateAction;
-import org.jabref.gui.importer.ImportCommand;
-import org.jabref.gui.importer.ImportEntriesDialog;
-import org.jabref.gui.importer.NewDatabaseAction;
-import org.jabref.gui.importer.NewEntryAction;
+import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.importer.*;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
 import org.jabref.gui.importer.fetcher.LookupIdentifierAction;
 import org.jabref.gui.integrity.IntegrityCheckAction;
@@ -172,6 +166,7 @@ public class JabRefFrame extends BorderPane {
     private TabPane tabbedPane;
     private SidePane sidePane;
     private PopOver progressViewPopOver;
+    private PopOver entryFromIdPopOver;
 
     private final TaskExecutor taskExecutor;
 
@@ -475,6 +470,31 @@ public class JabRefFrame extends BorderPane {
         final Button pushToApplicationButton = factory.createIconButton(pushToApplicationAction.getActionInformation(), pushToApplicationAction);
         pushToApplicationsManager.registerReconfigurable(pushToApplicationButton);
 
+        // Create New Entry From ID Button
+
+        Button newEntryFromIdButton = new Button();
+        newEntryFromIdButton.setGraphic(IconTheme.JabRefIcons.IMPORT.getGraphicNode());
+        newEntryFromIdButton.setStyle("-fx-background-color: transparent;");
+        newEntryFromIdButton.setStyle("-fx-border-color: transparent;");
+        newEntryFromIdButton.setOnMouseClicked(event -> {
+            GenerateEntryFromIdDialog entryFromId = new GenerateEntryFromIdDialog(this, dialogService, prefs, factory);
+
+            if (entryFromIdPopOver == null) {
+                entryFromIdPopOver = new PopOver(entryFromId.getDialogPane());
+                entryFromIdPopOver.setTitle(Localization.lang("Entry From ID"));
+                entryFromIdPopOver.setArrowLocation(PopOver.ArrowLocation.TOP_CENTER);
+                entryFromIdPopOver.setContentNode(entryFromId.getDialogPane());
+                entryFromIdPopOver.show(newEntryFromIdButton);
+            } else if (entryFromIdPopOver.isShowing()) {
+                entryFromIdPopOver.hide();
+            } else {
+                entryFromIdPopOver.setContentNode(entryFromId.getDialogPane());
+                entryFromIdPopOver.show(newEntryFromIdButton);
+            }
+        });
+
+        // Setup Toolbar
+
         ToolBar toolBar = new ToolBar(
 
                 new HBox(
@@ -491,6 +511,7 @@ public class JabRefFrame extends BorderPane {
                 new HBox(
                         factory.createIconButton(StandardActions.NEW_ARTICLE, new NewEntryAction(this, StandardEntryType.Article, dialogService, prefs, stateManager)),
                         factory.createIconButton(StandardActions.NEW_ENTRY, new NewEntryAction(this, dialogService, prefs, stateManager)),
+                        newEntryFromIdButton,
                         factory.createIconButton(StandardActions.NEW_ENTRY_FROM_PLAIN_TEXT, new ExtractBibtexAction(dialogService, prefs, stateManager)),
                         factory.createIconButton(StandardActions.DELETE_ENTRY, new EditAction(StandardActions.DELETE_ENTRY, this, stateManager))
                 ),

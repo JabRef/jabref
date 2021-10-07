@@ -131,7 +131,6 @@ public enum StandardActions implements Action {
     LIBRARY_PROPERTIES(Localization.lang("Library properties")),
     EDIT_PREAMBLE(Localization.lang("Edit preamble")),
     EDIT_STRINGS(Localization.lang("Edit string constants"), IconTheme.JabRefIcons.EDIT_STRINGS, KeyBinding.EDIT_STRINGS),
-
     FIND_DUPLICATES(Localization.lang("Find duplicates"), IconTheme.JabRefIcons.FIND_DUPLICATES),
     MERGE_ENTRIES(Localization.lang("Merge entries"), IconTheme.JabRefIcons.MERGE_ENTRIES, KeyBinding.MERGE_ENTRIES),
     RESOLVE_DUPLICATE_KEYS(Localization.lang("Resolve duplicate citation keys"), Localization.lang("Find and remove duplicate citation keys"), KeyBinding.RESOLVE_DUPLICATE_CITATION_KEYS),
