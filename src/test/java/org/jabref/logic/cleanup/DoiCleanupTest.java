@@ -4,119 +4,64 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class DoiCleanupTest {
 
-    private BibEntry expected;
+    @ParameterizedTest
+    @MethodSource("provideDoiForAllLowers")
+    public void testChangeDoi(BibEntry expected, BibEntry doiInfoField ) {
+        DoiCleanup cleanUp = new DoiCleanup();
+        cleanUp.cleanup(doiInfoField);
 
-    @BeforeEach
-    public void setUp() {
-        expected = new BibEntry()
-                .withField(StandardField.DOI, "10.1145/2594455");
+        assertEquals(expected, doiInfoField);
     }
 
-    @Test
-    void cleanupDoiEntryJustDoi() {
-
-        BibEntry input = new BibEntry()
-                .withField(StandardField.DOI, "10.1145/2594455");
-
-        DoiCleanup cleanup = new DoiCleanup();
-        cleanup.cleanup(input);
-
-        assertEquals(expected, input);
-    }
-
-    @Test
-    void cleanupDoiEntryJustDoiAllEntries() {
-
+    private static Stream<Arguments> provideDoiForAllLowers() {
         UnknownField unknownField = new UnknownField("ee");
+        BibEntry doiResult = new BibEntry().withField(StandardField.DOI, "10.1145/2594455");
 
-        BibEntry input = new BibEntry()
-                .withField(StandardField.DOI, "10.1145/2594455")
-                .withField(StandardField.URL, "https://doi.org/10.1145/2594455")
-                .withField(StandardField.NOTE, "https://doi.org/10.1145/2594455")
-                .withField(unknownField, "https://doi.org/10.1145/2594455");
+        return Stream.of(
+                // cleanup for Doi field only
+                Arguments.of( doiResult, new BibEntry().withField(
+                        StandardField.URL, "https://doi.org/10.1145/2594455")),
 
-        DoiCleanup cleanup = new DoiCleanup();
-        cleanup.cleanup(input);
+                // cleanup with Doi and URL to all entries
+                Arguments.of( doiResult, new BibEntry()
+                        .withField(StandardField.DOI, "10.1145/2594455")
+                        .withField(StandardField.URL, "https://doi.org/10.1145/2594455")
+                        .withField(StandardField.NOTE, "https://doi.org/10.1145/2594455")
+                        .withField(unknownField, "https://doi.org/10.1145/2594455")),
 
-        assertEquals(expected, input);
-    }
+                // cleanup with Doi and no URL to entries
+                Arguments.of(
+                        new BibEntry()
+                        .withField(StandardField.DOI, "10.1145/2594455")
+                        .withField(StandardField.NOTE, "This is a random note to this Doi")
+                        .withField(unknownField, "This is a random ee field for this Doi"),
+                        new BibEntry()
+                        .withField(StandardField.DOI, "10.1145/2594455")
+                        .withField(StandardField.NOTE, "This is a random note to this Doi")
+                        .withField(unknownField, "This is a random ee field for this Doi")),
 
-    @Test
-    void cleanupDoiEntryDoiFieldsWithoutHttp() {
+                // cleanup with spaced Doi
+                Arguments.of( doiResult, new BibEntry()
+                        .withField(StandardField.DOI, "10.1145 / 2594455")),
 
-        UnknownField unknownField = new UnknownField("ee");
+                // cleanup just Note field with URL
+                Arguments.of( doiResult, new BibEntry()
+                        .withField(StandardField.NOTE, "https://doi.org/10.1145/2594455")),
 
-        BibEntry input = new BibEntry()
-                .withField(StandardField.DOI, "10.1145/2594455")
-                .withField(StandardField.NOTE, "This is a random note to this Doi")
-                .withField(unknownField, "This is a random ee field for this Doi");
-
-        BibEntry output = new BibEntry()
-                .withField(StandardField.DOI, "10.1145/2594455")
-                .withField(StandardField.NOTE, "This is a random note to this Doi")
-                .withField(unknownField, "This is a random ee field for this Doi");
-
-        DoiCleanup cleanup = new DoiCleanup();
-        cleanup.cleanup(input);
-
-        assertEquals(output, input);
-    }
-
-    @Test
-    void cleanupDoiEntryDoiWithSpaces() {
-
-        BibEntry input = new BibEntry()
-                .withField(StandardField.DOI, "10.1145 / 2594455");
-
-        DoiCleanup cleanup = new DoiCleanup();
-        cleanup.cleanup(input);
-
-        assertEquals(expected, input);
-    }
-
-    @Test
-    void cleanupDoiJustUrl() {
-
-        BibEntry input = new BibEntry()
-                .withField(StandardField.URL, "https://doi.org/10.1145/2594455");
-
-        DoiCleanup cleanup = new DoiCleanup();
-        cleanup.cleanup(input);
-
-        assertEquals(expected, input);
-    }
-
-    @Test
-    void cleanupDoiJustNote() {
-
-        BibEntry input = new BibEntry()
-                .withField(StandardField.NOTE, "https://doi.org/10.1145/2594455");
-
-        DoiCleanup cleanup = new DoiCleanup();
-        cleanup.cleanup(input);
-
-        assertEquals(expected, input);
-    }
-
-    @Test
-    void cleanupDoiJustEe() {
-
-        UnknownField unknownField = new UnknownField("ee");
-
-        BibEntry input = new BibEntry()
-                .withField(unknownField, "https://doi.org/10.1145/2594455");
-
-        DoiCleanup cleanup = new DoiCleanup();
-        cleanup.cleanup(input);
-
-        assertEquals(expected, input);
+                // cleanup just ee field with URL
+                Arguments.of( doiResult, new BibEntry()
+                        .withField(unknownField, "https://doi.org/10.1145/2594455"))
+        );
     }
 
 }
