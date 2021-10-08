@@ -1,12 +1,14 @@
 package org.jabref.gui.importer;
 
+import java.util.Objects;
+
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.DialogPane;
 import javafx.scene.control.TextField;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.JabRefFrame;
+import org.jabref.gui.LibraryTab;
 import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
@@ -19,18 +21,19 @@ public class GenerateEntryFromIdDialog {
 
     private final PreferencesService preferencesService;
     private final DialogService dialogService;
-    private final JabRefFrame jabRefFrame;
+    private final LibraryTab libraryTab;
 
-    public GenerateEntryFromIdDialog(JabRefFrame jabRefFrame, DialogService dialogService, PreferencesService preferencesService) {
+    public GenerateEntryFromIdDialog(LibraryTab libraryTab, DialogService dialogService, PreferencesService preferencesService) {
+        Objects.requireNonNull(libraryTab);
         ViewLoader.view(this).load();
         this.preferencesService = preferencesService;
         this.dialogService = dialogService;
-        this.jabRefFrame = jabRefFrame;
+        this.libraryTab = libraryTab;
     }
 
     @FXML private void generateEntry() {
         new GenerateEntryFromIdAction(
-                jabRefFrame,
+                libraryTab,
                 dialogService,
                 preferencesService,
                 idTextField.getText()

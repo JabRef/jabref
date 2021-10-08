@@ -478,29 +478,6 @@ public class JabRefFrame extends BorderPane {
         final Button pushToApplicationButton = factory.createIconButton(pushToApplicationAction.getActionInformation(), pushToApplicationAction);
         pushToApplicationsManager.registerReconfigurable(pushToApplicationButton);
 
-        // Create New Entry From ID Button
-
-        Button newEntryFromIdButton = new Button();
-        newEntryFromIdButton.setGraphic(IconTheme.JabRefIcons.IMPORT.getGraphicNode());
-        newEntryFromIdButton.setStyle("-fx-background-color: transparent;");
-        newEntryFromIdButton.setStyle("-fx-border-color: transparent;");
-        newEntryFromIdButton.setOnMouseClicked(event -> {
-            GenerateEntryFromIdDialog entryFromId = new GenerateEntryFromIdDialog(this, dialogService, prefs);
-
-            if (entryFromIdPopOver == null) {
-                entryFromIdPopOver = new PopOver(entryFromId.getDialogPane());
-                entryFromIdPopOver.setTitle(Localization.lang("Entry From ID"));
-                entryFromIdPopOver.setArrowLocation(PopOver.ArrowLocation.TOP_CENTER);
-                entryFromIdPopOver.setContentNode(entryFromId.getDialogPane());
-                entryFromIdPopOver.show(newEntryFromIdButton);
-            } else if (entryFromIdPopOver.isShowing()) {
-                entryFromIdPopOver.hide();
-            } else {
-                entryFromIdPopOver.setContentNode(entryFromId.getDialogPane());
-                entryFromIdPopOver.show(newEntryFromIdButton);
-            }
-        });
-
         // Setup Toolbar
 
         ToolBar toolBar = new ToolBar(
@@ -519,7 +496,7 @@ public class JabRefFrame extends BorderPane {
                 new HBox(
                         factory.createIconButton(StandardActions.NEW_ARTICLE, new NewEntryAction(this, StandardEntryType.Article, dialogService, prefs, stateManager)),
                         factory.createIconButton(StandardActions.NEW_ENTRY, new NewEntryAction(this, dialogService, prefs, stateManager)),
-                        newEntryFromIdButton,
+                        createNewEntryFromIdButton(),
                         factory.createIconButton(StandardActions.NEW_ENTRY_FROM_PLAIN_TEXT, new ExtractBibtexAction(dialogService, prefs, stateManager)),
                         factory.createIconButton(StandardActions.DELETE_ENTRY, new EditAction(StandardActions.DELETE_ENTRY, this, stateManager))
                 ),
@@ -933,6 +910,34 @@ public class JabRefFrame extends BorderPane {
                 help);
         menu.setUseSystemMenuBar(true);
         return menu;
+    }
+
+    private Button createNewEntryFromIdButton() {
+        // Create New Entry From ID Button
+        Button newEntryFromIdButton = new Button();
+        newEntryFromIdButton.setGraphic(IconTheme.JabRefIcons.IMPORT.getGraphicNode());
+        newEntryFromIdButton.setStyle("-fx-background-color: transparent;");
+        newEntryFromIdButton.setStyle("-fx-border-color: transparent;");
+        newEntryFromIdButton.setOnMouseClicked(event -> {
+            GenerateEntryFromIdDialog entryFromId = new GenerateEntryFromIdDialog(getCurrentLibraryTab(), dialogService, prefs);
+
+            if (entryFromIdPopOver == null) {
+                entryFromIdPopOver = new PopOver(entryFromId.getDialogPane());
+                entryFromIdPopOver.setTitle(Localization.lang("Entry From ID"));
+                entryFromIdPopOver.setArrowLocation(PopOver.ArrowLocation.TOP_CENTER);
+                entryFromIdPopOver.setContentNode(entryFromId.getDialogPane());
+                entryFromIdPopOver.show(newEntryFromIdButton);
+            } else if (entryFromIdPopOver.isShowing()) {
+                entryFromIdPopOver.hide();
+            } else {
+                entryFromIdPopOver.setContentNode(entryFromId.getDialogPane());
+                entryFromIdPopOver.show(newEntryFromIdButton);
+            }
+        });
+
+        // Todo create binding to disable Button if no libraryTab is opened.
+
+        return newEntryFromIdButton;
     }
 
     private Group createTaskIndicator() {
