@@ -1,6 +1,5 @@
 package org.jabref.logic.importer.fetcher;
 
-
 import java.util.Optional;
 
 import org.jabref.logic.bibtex.FieldContentFormatterPreferences;
@@ -24,18 +23,17 @@ import static org.mockito.Mockito.when;
  * IdBasedFetcher interface are a prerequisite. Excluding TitleFetcher.
  */
 class CompositeIdFetcherTest {
-    private CompositeIdFetcher compositeIdFetcher;
-
+    private static BibEntry groundEntryArXiv;
+    private static BibEntry groundDOIEntry;
+    private static BibEntry groundIsbnEntry;
+    private static BibEntry groundIacrEprintEntry;
     private static String groundInvalidArXivId;
     private static String groundArXivId;
     private static String groundDOIId;
     private static String groundIsbnId;
     private static String groundIacrEprintId;
 
-    private static BibEntry groundEntryArXiv;
-    private static BibEntry groundDOIEntry;
-    private static BibEntry groundIsbnEntry;
-    private static BibEntry groundIacrEprintEntry;
+    private CompositeIdFetcher compositeIdFetcher;
 
     @BeforeAll
     static void setUpGroundEntriesAndIds() {
@@ -88,7 +86,6 @@ class CompositeIdFetcherTest {
                 .withField(StandardField.YEAR, "2017");
         groundIacrEprintEntry.setCitationKey("cryptoeprint:2017:1118");
     }
-
 
     @BeforeEach
     void setUp() throws Exception {
