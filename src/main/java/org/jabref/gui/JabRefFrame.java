@@ -13,7 +13,9 @@ import java.util.stream.Collectors;
 
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
+import javafx.beans.binding.BooleanExpression;
 import javafx.beans.binding.StringBinding;
+import javafx.beans.property.Property;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.transformation.FilteredList;
@@ -935,7 +937,7 @@ public class JabRefFrame extends BorderPane {
             }
         });
 
-        // Todo create binding to disable Button if no libraryTab is opened.
+        newEntryFromIdButton.disableProperty().bind(ActionHelper.needsDatabase(stateManager).not());
 
         return newEntryFromIdButton;
     }
