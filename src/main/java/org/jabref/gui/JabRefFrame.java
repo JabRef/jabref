@@ -40,7 +40,11 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.control.skin.TabPaneSkin;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.TransferMode;
-import javafx.scene.layout.*;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.VBox;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 
@@ -83,7 +87,11 @@ import org.jabref.gui.help.ErrorConsoleAction;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.help.SearchForUpdateAction;
 import org.jabref.gui.icon.IconTheme;
-import org.jabref.gui.importer.*;
+import org.jabref.gui.importer.GenerateEntryFromIdDialog;
+import org.jabref.gui.importer.ImportCommand;
+import org.jabref.gui.importer.ImportEntriesDialog;
+import org.jabref.gui.importer.NewDatabaseAction;
+import org.jabref.gui.importer.NewEntryAction;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
 import org.jabref.gui.importer.fetcher.LookupIdentifierAction;
 import org.jabref.gui.integrity.IntegrityCheckAction;
@@ -477,7 +485,7 @@ public class JabRefFrame extends BorderPane {
         newEntryFromIdButton.setStyle("-fx-background-color: transparent;");
         newEntryFromIdButton.setStyle("-fx-border-color: transparent;");
         newEntryFromIdButton.setOnMouseClicked(event -> {
-            GenerateEntryFromIdDialog entryFromId = new GenerateEntryFromIdDialog(this, dialogService, prefs, factory);
+            GenerateEntryFromIdDialog entryFromId = new GenerateEntryFromIdDialog(this, dialogService, prefs);
 
             if (entryFromIdPopOver == null) {
                 entryFromIdPopOver = new PopOver(entryFromId.getDialogPane());

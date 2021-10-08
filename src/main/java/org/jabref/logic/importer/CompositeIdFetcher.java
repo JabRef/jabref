@@ -1,11 +1,16 @@
 package org.jabref.logic.importer;
 
-import org.jabref.logic.importer.fetcher.*;
+import java.util.Optional;
+
+import org.jabref.logic.importer.fetcher.ArXiv;
+import org.jabref.logic.importer.fetcher.CrossRef;
+import org.jabref.logic.importer.fetcher.DoiFetcher;
+import org.jabref.logic.importer.fetcher.IacrEprintFetcher;
+import org.jabref.logic.importer.fetcher.IsbnFetcher;
 import org.jabref.model.entry.BibEntry;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.Optional;
 
 public class CompositeIdFetcher implements IdBasedFetcher {
 
@@ -17,53 +22,52 @@ public class CompositeIdFetcher implements IdBasedFetcher {
         this.importFormatPreferences = importFormatPreferences;
     }
 
-
     @Override
     public Optional<BibEntry> performSearchById(String identifier) {
 
         Optional<BibEntry> fetchedEntry;
 
         try {
-            if ((fetchedEntry = new ArXiv(importFormatPreferences).performSearchById(identifier)).isPresent()) {
+            fetchedEntry = new ArXiv(importFormatPreferences).performSearchById(identifier);
+            if (fetchedEntry.isPresent()) {
                 return fetchedEntry;
             }
-
         } catch (FetcherException fetcherException) {
             LOGGER.debug(fetcherException.getMessage());
         }
 
         try {
-            if ((fetchedEntry = new IsbnFetcher(importFormatPreferences).performSearchById(identifier)).isPresent()) {
+            fetchedEntry = new IsbnFetcher(importFormatPreferences).performSearchById(identifier);
+            if (fetchedEntry.isPresent()) {
                 return fetchedEntry;
             }
-
         } catch (FetcherException fetcherException) {
             LOGGER.debug(fetcherException.getMessage());
         }
 
         try {
-            if ((fetchedEntry = new DoiFetcher(importFormatPreferences).performSearchById(identifier)).isPresent()) {
+            fetchedEntry = new DoiFetcher(importFormatPreferences).performSearchById(identifier);
+            if (fetchedEntry.isPresent()) {
                 return fetchedEntry;
             }
-
         } catch (FetcherException fetcherException) {
             LOGGER.debug(fetcherException.getMessage());
         }
 
         try {
-            if ((fetchedEntry = new IacrEprintFetcher(importFormatPreferences).performSearchById(identifier)).isPresent()) {
+            fetchedEntry = new IacrEprintFetcher(importFormatPreferences).performSearchById(identifier);
+            if (fetchedEntry.isPresent()) {
                 return fetchedEntry;
             }
-
         } catch (FetcherException fetcherException) {
             LOGGER.debug(fetcherException.getMessage());
         }
 
         try {
-            if ((fetchedEntry = new CrossRef().performSearchById(identifier)).isPresent()) {
+            fetchedEntry = new CrossRef().performSearchById(identifier);
+            if (fetchedEntry.isPresent()) {
                 return fetchedEntry;
             }
-
         } catch (FetcherException fetcherException) {
             LOGGER.debug(fetcherException.getMessage());
         }

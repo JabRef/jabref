@@ -1,5 +1,6 @@
 package org.jabref.gui.importer;
 
+import java.util.Optional;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefFrame;
@@ -7,8 +8,6 @@ import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.logic.importer.CompositeIdFetcher;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.PreferencesService;
-
-import java.util.Optional;
 
 public class GenerateEntryFromIdAction extends SimpleCommand {
     private final JabRefFrame jabRefFrame;
