@@ -913,7 +913,6 @@ public class JabRefFrame extends BorderPane {
     }
 
     private Button createNewEntryFromIdButton() {
-        // Create New Entry From ID Button
         Button newEntryFromIdButton = new Button();
         newEntryFromIdButton.setGraphic(IconTheme.JabRefIcons.IMPORT.getGraphicNode());
         newEntryFromIdButton.setStyle("-fx-background-color: transparent;");

@@ -1,7 +1,5 @@
 package org.jabref.gui.importer;
 
-import java.util.Objects;
-
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.DialogPane;
@@ -24,7 +22,6 @@ public class GenerateEntryFromIdDialog {
     private final LibraryTab libraryTab;
 
     public GenerateEntryFromIdDialog(LibraryTab libraryTab, DialogService dialogService, PreferencesService preferencesService) {
-        Objects.requireNonNull(libraryTab);
         ViewLoader.view(this).load();
         this.preferencesService = preferencesService;
         this.dialogService = dialogService;
