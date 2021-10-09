@@ -934,6 +934,8 @@ public class JabRefFrame extends BorderPane {
             }
         });
 
+        newEntryFromIdButton.getStyleClass().setAll("icon-button");
+        newEntryFromIdButton.setFocusTraversable(false);
         newEntryFromIdButton.disableProperty().bind(ActionHelper.needsDatabase(stateManager).not());
 
         return newEntryFromIdButton;
