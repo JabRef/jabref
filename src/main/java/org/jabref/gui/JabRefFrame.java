@@ -922,7 +922,7 @@ public class JabRefFrame extends BorderPane {
 
             if (entryFromIdPopOver == null) {
                 entryFromIdPopOver = new PopOver(entryFromId.getDialogPane());
-                entryFromIdPopOver.setTitle(Localization.lang("Entry From ID"));
+                entryFromIdPopOver.setTitle(Localization.lang("New entry from ID"));
                 entryFromIdPopOver.setArrowLocation(PopOver.ArrowLocation.TOP_CENTER);
                 entryFromIdPopOver.setContentNode(entryFromId.getDialogPane());
                 entryFromIdPopOver.show(newEntryFromIdButton);
