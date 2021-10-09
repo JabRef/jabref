@@ -42,8 +42,9 @@ public class LinkedIdentifierColumn extends MainTableColumn<Map<Field, String>> 
                                   BibDatabaseContext database,
                                   DialogService dialogService,
                                   PreferencesService preferences,
-                                  StateManager stateManager) {
-        super(model);
+                                  StateManager stateManager,
+                                  boolean withListener) {
+        super(model, withListener);
         this.database = database;
         this.cellFactory = cellFactory;
         this.dialogService = dialogService;

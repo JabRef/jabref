@@ -38,8 +38,8 @@ public class SpecialFieldColumn extends MainTableColumn<Optional<SpecialFieldVal
     private final PreferencesService preferencesService;
     private final UndoManager undoManager;
 
-    public SpecialFieldColumn(MainTableColumnModel model, PreferencesService preferencesService, UndoManager undoManager) {
-        super(model);
+    public SpecialFieldColumn(MainTableColumnModel model, PreferencesService preferencesService, UndoManager undoManager, boolean withListener) {
+        super(model, withListener);
         this.preferencesService = preferencesService;
         this.undoManager = undoManager;
 

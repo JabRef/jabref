@@ -39,13 +39,15 @@ public class FileColumn extends MainTableColumn<List<LinkedFile>> {
 
     /**
      * Creates a joined column for all the linked files.
+     *
      */
     public FileColumn(MainTableColumnModel model,
                       BibDatabaseContext database,
                       ExternalFileTypes externalFileTypes,
                       DialogService dialogService,
-                      PreferencesService preferencesService) {
-        super(model);
+                      PreferencesService preferencesService,
+                      boolean withListener) {
+        super(model, withListener);
         this.externalFileTypes = Objects.requireNonNull(externalFileTypes);
         this.database = Objects.requireNonNull(database);
         this.dialogService = dialogService;
@@ -84,8 +86,9 @@ public class FileColumn extends MainTableColumn<List<LinkedFile>> {
                       ExternalFileTypes externalFileTypes,
                       DialogService dialogService,
                       PreferencesService preferencesService,
-                      String fileType) {
-        super(model);
+                      String fileType,
+                      boolean withListener) {
+        super(model, withListener);
         this.externalFileTypes = Objects.requireNonNull(externalFileTypes);
         this.database = Objects.requireNonNull(database);
         this.dialogService = dialogService;

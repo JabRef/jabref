@@ -20,8 +20,8 @@ public class FieldColumn extends MainTableColumn<String> {
 
     private final OrFields fields;
 
-    public FieldColumn(MainTableColumnModel model) {
-        super(model);
+    public FieldColumn(MainTableColumnModel model, boolean withListener) {
+        super(model, withListener);
         this.fields = FieldFactory.parseOrFields(model.getQualifier());
 
         setText(getDisplayName());
@@ -35,7 +35,7 @@ public class FieldColumn extends MainTableColumn<String> {
             // comparator can't parse more than one value
             Field field = Iterables.getOnlyElement(fields);
 
-            if (field instanceof UnknownField || field.isNumeric()) {
+            if ((field instanceof UnknownField) || field.isNumeric()) {
                 this.setComparator(new NumericFieldComparator());
             }
         }

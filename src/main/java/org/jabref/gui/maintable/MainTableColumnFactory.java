@@ -59,13 +59,16 @@ public class MainTableColumnFactory {
     private final UndoManager undoManager;
     private final DialogService dialogService;
     private final StateManager stateManager;
+    private final boolean withListener;
 
     public MainTableColumnFactory(BibDatabaseContext database,
                                   PreferencesService preferencesService,
                                   ExternalFileTypes externalFileTypes,
                                   UndoManager undoManager,
                                   DialogService dialogService,
-                                  StateManager stateManager) {
+                                  StateManager stateManager,
+                                  boolean withListener) {
+
         this.database = Objects.requireNonNull(database);
         this.preferencesService = Objects.requireNonNull(preferencesService);
         this.columnPreferences = preferencesService.getColumnPreferences();
@@ -74,6 +77,7 @@ public class MainTableColumnFactory {
         this.cellFactory = new CellFactory(externalFileTypes, preferencesService, undoManager);
         this.undoManager = undoManager;
         this.stateManager = stateManager;
+        this.withListener = withListener;
     }
 
     public List<TableColumn<BibEntryTableViewModel, ?>> createColumns() {
@@ -132,7 +136,7 @@ public class MainTableColumnFactory {
      * Creates a column with a continous number
      */
     private TableColumn<BibEntryTableViewModel, String> createIndexColumn(MainTableColumnModel columnModel) {
-        TableColumn<BibEntryTableViewModel, String> column = new MainTableColumn<>(columnModel);
+        TableColumn<BibEntryTableViewModel, String> column = new MainTableColumn<>(columnModel, withListener);
         Node header = new Text("#");
         header.getStyleClass().add("mainTable-header");
         Tooltip.install(header, new Tooltip(MainTableColumnModel.Type.INDEX.getDisplayName()));
@@ -151,7 +155,7 @@ public class MainTableColumnFactory {
      * Creates a column for group color bars.
      */
     private TableColumn<BibEntryTableViewModel, ?> createGroupColumn(MainTableColumnModel columnModel) {
-        TableColumn<BibEntryTableViewModel, List<AbstractGroup>> column = new MainTableColumn<>(columnModel);
+        TableColumn<BibEntryTableViewModel, List<AbstractGroup>> column = new MainTableColumn<>(columnModel, withListener);
         Node headerGraphic = IconTheme.JabRefIcons.DEFAULT_GROUP_ICON.getGraphicNode();
         Tooltip.install(headerGraphic, new Tooltip(Localization.lang("Group color")));
         column.setGraphic(headerGraphic);
@@ -204,21 +208,21 @@ public class MainTableColumnFactory {
      * Creates a text column to display any standard field.
      */
     private TableColumn<BibEntryTableViewModel, ?> createFieldColumn(MainTableColumnModel columnModel) {
-        return new FieldColumn(columnModel);
+        return new FieldColumn(columnModel, withListener);
     }
 
     /**
      * Creates a clickable icons column for DOIs, URLs, URIs and EPrints.
      */
     private TableColumn<BibEntryTableViewModel, Map<Field, String>> createIdentifierColumn(MainTableColumnModel columnModel) {
-        return new LinkedIdentifierColumn(columnModel, cellFactory, database, dialogService, preferencesService, stateManager);
+        return new LinkedIdentifierColumn(columnModel, cellFactory, database, dialogService, preferencesService, stateManager, withListener);
     }
 
     /**
      * Creates a column that displays a {@link SpecialField}
      */
     private TableColumn<BibEntryTableViewModel, Optional<SpecialFieldValueViewModel>> createSpecialFieldColumn(MainTableColumnModel columnModel) {
-        return new SpecialFieldColumn(columnModel, preferencesService, undoManager);
+        return new SpecialFieldColumn(columnModel, preferencesService, undoManager, withListener);
     }
 
     /**
@@ -230,7 +234,8 @@ public class MainTableColumnFactory {
                 database,
                 externalFileTypes,
                 dialogService,
-                preferencesService);
+                preferencesService,
+                withListener);
     }
 
     /**
@@ -242,6 +247,7 @@ public class MainTableColumnFactory {
                 externalFileTypes,
                 dialogService,
                 preferencesService,
-                columnModel.getQualifier());
+                columnModel.getQualifier(),
+                withListener);
     }
 }

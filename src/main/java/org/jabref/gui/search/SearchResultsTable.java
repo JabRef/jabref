@@ -11,9 +11,6 @@ import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.maintable.BibEntryTableViewModel;
 import org.jabref.gui.maintable.MainTable;
 import org.jabref.gui.maintable.MainTableColumnFactory;
-import org.jabref.gui.maintable.MainTablePreferences;
-import org.jabref.gui.maintable.SmartConstrainedResizePolicy;
-import org.jabref.gui.maintable.columns.MainTableColumn;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.preferences.PreferencesService;
 
@@ -28,27 +25,14 @@ public class SearchResultsTable extends TableView<BibEntryTableViewModel> {
                               ExternalFileTypes externalFileTypes) {
         super();
 
-        MainTablePreferences mainTablePreferences = preferencesService.getMainTablePreferences();
-
         this.getColumns().addAll(new MainTableColumnFactory(
                 database,
                 preferencesService,
                 externalFileTypes,
                 undoManager,
                 dialogService,
-                stateManager).createColumns());
-
-        this.getSortOrder().clear();
-        mainTablePreferences.getColumnPreferences().getColumnSortOrder().forEach(columnModel ->
-                this.getColumns().stream()
-                    .map(column -> (MainTableColumn<?>) column)
-                    .filter(column -> column.getModel().equals(columnModel))
-                    .findFirst()
-                    .ifPresent(column -> this.getSortOrder().add(column)));
-
-        if (mainTablePreferences.getResizeColumnsToFit()) {
-            this.setColumnResizePolicy(new SmartConstrainedResizePolicy());
-        }
+                stateManager,
+                false).createColumns());
 
         this.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
         this.setItems(model.getEntriesFilteredAndSorted());

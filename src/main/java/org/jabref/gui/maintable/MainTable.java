@@ -104,7 +104,8 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                         externalFileTypes,
                         libraryTab.getUndoManager(),
                         dialogService,
-                        stateManager).createColumns());
+                        stateManager,
+                        true).createColumns());
 
         new ViewModelTableRowFactory<BibEntryTableViewModel>()
                 .withOnMouseClickedEvent((entry, event) -> {
