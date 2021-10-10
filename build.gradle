@@ -308,7 +308,9 @@ task generateSource(dependsOn: ["generateBstGrammarSource",
                                 "generateMedlineSource",
                                 "generateBibtexmlSource",
                                 "generateEndnoteSource",
-                                "generateModsSource"]) {
+                                "generateModsSource",
+                                "downloadSchema",
+                                "generateApolloSources"]) {
     group = 'JabRef'
     description 'Generates all necessary (Java) source files.'
 }
@@ -384,11 +386,12 @@ task generateJournalAbbreviationList(type: JournalAbbreviationConverter) {
     outputDir = file("src/main/resources/journals")
 }
 
+task downloadSchema(type: com.apollographql.apollo.gradle.internal.ApolloDownloadSchemaTask) {
+    endpoint.set("https://jabref-dev.azurewebsites.net/api")
+    schemaRelativeToProject.set("src/main/java/org/jabref/jabrefonline/graphql/schema.json")
+}
 
 apollo {
-    //  ./gradlew generateApolloSources
-    // ./gradlew downloadApolloSchema --endpoint="https://jabref-dev.azurewebsites.net/api" --schema="src/main/java/org/jabref/jabrefonline/graphql/schema.json"
-
   schemaFile = file("src/main/java/org/jabref/jabrefonline/graphql/schema.json")
   graphqlSourceDirectorySet.srcDirs += "src/main/java/org/jabref/jabrefonline/graphql/"
   graphqlSourceDirectorySet.excludes = ["schema.json"]
