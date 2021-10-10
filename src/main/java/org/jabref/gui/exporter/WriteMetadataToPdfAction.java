@@ -1,5 +1,6 @@
 package org.jabref.gui.exporter;
 
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
@@ -22,21 +23,35 @@ import javafx.stage.Stage;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.FXDialog;
-import org.jabref.gui.Globals;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.util.BackgroundTask;
+import org.jabref.gui.util.TaskExecutor;
+import org.jabref.logic.bibtex.FieldWriterPreferences;
+import org.jabref.logic.exporter.EmbeddedBibFilePdfExporter;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.StandardFileType;
+import org.jabref.logic.util.io.FileUtil;
+import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.logic.xmp.XmpUtilWriter;
 import org.jabref.model.database.BibDatabase;
+import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntryTypesManager;
+import org.jabref.preferences.FilePreferences;
 
 import static org.jabref.gui.actions.ActionHelper.needsDatabase;
 
-public class WriteXMPAction extends SimpleCommand {
+public class WriteMetadataToPdfAction extends SimpleCommand {
 
     private final StateManager stateManager;
     private final DialogService dialogService;
+    private final TaskExecutor taskExecutor;
+    private final FilePreferences filePreferences;
+    private final XmpPreferences xmpPreferences;
+    private final EmbeddedBibFilePdfExporter embeddedBibExporter;
+    private final Charset encoding;
 
     private OptionsDialog optionsDialog;
 
@@ -48,9 +63,14 @@ public class WriteXMPAction extends SimpleCommand {
     private int entriesChanged;
     private int errors;
 
-    public WriteXMPAction(StateManager stateManager, DialogService dialogService) {
+    public WriteMetadataToPdfAction(StateManager stateManager, BibDatabaseMode databaseMode, BibEntryTypesManager entryTypesManager, FieldWriterPreferences fieldWriterPreferences, DialogService dialogService, TaskExecutor taskExecutor, FilePreferences filePreferences, XmpPreferences xmpPreferences, Charset encoding) {
         this.stateManager = stateManager;
         this.dialogService = dialogService;
+        this.taskExecutor = taskExecutor;
+        this.filePreferences = filePreferences;
+        this.xmpPreferences = xmpPreferences;
+        this.encoding = encoding;
+        this.embeddedBibExporter = new EmbeddedBibFilePdfExporter(databaseMode, entryTypesManager, fieldWriterPreferences);
 
         this.executable.bind(needsDatabase(stateManager));
     }
@@ -58,8 +78,8 @@ public class WriteXMPAction extends SimpleCommand {
     @Override
     public void execute() {
         init();
-        BackgroundTask.wrap(this::writeXMP)
-                      .executeWith(Globals.TASK_EXECUTOR);
+        BackgroundTask.wrap(this::writeMetadata)
+                      .executeWith(taskExecutor);
     }
 
     public void init() {
@@ -77,14 +97,14 @@ public class WriteXMPAction extends SimpleCommand {
 
             if (entries.isEmpty()) {
                 dialogService.showErrorDialogAndWait(
-                        Localization.lang("Write XMP metadata"),
+                        Localization.lang("Write metadata to PDF files"),
                         Localization.lang("This operation requires one or more entries to be selected."));
                 shouldContinue = false;
                 return;
             } else {
                 boolean confirm = dialogService.showConfirmationDialogAndWait(
-                        Localization.lang("Write XMP metadata"),
-                        Localization.lang("Write XMP metadata for all PDFs in current library?"));
+                        Localization.lang("Write metadata to PDF files"),
+                        Localization.lang("Write metadata for all PDFs in current library?"));
                 if (confirm) {
                     shouldContinue = false;
                     return;
@@ -99,10 +119,10 @@ public class WriteXMPAction extends SimpleCommand {
         }
         optionsDialog.open();
 
-        dialogService.notify(Localization.lang("Writing XMP metadata..."));
+        dialogService.notify(Localization.lang("Writing metadata..."));
     }
 
-    private void writeXMP() {
+    private void writeMetadata() {
         if (!shouldContinue || stateManager.getActiveDatabase().isEmpty()) {
             return;
         }
@@ -110,10 +130,10 @@ public class WriteXMPAction extends SimpleCommand {
         for (BibEntry entry : entries) {
             // Make a list of all PDFs linked from this entry:
             List<Path> files = entry.getFiles().stream()
-                                    .filter(file -> file.getFileType().equalsIgnoreCase("pdf"))
-                                    .map(file -> file.findIn(stateManager.getActiveDatabase().get(), Globals.prefs.getFilePreferences()))
+                                    .map(file -> file.findIn(stateManager.getActiveDatabase().get(), filePreferences))
                                     .filter(Optional::isPresent)
                                     .map(Optional::get)
+                                    .filter(path -> StandardFileType.PDF.getExtensions().contains(FileUtil.getFileExtension(path)))
                                     .collect(Collectors.toList());
 
             Platform.runLater(() -> optionsDialog.getProgressArea()
@@ -127,7 +147,7 @@ public class WriteXMPAction extends SimpleCommand {
                 for (Path file : files) {
                     if (Files.exists(file)) {
                         try {
-                            XmpUtilWriter.writeXmp(file, entry, database, Globals.prefs.getXmpPreferences());
+                            writeMetadataToFile(file, entry, stateManager.getActiveDatabase().get(), database);
                             Platform.runLater(
                                     () -> optionsDialog.getProgressArea().appendText("  " + Localization.lang("OK") + ".\n"));
                             entriesChanged++;
@@ -159,7 +179,7 @@ public class WriteXMPAction extends SimpleCommand {
         Platform.runLater(() -> {
             optionsDialog.getProgressArea()
                          .appendText("\n"
-                                 + Localization.lang("Finished writing XMP for %0 file (%1 skipped, %2 errors).", String
+                                 + Localization.lang("Finished writing metadata for %0 file (%1 skipped, %2 errors).", String
                                  .valueOf(entriesChanged), String.valueOf(skipped), String.valueOf(errors)));
             optionsDialog.done();
         });
@@ -168,8 +188,16 @@ public class WriteXMPAction extends SimpleCommand {
             return;
         }
 
-        dialogService.notify(Localization.lang("Finished writing XMP for %0 file (%1 skipped, %2 errors).",
+        dialogService.notify(Localization.lang("Finished writing metadata for %0 file (%1 skipped, %2 errors).",
                 String.valueOf(entriesChanged), String.valueOf(skipped), String.valueOf(errors)));
+    }
+
+    private void writeMetadataToFile(Path file, BibEntry entry, BibDatabaseContext databaseContext, BibDatabase database) throws Exception {
+        // XMP
+        XmpUtilWriter.writeXmp(file, entry, database, xmpPreferences);
+
+        // Embedded Bib File
+        embeddedBibExporter.exportToFileByPath(databaseContext, database, encoding, filePreferences, file);
     }
 
     class OptionsDialog extends FXDialog {
@@ -182,7 +210,7 @@ public class WriteXMPAction extends SimpleCommand {
         private final TextArea progressArea;
 
         public OptionsDialog() {
-            super(AlertType.NONE, Localization.lang("Writing XMP metadata for selected entries..."), false);
+            super(AlertType.NONE, Localization.lang("Writing metadata for selected entries..."), false);
             okButton.setDisable(true);
             okButton.setOnAction(e -> dispose());
             okButton.setPrefSize(100, 30);

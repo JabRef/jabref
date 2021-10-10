@@ -210,17 +210,17 @@ public class PdfIndexer {
                 // if there is no index yet, don't need to check anything!
             }
             // If no document was found, add the new one
-            Optional<Document> document = new DocumentReader(entry, filePreferences).readLinkedPdf(this.databaseContext, linkedFile);
-            if (document.isPresent()) {
+            Optional<List<Document>> pages = new DocumentReader(entry, filePreferences).readLinkedPdf(this.databaseContext, linkedFile);
+            if (pages.isPresent()) {
                 IndexWriter indexWriter = new IndexWriter(directoryToIndex,
                         new IndexWriterConfig(
                                 new EnglishStemAnalyzer()).setOpenMode(IndexWriterConfig.OpenMode.CREATE_OR_APPEND));
-                indexWriter.addDocument(document.get());
+                indexWriter.addDocuments(pages.get());
                 indexWriter.commit();
                 indexWriter.close();
             }
         } catch (IOException e) {
-            LOGGER.warn("Could not add the document to the index!", e);
+            LOGGER.warn("Could not add the document {} to the index!", linkedFile.getLink(), e);
         }
     }
 }

@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" demote-non-dropping-particle="sort-only" default-locale="en-GB">
+<style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" demote-non-dropping-particle="sort-only">
+  <!-- This style was edited with the Visual CSL Editor (https://editor.citationstyles.org/visualEditor/) -->
   <info>
     <title>Cardiff University - Harvard</title>
-    <id>http://www.zotero.org/styles/harvard-cardiff-university</id>
-    <link href="http://www.zotero.org/styles/harvard-cardiff-university" rel="self"/>
-    <link href="https://xerte.cardiff.ac.uk/play_4069" rel="documentation"/>
+    <id>http://www.zotero.org/styles/cardiff-university-harvard</id>
+    <link href="http://www.zotero.org/styles/cardiff-university-harvard" rel="self"/>
     <link href="https://xerte.cardiff.ac.uk/play_4191" rel="documentation"/>
+    <link href="https://xerte.cardiff.ac.uk/play_4069" rel="documentation"/>
     <link href="https://github.com/citation-style-language/styles/pull/3676#issuecomment-420542651" rel="documentation"/>
     <author>
       <name>Zoe Young</name>
@@ -17,7 +18,7 @@
     <category citation-format="author-date"/>
     <category field="generic-base"/>
     <summary>The Harvard author-date style - adapted for Cardiff University</summary>
-    <updated>2017-05-10T15:33:29+00:00</updated>
+    <updated>2020-07-14T09:11:47+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <macro name="editor">
@@ -181,7 +182,7 @@
       </group>
     </layout>
   </citation>
-  <bibliography et-al-min="3" et-al-use-first="1" hanging-indent="false">
+  <bibliography et-al-min="8" et-al-use-first="1" hanging-indent="false">
     <sort>
       <key macro="author"/>
       <key macro="year-date"/>

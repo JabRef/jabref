@@ -6,9 +6,10 @@ import java.util.Collections;
 import java.util.List;
 
 import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.util.StandardFileType;
-import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.StandardEntryType;
@@ -25,13 +26,15 @@ class PdfMergeMetadataImporterTest {
 
     private PdfMergeMetadataImporter importer;
     private ImportFormatPreferences importFormatPreferences;
-    private XmpPreferences xmpPreferences;
 
     @BeforeEach
     void setUp() {
+        ImporterPreferences importerPreferences = mock(ImporterPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        when(importerPreferences.isGrobidEnabled()).thenReturn(true);
+        when(importerPreferences.getGrobidURL()).thenReturn("http://grobid.jabref.org:8070");
         importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(importFormatPreferences.getFieldContentFormatterPreferences().getNonWrappableFields()).thenReturn(List.of());
-        importer = new PdfMergeMetadataImporter(importFormatPreferences);
+        importer = new PdfMergeMetadataImporter(importerPreferences, importFormatPreferences);
     }
 
     @Test
@@ -81,7 +84,7 @@ class PdfMergeMetadataImporterTest {
         expected.setField(StandardField.VOLUME, "1");
 
         // From merge
-        expected.setField(StandardField.FILE, ":" + file.toAbsolutePath().toString() + ":" + StandardFileType.PDF.getName());
+        expected.setFiles(List.of(new LinkedFile("", file.toAbsolutePath(), StandardFileType.PDF.getName())));
 
         assertEquals(Collections.singletonList(expected), result);
     }

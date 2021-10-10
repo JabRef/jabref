@@ -68,7 +68,7 @@ public class OpenUrlAction extends SimpleCommand {
                     if (field.equals(StandardField.DOI) && preferences.getDOIPreferences().isUseCustom()) {
                         JabRefDesktop.openCustomDoi(link.get(), preferences, dialogService);
                     } else {
-                        JabRefDesktop.openExternalViewer(databaseContext, link.get(), field);
+                        JabRefDesktop.openExternalViewer(databaseContext, preferences, link.get(), field);
                     }
                 } catch (IOException e) {
                     dialogService.showErrorDialogAndWait(Localization.lang("Unable to open link."), e);

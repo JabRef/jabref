@@ -37,10 +37,10 @@ class OOProcessNumericMarkers {
             cgs.createNumberedBibliographySortedByComparator(OOProcess.AUTHOR_YEAR_TITLE_COMPARATOR);
         }
 
-        for (CitationGroup cg : cgs.getCitationGroupsInGlobalOrder()) {
-            List<CitationMarkerNumericEntry> cits = OOListUtil.map(cg.getCitationsInLocalOrder(), e -> e);
+        for (CitationGroup group : cgs.getCitationGroupsInGlobalOrder()) {
+            List<CitationMarkerNumericEntry> cits = OOListUtil.map(group.getCitationsInLocalOrder(), e -> e);
             OOText citMarker = style.getNumCitationMarker2(cits);
-            cg.setCitationMarker(Optional.of(citMarker));
+            group.setCitationMarker(Optional.of(citMarker));
         }
     }
 

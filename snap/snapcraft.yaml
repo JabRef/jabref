@@ -10,7 +10,8 @@ description: |
   `snap connect jabref:removable-media`
 grade: stable
 confinement: strict
-base: core18
+base: core20
+compression: lzo
 architectures:
   - build-on: amd64
 
@@ -36,14 +37,18 @@ plugs:
     interface: system-files
     write:
     - /etc/chromium/native-messaging-hosts/org.jabref.jabref.json
+    
+layout:
+  /usr/share/libdrm:
+    bind: $SNAP/gnome-platform/usr/share/libdrm
 
 apps:
   jabref:
     command: bin/JabRef
-    extensions: [gnome-3-34]
+    extensions: [gnome-3-38]
   browser-proxy:
     command: lib/jabrefHost.py
-    extensions: [gnome-3-34]
+    extensions: [gnome-3-38]
 
 environment:
   _JAVA_OPTIONS: "-Duser.home=$SNAP_USER_DATA"

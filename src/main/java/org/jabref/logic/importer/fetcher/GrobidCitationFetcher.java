@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.logic.importer.util.GrobidService;
@@ -21,15 +22,13 @@ import org.slf4j.LoggerFactory;
 
 public class GrobidCitationFetcher implements SearchBasedFetcher {
 
-    public static final String GROBID_URL = "http://grobid.jabref.org:8070";
-
     private static final Logger LOGGER = LoggerFactory.getLogger(GrobidCitationFetcher.class);
 
     private ImportFormatPreferences importFormatPreferences;
     private GrobidService grobidService;
 
-    public GrobidCitationFetcher(ImportFormatPreferences importFormatPreferences) {
-        this(importFormatPreferences, new GrobidService(GROBID_URL));
+    public GrobidCitationFetcher(ImporterPreferences importerPreferences, ImportFormatPreferences importFormatPreferences) {
+        this(importFormatPreferences, new GrobidService(importerPreferences));
     }
 
     GrobidCitationFetcher(ImportFormatPreferences importFormatPreferences, GrobidService grobidService) {

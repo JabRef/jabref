@@ -66,11 +66,11 @@
     -fx-background-color: -fx-control-inner-background;
 }
 
-.table-row-cell: odd{
+.table-row-cell:odd{
     -fx-background-color:#272b38;
 }
 
-.table-row-cell: even{
+.table-row-cell:even{
     -fx-background-color: #212330;
 }
 
@@ -108,12 +108,20 @@
     -fx-background-color: -jr-background;
 }
 
+.mainToolbar .search-field .button .glyph-icon {
+    -fx-fill: derive(-fx-light-text-color, 80%);
+    -fx-text-fill: derive(-fx-light-text-color, 80%);
+    -fx-icon-color: derive(-fx-light-text-color, 80%);
+}
+
 .mainToolbar .search-field .toggle-button .glyph-icon {
     -fx-fill: -jr-search-text;
     -fx-text-fill: -jr-search-text;
+    -fx-icon-color:-jr-search-text;
 }
 
 .mainToolbar .search-field .toggle-button:selected .glyph-icon {
-    -fx-fill: derive(-jr-search-text, 80%);
-    -fx-text-fill: derive(-jr-search-text, 80%);
+    -fx-fill: derive(-fx-light-text-color, 80%);
+    -fx-text-fill: derive(-fx-light-text-color, 80%);
+    -fx-icon-color: derive(-fx-light-text-color, 80%);
 }
