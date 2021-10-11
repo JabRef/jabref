@@ -8,15 +8,11 @@ import org.jabref.logic.importer.fetcher.DoiFetcher;
 import org.jabref.logic.importer.fetcher.IacrEprintFetcher;
 import org.jabref.logic.importer.fetcher.IsbnFetcher;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.identifier.ArXivIdentifier;
-import org.jabref.model.entry.identifier.DOI;
-import org.jabref.model.entry.identifier.Eprint;
-import org.jabref.model.entry.identifier.ISBN;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class CompositeIdFetcher {
+public class CompositeIdFetcher implements IdBasedFetcher {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CompositeIdFetcher.class);
 
@@ -26,42 +22,51 @@ public class CompositeIdFetcher {
         this.importFormatPreferences = importFormatPreferences;
     }
 
+    @Override
     public Optional<BibEntry> performSearchById(String identifier) {
+
+        Optional<BibEntry> fetchedEntry;
+
         try {
-            if (ArXivIdentifier.parse(identifier).isPresent()) {
-                return new ArXiv(importFormatPreferences).performSearchById(identifier);
+            fetchedEntry = new ArXiv(importFormatPreferences).performSearchById(identifier);
+            if (fetchedEntry.isPresent()) {
+                return fetchedEntry;
             }
         } catch (FetcherException fetcherException) {
             LOGGER.debug(fetcherException.getMessage());
         }
 
         try {
-            if (ISBN.parse(identifier).isPresent()) {
-                return new IsbnFetcher(importFormatPreferences).performSearchById(identifier);
+            fetchedEntry = new IsbnFetcher(importFormatPreferences).performSearchById(identifier);
+            if (fetchedEntry.isPresent()) {
+                return fetchedEntry;
             }
         } catch (FetcherException fetcherException) {
             LOGGER.debug(fetcherException.getMessage());
         }
 
         try {
-            if (DOI.parse(identifier).isPresent()) {
-                return new DoiFetcher(importFormatPreferences).performSearchById(identifier);
+            fetchedEntry = new DoiFetcher(importFormatPreferences).performSearchById(identifier);
+            if (fetchedEntry.isPresent()) {
+                return fetchedEntry;
             }
         } catch (FetcherException fetcherException) {
             LOGGER.debug(fetcherException.getMessage());
         }
 
         try {
-            if (DOI.parse(identifier).isPresent()) {
-                return new CrossRef().performSearchById(identifier);
+            fetchedEntry = new IacrEprintFetcher(importFormatPreferences).performSearchById(identifier);
+            if (fetchedEntry.isPresent()) {
+                return fetchedEntry;
             }
         } catch (FetcherException fetcherException) {
             LOGGER.debug(fetcherException.getMessage());
         }
 
         try {
-            if (Eprint.build(identifier).isPresent()) {
-                return new IacrEprintFetcher(importFormatPreferences).performSearchById(identifier);
+            fetchedEntry = new CrossRef().performSearchById(identifier);
+            if (fetchedEntry.isPresent()) {
+                return fetchedEntry;
             }
         } catch (FetcherException fetcherException) {
             LOGGER.debug(fetcherException.getMessage());
@@ -71,4 +76,8 @@ public class CompositeIdFetcher {
 
     }
 
+    @Override
+    public String getName() {
+        return "CompositeIdFetcher";
+    }
 }
