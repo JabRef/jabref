@@ -1,5 +1,6 @@
-package org.jabref.gui;
+package org.jabref.gui.sidepane;
 
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -9,6 +10,11 @@ import java.util.Map;
 
 import javax.swing.undo.UndoManager;
 
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.VBox;
+
+import org.jabref.gui.DialogService;
+import org.jabref.gui.StateManager;
 import org.jabref.gui.groups.GroupSidePane;
 import org.jabref.gui.importer.fetcher.WebSearchPane;
 import org.jabref.gui.openoffice.OpenOfficeSidePanel;
@@ -18,9 +24,7 @@ import org.jabref.preferences.PreferencesService;
 /**
  * Manages which {@link SidePaneComponent}s are shown.
  */
-public class SidePaneManager {
-
-    private final SidePane sidePane;
+public class SidePane extends VBox {
 
     private final Map<SidePaneType, SidePaneComponent> components = new LinkedHashMap<>();
     private final List<SidePaneComponent> visibleComponents = new LinkedList<>();
@@ -31,18 +35,18 @@ public class SidePaneManager {
     private final StateManager stateManager;
     private final UndoManager undoManager;
 
-    public SidePaneManager(PreferencesService preferencesService,
-                           TaskExecutor taskExecutor,
-                           DialogService dialogService,
-                           StateManager stateManager,
-                           UndoManager undoManager) {
+    public SidePane(PreferencesService preferencesService,
+                    TaskExecutor taskExecutor,
+                    DialogService dialogService,
+                    StateManager stateManager,
+                    UndoManager undoManager) {
         this.preferencesService = preferencesService;
         this.taskExecutor = taskExecutor;
         this.dialogService = dialogService;
         this.stateManager = stateManager;
         this.undoManager = undoManager;
 
-        this.sidePane = new SidePane();
+        setId("sidePane");
 
         preferencesService.getSidePanePreferences().visiblePanes().forEach(this::show);
 
@@ -51,10 +55,6 @@ public class SidePaneManager {
         }
 
         updateView();
-    }
-
-    public SidePane getPane() {
-        return sidePane;
     }
 
     public boolean isComponentVisible(SidePaneType type) {
@@ -70,7 +70,6 @@ public class SidePaneManager {
                 case GROUPS -> new GroupSidePane(this, taskExecutor, stateManager, preferencesService, dialogService);
             };
             components.put(component.getType(), component);
-
         }
         return component;
     }
@@ -78,7 +77,7 @@ public class SidePaneManager {
     /**
      * If the given component is visible it will be hidden and the other way around.
      */
-    public void toggle(SidePaneType type) {
+    protected void toggle(SidePaneType type) {
         if (isComponentVisible(type)) {
             hide(type);
         } else {
@@ -89,7 +88,7 @@ public class SidePaneManager {
     /**
      * Makes sure that the given component is visible.
      */
-    public void show(SidePaneType type) {
+    protected void show(SidePaneType type) {
         SidePaneComponent component = getComponent(type);
         if (!visibleComponents.contains(component)) {
             // Add the new component
@@ -107,7 +106,7 @@ public class SidePaneManager {
     /**
      * Makes sure that the given component is not visible.
      */
-    public void hide(SidePaneType type) {
+    protected void hide(SidePaneType type) {
         SidePaneComponent component = getComponent(type);
         if (visibleComponents.contains(component)) {
             component.beforeClosing();
@@ -137,7 +136,7 @@ public class SidePaneManager {
     /**
      * Moves the given component up.
      */
-    public void moveUp(SidePaneComponent component) {
+    protected void moveUp(SidePaneComponent component) {
         if (visibleComponents.contains(component)) {
             int currentPosition = visibleComponents.indexOf(component);
             if (currentPosition > 0) {
@@ -154,7 +153,7 @@ public class SidePaneManager {
     /**
      * Moves the given component down.
      */
-    public void moveDown(SidePaneComponent comp) {
+    protected void moveDown(SidePaneComponent comp) {
         if (visibleComponents.contains(comp)) {
             int currentPosition = visibleComponents.indexOf(comp);
             if (currentPosition < (visibleComponents.size() - 1)) {
@@ -172,8 +171,21 @@ public class SidePaneManager {
      * Updates the view to reflect changes to visible components.
      */
     private void updateView() {
-        sidePane.setComponents(visibleComponents);
-        sidePane.setVisible(!visibleComponents.isEmpty());
+        setComponents(visibleComponents);
+        setVisible(!visibleComponents.isEmpty());
+    }
+
+    private void setComponents(Collection<SidePaneComponent> components) {
+        getChildren().clear();
+
+        for (SidePaneComponent component : components) {
+            BorderPane node = new BorderPane();
+            node.getStyleClass().add("sidePaneComponent");
+            node.setTop(component.getHeader());
+            node.setCenter(component.getContentPane());
+            getChildren().add(node);
+            VBox.setVgrow(node, component.getResizePolicy());
+        }
     }
 
     /**
@@ -193,19 +205,5 @@ public class SidePaneManager {
             int pos2 = preferredPositions.getOrDefault(comp2.getType(), 0);
             return Integer.compare(pos1, pos2);
         }
-    }
-
-    public static SidePaneComponent parse(SidePaneType type,
-                                          SidePaneManager sidePaneManager,
-                                          PreferencesService preferencesService,
-                                          TaskExecutor taskExecutor,
-                                          DialogService dialogService,
-                                          StateManager stateManager,
-                                          UndoManager undoManager) {
-        return switch (type) {
-            case GROUPS -> new GroupSidePane(sidePaneManager, taskExecutor, stateManager, preferencesService, dialogService);
-            case WEB_SEARCH -> new WebSearchPane(sidePaneManager, preferencesService, dialogService, stateManager);
-            case OPEN_OFFICE -> new OpenOfficeSidePanel(sidePaneManager, taskExecutor, preferencesService, dialogService, stateManager, undoManager);
-        };
     }
 }

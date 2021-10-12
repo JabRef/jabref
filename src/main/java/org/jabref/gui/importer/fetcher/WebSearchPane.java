@@ -14,9 +14,6 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.SidePaneComponent;
-import org.jabref.gui.SidePaneManager;
-import org.jabref.gui.SidePaneType;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.Action;
 import org.jabref.gui.actions.ActionFactory;
@@ -24,6 +21,9 @@ import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.search.SearchTextField;
+import org.jabref.gui.sidepane.SidePane;
+import org.jabref.gui.sidepane.SidePaneComponent;
+import org.jabref.gui.sidepane.SidePaneType;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.logic.l10n.Localization;
@@ -38,8 +38,8 @@ public class WebSearchPane extends SidePaneComponent {
     private final PreferencesService preferences;
     private final WebSearchPaneViewModel viewModel;
 
-    public WebSearchPane(SidePaneManager sidePaneManager, PreferencesService preferences, DialogService dialogService, StateManager stateManager) {
-        super(sidePaneManager, IconTheme.JabRefIcons.WWW, Localization.lang("Web search"));
+    public WebSearchPane(SidePane sidePane, PreferencesService preferences, DialogService dialogService, StateManager stateManager) {
+        super(sidePane, IconTheme.JabRefIcons.WWW, Localization.lang("Web search"));
         this.preferences = preferences;
         this.viewModel = new WebSearchPaneViewModel(preferences, dialogService, stateManager);
     }

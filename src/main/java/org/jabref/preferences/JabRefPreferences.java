@@ -38,7 +38,6 @@ import javafx.beans.InvalidationListener;
 import javafx.scene.control.TableColumn.SortType;
 
 import org.jabref.gui.Globals;
-import org.jabref.gui.SidePaneType;
 import org.jabref.gui.autocompleter.AutoCompleteFirstNameMode;
 import org.jabref.gui.autocompleter.AutoCompletePreferences;
 import org.jabref.gui.desktop.JabRefDesktop;
@@ -54,6 +53,7 @@ import org.jabref.gui.maintable.MainTableNameFormatPreferences.DisplayStyle;
 import org.jabref.gui.maintable.MainTablePreferences;
 import org.jabref.gui.mergeentries.MergeEntries;
 import org.jabref.gui.search.SearchDisplayMode;
+import org.jabref.gui.sidepane.SidePaneType;
 import org.jabref.gui.specialfields.SpecialFieldsPreferences;
 import org.jabref.gui.util.Theme;
 import org.jabref.logic.JabRefException;

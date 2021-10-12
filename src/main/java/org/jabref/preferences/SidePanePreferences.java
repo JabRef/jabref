@@ -9,7 +9,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableMap;
 import javafx.collections.ObservableSet;
 
-import org.jabref.gui.SidePaneType;
+import org.jabref.gui.sidepane.SidePaneType;
 
 public class SidePanePreferences {
     private final ObservableSet<SidePaneType> visiblePanes;

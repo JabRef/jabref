@@ -6,13 +6,13 @@ import javafx.scene.Node;
 import javafx.scene.layout.Priority;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.SidePaneComponent;
-import org.jabref.gui.SidePaneManager;
-import org.jabref.gui.SidePaneType;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.Action;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.sidepane.SidePane;
+import org.jabref.gui.sidepane.SidePaneComponent;
+import org.jabref.gui.sidepane.SidePaneType;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
 import org.jabref.preferences.PreferencesService;
@@ -26,13 +26,13 @@ public class OpenOfficeSidePanel extends SidePaneComponent {
     private final UndoManager undoManager;
     private final OpenOfficePreferences ooPrefs;
 
-    public OpenOfficeSidePanel(SidePaneManager sidePaneManager,
+    public OpenOfficeSidePanel(SidePane sidePane,
                                TaskExecutor taskExecutor,
                                PreferencesService preferencesService,
                                DialogService dialogService,
                                StateManager stateManager,
                                UndoManager undoManager) {
-        super(sidePaneManager, IconTheme.JabRefIcons.FILE_OPENOFFICE, "OpenOffice/LibreOffice");
+        super(sidePane, IconTheme.JabRefIcons.FILE_OPENOFFICE, "OpenOffice/LibreOffice");
         this.taskExecutor = taskExecutor;
         this.preferencesService = preferencesService;
         this.dialogService = dialogService;
