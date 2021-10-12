@@ -383,7 +383,7 @@
           <group delimiter=", ">
             <text macro="author-short"/>
             <text macro="title-short"/>
-            <text value="op cit." font-style="italic"/>
+            <text value="op. cit." font-style="italic"/>
             <text macro="point-locator"/>
           </group>
         </else-if>

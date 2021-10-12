@@ -5,6 +5,7 @@ import javax.swing.undo.UndoManager;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.SplitPane;
+import javafx.scene.control.TableColumn;
 import javafx.scene.control.ToggleButton;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -14,13 +15,11 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.maintable.BibEntryTableViewModel;
-import org.jabref.gui.maintable.MainTableColumnModel;
-import org.jabref.gui.maintable.MainTableDataModel;
-import org.jabref.gui.maintable.columns.FieldColumn;
 import org.jabref.gui.maintable.columns.SpecialFieldColumn;
 import org.jabref.gui.preview.PreviewViewer;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ValueTableCellFactory;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.preferences.PreferencesService;
 
@@ -53,17 +52,18 @@ public class GlobalSearchResultDialog extends BaseDialog<Void> {
 
     @FXML
     private void initialize() {
-        viewModel = new GlobalSearchResultDialogViewModel(stateManager, preferencesService);
+        viewModel = new GlobalSearchResultDialogViewModel(preferencesService);
 
         PreviewViewer previewViewer = new PreviewViewer(viewModel.getSearchDatabaseContext(), dialogService, stateManager);
         previewViewer.setTheme(preferencesService.getTheme());
         previewViewer.setLayout(preferencesService.getPreviewPreferences().getCurrentPreviewStyle());
 
-        FieldColumn fieldColumn = new FieldColumn(MainTableColumnModel.parse("field:library"));
+        TableColumn<BibEntryTableViewModel, String> fieldColumn = new TableColumn<>(Localization.lang("Library"));
         new ValueTableCellFactory<BibEntryTableViewModel, String>().withText(FileUtil::getBaseName)
                                                                    .install(fieldColumn);
+        fieldColumn.setCellValueFactory(param -> param.getValue().bibDatabaseContextProperty());
 
-        MainTableDataModel model = new MainTableDataModel(viewModel.getSearchDatabaseContext(), preferencesService, stateManager);
+        SearchResultsTableDataModel model = new SearchResultsTableDataModel(viewModel.getSearchDatabaseContext(), preferencesService, stateManager);
         SearchResultsTable resultsTable = new SearchResultsTable(model, viewModel.getSearchDatabaseContext(), preferencesService, undoManager, dialogService, stateManager, externalFileTypes);
         resultsTable.getColumns().add(0, fieldColumn);
         resultsTable.getColumns().removeIf(col -> col instanceof SpecialFieldColumn);
@@ -86,9 +86,5 @@ public class GlobalSearchResultDialog extends BaseDialog<Void> {
                     ? IconTheme.JabRefIcons.KEEP_ON_TOP.getGraphicNode()
                     : IconTheme.JabRefIcons.KEEP_ON_TOP_OFF.getGraphicNode());
         });
-    }
-
-    public void updateSearch() {
-        viewModel.updateSearch();
     }
 }

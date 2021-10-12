@@ -29,6 +29,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.preferences.FilePreferences;
 import org.jabref.preferences.PreferencesService;
+import org.jabref.testutils.category.FetcherTest;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
@@ -219,6 +220,7 @@ class LinkedFileViewModelTest {
         new CurrentThreadTaskExecutor().execute(task);
     }
 
+    @FetcherTest
     @Test
     void downloadHtmlWhenLinkedFilePointsToHtml() throws MalformedURLException {
         // the link mentioned in issue #7452
