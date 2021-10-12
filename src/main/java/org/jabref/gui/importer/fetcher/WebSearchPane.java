@@ -116,12 +116,12 @@ public class WebSearchPane extends SidePaneComponent {
 
     @Override
     public void beforeClosing() {
-        preferences.getSidePanePreferences().setWebSearchPaneVisible(false);
+        preferences.getSidePanePreferences().visiblePanes().remove(SidePaneType.WEB_SEARCH);
     }
 
     @Override
     public void afterOpening() {
-        preferences.getSidePanePreferences().setWebSearchPaneVisible(true);
+        preferences.getSidePanePreferences().visiblePanes().add(SidePaneType.WEB_SEARCH);
     }
 
     @Override

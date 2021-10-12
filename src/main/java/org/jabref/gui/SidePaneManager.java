@@ -38,16 +38,10 @@ public class SidePaneManager {
                 new OpenOfficeSidePanel(this, taskExecutor, preferencesService, dialogService, stateManager, undoManager))
               .forEach(pane -> components.put(pane.getType(), pane));
 
-        if (preferencesService.getSidePanePreferences().isGroupsPaneVisible()) {
-            show(SidePaneType.GROUPS);
-        }
+        preferencesService.getSidePanePreferences().visiblePanes().forEach(this::show);
 
         if (openOfficePreferences.getShowPanel()) {
             show(SidePaneType.OPEN_OFFICE);
-        }
-
-        if (preferencesService.getSidePanePreferences().isWebSearchPaneVisible()) {
-            show(SidePaneType.WEB_SEARCH);
         }
 
         updateView();

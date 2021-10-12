@@ -18,6 +18,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
@@ -2459,18 +2460,34 @@ public class JabRefPreferences implements PreferencesService {
         }
 
         sidePanePreferences = new SidePanePreferences(
-                getBoolean(WEB_SEARCH_VISIBLE),
-                getBoolean(GROUP_SIDEPANE_VISIBLE),
+                getVisiblePanes(),
                 getSidePanePreferredPositions(),
                 getInt(SELECTED_FETCHER_INDEX));
 
-        EasyBind.subscribe(sidePanePreferences.webSearchPaneVisibleProperty(), newValue -> putBoolean(WEB_SEARCH_VISIBLE, newValue));
-        EasyBind.subscribe(sidePanePreferences.groupsPaneVisibleProperty(), newValue -> putBoolean(GROUP_SIDEPANE_VISIBLE, newValue));
+        sidePanePreferences.visiblePanes().addListener((InvalidationListener) listener ->
+                storeVisiblePanes(sidePanePreferences.visiblePanes()));
+
         sidePanePreferences.getPreferredPositions().addListener((InvalidationListener) listener ->
                 storeSidePanePreferredPositions(sidePanePreferences.getPreferredPositions()));
         EasyBind.subscribe(sidePanePreferences.webSearchFetcherSelectedProperty(), newValue -> putInt(SELECTED_FETCHER_INDEX, newValue));
 
         return sidePanePreferences;
+    }
+
+    private Set<SidePaneType> getVisiblePanes() {
+        HashSet<SidePaneType> visiblePanes = new HashSet<>();
+        if (getBoolean(WEB_SEARCH_VISIBLE)) {
+            visiblePanes.add(SidePaneType.WEB_SEARCH);
+        }
+        if (getBoolean(GROUP_SIDEPANE_VISIBLE)) {
+            visiblePanes.add(SidePaneType.GROUPS);
+        }
+        return visiblePanes;
+    }
+
+    private void storeVisiblePanes(Set<SidePaneType> visiblePanes) {
+        putBoolean(WEB_SEARCH_VISIBLE, visiblePanes.contains(SidePaneType.WEB_SEARCH));
+        putBoolean(GROUP_SIDEPANE_VISIBLE, visiblePanes.contains(SidePaneType.GROUPS));
     }
 
     private Map<SidePaneType, Integer> getSidePanePreferredPositions() {

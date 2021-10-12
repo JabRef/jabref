@@ -1,55 +1,31 @@
 package org.jabref.preferences;
 
 import java.util.Map;
+import java.util.Set;
 
-import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
-import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableMap;
+import javafx.collections.ObservableSet;
 
 import org.jabref.gui.SidePaneType;
 
 public class SidePanePreferences {
-    private final BooleanProperty webSearchPaneVisible;
-    // private final boolean openOfficePaneVisible;
-    private final BooleanProperty groupsPaneVisible;
+    private final ObservableSet<SidePaneType> visiblePanes;
     private final ObservableMap<SidePaneType, Integer> preferredPositions;
     private final IntegerProperty webSearchFetcherSelected;
 
-    public SidePanePreferences(boolean webSearchPaneVisible,
-                               boolean groupsPaneVisible,
+    public SidePanePreferences(Set<SidePaneType> visiblePanes,
                                Map<SidePaneType, Integer> preferredPositions,
                                int webSearchFetcherSelected) {
-        this.webSearchPaneVisible = new SimpleBooleanProperty(webSearchPaneVisible);
-        this.groupsPaneVisible = new SimpleBooleanProperty(groupsPaneVisible);
+        this.visiblePanes = FXCollections.observableSet(visiblePanes);
         this.preferredPositions = FXCollections.observableMap(preferredPositions);
         this.webSearchFetcherSelected = new SimpleIntegerProperty(webSearchFetcherSelected);
     }
 
-    public boolean isWebSearchPaneVisible() {
-        return webSearchPaneVisible.get();
-    }
-
-    public BooleanProperty webSearchPaneVisibleProperty() {
-        return webSearchPaneVisible;
-    }
-
-    public void setWebSearchPaneVisible(boolean webSearchPaneVisible) {
-        this.webSearchPaneVisible.set(webSearchPaneVisible);
-    }
-
-    public boolean isGroupsPaneVisible() {
-        return groupsPaneVisible.get();
-    }
-
-    public BooleanProperty groupsPaneVisibleProperty() {
-        return groupsPaneVisible;
-    }
-
-    public void setGroupsPaneVisible(boolean groupsPaneVisible) {
-        this.groupsPaneVisible.set(groupsPaneVisible);
+    public ObservableSet<SidePaneType> visiblePanes() {
+        return visiblePanes;
     }
 
     public ObservableMap<SidePaneType, Integer> getPreferredPositions() {
