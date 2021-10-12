@@ -914,9 +914,11 @@ public class JabRefFrame extends BorderPane {
 
     private Button createNewEntryFromIdButton() {
         Button newEntryFromIdButton = new Button();
+
         newEntryFromIdButton.setGraphic(IconTheme.JabRefIcons.IMPORT.getGraphicNode());
-        newEntryFromIdButton.setStyle("-fx-background-color: transparent;");
-        newEntryFromIdButton.setStyle("-fx-border-color: transparent;");
+        newEntryFromIdButton.getStyleClass().setAll("icon-button");
+        newEntryFromIdButton.setFocusTraversable(false);
+        newEntryFromIdButton.disableProperty().bind(ActionHelper.needsDatabase(stateManager).not());
         newEntryFromIdButton.setOnMouseClicked(event -> {
             GenerateEntryFromIdDialog entryFromId = new GenerateEntryFromIdDialog(getCurrentLibraryTab(), dialogService, prefs, stateManager, taskExecutor);
 
@@ -933,10 +935,6 @@ public class JabRefFrame extends BorderPane {
                 entryFromIdPopOver.show(newEntryFromIdButton);
             }
         });
-
-        newEntryFromIdButton.getStyleClass().setAll("icon-button");
-        newEntryFromIdButton.setFocusTraversable(false);
-        newEntryFromIdButton.disableProperty().bind(ActionHelper.needsDatabase(stateManager).not());
 
         return newEntryFromIdButton;
     }
