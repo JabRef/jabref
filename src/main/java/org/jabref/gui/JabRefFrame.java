@@ -18,7 +18,6 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.transformation.FilteredList;
 import javafx.concurrent.Task;
-import javafx.css.PseudoClass;
 import javafx.geometry.Orientation;
 import javafx.scene.Group;
 import javafx.scene.Node;
