@@ -33,7 +33,7 @@ public class CompositeIdFetcher implements IdBasedFetcher {
                 return fetchedEntry;
             }
         } catch (FetcherException fetcherException) {
-            LOGGER.info(fetcherException.getMessage());
+            LOGGER.debug(fetcherException.getMessage());
         }
 
         try {
@@ -43,7 +43,7 @@ public class CompositeIdFetcher implements IdBasedFetcher {
                 return fetchedEntry;
             }
         } catch (FetcherException fetcherException) {
-            LOGGER.info(fetcherException.getMessage());
+            LOGGER.debug(fetcherException.getMessage());
         }
 
         try {
@@ -53,7 +53,7 @@ public class CompositeIdFetcher implements IdBasedFetcher {
                 return fetchedEntry;
             }
         } catch (FetcherException fetcherException) {
-            LOGGER.info(fetcherException.getMessage());
+            LOGGER.debug(fetcherException.getMessage());
         }
 
         try {
@@ -63,7 +63,7 @@ public class CompositeIdFetcher implements IdBasedFetcher {
                 return fetchedEntry;
             }
         } catch (FetcherException fetcherException) {
-            LOGGER.info(fetcherException.getMessage());
+            LOGGER.debug(fetcherException.getMessage());
         }
 
         try {
@@ -73,7 +73,7 @@ public class CompositeIdFetcher implements IdBasedFetcher {
                 return fetchedEntry;
             }
         } catch (FetcherException fetcherException) {
-            LOGGER.info(fetcherException.getMessage());
+            LOGGER.debug(fetcherException.getMessage());
         }
 
         return Optional.empty();
