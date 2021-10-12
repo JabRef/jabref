@@ -22,7 +22,7 @@ public class CompositeIdFetcher implements IdBasedFetcher {
         this.importFormatPreferences = importFormatPreferences;
     }
 
-    public Optional<BibEntry> performSearchById(String identifier) throws FetcherException {
+    public Optional<BibEntry> performSearchById(String identifier) {
 
         Optional<BibEntry> fetchedEntry;
 
