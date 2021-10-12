@@ -22,54 +22,58 @@ public class CompositeIdFetcher implements IdBasedFetcher {
         this.importFormatPreferences = importFormatPreferences;
     }
 
-    @Override
-    public Optional<BibEntry> performSearchById(String identifier) {
+    public Optional<BibEntry> performSearchById(String identifier) throws FetcherException {
 
         Optional<BibEntry> fetchedEntry;
 
         try {
-            fetchedEntry = new ArXiv(importFormatPreferences).performSearchById(identifier);
+            ArXiv arXiv = new ArXiv(importFormatPreferences);
+            fetchedEntry = arXiv.performSearchById(identifier);
             if (fetchedEntry.isPresent()) {
                 return fetchedEntry;
             }
         } catch (FetcherException fetcherException) {
-            LOGGER.debug(fetcherException.getMessage());
+            LOGGER.info(fetcherException.getMessage());
         }
 
         try {
-            fetchedEntry = new IsbnFetcher(importFormatPreferences).performSearchById(identifier);
+            IsbnFetcher isbnFetcher = new IsbnFetcher(importFormatPreferences);
+            fetchedEntry = isbnFetcher.performSearchById(identifier);
             if (fetchedEntry.isPresent()) {
                 return fetchedEntry;
             }
         } catch (FetcherException fetcherException) {
-            LOGGER.debug(fetcherException.getMessage());
+            LOGGER.info(fetcherException.getMessage());
         }
 
         try {
-            fetchedEntry = new DoiFetcher(importFormatPreferences).performSearchById(identifier);
+            DoiFetcher doiFetcher = new DoiFetcher(importFormatPreferences);
+            fetchedEntry = doiFetcher.performSearchById(identifier);
             if (fetchedEntry.isPresent()) {
                 return fetchedEntry;
             }
         } catch (FetcherException fetcherException) {
-            LOGGER.debug(fetcherException.getMessage());
+            LOGGER.info(fetcherException.getMessage());
         }
 
         try {
-            fetchedEntry = new IacrEprintFetcher(importFormatPreferences).performSearchById(identifier);
+            IacrEprintFetcher iacrEprintFetcher = new IacrEprintFetcher(importFormatPreferences);
+            fetchedEntry = iacrEprintFetcher.performSearchById(identifier);
             if (fetchedEntry.isPresent()) {
                 return fetchedEntry;
             }
         } catch (FetcherException fetcherException) {
-            LOGGER.debug(fetcherException.getMessage());
+            LOGGER.info(fetcherException.getMessage());
         }
 
         try {
-            fetchedEntry = new CrossRef().performSearchById(identifier);
+            CrossRef crossRef = new CrossRef();
+            fetchedEntry = crossRef.performSearchById(identifier);
             if (fetchedEntry.isPresent()) {
                 return fetchedEntry;
             }
         } catch (FetcherException fetcherException) {
-            LOGGER.debug(fetcherException.getMessage());
+            LOGGER.info(fetcherException.getMessage());
         }
 
         return Optional.empty();
@@ -78,6 +82,6 @@ public class CompositeIdFetcher implements IdBasedFetcher {
 
     @Override
     public String getName() {
-        return "CompositeIdFetcher";
+        return null;
     }
 }

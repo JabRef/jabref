@@ -18,6 +18,7 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.transformation.FilteredList;
 import javafx.concurrent.Task;
+import javafx.css.PseudoClass;
 import javafx.geometry.Orientation;
 import javafx.scene.Group;
 import javafx.scene.Node;
@@ -918,11 +919,11 @@ public class JabRefFrame extends BorderPane {
         newEntryFromIdButton.setStyle("-fx-background-color: transparent;");
         newEntryFromIdButton.setStyle("-fx-border-color: transparent;");
         newEntryFromIdButton.setOnMouseClicked(event -> {
-            GenerateEntryFromIdDialog entryFromId = new GenerateEntryFromIdDialog(getCurrentLibraryTab(), dialogService, prefs);
+            GenerateEntryFromIdDialog entryFromId = new GenerateEntryFromIdDialog(getCurrentLibraryTab(), dialogService, prefs, stateManager, taskExecutor);
 
             if (entryFromIdPopOver == null) {
                 entryFromIdPopOver = new PopOver(entryFromId.getDialogPane());
-                entryFromIdPopOver.setTitle(Localization.lang("New entry from ID"));
+                entryFromIdPopOver.setTitle(Localization.lang("Import by ID"));
                 entryFromIdPopOver.setArrowLocation(PopOver.ArrowLocation.TOP_CENTER);
                 entryFromIdPopOver.setContentNode(entryFromId.getDialogPane());
                 entryFromIdPopOver.show(newEntryFromIdButton);
