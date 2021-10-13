@@ -1105,7 +1105,6 @@ public class JabRefPreferences implements PreferencesService {
                 get(OO_PATH),
                 getBoolean(OO_USE_ALL_OPEN_BASES),
                 getBoolean(OO_SYNC_WHEN_CITING),
-                getBoolean(OO_SHOW_PANEL),
                 getStringList(OO_EXTERNAL_STYLE_FILES),
                 get(OO_BIBLIOGRAPHY_STYLE_FILE));
     }
@@ -1116,7 +1115,6 @@ public class JabRefPreferences implements PreferencesService {
         put(OO_PATH, openOfficePreferences.getInstallationPath());
         putBoolean(OO_USE_ALL_OPEN_BASES, openOfficePreferences.getUseAllDatabases());
         putBoolean(OO_SYNC_WHEN_CITING, openOfficePreferences.getSyncWhenCiting());
-        putBoolean(OO_SHOW_PANEL, openOfficePreferences.getShowPanel());
         putStringList(OO_EXTERNAL_STYLE_FILES, openOfficePreferences.getExternalStyles());
         put(OO_BIBLIOGRAPHY_STYLE_FILE, openOfficePreferences.getCurrentStyle());
     }
@@ -2466,7 +2464,6 @@ public class JabRefPreferences implements PreferencesService {
 
         sidePanePreferences.visiblePanes().addListener((InvalidationListener) listener ->
                 storeVisiblePanes(sidePanePreferences.visiblePanes()));
-
         sidePanePreferences.getPreferredPositions().addListener((InvalidationListener) listener ->
                 storeSidePanePreferredPositions(sidePanePreferences.getPreferredPositions()));
         EasyBind.subscribe(sidePanePreferences.webSearchFetcherSelectedProperty(), newValue -> putInt(SELECTED_FETCHER_INDEX, newValue));
@@ -2482,12 +2479,16 @@ public class JabRefPreferences implements PreferencesService {
         if (getBoolean(GROUP_SIDEPANE_VISIBLE)) {
             visiblePanes.add(SidePaneType.GROUPS);
         }
+        if (getBoolean(OO_SHOW_PANEL)) {
+            visiblePanes.add(SidePaneType.OPEN_OFFICE);
+        }
         return visiblePanes;
     }
 
     private void storeVisiblePanes(Set<SidePaneType> visiblePanes) {
         putBoolean(WEB_SEARCH_VISIBLE, visiblePanes.contains(SidePaneType.WEB_SEARCH));
         putBoolean(GROUP_SIDEPANE_VISIBLE, visiblePanes.contains(SidePaneType.GROUPS));
+        putBoolean(OO_SHOW_PANEL, visiblePanes.contains(SidePaneType.OPEN_OFFICE));
     }
 
     private Map<SidePaneType, Integer> getSidePanePreferredPositions() {

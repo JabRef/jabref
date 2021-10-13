@@ -50,10 +50,6 @@ public class SidePane extends VBox {
 
         preferencesService.getSidePanePreferences().visiblePanes().forEach(this::show);
 
-        if (preferencesService.getOpenOfficePreferences().getShowPanel()) {
-            show(SidePaneType.OPEN_OFFICE);
-        }
-
         updateView();
     }
 
