@@ -144,7 +144,7 @@ public class ImportEntriesViewModel extends AbstractViewModel {
 
         if (shouldDownloadFiles) {
             for (BibEntry bibEntry : entriesToImport) {
-                bibEntry.getFiles().stream().filter(file -> !file.isOnlineLink()).forEach(linkedFile ->
+                bibEntry.getFiles().stream().filter(file -> file.isOnlineLink()).forEach(linkedFile ->
                         new LinkedFileViewModel(
                                 linkedFile,
                                 bibEntry,
