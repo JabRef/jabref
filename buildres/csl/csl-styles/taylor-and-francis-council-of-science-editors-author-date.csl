@@ -13,7 +13,7 @@
     <category citation-format="author-date"/>
     <category field="science"/>
     <summary>The Council of Science Editors style for T&amp;F journals as per guidelines (version 2.0, 18 Jan 2018).</summary>
-    <updated>2019-10-30T11:30:54+00:00</updated>
+    <updated>2021-04-09T11:30:54+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <macro name="editor-translator">
@@ -37,7 +37,7 @@
   </macro>
   <macro name="author-short">
     <names variable="author">
-      <name form="short" delimiter=", " initialize-with="." and="symbol"/>
+      <name form="short" delimiter=", " initialize-with="." and="text"/>
       <substitute>
         <names variable="editor"/>
         <names variable="translator"/>
@@ -46,7 +46,14 @@
     </names>
   </macro>
   <macro name="access">
-    <text variable="URL"/>
+    <choose>
+      <if match="any" variable="DOI">
+        <text variable="DOI" prefix="https://doi.org/"/>
+      </if>
+      <else>
+        <text variable="URL"/>
+      </else>
+    </choose>
   </macro>
   <macro name="title">
     <group delimiter=" ">

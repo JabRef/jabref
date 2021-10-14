@@ -17,6 +17,7 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
+import javafx.collections.transformation.FilteredList;
 import javafx.scene.control.MultipleSelectionModel;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.DragEvent;
@@ -83,6 +84,9 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
     private final CustomLocalDragboard localDragboard;
     private ListProperty<PreviewLayout> dragSourceList = null;
     private ObjectProperty<MultipleSelectionModel<PreviewLayout>> dragSourceSelectionModel = null;
+    private final List<String> restartWarning = new ArrayList<>();
+
+    private final FilteredList<PreviewLayout> filteredPreviews = new FilteredList<>(this.availableListProperty());
 
     public PreviewTabViewModel(DialogService dialogService, PreferencesService preferences, TaskExecutor taskExecutor, StateManager stateManager) {
         this.dialogService = dialogService;
@@ -90,13 +94,6 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
         this.taskExecutor = taskExecutor;
         this.localDragboard = stateManager.getLocalDragboard();
         initialPreviewPreferences = preferences.getPreviewPreferences();
-
-        sourceTextProperty.addListener((observable, oldValue, newValue) -> {
-            var currentLayout = getCurrentLayout();
-            if (currentLayout instanceof TextBasedPreviewLayout) {
-                ((TextBasedPreviewLayout) currentLayout).setText(sourceTextProperty.getValue().replace("\n", "__NEWLINE__"));
-            }
-        });
 
         chosenListValidator = new FunctionBasedValidator<>(
                 chosenListProperty,
@@ -108,6 +105,7 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
                         )
                 )
         );
+
     }
 
     public BooleanProperty showAsExtraTabProperty() {
@@ -174,24 +172,18 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
                                                               .orElse(null));
     }
 
-    private PreviewLayout getCurrentLayout() {
-        if (!chosenSelectionModelProperty.getValue().getSelectedItems().isEmpty()) {
-            return chosenSelectionModelProperty.getValue().getSelectedItems().get(0);
-
-        }
-
-        if (!chosenListProperty.getValue().isEmpty()) {
-            return chosenListProperty.getValue().get(0);
-        }
-
-        PreviewLayout layout = findLayoutByName(TextBasedPreviewLayout.NAME);
-        if (layout == null) {
-            layout = initialPreviewPreferences.getTextBasedPreviewLayout();
-        }
-
-        return layout;
+    /**
+     * Getter method for warning list.
+     * @return list of string with warning information.
+     */
+    @Override
+    public List<String> getRestartWarnings() {
+        return restartWarning;
     }
 
+    /**
+     * Store the changes of preference-preview settings.
+     */
     @Override
     public void storeSettings() {
         PreviewPreferences previewPreferences = preferences.getPreviewPreferences();
@@ -203,6 +195,9 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
         PreviewLayout previewStyle = findLayoutByName(TextBasedPreviewLayout.NAME);
         if (previewStyle == null) {
             previewStyle = previewPreferences.getTextBasedPreviewLayout();
+        }
+        if (showAsExtraTab.getValue() != initialPreviewPreferences.showPreviewAsExtraTab()) {
+            restartWarning.add(Localization.lang("Show preview as a tab in entry editor"));
         }
 
         PreviewPreferences newPreviewPreferences = preferences.getPreviewPreferences()
@@ -467,6 +462,10 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
         return success;
     }
 
+    public FilteredList<PreviewLayout> getFilteredPreviews() {
+        return this.filteredPreviews;
+    }
+
     public ListProperty<PreviewLayout> availableListProperty() {
         return availableListProperty;
     }
@@ -493,5 +492,9 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
 
     public StringProperty sourceTextProperty() {
         return sourceTextProperty;
+    }
+
+    public void setFilterPredicate(String searchTerm) {
+        this.filteredPreviews.setPredicate(preview -> searchTerm.isEmpty() || preview.containsCaseIndependent(searchTerm));
     }
 }

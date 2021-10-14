@@ -1,12 +1,12 @@
 package org.jabref.logic.importer;
 
+import java.nio.charset.Charset;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.jabref.logic.bibtex.FieldContentFormatterPreferences;
-import org.jabref.logic.importer.fetcher.ACMPortalFetcher;
 import org.jabref.logic.importer.fetcher.AbstractIsbnFetcher;
 import org.jabref.logic.importer.fetcher.GoogleScholar;
 import org.jabref.logic.importer.fetcher.GrobidCitationFetcher;
@@ -14,6 +14,8 @@ import org.jabref.logic.importer.fetcher.IsbnViaEbookDeFetcher;
 import org.jabref.logic.importer.fetcher.IsbnViaOttoBibFetcher;
 import org.jabref.logic.importer.fetcher.JstorFetcher;
 import org.jabref.logic.importer.fetcher.MrDLibFetcher;
+import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.preferences.FilePreferences;
 
 import io.github.classgraph.ClassGraph;
 import io.github.classgraph.ClassInfoList;
@@ -28,7 +30,7 @@ import static org.mockito.Mockito.when;
 class WebFetchersTest {
 
     private ImportFormatPreferences importFormatPreferences;
-    private final ClassGraph classGraph = new ClassGraph().enableAllInfo().whitelistPackages("org.jabref");
+    private final ClassGraph classGraph = new ClassGraph().enableAllInfo().acceptPackages("org.jabref");
 
     @BeforeEach
     void setUp() throws Exception {
@@ -54,7 +56,6 @@ class WebFetchersTest {
             expected.remove(IsbnViaOttoBibFetcher.class);
 
             // Remove the following, because they don't work at the moment
-            expected.remove(ACMPortalFetcher.class);
             expected.remove(JstorFetcher.class);
             expected.remove(GoogleScholar.class);
 
@@ -64,7 +65,7 @@ class WebFetchersTest {
 
     @Test
     void getEntryBasedFetchersReturnsAllFetcherDerivingFromEntryBasedFetcher() throws Exception {
-        Set<EntryBasedFetcher> idFetchers = WebFetchers.getEntryBasedFetchers(importFormatPreferences);
+        Set<EntryBasedFetcher> idFetchers = WebFetchers.getEntryBasedFetchers(mock(ImporterPreferences.class), importFormatPreferences, mock(FilePreferences.class), mock(BibDatabaseContext.class), Charset.defaultCharset());
 
         try (ScanResult scanResult = classGraph.scan()) {
             ClassInfoList controlClasses = scanResult.getClassesImplementing(EntryBasedFetcher.class.getCanonicalName());
@@ -87,7 +88,6 @@ class WebFetchersTest {
             expected.remove(SearchBasedParserFetcher.class);
 
             // Remove the following, because they don't work atm
-            expected.remove(ACMPortalFetcher.class);
             expected.remove(JstorFetcher.class);
             expected.remove(GoogleScholar.class);
 
@@ -110,7 +110,6 @@ class WebFetchersTest {
             Set<Class<?>> expected = new HashSet<>(controlClasses.loadClasses());
 
             // Remove the following, because they don't work atm
-            expected.remove(ACMPortalFetcher.class);
             expected.remove(JstorFetcher.class);
             expected.remove(GoogleScholar.class);
 
@@ -128,7 +127,6 @@ class WebFetchersTest {
 
             expected.remove(IdParserFetcher.class);
             // Remove the following, because they don't work at the moment
-            expected.remove(ACMPortalFetcher.class);
             expected.remove(GoogleScholar.class);
 
             assertEquals(expected, getClasses(idFetchers));

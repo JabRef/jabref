@@ -8,7 +8,6 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
-import org.jabref.gui.DialogService;
 import org.jabref.gui.autocompleter.AutoCompleteFirstNameMode;
 import org.jabref.gui.autocompleter.AutoCompletePreferences;
 import org.jabref.gui.entryeditor.EntryEditorPreferences;
@@ -25,6 +24,7 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty acceptRecommendationsProperty = new SimpleBooleanProperty();
     private final BooleanProperty enableLatexCitationsTabProperty = new SimpleBooleanProperty();
     private final BooleanProperty enableValidationProperty = new SimpleBooleanProperty();
+    private final BooleanProperty allowIntegerEditionProperty = new SimpleBooleanProperty();
     private final BooleanProperty enableAutoCompleteProperty = new SimpleBooleanProperty();
     private final StringProperty autoCompleteFieldsProperty = new SimpleStringProperty();
     private final BooleanProperty autoCompleteFirstLastProperty = new SimpleBooleanProperty();
@@ -34,31 +34,30 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty firstNameModeFullProperty = new SimpleBooleanProperty();
     private final BooleanProperty firstNameModeBothProperty = new SimpleBooleanProperty();
 
-    private final DialogService dialogService;
     private final PreferencesService preferencesService;
-    private final EntryEditorPreferences initialEntryEditorPreferences;
+    private final EntryEditorPreferences entryEditorPreferences;
     private final AutoCompletePreferences initialAutoCompletePreferences;
 
     private final List<String> restartWarnings = new ArrayList<>();
 
-    public EntryEditorTabViewModel(DialogService dialogService, PreferencesService preferencesService) {
-        this.dialogService = dialogService;
+    public EntryEditorTabViewModel(PreferencesService preferencesService) {
         this.preferencesService = preferencesService;
-        this.initialEntryEditorPreferences = preferencesService.getEntryEditorPreferences();
+        this.entryEditorPreferences = preferencesService.getEntryEditorPreferences();
         this.initialAutoCompletePreferences = preferencesService.getAutoCompletePreferences();
     }
 
     @Override
     public void setValues() {
         // ToDo: Include CustomizeGeneralFieldsDialog in PreferencesDialog
-        // therefore yet unused: initialEntryEditorPreferences.getEntryEditorTabList();
+        // therefore yet unused: entryEditorPreferences.getEntryEditorTabList();
 
-        openOnNewEntryProperty.setValue(initialEntryEditorPreferences.shouldOpenOnNewEntry());
-        defaultSourceProperty.setValue(initialEntryEditorPreferences.showSourceTabByDefault());
-        enableRelatedArticlesTabProperty.setValue(initialEntryEditorPreferences.shouldShowRecommendationsTab());
-        acceptRecommendationsProperty.setValue(initialEntryEditorPreferences.isMrdlibAccepted());
-        enableLatexCitationsTabProperty.setValue(initialEntryEditorPreferences.shouldShowLatexCitationsTab());
-        enableValidationProperty.setValue(initialEntryEditorPreferences.shouldEnableValidation());
+        openOnNewEntryProperty.setValue(entryEditorPreferences.shouldOpenOnNewEntry());
+        defaultSourceProperty.setValue(entryEditorPreferences.showSourceTabByDefault());
+        enableRelatedArticlesTabProperty.setValue(entryEditorPreferences.shouldShowRecommendationsTab());
+        acceptRecommendationsProperty.setValue(entryEditorPreferences.isMrdlibAccepted());
+        enableLatexCitationsTabProperty.setValue(entryEditorPreferences.shouldShowLatexCitationsTab());
+        enableValidationProperty.setValue(entryEditorPreferences.shouldEnableValidation());
+        allowIntegerEditionProperty.setValue(entryEditorPreferences.shouldAllowIntegerEditionBibtex());
 
         enableAutoCompleteProperty.setValue(initialAutoCompletePreferences.shouldAutoComplete());
         autoCompleteFieldsProperty.setValue(initialAutoCompletePreferences.getCompleteNamesAsString());
@@ -80,15 +79,15 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public void storeSettings() {
-        preferencesService.storeEntryEditorPreferences(new EntryEditorPreferences(
-                initialEntryEditorPreferences.getEntryEditorTabList(),
-                openOnNewEntryProperty.getValue(),
-                enableRelatedArticlesTabProperty.getValue(),
-                acceptRecommendationsProperty.getValue(),
-                enableLatexCitationsTabProperty.getValue(),
-                defaultSourceProperty.getValue(),
-                enableValidationProperty.getValue(),
-                initialEntryEditorPreferences.getDividerPosition()));
+        // entryEditorPreferences.setEntryEditorTabList();
+        entryEditorPreferences.setShouldOpenOnNewEntry(openOnNewEntryProperty.getValue());
+        entryEditorPreferences.setShouldShowRecommendationsTab(enableRelatedArticlesTabProperty.getValue());
+        entryEditorPreferences.setIsMrdlibAccepted(acceptRecommendationsProperty.getValue());
+        entryEditorPreferences.setShouldShowLatexCitationsTab(enableLatexCitationsTabProperty.getValue());
+        entryEditorPreferences.setShowSourceTabByDefault(defaultSourceProperty.getValue());
+        entryEditorPreferences.setEnableValidation(enableValidationProperty.getValue());
+        entryEditorPreferences.setAllowIntegerEditionBibtex(allowIntegerEditionProperty.getValue());
+        // entryEditorPreferences.setDividerPosition();
 
         // default
         AutoCompletePreferences.NameFormat nameFormat = AutoCompletePreferences.NameFormat.BOTH;
@@ -149,6 +148,10 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
 
     public BooleanProperty enableValidationProperty() {
         return enableValidationProperty;
+    }
+
+    public BooleanProperty allowIntegerEditionProperty() {
+        return this.allowIntegerEditionProperty;
     }
 
     public BooleanProperty enableAutoCompleteProperty() {

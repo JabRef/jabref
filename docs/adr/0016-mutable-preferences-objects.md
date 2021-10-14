@@ -7,7 +7,7 @@ To create an immutable preferences object every time seems to be a waste of time
 ## Considered Options
 
 * Alter the existing object and return it (by a `with*` -method, similar to a builder, but changing the object at hand).
-* Create a new object every time a preferences object should be altered
+* Create a new object every time a preferences object should be altered.
 
 ## Decision Outcome
 

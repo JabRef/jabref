@@ -3,7 +3,9 @@ package org.jabref.gui.fieldeditors;
 import java.util.Optional;
 
 import javafx.beans.binding.Bindings;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ObservableList;
+import javafx.css.PseudoClass;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.Parent;
@@ -21,6 +23,7 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.text.Text;
 
 import org.jabref.gui.DialogService;
@@ -32,6 +35,7 @@ import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.gui.copyfiles.CopySingleFileAction;
 import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.importer.GrobidOptInDialogHelper;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.TaskExecutor;
@@ -46,6 +50,8 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
+import com.tobiasdiez.easybind.EasyBind;
+import com.tobiasdiez.easybind.optional.ObservableOptionalValue;
 
 public class LinkedFilesEditor extends HBox implements FieldEditorFX {
 
@@ -56,6 +62,8 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
     private final BibDatabaseContext databaseContext;
     private final UiThreadObservableList<LinkedFileViewModel> decoratedModelList;
     private final PreferencesService preferencesService;
+
+    private ObservableOptionalValue<BibEntry> bibEntry = EasyBind.wrapNullable(new SimpleObjectProperty<>());
 
     public LinkedFilesEditor(Field field,
                              DialogService dialogService,
@@ -75,7 +83,7 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
 
         ViewModelListCellFactory<LinkedFileViewModel> cellFactory = new ViewModelListCellFactory<LinkedFileViewModel>()
                 .withStringTooltip(LinkedFileViewModel::getDescription)
-                .withGraphic(LinkedFilesEditor::createFileDisplay)
+                .withGraphic(this::createFileDisplay)
                 .withContextMenu(this::createContextMenuForFile)
                 .withOnMouseClickedEvent(this::handleItemMouseClick)
                 .setOnDragDetected(this::handleOnDragDetected)
@@ -136,12 +144,17 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
         event.consume();
     }
 
-    private static Node createFileDisplay(LinkedFileViewModel linkedFile) {
+    private Node createFileDisplay(LinkedFileViewModel linkedFile) {
+        PseudoClass opacity = PseudoClass.getPseudoClass("opacity");
+
         Node icon = linkedFile.getTypeIcon().getGraphicNode();
         icon.setOnMouseClicked(event -> linkedFile.open());
+
         Text link = new Text();
         link.textProperty().bind(linkedFile.linkProperty());
         link.getStyleClass().setAll("file-row-text");
+        EasyBind.subscribe(linkedFile.isAutomaticallyFoundProperty(), found -> link.pseudoClassStateChanged(opacity, found));
+
         Text desc = new Text();
         desc.textProperty().bind(linkedFile.descriptionProperty());
         desc.getStyleClass().setAll("file-row-text");
@@ -151,25 +164,36 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
         progressIndicator.visibleProperty().bind(linkedFile.downloadOngoingProperty());
 
         HBox info = new HBox(8);
+        HBox.setHgrow(info, Priority.ALWAYS);
         info.setStyle("-fx-padding: 0.5em 0 0.5em 0;"); // To align with buttons below which also have 0.5em padding
         info.getChildren().setAll(icon, link, desc, progressIndicator);
 
         Button acceptAutoLinkedFile = IconTheme.JabRefIcons.AUTO_LINKED_FILE.asButton();
         acceptAutoLinkedFile.setTooltip(new Tooltip(Localization.lang("This file was found automatically. Do you want to link it to this entry?")));
         acceptAutoLinkedFile.visibleProperty().bind(linkedFile.isAutomaticallyFoundProperty());
+        acceptAutoLinkedFile.managedProperty().bind(linkedFile.isAutomaticallyFoundProperty());
         acceptAutoLinkedFile.setOnAction(event -> linkedFile.acceptAsLinked());
         acceptAutoLinkedFile.getStyleClass().setAll("icon-button");
 
-        Button writeXMPMetadata = IconTheme.JabRefIcons.IMPORT.asButton();
-        writeXMPMetadata.setTooltip(new Tooltip(Localization.lang("Write BibTeXEntry as XMP metadata to PDF.")));
-        writeXMPMetadata.visibleProperty().bind(linkedFile.canWriteXMPMetadataProperty());
-        writeXMPMetadata.setOnAction(event -> linkedFile.writeXMPMetadata());
-        writeXMPMetadata.getStyleClass().setAll("icon-button");
+        Button writeMetadataToPdf = IconTheme.JabRefIcons.IMPORT.asButton();
+        writeMetadataToPdf.setTooltip(new Tooltip(Localization.lang("Write BibTeXEntry metadata to PDF.")));
+        writeMetadataToPdf.visibleProperty().bind(linkedFile.isOfflinePdfProperty());
+        writeMetadataToPdf.setOnAction(event -> linkedFile.writeMetadataToPdf());
+        writeMetadataToPdf.getStyleClass().setAll("icon-button");
+
+        Button parsePdfMetadata = IconTheme.JabRefIcons.FILE_SEARCH.asButton();
+        parsePdfMetadata.setTooltip(new Tooltip(Localization.lang("Parse Metadata from PDF.")));
+        parsePdfMetadata.visibleProperty().bind(linkedFile.isOfflinePdfProperty());
+        parsePdfMetadata.setOnAction(event -> {
+            GrobidOptInDialogHelper.showAndWaitIfUserIsUndecided(dialogService, preferencesService.getImporterPreferences());
+            linkedFile.parsePdfMetadataAndShowMergeDialog();
+        });
+        parsePdfMetadata.getStyleClass().setAll("icon-button");
 
         HBox container = new HBox(10);
         container.setPrefHeight(Double.NEGATIVE_INFINITY);
 
-        container.getChildren().addAll(info, acceptAutoLinkedFile, writeXMPMetadata);
+        container.getChildren().addAll(acceptAutoLinkedFile, info, writeMetadataToPdf, parsePdfMetadata);
 
         return container;
     }
@@ -199,6 +223,7 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
 
     @Override
     public void bindToEntry(BibEntry entry) {
+        bibEntry = EasyBind.wrapNullable(new SimpleObjectProperty<>(entry));
         viewModel.bindToEntry(entry);
     }
 
@@ -225,8 +250,8 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
     private void handleItemMouseClick(LinkedFileViewModel linkedFile, MouseEvent event) {
 
         if (event.getButton().equals(MouseButton.PRIMARY) && (event.getClickCount() == 2)) {
-            // Double click -> edit
-            linkedFile.edit();
+            // Double click -> open
+            linkedFile.open();
         }
     }
 
@@ -273,19 +298,19 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
                                 () -> !linkedFile.getFile().isOnlineLink()
                                         && linkedFile.getFile().findIn(databaseContext, preferencesService.getFilePreferences()).isPresent()
                                         && !linkedFile.isGeneratedNameSameAsOriginal(),
-                                linkedFile.getFile().linkProperty());
+                                linkedFile.getFile().linkProperty(), bibEntry.getValue().map(BibEntry::getFieldsObservable).orElse(null));
                         case MOVE_FILE_TO_FOLDER -> Bindings.createBooleanBinding(
                                 () -> !linkedFile.getFile().isOnlineLink()
                                         && linkedFile.getFile().findIn(databaseContext, preferencesService.getFilePreferences()).isPresent()
                                         && !linkedFile.isGeneratedPathSameAsOriginal(),
-                                linkedFile.getFile().linkProperty());
+                                linkedFile.getFile().linkProperty(), bibEntry.getValue().map(BibEntry::getFieldsObservable).orElse(null));
                         case DOWNLOAD_FILE -> Bindings.createBooleanBinding(
                                 () -> linkedFile.getFile().isOnlineLink(),
-                                linkedFile.getFile().linkProperty());
+                                linkedFile.getFile().linkProperty(), bibEntry.getValue().map(BibEntry::getFieldsObservable).orElse(null));
                         case OPEN_FILE, OPEN_FOLDER, RENAME_FILE_TO_NAME, DELETE_FILE -> Bindings.createBooleanBinding(
                                 () -> !linkedFile.getFile().isOnlineLink()
                                         && linkedFile.getFile().findIn(databaseContext, preferencesService.getFilePreferences()).isPresent(),
-                                linkedFile.getFile().linkProperty());
+                                linkedFile.getFile().linkProperty(), bibEntry.getValue().map(BibEntry::getFieldsObservable).orElse(null));
                         default -> BindingsHelper.constantOf(true);
                     });
         }

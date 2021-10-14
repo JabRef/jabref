@@ -14,14 +14,15 @@ import org.jabref.gui.Globals;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.preferences.appearance.AppearanceTab;
 import org.jabref.gui.preferences.citationkeypattern.CitationKeyPatternTab;
+import org.jabref.gui.preferences.customexporter.CustomExporterTab;
+import org.jabref.gui.preferences.customimporter.CustomImporterTab;
 import org.jabref.gui.preferences.entryeditor.EntryEditorTab;
 import org.jabref.gui.preferences.entryeditortabs.CustomEditorFieldsTab;
-import org.jabref.gui.preferences.exporter.ExportCustomizationTab;
 import org.jabref.gui.preferences.external.ExternalTab;
 import org.jabref.gui.preferences.file.FileTab;
 import org.jabref.gui.preferences.general.GeneralTab;
 import org.jabref.gui.preferences.groups.GroupsTab;
-import org.jabref.gui.preferences.importer.ImportCustomizationTab;
+import org.jabref.gui.preferences.importexport.ImportExportTab;
 import org.jabref.gui.preferences.journals.JournalAbbreviationsTab;
 import org.jabref.gui.preferences.keybindings.KeyBindingsTab;
 import org.jabref.gui.preferences.linkedfiles.LinkedFilesTab;
@@ -74,12 +75,13 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
                 new JournalAbbreviationsTab(),
                 new GroupsTab(),
                 new EntryEditorTab(),
+                new ImportExportTab(),
                 new CustomEditorFieldsTab(),
                 new CitationKeyPatternTab(),
                 new LinkedFilesTab(),
                 new NameFormatterTab(),
-                new ImportCustomizationTab(),
-                new ExportCustomizationTab(),
+                new CustomImporterTab(),
+                new CustomExporterTab(),
                 new XmpPrivacyTab(),
                 new NetworkTab(),
                 new AppearanceTab()
@@ -161,7 +163,6 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
      */
     private void updateAfterPreferenceChanges() {
         // Reload internal preferences cache
-        preferences.updateEntryEditorTabList();
         preferences.updateGlobalCitationKeyPattern();
         preferences.updateMainTableColumns();
 
@@ -171,7 +172,8 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
         LayoutFormatterPreferences layoutPreferences = preferences.getLayoutFormatterPreferences(Globals.journalAbbreviationRepository);
         SavePreferences savePreferences = preferences.getSavePreferencesForExport();
         XmpPreferences xmpPreferences = preferences.getXmpPreferences();
-        Globals.exportFactory = ExporterFactory.create(customExporters, layoutPreferences, savePreferences, xmpPreferences);
+        Globals.exportFactory = ExporterFactory.create(customExporters, layoutPreferences, savePreferences,
+                xmpPreferences, preferences.getDefaultBibDatabaseMode(), Globals.entryTypesManager);
 
         ExternalApplicationsPreferences externalApplicationsPreferences = preferences.getExternalApplicationsPreferences();
         PushToApplicationsManager manager = frame.getPushToApplicationsManager();

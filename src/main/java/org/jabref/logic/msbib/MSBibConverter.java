@@ -63,7 +63,7 @@ public class MSBibConverter {
         }
 
         result.day = entry.getFieldOrAliasLatexFree(StandardField.DAY).orElse(null);
-        result.month = entry.getMonth().map(Month::getNumber).map(Object::toString).orElse(null);
+        result.month = entry.getMonth().map(Month::getFullName).orElse(null);
 
         if (!entry.getLatexFreeField(StandardField.YEAR).isPresent()) {
             result.year = entry.getFieldOrAliasLatexFree(StandardField.YEAR).orElse(null);
@@ -111,7 +111,11 @@ public class MSBibConverter {
             result.publicationTitle = entry.getLatexFreeField(StandardField.TITLE).orElse(null);
         }
 
-        entry.getField(StandardField.AUTHOR).ifPresent(authors -> result.authors = getAuthors(entry, authors, StandardField.AUTHOR));
+        if (entry.getType().equals(IEEETranEntryType.Patent)) {
+            entry.getField(StandardField.AUTHOR).ifPresent(authors -> result.inventors = getAuthors(entry, authors, StandardField.AUTHOR));
+        } else {
+            entry.getField(StandardField.AUTHOR).ifPresent(authors -> result.authors = getAuthors(entry, authors, StandardField.AUTHOR));
+        }
         entry.getField(StandardField.EDITOR).ifPresent(editors -> result.editors = getAuthors(entry, editors, StandardField.EDITOR));
         entry.getField(StandardField.TRANSLATOR).ifPresent(translator -> result.translators = getAuthors(entry, translator, StandardField.EDITOR));
 

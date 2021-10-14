@@ -21,24 +21,14 @@
     <content>
         <VBox prefHeight="200.0" prefWidth="400.0">
             <children>
-                <TitledPane fx:id="biblatexTitlePane" animated="false" collapsible="false" text="Biblatex">
+                <TitledPane fx:id="recommendedEntriesTitlePane" animated="false" collapsible="false" text="%Recommended">
                     <content>
-                        <FlowPane fx:id="biblatexPane" prefHeight="200.0" prefWidth="200.0"/>
+                        <FlowPane fx:id="recommendedEntriesPane" prefHeight="50.0" prefWidth="200.0"/>
                     </content>
                 </TitledPane>
-                <TitledPane fx:id="biblatexSoftwareTitlePane" animated="false" collapsible="false" text="Biblatex-Software">
+                <TitledPane fx:id="otherEntriesTitlePane" animated="false" collapsible="true" expanded="false" text="%Others">
                     <content>
-                        <FlowPane fx:id="biblatexSoftwarePane" prefHeight="200.0" prefWidth="200.0"/>
-                    </content>
-                </TitledPane>
-                <TitledPane fx:id="bibTexTitlePane" animated="false" collapsible="false" text="BibTeX">
-                    <content>
-                        <FlowPane fx:id="bibTexPane" prefHeight="200.0" prefWidth="200.0"/>
-                    </content>
-                </TitledPane>
-                <TitledPane fx:id="ieeeTranTitlePane" animated="false" collapsible="false" text="IEEETran">
-                    <content>
-                        <FlowPane fx:id="ieeetranPane" prefHeight="200.0" prefWidth="200.0"/>
+                        <FlowPane fx:id="otherEntriesPane" prefHeight="100.0" prefWidth="200.0"/>
                     </content>
                 </TitledPane>
                 <TitledPane fx:id="customTitlePane" animated="false" collapsible="false" text="%Custom">

@@ -654,7 +654,6 @@ public class StringUtil {
      * Return string enclosed in HTML bold tags  if not null, otherwise return alternative text in HTML bold tags
      */
     public static String boldHTML(String input, String alternative) {
-
         if (input == null) {
             return "<b>" + alternative + "</b>";
         }
@@ -734,5 +733,22 @@ public class StringUtil {
 
     public static String substringBetween(String str, String open, String close) {
         return StringUtils.substringBetween(str, open, close);
+    }
+
+    public static String ignoreCurlyBracket(String title) {
+        return isNotBlank(title) ? title.replace("{", "").replace("}", "") : title;
+    }
+
+    /**
+     * Encloses the given string with " if there is a space contained
+     *
+     * @return Returns a string
+     */
+    public static String quoteStringIfSpaceIsContained(String string) {
+        if (string.contains(" ")) {
+            return "\"" + string + "\"";
+        } else {
+            return string;
+        }
     }
 }

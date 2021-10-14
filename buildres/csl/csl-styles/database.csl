@@ -25,8 +25,12 @@
   </macro>
   <macro name="author">
     <names variable="author">
-      <name and="text" delimiter-precedes-last="never" et-al-min="4" et-al-use-first="3" initialize-with=". " name-as-sort-order="all"/>
+      <name and="text" delimiter-precedes-last="never" initialize-with="." name-as-sort-order="all"/>
       <label form="short" prefix=" (" suffix=")"/>
+      <substitute>
+        <names variable="editor"/>
+        <text variable="title"/>
+      </substitute>
     </names>
   </macro>
   <macro name="publisher">

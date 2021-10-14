@@ -26,12 +26,12 @@ import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 
 public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> implements PreferencesTab {
 
+    private final ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
     @FXML private ComboBox<Language> language;
     @FXML private ComboBox<Charset> defaultEncoding;
     @FXML private ComboBox<BibDatabaseMode> biblatexMode;
     @FXML private CheckBox inspectionWarningDuplicate;
     @FXML private CheckBox confirmDelete;
-    @FXML private CheckBox allowIntegerEdition;
     @FXML private CheckBox memoryStickMode;
     @FXML private CheckBox collectTelemetry;
     @FXML private CheckBox showAdvancedHints;
@@ -41,8 +41,6 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> i
     @FXML private Button markOwnerHelp;
     @FXML private CheckBox addCreationDate;
     @FXML private CheckBox addModificationDate;
-
-    private final ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
 
     public GeneralTab() {
         ViewLoader.view(this)
@@ -56,7 +54,7 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> i
     }
 
     public void initialize() {
-        this.viewModel = new GeneralTabViewModel(dialogService, preferencesService);
+        this.viewModel = new GeneralTabViewModel(dialogService, preferencesService, preferencesService.getGeneralPreferences(), preferencesService.getTelemetryPreferences(), preferencesService.getOwnerPreferences(), preferencesService.getTimestampPreferences());
 
         new ViewModelListCellFactory<Language>()
                 .withText(Language::getDisplayName)
@@ -78,7 +76,6 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> i
 
         inspectionWarningDuplicate.selectedProperty().bindBidirectional(viewModel.inspectionWarningDuplicateProperty());
         confirmDelete.selectedProperty().bindBidirectional(viewModel.confirmDeleteProperty());
-        allowIntegerEdition.selectedProperty().bindBidirectional(viewModel.allowIntegerEditionProperty());
         memoryStickMode.selectedProperty().bindBidirectional(viewModel.memoryStickModeProperty());
         collectTelemetry.selectedProperty().bindBidirectional(viewModel.collectTelemetryProperty());
         showAdvancedHints.selectedProperty().bindBidirectional(viewModel.showAdvancedHintsProperty());

@@ -8,11 +8,10 @@
     <link href="http://guides.lib.monash.edu/citing-referencing/harvard" rel="documentation"/>
     <author>
       <name>Patrick O'Brien</name>
-      <email>obrienpat86@gmail.com</email>
     </author>
     <category citation-format="author-date"/>
     <category field="generic-base"/>
-    <updated>2018-12-30T00:24:57+00:00</updated>
+    <updated>2021-02-09T09:23:58+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="en">
@@ -131,10 +130,10 @@
           </else-if>
           <else>
             <group>
-              <text term="retrieved" text-case="capitalize-first" suffix=" "/>
-              <text term="from" suffix=" "/>
-              <text variable="URL"/>
+              <text term="accessed" text-case="capitalize-first" suffix=" "/>
+              <date form="text" variable="accessed"/>
             </group>
+            <text variable="URL" prefix=", "/>
           </else>
         </choose>
       </if>
@@ -214,17 +213,14 @@
     <text macro="title"/>
     <choose>
       <if type="report thesis" match="any">
-        <group delimiter=", ">
+        <group delimiter=", " prefix=", ">
           <group delimiter=" ">
             <choose>
-              <if variable="genre" match="any">
-                <text variable="genre"/>
-              </if>
+              <if variable="genre" match="any"/>
               <else>
                 <text variable="collection-title"/>
               </else>
             </choose>
-            <text variable="number" prefix="No. "/>
           </group>
           <group delimiter=" ">
             <text term="version" text-case="capitalize-first"/>
@@ -258,10 +254,7 @@
   <macro name="publisher">
     <choose>
       <if type="report" match="any">
-        <group delimiter=": ">
-          <text variable="publisher-place"/>
-          <text variable="publisher"/>
-        </group>
+        <text variable="publisher"/>
       </if>
       <else-if type="thesis" match="any">
         <group delimiter=", ">
@@ -586,7 +579,7 @@
       </if>
     </choose>
   </macro>
-  <citation et-al-min="5" et-al-use-first="1" et-al-subsequent-min="3" et-al-subsequent-use-first="1" disambiguate-add-names="true" disambiguate-add-givenname="true" disambiguate-add-year-suffix="true" givenname-disambiguation-rule="primary-name" collapse="year">
+  <citation et-al-min="5" et-al-use-first="1" disambiguate-add-names="true" disambiguate-add-givenname="true" disambiguate-add-year-suffix="true" givenname-disambiguation-rule="primary-name" collapse="year">
     <sort>
       <key macro="author"/>
       <key macro="issued-sort"/>
@@ -609,7 +602,7 @@
     </sort>
     <layout suffix=".">
       <group delimiter=", ">
-        <group delimiter=" ">
+        <group delimiter=", ">
           <text macro="author"/>
           <text macro="issued" suffix=","/>
           <text macro="title-plus-extra"/>

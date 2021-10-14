@@ -57,7 +57,9 @@ public class ImportHandler {
         this.stateManager = stateManager;
 
         this.linker = new ExternalFilesEntryLinker(externalFileTypes, preferencesService.getFilePreferences(), database);
-        this.contentImporter = new ExternalFilesContentImporter(preferencesService.getImportFormatPreferences(), preferencesService.getTimestampPreferences());
+        this.contentImporter = new ExternalFilesContentImporter(
+                preferencesService.getImporterPreferences(),
+                preferencesService.getImportFormatPreferences());
         this.undoManager = undoManager;
     }
 
@@ -89,33 +91,19 @@ public class ImportHandler {
 
                     try {
                         if (FileUtil.isPDFFile(file)) {
+                            var pdfImporterResult = contentImporter.importPDFContent(file);
+                            List<BibEntry> pdfEntriesInFile = pdfImporterResult.getDatabase().getEntries();
 
-                            var xmpParserResult = contentImporter.importXMPContent(file);
-                            List<BibEntry> xmpEntriesInFile = xmpParserResult.getDatabase().getEntries();
-
-                            if (xmpParserResult.hasWarnings()) {
-                                addResultToList(file, false, Localization.lang("Error reading XMP content: %0", xmpParserResult.getErrorMessage()));
+                            if (pdfImporterResult.hasWarnings()) {
+                                addResultToList(file, false, Localization.lang("Error reading PDF content: %0", pdfImporterResult.getErrorMessage()));
                             }
 
-                            // First try xmp import, if empty try pdf import, otherwise create empty entry
-                            if (!xmpEntriesInFile.isEmpty()) {
-                                entriesToAdd = xmpEntriesInFile;
-                                addResultToList(file, true, Localization.lang("Importing using XMP data..."));
+                            if (!pdfEntriesInFile.isEmpty()) {
+                                entriesToAdd = pdfEntriesInFile;
+                                addResultToList(file, true, Localization.lang("Importing using extracted PDF data"));
                             } else {
-                                var pdfImporterResult = contentImporter.importPDFContent(file);
-                                List<BibEntry> pdfEntriesInFile = pdfImporterResult.getDatabase().getEntries();
-
-                                if (pdfImporterResult.hasWarnings()) {
-                                    addResultToList(file, false, Localization.lang("Error reading PDF content: %0", pdfImporterResult.getErrorMessage()));
-                                }
-
-                                if (!pdfEntriesInFile.isEmpty()) {
-                                    entriesToAdd = pdfEntriesInFile;
-                                    addResultToList(file, true, Localization.lang("Importing using extracted PDF data"));
-                                } else {
-                                    entriesToAdd = Collections.singletonList(createEmptyEntryWithLink(file));
-                                    addResultToList(file, false, Localization.lang("No metadata found. Creating empty entry with file link"));
-                                }
+                                entriesToAdd = Collections.singletonList(createEmptyEntryWithLink(file));
+                                addResultToList(file, false, Localization.lang("No metadata found. Creating empty entry with file link"));
                             }
                         } else if (FileUtil.isBibFile(file)) {
                             var bibtexParserResult = contentImporter.importFromBibFile(file, fileUpdateMonitor);
@@ -173,7 +161,9 @@ public class ImportHandler {
                 preferencesService.getTimestampPreferences());
 
         // Generate citation keys
-        generateKeys(entries);
+        if (preferencesService.getImporterPreferences().isGenerateNewKeyOnImport()) {
+            generateKeys(entries);
+        }
 
         // Add to group
         addToGroups(entries, stateManager.getSelectedGroup(bibdatabase));
@@ -181,8 +171,7 @@ public class ImportHandler {
 
     private void addToGroups(List<BibEntry> entries, Collection<GroupTreeNode> groups) {
         for (GroupTreeNode node : groups) {
-            if (node.getGroup() instanceof GroupEntryChanger) {
-                GroupEntryChanger entryChanger = (GroupEntryChanger) node.getGroup();
+            if (node.getGroup() instanceof GroupEntryChanger entryChanger) {
                 List<FieldChange> undo = entryChanger.add(entries);
                 // TODO: Add undo
                 // if (!undo.isEmpty()) {

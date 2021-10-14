@@ -12,6 +12,8 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.jabref.logic.net.URLDownload;
+
 import kong.unirest.json.JSONArray;
 import kong.unirest.json.JSONObject;
 import org.slf4j.Logger;
@@ -94,12 +96,12 @@ public class Version {
      * Grabs all the available releases from the GitHub repository
      */
     public static List<Version> getAllAvailableVersions() throws IOException {
+        URLDownload.bypassSSLVerification();
         HttpURLConnection connection = (HttpURLConnection) new URL(JABREF_GITHUB_RELEASES).openConnection();
         connection.setRequestProperty("Accept-Charset", "UTF-8");
         try (BufferedReader rd = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
-
-            List<Version> versions = new ArrayList<>();
             JSONArray objects = new JSONArray(rd.readLine());
+            List<Version> versions = new ArrayList<>(objects.length());
             for (int i = 0; i < objects.length(); i++) {
                 JSONObject jsonObject = objects.getJSONObject(i);
                 Version version = Version.parse(jsonObject.getString("tag_name").replaceFirst("v", ""));

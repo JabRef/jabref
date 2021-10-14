@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<style xmlns="http://purl.org/net/xbiblio/csl" default-locale="en-GB" demote-non-dropping-particle="sort-only" version="1.0" class="in-text">
+<style xmlns="http://purl.org/net/xbiblio/csl" demote-non-dropping-particle="sort-only" version="1.0" class="in-text" default-locale="en-GB">
   <info>
     <title>Restoration Ecology</title>
     <id>http://www.zotero.org/styles/restoration-ecology</id>
     <link href="http://www.zotero.org/styles/restoration-ecology" rel="self"/>
     <link href="http://www.zotero.org/styles/genome-biology-and-evolution" rel="template"/>
-    <link href="http://onlinelibrary.wiley.com/journal/10.1111/(ISSN)1526-100X/homepage/ForAuthors.html" rel="documentation"/>
+    <link href="https://onlinelibrary.wiley.com/page/journal/1526100x/homepage/forauthors.html" rel="documentation"/>
     <author>
       <name>Caitlin Rottler</name>
       <email>caitlin.m.rottler@gmail.com</email>
@@ -13,7 +13,7 @@
     <category citation-format="author-date"/>
     <category field="biology"/>
     <eissn>1526-100X</eissn>
-    <updated>2016-06-24T17:34:02+00:00</updated>
+    <updated>2021-06-02T07:49:02+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <macro name="editor">
@@ -33,7 +33,7 @@
   </macro>
   <macro name="author">
     <names variable="author">
-      <name initialize-with="" sort-separator=" " name-as-sort-order="all" delimiter-precedes-last="always" et-al-min="4"/>
+      <name initialize-with="" sort-separator=" " name-as-sort-order="all" delimiter-precedes-last="always"/>
       <label prefix=", " form="short"/>
       <substitute>
         <names variable="editor"/>
@@ -94,7 +94,7 @@
       </else>
     </choose>
   </macro>
-  <citation collapse="year" disambiguate-add-givenname="true" disambiguate-add-names="true" disambiguate-add-year-suffix="true" et-al-use-first="1" et-al-min="3">
+  <citation collapse="year" disambiguate-add-givenname="true" disambiguate-add-names="true" disambiguate-add-year-suffix="true" et-al-min="3" et-al-use-first="1">
     <layout delimiter="; " prefix="(" suffix=")">
       <group delimiter=", ">
         <group delimiter=" ">
@@ -105,7 +105,7 @@
       </group>
     </layout>
   </citation>
-  <bibliography et-al-min="6" et-al-use-first="1" line-spacing="2" hanging-indent="true">
+  <bibliography line-spacing="2" hanging-indent="true">
     <sort>
       <key macro="author"/>
       <key variable="title"/>

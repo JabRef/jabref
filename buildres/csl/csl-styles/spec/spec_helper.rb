@@ -1,61 +1,19 @@
 require 'csl'
 require 'json'
+require 'yaml'
 
-STYLE_ROOT = File.expand_path('../..', __FILE__)
+PROJECT_ROOT = File.expand_path('../..', __FILE__)
+PULL_REQUEST = File.join(PROJECT_ROOT, 'pull-request')
+STYLE_ROOT = File.directory?(PULL_REQUEST) ? PULL_REQUEST : PROJECT_ROOT
 
 ISSN = Hash.new { |h,k| h[k] = [] }
 TITLES = Hash.new { |h,k| h[k] = [] }
-
-# These ISSNs are ignored when checking for duplicate ISSNs
-ISSN_FILTER = %w{
-  1662-453X 1663-9812 1664-042X 1664-0640 1664-1078 1664-2295
-  1664-2392 1664-302X 1664-3224 1664-462X 1664-8021 2234-943X
-  0036-8075 1095-9203 1359-4184 1476-5578 1097-6256 1047-7594
-  1546-1726 2108-6419 0035-2969 1958-5691 0943-8610 2194-508X
-  0223-5099 0322-8916 1805-6555 1899-0665 0305-1048 1362-4962
-  0042-7306 1783-1830 1438-5627 0353-6483 1855-8399
-}
-
-# These titles are ignored when checking for duplicate titles
-TITLES_FILTER = [
-  # 'example title 1',
-  # 'example title 2'
-]
-
-# These styles are ignored when checking for valid citation-formats
-CITATION_FORMAT_FILTER = %w{
-  bibtex blank national-archives-of-australia
-}
-
-# These styles are ignored when checking for unused macros
-UNUSED_MACROS_FILTER = %w{
-  apa-annotated-bibliography
-  apa-cv
-  apa-numeric-superscript
-  apa-numeric-superscript-brackets
-  apa-with-abstract
-  chicago-annotated-bibliography chicago-author-date chicago-author-date-16th-edition
-  chicago-library-list chicago-note-bibliography-16th-edition
-  chicago-note-bibliography-with-ibid
-  chicago-note-bibliography taylor-and-francis-chicago-author-date
-  turabian-author-date
-}
-
-# These files and directories are ignored when checking for extra files
-EXTRA_FILES_FILTER = [
-  'CONTRIBUTING.md', 'Gemfile', 'Gemfile.lock', 'README.md',
-  'dependent', 'Rakefile', 'renamed-styles.json'
-]
-
-# These directories and their contents are ignored when checking for extra files
-EXTRA_FILES_DIRECTORY_FILTER = [
-  'spec', 'vendor'
-]
+FILTER = YAML.load_file(File.join(File.dirname(__FILE__), 'filters.yaml'))
 
 EXTRA_FILES = Dir[File.join(STYLE_ROOT, '**', '*')].reject do |file|
   basedir = file.sub(STYLE_ROOT + "/","").partition("/")[0]
   name = File.basename(file)
-  File.extname(file) == '.csl' || EXTRA_FILES_FILTER.any? { |f| f === name } || EXTRA_FILES_DIRECTORY_FILTER.any? { |d| d === basedir}
+  File.extname(file) == '.csl' || FILTER['EXTRA_FILES'].any? { |f| f === name } || FILTER['EXTRA_FILES_DIRECTORY'].any? { |d| d === basedir}
 end
 
 # License URL and text
@@ -77,19 +35,19 @@ def load_style(path)
     begin
       if style.info.has_issn?
         [style.info.issn].flatten(1).each do |issn|
-          ISSN[issn.to_s] << basename unless ISSN_FILTER.include?(issn.to_s)
+          ISSN[issn.to_s] << basename unless FILTER['ISSN'].include?(issn.to_s)
         end
       end
 
       if style.info.has_eissn?
         [style.info.eissn].flatten(1).each do |issn|
-          ISSN[issn.to_s] << basename unless ISSN_FILTER.include?(issn.to_s)
+          ISSN[issn.to_s] << basename unless FILTER['ISSN'].include?(issn.to_s)
         end
       end
 
       if style.has_title?
         title = style.title.to_s.downcase
-        TITLES[title] << basename unless TITLES_FILTER.include?(title)
+        TITLES[title] << basename unless FILTER['TITLES'].include?(title)
       end
     rescue
       warn "Failed to extract ISSN of style #{basename}"
@@ -134,19 +92,19 @@ STYLE_FILTER = case ENV['CSL_TEST']
   end
 
 def collect_styles(type = '')
-  Dir[File.join(STYLE_ROOT, type, '*.csl')].select do |filename|
+  dependence = type == '' ? 'independent' : type
+  glob = File.join(STYLE_ROOT, type, '*.csl')
+  print "\nLoading #{dependence} styles matching #{STYLE_FILTER.source} in #{glob}"
+
+  Dir[glob].select do |filename|
     filename =~ STYLE_FILTER
   end
 end
-
-print "\nLoading dependent styles"
 
 Dependents = Hash[collect_styles('dependent').each_with_index.map { |path, i|
   print '.' if i % 120 == 0
   load_style(path)
 }]
-
-print "\nLoading independent styles"
 
 Independents = Hash[collect_styles.each_with_index.map { |path, i|
   print '.'  if i % 120 == 0

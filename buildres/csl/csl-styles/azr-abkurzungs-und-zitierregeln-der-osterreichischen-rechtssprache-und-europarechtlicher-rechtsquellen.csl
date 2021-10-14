@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <style xmlns="http://purl.org/net/xbiblio/csl" version="1.0" class="note" default-locale="de-AT">
   <info>
-    <title>AZR - Abkürzungs- und Zitierregeln der österreichischen Rechtssprache und europarechtlicher Rechtsquellen (German - Austria)</title>
+    <title>AZR - Abkürzungs- und Zitierregeln der österreichischen Rechtssprache und europarechtlicher Rechtsquellen (Deutsch - Österreich)</title>
     <title-short>AZR</title-short>
     <id>http://www.zotero.org/styles/azr-abkurzungs-und-zitierregeln-der-osterreichischen-rechtssprache-und-europarechtlicher-rechtsquellen</id>
     <link href="http://www.zotero.org/styles/azr-abkurzungs-und-zitierregeln-der-osterreichischen-rechtssprache-und-europarechtlicher-rechtsquellen" rel="self"/>
@@ -36,7 +36,7 @@
   </macro>
   <macro name="sort-key">
     <choose>
-      <if type="bill" match="any">
+      <if type="bill legislation" match="any">
         <text value="3"/>
       </if>
       <else-if type="legal_case" match="any">
@@ -75,7 +75,7 @@
   <citation et-al-min="4" et-al-use-first="1" disambiguate-add-names="true" givenname-disambiguation-rule="all-names-with-initials" disambiguate-add-givenname="true">
     <layout suffix="." delimiter="; ">
       <choose>
-        <if type="bill">
+        <if type="bill legislation" match="any">
           <choose>
             <if variable="genre" match="all">
               <!-- Verordnung oder Richtlinie der Europäischen Union -->
@@ -306,7 +306,14 @@
           <text variable="title" suffix=" "/>
           <text variable="URL" suffix=" "/>
           <text variable="locator" prefix="(" suffix="), "/>
-          <date variable="accessed" prefix="(aufgerufen am " suffix=")" form="numeric"/>
+          <choose>
+            <if variable="issued">
+              <date variable="issued" prefix="(Stand " suffix=")" form="numeric"/>
+            </if>
+            <else>
+              <date variable="accessed" prefix="(aufgerufen am " suffix=")" form="numeric"/>
+            </else>
+          </choose>
         </else-if>
         <else>
           <group delimiter=", ">
@@ -327,7 +334,7 @@
     </sort>
     <layout>
       <choose>
-        <if type="bill">
+        <if type="bill legislation" match="any">
           <choose>
             <if variable="genre" match="all">
               <!-- Verordnung oder Richtlinie der Europäischen Union -->
@@ -466,7 +473,14 @@
           <text variable="title" suffix=" "/>
           <text variable="URL" suffix=" "/>
           <text variable="locator" prefix="(" suffix="), "/>
-          <date variable="accessed" prefix="(aufgerufen am " suffix=")" form="numeric"/>
+          <choose>
+            <if variable="issued">
+              <date variable="issued" prefix="(Stand " suffix=")" form="numeric"/>
+            </if>
+            <else>
+              <date variable="accessed" prefix="(aufgerufen am " suffix=")" form="numeric"/>
+            </else>
+          </choose>
         </else-if>
         <else>
           <group delimiter=", ">

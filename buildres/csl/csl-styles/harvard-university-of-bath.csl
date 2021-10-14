@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" demote-non-dropping-particle="sort-only" default-locale="en-GB">
-  <!-- This style was edited with the Visual CSL Editor (http://editor.citationstyles.org/visualEditor/) -->
   <info>
     <title>University of Bath - Harvard</title>
     <id>http://www.zotero.org/styles/harvard-university-of-bath</id>
@@ -9,17 +8,17 @@
     <link href="https://library.bath.ac.uk/referencing/harvard-bath" rel="documentation"/>
     <link href="https://github.com/alex-ball/bathbib/" rel="documentation"/>
     <author>
-      <name>Rob Fuller</name>
-      <email>rob.fuller1@gmail.com</email>
-    </author>
-    <author>
       <name>Alex Ball</name>
       <email>ab318@bath.ac.uk</email>
+    </author>
+    <author>
+      <name>Rob Fuller</name>
+      <email>rob.fuller1@gmail.com</email>
     </author>
     <category citation-format="author-date"/>
     <category field="generic-base"/>
     <summary>Adaptation of Harvard referencing style used at the University of Bath.</summary>
-    <updated>2019-09-13T15:00:00+00:00</updated>
+    <updated>2021-02-24T15:00:00+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="en">
@@ -45,16 +44,27 @@
       <label form="short" prefix=", " text-case="lowercase"/>
     </names>
   </macro>
+  <macro name="byeditor">
+    <names variable="editor">
+      <label form="verb-short" text-case="capitalize-first" suffix=" "/>
+      <name and="text" delimiter-precedes-last="never" initialize-with="."/>
+    </names>
+  </macro>
   <macro name="author">
     <names variable="author">
       <name and="text" delimiter-precedes-last="never" initialize-with="." name-as-sort-order="all"/>
       <label form="short" prefix=" " text-case="lowercase"/>
       <substitute>
-        <names variable="editor">
-          <name and="text" delimiter-precedes-last="never" initialize-with="." name-as-sort-order="all"/>
-          <label form="short" prefix=", " text-case="lowercase"/>
-        </names>
-        <text macro="title"/>
+        <choose>
+          <if type="entry"/>
+          <else>
+            <names variable="editor">
+              <name and="text" delimiter-precedes-last="never" initialize-with="." name-as-sort-order="all"/>
+              <label form="short" prefix=", " text-case="lowercase"/>
+            </names>
+          </else>
+        </choose>
+        <text macro="title-label"/>
       </substitute>
     </names>
   </macro>
@@ -62,8 +72,12 @@
     <names variable="author">
       <name form="short" and="text" delimiter-precedes-last="never" initialize-with="."/>
       <substitute>
-        <names variable="editor"/>
-        <names variable="translator"/>
+        <choose>
+          <if type="entry"/>
+          <else>
+            <names variable="editor"/>
+          </else>
+        </choose>
         <text macro="title-short"/>
       </substitute>
     </names>
@@ -127,7 +141,7 @@
       <if type="bill broadcast book dataset graphic legal_case map motion_picture musical_score patent report song speech webpage thesis" match="any">
         <text variable="title" font-style="italic"/>
       </if>
-      <else-if type="legislation">
+      <else-if type="legislation legal_case" match="any">
         <choose>
           <if variable="container-title">
             <text variable="title"/>
@@ -150,6 +164,7 @@
       <if type="thesis motion_picture broadcast" match="any"/>
       <else-if type="report" variable="number"/>
       <else-if type="patent" variable="number"/>
+      <else-if type="bill" variable="number"/>
       <else>
         <text variable="genre" prefix=" [" suffix="]"/>
       </else>
@@ -157,9 +172,35 @@
   </macro>
   <macro name="title-short">
     <choose>
-      <if type="bill broadcast book dataset graphic map motion_picture musical_score patent report song webpage thesis" match="any">
-        <text variable="title" font-style="italic"/>
+      <if type="bill broadcast dataset graphic map motion_picture musical_score patent report song webpage thesis" match="any">
+        <text variable="title" form="short" font-style="italic"/>
       </if>
+      <else-if type="legislation legal_case" match="any">
+        <choose>
+          <if variable="container-title">
+            <text variable="title" form="short"/>
+          </if>
+          <else>
+            <text variable="title" form="short" font-style="italic"/>
+          </else>
+        </choose>
+      </else-if>
+      <else-if type="entry">
+        <text variable="container-title" form="short"/>
+      </else-if>
+      <else>
+        <text variable="title" form="short"/>
+      </else>
+    </choose>
+  </macro>
+  <macro name="title-label">
+    <choose>
+      <if type="entry">
+        <text variable="container-title"/>
+      </if>
+      <else-if type="bill broadcast dataset graphic legal_case map motion_picture musical_score patent report song speech webpage thesis" match="any">
+        <text variable="title" font-style="italic"/>
+      </else-if>
       <else-if type="legislation legal_case" match="any">
         <choose>
           <if variable="container-title">
@@ -171,7 +212,7 @@
         </choose>
       </else-if>
       <else>
-        <text variable="title-short"/>
+        <text variable="title"/>
       </else>
     </choose>
   </macro>
@@ -449,6 +490,19 @@
           </group>
           <text prefix=" " suffix="." macro="publisher"/>
         </else-if>
+        <else-if type="entry">
+          <group prefix=" " suffix="." delimiter=". ">
+            <text macro="byeditor"/>
+            <text macro="edition"/>
+            <group delimiter=" ">
+              <text variable="title" font-style="italic"/>
+              <text macro="online"/>
+            </group>
+            <text macro="series"/>
+            <text macro="status"/>
+            <text macro="publisher"/>
+          </group>
+        </else-if>
         <else-if type="article-journal" match="any">
           <group prefix=" " suffix="." delimiter=". ">
             <text macro="title"/>
@@ -565,12 +619,12 @@
           </group>
         </else-if>
         <else-if type="graphic map" match="any">
-          <group prefix=" " suffix="." delimiter=" ">
-            <group delimiter=", ">
+          <group prefix=" " suffix="." delimiter=", ">
+            <group delimiter=" ">
               <text macro="title"/>
-              <text variable="scale"/>
+              <text macro="online"/>
             </group>
-            <text macro="online"/>
+            <text variable="scale"/>
           </group>
           <group prefix=" " suffix="." delimiter=". ">
             <text macro="edition"/>
@@ -616,9 +670,10 @@
             </choose>
           </group>
           <group prefix=" " suffix="." delimiter=". ">
+            <text macro="editor"/>
+            <text macro="edition"/>
             <text macro="series"/>
             <text macro="status"/>
-            <text macro="editor"/>
           </group>
           <group prefix=" " suffix="." delimiter=", ">
             <choose>

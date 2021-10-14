@@ -46,7 +46,7 @@ It supports you in every step of your research work.
 
 ## Installation
 
-Fresh development builds are available at [builds.jabref.org](https://builds.jabref.org/master/).
+Fresh development builds are available at [builds.jabref.org](https://builds.jabref.org/main/).
 The [latest stable release is available at FossHub](https://downloads.jabref.org/).
 
 Please see our [Installation Guide](https://docs.jabref.org/installation).
@@ -95,5 +95,10 @@ and then generate the Eclipse `gradlew eclipse`.
 For IntelliJ IDEA, just import the project via a Gradle Import by pointing at the `build.gradle`.
 
 `gradlew test` executes all tests. We use [Github Actions](https://github.com/JabRef/jabref/actions) for executing the tests after each commit. For developing, it is sufficient to locally only run the associated test for the classes you changed. Github will report any other failure.
+
+## Sponsoring
+
+JabRef development is powered by YourKit Java Profiler [![YourKit Java Profiler](https://www.yourkit.com/images/yk_logo.png)](https://www.yourkit.com/java/profiler/)
+
 
 [JabRef]: https://www.jabref.org

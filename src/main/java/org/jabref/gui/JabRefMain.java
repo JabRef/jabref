@@ -1,6 +1,12 @@
 package org.jabref.gui;
 
+import java.io.File;
+import java.io.IOException;
 import java.net.Authenticator;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Comparator;
 
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -20,6 +26,7 @@ import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.remote.client.RemoteClient;
 import org.jabref.logic.util.OS;
 import org.jabref.migrations.PreferencesMigrations;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.preferences.JabRefPreferences;
 import org.jabref.preferences.PreferencesService;
@@ -59,17 +66,19 @@ public class JabRefMain extends Application {
 
             applyPreferences(preferences);
 
+            clearOldSearchIndices();
+
             try {
                 // Process arguments
-                ArgumentProcessor argumentProcessor = new ArgumentProcessor(arguments, ArgumentProcessor.Mode.INITIAL_START);
+                ArgumentProcessor argumentProcessor = new ArgumentProcessor(arguments, ArgumentProcessor.Mode.INITIAL_START, preferences);
                 // Check for running JabRef
-                if (!handleMultipleAppInstances(arguments) || argumentProcessor.shouldShutDown()) {
+                if (!handleMultipleAppInstances(arguments, preferences) || argumentProcessor.shouldShutDown()) {
                     Platform.exit();
                     return;
                 }
 
                 // If not, start GUI
-                new JabRefGUI(mainStage, argumentProcessor.getParserResults(), argumentProcessor.isBlank());
+                new JabRefGUI(mainStage, argumentProcessor.getParserResults(), argumentProcessor.isBlank(), preferences);
             } catch (ParseException e) {
                 LOGGER.error("Problem parsing arguments", e);
 
@@ -88,8 +97,8 @@ public class JabRefMain extends Application {
         Globals.shutdownThreadPools();
     }
 
-    private static boolean handleMultipleAppInstances(String[] args) {
-        RemotePreferences remotePreferences = Globals.prefs.getRemotePreferences();
+    private static boolean handleMultipleAppInstances(String[] args, PreferencesService preferences) {
+        RemotePreferences remotePreferences = preferences.getRemotePreferences();
         if (remotePreferences.useRemoteServer()) {
             // Try to contact already running JabRef
             RemoteClient remoteClient = new RemoteClient(remotePreferences.getPort());
@@ -104,7 +113,7 @@ public class JabRefMain extends Application {
                 }
             } else {
                 // We are alone, so we start the server
-                Globals.REMOTE_LISTENER.openAndStart(new JabRefMessageHandler(), remotePreferences.getPort());
+                Globals.REMOTE_LISTENER.openAndStart(new JabRefMessageHandler(), remotePreferences.getPort(), preferences);
             }
         }
         return true;
@@ -115,7 +124,7 @@ public class JabRefMain extends Application {
         Globals.journalAbbreviationRepository = JournalAbbreviationLoader.loadRepository(preferences.getJournalAbbreviationPreferences());
 
         // Build list of Import and Export formats
-        Globals.IMPORT_FORMAT_READER.resetImportFormats(preferences.getImportFormatPreferences(),
+        Globals.IMPORT_FORMAT_READER.resetImportFormats(preferences.getImporterPreferences(), preferences.getImportFormatPreferences(),
                 preferences.getXmpPreferences(), Globals.getFileUpdateMonitor());
         Globals.entryTypesManager.addCustomOrModifiedTypes(preferences.getBibEntryTypes(BibDatabaseMode.BIBTEX),
                 preferences.getBibEntryTypes(BibDatabaseMode.BIBLATEX));
@@ -123,7 +132,9 @@ public class JabRefMain extends Application {
                 preferences.getCustomExportFormats(Globals.journalAbbreviationRepository),
                 preferences.getLayoutFormatterPreferences(Globals.journalAbbreviationRepository),
                 preferences.getSavePreferencesForExport(),
-                preferences.getXmpPreferences());
+                preferences.getXmpPreferences(),
+                preferences.getDefaultBibDatabaseMode(),
+                Globals.entryTypesManager);
 
         // Initialize protected terms loader
         Globals.protectedTermsLoader = new ProtectedTermsLoader(preferences.getProtectedTermsPreferences());
@@ -137,6 +148,26 @@ public class JabRefMain extends Application {
         ProxyRegisterer.register(proxyPreferences);
         if (proxyPreferences.isUseProxy() && proxyPreferences.isUseAuthentication()) {
             Authenticator.setDefault(new ProxyAuthenticator());
+        }
+    }
+
+    private static void clearOldSearchIndices() {
+        Path currentIndexPath = BibDatabaseContext.getFulltextIndexBasePath();
+        Path appData = currentIndexPath.getParent();
+
+        try (DirectoryStream<Path> stream = Files.newDirectoryStream(appData)) {
+            for (Path path : stream) {
+                if (Files.isDirectory(path) && !path.equals(currentIndexPath)) {
+                    LOGGER.info("Deleting out-of-date fulltext search index at {}.", path);
+                    Files.walk(path)
+                         .sorted(Comparator.reverseOrder())
+                         .map(Path::toFile)
+                         .forEach(File::delete);
+
+                }
+            }
+        } catch (IOException e) {
+            LOGGER.error("Could not access app-directory at {}", appData, e);
         }
     }
 }

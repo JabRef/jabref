@@ -2,6 +2,7 @@ package org.jabref.logic.formatter.casechanger;
 
 import java.util.stream.Stream;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -13,7 +14,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class TitleCaseFormatterTest {
 
-    private final TitleCaseFormatter formatter = new TitleCaseFormatter();
+    private TitleCaseFormatter formatter;
+
+    @BeforeEach
+    public void setUp() {
+        formatter = new TitleCaseFormatter();
+    }
 
     private static Stream<Arguments> testData() {
         return Stream.of(
@@ -22,25 +28,25 @@ public class TitleCaseFormatterTest {
                 Arguments.of("An Upper Each First And", "an upper each first and"),
                 Arguments.of("An Upper Each First And", "an upper each first AND"),
                 Arguments.of("An Upper Each of the and First And",
-                             "an upper each of the and first and"),
+                        "an upper each of the and first and"),
                 Arguments.of("An Upper Each of the and First And",
-                             "an upper each of the AND first and"),
+                        "an upper each of the AND first and"),
                 Arguments.of("An Upper Each of: The and First And",
-                             "an upper each of: the and first and"),
+                        "an upper each of: the and first and"),
                 Arguments.of("An Upper First with and without {CURLY} {brackets}",
-                             "AN UPPER FIRST WITH AND WITHOUT {CURLY} {brackets}"),
+                        "AN UPPER FIRST WITH AND WITHOUT {CURLY} {brackets}"),
                 Arguments.of("An Upper First with {A}nd without {C}urly {b}rackets",
-                             "AN UPPER FIRST WITH {A}ND WITHOUT {C}URLY {b}rackets"),
+                        "AN UPPER FIRST WITH {A}ND WITHOUT {C}URLY {b}rackets"),
                 Arguments.of("{b}rackets {b}rac{K}ets Brack{E}ts",
-                             "{b}RaCKeTS {b}RaC{K}eTS bRaCK{E}ts"),
+                        "{b}RaCKeTS {b}RaC{K}eTS bRaCK{E}ts"),
                 Arguments.of("Two Experiences Designing for Effective Security",
-                             "Two experiences designing for effective security"),
+                        "Two experiences designing for effective security"),
                 Arguments.of("Bibliographic Software. A Comparison.",
-                             "bibliographic software. a comparison."),
+                        "bibliographic software. a comparison."),
                 Arguments.of("Bibliographic Software. {A COMPARISON.}",
-                             "bibliographic software. {A COMPARISON.}"),
+                        "bibliographic software. {A COMPARISON.}"),
                 Arguments.of("{BPMN} Conformance in Open Source Engines",
-                             new TitleCaseFormatter().getExampleInput()));
+                        new TitleCaseFormatter().getExampleInput()));
     }
 
     @ParameterizedTest

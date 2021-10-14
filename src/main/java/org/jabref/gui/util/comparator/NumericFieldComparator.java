@@ -2,6 +2,8 @@ package org.jabref.gui.util.comparator;
 
 import java.util.Comparator;
 
+import org.jabref.model.strings.StringUtil;
+
 /**
  * Comparator for numeric cases. The purpose of this class is to add the numeric comparison, because values are sorted
  * as if they were strings.
@@ -10,51 +12,54 @@ public class NumericFieldComparator implements Comparator<String> {
 
     @Override
     public int compare(String val1, String val2) {
-        // We start by implementing the comparison in the edge cases (if one of the values is null).
-        if (val1 == null && val2 == null) {
-            return 0;
-        }
-
-        if (val1 == null) {
-            // We assume that "null" is "less than" any other value.
-            return -1;
-        }
-
-        if (val2 == null) {
-            return 1;
-        }
-
-        // Now we start the conversion to integers.
-        Integer valInt1 = null;
-        Integer valInt2 = null;
-        try {
-            // Trim in case the user added an unnecessary white space (e.g. 1 1 instead of 11).
-            valInt1 = Integer.parseInt(val1.trim());
-        } catch (NumberFormatException ignore) {
-            // do nothing
-        }
-        try {
-            valInt2 = Integer.parseInt(val2.trim());
-        } catch (NumberFormatException ignore) {
-            // do nothing
-        }
+        Integer valInt1 = parseInt(val1);
+        Integer valInt2 = parseInt(val2);
 
         if (valInt1 == null && valInt2 == null) {
-            // None of the values were parsed (i.e both are not numeric)
-            // so we will use the normal string comparison.
-            return val1.compareTo(val2);
-        }
-
-        if (valInt1 == null) {
-            // We assume that strings "are less" than integers
+            if (val1 != null && val2 != null) {
+                return val1.compareTo(val2);
+            } else {
+                return 0;
+            }
+        } else if (valInt1 == null) {
+            // We assume that "null" is "less than" any other value.
             return -1;
-        }
-
-        if (valInt2 == null) {
+        } else if (valInt2 == null) {
             return 1;
         }
 
         // If we arrive at this stage then both values are actually numeric !
         return valInt1 - valInt2;
+    }
+
+    private static Integer parseInt(String number) {
+        if (!isNumber(number)) {
+            return null;
+        }
+
+        try {
+            return Integer.valueOf(number.trim());
+        } catch (NumberFormatException ignore) {
+            return null;
+        }
+    }
+
+    private static boolean isNumber(String number) {
+        if (StringUtil.isNullOrEmpty(number)) {
+            return false;
+        }
+        if (number.length() == 1 && (number.charAt(0) == '-' || number.charAt(0) == '+')) {
+            return false;
+        }
+        for (int i = 0; i < number.length(); i++) {
+            char c = number.charAt(i);
+            if (i == 0 && (c == '-' || c == '+')) {
+                continue;
+            } else if (!Character.isDigit(c)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

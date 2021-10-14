@@ -124,7 +124,7 @@ JabRef uses the logging facade [SLF4j](https://www.slf4j.org/). All log messages
 * Obtaining a logger for a class:
 
   ```java
-  private static final Log LOGGER = LogFactory.getLog(<ClassName>.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(<ClassName>.class);
   ```
 
 * If the logging event is caused by an exception, please add the exception to the log message as:
@@ -229,6 +229,8 @@ Defaults should go into the model package. See [Comments in this Commit](https:/
 
 ## Test Cases
 
+### General hints on tests
+
 Imagine you want to test the method `format(String value)` in the class `BracesFormatter` which removes double braces in a given string.
 
 * _Placing:_ all tests should be placed in a class named `classTest`, e.g. `BracesFormatterTest`.
@@ -315,6 +317,21 @@ public void getTypeReturnsBibLatexArticleInBibLatexMode() {
 ```
 
 To test that a preferences migration works successfully, use the mockito method `verify`. See `PreferencesMigrationsTest` for an example.
+
+### Background on Java testing
+
+In JabRef, we mainly rely to basic JUnit tests to increase code coverage. There are other ways to test:
+
+| Type | Techniques | Tool \(Java\) | Kind of tests | Used In JabRef |
+| :--- | :--- | :--- | :--- | :--- |
+| Functional | Dynamics, black box, positive and negative | [JUnit-QuickCheck](https://github.com/pholser/junit-quickcheck) | Random data generation | No, not intended, because other test kinds seem more helpful. |
+| Functional | Dynamics, black box, positive and negative | [GraphWalker](https://graphwalker.github.io/) | Model-based | No, because the BibDatabase doesn't need to be tests |
+| Functional | Dynamics, black box, positive and negative | [TestFX](https://github.com/TestFX/TestFX) | GUI Tests | Yes |
+| Functional | Dynamics, white box, negative | [PIT](https://pitest.org/) | Mutation | No |
+| Functional | Dynamics, white box, positive and negative | [Mockito](https://site.mockito.org/) | Mocking | Yes |
+| Non-functional | Dynamics, black box, positive and negative | [JETM](http://jetm.void.fm/), [Apache JMeter](https://jmeter.apache.org/) | Performance \(performance testing vs load testing respectively\) | No |
+| Structural | Static, white box | [CheckStyle](https://checkstyle.sourceforge.io/) | Constient formatting of the source code | Yes |
+| Structural | Dynamics, white box | [SpotBugs](https://spotbugs.github.io/) | Reocurreing bugs \(based on experience of other projects\) | No |
 
 ## UI
 

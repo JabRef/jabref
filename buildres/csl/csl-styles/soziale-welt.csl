@@ -2,7 +2,7 @@
 <style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" demote-non-dropping-particle="sort-only" default-locale="de-DE">
   <!-- This style was edited with the Visual CSL Editor (http://steveridout.com/csl/visualEditor/) -->
   <info>
-    <title>Soziale Welt (German)</title>
+    <title>Soziale Welt (Deutsch)</title>
     <id>http://www.zotero.org/styles/soziale-welt</id>
     <link href="http://www.zotero.org/styles/soziale-welt" rel="self"/>
     <link href="http://www.soziale-welt.nomos.de/fileadmin/soziale-welt/doc/Autorenhinweise_sw.pdf" rel="documentation"/>
@@ -17,7 +17,7 @@
     <category citation-format="author-date"/>
     <category field="social_science"/>
     <issn>0038-6073</issn>
-    <summary>Stil für Soziale Welt (German)</summary>
+    <summary>Stil für Soziale Welt (Deutsch)</summary>
     <updated>2015-11-23T15:49:26+01:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>

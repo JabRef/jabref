@@ -1,2 +1,2 @@
 .env
-spec/sheldon/travis.json
+spec/sheldon/ci.json

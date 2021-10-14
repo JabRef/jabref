@@ -19,7 +19,7 @@
     <issn>0047-2506</issn>
     <eissn>1478-6990</eissn>
     <summary>Basically the only difference with Academy of Management Review is that the titles of books and journals should not be bold, only italicized.</summary>
-    <updated>2020-05-21T08:58:02+00:00</updated>
+    <updated>2021-01-16T14:53:39+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <macro name="container-contributors">
@@ -231,24 +231,22 @@
       <key macro="author"/>
       <key macro="issued-year"/>
     </sort>
-    <layout>
-      <group suffix=".">
-        <text macro="author" suffix="."/>
-        <text macro="issued" suffix=" "/>
-        <group delimiter=". ">
-          <text macro="title"/>
-          <group>
-            <text macro="container-contributors"/>
-            <text macro="secondary-contributors"/>
-            <text variable="container-title" font-style="italic" font-weight="normal"/>
-          </group>
+    <layout suffix=".">
+      <group delimiter=". ">
+        <text macro="author"/>
+        <text macro="issued"/>
+        <text macro="title"/>
+        <group>
+          <text macro="container-contributors"/>
+          <text macro="secondary-contributors"/>
+          <text variable="container-title" font-style="italic" font-weight="normal"/>
         </group>
-        <text macro="locators"/>
-        <group delimiter=", ">
-          <text macro="event"/>
-          <text macro="access"/>
-          <text macro="publisher" prefix=". "/>
-        </group>
+      </group>
+      <text macro="locators"/>
+      <group delimiter=", ">
+        <text macro="event"/>
+        <text macro="access"/>
+        <text macro="publisher" prefix=". "/>
       </group>
     </layout>
   </bibliography>

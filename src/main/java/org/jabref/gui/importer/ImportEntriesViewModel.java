@@ -28,7 +28,6 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
-import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.FilePreferences;
 import org.jabref.preferences.PreferencesService;
@@ -145,18 +144,15 @@ public class ImportEntriesViewModel extends AbstractViewModel {
 
         if (shouldDownloadFiles) {
             for (BibEntry bibEntry : entriesToImport) {
-                for (LinkedFile linkedFile : bibEntry.getFiles()) {
-                    LinkedFileViewModel linkedFileViewModel = new LinkedFileViewModel(
-                            linkedFile,
-                            bibEntry,
-                            databaseContext,
-                            taskExecutor,
-                            dialogService,
-                            preferences.getXmpPreferences(),
-                            filePreferences,
-                            ExternalFileTypes.getInstance());
-                    linkedFileViewModel.download();
-                }
+                bibEntry.getFiles().stream().filter(file -> file.isOnlineLink()).forEach(linkedFile ->
+                        new LinkedFileViewModel(
+                                linkedFile,
+                                bibEntry,
+                                databaseContext,
+                                taskExecutor,
+                                dialogService,
+                                preferences,
+                                ExternalFileTypes.getInstance()).download());
             }
         }
 

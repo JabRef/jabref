@@ -22,9 +22,9 @@ import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.openoffice.OOBibStyle;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
-import org.jabref.logic.openoffice.StyleLoader;
+import org.jabref.logic.openoffice.style.OOBibStyle;
+import org.jabref.logic.openoffice.style.StyleLoader;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.preferences.PreferencesService;
@@ -96,7 +96,7 @@ public class StyleSelectDialogViewModel {
         OOBibStyle style = selectedItem.getValue().getStyle();
         Optional<ExternalFileType> type = ExternalFileTypes.getInstance().getExternalFileTypeByExt("jstyle");
         try {
-            JabRefDesktop.openExternalFileAnyFormat(new BibDatabaseContext(), style.getPath(), type);
+            JabRefDesktop.openExternalFileAnyFormat(new BibDatabaseContext(), preferencesService, style.getPath(), type);
         } catch (IOException e) {
             dialogService.showErrorDialogAndWait(e);
         }
