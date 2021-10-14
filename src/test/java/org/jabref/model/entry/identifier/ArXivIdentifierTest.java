@@ -91,4 +91,11 @@ class ArXivIdentifierTest {
 
         assertEquals(Optional.of(new ArXivIdentifier("hep-ex/0307015", "1", "hep-ex")), parsed);
     }
+
+    @Test
+    void fourDigitDateIsInvalidInLegacyFormat() throws Exception {
+        Optional<ArXivIdentifier> parsed = ArXivIdentifier.parse("2017/1118");
+
+        assertEquals(Optional.empty(), parsed);
+    }
 }
