@@ -100,6 +100,9 @@
     </choose>
   </macro>
   <citation et-al-min="3" et-al-use-first="1" disambiguate-add-names="true" disambiguate-add-givenname="true">
+    <sort>
+      <key variable="citation-number"/>
+    </sort>
     <layout vertical-align="sup" delimiter=",">
       <text variable="citation-number"/>
     </layout>
