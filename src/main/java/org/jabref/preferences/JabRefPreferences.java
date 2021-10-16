@@ -18,6 +18,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
@@ -37,7 +38,6 @@ import javafx.beans.InvalidationListener;
 import javafx.scene.control.TableColumn.SortType;
 
 import org.jabref.gui.Globals;
-import org.jabref.gui.SidePaneType;
 import org.jabref.gui.autocompleter.AutoCompleteFirstNameMode;
 import org.jabref.gui.autocompleter.AutoCompletePreferences;
 import org.jabref.gui.desktop.JabRefDesktop;
@@ -53,6 +53,7 @@ import org.jabref.gui.maintable.MainTableNameFormatPreferences.DisplayStyle;
 import org.jabref.gui.maintable.MainTablePreferences;
 import org.jabref.gui.mergeentries.MergeEntries;
 import org.jabref.gui.search.SearchDisplayMode;
+import org.jabref.gui.sidepane.SidePaneType;
 import org.jabref.gui.specialfields.SpecialFieldsPreferences;
 import org.jabref.gui.util.Theme;
 import org.jabref.logic.JabRefException;
@@ -1104,7 +1105,6 @@ public class JabRefPreferences implements PreferencesService {
                 get(OO_PATH),
                 getBoolean(OO_USE_ALL_OPEN_BASES),
                 getBoolean(OO_SYNC_WHEN_CITING),
-                getBoolean(OO_SHOW_PANEL),
                 getStringList(OO_EXTERNAL_STYLE_FILES),
                 get(OO_BIBLIOGRAPHY_STYLE_FILE));
     }
@@ -1115,7 +1115,6 @@ public class JabRefPreferences implements PreferencesService {
         put(OO_PATH, openOfficePreferences.getInstallationPath());
         putBoolean(OO_USE_ALL_OPEN_BASES, openOfficePreferences.getUseAllDatabases());
         putBoolean(OO_SYNC_WHEN_CITING, openOfficePreferences.getSyncWhenCiting());
-        putBoolean(OO_SHOW_PANEL, openOfficePreferences.getShowPanel());
         putStringList(OO_EXTERNAL_STYLE_FILES, openOfficePreferences.getExternalStyles());
         put(OO_BIBLIOGRAPHY_STYLE_FILE, openOfficePreferences.getCurrentStyle());
     }
@@ -2454,28 +2453,42 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public SidePanePreferences getSidePanePreferences() {
-        if (this.sidePanePreferences == null) {
-            updateSidePanePreferences();
+        if (Objects.nonNull(sidePanePreferences)) {
+            return sidePanePreferences;
         }
-        return this.sidePanePreferences;
-    }
 
-    void updateSidePanePreferences() {
-        this.sidePanePreferences = new SidePanePreferences(
-                getBoolean(WEB_SEARCH_VISIBLE),
-                getBoolean(GROUP_SIDEPANE_VISIBLE),
+        sidePanePreferences = new SidePanePreferences(
+                getVisiblePanes(),
                 getSidePanePreferredPositions(),
                 getInt(SELECTED_FETCHER_INDEX));
+
+        sidePanePreferences.visiblePanes().addListener((InvalidationListener) listener ->
+                storeVisiblePanes(sidePanePreferences.visiblePanes()));
+        sidePanePreferences.getPreferredPositions().addListener((InvalidationListener) listener ->
+                storeSidePanePreferredPositions(sidePanePreferences.getPreferredPositions()));
+        EasyBind.subscribe(sidePanePreferences.webSearchFetcherSelectedProperty(), newValue -> putInt(SELECTED_FETCHER_INDEX, newValue));
+
+        return sidePanePreferences;
     }
 
-    @Override
-    public void storeSidePanePreferences(SidePanePreferences preferences) {
-        putBoolean(WEB_SEARCH_VISIBLE, preferences.isWebSearchPaneVisible());
-        putBoolean(GROUP_SIDEPANE_VISIBLE, preferences.isGroupsPaneVisible());
-        storeSidePanePreferredPositions(preferences.getPreferredPositions());
-        putInt(SELECTED_FETCHER_INDEX, preferences.getWebSearchFetcherSelected());
+    private Set<SidePaneType> getVisiblePanes() {
+        HashSet<SidePaneType> visiblePanes = new HashSet<>();
+        if (getBoolean(WEB_SEARCH_VISIBLE)) {
+            visiblePanes.add(SidePaneType.WEB_SEARCH);
+        }
+        if (getBoolean(GROUP_SIDEPANE_VISIBLE)) {
+            visiblePanes.add(SidePaneType.GROUPS);
+        }
+        if (getBoolean(OO_SHOW_PANEL)) {
+            visiblePanes.add(SidePaneType.OPEN_OFFICE);
+        }
+        return visiblePanes;
+    }
 
-        this.sidePanePreferences = preferences;
+    private void storeVisiblePanes(Set<SidePaneType> visiblePanes) {
+        putBoolean(WEB_SEARCH_VISIBLE, visiblePanes.contains(SidePaneType.WEB_SEARCH));
+        putBoolean(GROUP_SIDEPANE_VISIBLE, visiblePanes.contains(SidePaneType.GROUPS));
+        putBoolean(OO_SHOW_PANEL, visiblePanes.contains(SidePaneType.OPEN_OFFICE));
     }
 
     private Map<SidePaneType, Integer> getSidePanePreferredPositions() {

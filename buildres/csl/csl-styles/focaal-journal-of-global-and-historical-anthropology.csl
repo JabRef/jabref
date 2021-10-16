@@ -1,26 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" demote-non-dropping-particle="display-and-sort" page-range-format="chicago" default-locale="en-US">
+<style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" page-range-format="expanded" default-locale="en-US">
   <info>
-    <title>Journal of Accounting Research</title>
-    <title-short>JAR</title-short>
-    <id>http://www.zotero.org/styles/journal-of-accounting-research</id>
-    <link href="http://www.zotero.org/styles/journal-of-accounting-research" rel="self"/>
+    <title>Focaal&#8212;Journal of Global and Historical Anthropology</title>
+    <id>http://www.zotero.org/styles/focaal-journal-of-global-and-historical-anthropology</id>
+    <link href="http://www.zotero.org/styles/focaal-journal-of-global-and-historical-anthropology" rel="self"/>
     <link href="http://www.zotero.org/styles/chicago-author-date" rel="template"/>
-    <link href="https://onlinelibrary.wiley.com/page/journal/1475679x/homepage/forauthors.html" rel="documentation"/>
+    <link href="https://journals.berghahnbooks.com/_uploads/focaal/focaal_style_guide_2021NEWMay14.pdf" rel="documentation"/>
     <author>
-      <name>Nicola Maria Fiore</name>
-      <email>ninnofiore@outlook.com</email>
+      <name>Patrick O'Brien</name>
     </author>
-    <contributor>
-      <name>Xuanheng Huang</name>
-      <email>huangxuanheng@gmail.com</email>
-    </contributor>
     <category citation-format="author-date"/>
-    <category field="generic-base"/>
-    <issn>0021-8456</issn>
-    <eissn>1475-679X</eissn>
-    <summary>Journal of Accounting Research (variant of the Chicago style)</summary>
-    <updated>2021-03-11T20:18:08+00:00</updated>
+    <category field="humanities"/>
+    <summary>Style for Focalls based on the author-date variant of the Chicago style</summary>
+    <updated>2021-10-04T08:41:44+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="en">
@@ -57,7 +49,7 @@
             <name and="text" delimiter=", "/>
           </names>
           <names variable="editor translator" delimiter=", ">
-            <label form="verb" suffix=" "/>
+            <label form="verb-short" suffix=" "/>
             <name and="text" delimiter=", "/>
           </names>
         </group>
@@ -92,7 +84,7 @@
   <macro name="contributors">
     <group delimiter=". ">
       <names variable="author">
-        <name font-variant="small-caps" and="text" delimiter-precedes-last="always" name-as-sort-order="first"/>
+        <name and="text" name-as-sort-order="first" sort-separator=", " delimiter=", " delimiter-precedes-last="always"/>
         <label form="short" prefix=", "/>
         <substitute>
           <names variable="editor"/>
@@ -141,28 +133,19 @@
         </else-if>
       </choose>
       <choose>
-        <if type="webpage post-weblog" match="any">
+        <if type="webpage post-weblog post" match="any">
           <date variable="issued" form="text"/>
         </if>
       </choose>
       <choose>
-        <if variable="issued" match="none">
+        <if type="legal_case article-journal" match="none">
           <group delimiter=" ">
-            <text term="accessed" text-case="capitalize-first"/>
-            <date variable="accessed" form="text"/>
+            <text variable="URL"/>
+            <group delimiter=" " prefix="(" suffix=")">
+              <text term="accessed"/>
+              <date variable="accessed" form="text"/>
+            </group>
           </group>
-        </if>
-      </choose>
-      <choose>
-        <if type="legal_case" match="none">
-          <choose>
-            <if variable="DOI">
-              <text variable="DOI" prefix="https://doi.org/"/>
-            </if>
-            <else>
-              <text variable="URL" prefix="Available at "/>
-            </else>
-          </choose>
         </if>
       </choose>
     </group>
@@ -176,7 +159,7 @@
           </if>
         </choose>
       </if>
-      <else-if type="bill book graphic legislation motion_picture song" match="any">
+      <else-if type="bill book graphic legislation motion_picture song report" match="any">
         <text variable="title" text-case="title" font-style="italic"/>
         <group prefix=" (" suffix=")" delimiter=" ">
           <text term="version"/>
@@ -252,6 +235,18 @@
         <choose>
           <if variable="volume">
             <text variable="volume" prefix=" "/>
+            <group prefix=" (" suffix=")">
+              <choose>
+                <if variable="issue">
+                  <text variable="issue"/>
+                </if>
+                <else>
+                  <date variable="issued">
+                    <date-part name="month"/>
+                  </date>
+                </else>
+              </choose>
+            </group>
           </if>
           <else-if variable="issue">
             <group delimiter=" " prefix=", ">
@@ -268,7 +263,6 @@
             </date>
           </else>
         </choose>
-        <date date-parts="year" form="numeric" variable="issued" prefix=" (" suffix=")"/>
       </if>
       <else-if type="legal_case">
         <text variable="volume" prefix=", "/>
@@ -398,10 +392,9 @@
     </choose>
   </macro>
   <macro name="publisher">
-    <group>
-      <text variable="publisher-place" suffix=": "/>
-      <text variable="publisher" suffix=", "/>
-      <date date-parts="year" form="numeric" variable="issued"/>
+    <group delimiter=": ">
+      <text variable="publisher-place"/>
+      <text variable="publisher"/>
     </group>
   </macro>
   <macro name="date">
@@ -409,6 +402,9 @@
       <if variable="issued">
         <group delimiter=" ">
           <date variable="original-date" form="text" date-parts="year" prefix="(" suffix=")"/>
+          <date variable="issued">
+            <date-part name="year"/>
+          </date>
         </group>
       </if>
       <else-if variable="status">
@@ -424,7 +420,7 @@
       <if variable="issued">
         <group delimiter=" ">
           <date variable="original-date" form="text" date-parts="year" prefix="[" suffix="]"/>
-          <date variable="issued" prefix="[" suffix="]">
+          <date variable="issued">
             <date-part name="year"/>
           </date>
         </group>
@@ -567,9 +563,13 @@
       </else>
     </choose>
   </macro>
-  <citation et-al-min="4" et-al-use-first="1" disambiguate-add-year-suffix="true" disambiguate-add-names="true" disambiguate-add-givenname="true" givenname-disambiguation-rule="primary-name" collapse="year" after-collapse-delimiter="; ">
-    <layout delimiter="; ">
-      <group delimiter=", ">
+  <citation et-al-min="3" et-al-use-first="1" disambiguate-add-year-suffix="true" disambiguate-add-names="true" disambiguate-add-givenname="true" givenname-disambiguation-rule="primary-name" collapse="year" after-collapse-delimiter="; ">
+    <sort>
+      <key variable="issued"/>
+      <key macro="contributors"/>
+    </sort>
+    <layout prefix="(" suffix=")" delimiter="; ">
+      <group delimiter=": ">
         <choose>
           <if variable="issued accessed" match="any">
             <group delimiter=" ">
