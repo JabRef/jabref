@@ -39,4 +39,61 @@ class AuthorTest {
         assertEquals("Moore, O. and O. Moore", Author.addDotIfAbbreviation("Moore, O. and O. Moore"));
         assertEquals("Moore, O. and O. Moore and Moore, O. O.", Author.addDotIfAbbreviation("Moore, O. and O. Moore and Moore, O. O."));
     }
+
+    @Test
+    void addDotIfAbbreviationIfNameIsNull() {
+        String nameTest = null;
+        assertEquals(null, Author.addDotIfAbbreviation(nameTest));
+    }
+
+    @Test
+    void addDotIfAbbreviationReturnNameIfEmptyString() {
+        assertEquals("", Author.addDotIfAbbreviation(""));
+    }
+
+    @Test
+    void addDotIfAbbreviationMoreLowerCaseLetters() {
+        assertEquals("asdf", Author.addDotIfAbbreviation("asdf"));
+    }
+
+    @Test
+    void addDotIfAbbreviationOnlyOneCharLowerCase() {
+        assertEquals("a", Author.addDotIfAbbreviation("a"));
+    }
+
+    @Test
+    void addDotIfAbbreviationStartWithUpperCaseAndHyphen() {
+        assertEquals("A.-melia", Author.addDotIfAbbreviation("A-melia"));
+    }
+
+    @Test
+    void addDotIfAbbreviationEndsWithUpperCaseLetter() {
+        assertEquals("AmeliA", Author.addDotIfAbbreviation("AmeliA"));
+    }
+
+    @Test
+    void addDotIfAbbreviationEndsWithUpperCaseLetterSpaced() {
+        assertEquals("Ameli A.", Author.addDotIfAbbreviation("Ameli A"));
+    }
+
+    @Test
+    void addDotIfAbbreviationEndsWithWhiteSpaced() {
+        assertEquals("Ameli", Author.addDotIfAbbreviation("Ameli "));
+    }
+
+    @Test
+    void addDotIfAbbreviationEndsWithDoubleAbbreviation() {
+        assertEquals("Ameli A. A.", Author.addDotIfAbbreviation("Ameli AA"));
+    }
+
+    @Test
+    void addDotIfAbbreviationIfStartsWithNumber() {
+        assertEquals("1", Author.addDotIfAbbreviation("1"));
+    }
+
+    @Test
+    void addDotIfAbbreviationIfStartsWithSpacedNumber() {
+        assertEquals("1 23", Author.addDotIfAbbreviation("1 23"));
+    }
+
 }
