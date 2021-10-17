@@ -8,7 +8,6 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.testutils.category.FetcherTest;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -16,19 +15,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @FetcherTest
 class DoiResolutionTest {
 
-    private DoiResolution finder;
-    private BibEntry entry;
-
-    @BeforeEach
-    void setUp() {
-        finder = new DoiResolution();
-        entry = new BibEntry();
-    }
+    private DoiResolution finder = new DoiResolution();
+    private BibEntry entry = new BibEntry();
 
     @Test
     void linkWithPdfInTitleTag() throws IOException {
         entry.setField(StandardField.DOI, "10.1051/0004-6361/201527330");
-
         assertEquals(
                 Optional.of(new URL("https://www.aanda.org/articles/aa/pdf/2016/01/aa27330-15.pdf")),
                 finder.findFullText(entry)
@@ -54,9 +46,23 @@ class DoiResolutionTest {
     }
 
     @Test
+    void returnAnythingWhenBehindSpringerPayWall() throws IOException {
+        // Springer returns a HTML page instead of an empty page,
+        // even if the user does not have access
+        // We cannot easily handle this case, because other publisher return the wrong media type.
+        entry.setField(StandardField.DOI, "10.1007/978-3-319-62594-2_12");
+        assertEquals(Optional.of(new URL("https://link.springer.com/content/pdf/10.1007%2F978-3-319-62594-2_12.pdf")), finder.findFullText(entry));
+    }
+
+    @Test
+    void notReturnAnythingWhenBehindElsevierPayWall() throws IOException {
+        entry.setField(StandardField.DOI, "10.1016/j.pquantelec.2021.100316");
+        assertEquals(Optional.empty(), finder.findFullText(entry));
+    }
+
+    @Test
     void notFoundByDOI() throws IOException {
         entry.setField(StandardField.DOI, "10.1186/unknown-doi");
-
         assertEquals(Optional.empty(), finder.findFullText(entry));
     }
 
