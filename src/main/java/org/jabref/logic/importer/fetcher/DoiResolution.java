@@ -51,7 +51,7 @@ public class DoiResolution implements FulltextFetcher {
             Connection connection = Jsoup.connect(doiLink);
             // pretend to be a browser (agent & referrer)
             connection.userAgent(URLDownload.USER_AGENT);
-            connection.referrer("http://www.google.com");
+            connection.referrer("https://www.google.com");
             connection.followRedirects(true);
             connection.ignoreHttpErrors(true);
             // some publishers are quite slow (default is 3s)
