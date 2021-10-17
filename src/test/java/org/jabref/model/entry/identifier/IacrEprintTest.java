@@ -19,7 +19,7 @@ public class IacrEprintTest {
 
     @Test
     public void rejectInvalidIacrEprint() {
-        assertThrows(IllegalArgumentException.class,() -> new IacrEprint(" 2021/12"));
+        assertThrows(IllegalArgumentException.class, () -> new IacrEprint("2021/12"));
     }
 
     @Test
@@ -41,7 +41,6 @@ public class IacrEprintTest {
     public void acceptShortenedDomainUrlIacrEprint() {
         assertEquals("2019/001", new IacrEprint("ia.cr/2019/001").getNormalized());
     }
-
 
     @Test
     public void constructValidIacrEprintUrl() {
