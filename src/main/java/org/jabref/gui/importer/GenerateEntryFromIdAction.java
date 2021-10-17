@@ -62,7 +62,7 @@ public class GenerateEntryFromIdAction extends SimpleCommand {
                     return Optional.empty();
                 }
 
-                this.updateMessage(Localization.lang("Searching..."));
+                updateMessage(Localization.lang("Searching..."));
 
                 // later catch more exceptions here and notify user
                 Optional<BibEntry> result = new CompositeIdFetcher(preferencesService.getImportFormatPreferences()).performSearchById(identifier);

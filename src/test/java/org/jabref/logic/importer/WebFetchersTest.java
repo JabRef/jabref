@@ -59,9 +59,6 @@ class WebFetchersTest {
             expected.remove(JstorFetcher.class);
             expected.remove(GoogleScholar.class);
 
-            // Remove CompositeIdFetcher for now
-            expected.remove(CompositeIdFetcher.class);
-
             assertEquals(expected, getClasses(idFetchers));
         }
     }

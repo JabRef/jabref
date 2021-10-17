@@ -12,7 +12,7 @@ import org.jabref.model.entry.BibEntry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class CompositeIdFetcher implements IdBasedFetcher {
+public class CompositeIdFetcher {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CompositeIdFetcher.class);
 
@@ -80,8 +80,7 @@ public class CompositeIdFetcher implements IdBasedFetcher {
 
     }
 
-    @Override
     public String getName() {
-        return null;
+        return "CompositeIdFetcher";
     }
 }
