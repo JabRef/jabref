@@ -3,6 +3,7 @@ package org.jabref.gui.importer;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.DialogPane;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 
 import org.jabref.gui.DialogService;
@@ -21,6 +22,7 @@ public class GenerateEntryFromIdDialog {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GenerateEntryFromIdDialog.class);
 
+    @FXML Label titleLabel;
     @FXML DialogPane dialogPane;
     @FXML TextField idTextField;
     @FXML Button generateButton;
@@ -39,9 +41,10 @@ public class GenerateEntryFromIdDialog {
         this.stateManager = stateManager;
         this.taskExecutor = taskExecutor;
 
+        this.titleLabel.setText(Localization.lang("Import new entry from ID..."));
         this.generateButton.setGraphic(IconTheme.JabRefIcons.IMPORT.getGraphicNode());
 
-        // a good idea would be to make to enter key correspond to the generateButton while the popup is in focus
+        this.generateButton.setDefaultButton(true);
 
     }
 
