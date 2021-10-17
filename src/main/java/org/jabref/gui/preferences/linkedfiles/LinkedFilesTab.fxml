@@ -39,7 +39,7 @@
     <CheckBox fx:id="useBibLocationAsPrimary" text="%Search and store files relative to bib file location">
         <tooltip>
             <Tooltip
-                    text="%When downloading files, or moving linked files to the file directory, use the BIB file location. This takes precedence over all other configured file directories"/>
+                    text="%When downloading files, or moving linked files to the file directory, use the bib file location. This takes precedence over all other configured file directories."/>
         </tooltip>
     </CheckBox>
     <CheckBox fx:id="searchFilesOnOpen" text="%When opening file link, search for matching file if no link is defined"/>
