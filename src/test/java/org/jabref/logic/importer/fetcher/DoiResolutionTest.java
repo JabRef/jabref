@@ -4,19 +4,31 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.Optional;
 
+import org.jabref.logic.preferences.DOIPreferences;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.testutils.category.FetcherTest;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 @FetcherTest
 class DoiResolutionTest {
 
-    private DoiResolution finder = new DoiResolution();
-    private BibEntry entry = new BibEntry();
+    private DoiResolution finder;
+    private BibEntry entry;
+
+    @BeforeEach
+    void setup() {
+        DOIPreferences doiPreferences = mock(DOIPreferences.class);
+        when(doiPreferences.isUseCustom()).thenReturn(false);
+        finder = new DoiResolution(doiPreferences);
+        entry =  new BibEntry();
+    }
 
     @Test
     void linkWithPdfInTitleTag() throws IOException {

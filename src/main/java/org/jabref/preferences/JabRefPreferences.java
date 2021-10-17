@@ -2030,7 +2030,6 @@ public class JabRefPreferences implements PreferencesService {
     // File preferences
     //*************************************************************************************************************
 
-    // ToDo: Can this be disbanded?
     @Override
     public ImportFormatPreferences getImportFormatPreferences() {
         return new ImportFormatPreferences(
@@ -2040,6 +2039,7 @@ public class JabRefPreferences implements PreferencesService {
                 getCitationKeyPatternPreferences(),
                 getFieldContentParserPreferences(),
                 getXmpPreferences(),
+                getDOIPreferences(),
                 getSpecialFieldsPreferences().isKeywordSyncEnabled());
     }
 

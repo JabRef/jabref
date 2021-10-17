@@ -2,6 +2,7 @@ package org.jabref.logic.importer.fetcher;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -12,6 +13,7 @@ import java.util.stream.Collectors;
 
 import org.jabref.logic.importer.FulltextFetcher;
 import org.jabref.logic.net.URLDownload;
+import org.jabref.logic.preferences.DOIPreferences;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
@@ -32,7 +34,14 @@ import org.slf4j.LoggerFactory;
  * See {@link org.jabref.logic.importer.WebFetchers#getFullTextFetchers(org.jabref.logic.importer.ImportFormatPreferences).}
  */
 public class DoiResolution implements FulltextFetcher {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(DoiResolution.class);
+    private DOIPreferences doiPreferences;
+
+    public DoiResolution(DOIPreferences doiPreferences) {
+        super();
+        this.doiPreferences = doiPreferences;
+    }
 
     @Override
     public Optional<URL> findFullText(BibEntry entry) throws IOException {
@@ -40,11 +49,19 @@ public class DoiResolution implements FulltextFetcher {
 
         Optional<DOI> doi = entry.getField(StandardField.DOI).flatMap(DOI::parse);
 
-        if (!doi.isPresent()) {
+        if (doi.isEmpty()) {
             return Optional.empty();
         }
 
-        String doiLink = doi.get().getURIAsASCIIString();
+        String doiLink;
+        if (doiPreferences.isUseCustom()) {
+            doiLink = doi.get()
+                         .getExternalURIWithCustomBase(doiPreferences.getDefaultBaseURI())
+                         .map(URI::toASCIIString)
+                         .orElse("");
+        } else {
+            doiLink = doi.get().getURIAsASCIIString();
+        }
         if (doiLink.isEmpty()) {
             return Optional.empty();
         }
