@@ -17,10 +17,7 @@ public class IacrEprint implements Identifier {
     public static final URI RESOLVER = URI.create("https://ia.cr");
     private static final Logger LOGGER = LoggerFactory.getLogger(Eprint.class);
 
-    private static final String IACR_EPRINT_EXP = "d{4}\\/\\d{3,5}";
-    private static final String HTTP_EXP = "https:\\/\\/";
-    private static final String URL_SHORT_EXP = "ia\\.cr\\/";
-    private static final String URL_EXP = "eprint\\.iacr\\.org\\/";
+    private static final String IACR_EPRINT_EXP = "\\d{4}\\/\\d{3,5}";
     private final String iacrEprint;
 
     IacrEprint(String iacrEprint) {
@@ -30,19 +27,17 @@ public class IacrEprint implements Identifier {
 
         if (matchesExcepted(trimmedId)) {
             Matcher matcher = Pattern.compile(IACR_EPRINT_EXP).matcher(trimmedId);
-            this.iacrEprint = matcher.group(1);
+            matcher.find();
+            this.iacrEprint = matcher.group(0);
         } else {
             throw new IllegalArgumentException(trimmedId + " is not a valid IacrEprint identifier.");
         }
-
     }
 
-    private boolean matchesExcepted(String identifier) {
-        return iacrEprint.matches(IACR_EPRINT_EXP) ||
-            iacrEprint.matches(URL_EXP + IACR_EPRINT_EXP) ||
-            iacrEprint.matches(URL_SHORT_EXP + IACR_EPRINT_EXP) ||
-            iacrEprint.matches(HTTP_EXP + URL_EXP + IACR_EPRINT_EXP) ||
-            iacrEprint.matches(HTTP_EXP + URL_SHORT_EXP + IACR_EPRINT_EXP);
+    private static boolean matchesExcepted(String identifier) {
+        return identifier.matches(
+                "(https\\:\\/\\/)?(ia\\.cr\\/|eprint\\.iacr\\.org\\/)?" + IACR_EPRINT_EXP
+        );
     }
 
     public static Optional<IacrEprint> parse(String identifier) {
@@ -76,4 +71,7 @@ public class IacrEprint implements Identifier {
         }
     }
 
+    public String getAsciiUrl() {
+        return getExternalURI().map(URI::toASCIIString).orElse("");
+    }
 }
