@@ -230,6 +230,8 @@ public class DOI implements Identifier {
      */
     @Override
     public Optional<URI> getExternalURI() {
+        // TODO: We need dependency injection here. It should never happen that this method is called.
+        //       Always, the user preferences should be honored --> #getExternalURIWithCustomBase
         return getExternalURIFromBase(RESOLVER);
     }
 

@@ -27,6 +27,9 @@ import org.slf4j.LoggerFactory;
 
 /**
  * FulltextFetcher implementation that follows the DOI resolution redirects and scans for a full-text PDF URL.
+ *
+ * Note that we also have custom fetchers in place.
+ * See {@link org.jabref.logic.importer.WebFetchers#getFullTextFetchers(org.jabref.logic.importer.ImportFormatPreferences).}
  */
 public class DoiResolution implements FulltextFetcher {
     private static final Logger LOGGER = LoggerFactory.getLogger(DoiResolution.class);
