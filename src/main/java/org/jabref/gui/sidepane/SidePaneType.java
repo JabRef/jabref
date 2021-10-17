@@ -1,4 +1,4 @@
-package org.jabref.gui;
+package org.jabref.gui.sidepane;
 
 /**
  * Definition of all possible components in the side pane.

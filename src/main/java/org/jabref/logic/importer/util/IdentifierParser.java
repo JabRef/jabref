@@ -5,8 +5,8 @@ import java.util.function.Function;
 
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.identifier.ArXivIdentifier;
 import org.jabref.model.entry.identifier.DOI;
-import org.jabref.model.entry.identifier.Eprint;
 import org.jabref.model.entry.identifier.ISBN;
 import org.jabref.model.entry.identifier.Identifier;
 import org.jabref.model.entry.identifier.MathSciNetId;
@@ -28,7 +28,7 @@ public class IdentifierParser {
         } else if (StandardField.ISBN.equals(field)) {
             return ISBN::parse;
         } else if (StandardField.EPRINT.equals(field)) {
-            return Eprint::build;
+            return ArXivIdentifier::parse;
         } else if (StandardField.MR_NUMBER.equals(field)) {
             return MathSciNetId::parse;
         }

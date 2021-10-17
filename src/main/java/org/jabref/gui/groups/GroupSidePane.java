@@ -8,13 +8,13 @@ import javafx.scene.control.Button;
 import javafx.scene.layout.Priority;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.SidePaneComponent;
-import org.jabref.gui.SidePaneManager;
-import org.jabref.gui.SidePaneType;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.Action;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.sidepane.SidePane;
+import org.jabref.gui.sidepane.SidePaneComponent;
+import org.jabref.gui.sidepane.SidePaneType;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.preferences.PreferencesService;
@@ -30,8 +30,8 @@ public class GroupSidePane extends SidePaneComponent {
     private final StateManager stateManager;
     private final Button intersectionUnionToggle = IconTheme.JabRefIcons.GROUP_INTERSECTION.asButton();
 
-    public GroupSidePane(SidePaneManager manager, TaskExecutor taskExecutor, StateManager stateManager, PreferencesService preferences, DialogService dialogService) {
-        super(manager, IconTheme.JabRefIcons.TOGGLE_GROUPS, Localization.lang("Groups"));
+    public GroupSidePane(SidePane sidePane, TaskExecutor taskExecutor, StateManager stateManager, PreferencesService preferences, DialogService dialogService) {
+        super(sidePane, IconTheme.JabRefIcons.TOGGLE_GROUPS, Localization.lang("Groups"));
         this.preferences = preferences;
         this.taskExecutor = taskExecutor;
         this.stateManager = stateManager;
@@ -51,12 +51,12 @@ public class GroupSidePane extends SidePaneComponent {
 
     @Override
     public void beforeClosing() {
-        preferences.storeSidePanePreferences(preferences.getSidePanePreferences().withGroupsPaneVisible(false));
+        preferences.getSidePanePreferences().visiblePanes().remove(SidePaneType.GROUPS);
     }
 
     @Override
     public void afterOpening() {
-        preferences.storeSidePanePreferences(preferences.getSidePanePreferences().withGroupsPaneVisible(true));
+        preferences.getSidePanePreferences().visiblePanes().add(SidePaneType.GROUPS);
         setGraphicsAndTooltipForButton(preferences.getGroupViewMode());
     }
 
