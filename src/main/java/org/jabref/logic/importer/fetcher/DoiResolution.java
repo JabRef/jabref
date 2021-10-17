@@ -48,23 +48,22 @@ public class DoiResolution implements FulltextFetcher {
 
         // follow all redirects and scan for a single pdf link
         try {
-            Connection session = Jsoup.newSession()
-                                      // some publishers are quite slow (default is 3s)
-                                      .timeout(10000)
-                                      .followRedirects(true)
-                                      .ignoreHttpErrors(true)
-                                      .referrer("https://www.google.com")
-                                      .userAgent(URLDownload.USER_AGENT);
+            Connection connection = Jsoup.connect(doiLink);
+            // pretend to be a browser (agent & referrer)
+            connection.userAgent(URLDownload.USER_AGENT);
+            connection.referrer("https://www.google.com");
+            connection.followRedirects(true);
+            connection.ignoreHttpErrors(true);
+            // some publishers are quite slow (default is 3s)
+            connection.timeout(10000);
 
-            Connection connection = session.newRequest().url(doiLink);
             Connection.Response response = connection.execute();
 
             Document html = response.parse();
-
             // citation pdf meta tag
             Optional<URL> citationMetaTag = citationMetaTag(html);
             if (citationMetaTag.isPresent()) {
-                return checkPdfPresense(citationMetaTag.get(), session);
+                return citationMetaTag;
             }
 
             // scan for PDF
@@ -90,18 +89,10 @@ public class DoiResolution implements FulltextFetcher {
             // return if only one link was found (high accuracy)
             if (links.size() == 1) {
                 LOGGER.info("Fulltext PDF found @ {}", doiLink);
-                return checkPdfPresense(links.get(0), session);
+                return Optional.of(links.get(0));
             }
-
-            // return only if one distinct link was found
-            Optional<URL> distinctLink = findDistinctLinks(links);
-            if (distinctLink.isEmpty()) {
-                return Optional.empty();
-            }
-
-            LOGGER.debug("Fulltext PDF link @ {}", distinctLink.get());
-            return checkPdfPresense(distinctLink.get(), session);
-
+            // return if links are equal
+            return findDistinctLinks(links);
         } catch (UnsupportedMimeTypeException type) {
             // this might be the PDF already as we follow redirects
             if (type.getMimeType().startsWith("application/pdf")) {
@@ -113,27 +104,6 @@ public class DoiResolution implements FulltextFetcher {
         }
 
         return Optional.empty();
-    }
-
-    /**
-     * Uses the given connection to check whether there really is a PDF behind the given link
-     *
-     * @return Optional.empty() if there is no PDF found (but HTML)
-     */
-    private Optional<URL> checkPdfPresense(URL url, Connection session) throws IOException {
-        // Wiley returns wrong content type
-        if (url.toExternalForm().contains("pdf")) {
-            // ... too much hacky ...
-        }
-        Connection pdfConnection = session.newRequest().url(url);
-        pdfConnection.method(Connection.Method.HEAD);
-        Connection.Response pdfResponse = pdfConnection.execute();
-        String contentType = pdfResponse.header("Content-Type");
-        if (contentType.startsWith("text/html")) {
-            return Optional.empty();
-        } else {
-            return Optional.of(url);
-        }
     }
 
     /**
