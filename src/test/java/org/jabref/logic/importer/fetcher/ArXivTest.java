@@ -223,7 +223,7 @@ class ArXivTest implements SearchBasedFetcherCapabilityTest, PagedSearchFetcherT
 
     @Test
     void searchWithMalformedIdThrowsException() throws Exception {
-        assertThrows(FetcherException.class, () -> fetcher.performSearchById("123412345"));
+        assertEquals(Optional.empty(), fetcher.performSearchById("123412345"));
     }
 
     @Test
