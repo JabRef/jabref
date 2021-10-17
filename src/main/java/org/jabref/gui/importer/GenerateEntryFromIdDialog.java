@@ -15,12 +15,8 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class GenerateEntryFromIdDialog {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(GenerateEntryFromIdDialog.class);
 
     @FXML Label titleLabel;
     @FXML DialogPane dialogPane;
@@ -43,9 +39,7 @@ public class GenerateEntryFromIdDialog {
 
         this.titleLabel.setText(Localization.lang("Import new entry from ID..."));
         this.generateButton.setGraphic(IconTheme.JabRefIcons.IMPORT.getGraphicNode());
-
         this.generateButton.setDefaultButton(true);
-
     }
 
     @FXML private void generateEntry() {
@@ -54,7 +48,6 @@ public class GenerateEntryFromIdDialog {
             return;
         }
 
-        // auto shift focus back to textfield for workflow
         this.idTextField.requestFocus();
 
         GenerateEntryFromIdAction generateEntryFromIdAction = new GenerateEntryFromIdAction(

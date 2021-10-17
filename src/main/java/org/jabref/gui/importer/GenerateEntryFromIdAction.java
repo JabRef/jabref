@@ -63,11 +63,8 @@ public class GenerateEntryFromIdAction extends SimpleCommand {
                 }
 
                 updateMessage(Localization.lang("Searching..."));
-
-                // later catch more exceptions here and notify user
                 Optional<BibEntry> result = new CompositeIdFetcher(preferencesService.getImportFormatPreferences()).performSearchById(identifier);
                 LOGGER.debug("Resulted in " + result);
-
                 if (result.isPresent()) {
                     final BibEntry entry = result.get();
                     ImportCleanup cleanup = new ImportCleanup(libraryTab.getBibDatabaseContext().getMode());
@@ -91,8 +88,6 @@ public class GenerateEntryFromIdAction extends SimpleCommand {
                     }
                 } else {
                     updateMessage(Localization.lang("Error"));
-                    // There could be more exact feedback if the CompositeIdFetcher.java / future IdFetcherManager
-                    // had a better structure or there would be individual exceptions for fetchers.
                     throw new JabRefException("Invalid identifier or connection failure.");
                 }
                 updateMessage(Localization.lang("Imported one entry"));
