@@ -110,9 +110,6 @@ public class ZbMATH implements SearchBasedParserFetcher, IdBasedParserFetcher, E
         uriBuilder.addParameter("q", new ZbMathQueryTransformer().transformLuceneQuery(luceneQuery).orElse("")); // search all fields
         uriBuilder.addParameter("start", "0"); // start index
         uriBuilder.addParameter("count", "200"); // should return up to 200 items (instead of default 100)
-
-        URLDownload.bypassSSLVerification();
-
         return uriBuilder.build().toURL();
     }
 
@@ -123,9 +120,6 @@ public class ZbMATH implements SearchBasedParserFetcher, IdBasedParserFetcher, E
         uriBuilder.addParameter("q", query);
         uriBuilder.addParameter("start", "0"); // start index
         uriBuilder.addParameter("count", "1"); // return exactly one item
-
-        URLDownload.bypassSSLVerification();
-
         return uriBuilder.build().toURL();
     }
 
