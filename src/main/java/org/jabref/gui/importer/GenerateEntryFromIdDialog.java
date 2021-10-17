@@ -10,6 +10,7 @@ import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.util.TaskExecutor;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
@@ -46,7 +47,7 @@ public class GenerateEntryFromIdDialog {
 
     @FXML private void generateEntry() {
         if (idTextField.getText().isEmpty()) {
-            dialogService.notify("Enter an valid identifier...");
+            dialogService.notify(Localization.lang("Enter a valid ID"));
             return;
         }
 
