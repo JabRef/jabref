@@ -7,7 +7,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class IacrEprintTest {
 
-
     @Test
     public void acceptPlainIacrEprint() {
         assertEquals("2019/001", new IacrEprint("2019/001").getNormalized());
