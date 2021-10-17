@@ -67,12 +67,6 @@ class DoiResolutionTest {
     }
 
     @Test
-    void notReturnAnythingWhenBehindElsevierPayWall() throws IOException {
-        entry.setField(StandardField.DOI, "10.1016/j.pquantelec.2021.100316");
-        assertEquals(Optional.empty(), finder.findFullText(entry));
-    }
-
-    @Test
     void notFoundByDOI() throws IOException {
         entry.setField(StandardField.DOI, "10.1186/unknown-doi");
         assertEquals(Optional.empty(), finder.findFullText(entry));
