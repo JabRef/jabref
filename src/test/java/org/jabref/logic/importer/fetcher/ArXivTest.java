@@ -6,7 +6,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.PagedSearchBasedFetcher;
 import org.jabref.logic.importer.SearchBasedFetcher;
@@ -223,7 +222,7 @@ class ArXivTest implements SearchBasedFetcherCapabilityTest, PagedSearchFetcherT
 
     @Test
     void searchWithMalformedIdThrowsException() throws Exception {
-        assertThrows(FetcherException.class, () -> fetcher.performSearchById("123412345"));
+        assertEquals(Optional.empty(), fetcher.performSearchById("123412345"));
     }
 
     @Test
