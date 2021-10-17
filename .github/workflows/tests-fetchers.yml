@@ -20,6 +20,7 @@ on:
   schedule:
     # run on each Wednesday
     - cron: '2 3 * * 3'
+  workflow_dispatch:
 
 env:
   SpringerNatureAPIKey: ${{ secrets.SPRINGERNATUREAPIKEY_FOR_TESTS }}
