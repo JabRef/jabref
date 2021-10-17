@@ -18,7 +18,6 @@ import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.SearchBasedParserFetcher;
 import org.jabref.logic.importer.fetcher.transformers.ZbMathQueryTransformer;
 import org.jabref.logic.importer.fileformat.BibtexParser;
-import org.jabref.logic.net.URLDownload;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
