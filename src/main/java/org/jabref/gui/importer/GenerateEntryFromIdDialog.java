@@ -37,7 +37,6 @@ public class GenerateEntryFromIdDialog {
         this.stateManager = stateManager;
         this.taskExecutor = taskExecutor;
 
-        this.titleLabel.setText(Localization.lang("Import new entry from ID..."));
         this.generateButton.setGraphic(IconTheme.JabRefIcons.IMPORT.getGraphicNode());
         this.generateButton.setDefaultButton(true);
     }

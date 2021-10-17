@@ -11,7 +11,7 @@
        <Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="102.0" prefWidth="360.0">
            <TextField fx:id="idTextField" layoutX="14.0" layoutY="40.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="29.0" prefWidth="287.0" />
            <Button fx:id="generateButton" layoutX="314.0" layoutY="40.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#generateEntry" prefHeight="30.0" prefWidth="55.0" textAlignment="CENTER" />
-           <Label layoutX="14.0" layoutY="14.0" prefHeight="16.0" prefWidth="328.0"/>
+           <Label layoutX="14.0" layoutY="14.0" prefHeight="16.0" prefWidth="328.0" text="Import new Entry from ID..."/>
        </Pane>
    </content>
 </DialogPane>
