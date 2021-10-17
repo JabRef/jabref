@@ -3,6 +3,7 @@ package org.jabref.logic.importer.fetcher;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -53,13 +54,17 @@ public class DoiResolution implements FulltextFetcher {
             return Optional.empty();
         }
 
+        URL base;
+
         String doiLink;
         if (doiPreferences.isUseCustom()) {
+            base = new URL(doiPreferences.getDefaultBaseURI());
             doiLink = doi.get()
-                         .getExternalURIWithCustomBase(doiPreferences.getDefaultBaseURI())
+                         .getExternalURIWithCustomBase(base.toString())
                          .map(URI::toASCIIString)
                          .orElse("");
         } else {
+            base = DOI.RESOLVER.toURL();
             doiLink = doi.get().getURIAsASCIIString();
         }
         if (doiLink.isEmpty()) {
@@ -84,6 +89,10 @@ public class DoiResolution implements FulltextFetcher {
             Optional<URL> citationMetaTag = citationMetaTag(html);
             if (citationMetaTag.isPresent()) {
                 return citationMetaTag;
+            }
+            Optional<URL> embeddedLink = findEmbeddedLink(html, base);
+            if (embeddedLink.isPresent()) {
+                return embeddedLink;
             }
 
             // scan for PDF
@@ -138,6 +147,23 @@ public class DoiResolution implements FulltextFetcher {
             try {
                 return Optional.of(new URL(citationPdfUrl.get()));
             } catch (MalformedURLException e) {
+                return Optional.empty();
+            }
+        }
+        return Optional.empty();
+    }
+
+    private Optional<URL> findEmbeddedLink(Document html, URL base) {
+        Elements embedElement = html.body().select("embed[id='pdf']");
+        Optional<String> pdfUrl = embedElement
+                .stream()
+                .map(e -> e.attr("src")).findFirst();
+
+        if (pdfUrl.isPresent()) {
+            try {
+                URL url = base.toURI().resolve(pdfUrl.get()).toURL();
+                return Optional.of(url);
+            } catch (MalformedURLException | URISyntaxException e) {
                 return Optional.empty();
             }
         }

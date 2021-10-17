@@ -23,7 +23,7 @@ public class DOI implements Identifier {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DOI.class);
 
-    private static final URI RESOLVER = URI.create("https://doi.org/");
+    public static final URI RESOLVER = URI.create("https://doi.org/");
 
     // Regex
     // (see http://www.doi.org/doi_handbook/2_Numbering.html)
