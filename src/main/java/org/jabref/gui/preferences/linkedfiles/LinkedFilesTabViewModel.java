@@ -78,8 +78,6 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
         // External files preferences / Attached files preferences / File preferences
         mainFileDirectoryProperty.setValue(initialFilePreferences.getFileDirectory().orElse(Path.of("")).toString());
         useBibLocationAsPrimaryProperty.setValue(initialFilePreferences.shouldStoreFilesRelativeToBib());
-        searchFilesOnOpenProperty.setValue(initialFilePreferences.shouldSearchFilesOnOpen());
-        openBrowseOnCreateProperty.setValue(initialFilePreferences.shouldOpenBrowseOnCreate());
         fileNamePatternProperty.setValue(initialFilePreferences.getFileNamePattern());
         fileDirectoryPatternProperty.setValue(initialFilePreferences.getFileDirectoryPattern());
 
@@ -102,9 +100,7 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
                 useBibLocationAsPrimaryProperty.getValue(),
                 fileNamePatternProperty.getValue(),
                 fileDirectoryPatternProperty.getValue(),
-                initialFilePreferences.shouldDownloadLinkedFiles(), // set in ImportEntriesViewModel
-                searchFilesOnOpenProperty.getValue(),
-                openBrowseOnCreateProperty.getValue()));
+                initialFilePreferences.shouldDownloadLinkedFiles())); // set in ImportEntriesViewModel
 
         // Autolink preferences
         AutoLinkPreferences.CitationKeyDependency citationKeyDependency = AutoLinkPreferences.CitationKeyDependency.START;
