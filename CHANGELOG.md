@@ -52,7 +52,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 
 ### Removed
 
-
+- We removed two orphaned preferences options [#8164](https://github.com/JabRef/jabref/pull/8164)
 
 
 

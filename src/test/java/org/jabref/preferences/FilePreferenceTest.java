@@ -19,14 +19,15 @@ public class FilePreferenceTest {
     private final String testFileNamePattern = "test";
     private final String testFileDirPattern = "test";
     private final boolean shouldDownloadLinkedFiles = false;
-    private final boolean shouldSearchFilesOnOpen = false;
-    private final boolean shouldOpenBrowseOnCreate = false;
 
     @BeforeEach
     public void setup() {
-        filePreferences = new FilePreferences(testUser, testMainFileDirectory, shouldStoreFilesRelativeToBibFile,
-                testFileNamePattern, testFileDirPattern, shouldDownloadLinkedFiles, shouldSearchFilesOnOpen,
-                shouldOpenBrowseOnCreate);
+        filePreferences = new FilePreferences(testUser,
+                testMainFileDirectory,
+                shouldStoreFilesRelativeToBibFile,
+                testFileNamePattern,
+                testFileDirPattern,
+                shouldDownloadLinkedFiles);
     }
 
     @Test
@@ -41,9 +42,12 @@ public class FilePreferenceTest {
 
     @Test
     public void getFileDirectoryEmptyTest() {
-        filePreferences = new FilePreferences(testUser, "", shouldStoreFilesRelativeToBibFile,
-                testFileNamePattern, testFileDirPattern, shouldDownloadLinkedFiles, shouldSearchFilesOnOpen,
-                shouldOpenBrowseOnCreate);
+        filePreferences = new FilePreferences(testUser,
+                "",
+                shouldStoreFilesRelativeToBibFile,
+                testFileNamePattern,
+                testFileDirPattern,
+                shouldDownloadLinkedFiles);
 
         assertEquals(Optional.empty(), filePreferences.getFileDirectory());
     }
@@ -71,21 +75,14 @@ public class FilePreferenceTest {
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
     public void withShouldDownloadLinkedFilesTest(boolean newShouldDownloadLinkedFiles) {
-        FilePreferences expected = new FilePreferences(testUser, testMainFileDirectory, shouldStoreFilesRelativeToBibFile,
-                testFileNamePattern, testFileDirPattern, newShouldDownloadLinkedFiles, shouldSearchFilesOnOpen,
-                shouldOpenBrowseOnCreate);
+        FilePreferences expected = new FilePreferences(testUser,
+                testMainFileDirectory,
+                shouldStoreFilesRelativeToBibFile,
+                testFileNamePattern,
+                testFileDirPattern,
+                newShouldDownloadLinkedFiles);
 
         assertEquals(expected.shouldDownloadLinkedFiles(),
                 filePreferences.withShouldDownloadLinkedFiles(newShouldDownloadLinkedFiles).shouldDownloadLinkedFiles());
-    }
-
-    @Test
-    public void shouldSearchFilesOnOpenTest() {
-        assertEquals(shouldSearchFilesOnOpen, filePreferences.shouldSearchFilesOnOpen());
-    }
-
-    @Test
-    public void shouldOpenBrowseOnCreateTest() {
-        assertEquals(shouldOpenBrowseOnCreate, filePreferences.shouldOpenBrowseOnCreate());
     }
 }
