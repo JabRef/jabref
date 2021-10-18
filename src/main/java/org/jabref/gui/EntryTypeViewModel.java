@@ -113,16 +113,14 @@ public class EntryTypeViewModel {
 
         @Override
         protected Optional<BibEntry> call() throws InterruptedException, FetcherException {
-            Optional<BibEntry> bibEntry = Optional.empty();
-
             searchingProperty().setValue(true);
             storeSelectedFetcher();
             fetcher = selectedItemProperty().getValue();
             searchID = idText.getValue();
-            if (!searchID.isEmpty()) {
-                bibEntry = fetcher.performSearchById(searchID);
+            if (searchID.isEmpty()) {
+                return Optional.empty();
             }
-            return bibEntry;
+            return fetcher.performSearchById(searchID);
         }
     }
 

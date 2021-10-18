@@ -141,8 +141,8 @@ public class JabRefMain extends Application {
         // Initialize protected terms loader
         Globals.protectedTermsLoader = new ProtectedTermsLoader(preferences.getProtectedTermsPreferences());
 
-        // Override used newline character with the one stored in the preferences
-        // The preferences return the system newline character sequence as default
+        // Override used newline character with the one stored in the preferences.
+        // The preferences return the system newline character sequence as default.
         OS.NEWLINE = preferences.getNewLineSeparator().toString();
     }
 
