@@ -33,8 +33,6 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty autolinkFileExactBibtexProperty = new SimpleBooleanProperty();
     private final BooleanProperty autolinkUseRegexProperty = new SimpleBooleanProperty();
     private final StringProperty autolinkRegexKeyProperty = new SimpleStringProperty("");
-    private final BooleanProperty searchFilesOnOpenProperty = new SimpleBooleanProperty();
-    private final BooleanProperty openBrowseOnCreateProperty = new SimpleBooleanProperty();
     private final ListProperty<String> defaultFileNamePatternsProperty =
             new SimpleListProperty<>(FXCollections.observableArrayList(FilePreferences.DEFAULT_FILENAME_PATTERNS));
     private final StringProperty fileNamePatternProperty = new SimpleStringProperty();
@@ -161,14 +159,6 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
 
     public StringProperty autolinkRegexKeyProperty() {
         return autolinkRegexKeyProperty;
-    }
-
-    public BooleanProperty searchFilesOnOpenProperty() {
-        return searchFilesOnOpenProperty;
-    }
-
-    public BooleanProperty openBrowseOnCreateProperty() {
-        return openBrowseOnCreateProperty;
     }
 
     public ListProperty<String> defaultFileNamePatternsProperty() {
