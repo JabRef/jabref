@@ -66,7 +66,6 @@ public class JabRefGUI {
     }
 
     private void openWindow(Stage mainStage) {
-
         LOGGER.debug("Initializing frame");
         mainFrame.init();
 
