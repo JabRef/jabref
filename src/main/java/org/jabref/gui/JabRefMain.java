@@ -21,6 +21,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.ProxyAuthenticator;
 import org.jabref.logic.net.ProxyPreferences;
 import org.jabref.logic.net.ProxyRegisterer;
+import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.remote.client.RemoteClient;
@@ -51,6 +52,7 @@ public class JabRefMain extends Application {
 
     @Override
     public void start(Stage mainStage) {
+        URLDownload.bypassSSLVerification();
         try {
             FallbackExceptionHandler.installExceptionHandler();
 

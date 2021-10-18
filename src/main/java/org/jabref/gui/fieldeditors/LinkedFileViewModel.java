@@ -481,7 +481,6 @@ public class LinkedFileViewModel extends AbstractViewModel {
                 if (dialogService.showConfirmationDialogAndWait(Localization.lang("Download file"),
                         Localization.lang("Unable to find valid certification path to requested target(%0), download anyway?",
                                 urlDownload.getSource().toString()))) {
-                    URLDownload.bypassSSLVerification();
                     return true;
                 } else {
                     dialogService.notify(Localization.lang("Download operation canceled."));
