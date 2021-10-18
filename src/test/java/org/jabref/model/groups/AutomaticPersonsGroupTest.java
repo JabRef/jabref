@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.junit.jupiter.api.Assertions.*;
 
 class AutomaticPersonsGroupTest {
     private static GroupTreeNode[] createPersonSubGroupFrom(String... lastNames) {
@@ -52,5 +53,23 @@ class AutomaticPersonsGroupTest {
         var subgroup = new AutomaticPersonsGroup("", GroupHierarchyType.INDEPENDENT, StandardField.AUTHOR).createSubgroups(bibEntry);
         var expectedSubgroup = createPersonSubGroupFrom("Gödel");
         assertThat(subgroup, contains(expectedSubgroup));
+    }
+
+    @Test
+    void testEqualsConditions() {
+        BibEntry bibEntry = new BibEntry().withField(StandardField.AUTHOR, "Kurt Gödel");
+        var subgroup = new AutomaticPersonsGroup("", GroupHierarchyType.INDEPENDENT, StandardField.AUTHOR).createSubgroups(bibEntry);
+        var sameSubGroup = new AutomaticPersonsGroup("", GroupHierarchyType.INDEPENDENT, StandardField.AUTHOR).createSubgroups(bibEntry);
+        var sameFieldsOfSubGroup = new AutomaticPersonsGroup("Test", GroupHierarchyType.REFINING, StandardField.AUTHOR).createSubgroups(bibEntry);
+
+        boolean isEqualToNull = subgroup.equals(null);
+        boolean isEqualWithAnotherClassObject = subgroup.equals("test");
+        boolean isEqualWithMatchObject = subgroup.equals(sameSubGroup);
+        boolean isEqualWithMatchFields = subgroup.equals(sameFieldsOfSubGroup);
+
+        assertFalse(isEqualToNull);
+        assertFalse(isEqualWithAnotherClassObject);
+        assertTrue(isEqualWithMatchObject);
+        assertTrue(isEqualWithMatchFields);
     }
 }
