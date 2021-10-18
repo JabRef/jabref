@@ -131,7 +131,7 @@ dependencies {
     implementation 'commons-cli:commons-cli:1.4'
 
     implementation 'org.libreoffice:libreoffice:7.2.1'
-    implementation 'org.libreoffice:unoloader:7.2.0'
+    implementation 'org.libreoffice:unoloader:7.2.2'
 
     implementation 'io.github.java-diff-utils:java-diff-utils:4.11'
     implementation 'info.debatty:java-string-similarity:2.0.0'
@@ -156,7 +156,7 @@ dependencies {
         exclude module: 'oraclepki'
     }
 
-    implementation ('com.google.guava:guava:31.0-jre') {
+    implementation ('com.google.guava:guava:31.0.1-jre') {
         // TODO: Remove this as soon as https://github.com/google/guava/issues/2960 is fixed
         exclude module: "jsr305"
     }
@@ -207,14 +207,14 @@ dependencies {
 
     implementation group: 'net.harawata', name: 'appdirs', version: '1.2.1'
 
-    testImplementation 'io.github.classgraph:classgraph:4.8.121'
+    testImplementation 'io.github.classgraph:classgraph:4.8.126'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.8.1'
     testImplementation 'org.junit.platform:junit-platform-launcher:1.8.1'
 
     testImplementation 'net.bytebuddy:byte-buddy-parent:1.11.18'
     testRuntimeOnly group: 'org.apache.logging.log4j', name: 'log4j-core', version: '3.0.0-SNAPSHOT'
     testRuntimeOnly group: 'org.apache.logging.log4j', name: 'log4j-jul', version: '3.0.0-SNAPSHOT'
-    testImplementation 'org.mockito:mockito-core:3.12.4'
+    testImplementation 'org.mockito:mockito-core:4.0.0'
     testImplementation 'org.xmlunit:xmlunit-core:2.8.2'
     testImplementation 'org.xmlunit:xmlunit-matchers:2.8.2'
     testRuntimeOnly 'com.tngtech.archunit:archunit-junit5-engine:0.21.0'
