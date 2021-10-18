@@ -429,6 +429,7 @@ public class JabRefPreferences implements PreferencesService {
     private ProtectedTermsPreferences protectedTermsPreferences;
     private MrDlibPreferences mrDlibPreferences;
     private EntryEditorPreferences entryEditorPreferences;
+    private FilePreferences filePreferences;
 
     // The constructor is made private to enforce this as a singleton class:
     private JabRefPreferences() {
@@ -2179,22 +2180,26 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public FilePreferences getFilePreferences() {
-        return new FilePreferences(
+        if (Objects.nonNull(filePreferences)) {
+            return filePreferences;
+        }
+
+        filePreferences = new FilePreferences(
                 getUser(),
                 get(MAIN_FILE_DIRECTORY),
                 getBoolean(STORE_RELATIVE_TO_BIB),
                 get(IMPORT_FILENAMEPATTERN),
                 get(IMPORT_FILEDIRPATTERN),
-                getBoolean(DOWNLOAD_LINKED_FILES));
-    }
+                getBoolean(DOWNLOAD_LINKED_FILES)
+        );
 
-    @Override
-    public void storeFilePreferences(FilePreferences preferences) {
-        put(MAIN_FILE_DIRECTORY, preferences.getFileDirectory().map(Path::toString).orElse(""));
-        putBoolean(STORE_RELATIVE_TO_BIB, preferences.shouldStoreFilesRelativeToBib());
-        put(IMPORT_FILENAMEPATTERN, preferences.getFileNamePattern());
-        put(IMPORT_FILEDIRPATTERN, preferences.getFileDirectoryPattern());
-        putBoolean(DOWNLOAD_LINKED_FILES, preferences.shouldDownloadLinkedFiles());
+        EasyBind.subscribe(filePreferences.mainFileDirectoryProperty(), newValue -> put(MAIN_FILE_DIRECTORY, filePreferences.getFileDirectory().map(Path::toString).orElse("")));
+        EasyBind.subscribe(filePreferences.storeFilesRelativeToBibFileProperty(), newValue -> putBoolean(STORE_RELATIVE_TO_BIB, newValue));
+        EasyBind.subscribe(filePreferences.fileNamePatternProperty(), newValue -> put(IMPORT_FILENAMEPATTERN, newValue));
+        EasyBind.subscribe(filePreferences.fileDirectoryPatternProperty(), newValue -> put(IMPORT_FILEDIRPATTERN, newValue));
+        EasyBind.subscribe(filePreferences.downloadLinkedFilesProperty(), newValue -> putBoolean(DOWNLOAD_LINKED_FILES, newValue));
+
+        return filePreferences;
     }
 
     @Override
