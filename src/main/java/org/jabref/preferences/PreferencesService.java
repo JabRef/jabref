@@ -305,8 +305,6 @@ public interface PreferencesService {
 
     GuiPreferences getGuiPreferences();
 
-    void storeGuiPreferences(GuiPreferences guiPreferences);
-
     void clearEditedFiles();
 
     Path getWorkingDir();

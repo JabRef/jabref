@@ -429,6 +429,7 @@ public class JabRefPreferences implements PreferencesService {
     private ProtectedTermsPreferences protectedTermsPreferences;
     private MrDlibPreferences mrDlibPreferences;
     private EntryEditorPreferences entryEditorPreferences;
+    private GuiPreferences guiPreferences;
 
     // The constructor is made private to enforce this as a singleton class:
     private JabRefPreferences() {
@@ -2524,7 +2525,11 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public GuiPreferences getGuiPreferences() {
-        return new GuiPreferences(
+        if (Objects.nonNull(guiPreferences)) {
+            return guiPreferences;
+        }
+
+        guiPreferences = new GuiPreferences(
                 getDouble(POS_X),
                 getDouble(POS_Y),
                 getDouble(SIZE_X),
@@ -2534,24 +2539,25 @@ public class JabRefPreferences implements PreferencesService {
                 getStringList(LAST_EDITED),
                 Path.of(get(LAST_FOCUSED)),
                 getDouble(SIDE_PANE_WIDTH));
-    }
 
-    @Override
-    public void storeGuiPreferences(GuiPreferences preferences) {
-        putDouble(POS_X, preferences.getPositionX());
-        putDouble(POS_Y, preferences.getPositionY());
-        putDouble(SIZE_X, preferences.getSizeX());
-        putDouble(SIZE_Y, preferences.getSizeY());
-        putBoolean(WINDOW_MAXIMISED, preferences.isWindowMaximised());
-        putBoolean(OPEN_LAST_EDITED, preferences.shouldOpenLastEdited());
-        putStringList(LAST_EDITED, preferences.getLastFilesOpened());
+        EasyBind.listen(guiPreferences.positionXProperty(), (obs, oldValue, newValue) -> putDouble(POS_X, newValue.doubleValue()));
+        EasyBind.listen(guiPreferences.positionYProperty(), (obs, oldValue, newValue) -> putDouble(POS_Y, newValue.doubleValue()));
+        EasyBind.listen(guiPreferences.sizeXProperty(), (obs, oldValue, newValue) -> putDouble(SIZE_X, newValue.doubleValue()));
+        EasyBind.listen(guiPreferences.sizeYProperty(), (obs, oldValue, newValue) -> putDouble(SIZE_Y, newValue.doubleValue()));
+        EasyBind.listen(guiPreferences.windowMaximisedProperty(), (obs, oldValue, newValue) -> putBoolean(WINDOW_MAXIMISED, newValue));
+        EasyBind.listen(guiPreferences.openLastEditedProperty(), (obs, oldValue, newValue) -> putBoolean(OPEN_LAST_EDITED, newValue));
+        guiPreferences.getLastFilesOpened().addListener((InvalidationListener) change ->
+                putStringList(LAST_EDITED, guiPreferences.getLastFilesOpened()));
+        EasyBind.listen(guiPreferences.lastFocusedFileProperty(), (obs, oldValue, newValue) -> {
+            if (newValue != null) {
+                put(LAST_FOCUSED, newValue.toAbsolutePath().toString());
+            } else {
+                remove(LAST_EDITED);
+            }
+        });
+        EasyBind.listen(guiPreferences.sidePaneWidthProperty(), (obs, oldValue, newValue) -> putDouble(SIDE_PANE_WIDTH, newValue.doubleValue()));
 
-        if (preferences.getLastFocusedFile() != null) {
-            String filePath = preferences.getLastFocusedFile().toAbsolutePath().toString();
-            put(LAST_FOCUSED, filePath);
-        }
-
-        putDouble(SIDE_PANE_WIDTH, preferences.getSidePaneWidth());
+        return guiPreferences;
     }
 
     @Override

@@ -352,9 +352,8 @@ public class JabRefFrame extends BorderPane {
                 Path focusedDatabase = getCurrentLibraryTab().getBibDatabaseContext()
                                                              .getDatabasePath()
                                                              .orElse(null);
-                prefs.storeGuiPreferences(prefs.getGuiPreferences()
-                                               .withLastFilesOpened(filenames)
-                                               .withLastFocusedFile(focusedDatabase));
+                prefs.getGuiPreferences().setLastFilesOpened(filenames);
+                prefs.getGuiPreferences().setLastFocusedFile(focusedDatabase);
             }
         }
 
@@ -462,8 +461,7 @@ public class JabRefFrame extends BorderPane {
         splitPane.setDividerPositions(prefs.getGuiPreferences().getSidePaneWidth());
         if (!splitPane.getDividers().isEmpty()) {
             EasyBind.subscribe(splitPane.getDividers().get(0).positionProperty(),
-                    position -> prefs.storeGuiPreferences(prefs.getGuiPreferences()
-                                                               .withSidePaneWidth(position.doubleValue())));
+                    position -> prefs.getGuiPreferences().setSidePaneWidth(position.doubleValue()));
         }
     }
 
