@@ -429,6 +429,7 @@ public class JabRefPreferences implements PreferencesService {
     private ProtectedTermsPreferences protectedTermsPreferences;
     private MrDlibPreferences mrDlibPreferences;
     private EntryEditorPreferences entryEditorPreferences;
+    private FilePreferences filePreferences;
 
     // The constructor is made private to enforce this as a singleton class:
     private JabRefPreferences() {
@@ -1336,6 +1337,7 @@ public class JabRefPreferences implements PreferencesService {
         if (Objects.nonNull(generalPreferences)) {
             return generalPreferences;
         }
+
         generalPreferences = new GeneralPreferences(
                 getDefaultEncoding(),
                 getBoolean(BIBLATEX_DEFAULT_MODE) ? BibDatabaseMode.BIBLATEX : BibDatabaseMode.BIBTEX,
@@ -1343,12 +1345,14 @@ public class JabRefPreferences implements PreferencesService {
                 getBoolean(CONFIRM_DELETE),
                 getBoolean(MEMORY_STICK_MODE),
                 getBoolean(SHOW_ADVANCED_HINTS));
-        EasyBind.subscribe(generalPreferences.defaultEncodingProperty(), newValue -> put(DEFAULT_ENCODING, newValue.name()));
-        EasyBind.subscribe(generalPreferences.defaultBibDatabaseModeProperty(), newValue -> putBoolean(BIBLATEX_DEFAULT_MODE, (newValue == BibDatabaseMode.BIBLATEX)));
-        EasyBind.subscribe(generalPreferences.isWarnAboutDuplicatesInInspectionProperty(), newValue -> putBoolean(WARN_ABOUT_DUPLICATES_IN_INSPECTION, newValue));
-        EasyBind.subscribe(generalPreferences.confirmDeleteProperty(), newValue -> putBoolean(CONFIRM_DELETE, newValue));
-        EasyBind.subscribe(generalPreferences.memoryStickModeProperty(), newValue -> putBoolean(MEMORY_STICK_MODE, newValue));
-        EasyBind.subscribe(generalPreferences.showAdvancedHintsProperty(), newValue -> putBoolean(SHOW_ADVANCED_HINTS, newValue));
+
+        EasyBind.listen(generalPreferences.defaultEncodingProperty(), (obs, oldValue, newValue) -> put(DEFAULT_ENCODING, newValue.name()));
+        EasyBind.listen(generalPreferences.defaultBibDatabaseModeProperty(), (obs, oldValue, newValue) -> putBoolean(BIBLATEX_DEFAULT_MODE, (newValue == BibDatabaseMode.BIBLATEX)));
+        EasyBind.listen(generalPreferences.isWarnAboutDuplicatesInInspectionProperty(), (obs, oldValue, newValue) -> putBoolean(WARN_ABOUT_DUPLICATES_IN_INSPECTION, newValue));
+        EasyBind.listen(generalPreferences.confirmDeleteProperty(), (obs, oldValue, newValue) -> putBoolean(CONFIRM_DELETE, newValue));
+        EasyBind.listen(generalPreferences.memoryStickModeProperty(), (obs, oldValue, newValue) -> putBoolean(MEMORY_STICK_MODE, newValue));
+        EasyBind.listen(generalPreferences.showAdvancedHintsProperty(), (obs, oldValue, newValue) -> putBoolean(SHOW_ADVANCED_HINTS, newValue));
+
         return generalPreferences;
     }
 
@@ -1361,8 +1365,8 @@ public class JabRefPreferences implements PreferencesService {
                 getBoolean(COLLECT_TELEMETRY),
                 !getBoolean(ALREADY_ASKED_TO_COLLECT_TELEMETRY) // mind the !
         );
-        EasyBind.subscribe(telemetryPreferences.collectTelemetryProperty(), newValue -> putBoolean(COLLECT_TELEMETRY, newValue));
-        EasyBind.subscribe(telemetryPreferences.askToCollectTelemetryProperty(), newValue -> putBoolean(ALREADY_ASKED_TO_COLLECT_TELEMETRY, !newValue));
+        EasyBind.listen(telemetryPreferences.collectTelemetryProperty(), (obs, oldValue, newValue) -> putBoolean(COLLECT_TELEMETRY, newValue));
+        EasyBind.listen(telemetryPreferences.askToCollectTelemetryProperty(), (obs, oldValue, newValue) -> putBoolean(ALREADY_ASKED_TO_COLLECT_TELEMETRY, !newValue));
         return telemetryPreferences;
     }
 
@@ -1374,8 +1378,8 @@ public class JabRefPreferences implements PreferencesService {
         doiPreferences = new DOIPreferences(
                 getBoolean(USE_CUSTOM_DOI_URI),
                 get(BASE_DOI_URI));
-        EasyBind.subscribe(doiPreferences.useCustomProperty(), newValue -> putBoolean(USE_CUSTOM_DOI_URI, newValue));
-        EasyBind.subscribe(doiPreferences.defaultBaseURIProperty(), newValue -> put(BASE_DOI_URI, newValue));
+        EasyBind.listen(doiPreferences.useCustomProperty(), (obs, oldValue, newValue) -> putBoolean(USE_CUSTOM_DOI_URI, newValue));
+        EasyBind.listen(doiPreferences.defaultBaseURIProperty(), (obs, oldValue, newValue) -> put(BASE_DOI_URI, newValue));
         return doiPreferences;
     }
 
@@ -1388,9 +1392,9 @@ public class JabRefPreferences implements PreferencesService {
                 getBoolean(USE_OWNER),
                 get(DEFAULT_OWNER),
                 getBoolean(OVERWRITE_OWNER));
-        EasyBind.subscribe(ownerPreferences.useOwnerProperty(), newValue -> putBoolean(USE_OWNER, newValue));
-        EasyBind.subscribe(ownerPreferences.defaultOwnerProperty(), newValue -> put(DEFAULT_OWNER, newValue));
-        EasyBind.subscribe(ownerPreferences.overwriteOwnerProperty(), newValue -> putBoolean(OVERWRITE_OWNER, newValue));
+        EasyBind.listen(ownerPreferences.useOwnerProperty(), (obs, oldValue, newValue) -> putBoolean(USE_OWNER, newValue));
+        EasyBind.listen(ownerPreferences.defaultOwnerProperty(), (obs, oldValue, newValue) -> put(DEFAULT_OWNER, newValue));
+        EasyBind.listen(ownerPreferences.overwriteOwnerProperty(), (obs, oldValue, newValue) -> putBoolean(OVERWRITE_OWNER, newValue));
         return ownerPreferences;
     }
 
@@ -1406,8 +1410,8 @@ public class JabRefPreferences implements PreferencesService {
                 FieldFactory.parseField(get(TIME_STAMP_FIELD)),
                 get(TIME_STAMP_FORMAT));
 
-        EasyBind.subscribe(timestampPreferences.addCreationDateProperty(), newValue -> putBoolean(ADD_CREATION_DATE, newValue));
-        EasyBind.subscribe(timestampPreferences.addModificationDateProperty(), newValue -> putBoolean(ADD_MODIFICATION_DATE, newValue));
+        EasyBind.listen(timestampPreferences.addCreationDateProperty(), (obs, oldValue, newValue) -> putBoolean(ADD_CREATION_DATE, newValue));
+        EasyBind.listen(timestampPreferences.addModificationDateProperty(), (obs, oldValue, newValue) -> putBoolean(ADD_MODIFICATION_DATE, newValue));
         return timestampPreferences;
     }
 
@@ -1584,15 +1588,15 @@ public class JabRefPreferences implements PreferencesService {
                 getBoolean(ALLOW_INTEGER_EDITION_BIBTEX),
                 getDouble(ENTRY_EDITOR_HEIGHT));
 
-        EasyBind.subscribe(entryEditorPreferences.entryEditorTabListProperty(), this::storeEntryEditorTabList);
-        EasyBind.subscribe(entryEditorPreferences.shouldOpenOnNewEntryProperty(), newValue -> putBoolean(AUTO_OPEN_FORM, newValue));
-        EasyBind.subscribe(entryEditorPreferences.shouldShowRecommendationsTabProperty(), newValue -> putBoolean(SHOW_RECOMMENDATIONS, newValue));
-        EasyBind.subscribe(entryEditorPreferences.isMrdlibAcceptedProperty(), newValue -> putBoolean(ACCEPT_RECOMMENDATIONS, newValue));
-        EasyBind.subscribe(entryEditorPreferences.shouldShowLatexCitationsTabProperty(), newValue -> putBoolean(SHOW_LATEX_CITATIONS, newValue));
-        EasyBind.subscribe(entryEditorPreferences.showSourceTabByDefaultProperty(), newValue -> putBoolean(DEFAULT_SHOW_SOURCE, newValue));
-        EasyBind.subscribe(entryEditorPreferences.enableValidationProperty(), newValue -> putBoolean(VALIDATE_IN_ENTRY_EDITOR, newValue));
-        EasyBind.subscribe(entryEditorPreferences.allowIntegerEditionBibtexProperty(), newValue -> putBoolean(ALLOW_INTEGER_EDITION_BIBTEX, newValue));
-        EasyBind.subscribe(entryEditorPreferences.dividerPositionProperty(), newValue -> putDouble(ENTRY_EDITOR_HEIGHT, newValue.doubleValue()));
+        EasyBind.listen(entryEditorPreferences.entryEditorTabListProperty(), (obs, oldValue, newValue) -> storeEntryEditorTabList(newValue));
+        EasyBind.listen(entryEditorPreferences.shouldOpenOnNewEntryProperty(), (obs, oldValue, newValue) -> putBoolean(AUTO_OPEN_FORM, newValue));
+        EasyBind.listen(entryEditorPreferences.shouldShowRecommendationsTabProperty(), (obs, oldValue, newValue) -> putBoolean(SHOW_RECOMMENDATIONS, newValue));
+        EasyBind.listen(entryEditorPreferences.isMrdlibAcceptedProperty(), (obs, oldValue, newValue) -> putBoolean(ACCEPT_RECOMMENDATIONS, newValue));
+        EasyBind.listen(entryEditorPreferences.shouldShowLatexCitationsTabProperty(), (obs, oldValue, newValue) -> putBoolean(SHOW_LATEX_CITATIONS, newValue));
+        EasyBind.listen(entryEditorPreferences.showSourceTabByDefaultProperty(), (obs, oldValue, newValue) -> putBoolean(DEFAULT_SHOW_SOURCE, newValue));
+        EasyBind.listen(entryEditorPreferences.enableValidationProperty(), (obs, oldValue, newValue) -> putBoolean(VALIDATE_IN_ENTRY_EDITOR, newValue));
+        EasyBind.listen(entryEditorPreferences.allowIntegerEditionBibtexProperty(), (obs, oldValue, newValue) -> putBoolean(ALLOW_INTEGER_EDITION_BIBTEX, newValue));
+        EasyBind.listen(entryEditorPreferences.dividerPositionProperty(), (obs, oldValue, newValue) -> putDouble(ENTRY_EDITOR_HEIGHT, newValue.doubleValue()));
 
         return entryEditorPreferences;
     }
@@ -2015,9 +2019,9 @@ public class JabRefPreferences implements PreferencesService {
                 getTheme()
         );
 
-        EasyBind.subscribe(appearancePreferences.shouldOverrideDefaultFontSizeProperty(), newValue -> putBoolean(OVERRIDE_DEFAULT_FONT_SIZE, newValue));
-        EasyBind.subscribe(appearancePreferences.mainFontSizeProperty(), newValue -> putInt(MAIN_FONT_SIZE, newValue));
-        EasyBind.subscribe(appearancePreferences.themeProperty(), newValue -> put(FX_THEME, newValue.getCssPathString()));
+        EasyBind.listen(appearancePreferences.shouldOverrideDefaultFontSizeProperty(), (obs, oldValue, newValue) -> putBoolean(OVERRIDE_DEFAULT_FONT_SIZE, newValue));
+        EasyBind.listen(appearancePreferences.mainFontSizeProperty(), (obs, oldValue, newValue) -> putInt(MAIN_FONT_SIZE, newValue));
+        EasyBind.listen(appearancePreferences.themeProperty(), (obs, oldValue, newValue) -> put(FX_THEME, newValue.getCssPathString()));
 
         return appearancePreferences;
     }
@@ -2179,22 +2183,26 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public FilePreferences getFilePreferences() {
-        return new FilePreferences(
+        if (Objects.nonNull(filePreferences)) {
+            return filePreferences;
+        }
+
+        filePreferences = new FilePreferences(
                 getUser(),
                 get(MAIN_FILE_DIRECTORY),
                 getBoolean(STORE_RELATIVE_TO_BIB),
                 get(IMPORT_FILENAMEPATTERN),
                 get(IMPORT_FILEDIRPATTERN),
-                getBoolean(DOWNLOAD_LINKED_FILES));
-    }
+                getBoolean(DOWNLOAD_LINKED_FILES)
+        );
 
-    @Override
-    public void storeFilePreferences(FilePreferences preferences) {
-        put(MAIN_FILE_DIRECTORY, preferences.getFileDirectory().map(Path::toString).orElse(""));
-        putBoolean(STORE_RELATIVE_TO_BIB, preferences.shouldStoreFilesRelativeToBib());
-        put(IMPORT_FILENAMEPATTERN, preferences.getFileNamePattern());
-        put(IMPORT_FILEDIRPATTERN, preferences.getFileDirectoryPattern());
-        putBoolean(DOWNLOAD_LINKED_FILES, preferences.shouldDownloadLinkedFiles());
+        EasyBind.listen(filePreferences.mainFileDirectoryProperty(), (obs, oldValue, newValue) -> put(MAIN_FILE_DIRECTORY, filePreferences.getFileDirectory().map(Path::toString).orElse("")));
+        EasyBind.listen(filePreferences.storeFilesRelativeToBibFileProperty(), (obs, oldValue, newValue) -> putBoolean(STORE_RELATIVE_TO_BIB, newValue));
+        EasyBind.listen(filePreferences.fileNamePatternProperty(), (obs, oldValue, newValue) -> put(IMPORT_FILENAMEPATTERN, newValue));
+        EasyBind.listen(filePreferences.fileDirectoryPatternProperty(), (obs, oldValue, newValue) -> put(IMPORT_FILEDIRPATTERN, newValue));
+        EasyBind.listen(filePreferences.downloadLinkedFilesProperty(), (obs, oldValue, newValue) -> putBoolean(DOWNLOAD_LINKED_FILES, newValue));
+
+        return filePreferences;
     }
 
     @Override
@@ -2458,7 +2466,7 @@ public class JabRefPreferences implements PreferencesService {
                 storeVisiblePanes(sidePanePreferences.visiblePanes()));
         sidePanePreferences.getPreferredPositions().addListener((InvalidationListener) listener ->
                 storeSidePanePreferredPositions(sidePanePreferences.getPreferredPositions()));
-        EasyBind.subscribe(sidePanePreferences.webSearchFetcherSelectedProperty(), newValue -> putInt(SELECTED_FETCHER_INDEX, newValue));
+        EasyBind.listen(sidePanePreferences.webSearchFetcherSelectedProperty(), (obs, oldValue, newValue) -> putInt(SELECTED_FETCHER_INDEX, newValue));
 
         return sidePanePreferences;
     }
@@ -2715,10 +2723,10 @@ public class JabRefPreferences implements PreferencesService {
                 getBoolean(SEND_OS_DATA),
                 getBoolean(SEND_TIMEZONE_DATA));
 
-        EasyBind.subscribe(mrDlibPreferences.acceptRecommendationsProperty(), newValue -> putBoolean(ACCEPT_RECOMMENDATIONS, newValue));
-        EasyBind.subscribe(mrDlibPreferences.sendLanguageProperty(), newValue -> putBoolean(SEND_LANGUAGE_DATA, newValue));
-        EasyBind.subscribe(mrDlibPreferences.sendOsProperty(), newValue -> putBoolean(SEND_OS_DATA, newValue));
-        EasyBind.subscribe(mrDlibPreferences.sendTimezoneProperty(), newValue -> putBoolean(SEND_TIMEZONE_DATA, newValue));
+        EasyBind.listen(mrDlibPreferences.acceptRecommendationsProperty(), (obs, oldValue, newValue) -> putBoolean(ACCEPT_RECOMMENDATIONS, newValue));
+        EasyBind.listen(mrDlibPreferences.sendLanguageProperty(), (obs, oldValue, newValue) -> putBoolean(SEND_LANGUAGE_DATA, newValue));
+        EasyBind.listen(mrDlibPreferences.sendOsProperty(), (obs, oldValue, newValue) -> putBoolean(SEND_OS_DATA, newValue));
+        EasyBind.listen(mrDlibPreferences.sendTimezoneProperty(), (obs, oldValue, newValue) -> putBoolean(SEND_TIMEZONE_DATA, newValue));
 
         return mrDlibPreferences;
     }
@@ -2775,10 +2783,10 @@ public class JabRefPreferences implements PreferencesService {
                 get(GROBID_URL)
         );
 
-        EasyBind.subscribe(importerPreferences.generateNewKeyOnImportProperty(), newValue -> putBoolean(GENERATE_KEY_ON_IMPORT, newValue));
-        EasyBind.subscribe(importerPreferences.grobidEnabledProperty(), newValue -> putBoolean(GROBID_ENABLED, newValue));
-        EasyBind.subscribe(importerPreferences.grobidOptOutProperty(), newValue -> putBoolean(GROBID_OPT_OUT, newValue));
-        EasyBind.subscribe(importerPreferences.grobidURLProperty(), newValue -> put(GROBID_URL, newValue));
+        EasyBind.listen(importerPreferences.generateNewKeyOnImportProperty(), (obs, oldValue, newValue) -> putBoolean(GENERATE_KEY_ON_IMPORT, newValue));
+        EasyBind.listen(importerPreferences.grobidEnabledProperty(), (obs, oldValue, newValue) -> putBoolean(GROBID_ENABLED, newValue));
+        EasyBind.listen(importerPreferences.grobidOptOutProperty(), (obs, oldValue, newValue) -> putBoolean(GROBID_OPT_OUT, newValue));
+        EasyBind.listen(importerPreferences.grobidURLProperty(), (obs, oldValue, newValue) -> put(GROBID_URL, newValue));
 
         return importerPreferences;
     }

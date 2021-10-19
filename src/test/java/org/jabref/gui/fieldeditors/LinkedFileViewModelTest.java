@@ -184,7 +184,7 @@ class LinkedFileViewModelTest {
 
     @Test
     void downloadHtmlFileCausesWarningDisplay() throws MalformedURLException {
-        when(filePreferences.shouldStoreFilesRelativeToBib()).thenReturn(true);
+        when(filePreferences.shouldStoreFilesRelativeToBibFile()).thenReturn(true);
         when(filePreferences.getFileNamePattern()).thenReturn("[citationkey]");
         when(filePreferences.getFileDirectoryPattern()).thenReturn("[entrytype]");
         databaseContext.setDatabasePath(tempFile);
@@ -228,7 +228,7 @@ class LinkedFileViewModelTest {
         String fileType = StandardExternalFileType.URL.getName();
         linkedFile = new LinkedFile(new URL(url), fileType);
 
-        when(filePreferences.shouldStoreFilesRelativeToBib()).thenReturn(true);
+        when(filePreferences.shouldStoreFilesRelativeToBibFile()).thenReturn(true);
         when(filePreferences.getFileNamePattern()).thenReturn("[citationkey]");
         when(filePreferences.getFileDirectoryPattern()).thenReturn("[entrytype]");
 
@@ -285,7 +285,7 @@ class LinkedFileViewModelTest {
     void downloadPdfFileWhenLinkedFilePointsToPdfUrl() throws MalformedURLException {
         linkedFile = new LinkedFile(new URL("http://arxiv.org/pdf/1207.0408v1"), "pdf");
         // Needed Mockito stubbing methods to run test
-        when(filePreferences.shouldStoreFilesRelativeToBib()).thenReturn(true);
+        when(filePreferences.shouldStoreFilesRelativeToBibFile()).thenReturn(true);
         when(filePreferences.getFileNamePattern()).thenReturn("[citationkey]");
         when(filePreferences.getFileDirectoryPattern()).thenReturn("[entrytype]");
 
