@@ -30,8 +30,6 @@ public class LinkedFilesTab extends AbstractPreferenceTabView<LinkedFilesTabView
     @FXML private RadioButton autolinkFileExactBibtex;
     @FXML private RadioButton autolinkUseRegex;
     @FXML private TextField autolinkRegexKey;
-    @FXML private CheckBox searchFilesOnOpen;
-    @FXML private CheckBox openBrowseOnCreate;
 
     @FXML private ComboBox<String> fileNamePattern;
     @FXML private TextField fileDirectoryPattern;
@@ -59,8 +57,6 @@ public class LinkedFilesTab extends AbstractPreferenceTabView<LinkedFilesTabView
         autolinkUseRegex.selectedProperty().bindBidirectional(viewModel.autolinkUseRegexProperty());
         autolinkRegexKey.textProperty().bindBidirectional(viewModel.autolinkRegexKeyProperty());
         autolinkRegexKey.disableProperty().bind(autolinkUseRegex.selectedProperty().not());
-        searchFilesOnOpen.selectedProperty().bindBidirectional(viewModel.searchFilesOnOpenProperty());
-        openBrowseOnCreate.selectedProperty().bindBidirectional(viewModel.openBrowseOnCreateProperty());
         fileNamePattern.valueProperty().bindBidirectional(viewModel.fileNamePatternProperty());
         fileNamePattern.itemsProperty().bind(viewModel.defaultFileNamePatternsProperty());
         fileDirectoryPattern.textProperty().bindBidirectional(viewModel.fileDirectoryPatternProperty());

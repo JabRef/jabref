@@ -68,8 +68,6 @@ public interface PreferencesService {
 
     FilePreferences getFilePreferences();
 
-    void storeFilePreferences(FilePreferences filePreferences);
-
     FieldWriterPreferences getFieldWriterPreferences();
 
     FileHistory getFileHistory();

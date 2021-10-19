@@ -36,7 +36,7 @@ public class DocumentReaderTest {
         this.filePreferences = mock(FilePreferences.class);
         when(filePreferences.getUser()).thenReturn("test");
         when(filePreferences.getFileDirectory()).thenReturn(Optional.empty());
-        when(filePreferences.shouldStoreFilesRelativeToBib()).thenReturn(true);
+        when(filePreferences.shouldStoreFilesRelativeToBibFile()).thenReturn(true);
     }
 
     @Test
