@@ -431,6 +431,8 @@ public class JabRefPreferences implements PreferencesService {
     private EntryEditorPreferences entryEditorPreferences;
     private FilePreferences filePreferences;
     private GuiPreferences guiPreferences;
+    private RemotePreferences remotePreferences;
+    private ProxyPreferences proxyPreferences;
 
     // The constructor is made private to enforce this as a singleton class:
     private JabRefPreferences() {
@@ -1608,34 +1610,42 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public RemotePreferences getRemotePreferences() {
-        return new RemotePreferences(getInt(REMOTE_SERVER_PORT), getBoolean(USE_REMOTE_SERVER));
-    }
+        if (Objects.nonNull(remotePreferences)) {
+            return remotePreferences;
+        }
 
-    @Override
-    public void storeRemotePreferences(RemotePreferences preferences) {
-        putInt(REMOTE_SERVER_PORT, preferences.getPort());
-        putBoolean(USE_REMOTE_SERVER, preferences.useRemoteServer());
+        remotePreferences = new RemotePreferences(
+                getInt(REMOTE_SERVER_PORT),
+                getBoolean(USE_REMOTE_SERVER));
+
+        EasyBind.listen(remotePreferences.portProperty(), (obs, oldValue, newValue) -> putInt(REMOTE_SERVER_PORT, newValue));
+        EasyBind.listen(remotePreferences.useRemoteServerProperty(), (obs, oldValue, newValue) -> putBoolean(USE_REMOTE_SERVER, newValue));
+
+        return remotePreferences;
     }
 
     @Override
     public ProxyPreferences getProxyPreferences() {
-        return new ProxyPreferences(
+        if (Objects.nonNull(proxyPreferences)) {
+            return proxyPreferences;
+        }
+
+        proxyPreferences = new ProxyPreferences(
                 getBoolean(PROXY_USE),
                 get(PROXY_HOSTNAME),
                 get(PROXY_PORT),
                 getBoolean(PROXY_USE_AUTHENTICATION),
                 get(PROXY_USERNAME),
                 get(PROXY_PASSWORD));
-    }
 
-    @Override
-    public void storeProxyPreferences(ProxyPreferences preferences) {
-        putBoolean(PROXY_USE, preferences.isUseProxy());
-        put(PROXY_HOSTNAME, preferences.getHostname());
-        put(PROXY_PORT, preferences.getPort());
-        putBoolean(PROXY_USE_AUTHENTICATION, preferences.isUseAuthentication());
-        put(PROXY_USERNAME, preferences.getUsername());
-        put(PROXY_PASSWORD, preferences.getPassword());
+        EasyBind.listen(proxyPreferences.useProxyProperty(), (obs, oldValue, newValue) -> putBoolean(PROXY_USE, newValue));
+        EasyBind.listen(proxyPreferences.hostnameProperty(), (obs, oldValue, newValue) -> put(PROXY_HOSTNAME, newValue));
+        EasyBind.listen(proxyPreferences.portProperty(), (obs, oldValue, newValue) -> put(PROXY_PORT, newValue));
+        EasyBind.listen(proxyPreferences.useAuthenticationProperty(), (obs, oldValue, newValue) -> putBoolean(PROXY_USE_AUTHENTICATION, newValue));
+        EasyBind.listen(proxyPreferences.usernameProperty(), (obs, oldValue, newValue) -> put(PROXY_USERNAME, newValue));
+        EasyBind.listen(proxyPreferences.passwordProperty(), (obs, oldValue, newValue) -> put(PROXY_PASSWORD, newValue));
+
+        return proxyPreferences;
     }
 
     //*************************************************************************************************************

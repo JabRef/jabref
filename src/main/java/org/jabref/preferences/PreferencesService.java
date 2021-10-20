@@ -181,11 +181,7 @@ public interface PreferencesService {
 
     RemotePreferences getRemotePreferences();
 
-    void storeRemotePreferences(RemotePreferences remotePreferences);
-
     ProxyPreferences getProxyPreferences();
-
-    void storeProxyPreferences(ProxyPreferences proxyPreferences);
 
     //*************************************************************************************************************
     // CitationKeyPatternPreferences
