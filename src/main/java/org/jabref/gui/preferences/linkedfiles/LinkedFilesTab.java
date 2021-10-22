@@ -52,8 +52,8 @@ public class LinkedFilesTab extends AbstractPreferenceTabView<LinkedFilesTabView
         this.viewModel = new LinkedFilesTabViewModel(dialogService, preferencesService);
 
         mainFileDirectory.textProperty().bindBidirectional(viewModel.mainFileDirectoryProperty());
-        mainFileDirectory.disableProperty().bindBidirectional(viewModel.useBibLocationAsPrimaryProperty());
-        browseDirectory.disableProperty().bindBidirectional(viewModel.useBibLocationAsPrimaryProperty());
+        mainFileDirectory.disableProperty().bind(viewModel.useBibLocationAsPrimaryProperty());
+        browseDirectory.disableProperty().bind(viewModel.useBibLocationAsPrimaryProperty());
         useBibLocationAsPrimary.selectedProperty().bindBidirectional(viewModel.useBibLocationAsPrimaryProperty());
         useMainFileDirectory.selectedProperty().bindBidirectional(viewModel.useMainFileDirectoryProperty());
 
