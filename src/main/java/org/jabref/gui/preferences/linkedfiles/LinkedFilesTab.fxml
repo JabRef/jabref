@@ -19,8 +19,6 @@
          fx:controller="org.jabref.gui.preferences.linkedfiles.LinkedFilesTab">
     <fx:define>
         <ToggleGroup fx:id="autolinkToggleGroup"/>
-    </fx:define>
-    <fx:define>
         <ToggleGroup fx:id="fileDirectoryToggleGroup"/>
     </fx:define>
     <Label styleClass="titleHeader" text="%Linked files"/>
