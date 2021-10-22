@@ -67,7 +67,7 @@ class CleanupWorkerTest {
 
         FilePreferences fileDirPrefs = mock(FilePreferences.class, Answers.RETURNS_SMART_NULLS);
         // Search and store files relative to bib file overwrites all other dirs
-        when(fileDirPrefs.shouldStoreFilesRelativeToBib()).thenReturn(true);
+        when(fileDirPrefs.shouldStoreFilesRelativeToBibFile()).thenReturn(true);
 
         worker = new CleanupWorker(context,
                 new CleanupPreferences(mock(LayoutFormatterPreferences.class), fileDirPrefs), mock(TimestampPreferences.class));

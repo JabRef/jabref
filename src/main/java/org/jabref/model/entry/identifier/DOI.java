@@ -20,10 +20,9 @@ import org.slf4j.LoggerFactory;
 public class DOI implements Identifier {
 
     public static final URI AGENCY_RESOLVER = URI.create("https://doi.org/doiRA");
+    public static final URI RESOLVER = URI.create("https://doi.org/");
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DOI.class);
-
-    private static final URI RESOLVER = URI.create("https://doi.org/");
 
     // Regex
     // (see http://www.doi.org/doi_handbook/2_Numbering.html)
@@ -230,6 +229,8 @@ public class DOI implements Identifier {
      */
     @Override
     public Optional<URI> getExternalURI() {
+        // TODO: We need dependency injection here. It should never happen that this method is called.
+        //       Always, the user preferences should be honored --> #getExternalURIWithCustomBase
         return getExternalURIFromBase(RESOLVER);
     }
 

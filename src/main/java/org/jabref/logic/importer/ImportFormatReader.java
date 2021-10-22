@@ -180,14 +180,14 @@ public class ImportFormatReader {
 
         try {
             UnknownFormatImport unknownFormatImport = importUnknownFormat(importer -> importer.importDatabase(filePath, importFormatPreferences.getEncoding()), importer -> importer.isRecognizedFormat(filePath, importFormatPreferences.getEncoding()));
-            unknownFormatImport.parserResult.setFile(filePath.toFile());
+            unknownFormatImport.parserResult.setPath(filePath);
             return unknownFormatImport;
         } catch (ImportException e) {
             // If all importers fail, try to read the file as BibTeX
             try {
                 ParserResult parserResult = OpenDatabase.loadDatabase(filePath, importFormatPreferences, fileMonitor);
                 if (parserResult.getDatabase().hasEntries() || !parserResult.getDatabase().hasNoStrings()) {
-                    parserResult.setFile(filePath.toFile());
+                    parserResult.setPath(filePath);
                     return new UnknownFormatImport(ImportFormatReader.BIBTEX_FORMAT, parserResult);
                 } else {
                     throw new ImportException(Localization.lang("Could not find a suitable import format."));

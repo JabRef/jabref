@@ -1,6 +1,5 @@
 package org.jabref.gui.importer;
 
-import java.io.File;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,8 +27,8 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
+import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.util.FileUpdateMonitor;
-import org.jabref.preferences.FilePreferences;
 import org.jabref.preferences.PreferencesService;
 
 import org.slf4j.Logger;
@@ -138,13 +137,11 @@ public class ImportEntriesViewModel extends AbstractViewModel {
         }
 
         // Remember the selection in the dialog
-        FilePreferences filePreferences = preferences.getFilePreferences()
-                                                     .withShouldDownloadLinkedFiles(shouldDownloadFiles);
-        preferences.storeFilePreferences(filePreferences);
+        preferences.getFilePreferences().setDownloadLinkedFiles(shouldDownloadFiles);
 
         if (shouldDownloadFiles) {
             for (BibEntry bibEntry : entriesToImport) {
-                bibEntry.getFiles().stream().filter(file -> file.isOnlineLink()).forEach(linkedFile ->
+                bibEntry.getFiles().stream().filter(LinkedFile::isOnlineLink).forEach(linkedFile ->
                         new LinkedFileViewModel(
                                 linkedFile,
                                 bibEntry,
@@ -159,7 +156,7 @@ public class ImportEntriesViewModel extends AbstractViewModel {
         new DatabaseMerger(preferences.getKeywordDelimiter()).mergeStrings(databaseContext.getDatabase(), parserResult.getDatabase());
         new DatabaseMerger(preferences.getKeywordDelimiter()).mergeMetaData(databaseContext.getMetaData(),
                 parserResult.getMetaData(),
-                parserResult.getFile().map(File::getName).orElse("unknown"),
+                parserResult.getPath().map(path -> path.getFileName().toString()).orElse("unknown"),
                 parserResult.getDatabase().getEntries());
 
         JabRefGUI.getMainFrame().getCurrentLibraryTab().markBaseChanged();
