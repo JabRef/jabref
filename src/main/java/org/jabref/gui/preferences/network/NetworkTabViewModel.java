@@ -48,16 +48,25 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
 
     private final DialogService dialogService;
     private final PreferencesService preferences;
-    private final RemotePreferences initialRemotePreferences;
-    private final ProxyPreferences initialProxyPreferences;
+    private final RemotePreferences remotePreferences;
+    private final ProxyPreferences proxyPreferences;
+    private final ProxyPreferences backupProxyPreferences;
 
     private final List<String> restartWarning = new ArrayList<>();
 
     public NetworkTabViewModel(DialogService dialogService, PreferencesService preferences) {
         this.dialogService = dialogService;
         this.preferences = preferences;
-        this.initialRemotePreferences = preferences.getRemotePreferences();
-        this.initialProxyPreferences = preferences.getProxyPreferences();
+        this.remotePreferences = preferences.getRemotePreferences();
+        this.proxyPreferences = preferences.getProxyPreferences();
+
+        backupProxyPreferences = new ProxyPreferences(
+                proxyPreferences.shouldUseProxy(),
+                proxyPreferences.getHostname(),
+                proxyPreferences.getPort(),
+                proxyPreferences.shouldUseAuthentication(),
+                proxyPreferences.getUsername(),
+                proxyPreferences.getPassword());
 
         remotePortValidator = new FunctionBasedValidator<>(
                 remotePortProperty,
@@ -108,65 +117,66 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
     }
 
     public void setValues() {
-        remoteServerProperty.setValue(initialRemotePreferences.useRemoteServer());
-        remotePortProperty.setValue(String.valueOf(initialRemotePreferences.getPort()));
+        remoteServerProperty.setValue(remotePreferences.useRemoteServer());
+        remotePortProperty.setValue(String.valueOf(remotePreferences.getPort()));
 
         setProxyValues();
     }
 
     private void setProxyValues() {
-        proxyUseProperty.setValue(initialProxyPreferences.isUseProxy());
-        proxyHostnameProperty.setValue(initialProxyPreferences.getHostname());
-        proxyPortProperty.setValue(initialProxyPreferences.getPort());
-        proxyUseAuthenticationProperty.setValue(initialProxyPreferences.isUseAuthentication());
-        proxyUsernameProperty.setValue(initialProxyPreferences.getUsername());
-        proxyPasswordProperty.setValue(initialProxyPreferences.getPassword());
+        proxyUseProperty.setValue(proxyPreferences.shouldUseProxy());
+        proxyHostnameProperty.setValue(proxyPreferences.getHostname());
+        proxyPortProperty.setValue(proxyPreferences.getPort());
+        proxyUseAuthenticationProperty.setValue(proxyPreferences.shouldUseAuthentication());
+        proxyUsernameProperty.setValue(proxyPreferences.getUsername());
+        proxyPasswordProperty.setValue(proxyPreferences.getPassword());
     }
 
     public void storeSettings() {
         storeRemoteSettings();
-        storeProxySettings();
-    }
 
-    private void storeRemoteSettings() {
-        RemotePreferences newRemotePreferences = new RemotePreferences(
-                initialRemotePreferences.getPort(),
-                remoteServerProperty.getValue()
-        );
-
-        getPortAsInt(remotePortProperty.getValue()).ifPresent(newPort -> {
-            if (initialRemotePreferences.isDifferentPort(newPort)) {
-                newRemotePreferences.setPort(newPort);
-
-                if (newRemotePreferences.useRemoteServer()) {
-                    restartWarning.add(Localization.lang("Remote server port") + ": " + newPort);
-                }
-            }
-        });
-
-        if (newRemotePreferences.useRemoteServer()) {
-            Globals.REMOTE_LISTENER.openAndStart(new JabRefMessageHandler(), initialRemotePreferences.getPort(), preferences);
-        } else {
-            Globals.REMOTE_LISTENER.stop();
-        }
-
-        preferences.storeRemotePreferences(newRemotePreferences);
-    }
-
-    private void storeProxySettings() {
-        ProxyPreferences newProxyPreferences = new ProxyPreferences(
+        storeProxySettings(new ProxyPreferences(
                 proxyUseProperty.getValue(),
                 proxyHostnameProperty.getValue().trim(),
                 proxyPortProperty.getValue().trim(),
                 proxyUseAuthenticationProperty.getValue(),
                 proxyUsernameProperty.getValue().trim(),
                 proxyPasswordProperty.getValue()
+        ));
+    }
+
+    private void storeRemoteSettings() {
+        RemotePreferences newRemotePreferences = new RemotePreferences(
+                remotePreferences.getPort(),
+                remoteServerProperty.getValue()
         );
 
-        if (!newProxyPreferences.equals(initialProxyPreferences)) {
+        getPortAsInt(remotePortProperty.getValue()).ifPresent(newPort -> {
+            if (remotePreferences.isDifferentPort(newPort)) {
+                remotePreferences.setPort(newPort);
+            }
+        });
+
+        if (remoteServerProperty.getValue()) {
+            remotePreferences.setUseRemoteServer(true);
+            Globals.REMOTE_LISTENER.openAndStart(new JabRefMessageHandler(), remotePreferences.getPort(), preferences);
+        } else {
+            remotePreferences.setUseRemoteServer(false);
+            Globals.REMOTE_LISTENER.stop();
+        }
+    }
+
+    private void storeProxySettings(ProxyPreferences newProxyPreferences) {
+        if (!newProxyPreferences.equals(proxyPreferences)) {
             ProxyRegisterer.register(newProxyPreferences);
         }
-        preferences.storeProxyPreferences(newProxyPreferences);
+
+        proxyPreferences.setUseProxy(newProxyPreferences.shouldUseProxy());
+        proxyPreferences.setHostname(newProxyPreferences.getHostname());
+        proxyPreferences.setPort(newProxyPreferences.getPort());
+        proxyPreferences.setUseAuthentication(newProxyPreferences.shouldUseAuthentication());
+        proxyPreferences.setUsername(newProxyPreferences.getUsername());
+        proxyPreferences.setPassword(newProxyPreferences.getPassword());
     }
 
     private Optional<Integer> getPortAsInt(String value) {
@@ -237,7 +247,14 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
 
         // Workaround for testing, since the URLDownload uses stored proxy settings, see
         // preferences.storeProxyPreferences(...) below.
-        storeProxySettings();
+        storeProxySettings(new ProxyPreferences(
+                proxyUseProperty.getValue(),
+                proxyHostnameProperty.getValue().trim(),
+                proxyPortProperty.getValue().trim(),
+                proxyUseAuthenticationProperty.getValue(),
+                proxyUsernameProperty.getValue().trim(),
+                proxyPasswordProperty.getValue()
+        ));
 
         URLDownload urlDownload;
         try {
@@ -253,7 +270,7 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
             dialogService.showErrorDialogAndWait(dialogTitle, connectionFailedText);
         }
 
-        preferences.storeProxyPreferences(initialProxyPreferences);
+        storeProxySettings(backupProxyPreferences);
     }
 
     @Override
