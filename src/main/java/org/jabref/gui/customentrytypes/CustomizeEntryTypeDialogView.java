@@ -170,6 +170,11 @@ public class CustomizeEntryTypeDialogView extends BaseDialog<Void> {
                 .install(fieldTypeActionColumn);
 
         viewModel.newFieldToAddProperty().bindBidirectional(addNewField.valueProperty());
+        // The valueProperty() of addNewField combobox is not updated if we just type text, we need to change focus
+        // from the combobox or select an item from the combobox to it be notified, with the code below we are updating the value
+        // of the combobox every time the user edit the combobox textfield, this necessary to update the disabled state of the addNewFieldButton
+        // because it depends on viewModel.newFieldToAddProperty() which is bound to addNewField.valueProperty()
+        EasyBind.subscribe(addNewField.getEditor().textProperty(), text -> addNewField.setValue(CustomEntryTypeDialogViewModel.FIELD_STRING_CONVERTER.fromString(text)));
 
         EasyBind.subscribe(viewModel.selectedEntryTypeProperty(), type -> {
             if (type != null) {
