@@ -40,7 +40,7 @@
     <RadioButton fx:id="useBibLocationAsPrimary" text="%Search and store files relative to library file location" toggleGroup="$fileDirectoryToggleGroup">
         <tooltip>
             <Tooltip
-                    text="%When downloading files, or moving linked files to the file directory, use the bib file location. This takes precedence over all other configured file directories."/>
+                    text="%When downloading files, or moving linked files to the file directory, use the bib file location."/>
         </tooltip>
     </RadioButton>
     <Label styleClass="sectionHeader" text="%Autolink files"/>
