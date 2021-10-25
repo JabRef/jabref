@@ -16,6 +16,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.PreferencesService;
 
+import org.controlsfx.control.PopOver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,13 +29,15 @@ public class GenerateEntryFromIdAction extends SimpleCommand {
     private final PreferencesService preferencesService;
     private final String identifier;
     private final TaskExecutor taskExecutor;
+    private final PopOver entryFromIdPopOver;
 
-    public GenerateEntryFromIdAction(LibraryTab libraryTab, DialogService dialogService, PreferencesService preferencesService, TaskExecutor taskExecutor, String identifier) {
+    public GenerateEntryFromIdAction(LibraryTab libraryTab, DialogService dialogService, PreferencesService preferencesService, TaskExecutor taskExecutor, PopOver entryFromIdPopOver, String identifier) {
         this.libraryTab = libraryTab;
         this.dialogService = dialogService;
         this.preferencesService = preferencesService;
         this.identifier = identifier;
         this.taskExecutor = taskExecutor;
+        this.entryFromIdPopOver = entryFromIdPopOver;
     }
 
     @Override
@@ -44,7 +47,10 @@ public class GenerateEntryFromIdAction extends SimpleCommand {
         backgroundTask.showToUser(true);
         backgroundTask.onRunning(() -> dialogService.notify("%s".formatted(backgroundTask.messageProperty().get())));
         backgroundTask.onFailure((e) -> dialogService.notify(Localization.lang("Entry could not be created")));
-        backgroundTask.onSuccess((entry) -> entry.ifPresentOrElse(libraryTab::insertEntry,
+        backgroundTask.onSuccess((entry) -> entry.ifPresentOrElse((e) -> {
+                libraryTab.insertEntry(e);
+                entryFromIdPopOver.hide();
+                },
                 () -> dialogService.notify(Localization.lang("Import canceled"))
         ));
         backgroundTask.executeWith(taskExecutor);

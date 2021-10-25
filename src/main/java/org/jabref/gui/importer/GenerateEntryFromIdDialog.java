@@ -13,6 +13,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
+import org.controlsfx.control.PopOver;
 
 public class GenerateEntryFromIdDialog {
 
@@ -24,6 +25,8 @@ public class GenerateEntryFromIdDialog {
     private final DialogService dialogService;
     private final LibraryTab libraryTab;
     private final TaskExecutor taskExecutor;
+
+    private PopOver entryFromIdPopOver;
 
     public GenerateEntryFromIdDialog(LibraryTab libraryTab, DialogService dialogService, PreferencesService preferencesService, TaskExecutor taskExecutor) {
         ViewLoader.view(this).load();
@@ -49,9 +52,14 @@ public class GenerateEntryFromIdDialog {
                 dialogService,
                 preferencesService,
                 taskExecutor,
+                entryFromIdPopOver,
                 idTextField.getText()
         );
         generateEntryFromIdAction.execute();
+    }
+
+    public void setEntryFromIdPopOver(PopOver entryFromIdPopOver) {
+        this.entryFromIdPopOver = entryFromIdPopOver;
     }
 
     public DialogPane getDialogPane() {

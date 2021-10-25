@@ -929,11 +929,13 @@ public class JabRefFrame extends BorderPane {
                 entryFromIdPopOver.setArrowLocation(PopOver.ArrowLocation.TOP_CENTER);
                 entryFromIdPopOver.setContentNode(entryFromId.getDialogPane());
                 entryFromIdPopOver.show(newEntryFromIdButton);
+                entryFromId.setEntryFromIdPopOver(entryFromIdPopOver);
             } else if (entryFromIdPopOver.isShowing()) {
                 entryFromIdPopOver.hide();
             } else {
                 entryFromIdPopOver.setContentNode(entryFromId.getDialogPane());
                 entryFromIdPopOver.show(newEntryFromIdButton);
+                entryFromId.setEntryFromIdPopOver(entryFromIdPopOver);
             }
         });
         newEntryFromIdButton.setTooltip(new Tooltip(Localization.lang("Import by ID")));
