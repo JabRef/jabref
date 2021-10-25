@@ -16,27 +16,27 @@ public class IacrEprintTest {
         return Stream.of(
                 Arguments.arguments(
                         "acceptPlainIacrEprint",
-                        new IacrEprint("2019/001").getNormalized()
+                        "2019/001"
                 ),
                 Arguments.arguments(
                         "ignoreLeadingAndTrailingWhitespaces",
-                        new IacrEprint(" 2019/001   ").getNormalized()
+                        " 2019/001   "
                 ),
                 Arguments.arguments(
                         "acceptFullUrlIacrEprint",
-                        new IacrEprint("https://eprint.iacr.org/2019/001").getNormalized()
+                        "https://eprint.iacr.org/2019/001"
                 ),
                 Arguments.arguments(
                         "acceptShortenedUrlIacrEprint",
-                        new IacrEprint("https://ia.cr/2019/001").getNormalized()
+                        "https://ia.cr/2019/001"
                 ),
                 Arguments.arguments(
                         "acceptDomainUrlIacrEprint",
-                        new IacrEprint("eprint.iacr.org/2019/001").getNormalized()
+                        "eprint.iacr.org/2019/001"
                 ),
                 Arguments.arguments(
                         "acceptShortenedDomainUrlIacrEprint",
-                        new IacrEprint("ia.cr/2019/001").getNormalized()
+                        "ia.cr/2019/001"
                 )
         );
     }
@@ -48,8 +48,8 @@ public class IacrEprintTest {
 
     @ParameterizedTest(name = "{index} {0}")
     @MethodSource("provideTestData")
-    public void acceptCorrectIacrEprintIdentifier(String name, String arg) {
-        assertEquals("2019/001", arg);
+    public void acceptCorrectIacrEprintIdentifier(String name, String identifier) {
+        assertEquals("2019/001", new IacrEprint(identifier).getNormalized());
     }
 
     @Test
