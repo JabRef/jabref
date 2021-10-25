@@ -5,9 +5,7 @@ import java.util.Optional;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.Globals;
 import org.jabref.gui.LibraryTab;
-import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
-import org.jabref.gui.duplicationFinder.DuplicateResolverDialog;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.JabRefException;
@@ -29,15 +27,13 @@ public class GenerateEntryFromIdAction extends SimpleCommand {
     private final DialogService dialogService;
     private final PreferencesService preferencesService;
     private final String identifier;
-    private final StateManager stateManager;
     private final TaskExecutor taskExecutor;
 
-    public GenerateEntryFromIdAction(LibraryTab libraryTab, DialogService dialogService, PreferencesService preferencesService, StateManager stateManager, TaskExecutor taskExecutor, String identifier) {
+    public GenerateEntryFromIdAction(LibraryTab libraryTab, DialogService dialogService, PreferencesService preferencesService, TaskExecutor taskExecutor, String identifier) {
         this.libraryTab = libraryTab;
         this.dialogService = dialogService;
         this.preferencesService = preferencesService;
         this.identifier = identifier;
-        this.stateManager = stateManager;
         this.taskExecutor = taskExecutor;
     }
 
@@ -69,25 +65,14 @@ public class GenerateEntryFromIdAction extends SimpleCommand {
                     final BibEntry entry = result.get();
                     ImportCleanup cleanup = new ImportCleanup(libraryTab.getBibDatabaseContext().getMode());
                     cleanup.doPostCleanup(entry);
+                    // DuplicateCheck only covers DOI and ISBN at the moment.
                     Optional<BibEntry> duplicate = new DuplicateCheck(Globals.entryTypesManager).containsDuplicate(libraryTab.getDatabase(), entry, libraryTab.getBibDatabaseContext().getMode());
                     if (duplicate.isPresent()) {
-                        DuplicateResolverDialog dialog = new DuplicateResolverDialog(entry, duplicate.get(), DuplicateResolverDialog.DuplicateResolverType.IMPORT_CHECK, libraryTab.getBibDatabaseContext(), stateManager);
-                        switch (dialogService.showCustomDialogAndWait(dialog).orElse(DuplicateResolverDialog.DuplicateResolverResult.BREAK)) {
-                            case KEEP_LEFT -> {
-                                libraryTab.getDatabase().removeEntry(duplicate.get());
-                                libraryTab.getDatabase().insertEntry(entry);
-                            }
-                            case KEEP_BOTH -> libraryTab.getDatabase().insertEntry(entry);
-                            case KEEP_MERGE -> {
-                                libraryTab.getDatabase().removeEntry(duplicate.get());
-                                libraryTab.getDatabase().insertEntry(dialog.getMergedEntry());
-                            }
-                            default -> {
-                            }
-                        }
+                        updateMessage(Localization.lang("Duplicates found"));
+                        throw new JabRefException("Duplicate found, import halted.");
                     }
                 } else {
-                    updateMessage(Localization.lang("Error"));
+                    updateMessage(Localization.lang("Could not find any bibliographic information."));
                     throw new JabRefException("Invalid identifier or connection failure.");
                 }
                 updateMessage(Localization.lang("Imported one entry"));
