@@ -936,6 +936,7 @@ public class JabRefFrame extends BorderPane {
                 entryFromIdPopOver.show(newEntryFromIdButton);
             }
         });
+        newEntryFromIdButton.setTooltip(new Tooltip(Localization.lang("Import by ID")));
 
         return newEntryFromIdButton;
     }

@@ -68,7 +68,7 @@ public class GenerateEntryFromIdAction extends SimpleCommand {
                     // DuplicateCheck only covers DOI and ISBN at the moment.
                     Optional<BibEntry> duplicate = new DuplicateCheck(Globals.entryTypesManager).containsDuplicate(libraryTab.getDatabase(), entry, libraryTab.getBibDatabaseContext().getMode());
                     if (duplicate.isPresent()) {
-                        updateMessage(Localization.lang("Duplicates found"));
+                        updateMessage(Localization.lang("Entry already exists."));
                         throw new JabRefException("Duplicate found, import halted.");
                     }
                 } else {
