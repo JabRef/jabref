@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -26,7 +25,6 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.FieldPriority;
 import org.jabref.model.entry.field.OrFields;
-import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.UnknownEntryType;
 import org.jabref.preferences.PreferencesService;
@@ -39,9 +37,6 @@ import de.saxsys.mvvmfx.utils.validation.Validator;
 public class CustomEntryTypeDialogViewModel {
 
     public static final StringConverter<Field> FIELD_STRING_CONVERTER = new StringConverter<>() {
-        private static final ObservableList<Field> FIELDS =
-                FXCollections.observableArrayList(FieldFactory.getStandardFieldsWithCitationKey());
-
         @Override
         public String toString(Field object) {
             return object != null ? object.getDisplayName() : "";
@@ -49,8 +44,7 @@ public class CustomEntryTypeDialogViewModel {
 
         @Override
         public Field fromString(String string) {
-            Optional<Field> lookupField = FIELDS.stream().filter(f -> f.getDisplayName().equalsIgnoreCase(string)).findFirst();
-            return lookupField.orElse(new UnknownField(string));
+            return FieldFactory.parseField(string);
         }
     };
 
