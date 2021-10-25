@@ -47,7 +47,6 @@ public class CompositeIdFetcher {
         }
 
         return Optional.empty();
-
     }
 
     public String getName() {
