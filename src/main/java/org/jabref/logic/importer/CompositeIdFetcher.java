@@ -12,7 +12,11 @@ import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.entry.identifier.ISBN;
 import org.jabref.model.entry.identifier.IacrEprint;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class CompositeIdFetcher {
+    private static final Logger LOGGER = LoggerFactory.getLogger(CompositeIdFetcher.class);
 
     private final ImportFormatPreferences importFormatPreferences;
 
@@ -39,7 +43,7 @@ public class CompositeIdFetcher {
                 return new IacrEprintFetcher(importFormatPreferences).performSearchById(iacrEprint.get().getNormalized());
             }
         } catch (FetcherException fetcherException) {
-            fetcherException.printStackTrace();
+            LOGGER.error("Error during fetching.", fetcherException);
         }
 
         return Optional.empty();
