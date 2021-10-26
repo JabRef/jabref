@@ -86,6 +86,8 @@ import org.jabref.gui.help.AboutAction;
 import org.jabref.gui.help.ErrorConsoleAction;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.help.SearchForUpdateAction;
+import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.importer.GenerateEntryFromIdDialog;
 import org.jabref.gui.importer.ImportCommand;
 import org.jabref.gui.importer.ImportEntriesDialog;
 import org.jabref.gui.importer.NewDatabaseAction;
@@ -174,6 +176,7 @@ public class JabRefFrame extends BorderPane {
     private SidePane sidePane;
     private TabPane tabbedPane;
     private PopOver progressViewPopOver;
+    private PopOver entryFromIdPopOver;
 
     private final TaskExecutor taskExecutor;
 
@@ -475,6 +478,8 @@ public class JabRefFrame extends BorderPane {
         final Button pushToApplicationButton = factory.createIconButton(pushToApplicationAction.getActionInformation(), pushToApplicationAction);
         pushToApplicationsManager.registerReconfigurable(pushToApplicationButton);
 
+        // Setup Toolbar
+
         ToolBar toolBar = new ToolBar(
 
                 new HBox(
@@ -491,6 +496,7 @@ public class JabRefFrame extends BorderPane {
                 new HBox(
                         factory.createIconButton(StandardActions.NEW_ARTICLE, new NewEntryAction(this, StandardEntryType.Article, dialogService, prefs, stateManager)),
                         factory.createIconButton(StandardActions.NEW_ENTRY, new NewEntryAction(this, dialogService, prefs, stateManager)),
+                        createNewEntryFromIdButton(),
                         factory.createIconButton(StandardActions.NEW_ENTRY_FROM_PLAIN_TEXT, new ExtractBibtexAction(dialogService, prefs, stateManager)),
                         factory.createIconButton(StandardActions.DELETE_ENTRY, new EditAction(StandardActions.DELETE_ENTRY, this, stateManager))
                 ),
@@ -903,6 +909,36 @@ public class JabRefFrame extends BorderPane {
                 help);
         menu.setUseSystemMenuBar(true);
         return menu;
+    }
+
+    private Button createNewEntryFromIdButton() {
+        Button newEntryFromIdButton = new Button();
+
+        newEntryFromIdButton.setGraphic(IconTheme.JabRefIcons.IMPORT.getGraphicNode());
+        newEntryFromIdButton.getStyleClass().setAll("icon-button");
+        newEntryFromIdButton.setFocusTraversable(false);
+        newEntryFromIdButton.disableProperty().bind(ActionHelper.needsDatabase(stateManager).not());
+        newEntryFromIdButton.setOnMouseClicked(event -> {
+            GenerateEntryFromIdDialog entryFromId = new GenerateEntryFromIdDialog(getCurrentLibraryTab(), dialogService, prefs, taskExecutor);
+
+            if (entryFromIdPopOver == null) {
+                entryFromIdPopOver = new PopOver(entryFromId.getDialogPane());
+                entryFromIdPopOver.setTitle(Localization.lang("Import by ID"));
+                entryFromIdPopOver.setArrowLocation(PopOver.ArrowLocation.TOP_CENTER);
+                entryFromIdPopOver.setContentNode(entryFromId.getDialogPane());
+                entryFromIdPopOver.show(newEntryFromIdButton);
+                entryFromId.setEntryFromIdPopOver(entryFromIdPopOver);
+            } else if (entryFromIdPopOver.isShowing()) {
+                entryFromIdPopOver.hide();
+            } else {
+                entryFromIdPopOver.setContentNode(entryFromId.getDialogPane());
+                entryFromIdPopOver.show(newEntryFromIdButton);
+                entryFromId.setEntryFromIdPopOver(entryFromIdPopOver);
+            }
+        });
+        newEntryFromIdButton.setTooltip(new Tooltip(Localization.lang("Import by ID")));
+
+        return newEntryFromIdButton;
     }
 
     private Group createTaskIndicator() {

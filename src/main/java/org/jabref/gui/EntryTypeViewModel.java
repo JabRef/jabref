@@ -151,7 +151,7 @@ public class EntryTypeViewModel {
                 ImportCleanup cleanup = new ImportCleanup(libraryTab.getBibDatabaseContext().getMode());
                 cleanup.doPostCleanup(entry);
                 Optional<BibEntry> duplicate = new DuplicateCheck(Globals.entryTypesManager).containsDuplicate(libraryTab.getDatabase(), entry, libraryTab.getBibDatabaseContext().getMode());
-                if ((duplicate.isPresent())) {
+                if (duplicate.isPresent()) {
                     DuplicateResolverDialog dialog = new DuplicateResolverDialog(entry, duplicate.get(), DuplicateResolverDialog.DuplicateResolverType.IMPORT_CHECK, libraryTab.getBibDatabaseContext(), stateManager);
                     switch (dialogService.showCustomDialogAndWait(dialog).orElse(DuplicateResolverDialog.DuplicateResolverResult.BREAK)) {
                         case KEEP_LEFT:
