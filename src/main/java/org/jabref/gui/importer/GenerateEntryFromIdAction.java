@@ -11,6 +11,7 @@ import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.JabRefException;
 import org.jabref.logic.database.DuplicateCheck;
 import org.jabref.logic.importer.CompositeIdFetcher;
+import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportCleanup;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
@@ -46,10 +47,11 @@ public class GenerateEntryFromIdAction extends SimpleCommand {
         backgroundTask.titleProperty().set(Localization.lang("Import by ID"));
         backgroundTask.showToUser(true);
         backgroundTask.onRunning(() -> dialogService.notify("%s".formatted(backgroundTask.messageProperty().get())));
-        backgroundTask.onFailure((e) -> dialogService.notify(Localization.lang("Entry could not be created")));
-        backgroundTask.onSuccess((entry) -> entry.ifPresentOrElse((e) -> {
-                libraryTab.insertEntry(e);
+        backgroundTask.onFailure((e) -> dialogService.notify(e.getMessage()));
+        backgroundTask.onSuccess((bibEntry) -> bibEntry.ifPresentOrElse((entry) -> {
+                libraryTab.insertEntry(entry);
                 entryFromIdPopOver.hide();
+                dialogService.notify(Localization.lang("Imported one entry"));
                 },
                 () -> dialogService.notify(Localization.lang("Import canceled"))
         ));
@@ -65,24 +67,25 @@ public class GenerateEntryFromIdAction extends SimpleCommand {
                 }
 
                 updateMessage(Localization.lang("Searching..."));
-                Optional<BibEntry> result = new CompositeIdFetcher(preferencesService.getImportFormatPreferences()).performSearchById(identifier);
-                LOGGER.debug("Resulted in {}", result);
-                if (result.isPresent()) {
-                    final BibEntry entry = result.get();
-                    ImportCleanup cleanup = new ImportCleanup(libraryTab.getBibDatabaseContext().getMode());
-                    cleanup.doPostCleanup(entry);
-                    // DuplicateCheck only covers DOI and ISBN at the moment.
-                    Optional<BibEntry> duplicate = new DuplicateCheck(Globals.entryTypesManager).containsDuplicate(libraryTab.getDatabase(), entry, libraryTab.getBibDatabaseContext().getMode());
-                    if (duplicate.isPresent()) {
-                        updateMessage(Localization.lang("Entry already exists."));
-                        throw new JabRefException("Duplicate found, import halted.");
+                try {
+                    Optional<BibEntry> result = new CompositeIdFetcher(preferencesService.getImportFormatPreferences()).performSearchById(identifier);
+                    if (result.isPresent()) {
+                        final BibEntry entry = result.get();
+                        ImportCleanup cleanup = new ImportCleanup(libraryTab.getBibDatabaseContext().getMode());
+                        cleanup.doPostCleanup(entry);
+                        // DuplicateCheck only covers DOI and ISBN at the moment.
+                        Optional<BibEntry> duplicate = new DuplicateCheck(Globals.entryTypesManager).containsDuplicate(libraryTab.getDatabase(), entry, libraryTab.getBibDatabaseContext().getMode());
+                        if (duplicate.isPresent()) {
+                            throw new JabRefException(Localization.lang("Entry already exists"));
+                        }
+                    } else {
+                        throw new JabRefException(Localization.lang("Could not find any bibliographic information."));
                     }
-                } else {
-                    updateMessage(Localization.lang("Could not find any bibliographic information."));
-                    throw new JabRefException("Invalid identifier or connection failure.");
+                    updateMessage(Localization.lang("Imported one entry"));
+                    return result;
+                } catch (FetcherException fetcherException) {
+                    throw new JabRefException("Fetcher error: %s".formatted(fetcherException.getMessage()));
                 }
-                updateMessage(Localization.lang("Imported one entry"));
-                return result;
             }
         };
     }
