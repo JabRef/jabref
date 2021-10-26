@@ -1004,7 +1004,7 @@ public class JabRefFrame extends BorderPane {
         });
     }
 
-    private ContextMenu createTabContextMenu(KeyBindingRepository keyBindingRepository) {
+    private ContextMenu createTabContextMenuFor(LibraryTab tab, KeyBindingRepository keyBindingRepository) {
         ContextMenu contextMenu = new ContextMenu();
         ActionFactory factory = new ActionFactory(keyBindingRepository);
 
@@ -1012,8 +1012,8 @@ public class JabRefFrame extends BorderPane {
                 factory.createMenuItem(StandardActions.OPEN_DATABASE_FOLDER, new OpenDatabaseFolder()),
                 factory.createMenuItem(StandardActions.OPEN_CONSOLE, new OpenConsoleAction(stateManager, prefs)),
                 new SeparatorMenuItem(),
-                factory.createMenuItem(StandardActions.CLOSE_LIBRARY, new CloseDatabaseAction()),
-                factory.createMenuItem(StandardActions.CLOSE_OTHER_LIBRARIES, new CloseOthersDatabaseAction()),
+                factory.createMenuItem(StandardActions.CLOSE_LIBRARY, new CloseDatabaseAction(tab)),
+                factory.createMenuItem(StandardActions.CLOSE_OTHER_LIBRARIES, new CloseOthersDatabaseAction(tab)),
                 factory.createMenuItem(StandardActions.CLOSE_ALL_LIBRARIES, new CloseAllDatabaseAction())
         );
 
@@ -1029,7 +1029,7 @@ public class JabRefFrame extends BorderPane {
             event.consume();
         });
 
-        libraryTab.setContextMenu(createTabContextMenu(Globals.getKeyPrefs()));
+        libraryTab.setContextMenu(createTabContextMenuFor(libraryTab, Globals.getKeyPrefs()));
 
         if (raisePanel) {
             tabbedPane.getSelectionModel().select(libraryTab);
@@ -1199,25 +1199,40 @@ public class JabRefFrame extends BorderPane {
     }
 
     private class CloseDatabaseAction extends SimpleCommand {
+        private final LibraryTab libraryTab;
+
+        public CloseDatabaseAction(LibraryTab libraryTab) {
+            this.libraryTab = libraryTab;
+        }
+
+        public CloseDatabaseAction() {
+            this(null);
+        }
 
         @Override
         public void execute() {
-            closeTab(getCurrentLibraryTab());
+            closeTab(Optional.of(libraryTab).orElse(getCurrentLibraryTab()));
         }
     }
 
     private class CloseOthersDatabaseAction extends SimpleCommand {
+        private final LibraryTab libraryTab;
+
+        public CloseOthersDatabaseAction(LibraryTab libraryTab) {
+            this.libraryTab = libraryTab;
+            this.executable.bind(ActionHelper.isOpenMultiDatabase(tabbedPane));
+        }
 
         public CloseOthersDatabaseAction() {
-            this.executable.bind(ActionHelper.isOpenMultiDatabase(tabbedPane));
+            this(null);
         }
 
         @Override
         public void execute() {
-            LibraryTab currentLibraryTab = getCurrentLibraryTab();
+            LibraryTab toKeepLibraryTab = Optional.of(libraryTab).orElse(getCurrentLibraryTab());
             for (Tab tab : tabbedPane.getTabs()) {
                 LibraryTab libraryTab = (LibraryTab) tab;
-                if (libraryTab != currentLibraryTab) {
+                if (libraryTab != toKeepLibraryTab) {
                     closeTab(libraryTab);
                 }
             }
