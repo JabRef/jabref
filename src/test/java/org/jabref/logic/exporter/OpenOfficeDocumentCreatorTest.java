@@ -84,7 +84,7 @@ public class OpenOfficeDocumentCreatorTest {
         exporter.export(databaseContext, zipPath, charset, entries);
 
         Path unzipFolder = testFolder.resolve("unzipFolder");
-        unzipContextXml(zipPath, testFolder.resolve(unzipFolder));
+        unzipContentXml(zipPath, testFolder.resolve(unzipFolder));
         Path contentXmlPath = unzipFolder.resolve("content.xml");
 
         Input.Builder control = Input.from(Files.newInputStream(xmlFile));
@@ -95,7 +95,7 @@ public class OpenOfficeDocumentCreatorTest {
                                        .withNodeMatcher(new DefaultNodeMatcher(ElementSelectors.byNameAndText)).throwComparisonFailure());
     }
 
-    private static void unzipContextXml(Path zipFile, Path unzipFolder) throws IOException {
+    private static void unzipContentXml(Path zipFile, Path unzipFolder) throws IOException {
         try (ZipInputStream zis = new ZipInputStream(new FileInputStream(zipFile.toFile()))) {
             ZipEntry zipEntry = zis.getNextEntry();
 
