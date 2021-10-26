@@ -18,12 +18,8 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.PreferencesService;
 
 import org.controlsfx.control.PopOver;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class GenerateEntryFromIdAction extends SimpleCommand {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(GenerateEntryFromIdDialog.class);
 
     private final LibraryTab libraryTab;
     private final DialogService dialogService;
