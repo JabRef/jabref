@@ -5,7 +5,6 @@ import java.util.stream.Stream;
 
 import org.jabref.logic.bibtex.FieldContentFormatterPreferences;
 import org.jabref.logic.importer.CompositeIdFetcher;
-import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
@@ -17,11 +16,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -30,7 +26,6 @@ import static org.mockito.Mockito.when;
  * IdBasedFetcher interface are a prerequisite. Excluding TitleFetcher.
  */
 class CompositeIdFetcherTest {
-    private final static Logger LOGGER = LoggerFactory.getLogger(CompositeIdFetcherTest.class);
 
     private CompositeIdFetcher compositeIdFetcher;
 
@@ -105,21 +100,13 @@ class CompositeIdFetcherTest {
     @ParameterizedTest
     @ValueSource(strings = "arZiv:2110.02957")
     void performSearchByIdReturnsEmptyForInvalidId(String groundInvalidArXivId) {
-        try {
-            assertEquals(Optional.empty(), compositeIdFetcher.performSearchById(groundInvalidArXivId));
-        } catch (FetcherException fetcherException) {
-            fail("Fetcher Exception caught: %s".formatted(fetcherException.getMessage()));
-        }
+        assertEquals(Optional.empty(), compositeIdFetcher.performSearchById(groundInvalidArXivId));
     }
 
     @ParameterizedTest(name = "{index} {0}")
     @MethodSource("provideTestData")
     void performSearchByIdReturnsCorrectEntryForIdentifier(String name, BibEntry bibEntry, String identifier) {
-        try {
         assertEquals(Optional.of(bibEntry), compositeIdFetcher.performSearchById(identifier));
-        } catch (FetcherException fetcherException) {
-            fail("Fetcher Exception caught: %s".formatted(fetcherException.getMessage()));
-        }
     }
 
 }
