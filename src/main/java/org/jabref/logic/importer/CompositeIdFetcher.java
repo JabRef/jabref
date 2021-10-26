@@ -26,6 +26,10 @@ public class CompositeIdFetcher {
 
     public Optional<BibEntry> performSearchById(String identifier) {
         try {
+            Optional<DOI> doi = DOI.parse(identifier);
+            if (doi.isPresent()) {
+                return new DoiFetcher(importFormatPreferences).performSearchById(doi.get().getNormalized());
+            }
             Optional<ArXivIdentifier> arXivIdentifier = ArXivIdentifier.parse(identifier);
             if (arXivIdentifier.isPresent()) {
                 return new ArXiv(importFormatPreferences).performSearchById(arXivIdentifier.get().getNormalized());
@@ -33,10 +37,6 @@ public class CompositeIdFetcher {
             Optional<ISBN> isbn = ISBN.parse(identifier);
             if (isbn.isPresent()) {
                 return new IsbnFetcher(importFormatPreferences).performSearchById(isbn.get().getNormalized());
-            }
-            Optional<DOI> doi = DOI.parse(identifier);
-            if (doi.isPresent()) {
-                return new DoiFetcher(importFormatPreferences).performSearchById(doi.get().getNormalized());
             }
             Optional<IacrEprint> iacrEprint = IacrEprint.parse(identifier);
             if (iacrEprint.isPresent()) {
