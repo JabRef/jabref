@@ -49,7 +49,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixed an issue where typing an invalid UNC path into the "Main file directory" text field caused an error. [#8107](https://github.com/JabRef/jabref/issues/8107)
 - We fixed an issue where "Open Folder" didn't select the file on macOS in Finder [#8130](https://github.com/JabRef/jabref/issues/8130)
 - We fixed an issue where importing PDFs resulted in an uncaught exception [#8143](https://github.com/JabRef/jabref/issues/8143)
-- We fixed an issue where right-clicking on a tab and selecting close will close the focused tab even if it is not the tab we right-clicked [#8193](https://github.com/JabRef/jabref/pull/8193) 
+- We fixed an issue where right-clicking on a tab and selecting close will close the focused tab even if it is not the tab we right-clicked [#8193](https://github.com/JabRef/jabref/pull/8193)
 
 ### Removed
 
