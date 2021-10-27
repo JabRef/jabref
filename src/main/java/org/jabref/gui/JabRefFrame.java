@@ -1223,13 +1223,9 @@ public class JabRefFrame extends BorderPane {
             this.executable.bind(ActionHelper.isOpenMultiDatabase(tabbedPane));
         }
 
-        public CloseOthersDatabaseAction() {
-            this(null);
-        }
-
         @Override
         public void execute() {
-            LibraryTab toKeepLibraryTab = Optional.of(libraryTab).orElse(getCurrentLibraryTab());
+            LibraryTab toKeepLibraryTab = Optional.of(libraryTab).get();
             for (Tab tab : tabbedPane.getTabs()) {
                 LibraryTab libraryTab = (LibraryTab) tab;
                 if (libraryTab != toKeepLibraryTab) {
