@@ -1205,13 +1205,16 @@ public class JabRefFrame extends BorderPane {
             this.libraryTab = libraryTab;
         }
 
+        /**
+         * Using this constructor will result in executing the command on the currently open library tab
+         * */
         public CloseDatabaseAction() {
             this(null);
         }
 
         @Override
         public void execute() {
-            closeTab(Optional.of(libraryTab).orElse(getCurrentLibraryTab()));
+            closeTab(Optional.ofNullable(libraryTab).orElse(getCurrentLibraryTab()));
         }
     }
 
