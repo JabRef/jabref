@@ -94,7 +94,7 @@ public class ExistingStudySearchAction extends SimpleCommand {
         }
         final Crawler crawler;
         try {
-            crawler = new Crawler(studyDirectory, new SlrGitHandler(studyDirectory), generalPreferences, importFormatPreferences, savePreferences, preferencesService.getTimestampPreferences(), new BibEntryTypesManager(), fileUpdateMonitor);
+            crawler = new Crawler(studyDirectory, new SlrGitHandler(studyDirectory), generalPreferences, importFormatPreferences, savePreferences, new BibEntryTypesManager(), fileUpdateMonitor);
         } catch (IOException | ParseException e) {
             LOGGER.error("Error during reading of study definition file.", e);
             dialogService.showErrorDialogAndWait(Localization.lang("Error during reading of study definition file."), e);

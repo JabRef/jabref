@@ -36,7 +36,6 @@ class CrawlerTest {
     Path tempRepositoryDirectory;
     ImportFormatPreferences importFormatPreferences;
     SavePreferences savePreferences;
-    TimestampPreferences timestampPreferences;
     BibEntryTypesManager entryTypesManager;
     SlrGitHandler gitHandler = mock(SlrGitHandler.class, Answers.RETURNS_DEFAULTS);
     String hashCodeQuantum = String.valueOf("Quantum".hashCode());
@@ -47,7 +46,7 @@ class CrawlerTest {
     @Test
     public void testWhetherAllFilesAreCreated() throws Exception {
         setUp();
-        Crawler testCrawler = new Crawler(getPathToStudyDefinitionFile(), gitHandler, generalPreferences, importFormatPreferences, savePreferences, timestampPreferences, entryTypesManager, new DummyFileUpdateMonitor());
+        Crawler testCrawler = new Crawler(getPathToStudyDefinitionFile(), gitHandler, generalPreferences, importFormatPreferences, savePreferences, entryTypesManager, new DummyFileUpdateMonitor());
 
         testCrawler.performCrawl();
 
@@ -88,7 +87,6 @@ class CrawlerTest {
 
         importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
         savePreferences = mock(SavePreferences.class, Answers.RETURNS_DEEP_STUBS);
-        timestampPreferences = mock(TimestampPreferences.class);
         when(savePreferences.getSaveOrder()).thenReturn(new SaveOrderConfig());
         when(savePreferences.takeMetadataSaveOrderInAccount()).thenReturn(true);
         when(savePreferences.getCitationKeyPatternPreferences()).thenReturn(citationKeyPatternPreferences);
