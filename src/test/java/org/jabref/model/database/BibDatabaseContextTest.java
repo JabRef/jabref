@@ -26,7 +26,7 @@ class BibDatabaseContextTest {
     void setUp() {
         fileDirPrefs = mock(FilePreferences.class);
         currentWorkingDir = Path.of(System.getProperty("user.dir"));
-        when(fileDirPrefs.shouldStoreFilesRelativeToBib()).thenReturn(true);
+        when(fileDirPrefs.shouldStoreFilesRelativeToBibFile()).thenReturn(true);
     }
 
     @Test
@@ -70,7 +70,7 @@ class BibDatabaseContextTest {
         BibDatabaseContext database = new BibDatabaseContext();
         database.setDatabasePath(file);
         database.getMetaData().setDefaultFileDirectory("../Literature");
-        assertEquals(Arrays.asList(currentWorkingDir.resolve(file.getParent()), Path.of("/absolute/Literature").toAbsolutePath()),
+        assertEquals(Arrays.asList(Path.of("/absolute/Literature").toAbsolutePath(), currentWorkingDir.resolve(file.getParent())),
                 database.getFileDirectories(fileDirPrefs));
     }
 
@@ -81,7 +81,7 @@ class BibDatabaseContextTest {
         BibDatabaseContext database = new BibDatabaseContext();
         database.setDatabasePath(file);
         database.getMetaData().setDefaultFileDirectory("Literature");
-        assertEquals(Arrays.asList(currentWorkingDir.resolve(file.getParent()), Path.of("/absolute/subdir/Literature").toAbsolutePath()),
+        assertEquals(Arrays.asList(Path.of("/absolute/subdir/Literature").toAbsolutePath(), currentWorkingDir.resolve(file.getParent())),
                 database.getFileDirectories(fileDirPrefs));
     }
 

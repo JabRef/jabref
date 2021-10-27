@@ -236,7 +236,7 @@
           <group prefix=" " delimiter=". ">
             <group>
               <!-- To Do: localize once we have a proper term -->
-              <text macro="title" suffix=" [computer program]" />
+              <text macro="title" suffix=" [computer program]"/>
             </group>
             <group delimiter=" ">
               <text term="version" text-case="capitalize-first"/>

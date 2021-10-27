@@ -86,6 +86,8 @@ import org.jabref.gui.help.AboutAction;
 import org.jabref.gui.help.ErrorConsoleAction;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.help.SearchForUpdateAction;
+import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.importer.GenerateEntryFromIdDialog;
 import org.jabref.gui.importer.ImportCommand;
 import org.jabref.gui.importer.ImportEntriesDialog;
 import org.jabref.gui.importer.NewDatabaseAction;
@@ -109,6 +111,9 @@ import org.jabref.gui.search.GlobalSearchBar;
 import org.jabref.gui.search.RebuildFulltextSearchIndexAction;
 import org.jabref.gui.shared.ConnectToSharedDatabaseCommand;
 import org.jabref.gui.shared.PullChangesFromSharedAction;
+import org.jabref.gui.sidepane.SidePane;
+import org.jabref.gui.sidepane.SidePaneComponent;
+import org.jabref.gui.sidepane.SidePaneType;
 import org.jabref.gui.slr.ExistingStudySearchAction;
 import org.jabref.gui.slr.StartNewStudyAction;
 import org.jabref.gui.specialfields.SpecialFieldMenuItemFactory;
@@ -168,10 +173,10 @@ public class JabRefFrame extends BorderPane {
     private final CountingUndoManager undoManager;
     private final PushToApplicationsManager pushToApplicationsManager;
     private final DialogService dialogService;
-    private SidePaneManager sidePaneManager;
-    private TabPane tabbedPane;
     private SidePane sidePane;
+    private TabPane tabbedPane;
     private PopOver progressViewPopOver;
+    private PopOver entryFromIdPopOver;
 
     private final TaskExecutor taskExecutor;
 
@@ -180,8 +185,8 @@ public class JabRefFrame extends BorderPane {
         this.dialogService = new JabRefDialogService(mainStage, this, prefs);
         this.stateManager = Globals.stateManager;
         this.pushToApplicationsManager = new PushToApplicationsManager(dialogService, stateManager, prefs);
-        this.globalSearchBar = new GlobalSearchBar(this, stateManager, prefs);
         this.undoManager = Globals.undoManager;
+        this.globalSearchBar = new GlobalSearchBar(this, stateManager, prefs, undoManager);
         this.fileHistory = new FileHistoryMenu(prefs, dialogService, getOpenDatabaseAction());
         this.taskExecutor = Globals.TASK_EXECUTOR;
         this.setOnKeyTyped(key -> {
@@ -350,9 +355,8 @@ public class JabRefFrame extends BorderPane {
                 Path focusedDatabase = getCurrentLibraryTab().getBibDatabaseContext()
                                                              .getDatabasePath()
                                                              .orElse(null);
-                prefs.storeGuiPreferences(prefs.getGuiPreferences()
-                                               .withLastFilesOpened(filenames)
-                                               .withLastFocusedFile(focusedDatabase));
+                prefs.getGuiPreferences().setLastFilesOpened(filenames);
+                prefs.getGuiPreferences().setLastFocusedFile(focusedDatabase);
             }
         }
 
@@ -460,8 +464,7 @@ public class JabRefFrame extends BorderPane {
         splitPane.setDividerPositions(prefs.getGuiPreferences().getSidePaneWidth());
         if (!splitPane.getDividers().isEmpty()) {
             EasyBind.subscribe(splitPane.getDividers().get(0).positionProperty(),
-                    position -> prefs.storeGuiPreferences(prefs.getGuiPreferences()
-                                                               .withSidePaneWidth(position.doubleValue())));
+                    position -> prefs.getGuiPreferences().setSidePaneWidth(position.doubleValue()));
         }
     }
 
@@ -474,6 +477,8 @@ public class JabRefFrame extends BorderPane {
         final PushToApplicationAction pushToApplicationAction = getPushToApplicationsManager().getPushToApplicationAction();
         final Button pushToApplicationButton = factory.createIconButton(pushToApplicationAction.getActionInformation(), pushToApplicationAction);
         pushToApplicationsManager.registerReconfigurable(pushToApplicationButton);
+
+        // Setup Toolbar
 
         ToolBar toolBar = new ToolBar(
 
@@ -491,6 +496,7 @@ public class JabRefFrame extends BorderPane {
                 new HBox(
                         factory.createIconButton(StandardActions.NEW_ARTICLE, new NewEntryAction(this, StandardEntryType.Article, dialogService, prefs, stateManager)),
                         factory.createIconButton(StandardActions.NEW_ENTRY, new NewEntryAction(this, dialogService, prefs, stateManager)),
+                        createNewEntryFromIdButton(),
                         factory.createIconButton(StandardActions.NEW_ENTRY_FROM_PLAIN_TEXT, new ExtractBibtexAction(dialogService, prefs, stateManager)),
                         factory.createIconButton(StandardActions.DELETE_ENTRY, new EditAction(StandardActions.DELETE_ENTRY, this, stateManager))
                 ),
@@ -566,8 +572,7 @@ public class JabRefFrame extends BorderPane {
     }
 
     public void init() {
-        sidePaneManager = new SidePaneManager(prefs, this, taskExecutor, dialogService, stateManager);
-        sidePane = sidePaneManager.getPane();
+        sidePane = new SidePane(prefs, taskExecutor, dialogService, stateManager, undoManager);
 
         tabbedPane = new TabPane();
         tabbedPane.setTabDragPolicy(TabPane.TabDragPolicy.REORDER);
@@ -594,8 +599,14 @@ public class JabRefFrame extends BorderPane {
         // Subscribe to the search
         EasyBind.subscribe(stateManager.activeSearchQueryProperty(),
                 query -> {
-                    if (getCurrentLibraryTab() != null) {
-                        getCurrentLibraryTab().setCurrentSearchQuery(query);
+                    if (prefs.getSearchPreferences().isKeepSearchString()) {
+                        for (LibraryTab tab : getLibraryTabs()) {
+                            tab.setCurrentSearchQuery(query);
+                        }
+                    } else {
+                        if (getCurrentLibraryTab() != null) {
+                            getCurrentLibraryTab().setCurrentSearchQuery(query);
+                        }
                     }
                 });
 
@@ -826,14 +837,14 @@ public class JabRefFrame extends BorderPane {
                 factory.createMenuItem(StandardActions.REBUILD_FULLTEXT_SEARCH_INDEX, new RebuildFulltextSearchIndexAction(stateManager, this::getCurrentLibraryTab, dialogService, prefs.getFilePreferences()))
         );
 
-        SidePaneComponent webSearch = sidePaneManager.getComponent(SidePaneType.WEB_SEARCH);
-        SidePaneComponent groups = sidePaneManager.getComponent(SidePaneType.GROUPS);
-        SidePaneComponent openOffice = sidePaneManager.getComponent(SidePaneType.OPEN_OFFICE);
+        SidePaneComponent webSearch = sidePane.getComponent(SidePaneType.WEB_SEARCH);
+        SidePaneComponent groups = sidePane.getComponent(SidePaneType.GROUPS);
+        SidePaneComponent openOffice = sidePane.getComponent(SidePaneType.OPEN_OFFICE);
 
         view.getItems().addAll(
-                factory.createCheckMenuItem(webSearch.getToggleAction(), webSearch.getToggleCommand(), sidePaneManager.isComponentVisible(SidePaneType.WEB_SEARCH)),
-                factory.createCheckMenuItem(groups.getToggleAction(), groups.getToggleCommand(), sidePaneManager.isComponentVisible(SidePaneType.GROUPS)),
-                factory.createCheckMenuItem(openOffice.getToggleAction(), openOffice.getToggleCommand(), sidePaneManager.isComponentVisible(SidePaneType.OPEN_OFFICE)),
+                factory.createCheckMenuItem(webSearch.getToggleAction(), webSearch.getToggleCommand(), sidePane.isComponentVisible(SidePaneType.WEB_SEARCH)),
+                factory.createCheckMenuItem(groups.getToggleAction(), groups.getToggleCommand(), sidePane.isComponentVisible(SidePaneType.GROUPS)),
+                factory.createCheckMenuItem(openOffice.getToggleAction(), openOffice.getToggleCommand(), sidePane.isComponentVisible(SidePaneType.OPEN_OFFICE)),
 
                 new SeparatorMenuItem(),
 
@@ -898,6 +909,36 @@ public class JabRefFrame extends BorderPane {
                 help);
         menu.setUseSystemMenuBar(true);
         return menu;
+    }
+
+    private Button createNewEntryFromIdButton() {
+        Button newEntryFromIdButton = new Button();
+
+        newEntryFromIdButton.setGraphic(IconTheme.JabRefIcons.IMPORT.getGraphicNode());
+        newEntryFromIdButton.getStyleClass().setAll("icon-button");
+        newEntryFromIdButton.setFocusTraversable(false);
+        newEntryFromIdButton.disableProperty().bind(ActionHelper.needsDatabase(stateManager).not());
+        newEntryFromIdButton.setOnMouseClicked(event -> {
+            GenerateEntryFromIdDialog entryFromId = new GenerateEntryFromIdDialog(getCurrentLibraryTab(), dialogService, prefs, taskExecutor);
+
+            if (entryFromIdPopOver == null) {
+                entryFromIdPopOver = new PopOver(entryFromId.getDialogPane());
+                entryFromIdPopOver.setTitle(Localization.lang("Import by ID"));
+                entryFromIdPopOver.setArrowLocation(PopOver.ArrowLocation.TOP_CENTER);
+                entryFromIdPopOver.setContentNode(entryFromId.getDialogPane());
+                entryFromIdPopOver.show(newEntryFromIdButton);
+                entryFromId.setEntryFromIdPopOver(entryFromIdPopOver);
+            } else if (entryFromIdPopOver.isShowing()) {
+                entryFromIdPopOver.hide();
+            } else {
+                entryFromIdPopOver.setContentNode(entryFromId.getDialogPane());
+                entryFromIdPopOver.show(newEntryFromIdButton);
+                entryFromId.setEntryFromIdPopOver(entryFromIdPopOver);
+            }
+        });
+        newEntryFromIdButton.setTooltip(new Tooltip(Localization.lang("Import by ID")));
+
+        return newEntryFromIdButton;
     }
 
     private Group createTaskIndicator() {
@@ -1162,10 +1203,6 @@ public class JabRefFrame extends BorderPane {
 
     public OpenDatabaseAction getOpenDatabaseAction() {
         return new OpenDatabaseAction(this, prefs, dialogService, stateManager);
-    }
-
-    public SidePaneManager getSidePaneManager() {
-        return sidePaneManager;
     }
 
     public PushToApplicationsManager getPushToApplicationsManager() {

@@ -11,6 +11,8 @@ env:
   SpringerNatureAPIKey: ${{ secrets.SpringerNatureAPIKey }}
   AstrophysicsDataSystemAPIKey: ${{ secrets.AstrophysicsDataSystemAPIKey }}
   IEEEAPIKey: ${{ secrets.IEEEAPIKey }}
+  GRADLE_OPTS: -Xmx4g
+  JAVA_OPTS: -Xmx4g
 
 jobs:
   checkstyle:
@@ -28,15 +30,7 @@ jobs:
         with:
           java-version: 16
           distribution: 'adopt'
-      - name: Restore gradle cache
-        uses: actions/cache@v2
-        with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle7-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle7-
+          cache: 'gradle'
       - name: Run check style reporter
         uses: nikitasavinov/checkstyle-action@master
         with:
@@ -47,7 +41,7 @@ jobs:
       - name: Run markdown-lint
         uses: avto-dev/markdown-lint@v1
         with:
-          args: CHANGELOG.md CONTRIBUTING.md README.md docs/
+          args: CHANGELOG.md CONTRIBUTING.md README.md
           config: '.markdownlint.yml'
   tests:
     name: Unit tests
@@ -60,15 +54,7 @@ jobs:
         with:
           java-version: 16
           distribution: 'adopt'
-      - uses: actions/cache@v2
-        name: Restore gradle cache
-        with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle7-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle7-
+          cache: 'gradle'
       - name: Run tests
         run: xvfb-run --auto-servernum ./gradlew check -x checkstyleJmh -x checkstyleMain -x checkstyleTest
         env:
@@ -100,15 +86,7 @@ jobs:
         with:
           java-version: 16
           distribution: 'adopt'
-      - name: Restore gradle cache
-        uses: actions/cache@v2
-        with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle7-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle7-
+          cache: 'gradle'
       - name: Run tests on PostgreSQL
         run: ./gradlew databaseTest --rerun-tasks
         env:
@@ -142,15 +120,7 @@ jobs:
         with:
           java-version: 16
           distribution: 'adopt'
-      - uses: actions/cache@v2
-        name: Restore gradle cache
-        with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle7-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle7-
+          cache: 'gradle'
       - name: Run GUI tests
         run: xvfb-run --auto-servernum ./gradlew guiTest
         env:
@@ -188,15 +158,7 @@ jobs:
         with:
           java-version: 16
           distribution: 'adopt'
-      - name: Restore gradle cache
-        uses: actions/cache@v2
-        with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle7-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle7-
+          cache: 'gradle'
       - name: Update test coverage metrics
         if: ${{ steps.checksecrets.outputs.secretspresent }}
         run: xvfb-run --auto-servernum ./gradlew jacocoTestReport && bash <(curl -s https://codecov.io/bash);

@@ -23,7 +23,8 @@ env:
   AstrophysicsDataSystemAPIKey: ${{ secrets.AstrophysicsDataSystemAPIKey }}
   IEEEAPIKey: ${{ secrets.IEEEAPIKey }}
   OSXCERT: ${{ secrets.OSX_SIGNING_CERT }}
-  GRADLE_OPTS: -Dorg.gradle.daemon=false -Dorg.gradle.vfs.watch=false
+  GRADLE_OPTS: -Xmx4g -Dorg.gradle.daemon=false -Dorg.gradle.vfs.watch=false
+  JAVA_OPTS: -Xmx4g
 
 jobs:
   build:
@@ -64,15 +65,7 @@ jobs:
         with:
           java-version: 16
           distribution: 'adopt'
-      - name: Restore gradle cache
-        uses: actions/cache@v2
-        with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle7x-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle7x-
+          cache: 'gradle'
       - name: Setup OSX key chain on OSX
         if: matrix.os == 'macos-latest'
         uses: apple-actions/import-codesign-certs@v1
@@ -105,7 +98,7 @@ jobs:
           jpackage --type pkg --dest build/distribution --name JabRef --mac-package-identifier JabRef --app-version "${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}" --app-image build/distribution/JabRef.app --verbose --type pkg --vendor JabRef --app-version "${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}" --file-associations buildres/mac/bibtexAssociations.properties --resource-dir buildres/mac
           productsign --sign "Developer ID Installer: JabRef e.V. (6792V39SK3)" "build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}.pkg" "build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}-signed.pkg"
       - name: Notarize dmg and pkg installer
-        if: matrix.os == 'macos-latest' && startsWith(github.ref, 'refs/tags/') 
+        if: matrix.os == 'macos-latest' && startsWith(github.ref, 'refs/tags/')
         shell: bash
         run: |
           REQUEST_UUID_DMG=$(xcrun altool --verbose --notarize-app --primary-bundle-id "org.jabref" --username ${{ secrets.OSX_NOTARIZATION_APP_USERNAME }} --password ${{ secrets.OSX_NOTARIZATION_APP_PWD }} --asc-provider "6792V39SK3" --file "build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}.dmg" | grep RequestUUID | awk '{print $3}')

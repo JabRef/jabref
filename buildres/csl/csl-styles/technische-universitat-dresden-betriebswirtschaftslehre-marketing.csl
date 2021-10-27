@@ -20,7 +20,7 @@
   </info>
   <locale xml:lang="de">
     <terms>
-      <term name="anonymous" form="short">o. V.</term>
+      <term name="anonymous" form="short">o.&#8201;V.</term>
       <term name="accessed" form="verb">Zugriff am</term>
       <term name="presented at">gehalten auf</term>
       <term name="et-al">et al.</term>

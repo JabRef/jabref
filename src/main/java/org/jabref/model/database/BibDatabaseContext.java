@@ -144,14 +144,14 @@ public class BibDatabaseContext {
         preferences.getFileDirectory().ifPresent(fileDirs::add);
 
         // 4. BIB file directory
-        if (preferences.shouldStoreFilesRelativeToBib()) {
+        if (preferences.shouldStoreFilesRelativeToBibFile()) {
             getDatabasePath().ifPresent(dbPath -> {
                 Path parentPath = dbPath.getParent();
                 if (parentPath == null) {
                     parentPath = Path.of(System.getProperty("user.dir"));
                 }
                 Objects.requireNonNull(parentPath, "BibTeX database parent path is null");
-                fileDirs.add(0, parentPath);
+                fileDirs.add(parentPath);
             });
         }
 
@@ -221,7 +221,7 @@ public class BibDatabaseContext {
         Path appData = getFulltextIndexBasePath();
 
         if (getDatabasePath().isPresent()) {
-            LOGGER.info("Index path for {} is {}", getDatabasePath().get(), appData.toString());
+            LOGGER.info("Index path for {} is {}", getDatabasePath().get(), appData);
             return appData.resolve(String.valueOf(this.getDatabasePath().get().hashCode()));
         }
 

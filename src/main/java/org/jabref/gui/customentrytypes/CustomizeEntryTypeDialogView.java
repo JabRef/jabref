@@ -6,7 +6,6 @@ import javax.inject.Inject;
 
 import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyStringWrapper;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar.ButtonData;
@@ -62,7 +61,6 @@ public class CustomizeEntryTypeDialogView extends BaseDialog<Void> {
     @FXML private ButtonType resetButton;
     @FXML private Button addNewEntryTypeButton;
     @FXML private Button addNewFieldButton;
-
 
     @Inject private PreferencesService preferencesService;
     @Inject private StateManager stateManager;
@@ -172,6 +170,9 @@ public class CustomizeEntryTypeDialogView extends BaseDialog<Void> {
                 .install(fieldTypeActionColumn);
 
         viewModel.newFieldToAddProperty().bindBidirectional(addNewField.valueProperty());
+        // The valueProperty() of addNewField ComboBox needs to be updated by typing text in the ComboBox textfield,
+        // since the enabled/disabled state of addNewFieldButton won't update otherwise
+        EasyBind.subscribe(addNewField.getEditor().textProperty(), text -> addNewField.setValue(CustomEntryTypeDialogViewModel.FIELD_STRING_CONVERTER.fromString(text)));
 
         EasyBind.subscribe(viewModel.selectedEntryTypeProperty(), type -> {
             if (type != null) {
@@ -184,12 +185,14 @@ public class CustomizeEntryTypeDialogView extends BaseDialog<Void> {
               .setOnDragDetected(this::handleOnDragDetected)
               .setOnDragDropped(this::handleOnDragDropped)
               .setOnDragOver(this::handleOnDragOver)
+              .setOnDragExited(this::handleOnDragExited)
               .install(fields);
 }
 
-    private void handleOnDragOver(FieldViewModel originalItem, DragEvent event) {
+    private void handleOnDragOver(TableRow<FieldViewModel> row, FieldViewModel originalItem, DragEvent event) {
         if ((event.getGestureSource() != originalItem) && event.getDragboard().hasContent(DragAndDropDataFormats.FIELD)) {
             event.acceptTransferModes(TransferMode.MOVE);
+            ControlHelper.setDroppingPseudoClasses(row, event);
         }
     }
 
@@ -206,28 +209,25 @@ public class CustomizeEntryTypeDialogView extends BaseDialog<Void> {
     }
 
     private void handleOnDragDropped(TableRow<FieldViewModel> row, FieldViewModel originalItem, DragEvent event) {
-        boolean success = false;
-
-        ObservableList<FieldViewModel> items = fields.itemsProperty().get();
 
         if (localDragboard.hasType(FieldViewModel.class)) {
             FieldViewModel field = localDragboard.getValue(FieldViewModel.class);
-            int draggedIdx = 0;
-            for (int i = 0; i < items.size(); i++) {
-                if (items.get(i).equals(field)) {
-                    draggedIdx = i;
-                    field = items.get(i);
-                    break;
-                }
-            }
-            int thisIdx = items.indexOf(originalItem);
-            items.set(draggedIdx, originalItem);
-            items.set(thisIdx, field);
-            success = true;
-        }
+            fields.getItems().remove(field);
 
-        event.setDropCompleted(success);
+            if (row.isEmpty()) {
+                fields.getItems().add(field);
+            } else {
+                // decide based on drop position whether to add the element before or after
+                int offset = event.getY() > (row.getHeight() / 2) ? 1 : 0;
+                fields.getItems().add(row.getIndex() + offset, field);
+            }
+        }
+        event.setDropCompleted(true);
         event.consume();
+    }
+
+    private void handleOnDragExited(TableRow<FieldViewModel> row, FieldViewModel fieldViewModel, DragEvent dragEvent) {
+        ControlHelper.removeDroppingPseudoClasses(row);
     }
 
     @FXML

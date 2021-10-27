@@ -113,16 +113,14 @@ public class EntryTypeViewModel {
 
         @Override
         protected Optional<BibEntry> call() throws InterruptedException, FetcherException {
-            Optional<BibEntry> bibEntry = Optional.empty();
-
             searchingProperty().setValue(true);
             storeSelectedFetcher();
             fetcher = selectedItemProperty().getValue();
             searchID = idText.getValue();
-            if (!searchID.isEmpty()) {
-                bibEntry = fetcher.performSearchById(searchID);
+            if (searchID.isEmpty()) {
+                return Optional.empty();
             }
-            return bibEntry;
+            return fetcher.performSearchById(searchID);
         }
     }
 
@@ -153,7 +151,7 @@ public class EntryTypeViewModel {
                 ImportCleanup cleanup = new ImportCleanup(libraryTab.getBibDatabaseContext().getMode());
                 cleanup.doPostCleanup(entry);
                 Optional<BibEntry> duplicate = new DuplicateCheck(Globals.entryTypesManager).containsDuplicate(libraryTab.getDatabase(), entry, libraryTab.getBibDatabaseContext().getMode());
-                if ((duplicate.isPresent())) {
+                if (duplicate.isPresent()) {
                     DuplicateResolverDialog dialog = new DuplicateResolverDialog(entry, duplicate.get(), DuplicateResolverDialog.DuplicateResolverType.IMPORT_CHECK, libraryTab.getBibDatabaseContext(), stateManager);
                     switch (dialogService.showCustomDialogAndWait(dialog).orElse(DuplicateResolverDialog.DuplicateResolverResult.BREAK)) {
                         case KEEP_LEFT:

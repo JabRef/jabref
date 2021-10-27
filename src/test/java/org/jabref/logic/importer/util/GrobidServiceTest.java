@@ -75,7 +75,7 @@ public class GrobidServiceTest {
 
     @Test
     public void failsWhenGrobidDisabled() {
-        ImporterPreferences importSettingsWithGrobidDisabled = new ImporterPreferences(false, true, false, "http://grobid.jabref.org:8070");
+        ImporterPreferences importSettingsWithGrobidDisabled = new ImporterPreferences(false, false, false, "http://grobid.jabref.org:8070");
         assertThrows(UnsupportedOperationException.class, () -> new GrobidService(importSettingsWithGrobidDisabled));
     }
 

@@ -23,6 +23,7 @@ import org.jabref.logic.importer.WebFetchers;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.SidePanePreferences;
 
 import com.tobiasdiez.easybind.EasyBind;
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
@@ -55,7 +56,8 @@ public class WebSearchPaneViewModel {
         fetchers.setAll(allFetchers);
 
         // Choose last-selected fetcher as default
-        int defaultFetcherIndex = preferencesService.getSidePanePreferences().getWebSearchFetcherSelected();
+        SidePanePreferences sidePanePreferences = preferencesService.getSidePanePreferences();
+        int defaultFetcherIndex = sidePanePreferences.getWebSearchFetcherSelected();
         if ((defaultFetcherIndex <= 0) || (defaultFetcherIndex >= fetchers.size())) {
             selectedFetcherProperty().setValue(fetchers.get(0));
         } else {
@@ -63,7 +65,7 @@ public class WebSearchPaneViewModel {
         }
         EasyBind.subscribe(selectedFetcherProperty(), newFetcher -> {
             int newIndex = fetchers.indexOf(newFetcher);
-            preferencesService.storeSidePanePreferences(preferencesService.getSidePanePreferences().withWebSearchFetcherSelected(newIndex));
+            sidePanePreferences.setWebSearchFetcherSelected(newIndex);
         });
 
         searchQueryValidator = new FunctionBasedValidator<>(

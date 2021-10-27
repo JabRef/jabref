@@ -30,8 +30,12 @@ class RenamePdfCleanupTest {
     private FilePreferences filePreferences;
     private RenamePdfCleanup cleanup;
 
+    // Ensure that the folder stays the same for all tests. By default @TempDir creates a new folder for each usage
+    private Path testFolder;
+
     @BeforeEach
     void setUp(@TempDir Path testFolder) {
+        this.testFolder = testFolder;
         Path path = testFolder.resolve("test.bib");
         MetaData metaData = new MetaData();
         BibDatabaseContext context = new BibDatabaseContext(new BibDatabase(), metaData);
@@ -41,7 +45,7 @@ class RenamePdfCleanupTest {
         entry.setCitationKey("Toot");
 
         filePreferences = mock(FilePreferences.class);
-        when(filePreferences.shouldStoreFilesRelativeToBib()).thenReturn(true); // Set Biblocation as Primary Directory, otherwise the tmp folders won't be cleaned up correctly
+        when(filePreferences.shouldStoreFilesRelativeToBibFile()).thenReturn(true); // Set Biblocation as Primary Directory, otherwise the tmp folders won't be cleaned up correctly
         cleanup = new RenamePdfCleanup(false, context, filePreferences);
     }
 
@@ -49,7 +53,7 @@ class RenamePdfCleanupTest {
      * Test for #466
      */
     @Test
-    void cleanupRenamePdfRenamesFileEvenIfOnlyDifferenceIsCase(@TempDir Path testFolder) throws IOException {
+    void cleanupRenamePdfRenamesFileEvenIfOnlyDifferenceIsCase() throws IOException {
         Path path = testFolder.resolve("toot.tmp");
         Files.createFile(path);
 
@@ -64,7 +68,7 @@ class RenamePdfCleanupTest {
     }
 
     @Test
-    void cleanupRenamePdfRenamesWithMultipleFiles(@TempDir Path testFolder) throws IOException {
+    void cleanupRenamePdfRenamesWithMultipleFiles() throws IOException {
         Path path = testFolder.resolve("Toot.tmp");
         Files.createFile(path);
 
@@ -87,7 +91,7 @@ class RenamePdfCleanupTest {
     }
 
     @Test
-    void cleanupRenamePdfRenamesFileStartingWithCitationKey(@TempDir Path testFolder) throws IOException {
+    void cleanupRenamePdfRenamesFileStartingWithCitationKey() throws IOException {
         Path path = testFolder.resolve("Toot.tmp");
         Files.createFile(path);
 
@@ -103,7 +107,7 @@ class RenamePdfCleanupTest {
     }
 
     @Test
-    void cleanupRenamePdfRenamesFileInSameFolder(@TempDir Path testFolder) throws IOException {
+    void cleanupRenamePdfRenamesFileInSameFolder() throws IOException {
         Path path = testFolder.resolve("Toot.pdf");
         Files.createFile(path);
         LinkedFile fileField = new LinkedFile("", Path.of("Toot.pdf"), "PDF");

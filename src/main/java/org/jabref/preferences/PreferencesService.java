@@ -67,8 +67,6 @@ public interface PreferencesService {
 
     FilePreferences getFilePreferences();
 
-    void storeFilePreferences(FilePreferences filePreferences);
-
     FieldWriterPreferences getFieldWriterPreferences();
 
     FileHistory getFileHistory();
@@ -178,11 +176,7 @@ public interface PreferencesService {
 
     RemotePreferences getRemotePreferences();
 
-    void storeRemotePreferences(RemotePreferences remotePreferences);
-
     ProxyPreferences getProxyPreferences();
-
-    void storeProxyPreferences(ProxyPreferences proxyPreferences);
 
     //*************************************************************************************************************
     // CitationKeyPatternPreferences
@@ -294,15 +288,11 @@ public interface PreferencesService {
 
     SidePanePreferences getSidePanePreferences();
 
-    void storeSidePanePreferences(SidePanePreferences sidePanePreferences);
-
     //*************************************************************************************************************
     // GuiPreferences
     //*************************************************************************************************************
 
     GuiPreferences getGuiPreferences();
-
-    void storeGuiPreferences(GuiPreferences guiPreferences);
 
     void clearEditedFiles();
 

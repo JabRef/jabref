@@ -3,7 +3,6 @@ package org.jabref.gui.preferences.linkedfiles;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
@@ -24,14 +23,14 @@ import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 public class LinkedFilesTab extends AbstractPreferenceTabView<LinkedFilesTabViewModel> implements PreferencesTab {
 
     @FXML private TextField mainFileDirectory;
-    @FXML private CheckBox useBibLocationAsPrimary;
+    @FXML private RadioButton useMainFileDirectory;
+    @FXML private RadioButton useBibLocationAsPrimary;
+    @FXML private Button browseDirectory;
     @FXML private Button autolinkRegexHelp;
     @FXML private RadioButton autolinkFileStartsBibtex;
     @FXML private RadioButton autolinkFileExactBibtex;
     @FXML private RadioButton autolinkUseRegex;
     @FXML private TextField autolinkRegexKey;
-    @FXML private CheckBox searchFilesOnOpen;
-    @FXML private CheckBox openBrowseOnCreate;
 
     @FXML private ComboBox<String> fileNamePattern;
     @FXML private TextField fileDirectoryPattern;
@@ -53,14 +52,16 @@ public class LinkedFilesTab extends AbstractPreferenceTabView<LinkedFilesTabView
         this.viewModel = new LinkedFilesTabViewModel(dialogService, preferencesService);
 
         mainFileDirectory.textProperty().bindBidirectional(viewModel.mainFileDirectoryProperty());
+        mainFileDirectory.disableProperty().bind(viewModel.useBibLocationAsPrimaryProperty());
+        browseDirectory.disableProperty().bind(viewModel.useBibLocationAsPrimaryProperty());
         useBibLocationAsPrimary.selectedProperty().bindBidirectional(viewModel.useBibLocationAsPrimaryProperty());
+        useMainFileDirectory.selectedProperty().bindBidirectional(viewModel.useMainFileDirectoryProperty());
+
         autolinkFileStartsBibtex.selectedProperty().bindBidirectional(viewModel.autolinkFileStartsBibtexProperty());
         autolinkFileExactBibtex.selectedProperty().bindBidirectional(viewModel.autolinkFileExactBibtexProperty());
         autolinkUseRegex.selectedProperty().bindBidirectional(viewModel.autolinkUseRegexProperty());
         autolinkRegexKey.textProperty().bindBidirectional(viewModel.autolinkRegexKeyProperty());
         autolinkRegexKey.disableProperty().bind(autolinkUseRegex.selectedProperty().not());
-        searchFilesOnOpen.selectedProperty().bindBidirectional(viewModel.searchFilesOnOpenProperty());
-        openBrowseOnCreate.selectedProperty().bindBidirectional(viewModel.openBrowseOnCreateProperty());
         fileNamePattern.valueProperty().bindBidirectional(viewModel.fileNamePatternProperty());
         fileNamePattern.itemsProperty().bind(viewModel.defaultFileNamePatternsProperty());
         fileDirectoryPattern.textProperty().bindBidirectional(viewModel.fileDirectoryPatternProperty());
