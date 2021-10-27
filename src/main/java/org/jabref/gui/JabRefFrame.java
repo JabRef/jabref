@@ -1009,7 +1009,7 @@ public class JabRefFrame extends BorderPane {
         ActionFactory factory = new ActionFactory(keyBindingRepository);
 
         contextMenu.getItems().addAll(
-                factory.createMenuItem(StandardActions.OPEN_DATABASE_FOLDER, new OpenDatabaseFolder()),
+                factory.createMenuItem(StandardActions.OPEN_DATABASE_FOLDER, new OpenDatabaseFolder(tab.getBibDatabaseContext())),
                 factory.createMenuItem(StandardActions.OPEN_CONSOLE, new OpenConsoleAction(stateManager, prefs)),
                 new SeparatorMenuItem(),
                 factory.createMenuItem(StandardActions.CLOSE_LIBRARY, new CloseDatabaseAction(tab)),
@@ -1246,10 +1246,15 @@ public class JabRefFrame extends BorderPane {
     }
 
     private class OpenDatabaseFolder extends SimpleCommand {
+        private final BibDatabaseContext databaseContext;
+
+        public OpenDatabaseFolder(BibDatabaseContext databaseContext) {
+            this.databaseContext = databaseContext;
+        }
 
         @Override
         public void execute() {
-            stateManager.getActiveDatabase().flatMap(BibDatabaseContext::getDatabasePath).ifPresent(path -> {
+            Optional.of(databaseContext).flatMap(BibDatabaseContext::getDatabasePath).ifPresent(path -> {
                 try {
                     JabRefDesktop.openFolderAndSelectFile(path, prefs);
                 } catch (IOException e) {
