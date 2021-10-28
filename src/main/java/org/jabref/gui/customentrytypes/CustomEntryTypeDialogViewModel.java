@@ -25,7 +25,6 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.FieldPriority;
 import org.jabref.model.entry.field.OrFields;
-import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.UnknownEntryType;
 import org.jabref.preferences.PreferencesService;
@@ -38,7 +37,6 @@ import de.saxsys.mvvmfx.utils.validation.Validator;
 public class CustomEntryTypeDialogViewModel {
 
     public static final StringConverter<Field> FIELD_STRING_CONVERTER = new StringConverter<>() {
-
         @Override
         public String toString(Field object) {
             return object != null ? object.getDisplayName() : "";
@@ -46,7 +44,7 @@ public class CustomEntryTypeDialogViewModel {
 
         @Override
         public Field fromString(String string) {
-            return new UnknownField(string);
+            return FieldFactory.parseField(string);
         }
     };
 

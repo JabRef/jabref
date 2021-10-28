@@ -148,7 +148,7 @@ public class JabRefMain extends Application {
 
     private static void configureProxy(ProxyPreferences proxyPreferences) {
         ProxyRegisterer.register(proxyPreferences);
-        if (proxyPreferences.isUseProxy() && proxyPreferences.isUseAuthentication()) {
+        if (proxyPreferences.shouldUseProxy() && proxyPreferences.shouldUseAuthentication()) {
             Authenticator.setDefault(new ProxyAuthenticator());
         }
     }
