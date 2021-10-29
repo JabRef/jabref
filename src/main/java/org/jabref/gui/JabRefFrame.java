@@ -1038,16 +1038,16 @@ public class JabRefFrame extends BorderPane {
         });
     }
 
-    private ContextMenu createTabContextMenu(KeyBindingRepository keyBindingRepository) {
+    private ContextMenu createTabContextMenuFor(LibraryTab tab, KeyBindingRepository keyBindingRepository) {
         ContextMenu contextMenu = new ContextMenu();
         ActionFactory factory = new ActionFactory(keyBindingRepository);
 
         contextMenu.getItems().addAll(
-                factory.createMenuItem(StandardActions.OPEN_DATABASE_FOLDER, new OpenDatabaseFolder()),
-                factory.createMenuItem(StandardActions.OPEN_CONSOLE, new OpenConsoleAction(stateManager, prefs)),
+                factory.createMenuItem(StandardActions.OPEN_DATABASE_FOLDER, new OpenDatabaseFolder(tab.getBibDatabaseContext())),
+                factory.createMenuItem(StandardActions.OPEN_CONSOLE, new OpenConsoleAction(tab.getBibDatabaseContext(), stateManager, prefs)),
                 new SeparatorMenuItem(),
-                factory.createMenuItem(StandardActions.CLOSE_LIBRARY, new CloseDatabaseAction()),
-                factory.createMenuItem(StandardActions.CLOSE_OTHER_LIBRARIES, new CloseOthersDatabaseAction()),
+                factory.createMenuItem(StandardActions.CLOSE_LIBRARY, new CloseDatabaseAction(tab)),
+                factory.createMenuItem(StandardActions.CLOSE_OTHER_LIBRARIES, new CloseOthersDatabaseAction(tab)),
                 factory.createMenuItem(StandardActions.CLOSE_ALL_LIBRARIES, new CloseAllDatabaseAction())
         );
 
@@ -1063,7 +1063,7 @@ public class JabRefFrame extends BorderPane {
             event.consume();
         });
 
-        libraryTab.setContextMenu(createTabContextMenu(Globals.getKeyPrefs()));
+        libraryTab.setContextMenu(createTabContextMenuFor(libraryTab, Globals.getKeyPrefs()));
 
         if (raisePanel) {
             tabbedPane.getSelectionModel().select(libraryTab);
@@ -1233,25 +1233,39 @@ public class JabRefFrame extends BorderPane {
     }
 
     private class CloseDatabaseAction extends SimpleCommand {
+        private final LibraryTab libraryTab;
+
+        public CloseDatabaseAction(LibraryTab libraryTab) {
+            this.libraryTab = libraryTab;
+        }
+
+        /**
+         * Using this constructor will result in executing the command on the currently open library tab
+         * */
+        public CloseDatabaseAction() {
+            this(null);
+        }
 
         @Override
         public void execute() {
-            closeTab(getCurrentLibraryTab());
+            closeTab(Optional.ofNullable(libraryTab).orElse(getCurrentLibraryTab()));
         }
     }
 
     private class CloseOthersDatabaseAction extends SimpleCommand {
+        private final LibraryTab libraryTab;
 
-        public CloseOthersDatabaseAction() {
+        public CloseOthersDatabaseAction(LibraryTab libraryTab) {
+            this.libraryTab = libraryTab;
             this.executable.bind(ActionHelper.isOpenMultiDatabase(tabbedPane));
         }
 
         @Override
         public void execute() {
-            LibraryTab currentLibraryTab = getCurrentLibraryTab();
+            LibraryTab toKeepLibraryTab = Optional.of(libraryTab).get();
             for (Tab tab : tabbedPane.getTabs()) {
                 LibraryTab libraryTab = (LibraryTab) tab;
-                if (libraryTab != currentLibraryTab) {
+                if (libraryTab != toKeepLibraryTab) {
                     closeTab(libraryTab);
                 }
             }
@@ -1269,10 +1283,15 @@ public class JabRefFrame extends BorderPane {
     }
 
     private class OpenDatabaseFolder extends SimpleCommand {
+        private final BibDatabaseContext databaseContext;
+
+        public OpenDatabaseFolder(BibDatabaseContext databaseContext) {
+            this.databaseContext = databaseContext;
+        }
 
         @Override
         public void execute() {
-            stateManager.getActiveDatabase().flatMap(BibDatabaseContext::getDatabasePath).ifPresent(path -> {
+            Optional.of(databaseContext).flatMap(BibDatabaseContext::getDatabasePath).ifPresent(path -> {
                 try {
                     JabRefDesktop.openFolderAndSelectFile(path, prefs);
                 } catch (IOException e) {
