@@ -47,6 +47,7 @@ import org.jabref.model.metadata.MetaData;
 import org.jabref.model.metadata.SaveOrderConfig;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
+import org.jabref.preferences.GeneralPreferences;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -66,18 +67,20 @@ class BibtexDatabaseWriterTest {
     private BibDatabaseContext bibtexContext;
     private ImportFormatPreferences importFormatPreferences;
     private final FileUpdateMonitor fileMonitor = new DummyFileUpdateMonitor();
-    private SavePreferences preferences;
+    private GeneralPreferences generalPreferences;
+    private SavePreferences savePreferences;
     private BibEntryTypesManager entryTypesManager;
 
     @BeforeEach
     void setUp() {
         stringWriter = new StringWriter();
-        preferences = mock(SavePreferences.class, Answers.RETURNS_DEEP_STUBS);
-        when(preferences.getSaveOrder()).thenReturn(new SaveOrderConfig());
-        when(preferences.getEncoding()).thenReturn(null);
-        when(preferences.takeMetadataSaveOrderInAccount()).thenReturn(true);
+        generalPreferences = mock(GeneralPreferences.class);
+        when(generalPreferences.getDefaultEncoding()).thenReturn(null);
+        savePreferences = mock(SavePreferences.class, Answers.RETURNS_DEEP_STUBS);
+        when(savePreferences.getSaveOrder()).thenReturn(new SaveOrderConfig());
+        when(savePreferences.takeMetadataSaveOrderInAccount()).thenReturn(true);
         entryTypesManager = new BibEntryTypesManager();
-        databaseWriter = new BibtexDatabaseWriter(stringWriter, preferences, entryTypesManager);
+        databaseWriter = new BibtexDatabaseWriter(stringWriter, generalPreferences, savePreferences, entryTypesManager);
 
         database = new BibDatabase();
         metaData = new MetaData();
@@ -97,7 +100,7 @@ class BibtexDatabaseWriterTest {
 
     @Test
     void writeEncoding() throws Exception {
-        when(preferences.getEncoding()).thenReturn(StandardCharsets.US_ASCII);
+        when(generalPreferences.getDefaultEncoding()).thenReturn(StandardCharsets.US_ASCII);
 
         databaseWriter.savePartOfDatabase(bibtexContext, Collections.emptyList());
 
@@ -115,7 +118,7 @@ class BibtexDatabaseWriterTest {
 
     @Test
     void writePreambleAndEncoding() throws Exception {
-        when(preferences.getEncoding()).thenReturn(StandardCharsets.US_ASCII);
+        when(generalPreferences.getDefaultEncoding()).thenReturn(StandardCharsets.US_ASCII);
         database.setPreamble("Test preamble");
 
         databaseWriter.savePartOfDatabase(bibtexContext, Collections.emptyList());
@@ -141,7 +144,7 @@ class BibtexDatabaseWriterTest {
 
     @Test
     void writeEncodingAndEntry() throws Exception {
-        when(preferences.getEncoding()).thenReturn(StandardCharsets.US_ASCII);
+        when(generalPreferences.getDefaultEncoding()).thenReturn(StandardCharsets.US_ASCII);
         BibEntry entry = new BibEntry();
         entry.setType(StandardEntryType.Article);
         database.insertEntry(entry);
@@ -166,7 +169,7 @@ class BibtexDatabaseWriterTest {
 
     @Test
     void writeEpilogueAndEncoding() throws Exception {
-        when(preferences.getEncoding()).thenReturn(StandardCharsets.US_ASCII);
+        when(generalPreferences.getDefaultEncoding()).thenReturn(StandardCharsets.US_ASCII);
         database.setEpilog("Test epilog");
 
         databaseWriter.savePartOfDatabase(bibtexContext, Collections.emptyList());
@@ -189,7 +192,7 @@ class BibtexDatabaseWriterTest {
 
     @Test
     void writeMetadataAndEncoding() throws Exception {
-        when(preferences.getEncoding()).thenReturn(StandardCharsets.US_ASCII);
+        when(generalPreferences.getDefaultEncoding()).thenReturn(StandardCharsets.US_ASCII);
         DatabaseCitationKeyPattern bibtexKeyPattern = new DatabaseCitationKeyPattern(mock(GlobalCitationKeyPattern.class));
         bibtexKeyPattern.setDefaultValue("test");
         metaData.setCiteKeyPattern(bibtexKeyPattern);
@@ -220,7 +223,7 @@ class BibtexDatabaseWriterTest {
 
     @Test
     void writeGroupsAndEncoding() throws Exception {
-        when(preferences.getEncoding()).thenReturn(StandardCharsets.US_ASCII);
+        when(generalPreferences.getDefaultEncoding()).thenReturn(StandardCharsets.US_ASCII);
 
         GroupTreeNode groupRoot = GroupTreeNode.fromGroup(new AllEntriesGroup(""));
         groupRoot.addChild(GroupTreeNode.fromGroup(new ExplicitGroup("test", GroupHierarchyType.INCLUDING, ',')));
@@ -250,7 +253,7 @@ class BibtexDatabaseWriterTest {
 
     @Test
     void writeStringAndEncoding() throws Exception {
-        when(preferences.getEncoding()).thenReturn(StandardCharsets.US_ASCII);
+        when(generalPreferences.getDefaultEncoding()).thenReturn(StandardCharsets.US_ASCII);
         database.addString(new BibtexString("name", "content"));
 
         databaseWriter.savePartOfDatabase(bibtexContext, Collections.emptyList());
@@ -330,8 +333,8 @@ class BibtexDatabaseWriterTest {
         Charset encoding = StandardCharsets.UTF_8;
         ParserResult result = new BibtexParser(importFormatPreferences, fileMonitor).parse(Importer.getReader(testBibtexFile, encoding));
 
-        when(preferences.getEncoding()).thenReturn(encoding);
-        when(preferences.shouldSaveInOriginalOrder()).thenReturn(true);
+        when(generalPreferences.getDefaultEncoding()).thenReturn(encoding);
+        when(savePreferences.shouldSaveInOriginalOrder()).thenReturn(true);
         BibDatabaseContext context = new BibDatabaseContext(result.getDatabase(), result.getMetaData());
 
         databaseWriter.savePartOfDatabase(context, result.getDatabase().getEntries());
@@ -344,8 +347,8 @@ class BibtexDatabaseWriterTest {
         Charset encoding = StandardCharsets.UTF_8;
         ParserResult result = new BibtexParser(importFormatPreferences, fileMonitor).parse(Importer.getReader(testBibtexFile, encoding));
 
-        when(preferences.getEncoding()).thenReturn(encoding);
-        when(preferences.shouldSaveInOriginalOrder()).thenReturn(true);
+        when(generalPreferences.getDefaultEncoding()).thenReturn(encoding);
+        when(savePreferences.shouldSaveInOriginalOrder()).thenReturn(true);
         BibDatabaseContext context = new BibDatabaseContext(result.getDatabase(), result.getMetaData());
 
         databaseWriter.savePartOfDatabase(context, result.getDatabase().getEntries());
@@ -358,8 +361,8 @@ class BibtexDatabaseWriterTest {
         Charset encoding = StandardCharsets.UTF_8;
         ParserResult result = new BibtexParser(importFormatPreferences, fileMonitor).parse(Importer.getReader(testBibtexFile, encoding));
 
-        when(preferences.getEncoding()).thenReturn(encoding);
-        when(preferences.shouldSaveInOriginalOrder()).thenReturn(true);
+        when(generalPreferences.getDefaultEncoding()).thenReturn(encoding);
+        when(savePreferences.shouldSaveInOriginalOrder()).thenReturn(true);
         BibDatabaseContext context = new BibDatabaseContext(result.getDatabase(), result.getMetaData());
 
         databaseWriter.savePartOfDatabase(context, result.getDatabase().getEntries());
@@ -375,8 +378,8 @@ class BibtexDatabaseWriterTest {
         BibEntry entry = result.getDatabase().getEntryByCitationKey("1137631").get();
         entry.setField(StandardField.AUTHOR, "Mr. Author");
 
-        when(preferences.getEncoding()).thenReturn(encoding);
-        when(preferences.shouldSaveInOriginalOrder()).thenReturn(true);
+        when(generalPreferences.getDefaultEncoding()).thenReturn(encoding);
+        when(savePreferences.shouldSaveInOriginalOrder()).thenReturn(true);
         BibDatabaseContext context = new BibDatabaseContext(result.getDatabase(), result.getMetaData());
 
         databaseWriter.savePartOfDatabase(context, result.getDatabase().getEntries());
@@ -394,8 +397,8 @@ class BibtexDatabaseWriterTest {
             string.setContent(string.getContent());
         }
 
-        when(preferences.getEncoding()).thenReturn(encoding);
-        when(preferences.shouldSaveInOriginalOrder()).thenReturn(true);
+        when(generalPreferences.getDefaultEncoding()).thenReturn(encoding);
+        when(savePreferences.shouldSaveInOriginalOrder()).thenReturn(true);
         BibDatabaseContext context = new BibDatabaseContext(result.getDatabase(), result.getMetaData());
 
         databaseWriter.savePartOfDatabase(context, result.getDatabase().getEntries());
@@ -409,8 +412,8 @@ class BibtexDatabaseWriterTest {
         Charset encoding = StandardCharsets.UTF_8;
         ParserResult result = new BibtexParser(importFormatPreferences, fileMonitor).parse(Importer.getReader(testBibtexFile, encoding));
 
-        when(preferences.getEncoding()).thenReturn(encoding);
-        when(preferences.shouldSaveInOriginalOrder()).thenReturn(true);
+        when(generalPreferences.getDefaultEncoding()).thenReturn(encoding);
+        when(savePreferences.shouldSaveInOriginalOrder()).thenReturn(true);
         BibDatabaseContext context = new BibDatabaseContext(result.getDatabase(), result.getMetaData());
 
         databaseWriter.savePartOfDatabase(context, result.getDatabase().getEntries());
@@ -440,7 +443,7 @@ class BibtexDatabaseWriterTest {
         entry.setChanged(false);
         database.insertEntry(entry);
 
-        when(preferences.shouldReformatFile()).thenReturn(true);
+        when(savePreferences.shouldReformatFile()).thenReturn(true);
         databaseWriter.savePartOfDatabase(bibtexContext, Collections.singletonList(entry));
 
         assertEquals(
@@ -467,7 +470,7 @@ class BibtexDatabaseWriterTest {
         string.setParsedSerialization("wrong serialization");
         database.addString(string);
 
-        when(preferences.shouldReformatFile()).thenReturn(true);
+        when(savePreferences.shouldReformatFile()).thenReturn(true);
         databaseWriter.savePartOfDatabase(bibtexContext, Collections.emptyList());
 
         assertEquals(OS.NEWLINE + "@String{name = {content}}" + OS.NEWLINE, stringWriter.toString());
@@ -626,7 +629,7 @@ class BibtexDatabaseWriterTest {
         database.insertEntry(secondEntry);
         database.insertEntry(thirdEntry);
 
-        when(preferences.shouldSaveInOriginalOrder()).thenReturn(false);
+        when(savePreferences.shouldSaveInOriginalOrder()).thenReturn(false);
         databaseWriter.savePartOfDatabase(bibtexContext, database.getEntries());
 
         assertEquals(
@@ -686,8 +689,8 @@ class BibtexDatabaseWriterTest {
 
         ParserResult firstParse = new BibtexParser(importFormatPreferences, fileMonitor).parse(new StringReader(fileContent));
 
-        when(preferences.getEncoding()).thenReturn(encoding);
-        when(preferences.shouldSaveInOriginalOrder()).thenReturn(true);
+        when(generalPreferences.getDefaultEncoding()).thenReturn(encoding);
+        when(savePreferences.shouldSaveInOriginalOrder()).thenReturn(true);
         BibDatabaseContext context = new BibDatabaseContext(firstParse.getDatabase(), firstParse.getMetaData());
 
         databaseWriter.savePartOfDatabase(context, firstParse.getDatabase().getEntries());
@@ -725,7 +728,7 @@ class BibtexDatabaseWriterTest {
 
         // write a second time
         stringWriter = new StringWriter();
-        databaseWriter = new BibtexDatabaseWriter(stringWriter, preferences, entryTypesManager);
+        databaseWriter = new BibtexDatabaseWriter(stringWriter, generalPreferences, savePreferences, entryTypesManager);
         databaseWriter.savePartOfDatabase(context, firstParse.getDatabase().getEntries());
 
         assertEquals(OS.NEWLINE +
@@ -764,7 +767,7 @@ class BibtexDatabaseWriterTest {
 
         // write entry
         stringWriter = new StringWriter();
-        databaseWriter = new BibtexDatabaseWriter(stringWriter, preferences, entryTypesManager);
+        databaseWriter = new BibtexDatabaseWriter(stringWriter, generalPreferences, savePreferences, entryTypesManager);
         BibDatabaseContext context = new BibDatabaseContext(firstParse.getDatabase(), firstParse.getMetaData());
         databaseWriter.savePartOfDatabase(context, firstParse.getDatabase().getEntries());
 
@@ -802,7 +805,7 @@ class BibtexDatabaseWriterTest {
 
         // write a second time
         stringWriter = new StringWriter();
-        databaseWriter = new BibtexDatabaseWriter(stringWriter, preferences, entryTypesManager);
+        databaseWriter = new BibtexDatabaseWriter(stringWriter, generalPreferences, savePreferences, entryTypesManager);
         databaseWriter.savePartOfDatabase(context, firstParse.getDatabase().getEntries());
 
         // returns tu original entry, not to the last saved one

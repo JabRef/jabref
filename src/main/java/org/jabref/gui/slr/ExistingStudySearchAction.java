@@ -21,6 +21,7 @@ import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.FileUpdateMonitor;
+import org.jabref.preferences.GeneralPreferences;
 import org.jabref.preferences.PreferencesService;
 
 import org.eclipse.jgit.api.errors.GitAPIException;
@@ -40,6 +41,7 @@ public class ExistingStudySearchAction extends SimpleCommand {
     private final TaskExecutor taskExecutor;
     private final PreferencesService preferencesService;
     private final StateManager stateManager;
+    private final GeneralPreferences generalPreferences;
     private final ImportFormatPreferences importFormatPreferences;
     private final SavePreferences savePreferences;
     // This can be either populated before crawl is called or is populated in the call using the directory dialog. This is helpful if the directory is selected in a previous dialog/UI element
@@ -55,6 +57,7 @@ public class ExistingStudySearchAction extends SimpleCommand {
         this.taskExecutor = taskExecutor;
         this.preferencesService = preferencesService;
         this.stateManager = stateManager;
+        this.generalPreferences = preferencesService.getGeneralPreferences();
         this.importFormatPreferences = preferencesService.getImportFormatPreferences();
         this.savePreferences = preferencesService.getSavePreferences();
 
@@ -91,7 +94,7 @@ public class ExistingStudySearchAction extends SimpleCommand {
         }
         final Crawler crawler;
         try {
-            crawler = new Crawler(studyDirectory, new SlrGitHandler(studyDirectory), importFormatPreferences, savePreferences, preferencesService.getTimestampPreferences(), new BibEntryTypesManager(), fileUpdateMonitor);
+            crawler = new Crawler(studyDirectory, new SlrGitHandler(studyDirectory), generalPreferences, importFormatPreferences, savePreferences, new BibEntryTypesManager(), fileUpdateMonitor);
         } catch (IOException | ParseException e) {
             LOGGER.error("Error during reading of study definition file.", e);
             dialogService.showErrorDialogAndWait(Localization.lang("Error during reading of study definition file."), e);

@@ -17,6 +17,7 @@ import org.jabref.model.texparser.Citation;
 import org.jabref.model.texparser.LatexBibEntriesResolverResult;
 import org.jabref.model.texparser.LatexParserResult;
 import org.jabref.model.util.FileUpdateMonitor;
+import org.jabref.preferences.GeneralPreferences;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,11 +27,13 @@ public class TexBibEntriesResolver {
     private static final Logger LOGGER = LoggerFactory.getLogger(TexBibEntriesResolver.class);
 
     private final BibDatabase masterDatabase;
+    private final GeneralPreferences generalPreferences;
     private final ImportFormatPreferences importFormatPreferences;
     private final FileUpdateMonitor fileMonitor;
 
-    public TexBibEntriesResolver(BibDatabase masterDatabase, ImportFormatPreferences importFormatPreferences, FileUpdateMonitor fileMonitor) {
+    public TexBibEntriesResolver(BibDatabase masterDatabase, GeneralPreferences generalPreferences, ImportFormatPreferences importFormatPreferences, FileUpdateMonitor fileMonitor) {
         this.masterDatabase = masterDatabase;
+        this.generalPreferences = generalPreferences;
         this.importFormatPreferences = importFormatPreferences;
         this.fileMonitor = fileMonitor;
     }
@@ -45,7 +48,7 @@ public class TexBibEntriesResolver {
         Map<Path, BibDatabase> bibDatabases = resolverResult.getBibFiles().values().stream().distinct().collect(Collectors.toMap(
                 Function.identity(), path -> {
                     try {
-                        return OpenDatabase.loadDatabase(path, importFormatPreferences, fileMonitor).getDatabase();
+                        return OpenDatabase.loadDatabase(path, generalPreferences, importFormatPreferences, fileMonitor).getDatabase();
                     } catch (IOException e) {
                         LOGGER.error("Error opening file '{}'", path, e);
                         return ParserResult.fromError(e).getDatabase();

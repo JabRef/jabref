@@ -1,6 +1,5 @@
 package org.jabref.logic.importer;
 
-import java.nio.charset.Charset;
 import java.util.Set;
 
 import org.jabref.logic.bibtex.FieldContentFormatterPreferences;
@@ -12,7 +11,6 @@ import org.jabref.logic.xmp.XmpPreferences;
 public class ImportFormatPreferences {
 
     private final Set<CustomImporter> customImportList;
-    private final Charset encoding;
     private final Character keywordSeparator;
     private final CitationKeyPatternPreferences citationKeyPatternPreferences;
     private final FieldContentFormatterPreferences fieldContentFormatterPreferences;
@@ -21,7 +19,6 @@ public class ImportFormatPreferences {
     private final boolean keywordSyncEnabled;
 
     public ImportFormatPreferences(Set<CustomImporter> customImportList,
-                                   Charset encoding,
                                    Character keywordSeparator,
                                    CitationKeyPatternPreferences citationKeyPatternPreferences,
                                    FieldContentFormatterPreferences fieldContentFormatterPreferences,
@@ -29,7 +26,6 @@ public class ImportFormatPreferences {
                                    DOIPreferences doiPreferences,
                                    boolean keywordSyncEnabled) {
         this.customImportList = customImportList;
-        this.encoding = encoding;
         this.keywordSeparator = keywordSeparator;
         this.citationKeyPatternPreferences = citationKeyPatternPreferences;
         this.fieldContentFormatterPreferences = fieldContentFormatterPreferences;
@@ -50,10 +46,6 @@ public class ImportFormatPreferences {
         return customImportList;
     }
 
-    public Charset getEncoding() {
-        return encoding;
-    }
-
     public Character getKeywordSeparator() {
         return keywordSeparator;
     }
@@ -64,18 +56,6 @@ public class ImportFormatPreferences {
 
     public FieldContentFormatterPreferences getFieldContentFormatterPreferences() {
         return fieldContentFormatterPreferences;
-    }
-
-    public ImportFormatPreferences withEncoding(Charset newEncoding) {
-        return new ImportFormatPreferences(
-                customImportList,
-                newEncoding,
-                keywordSeparator,
-                citationKeyPatternPreferences,
-                fieldContentFormatterPreferences,
-                xmpPreferences,
-                doiPreferences,
-                keywordSyncEnabled);
     }
 
     /**

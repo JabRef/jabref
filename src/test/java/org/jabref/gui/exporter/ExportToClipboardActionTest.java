@@ -30,6 +30,7 @@ import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.metadata.MetaData;
+import org.jabref.preferences.GeneralPreferences;
 import org.jabref.preferences.ImportExportPreferences;
 import org.jabref.preferences.PreferencesService;
 
@@ -102,7 +103,9 @@ public class ExportToClipboardActionTest {
 
         when(importExportPrefs.getLastExportExtension()).thenReturn("HTML");
         when(preferences.getImportExportPreferences()).thenReturn(importExportPrefs);
-        when(preferences.getDefaultEncoding()).thenReturn(StandardCharsets.UTF_8);
+        GeneralPreferences generalPreferences = mock(GeneralPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        when(generalPreferences.getDefaultEncoding()).thenReturn(StandardCharsets.UTF_8);
+        when(preferences.getGeneralPreferences()).thenReturn(generalPreferences);
         when(libraryTab.getSelectedEntries()).thenReturn(selectedEntries);
         when(libraryTab.getBibDatabaseContext()).thenReturn(databaseContext);
         when(databaseContext.getFileDirectories(preferences.getFilePreferences())).thenReturn(new ArrayList<>(Arrays.asList(Path.of("path"))));

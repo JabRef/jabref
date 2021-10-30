@@ -1132,7 +1132,7 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public JournalAbbreviationPreferences getJournalAbbreviationPreferences() {
-        return new JournalAbbreviationPreferences(getStringList(EXTERNAL_JOURNAL_LISTS), getDefaultEncoding());
+        return new JournalAbbreviationPreferences(getStringList(EXTERNAL_JOURNAL_LISTS), getGeneralPreferences().getDefaultEncoding());
     }
 
     @Override
@@ -1317,32 +1317,13 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     @Override
-    public Charset getDefaultEncoding() {
-        return Charset.forName(get(DEFAULT_ENCODING));
-    }
-
-    /**
-     * Returns the default BibDatabase mode, which can be either BIBTEX or BIBLATEX.
-     *
-     * @return the default BibDatabaseMode
-     */
-    @Override
-    public BibDatabaseMode getDefaultBibDatabaseMode() {
-        if (getBoolean(BIBLATEX_DEFAULT_MODE)) {
-            return BibDatabaseMode.BIBLATEX;
-        } else {
-            return BibDatabaseMode.BIBTEX;
-        }
-    }
-
-    @Override
     public GeneralPreferences getGeneralPreferences() {
         if (Objects.nonNull(generalPreferences)) {
             return generalPreferences;
         }
 
         generalPreferences = new GeneralPreferences(
-                getDefaultEncoding(),
+                Charset.forName(get(DEFAULT_ENCODING)),
                 getBoolean(BIBLATEX_DEFAULT_MODE) ? BibDatabaseMode.BIBLATEX : BibDatabaseMode.BIBTEX,
                 getBoolean(WARN_ABOUT_DUPLICATES_IN_INSPECTION),
                 getBoolean(CONFIRM_DELETE),
@@ -2045,7 +2026,6 @@ public class JabRefPreferences implements PreferencesService {
     public ImportFormatPreferences getImportFormatPreferences() {
         return new ImportFormatPreferences(
                 getCustomImportFormats(),
-                getDefaultEncoding(),
                 getKeywordDelimiter(),
                 getCitationKeyPatternPreferences(),
                 getFieldContentParserPreferences(),
@@ -2120,7 +2100,6 @@ public class JabRefPreferences implements PreferencesService {
         return new SavePreferences(
                 false,
                 null,
-                this.getDefaultEncoding(),
                 SavePreferences.DatabaseSaveType.ALL,
                 true,
                 this.getBoolean(REFORMAT_FILE_ON_SAVE_AND_EXPORT),

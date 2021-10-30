@@ -21,6 +21,7 @@ import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.event.BibDatabaseContextChangedEvent;
 import org.jabref.model.entry.BibEntryTypesManager;
+import org.jabref.preferences.GeneralPreferences;
 import org.jabref.preferences.PreferencesService;
 
 import com.google.common.eventbus.Subscribe;
@@ -130,11 +131,11 @@ public class BackupManager {
 
     private void performBackup(Path backupPath) {
         try {
-            Charset charset = bibDatabaseContext.getMetaData().getEncoding().orElse(preferences.getDefaultEncoding());
+            Charset charset = bibDatabaseContext.getMetaData().getEncoding().orElse(preferences.getGeneralPreferences().getDefaultEncoding());
+            GeneralPreferences generalPreferences = preferences.getGeneralPreferences();
             SavePreferences savePreferences = preferences.getSavePreferences()
-                                                         .withEncoding(charset)
                                                          .withMakeBackup(false);
-            new BibtexDatabaseWriter(new AtomicFileWriter(backupPath, savePreferences.getEncoding()), savePreferences, entryTypesManager)
+            new BibtexDatabaseWriter(new AtomicFileWriter(backupPath, charset), generalPreferences, savePreferences, entryTypesManager)
                     .saveDatabase(bibDatabaseContext);
         } catch (IOException e) {
             logIfCritical(backupPath, e);

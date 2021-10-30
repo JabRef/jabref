@@ -201,6 +201,7 @@ public class ParseLatexDialogViewModel extends AbstractViewModel {
 
         TexBibEntriesResolver entriesResolver = new TexBibEntriesResolver(
                 databaseContext.getDatabase(),
+                preferencesService.getGeneralPreferences(),
                 preferencesService.getImportFormatPreferences(),
                 fileMonitor);
 
