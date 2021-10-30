@@ -3,6 +3,8 @@ package org.jabref.gui.sidepane;
 import java.util.Collections;
 import java.util.List;
 
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -24,6 +26,7 @@ public abstract class SidePaneComponent {
     private final JabRefIcon icon;
     private final String title;
     private Node contentNode;
+    private final BooleanProperty visible = new SimpleBooleanProperty();
 
     public SidePaneComponent(SidePane sidePane, JabRefIcon icon, String title) {
         this.sidePane = sidePane;
@@ -32,11 +35,25 @@ public abstract class SidePaneComponent {
         this.toggleCommand = new ToggleCommand(this);
     }
 
+    public BooleanProperty visibleProperty() {
+        return visible;
+    }
+
+    public boolean isVisible() {
+        return visibleProperty().get();
+    }
+
+    // TODO ('hide() is only used in SidePane')
     protected void hide() {
+        visible.setValue(false);
+        // TODO('Model should not update the view directly')
         sidePane.hide(this.getType());
     }
 
+    // TODO ('show() is only used in SidePane')
     protected void show() {
+        visible.setValue(true);
+        // TODO('Model should not update the view directly')
         sidePane.show(this.getType());
     }
 
@@ -96,6 +113,7 @@ public abstract class SidePaneComponent {
     public final Node getHeader() {
         Button close = IconTheme.JabRefIcons.CLOSE.asButton();
         close.setTooltip(new Tooltip(Localization.lang("Hide panel")));
+        // TODO (Use visibleProperty inside onAction)
         close.setOnAction(event -> hide());
 
         Button up = IconTheme.JabRefIcons.UP.asButton();
