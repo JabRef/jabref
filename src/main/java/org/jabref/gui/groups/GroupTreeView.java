@@ -329,6 +329,12 @@ public class GroupTreeView extends BorderPane {
                 event.setDropCompleted(success);
                 event.consume();
             });
+            row.setOnMouseClicked(event -> {
+                if (event.getButton().equals(MouseButton.PRIMARY) && event.getClickCount() == 2) {
+                    viewModel.editGroup(row.getItem());
+                    groupTree.refresh();
+                }
+            });
 
             return row;
         });
