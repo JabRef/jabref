@@ -25,6 +25,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.CheckMenuItem;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
@@ -113,6 +114,7 @@ import org.jabref.gui.shared.ConnectToSharedDatabaseCommand;
 import org.jabref.gui.shared.PullChangesFromSharedAction;
 import org.jabref.gui.sidepane.SidePane;
 import org.jabref.gui.sidepane.SidePaneComponent;
+import org.jabref.gui.sidepane.SidePaneContainerView;
 import org.jabref.gui.sidepane.SidePaneType;
 import org.jabref.gui.slr.ExistingStudySearchAction;
 import org.jabref.gui.slr.StartNewStudyAction;
@@ -145,6 +147,7 @@ import org.jabref.preferences.TelemetryPreferences;
 import com.google.common.eventbus.Subscribe;
 import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.EasyObservableList;
+import de.saxsys.mvvmfx.utils.commands.Command;
 import org.controlsfx.control.PopOver;
 import org.controlsfx.control.TaskProgressView;
 import org.fxmisc.richtext.CodeArea;
@@ -343,7 +346,7 @@ public class JabRefFrame extends BorderPane {
      * FIXME: Currently some threads remain and therefore hinder JabRef to be closed properly
      *
      * @param filenames the filenames of all currently opened files - used for storing them if prefs openLastEdited is
-     *                  set to true
+     * set to true
      */
     private void tearDownJabRef(List<String> filenames) {
         if (prefs.getGuiPreferences().shouldOpenLastEdited()) {
@@ -941,6 +944,12 @@ public class JabRefFrame extends BorderPane {
         return newEntryFromIdButton;
     }
 
+    private CheckMenuItem createSidePaneCheckMenuItem(SidePaneContainerView container, ActionFactory factory, SidePaneType paneType, Command toggleCommand) {
+        CheckMenuItem checkMenuItem = factory.createCheckMenuItem(paneType.getToggleAction(), toggleCommand, (container.isPaneVisibleProperty(paneType).get()));
+        checkMenuItem.selectedProperty().bindBidirectional(container.isPaneVisibleProperty(paneType));
+        return checkMenuItem;
+    }
+
     private Group createTaskIndicator() {
         ProgressIndicator indicator = new ProgressIndicator();
         indicator.getStyleClass().add("progress-indicatorToolbar");
@@ -1108,7 +1117,7 @@ public class JabRefFrame extends BorderPane {
     /**
      * Opens the import inspection dialog to let the user decide which of the given entries to import.
      *
-     * @param panel        The BasePanel to add to.
+     * @param panel The BasePanel to add to.
      * @param parserResult The entries to add.
      */
     private void addImportedEntries(final LibraryTab panel, final ParserResult parserResult) {
@@ -1241,7 +1250,7 @@ public class JabRefFrame extends BorderPane {
 
         /**
          * Using this constructor will result in executing the command on the currently open library tab
-         * */
+         */
         public CloseDatabaseAction() {
             this(null);
         }
