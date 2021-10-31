@@ -45,7 +45,6 @@ public class SidePane extends VBox {
         this.dialogService = dialogService;
         this.stateManager = stateManager;
         this.undoManager = undoManager;
-        initComponents();
 
         setId("sidePane");
 
@@ -54,21 +53,7 @@ public class SidePane extends VBox {
         updateView();
     }
 
-    private void initComponents() {
-        components.put(SidePaneType.GROUPS, new GroupSidePane(this, taskExecutor, stateManager, preferencesService, dialogService));
-        components.put(SidePaneType.OPEN_OFFICE, new OpenOfficeSidePanel(this, taskExecutor, preferencesService, dialogService, stateManager, undoManager));
-        components.put(SidePaneType.WEB_SEARCH, new WebSearchPane(this, preferencesService, dialogService, stateManager));
-        components.forEach((key, value) -> value.visibleProperty().addListener((x, y, isVisible) -> {
-            if (isVisible) {
-                show(key);
-            } else {
-                hide(key);
-            }
-        }));
-    }
-
     public boolean isComponentVisible(SidePaneType type) {
-        // TODO('return getComponent(type).visiblePropertyProperty().get();')
         return visibleComponents.contains(getComponent(type));
     }
 
