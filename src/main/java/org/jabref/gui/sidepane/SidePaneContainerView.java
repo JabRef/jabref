@@ -68,7 +68,7 @@ public class SidePaneContainerView extends VBox {
                 new CloseSidePaneAction(GROUPS), new MoveUpAction(GROUPS), new MoveDownAction(GROUPS), preferencesService, dialogService);
         GroupTreeView groupsContent = new GroupTreeView(taskExecutor, stateManager, preferencesService, dialogService);
 
-        return new GroupsSidePaneView(groupsHeader, groupsContent, Priority.ALWAYS, preferencesService, dialogService);
+        return new GroupsSidePaneView(groupsHeader, groupsContent, Priority.ALWAYS);
     }
 
     private SidePaneView createOpenOfficeSidePaneView() {
