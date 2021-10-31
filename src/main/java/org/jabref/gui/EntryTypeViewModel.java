@@ -15,6 +15,7 @@ import javafx.concurrent.Task;
 import javafx.concurrent.Worker;
 
 import org.jabref.gui.duplicationFinder.DuplicateResolverDialog;
+import org.jabref.gui.importer.NewEntryAction;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.database.DuplicateCheck;
 import org.jabref.logic.importer.FetcherException;
@@ -25,6 +26,7 @@ import org.jabref.logic.importer.fetcher.DoiFetcher;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.strings.StringUtil;
+import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.preferences.PreferencesService;
 
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
@@ -180,7 +182,13 @@ public class EntryTypeViewModel {
             } else if (result.isEmpty()) {
                 String fetcher = selectedItemProperty().getValue().getName();
                 String searchId = idText.getValue();
-                dialogService.showErrorDialogAndWait(Localization.lang("Fetcher '%0' did not find an entry for id '%1'.", fetcher, searchId));
+                boolean addEntryFlag = dialogService.showConfirmationDialogAndWait("DOI not found",
+                        Localization.lang("Fetcher '%0' did not find an entry for id '%1'.", fetcher, searchId),
+                        "Add entry manually", "Return to dialog");
+                if (addEntryFlag) {
+                    new NewEntryAction(libraryTab.frame(), StandardEntryType.Article, dialogService, preferencesService, stateManager).execute();
+                    searchSuccesfulProperty.set(true);
+                }
             }
             fetcherWorker = new FetcherWorker();
 
