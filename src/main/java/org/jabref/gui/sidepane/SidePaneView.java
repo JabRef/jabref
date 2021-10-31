@@ -1,7 +1,5 @@
 package org.jabref.gui.sidepane;
 
-import java.util.Optional;
-
 import javafx.scene.Node;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Priority;
