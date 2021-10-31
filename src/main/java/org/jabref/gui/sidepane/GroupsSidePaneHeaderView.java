@@ -3,8 +3,6 @@ package org.jabref.gui.sidepane;
 import javafx.scene.control.Button;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.Globals;
-import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.groups.GroupModeViewModel;
 import org.jabref.gui.groups.GroupViewMode;
@@ -26,8 +24,7 @@ public class GroupsSidePaneHeaderView extends SidePaneHeaderView {
 
     private void setupIntersectionUnionToggle() {
         addButtonAtPosition(intersectionUnionToggle, 2);
-        ActionFactory factory = new ActionFactory(Globals.getKeyPrefs());
-        factory.configureIconButton(getSidePaneType().getToggleAction(), new ToggleUnionIntersectionAction(), intersectionUnionToggle);
+        intersectionUnionToggle.setOnAction(event -> new ToggleUnionIntersectionAction().execute());
     }
 
     public void afterOpening() {

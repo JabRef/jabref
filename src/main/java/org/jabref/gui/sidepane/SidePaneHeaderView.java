@@ -6,8 +6,6 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 
-import org.jabref.gui.Globals;
-import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.logic.l10n.Localization;
@@ -29,18 +27,17 @@ public class SidePaneHeaderView extends BorderPane {
     }
 
     private void initView() {
-        ActionFactory factory = new ActionFactory(Globals.getKeyPrefs());
         Button closeButton = IconTheme.JabRefIcons.CLOSE.asButton();
         closeButton.setTooltip(new Tooltip(Localization.lang("Hide panel")));
-        factory.configureIconButton(sidePaneType.getToggleAction(), closeCommand, closeButton);
+        closeButton.setOnAction(e -> closeCommand.execute());
 
         Button upButton = IconTheme.JabRefIcons.UP.asButton();
         upButton.setTooltip(new Tooltip(Localization.lang("Move panel up")));
-        factory.configureIconButton(sidePaneType.getToggleAction(), moveUpCommand, upButton);
+        upButton.setOnAction(e -> moveUpCommand.execute());
 
         Button downButton = IconTheme.JabRefIcons.DOWN.asButton();
         downButton.setTooltip(new Tooltip(Localization.lang("Move panel down")));
-        factory.configureIconButton(sidePaneType.getToggleAction(), moveDownCommand, downButton);
+        downButton.setOnAction(e -> moveDownCommand.execute());
 
         this.buttonContainer = new HBox();
         buttonContainer.getChildren().addAll(upButton, downButton, closeButton);
@@ -52,7 +49,7 @@ public class SidePaneHeaderView extends BorderPane {
     }
 
     protected void addButtonAtPosition(Button button, int position) {
-        this.buttonContainer.getChildren().set(position, button);
+        this.buttonContainer.getChildren().add(position, button);
     }
 
     public SidePaneType getSidePaneType() {

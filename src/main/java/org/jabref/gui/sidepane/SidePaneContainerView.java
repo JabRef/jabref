@@ -1,14 +1,11 @@
 package org.jabref.gui.sidepane;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 import javax.swing.undo.UndoManager;
 
 import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.SimpleBooleanProperty;
 import javafx.scene.Node;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
@@ -36,11 +33,6 @@ public class SidePaneContainerView extends VBox {
     private final DialogService dialogService;
     private final StateManager stateManager;
     private final UndoManager undoManager;
-
-    // Probably should go into the view model
-    private final BooleanProperty groupsPaneVisible = new SimpleBooleanProperty();
-    private final BooleanProperty openOfficePaneVisible = new SimpleBooleanProperty();
-    private final BooleanProperty webSearchPaneVisible = new SimpleBooleanProperty();
 
     public SidePaneContainerView(PreferencesService preferencesService,
                                  TaskExecutor taskExecutor,
@@ -96,9 +88,9 @@ public class SidePaneContainerView extends VBox {
         return new SidePaneView(paneHeaderView, paneContent, Priority.NEVER);
     }
 
-    private void showSidePanes(Set<SidePaneType> toShowSidePanes) {
+    private void showVisibleSidePanes() {
         getChildren().clear();
-        toShowSidePanes.forEach(type -> {
+        viewModel.getVisiblePanes().forEach(type -> {
             SidePaneView view = getSidePaneView(type);
             getChildren().add(view);
             VBox.setVgrow(view, view.getResizePolicy());
@@ -108,6 +100,9 @@ public class SidePaneContainerView extends VBox {
     private void show(SidePaneType sidePane) {
         if (viewModel.show(sidePane)) {
             updateView();
+            if (sidePane == GROUPS) {
+                ((GroupsSidePaneView) getSidePaneView(sidePane)).afterOpening();
+            }
         }
     }
 
@@ -129,17 +124,32 @@ public class SidePaneContainerView extends VBox {
         }
     }
 
+    /**
+     * If the given component is visible it will be hidden and the other way around.
+     */
+    private void toggle(SidePaneType sidePane) {
+        if (viewModel.isSidePaneVisible(sidePane)) {
+            hide(sidePane);
+        } else {
+            show(sidePane);
+        }
+    }
+
     private void updateView() {
-        showSidePanes(new HashSet<>(viewModel.getVisiblePanes()));
+        showVisibleSidePanes();
         setVisible(!viewModel.getVisiblePanes().isEmpty());
     }
 
-    public BooleanProperty isPaneVisibleProperty(SidePaneType sidePaneType) {
-        return switch (sidePaneType) {
-            case GROUPS -> groupsPaneVisible;
-            case WEB_SEARCH -> webSearchPaneVisible;
-            case OPEN_OFFICE -> openOfficePaneVisible;
+    public BooleanProperty sidePaneVisibleProperty(SidePaneType sidePane) {
+        return switch (sidePane) {
+            case GROUPS -> viewModel.groupsSidePaneVisibleProperty();
+            case WEB_SEARCH -> viewModel.webSearchSidePaneVisibleProperty();
+            case OPEN_OFFICE -> viewModel.openOfficePaneVisibleProperty();
         };
+    }
+
+    public ToggleCommand getToggleCommandFor(SidePaneType sidePane) {
+        return new ToggleCommand(sidePane);
     }
 
     private class CloseSidePaneAction extends SimpleCommand {
@@ -178,6 +188,20 @@ public class SidePaneContainerView extends VBox {
         @Override
         public void execute() {
             moveDown(toMoveDownSidePane);
+        }
+    }
+
+    public class ToggleCommand extends SimpleCommand {
+
+        private final SidePaneType sidePane;
+
+        public ToggleCommand(SidePaneType sidePane) {
+            this.sidePane = sidePane;
+        }
+
+        @Override
+        public void execute() {
+            toggle(sidePane);
         }
     }
 }

@@ -23,7 +23,10 @@ import org.jabref.preferences.PreferencesService;
 
 /**
  * Manages which {@link SidePaneComponent}s are shown.
+ *
+ * @deprecated
  */
+@Deprecated
 public class SidePane extends VBox {
 
     private final Map<SidePaneType, SidePaneComponent> components = new LinkedHashMap<>();

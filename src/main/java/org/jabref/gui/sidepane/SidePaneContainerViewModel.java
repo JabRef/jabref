@@ -5,7 +5,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.IntStream;
 
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 
 import org.jabref.gui.AbstractViewModel;
@@ -16,8 +19,31 @@ public class SidePaneContainerViewModel extends AbstractViewModel {
     // TODO('Use preferencesService.getSidePanePreferences().visiblePanes() as the single source of truth')
     private final ObservableList<SidePaneType> visiblePanes = FXCollections.observableArrayList();
 
+    private final BooleanProperty groupsPaneVisible = new SimpleBooleanProperty();
+    private final BooleanProperty openOfficePaneVisible = new SimpleBooleanProperty();
+    private final BooleanProperty webSearchPaneVisible = new SimpleBooleanProperty();
+
     public SidePaneContainerViewModel(PreferencesService preferencesService) {
         this.preferencesService = preferencesService;
+        visiblePanes.addListener((ListChangeListener<SidePaneType>) change -> {
+            while (change.next()) {
+                if (change.wasAdded()) {
+                    SidePaneType addedSidePane = change.getAddedSubList().get(0);
+                    switch (addedSidePane) {
+                        case GROUPS -> groupsPaneVisible.setValue(true);
+                        case OPEN_OFFICE -> openOfficePaneVisible.setValue(true);
+                        case WEB_SEARCH -> webSearchPaneVisible.setValue(true);
+                    }
+                } else if (change.wasRemoved()) {
+                    SidePaneType removedSidePane = change.getRemoved().get(0);
+                    switch (removedSidePane) {
+                        case GROUPS -> groupsPaneVisible.setValue(false);
+                        case OPEN_OFFICE -> openOfficePaneVisible.setValue(false);
+                        case WEB_SEARCH -> webSearchPaneVisible.setValue(false);
+                    }
+                }
+            }
+        });
     }
 
     /**
@@ -88,13 +114,28 @@ public class SidePaneContainerViewModel extends AbstractViewModel {
      */
     public boolean hide(SidePaneType sidePane) {
         if (visiblePanes.contains(sidePane)) {
-            // TODO('Before closing')
             visiblePanes.remove(sidePane);
             preferencesService.getSidePanePreferences().visiblePanes().remove(sidePane);
             return true;
         } else {
             return false;
         }
+    }
+
+    public BooleanProperty groupsSidePaneVisibleProperty() {
+        return groupsPaneVisible;
+    }
+
+    public BooleanProperty openOfficePaneVisibleProperty() {
+        return openOfficePaneVisible;
+    }
+
+    public BooleanProperty webSearchSidePaneVisibleProperty() {
+        return webSearchPaneVisible;
+    }
+
+    public boolean isSidePaneVisible(SidePaneType sidePane) {
+        return visiblePanes.contains(sidePane);
     }
 
     /**

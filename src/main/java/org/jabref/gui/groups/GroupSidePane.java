@@ -21,7 +21,10 @@ import org.jabref.preferences.PreferencesService;
 
 /**
  * The groups side pane.
+ * @deprecated
  */
+
+@Deprecated
 public class GroupSidePane extends SidePaneComponent {
 
     private final PreferencesService preferences;

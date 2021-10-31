@@ -112,8 +112,6 @@ import org.jabref.gui.search.GlobalSearchBar;
 import org.jabref.gui.search.RebuildFulltextSearchIndexAction;
 import org.jabref.gui.shared.ConnectToSharedDatabaseCommand;
 import org.jabref.gui.shared.PullChangesFromSharedAction;
-import org.jabref.gui.sidepane.SidePane;
-import org.jabref.gui.sidepane.SidePaneComponent;
 import org.jabref.gui.sidepane.SidePaneContainerView;
 import org.jabref.gui.sidepane.SidePaneType;
 import org.jabref.gui.slr.ExistingStudySearchAction;
@@ -147,7 +145,6 @@ import org.jabref.preferences.TelemetryPreferences;
 import com.google.common.eventbus.Subscribe;
 import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.EasyObservableList;
-import de.saxsys.mvvmfx.utils.commands.Command;
 import org.controlsfx.control.PopOver;
 import org.controlsfx.control.TaskProgressView;
 import org.fxmisc.richtext.CodeArea;
@@ -176,7 +173,7 @@ public class JabRefFrame extends BorderPane {
     private final CountingUndoManager undoManager;
     private final PushToApplicationsManager pushToApplicationsManager;
     private final DialogService dialogService;
-    private SidePane sidePane;
+    private SidePaneContainerView sidePaneContainerView;
     private TabPane tabbedPane;
     private PopOver progressViewPopOver;
     private PopOver entryFromIdPopOver;
@@ -432,8 +429,8 @@ public class JabRefFrame extends BorderPane {
         head.setSpacing(0d);
         setTop(head);
 
-        splitPane.getItems().addAll(sidePane, tabbedPane);
-        SplitPane.setResizableWithParent(sidePane, false);
+        splitPane.getItems().addAll(sidePaneContainerView, tabbedPane);
+        SplitPane.setResizableWithParent(sidePaneContainerView, false);
 
         // We need to wait with setting the divider since it gets reset a few times during the initial set-up
         mainStage.showingProperty().addListener(new ChangeListener<>() {
@@ -442,15 +439,14 @@ public class JabRefFrame extends BorderPane {
             public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean showing) {
                 if (showing) {
                     setDividerPosition();
-
-                    EasyBind.subscribe(sidePane.visibleProperty(), visible -> {
+                    EasyBind.subscribe(sidePaneContainerView.visibleProperty(), visible -> {
                         if (visible) {
-                            if (!splitPane.getItems().contains(sidePane)) {
-                                splitPane.getItems().add(0, sidePane);
+                            if (!splitPane.getItems().contains(sidePaneContainerView)) {
+                                splitPane.getItems().add(0, sidePaneContainerView);
                                 setDividerPosition();
                             }
                         } else {
-                            splitPane.getItems().remove(sidePane);
+                            splitPane.getItems().remove(sidePaneContainerView);
                         }
                     });
 
@@ -575,8 +571,7 @@ public class JabRefFrame extends BorderPane {
     }
 
     public void init() {
-        sidePane = new SidePane(prefs, taskExecutor, dialogService, stateManager, undoManager);
-
+        sidePaneContainerView = new SidePaneContainerView(prefs, taskExecutor, dialogService, stateManager, undoManager);
         tabbedPane = new TabPane();
         tabbedPane.setTabDragPolicy(TabPane.TabDragPolicy.REORDER);
 
@@ -840,14 +835,10 @@ public class JabRefFrame extends BorderPane {
                 factory.createMenuItem(StandardActions.REBUILD_FULLTEXT_SEARCH_INDEX, new RebuildFulltextSearchIndexAction(stateManager, this::getCurrentLibraryTab, dialogService, prefs.getFilePreferences()))
         );
 
-        SidePaneComponent webSearch = sidePane.getComponent(SidePaneType.WEB_SEARCH);
-        SidePaneComponent groups = sidePane.getComponent(SidePaneType.GROUPS);
-        SidePaneComponent openOffice = sidePane.getComponent(SidePaneType.OPEN_OFFICE);
-
         view.getItems().addAll(
-                factory.createCheckMenuItem(webSearch.getToggleAction(), webSearch.getToggleCommand(), sidePane.isComponentVisible(SidePaneType.WEB_SEARCH)),
-                factory.createCheckMenuItem(groups.getToggleAction(), groups.getToggleCommand(), sidePane.isComponentVisible(SidePaneType.GROUPS)),
-                factory.createCheckMenuItem(openOffice.getToggleAction(), openOffice.getToggleCommand(), sidePane.isComponentVisible(SidePaneType.OPEN_OFFICE)),
+                createSidePaneCheckMenuItem(sidePaneContainerView, factory, SidePaneType.WEB_SEARCH),
+                createSidePaneCheckMenuItem(sidePaneContainerView, factory, SidePaneType.GROUPS),
+                createSidePaneCheckMenuItem(sidePaneContainerView, factory, SidePaneType.OPEN_OFFICE),
 
                 new SeparatorMenuItem(),
 
@@ -944,9 +935,9 @@ public class JabRefFrame extends BorderPane {
         return newEntryFromIdButton;
     }
 
-    private CheckMenuItem createSidePaneCheckMenuItem(SidePaneContainerView container, ActionFactory factory, SidePaneType paneType, Command toggleCommand) {
-        CheckMenuItem checkMenuItem = factory.createCheckMenuItem(paneType.getToggleAction(), toggleCommand, (container.isPaneVisibleProperty(paneType).get()));
-        checkMenuItem.selectedProperty().bindBidirectional(container.isPaneVisibleProperty(paneType));
+    private CheckMenuItem createSidePaneCheckMenuItem(SidePaneContainerView container, ActionFactory factory, SidePaneType sidePane) {
+        CheckMenuItem checkMenuItem = factory.createCheckMenuItem(sidePane.getToggleAction(), container.getToggleCommandFor(sidePane), container.sidePaneVisibleProperty(sidePane).get());
+        EasyBind.subscribe(container.sidePaneVisibleProperty(sidePane), checkMenuItem::setSelected);
         return checkMenuItem;
     }
 

@@ -31,6 +31,7 @@ import org.jabref.preferences.PreferencesService;
 
 import com.tobiasdiez.easybind.EasyBind;
 
+@Deprecated
 public class WebSearchPane extends SidePaneComponent {
 
     private static final PseudoClass QUERY_INVALID = PseudoClass.getPseudoClass("invalid");

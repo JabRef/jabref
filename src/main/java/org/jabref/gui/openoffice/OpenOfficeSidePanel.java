@@ -17,6 +17,7 @@ import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
 import org.jabref.preferences.PreferencesService;
 
+@Deprecated
 public class OpenOfficeSidePanel extends SidePaneComponent {
 
     private final TaskExecutor taskExecutor;
