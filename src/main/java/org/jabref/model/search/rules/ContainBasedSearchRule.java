@@ -52,7 +52,6 @@ public class ContainBasedSearchRule implements SearchRule {
 
     @Override
     public boolean applyRule(String query, BibEntry bibEntry) {
-
         String searchString = query;
         if (!searchFlags.contains(SearchRules.SearchFlags.CASE_SENSITIVE)) {
             searchString = searchString.toLowerCase(Locale.ROOT);
@@ -84,7 +83,6 @@ public class ContainBasedSearchRule implements SearchRule {
 
     @Override
     public PdfSearchResults getFulltextResults(String query, BibEntry bibEntry) {
-
         if (!searchFlags.contains(SearchRules.SearchFlags.FULLTEXT) || databaseContext == null) {
             return new PdfSearchResults(List.of());
         }
