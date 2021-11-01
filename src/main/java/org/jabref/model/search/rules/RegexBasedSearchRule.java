@@ -1,7 +1,6 @@
 package org.jabref.model.search.rules;
 
 import java.util.EnumSet;
-import java.util.Locale;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -21,7 +20,7 @@ import org.slf4j.LoggerFactory;
 @AllowedToUseLogic("Because access to the lucene index is needed")
 public class RegexBasedSearchRule extends FullTextSearchRule {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(GrammarBasedSearchRule.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(RegexBasedSearchRule.class);
 
     public RegexBasedSearchRule(EnumSet<SearchFlags> searchFlags) {
         super(searchFlags);
@@ -29,13 +28,8 @@ public class RegexBasedSearchRule extends FullTextSearchRule {
 
     @Override
     public boolean validateSearchStrings(String query) {
-        String searchString = query;
-        if (!searchFlags.contains(SearchRules.SearchFlags.CASE_SENSITIVE)) {
-            searchString = searchString.toLowerCase(Locale.ROOT);
-        }
-
         try {
-            Pattern.compile(searchString, searchFlags.contains(SearchRules.SearchFlags.CASE_SENSITIVE) ? 0 : Pattern.CASE_INSENSITIVE);
+            Pattern.compile(query, searchFlags.contains(SearchRules.SearchFlags.CASE_SENSITIVE) ? 0 : Pattern.CASE_INSENSITIVE);
         } catch (PatternSyntaxException ex) {
             return false;
         }
@@ -45,10 +39,10 @@ public class RegexBasedSearchRule extends FullTextSearchRule {
     @Override
     public boolean applyRule(String query, BibEntry bibEntry) {
         Pattern pattern;
-
         try {
             pattern = Pattern.compile(query, searchFlags.contains(SearchRules.SearchFlags.CASE_SENSITIVE) ? 0 : Pattern.CASE_INSENSITIVE);
         } catch (PatternSyntaxException ex) {
+            LOGGER.debug("Could not compile regex {}", query, ex);
             return false;
         }
 
