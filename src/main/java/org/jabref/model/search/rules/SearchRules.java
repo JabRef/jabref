@@ -18,7 +18,7 @@ public class SearchRules {
      */
     public static SearchRule getSearchRuleByQuery(String query, EnumSet<SearchFlags> searchFlags) {
         if (isSimpleQuery(query)) {
-            return new ContainBasedSearchRule(searchFlags);
+            return new ContainsBasedSearchRule(searchFlags);
         }
 
         // this searches specified fields if specified,
@@ -39,7 +39,7 @@ public class SearchRules {
         if (searchFlags.contains(SearchFlags.REGULAR_EXPRESSION)) {
             return new RegexBasedSearchRule(searchFlags);
         } else {
-            return new ContainBasedSearchRule(searchFlags);
+            return new ContainsBasedSearchRule(searchFlags);
         }
     }
 
