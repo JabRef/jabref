@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="utf-8"?>
+<style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" default-locale="en-US">
+  <info>
+    <title>Wikipedia Templates</title>
+    <title-short>Wikipedia Templates</title-short>
+    <author>
+      <name>Sally Baker</name>
+    </author>
+    <id>http://www.zotero.org/styles/wikipedia-templates</id>
+    <link href="http://www.zotero.org/styles/wikipedia-templates" rel="self"/>
+    <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
+    <link href="https://en.wikipedia.org/wiki/Template:Citation" rel="documentation"/>
+    <link href="https://en.wikipedia.org/wiki/Template:Cite_book" rel="documentation"/>
+    <link href="https://en.wikipedia.org/wiki/Template:Cite_journal" rel="documentation"/>
+    <category field="generic-base"/>
+    <category citation-format="numeric"/>
+    <updated>2021-10-14T13:30:00+10:00</updated>
+  </info>
+  <!-- Top level macro which defines what bibliographical format will be returned -->
+  <macro name="citations">
+    <choose>
+      <if type="book chapter" match="any">
+        <text macro="book-citation"/>
+      </if>
+      <else-if type="article-journal">
+        <text macro="journal-citation"/>
+      </else-if>
+      <else>
+        <text macro="generic-citation"/>
+      </else>
+    </choose>
+  </macro>
+  <!-- Inline citations are bibliographical entries wrapped in 'ref' tags -->
+  <macro name="inline-citation">
+    <text macro="citations" prefix="&lt;ref&gt;" suffix="&lt;/ref&gt;"/>
+  </macro>
+  <!-- Macros defining format types -->
+<!-- TO DO: edition, if not the first edition -->
+  <macro name="book-citation">
+    <group prefix="{{cite book" suffix="}}">
+      <text macro="contributor-statements"/>
+      <text macro="date"/>
+      <text macro="title-statements"/>
+      <text macro="publisher"/>
+      <text macro="series"/>
+      <text macro="volume"/>
+      <text macro="edition"/>
+      <text macro="place"/>
+      <text macro="pagination"/>
+      <text macro="url"/>
+      <text macro="doi"/>
+      <text macro="isbn"/>
+    </group>
+  </macro>
+  <macro name="journal-citation">
+    <group prefix="{{cite journal" suffix="}}">
+      <text macro="contributor-statements"/>
+      <text macro="title-statements"/>
+      <text macro="volume"/>
+      <text macro="issue"/>
+      <text macro="pagination"/>
+      <text macro="publisher"/>
+      <text macro="place"/>
+      <text macro="date"/>
+      <text macro="url"/>
+      <text macro="issn"/>
+      <text macro="doi"/>
+      <text macro="access-date"/>
+    </group>
+  </macro>
+  <macro name="generic-citation">
+    <group prefix="{{Citation" suffix="}}">
+      <text macro="contributor-statements"/>
+      <text macro="date"/>
+      <text macro="title-statements"/>
+      <text macro="publisher"/>
+      <text macro="place"/>
+      <text macro="pagination"/>
+      <text macro="url"/>
+      <text macro="access-date"/>
+    </group>
+  </macro>
+<!-- Macros defining required fields-->
+  <macro name="contributor-statements">
+    <names variable="author" prefix=" | vauthors=">
+      <name name-as-sort-order="all" initialize-with=". " delimiter=", " prefix="((" suffix="))"/>
+    </names>
+    <names variable="editor" prefix=" | veditors=" >
+      <name name-as-sort-order="all" initialize-with=". " delimiter=", " prefix="((" suffix="))"/>
+    </names>
+  </macro>
+  <macro name="date">
+    <choose>
+      <if type="book article-journal chapter" match="any">
+        <date variable="issued" prefix=" | date=">
+          <date-part name="day" form="numeric"/>
+          <date-part name="month" form="long" prefix=" "/>
+          <date-part name="year" form="long" prefix=" "/>
+        </date>
+      </if>
+      <else>
+        <date variable="issued" prefix=" | year=">
+          <date-part name="year" form="long"/>
+        </date>
+      </else>
+    </choose>
+  </macro>
+  <macro name="title-statements">
+    <choose>
+        <if type="chapter">
+          <text variable="container-title" prefix=" | chapter="/>
+          <text variable="title" prefix=" | title="/>
+        </if>
+        <else-if type="article-journal">
+          <text variable="container-title" prefix=" | journal ="/>
+          <text variable="title" prefix=" | title="/>
+        </else-if>
+        <else>
+          <text variable="title" prefix=" | title="/>
+        </else>
+    </choose>
+  </macro>
+  <macro name="publisher">
+    <text variable="publisher" prefix=" | publisher="/>
+  </macro>
+  <macro name="place">
+    <text variable="original-publisher-place" prefix=" | publication-place="/>
+  </macro>
+  <macro name="series">
+    <text variable="collection-title" prefix=" | series="/>
+  </macro>
+  <macro name="volume">
+    <number variable="volume" prefix=" | volume="/>
+  </macro>
+  <macro name="edition">
+    <number variable="edition" form="ordinal" prefix=" | edition="/>
+  </macro>
+  <macro name="doi">
+    <text variable="DOI" prefix=" | doi="/>
+  </macro>
+  <macro name="isbn">
+    <text variable="ISBN" prefix=" | isbn="/>
+  </macro>
+   <macro name="issn">
+    <text variable="ISSN" prefix=" | issn="/>
+  </macro>
+  <macro name="pagination">
+    <choose>
+      <if type="article-journal chapter">
+        <text variable="page" prefix=" | pages="/>
+      </if>
+    </choose>
+  </macro>
+  <macro name="url">
+    <text variable="URL" prefix=" | url="/>
+  </macro>
+  <macro name="access-date">
+    <date variable="accessed" prefix=" | access-date=">
+      <date-part name="day" form="numeric" suffix=" "/>
+      <date-part name="month" form="long" suffix=" "/>
+      <date-part name="year" form="long"/>
+    </date>
+  </macro>
+  <macro name="issue">
+    <number variable="issue" prefix=" | issue="/>
+  </macro>
+<!-- Inline citations -->
+  <citation>
+    <layout>
+      <text macro="inline-citation"/>
+    </layout>
+  </citation>
+  <!-- Bibliography -->
+  <bibliography>
+    <sort>
+      <key macro="contributor-statements"/>
+      <key macro="date"/>
+    </sort>
+    <layout>
+      <text macro="citations"/>
+    </layout>
+  </bibliography>
+</style>
