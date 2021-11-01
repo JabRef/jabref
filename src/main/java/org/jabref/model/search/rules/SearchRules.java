@@ -3,6 +3,9 @@ package org.jabref.model.search.rules;
 import java.util.EnumSet;
 import java.util.regex.Pattern;
 
+/**
+ * This is a factory to instantiate the matching SearchRule implementation matching a given query
+ */
 public class SearchRules {
 
     private static final Pattern SIMPLE_EXPRESSION = Pattern.compile("[^\\p{Punct}]*");
