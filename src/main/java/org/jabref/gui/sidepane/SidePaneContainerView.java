@@ -6,22 +6,15 @@ import java.util.Map;
 import javax.swing.undo.UndoManager;
 
 import javafx.beans.property.BooleanProperty;
-import javafx.scene.Node;
-import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
-import org.jabref.gui.groups.GroupTreeView;
-import org.jabref.gui.importer.fetcher.WebSearchPaneView;
-import org.jabref.gui.openoffice.OpenOfficePanel;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.preferences.PreferencesService;
 
 import static org.jabref.gui.sidepane.SidePaneType.GROUPS;
-import static org.jabref.gui.sidepane.SidePaneType.OPEN_OFFICE;
-import static org.jabref.gui.sidepane.SidePaneType.WEB_SEARCH;
 
 public class SidePaneContainerView extends VBox {
     // Don't use this map directly to lookup sidePaneViews, instead use getSidePaneView() for lazy loading
@@ -34,6 +27,8 @@ public class SidePaneContainerView extends VBox {
     private final StateManager stateManager;
     private final UndoManager undoManager;
 
+    private final SidePaneViewContentFactory sidePaneViewContentFactory;
+
     public SidePaneContainerView(PreferencesService preferencesService,
                                  TaskExecutor taskExecutor,
                                  DialogService dialogService,
@@ -44,48 +39,23 @@ public class SidePaneContainerView extends VBox {
         this.dialogService = dialogService;
         this.stateManager = stateManager;
         this.undoManager = undoManager;
+        this.sidePaneViewContentFactory = new SidePaneViewContentFactory(preferencesService, taskExecutor, dialogService, stateManager, undoManager);
         this.viewModel = new SidePaneContainerViewModel(preferencesService);
 
         preferencesService.getSidePanePreferences().visiblePanes().forEach(this::show);
         updateView();
     }
 
-    private SidePaneView getSidePaneView(SidePaneType sidePaneType) {
-        SidePaneView sidePaneView = sidePaneViewLookup.get(sidePaneType);
+    private SidePaneView getSidePaneView(SidePaneType sidePane) {
+        SidePaneView sidePaneView = sidePaneViewLookup.get(sidePane);
         if (sidePaneView == null) {
-            sidePaneView = switch (sidePaneType) {
-                case GROUPS -> createGroupsSidePaneView();
-                case WEB_SEARCH -> createWebSearchSidePaneView();
-                case OPEN_OFFICE -> createOpenOfficeSidePaneView();
+            sidePaneView = switch (sidePane) {
+                case GROUPS -> new GroupsSidePaneView(new CloseSidePaneAction(sidePane), new MoveUpAction(sidePane), new MoveDownAction(sidePane), sidePaneViewContentFactory, preferencesService, dialogService);
+                case WEB_SEARCH, OPEN_OFFICE -> new SidePaneView(sidePane, new CloseSidePaneAction(sidePane), new MoveUpAction(sidePane), new MoveDownAction(sidePane), sidePaneViewContentFactory);
             };
-            sidePaneViewLookup.put(sidePaneType, sidePaneView);
+            sidePaneViewLookup.put(sidePane, sidePaneView);
         }
         return sidePaneView;
-    }
-
-    private SidePaneView createGroupsSidePaneView() {
-        GroupsSidePaneHeaderView groupsHeader = new GroupsSidePaneHeaderView(GROUPS,
-                new CloseSidePaneAction(GROUPS), new MoveUpAction(GROUPS), new MoveDownAction(GROUPS), preferencesService, dialogService);
-        GroupTreeView groupsContent = new GroupTreeView(taskExecutor, stateManager, preferencesService, dialogService);
-
-        return new GroupsSidePaneView(groupsHeader, groupsContent, Priority.ALWAYS);
-    }
-
-    private SidePaneView createOpenOfficeSidePaneView() {
-        Node openOfficePaneContent = new OpenOfficePanel(preferencesService, preferencesService.getOpenOfficePreferences(),
-                preferencesService.getKeyBindingRepository(), taskExecutor, dialogService, stateManager, undoManager).getContent();
-        return createSidePaneView(OPEN_OFFICE, openOfficePaneContent);
-    }
-
-    private SidePaneView createWebSearchSidePaneView() {
-        Node webSearchPaneContent = new WebSearchPaneView(preferencesService, dialogService, stateManager);
-        return createSidePaneView(WEB_SEARCH, webSearchPaneContent);
-    }
-
-    private SidePaneView createSidePaneView(SidePaneType sidePaneType, Node paneContent) {
-        SidePaneHeaderView paneHeaderView = new SidePaneHeaderView(sidePaneType, new CloseSidePaneAction(sidePaneType),
-                new MoveUpAction(sidePaneType), new MoveDownAction(sidePaneType));
-        return new SidePaneView(paneHeaderView, paneContent, Priority.NEVER);
     }
 
     private void showVisibleSidePanes() {
