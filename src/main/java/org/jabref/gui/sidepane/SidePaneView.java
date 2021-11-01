@@ -3,6 +3,7 @@ package org.jabref.gui.sidepane;
 import javafx.scene.Node;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.VBox;
 
 public class SidePaneView extends BorderPane {
     private final SidePaneHeaderView sidePaneHeaderView;
@@ -20,6 +21,7 @@ public class SidePaneView extends BorderPane {
         getStyleClass().add("sidePaneComponent");
         setTop(sidePaneHeaderView);
         setCenter(content);
+        VBox.setVgrow(this, getResizePolicy());
     }
 
     public Priority getResizePolicy() {

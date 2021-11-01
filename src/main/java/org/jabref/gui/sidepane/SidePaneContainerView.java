@@ -93,7 +93,6 @@ public class SidePaneContainerView extends VBox {
         viewModel.getVisiblePanes().forEach(type -> {
             SidePaneView view = getSidePaneView(type);
             getChildren().add(view);
-            VBox.setVgrow(view, view.getResizePolicy());
         });
     }
 
