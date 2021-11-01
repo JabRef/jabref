@@ -23,6 +23,7 @@
   <locale>
     <terms>
       <term name="from">z</term>
+      <term name="no date">b.r.</term>
     </terms>
   </locale>
   <macro name="author">
@@ -180,7 +181,7 @@
         </date>
       </if>
       <else>
-        <text term="no date"/>
+        <text term="no date" suffix="]" prefix="["/>
       </else>
     </choose>
   </macro>
