@@ -11,12 +11,12 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.model.search.rules.SearchRules.SearchFlags;
 
 /**
- * Search rule for contain-based search.
+ * Search rule for a search based on String.contains()
  */
 @AllowedToUseLogic("Because access to the lucene index is needed")
-public class ContainBasedSearchRule extends FullTextSearchRule {
+public class ContainsBasedSearchRule extends FullTextSearchRule {
 
-    public ContainBasedSearchRule(EnumSet<SearchFlags> searchFlags) {
+    public ContainsBasedSearchRule(EnumSet<SearchFlags> searchFlags) {
         super(searchFlags);
     }
 

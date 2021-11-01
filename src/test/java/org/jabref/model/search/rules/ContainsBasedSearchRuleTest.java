@@ -14,15 +14,15 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * Test case for ContainBasedSearchRule.
  */
-public class ContainBasedSearchRuleTest {
+public class ContainsBasedSearchRuleTest {
 
     private final BibEntry be = new BibEntry(StandardEntryType.InCollection)
             .withCitationKey("shields01")
             .withField(StandardField.TITLE, "Marine finfish larviculture in Europe")
             .withField(StandardField.YEAR, "2001")
             .withField(StandardField.AUTHOR, "Kevin Shields");
-    private final ContainBasedSearchRule bsCaseSensitive = new ContainBasedSearchRule(EnumSet.of(SearchRules.SearchFlags.CASE_SENSITIVE, SearchRules.SearchFlags.REGULAR_EXPRESSION));
-    private final ContainBasedSearchRule bsCaseInsensitive = new ContainBasedSearchRule(EnumSet.of(SearchRules.SearchFlags.REGULAR_EXPRESSION));
+    private final ContainsBasedSearchRule bsCaseSensitive = new ContainsBasedSearchRule(EnumSet.of(SearchRules.SearchFlags.CASE_SENSITIVE, SearchRules.SearchFlags.REGULAR_EXPRESSION));
+    private final ContainsBasedSearchRule bsCaseInsensitive = new ContainsBasedSearchRule(EnumSet.of(SearchRules.SearchFlags.REGULAR_EXPRESSION));
     private final RegexBasedSearchRule bsCaseSensitiveRegexp = new RegexBasedSearchRule(EnumSet.of(SearchRules.SearchFlags.CASE_SENSITIVE, SearchRules.SearchFlags.REGULAR_EXPRESSION));
     private final RegexBasedSearchRule bsCaseInsensitiveRegexp = new RegexBasedSearchRule(EnumSet.of(SearchRules.SearchFlags.REGULAR_EXPRESSION));
 
