@@ -207,7 +207,7 @@ dependencies {
 
     implementation group: 'net.harawata', name: 'appdirs', version: '1.2.1'
 
-    testImplementation 'io.github.classgraph:classgraph:4.8.128'
+    testImplementation 'io.github.classgraph:classgraph:4.8.129'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.8.1'
     testImplementation 'org.junit.platform:junit-platform-launcher:1.8.1'
 
