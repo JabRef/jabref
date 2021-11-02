@@ -23,7 +23,7 @@ public abstract class AbstractQueryTransformer {
     public static final String NO_EXPLICIT_FIELD = "default";
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractQueryTransformer.class);
 
-    // These can be used for filtering in post processing
+    // These can be used for filtering in post-processing
     protected int startYear = Integer.MAX_VALUE;
     protected int endYear = Integer.MIN_VALUE;
 
