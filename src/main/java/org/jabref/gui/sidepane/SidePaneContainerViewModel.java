@@ -1,7 +1,10 @@
 package org.jabref.gui.sidepane;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.IntStream;
 
@@ -68,9 +71,7 @@ public class SidePaneContainerViewModel extends AbstractViewModel {
             int currentPosition = visiblePanes.indexOf(sidePane);
             if (currentPosition > 0) {
                 int newPosition = currentPosition - 1;
-                visiblePanes.remove(currentPosition);
-                visiblePanes.add(newPosition, sidePane);
-
+                swap(visiblePanes, currentPosition, newPosition);
                 updatePreferredPositions();
                 return true;
             }
@@ -86,9 +87,7 @@ public class SidePaneContainerViewModel extends AbstractViewModel {
             int currentPosition = visiblePanes.indexOf(sidePane);
             if (currentPosition < (visiblePanes.size() - 1)) {
                 int newPosition = currentPosition + 1;
-                visiblePanes.remove(currentPosition);
-                visiblePanes.add(newPosition, sidePane);
-
+                swap(visiblePanes, currentPosition, newPosition);
                 updatePreferredPositions();
                 return true;
             }
@@ -136,6 +135,15 @@ public class SidePaneContainerViewModel extends AbstractViewModel {
 
     public boolean isSidePaneVisible(SidePaneType sidePane) {
         return visiblePanes.contains(sidePane);
+    }
+
+    /**
+     * This implementation is inefficient because of some JavaFX limitations, we only advice to use it on small lists
+     */
+    private <T> void swap(ObservableList<T> observableList, int i, int j) {
+        List<T> placeholder = new ArrayList<>(observableList);
+        Collections.swap(placeholder, i, j);
+        observableList.sort(Comparator.comparingInt(placeholder::indexOf));
     }
 
     /**
