@@ -8,10 +8,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.IntStream;
 
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.FXCollections;
-import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 
 import org.jabref.gui.AbstractViewModel;
@@ -28,25 +28,10 @@ public class SidePaneContainerViewModel extends AbstractViewModel {
 
     public SidePaneContainerViewModel(PreferencesService preferencesService) {
         this.preferencesService = preferencesService;
-        visiblePanes.addListener((ListChangeListener<SidePaneType>) change -> {
-            while (change.next()) {
-                if (change.wasAdded()) {
-                    SidePaneType addedSidePane = change.getAddedSubList().get(0);
-                    switch (addedSidePane) {
-                        case GROUPS -> groupsPaneVisible.setValue(true);
-                        case OPEN_OFFICE -> openOfficePaneVisible.setValue(true);
-                        case WEB_SEARCH -> webSearchPaneVisible.setValue(true);
-                    }
-                } else if (change.wasRemoved()) {
-                    SidePaneType removedSidePane = change.getRemoved().get(0);
-                    switch (removedSidePane) {
-                        case GROUPS -> groupsPaneVisible.setValue(false);
-                        case OPEN_OFFICE -> openOfficePaneVisible.setValue(false);
-                        case WEB_SEARCH -> webSearchPaneVisible.setValue(false);
-                    }
-                }
-            }
-        });
+
+        groupsPaneVisible.bind(Bindings.createBooleanBinding(() -> visiblePanes.contains(SidePaneType.GROUPS), visiblePanes));
+        openOfficePaneVisible.bind(Bindings.createBooleanBinding(() -> visiblePanes.contains(SidePaneType.OPEN_OFFICE), visiblePanes));
+        webSearchPaneVisible.bind(Bindings.createBooleanBinding(() -> visiblePanes.contains(SidePaneType.WEB_SEARCH), visiblePanes));
     }
 
     /**
