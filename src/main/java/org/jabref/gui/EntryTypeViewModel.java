@@ -182,9 +182,12 @@ public class EntryTypeViewModel {
             } else if (result.isEmpty()) {
                 String fetcher = selectedItemProperty().getValue().getName();
                 String searchId = idText.getValue();
+                // When DOI ID is not found, allow the user to either return to the dialog or
+                // add entry manually
                 boolean addEntryFlag = dialogService.showConfirmationDialogAndWait("DOI not found",
                         Localization.lang("Fetcher '%0' did not find an entry for id '%1'.", fetcher, searchId),
-                        "Add entry manually", "Return to dialog");
+                        Localization.lang("Add entry manually"),
+                        Localization.lang("Return to dialog"));
                 if (addEntryFlag) {
                     new NewEntryAction(libraryTab.frame(), StandardEntryType.Article, dialogService, preferencesService, stateManager).execute();
                     searchSuccesfulProperty.set(true);
