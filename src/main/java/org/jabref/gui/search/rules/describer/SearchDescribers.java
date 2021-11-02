@@ -3,6 +3,7 @@ package org.jabref.gui.search.rules.describer;
 import org.jabref.logic.search.SearchQuery;
 import org.jabref.model.search.rules.ContainsBasedSearchRule;
 import org.jabref.model.search.rules.GrammarBasedSearchRule;
+import org.jabref.model.search.rules.LuceneBasedSearchRule;
 import org.jabref.model.search.rules.RegexBasedSearchRule;
 
 public class SearchDescribers {
@@ -17,12 +18,14 @@ public class SearchDescribers {
      * @return the search describer to turn the search into something human understandable
      */
     public static SearchDescriber getSearchDescriberFor(SearchQuery searchQuery) {
-        if (searchQuery.getRule() instanceof GrammarBasedSearchRule grammarBasedSearchRule) {
-            return new GrammarBasedSearchRuleDescriber(grammarBasedSearchRule.getSearchFlags(), grammarBasedSearchRule.getTree());
+        if (searchQuery.getRule() instanceof LuceneBasedSearchRule lucenceBasedSearchRule) {
+            return new LuceneBasedSearchRuleDescriber(lucenceBasedSearchRule.getSearchFlags(), searchQuery.getQuery());
         } else if (searchQuery.getRule() instanceof ContainsBasedSearchRule containBasedSearchRule) {
             return new ContainsAndRegexBasedSearchRuleDescriber(containBasedSearchRule.getSearchFlags(), searchQuery.getQuery());
         } else if (searchQuery.getRule() instanceof RegexBasedSearchRule regexBasedSearchRule) {
             return new ContainsAndRegexBasedSearchRuleDescriber(regexBasedSearchRule.getSearchFlags(), searchQuery.getQuery());
+        } else if (searchQuery.getRule() instanceof GrammarBasedSearchRule grammarBasedSearchRule) {
+            return new GrammarBasedSearchRuleDescriber(grammarBasedSearchRule.getSearchFlags(), grammarBasedSearchRule.getTree());
         } else {
             throw new IllegalStateException("Cannot find a describer for searchRule " + searchQuery.getRule() + " and query " + searchQuery.getQuery());
         }

@@ -8,7 +8,11 @@ import java.util.regex.Pattern;
  */
 public class SearchRules {
 
-    private static final Pattern SIMPLE_EXPRESSION = Pattern.compile("[^\\p{Punct}]*");
+    // In case Lucene keywords are contained, it is not a simple expression any more
+    private static final Pattern SIMPLE_EXPRESSION = Pattern.compile("^((?! AND | OR )[^\\p{Punct}])*$");
+
+    // used for checking the syntax of the query
+    private static LuceneBasedSearchRule luceneBasedSearchRule = new LuceneBasedSearchRule(EnumSet.noneOf(SearchFlags.class));
 
     private SearchRules() {
     }
@@ -19,6 +23,10 @@ public class SearchRules {
     public static SearchRule getSearchRuleByQuery(String query, EnumSet<SearchFlags> searchFlags) {
         if (isSimpleQuery(query)) {
             return new ContainsBasedSearchRule(searchFlags);
+        }
+
+        if (luceneBasedSearchRule.validateSearchStrings(query)) {
+            return new LuceneBasedSearchRule(searchFlags);
         }
 
         // this searches specified fields if specified,
