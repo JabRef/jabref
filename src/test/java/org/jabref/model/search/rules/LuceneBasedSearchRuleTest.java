@@ -18,7 +18,8 @@ class LuceneBasedSearchRuleTest {
             .withCitationKey("shields01")
             .withField(StandardField.TITLE, "Marine finfish larviculture in Europe")
             .withField(StandardField.YEAR, "2001")
-            .withField(StandardField.AUTHOR, "Kevin Shields");
+            .withField(StandardField.AUTHOR, "Kevin Shields")
+            .withField(StandardField.GROUPS, "included");
 
     private final LuceneBasedSearchRule luceneBasedSearchRuleCaseSensitive = new LuceneBasedSearchRule(EnumSet.of(SearchRules.SearchFlags.CASE_SENSITIVE));
     private final LuceneBasedSearchRule luceneBasedSearchRuleCaseInsensitive = new LuceneBasedSearchRule(EnumSet.noneOf(SearchRules.SearchFlags.class));
@@ -73,9 +74,15 @@ class LuceneBasedSearchRuleTest {
 
             "Marie",
 
-            "/M[0-9]+e/"
+            "/M[0-9]+e/",
+
+            // this tests for grouping (indicated the brackets)
+            "(groups=excluded)",
+
+            // this tests for the NOT operator, grouping and Boolean AND
+            "NOT(groups=excluded) AND NOT(groups=included)"
     })
-    public void nofindsCaseSensitive(String query) {
+    public void notFindsCaseSensitive(String query) {
         assertTrue(luceneBasedSearchRuleCaseSensitive.validateSearchStrings(query));
         assertFalse(luceneBasedSearchRuleCaseSensitive.applyRule(query, bibEntry));
     }

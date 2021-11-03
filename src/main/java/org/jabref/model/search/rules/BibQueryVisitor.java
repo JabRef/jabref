@@ -14,6 +14,7 @@ import org.jabref.model.entry.field.FieldFactory;
 
 import org.apache.lucene.queryparser.flexible.core.nodes.BooleanQueryNode;
 import org.apache.lucene.queryparser.flexible.core.nodes.FieldQueryNode;
+import org.apache.lucene.queryparser.flexible.core.nodes.GroupQueryNode;
 import org.apache.lucene.queryparser.flexible.core.nodes.ModifierQueryNode;
 import org.apache.lucene.queryparser.flexible.core.nodes.OrQueryNode;
 import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
@@ -42,8 +43,10 @@ public class BibQueryVisitor {
             return matchFound((ModifierQueryNode) query);
         } else if (query instanceof RegexpQueryNode) {
             return matchFound((RegexpQueryNode) query);
+        } else if (query instanceof GroupQueryNode) {
+            return matchFound(((GroupQueryNode) query).getChild());
         } else {
-            LOGGER.error("Unsupported case when transforming the query:\n {}", query);
+            LOGGER.error("Unsupported case when evaluating the query:\n {}", query);
             return false;
         }
     }
