@@ -30,6 +30,7 @@ import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.texparser.DefaultLatexParser;
 import org.jabref.logic.texparser.TexBibEntriesResolver;
+import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.PreferencesService;
@@ -58,8 +59,10 @@ public class ParseLatexDialogViewModel extends AbstractViewModel {
     private final BooleanProperty searchInProgress;
     private final BooleanProperty successfulSearch;
 
-    public ParseLatexDialogViewModel(BibDatabaseContext databaseContext, DialogService dialogService,
-                                     TaskExecutor taskExecutor, PreferencesService preferencesService,
+    public ParseLatexDialogViewModel(BibDatabaseContext databaseContext,
+                                     DialogService dialogService,
+                                     TaskExecutor taskExecutor,
+                                     PreferencesService preferencesService,
                                      FileUpdateMonitor fileMonitor) {
         this.databaseContext = databaseContext;
         this.dialogService = dialogService;
@@ -67,7 +70,7 @@ public class ParseLatexDialogViewModel extends AbstractViewModel {
         this.preferencesService = preferencesService;
         this.fileMonitor = fileMonitor;
         this.latexFileDirectory = new SimpleStringProperty(databaseContext.getMetaData().getLatexFileDirectory(preferencesService.getUser())
-                                                                          .orElseGet(preferencesService::getWorkingDir)
+                                                                          .orElse(FileUtil.getInitialDirectory(databaseContext, preferencesService))
                                                                           .toAbsolutePath().toString());
         this.root = new SimpleObjectProperty<>();
         this.checkedFileList = FXCollections.observableArrayList();
