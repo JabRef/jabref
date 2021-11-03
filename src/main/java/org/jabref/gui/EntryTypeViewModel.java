@@ -184,7 +184,7 @@ public class EntryTypeViewModel {
                 String searchId = idText.getValue();
                 // When DOI ID is not found, allow the user to either return to the dialog or
                 // add entry manually
-                boolean addEntryFlag = dialogService.showConfirmationDialogAndWait("DOI not found",
+                boolean addEntryFlag = dialogService.showConfirmationDialogAndWait(Localization.lang("DOI not found"),
                         Localization.lang("Fetcher '%0' did not find an entry for id '%1'.", fetcher, searchId),
                         Localization.lang("Add entry manually"),
                         Localization.lang("Return to dialog"));

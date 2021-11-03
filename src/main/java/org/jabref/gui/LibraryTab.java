@@ -372,6 +372,10 @@ public class LibraryTab extends Tab {
         return frame;
     }
 
+    public StateManager stateManager() {
+        return stateManager;
+    }
+
     /**
      * Removes the selected entries from the database
      *

@@ -15,6 +15,7 @@ import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportCleanup;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.preferences.PreferencesService;
 
 import org.controlsfx.control.PopOver;
@@ -43,7 +44,17 @@ public class GenerateEntryFromIdAction extends SimpleCommand {
         backgroundTask.titleProperty().set(Localization.lang("Import by ID"));
         backgroundTask.showToUser(true);
         backgroundTask.onRunning(() -> dialogService.notify("%s".formatted(backgroundTask.messageProperty().get())));
-        backgroundTask.onFailure((e) -> dialogService.notify(e.getMessage()));
+        backgroundTask.onFailure((e) -> {
+            // When unable to import by ID, present the user options to cancel or add entry manually
+            boolean addEntryFlag = dialogService.showConfirmationDialogAndWait(Localization.lang("Failed to import by ID"),
+                                    e.getMessage(),
+                                   Localization.lang("Add entry manually"));
+            if (addEntryFlag) {
+                // add entry manually
+                new NewEntryAction(libraryTab.frame(), StandardEntryType.Article, dialogService,
+                                    preferencesService, libraryTab.stateManager()).execute();
+            }
+        });
         backgroundTask.onSuccess((bibEntry) -> bibEntry.ifPresentOrElse((entry) -> {
                 libraryTab.insertEntry(entry);
                 entryFromIdPopOver.hide();
