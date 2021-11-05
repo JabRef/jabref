@@ -108,7 +108,7 @@ configurations {
 }
 
 javafx {
-    version = "17.0.0.1"
+    version = "17.0.1"
     modules = [ 'javafx.controls', 'javafx.fxml', 'javafx.web', 'javafx.swing' ]
 }
 
