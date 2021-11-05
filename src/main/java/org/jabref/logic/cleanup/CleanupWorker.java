@@ -52,6 +52,8 @@ public class CleanupWorker {
 
     private CleanupJob toJob(CleanupPreset.CleanupStep action) {
         switch (action) {
+            case CLEAN_UP_EMPTY_ENTRY:
+                return new EmptyEntryCleanup();
             case CLEAN_UP_DOI:
                 return new DoiCleanup();
             case CLEANUP_EPRINT:
