@@ -296,8 +296,15 @@ public interface PreferencesService {
 
     void clearEditedFiles();
 
+    /**
+     * Gets the directory for file browsing dialogs. This ensures that each browse dialog starts in the last visited
+     * browse directory.
+     */
     Path getWorkingDir();
 
+    /**
+     * Stores the directory for file browsing dialogs
+     */
     void setWorkingDirectory(Path dir);
 
     //*************************************************************************************************************

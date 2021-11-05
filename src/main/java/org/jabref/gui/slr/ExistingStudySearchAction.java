@@ -19,6 +19,7 @@ import org.jabref.logic.git.SlrGitHandler;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.GeneralPreferences;
@@ -61,7 +62,9 @@ public class ExistingStudySearchAction extends SimpleCommand {
         this.importFormatPreferences = preferencesService.getImportFormatPreferences();
         this.savePreferences = preferencesService.getSavePreferences();
 
-        this.workingDirectory = getInitialDirectory(preferencesService.getWorkingDir());
+        this.workingDirectory = stateManager.getActiveDatabase()
+                                            .map(database -> FileUtil.getInitialDirectory(database, preferencesService))
+                                            .orElse(preferencesService.getWorkingDir());
     }
 
     @Override
@@ -102,9 +105,9 @@ public class ExistingStudySearchAction extends SimpleCommand {
         }
         dialogService.notify(Localization.lang("Searching"));
         BackgroundTask.wrap(() -> {
-            crawler.performCrawl();
-            return 0; // Return any value to make this a callable instead of a runnable. This allows throwing exceptions.
-        })
+                          crawler.performCrawl();
+                          return 0; // Return any value to make this a callable instead of a runnable. This allows throwing exceptions.
+                      })
                       .onFailure(e -> {
                           LOGGER.error("Error during persistence of crawling results.");
                           dialogService.showErrorDialogAndWait(Localization.lang("Error during persistence of crawling results."), e);
@@ -122,12 +125,5 @@ public class ExistingStudySearchAction extends SimpleCommand {
      */
     protected void setupRepository(Path studyRepositoryRoot) throws IOException, GitAPIException {
         // Do nothing as repository is already setup
-    }
-
-    /**
-     * @return Path of current panel database directory or the standard working directory
-     */
-    private Path getInitialDirectory(Path standardWorkingDirectory) {
-        return stateManager.getActiveDatabase().flatMap(database -> database.getDatabasePath().map(Path::getParent)).orElse(standardWorkingDirectory);
     }
 }
