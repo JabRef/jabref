@@ -213,6 +213,15 @@ public class BibDatabaseContext {
         return database.getEntries();
     }
 
+    public boolean hasEmptyEntries() {
+        for (BibEntry currentEntry: this.getEntries()) {
+            if (currentEntry.getFields().isEmpty()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public static Path getFulltextIndexBasePath() {
         return Path.of(AppDirsFactory.getInstance().getUserDataDir(SEARCH_INDEX_BASE_PATH, SearchFieldConstants.VERSION, "org.jabref"));
     }
