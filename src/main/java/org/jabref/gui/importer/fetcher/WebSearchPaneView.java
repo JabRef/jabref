@@ -35,10 +35,10 @@ public class WebSearchPaneView extends VBox {
     public WebSearchPaneView(PreferencesService preferences, DialogService dialogService, StateManager stateManager) {
         this.preferences = preferences;
         this.viewModel = new WebSearchPaneViewModel(preferences, dialogService, stateManager);
-        initView();
+        initialize();
     }
 
-    private void initView() {
+    private void initialize() {
         ComboBox<SearchBasedFetcher> fetchers = new ComboBox<>();
         new ViewModelListCellFactory<SearchBasedFetcher>()
                 .withText(SearchBasedFetcher::getName)

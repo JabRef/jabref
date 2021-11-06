@@ -28,10 +28,10 @@ public class SidePaneComponent extends BorderPane {
         this.moveUpCommand = moveUpCommand;
         this.moveDownCommand = moveDownCommand;
         this.contentFactory = contentFactory;
-        initView();
+        initialize();
     }
 
-    private void initView() {
+    private void initialize() {
         getStyleClass().add("sidePaneComponent");
         setTop(createHeaderView());
         setCenter(contentFactory.create(sidePaneType));
