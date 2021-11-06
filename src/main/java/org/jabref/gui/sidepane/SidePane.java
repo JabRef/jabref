@@ -46,9 +46,9 @@ public class SidePane extends VBox {
         this.sidePaneContentFactory = new SidePaneContentFactory(preferencesService, taskExecutor, dialogService, stateManager, undoManager);
         this.viewModel = new SidePaneViewModel(preferencesService, stateManager);
 
-        EasyBind.subscribe(stateManager.sidePaneComponentVisibleProperty(GROUPS), isShow -> showOrHidePane(GROUPS, isShow));
-        EasyBind.subscribe(stateManager.sidePaneComponentVisibleProperty(WEB_SEARCH), isShow -> showOrHidePane(WEB_SEARCH, isShow));
-        EasyBind.subscribe(stateManager.sidePaneComponentVisibleProperty(OPEN_OFFICE), isShow -> showOrHidePane(OPEN_OFFICE, isShow));
+        EasyBind.subscribe(stateManager.sidePaneComponentVisiblePropertyFor(GROUPS), isShow -> showOrHidePane(GROUPS, isShow));
+        EasyBind.subscribe(stateManager.sidePaneComponentVisiblePropertyFor(WEB_SEARCH), isShow -> showOrHidePane(WEB_SEARCH, isShow));
+        EasyBind.subscribe(stateManager.sidePaneComponentVisiblePropertyFor(OPEN_OFFICE), isShow -> showOrHidePane(OPEN_OFFICE, isShow));
 
         preferencesService.getSidePanePreferences().visiblePanes().forEach(this::show);
         updateView();
@@ -126,7 +126,7 @@ public class SidePane extends VBox {
     }
 
     public BooleanProperty paneVisibleProperty(SidePaneType pane) {
-        return stateManager.sidePaneComponentVisibleProperty(pane);
+        return stateManager.sidePaneComponentVisiblePropertyFor(pane);
     }
 
     public ToggleCommand getToggleCommandFor(SidePaneType sidePane) {

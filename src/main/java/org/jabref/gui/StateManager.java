@@ -1,14 +1,10 @@
 package org.jabref.gui;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
-import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
@@ -77,19 +73,19 @@ public class StateManager {
         visiblePanes.addListener((ListChangeListener<? super SidePaneType>) change -> {
             while (change.next()) {
                 if (change.wasAdded()) {
-                    SidePaneType added = change.getAddedSubList().get(0);
-                    sidePaneComponentVisibleProperty(added).set(true);
-                    Globals.prefs.getSidePanePreferences().visiblePanes().add(added);
+                    SidePaneType visibleComponent = change.getAddedSubList().get(0);
+                    sidePaneComponentVisiblePropertyFor(visibleComponent).set(true);
+                    Globals.prefs.getSidePanePreferences().visiblePanes().add(visibleComponent);
                 } else if (change.wasRemoved()) {
-                    SidePaneType removed = change.getRemoved().get(0);
-                    sidePaneComponentVisibleProperty(removed).set(false);
-                    Globals.prefs.getSidePanePreferences().visiblePanes().remove(removed);
+                    SidePaneType hiddenComponent = change.getRemoved().get(0);
+                    sidePaneComponentVisiblePropertyFor(hiddenComponent).set(false);
+                    Globals.prefs.getSidePanePreferences().visiblePanes().remove(hiddenComponent);
                 }
             }
         });
     }
 
-    public BooleanProperty sidePaneComponentVisibleProperty(SidePaneType component) {
+    public BooleanProperty sidePaneComponentVisiblePropertyFor(SidePaneType component) {
         return switch (component) {
             case WEB_SEARCH -> webSearchPaneVisible;
             case GROUPS -> groupsPaneVisible;
