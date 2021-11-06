@@ -126,7 +126,8 @@ public class JabRefMain extends Application {
         Globals.journalAbbreviationRepository = JournalAbbreviationLoader.loadRepository(preferences.getJournalAbbreviationPreferences());
 
         // Build list of Import and Export formats
-        Globals.IMPORT_FORMAT_READER.resetImportFormats(preferences.getImporterPreferences(), preferences.getImportFormatPreferences(),
+        Globals.IMPORT_FORMAT_READER.resetImportFormats(preferences.getImporterPreferences(),
+                preferences.getGeneralPreferences(), preferences.getImportFormatPreferences(),
                 preferences.getXmpPreferences(), Globals.getFileUpdateMonitor());
         Globals.entryTypesManager.addCustomOrModifiedTypes(preferences.getBibEntryTypes(BibDatabaseMode.BIBTEX),
                 preferences.getBibEntryTypes(BibDatabaseMode.BIBLATEX));
@@ -135,7 +136,7 @@ public class JabRefMain extends Application {
                 preferences.getLayoutFormatterPreferences(Globals.journalAbbreviationRepository),
                 preferences.getSavePreferencesForExport(),
                 preferences.getXmpPreferences(),
-                preferences.getDefaultBibDatabaseMode(),
+                preferences.getGeneralPreferences().getDefaultBibDatabaseMode(),
                 Globals.entryTypesManager);
 
         // Initialize protected terms loader
@@ -148,7 +149,7 @@ public class JabRefMain extends Application {
 
     private static void configureProxy(ProxyPreferences proxyPreferences) {
         ProxyRegisterer.register(proxyPreferences);
-        if (proxyPreferences.isUseProxy() && proxyPreferences.isUseAuthentication()) {
+        if (proxyPreferences.shouldUseProxy() && proxyPreferences.shouldUseAuthentication()) {
             Authenticator.setDefault(new ProxyAuthenticator());
         }
     }

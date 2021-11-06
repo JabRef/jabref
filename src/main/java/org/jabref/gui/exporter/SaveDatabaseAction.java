@@ -35,6 +35,7 @@ import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.event.ChangePropagation;
 import org.jabref.model.entry.BibEntryTypesManager;
+import org.jabref.preferences.GeneralPreferences;
 import org.jabref.preferences.PreferencesService;
 
 import org.slf4j.Logger;
@@ -90,7 +91,7 @@ public class SaveDatabaseAction {
     public void saveSelectedAsPlain() {
         askForSavePath().ifPresent(path -> {
             try {
-                saveDatabase(path, true, preferences.getDefaultEncoding(), SavePreferences.DatabaseSaveType.PLAIN_BIBTEX);
+                saveDatabase(path, true, preferences.getGeneralPreferences().getDefaultEncoding(), SavePreferences.DatabaseSaveType.PLAIN_BIBTEX);
                 frame.getFileHistory().newFile(path);
                 dialogService.notify(Localization.lang("Saved selected to '%0'.", path.toString()));
             } catch (SaveException ex) {
@@ -201,7 +202,7 @@ public class SaveDatabaseAction {
             Charset encoding = libraryTab.getBibDatabaseContext()
                                          .getMetaData()
                                          .getEncoding()
-                                         .orElse(preferences.getDefaultEncoding());
+                                         .orElse(preferences.getGeneralPreferences().getDefaultEncoding());
             // Make sure to remember which encoding we used.
             libraryTab.getBibDatabaseContext().getMetaData().setEncoding(encoding, ChangePropagation.DO_NOT_POST_EVENT);
 
@@ -224,11 +225,11 @@ public class SaveDatabaseAction {
     }
 
     private boolean saveDatabase(Path file, boolean selectedOnly, Charset encoding, SavePreferences.DatabaseSaveType saveType) throws SaveException {
-        SavePreferences preferences = this.preferences.getSavePreferences()
-                                                      .withEncoding(encoding)
+        GeneralPreferences generalPreferences = this.preferences.getGeneralPreferences();
+        SavePreferences savePreferences = this.preferences.getSavePreferences()
                                                       .withSaveType(saveType);
-        try (AtomicFileWriter fileWriter = new AtomicFileWriter(file, preferences.getEncoding(), preferences.shouldMakeBackup())) {
-            BibtexDatabaseWriter databaseWriter = new BibtexDatabaseWriter(fileWriter, preferences, entryTypesManager);
+        try (AtomicFileWriter fileWriter = new AtomicFileWriter(file, encoding, savePreferences.shouldMakeBackup())) {
+            BibtexDatabaseWriter databaseWriter = new BibtexDatabaseWriter(fileWriter, generalPreferences, savePreferences, entryTypesManager);
 
             if (selectedOnly) {
                 databaseWriter.savePartOfDatabase(libraryTab.getBibDatabaseContext(), libraryTab.getSelectedEntries());
@@ -239,7 +240,7 @@ public class SaveDatabaseAction {
             libraryTab.registerUndoableChanges(databaseWriter.getSaveActionsFieldChanges());
 
             if (fileWriter.hasEncodingProblems()) {
-                saveWithDifferentEncoding(file, selectedOnly, preferences.getEncoding(), fileWriter.getEncodingProblems(), saveType);
+                saveWithDifferentEncoding(file, selectedOnly, encoding, fileWriter.getEncodingProblems(), saveType);
             }
         } catch (UnsupportedCharsetException ex) {
             throw new SaveException(Localization.lang("Character encoding '%0' is not supported.", encoding.displayName()), ex);
