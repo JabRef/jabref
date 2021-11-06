@@ -49,11 +49,11 @@ public class SidePaneViewModel extends AbstractViewModel {
     }
 
     /**
-     * @return True if <b>sidePane</b> is visible, and it can still move up therefore we should update the view
+     * @return True if <b>pane</b> is visible, and it can still move up therefore we should update the view
      */
-    public boolean moveUp(SidePaneType sidePane) {
-        if (visiblePanes.contains(sidePane)) {
-            int currentPosition = visiblePanes.indexOf(sidePane);
+    public boolean moveUp(SidePaneType pane) {
+        if (visiblePanes.contains(pane)) {
+            int currentPosition = visiblePanes.indexOf(pane);
             if (currentPosition > 0) {
                 int newPosition = currentPosition - 1;
                 swap(visiblePanes, currentPosition, newPosition);
@@ -65,11 +65,11 @@ public class SidePaneViewModel extends AbstractViewModel {
     }
 
     /**
-     * @return True if <b>sidePane</b> is visible, and it can still move down therefore we should update the view
+     * @return True if <b>pane</b> is visible, and it can still move down therefore we should update the view
      */
-    public boolean moveDown(SidePaneType sidePane) {
-        if (visiblePanes.contains(sidePane)) {
-            int currentPosition = visiblePanes.indexOf(sidePane);
+    public boolean moveDown(SidePaneType pane) {
+        if (visiblePanes.contains(pane)) {
+            int currentPosition = visiblePanes.indexOf(pane);
             if (currentPosition < (visiblePanes.size() - 1)) {
                 int newPosition = currentPosition + 1;
                 swap(visiblePanes, currentPosition, newPosition);
@@ -81,12 +81,12 @@ public class SidePaneViewModel extends AbstractViewModel {
     }
 
     /**
-     * @return True if <b>sidePane</b> is not already shown which means the view needs to be updated
+     * @return True if <b>pane</b> is not already shown which means the view needs to be updated
      */
-    public boolean show(SidePaneType sidePane) {
-        if (!visiblePanes.contains(sidePane)) {
-            visiblePanes.add(sidePane);
-            preferencesService.getSidePanePreferences().visiblePanes().add(sidePane);
+    public boolean show(SidePaneType pane) {
+        if (!visiblePanes.contains(pane)) {
+            visiblePanes.add(pane);
+            preferencesService.getSidePanePreferences().visiblePanes().add(pane);
             visiblePanes.sorted(new PreferredIndexSort(preferencesService));
             return true;
         }
@@ -94,12 +94,12 @@ public class SidePaneViewModel extends AbstractViewModel {
     }
 
     /**
-     * @return True if <b>sidePane</b> is visible which means the view needs to be updated
+     * @return True if <b>pane</b> is visible which means the view needs to be updated
      */
-    public boolean hide(SidePaneType sidePane) {
-        if (visiblePanes.contains(sidePane)) {
-            visiblePanes.remove(sidePane);
-            preferencesService.getSidePanePreferences().visiblePanes().remove(sidePane);
+    public boolean hide(SidePaneType pane) {
+        if (visiblePanes.contains(pane)) {
+            visiblePanes.remove(pane);
+            preferencesService.getSidePanePreferences().visiblePanes().remove(pane);
             return true;
         } else {
             return false;
@@ -118,8 +118,8 @@ public class SidePaneViewModel extends AbstractViewModel {
         return webSearchPaneVisible;
     }
 
-    public boolean isSidePaneVisible(SidePaneType sidePane) {
-        return visiblePanes.contains(sidePane);
+    public boolean isPaneVisible(SidePaneType pane) {
+        return visiblePanes.contains(pane);
     }
 
     /**

@@ -46,19 +46,19 @@ public class SidePane extends VBox {
         updateView();
     }
 
-    private SidePaneComponent getSidePaneComponent(SidePaneType sidePane) {
-        SidePaneComponent sidePaneComponent = sidePaneComponentLookup.get(sidePane);
+    private SidePaneComponent getSidePaneComponent(SidePaneType pane) {
+        SidePaneComponent sidePaneComponent = sidePaneComponentLookup.get(pane);
         if (sidePaneComponent == null) {
-            sidePaneComponent = switch (sidePane) {
-                case GROUPS -> new GroupsSidePaneComponent(new CloseSidePaneAction(sidePane), new MoveUpAction(sidePane), new MoveDownAction(sidePane), sidePaneContentFactory, preferencesService, dialogService);
-                case WEB_SEARCH, OPEN_OFFICE -> new SidePaneComponent(sidePane, new CloseSidePaneAction(sidePane), new MoveUpAction(sidePane), new MoveDownAction(sidePane), sidePaneContentFactory);
+            sidePaneComponent = switch (pane) {
+                case GROUPS -> new GroupsSidePaneComponent(new ClosePaneAction(pane), new MoveUpAction(pane), new MoveDownAction(pane), sidePaneContentFactory, preferencesService, dialogService);
+                case WEB_SEARCH, OPEN_OFFICE -> new SidePaneComponent(pane, new ClosePaneAction(pane), new MoveUpAction(pane), new MoveDownAction(pane), sidePaneContentFactory);
             };
-            sidePaneComponentLookup.put(sidePane, sidePaneComponent);
+            sidePaneComponentLookup.put(pane, sidePaneComponent);
         }
         return sidePaneComponent;
     }
 
-    private void showVisibleSidePanes() {
+    private void showVisiblePanes() {
         getChildren().clear();
         viewModel.getVisiblePanes().forEach(type -> {
             SidePaneComponent view = getSidePaneComponent(type);
@@ -66,29 +66,29 @@ public class SidePane extends VBox {
         });
     }
 
-    private void show(SidePaneType sidePane) {
-        if (viewModel.show(sidePane)) {
+    private void show(SidePaneType pane) {
+        if (viewModel.show(pane)) {
             updateView();
-            if (sidePane == GROUPS) {
-                ((GroupsSidePaneComponent) getSidePaneComponent(sidePane)).afterOpening();
+            if (pane == GROUPS) {
+                ((GroupsSidePaneComponent) getSidePaneComponent(pane)).afterOpening();
             }
         }
     }
 
-    private void hide(SidePaneType sidePane) {
-        if (viewModel.hide(sidePane)) {
+    private void hide(SidePaneType pane) {
+        if (viewModel.hide(pane)) {
             updateView();
         }
     }
 
-    private void moveUp(SidePaneType sidePane) {
-        if (viewModel.moveUp(sidePane)) {
+    private void moveUp(SidePaneType pane) {
+        if (viewModel.moveUp(pane)) {
             updateView();
         }
     }
 
-    private void moveDown(SidePaneType sidePane) {
-        if (viewModel.moveDown(sidePane)) {
+    private void moveDown(SidePaneType pane) {
+        if (viewModel.moveDown(pane)) {
             updateView();
         }
     }
@@ -96,16 +96,16 @@ public class SidePane extends VBox {
     /**
      * If the given component is visible it will be hidden and the other way around.
      */
-    private void toggle(SidePaneType sidePane) {
-        if (viewModel.isSidePaneVisible(sidePane)) {
-            hide(sidePane);
+    private void toggle(SidePaneType pane) {
+        if (viewModel.isPaneVisible(pane)) {
+            hide(pane);
         } else {
-            show(sidePane);
+            show(pane);
         }
     }
 
     private void updateView() {
-        showVisibleSidePanes();
+        showVisiblePanes();
         setVisible(!viewModel.getVisiblePanes().isEmpty());
     }
 
@@ -121,56 +121,56 @@ public class SidePane extends VBox {
         return new ToggleCommand(sidePane);
     }
 
-    private class CloseSidePaneAction extends SimpleCommand {
-        private final SidePaneType toCloseSidePane;
+    private class ClosePaneAction extends SimpleCommand {
+        private final SidePaneType toClosePane;
 
-        public CloseSidePaneAction(SidePaneType toCloseSidePane) {
-            this.toCloseSidePane = toCloseSidePane;
+        public ClosePaneAction(SidePaneType toClosePane) {
+            this.toClosePane = toClosePane;
         }
 
         @Override
         public void execute() {
-            hide(toCloseSidePane);
+            hide(toClosePane);
         }
     }
 
     private class MoveUpAction extends SimpleCommand {
-        private final SidePaneType toMoveUpSidePane;
+        private final SidePaneType toMoveUpPane;
 
-        public MoveUpAction(SidePaneType toMoveUpSidePane) {
-            this.toMoveUpSidePane = toMoveUpSidePane;
+        public MoveUpAction(SidePaneType toMoveUpPane) {
+            this.toMoveUpPane = toMoveUpPane;
         }
 
         @Override
         public void execute() {
-            moveUp(toMoveUpSidePane);
+            moveUp(toMoveUpPane);
         }
     }
 
     private class MoveDownAction extends SimpleCommand {
-        private final SidePaneType toMoveDownSidePane;
+        private final SidePaneType toMoveDownPane;
 
-        public MoveDownAction(SidePaneType toMoveDownSidePane) {
-            this.toMoveDownSidePane = toMoveDownSidePane;
+        public MoveDownAction(SidePaneType toMoveDownPane) {
+            this.toMoveDownPane = toMoveDownPane;
         }
 
         @Override
         public void execute() {
-            moveDown(toMoveDownSidePane);
+            moveDown(toMoveDownPane);
         }
     }
 
     public class ToggleCommand extends SimpleCommand {
 
-        private final SidePaneType sidePane;
+        private final SidePaneType pane;
 
-        public ToggleCommand(SidePaneType sidePane) {
-            this.sidePane = sidePane;
+        public ToggleCommand(SidePaneType pane) {
+            this.pane = pane;
         }
 
         @Override
         public void execute() {
-            toggle(sidePane);
+            toggle(pane);
         }
     }
 }
