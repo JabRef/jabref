@@ -31,14 +31,14 @@ public class GenerateEntryFromIdAction extends SimpleCommand {
     private final PopOver entryFromIdPopOver;
     private final StateManager stateManager;
 
-    public GenerateEntryFromIdAction(LibraryTab libraryTab, DialogService dialogService, PreferencesService preferencesService, TaskExecutor taskExecutor, PopOver entryFromIdPopOver, String identifier) {
+    public GenerateEntryFromIdAction(LibraryTab libraryTab, DialogService dialogService, PreferencesService preferencesService, TaskExecutor taskExecutor, PopOver entryFromIdPopOver, String identifier, StateManager stateManager) {
         this.libraryTab = libraryTab;
         this.dialogService = dialogService;
         this.preferencesService = preferencesService;
         this.identifier = identifier;
         this.taskExecutor = taskExecutor;
         this.entryFromIdPopOver = entryFromIdPopOver;
-        this.stateManager = new StateManager();
+        this.stateManager = stateManager;
     }
 
     @Override

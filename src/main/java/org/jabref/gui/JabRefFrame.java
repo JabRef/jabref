@@ -919,7 +919,7 @@ public class JabRefFrame extends BorderPane {
         newEntryFromIdButton.setFocusTraversable(false);
         newEntryFromIdButton.disableProperty().bind(ActionHelper.needsDatabase(stateManager).not());
         newEntryFromIdButton.setOnMouseClicked(event -> {
-            GenerateEntryFromIdDialog entryFromId = new GenerateEntryFromIdDialog(getCurrentLibraryTab(), dialogService, prefs, taskExecutor);
+            GenerateEntryFromIdDialog entryFromId = new GenerateEntryFromIdDialog(getCurrentLibraryTab(), dialogService, prefs, taskExecutor, stateManager);
 
             if (entryFromIdPopOver == null) {
                 entryFromIdPopOver = new PopOver(entryFromId.getDialogPane());
