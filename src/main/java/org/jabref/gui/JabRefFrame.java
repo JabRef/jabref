@@ -937,10 +937,6 @@ public class JabRefFrame extends BorderPane {
         return newEntryFromIdButton;
     }
 
-    private CheckMenuItem createSidePaneCheckMenuItem(SidePane container, ActionFactory factory, SidePaneType sidePane) {
-        return factory.createCheckMenuItem(sidePane.getToggleAction(), container.getToggleCommandFor(sidePane), container.paneVisibleProperty(sidePane));
-    }
-
     private Group createTaskIndicator() {
         ProgressIndicator indicator = new ProgressIndicator();
         indicator.getStyleClass().add("progress-indicatorToolbar");
