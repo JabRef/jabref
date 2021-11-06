@@ -96,10 +96,7 @@ public class SidePaneViewModel extends AbstractViewModel {
     public boolean isPaneVisible(SidePaneType pane) {
         return getVisiblePanes().contains(pane);
     }
-
-    /**
-     * This implementation is inefficient because of some JavaFX limitations, we only advice to use it on small lists
-     */
+    
     private <T> void swap(ObservableList<T> observableList, int i, int j) {
         List<T> placeholder = new ArrayList<>(observableList);
         Collections.swap(placeholder, i, j);
