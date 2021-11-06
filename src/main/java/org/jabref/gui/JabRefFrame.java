@@ -834,11 +834,13 @@ public class JabRefFrame extends BorderPane {
 
                 factory.createMenuItem(StandardActions.REBUILD_FULLTEXT_SEARCH_INDEX, new RebuildFulltextSearchIndexAction(stateManager, this::getCurrentLibraryTab, dialogService, prefs.getFilePreferences()))
         );
-
+        SidePaneType webSearchPane = SidePaneType.WEB_SEARCH;
+        SidePaneType groupsPane = SidePaneType.GROUPS;
+        SidePaneType openOfficePane = SidePaneType.OPEN_OFFICE;
         view.getItems().addAll(
-                createSidePaneCheckMenuItem(sidePane, factory, SidePaneType.WEB_SEARCH),
-                createSidePaneCheckMenuItem(sidePane, factory, SidePaneType.GROUPS),
-                createSidePaneCheckMenuItem(sidePane, factory, SidePaneType.OPEN_OFFICE),
+                factory.createCheckMenuItem(webSearchPane.getToggleAction(), sidePane.getToggleCommandFor(webSearchPane), sidePane.sidePaneVisibleProperty(webSearchPane)),
+                factory.createCheckMenuItem(groupsPane.getToggleAction(), sidePane.getToggleCommandFor(groupsPane), sidePane.sidePaneVisibleProperty(groupsPane)),
+                factory.createCheckMenuItem(openOfficePane.getToggleAction(), sidePane.getToggleCommandFor(openOfficePane), sidePane.sidePaneVisibleProperty(openOfficePane)),
 
                 new SeparatorMenuItem(),
 
@@ -936,9 +938,7 @@ public class JabRefFrame extends BorderPane {
     }
 
     private CheckMenuItem createSidePaneCheckMenuItem(SidePane container, ActionFactory factory, SidePaneType sidePane) {
-        CheckMenuItem checkMenuItem = factory.createCheckMenuItem(sidePane.getToggleAction(), container.getToggleCommandFor(sidePane), container.sidePaneVisibleProperty(sidePane).get());
-        EasyBind.subscribe(container.sidePaneVisibleProperty(sidePane), checkMenuItem::setSelected);
-        return checkMenuItem;
+        return factory.createCheckMenuItem(sidePane.getToggleAction(), container.getToggleCommandFor(sidePane), container.sidePaneVisibleProperty(sidePane));
     }
 
     private Group createTaskIndicator() {
