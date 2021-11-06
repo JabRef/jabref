@@ -55,15 +55,12 @@ public class FileTabViewModel implements PreferenceTabViewModel {
     public void storeSettings() {
         preferences.storeOpenLastFilesOnStartup(openLastStartupProperty.getValue());
 
-        preferences.getImportExportPreferences().setNonWrappableFields(noWrapFilesProperty.getValue().trim());
-        preferences.getImportExportPreferences().setResolveStringsForStandardBibtexFields(resolveStringsBibTexProperty.getValue());
-        preferences.getImportExportPreferences().setResolveStringsForAllStrings(resolveStringsAllProperty.getValue());
-        preferences.getImportExportPreferences().setNonResolvableFields(resolveStringsExceptProperty.getValue().trim());
-        preferences.getImportExportPreferences().setNewLineSeparator(selectedNewLineSeparatorProperty.getValue());
-        preferences.getImportExportPreferences().setAlwaysReformatOnSave(alwaysReformatBibProperty.getValue());
-        // preferences.getImportExportPreferences().setImportWorkingDirectory(initialImportExportPreferences.getImportWorkingDirectory());
-        // preferences.getImportExportPreferences().setLastExportExtension(initialImportExportPreferences.getLastExportExtension());
-        // preferences.getImportExportPreferences().setExportWorkingDirectory(initialImportExportPreferences.getExportWorkingDirectory());
+        importExportPreferences.setNonWrappableFields(noWrapFilesProperty.getValue().trim());
+        importExportPreferences.setResolveStringsForStandardBibtexFields(resolveStringsBibTexProperty.getValue());
+        importExportPreferences.setResolveStringsForAllStrings(resolveStringsAllProperty.getValue());
+        importExportPreferences.setNonResolvableFields(resolveStringsExceptProperty.getValue().trim());
+        importExportPreferences.setNewLineSeparator(selectedNewLineSeparatorProperty.getValue());
+        importExportPreferences.setAlwaysReformatOnSave(alwaysReformatBibProperty.getValue());
 
         preferences.storeShouldAutosave(autosaveLocalLibraries.getValue());
     }
@@ -73,6 +70,8 @@ public class FileTabViewModel implements PreferenceTabViewModel {
     public BooleanProperty openLastStartupProperty() {
         return openLastStartupProperty;
     }
+
+    // ImportExport
 
     public StringProperty noWrapFilesProperty() {
         return noWrapFilesProperty;
