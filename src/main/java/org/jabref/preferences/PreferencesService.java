@@ -335,8 +335,6 @@ public interface PreferencesService {
 
     SearchPreferences getSearchPreferences();
 
-    void storeSearchPreferences(SearchPreferences preferences);
-
     String getLastPreferencesExportPath();
 
     void storeLastPreferencesExportPath(Path exportFile);

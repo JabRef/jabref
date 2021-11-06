@@ -35,6 +35,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javafx.beans.InvalidationListener;
+import javafx.collections.SetChangeListener;
 import javafx.scene.control.TableColumn.SortType;
 
 import org.jabref.gui.Globals;
@@ -108,6 +109,7 @@ import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.EntryTypeFactory;
 import org.jabref.model.metadata.SaveOrderConfig;
 import org.jabref.model.push.PushToApplicationConstants;
+import org.jabref.model.search.rules.SearchRules;
 import org.jabref.model.strings.StringUtil;
 
 import com.tobiasdiez.easybind.EasyBind;
@@ -429,6 +431,7 @@ public class JabRefPreferences implements PreferencesService {
     private ProtectedTermsPreferences protectedTermsPreferences;
     private MrDlibPreferences mrDlibPreferences;
     private EntryEditorPreferences entryEditorPreferences;
+    private SearchPreferences searchPreferences;
 
     // The constructor is made private to enforce this as a singleton class:
     private JabRefPreferences() {
@@ -2565,6 +2568,10 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public SearchPreferences getSearchPreferences() {
+        if (Objects.nonNull(searchPreferences)) {
+            return searchPreferences;
+        }
+
         SearchDisplayMode searchDisplayMode;
         try {
             searchDisplayMode = SearchDisplayMode.valueOf(get(SEARCH_DISPLAY_MODE));
@@ -2573,23 +2580,24 @@ public class JabRefPreferences implements PreferencesService {
             searchDisplayMode = SearchDisplayMode.valueOf((String) defaults.get(SEARCH_DISPLAY_MODE));
         }
 
-        return new SearchPreferences(
+        searchPreferences = new SearchPreferences(
                 searchDisplayMode,
                 getBoolean(SEARCH_CASE_SENSITIVE),
                 getBoolean(SEARCH_REG_EXP),
                 getBoolean(SEARCH_FULLTEXT),
                 getBoolean(SEARCH_KEEP_SEARCH_STRING),
                 getBoolean(SEARCH_KEEP_GLOBAL_WINDOW_ON_TOP));
-    }
 
-    @Override
-    public void storeSearchPreferences(SearchPreferences preferences) {
-        put(SEARCH_DISPLAY_MODE, Objects.requireNonNull(preferences.getSearchDisplayMode()).toString());
-        putBoolean(SEARCH_CASE_SENSITIVE, preferences.isCaseSensitive());
-        putBoolean(SEARCH_REG_EXP, preferences.isRegularExpression());
-        putBoolean(SEARCH_FULLTEXT, preferences.isFulltext());
-        putBoolean(SEARCH_KEEP_SEARCH_STRING, preferences.isKeepSearchString());
-        putBoolean(SEARCH_KEEP_GLOBAL_WINDOW_ON_TOP, preferences.isKeepWindowOnTop());
+        EasyBind.listen(searchPreferences.searchDisplayModeProperty(), (obs, oldValue, newValue) -> put(SEARCH_DISPLAY_MODE, Objects.requireNonNull(searchPreferences.getSearchDisplayMode()).toString()));
+        searchPreferences.getObservableSearchFlags().addListener((SetChangeListener<SearchRules.SearchFlags>) c -> {
+                putBoolean(SEARCH_CASE_SENSITIVE, searchPreferences.getObservableSearchFlags().contains(SearchRules.SearchFlags.CASE_SENSITIVE));
+                putBoolean(SEARCH_REG_EXP, searchPreferences.getObservableSearchFlags().contains(SearchRules.SearchFlags.REGULAR_EXPRESSION));
+                putBoolean(SEARCH_FULLTEXT, searchPreferences.getObservableSearchFlags().contains(SearchRules.SearchFlags.FULLTEXT));
+                putBoolean(SEARCH_KEEP_SEARCH_STRING, searchPreferences.getObservableSearchFlags().contains(SearchRules.SearchFlags.KEEP_SEARCH_STRING));
+        });
+        EasyBind.listen(searchPreferences.keepWindowOnTopProperty(), (obs, oldValue, newValue) -> putBoolean(SEARCH_KEEP_GLOBAL_WINDOW_ON_TOP, searchPreferences.shouldKeepWindowOnTop()));
+
+        return searchPreferences;
     }
 
     //*************************************************************************************************************
