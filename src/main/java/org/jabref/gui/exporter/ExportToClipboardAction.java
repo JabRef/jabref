@@ -110,8 +110,7 @@ public class ExportToClipboardAction extends SimpleCommand {
                                                 .getFileDirectories(preferences.getFilePreferences()));
 
         // Add chosen export type to last used preference, to become default
-        preferences.storeImportExportPreferences(
-               preferences.getImportExportPreferences().withLastExportExtension(exporter.getName()));
+        preferences.getImportExportPreferences().setLastExportExtension(exporter.getName());
 
         Path tmp = null;
         try {

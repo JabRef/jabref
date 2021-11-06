@@ -240,8 +240,6 @@ public interface PreferencesService {
 
     NewLineSeparator getNewLineSeparator();
 
-    void storeNewLineSeparator(NewLineSeparator newLineSeparator);
-
     AutoLinkPreferences getAutoLinkPreferences();
 
     boolean shouldAutosave();
@@ -257,8 +255,6 @@ public interface PreferencesService {
     //*************************************************************************************************************
 
     ImportExportPreferences getImportExportPreferences();
-
-    void storeImportExportPreferences(ImportExportPreferences preferences);
 
     List<TemplateExporter> getCustomExportFormats(JournalAbbreviationRepository repository);
 

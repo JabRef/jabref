@@ -28,25 +28,25 @@ public class FileTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty autosaveLocalLibraries = new SimpleBooleanProperty();
 
     private final PreferencesService preferences;
-    private final ImportExportPreferences initialImportExportPreferences;
+    private final ImportExportPreferences importExportPreferences;
 
     FileTabViewModel(PreferencesService preferences) {
         this.preferences = preferences;
-        this.initialImportExportPreferences = preferences.getImportExportPreferences();
+        this.importExportPreferences = preferences.getImportExportPreferences();
     }
 
     @Override
     public void setValues() {
         openLastStartupProperty.setValue(preferences.shouldOpenLastFilesOnStartup());
 
-        noWrapFilesProperty.setValue(initialImportExportPreferences.getNonWrappableFields());
-        resolveStringsAllProperty.setValue(initialImportExportPreferences.shouldResolveStringsForAllStrings()); // Flipped around
-        resolveStringsBibTexProperty.setValue(initialImportExportPreferences.shouldResolveStringsForStandardBibtexFields());
-        resolveStringsExceptProperty.setValue(initialImportExportPreferences.getNonResolvableFields());
+        noWrapFilesProperty.setValue(importExportPreferences.getNonWrappableFields());
+        resolveStringsAllProperty.setValue(importExportPreferences.shouldResolveStringsForAllStrings()); // Flipped around
+        resolveStringsBibTexProperty.setValue(importExportPreferences.shouldResolveStringsForStandardBibtexFields());
+        resolveStringsExceptProperty.setValue(importExportPreferences.getNonResolvableFields());
         newLineSeparatorListProperty.setValue(FXCollections.observableArrayList(NewLineSeparator.values()));
-        selectedNewLineSeparatorProperty.setValue(initialImportExportPreferences.getNewLineSeparator());
+        selectedNewLineSeparatorProperty.setValue(importExportPreferences.getNewLineSeparator());
 
-        alwaysReformatBibProperty.setValue(initialImportExportPreferences.shouldAlwaysReformatOnSave());
+        alwaysReformatBibProperty.setValue(importExportPreferences.shouldAlwaysReformatOnSave());
 
         autosaveLocalLibraries.setValue(preferences.shouldAutosave());
     }
@@ -55,17 +55,15 @@ public class FileTabViewModel implements PreferenceTabViewModel {
     public void storeSettings() {
         preferences.storeOpenLastFilesOnStartup(openLastStartupProperty.getValue());
 
-        ImportExportPreferences newImportExportPreferences = new ImportExportPreferences(
-                noWrapFilesProperty.getValue().trim(),
-                resolveStringsBibTexProperty.getValue(),
-                resolveStringsAllProperty.getValue(),
-                resolveStringsExceptProperty.getValue().trim(),
-                selectedNewLineSeparatorProperty.getValue(),
-                alwaysReformatBibProperty.getValue(),
-                initialImportExportPreferences.getImportWorkingDirectory(),
-                initialImportExportPreferences.getLastExportExtension(),
-                initialImportExportPreferences.getExportWorkingDirectory());
-        preferences.storeImportExportPreferences(newImportExportPreferences);
+        preferences.getImportExportPreferences().setNonWrappableFields(noWrapFilesProperty.getValue().trim());
+        preferences.getImportExportPreferences().setResolveStringsForStandardBibtexFields(resolveStringsBibTexProperty.getValue());
+        preferences.getImportExportPreferences().setResolveStringsForAllStrings(resolveStringsAllProperty.getValue());
+        preferences.getImportExportPreferences().setNonResolvableFields(resolveStringsExceptProperty.getValue().trim());
+        preferences.getImportExportPreferences().setNewLineSeparator(selectedNewLineSeparatorProperty.getValue());
+        preferences.getImportExportPreferences().setAlwaysReformatOnSave(alwaysReformatBibProperty.getValue());
+        // preferences.getImportExportPreferences().setImportWorkingDirectory(initialImportExportPreferences.getImportWorkingDirectory());
+        // preferences.getImportExportPreferences().setLastExportExtension(initialImportExportPreferences.getLastExportExtension());
+        // preferences.getImportExportPreferences().setExportWorkingDirectory(initialImportExportPreferences.getExportWorkingDirectory());
 
         preferences.storeShouldAutosave(autosaveLocalLibraries.getValue());
     }

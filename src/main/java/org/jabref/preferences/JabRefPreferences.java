@@ -437,6 +437,7 @@ public class JabRefPreferences implements PreferencesService {
     private ProxyPreferences proxyPreferences;
     private SearchPreferences searchPreferences;
     private AutoLinkPreferences autoLinkPreferences;
+    private ImportExportPreferences importExportPreferences;
 
     // The constructor is made private to enforce this as a singleton class:
     private JabRefPreferences() {
@@ -2127,15 +2128,6 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     @Override
-    public void storeNewLineSeparator(NewLineSeparator newLineSeparator) {
-        String escapeChars = newLineSeparator.toString();
-        put(NEWLINE, escapeChars);
-
-        // We also have to change Globals variable as globals is not a getter, but a constant
-        OS.NEWLINE = escapeChars;
-    }
-
-    @Override
     public FieldContentFormatterPreferences getFieldContentParserPreferences() {
         return new FieldContentFormatterPreferences(
                 getStringList(NON_WRAPPABLE_FIELDS).stream().map(FieldFactory::parseField).collect(Collectors.toList()));
@@ -2258,7 +2250,11 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public ImportExportPreferences getImportExportPreferences() {
-        return new ImportExportPreferences(
+        if (Objects.nonNull(importExportPreferences)) {
+            return importExportPreferences;
+        }
+
+        importExportPreferences = new ImportExportPreferences(
                 get(NON_WRAPPABLE_FIELDS),
                 !getBoolean(RESOLVE_STRINGS_ALL_FIELDS),
                 getBoolean(RESOLVE_STRINGS_ALL_FIELDS),
@@ -2268,18 +2264,22 @@ public class JabRefPreferences implements PreferencesService {
                 Path.of(get(IMPORT_WORKING_DIRECTORY)),
                 get(LAST_USED_EXPORT),
                 Path.of(get(EXPORT_WORKING_DIRECTORY)));
-    }
 
-    @Override
-    public void storeImportExportPreferences(ImportExportPreferences preferences) {
-        put(NON_WRAPPABLE_FIELDS, preferences.getNonWrappableFields());
-        putBoolean(RESOLVE_STRINGS_ALL_FIELDS, preferences.shouldResolveStringsForAllStrings());
-        put(DO_NOT_RESOLVE_STRINGS_FOR, preferences.getNonResolvableFields());
-        storeNewLineSeparator(preferences.getNewLineSeparator());
-        putBoolean(REFORMAT_FILE_ON_SAVE_AND_EXPORT, preferences.shouldAlwaysReformatOnSave());
-        put(IMPORT_WORKING_DIRECTORY, preferences.getImportWorkingDirectory().toString());
-        put(LAST_USED_EXPORT, preferences.getLastExportExtension());
-        put(EXPORT_WORKING_DIRECTORY, preferences.getExportWorkingDirectory().toString());
+        EasyBind.listen(importExportPreferences.nonWrappableFieldsProperty(), (obs, oldValue, newValue) -> put(NON_WRAPPABLE_FIELDS, newValue));
+        EasyBind.listen(importExportPreferences.resolveStringsForStandardBibtexFieldsProperty(), (obs, oldValue, newValue) -> putBoolean(RESOLVE_STRINGS_ALL_FIELDS, newValue));
+        EasyBind.listen(importExportPreferences.resolveStringsForAllStringsProperty(), (obs, oldValue, newValue) -> putBoolean(RESOLVE_STRINGS_ALL_FIELDS, newValue));
+        EasyBind.listen(importExportPreferences.nonResolvableFieldsProperty(), (obs, oldValue, newValue) -> put(DO_NOT_RESOLVE_STRINGS_FOR, newValue));
+        EasyBind.listen(importExportPreferences.newLineSeparatorProperty(), (obs, oldValue, newValue) -> {
+            String escapeChars = newValue.toString();
+            put(NEWLINE, escapeChars);
+            OS.NEWLINE = escapeChars;
+        });
+        EasyBind.listen(importExportPreferences.alwaysReformatOnSaveProperty(), (obs, oldValue, newValue) -> putBoolean(REFORMAT_FILE_ON_SAVE_AND_EXPORT, newValue));
+        EasyBind.listen(importExportPreferences.importWorkingDirectoryProperty(), (obs, oldValue, newValue) -> put(IMPORT_WORKING_DIRECTORY, newValue.toString()));
+        EasyBind.listen(importExportPreferences.lastExportExtensionProperty(), (obs, oldValue, newValue) -> put(LAST_USED_EXPORT, newValue));
+        EasyBind.listen(importExportPreferences.exportWorkingDirectoryProperty(), (obs, oldValue, newValue) -> put(EXPORT_WORKING_DIRECTORY, newValue.toString()));
+
+        return importExportPreferences;
     }
 
     @Override
