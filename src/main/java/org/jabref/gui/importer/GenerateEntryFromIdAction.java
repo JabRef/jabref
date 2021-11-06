@@ -5,6 +5,7 @@ import java.util.Optional;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.Globals;
 import org.jabref.gui.LibraryTab;
+import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.TaskExecutor;
@@ -28,6 +29,7 @@ public class GenerateEntryFromIdAction extends SimpleCommand {
     private final String identifier;
     private final TaskExecutor taskExecutor;
     private final PopOver entryFromIdPopOver;
+    private final StateManager stateManager;
 
     public GenerateEntryFromIdAction(LibraryTab libraryTab, DialogService dialogService, PreferencesService preferencesService, TaskExecutor taskExecutor, PopOver entryFromIdPopOver, String identifier) {
         this.libraryTab = libraryTab;
@@ -36,6 +38,7 @@ public class GenerateEntryFromIdAction extends SimpleCommand {
         this.identifier = identifier;
         this.taskExecutor = taskExecutor;
         this.entryFromIdPopOver = entryFromIdPopOver;
+        this.stateManager = new StateManager();
     }
 
     @Override
@@ -52,7 +55,7 @@ public class GenerateEntryFromIdAction extends SimpleCommand {
             if (addEntryFlag) {
                 // add entry manually
                 new NewEntryAction(libraryTab.frame(), StandardEntryType.Article, dialogService,
-                                    preferencesService, libraryTab.stateManager()).execute();
+                                    preferencesService, stateManager).execute();
             }
         });
         backgroundTask.onSuccess((bibEntry) -> bibEntry.ifPresentOrElse((entry) -> {
