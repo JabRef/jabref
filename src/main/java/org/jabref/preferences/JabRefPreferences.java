@@ -436,6 +436,7 @@ public class JabRefPreferences implements PreferencesService {
     private RemotePreferences remotePreferences;
     private ProxyPreferences proxyPreferences;
     private SearchPreferences searchPreferences;
+    private AutoLinkPreferences autoLinkPreferences;
 
     // The constructor is made private to enforce this as a singleton class:
     private JabRefPreferences() {
@@ -2200,6 +2201,10 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public AutoLinkPreferences getAutoLinkPreferences() {
+        if (Objects.nonNull(autoLinkPreferences)) {
+            return autoLinkPreferences;
+        }
+
         AutoLinkPreferences.CitationKeyDependency citationKeyDependency =
                 AutoLinkPreferences.CitationKeyDependency.START; // default
         if (getBoolean(AUTOLINK_EXACT_KEY_ONLY)) {
@@ -2208,32 +2213,33 @@ public class JabRefPreferences implements PreferencesService {
             citationKeyDependency = AutoLinkPreferences.CitationKeyDependency.REGEX;
         }
 
-        return new AutoLinkPreferences(
+        autoLinkPreferences = new AutoLinkPreferences(
                 citationKeyDependency,
                 get(AUTOLINK_REG_EXP_SEARCH_EXPRESSION_KEY),
                 getBoolean(ASK_AUTO_NAMING_PDFS_AGAIN),
                 getKeywordDelimiter());
-    }
 
-    @Override
-    public void storeAutoLinkPreferences(AutoLinkPreferences preferences) {
-        // Starts bibtex only omitted, as it is not being saved
-        switch (preferences.getCitationKeyDependency()) {
-            case START -> {
-                putBoolean(AUTOLINK_EXACT_KEY_ONLY, false);
-                putBoolean(AUTOLINK_USE_REG_EXP_SEARCH_KEY, false);
-            }
-            case EXACT -> {
-                putBoolean(AUTOLINK_EXACT_KEY_ONLY, true);
-                putBoolean(AUTOLINK_USE_REG_EXP_SEARCH_KEY, false);
-            }
-            case REGEX -> {
-                putBoolean(AUTOLINK_EXACT_KEY_ONLY, false);
-                putBoolean(AUTOLINK_USE_REG_EXP_SEARCH_KEY, true);
-            }
-        }
-        putBoolean(ASK_AUTO_NAMING_PDFS_AGAIN, preferences.shouldAskAutoNamingPdfs());
-        put(AUTOLINK_REG_EXP_SEARCH_EXPRESSION_KEY, preferences.getRegularExpression());
+        EasyBind.listen(autoLinkPreferences.citationKeyDependencyProperty(), (obs, oldValue, newValue) -> {
+                    // Starts bibtex only omitted, as it is not being saved
+                    switch (newValue) {
+                        case START -> {
+                            putBoolean(AUTOLINK_EXACT_KEY_ONLY, false);
+                            putBoolean(AUTOLINK_USE_REG_EXP_SEARCH_KEY, false);
+                        }
+                        case EXACT -> {
+                            putBoolean(AUTOLINK_EXACT_KEY_ONLY, true);
+                            putBoolean(AUTOLINK_USE_REG_EXP_SEARCH_KEY, false);
+                        }
+                        case REGEX -> {
+                            putBoolean(AUTOLINK_EXACT_KEY_ONLY, false);
+                            putBoolean(AUTOLINK_USE_REG_EXP_SEARCH_KEY, true);
+                        }
+                    }
+                });
+        EasyBind.listen(autoLinkPreferences.askAutoNamingPdfsProperty(), (obs, oldValue, newValue) -> putBoolean(ASK_AUTO_NAMING_PDFS_AGAIN, newValue));
+        EasyBind.listen(autoLinkPreferences.regularExpressionProperty(), (obs, oldValue, newValue) -> put(AUTOLINK_REG_EXP_SEARCH_EXPRESSION_KEY, newValue));
+
+        return autoLinkPreferences;
     }
 
     @Override

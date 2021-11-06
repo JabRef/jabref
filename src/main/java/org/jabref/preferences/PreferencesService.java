@@ -244,8 +244,6 @@ public interface PreferencesService {
 
     AutoLinkPreferences getAutoLinkPreferences();
 
-    void storeAutoLinkPreferences(AutoLinkPreferences autoLinkPreferences);
-
     boolean shouldAutosave();
 
     void storeShouldAutosave(boolean shouldAutosave);
