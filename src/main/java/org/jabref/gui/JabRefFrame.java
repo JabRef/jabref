@@ -838,9 +838,9 @@ public class JabRefFrame extends BorderPane {
         SidePaneType groupsPane = SidePaneType.GROUPS;
         SidePaneType openOfficePane = SidePaneType.OPEN_OFFICE;
         view.getItems().addAll(
-                factory.createCheckMenuItem(webSearchPane.getToggleAction(), sidePane.getToggleCommandFor(webSearchPane), sidePane.sidePaneVisibleProperty(webSearchPane)),
-                factory.createCheckMenuItem(groupsPane.getToggleAction(), sidePane.getToggleCommandFor(groupsPane), sidePane.sidePaneVisibleProperty(groupsPane)),
-                factory.createCheckMenuItem(openOfficePane.getToggleAction(), sidePane.getToggleCommandFor(openOfficePane), sidePane.sidePaneVisibleProperty(openOfficePane)),
+                factory.createCheckMenuItem(webSearchPane.getToggleAction(), sidePane.getToggleCommandFor(webSearchPane), sidePane.paneVisibleProperty(webSearchPane)),
+                factory.createCheckMenuItem(groupsPane.getToggleAction(), sidePane.getToggleCommandFor(groupsPane), sidePane.paneVisibleProperty(groupsPane)),
+                factory.createCheckMenuItem(openOfficePane.getToggleAction(), sidePane.getToggleCommandFor(openOfficePane), sidePane.paneVisibleProperty(openOfficePane)),
 
                 new SeparatorMenuItem(),
 
@@ -938,7 +938,7 @@ public class JabRefFrame extends BorderPane {
     }
 
     private CheckMenuItem createSidePaneCheckMenuItem(SidePane container, ActionFactory factory, SidePaneType sidePane) {
-        return factory.createCheckMenuItem(sidePane.getToggleAction(), container.getToggleCommandFor(sidePane), container.sidePaneVisibleProperty(sidePane));
+        return factory.createCheckMenuItem(sidePane.getToggleAction(), container.getToggleCommandFor(sidePane), container.paneVisibleProperty(sidePane));
     }
 
     private Group createTaskIndicator() {

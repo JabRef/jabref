@@ -109,10 +109,10 @@ public class SidePane extends VBox {
         setVisible(!viewModel.getVisiblePanes().isEmpty());
     }
 
-    public BooleanProperty sidePaneVisibleProperty(SidePaneType sidePane) {
-        return switch (sidePane) {
-            case GROUPS -> viewModel.groupsSidePaneVisibleProperty();
-            case WEB_SEARCH -> viewModel.webSearchSidePaneVisibleProperty();
+    public BooleanProperty paneVisibleProperty(SidePaneType pane) {
+        return switch (pane) {
+            case GROUPS -> viewModel.groupsPaneVisibleProperty();
+            case WEB_SEARCH -> viewModel.webSearchPaneVisibleProperty();
             case OPEN_OFFICE -> viewModel.openOfficePaneVisibleProperty();
         };
     }

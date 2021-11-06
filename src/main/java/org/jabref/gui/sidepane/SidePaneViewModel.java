@@ -106,7 +106,7 @@ public class SidePaneViewModel extends AbstractViewModel {
         }
     }
 
-    public BooleanProperty groupsSidePaneVisibleProperty() {
+    public BooleanProperty groupsPaneVisibleProperty() {
         return groupsPaneVisible;
     }
 
@@ -114,7 +114,7 @@ public class SidePaneViewModel extends AbstractViewModel {
         return openOfficePaneVisible;
     }
 
-    public BooleanProperty webSearchSidePaneVisibleProperty() {
+    public BooleanProperty webSearchPaneVisibleProperty() {
         return webSearchPaneVisible;
     }
 
