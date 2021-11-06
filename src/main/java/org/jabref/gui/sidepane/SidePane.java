@@ -16,10 +16,10 @@ import org.jabref.preferences.PreferencesService;
 
 import static org.jabref.gui.sidepane.SidePaneType.GROUPS;
 
-public class SidePaneContainerView extends VBox {
+public class SidePane extends VBox {
     // Don't use this map directly to lookup sidePaneViews, instead use getSidePaneView() for lazy loading
-    private final Map<SidePaneType, SidePaneView> sidePaneViewLookup = new HashMap<>();
-    private final SidePaneContainerViewModel viewModel;
+    private final Map<SidePaneType, SidePaneComponent> sidePaneComponentLookup = new HashMap<>();
+    private final SidePaneViewModel viewModel;
 
     private final PreferencesService preferencesService;
     private final TaskExecutor taskExecutor;
@@ -27,41 +27,41 @@ public class SidePaneContainerView extends VBox {
     private final StateManager stateManager;
     private final UndoManager undoManager;
 
-    private final SidePaneViewContentFactory sidePaneViewContentFactory;
+    private final SidePaneContentFactory sidePaneContentFactory;
 
-    public SidePaneContainerView(PreferencesService preferencesService,
-                                 TaskExecutor taskExecutor,
-                                 DialogService dialogService,
-                                 StateManager stateManager,
-                                 UndoManager undoManager) {
+    public SidePane(PreferencesService preferencesService,
+                    TaskExecutor taskExecutor,
+                    DialogService dialogService,
+                    StateManager stateManager,
+                    UndoManager undoManager) {
         this.preferencesService = preferencesService;
         this.taskExecutor = taskExecutor;
         this.dialogService = dialogService;
         this.stateManager = stateManager;
         this.undoManager = undoManager;
-        this.sidePaneViewContentFactory = new SidePaneViewContentFactory(preferencesService, taskExecutor, dialogService, stateManager, undoManager);
-        this.viewModel = new SidePaneContainerViewModel(preferencesService);
+        this.sidePaneContentFactory = new SidePaneContentFactory(preferencesService, taskExecutor, dialogService, stateManager, undoManager);
+        this.viewModel = new SidePaneViewModel(preferencesService);
 
         preferencesService.getSidePanePreferences().visiblePanes().forEach(this::show);
         updateView();
     }
 
-    private SidePaneView getSidePaneView(SidePaneType sidePane) {
-        SidePaneView sidePaneView = sidePaneViewLookup.get(sidePane);
-        if (sidePaneView == null) {
-            sidePaneView = switch (sidePane) {
-                case GROUPS -> new GroupsSidePaneView(new CloseSidePaneAction(sidePane), new MoveUpAction(sidePane), new MoveDownAction(sidePane), sidePaneViewContentFactory, preferencesService, dialogService);
-                case WEB_SEARCH, OPEN_OFFICE -> new SidePaneView(sidePane, new CloseSidePaneAction(sidePane), new MoveUpAction(sidePane), new MoveDownAction(sidePane), sidePaneViewContentFactory);
+    private SidePaneComponent getSidePaneComponent(SidePaneType sidePane) {
+        SidePaneComponent sidePaneComponent = sidePaneComponentLookup.get(sidePane);
+        if (sidePaneComponent == null) {
+            sidePaneComponent = switch (sidePane) {
+                case GROUPS -> new GroupsSidePaneComponent(new CloseSidePaneAction(sidePane), new MoveUpAction(sidePane), new MoveDownAction(sidePane), sidePaneContentFactory, preferencesService, dialogService);
+                case WEB_SEARCH, OPEN_OFFICE -> new SidePaneComponent(sidePane, new CloseSidePaneAction(sidePane), new MoveUpAction(sidePane), new MoveDownAction(sidePane), sidePaneContentFactory);
             };
-            sidePaneViewLookup.put(sidePane, sidePaneView);
+            sidePaneComponentLookup.put(sidePane, sidePaneComponent);
         }
-        return sidePaneView;
+        return sidePaneComponent;
     }
 
     private void showVisibleSidePanes() {
         getChildren().clear();
         viewModel.getVisiblePanes().forEach(type -> {
-            SidePaneView view = getSidePaneView(type);
+            SidePaneComponent view = getSidePaneComponent(type);
             getChildren().add(view);
         });
     }
@@ -70,7 +70,7 @@ public class SidePaneContainerView extends VBox {
         if (viewModel.show(sidePane)) {
             updateView();
             if (sidePane == GROUPS) {
-                ((GroupsSidePaneView) getSidePaneView(sidePane)).afterOpening();
+                ((GroupsSidePaneComponent) getSidePaneComponent(sidePane)).afterOpening();
             }
         }
     }

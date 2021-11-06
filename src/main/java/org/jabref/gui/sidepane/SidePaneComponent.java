@@ -13,16 +13,16 @@ import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.logic.l10n.Localization;
 
-public class SidePaneView extends BorderPane {
+public class SidePaneComponent extends BorderPane {
     private final SidePaneType sidePaneType;
     private final SimpleCommand closeCommand;
     private final SimpleCommand moveUpCommand;
     private final SimpleCommand moveDownCommand;
-    private final SidePaneViewContentFactory contentFactory;
+    private final SidePaneContentFactory contentFactory;
 
     private HBox buttonContainer;
 
-    public SidePaneView(SidePaneType sidePaneType, SimpleCommand closeCommand, SimpleCommand moveUpCommand, SimpleCommand moveDownCommand, SidePaneViewContentFactory contentFactory) {
+    public SidePaneComponent(SidePaneType sidePaneType, SimpleCommand closeCommand, SimpleCommand moveUpCommand, SimpleCommand moveDownCommand, SidePaneContentFactory contentFactory) {
         this.sidePaneType = sidePaneType;
         this.closeCommand = closeCommand;
         this.moveUpCommand = moveUpCommand;

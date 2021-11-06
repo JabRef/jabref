@@ -12,18 +12,18 @@ import org.jabref.gui.openoffice.OpenOfficePanel;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.preferences.PreferencesService;
 
-public class SidePaneViewContentFactory {
+public class SidePaneContentFactory {
     private final PreferencesService preferences;
     private final TaskExecutor taskExecutor;
     private final DialogService dialogService;
     private final StateManager stateManager;
     private final UndoManager undoManager;
 
-    public SidePaneViewContentFactory(PreferencesService preferences,
-                                      TaskExecutor taskExecutor,
-                                      DialogService dialogService,
-                                      StateManager stateManager,
-                                      UndoManager undoManager) {
+    public SidePaneContentFactory(PreferencesService preferences,
+                                  TaskExecutor taskExecutor,
+                                  DialogService dialogService,
+                                  StateManager stateManager,
+                                  UndoManager undoManager) {
         this.preferences = preferences;
         this.taskExecutor = taskExecutor;
         this.dialogService = dialogService;

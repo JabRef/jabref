@@ -112,7 +112,7 @@ import org.jabref.gui.search.GlobalSearchBar;
 import org.jabref.gui.search.RebuildFulltextSearchIndexAction;
 import org.jabref.gui.shared.ConnectToSharedDatabaseCommand;
 import org.jabref.gui.shared.PullChangesFromSharedAction;
-import org.jabref.gui.sidepane.SidePaneContainerView;
+import org.jabref.gui.sidepane.SidePane;
 import org.jabref.gui.sidepane.SidePaneType;
 import org.jabref.gui.slr.ExistingStudySearchAction;
 import org.jabref.gui.slr.StartNewStudyAction;
@@ -173,7 +173,7 @@ public class JabRefFrame extends BorderPane {
     private final CountingUndoManager undoManager;
     private final PushToApplicationsManager pushToApplicationsManager;
     private final DialogService dialogService;
-    private SidePaneContainerView sidePaneContainerView;
+    private SidePane sidePane;
     private TabPane tabbedPane;
     private PopOver progressViewPopOver;
     private PopOver entryFromIdPopOver;
@@ -429,8 +429,8 @@ public class JabRefFrame extends BorderPane {
         head.setSpacing(0d);
         setTop(head);
 
-        splitPane.getItems().addAll(sidePaneContainerView, tabbedPane);
-        SplitPane.setResizableWithParent(sidePaneContainerView, false);
+        splitPane.getItems().addAll(sidePane, tabbedPane);
+        SplitPane.setResizableWithParent(sidePane, false);
 
         // We need to wait with setting the divider since it gets reset a few times during the initial set-up
         mainStage.showingProperty().addListener(new ChangeListener<>() {
@@ -439,14 +439,14 @@ public class JabRefFrame extends BorderPane {
             public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean showing) {
                 if (showing) {
                     setDividerPosition();
-                    EasyBind.subscribe(sidePaneContainerView.visibleProperty(), visible -> {
+                    EasyBind.subscribe(sidePane.visibleProperty(), visible -> {
                         if (visible) {
-                            if (!splitPane.getItems().contains(sidePaneContainerView)) {
-                                splitPane.getItems().add(0, sidePaneContainerView);
+                            if (!splitPane.getItems().contains(sidePane)) {
+                                splitPane.getItems().add(0, sidePane);
                                 setDividerPosition();
                             }
                         } else {
-                            splitPane.getItems().remove(sidePaneContainerView);
+                            splitPane.getItems().remove(sidePane);
                         }
                     });
 
@@ -571,7 +571,7 @@ public class JabRefFrame extends BorderPane {
     }
 
     public void init() {
-        sidePaneContainerView = new SidePaneContainerView(prefs, taskExecutor, dialogService, stateManager, undoManager);
+        sidePane = new SidePane(prefs, taskExecutor, dialogService, stateManager, undoManager);
         tabbedPane = new TabPane();
         tabbedPane.setTabDragPolicy(TabPane.TabDragPolicy.REORDER);
 
@@ -836,9 +836,9 @@ public class JabRefFrame extends BorderPane {
         );
 
         view.getItems().addAll(
-                createSidePaneCheckMenuItem(sidePaneContainerView, factory, SidePaneType.WEB_SEARCH),
-                createSidePaneCheckMenuItem(sidePaneContainerView, factory, SidePaneType.GROUPS),
-                createSidePaneCheckMenuItem(sidePaneContainerView, factory, SidePaneType.OPEN_OFFICE),
+                createSidePaneCheckMenuItem(sidePane, factory, SidePaneType.WEB_SEARCH),
+                createSidePaneCheckMenuItem(sidePane, factory, SidePaneType.GROUPS),
+                createSidePaneCheckMenuItem(sidePane, factory, SidePaneType.OPEN_OFFICE),
 
                 new SeparatorMenuItem(),
 
@@ -935,7 +935,7 @@ public class JabRefFrame extends BorderPane {
         return newEntryFromIdButton;
     }
 
-    private CheckMenuItem createSidePaneCheckMenuItem(SidePaneContainerView container, ActionFactory factory, SidePaneType sidePane) {
+    private CheckMenuItem createSidePaneCheckMenuItem(SidePane container, ActionFactory factory, SidePaneType sidePane) {
         CheckMenuItem checkMenuItem = factory.createCheckMenuItem(sidePane.getToggleAction(), container.getToggleCommandFor(sidePane), container.sidePaneVisibleProperty(sidePane).get());
         EasyBind.subscribe(container.sidePaneVisibleProperty(sidePane), checkMenuItem::setSelected);
         return checkMenuItem;

@@ -17,7 +17,7 @@ import javafx.collections.ObservableList;
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.preferences.PreferencesService;
 
-public class SidePaneContainerViewModel extends AbstractViewModel {
+public class SidePaneViewModel extends AbstractViewModel {
     private final PreferencesService preferencesService;
     // TODO('Use preferencesService.getSidePanePreferences().visiblePanes() as the single source of truth')
     private final ObservableList<SidePaneType> visiblePanes = FXCollections.observableArrayList();
@@ -26,7 +26,7 @@ public class SidePaneContainerViewModel extends AbstractViewModel {
     private final BooleanProperty openOfficePaneVisible = new SimpleBooleanProperty();
     private final BooleanProperty webSearchPaneVisible = new SimpleBooleanProperty();
 
-    public SidePaneContainerViewModel(PreferencesService preferencesService) {
+    public SidePaneViewModel(PreferencesService preferencesService) {
         this.preferencesService = preferencesService;
 
         groupsPaneVisible.bind(Bindings.createBooleanBinding(() -> visiblePanes.contains(SidePaneType.GROUPS), visiblePanes));
