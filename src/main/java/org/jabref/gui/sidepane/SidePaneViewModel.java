@@ -8,30 +8,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.IntStream;
 
-import javafx.beans.binding.Bindings;
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 import org.jabref.gui.AbstractViewModel;
+import org.jabref.gui.StateManager;
 import org.jabref.preferences.PreferencesService;
 
 public class SidePaneViewModel extends AbstractViewModel {
     private final PreferencesService preferencesService;
-    // TODO('Use preferencesService.getSidePanePreferences().visiblePanes() as the single source of truth')
-    private final ObservableList<SidePaneType> visiblePanes = FXCollections.observableArrayList();
+    private final StateManager stateManager;
 
-    private final BooleanProperty groupsPaneVisible = new SimpleBooleanProperty();
-    private final BooleanProperty openOfficePaneVisible = new SimpleBooleanProperty();
-    private final BooleanProperty webSearchPaneVisible = new SimpleBooleanProperty();
-
-    public SidePaneViewModel(PreferencesService preferencesService) {
+    public SidePaneViewModel(PreferencesService preferencesService, StateManager stateManager) {
         this.preferencesService = preferencesService;
-
-        groupsPaneVisible.bind(Bindings.createBooleanBinding(() -> visiblePanes.contains(SidePaneType.GROUPS), visiblePanes));
-        openOfficePaneVisible.bind(Bindings.createBooleanBinding(() -> visiblePanes.contains(SidePaneType.OPEN_OFFICE), visiblePanes));
-        webSearchPaneVisible.bind(Bindings.createBooleanBinding(() -> visiblePanes.contains(SidePaneType.WEB_SEARCH), visiblePanes));
+        this.stateManager = stateManager;
     }
 
     /**
@@ -40,23 +29,23 @@ public class SidePaneViewModel extends AbstractViewModel {
      */
     private void updatePreferredPositions() {
         Map<SidePaneType, Integer> preferredPositions = new HashMap<>(preferencesService.getSidePanePreferences().getPreferredPositions());
-        IntStream.range(0, visiblePanes.size()).forEach(i -> preferredPositions.put(visiblePanes.get(i), i));
+        IntStream.range(0, getVisiblePanes().size()).forEach(i -> preferredPositions.put(getVisiblePanes().get(i), i));
         preferencesService.getSidePanePreferences().setPreferredPositions(preferredPositions);
     }
 
     public ObservableList<SidePaneType> getVisiblePanes() {
-        return visiblePanes;
+        return stateManager.getVisibleSidePaneComponents();
     }
 
     /**
      * @return True if <b>pane</b> is visible, and it can still move up therefore we should update the view
      */
     public boolean moveUp(SidePaneType pane) {
-        if (visiblePanes.contains(pane)) {
-            int currentPosition = visiblePanes.indexOf(pane);
+        if (getVisiblePanes().contains(pane)) {
+            int currentPosition = getVisiblePanes().indexOf(pane);
             if (currentPosition > 0) {
                 int newPosition = currentPosition - 1;
-                swap(visiblePanes, currentPosition, newPosition);
+                swap(getVisiblePanes(), currentPosition, newPosition);
                 updatePreferredPositions();
                 return true;
             }
@@ -68,11 +57,11 @@ public class SidePaneViewModel extends AbstractViewModel {
      * @return True if <b>pane</b> is visible, and it can still move down therefore we should update the view
      */
     public boolean moveDown(SidePaneType pane) {
-        if (visiblePanes.contains(pane)) {
-            int currentPosition = visiblePanes.indexOf(pane);
-            if (currentPosition < (visiblePanes.size() - 1)) {
+        if (getVisiblePanes().contains(pane)) {
+            int currentPosition = getVisiblePanes().indexOf(pane);
+            if (currentPosition < (getVisiblePanes().size() - 1)) {
                 int newPosition = currentPosition + 1;
-                swap(visiblePanes, currentPosition, newPosition);
+                swap(getVisiblePanes(), currentPosition, newPosition);
                 updatePreferredPositions();
                 return true;
             }
@@ -84,10 +73,9 @@ public class SidePaneViewModel extends AbstractViewModel {
      * @return True if <b>pane</b> is not already shown which means the view needs to be updated
      */
     public boolean show(SidePaneType pane) {
-        if (!visiblePanes.contains(pane)) {
-            visiblePanes.add(pane);
-            preferencesService.getSidePanePreferences().visiblePanes().add(pane);
-            visiblePanes.sorted(new PreferredIndexSort(preferencesService));
+        if (!getVisiblePanes().contains(pane)) {
+            getVisiblePanes().add(pane);
+            getVisiblePanes().sort(new PreferredIndexSort(preferencesService));
             return true;
         }
         return false;
@@ -97,29 +85,16 @@ public class SidePaneViewModel extends AbstractViewModel {
      * @return True if <b>pane</b> is visible which means the view needs to be updated
      */
     public boolean hide(SidePaneType pane) {
-        if (visiblePanes.contains(pane)) {
-            visiblePanes.remove(pane);
-            preferencesService.getSidePanePreferences().visiblePanes().remove(pane);
+        if (getVisiblePanes().contains(pane)) {
+            getVisiblePanes().remove(pane);
             return true;
         } else {
             return false;
         }
     }
 
-    public BooleanProperty groupsPaneVisibleProperty() {
-        return groupsPaneVisible;
-    }
-
-    public BooleanProperty openOfficePaneVisibleProperty() {
-        return openOfficePaneVisible;
-    }
-
-    public BooleanProperty webSearchPaneVisibleProperty() {
-        return webSearchPaneVisible;
-    }
-
     public boolean isPaneVisible(SidePaneType pane) {
-        return visiblePanes.contains(pane);
+        return getVisiblePanes().contains(pane);
     }
 
     /**

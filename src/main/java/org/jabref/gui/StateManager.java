@@ -1,22 +1,30 @@
 package org.jabref.gui;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
+import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ReadOnlyListProperty;
 import javafx.beans.property.ReadOnlyListWrapper;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
 import javafx.concurrent.Task;
 import javafx.scene.Node;
 
+import org.jabref.gui.sidepane.SidePaneType;
 import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.gui.util.DialogWindowState;
 import org.jabref.gui.util.OptionalObjectProperty;
@@ -57,8 +65,40 @@ public class StateManager {
     private final EasyBinding<Double> tasksProgress = EasyBind.reduce(backgroundTasks, tasks -> tasks.filter(Task::isRunning).mapToDouble(Task::getProgress).average().orElse(1));
     private final ObservableMap<String, DialogWindowState> dialogWindowStates = FXCollections.observableHashMap();
 
+    private final ObservableList<SidePaneType> visiblePanes = FXCollections.observableArrayList();
+
+    private final BooleanProperty groupsPaneVisible = new SimpleBooleanProperty();
+    private final BooleanProperty openOfficePaneVisible = new SimpleBooleanProperty();
+    private final BooleanProperty webSearchPaneVisible = new SimpleBooleanProperty();
+
     public StateManager() {
         activeGroups.bind(Bindings.valueAt(selectedGroups, activeDatabase.orElse(null)));
+
+        visiblePanes.addListener((ListChangeListener<? super SidePaneType>) change -> {
+            while (change.next()) {
+                if (change.wasAdded()) {
+                    SidePaneType added = change.getAddedSubList().get(0);
+                    sidePaneComponentVisibleProperty(added).set(true);
+                    Globals.prefs.getSidePanePreferences().visiblePanes().add(added);
+                } else if (change.wasRemoved()) {
+                    SidePaneType removed = change.getRemoved().get(0);
+                    sidePaneComponentVisibleProperty(removed).set(false);
+                    Globals.prefs.getSidePanePreferences().visiblePanes().remove(removed);
+                }
+            }
+        });
+    }
+
+    public BooleanProperty sidePaneComponentVisibleProperty(SidePaneType component) {
+        return switch (component) {
+            case WEB_SEARCH -> webSearchPaneVisible;
+            case GROUPS -> groupsPaneVisible;
+            case OPEN_OFFICE -> openOfficePaneVisible;
+        };
+    }
+
+    public ObservableList<SidePaneType> getVisibleSidePaneComponents() {
+        return visiblePanes;
     }
 
     public CustomLocalDragboard getLocalDragboard() {

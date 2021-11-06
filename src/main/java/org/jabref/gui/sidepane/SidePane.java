@@ -14,7 +14,11 @@ import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.preferences.PreferencesService;
 
+import com.tobiasdiez.easybind.EasyBind;
+
 import static org.jabref.gui.sidepane.SidePaneType.GROUPS;
+import static org.jabref.gui.sidepane.SidePaneType.OPEN_OFFICE;
+import static org.jabref.gui.sidepane.SidePaneType.WEB_SEARCH;
 
 public class SidePane extends VBox {
     // Don't use this map directly to lookup sidePaneViews, instead use getSidePaneView() for lazy loading
@@ -40,10 +44,22 @@ public class SidePane extends VBox {
         this.stateManager = stateManager;
         this.undoManager = undoManager;
         this.sidePaneContentFactory = new SidePaneContentFactory(preferencesService, taskExecutor, dialogService, stateManager, undoManager);
-        this.viewModel = new SidePaneViewModel(preferencesService);
+        this.viewModel = new SidePaneViewModel(preferencesService, stateManager);
+
+        EasyBind.subscribe(stateManager.sidePaneComponentVisibleProperty(GROUPS), isShow -> showOrHidePane(GROUPS, isShow));
+        EasyBind.subscribe(stateManager.sidePaneComponentVisibleProperty(WEB_SEARCH), isShow -> showOrHidePane(WEB_SEARCH, isShow));
+        EasyBind.subscribe(stateManager.sidePaneComponentVisibleProperty(OPEN_OFFICE), isShow -> showOrHidePane(OPEN_OFFICE, isShow));
 
         preferencesService.getSidePanePreferences().visiblePanes().forEach(this::show);
         updateView();
+    }
+
+    private void showOrHidePane(SidePaneType pane, boolean isShow) {
+        if (isShow) {
+            show(pane);
+        } else {
+            hide(pane);
+        }
     }
 
     private SidePaneComponent getSidePaneComponent(SidePaneType pane) {
@@ -110,11 +126,7 @@ public class SidePane extends VBox {
     }
 
     public BooleanProperty paneVisibleProperty(SidePaneType pane) {
-        return switch (pane) {
-            case GROUPS -> viewModel.groupsPaneVisibleProperty();
-            case WEB_SEARCH -> viewModel.webSearchPaneVisibleProperty();
-            case OPEN_OFFICE -> viewModel.openOfficePaneVisibleProperty();
-        };
+        return stateManager.sidePaneComponentVisibleProperty(pane);
     }
 
     public ToggleCommand getToggleCommandFor(SidePaneType sidePane) {
