@@ -1189,12 +1189,11 @@ public class JabRefFrame extends BorderPane {
         if (response.isPresent() && response.get().equals(deleteEmptyEntries)) {
             // The user wants to delete.
             try {
-                for (BibEntry currentEntry: context.getEntries()) {
+                for (BibEntry currentEntry : new ArrayList<BibEntry>(context.getEntries())) {
                     if (currentEntry.getFields().isEmpty()) {
                         context.getDatabase().removeEntries(Collections.singletonList(currentEntry));
                     }
                 }
-
                 SaveDatabaseAction saveAction = new SaveDatabaseAction(libraryTab, prefs, Globals.entryTypesManager);
                 if (saveAction.save()) {
                     return true;
