@@ -3,19 +3,17 @@ package org.jabref.gui.doi;
 import java.util.stream.Stream;
 
 import org.jabref.model.entry.identifier.DOI;
-// import static org.jabref.model.entry.identifier.DOI.removeScharDOI;
 
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-/*
-Test class for the added removeScharDOI(String inputStr) method
-The method is supposed to automatically remove the non-valid characters at the end of the input DOI
- */
+  /*
+  Test class for the added removeScharDOI(String inputStr) method
+  The method is supposed to automatically remove the non-valid characters at the end of the input DOI
+   */
 
 public class DOITest {
     private static Stream<Arguments> testData() {
