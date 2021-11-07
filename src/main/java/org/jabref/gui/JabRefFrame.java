@@ -1167,10 +1167,8 @@ public class JabRefFrame extends BorderPane {
 
     /**
      * Ask if the user really wants to remove any empty entries
-     *
-     * @return true if the user choose to remove the empty entries
      */
-    private boolean confirmEmptyEntry(LibraryTab libraryTab, BibDatabaseContext context) {
+    private void confirmEmptyEntry(LibraryTab libraryTab, BibDatabaseContext context) {
         String filename = libraryTab.getBibDatabaseContext()
                                     .getDatabasePath()
                                     .map(Path::toAbsolutePath)
@@ -1196,7 +1194,7 @@ public class JabRefFrame extends BorderPane {
                 }
                 SaveDatabaseAction saveAction = new SaveDatabaseAction(libraryTab, prefs, Globals.entryTypesManager);
                 if (saveAction.save()) {
-                    return true;
+                    return;
                 }
                 // The action was either canceled or unsuccessful.
                 dialogService.notify(Localization.lang("Unable to save library"));
@@ -1204,10 +1202,10 @@ public class JabRefFrame extends BorderPane {
                 LOGGER.error("A problem occurred when trying to delete the empty entries", ex);
                 dialogService.showErrorDialogAndWait(Localization.lang("Delete empty entries"), Localization.lang("Could not delete empty entries."), ex);
             }
-            // Save was cancelled or an error occurred.
-            return false;
+//            // Save was cancelled or an error occurred.
+//            return false;
         }
-        return response.isEmpty() || !response.get().equals(cancel);
+//        return response.isEmpty() || !response.get().equals(cancel);
     }
 
     private void closeTab(LibraryTab libraryTab) {
@@ -1218,12 +1216,10 @@ public class JabRefFrame extends BorderPane {
 
         final BibDatabaseContext context = libraryTab.getBibDatabaseContext();
         if (context.hasEmptyEntries()) {
-            if (confirmEmptyEntry(libraryTab, context)) {
-                removeTab(libraryTab);
-            } else {
-                return;
-            }
-        } else if (libraryTab.isModified() && (context.getLocation() == DatabaseLocation.LOCAL)) {
+            confirmEmptyEntry(libraryTab, context);
+        }
+
+        if (libraryTab.isModified() && (context.getLocation() == DatabaseLocation.LOCAL)) {
             if (confirmClose(libraryTab)) {
                 removeTab(libraryTab);
             } else {
