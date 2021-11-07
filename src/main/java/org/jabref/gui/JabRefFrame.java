@@ -137,6 +137,7 @@ import org.jabref.logic.undo.UndoChangeEvent;
 import org.jabref.logic.undo.UndoRedoEvent;
 import org.jabref.logic.util.OS;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.preferences.PreferencesService;
@@ -1164,6 +1165,52 @@ public class JabRefFrame extends BorderPane {
         return response.isEmpty() || !response.get().equals(cancel);
     }
 
+    /**
+     * Ask if the user really wants to remove any empty entries
+     *
+     * @return true if the user choose to remove the empty entries
+     */
+    private boolean confirmEmptyEntry(LibraryTab libraryTab, BibDatabaseContext context) {
+        String filename = libraryTab.getBibDatabaseContext()
+                                    .getDatabasePath()
+                                    .map(Path::toAbsolutePath)
+                                    .map(Path::toString)
+                                    .orElse(Localization.lang("untitled"));
+
+        ButtonType deleteEmptyEntries = new ButtonType(Localization.lang("Delete empty entries"), ButtonBar.ButtonData.YES);
+        ButtonType keepEmptyEntries = new ButtonType(Localization.lang("Keep empty entries"), ButtonBar.ButtonData.NO);
+        ButtonType cancel = new ButtonType(Localization.lang("Return to JabRef"), ButtonBar.ButtonData.CANCEL_CLOSE);
+
+        Optional<ButtonType> response = dialogService.showCustomButtonDialogAndWait(Alert.AlertType.CONFIRMATION,
+                Localization.lang("Empty entries"),
+                Localization.lang("Library '%0' has empty entries. Do you want to delete them?", filename),
+                deleteEmptyEntries, keepEmptyEntries, cancel);
+
+        if (response.isPresent() && response.get().equals(deleteEmptyEntries)) {
+            // The user wants to delete.
+            try {
+                for (BibEntry currentEntry: context.getEntries()) {
+                    if (currentEntry.getFields().isEmpty()) {
+                        context.getDatabase().removeEntries(Collections.singletonList(currentEntry));
+                    }
+                }
+
+                SaveDatabaseAction saveAction = new SaveDatabaseAction(libraryTab, prefs, Globals.entryTypesManager);
+                if (saveAction.save()) {
+                    return true;
+                }
+                // The action was either canceled or unsuccessful.
+                dialogService.notify(Localization.lang("Unable to save library"));
+            } catch (Throwable ex) {
+                LOGGER.error("A problem occurred when trying to save the file", ex);
+                dialogService.showErrorDialogAndWait(Localization.lang("Save library"), Localization.lang("Could not save file."), ex);
+            }
+            // Save was cancelled or an error occurred.
+            return false;
+        }
+        return response.isEmpty() || !response.get().equals(cancel);
+    }
+
     private void closeTab(LibraryTab libraryTab) {
         // empty tab without database
         if (libraryTab == null) {
@@ -1171,6 +1218,11 @@ public class JabRefFrame extends BorderPane {
         }
 
         final BibDatabaseContext context = libraryTab.getBibDatabaseContext();
+        if (confirmEmptyEntry(libraryTab, context)) {
+            removeTab(libraryTab);
+        } else {
+            return;
+        }
 
         if (libraryTab.isModified() && (context.getLocation() == DatabaseLocation.LOCAL)) {
             if (confirmClose(libraryTab)) {
