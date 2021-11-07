@@ -1202,8 +1202,8 @@ public class JabRefFrame extends BorderPane {
                 // The action was either canceled or unsuccessful.
                 dialogService.notify(Localization.lang("Unable to save library"));
             } catch (Throwable ex) {
-                LOGGER.error("A problem occurred when trying to save the file", ex);
-                dialogService.showErrorDialogAndWait(Localization.lang("Save library"), Localization.lang("Could not save file."), ex);
+                LOGGER.error("A problem occurred when trying to delete the empty entries", ex);
+                dialogService.showErrorDialogAndWait(Localization.lang("Delete empty entries"), Localization.lang("Could not delete empty entries."), ex);
             }
             // Save was cancelled or an error occurred.
             return false;
@@ -1218,13 +1218,13 @@ public class JabRefFrame extends BorderPane {
         }
 
         final BibDatabaseContext context = libraryTab.getBibDatabaseContext();
-        if (confirmEmptyEntry(libraryTab, context)) {
-            removeTab(libraryTab);
-        } else {
-            return;
-        }
-
-        if (libraryTab.isModified() && (context.getLocation() == DatabaseLocation.LOCAL)) {
+        if (context.hasEmptyEntries()) {
+            if (confirmEmptyEntry(libraryTab, context)) {
+                removeTab(libraryTab);
+            } else {
+                return;
+            }
+        } else if (libraryTab.isModified() && (context.getLocation() == DatabaseLocation.LOCAL)) {
             if (confirmClose(libraryTab)) {
                 removeTab(libraryTab);
             } else {
