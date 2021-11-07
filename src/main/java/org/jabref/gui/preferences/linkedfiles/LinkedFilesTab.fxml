@@ -19,13 +19,14 @@
          fx:controller="org.jabref.gui.preferences.linkedfiles.LinkedFilesTab">
     <fx:define>
         <ToggleGroup fx:id="autolinkToggleGroup"/>
+        <ToggleGroup fx:id="fileDirectoryToggleGroup"/>
     </fx:define>
     <Label styleClass="titleHeader" text="%Linked files"/>
-
+    <Label styleClass="sectionHeader" text="%File directory"/>
     <HBox alignment="CENTER_LEFT" spacing="10.0">
-        <Label text="%Main file directory"/>
+        <RadioButton fx:id="useMainFileDirectory" text="%Main file directory" toggleGroup="$fileDirectoryToggleGroup"></RadioButton>
         <TextField fx:id="mainFileDirectory" HBox.hgrow="ALWAYS"/>
-        <Button onAction="#mainFileDirBrowse"
+        <Button fx:id="browseDirectory" onAction="#mainFileDirBrowse"
                 styleClass="icon-button,narrow"
                 prefHeight="20.0" prefWidth="20.0" GridPane.columnIndex="2">
             <graphic>
@@ -36,12 +37,12 @@
             </tooltip>
         </Button>
     </HBox>
-    <CheckBox fx:id="useBibLocationAsPrimary" text="%Search and store files relative to library file location">
+    <RadioButton fx:id="useBibLocationAsPrimary" text="%Search and store files relative to library file location" toggleGroup="$fileDirectoryToggleGroup">
         <tooltip>
             <Tooltip
-                    text="%When downloading files, or moving linked files to the file directory, prefer the BIB file location rather than the file directory set above"/>
+                    text="%When downloading files, or moving linked files to the file directory, use the bib file location."/>
         </tooltip>
-    </CheckBox>
+    </RadioButton>
     <Label styleClass="sectionHeader" text="%Autolink files"/>
     <RadioButton fx:id="autolinkFileStartsBibtex" text="%Autolink files with names starting with the citation key"
                  toggleGroup="$autolinkToggleGroup"/>

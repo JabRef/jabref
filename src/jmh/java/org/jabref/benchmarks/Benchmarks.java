@@ -31,6 +31,7 @@ import org.jabref.model.groups.WordKeywordGroup;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.model.search.rules.SearchRules.SearchFlags;
 import org.jabref.model.util.DummyFileUpdateMonitor;
+import org.jabref.preferences.GeneralPreferences;
 import org.jabref.preferences.JabRefPreferences;
 
 import org.openjdk.jmh.Main;
@@ -76,7 +77,7 @@ public class Benchmarks {
 
     private StringWriter getOutputWriter() throws IOException {
         StringWriter outputWriter = new StringWriter();
-        BibtexDatabaseWriter databaseWriter = new BibtexDatabaseWriter(outputWriter, mock(SavePreferences.class), new BibEntryTypesManager());
+        BibtexDatabaseWriter databaseWriter = new BibtexDatabaseWriter(outputWriter, mock(GeneralPreferences.class), mock(SavePreferences.class), new BibEntryTypesManager());
         databaseWriter.savePartOfDatabase(new BibDatabaseContext(database, new MetaData()), database.getEntries());
         return outputWriter;
     }

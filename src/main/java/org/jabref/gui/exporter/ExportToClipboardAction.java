@@ -126,7 +126,7 @@ public class ExportToClipboardAction extends SimpleCommand {
                     panel.getBibDatabaseContext()
                          .getMetaData()
                          .getEncoding()
-                         .orElse(preferences.getDefaultEncoding()),
+                         .orElse(preferences.getGeneralPreferences().getDefaultEncoding()),
                     entries);
             // Read the file and put the contents on the clipboard:
 
@@ -163,7 +163,7 @@ public class ExportToClipboardAction extends SimpleCommand {
         try (BufferedReader reader = Files.newBufferedReader(tmp, panel.getBibDatabaseContext()
                                                                        .getMetaData()
                                                                        .getEncoding()
-                                                                       .orElse(preferences.getDefaultEncoding()))) {
+                                                                       .orElse(preferences.getGeneralPreferences().getDefaultEncoding()))) {
             return reader.lines().collect(Collectors.joining(OS.NEWLINE));
         }
     }

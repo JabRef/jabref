@@ -62,7 +62,7 @@ public class ExportCommand extends SimpleCommand {
                                                         .collect(Collectors.toList());
 
         Globals.exportFactory = ExporterFactory.create(customExporters, layoutPreferences, savePreferences,
-                xmpPreferences, preferences.getDefaultBibDatabaseMode(), Globals.entryTypesManager);
+                xmpPreferences, preferences.getGeneralPreferences().getDefaultBibDatabaseMode(), Globals.entryTypesManager);
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                 .addExtensionFilter(FileFilterConverter.exporterToExtensionFilter(exporters))
                 .withDefaultExtension(preferences.getImportExportPreferences().getLastExportExtension())
@@ -111,7 +111,7 @@ public class ExportCommand extends SimpleCommand {
                                  .getBibDatabaseContext()
                                  .getMetaData()
                                  .getEncoding()
-                                 .orElse(preferences.getDefaultEncoding()),
+                                 .orElse(preferences.getGeneralPreferences().getDefaultEncoding()),
                             finEntries);
                     return null; // can not use BackgroundTask.wrap(Runnable) because Runnable.run() can't throw Exceptions
                 })

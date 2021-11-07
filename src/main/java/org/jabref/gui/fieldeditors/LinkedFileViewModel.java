@@ -409,8 +409,8 @@ public class LinkedFileViewModel extends AbstractViewModel {
                 try {
                     XmpUtilWriter.writeXmp(file.get(), entry, databaseContext.getDatabase(), preferences.getXmpPreferences());
 
-                    EmbeddedBibFilePdfExporter embeddedBibExporter = new EmbeddedBibFilePdfExporter(preferences.getDefaultBibDatabaseMode(), Globals.entryTypesManager, preferences.getFieldWriterPreferences());
-                    embeddedBibExporter.exportToFileByPath(databaseContext, databaseContext.getDatabase(), preferences.getDefaultEncoding(), preferences.getFilePreferences(), file.get());
+                    EmbeddedBibFilePdfExporter embeddedBibExporter = new EmbeddedBibFilePdfExporter(preferences.getGeneralPreferences().getDefaultBibDatabaseMode(), Globals.entryTypesManager, preferences.getFieldWriterPreferences());
+                    embeddedBibExporter.exportToFileByPath(databaseContext, databaseContext.getDatabase(), preferences.getGeneralPreferences().getDefaultEncoding(), preferences.getFilePreferences(), file.get());
                 } catch (IOException | TransformerException ex) {
                     // TODO: Print error message
                     // Localization.lang("Error while writing") + " '" + file.toString() + "': " + ex;
@@ -566,7 +566,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
     private Supplier<BibEntry> wrapImporterToSupplier(Importer importer, Path filePath) {
         return () -> {
             try {
-                ParserResult parserResult = importer.importDatabase(filePath, preferences.getDefaultEncoding());
+                ParserResult parserResult = importer.importDatabase(filePath, preferences.getGeneralPreferences().getDefaultEncoding());
                 if (parserResult.isInvalid() || parserResult.isEmpty() || !parserResult.getDatabase().hasEntries()) {
                     return null;
                 }

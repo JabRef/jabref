@@ -151,7 +151,7 @@ public class BibDatabaseContext {
                     parentPath = Path.of(System.getProperty("user.dir"));
                 }
                 Objects.requireNonNull(parentPath, "BibTeX database parent path is null");
-                fileDirs.add(0, parentPath);
+                fileDirs.add(parentPath);
             });
         }
 
