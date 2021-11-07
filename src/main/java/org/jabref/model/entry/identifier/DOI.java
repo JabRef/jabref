@@ -106,6 +106,10 @@ public class DOI implements Identifier {
         // Remove whitespace
         String trimmedDoi = doi.trim();
 
+        //jie add-------------------------
+        trimmedDoi = removeScharDOI(trimmedDoi);
+        //jie add done--------------------
+
         // HTTP URL decoding
         if (doi.matches(HTTP_EXP) || doi.matches(SHORT_DOI_HTTP_EXP)) {
             try {
@@ -139,6 +143,47 @@ public class DOI implements Identifier {
                 }
             }
         }
+    }
+
+    /**
+     * Removes all special characters at the end of the DOI string
+     *
+     * @param doiStr the DOI/Short DOI string
+     * @return an DOI string with the special character at the end removed
+     */
+    public static String removeScharDOI(String doiStr) {
+        //jie add
+        char[] lcharDoi = doiStr.toCharArray();
+        int i = lcharDoi.length-1;
+        // valid DOI characters are a-z(97-122), A-Z(65-90), 0-9(48-57), -(45), .(46), _(95), ;(59), ( (40), ) (41), /(47)
+        for (; i >= 0; i--) {
+            if ((lcharDoi[i] >= 45 && lcharDoi[i] <= 47) ||
+                    (lcharDoi[i] >= 48 && lcharDoi[i] <= 57) ||
+                    (lcharDoi[i] >= 65 && lcharDoi[i] <= 90) ||
+                    (lcharDoi[i] >= 97 && lcharDoi[i] <= 122) ||
+                    lcharDoi[i] == 95 ||
+                    lcharDoi[i] == 59 ||
+                    lcharDoi[i] == 40 ||
+                    lcharDoi[i] == 41
+            ) {
+                // System.out.println(i);
+                break;
+            }
+        }
+
+//        char[] lcharDoi = doiStr.toCharArray();
+//        //jie add
+//        int i = lcharDoi.length-1;
+//        for (; i >= 0; i--) {
+//            if (lcharDoi[i] != 45 || (lcharDoi[i] >= 48 && lcharDoi[i] <= 57) ||
+//                    lcharDoi[i] != 47 || lcharDoi[i] >= 65 && lcharDoi[i] <= 90 ||
+//                    lcharDoi[i] != 95 || lcharDoi[i] >= 97 && lcharDoi[i] <= 122
+//            ) {
+//                System.out.println(i);
+//                break;
+//            }
+//        }
+        return doiStr.substring(0, i+1);
     }
 
     /**
