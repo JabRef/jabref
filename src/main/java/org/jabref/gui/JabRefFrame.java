@@ -399,6 +399,12 @@ public class JabRefFrame extends BorderPane {
             LibraryTab libraryTab = getLibraryTabAt(i);
             final BibDatabaseContext context = libraryTab.getBibDatabaseContext();
 
+            if (context.hasEmptyEntries()) {
+                if (!confirmEmptyEntry(libraryTab, context)) {
+                    return false;
+                }
+            }
+
             if (libraryTab.isModified() && (context.getLocation() == DatabaseLocation.LOCAL)) {
                 tabbedPane.getSelectionModel().select(i);
                 if (!confirmClose(libraryTab)) {
