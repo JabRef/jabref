@@ -660,15 +660,6 @@ public class LibraryTab extends Tab {
         }
     }
 
-    private boolean showEmptyEntryWarning(String fileName) {
-        String title = Localization.lang("Empty entry");
-        String message = Localization.lang("Library '%0' has empty entries. Do you want to delete them?", fileName);
-        String okButton = Localization.lang("Delete entry");
-        String cancelButton = Localization.lang("Keep entry");
-
-        return dialogService.showConfirmationDialogAndWait(title, message, okButton, cancelButton);
-    }
-
     /**
      * Depending on whether a preview or an entry editor is showing, save the current divider location in the correct preference setting.
      */
