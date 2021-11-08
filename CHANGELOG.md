@@ -45,6 +45,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 ### Fixed
 
 - We fixed an issue where an invalid DOI should not show "Connection error" [#8127](https://github.com/JabRef/jabref/issues/8127)
+- We fixed an issue where an invalid DOI should not show "Connection error" [#8127](https://github.com/JabRef/jabref/issues/8127)
 - We fixed an issue where an exception ocurred when a linked online file was edited in the entry editor [#8008](https://github.com/JabRef/jabref/issues/8008)
 - We fixed an issue where an exception occurred when a linked online file was edited in the entry editor [#8008](https://github.com/JabRef/jabref/issues/8008)
 - We fixed an issue when checking for a new version when JabRef is used behind a corporate proxy. [#7884](https://github.com/JabRef/jabref/issues/7884)
