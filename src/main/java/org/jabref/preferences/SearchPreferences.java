@@ -2,20 +2,27 @@ package org.jabref.preferences;
 
 import java.util.EnumSet;
 
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableSet;
+
 import org.jabref.gui.search.SearchDisplayMode;
-import org.jabref.model.search.rules.SearchRules;
 import org.jabref.model.search.rules.SearchRules.SearchFlags;
 
 public class SearchPreferences {
 
-    private final SearchDisplayMode searchDisplayMode;
-    private final EnumSet<SearchFlags> searchFlags;
-    private final boolean keepWindowOnTop;
+    private final ObjectProperty<SearchDisplayMode> searchDisplayMode;
+    private final ObservableSet<SearchFlags> searchFlags;
+    private final BooleanProperty keepWindowOnTop;
 
     public SearchPreferences(SearchDisplayMode searchDisplayMode, boolean isCaseSensitive, boolean isRegularExpression, boolean isFulltext, boolean isKeepSearchString, boolean keepWindowOnTop) {
-        this.searchDisplayMode = searchDisplayMode;
-        this.keepWindowOnTop = keepWindowOnTop;
-        searchFlags = EnumSet.noneOf(SearchFlags.class);
+        this.searchDisplayMode = new SimpleObjectProperty<>(searchDisplayMode);
+        this.keepWindowOnTop = new SimpleBooleanProperty(keepWindowOnTop);
+
+        searchFlags = FXCollections.observableSet(EnumSet.noneOf(SearchFlags.class));
         if (isCaseSensitive) {
             searchFlags.add(SearchFlags.CASE_SENSITIVE);
         }
@@ -31,17 +38,42 @@ public class SearchPreferences {
     }
 
     public SearchPreferences(SearchDisplayMode searchDisplayMode, EnumSet<SearchFlags> searchFlags, boolean keepWindowOnTop) {
-        this.searchDisplayMode = searchDisplayMode;
-        this.searchFlags = searchFlags;
-        this.keepWindowOnTop = keepWindowOnTop;
+        this.searchDisplayMode = new SimpleObjectProperty<>(searchDisplayMode);
+        this.keepWindowOnTop = new SimpleBooleanProperty(keepWindowOnTop);
+
+        this.searchFlags = FXCollections.observableSet(searchFlags);
+    }
+
+    public EnumSet<SearchFlags> getSearchFlags() {
+        return EnumSet.copyOf(searchFlags);
+    }
+
+    protected ObservableSet<SearchFlags> getObservableSearchFlags() {
+        return searchFlags;
     }
 
     public SearchDisplayMode getSearchDisplayMode() {
+        return searchDisplayMode.get();
+    }
+
+    public ObjectProperty<SearchDisplayMode> searchDisplayModeProperty() {
         return searchDisplayMode;
+    }
+
+    public void setSearchDisplayMode(SearchDisplayMode searchDisplayMode) {
+        this.searchDisplayMode.set(searchDisplayMode);
     }
 
     public boolean isCaseSensitive() {
         return searchFlags.contains(SearchFlags.CASE_SENSITIVE);
+    }
+
+    public void setSearchFlag(SearchFlags flag, boolean value) {
+        if (searchFlags.contains(flag) && !value) {
+            searchFlags.remove(flag);
+        } else if (!searchFlags.contains(flag) && value) {
+            searchFlags.add(flag);
+        }
     }
 
     public boolean isRegularExpression() {
@@ -52,52 +84,19 @@ public class SearchPreferences {
         return searchFlags.contains(SearchFlags.FULLTEXT);
     }
 
-    public boolean isKeepSearchString() {
+    public boolean shouldKeepSearchString() {
         return searchFlags.contains(SearchFlags.KEEP_SEARCH_STRING);
     }
 
-    public boolean isKeepWindowOnTop() {
+    public boolean shouldKeepWindowOnTop() {
+        return keepWindowOnTop.get();
+    }
+
+    public BooleanProperty keepWindowOnTopProperty() {
         return keepWindowOnTop;
     }
 
-    public EnumSet<SearchFlags> getSearchFlags() {
-        EnumSet<SearchFlags> searchFlags = EnumSet.noneOf(SearchFlags.class);
-        if (isCaseSensitive()) {
-            searchFlags.add(SearchRules.SearchFlags.CASE_SENSITIVE);
-        }
-        if (isRegularExpression()) {
-            searchFlags.add(SearchRules.SearchFlags.REGULAR_EXPRESSION);
-        }
-        if (isFulltext()) {
-            searchFlags.add(SearchRules.SearchFlags.FULLTEXT);
-        }
-        if (isKeepSearchString()) {
-            searchFlags.add(SearchRules.SearchFlags.KEEP_SEARCH_STRING);
-        }
-        return searchFlags;
-    }
-
-    public SearchPreferences withSearchDisplayMode(SearchDisplayMode newSearchDisplayMode) {
-        return new SearchPreferences(newSearchDisplayMode, isCaseSensitive(), isRegularExpression(), isFulltext(), isKeepSearchString(), isKeepWindowOnTop());
-    }
-
-    public SearchPreferences withCaseSensitive(boolean newCaseSensitive) {
-        return new SearchPreferences(searchDisplayMode, newCaseSensitive, isRegularExpression(), isFulltext(), isKeepSearchString(), isKeepWindowOnTop());
-    }
-
-    public SearchPreferences withRegularExpression(boolean newRegularExpression) {
-        return new SearchPreferences(searchDisplayMode, isCaseSensitive(), newRegularExpression, isFulltext(), isKeepSearchString(), isKeepWindowOnTop());
-    }
-
-    public SearchPreferences withFulltext(boolean newFulltext) {
-        return new SearchPreferences(searchDisplayMode, isCaseSensitive(), isRegularExpression(), newFulltext, isKeepSearchString(), isKeepWindowOnTop());
-    }
-
-    public SearchPreferences withKeepSearchString(boolean newKeepSearchString) {
-        return new SearchPreferences(searchDisplayMode, isCaseSensitive(), isRegularExpression(), isFulltext(), newKeepSearchString, isKeepWindowOnTop());
-    }
-
-    public SearchPreferences withKeepGlobalSearchDialogOnTop(boolean keepWindowOnTop) {
-        return new SearchPreferences(searchDisplayMode, isCaseSensitive(), isRegularExpression(), isFulltext(), isKeepSearchString(), keepWindowOnTop);
+    public void setKeepWindowOnTop(boolean keepWindowOnTop) {
+        this.keepWindowOnTop.set(keepWindowOnTop);
     }
 }

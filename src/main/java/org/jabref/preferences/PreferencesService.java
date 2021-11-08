@@ -240,11 +240,7 @@ public interface PreferencesService {
 
     NewLineSeparator getNewLineSeparator();
 
-    void storeNewLineSeparator(NewLineSeparator newLineSeparator);
-
     AutoLinkPreferences getAutoLinkPreferences();
-
-    void storeAutoLinkPreferences(AutoLinkPreferences autoLinkPreferences);
 
     boolean shouldAutosave();
 
@@ -259,8 +255,6 @@ public interface PreferencesService {
     //*************************************************************************************************************
 
     ImportExportPreferences getImportExportPreferences();
-
-    void storeImportExportPreferences(ImportExportPreferences preferences);
 
     List<TemplateExporter> getCustomExportFormats(JournalAbbreviationRepository repository);
 
@@ -328,8 +322,6 @@ public interface PreferencesService {
     void storeSpecialFieldsPreferences(SpecialFieldsPreferences specialFieldsPreferences);
 
     SearchPreferences getSearchPreferences();
-
-    void storeSearchPreferences(SearchPreferences preferences);
 
     String getLastPreferencesExportPath();
 
