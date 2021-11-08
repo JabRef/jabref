@@ -61,7 +61,9 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
 
     @Override
     public Optional<BibEntry> performSearchById(String identifier) throws FetcherException {
+
         Optional<DOI> doi = DOI.parse(identifier);
+
         try {
             if (doi.isPresent()) {
                 Optional<BibEntry> fetchedEntry;
@@ -70,13 +72,18 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
                 if (getAgency(doi.get()).isPresent() && "medra".equalsIgnoreCase(getAgency(doi.get()).get())) {
                     return new Medra().performSearchById(identifier);
                 }
-
                 URL doiURL = new URL(doi.get().getURIAsASCIIString());
 
                 // BibTeX data
                 URLDownload download = getUrlDownload(doiURL);
                 download.addHeader("Accept", MediaTypes.APPLICATION_BIBTEX);
-                String bibtexString = download.asString();
+                String bibtexString;
+                try {
+                    bibtexString = download.asString();
+                } catch (IOException e) {
+                    // an IOException will be thrown if download is unable to download from the doiURL
+                    throw new FetcherException(Localization.lang("No DOI data exists"), e);
+                }
 
                 // BibTeX entry
                 fetchedEntry = BibtexParser.singleFromString(bibtexString, preferences, new DummyFileUpdateMonitor());

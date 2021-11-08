@@ -106,6 +106,14 @@ public class DOI implements Identifier {
         // Remove whitespace
         String trimmedDoi = doi.trim();
 
+        // https://howtodoinjava.com/java/regex/java-clean-ascii-text-non-printable-chars/
+        // strips off all non-ASCII characters
+        trimmedDoi = trimmedDoi.replaceAll("[^\\x00-\\x7F]", "");
+        // erases all the ASCII control characters
+        trimmedDoi = trimmedDoi.replaceAll("[\\p{Cntrl}&&[^\r\n\t]]", "");
+        // removes non-printable characters from Unicode
+        trimmedDoi = trimmedDoi.replaceAll("\\p{C}", "");
+        
         // HTTP URL decoding
         if (doi.matches(HTTP_EXP) || doi.matches(SHORT_DOI_HTTP_EXP)) {
             try {
