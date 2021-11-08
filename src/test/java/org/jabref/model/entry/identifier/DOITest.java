@@ -272,4 +272,21 @@ public class DOITest {
     public void rejectMissingDividerInShortDoi() {
         assertThrows(IllegalArgumentException.class, () -> new DOI("10gf4gqc end"));
     }
+
+    private static Stream<Arguments> testECharData() {
+        return Stream.of(
+                // Arguments.of("10.1006/jmbi.1998.2354", new DOI("10.1006/jmbi.1998.2354").getDOI()),
+                Arguments.of(DOI.removeScharDOI("10.1007/978-3-319-47590-5_8?"), "10.1007/978-3-319-47590-5_8"),
+                Arguments.of(DOI.removeScharDOI("10.1007/978-3-319-47590-5_8?$"), "10.1007/978-3-319-47590-5_8"),
+                Arguments.of(DOI.removeScharDOI("10.1007/978-3-319-47590-5_8"), "10.1007/978-3-319-47590-5_8"),
+                Arguments.of(DOI.removeScharDOI("10.1007/978-3-319-47590-?%"), "10.1007/978-3-319-47590-"),
+                Arguments.of(DOI.removeScharDOI("10.1007/*?"), "10.1007/")
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("testECharData")
+    public void testEquals2(String expected, String input) {
+        assertEquals(expected, input);
+    }
 }
