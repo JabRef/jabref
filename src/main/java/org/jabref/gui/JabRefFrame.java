@@ -1168,7 +1168,7 @@ public class JabRefFrame extends BorderPane {
     /**
      * Ask if the user really wants to remove any empty entries
      */
-    private void confirmEmptyEntry(LibraryTab libraryTab, BibDatabaseContext context) {
+    private Boolean confirmEmptyEntry(LibraryTab libraryTab, BibDatabaseContext context) {
         String filename = libraryTab.getBibDatabaseContext()
                                     .getDatabasePath()
                                     .map(Path::toAbsolutePath)
@@ -1183,7 +1183,6 @@ public class JabRefFrame extends BorderPane {
                 Localization.lang("Empty entries"),
                 Localization.lang("Library '%0' has empty entries. Do you want to delete them?", filename),
                 deleteEmptyEntries, keepEmptyEntries, cancel);
-
         if (response.isPresent() && response.get().equals(deleteEmptyEntries)) {
             // The user wants to delete.
             try {
@@ -1194,7 +1193,7 @@ public class JabRefFrame extends BorderPane {
                 }
                 SaveDatabaseAction saveAction = new SaveDatabaseAction(libraryTab, prefs, Globals.entryTypesManager);
                 if (saveAction.save()) {
-                    return;
+                    return true;
                 }
                 // The action was either canceled or unsuccessful.
                 dialogService.notify(Localization.lang("Unable to save library"));
@@ -1202,10 +1201,10 @@ public class JabRefFrame extends BorderPane {
                 LOGGER.error("A problem occurred when trying to delete the empty entries", ex);
                 dialogService.showErrorDialogAndWait(Localization.lang("Delete empty entries"), Localization.lang("Could not delete empty entries."), ex);
             }
-//            // Save was cancelled or an error occurred.
-//            return false;
+            // Save was cancelled or an error occurred.
+            return false;
         }
-//        return response.isEmpty() || !response.get().equals(cancel);
+        return !response.get().equals(cancel);
     }
 
     private void closeTab(LibraryTab libraryTab) {
@@ -1216,7 +1215,9 @@ public class JabRefFrame extends BorderPane {
 
         final BibDatabaseContext context = libraryTab.getBibDatabaseContext();
         if (context.hasEmptyEntries()) {
-            confirmEmptyEntry(libraryTab, context);
+            if (!confirmEmptyEntry(libraryTab, context)) {
+                return;
+            }
         }
 
         if (libraryTab.isModified() && (context.getLocation() == DatabaseLocation.LOCAL)) {
