@@ -152,7 +152,7 @@ public class DOI implements Identifier {
      */
     public static String removeScharDOI(String doiStr) {
         char[] lcharDoi = doiStr.toCharArray();
-        int i = lcharDoi.length - 1;
+        int i = lcharDoi.length-1;
         // valid DOI characters are a-z(97-122), A-Z(65-90), 0-9(48-57), -(45), .(46), _(95), ;(59), ( (40), ) (41), /(47)
         for (; i >= 0; i--) {
             if ((lcharDoi[i] >= 45 && lcharDoi[i] <= 47) ||
@@ -167,7 +167,7 @@ public class DOI implements Identifier {
                 break;
             }
         }
-        return doiStr.substring(0, i + 1);
+        return doiStr.substring(0, i+1);
     }
 
     /**
