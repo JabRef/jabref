@@ -46,10 +46,6 @@ public class CleanupPreset {
 
     public enum CleanupStep {
         /**
-         * Removes empty entries.
-         */
-        CLEAN_UP_EMPTY_ENTRY,
-        /**
          * Removes the http://... for each DOI. Moves DOIs from URL and NOTE filed to DOI field.
          */
         CLEAN_UP_DOI,
