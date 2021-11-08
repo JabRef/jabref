@@ -28,6 +28,7 @@ import de.saxsys.mvvmfx.utils.validation.Validator;
 public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
 
     private final StringProperty mainFileDirectoryProperty = new SimpleStringProperty("");
+    private final BooleanProperty useMainFileDirectoryProperty = new SimpleBooleanProperty();
     private final BooleanProperty useBibLocationAsPrimaryProperty = new SimpleBooleanProperty();
     private final BooleanProperty autolinkFileStartsBibtexProperty = new SimpleBooleanProperty();
     private final BooleanProperty autolinkFileExactBibtexProperty = new SimpleBooleanProperty();
@@ -75,6 +76,7 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
     public void setValues() {
         // External files preferences / Attached files preferences / File preferences
         mainFileDirectoryProperty.setValue(filePreferences.getFileDirectory().orElse(Path.of("")).toString());
+        useMainFileDirectoryProperty.setValue(!filePreferences.shouldStoreFilesRelativeToBibFile());
         useBibLocationAsPrimaryProperty.setValue(filePreferences.shouldStoreFilesRelativeToBibFile());
         fileNamePatternProperty.setValue(filePreferences.getFileNamePattern());
         fileDirectoryPatternProperty.setValue(filePreferences.getFileDirectoryPattern());
@@ -136,7 +138,6 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
     }
 
     // External file links
-
     public StringProperty mainFileDirectoryProperty() {
         return mainFileDirectoryProperty;
     }
@@ -171,6 +172,10 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
 
     public StringProperty fileDirectoryPatternProperty() {
         return fileDirectoryPatternProperty;
+    }
+
+    public BooleanProperty useMainFileDirectoryProperty() {
+        return useMainFileDirectoryProperty;
     }
 }
 

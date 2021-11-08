@@ -430,6 +430,9 @@ public class JabRefPreferences implements PreferencesService {
     private MrDlibPreferences mrDlibPreferences;
     private EntryEditorPreferences entryEditorPreferences;
     private FilePreferences filePreferences;
+    private GuiPreferences guiPreferences;
+    private RemotePreferences remotePreferences;
+    private ProxyPreferences proxyPreferences;
 
     // The constructor is made private to enforce this as a singleton class:
     private JabRefPreferences() {
@@ -509,7 +512,7 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(SIZE_X, 1024);
         defaults.put(SIZE_Y, 768);
         defaults.put(WINDOW_MAXIMISED, Boolean.TRUE);
-        defaults.put(AUTO_RESIZE_MODE, Boolean.TRUE);
+        defaults.put(AUTO_RESIZE_MODE, Boolean.FALSE); // By default disable "Fit table horizontally on the screen"
         defaults.put(ENTRY_EDITOR_HEIGHT, 0.65);
         defaults.put(NAMES_AS_IS, Boolean.FALSE); // "Show names unchanged"
         defaults.put(NAMES_FIRST_LAST, Boolean.FALSE); // "Show 'Firstname Lastname'"
@@ -1129,7 +1132,7 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public JournalAbbreviationPreferences getJournalAbbreviationPreferences() {
-        return new JournalAbbreviationPreferences(getStringList(EXTERNAL_JOURNAL_LISTS), getDefaultEncoding());
+        return new JournalAbbreviationPreferences(getStringList(EXTERNAL_JOURNAL_LISTS), getGeneralPreferences().getDefaultEncoding());
     }
 
     @Override
@@ -1314,32 +1317,13 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     @Override
-    public Charset getDefaultEncoding() {
-        return Charset.forName(get(DEFAULT_ENCODING));
-    }
-
-    /**
-     * Returns the default BibDatabase mode, which can be either BIBTEX or BIBLATEX.
-     *
-     * @return the default BibDatabaseMode
-     */
-    @Override
-    public BibDatabaseMode getDefaultBibDatabaseMode() {
-        if (getBoolean(BIBLATEX_DEFAULT_MODE)) {
-            return BibDatabaseMode.BIBLATEX;
-        } else {
-            return BibDatabaseMode.BIBTEX;
-        }
-    }
-
-    @Override
     public GeneralPreferences getGeneralPreferences() {
         if (Objects.nonNull(generalPreferences)) {
             return generalPreferences;
         }
 
         generalPreferences = new GeneralPreferences(
-                getDefaultEncoding(),
+                Charset.forName(get(DEFAULT_ENCODING)),
                 getBoolean(BIBLATEX_DEFAULT_MODE) ? BibDatabaseMode.BIBLATEX : BibDatabaseMode.BIBTEX,
                 getBoolean(WARN_ABOUT_DUPLICATES_IN_INSPECTION),
                 getBoolean(CONFIRM_DELETE),
@@ -1607,34 +1591,42 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public RemotePreferences getRemotePreferences() {
-        return new RemotePreferences(getInt(REMOTE_SERVER_PORT), getBoolean(USE_REMOTE_SERVER));
-    }
+        if (Objects.nonNull(remotePreferences)) {
+            return remotePreferences;
+        }
 
-    @Override
-    public void storeRemotePreferences(RemotePreferences preferences) {
-        putInt(REMOTE_SERVER_PORT, preferences.getPort());
-        putBoolean(USE_REMOTE_SERVER, preferences.useRemoteServer());
+        remotePreferences = new RemotePreferences(
+                getInt(REMOTE_SERVER_PORT),
+                getBoolean(USE_REMOTE_SERVER));
+
+        EasyBind.listen(remotePreferences.portProperty(), (obs, oldValue, newValue) -> putInt(REMOTE_SERVER_PORT, newValue));
+        EasyBind.listen(remotePreferences.useRemoteServerProperty(), (obs, oldValue, newValue) -> putBoolean(USE_REMOTE_SERVER, newValue));
+
+        return remotePreferences;
     }
 
     @Override
     public ProxyPreferences getProxyPreferences() {
-        return new ProxyPreferences(
+        if (Objects.nonNull(proxyPreferences)) {
+            return proxyPreferences;
+        }
+
+        proxyPreferences = new ProxyPreferences(
                 getBoolean(PROXY_USE),
                 get(PROXY_HOSTNAME),
                 get(PROXY_PORT),
                 getBoolean(PROXY_USE_AUTHENTICATION),
                 get(PROXY_USERNAME),
                 get(PROXY_PASSWORD));
-    }
 
-    @Override
-    public void storeProxyPreferences(ProxyPreferences preferences) {
-        putBoolean(PROXY_USE, preferences.isUseProxy());
-        put(PROXY_HOSTNAME, preferences.getHostname());
-        put(PROXY_PORT, preferences.getPort());
-        putBoolean(PROXY_USE_AUTHENTICATION, preferences.isUseAuthentication());
-        put(PROXY_USERNAME, preferences.getUsername());
-        put(PROXY_PASSWORD, preferences.getPassword());
+        EasyBind.listen(proxyPreferences.useProxyProperty(), (obs, oldValue, newValue) -> putBoolean(PROXY_USE, newValue));
+        EasyBind.listen(proxyPreferences.hostnameProperty(), (obs, oldValue, newValue) -> put(PROXY_HOSTNAME, newValue));
+        EasyBind.listen(proxyPreferences.portProperty(), (obs, oldValue, newValue) -> put(PROXY_PORT, newValue));
+        EasyBind.listen(proxyPreferences.useAuthenticationProperty(), (obs, oldValue, newValue) -> putBoolean(PROXY_USE_AUTHENTICATION, newValue));
+        EasyBind.listen(proxyPreferences.usernameProperty(), (obs, oldValue, newValue) -> put(PROXY_USERNAME, newValue));
+        EasyBind.listen(proxyPreferences.passwordProperty(), (obs, oldValue, newValue) -> put(PROXY_PASSWORD, newValue));
+
+        return proxyPreferences;
     }
 
     //*************************************************************************************************************
@@ -2034,7 +2026,6 @@ public class JabRefPreferences implements PreferencesService {
     public ImportFormatPreferences getImportFormatPreferences() {
         return new ImportFormatPreferences(
                 getCustomImportFormats(),
-                getDefaultEncoding(),
                 getKeywordDelimiter(),
                 getCitationKeyPatternPreferences(),
                 getFieldContentParserPreferences(),
@@ -2109,7 +2100,6 @@ public class JabRefPreferences implements PreferencesService {
         return new SavePreferences(
                 false,
                 null,
-                this.getDefaultEncoding(),
                 SavePreferences.DatabaseSaveType.ALL,
                 true,
                 this.getBoolean(REFORMAT_FILE_ON_SAVE_AND_EXPORT),
@@ -2532,7 +2522,11 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public GuiPreferences getGuiPreferences() {
-        return new GuiPreferences(
+        if (Objects.nonNull(guiPreferences)) {
+            return guiPreferences;
+        }
+
+        guiPreferences = new GuiPreferences(
                 getDouble(POS_X),
                 getDouble(POS_Y),
                 getDouble(SIZE_X),
@@ -2542,24 +2536,25 @@ public class JabRefPreferences implements PreferencesService {
                 getStringList(LAST_EDITED),
                 Path.of(get(LAST_FOCUSED)),
                 getDouble(SIDE_PANE_WIDTH));
-    }
 
-    @Override
-    public void storeGuiPreferences(GuiPreferences preferences) {
-        putDouble(POS_X, preferences.getPositionX());
-        putDouble(POS_Y, preferences.getPositionY());
-        putDouble(SIZE_X, preferences.getSizeX());
-        putDouble(SIZE_Y, preferences.getSizeY());
-        putBoolean(WINDOW_MAXIMISED, preferences.isWindowMaximised());
-        putBoolean(OPEN_LAST_EDITED, preferences.shouldOpenLastEdited());
-        putStringList(LAST_EDITED, preferences.getLastFilesOpened());
+        EasyBind.listen(guiPreferences.positionXProperty(), (obs, oldValue, newValue) -> putDouble(POS_X, newValue.doubleValue()));
+        EasyBind.listen(guiPreferences.positionYProperty(), (obs, oldValue, newValue) -> putDouble(POS_Y, newValue.doubleValue()));
+        EasyBind.listen(guiPreferences.sizeXProperty(), (obs, oldValue, newValue) -> putDouble(SIZE_X, newValue.doubleValue()));
+        EasyBind.listen(guiPreferences.sizeYProperty(), (obs, oldValue, newValue) -> putDouble(SIZE_Y, newValue.doubleValue()));
+        EasyBind.listen(guiPreferences.windowMaximisedProperty(), (obs, oldValue, newValue) -> putBoolean(WINDOW_MAXIMISED, newValue));
+        EasyBind.listen(guiPreferences.openLastEditedProperty(), (obs, oldValue, newValue) -> putBoolean(OPEN_LAST_EDITED, newValue));
+        guiPreferences.getLastFilesOpened().addListener((InvalidationListener) change ->
+                putStringList(LAST_EDITED, guiPreferences.getLastFilesOpened()));
+        EasyBind.listen(guiPreferences.lastFocusedFileProperty(), (obs, oldValue, newValue) -> {
+            if (newValue != null) {
+                put(LAST_FOCUSED, newValue.toAbsolutePath().toString());
+            } else {
+                remove(LAST_EDITED);
+            }
+        });
+        EasyBind.listen(guiPreferences.sidePaneWidthProperty(), (obs, oldValue, newValue) -> putDouble(SIDE_PANE_WIDTH, newValue.doubleValue()));
 
-        if (preferences.getLastFocusedFile() != null) {
-            String filePath = preferences.getLastFocusedFile().toAbsolutePath().toString();
-            put(LAST_FOCUSED, filePath);
-        }
-
-        putDouble(SIDE_PANE_WIDTH, preferences.getSidePaneWidth());
+        return guiPreferences;
     }
 
     @Override
