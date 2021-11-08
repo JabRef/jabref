@@ -66,8 +66,8 @@ public class SidePane extends VBox {
         SidePaneComponent sidePaneComponent = sidePaneComponentLookup.get(pane);
         if (sidePaneComponent == null) {
             sidePaneComponent = switch (pane) {
-                case GROUPS -> new GroupsSidePaneComponent(new ClosePaneAction(pane), new MoveUpAction(pane), new MoveDownAction(pane), sidePaneContentFactory, preferencesService, dialogService);
-                case WEB_SEARCH, OPEN_OFFICE -> new SidePaneComponent(pane, new ClosePaneAction(pane), new MoveUpAction(pane), new MoveDownAction(pane), sidePaneContentFactory);
+                case GROUPS -> new GroupsSidePaneComponent(new ClosePaneAction(stateManager, pane), new MoveUpAction(pane), new MoveDownAction(pane), sidePaneContentFactory, preferencesService, dialogService);
+                case WEB_SEARCH, OPEN_OFFICE -> new SidePaneComponent(pane, new ClosePaneAction(stateManager, pane), new MoveUpAction(pane), new MoveDownAction(pane), sidePaneContentFactory);
             };
             sidePaneComponentLookup.put(pane, sidePaneComponent);
         }
@@ -109,17 +109,6 @@ public class SidePane extends VBox {
         }
     }
 
-    /**
-     * If the given component is visible it will be hidden and the other way around.
-     */
-    private void toggle(SidePaneType pane) {
-        if (viewModel.isPaneVisible(pane)) {
-            hide(pane);
-        } else {
-            show(pane);
-        }
-    }
-
     private void updateView() {
         showVisiblePanes();
         setVisible(!viewModel.getVisiblePanes().isEmpty());
@@ -129,21 +118,8 @@ public class SidePane extends VBox {
         return stateManager.sidePaneComponentVisiblePropertyFor(pane);
     }
 
-    public ToggleCommand getToggleCommandFor(SidePaneType sidePane) {
-        return new ToggleCommand(sidePane);
-    }
-
-    private class ClosePaneAction extends SimpleCommand {
-        private final SidePaneType toClosePane;
-
-        public ClosePaneAction(SidePaneType toClosePane) {
-            this.toClosePane = toClosePane;
-        }
-
-        @Override
-        public void execute() {
-            hide(toClosePane);
-        }
+    public SimpleCommand getToggleCommandFor(SidePaneType sidePane) {
+        return new TogglePaneAction(stateManager, sidePane);
     }
 
     private class MoveUpAction extends SimpleCommand {
@@ -169,20 +145,6 @@ public class SidePane extends VBox {
         @Override
         public void execute() {
             moveDown(toMoveDownPane);
-        }
-    }
-
-    public class ToggleCommand extends SimpleCommand {
-
-        private final SidePaneType pane;
-
-        public ToggleCommand(SidePaneType pane) {
-            this.pane = pane;
-        }
-
-        @Override
-        public void execute() {
-            toggle(pane);
         }
     }
 }
