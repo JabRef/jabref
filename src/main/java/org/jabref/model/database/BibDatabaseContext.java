@@ -213,6 +213,10 @@ public class BibDatabaseContext {
         return database.getEntries();
     }
 
+    /**
+     * check if the database has any empty entries
+     * @return true if the database has any empty entries; otherwise false
+     */
     public boolean hasEmptyEntries() {
         for (BibEntry currentEntry: this.getEntries()) {
             if (currentEntry.getFields().isEmpty()) {
