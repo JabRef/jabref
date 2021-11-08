@@ -140,7 +140,7 @@ dependencies {
     implementation 'org.antlr:antlr-runtime:3.5.2'
 
     antlr4 'org.antlr:antlr4:4.9.2'
-    implementation 'org.antlr:antlr4-runtime:4.9.2'
+    implementation 'org.antlr:antlr4-runtime:4.9.3'
 
     implementation group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: '5.13.0.202109080827-r'
 
