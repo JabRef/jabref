@@ -113,7 +113,7 @@ public class DOI implements Identifier {
         trimmedDoi = trimmedDoi.replaceAll("[\\p{Cntrl}&&[^\r\n\t]]", "");
         // removes non-printable characters from Unicode
         trimmedDoi = trimmedDoi.replaceAll("\\p{C}", "");
-        
+
         // HTTP URL decoding
         if (doi.matches(HTTP_EXP) || doi.matches(SHORT_DOI_HTTP_EXP)) {
             try {
