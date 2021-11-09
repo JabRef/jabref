@@ -79,7 +79,7 @@ public class EntryTypeView extends BaseDialog<EntryType> {
         ControlHelper.setAction(generateButton, this.getDialogPane(), event -> viewModel.runFetcherWorker());
 
         setResultConverter(button -> {
-            // The buttonType will always be cancel, even if we pressed one of the entry type buttons
+            // The buttonType will always be "cancel", even if we pressed one of the entry type buttons
             return type;
         });
 

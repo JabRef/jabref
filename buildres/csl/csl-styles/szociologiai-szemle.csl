@@ -120,7 +120,7 @@
       <else>
         <choose>
           <if variable="DOI">
-            <text variable="DOI" prefix="http://dx.doi.org/"/>
+            <text variable="DOI" prefix="https://doi.org/"/>
           </if>
           <else>
             <choose>

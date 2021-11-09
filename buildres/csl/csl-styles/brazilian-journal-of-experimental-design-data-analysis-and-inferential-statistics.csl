@@ -71,7 +71,7 @@
     <names variable="container-author">
       <name and="text" name-as-sort-order="all" sort-separator=", " delimiter=", " delimiter-precedes-last="never">
         <name-part name="family" text-case="uppercase"/>
-       </name>
+      </name>
     </names>
   </macro>
   <macro name="container-responsability">

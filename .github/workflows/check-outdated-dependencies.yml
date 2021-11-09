@@ -16,6 +16,7 @@ jobs:
         with:
           java-version: 16
           distribution: 'adopt'
+          cache: 'gradle'
       - name: Look for outdated dependencies
         run: ./gradlew -q checkOutdatedDependencies
       - name: Report issues

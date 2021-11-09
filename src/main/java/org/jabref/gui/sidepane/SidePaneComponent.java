@@ -1,4 +1,4 @@
-package org.jabref.gui;
+package org.jabref.gui.sidepane;
 
 import java.util.Collections;
 import java.util.List;
@@ -19,33 +19,33 @@ import org.jabref.logic.l10n.Localization;
 
 public abstract class SidePaneComponent {
 
-    private final SidePaneManager manager;
+    private final SidePane sidePane;
     private final ToggleCommand toggleCommand;
     private final JabRefIcon icon;
     private final String title;
     private Node contentNode;
 
-    public SidePaneComponent(SidePaneManager manager, JabRefIcon icon, String title) {
-        this.manager = manager;
+    public SidePaneComponent(SidePane sidePane, JabRefIcon icon, String title) {
+        this.sidePane = sidePane;
         this.icon = icon;
         this.title = title;
         this.toggleCommand = new ToggleCommand(this);
     }
 
     protected void hide() {
-        manager.hide(this.getType());
+        sidePane.hide(this.getType());
     }
 
     protected void show() {
-        manager.show(this.getType());
+        sidePane.show(this.getType());
     }
 
     protected void moveUp() {
-        manager.moveUp(this);
+        sidePane.moveUp(this);
     }
 
     protected void moveDown() {
-        manager.moveDown(this);
+        sidePane.moveDown(this);
     }
 
     /**
@@ -130,7 +130,7 @@ public abstract class SidePaneComponent {
     /**
      * Create the content of this component
      *
-     * @implNote The {@link SidePaneManager} always creates an instance of every side component (e.g., to get the toggle action)
+     * @implNote The {@link SidePane} always creates an instance of every side component (e.g., to get the toggle action)
      * but we only want to create the content view if the component is shown to save resources.
      * This is the reason for the lazy loading.
      */
@@ -151,7 +151,7 @@ public abstract class SidePaneComponent {
 
         @Override
         public void execute() {
-            manager.toggle(component.getType());
+            sidePane.toggle(component.getType());
         }
     }
 }

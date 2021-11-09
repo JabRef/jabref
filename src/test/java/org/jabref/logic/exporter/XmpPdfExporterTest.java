@@ -102,7 +102,7 @@ class XmpPdfExporterTest {
 
         filePreferences = mock(FilePreferences.class);
         when(filePreferences.getUser()).thenReturn(tempDir.toAbsolutePath().toString());
-        when(filePreferences.shouldStoreFilesRelativeToBib()).thenReturn(false);
+        when(filePreferences.shouldStoreFilesRelativeToBibFile()).thenReturn(false);
 
         importer = new PdfXmpImporter(xmpPreferences);
         exporter = new XmpPdfExporter(xmpPreferences);

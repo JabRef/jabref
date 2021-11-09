@@ -26,8 +26,8 @@ import org.jabref.logic.util.OS;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.identifier.ArXivIdentifier;
 import org.jabref.model.entry.identifier.DOI;
-import org.jabref.model.entry.identifier.Eprint;
 import org.jabref.model.util.FileHelper;
 import org.jabref.preferences.PreferencesService;
 
@@ -84,7 +84,12 @@ public class JabRefDesktop {
             openDoi(link);
             return;
         } else if (StandardField.EPRINT.equals(field)) {
-            link = Eprint.build(link).map(Eprint::getURIAsASCIIString).orElse(link);
+            link = ArXivIdentifier.parse(link)
+                                  .map(ArXivIdentifier::getExternalURI)
+                                  .filter(Optional::isPresent)
+                                  .map(Optional::get)
+                                  .map(URI::toASCIIString)
+                                  .orElse(link);
             // should be opened in browser
             field = StandardField.URL;
         }

@@ -20,11 +20,7 @@ jobs:
         with:
           java-version: 16
           distribution: 'adopt'
-      - uses: actions/cache@v1
-        name: Restore gradle wrapper
-        with:
-          path: ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-${{ hashFiles('gradle/wrapper/gradle-wrapper.properties') }}
+          cache: 'gradle'
       - name: Update journal lists
         run: |
           set +o pipefail
