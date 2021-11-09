@@ -157,6 +157,7 @@ public class JabRefPreferences implements PreferencesService {
     public static final String REFORMAT_FILE_ON_SAVE_AND_EXPORT = "reformatFileOnSaveAndExport";
     public static final String EXPORT_IN_ORIGINAL_ORDER = "exportInOriginalOrder";
     public static final String EXPORT_IN_SPECIFIED_ORDER = "exportInSpecifiedOrder";
+    public static final String EXPORT_IN_TABLE_ORDER = "exportInTableOrder";
     public static final String EXPORT_PRIMARY_SORT_FIELD = "exportPriSort";
     public static final String EXPORT_PRIMARY_SORT_DESCENDING = "exportPriDescending";
     public static final String EXPORT_SECONDARY_SORT_FIELD = "exportSecSort";
@@ -532,6 +533,7 @@ public class JabRefPreferences implements PreferencesService {
         // export order
         defaults.put(EXPORT_IN_ORIGINAL_ORDER, Boolean.FALSE);
         defaults.put(EXPORT_IN_SPECIFIED_ORDER, Boolean.FALSE);
+        defaults.put(EXPORT_IN_TABLE_ORDER, Boolean.FALSE);
 
         // export order: if EXPORT_IN_SPECIFIED_ORDER, then use following criteria
         defaults.put(EXPORT_PRIMARY_SORT_FIELD, InternalField.KEY_FIELD.getName());
@@ -2048,7 +2050,7 @@ public class JabRefPreferences implements PreferencesService {
         );
 
         return new SaveOrderConfig(
-                SaveOrderConfig.OrderType.fromBooleans(getBoolean(EXPORT_IN_SPECIFIED_ORDER), getBoolean(EXPORT_IN_ORIGINAL_ORDER)),
+                SaveOrderConfig.OrderType.fromBooleans(getBoolean(EXPORT_IN_SPECIFIED_ORDER), getBoolean(EXPORT_IN_TABLE_ORDER)),
                 sortCriteria
         );
     }
@@ -2057,6 +2059,7 @@ public class JabRefPreferences implements PreferencesService {
     public void storeExportSaveOrder(SaveOrderConfig config) {
         putBoolean(EXPORT_IN_ORIGINAL_ORDER, config.getOrderType() == SaveOrderConfig.OrderType.ORIGINAL);
         putBoolean(EXPORT_IN_SPECIFIED_ORDER, config.getOrderType() == SaveOrderConfig.OrderType.SPECIFIED);
+        putBoolean(EXPORT_IN_TABLE_ORDER, config.getOrderType() == SaveOrderConfig.OrderType.TABLE);
 
         put(EXPORT_PRIMARY_SORT_FIELD, config.getSortCriteria().get(0).field.getName());
         put(EXPORT_SECONDARY_SORT_FIELD, config.getSortCriteria().get(1).field.getName());
