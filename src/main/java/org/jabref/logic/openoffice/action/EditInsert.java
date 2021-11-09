@@ -20,6 +20,7 @@ import org.jabref.model.openoffice.uno.CreationException;
 import org.jabref.model.openoffice.uno.NoDocumentException;
 import org.jabref.model.openoffice.uno.UnoScreenRefresh;
 import org.jabref.model.openoffice.util.OOListUtil;
+import org.jabref.model.strings.StringUtil;
 
 import com.sun.star.beans.IllegalTypeException;
 import com.sun.star.beans.NotRemoveableException;
@@ -73,11 +74,11 @@ public class EditInsert {
 
         List<String> citationKeys = OOListUtil.map(entries, EditInsert::insertEntryGetCitationKey);
 
-        final int nEntries = entries.size();
-        List<Optional<OOText>> pageInfos = OODataModel.fakePageInfos(pageInfo, nEntries);
+        final int totalEntries = entries.size();
+        List<Optional<OOText>> pageInfos = OODataModel.fakePageInfos(pageInfo, totalEntries);
 
-        List<CitationMarkerEntry> citations = new ArrayList<>(nEntries);
-        for (int i = 0; i < nEntries; i++) {
+        List<CitationMarkerEntry> citations = new ArrayList<>(totalEntries);
+        for (int i = 0; i < totalEntries; i++) {
             Citation cit = new Citation(citationKeys.get(i));
             cit.lookupInDatabases(Collections.singletonList(database));
             cit.setPageInfo(pageInfos.get(i));
@@ -85,14 +86,16 @@ public class EditInsert {
         }
 
         // The text we insert
-        OOText citeText =
-            (style.isNumberEntries()
-             ? OOText.fromString("[-]") // A dash only. Only refresh later.
-             : style.createCitationMarker(citations,
-                                          citationType.inParenthesis(),
-                                          NonUniqueCitationMarker.FORGIVEN));
+        OOText citeText = null;
+        if (style.isNumberEntries()) {
+            citeText = OOText.fromString("[-]"); // A dash only. Only refresh later.
+        } else {
+            citeText = style.createCitationMarker(citations,
+                                                  citationType.inParenthesis(),
+                                                  NonUniqueCitationMarker.FORGIVEN);
+        }
 
-        if ("".equals(OOText.toString(citeText))) {
+        if (StringUtil.isBlank(OOText.toString(citeText))) {
             citeText = OOText.fromString("[?]");
         }
 

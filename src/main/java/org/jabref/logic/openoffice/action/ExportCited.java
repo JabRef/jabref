@@ -52,8 +52,8 @@ public class ExportCited {
         WrappedTargetException {
 
         OOFrontend frontend = new OOFrontend(doc);
-        CitedKeys cks = frontend.citationGroups.getCitedKeysUnordered();
-        cks.lookupInDatabases(databases);
+        CitedKeys citationKeys = frontend.citationGroups.getCitedKeysUnordered();
+        citationKeys.lookupInDatabases(databases);
 
         List<String> unresolvedKeys = new ArrayList<>();
         BibDatabase resultDatabase = new BibDatabase();
@@ -61,13 +61,13 @@ public class ExportCited {
         List<BibEntry> entriesToInsert = new ArrayList<>();
         Set<String> seen = new HashSet<>(); // Only add crossReference once.
 
-        for (CitedKey ck : cks.values()) {
-            if (ck.getLookupResult().isEmpty()) {
-                unresolvedKeys.add(ck.citationKey);
+        for (CitedKey citation : citationKeys.values()) {
+            if (citation.getLookupResult().isEmpty()) {
+                unresolvedKeys.add(citation.citationKey);
                 continue;
             } else {
-                BibEntry entry = ck.getLookupResult().get().entry;
-                BibDatabase loopDatabase = ck.getLookupResult().get().database;
+                BibEntry entry = citation.getLookupResult().get().entry;
+                BibDatabase loopDatabase = citation.getLookupResult().get().database;
 
                 // If entry found
                 BibEntry clonedEntry = (BibEntry) entry.clone();
