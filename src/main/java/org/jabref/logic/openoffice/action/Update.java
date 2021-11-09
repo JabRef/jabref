@@ -21,6 +21,8 @@ import com.sun.star.text.XTextDocument;
  */
 public class Update {
 
+    static final boolean USE_LOCK_CONTROLLERS = true;
+    
     private Update() {
         /**/
     }
@@ -41,13 +43,11 @@ public class Update {
         WrappedTargetException,
         com.sun.star.lang.IllegalArgumentException {
 
-        final boolean useLockControllers = true;
-
         frontend.imposeGlobalOrder(doc, fcursor);
         OOProcess.produceCitationMarkers(frontend.citationGroups, databases, style);
 
         try {
-            if (useLockControllers) {
+            if (USE_LOCK_CONTROLLERS) {
                 UnoScreenRefresh.lockControllers(doc);
             }
 
@@ -63,7 +63,7 @@ public class Update {
 
             return frontend.citationGroups.getUnresolvedKeys();
         } finally {
-            if (useLockControllers && UnoScreenRefresh.hasControllersLocked(doc)) {
+            if (USE_LOCK_CONTROLLERS && UnoScreenRefresh.hasControllersLocked(doc)) {
                 UnoScreenRefresh.unlockControllers(doc);
             }
         }

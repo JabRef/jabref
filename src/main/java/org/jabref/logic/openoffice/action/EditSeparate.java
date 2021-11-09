@@ -50,38 +50,38 @@ public class EditSeparate {
         frontend.citationGroups.lookupCitations(databases);
         frontend.citationGroups.imposeLocalOrder(OOProcess.comparatorForMulticite(style));
 
-        List<CitationGroup> cgs = frontend.citationGroups.getCitationGroupsUnordered();
+        List<CitationGroup> groups = frontend.citationGroups.getCitationGroupsUnordered();
 
         try {
             UnoScreenRefresh.lockControllers(doc);
 
-            for (CitationGroup group : cgs) {
+            for (CitationGroup group : groups) {
 
                 XTextRange range1 = (frontend
                                      .getMarkRange(doc, group)
                                      .orElseThrow(IllegalStateException::new));
                 XTextCursor textCursor = range1.getText().createTextCursorByRange(range1);
 
-                List<Citation> cits = group.citationsInStorageOrder;
-                if (cits.size() <= 1) {
+                List<Citation> citations = group.citationsInStorageOrder;
+                if (citations.size() <= 1) {
                     continue;
                 }
 
                 frontend.removeCitationGroup(group, doc);
-                // Now we own the content of cits
+                // Now we own the content of citations
 
                 // Create a citation group for each citation.
-                final int last = cits.size() - 1;
-                for (int i = 0; i < cits.size(); i++) {
+                final int last = citations.size() - 1;
+                for (int i = 0; i < citations.size(); i++) {
                     boolean insertSpaceAfter = (i != last);
-                    Citation cit = cits.get(i);
+                    Citation citation = citations.get(i);
 
                     UpdateCitationMarkers.createAndFillCitationGroup(frontend,
                                                                      doc,
-                                                                     List.of(cit.citationKey),
-                                                                     List.of(cit.getPageInfo()),
+                                                                     List.of(citation.citationKey),
+                                                                     List.of(citation.getPageInfo()),
                                                                      group.citationType,
-                                                                     OOText.fromString(cit.citationKey),
+                                                                     OOText.fromString(citation.citationKey),
                                                                      textCursor,
                                                                      style,
                                                                      insertSpaceAfter);
