@@ -152,15 +152,14 @@ public class DOI implements Identifier {
     public static Optional<DOI> parse(String doi) {
         try {
             String cleanedDOI = doi.trim();
-            cleanedDOI = doi.replaceAll(" ", "");
-
+            cleanedDOI = cleanedDOI.replaceAll("\\s+",""); // remove white space
             // https://howtodoinjava.com/java/regex/java-clean-ascii-text-non-printable-chars/
-            // strips off all non-ASCII characters
-            cleanedDOI = cleanedDOI.replaceAll("[^\\x00-\\x7F]", "");
-            // erases all the ASCII control characters
-            cleanedDOI = cleanedDOI.replaceAll("[\\p{Cntrl}&&[^\r\n\t]]", "");
-            // removes non-printable characters from Unicode
-            cleanedDOI = cleanedDOI.replaceAll("\\p{C}", "");
+            String pattern = "["
+                            +"^\\x00-\\x7F" // strips off all non-ASCII characters
+                            +"\\p{Cntrl}&&[^\r\n\t]" // erases all the ASCII control characters
+                            +"\\p{C}" // removes non-printable characters from Unicode
+                            +"]";
+            cleanedDOI = cleanedDOI.replaceAll(pattern,"");
 
             return Optional.of(new DOI(cleanedDOI));
         } catch (IllegalArgumentException | NullPointerException e) {
