@@ -20,6 +20,7 @@ on:
   schedule:
     # run on each Wednesday
     - cron: '2 3 * * 3'
+  workflow_dispatch:
 
 env:
   SpringerNatureAPIKey: ${{ secrets.SPRINGERNATUREAPIKEY_FOR_TESTS }}
@@ -38,15 +39,7 @@ jobs:
         with:
           java-version: 16
           distribution: 'adopt'
-      - uses: actions/cache@v2
-        name: Restore gradle cache
-        with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle-
+          cache: 'gradle'
       - name: Run fetcher tests
         run: ./gradlew fetcherTest
         env:

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" demote-non-dropping-particle="sort-only" page-range-format="expanded" default-locale="en-US">
+<style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" demote-non-dropping-particle="sort-only" page-range-format="expanded" initialize-with-hyphen="false" default-locale="en-US">
   <info>
     <title>American Medical Association 11th edition (sorted alphabetically)</title>
     <title-short>AMA (11th ed.)</title-short>
@@ -27,12 +27,13 @@
     <category citation-format="numeric"/>
     <category field="medicine"/>
     <summary>The American Medical Association style as used in JAMA, with alphabetically sorted bibliography. Version 11 as per November-2019.</summary>
-    <updated>2020-04-23T13:38:04+00:00</updated>
+    <updated>2021-10-28T13:38:04+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="en">
     <terms>
-      <term name="page-range-delimiter">-</term>
+      <term name="page-range-delimiter">-</term>      
+      <term name="presented at">presented at</term>
     </terms>
   </locale>
   <macro name="editor">

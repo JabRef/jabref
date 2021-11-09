@@ -2,6 +2,7 @@ package org.jabref.logic.importer.util;
 
 import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.EnumSet;
 import java.util.List;
 
 import javafx.scene.paint.Color;
@@ -17,8 +18,10 @@ import org.jabref.model.groups.AutomaticPersonsGroup;
 import org.jabref.model.groups.ExplicitGroup;
 import org.jabref.model.groups.GroupHierarchyType;
 import org.jabref.model.groups.GroupTreeNode;
+import org.jabref.model.groups.SearchGroup;
 import org.jabref.model.groups.TexGroup;
 import org.jabref.model.metadata.MetaData;
+import org.jabref.model.search.rules.SearchRules;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
 
@@ -129,5 +132,13 @@ class GroupsParserTest {
     @Test
     void fromStringUnknownGroupThrowsException() throws Exception {
         assertThrows(ParseException.class, () -> GroupsParser.fromString("0 UnknownGroup:myUnknownGroup;0;;1;;;;", ',', fileMonitor, metaData));
+    }
+
+    @Test
+    void fromStringParsesSearchGroup() throws Exception {
+        SearchGroup expected = new SearchGroup("Data", GroupHierarchyType.INCLUDING, "project=data|number|quant*", EnumSet.of(SearchRules.SearchFlags.REGULAR_EXPRESSION));
+        AbstractGroup parsed = GroupsParser.fromString("SearchGroup:Data;2;project=data|number|quant*;0;1;1;;;;;", ',', fileMonitor, metaData);
+        assertEquals(expected, parsed);
+
     }
 }

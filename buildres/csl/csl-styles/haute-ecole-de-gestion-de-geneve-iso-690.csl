@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" demote-non-dropping-particle="never">
   <info>
-    <title>Haute école de gestion de Genève - ISO-690</title>
+    <title>Haute école de gestion de Genève - ISO 690</title>
     <title-short>HEG Genève - ISO 690</title-short>
     <id>http://www.zotero.org/styles/haute-ecole-de-gestion-de-geneve-iso-690</id>
     <link href="http://www.zotero.org/styles/haute-ecole-de-gestion-de-geneve-iso-690" rel="self"/>
@@ -17,7 +17,7 @@
     </contributor>
     <category citation-format="author-date"/>
     <category field="generic-base"/>
-    <updated>2021-01-05T15:00:00+00:00</updated>
+    <updated>2021-10-16T18:00:00+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <macro name="editor">
@@ -333,217 +333,191 @@
     <layout>
       <choose>
         <if type="book map" match="any">
-          <group display="block">
-            <text macro="responsability" suffix=". "/>
-            <choose>
-              <if variable="author editor translator" match="any">
-                <text macro="title" suffix=". "/>
-              </if>
-            </choose>
-            <text macro="genre" suffix=". "/>
-            <text macro="edition" suffix=". "/>
-            <text macro="publisher-group" suffix=". "/>
-            <text macro="accessed" suffix=". "/>
-            <text macro="collection" suffix=". "/>
-            <text macro="isbn" suffix=". "/>
-            <text macro="url"/>
-          </group>
+          <text macro="responsability" suffix=". "/>
+          <choose>
+            <if variable="author editor translator" match="any">
+              <text macro="title" suffix=". "/>
+            </if>
+          </choose>
+          <text macro="genre" suffix=". "/>
+          <text macro="edition" suffix=". "/>
+          <text macro="publisher-group" suffix=". "/>
+          <text macro="accessed" suffix=". "/>
+          <text macro="collection" suffix=". "/>
+          <text macro="isbn" suffix=". "/>
+          <text macro="url"/>
         </if>
         <else-if type="article-journal article-magazine" match="any">
-          <group display="block">
-            <text macro="responsability" suffix=". "/>
-            <choose>
-              <if variable="author editor translator" match="any">
-                <text macro="title" suffix=". "/>
-              </if>
-            </choose>
-            <text macro="edition" suffix=". "/>
-            <text macro="date" suffix=". "/>
-            <text macro="issue" suffix=". "/>
-            <text macro="accessed" suffix=". "/>
-            <text macro="doi" suffix=". "/>
-            <text macro="url"/>
-          </group>
+          <text macro="responsability" suffix=". "/>
+          <choose>
+            <if variable="author editor translator" match="any">
+              <text macro="title" suffix=". "/>
+            </if>
+          </choose>
+          <text macro="edition" suffix=". "/>
+          <text macro="date" suffix=". "/>
+          <text macro="issue" suffix=". "/>
+          <text macro="accessed" suffix=". "/>
+          <text macro="doi" suffix=". "/>
+          <text macro="url"/>
         </else-if>
         <else-if type="article-newspaper">
-          <group display="block">
-            <text macro="responsability" suffix=". "/>
-            <choose>
-              <if variable="author editor translator" match="any">
-                <text macro="title" suffix=". "/>
-              </if>
-            </choose>
-            <text macro="edition" suffix=". "/>
-            <text macro="publisher-group" suffix=", "/>
-            <text macro="date" suffix=". "/>
-            <text macro="page" suffix=". "/>
-            <text macro="accessed" suffix=". "/>
-            <text macro="url"/>
-          </group>
+          <text macro="responsability" suffix=". "/>
+          <choose>
+            <if variable="author editor translator" match="any">
+              <text macro="title" suffix=". "/>
+            </if>
+          </choose>
+          <text macro="edition" suffix=". "/>
+          <text macro="publisher-group" suffix=", "/>
+          <text macro="date" suffix=". "/>
+          <text macro="page" suffix=". "/>
+          <text macro="accessed" suffix=". "/>
+          <text macro="url"/>
         </else-if>
         <else-if type="chapter entry entry-dictionary entry-encyclopedia" match="any">
-          <group display="block">
-            <text macro="responsability" suffix=". "/>
-            <choose>
-              <if variable="author editor translator" match="any">
-                <text macro="title" suffix=". "/>
-              </if>
-            </choose>
-            <text macro="edition" suffix=". "/>
-            <text macro="publisher-group" suffix=". "/>
-            <text macro="page" suffix=". "/>
-            <text macro="collection" suffix=". "/>
-            <text macro="accessed" suffix=". "/>
-            <text macro="isbn" suffix=". "/>
-            <text macro="url"/>
-          </group>
+          <text macro="responsability" suffix=". "/>
+          <choose>
+            <if variable="author editor translator" match="any">
+              <text macro="title" suffix=". "/>
+            </if>
+          </choose>
+          <text macro="edition" suffix=". "/>
+          <text macro="publisher-group" suffix=". "/>
+          <text macro="page" suffix=". "/>
+          <text macro="collection" suffix=". "/>
+          <text macro="accessed" suffix=". "/>
+          <text macro="isbn" suffix=". "/>
+          <text macro="url"/>
         </else-if>
         <else-if type="speech">
-          <group display="block">
-            <text macro="responsability" suffix=". "/>
-            <choose>
-              <if variable="author editor translator" match="any">
-                <text macro="title" suffix=". "/>
-              </if>
-            </choose>
-            <text macro="genre" suffix=". "/>
-            <text macro="publisher-group" suffix=". "/>
-            <text macro="date" suffix=". "/>
-            <text macro="accessed" suffix=". "/>
-            <text macro="page" suffix=". "/>
-            <text macro="url"/>
-          </group>
+          <text macro="responsability" suffix=". "/>
+          <choose>
+            <if variable="author editor translator" match="any">
+              <text macro="title" suffix=". "/>
+            </if>
+          </choose>
+          <text macro="genre" suffix=". "/>
+          <text macro="publisher-group" suffix=". "/>
+          <text macro="date" suffix=". "/>
+          <text macro="accessed" suffix=". "/>
+          <text macro="page" suffix=". "/>
+          <text macro="url"/>
         </else-if>
         <else-if type="paper-conference">
-          <group display="block">
-            <text macro="responsability" suffix=". "/>
-            <choose>
-              <if variable="author editor translator" match="any">
-                <text macro="title" suffix=". "/>
-              </if>
-            </choose>
-            <text macro="genre" suffix=". "/>
-            <text macro="publisher-group" suffix=". "/>
-            <text macro="date" suffix=". "/>
-            <text macro="page" suffix=". "/>
-            <text macro="accessed" suffix=". "/>
-            <text macro="collection" suffix=". "/>
-            <text macro="isbn" suffix=". "/>
-            <text macro="url"/>
-          </group>
+          <text macro="responsability" suffix=". "/>
+          <choose>
+            <if variable="author editor translator" match="any">
+              <text macro="title" suffix=". "/>
+            </if>
+          </choose>
+          <text macro="genre" suffix=". "/>
+          <text macro="publisher-group" suffix=". "/>
+          <text macro="date" suffix=". "/>
+          <text macro="page" suffix=". "/>
+          <text macro="accessed" suffix=". "/>
+          <text macro="collection" suffix=". "/>
+          <text macro="isbn" suffix=". "/>
+          <text macro="url"/>
         </else-if>
         <else-if type="thesis">
-          <group display="block">
-            <text macro="responsability" suffix=". "/>
-            <choose>
-              <if variable="author editor translator" match="any">
-                <text macro="title" suffix=". "/>
-              </if>
-            </choose>
-            <text macro="genre" suffix=". "/>
-            <text macro="publisher-group" suffix=". "/>
-            <text macro="accessed" suffix=". "/>
-            <text macro="url"/>
-          </group>
+          <text macro="responsability" suffix=". "/>
+          <choose>
+            <if variable="author editor translator" match="any">
+              <text macro="title" suffix=". "/>
+            </if>
+          </choose>
+          <text macro="genre" suffix=". "/>
+          <text macro="publisher-group" suffix=". "/>
+          <text macro="accessed" suffix=". "/>
+          <text macro="url"/>
         </else-if>
         <else-if type="post-weblog post webpage" match="any">
-          <group display="block">
-            <text macro="responsability" suffix=". "/>
-            <choose>
-              <if variable="author editor translator" match="any">
-                <text macro="title" suffix=". "/>
-              </if>
-            </choose>
-            <text macro="date" suffix=". "/>
-            <text macro="accessed" suffix=". "/>
-            <text macro="url"/>
-          </group>
+          <text macro="responsability" suffix=". "/>
+          <choose>
+            <if variable="author editor translator" match="any">
+              <text macro="title" suffix=". "/>
+            </if>
+          </choose>
+          <text macro="date" suffix=". "/>
+          <text macro="accessed" suffix=". "/>
+          <text macro="url"/>
         </else-if>
         <else-if type="broadcast motion_picture song" match="any">
-          <group display="block">
-            <text macro="responsability" suffix=". "/>
-            <choose>
-              <if variable="author editor translator" match="any">
-                <text macro="title" suffix=". "/>
-              </if>
-            </choose>
-            <text macro="medium" suffix=". "/>
-            <text macro="publisher-group" suffix=", "/>
-            <text macro="date" suffix=". "/>
-            <text macro="accessed" suffix=". "/>
-            <text macro="collection" suffix=". "/>
-            <text macro="isbn" suffix=". "/>
-            <text macro="url"/>
-          </group>
+          <text macro="responsability" suffix=". "/>
+          <choose>
+            <if variable="author editor translator" match="any">
+              <text macro="title" suffix=". "/>
+            </if>
+          </choose>
+          <text macro="medium" suffix=". "/>
+          <text macro="publisher-group" suffix=", "/>
+          <text macro="date" suffix=". "/>
+          <text macro="accessed" suffix=". "/>
+          <text macro="collection" suffix=". "/>
+          <text macro="isbn" suffix=". "/>
+          <text macro="url"/>
         </else-if>
         <else-if type="report">
-          <group display="block">
-            <text macro="responsability" suffix=". "/>
-            <choose>
-              <if variable="author editor translator" match="any">
-                <text macro="title" suffix=". "/>
-              </if>
-            </choose>
-            <text macro="genre" suffix=". "/>
-            <text macro="edition" suffix=". "/>
-            <text macro="publisher-group" suffix=". "/>
-            <text macro="accessed" suffix=". "/>
-            <text macro="collection" suffix=". "/>
-            <text macro="url"/>
-          </group>
+          <text macro="responsability" suffix=". "/>
+          <choose>
+            <if variable="author editor translator" match="any">
+              <text macro="title" suffix=". "/>
+            </if>
+          </choose>
+          <text macro="genre" suffix=". "/>
+          <text macro="edition" suffix=". "/>
+          <text macro="publisher-group" suffix=". "/>
+          <text macro="accessed" suffix=". "/>
+          <text macro="collection" suffix=". "/>
+          <text macro="url"/>
         </else-if>
         <else-if type="manuscript">
-          <group display="block">
-            <text macro="responsability" suffix=". "/>
-            <choose>
-              <if variable="author editor translator" match="any">
-                <text macro="title" suffix=". "/>
-              </if>
-            </choose>
-            <text macro="genre" suffix=". "/>
-            <text macro="edition" suffix=". "/>
-            <text macro="publisher-group" suffix=". "/>
-            <text macro="accessed" suffix=". "/>
-            <text macro="collection" suffix=". "/>
-            <text macro="url"/>
-          </group>
+          <text macro="responsability" suffix=". "/>
+          <choose>
+            <if variable="author editor translator" match="any">
+              <text macro="title" suffix=". "/>
+            </if>
+          </choose>
+          <text macro="genre" suffix=". "/>
+          <text macro="edition" suffix=". "/>
+          <text macro="publisher-group" suffix=". "/>
+          <text macro="accessed" suffix=". "/>
+          <text macro="collection" suffix=". "/>
+          <text macro="url"/>
         </else-if>
         <else-if type="patent">
-          <group display="block">
-            <text macro="responsability" suffix=". "/>
-            <choose>
-              <if variable="author editor translator" match="any">
-                <text macro="title" suffix=". "/>
-              </if>
-            </choose>
-            <text macro="number" suffix=". "/>
-            <text macro="date" suffix=". "/>
-            <text macro="publisher-group" suffix=". "/>
-            <text macro="accessed" suffix=". "/>
-            <text macro="collection" suffix=". "/>
-            <text macro="url"/>
-          </group>
+          <text macro="responsability" suffix=". "/>
+          <choose>
+            <if variable="author editor translator" match="any">
+              <text macro="title" suffix=". "/>
+            </if>
+          </choose>
+          <text macro="number" suffix=". "/>
+          <text macro="date" suffix=". "/>
+          <text macro="publisher-group" suffix=". "/>
+          <text macro="accessed" suffix=". "/>
+          <text macro="collection" suffix=". "/>
+          <text macro="url"/>
         </else-if>
         <else>
-          <group display="block">
-            <text macro="responsability" suffix=". "/>
-            <choose>
-              <if variable="author editor translator" match="any">
-                <text macro="title" suffix=". "/>
-              </if>
-            </choose>
-            <text macro="medium" suffix=". "/>
-            <text macro="genre" suffix=". "/>
-            <text macro="date" suffix=". "/>
-            <text macro="edition" suffix=". "/>
-            <text macro="publisher-group" suffix=". "/>
-            <text macro="number" suffix=". "/>
-            <text macro="accessed" suffix=". "/>
-            <text macro="collection" suffix=". "/>
-            <text macro="page" suffix=". "/>
-            <text macro="isbn" suffix=". "/>
-            <text macro="url"/>
-          </group>
+          <text macro="responsability" suffix=". "/>
+          <choose>
+            <if variable="author editor translator" match="any">
+              <text macro="title" suffix=". "/>
+            </if>
+          </choose>
+          <text macro="medium" suffix=". "/>
+          <text macro="genre" suffix=". "/>
+          <text macro="date" suffix=". "/>
+          <text macro="edition" suffix=". "/>
+          <text macro="publisher-group" suffix=". "/>
+          <text macro="number" suffix=". "/>
+          <text macro="accessed" suffix=". "/>
+          <text macro="collection" suffix=". "/>
+          <text macro="page" suffix=". "/>
+          <text macro="isbn" suffix=". "/>
+          <text macro="url"/>
         </else>
       </choose>
       <group display="right-inline">

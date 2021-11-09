@@ -1,6 +1,7 @@
 package org.jabref.gui.preferences.linkedfiles;
 
 import java.nio.file.Files;
+import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 
 import javafx.beans.property.BooleanProperty;
@@ -27,13 +28,12 @@ import de.saxsys.mvvmfx.utils.validation.Validator;
 public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
 
     private final StringProperty mainFileDirectoryProperty = new SimpleStringProperty("");
+    private final BooleanProperty useMainFileDirectoryProperty = new SimpleBooleanProperty();
     private final BooleanProperty useBibLocationAsPrimaryProperty = new SimpleBooleanProperty();
     private final BooleanProperty autolinkFileStartsBibtexProperty = new SimpleBooleanProperty();
     private final BooleanProperty autolinkFileExactBibtexProperty = new SimpleBooleanProperty();
     private final BooleanProperty autolinkUseRegexProperty = new SimpleBooleanProperty();
     private final StringProperty autolinkRegexKeyProperty = new SimpleStringProperty("");
-    private final BooleanProperty searchFilesOnOpenProperty = new SimpleBooleanProperty();
-    private final BooleanProperty openBrowseOnCreateProperty = new SimpleBooleanProperty();
     private final ListProperty<String> defaultFileNamePatternsProperty =
             new SimpleListProperty<>(FXCollections.observableArrayList(FilePreferences.DEFAULT_FILENAME_PATTERNS));
     private final StringProperty fileNamePatternProperty = new SimpleStringProperty();
@@ -43,20 +43,24 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
 
     private final DialogService dialogService;
     private final PreferencesService preferences;
-    private final FilePreferences initialFilePreferences;
+    private final FilePreferences filePreferences;
     private final AutoLinkPreferences initialAutoLinkPreferences;
 
     public LinkedFilesTabViewModel(DialogService dialogService, PreferencesService preferences) {
         this.dialogService = dialogService;
         this.preferences = preferences;
-        this.initialFilePreferences = preferences.getFilePreferences();
+        this.filePreferences = preferences.getFilePreferences();
         this.initialAutoLinkPreferences = preferences.getAutoLinkPreferences();
 
         mainFileDirValidator = new FunctionBasedValidator<>(
                 mainFileDirectoryProperty,
                 input -> {
-                    Path path = Path.of(mainFileDirectoryProperty.getValue());
-                    return (Files.exists(path) && Files.isDirectory(path));
+                    try {
+                        Path path = Path.of(mainFileDirectoryProperty.getValue());
+                        return (Files.exists(path) && Files.isDirectory(path));
+                    } catch (InvalidPathException ex) {
+                        return false;
+                    }
                 },
                 ValidationMessage.error(String.format("%s > %s > %s %n %n %s",
                         Localization.lang("File"),
@@ -71,12 +75,11 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
     @Override
     public void setValues() {
         // External files preferences / Attached files preferences / File preferences
-        mainFileDirectoryProperty.setValue(initialFilePreferences.getFileDirectory().orElse(Path.of("")).toString());
-        useBibLocationAsPrimaryProperty.setValue(initialFilePreferences.shouldStoreFilesRelativeToBib());
-        searchFilesOnOpenProperty.setValue(initialFilePreferences.shouldSearchFilesOnOpen());
-        openBrowseOnCreateProperty.setValue(initialFilePreferences.shouldOpenBrowseOnCreate());
-        fileNamePatternProperty.setValue(initialFilePreferences.getFileNamePattern());
-        fileDirectoryPatternProperty.setValue(initialFilePreferences.getFileDirectoryPattern());
+        mainFileDirectoryProperty.setValue(filePreferences.getFileDirectory().orElse(Path.of("")).toString());
+        useMainFileDirectoryProperty.setValue(!filePreferences.shouldStoreFilesRelativeToBibFile());
+        useBibLocationAsPrimaryProperty.setValue(filePreferences.shouldStoreFilesRelativeToBibFile());
+        fileNamePatternProperty.setValue(filePreferences.getFileNamePattern());
+        fileDirectoryPatternProperty.setValue(filePreferences.getFileDirectoryPattern());
 
         // Autolink preferences
         switch (initialAutoLinkPreferences.getCitationKeyDependency()) {
@@ -91,29 +94,22 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
     @Override
     public void storeSettings() {
         // External files preferences / Attached files preferences / File preferences
-        preferences.storeFilePreferences(new FilePreferences(
-                initialFilePreferences.getUser(),
-                mainFileDirectoryProperty.getValue(),
-                useBibLocationAsPrimaryProperty.getValue(),
-                fileNamePatternProperty.getValue(),
-                fileDirectoryPatternProperty.getValue(),
-                initialFilePreferences.shouldDownloadLinkedFiles(), // set in ImportEntriesViewModel
-                searchFilesOnOpenProperty.getValue(),
-                openBrowseOnCreateProperty.getValue()));
+        filePreferences.setMainFileDirectory(mainFileDirectoryProperty.getValue());
+        filePreferences.setStoreFilesRelativeToBibFile(useBibLocationAsPrimaryProperty.getValue());
+        filePreferences.setFileNamePattern(fileNamePatternProperty.getValue());
+        filePreferences.setFileDirectoryPattern(fileDirectoryPatternProperty.getValue());
+        filePreferences.setDownloadLinkedFiles(filePreferences.shouldDownloadLinkedFiles()); // set in ImportEntriesViewModel
 
         // Autolink preferences
-        AutoLinkPreferences.CitationKeyDependency citationKeyDependency = AutoLinkPreferences.CitationKeyDependency.START;
-        if (autolinkFileExactBibtexProperty.getValue()) {
-            citationKeyDependency = AutoLinkPreferences.CitationKeyDependency.EXACT;
+        if (autolinkFileStartsBibtexProperty.getValue()) {
+            preferences.getAutoLinkPreferences().setCitationKeyDependency(AutoLinkPreferences.CitationKeyDependency.START);
+        } else if (autolinkFileExactBibtexProperty.getValue()) {
+            preferences.getAutoLinkPreferences().setCitationKeyDependency(AutoLinkPreferences.CitationKeyDependency.EXACT);
         } else if (autolinkUseRegexProperty.getValue()) {
-            citationKeyDependency = AutoLinkPreferences.CitationKeyDependency.REGEX;
+            preferences.getAutoLinkPreferences().setCitationKeyDependency(AutoLinkPreferences.CitationKeyDependency.REGEX);
         }
 
-        preferences.storeAutoLinkPreferences(new AutoLinkPreferences(
-                citationKeyDependency,
-                autolinkRegexKeyProperty.getValue(),
-                initialAutoLinkPreferences.shouldAskAutoNamingPdfs(),
-                preferences.getKeywordDelimiter()));
+        preferences.getAutoLinkPreferences().setRegularExpression(autolinkRegexKeyProperty.getValue());
     }
 
     ValidationStatus mainFileDirValidationStatus() {
@@ -139,7 +135,6 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
     }
 
     // External file links
-
     public StringProperty mainFileDirectoryProperty() {
         return mainFileDirectoryProperty;
     }
@@ -164,14 +159,6 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
         return autolinkRegexKeyProperty;
     }
 
-    public BooleanProperty searchFilesOnOpenProperty() {
-        return searchFilesOnOpenProperty;
-    }
-
-    public BooleanProperty openBrowseOnCreateProperty() {
-        return openBrowseOnCreateProperty;
-    }
-
     public ListProperty<String> defaultFileNamePatternsProperty() {
         return defaultFileNamePatternsProperty;
     }
@@ -182,6 +169,10 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
 
     public StringProperty fileDirectoryPatternProperty() {
         return fileDirectoryPatternProperty;
+    }
+
+    public BooleanProperty useMainFileDirectoryProperty() {
+        return useMainFileDirectoryProperty;
     }
 }
 

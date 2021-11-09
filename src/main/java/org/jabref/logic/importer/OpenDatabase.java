@@ -11,6 +11,7 @@ import org.jabref.migrations.ConvertMarkingToGroups;
 import org.jabref.migrations.PostOpenMigration;
 import org.jabref.migrations.SpecialFieldsToSeparateFields;
 import org.jabref.model.util.FileUpdateMonitor;
+import org.jabref.preferences.GeneralPreferences;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,10 +29,10 @@ public class OpenDatabase {
      * @param fileToOpen Name of the BIB-file to open
      * @return ParserResult which never is null
      */
-    public static ParserResult loadDatabase(Path fileToOpen, ImportFormatPreferences importFormatPreferences, FileUpdateMonitor fileMonitor)
+    public static ParserResult loadDatabase(Path fileToOpen, GeneralPreferences generalPreferences, ImportFormatPreferences importFormatPreferences, FileUpdateMonitor fileMonitor)
             throws IOException {
         ParserResult result = new BibtexImporter(importFormatPreferences, fileMonitor).importDatabase(fileToOpen,
-                importFormatPreferences.getEncoding());
+                generalPreferences.getDefaultEncoding());
 
         performLoadDatabaseMigrations(result, importFormatPreferences.getKeywordSeparator());
 

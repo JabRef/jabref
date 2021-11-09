@@ -54,7 +54,6 @@ public class MainTableDataModel {
         // We need to wrap the list since otherwise sorting in the table does not work
         entriesSorted = new SortedList<>(entriesFiltered);
         groupViewMode = preferencesService.getGroupViewMode();
-
     }
 
     private boolean isMatched(ObservableList<GroupTreeNode> groups, Optional<SearchQuery> query, BibEntryTableViewModel entry) {

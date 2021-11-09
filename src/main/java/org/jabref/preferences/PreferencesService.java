@@ -1,6 +1,5 @@
 package org.jabref.preferences;
 
-import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
@@ -68,8 +67,6 @@ public interface PreferencesService {
 
     FilePreferences getFilePreferences();
 
-    void storeFilePreferences(FilePreferences filePreferences);
-
     FieldWriterPreferences getFieldWriterPreferences();
 
     FileHistory getFileHistory();
@@ -97,8 +94,6 @@ public interface PreferencesService {
     SavePreferences getSavePreferencesForExport();
 
     SavePreferences getSavePreferences();
-
-    Charset getDefaultEncoding();
 
     String getUser();
 
@@ -138,8 +133,6 @@ public interface PreferencesService {
     Language getLanguage();
 
     void setLanguage(Language language);
-
-    BibDatabaseMode getDefaultBibDatabaseMode();
 
     GeneralPreferences getGeneralPreferences();
 
@@ -183,11 +176,7 @@ public interface PreferencesService {
 
     RemotePreferences getRemotePreferences();
 
-    void storeRemotePreferences(RemotePreferences remotePreferences);
-
     ProxyPreferences getProxyPreferences();
-
-    void storeProxyPreferences(ProxyPreferences proxyPreferences);
 
     //*************************************************************************************************************
     // CitationKeyPatternPreferences
@@ -251,11 +240,7 @@ public interface PreferencesService {
 
     NewLineSeparator getNewLineSeparator();
 
-    void storeNewLineSeparator(NewLineSeparator newLineSeparator);
-
     AutoLinkPreferences getAutoLinkPreferences();
-
-    void storeAutoLinkPreferences(AutoLinkPreferences autoLinkPreferences);
 
     boolean shouldAutosave();
 
@@ -270,8 +255,6 @@ public interface PreferencesService {
     //*************************************************************************************************************
 
     ImportExportPreferences getImportExportPreferences();
-
-    void storeImportExportPreferences(ImportExportPreferences preferences);
 
     List<TemplateExporter> getCustomExportFormats(JournalAbbreviationRepository repository);
 
@@ -299,20 +282,23 @@ public interface PreferencesService {
 
     SidePanePreferences getSidePanePreferences();
 
-    void storeSidePanePreferences(SidePanePreferences sidePanePreferences);
-
     //*************************************************************************************************************
     // GuiPreferences
     //*************************************************************************************************************
 
     GuiPreferences getGuiPreferences();
 
-    void storeGuiPreferences(GuiPreferences guiPreferences);
-
     void clearEditedFiles();
 
+    /**
+     * Gets the directory for file browsing dialogs. This ensures that each browse dialog starts in the last visited
+     * browse directory.
+     */
     Path getWorkingDir();
 
+    /**
+     * Stores the directory for file browsing dialogs
+     */
     void setWorkingDirectory(Path dir);
 
     //*************************************************************************************************************
@@ -336,8 +322,6 @@ public interface PreferencesService {
     void storeSpecialFieldsPreferences(SpecialFieldsPreferences specialFieldsPreferences);
 
     SearchPreferences getSearchPreferences();
-
-    void storeSearchPreferences(SearchPreferences preferences);
 
     String getLastPreferencesExportPath();
 

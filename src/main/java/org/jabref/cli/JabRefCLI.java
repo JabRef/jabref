@@ -19,7 +19,7 @@ public class JabRefCLI {
     private static final int WIDTH = 100; // Number of characters per line
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefCLI.class);
     private final CommandLine cl;
-    private List<String> leftOver;
+    private final List<String> leftOver;
 
     public JabRefCLI(String[] args) throws ParseException {
         Options options = getOptions();
@@ -271,7 +271,7 @@ public class JabRefCLI {
         options.addOption(Option
                 .builder()
                 .longOpt("embeddBibfileInPdf")
-                .desc(String.format("%s: '%s'", Localization.lang("Embedd BibTeXEntry in PDF."), "-w pathToMyOwnPaper.pdf"))
+                .desc(String.format("%s: '%s'", Localization.lang("Embed BibTeXEntry in PDF."), "-w pathToMyOwnPaper.pdf"))
                 .hasArg()
                 .argName("CITEKEY1[,CITEKEY2][,CITEKEYn] | PDF1[,PDF2][,PDFn] | all")
                 .build());

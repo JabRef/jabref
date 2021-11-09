@@ -17,6 +17,7 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
+import javafx.collections.transformation.FilteredList;
 import javafx.scene.control.MultipleSelectionModel;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.DragEvent;
@@ -83,7 +84,9 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
     private final CustomLocalDragboard localDragboard;
     private ListProperty<PreviewLayout> dragSourceList = null;
     private ObjectProperty<MultipleSelectionModel<PreviewLayout>> dragSourceSelectionModel = null;
-    private List<String> restartWarning = new ArrayList<>();
+    private final List<String> restartWarning = new ArrayList<>();
+
+    private final FilteredList<PreviewLayout> filteredPreviews = new FilteredList<>(this.availableListProperty());
 
     public PreviewTabViewModel(DialogService dialogService, PreferencesService preferences, TaskExecutor taskExecutor, StateManager stateManager) {
         this.dialogService = dialogService;
@@ -91,13 +94,6 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
         this.taskExecutor = taskExecutor;
         this.localDragboard = stateManager.getLocalDragboard();
         initialPreviewPreferences = preferences.getPreviewPreferences();
-
-        sourceTextProperty.addListener((observable, oldValue, newValue) -> {
-            var currentLayout = getCurrentLayout();
-            if (currentLayout instanceof TextBasedPreviewLayout) {
-                ((TextBasedPreviewLayout) currentLayout).setText(sourceTextProperty.getValue().replace("\n", "__NEWLINE__"));
-            }
-        });
 
         chosenListValidator = new FunctionBasedValidator<>(
                 chosenListProperty,
@@ -109,6 +105,7 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
                         )
                 )
         );
+
     }
 
     public BooleanProperty showAsExtraTabProperty() {
@@ -173,24 +170,6 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
                                     .orElse(chosenListProperty.getValue().stream().filter(layout -> layout.getName().equals(name))
                                                               .findAny()
                                                               .orElse(null));
-    }
-
-    private PreviewLayout getCurrentLayout() {
-        if (!chosenSelectionModelProperty.getValue().getSelectedItems().isEmpty()) {
-            return chosenSelectionModelProperty.getValue().getSelectedItems().get(0);
-
-        }
-
-        if (!chosenListProperty.getValue().isEmpty()) {
-            return chosenListProperty.getValue().get(0);
-        }
-
-        PreviewLayout layout = findLayoutByName(TextBasedPreviewLayout.NAME);
-        if (layout == null) {
-            layout = initialPreviewPreferences.getTextBasedPreviewLayout();
-        }
-
-        return layout;
     }
 
     /**
@@ -483,6 +462,10 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
         return success;
     }
 
+    public FilteredList<PreviewLayout> getFilteredPreviews() {
+        return this.filteredPreviews;
+    }
+
     public ListProperty<PreviewLayout> availableListProperty() {
         return availableListProperty;
     }
@@ -509,5 +492,9 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
 
     public StringProperty sourceTextProperty() {
         return sourceTextProperty;
+    }
+
+    public void setFilterPredicate(String searchTerm) {
+        this.filteredPreviews.setPredicate(preview -> searchTerm.isEmpty() || preview.containsCaseIndependent(searchTerm));
     }
 }

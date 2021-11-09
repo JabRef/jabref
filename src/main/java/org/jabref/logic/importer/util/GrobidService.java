@@ -54,7 +54,7 @@ public class GrobidService {
      * Calls the Grobid server for converting the citation into a BibEntry
      *
      * @return A BibEntry for the String
-     * @throws IOException if an I/O excecption during the call ocurred or no BibTeX entry could be determiend
+     * @throws IOException if an I/O exception during the call occurred or no BibTeX entry could be determined
      */
     public Optional<BibEntry> processCitation(String rawCitation, ImportFormatPreferences importFormatPreferences, ConsolidateCitations consolidateCitations) throws IOException, ParseException {
         Connection.Response response = Jsoup.connect(importerPreferences.getGrobidURL() + "/api/processCitation")
