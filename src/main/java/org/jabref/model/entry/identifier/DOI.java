@@ -88,6 +88,14 @@ public class DOI implements Identifier {
     private static final Pattern FIND_SHORT_DOI_SHORTCUT = Pattern.compile(IN_TEXT_SHORT_DOI_SHORTCUT, Pattern.CASE_INSENSITIVE); // eg doi.org/bfrhmx (no "10/")
     private static final Pattern EXACT_SHORT_DOI_PATT = Pattern.compile(SHORT_DOI_EXP_PREFIX + SHORT_DOI_EXP, Pattern.CASE_INSENSITIVE);
     private static final Pattern FIND_SHORT_DOI_PATT = Pattern.compile("(?:https?://[^\\s]+?)?" + FIND_SHORT_DOI_EXP, Pattern.CASE_INSENSITIVE);
+
+    // See https://www.baeldung.com/java-regex-s-splus for explanation of \\s+
+    // See https://stackoverflow.com/questions/3203190/regex-any-ascii-character for the regexp that includes ASCII characters only
+    // Another reference for regexp for ASCII characters: https://howtodoinjava.com/java/regex/java-clean-ascii-text-non-printable-chars/
+    private static final String PARSE_DOI ="[\\s+" // remove white space characters, i.e, \t, \n, \x0B, \f, \r . + is a greedy quantifier
+                                          +"[^\\x00-\\x7F]" // strips off all non-ASCII characters
+                                          +"]";
+
     // DOI
     private final String doi;
     // Short DOI
@@ -151,15 +159,10 @@ public class DOI implements Identifier {
      */
     public static Optional<DOI> parse(String doi) {
         try {
-            String cleanedDOI = doi.trim();
-            cleanedDOI = cleanedDOI.replaceAll("\\s+",""); // remove white space
-            // https://howtodoinjava.com/java/regex/java-clean-ascii-text-non-printable-chars/
-            String pattern = "["
-                            +"^\\x00-\\x7F" // strips off all non-ASCII characters
-                            +"\\p{Cntrl}&&[^\r\n\t]" // erases all the ASCII control characters
-                            +"\\p{C}" // removes non-printable characters from Unicode
-                            +"]";
-            cleanedDOI = cleanedDOI.replaceAll(pattern,"");
+            String cleanedDOI = doi;
+            System.out.println("doi: "+doi);
+            cleanedDOI = cleanedDOI.replaceAll(PARSE_DOI,"");
+            System.out.println("cleanedDOI: "+cleanedDOI);
 
             return Optional.of(new DOI(cleanedDOI));
         } catch (IllegalArgumentException | NullPointerException e) {
