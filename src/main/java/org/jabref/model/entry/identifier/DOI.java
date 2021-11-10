@@ -92,9 +92,9 @@ public class DOI implements Identifier {
     // See https://www.baeldung.com/java-regex-s-splus for explanation of \\s+
     // See https://stackoverflow.com/questions/3203190/regex-any-ascii-character for the regexp that includes ASCII characters only
     // Another reference for regexp for ASCII characters: https://howtodoinjava.com/java/regex/java-clean-ascii-text-non-printable-chars/
-    private static final String PARSE_DOI  = "[\\s+" // remove white space characters, i.e, \t, \n, \x0B, \f, \r . + is a greedy quantifier
-                                           + "[^\\x00-\\x7F]" // strips off all non-ASCII characters
-                                           + "]";
+    private static final String PARSE_DOI = "[\\s+" // remove white space characters, i.e, \t, \n, \x0B, \f, \r . + is a greedy quantifier
+                                          + "[^\\x00-\\x7F]" // strips off all non-ASCII characters
+                                          + "]";
 
     // DOI
     private final String doi;

@@ -121,8 +121,8 @@ public class DOITest {
                 // parse DOI with non-ASCII characters and whitespace
                 Arguments.of("https://doi.org/10/gf4gqc", DOI.parse("�https : \n  ␛ / / doi.org / \t 10 / \r gf4gqc�␛").get().getURIAsASCIIString()),
                 Arguments.of("10/gf4gqc", DOI.parse("�https : \n  ␛ / / doi.org / \t 10 / \r gf4gqc�␛").get().getDOI()),
-                Arguments.of("10/gf4gqc", DOI.parse("10 / gf4gqc").get().getDOI()),
-                Arguments.of("10.3218/3846-0", DOI.parse("�10.3218\n/384␛6-0�").get().getDOI()),
+                Arguments.of("10/gf4gqc", DOI.parse(" 10 / gf4gqc ").get().getDOI()),
+                Arguments.of("10.3218/3846-0", DOI.parse(" �10.3218\n/384␛6-0�").get().getDOI()),
                 // parse already-cleaned DOI
                 Arguments.of("10.3218/3846-0", DOI.parse("10.3218/3846-0").get().getDOI()),
 
