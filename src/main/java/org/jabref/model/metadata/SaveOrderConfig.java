@@ -67,7 +67,7 @@ public class SaveOrderConfig {
         }
 
         try {
-            this.orderType = OrderType.valueOf(data.get(0));
+            this.orderType = OrderType.valueOf(data.get(0).toUpperCase());
         } catch (IllegalArgumentException ex) {
             if (data.size() > 1 && data.size() % 2 == 1) {
                 LOGGER.warn("Could not parse sort order: {} - trying to parse the sort criteria", data.get(0));
