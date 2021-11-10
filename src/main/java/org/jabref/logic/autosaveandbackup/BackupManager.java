@@ -1,6 +1,7 @@
 package org.jabref.logic.autosaveandbackup;
 
 import java.io.IOException;
+import java.io.Writer;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -8,6 +9,7 @@ import java.nio.file.StandardCopyOption;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
+import java.util.StringJoiner;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 
@@ -17,6 +19,7 @@ import org.jabref.logic.exporter.BibtexDatabaseWriter;
 import org.jabref.logic.exporter.SavePreferences;
 import org.jabref.logic.util.CoarseChangeFilter;
 import org.jabref.logic.util.DelayTaskThrottler;
+import org.jabref.logic.util.OS;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.event.BibDatabaseContextChangedEvent;
@@ -135,8 +138,11 @@ public class BackupManager {
             GeneralPreferences generalPreferences = preferences.getGeneralPreferences();
             SavePreferences savePreferences = preferences.getSavePreferences()
                                                          .withMakeBackup(false);
-            new BibtexDatabaseWriter(new AtomicFileWriter(backupPath, charset), generalPreferences, savePreferences, entryTypesManager)
+            Writer writer = new AtomicFileWriter(backupPath, charset);
+            StringJoiner stringJoiner = new StringJoiner(OS.NEWLINE);
+            new BibtexDatabaseWriter(stringJoiner, generalPreferences, savePreferences, entryTypesManager)
                     .saveDatabase(bibDatabaseContext);
+            writer.write(stringJoiner.toString());
         } catch (IOException e) {
             logIfCritical(backupPath, e);
         }

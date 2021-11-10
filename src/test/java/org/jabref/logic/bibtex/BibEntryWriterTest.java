@@ -2,11 +2,11 @@ package org.jabref.logic.bibtex;
 
 import java.io.IOException;
 import java.io.StringReader;
-import java.io.StringWriter;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+import java.util.StringJoiner;
 
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParserResult;
@@ -47,7 +47,7 @@ class BibEntryWriterTest {
 
     @Test
     void testSerialization() throws IOException {
-        StringWriter stringWriter = new StringWriter();
+        StringJoiner stringJoiner = new StringJoiner(OS.NEWLINE);
 
         BibEntry entry = new BibEntry(StandardEntryType.Article);
         // set a required field
@@ -57,9 +57,9 @@ class BibEntryWriterTest {
         entry.setField(StandardField.NUMBER, "1");
         entry.setField(StandardField.NOTE, "some note");
 
-        writer.write(entry, stringWriter, BibDatabaseMode.BIBTEX);
+        writer.write(entry, stringJoiner, BibDatabaseMode.BIBTEX);
 
-        String actual = stringWriter.toString();
+        String actual = stringJoiner.toString();
 
         // @formatter:off
         String expected = OS.NEWLINE + "@Article{," + OS.NEWLINE +
@@ -83,10 +83,10 @@ class BibEntryWriterTest {
         entry.setField(StandardField.COMMENT, "testentry");
         entry.setCitationKey("test");
 
-        // write out bibtex string
-        StringWriter stringWriter = new StringWriter();
-        writer.write(entry, stringWriter, BibDatabaseMode.BIBTEX);
-        String actual = stringWriter.toString();
+        // write out bibtex stringJoiner
+        StringJoiner stringJoiner = new StringJoiner(OS.NEWLINE);
+        writer.write(entry, stringJoiner, BibDatabaseMode.BIBTEX);
+        String actual = stringJoiner.toString();
 
         assertEquals(expected, actual);
     }
@@ -97,20 +97,20 @@ class BibEntryWriterTest {
         LinkedFile file = new LinkedFile("test", Path.of("/home/uers/test.pdf"), "PDF");
         entry.addFile(file);
 
-        StringWriter stringWriter = new StringWriter();
-        writer.write(entry, stringWriter, BibDatabaseMode.BIBTEX);
+        StringJoiner stringJoiner = new StringJoiner(OS.NEWLINE);
+        writer.write(entry, stringJoiner, BibDatabaseMode.BIBTEX);
 
         assertEquals(OS.NEWLINE +
                 "@Article{,"
                 + OS.NEWLINE
                 + "  file = {test:/home/uers/test.pdf:PDF},"
                 + OS.NEWLINE
-                + "}" + OS.NEWLINE, stringWriter.toString());
+                + "}" + OS.NEWLINE, stringJoiner.toString());
     }
 
     @Test
     void writeEntryWithOrField() throws Exception {
-        StringWriter stringWriter = new StringWriter();
+        StringJoiner stringJoiner = new StringJoiner(OS.NEWLINE);
 
         BibEntry entry = new BibEntry(StandardEntryType.InBook);
         // set an required OR field (author/editor)
@@ -120,9 +120,9 @@ class BibEntryWriterTest {
         entry.setField(StandardField.NUMBER, "1");
         entry.setField(StandardField.NOTE, "some note");
 
-        writer.write(entry, stringWriter, BibDatabaseMode.BIBTEX);
+        writer.write(entry, stringJoiner, BibDatabaseMode.BIBTEX);
 
-        String actual = stringWriter.toString();
+        String actual = stringJoiner.toString();
 
         // @formatter:off
         String expected = OS.NEWLINE + "@InBook{," + OS.NEWLINE +
@@ -138,7 +138,7 @@ class BibEntryWriterTest {
 
     @Test
     void writeEntryWithOrFieldBothFieldsPresent() throws Exception {
-        StringWriter stringWriter = new StringWriter();
+        StringJoiner stringJoiner = new StringJoiner(OS.NEWLINE);
 
         BibEntry entry = new BibEntry(StandardEntryType.InBook);
         // set an required OR field with both fields(author/editor)
@@ -149,9 +149,9 @@ class BibEntryWriterTest {
         entry.setField(StandardField.NUMBER, "1");
         entry.setField(StandardField.NOTE, "some note");
 
-        writer.write(entry, stringWriter, BibDatabaseMode.BIBTEX);
+        writer.write(entry, stringJoiner, BibDatabaseMode.BIBTEX);
 
-        String actual = stringWriter.toString();
+        String actual = stringJoiner.toString();
 
         // @formatter:off
         String expected = OS.NEWLINE + "@InBook{," + OS.NEWLINE +
@@ -178,9 +178,9 @@ class BibEntryWriterTest {
         entry.setCitationKey("test");
 
         // write out bibtex string
-        StringWriter stringWriter = new StringWriter();
-        writer.write(entry, stringWriter, BibDatabaseMode.BIBTEX);
-        String actual = stringWriter.toString();
+        StringJoiner stringJoiner = new StringJoiner(OS.NEWLINE);
+        writer.write(entry, stringJoiner, BibDatabaseMode.BIBTEX);
+        String actual = stringJoiner.toString();
 
         assertEquals(expected, actual);
     }
@@ -202,9 +202,9 @@ class BibEntryWriterTest {
         BibEntry entry = entries.iterator().next();
 
         // write out bibtex string
-        StringWriter stringWriter = new StringWriter();
-        writer.write(entry, stringWriter, BibDatabaseMode.BIBTEX);
-        String actual = stringWriter.toString();
+        StringJoiner stringJoiner = new StringJoiner(OS.NEWLINE);
+        writer.write(entry, stringJoiner, BibDatabaseMode.BIBTEX);
+        String actual = stringJoiner.toString();
 
         assertEquals(bibtexEntry, actual);
     }
@@ -226,9 +226,9 @@ class BibEntryWriterTest {
         BibEntry entry = entries.iterator().next();
 
         // write out bibtex string
-        StringWriter stringWriter = new StringWriter();
-        writer.write(entry, stringWriter, BibDatabaseMode.BIBTEX);
-        String actual = stringWriter.toString();
+        StringJoiner stringJoiner = new StringJoiner(OS.NEWLINE);
+        writer.write(entry, stringJoiner, BibDatabaseMode.BIBTEX);
+        String actual = stringJoiner.toString();
 
         assertEquals(bibtexEntry, actual);
     }
@@ -253,9 +253,9 @@ class BibEntryWriterTest {
         entry.setField(StandardField.AUTHOR, "BlaBla");
 
         // write out bibtex string
-        StringWriter stringWriter = new StringWriter();
-        writer.write(entry, stringWriter, BibDatabaseMode.BIBTEX);
-        String actual = stringWriter.toString();
+        StringJoiner stringJoiner = new StringJoiner(OS.NEWLINE);
+        writer.write(entry, stringJoiner, BibDatabaseMode.BIBTEX);
+        String actual = stringJoiner.toString();
 
         // @formatter:off
         String expected = OS.NEWLINE + "@Article{test," + OS.NEWLINE +
@@ -289,9 +289,9 @@ class BibEntryWriterTest {
         entry.setField(StandardField.AUTHOR, "BlaBla");
 
         // write out bibtex string
-        StringWriter stringWriter = new StringWriter();
-        writer.write(entry, stringWriter, BibDatabaseMode.BIBTEX);
-        String actual = stringWriter.toString();
+        StringJoiner stringJoiner = new StringJoiner(OS.NEWLINE);
+        writer.write(entry, stringJoiner, BibDatabaseMode.BIBTEX);
+        String actual = stringJoiner.toString();
 
         // @formatter:off
         String expected = OS.NEWLINE + "@Article{test," + OS.NEWLINE +
@@ -326,9 +326,9 @@ class BibEntryWriterTest {
         entry.setType(StandardEntryType.InProceedings);
 
         // write out bibtex string
-        StringWriter stringWriter = new StringWriter();
-        writer.write(entry, stringWriter, BibDatabaseMode.BIBTEX);
-        String actual = stringWriter.toString();
+        StringJoiner stringJoiner = new StringJoiner(OS.NEWLINE);
+        writer.write(entry, stringJoiner, BibDatabaseMode.BIBTEX);
+        String actual = stringJoiner.toString();
 
         // @formatter:off
         String expectedNewEntry = OS.NEWLINE + "@InProceedings{test," + OS.NEWLINE +
@@ -359,9 +359,9 @@ class BibEntryWriterTest {
         BibEntry entry = entries.iterator().next();
 
         // write out bibtex string
-        StringWriter stringWriter = new StringWriter();
-        writer.write(entry, stringWriter, BibDatabaseMode.BIBTEX);
-        String actual = stringWriter.toString();
+        StringJoiner stringJoiner = new StringJoiner(OS.NEWLINE);
+        writer.write(entry, stringJoiner, BibDatabaseMode.BIBTEX);
+        String actual = stringJoiner.toString();
 
         // Only one appending newline is written by the writer, the rest by FileActions. So, these should be removed here.
         assertEquals(bibtexEntry.substring(0, bibtexEntry.length() - 1), actual);
@@ -392,9 +392,9 @@ class BibEntryWriterTest {
         BibEntry entry = entries.iterator().next();
 
         // write out bibtex string
-        StringWriter stringWriter = new StringWriter();
-        writer.write(entry, stringWriter, BibDatabaseMode.BIBTEX);
-        String actual = stringWriter.toString();
+        StringJoiner stringJoiner = new StringJoiner(OS.NEWLINE);
+        writer.write(entry, stringJoiner, BibDatabaseMode.BIBTEX);
+        String actual = stringJoiner.toString();
 
         assertEquals(bibtexEntry, actual);
         return actual;
@@ -421,9 +421,9 @@ class BibEntryWriterTest {
         assertEquals("#mar#", entry.getField(StandardField.MONTH).get());
 
         // write out bibtex string
-        StringWriter stringWriter = new StringWriter();
-        writer.write(entry, stringWriter, BibDatabaseMode.BIBTEX);
-        String actual = stringWriter.toString();
+        StringJoiner stringJoiner = new StringJoiner(OS.NEWLINE);
+        writer.write(entry, stringJoiner, BibDatabaseMode.BIBTEX);
+        String actual = stringJoiner.toString();
 
         assertEquals(bibtexEntry, actual);
     }
@@ -435,14 +435,14 @@ class BibEntryWriterTest {
         // enable writing
         entry.setChanged(true);
 
-        StringWriter stringWriter = new StringWriter();
-        writer.write(entry, stringWriter, BibDatabaseMode.BIBTEX);
+        StringJoiner stringJoiner = new StringJoiner(OS.NEWLINE);
+        writer.write(entry, stringJoiner, BibDatabaseMode.BIBTEX);
 
         assertEquals(OS.NEWLINE +
                         "@Misc{," + OS.NEWLINE +
                         "  month = apr," + OS.NEWLINE +
                         "}" + OS.NEWLINE,
-                stringWriter.toString());
+                stringJoiner.toString());
     }
 
     @Test
@@ -452,14 +452,14 @@ class BibEntryWriterTest {
         // enable writing
         entry.setChanged(true);
 
-        StringWriter stringWriter = new StringWriter();
-        writer.write(entry, stringWriter, BibDatabaseMode.BIBTEX);
+        StringJoiner stringJoiner = new StringJoiner(OS.NEWLINE);
+        writer.write(entry, stringJoiner, BibDatabaseMode.BIBTEX);
 
         assertEquals(OS.NEWLINE +
                         "@Misc{," + OS.NEWLINE +
                         "  month = {apr}," + OS.NEWLINE +
                         "}" + OS.NEWLINE,
-                stringWriter.toString());
+                stringJoiner.toString());
     }
 
     @Test
@@ -482,9 +482,9 @@ class BibEntryWriterTest {
         entry.setField(StandardField.HOWPUBLISHED, "asdf");
 
         // write out bibtex string
-        StringWriter stringWriter = new StringWriter();
-        writer.write(entry, stringWriter, BibDatabaseMode.BIBTEX);
-        String actual = stringWriter.toString();
+        StringJoiner stringJoiner = new StringJoiner(OS.NEWLINE);
+        writer.write(entry, stringJoiner, BibDatabaseMode.BIBTEX);
+        String actual = stringJoiner.toString();
 
         // @formatter:off
         String expected = OS.NEWLINE + "@Article{test," + OS.NEWLINE +
@@ -500,15 +500,15 @@ class BibEntryWriterTest {
 
     @Test
     void doNotWriteEmptyFields() throws IOException {
-        StringWriter stringWriter = new StringWriter();
+        StringJoiner stringJoiner = new StringJoiner(OS.NEWLINE);
 
         BibEntry entry = new BibEntry(StandardEntryType.Article);
         entry.setField(StandardField.AUTHOR, "  ");
         entry.setField(StandardField.NOTE, "some note");
 
-        writer.write(entry, stringWriter, BibDatabaseMode.BIBTEX);
+        writer.write(entry, stringJoiner, BibDatabaseMode.BIBTEX);
 
-        String actual = stringWriter.toString();
+        String actual = stringJoiner.toString();
 
         String expected = OS.NEWLINE + "@Article{," + OS.NEWLINE +
                 "  note   = {some note}," + OS.NEWLINE +
@@ -519,12 +519,12 @@ class BibEntryWriterTest {
 
     @Test
     void writeThrowsErrorIfFieldContainsUnbalancedBraces() {
-        StringWriter stringWriter = new StringWriter();
+        StringJoiner stringJoiner = new StringJoiner(OS.NEWLINE);
 
         BibEntry entry = new BibEntry(StandardEntryType.Article);
         entry.setField(StandardField.NOTE, "some text with unbalanced { braces");
 
-        assertThrows(IOException.class, () -> writer.write(entry, stringWriter, BibDatabaseMode.BIBTEX));
+        assertThrows(IOException.class, () -> writer.write(entry, stringJoiner, BibDatabaseMode.BIBTEX));
     }
 
     @Test
@@ -545,9 +545,9 @@ class BibEntryWriterTest {
         BibEntry entry = entries.iterator().next();
 
         // write out bibtex string
-        StringWriter stringWriter = new StringWriter();
-        writer.write(entry, stringWriter, BibDatabaseMode.BIBTEX);
-        String actual = stringWriter.toString();
+        StringJoiner stringJoiner = new StringJoiner(OS.NEWLINE);
+        writer.write(entry, stringJoiner, BibDatabaseMode.BIBTEX);
+        String actual = stringJoiner.toString();
 
         assertEquals(bibtexEntry, actual);
     }
@@ -573,9 +573,9 @@ class BibEntryWriterTest {
         entry.setField(StandardField.AUTHOR, "John Doe");
 
         // write out bibtex string
-        StringWriter stringWriter = new StringWriter();
-        writer.write(entry, stringWriter, BibDatabaseMode.BIBTEX);
-        String actual = stringWriter.toString();
+        StringJoiner stringJoiner = new StringJoiner(OS.NEWLINE);
+        writer.write(entry, stringJoiner, BibDatabaseMode.BIBTEX);
+        String actual = stringJoiner.toString();
         // @formatter:off
         String expected = "% Some random comment that should stay here" + OS.NEWLINE + OS.NEWLINE +
                 "@Article{test," + OS.NEWLINE +
@@ -591,7 +591,7 @@ class BibEntryWriterTest {
 
     @Test
     void alphabeticSerialization() throws IOException {
-        StringWriter stringWriter = new StringWriter();
+        StringJoiner stringJoiner = new StringJoiner(OS.NEWLINE);
 
         BibEntry entry = new BibEntry(StandardEntryType.Article);
         // required fields
@@ -606,9 +606,9 @@ class BibEntryWriterTest {
         entry.setField(StandardField.YEAR, "2019");
         entry.setField(StandardField.CHAPTER, "chapter");
 
-        writer.write(entry, stringWriter, BibDatabaseMode.BIBLATEX);
+        writer.write(entry, stringJoiner, BibDatabaseMode.BIBLATEX);
 
-        String actual = stringWriter.toString();
+        String actual = stringJoiner.toString();
 
         // @formatter:off
         String expected = OS.NEWLINE + "@Article{," + OS.NEWLINE +

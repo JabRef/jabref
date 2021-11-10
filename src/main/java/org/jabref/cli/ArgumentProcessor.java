@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
+import java.util.StringJoiner;
 import java.util.Vector;
 import java.util.prefs.BackingStoreException;
 
@@ -531,8 +532,10 @@ public class ArgumentProcessor {
             GeneralPreferences generalPreferences = preferencesService.getGeneralPreferences();
             SavePreferences savePreferences = preferencesService.getSavePreferences();
             AtomicFileWriter fileWriter = new AtomicFileWriter(Path.of(subName), generalPreferences.getDefaultEncoding());
-            BibDatabaseWriter databaseWriter = new BibtexDatabaseWriter(fileWriter, generalPreferences, savePreferences, Globals.entryTypesManager);
+            StringJoiner stringJoiner = new StringJoiner(OS.NEWLINE);
+            BibDatabaseWriter databaseWriter = new BibtexDatabaseWriter(stringJoiner, generalPreferences, savePreferences, Globals.entryTypesManager);
             databaseWriter.saveDatabase(new BibDatabaseContext(newBase));
+            fileWriter.write(stringJoiner.toString());
 
             // Show just a warning message if encoding did not work for all characters:
             if (fileWriter.hasEncodingProblems()) {

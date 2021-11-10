@@ -2,7 +2,6 @@ package org.jabref.logic.exporter;
 
 import java.io.IOException;
 import java.io.StringReader;
-import java.io.StringWriter;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -11,6 +10,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.StringJoiner;
 
 import org.jabref.logic.citationkeypattern.AbstractCitationKeyPattern;
 import org.jabref.logic.citationkeypattern.DatabaseCitationKeyPattern;
@@ -60,7 +60,7 @@ import static org.mockito.Mockito.when;
 
 class BibtexDatabaseWriterTest {
 
-    private StringWriter stringWriter;
+    private StringJoiner stringJoiner;
     private BibtexDatabaseWriter databaseWriter;
     private BibDatabase database;
     private MetaData metaData;
@@ -73,14 +73,14 @@ class BibtexDatabaseWriterTest {
 
     @BeforeEach
     void setUp() {
-        stringWriter = new StringWriter();
+        stringJoiner = new StringJoiner(OS.NEWLINE);
         generalPreferences = mock(GeneralPreferences.class);
         when(generalPreferences.getDefaultEncoding()).thenReturn(null);
         savePreferences = mock(SavePreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(savePreferences.getSaveOrder()).thenReturn(new SaveOrderConfig());
         when(savePreferences.takeMetadataSaveOrderInAccount()).thenReturn(true);
         entryTypesManager = new BibEntryTypesManager();
-        databaseWriter = new BibtexDatabaseWriter(stringWriter, generalPreferences, savePreferences, entryTypesManager);
+        databaseWriter = new BibtexDatabaseWriter(stringJoiner, generalPreferences, savePreferences, entryTypesManager);
 
         database = new BibDatabase();
         metaData = new MetaData();
@@ -104,7 +104,7 @@ class BibtexDatabaseWriterTest {
 
         databaseWriter.savePartOfDatabase(bibtexContext, Collections.emptyList());
 
-        assertEquals("% Encoding: US-ASCII" + OS.NEWLINE, stringWriter.toString());
+        assertEquals("% Encoding: US-ASCII" + OS.NEWLINE, stringJoiner.toString());
     }
 
     @Test
@@ -113,7 +113,7 @@ class BibtexDatabaseWriterTest {
 
         databaseWriter.savePartOfDatabase(bibtexContext, Collections.emptyList());
 
-        assertEquals(OS.NEWLINE + "@Preamble{Test preamble}" + OS.NEWLINE, stringWriter.toString());
+        assertEquals(OS.NEWLINE + "@Preamble{Test preamble}" + OS.NEWLINE, stringJoiner.toString());
     }
 
     @Test
@@ -124,7 +124,7 @@ class BibtexDatabaseWriterTest {
         databaseWriter.savePartOfDatabase(bibtexContext, Collections.emptyList());
 
         assertEquals("% Encoding: US-ASCII" + OS.NEWLINE + OS.NEWLINE +
-                "@Preamble{Test preamble}" + OS.NEWLINE, stringWriter.toString());
+                "@Preamble{Test preamble}" + OS.NEWLINE, stringJoiner.toString());
     }
 
     @Test
@@ -139,7 +139,7 @@ class BibtexDatabaseWriterTest {
                 OS.NEWLINE +
                         "@Article{," + OS.NEWLINE + "}"
                         + OS.NEWLINE,
-                stringWriter.toString());
+                stringJoiner.toString());
     }
 
     @Test
@@ -155,7 +155,7 @@ class BibtexDatabaseWriterTest {
                 "% Encoding: US-ASCII" + OS.NEWLINE + OS.NEWLINE +
                         "@Article{," + OS.NEWLINE + "}"
                         + OS.NEWLINE,
-                stringWriter.toString());
+                stringJoiner.toString());
     }
 
     @Test
@@ -164,7 +164,7 @@ class BibtexDatabaseWriterTest {
 
         databaseWriter.savePartOfDatabase(bibtexContext, Collections.emptyList());
 
-        assertEquals(OS.NEWLINE + "Test epilog" + OS.NEWLINE, stringWriter.toString());
+        assertEquals(OS.NEWLINE + "Test epilog" + OS.NEWLINE, stringJoiner.toString());
     }
 
     @Test
@@ -175,7 +175,7 @@ class BibtexDatabaseWriterTest {
         databaseWriter.savePartOfDatabase(bibtexContext, Collections.emptyList());
 
         assertEquals("% Encoding: US-ASCII" + OS.NEWLINE + OS.NEWLINE +
-                "Test epilog" + OS.NEWLINE, stringWriter.toString());
+                "Test epilog" + OS.NEWLINE, stringJoiner.toString());
     }
 
     @Test
@@ -187,7 +187,7 @@ class BibtexDatabaseWriterTest {
         databaseWriter.savePartOfDatabase(bibtexContext, Collections.emptyList());
 
         assertEquals(OS.NEWLINE + "@Comment{jabref-meta: keypatterndefault:test;}" + OS.NEWLINE,
-                stringWriter.toString());
+                stringJoiner.toString());
     }
 
     @Test
@@ -201,7 +201,7 @@ class BibtexDatabaseWriterTest {
 
         assertEquals("% Encoding: US-ASCII" + OS.NEWLINE + OS.NEWLINE
                 +
-                "@Comment{jabref-meta: keypatterndefault:test;}" + OS.NEWLINE, stringWriter.toString());
+                "@Comment{jabref-meta: keypatterndefault:test;}" + OS.NEWLINE, stringJoiner.toString());
     }
 
     @Test
@@ -217,7 +217,7 @@ class BibtexDatabaseWriterTest {
                 + "@Comment{jabref-meta: grouping:" + OS.NEWLINE
                 + "0 AllEntriesGroup:;" + OS.NEWLINE
                 + "1 StaticGroup:test\\;2\\;1\\;\\;\\;\\;;" + OS.NEWLINE
-                + "}" + OS.NEWLINE, stringWriter.toString());
+                + "}" + OS.NEWLINE, stringJoiner.toString());
         // @formatter:on
     }
 
@@ -238,7 +238,7 @@ class BibtexDatabaseWriterTest {
                         + "@Comment{jabref-meta: grouping:" + OS.NEWLINE
                         + "0 AllEntriesGroup:;" + OS.NEWLINE
                         + "1 StaticGroup:test\\;2\\;1\\;\\;\\;\\;;" + OS.NEWLINE
-                        + "}" + OS.NEWLINE, stringWriter.toString());
+                        + "}" + OS.NEWLINE, stringJoiner.toString());
         // @formatter:on
     }
 
@@ -248,7 +248,7 @@ class BibtexDatabaseWriterTest {
 
         databaseWriter.savePartOfDatabase(bibtexContext, Collections.emptyList());
 
-        assertEquals(OS.NEWLINE + "@String{name = {content}}" + OS.NEWLINE, stringWriter.toString());
+        assertEquals("@String{name = {content}}" + OS.NEWLINE + OS.NEWLINE, stringJoiner.toString());
     }
 
     @Test
@@ -259,7 +259,17 @@ class BibtexDatabaseWriterTest {
         databaseWriter.savePartOfDatabase(bibtexContext, Collections.emptyList());
 
         assertEquals("% Encoding: US-ASCII" + OS.NEWLINE + OS.NEWLINE +
-                "@String{name = {content}}" + OS.NEWLINE, stringWriter.toString());
+                "@String{name = {content}}" + OS.NEWLINE, stringJoiner.toString());
+    }
+
+    @Test
+    void doNotWriteUtf8StringAndEncoding() throws Exception {
+        when(generalPreferences.getDefaultEncoding()).thenReturn(StandardCharsets.UTF_8);
+        database.addString(new BibtexString("name", "content"));
+
+        databaseWriter.savePartOfDatabase(bibtexContext, Collections.emptyList());
+
+        assertEquals("@String{name = {content}}" + OS.NEWLINE + OS.NEWLINE, stringJoiner.toString());
     }
 
     @Test
@@ -291,7 +301,7 @@ class BibtexDatabaseWriterTest {
                         + "@Comment{jabref-meta: databaseType:bibtex;}"
                         + OS.NEWLINE + OS.NEWLINE
                         + "@Comment{jabref-entrytype: customizedtype: req[title;author;date] opt[year;month;publisher]}" + OS.NEWLINE,
-                stringWriter.toString());
+                stringJoiner.toString());
     }
 
     @Test
@@ -317,14 +327,13 @@ class BibtexDatabaseWriterTest {
         databaseWriter.savePartOfDatabase(bibtexContext, Arrays.asList(entry, otherEntry));
 
         assertEquals(
-                OS.NEWLINE
-                        + "@Customizedtype{," + OS.NEWLINE + "}" + OS.NEWLINE + OS.NEWLINE
+                "@Customizedtype{," + OS.NEWLINE + "}" + OS.NEWLINE + OS.NEWLINE
                         + "@Othercustomizedtype{," + OS.NEWLINE + "}" + OS.NEWLINE + OS.NEWLINE
                         + "@Comment{jabref-meta: databaseType:bibtex;}"
                         + OS.NEWLINE + OS.NEWLINE
                         + "@Comment{jabref-entrytype: customizedtype: req[title] opt[]}" + OS.NEWLINE + OS.NEWLINE
                         + "@Comment{jabref-entrytype: othercustomizedtype: req[title] opt[]}" + OS.NEWLINE,
-                stringWriter.toString());
+                stringJoiner.toString());
     }
 
     @Test
@@ -338,7 +347,34 @@ class BibtexDatabaseWriterTest {
         BibDatabaseContext context = new BibDatabaseContext(result.getDatabase(), result.getMetaData());
 
         databaseWriter.savePartOfDatabase(context, result.getDatabase().getEntries());
-        assertEquals(Files.readString(testBibtexFile, encoding), stringWriter.toString());
+        assertEquals(Files.readString(testBibtexFile, encoding), stringJoiner.toString());
+    }
+
+    @Test
+    void roundtripUtf8EncodingHeaderRemoved() throws Exception {
+        when(generalPreferences.getDefaultEncoding()).thenReturn(StandardCharsets.UTF_8);
+        // @formatter:off
+        String bibtexEntry = OS.NEWLINE + "% Encoding: UTF8" + OS.NEWLINE +
+                OS.NEWLINE +
+                "@Article{," + OS.NEWLINE +
+                "  author  = {Foo Bar}," + OS.NEWLINE +
+                "  journal = {International Journal of Something}," + OS.NEWLINE +
+                "  note    = {some note}," + OS.NEWLINE +
+                "  number  = {1}," + OS.NEWLINE +
+                "}" + OS.NEWLINE;
+        // @formatter:on
+        ParserResult result = new BibtexParser(importFormatPreferences, fileMonitor).parse(new StringReader(bibtexEntry));
+        BibDatabaseContext context = new BibDatabaseContext(result.getDatabase(), result.getMetaData());
+        databaseWriter.saveDatabase(context);
+        // @formatter:off
+        String expected = "@Article{," + OS.NEWLINE +
+                "  author  = {Foo Bar}," + OS.NEWLINE +
+                "  journal = {International Journal of Something}," + OS.NEWLINE +
+                "  note    = {some note}," + OS.NEWLINE +
+                "  number  = {1}," + OS.NEWLINE +
+                "}" + OS.NEWLINE;
+        // @formatter:on
+       assertEquals(expected, stringJoiner.toString());
     }
 
     @Test
@@ -352,7 +388,7 @@ class BibtexDatabaseWriterTest {
         BibDatabaseContext context = new BibDatabaseContext(result.getDatabase(), result.getMetaData());
 
         databaseWriter.savePartOfDatabase(context, result.getDatabase().getEntries());
-        assertEquals(Files.readString(testBibtexFile, encoding), stringWriter.toString());
+        assertEquals(Files.readString(testBibtexFile, encoding), stringJoiner.toString());
     }
 
     @Test
@@ -366,7 +402,7 @@ class BibtexDatabaseWriterTest {
         BibDatabaseContext context = new BibDatabaseContext(result.getDatabase(), result.getMetaData());
 
         databaseWriter.savePartOfDatabase(context, result.getDatabase().getEntries());
-        assertEquals(Files.readString(testBibtexFile, encoding), stringWriter.toString());
+        assertEquals(Files.readString(testBibtexFile, encoding), stringJoiner.toString());
     }
 
     @Test
@@ -383,7 +419,7 @@ class BibtexDatabaseWriterTest {
         BibDatabaseContext context = new BibDatabaseContext(result.getDatabase(), result.getMetaData());
 
         databaseWriter.savePartOfDatabase(context, result.getDatabase().getEntries());
-        assertEquals(Files.readString(Path.of("src/test/resources/testbib/bibWithUserCommentAndEntryChange.bib"), encoding), stringWriter.toString());
+        assertEquals(Files.readString(Path.of("src/test/resources/testbib/bibWithUserCommentAndEntryChange.bib"), encoding), stringJoiner.toString());
     }
 
     @Test
@@ -403,7 +439,7 @@ class BibtexDatabaseWriterTest {
 
         databaseWriter.savePartOfDatabase(context, result.getDatabase().getEntries());
 
-        assertEquals(Files.readString(testBibtexFile, encoding), stringWriter.toString());
+        assertEquals(Files.readString(testBibtexFile, encoding), stringJoiner.toString());
     }
 
     @Test
@@ -417,7 +453,7 @@ class BibtexDatabaseWriterTest {
         BibDatabaseContext context = new BibDatabaseContext(result.getDatabase(), result.getMetaData());
 
         databaseWriter.savePartOfDatabase(context, result.getDatabase().getEntries());
-        assertEquals(Files.readString(testBibtexFile, encoding), stringWriter.toString());
+        assertEquals(Files.readString(testBibtexFile, encoding), stringJoiner.toString());
     }
 
     @Test
@@ -431,7 +467,7 @@ class BibtexDatabaseWriterTest {
 
         databaseWriter.savePartOfDatabase(bibtexContext, Collections.singletonList(entry));
 
-        assertEquals("presaved serialization", stringWriter.toString());
+        assertEquals("presaved serialization", stringJoiner.toString());
     }
 
     @Test
@@ -450,7 +486,7 @@ class BibtexDatabaseWriterTest {
                 OS.NEWLINE
                         + "@Article{," + OS.NEWLINE + "  author = {Mr. author}," + OS.NEWLINE + "}"
                         + OS.NEWLINE,
-                stringWriter.toString());
+                stringJoiner.toString());
     }
 
     @Test
@@ -461,7 +497,7 @@ class BibtexDatabaseWriterTest {
 
         databaseWriter.savePartOfDatabase(bibtexContext, Collections.emptyList());
 
-        assertEquals("serialization", stringWriter.toString());
+        assertEquals("serialization", stringJoiner.toString());
     }
 
     @Test
@@ -473,7 +509,7 @@ class BibtexDatabaseWriterTest {
         when(savePreferences.shouldReformatFile()).thenReturn(true);
         databaseWriter.savePartOfDatabase(bibtexContext, Collections.emptyList());
 
-        assertEquals(OS.NEWLINE + "@String{name = {content}}" + OS.NEWLINE, stringWriter.toString());
+        assertEquals(OS.NEWLINE + "@String{name = {content}}" + OS.NEWLINE, stringJoiner.toString());
     }
 
     @Test
@@ -495,7 +531,7 @@ class BibtexDatabaseWriterTest {
                         + "journal[title_case]" + OS.NEWLINE
                         + "title[lower_case]" + OS.NEWLINE
                         + ";}"
-                        + OS.NEWLINE, stringWriter.toString());
+                        + OS.NEWLINE, stringJoiner.toString());
     }
 
     @Test
@@ -510,7 +546,7 @@ class BibtexDatabaseWriterTest {
 
         assertEquals(OS.NEWLINE
                 + "@Comment{jabref-meta: saveOrderConfig:specified;author;false;year;true;abstract;false;}"
-                + OS.NEWLINE, stringWriter.toString());
+                + OS.NEWLINE, stringJoiner.toString());
     }
 
     @Test
@@ -524,7 +560,7 @@ class BibtexDatabaseWriterTest {
 
         assertEquals(OS.NEWLINE + "@Comment{jabref-meta: keypattern_article:articleTest;}" + OS.NEWLINE
                         + OS.NEWLINE + "@Comment{jabref-meta: keypatterndefault:test;}" + OS.NEWLINE,
-                stringWriter.toString());
+                stringJoiner.toString());
     }
 
     @Test
@@ -534,7 +570,7 @@ class BibtexDatabaseWriterTest {
         databaseWriter.savePartOfDatabase(bibtexContext, Collections.emptyList());
 
         assertEquals(OS.NEWLINE + "@Comment{jabref-meta: databaseType:biblatex;}" + OS.NEWLINE,
-                stringWriter.toString());
+                stringJoiner.toString());
     }
 
     @Test
@@ -544,7 +580,7 @@ class BibtexDatabaseWriterTest {
         databaseWriter.savePartOfDatabase(bibtexContext, Collections.emptyList());
 
         assertEquals(OS.NEWLINE + "@Comment{jabref-meta: protectedFlag:true;}" + OS.NEWLINE,
-                stringWriter.toString());
+                stringJoiner.toString());
     }
 
     @Test
@@ -557,7 +593,7 @@ class BibtexDatabaseWriterTest {
 
         assertEquals(OS.NEWLINE + "@Comment{jabref-meta: fileDirectory:\\\\Literature\\\\;}" + OS.NEWLINE +
                 OS.NEWLINE + "@Comment{jabref-meta: fileDirectory-defaultOwner-user:D:\\\\Documents;}"
-                + OS.NEWLINE + OS.NEWLINE + "@Comment{jabref-meta: fileDirectoryLatex-defaultOwner-user:D:\\\\Latex;}" + OS.NEWLINE, stringWriter.toString());
+                + OS.NEWLINE + OS.NEWLINE + "@Comment{jabref-meta: fileDirectoryLatex-defaultOwner-user:D:\\\\Latex;}" + OS.NEWLINE, stringJoiner.toString());
     }
 
     @Test
@@ -589,9 +625,7 @@ class BibtexDatabaseWriterTest {
 
         databaseWriter.savePartOfDatabase(bibtexContext, database.getEntries());
 
-        assertEquals(
-                OS.NEWLINE +
-                        "@Article{," + OS.NEWLINE +
+        assertEquals("@Article{," + OS.NEWLINE +
                         "  author = {A}," + OS.NEWLINE +
                         "  year   = {2010}," + OS.NEWLINE +
                         "}" + OS.NEWLINE + OS.NEWLINE +
@@ -605,7 +639,7 @@ class BibtexDatabaseWriterTest {
                         "}" + OS.NEWLINE + OS.NEWLINE +
                         "@Comment{jabref-meta: saveOrderConfig:specified;author;false;year;true;abstract;false;}" +
                         OS.NEWLINE,
-                stringWriter.toString());
+                stringJoiner.toString());
     }
 
     @Test
@@ -632,9 +666,7 @@ class BibtexDatabaseWriterTest {
         when(savePreferences.shouldSaveInOriginalOrder()).thenReturn(false);
         databaseWriter.savePartOfDatabase(bibtexContext, database.getEntries());
 
-        assertEquals(
-                OS.NEWLINE +
-                        "@Article{," + OS.NEWLINE +
+        assertEquals("Article{," + OS.NEWLINE +
                         "  author = {A}," + OS.NEWLINE +
                         "  year   = {2010}," + OS.NEWLINE +
                         "}" + OS.NEWLINE + OS.NEWLINE +
@@ -647,7 +679,7 @@ class BibtexDatabaseWriterTest {
                         "  year   = {2000}," + OS.NEWLINE +
                         "}"
                         + OS.NEWLINE,
-                stringWriter.toString());
+                stringJoiner.toString());
     }
 
     @Test
@@ -662,7 +694,7 @@ class BibtexDatabaseWriterTest {
                 OS.NEWLINE + "@Article{," + OS.NEWLINE +
                         "  note = {some note}," + OS.NEWLINE +
                         "}" + OS.NEWLINE,
-                stringWriter.toString());
+                stringJoiner.toString());
     }
 
     @Test
@@ -679,7 +711,7 @@ class BibtexDatabaseWriterTest {
                 OS.NEWLINE + "@Article{," + OS.NEWLINE +
                         "  abstract = {" + text + "}," + OS.NEWLINE +
                         "}" + OS.NEWLINE,
-                stringWriter.toString());
+                stringJoiner.toString());
     }
 
     @Test
@@ -695,7 +727,7 @@ class BibtexDatabaseWriterTest {
 
         databaseWriter.savePartOfDatabase(context, firstParse.getDatabase().getEntries());
 
-        assertEquals(fileContent, stringWriter.toString());
+        assertEquals(fileContent, stringJoiner.toString());
     }
 
     @Test
@@ -727,8 +759,8 @@ class BibtexDatabaseWriterTest {
         entry.setField(StandardField.AUTHOR, "Test");
 
         // write a second time
-        stringWriter = new StringWriter();
-        databaseWriter = new BibtexDatabaseWriter(stringWriter, generalPreferences, savePreferences, entryTypesManager);
+        stringJoiner = new StringJoiner(OS.NEWLINE);
+        databaseWriter = new BibtexDatabaseWriter(stringJoiner, generalPreferences, savePreferences, entryTypesManager);
         databaseWriter.savePartOfDatabase(context, firstParse.getDatabase().getEntries());
 
         assertEquals(OS.NEWLINE +
@@ -739,7 +771,7 @@ class BibtexDatabaseWriterTest {
                 "  number  = {1}," + OS.NEWLINE +
                 "}" + OS.NEWLINE +
                 "" + OS.NEWLINE +
-                "@Comment{jabref-meta: databaseType:bibtex;}" + OS.NEWLINE, stringWriter.toString());
+                "@Comment{jabref-meta: databaseType:bibtex;}" + OS.NEWLINE, stringJoiner.toString());
     }
 
     @Test
@@ -766,12 +798,10 @@ class BibtexDatabaseWriterTest {
         entry.setChanged(false);
 
         // write entry
-        stringWriter = new StringWriter();
-        databaseWriter = new BibtexDatabaseWriter(stringWriter, generalPreferences, savePreferences, entryTypesManager);
         BibDatabaseContext context = new BibDatabaseContext(firstParse.getDatabase(), firstParse.getMetaData());
         databaseWriter.savePartOfDatabase(context, firstParse.getDatabase().getEntries());
 
-        assertEquals(bibtexEntry, stringWriter.toString());
+        assertEquals(bibtexEntry, stringJoiner.toString());
     }
 
     @Test
@@ -804,11 +834,11 @@ class BibtexDatabaseWriterTest {
         entry.setChanged(false);
 
         // write a second time
-        stringWriter = new StringWriter();
-        databaseWriter = new BibtexDatabaseWriter(stringWriter, generalPreferences, savePreferences, entryTypesManager);
+        stringJoiner = new StringJoiner(OS.NEWLINE);
+        databaseWriter = new BibtexDatabaseWriter(stringJoiner, generalPreferences, savePreferences, entryTypesManager);
         databaseWriter.savePartOfDatabase(context, firstParse.getDatabase().getEntries());
 
         // returns tu original entry, not to the last saved one
-        assertEquals(bibtexEntry, stringWriter.toString());
+        assertEquals(bibtexEntry, stringJoiner.toString());
     }
 }

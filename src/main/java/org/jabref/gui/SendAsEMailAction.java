@@ -2,11 +2,11 @@ package org.jabref.gui;
 
 import java.awt.Desktop;
 import java.io.IOException;
-import java.io.StringWriter;
 import java.net.URI;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.StringJoiner;
 
 import org.jabref.architecture.AllowedToUseAwt;
 import org.jabref.gui.actions.ActionHelper;
@@ -16,6 +16,7 @@ import org.jabref.gui.util.BackgroundTask;
 import org.jabref.logic.bibtex.BibEntryWriter;
 import org.jabref.logic.bibtex.FieldWriter;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.OS;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -71,7 +72,7 @@ public class SendAsEMailAction extends SimpleCommand {
             return Localization.lang("This operation requires one or more entries to be selected.");
         }
 
-        StringWriter rawEntries = new StringWriter();
+        StringJoiner rawEntries = new StringJoiner(OS.NEWLINE);
         BibDatabaseContext databaseContext = stateManager.getActiveDatabase().get();
         List<BibEntry> entries = stateManager.getSelectedEntries();
 
@@ -104,7 +105,7 @@ public class SendAsEMailAction extends SimpleCommand {
             }
         }
 
-        String mailTo = "?Body=".concat(rawEntries.getBuffer().toString());
+        String mailTo = "?Body=".concat(rawEntries.toString());
         mailTo = mailTo.concat("&Subject=");
         mailTo = mailTo.concat(preferencesService.getExternalApplicationsPreferences().getEmailSubject());
         for (String path : attachments) {

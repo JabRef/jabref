@@ -10,6 +10,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.StringJoiner;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -25,6 +26,7 @@ import org.jabref.logic.importer.OpenDatabase;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.OS;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntryTypesManager;
@@ -416,12 +418,10 @@ class StudyRepository {
             Files.createFile(pathToFile);
         }
         try (Writer fileWriter = new FileWriter(pathToFile.toFile())) {
-            BibtexDatabaseWriter databaseWriter = new BibtexDatabaseWriter(fileWriter, generalPreferences, savePreferences, bibEntryTypesManager);
+            StringJoiner stringJoiner = new StringJoiner(OS.NEWLINE);
+            BibtexDatabaseWriter databaseWriter = new BibtexDatabaseWriter(stringJoiner, generalPreferences, savePreferences, bibEntryTypesManager);
             databaseWriter.saveDatabase(new BibDatabaseContext(entries));
-        }
-        try (AtomicFileWriter fileWriter = new AtomicFileWriter(pathToFile, generalPreferences.getDefaultEncoding(), savePreferences.shouldMakeBackup())) {
-            BibtexDatabaseWriter databaseWriter = new BibtexDatabaseWriter(fileWriter, generalPreferences, savePreferences, bibEntryTypesManager);
-            databaseWriter.saveDatabase(new BibDatabaseContext(entries));
+            fileWriter.write(stringJoiner.toString());
         } catch (UnsupportedCharsetException ex) {
             throw new SaveException(Localization.lang("Character encoding '%0' is not supported.", generalPreferences.getDefaultEncoding().displayName()), ex);
         } catch (IOException ex) {

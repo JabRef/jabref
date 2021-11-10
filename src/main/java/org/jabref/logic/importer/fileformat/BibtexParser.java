@@ -149,7 +149,6 @@ public class BibtexParser implements Parser {
     }
 
     private void parseDatabaseID() throws IOException {
-
         while (!eof) {
             skipWhitespace();
             char c = (char) read();
@@ -345,7 +344,13 @@ public class BibtexParser implements Parser {
             }
             runningIndex++;
         }
-        return context.substring(runningIndex + 1);
+        // strip empty lines
+        while ((runningIndex < indexOfAt) &&
+                (context.charAt(runningIndex) == '\r' ||
+                        context.charAt(runningIndex) == '\n')) {
+            runningIndex++;
+        }
+        return context.substring(runningIndex);
     }
 
     private String getPureTextFromFile() {

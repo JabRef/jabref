@@ -1,7 +1,6 @@
 package org.jabref.logic.exporter;
 
 import java.io.IOException;
-import java.io.Writer;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -13,6 +12,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.StringJoiner;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -47,14 +47,14 @@ import org.jabref.preferences.GeneralPreferences;
 public abstract class BibDatabaseWriter {
 
     private static final Pattern REFERENCE_PATTERN = Pattern.compile("(#[A-Za-z]+#)"); // Used to detect string references in strings
-    protected final Writer writer;
+    protected final StringJoiner blockJoiner;
     protected final GeneralPreferences generalPreferences;
     protected final SavePreferences savePreferences;
     protected final List<FieldChange> saveActionsFieldChanges = new ArrayList<>();
     protected final BibEntryTypesManager entryTypesManager;
 
-    public BibDatabaseWriter(Writer writer, GeneralPreferences generalPreferences, SavePreferences savePreferences, BibEntryTypesManager entryTypesManager) {
-        this.writer = Objects.requireNonNull(writer);
+    public BibDatabaseWriter(StringJoiner blockJoiner, GeneralPreferences generalPreferences, SavePreferences savePreferences, BibEntryTypesManager entryTypesManager) {
+        this.blockJoiner = Objects.requireNonNull(blockJoiner);
         this.generalPreferences = generalPreferences;
         this.savePreferences = savePreferences;
         this.entryTypesManager = entryTypesManager;
@@ -179,7 +179,7 @@ public abstract class BibDatabaseWriter {
 
         // Some file formats write something at the start of the file (like the encoding)
         if (savePreferences.getSaveType() != SavePreferences.DatabaseSaveType.PLAIN_BIBTEX) {
-            writePrelogue(bibDatabaseContext, generalPreferences.getDefaultEncoding());
+            writeProlog(bibDatabaseContext, generalPreferences.getDefaultEncoding());
         }
 
         // Write preamble if there is one.
@@ -220,11 +220,9 @@ public abstract class BibDatabaseWriter {
 
         // finally write whatever remains of the file, but at least a concluding newline
         writeEpilogue(bibDatabaseContext.getDatabase().getEpilog());
-
-        writer.close();
     }
 
-    protected abstract void writePrelogue(BibDatabaseContext bibDatabaseContext, Charset encoding) throws IOException;
+    protected abstract void writeProlog(BibDatabaseContext bibDatabaseContext, Charset encoding) throws IOException;
 
     protected abstract void writeEntry(BibEntry entry, BibDatabaseMode mode) throws IOException;
 
@@ -271,17 +269,15 @@ public abstract class BibDatabaseWriter {
         }
 
         for (BibtexString.Type t : BibtexString.Type.values()) {
-            boolean isFirstStringInType = true;
             for (BibtexString bs : strings) {
                 if (remaining.containsKey(bs.getName()) && (bs.getType() == t)) {
-                    writeString(bs, isFirstStringInType, remaining, maxKeyLength);
-                    isFirstStringInType = false;
+                    writeString(bs, remaining, maxKeyLength);
                 }
             }
         }
     }
 
-    protected void writeString(BibtexString bibtexString, boolean isFirstString, Map<String, BibtexString> remaining, int maxKeyLength)
+    protected void writeString(BibtexString bibtexString, Map<String, BibtexString> remaining, int maxKeyLength)
             throws IOException {
         // First remove this from the "remaining" list so it can't cause problem with circular refs:
         remaining.remove(bibtexString.getName());
@@ -300,14 +296,14 @@ public abstract class BibDatabaseWriter {
             // If the label we found exists as a key in the "remaining" Map, we go on and write it now:
             if (remaining.containsKey(label)) {
                 BibtexString referred = remaining.get(label);
-                writeString(referred, isFirstString, remaining, maxKeyLength);
+                writeString(referred, remaining, maxKeyLength);
             }
         }
 
-        writeString(bibtexString, isFirstString, maxKeyLength);
+        writeString(bibtexString, maxKeyLength);
     }
 
-    protected abstract void writeString(BibtexString bibtexString, boolean isFirstString, int maxKeyLength)
+    protected abstract void writeString(BibtexString bibtexString, int maxKeyLength)
             throws IOException;
 
     protected void writeEntryTypeDefinitions(Set<BibEntryType> types) throws IOException {
