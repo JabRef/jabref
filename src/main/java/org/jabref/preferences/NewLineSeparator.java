@@ -1,7 +1,7 @@
 package org.jabref.preferences;
 
 /**
- * An enum which contains the possible NewLineSeperators
+ * An enum which contains the possible NewLineSeparators
  * Possible are CR ("\n"), LF ("\r") and the windows standard CR/LF.
  */
 public enum NewLineSeparator {

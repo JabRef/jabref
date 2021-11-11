@@ -10,13 +10,12 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
-import java.util.StringJoiner;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.database.DatabaseMerger;
-import org.jabref.logic.exporter.AtomicFileWriter;
+import org.jabref.logic.exporter.BibWriter;
 import org.jabref.logic.exporter.BibtexDatabaseWriter;
 import org.jabref.logic.exporter.SaveException;
 import org.jabref.logic.exporter.SavePreferences;
@@ -418,10 +417,9 @@ class StudyRepository {
             Files.createFile(pathToFile);
         }
         try (Writer fileWriter = new FileWriter(pathToFile.toFile())) {
-            StringJoiner stringJoiner = new StringJoiner(OS.NEWLINE);
-            BibtexDatabaseWriter databaseWriter = new BibtexDatabaseWriter(stringJoiner, generalPreferences, savePreferences, bibEntryTypesManager);
+            BibWriter bibWriter = new BibWriter(fileWriter, OS.NEWLINE);
+            BibtexDatabaseWriter databaseWriter = new BibtexDatabaseWriter(bibWriter, generalPreferences, savePreferences, bibEntryTypesManager);
             databaseWriter.saveDatabase(new BibDatabaseContext(entries));
-            fileWriter.write(stringJoiner.toString());
         } catch (UnsupportedCharsetException ex) {
             throw new SaveException(Localization.lang("Character encoding '%0' is not supported.", generalPreferences.getDefaultEncoding().displayName()), ex);
         } catch (IOException ex) {

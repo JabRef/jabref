@@ -9,12 +9,12 @@ import java.nio.file.StandardCopyOption;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
-import java.util.StringJoiner;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 
 import org.jabref.logic.bibtex.InvalidFieldValueException;
 import org.jabref.logic.exporter.AtomicFileWriter;
+import org.jabref.logic.exporter.BibWriter;
 import org.jabref.logic.exporter.BibtexDatabaseWriter;
 import org.jabref.logic.exporter.SavePreferences;
 import org.jabref.logic.util.CoarseChangeFilter;
@@ -139,10 +139,9 @@ public class BackupManager {
             SavePreferences savePreferences = preferences.getSavePreferences()
                                                          .withMakeBackup(false);
             Writer writer = new AtomicFileWriter(backupPath, charset);
-            StringJoiner stringJoiner = new StringJoiner(OS.NEWLINE);
-            new BibtexDatabaseWriter(stringJoiner, generalPreferences, savePreferences, entryTypesManager)
+            BibWriter bibWriter = new BibWriter(writer, OS.NEWLINE);
+            new BibtexDatabaseWriter(bibWriter, generalPreferences, savePreferences, entryTypesManager)
                     .saveDatabase(bibDatabaseContext);
-            writer.write(stringJoiner.toString());
         } catch (IOException e) {
             logIfCritical(backupPath, e);
         }

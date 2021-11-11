@@ -2,10 +2,10 @@ package org.jabref.gui.entryeditor;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.io.StringWriter;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.StringJoiner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -38,6 +38,7 @@ import org.jabref.logic.bibtex.BibEntryWriter;
 import org.jabref.logic.bibtex.FieldWriter;
 import org.jabref.logic.bibtex.FieldWriterPreferences;
 import org.jabref.logic.bibtex.InvalidFieldValueException;
+import org.jabref.logic.exporter.BibWriter;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.BibtexParser;
@@ -129,11 +130,11 @@ public class SourceTab extends EntryEditorTab {
     }
 
     private String getSourceString(BibEntry entry, BibDatabaseMode type, FieldWriterPreferences fieldWriterPreferences) throws IOException {
-        StringJoiner stringJoiner = new StringJoiner(OS.NEWLINE);
+        StringWriter writer = new StringWriter();
+        BibWriter bibWriter = new BibWriter(writer, OS.NEWLINE);
         FieldWriter fieldWriter = FieldWriter.buildIgnoreHashes(fieldWriterPreferences);
-        new BibEntryWriter(fieldWriter, Globals.entryTypesManager).writeWithoutPrependedNewlines(entry, stringJoiner, type);
-
-        return stringJoiner.toString();
+        new BibEntryWriter(fieldWriter, Globals.entryTypesManager).write(entry, bibWriter, type);
+        return writer.toString();
     }
 
     /* Work around for different input methods.

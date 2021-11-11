@@ -10,12 +10,12 @@ import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
 import java.util.SortedSet;
-import java.util.StringJoiner;
 import java.util.TreeSet;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import org.jabref.logic.TypedBibEntry;
+import org.jabref.logic.exporter.BibWriter;
 import org.jabref.logic.util.OS;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
@@ -37,14 +37,15 @@ public class BibEntryWriter {
     }
 
     public String serializeAll(List<BibEntry> entries, BibDatabaseMode databaseMode) throws IOException {
-        StringJoiner writer = new StringJoiner(OS.NEWLINE);
+        StringWriter writer = new StringWriter();
+        BibWriter bibWriter = new BibWriter(writer, OS.NEWLINE);
         for (BibEntry entry : entries) {
-            write(entry, writer, databaseMode);
+            write(entry, bibWriter, databaseMode);
         }
         return writer.toString();
     }
 
-    public void write(BibEntry entry, StringJoiner out, BibDatabaseMode bibDatabaseMode) throws IOException {
+    public void write(BibEntry entry, BibWriter out, BibDatabaseMode bibDatabaseMode) throws IOException {
         write(entry, out, bibDatabaseMode, false);
     }
 
@@ -56,46 +57,37 @@ public class BibEntryWriter {
      * @param bibDatabaseMode The database mode (bibtex or biblatex)
      * @param reformat        Should the entry be in any case, even if no change occurred?
      */
-    public void write(BibEntry entry, StringJoiner out, BibDatabaseMode bibDatabaseMode, Boolean reformat) throws IOException {
+    public void write(BibEntry entry, BibWriter out, BibDatabaseMode bibDatabaseMode, Boolean reformat) throws IOException {
         // if the entry has not been modified, write it as it was
         if (!reformat && !entry.hasChanged()) {
-            out.add(entry.getParsedSerialization());
+            out.write(entry.getParsedSerialization());
+            out.finishBlock();
             return;
         }
 
         writeUserComments(entry, out);
         writeRequiredFieldsFirstRemainingFieldsSecond(entry, out, bibDatabaseMode);
+        out.finishBlock();
     }
 
-    private void writeUserComments(BibEntry entry, StringJoiner out) throws IOException {
+    private void writeUserComments(BibEntry entry, BibWriter out) throws IOException {
         String userComments = entry.getUserComments();
 
         if (!userComments.isEmpty()) {
-            out.add(userComments);
+            out.write(userComments);
         }
-    }
-
-    public void writeWithoutPrependedNewlines(BibEntry entry, StringJoiner out, BibDatabaseMode bibDatabaseMode) throws IOException {
-        // if the entry has not been modified, write it as it was
-        if (!entry.hasChanged()) {
-            out.add(entry.getParsedSerialization().trim());
-            return;
-        }
-
-        writeRequiredFieldsFirstRemainingFieldsSecond(entry, out, bibDatabaseMode);
     }
 
     /**
      * Writes fields in the order of requiredFields, optionalFields and other fields, but does not sort the fields.
      */
-    private void writeRequiredFieldsFirstRemainingFieldsSecond(BibEntry entry, StringJoiner out,
+    private void writeRequiredFieldsFirstRemainingFieldsSecond(BibEntry entry, BibWriter out,
                                                                BibDatabaseMode bibDatabaseMode) throws IOException {
         // Write header with type and bibtex-key
         TypedBibEntry typedEntry = new TypedBibEntry(entry, bibDatabaseMode);
-        StringWriter writer = new StringWriter();
-        writer.write('@' + typedEntry.getTypeForDisplay() + '{');
+        out.write('@' + typedEntry.getTypeForDisplay() + '{');
 
-        writeKeyField(entry, writer);
+        writeKeyField(entry, out);
 
         Set<Field> written = new HashSet<>();
         written.add(InternalField.KEY_FIELD);
@@ -112,7 +104,7 @@ public class BibEntryWriter {
                                              .collect(Collectors.toList());
 
             for (Field field : requiredFields) {
-                writeField(entry, writer, field, indentation);
+                writeField(entry, out, field, indentation);
             }
 
             // Then optional fields
@@ -124,7 +116,7 @@ public class BibEntryWriter {
                                              .collect(Collectors.toList());
 
             for (Field field : optionalFields) {
-                writeField(entry, writer, field, indentation);
+                writeField(entry, out, field, indentation);
             }
 
             written.addAll(requiredFields);
@@ -137,18 +129,16 @@ public class BibEntryWriter {
                                                 .collect(Collectors.toCollection(() -> new TreeSet<>(Comparator.comparing(Field::getName))));
 
         for (Field field : remainingFields) {
-            writeField(entry, writer, field, indentation);
+            writeField(entry, out, field, indentation);
         }
 
         // Finally, end the entry.
-        writer.write('}');
-        writer.write(OS.NEWLINE);
-        out.add(writer.toString());
+        out.writeLine("}");
     }
 
-    private void writeKeyField(BibEntry entry, StringWriter out) throws IOException {
+    private void writeKeyField(BibEntry entry, BibWriter out) throws IOException {
         String keyField = StringUtil.shaveString(entry.getCitationKey().orElse(""));
-        out.write(keyField + ',' + OS.NEWLINE);
+        out.writeLine(keyField + ',');
     }
 
     /**
@@ -159,9 +149,9 @@ public class BibEntryWriter {
      * @param field the field
      * @throws IOException In case of an IO error
      */
-    private void writeField(BibEntry entry, StringWriter out, Field field, int indentation) throws IOException {
+    private void writeField(BibEntry entry, BibWriter out, Field field, int indentation) throws IOException {
         Optional<String> value = entry.getField(field);
-        // only write field if is is not empty
+        // only write field if it is not empty
         // field.ifPresent does not work as an IOException may be thrown
         if (value.isPresent() && !value.get().trim().isEmpty()) {
             out.write("  " + getFormattedFieldName(field, indentation));
@@ -170,7 +160,7 @@ public class BibEntryWriter {
             } catch (InvalidFieldValueException ex) {
                 throw new IOException("Error in field '" + field + " of entry " + entry.getCitationKey().orElse("") + "': " + ex.getMessage(), ex);
             }
-            out.write(',' + OS.NEWLINE);
+            out.writeLine(",");
         }
     }
 
@@ -187,19 +177,17 @@ public class BibEntryWriter {
     /**
      * Get display version of a entry field.
      * <p>
-     * BibTeX is case-insensitive therefore there is no difference between:
-     * howpublished, HOWPUBLISHED, HowPublished, etc.
+     * BibTeX is case-insensitive therefore there is no difference between: howpublished, HOWPUBLISHED, HowPublished, etc.
      * <p>
-     * The was a long discussion about how JabRef should write the fields.
-     * See https://github.com/JabRef/jabref/issues/116
+     * There was a long discussion about how JabRef should write the fields. See https://github.com/JabRef/jabref/issues/116
      * <p>
      * The team decided to do the biblatex way and use lower case for the field names.
      *
      * @param field The name of the field.
      * @return The display version of the field name.
      */
-    private String getFormattedFieldName(Field field, int intendation) {
+    private String getFormattedFieldName(Field field, int intention) {
         String fieldName = field.getName();
-        return fieldName.toLowerCase(Locale.ROOT) + StringUtil.repeatSpaces(intendation - fieldName.length()) + " = ";
+        return fieldName.toLowerCase(Locale.ROOT) + StringUtil.repeatSpaces(intention - fieldName.length()) + " = ";
     }
 }

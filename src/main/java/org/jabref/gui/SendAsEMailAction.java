@@ -2,11 +2,11 @@ package org.jabref.gui;
 
 import java.awt.Desktop;
 import java.io.IOException;
+import java.io.StringWriter;
 import java.net.URI;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.StringJoiner;
 
 import org.jabref.architecture.AllowedToUseAwt;
 import org.jabref.gui.actions.ActionHelper;
@@ -15,6 +15,7 @@ import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.logic.bibtex.BibEntryWriter;
 import org.jabref.logic.bibtex.FieldWriter;
+import org.jabref.logic.exporter.BibWriter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.OS;
 import org.jabref.logic.util.io.FileUtil;
@@ -72,7 +73,8 @@ public class SendAsEMailAction extends SimpleCommand {
             return Localization.lang("This operation requires one or more entries to be selected.");
         }
 
-        StringJoiner rawEntries = new StringJoiner(OS.NEWLINE);
+        StringWriter rawEntries = new StringWriter();
+        BibWriter bibWriter = new BibWriter(rawEntries, OS.NEWLINE);
         BibDatabaseContext databaseContext = stateManager.getActiveDatabase().get();
         List<BibEntry> entries = stateManager.getSelectedEntries();
 
@@ -81,7 +83,7 @@ public class SendAsEMailAction extends SimpleCommand {
 
         for (BibEntry entry : entries) {
             try {
-                bibtexEntryWriter.write(entry, rawEntries, databaseContext.getMode());
+                bibtexEntryWriter.write(entry, bibWriter, databaseContext.getMode());
             } catch (IOException e) {
                 LOGGER.warn("Problem creating BibTeX file for mailing.", e);
             }

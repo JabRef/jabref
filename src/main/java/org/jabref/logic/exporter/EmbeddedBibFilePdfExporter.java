@@ -3,6 +3,7 @@ package org.jabref.logic.exporter;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringWriter;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -10,7 +11,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.StringJoiner;
 
 import org.jabref.logic.bibtex.BibEntryWriter;
 import org.jabref.logic.bibtex.FieldWriter;
@@ -102,11 +102,12 @@ public class EmbeddedBibFilePdfExporter extends Exporter {
     }
 
     private String getBibString(List<BibEntry> entries) throws IOException {
-        StringJoiner stringWriter = new StringJoiner(OS.NEWLINE);
+        StringWriter stringWriter = new StringWriter();
+        BibWriter bibWriter = new BibWriter(stringWriter, OS.NEWLINE);
         FieldWriter fieldWriter = FieldWriter.buildIgnoreHashes(fieldWriterPreferences);
         BibEntryWriter bibEntryWriter = new BibEntryWriter(fieldWriter, bibEntryTypesManager);
         for (BibEntry entry : entries) {
-            bibEntryWriter.writeWithoutPrependedNewlines(entry, stringWriter, bibDatabaseMode);
+            bibEntryWriter.write(entry, bibWriter, bibDatabaseMode);
         }
         return stringWriter.toString();
     }

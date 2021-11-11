@@ -7,7 +7,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
 import java.util.Set;
-import java.util.StringJoiner;
 import java.util.stream.Collectors;
 
 import javafx.scene.control.ButtonBar;
@@ -25,6 +24,7 @@ import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.autosaveandbackup.AutosaveManager;
 import org.jabref.logic.autosaveandbackup.BackupManager;
 import org.jabref.logic.exporter.AtomicFileWriter;
+import org.jabref.logic.exporter.BibWriter;
 import org.jabref.logic.exporter.BibtexDatabaseWriter;
 import org.jabref.logic.exporter.SaveException;
 import org.jabref.logic.exporter.SavePreferences;
@@ -231,16 +231,14 @@ public class SaveDatabaseAction {
         SavePreferences savePreferences = this.preferences.getSavePreferences()
                                                       .withSaveType(saveType);
         try (AtomicFileWriter fileWriter = new AtomicFileWriter(file, encoding, savePreferences.shouldMakeBackup())) {
-            StringJoiner stringJoiner = new StringJoiner(OS.NEWLINE);
-            BibtexDatabaseWriter databaseWriter = new BibtexDatabaseWriter(stringJoiner, generalPreferences, savePreferences, entryTypesManager);
+            BibWriter bibWriter = new BibWriter(fileWriter, OS.NEWLINE);
+            BibtexDatabaseWriter databaseWriter = new BibtexDatabaseWriter(bibWriter, generalPreferences, savePreferences, entryTypesManager);
 
             if (selectedOnly) {
                 databaseWriter.savePartOfDatabase(libraryTab.getBibDatabaseContext(), libraryTab.getSelectedEntries());
             } else {
                 databaseWriter.saveDatabase(libraryTab.getBibDatabaseContext());
             }
-
-            fileWriter.write(stringJoiner.toString());
 
             libraryTab.registerUndoableChanges(databaseWriter.getSaveActionsFieldChanges());
 

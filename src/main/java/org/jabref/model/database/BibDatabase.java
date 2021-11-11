@@ -21,6 +21,7 @@ import java.util.stream.Collectors;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
+import org.jabref.logic.util.OS;
 import org.jabref.model.database.event.EntriesAddedEvent;
 import org.jabref.model.database.event.EntriesRemovedEvent;
 import org.jabref.model.entry.BibEntry;
@@ -59,7 +60,15 @@ public class BibDatabase {
 
     // All file contents below the last entry in the file
     private String epilog = "";
+
     private String sharedDatabaseID;
+
+    private String newLine = OS.NEWLINE;
+
+    public BibDatabase(List<BibEntry> entries, String newLine) {
+        this(entries);
+        this.newLine = newLine;
+    }
 
     public BibDatabase(List<BibEntry> entries) {
         this();
@@ -621,5 +630,12 @@ public class BibDatabase {
      */
     public boolean isDuplicateCitationKeyExisting(String key) {
         return getNumberOfCitationKeyOccurrences(key) > 1;
+    }
+
+    /**
+     * Returns the string used to indicate a linebreak
+     */
+    public String getNewLine() {
+        return newLine;
     }
 }

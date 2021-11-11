@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PushbackReader;
 import java.io.Reader;
+import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.Deque;
@@ -29,6 +30,7 @@ import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.util.MetaDataParser;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.OS;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.KeyCollisionException;
 import org.jabref.model.entry.BibEntry;
@@ -71,6 +73,7 @@ public class BibtexParser implements Parser {
     private PushbackReader pushbackReader;
     private BibDatabase database;
     private Set<BibEntryType> entryTypes;
+    private String newLine = OS.NEWLINE;
     private boolean eof;
     private int line = 1;
     private ParserResult parserResult;
@@ -132,7 +135,9 @@ public class BibtexParser implements Parser {
         Objects.requireNonNull(in);
         pushbackReader = new PushbackReader(in, BibtexParser.LOOKAHEAD);
 
-        // Bibtex related contents.
+        determineNewLine();
+
+        // BibTeX related contents.
         initializeParserResult();
 
         parseDatabaseID();
@@ -140,6 +145,25 @@ public class BibtexParser implements Parser {
         skipWhitespace();
 
         return parseFileContent();
+    }
+
+    private void determineNewLine() throws IOException {
+        StringWriter stringWriter = new StringWriter(BibtexParser.LOOKAHEAD);
+        int i = 0;
+        int currentChar;
+        do {
+            currentChar = pushbackReader.read();
+            stringWriter.append((char) currentChar);
+            i++;
+        } while ((i<BibtexParser.LOOKAHEAD) && (currentChar != '\r') && (currentChar != '\n'));
+        if (currentChar == '\r') {
+            newLine = "\r\n";
+        } else if (currentChar == '\n') {
+            newLine = "\n";
+        }
+
+        // unread all sneaked characters
+        pushbackReader.unread(stringWriter.toString().toCharArray());
     }
 
     private void initializeParserResult() {
@@ -184,7 +208,7 @@ public class BibtexParser implements Parser {
 
             if ("preamble".equals(entryType)) {
                 database.setPreamble(parsePreamble());
-                // Consume new line which signals end of preamble
+                // Consume a new line which separates the preamble from the next part (if the file was written with JabRef)
                 skipOneNewline();
                 // the preamble is saved verbatim anyways, so the text read so far can be dropped
                 dumpTextReadSoFarToString();
@@ -236,8 +260,21 @@ public class BibtexParser implements Parser {
             // store comments collected without type definition
             entry.setCommentsBeforeEntry(
                     commentsAndEntryTypeDefinition.substring(0, commentsAndEntryTypeDefinition.lastIndexOf('@')));
+
             // store complete parsed serialization (comments, type definition + type contents)
-            entry.setParsedSerialization(commentsAndEntryTypeDefinition + dumpTextReadSoFarToString());
+
+            String parsedSerialization = commentsAndEntryTypeDefinition + dumpTextReadSoFarToString();
+            // normalize new lines
+            parsedSerialization = parsedSerialization.replace("\r\n", "\n");
+            // strip newlines from beginning and and (we need to keep whitespaces, thus trim() cannot be used)
+            while (parsedSerialization.startsWith("\n")) {
+                parsedSerialization = parsedSerialization.substring(1);
+            }
+            while (parsedSerialization.endsWith("\n")) {
+                parsedSerialization = parsedSerialization.substring(0, parsedSerialization.length()-1);
+            }
+            parsedSerialization = parsedSerialization.replace("\n", newLine);
+            entry.setParsedSerialization(parsedSerialization);
 
             database.insertEntry(entry);
         } catch (IOException ex) {
@@ -505,7 +542,10 @@ public class BibtexParser implements Parser {
 
     private String parsePreamble() throws IOException {
         skipWhitespace();
-        return parseBracketedText();
+        String result = parseBracketedText();
+        // also "include" the newline in the preamble
+        skipOneNewline();
+        return result;
     }
 
     private BibEntry parseEntry(String entryType) throws IOException {
