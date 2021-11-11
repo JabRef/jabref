@@ -1,6 +1,9 @@
 package org.jabref.model.entry;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -40,25 +43,16 @@ class AuthorTest {
         assertEquals("Moore, O. and O. Moore and Moore, O. O.", Author.addDotIfAbbreviation("Moore, O. and O. Moore and Moore, O. O."));
     }
 
-    @Test
-    void addDotIfAbbreviationIfNameIsNull() {
-        String nameTest = null;
-        assertEquals(null, Author.addDotIfAbbreviation(nameTest));
+    @ParameterizedTest
+    @NullAndEmptySource
+    void addDotIfAbbreviationIfNameIsNullOrEmpty(String input) {
+        assertEquals(input, Author.addDotIfAbbreviation(input));
     }
 
-    @Test
-    void addDotIfAbbreviationReturnNameIfEmptyString() {
-        assertEquals("", Author.addDotIfAbbreviation(""));
-    }
-
-    @Test
-    void addDotIfAbbreviationMoreLowerCaseLetters() {
-        assertEquals("asdf", Author.addDotIfAbbreviation("asdf"));
-    }
-
-    @Test
-    void addDotIfAbbreviationOnlyOneCharLowerCase() {
-        assertEquals("a", Author.addDotIfAbbreviation("a"));
+    @ParameterizedTest
+    @ValueSource(strings = {"asdf", "a"})
+    void addDotIfAbbreviationLowerCaseLetters(String input) {
+        assertEquals(input, Author.addDotIfAbbreviation(input));
     }
 
     @Test
@@ -86,14 +80,10 @@ class AuthorTest {
         assertEquals("Ameli A. A.", Author.addDotIfAbbreviation("Ameli AA"));
     }
 
-    @Test
-    void addDotIfAbbreviationIfStartsWithNumber() {
-        assertEquals("1", Author.addDotIfAbbreviation("1"));
-    }
-
-    @Test
-    void addDotIfAbbreviationIfStartsWithSpacedNumber() {
-        assertEquals("1 23", Author.addDotIfAbbreviation("1 23"));
+    @ParameterizedTest
+    @ValueSource(strings = {"1", "1 23"})
+    void addDotIfAbbreviationIfStartsWithNumber(String input) {
+        assertEquals(input, Author.addDotIfAbbreviation(input));
     }
 
 }
