@@ -289,7 +289,7 @@ public class JabRefPreferences implements PreferencesService {
 
     /**
      * The OpenOffice/LibreOffice connection preferences are:
-     * OO_PATH main directory for OO/LO installation, used to detect location on Win/OS X when using manual connect
+     * OO_PATH main directory for OO/LO installation, used to detect location on Win/macOS when using manual connect
      * OO_EXECUTABLE_PATH path to soffice-file
      * OO_JARS_PATH directory that contains juh.jar, jurt.jar, ridl.jar, unoil.jar
      * OO_SYNC_WHEN_CITING true if the reference list is updated when adding a new citation
