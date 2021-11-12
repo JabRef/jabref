@@ -1,5 +1,7 @@
 package org.jabref.gui.entryeditor;
 
+import javax.swing.undo.UndoManager;
+
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.autocompleter.SuggestionProviders;
@@ -9,8 +11,6 @@ import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.preferences.PreferencesService;
-
-import javax.swing.undo.UndoManager;
 
 public class OptionalFieldsTab extends OptionalFieldsTabBase {
     public OptionalFieldsTab(BibDatabaseContext databaseContext,
