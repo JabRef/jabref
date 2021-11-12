@@ -8,6 +8,7 @@ import org.jabref.gui.autocompleter.SuggestionProviders;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.preferences.PreferencesService;
@@ -24,7 +25,7 @@ public class OptionalFields2Tab extends OptionalFieldsTabBase {
                               TaskExecutor taskExecutor,
                               JournalAbbreviationRepository journalAbbreviationRepository) {
         super(
-                "Optional fields 2",
+                Localization.lang("Optional fields 2"),
                 false,
                 databaseContext,
                 suggestionProviders,

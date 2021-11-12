@@ -42,7 +42,7 @@ public class OptionalFieldsTabBase extends FieldsEditorTab {
         super(true, databaseContext, suggestionProviders, undoManager, dialogService, preferences, stateManager, externalFileTypes, taskExecutor, journalAbbreviationRepository);
         this.entryTypesManager = entryTypesManager;
         this.isPrimaryOptionalFields = isPrimaryOptionalFields;
-        setText(Localization.lang(title));
+        setText(title);
         setTooltip(new Tooltip(Localization.lang("Show optional fields")));
         setGraphic(IconTheme.JabRefIcons.OPTIONAL.getGraphicNode());
     }
