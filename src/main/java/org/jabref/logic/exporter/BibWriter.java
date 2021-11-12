@@ -26,16 +26,16 @@ public class BibWriter {
     /**
      * Writes the given string. The newlines of the given string are converted to the newline set for this clas
      */
-     public void write(String string) throws IOException {
-         if (precedingNewLineRequired) {
-             writer.write(newline);
-             precedingNewLineRequired = false;
-         }
-         string = string.replace("\r\n", "\n").replace("\n", newline);
-         writer.write(string);
-         lastWriteWasNewline = string.endsWith(newline);
-         somethingWasWritten = true;
-     }
+    public void write(String string) throws IOException {
+        if (precedingNewLineRequired) {
+            writer.write(newline);
+            precedingNewLineRequired = false;
+        }
+        string = string.replace("\r\n", "\n").replace("\n", newline);
+        writer.write(string);
+        lastWriteWasNewline = string.endsWith(newline);
+        somethingWasWritten = true;
+    }
 
     /**
      * Writes the given string and finishes it with a line break
@@ -49,7 +49,9 @@ public class BibWriter {
      * Finishes a line
      */
     public void finishLine() throws IOException {
-        this.write(newline);
+        if (!this.lastWriteWasNewline) {
+            this.write(newline);
+        }
     }
 
     /**

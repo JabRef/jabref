@@ -94,7 +94,6 @@ public class BibtexDatabaseWriter extends BibDatabaseWriter {
         }
 
         bibWriter.writeLine("}");
-        bibWriter.finishBlock();
     }
 
     @Override

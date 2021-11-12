@@ -256,6 +256,14 @@ public class BibtexParser implements Parser {
             // this is at least `@Type`
             String commentsAndEntryTypeDefinition = dumpTextReadSoFarToString();
 
+            // remove first newline
+            // this is appended by JabRef during writing automatically
+            if (commentsAndEntryTypeDefinition.startsWith("\r\n")) {
+                commentsAndEntryTypeDefinition = commentsAndEntryTypeDefinition.substring(2);
+            } else if (commentsAndEntryTypeDefinition.startsWith("\n")) {
+                commentsAndEntryTypeDefinition = commentsAndEntryTypeDefinition.substring(1);
+            }
+
             BibEntry entry = parseEntry(type);
             // store comments collected without type definition
             entry.setCommentsBeforeEntry(
@@ -264,16 +272,6 @@ public class BibtexParser implements Parser {
             // store complete parsed serialization (comments, type definition + type contents)
 
             String parsedSerialization = commentsAndEntryTypeDefinition + dumpTextReadSoFarToString();
-            // normalize new lines
-            parsedSerialization = parsedSerialization.replace("\r\n", "\n");
-            // strip newlines from beginning and and (we need to keep whitespaces, thus trim() cannot be used)
-            while (parsedSerialization.startsWith("\n")) {
-                parsedSerialization = parsedSerialization.substring(1);
-            }
-            while (parsedSerialization.endsWith("\n")) {
-                parsedSerialization = parsedSerialization.substring(0, parsedSerialization.length()-1);
-            }
-            parsedSerialization = parsedSerialization.replace("\n", newLine);
             entry.setParsedSerialization(parsedSerialization);
 
             database.insertEntry(entry);

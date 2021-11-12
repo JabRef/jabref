@@ -75,6 +75,8 @@ public class BibEntryWriter {
 
         if (!userComments.isEmpty()) {
             out.write(userComments);
+            // ensure that a line break appears after the comment
+            out.finishLine();
         }
     }
 
