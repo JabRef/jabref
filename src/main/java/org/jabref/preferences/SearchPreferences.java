@@ -46,7 +46,7 @@ public class SearchPreferences {
 
     public EnumSet<SearchFlags> getSearchFlags() {
         // copy of returns an exception when the EnumSet is empty
-        if(searchFlags.isEmpty()) {
+        if (searchFlags.isEmpty()) {
             return EnumSet.noneOf(SearchFlags.class);
         }
         return EnumSet.copyOf(searchFlags);
