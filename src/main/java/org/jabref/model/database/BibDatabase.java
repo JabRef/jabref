@@ -21,7 +21,6 @@ import java.util.stream.Collectors;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
-import org.jabref.logic.util.OS;
 import org.jabref.model.database.event.EntriesAddedEvent;
 import org.jabref.model.database.event.EntriesRemovedEvent;
 import org.jabref.model.entry.BibEntry;
@@ -63,7 +62,7 @@ public class BibDatabase {
 
     private String sharedDatabaseID;
 
-    private String newLineSeparator = OS.NEWLINE;
+    private String newLineSeparator = System.lineSeparator();
 
     public BibDatabase(List<BibEntry> entries, String newLineSeparator) {
         this(entries);
