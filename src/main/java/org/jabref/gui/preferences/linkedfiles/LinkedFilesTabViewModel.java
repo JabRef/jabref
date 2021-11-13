@@ -101,18 +101,15 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
         filePreferences.setDownloadLinkedFiles(filePreferences.shouldDownloadLinkedFiles()); // set in ImportEntriesViewModel
 
         // Autolink preferences
-        AutoLinkPreferences.CitationKeyDependency citationKeyDependency = AutoLinkPreferences.CitationKeyDependency.START;
-        if (autolinkFileExactBibtexProperty.getValue()) {
-            citationKeyDependency = AutoLinkPreferences.CitationKeyDependency.EXACT;
+        if (autolinkFileStartsBibtexProperty.getValue()) {
+            preferences.getAutoLinkPreferences().setCitationKeyDependency(AutoLinkPreferences.CitationKeyDependency.START);
+        } else if (autolinkFileExactBibtexProperty.getValue()) {
+            preferences.getAutoLinkPreferences().setCitationKeyDependency(AutoLinkPreferences.CitationKeyDependency.EXACT);
         } else if (autolinkUseRegexProperty.getValue()) {
-            citationKeyDependency = AutoLinkPreferences.CitationKeyDependency.REGEX;
+            preferences.getAutoLinkPreferences().setCitationKeyDependency(AutoLinkPreferences.CitationKeyDependency.REGEX);
         }
 
-        preferences.storeAutoLinkPreferences(new AutoLinkPreferences(
-                citationKeyDependency,
-                autolinkRegexKeyProperty.getValue(),
-                initialAutoLinkPreferences.shouldAskAutoNamingPdfs(),
-                preferences.getKeywordDelimiter()));
+        preferences.getAutoLinkPreferences().setRegularExpression(autolinkRegexKeyProperty.getValue());
     }
 
     ValidationStatus mainFileDirValidationStatus() {

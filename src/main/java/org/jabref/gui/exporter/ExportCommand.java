@@ -98,9 +98,8 @@ public class ExportCommand extends SimpleCommand {
 
         // Make sure we remember which filter was used, to set
         // the default for next time:
-        preferences.storeImportExportPreferences(preferences.getImportExportPreferences()
-                                                            .withLastExportExtension(format.getName())
-                                                            .withExportWorkingDirectory(file.getParent()));
+        preferences.getImportExportPreferences().setLastExportExtension(format.getName());
+        preferences.getImportExportPreferences().setExportWorkingDirectory(file.getParent());
 
         final List<BibEntry> finEntries = entries;
         BackgroundTask

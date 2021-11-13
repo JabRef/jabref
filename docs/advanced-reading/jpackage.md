@@ -1,6 +1,6 @@
 # Creating a binary and debug it
 
-JabRef uses [jpackage](https://docs.oracle.com/en/java/javase/14/jpackage/) to build binary application bundles and installers for Windows, Linux, and Mac OS X. For Gradle, we use the [Badass JLink Plugin](https://badass-jlink-plugin.beryx.org/releases/latest/).
+JabRef uses [jpackage](https://docs.oracle.com/en/java/javase/14/jpackage/) to build binary application bundles and installers for Windows, Linux, and macOS. For Gradle, we use the [Badass JLink Plugin](https://badass-jlink-plugin.beryx.org/releases/latest/).
 
 ## Build Windows binaries locally
 

@@ -240,8 +240,6 @@ public interface PreferencesService {
 
     AutoLinkPreferences getAutoLinkPreferences();
 
-    void storeAutoLinkPreferences(AutoLinkPreferences autoLinkPreferences);
-
     boolean shouldAutosave();
 
     void storeShouldAutosave(boolean shouldAutosave);
@@ -255,8 +253,6 @@ public interface PreferencesService {
     //*************************************************************************************************************
 
     ImportExportPreferences getImportExportPreferences();
-
-    void storeImportExportPreferences(ImportExportPreferences preferences);
 
     List<TemplateExporter> getCustomExportFormats(JournalAbbreviationRepository repository);
 
@@ -324,8 +320,6 @@ public interface PreferencesService {
     void storeSpecialFieldsPreferences(SpecialFieldsPreferences specialFieldsPreferences);
 
     SearchPreferences getSearchPreferences();
-
-    void storeSearchPreferences(SearchPreferences preferences);
 
     String getLastPreferencesExportPath();
 

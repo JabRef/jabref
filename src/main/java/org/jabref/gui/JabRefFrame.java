@@ -599,7 +599,7 @@ public class JabRefFrame extends BorderPane {
         // Subscribe to the search
         EasyBind.subscribe(stateManager.activeSearchQueryProperty(),
                 query -> {
-                    if (prefs.getSearchPreferences().isKeepSearchString()) {
+                    if (prefs.getSearchPreferences().shouldKeepSearchString()) {
                         for (LibraryTab tab : getLibraryTabs()) {
                             tab.setCurrentSearchQuery(query);
                         }

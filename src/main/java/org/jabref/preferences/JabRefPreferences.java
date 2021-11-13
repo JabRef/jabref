@@ -35,6 +35,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javafx.beans.InvalidationListener;
+import javafx.collections.SetChangeListener;
 import javafx.scene.control.TableColumn.SortType;
 
 import org.jabref.gui.Globals;
@@ -108,6 +109,7 @@ import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.EntryTypeFactory;
 import org.jabref.model.metadata.SaveOrderConfig;
 import org.jabref.model.push.PushToApplicationConstants;
+import org.jabref.model.search.rules.SearchRules;
 import org.jabref.model.strings.StringUtil;
 
 import com.tobiasdiez.easybind.EasyBind;
@@ -287,7 +289,7 @@ public class JabRefPreferences implements PreferencesService {
 
     /**
      * The OpenOffice/LibreOffice connection preferences are:
-     * OO_PATH main directory for OO/LO installation, used to detect location on Win/OS X when using manual connect
+     * OO_PATH main directory for OO/LO installation, used to detect location on Win/macOS when using manual connect
      * OO_EXECUTABLE_PATH path to soffice-file
      * OO_JARS_PATH directory that contains juh.jar, jurt.jar, ridl.jar, unoil.jar
      * OO_SYNC_WHEN_CITING true if the reference list is updated when adding a new citation
@@ -433,6 +435,9 @@ public class JabRefPreferences implements PreferencesService {
     private GuiPreferences guiPreferences;
     private RemotePreferences remotePreferences;
     private ProxyPreferences proxyPreferences;
+    private SearchPreferences searchPreferences;
+    private AutoLinkPreferences autoLinkPreferences;
+    private ImportExportPreferences importExportPreferences;
 
     // The constructor is made private to enforce this as a singleton class:
     private JabRefPreferences() {
@@ -2183,6 +2188,10 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public AutoLinkPreferences getAutoLinkPreferences() {
+        if (Objects.nonNull(autoLinkPreferences)) {
+            return autoLinkPreferences;
+        }
+
         AutoLinkPreferences.CitationKeyDependency citationKeyDependency =
                 AutoLinkPreferences.CitationKeyDependency.START; // default
         if (getBoolean(AUTOLINK_EXACT_KEY_ONLY)) {
@@ -2191,32 +2200,33 @@ public class JabRefPreferences implements PreferencesService {
             citationKeyDependency = AutoLinkPreferences.CitationKeyDependency.REGEX;
         }
 
-        return new AutoLinkPreferences(
+        autoLinkPreferences = new AutoLinkPreferences(
                 citationKeyDependency,
                 get(AUTOLINK_REG_EXP_SEARCH_EXPRESSION_KEY),
                 getBoolean(ASK_AUTO_NAMING_PDFS_AGAIN),
                 getKeywordDelimiter());
-    }
 
-    @Override
-    public void storeAutoLinkPreferences(AutoLinkPreferences preferences) {
-        // Starts bibtex only omitted, as it is not being saved
-        switch (preferences.getCitationKeyDependency()) {
-            case START -> {
-                putBoolean(AUTOLINK_EXACT_KEY_ONLY, false);
-                putBoolean(AUTOLINK_USE_REG_EXP_SEARCH_KEY, false);
-            }
-            case EXACT -> {
-                putBoolean(AUTOLINK_EXACT_KEY_ONLY, true);
-                putBoolean(AUTOLINK_USE_REG_EXP_SEARCH_KEY, false);
-            }
-            case REGEX -> {
-                putBoolean(AUTOLINK_EXACT_KEY_ONLY, false);
-                putBoolean(AUTOLINK_USE_REG_EXP_SEARCH_KEY, true);
-            }
-        }
-        putBoolean(ASK_AUTO_NAMING_PDFS_AGAIN, preferences.shouldAskAutoNamingPdfs());
-        put(AUTOLINK_REG_EXP_SEARCH_EXPRESSION_KEY, preferences.getRegularExpression());
+        EasyBind.listen(autoLinkPreferences.citationKeyDependencyProperty(), (obs, oldValue, newValue) -> {
+                    // Starts bibtex only omitted, as it is not being saved
+                    switch (newValue) {
+                        case START -> {
+                            putBoolean(AUTOLINK_EXACT_KEY_ONLY, false);
+                            putBoolean(AUTOLINK_USE_REG_EXP_SEARCH_KEY, false);
+                        }
+                        case EXACT -> {
+                            putBoolean(AUTOLINK_EXACT_KEY_ONLY, true);
+                            putBoolean(AUTOLINK_USE_REG_EXP_SEARCH_KEY, false);
+                        }
+                        case REGEX -> {
+                            putBoolean(AUTOLINK_EXACT_KEY_ONLY, false);
+                            putBoolean(AUTOLINK_USE_REG_EXP_SEARCH_KEY, true);
+                        }
+                    }
+                });
+        EasyBind.listen(autoLinkPreferences.askAutoNamingPdfsProperty(), (obs, oldValue, newValue) -> putBoolean(ASK_AUTO_NAMING_PDFS_AGAIN, newValue));
+        EasyBind.listen(autoLinkPreferences.regularExpressionProperty(), (obs, oldValue, newValue) -> put(AUTOLINK_REG_EXP_SEARCH_EXPRESSION_KEY, newValue));
+
+        return autoLinkPreferences;
     }
 
     @Override
@@ -2235,7 +2245,11 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public ImportExportPreferences getImportExportPreferences() {
-        return new ImportExportPreferences(
+        if (Objects.nonNull(importExportPreferences)) {
+            return importExportPreferences;
+        }
+
+        importExportPreferences = new ImportExportPreferences(
                 get(NON_WRAPPABLE_FIELDS),
                 !getBoolean(RESOLVE_STRINGS_ALL_FIELDS),
                 getBoolean(RESOLVE_STRINGS_ALL_FIELDS),
@@ -2244,17 +2258,17 @@ public class JabRefPreferences implements PreferencesService {
                 Path.of(get(IMPORT_WORKING_DIRECTORY)),
                 get(LAST_USED_EXPORT),
                 Path.of(get(EXPORT_WORKING_DIRECTORY)));
-    }
 
-    @Override
-    public void storeImportExportPreferences(ImportExportPreferences preferences) {
-        put(NON_WRAPPABLE_FIELDS, preferences.getNonWrappableFields());
-        putBoolean(RESOLVE_STRINGS_ALL_FIELDS, preferences.shouldResolveStringsForAllStrings());
-        put(DO_NOT_RESOLVE_STRINGS_FOR, preferences.getNonResolvableFields());
-        putBoolean(REFORMAT_FILE_ON_SAVE_AND_EXPORT, preferences.shouldAlwaysReformatOnSave());
-        put(IMPORT_WORKING_DIRECTORY, preferences.getImportWorkingDirectory().toString());
-        put(LAST_USED_EXPORT, preferences.getLastExportExtension());
-        put(EXPORT_WORKING_DIRECTORY, preferences.getExportWorkingDirectory().toString());
+        EasyBind.listen(importExportPreferences.nonWrappableFieldsProperty(), (obs, oldValue, newValue) -> put(NON_WRAPPABLE_FIELDS, newValue));
+        EasyBind.listen(importExportPreferences.resolveStringsForStandardBibtexFieldsProperty(), (obs, oldValue, newValue) -> putBoolean(RESOLVE_STRINGS_ALL_FIELDS, newValue));
+        EasyBind.listen(importExportPreferences.resolveStringsForAllStringsProperty(), (obs, oldValue, newValue) -> putBoolean(RESOLVE_STRINGS_ALL_FIELDS, newValue));
+        EasyBind.listen(importExportPreferences.nonResolvableFieldsProperty(), (obs, oldValue, newValue) -> put(DO_NOT_RESOLVE_STRINGS_FOR, newValue));
+        EasyBind.listen(importExportPreferences.alwaysReformatOnSaveProperty(), (obs, oldValue, newValue) -> putBoolean(REFORMAT_FILE_ON_SAVE_AND_EXPORT, newValue));
+        EasyBind.listen(importExportPreferences.importWorkingDirectoryProperty(), (obs, oldValue, newValue) -> put(IMPORT_WORKING_DIRECTORY, newValue.toString()));
+        EasyBind.listen(importExportPreferences.lastExportExtensionProperty(), (obs, oldValue, newValue) -> put(LAST_USED_EXPORT, newValue));
+        EasyBind.listen(importExportPreferences.exportWorkingDirectoryProperty(), (obs, oldValue, newValue) -> put(EXPORT_WORKING_DIRECTORY, newValue.toString()));
+
+        return importExportPreferences;
     }
 
     @Override
@@ -2552,6 +2566,10 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public SearchPreferences getSearchPreferences() {
+        if (Objects.nonNull(searchPreferences)) {
+            return searchPreferences;
+        }
+
         SearchDisplayMode searchDisplayMode;
         try {
             searchDisplayMode = SearchDisplayMode.valueOf(get(SEARCH_DISPLAY_MODE));
@@ -2560,23 +2578,24 @@ public class JabRefPreferences implements PreferencesService {
             searchDisplayMode = SearchDisplayMode.valueOf((String) defaults.get(SEARCH_DISPLAY_MODE));
         }
 
-        return new SearchPreferences(
+        searchPreferences = new SearchPreferences(
                 searchDisplayMode,
                 getBoolean(SEARCH_CASE_SENSITIVE),
                 getBoolean(SEARCH_REG_EXP),
                 getBoolean(SEARCH_FULLTEXT),
                 getBoolean(SEARCH_KEEP_SEARCH_STRING),
                 getBoolean(SEARCH_KEEP_GLOBAL_WINDOW_ON_TOP));
-    }
 
-    @Override
-    public void storeSearchPreferences(SearchPreferences preferences) {
-        put(SEARCH_DISPLAY_MODE, Objects.requireNonNull(preferences.getSearchDisplayMode()).toString());
-        putBoolean(SEARCH_CASE_SENSITIVE, preferences.isCaseSensitive());
-        putBoolean(SEARCH_REG_EXP, preferences.isRegularExpression());
-        putBoolean(SEARCH_FULLTEXT, preferences.isFulltext());
-        putBoolean(SEARCH_KEEP_SEARCH_STRING, preferences.isKeepSearchString());
-        putBoolean(SEARCH_KEEP_GLOBAL_WINDOW_ON_TOP, preferences.isKeepWindowOnTop());
+        EasyBind.listen(searchPreferences.searchDisplayModeProperty(), (obs, oldValue, newValue) -> put(SEARCH_DISPLAY_MODE, Objects.requireNonNull(searchPreferences.getSearchDisplayMode()).toString()));
+        searchPreferences.getObservableSearchFlags().addListener((SetChangeListener<SearchRules.SearchFlags>) c -> {
+                putBoolean(SEARCH_CASE_SENSITIVE, searchPreferences.getObservableSearchFlags().contains(SearchRules.SearchFlags.CASE_SENSITIVE));
+                putBoolean(SEARCH_REG_EXP, searchPreferences.getObservableSearchFlags().contains(SearchRules.SearchFlags.REGULAR_EXPRESSION));
+                putBoolean(SEARCH_FULLTEXT, searchPreferences.getObservableSearchFlags().contains(SearchRules.SearchFlags.FULLTEXT));
+                putBoolean(SEARCH_KEEP_SEARCH_STRING, searchPreferences.getObservableSearchFlags().contains(SearchRules.SearchFlags.KEEP_SEARCH_STRING));
+        });
+        EasyBind.listen(searchPreferences.keepWindowOnTopProperty(), (obs, oldValue, newValue) -> putBoolean(SEARCH_KEEP_GLOBAL_WINDOW_ON_TOP, searchPreferences.shouldKeepWindowOnTop()));
+
+        return searchPreferences;
     }
 
     //*************************************************************************************************************
