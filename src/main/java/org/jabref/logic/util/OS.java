@@ -7,11 +7,9 @@ import java.util.Locale;
  */
 public class OS {
     // File separator obtained from system
-    public static final String FILE_SEPARATOR = System.getProperty("file.separator");
+    private static final String FILE_SEPARATOR = System.getProperty("file.separator");
 
-    // Newlines
-    // will be overridden in initialization due to feature #857 @ JabRef.java
-    public static String NEWLINE = System.lineSeparator();
+    public static final String NEWLINE = System.lineSeparator();
 
     // https://commons.apache.org/proper/commons-lang/javadocs/api-2.6/org/apache/commons/lang/SystemUtils.html
     private static final String OS_NAME = System.getProperty("os.name", "unknown").toLowerCase(Locale.ROOT);
