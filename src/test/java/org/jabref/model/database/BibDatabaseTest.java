@@ -52,6 +52,8 @@ class BibDatabaseTest {
         database.insertEntry(entry);
         BibDatabaseContext bibDatabaseContext = new BibDatabaseContext(database, new MetaData());
         assertEquals(true, bibDatabaseContext.hasEmptyEntries());
+        bibDatabaseContext.getDatabase().removeEntries(Collections.singletonList(entry));
+        assertEquals(Collections.emptyList(), bibDatabaseContext.getEntries());
     }
 
     @Test
