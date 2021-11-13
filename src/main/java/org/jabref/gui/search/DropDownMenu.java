@@ -80,12 +80,7 @@ public class DropDownMenu {
         // authorButton action
         authorButton.setOnAction(event -> {
             if (!isPrevAttribute(searchField)) { // checks if the search term prior is an attribute and wont queue another if so
-                if (searchField.getCaretPosition() != 0) {
-                    if (!searchField.getText(searchField.getCaretPosition() - 1, searchField.getCaretPosition()).equals(" ")) {
-                        searchField.insertText(searchField.getCaretPosition(), " ");
-                        searchField.positionCaret(searchField.getText().length());
-                    }
-                }
+                checkAndAddSpace(searchField); // checks if there is a space prior and if not adds it
                 searchField.insertText(searchField.getCaretPosition(), "author:");
                 searchField.positionCaret(searchField.getText().length());
             }
@@ -93,50 +88,34 @@ public class DropDownMenu {
 
         // journalButton action
         journalButton.setOnAction(event -> {
-            if (searchField.getCaretPosition() != 0) {
-                if (!searchField.getText(searchField.getCaretPosition() - 1, searchField.getCaretPosition()).equals(" ")) {
-                    searchField.insertText(searchField.getCaretPosition(), " ");
-                    searchField.positionCaret(searchField.getText().length());
-                }
+            if (!isPrevAttribute(searchField)) {
+                checkAndAddSpace(searchField);
+                searchField.insertText(searchField.getCaretPosition(), "journal:");
+                searchField.positionCaret(searchField.getText().length());
             }
-            searchField.insertText(searchField.getCaretPosition(), "journal:");
-            searchField.positionCaret(searchField.getText().length());
         });
 
         // titleButton action
         titleButton.setOnAction(event -> {
-            if (searchField.getCaretPosition() != 0) {
-                if (!searchField.getText(searchField.getCaretPosition() - 1, searchField.getCaretPosition()).equals(" ")) {
-                    searchField.insertText(searchField.getCaretPosition(), " ");
-                    searchField.positionCaret(searchField.getText().length());
-                }
+            if (!isPrevAttribute(searchField)) {
+                checkAndAddSpace(searchField);
+                searchField.insertText(searchField.getCaretPosition(), "title:");
+                searchField.positionCaret(searchField.getText().length());
             }
-            searchField.insertText(searchField.getCaretPosition(), "title:");
-            searchField.positionCaret(searchField.getText().length());
         });
 
         // yearButton action
         yearButton.setOnAction(event -> {
-            if (searchField.getCaretPosition() != 0) {
-                if (!searchField.getText(searchField.getCaretPosition() - 1, searchField.getCaretPosition()).equals(" ")) {
-                    searchField.insertText(searchField.getCaretPosition(), " ");
-                    searchField.positionCaret(searchField.getText().length());
-                }
+            if (!isPrevAttribute(searchField)) {
+                checkAndAddSpace(searchField);
+                searchField.insertText(searchField.getCaretPosition(), "year:");
+                searchField.positionCaret(searchField.getText().length());
             }
-            searchField.insertText(searchField.getCaretPosition(), "year:");
-            searchField.positionCaret(searchField.getText().length());
         });
 
         // yearRangeButton action
         yearRangeButton.setOnAction(event -> {
-            if (searchField.getCaretPosition() != 0) {
-                if (!searchField.getText(searchField.getCaretPosition() - 1, searchField.getCaretPosition()).equals(" ")) {
-                    searchField.insertText(searchField.getCaretPosition(), " ");
-                    searchField.positionCaret(searchField.getText().length());
-                }
-            }
-            searchField.insertText(searchField.getCaretPosition(), "year:");
-            searchField.positionCaret(searchField.getText().length());
+
         });
 
         // andButton action
@@ -188,12 +167,20 @@ public class DropDownMenu {
         });
     }
 
+    private void checkAndAddSpace(CustomTextField searchField) {
+        if (searchField.getCaretPosition() != 0) {
+            if (!searchField.getText(searchField.getCaretPosition() - 1, searchField.getCaretPosition()).equals(" ")) {
+                searchField.insertText(searchField.getCaretPosition(), " ");
+                searchField.positionCaret(searchField.getText().length());
+            }
+        }
+    }
+
     private boolean isPrevAttribute(CustomTextField searchField) {
         isPrevAttribute = false;
         if (searchField.getCaretPosition() != 0) {
             if (searchField.getText(searchField.getCaretPosition() - 1, searchField.getCaretPosition()).equals(":")) {
                 isPrevAttribute = true;
-                System.out.println("IS TRUEEEEEEEEEEEEEEEEEEEEEEEEEEEE");
             }
         }
         return isPrevAttribute;
