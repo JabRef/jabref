@@ -110,7 +110,7 @@ public class GlobalSearchBar extends HBox {
     private GlobalSearchResultDialog globalSearchResultDialog;
 
     private final DropDownMenu dropDownMenu;
-    public final JFXChipView<Property<String>> chipView;
+    public final JFXChipView<String> chipView;
 
     public GlobalSearchBar(JabRefFrame frame, StateManager stateManager, PreferencesService preferencesService, CountingUndoManager undoManager) {
         super();
@@ -136,6 +136,7 @@ public class GlobalSearchBar extends HBox {
         chipView = new JFXChipView<>();
         chipView.setMaxHeight(30);
         chipView.autosize();
+        chipView.getSuggestions().addAll("HELLO", "TROLL", "WFEWEF", "WEF");
 
         KeyBindingRepository keyBindingRepository = Globals.getKeyPrefs();
         searchField.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
@@ -210,7 +211,7 @@ public class GlobalSearchBar extends HBox {
         this.stateManager.activeDatabaseProperty().addListener((obs, oldValue, newValue) -> stateManager.activeSearchQueryProperty().get().ifPresent(this::updateSearchResultsForQuery));
 
         // ChipView Prototype
-        chipView.getChips().addListener((ListChangeListener<? super Property<String>>) event -> {
+        chipView.getChips().addListener((ListChangeListener<? super String>) event -> {
             this.setSearchTerm(chipView.getChips().toString());
         });
     }
