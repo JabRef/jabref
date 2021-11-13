@@ -155,7 +155,7 @@ public class BibtexParser implements Parser {
             currentChar = pushbackReader.read();
             stringWriter.append((char) currentChar);
             i++;
-        } while ((i<BibtexParser.LOOKAHEAD) && (currentChar != '\r') && (currentChar != '\n'));
+        } while ((i < BibtexParser.LOOKAHEAD) && (currentChar != '\r') && (currentChar != '\n'));
         if (currentChar == '\r') {
             newLineSeparator = "\r\n";
         } else if (currentChar == '\n') {
