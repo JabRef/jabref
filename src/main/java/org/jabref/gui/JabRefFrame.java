@@ -181,6 +181,9 @@ public class JabRefFrame extends BorderPane {
 
     private final TaskExecutor taskExecutor;
 
+    // ChipView Prototype
+    private VBox SearchBox;
+
     public JabRefFrame(Stage mainStage) {
         this.mainStage = mainStage;
         this.dialogService = new JabRefDialogService(mainStage, this, prefs);
@@ -197,6 +200,11 @@ public class JabRefFrame extends BorderPane {
                 }
             }
         });
+
+        // ChipView Prototype
+        this.SearchBox = new VBox(globalSearchBar, globalSearchBar.chipView);
+        this.SearchBox.autosize();
+        this.SearchBox.setPrefSize(750, 30);
     }
 
     private void initDragAndDrop() {
@@ -496,7 +504,7 @@ public class JabRefFrame extends BorderPane {
 
                 leftSpacer,
 
-                globalSearchBar,
+                SearchBox,
 
                 rightSpacer,
 

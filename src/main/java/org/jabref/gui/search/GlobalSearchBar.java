@@ -13,7 +13,9 @@ import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.Property;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.collections.ListChangeListener;
 import javafx.css.PseudoClass;
 import javafx.event.Event;
 import javafx.geometry.Insets;
@@ -64,6 +66,7 @@ import org.jabref.model.search.rules.SearchRules;
 import org.jabref.preferences.PreferencesService;
 import org.jabref.preferences.SearchPreferences;
 
+import com.jfoenix.controls.JFXChipView;
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
 import de.saxsys.mvvmfx.utils.validation.Validator;
@@ -107,6 +110,8 @@ public class GlobalSearchBar extends HBox {
     private GlobalSearchResultDialog globalSearchResultDialog;
 
     private final DropDownMenu dropDownMenu;
+    public final JFXChipView<Property<String>> chipView;
+
     public GlobalSearchBar(JabRefFrame frame, StateManager stateManager, PreferencesService preferencesService, CountingUndoManager undoManager) {
         super();
         this.stateManager = stateManager;
@@ -126,6 +131,11 @@ public class GlobalSearchBar extends HBox {
 
         // Prototype DropDownMenu
         dropDownMenu = new DropDownMenu(searchField, this);
+
+        // Prototype ChipView
+        chipView = new JFXChipView<>();
+        chipView.setMaxHeight(30);
+        chipView.autosize();
 
         KeyBindingRepository keyBindingRepository = Globals.getKeyPrefs();
         searchField.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
@@ -198,6 +208,11 @@ public class GlobalSearchBar extends HBox {
 
         this.stateManager.activeSearchQueryProperty().addListener((obs, oldvalue, newValue) -> newValue.ifPresent(this::updateSearchResultsForQuery));
         this.stateManager.activeDatabaseProperty().addListener((obs, oldValue, newValue) -> stateManager.activeSearchQueryProperty().get().ifPresent(this::updateSearchResultsForQuery));
+
+        // ChipView Prototype
+        chipView.getChips().addListener((ListChangeListener<? super Property<String>>) event -> {
+            this.setSearchTerm(chipView.getChips().toString());
+        });
     }
 
     private void updateSearchResultsForQuery(SearchQuery query) {
