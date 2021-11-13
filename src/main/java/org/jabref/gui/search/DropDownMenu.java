@@ -23,6 +23,7 @@ public class DropDownMenu {
     public Button leftBracketButton;
     public Button rightBracketButton;
     public RecentSearch recentSearch;
+    private boolean isPrevAttribute;
     // private final Button articleButton;
     // private final Button bookButton;
     // private final Button citationKeyButton;
@@ -60,30 +61,34 @@ public class DropDownMenu {
         Node buttonBox = mainBox;
 
         searchField.addEventFilter(MouseEvent.MOUSE_CLICKED, event -> {
-            if (searchbarDropDown == null) {
+            if (searchbarDropDown == null || !searchbarDropDown.isShowing()) {
                 searchbarDropDown = new PopOver(buttonBox);
                 searchbarDropDown.setWidth(searchField.getWidth());
                 searchbarDropDown.setArrowLocation(PopOver.ArrowLocation.TOP_CENTER);
                 searchbarDropDown.setContentNode(buttonBox);
+                searchbarDropDown.setDetachable(false); // not detachable
                 searchbarDropDown.show(searchField);
-            } else if (searchbarDropDown.isShowing()) {
-                searchbarDropDown.hide();
+//            } else if (searchbarDropDown.isShowing()) {
+//                searchbarDropDown.hide();  // this makes the dropdown disappear if you re-click on searchbar
             } else {
-                searchbarDropDown.setContentNode(buttonBox);
-                searchbarDropDown.show(searchField);
+//                searchbarDropDown.setContentNode(buttonBox);
+                // this makes the drop down reappear every time you click on search bar, even if its shown already
+//                searchbarDropDown.show(searchField);
             }
         });
 
         // authorButton action
         authorButton.setOnAction(event -> {
-            if (searchField.getCaretPosition() != 0) {
-                if (!searchField.getText(searchField.getCaretPosition() - 1, searchField.getCaretPosition()).equals(" ")) {
-                    searchField.insertText(searchField.getCaretPosition(), " ");
-                    searchField.positionCaret(searchField.getText().length());
+            if (!isPrevAttribute(searchField)) { // checks if the search term prior is an attribute and wont queue another if so
+                if (searchField.getCaretPosition() != 0) {
+                    if (!searchField.getText(searchField.getCaretPosition() - 1, searchField.getCaretPosition()).equals(" ")) {
+                        searchField.insertText(searchField.getCaretPosition(), " ");
+                        searchField.positionCaret(searchField.getText().length());
+                    }
                 }
+                searchField.insertText(searchField.getCaretPosition(), "author:");
+                searchField.positionCaret(searchField.getText().length());
             }
-            searchField.insertText(searchField.getCaretPosition(), "author:");
-            searchField.positionCaret(searchField.getText().length());
         });
 
         // journalButton action
@@ -183,4 +188,14 @@ public class DropDownMenu {
         });
     }
 
+    private boolean isPrevAttribute(CustomTextField searchField) {
+        isPrevAttribute = false;
+        if (searchField.getCaretPosition() != 0) {
+            if (searchField.getText(searchField.getCaretPosition() - 1, searchField.getCaretPosition()).equals(":")) {
+                isPrevAttribute = true;
+                System.out.println("IS TRUEEEEEEEEEEEEEEEEEEEEEEEEEEEE");
+            }
+        }
+        return isPrevAttribute;
+    }
 }
