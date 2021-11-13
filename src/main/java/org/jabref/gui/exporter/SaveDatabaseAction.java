@@ -32,7 +32,6 @@ import org.jabref.logic.l10n.Encodings;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.shared.DatabaseLocation;
 import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
-import org.jabref.logic.util.OS;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.event.ChangePropagation;
@@ -231,13 +230,14 @@ public class SaveDatabaseAction {
         SavePreferences savePreferences = this.preferences.getSavePreferences()
                                                       .withSaveType(saveType);
         try (AtomicFileWriter fileWriter = new AtomicFileWriter(file, encoding, savePreferences.shouldMakeBackup())) {
-            BibWriter bibWriter = new BibWriter(fileWriter, OS.NEWLINE);
+            BibDatabaseContext bibDatabaseContext = libraryTab.getBibDatabaseContext();
+            BibWriter bibWriter = new BibWriter(fileWriter, bibDatabaseContext.getDatabase().getNewLineSeparator());
             BibtexDatabaseWriter databaseWriter = new BibtexDatabaseWriter(bibWriter, generalPreferences, savePreferences, entryTypesManager);
 
             if (selectedOnly) {
-                databaseWriter.savePartOfDatabase(libraryTab.getBibDatabaseContext(), libraryTab.getSelectedEntries());
+                databaseWriter.savePartOfDatabase(bibDatabaseContext, libraryTab.getSelectedEntries());
             } else {
-                databaseWriter.saveDatabase(libraryTab.getBibDatabaseContext());
+                databaseWriter.saveDatabase(bibDatabaseContext);
             }
 
             libraryTab.registerUndoableChanges(databaseWriter.getSaveActionsFieldChanges());

@@ -73,7 +73,6 @@ public class BibtexParser implements Parser {
     private PushbackReader pushbackReader;
     private BibDatabase database;
     private Set<BibEntryType> entryTypes;
-    private String newLine = OS.NEWLINE;
     private boolean eof;
     private int line = 1;
     private ParserResult parserResult;
@@ -135,10 +134,10 @@ public class BibtexParser implements Parser {
         Objects.requireNonNull(in);
         pushbackReader = new PushbackReader(in, BibtexParser.LOOKAHEAD);
 
-        determineNewLine();
+        String newLineSeparator = determineNewLineSeparator();
 
         // BibTeX related contents.
-        initializeParserResult();
+        initializeParserResult(newLineSeparator);
 
         parseDatabaseID();
 
@@ -147,7 +146,8 @@ public class BibtexParser implements Parser {
         return parseFileContent();
     }
 
-    private void determineNewLine() throws IOException {
+    private String determineNewLineSeparator() throws IOException {
+        String newLineSeparator = OS.NEWLINE;
         StringWriter stringWriter = new StringWriter(BibtexParser.LOOKAHEAD);
         int i = 0;
         int currentChar;
@@ -157,17 +157,20 @@ public class BibtexParser implements Parser {
             i++;
         } while ((i<BibtexParser.LOOKAHEAD) && (currentChar != '\r') && (currentChar != '\n'));
         if (currentChar == '\r') {
-            newLine = "\r\n";
+            newLineSeparator = "\r\n";
         } else if (currentChar == '\n') {
-            newLine = "\n";
+            newLineSeparator = "\n";
         }
 
         // unread all sneaked characters
         pushbackReader.unread(stringWriter.toString().toCharArray());
+
+        return newLineSeparator;
     }
 
-    private void initializeParserResult() {
+    private void initializeParserResult(String newLineSeparator) {
         database = new BibDatabase();
+        database.setNewLineSeparator(newLineSeparator);
         entryTypes = new HashSet<>(); // To store custom entry types parsed.
         parserResult = new ParserResult(database, new MetaData(), entryTypes);
     }

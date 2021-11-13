@@ -211,6 +211,54 @@ class BibEntryWriterTest {
     }
 
     @Test
+    void roundTripWithKeepsCRLFLineBreakStyle() throws IOException {
+        // @formatter:off
+        String bibtexEntry = "@Article{test,\r\n" +
+                "  Author                   = {Foo Bar},\r\n" +
+                "  Journal                  = {International Journal of Something},\r\n" +
+                "  Note                     = {some note},\r\n" +
+                "  Number                   = {1}\r\n" +
+                "}\r\n";
+        // @formatter:on
+
+        // read in bibtex string
+        ParserResult result = new BibtexParser(importFormatPreferences, fileMonitor).parse(new StringReader(bibtexEntry));
+        Collection<BibEntry> entries = result.getDatabase().getEntries();
+        BibEntry entry = entries.iterator().next();
+
+        // write out bibtex string
+        // need to reconfigure writer to use "\r\n"
+        bibWriter = new BibWriter(stringWriter, "\r\n");
+        bibEntryWriter.write(entry, bibWriter, BibDatabaseMode.BIBTEX);
+
+        assertEquals(bibtexEntry, stringWriter.toString());
+    }
+
+    @Test
+    void roundTripWithKeepsLFLineBreakStyle() throws IOException {
+        // @formatter:off
+        String bibtexEntry = "@Article{test,\n" +
+                "  Author                   = {Foo Bar},\n" +
+                "  Journal                  = {International Journal of Something},\n" +
+                "  Note                     = {some note},\n" +
+                "  Number                   = {1}\n" +
+                "}\n";
+        // @formatter:on
+
+        // read in bibtex string
+        ParserResult result = new BibtexParser(importFormatPreferences, fileMonitor).parse(new StringReader(bibtexEntry));
+        Collection<BibEntry> entries = result.getDatabase().getEntries();
+        BibEntry entry = entries.iterator().next();
+
+        // write out bibtex string
+        // need to reconfigure writer to use "\n"
+        bibWriter = new BibWriter(stringWriter, "\n");
+        bibEntryWriter.write(entry, bibWriter, BibDatabaseMode.BIBTEX);
+
+        assertEquals(bibtexEntry, stringWriter.toString());
+    }
+
+    @Test
     void roundTripWithModification() throws IOException {
         // @formatter:off
         String bibtexEntry = "@Article{test," + OS.NEWLINE +

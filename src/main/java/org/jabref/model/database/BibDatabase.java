@@ -63,11 +63,11 @@ public class BibDatabase {
 
     private String sharedDatabaseID;
 
-    private String newLine = OS.NEWLINE;
+    private String newLineSeparator = OS.NEWLINE;
 
-    public BibDatabase(List<BibEntry> entries, String newLine) {
+    public BibDatabase(List<BibEntry> entries, String newLineSeparator) {
         this(entries);
-        this.newLine = newLine;
+        this.newLineSeparator = newLineSeparator;
     }
 
     public BibDatabase(List<BibEntry> entries) {
@@ -633,9 +633,18 @@ public class BibDatabase {
     }
 
     /**
+     * Set the newline separator.
+     * @param newLineSeparator
+     */
+    public void setNewLineSeparator(String newLineSeparator) {
+        this.newLineSeparator = newLineSeparator;
+    }
+
+    /**
      * Returns the string used to indicate a linebreak
      */
-    public String getNewLine() {
-        return newLine;
+    public String getNewLineSeparator() {
+        return newLineSeparator;
     }
+
 }

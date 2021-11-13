@@ -2118,20 +2118,6 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     @Override
-    public NewLineSeparator getNewLineSeparator() {
-        return NewLineSeparator.parse(get(NEWLINE));
-    }
-
-    @Override
-    public void storeNewLineSeparator(NewLineSeparator newLineSeparator) {
-        String escapeChars = newLineSeparator.toString();
-        put(NEWLINE, escapeChars);
-
-        // We also have to change Globals variable as globals is not a getter, but a constant
-        OS.NEWLINE = escapeChars;
-    }
-
-    @Override
     public FieldContentFormatterPreferences getFieldContentParserPreferences() {
         return new FieldContentFormatterPreferences(
                 getStringList(NON_WRAPPABLE_FIELDS).stream().map(FieldFactory::parseField).collect(Collectors.toList()));
@@ -2254,7 +2240,6 @@ public class JabRefPreferences implements PreferencesService {
                 !getBoolean(RESOLVE_STRINGS_ALL_FIELDS),
                 getBoolean(RESOLVE_STRINGS_ALL_FIELDS),
                 get(DO_NOT_RESOLVE_STRINGS_FOR),
-                getNewLineSeparator(),
                 getBoolean(REFORMAT_FILE_ON_SAVE_AND_EXPORT),
                 Path.of(get(IMPORT_WORKING_DIRECTORY)),
                 get(LAST_USED_EXPORT),
@@ -2266,7 +2251,6 @@ public class JabRefPreferences implements PreferencesService {
         put(NON_WRAPPABLE_FIELDS, preferences.getNonWrappableFields());
         putBoolean(RESOLVE_STRINGS_ALL_FIELDS, preferences.shouldResolveStringsForAllStrings());
         put(DO_NOT_RESOLVE_STRINGS_FOR, preferences.getNonResolvableFields());
-        storeNewLineSeparator(preferences.getNewLineSeparator());
         putBoolean(REFORMAT_FILE_ON_SAVE_AND_EXPORT, preferences.shouldAlwaysReformatOnSave());
         put(IMPORT_WORKING_DIRECTORY, preferences.getImportWorkingDirectory().toString());
         put(LAST_USED_EXPORT, preferences.getLastExportExtension());

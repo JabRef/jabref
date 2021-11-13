@@ -7,7 +7,6 @@ public class ImportExportPreferences {
     private final boolean resolveStringsForStandardBibtexFields;
     private final boolean resolveStringsForAllStrings;
     private final String nonResolvableFields;
-    private final NewLineSeparator newLineSeparator;
     private final boolean alwaysReformatOnSave;
     private Path importWorkingDirectory;
     private String lastExportExtension;
@@ -17,7 +16,6 @@ public class ImportExportPreferences {
                                    boolean resolveStringsForStandardBibtexFields,
                                    boolean resolveStringsForAllStrings,
                                    String nonResolvableFields,
-                                   NewLineSeparator newLineSeparator,
                                    boolean alwaysReformatOnSave,
                                    Path importWorkingDirectory,
                                    String lastExportExtension,
@@ -26,7 +24,6 @@ public class ImportExportPreferences {
         this.resolveStringsForStandardBibtexFields = resolveStringsForStandardBibtexFields;
         this.resolveStringsForAllStrings = resolveStringsForAllStrings;
         this.nonResolvableFields = nonResolvableFields;
-        this.newLineSeparator = newLineSeparator;
         this.alwaysReformatOnSave = alwaysReformatOnSave;
         this.importWorkingDirectory = importWorkingDirectory;
         this.lastExportExtension = lastExportExtension;
@@ -47,10 +44,6 @@ public class ImportExportPreferences {
 
     public String getNonResolvableFields() {
         return nonResolvableFields;
-    }
-
-    public NewLineSeparator getNewLineSeparator() {
-        return newLineSeparator;
     }
 
     public boolean shouldAlwaysReformatOnSave() {

@@ -1304,6 +1304,32 @@ class BibtexParserTest {
     }
 
     @Test
+    void parseRecognizesCRLFLineBreak() throws IOException {
+        ParserResult result = parser.parse(
+                new StringReader("@InProceedings{6055279,\r\n" + "  Title                    = {Educational session 1},\r\n"
+                        + "  Booktitle                = {Custom Integrated Circuits Conference (CICC), 2011 IEEE},\r\n"
+                        + "  Year                     = {2011},\r\n" + "  Month                    = {Sept},\r\n"
+                        + "  Pages                    = {1-7},\r\n"
+                        + "  Abstract                 = {Start of the above-titled section of the conference proceedings record.},\r\n"
+                        + "  DOI                      = {10.1109/CICC.2011.6055279},\r\n"
+                        + "  ISSN                     = {0886-5930}\r\n" + "}\r\n"));
+        assertEquals("\r\n", result.getDatabase().getNewLineSeparator());
+    }
+
+    @Test
+    void parseRecognizesLFLineBreak() throws IOException {
+        ParserResult result = parser.parse(
+                new StringReader("@InProceedings{6055279,\n" + "  Title                    = {Educational session 1},\n"
+                        + "  Booktitle                = {Custom Integrated Circuits Conference (CICC), 2011 IEEE},\n"
+                        + "  Year                     = {2011},\n" + "  Month                    = {Sept},\n"
+                        + "  Pages                    = {1-7},\n"
+                        + "  Abstract                 = {Start of the above-titled section of the conference proceedings record.},\n"
+                        + "  DOI                      = {10.1109/CICC.2011.6055279},\n"
+                        + "  ISSN                     = {0886-5930}\n" + "}\n"));
+        assertEquals("\n", result.getDatabase().getNewLineSeparator());
+    }
+
+    @Test
     void integrationTestSaveActions() throws IOException {
         ParserResult parserResult = parser
                 .parse(new StringReader("@comment{jabref-meta: saveActions:enabled;title[lower_case]}"));

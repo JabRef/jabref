@@ -3,12 +3,14 @@ package org.jabref.logic.exporter;
 import java.io.IOException;
 import java.io.Writer;
 
+import org.jabref.model.strings.StringUtil;
+
 /**
  * Class to write to a .bib file. Used by {@link BibtexDatabaseWriter}
  */
 public class BibWriter {
 
-    private final String newline;
+    private final String newLineSeparator;
     private final Writer writer;
 
     private boolean precedingNewLineRequired = false;
@@ -16,11 +18,11 @@ public class BibWriter {
     private boolean lastWriteWasNewline = false;
 
     /**
-     * @param newline the string used for a line break
+     * @param newLineSeparator the string used for a line break
      */
-    public BibWriter(Writer writer, String newline) {
+    public BibWriter(Writer writer, String newLineSeparator) {
         this.writer = writer;
-        this.newline = newline;
+        this.newLineSeparator = newLineSeparator;
     }
 
     /**
@@ -28,12 +30,12 @@ public class BibWriter {
      */
     public void write(String string) throws IOException {
         if (precedingNewLineRequired) {
-            writer.write(newline);
+            writer.write(newLineSeparator);
             precedingNewLineRequired = false;
         }
-        string = string.replace("\r\n", "\n").replace("\n", newline);
+        string = StringUtil.unifyLineBreaks(string, newLineSeparator);
         writer.write(string);
-        lastWriteWasNewline = string.endsWith(newline);
+        lastWriteWasNewline = string.endsWith(newLineSeparator);
         somethingWasWritten = true;
     }
 
@@ -50,7 +52,7 @@ public class BibWriter {
      */
     public void finishLine() throws IOException {
         if (!this.lastWriteWasNewline) {
-            this.write(newline);
+            this.write(newLineSeparator);
         }
     }
 

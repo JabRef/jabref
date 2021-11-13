@@ -27,7 +27,7 @@ public class FieldFormatterCleanups {
         this.actions = Objects.requireNonNull(actions);
     }
 
-    private static String getMetaDataString(List<FieldFormatterCleanup> actionList, String newline) {
+    private static String getMetaDataString(List<FieldFormatterCleanup> actionList, String newLineSeparator) {
         // first, group all formatters by the field for which they apply
         Map<Field, List<String>> groupedByField = new TreeMap<>(Comparator.comparing(Field::getName));
         for (FieldFormatterCleanup cleanup : actionList) {
@@ -50,7 +50,7 @@ public class FieldFormatterCleanups {
         for (Map.Entry<Field, List<String>> entry : groupedByField.entrySet()) {
             result.append(entry.getKey().getName());
 
-            StringJoiner joiner = new StringJoiner(",", "[", "]" + newline);
+            StringJoiner joiner = new StringJoiner(",", "[", "]" + newLineSeparator);
             entry.getValue().forEach(joiner::add);
             result.append(joiner.toString());
         }
