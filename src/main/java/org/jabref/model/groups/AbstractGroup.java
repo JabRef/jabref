@@ -9,7 +9,7 @@ import javafx.beans.property.StringProperty;
 import javafx.scene.paint.Color;
 
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.search.SearchMatcher;
+import org.jabref.logic.search.SearchMatcher;
 import org.jabref.model.strings.StringUtil;
 
 /**

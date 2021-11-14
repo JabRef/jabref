@@ -20,8 +20,8 @@ import org.jabref.logic.search.SearchQuery;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.groups.GroupTreeNode;
-import org.jabref.model.search.matchers.MatcherSet;
-import org.jabref.model.search.matchers.MatcherSets;
+import org.jabref.logic.search.matchers.MatcherSet;
+import org.jabref.logic.search.matchers.MatcherSets;
 import org.jabref.preferences.PreferencesService;
 
 import com.tobiasdiez.easybind.EasyBind;

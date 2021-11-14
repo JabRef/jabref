@@ -1,4 +1,4 @@
-package org.jabref.model.search.rules;
+package org.jabref.logic.search.rules;
 
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.pdf.search.PdfSearchResults;

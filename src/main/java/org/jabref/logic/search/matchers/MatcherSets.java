@@ -1,4 +1,4 @@
-package org.jabref.model.search.matchers;
+package org.jabref.logic.search.matchers;
 
 public class MatcherSets {
 

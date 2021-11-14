@@ -4,7 +4,7 @@ import java.util.EnumSet;
 
 import javafx.scene.text.TextFlow;
 
-import org.jabref.model.search.rules.SearchRules.SearchFlags;
+import org.jabref.logic.search.rules.SearchRules.SearchFlags;
 
 public class LuceneBasedSearchRuleDescriber implements SearchDescriber {
 

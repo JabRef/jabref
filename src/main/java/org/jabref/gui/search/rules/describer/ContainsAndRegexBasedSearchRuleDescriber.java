@@ -8,9 +8,9 @@ import javafx.scene.text.TextFlow;
 
 import org.jabref.gui.util.TooltipTextUtil;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.model.search.rules.SearchRules;
-import org.jabref.model.search.rules.SearchRules.SearchFlags;
-import org.jabref.model.search.rules.SentenceAnalyzer;
+import org.jabref.logic.search.rules.SearchRules;
+import org.jabref.logic.search.rules.SearchRules.SearchFlags;
+import org.jabref.logic.search.rules.SentenceAnalyzer;
 
 public class ContainsAndRegexBasedSearchRuleDescriber implements SearchDescriber {
 

@@ -1,4 +1,4 @@
-package org.jabref.model.search.matchers;
+package org.jabref.logic.search.matchers;
 
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.util.ListUtil;

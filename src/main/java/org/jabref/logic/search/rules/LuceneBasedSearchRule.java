@@ -1,12 +1,10 @@
-package org.jabref.model.search.rules;
+package org.jabref.logic.search.rules;
 
 import java.util.EnumSet;
-import java.util.Locale;
 import java.util.concurrent.ExecutionException;
 
-import org.jabref.architecture.AllowedToUseLogic;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.search.rules.SearchRules.SearchFlags;
+import org.jabref.logic.search.rules.SearchRules.SearchFlags;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -21,7 +19,6 @@ import org.slf4j.LoggerFactory;
 /**
  * Search rule for a search based on String.contains()
  */
-@AllowedToUseLogic("Because access to the lucene index is needed")
 public class LuceneBasedSearchRule extends FullTextSearchRule {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LuceneBasedSearchRule.class);

@@ -1,4 +1,4 @@
-package org.jabref.model.search.rules;
+package org.jabref.logic.search.rules;
 
 import java.io.IOException;
 import java.util.Collections;

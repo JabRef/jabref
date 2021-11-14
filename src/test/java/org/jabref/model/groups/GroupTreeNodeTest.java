@@ -10,10 +10,10 @@ import java.util.Optional;
 import org.jabref.model.FieldChange;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.model.search.matchers.AndMatcher;
-import org.jabref.model.search.matchers.OrMatcher;
-import org.jabref.model.search.rules.SearchRules;
-import org.jabref.model.search.rules.SearchRules.SearchFlags;
+import org.jabref.logic.search.matchers.AndMatcher;
+import org.jabref.logic.search.matchers.OrMatcher;
+import org.jabref.logic.search.rules.SearchRules;
+import org.jabref.logic.search.rules.SearchRules.SearchFlags;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

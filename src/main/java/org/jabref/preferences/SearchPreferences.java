@@ -10,7 +10,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableSet;
 
 import org.jabref.gui.search.SearchDisplayMode;
-import org.jabref.model.search.rules.SearchRules.SearchFlags;
+import org.jabref.logic.search.rules.SearchRules.SearchFlags;
 
 public class SearchPreferences {
 

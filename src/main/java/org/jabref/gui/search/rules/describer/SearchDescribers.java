@@ -1,10 +1,10 @@
 package org.jabref.gui.search.rules.describer;
 
 import org.jabref.logic.search.SearchQuery;
-import org.jabref.model.search.rules.ContainsBasedSearchRule;
-import org.jabref.model.search.rules.GrammarBasedSearchRule;
-import org.jabref.model.search.rules.LuceneBasedSearchRule;
-import org.jabref.model.search.rules.RegexBasedSearchRule;
+import org.jabref.logic.search.rules.ContainsBasedSearchRule;
+import org.jabref.logic.search.rules.GrammarBasedSearchRule;
+import org.jabref.logic.search.rules.LuceneBasedSearchRule;
+import org.jabref.logic.search.rules.RegexBasedSearchRule;
 
 public class SearchDescribers {
 

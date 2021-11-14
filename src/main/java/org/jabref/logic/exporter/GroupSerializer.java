@@ -18,7 +18,7 @@ import org.jabref.model.groups.KeywordGroup;
 import org.jabref.model.groups.RegexKeywordGroup;
 import org.jabref.model.groups.SearchGroup;
 import org.jabref.model.groups.TexGroup;
-import org.jabref.model.search.rules.SearchRules;
+import org.jabref.logic.search.rules.SearchRules;
 import org.jabref.model.strings.StringUtil;
 
 public class GroupSerializer {

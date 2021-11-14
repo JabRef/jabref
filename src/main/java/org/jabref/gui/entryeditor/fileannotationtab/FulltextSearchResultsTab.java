@@ -30,7 +30,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.pdf.search.PdfSearchResults;
 import org.jabref.model.pdf.search.SearchResult;
-import org.jabref.model.search.rules.SearchRules;
+import org.jabref.logic.search.rules.SearchRules;
 import org.jabref.preferences.PreferencesService;
 
 import org.slf4j.Logger;

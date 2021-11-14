@@ -1,4 +1,4 @@
-package org.jabref.model.search.rules;
+package org.jabref.logic.search.rules;
 
 import java.util.EnumSet;
 import java.util.Optional;
@@ -6,10 +6,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
-import org.jabref.architecture.AllowedToUseLogic;
+import org.jabref.logic.search.rules.SearchRules.SearchFlags;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
-import org.jabref.model.search.rules.SearchRules.SearchFlags;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,7 +16,6 @@ import org.slf4j.LoggerFactory;
 /**
  * Search rule for regex-based search.
  */
-@AllowedToUseLogic("Because access to the lucene index is needed")
 public class RegexBasedSearchRule extends FullTextSearchRule {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RegexBasedSearchRule.class);

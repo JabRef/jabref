@@ -1,4 +1,4 @@
-package org.jabref.model.search;
+package org.jabref.logic.search;
 
 import org.jabref.model.entry.BibEntry;
 

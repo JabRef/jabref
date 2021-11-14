@@ -1,12 +1,12 @@
-package org.jabref.model.search;
+package org.jabref.logic.search;
 
 import java.util.EnumSet;
 import java.util.Objects;
 
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.search.rules.SearchRule;
-import org.jabref.model.search.rules.SearchRules;
-import org.jabref.model.search.rules.SearchRules.SearchFlags;
+import org.jabref.logic.search.rules.SearchRule;
+import org.jabref.logic.search.rules.SearchRules;
+import org.jabref.logic.search.rules.SearchRules.SearchFlags;
 
 public class GroupSearchQuery implements SearchMatcher {
 

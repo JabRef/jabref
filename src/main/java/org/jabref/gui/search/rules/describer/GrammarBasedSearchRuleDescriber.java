@@ -12,9 +12,9 @@ import javafx.scene.text.TextFlow;
 
 import org.jabref.gui.util.TooltipTextUtil;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.model.search.rules.GrammarBasedSearchRule;
-import org.jabref.model.search.rules.SearchRules;
-import org.jabref.model.search.rules.SearchRules.SearchFlags;
+import org.jabref.logic.search.rules.GrammarBasedSearchRule;
+import org.jabref.logic.search.rules.SearchRules;
+import org.jabref.logic.search.rules.SearchRules.SearchFlags;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.search.SearchBaseVisitor;
 import org.jabref.search.SearchParser;
