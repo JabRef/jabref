@@ -58,7 +58,7 @@ Handling synchronization between user interaction and proper display of the comp
 - When interacting with the dropdown menu it will check and add new items (attributes, logical operators, brackets) to the ArrayList searchItemList and build a full search string to update the search field.
 - When typing directly into the search field it will fetch changes or additions to the ArrayList searchItemList and update the search field accordingly. 
 
-![User Search Input](/sweng/diagrams/user-search-input.png "user-search-input.png")
+![User Search Input](/docs/sweng/diagrams/user-search-input.png "user-search-input.png")
 
 #### 5.2.2 Recent Search
 
@@ -68,7 +68,7 @@ The Recent Search functionality shows the user a record of past searches inside 
 - Clicking on an entry in Recent Search performs a corresponding search.
 - The List is ordered from bottom to top.
 
-![Recent Search](/diagrams/recent-search.png "recent-search.png")
+![Recent Search](/docs/sweng/diagrams/recent-search.png "recent-search.png")
 
 #### 5.2.3 ChipView
 
@@ -77,7 +77,7 @@ The ChipView transforms coherent search strings into a single chip.
 - Pressing a button in DropDownMenu creates a new chip.
 - The resulting chip can then be filled with a search query.
 
-![ChipView](/diagrams/chip-view.png "chip-view.png")
+![ChipView](/docs/sweng/diagrams/chip-view.png "chip-view.png")
 
 #### 5.2.4 Autocomplete
 
@@ -87,7 +87,7 @@ The input is tracked as far as possible.
 
 - A pop-up menu appears with all the recommended entries which you can click on.
 
-![Autocomplete](/diagrams/autocomplete.png "autocomplete.png")
+![Autocomplete](/docs/sweng/diagrams/autocomplete.png "autocomplete.png")
 
 ### 5.3 Logic
 <!-- An dieser Stelle können noch logische Aspekte, wie zum Beispiel logische Einschränkungen spezifiziert werden. Hierzu kann zum Beispiel OCL verwendet werden. -->
@@ -96,7 +96,7 @@ The buttons in the dropdown menu have to function differently under certain cond
 
 Furthermore a rudimentary weighted logic operating option is depicted in the following activity diagram. A logic operator can be weighted normally (1) or weaker (-1) once, which allows for a little more complexity in the drop down menu.
 
-![Logic Operators](/diagrams/logic-operators.png "logic-operators.png")
+![Logic Operators](/docs/sweng/diagrams/logic-operators.png "logic-operators.png")
 
 #### 5.3.2 OCL Constraints
 
