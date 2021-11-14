@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.IntStream;
 
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 
 import org.jabref.gui.AbstractViewModel;
@@ -21,6 +22,26 @@ public class SidePaneViewModel extends AbstractViewModel {
     public SidePaneViewModel(PreferencesService preferencesService, StateManager stateManager) {
         this.preferencesService = preferencesService;
         this.stateManager = stateManager;
+
+        getVisiblePanes().addListener((ListChangeListener<? super SidePaneType>) change -> {
+            while (change.next()) {
+                if (change.wasAdded()) {
+                    onPaneAdded(change.getAddedSubList().get(0));
+                } else if (change.wasRemoved()) {
+                    onPaneRemoved(change.getRemoved().get(0));
+                }
+            }
+        });
+    }
+
+    private void onPaneAdded(SidePaneType pane) {
+        stateManager.sidePaneComponentVisiblePropertyFor(pane).set(true);
+        preferencesService.getSidePanePreferences().visiblePanes().add(pane);
+    }
+
+    private void onPaneRemoved(SidePaneType pane) {
+        stateManager.sidePaneComponentVisiblePropertyFor(pane).set(false);
+        preferencesService.getSidePanePreferences().visiblePanes().remove(pane);
     }
 
     /**
@@ -96,7 +117,7 @@ public class SidePaneViewModel extends AbstractViewModel {
     public boolean isPaneVisible(SidePaneType pane) {
         return getVisiblePanes().contains(pane);
     }
-    
+
     private <T> void swap(ObservableList<T> observableList, int i, int j) {
         List<T> placeholder = new ArrayList<>(observableList);
         Collections.swap(placeholder, i, j);

@@ -14,7 +14,6 @@ import javafx.beans.property.ReadOnlyListWrapper;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.collections.FXCollections;
-import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
 import javafx.concurrent.Task;
@@ -69,20 +68,6 @@ public class StateManager {
 
     public StateManager() {
         activeGroups.bind(Bindings.valueAt(selectedGroups, activeDatabase.orElse(null)));
-
-        visiblePanes.addListener((ListChangeListener<? super SidePaneType>) change -> {
-            while (change.next()) {
-                if (change.wasAdded()) {
-                    SidePaneType visibleComponent = change.getAddedSubList().get(0);
-                    sidePaneComponentVisiblePropertyFor(visibleComponent).set(true);
-                    Globals.prefs.getSidePanePreferences().visiblePanes().add(visibleComponent);
-                } else if (change.wasRemoved()) {
-                    SidePaneType hiddenComponent = change.getRemoved().get(0);
-                    sidePaneComponentVisiblePropertyFor(hiddenComponent).set(false);
-                    Globals.prefs.getSidePanePreferences().visiblePanes().remove(hiddenComponent);
-                }
-            }
-        });
     }
 
     public BooleanProperty sidePaneComponentVisiblePropertyFor(SidePaneType component) {
