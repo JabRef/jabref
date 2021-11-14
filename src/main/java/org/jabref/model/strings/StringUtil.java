@@ -394,6 +394,7 @@ public class StringUtil {
 
     /**
      * Replaces all platform-dependent line breaks by OS.NEWLINE line breaks.
+     * AKA normalize newlines
      * <p>
      * We do NOT use UNIX line breaks as the user explicitly configures its linebreaks and this method is used in bibtex field writing
      *
