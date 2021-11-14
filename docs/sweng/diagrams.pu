@@ -1,0 +1,246 @@
+' +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+@startuml class-diagram
+mainframe **Class Diagram: "Better Search" Implementation  **
+' =======================================================
+' Grouping
+' =======================================================
+together {
+    class DropDownMenu
+    class SearchFieldSynchronizer
+}
+
+' =======================================================
+' Relations
+' =======================================================
+CustomTextField - GlobalSearchbar
+SearchItem *- itemType
+RecentSearch <- SearchFieldSynchronizer
+GlobalSearchbar -- Highlighting
+GlobalSearchbar <-- Autocomplete
+DropDownMenu <-- RecentSearch
+
+SearchFieldSynchronizer -- LuceneBasedSearchRule
+SearchItem "0...*" -> "1 " SearchFieldSynchronizer
+JFXChipView -- SearchFieldSynchronizer
+DropDownMenu --> SearchFieldSynchronizer
+CustomTextField <-- TextInputControl
+Autocomplete <-- TextInputControl
+TextInputControl <-- SearchFieldSynchronizer
+RecentSearch "1 " <-- "0...*" SearchItem
+
+' =======================================================
+' Classes
+' =======================================================
+class GlobalSearchbar {
+    searchField: CustomTextField
+    updateSearchResultsForQuery()
+    ' initSearchModifierButtons()
+    ' initSearchModifierButton()
+    ' focus()
+    performSearch()
+    ' validRegex()
+    ' informUserAboutInvalidSearchQuery()
+    updateResults()
+    ' setSearchFieldHintTooltip()
+    ' updateHintVisibility()
+    ' registerEventListener()
+    ' onSuggestionChosen()
+}
+
+class RecentSearch {
+    pastSearchItemList: ArrayList<SearchItem>
+    ListView<String> authors
+    ListView<String> titles
+    show()
+    hide()
+    add()
+    checkSearchItemExists()
+
+}
+
+class DropDownMenu {
+    authorBtn: Button
+    journalBtn: Button
+    titleBtn: Button
+    yearBtn: Button
+    andBtn: Button
+    orBtn: Button
+    andMinusBtn: Button
+    orMinusBtn: Button
+    isPrevAttribute: boolean
+    checkAndAddSpace()
+    isPrevAttribute()
+}
+
+class LuceneBasedSearchRule {
+    validateSearchStrings()
+}
+
+class Autocomplete {
+    AutoCompletionTextFieldBinding<T> String
+    AutoCompletePopup<T> autoCompletionPopup
+    bindAutoCompletion()
+}
+
+class SearchFieldSynchronizer {
+    searchItemList: ArrayList<SearchItem>
+    searchString: String 
+    compare()
+    updateList()
+    addSearchItemToList()
+    removeSearchItemToList()
+    insertSearchItemToList()
+    SearchStringBuilder()
+    validateButton()
+}
+
+class SearchItem {
+    itemType: enum 
+    item: String
+    getType()
+    get()
+    setType()
+    set()
+}
+
+enum itemType {
+    logicalOperator
+    attribute
+    bracket
+}
+
+class CustomTextField {
+    get()
+    get(int start, int end)
+    length()
+    addListener()
+}
+
+class TextInputControl {
+    getText()
+    insertText()
+    deleteText()
+    replaceText()
+    positionCaret()
+    getCarretPosition()
+    getLength()
+}
+
+class JFXChipView {
+    chips
+    StringConverter()
+}
+@enduml
+
+' +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+' Julian: Recent Search
+@startuml recent-search
+mainframe **Sequence Diagram: Recent Search  **
+actor User
+User -> GlobalSearchBar: performSearch()
+GlobalSearchBar -> RecentSearch: addQueryToRecentSearches
+User -> RecentSearch: clickOnRecentSearchEntry
+RecentSearch -> GlobalSearchBar: performSearch()
+@enduml
+
+' +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+' Mark: User Search Input
+@startuml user-search-input
+mainframe **Sequence Diagram: User Search Input  **
+actor User
+User -> DropDownMenu: Button Input
+box **SearchFieldSynchronizer**
+DropDownMenu -> SearchFieldSynchronizer: <font color=green>                ActionEvent
+entity searchItemList
+SearchFieldSynchronizer -> searchItemList: addSearchItemToList()
+searchItemList --> SearchFieldSynchronizer: SearchStringBuilder()
+end box
+box **CustomTextField** #White
+entity searchField
+SearchFieldSynchronizer -> searchField: replaceText()
+end box
+
+User -> searchField: Text Input
+searchField --> SearchFieldSynchronizer: <font color=green>EventListener
+SearchFieldSynchronizer -> searchItemList: updateList()
+searchItemList --> SearchFieldSynchronizer: SearchStringBuilder()
+SearchFieldSynchronizer -> searchField: replaceText()
+@enduml
+
+' +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+' Albert: Autocomplete
+@startuml
+mainframe **Sequence Diagram: Autocomplete  **
+actor User
+User -> AutoCompletePopup: bindAutoCompletion()
+AutoCompletePopup -> AutoCompletionTextInputBinding: convertSuggestionsToStrings
+AutoCompletionTextInputBinding -> GlobalSearchBar: provideSuggestionsInGlobalSearch
+GlobalSearchBar -> AutoCompletePopup: bindAutoCompletion()
+@enduml
+
+' +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+' Dani: ChipView
+@startuml
+mainframe Sequence Diagram: ChipView 
+actor User
+User->GlobalSearchBar: performSearch()
+GlobalSearchBar->ChipView: addChipViewToSearchField()
+User->ChipView: clickOnChipInSearchField
+ChipView->GlobalSearchBar:deleteChosenSearchkey()
+@enduml
+
+' +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+' Mark: Logical Operators
+@startuml logic-operators
+mainframe **Activity Diagram: Logic Operators  **
+start
+switch ( Button Press )
+case (  )
+    :Attribute;
+    if (leftSideExists?) then
+        if (isLeftAttribute?) then
+            if (isLeftAttributeWithoutSearchString?) then
+                #pink:do nothing;
+                kill
+            endif
+        #palegreen:Add OR;
+        endif
+    endif
+    #palegreen:Add attribute;
+    stop
+case (  ) 
+    switch ( Logic Operator )
+        case ( )
+        :1;
+            if (leftSideExists?) then
+                if (isLeftAttribute?) then
+                    if (isLeftAttributeWithSearchString?) then
+                        #palegreen:Add logic operator;
+                        kill
+                    endif
+                endif
+            endif
+        #pink:do nothing;
+        stop
+        case (  )
+        :-1;
+        if (!MinusOneExists?) then
+            if (leftSideExists?) then
+                if (isLeftAttribute?) then
+                    if (isLeftAttributeWithSearchString?) then
+                        #palegreen:Add right bracket;
+                        #palegreen:Add logic operator;
+                        #palegreen:Add left bracket;
+                        :positionCarret to start;
+                        #palegreen:Add left bracket;
+                        :positionCarret to end;
+                        #palegreen:Add right bracket;
+                        :positionCarret to end - 1;
+                        kill
+                    endif
+                endif
+            endif
+        endif
+        #pink:do nothing;
+    stop
+@enduml
