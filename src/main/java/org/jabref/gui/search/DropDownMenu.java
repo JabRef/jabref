@@ -78,7 +78,7 @@ public class DropDownMenu {
         });
 
         // authorButton action
-        authorButton.setOnAction(event -> {
+        authorButton.addEventFilter(MouseEvent.MOUSE_CLICKED, event -> {
             if (!isPrevAttribute(searchField)) { // checks if the search term prior is an attribute and wont queue another if so
                 checkAndAddSpace(searchField); // checks if there is a space prior and if not adds it
                 searchField.insertText(searchField.getCaretPosition(), "author:");
@@ -87,7 +87,7 @@ public class DropDownMenu {
         });
 
         // journalButton action
-        journalButton.setOnAction(event -> {
+        journalButton.addEventFilter(MouseEvent.MOUSE_CLICKED, event ->{
             if (!isPrevAttribute(searchField)) {
                 checkAndAddSpace(searchField);
                 searchField.insertText(searchField.getCaretPosition(), "journal:");
@@ -96,7 +96,7 @@ public class DropDownMenu {
         });
 
         // titleButton action
-        titleButton.setOnAction(event -> {
+        titleButton.addEventFilter(MouseEvent.MOUSE_CLICKED, event ->{
             if (!isPrevAttribute(searchField)) {
                 checkAndAddSpace(searchField);
                 searchField.insertText(searchField.getCaretPosition(), "title:");
@@ -105,7 +105,7 @@ public class DropDownMenu {
         });
 
         // yearButton action
-        yearButton.setOnAction(event -> {
+        yearButton.addEventFilter(MouseEvent.MOUSE_CLICKED, event ->{
             if (!isPrevAttribute(searchField)) {
                 checkAndAddSpace(searchField);
                 searchField.insertText(searchField.getCaretPosition(), "year:");
@@ -114,12 +114,12 @@ public class DropDownMenu {
         });
 
         // yearRangeButton action
-        yearRangeButton.setOnAction(event -> {
+        yearRangeButton.addEventFilter(MouseEvent.MOUSE_CLICKED, event ->{
 
         });
 
         // andButton action
-        andButton.setOnAction(event -> {
+        andButton.addEventFilter(MouseEvent.MOUSE_CLICKED, event ->{
             if (searchField.getCaretPosition() != 0) {
                 if (!searchField.getText(searchField.getCaretPosition() - 1, searchField.getCaretPosition()).equals(" ")) {
                     searchField.insertText(searchField.getCaretPosition(), " ");
@@ -131,7 +131,7 @@ public class DropDownMenu {
         });
 
         // orButton action
-        orButton.setOnAction(event -> {
+        orButton.addEventFilter(MouseEvent.MOUSE_CLICKED, event ->{
             if (searchField.getCaretPosition() != 0) {
                 if (!searchField.getText(searchField.getCaretPosition() - 1, searchField.getCaretPosition()).equals(" ")) {
                     searchField.insertText(searchField.getCaretPosition(), " ");
@@ -143,7 +143,7 @@ public class DropDownMenu {
         });
 
         // leftBracketButton action
-        leftBracketButton.setOnAction(event -> {
+        leftBracketButton.addEventFilter(MouseEvent.MOUSE_CLICKED, event ->{
             if (searchField.getCaretPosition() != 0) {
                 if (!searchField.getText(searchField.getCaretPosition() - 1, searchField.getCaretPosition()).equals(" ")) {
                     searchField.insertText(searchField.getCaretPosition(), " ");
@@ -155,7 +155,7 @@ public class DropDownMenu {
         });
 
         // orButton action
-        rightBracketButton.setOnAction(event -> {
+        rightBracketButton.addEventFilter(MouseEvent.MOUSE_CLICKED, event ->{
             if (searchField.getCaretPosition() != 0) {
                 if (!searchField.getText(searchField.getCaretPosition() - 1, searchField.getCaretPosition()).equals(" ")) {
                     searchField.insertText(searchField.getCaretPosition(), " ");
