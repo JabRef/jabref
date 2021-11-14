@@ -11,6 +11,7 @@ import java.util.regex.PatternSyntaxException;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
+import org.jabref.model.entry.field.StandardField;
 
 import org.apache.lucene.queryparser.flexible.core.nodes.BooleanQueryNode;
 import org.apache.lucene.queryparser.flexible.core.nodes.FieldQueryNode;
@@ -69,15 +70,23 @@ public class BibQueryVisitor {
 
         Pattern finalPattern = pattern;
 
-        if (searchField.isEmpty()) {
+        if (searchField.isEmpty() || searchField.equalsIgnoreCase("anyfield")) {
             return bibEntry.getFields().stream()
                            .map(field -> bibEntry.getLatexFreeField(field))
-                           .filter(content -> matchFound(finalSearchString, finalPattern, content))
+                           .filter(content -> matchFound(finalSearchString, finalPattern, content, false))
                            .findAny()
                            .isPresent();
         } else {
-            Field field = FieldFactory.parseField(searchField);
-            return matchFound(finalSearchString, finalPattern, bibEntry.getLatexFreeField(field));
+            boolean exactWordMatch;
+            Field field;
+            if (searchField.equals("anykeyword")) {
+                field = StandardField.KEYWORDS;
+                exactWordMatch = true;
+            } else {
+                field = FieldFactory.parseField(searchField);
+                exactWordMatch = false;
+            }
+            return matchFound(finalSearchString, finalPattern, bibEntry.getLatexFreeField(field), exactWordMatch);
         }
     }
 
@@ -93,9 +102,10 @@ public class BibQueryVisitor {
     }
 
     /**
-     * @param finalPattern if not null, the RegEx pattern to match for. If null, a "normal" search is executed
+     * @param finalPattern   if not null, the RegEx pattern to match for. If null, a "normal" search is executed
+     * @param exactWordMatch
      */
-    private boolean matchFound(String finalSearchString, Pattern finalPattern, Optional<String> content) {
+    private boolean matchFound(String finalSearchString, Pattern finalPattern, Optional<String> content, boolean exactWordMatch) {
         return content.map(value -> searchFlags.contains(SearchRules.SearchFlags.CASE_SENSITIVE) ? value : value.toLowerCase(Locale.ROOT))
                       .filter(value -> {
                           if (finalPattern != null) {
@@ -105,7 +115,8 @@ public class BibQueryVisitor {
                               Iterator<String> unmatchedWordsIterator = unmatchedWords.iterator();
                               while (unmatchedWordsIterator.hasNext()) {
                                   String word = unmatchedWordsIterator.next();
-                                  if (value.contains(word)) {
+                                  if ((exactWordMatch && value.equals(word)) ||
+                                          (!exactWordMatch && value.contains(word))) {
                                       unmatchedWordsIterator.remove();
                                   }
                               }
