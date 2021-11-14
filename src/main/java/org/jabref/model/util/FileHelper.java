@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.BiPredicate;
 
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.preferences.FilePreferences;
@@ -24,6 +25,10 @@ import org.apache.tika.mime.MimeTypeException;
 import org.apache.tika.parser.AutoDetectParser;
 
 public class FileHelper {
+
+    public static <T, U> boolean equals(Path left, Path right, BiPredicate<Path, Path> equality) {
+        return equality.test(left, right);
+    }
 
     /**
      * Returns the extension of a file or Optional.empty() if the file does not have one (no . in name).
