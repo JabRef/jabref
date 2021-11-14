@@ -34,6 +34,23 @@ public class GrammarBasedSearchRuleTest {
         assertFalse(searchRule.applyRule(query, makeBibtexEntry()));
     }
 
+    @Test
+    void searchRuleOfDocumentationMatches() {
+        // FIXME: Even though we do not provide a regex, the following instantiation does not match anything:
+        //        GrammarBasedSearchRule searchRule = new GrammarBasedSearchRule(EnumSet.noneOf(SearchRules.SearchFlags.class));
+        GrammarBasedSearchRule searchRule = new GrammarBasedSearchRule(EnumSet.of(SearchRules.SearchFlags.REGULAR_EXPRESSION));
+
+        String query = "(author = miller or title|keywords = \"image processing\") and not author = brown";
+        assertTrue(searchRule.validateSearchStrings(query));
+        assertTrue(searchRule.applyRule(query, new BibEntry()
+                .withCitationKey("key")
+                .withField(StandardField.KEYWORDS, "image processing")));
+        assertFalse(searchRule.applyRule(query, new BibEntry()
+                .withCitationKey("key")
+                .withField(StandardField.AUTHOR, "Sam Brown")
+                .withField(StandardField.KEYWORDS, "image processing")));
+    }
+
     public BibEntry makeBibtexEntry() {
         return new BibEntry(StandardEntryType.InCollection)
                 .withCitationKey("shields01")
