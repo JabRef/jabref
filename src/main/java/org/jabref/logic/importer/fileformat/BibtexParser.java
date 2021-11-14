@@ -66,7 +66,7 @@ import org.slf4j.LoggerFactory;
 public class BibtexParser implements Parser {
     private static final Logger LOGGER = LoggerFactory.getLogger(BibtexParser.class);
 
-    private static final Integer LOOKAHEAD = 64;
+    private static final Integer LOOKAHEAD = 1024;
     private final FieldContentFormatter fieldContentFormatter;
     private final Deque<Character> pureTextFromFile = new LinkedList<>();
     private final ImportFormatPreferences importFormatPreferences;
