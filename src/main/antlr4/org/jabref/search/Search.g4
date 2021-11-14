@@ -37,7 +37,7 @@ expression:
     LPAREN expression RPAREN                         #parenExpression  // example: (author=miller)
     | NOT expression                                 #unaryExpression  // example: not author = miller
     | left=expression operator=AND right=expression  #binaryExpression // example: author = miller and title = test
-    | left=expression operator=OR right=expression   #binaryExpression // example: author = miller and title = test
+    | left=expression operator=OR right=expression   #binaryExpression // example: author = miller or title = test
     | comparison                                     #atomExpression
     ;
 
