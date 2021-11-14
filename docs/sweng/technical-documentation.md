@@ -31,11 +31,11 @@ Das Design soll maximale Performance gewährleisten
 … -->
 For the design of the extension, at its core a GUI implementation of a dropdown menu, future extensability will be ensured because JabRef already has dropdown menus implemented with JavaFX. Those will be re-used, which will also satisfy low development costs and good performance.
 
-## System Performance
+## 4 System Performance
 <!-- Um die Designlösung die nachfolgend beschrieben wird einzuführen, sollten an dieser Stelle nochmals das gewünschte Verhalten des Systems (abgeleitet aus dem Pflichtenheft) kurz beschrieben werden. Idealerweise sollte hier genügend Information gegeben werden, so dass man die Diagramme und Spezifikationen die im nächsten Abschnitt beschrieben werden verstehen kann, ohne zuvor das Pflichtenheft im Detail gelesen zu haben. -->
 The extension implements a dropdown menu for the existing global search bar. This dropdown menu will consist of clickable buttons which allows the user to search for specific fields (i.e. author, title) without the need of having to type in a complex search syntax. Furthermore the implemented dropdown menu has the option to browse through and re-search the most recent search queries.
 
-## Design
+## 5 Design
 <!-- An dieser Stelle wird nun das eigentliche Softwaredesign (die technische Lösung) beschrieben. In grösseren Systemen wird typischerweise zwischen High-level Design (Architektur) sowie Mid-level Design (UML Klassen- und Sequenzdiagramme) sowie Detaildesign (Detaillierte Beschreibung von einigen Schlüsselklassen) unterschieden. Für diese kleine Änderung, muss diese Unterscheidung aber nicht gemacht werden. Jedoch wollen wir explizit zwischen Statik, Dynamik und Logik zu unterscheiden. -->
 
 
