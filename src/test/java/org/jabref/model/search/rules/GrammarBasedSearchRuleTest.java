@@ -36,7 +36,7 @@ public class GrammarBasedSearchRuleTest {
 
     @Test
     void searchRuleOfDocumentationMatches() {
-        GrammarBasedSearchRule searchRule = new GrammarBasedSearchRule(EnumSet.noneOf(SearchRules.SearchFlags.class));
+        GrammarBasedSearchRule searchRule = new GrammarBasedSearchRule(EnumSet.of(SearchRules.SearchFlags.REGULAR_EXPRESSION));
 
         String query = "(author = miller or title|keywords = \"image processing\") and not author = brown";
         assertTrue(searchRule.validateSearchStrings(query));
@@ -51,7 +51,8 @@ public class GrammarBasedSearchRuleTest {
 
     @Test
     void searchForAnyFieldWorks() {
-        GrammarBasedSearchRule searchRule = new GrammarBasedSearchRule(EnumSet.noneOf(SearchRules.SearchFlags.class));
+        GrammarBasedSearchRule searchRule = new GrammarBasedSearchRule(EnumSet.of(SearchRules.SearchFlags.REGULAR_EXPRESSION));
+
         String query = "anyfield:fruit";
         assertTrue(searchRule.validateSearchStrings(query));
         assertTrue(searchRule.applyRule(query, new BibEntry()
@@ -60,7 +61,8 @@ public class GrammarBasedSearchRuleTest {
 
     @Test
     void searchForAnyKeywordWorks() {
-        GrammarBasedSearchRule searchRule = new GrammarBasedSearchRule(EnumSet.noneOf(SearchRules.SearchFlags.class));
+        GrammarBasedSearchRule searchRule = new GrammarBasedSearchRule(EnumSet.of(SearchRules.SearchFlags.REGULAR_EXPRESSION));
+
         String query = "anykeyword:apple";
         assertTrue(searchRule.validateSearchStrings(query));
         assertTrue(searchRule.applyRule(query, new BibEntry()
