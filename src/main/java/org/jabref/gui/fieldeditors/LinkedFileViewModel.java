@@ -60,7 +60,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.FileHelper;
-import org.jabref.model.util.OptionalUtil;
+import org.jabref.preferences.FilePreferences;
 import org.jabref.preferences.PreferencesService;
 
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
@@ -332,9 +332,29 @@ public class LinkedFileViewModel extends AbstractViewModel {
      * @return true if suggested filepath is same as existing filepath.
      */
     public boolean isGeneratedPathSameAsOriginal() {
-        Optional<Path> newDir = databaseContext.getFirstExistingFileDir(preferences.getFilePreferences());
+        FilePreferences filePreferences = preferences.getFilePreferences();
+        Optional<Path> newDir = databaseContext.getFirstExistingFileDir(filePreferences);
+        if (newDir.isEmpty()) {
+            // could not find default path
+            return false;
+        }
+
+        // append File directory pattern if exits
+        String targetDirectoryName = "";
+        if (!filePreferences.getFileDirectoryPattern().isEmpty()) {
+            targetDirectoryName = FileUtil.createDirNameFromPattern(
+                    databaseContext.getDatabase(),
+                    entry,
+                    filePreferences.getFileDirectoryPattern());
+        }
+        Path targetDir = newDir.get().resolve(targetDirectoryName);
 
         Optional<Path> currentDir = linkedFile.findIn(databaseContext, preferences.getFilePreferences()).map(Path::getParent);
+        if (currentDir.isEmpty()) {
+            // Could not find file
+            return false;
+        }
+        Path oldDir = currentDir.get();
 
         BiPredicate<Path, Path> equality = (fileA, fileB) -> {
             try {
@@ -343,7 +363,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
                 return false;
             }
         };
-        return OptionalUtil.equals(newDir, currentDir, equality);
+        return FileHelper.equals(targetDir, oldDir, equality);
     }
 
     public void moveToDefaultDirectoryAndRename() {
