@@ -33,12 +33,12 @@ public class SaveOrderConfig {
             return name;
         }
 
-        public static SaveOrderConfig.OrderType fromBooleans(boolean saveInSpecifiedOrder, boolean saveInTableOrder) {
-            SaveOrderConfig.OrderType orderType = SaveOrderConfig.OrderType.ORIGINAL;
+        public static SaveOrderConfig.OrderType fromBooleans(boolean saveInSpecifiedOrder, boolean saveInOriginalOrder) {
+            SaveOrderConfig.OrderType orderType = SaveOrderConfig.OrderType.TABLE;
             if (saveInSpecifiedOrder) {
                 orderType = SaveOrderConfig.OrderType.SPECIFIED;
-            } else if (saveInTableOrder) {
-                orderType = SaveOrderConfig.OrderType.TABLE;
+            } else if (saveInOriginalOrder) {
+                orderType = SaveOrderConfig.OrderType.ORIGINAL;
             }
 
             return orderType;
