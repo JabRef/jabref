@@ -93,7 +93,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 
 - We added confirmation dialog when user wants to close a library where any empty entires are detected. [#8096](https://github.com/JabRef/jabref/issues/8096)
 - We added import support for CFF files. [#7945](https://github.com/JabRef/jabref/issues/7945)
-- We added support to use Lucence search syntax also for the searchin the library or in dynamic groups.
+- We added support to use [Apache Lucence search syntax](https://lucene.apache.org/core/8_10_1/queryparser/org/apache/lucene/queryparser/classic/package-summary.html#package.description) also for the search in the library or in dynamic groups. For end users, there should be no significant difference.
 - We added the option to copy the DOI of an entry directly from the context menu copy submenu. [#7826](https://github.com/JabRef/jabref/issues/7826)
 - We added a fulltext search feature. [#2838](https://github.com/JabRef/jabref/pull/2838)
 - We improved the deduction of bib-entries from imported fulltext pdfs. [#7947](https://github.com/JabRef/jabref/pull/7947)
