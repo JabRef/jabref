@@ -42,6 +42,10 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We improved the Drag and Drop behavior in the "Customize Entry Types" Dialog [#6338](https://github.com/JabRef/jabref/issues/6338)
 - When determining the URL of an ArXiV eprint, the URL now points to the version [#8149](https://github.com/JabRef/jabref/pull/8149)
 - We Included all standard fields with citation key when exporting to Old OpenOffice/LibreOffice Calc Format [#8176](https://github.com/JabRef/jabref/pull/8176)
+- In case the database is encoded with `UTF8`, the `% Encoding` marker is not written anymore
+- The written `.bib` file has the same line endings [#390](https://github.com/koppor/jabref/issues/390)
+- The written `.bib` file always has a final line break
+- The written `.bib` file keeps the newline separator of the loaded `.bib` file
 - We present options to manually enter an article or return to the New Entry menu when the fetcher DOI fails to find an entry for an ID [#7870](https://github.com/JabRef/jabref/issues/7870)
 - We trim white space and non-ASCII characters from DOI [#8127](https://github.com/JabRef/jabref/issues/8127)
 - The duplicate checker now inspects other fields in case no difference in the required and optional fields are found.

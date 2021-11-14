@@ -1,18 +1,12 @@
 package org.jabref.gui.preferences.file;
 
 import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.ListProperty;
-import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleListProperty;
-import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
-import javafx.collections.FXCollections;
 
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.preferences.ImportExportPreferences;
-import org.jabref.preferences.NewLineSeparator;
 import org.jabref.preferences.PreferencesService;
 
 public class FileTabViewModel implements PreferenceTabViewModel {
@@ -22,8 +16,6 @@ public class FileTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty resolveStringsBibTexProperty = new SimpleBooleanProperty();
     private final BooleanProperty resolveStringsAllProperty = new SimpleBooleanProperty();
     private final StringProperty resolveStringsExceptProperty = new SimpleStringProperty("");
-    private final ListProperty<NewLineSeparator> newLineSeparatorListProperty = new SimpleListProperty<>();
-    private final ObjectProperty<NewLineSeparator> selectedNewLineSeparatorProperty = new SimpleObjectProperty<>();
     private final BooleanProperty alwaysReformatBibProperty = new SimpleBooleanProperty();
     private final BooleanProperty autosaveLocalLibraries = new SimpleBooleanProperty();
 
@@ -43,8 +35,6 @@ public class FileTabViewModel implements PreferenceTabViewModel {
         resolveStringsAllProperty.setValue(importExportPreferences.shouldResolveStringsForAllStrings()); // Flipped around
         resolveStringsBibTexProperty.setValue(importExportPreferences.shouldResolveStringsForStandardBibtexFields());
         resolveStringsExceptProperty.setValue(importExportPreferences.getNonResolvableFields());
-        newLineSeparatorListProperty.setValue(FXCollections.observableArrayList(NewLineSeparator.values()));
-        selectedNewLineSeparatorProperty.setValue(importExportPreferences.getNewLineSeparator());
 
         alwaysReformatBibProperty.setValue(importExportPreferences.shouldAlwaysReformatOnSave());
 
@@ -59,7 +49,6 @@ public class FileTabViewModel implements PreferenceTabViewModel {
         importExportPreferences.setResolveStringsForStandardBibtexFields(resolveStringsBibTexProperty.getValue());
         importExportPreferences.setResolveStringsForAllStrings(resolveStringsAllProperty.getValue());
         importExportPreferences.setNonResolvableFields(resolveStringsExceptProperty.getValue().trim());
-        importExportPreferences.setNewLineSeparator(selectedNewLineSeparatorProperty.getValue());
         importExportPreferences.setAlwaysReformatOnSave(alwaysReformatBibProperty.getValue());
 
         preferences.storeShouldAutosave(autosaveLocalLibraries.getValue());
@@ -87,14 +76,6 @@ public class FileTabViewModel implements PreferenceTabViewModel {
 
     public StringProperty resolveStringsExceptProperty() {
         return resolveStringsExceptProperty;
-    }
-
-    public ListProperty<NewLineSeparator> newLineSeparatorListProperty() {
-        return newLineSeparatorListProperty;
-    }
-
-    public ObjectProperty<NewLineSeparator> selectedNewLineSeparatorProperty() {
-        return selectedNewLineSeparatorProperty;
     }
 
     public BooleanProperty alwaysReformatBibProperty() {

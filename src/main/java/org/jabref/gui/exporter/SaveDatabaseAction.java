@@ -24,6 +24,7 @@ import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.autosaveandbackup.AutosaveManager;
 import org.jabref.logic.autosaveandbackup.BackupManager;
 import org.jabref.logic.exporter.AtomicFileWriter;
+import org.jabref.logic.exporter.BibWriter;
 import org.jabref.logic.exporter.BibtexDatabaseWriter;
 import org.jabref.logic.exporter.SaveException;
 import org.jabref.logic.exporter.SavePreferences;
@@ -229,12 +230,14 @@ public class SaveDatabaseAction {
         SavePreferences savePreferences = this.preferences.getSavePreferences()
                                                       .withSaveType(saveType);
         try (AtomicFileWriter fileWriter = new AtomicFileWriter(file, encoding, savePreferences.shouldMakeBackup())) {
-            BibtexDatabaseWriter databaseWriter = new BibtexDatabaseWriter(fileWriter, generalPreferences, savePreferences, entryTypesManager);
+            BibDatabaseContext bibDatabaseContext = libraryTab.getBibDatabaseContext();
+            BibWriter bibWriter = new BibWriter(fileWriter, bibDatabaseContext.getDatabase().getNewLineSeparator());
+            BibtexDatabaseWriter databaseWriter = new BibtexDatabaseWriter(bibWriter, generalPreferences, savePreferences, entryTypesManager);
 
             if (selectedOnly) {
-                databaseWriter.savePartOfDatabase(libraryTab.getBibDatabaseContext(), libraryTab.getSelectedEntries());
+                databaseWriter.savePartOfDatabase(bibDatabaseContext, libraryTab.getSelectedEntries());
             } else {
-                databaseWriter.saveDatabase(libraryTab.getBibDatabaseContext());
+                databaseWriter.saveDatabase(bibDatabaseContext);
             }
 
             libraryTab.registerUndoableChanges(databaseWriter.getSaveActionsFieldChanges());

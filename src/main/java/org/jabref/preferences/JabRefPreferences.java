@@ -2124,11 +2124,6 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     @Override
-    public NewLineSeparator getNewLineSeparator() {
-        return NewLineSeparator.parse(get(NEWLINE));
-    }
-
-    @Override
     public FieldContentFormatterPreferences getFieldContentParserPreferences() {
         return new FieldContentFormatterPreferences(
                 getStringList(NON_WRAPPABLE_FIELDS).stream().map(FieldFactory::parseField).collect(Collectors.toList()));
@@ -2260,7 +2255,6 @@ public class JabRefPreferences implements PreferencesService {
                 !getBoolean(RESOLVE_STRINGS_ALL_FIELDS),
                 getBoolean(RESOLVE_STRINGS_ALL_FIELDS),
                 get(DO_NOT_RESOLVE_STRINGS_FOR),
-                getNewLineSeparator(),
                 getBoolean(REFORMAT_FILE_ON_SAVE_AND_EXPORT),
                 Path.of(get(IMPORT_WORKING_DIRECTORY)),
                 get(LAST_USED_EXPORT),
@@ -2270,11 +2264,6 @@ public class JabRefPreferences implements PreferencesService {
         EasyBind.listen(importExportPreferences.resolveStringsForStandardBibtexFieldsProperty(), (obs, oldValue, newValue) -> putBoolean(RESOLVE_STRINGS_ALL_FIELDS, newValue));
         EasyBind.listen(importExportPreferences.resolveStringsForAllStringsProperty(), (obs, oldValue, newValue) -> putBoolean(RESOLVE_STRINGS_ALL_FIELDS, newValue));
         EasyBind.listen(importExportPreferences.nonResolvableFieldsProperty(), (obs, oldValue, newValue) -> put(DO_NOT_RESOLVE_STRINGS_FOR, newValue));
-        EasyBind.listen(importExportPreferences.newLineSeparatorProperty(), (obs, oldValue, newValue) -> {
-            String escapeChars = newValue.toString();
-            put(NEWLINE, escapeChars);
-            OS.NEWLINE = escapeChars;
-        });
         EasyBind.listen(importExportPreferences.alwaysReformatOnSaveProperty(), (obs, oldValue, newValue) -> putBoolean(REFORMAT_FILE_ON_SAVE_AND_EXPORT, newValue));
         EasyBind.listen(importExportPreferences.importWorkingDirectoryProperty(), (obs, oldValue, newValue) -> put(IMPORT_WORKING_DIRECTORY, newValue.toString()));
         EasyBind.listen(importExportPreferences.lastExportExtensionProperty(), (obs, oldValue, newValue) -> put(LAST_USED_EXPORT, newValue));
