@@ -397,7 +397,7 @@ public class BibEntry implements Cloneable {
     }
 
     /**
-     * Returns an set containing the names of all fields that are set for this particular entry.
+     * Returns a set containing the names of all fields that are set for this particular entry.
      *
      * @return a set of existing field names
      */

@@ -44,6 +44,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We Included all standard fields with citation key when exporting to Old OpenOffice/LibreOffice Calc Format [#8176](https://github.com/JabRef/jabref/pull/8176)
 - We present options to manually enter an article or return to the New Entry menu when the fetcher DOI fails to find an entry for an ID [#7870](https://github.com/JabRef/jabref/issues/7870)
 - We trim white space and non-ASCII characters from DOI [#8127](https://github.com/JabRef/jabref/issues/8127)
+- The duplicate checker now inspects other fields in case no difference in the required and optional fields are found.
 
 ### Fixed
 
@@ -57,6 +58,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixed an issue where typing an invalid UNC path into the "Main file directory" text field caused an error. [#8107](https://github.com/JabRef/jabref/issues/8107)
 - We fixed an issue where "Open Folder" didn't select the file on macOS in Finder [#8130](https://github.com/JabRef/jabref/issues/8130)
 - We fixed an issue where importing PDFs resulted in an uncaught exception [#8143](https://github.com/JabRef/jabref/issues/8143)
+- We fixed "The library has been modified by another program" showing up when line breaks change [#4877](https://github.com/JabRef/jabref/issues/4877)
 - The default directory of the "LaTeX Citations" tab is now the directory of the currently opened database (and not the directory chosen at the last open file dialog or the last database save) [koppor#538](https://github.com/koppor/jabref/issues/538)
 - We fixed an issue where right-clicking on a tab and selecting close will close the focused tab even if it is not the tab we right-clicked [#8193](https://github.com/JabRef/jabref/pull/8193)
 - We fixed an issue where selecting a citation style in the preferences would sometimes produce an exception [#7860](https://github.com/JabRef/jabref/issues/7860)
