@@ -1,14 +1,15 @@
 package org.jabref.logic.importer;
 
 import java.io.BufferedReader;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.util.Objects;
 
 import org.jabref.logic.util.FileType;
@@ -123,7 +124,7 @@ public abstract class Importer implements Comparable<Importer> {
 
     public static BufferedReader getReader(Path filePath, Charset encoding)
             throws IOException {
-        InputStream stream = new FileInputStream(filePath.toFile());
+        InputStream stream = Files.newInputStream(filePath, StandardOpenOption.READ);
         return new BufferedReader(new InputStreamReader(stream, encoding));
     }
 
