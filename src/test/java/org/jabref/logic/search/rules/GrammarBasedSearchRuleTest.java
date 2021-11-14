@@ -37,6 +37,8 @@ public class GrammarBasedSearchRuleTest {
 
     @Test
     void searchRuleOfDocumentationMatches() {
+        // FIXME: Even though we do not provide a regex, the following instantiation does not match anything:
+        //        GrammarBasedSearchRule searchRule = new GrammarBasedSearchRule(EnumSet.noneOf(SearchRules.SearchFlags.class));
         GrammarBasedSearchRule searchRule = new GrammarBasedSearchRule(EnumSet.of(SearchRules.SearchFlags.REGULAR_EXPRESSION));
 
         String query = "(author = miller or title|keywords = \"image processing\") and not author = brown";

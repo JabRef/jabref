@@ -45,6 +45,8 @@ class LuceneBasedSearchRuleTest {
 
             "Marine",
 
+            "(author = miller or title|keywords = \"finfish\") and not author = brown",
+
             // RegEx syntax of Lucene
             "/M[a-z]+e/"
     })
