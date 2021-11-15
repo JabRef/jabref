@@ -2,7 +2,7 @@ package org.jabref.gui.maintable;
 
 import java.util.List;
 
-public class SearchDialogColumnPreferences implements AbstractColumnPreferences{
+public class SearchDialogColumnPreferences implements AbstractColumnPreferences {
 
     private final List<MainTableColumnModel> columns;
     private final List<MainTableColumnModel> columnSortOrder;

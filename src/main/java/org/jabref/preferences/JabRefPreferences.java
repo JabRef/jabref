@@ -2032,7 +2032,6 @@ public class JabRefPreferences implements PreferencesService {
         searchDialogTableColunns = columns;
     }
 
-
     private List<MainTableColumnModel> createSearchDialogColumns() {
         if (this.searchDialogTableColunns == null) {
             updateSearchDialogTableColumns();
@@ -2051,7 +2050,6 @@ public class JabRefPreferences implements PreferencesService {
         }
         return this.searchDialogColumnSortOrder;
     }
-
 
     /**
      * Reloads the MainTableColumnSortOrder from scratch to cache
@@ -2074,7 +2072,6 @@ public class JabRefPreferences implements PreferencesService {
                 createSearchDialogColumnSortOrder());
     }
 
-    // TODO is that needed?
     /**
      * Stores the {@link SearchDialogColumnPreferences} in the preferences
      *
