@@ -33,13 +33,14 @@ public class SearchResultsTable extends TableView<BibEntryTableViewModel> {
         this.getColumns().addAll(new MainTableColumnFactory(
                 database,
                 preferencesService,
+                preferencesService.getSearchDialogColumnPreferences(),
                 externalFileTypes,
                 undoManager,
                 dialogService,
                 stateManager).createColumns());
 
         this.getSortOrder().clear();
-        mainTablePreferences.getColumnPreferences().getColumnSortOrder().forEach(columnModel ->
+        preferencesService.getSearchDialogColumnPreferences().getColumnSortOrder().forEach(columnModel ->
                 this.getColumns().stream()
                     .map(column -> (MainTableColumn<?>) column)
                     .filter(column -> column.getModel().equals(columnModel))

@@ -101,6 +101,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                 new MainTableColumnFactory(
                         database,
                         preferencesService,
+                        preferencesService.getColumnPreferences(),
                         externalFileTypes,
                         libraryTab.getUndoManager(),
                         dialogService,

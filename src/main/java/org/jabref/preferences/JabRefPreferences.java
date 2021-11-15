@@ -52,6 +52,7 @@ import org.jabref.gui.maintable.MainTableNameFormatPreferences;
 import org.jabref.gui.maintable.MainTableNameFormatPreferences.AbbreviationStyle;
 import org.jabref.gui.maintable.MainTableNameFormatPreferences.DisplayStyle;
 import org.jabref.gui.maintable.MainTablePreferences;
+import org.jabref.gui.maintable.SearchDialogColumnPreferences;
 import org.jabref.gui.mergeentries.MergeEntries;
 import org.jabref.gui.search.SearchDisplayMode;
 import org.jabref.gui.sidepane.SidePaneType;
@@ -157,7 +158,7 @@ public class JabRefPreferences implements PreferencesService {
     public static final String REFORMAT_FILE_ON_SAVE_AND_EXPORT = "reformatFileOnSaveAndExport";
     public static final String EXPORT_IN_ORIGINAL_ORDER = "exportInOriginalOrder";
     public static final String EXPORT_IN_SPECIFIED_ORDER = "exportInSpecifiedOrder";
-    
+
     public static final String EXPORT_PRIMARY_SORT_FIELD = "exportPriSort";
     public static final String EXPORT_PRIMARY_SORT_DESCENDING = "exportPriDescending";
     public static final String EXPORT_SECONDARY_SORT_FIELD = "exportSecSort";
@@ -172,6 +173,11 @@ public class JabRefPreferences implements PreferencesService {
     public static final String COLUMN_WIDTHS = "mainTableColumnWidths";
     public static final String COLUMN_SORT_TYPES = "mainTableColumnSortTypes";
     public static final String COLUMN_SORT_ORDER = "mainTableColumnSortOrder";
+
+    public static final String SEARCH_DIALOG_COLUMN_NAMES = "mainTableColumnNames";
+    public static final String SEARCH_DIALOG_COLUMN_WIDTHS = "mainTableColumnWidths";
+    public static final String SEARCH_DIALOG_COLUMN_SORT_TYPES = "searchDialogColumnSortTypes";
+    public static final String SEARCH_DIALOG_COLUMN_SORT_ORDER = "searchDalogColumnSortOrder";
 
     public static final String SIDE_PANE_COMPONENT_PREFERRED_POSITIONS = "sidePaneComponentPreferredPositions";
     public static final String SIDE_PANE_COMPONENT_NAMES = "sidePaneComponentNames";
@@ -421,6 +427,10 @@ public class JabRefPreferences implements PreferencesService {
     private Map<String, Set<Field>> entryEditorTabList;
     private List<MainTableColumnModel> mainTableColumns;
     private List<MainTableColumnModel> mainTableColumnSortOrder;
+
+    private List<MainTableColumnModel> searchDialogTableColunns;
+    private List<MainTableColumnModel> searchDialogColumnSortOrder;
+
     private Theme globalTheme;
     private Set<CustomImporter> customImporters;
     private String userName;
@@ -1826,11 +1836,6 @@ public class JabRefPreferences implements PreferencesService {
     // MainTablePreferences
     //*************************************************************************************************************
 
-    /**
-     * Creates the GlobalCitationKeyPattern from cache
-     *
-     * @return GlobalCitationKeyPattern containing all keys without a parent AbstractKeyPattern
-     */
     private List<MainTableColumnModel> createMainTableColumns() {
         if (this.mainTableColumns == null) {
             updateMainTableColumns();
@@ -1838,9 +1843,6 @@ public class JabRefPreferences implements PreferencesService {
         return this.mainTableColumns;
     }
 
-    /**
-     * Reloads the GlobalCitationKeyPattern from scratch
-     */
     @Override
     public void updateMainTableColumns() {
         List<String> columnNames = getStringList(COLUMN_NAMES);
@@ -1986,6 +1988,118 @@ public class JabRefPreferences implements PreferencesService {
 
         putBoolean(ABBR_AUTHOR_NAMES, preferences.getAbbreviationStyle() == AbbreviationStyle.FULL);
         putBoolean(NAMES_LAST_ONLY, preferences.getAbbreviationStyle() == AbbreviationStyle.LASTNAME_ONLY);
+    }
+
+    //*************************************************************************************************************
+    // SearchDialogColumnsPreferences
+    //***********************************************s**************************************************************
+
+    public void updateSearchDialogTableColumns() {
+        List<String> columnNames = getStringList(SEARCH_DIALOG_COLUMN_NAMES);
+
+        List<Double> columnWidths = getStringList(SEARCH_DIALOG_COLUMN_WIDTHS)
+                .stream()
+                .map(string -> {
+                    try {
+                        return Double.parseDouble(string);
+                    } catch (NumberFormatException e) {
+                        LOGGER.error("Exception while parsing column widths. Choosing default.", e);
+                        return SearchDialogColumnPreferences.DEFAULT_COLUMN_WIDTH;
+                    }
+                })
+                .collect(Collectors.toList());
+
+        List<SortType> columnSortTypes = getStringList(SEARCH_DIALOG_COLUMN_SORT_TYPES)
+                .stream()
+                .map(SortType::valueOf)
+                .collect(Collectors.toList());
+
+        List<MainTableColumnModel> columns = new ArrayList<>();
+        for (int i = 0; i < columnNames.size(); i++) {
+            MainTableColumnModel columnModel = MainTableColumnModel.parse(columnNames.get(i));
+
+            if (i < columnWidths.size()) {
+                columnModel.widthProperty().setValue(columnWidths.get(i));
+            }
+
+            if (i < columnSortTypes.size()) {
+                columnModel.sortTypeProperty().setValue(columnSortTypes.get(i));
+            }
+
+            columns.add(columnModel);
+        }
+
+        searchDialogTableColunns = columns;
+    }
+
+
+    private List<MainTableColumnModel> createSearchDialogColumns() {
+        if (this.searchDialogTableColunns == null) {
+            updateSearchDialogTableColumns();
+        }
+        return this.searchDialogTableColunns;
+    }
+
+    /**
+     * Creates the ColumnSortOrder from cache
+     *
+     * @return List containing only the the columns in its proper sort order
+     */
+    private List<MainTableColumnModel> createSearchDialogColumnSortOrder() {
+        if (this.searchDialogColumnSortOrder == null) {
+            updateSearchDialogColumnSortOrder();
+        }
+        return this.searchDialogColumnSortOrder;
+    }
+
+
+    /**
+     * Reloads the MainTableColumnSortOrder from scratch to cache
+     */
+    private void updateSearchDialogColumnSortOrder() {
+        List<MainTableColumnModel> columnsOrdered = new ArrayList<>();
+        getStringList(SEARCH_DIALOG_COLUMN_SORT_ORDER).forEach(columnName ->
+                searchDialogTableColunns.stream().filter(column ->
+                        column.getName().equals(columnName))
+                                .findFirst()
+                                .ifPresent(columnsOrdered::add));
+
+        searchDialogColumnSortOrder = columnsOrdered;
+    }
+
+    @Override
+    public SearchDialogColumnPreferences getSearchDialogColumnPreferences() {
+        return new SearchDialogColumnPreferences(
+                createSearchDialogColumns(),
+                createSearchDialogColumnSortOrder());
+    }
+
+    // TODO is that needed?
+    /**
+     * Stores the {@link SearchDialogColumnPreferences} in the preferences
+     *
+     * @param columnPreferences the preferences to store
+     */
+    public void storeSearchDialogColumnPreferences(SearchDialogColumnPreferences columnPreferences) {
+        putStringList(SEARCH_DIALOG_COLUMN_NAMES, columnPreferences.getColumns().stream()
+                                                     .map(MainTableColumnModel::getName)
+                                                     .collect(Collectors.toList()));
+
+        List<String> columnWidthsInOrder = new ArrayList<>();
+        columnPreferences.getColumns().forEach(column -> columnWidthsInOrder.add(column.widthProperty().getValue().toString()));
+        putStringList(SEARCH_DIALOG_COLUMN_WIDTHS, columnWidthsInOrder);
+
+        List<String> columnSortTypesInOrder = new ArrayList<>();
+        columnPreferences.getColumns().forEach(column -> columnSortTypesInOrder.add(column.sortTypeProperty().getValue().toString()));
+        putStringList(SEARCH_DIALOG_COLUMN_SORT_TYPES, columnSortTypesInOrder);
+
+        putStringList(SEARCH_DIALOG_COLUMN_SORT_ORDER, columnPreferences
+                .getColumnSortOrder().stream()
+                .map(MainTableColumnModel::getName)
+                .collect(Collectors.toList()));
+
+        // Update cache
+        searchDialogTableColunns = columnPreferences.getColumns();
     }
 
     //*************************************************************************************************************

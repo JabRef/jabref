@@ -15,6 +15,7 @@ import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.maintable.ColumnPreferences;
 import org.jabref.gui.maintable.MainTableNameFormatPreferences;
 import org.jabref.gui.maintable.MainTablePreferences;
+import org.jabref.gui.maintable.SearchDialogColumnPreferences;
 import org.jabref.gui.specialfields.SpecialFieldsPreferences;
 import org.jabref.gui.util.Theme;
 import org.jabref.logic.JabRefException;
@@ -221,6 +222,12 @@ public interface PreferencesService {
     void storeMainTableNameFormatPreferences(MainTableNameFormatPreferences preferences);
 
     //*************************************************************************************************************
+    // SearchDialogColumnPreferences
+    //*************************************************************************************************************
+
+    SearchDialogColumnPreferences getSearchDialogColumnPreferences();
+
+    //*************************************************************************************************************
     // AppearancePreferences
     //*************************************************************************************************************
 
@@ -340,4 +347,5 @@ public interface PreferencesService {
     void storeIdBasedFetcherForEntryGenerator(String fetcherName);
 
     ProtectedTermsPreferences getProtectedTermsPreferences();
+
 }

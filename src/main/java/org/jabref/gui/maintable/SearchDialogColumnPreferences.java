@@ -2,15 +2,12 @@ package org.jabref.gui.maintable;
 
 import java.util.List;
 
-public class ColumnPreferences implements AbstractColumnPreferences {
-
-    public static final double DEFAULT_COLUMN_WIDTH = 100;
-    public static final double ICON_COLUMN_WIDTH = 16 + 12; // add some additional space to improve appearance
+public class SearchDialogColumnPreferences implements AbstractColumnPreferences{
 
     private final List<MainTableColumnModel> columns;
     private final List<MainTableColumnModel> columnSortOrder;
 
-    public ColumnPreferences(List<MainTableColumnModel> columns, List<MainTableColumnModel> columnSortOrder) {
+    public SearchDialogColumnPreferences(List<MainTableColumnModel> columns, List<MainTableColumnModel> columnSortOrder) {
         this.columns = columns;
         this.columnSortOrder = columnSortOrder;
     }

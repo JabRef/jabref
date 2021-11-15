@@ -52,7 +52,7 @@ public class MainTableColumnFactory {
     private static final Logger LOGGER = LoggerFactory.getLogger(MainTableColumnFactory.class);
 
     private final PreferencesService preferencesService;
-    private final ColumnPreferences columnPreferences;
+    private final AbstractColumnPreferences columnPreferences;
     private final ExternalFileTypes externalFileTypes;
     private final BibDatabaseContext database;
     private final CellFactory cellFactory;
@@ -62,13 +62,14 @@ public class MainTableColumnFactory {
 
     public MainTableColumnFactory(BibDatabaseContext database,
                                   PreferencesService preferencesService,
+                                  AbstractColumnPreferences abstractColumnPrefs,
                                   ExternalFileTypes externalFileTypes,
                                   UndoManager undoManager,
                                   DialogService dialogService,
                                   StateManager stateManager) {
         this.database = Objects.requireNonNull(database);
         this.preferencesService = Objects.requireNonNull(preferencesService);
-        this.columnPreferences = preferencesService.getColumnPreferences();
+        this.columnPreferences = abstractColumnPrefs;
         this.externalFileTypes = Objects.requireNonNull(externalFileTypes);
         this.dialogService = dialogService;
         this.cellFactory = new CellFactory(externalFileTypes, preferencesService, undoManager);
