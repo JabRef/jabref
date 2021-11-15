@@ -151,7 +151,7 @@ public class BibDatabaseContext {
                     parentPath = Path.of(System.getProperty("user.dir"));
                 }
                 Objects.requireNonNull(parentPath, "BibTeX database parent path is null");
-                fileDirs.add(0, parentPath);
+                fileDirs.add(parentPath);
             });
         }
 
@@ -211,6 +211,14 @@ public class BibDatabaseContext {
 
     public List<BibEntry> getEntries() {
         return database.getEntries();
+    }
+
+    /**
+     * check if the database has any empty entries
+     * @return true if the database has any empty entries; otherwise false
+     */
+    public boolean hasEmptyEntries() {
+        return this.getEntries().stream().anyMatch(entry->entry.getFields().isEmpty());
     }
 
     public static Path getFulltextIndexBasePath() {

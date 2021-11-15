@@ -170,6 +170,9 @@ public class CustomizeEntryTypeDialogView extends BaseDialog<Void> {
                 .install(fieldTypeActionColumn);
 
         viewModel.newFieldToAddProperty().bindBidirectional(addNewField.valueProperty());
+        // The valueProperty() of addNewField ComboBox needs to be updated by typing text in the ComboBox textfield,
+        // since the enabled/disabled state of addNewFieldButton won't update otherwise
+        EasyBind.subscribe(addNewField.getEditor().textProperty(), text -> addNewField.setValue(CustomEntryTypeDialogViewModel.FIELD_STRING_CONVERTER.fromString(text)));
 
         EasyBind.subscribe(viewModel.selectedEntryTypeProperty(), type -> {
             if (type != null) {

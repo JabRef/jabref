@@ -15,6 +15,7 @@ import java.util.Objects;
 import org.jabref.logic.bibtex.BibEntryWriter;
 import org.jabref.logic.bibtex.FieldWriter;
 import org.jabref.logic.bibtex.FieldWriterPreferences;
+import org.jabref.logic.util.OS;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
@@ -101,12 +102,13 @@ public class EmbeddedBibFilePdfExporter extends Exporter {
     }
 
     private String getBibString(List<BibEntry> entries) throws IOException {
-        StringWriter stringWriter = new StringWriter(200);
+        StringWriter stringWriter = new StringWriter();
+        BibWriter bibWriter = new BibWriter(stringWriter, OS.NEWLINE);
         FieldWriter fieldWriter = FieldWriter.buildIgnoreHashes(fieldWriterPreferences);
         BibEntryWriter bibEntryWriter = new BibEntryWriter(fieldWriter, bibEntryTypesManager);
         for (BibEntry entry : entries) {
-            bibEntryWriter.writeWithoutPrependedNewlines(entry, stringWriter, bibDatabaseMode);
+            bibEntryWriter.write(entry, bibWriter, bibDatabaseMode);
         }
-        return stringWriter.getBuffer().toString();
+        return stringWriter.toString();
     }
 }

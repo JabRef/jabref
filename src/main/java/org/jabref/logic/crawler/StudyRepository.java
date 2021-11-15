@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.database.DatabaseMerger;
-import org.jabref.logic.exporter.AtomicFileWriter;
+import org.jabref.logic.exporter.BibWriter;
 import org.jabref.logic.exporter.BibtexDatabaseWriter;
 import org.jabref.logic.exporter.SaveException;
 import org.jabref.logic.exporter.SavePreferences;
@@ -25,6 +25,7 @@ import org.jabref.logic.importer.OpenDatabase;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.OS;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntryTypesManager;
@@ -34,6 +35,7 @@ import org.jabref.model.study.Study;
 import org.jabref.model.study.StudyDatabase;
 import org.jabref.model.study.StudyQuery;
 import org.jabref.model.util.FileUpdateMonitor;
+import org.jabref.preferences.GeneralPreferences;
 
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.slf4j.Logger;
@@ -61,6 +63,7 @@ class StudyRepository {
     private final Path studyDefinitionFile;
     private final SlrGitHandler gitHandler;
     private final Study study;
+    private final GeneralPreferences generalPreferences;
     private final ImportFormatPreferences importFormatPreferences;
     private final FileUpdateMonitor fileUpdateMonitor;
     private final SavePreferences savePreferences;
@@ -79,12 +82,14 @@ class StudyRepository {
      */
     public StudyRepository(Path pathToRepository,
                            SlrGitHandler gitHandler,
+                           GeneralPreferences generalPreferences,
                            ImportFormatPreferences importFormatPreferences,
                            FileUpdateMonitor fileUpdateMonitor,
                            SavePreferences savePreferences,
                            BibEntryTypesManager bibEntryTypesManager) throws IOException, ParseException {
         this.repositoryPath = pathToRepository;
         this.gitHandler = gitHandler;
+        this.generalPreferences = generalPreferences;
         this.importFormatPreferences = importFormatPreferences;
         this.fileUpdateMonitor = fileUpdateMonitor;
         this.studyDefinitionFile = Path.of(repositoryPath.toString(), STUDY_DEFINITION_FILE_NAME);
@@ -132,7 +137,7 @@ class StudyRepository {
      */
     public BibDatabaseContext getFetcherResultEntries(String query, String fetcherName) throws IOException {
         if (Files.exists(getPathToFetcherResultFile(query, fetcherName))) {
-            return OpenDatabase.loadDatabase(getPathToFetcherResultFile(query, fetcherName), importFormatPreferences, fileUpdateMonitor).getDatabaseContext();
+            return OpenDatabase.loadDatabase(getPathToFetcherResultFile(query, fetcherName), generalPreferences, importFormatPreferences, fileUpdateMonitor).getDatabaseContext();
         }
         return new BibDatabaseContext();
     }
@@ -142,7 +147,7 @@ class StudyRepository {
      */
     public BibDatabaseContext getQueryResultEntries(String query) throws IOException {
         if (Files.exists(getPathToQueryResultFile(query))) {
-            return OpenDatabase.loadDatabase(getPathToQueryResultFile(query), importFormatPreferences, fileUpdateMonitor).getDatabaseContext();
+            return OpenDatabase.loadDatabase(getPathToQueryResultFile(query), generalPreferences, importFormatPreferences, fileUpdateMonitor).getDatabaseContext();
         }
         return new BibDatabaseContext();
     }
@@ -152,7 +157,7 @@ class StudyRepository {
      */
     public BibDatabaseContext getStudyResultEntries() throws IOException {
         if (Files.exists(getPathToStudyResultFile())) {
-            return OpenDatabase.loadDatabase(getPathToStudyResultFile(), importFormatPreferences, fileUpdateMonitor).getDatabaseContext();
+            return OpenDatabase.loadDatabase(getPathToStudyResultFile(), generalPreferences, importFormatPreferences, fileUpdateMonitor).getDatabaseContext();
         }
         return new BibDatabaseContext();
     }
@@ -412,14 +417,11 @@ class StudyRepository {
             Files.createFile(pathToFile);
         }
         try (Writer fileWriter = new FileWriter(pathToFile.toFile())) {
-            BibtexDatabaseWriter databaseWriter = new BibtexDatabaseWriter(fileWriter, savePreferences, bibEntryTypesManager);
-            databaseWriter.saveDatabase(new BibDatabaseContext(entries));
-        }
-        try (AtomicFileWriter fileWriter = new AtomicFileWriter(pathToFile, savePreferences.getEncoding(), savePreferences.shouldMakeBackup())) {
-            BibtexDatabaseWriter databaseWriter = new BibtexDatabaseWriter(fileWriter, savePreferences, bibEntryTypesManager);
+            BibWriter bibWriter = new BibWriter(fileWriter, OS.NEWLINE);
+            BibtexDatabaseWriter databaseWriter = new BibtexDatabaseWriter(bibWriter, generalPreferences, savePreferences, bibEntryTypesManager);
             databaseWriter.saveDatabase(new BibDatabaseContext(entries));
         } catch (UnsupportedCharsetException ex) {
-            throw new SaveException(Localization.lang("Character encoding '%0' is not supported.", savePreferences.getEncoding().displayName()), ex);
+            throw new SaveException(Localization.lang("Character encoding '%0' is not supported.", generalPreferences.getDefaultEncoding().displayName()), ex);
         } catch (IOException ex) {
             throw new SaveException("Problems saving: " + ex, ex);
         }

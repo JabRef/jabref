@@ -62,7 +62,7 @@ public class ExportCommand extends SimpleCommand {
                                                         .collect(Collectors.toList());
 
         Globals.exportFactory = ExporterFactory.create(customExporters, layoutPreferences, savePreferences,
-                xmpPreferences, preferences.getDefaultBibDatabaseMode(), Globals.entryTypesManager);
+                xmpPreferences, preferences.getGeneralPreferences().getDefaultBibDatabaseMode(), Globals.entryTypesManager);
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                 .addExtensionFilter(FileFilterConverter.exporterToExtensionFilter(exporters))
                 .withDefaultExtension(preferences.getImportExportPreferences().getLastExportExtension())
@@ -98,9 +98,8 @@ public class ExportCommand extends SimpleCommand {
 
         // Make sure we remember which filter was used, to set
         // the default for next time:
-        preferences.storeImportExportPreferences(preferences.getImportExportPreferences()
-                                                            .withLastExportExtension(format.getName())
-                                                            .withExportWorkingDirectory(file.getParent()));
+        preferences.getImportExportPreferences().setLastExportExtension(format.getName());
+        preferences.getImportExportPreferences().setExportWorkingDirectory(file.getParent());
 
         final List<BibEntry> finEntries = entries;
         BackgroundTask
@@ -111,7 +110,7 @@ public class ExportCommand extends SimpleCommand {
                                  .getBibDatabaseContext()
                                  .getMetaData()
                                  .getEncoding()
-                                 .orElse(preferences.getDefaultEncoding()),
+                                 .orElse(preferences.getGeneralPreferences().getDefaultEncoding()),
                             finEntries);
                     return null; // can not use BackgroundTask.wrap(Runnable) because Runnable.run() can't throw Exceptions
                 })
