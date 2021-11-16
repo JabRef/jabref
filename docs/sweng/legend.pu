@@ -1,0 +1,6 @@
+@startuml legend #White
+legend right 
+    |<#TECHNOLOGY>     | <#White> Existing class |
+    |<#PeachPuff>      | <#White> New class |
+endlegend
+@enduml

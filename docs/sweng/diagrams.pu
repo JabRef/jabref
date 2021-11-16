@@ -1,6 +1,21 @@
 ' +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 @startuml class-diagram
 mainframe **Class Diagram: "Better Search" Implementation  **
+' package LEGEND {
+'     class Existing as " Existing Classes " #White
+'     hide  Existing circle
+'     hide  Existing methods
+'     hide  Existing members
+
+'     class New as " New Classes "
+'     hide  New circle
+'     hide  New methods
+'     hide  New members
+
+'     ' Workaround to prevent PlantUML from positioning the legend blocks randomly.
+'     Existing -[hidden]- New
+' }
+
 ' =======================================================
 ' Grouping
 ' =======================================================
@@ -31,7 +46,7 @@ RecentSearch "1 " <-- "0...*" SearchItem
 ' =======================================================
 ' Classes
 ' =======================================================
-class GlobalSearchbar {
+class GlobalSearchbar #TECHNOLOGY {
     searchField: CustomTextField
     updateSearchResultsForQuery()
     ' initSearchModifierButtons()
@@ -47,7 +62,11 @@ class GlobalSearchbar {
     ' onSuggestionChosen()
 }
 
-class RecentSearch {
+class Highlighting #TECHNOLOGY {
+
+}
+
+class RecentSearch #PeachPuff {
     pastSearchItemList: ArrayList<SearchItem>
     ListView<String> authors
     ListView<String> titles
@@ -58,7 +77,7 @@ class RecentSearch {
 
 }
 
-class DropDownMenu {
+class DropDownMenu #PeachPuff {
     authorBtn: Button
     journalBtn: Button
     titleBtn: Button
@@ -72,17 +91,17 @@ class DropDownMenu {
     isPrevAttribute()
 }
 
-class LuceneBasedSearchRule {
+class LuceneBasedSearchRule #TECHNOLOGY {
     validateSearchStrings()
 }
 
-class Autocomplete {
+class Autocomplete #TECHNOLOGY {
     AutoCompletionTextFieldBinding<T> String
     AutoCompletePopup<T> autoCompletionPopup
     bindAutoCompletion()
 }
 
-class SearchFieldSynchronizer {
+class SearchFieldSynchronizer #PeachPuff {
     searchItemList: ArrayList<SearchItem>
     searchString: String 
     compare()
@@ -94,7 +113,7 @@ class SearchFieldSynchronizer {
     validateButton()
 }
 
-class SearchItem {
+class SearchItem #PeachPuff {
     itemType: enum 
     item: String
     getType()
@@ -103,20 +122,20 @@ class SearchItem {
     set()
 }
 
-enum itemType {
+enum itemType #PeachPuff {
     logicalOperator
     attribute
     bracket
 }
 
-class CustomTextField {
+class CustomTextField #TECHNOLOGY {
     get()
     get(int start, int end)
     length()
     addListener()
 }
 
-class TextInputControl {
+class TextInputControl #TECHNOLOGY {
     getText()
     insertText()
     deleteText()
@@ -126,7 +145,7 @@ class TextInputControl {
     getLength()
 }
 
-class JFXChipView {
+class JFXChipView #TECHNOLOGY {
     chips
     StringConverter()
 }

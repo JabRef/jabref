@@ -47,7 +47,7 @@ For that an ArrayList will be kept and updated in accordance with the - by the u
 
 RecentSearch will keep track of previously searched for important attributes - mainly authors and titles - in separate lists and also display them in the dropdown menu at the end.
 
-![Class Diagram](/docs/sweng/diagrams/class-diagram.png "class-diagram.png")
+![Class Diagram](/docs/sweng/diagrams/class-diagram-withLegend.png "class-diagram.png")
 
 ### 5.2 Dynamics
 <!-- An dieser Stelle sollten die dynamische Aspekte, zum Beispiel mit Hilfe von UML Sequenz/Kollaborationsdiagrammen, oder Akivitätsdiagrammen beschrieben werden. -->
