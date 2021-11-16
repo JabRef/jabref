@@ -26,6 +26,14 @@ import org.apache.tika.parser.AutoDetectParser;
 
 public class FileHelper {
 
+    /**
+     * Returns if the two paths are identical.
+     *
+     * @param left        one of the two paths for comparison
+     * @param right       the second path for comparison
+     * @param equality    a predicate of two paths arguments
+     * @return true if the two paths are identical
+     */
     public static <T, U> boolean equals(Path left, Path right, BiPredicate<Path, Path> equality) {
         return equality.test(left, right);
     }
