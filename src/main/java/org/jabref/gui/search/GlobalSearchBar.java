@@ -291,7 +291,6 @@ public class GlobalSearchBar extends HBox {
         LOGGER.debug("Run search " + searchField.getText());
 
         // Prototype DropDownMenu
-        // Add to RecentSearch
 
         // An empty search field should cause the search to be cleared.
         if (searchField.getText().isEmpty()) {
