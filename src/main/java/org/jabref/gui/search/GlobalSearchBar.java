@@ -14,6 +14,8 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.css.PseudoClass;
 import javafx.event.Event;
 import javafx.geometry.Insets;
@@ -125,7 +127,20 @@ public class GlobalSearchBar extends HBox {
         updateHintVisibility();
 
         // Prototype DropDownMenu
-        dropDownMenu = new DropDownMenu(searchField, this);
+        this.dropDownMenu = new DropDownMenu(searchField, this);
+
+        // Prototype RecentSearch
+        // Add to RecentSearch after searchbar loses focus
+        searchField.focusedProperty().addListener(new ChangeListener<Boolean>() {
+            @Override
+            public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+                if (newValue) {
+                    LOGGER.info("Searchbar in focus");
+                } else {
+                    dropDownMenu.recentSearch.add(searchField.getText());
+                }
+            }
+        });
 
         KeyBindingRepository keyBindingRepository = Globals.getKeyPrefs();
         searchField.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
@@ -272,14 +287,11 @@ public class GlobalSearchBar extends HBox {
     }
 
     public void performSearch() {
-
-        LOGGER.debug("Flags: {}", searchPreferences.getSearchFlags());
+LOGGER.debug("Flags: {}", searchPreferences.getSearchFlags());
         LOGGER.debug("Run search " + searchField.getText());
 
         // Prototype DropDownMenu
-        if (!searchField.getText().isEmpty()) {
-            this.dropDownMenu.recentSearch.add(searchField.getText());
-        }
+        // Add to RecentSearch
 
         // An empty search field should cause the search to be cleared.
         if (searchField.getText().isEmpty()) {
