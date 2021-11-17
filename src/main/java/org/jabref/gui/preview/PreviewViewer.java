@@ -1,9 +1,5 @@
 package org.jabref.gui.preview;
 
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Pattern;
@@ -37,7 +33,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.events.EventTarget;
-import org.w3c.dom.html.HTMLAnchorElement;
 
 /**
  * Displays an BibEntry using the given layout format.
@@ -152,17 +147,6 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
                 Node node = anchorList.item(i);
                 EventTarget eventTarget = (EventTarget) node;
                 eventTarget.addEventListener("click", evt -> {
-                    EventTarget target = evt.getCurrentTarget();
-                    HTMLAnchorElement anchorElement = (HTMLAnchorElement) target;
-                    String href = anchorElement.getHref();
-                    try {
-                        java.awt.Desktop.getDesktop().browse(new URL(href).toURI());
-                    } catch (MalformedURLException | URISyntaxException exception) {
-                        exception.printStackTrace();
-                    } catch (IOException exception) {
-                        exception.printStackTrace();
-                    }
-
                     evt.preventDefault();
                 }, false);
             }
