@@ -7,8 +7,8 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 
+import com.jfoenix.controls.JFXChipView;
 import org.controlsfx.control.PopOver;
-import org.controlsfx.control.textfield.CustomTextField;
 
 public class DropDownMenu {
     // DropDown Searchbar
@@ -31,8 +31,9 @@ public class DropDownMenu {
     // test buttons
     // private final Button testButton;
 
-    public DropDownMenu(CustomTextField searchField, GlobalSearchBar globalSearchBar) {
+    public DropDownMenu(JFXChipView<SearchItem> searchField, GlobalSearchBar globalSearchBar) {
         // Testing dropdown for searchbar
+        SearchFieldSynchronizer searchFieldSynchronizer = new SearchFieldSynchronizer(searchField);
 
         authorButton = new Button("Author");
         journalButton = new Button("Journal");
@@ -79,110 +80,48 @@ public class DropDownMenu {
 
         // authorButton action
         authorButton.addEventFilter(MouseEvent.MOUSE_CLICKED, event -> {
-            if (!isPrevAttribute(searchField)) { // checks if the search term prior is an attribute and wont queue another if so
-                checkAndAddSpace(searchField); // checks if there is a space prior and if not adds it
-                searchField.insertText(searchField.getCaretPosition(), "author:");
-                searchField.positionCaret(searchField.getText().length());
-            }
+            searchFieldSynchronizer.addSearchItem("attribute", "author:");
         });
 
         // journalButton action
-        journalButton.addEventFilter(MouseEvent.MOUSE_CLICKED, event ->{
-            if (!isPrevAttribute(searchField)) {
-                checkAndAddSpace(searchField);
-                searchField.insertText(searchField.getCaretPosition(), "journal:");
-                searchField.positionCaret(searchField.getText().length());
-            }
+        journalButton.addEventFilter(MouseEvent.MOUSE_CLICKED, event -> {
+            searchFieldSynchronizer.addSearchItem("attribute", "journal:");
         });
 
         // titleButton action
-        titleButton.addEventFilter(MouseEvent.MOUSE_CLICKED, event ->{
-            if (!isPrevAttribute(searchField)) {
-                checkAndAddSpace(searchField);
-                searchField.insertText(searchField.getCaretPosition(), "title:");
-                searchField.positionCaret(searchField.getText().length());
-            }
+        titleButton.addEventFilter(MouseEvent.MOUSE_CLICKED, event -> {
+            searchFieldSynchronizer.addSearchItem("attribute", "title:");
         });
 
         // yearButton action
-        yearButton.addEventFilter(MouseEvent.MOUSE_CLICKED, event ->{
-            if (!isPrevAttribute(searchField)) {
-                checkAndAddSpace(searchField);
-                searchField.insertText(searchField.getCaretPosition(), "year:");
-                searchField.positionCaret(searchField.getText().length());
-            }
+        yearButton.addEventFilter(MouseEvent.MOUSE_CLICKED, event -> {
+            searchFieldSynchronizer.addSearchItem("attribute", "year:");
         });
 
         // yearRangeButton action
-        yearRangeButton.addEventFilter(MouseEvent.MOUSE_CLICKED, event ->{
+        yearRangeButton.addEventFilter(MouseEvent.MOUSE_CLICKED, event -> {
 
         });
 
         // andButton action
-        andButton.addEventFilter(MouseEvent.MOUSE_CLICKED, event ->{
-            if (searchField.getCaretPosition() != 0) {
-                if (!searchField.getText(searchField.getCaretPosition() - 1, searchField.getCaretPosition()).equals(" ")) {
-                    searchField.insertText(searchField.getCaretPosition(), " ");
-                    searchField.positionCaret(searchField.getText().length());
-                }
-            }
-            searchField.insertText(searchField.getCaretPosition(), "AND ");
-            searchField.positionCaret(searchField.getText().length());
+        andButton.addEventFilter(MouseEvent.MOUSE_CLICKED, event -> {
+            searchFieldSynchronizer.addSearchItem("logicalOperator", "AND");
         });
 
         // orButton action
-        orButton.addEventFilter(MouseEvent.MOUSE_CLICKED, event ->{
-            if (searchField.getCaretPosition() != 0) {
-                if (!searchField.getText(searchField.getCaretPosition() - 1, searchField.getCaretPosition()).equals(" ")) {
-                    searchField.insertText(searchField.getCaretPosition(), " ");
-                    searchField.positionCaret(searchField.getText().length());
-                }
-            }
-            searchField.insertText(searchField.getCaretPosition(), "OR ");
-            searchField.positionCaret(searchField.getText().length());
+        orButton.addEventFilter(MouseEvent.MOUSE_CLICKED, event -> {
+            searchFieldSynchronizer.addSearchItem("logicalOperator", "OR");
         });
 
         // leftBracketButton action
-        leftBracketButton.addEventFilter(MouseEvent.MOUSE_CLICKED, event ->{
-            if (searchField.getCaretPosition() != 0) {
-                if (!searchField.getText(searchField.getCaretPosition() - 1, searchField.getCaretPosition()).equals(" ")) {
-                    searchField.insertText(searchField.getCaretPosition(), " ");
-                    searchField.positionCaret(searchField.getText().length());
-                }
-            }
-            searchField.insertText(searchField.getCaretPosition(), "( ");
-            searchField.positionCaret(searchField.getText().length());
+        leftBracketButton.addEventFilter(MouseEvent.MOUSE_CLICKED, event -> {
+            searchFieldSynchronizer.addSearchItem("bracket", "(");
         });
 
         // orButton action
-        rightBracketButton.addEventFilter(MouseEvent.MOUSE_CLICKED, event ->{
-            if (searchField.getCaretPosition() != 0) {
-                if (!searchField.getText(searchField.getCaretPosition() - 1, searchField.getCaretPosition()).equals(" ")) {
-                    searchField.insertText(searchField.getCaretPosition(), " ");
-                    searchField.positionCaret(searchField.getText().length());
-                }
-            }
-            searchField.insertText(searchField.getCaretPosition(), ") ");
-            searchField.positionCaret(searchField.getText().length());
+        rightBracketButton.addEventFilter(MouseEvent.MOUSE_CLICKED, event -> {
+            searchFieldSynchronizer.addSearchItem("bracket", ")");
         });
     }
 
-    private void checkAndAddSpace(CustomTextField searchField) {
-        if (searchField.getCaretPosition() != 0) {
-            if (!searchField.getText(searchField.getCaretPosition() - 1, searchField.getCaretPosition()).equals(" ")) {
-                searchField.insertText(searchField.getCaretPosition(), " ");
-                searchField.positionCaret(searchField.getText().length());
-            }
-        }
-    }
-
-    private boolean isPrevAttribute(CustomTextField searchField) {
-        isPrevAttribute = false;
-        if (searchField.getCaretPosition() != 0) {
-            if (searchField.getText(searchField.getCaretPosition() - 1, searchField.getCaretPosition()).equals(":")) {
-                isPrevAttribute = true;
-            }
-        }
-        return isPrevAttribute;
-    }
 }

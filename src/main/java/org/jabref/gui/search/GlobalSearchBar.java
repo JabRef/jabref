@@ -13,11 +13,10 @@ import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.Property;
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.collections.ListChangeListener;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.ListChangeListener;
 import javafx.css.PseudoClass;
 import javafx.event.Event;
 import javafx.geometry.Insets;
@@ -112,7 +111,7 @@ public class GlobalSearchBar extends HBox {
     private GlobalSearchResultDialog globalSearchResultDialog;
 
     private final DropDownMenu dropDownMenu;
-    public final JFXChipView<String> chipView;
+    public final JFXChipView<SearchItem> chipView;
 
     public GlobalSearchBar(JabRefFrame frame, StateManager stateManager, PreferencesService preferencesService, CountingUndoManager undoManager) {
         super();
@@ -131,9 +130,6 @@ public class GlobalSearchBar extends HBox {
         searchFieldTooltip.setMaxHeight(10);
         updateHintVisibility();
 
-        // Prototype DropDownMenu
-        this.dropDownMenu = new DropDownMenu(searchField, this);
-
         // Prototype RecentSearch
         // Add to RecentSearch after searchbar loses focus
         searchField.focusedProperty().addListener(new ChangeListener<Boolean>() {
@@ -151,9 +147,11 @@ public class GlobalSearchBar extends HBox {
         chipView = new JFXChipView<>();
         chipView.setMaxHeight(30);
         chipView.autosize();
-        chipView.getSuggestions().addAll("HELLO", "TROLL", "WFEWEF", "WEF");
 
+        // Prototype DropDownMenu
+        this.dropDownMenu = new DropDownMenu(chipView, this);
         KeyBindingRepository keyBindingRepository = Globals.getKeyPrefs();
+
         searchField.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
             Optional<KeyBinding> keyBinding = keyBindingRepository.mapToKeyBinding(event);
             if (keyBinding.isPresent()) {
@@ -226,7 +224,7 @@ public class GlobalSearchBar extends HBox {
         this.stateManager.activeDatabaseProperty().addListener((obs, oldValue, newValue) -> stateManager.activeSearchQueryProperty().get().ifPresent(this::updateSearchResultsForQuery));
 
         // ChipView Prototype
-        chipView.getChips().addListener((ListChangeListener<? super String>) event -> {
+        chipView.getChips().addListener((ListChangeListener<? super SearchItem>) event -> {
             this.setSearchTerm(chipView.getChips().toString());
         });
     }
