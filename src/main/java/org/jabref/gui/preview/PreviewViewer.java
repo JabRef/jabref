@@ -1,5 +1,7 @@
 package org.jabref.gui.preview;
 
+import java.io.IOException;
+import java.net.MalformedURLException;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Pattern;
@@ -17,6 +19,7 @@ import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.Globals;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.Theme;
@@ -33,6 +36,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.events.EventTarget;
+import org.w3c.dom.html.HTMLAnchorElement;
 
 /**
  * Displays an BibEntry using the given layout format.
@@ -147,6 +151,16 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
                 Node node = anchorList.item(i);
                 EventTarget eventTarget = (EventTarget) node;
                 eventTarget.addEventListener("click", evt -> {
+                    EventTarget target = evt.getCurrentTarget();
+                    HTMLAnchorElement anchorElement = (HTMLAnchorElement) target;
+                    String href = anchorElement.getHref();
+                    try {
+                        JabRefDesktop.openBrowser(href);
+                    } catch (MalformedURLException exception) {
+                        exception.printStackTrace();
+                    } catch (IOException exception) {
+                        exception.printStackTrace();
+                    }
                     evt.preventDefault();
                 }, false);
             }
