@@ -183,7 +183,7 @@
   <macro name="secondary-producers">
     <names variable="translator">
       <label form="verb-short" suffix=" " text-case="capitalize-first"/>
-      <name form="long" delimiter=", "></name>
+      <name form="long" delimiter=", "/>
       <et-al term="et-al" font-style="italic"/>
     </names>
   </macro>

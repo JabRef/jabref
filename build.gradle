@@ -20,11 +20,11 @@ plugins {
 
     id 'org.openjfx.javafxplugin' version '0.0.10'
 
-    id 'org.beryx.jlink' version '2.24.2'
+    id 'org.beryx.jlink' version '2.24.4'
 
     // nicer test outputs during running and completion
     // Homepage: https://github.com/radarsh/gradle-test-logger-plugin
-    id 'com.adarshr.test-logger' version '3.0.0'
+    id 'com.adarshr.test-logger' version '3.1.0'
 
     id 'jacoco'
 
@@ -110,7 +110,7 @@ configurations {
 }
 
 javafx {
-    version = "17.0.0.1"
+    version = "17.0.1"
     modules = [ 'javafx.controls', 'javafx.fxml', 'javafx.web', 'javafx.swing' ]
 }
 
@@ -130,10 +130,10 @@ dependencies {
     // required for reading write-protected PDFs - see https://github.com/JabRef/jabref/pull/942#issuecomment-209252635
     implementation 'org.bouncycastle:bcprov-jdk15on:1.69'
 
-    implementation 'commons-cli:commons-cli:1.4'
+    implementation 'commons-cli:commons-cli:1.5.0'
 
-    implementation 'org.libreoffice:libreoffice:7.2.1'
-    implementation 'org.libreoffice:unoloader:7.2.0'
+    implementation 'org.libreoffice:libreoffice:7.2.2'
+    implementation 'org.libreoffice:unoloader:7.2.2'
 
     implementation 'io.github.java-diff-utils:java-diff-utils:4.11'
     implementation 'info.debatty:java-string-similarity:2.0.0'
@@ -141,8 +141,8 @@ dependencies {
     antlr3 'org.antlr:antlr:3.5.2'
     implementation 'org.antlr:antlr-runtime:3.5.2'
 
-    antlr4 'org.antlr:antlr4:4.9.2'
-    implementation 'org.antlr:antlr4-runtime:4.9.2'
+    antlr4 'org.antlr:antlr4:4.9.3'
+    implementation 'org.antlr:antlr4-runtime:4.9.3'
 
     implementation group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: '5.13.0.202109080827-r'
 
@@ -158,7 +158,7 @@ dependencies {
         exclude module: 'oraclepki'
     }
 
-    implementation ('com.google.guava:guava:31.0-jre') {
+    implementation ('com.google.guava:guava:31.0.1-jre') {
         // TODO: Remove this as soon as https://github.com/google/guava/issues/2960 is fixed
         exclude module: "jsr305"
     }
@@ -171,14 +171,14 @@ dependencies {
     implementation 'de.saxsys:mvvmfx-validation:1.9.0-SNAPSHOT'
     implementation 'de.saxsys:mvvmfx:1.8.0'
     implementation 'com.tobiasdiez:easybind:2.2'
-    implementation 'org.fxmisc.flowless:flowless:0.6.6'
-    implementation 'org.fxmisc.richtext:richtextfx:0.10.6'
+    implementation 'org.fxmisc.flowless:flowless:0.6.7'
+    implementation 'org.fxmisc.richtext:richtextfx:0.10.7'
     implementation group: 'org.glassfish.hk2.external', name: 'jakarta.inject', version: '2.6.1'
     implementation 'com.jfoenix:jfoenix:9.0.10'
     implementation 'org.controlsfx:controlsfx:11.1.0'
 
-    implementation 'org.jsoup:jsoup:1.14.2'
-    implementation 'com.konghq:unirest-java:3.13.0'
+    implementation 'org.jsoup:jsoup:1.14.3'
+    implementation 'com.konghq:unirest-java:3.13.3'
 
     implementation 'org.slf4j:slf4j-api:2.0.0-alpha5'
     implementation group: 'org.apache.logging.log4j', name: 'log4j-jcl', version: '3.0.0-SNAPSHOT'
@@ -209,18 +209,18 @@ dependencies {
 
     implementation group: 'net.harawata', name: 'appdirs', version: '1.2.1'
 
-    testImplementation 'io.github.classgraph:classgraph:4.8.121'
+    testImplementation 'io.github.classgraph:classgraph:4.8.130'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.8.1'
     testImplementation 'org.junit.platform:junit-platform-launcher:1.8.1'
 
-    testImplementation 'net.bytebuddy:byte-buddy-parent:1.11.18'
+    testImplementation 'net.bytebuddy:byte-buddy-parent:1.12.1'
     testRuntimeOnly group: 'org.apache.logging.log4j', name: 'log4j-core', version: '3.0.0-SNAPSHOT'
     testRuntimeOnly group: 'org.apache.logging.log4j', name: 'log4j-jul', version: '3.0.0-SNAPSHOT'
-    testImplementation 'org.mockito:mockito-core:3.12.4'
-    testImplementation 'org.xmlunit:xmlunit-core:2.8.2'
-    testImplementation 'org.xmlunit:xmlunit-matchers:2.8.2'
-    testRuntimeOnly 'com.tngtech.archunit:archunit-junit5-engine:0.21.0'
-    testImplementation 'com.tngtech.archunit:archunit-junit5-api:0.21.0'
+    testImplementation 'org.mockito:mockito-core:4.0.0'
+    testImplementation 'org.xmlunit:xmlunit-core:2.8.3'
+    testImplementation 'org.xmlunit:xmlunit-matchers:2.8.3'
+    testRuntimeOnly 'com.tngtech.archunit:archunit-junit5-engine:0.22.0'
+    testImplementation 'com.tngtech.archunit:archunit-junit5-api:0.22.0'
     testImplementation "org.testfx:testfx-core:4.0.17-alpha-SNAPSHOT"
     testImplementation "org.testfx:testfx-junit5:4.0.17-alpha-SNAPSHOT"
     testImplementation "org.hamcrest:hamcrest-library:2.2"

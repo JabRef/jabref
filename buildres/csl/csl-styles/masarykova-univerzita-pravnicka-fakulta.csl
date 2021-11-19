@@ -5,7 +5,7 @@
     <id>http://www.zotero.org/styles/masarykova-univerzita-pravnicka-fakulta</id>
     <link href="http://www.zotero.org/styles/masarykova-univerzita-pravnicka-fakulta" rel="self"/>
     <link href="http://www.zotero.org/styles/iso690-full-note-cs" rel="template"/>
-    <link href="https://is.muni.cz/do/law/ud/predp/smer/Smernice_dekana_c._3-2020_O_citacich_dokumentu.pdf" rel="documentation"/>
+    <link href="https://is.muni.cz/do/law/ud/predp/smer/Smernice_c._3-2020-O_citacich_dokumentu_3.3_final.pdf" rel="documentation"/>
     <author>
       <name>Oldrich Tristan Florian</name>
       <email>oldrich.florian@gmail.com</email>
@@ -14,7 +14,7 @@
     <category citation-format="note"/>
     <category field="law"/>
     <summary>Masaryk University, Faculty of Law</summary>
-    <updated>2021-03-07T10:00:00+00:00</updated>
+    <updated>2021-10-07T10:00:00+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="cs">
@@ -357,7 +357,6 @@
                 <if variable="URL" match="any">
                   <text prefix=". " macro="issued"/>
                   <text prefix=", " macro="citation-locator"/>
-                  <text prefix=" " macro="quoted"/>
                   <text prefix=". " macro="identifier"/>
                 </if>
                 <else-if variable="issued" match="none">
@@ -390,7 +389,11 @@
                 <if variable="URL" match="any">
                   <text prefix=". " macro="issued"/>
                   <text prefix=", " macro="citation-locator"/>
-                  <text prefix=" " macro="quoted"/>
+                  <choose>
+                    <if type="webpage post-weblog" match="any">
+                      <text prefix=" " macro="quoted"/>
+                    </if>
+                  </choose>
                   <text prefix=". " macro="identifier"/>
                 </if>
                 <else>
@@ -407,7 +410,6 @@
               <choose>
                 <if variable="URL" match="any">
                   <text prefix=", " macro="citation-locator"/>
-                  <text prefix=" " macro="quoted"/>
                   <text prefix=". " macro="identifier"/>
                 </if>
                 <else>
@@ -432,7 +434,6 @@
                 <if variable="URL" match="any">
                   <text prefix=". " macro="issued"/>
                   <text prefix=", " macro="citation-locator"/>
-                  <text prefix=" " macro="quoted"/>
                   <text prefix=". " macro="identifier"/>
                 </if>
                 <else-if variable="issued" match="none">
@@ -484,7 +485,6 @@
             <if variable="URL" match="any">
               <text prefix=". " macro="issued"/>
               <text prefix=", " macro="page-range"/>
-              <text prefix=" " macro="quoted"/>
               <text prefix=". " macro="collection" suffix="."/>
               <text prefix=". " macro="identifier"/>
             </if>
@@ -496,7 +496,6 @@
               </choose>
               <text prefix=". " macro="collection" suffix="."/>
               <text prefix=", " macro="page-range"/>
-              <text prefix=" " macro="quoted"/>
               <text prefix=". " macro="collection" suffix="."/>
             </else-if>
             <else>
@@ -522,7 +521,11 @@
           <choose>
             <if variable="URL" match="any">
               <text prefix=", " macro="page-range"/>
-              <text prefix=" " macro="quoted"/>
+                <choose>
+                  <if type="webpage post-weblog" match="any">
+                    <text prefix=" " macro="quoted"/>
+                  </if>
+                </choose>
               <text prefix=". " macro="identifier"/>
             </if>
             <else>
@@ -538,7 +541,6 @@
           <choose>
             <if variable="URL" match="any">
               <text prefix=", " macro="page-range"/>
-              <text prefix=" " macro="quoted"/>
               <text prefix=". " macro="identifier"/>
             </if>
             <else>
@@ -561,7 +563,6 @@
             <if variable="URL" match="any">
               <text prefix=" " macro="medium"/>
               <text prefix=". " macro="issued"/>
-              <text prefix=" " macro="quoted" suffix="."/>
               <text prefix=". " macro="collection" suffix="."/>
               <text prefix=". " macro="identifier"/>
             </if>

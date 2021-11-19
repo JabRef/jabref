@@ -1,7 +1,6 @@
 package org.jabref.gui.exporter;
 
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -27,6 +26,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.metadata.MetaData;
+import org.jabref.preferences.GeneralPreferences;
 import org.jabref.preferences.JabRefPreferences;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -103,14 +103,14 @@ class SaveDatabaseActionTest {
 
         FieldWriterPreferences fieldWriterPreferences = mock(FieldWriterPreferences.class);
         when(fieldWriterPreferences.getFieldContentFormatterPreferences()).thenReturn(mock(FieldContentFormatterPreferences.class));
+        GeneralPreferences generalPreferences = mock(GeneralPreferences.class);
         SavePreferences savePreferences = mock(SavePreferences.class);
         // In case a "thenReturn" is modified, the whole mock has to be recreated
         dbContext = mock(BibDatabaseContext.class);
         libraryTab = mock(LibraryTab.class);
         MetaData metaData = mock(MetaData.class);
-        when(savePreferences.withEncoding(any(Charset.class))).thenReturn(savePreferences);
         when(savePreferences.withSaveType(any(SavePreferences.DatabaseSaveType.class))).thenReturn(savePreferences);
-        when(savePreferences.getEncoding()).thenReturn(StandardCharsets.UTF_8);
+        when(generalPreferences.getDefaultEncoding()).thenReturn(StandardCharsets.UTF_8);
         when(savePreferences.getFieldWriterPreferences()).thenReturn(fieldWriterPreferences);
         GlobalCitationKeyPattern emptyGlobalCitationKeyPattern = GlobalCitationKeyPattern.fromPattern("");
         when(metaData.getCiteKeyPattern(any(GlobalCitationKeyPattern.class))).thenReturn(emptyGlobalCitationKeyPattern);
@@ -122,7 +122,7 @@ class SaveDatabaseActionTest {
         when(dbContext.getMetaData()).thenReturn(metaData);
         when(dbContext.getEntries()).thenReturn(database.getEntries());
         when(preferences.getBoolean(JabRefPreferences.LOCAL_AUTO_SAVE)).thenReturn(false);
-        when(preferences.getDefaultEncoding()).thenReturn(StandardCharsets.UTF_8);
+        when(preferences.getGeneralPreferences()).thenReturn(generalPreferences);
         when(preferences.getFieldContentParserPreferences()).thenReturn(mock(FieldContentFormatterPreferences.class));
         when(preferences.getSavePreferences()).thenReturn(savePreferences);
         when(libraryTab.frame()).thenReturn(jabRefFrame);

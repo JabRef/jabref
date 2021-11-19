@@ -50,7 +50,7 @@ jobs:
     - name: Set up Ruby
       uses: ruby/setup-ruby@v1
       with:
-        ruby-version: 3.0.0
+        ruby-version: 3.0.2
     - name: but use cache to speed that up
       uses: actions/cache@v2
       with:

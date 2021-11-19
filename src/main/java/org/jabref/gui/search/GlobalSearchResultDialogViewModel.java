@@ -13,17 +13,13 @@ public class GlobalSearchResultDialogViewModel {
 
     private final BibDatabaseContext searchDatabaseContext = new BibDatabaseContext();
     private final BooleanProperty keepOnTop = new SimpleBooleanProperty();
-    private SearchPreferences searchPreferences;
 
     public GlobalSearchResultDialogViewModel(PreferencesService preferencesService) {
-        searchPreferences = preferencesService.getSearchPreferences();
+        SearchPreferences searchPreferences = preferencesService.getSearchPreferences();
 
-        keepOnTop.set(searchPreferences.isKeepWindowOnTop());
+        keepOnTop.set(searchPreferences.shouldKeepWindowOnTop());
 
-        EasyBind.subscribe(this.keepOnTop, selected -> {
-            searchPreferences = searchPreferences.withKeepGlobalSearchDialogOnTop(selected);
-            preferencesService.storeSearchPreferences(searchPreferences);
-        });
+        EasyBind.subscribe(this.keepOnTop, searchPreferences::setKeepWindowOnTop);
     }
 
     public BibDatabaseContext getSearchDatabaseContext() {

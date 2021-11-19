@@ -107,7 +107,7 @@ class EmbeddedBibFilePdfExporterTest {
 
         filePreferences = mock(FilePreferences.class);
         when(filePreferences.getUser()).thenReturn(tempDir.toAbsolutePath().toString());
-        when(filePreferences.shouldStoreFilesRelativeToBib()).thenReturn(false);
+        when(filePreferences.shouldStoreFilesRelativeToBibFile()).thenReturn(false);
 
         importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(importFormatPreferences.getFieldContentFormatterPreferences().getNonWrappableFields()).thenReturn(List.of());

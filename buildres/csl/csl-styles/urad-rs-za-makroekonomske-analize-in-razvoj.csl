@@ -688,7 +688,7 @@
             </group>
           </if>
           <else>
-          <group delimiter=", ">
+            <group delimiter=", ">
               <text macro="title"/>
               <text macro="format"/>
               <text macro="description"/>
