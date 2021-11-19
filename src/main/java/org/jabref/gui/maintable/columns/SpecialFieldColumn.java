@@ -12,7 +12,7 @@ import javafx.scene.input.MouseButton;
 
 import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.gui.maintable.BibEntryTableViewModel;
-import org.jabref.gui.maintable.ColumnPreferences;
+import org.jabref.gui.maintable.MainTableColumnPreferences;
 import org.jabref.gui.maintable.MainTableColumnFactory;
 import org.jabref.gui.maintable.MainTableColumnModel;
 import org.jabref.gui.specialfields.SpecialFieldValueViewModel;
@@ -58,7 +58,7 @@ public class SpecialFieldColumn extends MainTableColumn<Optional<SpecialFieldVal
                     .withGraphicIfPresent(this::createSpecialRating)
                     .install(this);
         } else {
-            MainTableColumnFactory.setExactWidth(this, ColumnPreferences.ICON_COLUMN_WIDTH);
+            MainTableColumnFactory.setExactWidth(this, MainTableColumnPreferences.ICON_COLUMN_WIDTH);
             this.setResizable(false);
 
             if (specialField.isSingleValueField()) {

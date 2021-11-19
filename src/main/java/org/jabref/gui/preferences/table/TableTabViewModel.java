@@ -17,7 +17,7 @@ import javafx.util.StringConverter;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
-import org.jabref.gui.maintable.ColumnPreferences;
+import org.jabref.gui.maintable.MainTableColumnPreferences;
 import org.jabref.gui.maintable.MainTableColumnModel;
 import org.jabref.gui.maintable.MainTableNameFormatPreferences;
 import org.jabref.gui.maintable.MainTablePreferences;
@@ -82,7 +82,7 @@ public class TableTabViewModel implements PreferenceTabViewModel {
     private final DialogService dialogService;
     private final PreferencesService preferences;
 
-    private ColumnPreferences initialColumnPreferences;
+    private MainTableColumnPreferences initialColumnPreferences;
     private SpecialFieldsPreferences initialSpecialFieldsPreferences;
 
     public TableTabViewModel(DialogService dialogService, PreferencesService preferences) {
@@ -243,7 +243,7 @@ public class TableTabViewModel implements PreferenceTabViewModel {
     public void storeSettings() {
         MainTablePreferences newMainTablePreferences = preferences.getMainTablePreferences();
         preferences.storeMainTablePreferences(new MainTablePreferences(
-                new ColumnPreferences(
+                new MainTableColumnPreferences(
                         columnsListProperty.getValue(),
                         newMainTablePreferences.getColumnPreferences().getColumnSortOrder()),
                 autoResizeColumnsProperty.getValue(),

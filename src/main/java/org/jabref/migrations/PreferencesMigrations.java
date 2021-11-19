@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 import javafx.scene.control.TableColumn;
 
 import org.jabref.gui.Globals;
-import org.jabref.gui.maintable.ColumnPreferences;
+import org.jabref.gui.maintable.MainTableColumnPreferences;
 import org.jabref.gui.maintable.MainTableColumnModel;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPattern;
 import org.jabref.model.entry.field.SpecialField;
@@ -341,7 +341,7 @@ public class PreferencesMigrations {
                                                    try {
                                                        return Double.parseDouble(string);
                                                    } catch (NumberFormatException e) {
-                                                       return ColumnPreferences.DEFAULT_COLUMN_WIDTH;
+                                                       return MainTableColumnPreferences.DEFAULT_COLUMN_WIDTH;
                                                    }
                                                })
                                                .collect(Collectors.toList());
@@ -357,7 +357,7 @@ public class PreferencesMigrations {
 
             for (int i = 0; i < columnNames.size(); i++) {
                 String name = columnNames.get(i);
-                double columnWidth = ColumnPreferences.DEFAULT_COLUMN_WIDTH;
+                double columnWidth = MainTableColumnPreferences.DEFAULT_COLUMN_WIDTH;
 
                 MainTableColumnModel.Type type = SpecialField.fromName(name)
                                                              .map(field -> MainTableColumnModel.Type.SPECIALFIELD)

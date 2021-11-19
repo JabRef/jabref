@@ -17,7 +17,7 @@ import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.fieldeditors.LinkedFileViewModel;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.maintable.BibEntryTableViewModel;
-import org.jabref.gui.maintable.ColumnPreferences;
+import org.jabref.gui.maintable.MainTableColumnPreferences;
 import org.jabref.gui.maintable.MainTableColumnFactory;
 import org.jabref.gui.maintable.MainTableColumnModel;
 import org.jabref.gui.util.ValueTableCellFactory;
@@ -106,7 +106,7 @@ public class FileColumn extends MainTableColumn<List<LinkedFile>> {
 
     private void setCommonSettings() {
         this.setResizable(false);
-        MainTableColumnFactory.setExactWidth(this, ColumnPreferences.ICON_COLUMN_WIDTH);
+        MainTableColumnFactory.setExactWidth(this, MainTableColumnPreferences.ICON_COLUMN_WIDTH);
         this.getStyleClass().add(MainTableColumnFactory.STYLE_ICON_COLUMN);
         this.setCellValueFactory(cellData -> cellData.getValue().getLinkedFiles());
     }

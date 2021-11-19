@@ -46,7 +46,8 @@ import org.jabref.gui.entryeditor.EntryEditorPreferences;
 import org.jabref.gui.groups.GroupViewMode;
 import org.jabref.gui.groups.GroupsPreferences;
 import org.jabref.gui.keyboard.KeyBindingRepository;
-import org.jabref.gui.maintable.ColumnPreferences;
+import org.jabref.gui.maintable.AbstractColumnPreferences;
+import org.jabref.gui.maintable.MainTableColumnPreferences;
 import org.jabref.gui.maintable.MainTableColumnModel;
 import org.jabref.gui.maintable.MainTableNameFormatPreferences;
 import org.jabref.gui.maintable.MainTableNameFormatPreferences.AbbreviationStyle;
@@ -1838,48 +1839,14 @@ public class JabRefPreferences implements PreferencesService {
 
     private List<MainTableColumnModel> createMainTableColumns() {
         if (this.mainTableColumns == null) {
-            updateMainTableColumns();
+            this.mainTableColumns = updateColumns(COLUMN_NAMES, COLUMN_WIDTHS, COLUMN_SORT_TYPES, MainTableColumnPreferences.DEFAULT_COLUMN_WIDTH);
         }
         return this.mainTableColumns;
     }
 
     @Override
     public void updateMainTableColumns() {
-        List<String> columnNames = getStringList(COLUMN_NAMES);
-
-        List<Double> columnWidths = getStringList(COLUMN_WIDTHS)
-                .stream()
-                .map(string -> {
-                    try {
-                        return Double.parseDouble(string);
-                    } catch (NumberFormatException e) {
-                        LOGGER.error("Exception while parsing column widths. Choosing default.", e);
-                        return ColumnPreferences.DEFAULT_COLUMN_WIDTH;
-                    }
-                })
-                .collect(Collectors.toList());
-
-        List<SortType> columnSortTypes = getStringList(COLUMN_SORT_TYPES)
-                .stream()
-                .map(SortType::valueOf)
-                .collect(Collectors.toList());
-
-        List<MainTableColumnModel> columns = new ArrayList<>();
-        for (int i = 0; i < columnNames.size(); i++) {
-            MainTableColumnModel columnModel = MainTableColumnModel.parse(columnNames.get(i));
-
-            if (i < columnWidths.size()) {
-                columnModel.widthProperty().setValue(columnWidths.get(i));
-            }
-
-            if (i < columnSortTypes.size()) {
-                columnModel.sortTypeProperty().setValue(columnSortTypes.get(i));
-            }
-
-            columns.add(columnModel);
-        }
-
-        mainTableColumns = columns;
+        mainTableColumns = updateColumns(COLUMN_NAMES, COLUMN_WIDTHS, COLUMN_SORT_TYPES, MainTableColumnPreferences.DEFAULT_COLUMN_WIDTH);
     }
 
     /**
@@ -1889,28 +1856,14 @@ public class JabRefPreferences implements PreferencesService {
      */
     private List<MainTableColumnModel> createMainTableColumnSortOrder() {
         if (this.mainTableColumnSortOrder == null) {
-            updateColumnSortOrder();
+            this.mainTableColumnSortOrder = updateColumnSortOrder(COLUMN_SORT_ORDER, mainTableColumns);
         }
         return this.mainTableColumnSortOrder;
     }
 
-    /**
-     * Reloads the MainTableColumnSortOrder from scratch to cache
-     */
-    private void updateColumnSortOrder() {
-        List<MainTableColumnModel> columnsOrdered = new ArrayList<>();
-        getStringList(COLUMN_SORT_ORDER).forEach(columnName ->
-                mainTableColumns.stream().filter(column ->
-                        column.getName().equals(columnName))
-                                .findFirst()
-                                .ifPresent(columnsOrdered::add));
-
-        mainTableColumnSortOrder = columnsOrdered;
-    }
-
     @Override
-    public ColumnPreferences getColumnPreferences() {
-        return new ColumnPreferences(
+    public MainTableColumnPreferences getColumnPreferences() {
+        return new MainTableColumnPreferences(
                 createMainTableColumns(),
                 createMainTableColumnSortOrder());
     }
@@ -1921,26 +1874,9 @@ public class JabRefPreferences implements PreferencesService {
      * @param columnPreferences the preferences to store
      */
     @Override
-    public void storeColumnPreferences(ColumnPreferences columnPreferences) {
-        putStringList(COLUMN_NAMES, columnPreferences.getColumns().stream()
-                                                     .map(MainTableColumnModel::getName)
-                                                     .collect(Collectors.toList()));
-
-        List<String> columnWidthsInOrder = new ArrayList<>();
-        columnPreferences.getColumns().forEach(column -> columnWidthsInOrder.add(column.widthProperty().getValue().toString()));
-        putStringList(COLUMN_WIDTHS, columnWidthsInOrder);
-
-        List<String> columnSortTypesInOrder = new ArrayList<>();
-        columnPreferences.getColumns().forEach(column -> columnSortTypesInOrder.add(column.sortTypeProperty().getValue().toString()));
-        putStringList(COLUMN_SORT_TYPES, columnSortTypesInOrder);
-
-        putStringList(COLUMN_SORT_ORDER, columnPreferences
-                .getColumnSortOrder().stream()
-                .map(MainTableColumnModel::getName)
-                .collect(Collectors.toList()));
-
+    public void storeMainTableColumnPreferences(MainTableColumnPreferences columnPreferences) {
         // Update cache
-        mainTableColumns = columnPreferences.getColumns();
+        mainTableColumns = storeColumnPreferences(columnPreferences, COLUMN_NAMES, COLUMN_WIDTHS, COLUMN_SORT_TYPES, COLUMN_SORT_ORDER);
     }
 
     @Override
@@ -1952,7 +1888,7 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public void storeMainTablePreferences(MainTablePreferences mainTablePreferences) {
-        storeColumnPreferences(mainTablePreferences.getColumnPreferences());
+        storeMainTableColumnPreferences(mainTablePreferences.getColumnPreferences());
         putBoolean(AUTO_RESIZE_MODE, mainTablePreferences.getResizeColumnsToFit());
         putBoolean(EXTRA_FILE_COLUMNS, mainTablePreferences.getExtraFileColumnsEnabled());
     }
@@ -1991,25 +1927,24 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     //*************************************************************************************************************
-    // SearchDialogColumnsPreferences
+    // Generic Column Handling
     //***********************************************s**************************************************************
 
-    public void updateSearchDialogTableColumns() {
-        List<String> columnNames = getStringList(SEARCH_DIALOG_COLUMN_NAMES);
-
-        List<Double> columnWidths = getStringList(SEARCH_DIALOG_COLUMN_WIDTHS)
+    public List<MainTableColumnModel> updateColumns(String columnNamesList, String columnWidthList, String sortTypeList, double defaultWidth) {
+        List<String> columnNames = getStringList(columnNamesList); //we keep column names
+        List<Double> columnWidths = getStringList(columnWidthList)
                 .stream()
                 .map(string -> {
                     try {
                         return Double.parseDouble(string);
                     } catch (NumberFormatException e) {
                         LOGGER.error("Exception while parsing column widths. Choosing default.", e);
-                        return SearchDialogColumnPreferences.DEFAULT_COLUMN_WIDTH;
+                        return defaultWidth;
                     }
                 })
                 .collect(Collectors.toList());
 
-        List<SortType> columnSortTypes = getStringList(SEARCH_DIALOG_COLUMN_SORT_TYPES)
+        List<SortType> columnSortTypes = getStringList(sortTypeList)
                 .stream()
                 .map(SortType::valueOf)
                 .collect(Collectors.toList());
@@ -2028,13 +1963,12 @@ public class JabRefPreferences implements PreferencesService {
 
             columns.add(columnModel);
         }
-
-        searchDialogTableColunns = columns;
+        return columns;
     }
 
     private List<MainTableColumnModel> createSearchDialogColumns() {
         if (this.searchDialogTableColunns == null) {
-            updateSearchDialogTableColumns();
+            this.searchDialogTableColunns = updateColumns(COLUMN_NAMES, SEARCH_DIALOG_COLUMN_WIDTHS, SEARCH_DIALOG_COLUMN_SORT_TYPES, SearchDialogColumnPreferences.DEFAULT_COLUMN_WIDTH);
         }
         return this.searchDialogTableColunns;
     }
@@ -2046,23 +1980,24 @@ public class JabRefPreferences implements PreferencesService {
      */
     private List<MainTableColumnModel> createSearchDialogColumnSortOrder() {
         if (this.searchDialogColumnSortOrder == null) {
-            updateSearchDialogColumnSortOrder();
+            this.searchDialogColumnSortOrder = updateColumnSortOrder(SEARCH_DIALOG_COLUMN_SORT_ORDER, searchDialogTableColunns);
         }
         return this.searchDialogColumnSortOrder;
     }
 
     /**
-     * Reloads the MainTableColumnSortOrder from scratch to cache
+     * Reloads the ColumnSortOrder from scratch
+     * @return
      */
-    private void updateSearchDialogColumnSortOrder() {
+    private List<MainTableColumnModel> updateColumnSortOrder(String sortOrderList,  List<MainTableColumnModel> tableColumns) {
         List<MainTableColumnModel> columnsOrdered = new ArrayList<>();
-        getStringList(SEARCH_DIALOG_COLUMN_SORT_ORDER).forEach(columnName ->
-                searchDialogTableColunns.stream().filter(column ->
+        getStringList(sortOrderList).forEach(columnName ->
+                tableColumns.stream().filter(column ->
                         column.getName().equals(columnName))
                                 .findFirst()
                                 .ifPresent(columnsOrdered::add));
 
-        searchDialogColumnSortOrder = columnsOrdered;
+      return columnsOrdered;
     }
 
     @Override
@@ -2077,26 +2012,31 @@ public class JabRefPreferences implements PreferencesService {
      *
      * @param columnPreferences the preferences to store
      */
+    @Override
     public void storeSearchDialogColumnPreferences(SearchDialogColumnPreferences columnPreferences) {
-        putStringList(SEARCH_DIALOG_COLUMN_NAMES, columnPreferences.getColumns().stream()
-                                                     .map(MainTableColumnModel::getName)
-                                                     .collect(Collectors.toList()));
+        searchDialogTableColunns = storeColumnPreferences(columnPreferences, COLUMN_NAMES, SEARCH_DIALOG_COLUMN_WIDTHS, SEARCH_DIALOG_COLUMN_SORT_TYPES, SEARCH_DIALOG_COLUMN_SORT_ORDER);
+    }
+
+    private List<MainTableColumnModel> storeColumnPreferences(AbstractColumnPreferences columnPreferences, String columnNamesList, String columnWidthList, String sortTypeList, String sortOrderList) {
+
+        putStringList(columnNamesList, columnPreferences.getColumns().stream()
+                      .map(MainTableColumnModel::getName)
+                      .collect(Collectors.toList()));
 
         List<String> columnWidthsInOrder = new ArrayList<>();
         columnPreferences.getColumns().forEach(column -> columnWidthsInOrder.add(column.widthProperty().getValue().toString()));
-        putStringList(SEARCH_DIALOG_COLUMN_WIDTHS, columnWidthsInOrder);
+        putStringList(columnWidthList, columnWidthsInOrder);
 
         List<String> columnSortTypesInOrder = new ArrayList<>();
         columnPreferences.getColumns().forEach(column -> columnSortTypesInOrder.add(column.sortTypeProperty().getValue().toString()));
-        putStringList(SEARCH_DIALOG_COLUMN_SORT_TYPES, columnSortTypesInOrder);
+        putStringList(sortTypeList, columnSortTypesInOrder);
 
-        putStringList(SEARCH_DIALOG_COLUMN_SORT_ORDER, columnPreferences
-                .getColumnSortOrder().stream()
-                .map(MainTableColumnModel::getName)
-                .collect(Collectors.toList()));
+        putStringList(sortOrderList, columnPreferences
+        .getColumnSortOrder().stream()
+        .map(MainTableColumnModel::getName)
+        .collect(Collectors.toList()));
 
-        // Update cache
-        searchDialogTableColunns = columnPreferences.getColumns();
+        return columnPreferences.getColumns();
     }
 
     //*************************************************************************************************************

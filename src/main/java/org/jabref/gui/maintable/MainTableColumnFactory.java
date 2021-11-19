@@ -157,7 +157,7 @@ public class MainTableColumnFactory {
         Tooltip.install(headerGraphic, new Tooltip(Localization.lang("Group color")));
         column.setGraphic(headerGraphic);
         column.getStyleClass().add(STYLE_ICON_COLUMN);
-        setExactWidth(column, ColumnPreferences.ICON_COLUMN_WIDTH);
+        setExactWidth(column, MainTableColumnPreferences.ICON_COLUMN_WIDTH);
         column.setResizable(false);
         column.setCellValueFactory(cellData -> cellData.getValue().getMatchedGroups());
         new ValueTableCellFactory<BibEntryTableViewModel, List<AbstractGroup>>()

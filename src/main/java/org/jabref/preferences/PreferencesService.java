@@ -12,7 +12,7 @@ import org.jabref.gui.entryeditor.EntryEditorPreferences;
 import org.jabref.gui.groups.GroupViewMode;
 import org.jabref.gui.groups.GroupsPreferences;
 import org.jabref.gui.keyboard.KeyBindingRepository;
-import org.jabref.gui.maintable.ColumnPreferences;
+import org.jabref.gui.maintable.MainTableColumnPreferences;
 import org.jabref.gui.maintable.MainTableNameFormatPreferences;
 import org.jabref.gui.maintable.MainTablePreferences;
 import org.jabref.gui.maintable.SearchDialogColumnPreferences;
@@ -209,9 +209,9 @@ public interface PreferencesService {
 
     void updateMainTableColumns();
 
-    ColumnPreferences getColumnPreferences();
+    MainTableColumnPreferences getColumnPreferences();
 
-    void storeColumnPreferences(ColumnPreferences columnPreferences);
+    void storeMainTableColumnPreferences(MainTableColumnPreferences columnPreferences);
 
     MainTablePreferences getMainTablePreferences();
 
@@ -226,6 +226,8 @@ public interface PreferencesService {
     //*************************************************************************************************************
 
     SearchDialogColumnPreferences getSearchDialogColumnPreferences();
+
+    void storeSearchDialogColumnPreferences(SearchDialogColumnPreferences columnPreferences);
 
     //*************************************************************************************************************
     // AppearancePreferences

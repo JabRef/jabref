@@ -57,6 +57,10 @@ public class SearchResultsTable extends TableView<BibEntryTableViewModel> {
         model.getEntriesFilteredAndSorted().comparatorProperty().bind(this.comparatorProperty());
 
         this.getStylesheets().add(MainTable.class.getResource("MainTable.css").toExternalForm());
+
+        // Store visual state
+        new SearchResultsTablePersistenceVisualState(this, preferencesService);
+
         database.getDatabase().registerListener(this);
     }
 }
