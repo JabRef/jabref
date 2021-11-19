@@ -12,9 +12,9 @@ import javafx.scene.input.MouseButton;
 
 import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.gui.maintable.BibEntryTableViewModel;
-import org.jabref.gui.maintable.MainTableColumnPreferences;
 import org.jabref.gui.maintable.MainTableColumnFactory;
 import org.jabref.gui.maintable.MainTableColumnModel;
+import org.jabref.gui.maintable.MainTableColumnPreferences;
 import org.jabref.gui.specialfields.SpecialFieldValueViewModel;
 import org.jabref.gui.specialfields.SpecialFieldViewModel;
 import org.jabref.gui.specialfields.SpecialFieldsPreferences;

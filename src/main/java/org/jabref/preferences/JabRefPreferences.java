@@ -47,8 +47,8 @@ import org.jabref.gui.groups.GroupViewMode;
 import org.jabref.gui.groups.GroupsPreferences;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.maintable.AbstractColumnPreferences;
-import org.jabref.gui.maintable.MainTableColumnPreferences;
 import org.jabref.gui.maintable.MainTableColumnModel;
+import org.jabref.gui.maintable.MainTableColumnPreferences;
 import org.jabref.gui.maintable.MainTableNameFormatPreferences;
 import org.jabref.gui.maintable.MainTableNameFormatPreferences.AbbreviationStyle;
 import org.jabref.gui.maintable.MainTableNameFormatPreferences.DisplayStyle;
@@ -1931,7 +1931,7 @@ public class JabRefPreferences implements PreferencesService {
     //***********************************************s**************************************************************
 
     public List<MainTableColumnModel> updateColumns(String columnNamesList, String columnWidthList, String sortTypeList, double defaultWidth) {
-        List<String> columnNames = getStringList(columnNamesList); //we keep column names
+        List<String> columnNames = getStringList(columnNamesList);
         List<Double> columnWidths = getStringList(columnWidthList)
                 .stream()
                 .map(string -> {

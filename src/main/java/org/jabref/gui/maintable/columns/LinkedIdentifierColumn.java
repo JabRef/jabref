@@ -15,9 +15,9 @@ import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.maintable.BibEntryTableViewModel;
 import org.jabref.gui.maintable.CellFactory;
-import org.jabref.gui.maintable.MainTableColumnPreferences;
 import org.jabref.gui.maintable.MainTableColumnFactory;
 import org.jabref.gui.maintable.MainTableColumnModel;
+import org.jabref.gui.maintable.MainTableColumnPreferences;
 import org.jabref.gui.maintable.OpenUrlAction;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.ValueTableCellFactory;
@@ -35,7 +35,6 @@ public class LinkedIdentifierColumn extends MainTableColumn<Map<Field, String>> 
     private final CellFactory cellFactory;
     private final DialogService dialogService;
     private final PreferencesService preferences;
-    private final StateManager stateManager;
 
     public LinkedIdentifierColumn(MainTableColumnModel model,
                                   CellFactory cellFactory,
@@ -48,7 +47,6 @@ public class LinkedIdentifierColumn extends MainTableColumn<Map<Field, String>> 
         this.cellFactory = cellFactory;
         this.dialogService = dialogService;
         this.preferences = preferences;
-        this.stateManager = stateManager;
 
         Node headerGraphic = IconTheme.JabRefIcons.WWW.getGraphicNode();
         Tooltip.install(headerGraphic, new Tooltip(Localization.lang("Linked identifiers")));
