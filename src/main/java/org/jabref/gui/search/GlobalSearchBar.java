@@ -410,6 +410,18 @@ public class GlobalSearchBar extends HBox {
         });
     }
 
+    // Sets carret position in global search bar. If out of bounds carret will be positioned at the end.
+    public void setCarretPosition(int position) {
+        DefaultTaskExecutor.runInJavaFXThread(() -> {
+            if (position >= 0 && position < searchField.getText().length()) {
+                searchField.positionCaret(position);
+            } else {
+                searchField.positionCaret(searchField.getText().length());
+            }
+
+        });
+    }
+
     private static class SearchPopupSkin<T> implements Skin<AutoCompletePopup<T>> {
 
         private final AutoCompletePopup<T> control;
