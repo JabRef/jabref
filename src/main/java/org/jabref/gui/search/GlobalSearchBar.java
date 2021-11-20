@@ -1,6 +1,7 @@
 package org.jabref.gui.search;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -107,6 +108,7 @@ public class GlobalSearchBar extends HBox {
 
     private final BooleanProperty globalSearchActive = new SimpleBooleanProperty(false);
     private GlobalSearchResultDialog globalSearchResultDialog;
+    private SearchFieldSynchronizer searchFieldSynchronizer;
 
     private final DropDownMenu dropDownMenu;
     public GlobalSearchBar(JabRefFrame frame, StateManager stateManager, PreferencesService preferencesService, CountingUndoManager undoManager) {
@@ -127,7 +129,8 @@ public class GlobalSearchBar extends HBox {
         updateHintVisibility();
 
         // Prototype DropDownMenu
-        this.dropDownMenu = new DropDownMenu(searchField, this);
+        this.searchFieldSynchronizer = new SearchFieldSynchronizer(searchField);
+        this.dropDownMenu = new DropDownMenu(searchField, this, searchFieldSynchronizer);
 
         // Prototype RecentSearch
         // Add to RecentSearch after searchbar loses focus
@@ -144,6 +147,7 @@ public class GlobalSearchBar extends HBox {
 
         KeyBindingRepository keyBindingRepository = Globals.getKeyPrefs();
         searchField.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
+
             Optional<KeyBinding> keyBinding = keyBindingRepository.mapToKeyBinding(event);
             if (keyBinding.isPresent()) {
                 if (keyBinding.get().equals(KeyBinding.CLOSE)) {
@@ -153,6 +157,12 @@ public class GlobalSearchBar extends HBox {
                     event.consume();
                 }
             }
+        });
+
+        // Listens to global search bar textfield changes and updates searchItemList in searchFieldSynchronizer
+        searchField.textProperty().addListener((observable, oldValue, newValue) -> {
+//            System.out.println("textfield changed from " + oldValue + " to " + newValue);
+            searchFieldSynchronizer.updateSearchItemList(textFieldToList());
         });
 
         ClipBoardManager.addX11Support(searchField);
@@ -213,6 +223,40 @@ public class GlobalSearchBar extends HBox {
 
         this.stateManager.activeSearchQueryProperty().addListener((obs, oldvalue, newValue) -> newValue.ifPresent(this::updateSearchResultsForQuery));
         this.stateManager.activeDatabaseProperty().addListener((obs, oldValue, newValue) -> stateManager.activeSearchQueryProperty().get().ifPresent(this::updateSearchResultsForQuery));
+    }
+
+    private ArrayList<String> textFieldToList() {
+        String str = searchField.getText();
+        String[]words = str.split("(?<=:)|\\ ");
+        ArrayList<String> list = new ArrayList<>();
+
+//        // ARRAY TEST
+//        System.out.print("Textfeld Array: ");
+//        for (String word : words) {
+//            System.out.print(word + " | ");
+//        }
+//        System.out.println();
+
+        for (int i = 0; i < words.length; i++) {
+            if (words[i].startsWith("\"")) {
+                if (words[i + 1] != null && words[i + 1].endsWith("\"") && !words[i].endsWith(":")) {
+                    String str2 = words[i] + " " + words[i + 1];
+                    list.add(str2);
+                    i++;
+                }
+            } else {
+                list.add(words[i]);
+            }
+        }
+
+      // TEXTFELD TEST
+        System.out.print("Textfeld Liste: ");
+        for (String word : list) {
+            System.out.print(word + " | ");
+        }
+        System.out.println();
+
+        return list;
     }
 
     private void updateSearchResultsForQuery(SearchQuery query) {
