@@ -22,7 +22,7 @@ public class SearchForUpdateAction extends SimpleCommand {
 
     @Override
     public void execute() {
-        new VersionWorker(buildInfo.version, versionPreferences.getIgnoredVersion(), dialogService, taskExecutor)
+        new VersionWorker(buildInfo.version, dialogService, taskExecutor, versionPreferences)
                 .checkForNewVersionAsync();
     }
 }

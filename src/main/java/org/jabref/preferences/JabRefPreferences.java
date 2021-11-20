@@ -440,6 +440,7 @@ public class JabRefPreferences implements PreferencesService {
     private AutoLinkPreferences autoLinkPreferences;
     private ImportExportPreferences importExportPreferences;
     private NameFormatterPreferences nameFormatterPreferences;
+    private VersionPreferences versionPreferences;
 
     // The constructor is made private to enforce this as a singleton class:
     private JabRefPreferences() {
@@ -1112,13 +1113,15 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public VersionPreferences getVersionPreferences() {
-        Version ignoredVersion = Version.parse(get(VERSION_IGNORED_UPDATE));
-        return new VersionPreferences(ignoredVersion);
-    }
+        if (Objects.nonNull(versionPreferences)) {
+            return versionPreferences;
+        }
 
-    @Override
-    public void storeVersionPreferences(VersionPreferences versionPreferences) {
-        put(VERSION_IGNORED_UPDATE, versionPreferences.getIgnoredVersion().toString());
+        versionPreferences = new VersionPreferences(Version.parse(get(VERSION_IGNORED_UPDATE)));
+
+        EasyBind.listen(versionPreferences.ignoredVersionProperty(), (obs, oldValue, newValue) -> put(VERSION_IGNORED_UPDATE, newValue.toString()));
+
+        return versionPreferences;
     }
 
     @Override

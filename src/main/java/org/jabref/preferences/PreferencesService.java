@@ -55,8 +55,6 @@ public interface PreferencesService {
 
     VersionPreferences getVersionPreferences();
 
-    void storeVersionPreferences(VersionPreferences versionPreferences);
-
     JournalAbbreviationPreferences getJournalAbbreviationPreferences();
 
     void storeKeyBindingRepository(KeyBindingRepository keyBindingRepository);
