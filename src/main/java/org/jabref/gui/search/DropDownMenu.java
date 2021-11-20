@@ -75,6 +75,9 @@ public class DropDownMenu {
             if (!isPrevAttribute(searchField)) { // checks if the search term prior is an attribute and wont queue another if so
 //                checkAndAddSpace(searchField); // checks if there is a space prior and if not adds it
 //                searchField.insertText(searchField.getCaretPosition(), "author:");
+                if (!isPrevOperator(searchFieldSynchronizer)) {
+                    searchFieldSynchronizer.addSearchItem("OR", ""); // add OR search by default
+                }
                 searchFieldSynchronizer.addSearchItem("author:", "");
                 searchField.setText(searchFieldSynchronizer.searchStringBuilder());
                 searchField.positionCaret(searchField.getText().length());
@@ -86,6 +89,9 @@ public class DropDownMenu {
             if (!isPrevAttribute(searchField)) {
 //                checkAndAddSpace(searchField);
 //                searchField.insertText(searchField.getCaretPosition(), "journal:");
+                if (!isPrevOperator(searchFieldSynchronizer)) {
+                    searchFieldSynchronizer.addSearchItem("OR", ""); // add OR search by default
+                }
                 searchFieldSynchronizer.addSearchItem("journal:", "");
                 searchField.setText(searchFieldSynchronizer.searchStringBuilder());
                 searchField.positionCaret(searchField.getText().length());
@@ -97,6 +103,9 @@ public class DropDownMenu {
             if (!isPrevAttribute(searchField)) {
 //                checkAndAddSpace(searchField);
 //                searchField.insertText(searchField.getCaretPosition(), "title:");
+                if (!isPrevOperator(searchFieldSynchronizer)) {
+                    searchFieldSynchronizer.addSearchItem("OR", ""); // add OR search by default
+                }
                 searchFieldSynchronizer.addSearchItem("title:", "");
                 searchField.setText(searchFieldSynchronizer.searchStringBuilder());
                 searchField.positionCaret(searchField.getText().length());
@@ -108,6 +117,9 @@ public class DropDownMenu {
             if (!isPrevAttribute(searchField)) {
 //                checkAndAddSpace(searchField);
 //                searchField.insertText(searchField.getCaretPosition(), "year:");
+                if (!isPrevOperator(searchFieldSynchronizer)) {
+                    searchFieldSynchronizer.addSearchItem("OR", ""); // add OR search by default
+                }
                 searchFieldSynchronizer.addSearchItem("year:", "");
                 searchField.setText(searchFieldSynchronizer.searchStringBuilder());
                 searchField.positionCaret(searchField.getText().length());

@@ -227,6 +227,8 @@ public class GlobalSearchBar extends HBox {
 
     private ArrayList<String> textFieldToList() {
         String str = searchField.getText();
+        // splits a string "author:luh AND year:2013 OR author:\"lee smith\"" into
+        // [author:] [luh] [AND] [year:] [2013] [OR] [author:] ["lee smith"]
         String[]words = str.split("(?<=:)|\\ ");
         ArrayList<String> list = new ArrayList<>();
 
