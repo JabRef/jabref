@@ -401,7 +401,7 @@ public class GlobalSearchBar extends HBox {
     }
 
     public void setSearchTerm(String searchTerm) {
-        if (searchTerm.equals(searchField.getText())) {
+        if (searchTerm == null || searchTerm.equals(searchField.getText())) {
             return;
         }
 
