@@ -769,7 +769,6 @@ public class JabRefFrame extends BorderPane {
                 SpecialFieldMenuItemFactory.createSpecialFieldMenu(SpecialField.READ_STATUS, factory, this, dialogService, prefs, undoManager, stateManager)
         );
 
-
         // @formatter:off
         library.getItems().addAll(
                 factory.createMenuItem(StandardActions.NEW_ENTRY, new NewEntryAction(this, dialogService, prefs, stateManager)),
