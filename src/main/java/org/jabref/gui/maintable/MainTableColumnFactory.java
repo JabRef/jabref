@@ -52,7 +52,7 @@ public class MainTableColumnFactory {
     private static final Logger LOGGER = LoggerFactory.getLogger(MainTableColumnFactory.class);
 
     private final PreferencesService preferencesService;
-    private final AbstractColumnPreferences columnPreferences;
+    private final ColumnPreferences columnPreferences;
     private final ExternalFileTypes externalFileTypes;
     private final BibDatabaseContext database;
     private final CellFactory cellFactory;
@@ -62,7 +62,7 @@ public class MainTableColumnFactory {
 
     public MainTableColumnFactory(BibDatabaseContext database,
                                   PreferencesService preferencesService,
-                                  AbstractColumnPreferences abstractColumnPrefs,
+                                  ColumnPreferences abstractColumnPrefs,
                                   ExternalFileTypes externalFileTypes,
                                   UndoManager undoManager,
                                   DialogService dialogService,
@@ -157,7 +157,7 @@ public class MainTableColumnFactory {
         Tooltip.install(headerGraphic, new Tooltip(Localization.lang("Group color")));
         column.setGraphic(headerGraphic);
         column.getStyleClass().add(STYLE_ICON_COLUMN);
-        setExactWidth(column, MainTableColumnPreferences.ICON_COLUMN_WIDTH);
+        setExactWidth(column, ColumnPreferences.ICON_COLUMN_WIDTH);
         column.setResizable(false);
         column.setCellValueFactory(cellData -> cellData.getValue().getMatchedGroups());
         new ValueTableCellFactory<BibEntryTableViewModel, List<AbstractGroup>>()

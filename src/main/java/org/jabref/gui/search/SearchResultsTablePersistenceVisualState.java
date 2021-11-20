@@ -6,7 +6,7 @@ import javafx.scene.control.TableView;
 
 import org.jabref.gui.maintable.AbstractPersistenceVisualStateTable;
 import org.jabref.gui.maintable.BibEntryTableViewModel;
-import org.jabref.gui.maintable.SearchDialogColumnPreferences;
+import org.jabref.gui.maintable.ColumnPreferences;
 import org.jabref.gui.maintable.columns.MainTableColumn;
 import org.jabref.preferences.PreferencesService;
 
@@ -15,8 +15,8 @@ import org.jabref.preferences.PreferencesService;
  */
 public class SearchResultsTablePersistenceVisualState extends AbstractPersistenceVisualStateTable {
 
-    public SearchResultsTablePersistenceVisualState(final TableView<BibEntryTableViewModel> mainTable, PreferencesService preferences) {
-        super(mainTable, preferences);
+    public SearchResultsTablePersistenceVisualState(final TableView<BibEntryTableViewModel> searchResultsTable, PreferencesService preferences) {
+        super(searchResultsTable, preferences);
     }
 
     /**
@@ -24,7 +24,7 @@ public class SearchResultsTablePersistenceVisualState extends AbstractPersistenc
      */
     @Override
     protected void updateColumns() {
-        preferences.storeSearchDialogColumnPreferences(new SearchDialogColumnPreferences(
+        preferences.storeSearchDialogColumnPreferences(new ColumnPreferences(
                 mainTable.getColumns().stream()
                          .filter(col -> col instanceof MainTableColumn<?>)
                          .map(column -> ((MainTableColumn<?>) column).getModel())
@@ -38,7 +38,7 @@ public class SearchResultsTablePersistenceVisualState extends AbstractPersistenc
      */
     @Override
     protected void updateSortOrder() {
-        preferences.storeSearchDialogColumnPreferences(new SearchDialogColumnPreferences(
+        preferences.storeSearchDialogColumnPreferences(new ColumnPreferences(
                 preferences.getSearchDialogColumnPreferences().getColumns(),
                 mainTable.getSortOrder().stream()
                          .filter(col -> col instanceof MainTableColumn<?>)

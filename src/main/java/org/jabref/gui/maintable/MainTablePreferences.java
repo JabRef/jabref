@@ -1,17 +1,17 @@
 package org.jabref.gui.maintable;
 
 public class MainTablePreferences {
-    private final MainTableColumnPreferences columnPreferences;
+    private final ColumnPreferences columnPreferences;
     private final boolean resizeColumnsToFit;
     private final boolean extraFileColumnsEnabled;
 
-    public MainTablePreferences(MainTableColumnPreferences columnPreferences, boolean resizeColumnsToFit, boolean extraFileColumnsEnabled) {
+    public MainTablePreferences(ColumnPreferences columnPreferences, boolean resizeColumnsToFit, boolean extraFileColumnsEnabled) {
         this.columnPreferences = columnPreferences;
         this.resizeColumnsToFit = resizeColumnsToFit;
         this.extraFileColumnsEnabled = extraFileColumnsEnabled;
     }
 
-    public MainTableColumnPreferences getColumnPreferences() {
+    public ColumnPreferences getColumnPreferences() {
         return columnPreferences;
     }
 

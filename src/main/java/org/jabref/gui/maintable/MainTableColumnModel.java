@@ -92,9 +92,9 @@ public class MainTableColumnModel {
         this.sortTypeProperty.setValue(TableColumn.SortType.ASCENDING);
 
         if (Type.ICON_COLUMNS.contains(type)) {
-            this.widthProperty.setValue(MainTableColumnPreferences.ICON_COLUMN_WIDTH);
+            this.widthProperty.setValue(ColumnPreferences.ICON_COLUMN_WIDTH);
         } else {
-            this.widthProperty.setValue(MainTableColumnPreferences.DEFAULT_COLUMN_WIDTH);
+            this.widthProperty.setValue(ColumnPreferences.DEFAULT_COLUMN_WIDTH);
         }
     }
 

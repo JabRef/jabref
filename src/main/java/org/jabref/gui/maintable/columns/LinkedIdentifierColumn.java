@@ -17,7 +17,7 @@ import org.jabref.gui.maintable.BibEntryTableViewModel;
 import org.jabref.gui.maintable.CellFactory;
 import org.jabref.gui.maintable.MainTableColumnFactory;
 import org.jabref.gui.maintable.MainTableColumnModel;
-import org.jabref.gui.maintable.MainTableColumnPreferences;
+import org.jabref.gui.maintable.ColumnPreferences;
 import org.jabref.gui.maintable.OpenUrlAction;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.ValueTableCellFactory;
@@ -52,7 +52,7 @@ public class LinkedIdentifierColumn extends MainTableColumn<Map<Field, String>> 
         Tooltip.install(headerGraphic, new Tooltip(Localization.lang("Linked identifiers")));
         this.setGraphic(headerGraphic);
         this.getStyleClass().add(MainTableColumnFactory.STYLE_ICON_COLUMN);
-        MainTableColumnFactory.setExactWidth(this, MainTableColumnPreferences.ICON_COLUMN_WIDTH);
+        MainTableColumnFactory.setExactWidth(this, ColumnPreferences.ICON_COLUMN_WIDTH);
         this.setResizable(false);
         this.setCellValueFactory(cellData -> cellData.getValue().getLinkedIdentifiers());
         new ValueTableCellFactory<BibEntryTableViewModel, Map<Field, String>>()

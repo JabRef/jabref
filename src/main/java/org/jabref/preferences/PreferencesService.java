@@ -12,10 +12,9 @@ import org.jabref.gui.entryeditor.EntryEditorPreferences;
 import org.jabref.gui.groups.GroupViewMode;
 import org.jabref.gui.groups.GroupsPreferences;
 import org.jabref.gui.keyboard.KeyBindingRepository;
-import org.jabref.gui.maintable.MainTableColumnPreferences;
+import org.jabref.gui.maintable.ColumnPreferences;
 import org.jabref.gui.maintable.MainTableNameFormatPreferences;
 import org.jabref.gui.maintable.MainTablePreferences;
-import org.jabref.gui.maintable.SearchDialogColumnPreferences;
 import org.jabref.gui.specialfields.SpecialFieldsPreferences;
 import org.jabref.gui.util.Theme;
 import org.jabref.logic.JabRefException;
@@ -209,9 +208,9 @@ public interface PreferencesService {
 
     void updateMainTableColumns();
 
-    MainTableColumnPreferences getColumnPreferences();
+    ColumnPreferences getColumnPreferences();
 
-    void storeMainTableColumnPreferences(MainTableColumnPreferences columnPreferences);
+    void storeMainTableColumnPreferences(ColumnPreferences columnPreferences);
 
     MainTablePreferences getMainTablePreferences();
 
@@ -225,9 +224,9 @@ public interface PreferencesService {
     // SearchDialogColumnPreferences
     //*************************************************************************************************************
 
-    SearchDialogColumnPreferences getSearchDialogColumnPreferences();
+    ColumnPreferences getSearchDialogColumnPreferences();
 
-    void storeSearchDialogColumnPreferences(SearchDialogColumnPreferences columnPreferences);
+    void storeSearchDialogColumnPreferences(ColumnPreferences columnPreferences);
 
     //*************************************************************************************************************
     // AppearancePreferences

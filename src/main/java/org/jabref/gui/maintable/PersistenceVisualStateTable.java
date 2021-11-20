@@ -21,7 +21,7 @@ public class PersistenceVisualStateTable extends AbstractPersistenceVisualStateT
      */
     @Override
     protected void updateColumns() {
-        preferences.storeMainTableColumnPreferences(new MainTableColumnPreferences(
+        preferences.storeMainTableColumnPreferences(new ColumnPreferences(
                 mainTable.getColumns().stream()
                          .filter(col -> col instanceof MainTableColumn<?>)
                          .map(column -> ((MainTableColumn<?>) column).getModel())
@@ -35,7 +35,7 @@ public class PersistenceVisualStateTable extends AbstractPersistenceVisualStateT
      */
     @Override
     protected void updateSortOrder() {
-        preferences.storeMainTableColumnPreferences(new MainTableColumnPreferences(
+        preferences.storeMainTableColumnPreferences(new ColumnPreferences(
                 preferences.getColumnPreferences().getColumns(),
                 mainTable.getSortOrder().stream()
                          .filter(col -> col instanceof MainTableColumn<?>)
