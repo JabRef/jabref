@@ -239,10 +239,13 @@ public class GlobalSearchBar extends HBox {
 
         for (int i = 0; i < words.length; i++) {
             if (words[i].startsWith("\"")) {
-                if (words[i + 1] != null && words[i + 1].endsWith("\"") && !words[i].endsWith(":")) {
+                boolean isWordAfterwards = i + 1 < words.length;
+                if (isWordAfterwards && words[i + 1].endsWith("\"") && !words[i].endsWith(":")) {
                     String str2 = words[i] + " " + words[i + 1];
                     list.add(str2);
                     i++;
+                } else {
+                    list.add(words[i]);
                 }
             } else {
                 list.add(words[i]);
