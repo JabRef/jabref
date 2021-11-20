@@ -128,7 +128,7 @@ dependencies {
     // required for reading write-protected PDFs - see https://github.com/JabRef/jabref/pull/942#issuecomment-209252635
     implementation 'org.bouncycastle:bcprov-jdk15on:1.69'
 
-    implementation 'commons-cli:commons-cli:1.4'
+    implementation 'commons-cli:commons-cli:1.5.0'
 
     implementation 'org.libreoffice:libreoffice:7.2.2'
     implementation 'org.libreoffice:unoloader:7.2.2'
@@ -139,7 +139,7 @@ dependencies {
     antlr3 'org.antlr:antlr:3.5.2'
     implementation 'org.antlr:antlr-runtime:3.5.2'
 
-    antlr4 'org.antlr:antlr4:4.9.2'
+    antlr4 'org.antlr:antlr4:4.9.3'
     implementation 'org.antlr:antlr4-runtime:4.9.3'
 
     implementation group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: '5.13.0.202109080827-r'
@@ -211,14 +211,14 @@ dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter:5.8.1'
     testImplementation 'org.junit.platform:junit-platform-launcher:1.8.1'
 
-    testImplementation 'net.bytebuddy:byte-buddy-parent:1.12.0'
+    testImplementation 'net.bytebuddy:byte-buddy-parent:1.12.1'
     testRuntimeOnly group: 'org.apache.logging.log4j', name: 'log4j-core', version: '3.0.0-SNAPSHOT'
     testRuntimeOnly group: 'org.apache.logging.log4j', name: 'log4j-jul', version: '3.0.0-SNAPSHOT'
     testImplementation 'org.mockito:mockito-core:4.0.0'
     testImplementation 'org.xmlunit:xmlunit-core:2.8.3'
     testImplementation 'org.xmlunit:xmlunit-matchers:2.8.3'
     testRuntimeOnly 'com.tngtech.archunit:archunit-junit5-engine:0.22.0'
-    testImplementation 'com.tngtech.archunit:archunit-junit5-api:0.21.0'
+    testImplementation 'com.tngtech.archunit:archunit-junit5-api:0.22.0'
     testImplementation "org.testfx:testfx-core:4.0.17-alpha-SNAPSHOT"
     testImplementation "org.testfx:testfx-junit5:4.0.17-alpha-SNAPSHOT"
     testImplementation "org.hamcrest:hamcrest-library:2.2"

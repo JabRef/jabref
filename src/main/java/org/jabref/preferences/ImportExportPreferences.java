@@ -14,7 +14,6 @@ public class ImportExportPreferences {
     private final BooleanProperty resolveStringsForStandardBibtexFields;
     private final BooleanProperty resolveStringsForAllStrings;
     private final StringProperty nonResolvableFields;
-    private final ObjectProperty<NewLineSeparator> newLineSeparator;
     private final BooleanProperty alwaysReformatOnSave;
     private final ObjectProperty<Path> importWorkingDirectory;
     private final StringProperty lastExportExtension;
@@ -24,7 +23,6 @@ public class ImportExportPreferences {
                                    boolean resolveStringsForStandardBibtexFields,
                                    boolean resolveStringsForAllStrings,
                                    String nonResolvableFields,
-                                   NewLineSeparator newLineSeparator,
                                    boolean alwaysReformatOnSave,
                                    Path importWorkingDirectory,
                                    String lastExportExtension,
@@ -33,7 +31,6 @@ public class ImportExportPreferences {
         this.resolveStringsForStandardBibtexFields = new SimpleBooleanProperty(resolveStringsForStandardBibtexFields);
         this.resolveStringsForAllStrings = new SimpleBooleanProperty(resolveStringsForAllStrings);
         this.nonResolvableFields = new SimpleStringProperty(nonResolvableFields);
-        this.newLineSeparator = new SimpleObjectProperty<>(newLineSeparator);
         this.alwaysReformatOnSave = new SimpleBooleanProperty(alwaysReformatOnSave);
         this.importWorkingDirectory = new SimpleObjectProperty<>(importWorkingDirectory);
         this.lastExportExtension = new SimpleStringProperty(lastExportExtension);
@@ -86,18 +83,6 @@ public class ImportExportPreferences {
 
     public void setNonResolvableFields(String nonResolvableFields) {
         this.nonResolvableFields.set(nonResolvableFields);
-    }
-
-    public NewLineSeparator getNewLineSeparator() {
-        return newLineSeparator.get();
-    }
-
-    public ObjectProperty<NewLineSeparator> newLineSeparatorProperty() {
-        return newLineSeparator;
-    }
-
-    public void setNewLineSeparator(NewLineSeparator newLineSeparator) {
-        this.newLineSeparator.set(newLineSeparator);
     }
 
     public boolean shouldAlwaysReformatOnSave() {

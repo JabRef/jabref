@@ -343,8 +343,8 @@ class BibtexParserTest {
     @Test
     void parseRecognizesEntryPrecedingComment() throws IOException {
         String comment = "@Comment{@article{myarticle,}" + OS.NEWLINE
-                + "@inproceedings{blabla, title={the proceedings of bl@bl@}; }" + OS.NEWLINE + "}";
-        String entryWithComment = comment + OS.NEWLINE + "@article{test,author={Ed von T@st}}";
+                + "@inproceedings{blabla, title={the proceedings of bl@bl@}; }" + OS.NEWLINE + "}" + OS.NEWLINE;
+        String entryWithComment = comment + "@article{test,author={Ed von T@st}}";
         BibEntry expected = new BibEntry(StandardEntryType.Article)
                 .withField(InternalField.KEY_FIELD, "test")
                 .withField(StandardField.AUTHOR, "Ed von T@st");
@@ -1197,7 +1197,7 @@ class BibtexParserTest {
     }
 
     @Test
-    void parseSavesNewlinesBeforeEntryInParsedSerialization() throws IOException {
+    void parseSavesAllButOneNewlinesBeforeEntryInParsedSerialization() throws IOException {
         String testEntry = "@article{test,author={Ed von Test}}";
         ParserResult result = parser
                 .parse(new StringReader(OS.NEWLINE + OS.NEWLINE + OS.NEWLINE + testEntry));
@@ -1206,11 +1206,12 @@ class BibtexParserTest {
         BibEntry parsedEntry = parsedEntries.iterator().next();
 
         assertEquals(1, parsedEntries.size());
-        assertEquals(OS.NEWLINE + OS.NEWLINE + OS.NEWLINE + testEntry, parsedEntry.getParsedSerialization());
+        // The first newline is removed, because JabRef interprets that always as block separator
+        assertEquals(OS.NEWLINE + OS.NEWLINE + testEntry, parsedEntry.getParsedSerialization());
     }
 
     @Test
-    void parseRemovesEncodingLineInParsedSerialization() throws IOException {
+    void parseRemovesEncodingLineAndSeparatorInParsedSerialization() throws IOException {
         String testEntry = "@article{test,author={Ed von Test}}";
         ParserResult result = parser.parse(
                 new StringReader(SavePreferences.ENCODING_PREFIX + OS.NEWLINE + OS.NEWLINE + OS.NEWLINE + testEntry));
@@ -1219,7 +1220,9 @@ class BibtexParserTest {
         BibEntry parsedEntry = parsedEntries.iterator().next();
 
         assertEquals(1, parsedEntries.size());
-        assertEquals(OS.NEWLINE + OS.NEWLINE + testEntry, parsedEntry.getParsedSerialization());
+        // First two newlines are removed because of removal of "Encoding"
+        // Third newline removed because of block functionality
+        assertEquals(testEntry, parsedEntry.getParsedSerialization());
     }
 
     @Test
@@ -1242,7 +1245,8 @@ class BibtexParserTest {
 
         assertEquals(2, parsedEntries.size());
         assertEquals(testEntryOne + OS.NEWLINE, first.getParsedSerialization());
-        assertEquals(OS.NEWLINE + OS.NEWLINE + testEntryTwo, second.getParsedSerialization());
+        // one newline is removed, because it is written by JabRef's block functionality
+        assertEquals(OS.NEWLINE + testEntryTwo, second.getParsedSerialization());
     }
 
     @Test
@@ -1297,6 +1301,32 @@ class BibtexParserTest {
         assertTrue(saveActions.isEnabled());
         assertEquals(Collections.singletonList(new FieldFormatterCleanup(StandardField.TITLE, new LowerCaseFormatter())),
                 saveActions.getConfiguredActions());
+    }
+
+    @Test
+    void parseRecognizesCRLFLineBreak() throws IOException {
+        ParserResult result = parser.parse(
+                new StringReader("@InProceedings{6055279,\r\n" + "  Title                    = {Educational session 1},\r\n"
+                        + "  Booktitle                = {Custom Integrated Circuits Conference (CICC), 2011 IEEE},\r\n"
+                        + "  Year                     = {2011},\r\n" + "  Month                    = {Sept},\r\n"
+                        + "  Pages                    = {1-7},\r\n"
+                        + "  Abstract                 = {Start of the above-titled section of the conference proceedings record.},\r\n"
+                        + "  DOI                      = {10.1109/CICC.2011.6055279},\r\n"
+                        + "  ISSN                     = {0886-5930}\r\n" + "}\r\n"));
+        assertEquals("\r\n", result.getDatabase().getNewLineSeparator());
+    }
+
+    @Test
+    void parseRecognizesLFLineBreak() throws IOException {
+        ParserResult result = parser.parse(
+                new StringReader("@InProceedings{6055279,\n" + "  Title                    = {Educational session 1},\n"
+                        + "  Booktitle                = {Custom Integrated Circuits Conference (CICC), 2011 IEEE},\n"
+                        + "  Year                     = {2011},\n" + "  Month                    = {Sept},\n"
+                        + "  Pages                    = {1-7},\n"
+                        + "  Abstract                 = {Start of the above-titled section of the conference proceedings record.},\n"
+                        + "  DOI                      = {10.1109/CICC.2011.6055279},\n"
+                        + "  ISSN                     = {0886-5930}\n" + "}\n"));
+        assertEquals("\n", result.getDatabase().getNewLineSeparator());
     }
 
     @Test

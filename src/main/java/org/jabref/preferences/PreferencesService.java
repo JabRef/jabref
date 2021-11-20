@@ -236,8 +236,6 @@ public interface PreferencesService {
 
     void storeOpenLastFilesOnStartup(boolean openLastFilesOnStartup);
 
-    NewLineSeparator getNewLineSeparator();
-
     AutoLinkPreferences getAutoLinkPreferences();
 
     boolean shouldAutosave();

@@ -22,6 +22,7 @@ import org.jabref.logic.bibtex.FieldWriterPreferences;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.exporter.AtomicFileWriter;
 import org.jabref.logic.exporter.BibDatabaseWriter;
+import org.jabref.logic.exporter.BibWriter;
 import org.jabref.logic.exporter.BibtexDatabaseWriter;
 import org.jabref.logic.exporter.EmbeddedBibFilePdfExporter;
 import org.jabref.logic.exporter.Exporter;
@@ -531,7 +532,8 @@ public class ArgumentProcessor {
             GeneralPreferences generalPreferences = preferencesService.getGeneralPreferences();
             SavePreferences savePreferences = preferencesService.getSavePreferences();
             AtomicFileWriter fileWriter = new AtomicFileWriter(Path.of(subName), generalPreferences.getDefaultEncoding());
-            BibDatabaseWriter databaseWriter = new BibtexDatabaseWriter(fileWriter, generalPreferences, savePreferences, Globals.entryTypesManager);
+            BibWriter bibWriter = new BibWriter(fileWriter, OS.NEWLINE);
+            BibDatabaseWriter databaseWriter = new BibtexDatabaseWriter(bibWriter, generalPreferences, savePreferences, Globals.entryTypesManager);
             databaseWriter.saveDatabase(new BibDatabaseContext(newBase));
 
             // Show just a warning message if encoding did not work for all characters:

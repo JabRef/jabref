@@ -10,6 +10,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.jabref.logic.util.OS;
 import org.jabref.logic.util.strings.StringSimilarity;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseMode;
@@ -25,6 +26,7 @@ import org.jabref.model.entry.field.OrFields;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.entry.identifier.ISBN;
+import org.jabref.model.strings.StringUtil;
 
 import com.google.common.collect.Sets;
 import org.slf4j.Logger;
@@ -101,13 +103,16 @@ public class DuplicateCheck {
 
     private static double[] compareRequiredFields(final BibEntryType type, final BibEntry one, final BibEntry two) {
         final Set<OrFields> requiredFields = type.getRequiredFields();
-        return requiredFields == null
+        return requiredFields.isEmpty()
                 ? new double[] {0., 0.}
                 : DuplicateCheck.compareFieldSet(requiredFields.stream().map(OrFields::getPrimary).collect(Collectors.toSet()), one, two);
     }
 
     private static boolean isFarFromThreshold(double value) {
-        return Math.abs(value - DuplicateCheck.DUPLICATE_THRESHOLD) > DuplicateCheck.DOUBT_RANGE;
+        if (value < 0.0) {
+            LOGGER.debug("Value {} is below zero. Should not happen", value);
+        }
+        return value - DuplicateCheck.DUPLICATE_THRESHOLD > DuplicateCheck.DOUBT_RANGE;
     }
 
     private static boolean compareOptionalFields(final BibEntryType type,
@@ -115,7 +120,7 @@ public class DuplicateCheck {
                                                  final BibEntry two,
                                                  final double[] req) {
         final Set<BibField> optionalFields = type.getOptionalFields();
-        if (optionalFields == null) {
+        if (optionalFields.isEmpty()) {
             return req[0] >= DuplicateCheck.DUPLICATE_THRESHOLD;
         }
         final double[] opt = DuplicateCheck.compareFieldSet(optionalFields.stream().map(BibField::getField).collect(Collectors.toSet()), one, two);
@@ -126,22 +131,26 @@ public class DuplicateCheck {
     }
 
     private static double[] compareFieldSet(final Collection<Field> fields, final BibEntry one, final BibEntry two) {
-        double res = 0;
-        double totWeights = 0.;
+        if (fields.isEmpty()) {
+            return new double[] {0.0, 0.0};
+        }
+        double equalWeights = 0;
+        double totalWeights = 0.;
         for (final Field field : fields) {
-            final double weight = DuplicateCheck.FIELD_WEIGHTS.getOrDefault(field, 1.0);
-            totWeights += weight;
+            final double currentWeight = DuplicateCheck.FIELD_WEIGHTS.getOrDefault(field, 1.0);
+            totalWeights += currentWeight;
             int result = DuplicateCheck.compareSingleField(field, one, two);
             if (result == EQUAL) {
-                res += weight;
+                equalWeights += currentWeight;
             } else if (result == EMPTY_IN_BOTH) {
-                totWeights -= weight;
+                totalWeights -= currentWeight;
             }
         }
-        if (totWeights > 0) {
-            return new double[] {res / totWeights, totWeights};
+        if (totalWeights > 0) {
+            return new double[] {equalWeights / totalWeights, totalWeights};
         }
-        return new double[] {0.5, 0.0};
+        // all fields are empty in both --> have no difference at all
+        return new double[] {0.0, 0.0};
     }
 
     private static int compareSingleField(final Field field, final BibEntry one, final BibEntry two) {
@@ -220,8 +229,8 @@ public class DuplicateCheck {
     }
 
     private static int compareField(final String stringOne, final String stringTwo) {
-        final String processedStringOne = stringOne.toLowerCase(Locale.ROOT).trim();
-        final String processedStringTwo = stringTwo.toLowerCase(Locale.ROOT).trim();
+        final String processedStringOne = StringUtil.unifyLineBreaks(stringOne.toLowerCase(Locale.ROOT).trim(), OS.NEWLINE);
+        final String processedStringTwo = StringUtil.unifyLineBreaks(stringTwo.toLowerCase(Locale.ROOT).trim(), OS.NEWLINE);
         final double similarity = DuplicateCheck.correlateByWords(processedStringOne, processedStringTwo);
         if (similarity > 0.8) {
             return EQUAL;
@@ -236,9 +245,7 @@ public class DuplicateCheck {
 
         int score = 0;
         for (final Field field : allFields) {
-            final Optional<String> stringOne = one.getField(field);
-            final Optional<String> stringTwo = two.getField(field);
-            if (stringOne.equals(stringTwo)) {
+            if (isSingleFieldEqual(one, two, field)) {
                 score++;
             }
         }
@@ -246,6 +253,19 @@ public class DuplicateCheck {
             return 1.01; // Just to make sure we can use score > 1 without trouble.
         }
         return (double) score / allFields.size();
+    }
+
+    private static boolean isSingleFieldEqual(BibEntry one, BibEntry two, Field field) {
+        final Optional<String> stringOne = one.getField(field);
+        final Optional<String> stringTwo = two.getField(field);
+        if (stringOne.isEmpty() && stringTwo.isEmpty()) {
+            return true;
+        }
+        if (stringOne.isEmpty() || stringTwo.isEmpty()) {
+            return false;
+        }
+        return (StringUtil.unifyLineBreaks(stringOne.get(), OS.NEWLINE).equals(
+                StringUtil.unifyLineBreaks(stringTwo.get(), OS.NEWLINE)));
     }
 
     /**
@@ -293,7 +313,7 @@ public class DuplicateCheck {
         }
         final double distanceIgnoredCase = new StringSimilarity().editDistanceIgnoreCase(longer, shorter);
         final double similarity = (longerLength - distanceIgnoredCase) / longerLength;
-        LOGGER.debug("Longer string: " + longer + " Shorter string: " + shorter + " Similarity: " + similarity);
+        LOGGER.debug("Longer string: {} Shorter string: {} Similarity: {}", longer, shorter, similarity);
         return similarity;
     }
 
@@ -330,7 +350,8 @@ public class DuplicateCheck {
 
         final Optional<BibEntryType> type = entryTypesManager.enrich(one.getType(), bibDatabaseMode);
         if (type.isPresent()) {
-            final double[] reqCmpResult = compareRequiredFields(type.get(), one, two);
+            BibEntryType entryType = type.get();
+            final double[] reqCmpResult = compareRequiredFields(entryType, one, two);
 
             if (isFarFromThreshold(reqCmpResult[0])) {
                 // Far from the threshold value, so we base our decision on the required fields only
@@ -338,11 +359,13 @@ public class DuplicateCheck {
             }
 
             // Close to the threshold value, so we take a look at the optional fields, if any:
-            return compareOptionalFields(type.get(), one, two, reqCmpResult);
-        } else {
-            // We don't know about the type, so simply compare fields without any distinction between optional/required
-            return compareFieldSet(Sets.union(one.getFields(), two.getFields()), one, two)[0] >= DuplicateCheck.DUPLICATE_THRESHOLD;
+            if (compareOptionalFields(type.get(), one, two, reqCmpResult)) {
+                return true;
+            }
         }
+        // if type is not present, so simply compare fields without any distinction between optional/required
+        // In case both required and optional fields are equal, we also use this fallback
+        return compareFieldSet(Sets.union(one.getFields(), two.getFields()), one, two)[0] >= DuplicateCheck.DUPLICATE_THRESHOLD;
     }
 
     /**

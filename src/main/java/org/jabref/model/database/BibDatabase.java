@@ -59,7 +59,15 @@ public class BibDatabase {
 
     // All file contents below the last entry in the file
     private String epilog = "";
+
     private String sharedDatabaseID;
+
+    private String newLineSeparator = System.lineSeparator();
+
+    public BibDatabase(List<BibEntry> entries, String newLineSeparator) {
+        this(entries);
+        this.newLineSeparator = newLineSeparator;
+    }
 
     public BibDatabase(List<BibEntry> entries) {
         this();
@@ -622,4 +630,20 @@ public class BibDatabase {
     public boolean isDuplicateCitationKeyExisting(String key) {
         return getNumberOfCitationKeyOccurrences(key) > 1;
     }
+
+    /**
+     * Set the newline separator.
+     * @param newLineSeparator
+     */
+    public void setNewLineSeparator(String newLineSeparator) {
+        this.newLineSeparator = newLineSeparator;
+    }
+
+    /**
+     * Returns the string used to indicate a linebreak
+     */
+    public String getNewLineSeparator() {
+        return newLineSeparator;
+    }
+
 }
