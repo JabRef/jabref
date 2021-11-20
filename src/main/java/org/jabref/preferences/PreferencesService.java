@@ -300,8 +300,6 @@ public interface PreferencesService {
 
     SpecialFieldsPreferences getSpecialFieldsPreferences();
 
-    void storeSpecialFieldsPreferences(SpecialFieldsPreferences specialFieldsPreferences);
-
     SearchPreferences getSearchPreferences();
 
     String getLastPreferencesExportPath();

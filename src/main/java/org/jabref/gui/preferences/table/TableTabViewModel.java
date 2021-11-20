@@ -1,8 +1,6 @@
 package org.jabref.gui.preferences.table;
 
-import java.util.ArrayList;
 import java.util.EnumSet;
-import java.util.List;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ListProperty;
@@ -62,8 +60,6 @@ public class TableTabViewModel implements PreferenceTabViewModel {
     private final ListProperty<MainTableColumnModel> availableColumnsProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final ObjectProperty<MainTableColumnModel> addColumnProperty = new SimpleObjectProperty<>();
     private final BooleanProperty specialFieldsEnabledProperty = new SimpleBooleanProperty();
-    private final BooleanProperty specialFieldsSyncKeywordsProperty = new SimpleBooleanProperty();
-    private final BooleanProperty specialFieldsSerializeProperty = new SimpleBooleanProperty();
     private final BooleanProperty extraFileColumnsEnabledProperty = new SimpleBooleanProperty();
     private final BooleanProperty autoResizeColumnsProperty = new SimpleBooleanProperty();
 
@@ -77,17 +73,16 @@ public class TableTabViewModel implements PreferenceTabViewModel {
 
     private final Validator columnsNotEmptyValidator;
 
-    private final List<String> restartWarnings = new ArrayList<>();
-
     private final DialogService dialogService;
     private final PreferencesService preferences;
 
     private ColumnPreferences initialColumnPreferences;
-    private SpecialFieldsPreferences initialSpecialFieldsPreferences;
+    private final SpecialFieldsPreferences specialFieldsPreferences;
 
     public TableTabViewModel(DialogService dialogService, PreferencesService preferences) {
         this.dialogService = dialogService;
         this.preferences = preferences;
+        this.specialFieldsPreferences = preferences.getSpecialFieldsPreferences();
 
         specialFieldsEnabledProperty.addListener((observable, oldValue, newValue) -> {
             if (newValue) {
@@ -118,12 +113,9 @@ public class TableTabViewModel implements PreferenceTabViewModel {
     public void setValues() {
         MainTablePreferences initialMainTablePreferences = preferences.getMainTablePreferences();
         initialColumnPreferences = initialMainTablePreferences.getColumnPreferences();
-        initialSpecialFieldsPreferences = preferences.getSpecialFieldsPreferences();
         MainTableNameFormatPreferences initialNameFormatPreferences = preferences.getMainTableNameFormatPreferences();
 
-        specialFieldsEnabledProperty.setValue(initialSpecialFieldsPreferences.isSpecialFieldsEnabled());
-        specialFieldsSyncKeywordsProperty.setValue(initialSpecialFieldsPreferences.shouldAutoSyncSpecialFieldsToKeyWords());
-        specialFieldsSerializeProperty.setValue(initialSpecialFieldsPreferences.shouldSerializeSpecialFields());
+        specialFieldsEnabledProperty.setValue(specialFieldsPreferences.isSpecialFieldsEnabled());
         extraFileColumnsEnabledProperty.setValue(initialMainTablePreferences.getExtraFileColumnsEnabled());
         autoResizeColumnsProperty.setValue(initialMainTablePreferences.getResizeColumnsToFit());
 
@@ -250,20 +242,7 @@ public class TableTabViewModel implements PreferenceTabViewModel {
                 extraFileColumnsEnabledProperty.getValue()
         ));
 
-        SpecialFieldsPreferences newSpecialFieldsPreferences = new SpecialFieldsPreferences(
-                specialFieldsEnabledProperty.getValue(),
-                specialFieldsSyncKeywordsProperty.getValue(),
-                specialFieldsSerializeProperty.getValue());
-
-        if (initialSpecialFieldsPreferences.shouldAutoSyncSpecialFieldsToKeyWords() != newSpecialFieldsPreferences.shouldAutoSyncSpecialFieldsToKeyWords()) {
-            restartWarnings.add(Localization.lang("Synchronize special fields to keywords"));
-        }
-
-        if (initialSpecialFieldsPreferences.shouldSerializeSpecialFields() != newSpecialFieldsPreferences.shouldSerializeSpecialFields()) {
-            restartWarnings.add(Localization.lang("Serialize special fields"));
-        }
-
-        preferences.storeSpecialFieldsPreferences(newSpecialFieldsPreferences);
+        specialFieldsPreferences.setSpecialFieldsEnabled(specialFieldsEnabledProperty.getValue());
 
         DisplayStyle displayStyle = DisplayStyle.LASTNAME_FIRSTNAME;
         if (namesNatbibProperty.getValue()) {
@@ -317,14 +296,6 @@ public class TableTabViewModel implements PreferenceTabViewModel {
 
     public BooleanProperty specialFieldsEnabledProperty() {
         return this.specialFieldsEnabledProperty;
-    }
-
-    public BooleanProperty specialFieldsSyncKeywordsProperty() {
-        return this.specialFieldsSyncKeywordsProperty;
-    }
-
-    public BooleanProperty specialFieldsSerializeProperty() {
-        return this.specialFieldsSerializeProperty;
     }
 
     public BooleanProperty extraFileColumnsEnabledProperty() {

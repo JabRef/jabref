@@ -35,8 +35,6 @@ public class TableTab extends AbstractPreferenceTabView<TableTabViewModel> imple
     @FXML private ComboBox<MainTableColumnModel> addColumnName;
     @FXML private CheckBox specialFieldsEnable;
     @FXML private Button specialFieldsHelp;
-    @FXML private RadioButton specialFieldsSyncKeywords;
-    @FXML private RadioButton specialFieldsSerialize;
     @FXML private CheckBox extraFileColumnsEnable;
     @FXML private CheckBox autoResizeColumns;
 
@@ -118,8 +116,6 @@ public class TableTab extends AbstractPreferenceTabView<TableTabViewModel> imple
 
     private void setupBindings() {
         specialFieldsEnable.selectedProperty().bindBidirectional(viewModel.specialFieldsEnabledProperty());
-        specialFieldsSyncKeywords.selectedProperty().bindBidirectional(viewModel.specialFieldsSyncKeywordsProperty());
-        specialFieldsSerialize.selectedProperty().bindBidirectional(viewModel.specialFieldsSerializeProperty());
         extraFileColumnsEnable.selectedProperty().bindBidirectional(viewModel.extraFileColumnsEnabledProperty());
         autoResizeColumns.selectedProperty().bindBidirectional(viewModel.autoResizeColumnsProperty());
 
