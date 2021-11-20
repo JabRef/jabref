@@ -95,8 +95,6 @@ public interface PreferencesService {
 
     SavePreferences getSavePreferences();
 
-    String getUser();
-
     SaveOrderConfig getExportSaveOrder();
 
     void storeExportSaveOrder(SaveOrderConfig config);
@@ -289,12 +287,6 @@ public interface PreferencesService {
     GuiPreferences getGuiPreferences();
 
     void clearEditedFiles();
-
-    /**
-     * Gets the directory for file browsing dialogs. This ensures that each browse dialog starts in the last visited
-     * browse directory.
-     */
-    Path getWorkingDir();
 
     //*************************************************************************************************************
     // Misc preferences

@@ -26,7 +26,6 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.util.FileHelper;
 import org.jabref.preferences.FilePreferences;
-import org.jabref.preferences.PreferencesService;
 
 import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.optional.ObservableOptionalValue;
@@ -41,13 +40,13 @@ public class LinkedFilesEditDialogViewModel extends AbstractViewModel {
     private final ObservableOptionalValue<ExternalFileType> monadicSelectedExternalFileType;
     private final BibDatabaseContext database;
     private final DialogService dialogService;
-    private final PreferencesService preferences;
+    private final FilePreferences filePreferences;
     private final ExternalFileTypes externalFileTypes;
 
-    public LinkedFilesEditDialogViewModel(LinkedFile linkedFile, BibDatabaseContext database, DialogService dialogService, PreferencesService preferences, ExternalFileTypes externalFileTypes) {
+    public LinkedFilesEditDialogViewModel(LinkedFile linkedFile, BibDatabaseContext database, DialogService dialogService, FilePreferences filePreferences, ExternalFileTypes externalFileTypes) {
         this.database = database;
         this.dialogService = dialogService;
-        this.preferences = preferences;
+        this.filePreferences = filePreferences;
         this.externalFileTypes = externalFileTypes;
         allExternalFileTypes.set(FXCollections.observableArrayList(externalFileTypes.getExternalFileTypeSelection()));
 
@@ -71,7 +70,6 @@ public class LinkedFilesEditDialogViewModel extends AbstractViewModel {
 
     public void openBrowseDialog() {
         String fileText = link.get();
-        FilePreferences filePreferences = preferences.getFilePreferences();
 
         Optional<Path> file = FileHelper.find(database, fileText, filePreferences);
 
@@ -142,7 +140,7 @@ public class LinkedFilesEditDialogViewModel extends AbstractViewModel {
     }
 
     private String relativize(Path filePath) {
-        List<Path> fileDirectories = database.getFileDirectories(preferences.getFilePreferences());
+        List<Path> fileDirectories = database.getFileDirectories(filePreferences);
         return FileUtil.relativize(filePath, fileDirectories).toString();
     }
 }

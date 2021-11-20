@@ -802,22 +802,6 @@ public class JabRefPreferences implements PreferencesService {
         storage.put(CLEANUP_FORMATTERS, convertListToString(Cleanups.DEFAULT_SAVE_ACTIONS.getAsStringList(OS.NEWLINE)));
     }
 
-    @Override
-    public String getUser() {
-        if (StringUtil.isNotBlank(userName)) {
-            return userName;
-        }
-
-        try {
-            userName = get(DEFAULT_OWNER) + '-' + InetAddress.getLocalHost().getHostName();
-            return userName;
-        } catch (UnknownHostException ex) {
-            LOGGER.error("Hostname not found. Please go to https://docs.jabref.org/ to find possible " +
-                    "problem resolution", ex);
-            return get(DEFAULT_OWNER);
-        }
-    }
-
     public void setLanguageDependentDefaultValues() {
         // Entry editor tab 0:
         defaults.put(CUSTOM_TAB_NAME + "_def0", Localization.lang("General"));
@@ -2158,11 +2142,6 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     @Override
-    public Path getWorkingDir() {
-        return Path.of(get(WORKING_DIRECTORY));
-    }
-
-    @Override
     public FilePreferences getFilePreferences() {
         if (Objects.nonNull(filePreferences)) {
             return filePreferences;
@@ -2186,6 +2165,21 @@ public class JabRefPreferences implements PreferencesService {
         EasyBind.listen(filePreferences.workingDirectoryProperty(), (obs, oldValue, newValue) -> put(WORKING_DIRECTORY, newValue.toString()));
 
         return filePreferences;
+    }
+
+    private String getUser() {
+        if (StringUtil.isNotBlank(userName)) {
+            return userName;
+        }
+
+        try {
+            userName = get(DEFAULT_OWNER) + '-' + InetAddress.getLocalHost().getHostName();
+            return userName;
+        } catch (UnknownHostException ex) {
+            LOGGER.error("Hostname not found. Please go to https://docs.jabref.org/ to find possible " +
+                    "problem resolution", ex);
+            return get(DEFAULT_OWNER);
+        }
     }
 
     @Override

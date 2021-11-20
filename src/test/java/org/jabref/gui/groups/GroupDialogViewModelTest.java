@@ -28,7 +28,7 @@ class GroupDialogViewModelTest {
     private final MetaData metaData = mock(MetaData.class);
 
     @BeforeEach
-    void setUp(@TempDir Path temporaryFolder) throws Exception {
+    void setUp(@TempDir Path temporaryFolder) {
         this.temporaryFolder = temporaryFolder;
         bibDatabaseContext = new BibDatabaseContext();
         DialogService dialogService = mock(DialogService.class);
@@ -38,7 +38,7 @@ class GroupDialogViewModelTest {
 
         PreferencesService preferencesService = mock(PreferencesService.class);
         when(preferencesService.getKeywordDelimiter()).thenReturn(',');
-        when(preferencesService.getUser()).thenReturn("MockedUser");
+        when(preferencesService.getFilePreferences().getUser()).thenReturn("MockedUser");
 
         bibDatabaseContext.setMetaData(metaData);
 
@@ -57,7 +57,7 @@ class GroupDialogViewModelTest {
     }
 
     @Test
-    void validateNonExistingAbsolutePath() throws Exception {
+    void validateNonExistingAbsolutePath() {
         var notAnAuxFile = temporaryFolder.resolve("notanauxfile.aux").toAbsolutePath();
         viewModel.texGroupFilePathProperty().setValue(notAnAuxFile.toString());
         assertFalse(viewModel.texGroupFilePathValidatonStatus().isValid());

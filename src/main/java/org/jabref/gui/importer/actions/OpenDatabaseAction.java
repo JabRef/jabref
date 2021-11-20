@@ -94,10 +94,10 @@ public class OpenDatabaseAction extends SimpleCommand {
      */
     private Path getInitialDirectory() {
         if (frame.getBasePanelCount() == 0) {
-            return preferencesService.getWorkingDir();
+            return preferencesService.getFilePreferences().getWorkingDirectory();
         } else {
             Optional<Path> databasePath = frame.getCurrentLibraryTab().getBibDatabaseContext().getDatabasePath();
-            return databasePath.map(Path::getParent).orElse(preferencesService.getWorkingDir());
+            return databasePath.map(Path::getParent).orElse(preferencesService.getFilePreferences().getWorkingDirectory());
         }
     }
 

@@ -180,7 +180,7 @@ public class UnlinkedFilesDialogViewModel {
         }
 
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
-                .withInitialDirectory(preferences.getWorkingDir())
+                .withInitialDirectory(preferences.getFilePreferences().getWorkingDirectory())
                 .addExtensionFilter(StandardFileType.TXT)
                 .withDefaultExtension(StandardFileType.TXT)
                 .build();
