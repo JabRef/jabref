@@ -157,7 +157,7 @@ public class JabRefPreferences implements PreferencesService {
     public static final String REFORMAT_FILE_ON_SAVE_AND_EXPORT = "reformatFileOnSaveAndExport";
     public static final String EXPORT_IN_ORIGINAL_ORDER = "exportInOriginalOrder";
     public static final String EXPORT_IN_SPECIFIED_ORDER = "exportInSpecifiedOrder";
-    
+
     public static final String EXPORT_PRIMARY_SORT_FIELD = "exportPriSort";
     public static final String EXPORT_PRIMARY_SORT_DESCENDING = "exportPriDescending";
     public static final String EXPORT_SECONDARY_SORT_FIELD = "exportSecSort";
@@ -439,6 +439,7 @@ public class JabRefPreferences implements PreferencesService {
     private SearchPreferences searchPreferences;
     private AutoLinkPreferences autoLinkPreferences;
     private ImportExportPreferences importExportPreferences;
+    private NameFormatterPreferences nameFormatterPreferences;
 
     // The constructor is made private to enforce this as a singleton class:
     private JabRefPreferences() {
@@ -2610,15 +2611,20 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public NameFormatterPreferences getNameFormatterPreferences() {
-        return new NameFormatterPreferences(
+        if (Objects.nonNull(nameFormatterPreferences)) {
+            return nameFormatterPreferences;
+        }
+
+        nameFormatterPreferences = new NameFormatterPreferences(
                 getStringList(NAME_FORMATER_KEY),
                 getStringList(NAME_FORMATTER_VALUE));
-    }
 
-    @Override
-    public void storeNameFormatterPreferences(NameFormatterPreferences preferences) {
-        putStringList(NAME_FORMATER_KEY, preferences.getNameFormatterKey());
-        putStringList(NAME_FORMATTER_VALUE, preferences.getNameFormatterValue());
+        nameFormatterPreferences.getNameFormatterKey().addListener((InvalidationListener) change ->
+                putStringList(NAME_FORMATER_KEY, nameFormatterPreferences.getNameFormatterKey()));
+        nameFormatterPreferences.getNameFormatterValue().addListener((InvalidationListener) change ->
+                putStringList(NAME_FORMATTER_VALUE, nameFormatterPreferences.getNameFormatterValue()));
+
+        return nameFormatterPreferences;
     }
 
     @Override

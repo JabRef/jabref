@@ -296,8 +296,6 @@ public interface PreferencesService {
 
     NameFormatterPreferences getNameFormatterPreferences();
 
-    void storeNameFormatterPreferences(NameFormatterPreferences preferences);
-
     AutoCompletePreferences getAutoCompletePreferences();
 
     void storeAutoCompletePreferences(AutoCompletePreferences autoCompletePreferences);
