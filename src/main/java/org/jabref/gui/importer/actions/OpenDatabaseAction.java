@@ -181,7 +181,7 @@ public class OpenDatabaseAction extends SimpleCommand {
 
         dialogService.notify(Localization.lang("Opening") + ": '" + file + "'");
 
-        preferencesService.setWorkingDirectory(fileToLoad.getParent());
+        preferencesService.getFilePreferences().setWorkingDirectory(fileToLoad.getParent());
 
         if (BackupManager.backupFileDiffers(fileToLoad)) {
             BackupUIManager.showRestoreBackupDialog(dialogService, fileToLoad);

@@ -117,7 +117,7 @@ public class ParseLatexDialogViewModel extends AbstractViewModel {
 
         dialogService.showDirectorySelectionDialog(directoryDialogConfiguration).ifPresent(selectedDirectory -> {
             latexFileDirectory.set(selectedDirectory.toAbsolutePath().toString());
-            preferencesService.setWorkingDirectory(selectedDirectory.toAbsolutePath());
+            preferencesService.getFilePreferences().setWorkingDirectory(selectedDirectory.toAbsolutePath());
         });
     }
 

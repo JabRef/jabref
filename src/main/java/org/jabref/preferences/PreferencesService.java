@@ -296,11 +296,6 @@ public interface PreferencesService {
      */
     Path getWorkingDir();
 
-    /**
-     * Stores the directory for file browsing dialogs
-     */
-    void setWorkingDirectory(Path dir);
-
     //*************************************************************************************************************
     // Misc preferences
     //*************************************************************************************************************

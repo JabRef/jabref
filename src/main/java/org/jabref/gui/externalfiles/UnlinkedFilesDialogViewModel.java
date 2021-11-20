@@ -80,8 +80,13 @@ public class UnlinkedFilesDialogViewModel {
 
     private final FunctionBasedValidator<String> scanDirectoryValidator;
 
-    public UnlinkedFilesDialogViewModel(DialogService dialogService, ExternalFileTypes externalFileTypes, UndoManager undoManager,
-                                        FileUpdateMonitor fileUpdateMonitor, PreferencesService preferences, StateManager stateManager, TaskExecutor taskExecutor) {
+    public UnlinkedFilesDialogViewModel(DialogService dialogService,
+                                        ExternalFileTypes externalFileTypes,
+                                        UndoManager undoManager,
+                                        FileUpdateMonitor fileUpdateMonitor,
+                                        PreferencesService preferences,
+                                        StateManager stateManager,
+                                        TaskExecutor taskExecutor) {
         this.preferences = preferences;
         this.dialogService = dialogService;
         this.taskExecutor = taskExecutor;
@@ -95,9 +100,9 @@ public class UnlinkedFilesDialogViewModel {
                 stateManager);
 
         this.fileFilterList = FXCollections.observableArrayList(
-            new FileExtensionViewModel(StandardFileType.ANY_FILE, externalFileTypes),
-            new FileExtensionViewModel(StandardFileType.BIBTEX_DB, externalFileTypes),
-            new FileExtensionViewModel(StandardFileType.PDF, externalFileTypes));
+                new FileExtensionViewModel(StandardFileType.ANY_FILE, externalFileTypes),
+                new FileExtensionViewModel(StandardFileType.BIBTEX_DB, externalFileTypes),
+                new FileExtensionViewModel(StandardFileType.PDF, externalFileTypes));
 
         this.dateFilterList = FXCollections.observableArrayList(DateRange.values());
 
@@ -218,12 +223,12 @@ public class UnlinkedFilesDialogViewModel {
 
     public void browseFileDirectory() {
         DirectoryDialogConfiguration directoryDialogConfiguration = new DirectoryDialogConfiguration.Builder()
-                .withInitialDirectory(preferences.getWorkingDir()).build();
+                .withInitialDirectory(preferences.getFilePreferences().getWorkingDirectory()).build();
 
         dialogService.showDirectorySelectionDialog(directoryDialogConfiguration)
                      .ifPresent(selectedDirectory -> {
                          directoryPath.setValue(selectedDirectory.toAbsolutePath().toString());
-                         preferences.setWorkingDirectory(selectedDirectory.toAbsolutePath());
+                         preferences.getFilePreferences().setWorkingDirectory(selectedDirectory.toAbsolutePath());
                      });
     }
 

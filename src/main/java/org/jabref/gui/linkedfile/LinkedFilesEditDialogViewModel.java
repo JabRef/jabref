@@ -25,6 +25,7 @@ import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.util.FileHelper;
+import org.jabref.preferences.FilePreferences;
 import org.jabref.preferences.PreferencesService;
 
 import com.tobiasdiez.easybind.EasyBind;
@@ -70,10 +71,11 @@ public class LinkedFilesEditDialogViewModel extends AbstractViewModel {
 
     public void openBrowseDialog() {
         String fileText = link.get();
+        FilePreferences filePreferences = preferences.getFilePreferences();
 
-        Optional<Path> file = FileHelper.find(database, fileText, preferences.getFilePreferences());
+        Optional<Path> file = FileHelper.find(database, fileText, filePreferences);
 
-        Path workingDir = file.orElse(preferences.getWorkingDir());
+        Path workingDir = file.orElse(filePreferences.getWorkingDirectory());
         String fileName = Path.of(fileText).getFileName().toString();
 
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
@@ -83,7 +85,7 @@ public class LinkedFilesEditDialogViewModel extends AbstractViewModel {
 
         dialogService.showFileOpenDialog(fileDialogConfiguration).ifPresent(path -> {
             // Store the directory for next time:
-            preferences.setWorkingDirectory(path);
+            filePreferences.setWorkingDirectory(path);
             link.set(relativize(path));
 
             setExternalFileTypeByExtension(link.getValueSafe());

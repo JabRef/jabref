@@ -2163,11 +2163,6 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     @Override
-    public void setWorkingDirectory(Path directory) {
-        put(WORKING_DIRECTORY, directory.toString());
-    }
-
-    @Override
     public FilePreferences getFilePreferences() {
         if (Objects.nonNull(filePreferences)) {
             return filePreferences;
@@ -2179,7 +2174,8 @@ public class JabRefPreferences implements PreferencesService {
                 getBoolean(STORE_RELATIVE_TO_BIB),
                 get(IMPORT_FILENAMEPATTERN),
                 get(IMPORT_FILEDIRPATTERN),
-                getBoolean(DOWNLOAD_LINKED_FILES)
+                getBoolean(DOWNLOAD_LINKED_FILES),
+                Path.of(get(WORKING_DIRECTORY))
         );
 
         EasyBind.listen(filePreferences.mainFileDirectoryProperty(), (obs, oldValue, newValue) -> put(MAIN_FILE_DIRECTORY, filePreferences.getFileDirectory().map(Path::toString).orElse("")));
@@ -2187,6 +2183,7 @@ public class JabRefPreferences implements PreferencesService {
         EasyBind.listen(filePreferences.fileNamePatternProperty(), (obs, oldValue, newValue) -> put(IMPORT_FILENAMEPATTERN, newValue));
         EasyBind.listen(filePreferences.fileDirectoryPatternProperty(), (obs, oldValue, newValue) -> put(IMPORT_FILEDIRPATTERN, newValue));
         EasyBind.listen(filePreferences.downloadLinkedFilesProperty(), (obs, oldValue, newValue) -> putBoolean(DOWNLOAD_LINKED_FILES, newValue));
+        EasyBind.listen(filePreferences.workingDirectoryProperty(), (obs, oldValue, newValue) -> put(WORKING_DIRECTORY, newValue.toString()));
 
         return filePreferences;
     }
