@@ -404,8 +404,10 @@ public class GlobalSearchBar extends HBox {
         if (searchTerm == null || searchTerm.equals(searchField.getText())) {
             return;
         }
-
-        DefaultTaskExecutor.runInJavaFXThread(() -> searchField.setText(searchTerm));
+        DefaultTaskExecutor.runInJavaFXThread(() -> {
+            searchField.setText(searchTerm);
+            searchField.positionCaret(searchField.getText().length());
+        });
     }
 
     private static class SearchPopupSkin<T> implements Skin<AutoCompletePopup<T>> {
