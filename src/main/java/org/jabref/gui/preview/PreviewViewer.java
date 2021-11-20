@@ -157,9 +157,9 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
                     try {
                         JabRefDesktop.openBrowser(href);
                     } catch (MalformedURLException exception) {
-                        exception.printStackTrace();
+                        LOGGER.error("Invalid URL", exception);
                     } catch (IOException exception) {
-                        exception.printStackTrace();
+                        LOGGER.error("Invalid URL Input", exception);
                     }
                     evt.preventDefault();
                 }, false);
