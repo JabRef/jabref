@@ -68,12 +68,6 @@ public class DropDownMenu {
                 searchbarDropDown.setContentNode(buttonBox);
                 searchbarDropDown.setDetachable(false); // not detachable
                 searchbarDropDown.show(searchField);
-//            } else if (searchbarDropDown.isShowing()) {
-//                searchbarDropDown.hide();  // this makes the dropdown disappear if you re-click on searchbar
-            } else {
-//                searchbarDropDown.setContentNode(buttonBox);
-                // this makes the drop down reappear every time you click on search bar, even if its shown already
-//                searchbarDropDown.show(searchField);
             }
         });
 
@@ -87,7 +81,7 @@ public class DropDownMenu {
         });
 
         // journalButton action
-        journalButton.addEventFilter(MouseEvent.MOUSE_CLICKED, event ->{
+        journalButton.addEventFilter(MouseEvent.MOUSE_CLICKED, event -> {
             if (!isPrevAttribute(searchField)) {
                 checkAndAddSpace(searchField);
                 searchField.insertText(searchField.getCaretPosition(), "journal:");
@@ -96,7 +90,7 @@ public class DropDownMenu {
         });
 
         // titleButton action
-        titleButton.addEventFilter(MouseEvent.MOUSE_CLICKED, event ->{
+        titleButton.addEventFilter(MouseEvent.MOUSE_CLICKED, event -> {
             if (!isPrevAttribute(searchField)) {
                 checkAndAddSpace(searchField);
                 searchField.insertText(searchField.getCaretPosition(), "title:");
@@ -105,7 +99,7 @@ public class DropDownMenu {
         });
 
         // yearButton action
-        yearButton.addEventFilter(MouseEvent.MOUSE_CLICKED, event ->{
+        yearButton.addEventFilter(MouseEvent.MOUSE_CLICKED, event -> {
             if (!isPrevAttribute(searchField)) {
                 checkAndAddSpace(searchField);
                 searchField.insertText(searchField.getCaretPosition(), "year:");
@@ -114,12 +108,12 @@ public class DropDownMenu {
         });
 
         // yearRangeButton action
-        yearRangeButton.addEventFilter(MouseEvent.MOUSE_CLICKED, event ->{
+        yearRangeButton.addEventFilter(MouseEvent.MOUSE_CLICKED, event -> {
 
         });
 
         // andButton action
-        andButton.addEventFilter(MouseEvent.MOUSE_CLICKED, event ->{
+        andButton.addEventFilter(MouseEvent.MOUSE_CLICKED, event -> {
             if (searchField.getCaretPosition() != 0) {
                 if (!searchField.getText(searchField.getCaretPosition() - 1, searchField.getCaretPosition()).equals(" ")) {
                     searchField.insertText(searchField.getCaretPosition(), " ");
@@ -131,7 +125,7 @@ public class DropDownMenu {
         });
 
         // orButton action
-        orButton.addEventFilter(MouseEvent.MOUSE_CLICKED, event ->{
+        orButton.addEventFilter(MouseEvent.MOUSE_CLICKED, event -> {
             if (searchField.getCaretPosition() != 0) {
                 if (!searchField.getText(searchField.getCaretPosition() - 1, searchField.getCaretPosition()).equals(" ")) {
                     searchField.insertText(searchField.getCaretPosition(), " ");
@@ -143,7 +137,7 @@ public class DropDownMenu {
         });
 
         // leftBracketButton action
-        leftBracketButton.addEventFilter(MouseEvent.MOUSE_CLICKED, event ->{
+        leftBracketButton.addEventFilter(MouseEvent.MOUSE_CLICKED, event -> {
             if (searchField.getCaretPosition() != 0) {
                 if (!searchField.getText(searchField.getCaretPosition() - 1, searchField.getCaretPosition()).equals(" ")) {
                     searchField.insertText(searchField.getCaretPosition(), " ");
@@ -155,7 +149,7 @@ public class DropDownMenu {
         });
 
         // orButton action
-        rightBracketButton.addEventFilter(MouseEvent.MOUSE_CLICKED, event ->{
+        rightBracketButton.addEventFilter(MouseEvent.MOUSE_CLICKED, event -> {
             if (searchField.getCaretPosition() != 0) {
                 if (!searchField.getText(searchField.getCaretPosition() - 1, searchField.getCaretPosition()).equals(" ")) {
                     searchField.insertText(searchField.getCaretPosition(), " ");
