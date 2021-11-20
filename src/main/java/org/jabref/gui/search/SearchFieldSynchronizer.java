@@ -71,18 +71,23 @@ public class SearchFieldSynchronizer {
         StringBuilder str = new StringBuilder();
 
         for (SearchItem current : searchItemList) {
+            boolean isLogicalOp = current.getItemType().equals("OR") || current.getItemType().equals("AND");
+//                    || current.getItemType().equals("title:") || current.getItemType().equals("year:");
             if (!str.isEmpty()) {
                 str.append(" ");
             }
             if (current.getItemType().endsWith(":")) {
                 str.append(current.getItemType());
                 str.append(current.getItem());
+            } else if (isLogicalOp && (current == searchItemList.get(searchItemList.size() - 1))) {
+                str.append(current.getItemType());
+                str.append(" ");
             } else {
                 str.append(current.getItemType());
             }
         }
         searchString = str.toString();
-//        System.out.println("searchStringBuilder: " + searchString);
+        System.out.println("searchStringBuilder: " + searchString);
         return searchString;
     }
 
