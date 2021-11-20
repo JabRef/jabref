@@ -1,5 +1,6 @@
 package org.jabref.gui.fieldeditors;
 
+import java.io.IOException;
 import java.net.CookieHandler;
 import java.net.CookieManager;
 import java.net.CookiePolicy;
@@ -22,6 +23,7 @@ import org.jabref.gui.externalfiletype.StandardExternalFileType;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.CurrentThreadTaskExecutor;
 import org.jabref.gui.util.TaskExecutor;
+import org.jabref.logic.externalfiles.LinkedFileHandler;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.database.BibDatabaseContext;
@@ -274,6 +276,35 @@ class LinkedFileViewModelTest {
         assertTrue(viewModel.isGeneratedPathSameAsOriginal());
     }
 
+    // Tests if isGeneratedPathSameAsOriginal takes into consideration File directory pattern
+    @Test
+    void isNotSamePathWithPattern() {
+        linkedFile = new LinkedFile("desc", tempFile, "pdf");
+        System.out.println(tempFile.getParent());
+        databaseContext = mock(BibDatabaseContext.class);
+        when(filePreferences.getFileNamePattern()).thenReturn("[citationkey]");
+        when(filePreferences.getFileDirectoryPattern()).thenReturn("[entrytype]");
+        when(databaseContext.getFirstExistingFileDir(filePreferences)).thenReturn(Optional.of(tempFile.getParent()));
+
+        LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, taskExecutor, dialogService, preferences, externalFileType);
+        assertFalse(viewModel.isGeneratedPathSameAsOriginal());
+    }
+
+    // Tests if isGeneratedPathSameAsOriginal takes into consideration File directory pattern
+    @Test
+    void isSamePathWithPattern() throws IOException {
+        linkedFile = new LinkedFile("desc", tempFile, "pdf");
+        databaseContext = mock(BibDatabaseContext.class);
+        when(filePreferences.getFileNamePattern()).thenReturn("[citationkey]");
+        when(filePreferences.getFileDirectoryPattern()).thenReturn("[entrytype]");
+        when(databaseContext.getFirstExistingFileDir(filePreferences)).thenReturn(Optional.of(tempFile.getParent()));
+
+        LinkedFileHandler fileHandler = new LinkedFileHandler(linkedFile, entry, databaseContext, filePreferences);
+        fileHandler.moveToDefaultDirectory();
+
+        LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, taskExecutor, dialogService, preferences, externalFileType);
+        assertTrue(viewModel.isGeneratedPathSameAsOriginal());
+    }
 
     // Tests if added parameters to mimeType gets parsed to correct format.
     @Test
