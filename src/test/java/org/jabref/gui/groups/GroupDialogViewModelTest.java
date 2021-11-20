@@ -8,6 +8,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.groups.AbstractGroup;
 import org.jabref.model.metadata.MetaData;
+import org.jabref.preferences.FilePreferences;
 import org.jabref.preferences.PreferencesService;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -38,6 +39,7 @@ class GroupDialogViewModelTest {
 
         PreferencesService preferencesService = mock(PreferencesService.class);
         when(preferencesService.getKeywordDelimiter()).thenReturn(',');
+        when(preferencesService.getFilePreferences()).thenReturn(mock(FilePreferences.class));
         when(preferencesService.getFilePreferences().getUser()).thenReturn("MockedUser");
 
         bibDatabaseContext.setMetaData(metaData);
