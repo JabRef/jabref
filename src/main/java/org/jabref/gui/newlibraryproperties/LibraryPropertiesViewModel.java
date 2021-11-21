@@ -5,6 +5,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 import org.jabref.gui.newlibraryproperties.general.GeneralPropertiesView;
+import org.jabref.gui.newlibraryproperties.saving.SavingPropertiesView;
 import org.jabref.model.database.BibDatabaseContext;
 
 public class LibraryPropertiesViewModel {
@@ -14,7 +15,8 @@ public class LibraryPropertiesViewModel {
     public LibraryPropertiesViewModel(BibDatabaseContext databaseContext) {
 
         propertiesTabs = FXCollections.observableArrayList(
-                new GeneralPropertiesView(databaseContext)
+                new GeneralPropertiesView(databaseContext),
+                new SavingPropertiesView(databaseContext)
         );
     }
 
