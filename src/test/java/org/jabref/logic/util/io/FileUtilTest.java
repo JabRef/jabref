@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import java.util.function.BiPredicate;
 
 import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.model.entry.BibEntry;
@@ -382,5 +383,29 @@ class FileUtilTest {
     void testIsNotBibFile() throws IOException {
         Path bibFile = Files.createFile(rootDir.resolve("test.pdf"));
         assertFalse(FileUtil.isBibFile(bibFile));
+    }
+
+    @Test
+    void testFilePathNotEqual(){
+        BiPredicate<Path, Path> equality = (fileA, fileB) -> {
+            try {
+                return Files.isSameFile(fileA, fileB);
+            } catch (IOException e) {
+                return false;
+            }
+        };
+        assertFalse(FileHelper.equals(existingTestFile, otherExistingTestFile, equality));
+    }
+
+    @Test
+    void testFilePathEqual(){
+        BiPredicate<Path, Path> equality = (fileA, fileB) -> {
+            try {
+                return Files.isSameFile(fileA, fileB);
+            } catch (IOException e) {
+                return false;
+            }
+        };
+        assertTrue(FileHelper.equals(existingTestFile, existingTestFile, equality));
     }
 }
