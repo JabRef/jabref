@@ -4,10 +4,12 @@
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
+<?import org.jabref.gui.icon.JabRefIconView?>
 <fx:root spacing="10.0" type="VBox"
          xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
          fx:controller="org.jabref.gui.libraryproperties.general.GeneralPropertiesView">
@@ -44,21 +46,45 @@
                GridPane.columnIndex="0" GridPane.rowIndex="4"/>
         <TextField fx:id="generalFileDirectory"
                    GridPane.columnIndex="1" GridPane.rowIndex="4"/>
-        <Button text="%Browse" onAction="#browseGeneralFileDirectory"
-                GridPane.columnIndex="2" GridPane.rowIndex="4"/>
+        <Button onAction="#browseGeneralFileDirectory"
+                styleClass="icon-button,narrow" prefHeight="20.0" prefWidth="20.0"
+                GridPane.columnIndex="2" GridPane.rowIndex="4">
+            <graphic>
+                <JabRefIconView glyph="OPEN"/>
+            </graphic>
+            <tooltip>
+                <Tooltip text="%Browse"/>
+            </tooltip>
+        </Button>
 
         <Label text="%User-specific file directory"
                GridPane.columnIndex="0" GridPane.rowIndex="5"/>
         <TextField fx:id="userSpecificFileDirectory"
                    GridPane.columnIndex="1" GridPane.rowIndex="5"/>
-        <Button text="%Browse" onAction="#browseUserSpecificFileDirectory"
-                GridPane.columnIndex="2" GridPane.rowIndex="5"/>
+        <Button onAction="#browseUserSpecificFileDirectory"
+                styleClass="icon-button,narrow" prefHeight="20.0" prefWidth="20.0"
+                GridPane.columnIndex="2" GridPane.rowIndex="5">
+            <graphic>
+                <JabRefIconView glyph="OPEN"/>
+            </graphic>
+            <tooltip>
+                <Tooltip text="%Browse"/>
+            </tooltip>
+        </Button>
 
         <Label text="%LaTeX file directory"
                GridPane.columnIndex="0" GridPane.rowIndex="6"/>
         <TextField fx:id="laTexFileDirectory"
                    GridPane.columnIndex="1" GridPane.rowIndex="6"/>
-        <Button text="%Browse" onAction="#browseLatexFileDirectory"
-                GridPane.columnIndex="2" GridPane.rowIndex="6"/>
+        <Button onAction="#browseLatexFileDirectory"
+                styleClass="icon-button,narrow" prefHeight="20.0" prefWidth="20.0"
+                GridPane.columnIndex="2" GridPane.rowIndex="6">
+            <graphic>
+                <JabRefIconView glyph="OPEN"/>
+            </graphic>
+            <tooltip>
+                <Tooltip text="%Browse"/>
+            </tooltip>
+        </Button>
     </GridPane>
 </fx:root>

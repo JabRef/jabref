@@ -4,6 +4,7 @@ import javax.inject.Inject;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 
@@ -42,7 +43,10 @@ public class LibraryPropertiesView extends BaseDialog<LibraryPropertiesViewModel
         viewModel = new LibraryPropertiesViewModel(databaseContext);
 
         for (PropertiesTab pane : viewModel.getPropertiesTabs()) {
-            tabPane.getTabs().add(new Tab(pane.getTabName(), pane.getBuilder()));
+            ScrollPane scrollPane = new ScrollPane(pane.getBuilder());
+            scrollPane.setFitToHeight(true);
+            scrollPane.setFitToWidth(true);
+            tabPane.getTabs().add(new Tab(pane.getTabName(), scrollPane));
             ((AbstractPropertiesTabView<?>) pane).prefWidthProperty().bind(tabPane.widthProperty());
             ((AbstractPropertiesTabView<?>) pane).getStyleClass().add("propertiesTab");
         }
