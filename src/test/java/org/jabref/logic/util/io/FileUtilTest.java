@@ -8,9 +8,9 @@ import java.nio.file.StandardOpenOption;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.BiPredicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import java.util.function.BiPredicate;
 
 import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.model.entry.BibEntry;
@@ -386,7 +386,7 @@ class FileUtilTest {
     }
 
     @Test
-    void testFilePathNotEqual(){
+    void testFilePathNotEqual() {
         BiPredicate<Path, Path> equality = (fileA, fileB) -> {
             try {
                 return Files.isSameFile(fileA, fileB);
@@ -398,7 +398,7 @@ class FileUtilTest {
     }
 
     @Test
-    void testFilePathEqual(){
+    void testFilePathEqual() {
         BiPredicate<Path, Path> equality = (fileA, fileB) -> {
             try {
                 return Files.isSameFile(fileA, fileB);
