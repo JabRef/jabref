@@ -17,7 +17,7 @@
 - The goal of this document is to provide a good overview of the project that explains the use, functionality, creation and architecture of the product. It aims to function as a guide for its current and future developers.
 kv
 ### 1.2 References
-- Functional Specification Document: [functional-specification-document.md](https://github.com/josphstar/jabref/blob/functional_specifications_doc_w1/docs/sweng/functional-specification-document.md)
+- Functional Specification Document: [functional-specification-document.md](https://github.com/josphstar/jabref/blob/designdoc/docs/sweng/functional-specification-document.md)
 - Issue [#341](https://github.com/koppor/jabref/issues/341)
 
 ## 2 System Overview
