@@ -59,6 +59,9 @@ public class DropDownMenu {
         mainBox.setMinWidth(searchField.getWidth());
         Node buttonBox = mainBox;
 
+        // TODO currently double click necessary to click out of focus (for dropdown and searchfield);
+        //  preferred is one click
+
         searchField.addEventFilter(MouseEvent.MOUSE_CLICKED, event -> {
             if (searchbarDropDown == null || !searchbarDropDown.isShowing()) {
                 searchbarDropDown = new PopOver(buttonBox);
@@ -165,6 +168,7 @@ public class DropDownMenu {
         });
 
         // leftBracketButton action
+        // TODO implement searchfieldsynchronizer class
         leftBracketButton.addEventFilter(MouseEvent.MOUSE_CLICKED, event -> {
             if (searchField.getCaretPosition() != 0) {
                 if (!searchField.getText(searchField.getCaretPosition() - 1, searchField.getCaretPosition()).equals(" ")) {
@@ -176,7 +180,8 @@ public class DropDownMenu {
             searchField.positionCaret(searchField.getText().length());
         });
 
-        // orButton action
+        // rightBracketButton action
+        // TODO implement searchfieldsynchronizer class
         rightBracketButton.addEventFilter(MouseEvent.MOUSE_CLICKED, event -> {
             if (searchField.getCaretPosition() != 0) {
                 if (!searchField.getText(searchField.getCaretPosition() - 1, searchField.getCaretPosition()).equals(" ")) {
@@ -208,7 +213,7 @@ public class DropDownMenu {
     }
 
     private boolean isPrevOperator(SearchFieldSynchronizer searchFieldSynchronizer) {
-        System.out.println("isPrevOperator?  " + searchFieldSynchronizer.isPrevOperator());
+//        System.out.println("isPrevOperator?  " + searchFieldSynchronizer.isPrevOperator());
         return searchFieldSynchronizer.isPrevOperator();
     }
 }

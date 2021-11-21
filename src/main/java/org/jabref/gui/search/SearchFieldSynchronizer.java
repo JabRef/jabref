@@ -67,6 +67,7 @@ public class SearchFieldSynchronizer {
 
     }
 
+    // -> searchItemList parsed to textField; used with button press
     public String searchStringBuilder() {
         StringBuilder str = new StringBuilder();
 
@@ -91,6 +92,8 @@ public class SearchFieldSynchronizer {
         return searchString;
     }
 
+    // TODO rework of searchItem class
+    // -> textField parsed to searchItemList; used with textField input
     // Takes a string, splits it up into attributes, search strings and operators. Updates search item list.
     public void updateSearchItemList(ArrayList<String> list) {
         searchItemList.clear();
@@ -103,10 +106,6 @@ public class SearchFieldSynchronizer {
                     } else {
                         searchItemList.add(new SearchItem(list.get(i), ""));
                     }
-//                } else if (list.get(i).equals("AND")) {
-//                    searchItemList.add(new SearchItem("AND", ""));
-//                } else if (list.get(i).equals("OR")) {
-//                    searchItemList.add(new SearchItem("OR", ""));
                 } else {
                     searchItemList.add(new SearchItem(list.get(i), ""));
                 }
