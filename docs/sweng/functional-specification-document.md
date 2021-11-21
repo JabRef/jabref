@@ -6,28 +6,29 @@
 
 - The open-sourced citation and reference management software JabRef is in need of a more functional global search and a user-friendly interface thereof.
 - The users of JabRef should be able to conveniently search in their citations library and perform complex search querys, also via GUI.
-- The goal of this project is to develop an implementation that improves upon the current library search capabilities and enables users of the JabRef software to very easily navigate their libraries. 
+- The main purpose of this feature is to add a UI for the global search bar. 
 
 ### 1.2 Definitions
 
-- Bracketing and Boost: Lucene allows for bracketing of multiple fields
+- Bracketing: Lucene allows for bracketing of multiple fields
 - Chipview: A box design for search terms which allows easier separation
-- Chips: boxes including a search key
+- Chips: A box in the ChipView. May contain search words, Boolean operators, ...
 - Complex search query: JabRef specific search query
 - Dropdown menu: Graphical menu which shows up below the item which triggers the menu
 - GUI: Graphical user interface
 - JabRef: Citation and reference management software
-- Lucene: Open-source search engine library 
+- Lucene: Open-source search engine library. [More details](http://www.lucenetutorial.com/lucene-query-syntax.html)
 - Query: Is a request for data or information from a database table or combination of tables
+- Search field: The textfield from the global search bar.
 - Search user interface: Main graphical user interface for the developed extension
 - Search key: Every search string typed into the global search bar which isn't a field. Search strings are separated by spaces in general but can be extended to more than one word by enclosing the search term within "".
 
 ### 1.3 Applications & Goals
 
 - "Better Search" is a feature implementation for the software JabRef.
-- Target group of the JabRef software are researchers, PHD candidates, university members, students and the scientific community in general.
+- Target group of the JabRef software are researchers, PhD candidates, university members, students and the scientific community in general.
 - An internet connection is not needed for this feature.
-- Search queries in global search must have the same syntax as the already implemented web search. 
+- Search queries in global search should have the same syntax as the already implemented web search. 
 - Search queries need to be performed reliably and without any bugs or errors.
 - Improve the view of the search bar.
 - Improve the use of the search bar.
@@ -35,14 +36,14 @@
 - Improve the autocomplete function of the search bar.
 
 ### 1.4 References
-* /R00/: [https://github.com/koppor/jabref/issues/341]()
+* /R00/: <https://github.com/koppor/jabref/issues/341>
 
 ### 1.5 Overview
 
-- The search user interface is a dropdown menu.
+- The search user interface is activated upon click on the search term in the search box.
 - Autocomplete is implemented into the global search bar and shows suggestions for fields and string searches in the search user interface. 
 - A chipview design for the fields in the global search bar shall show the search key in separated boxes.
-- Search strings in the global search bar are already parsed with Lucene.
+- Search strings in the search field are already parsed with Lucene.
 
 
 ## 2. General description
@@ -50,15 +51,15 @@
 ### 2.1 Embedding
 
 - The search category fields from the dropdown menu can be chosen via mouseclick and added with a search key, they will be used in the global search bar.
-- The global search bar uses Lucene query syntax to run the search.
-- The global search bar uses the internal autocompletion which proposes search key results from the local database.
+- The search field uses Lucene query syntax to run the search.
+- The search field uses the internal autocompletion which proposes search key results from the local database.
 
 
 ### 2.2 Functional requirements
 
-| Features | | | | | |
-| :---:   | :-: | :-: | :-: | :-: | :-: |
-| MUST: | Global Search Bar | <s>Lucene Syntax</s> | Search User Interface | Chipview Design | Autocompletion |
+| Features | | | |
+| :---: | :---: | :---: | :---: | 
+| MUST: | Search User Interface | Chipview Design | Autocompletion |
 | SHOULD: | Highlighting | Recent Search |
 
 - <s>Lucene syntax</s>
@@ -68,18 +69,16 @@
 - Highlighting
 - Recent search
 
-
 ### 2.3 User profile
 
-- For all JabRefusers in all Languages, without special knowhow.
-- Target group of the JabRef software are researchers, PHD candidates, university members, students and the scientific community in general.
+- All JabRef users with basic know-how in field-based search.
+- Target group of the JabRef software are researchers, PhD candidates, university members, students and the scientific community in general.
 - For all supported operating systems (Linux, OS, Windows)
 
 ### 2.4 Limitations
 
 - Lucene has to be used for global search bar.
-- Chipview is required in the search bar.
-- Search bar is required to use autocomplete.
+- The speed of query evaluation depends on the current JabRef implementation and won't be altered.
 
 ### 2.5 Assumptions & Dependencies
 
@@ -119,8 +118,7 @@
   - /F42/ Words suggested by autocomplete should be color-coded in the suggestions.
   - /F43/ Autocomplete could correct typos and overwrite them.
 
-- /F50/ Highlighting the search key after a search properly should be implemented into JabRef.
-  - /F51/ Search keys should be highlighted red if not found in the global database.
+- /F50/ Red highlighting could be implemented for the search field if the search syntax is not valid.
 
 - /F60/ The recent search should be implemented as a dropdown menu.
   - /F61/ A clickable item corresponding to the recent search should be inside the global search bar. 
@@ -169,5 +167,5 @@
   * After selection of the author field an author field shows up in the global search bar. The cursor will be positioned to the right of this field. 
   * After typing in the author and selecting the OR field the position of the cursor is to the right again. 
   * After selecting the title field the cursor position changes to the right of this field once again. Typing in the title and pressing ENTER starts the search query which will be parsed with Lucene and passed on to the complex search query. The matched entries will show up in the main library pane. After clicking on an entry Metadata will show up; "Beat Schmutz" and "Morphological analysis" will be highlighted. 
-* Postconditions exception: The search finds no matching entries in the library. in this case the library pane stays empty or a pop-up could suggest that no entries were found.
+* Postconditions exception: The search finds no matching entries in the library. in this case the library pane stays empty.
 

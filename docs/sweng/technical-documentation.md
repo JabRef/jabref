@@ -1,13 +1,15 @@
 # Technical Documentation
 
-| Project Overview | | | | | |
-| :---: | :-: | :-: | :-: | :-: | :-: |
+| Project Overview  | | | | | |
+| :---: | :---: | :---: | :---: | :---: | :---: |
 | Version | Project Name | Authors | Status | Date | Comment |
-| 0.1 | Better Search | MS, DM, JB, AJ | In Progress | 10.11.2021 | 
+| 0.1 | Better Search | MS, DM, JB, AJ | In Progress | 2021-11-20 | |
 
 | Project Members | | | |
 | :---: | :---: | :---: | :---: |
 | Julian Bopp | Albert Jasari | Daniel Madoery | Mark Starzynski
+
+
 
 ## 1 Introduction
 
