@@ -1,4 +1,4 @@
-package org.jabref.gui.newlibraryproperties.saving;
+package org.jabref.gui.libraryproperties.saving;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -13,7 +13,7 @@ import javafx.beans.property.SimpleListProperty;
 import javafx.collections.FXCollections;
 
 import org.jabref.gui.commonfxcontrols.SortCriterionViewModel;
-import org.jabref.gui.newlibraryproperties.PropertiesTabViewModel;
+import org.jabref.gui.libraryproperties.PropertiesTabViewModel;
 import org.jabref.logic.cleanup.Cleanups;
 import org.jabref.logic.cleanup.FieldFormatterCleanup;
 import org.jabref.logic.cleanup.FieldFormatterCleanups;

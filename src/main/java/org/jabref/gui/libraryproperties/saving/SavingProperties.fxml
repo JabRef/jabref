@@ -7,7 +7,7 @@
 <?import org.jabref.gui.commonfxcontrols.SaveOrderConfigPanel?>
 <fx:root spacing="10.0" type="VBox"
          xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
-         fx:controller="org.jabref.gui.newlibraryproperties.saving.SavingPropertiesView">
+         fx:controller="org.jabref.gui.libraryproperties.saving.SavingPropertiesView">
     <Label styleClass="sectionHeader" text="%Library protection"/>
     <CheckBox fx:id="protect"
               text="%Refuse to save the library before external changes have been reviewed."/>

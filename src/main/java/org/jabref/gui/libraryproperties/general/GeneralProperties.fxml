@@ -10,7 +10,7 @@
 <?import javafx.scene.layout.VBox?>
 <fx:root spacing="10.0" type="VBox"
          xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
-         fx:controller="org.jabref.gui.newlibraryproperties.general.GeneralPropertiesView">
+         fx:controller="org.jabref.gui.libraryproperties.general.GeneralPropertiesView">
     <GridPane hgap="10.0" vgap="4.0">
         <columnConstraints>
             <ColumnConstraints/>

@@ -1,11 +1,11 @@
-package org.jabref.gui.newlibraryproperties;
+package org.jabref.gui.libraryproperties;
 
 import javafx.beans.property.ReadOnlyListWrapper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
-import org.jabref.gui.newlibraryproperties.general.GeneralPropertiesView;
-import org.jabref.gui.newlibraryproperties.saving.SavingPropertiesView;
+import org.jabref.gui.libraryproperties.general.GeneralPropertiesView;
+import org.jabref.gui.libraryproperties.saving.SavingPropertiesView;
 import org.jabref.model.database.BibDatabaseContext;
 
 public class LibraryPropertiesViewModel {

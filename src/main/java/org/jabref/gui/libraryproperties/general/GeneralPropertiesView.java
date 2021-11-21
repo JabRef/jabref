@@ -1,4 +1,4 @@
-package org.jabref.gui.newlibraryproperties.general;
+package org.jabref.gui.libraryproperties.general;
 
 import java.nio.charset.Charset;
 
@@ -8,8 +8,8 @@ import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 
-import org.jabref.gui.newlibraryproperties.AbstractPropertiesTabView;
-import org.jabref.gui.newlibraryproperties.PropertiesTab;
+import org.jabref.gui.libraryproperties.AbstractPropertiesTabView;
+import org.jabref.gui.libraryproperties.PropertiesTab;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;

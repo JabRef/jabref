@@ -1,4 +1,4 @@
-package org.jabref.gui.newlibraryproperties.general;
+package org.jabref.gui.libraryproperties.general;
 
 import java.nio.charset.Charset;
 import java.nio.file.Path;
@@ -14,7 +14,7 @@ import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.newlibraryproperties.PropertiesTabViewModel;
+import org.jabref.gui.libraryproperties.PropertiesTabViewModel;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.logic.l10n.Encodings;
 import org.jabref.logic.shared.DatabaseLocation;

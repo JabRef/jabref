@@ -1,4 +1,4 @@
-package org.jabref.gui.newlibraryproperties;
+package org.jabref.gui.libraryproperties;
 
 import javafx.scene.Node;
 
