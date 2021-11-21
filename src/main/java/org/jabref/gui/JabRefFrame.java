@@ -98,11 +98,11 @@ import org.jabref.gui.integrity.IntegrityCheckAction;
 import org.jabref.gui.journals.AbbreviateAction;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.keyboard.KeyBindingRepository;
-import org.jabref.gui.libraryproperties.LibraryPropertiesAction;
 import org.jabref.gui.menus.FileHistoryMenu;
 import org.jabref.gui.mergeentries.MergeEntriesAction;
 import org.jabref.gui.metadata.BibtexStringEditorAction;
 import org.jabref.gui.metadata.PreambleEditor;
+import org.jabref.gui.newlibraryproperties.LibraryPropertiesAction;
 import org.jabref.gui.preferences.ShowPreferencesAction;
 import org.jabref.gui.preview.CopyCitationAction;
 import org.jabref.gui.push.PushToApplicationAction;
@@ -776,7 +776,7 @@ public class JabRefFrame extends BorderPane {
 
                 new SeparatorMenuItem(),
 
-                factory.createMenuItem(StandardActions.LIBRARY_PROPERTIES, new LibraryPropertiesAction(this, stateManager)),
+                factory.createMenuItem(StandardActions.LIBRARY_PROPERTIES, new LibraryPropertiesAction(this.getCurrentLibraryTab(), stateManager)),
                 factory.createMenuItem(StandardActions.EDIT_PREAMBLE, new PreambleEditor(stateManager, undoManager, this.getDialogService())),
                 factory.createMenuItem(StandardActions.EDIT_STRINGS, new BibtexStringEditorAction(stateManager)),
                 factory.createMenuItem(StandardActions.MANAGE_CITE_KEY_PATTERNS, new CitationKeyPatternAction(this, stateManager))

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.ButtonType?>
+<?import javafx.scene.control.DialogPane?>
+<DialogPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="org.jabref.gui.newlibraryproperties.LibraryPropertiesView"
+            prefHeight="400.0" prefWidth="600.0">
+    <ButtonType fx:id="saveButton" text="%Save" buttonData="OK_DONE"/>
+    <ButtonType fx:constant="CANCEL"/>
+</DialogPane>
