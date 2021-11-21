@@ -776,7 +776,7 @@ public class JabRefFrame extends BorderPane {
 
                 new SeparatorMenuItem(),
 
-                factory.createMenuItem(StandardActions.LIBRARY_PROPERTIES, new LibraryPropertiesAction(this.getCurrentLibraryTab(), stateManager)),
+                factory.createMenuItem(StandardActions.LIBRARY_PROPERTIES, new LibraryPropertiesAction(stateManager)),
                 factory.createMenuItem(StandardActions.EDIT_PREAMBLE, new PreambleEditor(stateManager, undoManager, this.getDialogService())),
                 factory.createMenuItem(StandardActions.EDIT_STRINGS, new BibtexStringEditorAction(stateManager)),
                 factory.createMenuItem(StandardActions.MANAGE_CITE_KEY_PATTERNS, new CitationKeyPatternAction(this, stateManager))
