@@ -17,6 +17,9 @@ public class RecentSearch {
 
     public void add(String Query) {
         RecentSearches.getItems().removeIf(entry -> entry.equals(Query));
+        if (Query.equals("")) {
+            return;
+        }
 
         this.RecentSearches.getItems().add(Query);
     }
