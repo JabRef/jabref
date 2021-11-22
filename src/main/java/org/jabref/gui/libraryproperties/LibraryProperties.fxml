@@ -9,6 +9,6 @@
     <content>
         <TabPane fx:id="tabPane" tabClosingPolicy="UNAVAILABLE"/>
     </content>
-    <ButtonType fx:id="saveButton" text="%Save" buttonData="OK_DONE"/>
+    <ButtonType fx:id="saveButton" text="%Apply" buttonData="OK_DONE"/>
     <ButtonType fx:constant="CANCEL"/>
 </DialogPane>
