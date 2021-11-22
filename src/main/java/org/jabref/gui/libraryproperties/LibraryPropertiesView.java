@@ -1,14 +1,11 @@
 package org.jabref.gui.libraryproperties;
 
-import javax.inject.Inject;
-
 import javafx.fxml.FXML;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 
-import org.jabref.gui.DialogService;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.logic.l10n.Localization;
@@ -20,8 +17,6 @@ public class LibraryPropertiesView extends BaseDialog<LibraryPropertiesViewModel
 
     public TabPane tabPane;
     @FXML private ButtonType saveButton;
-
-    @Inject private DialogService dialogService;
 
     private final BibDatabaseContext databaseContext;
     private LibraryPropertiesViewModel viewModel;
@@ -47,8 +42,11 @@ public class LibraryPropertiesView extends BaseDialog<LibraryPropertiesViewModel
             scrollPane.setFitToHeight(true);
             scrollPane.setFitToWidth(true);
             tabPane.getTabs().add(new Tab(pane.getTabName(), scrollPane));
-            ((AbstractPropertiesTabView<?>) pane).prefWidthProperty().bind(tabPane.widthProperty());
-            ((AbstractPropertiesTabView<?>) pane).getStyleClass().add("propertiesTab");
+            if (pane instanceof AbstractPropertiesTabView<?> propertiesTab) {
+                propertiesTab.prefHeightProperty().bind(tabPane.tabMaxHeightProperty());
+                propertiesTab.prefWidthProperty().bind(tabPane.widthProperty());
+                propertiesTab.getStyleClass().add("propertiesTab");
+            }
         }
 
         viewModel.setValues();
