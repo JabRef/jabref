@@ -4,6 +4,7 @@ import javafx.beans.property.ReadOnlyListWrapper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
+import org.jabref.gui.libraryproperties.constants.ConstantsPropertiesView;
 import org.jabref.gui.libraryproperties.general.GeneralPropertiesView;
 import org.jabref.gui.libraryproperties.saving.SavingPropertiesView;
 import org.jabref.model.database.BibDatabaseContext;
@@ -16,7 +17,8 @@ public class LibraryPropertiesViewModel {
 
         propertiesTabs = FXCollections.observableArrayList(
                 new GeneralPropertiesView(databaseContext),
-                new SavingPropertiesView(databaseContext)
+                new SavingPropertiesView(databaseContext),
+                new ConstantsPropertiesView(databaseContext)
         );
     }
 

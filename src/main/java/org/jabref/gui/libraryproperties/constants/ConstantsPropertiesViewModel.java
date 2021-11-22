@@ -1,4 +1,4 @@
-package org.jabref.gui.metadata;
+package org.jabref.gui.libraryproperties.constants;
 
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -11,76 +11,79 @@ import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
-import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.help.HelpAction;
+import org.jabref.gui.libraryproperties.PropertiesTabViewModel;
 import org.jabref.logic.bibtex.comparator.BibtexStringComparator;
 import org.jabref.logic.help.HelpFile;
-import org.jabref.model.database.BibDatabase;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibtexString;
 
 import com.tobiasdiez.easybind.EasyBind;
 
-public class BibtexStringEditorDialogViewModel extends AbstractViewModel {
+public class ConstantsPropertiesViewModel implements PropertiesTabViewModel {
+
     private static final String NEW_STRING_LABEL = "NewString"; // must not contain spaces
 
-    private final ListProperty<BibtexStringEditorItemModel> stringsListProperty =
+    private final ListProperty<ConstantsItemModel> stringsListProperty =
             new SimpleListProperty<>(FXCollections.observableArrayList());
 
-    private final BibDatabase bibDatabase;
     private final BooleanProperty validProperty = new SimpleBooleanProperty();
 
-    public BibtexStringEditorDialogViewModel(BibDatabase bibDatabase) {
-        this.bibDatabase = bibDatabase;
-        addAllStringsFromDB();
+    private final BibDatabaseContext databaseContext;
+
+    public ConstantsPropertiesViewModel(BibDatabaseContext databaseContext) {
+        this.databaseContext = databaseContext;
 
         ObservableList<ObservableValue<Boolean>> allValidProperty =
-                EasyBind.map(stringsListProperty(), BibtexStringEditorItemModel::combinedValidationValidProperty);
+                EasyBind.map(stringsListProperty, ConstantsItemModel::combinedValidationValidProperty);
         validProperty.bind(EasyBind.combine(allValidProperty, stream -> stream.allMatch(valid -> valid)));
     }
 
-    private void addAllStringsFromDB() {
-        stringsListProperty.addAll(bibDatabase.getStringValues().stream()
-                                              .sorted(new BibtexStringComparator(false))
-                                              .map(this::convertFromBibTexString)
-                                              .collect(Collectors.toSet()));
+    @Override
+    public void setValues() {
+        stringsListProperty.addAll(databaseContext.getDatabase().getStringValues().stream()
+                                                  .sorted(new BibtexStringComparator(false))
+                                                  .map(this::convertFromBibTexString)
+                                                  .collect(Collectors.toSet()));
     }
 
     public void addNewString() {
-        BibtexStringEditorItemModel newItem;
+        ConstantsItemModel newItem;
         if (labelAlreadyExists(NEW_STRING_LABEL).isPresent()) {
             int i = 1;
             while (labelAlreadyExists(NEW_STRING_LABEL + i).isPresent()) {
                 i++;
             }
-            newItem = new BibtexStringEditorItemModel(NEW_STRING_LABEL + i, "");
+            newItem = new ConstantsItemModel(NEW_STRING_LABEL + i, "");
         } else {
-            newItem = new BibtexStringEditorItemModel(NEW_STRING_LABEL, "");
+            newItem = new ConstantsItemModel(NEW_STRING_LABEL, "");
         }
 
         stringsListProperty.add(newItem);
     }
 
-    public void removeString(BibtexStringEditorItemModel item) {
+    public void removeString(ConstantsItemModel item) {
         stringsListProperty.remove(item);
     }
 
-    private BibtexStringEditorItemModel convertFromBibTexString(BibtexString bibtexString) {
-        return new BibtexStringEditorItemModel(bibtexString.getName(), bibtexString.getContent());
+    private ConstantsItemModel convertFromBibTexString(BibtexString bibtexString) {
+        return new ConstantsItemModel(bibtexString.getName(), bibtexString.getContent());
     }
 
-    public void save() {
-        bibDatabase.setStrings(stringsListProperty.stream()
+    @Override
+    public void storeSettings() {
+        databaseContext.getDatabase().setStrings(stringsListProperty.stream()
                                                   .map(this::fromBibtexStringViewModel)
                                                   .collect(Collectors.toList()));
     }
 
-    private BibtexString fromBibtexStringViewModel(BibtexStringEditorItemModel viewModel) {
+    private BibtexString fromBibtexStringViewModel(ConstantsItemModel viewModel) {
         String label = viewModel.labelProperty().getValue();
         String content = viewModel.contentProperty().getValue();
         return new BibtexString(label, content);
     }
 
-    public Optional<BibtexStringEditorItemModel> labelAlreadyExists(String label) {
+    public Optional<ConstantsItemModel> labelAlreadyExists(String label) {
         return stringsListProperty.stream()
                                   .filter(item -> item.labelProperty().getValue().equals(label))
                                   .findFirst();
@@ -90,7 +93,7 @@ public class BibtexStringEditorDialogViewModel extends AbstractViewModel {
         HelpAction.openHelpPage(HelpFile.STRING_EDITOR);
     }
 
-    public ListProperty<BibtexStringEditorItemModel> stringsListProperty() {
+    public ListProperty<ConstantsItemModel> stringsListProperty() {
         return stringsListProperty;
     }
 
