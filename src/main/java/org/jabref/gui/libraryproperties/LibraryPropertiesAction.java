@@ -1,7 +1,5 @@
 package org.jabref.gui.libraryproperties;
 
-import java.util.Optional;
-
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
@@ -17,25 +15,24 @@ public class LibraryPropertiesAction extends SimpleCommand {
     private static final Logger LOGGER = LoggerFactory.getLogger(LibraryPropertiesAction.class);
 
     private final StateManager stateManager;
-    private final Optional<BibDatabaseContext> alternateDatabase;
+    private final BibDatabaseContext alternateDatabase;
 
     public LibraryPropertiesAction(StateManager stateManager) {
-        this.stateManager = stateManager;
+        this(null, stateManager);
         this.executable.bind(needsDatabase(stateManager));
-        this.alternateDatabase = Optional.empty();
     }
 
     public LibraryPropertiesAction(BibDatabaseContext databaseContext, StateManager stateManager) {
         this.stateManager = stateManager;
-        this.alternateDatabase = Optional.ofNullable(databaseContext);
+        this.alternateDatabase = databaseContext;
     }
 
     @Override
     public void execute() {
         DialogService dialogService = Injector.instantiateModelOrService(DialogService.class);
 
-        if (alternateDatabase.isPresent()) {
-            dialogService.showCustomDialogAndWait(new LibraryPropertiesView(alternateDatabase.get()));
+        if (alternateDatabase != null) {
+            dialogService.showCustomDialogAndWait(new LibraryPropertiesView(alternateDatabase));
         } else {
             if (stateManager.getActiveDatabase().isPresent()) {
                 dialogService.showCustomDialogAndWait(new LibraryPropertiesView(stateManager.getActiveDatabase().get()));

@@ -30,7 +30,11 @@ public class LibraryPropertiesView extends BaseDialog<LibraryPropertiesViewModel
 
         ControlHelper.setAction(saveButton, getDialogPane(), event -> savePreferencesAndCloseDialog());
 
-        setTitle(Localization.lang("Library properties"));
+        if (databaseContext.getDatabasePath().isPresent()) {
+            setTitle(Localization.lang("%0 - Library properties", databaseContext.getDatabasePath().get().getFileName()));
+        } else {
+            setTitle(Localization.lang("Library properties"));
+        }
     }
 
     @FXML

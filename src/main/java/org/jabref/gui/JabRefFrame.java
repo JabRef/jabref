@@ -1044,6 +1044,7 @@ public class JabRefFrame extends BorderPane {
         ActionFactory factory = new ActionFactory(keyBindingRepository);
 
         contextMenu.getItems().addAll(
+                factory.createMenuItem(StandardActions.LIBRARY_PROPERTIES, new LibraryPropertiesAction(tab.getBibDatabaseContext(), stateManager)),
                 factory.createMenuItem(StandardActions.OPEN_DATABASE_FOLDER, new OpenDatabaseFolder(tab.getBibDatabaseContext())),
                 factory.createMenuItem(StandardActions.OPEN_CONSOLE, new OpenConsoleAction(tab.getBibDatabaseContext(), stateManager, prefs)),
                 new SeparatorMenuItem(),
