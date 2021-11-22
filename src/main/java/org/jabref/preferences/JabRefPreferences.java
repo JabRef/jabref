@@ -314,10 +314,7 @@ public class JabRefPreferences implements PreferencesService {
 
     // Special field preferences
     public static final String SPECIALFIELDSENABLED = "specialFieldsEnabled";
-    // The choice between AUTOSYNCSPECIALFIELDSTOKEYWORDS and SERIALIZESPECIALFIELDS is mutually exclusive
-    // At least in the settings, not in the implementation. But having both confused the users, therefore, having activated both options at the same time has been disabled
-    public static final String SERIALIZESPECIALFIELDS = "serializeSpecialFields";
-    public static final String AUTOSYNCSPECIALFIELDSTOKEYWORDS = "autoSyncSpecialFieldsToKeywords";
+
     // Prefs node for CitationKeyPatterns
     public static final String CITATION_KEY_PATTERNS_NODE = "bibtexkeypatterns";
     // Prefs node for customized entry types
@@ -447,6 +444,9 @@ public class JabRefPreferences implements PreferencesService {
     private SearchPreferences searchPreferences;
     private AutoLinkPreferences autoLinkPreferences;
     private ImportExportPreferences importExportPreferences;
+    private NameFormatterPreferences nameFormatterPreferences;
+    private VersionPreferences versionPreferences;
+    private SpecialFieldsPreferences specialFieldsPreferences;
 
     // The constructor is made private to enforce this as a singleton class:
     private JabRefPreferences() {
@@ -620,8 +620,6 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(OO_EXTERNAL_STYLE_FILES, "");
 
         defaults.put(SPECIALFIELDSENABLED, Boolean.TRUE);
-        defaults.put(AUTOSYNCSPECIALFIELDSTOKEYWORDS, Boolean.FALSE);
-        defaults.put(SERIALIZESPECIALFIELDS, Boolean.TRUE);
 
         defaults.put(USE_OWNER, Boolean.FALSE);
         defaults.put(OVERWRITE_OWNER, Boolean.FALSE);
@@ -809,22 +807,6 @@ public class JabRefPreferences implements PreferencesService {
             storage.put(CLEANUP + action.name(), !deactivatedJobs.contains(action));
         }
         storage.put(CLEANUP_FORMATTERS, convertListToString(Cleanups.DEFAULT_SAVE_ACTIONS.getAsStringList(OS.NEWLINE)));
-    }
-
-    @Override
-    public String getUser() {
-        if (StringUtil.isNotBlank(userName)) {
-            return userName;
-        }
-
-        try {
-            userName = get(DEFAULT_OWNER) + '-' + InetAddress.getLocalHost().getHostName();
-            return userName;
-        } catch (UnknownHostException ex) {
-            LOGGER.error("Hostname not found. Please go to https://docs.jabref.org/ to find possible " +
-                    "problem resolution", ex);
-            return get(DEFAULT_OWNER);
-        }
     }
 
     public void setLanguageDependentDefaultValues() {
@@ -1135,13 +1117,15 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public VersionPreferences getVersionPreferences() {
-        Version ignoredVersion = Version.parse(get(VERSION_IGNORED_UPDATE));
-        return new VersionPreferences(ignoredVersion);
-    }
+        if (Objects.nonNull(versionPreferences)) {
+            return versionPreferences;
+        }
 
-    @Override
-    public void storeVersionPreferences(VersionPreferences versionPreferences) {
-        put(VERSION_IGNORED_UPDATE, versionPreferences.getIgnoredVersion().toString());
+        versionPreferences = new VersionPreferences(Version.parse(get(VERSION_IGNORED_UPDATE)));
+
+        EasyBind.listen(versionPreferences.ignoredVersionProperty(), (obs, oldValue, newValue) -> put(VERSION_IGNORED_UPDATE, newValue.toString()));
+
+        return versionPreferences;
     }
 
     @Override
@@ -2084,8 +2068,7 @@ public class JabRefPreferences implements PreferencesService {
                 getCitationKeyPatternPreferences(),
                 getFieldContentParserPreferences(),
                 getXmpPreferences(),
-                getDOIPreferences(),
-                getSpecialFieldsPreferences().isKeywordSyncEnabled());
+                getDOIPreferences());
     }
 
     @Override
@@ -2202,16 +2185,6 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     @Override
-    public Path getWorkingDir() {
-        return Path.of(get(WORKING_DIRECTORY));
-    }
-
-    @Override
-    public void setWorkingDirectory(Path directory) {
-        put(WORKING_DIRECTORY, directory.toString());
-    }
-
-    @Override
     public FilePreferences getFilePreferences() {
         if (Objects.nonNull(filePreferences)) {
             return filePreferences;
@@ -2223,7 +2196,8 @@ public class JabRefPreferences implements PreferencesService {
                 getBoolean(STORE_RELATIVE_TO_BIB),
                 get(IMPORT_FILENAMEPATTERN),
                 get(IMPORT_FILEDIRPATTERN),
-                getBoolean(DOWNLOAD_LINKED_FILES)
+                getBoolean(DOWNLOAD_LINKED_FILES),
+                Path.of(get(WORKING_DIRECTORY))
         );
 
         EasyBind.listen(filePreferences.mainFileDirectoryProperty(), (obs, oldValue, newValue) -> put(MAIN_FILE_DIRECTORY, filePreferences.getFileDirectory().map(Path::toString).orElse("")));
@@ -2231,8 +2205,24 @@ public class JabRefPreferences implements PreferencesService {
         EasyBind.listen(filePreferences.fileNamePatternProperty(), (obs, oldValue, newValue) -> put(IMPORT_FILENAMEPATTERN, newValue));
         EasyBind.listen(filePreferences.fileDirectoryPatternProperty(), (obs, oldValue, newValue) -> put(IMPORT_FILEDIRPATTERN, newValue));
         EasyBind.listen(filePreferences.downloadLinkedFilesProperty(), (obs, oldValue, newValue) -> putBoolean(DOWNLOAD_LINKED_FILES, newValue));
+        EasyBind.listen(filePreferences.workingDirectoryProperty(), (obs, oldValue, newValue) -> put(WORKING_DIRECTORY, newValue.toString()));
 
         return filePreferences;
+    }
+
+    private String getUser() {
+        if (StringUtil.isNotBlank(userName)) {
+            return userName;
+        }
+
+        try {
+            userName = get(DEFAULT_OWNER) + '-' + InetAddress.getLocalHost().getHostName();
+            return userName;
+        } catch (UnknownHostException ex) {
+            LOGGER.error("Hostname not found. Please go to https://docs.jabref.org/ to find possible " +
+                    "problem resolution", ex);
+            return get(DEFAULT_OWNER);
+        }
     }
 
     @Override
@@ -2667,15 +2657,20 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public NameFormatterPreferences getNameFormatterPreferences() {
-        return new NameFormatterPreferences(
+        if (Objects.nonNull(nameFormatterPreferences)) {
+            return nameFormatterPreferences;
+        }
+
+        nameFormatterPreferences = new NameFormatterPreferences(
                 getStringList(NAME_FORMATER_KEY),
                 getStringList(NAME_FORMATTER_VALUE));
-    }
 
-    @Override
-    public void storeNameFormatterPreferences(NameFormatterPreferences preferences) {
-        putStringList(NAME_FORMATER_KEY, preferences.getNameFormatterKey());
-        putStringList(NAME_FORMATTER_VALUE, preferences.getNameFormatterValue());
+        nameFormatterPreferences.getNameFormatterKey().addListener((InvalidationListener) change ->
+                putStringList(NAME_FORMATER_KEY, nameFormatterPreferences.getNameFormatterKey()));
+        nameFormatterPreferences.getNameFormatterValue().addListener((InvalidationListener) change ->
+                putStringList(NAME_FORMATTER_VALUE, nameFormatterPreferences.getNameFormatterValue()));
+
+        return nameFormatterPreferences;
     }
 
     @Override
@@ -2715,17 +2710,15 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public SpecialFieldsPreferences getSpecialFieldsPreferences() {
-        return new SpecialFieldsPreferences(
-                getBoolean(SPECIALFIELDSENABLED),
-                getBoolean(AUTOSYNCSPECIALFIELDSTOKEYWORDS),
-                getBoolean(SERIALIZESPECIALFIELDS));
-    }
+        if (Objects.nonNull(specialFieldsPreferences)) {
+            return specialFieldsPreferences;
+        }
 
-    @Override
-    public void storeSpecialFieldsPreferences(SpecialFieldsPreferences specialFieldsPreferences) {
-        putBoolean(SPECIALFIELDSENABLED, specialFieldsPreferences.isSpecialFieldsEnabled());
-        putBoolean(AUTOSYNCSPECIALFIELDSTOKEYWORDS, specialFieldsPreferences.shouldAutoSyncSpecialFieldsToKeyWords());
-        putBoolean(SERIALIZESPECIALFIELDS, specialFieldsPreferences.shouldSerializeSpecialFields());
+        specialFieldsPreferences = new SpecialFieldsPreferences(getBoolean(SPECIALFIELDSENABLED));
+
+        EasyBind.listen(specialFieldsPreferences.specialFieldsEnabledProperty(), (obs, oldValue, newValue) -> putBoolean(SPECIALFIELDSENABLED, newValue));
+
+        return specialFieldsPreferences;
     }
 
     @Override

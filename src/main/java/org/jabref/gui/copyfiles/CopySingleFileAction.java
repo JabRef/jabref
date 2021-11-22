@@ -14,40 +14,40 @@ import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.util.OptionalUtil;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.FilePreferences;
 
 public class CopySingleFileAction extends SimpleCommand {
 
     private final LinkedFile linkedFile;
     private final DialogService dialogService;
     private final BibDatabaseContext databaseContext;
-    private final PreferencesService preferencesService;
+    private final FilePreferences filePreferences;
 
     private final BiFunction<Path, Path, Path> resolvePathFilename = (path, file) -> path.resolve(file.getFileName());
 
-    public CopySingleFileAction(LinkedFile linkedFile, DialogService dialogService, BibDatabaseContext databaseContext, PreferencesService preferencesService) {
+    public CopySingleFileAction(LinkedFile linkedFile, DialogService dialogService, BibDatabaseContext databaseContext, FilePreferences filePreferences) {
         this.linkedFile = linkedFile;
         this.dialogService = dialogService;
         this.databaseContext = databaseContext;
-        this.preferencesService = preferencesService;
+        this.filePreferences = filePreferences;
 
         this.executable.bind(Bindings.createBooleanBinding(
                 () -> !linkedFile.isOnlineLink()
-                        && linkedFile.findIn(databaseContext, preferencesService.getFilePreferences()).isPresent(),
+                        && linkedFile.findIn(databaseContext, this.filePreferences).isPresent(),
                 linkedFile.linkProperty()));
     }
 
     @Override
     public void execute() {
         DirectoryDialogConfiguration dirDialogConfiguration = new DirectoryDialogConfiguration.Builder()
-                .withInitialDirectory(preferencesService.getWorkingDir())
+                .withInitialDirectory(filePreferences.getWorkingDirectory())
                 .build();
         Optional<Path> exportPath = dialogService.showDirectorySelectionDialog(dirDialogConfiguration);
         exportPath.ifPresent(this::copyFileToDestination);
     }
 
     private void copyFileToDestination(Path exportPath) {
-        Optional<Path> fileToExport = linkedFile.findIn(databaseContext, preferencesService.getFilePreferences());
+        Optional<Path> fileToExport = linkedFile.findIn(databaseContext, filePreferences);
         Optional<Path> newPath = OptionalUtil.combine(Optional.of(exportPath), fileToExport, resolvePathFilename);
 
         if (newPath.isPresent()) {

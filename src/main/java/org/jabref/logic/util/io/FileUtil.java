@@ -27,7 +27,6 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.util.OptionalUtil;
-import org.jabref.preferences.PreferencesService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -364,7 +363,7 @@ public class FileUtil {
      * @return True if file extension is ".bib", false otherwise
      */
     public static boolean isBibFile(Path file) {
-        return getFileExtension(file).filter(type -> "bib".equals(type)).isPresent();
+        return getFileExtension(file).filter("bib"::equals).isPresent();
     }
 
     /**
@@ -374,13 +373,13 @@ public class FileUtil {
      * @return True if file extension is ".bib", false otherwise
      */
     public static boolean isPDFFile(Path file) {
-        return getFileExtension(file).filter(type -> "pdf".equals(type)).isPresent();
+        return getFileExtension(file).filter("pdf"::equals).isPresent();
     }
 
     /**
      * @return Path of current panel database directory or the standard working directory in case the datbase was not saved yet
      */
-    public static Path getInitialDirectory(BibDatabaseContext databaseContext, PreferencesService preferencesService) {
-        return databaseContext.getDatabasePath().map(Path::getParent).orElse(preferencesService.getWorkingDir());
+    public static Path getInitialDirectory(BibDatabaseContext databaseContext, Path workingDirectory) {
+        return databaseContext.getDatabasePath().map(Path::getParent).orElse(workingDirectory);
     }
 }

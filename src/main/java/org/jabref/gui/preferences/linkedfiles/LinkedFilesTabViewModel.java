@@ -42,15 +42,13 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
     private final Validator mainFileDirValidator;
 
     private final DialogService dialogService;
-    private final PreferencesService preferences;
     private final FilePreferences filePreferences;
-    private final AutoLinkPreferences initialAutoLinkPreferences;
+    private final AutoLinkPreferences autoLinkPreferences;
 
     public LinkedFilesTabViewModel(DialogService dialogService, PreferencesService preferences) {
         this.dialogService = dialogService;
-        this.preferences = preferences;
         this.filePreferences = preferences.getFilePreferences();
-        this.initialAutoLinkPreferences = preferences.getAutoLinkPreferences();
+        this.autoLinkPreferences = preferences.getAutoLinkPreferences();
 
         mainFileDirValidator = new FunctionBasedValidator<>(
                 mainFileDirectoryProperty,
@@ -82,13 +80,13 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
         fileDirectoryPatternProperty.setValue(filePreferences.getFileDirectoryPattern());
 
         // Autolink preferences
-        switch (initialAutoLinkPreferences.getCitationKeyDependency()) {
+        switch (autoLinkPreferences.getCitationKeyDependency()) {
             case START -> autolinkFileStartsBibtexProperty.setValue(true);
             case EXACT -> autolinkFileExactBibtexProperty.setValue(true);
             case REGEX -> autolinkUseRegexProperty.setValue(true);
         }
 
-        autolinkRegexKeyProperty.setValue(initialAutoLinkPreferences.getRegularExpression());
+        autolinkRegexKeyProperty.setValue(autoLinkPreferences.getRegularExpression());
     }
 
     @Override
@@ -102,14 +100,14 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
 
         // Autolink preferences
         if (autolinkFileStartsBibtexProperty.getValue()) {
-            preferences.getAutoLinkPreferences().setCitationKeyDependency(AutoLinkPreferences.CitationKeyDependency.START);
+            autoLinkPreferences.setCitationKeyDependency(AutoLinkPreferences.CitationKeyDependency.START);
         } else if (autolinkFileExactBibtexProperty.getValue()) {
-            preferences.getAutoLinkPreferences().setCitationKeyDependency(AutoLinkPreferences.CitationKeyDependency.EXACT);
+            autoLinkPreferences.setCitationKeyDependency(AutoLinkPreferences.CitationKeyDependency.EXACT);
         } else if (autolinkUseRegexProperty.getValue()) {
-            preferences.getAutoLinkPreferences().setCitationKeyDependency(AutoLinkPreferences.CitationKeyDependency.REGEX);
+            autoLinkPreferences.setCitationKeyDependency(AutoLinkPreferences.CitationKeyDependency.REGEX);
         }
 
-        preferences.getAutoLinkPreferences().setRegularExpression(autolinkRegexKeyProperty.getValue());
+        autoLinkPreferences.setRegularExpression(autolinkRegexKeyProperty.getValue());
     }
 
     ValidationStatus mainFileDirValidationStatus() {

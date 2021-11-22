@@ -16,14 +16,14 @@ import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.protectedterms.ProtectedTermsList;
 import org.jabref.logic.util.StandardFileType;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.FilePreferences;
 
 public class NewProtectedTermsFileDialog extends BaseDialog<Void> {
 
     private final TextField newFile = new TextField();
     private final DialogService dialogService;
 
-    public NewProtectedTermsFileDialog(List<ProtectedTermsListItemModel> termsLists, DialogService dialogService, PreferencesService preferencesService) {
+    public NewProtectedTermsFileDialog(List<ProtectedTermsListItemModel> termsLists, DialogService dialogService, FilePreferences filePreferences) {
         this.dialogService = dialogService;
 
         this.setTitle(Localization.lang("New protected terms file"));
@@ -31,7 +31,7 @@ public class NewProtectedTermsFileDialog extends BaseDialog<Void> {
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                 .addExtensionFilter(Localization.lang("Protected terms file"), StandardFileType.TERMS)
                 .withDefaultExtension(Localization.lang("Protected terms file"), StandardFileType.TERMS)
-                .withInitialDirectory(preferencesService.getWorkingDir())
+                .withInitialDirectory(filePreferences.getWorkingDirectory())
                 .build();
 
         Button browse = new Button(Localization.lang("Browse"));

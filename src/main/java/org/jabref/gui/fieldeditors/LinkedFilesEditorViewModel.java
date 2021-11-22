@@ -137,7 +137,7 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
 
     public void addNewFile() {
         Path workingDirectory = databaseContext.getFirstExistingFileDir(preferences.getFilePreferences())
-                                               .orElse(preferences.getWorkingDir());
+                                               .orElse(preferences.getFilePreferences().getWorkingDirectory());
 
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                 .withInitialDirectory(workingDirectory)

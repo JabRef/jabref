@@ -133,6 +133,6 @@ public abstract class AbstractPushToApplication implements PushToApplication {
     }
 
     public PushToApplicationSettings getSettings(PushToApplication application, ObjectProperty<PushToApplicationPreferences> preferences) {
-        return new PushToApplicationSettings(application, dialogService, preferencesService, preferences);
+        return new PushToApplicationSettings(application, dialogService, preferencesService.getFilePreferences(), preferences);
     }
 }

@@ -75,7 +75,7 @@ public class LibraryPropertiesDialogViewModel {
         this.initialSaveOrderConfig = initialMetaData.getSaveOrderConfig().orElseGet(preferences::getExportSaveOrder);
 
         this.directoryDialogConfiguration = new DirectoryDialogConfiguration.Builder()
-                .withInitialDirectory(preferences.getWorkingDir()).build();
+                .withInitialDirectory(preferences.getFilePreferences().getWorkingDirectory()).build();
 
         setValues();
     }
@@ -88,8 +88,8 @@ public class LibraryPropertiesDialogViewModel {
         selectedEncodingPropety.setValue(initialMetaData.getEncoding().orElse(preferences.getGeneralPreferences().getDefaultEncoding()));
         selectedDatabaseModeProperty.setValue(initialMetaData.getMode().orElse(BibDatabaseMode.BIBLATEX));
         generalFileDirectoryProperty.setValue(initialMetaData.getDefaultFileDirectory().orElse("").trim());
-        userSpecificFileDirectoryProperty.setValue(initialMetaData.getUserFileDirectory(preferences.getUser()).orElse("").trim());
-        laTexFileDirectoryProperty.setValue(initialMetaData.getLatexFileDirectory(preferences.getUser()).map(Path::toString).orElse(""));
+        userSpecificFileDirectoryProperty.setValue(initialMetaData.getUserFileDirectory(preferences.getFilePreferences().getUser()).orElse("").trim());
+        laTexFileDirectoryProperty.setValue(initialMetaData.getLatexFileDirectory(preferences.getFilePreferences().getUser()).map(Path::toString).orElse(""));
         libraryProtectedProperty.setValue(initialMetaData.isProtected());
 
         // SaveOrderConfigPanel
@@ -134,16 +134,16 @@ public class LibraryPropertiesDialogViewModel {
 
         String userSpecificFileDirectory = userSpecificFileDirectoryProperty.getValue();
         if (userSpecificFileDirectory.isEmpty()) {
-            newMetaData.clearUserFileDirectory(preferences.getUser());
+            newMetaData.clearUserFileDirectory(preferences.getFilePreferences().getUser());
         } else {
-            newMetaData.setUserFileDirectory(preferences.getUser(), userSpecificFileDirectory);
+            newMetaData.setUserFileDirectory(preferences.getFilePreferences().getUser(), userSpecificFileDirectory);
         }
 
         String latexFileDirectory = laTexFileDirectoryProperty.getValue();
         if (latexFileDirectory.isEmpty()) {
-            newMetaData.clearLatexFileDirectory(preferences.getUser());
+            newMetaData.clearLatexFileDirectory(preferences.getFilePreferences().getUser());
         } else {
-            newMetaData.setLatexFileDirectory(preferences.getUser(), Path.of(latexFileDirectory));
+            newMetaData.setLatexFileDirectory(preferences.getFilePreferences().getUser(), Path.of(latexFileDirectory));
         }
 
         if (libraryProtectedProperty.getValue()) {
