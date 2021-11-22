@@ -600,7 +600,7 @@ public class StringUtil {
      * @return String with n spaces
      */
     public static String repeatSpaces(int n) {
-        return repeat(n, ' ');
+        return repeat(Math.max(n, 0), ' ');
     }
 
     /**

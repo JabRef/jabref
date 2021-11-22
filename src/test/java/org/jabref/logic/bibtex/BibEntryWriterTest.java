@@ -7,6 +7,7 @@ import java.nio.file.Path;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import org.jabref.logic.exporter.BibWriter;
 import org.jabref.logic.importer.ImportFormatPreferences;
@@ -18,6 +19,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.entry.types.UnknownEntryType;
@@ -26,6 +28,9 @@ import org.jabref.model.util.FileUpdateMonitor;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -464,7 +469,7 @@ class BibEntryWriterTest {
         Collection<BibEntry> entries = result.getDatabase().getEntries();
         BibEntry entry = entries.iterator().next();
 
-        // modify month field
+        // check month field
         Set<Field> fields = entry.getFields();
         assertTrue(fields.contains(StandardField.MONTH));
         assertEquals("#mar#", entry.getField(StandardField.MONTH).get());
@@ -473,6 +478,51 @@ class BibEntryWriterTest {
         bibEntryWriter.write(entry, bibWriter, BibDatabaseMode.BIBTEX);
 
         assertEquals(bibtexEntry, stringWriter.toString());
+    }
+
+    @Test
+    void customTypeCanBewritten() throws IOException {
+        // @formatter:off
+        String bibtexEntry = "@reference{Broecker1984,\n" +
+                "title = {International Center of Photography},\n" +
+                "subtitle = {Encyclopedia of Photography},\n" +
+                "editor = {Broecker, William L.},\n" +
+                "date = {1984},\n" +
+                "eprint = {305515791},\n" +
+                "eprinttype = {scribd},\n" +
+                "isbn = {0-517-55271-X},\n" +
+                "keywords = {g:photography, p:positive, c:silver, m:albumen, c:pigment, m:carbon, g:reference, c:encyclopedia},\n" +
+                "location = {New York},\n" +
+                "pagetotal = {678},\n" +
+                "publisher = {Crown},\n" +
+                "}\n";
+        // @formatter:on
+
+        // read in bibtex string
+        ParserResult result = new BibtexParser(importFormatPreferences, fileMonitor).parse(new StringReader(bibtexEntry));
+        Collection<BibEntry> entries = result.getDatabase().getEntries();
+        BibEntry entry = entries.iterator().next();
+
+        entry.setField(FieldFactory.parseField("location"), "NY");
+
+        // write out bibtex string
+        bibEntryWriter.write(entry, bibWriter, BibDatabaseMode.BIBTEX);
+
+        String expected = "@Reference{Broecker1984," + OS.NEWLINE +
+                "  date       = {1984}," + OS.NEWLINE +
+                "  editor     = {Broecker, William L.}," + OS.NEWLINE +
+                "  eprint     = {305515791}," + OS.NEWLINE +
+                "  eprinttype = {scribd}," + OS.NEWLINE +
+                "  isbn       = {0-517-55271-X}," + OS.NEWLINE +
+                "  keywords   = {g:photography, p:positive, c:silver, m:albumen, c:pigment, m:carbon, g:reference, c:encyclopedia}," + OS.NEWLINE +
+                "  location   = {NY}," + OS.NEWLINE +
+                "  pagetotal  = {678}," + OS.NEWLINE +
+                "  publisher  = {Crown}," + OS.NEWLINE +
+                "  subtitle   = {Encyclopedia of Photography}," + OS.NEWLINE +
+                "  title      = {International Center of Photography}," + OS.NEWLINE +
+                "}" + OS.NEWLINE;
+
+        assertEquals(expected, stringWriter.toString());
     }
 
     @Test
@@ -713,6 +763,24 @@ class BibEntryWriterTest {
         // @formatter:on
 
         assertEquals(expected1 + OS.NEWLINE + expected2, output);
-
     }
+
+    static Stream<Arguments> testGetFormattedFieldNameData() {
+        return Stream.of(
+                Arguments.of(" = ", "", 0),
+                Arguments.of("a = ", "a", 0),
+                Arguments.of("   = ", "", 2),
+                Arguments.of("a  = ", "a", 2),
+                Arguments.of("abc = ", "abc", 2),
+                Arguments.of("abcdef = ", "abcdef", 6)
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("testGetFormattedFieldNameData")
+    void testGetFormattedFieldName(String expected, String fieldName, int indent) {
+        Field field = FieldFactory.parseField(fieldName);
+        assertEquals(expected, bibEntryWriter.getFormattedFieldName(field, indent));
+    }
+
 }

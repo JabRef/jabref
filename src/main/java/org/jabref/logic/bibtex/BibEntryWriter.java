@@ -177,7 +177,7 @@ public class BibEntryWriter {
     }
 
     /**
-     * Get display version of a entry field.
+     * Get display version of an entry field.
      * <p>
      * BibTeX is case-insensitive therefore there is no difference between: howpublished, HOWPUBLISHED, HowPublished, etc.
      * <p>
@@ -188,8 +188,8 @@ public class BibEntryWriter {
      * @param field The name of the field.
      * @return The display version of the field name.
      */
-    private String getFormattedFieldName(Field field, int intention) {
+    static String getFormattedFieldName(Field field, int indent) {
         String fieldName = field.getName();
-        return fieldName.toLowerCase(Locale.ROOT) + StringUtil.repeatSpaces(intention - fieldName.length()) + " = ";
+        return fieldName.toLowerCase(Locale.ROOT) + StringUtil.repeatSpaces(indent - fieldName.length()) + " = ";
     }
 }
