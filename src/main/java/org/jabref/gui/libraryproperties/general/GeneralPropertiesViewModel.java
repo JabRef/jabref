@@ -54,7 +54,7 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
         this.initialMetaData = databaseContext.getMetaData();
 
         this.directoryDialogConfiguration = new DirectoryDialogConfiguration.Builder()
-                .withInitialDirectory(preferencesService.getWorkingDir()).build();
+                .withInitialDirectory(preferencesService.getFilePreferences().getWorkingDirectory()).build();
     }
 
     @Override
@@ -65,8 +65,8 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
         selectedEncodingProperty.setValue(initialMetaData.getEncoding().orElse(preferencesService.getGeneralPreferences().getDefaultEncoding()));
         selectedDatabaseModeProperty.setValue(initialMetaData.getMode().orElse(BibDatabaseMode.BIBLATEX));
         generalFileDirectoryProperty.setValue(initialMetaData.getDefaultFileDirectory().orElse("").trim());
-        userSpecificFileDirectoryProperty.setValue(initialMetaData.getUserFileDirectory(preferencesService.getUser()).orElse("").trim());
-        laTexFileDirectoryProperty.setValue(initialMetaData.getLatexFileDirectory(preferencesService.getUser()).map(Path::toString).orElse(""));
+        userSpecificFileDirectoryProperty.setValue(initialMetaData.getUserFileDirectory(preferencesService.getFilePreferences().getUser()).orElse("").trim());
+        laTexFileDirectoryProperty.setValue(initialMetaData.getLatexFileDirectory(preferencesService.getFilePreferences().getUser()).map(Path::toString).orElse(""));
 
         preambleProperty.setValue(databaseContext.getDatabase().getPreamble().orElse(""));
     }
@@ -87,16 +87,16 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
 
         String userSpecificFileDirectory = userSpecificFileDirectoryProperty.getValue();
         if (userSpecificFileDirectory.isEmpty()) {
-            newMetaData.clearUserFileDirectory(preferencesService.getUser());
+            newMetaData.clearUserFileDirectory(preferencesService.getFilePreferences().getUser());
         } else {
-            newMetaData.setUserFileDirectory(preferencesService.getUser(), userSpecificFileDirectory);
+            newMetaData.setUserFileDirectory(preferencesService.getFilePreferences().getUser(), userSpecificFileDirectory);
         }
 
         String latexFileDirectory = laTexFileDirectoryProperty.getValue();
         if (latexFileDirectory.isEmpty()) {
-            newMetaData.clearLatexFileDirectory(preferencesService.getUser());
+            newMetaData.clearLatexFileDirectory(preferencesService.getFilePreferences().getUser());
         } else {
-            newMetaData.setLatexFileDirectory(preferencesService.getUser(), Path.of(latexFileDirectory));
+            newMetaData.setLatexFileDirectory(preferencesService.getFilePreferences().getUser(), Path.of(latexFileDirectory));
         }
 
         databaseContext.setMetaData(newMetaData);
