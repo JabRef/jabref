@@ -55,8 +55,6 @@ public interface PreferencesService {
 
     VersionPreferences getVersionPreferences();
 
-    void storeVersionPreferences(VersionPreferences versionPreferences);
-
     JournalAbbreviationPreferences getJournalAbbreviationPreferences();
 
     void storeKeyBindingRepository(KeyBindingRepository keyBindingRepository);
@@ -94,8 +92,6 @@ public interface PreferencesService {
     SavePreferences getSavePreferencesForExport();
 
     SavePreferences getSavePreferences();
-
-    String getUser();
 
     SaveOrderConfig getExportSaveOrder();
 
@@ -288,17 +284,6 @@ public interface PreferencesService {
 
     void clearEditedFiles();
 
-    /**
-     * Gets the directory for file browsing dialogs. This ensures that each browse dialog starts in the last visited
-     * browse directory.
-     */
-    Path getWorkingDir();
-
-    /**
-     * Stores the directory for file browsing dialogs
-     */
-    void setWorkingDirectory(Path dir);
-
     //*************************************************************************************************************
     // Misc preferences
     //*************************************************************************************************************
@@ -309,15 +294,11 @@ public interface PreferencesService {
 
     NameFormatterPreferences getNameFormatterPreferences();
 
-    void storeNameFormatterPreferences(NameFormatterPreferences preferences);
-
     AutoCompletePreferences getAutoCompletePreferences();
 
     void storeAutoCompletePreferences(AutoCompletePreferences autoCompletePreferences);
 
     SpecialFieldsPreferences getSpecialFieldsPreferences();
-
-    void storeSpecialFieldsPreferences(SpecialFieldsPreferences specialFieldsPreferences);
 
     SearchPreferences getSearchPreferences();
 

@@ -4,7 +4,9 @@ import java.nio.file.Path;
 import java.util.Optional;
 
 import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
@@ -20,19 +22,22 @@ public class FilePreferences {
     private final StringProperty fileNamePattern = new SimpleStringProperty();
     private final StringProperty fileDirectoryPattern = new SimpleStringProperty();
     private final BooleanProperty downloadLinkedFiles = new SimpleBooleanProperty();
+    private final ObjectProperty<Path> workingDirectory = new SimpleObjectProperty<>();
 
     public FilePreferences(String user,
                            String mainFileDirectory,
                            boolean storeFilesRelativeToBibFile,
                            String fileNamePattern,
                            String fileDirectoryPattern,
-                           boolean downloadLinkedFiles) {
+                           boolean downloadLinkedFiles,
+                           Path workingDirectory) {
         this.user.setValue(user);
         this.mainFileDirectory.setValue(mainFileDirectory);
         this.storeFilesRelativeToBibFile.setValue(storeFilesRelativeToBibFile);
         this.fileNamePattern.setValue(fileNamePattern);
         this.fileDirectoryPattern.setValue(fileDirectoryPattern);
         this.downloadLinkedFiles.setValue(downloadLinkedFiles);
+        this.workingDirectory.setValue(workingDirectory);
     }
 
     public String getUser() { // Read only
@@ -101,5 +106,17 @@ public class FilePreferences {
 
     public void setDownloadLinkedFiles(boolean shouldDownloadLinkedFiles) {
         this.downloadLinkedFiles.set(shouldDownloadLinkedFiles);
+    }
+
+    public Path getWorkingDirectory() {
+        return workingDirectory.get();
+    }
+
+    public ObjectProperty<Path> workingDirectoryProperty() {
+        return workingDirectory;
+    }
+
+    public void setWorkingDirectory(Path workingDirectory) {
+        this.workingDirectory.set(workingDirectory);
     }
 }
