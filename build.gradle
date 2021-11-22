@@ -214,7 +214,7 @@ dependencies {
     testImplementation 'net.bytebuddy:byte-buddy-parent:1.12.1'
     testRuntimeOnly group: 'org.apache.logging.log4j', name: 'log4j-core', version: '3.0.0-SNAPSHOT'
     testRuntimeOnly group: 'org.apache.logging.log4j', name: 'log4j-jul', version: '3.0.0-SNAPSHOT'
-    testImplementation 'org.mockito:mockito-core:4.0.0'
+    testImplementation 'org.mockito:mockito-core:4.1.0'
     testImplementation 'org.xmlunit:xmlunit-core:2.8.3'
     testImplementation 'org.xmlunit:xmlunit-matchers:2.8.3'
     testRuntimeOnly 'com.tngtech.archunit:archunit-junit5-engine:0.22.0'
