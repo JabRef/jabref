@@ -21,6 +21,7 @@ import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.types.EntryTypeFactory;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.entry.types.UnknownEntryType;
 import org.jabref.model.util.DummyFileUpdateMonitor;
@@ -783,4 +784,18 @@ class BibEntryWriterTest {
         assertEquals(expected, bibEntryWriter.getFormattedFieldName(field, indent));
     }
 
+    static Stream<Arguments> testGetLengthOfLongestFieldNameData() {
+        return Stream.of(
+                Arguments.of(1, new BibEntry().withField(FieldFactory.parseField("t"), "t")),
+                Arguments.of(5, new BibEntry(EntryTypeFactory.parse("reference"))
+                        .withCitationKey("Broecker1984")
+                        .withField(StandardField.TITLE, "International Center of Photography}"))
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("testGetLengthOfLongestFieldNameData")
+    void testGetLengthOfLongestFieldName(int expected, BibEntry entry) {
+        assertEquals(expected, bibEntryWriter.getLengthOfLongestFieldName(entry));
+    }
 }

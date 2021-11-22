@@ -93,7 +93,7 @@ public class BibEntryWriter {
 
         Set<Field> written = new HashSet<>();
         written.add(InternalField.KEY_FIELD);
-        int indentation = getLengthOfLongestFieldName(entry);
+        final int indent = getLengthOfLongestFieldName(entry);
 
         Optional<BibEntryType> type = entryTypesManager.enrich(entry.getType(), bibDatabaseMode);
         if (type.isPresent()) {
@@ -106,7 +106,7 @@ public class BibEntryWriter {
                                              .collect(Collectors.toList());
 
             for (Field field : requiredFields) {
-                writeField(entry, out, field, indentation);
+                writeField(entry, out, field, indent);
             }
 
             // Then optional fields
@@ -118,7 +118,7 @@ public class BibEntryWriter {
                                              .collect(Collectors.toList());
 
             for (Field field : optionalFields) {
-                writeField(entry, out, field, indentation);
+                writeField(entry, out, field, indent);
             }
 
             written.addAll(requiredFields);
@@ -131,7 +131,7 @@ public class BibEntryWriter {
                                                 .collect(Collectors.toCollection(() -> new TreeSet<>(Comparator.comparing(Field::getName))));
 
         for (Field field : remainingFields) {
-            writeField(entry, out, field, indentation);
+            writeField(entry, out, field, indent);
         }
 
         // Finally, end the entry.
@@ -151,12 +151,13 @@ public class BibEntryWriter {
      * @param field the field
      * @throws IOException In case of an IO error
      */
-    private void writeField(BibEntry entry, BibWriter out, Field field, int indentation) throws IOException {
+    private void writeField(BibEntry entry, BibWriter out, Field field, int indent) throws IOException {
         Optional<String> value = entry.getField(field);
         // only write field if it is not empty
         // field.ifPresent does not work as an IOException may be thrown
         if (value.isPresent() && !value.get().trim().isEmpty()) {
-            out.write("  " + getFormattedFieldName(field, indentation));
+            out.write("  ");
+            out.write(getFormattedFieldName(field, indent));
             try {
                 out.write(fieldWriter.write(field, value.get()));
             } catch (InvalidFieldValueException ex) {
@@ -166,7 +167,7 @@ public class BibEntryWriter {
         }
     }
 
-    private int getLengthOfLongestFieldName(BibEntry entry) {
+    static int getLengthOfLongestFieldName(BibEntry entry) {
         Predicate<Field> isNotCitationKey = field -> !InternalField.KEY_FIELD.equals(field);
         return entry.getFields()
                     .stream()
