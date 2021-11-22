@@ -1970,7 +1970,7 @@ public class JabRefPreferences implements PreferencesService {
      * Reloads the ColumnSortOrder from scratch
      * @return
      */
-    private List<MainTableColumnModel> updateColumnSortOrder(String sortOrderList,  List<MainTableColumnModel> tableColumns) {
+    private List<MainTableColumnModel> updateColumnSortOrder(String sortOrderList, List<MainTableColumnModel> tableColumns) {
         List<MainTableColumnModel> columnsOrdered = new ArrayList<>();
         getStringList(sortOrderList).forEach(columnName ->
                 tableColumns.stream().filter(column ->
