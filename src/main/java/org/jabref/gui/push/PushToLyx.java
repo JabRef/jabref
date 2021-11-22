@@ -57,7 +57,7 @@ public class PushToLyx extends AbstractPushToApplication implements PushToApplic
 
     @Override
     public PushToApplicationSettings getSettings(PushToApplication application, ObjectProperty<PushToApplicationPreferences> preferences) {
-        return new PushToLyxSettings(application, dialogService, preferencesService, preferences);
+        return new PushToLyxSettings(application, dialogService, preferencesService.getFilePreferences(), preferences);
     }
 
     @Override
