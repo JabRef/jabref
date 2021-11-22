@@ -73,8 +73,8 @@ public class ConstantsPropertiesViewModel implements PropertiesTabViewModel {
     @Override
     public void storeSettings() {
         databaseContext.getDatabase().setStrings(stringsListProperty.stream()
-                                                  .map(this::fromBibtexStringViewModel)
-                                                  .collect(Collectors.toList()));
+                                                                    .map(this::fromBibtexStringViewModel)
+                                                                    .collect(Collectors.toList()));
     }
 
     private BibtexString fromBibtexStringViewModel(ConstantsItemModel viewModel) {

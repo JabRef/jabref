@@ -4,7 +4,6 @@ import javax.inject.Inject;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
-import javafx.scene.layout.AnchorPane;
 
 import org.jabref.gui.Globals;
 import org.jabref.gui.actions.ActionFactory;
@@ -25,7 +24,6 @@ public class KeyPatternPropertiesView extends AbstractPropertiesTabView<KeyPatte
 
     @FXML private Button keyPatternHelp;
     @FXML private CitationKeyPatternPanel bibtexKeyPatternTable;
-    @FXML private AnchorPane keyPatternContainer;
 
     @Inject private PreferencesService preferencesService;
     @Inject private BibEntryTypesManager bibEntryTypesManager;

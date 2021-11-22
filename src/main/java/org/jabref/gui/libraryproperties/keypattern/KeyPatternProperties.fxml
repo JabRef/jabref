@@ -15,7 +15,7 @@
         <Button fx:id="keyPatternHelp" prefWidth="20.0"/>
     </HBox>
     <Label text="%( Note: Press return to commit changes in the table! )"/>
-    <AnchorPane fx:id="keyPatternContainer" VBox.vgrow="ALWAYS">
+    <AnchorPane VBox.vgrow="ALWAYS">
         <CitationKeyPatternPanel fx:id="bibtexKeyPatternTable"
                                  AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
                                  AnchorPane.topAnchor="0.0" AnchorPane.bottomAnchor="0.0"/>

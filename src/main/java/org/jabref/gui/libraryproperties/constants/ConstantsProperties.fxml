@@ -12,9 +12,9 @@
          xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
          fx:controller="org.jabref.gui.libraryproperties.constants.ConstantsPropertiesView">
     <Label styleClass="sectionHeader" text="%String constants"/>
-    <HBox spacing="4.0">
+    <HBox spacing="4.0" VBox.vgrow="ALWAYS">
         <VBox spacing="4.0" HBox.hgrow="ALWAYS">
-            <TableView fx:id="stringsList">
+            <TableView fx:id="stringsList" VBox.vgrow="ALWAYS">
                 <columns>
                     <TableColumn fx:id="labelColumn" minWidth="75.0" text="%Label"/>
                     <TableColumn fx:id="contentColumn" minWidth="75.0" text="%Content"/>
