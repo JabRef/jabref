@@ -3,6 +3,8 @@ package org.jabref.gui.libraryproperties.general;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
 
+import javax.swing.undo.UndoManager;
+
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
@@ -15,6 +17,7 @@ import javafx.collections.FXCollections;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.libraryproperties.PropertiesTabViewModel;
+import org.jabref.gui.undo.UndoablePreambleChange;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.logic.l10n.Encodings;
 import org.jabref.logic.shared.DatabaseLocation;
@@ -33,6 +36,7 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
     private final StringProperty generalFileDirectoryProperty = new SimpleStringProperty("");
     private final StringProperty userSpecificFileDirectoryProperty = new SimpleStringProperty("");
     private final StringProperty laTexFileDirectoryProperty = new SimpleStringProperty("");
+    private final StringProperty preambleProperty = new SimpleStringProperty("");
 
     private final DialogService dialogService;
     private final PreferencesService preferencesService;
@@ -40,10 +44,12 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
     private final BibDatabaseContext databaseContext;
     private final MetaData initialMetaData;
     private final DirectoryDialogConfiguration directoryDialogConfiguration;
+    private final UndoManager undoManager;
 
-    GeneralPropertiesViewModel(BibDatabaseContext databaseContext, DialogService dialogService, PreferencesService preferencesService) {
+    GeneralPropertiesViewModel(BibDatabaseContext databaseContext, DialogService dialogService, PreferencesService preferencesService, UndoManager undoManager) {
         this.dialogService = dialogService;
         this.preferencesService = preferencesService;
+        this.undoManager = undoManager;
         this.databaseContext = databaseContext;
         this.initialMetaData = databaseContext.getMetaData();
 
@@ -61,6 +67,8 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
         generalFileDirectoryProperty.setValue(initialMetaData.getDefaultFileDirectory().orElse("").trim());
         userSpecificFileDirectoryProperty.setValue(initialMetaData.getUserFileDirectory(preferencesService.getUser()).orElse("").trim());
         laTexFileDirectoryProperty.setValue(initialMetaData.getLatexFileDirectory(preferencesService.getUser()).map(Path::toString).orElse(""));
+
+        preambleProperty.setValue(databaseContext.getDatabase().getPreamble().orElse(""));
     }
 
     @Override
@@ -92,6 +100,12 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
         }
 
         databaseContext.setMetaData(newMetaData);
+
+        String newPreamble = preambleProperty.getValue();
+        if (!databaseContext.getDatabase().getPreamble().orElse("").equals(newPreamble)) {
+            undoManager.addEdit(new UndoablePreambleChange(databaseContext.getDatabase(), databaseContext.getDatabase().getPreamble().orElse(null), newPreamble));
+            databaseContext.getDatabase().setPreamble(newPreamble);
+        }
     }
 
     public void browseGeneralDir() {
@@ -139,5 +153,9 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
 
     public StringProperty laTexFileDirectoryProperty() {
         return this.laTexFileDirectoryProperty;
+    }
+
+    public StringProperty preambleProperty() {
+        return this.preambleProperty;
     }
 }
