@@ -138,7 +138,7 @@ public class StringUtil {
             return "";
         }
 
-        int updatedFrom = Math.max(from, 0);
+        int updatedFrom = Math.max(0, from);
         int updatedTo = Math.min(strings.length, to);
 
         StringBuilder stringBuilder = new StringBuilder();
@@ -600,7 +600,7 @@ public class StringUtil {
      * @return String with n spaces
      */
     public static String repeatSpaces(int n) {
-        return repeat(Math.max(n, 0), ' ');
+        return repeat(Math.max(0, n), ' ');
     }
 
     /**
