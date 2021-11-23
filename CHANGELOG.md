@@ -51,6 +51,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We present options to manually enter an article or return to the New Entry menu when the fetcher DOI fails to find an entry for an ID [#7870](https://github.com/JabRef/jabref/issues/7870)
 - We trim white space and non-ASCII characters from DOI [#8127](https://github.com/JabRef/jabref/issues/8127)
 - The duplicate checker now inspects other fields in case no difference in the required and optional fields are found.
+- We reworked the library properties dialog and integrated the `Library > Preamble`, `Library > Citation key pattern` and `Library > String constants dialogs` [#8264](https://github.com/JabRef/jabref/pulls/8264)
 
 ### Fixed
 
