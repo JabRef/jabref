@@ -34,10 +34,11 @@ start:
 // labels are used to refer to parts of the rules in the generated code later on
 // label=actualThingy
 expression:
-    LPAREN expression RPAREN                                  #parenExpression  // example: (author=miller)
-    | left=expression operator=(AND | OR) right=expression    #binaryExpression // example: author = miller and title = test
-    | NOT expression                                          #unaryExpression  // example: not author = miller
-    | comparison                                              #atomExpression
+    LPAREN expression RPAREN                         #parenExpression  // example: (author=miller)
+    | NOT expression                                 #unaryExpression  // example: not author = miller
+    | left=expression operator=AND right=expression  #binaryExpression // example: author = miller and title = test
+    | left=expression operator=OR right=expression   #binaryExpression // example: author = miller or title = test
+    | comparison                                     #atomExpression
     ;
 
 comparison:

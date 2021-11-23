@@ -10,10 +10,15 @@
       <name>Tony Chuang</name>
       <email>zcchuang@tiu.edu</email>
     </author>
+    <contributor>
+      <name>J. David Stark</name>
+      <email>david@jdavidstark.com</email>
+      <uri>https://www.jdavidstark.com/</uri>
+    </contributor>
     <category citation-format="author-date"/>
     <category field="generic-base"/>
     <summary>The author-date variant of the Turabian 9th edition - Based on Chicago 17th (author-date)</summary>
-    <updated>2020-05-16T19:15:00+00:00</updated>
+    <updated>2021-10-29T15:28:42+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="en">
@@ -274,9 +279,6 @@
             <group delimiter=" " prefix=", ">
               <text term="issue" form="short"/>
               <text variable="issue"/>
-              <date variable="issued" prefix="(" suffix=")">
-                <date-part name="month"/>
-              </date>
             </group>
           </else-if>
           <else>
@@ -285,6 +287,10 @@
             </date>
           </else>
         </choose>
+        <!-- Moving this snippet here allows the season information to be produced properly per Turabian, 9th ed., ยง19.2.5.  -->
+        <date variable="issued" prefix=" (" suffix=")">
+          <date-part name="month"/>
+        </date>
       </if>
       <else-if type="legal_case">
         <text variable="volume" prefix=", "/>
@@ -430,12 +436,9 @@
   <macro name="date">
     <choose>
       <if variable="issued">
-        <group delimiter=" ">
-          <date variable="original-date" form="text" date-parts="year" prefix="[" suffix="]"/>
-          <date variable="issued">
-            <date-part name="year"/>
-          </date>
-        </group>
+        <date variable="issued">
+          <date-part name="year"/>
+        </date>
       </if>
       <else-if variable="status">
         <text variable="status" text-case="capitalize-first"/>
@@ -444,6 +447,10 @@
         <text term="no date" form="short"/>
       </else>
     </choose>
+  </macro>
+  <macro name="original-publication-date">
+    <!-- Adds support for placing the original publication date at the end of the reference list entry per Turabian, 9th ed., ยง19.1.4. -->
+    <date variable="original-date" form="text" date-parts="year" prefix=" (Orig. pub. " suffix=".)"/>
   </macro>
   <macro name="date-in-text">
     <choose>
@@ -624,23 +631,27 @@
       <key variable="title"/>
     </sort>
     <layout suffix=".">
-      <group delimiter=". ">
-        <text macro="contributors"/>
-        <text macro="date"/>
-        <text macro="title"/>
+      <group suffix=".">
+        <group delimiter=". ">
+          <text macro="contributors"/>
+          <text macro="date"/>
+          <text macro="title"/>
+        </group>
+        <text macro="description"/>
+        <text macro="secondary-contributors" prefix=". "/>
+        <text macro="container-title" prefix=". "/>
+        <text macro="container-contributors"/>
+        <text macro="edition"/>
+        <text macro="locators-chapter"/>
+        <text macro="collection-title-journal" prefix=", " suffix=", "/>
+        <text macro="locators"/>
+        <text macro="collection-title" prefix=". "/>
+        <text macro="issue"/>
+        <text macro="locators-article"/>
+        <text macro="access" prefix=". "/>
       </group>
-      <text macro="description"/>
-      <text macro="secondary-contributors" prefix=". "/>
-      <text macro="container-title" prefix=". "/>
-      <text macro="container-contributors"/>
-      <text macro="edition"/>
-      <text macro="locators-chapter"/>
-      <text macro="collection-title-journal" prefix=", " suffix=", "/>
-      <text macro="locators"/>
-      <text macro="collection-title" prefix=". "/>
-      <text macro="issue"/>
-      <text macro="locators-article"/>
-      <text macro="access" prefix=". "/>
+      <!-- Adds support for placing the original publication date at the end of the reference list entry per Turabian, 9th ed., ยง19.1.4. -->
+      <text macro="original-publication-date"/>
     </layout>
   </bibliography>
 </style>

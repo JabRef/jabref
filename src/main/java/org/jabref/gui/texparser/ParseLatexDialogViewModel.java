@@ -69,8 +69,8 @@ public class ParseLatexDialogViewModel extends AbstractViewModel {
         this.taskExecutor = taskExecutor;
         this.preferencesService = preferencesService;
         this.fileMonitor = fileMonitor;
-        this.latexFileDirectory = new SimpleStringProperty(databaseContext.getMetaData().getLatexFileDirectory(preferencesService.getUser())
-                                                                          .orElse(FileUtil.getInitialDirectory(databaseContext, preferencesService))
+        this.latexFileDirectory = new SimpleStringProperty(databaseContext.getMetaData().getLatexFileDirectory(preferencesService.getFilePreferences().getUser())
+                                                                          .orElse(FileUtil.getInitialDirectory(databaseContext, preferencesService.getFilePreferences().getWorkingDirectory()))
                                                                           .toAbsolutePath().toString());
         this.root = new SimpleObjectProperty<>();
         this.checkedFileList = FXCollections.observableArrayList();
@@ -117,7 +117,7 @@ public class ParseLatexDialogViewModel extends AbstractViewModel {
 
         dialogService.showDirectorySelectionDialog(directoryDialogConfiguration).ifPresent(selectedDirectory -> {
             latexFileDirectory.set(selectedDirectory.toAbsolutePath().toString());
-            preferencesService.setWorkingDirectory(selectedDirectory.toAbsolutePath());
+            preferencesService.getFilePreferences().setWorkingDirectory(selectedDirectory.toAbsolutePath());
         });
     }
 

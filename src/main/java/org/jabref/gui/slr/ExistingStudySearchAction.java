@@ -63,8 +63,8 @@ public class ExistingStudySearchAction extends SimpleCommand {
         this.savePreferences = preferencesService.getSavePreferences();
 
         this.workingDirectory = stateManager.getActiveDatabase()
-                                            .map(database -> FileUtil.getInitialDirectory(database, preferencesService))
-                                            .orElse(preferencesService.getWorkingDir());
+                                            .map(database -> FileUtil.getInitialDirectory(database, preferencesService.getFilePreferences().getWorkingDirectory()))
+                                            .orElse(preferencesService.getFilePreferences().getWorkingDirectory());
     }
 
     @Override
