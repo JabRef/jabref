@@ -25,6 +25,8 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We allowed the user to also preview the available citation styles in the preferences besides the selected ones [#8108](https://github.com/JabRef/jabref/issues/8108)
 - We added an option to search the available citation styles by name in the preferences [#8108](https://github.com/JabRef/jabref/issues/8108)
 - We added an option to generate bib-entries from ID through a popover in the toolbar. [#4183](https://github.com/JabRef/jabref/issues/4183)
+- We added a menu option in the right click menu of the main table tabs to display the library properties. [#6527](https://github.com/JabRef/jabref/issues/6527)
+- When a `.bib` file ("library") was saved successfully, a notification is shown
 
 ### Changed
 
