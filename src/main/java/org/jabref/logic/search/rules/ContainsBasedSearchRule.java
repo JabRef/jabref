@@ -5,9 +5,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 
+import org.jabref.logic.search.rules.SearchRules.SearchFlags;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
-import org.jabref.logic.search.rules.SearchRules.SearchFlags;
 
 /**
  * Search rule for a search based on String.contains()

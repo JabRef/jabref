@@ -3,8 +3,8 @@ package org.jabref.logic.search.rules;
 import java.util.EnumSet;
 import java.util.concurrent.ExecutionException;
 
-import org.jabref.model.entry.BibEntry;
 import org.jabref.logic.search.rules.SearchRules.SearchFlags;
+import org.jabref.model.entry.BibEntry;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;

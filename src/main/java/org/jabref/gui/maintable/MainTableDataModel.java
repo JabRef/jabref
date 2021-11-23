@@ -17,11 +17,11 @@ import org.jabref.gui.groups.GroupViewMode;
 import org.jabref.gui.groups.GroupsPreferences;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.logic.search.SearchQuery;
+import org.jabref.logic.search.matchers.MatcherSet;
+import org.jabref.logic.search.matchers.MatcherSets;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.groups.GroupTreeNode;
-import org.jabref.logic.search.matchers.MatcherSet;
-import org.jabref.logic.search.matchers.MatcherSets;
 import org.jabref.preferences.PreferencesService;
 
 import com.tobiasdiez.easybind.EasyBind;

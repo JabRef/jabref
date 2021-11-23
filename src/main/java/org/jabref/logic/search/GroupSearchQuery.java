@@ -3,10 +3,10 @@ package org.jabref.logic.search;
 import java.util.EnumSet;
 import java.util.Objects;
 
-import org.jabref.model.entry.BibEntry;
 import org.jabref.logic.search.rules.SearchRule;
 import org.jabref.logic.search.rules.SearchRules;
 import org.jabref.logic.search.rules.SearchRules.SearchFlags;
+import org.jabref.model.entry.BibEntry;
 
 public class GroupSearchQuery implements SearchMatcher {
 

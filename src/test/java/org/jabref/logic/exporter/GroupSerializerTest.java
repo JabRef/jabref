@@ -9,6 +9,7 @@ import java.util.List;
 import javafx.scene.paint.Color;
 
 import org.jabref.logic.auxparser.DefaultAuxParser;
+import org.jabref.logic.search.rules.SearchRules;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.groups.AllEntriesGroup;
@@ -25,7 +26,6 @@ import org.jabref.model.groups.SearchGroup;
 import org.jabref.model.groups.TexGroup;
 import org.jabref.model.groups.WordKeywordGroup;
 import org.jabref.model.metadata.MetaData;
-import org.jabref.logic.search.rules.SearchRules;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.junit.jupiter.api.BeforeEach;

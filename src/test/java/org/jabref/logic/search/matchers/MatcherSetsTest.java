@@ -1,7 +1,7 @@
 package org.jabref.logic.search.matchers;
 
-import org.jabref.model.entry.BibEntry;
 import org.jabref.logic.search.rules.MockSearchMatcher;
+import org.jabref.model.entry.BibEntry;
 
 import org.junit.jupiter.api.Test;
 

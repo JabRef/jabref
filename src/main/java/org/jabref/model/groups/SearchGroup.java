@@ -3,9 +3,9 @@ package org.jabref.model.groups;
 import java.util.EnumSet;
 import java.util.Objects;
 
-import org.jabref.model.entry.BibEntry;
 import org.jabref.logic.search.GroupSearchQuery;
 import org.jabref.logic.search.rules.SearchRules.SearchFlags;
+import org.jabref.model.entry.BibEntry;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

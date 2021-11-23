@@ -1,7 +1,7 @@
 package org.jabref.logic.search.rules;
 
-import org.jabref.model.entry.BibEntry;
 import org.jabref.logic.search.SearchMatcher;
+import org.jabref.model.entry.BibEntry;
 
 /**
  * Mock search rule that returns the values passed. Useful for testing.

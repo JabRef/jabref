@@ -8,13 +8,13 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.jabref.logic.search.SearchMatcher;
+import org.jabref.logic.search.matchers.MatcherSet;
+import org.jabref.logic.search.matchers.MatcherSets;
 import org.jabref.model.FieldChange;
 import org.jabref.model.TreeNode;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.logic.search.SearchMatcher;
-import org.jabref.logic.search.matchers.MatcherSet;
-import org.jabref.logic.search.matchers.MatcherSets;
 
 /**
  * A node in the groups tree that holds exactly one AbstractGroup.

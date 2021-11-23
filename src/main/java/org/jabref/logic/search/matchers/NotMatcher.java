@@ -2,8 +2,8 @@ package org.jabref.logic.search.matchers;
 
 import java.util.Objects;
 
-import org.jabref.model.entry.BibEntry;
 import org.jabref.logic.search.SearchMatcher;
+import org.jabref.model.entry.BibEntry;
 
 /**
  * Inverts the search result.
