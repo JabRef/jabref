@@ -27,8 +27,9 @@ env:
   JAVA_OPTS: -Xmx4g
 
 concurrency:
-  group: ${{ github.head_ref }}
+  group: ${{ github.ref }}
   cancel-in-progress: true
+
 
 jobs:
   build:
