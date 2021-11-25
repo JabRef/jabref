@@ -201,10 +201,6 @@ public class JabRefFrame extends BorderPane {
             }
         });
 
-        // ChipView Prototype
-        this.SearchBox = new VBox(globalSearchBar, globalSearchBar.chipView);
-        this.SearchBox.autosize();
-        this.SearchBox.setPrefSize(750, 30);
     }
 
     private void initDragAndDrop() {
@@ -504,7 +500,7 @@ public class JabRefFrame extends BorderPane {
 
                 leftSpacer,
 
-                SearchBox,
+                globalSearchBar,
 
                 rightSpacer,
 
