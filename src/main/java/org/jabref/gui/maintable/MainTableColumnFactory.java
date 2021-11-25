@@ -27,6 +27,7 @@ import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.maintable.columns.FieldColumn;
 import org.jabref.gui.maintable.columns.FileColumn;
+import org.jabref.gui.maintable.columns.LibraryColumn;
 import org.jabref.gui.maintable.columns.LinkedIdentifierColumn;
 import org.jabref.gui.maintable.columns.MainTableColumn;
 import org.jabref.gui.maintable.columns.SpecialFieldColumn;
@@ -94,6 +95,9 @@ public class MainTableColumnFactory {
                     break;
                 case LINKED_IDENTIFIER:
                     columns.add(createIdentifierColumn(column));
+                    break;
+                case LIBRARY_NAME:
+                    columns.add(createLibraryColumn(column));
                     break;
                 case EXTRAFILE:
                     if (!column.getQualifier().isBlank()) {
@@ -244,5 +248,12 @@ public class MainTableColumnFactory {
                 dialogService,
                 preferencesService,
                 columnModel.getQualifier());
+    }
+
+    /**
+     * Create library column containing the Filename of the library's bib file
+     */
+    private TableColumn<BibEntryTableViewModel, String> createLibraryColumn(MainTableColumnModel columnModel) {
+        return new LibraryColumn(columnModel);
     }
 }

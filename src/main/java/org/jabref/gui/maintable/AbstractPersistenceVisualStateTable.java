@@ -31,19 +31,14 @@ public abstract class AbstractPersistenceVisualStateTable {
 
     /**
      * Stores shown columns, their width and their sortType in preferences.
-     * By default does nothing, override in subclass
+     * override in subclass
      */
-    protected void updateColumns() {
-        // empty
-    }
+    protected abstract void updateColumns();
 
     /**
-     * Stores the SortOrder of the the Table in the preferences. Cannot be combined with updateColumns, because JavaFX
+     * Stores the SortOrder of the table in the preferences. Cannot be combined with updateColumns, because JavaFX
      * would provide just an empty list for the sort order on other changes.
-     *  By default does nothing, override in subclass
-
+     * override in subclass
      */
-    protected void updateSortOrder() {
-        // empty
-    }
+    protected abstract void updateSortOrder();
 }
