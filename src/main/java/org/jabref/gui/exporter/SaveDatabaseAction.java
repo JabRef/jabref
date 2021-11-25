@@ -214,6 +214,7 @@ public class SaveDatabaseAction {
                 libraryTab.getUndoManager().markUnchanged();
                 libraryTab.resetChangedProperties();
             }
+            dialogService.notify(Localization.lang("Library saved"));
             return success;
         } catch (SaveException ex) {
             LOGGER.error(String.format("A problem occurred when trying to save the file %s", targetPath), ex);
