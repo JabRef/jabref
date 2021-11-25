@@ -35,6 +35,7 @@ import org.jabref.gui.externalfiles.ImportHandler;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.keyboard.KeyBindingRepository;
+import org.jabref.gui.maintable.columns.LibraryColumn;
 import org.jabref.gui.maintable.columns.MainTableColumn;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.CustomLocalDragboard;
@@ -106,6 +107,8 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                         libraryTab.getUndoManager(),
                         dialogService,
                         stateManager).createColumns());
+
+        this.getColumns().removeIf(col -> col instanceof LibraryColumn);
 
         new ViewModelTableRowFactory<BibEntryTableViewModel>()
                 .withOnMouseClickedEvent((entry, event) -> {
