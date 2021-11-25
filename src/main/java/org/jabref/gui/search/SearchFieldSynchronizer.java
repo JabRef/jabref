@@ -27,29 +27,99 @@ public class SearchFieldSynchronizer {
         }
     }
 
-    public boolean isPrevAttribute() {
-        return searchItemList.get(searchItemList.size() - 1).getItemType().equals("attribute");
-    }
-
-    public boolean isPrevLogical() {
-        return searchItemList.get(searchItemList.size() - 1).getItemType().equals("logicalOperator");
-    }
-
-    public boolean isPrevBracket() {
-        return searchItemList.get(searchItemList.size() - 1).getItemType().equals("bracket");
-    }
-
     public boolean isValid(SearchItem newItem) {
-        if (searchItemList.size() != 0) {
-            return switch (newItem.getItemType()) {
-                case "attribute" -> !(isPrevAttribute());
-                case "logicalOperator" -> !(isPrevLogical());
-                case "bracket" -> !(isPrevBracket());
-                default -> false;
-            };
-        } else {
-            return true;
+        if (newItem.getItemType().equals("query")) {
+            if (searchItemList.isEmpty()) {
+                return true;
+            }
+            if (this.returnLatest().isQuery()) {
+                return false;
+            }
+            if (this.returnLatest().isAttribute()) {
+                return true;
+            }
+            if (this.returnLatest().isLogical()) {
+                return false;
+            }
+            if (this.returnLatest().isBracket()) {
+                return false; // TODO: Think about how to manage brackets
+            }
         }
+
+        if (newItem.getItemType().equals("attribute")) {
+            if (searchItemList.isEmpty()) {
+                return true;
+            }
+            if (this.returnLatest().isQuery()) {
+                if (this.isFirstQuery()) {
+                    return false;
+                }
+                return true;
+            }
+            if (this.returnLatest().isAttribute()) {
+                return false;
+            }
+            if (this.returnLatest().isLogical()) {
+                return true;
+            }
+            if (this.returnLatest().isBracket()) {
+                return false; // TODO: Think about how to manage brackets
+            }
+        }
+
+        if (newItem.getItemType().equals("logical")) {
+            if (searchItemList.isEmpty()) {
+                return false;
+            }
+            if (this.returnLatest().isQuery()) {
+                if (this.isFirstQuery()) {
+                    return false;
+                }
+                return true;
+            }
+            if (this.returnLatest().isAttribute()) {
+                return false;
+            }
+            if (this.returnLatest().isLogical()) {
+                return false;
+            }
+            if (this.returnLatest().isBracket()) {
+                return false; // TODO: Think about how to manage brackets
+            }
+        }
+        // TODO: Think about how to manage brackets
+        if (newItem.getItemType().equals("bracket")) {
+            if (searchItemList.isEmpty()) {
+                return false;
+            }
+            if (this.returnLatest().getItemType().equals("query")) {
+                if (this.isFirstQuery()) {
+                    return false;
+                }
+                return false;
+            }
+            if (this.returnLatest().getItemType().equals("attribute")) {
+                return false;
+            }
+            if (this.returnLatest().getItemType().equals("logicalOperator")) {
+                return false;
+            }
+            if (this.returnLatest().getItemType().equals("bracket")) {
+                return false; // TODO: Think about how to manage brackets
+            }
+        }
+        return false;
+    }
+
+    public boolean isFirstQuery() {
+        if (searchItemList.isEmpty()) {
+            return false;
+        }
+        return searchItemList.get(0).getItemType().equals("query");
+    }
+
+    public SearchItem returnLatest() {
+        return searchItemList.get(searchItemList.size() - 1);
     }
 
     public void synchronize(JFXChipView<SearchItem> chipView) {
