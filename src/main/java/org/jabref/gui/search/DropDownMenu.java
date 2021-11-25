@@ -100,6 +100,7 @@ public class DropDownMenu {
         // yearButton action
         yearButton.addEventFilter(MouseEvent.MOUSE_CLICKED, event -> {
             searchFieldSynchronizer.addSearchItem("attribute", "year:");
+            searchFieldSynchronizer.synchronize();
         });
 
         // yearRangeButton action
