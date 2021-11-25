@@ -1,6 +1,7 @@
 package org.jabref.gui.search;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -149,7 +150,8 @@ public class GlobalSearchBar extends HBox {
         chipView.autosize();
 
         // Prototype DropDownMenu
-        this.dropDownMenu = new DropDownMenu(chipView, this);
+        SearchFieldSynchronizer searchFieldSynchronizer = new SearchFieldSynchronizer(searchField);
+        this.dropDownMenu = new DropDownMenu(searchField, this, searchFieldSynchronizer);
         KeyBindingRepository keyBindingRepository = Globals.getKeyPrefs();
 
         searchField.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
@@ -164,6 +166,17 @@ public class GlobalSearchBar extends HBox {
             }
         });
 
+//        searchFieldSynchronizer.searchItemList.addListener(new ListChangeListener<SearchItem>() {
+//            @Override
+//            public void onChanged(Change<? extends SearchItem> c) {
+//                searchFieldSynchronizer.synchronize();
+//            }
+//        });
+        // Listens to global search bar textfield changes and updates searchItemList in searchFieldSynchronizer
+        searchField.textProperty().addListener((observable, oldValue, newValue) -> {
+//            System.out.println("textfield changed from " + oldValue + " to " + newValue);
+            searchFieldSynchronizer.updateSearchItemList(textFieldToList());
+        });
         ClipBoardManager.addX11Support(searchField);
 
         regularExpressionButton = IconTheme.JabRefIcons.REG_EX.asToggleButton();
@@ -488,5 +501,44 @@ public class GlobalSearchBar extends HBox {
         public void dispose() {
             // empty
         }
+    }
+
+    private ArrayList<String> textFieldToList() {
+        String str = searchField.getText();
+        // splits a string "author:luh AND year:2013 OR author:\"lee smith\"" into
+        // [author:] [luh] [AND] [year:] [2013] [OR] [author:] ["lee smith"]
+        String[]words = str.split("(?<=:)|\\ ");
+        ArrayList<String> list = new ArrayList<>();
+
+//        // ARRAY TEST
+//        System.out.print("Textfeld Array: ");
+//        for (String word : words) {
+//            System.out.print(word + " | ");
+//        }
+//        System.out.println();
+
+        for (int i = 0; i < words.length; i++) {
+            if (words[i].startsWith("\"")) {
+                boolean isWordAfterwards = i + 1 < words.length;
+                if (isWordAfterwards && words[i + 1].endsWith("\"") && !words[i].endsWith(":")) {
+                    String str2 = words[i] + " " + words[i + 1];
+                    list.add(str2);
+                    i++;
+                } else {
+                    list.add(words[i]);
+                }
+            } else {
+                list.add(words[i]);
+            }
+        }
+
+        // TEXTFELD TEST
+        System.out.print("Textfeld Liste: ");
+        for (String word : list) {
+            System.out.print(word + " | ");
+        }
+        System.out.println();
+
+        return list;
     }
 }

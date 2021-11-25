@@ -3,21 +3,16 @@ package org.jabref.gui.search;
 import java.util.ArrayList;
 
 import javafx.collections.FXCollections;
-import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 
-import com.jfoenix.controls.JFXChipView;
+import org.controlsfx.control.textfield.CustomTextField;
 
 public class SearchFieldSynchronizer {
     ObservableList<SearchItem> searchItemList = FXCollections.observableList(new ArrayList<SearchItem>());
-    String searchString;
-    public SearchFieldSynchronizer(JFXChipView<SearchItem> chipView) {
-        searchItemList.addListener(new ListChangeListener<SearchItem>() {
-            @Override
-            public void onChanged(Change<? extends SearchItem> c) {
-                synchronize(chipView);
-            }
-        });
+    CustomTextField searchField;
+    public SearchFieldSynchronizer(CustomTextField searchField) {
+        this.searchField = searchField;
+
     }
 
     public void addSearchItem(String itemType, String item) {
@@ -122,9 +117,71 @@ public class SearchFieldSynchronizer {
         return searchItemList.get(searchItemList.size() - 1);
     }
 
-    public void synchronize(JFXChipView<SearchItem> chipView) {
-        chipView.getChips().removeAll();
-        chipView.getChips().addAll(searchItemList);
+    public void synchronize() {
+        if (searchItemList.size() == 1) {
+            if (searchItemList.get(0).getItem().equals("") || searchItemList.get(0).getItem().equals(" ")) {
+                searchItemList.clear();
+            }
+        }
+        this.clearEmptyItems();
+        this.searchItemListToString();
+        searchField.setText(this.searchStringBuilder());
+        searchField.positionCaret(searchField.getText().length());
+    }
 
+    public String searchStringBuilder() {
+        StringBuilder searchString = new StringBuilder();
+        for (SearchItem item : searchItemList) {
+
+            if (item.isQuery()) {
+                searchString.append(item.getItem());
+                searchString.append(" ");
+            }
+            if (item.isLogical()) {
+                searchString.append(item.getItem());
+                searchString.append(" ");
+            }
+            if (item.isAttribute()) {
+                searchString.append(item.getItem());
+            }
+        }
+        return searchString.toString();
+    }
+
+    public void updateSearchItemList(ArrayList<String> list) {
+        searchItemList.clear();
+        if (!list.isEmpty()) {
+            for (String s : list) {
+                if (s.endsWith(":")) {
+                    searchItemList.add(new SearchItem("attribute", s));
+                } else if (s.equals("AND")) {
+                    searchItemList.add(new SearchItem("logical", s));
+                } else if (s.equals("OR")) {
+                    searchItemList.add(new SearchItem("logical", s));
+                } else if (s.equals("(")) {
+                    searchItemList.add(new SearchItem("bracket", s));
+                } else if (s.equals(")")) {
+                    searchItemList.add(new SearchItem("bracket", s));
+                } else {
+                    searchItemList.add(new SearchItem("query", s));
+                }
+            }
+            searchStringBuilder();
+        }
+        searchItemListToString();
+    }
+
+    public void searchItemListToString() {
+        for (SearchItem item : searchItemList) {
+            System.out.print("| ");
+            System.out.print("Type: " + item.getItemType() + ", ");
+            System.out.print("Value: " + item.getItem());
+            System.out.print(" |");
+        }
+    }
+
+    public void clearEmptyItems() {
+        searchItemList.removeIf(item -> item.getItem().equals(""));
+        searchItemList.removeIf(item -> item.getItem().equals(" "));
     }
 }

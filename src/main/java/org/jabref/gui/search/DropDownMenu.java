@@ -7,8 +7,8 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 
-import com.jfoenix.controls.JFXChipView;
 import org.controlsfx.control.PopOver;
+import org.controlsfx.control.textfield.CustomTextField;
 
 public class DropDownMenu {
     // DropDown Searchbar
@@ -28,12 +28,13 @@ public class DropDownMenu {
     // private final Button bookButton;
     // private final Button citationKeyButton;
 
+    private SearchFieldSynchronizer searchFieldSynchronizer;
     // test buttons
     // private final Button testButton;
 
-    public DropDownMenu(JFXChipView<SearchItem> searchField, GlobalSearchBar globalSearchBar) {
+    public DropDownMenu(CustomTextField searchField, GlobalSearchBar globalSearchBar, SearchFieldSynchronizer searchFieldSynchronizer) {
+        this.searchFieldSynchronizer = searchFieldSynchronizer;
         // Testing dropdown for searchbar
-        SearchFieldSynchronizer searchFieldSynchronizer = new SearchFieldSynchronizer(searchField);
 
         authorButton = new Button("Author");
         journalButton = new Button("Journal");
@@ -81,16 +82,19 @@ public class DropDownMenu {
         // authorButton action
         authorButton.addEventFilter(MouseEvent.MOUSE_CLICKED, event -> {
             searchFieldSynchronizer.addSearchItem("attribute", "author:");
+            searchFieldSynchronizer.synchronize();
         });
 
         // journalButton action
         journalButton.addEventFilter(MouseEvent.MOUSE_CLICKED, event -> {
             searchFieldSynchronizer.addSearchItem("attribute", "journal:");
+            searchFieldSynchronizer.synchronize();
         });
 
         // titleButton action
         titleButton.addEventFilter(MouseEvent.MOUSE_CLICKED, event -> {
             searchFieldSynchronizer.addSearchItem("attribute", "title:");
+            searchFieldSynchronizer.synchronize();
         });
 
         // yearButton action
@@ -100,27 +104,32 @@ public class DropDownMenu {
 
         // yearRangeButton action
         yearRangeButton.addEventFilter(MouseEvent.MOUSE_CLICKED, event -> {
+            searchFieldSynchronizer.synchronize();
 
         });
 
         // andButton action
         andButton.addEventFilter(MouseEvent.MOUSE_CLICKED, event -> {
-            searchFieldSynchronizer.addSearchItem("logicalOperator", "AND");
+            searchFieldSynchronizer.addSearchItem("logical", "AND");
+            searchFieldSynchronizer.synchronize();
         });
 
         // orButton action
         orButton.addEventFilter(MouseEvent.MOUSE_CLICKED, event -> {
-            searchFieldSynchronizer.addSearchItem("logicalOperator", "OR");
+            searchFieldSynchronizer.addSearchItem("logical", "OR");
+            searchFieldSynchronizer.synchronize();
         });
 
         // leftBracketButton action
         leftBracketButton.addEventFilter(MouseEvent.MOUSE_CLICKED, event -> {
             searchFieldSynchronizer.addSearchItem("bracket", "(");
+            searchFieldSynchronizer.synchronize();
         });
 
         // orButton action
         rightBracketButton.addEventFilter(MouseEvent.MOUSE_CLICKED, event -> {
             searchFieldSynchronizer.addSearchItem("bracket", ")");
+            searchFieldSynchronizer.synchronize();
         });
     }
 
