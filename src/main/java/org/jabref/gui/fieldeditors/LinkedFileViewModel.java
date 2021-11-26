@@ -344,11 +344,10 @@ public class LinkedFileViewModel extends AbstractViewModel {
                 databaseContext.getDatabase(),
                 entry,
                 filePreferences.getFileDirectoryPattern());
-        
+
         Path targetDir = baseDir.get().resolve(targetDirectoryName);
 
         Optional<Path> currentDir = linkedFile.findIn(databaseContext, preferences.getFilePreferences()).map(Path::getParent);
-        System.out.println(linkedFile.findIn(databaseContext, preferences.getFilePreferences()));
         if (currentDir.isEmpty()) {
             // Could not find file
             return false;
