@@ -159,7 +159,7 @@ public class SearchFieldSynchronizer {
                 } else if (s.equals(")")) {
                     searchItemList.add(new SearchItem("bracket", s));
                 } else if (s.equals(" ")) {
-
+                    continue;
                 } else {
                     searchItemList.add(new SearchItem("query", s));
                 }
