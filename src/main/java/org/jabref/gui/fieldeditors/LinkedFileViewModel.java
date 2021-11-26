@@ -60,6 +60,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.FileHelper;
+import org.jabref.model.util.OptionalUtil;
 import org.jabref.preferences.FilePreferences;
 import org.jabref.preferences.PreferencesService;
 
@@ -345,14 +346,13 @@ public class LinkedFileViewModel extends AbstractViewModel {
                 entry,
                 filePreferences.getFileDirectoryPattern());
 
-        Path targetDir = baseDir.get().resolve(targetDirectoryName);
+        Optional<Path> targetDir = baseDir.map(dir -> dir.resolve(targetDirectoryName));
 
         Optional<Path> currentDir = linkedFile.findIn(databaseContext, preferences.getFilePreferences()).map(Path::getParent);
         if (currentDir.isEmpty()) {
             // Could not find file
             return false;
         }
-        Path oldDir = currentDir.get();
 
         BiPredicate<Path, Path> equality = (fileA, fileB) -> {
             try {
@@ -361,7 +361,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
                 return false;
             }
         };
-        return FileHelper.equals(targetDir, oldDir, equality);
+        return OptionalUtil.equals(targetDir, currentDir, equality);
     }
 
     public void moveToDefaultDirectoryAndRename() {
