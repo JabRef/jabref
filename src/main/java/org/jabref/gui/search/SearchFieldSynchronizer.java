@@ -118,14 +118,11 @@ public class SearchFieldSynchronizer {
     }
 
     public void synchronize() {
-        if (searchItemList.size() == 1) {
-            if (searchItemList.get(0).getItem().equals("") || searchItemList.get(0).getItem().equals(" ")) {
-                searchItemList.clear();
-            }
-        }
-        this.clearEmptyItems();
         this.searchItemListToString();
-        searchField.setText(this.searchStringBuilder());
+
+        String searchString = this.searchStringBuilder();
+        searchField.clear();
+        searchField.setText(searchString);
         searchField.positionCaret(searchField.getText().length());
     }
 
@@ -178,10 +175,5 @@ public class SearchFieldSynchronizer {
             System.out.print("Value: " + item.getItem());
             System.out.print(" |");
         }
-    }
-
-    public void clearEmptyItems() {
-        searchItemList.removeIf(item -> item.getItem().equals(""));
-        searchItemList.removeIf(item -> item.getItem().equals(" "));
     }
 }
