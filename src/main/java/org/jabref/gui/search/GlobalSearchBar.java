@@ -168,6 +168,7 @@ public class GlobalSearchBar extends HBox {
         searchField.textProperty().addListener((observable, oldValue, newValue) -> {
 //            System.out.println("textfield changed from " + oldValue + " to " + newValue);
             searchFieldSynchronizer.updateSearchItemList(textFieldToList());
+            searchFieldSynchronizer.syntaxHighlighting();
         });
         ClipBoardManager.addX11Support(searchField);
 

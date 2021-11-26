@@ -17,26 +17,26 @@ public class SearchFieldSynchronizer {
 
     public void addSearchItem(String itemType, String item) {
         SearchItem newItem = new SearchItem(itemType, item);
-        if (isValid(newItem)) {
+        if (isValid(this.searchItemList, newItem)) {
             searchItemList.add(newItem);
         }
     }
 
-    public boolean isValid(SearchItem newItem) {
+    public boolean isValid(ObservableList<SearchItem> searchItemList, SearchItem newItem) {
         if (newItem.getItemType().equals("query")) {
             if (searchItemList.isEmpty()) {
                 return true;
             }
-            if (this.returnLatest().isQuery()) {
+            if (this.returnLatest(searchItemList).isQuery()) {
                 return false;
             }
-            if (this.returnLatest().isAttribute()) {
+            if (this.returnLatest(searchItemList).isAttribute()) {
                 return true;
             }
-            if (this.returnLatest().isLogical()) {
+            if (this.returnLatest(searchItemList).isLogical()) {
                 return false;
             }
-            if (this.returnLatest().isBracket()) {
+            if (this.returnLatest(searchItemList).isBracket()) {
                 return false; // TODO: Think about how to manage brackets
             }
         }
@@ -45,19 +45,19 @@ public class SearchFieldSynchronizer {
             if (searchItemList.isEmpty()) {
                 return true;
             }
-            if (this.returnLatest().isQuery()) {
+            if (this.returnLatest(searchItemList).isQuery()) {
                 if (this.isFirstQuery()) {
                     return false;
                 }
                 return true;
             }
-            if (this.returnLatest().isAttribute()) {
+            if (this.returnLatest(searchItemList).isAttribute()) {
                 return false;
             }
-            if (this.returnLatest().isLogical()) {
+            if (this.returnLatest(searchItemList).isLogical()) {
                 return true;
             }
-            if (this.returnLatest().isBracket()) {
+            if (this.returnLatest(searchItemList).isBracket()) {
                 return false; // TODO: Think about how to manage brackets
             }
         }
@@ -66,19 +66,19 @@ public class SearchFieldSynchronizer {
             if (searchItemList.isEmpty()) {
                 return false;
             }
-            if (this.returnLatest().isQuery()) {
+            if (this.returnLatest(searchItemList).isQuery()) {
                 if (this.isFirstQuery()) {
                     return false;
                 }
                 return true;
             }
-            if (this.returnLatest().isAttribute()) {
+            if (this.returnLatest(searchItemList).isAttribute()) {
                 return false;
             }
-            if (this.returnLatest().isLogical()) {
+            if (this.returnLatest(searchItemList).isLogical()) {
                 return false;
             }
-            if (this.returnLatest().isBracket()) {
+            if (this.returnLatest(searchItemList).isBracket()) {
                 return false; // TODO: Think about how to manage brackets
             }
         }
@@ -87,19 +87,19 @@ public class SearchFieldSynchronizer {
             if (searchItemList.isEmpty()) {
                 return false;
             }
-            if (this.returnLatest().getItemType().equals("query")) {
+            if (this.returnLatest(searchItemList).getItemType().equals("query")) {
                 if (this.isFirstQuery()) {
                     return false;
                 }
                 return false;
             }
-            if (this.returnLatest().getItemType().equals("attribute")) {
+            if (this.returnLatest(searchItemList).getItemType().equals("attribute")) {
                 return false;
             }
-            if (this.returnLatest().getItemType().equals("logicalOperator")) {
+            if (this.returnLatest(searchItemList).getItemType().equals("logicalOperator")) {
                 return false;
             }
-            if (this.returnLatest().getItemType().equals("bracket")) {
+            if (this.returnLatest(searchItemList).getItemType().equals("bracket")) {
                 return false; // TODO: Think about how to manage brackets
             }
         }
@@ -113,17 +113,16 @@ public class SearchFieldSynchronizer {
         return searchItemList.get(0).getItemType().equals("query");
     }
 
-    public SearchItem returnLatest() {
+    public SearchItem returnLatest(ObservableList<SearchItem> searchItemList) {
         return searchItemList.get(searchItemList.size() - 1);
     }
 
     public void synchronize() {
-        this.searchItemListToString();
-
         String searchString = this.searchStringBuilder();
         searchField.clear();
         searchField.setText(searchString);
         searchField.positionCaret(searchField.getText().length());
+        syntaxHighlighting();
     }
 
     public String searchStringBuilder() {
@@ -159,21 +158,54 @@ public class SearchFieldSynchronizer {
                     searchItemList.add(new SearchItem("bracket", s));
                 } else if (s.equals(")")) {
                     searchItemList.add(new SearchItem("bracket", s));
+                } else if (s.equals(" ")) {
+
                 } else {
                     searchItemList.add(new SearchItem("query", s));
                 }
             }
             searchStringBuilder();
         }
-        searchItemListToString();
     }
 
-    public void searchItemListToString() {
+    public void searchItemListToString(ObservableList<SearchItem> searchItemList) {
         for (SearchItem item : searchItemList) {
             System.out.print("| ");
             System.out.print("Type: " + item.getItemType() + ", ");
             System.out.print("Value: " + item.getItem());
             System.out.print(" |");
+        }
+    }
+
+    public boolean isValidSearch(ObservableList<SearchItem> searchItemListCheck) {
+        ObservableList<SearchItem> searchItemListNew = FXCollections.observableList(new ArrayList<SearchItem>());
+
+        for (SearchItem item : searchItemListCheck) {
+            if (this.isValid(searchItemListNew, item)) {
+                searchItemListNew.add(item);
+            } else {
+                System.out.println("not valid");
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    public void syntaxHighlighting() {
+        if (this.isValidSearch(this.searchItemList)) {
+            this.searchField.setStyle("-fx-border-color: green");
+        } else {
+            this.searchField.setStyle("-fx-border-color: red");
+        }
+
+        if (!this.searchItemList.isEmpty()) {
+            if (this.searchItemList.get(searchItemList.size() - 1).isAttribute()) {
+                this.searchField.setStyle("-fx-border-color: red");
+            }
+            if (this.searchItemList.get(searchItemList.size() - 1).isLogical()) {
+                this.searchField.setStyle("-fx-border-color: red");
+            }
         }
     }
 }
