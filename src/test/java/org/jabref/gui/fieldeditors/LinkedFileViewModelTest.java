@@ -280,7 +280,6 @@ class LinkedFileViewModelTest {
     @Test
     void isNotSamePathWithPattern() {
         linkedFile = new LinkedFile("desc", tempFile, "pdf");
-        System.out.println(tempFile.getParent());
         databaseContext = mock(BibDatabaseContext.class);
         when(filePreferences.getFileNamePattern()).thenReturn("[citationkey]");
         when(filePreferences.getFileDirectoryPattern()).thenReturn("[entrytype]");
