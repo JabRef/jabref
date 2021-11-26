@@ -181,8 +181,6 @@ public class JabRefFrame extends BorderPane {
 
     private final TaskExecutor taskExecutor;
 
-    // ChipView Prototype
-    private VBox SearchBox;
 
     public JabRefFrame(Stage mainStage) {
         this.mainStage = mainStage;
