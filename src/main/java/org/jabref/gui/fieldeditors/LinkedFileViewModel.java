@@ -333,8 +333,8 @@ public class LinkedFileViewModel extends AbstractViewModel {
      */
     public boolean isGeneratedPathSameAsOriginal() {
         FilePreferences filePreferences = preferences.getFilePreferences();
-        Optional<Path> newDir = databaseContext.getFirstExistingFileDir(filePreferences);
-        if (newDir.isEmpty()) {
+        Optional<Path> baseDir = databaseContext.getFirstExistingFileDir(filePreferences);
+        if (baseDir.isEmpty()) {
             // could not find default path
             return false;
         }
@@ -347,7 +347,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
                     entry,
                     filePreferences.getFileDirectoryPattern());
         }
-        Path targetDir = newDir.get().resolve(targetDirectoryName);
+        Path targetDir = baseDir.get().resolve(targetDirectoryName);
 
         Optional<Path> currentDir = linkedFile.findIn(databaseContext, preferences.getFilePreferences()).map(Path::getParent);
         if (currentDir.isEmpty()) {
