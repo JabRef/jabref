@@ -1,7 +1,6 @@
 package org.jabref.gui.search;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -36,7 +35,6 @@ public class SearchFieldSynchronizer {
     }
 
     public boolean isValid(ObservableList<SearchItem> searchItemList, SearchItem newItem) {
-        searchItemListToString(searchItemList);
         if (newItem.getItemType().equals("query")) {
             if (searchItemList.isEmpty()) {
                 return true;
@@ -175,7 +173,6 @@ public class SearchFieldSynchronizer {
         searchItemList.clear();
         if (!list.isEmpty()) {
             for (String s : list) {
-                System.out.println(s);
                 if (s.endsWith(":")) {
                     searchItemList.add(new SearchItem("attribute", s));
                 } else if (s.equals("AND")) {
@@ -192,8 +189,9 @@ public class SearchFieldSynchronizer {
                     searchItemList.add(new SearchItem("query", s));
                 }
             }
-            //searchField.setText(searchStringBuilder());
+            // searchField.setText(searchStringBuilder());
         }
+        searchItemListToString(searchItemList);
     }
 
     public void searchItemListToString(ObservableList<SearchItem> searchItemList) {
@@ -203,6 +201,7 @@ public class SearchFieldSynchronizer {
             System.out.print("Value: " + item.getItem());
             System.out.print(" |");
         }
+        System.out.println("----");
     }
 
     public boolean isValidSearch(ObservableList<SearchItem> searchItemListCheck) {
@@ -253,7 +252,6 @@ public class SearchFieldSynchronizer {
         // [author:] [luh] [AND] [year:] [2013] [OR] [author:] ["lee smith"]
         String[] words = str.split("(?<=:)|\\ ");
         ArrayList<String> list = new ArrayList<>();
-        list = new ArrayList<>(Arrays.asList(words));
 //        for (String word : words) {
 //            word = word.trim();
 //            if (!word.equals("")) {
@@ -268,20 +266,20 @@ public class SearchFieldSynchronizer {
 //        }
 //        System.out.println();
 
-//        for (int i = 0; i < words.length; i++) {
-//            if (words[i].startsWith("\"")) {
-//                boolean isWordAfterwards = i + 1 < words.length;
-//                if (isWordAfterwards && words[i + 1].endsWith("\"") && !words[i].endsWith(":")) {
-//                    String str2 = words[i] + " " + words[i + 1];
-//                    list.add(str2);
-//                    i++;
-//                } else {
-//                    list.add(words[i]);
-//                }
-//            } else {
-//                list.add(words[i]);
-//            }
-//        }
+        for (int i = 0; i < words.length; i++) {
+            if (words[i].startsWith("\"")) {
+                boolean isWordAfterwards = i + 1 < words.length;
+                if (isWordAfterwards && words[i + 1].endsWith("\"") && !words[i].endsWith(":")) {
+                    String str2 = words[i] + " " + words[i + 1];
+                    list.add(str2);
+                    i++;
+                } else {
+                    list.add(words[i]);
+                }
+            } else {
+                list.add(words[i]);
+            }
+        }
 
 /*
         // TEXTFELD TEST

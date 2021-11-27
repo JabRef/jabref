@@ -133,7 +133,7 @@ public class GlobalSearchBar extends HBox {
             @Override
             public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
                 if (newValue) {
-                    LOGGER.info("Searchbar in focus");
+                    // LOGGER.info("Searchbar in focus");
                 } else {
                     dropDownMenu.recentSearch.add(searchField.getText());
                 }
