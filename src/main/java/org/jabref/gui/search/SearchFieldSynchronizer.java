@@ -17,12 +17,25 @@ public class SearchFieldSynchronizer {
 
     public void addSearchItem(String itemType, String item) {
         SearchItem newItem = new SearchItem(itemType, item);
+
+        if (!searchItemList.isEmpty()) {
+            if (searchItemList.get(0).getItem().equals("")) {
+                searchItemList.remove(searchItemList.get(0));
+            }
+        }
+        if (isValid(this.searchItemList, newItem)) {
+            searchItemList.add(newItem);
+        }
+    }
+
+    public void addSearchItem(SearchItem newItem) {
         if (isValid(this.searchItemList, newItem)) {
             searchItemList.add(newItem);
         }
     }
 
     public boolean isValid(ObservableList<SearchItem> searchItemList, SearchItem newItem) {
+        searchItemListToString(searchItemList);
         if (newItem.getItemType().equals("query")) {
             if (searchItemList.isEmpty()) {
                 return true;
@@ -127,19 +140,32 @@ public class SearchFieldSynchronizer {
 
     public String searchStringBuilder() {
         StringBuilder searchString = new StringBuilder();
+        int i = 0;
         for (SearchItem item : searchItemList) {
-
             if (item.isQuery()) {
+                if (i > 0) {
+                    if (!searchItemList.get(i - 1).isAttribute()) {
+                        searchString.append(" ");
+                    }
+                }
                 searchString.append(item.getItem());
-                searchString.append(" ");
             }
             if (item.isLogical()) {
+                if (i > 0) {
+                    searchString.append(" ");
+                }
                 searchString.append(item.getItem());
-                searchString.append(" ");
+                if (returnLatest(searchItemList).equals(item)) {
+                    searchString.append(" ");
+                }
             }
             if (item.isAttribute()) {
+                if (i > 0) {
+                    searchString.append(" ");
+                }
                 searchString.append(item.getItem());
             }
+            i = i + 1;
         }
         return searchString.toString();
     }
