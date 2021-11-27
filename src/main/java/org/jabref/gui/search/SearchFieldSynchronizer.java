@@ -192,8 +192,7 @@ public class SearchFieldSynchronizer {
                     searchItemList.add(new SearchItem("query", s));
                 }
             }
-            searchItemListToString(searchItemList);
-            searchStringBuilder();
+            //searchField.setText(searchStringBuilder());
         }
     }
 
@@ -236,6 +235,16 @@ public class SearchFieldSynchronizer {
                 this.searchField.setStyle("-fx-border-color: red");
             }
         }
+
+        for (SearchItem item : this.searchItemList) {
+            if (item.isAttribute()) {
+                if (searchItemList.indexOf(item) + 1 < searchItemList.size()) {
+                    if (Character.isWhitespace(searchItemList.get(searchItemList.indexOf(item) + 1).getItem().charAt(0))) {
+                        this.searchField.setStyle("-fx-border-color: red");
+                    }
+                }
+            }
+        }
     }
 
     public ArrayList<String> textFieldToList() {
@@ -245,10 +254,16 @@ public class SearchFieldSynchronizer {
         String[] words = str.split("(?<=:)|\\ ");
         ArrayList<String> list = new ArrayList<>();
         list = new ArrayList<>(Arrays.asList(words));
+//        for (String word : words) {
+//            word = word.trim();
+//            if (!word.equals("")) {
+//                list.add(word);
+//            }
+//        }
 
 //        // ARRAY TEST
 //        System.out.print("Textfeld Array: ");
-//        for (String word : words) {
+//        for (String word : list) {
 //            System.out.print(word + " | ");
 //        }
 //        System.out.println();
