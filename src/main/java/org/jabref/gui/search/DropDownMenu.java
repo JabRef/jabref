@@ -11,7 +11,6 @@ import org.controlsfx.control.PopOver;
 import org.controlsfx.control.textfield.CustomTextField;
 
 public class DropDownMenu {
-    // DropDown Searchbar
     public PopOver searchbarDropDown;
     public Button authorButton;
     public Button journalButton;
@@ -23,18 +22,8 @@ public class DropDownMenu {
     public Button leftBracketButton;
     public Button rightBracketButton;
     public RecentSearch recentSearch;
-    private boolean isPrevAttribute;
-    // private final Button articleButton;
-    // private final Button bookButton;
-    // private final Button citationKeyButton;
-
-    private SearchFieldSynchronizer searchFieldSynchronizer;
-    // test buttons
-    // private final Button testButton;
 
     public DropDownMenu(CustomTextField searchField, GlobalSearchBar globalSearchBar, SearchFieldSynchronizer searchFieldSynchronizer) {
-        this.searchFieldSynchronizer = searchFieldSynchronizer;
-        // Testing dropdown for searchbar
 
         authorButton = new Button("Author");
         journalButton = new Button("Journal");
@@ -45,9 +34,7 @@ public class DropDownMenu {
         orButton = new Button("OR");
         leftBracketButton = new Button("(");
         rightBracketButton = new Button(")");
-        // articleButton = new Button("Article");
-        // bookButton = new Button("Book");
-        // citationKeyButton = new Button("CitationKey");
+
         Text titleLucene = new Text(" Lucene Search");
         Text titleRecent = new Text(" Recent Searches");
         recentSearch = new RecentSearch(globalSearchBar);
@@ -70,12 +57,6 @@ public class DropDownMenu {
                 searchbarDropDown.setContentNode(buttonBox);
                 searchbarDropDown.setDetachable(false); // not detachable
                 searchbarDropDown.show(searchField);
-//            } else if (searchbarDropDown.isShowing()) {
-//                searchbarDropDown.hide();  // this makes the dropdown disappear if you re-click on searchbar
-            } else {
-//                searchbarDropDown.setContentNode(buttonBox);
-                // this makes the drop down reappear every time you click on search bar, even if its shown already
-//                searchbarDropDown.show(searchField);
             }
         });
 
