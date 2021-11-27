@@ -244,6 +244,19 @@ public class SearchFieldSynchronizer {
                 }
             }
         }
+
+        boolean onlyQueries = true;
+        for (SearchItem item : this.searchItemList) {
+            if (!item.isQuery()) {
+                onlyQueries = false;
+                break;
+            }
+        }
+
+        if (onlyQueries) {
+            this.searchField.setStyle("-fx-border-color: green");
+        }
+
     }
 
     public ArrayList<String> textFieldToList() {
