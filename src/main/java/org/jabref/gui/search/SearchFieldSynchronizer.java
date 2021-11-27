@@ -1,6 +1,7 @@
 package org.jabref.gui.search;
 
 import java.util.ArrayList;
+import java.util.Stack;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -397,5 +398,28 @@ public class SearchFieldSynchronizer {
         }
 
         return list;
+    }
+
+    /* Check if brackets are balanced */
+    public boolean bracketsBalanced() {
+        Stack<String> bracketStack = new Stack<>();
+
+        for (SearchItem item : this.searchItemList) {
+            // if it's a left bracket -> push to Stack
+            // if it's a right bracket -> pop from stack and check if we get a left bracket
+            if (item.isLeftBracket()) {
+                bracketStack.push(item.getItem());
+            } else if (item.isRightBracket()) {
+                if (bracketStack.isEmpty()) {
+                    return false;
+                } else {
+                    if (!bracketStack.pop().equals("(")) {
+                        return false;
+                    }
+                }
+            }
+        }
+
+        return bracketStack.isEmpty();
     }
 }

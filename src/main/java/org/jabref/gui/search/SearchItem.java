@@ -40,4 +40,12 @@ public class SearchItem {
     public boolean isBracket() {
         return this.itemType.equals("bracket");
     }
+
+    public boolean isLeftBracket() {
+        return this.itemType.equals("bracket") && this.item.equals("(");
+    }
+
+    public boolean isRightBracket() {
+        return this.itemType.equals("bracket") && this.item.equals(")");
+    }
 }
