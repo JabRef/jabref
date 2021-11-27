@@ -35,5 +35,9 @@ public class SearchFieldSynchronizerTest {
         System.out.println(searchString);
         assertEquals(trueSearchString, searchString);
     }
+
+    @Test
+    void textFieldtoListTest() {
+    }
 }
 

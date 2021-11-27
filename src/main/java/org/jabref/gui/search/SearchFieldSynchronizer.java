@@ -1,6 +1,7 @@
 package org.jabref.gui.search;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -174,6 +175,7 @@ public class SearchFieldSynchronizer {
         searchItemList.clear();
         if (!list.isEmpty()) {
             for (String s : list) {
+                System.out.println(s);
                 if (s.endsWith(":")) {
                     searchItemList.add(new SearchItem("attribute", s));
                 } else if (s.equals("AND")) {
@@ -190,6 +192,7 @@ public class SearchFieldSynchronizer {
                     searchItemList.add(new SearchItem("query", s));
                 }
             }
+            searchItemListToString(searchItemList);
             searchStringBuilder();
         }
     }
@@ -233,5 +236,47 @@ public class SearchFieldSynchronizer {
                 this.searchField.setStyle("-fx-border-color: red");
             }
         }
+    }
+
+    public ArrayList<String> textFieldToList() {
+        String str = searchField.getText();
+        // splits a string "author:luh AND year:2013 OR author:\"lee smith\"" into
+        // [author:] [luh] [AND] [year:] [2013] [OR] [author:] ["lee smith"]
+        String[] words = str.split("(?<=:)|\\ ");
+        ArrayList<String> list = new ArrayList<>();
+        list = new ArrayList<>(Arrays.asList(words));
+
+//        // ARRAY TEST
+//        System.out.print("Textfeld Array: ");
+//        for (String word : words) {
+//            System.out.print(word + " | ");
+//        }
+//        System.out.println();
+
+//        for (int i = 0; i < words.length; i++) {
+//            if (words[i].startsWith("\"")) {
+//                boolean isWordAfterwards = i + 1 < words.length;
+//                if (isWordAfterwards && words[i + 1].endsWith("\"") && !words[i].endsWith(":")) {
+//                    String str2 = words[i] + " " + words[i + 1];
+//                    list.add(str2);
+//                    i++;
+//                } else {
+//                    list.add(words[i]);
+//                }
+//            } else {
+//                list.add(words[i]);
+//            }
+//        }
+
+/*
+        // TEXTFELD TEST
+        System.out.print("Textfeld Liste: ");
+        for (String word : list) {
+            System.out.print(word + " | ");
+        }
+        System.out.println();
+*/
+
+        return list;
     }
 }
