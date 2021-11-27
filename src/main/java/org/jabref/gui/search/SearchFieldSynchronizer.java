@@ -6,6 +6,8 @@ import java.util.Stack;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
+import org.apache.lucene.queryparser.flexible.core.QueryNodeException;
+import org.apache.lucene.queryparser.flexible.standard.StandardQueryParser;
 import org.controlsfx.control.textfield.CustomTextField;
 
 public class SearchFieldSynchronizer {
@@ -34,7 +36,7 @@ public class SearchFieldSynchronizer {
         }
     }
 
-    /* Does the same as the function above but accepts SearchItems directly*/
+    /* Does the same as the function above but accepts SearchItems objects directly*/
     public void addSearchItem(SearchItem newItem) {
         if (!searchItemList.isEmpty()) {
             if (searchItemList.get(0).getItem().equals("")) {
@@ -49,132 +51,33 @@ public class SearchFieldSynchronizer {
     /* Used mainly by the DropDownMenu to check if a button press
     should add an item to the searchItemList or not. */
     public boolean isValid(ObservableList<SearchItem> searchItemList, SearchItem newItem) {
+        StandardQueryParser queryParser = new StandardQueryParser();
 
-        // new item is of type query
-        if (newItem.getItemType().equals("query")) {
-
-            // if list is empty it's okay to add a query
-            if (searchItemList.isEmpty()) {
-                return true;
-            }
-
-            // a query should usually not follow a query (only okay if searchField consists of only queries)
-            if (this.returnLatest(searchItemList).isQuery()) {
-                return false;
-            }
-
-            // query is allowed to follow attribute
-            if (this.returnLatest(searchItemList).isAttribute()) {
-                return true;
-            }
-
-            // query is not allowed to follow logical
-            if (this.returnLatest(searchItemList).isLogical()) {
-                return false;
-            }
-
-            //
-            if (this.returnLatest(searchItemList).isBracket()) {
-                return false; // TODO: Think about how to manage brackets
-            }
+        boolean valid = true;
+        try {
+            queryParser.parse(this.searchStringBuilder(), "");
+        } catch (QueryNodeException e) {
+            valid = false;
         }
 
-        // new item is of type "attribute"
-        if (newItem.getItemType().equals("attribute")) {
-
-            // if list is empty it's okay to add attribute
-            if (searchItemList.isEmpty()) {
-                return true;
-            }
-
-            // attribute is allowed to follow query but not when search starts with a query
-            if (this.returnLatest(searchItemList).isQuery()) {
-                if (this.isFirstQuery()) {
-                    return false;
-                }
-                return true;
-            }
-
-            // attribute is not allowed to follow attribute
-            if (this.returnLatest(searchItemList).isAttribute()) {
-                return false;
-            }
-
-            // attribute is allowed to follow logical
-            if (this.returnLatest(searchItemList).isLogical()) {
-                return true;
-            }
-
-            //
-            if (this.returnLatest(searchItemList).isBracket()) {
-                return false; // TODO: Think about how to manage brackets
-            }
+        if (valid) {
+            return true;
         }
 
-        // new item is of type "logical"
-        if (newItem.getItemType().equals("logical")) {
-
-            // logical is not allowed as first item in list
-            if (searchItemList.isEmpty()) {
-                return false;
-            }
-
-            // logical is allowed to follow query but not if search starts with a query
-            if (this.returnLatest(searchItemList).isQuery()) {
-                if (this.isFirstQuery()) {
-                    return false;
-                }
-                return true;
-            }
-
-            // logical is not allowed to follow attribute
-            if (this.returnLatest(searchItemList).isAttribute()) {
-                return false;
-            }
-
-            // logical is not allowed to follow logical
-            if (this.returnLatest(searchItemList).isLogical()) {
-                return false;
-            }
-
-            //
-            if (this.returnLatest(searchItemList).isBracket()) {
-                return false; // TODO: Think about how to manage brackets
-            }
+        valid = true;
+        SearchItem Foo = new SearchItem("query", "foo");
+        searchItemList.add(newItem);
+        searchItemList.add(Foo);
+        try {
+            queryParser.parse(this.searchStringBuilder(), "");
+        } catch (QueryNodeException e) {
+            valid = false;
         }
 
-        // new item is of type "bracket"
-        // TODO: Think about how to manage brackets
-        if (newItem.getItemType().equals("bracket")) {
-            if (searchItemList.isEmpty()) {
-                return false;
-            }
-            if (this.returnLatest(searchItemList).getItemType().equals("query")) {
-                if (this.isFirstQuery()) {
-                    return false;
-                }
-                return false;
-            }
-            if (this.returnLatest(searchItemList).getItemType().equals("attribute")) {
-                return false;
-            }
-            if (this.returnLatest(searchItemList).getItemType().equals("logicalOperator")) {
-                return false;
-            }
-            if (this.returnLatest(searchItemList).getItemType().equals("bracket")) {
-                return false; // TODO: Think about how to manage brackets
-            }
-        }
-        return false;
-    }
+        searchItemList.remove(newItem);
+        searchItemList.remove(Foo);
 
-    /* Returns true if the searchItemList is not empty
-    and the first item in it is an item of type query */
-    public boolean isFirstQuery() {
-        if (searchItemList.isEmpty()) {
-            return false;
-        }
-        return searchItemList.get(0).getItemType().equals("query");
+        return valid;
     }
 
     /* Returns the last SearchItem from a searchItemList */
@@ -306,70 +209,12 @@ public class SearchFieldSynchronizer {
         System.out.println("----");
     }
 
-    /* Checks if a given searchItemList is a valid list by adding every single item in order
-    to a new list and checking if every step is valid according to the isValid function
-
-    return true, if valid
-    return false, if not valid
-     */
-    public boolean isValidSearch(ObservableList<SearchItem> searchItemListCheck) {
-        ObservableList<SearchItem> searchItemListNew = FXCollections.observableList(new ArrayList<SearchItem>());
-
-        // Every time we add one item check if it would be valid to do so or not.
-        for (SearchItem item : searchItemListCheck) {
-            if (this.isValid(searchItemListNew, item)) {
-                searchItemListNew.add(item);
-            } else {
-                System.out.println("not valid");
-                return false;
-            }
-        }
-
-        return true;
-    }
-
     // Highlights the searchField green if the search query is valid and red if it is invalid
     public void syntaxHighlighting() {
-
-        // Highlight if some new SearchItem is not a valid new SearchItem according to isValid function
-        if (this.isValidSearch(this.searchItemList)) {
+        if (isValidLucene()) {
             this.searchField.setStyle("-fx-border-color: green");
         } else {
             this.searchField.setStyle("-fx-border-color: red");
-        }
-
-        // Highlight red if only SearchItem is attribute or logical or if last SearchItem is attribute or logical
-        if (!this.searchItemList.isEmpty()) {
-            if (this.searchItemList.get(searchItemList.size() - 1).isAttribute()) {
-                this.searchField.setStyle("-fx-border-color: red");
-            }
-            if (this.searchItemList.get(searchItemList.size() - 1).isLogical()) {
-                this.searchField.setStyle("-fx-border-color: red");
-            }
-        }
-
-        // Highlight red if attribute is followed by a space (" ")
-        for (SearchItem item : this.searchItemList) {
-            if (item.isAttribute()) {
-                if (searchItemList.indexOf(item) + 1 < searchItemList.size()) {
-                    if (Character.isWhitespace(searchItemList.get(searchItemList.indexOf(item) + 1).getItem().charAt(0))) {
-                        this.searchField.setStyle("-fx-border-color: red");
-                    }
-                }
-            }
-        }
-
-        // Highlight green if only queries in list
-        boolean onlyQueries = true;
-        for (SearchItem item : this.searchItemList) {
-            if (!item.isQuery()) {
-                onlyQueries = false;
-                break;
-            }
-        }
-
-        if (onlyQueries) {
-            this.searchField.setStyle("-fx-border-color: green");
         }
 
     }
@@ -401,25 +246,35 @@ public class SearchFieldSynchronizer {
     }
 
     /* Check if brackets are balanced */
-    public boolean bracketsBalanced() {
-        Stack<String> bracketStack = new Stack<>();
+    public boolean bracketsBalanced(ObservableList<SearchItem> searchItemList) {
+        Stack<SearchItem> bracketStack = new Stack<>();
 
-        for (SearchItem item : this.searchItemList) {
+        for (SearchItem item : searchItemList) {
             // if it's a left bracket -> push to Stack
             // if it's a right bracket -> pop from stack and check if we get a left bracket
             if (item.isLeftBracket()) {
-                bracketStack.push(item.getItem());
+                bracketStack.push(item);
             } else if (item.isRightBracket()) {
                 if (bracketStack.isEmpty()) {
                     return false;
                 } else {
-                    if (!bracketStack.pop().equals("(")) {
+                    if (bracketStack.pop().isRightBracket()) {
                         return false;
                     }
                 }
             }
         }
-
         return bracketStack.isEmpty();
+    }
+
+    // Uses StandardQueryParser to parse searchString. Throws exception if not valid syntax
+    public boolean isValidLucene() {
+        StandardQueryParser queryParser = new StandardQueryParser();
+        try {
+            queryParser.parse(this.searchStringBuilder(), "");
+        } catch (QueryNodeException e) {
+            return false;
+        }
+        return true;
     }
 }

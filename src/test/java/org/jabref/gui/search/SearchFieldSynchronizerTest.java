@@ -1,5 +1,9 @@
 package org.jabref.gui.search;
 
+import java.util.ArrayList;
+
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.embed.swing.JFXPanel;
 
 import org.controlsfx.control.textfield.CustomTextField;
@@ -7,6 +11,8 @@ import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Tag("fast")
 public class SearchFieldSynchronizerTest {
@@ -14,7 +20,7 @@ public class SearchFieldSynchronizerTest {
     SearchFieldSynchronizer searchFieldSynchronizer = new SearchFieldSynchronizer(searchField);
 
     @Test
-    void searchStringBuilderTest() {
+    void searchStringBuilderMixed() {
         JFXPanel fxPanel = new JFXPanel();
         searchField = new CustomTextField();
         searchFieldSynchronizer = new SearchFieldSynchronizer(searchField);
@@ -37,7 +43,33 @@ public class SearchFieldSynchronizerTest {
     }
 
     @Test
-    void textFieldtoListTest() {
+    void textFieldToListTest() {
+    }
+
+    @Test
+    void bracketsBalancedTest() {
+        searchFieldSynchronizer = new SearchFieldSynchronizer(searchField);
+        SearchItem item1 = new SearchItem("bracket", "(");
+        SearchItem item2 = new SearchItem("bracket", "(");
+        SearchItem item3 = new SearchItem("bracket", "(");
+        SearchItem item4 = new SearchItem("bracket", ")");
+        SearchItem item5 = new SearchItem("bracket", ")");
+        SearchItem item6 = new SearchItem("bracket", ")");
+
+        ObservableList<SearchItem> searchItemList = FXCollections.observableList(new ArrayList<SearchItem>());
+        searchItemList.add(item1);
+        searchItemList.add(item2);
+        searchItemList.add(item3);
+        searchItemList.add(item4);
+        searchItemList.add(item5);
+        searchItemList.add(item6);
+
+        assertTrue(searchFieldSynchronizer.bracketsBalanced(searchItemList));
+
+        SearchItem item7 = new SearchItem("bracket", ")");
+        searchItemList.add(item7);
+
+        assertFalse(searchFieldSynchronizer.bracketsBalanced(searchItemList));
     }
 }
 
