@@ -22,8 +22,7 @@ public class SearchFieldSynchronizer {
     public void addSearchItem(String itemType, String item) {
         SearchItem newItem = new SearchItem(itemType, item);
 
-        // Remove empty query item (appears after clearing the searchBar text
-        // and prevents you from clicking buttons if not removed)
+        // Remove empty query item (appears after clearing the searchBar text)
         if (!searchItemList.isEmpty()) {
             if (searchItemList.get(0).getItem().equals("")) {
                 searchItemList.remove(searchItemList.get(0));
