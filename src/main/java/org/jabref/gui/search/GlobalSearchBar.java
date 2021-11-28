@@ -14,6 +14,8 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.css.PseudoClass;
 import javafx.event.Event;
 import javafx.geometry.Insets;
@@ -106,6 +108,8 @@ public class GlobalSearchBar extends HBox {
     private final BooleanProperty globalSearchActive = new SimpleBooleanProperty(false);
     private GlobalSearchResultDialog globalSearchResultDialog;
 
+    private final DropDownMenu dropDownMenu;
+
     public GlobalSearchBar(JabRefFrame frame, StateManager stateManager, PreferencesService preferencesService, CountingUndoManager undoManager) {
         super();
         this.stateManager = stateManager;
@@ -123,7 +127,24 @@ public class GlobalSearchBar extends HBox {
         searchFieldTooltip.setMaxHeight(10);
         updateHintVisibility();
 
+        // Prototype RecentSearch
+        // Add to RecentSearch after searchbar loses focus
+        searchField.focusedProperty().addListener(new ChangeListener<Boolean>() {
+            @Override
+            public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+                if (newValue) {
+                    // LOGGER.info("Searchbar in focus");
+                } else {
+                    dropDownMenu.recentSearch.add(searchField.getText());
+                }
+            }
+        });
+
+        // Prototype DropDownMenu
+        SearchFieldSynchronizer searchFieldSynchronizer = new SearchFieldSynchronizer(searchField);
+        this.dropDownMenu = new DropDownMenu(searchField, this, searchFieldSynchronizer);
         KeyBindingRepository keyBindingRepository = Globals.getKeyPrefs();
+
         searchField.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
             Optional<KeyBinding> keyBinding = keyBindingRepository.mapToKeyBinding(event);
             if (keyBinding.isPresent()) {
@@ -136,6 +157,18 @@ public class GlobalSearchBar extends HBox {
             }
         });
 
+//        searchFieldSynchronizer.searchItemList.addListener(new ListChangeListener<SearchItem>() {
+//            @Override
+//            public void onChanged(Change<? extends SearchItem> c) {
+//                searchFieldSynchronizer.synchronize();
+//            }
+//        });
+        // Listens to global search bar textfield changes and updates searchItemList in searchFieldSynchronizer
+        searchField.textProperty().addListener((observable, oldValue, newValue) -> {
+//            System.out.println("textfield changed from " + oldValue + " to " + newValue);
+            searchFieldSynchronizer.updateSearchItemList(searchFieldSynchronizer.textFieldToList());
+            searchFieldSynchronizer.syntaxHighlighting();
+        });
         ClipBoardManager.addX11Support(searchField);
 
         regularExpressionButton = IconTheme.JabRefIcons.REG_EX.asToggleButton();
@@ -268,9 +301,10 @@ public class GlobalSearchBar extends HBox {
     }
 
     public void performSearch() {
-
         LOGGER.debug("Flags: {}", searchPreferences.getSearchFlags());
         LOGGER.debug("Run search " + searchField.getText());
+
+        // Prototype DropDownMenu
 
         // An empty search field should cause the search to be cleared.
         if (searchField.getText().isEmpty()) {
@@ -361,7 +395,7 @@ public class GlobalSearchBar extends HBox {
 
     private void setSearchFieldHintTooltip(TextFlow description) {
         if (preferencesService.getGeneralPreferences().shouldShowAdvancedHints()) {
-            String genericDescription = Localization.lang("Hint:\n\nTo search all fields for <b>Smith</b>, enter:\n<tt>smith</tt>\n\nTo search the field <b>author</b> for <b>Smith</b> and the field <b>title</b> for <b>electrical</b>, enter:\n<tt>author=Smith and title=electrical</tt>");
+            String genericDescription = Localization.lang("Hint:\n\nTo search all fields for <b>Smith</b>, enter:\n<tt>smith</tt>\n\nTo search the field <b>author</b> for <b>Smith</b> and the field <b>title</b> for <b>electrical</b>, enter:\n<tt>author:Smith and title:electrical</tt>");
             List<Text> genericDescriptionTexts = TooltipTextUtil.createTextsFromHtml(genericDescription);
 
             if (description == null) {
