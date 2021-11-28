@@ -276,4 +276,9 @@ public class SearchFieldSynchronizer {
         }
         return true;
     }
+
+    // Deletes all entries in the List
+    public void deleteAllEntries() {
+        searchItemList.clear();
+    }
 }
