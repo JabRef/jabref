@@ -206,7 +206,7 @@ public interface PreferencesService {
 
     ColumnPreferences getColumnPreferences();
 
-    void storeColumnPreferences(ColumnPreferences columnPreferences);
+    void storeMainTableColumnPreferences(ColumnPreferences columnPreferences);
 
     MainTablePreferences getMainTablePreferences();
 
@@ -215,6 +215,14 @@ public interface PreferencesService {
     MainTableNameFormatPreferences getMainTableNameFormatPreferences();
 
     void storeMainTableNameFormatPreferences(MainTableNameFormatPreferences preferences);
+
+    //*************************************************************************************************************
+    // SearchDialogColumnPreferences
+    //*************************************************************************************************************
+
+    ColumnPreferences getSearchDialogColumnPreferences();
+
+    void storeSearchDialogColumnPreferences(ColumnPreferences columnPreferences);
 
     //*************************************************************************************************************
     // AppearancePreferences
@@ -321,4 +329,5 @@ public interface PreferencesService {
     void storeIdBasedFetcherForEntryGenerator(String fetcherName);
 
     ProtectedTermsPreferences getProtectedTermsPreferences();
+
 }
