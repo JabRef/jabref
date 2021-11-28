@@ -1991,7 +1991,7 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     /**
-     * Stores the {@link JabRefPreferences::SearchDialogColumnPreferences} in the preferences
+     * Stores the {@link ColumnPreferences} in the preferences
      *
      * @param columnPreferences the preferences to store
      */
