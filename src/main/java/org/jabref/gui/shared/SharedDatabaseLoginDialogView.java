@@ -19,6 +19,7 @@ import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.IconValidationDecorator;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.shared.DBMSType;
+import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
@@ -46,6 +47,7 @@ public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
     @FXML private TextField serverTimezone;
 
     @Inject private DialogService dialogService;
+    @Inject private PreferencesService preferencesService;
 
     private SharedDatabaseLoginDialogViewModel viewModel;
     private final ControlsFxVisualizer visualizer = new ControlsFxVisualizer();
@@ -78,7 +80,7 @@ public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
     private void initialize() {
         visualizer.setDecoration(new IconValidationDecorator());
 
-        viewModel = new SharedDatabaseLoginDialogViewModel(frame, dialogService);
+        viewModel = new SharedDatabaseLoginDialogViewModel(frame, dialogService, preferencesService);
         databaseType.getItems().addAll(DBMSType.values());
         databaseType.getSelectionModel().select(0);
 
@@ -111,13 +113,11 @@ public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
             visualizer.initVisualization(viewModel.portValidation(), port, true);
             visualizer.initVisualization(viewModel.userValidation(), user, true);
 
-            EasyBind.subscribe(autosave.selectedProperty(), selected -> {
-                visualizer.initVisualization(viewModel.folderValidation(), folder, true);
-            });
+            EasyBind.subscribe(autosave.selectedProperty(), selected ->
+                    visualizer.initVisualization(viewModel.folderValidation(), folder, true));
 
-            EasyBind.subscribe(useSSL.selectedProperty(), selected -> {
-                visualizer.initVisualization(viewModel.keystoreValidation(), fileKeystore, true);
-            });
+            EasyBind.subscribe(useSSL.selectedProperty(), selected ->
+                    visualizer.initVisualization(viewModel.keystoreValidation(), fileKeystore, true));
         });
     }
 

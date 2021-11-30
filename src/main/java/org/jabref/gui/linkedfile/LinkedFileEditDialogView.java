@@ -32,7 +32,7 @@ public class LinkedFileEditDialogView extends BaseDialog<LinkedFile> {
     private LinkedFilesEditDialogViewModel viewModel;
 
     private final LinkedFile linkedFile;
-    private ExternalFileTypes externalFileTypes;
+    private final ExternalFileTypes externalFileTypes;
 
     public LinkedFileEditDialogView(LinkedFile linkedFile) {
         this.linkedFile = linkedFile;
@@ -56,7 +56,7 @@ public class LinkedFileEditDialogView extends BaseDialog<LinkedFile> {
     @FXML
     private void initialize() {
 
-        viewModel = new LinkedFilesEditDialogViewModel(linkedFile, stateManager.getActiveDatabase().get(), dialogService, preferences, externalFileTypes);
+        viewModel = new LinkedFilesEditDialogViewModel(linkedFile, stateManager.getActiveDatabase().get(), dialogService, preferences.getFilePreferences(), externalFileTypes);
         fileType.itemsProperty().bindBidirectional(viewModel.externalFileTypeProperty());
         description.textProperty().bindBidirectional(viewModel.descriptionProperty());
         link.textProperty().bindBidirectional(viewModel.linkProperty());

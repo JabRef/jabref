@@ -47,7 +47,6 @@ class StudyDatabaseToFetcherConverterTest {
         when(savePreferences.takeMetadataSaveOrderInAccount()).thenReturn(true);
         when(importFormatPreferences.getKeywordSeparator()).thenReturn(',');
         when(importFormatPreferences.getFieldContentFormatterPreferences()).thenReturn(new FieldContentFormatterPreferences());
-        when(importFormatPreferences.isKeywordSyncEnabled()).thenReturn(false);
         entryTypesManager = new BibEntryTypesManager();
         gitHandler = mock(SlrGitHandler.class, Answers.RETURNS_DEFAULTS);
     }

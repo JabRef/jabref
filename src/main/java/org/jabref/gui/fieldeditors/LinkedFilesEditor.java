@@ -275,7 +275,7 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
                 factory.createMenuItem(StandardActions.RENAME_FILE_TO_NAME, new ContextAction(StandardActions.RENAME_FILE_TO_NAME, linkedFile, preferencesService)),
                 factory.createMenuItem(StandardActions.MOVE_FILE_TO_FOLDER, new ContextAction(StandardActions.MOVE_FILE_TO_FOLDER, linkedFile, preferencesService)),
                 factory.createMenuItem(StandardActions.MOVE_FILE_TO_FOLDER_AND_RENAME, new ContextAction(StandardActions.MOVE_FILE_TO_FOLDER_AND_RENAME, linkedFile, preferencesService)),
-                factory.createMenuItem(StandardActions.COPY_FILE_TO_FOLDER, new CopySingleFileAction(linkedFile.getFile(), dialogService, databaseContext, preferencesService)),
+                factory.createMenuItem(StandardActions.COPY_FILE_TO_FOLDER, new CopySingleFileAction(linkedFile.getFile(), dialogService, databaseContext, preferencesService.getFilePreferences())),
                 factory.createMenuItem(StandardActions.REMOVE_LINK, new ContextAction(StandardActions.REMOVE_LINK, linkedFile, preferencesService)),
                 factory.createMenuItem(StandardActions.DELETE_FILE, new ContextAction(StandardActions.DELETE_FILE, linkedFile, preferencesService))
         );
@@ -294,12 +294,12 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
 
             this.executable.bind(
                     switch (command) {
-                        case RENAME_FILE_TO_PATTERN, MOVE_FILE_TO_FOLDER_AND_RENAME -> Bindings.createBooleanBinding(
+                        case RENAME_FILE_TO_PATTERN -> Bindings.createBooleanBinding(
                                 () -> !linkedFile.getFile().isOnlineLink()
                                         && linkedFile.getFile().findIn(databaseContext, preferencesService.getFilePreferences()).isPresent()
                                         && !linkedFile.isGeneratedNameSameAsOriginal(),
                                 linkedFile.getFile().linkProperty(), bibEntry.getValue().map(BibEntry::getFieldsObservable).orElse(null));
-                        case MOVE_FILE_TO_FOLDER -> Bindings.createBooleanBinding(
+                        case MOVE_FILE_TO_FOLDER, MOVE_FILE_TO_FOLDER_AND_RENAME -> Bindings.createBooleanBinding(
                                 () -> !linkedFile.getFile().isOnlineLink()
                                         && linkedFile.getFile().findIn(databaseContext, preferencesService.getFilePreferences()).isPresent()
                                         && !linkedFile.isGeneratedPathSameAsOriginal(),
