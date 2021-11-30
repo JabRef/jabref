@@ -102,9 +102,10 @@ open module org.jabref {
     requires com.fasterxml.jackson.datatype.jsr310;
     requires net.harawata.appdirs;
 
-    // custom module name for the apollo shadow jar under libs
-    requires com.customapollo.thirdparty.apollo;
-    // jetbrains annotations, required for apollo
-    requires annotations;
-
+    requires com.apollographql.apollo3.api;
+    requires com.apollographql.apollo3.runtime;
+    requires com.apollographql.apollo3.rx3;
+    requires kotlin.stdlib;
+    requires okhttp3;
+    requires io.reactivex.rxjava3;
 }

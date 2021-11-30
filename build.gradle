@@ -34,7 +34,7 @@ plugins {
 
     id 'idea'
 
-    id "com.apollographql.apollo" version '2.5.9'
+    id "com.apollographql.apollo3" version '3.0.0-beta04'
 }
 
 // Enable following for debugging
@@ -208,6 +208,10 @@ dependencies {
     implementation 'com.vladsch.flexmark:flexmark-ext-gfm-tasklist:0.62.2'
 
     implementation group: 'net.harawata', name: 'appdirs', version: '1.2.1'
+
+    // jabref online
+    implementation("com.apollographql.apollo3:apollo-runtime:3.0.0-beta04")
+    implementation("com.apollographql.apollo3:apollo-rx3-support:3.0.0-beta04")
 
     testImplementation 'io.github.classgraph:classgraph:4.8.137'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.8.1'
@@ -386,22 +390,21 @@ task generateJournalAbbreviationList(type: JournalAbbreviationConverter) {
     outputDir = file("src/main/resources/journals")
 }
 
-task downloadSchema(type: com.apollographql.apollo.gradle.internal.ApolloDownloadSchemaTask) {
+task downloadSchema(type: com.apollographql.apollo3.gradle.internal.ApolloDownloadSchemaTask) {
     endpoint.set("https://jabref-dev.azurewebsites.net/api")
-    schemaRelativeToProject.set("src/main/java/org/jabref/jabrefonline/graphql/schema.json")
+    schema.set("src/main/java/org/jabref/jabrefonline/graphql/schema.json")
 }
 
 apollo {
   schemaFile = file("src/main/java/org/jabref/jabrefonline/graphql/schema.json")
-  graphqlSourceDirectorySet.srcDirs += "src/main/java/org/jabref/jabrefonline/graphql/"
-  graphqlSourceDirectorySet.excludes = ["schema.json"]
-  customTypeMapping = [
+  srcDir(file("src/main/java/org/jabref/jabrefonline/graphql/"))
+  excludes = ["schema.json"]
+  customScalarsMapping = [
     "DateTime" : "java.time.LocalDateTime"
   ]
   generateKotlinModels = false
-  nullableValueType = "javaOptional"
-  useJavaBeansSemanticNaming = true
-  rootPackageName = "org.jabref.jabrefonline"
+  useSemanticNaming = true
+  packageName = "org.jabref.jabrefonline"
 }
 
 tasks.withType(JavaCompile) {

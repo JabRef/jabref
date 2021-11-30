@@ -1,13 +1,12 @@
 package org.jabref.jabrefonline;
 
-import java.util.Optional;
-
 import org.jabref.jabrefonline.GetDocumentByIdQuery.Data;
 
-import com.apollographql.apollo.ApolloCall.Callback;
-import com.apollographql.apollo.ApolloClient;
-import com.apollographql.apollo.api.Response;
-import com.apollographql.apollo.exception.ApolloException;
+import com.apollographql.apollo3.ApolloClient;
+import com.apollographql.apollo3.ApolloQueryCall;
+import com.apollographql.apollo3.api.ApolloResponse;
+import com.apollographql.apollo3.rx3.Rx3Apollo;
+import io.reactivex.rxjava3.core.Single;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,19 +23,9 @@ public class GetDocumentByIdQ {
                                                 .build();
 
         // Then enqueue your query
-        apolloClient.query(new GetDocumentByIdQuery("83")).enqueue(new Callback<Optional<Data>>() {
+        ApolloQueryCall<Data> queryCall = apolloClient.query(new GetDocumentByIdQuery("83"));
 
-            @Override
-            public void onResponse(Response<Optional<Data>> arg0) {
-                // TODO Auto-generated method stub
-
-            }
-
-            @Override
-            public void onFailure(ApolloException ex) {
-                LOGGER.error("error", ex);
-            }
-        });
+        Single<ApolloResponse<Data>> queryResponse = Rx3Apollo.single(queryCall);
 
     }
 
