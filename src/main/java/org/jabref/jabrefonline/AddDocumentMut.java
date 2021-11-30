@@ -12,17 +12,14 @@ public class AddDocumentMut {
 
     void update() {
 
-
-
         // First, create an `ApolloClient`
         // Replace the serverUrl with your GraphQL endpoint
-        ApolloClient apolloClient = ApolloClient.builder()
-                                                .serverUrl("https://jabref-dev.azurewebsites.net/api")
-                                                .build();
+        ApolloClient.Builder apolloClient = new ApolloClient.Builder()
+                                                                      .serverUrl("https://jabref-dev.azurewebsites.net/api");
 
+        var optionalPersonInoput = new Optional.Present<>(new AddPersonInput("JabRef"));
 
-        var optionalPersonInoput  = new Optional.Present<>(new AddPersonInput("JabRef"));
-
+        // new AddJournalArticleInput().title(new Optional.Present<>("JabRef is great"));
         /*
         new AddJournalArticleInput(null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null)
 
