@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" page-range-format="expanded" demote-non-dropping-particle="never" default-locale="en-US">
+<style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" page-range-format="expanded" demote-non-dropping-particle="never" default-locale="en-GB">
   <info>
     <title>Polar Research</title>
     <id>http://www.zotero.org/styles/polar-research</id>
@@ -13,12 +13,17 @@
     <category field="geography"/>
     <issn>0800-0395</issn>
     <eissn>1751-8369</eissn>
-    <updated>2021-11-02T21:00:24+00:00</updated>
+    <updated>2021-11-17T09:18:50+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
+  <locale xml:lang="en">
+    <terms>
+      <term name="accessed">accessed on the internet at</term>
+    </terms>
+  </locale>
   <macro name="editor">
     <names variable="editor" delimiter=", ">
-      <name and="symbol" delimiter-precedes-last="never" initialize-with="." name-as-sort-order="all" sort-separator=" "/>
+      <name and="symbol" delimiter-precedes-last="never" initialize-with="." sort-separator=" "/>
       <label form="short" font-style="normal" prefix=" (" suffix=")"/>
     </names>
   </macro>
@@ -48,15 +53,11 @@
         <text variable="DOI" prefix=", doi: "/>
       </if>
       <else-if variable="URL">
-        <text value="Available at:" prefix=" " suffix=" "/>
-        <text variable="URL"/>
-        <group prefix=" [" suffix="]">
-          <text term="accessed" text-case="capitalize-first" suffix=" "/>
-          <date variable="accessed">
-            <date-part name="month" suffix=" "/>
-            <date-part name="day" suffix=", "/>
-            <date-part name="year"/>
-          </date>
+        <group delimiter=" " prefix=". ">
+          <text term="accessed" text-case="capitalize-first" prefix=" " suffix=" "/>
+          <text variable="URL"/>
+          <text value="on" suffix=" "/>
+          <date form="text" variable="accessed"/>
         </group>
       </else-if>
     </choose>
@@ -199,8 +200,8 @@
       <key macro="author"/>
       <key variable="title"/>
     </sort>
-    <layout>
-      <group suffix=".">
+    <layout suffix=".">
+      <group>
         <group delimiter=". ">
           <text macro="author"/>
           <text macro="year"/>
