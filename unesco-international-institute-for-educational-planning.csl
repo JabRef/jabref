@@ -71,7 +71,7 @@
   </macro>
   <macro name="author-short">
     <names variable="author">
-      <name form="short" and="text" delimiter=", " delimiter-precedes-last="always"/>
+      <name form="short" and="text" delimiter=", "/>
       <substitute>
         <names variable="editor"/>
         <names variable="translator"/>
