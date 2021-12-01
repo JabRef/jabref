@@ -56,9 +56,7 @@ public class CreateModifyExporterDialogViewModel extends AbstractViewModel {
     public ExporterViewModel saveExporter() {
         Path layoutFileDir = Path.of(layoutFile.get()).getParent();
         if (layoutFileDir != null) {
-            String layoutFileDirString = layoutFileDir.toString();
-            preferences.storeImportExportPreferences(
-                    preferences.getImportExportPreferences().withExportWorkingDirectory(Path.of(layoutFileDirString)));
+            preferences.getImportExportPreferences().setExportWorkingDirectory(layoutFileDir);
         }
 
         // Check that there are no empty strings.

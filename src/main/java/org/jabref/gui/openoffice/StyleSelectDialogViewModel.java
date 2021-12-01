@@ -62,7 +62,7 @@ public class StyleSelectDialogViewModel {
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                 .addExtensionFilter(Localization.lang("Style file"), StandardFileType.JSTYLE)
                 .withDefaultExtension(Localization.lang("Style file"), StandardFileType.JSTYLE)
-                .withInitialDirectory(preferencesService.getWorkingDir())
+                .withInitialDirectory(preferencesService.getFilePreferences().getWorkingDirectory())
                 .build();
         Optional<Path> path = dialogService.showFileOpenDialog(fileDialogConfiguration);
         path.map(Path::toAbsolutePath).map(Path::toString).ifPresent(stylePath -> {

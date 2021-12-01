@@ -83,7 +83,7 @@ public class GroupDialogViewModel {
     private final BooleanProperty keywordGroupRegexProperty = new SimpleBooleanProperty();
 
     private final StringProperty searchGroupSearchTermProperty = new SimpleStringProperty("");
-    private final ObjectProperty<EnumSet<SearchFlags>> searchFlagsProperty = new SimpleObjectProperty(EnumSet.noneOf(SearchFlags.class));
+    private final ObjectProperty<EnumSet<SearchFlags>> searchFlagsProperty = new SimpleObjectProperty<>(EnumSet.noneOf(SearchFlags.class));
 
     private final BooleanProperty autoGroupKeywordsOptionProperty = new SimpleBooleanProperty();
     private final StringProperty autoGroupKeywordsFieldProperty = new SimpleStringProperty("");
@@ -236,7 +236,7 @@ public class GroupDialogViewModel {
                             return false;
                         }
                         return FileUtil.getFileExtension(input)
-                                .map(extension -> extension.toLowerCase().equals("aux"))
+                                .map(extension -> extension.equalsIgnoreCase("aux"))
                                 .orElse(false);
                     }
                 },
@@ -273,7 +273,7 @@ public class GroupDialogViewModel {
      * @return an absolute path if LatexFileDirectory exists; otherwise, returns input
      */
     private Path getAbsoluteTexGroupPath(String input) {
-        Optional<Path> latexFileDirectory = currentDatabase.getMetaData().getLatexFileDirectory(preferencesService.getUser());
+        Optional<Path> latexFileDirectory = currentDatabase.getMetaData().getLatexFileDirectory(preferencesService.getFilePreferences().getUser());
         return latexFileDirectory.map(path -> path.resolve(input)).orElse(Path.of(input));
     }
 
@@ -435,7 +435,9 @@ public class GroupDialogViewModel {
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                 .addExtensionFilter(StandardFileType.AUX)
                 .withDefaultExtension(StandardFileType.AUX)
-                .withInitialDirectory(preferencesService.getWorkingDir()).build();
+                .withInitialDirectory(currentDatabase.getMetaData()
+                                                     .getLatexFileDirectory(preferencesService.getFilePreferences().getUser())
+                                                     .orElse(FileUtil.getInitialDirectory(currentDatabase, preferencesService.getFilePreferences().getWorkingDirectory()))).build();
         dialogService.showFileOpenDialog(fileDialogConfiguration)
                      .ifPresent(file -> texGroupFilePathProperty.setValue(
                              FileUtil.relativize(file.toAbsolutePath(), getFileDirectoriesAsPaths()).toString()

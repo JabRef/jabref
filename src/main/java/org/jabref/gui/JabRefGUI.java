@@ -59,9 +59,9 @@ public class JabRefGUI {
         openWindow(mainStage);
 
         new VersionWorker(Globals.BUILD_INFO.version,
-                preferencesService.getVersionPreferences().getIgnoredVersion(),
                 mainFrame.getDialogService(),
-                Globals.TASK_EXECUTOR)
+                Globals.TASK_EXECUTOR,
+                preferencesService.getVersionPreferences())
                 .checkForNewVersionDelayed();
     }
 
@@ -279,6 +279,7 @@ public class JabRefGUI {
             try {
                 parsedDatabase = OpenDatabase.loadDatabase(
                         dbFile,
+                        preferencesService.getGeneralPreferences(),
                         preferencesService.getImportFormatPreferences(),
                         Globals.getFileUpdateMonitor());
             } catch (IOException ex) {

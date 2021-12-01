@@ -1,7 +1,6 @@
 package org.jabref.logic.exporter;
 
 import java.io.IOException;
-import java.io.Writer;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -42,18 +41,21 @@ import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.model.metadata.SaveOrderConfig;
 import org.jabref.model.strings.StringUtil;
+import org.jabref.preferences.GeneralPreferences;
 
 public abstract class BibDatabaseWriter {
 
     private static final Pattern REFERENCE_PATTERN = Pattern.compile("(#[A-Za-z]+#)"); // Used to detect string references in strings
-    protected final Writer writer;
-    protected final SavePreferences preferences;
+    protected final BibWriter bibWriter;
+    protected final GeneralPreferences generalPreferences;
+    protected final SavePreferences savePreferences;
     protected final List<FieldChange> saveActionsFieldChanges = new ArrayList<>();
     protected final BibEntryTypesManager entryTypesManager;
 
-    public BibDatabaseWriter(Writer writer, SavePreferences preferences, BibEntryTypesManager entryTypesManager) {
-        this.writer = Objects.requireNonNull(writer);
-        this.preferences = preferences;
+    public BibDatabaseWriter(BibWriter bibWriter, GeneralPreferences generalPreferences, SavePreferences savePreferences, BibEntryTypesManager entryTypesManager) {
+        this.bibWriter = Objects.requireNonNull(bibWriter);
+        this.generalPreferences = generalPreferences;
+        this.savePreferences = savePreferences;
         this.entryTypesManager = entryTypesManager;
     }
 
@@ -171,13 +173,12 @@ public abstract class BibDatabaseWriter {
             writeDatabaseID(sharedDatabaseIDOptional.get());
         }
 
-        // Map to collect entry type definitions that we must save along with entries using them.
-        Set<BibEntryType> typesToWrite = new TreeSet<>();
-
         // Some file formats write something at the start of the file (like the encoding)
-        if (preferences.getSaveType() != SavePreferences.DatabaseSaveType.PLAIN_BIBTEX) {
-            writePrelogue(bibDatabaseContext, preferences.getEncoding());
+        if (savePreferences.getSaveType() != SavePreferences.DatabaseSaveType.PLAIN_BIBTEX) {
+            writeProlog(bibDatabaseContext, generalPreferences.getDefaultEncoding());
         }
+
+        bibWriter.finishBlock();
 
         // Write preamble if there is one.
         writePreamble(bibDatabaseContext.getDatabase().getPreamble().orElse(""));
@@ -186,13 +187,16 @@ public abstract class BibDatabaseWriter {
         writeStrings(bibDatabaseContext.getDatabase());
 
         // Write database entries.
-        List<BibEntry> sortedEntries = getSortedEntries(bibDatabaseContext, entries, preferences);
+        List<BibEntry> sortedEntries = getSortedEntries(bibDatabaseContext, entries, savePreferences);
         List<FieldChange> saveActionChanges = applySaveActions(sortedEntries, bibDatabaseContext.getMetaData());
         saveActionsFieldChanges.addAll(saveActionChanges);
-        if (preferences.getCitationKeyPatternPreferences().shouldGenerateCiteKeysBeforeSaving()) {
+        if (savePreferences.getCitationKeyPatternPreferences().shouldGenerateCiteKeysBeforeSaving()) {
             List<FieldChange> keyChanges = generateCitationKeys(bibDatabaseContext, sortedEntries);
             saveActionsFieldChanges.addAll(keyChanges);
         }
+
+        // Map to collect entry type definitions that we must save along with entries using them.
+        Set<BibEntryType> typesToWrite = new TreeSet<>();
 
         for (BibEntry entry : sortedEntries) {
             // Check if we must write the type definition for this
@@ -207,9 +211,9 @@ public abstract class BibDatabaseWriter {
             writeEntry(entry, bibDatabaseContext.getMode());
         }
 
-        if (preferences.getSaveType() != SavePreferences.DatabaseSaveType.PLAIN_BIBTEX) {
+        if (savePreferences.getSaveType() != SavePreferences.DatabaseSaveType.PLAIN_BIBTEX) {
             // Write meta data.
-            writeMetaData(bibDatabaseContext.getMetaData(), preferences.getCitationKeyPatternPreferences().getKeyPattern());
+            writeMetaData(bibDatabaseContext.getMetaData(), savePreferences.getCitationKeyPatternPreferences().getKeyPattern());
 
             // Write type definitions, if any:
             writeEntryTypeDefinitions(typesToWrite);
@@ -217,11 +221,9 @@ public abstract class BibDatabaseWriter {
 
         // finally write whatever remains of the file, but at least a concluding newline
         writeEpilogue(bibDatabaseContext.getDatabase().getEpilog());
-
-        writer.close();
     }
 
-    protected abstract void writePrelogue(BibDatabaseContext bibDatabaseContext, Charset encoding) throws IOException;
+    protected abstract void writeProlog(BibDatabaseContext bibDatabaseContext, Charset encoding) throws IOException;
 
     protected abstract void writeEntry(BibEntry entry, BibDatabaseMode mode) throws IOException;
 
@@ -268,17 +270,17 @@ public abstract class BibDatabaseWriter {
         }
 
         for (BibtexString.Type t : BibtexString.Type.values()) {
-            boolean isFirstStringInType = true;
             for (BibtexString bs : strings) {
                 if (remaining.containsKey(bs.getName()) && (bs.getType() == t)) {
-                    writeString(bs, isFirstStringInType, remaining, maxKeyLength);
-                    isFirstStringInType = false;
+                    writeString(bs, remaining, maxKeyLength);
                 }
             }
         }
+
+        bibWriter.finishBlock();
     }
 
-    protected void writeString(BibtexString bibtexString, boolean isFirstString, Map<String, BibtexString> remaining, int maxKeyLength)
+    protected void writeString(BibtexString bibtexString, Map<String, BibtexString> remaining, int maxKeyLength)
             throws IOException {
         // First remove this from the "remaining" list so it can't cause problem with circular refs:
         remaining.remove(bibtexString.getName());
@@ -297,14 +299,14 @@ public abstract class BibDatabaseWriter {
             // If the label we found exists as a key in the "remaining" Map, we go on and write it now:
             if (remaining.containsKey(label)) {
                 BibtexString referred = remaining.get(label);
-                writeString(referred, isFirstString, remaining, maxKeyLength);
+                writeString(referred, remaining, maxKeyLength);
             }
         }
 
-        writeString(bibtexString, isFirstString, maxKeyLength);
+        writeString(bibtexString, maxKeyLength);
     }
 
-    protected abstract void writeString(BibtexString bibtexString, boolean isFirstString, int maxKeyLength)
+    protected abstract void writeString(BibtexString bibtexString, int maxKeyLength)
             throws IOException;
 
     protected void writeEntryTypeDefinitions(Set<BibEntryType> types) throws IOException {
@@ -320,7 +322,7 @@ public abstract class BibDatabaseWriter {
      */
     protected List<FieldChange> generateCitationKeys(BibDatabaseContext databaseContext, List<BibEntry> entries) {
         List<FieldChange> changes = new ArrayList<>();
-        CitationKeyGenerator keyGenerator = new CitationKeyGenerator(databaseContext, preferences.getCitationKeyPatternPreferences());
+        CitationKeyGenerator keyGenerator = new CitationKeyGenerator(databaseContext, savePreferences.getCitationKeyPatternPreferences());
         for (BibEntry bes : entries) {
             Optional<String> oldKey = bes.getCitationKey();
             if (StringUtil.isBlank(oldKey)) {
