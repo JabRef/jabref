@@ -3,6 +3,7 @@ package org.jabref.gui.logging;
 import java.util.Locale;
 
 import org.tinylog.Level;
+import org.tinylog.format.AdvancedMessageFormatter;
 import org.tinylog.format.MessageFormatter;
 import org.tinylog.provider.ContextProvider;
 import org.tinylog.provider.LoggingProvider;
@@ -40,7 +41,7 @@ public class GuiAppender implements LoggingProvider {
     private void log(Throwable exception, String message, Object[] arguments) {
         StringBuilder builder = new StringBuilder();
         if (message != null) {
-            builder.append(new AdvancedMesageFormatter(Locale.ENGLISH).format(message, arguments));
+            builder.append(new AdvancedMessageFormatter(Locale.ENGLISH, true).format(message, arguments));
         }
         if (exception != null) {
             if (builder.length() > 0) {

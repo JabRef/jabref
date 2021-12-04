@@ -8,22 +8,22 @@ import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.logic.util.OS;
 
 import com.google.common.base.Throwables;
-import org.apache.logging.log4j.core.LogEvent;
+import org.slf4j.event.LoggingEvent;
 
 public class LogEventViewModel {
 
-    private LogEvent logEvent;
+    private final LoggingEvent logEvent;
 
-    public LogEventViewModel(LogEvent logEvent) {
+    public LogEventViewModel(LoggingEvent logEvent) {
         this.logEvent = Objects.requireNonNull(logEvent);
     }
 
     public String getDisplayText() {
-        return logEvent.getMessage().getFormattedMessage();
+        return logEvent.getMessage();
     }
 
     public String getStyleClass() {
-        switch (logEvent.getLevel().getStandardLevel()) {
+        switch (logEvent.getLevel()) {
             case ERROR:
                 return "exception";
             case WARN:
@@ -35,7 +35,7 @@ public class LogEventViewModel {
     }
 
     public JabRefIcon getIcon() {
-        switch (logEvent.getLevel().getStandardLevel()) {
+        switch (logEvent.getLevel()) {
             case ERROR:
                 return (IconTheme.JabRefIcons.INTEGRITY_FAIL);
             case WARN:
@@ -47,7 +47,7 @@ public class LogEventViewModel {
     }
 
     public Optional<String> getStackTrace() {
-        return Optional.ofNullable(logEvent.getMessage().getThrowable()).map(Throwables::getStackTraceAsString);
+        return Optional.ofNullable(logEvent.getThrowable()).map(Throwables::getStackTraceAsString);
     }
 
     public String getDetailedText() {
