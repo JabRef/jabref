@@ -24,9 +24,9 @@ public class AboutDialogViewModel extends AbstractViewModel {
 
     private static final String HOMEPAGE_URL = "https://www.jabref.org";
     private static final String DONATION_URL = "https://donations.jabref.org";
-    private static final String LIBRARIES_URL = "https://github.com/JabRef/jabref/blob/master/external-libraries.md";
+    private static final String LIBRARIES_URL = "https://github.com/JabRef/jabref/blob/main/external-libraries.md";
     private static final String GITHUB_URL = "https://github.com/JabRef/jabref";
-    private static final String LICENSE_URL = "https://github.com/JabRef/jabref/blob/master/LICENSE.md";
+    private static final String LICENSE_URL = "https://github.com/JabRef/jabref/blob/main/LICENSE.md";
     private static final String CONTRIBUTORS_URL = "https://github.com/JabRef/jabref/graphs/contributors";
     private final String changelogUrl;
     private final String versionInfo;

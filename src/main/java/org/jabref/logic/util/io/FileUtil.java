@@ -24,8 +24,10 @@ import java.util.stream.Stream;
 
 import org.jabref.logic.citationkeypattern.BracketedPattern;
 import org.jabref.model.database.BibDatabase;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.util.OptionalUtil;
+import org.jabref.preferences.PreferencesService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -373,5 +375,12 @@ public class FileUtil {
      */
     public static boolean isPDFFile(Path file) {
         return getFileExtension(file).filter(type -> "pdf".equals(type)).isPresent();
+    }
+
+    /**
+     * @return Path of current panel database directory or the standard working directory in case the datbase was not saved yet
+     */
+    public static Path getInitialDirectory(BibDatabaseContext databaseContext, PreferencesService preferencesService) {
+        return databaseContext.getDatabasePath().map(Path::getParent).orElse(preferencesService.getWorkingDir());
     }
 }

@@ -99,6 +99,33 @@ class EntryComparatorTest {
         assertEquals(-1, new EntryComparator(false, false, InternalField.KEY_FIELD).compare(e1, e2));
         assertEquals(1, new EntryComparator(false, false, InternalField.KEY_FIELD).compare(e2, e1));
     }
+
+    @Test
+    void compareWithCrLfFields() {
+        BibEntry e1 = new BibEntry()
+                .withField(StandardField.COMMENT, "line1\r\n\r\nline3\r\n\r\nline5");
+        BibEntry e2 = new BibEntry()
+                .withField(StandardField.COMMENT, "line1\r\n\r\nline3\r\n\r\nline5");
+        assertEquals(0, new EntryComparator(false, false, InternalField.KEY_FIELD).compare(e1, e2));
+    }
+
+    @Test
+    void compareWithLfFields() {
+        BibEntry e1 = new BibEntry()
+                .withField(StandardField.COMMENT, "line1\n\nline3\n\nline5");
+        BibEntry e2 = new BibEntry()
+                .withField(StandardField.COMMENT, "line1\n\nline3\n\nline5");
+        assertEquals(0, new EntryComparator(false, false, InternalField.KEY_FIELD).compare(e1, e2));
+    }
+
+    @Test
+    void compareWithMixedLineEndings() {
+        BibEntry e1 = new BibEntry()
+                .withField(StandardField.COMMENT, "line1\n\nline3\n\nline5");
+        BibEntry e2 = new BibEntry()
+                .withField(StandardField.COMMENT, "line1\r\n\r\nline3\r\n\r\nline5");
+        assertEquals(-1, new EntryComparator(false, false, InternalField.KEY_FIELD).compare(e1, e2));
+    }
 }
 
 

@@ -31,10 +31,6 @@
                      toggleGroup="$stringsResolveToggleGroup"/>
         <TextField fx:id="resolveStringsExcept" HBox.hgrow="ALWAYS"/>
     </HBox>
-    <HBox alignment="CENTER_LEFT" spacing="10.0">
-        <Label alignment="TOP_LEFT" text="%Newline separator"/>
-        <ComboBox fx:id="newLineSeparator" prefWidth="120.0"/>
-    </HBox>
     <CheckBox fx:id="alwaysReformatBib" text="%Always reformat BIB file on save and export"/>
 
     <Label styleClass="sectionHeader" text="%Autosave"/>

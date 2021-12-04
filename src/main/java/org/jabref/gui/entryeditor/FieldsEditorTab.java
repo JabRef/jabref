@@ -126,6 +126,7 @@ abstract class FieldsEditorTab extends EntryEditorTab {
             addColumn(gridPane, 1, editors.values().stream().map(FieldEditorFX::getNode).limit(rows));
             addColumn(gridPane, 4, editors.values().stream().map(FieldEditorFX::getNode).skip(rows));
 
+            columnExpand.setPercentWidth(40);
             gridPane.getColumnConstraints().addAll(columnDoNotContract, columnExpand, new ColumnConstraints(10),
                     columnDoNotContract, columnExpand);
 
