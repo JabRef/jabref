@@ -22,7 +22,6 @@ class DateTest {
         assertEquals(Optional.of(expectedDataRange), Date.parse("2014/2017"));
     }
 
-
     @Test
     void parseCorrectlyDayMonthYearDate() throws Exception {
         Date expected = new Date(LocalDate.of(2014, 6, 19));
