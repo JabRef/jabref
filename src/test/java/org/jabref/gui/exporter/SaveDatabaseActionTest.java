@@ -26,6 +26,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.metadata.MetaData;
+import org.jabref.preferences.FilePreferences;
 import org.jabref.preferences.GeneralPreferences;
 import org.jabref.preferences.JabRefPreferences;
 
@@ -46,10 +47,11 @@ class SaveDatabaseActionTest {
 
     private static final String TEST_BIBTEX_LIBRARY_LOCATION = "C:\\Users\\John_Doe\\Jabref\\literature.bib";
     private Path file = Path.of(TEST_BIBTEX_LIBRARY_LOCATION);
-    private DialogService dialogService = mock(DialogService.class);
-    private JabRefPreferences preferences = mock(JabRefPreferences.class);
+    private final DialogService dialogService = mock(DialogService.class);
+    private final FilePreferences filePreferences = mock(FilePreferences.class);
+    private final JabRefPreferences preferences = mock(JabRefPreferences.class);
     private LibraryTab libraryTab = mock(LibraryTab.class);
-    private JabRefFrame jabRefFrame = mock(JabRefFrame.class);
+    private final JabRefFrame jabRefFrame = mock(JabRefFrame.class);
     private BibDatabaseContext dbContext = spy(BibDatabaseContext.class);
     private SaveDatabaseAction saveDatabaseAction;
 
@@ -57,6 +59,8 @@ class SaveDatabaseActionTest {
     public void setUp() {
         when(libraryTab.frame()).thenReturn(jabRefFrame);
         when(libraryTab.getBibDatabaseContext()).thenReturn(dbContext);
+        when(filePreferences.getWorkingDirectory()).thenReturn(Path.of(TEST_BIBTEX_LIBRARY_LOCATION));
+        when(preferences.getFilePreferences()).thenReturn(filePreferences);
         when(jabRefFrame.getDialogService()).thenReturn(dialogService);
 
         saveDatabaseAction = spy(new SaveDatabaseAction(libraryTab, preferences, mock(BibEntryTypesManager.class)));
@@ -64,24 +68,22 @@ class SaveDatabaseActionTest {
 
     @Test
     public void saveAsShouldSetWorkingDirectory() {
-        when(preferences.getWorkingDir()).thenReturn(Path.of(TEST_BIBTEX_LIBRARY_LOCATION));
         when(dialogService.showFileSaveDialog(any(FileDialogConfiguration.class))).thenReturn(Optional.of(file));
         doReturn(true).when(saveDatabaseAction).saveAs(any());
 
         saveDatabaseAction.saveAs();
 
-        verify(preferences, times(1)).setWorkingDirectory(file.getParent());
+        verify(filePreferences, times(1)).setWorkingDirectory(file.getParent());
     }
 
     @Test
     public void saveAsShouldNotSetWorkingDirectoryIfNotSelected() {
-        when(preferences.getWorkingDir()).thenReturn(Path.of(TEST_BIBTEX_LIBRARY_LOCATION));
         when(dialogService.showFileSaveDialog(any(FileDialogConfiguration.class))).thenReturn(Optional.empty());
         doReturn(false).when(saveDatabaseAction).saveAs(any());
 
         saveDatabaseAction.saveAs();
 
-        verify(preferences, times(0)).setWorkingDirectory(file.getParent());
+        verify(filePreferences, times(0)).setWorkingDirectory(any());
     }
 
     @Test
