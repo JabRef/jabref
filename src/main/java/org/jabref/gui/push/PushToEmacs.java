@@ -131,6 +131,6 @@ public class PushToEmacs extends AbstractPushToApplication implements PushToAppl
 
     @Override
     public PushToApplicationSettings getSettings(PushToApplication application, ObjectProperty<PushToApplicationPreferences> preferences) {
-        return new PushToEmacsSettings(application, dialogService, preferencesService, preferences);
+        return new PushToEmacsSettings(application, dialogService, preferencesService.getFilePreferences(), preferences);
     }
 }

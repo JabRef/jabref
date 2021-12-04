@@ -7,6 +7,7 @@ import java.util.Set;
 import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
+import org.jabref.preferences.GeneralPreferences;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -24,10 +25,11 @@ class ImportFormatReaderTestParameterless {
     @BeforeEach
     void setUp() {
         reader = new ImportFormatReader();
+        GeneralPreferences generalPreferences = mock(GeneralPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        when(generalPreferences.getDefaultEncoding()).thenReturn(StandardCharsets.UTF_8);
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
-        when(importFormatPreferences.getEncoding()).thenReturn(StandardCharsets.UTF_8);
         when(importFormatPreferences.getCustomImportList()).thenReturn(Set.of());
-        reader.resetImportFormats(mock(ImporterPreferences.class), importFormatPreferences, mock(XmpPreferences.class), fileMonitor);
+        reader.resetImportFormats(mock(ImporterPreferences.class), generalPreferences, importFormatPreferences, mock(XmpPreferences.class), fileMonitor);
     }
 
     @Test

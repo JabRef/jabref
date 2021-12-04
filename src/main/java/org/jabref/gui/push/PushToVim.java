@@ -42,7 +42,7 @@ public class PushToVim extends AbstractPushToApplication implements PushToApplic
 
     @Override
     public PushToApplicationSettings getSettings(PushToApplication application, ObjectProperty<PushToApplicationPreferences> preferences) {
-        return new PushToVimSettings(application, dialogService, preferencesService, preferences);
+        return new PushToVimSettings(application, dialogService, preferencesService.getFilePreferences(), preferences);
     }
 
     @Override

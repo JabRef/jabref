@@ -6,7 +6,7 @@ import javafx.scene.control.TextField;
 
 import org.jabref.gui.DialogService;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.FilePreferences;
 import org.jabref.preferences.PushToApplicationPreferences;
 
 public class PushToVimSettings extends PushToApplicationSettings {
@@ -15,9 +15,9 @@ public class PushToVimSettings extends PushToApplicationSettings {
 
     public PushToVimSettings(PushToApplication application,
                              DialogService dialogService,
-                             PreferencesService preferencesService,
+                             FilePreferences filePreferences,
                              ObjectProperty<PushToApplicationPreferences> preferences) {
-        super(application, dialogService, preferencesService, preferences);
+        super(application, dialogService, filePreferences, preferences);
 
         settingsPane.add(new Label(Localization.lang("Vim server name") + ":"), 0, 1);
         settingsPane.add(vimServer, 1, 1);

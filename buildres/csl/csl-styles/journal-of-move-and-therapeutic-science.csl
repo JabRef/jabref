@@ -53,7 +53,7 @@
         <choose>
           <if variable="DOI">
             <text value="DOI:"/>
-            <text variable="DOI" prefix="http://dx.doi.org/"/>
+            <text variable="DOI" prefix="https://doi.org/"/>
           </if>
           <else-if variable="URL">
             <text value="Available at:" suffix=" "/>

@@ -308,11 +308,19 @@ class StringUtilTest {
         assertEquals("Modele", StringUtil.replaceSpecialCharacters("Modèle"));
     }
 
-    @Test
-    void testRepeatSpaces() {
-        assertEquals("", StringUtil.repeatSpaces(0));
-        assertEquals(" ", StringUtil.repeatSpaces(1));
-        assertEquals("       ", StringUtil.repeatSpaces(7));
+    static Stream<Arguments> testRepeatSpacesData() {
+        return Stream.of(
+                Arguments.of("", -1),
+                Arguments.of("", 0),
+                Arguments.of(" ", 1),
+                Arguments.of("       ", 7)
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("testRepeatSpacesData")
+    void testRepeatSpaces(String result, int count) {
+        assertEquals(result, StringUtil.repeatSpaces(count));
     }
 
     @Test

@@ -2,7 +2,6 @@ package org.jabref.logic.crawler;
 
 import java.net.URL;
 import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -12,11 +11,11 @@ import org.jabref.logic.citationkeypattern.GlobalCitationKeyPattern;
 import org.jabref.logic.exporter.SavePreferences;
 import org.jabref.logic.git.SlrGitHandler;
 import org.jabref.logic.importer.ImportFormatPreferences;
-import org.jabref.logic.preferences.TimestampPreferences;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.metadata.SaveOrderConfig;
 import org.jabref.model.util.DummyFileUpdateMonitor;
+import org.jabref.preferences.GeneralPreferences;
 
 import org.eclipse.jgit.api.Git;
 import org.junit.jupiter.api.Test;
@@ -36,16 +35,17 @@ class CrawlerTest {
     Path tempRepositoryDirectory;
     ImportFormatPreferences importFormatPreferences;
     SavePreferences savePreferences;
-    TimestampPreferences timestampPreferences;
     BibEntryTypesManager entryTypesManager;
     SlrGitHandler gitHandler = mock(SlrGitHandler.class, Answers.RETURNS_DEFAULTS);
     String hashCodeQuantum = String.valueOf("Quantum".hashCode());
     String hashCodeCloudComputing = String.valueOf("Cloud Computing".hashCode());
 
+    GeneralPreferences generalPreferences = mock(GeneralPreferences.class, Answers.RETURNS_DEEP_STUBS);
+
     @Test
     public void testWhetherAllFilesAreCreated() throws Exception {
         setUp();
-        Crawler testCrawler = new Crawler(getPathToStudyDefinitionFile(), gitHandler, importFormatPreferences, savePreferences, timestampPreferences, entryTypesManager, new DummyFileUpdateMonitor());
+        Crawler testCrawler = new Crawler(getPathToStudyDefinitionFile(), gitHandler, generalPreferences, importFormatPreferences, savePreferences, entryTypesManager, new DummyFileUpdateMonitor());
 
         testCrawler.performCrawl();
 
@@ -86,16 +86,12 @@ class CrawlerTest {
 
         importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
         savePreferences = mock(SavePreferences.class, Answers.RETURNS_DEEP_STUBS);
-        timestampPreferences = mock(TimestampPreferences.class);
         when(savePreferences.getSaveOrder()).thenReturn(new SaveOrderConfig());
-        when(savePreferences.getEncoding()).thenReturn(null);
         when(savePreferences.takeMetadataSaveOrderInAccount()).thenReturn(true);
         when(savePreferences.getCitationKeyPatternPreferences()).thenReturn(citationKeyPatternPreferences);
-        when(savePreferences.getEncoding()).thenReturn(Charset.defaultCharset());
+        when(generalPreferences.getDefaultEncoding()).thenReturn(Charset.defaultCharset());
         when(importFormatPreferences.getKeywordSeparator()).thenReturn(',');
         when(importFormatPreferences.getFieldContentFormatterPreferences()).thenReturn(new FieldContentFormatterPreferences());
-        when(importFormatPreferences.isKeywordSyncEnabled()).thenReturn(false);
-        when(importFormatPreferences.getEncoding()).thenReturn(StandardCharsets.UTF_8);
         entryTypesManager = new BibEntryTypesManager();
     }
 

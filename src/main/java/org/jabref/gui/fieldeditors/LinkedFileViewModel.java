@@ -61,6 +61,7 @@ import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.FileHelper;
 import org.jabref.model.util.OptionalUtil;
+import org.jabref.preferences.FilePreferences;
 import org.jabref.preferences.PreferencesService;
 
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
@@ -332,9 +333,26 @@ public class LinkedFileViewModel extends AbstractViewModel {
      * @return true if suggested filepath is same as existing filepath.
      */
     public boolean isGeneratedPathSameAsOriginal() {
-        Optional<Path> newDir = databaseContext.getFirstExistingFileDir(preferences.getFilePreferences());
+        FilePreferences filePreferences = preferences.getFilePreferences();
+        Optional<Path> baseDir = databaseContext.getFirstExistingFileDir(filePreferences);
+        if (baseDir.isEmpty()) {
+            // could not find default path
+            return false;
+        }
+
+        // append File directory pattern if exits
+        String targetDirectoryName = FileUtil.createDirNameFromPattern(
+                databaseContext.getDatabase(),
+                entry,
+                filePreferences.getFileDirectoryPattern());
+
+        Optional<Path> targetDir = baseDir.map(dir -> dir.resolve(targetDirectoryName));
 
         Optional<Path> currentDir = linkedFile.findIn(databaseContext, preferences.getFilePreferences()).map(Path::getParent);
+        if (currentDir.isEmpty()) {
+            // Could not find file
+            return false;
+        }
 
         BiPredicate<Path, Path> equality = (fileA, fileB) -> {
             try {
@@ -343,7 +361,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
                 return false;
             }
         };
-        return OptionalUtil.equals(newDir, currentDir, equality);
+        return OptionalUtil.equals(targetDir, currentDir, equality);
     }
 
     public void moveToDefaultDirectoryAndRename() {
@@ -409,8 +427,8 @@ public class LinkedFileViewModel extends AbstractViewModel {
                 try {
                     XmpUtilWriter.writeXmp(file.get(), entry, databaseContext.getDatabase(), preferences.getXmpPreferences());
 
-                    EmbeddedBibFilePdfExporter embeddedBibExporter = new EmbeddedBibFilePdfExporter(preferences.getDefaultBibDatabaseMode(), Globals.entryTypesManager, preferences.getFieldWriterPreferences());
-                    embeddedBibExporter.exportToFileByPath(databaseContext, databaseContext.getDatabase(), preferences.getDefaultEncoding(), preferences.getFilePreferences(), file.get());
+                    EmbeddedBibFilePdfExporter embeddedBibExporter = new EmbeddedBibFilePdfExporter(preferences.getGeneralPreferences().getDefaultBibDatabaseMode(), Globals.entryTypesManager, preferences.getFieldWriterPreferences());
+                    embeddedBibExporter.exportToFileByPath(databaseContext, databaseContext.getDatabase(), preferences.getGeneralPreferences().getDefaultEncoding(), preferences.getFilePreferences(), file.get());
                 } catch (IOException | TransformerException ex) {
                     // TODO: Print error message
                     // Localization.lang("Error while writing") + " '" + file.toString() + "': " + ex;
@@ -481,7 +499,6 @@ public class LinkedFileViewModel extends AbstractViewModel {
                 if (dialogService.showConfirmationDialogAndWait(Localization.lang("Download file"),
                         Localization.lang("Unable to find valid certification path to requested target(%0), download anyway?",
                                 urlDownload.getSource().toString()))) {
-                    URLDownload.bypassSSLVerification();
                     return true;
                 } else {
                     dialogService.notify(Localization.lang("Download operation canceled."));
@@ -567,7 +584,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
     private Supplier<BibEntry> wrapImporterToSupplier(Importer importer, Path filePath) {
         return () -> {
             try {
-                ParserResult parserResult = importer.importDatabase(filePath, preferences.getDefaultEncoding());
+                ParserResult parserResult = importer.importDatabase(filePath, preferences.getGeneralPreferences().getDefaultEncoding());
                 if (parserResult.isInvalid() || parserResult.isEmpty() || !parserResult.getDatabase().hasEntries()) {
                     return null;
                 }

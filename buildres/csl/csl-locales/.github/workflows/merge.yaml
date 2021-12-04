@@ -58,7 +58,7 @@ jobs:
       if: github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && (steps.update.outputs.updated == 'true' || steps.update.outputs.deleted == 'true'))
       uses: ruby/setup-ruby@v1
       with:
-        ruby-version: 3.0.0
+        ruby-version: 3.0.2
     - name: but use cache to speed that up
       if: github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && (steps.update.outputs.updated == 'true' || steps.update.outputs.deleted == 'true'))
       uses: actions/cache@v2
