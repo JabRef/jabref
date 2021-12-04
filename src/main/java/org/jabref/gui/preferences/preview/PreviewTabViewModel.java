@@ -160,7 +160,6 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
     }
 
     public void refreshPreview() {
-        layoutProperty.setValue(null);
         setPreviewLayout(chosenSelectionModelProperty.getValue().getSelectedItem());
     }
 

@@ -310,20 +310,20 @@ public class ArgumentProcessor {
         try {
             if (writeXMP) {
                 if (xmpPdfExporter.exportToAllFilesOfEntry(databaseContext, encoding, filePreferences, entry, List.of(entry))) {
-                    System.out.println(String.format("Successfully written XMP metadata on at least one linked file of %s", citeKey));
+                    System.out.printf("Successfully written XMP metadata on at least one linked file of %s%n", citeKey);
                 } else {
-                    System.err.println(String.format("Cannot write XMP metadata on any linked files of %s. Make sure there is at least one linked file and the path is correct.", citeKey));
+                    System.err.printf("Cannot write XMP metadata on any linked files of %s. Make sure there is at least one linked file and the path is correct.%n", citeKey);
                 }
             }
             if (embeddBibfile) {
                 if (embeddedBibFilePdfExporter.exportToAllFilesOfEntry(databaseContext, encoding, filePreferences, entry, List.of(entry))) {
-                    System.out.println(String.format("Successfully embedded metadata on at least one linked file of %s", citeKey));
+                    System.out.printf("Successfully embedded metadata on at least one linked file of %s%n", citeKey);
                 } else {
-                    System.out.println(String.format("Cannot embedd metadata on any linked files of %s. Make sure there is at least one linked file and the path is correct.", citeKey));
+                    System.out.printf("Cannot embedd metadata on any linked files of %s. Make sure there is at least one linked file and the path is correct.%n", citeKey);
                 }
             }
         } catch (Exception e) {
-            LOGGER.error(String.format("Failed writing metadata on a linked file of %s.", citeKey));
+            LOGGER.error("Failed writing metadata on a linked file of {}.", citeKey);
         }
     }
 
@@ -331,7 +331,7 @@ public class ArgumentProcessor {
         for (String citeKey : citeKeys) {
             List<BibEntry> bibEntryList = dataBase.getEntriesByCitationKey(citeKey);
             if (bibEntryList.isEmpty()) {
-                System.err.println(String.format("Skipped - Cannot find %s in library.", citeKey));
+                System.err.printf("Skipped - Cannot find %s in library.%n", citeKey);
                 continue;
             }
             for (BibEntry entry : bibEntryList) {
@@ -350,25 +350,25 @@ public class ArgumentProcessor {
                 try {
                     if (writeXMP) {
                         if (xmpPdfExporter.exportToFileByPath(databaseContext, dataBase, encoding, filePreferences, filePath)) {
-                            System.out.println(String.format("Successfully written XMP metadata of at least one entry to %s", fileName));
+                            System.out.printf("Successfully written XMP metadata of at least one entry to %s%n", fileName);
                         } else {
-                            System.out.println(String.format("File %s is not linked to any entry in database.", fileName));
+                            System.out.printf("File %s is not linked to any entry in database.%n", fileName);
                         }
                     }
                     if (embeddBibfile) {
                         if (embeddedBibFilePdfExporter.exportToFileByPath(databaseContext, dataBase, encoding, filePreferences, filePath)) {
-                            System.out.println(String.format("Successfully embedded XMP metadata of at least one entry to %s", fileName));
+                            System.out.printf("Successfully embedded XMP metadata of at least one entry to %s%n", fileName);
                         } else {
-                            System.out.println(String.format("File %s is not linked to any entry in database.", fileName));
+                            System.out.printf("File %s is not linked to any entry in database.%n", fileName);
                         }
                     }
                 } catch (IOException e) {
                     LOGGER.error("Error accessing file '{}'.", fileName);
                 } catch (Exception e) {
-                    LOGGER.error(String.format("Error writing entry to %s.", fileName));
+                    LOGGER.error("Error writing entry to {}.", fileName);
                 }
             } else {
-                LOGGER.error(String.format("Skipped - PDF %s does not exist", fileName));
+                LOGGER.error("Skipped - PDF {} does not exist", fileName);
             }
         }
     }

@@ -84,7 +84,7 @@ public class CustomImporterTabViewModel implements PreferenceTabViewModel {
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                 .addExtensionFilter(StandardFileType.CLASS, StandardFileType.JAR, StandardFileType.ZIP)
                 .withDefaultExtension(StandardFileType.CLASS)
-                .withInitialDirectory(preferences.getWorkingDir())
+                .withInitialDirectory(preferences.getFilePreferences().getWorkingDirectory())
                 .build();
 
         Optional<Path> selectedFile = dialogService.showFileOpenDialog(fileDialogConfiguration);

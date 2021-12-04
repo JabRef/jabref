@@ -15,7 +15,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.FilePreferences;
 import org.jabref.preferences.PushToApplicationPreferences;
 
 public class PushToApplicationSettings {
@@ -28,7 +28,7 @@ public class PushToApplicationSettings {
 
     public PushToApplicationSettings(PushToApplication application,
                                      DialogService dialogService,
-                                     PreferencesService preferencesService,
+                                     FilePreferences filePreferences,
                                      ObjectProperty<PushToApplicationPreferences> preferences) {
         this.application = (AbstractPushToApplication) application;
         this.preferences = preferences;
@@ -61,7 +61,7 @@ public class PushToApplicationSettings {
         settingsPane.add(path, 1, 0);
 
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
-                .withInitialDirectory(preferencesService.getWorkingDir()).build();
+                .withInitialDirectory(filePreferences.getWorkingDirectory()).build();
         browse.setOnAction(e -> dialogService.showFileOpenDialog(fileDialogConfiguration)
                                              .ifPresent(f -> path.setText(f.toAbsolutePath().toString())));
         settingsPane.add(browse, 2, 0);
