@@ -66,8 +66,6 @@ public class Date {
      *
      * @param date the start date
      * @param endDate the start date
-     * @throws NullPointerException     if DOI/Short DOI is null
-     * @throws IllegalArgumentException if doi does not include a valid DOI/Short DOI
      */
     public Date(TemporalAccessor date, TemporalAccessor endDate) {
         this.date = date;
