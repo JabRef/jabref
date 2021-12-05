@@ -398,7 +398,13 @@ public class JabRefFrame extends BorderPane {
 
             if (context.hasEmptyEntries()) {
                 if (prefs.getGeneralPreferences().shouldConfirmEmptyEntries()) {
-                    if (!confirmEmptyEntry(libraryTab, context)) {
+                    Optional<ButtonType> response = confirmEmptyEntry(libraryTab);
+                    if (!deleteEmptyEntry(libraryTab, context, response)) {
+                        return false;
+                    }
+                } else if (prefs.getGeneralPreferences().shouldDeleteEmptyEntries()) {
+                    Optional<ButtonType> response = Optional.of(new ButtonType(Localization.lang("Delete empty entries"), ButtonBar.ButtonData.YES));
+                    if (!deleteEmptyEntry(libraryTab, context, response)) {
                         return false;
                     }
                 }
@@ -1171,8 +1177,9 @@ public class JabRefFrame extends BorderPane {
 
     /**
      * Ask if the user really wants to remove any empty entries
+     * @return Optional<ButtonType>
      */
-    private Boolean confirmEmptyEntry(LibraryTab libraryTab, BibDatabaseContext context) {
+    private Optional<ButtonType> confirmEmptyEntry(LibraryTab libraryTab) {
         String filename = libraryTab.getBibDatabaseContext()
                                     .getDatabasePath()
                                     .map(Path::toAbsolutePath)
@@ -1189,8 +1196,11 @@ public class JabRefFrame extends BorderPane {
                 Localization.lang("Do not ask again"),
                 optOut -> prefs.getGeneralPreferences().setConfirmEmptyEntries(!optOut),
                 deleteEmptyEntries, keepEmptyEntries, cancel);
+        return response;
+    }
 
-        if (response.isPresent() && response.get().equals(deleteEmptyEntries)) {
+    private Boolean deleteEmptyEntry(LibraryTab libraryTab, BibDatabaseContext context, Optional<ButtonType> response) {
+        if (response.isPresent() && response.get().getButtonData() == ButtonBar.ButtonData.YES) {
             // The user wants to delete.
             try {
                 for (BibEntry currentEntry : new ArrayList<>(context.getEntries())) {
@@ -1211,7 +1221,7 @@ public class JabRefFrame extends BorderPane {
             // Save was cancelled or an error occurred.
             return false;
         }
-        return !response.get().equals(cancel);
+        return !(response.get().getButtonData() == ButtonBar.ButtonData.CANCEL_CLOSE);
     }
 
     private void closeTab(LibraryTab libraryTab) {
@@ -1223,7 +1233,13 @@ public class JabRefFrame extends BorderPane {
         final BibDatabaseContext context = libraryTab.getBibDatabaseContext();
         if (context.hasEmptyEntries()) {
             if (prefs.getGeneralPreferences().shouldConfirmEmptyEntries()) {
-                if (!confirmEmptyEntry(libraryTab, context)) {
+                Optional<ButtonType> response = confirmEmptyEntry(libraryTab);
+                if (!deleteEmptyEntry(libraryTab, context, response)) {
+                    return;
+                }
+            } else if (prefs.getGeneralPreferences().shouldDeleteEmptyEntries()) {
+                Optional<ButtonType> response = Optional.of(new ButtonType(Localization.lang("Delete empty entries"), ButtonBar.ButtonData.YES));
+                if (!deleteEmptyEntry(libraryTab, context, response)) {
                     return;
                 }
             }
