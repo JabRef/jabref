@@ -84,16 +84,16 @@ public class GeneralPreferences {
         this.confirmDelete.set(confirmDelete);
     }
 
-    public void setConfirmEmptyEntries(boolean confirmEmptyEntries) {
-        this.confirmEmptyEntries.set(confirmEmptyEntries);
-    }
-
-    public boolean shouldConfirmEmptyEmtries() {
+    public boolean shouldConfirmEmptyEntries() {
         return confirmEmptyEntries.get();
     }
 
     public BooleanProperty confirmEmptyEntriesProperty() {
         return confirmEmptyEntries;
+    }
+
+    public void setConfirmEmptyEntries(boolean confirmEmptyEntries) {
+        this.confirmEmptyEntries.set(confirmEmptyEntries);
     }
 
     public boolean isMemoryStickMode() {
