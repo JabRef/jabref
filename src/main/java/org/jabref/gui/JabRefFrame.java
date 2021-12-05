@@ -1196,6 +1196,11 @@ public class JabRefFrame extends BorderPane {
                 Localization.lang("Do not ask again"),
                 optOut -> prefs.getGeneralPreferences().setConfirmEmptyEntries(!optOut),
                 deleteEmptyEntries, keepEmptyEntries, cancel);
+        if (response.isPresent() && response.get().getButtonData().equals(ButtonBar.ButtonData.NO)) {
+            prefs.getGeneralPreferences().setDeleteEmptyEntries(false);
+        } else if (response.isPresent() && response.get().getButtonData().equals(ButtonBar.ButtonData.YES)) {
+            prefs.getGeneralPreferences().setDeleteEmptyEntries(true);
+        }
         return response;
     }
 
@@ -1229,7 +1234,6 @@ public class JabRefFrame extends BorderPane {
         if (libraryTab == null) {
             return;
         }
-
         final BibDatabaseContext context = libraryTab.getBibDatabaseContext();
         if (context.hasEmptyEntries()) {
             if (prefs.getGeneralPreferences().shouldConfirmEmptyEntries()) {
