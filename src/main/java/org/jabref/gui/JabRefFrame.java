@@ -1178,7 +1178,7 @@ public class JabRefFrame extends BorderPane {
     /**
      * Ask if the user really wants to remove any empty entries
      *
-     * @return Optional<ButtonType>
+     * @return user response from the confirmation dialog
      */
     private Optional<ButtonType> confirmEmptyEntry(LibraryTab libraryTab) {
         String filename = libraryTab.getBibDatabaseContext()
