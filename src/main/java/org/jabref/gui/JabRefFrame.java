@@ -1191,6 +1191,7 @@ public class JabRefFrame extends BorderPane {
                 deleteEmptyEntries, keepEmptyEntries, cancel);
 
         if (response.isPresent() && response.get().equals(deleteEmptyEntries)) {
+            // The user wants to delete.
             try {
                 for (BibEntry currentEntry : new ArrayList<>(context.getEntries())) {
                     if (currentEntry.getFields().isEmpty()) {
