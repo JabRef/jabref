@@ -397,8 +397,10 @@ public class JabRefFrame extends BorderPane {
             final BibDatabaseContext context = libraryTab.getBibDatabaseContext();
 
             if (context.hasEmptyEntries()) {
-                if (!confirmEmptyEntry(libraryTab, context)) {
-                    return false;
+                if (prefs.getGeneralPreferences().shouldConfirmEmptyEntries()) {
+                    if (!confirmEmptyEntry(libraryTab, context)) {
+                        return false;
+                    }
                 }
             }
 
@@ -1217,8 +1219,10 @@ public class JabRefFrame extends BorderPane {
 
         final BibDatabaseContext context = libraryTab.getBibDatabaseContext();
         if (context.hasEmptyEntries()) {
-            if (!confirmEmptyEntry(libraryTab, context)) {
-                return;
+            if (prefs.getGeneralPreferences().shouldConfirmEmptyEntries()) {
+                if (!confirmEmptyEntry(libraryTab, context)) {
+                    return;
+                }
             }
         }
 
