@@ -15,6 +15,7 @@ public class GeneralPreferences {
     private final BooleanProperty warnAboutDuplicatesInInspection;
     private final BooleanProperty confirmDelete;
     private final BooleanProperty confirmEmptyEntries;
+    private final BooleanProperty deleteEmptyEntries;
 
     private final BooleanProperty memoryStickMode;
     private final BooleanProperty showAdvancedHints;
@@ -24,6 +25,7 @@ public class GeneralPreferences {
                               boolean warnAboutDuplicatesInInspection,
                               boolean confirmDelete,
                               boolean confirmEmptyEntries,
+                              boolean deleteEmptyEntries,
                               boolean memoryStickMode,
                               boolean showAdvancedHints) {
         this.defaultEncoding = new SimpleObjectProperty<>(defaultEncoding);
@@ -31,6 +33,7 @@ public class GeneralPreferences {
         this.warnAboutDuplicatesInInspection = new SimpleBooleanProperty(warnAboutDuplicatesInInspection);
         this.confirmDelete = new SimpleBooleanProperty(confirmDelete);
         this.confirmEmptyEntries = new SimpleBooleanProperty(confirmEmptyEntries);
+        this.deleteEmptyEntries = new SimpleBooleanProperty(deleteEmptyEntries);
 
         this.memoryStickMode = new SimpleBooleanProperty(memoryStickMode);
         this.showAdvancedHints = new SimpleBooleanProperty(showAdvancedHints);
@@ -94,6 +97,18 @@ public class GeneralPreferences {
 
     public void setConfirmEmptyEntries(boolean confirmEmptyEntries) {
         this.confirmEmptyEntries.set(confirmEmptyEntries);
+    }
+
+    public boolean shouldDeleteEmptyEntries() {
+        return deleteEmptyEntries.get();
+    }
+
+    public BooleanProperty deleteEmptyEntriesProperty() {
+        return deleteEmptyEntries;
+    }
+
+    public void setDeleteEmptyEntries(boolean deleteEmptyEntries) {
+        this.deleteEmptyEntries.set(deleteEmptyEntries);
     }
 
     public boolean isMemoryStickMode() {
