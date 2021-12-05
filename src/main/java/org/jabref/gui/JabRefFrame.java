@@ -634,7 +634,12 @@ public class JabRefFrame extends BorderPane {
             stateManager.setSelectedEntries(libraryTab.getSelectedEntries());
 
             // Update active search query when switching between databases
-            stateManager.activeSearchQueryProperty().set(libraryTab.getCurrentSearchQuery());
+            if (prefs.getSearchPreferences().shouldKeepSearchString() && libraryTab.getCurrentSearchQuery().isEmpty() && stateManager.activeSearchQueryProperty().get().isPresent()) {
+                // apply search query also when opening a new library and keep search string is activated
+               libraryTab.setCurrentSearchQuery(stateManager.activeSearchQueryProperty().get());
+            } else {
+                stateManager.activeSearchQueryProperty().set(libraryTab.getCurrentSearchQuery());
+            }
 
             // Update search autocompleter with information for the correct database:
             libraryTab.updateSearchManager();

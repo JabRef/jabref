@@ -16,6 +16,7 @@ import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.maintable.columns.SpecialFieldColumn;
 import org.jabref.gui.preview.PreviewViewer;
 import org.jabref.gui.util.BaseDialog;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
@@ -39,6 +40,7 @@ public class GlobalSearchResultDialog extends BaseDialog<Void> {
         this.undoManager = undoManager;
         this.externalFileTypes = externalFileTypes;
 
+        setTitle(Localization.lang("Search results from open libraries"));
         ViewLoader.view(this)
                   .load()
                   .setAsDialogPane(this);
