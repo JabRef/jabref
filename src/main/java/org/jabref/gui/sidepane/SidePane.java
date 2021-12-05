@@ -5,7 +5,9 @@ import java.util.Map;
 
 import javax.swing.undo.UndoManager;
 
-import javafx.beans.property.BooleanProperty;
+import javafx.beans.binding.Bindings;
+import javafx.beans.binding.BooleanBinding;
+import javafx.collections.ListChangeListener;
 import javafx.scene.layout.VBox;
 
 import org.jabref.gui.DialogService;
@@ -14,137 +16,45 @@ import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.preferences.PreferencesService;
 
-import com.tobiasdiez.easybind.EasyBind;
-
-import static org.jabref.gui.sidepane.SidePaneType.GROUPS;
-import static org.jabref.gui.sidepane.SidePaneType.OPEN_OFFICE;
-import static org.jabref.gui.sidepane.SidePaneType.WEB_SEARCH;
-
 public class SidePane extends VBox {
-    // Don't use this map directly to lookup sidePaneViews, instead use getSidePaneView() for lazy loading
-    private final Map<SidePaneType, SidePaneComponent> sidePaneComponentLookup = new HashMap<>();
     private final SidePaneViewModel viewModel;
-
     private final PreferencesService preferencesService;
-    private final TaskExecutor taskExecutor;
-    private final DialogService dialogService;
     private final StateManager stateManager;
-    private final UndoManager undoManager;
 
-    private final SidePaneContentFactory sidePaneContentFactory;
+    // These bindings need to be stored, otherwise they are garbage collected
+    @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
+    private final Map<SidePaneType, BooleanBinding> visibleBindings = new HashMap<>();
 
     public SidePane(PreferencesService preferencesService,
                     TaskExecutor taskExecutor,
                     DialogService dialogService,
                     StateManager stateManager,
                     UndoManager undoManager) {
-        this.preferencesService = preferencesService;
-        this.taskExecutor = taskExecutor;
-        this.dialogService = dialogService;
         this.stateManager = stateManager;
-        this.undoManager = undoManager;
-        this.sidePaneContentFactory = new SidePaneContentFactory(preferencesService, taskExecutor, dialogService, stateManager, undoManager);
-        this.viewModel = new SidePaneViewModel(preferencesService, stateManager);
+        this.preferencesService = preferencesService;
+        this.viewModel = new SidePaneViewModel(preferencesService, stateManager, taskExecutor, dialogService, undoManager);
 
-        EasyBind.subscribe(stateManager.sidePaneComponentVisiblePropertyFor(GROUPS), isShow -> showOrHidePane(GROUPS, isShow));
-        EasyBind.subscribe(stateManager.sidePaneComponentVisiblePropertyFor(WEB_SEARCH), isShow -> showOrHidePane(WEB_SEARCH, isShow));
-        EasyBind.subscribe(stateManager.sidePaneComponentVisiblePropertyFor(OPEN_OFFICE), isShow -> showOrHidePane(OPEN_OFFICE, isShow));
-
-        preferencesService.getSidePanePreferences().visiblePanes().forEach(this::show);
+        stateManager.getVisibleSidePaneComponents().addListener((ListChangeListener<SidePaneType>) c -> updateView());
         updateView();
     }
 
-    private void showOrHidePane(SidePaneType pane, boolean isShow) {
-        if (isShow) {
-            show(pane);
-        } else {
-            hide(pane);
-        }
-    }
-
-    private SidePaneComponent getSidePaneComponent(SidePaneType pane) {
-        SidePaneComponent sidePaneComponent = sidePaneComponentLookup.get(pane);
-        if (sidePaneComponent == null) {
-            sidePaneComponent = switch (pane) {
-                case GROUPS -> new GroupsSidePaneComponent(new ClosePaneAction(stateManager, pane), new MoveUpAction(pane), new MoveDownAction(pane), sidePaneContentFactory, preferencesService, dialogService);
-                case WEB_SEARCH, OPEN_OFFICE -> new SidePaneComponent(pane, new ClosePaneAction(stateManager, pane), new MoveUpAction(pane), new MoveDownAction(pane), sidePaneContentFactory);
-            };
-            sidePaneComponentLookup.put(pane, sidePaneComponent);
-        }
-        return sidePaneComponent;
-    }
-
-    private void showVisiblePanes() {
+     private void updateView() {
         getChildren().clear();
-        viewModel.getVisiblePanes().forEach(type -> {
-            SidePaneComponent view = getSidePaneComponent(type);
-            getChildren().add(view);
-        });
-    }
+         for (SidePaneType type : stateManager.getVisibleSidePaneComponents()) {
+             SidePaneComponent view = viewModel.getSidePaneComponent(type);
+             getChildren().add(view);
+         }
+     }
 
-    private void show(SidePaneType pane) {
-        if (viewModel.show(pane)) {
-            updateView();
-            if (pane == GROUPS) {
-                ((GroupsSidePaneComponent) getSidePaneComponent(pane)).afterOpening();
-            }
-        }
-    }
-
-    private void hide(SidePaneType pane) {
-        if (viewModel.hide(pane)) {
-            updateView();
-        }
-    }
-
-    private void moveUp(SidePaneType pane) {
-        if (viewModel.moveUp(pane)) {
-            updateView();
-        }
-    }
-
-    private void moveDown(SidePaneType pane) {
-        if (viewModel.moveDown(pane)) {
-            updateView();
-        }
-    }
-
-    private void updateView() {
-        showVisiblePanes();
-        setVisible(!viewModel.getVisiblePanes().isEmpty());
-    }
-
-    public BooleanProperty paneVisibleProperty(SidePaneType pane) {
-        return stateManager.sidePaneComponentVisiblePropertyFor(pane);
+    public BooleanBinding paneVisibleBinding(SidePaneType pane) {
+        BooleanBinding visibility = Bindings.createBooleanBinding(
+                () -> stateManager.getVisibleSidePaneComponents().contains(pane),
+                stateManager.getVisibleSidePaneComponents());
+        visibleBindings.put(pane, visibility);
+        return visibility;
     }
 
     public SimpleCommand getToggleCommandFor(SidePaneType sidePane) {
-        return new TogglePaneAction(stateManager, sidePane);
-    }
-
-    private class MoveUpAction extends SimpleCommand {
-        private final SidePaneType toMoveUpPane;
-
-        public MoveUpAction(SidePaneType toMoveUpPane) {
-            this.toMoveUpPane = toMoveUpPane;
-        }
-
-        @Override
-        public void execute() {
-            moveUp(toMoveUpPane);
-        }
-    }
-
-    private class MoveDownAction extends SimpleCommand {
-        private final SidePaneType toMoveDownPane;
-
-        public MoveDownAction(SidePaneType toMoveDownPane) {
-            this.toMoveDownPane = toMoveDownPane;
-        }
-
-        @Override
-        public void execute() {
-            moveDown(toMoveDownPane);
-        }
+        return new TogglePaneAction(stateManager, sidePane, preferencesService.getSidePanePreferences());
     }
 }

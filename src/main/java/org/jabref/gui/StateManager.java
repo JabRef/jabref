@@ -7,11 +7,9 @@ import java.util.stream.Collectors;
 
 import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
-import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ReadOnlyListProperty;
 import javafx.beans.property.ReadOnlyListWrapper;
-import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -59,27 +57,14 @@ public class StateManager {
     private final EasyBinding<Boolean> anyTaskRunning = EasyBind.reduce(backgroundTasks, tasks -> tasks.anyMatch(Task::isRunning));
     private final EasyBinding<Double> tasksProgress = EasyBind.reduce(backgroundTasks, tasks -> tasks.filter(Task::isRunning).mapToDouble(Task::getProgress).average().orElse(1));
     private final ObservableMap<String, DialogWindowState> dialogWindowStates = FXCollections.observableHashMap();
-
-    private final ObservableList<SidePaneType> visiblePanes = FXCollections.observableArrayList();
-
-    private final BooleanProperty groupsPaneVisible = new SimpleBooleanProperty();
-    private final BooleanProperty openOfficePaneVisible = new SimpleBooleanProperty();
-    private final BooleanProperty webSearchPaneVisible = new SimpleBooleanProperty();
+    private final ObservableList<SidePaneType> visibleSidePanes = FXCollections.observableArrayList();
 
     public StateManager() {
         activeGroups.bind(Bindings.valueAt(selectedGroups, activeDatabase.orElse(null)));
     }
 
-    public BooleanProperty sidePaneComponentVisiblePropertyFor(SidePaneType component) {
-        return switch (component) {
-            case WEB_SEARCH -> webSearchPaneVisible;
-            case GROUPS -> groupsPaneVisible;
-            case OPEN_OFFICE -> openOfficePaneVisible;
-        };
-    }
-
     public ObservableList<SidePaneType> getVisibleSidePaneComponents() {
-        return visiblePanes;
+        return visibleSidePanes;
     }
 
     public CustomLocalDragboard getLocalDragboard() {

@@ -15,7 +15,12 @@ public class GroupsSidePaneComponent extends SidePaneComponent {
     private final DialogService dialogService;
     private final Button intersectionUnionToggle = IconTheme.JabRefIcons.GROUP_INTERSECTION.asButton();
 
-    public GroupsSidePaneComponent(SimpleCommand closeCommand, SimpleCommand moveUpCommand, SimpleCommand moveDownCommand, SidePaneContentFactory contentFactory, PreferencesService preferences, DialogService dialogService) {
+    public GroupsSidePaneComponent(SimpleCommand closeCommand,
+                                   SimpleCommand moveUpCommand,
+                                   SimpleCommand moveDownCommand,
+                                   SidePaneContentFactory contentFactory,
+                                   PreferencesService preferences,
+                                   DialogService dialogService) {
         super(SidePaneType.GROUPS, closeCommand, moveUpCommand, moveDownCommand, contentFactory);
         this.preferences = preferences;
         this.dialogService = dialogService;

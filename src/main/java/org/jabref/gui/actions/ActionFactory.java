@@ -5,7 +5,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Objects;
 
-import javafx.beans.property.BooleanProperty;
+import javafx.beans.binding.BooleanExpression;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBase;
 import javafx.scene.control.CheckMenuItem;
@@ -114,10 +114,9 @@ public class ActionFactory {
         return checkMenuItem;
     }
 
-    public CheckMenuItem createCheckMenuItem(Action action, Command command, BooleanProperty selectedProperty) {
+    public CheckMenuItem createCheckMenuItem(Action action, Command command, BooleanExpression selectedBinding) {
         CheckMenuItem checkMenuItem = ActionUtils.createCheckMenuItem(new JabRefAction(action, command, keyBindingRepository, Sources.FromMenu));
-        checkMenuItem.setSelected(selectedProperty.getValue());
-        EasyBind.subscribe(selectedProperty, checkMenuItem::setSelected);
+        EasyBind.subscribe(selectedBinding, checkMenuItem::setSelected);
         setGraphic(checkMenuItem, action);
 
         return checkMenuItem;

@@ -8,114 +8,144 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.IntStream;
 
+import javax.swing.undo.UndoManager;
+
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 
 import org.jabref.gui.AbstractViewModel;
+import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.actions.SimpleCommand;
+import org.jabref.gui.util.TaskExecutor;
 import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.SidePanePreferences;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import static org.jabref.gui.sidepane.SidePaneType.GROUPS;
 
 public class SidePaneViewModel extends AbstractViewModel {
+    private static final Logger LOGGER = LoggerFactory.getLogger(SidePaneViewModel.class);
+
+    private final Map<SidePaneType, SidePaneComponent> sidePaneComponentLookup = new HashMap<>();
+
     private final PreferencesService preferencesService;
     private final StateManager stateManager;
+    private final SidePaneContentFactory sidePaneContentFactory;
+    private final DialogService dialogService;
 
-    public SidePaneViewModel(PreferencesService preferencesService, StateManager stateManager) {
+    public SidePaneViewModel(PreferencesService preferencesService,
+                             StateManager stateManager,
+                             TaskExecutor taskExecutor,
+                             DialogService dialogService,
+                             UndoManager undoManager) {
         this.preferencesService = preferencesService;
         this.stateManager = stateManager;
+        this.dialogService = dialogService;
+        this.sidePaneContentFactory = new SidePaneContentFactory(preferencesService, taskExecutor, dialogService, stateManager, undoManager);
 
-        getVisiblePanes().addListener((ListChangeListener<? super SidePaneType>) change -> {
+        preferencesService.getSidePanePreferences().visiblePanes().forEach(this::show);
+        getPanes().addListener((ListChangeListener<? super SidePaneType>) change -> {
             while (change.next()) {
                 if (change.wasAdded()) {
-                    onPaneAdded(change.getAddedSubList().get(0));
+                    preferencesService.getSidePanePreferences().visiblePanes().add(change.getAddedSubList().get(0));
                 } else if (change.wasRemoved()) {
-                    onPaneRemoved(change.getRemoved().get(0));
+                    preferencesService.getSidePanePreferences().visiblePanes().remove(change.getRemoved().get(0));
                 }
             }
         });
     }
 
-    private void onPaneAdded(SidePaneType pane) {
-        stateManager.sidePaneComponentVisiblePropertyFor(pane).set(true);
-        preferencesService.getSidePanePreferences().visiblePanes().add(pane);
-    }
+    protected SidePaneComponent getSidePaneComponent(SidePaneType pane) {
 
-    private void onPaneRemoved(SidePaneType pane) {
-        stateManager.sidePaneComponentVisiblePropertyFor(pane).set(false);
-        preferencesService.getSidePanePreferences().visiblePanes().remove(pane);
+        SidePaneComponent sidePaneComponent = sidePaneComponentLookup.get(pane);
+        if (sidePaneComponent == null) {
+            sidePaneComponent = switch (pane) {
+                case GROUPS -> new GroupsSidePaneComponent(
+                        new ClosePaneAction(pane),
+                        new MoveUpAction(pane),
+                        new MoveDownAction(pane),
+                        sidePaneContentFactory,
+                        preferencesService,
+                        dialogService);
+                case WEB_SEARCH, OPEN_OFFICE -> new SidePaneComponent(pane,
+                        new ClosePaneAction(pane),
+                        new MoveUpAction(pane),
+                        new MoveDownAction(pane),
+                        sidePaneContentFactory);
+            };
+            sidePaneComponentLookup.put(pane, sidePaneComponent);
+        }
+        return sidePaneComponent;
     }
 
     /**
-     * Stores the current configuration of visible panes in the preferences,
-     * so that we show panes at the preferred position next time.
+     * Stores the current configuration of visible panes in the preferences, so that we show panes at the preferred
+     * position next time.
      */
     private void updatePreferredPositions() {
         Map<SidePaneType, Integer> preferredPositions = new HashMap<>(preferencesService.getSidePanePreferences().getPreferredPositions());
-        IntStream.range(0, getVisiblePanes().size()).forEach(i -> preferredPositions.put(getVisiblePanes().get(i), i));
+        IntStream.range(0, getPanes().size()).forEach(i -> preferredPositions.put(getPanes().get(i), i));
         preferencesService.getSidePanePreferences().setPreferredPositions(preferredPositions);
     }
 
-    public ObservableList<SidePaneType> getVisiblePanes() {
-        return stateManager.getVisibleSidePaneComponents();
-    }
-
-    /**
-     * @return True if <b>pane</b> is visible, and it can still move up therefore we should update the view
-     */
-    public boolean moveUp(SidePaneType pane) {
-        if (getVisiblePanes().contains(pane)) {
-            int currentPosition = getVisiblePanes().indexOf(pane);
+    public void moveUp(SidePaneType pane) {
+        if (getPanes().contains(pane)) {
+            int currentPosition = getPanes().indexOf(pane);
             if (currentPosition > 0) {
                 int newPosition = currentPosition - 1;
-                swap(getVisiblePanes(), currentPosition, newPosition);
+                swap(getPanes(), currentPosition, newPosition);
                 updatePreferredPositions();
-                return true;
+            } else {
+                LOGGER.debug("SidePaneComponent is already at the bottom");
             }
-        }
-        return false;
-    }
-
-    /**
-     * @return True if <b>pane</b> is visible, and it can still move down therefore we should update the view
-     */
-    public boolean moveDown(SidePaneType pane) {
-        if (getVisiblePanes().contains(pane)) {
-            int currentPosition = getVisiblePanes().indexOf(pane);
-            if (currentPosition < (getVisiblePanes().size() - 1)) {
-                int newPosition = currentPosition + 1;
-                swap(getVisiblePanes(), currentPosition, newPosition);
-                updatePreferredPositions();
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * @return True if <b>pane</b> is not already shown which means the view needs to be updated
-     */
-    public boolean show(SidePaneType pane) {
-        if (!getVisiblePanes().contains(pane)) {
-            getVisiblePanes().add(pane);
-            getVisiblePanes().sort(new PreferredIndexSort(preferencesService));
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * @return True if <b>pane</b> is visible which means the view needs to be updated
-     */
-    public boolean hide(SidePaneType pane) {
-        if (getVisiblePanes().contains(pane)) {
-            getVisiblePanes().remove(pane);
-            return true;
         } else {
-            return false;
+            LOGGER.warn("SidePaneComponent {} not visible", pane.getTitle());
         }
     }
 
-    public boolean isPaneVisible(SidePaneType pane) {
-        return getVisiblePanes().contains(pane);
+    public void moveDown(SidePaneType pane) {
+        if (getPanes().contains(pane)) {
+            int currentPosition = getPanes().indexOf(pane);
+            if (currentPosition < (getPanes().size() - 1)) {
+                int newPosition = currentPosition + 1;
+                swap(getPanes(), currentPosition, newPosition);
+                updatePreferredPositions();
+            } else {
+                LOGGER.debug("SidePaneComponent {} is already at the top", pane.getTitle());
+            }
+        } else {
+            LOGGER.warn("SidePaneComponent {} not visible", pane.getTitle());
+        }
+    }
+
+    public void show(SidePaneType pane) {
+        if (!getPanes().contains(pane)) {
+            getPanes().add(pane);
+            getPanes().sort(new PreferredIndexSort(preferencesService.getSidePanePreferences()));
+        } else {
+            LOGGER.warn("SidePaneComponent {} not visible", pane.getTitle());
+        }
+
+        if (pane == GROUPS
+                && stateManager.getVisibleSidePaneComponents().contains(GROUPS)
+                && getSidePaneComponent(pane) instanceof GroupsSidePaneComponent component) {
+            component.afterOpening();
+        }
+    }
+
+    public void hide(SidePaneType pane) {
+        if (getPanes().contains(pane)) {
+            getPanes().remove(pane);
+        } else {
+            LOGGER.warn("SidePaneComponent {} not visible", pane.getTitle());
+        }
+    }
+
+    private ObservableList<SidePaneType> getPanes() {
+        return stateManager.getVisibleSidePaneComponents();
     }
 
     private <T> void swap(ObservableList<T> observableList, int i, int j) {
@@ -127,12 +157,12 @@ public class SidePaneViewModel extends AbstractViewModel {
     /**
      * Helper class for sorting visible side panes based on their preferred position.
      */
-    private static class PreferredIndexSort implements Comparator<SidePaneType> {
+    protected static class PreferredIndexSort implements Comparator<SidePaneType> {
 
         private final Map<SidePaneType, Integer> preferredPositions;
 
-        public PreferredIndexSort(PreferencesService preferencesService) {
-            preferredPositions = preferencesService.getSidePanePreferences().getPreferredPositions();
+        public PreferredIndexSort(SidePanePreferences sidePanePreferences) {
+            this.preferredPositions = sidePanePreferences.getPreferredPositions();
         }
 
         @Override
@@ -140,6 +170,45 @@ public class SidePaneViewModel extends AbstractViewModel {
             int pos1 = preferredPositions.getOrDefault(type1, 0);
             int pos2 = preferredPositions.getOrDefault(type2, 0);
             return Integer.compare(pos1, pos2);
+        }
+    }
+
+    private class MoveUpAction extends SimpleCommand {
+        private final SidePaneType toMoveUpPane;
+
+        public MoveUpAction(SidePaneType toMoveUpPane) {
+            this.toMoveUpPane = toMoveUpPane;
+        }
+
+        @Override
+        public void execute() {
+            moveUp(toMoveUpPane);
+        }
+    }
+
+    private class MoveDownAction extends SimpleCommand {
+        private final SidePaneType toMoveDownPane;
+
+        public MoveDownAction(SidePaneType toMoveDownPane) {
+            this.toMoveDownPane = toMoveDownPane;
+        }
+
+        @Override
+        public void execute() {
+            moveDown(toMoveDownPane);
+        }
+    }
+
+    public class ClosePaneAction extends SimpleCommand {
+        private final SidePaneType toClosePane;
+
+        public ClosePaneAction(SidePaneType toClosePane) {
+            this.toClosePane = toClosePane;
+        }
+
+        @Override
+        public void execute() {
+            stateManager.getVisibleSidePaneComponents().remove(toClosePane);
         }
     }
 }
