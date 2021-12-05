@@ -12,6 +12,7 @@ import java.util.TimerTask;
 import java.util.stream.Collectors;
 
 import javafx.application.Platform;
+import javafx.beans.InvalidationListener;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.StringBinding;
 import javafx.beans.value.ChangeListener;
@@ -432,8 +433,11 @@ public class JabRefFrame extends BorderPane {
         head.setSpacing(0d);
         setTop(head);
 
-        splitPane.getItems().addAll(sidePane, tabbedPane);
+        splitPane.getItems().addAll(tabbedPane);
         SplitPane.setResizableWithParent(sidePane, false);
+
+        sidePane.getChildren().addListener((InvalidationListener) c -> updateSidePane());
+        updateSidePane();
 
         // We need to wait with setting the divider since it gets reset a few times during the initial set-up
         mainStage.showingProperty().addListener(new ChangeListener<>() {
@@ -442,24 +446,23 @@ public class JabRefFrame extends BorderPane {
             public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean showing) {
                 if (showing) {
                     setDividerPosition();
-                    EasyBind.subscribe(sidePane.visibleProperty(), visible -> {
-                        if (visible) {
-                            if (!splitPane.getItems().contains(sidePane)) {
-                                splitPane.getItems().add(0, sidePane);
-                                setDividerPosition();
-                            }
-                        } else {
-                            splitPane.getItems().remove(sidePane);
-                        }
-                    });
-
-                    mainStage.showingProperty().removeListener(this);
                     observable.removeListener(this);
                 }
             }
         });
 
         setCenter(splitPane);
+    }
+
+    private void updateSidePane() {
+        if (sidePane.getChildren().isEmpty()) {
+            splitPane.getItems().remove(sidePane);
+        } else {
+            if (!splitPane.getItems().contains(sidePane)) {
+                splitPane.getItems().add(0, sidePane);
+                setDividerPosition();
+            }
+        }
     }
 
     private void setDividerPosition() {
