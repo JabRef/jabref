@@ -1179,19 +1179,18 @@ public class JabRefFrame extends BorderPane {
                                     .map(Path::toString)
                                     .orElse(Localization.lang("untitled"));
 
-        String title = Localization.lang("Empty entries");
-        String message = Localization.lang("Library '%0' has empty entries. Do you want to delete them?", filename);
-        String okButton = Localization.lang("Delete empty entries");
-        String cancelButton = Localization.lang("Keep empty entries");
+        ButtonType deleteEmptyEntries = new ButtonType(Localization.lang("Delete empty entries"), ButtonBar.ButtonData.YES);
+        ButtonType keepEmptyEntries = new ButtonType(Localization.lang("Keep empty entries"), ButtonBar.ButtonData.NO);
+        ButtonType cancel = new ButtonType(Localization.lang("Return to JabRef"), ButtonBar.ButtonData.CANCEL_CLOSE);
 
-        Boolean response = dialogService.showConfirmationDialogWithOptOutAndWait(title,
-                message,
-                okButton,
-                cancelButton,
+        Optional<ButtonType> response = dialogService.showCustomButtonDialogWithOptOutAndWait(Alert.AlertType.CONFIRMATION,
+                Localization.lang("Empty entries"),
+                Localization.lang("Library '%0' has empty entries. Do you want to delete them?", filename),
                 Localization.lang("Do not ask again"),
-                optOut -> prefs.getGeneralPreferences().setConfirmEmptyEntries(!optOut));
-        if (response) {
-            // The user wants to delete.
+                optOut -> prefs.getGeneralPreferences().setConfirmEmptyEntries(!optOut),
+                deleteEmptyEntries, keepEmptyEntries, cancel);
+
+        if (response.isPresent() && response.get().equals(deleteEmptyEntries)) {
             try {
                 for (BibEntry currentEntry : new ArrayList<>(context.getEntries())) {
                     if (currentEntry.getFields().isEmpty()) {
@@ -1211,7 +1210,7 @@ public class JabRefFrame extends BorderPane {
             // Save was cancelled or an error occurred.
             return false;
         }
-        return true;
+        return !response.get().equals(cancel);
     }
 
     private void closeTab(LibraryTab libraryTab) {
