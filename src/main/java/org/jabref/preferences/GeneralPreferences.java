@@ -14,6 +14,7 @@ public class GeneralPreferences {
     private final ObjectProperty<BibDatabaseMode> defaultBibDatabaseMode;
     private final BooleanProperty warnAboutDuplicatesInInspection;
     private final BooleanProperty confirmDelete;
+    private final BooleanProperty confirmEmptyEntries;
 
     private final BooleanProperty memoryStickMode;
     private final BooleanProperty showAdvancedHints;
@@ -22,12 +23,14 @@ public class GeneralPreferences {
                               BibDatabaseMode defaultBibDatabaseMode,
                               boolean warnAboutDuplicatesInInspection,
                               boolean confirmDelete,
+                              boolean confirmEmptyEntries,
                               boolean memoryStickMode,
                               boolean showAdvancedHints) {
         this.defaultEncoding = new SimpleObjectProperty<>(defaultEncoding);
         this.defaultBibDatabaseMode = new SimpleObjectProperty<>(defaultBibDatabaseMode);
         this.warnAboutDuplicatesInInspection = new SimpleBooleanProperty(warnAboutDuplicatesInInspection);
         this.confirmDelete = new SimpleBooleanProperty(confirmDelete);
+        this.confirmEmptyEntries = new SimpleBooleanProperty(confirmEmptyEntries);
 
         this.memoryStickMode = new SimpleBooleanProperty(memoryStickMode);
         this.showAdvancedHints = new SimpleBooleanProperty(showAdvancedHints);
@@ -79,6 +82,18 @@ public class GeneralPreferences {
 
     public void setConfirmDelete(boolean confirmDelete) {
         this.confirmDelete.set(confirmDelete);
+    }
+
+    public void setConfirmEmptyEntries(boolean confirmEmptyEntries) {
+        this.confirmEmptyEntries.set(confirmEmptyEntries);
+    }
+
+    public boolean shouldConfirmEmptyEmtries() {
+        return confirmEmptyEntries.get();
+    }
+
+    public BooleanProperty confirmEmptyEntriesProperty() {
+        return confirmEmptyEntries;
     }
 
     public boolean isMemoryStickMode() {
