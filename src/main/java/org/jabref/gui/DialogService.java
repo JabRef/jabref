@@ -179,6 +179,19 @@ public interface DialogService {
                                                        ButtonType... buttonTypes);
 
     /**
+     * This will create and display a new dialog of the specified
+     * {@link Alert.AlertType} but with user defined buttons as optional
+     * {@link ButtonType}s.
+     * Moreover, the dialog contains a opt-out checkbox with the given text to support "Do not ask again"-behaviour.
+     *
+     * @return Optional with the pressed Button as ButtonType
+     */
+    Optional<ButtonType> showCustomButtonDialogWithOptOutAndWait(Alert.AlertType type, String title, String content,
+                                                                 String optOutMessage, Consumer<Boolean> optOutAction,
+                                                                 ButtonType... buttonTypes);
+
+
+    /**
      * This will create and display a new dialog showing a custom {@link DialogPane}
      * and using custom {@link ButtonType}s.
      *

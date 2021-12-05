@@ -16,6 +16,7 @@ import javafx.concurrent.Task;
 import javafx.print.PrinterJob;
 import javafx.scene.Group;
 import javafx.scene.Node;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
@@ -255,6 +256,15 @@ public class JabRefDialogService implements DialogService {
     public Optional<ButtonType> showCustomButtonDialogAndWait(AlertType type, String title, String content,
                                                               ButtonType... buttonTypes) {
         FXDialog alert = createDialog(type, title, content);
+        alert.getButtonTypes().setAll(buttonTypes);
+        return alert.showAndWait();
+    }
+
+    @Override
+    public Optional<ButtonType> showCustomButtonDialogWithOptOutAndWait(Alert.AlertType type, String title, String content,
+                                                                        String optOutMessage, Consumer<Boolean> optOutAction,
+                                                                        ButtonType... buttonTypes) {
+        FXDialog alert = createDialogWithOptOut(AlertType.CONFIRMATION, title, content, optOutMessage, optOutAction);
         alert.getButtonTypes().setAll(buttonTypes);
         return alert.showAndWait();
     }
