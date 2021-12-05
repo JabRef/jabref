@@ -1179,15 +1179,18 @@ public class JabRefFrame extends BorderPane {
                                     .map(Path::toString)
                                     .orElse(Localization.lang("untitled"));
 
-        ButtonType deleteEmptyEntries = new ButtonType(Localization.lang("Delete empty entries"), ButtonBar.ButtonData.YES);
-        ButtonType keepEmptyEntries = new ButtonType(Localization.lang("Keep empty entries"), ButtonBar.ButtonData.NO);
-        ButtonType cancel = new ButtonType(Localization.lang("Return to JabRef"), ButtonBar.ButtonData.CANCEL_CLOSE);
+        String title = Localization.lang("Empty entries");
+        String message = Localization.lang("Library '%0' has empty entries. Do you want to delete them?", filename);
+        String okButton = Localization.lang("Delete empty entries");
+        String cancelButton = Localization.lang("Keep empty entries");
 
-        Optional<ButtonType> response = dialogService.showCustomButtonDialogAndWait(Alert.AlertType.CONFIRMATION,
-                Localization.lang("Empty entries"),
-                Localization.lang("Library '%0' has empty entries. Do you want to delete them?", filename),
-                deleteEmptyEntries, keepEmptyEntries, cancel);
-        if (response.isPresent() && response.get().equals(deleteEmptyEntries)) {
+        Boolean response = dialogService.showConfirmationDialogWithOptOutAndWait(title,
+                message,
+                okButton,
+                cancelButton,
+                Localization.lang("Do not ask again"),
+                optOut -> prefs.getGeneralPreferences().setConfirmEmptyEntries(!optOut));
+        if (response) {
             // The user wants to delete.
             try {
                 for (BibEntry currentEntry : new ArrayList<>(context.getEntries())) {
@@ -1208,7 +1211,7 @@ public class JabRefFrame extends BorderPane {
             // Save was cancelled or an error occurred.
             return false;
         }
-        return !response.get().equals(cancel);
+        return true;
     }
 
     private void closeTab(LibraryTab libraryTab) {
