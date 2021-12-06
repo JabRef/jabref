@@ -649,7 +649,7 @@ public class JabRefPreferences implements PreferencesService {
         // Currently, JabRef does not escape them
         defaults.put(KEY_GEN_FIRST_LETTER_A, Boolean.TRUE);
         defaults.put(KEY_GEN_ALWAYS_ADD_LETTER, Boolean.FALSE);
-        defaults.put(EMAIL_SUBJECT, Localization.lang("References"));
+        defaults.put(EMAIL_SUBJECT, "References");
         defaults.put(OPEN_FOLDERS_OF_ATTACHED_FILES, Boolean.FALSE);
         defaults.put(WEB_SEARCH_VISIBLE, Boolean.TRUE);
         defaults.put(GROUP_SIDEPANE_VISIBLE, Boolean.TRUE);
@@ -827,7 +827,7 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(CUSTOM_TAB_FIELDS + "_def2", StandardField.COMMENT.getName());
         defaults.put(CUSTOM_TAB_NAME + "_def2", Localization.lang("Comments"));
 
-        defaults.put(EMAIL_SUBJECT, Localization.lang("References"));
+        defaults.put(EMAIL_SUBJECT, "References");
     }
 
     /**

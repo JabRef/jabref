@@ -23,6 +23,7 @@ import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.preferences.ExternalApplicationsPreferences;
+import org.jabref.preferences.JabRefPreferences;
 import org.jabref.preferences.PreferencesService;
 import org.jabref.preferences.PushToApplicationPreferences;
 
@@ -34,6 +35,7 @@ import de.saxsys.mvvmfx.utils.validation.Validator;
 
 public class ExternalTabViewModel implements PreferenceTabViewModel {
 
+    private String defaultEMailReferenceSubject = null;
     private final StringProperty eMailReferenceSubjectProperty = new SimpleStringProperty("");
     private final BooleanProperty autoOpenAttachedFoldersProperty = new SimpleBooleanProperty();
     private final ListProperty<PushToApplication> pushToApplicationsListProperty = new SimpleListProperty<>();
@@ -81,7 +83,8 @@ public class ExternalTabViewModel implements PreferenceTabViewModel {
     }
 
     public void setValues() {
-        eMailReferenceSubjectProperty.setValue(initialPreferences.getEmailSubject());
+        defaultEMailReferenceSubject = Localization.lang((String) preferences.getDefaults().get(JabRefPreferences.EMAIL_SUBJECT));
+        eMailReferenceSubjectProperty.setValue(Localization.lang(initialPreferences.getEmailSubject()));
         autoOpenAttachedFoldersProperty.setValue(initialPreferences.shouldAutoOpenEmailAttachmentsFolder());
 
         pushToApplicationsListProperty.setValue(
@@ -98,8 +101,13 @@ public class ExternalTabViewModel implements PreferenceTabViewModel {
     }
 
     public void storeSettings() {
+        String eMailSubject = eMailReferenceSubjectProperty.getValue();
+        if (eMailSubject.equals(defaultEMailReferenceSubject)) {
+            eMailSubject = (String) preferences.getDefaults().get(JabRefPreferences.EMAIL_SUBJECT);
+        }
+
         preferences.storeExternalApplicationsPreferences(new ExternalApplicationsPreferences(
-                eMailReferenceSubjectProperty.getValue(),
+                eMailSubject,
                 autoOpenAttachedFoldersProperty.getValue(),
                 selectedPushToApplicationProperty.getValue().getDisplayName(),
                 citeCommandProperty.getValue(),
