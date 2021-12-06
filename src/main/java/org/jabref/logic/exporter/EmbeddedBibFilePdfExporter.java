@@ -80,7 +80,15 @@ public class EmbeddedBibFilePdfExporter extends Exporter {
                 document.getDocumentCatalog().setNames(nameDictionary);
             } else {
                 efTree = nameDictionary.getEmbeddedFiles();
+                if (efTree == null) {
+                    efTree = new PDEmbeddedFilesNameTreeNode();
+                    nameDictionary.setEmbeddedFiles(efTree);
+                }
                 names = efTree.getNames();
+                if (names == null) {
+                    names = new HashMap<>();
+                    efTree.setNames(names);
+                }
             }
 
             if (efTree != null) {
