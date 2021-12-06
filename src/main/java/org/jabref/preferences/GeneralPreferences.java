@@ -86,57 +86,27 @@ public class GeneralPreferences {
     public void setConfirmDelete(boolean confirmDelete) {
         this.confirmDelete.set(confirmDelete);
     }
-
-    /**
-     * Get the preference of whether to give a confirmation dialog when empty entries are detected in the library
-     *
-     * @return true if the preference is set as yes
-     */
+    
     public boolean shouldConfirmEmptyEntries() {
         return confirmEmptyEntries.get();
     }
 
-    /**
-     * Get the BooleanProperty of the preference of whether to give a confirmation dialog when empty entries are detected in the library
-     *
-     * @return BooleanProperty
-     */
     public BooleanProperty confirmEmptyEntriesProperty() {
         return confirmEmptyEntries;
     }
 
-    /**
-     * Set the preference of whether to give a confirmation dialog when empty entries are detected in the library
-     *
-     * @param confirmEmptyEntries        boolean for the preference
-     */
     public void setConfirmEmptyEntries(boolean confirmEmptyEntries) {
         this.confirmEmptyEntries.set(confirmEmptyEntries);
     }
 
-    /**
-     * Get the preference of whether to delete the empty entries detected in the library if confirmation dialog is opted out
-     *
-     * @return true if the preference is set as yes (delete)
-     */
     public boolean shouldDeleteEmptyEntries() {
         return deleteEmptyEntries.get();
     }
 
-    /**
-     * Get the BooleanProperty of the preference of whether to delete the empty entries detected in the library if confirmation dialog is opted out
-     *
-     * @return BooleanProperty
-     */
     public BooleanProperty deleteEmptyEntriesProperty() {
         return deleteEmptyEntries;
     }
 
-    /**
-     * Set the preference of whether to delete the empty entries detected in the library if confirmation dialog is opted out
-     *
-     * @param deleteEmptyEntries        boolean for the preference
-     */
     public void setDeleteEmptyEntries(boolean deleteEmptyEntries) {
         this.deleteEmptyEntries.set(deleteEmptyEntries);
     }
