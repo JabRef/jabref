@@ -136,14 +136,6 @@ public class SidePaneViewModel extends AbstractViewModel {
         }
     }
 
-    public void hide(SidePaneType pane) {
-        if (getPanes().contains(pane)) {
-            getPanes().remove(pane);
-        } else {
-            LOGGER.warn("SidePaneComponent {} not visible", pane.getTitle());
-        }
-    }
-
     private ObservableList<SidePaneType> getPanes() {
         return stateManager.getVisibleSidePaneComponents();
     }
