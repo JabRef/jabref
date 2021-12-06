@@ -133,7 +133,7 @@ public class WriteMetadataToPdfAction extends SimpleCommand {
                                     .map(file -> file.findIn(stateManager.getActiveDatabase().get(), filePreferences))
                                     .filter(Optional::isPresent)
                                     .map(Optional::get)
-                                    .filter(path -> StandardFileType.PDF.getExtensions().contains(FileUtil.getFileExtension(path)))
+                                    .filter(path -> FileUtil.isPDFFile(path))
                                     .collect(Collectors.toList());
 
             Platform.runLater(() -> optionsDialog.getProgressArea()
