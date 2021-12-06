@@ -121,7 +121,7 @@ dependencies {
     implementation 'org.apache.pdfbox:xmpbox:2.0.24'
 
     implementation group: 'org.apache.commons', name: 'commons-csv', version: '1.9.0'
-    implementation 'com.h2database:h2-mvstore:1.4.200'
+    implementation 'com.h2database:h2-mvstore:2.0.202'
 
     implementation group: 'org.apache.tika', name: 'tika-core', version: '2.1.0'
 
