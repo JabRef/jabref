@@ -7,6 +7,7 @@ import javafx.scene.control.TextField;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
+import org.jabref.gui.StateManager;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.l10n.Localization;
@@ -25,16 +26,17 @@ public class GenerateEntryFromIdDialog {
     private final DialogService dialogService;
     private final LibraryTab libraryTab;
     private final TaskExecutor taskExecutor;
+    private final StateManager stateManager;
 
     private PopOver entryFromIdPopOver;
 
-    public GenerateEntryFromIdDialog(LibraryTab libraryTab, DialogService dialogService, PreferencesService preferencesService, TaskExecutor taskExecutor) {
+    public GenerateEntryFromIdDialog(LibraryTab libraryTab, DialogService dialogService, PreferencesService preferencesService, TaskExecutor taskExecutor, StateManager stateManager) {
         ViewLoader.view(this).load();
         this.preferencesService = preferencesService;
         this.dialogService = dialogService;
         this.libraryTab = libraryTab;
         this.taskExecutor = taskExecutor;
-
+        this.stateManager = stateManager;
         this.generateButton.setGraphic(IconTheme.JabRefIcons.IMPORT.getGraphicNode());
         this.generateButton.setDefaultButton(true);
     }
@@ -53,7 +55,8 @@ public class GenerateEntryFromIdDialog {
                 preferencesService,
                 taskExecutor,
                 entryFromIdPopOver,
-                idTextField.getText()
+                idTextField.getText(),
+                stateManager
         );
         generateEntryFromIdAction.execute();
     }

@@ -13,7 +13,7 @@
     <category citation-format="numeric"/>
     <category field="generic-base"/>
     <summary>The Chinese GB/T7714-2015 numeric style</summary>
-    <updated>2019-04-27T18:00:00+08:00</updated>
+    <updated>2021-11-25T18:00:00+08:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="zh-CN">
@@ -163,7 +163,11 @@
   </macro>
   <macro name="title">
     <text variable="title" text-case="title"/>
-    <text variable="number" prefix=": "/>
+    <choose>
+        <if type="bill broadcast legal_case legislation patent report song" match="any">
+          <text variable="number" prefix=": "/>
+        </if>
+    </choose>
     <group delimiter="/" prefix="[" suffix="]">
       <text macro="type-code"/>
       <choose>

@@ -2,6 +2,7 @@ package org.jabref.gui.search;
 
 import java.lang.reflect.Field;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
@@ -59,6 +60,7 @@ import org.jabref.gui.util.TooltipTextUtil;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.search.SearchQuery;
 import org.jabref.model.entry.Author;
+import org.jabref.model.search.rules.SearchRules;
 import org.jabref.preferences.PreferencesService;
 import org.jabref.preferences.SearchPreferences;
 
@@ -99,7 +101,7 @@ public class GlobalSearchBar extends HBox {
     private final Validator regexValidator;
     private final UndoManager undoManager;
 
-    private SearchPreferences searchPreferences;
+    private final SearchPreferences searchPreferences;
 
     private final BooleanProperty globalSearchActive = new SimpleBooleanProperty(false);
     private GlobalSearchResultDialog globalSearchResultDialog;
@@ -204,8 +206,7 @@ public class GlobalSearchBar extends HBox {
         regularExpressionButton.setTooltip(new Tooltip(Localization.lang("regular expression")));
         initSearchModifierButton(regularExpressionButton);
         regularExpressionButton.setOnAction(event -> {
-            searchPreferences = searchPreferences.withRegularExpression(regularExpressionButton.isSelected());
-            preferencesService.storeSearchPreferences(searchPreferences);
+            searchPreferences.setSearchFlag(SearchRules.SearchFlags.REGULAR_EXPRESSION, regularExpressionButton.isSelected());
             performSearch();
         });
 
@@ -213,8 +214,7 @@ public class GlobalSearchBar extends HBox {
         caseSensitiveButton.setTooltip(new Tooltip(Localization.lang("Case sensitive")));
         initSearchModifierButton(caseSensitiveButton);
         caseSensitiveButton.setOnAction(event -> {
-            searchPreferences = searchPreferences.withCaseSensitive(caseSensitiveButton.isSelected());
-            preferencesService.storeSearchPreferences(searchPreferences);
+            searchPreferences.setSearchFlag(SearchRules.SearchFlags.CASE_SENSITIVE, caseSensitiveButton.isSelected());
             performSearch();
         });
 
@@ -222,17 +222,15 @@ public class GlobalSearchBar extends HBox {
         fulltextButton.setTooltip(new Tooltip(Localization.lang("Fulltext search")));
         initSearchModifierButton(fulltextButton);
         fulltextButton.setOnAction(event -> {
-            searchPreferences = searchPreferences.withFulltext(fulltextButton.isSelected());
-            preferencesService.storeSearchPreferences(searchPreferences);
+            searchPreferences.setSearchFlag(SearchRules.SearchFlags.FULLTEXT, fulltextButton.isSelected());
             performSearch();
         });
 
-        keepSearchString.setSelected(searchPreferences.isKeepSearchString());
+        keepSearchString.setSelected(searchPreferences.shouldKeepSearchString());
         keepSearchString.setTooltip(new Tooltip(Localization.lang("Keep search string across libraries")));
         initSearchModifierButton(keepSearchString);
         keepSearchString.setOnAction(evt -> {
-            searchPreferences = searchPreferences.withKeepSearchString(keepSearchString.isSelected());
-            preferencesService.storeSearchPreferences(searchPreferences);
+            searchPreferences.setSearchFlag(SearchRules.SearchFlags.KEEP_SEARCH_STRING, keepSearchString.isSelected());
             performSearch();
         });
 
@@ -390,7 +388,7 @@ public class GlobalSearchBar extends HBox {
         DefaultTaskExecutor.runInJavaFXThread(() -> searchField.setText(searchTerm));
     }
 
-    private class SearchPopupSkin<T> implements Skin<AutoCompletePopup<T>> {
+    private static class SearchPopupSkin<T> implements Skin<AutoCompletePopup<T>> {
 
         private final AutoCompletePopup<T> control;
         private final ListView<T> suggestionList;
@@ -400,7 +398,7 @@ public class GlobalSearchBar extends HBox {
             this.control = control;
             this.suggestionList = new ListView<>(control.getSuggestions());
             this.suggestionList.getStyleClass().add("auto-complete-popup");
-            this.suggestionList.getStylesheets().add(AutoCompletionBinding.class.getResource("autocompletion.css").toExternalForm());
+            this.suggestionList.getStylesheets().add(Objects.requireNonNull(AutoCompletionBinding.class.getResource("autocompletion.css")).toExternalForm());
             this.suggestionList.prefHeightProperty().bind(Bindings.min(control.visibleRowCountProperty(), Bindings.size(this.suggestionList.getItems())).multiply(24).add(18));
             this.suggestionList.setCellFactory(TextFieldListCell.forListView(control.getConverter()));
             this.suggestionList.prefWidthProperty().bind(control.prefWidthProperty());

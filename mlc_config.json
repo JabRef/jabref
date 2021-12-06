@@ -35,6 +35,9 @@
         },
         {
             "pattern": "^http://localhost"
+        },
+        {
+            "pattern": "^https://demo.teamscale.com"
         }
     ]
 }

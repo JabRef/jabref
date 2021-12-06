@@ -10,7 +10,7 @@ import org.jabref.build.xjc.XjcTask
 plugins {
     id 'application'
 
-    id "com.simonharrer.modernizer" version '2.1.0-1'
+    id 'com.github.andygoossens.modernizer' version '1.6.1'
 
     id 'me.champeau.gradle.jmh' version '0.5.3'
 
@@ -24,7 +24,7 @@ plugins {
 
     // nicer test outputs during running and completion
     // Homepage: https://github.com/radarsh/gradle-test-logger-plugin
-    id 'com.adarshr.test-logger' version '3.0.0'
+    id 'com.adarshr.test-logger' version '3.1.0'
 
     id 'jacoco'
 
@@ -108,7 +108,7 @@ configurations {
 }
 
 javafx {
-    version = "17.0.0.1"
+    version = "17.0.1"
     modules = [ 'javafx.controls', 'javafx.fxml', 'javafx.web', 'javafx.swing' ]
 }
 
@@ -121,14 +121,14 @@ dependencies {
     implementation 'org.apache.pdfbox:xmpbox:2.0.24'
 
     implementation group: 'org.apache.commons', name: 'commons-csv', version: '1.9.0'
-    implementation 'com.h2database:h2-mvstore:1.4.200'
+    implementation 'com.h2database:h2-mvstore:2.0.202'
 
     implementation group: 'org.apache.tika', name: 'tika-core', version: '2.1.0'
 
     // required for reading write-protected PDFs - see https://github.com/JabRef/jabref/pull/942#issuecomment-209252635
     implementation 'org.bouncycastle:bcprov-jdk15on:1.69'
 
-    implementation 'commons-cli:commons-cli:1.4'
+    implementation 'commons-cli:commons-cli:1.5.0'
 
     implementation 'org.libreoffice:libreoffice:7.2.2'
     implementation 'org.libreoffice:unoloader:7.2.2'
@@ -139,8 +139,8 @@ dependencies {
     antlr3 'org.antlr:antlr:3.5.2'
     implementation 'org.antlr:antlr-runtime:3.5.2'
 
-    antlr4 'org.antlr:antlr4:4.9.2'
-    implementation 'org.antlr:antlr4-runtime:4.9.2'
+    antlr4 'org.antlr:antlr4:4.9.3'
+    implementation 'org.antlr:antlr4-runtime:4.9.3'
 
     implementation group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: '5.13.0.202109080827-r'
 
@@ -149,7 +149,7 @@ dependencies {
 
     implementation group: 'org.mariadb.jdbc', name: 'mariadb-java-client', version: '2.7.4'
 
-    implementation 'org.postgresql:postgresql:42.2.24'
+    implementation 'org.postgresql:postgresql:42.3.1'
 
     implementation ('com.oracle.ojdbc:ojdbc10:19.3.0.0') {
         // causing module issues
@@ -169,14 +169,14 @@ dependencies {
     implementation 'de.saxsys:mvvmfx-validation:1.9.0-SNAPSHOT'
     implementation 'de.saxsys:mvvmfx:1.8.0'
     implementation 'com.tobiasdiez:easybind:2.2'
-    implementation 'org.fxmisc.flowless:flowless:0.6.6'
-    implementation 'org.fxmisc.richtext:richtextfx:0.10.6'
+    implementation 'org.fxmisc.flowless:flowless:0.6.7'
+    implementation 'org.fxmisc.richtext:richtextfx:0.10.7'
     implementation group: 'org.glassfish.hk2.external', name: 'jakarta.inject', version: '2.6.1'
     implementation 'com.jfoenix:jfoenix:9.0.10'
     implementation 'org.controlsfx:controlsfx:11.1.0'
 
     implementation 'org.jsoup:jsoup:1.14.3'
-    implementation 'com.konghq:unirest-java:3.13.0'
+    implementation 'com.konghq:unirest-java:3.13.4'
 
     implementation 'org.slf4j:slf4j-api:2.0.0-alpha5'
     implementation group: 'org.apache.logging.log4j', name: 'log4j-jcl', version: '3.0.0-SNAPSHOT'
@@ -207,23 +207,22 @@ dependencies {
 
     implementation group: 'net.harawata', name: 'appdirs', version: '1.2.1'
 
-    testImplementation 'io.github.classgraph:classgraph:4.8.128'
+    testImplementation 'io.github.classgraph:classgraph:4.8.137'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.8.1'
     testImplementation 'org.junit.platform:junit-platform-launcher:1.8.1'
 
-    testImplementation 'net.bytebuddy:byte-buddy-parent:1.11.21'
     testRuntimeOnly group: 'org.apache.logging.log4j', name: 'log4j-core', version: '3.0.0-SNAPSHOT'
     testRuntimeOnly group: 'org.apache.logging.log4j', name: 'log4j-jul', version: '3.0.0-SNAPSHOT'
-    testImplementation 'org.mockito:mockito-core:4.0.0'
+    testImplementation 'org.mockito:mockito-core:4.1.0'
     testImplementation 'org.xmlunit:xmlunit-core:2.8.3'
     testImplementation 'org.xmlunit:xmlunit-matchers:2.8.3'
-    testRuntimeOnly 'com.tngtech.archunit:archunit-junit5-engine:0.21.0'
-    testImplementation 'com.tngtech.archunit:archunit-junit5-api:0.21.0'
+    testRuntimeOnly 'com.tngtech.archunit:archunit-junit5-engine:0.22.0'
+    testImplementation 'com.tngtech.archunit:archunit-junit5-api:0.22.0'
     testImplementation "org.testfx:testfx-core:4.0.17-alpha-SNAPSHOT"
     testImplementation "org.testfx:testfx-junit5:4.0.17-alpha-SNAPSHOT"
     testImplementation "org.hamcrest:hamcrest-library:2.2"
 
-    checkstyle 'com.puppycrawl.tools:checkstyle:9.0.1'
+    checkstyle 'com.puppycrawl.tools:checkstyle:9.2'
     xjc group: 'org.glassfish.jaxb', name: 'jaxb-xjc', version: '2.3.3'
 }
 

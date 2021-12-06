@@ -138,7 +138,7 @@ public class StringUtil {
             return "";
         }
 
-        int updatedFrom = Math.max(from, 0);
+        int updatedFrom = Math.max(0, from);
         int updatedTo = Math.min(strings.length, to);
 
         StringBuilder stringBuilder = new StringBuilder();
@@ -394,6 +394,7 @@ public class StringUtil {
 
     /**
      * Replaces all platform-dependent line breaks by OS.NEWLINE line breaks.
+     * AKA normalize newlines
      * <p>
      * We do NOT use UNIX line breaks as the user explicitly configures its linebreaks and this method is used in bibtex field writing
      *
@@ -599,7 +600,7 @@ public class StringUtil {
      * @return String with n spaces
      */
     public static String repeatSpaces(int n) {
-        return repeat(n, ' ');
+        return repeat(Math.max(0, n), ' ');
     }
 
     /**

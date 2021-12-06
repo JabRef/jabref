@@ -35,6 +35,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javafx.beans.InvalidationListener;
+import javafx.collections.SetChangeListener;
 import javafx.scene.control.TableColumn.SortType;
 
 import org.jabref.gui.Globals;
@@ -108,6 +109,7 @@ import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.EntryTypeFactory;
 import org.jabref.model.metadata.SaveOrderConfig;
 import org.jabref.model.push.PushToApplicationConstants;
+import org.jabref.model.search.rules.SearchRules;
 import org.jabref.model.strings.StringUtil;
 
 import com.tobiasdiez.easybind.EasyBind;
@@ -155,6 +157,7 @@ public class JabRefPreferences implements PreferencesService {
     public static final String REFORMAT_FILE_ON_SAVE_AND_EXPORT = "reformatFileOnSaveAndExport";
     public static final String EXPORT_IN_ORIGINAL_ORDER = "exportInOriginalOrder";
     public static final String EXPORT_IN_SPECIFIED_ORDER = "exportInSpecifiedOrder";
+
     public static final String EXPORT_PRIMARY_SORT_FIELD = "exportPriSort";
     public static final String EXPORT_PRIMARY_SORT_DESCENDING = "exportPriDescending";
     public static final String EXPORT_SECONDARY_SORT_FIELD = "exportSecSort";
@@ -169,6 +172,10 @@ public class JabRefPreferences implements PreferencesService {
     public static final String COLUMN_WIDTHS = "mainTableColumnWidths";
     public static final String COLUMN_SORT_TYPES = "mainTableColumnSortTypes";
     public static final String COLUMN_SORT_ORDER = "mainTableColumnSortOrder";
+
+    public static final String SEARCH_DIALOG_COLUMN_WIDTHS = "searchTableColumnWidths";
+    public static final String SEARCH_DIALOG_COLUMN_SORT_TYPES = "searchDialogColumnSortTypes";
+    public static final String SEARCH_DIALOG_COLUMN_SORT_ORDER = "searchDalogColumnSortOrder";
 
     public static final String SIDE_PANE_COMPONENT_PREFERRED_POSITIONS = "sidePaneComponentPreferredPositions";
     public static final String SIDE_PANE_COMPONENT_NAMES = "sidePaneComponentNames";
@@ -287,7 +294,7 @@ public class JabRefPreferences implements PreferencesService {
 
     /**
      * The OpenOffice/LibreOffice connection preferences are:
-     * OO_PATH main directory for OO/LO installation, used to detect location on Win/OS X when using manual connect
+     * OO_PATH main directory for OO/LO installation, used to detect location on Win/macOS when using manual connect
      * OO_EXECUTABLE_PATH path to soffice-file
      * OO_JARS_PATH directory that contains juh.jar, jurt.jar, ridl.jar, unoil.jar
      * OO_SYNC_WHEN_CITING true if the reference list is updated when adding a new citation
@@ -307,10 +314,7 @@ public class JabRefPreferences implements PreferencesService {
 
     // Special field preferences
     public static final String SPECIALFIELDSENABLED = "specialFieldsEnabled";
-    // The choice between AUTOSYNCSPECIALFIELDSTOKEYWORDS and SERIALIZESPECIALFIELDS is mutually exclusive
-    // At least in the settings, not in the implementation. But having both confused the users, therefore, having activated both options at the same time has been disabled
-    public static final String SERIALIZESPECIALFIELDS = "serializeSpecialFields";
-    public static final String AUTOSYNCSPECIALFIELDSTOKEYWORDS = "autoSyncSpecialFieldsToKeywords";
+
     // Prefs node for CitationKeyPatterns
     public static final String CITATION_KEY_PATTERNS_NODE = "bibtexkeypatterns";
     // Prefs node for customized entry types
@@ -418,6 +422,10 @@ public class JabRefPreferences implements PreferencesService {
     private Map<String, Set<Field>> entryEditorTabList;
     private List<MainTableColumnModel> mainTableColumns;
     private List<MainTableColumnModel> mainTableColumnSortOrder;
+
+    private List<MainTableColumnModel> searchDialogTableColunns;
+    private List<MainTableColumnModel> searchDialogColumnSortOrder;
+
     private Theme globalTheme;
     private Set<CustomImporter> customImporters;
     private String userName;
@@ -433,6 +441,12 @@ public class JabRefPreferences implements PreferencesService {
     private GuiPreferences guiPreferences;
     private RemotePreferences remotePreferences;
     private ProxyPreferences proxyPreferences;
+    private SearchPreferences searchPreferences;
+    private AutoLinkPreferences autoLinkPreferences;
+    private ImportExportPreferences importExportPreferences;
+    private NameFormatterPreferences nameFormatterPreferences;
+    private VersionPreferences versionPreferences;
+    private SpecialFieldsPreferences specialFieldsPreferences;
 
     // The constructor is made private to enforce this as a singleton class:
     private JabRefPreferences() {
@@ -525,7 +539,7 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(REFORMAT_FILE_ON_SAVE_AND_EXPORT, Boolean.FALSE);
 
         // export order
-        defaults.put(EXPORT_IN_ORIGINAL_ORDER, Boolean.FALSE);
+        defaults.put(EXPORT_IN_ORIGINAL_ORDER, Boolean.TRUE);
         defaults.put(EXPORT_IN_SPECIFIED_ORDER, Boolean.FALSE);
 
         // export order: if EXPORT_IN_SPECIFIED_ORDER, then use following criteria
@@ -606,8 +620,6 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(OO_EXTERNAL_STYLE_FILES, "");
 
         defaults.put(SPECIALFIELDSENABLED, Boolean.TRUE);
-        defaults.put(AUTOSYNCSPECIALFIELDSTOKEYWORDS, Boolean.FALSE);
-        defaults.put(SERIALIZESPECIALFIELDS, Boolean.TRUE);
 
         defaults.put(USE_OWNER, Boolean.FALSE);
         defaults.put(OVERWRITE_OWNER, Boolean.FALSE);
@@ -795,22 +807,6 @@ public class JabRefPreferences implements PreferencesService {
             storage.put(CLEANUP + action.name(), !deactivatedJobs.contains(action));
         }
         storage.put(CLEANUP_FORMATTERS, convertListToString(Cleanups.DEFAULT_SAVE_ACTIONS.getAsStringList(OS.NEWLINE)));
-    }
-
-    @Override
-    public String getUser() {
-        if (StringUtil.isNotBlank(userName)) {
-            return userName;
-        }
-
-        try {
-            userName = get(DEFAULT_OWNER) + '-' + InetAddress.getLocalHost().getHostName();
-            return userName;
-        } catch (UnknownHostException ex) {
-            LOGGER.error("Hostname not found. Please go to https://docs.jabref.org/ to find possible " +
-                    "problem resolution", ex);
-            return get(DEFAULT_OWNER);
-        }
     }
 
     public void setLanguageDependentDefaultValues() {
@@ -1057,7 +1053,9 @@ public class JabRefPreferences implements PreferencesService {
         try (OutputStream os = Files.newOutputStream(file)) {
             prefs.exportSubtree(os);
         } catch (BackingStoreException | IOException ex) {
-            throw new JabRefException("Could not export preferences", Localization.lang("Could not export preferences"),
+            throw new JabRefException(
+                    "Could not export preferences",
+                    Localization.lang("Could not export preferences"),
                     ex);
         }
     }
@@ -1066,14 +1064,17 @@ public class JabRefPreferences implements PreferencesService {
      * Imports Preferences from an XML file.
      *
      * @param file Path of file to import from
-     * @throws JabRefException thrown if importing the preferences failed due to an InvalidPreferencesFormatException or an IOException
+     * @throws JabRefException thrown if importing the preferences failed due to an InvalidPreferencesFormatException or
+     *                         an IOException
      */
     @Override
     public void importPreferences(Path file) throws JabRefException {
         try (InputStream is = Files.newInputStream(file)) {
             Preferences.importPreferences(is);
         } catch (InvalidPreferencesFormatException | IOException ex) {
-            throw new JabRefException("Could not import preferences", Localization.lang("Could not import preferences"),
+            throw new JabRefException(
+                    "Could not import preferences",
+                    Localization.lang("Could not import preferences"),
                     ex);
         }
     }
@@ -1121,18 +1122,20 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public VersionPreferences getVersionPreferences() {
-        Version ignoredVersion = Version.parse(get(VERSION_IGNORED_UPDATE));
-        return new VersionPreferences(ignoredVersion);
-    }
+        if (Objects.nonNull(versionPreferences)) {
+            return versionPreferences;
+        }
 
-    @Override
-    public void storeVersionPreferences(VersionPreferences versionPreferences) {
-        put(VERSION_IGNORED_UPDATE, versionPreferences.getIgnoredVersion().toString());
+        versionPreferences = new VersionPreferences(Version.parse(get(VERSION_IGNORED_UPDATE)));
+
+        EasyBind.listen(versionPreferences.ignoredVersionProperty(), (obs, oldValue, newValue) -> put(VERSION_IGNORED_UPDATE, newValue.toString()));
+
+        return versionPreferences;
     }
 
     @Override
     public JournalAbbreviationPreferences getJournalAbbreviationPreferences() {
-        return new JournalAbbreviationPreferences(getStringList(EXTERNAL_JOURNAL_LISTS), getDefaultEncoding());
+        return new JournalAbbreviationPreferences(getStringList(EXTERNAL_JOURNAL_LISTS), getGeneralPreferences().getDefaultEncoding());
     }
 
     @Override
@@ -1317,32 +1320,13 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     @Override
-    public Charset getDefaultEncoding() {
-        return Charset.forName(get(DEFAULT_ENCODING));
-    }
-
-    /**
-     * Returns the default BibDatabase mode, which can be either BIBTEX or BIBLATEX.
-     *
-     * @return the default BibDatabaseMode
-     */
-    @Override
-    public BibDatabaseMode getDefaultBibDatabaseMode() {
-        if (getBoolean(BIBLATEX_DEFAULT_MODE)) {
-            return BibDatabaseMode.BIBLATEX;
-        } else {
-            return BibDatabaseMode.BIBTEX;
-        }
-    }
-
-    @Override
     public GeneralPreferences getGeneralPreferences() {
         if (Objects.nonNull(generalPreferences)) {
             return generalPreferences;
         }
 
         generalPreferences = new GeneralPreferences(
-                getDefaultEncoding(),
+                Charset.forName(get(DEFAULT_ENCODING)),
                 getBoolean(BIBLATEX_DEFAULT_MODE) ? BibDatabaseMode.BIBLATEX : BibDatabaseMode.BIBTEX,
                 getBoolean(WARN_ABOUT_DUPLICATES_IN_INSPECTION),
                 getBoolean(CONFIRM_DELETE),
@@ -1839,58 +1823,16 @@ public class JabRefPreferences implements PreferencesService {
     // MainTablePreferences
     //*************************************************************************************************************
 
-    /**
-     * Creates the GlobalCitationKeyPattern from cache
-     *
-     * @return GlobalCitationKeyPattern containing all keys without a parent AbstractKeyPattern
-     */
     private List<MainTableColumnModel> createMainTableColumns() {
         if (this.mainTableColumns == null) {
-            updateMainTableColumns();
+            this.mainTableColumns = updateColumns(COLUMN_NAMES, COLUMN_WIDTHS, COLUMN_SORT_TYPES, ColumnPreferences.DEFAULT_COLUMN_WIDTH);
         }
         return this.mainTableColumns;
     }
 
-    /**
-     * Reloads the GlobalCitationKeyPattern from scratch
-     */
     @Override
     public void updateMainTableColumns() {
-        List<String> columnNames = getStringList(COLUMN_NAMES);
-
-        List<Double> columnWidths = getStringList(COLUMN_WIDTHS)
-                .stream()
-                .map(string -> {
-                    try {
-                        return Double.parseDouble(string);
-                    } catch (NumberFormatException e) {
-                        LOGGER.error("Exception while parsing column widths. Choosing default.", e);
-                        return ColumnPreferences.DEFAULT_COLUMN_WIDTH;
-                    }
-                })
-                .collect(Collectors.toList());
-
-        List<SortType> columnSortTypes = getStringList(COLUMN_SORT_TYPES)
-                .stream()
-                .map(SortType::valueOf)
-                .collect(Collectors.toList());
-
-        List<MainTableColumnModel> columns = new ArrayList<>();
-        for (int i = 0; i < columnNames.size(); i++) {
-            MainTableColumnModel columnModel = MainTableColumnModel.parse(columnNames.get(i));
-
-            if (i < columnWidths.size()) {
-                columnModel.widthProperty().setValue(columnWidths.get(i));
-            }
-
-            if (i < columnSortTypes.size()) {
-                columnModel.sortTypeProperty().setValue(columnSortTypes.get(i));
-            }
-
-            columns.add(columnModel);
-        }
-
-        mainTableColumns = columns;
+        mainTableColumns = updateColumns(COLUMN_NAMES, COLUMN_WIDTHS, COLUMN_SORT_TYPES, ColumnPreferences.DEFAULT_COLUMN_WIDTH);
     }
 
     /**
@@ -1900,23 +1842,9 @@ public class JabRefPreferences implements PreferencesService {
      */
     private List<MainTableColumnModel> createMainTableColumnSortOrder() {
         if (this.mainTableColumnSortOrder == null) {
-            updateColumnSortOrder();
+            this.mainTableColumnSortOrder = updateColumnSortOrder(COLUMN_SORT_ORDER, mainTableColumns);
         }
         return this.mainTableColumnSortOrder;
-    }
-
-    /**
-     * Reloads the MainTableColumnSortOrder from scratch to cache
-     */
-    private void updateColumnSortOrder() {
-        List<MainTableColumnModel> columnsOrdered = new ArrayList<>();
-        getStringList(COLUMN_SORT_ORDER).forEach(columnName ->
-                mainTableColumns.stream().filter(column ->
-                        column.getName().equals(columnName))
-                                .findFirst()
-                                .ifPresent(columnsOrdered::add));
-
-        mainTableColumnSortOrder = columnsOrdered;
     }
 
     @Override
@@ -1932,26 +1860,9 @@ public class JabRefPreferences implements PreferencesService {
      * @param columnPreferences the preferences to store
      */
     @Override
-    public void storeColumnPreferences(ColumnPreferences columnPreferences) {
-        putStringList(COLUMN_NAMES, columnPreferences.getColumns().stream()
-                                                     .map(MainTableColumnModel::getName)
-                                                     .collect(Collectors.toList()));
-
-        List<String> columnWidthsInOrder = new ArrayList<>();
-        columnPreferences.getColumns().forEach(column -> columnWidthsInOrder.add(column.widthProperty().getValue().toString()));
-        putStringList(COLUMN_WIDTHS, columnWidthsInOrder);
-
-        List<String> columnSortTypesInOrder = new ArrayList<>();
-        columnPreferences.getColumns().forEach(column -> columnSortTypesInOrder.add(column.sortTypeProperty().getValue().toString()));
-        putStringList(COLUMN_SORT_TYPES, columnSortTypesInOrder);
-
-        putStringList(COLUMN_SORT_ORDER, columnPreferences
-                .getColumnSortOrder().stream()
-                .map(MainTableColumnModel::getName)
-                .collect(Collectors.toList()));
-
+    public void storeMainTableColumnPreferences(ColumnPreferences columnPreferences) {
         // Update cache
-        mainTableColumns = columnPreferences.getColumns();
+        mainTableColumns = storeColumnPreferences(columnPreferences, COLUMN_NAMES, COLUMN_WIDTHS, COLUMN_SORT_TYPES, COLUMN_SORT_ORDER);
     }
 
     @Override
@@ -1963,7 +1874,7 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public void storeMainTablePreferences(MainTablePreferences mainTablePreferences) {
-        storeColumnPreferences(mainTablePreferences.getColumnPreferences());
+        storeMainTableColumnPreferences(mainTablePreferences.getColumnPreferences());
         putBoolean(AUTO_RESIZE_MODE, mainTablePreferences.getResizeColumnsToFit());
         putBoolean(EXTRA_FILE_COLUMNS, mainTablePreferences.getExtraFileColumnsEnabled());
     }
@@ -1999,6 +1910,116 @@ public class JabRefPreferences implements PreferencesService {
 
         putBoolean(ABBR_AUTHOR_NAMES, preferences.getAbbreviationStyle() == AbbreviationStyle.FULL);
         putBoolean(NAMES_LAST_ONLY, preferences.getAbbreviationStyle() == AbbreviationStyle.LASTNAME_ONLY);
+    }
+
+    //*************************************************************************************************************
+    // Generic Column Handling
+    //***********************************************s**************************************************************
+
+    public List<MainTableColumnModel> updateColumns(String columnNamesList, String columnWidthList, String sortTypeList, double defaultWidth) {
+        List<String> columnNames = getStringList(columnNamesList);
+        List<Double> columnWidths = getStringList(columnWidthList)
+                                                                  .stream()
+                                                                  .map(string -> {
+                                                                      try {
+                                                                          return Double.parseDouble(string);
+                                                                      } catch (NumberFormatException e) {
+                                                                          LOGGER.error("Exception while parsing column widths. Choosing default.", e);
+                                                                          return defaultWidth;
+                                                                      }
+                                                                  })
+                                                                  .collect(Collectors.toList());
+
+        List<SortType> columnSortTypes = getStringList(sortTypeList)
+                                                                    .stream()
+                                                                    .map(SortType::valueOf)
+                                                                    .collect(Collectors.toList());
+
+        List<MainTableColumnModel> columns = new ArrayList<>();
+        for (int i = 0; i < columnNames.size(); i++) {
+            MainTableColumnModel columnModel = MainTableColumnModel.parse(columnNames.get(i));
+
+            if (i < columnWidths.size()) {
+                columnModel.widthProperty().setValue(columnWidths.get(i));
+            }
+
+            if (i < columnSortTypes.size()) {
+                columnModel.sortTypeProperty().setValue(columnSortTypes.get(i));
+            }
+
+            columns.add(columnModel);
+        }
+        return columns;
+    }
+
+    private List<MainTableColumnModel> createSearchDialogColumns() {
+        if (this.searchDialogTableColunns == null) {
+            this.searchDialogTableColunns = updateColumns(COLUMN_NAMES, SEARCH_DIALOG_COLUMN_WIDTHS, SEARCH_DIALOG_COLUMN_SORT_TYPES, ColumnPreferences.DEFAULT_COLUMN_WIDTH);
+        }
+        return this.searchDialogTableColunns;
+    }
+
+    /**
+     * Creates the ColumnSortOrder from cache
+     *
+     * @return List containing only the the columns in its proper sort order
+     */
+    private List<MainTableColumnModel> createSearchDialogColumnSortOrder() {
+        if (this.searchDialogColumnSortOrder == null) {
+            this.searchDialogColumnSortOrder = updateColumnSortOrder(SEARCH_DIALOG_COLUMN_SORT_ORDER, searchDialogTableColunns);
+        }
+        return this.searchDialogColumnSortOrder;
+    }
+
+    /**
+     * Reloads the ColumnSortOrder from scratch
+     */
+    private List<MainTableColumnModel> updateColumnSortOrder(String sortOrderList, List<MainTableColumnModel> tableColumns) {
+        List<MainTableColumnModel> columnsOrdered = new ArrayList<>();
+        getStringList(sortOrderList).forEach(columnName -> tableColumns.stream().filter(column -> column.getName().equals(columnName))
+                                                                       .findFirst()
+                                                                       .ifPresent(columnsOrdered::add));
+
+        return columnsOrdered;
+    }
+
+    @Override
+    public ColumnPreferences getSearchDialogColumnPreferences() {
+        return new ColumnPreferences(
+                                     createSearchDialogColumns(),
+                                     createSearchDialogColumnSortOrder());
+    }
+
+    /**
+     * Stores the {@link ColumnPreferences} in the preferences
+     *
+     * @param columnPreferences the preferences to store
+     */
+    @Override
+    public void storeSearchDialogColumnPreferences(ColumnPreferences columnPreferences) {
+        searchDialogTableColunns = storeColumnPreferences(columnPreferences, COLUMN_NAMES, SEARCH_DIALOG_COLUMN_WIDTHS, SEARCH_DIALOG_COLUMN_SORT_TYPES, SEARCH_DIALOG_COLUMN_SORT_ORDER);
+    }
+
+    private List<MainTableColumnModel> storeColumnPreferences(ColumnPreferences columnPreferences, String columnNamesList, String columnWidthList, String sortTypeList, String sortOrderList) {
+
+        putStringList(columnNamesList, columnPreferences.getColumns().stream()
+                                                        .map(MainTableColumnModel::getName)
+                                                        .collect(Collectors.toList()));
+
+        List<String> columnWidthsInOrder = new ArrayList<>();
+        columnPreferences.getColumns().forEach(column -> columnWidthsInOrder.add(column.widthProperty().getValue().toString()));
+        putStringList(columnWidthList, columnWidthsInOrder);
+
+        List<String> columnSortTypesInOrder = new ArrayList<>();
+        columnPreferences.getColumns().forEach(column -> columnSortTypesInOrder.add(column.sortTypeProperty().getValue().toString()));
+        putStringList(sortTypeList, columnSortTypesInOrder);
+
+        putStringList(sortOrderList, columnPreferences
+                                                      .getColumnSortOrder().stream()
+                                                      .map(MainTableColumnModel::getName)
+                                                      .collect(Collectors.toList()));
+
+        return columnPreferences.getColumns();
     }
 
     //*************************************************************************************************************
@@ -2045,13 +2066,11 @@ public class JabRefPreferences implements PreferencesService {
     public ImportFormatPreferences getImportFormatPreferences() {
         return new ImportFormatPreferences(
                 getCustomImportFormats(),
-                getDefaultEncoding(),
                 getKeywordDelimiter(),
                 getCitationKeyPatternPreferences(),
                 getFieldContentParserPreferences(),
                 getXmpPreferences(),
-                getDOIPreferences(),
-                getSpecialFieldsPreferences().isKeywordSyncEnabled());
+                getDOIPreferences());
     }
 
     @Override
@@ -2120,7 +2139,6 @@ public class JabRefPreferences implements PreferencesService {
         return new SavePreferences(
                 false,
                 null,
-                this.getDefaultEncoding(),
                 SavePreferences.DatabaseSaveType.ALL,
                 true,
                 this.getBoolean(REFORMAT_FILE_ON_SAVE_AND_EXPORT),
@@ -2136,20 +2154,6 @@ public class JabRefPreferences implements PreferencesService {
     @Override
     public void storeOpenLastFilesOnStartup(boolean openLastFilesOnStartup) {
         putBoolean(OPEN_LAST_EDITED, openLastFilesOnStartup);
-    }
-
-    @Override
-    public NewLineSeparator getNewLineSeparator() {
-        return NewLineSeparator.parse(get(NEWLINE));
-    }
-
-    @Override
-    public void storeNewLineSeparator(NewLineSeparator newLineSeparator) {
-        String escapeChars = newLineSeparator.toString();
-        put(NEWLINE, escapeChars);
-
-        // We also have to change Globals variable as globals is not a getter, but a constant
-        OS.NEWLINE = escapeChars;
     }
 
     @Override
@@ -2183,16 +2187,6 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     @Override
-    public Path getWorkingDir() {
-        return Path.of(get(WORKING_DIRECTORY));
-    }
-
-    @Override
-    public void setWorkingDirectory(Path directory) {
-        put(WORKING_DIRECTORY, directory.toString());
-    }
-
-    @Override
     public FilePreferences getFilePreferences() {
         if (Objects.nonNull(filePreferences)) {
             return filePreferences;
@@ -2204,7 +2198,8 @@ public class JabRefPreferences implements PreferencesService {
                 getBoolean(STORE_RELATIVE_TO_BIB),
                 get(IMPORT_FILENAMEPATTERN),
                 get(IMPORT_FILEDIRPATTERN),
-                getBoolean(DOWNLOAD_LINKED_FILES)
+                getBoolean(DOWNLOAD_LINKED_FILES),
+                Path.of(get(WORKING_DIRECTORY))
         );
 
         EasyBind.listen(filePreferences.mainFileDirectoryProperty(), (obs, oldValue, newValue) -> put(MAIN_FILE_DIRECTORY, filePreferences.getFileDirectory().map(Path::toString).orElse("")));
@@ -2212,12 +2207,32 @@ public class JabRefPreferences implements PreferencesService {
         EasyBind.listen(filePreferences.fileNamePatternProperty(), (obs, oldValue, newValue) -> put(IMPORT_FILENAMEPATTERN, newValue));
         EasyBind.listen(filePreferences.fileDirectoryPatternProperty(), (obs, oldValue, newValue) -> put(IMPORT_FILEDIRPATTERN, newValue));
         EasyBind.listen(filePreferences.downloadLinkedFilesProperty(), (obs, oldValue, newValue) -> putBoolean(DOWNLOAD_LINKED_FILES, newValue));
+        EasyBind.listen(filePreferences.workingDirectoryProperty(), (obs, oldValue, newValue) -> put(WORKING_DIRECTORY, newValue.toString()));
 
         return filePreferences;
     }
 
+    private String getUser() {
+        if (StringUtil.isNotBlank(userName)) {
+            return userName;
+        }
+
+        try {
+            userName = get(DEFAULT_OWNER) + '-' + InetAddress.getLocalHost().getHostName();
+            return userName;
+        } catch (UnknownHostException ex) {
+            LOGGER.error("Hostname not found. Please go to https://docs.jabref.org/ to find possible " +
+                    "problem resolution", ex);
+            return get(DEFAULT_OWNER);
+        }
+    }
+
     @Override
     public AutoLinkPreferences getAutoLinkPreferences() {
+        if (Objects.nonNull(autoLinkPreferences)) {
+            return autoLinkPreferences;
+        }
+
         AutoLinkPreferences.CitationKeyDependency citationKeyDependency =
                 AutoLinkPreferences.CitationKeyDependency.START; // default
         if (getBoolean(AUTOLINK_EXACT_KEY_ONLY)) {
@@ -2226,32 +2241,33 @@ public class JabRefPreferences implements PreferencesService {
             citationKeyDependency = AutoLinkPreferences.CitationKeyDependency.REGEX;
         }
 
-        return new AutoLinkPreferences(
+        autoLinkPreferences = new AutoLinkPreferences(
                 citationKeyDependency,
                 get(AUTOLINK_REG_EXP_SEARCH_EXPRESSION_KEY),
                 getBoolean(ASK_AUTO_NAMING_PDFS_AGAIN),
                 getKeywordDelimiter());
-    }
 
-    @Override
-    public void storeAutoLinkPreferences(AutoLinkPreferences preferences) {
-        // Starts bibtex only omitted, as it is not being saved
-        switch (preferences.getCitationKeyDependency()) {
-            case START -> {
-                putBoolean(AUTOLINK_EXACT_KEY_ONLY, false);
-                putBoolean(AUTOLINK_USE_REG_EXP_SEARCH_KEY, false);
+        EasyBind.listen(autoLinkPreferences.citationKeyDependencyProperty(), (obs, oldValue, newValue) -> {
+            // Starts bibtex only omitted, as it is not being saved
+            switch (newValue) {
+                case START -> {
+                    putBoolean(AUTOLINK_EXACT_KEY_ONLY, false);
+                    putBoolean(AUTOLINK_USE_REG_EXP_SEARCH_KEY, false);
+                }
+                case EXACT -> {
+                    putBoolean(AUTOLINK_EXACT_KEY_ONLY, true);
+                    putBoolean(AUTOLINK_USE_REG_EXP_SEARCH_KEY, false);
+                }
+                case REGEX -> {
+                    putBoolean(AUTOLINK_EXACT_KEY_ONLY, false);
+                    putBoolean(AUTOLINK_USE_REG_EXP_SEARCH_KEY, true);
+                }
             }
-            case EXACT -> {
-                putBoolean(AUTOLINK_EXACT_KEY_ONLY, true);
-                putBoolean(AUTOLINK_USE_REG_EXP_SEARCH_KEY, false);
-            }
-            case REGEX -> {
-                putBoolean(AUTOLINK_EXACT_KEY_ONLY, false);
-                putBoolean(AUTOLINK_USE_REG_EXP_SEARCH_KEY, true);
-            }
-        }
-        putBoolean(ASK_AUTO_NAMING_PDFS_AGAIN, preferences.shouldAskAutoNamingPdfs());
-        put(AUTOLINK_REG_EXP_SEARCH_EXPRESSION_KEY, preferences.getRegularExpression());
+        });
+        EasyBind.listen(autoLinkPreferences.askAutoNamingPdfsProperty(), (obs, oldValue, newValue) -> putBoolean(ASK_AUTO_NAMING_PDFS_AGAIN, newValue));
+        EasyBind.listen(autoLinkPreferences.regularExpressionProperty(), (obs, oldValue, newValue) -> put(AUTOLINK_REG_EXP_SEARCH_EXPRESSION_KEY, newValue));
+
+        return autoLinkPreferences;
     }
 
     @Override
@@ -2270,28 +2286,30 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public ImportExportPreferences getImportExportPreferences() {
-        return new ImportExportPreferences(
+        if (Objects.nonNull(importExportPreferences)) {
+            return importExportPreferences;
+        }
+
+        importExportPreferences = new ImportExportPreferences(
                 get(NON_WRAPPABLE_FIELDS),
                 !getBoolean(RESOLVE_STRINGS_ALL_FIELDS),
                 getBoolean(RESOLVE_STRINGS_ALL_FIELDS),
                 get(DO_NOT_RESOLVE_STRINGS_FOR),
-                getNewLineSeparator(),
                 getBoolean(REFORMAT_FILE_ON_SAVE_AND_EXPORT),
                 Path.of(get(IMPORT_WORKING_DIRECTORY)),
                 get(LAST_USED_EXPORT),
                 Path.of(get(EXPORT_WORKING_DIRECTORY)));
-    }
 
-    @Override
-    public void storeImportExportPreferences(ImportExportPreferences preferences) {
-        put(NON_WRAPPABLE_FIELDS, preferences.getNonWrappableFields());
-        putBoolean(RESOLVE_STRINGS_ALL_FIELDS, preferences.shouldResolveStringsForAllStrings());
-        put(DO_NOT_RESOLVE_STRINGS_FOR, preferences.getNonResolvableFields());
-        storeNewLineSeparator(preferences.getNewLineSeparator());
-        putBoolean(REFORMAT_FILE_ON_SAVE_AND_EXPORT, preferences.shouldAlwaysReformatOnSave());
-        put(IMPORT_WORKING_DIRECTORY, preferences.getImportWorkingDirectory().toString());
-        put(LAST_USED_EXPORT, preferences.getLastExportExtension());
-        put(EXPORT_WORKING_DIRECTORY, preferences.getExportWorkingDirectory().toString());
+        EasyBind.listen(importExportPreferences.nonWrappableFieldsProperty(), (obs, oldValue, newValue) -> put(NON_WRAPPABLE_FIELDS, newValue));
+        EasyBind.listen(importExportPreferences.resolveStringsForStandardBibtexFieldsProperty(), (obs, oldValue, newValue) -> putBoolean(RESOLVE_STRINGS_ALL_FIELDS, newValue));
+        EasyBind.listen(importExportPreferences.resolveStringsForAllStringsProperty(), (obs, oldValue, newValue) -> putBoolean(RESOLVE_STRINGS_ALL_FIELDS, newValue));
+        EasyBind.listen(importExportPreferences.nonResolvableFieldsProperty(), (obs, oldValue, newValue) -> put(DO_NOT_RESOLVE_STRINGS_FOR, newValue));
+        EasyBind.listen(importExportPreferences.alwaysReformatOnSaveProperty(), (obs, oldValue, newValue) -> putBoolean(REFORMAT_FILE_ON_SAVE_AND_EXPORT, newValue));
+        EasyBind.listen(importExportPreferences.importWorkingDirectoryProperty(), (obs, oldValue, newValue) -> put(IMPORT_WORKING_DIRECTORY, newValue.toString()));
+        EasyBind.listen(importExportPreferences.lastExportExtensionProperty(), (obs, oldValue, newValue) -> put(LAST_USED_EXPORT, newValue));
+        EasyBind.listen(importExportPreferences.exportWorkingDirectoryProperty(), (obs, oldValue, newValue) -> put(EXPORT_WORKING_DIRECTORY, newValue.toString()));
+
+        return importExportPreferences;
     }
 
     @Override
@@ -2356,8 +2374,12 @@ public class JabRefPreferences implements PreferencesService {
             exporterName = formatData.get(EXPORTER_NAME_INDEX);
             filename = formatData.get(EXPORTER_FILENAME_INDEX);
             extension = formatData.get(EXPORTER_EXTENSION_INDEX);
-            TemplateExporter format = new TemplateExporter(exporterName, filename, extension,
-                    layoutPreferences, savePreferences);
+            TemplateExporter format = new TemplateExporter(
+                    exporterName,
+                    filename,
+                    extension,
+                    layoutPreferences,
+                    savePreferences);
             format.setCustomExport(true);
             formats.add(format);
             i++;
@@ -2589,6 +2611,10 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public SearchPreferences getSearchPreferences() {
+        if (Objects.nonNull(searchPreferences)) {
+            return searchPreferences;
+        }
+
         SearchDisplayMode searchDisplayMode;
         try {
             searchDisplayMode = SearchDisplayMode.valueOf(get(SEARCH_DISPLAY_MODE));
@@ -2597,23 +2623,24 @@ public class JabRefPreferences implements PreferencesService {
             searchDisplayMode = SearchDisplayMode.valueOf((String) defaults.get(SEARCH_DISPLAY_MODE));
         }
 
-        return new SearchPreferences(
+        searchPreferences = new SearchPreferences(
                 searchDisplayMode,
                 getBoolean(SEARCH_CASE_SENSITIVE),
                 getBoolean(SEARCH_REG_EXP),
                 getBoolean(SEARCH_FULLTEXT),
                 getBoolean(SEARCH_KEEP_SEARCH_STRING),
                 getBoolean(SEARCH_KEEP_GLOBAL_WINDOW_ON_TOP));
-    }
 
-    @Override
-    public void storeSearchPreferences(SearchPreferences preferences) {
-        put(SEARCH_DISPLAY_MODE, Objects.requireNonNull(preferences.getSearchDisplayMode()).toString());
-        putBoolean(SEARCH_CASE_SENSITIVE, preferences.isCaseSensitive());
-        putBoolean(SEARCH_REG_EXP, preferences.isRegularExpression());
-        putBoolean(SEARCH_FULLTEXT, preferences.isFulltext());
-        putBoolean(SEARCH_KEEP_SEARCH_STRING, preferences.isKeepSearchString());
-        putBoolean(SEARCH_KEEP_GLOBAL_WINDOW_ON_TOP, preferences.isKeepWindowOnTop());
+        EasyBind.listen(searchPreferences.searchDisplayModeProperty(), (obs, oldValue, newValue) -> put(SEARCH_DISPLAY_MODE, Objects.requireNonNull(searchPreferences.getSearchDisplayMode()).toString()));
+        searchPreferences.getObservableSearchFlags().addListener((SetChangeListener<SearchRules.SearchFlags>) c -> {
+            putBoolean(SEARCH_CASE_SENSITIVE, searchPreferences.getObservableSearchFlags().contains(SearchRules.SearchFlags.CASE_SENSITIVE));
+            putBoolean(SEARCH_REG_EXP, searchPreferences.getObservableSearchFlags().contains(SearchRules.SearchFlags.REGULAR_EXPRESSION));
+            putBoolean(SEARCH_FULLTEXT, searchPreferences.getObservableSearchFlags().contains(SearchRules.SearchFlags.FULLTEXT));
+            putBoolean(SEARCH_KEEP_SEARCH_STRING, searchPreferences.getObservableSearchFlags().contains(SearchRules.SearchFlags.KEEP_SEARCH_STRING));
+        });
+        EasyBind.listen(searchPreferences.keepWindowOnTopProperty(), (obs, oldValue, newValue) -> putBoolean(SEARCH_KEEP_GLOBAL_WINDOW_ON_TOP, searchPreferences.shouldKeepWindowOnTop()));
+
+        return searchPreferences;
     }
 
     //*************************************************************************************************************
@@ -2636,15 +2663,20 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public NameFormatterPreferences getNameFormatterPreferences() {
-        return new NameFormatterPreferences(
+        if (Objects.nonNull(nameFormatterPreferences)) {
+            return nameFormatterPreferences;
+        }
+
+        nameFormatterPreferences = new NameFormatterPreferences(
                 getStringList(NAME_FORMATER_KEY),
                 getStringList(NAME_FORMATTER_VALUE));
-    }
 
-    @Override
-    public void storeNameFormatterPreferences(NameFormatterPreferences preferences) {
-        putStringList(NAME_FORMATER_KEY, preferences.getNameFormatterKey());
-        putStringList(NAME_FORMATTER_VALUE, preferences.getNameFormatterValue());
+        nameFormatterPreferences.getNameFormatterKey().addListener((InvalidationListener) change ->
+                putStringList(NAME_FORMATER_KEY, nameFormatterPreferences.getNameFormatterKey()));
+        nameFormatterPreferences.getNameFormatterValue().addListener((InvalidationListener) change ->
+                putStringList(NAME_FORMATTER_VALUE, nameFormatterPreferences.getNameFormatterValue()));
+
+        return nameFormatterPreferences;
     }
 
     @Override
@@ -2684,17 +2716,15 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public SpecialFieldsPreferences getSpecialFieldsPreferences() {
-        return new SpecialFieldsPreferences(
-                getBoolean(SPECIALFIELDSENABLED),
-                getBoolean(AUTOSYNCSPECIALFIELDSTOKEYWORDS),
-                getBoolean(SERIALIZESPECIALFIELDS));
-    }
+        if (Objects.nonNull(specialFieldsPreferences)) {
+            return specialFieldsPreferences;
+        }
 
-    @Override
-    public void storeSpecialFieldsPreferences(SpecialFieldsPreferences specialFieldsPreferences) {
-        putBoolean(SPECIALFIELDSENABLED, specialFieldsPreferences.isSpecialFieldsEnabled());
-        putBoolean(AUTOSYNCSPECIALFIELDSTOKEYWORDS, specialFieldsPreferences.shouldAutoSyncSpecialFieldsToKeyWords());
-        putBoolean(SERIALIZESPECIALFIELDS, specialFieldsPreferences.shouldSerializeSpecialFields());
+        specialFieldsPreferences = new SpecialFieldsPreferences(getBoolean(SPECIALFIELDSENABLED));
+
+        EasyBind.listen(specialFieldsPreferences.specialFieldsEnabledProperty(), (obs, oldValue, newValue) -> putBoolean(SPECIALFIELDSENABLED, newValue));
+
+        return specialFieldsPreferences;
     }
 
     @Override

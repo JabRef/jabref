@@ -38,6 +38,7 @@ import org.jabref.model.database.BibDatabases;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.FileUpdateMonitor;
+import org.jabref.preferences.GeneralPreferences;
 
 public class ImportFormatReader {
 
@@ -49,9 +50,11 @@ public class ImportFormatReader {
      */
     private final List<Importer> formats = new ArrayList<>();
 
+    private GeneralPreferences generalPreferences;
     private ImportFormatPreferences importFormatPreferences;
 
-    public void resetImportFormats(ImporterPreferences importerPreferences, ImportFormatPreferences newImportFormatPreferences, XmpPreferences xmpPreferences, FileUpdateMonitor fileMonitor) {
+    public void resetImportFormats(ImporterPreferences importerPreferences, GeneralPreferences generalPreferences, ImportFormatPreferences newImportFormatPreferences, XmpPreferences xmpPreferences, FileUpdateMonitor fileMonitor) {
+        this.generalPreferences = generalPreferences;
         this.importFormatPreferences = newImportFormatPreferences;
 
         formats.clear();
@@ -112,7 +115,7 @@ public class ImportFormatReader {
         }
 
         try {
-            return importer.get().importDatabase(file, importFormatPreferences.getEncoding());
+            return importer.get().importDatabase(file, generalPreferences.getDefaultEncoding());
         } catch (IOException e) {
             throw new ImportException(e);
         }
@@ -179,13 +182,13 @@ public class ImportFormatReader {
         Objects.requireNonNull(filePath);
 
         try {
-            UnknownFormatImport unknownFormatImport = importUnknownFormat(importer -> importer.importDatabase(filePath, importFormatPreferences.getEncoding()), importer -> importer.isRecognizedFormat(filePath, importFormatPreferences.getEncoding()));
+            UnknownFormatImport unknownFormatImport = importUnknownFormat(importer -> importer.importDatabase(filePath, generalPreferences.getDefaultEncoding()), importer -> importer.isRecognizedFormat(filePath, generalPreferences.getDefaultEncoding()));
             unknownFormatImport.parserResult.setPath(filePath);
             return unknownFormatImport;
         } catch (ImportException e) {
             // If all importers fail, try to read the file as BibTeX
             try {
-                ParserResult parserResult = OpenDatabase.loadDatabase(filePath, importFormatPreferences, fileMonitor);
+                ParserResult parserResult = OpenDatabase.loadDatabase(filePath, generalPreferences, importFormatPreferences, fileMonitor);
                 if (parserResult.getDatabase().hasEntries() || !parserResult.getDatabase().hasNoStrings()) {
                     parserResult.setPath(filePath);
                     return new UnknownFormatImport(ImportFormatReader.BIBTEX_FORMAT, parserResult);

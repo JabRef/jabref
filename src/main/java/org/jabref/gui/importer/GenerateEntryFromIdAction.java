@@ -5,6 +5,7 @@ import java.util.Optional;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.Globals;
 import org.jabref.gui.LibraryTab;
+import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.TaskExecutor;
@@ -15,6 +16,7 @@ import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportCleanup;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.preferences.PreferencesService;
 
 import org.controlsfx.control.PopOver;
@@ -27,14 +29,16 @@ public class GenerateEntryFromIdAction extends SimpleCommand {
     private final String identifier;
     private final TaskExecutor taskExecutor;
     private final PopOver entryFromIdPopOver;
+    private final StateManager stateManager;
 
-    public GenerateEntryFromIdAction(LibraryTab libraryTab, DialogService dialogService, PreferencesService preferencesService, TaskExecutor taskExecutor, PopOver entryFromIdPopOver, String identifier) {
+    public GenerateEntryFromIdAction(LibraryTab libraryTab, DialogService dialogService, PreferencesService preferencesService, TaskExecutor taskExecutor, PopOver entryFromIdPopOver, String identifier, StateManager stateManager) {
         this.libraryTab = libraryTab;
         this.dialogService = dialogService;
         this.preferencesService = preferencesService;
         this.identifier = identifier;
         this.taskExecutor = taskExecutor;
         this.entryFromIdPopOver = entryFromIdPopOver;
+        this.stateManager = stateManager;
     }
 
     @Override
@@ -43,7 +47,17 @@ public class GenerateEntryFromIdAction extends SimpleCommand {
         backgroundTask.titleProperty().set(Localization.lang("Import by ID"));
         backgroundTask.showToUser(true);
         backgroundTask.onRunning(() -> dialogService.notify("%s".formatted(backgroundTask.messageProperty().get())));
-        backgroundTask.onFailure((e) -> dialogService.notify(e.getMessage()));
+        backgroundTask.onFailure((e) -> {
+            // When unable to import by ID, present the user options to cancel or add entry manually
+            boolean addEntryFlag = dialogService.showConfirmationDialogAndWait(Localization.lang("Failed to import by ID"),
+                                    e.getMessage(),
+                                   Localization.lang("Add entry manually"));
+            if (addEntryFlag) {
+                // add entry manually
+                new NewEntryAction(libraryTab.frame(), StandardEntryType.Article, dialogService,
+                                    preferencesService, stateManager).execute();
+            }
+        });
         backgroundTask.onSuccess((bibEntry) -> bibEntry.ifPresentOrElse((entry) -> {
                 libraryTab.insertEntry(entry);
                 entryFromIdPopOver.hide();

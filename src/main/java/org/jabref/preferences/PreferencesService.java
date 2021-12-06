@@ -1,6 +1,5 @@
 package org.jabref.preferences;
 
-import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
@@ -56,8 +55,6 @@ public interface PreferencesService {
 
     VersionPreferences getVersionPreferences();
 
-    void storeVersionPreferences(VersionPreferences versionPreferences);
-
     JournalAbbreviationPreferences getJournalAbbreviationPreferences();
 
     void storeKeyBindingRepository(KeyBindingRepository keyBindingRepository);
@@ -96,10 +93,6 @@ public interface PreferencesService {
 
     SavePreferences getSavePreferences();
 
-    Charset getDefaultEncoding();
-
-    String getUser();
-
     SaveOrderConfig getExportSaveOrder();
 
     void storeExportSaveOrder(SaveOrderConfig config);
@@ -136,8 +129,6 @@ public interface PreferencesService {
     Language getLanguage();
 
     void setLanguage(Language language);
-
-    BibDatabaseMode getDefaultBibDatabaseMode();
 
     GeneralPreferences getGeneralPreferences();
 
@@ -215,7 +206,7 @@ public interface PreferencesService {
 
     ColumnPreferences getColumnPreferences();
 
-    void storeColumnPreferences(ColumnPreferences columnPreferences);
+    void storeMainTableColumnPreferences(ColumnPreferences columnPreferences);
 
     MainTablePreferences getMainTablePreferences();
 
@@ -224,6 +215,14 @@ public interface PreferencesService {
     MainTableNameFormatPreferences getMainTableNameFormatPreferences();
 
     void storeMainTableNameFormatPreferences(MainTableNameFormatPreferences preferences);
+
+    //*************************************************************************************************************
+    // SearchDialogColumnPreferences
+    //*************************************************************************************************************
+
+    ColumnPreferences getSearchDialogColumnPreferences();
+
+    void storeSearchDialogColumnPreferences(ColumnPreferences columnPreferences);
 
     //*************************************************************************************************************
     // AppearancePreferences
@@ -243,13 +242,7 @@ public interface PreferencesService {
 
     void storeOpenLastFilesOnStartup(boolean openLastFilesOnStartup);
 
-    NewLineSeparator getNewLineSeparator();
-
-    void storeNewLineSeparator(NewLineSeparator newLineSeparator);
-
     AutoLinkPreferences getAutoLinkPreferences();
-
-    void storeAutoLinkPreferences(AutoLinkPreferences autoLinkPreferences);
 
     boolean shouldAutosave();
 
@@ -264,8 +257,6 @@ public interface PreferencesService {
     //*************************************************************************************************************
 
     ImportExportPreferences getImportExportPreferences();
-
-    void storeImportExportPreferences(ImportExportPreferences preferences);
 
     List<TemplateExporter> getCustomExportFormats(JournalAbbreviationRepository repository);
 
@@ -301,10 +292,6 @@ public interface PreferencesService {
 
     void clearEditedFiles();
 
-    Path getWorkingDir();
-
-    void setWorkingDirectory(Path dir);
-
     //*************************************************************************************************************
     // Misc preferences
     //*************************************************************************************************************
@@ -315,19 +302,13 @@ public interface PreferencesService {
 
     NameFormatterPreferences getNameFormatterPreferences();
 
-    void storeNameFormatterPreferences(NameFormatterPreferences preferences);
-
     AutoCompletePreferences getAutoCompletePreferences();
 
     void storeAutoCompletePreferences(AutoCompletePreferences autoCompletePreferences);
 
     SpecialFieldsPreferences getSpecialFieldsPreferences();
 
-    void storeSpecialFieldsPreferences(SpecialFieldsPreferences specialFieldsPreferences);
-
     SearchPreferences getSearchPreferences();
-
-    void storeSearchPreferences(SearchPreferences preferences);
 
     String getLastPreferencesExportPath();
 
@@ -348,4 +329,5 @@ public interface PreferencesService {
     void storeIdBasedFetcherForEntryGenerator(String fetcherName);
 
     ProtectedTermsPreferences getProtectedTermsPreferences();
+
 }

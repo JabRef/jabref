@@ -215,7 +215,7 @@ public interface DialogService {
     <V> Optional<ButtonType> showBackgroundProgressDialogAndWait(String title, String content, StateManager stateManager);
 
     /**
-     * Notify the user in an non-blocking way (i.e., in form of toast in a snackbar).
+     * Notify the user in a non-blocking way (i.e., in form of toast in a snackbar).
      *
      * @param message the message to show.
      */

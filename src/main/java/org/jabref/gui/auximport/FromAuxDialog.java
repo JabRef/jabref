@@ -93,7 +93,7 @@ public class FromAuxDialog extends BaseDialog<Void> {
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                 .addExtensionFilter(StandardFileType.AUX)
                 .withDefaultExtension(StandardFileType.AUX)
-                .withInitialDirectory(preferences.getWorkingDir()).build();
+                .withInitialDirectory(preferences.getFilePreferences().getWorkingDirectory()).build();
         dialogService.showFileOpenDialog(fileDialogConfiguration).ifPresent(file -> auxFileField.setText(file.toAbsolutePath().toString()));
     }
 }
