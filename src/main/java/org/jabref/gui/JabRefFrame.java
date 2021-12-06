@@ -1227,7 +1227,7 @@ public class JabRefFrame extends BorderPane {
             // Save was cancelled or an error occurred.
             return false;
         }
-        return !(response.get().getButtonData() == ButtonBar.ButtonData.CANCEL_CLOSE);
+        return response.get().getButtonData() != ButtonBar.ButtonData.CANCEL_CLOSE;
     }
 
     private void closeTab(LibraryTab libraryTab) {
@@ -1235,6 +1235,7 @@ public class JabRefFrame extends BorderPane {
         if (libraryTab == null) {
             return;
         }
+        prefs.getGeneralPreferences().setConfirmEmptyEntries(true);
         final BibDatabaseContext context = libraryTab.getBibDatabaseContext();
         if (context.hasEmptyEntries()) {
             if (prefs.getGeneralPreferences().shouldConfirmEmptyEntries()) {
