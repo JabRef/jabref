@@ -88,7 +88,7 @@ public enum StandardActions implements Action {
 
     PARSE_LATEX(Localization.lang("Search for citations in LaTeX files..."), IconTheme.JabRefIcons.LATEX_CITATIONS),
     NEW_SUB_LIBRARY_FROM_AUX(Localization.lang("New sublibrary based on AUX file") + "...", Localization.lang("New BibTeX sublibrary") + Localization.lang("This feature generates a new library based on which entries are needed in an existing LaTeX document."), IconTheme.JabRefIcons.NEW),
-    WRITE_METADATA_TO_PDF(Localization.lang("Write metadata to PDFs"), Localization.lang("Will write metadata to the PDFs linked from selected entries."), KeyBinding.WRITE_METADATA_TO_PDF),
+    WRITE_METADATA_TO_PDF(Localization.lang("Write metadata to PDF files"), Localization.lang("Will write metadata to the PDFs linked from selected entries."), KeyBinding.WRITE_METADATA_TO_PDF),
     START_NEW_STUDY(Localization.lang("Start new systematic literature review")),
     SEARCH_FOR_EXISTING_STUDY(Localization.lang("Perform search for existing systematic literature review")),
     OPEN_DATABASE_FOLDER(Localization.lang("Reveal in file explorer")),
