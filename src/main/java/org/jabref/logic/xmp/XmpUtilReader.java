@@ -17,8 +17,12 @@ import org.apache.pdfbox.pdmodel.PDDocumentInformation;
 import org.apache.pdfbox.pdmodel.common.PDMetadata;
 import org.apache.xmpbox.XMPMetadata;
 import org.apache.xmpbox.schema.DublinCoreSchema;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class XmpUtilReader {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(XmpUtilReader.class);
 
     private static final String START_TAG = "<rdf:Description";
     private static final String END_TAG = "</rdf:Description>";
@@ -120,7 +124,7 @@ public class XmpUtilReader {
         int startDescriptionSection = xmp.indexOf(START_TAG);
         int endDescriptionSection = xmp.lastIndexOf(END_TAG) + END_TAG.length();
 
-        if (startDescriptionSection < 0 || startDescriptionSection > endDescriptionSection || endDescriptionSection == END_TAG.length() - 1) {
+        if ((startDescriptionSection < 0) || (startDescriptionSection > endDescriptionSection) || (endDescriptionSection == (END_TAG.length() - 1))) {
             return metaList;
         }
 
@@ -134,7 +138,12 @@ public class XmpUtilReader {
         for (String s : descriptionsArray) {
             // END_TAG is appended, because of the split operation above
             String xmpMetaString = start + s + END_TAG + end;
-            metaList.add(XmpUtilShared.parseXmpMetadata(new ByteArrayInputStream(xmpMetaString.getBytes())));
+            try {
+                metaList.add(XmpUtilShared.parseXmpMetadata(new ByteArrayInputStream(xmpMetaString.getBytes())));
+            }
+            catch (IOException ex) {
+                LOGGER.error("Problem parsing XMP schema. Continuing with other schemas.", ex);
+            }
         }
         return metaList;
     }
