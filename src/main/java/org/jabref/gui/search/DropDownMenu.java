@@ -60,8 +60,8 @@ public class DropDownMenu {
         HBox bracketButtons = new HBox(2, leftBracketButton, rightBracketButton);
 
         VBox mainBox = new VBox(4, titleLucene, luceneString, buttonsLucene, andOrButtons, bracketButtons, titleRecent, recentSearchBox);
-        mainBox.setMinHeight(500);
-        mainBox.setMinWidth(500);
+        //mainBox.setMinHeight(500);
+        //mainBox.setMinWidth(500);
         Node buttonBox = mainBox;
 
         searchField.addEventFilter(MouseEvent.MOUSE_CLICKED, event -> {
@@ -77,19 +77,44 @@ public class DropDownMenu {
 
         // addString action
         addString.addEventFilter(MouseEvent.MOUSE_CLICKED, event -> {
-            String adder = searchString.getText();
             String current = searchField.getText();
-            String newString = current + adder;
-            searchField.positionCaret(searchField.getText().length());
-            searchField.setText(newString);
-            searchString.clear();
+            String adder = searchString.getText();
+            String newString = "";
+            int pos = current.length() - 1;
+            while(pos > 0) {
+                char ch = current.charAt(pos);
+                if(ch == ':') {
+                    break;
+                }
+                pos--;
+            }
+            if(searchField.getText().isEmpty()) {
+                searchField.setText(adder);
+                searchField.positionCaret(searchField.getText().length());
+                searchString.clear();
+            } else {
+                if (pos == 0) {
+                    newString = current + " " + adder;
+                }
+                else if(pos == current.length() - 1) {
+                    newString = current + adder;
+                } else {
+                    String sub = current.substring(0, pos + 1);
+                    newString = sub + adder;
+                }
+                searchField.setText(newString);
+                searchField.positionCaret(searchField.getText().length());
+                searchString.clear();
+            }
+
+
         });
 
         // searchStart action
         searchStart.addEventFilter(MouseEvent.MOUSE_CLICKED, event -> {
             globalSearchBar.focus();
             globalSearchBar.performSearch();
-            // searchbarDropDown.hide();
+            searchbarDropDown.hide();
         });
 
         // deleteButton action
