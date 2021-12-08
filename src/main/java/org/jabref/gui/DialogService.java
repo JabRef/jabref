@@ -178,7 +178,7 @@ public interface DialogService {
     Optional<ButtonType> showCustomButtonDialogAndWait(Alert.AlertType type, String title, String content,
                                                        ButtonType... buttonTypes);
 
-    // for issue #8296: Add "Do not ask again" for empty entry confirmation in JabRef
+    // CS427 Issue link: https://github.com/JabRef/jabref/issues/8296
     /**
      * This will create and display a new dialog of the specified
      * {@link Alert.AlertType} but with user defined buttons as optional
