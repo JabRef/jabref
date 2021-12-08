@@ -75,7 +75,6 @@ public class Date {
 
     /**
      * Creates a Date from date and endDate.
-     * CS427 Issue link: https://github.com/JabRef/jabref/issues/7864
      *
      * @param dateString the string to extract the date information
      * @throws DateTimeParseException if dataString is mal-formatted
