@@ -64,7 +64,7 @@ public class EmbeddedBibFilePdfExporter extends Exporter {
     }
 
     private void embedBibTex(String bibTeX, Path file, Charset encoding) throws IOException {
-        if (!Files.exists(file) || !StandardFileType.PDF.getExtensions().contains(FileUtil.getFileExtension(file).orElse(""))) {
+        if (!Files.exists(file) || !FileUtil.isPDFFile(file)) {
             return;
         }
         try (PDDocument document = PDDocument.load(file.toFile())) {
@@ -80,7 +80,15 @@ public class EmbeddedBibFilePdfExporter extends Exporter {
                 document.getDocumentCatalog().setNames(nameDictionary);
             } else {
                 efTree = nameDictionary.getEmbeddedFiles();
+                if (efTree == null) {
+                    efTree = new PDEmbeddedFilesNameTreeNode();
+                    nameDictionary.setEmbeddedFiles(efTree);
+                }
                 names = efTree.getNames();
+                if (names == null) {
+                    names = new HashMap<>();
+                    efTree.setNames(names);
+                }
             }
 
             if (efTree != null) {
