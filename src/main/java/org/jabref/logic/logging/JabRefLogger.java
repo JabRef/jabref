@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class JabRefLogger {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefLogger.class);
 
     private JabRefLogger() {
@@ -16,7 +17,7 @@ public class JabRefLogger {
 
     private static void setLogLevelToDebugForJabRefClasses() {
 
-            //TODO:
+        //TODO:
 
     }
 }
