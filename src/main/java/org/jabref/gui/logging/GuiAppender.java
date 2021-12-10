@@ -11,7 +11,6 @@ import org.tinylog.provider.NopContextProvider;
 
 public class GuiAppender implements LoggingProvider {
 
-
     @Override
     public ContextProvider getContextProvider() {
         return new NopContextProvider();
@@ -31,7 +30,6 @@ public class GuiAppender implements LoggingProvider {
     public boolean isEnabled(int depth, String tag, Level level) {
         return level.ordinal() >= Level.INFO.ordinal();
     }
-
 
     @Override
     public void shutdown() {
@@ -64,7 +62,6 @@ public class GuiAppender implements LoggingProvider {
 
     }
 
-
     /*
       The log event will be forwarded to the {@link LogMessages} archive.
 
@@ -72,5 +69,5 @@ public class GuiAppender implements LoggingProvider {
         // We need to make a copy as instances of LogEvent are reused by log4j
         DefaultTaskExecutor.runInJavaFXThread(() -> LogMessages.getInstance().add(copy));
     }
-*/
+    */
 }

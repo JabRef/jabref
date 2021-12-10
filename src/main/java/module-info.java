@@ -41,7 +41,6 @@ open module org.jabref {
 
     requires org.tinylog.api;
     requires org.tinylog.api.slf4j;
-    requires applicationinsights.logging.log4j2;
 
 
     // Preferences and XML
@@ -100,4 +99,5 @@ open module org.jabref {
     requires com.fasterxml.jackson.dataformat.yaml;
     requires com.fasterxml.jackson.datatype.jsr310;
     requires net.harawata.appdirs;
+    requires applicationinsights.logging.log4j2;
 }

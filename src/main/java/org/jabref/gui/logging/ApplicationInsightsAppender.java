@@ -8,10 +8,7 @@ import com.microsoft.applicationinsights.telemetry.Telemetry;
 import com.microsoft.applicationinsights.telemetry.TraceTelemetry;
 import org.slf4j.event.LoggingEvent;
 
-
-public class ApplicationInsightsAppender{
-
-
+public class ApplicationInsightsAppender {
 
     /**
      * The log event will be forwarded to the {@link LogMessages} archive.

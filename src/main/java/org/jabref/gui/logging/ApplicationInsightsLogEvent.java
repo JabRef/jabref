@@ -43,9 +43,7 @@ public final class ApplicationInsightsLogEvent extends ApplicationInsightsEvent 
 
     @Override
     public String getMessage() {
-        String message = this.logEvent.getMessage() != null ?
-                this.logEvent.getMessage() :
-                "Log4j Trace";
+        String message = this.logEvent.getMessage() != null ? this.logEvent.getMessage() : "Log4j Trace";
 
         return message;
     }
@@ -83,7 +81,7 @@ public final class ApplicationInsightsLogEvent extends ApplicationInsightsEvent 
             addLogEventProperty("Logger Message", getMessage(), metaData);
         }
 
-           for(StackTraceElement stackTraceElement : logEvent.getThrowable().getStackTrace()) {
+        for (StackTraceElement stackTraceElement : logEvent.getThrowable().getStackTrace()) {
 
             addLogEventProperty("ClassName", stackTraceElement.getClassName(), metaData);
             addLogEventProperty("FileName", stackTraceElement.getFileName(), metaData);
@@ -91,7 +89,7 @@ public final class ApplicationInsightsLogEvent extends ApplicationInsightsEvent 
             addLogEventProperty("LineNumber", String.valueOf(stackTraceElement.getLineNumber()), metaData);
         }
 
-        for (Entry<String,String> entry : MDC.getMDCAdapter().getCopyOfContextMap().entrySet()) {
+        for (Entry<String, String> entry : MDC.getMDCAdapter().getCopyOfContextMap().entrySet()) {
             addLogEventProperty(entry.getKey(), entry.getValue(), metaData);
         }
 
