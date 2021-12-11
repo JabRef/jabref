@@ -13,10 +13,9 @@ import java.util.stream.Collectors;
 
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
+import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.StringBinding;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.transformation.FilteredList;
 import javafx.concurrent.Task;
 import javafx.geometry.Orientation;
@@ -143,6 +142,7 @@ import org.jabref.preferences.TelemetryPreferences;
 import com.google.common.eventbus.Subscribe;
 import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.EasyObservableList;
+import com.tobiasdiez.easybind.Subscription;
 import org.controlsfx.control.PopOver;
 import org.controlsfx.control.TaskProgressView;
 import org.fxmisc.richtext.CodeArea;
@@ -175,6 +175,8 @@ public class JabRefFrame extends BorderPane {
     private TabPane tabbedPane;
     private PopOver progressViewPopOver;
     private PopOver entryFromIdPopOver;
+
+    private Subscription dividerSubscription;
 
     private final TaskExecutor taskExecutor;
 
@@ -440,11 +442,10 @@ public class JabRefFrame extends BorderPane {
         updateSidePane();
 
         // We need to wait with setting the divider since it gets reset a few times during the initial set-up
-        mainStage.showingProperty().addListener(new ChangeListener<>() {
-
+        mainStage.showingProperty().addListener(new InvalidationListener() {
             @Override
-            public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean showing) {
-                if (showing) {
+            public void invalidated(Observable observable) {
+                if (mainStage.isShowing()) {
                     setDividerPosition();
                     observable.removeListener(this);
                 }
@@ -456,6 +457,9 @@ public class JabRefFrame extends BorderPane {
 
     private void updateSidePane() {
         if (sidePane.getChildren().isEmpty()) {
+            if (dividerSubscription != null) {
+                dividerSubscription.unsubscribe();
+            }
             splitPane.getItems().remove(sidePane);
         } else {
             if (!splitPane.getItems().contains(sidePane)) {
@@ -467,8 +471,8 @@ public class JabRefFrame extends BorderPane {
 
     private void setDividerPosition() {
         splitPane.setDividerPositions(prefs.getGuiPreferences().getSidePaneWidth());
-        if (!splitPane.getDividers().isEmpty()) {
-            EasyBind.subscribe(splitPane.getDividers().get(0).positionProperty(),
+        if (mainStage.isShowing() && !sidePane.getChildren().isEmpty()) {
+            dividerSubscription = EasyBind.subscribe(splitPane.getDividers().get(0).positionProperty(),
                     position -> prefs.getGuiPreferences().setSidePaneWidth(position.doubleValue()));
         }
     }
