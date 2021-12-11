@@ -63,7 +63,6 @@ public class DropDownMenu {
             });
         });
 
-
         // authorButton action
         authorButton.addEventFilter(MouseEvent.MOUSE_CLICKED, event -> {
             searchFieldSynchronizer.addSearchItem("attribute", "author:");
