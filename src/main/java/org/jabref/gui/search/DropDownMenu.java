@@ -28,6 +28,7 @@ public class DropDownMenu {
     public Button searchStart;
     public Button addString;
     public RecentSearch recentSearch;
+    public TextField searchString;
 
     public DropDownMenu(CustomTextField searchField, GlobalSearchBar globalSearchBar, SearchFieldSynchronizer searchFieldSynchronizer) {
 
@@ -43,11 +44,11 @@ public class DropDownMenu {
         deleteButton = IconTheme.JabRefIcons.DELETE_ENTRY.asButton();
         searchStart = IconTheme.JabRefIcons.SEARCH.asButton();
         addString = IconTheme.JabRefIcons.ADD_ENTRY.asButton();
+        searchString = new TextField();
 
         Text titleLucene = new Text(" Lucene Search");
         Text titleRecent = new Text(" Recent Searches");
         recentSearch = new RecentSearch(globalSearchBar);
-        TextField searchString = new TextField();
         searchString.setPrefWidth(200);
         HBox luceneString = new HBox(searchString, addString, searchStart, deleteButton);
         HBox recentSearchBox = recentSearch.getHBox();
@@ -69,6 +70,7 @@ public class DropDownMenu {
                 searchbarDropDown.setContentNode(buttonBox);
                 searchbarDropDown.setDetachable(false); // not detachable
                 searchbarDropDown.show(searchField);
+                searchString.setFocusTraversable(false);
             }
         });
 
@@ -102,6 +104,7 @@ public class DropDownMenu {
                 searchField.positionCaret(searchField.getText().length());
                 searchString.clear();
             }
+            searchString.setFocusTraversable(false);
         });
 
         // searchStart action
@@ -116,6 +119,7 @@ public class DropDownMenu {
             searchField.clear();
             searchString.clear();
             searchFieldSynchronizer.deleteAllEntries();
+            searchString.setFocusTraversable(false);
         });
 
         // authorButton action
