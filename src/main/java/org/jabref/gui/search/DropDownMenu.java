@@ -3,18 +3,15 @@ package org.jabref.gui.search;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 
+import org.jabref.gui.icon.IconTheme;
+
 import org.controlsfx.control.PopOver;
 import org.controlsfx.control.textfield.CustomTextField;
-import org.jabref.gui.icon.IconTheme;
-import org.jabref.gui.keyboard.KeyBinding;
-
-import java.awt.*;
 
 public class DropDownMenu {
     public PopOver searchbarDropDown;
@@ -60,8 +57,8 @@ public class DropDownMenu {
         HBox bracketButtons = new HBox(2, leftBracketButton, rightBracketButton);
 
         VBox mainBox = new VBox(4, titleLucene, luceneString, buttonsLucene, andOrButtons, bracketButtons, titleRecent, recentSearchBox);
-        //mainBox.setMinHeight(500);
-        //mainBox.setMinWidth(500);
+        // mainBox.setMinHeight(500);
+        // mainBox.setMinWidth(500);
         Node buttonBox = mainBox;
 
         searchField.addEventFilter(MouseEvent.MOUSE_CLICKED, event -> {
@@ -81,22 +78,21 @@ public class DropDownMenu {
             String adder = searchString.getText();
             String newString = "";
             int pos = current.length() - 1;
-            while(pos > 0) {
+            while (pos > 0) {
                 char ch = current.charAt(pos);
-                if(ch == ':') {
+                if (ch == ':') {
                     break;
                 }
                 pos--;
             }
-            if(searchField.getText().isEmpty()) {
+            if (searchField.getText().isEmpty()) {
                 searchField.setText(adder);
                 searchField.positionCaret(searchField.getText().length());
                 searchString.clear();
             } else {
                 if (pos == 0) {
                     newString = current + " " + adder;
-                }
-                else if(pos == current.length() - 1) {
+                } else if (pos == current.length() - 1) {
                     newString = current + adder;
                 } else {
                     String sub = current.substring(0, pos + 1);
@@ -106,8 +102,6 @@ public class DropDownMenu {
                 searchField.positionCaret(searchField.getText().length());
                 searchString.clear();
             }
-
-
         });
 
         // searchStart action

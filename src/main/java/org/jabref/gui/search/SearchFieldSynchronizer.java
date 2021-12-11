@@ -6,6 +6,7 @@ import java.util.Stack;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
+import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.queryparser.flexible.core.QueryNodeException;
 import org.apache.lucene.queryparser.flexible.standard.StandardQueryParser;
 import org.controlsfx.control.textfield.CustomTextField;
