@@ -41,6 +41,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We reworked the export order in the preferences and the save order in the library preferences. You can now set more than three sort criteria in your library preferences. [#7935](https://github.com/JabRef/jabref/pull/7935)
 - The metadata-to-pdf actions now also embeds the bibfile to the PDF. [#8037](https://github.com/JabRef/jabref/pull/8037)
 - The snap was updated to use the core20 base and to use lzo compression for better startup performance [#8109](https://github.com/JabRef/jabref/pull/8109)
+- We moved the union/intersection view button in the group sidepane to the left of the other controls. [#8202](https://github.com/JabRef/jabref/pull/8202)
 - We improved the Drag and Drop behavior in the "Customize Entry Types" Dialog [#6338](https://github.com/JabRef/jabref/issues/6338)
 - When determining the URL of an ArXiV eprint, the URL now points to the version [#8149](https://github.com/JabRef/jabref/pull/8149)
 - We Included all standard fields with citation key when exporting to Old OpenOffice/LibreOffice Calc Format [#8176](https://github.com/JabRef/jabref/pull/8176)
@@ -61,6 +62,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixed some icons that were drawn in the wrong color when JabRef used a custom theme. [#7853](https://github.com/JabRef/jabref/issues/7853)
 - We fixed an issue where the `Aux file` on `Edit group` doesn't support relative sub-directories path to import. [#7719](https://github.com/JabRef/jabref/issues/7719).
 - We fixed an issue where it was impossible to add or modify groups. [#7912](https://github.com/JabRef/jabref/pull/793://github.com/JabRef/jabref/pull/7921)
+- We fixed an issue about the visible side pane components being out of sync with the view menu. [#8115](https://github.com/JabRef/jabref/issues/8115)
 - We fixed an issue where exported entries from a Citavi bib containing URLs could not be imported [#7892](https://github.com/JabRef/jabref/issues/7882)
 - We fixed an issue where the icons in the search bar had the same color, toggled as well as untoggled. [#8014](https://github.com/JabRef/jabref/pull/8014)
 - We fixed an issue where typing an invalid UNC path into the "Main file directory" text field caused an error. [#8107](https://github.com/JabRef/jabref/issues/8107)
@@ -72,6 +74,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixed an issue where right-clicking on a tab and selecting close will close the focused tab even if it is not the tab we right-clicked [#8193](https://github.com/JabRef/jabref/pull/8193)
 - We fixed an issue where selecting a citation style in the preferences would sometimes produce an exception [#7860](https://github.com/JabRef/jabref/issues/7860)
 - We fixed an issue where an exception would occur when clicking on a DOI link in the preview pane [#7706](https://github.com/JabRef/jabref/issues/7706)
+
 
 ### Removed
 
