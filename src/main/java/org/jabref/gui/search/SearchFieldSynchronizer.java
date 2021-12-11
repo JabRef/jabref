@@ -6,7 +6,6 @@ import java.util.Stack;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
-import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.queryparser.flexible.core.QueryNodeException;
 import org.apache.lucene.queryparser.flexible.standard.StandardQueryParser;
 import org.controlsfx.control.textfield.CustomTextField;
@@ -28,6 +27,10 @@ public class SearchFieldSynchronizer {
             if (searchItemList.get(0).getItem().equals("")) {
                 searchItemList.remove(searchItemList.get(0));
             }
+        }
+
+        if (itemType.equals("bracket") && item.equals("(")) {
+            searchItemList.add(newItem);
         }
 
         // Add item, if valid according to isValid function
@@ -106,7 +109,6 @@ public class SearchFieldSynchronizer {
 
         // loop over all SearchItem in searchItemList
         for (SearchItem item : searchItemList) {
-
             if (item.isQuery()) {
                 // item is query
 
@@ -143,6 +145,16 @@ public class SearchFieldSynchronizer {
                 if (i > 0) {
                     // not first item
                     searchString.append(" ");
+                }
+                searchString.append(item.getItem());
+            }
+
+            if (item.isBracket()) {
+                if (i > 0) {
+                    // not first item
+                    if (item.getItemType().equals("(")) {
+                        searchString.append(" ");
+                    }
                 }
                 searchString.append(item.getItem());
             }
@@ -223,8 +235,9 @@ public class SearchFieldSynchronizer {
         String str = searchField.getText();
 
         // splits a string "author:luh AND year:2013 OR author:\"lee smith\"" into
-        // [author:] [luh] [AND] [year:] [2013] [OR] [author:] ["lee smith"]
-        String[] words = str.split("(?<=:)|\\ ");
+        // [(] [author:] [luh] [AND] [year:] [2013] [)] [OR] [(] [author:] ["lee smith" [)]]
+//        String[] words = str.split("(?<=:)|\\ ");
+        String[] words = str.split("(?<=:)|(?<=\\()|(?=\\))|\\ ");
         ArrayList<String> list = new ArrayList<>();
 
         for (int i = 0; i < words.length; i++) {
