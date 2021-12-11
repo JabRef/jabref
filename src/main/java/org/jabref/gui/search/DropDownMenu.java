@@ -106,18 +106,25 @@ public class DropDownMenu {
                 } else if (searchFieldSynchronizer.searchItemList.get(searchFieldSynchronizer.searchItemList.size() - 1).isRightBracket() && searchFieldSynchronizer.searchItemList.get(searchFieldSynchronizer.searchItemList.size() - 2).isLeftBracket()) {
                     String subi = current.substring(0, pos2);
                     newString = subi + adder + ")";
-                } else if (pos == 0 && pos2 == 0 && !searchString.getText().isEmpty()) {
+                } else if (searchFieldSynchronizer.searchItemList.get(searchFieldSynchronizer.searchItemList.size() - 1).isRightBracket() && searchFieldSynchronizer.searchItemList.get(searchFieldSynchronizer.searchItemList.size() - 2).isLogical()) {
+                    String subs = current.substring(0, pos2);
+                    newString = subs + adder + ")";
+                } else if (searchFieldSynchronizer.searchItemList.get(searchFieldSynchronizer.searchItemList.size() - 1).isQuery() && pos == 0 && !searchString.getText().isEmpty()) {
                     newString = current + " " + adder;
-                } else if (pos2 == current.length() - 1 && pos == 0) {
+                } else if (searchFieldSynchronizer.searchItemList.get(searchFieldSynchronizer.searchItemList.size() - 1).isRightBracket() && searchFieldSynchronizer.searchItemList.get(searchFieldSynchronizer.searchItemList.size() - 2).isQuery() && !searchFieldSynchronizer.searchItemList.get(searchFieldSynchronizer.searchItemList.size() - 3).isAttribute()) {
                     String subs = current.substring(0, pos2);
                     newString = subs + " " + adder + ")";
-                } else if (pos == current.length() - 1 && pos2 == 0) {
+                } else if (searchFieldSynchronizer.searchItemList.get(searchFieldSynchronizer.searchItemList.size() - 1).isAttribute()) {
                     newString = current + adder;
-                } else if (pos2 == current.length() - 1 && pos == current.length() - 2) {
-                    newString = current + adder + ")";
-                } else if (pos2 == current.length() - 1 && pos > 0) {
+                } else if (searchFieldSynchronizer.searchItemList.get(searchFieldSynchronizer.searchItemList.size() - 1).isRightBracket() && searchFieldSynchronizer.searchItemList.get(searchFieldSynchronizer.searchItemList.size() - 2).isAttribute()) {
+                    String subidu = current.substring(0, pos2);
+                    newString = subidu + adder + ")";
+                } else if (searchFieldSynchronizer.searchItemList.get(searchFieldSynchronizer.searchItemList.size() - 1).isRightBracket() && searchFieldSynchronizer.searchItemList.get(searchFieldSynchronizer.searchItemList.size() - 2).isQuery() && searchFieldSynchronizer.searchItemList.get(searchFieldSynchronizer.searchItemList.size() - 3).isAttribute()) {
                     String sub = current.substring(0, pos + 1);
                     newString = sub + adder + ")";
+                } else if (searchFieldSynchronizer.searchItemList.get(searchFieldSynchronizer.searchItemList.size() - 1).isQuery() && searchFieldSynchronizer.searchItemList.get(searchFieldSynchronizer.searchItemList.size() - 2).isAttribute()) {
+                    String nsub = current.substring(0, pos + 1);
+                    newString = nsub + adder;
                 }
                 searchField.setText(newString);
                 searchField.positionCaret(searchField.getText().length());
