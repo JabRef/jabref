@@ -52,13 +52,14 @@ public class SearchFieldSynchronizer {
     public boolean isValid(ObservableList<SearchItem> searchItemList, SearchItem newItem) {
         StandardQueryParser queryParser = new StandardQueryParser();
 
+        searchItemList.add(newItem);
         boolean valid = true;
         try {
             queryParser.parse(this.searchStringBuilder(), "");
         } catch (QueryNodeException e) {
             valid = false;
         }
-
+        searchItemList.remove(newItem);
         if (valid) {
             return true;
         }
@@ -109,11 +110,11 @@ public class SearchFieldSynchronizer {
             if (item.isQuery()) {
                 // item is query
 
-                // if it's not the first item append " " if the item before the current one was not an attribute
+                // if it's not the first item append " " if the item before the current one was not an attribute or bracket
                 if (i > 0) {
                     // not first item
-                    if (!searchItemList.get(i - 1).isAttribute()) {
-                        // item before was not attribute
+                    if (!searchItemList.get(i - 1).isAttribute() && !searchItemList.get(i - 1).isLeftBracket()) {
+                        // item before was not attribute or left bracket
                         searchString.append(" ");
                     }
                 }
@@ -139,11 +140,26 @@ public class SearchFieldSynchronizer {
 
             if (item.isAttribute()) {
                 // item is attribute
+
+                // if it's not the first item append " " if the item before the current one was not a bracket
                 if (i > 0) {
                     // not first item
-                    searchString.append(" ");
+                    if (!searchItemList.get(i - 1).isLeftBracket()) {
+                        // item before was not attribute or left bracket
+                        searchString.append(" ");
+                    }
                 }
                 searchString.append(item.getItem());
+            }
+
+            if (item.isBracket()) {
+                // item is bracket
+                if (item.isRightBracket()) {
+                   searchString.append(")");
+                }
+                if (item.isLeftBracket()) {
+                    searchString.append("(");
+                }
             }
             // raise index counter by one
             i = i + 1;
@@ -194,6 +210,7 @@ public class SearchFieldSynchronizer {
                     searchItemList.add(new SearchItem("query", s));
                 }
             }
+            searchItemListToString(searchItemList);
         }
     }
 
@@ -222,11 +239,17 @@ public class SearchFieldSynchronizer {
         String str = searchField.getText();
 
         // splits a string "author:luh AND year:2013 OR author:\"lee smith\"" into
-        // [author:] [luh] [AND] [year:] [2013] [OR] [author:] ["lee smith"]
-        String[] words = str.split("(?<=:)|\\ ");
+        // [(] [author:] [luh] [AND] [year:] [2013] [)] [OR] [(] [author:] ["lee smith" [)]]
+        // String[] words = str.split("(?<=:)|\\ ");
+        String[] words = str.split("(?<=:)|(?<=\\()|(?=\\))|\\ ");
         ArrayList<String> list = new ArrayList<>();
 
         for (int i = 0; i < words.length; i++) {
+            if (words[i].equals(")(")) {
+                list.add(")");
+                list.add("(");
+                continue;
+            }
             if (words[i].startsWith("\"")) {
                 boolean isWordAfterwards = i + 1 < words.length;
                 if (isWordAfterwards && words[i + 1].endsWith("\"") && !words[i].endsWith(":")) {
