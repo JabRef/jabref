@@ -62,27 +62,33 @@ public class DropDownMenu {
         recentSearch = new RecentSearch(globalSearchBar);
         TextField searchString = new TextField();
         searchString.setPrefWidth(200);
-        HBox luceneString = new HBox(searchString, addString, searchStart, deleteButton);
-        HBox recentSearchBox = recentSearch.getHBox();
-        HBox buttonsLucene = new HBox(2, authorButton, journalButton, titleButton,
-                yearButton);//yearRangeButton removed
-        HBox andOrButtons = new HBox(2, andButton, orButton);
-        HBox bracketButtons = new HBox(2, leftBracketButton, rightBracketButton);
 
         //yearRangeSlider horizontal
+        Text titelYearRangeSlider = new Text("      Year-Range");
         final RangeSlider hSlider = new RangeSlider(1800, 2021, 10, 90);
         hSlider.setShowTickMarks(true);
         hSlider.setShowTickLabels(true);
         hSlider.setBlockIncrement(10);
-        hSlider.setPrefWidth(400);
+        hSlider.setPrefWidth(100);
         hSlider.setMajorTickUnit(100);
-        //hSlider.setMinorTickCount(10);
+        hSlider.setMinorTickCount(10);
         hSlider.showTickMarksProperty();
-        Label label = new Label("search from " + hSlider.getMin() + " to " + hSlider.getMax());
+        Label label = new Label();
+
+        HBox luceneString = new HBox(searchString, addString, searchStart, deleteButton);
+        HBox recentSearchBox = recentSearch.getHBox();
+        HBox buttonsLucene = new HBox(2, authorButton, journalButton, titleButton,
+                yearButton);//yearRangeButton removed
+        HBox andOrButtons = new HBox(2, andButton, orButton, titelYearRangeSlider, hSlider, label);
+        HBox bracketButtons = new HBox(2, leftBracketButton, rightBracketButton);
+        //HBox yearRangeSlider = new HBox(2, titelYearRangeSlider, hSlider, label);
 
 
 
-        VBox mainBox = new VBox(4, titleLucene, luceneString, buttonsLucene, andOrButtons, bracketButtons, titleRecent, recentSearchBox, hSlider, label);
+
+
+
+        VBox mainBox = new VBox(4, titleLucene, luceneString, buttonsLucene, andOrButtons, bracketButtons, titleRecent, recentSearchBox);
         //mainBox.setMinHeight(500);
         //mainBox.setMinWidth(500);
         Node buttonBox = mainBox;
@@ -192,7 +198,7 @@ public class DropDownMenu {
         hSlider.highValueProperty().addListener(new ChangeListener<Number>() {
             @Override
             public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-                label.setText(Integer.toString((int) hSlider.getHighValue()));
+                label.setText("search from " + Integer.toString((int) hSlider.getLowValue()) + " to " + Integer.toString((int) hSlider.getHighValue()));
             }
         });
 //
