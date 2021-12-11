@@ -70,7 +70,7 @@ class CompositeIdFetcherTest {
                                 .withField(StandardField.PUBLISHER, "Addison Wesley")
                                 .withField(StandardField.YEAR, "2018")
                                 .withField(StandardField.AUTHOR, "Bloch, Joshua")
-                                .withField(StandardField.DATE, "2018-01-01")
+                                .withField(StandardField.DATE, "2018-01-31")
                                 .withField(new UnknownField("ean"), "9780134685991")
                                 .withField(StandardField.ISBN, "0134685997")
                                 .withField(StandardField.URL, "https://www.ebook.de/de/product/28983211/joshua_bloch_effective_java.html")
@@ -86,7 +86,7 @@ class CompositeIdFetcherTest {
                                 .withField(StandardField.AUTHOR, "Barry Burd")
                                 .withField(StandardField.MONTH, "jul")
                                 .withField(StandardField.DOI, "10.1002/9781118257517")
-                                .withCitationKey("2011"),
+                                .withCitationKey("Burd_2011"),
                         "10.1002/9781118257517"
                 )
         );
