@@ -189,7 +189,6 @@ public class DropDownMenu {
         hSlider.addEventFilter(MouseEvent.MOUSE_CLICKED, event -> {
             searchFieldSynchronizer.addSearchItem("attribute", "year " + Integer.toString((int) hSlider.getLowValue()) + " to " + Integer.toString((int) hSlider.getHighValue()) + ": ");
             searchFieldSynchronizer.synchronize();
-            searchField.clear();
         });
         // yearRangeSlider output on action
         hSlider.highValueProperty().addListener(new ChangeListener<Number>() {
