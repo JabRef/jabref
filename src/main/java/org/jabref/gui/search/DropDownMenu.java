@@ -30,6 +30,7 @@ public class DropDownMenu {
     public RecentSearch recentSearch;
     public TextField searchString;
 
+    @SuppressWarnings("checkstyle:NoWhitespaceBefore")
     public DropDownMenu(CustomTextField searchField, GlobalSearchBar globalSearchBar, SearchFieldSynchronizer searchFieldSynchronizer) {
 
         authorButton = new Button("Author");
@@ -80,6 +81,7 @@ public class DropDownMenu {
             String adder = searchString.getText();
             String newString = "";
             int pos = current.length() - 1;
+            int pos2 = current.length() - 1;
             while (pos > 0) {
                 char ch = current.charAt(pos);
                 if (ch == ':') {
@@ -87,18 +89,35 @@ public class DropDownMenu {
                 }
                 pos--;
             }
+            while (pos2 > 0) {
+                char cha = current.charAt(pos2);
+                if (cha == ')') {
+                    break;
+                }
+                pos2--;
+            }
             if (searchField.getText().isEmpty()) {
                 searchField.setText(adder);
                 searchField.positionCaret(searchField.getText().length());
                 searchString.clear();
             } else {
-                if (pos == 0) {
-                    newString = current + " " + adder;
-                } else if (pos == current.length() - 1) {
+                if (searchFieldSynchronizer.searchItemList.get(searchFieldSynchronizer.searchItemList.size() - 1).isLogical()) {
                     newString = current + adder;
-                } else {
+                } else if (searchFieldSynchronizer.searchItemList.get(searchFieldSynchronizer.searchItemList.size() - 1).isRightBracket() && searchFieldSynchronizer.searchItemList.get(searchFieldSynchronizer.searchItemList.size() - 2).isLeftBracket()) {
+                    String subi = current.substring(0, pos2);
+                    newString = subi + adder + ")";
+                } else if (pos == 0 && pos2 == 0 && !searchString.getText().isEmpty()) {
+                    newString = current + " " + adder;
+                } else if (pos2 == current.length() - 1 && pos == 0) {
+                    String subs = current.substring(0, pos2);
+                    newString = subs + " " + adder + ")";
+                } else if (pos == current.length() - 1 && pos2 == 0) {
+                    newString = current + adder;
+                } else if (pos2 == current.length() - 1 && pos == current.length() - 2) {
+                    newString = current + adder + ")";
+                } else if (pos2 == current.length() - 1 && pos > 0) {
                     String sub = current.substring(0, pos + 1);
-                    newString = sub + adder;
+                    newString = sub + adder + ")";
                 }
                 searchField.setText(newString);
                 searchField.positionCaret(searchField.getText().length());
