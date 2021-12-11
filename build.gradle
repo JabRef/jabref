@@ -179,9 +179,9 @@ dependencies {
     implementation 'com.konghq:unirest-java:3.13.4'
 
     implementation 'org.slf4j:slf4j-api:2.0.0-alpha5'
-    implementation "org.tinylog:tinylog-api:2.4.0"
-    implementation "org.tinylog:slf4j-tinylog:2.4.0"
-   // implementation "org.tinylog:tinylog-impl:2.4.0"
+    implementation "org.tinylog:tinylog-api:2.4.1"
+    implementation "org.tinylog:slf4j-tinylog:2.4.1"
+    implementation "org.tinylog:tinylog-impl:2.4.1"
 
     implementation 'de.undercouch:citeproc-java:3.0.0-alpha.2'
 
