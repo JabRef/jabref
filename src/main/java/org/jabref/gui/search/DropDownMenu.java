@@ -187,15 +187,19 @@ public class DropDownMenu {
 
         // yearRangeSlider action
         hSlider.addEventFilter(MouseEvent.MOUSE_CLICKED, event -> {
-            searchFieldSynchronizer.addSearchItem("attribute", "year " + Integer.toString((int) hSlider.getLowValue()) + " to " + Integer.toString((int) hSlider.getHighValue()) + ": ");
-            searchFieldSynchronizer.synchronize();
+            if(searchFieldSynchronizer == null) {
+                searchFieldSynchronizer.addSearchItem("attribute", "year " + Integer.toString((int) hSlider.getLowValue()) + " to " + Integer.toString((int) hSlider.getHighValue()) + ": ");
+                searchFieldSynchronizer.synchronize();
+            }
+            else{
+                searchField.clear();
+                searchString.clear();
+            }
         });
         // yearRangeSlider output on action
-        hSlider.highValueProperty().addListener(new ChangeListener<Number>() {
-            @Override
-            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-                label.setText("search from " + Integer.toString((int) hSlider.getLowValue()) + " to " + Integer.toString((int) hSlider.getHighValue()));
-            }
+        hSlider.highValueProperty().addListener((observable, oldValue, newValue) -> {
+            label.setText("search from " + Integer.toString((int) hSlider.getLowValue()) + " to " + Integer.toString((int) hSlider.getHighValue()));
+
         });
 
         // andButton action
