@@ -1,30 +1,19 @@
 package org.jabref.gui.search;
 
-import javafx.beans.Observable;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
-import javafx.css.CssMetaData;
-import javafx.css.Styleable;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
-import javafx.scene.control.Label;
+
+import org.jabref.gui.icon.IconTheme;
 
 import org.controlsfx.control.PopOver;
-import javafx.scene.control.Slider;
 import org.controlsfx.control.RangeSlider;
 import org.controlsfx.control.textfield.CustomTextField;
-import org.jabref.gui.icon.IconTheme;
-import org.jabref.gui.keyboard.KeyBinding;
-
-import javax.swing.event.ChangeEvent;
-import java.awt.*;
-import java.util.List;
 
 public class DropDownMenu {
     public PopOver searchbarDropDown;
@@ -42,6 +31,7 @@ public class DropDownMenu {
     public Button addString;
     public RecentSearch recentSearch;
 
+    @SuppressWarnings("checkstyle:EmptyLineSeparator")
     public DropDownMenu(CustomTextField searchField, GlobalSearchBar globalSearchBar, SearchFieldSynchronizer searchFieldSynchronizer) {
 
         authorButton = new Button("Author");
@@ -63,7 +53,7 @@ public class DropDownMenu {
         TextField searchString = new TextField();
         searchString.setPrefWidth(200);
 
-        //yearRangeSlider horizontal
+        // yearRangeSlider horizontal
         Text titelYearRangeSlider = new Text("      Year-Range");
         final RangeSlider hSlider = new RangeSlider(1800, 2021, 10, 90);
         hSlider.setShowTickMarks(true);
@@ -78,22 +68,15 @@ public class DropDownMenu {
         HBox luceneString = new HBox(searchString, addString, searchStart, deleteButton);
         HBox recentSearchBox = recentSearch.getHBox();
         HBox buttonsLucene = new HBox(2, authorButton, journalButton, titleButton,
-                yearButton);//yearRangeButton removed
+                yearButton); // yearRangeButton removed
         HBox andOrButtons = new HBox(2, andButton, orButton, titelYearRangeSlider, hSlider, label);
         HBox bracketButtons = new HBox(2, leftBracketButton, rightBracketButton);
-        //HBox yearRangeSlider = new HBox(2, titelYearRangeSlider, hSlider, label);
-
-
-
-
-
+        // HBox yearRangeSlider = new HBox(2, titelYearRangeSlider, hSlider, label);
 
         VBox mainBox = new VBox(4, titleLucene, luceneString, buttonsLucene, andOrButtons, bracketButtons, titleRecent, recentSearchBox);
-        //mainBox.setMinHeight(500);
-        //mainBox.setMinWidth(500);
+        // mainBox.setMinHeight(500);
+        // mainBox.setMinWidth(500);
         Node buttonBox = mainBox;
-
-
 
         searchField.addEventFilter(MouseEvent.MOUSE_CLICKED, event -> {
             if (searchbarDropDown == null || !searchbarDropDown.isShowing()) {
@@ -112,22 +95,21 @@ public class DropDownMenu {
             String adder = searchString.getText();
             String newString = "";
             int pos = current.length() - 1;
-            while(pos > 0) {
+            while (pos > 0) {
                 char ch = current.charAt(pos);
-                if(ch == ':') {
+                if (ch == ':') {
                     break;
                 }
                 pos--;
             }
-            if(searchField.getText().isEmpty()) {
+            if (searchField.getText().isEmpty()) {
                 searchField.setText(adder);
                 searchField.positionCaret(searchField.getText().length());
                 searchString.clear();
             } else {
                 if (pos == 0) {
                     newString = current + " " + adder;
-                }
-                else if(pos == current.length() - 1) {
+                } else if (pos == current.length() - 1) {
                     newString = current + adder;
                 } else {
                     String sub = current.substring(0, pos + 1);
@@ -137,8 +119,6 @@ public class DropDownMenu {
                 searchField.positionCaret(searchField.getText().length());
                 searchString.clear();
             }
-
-
         });
 
         // searchStart action
@@ -186,20 +166,35 @@ public class DropDownMenu {
         });
 
         // yearRangeSlider action
-        hSlider.addEventFilter(MouseEvent.MOUSE_CLICKED, event -> {
-            if(searchFieldSynchronizer == null) {
-                searchFieldSynchronizer.addSearchItem("attribute", "year " + Integer.toString((int) hSlider.getLowValue()) + " to " + Integer.toString((int) hSlider.getHighValue()) + ": ");
-                searchFieldSynchronizer.synchronize();
+        hSlider.addEventFilter(MouseEvent.MOUSE_RELEASED, event -> {
+            int pos = 0;
+            boolean bol = false;
+            SearchItem item = null;
+            if (!searchField.getText().isEmpty()) {
+                for (int i = 0; i < searchFieldSynchronizer.searchItemList.size(); i++) {
+                    item = searchFieldSynchronizer.searchItemList.get(i);
+                    if (item.getItemType().equals("attribute")) {
+                        if (item.getItem().equals("year-range:")) {
+                            pos = i;
+                            bol = true;
+                        }
+                    }
+                }
             }
-            else{
-                searchField.clear();
-                searchString.clear();
+
+            if (!bol) {
+                searchFieldSynchronizer.addSearchItem("attribute", "year-range:");
+                searchFieldSynchronizer.addSearchItem("query", Integer.toString((int) hSlider.getLowValue()) + "to" + Integer.toString((int) hSlider.getHighValue()));
+                searchFieldSynchronizer.synchronize();
+            } else {
+               searchFieldSynchronizer.searchItemList.get(pos + 1).setItem(Integer.toString((int) hSlider.getLowValue()) + "to" + Integer.toString((int) hSlider.getHighValue()));
+               searchFieldSynchronizer.synchronize();
             }
         });
+
         // yearRangeSlider output on action
         hSlider.highValueProperty().addListener((observable, oldValue, newValue) -> {
             label.setText("search from " + Integer.toString((int) hSlider.getLowValue()) + " to " + Integer.toString((int) hSlider.getHighValue()));
-
         });
 
         // andButton action
