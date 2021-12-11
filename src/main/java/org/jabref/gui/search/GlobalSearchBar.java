@@ -14,8 +14,6 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.css.PseudoClass;
 import javafx.event.Event;
 import javafx.geometry.Insets;
@@ -126,19 +124,6 @@ public class GlobalSearchBar extends HBox {
         searchFieldTooltip.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
         searchFieldTooltip.setMaxHeight(10);
         updateHintVisibility();
-
-        // Prototype RecentSearch
-        // Add to RecentSearch after searchbar loses focus
-        searchField.focusedProperty().addListener(new ChangeListener<Boolean>() {
-            @Override
-            public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
-                if (newValue) {
-                    // LOGGER.info("Searchbar in focus");
-                } else {
-                    dropDownMenu.recentSearch.add(searchField.getText());
-                }
-            }
-        });
 
         // Prototype DropDownMenu
         SearchFieldSynchronizer searchFieldSynchronizer = new SearchFieldSynchronizer(searchField);

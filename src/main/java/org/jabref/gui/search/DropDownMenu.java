@@ -58,7 +58,11 @@ public class DropDownMenu {
                 searchbarDropDown.setDetachable(false); // not detachable
                 searchbarDropDown.show(searchField);
             }
+            searchbarDropDown.setOnHiding(event1 -> {
+                recentSearch.add(searchField.getText());
+            });
         });
+
 
         // authorButton action
         authorButton.addEventFilter(MouseEvent.MOUSE_CLICKED, event -> {
