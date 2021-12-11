@@ -1,5 +1,10 @@
 package org.jabref.gui.search;
 
+import javafx.beans.Observable;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.css.CssMetaData;
+import javafx.css.Styleable;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
@@ -8,13 +13,18 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
+import javafx.scene.control.Label;
 
 import org.controlsfx.control.PopOver;
+import javafx.scene.control.Slider;
+import org.controlsfx.control.RangeSlider;
 import org.controlsfx.control.textfield.CustomTextField;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.keyboard.KeyBinding;
 
+import javax.swing.event.ChangeEvent;
 import java.awt.*;
+import java.util.List;
 
 public class DropDownMenu {
     public PopOver searchbarDropDown;
@@ -55,14 +65,29 @@ public class DropDownMenu {
         HBox luceneString = new HBox(searchString, addString, searchStart, deleteButton);
         HBox recentSearchBox = recentSearch.getHBox();
         HBox buttonsLucene = new HBox(2, authorButton, journalButton, titleButton,
-                yearButton, yearRangeButton);
+                yearButton);//yearRangeButton removed
         HBox andOrButtons = new HBox(2, andButton, orButton);
         HBox bracketButtons = new HBox(2, leftBracketButton, rightBracketButton);
 
-        VBox mainBox = new VBox(4, titleLucene, luceneString, buttonsLucene, andOrButtons, bracketButtons, titleRecent, recentSearchBox);
+        //yearRangeSlider horizontal
+        final RangeSlider hSlider = new RangeSlider(1800, 2021, 10, 90);
+        hSlider.setShowTickMarks(true);
+        hSlider.setShowTickLabels(true);
+        hSlider.setBlockIncrement(10);
+        hSlider.setPrefWidth(400);
+        hSlider.setMajorTickUnit(100);
+        //hSlider.setMinorTickCount(10);
+        hSlider.showTickMarksProperty();
+        Label label = new Label("search from " + hSlider.getMin() + " to " + hSlider.getMax());
+
+
+
+        VBox mainBox = new VBox(4, titleLucene, luceneString, buttonsLucene, andOrButtons, bracketButtons, titleRecent, recentSearchBox, hSlider, label);
         //mainBox.setMinHeight(500);
         //mainBox.setMinWidth(500);
         Node buttonBox = mainBox;
+
+
 
         searchField.addEventFilter(MouseEvent.MOUSE_CLICKED, event -> {
             if (searchbarDropDown == null || !searchbarDropDown.isShowing()) {
@@ -153,6 +178,29 @@ public class DropDownMenu {
             searchFieldSynchronizer.synchronize();
 
         });
+
+//        // yearRangeSlider action
+//        hSlider.addEventFilter(MouseEvent.MOUSE_CLICKED, event -> {
+//            searchFieldSynchronizer.addSearchItem("attribute", "year:");
+//            searchFieldSynchronizer.synchronize();
+//        });
+
+        //            @Override
+//            public void stateChanged(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+//
+//            }
+        hSlider.highValueProperty().addListener(new ChangeListener<Number>() {
+            @Override
+            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+                label.setText(Integer.toString((int) hSlider.getHighValue()));
+            }
+        });
+//
+//        hSlider.valueProperty().addListener(new ChangeListener()<Number>() {
+//            @Override
+//            public void changed (ObservableValue <? extends Number> observable, Number oldValue, Number newValue){
+//            }
+//        });
 
         // andButton action
         andButton.addEventFilter(MouseEvent.MOUSE_CLICKED, event -> {
