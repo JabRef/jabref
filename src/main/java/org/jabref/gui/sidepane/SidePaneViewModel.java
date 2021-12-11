@@ -44,7 +44,12 @@ public class SidePaneViewModel extends AbstractViewModel {
         this.preferencesService = preferencesService;
         this.stateManager = stateManager;
         this.dialogService = dialogService;
-        this.sidePaneContentFactory = new SidePaneContentFactory(preferencesService, taskExecutor, dialogService, stateManager, undoManager);
+        this.sidePaneContentFactory = new SidePaneContentFactory(
+                preferencesService,
+                taskExecutor,
+                dialogService,
+                stateManager,
+                undoManager);
 
         preferencesService.getSidePanePreferences().visiblePanes().forEach(this::show);
         getPanes().addListener((ListChangeListener<? super SidePaneType>) change -> {
@@ -86,7 +91,8 @@ public class SidePaneViewModel extends AbstractViewModel {
      * position next time.
      */
     private void updatePreferredPositions() {
-        Map<SidePaneType, Integer> preferredPositions = new HashMap<>(preferencesService.getSidePanePreferences().getPreferredPositions());
+        Map<SidePaneType, Integer> preferredPositions = new HashMap<>(preferencesService.getSidePanePreferences()
+                                                                                        .getPreferredPositions());
         IntStream.range(0, getPanes().size()).forEach(i -> preferredPositions.put(getPanes().get(i), i));
         preferencesService.getSidePanePreferences().setPreferredPositions(preferredPositions);
     }
@@ -121,7 +127,7 @@ public class SidePaneViewModel extends AbstractViewModel {
         }
     }
 
-    public void show(SidePaneType pane) {
+    private void show(SidePaneType pane) {
         if (!getPanes().contains(pane)) {
             getPanes().add(pane);
             getPanes().sort(new PreferredIndexSort(preferencesService.getSidePanePreferences()));

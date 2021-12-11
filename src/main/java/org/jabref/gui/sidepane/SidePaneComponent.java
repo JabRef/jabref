@@ -22,7 +22,11 @@ public class SidePaneComponent extends BorderPane {
 
     private HBox buttonContainer;
 
-    public SidePaneComponent(SidePaneType sidePaneType, SimpleCommand closeCommand, SimpleCommand moveUpCommand, SimpleCommand moveDownCommand, SidePaneContentFactory contentFactory) {
+    public SidePaneComponent(SidePaneType sidePaneType,
+                             SimpleCommand closeCommand,
+                             SimpleCommand moveUpCommand,
+                             SimpleCommand moveDownCommand,
+                             SidePaneContentFactory contentFactory) {
         this.sidePaneType = sidePaneType;
         this.closeCommand = closeCommand;
         this.moveUpCommand = moveUpCommand;

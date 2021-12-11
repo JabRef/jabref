@@ -33,9 +33,23 @@ public class SidePaneContentFactory {
 
     public Node create(SidePaneType sidePaneType) {
         return switch (sidePaneType) {
-            case GROUPS -> new GroupTreeView(taskExecutor, stateManager, preferences, dialogService);
-            case OPEN_OFFICE -> new OpenOfficePanel(preferences, preferences.getOpenOfficePreferences(), preferences.getKeyBindingRepository(), taskExecutor, dialogService, stateManager, undoManager).getContent();
-            case WEB_SEARCH -> new WebSearchPaneView(preferences, dialogService, stateManager);
+            case GROUPS -> new GroupTreeView(
+                    taskExecutor,
+                    stateManager,
+                    preferences,
+                    dialogService);
+            case OPEN_OFFICE -> new OpenOfficePanel(
+                    preferences,
+                    preferences.getOpenOfficePreferences(),
+                    preferences.getKeyBindingRepository(),
+                    taskExecutor,
+                    dialogService,
+                    stateManager,
+                    undoManager).getContent();
+            case WEB_SEARCH -> new WebSearchPaneView(
+                    preferences,
+                    dialogService,
+                    stateManager);
         };
     }
 }

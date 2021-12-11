@@ -28,7 +28,7 @@ public class GroupsSidePaneComponent extends SidePaneComponent {
     }
 
     private void setupIntersectionUnionToggle() {
-        addExtraButtonToHeader(intersectionUnionToggle, 2);
+        addExtraButtonToHeader(intersectionUnionToggle, 0);
         intersectionUnionToggle.setOnAction(event -> new ToggleUnionIntersectionAction().execute());
     }
 

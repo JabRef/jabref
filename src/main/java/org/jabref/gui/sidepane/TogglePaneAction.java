@@ -23,6 +23,5 @@ public class TogglePaneAction extends SimpleCommand {
         } else {
             stateManager.getVisibleSidePaneComponents().remove(pane);
         }
-
     }
 }
