@@ -21,7 +21,6 @@ public class DropDownMenu {
     public Button journalButton;
     public Button titleButton;
     public Button yearButton;
-    public Button yearRangeButton;
     public Button andButton;
     public Button orButton;
     public Button andGroupButton;
@@ -41,7 +40,6 @@ public class DropDownMenu {
         journalButton = new Button("Journal");
         titleButton = new Button("Title");
         yearButton = new Button("Year");
-        yearRangeButton = new Button("Year-Range");
         andButton = new Button("AND");
         orButton = new Button("OR");
         andGroupButton = new Button("AND^-1");
@@ -60,7 +58,7 @@ public class DropDownMenu {
         searchString.setPrefWidth(200);
 
         // yearRangeSlider horizontal
-        Text titelYearRangeSlider = new Text("      Year-Range");
+        Text titelYearRangeSlider = new Text("Year-Range");
         final RangeSlider hSlider = new RangeSlider(1800, 2022, 10, 90);
         hSlider.setShowTickMarks(true);
         hSlider.setShowTickLabels(true);
@@ -74,11 +72,12 @@ public class DropDownMenu {
         HBox luceneString = new HBox(searchString, addString, searchStart, deleteButton);
         HBox recentSearchBox = recentSearch.getHBox();
         HBox buttonsLucene = new HBox(2, authorButton, journalButton, titleButton,
-                yearButton, yearRangeButton);
-        HBox andOrButtonsWithYearRangeSlider = new HBox(2, andButton, orButton, titelYearRangeSlider, hSlider, label);
+                yearButton);
+        HBox andOrButtons = new HBox(2, andButton, orButton, andGroupButton, orGroupButton);
         HBox bracketButtons = new HBox(2, leftBracketButton, rightBracketButton);
+        HBox yearRangeSlider = new HBox(2, titelYearRangeSlider, hSlider, label);
 
-        VBox mainBox = new VBox(4, titleLucene, luceneString, buttonsLucene, andOrButtonsWithYearRangeSlider, bracketButtons, titleRecent, recentSearchBox);
+        VBox mainBox = new VBox(4, titleLucene, luceneString, buttonsLucene, yearRangeSlider, andOrButtons, bracketButtons, titleRecent, recentSearchBox);
         // mainBox.setMinHeight(500);
         // mainBox.setMinWidth(500);
         Node buttonBox = mainBox;
@@ -195,11 +194,6 @@ public class DropDownMenu {
             searchFieldSynchronizer.synchronize();
         });
 
-        // yearRangeButton action
-        yearRangeButton.addEventFilter(MouseEvent.MOUSE_CLICKED, event -> {
-            searchFieldSynchronizer.synchronize();
-        });
-
         // yearRangeSlider action
         hSlider.addEventFilter(MouseEvent.MOUSE_RELEASED, event -> {
             int pos = 0;
@@ -228,7 +222,10 @@ public class DropDownMenu {
 
         // yearRangeSlider output on action
         hSlider.highValueProperty().addListener((observable, oldValue, newValue) -> {
-            label.setText("search from " + Integer.toString((int) hSlider.getLowValue()) + " to " + Integer.toString((int) hSlider.getHighValue()));
+            label.setText("from " + Integer.toString((int) hSlider.getLowValue()) + " to " + Integer.toString((int) hSlider.getHighValue()));
+        });
+        hSlider.lowValueChangingProperty().addListener((observable, oldValue, newValue) -> {
+            label.setText("from " + Integer.toString((int) hSlider.getLowValue()) + " to " + Integer.toString((int) hSlider.getHighValue()));
         });
 
         // andButton action
