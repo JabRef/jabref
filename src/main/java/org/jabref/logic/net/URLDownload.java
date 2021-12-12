@@ -86,6 +86,7 @@ public class URLDownload {
     public URLDownload(URL source) {
         this.source = source;
         this.addHeader("User-Agent", URLDownload.USER_AGENT);
+        bypassSSLVerification();
     }
 
     /**
@@ -200,7 +201,7 @@ public class URLDownload {
         Unirest.config().setDefaultHeader("User-Agent", "Mozilla/5.0 (Windows; U; WindowsNT 5.1; en-US; rv1.8.1.6) Gecko/20070725 Firefox/2.0.0.6");
 
         int statusCode = Unirest.head(source.toString()).asString().getStatus();
-        return statusCode >= 200 && statusCode < 300;
+        return (statusCode >= 200) && (statusCode < 300);
     }
 
     public boolean isMimeType(String type) {
