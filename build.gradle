@@ -208,7 +208,7 @@ dependencies {
     implementation group: 'net.harawata', name: 'appdirs', version: '1.2.1'
 
     testImplementation 'io.github.classgraph:classgraph:4.8.137'
-    testImplementation 'org.junit.jupiter:junit-jupiter:5.8.1'
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.8.2'
     testImplementation 'org.junit.platform:junit-platform-launcher:1.8.1'
 
     testRuntimeOnly group: 'org.apache.logging.log4j', name: 'log4j-core', version: '3.0.0-SNAPSHOT'
