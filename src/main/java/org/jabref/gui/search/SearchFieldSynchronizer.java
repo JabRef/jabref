@@ -198,32 +198,11 @@ public class SearchFieldSynchronizer {
 
             if (item.isAttribute()) {
                 // item is attribute
-/*
-<<<<<<< HEAD
-                String lastChar = "empty";
-                if (searchString.length() != 0) {
-                    lastChar = searchString.substring(searchString.length() - 1);
-                }
-                if (i > 0 && !lastChar.equals("(")) {
-                    // not first item and last character not (
-                    searchString.append(" ");
-                }
-                searchString.append(item.getItem());
-            }
-
-            if (item.isBracket()) {
-                if (i > 0) {
-                    // not first item
-                    if (item.getItemType().equals("(")) {
-=======
-*/
-
                 // if it's not the first item append " " if the item before the current one was not a bracket
                 if (i > 0) {
                     // not first item
                     if (!searchItemList.get(i - 1).isLeftBracket()) {
                         // item before was not attribute or left bracket
-//>>>>>>> DropDownProto_Julian
                         searchString.append(" ");
                     }
                 }
