@@ -71,7 +71,7 @@ public class DropDownMenu {
         HBox recentSearchBox = recentSearch.getHBox();
         HBox buttonsLucene = new HBox(2, authorButton, journalButton, titleButton,
                 yearButton, yearRangeButton);
-        HBox andOrButtons = new HBox(2, andButton, orButton);
+        HBox andOrButtonsWithYearRangeSlider = new HBox(2, andButton, orButton, titelYearRangeSlider, hSlider, label);
         HBox bracketButtons = new HBox(2, leftBracketButton, rightBracketButton);
 
         VBox mainBox = new VBox(4, titleLucene, luceneString, buttonsLucene, andOrButtonsWithYearRangeSlider, bracketButtons, titleRecent, recentSearchBox);
