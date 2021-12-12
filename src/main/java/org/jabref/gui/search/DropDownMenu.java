@@ -19,6 +19,8 @@ public class DropDownMenu {
     public Button yearRangeButton;
     public Button andButton;
     public Button orButton;
+    public Button andGroupButton;
+    public Button orGroupButton;
     public Button leftBracketButton;
     public Button rightBracketButton;
     public RecentSearch recentSearch;
@@ -32,6 +34,8 @@ public class DropDownMenu {
         yearRangeButton = new Button("Year-Range");
         andButton = new Button("AND");
         orButton = new Button("OR");
+        andGroupButton = new Button("AND^-1");
+        orGroupButton = new Button("OR^-1");
         leftBracketButton = new Button("(");
         rightBracketButton = new Button(")");
 
@@ -41,7 +45,7 @@ public class DropDownMenu {
         HBox recentSearchBox = recentSearch.getHBox();
         HBox buttonsLucene = new HBox(2, authorButton, journalButton, titleButton,
                 yearButton, yearRangeButton);
-        HBox andOrButtons = new HBox(2, andButton, orButton);
+        HBox andOrButtons = new HBox(2, andButton, orButton, andGroupButton, orGroupButton);
         HBox bracketButtons = new HBox(2, leftBracketButton, rightBracketButton);
 
         VBox mainBox = new VBox(4, titleLucene, buttonsLucene, andOrButtons, bracketButtons, titleRecent, recentSearchBox);
@@ -114,6 +118,20 @@ public class DropDownMenu {
         // rightBracketButton action
         rightBracketButton.addEventFilter(MouseEvent.MOUSE_CLICKED, event -> {
             searchFieldSynchronizer.addSearchItem("bracket", ")");
+            searchFieldSynchronizer.synchronize();
+        });
+
+        // andGroupButton action
+        andGroupButton.addEventFilter(MouseEvent.MOUSE_CLICKED, event -> {
+            searchFieldSynchronizer.addBrackets();
+            searchFieldSynchronizer.addSearchItem("logical", "AND");
+            searchFieldSynchronizer.synchronize();
+        });
+
+        // orGroupButton action
+        orGroupButton.addEventFilter(MouseEvent.MOUSE_CLICKED, event -> {
+            searchFieldSynchronizer.addBrackets();
+            searchFieldSynchronizer.addSearchItem("logical", "OR");
             searchFieldSynchronizer.synchronize();
         });
     }

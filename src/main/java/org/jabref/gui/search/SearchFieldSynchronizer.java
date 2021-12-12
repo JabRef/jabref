@@ -85,6 +85,16 @@ public class SearchFieldSynchronizer {
         return searchItemList.get(searchItemList.size() - 1);
     }
 
+    /* Text before --------, Text after addBrackets (--------) */
+    public void addBrackets() {
+        if (isValidLucene()) {
+            searchItemList.add(0, new SearchItem("bracket", "("));
+            searchItemList.add(new SearchItem("bracket", ")"));
+        } else {
+            System.out.print("TEST");
+        }
+    }
+
     /* builds a new searchString by calling searchStringBuilder,
     sets the searchField text and positions caret at the end */
     public void synchronize() {
