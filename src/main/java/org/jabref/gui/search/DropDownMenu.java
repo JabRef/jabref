@@ -55,7 +55,7 @@ public class DropDownMenu {
 
         // yearRangeSlider horizontal
         Text titelYearRangeSlider = new Text("      Year-Range");
-        final RangeSlider hSlider = new RangeSlider(1800, 2021, 10, 90);
+        final RangeSlider hSlider = new RangeSlider(1800, 2022, 10, 90);
         hSlider.setShowTickMarks(true);
         hSlider.setShowTickLabels(true);
         hSlider.setBlockIncrement(10);
@@ -69,11 +69,11 @@ public class DropDownMenu {
         HBox recentSearchBox = recentSearch.getHBox();
         HBox buttonsLucene = new HBox(2, authorButton, journalButton, titleButton,
                 yearButton); // yearRangeButton removed
-        HBox andOrButtons = new HBox(2, andButton, orButton, titelYearRangeSlider, hSlider, label);
+        HBox andOrButtonsWithYearRangeSlider = new HBox(2, andButton, orButton, titelYearRangeSlider, hSlider, label);
         HBox bracketButtons = new HBox(2, leftBracketButton, rightBracketButton);
         // HBox yearRangeSlider = new HBox(2, titelYearRangeSlider, hSlider, label);
 
-        VBox mainBox = new VBox(4, titleLucene, luceneString, buttonsLucene, andOrButtons, bracketButtons, titleRecent, recentSearchBox);
+        VBox mainBox = new VBox(4, titleLucene, luceneString, buttonsLucene, andOrButtonsWithYearRangeSlider, bracketButtons, titleRecent, recentSearchBox);
         // mainBox.setMinHeight(500);
         // mainBox.setMinWidth(500);
         Node buttonBox = mainBox;
@@ -162,7 +162,6 @@ public class DropDownMenu {
         // yearRangeButton action
         yearRangeButton.addEventFilter(MouseEvent.MOUSE_CLICKED, event -> {
             searchFieldSynchronizer.synchronize();
-
         });
 
         // yearRangeSlider action
@@ -181,7 +180,6 @@ public class DropDownMenu {
                     }
                 }
             }
-
             if (!bol) {
                 searchFieldSynchronizer.addSearchItem("attribute", "year-range:");
                 searchFieldSynchronizer.addSearchItem("query", Integer.toString((int) hSlider.getLowValue()) + "to" + Integer.toString((int) hSlider.getHighValue()));
@@ -221,5 +219,4 @@ public class DropDownMenu {
             searchFieldSynchronizer.synchronize();
         });
     }
-
 }
