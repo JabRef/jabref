@@ -2,6 +2,7 @@ package org.jabref.gui.search;
 
 import javafx.scene.Node;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
@@ -11,6 +12,7 @@ import javafx.scene.text.Text;
 import org.jabref.gui.icon.IconTheme;
 
 import org.controlsfx.control.PopOver;
+import org.controlsfx.control.RangeSlider;
 import org.controlsfx.control.textfield.CustomTextField;
 
 public class DropDownMenu {
@@ -50,7 +52,21 @@ public class DropDownMenu {
         Text titleLucene = new Text(" Lucene Search");
         Text titleRecent = new Text(" Recent Searches");
         recentSearch = new RecentSearch(globalSearchBar);
+        TextField searchString = new TextField();
         searchString.setPrefWidth(200);
+
+        // yearRangeSlider horizontal
+        Text titelYearRangeSlider = new Text("      Year-Range");
+        final RangeSlider hSlider = new RangeSlider(1800, 2022, 10, 90);
+        hSlider.setShowTickMarks(true);
+        hSlider.setShowTickLabels(true);
+        hSlider.setBlockIncrement(10);
+        hSlider.setPrefWidth(100);
+        hSlider.setMajorTickUnit(100);
+        hSlider.setMinorTickCount(10);
+        hSlider.showTickMarksProperty();
+        Label label = new Label();
+
         HBox luceneString = new HBox(searchString, addString, searchStart, deleteButton);
         HBox recentSearchBox = recentSearch.getHBox();
         HBox buttonsLucene = new HBox(2, authorButton, journalButton, titleButton,
@@ -58,7 +74,7 @@ public class DropDownMenu {
         HBox andOrButtons = new HBox(2, andButton, orButton);
         HBox bracketButtons = new HBox(2, leftBracketButton, rightBracketButton);
 
-        VBox mainBox = new VBox(4, titleLucene, luceneString, buttonsLucene, andOrButtons, bracketButtons, titleRecent, recentSearchBox);
+        VBox mainBox = new VBox(4, titleLucene, luceneString, buttonsLucene, andOrButtonsWithYearRangeSlider, bracketButtons, titleRecent, recentSearchBox);
         // mainBox.setMinHeight(500);
         // mainBox.setMinWidth(500);
         Node buttonBox = mainBox;
@@ -175,7 +191,37 @@ public class DropDownMenu {
         // yearRangeButton action
         yearRangeButton.addEventFilter(MouseEvent.MOUSE_CLICKED, event -> {
             searchFieldSynchronizer.synchronize();
+        });
 
+        // yearRangeSlider action
+        hSlider.addEventFilter(MouseEvent.MOUSE_RELEASED, event -> {
+            int pos = 0;
+            boolean bol = false;
+            SearchItem item = null;
+            if (!searchField.getText().isEmpty()) {
+                for (int i = 0; i < searchFieldSynchronizer.searchItemList.size(); i++) {
+                    item = searchFieldSynchronizer.searchItemList.get(i);
+                    if (item.getItemType().equals("attribute")) {
+                        if (item.getItem().equals("year-range:")) {
+                            pos = i;
+                            bol = true;
+                        }
+                    }
+                }
+            }
+            if (!bol) {
+                searchFieldSynchronizer.addSearchItem("attribute", "year-range:");
+                searchFieldSynchronizer.addSearchItem("query", Integer.toString((int) hSlider.getLowValue()) + "to" + Integer.toString((int) hSlider.getHighValue()));
+                searchFieldSynchronizer.synchronize();
+            } else {
+               searchFieldSynchronizer.searchItemList.get(pos + 1).setItem(Integer.toString((int) hSlider.getLowValue()) + "to" + Integer.toString((int) hSlider.getHighValue()));
+               searchFieldSynchronizer.synchronize();
+            }
+        });
+
+        // yearRangeSlider output on action
+        hSlider.highValueProperty().addListener((observable, oldValue, newValue) -> {
+            label.setText("search from " + Integer.toString((int) hSlider.getLowValue()) + " to " + Integer.toString((int) hSlider.getHighValue()));
         });
 
         // andButton action
