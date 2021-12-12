@@ -22,6 +22,8 @@ public class DropDownMenu {
     public Button yearRangeButton;
     public Button andButton;
     public Button orButton;
+    public Button andGroupButton;
+    public Button orGroupButton;
     public Button leftBracketButton;
     public Button rightBracketButton;
     public Button deleteButton;
@@ -40,6 +42,8 @@ public class DropDownMenu {
         yearRangeButton = new Button("Year-Range");
         andButton = new Button("AND");
         orButton = new Button("OR");
+        andGroupButton = new Button("AND^-1");
+        orGroupButton = new Button("OR^-1");
         leftBracketButton = new Button("(");
         rightBracketButton = new Button(")");
         deleteButton = IconTheme.JabRefIcons.DELETE_ENTRY.asButton();
@@ -55,7 +59,7 @@ public class DropDownMenu {
         HBox recentSearchBox = recentSearch.getHBox();
         HBox buttonsLucene = new HBox(2, authorButton, journalButton, titleButton,
                 yearButton, yearRangeButton);
-        HBox andOrButtons = new HBox(2, andButton, orButton);
+        HBox andOrButtons = new HBox(2, andButton, orButton, andGroupButton, orGroupButton);
         HBox bracketButtons = new HBox(2, leftBracketButton, rightBracketButton);
 
         VBox mainBox = new VBox(4, titleLucene, luceneString, buttonsLucene, andOrButtons, bracketButtons, titleRecent, recentSearchBox);
@@ -146,6 +150,9 @@ public class DropDownMenu {
             searchString.clear();
             searchFieldSynchronizer.deleteAllEntries();
             searchString.setFocusTraversable(false);
+            searchbarDropDown.setOnHiding(event1 -> {
+                recentSearch.add(searchField.getText());
+            });
         });
 
         // authorButton action
@@ -196,9 +203,23 @@ public class DropDownMenu {
             searchFieldSynchronizer.synchronize();
         });
 
-        // orButton action
+        // rightBracketButton action
         rightBracketButton.addEventFilter(MouseEvent.MOUSE_CLICKED, event -> {
             searchFieldSynchronizer.addSearchItem("bracket", ")");
+            searchFieldSynchronizer.synchronize();
+        });
+
+        // andGroupButton action
+        andGroupButton.addEventFilter(MouseEvent.MOUSE_CLICKED, event -> {
+            searchFieldSynchronizer.addBrackets();
+            searchFieldSynchronizer.addSearchItem("logical", "AND");
+            searchFieldSynchronizer.synchronize();
+        });
+
+        // orGroupButton action
+        orGroupButton.addEventFilter(MouseEvent.MOUSE_CLICKED, event -> {
+            searchFieldSynchronizer.addBrackets();
+            searchFieldSynchronizer.addSearchItem("logical", "OR");
             searchFieldSynchronizer.synchronize();
         });
     }
