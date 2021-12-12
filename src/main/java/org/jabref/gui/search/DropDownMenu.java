@@ -111,7 +111,7 @@ public class DropDownMenu {
             searchFieldSynchronizer.synchronize();
         });
 
-        // orButton action
+        // rightBracketButton action
         rightBracketButton.addEventFilter(MouseEvent.MOUSE_CLICKED, event -> {
             searchFieldSynchronizer.addSearchItem("bracket", ")");
             searchFieldSynchronizer.synchronize();
