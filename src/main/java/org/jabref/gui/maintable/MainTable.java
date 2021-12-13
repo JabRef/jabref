@@ -43,11 +43,13 @@ import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.ViewModelTableRowFactory;
 import org.jabref.logic.importer.ImportCleanup;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.pdf.search.indexing.PdfIndexer;
 import org.jabref.logic.util.OS;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.database.event.EntriesAddedEvent;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.preferences.FilePreferences;
 import org.jabref.preferences.PreferencesService;
 
 import com.google.common.eventbus.Subscribe;
@@ -68,6 +70,8 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
     private long lastKeyPressTime;
     private String columnSearchTerm;
+
+    private final FilePreferences filePreferences;
 
     public MainTable(MainTableDataModel model,
                      LibraryTab libraryTab,
@@ -177,6 +181,8 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
             }
             this.jumpToSearchKey(getSortOrder().get(0), key);
         });
+
+        filePreferences = preferencesService.getFilePreferences();
 
         database.getDatabase().registerListener(this);
     }
@@ -375,20 +381,30 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
             switch (ControlHelper.getDroppingMouseLocation(row, event)) {
                 case TOP, BOTTOM -> importHandler.importFilesInBackground(files).executeWith(Globals.TASK_EXECUTOR);
                 case CENTER -> {
-                    BibEntry entry = target.getEntry();
-                    switch (event.getTransferMode()) {
-                        case LINK -> {
-                            LOGGER.debug("Mode LINK"); // shift on win or no modifier
-                            importHandler.getLinker().addFilesToEntry(entry, files);
+                    try {
+                        BibEntry entry = target.getEntry();
+                        switch (event.getTransferMode()) {
+                            case LINK -> {
+                                LOGGER.debug("Mode LINK"); // shift on win or no modifier
+                                importHandler.getLinker().addFilesToEntry(entry, files);
+                            }
+                            case MOVE -> {
+                                LOGGER.debug("Mode MOVE"); // alt on win
+                                libraryTab.getIndexingTaskManager().setBlockingNewTasks(true);
+                                importHandler.getLinker().moveFilesToFileDirAndAddToEntry(entry, files);
+                                libraryTab.getIndexingTaskManager().setBlockingNewTasks(false);
+                                libraryTab.getIndexingTaskManager().addToIndex(PdfIndexer.of(database, filePreferences), entry, database);
+                            }
+                            case COPY -> {
+                                LOGGER.debug("Mode Copy"); // ctrl on win
+                                libraryTab.getIndexingTaskManager().setBlockingNewTasks(true);
+                                importHandler.getLinker().copyFilesToFileDirAndAddToEntry(entry, files);
+                                libraryTab.getIndexingTaskManager().setBlockingNewTasks(false);
+                                libraryTab.getIndexingTaskManager().addToIndex(PdfIndexer.of(database, filePreferences), entry, database);
+                            }
                         }
-                        case MOVE -> {
-                            LOGGER.debug("Mode MOVE"); // alt on win
-                            importHandler.getLinker().moveFilesToFileDirAndAddToEntry(entry, files);
-                        }
-                        case COPY -> {
-                            LOGGER.debug("Mode Copy"); // ctrl on win
-                            importHandler.getLinker().copyFilesToFileDirAndAddToEntry(entry, files);
-                        }
+                    } catch (IOException e) {
+                        LOGGER.error("Failed to obtain PDFIndexer.", e);
                     }
                 }
             }
