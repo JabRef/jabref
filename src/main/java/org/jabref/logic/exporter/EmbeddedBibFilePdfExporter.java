@@ -91,16 +91,24 @@ public class EmbeddedBibFilePdfExporter extends Exporter {
                 }
             }
 
+            PDComplexFileSpecification fileSpecification;
+            if (names.containsKey(EMBEDDED_FILE_NAME)) {
+                fileSpecification = names.get(EMBEDDED_FILE_NAME);
+            } else {
+                fileSpecification = new PDComplexFileSpecification();
+            }
             if (efTree != null) {
-                PDComplexFileSpecification fileSpecification = new PDComplexFileSpecification();
-                fileSpecification.setFile(EMBEDDED_FILE_NAME);
                 InputStream inputStream = new ByteArrayInputStream(bibTeX.getBytes(encoding));
+                fileSpecification.setFile(EMBEDDED_FILE_NAME);
                 PDEmbeddedFile embeddedFile = new PDEmbeddedFile(document, inputStream);
                 embeddedFile.setSubtype("text/x-bibtex");
                 embeddedFile.setSize(bibTeX.length());
                 fileSpecification.setEmbeddedFile(embeddedFile);
 
-                names.put(EMBEDDED_FILE_NAME, fileSpecification);
+                if (!names.containsKey(EMBEDDED_FILE_NAME)) {
+                    names.put(EMBEDDED_FILE_NAME, fileSpecification);
+                }
+
                 efTree.setNames(names);
                 nameDictionary.setEmbeddedFiles(efTree);
                 document.getDocumentCatalog().setNames(nameDictionary);
