@@ -41,7 +41,7 @@ public class EntryEditorTab extends AbstractPreferenceTabView<EntryEditorTabView
     }
 
     public void initialize() {
-        this.viewModel = new EntryEditorTabViewModel(preferencesService);
+        this.viewModel = new EntryEditorTabViewModel(preferencesService.getEntryEditorPreferences(), preferencesService.getAutoCompletePreferences());
 
         openOnNewEntry.selectedProperty().bindBidirectional(viewModel.openOnNewEntryProperty());
         defaultSource.selectedProperty().bindBidirectional(viewModel.defaultSourceProperty());

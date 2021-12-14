@@ -293,8 +293,6 @@ public interface PreferencesService {
 
     AutoCompletePreferences getAutoCompletePreferences();
 
-    void storeAutoCompletePreferences(AutoCompletePreferences autoCompletePreferences);
-
     SpecialFieldsPreferences getSpecialFieldsPreferences();
 
     SearchPreferences getSearchPreferences();

@@ -449,6 +449,7 @@ public class JabRefPreferences implements PreferencesService {
     private SpecialFieldsPreferences specialFieldsPreferences;
     private GroupsPreferences groupsPreferences;
     private XmpPreferences xmpPreferences;
+    private AutoCompletePreferences autoCompletePreferences;
 
     // The constructor is made private to enforce this as a singleton class:
     private JabRefPreferences() {
@@ -2706,6 +2707,10 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public AutoCompletePreferences getAutoCompletePreferences() {
+        if (Objects.nonNull(autoCompletePreferences)) {
+            return autoCompletePreferences;
+        }
+
         AutoCompletePreferences.NameFormat nameFormat = AutoCompletePreferences.NameFormat.BOTH;
         if (getBoolean(AUTOCOMPLETER_LAST_FIRST)) {
             nameFormat = AutoCompletePreferences.NameFormat.LAST_FIRST;
@@ -2713,30 +2718,33 @@ public class JabRefPreferences implements PreferencesService {
             nameFormat = AutoCompletePreferences.NameFormat.FIRST_LAST;
         }
 
-        return new AutoCompletePreferences(
+        autoCompletePreferences = new AutoCompletePreferences(
                 getBoolean(AUTO_COMPLETE),
                 AutoCompleteFirstNameMode.parse(get(AUTOCOMPLETER_FIRSTNAME_MODE)),
                 nameFormat,
-                getStringList(AUTOCOMPLETER_COMPLETE_FIELDS).stream().map(FieldFactory::parseField).collect(Collectors.toSet()),
-                getJournalAbbreviationPreferences());
-    }
+                getStringList(AUTOCOMPLETER_COMPLETE_FIELDS).stream().map(FieldFactory::parseField).collect(Collectors.toSet())
+        );
 
-    @Override
-    public void storeAutoCompletePreferences(AutoCompletePreferences preferences) {
-        putBoolean(AUTO_COMPLETE, preferences.shouldAutoComplete());
-        put(AUTOCOMPLETER_FIRSTNAME_MODE, preferences.getFirstNameMode().name());
-        putStringList(AUTOCOMPLETER_COMPLETE_FIELDS, preferences.getCompleteFields().stream().map(Field::getName).collect(Collectors.toList()));
+        EasyBind.listen(autoCompletePreferences.autoCompleteProperty(), (obs, oldValue, newValue) -> putBoolean(AUTO_COMPLETE, newValue));
+        EasyBind.listen(autoCompletePreferences.firstNameModeProperty(), (obs, oldValue, newValue) -> put(AUTOCOMPLETER_FIRSTNAME_MODE, newValue.name()));
+        autoCompletePreferences.getCompleteFields().addListener((SetChangeListener<Field>) c ->
+                putStringList(AUTOCOMPLETER_COMPLETE_FIELDS, autoCompletePreferences.getCompleteFields().stream()
+                                                                                    .map(Field::getName)
+                                                                                    .collect(Collectors.toList())));
+        EasyBind.listen(autoCompletePreferences.nameFormatProperty(), (obs, oldValue, newValue) -> {
+            if (autoCompletePreferences.getNameFormat() == AutoCompletePreferences.NameFormat.BOTH) {
+                putBoolean(AUTOCOMPLETER_LAST_FIRST, false);
+                putBoolean(AUTOCOMPLETER_FIRST_LAST, false);
+            } else if (autoCompletePreferences.getNameFormat() == AutoCompletePreferences.NameFormat.LAST_FIRST) {
+                putBoolean(AUTOCOMPLETER_LAST_FIRST, true);
+                putBoolean(AUTOCOMPLETER_FIRST_LAST, false);
+            } else {
+                putBoolean(AUTOCOMPLETER_LAST_FIRST, false);
+                putBoolean(AUTOCOMPLETER_FIRST_LAST, true);
+            }
+        });
 
-        if (preferences.getNameFormat() == AutoCompletePreferences.NameFormat.BOTH) {
-            putBoolean(AUTOCOMPLETER_LAST_FIRST, false);
-            putBoolean(AUTOCOMPLETER_FIRST_LAST, false);
-        } else if (preferences.getNameFormat() == AutoCompletePreferences.NameFormat.LAST_FIRST) {
-            putBoolean(AUTOCOMPLETER_LAST_FIRST, true);
-            putBoolean(AUTOCOMPLETER_FIRST_LAST, false);
-        } else {
-            putBoolean(AUTOCOMPLETER_LAST_FIRST, false);
-            putBoolean(AUTOCOMPLETER_FIRST_LAST, true);
-        }
+        return autoCompletePreferences;
     }
 
     @Override

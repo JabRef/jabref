@@ -45,12 +45,7 @@ public class GroupsTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public void storeSettings() {
-        GroupViewMode groupViewMode = GroupViewMode.UNION;
-        if (groupViewModeIntersectionProperty.getValue()) {
-            groupViewMode = GroupViewMode.INTERSECTION;
-        }
-
-        groupsPreferences.setGroupViewMode(groupViewMode);
+        groupsPreferences.setGroupViewMode(groupViewModeIntersectionProperty.getValue() ? GroupViewMode.INTERSECTION : GroupViewMode.UNION);
         groupsPreferences.setAutoAssignGroup(autoAssignGroupProperty.getValue());
         groupsPreferences.setDisplayGroupCount(displayGroupCountProperty.getValue());
         groupsPreferences.keywordSeparatorProperty().setValue(keywordSeparatorProperty.getValue().charAt(0));
