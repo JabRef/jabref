@@ -61,7 +61,7 @@ public class JabRefGUI {
         new VersionWorker(Globals.BUILD_INFO.version,
                 mainFrame.getDialogService(),
                 Globals.TASK_EXECUTOR,
-                preferencesService.getVersionPreferences())
+                preferencesService.getInternalPreferences())
                 .checkForNewVersionDelayed();
     }
 

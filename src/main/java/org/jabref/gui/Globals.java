@@ -127,7 +127,7 @@ public class Globals {
         telemetryClient = new TelemetryClient(telemetryConfiguration);
         telemetryClient.getContext().getProperties().put("JabRef version", Globals.BUILD_INFO.version.toString());
         telemetryClient.getContext().getProperties().put("Java version", StandardSystemProperty.JAVA_VERSION.value());
-        telemetryClient.getContext().getUser().setId(Globals.prefs.getOrCreateUserId());
+        telemetryClient.getContext().getUser().setId(Globals.prefs.getTelemetryPreferences().getUserId());
         telemetryClient.getContext().getSession().setId(UUID.randomUUID().toString());
         telemetryClient.getContext().getDevice().setOperatingSystem(StandardSystemProperty.OS_NAME.value());
         telemetryClient.getContext().getDevice().setOperatingSystemVersion(StandardSystemProperty.OS_VERSION.value());

@@ -9,7 +9,6 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.groups.GroupViewMode;
 import org.jabref.gui.groups.GroupsPreferences;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
-import org.jabref.preferences.PreferencesService;
 
 public class GroupsTabViewModel implements PreferenceTabViewModel {
 
@@ -20,18 +19,16 @@ public class GroupsTabViewModel implements PreferenceTabViewModel {
     private final StringProperty keywordSeparatorProperty = new SimpleStringProperty("");
 
     private final DialogService dialogService;
-    private final PreferencesService preferences;
-    private final GroupsPreferences initialGroupsPreferences;
+    private final GroupsPreferences groupsPreferences;
 
-    public GroupsTabViewModel(DialogService dialogService, PreferencesService preferences) {
+    public GroupsTabViewModel(DialogService dialogService, GroupsPreferences groupsPreferences) {
         this.dialogService = dialogService;
-        this.preferences = preferences;
-        this.initialGroupsPreferences = preferences.getGroupsPreferences();
+        this.groupsPreferences = groupsPreferences;
     }
 
     @Override
     public void setValues() {
-        switch (initialGroupsPreferences.getGroupViewMode()) {
+        switch (groupsPreferences.getGroupViewMode()) {
             case INTERSECTION -> {
                 groupViewModeIntersectionProperty.setValue(true);
                 groupViewModeUnionProperty.setValue(false);
@@ -41,9 +38,9 @@ public class GroupsTabViewModel implements PreferenceTabViewModel {
                 groupViewModeUnionProperty.setValue(true);
             }
         }
-        autoAssignGroupProperty.setValue(initialGroupsPreferences.shouldAutoAssignGroup());
-        displayGroupCountProperty.setValue(initialGroupsPreferences.shouldDisplayGroupCount());
-        keywordSeparatorProperty.setValue(initialGroupsPreferences.getKeywordDelimiter().toString());
+        autoAssignGroupProperty.setValue(groupsPreferences.shouldAutoAssignGroup());
+        displayGroupCountProperty.setValue(groupsPreferences.shouldDisplayGroupCount());
+        keywordSeparatorProperty.setValue(groupsPreferences.getKeywordSeparator().toString());
     }
 
     @Override
@@ -53,12 +50,10 @@ public class GroupsTabViewModel implements PreferenceTabViewModel {
             groupViewMode = GroupViewMode.INTERSECTION;
         }
 
-        GroupsPreferences newGroupsPreferences = new GroupsPreferences(
-                groupViewMode,
-                autoAssignGroupProperty.getValue(),
-                displayGroupCountProperty.getValue(),
-                keywordSeparatorProperty.getValue().charAt(0));
-        preferences.storeGroupsPreferences(newGroupsPreferences);
+        groupsPreferences.setGroupViewMode(groupViewMode);
+        groupsPreferences.setAutoAssignGroup(autoAssignGroupProperty.getValue());
+        groupsPreferences.setDisplayGroupCount(displayGroupCountProperty.getValue());
+        groupsPreferences.keywordSeparatorProperty().setValue(keywordSeparatorProperty.getValue().charAt(0));
     }
 
     public BooleanProperty groupViewModeIntersectionProperty() {
