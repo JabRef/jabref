@@ -390,16 +390,20 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                             }
                             case MOVE -> {
                                 LOGGER.debug("Mode MOVE"); // alt on win
-                                libraryTab.getIndexingTaskManager().setBlockingNewTasks(true);
-                                importHandler.getLinker().moveFilesToFileDirAndAddToEntry(entry, files);
-                                libraryTab.getIndexingTaskManager().setBlockingNewTasks(false);
+                                try (AutoCloseable blocker = libraryTab.getIndexingTaskManager().blockNewTasks()) {
+                                    importHandler.getLinker().moveFilesToFileDirAndAddToEntry(entry, files);
+                                } catch (Exception e) {
+                                    LOGGER.error("Could not block IndexingTaskManager", e);
+                                }
                                 libraryTab.getIndexingTaskManager().addToIndex(PdfIndexer.of(database, filePreferences), entry, database);
                             }
                             case COPY -> {
                                 LOGGER.debug("Mode Copy"); // ctrl on win
-                                libraryTab.getIndexingTaskManager().setBlockingNewTasks(true);
-                                importHandler.getLinker().copyFilesToFileDirAndAddToEntry(entry, files);
-                                libraryTab.getIndexingTaskManager().setBlockingNewTasks(false);
+                                try (AutoCloseable blocker = libraryTab.getIndexingTaskManager().blockNewTasks()) {
+                                    importHandler.getLinker().copyFilesToFileDirAndAddToEntry(entry, files);
+                                } catch (Exception e) {
+                                    LOGGER.error("Could not block IndexingTaskManager", e);
+                                }
                                 libraryTab.getIndexingTaskManager().addToIndex(PdfIndexer.of(database, filePreferences), entry, database);
                             }
                         }

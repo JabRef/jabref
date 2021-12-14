@@ -72,10 +72,15 @@ public class IndexingTaskManager extends BackgroundTask<Void> {
         }
     }
 
-    public void setBlockingNewTasks(boolean blockingNewTasks) {
+    public AutoCloseable blockNewTasks() {
         synchronized (lock) {
-            isBlockingNewTasks = blockingNewTasks;
+            isBlockingNewTasks = true;
         }
+        return () -> {
+            synchronized (lock) {
+                isBlockingNewTasks = false;
+            }
+        };
     }
 
     public void createIndex(PdfIndexer indexer) {
