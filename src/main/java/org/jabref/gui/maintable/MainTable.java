@@ -43,7 +43,6 @@ import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.ViewModelTableRowFactory;
 import org.jabref.logic.importer.ImportCleanup;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.pdf.search.indexing.PdfIndexer;
 import org.jabref.logic.util.OS;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
@@ -381,34 +380,20 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
             switch (ControlHelper.getDroppingMouseLocation(row, event)) {
                 case TOP, BOTTOM -> importHandler.importFilesInBackground(files).executeWith(Globals.TASK_EXECUTOR);
                 case CENTER -> {
-                    try {
-                        BibEntry entry = target.getEntry();
-                        switch (event.getTransferMode()) {
-                            case LINK -> {
-                                LOGGER.debug("Mode LINK"); // shift on win or no modifier
-                                importHandler.getLinker().addFilesToEntry(entry, files);
-                            }
-                            case MOVE -> {
-                                LOGGER.debug("Mode MOVE"); // alt on win
-                                try (AutoCloseable blocker = libraryTab.getIndexingTaskManager().blockNewTasks()) {
-                                    importHandler.getLinker().moveFilesToFileDirAndAddToEntry(entry, files);
-                                } catch (Exception e) {
-                                    LOGGER.error("Could not block IndexingTaskManager", e);
-                                }
-                                libraryTab.getIndexingTaskManager().addToIndex(PdfIndexer.of(database, filePreferences), entry, database);
-                            }
-                            case COPY -> {
-                                LOGGER.debug("Mode Copy"); // ctrl on win
-                                try (AutoCloseable blocker = libraryTab.getIndexingTaskManager().blockNewTasks()) {
-                                    importHandler.getLinker().copyFilesToFileDirAndAddToEntry(entry, files);
-                                } catch (Exception e) {
-                                    LOGGER.error("Could not block IndexingTaskManager", e);
-                                }
-                                libraryTab.getIndexingTaskManager().addToIndex(PdfIndexer.of(database, filePreferences), entry, database);
-                            }
+                    BibEntry entry = target.getEntry();
+                    switch (event.getTransferMode()) {
+                        case LINK -> {
+                            LOGGER.debug("Mode LINK"); // shift on win or no modifier
+                            importHandler.getLinker().addFilesToEntry(entry, files);
                         }
-                    } catch (IOException e) {
-                        LOGGER.error("Failed to obtain PDFIndexer.", e);
+                        case MOVE -> {
+                            LOGGER.debug("Mode MOVE"); // alt on win
+                            importHandler.getLinker().moveFilesToFileDirAndAddToEntry(entry, files, libraryTab.getIndexingTaskManager());
+                        }
+                        case COPY -> {
+                            LOGGER.debug("Mode Copy"); // ctrl on win
+                            importHandler.getLinker().copyFilesToFileDirAndAddToEntry(entry, files, libraryTab.getIndexingTaskManager());
+                        }
                     }
                 }
             }
