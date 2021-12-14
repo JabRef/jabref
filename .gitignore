@@ -472,5 +472,3 @@ lib/ojdbc.jar
 
 # do not ignore JabRef icons (they are ignored by the macos setting above)
 !src/main/java/org/jabref/gui/icon
-
-JabRef_Main.xml
