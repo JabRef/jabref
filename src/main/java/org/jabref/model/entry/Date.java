@@ -62,7 +62,6 @@ public class Date {
     }
 
     /**
-     * CS427 Issue link: https://github.com/JabRef/jabref/issues/7864
      * Creates a Date from date and endDate.
      *
      * @param date the start date
