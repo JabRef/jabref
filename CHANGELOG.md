@@ -56,6 +56,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 
 ### Fixed
 
+- We fixed an issue where an exception occurred when pasting an entry with a publication date-range of the form 1910/1917 [#7864](https://github.com/JabRef/jabref/issues/7864)
 - We fixed an issue where an exception occured when a preview style was edited and afterwards another preview style selected. [#8280](https://github.com/JabRef/jabref/issues/8280)
 - We fixed an issue where the actions to move a file to a directory were incorrectly disabled. [#7908](https://github.com/JabRef/jabref/issues/7908)
 - We fixed an issue where an exception occurred when a linked online file was edited in the entry editor [#8008](https://github.com/JabRef/jabref/issues/8008)
