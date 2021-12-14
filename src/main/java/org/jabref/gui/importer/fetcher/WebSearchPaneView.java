@@ -2,7 +2,6 @@ package org.jabref.gui.importer.fetcher;
 
 import javafx.css.PseudoClass;
 import javafx.geometry.Pos;
-import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
@@ -15,15 +14,10 @@ import javafx.scene.layout.VBox;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
-import org.jabref.gui.actions.Action;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.help.HelpAction;
-import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.search.SearchTextField;
-import org.jabref.gui.sidepane.SidePane;
-import org.jabref.gui.sidepane.SidePaneComponent;
-import org.jabref.gui.sidepane.SidePaneType;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.logic.l10n.Localization;
@@ -31,27 +25,20 @@ import org.jabref.preferences.PreferencesService;
 
 import com.tobiasdiez.easybind.EasyBind;
 
-public class WebSearchPane extends SidePaneComponent {
+public class WebSearchPaneView extends VBox {
 
     private static final PseudoClass QUERY_INVALID = PseudoClass.getPseudoClass("invalid");
 
-    private final PreferencesService preferences;
     private final WebSearchPaneViewModel viewModel;
+    private final PreferencesService preferences;
 
-    public WebSearchPane(SidePane sidePane, PreferencesService preferences, DialogService dialogService, StateManager stateManager) {
-        super(sidePane, IconTheme.JabRefIcons.WWW, Localization.lang("Web search"));
+    public WebSearchPaneView(PreferencesService preferences, DialogService dialogService, StateManager stateManager) {
         this.preferences = preferences;
         this.viewModel = new WebSearchPaneViewModel(preferences, dialogService, stateManager);
+        initialize();
     }
 
-    @Override
-    public Action getToggleAction() {
-        return StandardActions.TOGGLE_WEB_SEARCH;
-    }
-
-    @Override
-    protected Node createContentPane() {
-        // Setup combo box for fetchers
+    private void initialize() {
         ComboBox<SearchBasedFetcher> fetchers = new ComboBox<>();
         new ViewModelListCellFactory<SearchBasedFetcher>()
                 .withText(SearchBasedFetcher::getName)
@@ -90,7 +77,7 @@ public class WebSearchPane extends SidePaneComponent {
                     }
                 });
 
-        // Allows to trigger search on pressing enter
+        // Allows triggering search on pressing enter
         query.setOnKeyPressed(event -> {
             if (event.getCode() == KeyCode.ENTER) {
                 viewModel.search();
@@ -102,30 +89,7 @@ public class WebSearchPane extends SidePaneComponent {
         search.setDefaultButton(false);
         search.setOnAction(event -> viewModel.search());
 
-        // Put everything together
-        VBox container = new VBox();
-        container.setAlignment(Pos.CENTER);
-        container.getChildren().addAll(fetcherContainer, query, search);
-        return container;
-    }
-
-    @Override
-    public SidePaneType getType() {
-        return SidePaneType.WEB_SEARCH;
-    }
-
-    @Override
-    public void beforeClosing() {
-        preferences.getSidePanePreferences().visiblePanes().remove(SidePaneType.WEB_SEARCH);
-    }
-
-    @Override
-    public void afterOpening() {
-        preferences.getSidePanePreferences().visiblePanes().add(SidePaneType.WEB_SEARCH);
-    }
-
-    @Override
-    public Priority getResizePolicy() {
-        return Priority.NEVER;
+        setAlignment(Pos.CENTER);
+        getChildren().addAll(fetcherContainer, query, search);
     }
 }
