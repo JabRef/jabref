@@ -289,8 +289,6 @@ public interface PreferencesService {
 
     XmpPreferences getXmpPreferences();
 
-    void storeXmpPreferences(XmpPreferences preferences);
-
     NameFormatterPreferences getNameFormatterPreferences();
 
     AutoCompletePreferences getAutoCompletePreferences();

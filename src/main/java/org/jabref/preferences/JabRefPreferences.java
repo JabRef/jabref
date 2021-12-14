@@ -448,6 +448,7 @@ public class JabRefPreferences implements PreferencesService {
     private InternalPreferences internalPreferences;
     private SpecialFieldsPreferences specialFieldsPreferences;
     private GroupsPreferences groupsPreferences;
+    private XmpPreferences xmpPreferences;
 
     // The constructor is made private to enforce this as a singleton class:
     private JabRefPreferences() {
@@ -2666,16 +2667,23 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public XmpPreferences getXmpPreferences() {
-        return new XmpPreferences(
+        if (Objects.nonNull(xmpPreferences)) {
+            return xmpPreferences;
+        }
+
+        xmpPreferences = new XmpPreferences(
                 getBoolean(USE_XMP_PRIVACY_FILTER),
                 getStringList(XMP_PRIVACY_FILTERS).stream().map(FieldFactory::parseField).collect(Collectors.toSet()),
-                getKeywordDelimiter());
-    }
+                getInternalPreferences().keywordSeparatorProperty());
 
-    @Override
-    public void storeXmpPreferences(XmpPreferences preferences) {
-        putBoolean(USE_XMP_PRIVACY_FILTER, preferences.shouldUseXmpPrivacyFilter());
-        putStringList(XMP_PRIVACY_FILTERS, preferences.getXmpPrivacyFilter().stream().map(Field::getName).collect(Collectors.toList()));
+        EasyBind.listen(xmpPreferences.useXmpPrivacyFilterProperty(),
+                (obs, oldValue, newValue) -> putBoolean(USE_XMP_PRIVACY_FILTER, newValue));
+        xmpPreferences.getXmpPrivacyFilter().addListener((SetChangeListener<Field>) c ->
+                putStringList(XMP_PRIVACY_FILTERS, xmpPreferences.getXmpPrivacyFilter().stream()
+                                                                 .map(Field::getName)
+                                                                 .collect(Collectors.toList())));
+
+        return xmpPreferences;
     }
 
     @Override
