@@ -90,9 +90,11 @@ public class PdfEmbeddedBibFileImporter extends Importer {
                     allParsedEntries.addAll(extractAndParseFiles(names));
                 } else {
                     List<PDNameTreeNode<PDComplexFileSpecification>> kids = efTree.getKids();
-                    for (PDNameTreeNode<PDComplexFileSpecification> node : kids) {
-                        names = node.getNames();
-                        allParsedEntries.addAll(extractAndParseFiles(names));
+                    if (kids != null) {
+                        for (PDNameTreeNode<PDComplexFileSpecification> node : kids) {
+                            names = node.getNames();
+                            allParsedEntries.addAll(extractAndParseFiles(names));
+                        }
                     }
                 }
             }

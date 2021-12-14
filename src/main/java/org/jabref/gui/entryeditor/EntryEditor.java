@@ -365,7 +365,7 @@ public class EntryEditor extends BorderPane {
                 preferencesService.getImportFormatPreferences(),
                 preferencesService.getFilePreferences(),
                 databaseContext,
-                preferencesService.getDefaultEncoding());
+                preferencesService.getGeneralPreferences().getDefaultEncoding());
         for (EntryBasedFetcher fetcher : entryBasedFetchers) {
             MenuItem fetcherMenuItem = new MenuItem(fetcher.getName());
             if (fetcher instanceof PdfMergeMetadataImporter.EntryBasedFetcherWrapper) {
@@ -378,7 +378,7 @@ public class EntryEditor extends BorderPane {
                                     preferencesService.getImportFormatPreferences(),
                                     preferencesService.getFilePreferences(),
                                     databaseContext,
-                                    preferencesService.getDefaultEncoding());
+                                    preferencesService.getGeneralPreferences().getDefaultEncoding());
                     fetchAndMerge(pdfMergeMetadataImporter);
                 });
             } else {

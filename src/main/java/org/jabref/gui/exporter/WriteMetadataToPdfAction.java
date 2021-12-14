@@ -30,7 +30,6 @@ import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.bibtex.FieldWriterPreferences;
 import org.jabref.logic.exporter.EmbeddedBibFilePdfExporter;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.logic.xmp.XmpUtilWriter;
@@ -133,7 +132,7 @@ public class WriteMetadataToPdfAction extends SimpleCommand {
                                     .map(file -> file.findIn(stateManager.getActiveDatabase().get(), filePreferences))
                                     .filter(Optional::isPresent)
                                     .map(Optional::get)
-                                    .filter(path -> StandardFileType.PDF.getExtensions().contains(FileUtil.getFileExtension(path)))
+                                    .filter(path -> FileUtil.isPDFFile(path))
                                     .collect(Collectors.toList());
 
             Platform.runLater(() -> optionsDialog.getProgressArea()

@@ -397,7 +397,7 @@
     </choose>
   </macro>
   <macro name="locator">
-    <group delimiter=" " prefix=", " suffix=".">
+    <group delimiter="&#160;" prefix=", " suffix=".">
       <choose>
         <if type="thesis" match="all" locator="page">
           <text value="f."/>
@@ -450,7 +450,10 @@
   <macro name="page-chapter">
     <choose>
       <if match="none" locator="page">
-        <text variable="page" prefix="p. "/>
+        <group delimiter="&#160;">
+          <label variable="page" form="short"/>
+          <text variable="page"/>
+        </group>
       </if>
     </choose>
   </macro>

@@ -54,7 +54,7 @@
   </macro>
   <macro name="author-short">
     <names variable="author">
-      <name form="short" delimiter="_" delimiter-precedes-last="always"/>
+      <name form="short" delimiter="_" delimiter-precedes-last="always" et-al-min="11" et-al-use-first="10"/>
       <substitute>
         <names variable="editor"/>
         <names variable="translator"/>
@@ -125,7 +125,7 @@
   <macro name="edition">
     <text variable="edition"/>
   </macro>
-  <citation et-al-min="11" et-al-use-first="10" disambiguate-add-year-suffix="true" disambiguate-add-names="false" disambiguate-add-givenname="false" collapse="year">
+  <citation disambiguate-add-year-suffix="true" disambiguate-add-names="false" disambiguate-add-givenname="false" collapse="year">
     <sort>
       <key macro="author"/>
       <key variable="issued"/>
@@ -134,7 +134,7 @@
       <text macro="citeKey"/>
     </layout>
   </citation>
-  <bibliography hanging-indent="false" et-al-min="11" et-al-use-first="10">
+  <bibliography hanging-indent="false">
     <sort>
       <key macro="author"/>
       <key variable="issued"/>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<style xmlns="http://purl.org/net/xbiblio/csl" version="1.0" class="note" default-locale="fr-FR">
+  <info>
+    <title>Bulletin archéologique des Écoles françaises à l’étranger (Français)</title>
+    <id>http://www.zotero.org/styles/bulletin-archeologique-des-ecoles-francaises-a-l-etranger</id>
+    <link href="http://www.zotero.org/styles/bulletin-archeologique-des-ecoles-francaises-a-l-etranger" rel="self"/>
+    <link href="http://www.zotero.org/styles/bulletin-de-correspondance-hellenique" rel="independent-parent"/>
+    <link href="https://www.efa.gr/fichespratiques/" rel="documentation"/>
+    <author>
+      <name>Nicolas Monteix</name>
+      <email>nicolas.monteix@univ-rouen.fr</email>
+    </author>
+    <category citation-format="note"/>
+    <category field="history"/>
+    <category field="anthropology"/>
+    <eissn>2732-687X</eissn>
+    <summary>Author-date style for Bulletin archéologique des Écoles françaises à l’étranger. Part of the style cannot be rendered automatically: some series (CID, EAD, FD, etc.) must be manually rendered; translated ancient texts are to be dealt by hand. Version 2021/07/01</summary>
+    <updated>2021-11-04T11:00:00+01:00</updated>
+    <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
+  </info>
+</style>

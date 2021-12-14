@@ -1,6 +1,5 @@
 package org.jabref.gui.desktop.os;
 
-import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -34,7 +33,8 @@ public class OSX implements NativeDesktop {
 
     @Override
     public void openFolderAndSelectFile(Path file) throws IOException {
-        Desktop.getDesktop().open(file.getParent().toFile());
+        String[] cmd = {"/usr/bin/open", "-R", file.toString()};
+        Runtime.getRuntime().exec(cmd);
     }
 
     @Override

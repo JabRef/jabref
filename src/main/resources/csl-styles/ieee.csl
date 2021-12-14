@@ -237,7 +237,7 @@
               <date-part name="month" form="short" suffix=" "/>
               <date-part name="day" form="numeric-leading-zeros" suffix=", "/>
               <date-part name="year"/>
-              </date>
+            </date>
           </group>
           <!-- [Online Video]. -->
           <group prefix="[" suffix="]" delimiter=" ">
@@ -322,7 +322,7 @@
       <choose>
         <!-- Specific Formats -->
         <if type="article-journal">
-          <group delimiter=", " >
+          <group delimiter=", ">
             <text macro="title"/>
             <text variable="container-title" font-style="italic" form="short"/>
             <text macro="locators"/>
@@ -331,13 +331,13 @@
             <text macro="status"/>
           </group>
           <choose>
-          <if variable="URL DOI" match="none">
-            <text value="." />
-          </if>
-          <else>
-            <text value="," />
-          </else>
-        </choose>
+            <if variable="URL DOI" match="none">
+              <text value="."/>
+            </if>
+            <else>
+              <text value=","/>
+            </else>
+          </choose>
           <text macro="access"/>
         </if>
         <else-if type="paper-conference speech" match="any">
@@ -352,16 +352,16 @@
           <text macro="access"/>
         </else-if>
         <else-if type="report">
-            <group delimiter=", " suffix=".">
-              <text macro="title"/>
-              <text macro="publisher"/>
-              <group delimiter=" ">
-                <text variable="genre"/>
-                <text variable="number"/>
-              </group>
-              <text macro="issued"/>
+          <group delimiter=", " suffix=".">
+            <text macro="title"/>
+            <text macro="publisher"/>
+            <group delimiter=" ">
+              <text variable="genre"/>
+              <text variable="number"/>
             </group>
-            <text macro="access"/>
+            <text macro="issued"/>
+          </group>
+          <text macro="access"/>
         </else-if>
         <else-if type="thesis">
           <group delimiter=", " suffix=".">
@@ -388,7 +388,7 @@
           </group>
           <text macro="access"/>
         </else-if>
-		    <!-- Online Video -->
+        <!-- Online Video -->
         <else-if type="motion_picture">
           <text macro="geographic-location" suffix=". "/>
           <group delimiter=", " suffix=".">

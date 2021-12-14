@@ -12,6 +12,7 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.testutils.category.FetcherTest;
 
+import com.google.common.base.Optional;
 import org.apache.lucene.queryparser.flexible.core.QueryNodeParseException;
 import org.apache.lucene.queryparser.flexible.core.parser.SyntaxParser;
 import org.apache.lucene.queryparser.flexible.standard.parser.StandardSyntaxParser;
@@ -20,7 +21,6 @@ import org.junit.jupiter.api.Test;
 
 import static org.jabref.logic.importer.fetcher.transformers.AbstractQueryTransformer.NO_EXPLICIT_FIELD;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 
 @FetcherTest
 class ACMPortalFetcherTest {
@@ -57,8 +57,7 @@ class ACMPortalFetcherTest {
         for (BibEntry bibEntry : fetchedEntries) {
             bibEntry.clearField(StandardField.ABSTRACT);
         }
-        assertFalse(fetchedEntries.isEmpty());
-        assertEquals(searchEntry, fetchedEntries.get(0));
+        assertEquals(Optional.of(searchEntry), fetchedEntries.stream().findFirst());
     }
 
     @Test

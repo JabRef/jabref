@@ -1,22 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" demote-non-dropping-particle="sort-only" default-locale="en-GB">
   <info>
-    <title>Cite Them Right 10th edition - Harvard</title>
+    <title>Cite Them Right 11th edition - Harvard</title>
     <id>http://www.zotero.org/styles/harvard-cite-them-right</id>
     <link href="http://www.zotero.org/styles/harvard-cite-them-right" rel="self"/>
-    <link href="http://www.zotero.org/styles/harvard-university-of-greenwich" rel="template"/>
+    <link href="http://www.zotero.org/styles/harvard-cite-them-right-10th-edition" rel="template"/>
     <link href="http://www.citethemrightonline.com/" rel="documentation"/>
     <author>
-      <name>Sebastian Karcher</name>
+      <name>Patrick O'Brien</name>
     </author>
-    <contributor>
-      <name>Scott Wagstaff</name>
-      <uri>http://www.mendeley.com/profiles/scott-wagstaff/</uri>
-    </contributor>
     <category citation-format="author-date"/>
     <category field="generic-base"/>
-    <summary>Harvard according to Cite Them Right, 10th edition.</summary>
-    <updated>2017-05-17T00:00:00+00:00</updated>
+    <summary>Harvard according to Cite Them Right, 11th edition.</summary>
+    <updated>2021-09-01T07:43:59+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="en-GB">
@@ -38,7 +34,7 @@
         <choose>
           <if variable="container-author" match="none">
             <names variable="editor translator" delimiter=", ">
-              <name and="text" initialize-with=". " delimiter=", " sort-separator=", " name-as-sort-order="all"/>
+              <name and="text" initialize-with="." name-as-sort-order="all"/>
               <label form="short" prefix=" (" suffix=")"/>
             </names>
           </if>
@@ -51,7 +47,7 @@
       <if type="chapter paper-conference" match="none">
         <names variable="editor translator" delimiter=". ">
           <label form="verb" text-case="capitalize-first" suffix=" "/>
-          <name and="text" initialize-with=". " delimiter=", "/>
+          <name and="text" initialize-with="."/>
         </names>
       </if>
       <else-if variable="container-author" match="any">
@@ -64,7 +60,7 @@
   </macro>
   <macro name="author">
     <names variable="author">
-      <name and="text" delimiter-precedes-last="never" initialize-with=". " name-as-sort-order="all"/>
+      <name and="text" delimiter-precedes-last="never" initialize-with="." name-as-sort-order="all"/>
       <label form="short" prefix=" (" suffix=")"/>
       <et-al font-style="italic"/>
       <substitute>
@@ -102,7 +98,7 @@
   <macro name="access">
     <choose>
       <if variable="DOI">
-        <text variable="DOI" prefix="doi: "/>
+        <text variable="DOI" prefix="doi:"/>
       </if>
       <else-if variable="URL">
         <text term="available at" suffix=": " text-case="capitalize-first"/>
@@ -130,10 +126,13 @@
   </macro>
   <macro name="title">
     <choose>
-      <if type="bill book graphic legal_case legislation motion_picture report song thesis webpage" match="any">
+      <if type="bill book legal_case legislation motion_picture report song thesis webpage graphic" match="any">
         <group delimiter=". ">
           <group delimiter=" ">
-            <text variable="title" font-style="italic"/>
+            <group delimiter=" ">
+              <text variable="title" font-style="italic"/>
+              <text variable="medium" prefix="[" suffix="]"/>
+            </group>
             <text macro="number-volumes"/>
           </group>
           <text macro="edition"/>
@@ -231,7 +230,18 @@
     <choose>
       <if variable="container-title">
         <group delimiter=". ">
-          <text variable="container-title" font-style="italic"/>
+          <group delimiter=" ">
+            <text variable="container-title" font-style="italic"/>
+            <choose>
+              <if type="article article-journal" match="any">
+                <choose>
+                  <if match="none" variable="page volume">
+                    <text value="Preprint" prefix="[" suffix="]"/>
+                  </if>
+                </choose>
+              </if>
+            </choose>
+          </group>
           <text macro="edition"/>
         </group>
       </if>

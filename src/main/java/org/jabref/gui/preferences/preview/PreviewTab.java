@@ -26,6 +26,7 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
+import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.preferences.PreferencesTab;
 import org.jabref.gui.preview.PreviewViewer;
@@ -40,6 +41,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
+import org.controlsfx.control.textfield.CustomTextField;
 import org.fxmisc.richtext.CodeArea;
 import org.fxmisc.richtext.LineNumberFactory;
 
@@ -56,6 +58,7 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> i
     @FXML private Button resetDefaultButton;
     @FXML private Tab previewTab;
     @FXML private CodeArea editArea;
+    @FXML private CustomTextField searchBox;
 
     @Inject private StateManager stateManager;
     @Inject private ThemeManager themeManager;
@@ -101,6 +104,9 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> i
     }
 
     public void initialize() {
+        searchBox.setPromptText(Localization.lang("Search") + "...");
+        searchBox.setLeft(IconTheme.JabRefIcons.SEARCH.getGraphicNode());
+
         this.viewModel = new PreviewTabViewModel(dialogService, preferencesService, taskExecutor, stateManager);
 
         lastKeyPressTime = System.currentTimeMillis();
@@ -117,7 +123,7 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> i
 
         showAsTabCheckBox.selectedProperty().bindBidirectional(viewModel.showAsExtraTabProperty());
 
-        availableListView.itemsProperty().bindBidirectional(viewModel.availableListProperty());
+        availableListView.setItems(viewModel.getFilteredPreviews());
         viewModel.availableSelectionModelProperty().setValue(availableListView.getSelectionModel());
         new ViewModelListCellFactory<PreviewLayout>()
                 .withText(PreviewLayout::getDisplayName)
@@ -127,6 +133,7 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> i
         availableListView.setOnDragDropped(event -> dragDropped(viewModel.availableListProperty(), event));
         availableListView.setOnKeyTyped(event -> jumpToSearchKey(availableListView, event));
         availableListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+        availableListView.selectionModelProperty().getValue().selectedItemProperty().addListener((observable, oldValue, newValue) -> viewModel.setPreviewLayout(newValue));
 
         chosenListView.itemsProperty().bindBidirectional(viewModel.chosenListProperty());
         viewModel.chosenSelectionModelProperty().setValue(chosenListView.getSelectionModel());
@@ -149,14 +156,19 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> i
 
         previewTab.setContent(new PreviewViewer(new BibDatabaseContext(), dialogService, stateManager, themeManager));
         ((PreviewViewer) previewTab.getContent()).setEntry(TestEntry.getTestEntry());
+
         EasyBind.subscribe(viewModel.layoutProperty(), value -> ((PreviewViewer) previewTab.getContent()).setLayout(value));
-        previewTab.getContent().visibleProperty().bind(viewModel.chosenSelectionModelProperty().getValue().selectedItemProperty().isNotNull());
+        previewTab.getContent().visibleProperty().bind(viewModel.chosenSelectionModelProperty().getValue().selectedItemProperty().isNotNull()
+                                                       .or(viewModel.availableSelectionModelProperty().getValue().selectedItemProperty().isNotNull()));
 
         editArea.clear();
         editArea.setParagraphGraphicFactory(LineNumberFactory.get(editArea));
         editArea.setContextMenu(contextMenu);
-        editArea.visibleProperty().bind(viewModel.chosenSelectionModelProperty().getValue().selectedItemProperty().isNotNull());
-        viewModel.sourceTextProperty().addListener((observable, oldValue, newValue) -> editArea.replaceText(newValue));
+        editArea.visibleProperty().bind(viewModel.chosenSelectionModelProperty().getValue().selectedItemProperty().isNotNull()
+                                        .or(viewModel.availableSelectionModelProperty().getValue().selectedItemProperty().isNotNull()));
+        viewModel.sourceTextProperty().addListener((observable, oldValue, newValue) -> {
+            editArea.replaceText(newValue);
+        });
         editArea.textProperty().addListener((observable, oldValue, newValue) -> {
             viewModel.sourceTextProperty().setValue(newValue);
             editArea.setStyleSpans(0, viewModel.computeHighlighting(newValue));
@@ -165,6 +177,10 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> i
             if (!newValue) {
                 viewModel.refreshPreview();
             }
+        });
+
+        searchBox.textProperty().addListener((observable, previousText, searchTerm) -> {
+            viewModel.setFilterPredicate(searchTerm);
         });
 
         readOnlyLabel.visibleProperty().bind(viewModel.selectedIsEditableProperty().not());
@@ -190,7 +206,7 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> i
             return;
         }
 
-        if (System.currentTimeMillis() - lastKeyPressTime < 1000) {
+        if ((System.currentTimeMillis() - lastKeyPressTime) < 1000) {
             listSearchTerm += keypressed.getCharacter().toLowerCase();
         } else {
             listSearchTerm = keypressed.getCharacter().toLowerCase();

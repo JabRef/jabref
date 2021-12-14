@@ -30,7 +30,8 @@ public enum Language {
     VIETNAMESE("Vietnamese", "vi"),
     GREEK("ελληνικά", "el"),
     TAGALOG("Tagalog/Filipino", "tl"),
-    POLISH("Polish", "pl");
+    POLISH("Polish", "pl"),
+    KOREAN("Korean (한국어)", "ko");
 
     private final String displayName;
     private final String id;

@@ -102,10 +102,10 @@ public class OpenDatabaseAction extends SimpleCommand {
      */
     private Path getInitialDirectory() {
         if (frame.getBasePanelCount() == 0) {
-            return preferencesService.getWorkingDir();
+            return preferencesService.getFilePreferences().getWorkingDirectory();
         } else {
             Optional<Path> databasePath = frame.getCurrentLibraryTab().getBibDatabaseContext().getDatabasePath();
-            return databasePath.map(Path::getParent).orElse(preferencesService.getWorkingDir());
+            return databasePath.map(Path::getParent).orElse(preferencesService.getFilePreferences().getWorkingDirectory());
         }
     }
 
@@ -189,7 +189,7 @@ public class OpenDatabaseAction extends SimpleCommand {
 
         dialogService.notify(Localization.lang("Opening") + ": '" + file + "'");
 
-        preferencesService.setWorkingDirectory(fileToLoad.getParent());
+        preferencesService.getFilePreferences().setWorkingDirectory(fileToLoad.getParent());
 
         if (BackupManager.backupFileDiffers(fileToLoad)) {
             BackupUIManager.showRestoreBackupDialog(dialogService, fileToLoad);
@@ -198,6 +198,7 @@ public class OpenDatabaseAction extends SimpleCommand {
         ParserResult result;
         try {
             result = OpenDatabase.loadDatabase(fileToLoad,
+                    preferencesService.getGeneralPreferences(),
                     preferencesService.getImportFormatPreferences(),
                     Globals.getFileUpdateMonitor());
         } catch (IOException e) {

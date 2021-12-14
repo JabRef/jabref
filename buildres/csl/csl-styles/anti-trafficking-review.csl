@@ -1,0 +1,384 @@
+<?xml version="1.0" encoding="utf-8"?>
+<style xmlns="http://purl.org/net/xbiblio/csl" class="note" version="1.0" demote-non-dropping-particle="display-and-sort" page-range-format="chicago" default-locale="en-GB">
+  <info>
+    <title>Anti-Trafficking Review</title>
+    <title-short>ATR</title-short>
+    <id>http://www.zotero.org/styles/anti-trafficking-review</id>
+    <link href="http://www.zotero.org/styles/anti-trafficking-review" rel="self"/>
+    <link href="http://www.zotero.org/styles/american-sociological-association" rel="template"/>
+    <link href="https://antitraffickingreview.org/index.php/atrjournal/about/submissions" rel="documentation"/>
+    <author>
+      <name>Borislav Gerasimov</name>
+      <email>atr@gaatw.org</email>
+    </author>
+    <category citation-format="note"/>
+    <category field="generic-base"/>
+    <issn>2286-7511</issn>
+    <eissn>2287-0113</eissn>
+    <summary>ATR referencing style guide</summary>
+    <updated>2021-10-06T13:48:35+00:00</updated>
+    <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
+  </info>
+  <locale xml:lang="en">
+    <terms>
+      <term name="version">version 1.2</term>
+    </terms>
+  </locale>
+  <macro name="editor-note">
+    <names variable="editor">
+      <name delimiter=" " and="text" delimiter-precedes-last="always" initialize-with=""/>
+      <label form="short" prefix=" (" suffix=")"/>
+    </names>
+  </macro>
+  <macro name="anon-note">
+    <text term="anonymous" form="short" text-case="capitalize-first" strip-periods="true"/>
+  </macro>
+  <macro name="author-note">
+    <names variable="author">
+      <name delimiter=" " and="text" delimiter-precedes-last="always" initialize-with=""/>
+      <label form="short" prefix=", "/>
+      <substitute>
+        <names variable="editor"/>
+        <names variable="translator"/>
+        <choose>
+          <if type="report">
+            <text variable="publisher"/>
+          </if>
+        </choose>
+        <text macro="anon-note"/>
+      </substitute>
+    </names>
+  </macro>
+  <macro name="access-note">
+    <group>
+      <choose>
+        <if type="webpage post-weblog post" match="any">
+          <group delimiter=" ">
+            <text term="retrieved" text-case="lowercase"/>
+            <date variable="accessed" form="text" suffix=", "/>
+            <text variable="URL" suffix="."/>
+          </group>
+        </if>
+        <else-if type="article-journal report" match="any">
+          <text variable="DOI" prefix="https://doi.org/"/>
+        </else-if>
+      </choose>
+    </group>
+  </macro>
+  <macro name="title-note">
+    <choose>
+      <if type="thesis">
+        <text variable="title" text-case="title"/>
+      </if>
+      <else-if type="book" variable="version" match="all">
+        <text variable="title" font-style="italic"/>
+      </else-if>
+      <else-if type="bill book graphic legal_case legislation motion_picture report song" match="any">
+        <text variable="title" font-style="italic" text-case="title"/>
+      </else-if>
+      <else>
+        <text variable="title" text-case="title" quotes="true" suffix=","/>
+      </else>
+    </choose>
+  </macro>
+  <macro name="publisher-note">
+    <choose>
+      <if type="thesis manuscript">
+        <group delimiter=", ">
+          <text variable="publisher"/>
+          <text variable="publisher-place" suffix="."/>
+          <choose>
+            <if type="manuscript" match="any">
+              <group delimiter=" ">
+                <text variable="genre"/>
+                <text variable="number"/>
+              </group>
+            </if>
+          </choose>
+        </group>
+      </if>
+      <else>
+        <group delimiter=", ">
+          <text variable="publisher"/>
+          <text variable="publisher-place"/>
+          <group delimiter=" ">
+            <date date-parts="year" form="numeric" variable="issued" suffix="."/>
+          </group>
+        </group>
+      </else>
+    </choose>
+  </macro>
+  <macro name="year-sort-note">
+    <choose>
+      <if variable="issued">
+        <date date-parts="year" form="numeric" variable="issued" suffix=","/>
+      </if>
+      <else>
+        <text term="no date" form="short"/>
+      </else>
+    </choose>
+  </macro>
+  <macro name="day-month-note">
+    <date form="text" variable="issued">
+      <date-part name="month" range-delimiter=""/>
+      <date-part name="year"/>
+    </date>
+  </macro>
+  <macro name="pages-note">
+    <label text-case="lowercase" suffix=" " variable="page" form="short"/>
+    <text variable="page"/>
+  </macro>
+  <macro name="edition-note">
+    <choose>
+      <if is-numeric="edition">
+        <group delimiter=" ">
+          <number variable="edition" form="ordinal"/>
+          <text term="edition" form="short"/>
+        </group>
+      </if>
+      <else>
+        <text variable="edition" suffix=""/>
+      </else>
+    </choose>
+  </macro>
+  <macro name="volume-note">
+    <group delimiter=" ">
+      <label text-case="capitalize-first" variable="volume" form="short"/>
+      <text variable="volume"/>
+    </group>
+  </macro>
+  <macro name="report-note">
+    <choose>
+      <if type="report" match="any">
+        <group delimiter=" ">
+          <text variable="genre" font-style="italic"/>
+          <text variable="number"/>
+        </group>
+      </if>
+    </choose>
+  </macro>
+  <citation et-al-min="4" et-al-use-first="1" et-al-subsequent-min="3" et-al-subsequent-use-first="1" disambiguate-add-year-suffix="true" disambiguate-add-names="true" disambiguate-add-givenname="true" collapse="year">
+    <sort>
+      <key macro="author-note"/>
+      <key macro="year-sort-note"/>
+      <key variable="title"/>
+    </sort>
+    <layout suffix=". ">
+      <group delimiter=" ">
+        <text macro="author-note" suffix=", "/>
+      </group>
+      <choose>
+        <if type="article-newspaper article-magazine" match="any">
+          <group delimiter=" ">
+            <text macro="title-note" prefix=" " suffix=","/>
+          </group>
+          <group prefix=" " delimiter=", ">
+            <text variable="container-title" font-style="italic" text-case="title" suffix=", "/>
+          </group>
+          <group>
+            <text macro="day-month-note" suffix=", "/>
+            <group delimiter=" ">
+              <text term="retrieved"/>
+              <date variable="accessed" form="text" suffix=", "/>
+              <text variable="URL" suffix="."/>
+            </group>
+            <text variable="edition"/>
+            <text variable="page" suffix="."/>
+          </group>
+        </if>
+        <else-if type="thesis">
+          <text macro="title-note" prefix=" " suffix=" " quotes="true"/>
+          <group prefix=" " delimiter=", ">
+            <text macro="edition-note"/>
+            <text macro="editor-note" suffix="."/>
+            <text variable="genre"/>
+            <text macro="publisher-note"/>
+          </group>
+        </else-if>
+        <else-if type="book" variable="version" match="all">
+          <group prefix=" " delimiter=" ">
+            <group>
+              <text macro="title-note" suffix=" [computer program]"/>
+            </group>
+            <group delimiter=" ">
+              <text term="version" text-case="capitalize-first"/>
+              <text variable="version"/>
+            </group>
+            <text variable="URL"/>
+          </group>
+        </else-if>
+        <else-if type="bill book graphic legal_case legislation motion_picture report song" match="any">
+          <group delimiter=", ">
+            <text macro="title-note" prefix=" "/>
+            <text macro="volume-note"/>
+            <text macro="edition-note"/>
+            <text macro="editor-note" suffix="."/>
+            <text macro="report-note"/>
+            <text macro="publisher-note"/>
+          </group>
+        </else-if>
+        <else-if type="chapter paper-conference" match="any">
+          <group delimiter=" ">
+            <text macro="title-note" prefix=" " suffix=""/>
+            <group delimiter=", " suffix=", ">
+              <group delimiter=" ">
+                <text term="in" text-case="lowercase"/>
+                <group delimiter=", ">
+                  <text macro="editor-note"/>
+                  <text variable="container-title" font-style="italic"/>
+                  <text macro="volume-note"/>
+                </group>
+              </group>
+              <text variable="collection-title" font-style="italic"/>
+            </group>
+            <text macro="publisher-note"/>
+            <text variable="page" prefix=" pp. " suffix="."/>
+          </group>
+        </else-if>
+        <else-if type="speech" match="any">
+          <group delimiter=", ">
+            <group delimiter=". ">
+              <text macro="title-note"/>
+              <group delimiter=" ">
+                <text term="presented at" text-case="capitalize-first"/>
+                <text variable="event"/>
+              </group>
+            </group>
+            <text macro="day-month-note"/>
+            <text variable="event-place"/>
+          </group>
+        </else-if>
+        <else>
+          <group suffix=", ">
+            <text macro="title-note" prefix=" "/>
+            <text macro="editor-note" prefix=" "/>
+          </group>
+          <group prefix=" " suffix="" delimiter=" ">
+            <text variable="container-title" font-style="italic" suffix=", " text-case="title"/>
+            <group delimiter=",">
+              <group>
+                <text variable="volume" prefix="vol. " suffix=", "/>
+                <text variable="issue" prefix="issue " suffix=", "/>
+                <text macro="year-sort-note" suffix=""/>
+              </group>
+              <text variable="page" prefix=" pp. " suffix=", "/>
+            </group>
+          </group>
+        </else>
+      </choose>
+      <text prefix=" " macro="access-note"/>
+    </layout>
+  </citation>
+  <bibliography hanging-indent="false">
+    <sort>
+      <key macro="author-note"/>
+      <key macro="year-sort-note"/>
+      <key variable="title"/>
+    </sort>
+    <layout suffix=" ">
+      <group delimiter=" ">
+        <text macro="author-note" suffix=", "/>
+      </group>
+      <choose>
+        <if type="article-newspaper article-magazine" match="any">
+          <group delimiter=" ">
+            <text macro="title-note" prefix=" " suffix=","/>
+          </group>
+          <group prefix=" " delimiter=", ">
+            <text variable="container-title" font-style="italic" text-case="title" suffix=", "/>
+          </group>
+          <group>
+            <text macro="day-month-note" suffix=", "/>
+            <group delimiter=" ">
+              <text term="retrieved"/>
+              <date variable="accessed" form="text" suffix=", "/>
+              <text variable="URL" suffix="."/>
+            </group>
+            <text variable="edition"/>
+            <text variable="page" suffix="."/>
+          </group>
+        </if>
+        <else-if type="thesis">
+          <text macro="title-note" prefix=" " suffix=" " quotes="true"/>
+          <group prefix=" " delimiter=", ">
+            <text macro="edition-note"/>
+            <text macro="editor-note" suffix="."/>
+            <text variable="genre"/>
+            <text macro="publisher-note"/>
+          </group>
+        </else-if>
+        <else-if type="book" variable="version" match="all">
+          <group prefix=" " delimiter=" ">
+            <group>
+              <text macro="title-note" suffix=" [computer program]"/>
+            </group>
+            <group delimiter=" ">
+              <text term="version" text-case="capitalize-first"/>
+              <text variable="version"/>
+            </group>
+            <text variable="URL"/>
+          </group>
+        </else-if>
+        <else-if type="bill book graphic legal_case legislation motion_picture report song" match="any">
+          <group delimiter=", ">
+            <text macro="title-note" prefix=" "/>
+            <text macro="volume-note"/>
+            <text macro="edition-note"/>
+            <text macro="editor-note" suffix="."/>
+            <text macro="report-note"/>
+            <text macro="publisher-note"/>
+          </group>
+        </else-if>
+        <else-if type="chapter paper-conference" match="any">
+          <group delimiter=" ">
+            <text macro="title-note" prefix=" " suffix=""/>
+            <group delimiter=", " suffix=", ">
+              <group delimiter=" ">
+                <text macro="pages-note"/>
+                <text term="in" text-case="lowercase"/>
+                <group delimiter=". ">
+                  <text variable="container-title" font-style="italic"/>
+                  <text macro="volume-note"/>
+                </group>
+              </group>
+              <text variable="collection-title" font-style="italic"/>
+              <text macro="editor-note"/>
+            </group>
+            <text macro="publisher-note"/>
+          </group>
+        </else-if>
+        <else-if type="speech" match="any">
+          <group delimiter=", ">
+            <group delimiter=". ">
+              <text macro="title-note"/>
+              <group delimiter=" ">
+                <text term="presented at" text-case="capitalize-first"/>
+                <text variable="event"/>
+              </group>
+            </group>
+            <text macro="day-month-note"/>
+            <text variable="event-place"/>
+          </group>
+        </else-if>
+        <else>
+          <group suffix=", ">
+            <text macro="title-note" prefix=" "/>
+            <text macro="editor-note" prefix=" "/>
+          </group>
+          <group prefix=" " suffix="" delimiter=" ">
+            <text variable="container-title" font-style="italic" suffix=", " text-case="title"/>
+            <group delimiter=",">
+              <group>
+                <text variable="volume" prefix="vol. " suffix=", "/>
+                <text variable="issue" prefix="issue " suffix=", "/>
+                <text macro="year-sort-note" suffix=""/>
+              </group>
+              <text variable="page" prefix=" pp. " suffix=", "/>
+            </group>
+          </group>
+        </else>
+      </choose>
+      <text prefix=" " macro="access-note"/>
+    </layout>
+  </bibliography>
+</style>

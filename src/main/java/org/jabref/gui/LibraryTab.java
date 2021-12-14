@@ -80,7 +80,6 @@ public class LibraryTab extends Tab {
     private static final Logger LOGGER = LoggerFactory.getLogger(LibraryTab.class);
     private final JabRefFrame frame;
     private final CountingUndoManager undoManager;
-    private final SidePaneManager sidePaneManager;
     private final ExternalFileTypes externalFileTypes;
     private final DialogService dialogService;
     private final PreferencesService preferencesService;
@@ -130,7 +129,6 @@ public class LibraryTab extends Tab {
         bibDatabaseContext.getDatabase().registerListener(this);
         bibDatabaseContext.getMetaData().registerListener(this);
 
-        this.sidePaneManager = frame.getSidePaneManager();
         this.tableModel = new MainTableDataModel(getBibDatabaseContext(), preferencesService, stateManager);
 
         citationStyleCache = new CitationStyleCache(bibDatabaseContext);
@@ -471,8 +469,6 @@ public class LibraryTab extends Tab {
     }
 
     private void createMainTable() {
-        bibDatabaseContext.getDatabase().registerListener(SpecialFieldDatabaseChangeListener.INSTANCE);
-
         mainTable = new MainTable(tableModel,
                 this,
                 bibDatabaseContext,
@@ -695,10 +691,6 @@ public class LibraryTab extends Tab {
 
     public BibDatabaseContext getBibDatabaseContext() {
         return this.bibDatabaseContext;
-    }
-
-    public SidePaneManager getSidePaneManager() {
-        return sidePaneManager;
     }
 
     public boolean isSaving() {
