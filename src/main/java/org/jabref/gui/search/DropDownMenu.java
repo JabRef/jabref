@@ -93,6 +93,9 @@ public class DropDownMenu {
                 searchbarDropDown.show(searchField);
                 searchString.setFocusTraversable(false);
             }
+            searchbarDropDown.setOnHiding(event1 -> {
+                recentSearch.add(searchField.getText());
+            });
         });
 
         // addString action
@@ -166,9 +169,6 @@ public class DropDownMenu {
             searchString.clear();
             searchFieldSynchronizer.deleteAllEntries();
             searchString.setFocusTraversable(false);
-            searchbarDropDown.setOnHiding(event1 -> {
-                recentSearch.add(searchField.getText());
-            });
         });
 
         // authorButton action
