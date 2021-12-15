@@ -57,7 +57,11 @@ public class PersonNameStringConverterTest {
             "TRUE, BOTH, BOTH, 'Reagle, Jr., J. M.'"
     })
     void testToStringWithAutoCompletePreferences(boolean shouldAutoComplete, AutoCompleteFirstNameMode firstNameMode, AutoCompletePreferences.NameFormat nameFormat, String expectedResult) {
-        AutoCompletePreferences preferences = new AutoCompletePreferences(shouldAutoComplete, firstNameMode, nameFormat, null, null);
+        AutoCompletePreferences preferences = new AutoCompletePreferences(
+                shouldAutoComplete,
+                firstNameMode,
+                nameFormat,
+                null);
         PersonNameStringConverter converter = new PersonNameStringConverter(preferences);
         String formattedStr = converter.toString(author);
         assertEquals(expectedResult, formattedStr);
