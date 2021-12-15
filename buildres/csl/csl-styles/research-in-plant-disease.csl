@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="utf-8"?>
+<style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" page-range-format="expanded" demote-non-dropping-particle="sort-only" default-locale="en-GB">
+  <info>
+    <title>Research in Plant Disease</title>
+    <title-short>RPD</title-short>
+    <id>http://www.zotero.org/styles/research-in-plant-disease</id>
+    <link href="http://www.zotero.org/styles/research-in-plant-disease" rel="self"/>
+    <link href="http://www.zotero.org/styles/cellular-reprogramming" rel="template"/>
+    <link href="https://www.online-rpd.org/authors/authors.php?v_type=&amp;lang=en" rel="documentation"/>
+    <author>
+      <name>Patrick O'Brien</name>
+    </author>
+    <category citation-format="author-date"/>
+    <category field="biology"/>
+    <issn>1598-2262</issn>
+    <eissn>2233-9191</eissn>
+    <updated>2021-12-04T09:17:07+00:00</updated>
+    <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
+  </info>
+  <locale xml:lang="en">
+    <terms>
+      <term name="editor" form="verb-short">eds. by</term>
+    </terms>
+  </locale>
+  <macro name="author-short">
+    <names variable="author">
+      <name form="short" and="text"/>
+      <substitute>
+        <names variable="editor translator"/>
+        <text variable="title"/>
+      </substitute>
+    </names>
+  </macro>
+  <macro name="author-count">
+    <names variable="author">
+      <name form="count"/>
+    </names>
+  </macro>
+  <macro name="author">
+    <names variable="author">
+      <name and="text" delimiter-precedes-last="never" initialize-with=". " name-as-sort-order="all"/>
+      <label form="short" prefix=" (" suffix=")"/>
+      <substitute>
+        <names variable="editor translator"/>
+        <text variable="title"/>
+      </substitute>
+    </names>
+  </macro>
+  <macro name="issued">
+    <date variable="issued">
+      <date-part name="year"/>
+    </date>
+  </macro>
+  <macro name="publisher">
+    <group delimiter=", ">
+      <text variable="publisher-place"/>
+      <text variable="publisher"/>
+    </group>
+  </macro>
+  <macro name="editor">
+    <names variable="editor">
+      <label form="verb-short"/>
+      <name prefix=" " and="text" delimiter-precedes-last="never" initialize-with=". "/>
+    </names>
+  </macro>
+  <macro name="edition">
+    <choose>
+      <if is-numeric="edition">
+        <group delimiter=" ">
+          <number variable="edition" form="ordinal"/>
+          <label variable="edition" form="short"/>
+        </group>
+      </if>
+      <else>
+        <text variable="edition"/>
+      </else>
+    </choose>
+  </macro>
+  <citation et-al-min="3" et-al-use-first="1" disambiguate-add-year-suffix="true" collapse="year">
+    <sort>
+      <key macro="author-short" names-min="1" names-use-first="1"/>
+      <key macro="author-count" names-min="3" names-use-first="3"/>
+      <key macro="author" names-min="3" names-use-first="1"/>
+      <key macro="issued"/>
+      <key variable="title"/>
+    </sort>
+    <layout prefix="(" suffix=")" delimiter="; ">
+      <group delimiter=", ">
+        <text macro="author-short"/>
+        <text macro="issued"/>
+      </group>
+    </layout>
+  </citation>
+  <bibliography et-al-min="11" et-al-use-first="10">
+    <sort>
+      <key macro="author-short" names-min="1" names-use-first="1"/>
+      <key macro="author-count" names-min="3" names-use-first="3"/>
+      <key macro="author" names-min="3" names-use-first="1"/>
+      <key macro="issued"/>
+    </sort>
+    <layout suffix=".">
+      <group delimiter=". ">
+        <text macro="author"/>
+        <text macro="issued"/>
+        <choose>
+          <if type="article article-magazine article-newspaper article-journal review" match="any">
+            <group delimiter=". ">
+              <text variable="title" suffix="."/>
+              <group delimiter=" ">
+                <text variable="container-title" form="short" text-case="title" font-style="italic"/>
+                <group delimiter=": ">
+                  <text variable="volume"/>
+                  <text variable="page"/>
+                </group>
+              </group>
+            </group>
+          </if>
+          <else-if type="chapter paper-conference" match="any">
+            <group delimiter=". ">
+              <text variable="title" suffix="."/>
+              <group delimiter=", ">
+                <group delimiter=": ">
+                  <text term="in" text-case="capitalize-first"/>
+                  <text variable="container-title" text-case="title"/>
+                </group>
+                <text macro="editor"/>
+                <group delimiter=" ">
+                  <label variable="page" form="short"/>
+                  <text variable="page"/>
+                </group>
+              </group>
+              <text macro="publisher"/>
+            </group>
+          </else-if>
+          <else-if type="thesis">
+            <group delimiter=". ">
+              <text variable="title"/>
+              <text variable="genre"/>
+              <text variable="publisher"/>
+              <group delimiter=" ">
+                <text variable="number-of-pages"/>
+                <label variable="number-of-pages" form="short"/>
+              </group>
+            </group>
+          </else-if>
+          <else-if type="book" match="any">
+            <group delimiter=". ">
+              <text variable="title"/>
+              <text macro="edition"/>
+              <text macro="publisher"/>
+              <group delimiter=" ">
+                <text variable="number-of-pages"/>
+                <label variable="number-of-pages" form="short"/>
+              </group>
+            </group>
+          </else-if>
+          <else-if type="webpage post post-weblog" match="any">
+            <group delimiter=". ">
+              <text variable="container-title"/>
+              <group delimiter=" ">
+                <text variable="URL" prefix="URL "/>
+                <date form="text" variable="accessed" prefix="[" suffix="]"/>
+              </group>
+            </group>
+          </else-if>
+          <else>
+            <group delimiter=". ">
+              <text variable="title"/>
+              <text variable="container-title"/>
+              <text macro="publisher"/>
+            </group>
+          </else>
+        </choose>
+      </group>
+    </layout>
+  </bibliography>
+</style>
