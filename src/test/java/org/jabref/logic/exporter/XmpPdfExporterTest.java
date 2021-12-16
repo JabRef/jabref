@@ -37,9 +37,9 @@ class XmpPdfExporterTest {
 
     @TempDir static Path tempDir;
 
-    private static final BibEntry olly2018 = new BibEntry(StandardEntryType.Article);
-    private static final BibEntry toral2006 = new BibEntry(StandardEntryType.Article);
-    private static final BibEntry vapnik2000 = new BibEntry(StandardEntryType.Article);
+    private static BibEntry olly2018 = new BibEntry(StandardEntryType.Article);
+    private static BibEntry toral2006 = new BibEntry(StandardEntryType.Article);
+    private static BibEntry vapnik2000 = new BibEntry(StandardEntryType.Article);
 
     private PdfXmpImporter importer;
     private XmpPdfExporter exporter;
