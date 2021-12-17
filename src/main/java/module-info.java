@@ -103,7 +103,7 @@ open module org.jabref {
     requires org.tinylog.impl;
 
     provides org.tinylog.writers.Writer
-    with org.jabref.gui.logging.GuiAppender,
-         org.jabref.gui.logging.ApplicationInsightsAppender;
+    with org.jabref.gui.logging.GuiWriter,
+         org.jabref.gui.logging.ApplicationInsightsWriter;
 
 }

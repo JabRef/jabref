@@ -1,2 +1,2 @@
-org.jabreg.gui.logging.ApplicationInsightsAppender
-org.jabref.gui.logging.GuiAppender
+org.jabreg.gui.logging.ApplicationInsightsWriter
+org.jabref.gui.logging.GuiWriter

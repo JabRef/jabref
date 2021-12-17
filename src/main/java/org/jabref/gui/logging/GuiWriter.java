@@ -12,13 +12,13 @@ import org.tinylog.core.LogEntry;
 import org.tinylog.core.LogEntryValue;
 import org.tinylog.writers.AbstractFormatPatternWriter;
 
-public class GuiAppender extends AbstractFormatPatternWriter {
+public class GuiWriter extends AbstractFormatPatternWriter {
 
-    public GuiAppender(final Map<String, String> properties) {
+    public GuiWriter(final Map<String, String> properties) {
         super(properties);
     }
 
-    public GuiAppender() {
+    public GuiWriter() {
         this(Collections.emptyMap());
     }
 

@@ -14,13 +14,13 @@ import org.tinylog.core.LogEntry;
 import org.tinylog.core.LogEntryValue;
 import org.tinylog.writers.AbstractFormatPatternWriter;
 
-public class ApplicationInsightsAppender extends AbstractFormatPatternWriter {
+public class ApplicationInsightsWriter extends AbstractFormatPatternWriter {
 
-    public ApplicationInsightsAppender(final Map<String, String> properties) {
+    public ApplicationInsightsWriter(final Map<String, String> properties) {
         super(properties);
     }
 
-    public ApplicationInsightsAppender() {
+    public ApplicationInsightsWriter() {
         this(Collections.emptyMap());
     }
 
