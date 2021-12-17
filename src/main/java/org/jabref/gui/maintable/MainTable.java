@@ -48,6 +48,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.database.event.EntriesAddedEvent;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.preferences.FilePreferences;
 import org.jabref.preferences.PreferencesService;
 
 import com.google.common.eventbus.Subscribe;
@@ -68,6 +69,8 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
     private long lastKeyPressTime;
     private String columnSearchTerm;
+
+    private final FilePreferences filePreferences;
 
     public MainTable(MainTableDataModel model,
                      LibraryTab libraryTab,
@@ -177,6 +180,8 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
             }
             this.jumpToSearchKey(getSortOrder().get(0), key);
         });
+
+        filePreferences = preferencesService.getFilePreferences();
 
         database.getDatabase().registerListener(this);
     }
@@ -383,11 +388,11 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                         }
                         case MOVE -> {
                             LOGGER.debug("Mode MOVE"); // alt on win
-                            importHandler.getLinker().moveFilesToFileDirAndAddToEntry(entry, files);
+                            importHandler.getLinker().moveFilesToFileDirAndAddToEntry(entry, files, libraryTab.getIndexingTaskManager());
                         }
                         case COPY -> {
                             LOGGER.debug("Mode Copy"); // ctrl on win
-                            importHandler.getLinker().copyFilesToFileDirAndAddToEntry(entry, files);
+                            importHandler.getLinker().copyFilesToFileDirAndAddToEntry(entry, files, libraryTab.getIndexingTaskManager());
                         }
                     }
                 }

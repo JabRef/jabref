@@ -23,6 +23,7 @@ public class IndexingTaskManager extends BackgroundTask<Void> {
 
     private final Object lock = new Object();
     private boolean isRunning = false;
+    private boolean isBlockingNewTasks = false;
 
     public IndexingTaskManager(TaskExecutor taskExecutor) {
         this.taskExecutor = taskExecutor;
@@ -58,15 +59,28 @@ public class IndexingTaskManager extends BackgroundTask<Void> {
     }
 
     private void enqueueTask(Runnable indexingTask) {
-        taskQueue.add(indexingTask);
-        // What if already running?
-        synchronized (lock) {
-            if (!isRunning) {
-                isRunning = true;
-                this.executeWith(taskExecutor);
-                showToUser(false);
+        if (!isBlockingNewTasks) {
+            taskQueue.add(indexingTask);
+            // What if already running?
+            synchronized (lock) {
+                if (!isRunning) {
+                    isRunning = true;
+                    this.executeWith(taskExecutor);
+                    showToUser(false);
+                }
             }
         }
+    }
+
+    public AutoCloseable blockNewTasks() {
+        synchronized (lock) {
+            isBlockingNewTasks = true;
+        }
+        return () -> {
+            synchronized (lock) {
+                isBlockingNewTasks = false;
+            }
+        };
     }
 
     public void createIndex(PdfIndexer indexer) {

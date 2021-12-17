@@ -24,6 +24,7 @@ import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.pdf.search.indexing.IndexingTaskManager;
 import org.jabref.logic.preview.PreviewLayout;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -43,6 +44,7 @@ public class PreviewPanel extends VBox {
     private final PreferencesService preferences;
     private final DialogService dialogService;
     private final StateManager stateManager;
+    private final IndexingTaskManager indexingTaskManager;
     private BibEntry entry;
 
     public PreviewPanel(BibDatabaseContext database,
@@ -50,11 +52,12 @@ public class PreviewPanel extends VBox {
                         ExternalFileTypes externalFileTypes,
                         KeyBindingRepository keyBindingRepository,
                         PreferencesService preferences,
-                        StateManager stateManager) {
+                        StateManager stateManager, IndexingTaskManager indexingTaskManager) {
         this.keyBindingRepository = keyBindingRepository;
         this.dialogService = dialogService;
         this.stateManager = stateManager;
         this.preferences = preferences;
+        this.indexingTaskManager = indexingTaskManager;
         fileLinker = new ExternalFilesEntryLinker(externalFileTypes, preferences.getFilePreferences(), database);
 
         PreviewPreferences previewPreferences = preferences.getPreviewPreferences();
@@ -87,7 +90,7 @@ public class PreviewPanel extends VBox {
 
                 if (event.getTransferMode() == TransferMode.MOVE) {
                     LOGGER.debug("Mode MOVE"); // shift on win or no modifier
-                    fileLinker.moveFilesToFileDirAndAddToEntry(entry, files);
+                    fileLinker.moveFilesToFileDirAndAddToEntry(entry, files, indexingTaskManager);
                 }
                 if (event.getTransferMode() == TransferMode.LINK) {
                     LOGGER.debug("Node LINK"); // alt on win
@@ -95,7 +98,7 @@ public class PreviewPanel extends VBox {
                 }
                 if (event.getTransferMode() == TransferMode.COPY) {
                     LOGGER.debug("Mode Copy"); // ctrl on win, no modifier on Xubuntu
-                    fileLinker.copyFilesToFileDirAndAddToEntry(entry, files);
+                    fileLinker.copyFilesToFileDirAndAddToEntry(entry, files, indexingTaskManager);
                 }
                 success = true;
             }
