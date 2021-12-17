@@ -78,14 +78,15 @@ public final class ApplicationInsightsLogEvent extends ApplicationInsightsEvent 
 
         if (isException()) {
             addLogEventProperty("Logger Message", getMessage(), metaData);
-        }
 
-        for (StackTraceElement stackTraceElement : logEvent.getException().getStackTrace()) {
+            for (StackTraceElement stackTraceElement : logEvent.getException().getStackTrace()) {
 
-            addLogEventProperty("ClassName", stackTraceElement.getClassName(), metaData);
-            addLogEventProperty("FileName", stackTraceElement.getFileName(), metaData);
-            addLogEventProperty("MethodName", stackTraceElement.getMethodName(), metaData);
-            addLogEventProperty("LineNumber", String.valueOf(stackTraceElement.getLineNumber()), metaData);
+                addLogEventProperty("ClassName", stackTraceElement.getClassName(), metaData);
+                addLogEventProperty("FileName", stackTraceElement.getFileName(), metaData);
+                addLogEventProperty("MethodName", stackTraceElement.getMethodName(), metaData);
+                addLogEventProperty("LineNumber", String.valueOf(stackTraceElement.getLineNumber()), metaData);
+            }
+
         }
 
         for (Entry<String, String> entry : MDC.getMDCAdapter().getCopyOfContextMap().entrySet()) {
