@@ -29,28 +29,27 @@ import com.microsoft.applicationinsights.internal.common.ApplicationInsightsEven
 import com.microsoft.applicationinsights.internal.logger.InternalLogger;
 import com.microsoft.applicationinsights.telemetry.SeverityLevel;
 import org.slf4j.MDC;
-import org.slf4j.event.Level;
-import org.slf4j.event.LoggingEvent;
+import org.tinylog.core.LogEntry;
 
 // TODO: Remove this copy as soon as the one included in AI is compatible with log4j 3
 public final class ApplicationInsightsLogEvent extends ApplicationInsightsEvent {
 
-    private final LoggingEvent logEvent;
+    private final LogEntry logEvent;
 
-    public ApplicationInsightsLogEvent(LoggingEvent logEvent) {
+    public ApplicationInsightsLogEvent(LogEntry logEvent) {
         this.logEvent = logEvent;
     }
 
     @Override
     public String getMessage() {
-        String message = this.logEvent.getMessage() != null ? this.logEvent.getMessage() : "Log4j Trace";
+        String message = this.logEvent.getMessage() != null ? this.logEvent.getMessage() : "Tinylog Trace";
 
         return message;
     }
 
     @Override
     public boolean isException() {
-        return this.logEvent.getThrowable() != null;
+        return this.logEvent.getException() != null;
     }
 
     @Override
@@ -58,7 +57,7 @@ public final class ApplicationInsightsLogEvent extends ApplicationInsightsEvent 
         Exception exception = null;
 
         if (isException()) {
-            Throwable throwable = this.logEvent.getThrowable();
+            Throwable throwable = this.logEvent.getException();
             exception = throwable instanceof Exception ? (Exception) throwable : new Exception(throwable);
         }
 
@@ -72,16 +71,16 @@ public final class ApplicationInsightsLogEvent extends ApplicationInsightsEvent 
 
         metaData.put("SourceType", "slf4j");
 
-        addLogEventProperty("LoggerName", logEvent.getLoggerName(), metaData);
+        // addLogEventProperty("LoggerName", logEvent.get metaData);
         addLogEventProperty("LoggingLevel", logEvent.getLevel() != null ? logEvent.getLevel().name() : null, metaData);
-        addLogEventProperty("ThreadName", logEvent.getThreadName(), metaData);
-        addLogEventProperty("TimeStamp", getFormattedDate(logEvent.getTimeStamp()), metaData);
+        addLogEventProperty("ThreadName", logEvent.getThread().getName(), metaData);
+        addLogEventProperty("TimeStamp", getFormattedDate(logEvent.getTimestamp().toInstant().toEpochMilli()), metaData);
 
         if (isException()) {
             addLogEventProperty("Logger Message", getMessage(), metaData);
         }
 
-        for (StackTraceElement stackTraceElement : logEvent.getThrowable().getStackTrace()) {
+        for (StackTraceElement stackTraceElement : logEvent.getException().getStackTrace()) {
 
             addLogEventProperty("ClassName", stackTraceElement.getClassName(), metaData);
             addLogEventProperty("FileName", stackTraceElement.getFileName(), metaData);
@@ -101,23 +100,19 @@ public final class ApplicationInsightsLogEvent extends ApplicationInsightsEvent 
 
     @Override
     public SeverityLevel getNormalizedSeverityLevel() {
-        Level logEventLevel = logEvent.getLevel();
+        org.tinylog.Level logEventLevel = logEvent.getLevel();
 
         switch (logEventLevel) {
 
             case ERROR:
                 return SeverityLevel.Error;
-
             case WARN:
                 return SeverityLevel.Warning;
-
             case INFO:
                 return SeverityLevel.Information;
-
             case TRACE:
             case DEBUG:
                 return SeverityLevel.Verbose;
-
             default:
                 InternalLogger.INSTANCE.error("Unknown slf4joption, %d, using TRACE level as default", logEventLevel);
                 return SeverityLevel.Verbose;

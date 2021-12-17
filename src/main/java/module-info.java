@@ -100,4 +100,5 @@ open module org.jabref {
     requires com.fasterxml.jackson.datatype.jsr310;
     requires net.harawata.appdirs;
     requires applicationinsights.logging.log4j2;
+    requires org.tinylog.impl;
 }

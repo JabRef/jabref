@@ -8,13 +8,13 @@ import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.logic.util.OS;
 
 import com.google.common.base.Throwables;
-import org.slf4j.event.LoggingEvent;
+import org.tinylog.core.LogEntry;
 
 public class LogEventViewModel {
 
-    private final LoggingEvent logEvent;
+    private final LogEntry logEvent;
 
-    public LogEventViewModel(LoggingEvent logEvent) {
+    public LogEventViewModel(LogEntry logEvent) {
         this.logEvent = Objects.requireNonNull(logEvent);
     }
 
@@ -47,7 +47,7 @@ public class LogEventViewModel {
     }
 
     public Optional<String> getStackTrace() {
-        return Optional.ofNullable(logEvent.getThrowable()).map(Throwables::getStackTraceAsString);
+        return Optional.ofNullable(logEvent.getException()).map(Throwables::getStackTraceAsString);
     }
 
     public String getDetailedText() {

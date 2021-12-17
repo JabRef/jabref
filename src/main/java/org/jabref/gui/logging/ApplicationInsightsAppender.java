@@ -1,25 +1,38 @@
 package org.jabref.gui.logging;
 
+import java.util.Collection;
+import java.util.EnumSet;
+import java.util.Map;
+
 import org.jabref.gui.Globals;
-import org.jabref.logic.logging.LogMessages;
 
 import com.microsoft.applicationinsights.telemetry.ExceptionTelemetry;
 import com.microsoft.applicationinsights.telemetry.Telemetry;
 import com.microsoft.applicationinsights.telemetry.TraceTelemetry;
-import org.slf4j.event.LoggingEvent;
+import org.tinylog.core.LogEntry;
+import org.tinylog.core.LogEntryValue;
+import org.tinylog.writers.AbstractFormatPatternWriter;
 
-public class ApplicationInsightsAppender {
+public class ApplicationInsightsAppender extends AbstractFormatPatternWriter {
 
-    /**
-     * The log event will be forwarded to the {@link LogMessages} archive.
-     */
-    public void append(LoggingEvent rawEvent) {
-        ApplicationInsightsLogEvent event = new ApplicationInsightsLogEvent(rawEvent);
+    public ApplicationInsightsAppender(final Map<String, String> properties) {
+        super(properties);
+    }
+
+    @Override
+    public Collection<LogEntryValue> getRequiredLogEntryValues() {
+        // TODO Auto-generated method stub
+        return EnumSet.allOf(LogEntryValue.class);
+    }
+
+    @Override
+    public void write(LogEntry logEntry) throws Exception {
+        ApplicationInsightsLogEvent event = new ApplicationInsightsLogEvent(logEntry);
 
         Telemetry telemetry;
         if (event.isException()) {
             ExceptionTelemetry exceptionTelemetry = new ExceptionTelemetry(event.getException());
-            exceptionTelemetry.getProperties().put("Message", rawEvent.getMessage());
+            exceptionTelemetry.getProperties().put("Message", logEntry.getMessage());
             exceptionTelemetry.setSeverityLevel(event.getNormalizedSeverityLevel());
             telemetry = exceptionTelemetry;
         } else {
@@ -30,5 +43,14 @@ public class ApplicationInsightsAppender {
         telemetry.getContext().getProperties().putAll(event.getCustomParameters());
 
         Globals.getTelemetryClient().ifPresent(client -> client.track(telemetry));
+    }
+
+    @Override
+    public void flush() throws Exception {
+    }
+
+    @Override
+    public void close() throws Exception {
+
     }
 }

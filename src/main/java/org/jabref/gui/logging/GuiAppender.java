@@ -1,73 +1,38 @@
 package org.jabref.gui.logging;
 
-import java.util.Locale;
+import java.util.Collection;
+import java.util.EnumSet;
+import java.util.Map;
 
-import org.tinylog.Level;
-import org.tinylog.format.AdvancedMessageFormatter;
-import org.tinylog.format.MessageFormatter;
-import org.tinylog.provider.ContextProvider;
-import org.tinylog.provider.LoggingProvider;
-import org.tinylog.provider.NopContextProvider;
+import org.jabref.gui.util.DefaultTaskExecutor;
+import org.jabref.logic.logging.LogMessages;
 
-public class GuiAppender implements LoggingProvider {
+import org.tinylog.core.LogEntry;
+import org.tinylog.core.LogEntryValue;
+import org.tinylog.writers.AbstractFormatPatternWriter;
 
-    @Override
-    public ContextProvider getContextProvider() {
-        return new NopContextProvider();
+public class GuiAppender extends AbstractFormatPatternWriter {
+
+    public GuiAppender(final Map<String, String> properties) {
+        super(properties);
     }
 
     @Override
-    public Level getMinimumLevel() {
-        return Level.INFO;
+    public Collection<LogEntryValue> getRequiredLogEntryValues() {
+        return EnumSet.allOf(LogEntryValue.class);
     }
 
     @Override
-    public Level getMinimumLevel(String tag) {
-        return Level.INFO;
+    public void write(LogEntry logEntry) throws Exception {
+        DefaultTaskExecutor.runInJavaFXThread(() -> LogMessages.getInstance().add(logEntry));
     }
 
     @Override
-    public boolean isEnabled(int depth, String tag, Level level) {
-        return level.ordinal() >= Level.INFO.ordinal();
+    public void flush() throws Exception {
     }
 
     @Override
-    public void shutdown() {
-        // Nothing to do
+    public void close() throws Exception {
     }
 
-    private void log(Throwable exception, String message, Object[] arguments) {
-        StringBuilder builder = new StringBuilder();
-        if (message != null) {
-            builder.append(new AdvancedMessageFormatter(Locale.ENGLISH, true).format(message, arguments));
-        }
-        if (exception != null) {
-            if (builder.length() > 0) {
-                builder.append(": ");
-            }
-            builder.append(exception);
-        }
-        System.out.println(builder);
-    }
-
-    @Override
-    public void log(int depth, String tag, Level level, Throwable exception, MessageFormatter formatter, Object obj, Object... arguments) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void log(String loggerClassName, String tag, Level level, Throwable exception, MessageFormatter formatter, Object obj, Object... arguments) {
-        // TODO Auto-generated method stub
-
-    }
-
-    /*
-      The log event will be forwarded to the {@link LogMessages} archive.
-
-    public void append(LoggingEvent event) {
-        // We need to make a copy as instances of LogEvent are reused by log4j
-        DefaultTaskExecutor.runInJavaFXThread(() -> LogMessages.getInstance().add(copy));
-    }
-    */
 }

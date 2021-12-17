@@ -3,7 +3,7 @@ package org.jabref.logic.logging;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
-import org.slf4j.event.LoggingEvent;
+import org.tinylog.core.LogEntry;
 
 /**
  * This class is used for storing and archiving all message output of JabRef as log events.
@@ -13,7 +13,7 @@ public class LogMessages {
 
     private static LogMessages instance = new LogMessages();
 
-    private final ObservableList<LoggingEvent> messages = FXCollections.observableArrayList();
+    private final ObservableList<LogEntry> messages = FXCollections.observableArrayList();
 
     private LogMessages() {
     }
@@ -22,11 +22,11 @@ public class LogMessages {
         return instance;
     }
 
-    public ObservableList<LoggingEvent> getMessages() {
+    public ObservableList<LogEntry> getMessages() {
         return FXCollections.unmodifiableObservableList(messages);
     }
 
-    public void add(LoggingEvent event) {
+    public void add(LogEntry event) {
         messages.add(event);
     }
 
