@@ -16,8 +16,6 @@ public class JabRefLogger {
     }
 
     private static void setLogLevelToDebugForJabRefClasses() {
-
-        //TODO:
-
+        // TODO
     }
 }
