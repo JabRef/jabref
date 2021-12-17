@@ -25,6 +25,9 @@
       <else-if type="article-journal">
         <text macro="journal-citation"/>
       </else-if>
+      <else-if type="entry-encyclopedia">
+        <text macro="encyclopedia"/>
+      </else-if>
       <else>
         <text macro="generic-citation"/>
       </else>
@@ -66,6 +69,24 @@
       <text macro="issn"/>
       <text macro="doi"/>
       <text macro="access-date"/>
+    </group>
+  </macro>
+  <macro name="encyclopedia">
+    <group prefix="{{cite encyclopedia" suffix="}}">
+      <text macro="contributor-statements"/>
+      <text macro="title-statements"/>
+      <text macro="date"/>
+      <text macro="publisher"/>
+      <text macro="place"/>
+      <text macro="url"/>
+      <text macro="access-date"/>
+      <text macro="edition"/>
+      <text macro="series"/>
+      <text macro="volume"/>
+      <text macro="isbn"/>
+      <text macro="issn"/>
+      <text macro="doi"/>
+      <text macro="pagination"/>
     </group>
   </macro>
   <macro name="generic-citation">
@@ -112,7 +133,11 @@
           <text variable="title" prefix=" | title="/>
         </if>
         <else-if type="article-journal">
-          <text variable="container-title" prefix=" | journal ="/>
+          <text variable="container-title" prefix=" | journal="/>
+          <text variable="title" prefix=" | title="/>
+        </else-if>
+        <else-if type="entry-encyclopedia">
+          <text variable="container-title" prefix=" | encyclopedia="/>
           <text variable="title" prefix=" | title="/>
         </else-if>
         <else>
@@ -146,7 +171,7 @@
   </macro>
   <macro name="pagination">
     <choose>
-      <if type="article-journal chapter">
+      <if type="article-journal chapter entry-encyclopedia" match="any">
         <text variable="page" prefix=" | pages="/>
       </if>
     </choose>
