@@ -1,7 +1,7 @@
 package org.jabref.gui.logging;
 
 /*
- * ApplicationInsights-Java
+ * ApplicationInsightsJava
  * Copyright (c) Microsoft Corporation
  * All rights reserved.
  *

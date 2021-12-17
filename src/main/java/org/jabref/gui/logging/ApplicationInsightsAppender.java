@@ -1,6 +1,7 @@
 package org.jabref.gui.logging;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Map;
 
@@ -19,9 +20,12 @@ public class ApplicationInsightsAppender extends AbstractFormatPatternWriter {
         super(properties);
     }
 
+    public ApplicationInsightsAppender() {
+        this(Collections.emptyMap());
+    }
+
     @Override
     public Collection<LogEntryValue> getRequiredLogEntryValues() {
-        // TODO Auto-generated method stub
         return EnumSet.allOf(LogEntryValue.class);
     }
 

@@ -1,6 +1,7 @@
 package org.jabref.gui.logging;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Map;
 
@@ -15,6 +16,10 @@ public class GuiAppender extends AbstractFormatPatternWriter {
 
     public GuiAppender(final Map<String, String> properties) {
         super(properties);
+    }
+
+    public GuiAppender() {
+        this(Collections.emptyMap());
     }
 
     @Override

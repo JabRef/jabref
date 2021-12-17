@@ -101,4 +101,9 @@ open module org.jabref {
     requires net.harawata.appdirs;
     requires applicationinsights.logging.log4j2;
     requires org.tinylog.impl;
+
+    provides org.tinylog.writers.Writer
+    with org.jabref.gui.logging.GuiAppender,
+         org.jabref.gui.logging.ApplicationInsightsAppender;
+
 }
