@@ -28,7 +28,6 @@ import java.util.Map.Entry;
 import com.microsoft.applicationinsights.internal.common.ApplicationInsightsEvent;
 import com.microsoft.applicationinsights.internal.logger.InternalLogger;
 import com.microsoft.applicationinsights.telemetry.SeverityLevel;
-import org.slf4j.MDC;
 import org.tinylog.core.LogEntry;
 
 // TODO: Remove this copy as soon as the one included in AI is compatible with log4j 3
@@ -89,7 +88,7 @@ public final class ApplicationInsightsLogEvent extends ApplicationInsightsEvent 
 
         }
 
-        for (Entry<String, String> entry : MDC.getMDCAdapter().getCopyOfContextMap().entrySet()) {
+        for (Entry<String, String> entry : logEvent.getContext().entrySet()) {
             addLogEventProperty(entry.getKey(), entry.getValue(), metaData);
         }
 
