@@ -38,10 +38,15 @@ open module org.jabref {
 
     // Logging
     requires org.slf4j;
-
     requires org.tinylog.api;
     requires org.tinylog.api.slf4j;
+    requires org.tinylog.impl;
 
+    provides org.tinylog.writers.Writer
+    with org.jabref.gui.logging.GuiWriter,
+         org.jabref.gui.logging.ApplicationInsightsWriter;
+
+    requires applicationinsights.logging.log4j2;
 
     // Preferences and XML
     requires java.prefs;
@@ -99,11 +104,4 @@ open module org.jabref {
     requires com.fasterxml.jackson.dataformat.yaml;
     requires com.fasterxml.jackson.datatype.jsr310;
     requires net.harawata.appdirs;
-    requires applicationinsights.logging.log4j2;
-    requires org.tinylog.impl;
-
-    provides org.tinylog.writers.Writer
-    with org.jabref.gui.logging.GuiWriter,
-         org.jabref.gui.logging.ApplicationInsightsWriter;
-
 }
