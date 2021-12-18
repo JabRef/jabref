@@ -81,7 +81,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixed an issue where XMP and embedded BibTeX export would not work [#8278](https://github.com/JabRef/jabref/issues/8278)
 - We fixed an issue where the XMP and embedded BibTeX import of a file containing multiple schemas failed [#8278](https://github.com/JabRef/jabref/issues/8278)
 - We fixed an issue where pdf-paths and the pdf-indexer could get out of sync [#8182](https://github.com/JabRef/jabref/issues/8182)
-- We fixed an issue where Status-Logger error messages appeared on startup of JabRef [#5475](https://github.com/JabRef/jabref/issues/5475)
+- We fixed an issue where Status-Logger error messages appeared during the startup of JabRef [#5475](https://github.com/JabRef/jabref/issues/5475)
 
 ### Removed
 
