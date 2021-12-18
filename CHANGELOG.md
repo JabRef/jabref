@@ -53,6 +53,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We trim white space and non-ASCII characters from DOI [#8127](https://github.com/JabRef/jabref/issues/8127)
 - The duplicate checker now inspects other fields in case no difference in the required and optional fields are found.
 - We reworked the library properties dialog and integrated the `Library > Preamble`, `Library > Citation key pattern` and `Library > String constants dialogs` [#8264](https://github.com/JabRef/jabref/pulls/8264)
+- We improved the startup time from JabRef by switching from the logging library `log4j2` to `tinylog` [#8007](https://github.com/JabRef/jabref/issues/8007)
 
 ### Fixed
 
@@ -80,13 +81,12 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixed an issue where XMP and embedded BibTeX export would not work [#8278](https://github.com/JabRef/jabref/issues/8278)
 - We fixed an issue where the XMP and embedded BibTeX import of a file containing multiple schemas failed [#8278](https://github.com/JabRef/jabref/issues/8278)
 - We fixed an issue where pdf-paths and the pdf-indexer could get out of sync [#8182](https://github.com/JabRef/jabref/issues/8182)
-
+- We fixed an issue where Status-Logger error messages appeared on startup of JabRef [#5475](https://github.com/JabRef/jabref/issues/5475)
 
 ### Removed
 
 - We removed two orphaned preferences options [#8164](https://github.com/JabRef/jabref/pull/8164)
-
-
+- We removed the functionality of the `--debug` commandline options. Use the java command line switch `-Dtinylog.level=debug` for debug output instead. [#8226](https://github.com/JabRef/jabref/pull/8226)
 
 
 
