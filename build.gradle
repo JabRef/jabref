@@ -177,12 +177,9 @@ dependencies {
     implementation 'com.konghq:unirest-java:3.13.4'
 
     implementation 'org.slf4j:slf4j-api:2.0.0-alpha5'
-    implementation group: 'org.apache.logging.log4j', name: 'log4j-jcl', version: '3.0.0-SNAPSHOT'
-    implementation group: 'org.apache.logging.log4j', name: 'log4j-slf4j18-impl', version: '3.0.0-SNAPSHOT'
-    implementation group: 'org.apache.logging.log4j', name: 'log4j-plugins', version: '3.0.0-SNAPSHOT'
-    implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '3.0.0-SNAPSHOT'
-    implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: '3.0.0-SNAPSHOT'
-    annotationProcessor group: 'org.apache.logging.log4j', name: 'log4j-core', version: '3.0.0-SNAPSHOT'
+    implementation "org.tinylog:tinylog-api:2.4.1"
+    implementation "org.tinylog:slf4j-tinylog:2.4.1"
+    implementation "org.tinylog:tinylog-impl:2.4.1"
 
     implementation 'de.undercouch:citeproc-java:3.0.0-alpha.3'
 
@@ -566,14 +563,9 @@ jlink {
         requires 'com.sun.xml.fastinfoset'
         requires 'com.sun.xml.txw2'
         requires 'org.slf4j'
-        uses 'org.apache.logging.log4j.util.PropertySource'
-        uses 'org.apache.logging.log4j.core.util.WatchEventService'
-        uses 'org.apache.logging.log4j.plugins.processor.PluginService'
         uses 'org.controlsfx.glyphfont.GlyphFont'
         uses 'com.airhacks.afterburner.views.ResourceLocator'
-        uses 'org.apache.logging.log4j.message.ThreadDumpMessage.ThreadInfoFactory'
         uses 'com.airhacks.afterburner.injection.PresenterFactory'
-        uses 'org.apache.logging.log4j.spi.Provider'
         uses 'org.mariadb.jdbc.credential.CredentialPlugin'
         uses 'org.mariadb.jdbc.authentication.AuthenticationPlugin'
         uses 'org.mariadb.jdbc.tls.TlsSocketPlugin'
@@ -582,16 +574,11 @@ jlink {
         uses 'org.eclipse.jgit.lib.GpgSigner'
         uses 'javax.xml.bind.JAXBContextFactory'
         provides 'org.apache.lucene.codecs.DocValuesFormat' with 'org.apache.lucene.codecs.lucene80.Lucene80DocValuesFormat'
-        provides 'javax.annotation.processing.Processor' with 'org.apache.logging.log4j.plugins.processor.PluginProcessor'
         provides 'org.controlsfx.glyphfont.GlyphFont' with 'org.controlsfx.glyphfont.FontAwesome'
-        provides 'org.apache.logging.log4j.message.ThreadDumpMessage.ThreadInfoFactory' with 'org.apache.logging.log4j.core.message.ExtendedThreadInfoFactory'
         provides 'org.mariadb.jdbc.tls.TlsSocketPlugin' with 'org.mariadb.jdbc.internal.protocol.tls.DefaultTlsSocketPlugin'
         provides 'com.microsoft.applicationinsights.core.dependencies.io.grpc.ServerProvider' with 'com.microsoft.applicationinsights.core.dependencies.io.grpc.netty.shaded.io.grpc.netty.NettyServerProvider'
         provides 'com.microsoft.applicationinsights.core.dependencies.io.grpc.NameResolverProvider' with 'com.microsoft.applicationinsights.core.dependencies.io.grpc.internal.DnsNameResolverProvider'
-        provides 'org.apache.logging.log4j.util.PropertySource' with 'org.apache.logging.log4j.util.EnvironmentPropertySource',
-                'org.apache.logging.log4j.util.SystemPropertiesPropertySource'
         provides 'java.sql.Driver' with 'org.postgresql.Driver'
-        provides 'org.apache.logging.log4j.plugins.processor.PluginService' with 'org.apache.logging.log4j.plugins.convert.plugins.Log4jPlugins'
         provides 'org.mariadb.jdbc.authentication.AuthenticationPlugin' with 'org.mariadb.jdbc.internal.com.send.authentication.CachingSha2PasswordPlugin',
                 'org.mariadb.jdbc.internal.com.send.authentication.ClearPasswordPlugin',
                 'org.mariadb.jdbc.internal.com.send.authentication.Ed25519PasswordPlugin',
@@ -603,8 +590,6 @@ jlink {
         provides 'org.mariadb.jdbc.credential.CredentialPlugin' with 'org.mariadb.jdbc.credential.aws.AwsIamCredentialPlugin',
                 'org.mariadb.jdbc.credential.env.EnvCredentialPlugin',
                 'org.mariadb.jdbc.credential.system.PropertiesCredentialPlugin'
-        provides 'org.slf4j.spi.SLF4JServiceProvider' with 'org.apache.logging.slf4j.SLF4JServiceProvider'
-        provides 'org.apache.logging.log4j.spi.Provider' with 'org.apache.logging.log4j.core.impl.Log4jProvider'
         provides 'java.security.Provider' with 'org.bouncycastle.jce.provider.BouncyCastleProvider',
                 'org.bouncycastle.pqc.jcajce.provider.BouncyCastlePQCProvider'
         provides 'com.microsoft.applicationinsights.core.dependencies.io.grpc.ManagedChannelProvider' with 'com.microsoft.applicationinsights.core.dependencies.io.grpc.netty.shaded.io.grpc.netty.NettyChannelProvider'
