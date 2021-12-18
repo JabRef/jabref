@@ -70,7 +70,6 @@ public final class ApplicationInsightsLogEvent extends ApplicationInsightsEvent 
 
         metaData.put("SourceType", "slf4j");
 
-        // addLogEventProperty("LoggerName", logEvent.get metaData);
         addLogEventProperty("LoggingLevel", logEvent.getLevel() != null ? logEvent.getLevel().name() : null, metaData);
         addLogEventProperty("ThreadName", logEvent.getThread().getName(), metaData);
         addLogEventProperty("TimeStamp", getFormattedDate(logEvent.getTimestamp().toInstant().toEpochMilli()), metaData);
