@@ -41,6 +41,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We reworked the export order in the preferences and the save order in the library preferences. You can now set more than three sort criteria in your library preferences. [#7935](https://github.com/JabRef/jabref/pull/7935)
 - The metadata-to-pdf actions now also embeds the bibfile to the PDF. [#8037](https://github.com/JabRef/jabref/pull/8037)
 - The snap was updated to use the core20 base and to use lzo compression for better startup performance [#8109](https://github.com/JabRef/jabref/pull/8109)
+- We moved the union/intersection view button in the group sidepane to the left of the other controls. [#8202](https://github.com/JabRef/jabref/pull/8202)
 - We improved the Drag and Drop behavior in the "Customize Entry Types" Dialog [#6338](https://github.com/JabRef/jabref/issues/6338)
 - When determining the URL of an ArXiV eprint, the URL now points to the version [#8149](https://github.com/JabRef/jabref/pull/8149)
 - We Included all standard fields with citation key when exporting to Old OpenOffice/LibreOffice Calc Format [#8176](https://github.com/JabRef/jabref/pull/8176)
@@ -52,9 +53,11 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We trim white space and non-ASCII characters from DOI [#8127](https://github.com/JabRef/jabref/issues/8127)
 - The duplicate checker now inspects other fields in case no difference in the required and optional fields are found.
 - We reworked the library properties dialog and integrated the `Library > Preamble`, `Library > Citation key pattern` and `Library > String constants dialogs` [#8264](https://github.com/JabRef/jabref/pulls/8264)
+- We improved the startup time of JabRef by switching from the logging library `log4j2` to `tinylog` [#8007](https://github.com/JabRef/jabref/issues/8007)
 
 ### Fixed
 
+- We fixed an issue where an exception occurred when pasting an entry with a publication date-range of the form 1910/1917 [#7864](https://github.com/JabRef/jabref/issues/7864)
 - We fixed an issue where an exception occured when a preview style was edited and afterwards another preview style selected. [#8280](https://github.com/JabRef/jabref/issues/8280)
 - We fixed an issue where the actions to move a file to a directory were incorrectly disabled. [#7908](https://github.com/JabRef/jabref/issues/7908)
 - We fixed an issue where an exception occurred when a linked online file was edited in the entry editor [#8008](https://github.com/JabRef/jabref/issues/8008)
@@ -62,6 +65,8 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixed some icons that were drawn in the wrong color when JabRef used a custom theme. [#7853](https://github.com/JabRef/jabref/issues/7853)
 - We fixed an issue where the `Aux file` on `Edit group` doesn't support relative sub-directories path to import. [#7719](https://github.com/JabRef/jabref/issues/7719).
 - We fixed an issue where it was impossible to add or modify groups. [#7912](https://github.com/JabRef/jabref/pull/793://github.com/JabRef/jabref/pull/7921)
+- We fixed an issue about the visible side pane components being out of sync with the view menu. [#8115](https://github.com/JabRef/jabref/issues/8115)
+- We fixed an issue where the side pane would not close when all its components were closed. [#8082]((https://github.com/JabRef/jabref/issues/8082))
 - We fixed an issue where exported entries from a Citavi bib containing URLs could not be imported [#7892](https://github.com/JabRef/jabref/issues/7882)
 - We fixed an issue where the icons in the search bar had the same color, toggled as well as untoggled. [#8014](https://github.com/JabRef/jabref/pull/8014)
 - We fixed an issue where typing an invalid UNC path into the "Main file directory" text field caused an error. [#8107](https://github.com/JabRef/jabref/issues/8107)
@@ -76,12 +81,13 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixed an issue where XMP and embedded BibTeX export would not work [#8278](https://github.com/JabRef/jabref/issues/8278)
 - We fixed an issue where the XMP and embedded BibTeX import of a file containing multiple schemas failed [#8278](https://github.com/JabRef/jabref/issues/8278)
 - We fixed an issue where writing embedded BibTeX import fails due to write protection or bibtex already being present [#8332](https://github.com/JabRef/jabref/pull/8332)
+- We fixed an issue where pdf-paths and the pdf-indexer could get out of sync [#8182](https://github.com/JabRef/jabref/issues/8182)
+- We fixed an issue where Status-Logger error messages appeared during the startup of JabRef [#5475](https://github.com/JabRef/jabref/issues/5475)
 
 ### Removed
 
 - We removed two orphaned preferences options [#8164](https://github.com/JabRef/jabref/pull/8164)
-
-
+- We removed the functionality of the `--debug` commandline options. Use the java command line switch `-Dtinylog.level=debug` for debug output instead. [#8226](https://github.com/JabRef/jabref/pull/8226)
 
 
 
