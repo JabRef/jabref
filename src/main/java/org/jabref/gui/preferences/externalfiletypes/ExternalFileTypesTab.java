@@ -1,13 +1,15 @@
-package org.jabref.gui.externalfiletype;
+package org.jabref.gui.preferences.externalfiletypes;
 
 import javafx.fxml.FXML;
-import javafx.scene.control.ButtonType;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 
+import org.jabref.gui.externalfiletype.ExternalFileType;
+import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIcon;
-import org.jabref.gui.util.BaseDialog;
+import org.jabref.gui.preferences.AbstractPreferenceTabView;
+import org.jabref.gui.preferences.PreferencesTab;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.logic.l10n.Localization;
@@ -17,7 +19,7 @@ import com.airhacks.afterburner.views.ViewLoader;
 /**
  * Editor for external file types.
  */
-public class CustomizeExternalFileTypesDialog extends BaseDialog<Void> {
+public class ExternalFileTypesTab extends AbstractPreferenceTabView<ExternalFileTypesTabViewModel> implements PreferencesTab {
 
     @FXML private TableColumn<ExternalFileType, JabRefIcon> fileTypesTableIconColumn;
     @FXML private TableColumn<ExternalFileType, String> fileTypesTableNameColumn;
@@ -28,26 +30,20 @@ public class CustomizeExternalFileTypesDialog extends BaseDialog<Void> {
     @FXML private TableColumn<ExternalFileType, Boolean> fileTypesTableDeleteColumn;
     @FXML private TableView<ExternalFileType> fileTypesTable;
 
-    private CustomizeExternalFileTypesViewModel viewModel;
-
-    public CustomizeExternalFileTypesDialog() {
-        this.setTitle(Localization.lang("Manage external file types"));
-
+    public ExternalFileTypesTab() {
         ViewLoader.view(this)
-                  .load()
-                  .setAsDialogPane(this);
+                  .root(this)
+                  .load();
+    }
 
-        this.setResultConverter(button -> {
-            if (button == ButtonType.OK) {
-                viewModel.storeSettings();
-            }
-            return null;
-        });
+    @Override
+    public String getTabName() {
+        return Localization.lang("External file types");
     }
 
     @FXML
     public void initialize() {
-        viewModel = new CustomizeExternalFileTypesViewModel();
+        viewModel = new ExternalFileTypesTabViewModel(ExternalFileTypes.getInstance());
 
         fileTypesTable.setItems(viewModel.getFileTypes());
 
