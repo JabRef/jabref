@@ -35,8 +35,6 @@
                 <RowConstraints minHeight="10.0" vgrow="SOMETIMES"/>
                 <RowConstraints minHeight="4.0" vgrow="SOMETIMES"/>
                 <RowConstraints minHeight="10.0" vgrow="SOMETIMES"/>
-                <RowConstraints minHeight="16.0" vgrow="SOMETIMES"/>
-                <RowConstraints minHeight="10.0" vgrow="SOMETIMES"/>
             </rowConstraints>
             <Label text="%Application to push entries to"/>
             <ComboBox fx:id="pushToApplicationCombo"
@@ -54,9 +52,6 @@
             <Label text="%Cite command" GridPane.rowIndex="2"/>
             <TextField fx:id="citeCommand"
                        prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
-
-            <Button onAction="#manageExternalFileTypes" text="%Manage external file types"
-                    prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="4"/>
         </GridPane>
     </HBox>
 

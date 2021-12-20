@@ -19,6 +19,7 @@ import org.jabref.gui.preferences.customimporter.CustomImporterTab;
 import org.jabref.gui.preferences.entryeditor.EntryEditorTab;
 import org.jabref.gui.preferences.entryeditortabs.CustomEditorFieldsTab;
 import org.jabref.gui.preferences.external.ExternalTab;
+import org.jabref.gui.preferences.externalfiletypes.ExternalFileTypesTab;
 import org.jabref.gui.preferences.file.FileTab;
 import org.jabref.gui.preferences.general.GeneralTab;
 import org.jabref.gui.preferences.groups.GroupsTab;
@@ -72,6 +73,7 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
                 new PreviewTab(),
                 new ProtectedTermsTab(),
                 new ExternalTab(frame.getPushToApplicationsManager()),
+                new ExternalFileTypesTab(),
                 new JournalAbbreviationsTab(),
                 new GroupsTab(),
                 new EntryEditorTab(),

@@ -1,33 +1,39 @@
-package org.jabref.gui.externalfiletype;
+package org.jabref.gui.preferences.externalfiletypes;
 
 import java.util.Comparator;
 import java.util.List;
-import java.util.Set;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.externalfiletype.CustomExternalFileType;
+import org.jabref.gui.externalfiletype.EditExternalFileTypeEntryDialog;
+import org.jabref.gui.externalfiletype.ExternalFileType;
+import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.logic.l10n.Localization;
 
 import com.airhacks.afterburner.injection.Injector;
 
-public class CustomizeExternalFileTypesViewModel {
+public class ExternalFileTypesTabViewModel implements PreferenceTabViewModel {
 
-    private final ObservableList<ExternalFileType> fileTypes;
+    private final ExternalFileTypes externalFileTypes;
+    private final ObservableList<ExternalFileType> fileTypes = FXCollections.observableArrayList();
 
-    public CustomizeExternalFileTypesViewModel() {
-        Set<ExternalFileType> types = ExternalFileTypes.getInstance().getExternalFileTypeSelection();
-        fileTypes = FXCollections.observableArrayList(types);
+    public ExternalFileTypesTabViewModel(ExternalFileTypes externalFileTypes) {
+        this.externalFileTypes = externalFileTypes;
+    }
+
+    @Override
+    public void setValues() {
+        fileTypes.setAll(externalFileTypes.getExternalFileTypeSelection());
         fileTypes.sort(Comparator.comparing(ExternalFileType::getName));
     }
 
-    /**
-     * Stores the list of external entry types in the preferences.
-     */
     public void storeSettings() {
-        ExternalFileTypes.getInstance().setExternalFileTypes(fileTypes);
+        externalFileTypes.setExternalFileTypes(fileTypes);
     }
 
     public void resetToDefaults() {
