@@ -4,7 +4,7 @@ updates:
   directory: "/"
   schedule:
     interval: weekly
-  open-pull-requests-limit: 10
+  open-pull-requests-limit: 15
   labels:
   - "type: dependencies"
   ignore:
@@ -14,12 +14,6 @@ updates:
   - dependency-name: com.microsoft.azure:applicationinsights-logging-log4j2
     versions:
     - ">= 2.5.a" # Blocked by https://github.com/microsoft/ApplicationInsights-Java/issues/1155
-  - dependency-name: de.jensd:fontawesomefx-materialdesignfont
-    versions:
-    - "> 1.7.22-4" # Strange versioning format
-  - dependency-name: org.fxmisc.richtext:richtextfx
-    versions:
-    - "< 0.10.6" # Blocked by https://github.com/FXMisc/RichTextFX/issues/967, wait for new release
 - package-ecosystem: "github-actions"
   directory: "/"
   schedule:

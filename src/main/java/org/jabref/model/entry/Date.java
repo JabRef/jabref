@@ -42,6 +42,7 @@ public class Date {
     }
 
     private final TemporalAccessor date;
+    private final TemporalAccessor endDate;
 
     public Date(int year, int month, int dayOfMonth) {
         this(LocalDate.of(year, month, dayOfMonth));
@@ -57,13 +58,44 @@ public class Date {
 
     public Date(TemporalAccessor date) {
         this.date = date;
+        endDate = null;
     }
 
+    /**
+     * Creates a Date from date and endDate.
+     *
+     * @param date the start date
+     * @param endDate the start date
+     */
+    public Date(TemporalAccessor date, TemporalAccessor endDate) {
+        this.date = date;
+        this.endDate = endDate;
+    }
+
+    /**
+     * Creates a Date from date and endDate.
+     *
+     * @param dateString the string to extract the date information
+     * @throws DateTimeParseException if dataString is mal-formatted
+     */
     public static Optional<Date> parse(String dateString) {
         Objects.requireNonNull(dateString);
 
         if (dateString.isEmpty()) {
             return Optional.empty();
+        }
+
+        // if dateString has format of uuuu/uuuu, treat as date range
+        if (dateString.matches("[0-9]{4}/[0-9]{4}")) {
+            try {
+                String[] strDates = dateString.split("/");
+                TemporalAccessor parsedDate = SIMPLE_DATE_FORMATS.parse(strDates[0]);
+                TemporalAccessor parsedEndDate = SIMPLE_DATE_FORMATS.parse(strDates[1]);
+                return Optional.of(new Date(parsedDate, parsedEndDate));
+            } catch (DateTimeParseException ignored) {
+                return Optional.empty();
+            }
+
         }
 
         try {

@@ -231,10 +231,15 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
         ikonGridView.setPrefHeight(400);
         ikonGridView.setHorizontalCellSpacing(4);
         ikonGridView.setVerticalCellSpacing(4);
-        ikonGridView.setItems(filteredList);
 
         VBox vBox = new VBox(10, searchBox, ikonGridView);
         vBox.setPadding(new Insets(10));
+
+        // Necessary because of a bug in controlsfx GridView
+        // https://github.com/controlsfx/controlsfx/issues/1400
+        Platform.runLater(() -> {
+            ikonGridView.setItems(filteredList);
+        });
 
         PopOver popOver = new PopOver(vBox);
         popOver.setDetachable(false);
@@ -242,13 +247,14 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
         popOver.setCornerRadius(0);
         popOver.setTitle("Icon picker");
         popOver.show(iconPickerButton);
+
     }
 
     public class IkonliCell extends GridCell<Ikon> {
         @Override
         protected void updateItem(Ikon ikon, boolean empty) {
             super.updateItem(ikon, empty);
-            if (empty || ikon == null) {
+            if (empty || (ikon == null)) {
                 setText(null);
                 setGraphic(null);
             } else {

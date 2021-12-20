@@ -74,3 +74,20 @@ parts:
     plugin: dump
     organize:
       JabRef-launcher: bin/JabRef
+  cleanup:
+    after:
+      - jabref
+      - jabref-launcher
+    plugin: nil
+    build-snaps:
+      - gnome-3-38-2004
+    override-prime: |
+      set -eux
+      for snap in "gnome-3-38-2004"; do  # List all content-snaps you're using here
+          cd "/snap/$snap/current" && find . -type f,l -exec rm -f "$SNAPCRAFT_PRIME/{}" "$SNAPCRAFT_PRIME/usr/{}" \;
+      done
+      for CRUFT in bug lintian man; do
+          rm -rf $SNAPCRAFT_PRIME/usr/share/$CRUFT
+      done
+      find $SNAPCRAFT_PRIME/usr/share/doc/ -type f -not -name 'copyright' -delete
+      find $SNAPCRAFT_PRIME/usr/share -type d -empty -delete

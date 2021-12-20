@@ -43,7 +43,6 @@ import org.jabref.logic.importer.WebFetchers;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
-import org.jabref.logic.logging.JabRefLogger;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.search.DatabaseSearcher;
 import org.jabref.logic.search.SearchQuery;
@@ -181,7 +180,7 @@ public class ArgumentProcessor {
     private List<ParserResult> processArguments() {
 
         if (!cli.isBlank() && cli.isDebugLogging()) {
-            JabRefLogger.setDebug();
+            System.err.println("use java property -Dtinylog.level=debug");
         }
 
         if ((startupMode == Mode.INITIAL_START) && cli.isShowVersion()) {
@@ -229,7 +228,7 @@ public class ArgumentProcessor {
             automaticallySetFileLinks(loaded);
         }
 
-        if (cli.isWriteXMPtoPdf() && cli.isEmbeddBibfileInPdf() || cli.isWriteMetadatatoPdf() && (cli.isWriteXMPtoPdf() || cli.isEmbeddBibfileInPdf())) {
+        if ((cli.isWriteXMPtoPdf() && cli.isEmbeddBibfileInPdf()) || (cli.isWriteMetadatatoPdf() && (cli.isWriteXMPtoPdf() || cli.isEmbeddBibfileInPdf()))) {
             System.err.println("Give only one of [writeXMPtoPdf, embeddBibfileInPdf, writeMetadatatoPdf]");
         }
 

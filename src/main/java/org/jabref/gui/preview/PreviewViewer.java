@@ -196,6 +196,10 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
     }
 
     public void setLayout(PreviewLayout newLayout) {
+        // Change listeners might set the layout to null while the update method is executing, therefore we need to prevent this here
+        if (newLayout == null) {
+            return;
+        }
         layout = newLayout;
         update();
     }

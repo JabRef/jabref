@@ -14,8 +14,6 @@ plugins {
 
     id 'me.champeau.gradle.jmh' version '0.5.3'
 
-    id 'com.github.ben-manes.versions' version '0.39.0'
-
     id 'org.javamodularity.moduleplugin' version '1.8.10'
 
     id 'org.openjfx.javafxplugin' version '0.0.10'
@@ -118,21 +116,21 @@ dependencies {
     // Include all jar-files in the 'lib' folder as dependencies
     implementation fileTree(dir: 'lib', includes: ['*.jar'])
 
-    implementation 'org.apache.pdfbox:pdfbox:2.0.24'
-    implementation 'org.apache.pdfbox:fontbox:2.0.24'
+    implementation 'org.apache.pdfbox:pdfbox:2.0.25'
+    implementation 'org.apache.pdfbox:fontbox:2.0.25'
     implementation 'org.apache.pdfbox:xmpbox:2.0.24'
 
     implementation group: 'org.apache.commons', name: 'commons-csv', version: '1.9.0'
-    implementation 'com.h2database:h2-mvstore:1.4.200'
+    implementation 'com.h2database:h2-mvstore:2.0.202'
 
-    implementation group: 'org.apache.tika', name: 'tika-core', version: '2.1.0'
+    implementation group: 'org.apache.tika', name: 'tika-core', version: '2.2.0'
 
     // required for reading write-protected PDFs - see https://github.com/JabRef/jabref/pull/942#issuecomment-209252635
-    implementation 'org.bouncycastle:bcprov-jdk15on:1.69'
+    implementation 'org.bouncycastle:bcprov-jdk15on:1.70'
 
     implementation 'commons-cli:commons-cli:1.5.0'
 
-    implementation 'org.libreoffice:libreoffice:7.2.2'
+    implementation 'org.libreoffice:libreoffice:7.2.3'
     implementation 'org.libreoffice:unoloader:7.2.2'
 
     implementation 'io.github.java-diff-utils:java-diff-utils:4.11'
@@ -151,7 +149,7 @@ dependencies {
 
     implementation group: 'org.mariadb.jdbc', name: 'mariadb-java-client', version: '2.7.4'
 
-    implementation 'org.postgresql:postgresql:42.2.24'
+    implementation 'org.postgresql:postgresql:42.3.1'
 
     implementation ('com.oracle.ojdbc:ojdbc10:19.3.0.0') {
         // causing module issues
@@ -175,20 +173,17 @@ dependencies {
     implementation 'org.fxmisc.richtext:richtextfx:0.10.7'
     implementation group: 'org.glassfish.hk2.external', name: 'jakarta.inject', version: '2.6.1'
     implementation 'com.jfoenix:jfoenix:9.0.10'
-    implementation 'org.controlsfx:controlsfx:11.1.0'
+    implementation 'org.controlsfx:controlsfx:11.1.1'
 
     implementation 'org.jsoup:jsoup:1.14.3'
     implementation 'com.konghq:unirest-java:3.13.4'
 
     implementation 'org.slf4j:slf4j-api:2.0.0-alpha5'
-    implementation group: 'org.apache.logging.log4j', name: 'log4j-jcl', version: '3.0.0-SNAPSHOT'
-    implementation group: 'org.apache.logging.log4j', name: 'log4j-slf4j18-impl', version: '3.0.0-SNAPSHOT'
-    implementation group: 'org.apache.logging.log4j', name: 'log4j-plugins', version: '3.0.0-SNAPSHOT'
-    implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '3.0.0-SNAPSHOT'
-    implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: '3.0.0-SNAPSHOT'
-    annotationProcessor group: 'org.apache.logging.log4j', name: 'log4j-core', version: '3.0.0-SNAPSHOT'
+    implementation "org.tinylog:tinylog-api:2.4.1"
+    implementation "org.tinylog:slf4j-tinylog:2.4.1"
+    implementation "org.tinylog:tinylog-impl:2.4.1"
 
-    implementation 'de.undercouch:citeproc-java:3.0.0-alpha.2'
+    implementation 'de.undercouch:citeproc-java:3.0.0-alpha.3'
 
     implementation group: 'jakarta.activation', name: 'jakarta.activation-api', version: '1.2.1'
     implementation group: 'jakarta.xml.bind', name: 'jakarta.xml.bind-api', version: '2.3.2'
@@ -213,15 +208,14 @@ dependencies {
     implementation("com.apollographql.apollo3:apollo-runtime:3.0.0-beta04")
     implementation("com.apollographql.apollo3:apollo-rx3-support:3.0.0-beta04")
 
-    testImplementation 'io.github.classgraph:classgraph:4.8.137'
-    testImplementation 'org.junit.jupiter:junit-jupiter:5.8.1'
-    testImplementation 'org.junit.platform:junit-platform-launcher:1.8.1'
+    testImplementation 'io.github.classgraph:classgraph:4.8.138'
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.8.2'
+    testImplementation 'org.junit.platform:junit-platform-launcher:1.8.2'
 
-    testImplementation 'net.bytebuddy:byte-buddy-parent:1.12.2'
     testRuntimeOnly group: 'org.apache.logging.log4j', name: 'log4j-core', version: '3.0.0-SNAPSHOT'
     testRuntimeOnly group: 'org.apache.logging.log4j', name: 'log4j-jul', version: '3.0.0-SNAPSHOT'
     testImplementation 'org.mockito:mockito-core:4.1.0'
-    testImplementation 'org.xmlunit:xmlunit-core:2.8.3'
+    testImplementation 'org.xmlunit:xmlunit-core:2.8.4'
     testImplementation 'org.xmlunit:xmlunit-matchers:2.8.3'
     testRuntimeOnly 'com.tngtech.archunit:archunit-junit5-engine:0.22.0'
     testImplementation 'com.tngtech.archunit:archunit-junit5-api:0.22.0'
@@ -231,46 +225,6 @@ dependencies {
 
     checkstyle 'com.puppycrawl.tools:checkstyle:9.2'
     xjc group: 'org.glassfish.jaxb', name: 'jaxb-xjc', version: '2.3.3'
-}
-
-dependencyUpdates {
-    outputFormatter = "json"
-}
-
-// We have some dependencies which cannot be updated due to various reasons.
-dependencyUpdates.resolutionStrategy {
-    componentSelection { rules ->
-        rules.all { ComponentSelection selection ->
-            boolean rejected = ['alpha', 'snapshot', 'beta', 'rc', 'cr', 'm', 'preview', 'b', 'ea'].any { qualifier ->
-                selection.candidate.version ==~ /(?i).*[.-]$qualifier[.\d-+]*/
-            }
-            if (rejected) {
-                selection.reject('Release candidate')
-            }
-        }
-        rules.withModule("org.javamodularity.moduleplugin:org.javamodularity.moduleplugin.gradle.plugin") { ComponentSelection selection ->
-            if (selection.candidate.version ==~ /1.6.0/) {
-                selection.reject("Does not work due to bug, see https://github.com/JabRef/jabref/pull/5270")
-            }
-        }
-        rules.withModule("com.microsoft.azure:applicationinsights-core") { ComponentSelection selection ->
-            if (selection.candidate.version ==~ /2.5.0/ || selection.candidate.version ==~ /2.5.1/) {
-                selection.reject("Does not work due to bug, see https://github.com/JabRef/jabref/pull/5596")
-            }
-        }
-        rules.withModule("com.microsoft.azure:applicationinsights-logging-log4j2") { ComponentSelection selection ->
-            if (selection.candidate.version ==~ /2.5.0/ || selection.candidate.version ==~ /2.5.1/) {
-                selection.reject("Does not work due to bug, see https://github.com/JabRef/jabref/pull/5596")
-            }
-        }
-    }
-}
-
-task checkOutdatedDependencies(dependsOn: dependencyUpdates) {
-    doLast {
-        def dependencyReport = new JsonSlurper().parseText(new File("build/dependencyUpdates/report.json").text)
-        assert dependencyReport.outdated.count == 0: "There are outdated dependencies in build.gradle!\n Run ./gradlew dependencyUpdates to see which"
-    }
 }
 
 clean {
@@ -634,14 +588,9 @@ jlink {
         requires 'com.sun.xml.fastinfoset'
         requires 'com.sun.xml.txw2'
         requires 'org.slf4j'
-        uses 'org.apache.logging.log4j.util.PropertySource'
-        uses 'org.apache.logging.log4j.core.util.WatchEventService'
-        uses 'org.apache.logging.log4j.plugins.processor.PluginService'
         uses 'org.controlsfx.glyphfont.GlyphFont'
         uses 'com.airhacks.afterburner.views.ResourceLocator'
-        uses 'org.apache.logging.log4j.message.ThreadDumpMessage.ThreadInfoFactory'
         uses 'com.airhacks.afterburner.injection.PresenterFactory'
-        uses 'org.apache.logging.log4j.spi.Provider'
         uses 'org.mariadb.jdbc.credential.CredentialPlugin'
         uses 'org.mariadb.jdbc.authentication.AuthenticationPlugin'
         uses 'org.mariadb.jdbc.tls.TlsSocketPlugin'
@@ -650,16 +599,11 @@ jlink {
         uses 'org.eclipse.jgit.lib.GpgSigner'
         uses 'javax.xml.bind.JAXBContextFactory'
         provides 'org.apache.lucene.codecs.DocValuesFormat' with 'org.apache.lucene.codecs.lucene80.Lucene80DocValuesFormat'
-        provides 'javax.annotation.processing.Processor' with 'org.apache.logging.log4j.plugins.processor.PluginProcessor'
         provides 'org.controlsfx.glyphfont.GlyphFont' with 'org.controlsfx.glyphfont.FontAwesome'
-        provides 'org.apache.logging.log4j.message.ThreadDumpMessage.ThreadInfoFactory' with 'org.apache.logging.log4j.core.message.ExtendedThreadInfoFactory'
         provides 'org.mariadb.jdbc.tls.TlsSocketPlugin' with 'org.mariadb.jdbc.internal.protocol.tls.DefaultTlsSocketPlugin'
         provides 'com.microsoft.applicationinsights.core.dependencies.io.grpc.ServerProvider' with 'com.microsoft.applicationinsights.core.dependencies.io.grpc.netty.shaded.io.grpc.netty.NettyServerProvider'
         provides 'com.microsoft.applicationinsights.core.dependencies.io.grpc.NameResolverProvider' with 'com.microsoft.applicationinsights.core.dependencies.io.grpc.internal.DnsNameResolverProvider'
-        provides 'org.apache.logging.log4j.util.PropertySource' with 'org.apache.logging.log4j.util.EnvironmentPropertySource',
-                'org.apache.logging.log4j.util.SystemPropertiesPropertySource'
         provides 'java.sql.Driver' with 'org.postgresql.Driver'
-        provides 'org.apache.logging.log4j.plugins.processor.PluginService' with 'org.apache.logging.log4j.plugins.convert.plugins.Log4jPlugins'
         provides 'org.mariadb.jdbc.authentication.AuthenticationPlugin' with 'org.mariadb.jdbc.internal.com.send.authentication.CachingSha2PasswordPlugin',
                 'org.mariadb.jdbc.internal.com.send.authentication.ClearPasswordPlugin',
                 'org.mariadb.jdbc.internal.com.send.authentication.Ed25519PasswordPlugin',
@@ -671,8 +615,6 @@ jlink {
         provides 'org.mariadb.jdbc.credential.CredentialPlugin' with 'org.mariadb.jdbc.credential.aws.AwsIamCredentialPlugin',
                 'org.mariadb.jdbc.credential.env.EnvCredentialPlugin',
                 'org.mariadb.jdbc.credential.system.PropertiesCredentialPlugin'
-        provides 'org.slf4j.spi.SLF4JServiceProvider' with 'org.apache.logging.slf4j.SLF4JServiceProvider'
-        provides 'org.apache.logging.log4j.spi.Provider' with 'org.apache.logging.log4j.core.impl.Log4jProvider'
         provides 'java.security.Provider' with 'org.bouncycastle.jce.provider.BouncyCastleProvider',
                 'org.bouncycastle.pqc.jcajce.provider.BouncyCastlePQCProvider'
         provides 'com.microsoft.applicationinsights.core.dependencies.io.grpc.ManagedChannelProvider' with 'com.microsoft.applicationinsights.core.dependencies.io.grpc.netty.shaded.io.grpc.netty.NettyChannelProvider'
