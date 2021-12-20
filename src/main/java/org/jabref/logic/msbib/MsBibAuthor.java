@@ -8,6 +8,8 @@ public class MsBibAuthor {
     private String middleName;
     private final Author author;
     private boolean isCorporate;
+    private String affiliation;
+    private String areaOfStudy;
 
     public MsBibAuthor(Author author) {
         this.author = author;
@@ -28,6 +30,12 @@ public class MsBibAuthor {
     public MsBibAuthor(Author author, boolean isCorporate) {
         this(author);
         this.isCorporate = isCorporate;
+    }
+
+    public MsBibAuthor(Author author, boolean isCorporate, String affiliation, String areaOfStudy) {
+        this(author,isCorporate);
+        this.affiliation = affiliation;
+        this.areaOfStudy = areaOfStudy;
     }
 
     public String getFirstName() {
@@ -56,6 +64,10 @@ public class MsBibAuthor {
     public String getLastFirst() {
         return author.getLastFirst(false);
     }
+
+    public String getAffiliation(){return this.affiliation;};
+
+    public String getAreaOfStudy(){return this.areaOfStudy;};
 
     public boolean isCorporate() {
         return isCorporate;
