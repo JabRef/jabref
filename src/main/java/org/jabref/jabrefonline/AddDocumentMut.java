@@ -1,6 +1,7 @@
 package org.jabref.jabrefonline;
 
 import org.jabref.jabrefonline.type.AddPersonInput;
+
 import com.apollographql.apollo3.ApolloClient;
 import com.apollographql.apollo3.api.Optional;
 import org.slf4j.Logger;
@@ -19,17 +20,12 @@ public class AddDocumentMut {
 
         var optionalPersonInoput = new Optional.Present<>(new AddPersonInput("JabRef"));
 
-
-
-
-
-        // new AddJournalArticleInput()
         /*
+        // new AddJournalArticleInput() //DO I really need to provide all f*cking paramesters as new Optional(?)
         new AddJournalArticleInput(null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null)
 
-        var article = AddJournalArticleInput.builder()
-                                            .title("JabRef is great!")
-                                            .authors(List.of(authorField)).build();
+
+
         AddUserDocumentInput docInput = AddUserDocumentInput.builder()
                                            .journalArticle(article)
                                            .build();
