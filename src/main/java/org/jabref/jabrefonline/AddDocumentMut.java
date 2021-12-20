@@ -19,7 +19,11 @@ public class AddDocumentMut {
 
         var optionalPersonInoput = new Optional.Present<>(new AddPersonInput("JabRef"));
 
-        // new AddJournalArticleInput().title(new Optional.Present<>("JabRef is great"));
+
+
+
+
+        // new AddJournalArticleInput()
         /*
         new AddJournalArticleInput(null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null)
 
