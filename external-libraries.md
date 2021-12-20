@@ -170,6 +170,13 @@ License: Apache-2.0
 ```
 
 ```yaml
+Id:      commons-io:commons-io
+Project: Apache Commons IO
+URL:     https://commons.apache.org/proper/commons-io/
+License: Apache-2.0
+```
+
+```yaml
 Id:      commons-logging:commons-logging
 Project: Apache Commons Logging
 URL:     http://commons.apache.org/logging/
@@ -240,6 +247,27 @@ License: BSD-3-Clause; sometimes EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
 ```
 
 ```yaml
+Id:      net.harawata:appdirs
+Project: AppDirs
+URL:     https://github.com/harawata/appdirs
+License: Apache-2.0
+```
+
+```yaml
+Id:      net.java.dev.jna
+Project: Java Native Access (JNA)
+URL:     https://github.com/java-native-access/jna
+License: Apache-2.0
+```
+
+```yaml
+Id:      net.java.dev.jna-platform
+Project: Java Native Access (JNA)
+URL:     https://github.com/java-native-access/jna
+License: Apache-2.0
+```
+
+```yaml
 Id:      net.jcip:jcip-annotations
 Project: JCIP (Java Concurrency in Practice) Annotations under Apache License
 URL:     http://stephenc.github.io/jcip-annotations/
@@ -285,13 +313,6 @@ License: Apache-2.0
 Id:      org.apache.commons:commons-text
 Project: Apache Commons Text
 URL:     https://commons.apache.org/proper/commons-text/
-License: Apache-2.0
-```
-
-```yaml
-Id:      org.apache.logging.log4j
-Project: Apache Log2j 2
-URL:     http://logging.apache.org/log4j/2.x/
 License: Apache-2.0
 ```
 
@@ -478,6 +499,27 @@ License: MPL-2.0 AND Apache-2.0
 ```
 
 ```yaml
+Id:      org.tinylog:slf4j-tinylog
+Project: tinylog 2
+URL:     https://github.com/tinylog-org/tinylog
+License: Apache-2.0
+```
+
+```yaml
+Id:      org.tinylog:tinylog-api
+Project: tinylog 2
+URL:     https://github.com/tinylog-org/tinylog
+License: Apache-2.0
+```
+
+```yaml
+Id:      org.tinylog:tinylog-impl
+Project: tinylog 2
+URL:     https://github.com/tinylog-org/tinylog
+License: Apache-2.0
+```
+
+```yaml
 Id:      org.yaml:snakeyaml
 Project: SnakeYAML
 URL:     https://bitbucket.org/asomov/snakeyaml-engine/src/master/
@@ -491,23 +533,23 @@ License: Apache-2.0
 3. (on WSL) `sed 's/[^a-z]*//' < build/dependencies.txt | sed "s/\(.*\) .*/\1/" | grep -v "\->" | sort | uniq > build/dependencies-for-external-libraries.txt`
 
 ```text
-com.fasterxml.jackson.core:jackson-annotations:2.12.3
-com.fasterxml.jackson.core:jackson-core:2.12.3
-com.fasterxml.jackson.core:jackson-databind:2.12.3
-com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.12.3
-com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.12.3
-com.fasterxml.jackson:jackson-bom:2.12.3
+com.fasterxml.jackson.core:jackson-annotations:2.13.0
+com.fasterxml.jackson.core:jackson-core:2.13.0
+com.fasterxml.jackson.core:jackson-databind:2.13.0
+com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.13.0
+com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.13.0
+com.fasterxml.jackson:jackson-bom:2.13.0
 com.github.tomtung:latex2unicode_2.12:0.2.6
-com.google.code.gson:gson:2.8.6
-com.google.errorprone:error_prone_annotations:2.5.1
+com.google.code.gson:gson:2.8.8
+com.google.errorprone:error_prone_annotations:2.7.1
 com.google.guava:failureaccess:1.0.1
-com.google.guava:guava:30.1.1-jre
+com.google.guava:guava:31.0.1-jre
 com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava
 com.google.j2objc:j2objc-annotations:1.3
-com.googlecode.javaewah:JavaEWAH:1.1.7
-com.h2database:h2-mvstore:1.4.200
+com.googlecode.javaewah:JavaEWAH:1.1.12
+com.h2database:h2-mvstore:2.0.202
 com.jfoenix:jfoenix:9.0.10
-com.konghq:unirest-java:3.11.11
+com.konghq:unirest-java:3.13.4
 com.microsoft.azure:applicationinsights-core:2.4.1
 com.microsoft.azure:applicationinsights-logging-log4j2:2.4.1
 com.oracle.ojdbc:ojdbc10:19.3.0.0
@@ -534,24 +576,27 @@ com.vladsch.flexmark:flexmark-util-sequence:0.62.2
 com.vladsch.flexmark:flexmark-util-visitor:0.62.2
 com.vladsch.flexmark:flexmark-util:0.62.2
 com.vladsch.flexmark:flexmark:0.62.2
-commons-cli:commons-cli:1.4
+commons-cli:commons-cli:1.5.0
 commons-codec:commons-codec:1.11
+commons-io:commons-io:2.11.0
 commons-logging:commons-logging:1.2
 de.saxsys:mvvmfx-validation:1.9.0-SNAPSHOT
 de.saxsys:mvvmfx:1.8.0
-de.undercouch:citeproc-java:3.0.0-alpha.2
+de.undercouch:citeproc-java:3.0.0-alpha.3
 eu.lestard:doc-annotations:0.2
 info.debatty:java-string-similarity:2.0.0
-io.github.java-diff-utils:java-diff-utils:4.10
+io.github.java-diff-utils:java-diff-utils:4.11
 jakarta.activation:jakarta.activation-api:1.2.1
 jakarta.annotation:jakarta.annotation-api:1.3.5
 jakarta.xml.bind:jakarta.xml.bind-api:2.3.2
+net.harawata:appdirs:1.2.1
+net.java.dev.jna:jna-platform:5.6.0
+net.java.dev.jna:jna:5.6.0
 net.jcip:jcip-annotations:1.0
 net.jodah:typetools:0.6.1
 org.antlr:antlr-runtime:3.5.2
-org.antlr:antlr4-runtime:4.7.2 -> 4.9.2
-org.antlr:antlr4-runtime:4.9.2
-org.apache.commons:commons-csv:1.8
+org.antlr:antlr4-runtime:4.9.3
+org.apache.commons:commons-csv:1.9.0
 org.apache.commons:commons-lang3:3.9
 org.apache.commons:commons-text:1.8
 org.apache.httpcomponents:httpasyncclient:4.1.4
@@ -559,55 +604,45 @@ org.apache.httpcomponents:httpclient:4.5.13
 org.apache.httpcomponents:httpcore-nio:4.4.13
 org.apache.httpcomponents:httpcore:4.4.13
 org.apache.httpcomponents:httpmime:4.5.13
-org.apache.logging.log4j:log4j-api:3.0.0-SNAPSHOT
-org.apache.logging.log4j:log4j-core:3.0.0-SNAPSHOT
-org.apache.logging.log4j:log4j-jcl:3.0.0-SNAPSHOT
-org.apache.logging.log4j:log4j-plugins:3.0.0-SNAPSHOT
-org.apache.logging.log4j:log4j-slf4j18-impl:3.0.0-SNAPSHOT
-org.apache.lucene:lucene-core:8.9.0
-org.apache.lucene:lucene-queries:8.9.0
-org.apache.lucene:lucene-queryparser:8.9.0
-org.apache.lucene:lucene-analyzers-common:8.9.0
-org.apache.lucene:lucene-backward-codecs:8.9.0
-org.apache.lucene:lucene-highlighter:8.9.0
-org.apache.pdfbox:fontbox:2.0.24
-org.apache.pdfbox:pdfbox:2.0.24
+org.apache.pdfbox:fontbox:2.0.25
+org.apache.pdfbox:pdfbox:2.0.25
 org.apache.pdfbox:xmpbox:2.0.24
-org.apache.tika:tika-core:1.26
-org.bouncycastle:bcprov-jdk15on:1.69
-org.checkerframework:checker-qual:3.8.0
-org.controlsfx:controlsfx:11.1.0
-org.eclipse.jgit:org.eclipse.jgit:5.12.0.202106070339-r
-org.fxmisc.flowless:flowless:0.6.3
-org.fxmisc.richtext:richtextfx:0.10.6
-org.fxmisc.undo:undofx:2.1.0
+org.apache.tika:tika-core:2.2.0
+org.bouncycastle:bcprov-jdk15on:1.70
+org.checkerframework:checker-qual:3.12.0
+org.codehaus.mojo:animal-sniffer-annotations:1.18
+org.controlsfx:controlsfx:11.1.1
+org.eclipse.jgit:org.eclipse.jgit:5.13.0.202109080827-r
+org.fxmisc.flowless:flowless:0.6.7
+org.fxmisc.richtext:richtextfx:0.10.7
+org.fxmisc.undo:undofx:2.1.1
 org.fxmisc.wellbehaved:wellbehavedfx:0.3.3
 org.glassfish.hk2.external:jakarta.inject:2.6.1
 org.glassfish.jaxb:jaxb-runtime:2.3.2
 org.glassfish.jaxb:txw2:2.3.2
 org.jbibtex:jbibtex:1.0.17
 org.jetbrains:annotations:15.0
-org.jsoup:jsoup:1.13.1
+org.jsoup:jsoup:1.14.3
 org.jvnet.staxex:stax-ex:1.8.1
 org.kordamp.ikonli:ikonli-core:12.2.0
 org.kordamp.ikonli:ikonli-javafx:12.2.0
 org.kordamp.ikonli:ikonli-materialdesign2-pack:12.2.0
-org.libreoffice:libreoffice:7.1.4
-org.libreoffice:unoloader:7.1.4
-org.mariadb.jdbc:mariadb-java-client:2.7.3
-org.openjfx:javafx-base:16
-org.openjfx:javafx-controls:16
-org.openjfx:javafx-fxml:16
-org.openjfx:javafx-graphics:16
-org.openjfx:javafx-media:16
-org.openjfx:javafx-swing:16
-org.openjfx:javafx-web:16
-org.postgresql:postgresql:42.2.22
+org.libreoffice:libreoffice:7.2.3
+org.libreoffice:unoloader:7.2.2
+org.mariadb.jdbc:mariadb-java-client:2.7.4
+org.openjfx:javafx-base:17.0.1
+org.openjfx:javafx-controls:17.0.1
+org.openjfx:javafx-fxml:17.0.1
+org.openjfx:javafx-graphics:17.0.1
+org.openjfx:javafx-media:17.0.1
+org.openjfx:javafx-swing:17.0.1
+org.openjfx:javafx-web:17.0.1
+org.postgresql:postgresql:42.3.1
 org.reactfx:reactfx:2.0-M5
 org.scala-lang:scala-library:2.12.8
-org.slf4j:slf4j-api:1.7.12 -> 2.0.0-alpha1
-org.slf4j:slf4j-api:1.7.30 -> 2.0.0-alpha1
-org.slf4j:slf4j-api:1.8.0-beta4 -> 2.0.0-alpha1
-org.slf4j:slf4j-api:2.0.0-alpha1
-org.yaml:snakeyaml:1.27
+org.slf4j:slf4j-api:2.0.0-alpha5
+org.tinylog:slf4j-tinylog:2.4.1
+org.tinylog:tinylog-api:2.4.1
+org.tinylog:tinylog-impl:2.4.1
+org.yaml:snakeyaml:1.28
 ```
