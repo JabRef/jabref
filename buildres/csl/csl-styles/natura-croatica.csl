@@ -14,7 +14,7 @@
     <category field="biology"/>
     <issn>1330-0520</issn>
     <eissn>1848-7386</eissn>
-    <updated>2021-10-27T08:21:10+00:00</updated>
+    <updated>2021-12-17T16:20:35+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <macro name="author">
@@ -22,6 +22,11 @@
       <name and="symbol" delimiter-precedes-last="never" initialize-with=". " name-as-sort-order="all">
         <name-part name="family" font-variant="small-caps"/>
       </name>
+      <label form="short" prefix=" (" suffix=")"/>
+      <substitute>
+        <names variable="editor translator"/>
+        <text variable="title"/>
+      </substitute>
     </names>
   </macro>
   <macro name="editor">
@@ -80,7 +85,7 @@
         <text macro="author-short"/>
         <group>
           <text macro="year-date"/>
-          <text variable="year-suffix" font-style="italic"/>
+          <text variable="year-suffix" font-style="normal"/>
         </group>
         <text variable="locator"/>
       </group>
@@ -100,14 +105,14 @@
             <date variable="issued">
               <date-part name="year"/>
             </date>
-            <text variable="year-suffix" font-style="italic"/>
+            <text variable="year-suffix" font-style="normal"/>
           </group>
         </group>
         <choose>
           <if type="bill book graphic legal_case motion_picture report song" match="any">
             <group suffix=".">
               <group>
-                <text variable="title" font-style="italic" text-case="capitalize-first" suffix=". "/>
+                <text variable="title" text-case="capitalize-first" font-style="normal" suffix=". "/>
                 <group delimiter=" " suffix=" ">
                   <text term="in" text-case="capitalize-first" font-style="italic"/>
                   <text macro="editor"/>
@@ -151,7 +156,7 @@
                   <text macro="editor"/>
                 </group>
                 <group>
-                  <text variable="container-title" text-case="title" font-style="italic"/>
+                  <text variable="container-title" text-case="title" font-style="normal"/>
                   <choose>
                     <if is-numeric="volume">
                       <group delimiter=" " suffix=".">
