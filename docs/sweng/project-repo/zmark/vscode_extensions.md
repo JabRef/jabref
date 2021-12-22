@@ -1,0 +1,24 @@
+# VS Code Extensions
+- [Markdown All in One](https://marketplace.visualstudio.com/items?itemName=yzhang.markdown-all-in-one)
+  - i.e. for autocomplete list, tables, table of contents etc
+- [Markdown Print](https://marketplace.visualstudio.com/items?itemName=pdconsec.vscode-print)
+- [Markdown Shortcuts](https://marketplace.visualstudio.com/items?itemName=mdickin.markdown-shortcuts)
+- [Preview](https://marketplace.visualstudio.com/items?itemName=searKing.preview-vscode)
+    - Ctrl+Shift+v
+- [Sync Scroll](https://marketplace.visualstudio.com/items?itemName=dqisme.sync-scroll)
+    - allows for syncing windows when scrolling, i.e. markdown code window and preview window
+- [Avanced New File](https://marketplace.visualstudio.com/items?itemName=dkundel.vscode-new-file)
+- [Debugger for Java](https://marketplace.visualstudio.com/items?itemName=vscjava.vscode-java-debug)
+- [Extension Pack for Java](https://marketplace.visualstudio.com/items?itemName=vscjava.vscode-java-pack)
+- [Git Graph](https://marketplace.visualstudio.com/items?itemName=mhutchie.git-graph)
+- [Git Indicators](https://marketplace.visualstudio.com/items?itemName=lamartire.git-indicators)
+- [Github Remote Repositories](https://marketplace.visualstudio.com/items?itemName=GitHub.remotehub)
+- [GitLink
+](https://marketplace.visualstudio.com/items?itemName=qezhu.gitlink)
+- [Jupyter](https://marketplace.visualstudio.com/items?itemName=ms-toolsai.jupyter)
+- [LaTeX Workshop](https://marketplace.visualstudio.com/items?itemName=James-Yu.latex-workshop)
+- [Make Hidden](https://marketplace.visualstudio.com/items?itemName=devine-davies.make-hidden)
+- [Material Icon Theme](https://marketplace.visualstudio.com/items?itemName=PKief.material-icon-theme)
+- [Path IntelliSense](https://marketplace.visualstudio.com/items?itemName=christian-kohler.path-intellisense)
+- [Python](https://marketplace.visualstudio.com/items?itemName=ms-python.python)
+- [Rewrap](https://marketplace.visualstudio.com/items?itemName=stkb.rewrap)

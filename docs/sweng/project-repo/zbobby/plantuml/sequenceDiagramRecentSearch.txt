@@ -1,0 +1,7 @@
+@startuml
+actor User
+User -> GlobalSearchBar: performSearch()
+GlobalSearchBar -> RecentSearch: addQueryToRecentSearches
+User -> RecentSearch: clickOnRecentSearchEntry
+RecentSearch -> GlobalSearchBar: performSearch()
+@enduml
