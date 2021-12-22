@@ -3,18 +3,15 @@ package org.jabref.gui.search;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 
+import org.jabref.gui.icon.IconTheme;
+
 import org.controlsfx.control.PopOver;
 import org.controlsfx.control.textfield.CustomTextField;
-import org.jabref.gui.icon.IconTheme;
-import org.jabref.gui.keyboard.KeyBinding;
-
-import java.awt.*;
 
 public class DropDownMenu {
     public PopOver searchbarDropDown;
@@ -31,7 +28,9 @@ public class DropDownMenu {
     public Button searchStart;
     public Button addString;
     public RecentSearch recentSearch;
+    public TextField searchString;
 
+    @SuppressWarnings("checkstyle:NoWhitespaceBefore")
     public DropDownMenu(CustomTextField searchField, GlobalSearchBar globalSearchBar, SearchFieldSynchronizer searchFieldSynchronizer) {
 
         authorButton = new Button("Author");
@@ -46,11 +45,11 @@ public class DropDownMenu {
         deleteButton = IconTheme.JabRefIcons.DELETE_ENTRY.asButton();
         searchStart = IconTheme.JabRefIcons.SEARCH.asButton();
         addString = IconTheme.JabRefIcons.ADD_ENTRY.asButton();
+        searchString = new TextField();
 
         Text titleLucene = new Text(" Lucene Search");
         Text titleRecent = new Text(" Recent Searches");
         recentSearch = new RecentSearch(globalSearchBar);
-        TextField searchString = new TextField();
         searchString.setPrefWidth(200);
         HBox luceneString = new HBox(searchString, addString, searchStart, deleteButton);
         HBox recentSearchBox = recentSearch.getHBox();
@@ -60,8 +59,8 @@ public class DropDownMenu {
         HBox bracketButtons = new HBox(2, leftBracketButton, rightBracketButton);
 
         VBox mainBox = new VBox(4, titleLucene, luceneString, buttonsLucene, andOrButtons, bracketButtons, titleRecent, recentSearchBox);
-        mainBox.setMinHeight(500);
-        mainBox.setMinWidth(500);
+        // mainBox.setMinHeight(500);
+        // mainBox.setMinWidth(500);
         Node buttonBox = mainBox;
 
         searchField.addEventFilter(MouseEvent.MOUSE_CLICKED, event -> {
@@ -72,24 +71,66 @@ public class DropDownMenu {
                 searchbarDropDown.setContentNode(buttonBox);
                 searchbarDropDown.setDetachable(false); // not detachable
                 searchbarDropDown.show(searchField);
+                searchString.setFocusTraversable(false);
             }
         });
 
         // addString action
         addString.addEventFilter(MouseEvent.MOUSE_CLICKED, event -> {
-            String adder = searchString.getText();
             String current = searchField.getText();
-            String newString = current + adder;
-            searchField.positionCaret(searchField.getText().length());
-            searchField.setText(newString);
-            searchString.clear();
+            String adder = searchString.getText();
+            String newString = "";
+            int pos = current.length() - 1;
+            int pos2 = current.length() - 1;
+            while (pos > 0) {
+                char ch = current.charAt(pos);
+                if (ch == ':') {
+                    break;
+                }
+                pos--;
+            }
+            while (pos2 > 0) {
+                char cha = current.charAt(pos2);
+                if (cha == ')') {
+                    break;
+                }
+                pos2--;
+            }
+            if (searchField.getText().isEmpty()) {
+                searchField.setText(adder);
+                searchField.positionCaret(searchField.getText().length());
+                searchString.clear();
+            } else {
+                if (searchFieldSynchronizer.searchItemList.get(searchFieldSynchronizer.searchItemList.size() - 1).isLogical()) {
+                    newString = current + adder;
+                } else if (searchFieldSynchronizer.searchItemList.get(searchFieldSynchronizer.searchItemList.size() - 1).isRightBracket() && searchFieldSynchronizer.searchItemList.get(searchFieldSynchronizer.searchItemList.size() - 2).isLeftBracket()) {
+                    String subi = current.substring(0, pos2);
+                    newString = subi + adder + ")";
+                } else if (pos == 0 && pos2 == 0 && !searchString.getText().isEmpty()) {
+                    newString = current + " " + adder;
+                } else if (pos2 == current.length() - 1 && pos == 0) {
+                    String subs = current.substring(0, pos2);
+                    newString = subs + " " + adder + ")";
+                } else if (pos == current.length() - 1 && pos2 == 0) {
+                    newString = current + adder;
+                } else if (pos2 == current.length() - 1 && pos == current.length() - 2) {
+                    newString = current + adder + ")";
+                } else if (pos2 == current.length() - 1 && pos > 0) {
+                    String sub = current.substring(0, pos + 1);
+                    newString = sub + adder + ")";
+                }
+                searchField.setText(newString);
+                searchField.positionCaret(searchField.getText().length());
+                searchString.clear();
+            }
+            searchString.setFocusTraversable(false);
         });
 
         // searchStart action
         searchStart.addEventFilter(MouseEvent.MOUSE_CLICKED, event -> {
             globalSearchBar.focus();
             globalSearchBar.performSearch();
-            // searchbarDropDown.hide();
+            searchbarDropDown.hide();
         });
 
         // deleteButton action
@@ -97,6 +138,7 @@ public class DropDownMenu {
             searchField.clear();
             searchString.clear();
             searchFieldSynchronizer.deleteAllEntries();
+            searchString.setFocusTraversable(false);
         });
 
         // authorButton action

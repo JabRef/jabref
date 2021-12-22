@@ -10,7 +10,9 @@ public class RecentSearch {
     public RecentSearch(GlobalSearchBar searchBar) {
         this.RecentSearches.setOnMouseClicked(event -> {
             String query = this.RecentSearches.getSelectionModel().getSelectedItem();
-            searchBar.setSearchTerm(query);
+            if (query != null) {
+                searchBar.setSearchTerm(query);
+            }
             searchBar.performSearch();
         });
     }
