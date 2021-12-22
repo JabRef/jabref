@@ -2,6 +2,7 @@ package org.jabref.gui.search;
 
 import javafx.scene.Node;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
@@ -11,6 +12,7 @@ import javafx.scene.text.Text;
 import org.jabref.gui.icon.IconTheme;
 
 import org.controlsfx.control.PopOver;
+import org.controlsfx.control.RangeSlider;
 import org.controlsfx.control.textfield.CustomTextField;
 
 public class DropDownMenu {
@@ -19,9 +21,10 @@ public class DropDownMenu {
     public Button journalButton;
     public Button titleButton;
     public Button yearButton;
-    public Button yearRangeButton;
     public Button andButton;
     public Button orButton;
+    public Button andGroupButton;
+    public Button orGroupButton;
     public Button leftBracketButton;
     public Button rightBracketButton;
     public Button deleteButton;
@@ -37,9 +40,10 @@ public class DropDownMenu {
         journalButton = new Button("Journal");
         titleButton = new Button("Title");
         yearButton = new Button("Year");
-        yearRangeButton = new Button("Year-Range");
         andButton = new Button("AND");
         orButton = new Button("OR");
+        andGroupButton = new Button("AND^-1");
+        orGroupButton = new Button("OR^-1");
         leftBracketButton = new Button("(");
         rightBracketButton = new Button(")");
         deleteButton = IconTheme.JabRefIcons.DELETE_ENTRY.asButton();
@@ -50,15 +54,30 @@ public class DropDownMenu {
         Text titleLucene = new Text(" Lucene Search");
         Text titleRecent = new Text(" Recent Searches");
         recentSearch = new RecentSearch(globalSearchBar);
+        TextField searchString = new TextField();
         searchString.setPrefWidth(200);
+
+        // yearRangeSlider horizontal
+        Text titelYearRangeSlider = new Text("Year-Range");
+        final RangeSlider hSlider = new RangeSlider(1800, 2022, 10, 90);
+        hSlider.setShowTickMarks(true);
+        hSlider.setShowTickLabels(true);
+        hSlider.setBlockIncrement(10);
+        hSlider.setPrefWidth(100);
+        hSlider.setMajorTickUnit(100);
+        hSlider.setMinorTickCount(10);
+        hSlider.showTickMarksProperty();
+        Label label = new Label();
+
         HBox luceneString = new HBox(searchString, addString, searchStart, deleteButton);
         HBox recentSearchBox = recentSearch.getHBox();
         HBox buttonsLucene = new HBox(2, authorButton, journalButton, titleButton,
-                yearButton, yearRangeButton);
-        HBox andOrButtons = new HBox(2, andButton, orButton);
+                yearButton);
+        HBox andOrButtons = new HBox(2, andButton, orButton, andGroupButton, orGroupButton);
         HBox bracketButtons = new HBox(2, leftBracketButton, rightBracketButton);
+        HBox yearRangeSlider = new HBox(2, titelYearRangeSlider, hSlider, label);
 
-        VBox mainBox = new VBox(4, titleLucene, luceneString, buttonsLucene, andOrButtons, bracketButtons, titleRecent, recentSearchBox);
+        VBox mainBox = new VBox(4, titleLucene, luceneString, buttonsLucene, yearRangeSlider, andOrButtons, bracketButtons, titleRecent, recentSearchBox);
         // mainBox.setMinHeight(500);
         // mainBox.setMinWidth(500);
         Node buttonBox = mainBox;
@@ -73,6 +92,9 @@ public class DropDownMenu {
                 searchbarDropDown.show(searchField);
                 searchString.setFocusTraversable(false);
             }
+            searchbarDropDown.setOnHiding(event1 -> {
+                recentSearch.add(searchField.getText());
+            });
         });
 
         // addString action
@@ -106,18 +128,25 @@ public class DropDownMenu {
                 } else if (searchFieldSynchronizer.searchItemList.get(searchFieldSynchronizer.searchItemList.size() - 1).isRightBracket() && searchFieldSynchronizer.searchItemList.get(searchFieldSynchronizer.searchItemList.size() - 2).isLeftBracket()) {
                     String subi = current.substring(0, pos2);
                     newString = subi + adder + ")";
-                } else if (pos == 0 && pos2 == 0 && !searchString.getText().isEmpty()) {
+                } else if (searchFieldSynchronizer.searchItemList.get(searchFieldSynchronizer.searchItemList.size() - 1).isRightBracket() && searchFieldSynchronizer.searchItemList.get(searchFieldSynchronizer.searchItemList.size() - 2).isLogical()) {
+                    String subs = current.substring(0, pos2);
+                    newString = subs + adder + ")";
+                } else if (searchFieldSynchronizer.searchItemList.get(searchFieldSynchronizer.searchItemList.size() - 1).isQuery() && pos == 0 && !searchString.getText().isEmpty()) {
                     newString = current + " " + adder;
-                } else if (pos2 == current.length() - 1 && pos == 0) {
+                } else if (searchFieldSynchronizer.searchItemList.get(searchFieldSynchronizer.searchItemList.size() - 1).isRightBracket() && searchFieldSynchronizer.searchItemList.get(searchFieldSynchronizer.searchItemList.size() - 2).isQuery() && !searchFieldSynchronizer.searchItemList.get(searchFieldSynchronizer.searchItemList.size() - 3).isAttribute()) {
                     String subs = current.substring(0, pos2);
                     newString = subs + " " + adder + ")";
-                } else if (pos == current.length() - 1 && pos2 == 0) {
+                } else if (searchFieldSynchronizer.searchItemList.get(searchFieldSynchronizer.searchItemList.size() - 1).isAttribute()) {
                     newString = current + adder;
-                } else if (pos2 == current.length() - 1 && pos == current.length() - 2) {
-                    newString = current + adder + ")";
-                } else if (pos2 == current.length() - 1 && pos > 0) {
+                } else if (searchFieldSynchronizer.searchItemList.get(searchFieldSynchronizer.searchItemList.size() - 1).isRightBracket() && searchFieldSynchronizer.searchItemList.get(searchFieldSynchronizer.searchItemList.size() - 2).isAttribute()) {
+                    String subidu = current.substring(0, pos2);
+                    newString = subidu + adder + ")";
+                } else if (searchFieldSynchronizer.searchItemList.get(searchFieldSynchronizer.searchItemList.size() - 1).isRightBracket() && searchFieldSynchronizer.searchItemList.get(searchFieldSynchronizer.searchItemList.size() - 2).isQuery() && searchFieldSynchronizer.searchItemList.get(searchFieldSynchronizer.searchItemList.size() - 3).isAttribute()) {
                     String sub = current.substring(0, pos + 1);
                     newString = sub + adder + ")";
+                } else if (searchFieldSynchronizer.searchItemList.get(searchFieldSynchronizer.searchItemList.size() - 1).isQuery() && searchFieldSynchronizer.searchItemList.get(searchFieldSynchronizer.searchItemList.size() - 2).isAttribute()) {
+                    String nsub = current.substring(0, pos + 1);
+                    newString = nsub + adder;
                 }
                 searchField.setText(newString);
                 searchField.positionCaret(searchField.getText().length());
@@ -165,10 +194,38 @@ public class DropDownMenu {
             searchFieldSynchronizer.synchronize();
         });
 
-        // yearRangeButton action
-        yearRangeButton.addEventFilter(MouseEvent.MOUSE_CLICKED, event -> {
-            searchFieldSynchronizer.synchronize();
+        // yearRangeSlider action
+        hSlider.addEventFilter(MouseEvent.MOUSE_RELEASED, event -> {
+            int pos = 0;
+            boolean bol = false;
+            SearchItem item = null;
+            if (!searchField.getText().isEmpty()) {
+                for (int i = 0; i < searchFieldSynchronizer.searchItemList.size(); i++) {
+                    item = searchFieldSynchronizer.searchItemList.get(i);
+                    if (item.getItemType().equals("attribute")) {
+                        if (item.getItem().equals("year-range:")) {
+                            pos = i;
+                            bol = true;
+                        }
+                    }
+                }
+            }
+            if (!bol) {
+                searchFieldSynchronizer.addSearchItem("attribute", "year-range:");
+                searchFieldSynchronizer.addSearchItem("query", Integer.toString((int) hSlider.getLowValue()) + "to" + Integer.toString((int) hSlider.getHighValue()));
+                searchFieldSynchronizer.synchronize();
+            } else {
+               searchFieldSynchronizer.searchItemList.get(pos + 1).setItem(Integer.toString((int) hSlider.getLowValue()) + "to" + Integer.toString((int) hSlider.getHighValue()));
+               searchFieldSynchronizer.synchronize();
+            }
+        });
 
+        // yearRangeSlider output on action
+        hSlider.highValueProperty().addListener((observable, oldValue, newValue) -> {
+            label.setText("from " + Integer.toString((int) hSlider.getLowValue()) + " to " + Integer.toString((int) hSlider.getHighValue()));
+        });
+        hSlider.lowValueChangingProperty().addListener((observable, oldValue, newValue) -> {
+            label.setText("from " + Integer.toString((int) hSlider.getLowValue()) + " to " + Integer.toString((int) hSlider.getHighValue()));
         });
 
         // andButton action
@@ -189,9 +246,23 @@ public class DropDownMenu {
             searchFieldSynchronizer.synchronize();
         });
 
-        // orButton action
+        // rightBracketButton action
         rightBracketButton.addEventFilter(MouseEvent.MOUSE_CLICKED, event -> {
             searchFieldSynchronizer.addSearchItem("bracket", ")");
+            searchFieldSynchronizer.synchronize();
+        });
+
+        // andGroupButton action
+        andGroupButton.addEventFilter(MouseEvent.MOUSE_CLICKED, event -> {
+            searchFieldSynchronizer.addBrackets();
+            searchFieldSynchronizer.addSearchItem("logical", "AND");
+            searchFieldSynchronizer.synchronize();
+        });
+
+        // orGroupButton action
+        orGroupButton.addEventFilter(MouseEvent.MOUSE_CLICKED, event -> {
+            searchFieldSynchronizer.addBrackets();
+            searchFieldSynchronizer.addSearchItem("logical", "OR");
             searchFieldSynchronizer.synchronize();
         });
     }

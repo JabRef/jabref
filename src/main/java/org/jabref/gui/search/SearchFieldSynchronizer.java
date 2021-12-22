@@ -29,22 +29,8 @@ public class SearchFieldSynchronizer {
                 searchItemList.remove(searchItemList.get(0));
             }
         }
-
-        // if last item is ) bracket, add new item before
-        if (latestIsBracket()) {
-            searchItemList.remove(searchItemList.size() - 1);
+        if (isValid(this.searchItemList, newItem)) {
             searchItemList.add(newItem);
-            searchItemList.add(new SearchItem("bracket", ")"));
-            if (!isValid()) {
-                System.out.println("NOT VALID");
-                searchItemList.remove(searchItemList.size() - 1);
-                searchItemList.remove(searchItemList.size() - 1);
-                searchItemList.add(new SearchItem("bracket", ")"));
-            }
-        } else {
-            if (isValid(this.searchItemList, newItem)) {
-                searchItemList.add(newItem);
-            }
         }
     }
 
@@ -100,13 +86,14 @@ public class SearchFieldSynchronizer {
     public boolean isValid(ObservableList<SearchItem> searchItemList, SearchItem newItem) {
         StandardQueryParser queryParser = new StandardQueryParser();
 
+        searchItemList.add(newItem);
         boolean valid = true;
         try {
             queryParser.parse(this.searchStringBuilder(), "");
         } catch (QueryNodeException e) {
             valid = false;
         }
-
+        searchItemList.remove(newItem);
         if (valid) {
             return true;
         }
@@ -140,13 +127,23 @@ public class SearchFieldSynchronizer {
                 && searchItemList.get(searchItemList.size() - 1).getItem().equals(")");
     }
 
+    /* Text before --------, Text after addBrackets (--------) */
+    public void addBrackets() {
+        if (isValidLucene()) {
+            searchItemList.add(0, new SearchItem("bracket", "("));
+            searchItemList.add(new SearchItem("bracket", ")"));
+        } else {
+            System.out.print("TEST");
+        }
+    }
+
     /* builds a new searchString by calling searchStringBuilder,
     sets the searchField text and positions caret at the right position */
     public void synchronize() {
         String searchString = this.searchStringBuilder();
         searchField.clear();
         searchField.setText(searchString);
-        searchField.positionCaret(caretPos());
+        searchField.positionCaret(searchField.getText().length());
         syntaxHighlighting();
     }
 
@@ -171,11 +168,11 @@ public class SearchFieldSynchronizer {
             if (item.isQuery()) {
                 // item is query
 
-                // if it's not the first item append " " if the item before the current one was not an attribute
+                // if it's not the first item append " " if the item before the current one was not an attribute or bracket
                 if (i > 0) {
                     // not first item
-                    if (!searchItemList.get(i - 1).isAttribute()) {
-                        // item before was not attribute
+                    if (!searchItemList.get(i - 1).isAttribute() && !searchItemList.get(i - 1).isLeftBracket()) {
+                        // item before was not attribute or left bracket
                         searchString.append(" ");
                     }
                 }
@@ -201,25 +198,25 @@ public class SearchFieldSynchronizer {
 
             if (item.isAttribute()) {
                 // item is attribute
-                String lastChar = "empty";
-                if (searchString.length() != 0) {
-                    lastChar = searchString.substring(searchString.length() - 1);
-                }
-                if (i > 0 && !lastChar.equals("(")) {
-                    // not first item and last character not (
-                    searchString.append(" ");
+                // if it's not the first item append " " if the item before the current one was not a bracket
+                if (i > 0) {
+                    // not first item
+                    if (!searchItemList.get(i - 1).isLeftBracket()) {
+                        // item before was not attribute or left bracket
+                        searchString.append(" ");
+                    }
                 }
                 searchString.append(item.getItem());
             }
 
             if (item.isBracket()) {
-                if (i > 0) {
-                    // not first item
-                    if (item.getItemType().equals("(")) {
-                        searchString.append(" ");
-                    }
+                // item is bracket
+                if (item.isRightBracket()) {
+                   searchString.append(")");
                 }
-                searchString.append(item.getItem());
+                if (item.isLeftBracket()) {
+                    searchString.append("(");
+                }
             }
             // raise index counter by one
             i = i + 1;
@@ -270,6 +267,7 @@ public class SearchFieldSynchronizer {
                     searchItemList.add(new SearchItem("query", s));
                 }
             }
+            searchItemListToString(searchItemList);
         }
     }
 
@@ -299,11 +297,16 @@ public class SearchFieldSynchronizer {
 
         // splits a string "author:luh AND year:2013 OR author:\"lee smith\"" into
         // [(] [author:] [luh] [AND] [year:] [2013] [)] [OR] [(] [author:] ["lee smith" [)]]
-//        String[] words = str.split("(?<=:)|\\ ");
+        // String[] words = str.split("(?<=:)|\\ ");
         String[] words = str.split("(?<=:)|(?<=\\()|(?=\\))|\\ ");
         ArrayList<String> list = new ArrayList<>();
 
         for (int i = 0; i < words.length; i++) {
+            if (words[i].equals(")(")) {
+                list.add(")");
+                list.add("(");
+                continue;
+            }
             if (words[i].startsWith("\"")) {
                 boolean isWordAfterwards = i + 1 < words.length;
                 if (isWordAfterwards && words[i + 1].endsWith("\"") && !words[i].endsWith(":")) {
