@@ -1,6 +1,7 @@
 package org.jabref.gui.search;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -14,6 +15,8 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.css.PseudoClass;
 import javafx.event.Event;
 import javafx.geometry.Insets;
@@ -105,7 +108,9 @@ public class GlobalSearchBar extends HBox {
 
     private final BooleanProperty globalSearchActive = new SimpleBooleanProperty(false);
     private GlobalSearchResultDialog globalSearchResultDialog;
+    private SearchFieldSynchronizer searchFieldSynchronizer;
 
+    private final DropDownMenu dropDownMenu;
     public GlobalSearchBar(JabRefFrame frame, StateManager stateManager, PreferencesService preferencesService, CountingUndoManager undoManager) {
         super();
         this.stateManager = stateManager;
@@ -123,8 +128,26 @@ public class GlobalSearchBar extends HBox {
         searchFieldTooltip.setMaxHeight(10);
         updateHintVisibility();
 
+        // Prototype DropDownMenu
+        this.searchFieldSynchronizer = new SearchFieldSynchronizer(searchField);
+        this.dropDownMenu = new DropDownMenu(searchField, this, searchFieldSynchronizer);
+
+        // Prototype RecentSearch
+        // Add to RecentSearch after searchbar loses focus
+        searchField.focusedProperty().addListener(new ChangeListener<Boolean>() {
+            @Override
+            public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+                if (newValue) {
+                    LOGGER.info("Searchbar in focus");
+                } else {
+                    dropDownMenu.recentSearch.add(searchField.getText());
+                }
+            }
+        });
+
         KeyBindingRepository keyBindingRepository = Globals.getKeyPrefs();
         searchField.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
+
             Optional<KeyBinding> keyBinding = keyBindingRepository.mapToKeyBinding(event);
             if (keyBinding.isPresent()) {
                 if (keyBinding.get().equals(KeyBinding.CLOSE)) {
@@ -134,6 +157,12 @@ public class GlobalSearchBar extends HBox {
                     event.consume();
                 }
             }
+        });
+
+        // Listens to global search bar textfield changes and updates searchItemList in searchFieldSynchronizer
+        searchField.textProperty().addListener((observable, oldValue, newValue) -> {
+//            System.out.println("textfield changed from " + oldValue + " to " + newValue);
+            searchFieldSynchronizer.updateSearchItemList(textFieldToList());
         });
 
         ClipBoardManager.addX11Support(searchField);
@@ -194,6 +223,45 @@ public class GlobalSearchBar extends HBox {
 
         this.stateManager.activeSearchQueryProperty().addListener((obs, oldvalue, newValue) -> newValue.ifPresent(this::updateSearchResultsForQuery));
         this.stateManager.activeDatabaseProperty().addListener((obs, oldValue, newValue) -> stateManager.activeSearchQueryProperty().get().ifPresent(this::updateSearchResultsForQuery));
+    }
+
+    private ArrayList<String> textFieldToList() {
+        String str = searchField.getText();
+        // splits a string "author:luh AND year:2013 OR author:\"lee smith\"" into
+        // [author:] [luh] [AND] [year:] [2013] [OR] [author:] ["lee smith"]
+        String[]words = str.split("(?<=:)|\\ ");
+        ArrayList<String> list = new ArrayList<>();
+
+//        // ARRAY TEST
+//        System.out.print("Textfeld Array: ");
+//        for (String word : words) {
+//            System.out.print(word + " | ");
+//        }
+//        System.out.println();
+
+        for (int i = 0; i < words.length; i++) {
+            if (words[i].startsWith("\"")) {
+                boolean isWordAfterwards = i + 1 < words.length;
+                if (isWordAfterwards && words[i + 1].endsWith("\"") && !words[i].endsWith(":")) {
+                    String str2 = words[i] + " " + words[i + 1];
+                    list.add(str2);
+                    i++;
+                } else {
+                    list.add(words[i]);
+                }
+            } else {
+                list.add(words[i]);
+            }
+        }
+
+      // TEXTFELD TEST
+        System.out.print("Textfeld Liste: ");
+        for (String word : list) {
+            System.out.print(word + " | ");
+        }
+        System.out.println();
+
+        return list;
     }
 
     private void updateSearchResultsForQuery(SearchQuery query) {
@@ -268,9 +336,10 @@ public class GlobalSearchBar extends HBox {
     }
 
     public void performSearch() {
-
         LOGGER.debug("Flags: {}", searchPreferences.getSearchFlags());
         LOGGER.debug("Run search " + searchField.getText());
+
+        // Prototype DropDownMenu
 
         // An empty search field should cause the search to be cleared.
         if (searchField.getText().isEmpty()) {
@@ -361,7 +430,7 @@ public class GlobalSearchBar extends HBox {
 
     private void setSearchFieldHintTooltip(TextFlow description) {
         if (preferencesService.getGeneralPreferences().shouldShowAdvancedHints()) {
-            String genericDescription = Localization.lang("Hint:\n\nTo search all fields for <b>Smith</b>, enter:\n<tt>smith</tt>\n\nTo search the field <b>author</b> for <b>Smith</b> and the field <b>title</b> for <b>electrical</b>, enter:\n<tt>author=Smith and title=electrical</tt>");
+            String genericDescription = Localization.lang("Hint:\n\nTo search all fields for <b>Smith</b>, enter:\n<tt>smith</tt>\n\nTo search the field <b>author</b> for <b>Smith</b> and the field <b>title</b> for <b>electrical</b>, enter:\n<tt>author:Smith and title:electrical</tt>");
             List<Text> genericDescriptionTexts = TooltipTextUtil.createTextsFromHtml(genericDescription);
 
             if (description == null) {
@@ -381,11 +450,25 @@ public class GlobalSearchBar extends HBox {
     }
 
     public void setSearchTerm(String searchTerm) {
-        if (searchTerm.equals(searchField.getText())) {
+        if (searchTerm == null || searchTerm.equals(searchField.getText())) {
             return;
         }
+        DefaultTaskExecutor.runInJavaFXThread(() -> {
+            searchField.setText(searchTerm);
+            searchField.positionCaret(searchField.getText().length());
+        });
+    }
 
-        DefaultTaskExecutor.runInJavaFXThread(() -> searchField.setText(searchTerm));
+    // Sets carret position in global search bar. If out of bounds carret will be positioned at the end.
+    public void setCarretPosition(int position) {
+        DefaultTaskExecutor.runInJavaFXThread(() -> {
+            if (position >= 0 && position < searchField.getText().length()) {
+                searchField.positionCaret(position);
+            } else {
+                searchField.positionCaret(searchField.getText().length());
+            }
+
+        });
     }
 
     private static class SearchPopupSkin<T> implements Skin<AutoCompletePopup<T>> {
