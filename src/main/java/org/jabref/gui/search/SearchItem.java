@@ -24,4 +24,28 @@ public class SearchItem {
     public void setItem(String item) {
         this.item = item;
     }
+
+    public boolean isQuery() {
+        return this.itemType.equals("query");
+    }
+
+    public boolean isAttribute() {
+        return this.itemType.equals("attribute");
+    }
+
+    public boolean isLogical() {
+        return this.itemType.equals("logical");
+    }
+
+    public boolean isBracket() {
+        return this.itemType.equals("bracket");
+    }
+
+    public boolean isLeftBracket() {
+        return this.itemType.equals("bracket") && this.item.equals("(");
+    }
+
+    public boolean isRightBracket() {
+        return this.itemType.equals("bracket") && this.item.equals(")");
+    }
 }
