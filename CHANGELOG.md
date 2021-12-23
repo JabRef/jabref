@@ -17,7 +17,8 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 
 ### Fixed
 
-- We fixed an issue where clicking on headings in the entry preview could lead to an exception [#8292](https://github.com/JabRef/jabref/issues/8292)
+- We fixed an issue where clicking on headings in the entry preview could lead to an exception. [#8292](https://github.com/JabRef/jabref/issues/8292)
+- We fixed an issue about empty metadata in library properties when called from the right click menu. [#8358](https://github.com/JabRef/jabref/issues/8358)
 
 ### Removed
 
