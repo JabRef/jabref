@@ -1,6 +1,7 @@
 package org.jabref.logic.integrity;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
@@ -25,11 +26,15 @@ import org.jabref.model.entry.types.IEEETranEntryType;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.preferences.FilePreferences;
+import org.jabref.preferences.GeneralPreferences;
+import org.jabref.preferences.PreferencesService;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.mockito.Answers;
 import org.mockito.Mockito;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -44,6 +49,24 @@ import static org.mockito.Mockito.when;
  * this test has to go to a test belonging to the respective checker. See PersonNamesCheckerTest for an example test.
  */
 class IntegrityCheckTest {
+    private PreferencesService preferenceService;
+
+    @BeforeEach
+    void setUp() {
+        preferenceService = mock(PreferencesService.class);
+
+        GeneralPreferences generalPreferences = mock(GeneralPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        when(generalPreferences.getDefaultEncoding()).thenReturn(StandardCharsets.UTF_8);
+
+        when(preferenceService.getGeneralPreferences()).thenReturn(generalPreferences);
+
+        FilePreferences filePreferencesMock = mock(FilePreferences.class);
+        when(filePreferencesMock.shouldStoreFilesRelativeToBibFile()).thenReturn(true);
+
+        when(preferenceService.getFilePreferences()).thenReturn(filePreferencesMock);
+
+        when(preferenceService.getCitationKeyPatternPreferences()).thenReturn(createCitationKeyPatternPreferences());
+    }
 
     @Test
     void bibTexAcceptsStandardEntryType() {
@@ -137,8 +160,7 @@ class IntegrityCheckTest {
         BibDatabaseContext context = new BibDatabaseContext(bibDatabase);
 
         new IntegrityCheck(context,
-                mock(FilePreferences.class),
-                createCitationKeyPatternPreferences(),
+                preferenceService,
                 JournalAbbreviationLoader.loadBuiltInRepository(), false)
                 .check();
 
@@ -170,30 +192,17 @@ class IntegrityCheckTest {
 
     private void assertWrong(BibDatabaseContext context) {
         List<IntegrityMessage> messages = new IntegrityCheck(context,
-                mock(FilePreferences.class),
-                createCitationKeyPatternPreferences(),
+                preferenceService,
                 JournalAbbreviationLoader.loadBuiltInRepository(), false)
                 .check();
         assertNotEquals(Collections.emptyList(), messages);
     }
 
     private void assertCorrect(BibDatabaseContext context) {
-        FilePreferences filePreferencesMock = mock(FilePreferences.class);
-        when(filePreferencesMock.shouldStoreFilesRelativeToBibFile()).thenReturn(true);
         List<IntegrityMessage> messages = new IntegrityCheck(context,
-                filePreferencesMock,
-                createCitationKeyPatternPreferences(),
+                preferenceService,
                 JournalAbbreviationLoader.loadBuiltInRepository(), false
         ).check();
-        assertEquals(Collections.emptyList(), messages);
-    }
-
-    private void assertCorrect(BibDatabaseContext context, boolean allowIntegerEdition) {
-        List<IntegrityMessage> messages = new IntegrityCheck(context,
-                mock(FilePreferences.class),
-                createCitationKeyPatternPreferences(),
-                JournalAbbreviationLoader.loadBuiltInRepository(),
-                allowIntegerEdition).check();
         assertEquals(Collections.emptyList(), messages);
     }
 

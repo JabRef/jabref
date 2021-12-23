@@ -24,7 +24,7 @@ public class UTF8CheckerTest {
      */
     @Test
     void fieldAcceptsUTF8() {
-        UTF8Checker checker = new UTF8Checker();
+        UTF8Checker checker = new UTF8Checker(StandardCharsets.UTF_8);
         entry.setField(StandardField.TITLE, "Only ascii characters!'@12");
         assertEquals(Collections.emptyList(), checker.check(entry));
     }
@@ -41,7 +41,7 @@ public class UTF8CheckerTest {
     void fieldDoesNotAcceptUmlauts() throws UnsupportedEncodingException {
         String defaultCharset = System.getProperty("file.encoding");
         System.getProperties().put("file.encoding", "GBK");
-        UTF8Checker checker = new UTF8Checker();
+        UTF8Checker checker = new UTF8Checker(StandardCharsets.UTF_8);
         String NonUTF8 = new String("你好，这条语句使用GBK字符集".getBytes(), "GBK");
         entry.setField(StandardField.MONTH, NonUTF8);
         assertEquals(List.of(new IntegrityMessage("Non-UTF-8 encoded field found", entry, StandardField.MONTH)), checker.check(entry));
