@@ -20,6 +20,7 @@ public enum StandardField implements Field {
     ADDRESS("address"),
     AFTERWORD("afterword", FieldProperty.PERSON_NAMES),
     AFFILIATION("affiliation"),
+    AREA_OF_STUDY("area_of_study"),
     ANNOTE("annote"),
     ANNOTATION("annotation"),
     ANNOTATOR("annotator", FieldProperty.PERSON_NAMES),

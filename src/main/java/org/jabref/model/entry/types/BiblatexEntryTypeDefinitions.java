@@ -30,7 +30,7 @@ public class BiblatexEntryTypeDefinitions {
                     StandardField.ISSN, StandardField.ADDENDUM, StandardField.PUBSTATE, StandardField.DOI, StandardField.EPRINT,
                     StandardField.EPRINTCLASS, StandardField.EPRINTTYPE, StandardField.URL, StandardField.URLDATE)
             .withRequiredFields(
-                    StandardField.AUTHOR, StandardField.TITLE, StandardField.JOURNALTITLE, StandardField.DATE,StandardField.AFFILIATION)
+                    StandardField.AUTHOR, StandardField.TITLE, StandardField.JOURNALTITLE, StandardField.DATE,StandardField.AFFILIATION,StandardField.AREA_OF_STUDY)
             .build();
 
     private static final BibEntryType BOOK = new BibEntryTypeBuilder()
