@@ -1,5 +1,6 @@
 package org.jabref.logic.integrity;
 
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,6 +11,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.preferences.FilePreferences;
+import org.jabref.preferences.PreferencesService;
 
 public class IntegrityCheck {
 
@@ -18,11 +20,14 @@ public class IntegrityCheck {
     private final List<EntryChecker> entryCheckers;
 
     public IntegrityCheck(BibDatabaseContext bibDatabaseContext,
-                          FilePreferences filePreferences,
-                          CitationKeyPatternPreferences citationKeyPatternPreferences,
+                          PreferencesService preferencesService,
                           JournalAbbreviationRepository journalAbbreviationRepository,
                           boolean allowIntegerEdition) {
         this.bibDatabaseContext = bibDatabaseContext;
+
+        Charset defaultEncoding = preferencesService.getGeneralPreferences().getDefaultEncoding();
+        FilePreferences filePreferences = preferencesService.getFilePreferences();
+        CitationKeyPatternPreferences citationKeyPatternPreferences = preferencesService.getCitationKeyPatternPreferences();
 
         fieldCheckers = new FieldCheckers(bibDatabaseContext,
                 filePreferences,
@@ -41,8 +46,8 @@ public class IntegrityCheck {
         if (bibDatabaseContext.isBiblatexMode()) {
             entryCheckers.addAll(List.of(
                     new JournalInAbbreviationListChecker(StandardField.JOURNALTITLE, journalAbbreviationRepository),
-                    new UTF8Checker())
-            );
+                    new UTF8Checker(bibDatabaseContext.getMetaData().getEncoding().orElse(defaultEncoding))
+            ));
         } else {
             entryCheckers.addAll(List.of(
                     new JournalInAbbreviationListChecker(StandardField.JOURNAL, journalAbbreviationRepository),

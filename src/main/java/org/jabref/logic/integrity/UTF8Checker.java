@@ -14,6 +14,11 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 
 public class UTF8Checker implements EntryChecker {
+    private final Charset charset;
+
+    public UTF8Checker(Charset charset) {
+        this.charset = charset;
+    }
 
     /**
      * Detect any non UTF-8 encoded field
@@ -23,7 +28,6 @@ public class UTF8Checker implements EntryChecker {
     @Override
     public List<IntegrityMessage> check(BibEntry entry) {
         List<IntegrityMessage> results = new ArrayList<>();
-        Charset charset = Charset.forName(System.getProperty("file.encoding"));
         for (Map.Entry<Field, String> field : entry.getFieldMap().entrySet()) {
             boolean utfOnly = UTF8EncodingChecker(field.getValue().getBytes(charset));
             if (!utfOnly) {
