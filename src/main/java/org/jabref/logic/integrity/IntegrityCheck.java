@@ -11,7 +11,6 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.preferences.FilePreferences;
-import org.jabref.preferences.PreferencesService;
 
 public class IntegrityCheck {
 
@@ -20,14 +19,12 @@ public class IntegrityCheck {
     private final List<EntryChecker> entryCheckers;
 
     public IntegrityCheck(BibDatabaseContext bibDatabaseContext,
-                          PreferencesService preferencesService,
+                          FilePreferences filePreferences,
+                          CitationKeyPatternPreferences citationKeyPatternPreferences,
+                          Charset defaultEncoding,
                           JournalAbbreviationRepository journalAbbreviationRepository,
                           boolean allowIntegerEdition) {
         this.bibDatabaseContext = bibDatabaseContext;
-
-        Charset defaultEncoding = preferencesService.getGeneralPreferences().getDefaultEncoding();
-        FilePreferences filePreferences = preferencesService.getFilePreferences();
-        CitationKeyPatternPreferences citationKeyPatternPreferences = preferencesService.getCitationKeyPatternPreferences();
 
         fieldCheckers = new FieldCheckers(bibDatabaseContext,
                 filePreferences,
