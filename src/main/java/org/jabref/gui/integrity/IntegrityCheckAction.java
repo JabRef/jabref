@@ -42,6 +42,7 @@ public class IntegrityCheckAction extends SimpleCommand {
         IntegrityCheck check = new IntegrityCheck(database,
                 Globals.prefs.getFilePreferences(),
                 Globals.prefs.getCitationKeyPatternPreferences(),
+                Globals.prefs.getGeneralPreferences().getDefaultEncoding(),
                 Globals.journalAbbreviationRepository,
                 Globals.prefs.getEntryEditorPreferences().shouldAllowIntegerEditionBibtex());
 
