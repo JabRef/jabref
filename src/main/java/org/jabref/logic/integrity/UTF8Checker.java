@@ -21,7 +21,7 @@ public class UTF8Checker implements EntryChecker {
      * <ol>
      * <li>decode a String into a bytes array</li>
      * <li>attempts to decode the bytes array to a character array using the UTF-8 Charset</li>
-     * <ol/>
+     * </ol>
      *
      * @param charset the charset used to decode BibEntry fields
      */
