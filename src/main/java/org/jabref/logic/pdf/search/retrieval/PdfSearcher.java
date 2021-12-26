@@ -14,6 +14,8 @@ import org.jabref.model.strings.StringUtil;
 
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.index.IndexWriter;
+import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.queryparser.classic.MultiFieldQueryParser;
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.search.IndexSearcher;
@@ -60,7 +62,10 @@ public final class PdfSearcher {
         try {
             List<SearchResult> resultDocs = new LinkedList<>();
 
-            IndexReader reader = DirectoryReader.open(indexDirectory);
+            IndexWriter indexWriter = new IndexWriter(indexDirectory,
+                                                      new IndexWriterConfig(
+                                                              new EnglishStemAnalyzer()).setOpenMode(IndexWriterConfig.OpenMode.CREATE_OR_APPEND));
+            IndexReader reader = DirectoryReader.open(indexWriter);
             IndexSearcher searcher = new IndexSearcher(reader);
             Query query = new MultiFieldQueryParser(PDF_FIELDS, new EnglishStemAnalyzer()).parse(searchString);
             TopDocs results = searcher.search(query, maxHits);
