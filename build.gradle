@@ -118,6 +118,16 @@ dependencies {
     implementation 'org.apache.pdfbox:fontbox:2.0.25'
     implementation 'org.apache.pdfbox:xmpbox:2.0.24'
 
+    implementation 'org.apache.lucene:lucene-core:9.0.0'
+    implementation ('org.apache.lucene:lucene-queryparser:9.0.0') {
+        exclude module: "lucene-sandbox"
+    }
+    implementation 'org.apache.lucene:lucene-queries:9.0.0'
+    implementation 'org.apache.lucene:lucene-analysis-common:9.0.0'
+    implementation 'org.apache.lucene:lucene-backward-codecs:9.0.0'
+    implementation 'org.apache.lucene:lucene-highlighter:9.0.0'
+
+
     implementation group: 'org.apache.commons', name: 'commons-csv', version: '1.9.0'
     implementation 'com.h2database:h2-mvstore:2.0.202'
 
@@ -573,7 +583,6 @@ jlink {
         uses 'org.eclipse.jgit.transport.SshSessionFactory'
         uses 'org.eclipse.jgit.lib.GpgSigner'
         uses 'javax.xml.bind.JAXBContextFactory'
-        provides 'org.apache.lucene.codecs.DocValuesFormat' with 'org.apache.lucene.codecs.lucene80.Lucene80DocValuesFormat'
         provides 'org.controlsfx.glyphfont.GlyphFont' with 'org.controlsfx.glyphfont.FontAwesome'
         provides 'org.mariadb.jdbc.tls.TlsSocketPlugin' with 'org.mariadb.jdbc.internal.protocol.tls.DefaultTlsSocketPlugin'
         provides 'com.microsoft.applicationinsights.core.dependencies.io.grpc.ServerProvider' with 'com.microsoft.applicationinsights.core.dependencies.io.grpc.netty.shaded.io.grpc.netty.NettyServerProvider'
