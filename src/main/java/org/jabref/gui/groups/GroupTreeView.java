@@ -86,7 +86,10 @@ public class GroupTreeView extends BorderPane {
      * Note: This panel is deliberately not created in FXML, since parsing of this took about 500 msecs. In an attempt
      * to speed up the startup time of JabRef, this has been rewritten to plain java.
      */
-    public GroupTreeView(TaskExecutor taskExecutor, StateManager stateManager, PreferencesService preferencesService, DialogService dialogService) {
+    public GroupTreeView(TaskExecutor taskExecutor,
+                         StateManager stateManager,
+                         PreferencesService preferencesService,
+                         DialogService dialogService) {
         this.taskExecutor = taskExecutor;
         this.stateManager = stateManager;
         this.preferencesService = preferencesService;
@@ -199,9 +202,17 @@ public class GroupTreeView extends BorderPane {
                                 group.allSelectedEntriesMatchedProperty());
                     }
                     Text text = new Text();
-                    if (preferencesService.getDisplayGroupCount()) {
-                        text.textProperty().bind(group.getHits().asString());
-                    }
+                    EasyBind.subscribe(preferencesService.getGroupsPreferences().displayGroupCountProperty(),
+                            (newValue) -> {
+                                if (text.textProperty().isBound()) {
+                                    text.textProperty().unbind();
+                                    text.setText("");
+                                }
+
+                                if (newValue) {
+                                    text.textProperty().bind(group.getHits().asString());
+                                }
+                            });
                     text.getStyleClass().setAll("text");
                     node.getChildren().add(text);
                     node.setMaxWidth(Control.USE_PREF_SIZE);
@@ -296,9 +307,7 @@ public class GroupTreeView extends BorderPane {
                 }
                 event.consume();
             });
-            row.setOnDragExited(event -> {
-                ControlHelper.removeDroppingPseudoClasses(row);
-            });
+            row.setOnDragExited(event -> ControlHelper.removeDroppingPseudoClasses(row));
 
             row.setOnDragDropped(event -> {
                 Dragboard dragboard = event.getDragboard();
