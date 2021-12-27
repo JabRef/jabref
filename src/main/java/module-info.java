@@ -102,8 +102,7 @@ open module org.jabref {
     // fulltext search
     requires org.apache.lucene.core;
     requires org.apache.lucene.queryparser;
-
-    requires org.eclipse.jgit;
+    requires org.apache.lucene.codecs;
     requires com.fasterxml.jackson.databind;
     requires com.fasterxml.jackson.dataformat.yaml;
     requires com.fasterxml.jackson.datatype.jsr310;
