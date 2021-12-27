@@ -2510,12 +2510,12 @@ public class JabRefPreferences implements PreferencesService {
         }
 
         sidePanePreferences = new SidePanePreferences(
-                getVisiblePanes(),
+                getVisibleSidePanes(),
                 getSidePanePreferredPositions(),
                 getInt(SELECTED_FETCHER_INDEX));
 
         sidePanePreferences.visiblePanes().addListener((InvalidationListener) listener ->
-                storeVisiblePanes(sidePanePreferences.visiblePanes()));
+                storeVisibleSidePanes(sidePanePreferences.visiblePanes()));
         sidePanePreferences.getPreferredPositions().addListener((InvalidationListener) listener ->
                 storeSidePanePreferredPositions(sidePanePreferences.getPreferredPositions()));
         EasyBind.listen(sidePanePreferences.webSearchFetcherSelectedProperty(), (obs, oldValue, newValue) -> putInt(SELECTED_FETCHER_INDEX, newValue));
@@ -2523,7 +2523,7 @@ public class JabRefPreferences implements PreferencesService {
         return sidePanePreferences;
     }
 
-    private Set<SidePaneType> getVisiblePanes() {
+    private Set<SidePaneType> getVisibleSidePanes() {
         HashSet<SidePaneType> visiblePanes = new HashSet<>();
         if (getBoolean(WEB_SEARCH_VISIBLE)) {
             visiblePanes.add(SidePaneType.WEB_SEARCH);
@@ -2537,7 +2537,7 @@ public class JabRefPreferences implements PreferencesService {
         return visiblePanes;
     }
 
-    private void storeVisiblePanes(Set<SidePaneType> visiblePanes) {
+    private void storeVisibleSidePanes(Set<SidePaneType> visiblePanes) {
         putBoolean(WEB_SEARCH_VISIBLE, visiblePanes.contains(SidePaneType.WEB_SEARCH));
         putBoolean(GROUP_SIDEPANE_VISIBLE, visiblePanes.contains(SidePaneType.GROUPS));
         putBoolean(OO_SHOW_PANEL, visiblePanes.contains(SidePaneType.OPEN_OFFICE));
