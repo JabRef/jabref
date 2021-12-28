@@ -116,7 +116,7 @@ dependencies {
 
     implementation 'org.apache.pdfbox:pdfbox:2.0.25'
     implementation 'org.apache.pdfbox:fontbox:2.0.25'
-    implementation 'org.apache.pdfbox:xmpbox:2.0.24'
+    implementation 'org.apache.pdfbox:xmpbox:2.0.25'
 
     implementation group: 'org.apache.commons', name: 'commons-csv', version: '1.9.0'
     implementation 'com.h2database:h2-mvstore:2.0.204'
