@@ -45,10 +45,14 @@ public class CopyCitationAction extends SimpleCommand {
     private final DialogService dialogService;
     private final ClipBoardManager clipBoardManager;
 
-    public CopyCitationAction(CitationStyleOutputFormat outputFormat, DialogService dialogService, StateManager stateManager, ClipBoardManager clipBoardManager, PreviewPreferences previewPreferences) {
+    public CopyCitationAction(CitationStyleOutputFormat outputFormat,
+                              DialogService dialogService,
+                              StateManager stateManager,
+                              ClipBoardManager clipBoardManager,
+                              PreviewPreferences previewPreferences) {
         this.selectedEntries = stateManager.getSelectedEntries();
-        this.style = previewPreferences.getCurrentPreviewStyle();
-        this.previewStyle = previewPreferences.getPreviewStyle();
+        this.style = previewPreferences.getSelectedPreviewLayout();
+        this.previewStyle = previewPreferences.getCustomPreviewLayout().getText();
         this.outputFormat = outputFormat;
         this.clipBoardManager = clipBoardManager;
         this.dialogService = dialogService;

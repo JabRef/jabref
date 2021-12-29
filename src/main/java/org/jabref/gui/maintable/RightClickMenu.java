@@ -97,7 +97,7 @@ public class RightClickMenu {
 
         // the submenu will behave dependent on what style is currently selected (citation/preview)
         PreviewPreferences previewPreferences = preferencesService.getPreviewPreferences();
-        PreviewLayout style = previewPreferences.getCurrentPreviewStyle();
+        PreviewLayout style = previewPreferences.getSelectedPreviewLayout();
         if (style instanceof CitationStylePreviewLayout) {
             copySpecialMenu.getItems().add(factory.createMenuItem(StandardActions.COPY_CITATION_HTML, new CopyCitationAction(CitationStyleOutputFormat.HTML, dialogService, stateManager, clipBoardManager, previewPreferences)));
             Menu copyCitationMenu = factory.createMenu(StandardActions.COPY_CITATION_MORE);

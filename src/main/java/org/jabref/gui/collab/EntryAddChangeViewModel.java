@@ -37,7 +37,7 @@ class EntryAddChangeViewModel extends DatabaseChangeViewModel {
     @Override
     public Node description() {
         PreviewViewer previewViewer = new PreviewViewer(new BibDatabaseContext(), JabRefGUI.getMainFrame().getDialogService(), stateManager);
-        previewViewer.setLayout(preferencesService.getPreviewPreferences().getCurrentPreviewStyle());
+        previewViewer.setLayout(preferencesService.getPreviewPreferences().getSelectedPreviewLayout());
         previewViewer.setEntry(entry);
         return previewViewer;
     }

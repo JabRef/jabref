@@ -341,7 +341,6 @@ public class JabRefPreferences implements PreferencesService {
     private static final String PREVIEW_STYLE = "previewStyle";
     private static final String CYCLE_PREVIEW_POS = "cyclePreviewPos";
     private static final String CYCLE_PREVIEW = "cyclePreview";
-    private static final String PREVIEW_PANEL_HEIGHT = "previewPanelHeightFX";
     private static final String PREVIEW_AS_TAB = "previewAsTab";
 
     // Proxy
@@ -703,7 +702,6 @@ public class JabRefPreferences implements PreferencesService {
         // preview
         defaults.put(CYCLE_PREVIEW, "Preview;" + CitationStyle.DEFAULT);
         defaults.put(CYCLE_PREVIEW_POS, 0);
-        defaults.put(PREVIEW_PANEL_HEIGHT, 0.65);
         defaults.put(PREVIEW_AS_TAB, Boolean.FALSE);
         defaults.put(PREVIEW_STYLE,
                 "<font face=\"sans-serif\">" +
@@ -2437,66 +2435,65 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public PreviewPreferences getPreviewPreferences() {
-        if (this.previewPreferences == null) {
-            updatePreviewPreferences();
+        if (Objects.nonNull(previewPreferences)) {
+            return previewPreferences;
         }
+
+        String style = get(PREVIEW_STYLE);
+        List<PreviewLayout> layouts = getPreviewLayouts(style);
+
+        this.previewPreferences = new PreviewPreferences(
+                layouts,
+                getPreviewCyclePosition(layouts),
+                new TextBasedPreviewLayout(style, getLayoutFormatterPreferences(Globals.journalAbbreviationRepository)),
+                (String) defaults.get(PREVIEW_STYLE),
+                getBoolean(PREVIEW_AS_TAB));
+
+        previewPreferences.getLayoutCycle().addListener((InvalidationListener) c ->
+                putStringList(CYCLE_PREVIEW, previewPreferences.getLayoutCycle().stream()
+                                                               .map(layout -> {
+                                                                   if (layout instanceof CitationStylePreviewLayout citationStyleLayout) {
+                                                                       return citationStyleLayout.getFilePath();
+                                                                   } else {
+                                                                       return layout.getDisplayName();
+                                                                   }
+                                                               }).collect(Collectors.toList())));
+        EasyBind.listen(previewPreferences.layoutCyclePositionProperty(), (obs, oldValue, newValue) -> putInt(CYCLE_PREVIEW_POS, newValue));
+        EasyBind.listen(previewPreferences.customPreviewLayoutProperty(), (obs, oldValue, newValue) -> put(PREVIEW_STYLE, newValue.getText()));
+        EasyBind.listen(previewPreferences.showPreviewAsExtraTabProperty(), (obs, oldValue, newValue) -> putBoolean(PREVIEW_AS_TAB, newValue));
+
         return this.previewPreferences;
     }
 
-    @Override
-    public void updatePreviewPreferences() {
+    private List<PreviewLayout> getPreviewLayouts(String style) {
         List<String> cycle = getStringList(CYCLE_PREVIEW);
-        double panelHeight = getDouble(PREVIEW_PANEL_HEIGHT);
-        String style = get(PREVIEW_STYLE);
-        String styleDefault = (String) defaults.get(PREVIEW_STYLE);
-        boolean showAsTab = getBoolean(PREVIEW_AS_TAB);
 
         // For backwards compatibility always add at least the default preview to the cycle
         if (cycle.isEmpty()) {
             cycle.add("Preview");
         }
 
-        List<PreviewLayout> layouts = cycle.stream()
-                                           .map(layout -> {
-                                               if (CitationStyle.isCitationStyleFile(layout)) {
-                                                   return CitationStyle.createCitationStyleFromFile(layout)
-                                                                       .map(file -> (PreviewLayout) new CitationStylePreviewLayout(file))
-                                                                       .orElse(null);
-                                               } else {
-                                                   return new TextBasedPreviewLayout(style, getLayoutFormatterPreferences(Globals.journalAbbreviationRepository));
-                                               }
-                                           })
-                                           .filter(Objects::nonNull)
-                                           .collect(Collectors.toList());
-
-        int cyclePos;
-        int storedCyclePos = getInt(CYCLE_PREVIEW_POS);
-        if (storedCyclePos < layouts.size()) {
-            cyclePos = storedCyclePos;
-        } else {
-            cyclePos = 0; // fallback if stored position is no longer valid
-        }
-
-        this.previewPreferences = new PreviewPreferences(layouts, cyclePos, panelHeight, style, styleDefault, showAsTab);
+        return cycle.stream()
+                    .map(layout -> {
+                        if (CitationStyle.isCitationStyleFile(layout)) {
+                            return CitationStyle.createCitationStyleFromFile(layout)
+                                                .map(file -> (PreviewLayout) new CitationStylePreviewLayout(file))
+                                                .orElse(null);
+                        } else {
+                            return new TextBasedPreviewLayout(style, getLayoutFormatterPreferences(Globals.journalAbbreviationRepository));
+                        }
+                    })
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.toList());
     }
 
-    @Override
-    public void storePreviewPreferences(PreviewPreferences preferences) {
-        putInt(CYCLE_PREVIEW_POS, preferences.getPreviewCyclePosition());
-        putStringList(CYCLE_PREVIEW, preferences.getPreviewCycle()
-                                                .stream()
-                                                .map(layout -> {
-                                                    if (layout instanceof CitationStylePreviewLayout) {
-                                                        return ((CitationStylePreviewLayout) layout).getFilePath();
-                                                    } else {
-                                                        return layout.getDisplayName();
-                                                    }
-                                                }).collect(Collectors.toList()));
-        putDouble(PREVIEW_PANEL_HEIGHT, preferences.getPreviewPanelDividerPosition().doubleValue());
-        put(PREVIEW_STYLE, preferences.getPreviewStyle());
-        putBoolean(PREVIEW_AS_TAB, preferences.showPreviewAsExtraTab());
-
-        updatePreviewPreferences();
+    private int getPreviewCyclePosition(List<PreviewLayout> layouts) {
+        int storedCyclePos = getInt(CYCLE_PREVIEW_POS);
+        if (storedCyclePos < layouts.size()) {
+            return storedCyclePos;
+        } else {
+            return 0; // fallback if stored position is no longer valid
+        }
     }
 
     //*************************************************************************************************************

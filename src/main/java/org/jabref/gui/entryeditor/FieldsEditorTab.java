@@ -232,7 +232,7 @@ abstract class FieldsEditorTab extends EntryEditorTab {
             scrollPane.setFitToHeight(true);
 
             SplitPane container = new SplitPane(scrollPane);
-            if (!preferences.getPreviewPreferences().showPreviewAsExtraTab()) {
+            if (!preferences.getPreviewPreferences().shouldShowPreviewAsExtraTab()) {
                 previewPanel = new PreviewPanel(databaseContext, dialogService, externalFileTypes, preferences.getKeyBindingRepository(), preferences, stateManager, indexingTaskManager);
                 container.getItems().add(previewPanel);
             }

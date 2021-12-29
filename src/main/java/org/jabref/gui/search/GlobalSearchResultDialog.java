@@ -53,7 +53,7 @@ public class GlobalSearchResultDialog extends BaseDialog<Void> {
 
         PreviewViewer previewViewer = new PreviewViewer(viewModel.getSearchDatabaseContext(), dialogService, stateManager);
         previewViewer.setTheme(preferencesService.getTheme());
-        previewViewer.setLayout(preferencesService.getPreviewPreferences().getCurrentPreviewStyle());
+        previewViewer.setLayout(preferencesService.getPreviewPreferences().getSelectedPreviewLayout());
 
         SearchResultsTableDataModel model = new SearchResultsTableDataModel(viewModel.getSearchDatabaseContext(), preferencesService, stateManager);
         SearchResultsTable resultsTable = new SearchResultsTable(model, viewModel.getSearchDatabaseContext(), preferencesService, undoManager, dialogService, stateManager, externalFileTypes);
