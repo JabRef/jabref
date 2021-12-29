@@ -26,8 +26,6 @@ import javafx.scene.input.TransferMode;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.DragAndDropDataFormats;
-import org.jabref.gui.JabRefGUI;
-import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.gui.util.BackgroundTask;
@@ -78,7 +76,6 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
     private final TaskExecutor taskExecutor;
 
     private final Validator chosenListValidator;
-    private final List<String> restartWarning = new ArrayList<>();
 
     private final CustomLocalDragboard localDragboard;
     private ListProperty<PreviewLayout> dragSourceList = null;
@@ -175,15 +172,6 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
     }
 
     /**
-     * Getter method for warning list.
-     * @return list of string with warning information.
-     */
-    @Override
-    public List<String> getRestartWarnings() {
-        return restartWarning;
-    }
-
-    /**
      * Store the changes of preference-preview settings.
      */
     @Override
@@ -196,9 +184,6 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
         if (customLayout == null) {
             customLayout = previewPreferences.getCustomPreviewLayout();
         }
-        if (showAsExtraTabProperty.getValue() != previewPreferences.shouldShowPreviewAsExtraTab()) {
-            restartWarning.add(Localization.lang("Show preview as a tab in entry editor"));
-        }
 
         previewPreferences.getLayoutCycle().clear();
         previewPreferences.getLayoutCycle().addAll(chosenListProperty);
@@ -208,12 +193,6 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
         if (!chosenSelectionModelProperty.getValue().getSelectedItems().isEmpty()) {
             previewPreferences.setLayoutCyclePosition(chosenListProperty.getValue().indexOf(
                     chosenSelectionModelProperty.getValue().getSelectedItems().get(0)));
-        }
-
-        for (LibraryTab libraryTab : JabRefGUI.getMainFrame().getLibraryTabs()) {
-            // TODO: Find a better way to update preview
-            libraryTab.closeBottomPane();
-            // basePanel.getPreviewPanel().updateLayout(preferences.getPreviewPreferences());
         }
     }
 

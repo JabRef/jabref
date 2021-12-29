@@ -82,6 +82,7 @@ public class EntryEditor extends BorderPane {
     * */
     private final List<EntryEditorTab> tabs;
     private Subscription typeSubscription;
+    private Subscription previewTabSubscription;
     /*
     * A reference to the entry this editor works on.
     * */
@@ -325,6 +326,9 @@ public class EntryEditor extends BorderPane {
         this.entry = entry;
 
         recalculateVisibleTabs();
+        EasyBind.listen(preferencesService.getPreviewPreferences().showPreviewAsExtraTabProperty(),
+                (obs, oldValue, newValue) -> recalculateVisibleTabs());
+
         if (entryEditorPreferences.showSourceTabByDefault()) {
             tabbed.getSelectionModel().select(sourceTab);
         }

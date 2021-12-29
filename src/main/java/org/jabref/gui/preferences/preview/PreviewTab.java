@@ -185,9 +185,7 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> i
             }
         });
 
-        searchBox.textProperty().addListener((observable, previousText, searchTerm) -> {
-            viewModel.setAvailableFilter(searchTerm);
-        });
+        searchBox.textProperty().addListener((observable, previousText, searchTerm) -> viewModel.setAvailableFilter(searchTerm));
 
         readOnlyLabel.visibleProperty().bind(viewModel.selectedIsEditableProperty().not());
         resetDefaultButton.disableProperty().bind(viewModel.selectedIsEditableProperty().not());
