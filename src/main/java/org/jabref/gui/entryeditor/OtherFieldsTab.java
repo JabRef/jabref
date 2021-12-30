@@ -41,6 +41,7 @@ public class OtherFieldsTab extends FieldsEditorTab {
                           DialogService dialogService,
                           PreferencesService preferences,
                           StateManager stateManager,
+                          ThemeManager themeManager,
                           IndexingTaskManager indexingTaskManager,
                           BibEntryTypesManager entryTypesManager,
                           ExternalFileTypes externalFileTypes,
