@@ -15,7 +15,7 @@ import com.airhacks.afterburner.views.ViewLoader;
 
 public class LibraryPropertiesView extends BaseDialog<LibraryPropertiesViewModel> {
 
-    public TabPane tabPane;
+    @FXML private TabPane tabPane;
     @FXML private ButtonType saveButton;
 
     private final BibDatabaseContext databaseContext;

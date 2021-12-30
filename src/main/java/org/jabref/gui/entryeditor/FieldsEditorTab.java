@@ -34,6 +34,7 @@ import org.jabref.gui.preview.PreviewPanel;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
+import org.jabref.logic.pdf.search.indexing.IndexingTaskManager;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
@@ -54,6 +55,7 @@ abstract class FieldsEditorTab extends EntryEditorTab {
     private final TaskExecutor taskExecutor;
     private final JournalAbbreviationRepository journalAbbreviationRepository;
     private final StateManager stateManager;
+    private final IndexingTaskManager indexingTaskManager;
     private PreviewPanel previewPanel;
     private final UndoManager undoManager;
     private Collection<Field> fields = new ArrayList<>();
@@ -69,7 +71,7 @@ abstract class FieldsEditorTab extends EntryEditorTab {
                            ThemeManager themeManager,
                            ExternalFileTypes externalFileTypes,
                            TaskExecutor taskExecutor,
-                           JournalAbbreviationRepository journalAbbreviationRepository) {
+                           JournalAbbreviationRepository journalAbbreviationRepository, IndexingTaskManager indexingTaskManager) {
         this.isCompressed = compressed;
         this.databaseContext = Objects.requireNonNull(databaseContext);
         this.suggestionProviders = Objects.requireNonNull(suggestionProviders);
@@ -81,6 +83,7 @@ abstract class FieldsEditorTab extends EntryEditorTab {
         this.taskExecutor = Objects.requireNonNull(taskExecutor);
         this.journalAbbreviationRepository = Objects.requireNonNull(journalAbbreviationRepository);
         this.stateManager = stateManager;
+        this.indexingTaskManager = indexingTaskManager;
     }
 
     private static void addColumn(GridPane gridPane, int columnIndex, List<Label> nodes) {
@@ -234,7 +237,7 @@ abstract class FieldsEditorTab extends EntryEditorTab {
 
             SplitPane container = new SplitPane(scrollPane);
             if (!preferences.getPreviewPreferences().showPreviewAsExtraTab()) {
-                previewPanel = new PreviewPanel(databaseContext, dialogService, externalFileTypes, preferences.getKeyBindingRepository(), preferences, stateManager, themeManager);
+                previewPanel = new PreviewPanel(databaseContext, dialogService, externalFileTypes, preferences.getKeyBindingRepository(), preferences, stateManager, themeManager, indexingTaskManager);
                 container.getItems().add(previewPanel);
             }
 

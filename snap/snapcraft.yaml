@@ -37,7 +37,7 @@ plugs:
     interface: system-files
     write:
     - /etc/chromium/native-messaging-hosts/org.jabref.jabref.json
-    
+
 layout:
   /usr/share/libdrm:
     bind: $SNAP/gnome-platform/usr/share/libdrm
@@ -57,7 +57,7 @@ environment:
 parts:
   jabref:
     plugin: dump
-    source: https://builds.jabref.org/main/JabRef-5.4-portable_linux.tar.gz
+    source: https://builds.jabref.org/main/JabRef-5.5-portable_linux.tar.gz
     stage-packages:
       - x11-utils
     override-build: |

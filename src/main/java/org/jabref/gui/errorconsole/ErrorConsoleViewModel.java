@@ -24,7 +24,6 @@ import org.jabref.logic.util.OS;
 
 import com.tobiasdiez.easybind.EasyBind;
 import org.apache.http.client.utils.URIBuilder;
-import org.apache.logging.log4j.core.LogEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

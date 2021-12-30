@@ -8,6 +8,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import javafx.collections.FXCollections;
+
 import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -184,7 +186,7 @@ public class XmpExporterTest {
 
     @Test
     public void exportSingleEntryWithPrivacyFilter(@TempDir Path testFolder) throws Exception {
-        when(xmpPreferences.getXmpPrivacyFilter()).thenReturn(Collections.singleton(StandardField.AUTHOR));
+        when(xmpPreferences.getXmpPrivacyFilter()).thenReturn(FXCollections.observableSet(Collections.singleton(StandardField.AUTHOR)));
         when(xmpPreferences.shouldUseXmpPrivacyFilter()).thenReturn(true);
 
         Path file = testFolder.resolve("ThisIsARandomlyNamedFile");

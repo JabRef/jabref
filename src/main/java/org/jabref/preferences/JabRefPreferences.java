@@ -444,8 +444,11 @@ public class JabRefPreferences implements PreferencesService {
     private AutoLinkPreferences autoLinkPreferences;
     private ImportExportPreferences importExportPreferences;
     private NameFormatterPreferences nameFormatterPreferences;
-    private VersionPreferences versionPreferences;
+    private InternalPreferences internalPreferences;
     private SpecialFieldsPreferences specialFieldsPreferences;
+    private GroupsPreferences groupsPreferences;
+    private XmpPreferences xmpPreferences;
+    private AutoCompletePreferences autoCompletePreferences;
 
     // The constructor is made private to enforce this as a singleton class:
     private JabRefPreferences() {
@@ -1120,19 +1123,6 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     @Override
-    public VersionPreferences getVersionPreferences() {
-        if (Objects.nonNull(versionPreferences)) {
-            return versionPreferences;
-        }
-
-        versionPreferences = new VersionPreferences(Version.parse(get(VERSION_IGNORED_UPDATE)));
-
-        EasyBind.listen(versionPreferences.ignoredVersionProperty(), (obs, oldValue, newValue) -> put(VERSION_IGNORED_UPDATE, newValue.toString()));
-
-        return versionPreferences;
-    }
-
-    @Override
     public JournalAbbreviationPreferences getJournalAbbreviationPreferences() {
         return new JournalAbbreviationPreferences(getStringList(EXTERNAL_JOURNAL_LISTS), getGeneralPreferences().getDefaultEncoding());
     }
@@ -1166,17 +1156,6 @@ public class JabRefPreferences implements PreferencesService {
         }
 
         putStringList(CLEANUP_FORMATTERS, cleanupPreset.getFormatterCleanups().getAsStringList(OS.NEWLINE));
-    }
-
-    public String getOrCreateUserId() {
-        Optional<String> userId = getAsOptional(USER_ID);
-        if (userId.isPresent()) {
-            return userId.get();
-        } else {
-            String newUserId = UUID.randomUUID().toString();
-            put(USER_ID, newUserId);
-            return newUserId;
-        }
     }
 
     @Override
@@ -1347,13 +1326,28 @@ public class JabRefPreferences implements PreferencesService {
         if (Objects.nonNull(telemetryPreferences)) {
             return telemetryPreferences;
         }
+
         telemetryPreferences = new TelemetryPreferences(
                 getBoolean(COLLECT_TELEMETRY),
-                !getBoolean(ALREADY_ASKED_TO_COLLECT_TELEMETRY) // mind the !
+                !getBoolean(ALREADY_ASKED_TO_COLLECT_TELEMETRY), // mind the !
+                getOrCreateUserId()
         );
+
         EasyBind.listen(telemetryPreferences.collectTelemetryProperty(), (obs, oldValue, newValue) -> putBoolean(COLLECT_TELEMETRY, newValue));
         EasyBind.listen(telemetryPreferences.askToCollectTelemetryProperty(), (obs, oldValue, newValue) -> putBoolean(ALREADY_ASKED_TO_COLLECT_TELEMETRY, !newValue));
+
         return telemetryPreferences;
+    }
+
+    private String getOrCreateUserId() {
+        Optional<String> userId = getAsOptional(USER_ID);
+        if (userId.isPresent()) {
+            return userId.get();
+        } else {
+            String newUserId = UUID.randomUUID().toString();
+            put(USER_ID, newUserId);
+            return newUserId;
+        }
     }
 
     @Override
@@ -1361,11 +1355,14 @@ public class JabRefPreferences implements PreferencesService {
         if (Objects.nonNull(doiPreferences)) {
             return doiPreferences;
         }
+
         doiPreferences = new DOIPreferences(
                 getBoolean(USE_CUSTOM_DOI_URI),
                 get(BASE_DOI_URI));
+
         EasyBind.listen(doiPreferences.useCustomProperty(), (obs, oldValue, newValue) -> putBoolean(USE_CUSTOM_DOI_URI, newValue));
         EasyBind.listen(doiPreferences.defaultBaseURIProperty(), (obs, oldValue, newValue) -> put(BASE_DOI_URI, newValue));
+
         return doiPreferences;
     }
 
@@ -1374,13 +1371,16 @@ public class JabRefPreferences implements PreferencesService {
         if (Objects.nonNull(ownerPreferences)) {
             return ownerPreferences;
         }
+
         ownerPreferences = new OwnerPreferences(
                 getBoolean(USE_OWNER),
                 get(DEFAULT_OWNER),
                 getBoolean(OVERWRITE_OWNER));
+
         EasyBind.listen(ownerPreferences.useOwnerProperty(), (obs, oldValue, newValue) -> putBoolean(USE_OWNER, newValue));
         EasyBind.listen(ownerPreferences.defaultOwnerProperty(), (obs, oldValue, newValue) -> put(DEFAULT_OWNER, newValue));
         EasyBind.listen(ownerPreferences.overwriteOwnerProperty(), (obs, oldValue, newValue) -> putBoolean(OVERWRITE_OWNER, newValue));
+
         return ownerPreferences;
     }
 
@@ -1389,6 +1389,7 @@ public class JabRefPreferences implements PreferencesService {
         if (Objects.nonNull(timestampPreferences)) {
             return timestampPreferences;
         }
+
         timestampPreferences = new TimestampPreferences(
                 getBoolean(ADD_CREATION_DATE),
                 getBoolean(ADD_MODIFICATION_DATE),
@@ -1398,6 +1399,7 @@ public class JabRefPreferences implements PreferencesService {
 
         EasyBind.listen(timestampPreferences.addCreationDateProperty(), (obs, oldValue, newValue) -> putBoolean(ADD_CREATION_DATE, newValue));
         EasyBind.listen(timestampPreferences.addModificationDateProperty(), (obs, oldValue, newValue) -> putBoolean(ADD_MODIFICATION_DATE, newValue));
+
         return timestampPreferences;
     }
 
@@ -1406,40 +1408,24 @@ public class JabRefPreferences implements PreferencesService {
     //*************************************************************************************************************
 
     @Override
-    public Character getKeywordDelimiter() {
-        return get(KEYWORD_SEPARATOR).charAt(0);
-    }
-
-    @Override
     public GroupsPreferences getGroupsPreferences() {
-        return new GroupsPreferences(
+        if (Objects.nonNull(groupsPreferences)) {
+            return groupsPreferences;
+        }
+
+        groupsPreferences = new GroupsPreferences(
                 GroupViewMode.valueOf(get(GROUP_INTERSECT_UNION_VIEW_MODE)),
                 getBoolean(AUTO_ASSIGN_GROUP),
                 getBoolean(DISPLAY_GROUP_COUNT),
-                get(KEYWORD_SEPARATOR).charAt(0));
-    }
+                getInternalPreferences().keywordSeparatorProperty()
+        );
 
-    @Override
-    public void storeGroupsPreferences(GroupsPreferences preferences) {
-        put(GROUP_INTERSECT_UNION_VIEW_MODE, preferences.getGroupViewMode().name());
-        putBoolean(AUTO_ASSIGN_GROUP, preferences.shouldAutoAssignGroup());
-        putBoolean(DISPLAY_GROUP_COUNT, preferences.shouldDisplayGroupCount());
-        put(KEYWORD_SEPARATOR, String.valueOf(preferences.getKeywordDelimiter()));
-    }
+        EasyBind.listen(groupsPreferences.groupViewModeProperty(), (obs, oldValue, newValue) -> put(GROUP_INTERSECT_UNION_VIEW_MODE, newValue.name()));
+        EasyBind.listen(groupsPreferences.autoAssignGroupProperty(), (obs, oldValue, newValue) -> putBoolean(AUTO_ASSIGN_GROUP, newValue));
+        EasyBind.listen(groupsPreferences.displayGroupCountProperty(), (obs, oldValue, newValue) -> putBoolean(DISPLAY_GROUP_COUNT, newValue));
+        // KeywordSeparator is handled by JabRefPreferences::getInternalPreferences
 
-    @Override
-    public GroupViewMode getGroupViewMode() {
-        return GroupViewMode.valueOf(get(GROUP_INTERSECT_UNION_VIEW_MODE));
-    }
-
-    @Override
-    public void setGroupViewMode(GroupViewMode mode) {
-        put(GROUP_INTERSECT_UNION_VIEW_MODE, mode.name());
-    }
-
-    @Override
-    public boolean getDisplayGroupCount() {
-        return getBoolean(DISPLAY_GROUP_COUNT);
+        return groupsPreferences;
     }
 
     //*************************************************************************************************************
@@ -1999,7 +1985,13 @@ public class JabRefPreferences implements PreferencesService {
         searchDialogTableColunns = storeColumnPreferences(columnPreferences, COLUMN_NAMES, SEARCH_DIALOG_COLUMN_WIDTHS, SEARCH_DIALOG_COLUMN_SORT_TYPES, SEARCH_DIALOG_COLUMN_SORT_ORDER);
     }
 
-    private List<MainTableColumnModel> storeColumnPreferences(ColumnPreferences columnPreferences, String columnNamesList, String columnWidthList, String sortTypeList, String sortOrderList) {
+    // MainTable and SearchResultTable use the same set of columnNames
+    @SuppressWarnings("SameParameterValue")
+    private List<MainTableColumnModel> storeColumnPreferences(ColumnPreferences columnPreferences,
+                                                              String columnNamesList,
+                                                              String columnWidthList,
+                                                              String sortTypeList,
+                                                              String sortOrderList) {
 
         putStringList(columnNamesList, columnPreferences.getColumns().stream()
                                                         .map(MainTableColumnModel::getName)
@@ -2014,11 +2006,53 @@ public class JabRefPreferences implements PreferencesService {
         putStringList(sortTypeList, columnSortTypesInOrder);
 
         putStringList(sortOrderList, columnPreferences
-                                                      .getColumnSortOrder().stream()
-                                                      .map(MainTableColumnModel::getName)
-                                                      .collect(Collectors.toList()));
+                .getColumnSortOrder().stream()
+                .map(MainTableColumnModel::getName)
+                .collect(Collectors.toList()));
 
         return columnPreferences.getColumns();
+    }
+
+    //*************************************************************************************************************
+    // InternalPreferences
+    //*************************************************************************************************************
+
+    @Override
+    public InternalPreferences getInternalPreferences() {
+        if (Objects.nonNull(internalPreferences)) {
+            return internalPreferences;
+        }
+
+        internalPreferences = new InternalPreferences(
+                Version.parse(get(VERSION_IGNORED_UPDATE)),
+                get(KEYWORD_SEPARATOR).charAt(0),
+                getUser()
+        );
+
+        EasyBind.listen(internalPreferences.ignoredVersionProperty(), (obs, oldValue, newValue) -> put(VERSION_IGNORED_UPDATE, newValue.toString()));
+        EasyBind.listen(internalPreferences.keywordSeparatorProperty(), ((observable, oldValue, newValue) -> put(KEYWORD_SEPARATOR, String.valueOf(newValue))));
+        // user is a static value, should only be changed for debugging
+
+        return internalPreferences;
+    }
+
+    private String getUser() {
+        if (StringUtil.isNotBlank(userName)) {
+            return userName;
+        }
+
+        try {
+            userName = get(DEFAULT_OWNER) + '-' + InetAddress.getLocalHost().getHostName();
+            return userName;
+        } catch (UnknownHostException ex) {
+            LOGGER.error("Hostname not found. Please go to https://docs.jabref.org/ to find possible problem resolution", ex);
+            return get(DEFAULT_OWNER);
+        }
+    }
+
+    @Override
+    public Character getKeywordDelimiter() {
+        return getInternalPreferences().getKeywordSeparator();
     }
 
     //*************************************************************************************************************
@@ -2179,7 +2213,7 @@ public class JabRefPreferences implements PreferencesService {
         }
 
         filePreferences = new FilePreferences(
-                getUser(),
+                getInternalPreferences().getUser(),
                 get(MAIN_FILE_DIRECTORY),
                 getBoolean(STORE_RELATIVE_TO_BIB),
                 get(IMPORT_FILENAMEPATTERN),
@@ -2196,21 +2230,6 @@ public class JabRefPreferences implements PreferencesService {
         EasyBind.listen(filePreferences.workingDirectoryProperty(), (obs, oldValue, newValue) -> put(WORKING_DIRECTORY, newValue.toString()));
 
         return filePreferences;
-    }
-
-    private String getUser() {
-        if (StringUtil.isNotBlank(userName)) {
-            return userName;
-        }
-
-        try {
-            userName = get(DEFAULT_OWNER) + '-' + InetAddress.getLocalHost().getHostName();
-            return userName;
-        } catch (UnknownHostException ex) {
-            LOGGER.error("Hostname not found. Please go to https://docs.jabref.org/ to find possible " +
-                    "problem resolution", ex);
-            return get(DEFAULT_OWNER);
-        }
     }
 
     @Override
@@ -2635,16 +2654,23 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public XmpPreferences getXmpPreferences() {
-        return new XmpPreferences(
+        if (Objects.nonNull(xmpPreferences)) {
+            return xmpPreferences;
+        }
+
+        xmpPreferences = new XmpPreferences(
                 getBoolean(USE_XMP_PRIVACY_FILTER),
                 getStringList(XMP_PRIVACY_FILTERS).stream().map(FieldFactory::parseField).collect(Collectors.toSet()),
-                getKeywordDelimiter());
-    }
+                getInternalPreferences().keywordSeparatorProperty());
 
-    @Override
-    public void storeXmpPreferences(XmpPreferences preferences) {
-        putBoolean(USE_XMP_PRIVACY_FILTER, preferences.shouldUseXmpPrivacyFilter());
-        putStringList(XMP_PRIVACY_FILTERS, preferences.getXmpPrivacyFilter().stream().map(Field::getName).collect(Collectors.toList()));
+        EasyBind.listen(xmpPreferences.useXmpPrivacyFilterProperty(),
+                (obs, oldValue, newValue) -> putBoolean(USE_XMP_PRIVACY_FILTER, newValue));
+        xmpPreferences.getXmpPrivacyFilter().addListener((SetChangeListener<Field>) c ->
+                putStringList(XMP_PRIVACY_FILTERS, xmpPreferences.getXmpPrivacyFilter().stream()
+                                                                 .map(Field::getName)
+                                                                 .collect(Collectors.toList())));
+
+        return xmpPreferences;
     }
 
     @Override
@@ -2667,6 +2693,10 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public AutoCompletePreferences getAutoCompletePreferences() {
+        if (Objects.nonNull(autoCompletePreferences)) {
+            return autoCompletePreferences;
+        }
+
         AutoCompletePreferences.NameFormat nameFormat = AutoCompletePreferences.NameFormat.BOTH;
         if (getBoolean(AUTOCOMPLETER_LAST_FIRST)) {
             nameFormat = AutoCompletePreferences.NameFormat.LAST_FIRST;
@@ -2674,30 +2704,33 @@ public class JabRefPreferences implements PreferencesService {
             nameFormat = AutoCompletePreferences.NameFormat.FIRST_LAST;
         }
 
-        return new AutoCompletePreferences(
+        autoCompletePreferences = new AutoCompletePreferences(
                 getBoolean(AUTO_COMPLETE),
                 AutoCompleteFirstNameMode.parse(get(AUTOCOMPLETER_FIRSTNAME_MODE)),
                 nameFormat,
-                getStringList(AUTOCOMPLETER_COMPLETE_FIELDS).stream().map(FieldFactory::parseField).collect(Collectors.toSet()),
-                getJournalAbbreviationPreferences());
-    }
+                getStringList(AUTOCOMPLETER_COMPLETE_FIELDS).stream().map(FieldFactory::parseField).collect(Collectors.toSet())
+        );
 
-    @Override
-    public void storeAutoCompletePreferences(AutoCompletePreferences preferences) {
-        putBoolean(AUTO_COMPLETE, preferences.shouldAutoComplete());
-        put(AUTOCOMPLETER_FIRSTNAME_MODE, preferences.getFirstNameMode().name());
-        putStringList(AUTOCOMPLETER_COMPLETE_FIELDS, preferences.getCompleteFields().stream().map(Field::getName).collect(Collectors.toList()));
+        EasyBind.listen(autoCompletePreferences.autoCompleteProperty(), (obs, oldValue, newValue) -> putBoolean(AUTO_COMPLETE, newValue));
+        EasyBind.listen(autoCompletePreferences.firstNameModeProperty(), (obs, oldValue, newValue) -> put(AUTOCOMPLETER_FIRSTNAME_MODE, newValue.name()));
+        autoCompletePreferences.getCompleteFields().addListener((SetChangeListener<Field>) c ->
+                putStringList(AUTOCOMPLETER_COMPLETE_FIELDS, autoCompletePreferences.getCompleteFields().stream()
+                                                                                    .map(Field::getName)
+                                                                                    .collect(Collectors.toList())));
+        EasyBind.listen(autoCompletePreferences.nameFormatProperty(), (obs, oldValue, newValue) -> {
+            if (autoCompletePreferences.getNameFormat() == AutoCompletePreferences.NameFormat.BOTH) {
+                putBoolean(AUTOCOMPLETER_LAST_FIRST, false);
+                putBoolean(AUTOCOMPLETER_FIRST_LAST, false);
+            } else if (autoCompletePreferences.getNameFormat() == AutoCompletePreferences.NameFormat.LAST_FIRST) {
+                putBoolean(AUTOCOMPLETER_LAST_FIRST, true);
+                putBoolean(AUTOCOMPLETER_FIRST_LAST, false);
+            } else {
+                putBoolean(AUTOCOMPLETER_LAST_FIRST, false);
+                putBoolean(AUTOCOMPLETER_FIRST_LAST, true);
+            }
+        });
 
-        if (preferences.getNameFormat() == AutoCompletePreferences.NameFormat.BOTH) {
-            putBoolean(AUTOCOMPLETER_LAST_FIRST, false);
-            putBoolean(AUTOCOMPLETER_FIRST_LAST, false);
-        } else if (preferences.getNameFormat() == AutoCompletePreferences.NameFormat.LAST_FIRST) {
-            putBoolean(AUTOCOMPLETER_LAST_FIRST, true);
-            putBoolean(AUTOCOMPLETER_FIRST_LAST, false);
-        } else {
-            putBoolean(AUTOCOMPLETER_LAST_FIRST, false);
-            putBoolean(AUTOCOMPLETER_FIRST_LAST, true);
-        }
+        return autoCompletePreferences;
     }
 
     @Override

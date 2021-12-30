@@ -114,14 +114,14 @@ dependencies {
     // Include all jar-files in the 'lib' folder as dependencies
     implementation fileTree(dir: 'lib', includes: ['*.jar'])
 
-    implementation 'org.apache.pdfbox:pdfbox:2.0.24'
-    implementation 'org.apache.pdfbox:fontbox:2.0.24'
-    implementation 'org.apache.pdfbox:xmpbox:2.0.24'
+    implementation 'org.apache.pdfbox:pdfbox:2.0.25'
+    implementation 'org.apache.pdfbox:fontbox:2.0.25'
+    implementation 'org.apache.pdfbox:xmpbox:2.0.25'
 
     implementation group: 'org.apache.commons', name: 'commons-csv', version: '1.9.0'
-    implementation 'com.h2database:h2-mvstore:2.0.202'
+    implementation 'com.h2database:h2-mvstore:2.0.204'
 
-    implementation group: 'org.apache.tika', name: 'tika-core', version: '2.1.0'
+    implementation group: 'org.apache.tika', name: 'tika-core', version: '2.2.0'
 
     // required for reading write-protected PDFs - see https://github.com/JabRef/jabref/pull/942#issuecomment-209252635
     implementation 'org.bouncycastle:bcprov-jdk15on:1.70'
@@ -143,7 +143,7 @@ dependencies {
     implementation group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: '5.13.0.202109080827-r'
 
     implementation group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-yaml', version: '2.13.0'
-    implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.13.0'
+    implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.13.1'
 
     implementation group: 'org.mariadb.jdbc', name: 'mariadb-java-client', version: '2.7.4'
 
@@ -177,12 +177,9 @@ dependencies {
     implementation 'com.konghq:unirest-java:3.13.4'
 
     implementation 'org.slf4j:slf4j-api:2.0.0-alpha5'
-    implementation group: 'org.apache.logging.log4j', name: 'log4j-jcl', version: '3.0.0-SNAPSHOT'
-    implementation group: 'org.apache.logging.log4j', name: 'log4j-slf4j18-impl', version: '3.0.0-SNAPSHOT'
-    implementation group: 'org.apache.logging.log4j', name: 'log4j-plugins', version: '3.0.0-SNAPSHOT'
-    implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '3.0.0-SNAPSHOT'
-    implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: '3.0.0-SNAPSHOT'
-    annotationProcessor group: 'org.apache.logging.log4j', name: 'log4j-core', version: '3.0.0-SNAPSHOT'
+    implementation "org.tinylog:tinylog-api:2.4.1"
+    implementation "org.tinylog:slf4j-tinylog:2.4.1"
+    implementation "org.tinylog:tinylog-impl:2.4.1"
 
     implementation 'de.undercouch:citeproc-java:3.0.0-alpha.3'
 
@@ -211,8 +208,8 @@ dependencies {
 
     testRuntimeOnly group: 'org.apache.logging.log4j', name: 'log4j-core', version: '3.0.0-SNAPSHOT'
     testRuntimeOnly group: 'org.apache.logging.log4j', name: 'log4j-jul', version: '3.0.0-SNAPSHOT'
-    testImplementation 'org.mockito:mockito-core:4.1.0'
-    testImplementation 'org.xmlunit:xmlunit-core:2.8.3'
+    testImplementation 'org.mockito:mockito-core:4.2.0'
+    testImplementation 'org.xmlunit:xmlunit-core:2.8.4'
     testImplementation 'org.xmlunit:xmlunit-matchers:2.8.3'
     testRuntimeOnly 'com.tngtech.archunit:archunit-junit5-engine:0.22.0'
     testImplementation 'com.tngtech.archunit:archunit-junit5-api:0.22.0'
@@ -566,14 +563,9 @@ jlink {
         requires 'com.sun.xml.fastinfoset'
         requires 'com.sun.xml.txw2'
         requires 'org.slf4j'
-        uses 'org.apache.logging.log4j.util.PropertySource'
-        uses 'org.apache.logging.log4j.core.util.WatchEventService'
-        uses 'org.apache.logging.log4j.plugins.processor.PluginService'
         uses 'org.controlsfx.glyphfont.GlyphFont'
         uses 'com.airhacks.afterburner.views.ResourceLocator'
-        uses 'org.apache.logging.log4j.message.ThreadDumpMessage.ThreadInfoFactory'
         uses 'com.airhacks.afterburner.injection.PresenterFactory'
-        uses 'org.apache.logging.log4j.spi.Provider'
         uses 'org.mariadb.jdbc.credential.CredentialPlugin'
         uses 'org.mariadb.jdbc.authentication.AuthenticationPlugin'
         uses 'org.mariadb.jdbc.tls.TlsSocketPlugin'
@@ -582,16 +574,11 @@ jlink {
         uses 'org.eclipse.jgit.lib.GpgSigner'
         uses 'javax.xml.bind.JAXBContextFactory'
         provides 'org.apache.lucene.codecs.DocValuesFormat' with 'org.apache.lucene.codecs.lucene80.Lucene80DocValuesFormat'
-        provides 'javax.annotation.processing.Processor' with 'org.apache.logging.log4j.plugins.processor.PluginProcessor'
         provides 'org.controlsfx.glyphfont.GlyphFont' with 'org.controlsfx.glyphfont.FontAwesome'
-        provides 'org.apache.logging.log4j.message.ThreadDumpMessage.ThreadInfoFactory' with 'org.apache.logging.log4j.core.message.ExtendedThreadInfoFactory'
         provides 'org.mariadb.jdbc.tls.TlsSocketPlugin' with 'org.mariadb.jdbc.internal.protocol.tls.DefaultTlsSocketPlugin'
         provides 'com.microsoft.applicationinsights.core.dependencies.io.grpc.ServerProvider' with 'com.microsoft.applicationinsights.core.dependencies.io.grpc.netty.shaded.io.grpc.netty.NettyServerProvider'
         provides 'com.microsoft.applicationinsights.core.dependencies.io.grpc.NameResolverProvider' with 'com.microsoft.applicationinsights.core.dependencies.io.grpc.internal.DnsNameResolverProvider'
-        provides 'org.apache.logging.log4j.util.PropertySource' with 'org.apache.logging.log4j.util.EnvironmentPropertySource',
-                'org.apache.logging.log4j.util.SystemPropertiesPropertySource'
         provides 'java.sql.Driver' with 'org.postgresql.Driver'
-        provides 'org.apache.logging.log4j.plugins.processor.PluginService' with 'org.apache.logging.log4j.plugins.convert.plugins.Log4jPlugins'
         provides 'org.mariadb.jdbc.authentication.AuthenticationPlugin' with 'org.mariadb.jdbc.internal.com.send.authentication.CachingSha2PasswordPlugin',
                 'org.mariadb.jdbc.internal.com.send.authentication.ClearPasswordPlugin',
                 'org.mariadb.jdbc.internal.com.send.authentication.Ed25519PasswordPlugin',
@@ -603,8 +590,6 @@ jlink {
         provides 'org.mariadb.jdbc.credential.CredentialPlugin' with 'org.mariadb.jdbc.credential.aws.AwsIamCredentialPlugin',
                 'org.mariadb.jdbc.credential.env.EnvCredentialPlugin',
                 'org.mariadb.jdbc.credential.system.PropertiesCredentialPlugin'
-        provides 'org.slf4j.spi.SLF4JServiceProvider' with 'org.apache.logging.slf4j.SLF4JServiceProvider'
-        provides 'org.apache.logging.log4j.spi.Provider' with 'org.apache.logging.log4j.core.impl.Log4jProvider'
         provides 'java.security.Provider' with 'org.bouncycastle.jce.provider.BouncyCastleProvider',
                 'org.bouncycastle.pqc.jcajce.provider.BouncyCastlePQCProvider'
         provides 'com.microsoft.applicationinsights.core.dependencies.io.grpc.ManagedChannelProvider' with 'com.microsoft.applicationinsights.core.dependencies.io.grpc.netty.shaded.io.grpc.netty.NettyChannelProvider'
