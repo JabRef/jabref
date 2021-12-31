@@ -136,33 +136,35 @@ public class ThemeManager {
 
     private void baseCssLiveUpdate() {
         baseStyleSheet.reload();
-        LOGGER.debug("Updating base CSS for {} scenes", scenes.size());
+        if (baseStyleSheet.getSceneStylesheet() == null) {
+            LOGGER.error("Base stylesheet does not exist.");
+        } else {
+            LOGGER.debug("Updating base CSS for {} scenes", scenes.size());
+        }
+
         DefaultTaskExecutor.runInJavaFXThread(() ->
                 updateRunner.accept(() -> scenes.forEach(this::updateBaseCss))
         );
     }
 
     private void additionalCssLiveUpdate() {
-        String newStyleSheetLocation = "";
-        if (this.theme.getAdditionalStylesheet().isPresent()) {
-            StyleSheet styleSheet = this.theme.getAdditionalStylesheet().get();
+        final String newStyleSheetLocation = this.theme.getAdditionalStylesheet().map(styleSheet -> {
             styleSheet.reload();
-            newStyleSheetLocation = styleSheet.getWebEngineStylesheet();
-        }
+            return styleSheet.getWebEngineStylesheet();
+        }).orElse(null);
 
         LOGGER.debug("Updating additional CSS for {} scenes and {} web engines", scenes.size(), webEngines.size());
 
-        final String finalNewStyleSheetLocation = newStyleSheetLocation;
         DefaultTaskExecutor.runInJavaFXThread(() ->
                 updateRunner.accept(() -> {
                     scenes.forEach(this::updateAdditionalCss);
 
                     webEngines.forEach(webEngine -> {
                         // force refresh by unloading style sheet, if the location hasn't changed
-                        if (webEngine.getUserStyleSheetLocation().equals(finalNewStyleSheetLocation)) {
+                        if (webEngine.getUserStyleSheetLocation().equals(newStyleSheetLocation)) {
                             webEngine.setUserStyleSheetLocation(null);
                         }
-                        webEngine.setUserStyleSheetLocation(finalNewStyleSheetLocation);
+                        webEngine.setUserStyleSheetLocation(newStyleSheetLocation);
                     });
                 })
         );

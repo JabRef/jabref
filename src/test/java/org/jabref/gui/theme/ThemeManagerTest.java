@@ -86,8 +86,8 @@ class ThemeManagerTest {
 
         // ActiveTheme should keep the additionalStylesheet in memory and provide it
         Optional<String> cssLocationAfterDeletion = themeManagerCreatedBeforeFileDeleted.getActiveTheme()
-                                                                              .getAdditionalStylesheet()
-                                                                              .map(StyleSheet::getWebEngineStylesheet);
+                                                                                        .getAdditionalStylesheet()
+                                                                                        .map(StyleSheet::getWebEngineStylesheet);
         assertTrue(cssLocationAfterDeletion.isPresent(), "expected custom theme location to be available");
         assertEquals(TEST_CSS_DATA, cssLocationAfterDeletion.get());
     }
@@ -117,8 +117,8 @@ class ThemeManagerTest {
 
         // ActiveTheme should provide an additionalStylesheet after the file was created
         Optional<String> cssLocationAfterFileCreated = themeManagerCreatedBeforeFileExists.getActiveTheme()
-                                                                                .getAdditionalStylesheet()
-                                                                                .map(StyleSheet::getWebEngineStylesheet);
+                                                                                          .getAdditionalStylesheet()
+                                                                                          .map(StyleSheet::getWebEngineStylesheet);
         assertTrue(cssLocationAfterFileCreated.isPresent(), "expected custom theme location to be available");
         assertEquals(TEST_CSS_DATA, cssLocationAfterFileCreated.get());
     }
@@ -141,15 +141,15 @@ class ThemeManagerTest {
         // ActiveTheme should provide the large additionalStylesheet that was created before
         ThemeManager themeManager = new ThemeManager(preferencesService, new DummyFileUpdateMonitor(), Runnable::run);
         Optional<String> cssLocationBeforeRemoved = themeManager.getActiveTheme()
-                                                        .getAdditionalStylesheet()
-                                                        .map(StyleSheet::getWebEngineStylesheet);
+                                                                .getAdditionalStylesheet()
+                                                                .map(StyleSheet::getWebEngineStylesheet);
         assertTrue(cssLocationBeforeRemoved.isPresent(), "expected custom theme location to be available");
         assertTrue(cssLocationBeforeRemoved.get().startsWith("file:"), "expected large custom theme to be a file");
 
         Files.move(largeCssTestFile, largeCssTestFile.resolveSibling("renamed.css"));
 
         // getAdditionalStylesheet() should no longer offer the deleted stylesheet as it is not been held in memory
-        assertEquals(Optional.empty(), themeManager.getActiveTheme().getAdditionalStylesheet(),
+        assertEquals(themeManager.getActiveTheme().getAdditionalStylesheet().get().getWebEngineStylesheet(), "",
                 "didn't expect additional stylesheet after css was deleted");
 
         Files.move(largeCssTestFile.resolveSibling("renamed.css"), largeCssTestFile);
@@ -203,8 +203,8 @@ class ThemeManagerTest {
     }
 
     /**
-     * Because of concurrency issues we have to choose some arbitrary number of msecs to wait for the watch service to
-     * start up and for the changed css to reload.
+     * Since the DefaultFileUpdateMonitor runs in a separate thread we have to wait for some arbitrary number of msecs
+     * for the thread to start up and the changed css to reload.
      */
     @Test
     public void liveReloadCssDataUrl() throws IOException, InterruptedException {
@@ -214,44 +214,32 @@ class ThemeManagerTest {
 
         final ThemeManager themeManager;
 
-        DefaultFileUpdateMonitor fileUpdateMonitor = null;
-        Thread thread = null;
-        try {
-            fileUpdateMonitor = new DefaultFileUpdateMonitor();
-            thread = new Thread(fileUpdateMonitor);
-            thread.start();
+        DefaultFileUpdateMonitor fileUpdateMonitor = new DefaultFileUpdateMonitor();
+        Thread thread = new Thread(fileUpdateMonitor);
+        thread.start();
 
-            // Wait for the watch service to start
-            Thread.sleep(500);
+        // Wait for the watch service to start
+        Thread.sleep(500);
 
-            themeManager = new ThemeManager(preferencesService, fileUpdateMonitor, Runnable::run);
+        themeManager = new ThemeManager(preferencesService, fileUpdateMonitor, Runnable::run);
 
-            Scene scene = mock(Scene.class);
-            when(scene.getStylesheets()).thenReturn(FXCollections.observableArrayList());
-            when(scene.getRoot()).thenReturn(mock(Parent.class));
+        Scene scene = mock(Scene.class);
+        when(scene.getStylesheets()).thenReturn(FXCollections.observableArrayList());
+        when(scene.getRoot()).thenReturn(mock(Parent.class));
 
-            try {
-                themeManager.installCss(scene);
-            } catch (NullPointerException ex) {
-                fail("Possible mocking issue due to NPE in installCss", ex);
-            }
+        themeManager.installCss(scene);
 
-            Files.writeString(testCss, """
-                    /* And now for something slightly different */
-                    .code-area .text {
-                        -fx-font-family: serif;
-                    }""", StandardOpenOption.CREATE);
+        Files.writeString(testCss, """
+                /* And now for something slightly different */
+                .code-area .text {
+                    -fx-font-family: serif;
+                }""", StandardOpenOption.CREATE);
 
-            // Wait for the stylesheet to be reloaded
-            Thread.sleep(500);
-        } finally {
-            if (fileUpdateMonitor != null) {
-                fileUpdateMonitor.shutdown();
-            }
-            if (thread != null) {
-                thread.join();
-            }
-        }
+        // Wait for the stylesheet to be reloaded
+        Thread.sleep(500);
+
+        fileUpdateMonitor.shutdown();
+        thread.join();
 
         Optional<String> testCssLocation2 = themeManager.getActiveTheme().getAdditionalStylesheet().map(StyleSheet::getWebEngineStylesheet);
         assertTrue(testCssLocation2.isPresent(), "expected custom theme location to be available");
