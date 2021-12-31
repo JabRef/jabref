@@ -10,8 +10,8 @@ import java.nio.file.Path;
 import java.util.Base64;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Consumer;
 
+import com.google.common.base.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,7 +50,7 @@ final class StyleSheetFile extends StyleSheet {
     private final URL url;
     private final Path path;
 
-    private final AtomicReference<Optional<String>> dataUrl = new AtomicReference<>(Optional.empty());
+    private final AtomicReference<String> dataUrl = new AtomicReference<>();
 
     StyleSheetFile(URL url) {
         this.url = url;
@@ -65,7 +65,7 @@ final class StyleSheetFile extends StyleSheet {
 
     @Override
     void reload() {
-        embedDataUrl(url, dataUrl::set);
+        getDataUrl(url).ifPresentOrElse(dataUrl::set, () -> dataUrl.set(""));
     }
 
     @Override
@@ -92,17 +92,19 @@ final class StyleSheetFile extends StyleSheet {
      */
     @Override
     public String getWebEngineStylesheet() {
-        if (dataUrl.get().isEmpty()) {
+        if (Strings.isNullOrEmpty(dataUrl.get())) {
             reload();
         }
 
-        return dataUrl.get().orElseGet(() -> {
+        if (Strings.isNullOrEmpty(dataUrl.get())) {
             URL stylesheet = getSceneStylesheet();
             return stylesheet == null ? "" : stylesheet.toExternalForm();
-        });
+        }
+
+        return dataUrl.get();
     }
 
-    static void embedDataUrl(URL url, Consumer<Optional<String>> embedded) {
+    static Optional<String> getDataUrl(URL url) {
         try {
             URLConnection conn = url.openConnection();
             conn.connect();
@@ -112,15 +114,16 @@ final class StyleSheetFile extends StyleSheet {
                 if (data.length < MAX_IN_MEMORY_CSS_LENGTH) {
                     String embeddedDataUrl = DATA_URL_PREFIX + Base64.getEncoder().encodeToString(data);
                     LOGGER.debug("Embedded css in data URL of length {}", embeddedDataUrl.length());
-                    embedded.accept(Optional.of(embeddedDataUrl));
+                    return Optional.of(embeddedDataUrl);
                 } else {
                     LOGGER.debug("Not embedding css in data URL as the length is >= {}", MAX_IN_MEMORY_CSS_LENGTH);
-                    embedded.accept(Optional.empty());
                 }
             }
         } catch (IOException e) {
             LOGGER.warn("Could not load css url {}", url, e);
         }
+
+        return Optional.empty();
     }
 
     @Override

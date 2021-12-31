@@ -25,7 +25,7 @@ public class StyleSheetDataUrl extends StyleSheet {
 
     @Override
     void reload() {
-        StyleSheetFile.embedDataUrl(url, embedded -> dataUrl = embedded.orElse(EMPTY_WEBENGINE_CSS));
+        StyleSheetFile.getDataUrl(url).ifPresentOrElse(createdUrl -> dataUrl = createdUrl, () -> dataUrl = EMPTY_WEBENGINE_CSS);
     }
 
     @Override
