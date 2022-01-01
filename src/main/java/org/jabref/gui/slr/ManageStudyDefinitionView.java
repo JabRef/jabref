@@ -68,9 +68,9 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
     @FXML private TableColumn<StudyDatabaseItem, String> databaseColumn;
     @FXML private TableColumn<StudyDatabaseItem, String> databaseActionColumn;
 
-    @Inject DialogService dialogService;
-    @Inject PreferencesService prefs;
-    @Inject ThemeManager themeManager;
+    @Inject private DialogService dialogService;
+    @Inject private PreferencesService prefs;
+    @Inject private ThemeManager themeManager;
 
     private ManageStudyDefinitionViewModel viewModel;
     private final Study study;
