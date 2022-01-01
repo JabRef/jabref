@@ -583,6 +583,7 @@ jlink {
         uses 'org.eclipse.jgit.transport.SshSessionFactory'
         uses 'org.eclipse.jgit.lib.GpgSigner'
         uses 'javax.xml.bind.JAXBContextFactory'
+        uses 'org.apache.lucene.codecs.Codec'
         provides 'org.apache.lucene.codecs.Codec' with 'org.apache.lucene.backward_codecs.lucene70.Lucene70Codec',
                             'org.apache.lucene.backward_codecs.lucene80.Lucene80Codec',
                             'org.apache.lucene.backward_codecs.lucene84.Lucene84Codec',

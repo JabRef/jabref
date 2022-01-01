@@ -103,6 +103,8 @@ open module org.jabref {
     requires org.apache.lucene.core;
     requires org.apache.lucene.queryparser;
     requires org.apache.lucene.codecs;
+    uses org.apache.lucene.codecs.Codec;
+
     requires com.fasterxml.jackson.databind;
     requires com.fasterxml.jackson.dataformat.yaml;
     requires com.fasterxml.jackson.datatype.jsr310;
