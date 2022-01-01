@@ -483,8 +483,6 @@
       </else>
     </choose>
   </macro>
-<<<<<<< HEAD
-=======
   <macro name="originally-published">
     <group delimiter=", ">
       <group delimiter=": ">
@@ -522,7 +520,6 @@
       </if>
     </choose>
   </macro>
->>>>>>> 1d32876badbd2ccbaef84d53c6fb2c2947a7d1d2
   <macro name="issued">
     <choose>
       <if variable="issued">
@@ -667,9 +664,6 @@
             </choose>
             <text macro="event"/>
           </group>
-<<<<<<< HEAD
-          <text macro="publisher"/>
-=======
             <group delimiter="; ">
               <text macro="originally-published"/>
                 <group delimiter=", ">
@@ -677,7 +671,6 @@
                 <text macro="publisher"/>
             </group>
           </group>
->>>>>>> 1d32876badbd2ccbaef84d53c6fb2c2947a7d1d2
           <text macro="issued"/>
         </group>
       </else-if>
@@ -709,9 +702,6 @@
               <text variable="genre" text-case="capitalize-first"/>
             </if>
           </choose>
-<<<<<<< HEAD
-          <text macro="publisher"/>
-=======
           <group delimiter=". ">
             <text macro="originally-published"/>
             <group delimiter=", ">
@@ -719,7 +709,6 @@
               <text macro="publisher"/>
             </group>
           </group>
->>>>>>> 1d32876badbd2ccbaef84d53c6fb2c2947a7d1d2
           <text macro="issued"/>
         </group>
       </else-if>
