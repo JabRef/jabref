@@ -1,8 +1,5 @@
 package org.jabref.gui.preferences.appearance;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -12,7 +9,6 @@ import javafx.scene.control.SpinnerValueFactory;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.gui.theme.Theme;
-import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.StandardFileType;
@@ -40,18 +36,14 @@ public class AppearanceTabViewModel implements PreferenceTabViewModel {
 
     private final DialogService dialogService;
     private final PreferencesService preferences;
-    private final ThemeManager themeManager;
     private final AppearancePreferences appearancePreferences;
 
     private final Validator fontSizeValidator;
     private final Validator customPathToThemeValidator;
 
-    private final List<String> restartWarnings = new ArrayList<>();
-
-    public AppearanceTabViewModel(DialogService dialogService, PreferencesService preferences, ThemeManager themeManager) {
+    public AppearanceTabViewModel(DialogService dialogService, PreferencesService preferences) {
         this.dialogService = dialogService;
         this.preferences = preferences;
-        this.themeManager = themeManager;
         this.appearancePreferences = preferences.getAppearancePreferences();
 
         fontSizeValidator = new FunctionBasedValidator<>(
@@ -101,22 +93,16 @@ public class AppearanceTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public void storeSettings() {
-        if (appearancePreferences.shouldOverrideDefaultFontSize() != fontOverrideProperty.getValue()) {
-            restartWarnings.add(Localization.lang("Override font settings"));
-        }
-
-        Theme newTheme = Theme.light(); // default;
-        if (themeDarkProperty.getValue()) {
-            newTheme = Theme.dark();
-        } else if (themeCustomProperty.getValue()) {
-            newTheme = Theme.custom(customPathToThemeProperty.getValue());
-        }
-
         appearancePreferences.setShouldOverrideDefaultFontSize(fontOverrideProperty.getValue());
         appearancePreferences.setMainFontSize(Integer.parseInt(fontSizeProperty.getValue()));
-        appearancePreferences.setTheme(newTheme);
 
-        themeManager.updateTheme();
+        if (themeLightProperty.getValue()) {
+            appearancePreferences.setTheme(Theme.light());
+        } else if (themeDarkProperty.getValue()) {
+            appearancePreferences.setTheme(Theme.dark());
+        } else if (themeCustomProperty.getValue()) {
+            appearancePreferences.setTheme(Theme.custom(customPathToThemeProperty.getValue()));
+        }
     }
 
     public ValidationStatus fontSizeValidationStatus() {
@@ -146,11 +132,6 @@ public class AppearanceTabViewModel implements PreferenceTabViewModel {
             return false;
         }
         return true;
-    }
-
-    @Override
-    public List<String> getRestartWarnings() {
-        return restartWarnings;
     }
 
     public BooleanProperty fontOverrideProperty() {

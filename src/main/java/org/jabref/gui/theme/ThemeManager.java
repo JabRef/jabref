@@ -16,8 +16,8 @@ import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.model.util.FileUpdateListener;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.AppearancePreferences;
-import org.jabref.preferences.PreferencesService;
 
+import com.tobiasdiez.easybind.EasyBind;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,7 +38,7 @@ public class ThemeManager {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ThemeManager.class);
 
-    private final PreferencesService preferencesService;
+    private final AppearancePreferences appearancePreferences;
     private final FileUpdateMonitor fileUpdateMonitor;
     private final Consumer<Runnable> updateRunner;
 
@@ -48,26 +48,28 @@ public class ThemeManager {
     private final Set<Scene> scenes = Collections.newSetFromMap(new WeakHashMap<>());
     private final Set<WebEngine> webEngines = Collections.newSetFromMap(new WeakHashMap<>());
 
-    public ThemeManager(PreferencesService preferencesService,
+    public ThemeManager(AppearancePreferences appearancePreferences,
                         FileUpdateMonitor fileUpdateMonitor,
                         Consumer<Runnable> updateRunner) {
-        this.preferencesService = Objects.requireNonNull(preferencesService);
+        this.appearancePreferences = Objects.requireNonNull(appearancePreferences);
         this.fileUpdateMonitor = Objects.requireNonNull(fileUpdateMonitor);
         this.updateRunner = Objects.requireNonNull(updateRunner);
 
         this.baseStyleSheet = StyleSheet.create(Theme.BASE_CSS).get();
-        this.theme = preferencesService.getAppearancePreferences().getTheme();
+        this.theme = appearancePreferences.getTheme();
 
         // Watching base CSS only works in development and test scenarios, where the build system exposes the CSS as a
         // file (e.g. for Gradle run task it will be in build/resources/main/org/jabref/gui/Base.css)
         addStylesheetToWatchlist(this.baseStyleSheet, this::baseCssLiveUpdate);
         baseCssLiveUpdate();
 
-        updateTheme();
+        EasyBind.subscribe(appearancePreferences.themeProperty(), theme -> updateThemeSettings());
+        EasyBind.subscribe(appearancePreferences.shouldOverrideDefaultFontSizeProperty(), should -> updateFontSettings());
+        EasyBind.subscribe(appearancePreferences.mainFontSizeProperty(), size -> updateFontSettings());
     }
 
-    public void updateTheme() {
-        Theme newTheme = Objects.requireNonNull(preferencesService.getAppearancePreferences().getTheme());
+    private void updateThemeSettings() {
+        Theme newTheme = Objects.requireNonNull(appearancePreferences.getTheme());
 
         if (newTheme.equals(theme)) {
             LOGGER.info("Not updating theme because it hasn't changed");
@@ -82,6 +84,11 @@ public class ThemeManager {
                 styleSheet -> addStylesheetToWatchlist(styleSheet, this::additionalCssLiveUpdate));
 
         additionalCssLiveUpdate();
+    }
+
+    private void updateFontSettings() {
+        DefaultTaskExecutor.runInJavaFXThread(() ->
+                updateRunner.accept(() -> scenes.forEach(this::updateFontStyle)));
     }
 
     private void removeStylesheetFromWatchList(StyleSheet styleSheet) {
@@ -102,6 +109,60 @@ public class ThemeManager {
                 LOGGER.warn("Cannot watch css path {} for live updates", watchPath, e);
             }
         }
+    }
+
+    private void baseCssLiveUpdate() {
+        baseStyleSheet.reload();
+        if (baseStyleSheet.getSceneStylesheet() == null) {
+            LOGGER.error("Base stylesheet does not exist.");
+        } else {
+            LOGGER.debug("Updating base CSS for {} scenes", scenes.size());
+        }
+
+        DefaultTaskExecutor.runInJavaFXThread(() ->
+                updateRunner.accept(() -> scenes.forEach(this::updateBaseCss))
+        );
+    }
+
+    private void additionalCssLiveUpdate() {
+        final String newStyleSheetLocation = this.theme.getAdditionalStylesheet().map(styleSheet -> {
+            styleSheet.reload();
+            return styleSheet.getWebEngineStylesheet();
+        }).orElse("");
+
+        LOGGER.debug("Updating additional CSS for {} scenes and {} web engines", scenes.size(), webEngines.size());
+
+        DefaultTaskExecutor.runInJavaFXThread(() ->
+                updateRunner.accept(() -> {
+                    scenes.forEach(this::updateAdditionalCss);
+
+                    webEngines.forEach(webEngine -> {
+                        // force refresh by unloading style sheet, if the location hasn't changed
+                        if (newStyleSheetLocation.equals(webEngine.getUserStyleSheetLocation())) {
+                            webEngine.setUserStyleSheetLocation(null);
+                        }
+                        webEngine.setUserStyleSheetLocation(newStyleSheetLocation);
+                    });
+                })
+        );
+    }
+
+    private void updateBaseCss(Scene scene) {
+        List<String> stylesheets = scene.getStylesheets();
+        if (!stylesheets.isEmpty()) {
+            stylesheets.remove(0);
+        }
+
+        stylesheets.add(0, baseStyleSheet.getSceneStylesheet().toExternalForm());
+    }
+
+    private void updateAdditionalCss(Scene scene) {
+        scene.getStylesheets().setAll(List.of(
+                baseStyleSheet.getSceneStylesheet().toExternalForm(),
+                appearancePreferences.getTheme()
+                                     .getAdditionalStylesheet().map(styleSheet -> styleSheet.getSceneStylesheet().toExternalForm())
+                                     .orElse("")
+        ));
     }
 
     /**
@@ -134,68 +195,23 @@ public class ThemeManager {
         });
     }
 
-    private void baseCssLiveUpdate() {
-        baseStyleSheet.reload();
-        if (baseStyleSheet.getSceneStylesheet() == null) {
-            LOGGER.error("Base stylesheet does not exist.");
-        } else {
-            LOGGER.debug("Updating base CSS for {} scenes", scenes.size());
-        }
-
-        DefaultTaskExecutor.runInJavaFXThread(() ->
-                updateRunner.accept(() -> scenes.forEach(this::updateBaseCss))
-        );
-    }
-
-    private void additionalCssLiveUpdate() {
-        final String newStyleSheetLocation = this.theme.getAdditionalStylesheet().map(styleSheet -> {
-            styleSheet.reload();
-            return styleSheet.getWebEngineStylesheet();
-        }).orElse(null);
-
-        LOGGER.debug("Updating additional CSS for {} scenes and {} web engines", scenes.size(), webEngines.size());
-
-        DefaultTaskExecutor.runInJavaFXThread(() ->
-                updateRunner.accept(() -> {
-                    scenes.forEach(this::updateAdditionalCss);
-
-                    webEngines.forEach(webEngine -> {
-                        // force refresh by unloading style sheet, if the location hasn't changed
-                        if (webEngine.getUserStyleSheetLocation().equals(newStyleSheetLocation)) {
-                            webEngine.setUserStyleSheetLocation(null);
-                        }
-                        webEngine.setUserStyleSheetLocation(newStyleSheetLocation);
-                    });
-                })
-        );
-    }
-
-    private void updateBaseCss(Scene scene) {
-        List<String> stylesheets = scene.getStylesheets();
-        if (!stylesheets.isEmpty()) {
-            stylesheets.remove(0);
-        }
-
-        stylesheets.add(0, baseStyleSheet.getSceneStylesheet().toExternalForm());
-    }
-
-    private void updateAdditionalCss(Scene scene) {
-        AppearancePreferences appearance = preferencesService.getAppearancePreferences();
-
-        List<String> stylesheets = List.of(
-                baseStyleSheet.getSceneStylesheet().toExternalForm(),
-                appearance.getTheme().getAdditionalStylesheet().map(styleSheet -> styleSheet.getSceneStylesheet().toExternalForm()).orElse("")
-        );
-
-        scene.getStylesheets().setAll(stylesheets);
-
-        if (appearance.shouldOverrideDefaultFontSize()) {
-            scene.getRoot().setStyle("-fx-font-size: " + appearance.getMainFontSize() + "pt;");
+    /**
+     * Updates the font size settings of a scene. This method needs to be called from every custom dialog constructor,
+     * since javafx overwrites the style if applied before showing the dialog
+     *
+     * @param scene is the scene, the font size should be applied to
+     */
+    public void updateFontStyle(Scene scene) {
+        if (appearancePreferences.shouldOverrideDefaultFontSize()) {
+            scene.getRoot().setStyle("-fx-font-size: " + appearancePreferences.getMainFontSize() + "pt;");
         } else {
             scene.getRoot().setStyle("");
         }
     }
 
+    /**
+     * @return the currently active theme
+     */
     public Theme getActiveTheme() {
         return this.theme;
     }

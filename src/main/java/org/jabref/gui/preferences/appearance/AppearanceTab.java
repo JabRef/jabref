@@ -2,8 +2,6 @@ package org.jabref.gui.preferences.appearance;
 
 import java.util.regex.Pattern;
 
-import javax.inject.Inject;
-
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
@@ -16,7 +14,6 @@ import javafx.util.converter.IntegerStringConverter;
 
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.preferences.PreferencesTab;
-import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.IconValidationDecorator;
 import org.jabref.logic.l10n.Localization;
 
@@ -32,12 +29,10 @@ public class AppearanceTab extends AbstractPreferenceTabView<AppearanceTabViewMo
     @FXML private RadioButton customTheme;
     @FXML private TextField customThemePath;
 
-    @Inject private ThemeManager themeManager;
-
     private final ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
 
     // The fontSizeFormatter formats the input given to the fontSize spinner so that non valid values cannot be entered.
-    private TextFormatter<Integer> fontSizeFormatter = new TextFormatter<Integer>(new IntegerStringConverter(), 9,
+    private final TextFormatter<Integer> fontSizeFormatter = new TextFormatter<>(new IntegerStringConverter(), 9,
             c -> {
                 if (Pattern.matches("\\d*", c.getText())) {
                     return c;
@@ -58,7 +53,7 @@ public class AppearanceTab extends AbstractPreferenceTabView<AppearanceTabViewMo
     }
 
     public void initialize() {
-        this.viewModel = new AppearanceTabViewModel(dialogService, preferencesService, themeManager);
+        this.viewModel = new AppearanceTabViewModel(dialogService, preferencesService);
 
         fontOverride.selectedProperty().bindBidirectional(viewModel.fontOverrideProperty());
 

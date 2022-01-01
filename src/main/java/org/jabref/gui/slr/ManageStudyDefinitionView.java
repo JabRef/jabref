@@ -25,6 +25,7 @@ import javafx.scene.input.KeyCode;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.gui.util.ValueTableCellFactory;
@@ -40,14 +41,6 @@ import com.airhacks.afterburner.views.ViewLoader;
  * are defined in the FXML file.
  */
 public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> {
-    Path workingDirectory;
-
-    @Inject DialogService dialogService;
-    @Inject PreferencesService prefs;
-
-    private ManageStudyDefinitionViewModel viewModel;
-    private final Study study;
-
     @FXML private TextField studyTitle;
     @FXML private TextField addAuthor;
     @FXML private TextField addResearchQuestion;
@@ -75,6 +68,15 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
     @FXML private TableColumn<StudyDatabaseItem, String> databaseColumn;
     @FXML private TableColumn<StudyDatabaseItem, String> databaseActionColumn;
 
+    @Inject DialogService dialogService;
+    @Inject PreferencesService prefs;
+    @Inject ThemeManager themeManager;
+
+    private ManageStudyDefinitionViewModel viewModel;
+    private final Study study;
+
+    Path workingDirectory;
+
     /**
      * This can be used to either create new study objects or edit existing ones.
      *
@@ -92,6 +94,8 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
                   .setAsDialogPane(this);
 
         setupSaveButton();
+
+        themeManager.updateFontStyle(getDialogPane().getScene());
     }
 
     private void setupSaveButton() {
