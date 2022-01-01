@@ -75,7 +75,7 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
     private ManageStudyDefinitionViewModel viewModel;
     private final Study study;
 
-    Path workingDirectory;
+    private final Path workingDirectory;
 
     /**
      * This can be used to either create new study objects or edit existing ones.
