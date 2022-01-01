@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" demote-non-dropping-particle="display-and-sort" page-range-format="chicago">
+<style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" demote-non-dropping-particle="display-and-sort" page-range-format="chicago" default-locale="pt-PT">
   <info>
-    <title>Universidade do Porto - Faculdade de Engenharia - Chicago Manual of Style 17th (author-date)</title>
-    <id>http://www.zotero.org/styles/universidade-do-porto-faculdade-de-engenharia-chicago</id>
-    <link href="http://www.zotero.org/styles/universidade-do-porto-faculdade-de-engenharia-chicago" rel="self"/>
+    <title>Universidade do Porto - Faculdade de Engenharia - Chicago Manual of Style 17th (author-date) (Português - Portugal)</title>
+    <id>http://www.zotero.org/styles/universidade-do-porto-faculdade-de-engenharia-chicago-pt</id>
+    <link href="http://www.zotero.org/styles/universidade-do-porto-faculdade-de-engenharia-chicago-pt" rel="self"/>
     <link href="http://www.zotero.org/styles/chicago-author-date" rel="template"/>
     <link href="https://feup.libguides.com/chicago" rel="documentation"/>
     <author>
@@ -17,16 +17,54 @@
     <category citation-format="author-date"/>
     <category field="engineering"/>
     <summary>The author-date variant of the Chicago style by FEUP</summary>
-    <updated>2020-06-12T10:31:41+00:00</updated>
+    <updated>2021-11-23T11:34:12+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
-  <locale xml:lang="en">
+  <locale xml:lang="pt">
     <terms>
+	  <term name="accessed">Acedido a</term>
+      <term name="editor" form="verb">editado por</term>
       <term name="editor" form="verb-short">ed.</term>
-      <term name="container-author" form="verb">by</term>
-      <term name="translator" form="verb-short">trans.</term>
-      <term name="editortranslator" form="verb">edited and translated by</term>
-      <term name="translator" form="short">trans.</term>
+      <term name="container-author" form="verb">por</term>
+      <term name="translator" form="verb-short">traduzido por</term>
+      <term name="editortranslator" form="verb">editado e traduzido por</term>
+      <term name="translator" form="short">trad.</term>
+	  <term name="and">e</term>
+	  <term name="no date" form="long">s.d</term>
+	  <term name="no date" form="short">s.d.</term>
+	   <term name="in" form="long">em</term>
+	   <term name="at" form="long">em</term>
+	   <term name="by" form="long">por</term>
+       <term name="by">por</term>
+	      <!-- PUNCTUATION -->
+    <term name="open-quote">"</term>
+    <term name="close-quote">"</term>
+    <!-- LONG MONTH FORMS -->
+    <term name="month-01">janeiro</term>
+    <term name="month-02">fevereiro</term>
+    <term name="month-03">março</term>
+    <term name="month-04">abril</term>
+    <term name="month-05">maio</term>
+    <term name="month-06">junho</term>
+    <term name="month-07">julho</term>
+    <term name="month-08">agosto</term>
+    <term name="month-09">setembro</term>
+    <term name="month-10">outubro</term>
+    <term name="month-11">novembro</term>
+    <term name="month-12">dezembro</term>
+    <!-- SHORT MONTH FORMS -->
+    <term name="month-01" form="short">jan.</term>
+    <term name="month-02" form="short">fev.</term>
+    <term name="month-03" form="short">mar.</term>
+    <term name="month-04" form="short">abr.</term>
+    <term name="month-05" form="short">mai.</term>
+    <term name="month-06" form="short">jun.</term>
+    <term name="month-07" form="short">jul.</term>
+    <term name="month-08" form="short">ago.</term>
+    <term name="month-09" form="short">set.</term>
+    <term name="month-10" form="short">out.</term>
+    <term name="month-11" form="short">nov.</term>
+    <term name="month-12" form="short">dez.</term>
     </terms>
   </locale>
   <macro name="secondary-contributors">
@@ -87,24 +125,46 @@
     </choose>
   </macro>
   <macro name="contributors">
-    <group delimiter=". ">
-      <names variable="author">
-        <name and="text" delimiter-precedes-last="always" initialize-with=". " name-as-sort-order="first"/>
-        <label form="short" prefix=", "/>
-        <substitute>
-          <names variable="editor"/>
-          <names variable="translator"/>
-          <names variable="director"/>
-          <text macro="substitute-title"/>
-          <text macro="title"/>
-        </substitute>
-      </names>
-      <text macro="recipient"/>
-    </group>
+    <choose>
+      <if type="book">
+        <group delimiter=". ">
+          <names variable="author">
+            <name and="text" name-as-sort-order="first" sort-separator=", " delimiter=", " delimiter-precedes-last="always"/>
+            <et-al/>
+            <label form="short" prefix=", "/>
+            <substitute>
+              <names variable="editor"/>
+              <names variable="translator"/>
+              <names variable="director"/>
+              <text macro="substitute-title"/>
+              <text macro="title"/>
+            </substitute>
+          </names>
+          <text macro="recipient"/>
+        </group>
+      </if>
+      <else-if type="book" match="none">
+        <group delimiter=". ">
+          <names variable="author">
+            <name and="text" name-as-sort-order="first" sort-separator=", " delimiter=", " delimiter-precedes-last="always"/>
+            <et-al/>
+            <label form="short" prefix=", "/>
+            <substitute>
+              <names variable="editor"/>
+              <names variable="translator"/>
+              <names variable="director"/>
+              <text macro="substitute-title"/>
+              <text macro="title"/>
+            </substitute>
+          </names>
+          <text macro="recipient"/>
+        </group>
+      </else-if>
+    </choose>
   </macro>
-  <macro name="contributors-short">
+    <macro name="contributors-short">
     <names variable="author">
-      <name form="short" and="text" delimiter=", " initialize-with=". "/>
+      <name form="short" and="text" delimiter-precedes-last="never" initialize-with=". "/>
       <substitute>
         <names variable="editor"/>
         <names variable="translator"/>
@@ -118,6 +178,7 @@
     <names variable="interviewer" delimiter=", ">
       <label form="verb" prefix=" " text-case="capitalize-first" suffix=" "/>
       <name and="text" delimiter=", "/>
+      <et-al/>
     </names>
   </macro>
   <macro name="archive">
@@ -143,10 +204,10 @@
         </if>
       </choose>
       <choose>
-        <if match="none" type="song">
+        <if match="none" type="song article-journal article article-magazine">
           <group delimiter=" ">
             <text term="accessed" text-case="capitalize-first"/>
-            <date variable="accessed" form="text"/>
+            <date form="text" variable="accessed" prefix=""/>
           </group>
         </if>
       </choose>
@@ -206,10 +267,10 @@
         </choose>
       </else-if>
       <else-if type="legal_case interview patent webpage" match="any">
-        <text variable="title" quotes="true"/>
+        <text variable="title" quotes="false" prefix="&quot;" suffix="&quot;"/>
       </else-if>
       <else>
-        <text variable="title" text-case="title" quotes="true"/>
+        <text variable="title" text-case="title" quotes="false" prefix="&quot;" suffix="&quot;"/>
       </else>
     </choose>
   </macro>
@@ -249,10 +310,10 @@
         <choose>
           <if variable="volume">
             <text variable="volume" prefix=" "/>
-            <group prefix=" (" suffix=")">
+            <group prefix=", ">
               <choose>
                 <if variable="issue">
-                  <text variable="issue"/>
+                  <text variable="issue" prefix="no."/>
                 </if>
                 <else>
                   <date variable="issued">
@@ -273,7 +334,7 @@
           </else-if>
           <else>
             <date variable="issued" prefix=", ">
-              <date-part name="month"/>
+              <date-part name="month" text-case="lowercase"/>
             </date>
           </else>
         </choose>
@@ -381,7 +442,7 @@
     </choose>
   </macro>
   <macro name="container-prefix">
-    <text term="in" text-case="capitalize-first"/>
+    <text term="in" text-case="lowercase" prefix="Comunicação apresentada "/>
   </macro>
   <macro name="container-title">
     <choose>
@@ -550,7 +611,7 @@
       <else-if type="patent">
         <group delimiter=", " prefix=", ">
           <group delimiter=" ">
-            <text value="filed"/>
+            <text value="submetida a"/>
             <date variable="submitted" form="text"/>
           </group>
           <group delimiter=" ">
@@ -559,7 +620,7 @@
                 <text term="and"/>
               </if>
             </choose>
-            <text value="issued"/>
+            <text value="publicada a"/>
             <date variable="issued" form="text"/>
           </group>
         </group>
@@ -598,30 +659,102 @@
       </group>
     </layout>
   </citation>
-  <bibliography hanging-indent="true" et-al-min="11" et-al-use-first="7" subsequent-author-substitute="&#8212;&#8212;&#8212;" entry-spacing="0">
+  <bibliography hanging-indent="true" et-al-min="11" et-al-use-first="7" subsequent-author-substitute="———" entry-spacing="0">
     <sort>
       <key macro="contributors"/>
       <key variable="issued"/>
       <key variable="title"/>
     </sort>
     <layout suffix=".">
-      <group delimiter=". ">
-        <text macro="contributors"/>
-        <text macro="date"/>
-        <text macro="title"/>
-      </group>
-      <text macro="description"/>
-      <text macro="secondary-contributors" prefix=". "/>
-      <text macro="container-title" prefix=". "/>
-      <text macro="container-contributors"/>
-      <text macro="edition"/>
-      <text macro="locators-chapter"/>
-      <text macro="collection-title-journal" prefix=", " suffix=", "/>
-      <text macro="locators"/>
-      <text macro="collection-title" prefix=". "/>
-      <text macro="issue"/>
-      <text macro="locators-article"/>
-      <text macro="access" prefix=". "/>
+      <choose>
+        <if type="entry-encyclopedia">
+          <group delimiter=" ">
+            <choose>
+              <if variable="author" match="none">
+                <group delimiter=", ">
+                  <text variable="container-title" font-style="italic" suffix="."/>
+                  <group delimiter=". ">
+                    <text macro="container-contributors"/>
+                    <group delimiter=", ">
+                      <text macro="publisher"/>
+                      <text macro="date"/>
+                    </group>
+                  </group>
+                  <text variable="title" prefix=" s.v. " quotes="true"/>
+                </group>
+              </if>
+              <else-if variable="author">
+                <group delimiter=". ">
+                  <text macro="contributors" suffix="."/>
+                  <text macro="date"/>
+                  <text variable="title" quotes="true"/>
+                  <text macro="container-title"/>
+                  <text macro="container-contributors" text-case="capitalize-first"/>
+                  <text macro="publisher"/>
+                  <text macro="access"/>
+                </group>
+              </else-if>
+            </choose>
+          </group>
+        </if>
+        <else-if type="motion_picture">
+          <group delimiter=". ">
+            <group delimiter=". ">
+              <group delimiter=" ">
+                <group delimiter=". ">
+                  <group delimiter=", ">
+                    <text variable="title" font-style="italic"/>
+                    <text variable="medium"/>
+                  </group>
+                  <group delimiter=", ">
+                    <text macro="publisher"/>
+                    <text macro="date"/>
+                  </group>
+                </group>
+              </group>
+            </group>
+          </group>
+        </else-if>
+        <else-if type="legislation">
+          <text macro="contributors" suffix=". "/>
+          <group delimiter=" ">
+            <text variable="title" font-style="italic"/>
+            <group prefix="(" suffix=")" delimiter=", ">
+              <text variable="section" prefix="capítulo "/>
+              <text variable="volume" prefix="vol. "/>
+            </group>
+          </group>
+        </else-if>
+        <else-if type="bill">
+          <text macro="contributors" suffix=". "/>
+          <group delimiter=" ">
+            <text variable="title" font-style="italic"/>
+            <group prefix="(RLRQ, " suffix=")" delimiter=", ">
+              <text variable="section" prefix="capítulo "/>
+              <text variable="number" prefix="nr. "/>
+            </group>
+          </group>
+        </else-if>
+        <else>
+          <group delimiter=". ">
+            <text macro="contributors"/>
+            <text macro="date"/>
+            <text macro="title"/>
+          </group>
+          <text macro="description"/>
+          <text macro="secondary-contributors" prefix=". "/>
+          <text macro="container-title" prefix=". "/>
+          <text macro="container-contributors"/>
+          <text macro="edition"/>
+          <text macro="locators-chapter"/>
+          <text macro="collection-title-journal" prefix=", " suffix=", "/>
+          <text macro="locators"/>
+          <text macro="collection-title" prefix=". "/>
+          <text macro="issue"/>
+          <text macro="locators-article"/>
+          <text macro="access" prefix=". "/>
+        </else>
+      </choose>
     </layout>
   </bibliography>
 </style>

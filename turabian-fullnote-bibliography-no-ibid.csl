@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <style xmlns="http://purl.org/net/xbiblio/csl" class="note" version="1.0" demote-non-dropping-particle="sort-only" default-locale="en-US">
   <info>
-    <title>Turabian 8th edition (full note)</title>
-    <id>http://www.zotero.org/styles/turabian-fullnote-bibliography</id>
-    <link href="http://www.zotero.org/styles/turabian-fullnote-bibliography" rel="self"/>
+    <title>Turabian 8th edition (full note, no ibid)</title>
+    <id>http://www.zotero.org/styles/turabian-fullnote-bibliography-no-ibid</id>
+    <link href="http://www.zotero.org/styles/turabian-fullnote-bibliography-no-ibid" rel="self"/>
     <link href="http://www.press.uchicago.edu/books/turabian/turabian_citationguide.html" rel="documentation"/>
     <author>
       <name>Elena Razlogova</name>
@@ -804,22 +804,13 @@
   <citation et-al-min="4" et-al-use-first="1" disambiguate-add-names="true">
     <layout suffix="." delimiter="; ">
       <choose>
-        <if position="ibid-with-locator">
-          <group delimiter=", ">
-            <text term="ibid"/>
-            <text macro="point-locators-subsequent"/>
-          </group>
-        </if>
-        <else-if position="ibid">
-          <text term="ibid"/>
-        </else-if>
-        <else-if position="subsequent">
+        <if position="subsequent">
           <group delimiter=", ">
             <text macro="contributors-short"/>
             <text macro="title-short"/>
             <text macro="point-locators-subsequent"/>
           </group>
-        </else-if>
+        </if>
         <else>
           <group delimiter=", ">
             <text macro="contributors-note"/>
