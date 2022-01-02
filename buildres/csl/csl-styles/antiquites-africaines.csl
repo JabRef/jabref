@@ -64,7 +64,7 @@
           <name form="short">
             <name-part name="family" font-variant="small-caps"/>
           </name>
-          <et-al font-style="italic" suffix=" "/>
+          <et-al font-style="italic"/>
           <substitute>
             <names variable="editor"/>
             <names variable="translator"/>
@@ -85,7 +85,7 @@
             <name-part name="family" font-variant="small-caps"/>
           </name>
           <label form="short" prefix=", " suffix=". " text-case="uppercase" strip-periods="true"/>
-          <et-al font-style="italic" suffix=" "/>
+          <et-al font-style="italic"/>
         </names>
       </if>
       <else-if variable="editor">
@@ -93,7 +93,7 @@
           <name form="short" et-al-min="3" et-al-use-first="1">
             <name-part name="family" font-variant="small-caps"/>
           </name>
-          <et-al font-style="italic" suffix=" "/>
+          <et-al font-style="italic"/>
         </names>
       </else-if>
       <else-if variable="collection-editor">
@@ -101,7 +101,7 @@
           <name form="short" et-al-min="3" et-al-use-first="1">
             <name-part name="family" font-variant="small-caps"/>
           </name>
-          <et-al font-style="italic" suffix=" "/>
+          <et-al font-style="italic"/>
         </names>
       </else-if>
       <else-if type="book">

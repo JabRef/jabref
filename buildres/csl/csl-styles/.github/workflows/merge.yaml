@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - master
+    tags-ignore:
+      - '**'
   workflow_dispatch:
     inputs:
       commit_message:
