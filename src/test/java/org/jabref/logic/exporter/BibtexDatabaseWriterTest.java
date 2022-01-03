@@ -104,12 +104,43 @@ public class BibtexDatabaseWriterTest {
     }
 
     @Test
-    void writeEncoding() throws Exception {
+    void writeEncodingUsAsciiWhenSetInPreferences() throws Exception {
         when(generalPreferences.getDefaultEncoding()).thenReturn(StandardCharsets.US_ASCII);
 
         databaseWriter.savePartOfDatabase(bibtexContext, Collections.emptyList());
 
         assertEquals("% Encoding: US-ASCII" + OS.NEWLINE, stringWriter.toString());
+    }
+
+    @Test
+    void writeEncodingUsAsciiWhenSetInPreferencesAndHeader() throws Exception {
+        when(generalPreferences.getDefaultEncoding()).thenReturn(StandardCharsets.US_ASCII);
+        metaData.setEncoding(StandardCharsets.US_ASCII);
+
+        databaseWriter.savePartOfDatabase(bibtexContext, Collections.emptyList());
+
+        assertEquals("% Encoding: US-ASCII" + OS.NEWLINE, stringWriter.toString());
+    }
+
+    @Test
+    void writeEncodingWindows1252WhenSetInPreferences() throws Exception {
+        Charset charsetWindows1252 = Charset.forName("windows-1252");
+        when(generalPreferences.getDefaultEncoding()).thenReturn(charsetWindows1252);
+
+        databaseWriter.savePartOfDatabase(bibtexContext, Collections.emptyList());
+
+        assertEquals("% Encoding: windows-1252" + OS.NEWLINE, stringWriter.toString());
+    }
+
+    @Test
+    void writeEncodingWindows1252WhenSetInPreferencesAndHeader() throws Exception {
+        Charset charsetWindows1252 = Charset.forName("windows-1252");
+        when(generalPreferences.getDefaultEncoding()).thenReturn(charsetWindows1252);
+        metaData.setEncoding(charsetWindows1252);
+
+        databaseWriter.savePartOfDatabase(bibtexContext, Collections.emptyList());
+
+        assertEquals("% Encoding: windows-1252" + OS.NEWLINE, stringWriter.toString());
     }
 
     @Test

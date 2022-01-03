@@ -183,7 +183,8 @@ public abstract class BibDatabaseWriter {
 
         // Some file formats write something at the start of the file (like the encoding)
         if (savePreferences.getSaveType() != SavePreferences.DatabaseSaveType.PLAIN_BIBTEX) {
-            writeProlog(bibDatabaseContext, generalPreferences.getDefaultEncoding());
+            Charset charset = bibDatabaseContext.getMetaData().getEncoding().orElse(generalPreferences.getDefaultEncoding());
+            writeProlog(bibDatabaseContext, charset);
         }
 
         bibWriter.finishBlock();

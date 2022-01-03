@@ -2,16 +2,19 @@ package org.jabref.logic.importer.fileformat;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 
 import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
+import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -124,5 +127,24 @@ public class BibtexImporterTest {
         Path file = Path.of(BibtexImporterTest.class.getResource("AutosavedSharedDatabase.bib").toURI());
         String sharedDatabaseID = importer.importDatabase(file, StandardCharsets.UTF_8).getDatabase().getSharedDatabaseID().get();
         assertEquals("13ceoc8dm42f5g1iitao3dj2ap", sharedDatabaseID);
+    }
+
+    @Test
+    public void testParsingOfWindows1252EncodedFileReturnsCorrectHeader() throws Exception {
+        ParserResult parserResult = importer.importDatabase(
+                Path.of(BibtexImporterTest.class.getResource("encoding-windows-1252-with-header.bib").toURI()),
+                StandardCharsets.UTF_8);
+        assertEquals(Optional.of(Charset.forName("Windows-1252")), parserResult.getMetaData().getEncoding());
+    }
+
+    @Test
+    public void testParsingOfWindows1252EncodedFileReadsDegreeCharacterCorrectly() throws Exception {
+        ParserResult parserResult = importer.importDatabase(
+                Path.of(BibtexImporterTest.class.getResource("encoding-windows-1252-with-header.bib").toURI()),
+                StandardCharsets.UTF_8);
+        List<BibEntry> bibEntries = parserResult.getDatabase().getEntries();
+        assertEquals(
+                List.of(new BibEntry(StandardEntryType.Article).withField(StandardField.ABSTRACT, "25° C")),
+                bibEntries);
     }
 }
