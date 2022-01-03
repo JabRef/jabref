@@ -17,6 +17,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 
 ### Fixed
 
+- We fixed an issue where clicking on "Accept changes" in the merge dialog would lead to an exception [forum#2418](https://discourse.jabref.org/t/the-library-has-been-modified-by-another-program/2418/8)
 - We fixed an issue where clicking on headings in the entry preview could lead to an exception. [#8292](https://github.com/JabRef/jabref/issues/8292)
 - We fixed an issue where IntegrityCheck used the system's character encoding instead of the one set by the library or in preferences [#8022](https://github.com/JabRef/jabref/issues/8022)
 - We fixed an issue about empty metadata in library properties when called from the right click menu. [#8358](https://github.com/JabRef/jabref/issues/8358)
