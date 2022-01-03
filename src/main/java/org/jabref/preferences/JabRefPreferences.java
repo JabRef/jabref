@@ -225,7 +225,7 @@ public class JabRefPreferences implements PreferencesService {
 
     public static final String WARN_ABOUT_DUPLICATES_IN_INSPECTION = "warnAboutDuplicatesInInspection";
     public static final String NON_WRAPPABLE_FIELDS = "nonWrappableFields";
-    public static final String RESOLVE_STRINGS_ALL_FIELDS = "resolveStringsAllFields";
+    public static final String RESOLVE_STRINGS_ALL_FIELDS = "resolveStringsAllFields55";
     public static final String DO_NOT_RESOLVE_STRINGS_FOR = "doNotResolveStringsFor";
     public static final String MERGE_ENTRIES_DIFF_MODE = "mergeEntriesDiffMode";
     public static final String CUSTOM_EXPORT_FORMAT = "customExportFormat";
@@ -631,8 +631,8 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(CONFIRM_DELETE, Boolean.TRUE);
         defaults.put(DEFAULT_CITATION_KEY_PATTERN, "[auth][year]");
         defaults.put(UNWANTED_CITATION_KEY_CHARACTERS, "-`ʹ:!;?^+");
-        defaults.put(DO_NOT_RESOLVE_STRINGS_FOR, StandardField.URL.getName());
-        defaults.put(RESOLVE_STRINGS_ALL_FIELDS, Boolean.FALSE);
+        defaults.put(DO_NOT_RESOLVE_STRINGS_FOR, "url;abstract;note;comment;doi;eprint;file");
+        defaults.put(RESOLVE_STRINGS_ALL_FIELDS, Boolean.TRUE);
         defaults.put(NON_WRAPPABLE_FIELDS, "pdf;ps;url;doi;file;isbn;issn");
         defaults.put(WARN_ABOUT_DUPLICATES_IN_INSPECTION, Boolean.TRUE);
         defaults.put(ADD_CREATION_DATE, Boolean.FALSE);

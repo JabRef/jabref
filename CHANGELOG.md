@@ -14,9 +14,11 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 ### Changed
 
 - We integrated the external file types dialog directly inside the preferences. [#8341](https://github.com/JabRef/jabref/pull/8341)
+- We disabled BibTeX String resolving by default for the fields `url`, `abstract`, `note`, `comment`, `doi` and `file` to keep #-chars [#7010](https://github.com/JabRef/jabref/issues/7010), [#7102](https://github.com/JabRef/jabref/issues/7012), [#8303]((https://github.com/JabRef/jabref/issues/8303))
 
 ### Fixed
 
+- We fixed an issue where #-chars in certain fields would be interpreted as BibTeX-Strings [#7010](https://github.com/JabRef/jabref/issues/7010), [#7102](https://github.com/JabRef/jabref/issues/7012), [#8303]((https://github.com/JabRef/jabref/issues/8303))
 - We fixed an issue where clicking on "Accept changes" in the merge dialog would lead to an exception [forum#2418](https://discourse.jabref.org/t/the-library-has-been-modified-by-another-program/2418/8)
 - We fixed an issue where clicking on headings in the entry preview could lead to an exception. [#8292](https://github.com/JabRef/jabref/issues/8292)
 - We fixed an issue where IntegrityCheck used the system's character encoding instead of the one set by the library or in preferences [#8022](https://github.com/JabRef/jabref/issues/8022)
