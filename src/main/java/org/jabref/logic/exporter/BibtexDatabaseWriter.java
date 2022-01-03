@@ -20,12 +20,16 @@ import org.jabref.model.metadata.MetaData;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.preferences.GeneralPreferences;
 
+/**
+ * Writes a .bib file following the BibTeX / BibLaTeX format using the provided {@link BibWriter}
+ */
 public class BibtexDatabaseWriter extends BibDatabaseWriter {
 
     public static final String DATABASE_ID_PREFIX = "DBID:";
-    private static final String STRING_PREFIX = "@String";
+
     private static final String COMMENT_PREFIX = "@Comment";
     private static final String PREAMBLE_PREFIX = "@Preamble";
+    private static final String STRING_PREFIX = "@String";
 
     public BibtexDatabaseWriter(BibWriter bibWriter, GeneralPreferences generalPreferences, SavePreferences savePreferences, BibEntryTypesManager entryTypesManager) {
         super(bibWriter, generalPreferences, savePreferences, entryTypesManager);
