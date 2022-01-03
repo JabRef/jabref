@@ -62,7 +62,7 @@ public class PreviewPreferences {
 
     public PreviewLayout getSelectedPreviewLayout() {
         if (layoutCycle.size() <= 0
-                || layoutCyclePosition.getValue() <= 0
+                || layoutCyclePosition.getValue() < 0
                 || layoutCyclePosition.getValue() >= layoutCycle.size()) {
             return getCustomPreviewLayout();
         } else {
