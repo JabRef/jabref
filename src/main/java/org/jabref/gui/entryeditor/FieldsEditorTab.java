@@ -40,6 +40,8 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.preferences.PreferencesService;
 
+import com.tobiasdiez.easybind.EasyBind;
+
 /**
  * A single tab displayed in the EntryEditor holding several FieldEditors.
  */
@@ -71,7 +73,8 @@ abstract class FieldsEditorTab extends EntryEditorTab {
                            ThemeManager themeManager,
                            ExternalFileTypes externalFileTypes,
                            TaskExecutor taskExecutor,
-                           JournalAbbreviationRepository journalAbbreviationRepository, IndexingTaskManager indexingTaskManager) {
+                           JournalAbbreviationRepository journalAbbreviationRepository,
+                           IndexingTaskManager indexingTaskManager) {
         this.isCompressed = compressed;
         this.databaseContext = Objects.requireNonNull(databaseContext);
         this.suggestionProviders = Objects.requireNonNull(suggestionProviders);
@@ -110,9 +113,16 @@ abstract class FieldsEditorTab extends EntryEditorTab {
 
         List<Label> labels = new ArrayList<>();
         for (Field field : fields) {
-            FieldEditorFX fieldEditor = FieldEditors.getForField(field, taskExecutor, dialogService,
+            FieldEditorFX fieldEditor = FieldEditors.getForField(
+                    field,
+                    taskExecutor,
+                    dialogService,
                     journalAbbreviationRepository,
-                    preferences, databaseContext, entry.getType(), suggestionProviders, undoManager);
+                    preferences,
+                    databaseContext,
+                    entry.getType(),
+                    suggestionProviders,
+                    undoManager);
             fieldEditor.bindToEntry(entry);
 
             editors.put(field, fieldEditor);
@@ -236,11 +246,14 @@ abstract class FieldsEditorTab extends EntryEditorTab {
             scrollPane.setFitToHeight(true);
 
             SplitPane container = new SplitPane(scrollPane);
-            if (!preferences.getPreviewPreferences().showPreviewAsExtraTab()) {
-                previewPanel = new PreviewPanel(databaseContext, dialogService, externalFileTypes, preferences.getKeyBindingRepository(), preferences, stateManager, themeManager, indexingTaskManager);
-                container.getItems().add(previewPanel);
-            }
-
+            previewPanel = new PreviewPanel(databaseContext, dialogService, externalFileTypes, preferences.getKeyBindingRepository(), preferences, stateManager, themeManager, indexingTaskManager);
+            EasyBind.subscribe(preferences.getPreviewPreferences().showPreviewAsExtraTabProperty(), show -> {
+                if (show) {
+                    container.getItems().remove(previewPanel);
+                } else {
+                    container.getItems().add(1, previewPanel);
+                }
+            });
             setContent(container);
         }
     }

@@ -15,7 +15,6 @@ import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ControlHelper;
-import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.preferences.PreferencesService;
@@ -38,7 +37,6 @@ public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel
 
     @Inject private DialogService dialogService;
     @Inject private PreferencesService preferencesService;
-    @Inject private TaskExecutor taskExecutor;
     @Inject private ThemeManager themeManager;
 
     private final JabRefFrame frame;
@@ -78,12 +76,12 @@ public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel
         searchBox.setLeft(IconTheme.JabRefIcons.SEARCH.getGraphicNode());
 
         EasyBind.subscribe(preferenceTabList.getSelectionModel().selectedItemProperty(), tab -> {
-            if (tab == null) {
-                preferencesContainer.setContent(null);
+            if (tab instanceof AbstractPreferenceTabView<?> preferencesTab) {
+                preferencesContainer.setContent(preferencesTab.getBuilder());
+                preferencesTab.prefWidthProperty().bind(preferencesContainer.widthProperty());
+                preferencesTab.getStyleClass().add("preferencesTab");
             } else {
-                preferencesContainer.setContent(tab.getBuilder());
-                ((AbstractPreferenceTabView<?>) tab).prefWidthProperty().bind(preferencesContainer.widthProperty());
-                ((AbstractPreferenceTabView<?>) tab).getStyleClass().add("preferencesTab");
+                preferencesContainer.setContent(null);
             }
         });
 

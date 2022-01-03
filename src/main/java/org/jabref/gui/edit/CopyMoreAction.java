@@ -34,7 +34,11 @@ public class CopyMoreAction extends SimpleCommand {
     private final ClipBoardManager clipBoardManager;
     private final PreferencesService preferencesService;
 
-    public CopyMoreAction(StandardActions action, DialogService dialogService, StateManager stateManager, ClipBoardManager clipBoardManager, PreferencesService preferencesService) {
+    public CopyMoreAction(StandardActions action,
+                          DialogService dialogService,
+                          StateManager stateManager,
+                          ClipBoardManager clipBoardManager,
+                          PreferencesService preferencesService) {
         this.action = action;
         this.dialogService = dialogService;
         this.stateManager = stateManager;

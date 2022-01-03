@@ -260,10 +260,6 @@ public interface PreferencesService {
 
     PreviewPreferences getPreviewPreferences();
 
-    void updatePreviewPreferences();
-
-    void storePreviewPreferences(PreviewPreferences previewPreferences);
-
     //*************************************************************************************************************
     // SidePanePreferences
     //*************************************************************************************************************

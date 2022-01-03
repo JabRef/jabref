@@ -57,7 +57,7 @@ public class PreviewTab extends EntryEditorTab {
 
     @Override
     public boolean shouldShow(BibEntry entry) {
-        return preferences.getPreviewPreferences().showPreviewAsExtraTab();
+        return preferences.getPreviewPreferences().shouldShowPreviewAsExtraTab();
     }
 
     @Override
