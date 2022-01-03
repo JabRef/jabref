@@ -37,7 +37,6 @@ public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel
 
     @Inject private DialogService dialogService;
     @Inject private PreferencesService preferencesService;
-    @Inject private TaskExecutor taskExecutor;
     @Inject private ThemeManager themeManager;
 
     private final JabRefFrame frame;
