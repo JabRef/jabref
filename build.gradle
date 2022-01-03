@@ -121,7 +121,7 @@ dependencies {
     implementation group: 'org.apache.commons', name: 'commons-csv', version: '1.9.0'
     implementation 'com.h2database:h2-mvstore:2.0.204'
 
-    implementation group: 'org.apache.tika', name: 'tika-core', version: '2.2.0'
+    implementation group: 'org.apache.tika', name: 'tika-core', version: '2.2.1'
 
     // required for reading write-protected PDFs - see https://github.com/JabRef/jabref/pull/942#issuecomment-209252635
     implementation 'org.bouncycastle:bcprov-jdk15on:1.70'
