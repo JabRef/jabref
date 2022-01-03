@@ -23,9 +23,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
 /**
- * This class tests the BibtexImporter. That importer is only used for --importToOpen, which is currently untested
+ * This class tests the BibtexImporter.
  * <p>
- * TODO: 1. Add test for --importToOpen 2. Move these tests to the code opening a bibtex file
+ * The tests for writing can be found at {@link org.jabref.logic.exporter.BibtexDatabaseWriterTest}
  */
 public class BibtexImporterTest {
 
