@@ -30,6 +30,7 @@ import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.preferences.PreferencesTab;
 import org.jabref.gui.preview.PreviewViewer;
+import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.IconValidationDecorator;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.l10n.Localization;
@@ -60,6 +61,7 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> i
     @FXML private CustomTextField searchBox;
 
     @Inject private StateManager stateManager;
+    @Inject private ThemeManager themeManager;
 
     private final ContextMenu contextMenu = new ContextMenu();
 
@@ -152,13 +154,12 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> i
         sortUpButton.disableProperty().bind(viewModel.chosenSelectionModelProperty().getValue().selectedItemProperty().isNull());
         sortDownButton.disableProperty().bind(viewModel.chosenSelectionModelProperty().getValue().selectedItemProperty().isNull());
 
-        previewTab.setContent(new PreviewViewer(new BibDatabaseContext(), dialogService, stateManager));
+        previewTab.setContent(new PreviewViewer(new BibDatabaseContext(), dialogService, stateManager, themeManager));
         ((PreviewViewer) previewTab.getContent()).setEntry(TestEntry.getTestEntry());
 
         EasyBind.subscribe(viewModel.layoutProperty(), value -> ((PreviewViewer) previewTab.getContent()).setLayout(value));
         previewTab.getContent().visibleProperty().bind(viewModel.chosenSelectionModelProperty().getValue().selectedItemProperty().isNotNull()
                                                        .or(viewModel.availableSelectionModelProperty().getValue().selectedItemProperty().isNotNull()));
-        ((PreviewViewer) previewTab.getContent()).setTheme(preferencesService.getTheme());
 
         editArea.clear();
         editArea.setParagraphGraphicFactory(LineNumberFactory.get(editArea));

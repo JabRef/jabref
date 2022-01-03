@@ -31,6 +31,7 @@ import org.jabref.gui.fieldeditors.FieldEditorFX;
 import org.jabref.gui.fieldeditors.FieldEditors;
 import org.jabref.gui.fieldeditors.FieldNameLabel;
 import org.jabref.gui.preview.PreviewPanel;
+import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.pdf.search.indexing.IndexingTaskManager;
@@ -49,6 +50,7 @@ abstract class FieldsEditorTab extends EntryEditorTab {
     private final SuggestionProviders suggestionProviders;
     private final DialogService dialogService;
     private final PreferencesService preferences;
+    private final ThemeManager themeManager;
     private final ExternalFileTypes externalFileTypes;
     private final TaskExecutor taskExecutor;
     private final JournalAbbreviationRepository journalAbbreviationRepository;
@@ -66,6 +68,7 @@ abstract class FieldsEditorTab extends EntryEditorTab {
                            DialogService dialogService,
                            PreferencesService preferences,
                            StateManager stateManager,
+                           ThemeManager themeManager,
                            ExternalFileTypes externalFileTypes,
                            TaskExecutor taskExecutor,
                            JournalAbbreviationRepository journalAbbreviationRepository, IndexingTaskManager indexingTaskManager) {
@@ -75,6 +78,7 @@ abstract class FieldsEditorTab extends EntryEditorTab {
         this.undoManager = Objects.requireNonNull(undoManager);
         this.dialogService = Objects.requireNonNull(dialogService);
         this.preferences = Objects.requireNonNull(preferences);
+        this.themeManager = themeManager;
         this.externalFileTypes = Objects.requireNonNull(externalFileTypes);
         this.taskExecutor = Objects.requireNonNull(taskExecutor);
         this.journalAbbreviationRepository = Objects.requireNonNull(journalAbbreviationRepository);
@@ -233,7 +237,7 @@ abstract class FieldsEditorTab extends EntryEditorTab {
 
             SplitPane container = new SplitPane(scrollPane);
             if (!preferences.getPreviewPreferences().showPreviewAsExtraTab()) {
-                previewPanel = new PreviewPanel(databaseContext, dialogService, externalFileTypes, preferences.getKeyBindingRepository(), preferences, stateManager, indexingTaskManager);
+                previewPanel = new PreviewPanel(databaseContext, dialogService, externalFileTypes, preferences.getKeyBindingRepository(), preferences, stateManager, themeManager, indexingTaskManager);
                 container.getItems().add(previewPanel);
             }
 

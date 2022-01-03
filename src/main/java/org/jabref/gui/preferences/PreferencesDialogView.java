@@ -12,6 +12,7 @@ import javafx.scene.control.ScrollPane;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.TaskExecutor;
@@ -38,6 +39,7 @@ public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel
     @Inject private DialogService dialogService;
     @Inject private PreferencesService preferencesService;
     @Inject private TaskExecutor taskExecutor;
+    @Inject private ThemeManager themeManager;
 
     private final JabRefFrame frame;
     private PreferencesDialogViewModel viewModel;
@@ -52,11 +54,7 @@ public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel
 
         ControlHelper.setAction(saveButton, getDialogPane(), event -> savePreferencesAndCloseDialog());
 
-        this.getDialogPane().setStyle("-fx-font-size: " + preferencesService.getAppearancePreferences().getMainFontSize() + "pt;");
-
-        // ToDo: After conversion of all tabs to mvvm, rework interface and make validSettings bindable
-        // Button btnSave = (Button) this.getDialogPane().lookupButton(saveButton);
-        // btnSave.disableProperty().bind(viewModel.validSettings().validProperty().not());
+        themeManager.updateFontStyle(getDialogPane().getScene());
     }
 
     public PreferencesDialogViewModel getViewModel() {
