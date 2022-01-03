@@ -13,6 +13,7 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.autocompleter.SuggestionProviders;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
@@ -36,13 +37,14 @@ public class RequiredFieldsTab extends FieldsEditorTab {
                              DialogService dialogService,
                              PreferencesService preferences,
                              StateManager stateManager,
+                             ThemeManager themeManager,
                              IndexingTaskManager indexingTaskManager,
                              BibEntryTypesManager entryTypesManager,
                              ExternalFileTypes externalFileTypes,
                              TaskExecutor taskExecutor,
                              JournalAbbreviationRepository journalAbbreviationRepository) {
         super(false, databaseContext, suggestionProviders, undoManager, dialogService,
-                preferences, stateManager, externalFileTypes, taskExecutor, journalAbbreviationRepository, indexingTaskManager);
+                preferences, stateManager, themeManager, externalFileTypes, taskExecutor, journalAbbreviationRepository, indexingTaskManager);
         this.entryTypesManager = entryTypesManager;
 
         setText(Localization.lang("Required fields"));

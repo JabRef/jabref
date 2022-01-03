@@ -1,8 +1,5 @@
 package org.jabref.gui.preferences.appearance;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -11,8 +8,8 @@ import javafx.scene.control.SpinnerValueFactory;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
+import org.jabref.gui.theme.Theme;
 import org.jabref.gui.util.FileDialogConfiguration;
-import org.jabref.gui.util.Theme;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.strings.StringUtil;
@@ -30,8 +27,6 @@ public class AppearanceTabViewModel implements PreferenceTabViewModel {
     public static SpinnerValueFactory<Integer> fontSizeValueFactory =
             new SpinnerValueFactory.IntegerSpinnerValueFactory(9, Integer.MAX_VALUE);
 
-    private static final String EMBEDDED_DARK_THEME_CSS = "Dark.css";
-
     private final BooleanProperty fontOverrideProperty = new SimpleBooleanProperty();
     private final StringProperty fontSizeProperty = new SimpleStringProperty();
     private final BooleanProperty themeLightProperty = new SimpleBooleanProperty();
@@ -45,8 +40,6 @@ public class AppearanceTabViewModel implements PreferenceTabViewModel {
 
     private final Validator fontSizeValidator;
     private final Validator customPathToThemeValidator;
-
-    private final List<String> restartWarnings = new ArrayList<>();
 
     public AppearanceTabViewModel(DialogService dialogService, PreferencesService preferences) {
         this.dialogService = dialogService;
@@ -81,12 +74,14 @@ public class AppearanceTabViewModel implements PreferenceTabViewModel {
         fontOverrideProperty.setValue(appearancePreferences.shouldOverrideDefaultFontSize());
         fontSizeProperty.setValue(String.valueOf(appearancePreferences.getMainFontSize()));
 
+        // The light theme is in fact the absence of any theme modifying 'base.css'. Another embedded theme like
+        // 'dark.css', stored in the classpath, can be introduced in {@link org.jabref.gui.theme.Theme}.
         Theme currentTheme = appearancePreferences.getTheme();
-        if (currentTheme.getType() == Theme.Type.LIGHT) {
+        if (currentTheme.getType() == Theme.Type.DEFAULT) {
             themeLightProperty.setValue(true);
             themeDarkProperty.setValue(false);
             themeCustomProperty.setValue(false);
-        } else if (currentTheme.getType() == Theme.Type.DARK) {
+        } else if (currentTheme.getType() == Theme.Type.EMBEDDED) {
             themeLightProperty.setValue(false);
             themeDarkProperty.setValue(true);
             themeCustomProperty.setValue(false);
@@ -94,42 +89,22 @@ public class AppearanceTabViewModel implements PreferenceTabViewModel {
             themeLightProperty.setValue(false);
             themeDarkProperty.setValue(false);
             themeCustomProperty.setValue(true);
-            customPathToThemeProperty.setValue(currentTheme.getCssPathString());
+            customPathToThemeProperty.setValue(currentTheme.getName());
         }
     }
 
     @Override
     public void storeSettings() {
-        if (appearancePreferences.shouldOverrideDefaultFontSize() != fontOverrideProperty.getValue()) {
-            restartWarnings.add(Localization.lang("Override font settings"));
-        }
-
-        int newFontSize = Integer.parseInt(fontSizeProperty.getValue());
-        if (appearancePreferences.getMainFontSize() != newFontSize) {
-            restartWarnings.add(Localization.lang("Override font size"));
-        }
-
-        Theme newTheme = appearancePreferences.getTheme();
-        if (themeLightProperty.getValue() && appearancePreferences.getTheme().getType() != Theme.Type.LIGHT) {
-            restartWarnings.add(Localization.lang("Theme changed to light theme."));
-            newTheme = new Theme("", preferences);
-        } else if (themeDarkProperty.getValue() && appearancePreferences.getTheme().getType() != Theme.Type.DARK) {
-            restartWarnings.add(Localization.lang("Theme changed to dark theme."));
-            newTheme = new Theme(EMBEDDED_DARK_THEME_CSS, preferences);
-        } else if (themeCustomProperty.getValue() &&
-                (!appearancePreferences.getTheme().getCssPathString()
-                                       .equalsIgnoreCase(customPathToThemeProperty.getValue())
-                        || appearancePreferences.getTheme().getType() != Theme.Type.CUSTOM)) {
-            restartWarnings.add(Localization.lang("Theme changed to a custom theme:") + " "
-                    + customPathToThemeProperty().getValue());
-            newTheme = new Theme(customPathToThemeProperty.getValue(), preferences);
-        }
-
         appearancePreferences.setShouldOverrideDefaultFontSize(fontOverrideProperty.getValue());
-        appearancePreferences.setMainFontSize(newFontSize);
-        appearancePreferences.setTheme(newTheme);
+        appearancePreferences.setMainFontSize(Integer.parseInt(fontSizeProperty.getValue()));
 
-        preferences.updateTheme();
+        if (themeLightProperty.getValue()) {
+            appearancePreferences.setTheme(Theme.light());
+        } else if (themeDarkProperty.getValue()) {
+            appearancePreferences.setTheme(Theme.dark());
+        } else if (themeCustomProperty.getValue()) {
+            appearancePreferences.setTheme(Theme.custom(customPathToThemeProperty.getValue()));
+        }
     }
 
     public ValidationStatus fontSizeValidationStatus() {
@@ -159,11 +134,6 @@ public class AppearanceTabViewModel implements PreferenceTabViewModel {
             return false;
         }
         return true;
-    }
-
-    @Override
-    public List<String> getRestartWarnings() {
-        return restartWarnings;
     }
 
     public BooleanProperty fontOverrideProperty() {

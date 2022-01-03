@@ -12,6 +12,7 @@ import javafx.scene.control.ScrollPane;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.ViewModelListCellFactory;
@@ -36,6 +37,8 @@ public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel
 
     @Inject private DialogService dialogService;
     @Inject private PreferencesService preferencesService;
+    @Inject private TaskExecutor taskExecutor;
+    @Inject private ThemeManager themeManager;
 
     private final JabRefFrame frame;
     private PreferencesDialogViewModel viewModel;
@@ -50,7 +53,7 @@ public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel
 
         ControlHelper.setAction(saveButton, getDialogPane(), event -> savePreferencesAndCloseDialog());
 
-        this.getDialogPane().setStyle("-fx-font-size: " + preferencesService.getAppearancePreferences().getMainFontSize() + "pt;");
+        themeManager.updateFontStyle(getDialogPane().getScene());
     }
 
     public PreferencesDialogViewModel getViewModel() {

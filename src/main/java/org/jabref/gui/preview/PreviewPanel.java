@@ -23,6 +23,7 @@ import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.keyboard.KeyBindingRepository;
+import org.jabref.gui.theme.ThemeManager;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.pdf.search.indexing.IndexingTaskManager;
 import org.jabref.logic.preview.PreviewLayout;
@@ -53,6 +54,7 @@ public class PreviewPanel extends VBox {
                         KeyBindingRepository keyBindingRepository,
                         PreferencesService preferences,
                         StateManager stateManager,
+                        ThemeManager themeManager,
                         IndexingTaskManager indexingTaskManager) {
         this.keyBindingRepository = keyBindingRepository;
         this.dialogService = dialogService;
@@ -62,10 +64,9 @@ public class PreviewPanel extends VBox {
         this.fileLinker = new ExternalFilesEntryLinker(externalFileTypes, preferences.getFilePreferences(), database);
 
         PreviewPreferences previewPreferences = preferences.getPreviewPreferences();
-        previewView = new PreviewViewer(database, dialogService, stateManager);
+        previewView = new PreviewViewer(database, dialogService, stateManager, themeManager);
         previewView.setLayout(previewPreferences.getSelectedPreviewLayout());
         previewView.setContextMenu(createPopupMenu());
-        previewView.setTheme(preferences.getTheme());
         previewView.setOnDragDetected(event -> {
             previewView.startFullDrag();
 
