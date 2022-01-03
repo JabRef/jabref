@@ -1,6 +1,7 @@
 package org.jabref.gui.theme;
 
 import java.io.IOException;
+import java.net.URL;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
@@ -160,7 +161,14 @@ public class ThemeManager {
         scene.getStylesheets().setAll(List.of(
                 baseStyleSheet.getSceneStylesheet().toExternalForm(),
                 appearancePreferences.getTheme()
-                                     .getAdditionalStylesheet().map(styleSheet -> styleSheet.getSceneStylesheet().toExternalForm())
+                                     .getAdditionalStylesheet().map(styleSheet -> {
+                                         URL stylesheetUrl = styleSheet.getSceneStylesheet();
+                                         if (stylesheetUrl != null) {
+                                             return stylesheetUrl.toExternalForm();
+                                         } else {
+                                             return "";
+                                         }
+                                     })
                                      .orElse("")
         ));
     }
