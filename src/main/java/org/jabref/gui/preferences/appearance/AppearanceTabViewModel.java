@@ -74,6 +74,8 @@ public class AppearanceTabViewModel implements PreferenceTabViewModel {
         fontOverrideProperty.setValue(appearancePreferences.shouldOverrideDefaultFontSize());
         fontSizeProperty.setValue(String.valueOf(appearancePreferences.getMainFontSize()));
 
+        // The light theme is in fact the absence of any theme modifying 'base.css'. Another embedded theme like
+        // 'dark.css', stored in the classpath, can be introduced in {@link org.jabref.gui.theme.Theme}.
         Theme currentTheme = appearancePreferences.getTheme();
         if (currentTheme.getType() == Theme.Type.DEFAULT) {
             themeLightProperty.setValue(true);

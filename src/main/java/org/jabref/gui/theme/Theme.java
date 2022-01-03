@@ -6,10 +6,8 @@ import java.util.Optional;
 /**
  * Represents one of three types of a css based Theme for JabRef:
  * <p>
- * The Default type of theme is the light theme, the dark theme is currently the only embedded theme and the custom
- * themes, that can be created by loading a proper css file. If a css file cannot be found, the Theme package will
- * nevertheless create a stylesheet representation for the missing file and report a file watch path so the user can
- * provide the file later, but will not provide the additional stylesheet.
+ * The Default type of theme is the light theme (which is in fact the absence of any theme), the dark theme is currently
+ * the only embedded theme and the custom themes, that can be created by loading a proper css file.
  */
 public class Theme {
 
