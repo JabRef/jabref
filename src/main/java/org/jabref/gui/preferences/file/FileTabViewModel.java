@@ -13,9 +13,9 @@ public class FileTabViewModel implements PreferenceTabViewModel {
 
     private final BooleanProperty openLastStartupProperty = new SimpleBooleanProperty();
     private final StringProperty noWrapFilesProperty = new SimpleStringProperty("");
-    private final BooleanProperty resolveStringsBibTexProperty = new SimpleBooleanProperty();
-    private final BooleanProperty resolveStringsAllProperty = new SimpleBooleanProperty();
-    private final StringProperty resolveStringsExceptProperty = new SimpleStringProperty("");
+    private final BooleanProperty doNotResolveStringsProperty = new SimpleBooleanProperty();
+    private final BooleanProperty resolveStringsProperty = new SimpleBooleanProperty();
+    private final StringProperty resolveStringsForFieldsProperty = new SimpleStringProperty("");
     private final BooleanProperty alwaysReformatBibProperty = new SimpleBooleanProperty();
     private final BooleanProperty autosaveLocalLibraries = new SimpleBooleanProperty();
 
@@ -30,14 +30,12 @@ public class FileTabViewModel implements PreferenceTabViewModel {
     @Override
     public void setValues() {
         openLastStartupProperty.setValue(preferences.shouldOpenLastFilesOnStartup());
-
         noWrapFilesProperty.setValue(importExportPreferences.getNonWrappableFields());
-        resolveStringsAllProperty.setValue(importExportPreferences.shouldResolveStringsForAllStrings()); // Flipped around
-        resolveStringsBibTexProperty.setValue(importExportPreferences.shouldResolveStringsForStandardBibtexFields());
-        resolveStringsExceptProperty.setValue(importExportPreferences.getNonResolvableFields());
 
+        doNotResolveStringsProperty.setValue(importExportPreferences.doNotResolveStrings());
+        resolveStringsProperty.setValue(!importExportPreferences.doNotResolveStrings());
+        resolveStringsForFieldsProperty.setValue(importExportPreferences.getResolvableFields());
         alwaysReformatBibProperty.setValue(importExportPreferences.shouldAlwaysReformatOnSave());
-
         autosaveLocalLibraries.setValue(preferences.shouldAutosave());
     }
 
@@ -45,10 +43,9 @@ public class FileTabViewModel implements PreferenceTabViewModel {
     public void storeSettings() {
         preferences.storeOpenLastFilesOnStartup(openLastStartupProperty.getValue());
 
+        importExportPreferences.setDoNotResolveStrings(doNotResolveStringsProperty.getValue());
         importExportPreferences.setNonWrappableFields(noWrapFilesProperty.getValue().trim());
-        importExportPreferences.setResolveStringsForStandardBibtexFields(resolveStringsBibTexProperty.getValue());
-        importExportPreferences.setResolveStringsForAllStrings(resolveStringsAllProperty.getValue());
-        importExportPreferences.setNonResolvableFields(resolveStringsExceptProperty.getValue().trim());
+        importExportPreferences.setResolvableFields(resolveStringsForFieldsProperty.getValue().trim());
         importExportPreferences.setAlwaysReformatOnSave(alwaysReformatBibProperty.getValue());
 
         preferences.storeShouldAutosave(autosaveLocalLibraries.getValue());
@@ -66,16 +63,8 @@ public class FileTabViewModel implements PreferenceTabViewModel {
         return noWrapFilesProperty;
     }
 
-    public BooleanProperty resolveStringsBibTexProperty() {
-        return resolveStringsBibTexProperty;
-    }
-
-    public BooleanProperty resolveStringsAllProperty() {
-        return resolveStringsAllProperty;
-    }
-
-    public StringProperty resolveStringsExceptProperty() {
-        return resolveStringsExceptProperty;
+    public StringProperty resolveStringsForFieldsProperty() {
+        return resolveStringsForFieldsProperty;
     }
 
     public BooleanProperty alwaysReformatBibProperty() {

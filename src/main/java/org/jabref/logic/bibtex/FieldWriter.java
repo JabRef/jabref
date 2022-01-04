@@ -2,8 +2,6 @@ package org.jabref.logic.bibtex;
 
 import org.jabref.logic.util.OS;
 import org.jabref.model.entry.field.Field;
-import org.jabref.model.entry.field.InternalField;
-import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.strings.StringUtil;
 
 import org.slf4j.Logger;
@@ -165,13 +163,11 @@ public class FieldWriter {
     }
 
     private boolean shouldResolveStrings(Field field) {
-        if (preferences.isResolveStringsAllFields()) {
+        if (!preferences.isDoNotResolveStrings()) {
             // Resolve strings for all fields except some:
-            return !preferences.getDoNotResolveStringsFor().contains(field);
-        } else {
-            // Default operation - we only resolve strings for standard fields:
-            return field instanceof StandardField || InternalField.BIBTEX_STRING.equals(field);
+            return preferences.getResolveStringsForFields().contains(field);
         }
+        return false;
     }
 
     private String formatWithoutResolvingStrings(String content, Field field) throws InvalidFieldValueException {

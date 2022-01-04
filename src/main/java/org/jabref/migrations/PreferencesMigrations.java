@@ -292,7 +292,7 @@ public class PreferencesMigrations {
     }
 
     private static void migrateDoNotResolveFields(JabRefPreferences prefs) {
-        Set<String> keys = new LinkedHashSet<>(prefs.getStringList(JabRefPreferences.DO_NOT_RESOLVE_STRINGS_FOR));
+        Set<String> keys = new LinkedHashSet<>(prefs.getStringList(JabRefPreferences.DO_NOT_RESOLVE_STRINGS));
         keys.add("url");
         keys.add("abstract");
         keys.add("note");
@@ -300,7 +300,7 @@ public class PreferencesMigrations {
         keys.add("doi");
         keys.add("eprint");
         keys.add("file");
-        prefs.putStringList(JabRefPreferences.DO_NOT_RESOLVE_STRINGS_FOR, new ArrayList<>(keys));
+        prefs.putStringList(JabRefPreferences.DO_NOT_RESOLVE_STRINGS, new ArrayList<>(keys));
     }
 
     private static void migrateTypedKeyPrefs(JabRefPreferences prefs, Preferences oldPatternPrefs)

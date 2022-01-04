@@ -24,12 +24,12 @@
         <Label text="%Do not wrap the following fields when saving"/>
         <TextField fx:id="noWrapFiles" HBox.hgrow="ALWAYS"/>
     </HBox>
-    <RadioButton fx:id="resolveStringsBibTex" text="%Resolve strings for standard BibTeX fields only"
+    <RadioButton fx:id="doNotResolveStrings" text="%Do not resolve BibTeX strings"
                  toggleGroup="$stringsResolveToggleGroup"/>
     <HBox alignment="CENTER_LEFT" spacing="10.0">
-        <RadioButton fx:id="resolveStringsAll" text="%Resolve strings for all fields except"
+        <RadioButton fx:id="resolveStrings" text="%Resolve BibTeX strings for the following fields"
                      toggleGroup="$stringsResolveToggleGroup"/>
-        <TextField fx:id="resolveStringsExcept" HBox.hgrow="ALWAYS"/>
+        <TextField fx:id="resolveStringsForFields" HBox.hgrow="ALWAYS"/>
     </HBox>
     <CheckBox fx:id="alwaysReformatBib" text="%Always reformat BIB file on save and export"/>
 

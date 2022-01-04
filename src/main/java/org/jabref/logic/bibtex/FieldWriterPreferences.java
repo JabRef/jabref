@@ -7,15 +7,15 @@ import org.jabref.model.entry.field.Field;
 
 public class FieldWriterPreferences {
 
-    private final boolean resolveStringsAllFields;
-    private final List<Field> doNotResolveStringsFor;
+    private final boolean doNotResolveStrings;
+    private final List<Field> resolveStringsForFields;
     private final int lineLength = 65; // Constant
     private final FieldContentFormatterPreferences fieldContentFormatterPreferences;
 
     public FieldWriterPreferences(boolean resolveStringsAllFields, List<Field> doNotResolveStringsFor,
                                   FieldContentFormatterPreferences fieldContentFormatterPreferences) {
-        this.resolveStringsAllFields = resolveStringsAllFields;
-        this.doNotResolveStringsFor = doNotResolveStringsFor;
+        this.doNotResolveStrings = resolveStringsAllFields;
+        this.resolveStringsForFields = doNotResolveStringsFor;
         this.fieldContentFormatterPreferences = fieldContentFormatterPreferences;
     }
 
@@ -28,12 +28,12 @@ public class FieldWriterPreferences {
         this(true, Collections.emptyList(), new FieldContentFormatterPreferences());
     }
 
-    public boolean isResolveStringsAllFields() {
-        return resolveStringsAllFields;
+    public boolean isDoNotResolveStrings() {
+        return doNotResolveStrings;
     }
 
-    public List<Field> getDoNotResolveStringsFor() {
-        return doNotResolveStringsFor;
+    public List<Field> getResolveStringsForFields() {
+        return resolveStringsForFields;
     }
 
     public int getLineLength() {

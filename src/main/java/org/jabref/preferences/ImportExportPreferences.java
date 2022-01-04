@@ -10,27 +10,25 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
 public class ImportExportPreferences {
+
     private final StringProperty nonWrappableFields;
-    private final BooleanProperty resolveStringsForStandardBibtexFields;
-    private final BooleanProperty resolveStringsForAllStrings;
-    private final StringProperty nonResolvableFields;
+    private final BooleanProperty doNotResolveStrings;
+    private final StringProperty resolvableFields;
     private final BooleanProperty alwaysReformatOnSave;
     private final ObjectProperty<Path> importWorkingDirectory;
     private final StringProperty lastExportExtension;
     private final ObjectProperty<Path> exportWorkingDirectory;
 
     public ImportExportPreferences(String nonWrappableFields,
-                                   boolean resolveStringsForStandardBibtexFields,
-                                   boolean resolveStringsForAllStrings,
-                                   String nonResolvableFields,
+                                   boolean doNotResolveStrings,
+                                   String resolvableFields,
                                    boolean alwaysReformatOnSave,
                                    Path importWorkingDirectory,
                                    String lastExportExtension,
                                    Path exportWorkingDirectory) {
         this.nonWrappableFields = new SimpleStringProperty(nonWrappableFields);
-        this.resolveStringsForStandardBibtexFields = new SimpleBooleanProperty(resolveStringsForStandardBibtexFields);
-        this.resolveStringsForAllStrings = new SimpleBooleanProperty(resolveStringsForAllStrings);
-        this.nonResolvableFields = new SimpleStringProperty(nonResolvableFields);
+        this.doNotResolveStrings = new SimpleBooleanProperty(doNotResolveStrings);
+        this.resolvableFields = new SimpleStringProperty(resolvableFields);
         this.alwaysReformatOnSave = new SimpleBooleanProperty(alwaysReformatOnSave);
         this.importWorkingDirectory = new SimpleObjectProperty<>(importWorkingDirectory);
         this.lastExportExtension = new SimpleStringProperty(lastExportExtension);
@@ -49,40 +47,28 @@ public class ImportExportPreferences {
         this.nonWrappableFields.set(nonWrappableFields);
     }
 
-    public boolean shouldResolveStringsForStandardBibtexFields() {
-        return resolveStringsForStandardBibtexFields.get();
+    public boolean doNotResolveStrings() {
+        return doNotResolveStrings.get();
     }
 
-    public BooleanProperty resolveStringsForStandardBibtexFieldsProperty() {
-        return resolveStringsForStandardBibtexFields;
+    public BooleanProperty doNotResolveStringsProperty() {
+        return doNotResolveStrings;
     }
 
-    public void setResolveStringsForStandardBibtexFields(boolean resolveStringsForStandardBibtexFields) {
-        this.resolveStringsForStandardBibtexFields.set(resolveStringsForStandardBibtexFields);
+    public void setDoNotResolveStrings(boolean doNotResolveStrings) {
+        this.doNotResolveStrings.set(doNotResolveStrings);
     }
 
-    public boolean shouldResolveStringsForAllStrings() {
-        return resolveStringsForAllStrings.get();
+    public String getResolvableFields() {
+        return resolvableFields.get();
     }
 
-    public BooleanProperty resolveStringsForAllStringsProperty() {
-        return resolveStringsForAllStrings;
+    public StringProperty resolvableFieldsProperty() {
+        return resolvableFields;
     }
 
-    public void setResolveStringsForAllStrings(boolean resolveStringsForAllStrings) {
-        this.resolveStringsForAllStrings.set(resolveStringsForAllStrings);
-    }
-
-    public String getNonResolvableFields() {
-        return nonResolvableFields.get();
-    }
-
-    public StringProperty nonResolvableFieldsProperty() {
-        return nonResolvableFields;
-    }
-
-    public void setNonResolvableFields(String nonResolvableFields) {
-        this.nonResolvableFields.set(nonResolvableFields);
+    public void setResolvableFields(String resolvableFields) {
+        this.resolvableFields.set(resolvableFields);
     }
 
     public boolean shouldAlwaysReformatOnSave() {
@@ -132,4 +118,5 @@ public class ImportExportPreferences {
     public void setExportWorkingDirectory(Path exportWorkingDirectory) {
         this.exportWorkingDirectory.set(exportWorkingDirectory);
     }
+
 }
