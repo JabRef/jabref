@@ -6,6 +6,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.autocompleter.SuggestionProviders;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
+import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
@@ -21,6 +22,7 @@ public class OptionalFields2Tab extends OptionalFieldsTabBase {
                               DialogService dialogService,
                               PreferencesService preferences,
                               StateManager stateManager,
+                              ThemeManager themeManager,
                               IndexingTaskManager indexingTaskManager,
                               BibEntryTypesManager entryTypesManager,
                               ExternalFileTypes externalFileTypes,
@@ -35,6 +37,7 @@ public class OptionalFields2Tab extends OptionalFieldsTabBase {
                 dialogService,
                 preferences,
                 stateManager,
+                themeManager,
                 indexingTaskManager,
                 entryTypesManager,
                 externalFileTypes,
