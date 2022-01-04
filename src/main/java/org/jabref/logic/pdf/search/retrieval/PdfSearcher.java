@@ -14,8 +14,6 @@ import org.jabref.model.strings.StringUtil;
 
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
-import org.apache.lucene.index.IndexWriter;
-import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.queryparser.classic.MultiFieldQueryParser;
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.search.IndexSearcher;
@@ -37,6 +35,7 @@ public final class PdfSearcher {
 
     private PdfSearcher(Directory indexDirectory) {
         this.indexDirectory = indexDirectory;
+
     }
 
     public static PdfSearcher of(BibDatabaseContext databaseContext) throws IOException {
@@ -51,7 +50,7 @@ public final class PdfSearcher {
      * @return a result set of all documents that have matches in any fields
      */
     public PdfSearchResults search(final String searchString, final int maxHits)
-            throws IOException {
+        throws IOException {
         if (StringUtil.isBlank(Objects.requireNonNull(searchString, "The search string was null!"))) {
             return new PdfSearchResults();
         }
@@ -59,13 +58,14 @@ public final class PdfSearcher {
             throw new IllegalArgumentException("Must be called with at least 1 maxHits, was" + maxHits);
         }
 
-        try {
-            List<SearchResult> resultDocs = new LinkedList<>();
+        List<SearchResult> resultDocs = new LinkedList<>();
 
-            IndexWriter indexWriter = new IndexWriter(indexDirectory,
-                                                      new IndexWriterConfig(
-                                                              new EnglishStemAnalyzer()).setOpenMode(IndexWriterConfig.OpenMode.CREATE_OR_APPEND));
-            IndexReader reader = DirectoryReader.open(indexWriter);
+        if (!DirectoryReader.indexExists(indexDirectory)) {
+            return new PdfSearchResults();
+        }
+
+        try (IndexReader reader = DirectoryReader.open(indexDirectory)) {
+
             IndexSearcher searcher = new IndexSearcher(reader);
             Query query = new MultiFieldQueryParser(PDF_FIELDS, new EnglishStemAnalyzer()).parse(searchString);
             TopDocs results = searcher.search(query, maxHits);
@@ -73,6 +73,7 @@ public final class PdfSearcher {
                 resultDocs.add(new SearchResult(searcher, query, scoreDoc));
             }
             return new PdfSearchResults(resultDocs);
+
         } catch (ParseException e) {
             LOGGER.warn("Could not parse query: '" + searchString + "'! \n" + e.getMessage());
             return new PdfSearchResults();
