@@ -58,8 +58,8 @@ public class CitationStyleGenerator {
     public static List<String> generateCitations(List<BibEntry> bibEntries, String style, CitationStyleOutputFormat outputFormat) {
         try {
             return CSL_ADAPTER.makeBibliography(bibEntries, style, outputFormat);
-        } catch (IllegalArgumentException ignored) {
-            LOGGER.error("Could not generate BibEntry citation. The CSL engine could not create a preview for your item.", ignored);
+        } catch (IllegalArgumentException e) {
+            LOGGER.error("Could not generate BibEntry citation. The CSL engine could not create a preview for your item.", e);
             return Collections.singletonList(Localization.lang("Cannot generate preview based on selected citation style."));
         } catch (IOException | ArrayIndexOutOfBoundsException e) {
             LOGGER.error("Could not generate BibEntry citation", e);

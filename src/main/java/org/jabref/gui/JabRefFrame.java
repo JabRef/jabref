@@ -115,6 +115,7 @@ import org.jabref.gui.slr.ExistingStudySearchAction;
 import org.jabref.gui.slr.StartNewStudyAction;
 import org.jabref.gui.specialfields.SpecialFieldMenuItemFactory;
 import org.jabref.gui.texparser.ParseLatexAction;
+import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.undo.UndoRedoAction;
 import org.jabref.gui.util.BackgroundTask;
@@ -169,6 +170,7 @@ public class JabRefFrame extends BorderPane {
 
     private final Stage mainStage;
     private final StateManager stateManager;
+    private final ThemeManager themeManager;
     private final CountingUndoManager undoManager;
     private final PushToApplicationsManager pushToApplicationsManager;
     private final DialogService dialogService;
@@ -183,8 +185,9 @@ public class JabRefFrame extends BorderPane {
 
     public JabRefFrame(Stage mainStage) {
         this.mainStage = mainStage;
-        this.dialogService = new JabRefDialogService(mainStage, this, prefs);
         this.stateManager = Globals.stateManager;
+        this.themeManager = Globals.getThemeManager();
+        this.dialogService = new JabRefDialogService(mainStage, this, themeManager);
         this.pushToApplicationsManager = new PushToApplicationsManager(dialogService, stateManager, prefs);
         this.undoManager = Globals.undoManager;
         this.globalSearchBar = new GlobalSearchBar(this, stateManager, prefs, undoManager);
@@ -494,7 +497,7 @@ public class JabRefFrame extends BorderPane {
 
                 new HBox(
                         factory.createIconButton(StandardActions.NEW_LIBRARY, new NewDatabaseAction(this, prefs)),
-                        factory.createIconButton(StandardActions.OPEN_LIBRARY, new OpenDatabaseAction(this, prefs, dialogService, stateManager)),
+                        factory.createIconButton(StandardActions.OPEN_LIBRARY, new OpenDatabaseAction(this, prefs, dialogService, stateManager, themeManager)),
                         factory.createIconButton(StandardActions.SAVE_LIBRARY, new SaveAction(SaveAction.SaveMethod.SAVE, this, prefs, stateManager))),
 
                 leftSpacer,
@@ -745,7 +748,7 @@ public class JabRefFrame extends BorderPane {
                         factory.createMenuItem(StandardActions.COPY_CITE_KEY, new CopyMoreAction(StandardActions.COPY_CITE_KEY, dialogService, stateManager, Globals.getClipboardManager(), prefs)),
                         factory.createMenuItem(StandardActions.COPY_KEY_AND_TITLE, new CopyMoreAction(StandardActions.COPY_KEY_AND_TITLE, dialogService, stateManager, Globals.getClipboardManager(), prefs)),
                         factory.createMenuItem(StandardActions.COPY_KEY_AND_LINK, new CopyMoreAction(StandardActions.COPY_KEY_AND_LINK, dialogService, stateManager, Globals.getClipboardManager(), prefs)),
-                        factory.createMenuItem(StandardActions.COPY_CITATION_PREVIEW, new CopyCitationAction(CitationStyleOutputFormat.HTML, dialogService, stateManager, Globals.getClipboardManager(), prefs.getPreviewPreferences())),
+                        factory.createMenuItem(StandardActions.COPY_CITATION_PREVIEW, new CopyCitationAction(CitationStyleOutputFormat.HTML, dialogService, stateManager, Globals.getClipboardManager(), Globals.TASK_EXECUTOR, prefs.getPreviewPreferences())),
                         factory.createMenuItem(StandardActions.EXPORT_SELECTED_TO_CLIPBOARD, new ExportToClipboardAction(dialogService, Globals.exportFactory, stateManager, Globals.getClipboardManager(), Globals.TASK_EXECUTOR, prefs))),
 
                 factory.createMenuItem(StandardActions.PASTE, new EditAction(StandardActions.PASTE, this, stateManager)),
@@ -841,8 +844,8 @@ public class JabRefFrame extends BorderPane {
                 factory.createMenuItem(StandardActions.SEND_AS_EMAIL, new SendAsEMailAction(dialogService, this.prefs, stateManager)),
                 pushToApplicationMenuItem,
                 new SeparatorMenuItem(),
-                factory.createMenuItem(StandardActions.START_NEW_STUDY, new StartNewStudyAction(this, Globals.getFileUpdateMonitor(), Globals.TASK_EXECUTOR, prefs, stateManager)),
-                factory.createMenuItem(StandardActions.SEARCH_FOR_EXISTING_STUDY, new ExistingStudySearchAction(this, Globals.getFileUpdateMonitor(), Globals.TASK_EXECUTOR, prefs, stateManager)),
+                factory.createMenuItem(StandardActions.START_NEW_STUDY, new StartNewStudyAction(this, Globals.getFileUpdateMonitor(), Globals.TASK_EXECUTOR, prefs, stateManager, themeManager)),
+                factory.createMenuItem(StandardActions.SEARCH_FOR_EXISTING_STUDY, new ExistingStudySearchAction(this, Globals.getFileUpdateMonitor(), Globals.TASK_EXECUTOR, prefs, stateManager, themeManager)),
 
                 new SeparatorMenuItem(),
 
@@ -1104,7 +1107,7 @@ public class JabRefFrame extends BorderPane {
     public LibraryTab addTab(BibDatabaseContext databaseContext, boolean raisePanel) {
         Objects.requireNonNull(databaseContext);
 
-        LibraryTab libraryTab = new LibraryTab(this, prefs, stateManager, databaseContext, ExternalFileTypes.getInstance());
+        LibraryTab libraryTab = new LibraryTab(this, prefs, stateManager, themeManager, databaseContext, ExternalFileTypes.getInstance());
         addTab(libraryTab, raisePanel);
         return libraryTab;
     }
@@ -1260,7 +1263,7 @@ public class JabRefFrame extends BorderPane {
     }
 
     public OpenDatabaseAction getOpenDatabaseAction() {
-        return new OpenDatabaseAction(this, prefs, dialogService, stateManager);
+        return new OpenDatabaseAction(this, prefs, dialogService, stateManager, themeManager);
     }
 
     public PushToApplicationsManager getPushToApplicationsManager() {

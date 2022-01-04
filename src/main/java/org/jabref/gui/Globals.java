@@ -8,6 +8,7 @@ import javafx.stage.Screen;
 
 import org.jabref.architecture.AllowedToUseAwt;
 import org.jabref.gui.keyboard.KeyBindingRepository;
+import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.util.DefaultFileUpdateMonitor;
 import org.jabref.gui.util.DefaultTaskExecutor;
@@ -76,9 +77,8 @@ public class Globals {
     public static BibEntryTypesManager entryTypesManager = new BibEntryTypesManager();
 
     private static ClipBoardManager clipBoardManager = null;
-
-    // Key binding preferences
     private static KeyBindingRepository keyBindingRepository;
+    private static ThemeManager themeManager;
 
     private static DefaultFileUpdateMonitor fileUpdateMonitor;
     private static TelemetryClient telemetryClient;
@@ -99,6 +99,16 @@ public class Globals {
             clipBoardManager = new ClipBoardManager(prefs);
         }
         return clipBoardManager;
+    }
+
+    public static synchronized ThemeManager getThemeManager() {
+        if (themeManager == null) {
+            themeManager = new ThemeManager(
+                    prefs.getAppearancePreferences(),
+                    getFileUpdateMonitor(),
+                    Runnable::run);
+        }
+        return themeManager;
     }
 
     // Background tasks
@@ -142,7 +152,9 @@ public class Globals {
 
     public static void shutdownThreadPools() {
         TASK_EXECUTOR.shutdown();
-        fileUpdateMonitor.shutdown();
+        if (fileUpdateMonitor != null) {
+            fileUpdateMonitor.shutdown();
+        }
         JabRefExecutorService.INSTANCE.shutdownEverything();
     }
 
