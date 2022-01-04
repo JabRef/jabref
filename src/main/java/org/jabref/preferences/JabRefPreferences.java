@@ -2182,8 +2182,8 @@ public class JabRefPreferences implements PreferencesService {
     @Override
     public FieldWriterPreferences getFieldWriterPreferences() {
         return new FieldWriterPreferences(
-                getBoolean(RESOLVE_STRINGS_FOR_FIELDS),
-                getStringList(DO_NOT_RESOLVE_STRINGS).stream().map(FieldFactory::parseField).collect(Collectors.toList()),
+                getBoolean(DO_NOT_RESOLVE_STRINGS),
+                getStringList(RESOLVE_STRINGS_FOR_FIELDS).stream().map(FieldFactory::parseField).collect(Collectors.toList()),
                 getFieldContentParserPreferences());
     }
 

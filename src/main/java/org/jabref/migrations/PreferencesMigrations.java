@@ -55,7 +55,6 @@ public class PreferencesMigrations {
         upgradeColumnPreferences(Globals.prefs);
         restoreVariablesForBackwardCompatibility(Globals.prefs);
         upgradePreviewStyleAllowMarkdown(Globals.prefs);
-        migrateDoNotResolveFields(Globals.prefs);
     }
 
     /**
@@ -289,18 +288,6 @@ public class PreferencesMigrations {
         keys.add("related");
         keys.add("entryset");
         prefs.putStringList(JabRefPreferences.AUTOCOMPLETER_COMPLETE_FIELDS, new ArrayList<>(keys));
-    }
-
-    private static void migrateDoNotResolveFields(JabRefPreferences prefs) {
-        Set<String> keys = new LinkedHashSet<>(prefs.getStringList(JabRefPreferences.DO_NOT_RESOLVE_STRINGS));
-        keys.add("url");
-        keys.add("abstract");
-        keys.add("note");
-        keys.add("comment");
-        keys.add("doi");
-        keys.add("eprint");
-        keys.add("file");
-        prefs.putStringList(JabRefPreferences.DO_NOT_RESOLVE_STRINGS, new ArrayList<>(keys));
     }
 
     private static void migrateTypedKeyPrefs(JabRefPreferences prefs, Preferences oldPatternPrefs)
