@@ -39,10 +39,13 @@ public class FileTab extends AbstractPreferenceTabView<FileTabViewModel> impleme
         this.viewModel = new FileTabViewModel(preferencesService);
         openLastStartup.selectedProperty().bindBidirectional(viewModel.openLastStartupProperty());
         noWrapFiles.textProperty().bindBidirectional(viewModel.noWrapFilesProperty());
+
+        doNotResolveStrings.selectedProperty().bindBidirectional(viewModel.doNotResolveStringsProperty());
+        resolveStrings.selectedProperty().bindBidirectional(viewModel.resolveStringsProperty());
         resolveStringsForFields.textProperty().bindBidirectional(viewModel.resolveStringsForFieldsProperty());
         resolveStringsForFields.disableProperty().bind(doNotResolveStrings.selectedProperty());
-        alwaysReformatBib.selectedProperty().bindBidirectional(viewModel.alwaysReformatBibProperty());
 
+        alwaysReformatBib.selectedProperty().bindBidirectional(viewModel.alwaysReformatBibProperty());
         autosaveLocalLibraries.selectedProperty().bindBidirectional(viewModel.autosaveLocalLibrariesProperty());
 
         ActionFactory actionFactory = new ActionFactory(Globals.getKeyPrefs());

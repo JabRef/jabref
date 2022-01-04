@@ -63,6 +63,14 @@ public class FileTabViewModel implements PreferenceTabViewModel {
         return noWrapFilesProperty;
     }
 
+    public BooleanProperty doNotResolveStringsProperty() {
+        return doNotResolveStringsProperty;
+    }
+
+    public BooleanProperty resolveStringsProperty() {
+        return resolveStringsProperty;
+    }
+
     public StringProperty resolveStringsForFieldsProperty() {
         return resolveStringsForFieldsProperty;
     }
