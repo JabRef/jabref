@@ -106,14 +106,7 @@
     -fx-border-width: 0px;
     -fx-background-color: -jr-theme;
     -fx-padding: 0.5em;
-    -fx-text-fill: -jr-white;
-}
-
-#addNewGroup:inactive {
-    -fx-border-width: 0px;
-    -fx-background-color: -jr-icon-background-active;
-    -fx-padding: 0.5em;
-    -fx-text-fill:-jr-black;
+    -fx-text-fill: -jr-sidepane-background;
 }
 
 #groupFilterBar {
