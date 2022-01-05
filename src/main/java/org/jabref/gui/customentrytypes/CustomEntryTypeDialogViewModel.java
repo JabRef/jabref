@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -131,24 +130,17 @@ public class CustomEntryTypeDialogViewModel {
         Field field = newFieldToAdd.getValue();
         FieldViewModel model = new FieldViewModel(field, true, FieldPriority.IMPORTANT);
 
-        boolean fieldExists = false;
-
         // create list with all the entry's fields
         ObservableList<FieldViewModel> entryFields = this.selectedEntryType.getValue().fields();
 
-        // compare every entry field name with the user field name in order to find out if any of them has the same one. If so, show warning.
-        for (FieldViewModel fieldViewModel : entryFields) {
-            if (Objects.equals(fieldViewModel.fieldName().getValue(), field.getDisplayName())) {
-                dialogService.showWarningDialogAndWait(Localization.lang("Duplicate fields"),
-                        Localization.lang("Warning: You added field \"%0\" twice. Only one will be kept.", field.getDisplayName()));
-                fieldExists = true;
-                break;
-            }
-        }
+        // compare every entry field name with the user field name in order to find out if any of them has the same one.
+        boolean fieldExists = entryFields.stream().anyMatch(fieldViewModel -> fieldViewModel.fieldName().getValue().equals(field.getDisplayName()));
 
-        // if the user field name isn't found inside the list, pass it to the entry as a new one.
-        if (!fieldExists) this.selectedEntryType.getValue().addField(model);
-
+        // if the user field name isn't found inside the list, pass it to the entry as a new one. If that is not the case, show warning.
+        if (!fieldExists)
+            this.selectedEntryType.getValue().addField(model);
+        else
+            dialogService.showWarningDialogAndWait(Localization.lang("Duplicate fields"), Localization.lang("Warning: You added field \"%0\" twice. Only one will be kept.", field.getDisplayName()));
 
         newFieldToAddProperty().setValue(null);
     }
