@@ -1,37 +1,20 @@
 package org.jabref.gui.customentrytypes;
 
-import java.util.EnumSet;
-
-import javax.inject.Inject;
-
+import com.airhacks.afterburner.views.ViewLoader;
+import com.tobiasdiez.easybind.EasyBind;
+import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
+import javafx.scene.control.*;
 import javafx.scene.control.ButtonBar.ButtonData;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableRow;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
-import javafx.scene.input.ClipboardContent;
-import javafx.scene.input.DragEvent;
-import javafx.scene.input.Dragboard;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.input.TransferMode;
-
+import javafx.scene.input.*;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.DragAndDropDataFormats;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.customentrytypes.CustomEntryTypeDialogViewModel.FieldType;
 import org.jabref.gui.icon.IconTheme;
-import org.jabref.gui.util.BaseDialog;
-import org.jabref.gui.util.ControlHelper;
-import org.jabref.gui.util.CustomLocalDragboard;
-import org.jabref.gui.util.RadioButtonCell;
-import org.jabref.gui.util.ValueTableCellFactory;
-import org.jabref.gui.util.ViewModelTableRowFactory;
+import org.jabref.gui.util.*;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
@@ -39,9 +22,8 @@ import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.Field;
 import org.jabref.preferences.PreferencesService;
 
-import com.airhacks.afterburner.views.ViewLoader;
-import com.tobiasdiez.easybind.EasyBind;
-import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
+import javax.inject.Inject;
+import java.util.EnumSet;
 
 public class CustomizeEntryTypeDialogView extends BaseDialog<Void> {
 
@@ -92,7 +74,7 @@ public class CustomizeEntryTypeDialogView extends BaseDialog<Void> {
         // As the state manager gets injected it's not available in the constructor
         this.localDragboard = stateManager.getLocalDragboard();
 
-        viewModel = new CustomEntryTypeDialogViewModel(mode, preferencesService, entryTypesManager);
+        viewModel = new CustomEntryTypeDialogViewModel(mode, preferencesService, entryTypesManager, dialogService);
         setupTable();
 
         addNewEntryTypeButton.disableProperty().bind(viewModel.entryTypeValidationStatus().validProperty().not());
