@@ -102,13 +102,6 @@
     -fx-translate-x: -0.4em;
 }
 
-#addNewGroup:active {
-    -fx-border-width: 0px;
-    -fx-background-color: -jr-theme;
-    -fx-padding: 0.5em;
-    -fx-text-fill: -jr-sidepane-background;
-}
-
 #groupFilterBar {
     -fx-background-color: -jr-sidepane-header-background;
     -fx-border-color: -jr-separator;
