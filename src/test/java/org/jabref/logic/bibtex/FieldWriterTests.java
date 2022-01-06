@@ -1,6 +1,6 @@
 package org.jabref.logic.bibtex;
 
-import java.util.Collections;
+import java.util.List;
 
 import org.jabref.logic.util.OS;
 import org.jabref.model.entry.field.StandardField;
@@ -8,11 +8,8 @@ import org.jabref.model.entry.field.UnknownField;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Answers;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.mock;
 
 class FieldWriterTests {
 
@@ -20,7 +17,8 @@ class FieldWriterTests {
 
     @BeforeEach
     void setUp() {
-        this.writer = new FieldWriter(mock(FieldWriterPreferences.class, Answers.RETURNS_DEEP_STUBS));
+        FieldWriterPreferences fieldWriterPreferences = new FieldWriterPreferences(false, List.of(StandardField.MONTH), new FieldContentFormatterPreferences());
+        writer = new FieldWriter(fieldWriterPreferences);
     }
 
     @Test
@@ -111,14 +109,5 @@ class FieldWriterTests {
     void hashEnclosedWordsGetRealStringsInMonthField() throws Exception {
         String text = "#jan# - #feb#";
         assertEquals("jan #{ - } # feb", writer.write(StandardField.MONTH, text));
-    }
-
-    @Test
-    void hashEnclosedWordsGetRealStringsInMonthFieldBecauseMonthIsStandardField() throws Exception {
-        FieldWriterPreferences fieldWriterPreferences = new FieldWriterPreferences(
-                false, Collections.emptyList(), new FieldContentFormatterPreferences());
-        FieldWriter formatter = new FieldWriter(fieldWriterPreferences);
-        String text = "#jan# - #feb#";
-        assertEquals("jan #{ - } # feb", formatter.write(StandardField.MONTH, text));
     }
 }
