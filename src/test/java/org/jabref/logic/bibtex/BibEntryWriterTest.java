@@ -42,7 +42,7 @@ import static org.mockito.Mockito.mock;
 class BibEntryWriterTest {
 
     private static ImportFormatPreferences importFormatPreferences;
-    private StringWriter stringWriter = new StringWriter();
+    private final StringWriter stringWriter = new StringWriter();
     private BibWriter bibWriter = new BibWriter(stringWriter, OS.NEWLINE);
     private BibEntryWriter bibEntryWriter;
     private final FileUpdateMonitor fileMonitor = new DummyFileUpdateMonitor();
@@ -50,7 +50,7 @@ class BibEntryWriterTest {
     @BeforeEach
     void setUpWriter() {
         importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
-        FieldWriterPreferences fieldWriterPreferences = mock(FieldWriterPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        FieldWriterPreferences fieldWriterPreferences = new FieldWriterPreferences(false, List.of(StandardField.MONTH), new FieldContentFormatterPreferences());
         bibEntryWriter = new BibEntryWriter(new FieldWriter(fieldWriterPreferences), new BibEntryTypesManager());
     }
 
