@@ -139,8 +139,7 @@ public class CustomEntryTypeDialogViewModel {
         // if the user field name isn't found inside the list, pass it to the entry as a new one. If that is not the case, show warning.
         if (!fieldExists) {
             this.selectedEntryType.getValue().addField(model);
-        }
-        else {
+        } else {
             dialogService.showWarningDialogAndWait(Localization.lang("Duplicate fields"), Localization.lang("Warning: You added field \"%0\" twice. Only one will be kept.", field.getDisplayName()));
         }
 
