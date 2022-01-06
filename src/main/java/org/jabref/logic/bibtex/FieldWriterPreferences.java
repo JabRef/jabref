@@ -1,9 +1,9 @@
 package org.jabref.logic.bibtex;
 
-import java.util.Collections;
 import java.util.List;
 
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.StandardField;
 
 public class FieldWriterPreferences {
 
@@ -12,20 +12,22 @@ public class FieldWriterPreferences {
     private final int lineLength = 65; // Constant
     private final FieldContentFormatterPreferences fieldContentFormatterPreferences;
 
-    public FieldWriterPreferences(boolean resolveStringsAllFields, List<Field> doNotResolveStringsFor,
+    public FieldWriterPreferences(boolean doNotResolveFields, List<Field> resolveStringsForFields,
                                   FieldContentFormatterPreferences fieldContentFormatterPreferences) {
-        this.doNotResolveStrings = resolveStringsAllFields;
-        this.resolveStringsForFields = doNotResolveStringsFor;
+        this.doNotResolveStrings = doNotResolveFields;
+        this.resolveStringsForFields = resolveStringsForFields;
         this.fieldContentFormatterPreferences = fieldContentFormatterPreferences;
     }
 
     /**
+     * ONLY USE IN TEST: ONLY resolves BibTex String for the Field Month
      * Creates an instance with default values (not obeying any user preferences). This constructor should be used with
      * caution. The other constructor has to be preferred.
+     * @deprecated
      */
+    @Deprecated
     public FieldWriterPreferences() {
-        // This constructor is only to allow an empty constructor in SavePreferences
-        this(true, Collections.emptyList(), new FieldContentFormatterPreferences());
+        this(false, List.of(StandardField.MONTH), new FieldContentFormatterPreferences());
     }
 
     public boolean isDoNotResolveStrings() {

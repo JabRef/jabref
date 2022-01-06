@@ -14,6 +14,7 @@ import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.jabref.logic.bibtex.FieldContentFormatterPreferences;
 import org.jabref.logic.bibtex.FieldWriter;
 import org.jabref.logic.bibtex.FieldWriterPreferences;
 import org.jabref.logic.bibtex.InvalidFieldValueException;
@@ -927,7 +928,7 @@ public class VM implements Warn {
      * @param bibDatabase
      */
     private void read(BibDatabase bibDatabase) {
-        FieldWriter fieldWriter = new FieldWriter(new FieldWriterPreferences());
+        FieldWriter fieldWriter = new FieldWriter(new FieldWriterPreferences(false, List.of(StandardField.MONTH), new FieldContentFormatterPreferences()));
         for (BstEntry e : entries) {
             for (Map.Entry<String, String> mEntry : e.fields.entrySet()) {
                 Field field = FieldFactory.parseField(mEntry.getKey());
