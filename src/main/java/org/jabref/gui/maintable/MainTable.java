@@ -48,7 +48,6 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.database.event.EntriesAddedEvent;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.preferences.FilePreferences;
 import org.jabref.preferences.PreferencesService;
 
 import com.google.common.eventbus.Subscribe;
@@ -61,6 +60,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
     private final LibraryTab libraryTab;
     private final DialogService dialogService;
+    private final StateManager stateManager;
     private final BibDatabaseContext database;
     private final MainTableDataModel model;
 
@@ -69,8 +69,6 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
     private long lastKeyPressTime;
     private String columnSearchTerm;
-
-    private final FilePreferences filePreferences;
 
     public MainTable(MainTableDataModel model,
                      LibraryTab libraryTab,
@@ -84,6 +82,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
         this.libraryTab = libraryTab;
         this.dialogService = dialogService;
+        this.stateManager = stateManager;
         this.database = Objects.requireNonNull(database);
         this.model = model;
         UndoManager undoManager = libraryTab.getUndoManager();
@@ -126,7 +125,8 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                         stateManager,
                         preferencesService,
                         undoManager,
-                        Globals.getClipboardManager()))
+                        Globals.getClipboardManager(),
+                        Globals.TASK_EXECUTOR))
                 .setOnDragDetected(this::handleOnDragDetected)
                 .setOnDragDropped(this::handleOnDragDropped)
                 .setOnDragOver(this::handleOnDragOver)
@@ -180,8 +180,6 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
             }
             this.jumpToSearchKey(getSortOrder().get(0), key);
         });
-
-        filePreferences = preferencesService.getFilePreferences();
 
         database.getDatabase().registerListener(this);
     }
@@ -273,20 +271,20 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                         break;
                     case PASTE:
                         if (!OS.OS_X) {
-                            new EditAction(StandardActions.PASTE, libraryTab.frame(), Globals.stateManager).execute();
+                            new EditAction(StandardActions.PASTE, libraryTab.frame(), stateManager).execute();
                         }
                         event.consume();
                         break;
                     case COPY:
-                        new EditAction(StandardActions.COPY, libraryTab.frame(), Globals.stateManager).execute();
+                        new EditAction(StandardActions.COPY, libraryTab.frame(), stateManager).execute();
                         event.consume();
                         break;
                     case CUT:
-                        new EditAction(StandardActions.CUT, libraryTab.frame(), Globals.stateManager).execute();
+                        new EditAction(StandardActions.CUT, libraryTab.frame(), stateManager).execute();
                         event.consume();
                         break;
                     case DELETE_ENTRY:
-                        new EditAction(StandardActions.DELETE_ENTRY, libraryTab.frame(), Globals.stateManager).execute();
+                        new EditAction(StandardActions.DELETE_ENTRY, libraryTab.frame(), stateManager).execute();
                         event.consume();
                         break;
                     default:
