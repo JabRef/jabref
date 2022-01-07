@@ -106,9 +106,12 @@ open module org.jabref {
     requires org.apache.lucene.backward_codecs;
     uses org.apache.lucene.backward_codecs.lucene87.Lucene87Codec;
     uses org.apache.lucene.codecs.lucene90.Lucene90Codec;
+    requires org.apache.lucene.analysis.common;
+    requires org.apache.lucene.highlighter;
 
     requires com.fasterxml.jackson.databind;
     requires com.fasterxml.jackson.dataformat.yaml;
     requires com.fasterxml.jackson.datatype.jsr310;
     requires net.harawata.appdirs;
+
 }
