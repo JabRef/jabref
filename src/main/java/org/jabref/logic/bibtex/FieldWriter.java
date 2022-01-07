@@ -164,7 +164,7 @@ public class FieldWriter {
 
     private boolean shouldResolveStrings(Field field) {
         if (!preferences.isDoNotResolveStrings()) {
-            // Resolve strings for all fields except some:
+            // Resolve strings for the list of fields only
             return preferences.getResolveStringsForFields().contains(field);
         }
         return false;
