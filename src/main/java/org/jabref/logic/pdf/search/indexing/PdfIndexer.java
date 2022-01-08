@@ -188,8 +188,7 @@ public class PdfIndexer {
         }
         try {
             // Check if a document with this path is already in the index
-            try {
-                IndexReader reader = DirectoryReader.open(directoryToIndex);
+            try (IndexReader reader = DirectoryReader.open(directoryToIndex)) {
                 IndexSearcher searcher = new IndexSearcher(reader);
                 TermQuery query = new TermQuery(new Term(SearchFieldConstants.PATH, linkedFile.getLink()));
                 TopDocs topDocs = searcher.search(query, 1);
@@ -204,19 +203,18 @@ public class PdfIndexer {
                         return;
                     }
                 }
-                reader.close();
             } catch (IndexNotFoundException e) {
                 // if there is no index yet, don't need to check anything!
             }
             // If no document was found, add the new one
             Optional<List<Document>> pages = new DocumentReader(entry, filePreferences).readLinkedPdf(this.databaseContext, linkedFile);
             if (pages.isPresent()) {
-                IndexWriter indexWriter = new IndexWriter(directoryToIndex,
-                        new IndexWriterConfig(
-                                new EnglishStemAnalyzer()).setOpenMode(IndexWriterConfig.OpenMode.CREATE_OR_APPEND));
-                indexWriter.addDocuments(pages.get());
-                indexWriter.commit();
-                indexWriter.close();
+                try (IndexWriter indexWriter = new IndexWriter(directoryToIndex,
+                                                               new IndexWriterConfig(
+                                                                                     new EnglishStemAnalyzer()).setOpenMode(IndexWriterConfig.OpenMode.CREATE_OR_APPEND))) {
+                    indexWriter.addDocuments(pages.get());
+                    indexWriter.commit();
+                }
             }
         } catch (IOException e) {
             LOGGER.warn("Could not add the document {} to the index!", linkedFile.getLink(), e);
