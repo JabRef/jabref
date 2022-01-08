@@ -102,9 +102,6 @@ open module org.jabref {
     // fulltext search
     requires org.apache.lucene.core;
     requires org.apache.lucene.queryparser;
-    requires org.apache.lucene.codecs;
-    requires org.apache.lucene.backward_codecs;
-    uses org.apache.lucene.codecs.lucene90.Lucene90Codec;
     requires org.apache.lucene.analysis.common;
     requires org.apache.lucene.highlighter;
 

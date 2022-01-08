@@ -124,9 +124,7 @@ dependencies {
     }
     implementation 'org.apache.lucene:lucene-queries:9.0.0'
     implementation 'org.apache.lucene:lucene-analysis-common:9.0.0'
-    implementation 'org.apache.lucene:lucene-backward-codecs:9.0.0'
     implementation 'org.apache.lucene:lucene-highlighter:9.0.0'
-    implementation 'org.apache.lucene:lucene-codecs:9.0.0'
 
     implementation group: 'org.apache.commons', name: 'commons-csv', version: '1.9.0'
     implementation 'com.h2database:h2-mvstore:2.0.204'
