@@ -529,7 +529,7 @@ task deleteInstallerTemp(type: Delete) {
 
 jpackage.dependsOn deleteInstallerTemp
 jlink {
-    addOptions('--strip-debug', '--compress', '2', '--no-header-files', '--no-man-pages')
+   // addOptions('--strip-debug', '--compress', '2', '--no-header-files', '--no-man-pages')
     launcher {
         name = 'JabRef'
     }
@@ -583,15 +583,6 @@ jlink {
         uses 'org.eclipse.jgit.transport.SshSessionFactory'
         uses 'org.eclipse.jgit.lib.GpgSigner'
         uses 'javax.xml.bind.JAXBContextFactory'
-        uses 'org.apache.lucene.backward_codecs.lucene87.Lucene87Codec';
-        uses 'org.apache.lucene.codecs.lucene90.Lucene90Codec';
-        provides 'org.apache.lucene.codecs.Codec' with 'org.apache.lucene.backward_codecs.lucene70.Lucene70Codec',
-                                'org.apache.lucene.backward_codecs.lucene80.Lucene80Codec',
-                                'org.apache.lucene.backward_codecs.lucene84.Lucene84Codec',
-                                'org.apache.lucene.backward_codecs.lucene86.Lucene86Codec',
-                                'org.apache.lucene.backward_codecs.lucene87.Lucene87Codec',
-                                'org.apache.lucene.codecs.lucene90.Lucene90Codec',
-                                'org.apache.lucene.codecs.simpletext.SimpleTextCodec';
         provides 'org.controlsfx.glyphfont.GlyphFont' with 'org.controlsfx.glyphfont.FontAwesome'
         provides 'org.mariadb.jdbc.tls.TlsSocketPlugin' with 'org.mariadb.jdbc.internal.protocol.tls.DefaultTlsSocketPlugin'
         provides 'com.microsoft.applicationinsights.core.dependencies.io.grpc.ServerProvider' with 'com.microsoft.applicationinsights.core.dependencies.io.grpc.netty.shaded.io.grpc.netty.NettyServerProvider'
