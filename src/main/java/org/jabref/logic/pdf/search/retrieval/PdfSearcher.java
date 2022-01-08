@@ -49,7 +49,7 @@ public final class PdfSearcher {
      * @return a result set of all documents that have matches in any fields
      */
     public PdfSearchResults search(final String searchString, final int maxHits)
-            throws IOException {
+        throws IOException {
         if (StringUtil.isBlank(Objects.requireNonNull(searchString, "The search string was null!"))) {
             return new PdfSearchResults();
         }
@@ -57,10 +57,15 @@ public final class PdfSearcher {
             throw new IllegalArgumentException("Must be called with at least 1 maxHits, was" + maxHits);
         }
 
-        try {
-            List<SearchResult> resultDocs = new LinkedList<>();
+        List<SearchResult> resultDocs = new LinkedList<>();
 
-            IndexReader reader = DirectoryReader.open(indexDirectory);
+        if (!DirectoryReader.indexExists(indexDirectory)) {
+            LOGGER.debug("Index directory {} does not yet exist", indexDirectory);
+            return new PdfSearchResults();
+        }
+
+        try (IndexReader reader = DirectoryReader.open(indexDirectory)) {
+
             IndexSearcher searcher = new IndexSearcher(reader);
             Query query = new MultiFieldQueryParser(PDF_FIELDS, new EnglishStemAnalyzer()).parse(searchString);
             TopDocs results = searcher.search(query, maxHits);
@@ -68,6 +73,7 @@ public final class PdfSearcher {
                 resultDocs.add(new SearchResult(searcher, query, scoreDoc));
             }
             return new PdfSearchResults(resultDocs);
+
         } catch (ParseException e) {
             LOGGER.warn("Could not parse query: '" + searchString + "'! \n" + e.getMessage());
             return new PdfSearchResults();
