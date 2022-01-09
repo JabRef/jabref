@@ -126,6 +126,5 @@ class FieldWriterTests {
                       + "## [Unreleased]";
 
         assertEquals("{" + text + "}", writer.write(StandardField.COMMENT, text));
-
     }
 }
