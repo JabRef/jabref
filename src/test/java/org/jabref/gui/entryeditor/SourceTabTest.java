@@ -1,6 +1,7 @@
 package org.jabref.gui.entryeditor;
 
 import java.util.Collections;
+import java.util.List;
 
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
@@ -18,6 +19,7 @@ import org.jabref.logic.bibtex.FieldWriterPreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.testutils.category.GUITest;
@@ -52,8 +54,9 @@ class SourceTabTest {
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class);
         when(importFormatPreferences.getFieldContentFormatterPreferences())
                 .thenReturn(mock(FieldContentFormatterPreferences.class));
+        FieldWriterPreferences fieldWriterPreferences = new FieldWriterPreferences(true, List.of(StandardField.MONTH), new FieldContentFormatterPreferences());
 
-        sourceTab = new SourceTab(new BibDatabaseContext(), new CountingUndoManager(), new FieldWriterPreferences(), importFormatPreferences, new DummyFileUpdateMonitor(), mock(DialogService.class), stateManager, keyBindingRepository);
+        sourceTab = new SourceTab(new BibDatabaseContext(), new CountingUndoManager(), fieldWriterPreferences, importFormatPreferences, new DummyFileUpdateMonitor(), mock(DialogService.class), stateManager, keyBindingRepository);
         pane = new TabPane(
                 new Tab("main area", area),
                 new Tab("other tab", new Label("some text")),

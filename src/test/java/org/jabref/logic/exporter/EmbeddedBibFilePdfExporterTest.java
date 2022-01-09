@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
 
+import org.jabref.logic.bibtex.FieldContentFormatterPreferences;
 import org.jabref.logic.bibtex.FieldWriterPreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.fileformat.PdfEmbeddedBibFileImporter;
@@ -114,7 +115,7 @@ class EmbeddedBibFilePdfExporterTest {
 
         bibDatabaseMode = BibDatabaseMode.BIBTEX;
         bibEntryTypesManager = new BibEntryTypesManager();
-        fieldWriterPreferences = new FieldWriterPreferences();
+        FieldWriterPreferences fieldWriterPreferences = new FieldWriterPreferences(true, List.of(StandardField.MONTH), new FieldContentFormatterPreferences());
 
         importer = new PdfEmbeddedBibFileImporter(importFormatPreferences);
         exporter = new EmbeddedBibFilePdfExporter(bibDatabaseMode, bibEntryTypesManager, fieldWriterPreferences);
