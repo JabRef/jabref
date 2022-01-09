@@ -5,6 +5,7 @@ import java.util.List;
 import org.jabref.logic.util.OS;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
+import org.jabref.model.strings.StringUtil;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -125,6 +126,8 @@ class FieldWriterTests {
                       + "\n"
                       + "## [Unreleased]";
 
-        assertEquals("{" + text + "}", writer.write(StandardField.COMMENT, text));
+        String writeResult = writer.write(StandardField.COMMENT, text);
+        String resultWithLfAsNewLineSeparator = StringUtil.unifyLineBreaks(writeResult, "\n");
+        assertEquals("{" + text + "}", resultWithLfAsNewLineSeparator);
     }
 }
