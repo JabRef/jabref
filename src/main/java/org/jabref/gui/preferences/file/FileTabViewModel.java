@@ -33,7 +33,7 @@ public class FileTabViewModel implements PreferenceTabViewModel {
         noWrapFilesProperty.setValue(importExportPreferences.getNonWrappableFields());
 
         doNotResolveStringsProperty.setValue(!importExportPreferences.resolveStrings());
-        resolveStringsProperty.setValue(!importExportPreferences.resolveStrings());
+        resolveStringsProperty.setValue(importExportPreferences.resolveStrings());
         resolveStringsForFieldsProperty.setValue(importExportPreferences.getResolvableFields());
         alwaysReformatBibProperty.setValue(importExportPreferences.shouldAlwaysReformatOnSave());
         autosaveLocalLibraries.setValue(preferences.shouldAutosave());
