@@ -23,9 +23,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
 /**
- * This class tests the BibtexImporter. That importer is only used for --importToOpen, which is currently untested
+ * This class tests the BibtexImporter.
  * <p>
- * TODO: 1. Add test for --importToOpen 2. Move these tests to the code opening a bibtex file
+ * The tests for writing can be found at {@link org.jabref.logic.exporter.BibtexDatabaseWriterTest}
  */
 public class BibtexImporterTest {
 
@@ -115,9 +115,7 @@ public class BibtexImporterTest {
     @Test
     public void testGetDescription() {
         assertEquals(
-                "This importer exists only to enable `--importToOpen someEntry.bib`\n"
-                        + "It is NOT intended to import a BIB file. This is done via the option action, which treats the metadata fields.\n"
-                        + "The metadata is not required to be read here, as this class is NOT called at --import.",
+                "This importer enables `--importToOpen someEntry.bib`",
                 importer.getDescription());
     }
 

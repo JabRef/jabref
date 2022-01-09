@@ -15,10 +15,7 @@ import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.util.FileUpdateMonitor;
 
 /**
- * This importer exists only to enable `--importToOpen someEntry.bib`
- *
- * It is NOT intended to import a BIB file. This is done via the option action, which treats the metadata fields
- * The metadata is not required to be read here, as this class is NOT called at --import
+ * This is a full class to read .bib files. It is used for <code>--import</code> and <code>--importToOpen </code>, too.
  */
 public class BibtexImporter extends Importer {
 
@@ -85,9 +82,7 @@ public class BibtexImporter extends Importer {
 
     @Override
     public String getDescription() {
-        return "This importer exists only to enable `--importToOpen someEntry.bib`\n" +
-                "It is NOT intended to import a BIB file. This is done via the option action, which treats the metadata fields.\n" +
-                "The metadata is not required to be read here, as this class is NOT called at --import.";
+        return "This importer enables `--importToOpen someEntry.bib`";
     }
 
     /**
