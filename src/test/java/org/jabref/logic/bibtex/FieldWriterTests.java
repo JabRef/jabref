@@ -18,7 +18,7 @@ class FieldWriterTests {
 
     @BeforeEach
     void setUp() {
-        FieldWriterPreferences fieldWriterPreferences = new FieldWriterPreferences(false, List.of(StandardField.MONTH), new FieldContentFormatterPreferences());
+        FieldWriterPreferences fieldWriterPreferences = new FieldWriterPreferences(true, List.of(StandardField.MONTH), new FieldContentFormatterPreferences());
         writer = new FieldWriter(fieldWriterPreferences);
     }
 

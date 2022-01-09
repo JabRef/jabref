@@ -32,8 +32,8 @@ public class FileTabViewModel implements PreferenceTabViewModel {
         openLastStartupProperty.setValue(preferences.shouldOpenLastFilesOnStartup());
         noWrapFilesProperty.setValue(importExportPreferences.getNonWrappableFields());
 
-        doNotResolveStringsProperty.setValue(importExportPreferences.doNotResolveStrings());
-        resolveStringsProperty.setValue(!importExportPreferences.doNotResolveStrings());
+        doNotResolveStringsProperty.setValue(!importExportPreferences.resolveStrings());
+        resolveStringsProperty.setValue(!importExportPreferences.resolveStrings());
         resolveStringsForFieldsProperty.setValue(importExportPreferences.getResolvableFields());
         alwaysReformatBibProperty.setValue(importExportPreferences.shouldAlwaysReformatOnSave());
         autosaveLocalLibraries.setValue(preferences.shouldAutosave());
@@ -43,7 +43,7 @@ public class FileTabViewModel implements PreferenceTabViewModel {
     public void storeSettings() {
         preferences.storeOpenLastFilesOnStartup(openLastStartupProperty.getValue());
 
-        importExportPreferences.setDoNotResolveStrings(doNotResolveStringsProperty.getValue());
+        importExportPreferences.setResolveStrings(!doNotResolveStringsProperty.getValue());
         importExportPreferences.setNonWrappableFields(noWrapFilesProperty.getValue().trim());
         importExportPreferences.setResolvableFields(resolveStringsForFieldsProperty.getValue().trim());
         importExportPreferences.setAlwaysReformatOnSave(alwaysReformatBibProperty.getValue());

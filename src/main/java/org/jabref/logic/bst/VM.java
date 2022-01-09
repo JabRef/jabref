@@ -928,7 +928,7 @@ public class VM implements Warn {
      * @param bibDatabase
      */
     private void read(BibDatabase bibDatabase) {
-        FieldWriter fieldWriter = new FieldWriter(new FieldWriterPreferences(false, List.of(StandardField.MONTH), new FieldContentFormatterPreferences()));
+        FieldWriter fieldWriter = new FieldWriter(new FieldWriterPreferences(true, List.of(StandardField.MONTH), new FieldContentFormatterPreferences()));
         for (BstEntry e : entries) {
             for (Map.Entry<String, String> mEntry : e.fields.entrySet()) {
                 Field field = FieldFactory.parseField(mEntry.getKey());

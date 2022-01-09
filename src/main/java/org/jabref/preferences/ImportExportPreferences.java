@@ -12,7 +12,7 @@ import javafx.beans.property.StringProperty;
 public class ImportExportPreferences {
 
     private final StringProperty nonWrappableFields;
-    private final BooleanProperty doNotResolveStrings;
+    private final BooleanProperty resolveStrings;
     private final StringProperty resolvableFields;
     private final BooleanProperty alwaysReformatOnSave;
     private final ObjectProperty<Path> importWorkingDirectory;
@@ -20,14 +20,14 @@ public class ImportExportPreferences {
     private final ObjectProperty<Path> exportWorkingDirectory;
 
     public ImportExportPreferences(String nonWrappableFields,
-                                   boolean doNotResolveStrings,
+                                   boolean resolveStrings,
                                    String resolvableFields,
                                    boolean alwaysReformatOnSave,
                                    Path importWorkingDirectory,
                                    String lastExportExtension,
                                    Path exportWorkingDirectory) {
         this.nonWrappableFields = new SimpleStringProperty(nonWrappableFields);
-        this.doNotResolveStrings = new SimpleBooleanProperty(doNotResolveStrings);
+        this.resolveStrings = new SimpleBooleanProperty(resolveStrings);
         this.resolvableFields = new SimpleStringProperty(resolvableFields);
         this.alwaysReformatOnSave = new SimpleBooleanProperty(alwaysReformatOnSave);
         this.importWorkingDirectory = new SimpleObjectProperty<>(importWorkingDirectory);
@@ -47,16 +47,16 @@ public class ImportExportPreferences {
         this.nonWrappableFields.set(nonWrappableFields);
     }
 
-    public boolean doNotResolveStrings() {
-        return doNotResolveStrings.get();
+    public boolean resolveStrings() {
+        return resolveStrings.get();
     }
 
-    public BooleanProperty doNotResolveStringsProperty() {
-        return doNotResolveStrings;
+    public BooleanProperty resolveStringsProperty() {
+        return resolveStrings;
     }
 
-    public void setDoNotResolveStrings(boolean doNotResolveStrings) {
-        this.doNotResolveStrings.set(doNotResolveStrings);
+    public void setResolveStrings(boolean resolveStrings) {
+        this.resolveStrings.set(resolveStrings);
     }
 
     public String getResolvableFields() {

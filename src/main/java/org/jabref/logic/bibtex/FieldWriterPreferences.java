@@ -7,14 +7,17 @@ import org.jabref.model.entry.field.StandardField;
 
 public class FieldWriterPreferences {
 
-    private final boolean doNotResolveStrings;
+    private final boolean resolveStrings;
     private final List<Field> resolveStringsForFields;
     private final int lineLength = 65; // Constant
     private final FieldContentFormatterPreferences fieldContentFormatterPreferences;
 
-    public FieldWriterPreferences(boolean doNotResolveFields, List<Field> resolveStringsForFields,
+    /**
+     * @param resolveStrings true - The character {@link FieldWriter#BIBTEX_STRING_START_END_SYMBOL} should be interpreted as indicator of BibTeX strings
+     */
+    public FieldWriterPreferences(boolean resolveStrings, List<Field> resolveStringsForFields,
                                   FieldContentFormatterPreferences fieldContentFormatterPreferences) {
-        this.doNotResolveStrings = doNotResolveFields;
+        this.resolveStrings = resolveStrings;
         this.resolveStringsForFields = resolveStringsForFields;
         this.fieldContentFormatterPreferences = fieldContentFormatterPreferences;
     }
@@ -30,8 +33,8 @@ public class FieldWriterPreferences {
         this(false, List.of(StandardField.MONTH), new FieldContentFormatterPreferences());
     }
 
-    public boolean isDoNotResolveStrings() {
-        return doNotResolveStrings;
+    public boolean isResolveStrings() {
+        return resolveStrings;
     }
 
     public List<Field> getResolveStringsForFields() {

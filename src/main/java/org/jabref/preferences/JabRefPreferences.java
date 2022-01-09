@@ -2182,7 +2182,7 @@ public class JabRefPreferences implements PreferencesService {
     @Override
     public FieldWriterPreferences getFieldWriterPreferences() {
         return new FieldWriterPreferences(
-                getBoolean(DO_NOT_RESOLVE_STRINGS),
+                !getBoolean(DO_NOT_RESOLVE_STRINGS),
                 getStringList(RESOLVE_STRINGS_FOR_FIELDS).stream().map(FieldFactory::parseField).collect(Collectors.toList()),
                 getFieldContentParserPreferences());
     }
@@ -2294,7 +2294,7 @@ public class JabRefPreferences implements PreferencesService {
 
         importExportPreferences = new ImportExportPreferences(
                 get(NON_WRAPPABLE_FIELDS),
-                getBoolean(DO_NOT_RESOLVE_STRINGS),
+                !getBoolean(DO_NOT_RESOLVE_STRINGS),
                 get(RESOLVE_STRINGS_FOR_FIELDS),
                 getBoolean(REFORMAT_FILE_ON_SAVE_AND_EXPORT),
                 Path.of(get(IMPORT_WORKING_DIRECTORY)),
@@ -2302,7 +2302,7 @@ public class JabRefPreferences implements PreferencesService {
                 Path.of(get(EXPORT_WORKING_DIRECTORY)));
 
         EasyBind.listen(importExportPreferences.nonWrappableFieldsProperty(), (obs, oldValue, newValue) -> put(NON_WRAPPABLE_FIELDS, newValue));
-        EasyBind.listen(importExportPreferences.doNotResolveStringsProperty(), (obs, oldValue, newValue) -> putBoolean(DO_NOT_RESOLVE_STRINGS, newValue));
+        EasyBind.listen(importExportPreferences.resolveStringsProperty(), (obs, oldValue, newValue) -> putBoolean(DO_NOT_RESOLVE_STRINGS, !newValue));
         EasyBind.listen(importExportPreferences.resolvableFieldsProperty(), (obs, oldValue, newValue) -> put(RESOLVE_STRINGS_FOR_FIELDS, newValue));
         EasyBind.listen(importExportPreferences.alwaysReformatOnSaveProperty(), (obs, oldValue, newValue) -> putBoolean(REFORMAT_FILE_ON_SAVE_AND_EXPORT, newValue));
         EasyBind.listen(importExportPreferences.importWorkingDirectoryProperty(), (obs, oldValue, newValue) -> put(IMPORT_WORKING_DIRECTORY, newValue.toString()));

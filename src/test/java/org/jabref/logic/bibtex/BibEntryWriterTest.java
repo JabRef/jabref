@@ -50,7 +50,7 @@ class BibEntryWriterTest {
     @BeforeEach
     void setUpWriter() {
         importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
-        FieldWriterPreferences fieldWriterPreferences = new FieldWriterPreferences(false, List.of(StandardField.MONTH), new FieldContentFormatterPreferences());
+        FieldWriterPreferences fieldWriterPreferences = new FieldWriterPreferences(true, List.of(StandardField.MONTH), new FieldContentFormatterPreferences());
         bibEntryWriter = new BibEntryWriter(new FieldWriter(fieldWriterPreferences), new BibEntryTypesManager());
     }
 

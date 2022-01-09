@@ -12,6 +12,9 @@ import org.slf4j.LoggerFactory;
  */
 public class FieldWriter {
 
+    // See also ADR-0024
+    public static final char BIBTEX_STRING_START_END_SYMBOL = '#';
+
     private static final Logger LOGGER = LoggerFactory.getLogger(FieldWriter.class);
 
     private static final char FIELD_START = '{';
@@ -84,7 +87,6 @@ public class FieldWriter {
             return FIELD_START + String.valueOf(FIELD_END);
         }
 
-        // If the field is non-standard, we will just append braces, wrap and write.
         if (!shouldResolveStrings(field)) {
             return formatWithoutResolvingStrings(content, field);
         }
@@ -111,7 +113,7 @@ public class FieldWriter {
             int goFrom = pivot;
             int pos1 = pivot;
             while (goFrom == pos1) {
-                pos1 = content.indexOf('#', goFrom);
+                pos1 = content.indexOf(BIBTEX_STRING_START_END_SYMBOL, goFrom);
                 if ((pos1 > 0) && (content.charAt(pos1 - 1) == '\\')) {
                     goFrom = pos1 + 1;
                     pos1++;
@@ -125,16 +127,19 @@ public class FieldWriter {
                 pos1 = content.length(); // No more occurrences found.
                 pos2 = -1;
             } else {
-                pos2 = content.indexOf('#', pos1 + 1);
+                pos2 = content.indexOf(BIBTEX_STRING_START_END_SYMBOL, pos1 + 1);
                 if (pos2 == -1) {
                     if (neverFailOnHashes) {
                         pos1 = content.length(); // just write out the rest of the text, and throw no exception
                     } else {
-                        LOGGER.error("The # character is not allowed in BibTeX strings unless escaped as in '\\#'. "
+                        LOGGER.error("The character {} is not allowed in BibTeX strings unless escaped as in '\\{}'. "
                                 + "In JabRef, use pairs of # characters to indicate a string. "
-                                + "Note that the entry causing the problem has been selected. Field value: {}", content);
+                                + "Note that the entry causing the problem has been selected. Field value: {}",
+                                BIBTEX_STRING_START_END_SYMBOL,
+                                BIBTEX_STRING_START_END_SYMBOL,
+                                content);
                         throw new InvalidFieldValueException(
-                                "The # character is not allowed in BibTeX strings unless escaped as in '\\#'.\n"
+                                "The character " + BIBTEX_STRING_START_END_SYMBOL + " is not allowed in BibTeX strings unless escaped as in '\\" + BIBTEX_STRING_START_END_SYMBOL + "'.\n"
                                         + "In JabRef, use pairs of # characters to indicate a string.\n"
                                         + "Note that the entry causing the problem has been selected. Field value: " + content);
                     }
@@ -163,7 +168,7 @@ public class FieldWriter {
     }
 
     private boolean shouldResolveStrings(Field field) {
-        if (!preferences.isDoNotResolveStrings()) {
+        if (preferences.isResolveStrings()) {
             // Resolve strings for the list of fields only
             return preferences.getResolveStringsForFields().contains(field);
         }
