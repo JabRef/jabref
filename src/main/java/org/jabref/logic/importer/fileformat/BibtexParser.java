@@ -53,15 +53,19 @@ import org.slf4j.LoggerFactory;
  * <p>
  * Use:
  * <p>
- * BibtexParser parser = new BibtexParser(reader);
+ * <code>BibtexParser parser = new BibtexParser(reader);</code>
  * <p>
- * ParserResult result = parser.parse();
+ * <code>ParserResult result = parser.parse();</code>
  * <p>
  * or
  * <p>
- * ParserResult result = BibtexParser.parse(reader);
+ * <code>ParserResult result = BibtexParser.parse(reader);</code>
  * <p>
  * Can be used stand-alone.
+ * <p>
+ * Main using method: {@link org.jabref.logic.importer.OpenDatabase#loadDatabase(java.nio.file.Path, org.jabref.preferences.GeneralPreferences, org.jabref.logic.importer.ImportFormatPreferences, org.jabref.model.util.FileUpdateMonitor)}
+ * <p>
+ * Opposite class: {@link org.jabref.logic.exporter.BibDatabaseWriter}
  */
 public class BibtexParser implements Parser {
     private static final Logger LOGGER = LoggerFactory.getLogger(BibtexParser.class);
@@ -121,14 +125,11 @@ public class BibtexParser implements Parser {
     }
 
     /**
-     * Will parse the BibTex-Data found when reading from reader. Ignores any encoding supplied in the file by "Encoding: myEncoding".
+     * Parses BibTeX data found when reading from reader. Ignores any encoding supplied in the file by "Encoding: myEncoding".
      * <p>
      * The reader will be consumed.
      * <p>
      * Multiple calls to parse() return the same results
-     *
-     * @return ParserResult
-     * @throws IOException
      */
     public ParserResult parse(Reader in) throws IOException {
         Objects.requireNonNull(in);
@@ -136,7 +137,7 @@ public class BibtexParser implements Parser {
 
         String newLineSeparator = determineNewLineSeparator();
 
-        // BibTeX related contents.
+        // BibTeX related contents
         initializeParserResult(newLineSeparator);
 
         parseDatabaseID();

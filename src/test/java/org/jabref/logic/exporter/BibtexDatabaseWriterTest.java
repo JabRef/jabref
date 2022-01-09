@@ -58,7 +58,10 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-class BibtexDatabaseWriterTest {
+/**
+ * Tests for reading can be found at {@link org.jabref.logic.importer.fileformat.BibtexImporterTest}
+ */
+public class BibtexDatabaseWriterTest {
 
     private BibtexDatabaseWriter databaseWriter;
     private BibDatabase database;
