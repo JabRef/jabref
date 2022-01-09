@@ -34,6 +34,8 @@ Example:
 left: BibTeX; right: Entry Editor
 
 ```text
+@String{ value = "example" }
+
 field1 = value     -> #value#
 field2 = {value}   -> value
 
