@@ -11,11 +11,11 @@ Affected code is (at least) `org.jabref.logic.importer.fileformat.BibtexParser#p
 
 ## Considered Options
 
-* Wrap string constants in #
-* Replace the internal # in JabRef by the non-used character §
-* Replace the internal # in JabRef by the non-used character %
-* Replace the internal # in JabRef by the non-used character &
-* Replace the internal # in JabRef by a single &
+* Wrap string constants in `#`
+* Replace the internal `#` in JabRef by the non-used character `§`
+* Replace the internal `#` in JabRef by the non-used character `%`
+* Replace the internal `#` in JabRef by the non-used character `&`
+* Replace the internal `#` in JabRef by a single `&`
 * Change the data type of a field value
 * Wrap plan # in curly braces: `{#}`
 
@@ -25,7 +25,7 @@ Chosen option: "Wrap string constants in #", because already existing behavior
 
 ## Pros and Cons of the Options
 
-### Wrap string constants in #
+### Wrap string constants in `#`
 
 When BibTeX on the disk contains `field = value`, it is rendered as `field = #value#` in the entry editor. The user then knows that `value` is a BibTeX string.
 
@@ -40,12 +40,12 @@ field2 = {value}   -> value
 field1 = value # value --> #value# # #value#
 ```
 
-* Good, because In place in JabRef since more then 10 yers
-* Bad, because `#` is used in BibTeX for string concatination
+* Good, because In place in JabRef since more than 10 years
+* Bad, because `#` is used in BibTeX for string concatenation
 * Bad, because `#` is used in Markdown to indicate headings. When using Markdown in fields such as comments, this causes writing errors
 * Bad, because `#` could appear in URLs
 
-### Replace the internal # in JabRef by the non-used character §
+### Replace the internal `#` in JabRef by the non-used character `§`
 
 When BibTeX on the disk contains `field = value`, it is rendered as `field = §value§` in the entry editor. The user then knows that `value` is a BibTeX string.
 
@@ -65,7 +65,7 @@ field1 = value # value --> §value§ # §value§
 * Bad, because Documentation needs to be updated
 * Bad, because `§` is not available on an US keyboard
 
-### Replace the internal # in JabRef by the non-used character %
+### Replace the internal `#` in JabRef by the non-used character `%`
 
 Similar to "Replace the internal # in JabRef by the non-used character §"
 
@@ -85,9 +85,9 @@ field1 = value # value --> %value% # %value%
 * Bad, because `%` is used for comments in LaTeX and thus migtht cause confusion
 * Bad, because `%` could appear in URLs: There is [url percent encoding](https://www.w3schools.com/tags/ref_urlencode.asp)
 
-### Replace the internal # in JabRef by the non-used character &
+### Replace the internal `#` in JabRef by the non-used character `&`
 
-Similar to "Replace the internal # in JabRef by the non-used character §"
+Similar to "Replace the internal `#` in JabRef by the non-used character `§`"
 
 Example:
 
@@ -103,7 +103,7 @@ field1 = value # value --> &value& # &value&
 * Good, because Users do not write LaTeX tables
 * Bad, because `&` is a LaTeX command for tables
 
-### Replace the internal # in JabRef by a single &
+### Replace the internal `#` in JabRef by a single `&`
 
 Prefix strings with `&`
 
