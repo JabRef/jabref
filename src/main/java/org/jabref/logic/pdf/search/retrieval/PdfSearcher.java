@@ -65,7 +65,6 @@ public final class PdfSearcher {
         }
 
         try (IndexReader reader = DirectoryReader.open(indexDirectory)) {
-
             IndexSearcher searcher = new IndexSearcher(reader);
             Query query = new MultiFieldQueryParser(PDF_FIELDS, new EnglishStemAnalyzer()).parse(searchString);
             TopDocs results = searcher.search(query, maxHits);
@@ -73,9 +72,8 @@ public final class PdfSearcher {
                 resultDocs.add(new SearchResult(searcher, query, scoreDoc));
             }
             return new PdfSearchResults(resultDocs);
-
         } catch (ParseException e) {
-            LOGGER.warn("Could not parse query: '" + searchString + "'! \n" + e.getMessage());
+            LOGGER.warn("Could not parse query: '{}'!\n{}", searchString, e.getMessage());
             return new PdfSearchResults();
         }
     }
