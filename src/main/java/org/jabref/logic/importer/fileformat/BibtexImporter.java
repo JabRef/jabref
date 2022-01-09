@@ -15,7 +15,7 @@ import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.util.FileUpdateMonitor;
 
 /**
- * This is a full class to read .bib files. It is used for <code>--import</code> and --importToOpen</code>, too.
+ * This is a full class to read .bib files. It is used for <code>--import</code> and <code>--importToOpen </code>, too.
  */
 public class BibtexImporter extends Importer {
 
