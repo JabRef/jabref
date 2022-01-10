@@ -1,22 +1,27 @@
 version: 2
 updates:
-- package-ecosystem: gradle
-  directory: "/"
-  schedule:
-    interval: weekly
-  open-pull-requests-limit: 15
-  labels:
-  - "type: dependencies"
-  ignore:
-  - dependency-name: com.microsoft.azure:applicationinsights-core
-    versions:
-    - ">= 2.5.a" # Blocked by https://github.com/microsoft/ApplicationInsights-Java/issues/1155
-  - dependency-name: com.microsoft.azure:applicationinsights-logging-log4j2
-    versions:
-    - ">= 2.5.a" # Blocked by https://github.com/microsoft/ApplicationInsights-Java/issues/1155
-- package-ecosystem: "github-actions"
-  directory: "/"
-  schedule:
-    interval: weekly
-  labels:
-  - "type: dependencies"
+  - package-ecosystem: gradle
+    directory: "/"
+    schedule:
+      interval: weekly
+    labels:
+      - "type: dependencies"
+    ignore:
+      - dependency-name: com.microsoft.azure:applicationinsights-core
+        versions:
+          - ">= 2.5.a" # Blocked by https://github.com/microsoft/ApplicationInsights-Java/issues/1155
+      - dependency-name: com.microsoft.azure:applicationinsights-logging-log4j2
+        versions:
+          - ">= 2.5.a" # Blocked by https://github.com/microsoft/ApplicationInsights-Java/issues/1155
+  - package-ecosystem: gradle
+    directory: "buildSrc/"
+    schedule:
+      interval: weekly
+    labels:
+      - "type: dependencies"
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: weekly
+    labels:
+      - "type: dependencies"
