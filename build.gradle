@@ -163,7 +163,7 @@ dependencies {
 
     // JavaFX stuff
     implementation 'org.kordamp.ikonli:ikonli-javafx:12.3.0'
-    implementation 'org.kordamp.ikonli:ikonli-materialdesign2-pack:12.2.0'
+    implementation 'org.kordamp.ikonli:ikonli-materialdesign2-pack:12.3.0'
     implementation 'de.saxsys:mvvmfx-validation:1.9.0-SNAPSHOT'
     implementation 'de.saxsys:mvvmfx:1.8.0'
     implementation 'com.tobiasdiez:easybind:2.2'
