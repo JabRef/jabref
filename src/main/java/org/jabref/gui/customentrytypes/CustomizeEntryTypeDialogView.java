@@ -48,8 +48,7 @@ public class CustomizeEntryTypeDialogView extends BaseDialog<Void> {
     private final BibDatabaseMode mode;
     private final BibEntryTypesManager entryTypesManager;
 
-    @FXML
-    private TableView<EntryTypeViewModel> entryTypes;
+    @FXML private TableView<EntryTypeViewModel> entryTypes;
     @FXML private TableColumn<EntryTypeViewModel, String> entryTypColumn;
     @FXML private TableColumn<EntryTypeViewModel, String> entryTypeActionsColumn;
     @FXML private TextField addNewEntryType;
