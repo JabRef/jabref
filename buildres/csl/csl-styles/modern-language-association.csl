@@ -138,6 +138,7 @@
         </else>
       </choose>
       <text variable="version"/>
+      <text variable="medium"/>
     </group>
   </macro>
   <macro name="volume-lowercase">

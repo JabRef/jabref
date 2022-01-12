@@ -31,6 +31,7 @@ import org.jabref.gui.fieldeditors.FieldEditorFX;
 import org.jabref.gui.fieldeditors.FieldEditors;
 import org.jabref.gui.fieldeditors.FieldNameLabel;
 import org.jabref.gui.preview.PreviewPanel;
+import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.pdf.search.indexing.IndexingTaskManager;
@@ -38,6 +39,8 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.preferences.PreferencesService;
+
+import com.tobiasdiez.easybind.EasyBind;
 
 /**
  * A single tab displayed in the EntryEditor holding several FieldEditors.
@@ -49,6 +52,7 @@ abstract class FieldsEditorTab extends EntryEditorTab {
     private final SuggestionProviders suggestionProviders;
     private final DialogService dialogService;
     private final PreferencesService preferences;
+    private final ThemeManager themeManager;
     private final ExternalFileTypes externalFileTypes;
     private final TaskExecutor taskExecutor;
     private final JournalAbbreviationRepository journalAbbreviationRepository;
@@ -66,15 +70,18 @@ abstract class FieldsEditorTab extends EntryEditorTab {
                            DialogService dialogService,
                            PreferencesService preferences,
                            StateManager stateManager,
+                           ThemeManager themeManager,
                            ExternalFileTypes externalFileTypes,
                            TaskExecutor taskExecutor,
-                           JournalAbbreviationRepository journalAbbreviationRepository, IndexingTaskManager indexingTaskManager) {
+                           JournalAbbreviationRepository journalAbbreviationRepository,
+                           IndexingTaskManager indexingTaskManager) {
         this.isCompressed = compressed;
         this.databaseContext = Objects.requireNonNull(databaseContext);
         this.suggestionProviders = Objects.requireNonNull(suggestionProviders);
         this.undoManager = Objects.requireNonNull(undoManager);
         this.dialogService = Objects.requireNonNull(dialogService);
         this.preferences = Objects.requireNonNull(preferences);
+        this.themeManager = themeManager;
         this.externalFileTypes = Objects.requireNonNull(externalFileTypes);
         this.taskExecutor = Objects.requireNonNull(taskExecutor);
         this.journalAbbreviationRepository = Objects.requireNonNull(journalAbbreviationRepository);
@@ -106,9 +113,16 @@ abstract class FieldsEditorTab extends EntryEditorTab {
 
         List<Label> labels = new ArrayList<>();
         for (Field field : fields) {
-            FieldEditorFX fieldEditor = FieldEditors.getForField(field, taskExecutor, dialogService,
+            FieldEditorFX fieldEditor = FieldEditors.getForField(
+                    field,
+                    taskExecutor,
+                    dialogService,
                     journalAbbreviationRepository,
-                    preferences, databaseContext, entry.getType(), suggestionProviders, undoManager);
+                    preferences,
+                    databaseContext,
+                    entry.getType(),
+                    suggestionProviders,
+                    undoManager);
             fieldEditor.bindToEntry(entry);
 
             editors.put(field, fieldEditor);
@@ -232,11 +246,14 @@ abstract class FieldsEditorTab extends EntryEditorTab {
             scrollPane.setFitToHeight(true);
 
             SplitPane container = new SplitPane(scrollPane);
-            if (!preferences.getPreviewPreferences().showPreviewAsExtraTab()) {
-                previewPanel = new PreviewPanel(databaseContext, dialogService, externalFileTypes, preferences.getKeyBindingRepository(), preferences, stateManager, indexingTaskManager);
-                container.getItems().add(previewPanel);
-            }
-
+            previewPanel = new PreviewPanel(databaseContext, dialogService, externalFileTypes, preferences.getKeyBindingRepository(), preferences, stateManager, themeManager, indexingTaskManager);
+            EasyBind.subscribe(preferences.getPreviewPreferences().showPreviewAsExtraTabProperty(), show -> {
+                if (show) {
+                    container.getItems().remove(previewPanel);
+                } else {
+                    container.getItems().add(1, previewPanel);
+                }
+            });
             setContent(container);
         }
     }

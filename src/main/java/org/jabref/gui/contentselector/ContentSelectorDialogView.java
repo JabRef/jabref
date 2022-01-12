@@ -14,6 +14,7 @@ import javafx.scene.control.SelectionModel;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
+import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.ViewModelListCellFactory;
@@ -25,23 +26,17 @@ import com.tobiasdiez.easybind.EasyBind;
 
 public class ContentSelectorDialogView extends BaseDialog<Void> {
 
-    @FXML
-    private Button addFieldNameButton;
-    @FXML
-    private Button removeFieldNameButton;
-    @FXML
-    private Button addKeywordButton;
-    @FXML
-    private Button removeKeywordButton;
-    @FXML
-    private ListView<Field> fieldsListView;
-    @FXML
-    private ListView<String> keywordsListView;
-    @FXML
-    private ButtonType saveButton;
+    @FXML private Button addFieldNameButton;
+    @FXML private Button removeFieldNameButton;
+    @FXML private Button addKeywordButton;
+    @FXML private Button removeKeywordButton;
+    @FXML private ListView<Field> fieldsListView;
+    @FXML private ListView<String> keywordsListView;
+    @FXML private ButtonType saveButton;
 
-    @Inject
-    private DialogService dialogService;
+    @Inject private DialogService dialogService;
+    @Inject private ThemeManager themeManager;
+
     private final LibraryTab libraryTab;
     private ContentSelectorDialogViewModel viewModel;
 
@@ -56,6 +51,8 @@ public class ContentSelectorDialogView extends BaseDialog<Void> {
                   .setAsDialogPane(this);
 
         ControlHelper.setAction(saveButton, getDialogPane(), event -> saveChangesAndClose());
+
+        themeManager.updateFontStyle(getDialogPane().getScene());
     }
 
     @FXML
