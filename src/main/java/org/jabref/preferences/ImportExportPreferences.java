@@ -55,7 +55,6 @@ public class ImportExportPreferences {
         this.shouldOpenLastEdited.set(shouldOpenLastEdited);
     }
 
-
     public String getNonWrappableFields() {
         return nonWrappableFields.get();
     }
