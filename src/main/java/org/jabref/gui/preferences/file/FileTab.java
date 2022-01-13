@@ -36,7 +36,8 @@ public class FileTab extends AbstractPreferenceTabView<FileTabViewModel> impleme
     }
 
     public void initialize() {
-        this.viewModel = new FileTabViewModel(preferencesService);
+        this.viewModel = new FileTabViewModel(preferencesService.getImportExportPreferences());
+
         openLastStartup.selectedProperty().bindBidirectional(viewModel.openLastStartupProperty());
         noWrapFiles.textProperty().bindBidirectional(viewModel.noWrapFilesProperty());
         resolveStringsBibTex.selectedProperty().bindBidirectional(viewModel.resolveStringsBibTexProperty());

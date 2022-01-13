@@ -20,7 +20,6 @@ public class GuiPreferences {
 
     private final BooleanProperty windowMaximised;
 
-    private final BooleanProperty shouldOpenLastEdited;
     private final ObservableList<String> lastFilesOpened;
     private final ObjectProperty<Path> lastFocusedFile;
     private final DoubleProperty sidePaneWidth;
@@ -30,15 +29,14 @@ public class GuiPreferences {
                           double sizeX,
                           double sizeY,
                           boolean windowMaximised,
-                          boolean shouldOpenLastEdited,
                           List<String> lastFilesOpened,
-                          Path lastFocusedFile, double sidePaneWidth) {
+                          Path lastFocusedFile,
+                          double sidePaneWidth) {
         this.positionX = new SimpleDoubleProperty(positionX);
         this.positionY = new SimpleDoubleProperty(positionY);
         this.sizeX = new SimpleDoubleProperty(sizeX);
         this.sizeY = new SimpleDoubleProperty(sizeY);
         this.windowMaximised = new SimpleBooleanProperty(windowMaximised);
-        this.shouldOpenLastEdited = new SimpleBooleanProperty(shouldOpenLastEdited);
         this.lastFilesOpened = FXCollections.observableArrayList(lastFilesOpened);
         this.lastFocusedFile = new SimpleObjectProperty<>(lastFocusedFile);
         this.sidePaneWidth = new SimpleDoubleProperty(sidePaneWidth);
@@ -102,18 +100,6 @@ public class GuiPreferences {
 
     public void setWindowMaximised(boolean windowMaximised) {
         this.windowMaximised.set(windowMaximised);
-    }
-
-    public boolean shouldOpenLastEdited() {
-        return shouldOpenLastEdited.get();
-    }
-
-    public BooleanProperty openLastEditedProperty() {
-        return shouldOpenLastEdited;
-    }
-
-    public void setOpenLastEdited(boolean shouldOpenLastEdited) {
-        this.shouldOpenLastEdited.set(shouldOpenLastEdited);
     }
 
     public ObservableList<String> getLastFilesOpened() {

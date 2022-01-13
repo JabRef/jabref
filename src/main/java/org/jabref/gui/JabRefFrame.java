@@ -350,7 +350,7 @@ public class JabRefFrame extends BorderPane {
      * set to true
      */
     private void tearDownJabRef(List<String> filenames) {
-        if (prefs.getGuiPreferences().shouldOpenLastEdited()) {
+        if (prefs.getImportExportPreferences().shouldOpenLastEdited()) {
             // Here we store the names of all current files. If there is no current file, we remove any
             // previously stored filename.
             if (filenames.isEmpty()) {
@@ -1113,10 +1113,10 @@ public class JabRefFrame extends BorderPane {
     }
 
     private boolean readyForAutosave(BibDatabaseContext context) {
-        return ((context.getLocation() == DatabaseLocation.SHARED) ||
-                ((context.getLocation() == DatabaseLocation.LOCAL) && prefs.shouldAutosave()))
-                &&
-                context.getDatabasePath().isPresent();
+        return ((context.getLocation() == DatabaseLocation.SHARED)
+                || ((context.getLocation() == DatabaseLocation.LOCAL)
+                && prefs.getImportExportPreferences().shouldAutoSave()))
+                && context.getDatabasePath().isPresent();
     }
 
     /**

@@ -7,7 +7,6 @@ import javafx.beans.property.StringProperty;
 
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.preferences.ImportExportPreferences;
-import org.jabref.preferences.PreferencesService;
 
 public class FileTabViewModel implements PreferenceTabViewModel {
 
@@ -19,39 +18,32 @@ public class FileTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty alwaysReformatBibProperty = new SimpleBooleanProperty();
     private final BooleanProperty autosaveLocalLibraries = new SimpleBooleanProperty();
 
-    private final PreferencesService preferences;
     private final ImportExportPreferences importExportPreferences;
 
-    FileTabViewModel(PreferencesService preferences) {
-        this.preferences = preferences;
-        this.importExportPreferences = preferences.getImportExportPreferences();
+    FileTabViewModel(ImportExportPreferences importExportPreferences) {
+        this.importExportPreferences = importExportPreferences;
     }
 
     @Override
     public void setValues() {
-        openLastStartupProperty.setValue(preferences.shouldOpenLastFilesOnStartup());
-
+        openLastStartupProperty.setValue(importExportPreferences.shouldOpenLastEdited());
         noWrapFilesProperty.setValue(importExportPreferences.getNonWrappableFields());
         resolveStringsAllProperty.setValue(importExportPreferences.shouldResolveStringsForAllStrings()); // Flipped around
         resolveStringsBibTexProperty.setValue(importExportPreferences.shouldResolveStringsForStandardBibtexFields());
         resolveStringsExceptProperty.setValue(importExportPreferences.getNonResolvableFields());
-
         alwaysReformatBibProperty.setValue(importExportPreferences.shouldAlwaysReformatOnSave());
-
-        autosaveLocalLibraries.setValue(preferences.shouldAutosave());
+        autosaveLocalLibraries.setValue(importExportPreferences.shouldAutoSave());
     }
 
     @Override
     public void storeSettings() {
-        preferences.storeOpenLastFilesOnStartup(openLastStartupProperty.getValue());
-
+        importExportPreferences.setOpenLastEdited(openLastStartupProperty.getValue());
         importExportPreferences.setNonWrappableFields(noWrapFilesProperty.getValue().trim());
         importExportPreferences.setResolveStringsForStandardBibtexFields(resolveStringsBibTexProperty.getValue());
         importExportPreferences.setResolveStringsForAllStrings(resolveStringsAllProperty.getValue());
         importExportPreferences.setNonResolvableFields(resolveStringsExceptProperty.getValue().trim());
         importExportPreferences.setAlwaysReformatOnSave(alwaysReformatBibProperty.getValue());
-
-        preferences.storeShouldAutosave(autosaveLocalLibraries.getValue());
+        importExportPreferences.setAutoSave(autosaveLocalLibraries.getValue());
     }
 
     // General

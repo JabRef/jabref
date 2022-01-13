@@ -224,15 +224,7 @@ public interface PreferencesService {
     // File preferences
     //*************************************************************************************************************
 
-    boolean shouldOpenLastFilesOnStartup();
-
-    void storeOpenLastFilesOnStartup(boolean openLastFilesOnStartup);
-
     AutoLinkPreferences getAutoLinkPreferences();
-
-    boolean shouldAutosave();
-
-    void storeShouldAutosave(boolean shouldAutosave);
 
     FileLinkPreferences getFileLinkPreferences();
 

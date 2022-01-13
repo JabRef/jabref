@@ -2164,16 +2164,6 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     @Override
-    public boolean shouldOpenLastFilesOnStartup() {
-        return getBoolean(OPEN_LAST_EDITED);
-    }
-
-    @Override
-    public void storeOpenLastFilesOnStartup(boolean openLastFilesOnStartup) {
-        putBoolean(OPEN_LAST_EDITED, openLastFilesOnStartup);
-    }
-
-    @Override
     public FieldContentFormatterPreferences getFieldContentParserPreferences() {
         return new FieldContentFormatterPreferences(
                 getStringList(NON_WRAPPABLE_FIELDS).stream().map(FieldFactory::parseField).collect(Collectors.toList()));
@@ -2272,16 +2262,6 @@ public class JabRefPreferences implements PreferencesService {
         return autoLinkPreferences;
     }
 
-    @Override
-    public boolean shouldAutosave() {
-        return getBoolean(LOCAL_AUTO_SAVE);
-    }
-
-    @Override
-    public void storeShouldAutosave(boolean shouldAutosave) {
-        putBoolean(LOCAL_AUTO_SAVE, shouldAutosave);
-    }
-
     //*************************************************************************************************************
     // Import/Export preferences
     //*************************************************************************************************************
@@ -2293,6 +2273,7 @@ public class JabRefPreferences implements PreferencesService {
         }
 
         importExportPreferences = new ImportExportPreferences(
+                getBoolean(OPEN_LAST_EDITED),
                 get(NON_WRAPPABLE_FIELDS),
                 !getBoolean(RESOLVE_STRINGS_ALL_FIELDS),
                 getBoolean(RESOLVE_STRINGS_ALL_FIELDS),
@@ -2300,8 +2281,10 @@ public class JabRefPreferences implements PreferencesService {
                 getBoolean(REFORMAT_FILE_ON_SAVE_AND_EXPORT),
                 Path.of(get(IMPORT_WORKING_DIRECTORY)),
                 get(LAST_USED_EXPORT),
-                Path.of(get(EXPORT_WORKING_DIRECTORY)));
+                Path.of(get(EXPORT_WORKING_DIRECTORY)),
+                getBoolean(LOCAL_AUTO_SAVE));
 
+        EasyBind.listen(importExportPreferences.openLastEditedProperty(), (obs, oldValue, newValue) -> putBoolean(OPEN_LAST_EDITED, newValue));
         EasyBind.listen(importExportPreferences.nonWrappableFieldsProperty(), (obs, oldValue, newValue) -> put(NON_WRAPPABLE_FIELDS, newValue));
         EasyBind.listen(importExportPreferences.resolveStringsForStandardBibtexFieldsProperty(), (obs, oldValue, newValue) -> putBoolean(RESOLVE_STRINGS_ALL_FIELDS, newValue));
         EasyBind.listen(importExportPreferences.resolveStringsForAllStringsProperty(), (obs, oldValue, newValue) -> putBoolean(RESOLVE_STRINGS_ALL_FIELDS, newValue));
@@ -2310,6 +2293,7 @@ public class JabRefPreferences implements PreferencesService {
         EasyBind.listen(importExportPreferences.importWorkingDirectoryProperty(), (obs, oldValue, newValue) -> put(IMPORT_WORKING_DIRECTORY, newValue.toString()));
         EasyBind.listen(importExportPreferences.lastExportExtensionProperty(), (obs, oldValue, newValue) -> put(LAST_USED_EXPORT, newValue));
         EasyBind.listen(importExportPreferences.exportWorkingDirectoryProperty(), (obs, oldValue, newValue) -> put(EXPORT_WORKING_DIRECTORY, newValue.toString()));
+        EasyBind.listen(importExportPreferences.autoSaveProperty(), (obs, oldValue, newValue) -> putBoolean(LOCAL_AUTO_SAVE, newValue));
 
         return importExportPreferences;
     }
@@ -2576,7 +2560,6 @@ public class JabRefPreferences implements PreferencesService {
                 getDouble(SIZE_X),
                 getDouble(SIZE_Y),
                 getBoolean(WINDOW_MAXIMISED),
-                getBoolean(OPEN_LAST_EDITED),
                 getStringList(LAST_EDITED),
                 Path.of(get(LAST_FOCUSED)),
                 getDouble(SIDE_PANE_WIDTH));
@@ -2586,7 +2569,6 @@ public class JabRefPreferences implements PreferencesService {
         EasyBind.listen(guiPreferences.sizeXProperty(), (obs, oldValue, newValue) -> putDouble(SIZE_X, newValue.doubleValue()));
         EasyBind.listen(guiPreferences.sizeYProperty(), (obs, oldValue, newValue) -> putDouble(SIZE_Y, newValue.doubleValue()));
         EasyBind.listen(guiPreferences.windowMaximisedProperty(), (obs, oldValue, newValue) -> putBoolean(WINDOW_MAXIMISED, newValue));
-        EasyBind.listen(guiPreferences.openLastEditedProperty(), (obs, oldValue, newValue) -> putBoolean(OPEN_LAST_EDITED, newValue));
         guiPreferences.getLastFilesOpened().addListener((InvalidationListener) change ->
                 putStringList(LAST_EDITED, guiPreferences.getLastFilesOpened()));
         EasyBind.listen(guiPreferences.lastFocusedFileProperty(), (obs, oldValue, newValue) -> {

@@ -10,6 +10,7 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
 public class ImportExportPreferences {
+    private final BooleanProperty shouldOpenLastEdited;
     private final StringProperty nonWrappableFields;
     private final BooleanProperty resolveStringsForStandardBibtexFields;
     private final BooleanProperty resolveStringsForAllStrings;
@@ -18,15 +19,19 @@ public class ImportExportPreferences {
     private final ObjectProperty<Path> importWorkingDirectory;
     private final StringProperty lastExportExtension;
     private final ObjectProperty<Path> exportWorkingDirectory;
+    private final BooleanProperty autoSave;
 
-    public ImportExportPreferences(String nonWrappableFields,
+    public ImportExportPreferences(boolean shouldOpenLastEdited,
+                                   String nonWrappableFields,
                                    boolean resolveStringsForStandardBibtexFields,
                                    boolean resolveStringsForAllStrings,
                                    String nonResolvableFields,
                                    boolean alwaysReformatOnSave,
                                    Path importWorkingDirectory,
                                    String lastExportExtension,
-                                   Path exportWorkingDirectory) {
+                                   Path exportWorkingDirectory,
+                                   boolean autoSave) {
+        this.shouldOpenLastEdited = new SimpleBooleanProperty(shouldOpenLastEdited);
         this.nonWrappableFields = new SimpleStringProperty(nonWrappableFields);
         this.resolveStringsForStandardBibtexFields = new SimpleBooleanProperty(resolveStringsForStandardBibtexFields);
         this.resolveStringsForAllStrings = new SimpleBooleanProperty(resolveStringsForAllStrings);
@@ -35,7 +40,21 @@ public class ImportExportPreferences {
         this.importWorkingDirectory = new SimpleObjectProperty<>(importWorkingDirectory);
         this.lastExportExtension = new SimpleStringProperty(lastExportExtension);
         this.exportWorkingDirectory = new SimpleObjectProperty<>(exportWorkingDirectory);
+        this.autoSave = new SimpleBooleanProperty(autoSave);
     }
+
+    public boolean shouldOpenLastEdited() {
+        return shouldOpenLastEdited.get();
+    }
+
+    public BooleanProperty openLastEditedProperty() {
+        return shouldOpenLastEdited;
+    }
+
+    public void setOpenLastEdited(boolean shouldOpenLastEdited) {
+        this.shouldOpenLastEdited.set(shouldOpenLastEdited);
+    }
+
 
     public String getNonWrappableFields() {
         return nonWrappableFields.get();
@@ -131,5 +150,17 @@ public class ImportExportPreferences {
 
     public void setExportWorkingDirectory(Path exportWorkingDirectory) {
         this.exportWorkingDirectory.set(exportWorkingDirectory);
+    }
+
+    public boolean shouldAutoSave() {
+        return autoSave.get();
+    }
+
+    public BooleanProperty autoSaveProperty() {
+        return autoSave;
+    }
+
+    public void setAutoSave(boolean shouldAutoSave) {
+        this.autoSave.set(shouldAutoSave);
     }
 }
