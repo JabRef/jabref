@@ -49,7 +49,7 @@ public class YamlExporterTest {
     public final void exportForNoEntriesWritesNothing(@TempDir Path tempFile) throws Exception {
         Path file = tempFile.resolve("ThisIsARandomlyNamedFile");
         Files.createFile(file);
-        yamlExporter.export(databaseContext, tempFile, charset, Collections.emptyList());
+        yamlExporter.export(databaseContext, tempFile, Collections.emptyList());
         assertEquals(Collections.emptyList(), Files.readAllLines(file));
     }
 
@@ -64,7 +64,7 @@ public class YamlExporterTest {
 
         Path file = tempFile.resolve("RandomFileName");
         Files.createFile(file);
-        yamlExporter.export(databaseContext, file, charset, Collections.singletonList(entry));
+        yamlExporter.export(databaseContext, file, Collections.singletonList(entry));
 
         List<String> expected = List.of(
                 "---",
@@ -92,7 +92,7 @@ public class YamlExporterTest {
 
         Path file = tempFile.resolve("RandomFileName");
         Files.createFile(file);
-        yamlExporter.export(databaseContext, file, charset, Collections.singletonList(entry));
+        yamlExporter.export(databaseContext, file, Collections.singletonList(entry));
 
         List<String> expected = List.of(
                 "---",
@@ -120,7 +120,7 @@ public class YamlExporterTest {
 
         Path file = tempFile.resolve("RandomFileName");
         Files.createFile(file);
-        yamlExporter.export(databaseContext, file, StandardCharsets.UTF_8, Collections.singletonList(entry));
+        yamlExporter.export(databaseContext, file, Collections.singletonList(entry));
 
         List<String> expected = List.of(
                 "---",
@@ -148,7 +148,7 @@ public class YamlExporterTest {
 
         Path file = tempFile.resolve("RandomFileName");
         Files.createFile(file);
-        yamlExporter.export(databaseContext, file, null, Collections.singletonList(entry));
+        yamlExporter.export(databaseContext, file, Collections.singletonList(entry));
 
         List<String> expected = List.of(
                 "---",
@@ -176,7 +176,7 @@ public class YamlExporterTest {
 
         Path file = tempFile.resolve("RandomFileName");
         Files.createFile(file);
-        yamlExporter.export(databaseContext, file, StandardCharsets.US_ASCII, Collections.singletonList(entry));
+        yamlExporter.export(databaseContext, file, Collections.singletonList(entry));
 
         List<String> expected = List.of(
                 "---",

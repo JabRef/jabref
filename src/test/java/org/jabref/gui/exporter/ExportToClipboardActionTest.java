@@ -1,6 +1,5 @@
 package org.jabref.gui.exporter;
 
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -94,10 +93,9 @@ public class ExportToClipboardActionTest {
 
     @Test
     public void testExecuteOnSuccess() {
-
         Exporter selectedExporter = new Exporter("html", "HTML", StandardFileType.HTML) {
             @Override
-            public void export(BibDatabaseContext databaseContext, Path file, Charset encoding, List<BibEntry> entries) {
+            public void export(BibDatabaseContext databaseContext, Path file, List<BibEntry> entries) {
             }
         };
 
@@ -105,7 +103,6 @@ public class ExportToClipboardActionTest {
         when(preferences.getImportExportPreferences()).thenReturn(importExportPrefs);
         GeneralPreferences generalPreferences = mock(GeneralPreferences.class, Answers.RETURNS_DEEP_STUBS);
         FilePreferences filePreferences = mock(FilePreferences.class, Answers.RETURNS_DEEP_STUBS);
-        when(generalPreferences.getDefaultEncoding()).thenReturn(StandardCharsets.UTF_8);
         when(preferences.getFilePreferences()).thenReturn(filePreferences);
         when(preferences.getGeneralPreferences()).thenReturn(generalPreferences);
         when(stateManager.getSelectedEntries()).thenReturn(selectedEntries);

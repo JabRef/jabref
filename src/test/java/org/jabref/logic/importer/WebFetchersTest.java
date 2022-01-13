@@ -1,6 +1,5 @@
 package org.jabref.logic.importer;
 
-import java.nio.charset.Charset;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
@@ -65,7 +64,7 @@ class WebFetchersTest {
 
     @Test
     void getEntryBasedFetchersReturnsAllFetcherDerivingFromEntryBasedFetcher() throws Exception {
-        Set<EntryBasedFetcher> idFetchers = WebFetchers.getEntryBasedFetchers(mock(ImporterPreferences.class), importFormatPreferences, mock(FilePreferences.class), mock(BibDatabaseContext.class), Charset.defaultCharset());
+        Set<EntryBasedFetcher> idFetchers = WebFetchers.getEntryBasedFetchers(mock(ImporterPreferences.class), importFormatPreferences, mock(FilePreferences.class), mock(BibDatabaseContext.class));
 
         try (ScanResult scanResult = classGraph.scan()) {
             ClassInfoList controlClasses = scanResult.getClassesImplementing(EntryBasedFetcher.class.getCanonicalName());

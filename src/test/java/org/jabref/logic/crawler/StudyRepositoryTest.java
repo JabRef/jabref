@@ -79,7 +79,6 @@ class StudyRepositoryTest {
                 DEFAULT_UNWANTED_CHARACTERS,
                 GlobalCitationKeyPattern.fromPattern("[auth][year]"),
                 ',');
-        when(generalPreferences.getDefaultEncoding()).thenReturn(Charset.defaultCharset());
         when(savePreferences.getSaveOrder()).thenReturn(new SaveOrderConfig());
         when(savePreferences.takeMetadataSaveOrderInAccount()).thenReturn(true);
         when(savePreferences.getCitationKeyPatternPreferences()).thenReturn(citationKeyPatternPreferences);

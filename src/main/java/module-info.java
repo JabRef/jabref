@@ -91,6 +91,7 @@ open module org.jabref {
     requires org.antlr.antlr4.runtime;
     requires flowless;
     requires org.apache.tika.core;
+    requires com.ibm.icu;
 
     requires flexmark;
     requires flexmark.ext.gfm.strikethrough;

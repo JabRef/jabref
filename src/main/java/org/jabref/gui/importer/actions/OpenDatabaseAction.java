@@ -198,7 +198,6 @@ public class OpenDatabaseAction extends SimpleCommand {
         ParserResult result;
         try {
             result = OpenDatabase.loadDatabase(fileToLoad,
-                    preferencesService.getGeneralPreferences(),
                     preferencesService.getImportFormatPreferences(),
                     Globals.getFileUpdateMonitor());
         } catch (IOException e) {

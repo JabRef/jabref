@@ -3,6 +3,8 @@ package org.jabref.logic.importer.fileformat;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Objects;
 import java.util.Optional;
@@ -41,28 +43,26 @@ public class BibtexImporter extends Importer {
     }
 
     @Override
-    public ParserResult importDatabase(Path filePath, Charset defaultEncoding) throws IOException {
+    public ParserResult importDatabase(Path filePath) throws IOException {
         // We want to check if there is a JabRef signature in the file, because that would tell us
         // which character encoding is used. However, to read the signature we must be using a compatible
         // encoding in the first place. Since the signature doesn't contain any fancy characters, we can
         // read it regardless of encoding, with either UTF-8 or UTF-16. That's the hypothesis, at any rate.
         // 8 bit is most likely, so we try that first:
         Optional<Charset> suppliedEncoding;
-        try (BufferedReader utf8Reader = getUTF8Reader(filePath)) {
-            suppliedEncoding = getSuppliedEncoding(utf8Reader);
-        }
-        // Now if that did not get us anywhere, we check with the 16 bit encoding:
-        if (!suppliedEncoding.isPresent()) {
-            try (BufferedReader utf16Reader = getUTF16Reader(filePath)) {
-                suppliedEncoding = getSuppliedEncoding(utf16Reader);
+        try (BufferedReader reader = Files.newBufferedReader(filePath)) {
+            reader.mark(8192);
+            suppliedEncoding = getSuppliedEncoding(reader);
+            if (!suppliedEncoding.isPresent() || suppliedEncoding.equals(StandardCharsets.UTF_8)) {
+                // read with UTF-8 in case no encoding string is present - or the given charset is UTF-8
+                reader.reset();
+                return this.importDatabase(reader);
             }
         }
-
-        if (suppliedEncoding.isPresent()) {
-            return super.importDatabase(filePath, suppliedEncoding.get());
-        } else {
-            return super.importDatabase(filePath, defaultEncoding);
+        try (BufferedReader reader = Files.newBufferedReader(filePath, suppliedEncoding.get())) {
+            return this.importDatabase(reader);
         }
+
     }
 
     @Override

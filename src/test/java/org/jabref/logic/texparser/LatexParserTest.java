@@ -41,7 +41,6 @@ public class LatexParserTest {
     @BeforeEach
     private void setUp() {
         generalPreferences = mock(GeneralPreferences.class, Answers.RETURNS_DEEP_STUBS);
-        when(generalPreferences.getDefaultEncoding()).thenReturn(StandardCharsets.UTF_8);
         importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
 
         database = new BibDatabase();

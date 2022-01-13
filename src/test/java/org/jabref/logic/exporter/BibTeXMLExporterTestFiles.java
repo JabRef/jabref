@@ -34,7 +34,6 @@ public class BibTeXMLExporterTestFiles {
 
     private static Path resourceDir;
     public BibDatabaseContext databaseContext;
-    public Charset charset;
     public Path tempFile;
     public BibTeXMLExporter bibtexmlExportFormat;
     public BibtexImporter testImporter;
@@ -51,7 +50,6 @@ public class BibTeXMLExporterTestFiles {
     @BeforeEach
     public void setUp(@TempDir Path testFolder) throws Exception {
         databaseContext = new BibDatabaseContext();
-        charset = StandardCharsets.UTF_8;
         bibtexmlExportFormat = new BibTeXMLExporter();
         Files.createFile(testFolder.resolve("ARandomlyNamedFile.tmp"));
         tempFile = testFolder.resolve("ARandomlyNamedFile.tmp");
@@ -65,10 +63,10 @@ public class BibTeXMLExporterTestFiles {
         Path importFile = resourceDir.resolve(filename);
         String tempFilePath = tempFile.toAbsolutePath().toString();
 
-        List<BibEntry> entries = testImporter.importDatabase(importFile, StandardCharsets.UTF_8).getDatabase()
+        List<BibEntry> entries = testImporter.importDatabase(importFile).getDatabase()
                                              .getEntries();
 
-        bibtexmlExportFormat.export(databaseContext, tempFile, charset, entries);
+        bibtexmlExportFormat.export(databaseContext, tempFile, entries);
 
         Builder control = Input.from(Files.newInputStream(resourceDir.resolve(xmlFileName)));
         Builder test = Input.from(Files.newInputStream(Path.of(tempFilePath)));

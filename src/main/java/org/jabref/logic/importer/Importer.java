@@ -1,5 +1,6 @@
 package org.jabref.logic.importer;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -14,6 +15,9 @@ import java.util.Objects;
 
 import org.jabref.logic.util.FileType;
 import org.jabref.model.database.BibDatabaseModeDetection;
+
+import com.ibm.icu.text.CharsetDetector;
+import com.ibm.icu.text.CharsetMatch;
 
 /**
  * Role of an importer for JabRef.
@@ -35,12 +39,11 @@ public abstract class Importer implements Comparable<Importer> {
      * Check whether the source is in the correct format for this importer.
      *
      * @param filePath the path of the file to check
-     * @param encoding the encoding of the file
      * @return true, if the file is in a recognized format
      * @throws IOException Signals that an I/O exception has occurred.
      */
-    public boolean isRecognizedFormat(Path filePath, Charset encoding) throws IOException {
-        try (BufferedReader bufferedReader = getReader(filePath, encoding)) {
+    public boolean isRecognizedFormat(Path filePath) throws IOException {
+        try (BufferedReader bufferedReader = getReader(filePath)) {
             return isRecognizedFormat(bufferedReader);
         }
     }
@@ -76,17 +79,21 @@ public abstract class Importer implements Comparable<Importer> {
 
     /**
      * Parse the database in the specified file.
-     * <p>
-     * Importer having the facilities to detect the correct encoding of a file should overwrite this method, determine
-     * the encoding and then call {@link #importDatabase(BufferedReader)}.
      *
      * @param filePath the path to the file which should be imported
-     * @param encoding the encoding used to decode the file
      */
-    public ParserResult importDatabase(Path filePath, Charset encoding) throws IOException {
-        try (BufferedReader bufferedReader = getReader(filePath, encoding)) {
+    public ParserResult importDatabase(Path filePath) throws IOException {
+        try (InputStream inputStream = Files.newInputStream(filePath, StandardOpenOption.READ)) {
+            BufferedInputStream bufferedInputStream = new BufferedInputStream(inputStream);
+
+            Charset charset = getCharset(bufferedInputStream);
+
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(bufferedInputStream, charset));
             ParserResult parserResult = importDatabase(bufferedReader);
-            parserResult.getMetaData().setEncoding(encoding);
+
+            // store the detected encoding
+            parserResult.getMetaData().setEncoding(charset);
+
             parserResult.setPath(filePath);
 
             // Make sure the mode is always set
@@ -95,6 +102,24 @@ public abstract class Importer implements Comparable<Importer> {
             }
             return parserResult;
         }
+    }
+
+    private static Charset getCharset(BufferedInputStream bufferedInputStream) {
+        Charset charset = StandardCharsets.UTF_8;
+
+        // This reads the first 8000 bytes only, thus the default size of 8192 of the bufferedInputStream is OK.
+        // See https://github.com/unicode-org/icu/blob/06ef8867f35befee7340e35082fefc9d3561d230/icu4j/main/classes/core/src/com/ibm/icu/text/CharsetDetector.java#L125 for details
+        CharsetDetector charsetDetector = new CharsetDetector();
+        try {
+            charsetDetector.setText(bufferedInputStream);
+            CharsetMatch charsetMatch = charsetDetector.detect();
+            if (charsetMatch != null) {
+                charset = Charset.forName(charsetMatch.getName());
+            }
+        } catch (IOException e) {
+            // we use the default charset
+        }
+        return charset;
     }
 
     /**
@@ -114,18 +139,16 @@ public abstract class Importer implements Comparable<Importer> {
         }
     }
 
-    protected static BufferedReader getUTF8Reader(Path filePath) throws IOException {
-        return getReader(filePath, StandardCharsets.UTF_8);
-    }
-
-    protected static BufferedReader getUTF16Reader(Path filePath) throws IOException {
-        return getReader(filePath, StandardCharsets.UTF_16);
-    }
-
-    public static BufferedReader getReader(Path filePath, Charset encoding)
-            throws IOException {
+    public static BufferedReader getReader(Path filePath) throws IOException {
         InputStream stream = Files.newInputStream(filePath, StandardOpenOption.READ);
-        return new BufferedReader(new InputStreamReader(stream, encoding));
+        return getReader(stream);
+    }
+
+    public static BufferedReader getReader(InputStream stream) throws IOException {
+        BufferedInputStream bufferedInputStream = new BufferedInputStream(stream);
+        Charset charset = getCharset(bufferedInputStream);
+        InputStreamReader reader = new InputStreamReader(stream, charset);
+        return new BufferedReader(reader);
     }
 
     /**

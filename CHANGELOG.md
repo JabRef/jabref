@@ -18,6 +18,9 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We moved the search box in preview preferences closer to the available citation styles list. [#8370](https://github.com/JabRef/jabref/pull/8370)
 - Changing the preference to show the preview panel as a separate tab now has effect without restarting JabRef. [#8370](https://github.com/JabRef/jabref/pull/8370)
 - We enabled switching themes in JabRef without the need to restart JabRef. [#7335](https://github.com/JabRef/jabref/pull/7335)
+- When exporting entries, the encoding is always UTF-8
+- When embedding BibTeX data into a PDF, the encoding is always UTF-8
+- JabRef automatically detects the encoding of a `.bib` file and does not need the `% Encoding:` header anymore. [#8417](https://github.com/JabRef/jabref/issues/8417)
 
 ### Fixed
 
@@ -30,6 +33,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixed an issue where someone could add a duplicate field in the customize entry type dialog. [#8194](https://github.com/JabRef/jabref/issues/8194)
 - We fixed a typo in the library properties tab: "String constants". There, one can configure [BibTeX string constants](https://docs.jabref.org/advanced/strings).
 - We fixed an issue when writing a non-UTF-8 encoded file: The header is written again. [#8417](https://github.com/JabRef/jabref/issues/8417)
+- We fixed an issue when reading non-UTF-8 encoded. [#8417](https://github.com/JabRef/jabref/issues/8417)
 
 ### Removed
 

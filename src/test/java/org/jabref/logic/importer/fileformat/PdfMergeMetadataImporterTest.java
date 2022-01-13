@@ -53,14 +53,14 @@ class PdfMergeMetadataImporterTest {
     @Test
     void doesNotHandleEncryptedPdfs() throws Exception {
         Path file = Path.of(PdfMergeMetadataImporter.class.getResource("/pdfs/encrypted.pdf").toURI());
-        List<BibEntry> result = importer.importDatabase(file, StandardCharsets.UTF_8).getDatabase().getEntries();
+        List<BibEntry> result = importer.importDatabase(file).getDatabase().getEntries();
         assertEquals(Collections.emptyList(), result);
     }
 
     @Test
     void importWorksAsExpected() throws Exception {
         Path file = Path.of(PdfMergeMetadataImporterTest.class.getResource("mixedMetadata.pdf").toURI());
-        List<BibEntry> result = importer.importDatabase(file, StandardCharsets.UTF_8).getDatabase().getEntries();
+        List<BibEntry> result = importer.importDatabase(file).getDatabase().getEntries();
 
         // From DOI (contained in embedded bib file)
         BibEntry expected = new BibEntry(StandardEntryType.Book);

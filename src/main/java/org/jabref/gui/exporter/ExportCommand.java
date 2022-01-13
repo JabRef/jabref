@@ -118,10 +118,6 @@ public class ExportCommand extends SimpleCommand {
                 .wrap(() -> {
                     format.export(stateManager.getActiveDatabase().get(),
                             file,
-                            stateManager.getActiveDatabase().get()
-                                 .getMetaData()
-                                 .getEncoding()
-                                 .orElse(preferences.getGeneralPreferences().getDefaultEncoding()),
                             finEntries);
                     return null; // can not use BackgroundTask.wrap(Runnable) because Runnable.run() can't throw Exceptions
                 })

@@ -1,13 +1,10 @@
 package org.jabref.logic.importer.fileformat;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.PushbackReader;
 import java.io.Reader;
 import java.io.StringWriter;
-import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.Deque;
 import java.util.HashMap;
@@ -26,6 +23,7 @@ import org.jabref.logic.bibtex.FieldWriter;
 import org.jabref.logic.exporter.BibtexDatabaseWriter;
 import org.jabref.logic.exporter.SavePreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.ParserResult;
@@ -109,7 +107,12 @@ public class BibtexParser implements Parser {
 
     @Override
     public List<BibEntry> parseEntries(InputStream inputStream) throws ParseException {
-        BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
+        Reader reader;
+        try {
+             reader = Importer.getReader(inputStream);
+        } catch (IOException e) {
+            throw new ParseException(e);
+        }
         return parseEntries(reader);
     }
 
@@ -126,7 +129,7 @@ public class BibtexParser implements Parser {
     }
 
     /**
-     * Parses BibTeX data found when reading from reader. Ignores any encoding supplied in the file by "Encoding: myEncoding".
+     * Parses BibTeX data found when reading from reader.
      * <p>
      * The reader will be consumed.
      * <p>

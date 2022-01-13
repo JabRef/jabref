@@ -1,7 +1,6 @@
 package org.jabref.logic.exporter;
 
 import java.math.BigInteger;
-import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.util.Comparator;
 import java.util.List;
@@ -68,7 +67,7 @@ class ModsExporter extends Exporter {
     }
 
     @Override
-    public void export(final BibDatabaseContext databaseContext, final Path file, final Charset encoding, List<BibEntry> entries) throws SaveException {
+    public void export(final BibDatabaseContext databaseContext, final Path file, List<BibEntry> entries) throws SaveException {
         Objects.requireNonNull(databaseContext);
         Objects.requireNonNull(entries);
         if (entries.isEmpty()) { // Only export if entries exist

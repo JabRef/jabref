@@ -89,7 +89,6 @@ class CrawlerTest {
         when(savePreferences.getSaveOrder()).thenReturn(new SaveOrderConfig());
         when(savePreferences.takeMetadataSaveOrderInAccount()).thenReturn(true);
         when(savePreferences.getCitationKeyPatternPreferences()).thenReturn(citationKeyPatternPreferences);
-        when(generalPreferences.getDefaultEncoding()).thenReturn(Charset.defaultCharset());
         when(importFormatPreferences.getKeywordSeparator()).thenReturn(',');
         when(importFormatPreferences.getFieldContentFormatterPreferences()).thenReturn(new FieldContentFormatterPreferences());
         entryTypesManager = new BibEntryTypesManager();

@@ -66,7 +66,7 @@ public class ExporterTest {
     public void testExportingEmptyDatabaseYieldsEmptyFile(Exporter exportFormat, String name, @TempDir Path testFolder) throws Exception {
         Path tmpFile = testFolder.resolve("ARandomlyNamedFile");
         Files.createFile(tmpFile);
-        exportFormat.export(databaseContext, tmpFile, charset, entries);
+        exportFormat.export(databaseContext, tmpFile, entries);
         assertEquals(Collections.emptyList(), Files.readAllLines(tmpFile));
     }
 
@@ -76,7 +76,7 @@ public class ExporterTest {
         assertThrows(NullPointerException.class, () -> {
             Path tmpFile = testFolder.resolve("ARandomlyNamedFile");
             Files.createFile(tmpFile);
-            exportFormat.export(null, tmpFile, charset, entries);
+            exportFormat.export(null, tmpFile, entries);
         });
     }
 
@@ -86,7 +86,7 @@ public class ExporterTest {
         assertThrows(NullPointerException.class, () -> {
             Path tmpFile = testFolder.resolve("ARandomlyNamedFile");
             Files.createFile(tmpFile);
-            exportFormat.export(databaseContext, tmpFile, charset, null);
+            exportFormat.export(databaseContext, tmpFile, Collections.emptyList());
         });
     }
 }

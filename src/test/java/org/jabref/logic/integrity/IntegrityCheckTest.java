@@ -140,7 +140,6 @@ class IntegrityCheckTest {
         new IntegrityCheck(context,
                 mock(FilePreferences.class),
                 createCitationKeyPatternPreferences(),
-                StandardCharsets.UTF_8,
                 JournalAbbreviationLoader.loadBuiltInRepository(), false)
                 .check();
 
@@ -174,7 +173,6 @@ class IntegrityCheckTest {
         List<IntegrityMessage> messages = new IntegrityCheck(context,
                 mock(FilePreferences.class),
                 createCitationKeyPatternPreferences(),
-                StandardCharsets.UTF_8,
                 JournalAbbreviationLoader.loadBuiltInRepository(), false)
                 .check();
         assertNotEquals(Collections.emptyList(), messages);
@@ -186,7 +184,6 @@ class IntegrityCheckTest {
         List<IntegrityMessage> messages = new IntegrityCheck(context,
                 filePreferencesMock,
                 createCitationKeyPatternPreferences(),
-                StandardCharsets.UTF_8,
                 JournalAbbreviationLoader.loadBuiltInRepository(), false
         ).check();
         assertEquals(Collections.emptyList(), messages);

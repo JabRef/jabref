@@ -137,7 +137,7 @@ public class WebFetchers {
     /**
      * @return sorted set containing entry based fetchers
      */
-    public static SortedSet<EntryBasedFetcher> getEntryBasedFetchers(ImporterPreferences importerPreferences, ImportFormatPreferences importFormatPreferences, FilePreferences filePreferences, BibDatabaseContext databaseContext, Charset defaultEncoding) {
+    public static SortedSet<EntryBasedFetcher> getEntryBasedFetchers(ImporterPreferences importerPreferences, ImportFormatPreferences importFormatPreferences, FilePreferences filePreferences, BibDatabaseContext databaseContext) {
         SortedSet<EntryBasedFetcher> set = new TreeSet<>(Comparator.comparing(WebFetcher::getName));
         set.add(new AstrophysicsDataSystem(importFormatPreferences));
         set.add(new DoiFetcher(importFormatPreferences));
@@ -145,7 +145,7 @@ public class WebFetchers {
         set.add(new MathSciNet(importFormatPreferences));
         set.add(new CrossRef());
         set.add(new ZbMATH(importFormatPreferences));
-        set.add(new PdfMergeMetadataImporter.EntryBasedFetcherWrapper(importerPreferences, importFormatPreferences, filePreferences, databaseContext, defaultEncoding));
+        set.add(new PdfMergeMetadataImporter.EntryBasedFetcherWrapper(importerPreferences, importFormatPreferences, filePreferences, databaseContext));
         return set;
     }
 

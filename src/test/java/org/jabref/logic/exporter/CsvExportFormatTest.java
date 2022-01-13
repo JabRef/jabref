@@ -1,8 +1,6 @@
 package org.jabref.logic.exporter;
 
 import java.io.File;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -29,7 +27,6 @@ import static org.mockito.Mockito.mock;
 public class CsvExportFormatTest {
 
     public BibDatabaseContext databaseContext;
-    public Charset charset;
     private Exporter exportFormat;
 
     @BeforeEach
@@ -44,7 +41,6 @@ public class CsvExportFormatTest {
         exportFormat = exporterFactory.getExporterByName("oocsv").get();
 
         databaseContext = new BibDatabaseContext();
-        charset = StandardCharsets.UTF_8;
     }
 
     @AfterEach
@@ -60,7 +56,7 @@ public class CsvExportFormatTest {
         entry.setField(StandardField.AUTHOR, "Someone, Van Something");
         List<BibEntry> entries = Arrays.asList(entry);
 
-        exportFormat.export(databaseContext, path, charset, entries);
+        exportFormat.export(databaseContext, path, entries);
 
         List<String> lines = Files.readAllLines(path);
         assertEquals(2, lines.size());
@@ -77,7 +73,7 @@ public class CsvExportFormatTest {
         entry.setField(StandardField.AUTHOR, "von Neumann, John and Smith, John and Black Brown, Peter");
         List<BibEntry> entries = Arrays.asList(entry);
 
-        exportFormat.export(databaseContext, path, charset, entries);
+        exportFormat.export(databaseContext, path, entries);
 
         List<String> lines = Files.readAllLines(path);
         assertEquals(2, lines.size());
@@ -94,7 +90,7 @@ public class CsvExportFormatTest {
         entry.setField(StandardField.EDITOR, "Someone, Van Something");
         List<BibEntry> entries = Arrays.asList(entry);
 
-        exportFormat.export(databaseContext, tmpFile.toPath(), charset, entries);
+        exportFormat.export(databaseContext, tmpFile.toPath(), entries);
 
         List<String> lines = Files.readAllLines(tmpFile.toPath());
         assertEquals(2, lines.size());
@@ -111,7 +107,7 @@ public class CsvExportFormatTest {
         entry.setField(StandardField.EDITOR, "von Neumann, John and Smith, John and Black Brown, Peter");
         List<BibEntry> entries = Arrays.asList(entry);
 
-        exportFormat.export(databaseContext, tmpFile.toPath(), charset, entries);
+        exportFormat.export(databaseContext, tmpFile.toPath(), entries);
 
         List<String> lines = Files.readAllLines(tmpFile.toPath());
         assertEquals(2, lines.size());

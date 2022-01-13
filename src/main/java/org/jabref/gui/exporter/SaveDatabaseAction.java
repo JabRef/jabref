@@ -2,6 +2,7 @@ package org.jabref.gui.exporter;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.charset.UnsupportedCharsetException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -92,7 +93,7 @@ public class SaveDatabaseAction {
     public void saveSelectedAsPlain() {
         askForSavePath().ifPresent(path -> {
             try {
-                saveDatabase(path, true, preferences.getGeneralPreferences().getDefaultEncoding(), SavePreferences.DatabaseSaveType.PLAIN_BIBTEX);
+                saveDatabase(path, true, StandardCharsets.UTF_8, SavePreferences.DatabaseSaveType.PLAIN_BIBTEX);
                 frame.getFileHistory().newFile(path);
                 dialogService.notify(Localization.lang("Saved selected to '%0'.", path.toString()));
             } catch (SaveException ex) {
@@ -203,7 +204,7 @@ public class SaveDatabaseAction {
             Charset encoding = libraryTab.getBibDatabaseContext()
                                          .getMetaData()
                                          .getEncoding()
-                                         .orElse(preferences.getGeneralPreferences().getDefaultEncoding());
+                                         .orElse(StandardCharsets.UTF_8);
             // Make sure to remember which encoding we used.
             libraryTab.getBibDatabaseContext().getMetaData().setEncoding(encoding, ChangePropagation.DO_NOT_POST_EVENT);
 

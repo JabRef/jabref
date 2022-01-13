@@ -2,8 +2,6 @@ package org.jabref.logic.importer.fileformat;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
@@ -42,13 +40,13 @@ public class BibtexImporterTest {
     @Test
     public void testIsRecognizedFormat() throws IOException, URISyntaxException {
         Path file = Path.of(BibtexImporterTest.class.getResource("BibtexImporter.examples.bib").toURI());
-        assertTrue(importer.isRecognizedFormat(file, StandardCharsets.UTF_8));
+        assertTrue(importer.isRecognizedFormat(file));
     }
 
     @Test
     public void testImportEntries() throws IOException, URISyntaxException {
         Path file = Path.of(BibtexImporterTest.class.getResource("BibtexImporter.examples.bib").toURI());
-        List<BibEntry> bibEntries = importer.importDatabase(file, StandardCharsets.UTF_8).getDatabase().getEntries();
+        List<BibEntry> bibEntries = importer.importDatabase(file).getDatabase().getEntries();
 
         assertEquals(4, bibEntries.size());
 
@@ -125,23 +123,21 @@ public class BibtexImporterTest {
     @Test
     public void testRecognizesDatabaseID() throws Exception {
         Path file = Path.of(BibtexImporterTest.class.getResource("AutosavedSharedDatabase.bib").toURI());
-        String sharedDatabaseID = importer.importDatabase(file, StandardCharsets.UTF_8).getDatabase().getSharedDatabaseID().get();
+        String sharedDatabaseID = importer.importDatabase(file).getDatabase().getSharedDatabaseID().get();
         assertEquals("13ceoc8dm42f5g1iitao3dj2ap", sharedDatabaseID);
     }
 
     @Test
     public void testParsingOfWindows1252EncodedFileReturnsCorrectHeader() throws Exception {
         ParserResult parserResult = importer.importDatabase(
-                Path.of(BibtexImporterTest.class.getResource("encoding-windows-1252-with-header.bib").toURI()),
-                StandardCharsets.UTF_8);
+                Path.of(BibtexImporterTest.class.getResource("encoding-windows-1252-with-header.bib").toURI()));
         assertEquals(Optional.of(Charset.forName("Windows-1252")), parserResult.getMetaData().getEncoding());
     }
 
     @Test
     public void testParsingOfWindows1252EncodedFileReadsDegreeCharacterCorrectly() throws Exception {
         ParserResult parserResult = importer.importDatabase(
-                Path.of(BibtexImporterTest.class.getResource("encoding-windows-1252-with-header.bib").toURI()),
-                StandardCharsets.UTF_8);
+                Path.of(BibtexImporterTest.class.getResource("encoding-windows-1252-with-header.bib").toURI()));
         List<BibEntry> bibEntries = parserResult.getDatabase().getEntries();
         assertEquals(
                 List.of(new BibEntry(StandardEntryType.Article).withField(StandardField.ABSTRACT, "25° C")),
