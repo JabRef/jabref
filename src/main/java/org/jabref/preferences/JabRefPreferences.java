@@ -2178,22 +2178,6 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     @Override
-    public FileHistory getFileHistory() {
-        return new FileHistory(getStringList(RECENT_DATABASES).stream().map(Path::of).collect(Collectors.toList()));
-    }
-
-    @Override
-    public void storeFileHistory(FileHistory history) {
-        if (!history.isEmpty()) {
-            putStringList(RECENT_DATABASES, history.getHistory()
-                                                   .stream()
-                                                   .map(Path::toAbsolutePath)
-                                                   .map(Path::toString)
-                                                   .collect(Collectors.toList()));
-        }
-    }
-
-    @Override
     public FilePreferences getFilePreferences() {
         if (Objects.nonNull(filePreferences)) {
             return filePreferences;
@@ -2562,6 +2546,7 @@ public class JabRefPreferences implements PreferencesService {
                 getBoolean(WINDOW_MAXIMISED),
                 getStringList(LAST_EDITED),
                 Path.of(get(LAST_FOCUSED)),
+                getFileHistory(),
                 getDouble(SIDE_PANE_WIDTH));
 
         EasyBind.listen(guiPreferences.positionXProperty(), (obs, oldValue, newValue) -> putDouble(POS_X, newValue.doubleValue()));
@@ -2578,9 +2563,26 @@ public class JabRefPreferences implements PreferencesService {
                 remove(LAST_EDITED);
             }
         });
+        guiPreferences.getFileHistory().getHistory().addListener((InvalidationListener) change -> storeFileHistory(guiPreferences.getFileHistory()));
         EasyBind.listen(guiPreferences.sidePaneWidthProperty(), (obs, oldValue, newValue) -> putDouble(SIDE_PANE_WIDTH, newValue.doubleValue()));
 
         return guiPreferences;
+    }
+
+    private FileHistory getFileHistory() {
+        return new FileHistory(getStringList(RECENT_DATABASES).stream()
+                                                              .map(Path::of)
+                                                              .collect(Collectors.toList()));
+    }
+
+    private void storeFileHistory(FileHistory history) {
+        if (!history.isEmpty()) {
+            putStringList(RECENT_DATABASES, history.getHistory()
+                                                   .stream()
+                                                   .map(Path::toAbsolutePath)
+                                                   .map(Path::toString)
+                                                   .collect(Collectors.toList()));
+        }
     }
 
     @Override

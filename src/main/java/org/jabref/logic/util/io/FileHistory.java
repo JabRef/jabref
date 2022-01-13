@@ -1,19 +1,20 @@
 package org.jabref.logic.util.io;
 
 import java.nio.file.Path;
-import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
+
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 
 public class FileHistory {
 
     private static final int HISTORY_SIZE = 8;
 
-    private final LinkedList<Path> history;
+    private final ObservableList<Path> history;
 
     public FileHistory(List<Path> files) {
-        history = new LinkedList<>(Objects.requireNonNull(files));
+        history = FXCollections.observableList(Objects.requireNonNull(files));
     }
 
     public int size() {
@@ -29,9 +30,9 @@ public class FileHistory {
      */
     public void newFile(Path file) {
         removeItem(file);
-        history.addFirst(file);
+        history.add(0, file);
         while (size() > HISTORY_SIZE) {
-            history.removeLast();
+            history.remove(HISTORY_SIZE);
         }
     }
 
@@ -43,7 +44,7 @@ public class FileHistory {
         history.remove(file);
     }
 
-    public List<Path> getHistory() {
-        return Collections.unmodifiableList(history);
+    public ObservableList<Path> getHistory() {
+        return FXCollections.unmodifiableObservableList(history);
     }
 }

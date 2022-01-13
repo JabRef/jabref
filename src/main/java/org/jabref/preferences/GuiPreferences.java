@@ -12,6 +12,8 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
+import org.jabref.logic.util.io.FileHistory;
+
 public class GuiPreferences {
     private final DoubleProperty positionX;
     private final DoubleProperty positionY;
@@ -22,6 +24,8 @@ public class GuiPreferences {
 
     private final ObservableList<String> lastFilesOpened;
     private final ObjectProperty<Path> lastFocusedFile;
+    private final FileHistory fileHistory;
+
     private final DoubleProperty sidePaneWidth;
 
     public GuiPreferences(double positionX,
@@ -31,6 +35,7 @@ public class GuiPreferences {
                           boolean windowMaximised,
                           List<String> lastFilesOpened,
                           Path lastFocusedFile,
+                          FileHistory fileHistory,
                           double sidePaneWidth) {
         this.positionX = new SimpleDoubleProperty(positionX);
         this.positionY = new SimpleDoubleProperty(positionY);
@@ -40,6 +45,7 @@ public class GuiPreferences {
         this.lastFilesOpened = FXCollections.observableArrayList(lastFilesOpened);
         this.lastFocusedFile = new SimpleObjectProperty<>(lastFocusedFile);
         this.sidePaneWidth = new SimpleDoubleProperty(sidePaneWidth);
+        this.fileHistory = fileHistory;
     }
 
     public double getPositionX() {
@@ -132,5 +138,9 @@ public class GuiPreferences {
 
     public void setSidePaneWidth(double sidePaneWidth) {
         this.sidePaneWidth.set(sidePaneWidth);
+    }
+
+    public FileHistory getFileHistory() {
+        return fileHistory;
     }
 }

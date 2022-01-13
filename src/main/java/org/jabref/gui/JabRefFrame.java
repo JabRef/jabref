@@ -364,7 +364,6 @@ public class JabRefFrame extends BorderPane {
             }
         }
 
-        fileHistory.storeHistory();
         prefs.flush();
     }
 

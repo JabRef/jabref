@@ -41,7 +41,6 @@ import org.jabref.logic.preferences.TimestampPreferences;
 import org.jabref.logic.protectedterms.ProtectedTermsPreferences;
 import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.util.io.AutoLinkPreferences;
-import org.jabref.logic.util.io.FileHistory;
 import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntryType;
@@ -64,10 +63,6 @@ public interface PreferencesService {
     FilePreferences getFilePreferences();
 
     FieldWriterPreferences getFieldWriterPreferences();
-
-    FileHistory getFileHistory();
-
-    void storeFileHistory(FileHistory history);
 
     FieldContentFormatterPreferences getFieldContentParserPreferences();
 
