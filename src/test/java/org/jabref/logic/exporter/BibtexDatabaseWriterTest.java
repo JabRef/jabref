@@ -381,9 +381,8 @@ public class BibtexDatabaseWriterTest {
 
     @Test
     void roundtripWin1252HeaderKept(@TempDir Path bibFolder) throws Exception {
-        when(generalPreferences.getDefaultEncoding()).thenReturn(StandardCharsets.UTF_8);
         Path testFile = Path.of(BibtexImporterTest.class.getResource("encoding-windows-1252-with-header.bib").toURI());
-        ParserResult result = new BibtexImporter(importFormatPreferences, fileMonitor).importDatabase(testFile, StandardCharsets.UTF_8);
+        ParserResult result = new BibtexImporter(importFormatPreferences, fileMonitor).importDatabase(testFile);
         BibDatabaseContext context = new BibDatabaseContext(result.getDatabase(), result.getMetaData());
 
         Path pathToFile = bibFolder.resolve("JabRef.bib");
