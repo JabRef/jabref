@@ -1,6 +1,6 @@
 package org.jabref.logic.exporter;
 
-import java.io.FileWriter;
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
@@ -54,6 +54,7 @@ import org.jabref.preferences.GeneralPreferences;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -412,24 +413,22 @@ public class BibtexDatabaseWriterTest {
     }
 
     @Test
-    void roundtripWin1252HeaderKept() throws Exception {
+    void roundtripWin1252HeaderKept(@TempDir Path bibFolder) throws Exception {
         when(generalPreferences.getDefaultEncoding()).thenReturn(StandardCharsets.UTF_8);
         Path testFile = Path.of(BibtexImporterTest.class.getResource("encoding-windows-1252-with-header.bib").toURI());
-        ParserResult result = new BibtexImporter(importFormatPreferences, fileMonitor).importDatabase(
-                testFile,
-                StandardCharsets.UTF_8);
+        ParserResult result = new BibtexImporter(importFormatPreferences, fileMonitor).importDatabase(testFile, StandardCharsets.UTF_8);
         BibDatabaseContext context = new BibDatabaseContext(result.getDatabase(), result.getMetaData());
 
-        Path file = Files.createTempFile("JabRef", ".bib");
-        file.toFile().deleteOnExit();
+        Path pathToFile = bibFolder.resolve("JabRef.bib");
+        Path file = Files.createFile(pathToFile);
+        Charset charset = Charset.forName("windows-1252");
 
-        try (FileWriter fileWriter = new FileWriter(file.toFile())) {
+        try (BufferedWriter fileWriter = Files.newBufferedWriter(file, charset)) {
             BibWriter bibWriter = new BibWriter(fileWriter, context.getDatabase().getNewLineSeparator());
             BibtexDatabaseWriter databaseWriter = new BibtexDatabaseWriter(bibWriter, generalPreferences, savePreferences, entryTypesManager);
             databaseWriter.saveDatabase(context);
         }
 
-        Charset charset = Charset.forName("windows-1252");
         assertEquals(Files.readString(testFile, charset), Files.readString(file, charset));
     }
 
