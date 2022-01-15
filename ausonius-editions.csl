@@ -28,7 +28,7 @@
       <term name="accessed">consulté le</term>
       <term name="no date">sans date</term>
       <term name="no date" form="short">à paraître</term>
-      <term name="sub verbo">s.u.</term>
+      <term name="sub-verbo">s.u.</term>
       <term name="open-quote">“</term>
       <term name="close-quote">”</term>
       <term name="open-inner-quote">‘</term>
@@ -272,7 +272,7 @@
               <text variable="container-title" font-style="italic"/>
               <text variable="volume"/>
               <group delimiter=" ">
-                <text term="sub verbo" font-style="italic"/>
+                <text term="sub-verbo" font-style="italic"/>
                 <text macro="title"/>
               </group>
               <text macro="pages"/>
