@@ -34,7 +34,7 @@ If you want to improve an existing CSL style, make sure that you start from the 
 The most recent version of each CSL style can be found in the [`master` branch of this repository](https://github.com/citation-style-language/styles).
 
 If you want to create a new style, find an existing style that closely matches what you need using the previews in the style repository. 
-Typically the best way to find a most similar style is the ["seach by example"](http://editor.citationstyles.org/searchByExample/) function of the CSL Visual Editor. 
+Typically the best way to find a most similar style is the ["search by example"](http://editor.citationstyles.org/searchByExample/) function of the CSL Visual Editor. 
 
 
 ### 2 - Edit the Style

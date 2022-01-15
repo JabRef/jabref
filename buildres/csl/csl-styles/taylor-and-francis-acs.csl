@@ -14,7 +14,7 @@
     <category field="chemistry"/>
     <category field="generic-base"/>
     <summary>The American Chemical Society style for Taylor &amp; Francis journals.</summary>
-    <updated>2019-06-13T12:53:43+00:00</updated>
+    <updated>2022-01-14T12:53:43+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="en">
@@ -125,7 +125,7 @@
     <sort>
       <key variable="citation-number"/>
     </sort>
-    <layout vertical-align="baseline" delimiter=", " prefix="[" suffix="]">
+    <layout vertical-align="sup" delimiter=", " prefix="[" suffix="]">
       <text variable="citation-number"/>
     </layout>
   </citation>
@@ -232,7 +232,7 @@
             </group>
           </group>
         </else-if>
-        <else-if type="webpage">
+        <else-if type="webpage post post-weblog" match="any">
           <group delimiter=" ">
             <text variable="title"/>
             <text variable="URL"/>

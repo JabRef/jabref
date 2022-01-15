@@ -1029,7 +1029,7 @@
         <text variable="collection-number" prefix=" "/>
       </group>
       <group delimiter=" ">
-        <text term="sub verbo" form="short"/>
+        <text term="sub-verbo" form="short"/>
         <text variable="title" text-case="title" quotes="true"/>
       </group>
     </group>
