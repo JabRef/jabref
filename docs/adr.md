@@ -21,10 +21,11 @@ Architectural decisions for JabRef:
 * [ADR-0016](https://github.com/JabRef/jabref/tree/main/docs/adr/0016-mutable-preferences-objects.md) - Mutable preferences objects
 * [ADR-0017](https://github.com/JabRef/jabref/tree/main/docs/adr/0017-allow-model-access-logic.md) - Allow org.jabref.model to access org.jabref.logic
 * [ADR-0018](https://github.com/JabRef/jabref/blob/main/docs/adr/0018-use-regular-expression-to-split-multiple-sentence-titles.md) - Use regular expression to split multiple-sentence titles
-* [ADR-0019](https://github.com/JabRef/jabref/blob/main/docs/adr/0019-implement-special-fields-as-seperate-fields.md) - Implement special fields as seperate fields
+* [ADR-0019](https://github.com/JabRef/jabref/blob/main/docs/adr/0019-implement-special-fields-as-seperate-fields.md) - Implement special fields as separate fields
 * [ADR-0020](https://github.com/JabRef/jabref/blob/main/docs/adr/0020-use-Jackson-to-parse-study-yml.md) - Use Jackson to parse study.yml
 * [ADR-0021](https://github.com/JabRef/jabref/blob/main/docs/adr/0021-keep-study-as-a-dto.md) - Keep study as a DTO
 * [ADR-0022](https://github.com/JabRef/jabref/blob/main/docs/adr/0022-remove-stop-words-during-query-transformation.md) - Remove stop words during query transformation
 * [ADR-0023](https://github.com/JabRef/jabref/blob/main/docs/adr/0023-localized-preferences.md) - Localized Preferences
+* [ADR-0024](https://github.com/JabRef/jabref/blob/main/docs/adr/0024-use-#-as-indicator-for-BibTeX-string-constants.md) - Use `#` as indicator for BibTeX string constants
 
 For new ADRs, please use [template.md](https://github.com/JabRef/jabref/tree/main/docs/adr/template.md) as basis. More information on the used format is available at [https://adr.github.io/madr/](https://adr.github.io/madr/). General information about architectural decision records is available at [https://adr.github.io/](https://adr.github.io/). Then add them to the above list.

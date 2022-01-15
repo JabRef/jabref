@@ -21,9 +21,9 @@ public class FileTab extends AbstractPreferenceTabView<FileTabViewModel> impleme
 
     @FXML private CheckBox openLastStartup;
     @FXML private TextField noWrapFiles;
-    @FXML private RadioButton resolveStringsBibTex;
-    @FXML private RadioButton resolveStringsAll;
-    @FXML private TextField resolveStringsExcept;
+    @FXML private RadioButton doNotResolveStrings;
+    @FXML private RadioButton resolveStrings;
+    @FXML private TextField resolveStringsForFields;
     @FXML private CheckBox alwaysReformatBib;
 
     @FXML private CheckBox autosaveLocalLibraries;
@@ -40,12 +40,13 @@ public class FileTab extends AbstractPreferenceTabView<FileTabViewModel> impleme
 
         openLastStartup.selectedProperty().bindBidirectional(viewModel.openLastStartupProperty());
         noWrapFiles.textProperty().bindBidirectional(viewModel.noWrapFilesProperty());
-        resolveStringsBibTex.selectedProperty().bindBidirectional(viewModel.resolveStringsBibTexProperty());
-        resolveStringsAll.selectedProperty().bindBidirectional(viewModel.resolveStringsAllProperty());
-        resolveStringsExcept.textProperty().bindBidirectional(viewModel.resolveStringsExceptProperty());
-        resolveStringsExcept.disableProperty().bind(resolveStringsAll.selectedProperty().not());
-        alwaysReformatBib.selectedProperty().bindBidirectional(viewModel.alwaysReformatBibProperty());
 
+        doNotResolveStrings.selectedProperty().bindBidirectional(viewModel.doNotResolveStringsProperty());
+        resolveStrings.selectedProperty().bindBidirectional(viewModel.resolveStringsProperty());
+        resolveStringsForFields.textProperty().bindBidirectional(viewModel.resolveStringsForFieldsProperty());
+        resolveStringsForFields.disableProperty().bind(doNotResolveStrings.selectedProperty());
+
+        alwaysReformatBib.selectedProperty().bindBidirectional(viewModel.alwaysReformatBibProperty());
         autosaveLocalLibraries.selectedProperty().bindBidirectional(viewModel.autosaveLocalLibrariesProperty());
 
         ActionFactory actionFactory = new ActionFactory(Globals.getKeyPrefs());

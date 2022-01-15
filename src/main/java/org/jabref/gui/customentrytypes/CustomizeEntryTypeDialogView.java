@@ -96,7 +96,7 @@ public class CustomizeEntryTypeDialogView extends BaseDialog<Void> {
         // As the state manager gets injected it's not available in the constructor
         this.localDragboard = stateManager.getLocalDragboard();
 
-        viewModel = new CustomEntryTypeDialogViewModel(mode, preferencesService, entryTypesManager);
+        viewModel = new CustomEntryTypeDialogViewModel(mode, preferencesService, entryTypesManager, dialogService);
         setupTable();
 
         addNewEntryTypeButton.disableProperty().bind(viewModel.entryTypeValidationStatus().validProperty().not());

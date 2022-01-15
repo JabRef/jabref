@@ -22,6 +22,7 @@ import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.jabref.logic.bibtex.FieldContentFormatter;
+import org.jabref.logic.bibtex.FieldWriter;
 import org.jabref.logic.exporter.BibtexDatabaseWriter;
 import org.jabref.logic.exporter.SavePreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
@@ -641,6 +642,9 @@ public class BibtexParser implements Parser {
                 String number = parseTextToken();
                 value.append(number);
             } else if (character == '#') {
+                // Here, we hit the case of BibTeX string concatenation. E.g., "author = Kopp # Kolb".
+                // We did NOT hit org.jabref.logic.bibtex.FieldWriter#BIBTEX_STRING_START_END_SYMBOL
+                // See also ADR-0024
                 consume('#');
             } else {
                 String textToken = parseTextToken();
@@ -648,7 +652,7 @@ public class BibtexParser implements Parser {
                     throw new IOException("Error in line " + line + " or above: "
                             + "Empty text token.\nThis could be caused " + "by a missing comma between two fields.");
                 }
-                value.append('#').append(textToken).append('#');
+                value.append(FieldWriter.BIBTEX_STRING_START_END_SYMBOL).append(textToken).append(FieldWriter.BIBTEX_STRING_START_END_SYMBOL);
             }
             skipWhitespace();
         }
