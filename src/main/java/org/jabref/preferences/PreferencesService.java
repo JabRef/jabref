@@ -289,10 +289,6 @@ public interface PreferencesService {
 
     MrDlibPreferences getMrDlibPreferences();
 
-    String getIdBasedFetcherForEntryGenerator();
-
-    void storeIdBasedFetcherForEntryGenerator(String fetcherName);
-
     ProtectedTermsPreferences getProtectedTermsPreferences();
 
 }

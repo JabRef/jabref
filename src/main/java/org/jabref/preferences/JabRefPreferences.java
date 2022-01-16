@@ -2545,6 +2545,7 @@ public class JabRefPreferences implements PreferencesService {
                 getStringList(LAST_EDITED),
                 Path.of(get(LAST_FOCUSED)),
                 getFileHistory(),
+                get(ID_ENTRY_GENERATOR),
                 getDouble(SIDE_PANE_WIDTH));
 
         EasyBind.listen(guiPreferences.positionXProperty(), (obs, oldValue, newValue) -> putDouble(POS_X, newValue.doubleValue()));
@@ -2562,6 +2563,7 @@ public class JabRefPreferences implements PreferencesService {
             }
         });
         guiPreferences.getFileHistory().getHistory().addListener((InvalidationListener) change -> storeFileHistory(guiPreferences.getFileHistory()));
+        EasyBind.listen(guiPreferences.lastSelectedIdBasedFetcherProperty(), (obs, oldValue, newValue) -> put(ID_ENTRY_GENERATOR, newValue));
         EasyBind.listen(guiPreferences.sidePaneWidthProperty(), (obs, oldValue, newValue) -> putDouble(SIDE_PANE_WIDTH, newValue.doubleValue()));
 
         return guiPreferences;
@@ -2772,16 +2774,6 @@ public class JabRefPreferences implements PreferencesService {
         EasyBind.listen(mrDlibPreferences.sendTimezoneProperty(), (obs, oldValue, newValue) -> putBoolean(SEND_TIMEZONE_DATA, newValue));
 
         return mrDlibPreferences;
-    }
-
-    @Override
-    public String getIdBasedFetcherForEntryGenerator() {
-        return get(ID_ENTRY_GENERATOR);
-    }
-
-    @Override
-    public void storeIdBasedFetcherForEntryGenerator(String fetcherName) {
-        put(ID_ENTRY_GENERATOR, fetcherName);
     }
 
     @Override

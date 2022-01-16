@@ -9,6 +9,8 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
@@ -26,6 +28,8 @@ public class GuiPreferences {
     private final ObjectProperty<Path> lastFocusedFile;
     private final FileHistory fileHistory;
 
+    private final StringProperty lastSelectedIdBasedFetcher;
+
     private final DoubleProperty sidePaneWidth;
 
     public GuiPreferences(double positionX,
@@ -36,6 +40,7 @@ public class GuiPreferences {
                           List<String> lastFilesOpened,
                           Path lastFocusedFile,
                           FileHistory fileHistory,
+                          String lastSelectedIdBasedFetcher,
                           double sidePaneWidth) {
         this.positionX = new SimpleDoubleProperty(positionX);
         this.positionY = new SimpleDoubleProperty(positionY);
@@ -44,6 +49,7 @@ public class GuiPreferences {
         this.windowMaximised = new SimpleBooleanProperty(windowMaximised);
         this.lastFilesOpened = FXCollections.observableArrayList(lastFilesOpened);
         this.lastFocusedFile = new SimpleObjectProperty<>(lastFocusedFile);
+        this.lastSelectedIdBasedFetcher = new SimpleStringProperty(lastSelectedIdBasedFetcher);
         this.sidePaneWidth = new SimpleDoubleProperty(sidePaneWidth);
         this.fileHistory = fileHistory;
     }
@@ -142,5 +148,17 @@ public class GuiPreferences {
 
     public FileHistory getFileHistory() {
         return fileHistory;
+    }
+
+    public String getLastSelectedIdBasedFetcher() {
+        return lastSelectedIdBasedFetcher.get();
+    }
+
+    public StringProperty lastSelectedIdBasedFetcherProperty() {
+        return lastSelectedIdBasedFetcher;
+    }
+
+    public void setLastSelectedIdBasedFetcher(String lastSelectedIdBasedFetcher) {
+        this.lastSelectedIdBasedFetcher.set(lastSelectedIdBasedFetcher);
     }
 }
