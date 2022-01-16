@@ -10,6 +10,8 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
+import org.jabref.model.strings.StringUtil;
+
 public class FilePreferences {
 
     public static final String[] DEFAULT_FILENAME_PATTERNS = new String[] {"[bibtexkey]", "[bibtexkey] - [title]"};
@@ -43,7 +45,7 @@ public class FilePreferences {
     }
 
     public Optional<Path> getFileDirectory() {
-        if (storeFilesRelativeToBibFile.getValue()) {
+        if (StringUtil.isBlank(mainFileDirectory.getValue())) {
             return Optional.empty();
         } else {
             return Optional.of(Path.of(mainFileDirectory.getValue()));
