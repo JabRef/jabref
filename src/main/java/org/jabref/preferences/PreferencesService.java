@@ -283,10 +283,6 @@ public interface PreferencesService {
 
     void storeExternalFileTypes(String externalFileTypes);
 
-    Optional<String> getMergeDiffMode();
-
-    void storeMergeDiffMode(String diffMode);
-
     MrDlibPreferences getMrDlibPreferences();
 
     ProtectedTermsPreferences getProtectedTermsPreferences();

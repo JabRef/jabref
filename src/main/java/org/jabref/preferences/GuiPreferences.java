@@ -14,6 +14,7 @@ import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
+import org.jabref.gui.mergeentries.DiffMode;
 import org.jabref.logic.util.io.FileHistory;
 
 public class GuiPreferences {
@@ -30,6 +31,8 @@ public class GuiPreferences {
 
     private final StringProperty lastSelectedIdBasedFetcher;
 
+    private final ObjectProperty<DiffMode> mergeDiffMode;
+
     private final DoubleProperty sidePaneWidth;
 
     public GuiPreferences(double positionX,
@@ -41,6 +44,7 @@ public class GuiPreferences {
                           Path lastFocusedFile,
                           FileHistory fileHistory,
                           String lastSelectedIdBasedFetcher,
+                          DiffMode mergeDiffMode,
                           double sidePaneWidth) {
         this.positionX = new SimpleDoubleProperty(positionX);
         this.positionY = new SimpleDoubleProperty(positionY);
@@ -50,6 +54,7 @@ public class GuiPreferences {
         this.lastFilesOpened = FXCollections.observableArrayList(lastFilesOpened);
         this.lastFocusedFile = new SimpleObjectProperty<>(lastFocusedFile);
         this.lastSelectedIdBasedFetcher = new SimpleStringProperty(lastSelectedIdBasedFetcher);
+        this.mergeDiffMode = new SimpleObjectProperty<>(mergeDiffMode);
         this.sidePaneWidth = new SimpleDoubleProperty(sidePaneWidth);
         this.fileHistory = fileHistory;
     }
@@ -134,18 +139,6 @@ public class GuiPreferences {
         this.lastFocusedFile.set(lastFocusedFile);
     }
 
-    public double getSidePaneWidth() {
-        return sidePaneWidth.get();
-    }
-
-    public DoubleProperty sidePaneWidthProperty() {
-        return sidePaneWidth;
-    }
-
-    public void setSidePaneWidth(double sidePaneWidth) {
-        this.sidePaneWidth.set(sidePaneWidth);
-    }
-
     public FileHistory getFileHistory() {
         return fileHistory;
     }
@@ -160,5 +153,29 @@ public class GuiPreferences {
 
     public void setLastSelectedIdBasedFetcher(String lastSelectedIdBasedFetcher) {
         this.lastSelectedIdBasedFetcher.set(lastSelectedIdBasedFetcher);
+    }
+
+    public DiffMode getMergeDiffMode() {
+        return mergeDiffMode.get();
+    }
+
+    public ObjectProperty<DiffMode> mergeDiffModeProperty() {
+        return mergeDiffMode;
+    }
+
+    public void setMergeDiffMode(DiffMode mergeDiffMode) {
+        this.mergeDiffMode.set(mergeDiffMode);
+    }
+
+    public double getSidePaneWidth() {
+        return sidePaneWidth.get();
+    }
+
+    public DoubleProperty sidePaneWidthProperty() {
+        return sidePaneWidth;
+    }
+
+    public void setSidePaneWidth(double sidePaneWidth) {
+        this.sidePaneWidth.set(sidePaneWidth);
     }
 }

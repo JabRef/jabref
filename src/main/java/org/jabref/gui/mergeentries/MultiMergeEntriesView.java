@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
@@ -76,7 +75,7 @@ public class MultiMergeEntriesView extends BaseDialog<BibEntry> {
     @FXML private VBox fieldEditor;
 
     @FXML private Label failedSuppliers;
-    @FXML private ComboBox<MergeEntries.DiffMode> diffMode;
+    @FXML private ComboBox<DiffMode> diffMode;
 
     private final ToggleGroup headerToggleGroup = new ToggleGroup();
     private final HashMap<Field, FieldRow> fieldRows = new HashMap<>();
@@ -127,26 +126,26 @@ public class MultiMergeEntriesView extends BaseDialog<BibEntry> {
         leftScrollPane.vvalueProperty().bindBidirectional(centerScrollPane.vvalueProperty());
         rightScrollPane.vvalueProperty().bindBidirectional(centerScrollPane.vvalueProperty());
 
-        viewModel.failedSuppliersProperty().addListener((obs, oldValue, newValue) -> {
-            failedSuppliers.setText(viewModel.failedSuppliersProperty().get().isEmpty() ? "" : Localization.lang("Could not extract Metadata from: %0", viewModel.failedSuppliersProperty().stream().collect(Collectors.joining(", "))));
-        });
+        viewModel.failedSuppliersProperty().addListener((obs, oldValue, newValue) ->
+                failedSuppliers.setText(viewModel.failedSuppliersProperty().get().isEmpty() ? "" : Localization.lang(
+                        "Could not extract Metadata from: %0",
+                        String.join(", ", viewModel.failedSuppliersProperty())
+                ))
+        );
 
         fillDiffModes();
     }
 
     private void fillDiffModes() {
-        diffMode.setItems(FXCollections.observableList(List.of(MergeEntries.DiffMode.PLAIN, MergeEntries.DiffMode.WORD, MergeEntries.DiffMode.CHARACTER)));
-        new ViewModelListCellFactory<MergeEntries.DiffMode>()
-                .withText(MergeEntries.DiffMode::getDisplayText)
+        diffMode.setItems(FXCollections.observableList(List.of(
+                DiffMode.PLAIN,
+                DiffMode.WORD,
+                DiffMode.CHARACTER)));
+        new ViewModelListCellFactory<DiffMode>()
+                .withText(DiffMode::getDisplayText)
                 .install(diffMode);
-        MergeEntries.DiffMode diffModePref = preferences.getMergeDiffMode()
-                                                          .flatMap(MergeEntries.DiffMode::parse)
-                                                          .orElse(MergeEntries.DiffMode.WORD);
-        diffMode.setValue(diffModePref);
-
-        EasyBind.subscribe(this.diffMode.valueProperty(), mode -> {
-            preferences.storeMergeDiffMode(mode.name());
-        });
+        diffMode.setValue(preferences.getGuiPreferences().getMergeDiffMode());
+        EasyBind.subscribe(this.diffMode.valueProperty(), mode -> preferences.getGuiPreferences().setMergeDiffMode(mode));
     }
 
     private void addColumn(MultiMergeEntriesViewModel.EntrySource entrySourceColumn) {
@@ -211,7 +210,7 @@ public class MultiMergeEntriesView extends BaseDialog<BibEntry> {
      * Adds ToggleButtons for all fields that are set for this BibEntry
      *
      * @param entrySourceColumn the entry to write
-     * @param columnIndex the index of the column to write this entry to
+     * @param columnIndex       the index of the column to write this entry to
      */
     private void writeBibEntryToColumn(MultiMergeEntriesViewModel.EntrySource entrySourceColumn, int columnIndex) {
         for (Map.Entry<Field, String> entry : entrySourceColumn.entryProperty().get().getFieldsObservable().entrySet()) {

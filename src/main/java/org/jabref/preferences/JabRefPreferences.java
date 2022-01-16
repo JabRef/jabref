@@ -52,7 +52,7 @@ import org.jabref.gui.maintable.MainTableNameFormatPreferences;
 import org.jabref.gui.maintable.MainTableNameFormatPreferences.AbbreviationStyle;
 import org.jabref.gui.maintable.MainTableNameFormatPreferences.DisplayStyle;
 import org.jabref.gui.maintable.MainTablePreferences;
-import org.jabref.gui.mergeentries.MergeEntries;
+import org.jabref.gui.mergeentries.DiffMode;
 import org.jabref.gui.search.SearchDisplayMode;
 import org.jabref.gui.sidepane.SidePaneType;
 import org.jabref.gui.specialfields.SpecialFieldsPreferences;
@@ -572,7 +572,7 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(LAST_FOCUSED, "");
         defaults.put(DEFAULT_SHOW_SOURCE, Boolean.FALSE);
 
-        defaults.put(MERGE_ENTRIES_DIFF_MODE, MergeEntries.DiffMode.WORD.name());
+        defaults.put(MERGE_ENTRIES_DIFF_MODE, DiffMode.WORD.name());
 
         defaults.put(SHOW_RECOMMENDATIONS, Boolean.TRUE);
         defaults.put(ACCEPT_RECOMMENDATIONS, Boolean.FALSE);
@@ -2546,6 +2546,7 @@ public class JabRefPreferences implements PreferencesService {
                 Path.of(get(LAST_FOCUSED)),
                 getFileHistory(),
                 get(ID_ENTRY_GENERATOR),
+                DiffMode.parse(get(MERGE_ENTRIES_DIFF_MODE)),
                 getDouble(SIDE_PANE_WIDTH));
 
         EasyBind.listen(guiPreferences.positionXProperty(), (obs, oldValue, newValue) -> putDouble(POS_X, newValue.doubleValue()));
@@ -2564,6 +2565,7 @@ public class JabRefPreferences implements PreferencesService {
         });
         guiPreferences.getFileHistory().getHistory().addListener((InvalidationListener) change -> storeFileHistory(guiPreferences.getFileHistory()));
         EasyBind.listen(guiPreferences.lastSelectedIdBasedFetcherProperty(), (obs, oldValue, newValue) -> put(ID_ENTRY_GENERATOR, newValue));
+        EasyBind.listen(guiPreferences.mergeDiffModeProperty(), (obs, oldValue, newValue) -> put(MERGE_ENTRIES_DIFF_MODE, newValue.name()));
         EasyBind.listen(guiPreferences.sidePaneWidthProperty(), (obs, oldValue, newValue) -> putDouble(SIDE_PANE_WIDTH, newValue.doubleValue()));
 
         return guiPreferences;
@@ -2744,16 +2746,6 @@ public class JabRefPreferences implements PreferencesService {
     @Override
     public void storeExternalFileTypes(String externalFileTypes) {
         put(EXTERNAL_FILE_TYPES, externalFileTypes);
-    }
-
-    @Override
-    public Optional<String> getMergeDiffMode() {
-        return getAsOptional(MERGE_ENTRIES_DIFF_MODE);
-    }
-
-    @Override
-    public void storeMergeDiffMode(String diffMode) {
-        put(MERGE_ENTRIES_DIFF_MODE, diffMode);
     }
 
     @Override
