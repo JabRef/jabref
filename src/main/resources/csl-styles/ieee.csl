@@ -49,6 +49,11 @@
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="en">
+    <date form="text">
+      <date-part name="month" form="short" suffix=" "/>
+      <date-part name="day" form="numeric-leading-zeros" suffix=", "/>
+      <date-part name="year"/>
+    </date>
     <terms>
       <term name="chapter" form="short">ch.</term>
       <term name="presented at">presented at the</term>
@@ -100,18 +105,10 @@
         </date>
       </else-if>
       <else-if type="motion_picture" match="any">
-        <date variable="issued" prefix="(" suffix=")">
-          <date-part name="month" form="short" suffix=" "/>
-          <date-part name="day" form="numeric-leading-zeros" suffix=", "/>
-          <date-part name="year"/>
-        </date>
+        <date variable="issued" form="text" prefix="(" suffix=")"/>
       </else-if>
       <else>
-        <date variable="issued">
-          <date-part name="month" form="short" suffix=" "/>
-          <date-part name="day" form="numeric-leading-zeros" suffix=", "/>
-          <date-part name="year"/>
-        </date>
+        <date variable="issued" form="text"/>
       </else>
     </choose>
   </macro>
@@ -233,11 +230,7 @@
           <!-- Accessed: Mon. DD, YYYY. -->
           <group delimiter=": ">
             <text term="accessed" text-case="capitalize-first"/>
-            <date variable="accessed">
-              <date-part name="month" form="short" suffix=" "/>
-              <date-part name="day" form="numeric-leading-zeros" suffix=", "/>
-              <date-part name="year"/>
-            </date>
+            <date variable="accessed" form="text"/>
           </group>
           <!-- [Online Video]. -->
           <group prefix="[" suffix="]" delimiter=" ">
