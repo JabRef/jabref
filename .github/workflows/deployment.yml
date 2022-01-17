@@ -65,7 +65,7 @@ jobs:
         uses: actions/setup-java@v2
         with:
           java-version: 17
-          distribution: 'adopt'
+          distribution: 'temurin'
           cache: 'gradle'
       - name: Setup OSX key chain on OSX
         if: matrix.os == 'macos-latest'

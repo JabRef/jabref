@@ -31,7 +31,7 @@ jobs:
         uses: actions/setup-java@v2
         with:
           java-version: 17
-          distribution: 'adopt'
+          distribution: 'temurin'
           cache: 'gradle'
       - name: Run check style reporter
         uses: nikitasavinov/checkstyle-action@master
@@ -55,7 +55,7 @@ jobs:
         uses: actions/setup-java@v2
         with:
           java-version: 17
-          distribution: 'adopt'
+          distribution: 'temurin'
           cache: 'gradle'
       - name: Run tests
         run: xvfb-run --auto-servernum ./gradlew check -x checkstyleJmh -x checkstyleMain -x checkstyleTest
@@ -87,7 +87,7 @@ jobs:
         uses: actions/setup-java@v2
         with:
           java-version: 17
-          distribution: 'adopt'
+          distribution: 'temurin'
           cache: 'gradle'
       - name: Run tests on PostgreSQL
         run: ./gradlew databaseTest --rerun-tasks
@@ -121,7 +121,7 @@ jobs:
         uses: actions/setup-java@v2
         with:
           java-version: 17
-          distribution: 'adopt'
+          distribution: 'temurin'
           cache: 'gradle'
       - name: Run GUI tests
         run: xvfb-run --auto-servernum ./gradlew guiTest
@@ -159,7 +159,7 @@ jobs:
         uses: actions/setup-java@v2
         with:
           java-version: 17
-          distribution: 'adopt'
+          distribution: 'temurin'
           cache: 'gradle'
       - name: Update test coverage metrics
         if: ${{ steps.checksecrets.outputs.secretspresent }}
