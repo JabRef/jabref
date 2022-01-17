@@ -45,6 +45,6 @@ public class FileHistory {
     }
 
     public ObservableList<Path> getHistory() {
-        return FXCollections.unmodifiableObservableList(history);
+        return history;
     }
 }
