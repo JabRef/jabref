@@ -35,7 +35,7 @@
     <category citation-format="note"/>
     <category field="generic-base"/>
     <summary>Chicago format with full notes and bibliography</summary>
-    <updated>2020-01-12T12:00:00+00:00</updated>
+    <updated>2017-10-12T12:00:00+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="en">
@@ -186,7 +186,7 @@
           <text macro="editor"/>
           <text macro="translator"/>
           <choose>
-            <if type="webpage post-weblog" match="any">
+            <if type="article-magazine article-newspaper webpage post-weblog" match="any">
               <text variable="container-title"/>
             </if>
           </choose>
