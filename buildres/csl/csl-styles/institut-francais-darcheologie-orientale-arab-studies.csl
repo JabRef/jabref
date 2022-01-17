@@ -22,7 +22,7 @@
   <locale xml:lang="en">
     <terms>
       <term name="no date" form="short">n.d.</term>
-      <term name="sub verbo" form="short">s.v.</term>
+      <term name="sub-verbo" form="short">s.v.</term>
       <term name="open-quote">“</term>
       <term name="close-quote">”</term>
       <term name="open-inner-quote">‘</term>

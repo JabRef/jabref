@@ -33,6 +33,11 @@
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="en">
+    <date form="text">
+      <date-part name="month" form="short" suffix=" "/>
+      <date-part name="day" form="numeric-leading-zeros" suffix=", "/>
+      <date-part name="year"/>
+    </date>
     <terms>
       <term name="chapter" form="short">ch.</term>
       <term name="presented at">presented at the</term>
@@ -65,17 +70,22 @@
           <date-part name="year" form="long"/>
         </date>
       </if>
-      <else-if type="bill book chapter graphic legal_case legislation motion_picture paper-conference song thesis" match="any">
+      <else-if type="bill book chapter graphic legal_case legislation song thesis" match="any">
         <date variable="issued">
           <date-part name="year" form="long"/>
         </date>
       </else-if>
-      <else>
+      <else-if type="paper-conference" match="any">
         <date variable="issued">
-          <date-part name="day" form="numeric-leading-zeros" suffix="-"/>
-          <date-part name="month" form="short" suffix="-" strip-periods="true"/>
-          <date-part name="year" form="long"/>
+          <date-part name="month" form="short"/>
+          <date-part name="year" prefix=" "/>
         </date>
+      </else-if>
+      <else-if type="motion_picture" match="any">
+        <date variable="issued" form="text" prefix="(" suffix=")"/>
+      </else-if>
+      <else>
+        <date variable="issued" form="text"/>
       </else>
     </choose>
   </macro>
@@ -177,11 +187,7 @@
           </group>
           <group prefix="[" suffix="]" delimiter=": ">
             <text term="accessed" text-case="capitalize-first"/>
-            <date variable="accessed">
-              <date-part name="day" form="numeric-leading-zeros" suffix="-"/>
-              <date-part name="month" form="short" suffix="-" strip-periods="true"/>
-              <date-part name="year" form="long"/>
-            </date>
+            <date variable="accessed" form="text"/>
           </group>
         </group>
       </if>

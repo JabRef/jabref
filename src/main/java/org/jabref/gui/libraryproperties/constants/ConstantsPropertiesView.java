@@ -44,7 +44,7 @@ public class ConstantsPropertiesView extends AbstractPropertiesTabView<Constants
 
     @Override
     public String getTabName() {
-        return Localization.lang("Strings constants");
+        return Localization.lang("String constants");
     }
 
     public void initialize() {

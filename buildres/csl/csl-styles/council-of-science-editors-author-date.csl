@@ -124,10 +124,11 @@
     </group>
   </macro>
   <macro name="year-date">
+    <date variable="issued" form="numeric" date-parts="year"/>
+  </macro>
+  <macro name="date">
     <group delimiter=" ">
-      <date variable="issued" delimiter=" ">
-        <date-part name="year"/>
-      </date>
+      <text macro="year-date"/>
       <choose>
         <if type="patent article-newspaper webpage" match="any">
           <date variable="issued" delimiter=" ">
@@ -188,7 +189,7 @@
     <layout prefix="(" suffix=")" delimiter="; ">
       <group delimiter=" ">
         <text macro="author-short"/>
-        <text macro="year-date"/>
+        <text macro="date"/>
       </group>
       <text variable="locator" prefix=": "/>
     </layout>
@@ -201,7 +202,7 @@
     <layout suffix=".">
       <group suffix="." delimiter=". ">
         <text macro="author"/>
-        <text macro="year-date"/>
+        <text macro="date"/>
         <text macro="title"/>
       </group>
       <group suffix=".">

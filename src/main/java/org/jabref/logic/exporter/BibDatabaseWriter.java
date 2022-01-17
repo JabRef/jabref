@@ -43,6 +43,14 @@ import org.jabref.model.metadata.SaveOrderConfig;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.preferences.GeneralPreferences;
 
+/**
+ * A generic writer for our database. This is independent of the concrete serialization format.
+ * For instance, we could also write out YAML or XML by subclassing this class.
+ * <p>
+ * Currently, {@link BibtexDatabaseWriter} is the only subclass of this class (and that class writes a .bib file)
+ * <p>
+ * The opposite class is {@link org.jabref.logic.importer.fileformat.BibtexParser}
+ */
 public abstract class BibDatabaseWriter {
 
     private static final Pattern REFERENCE_PATTERN = Pattern.compile("(#[A-Za-z]+#)"); // Used to detect string references in strings
@@ -175,7 +183,8 @@ public abstract class BibDatabaseWriter {
 
         // Some file formats write something at the start of the file (like the encoding)
         if (savePreferences.getSaveType() != SavePreferences.DatabaseSaveType.PLAIN_BIBTEX) {
-            writeProlog(bibDatabaseContext, generalPreferences.getDefaultEncoding());
+            Charset charset = bibDatabaseContext.getMetaData().getEncoding().orElse(generalPreferences.getDefaultEncoding());
+            writeProlog(bibDatabaseContext, charset);
         }
 
         bibWriter.finishBlock();
