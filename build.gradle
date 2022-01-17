@@ -475,12 +475,24 @@ tasks.withType(Test) {
     reports.html.outputLocation.set(file("${reporting.baseDir}/${name}"))
 }
 
+task jacocoPrepare() {
+    doFirst {
+        // Ignore failures of tests
+        tasks.withType(Test) {
+                    ignoreFailures = true
+        }
+    }
+}
+test.mustRunAfter jacocoPrepare
+databaseTest.mustRunAfter jacocoPrepare
+fetcherTest.mustRunAfter jacocoPrepare
+
 jacocoTestReport {
     executionData files(
             "$buildDir/jacoco/test.exec",
             "$buildDir/jacoco/databaseTest.exec",
             "$buildDir/jacoco/fetcherTest.exec").filter { it.exists() }
-    dependsOn test, databaseTest, fetcherTest
+    dependsOn jacocoPrepare, test, databaseTest, fetcherTest
 
     reports {
         csv.getRequired().set(true)
