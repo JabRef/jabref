@@ -165,8 +165,6 @@ public class GroupTreeView extends BorderPane {
         });
         searchField.textProperty().addListener((observable, oldValue, newValue) -> searchTask.restart());
 
-        setNewGroupButtonStyle(groupTree);
-
         groupTree.rootProperty().bind(
                 EasyBind.map(viewModel.rootGroupProperty(),
                         group -> {
@@ -245,7 +243,6 @@ public class GroupTreeView extends BorderPane {
         groupTree.setRowFactory(treeTable -> {
             TreeTableRow<GroupNodeViewModel> row = new TreeTableRow<>();
             row.treeItemProperty().addListener((ov, oldTreeItem, newTreeItem) -> {
-                setNewGroupButtonStyle(treeTable);
                 boolean isRoot = newTreeItem == treeTable.getRoot();
                 row.pseudoClassStateChanged(rootPseudoClass, isRoot);
 
@@ -478,19 +475,6 @@ public class GroupTreeView extends BorderPane {
             m.invoke(null, customTextField, customTextField.rightProperty());
         } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException ex) {
             LOGGER.error("Failed to decorate text field with clear button", ex);
-        }
-    }
-
-    private void setNewGroupButtonStyle(TreeTableView<GroupNodeViewModel> groupTree) {
-        PseudoClass active = PseudoClass.getPseudoClass("active");
-        PseudoClass inactive = PseudoClass.getPseudoClass("inactive");
-
-        if (groupTree.getRoot() != null) {
-            boolean isActive = groupTree.getExpandedItemCount() <= 10;
-            addNewGroup.pseudoClassStateChanged(active, isActive);
-            addNewGroup.pseudoClassStateChanged(inactive, !isActive);
-        } else {
-            addNewGroup.pseudoClassStateChanged(active, true);
         }
     }
 
