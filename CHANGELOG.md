@@ -7,9 +7,7 @@ In case, there is no issue present, the pull request implementing the feature is
 
 Note that this project **does not** adhere to [Semantic Versioning](http://semver.org/).
 
-## [Unreleased]
-
-### Added
+## [5.5] - 2022-01-17
 
 ### Changed
 
@@ -32,20 +30,6 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixed an issue where someone could add a duplicate field in the customize entry type dialog. [#8194](https://github.com/JabRef/jabref/issues/8194)
 - We fixed a typo in the library properties tab: "String constants". There, one can configure [BibTeX string constants](https://docs.jabref.org/advanced/strings).
 - We fixed an issue when writing a non-UTF-8 encoded file: The header is written again. [#8417](https://github.com/JabRef/jabref/issues/8417)
-
-### Removed
-
-
-
-
-
-
-
-
-
-
-
-
 
 ## [5.4] - 2021-12-20
 
@@ -732,7 +716,8 @@ The changelog of JabRef 4.x is available at the [v4.3.1 tag](https://github.com/
 The changelog of JabRef 3.x is available at the [v3.8.2 tag](https://github.com/JabRef/jabref/blob/v3.8.2/CHANGELOG.md).
 The changelog of JabRef 2.11 and all previous versions is available as [text file in the v2.11.1 tag](https://github.com/JabRef/jabref/blob/v2.11.1/CHANGELOG).
 
-[Unreleased]: https://github.com/JabRef/jabref/compare/v5.4...HEAD
+[Unreleased]: https://github.com/JabRef/jabref/compare/v5.5...HEAD
+[5.5]: https://github.com/JabRef/jabref/compare/v5.4...v5.5
 [5.4]: https://github.com/JabRef/jabref/compare/v5.3...v5.4
 [5.3]: https://github.com/JabRef/jabref/compare/v5.2...v5.3
 [5.2]: https://github.com/JabRef/jabref/compare/v5.1...v5.2
