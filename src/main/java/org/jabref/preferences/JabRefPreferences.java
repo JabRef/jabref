@@ -1180,16 +1180,6 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     @Override
-    public boolean shouldWarnAboutDuplicatesForImport() {
-        return getBoolean(WARN_ABOUT_DUPLICATES_IN_INSPECTION);
-    }
-
-    @Override
-    public void setShouldWarnAboutDuplicatesForImport(boolean value) {
-        putBoolean(WARN_ABOUT_DUPLICATES_IN_INSPECTION, value);
-    }
-
-    @Override
     @Deprecated
     public String getDefaultsDefaultCitationKeyPattern() {
         return (String) defaults.get(DEFAULT_CITATION_KEY_PATTERN);
@@ -2265,7 +2255,8 @@ public class JabRefPreferences implements PreferencesService {
                 Path.of(get(IMPORT_WORKING_DIRECTORY)),
                 get(LAST_USED_EXPORT),
                 Path.of(get(EXPORT_WORKING_DIRECTORY)),
-                getBoolean(LOCAL_AUTO_SAVE));
+                getBoolean(LOCAL_AUTO_SAVE),
+                getBoolean(WARN_ABOUT_DUPLICATES_IN_INSPECTION));
 
         EasyBind.listen(importExportPreferences.openLastEditedProperty(), (obs, oldValue, newValue) -> putBoolean(OPEN_LAST_EDITED, newValue));
         EasyBind.listen(importExportPreferences.nonWrappableFieldsProperty(), (obs, oldValue, newValue) -> put(NON_WRAPPABLE_FIELDS, newValue));
@@ -2276,6 +2267,7 @@ public class JabRefPreferences implements PreferencesService {
         EasyBind.listen(importExportPreferences.lastExportExtensionProperty(), (obs, oldValue, newValue) -> put(LAST_USED_EXPORT, newValue));
         EasyBind.listen(importExportPreferences.exportWorkingDirectoryProperty(), (obs, oldValue, newValue) -> put(EXPORT_WORKING_DIRECTORY, newValue.toString()));
         EasyBind.listen(importExportPreferences.autoSaveProperty(), (obs, oldValue, newValue) -> putBoolean(LOCAL_AUTO_SAVE, newValue));
+        EasyBind.listen(importExportPreferences.warnAboutDuplicatesOnImportProperty(), (obs, oldValue, newValue) -> putBoolean(WARN_ABOUT_DUPLICATES_IN_INSPECTION, newValue));
 
         return importExportPreferences;
     }

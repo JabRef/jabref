@@ -19,6 +19,7 @@ public class ImportExportPreferences {
     private final StringProperty lastExportExtension;
     private final ObjectProperty<Path> exportWorkingDirectory;
     private final BooleanProperty autoSave;
+    private final BooleanProperty warnAboutDuplicatesOnImport;
 
     public ImportExportPreferences(boolean shouldOpenLastEdited,
                                    String nonWrappableFields,
@@ -28,7 +29,8 @@ public class ImportExportPreferences {
                                    Path importWorkingDirectory,
                                    String lastExportExtension,
                                    Path exportWorkingDirectory,
-                                   boolean autoSave) {
+                                   boolean autoSave,
+                                   boolean warnAboutDuplicatesOnImport) {
         this.shouldOpenLastEdited = new SimpleBooleanProperty(shouldOpenLastEdited);
         this.nonWrappableFields = new SimpleStringProperty(nonWrappableFields);
         this.resolveStrings = new SimpleBooleanProperty(resolveStrings);
@@ -38,6 +40,7 @@ public class ImportExportPreferences {
         this.lastExportExtension = new SimpleStringProperty(lastExportExtension);
         this.exportWorkingDirectory = new SimpleObjectProperty<>(exportWorkingDirectory);
         this.autoSave = new SimpleBooleanProperty(autoSave);
+        this.warnAboutDuplicatesOnImport = new SimpleBooleanProperty(warnAboutDuplicatesOnImport);
     }
 
     public boolean shouldOpenLastEdited() {
@@ -146,5 +149,17 @@ public class ImportExportPreferences {
 
     public void setAutoSave(boolean shouldAutoSave) {
         this.autoSave.set(shouldAutoSave);
+    }
+
+    public boolean shouldWarnAboutDuplicatesOnImport() {
+        return warnAboutDuplicatesOnImport.get();
+    }
+
+    public BooleanProperty warnAboutDuplicatesOnImportProperty() {
+        return warnAboutDuplicatesOnImport;
+    }
+
+    public void setWarnAboutDuplicatesOnImport(boolean warnAboutDuplicatesOnImport) {
+        this.warnAboutDuplicatesOnImport.set(warnAboutDuplicatesOnImport);
     }
 }

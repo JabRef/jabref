@@ -90,10 +90,6 @@ public interface PreferencesService {
 
     void storeExportSaveOrder(SaveOrderConfig config);
 
-    boolean shouldWarnAboutDuplicatesForImport();
-
-    void setShouldWarnAboutDuplicatesForImport(boolean value);
-
     void clear() throws BackingStoreException;
 
     void deleteKey(String key) throws IllegalArgumentException;
