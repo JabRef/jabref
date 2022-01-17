@@ -479,7 +479,7 @@ task jacocoPrepare() {
     doFirst {
         // Ignore failures of tests
         tasks.withType(Test) {
-                    ignoreFailures = true
+            ignoreFailures = true
         }
     }
 }
