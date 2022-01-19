@@ -1034,7 +1034,7 @@ public class JabRefFrame extends BorderPane {
      */
     public void setupAllTables() {
         tabbedPane.getTabs().forEach(tab -> {
-            if(tab instanceof LibraryTab libraryTab && (libraryTab.getDatabase() !=null)) {
+            if (tab instanceof LibraryTab libraryTab && (libraryTab.getDatabase() != null)) {
                 DefaultTaskExecutor.runInJavaFXThread(libraryTab::setupMainPanel);
             }
         });
