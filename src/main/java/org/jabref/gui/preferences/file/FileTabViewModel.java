@@ -77,7 +77,9 @@ public class FileTabViewModel implements PreferenceTabViewModel {
         return alwaysReformatBibProperty;
     }
 
-    public BooleanProperty warnAboutDuplicatesOnImportProperty() { return warnAboutDuplicatesOnImportProperty; }
+    public BooleanProperty warnAboutDuplicatesOnImportProperty() {
+        return warnAboutDuplicatesOnImportProperty;
+    }
 
     // Autosave
     public BooleanProperty autosaveLocalLibrariesProperty() {
