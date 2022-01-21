@@ -49,6 +49,11 @@
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="en">
+    <date form="text">
+      <date-part name="month" form="short" suffix=" "/>
+      <date-part name="day" form="numeric-leading-zeros" suffix=", "/>
+      <date-part name="year"/>
+    </date>
     <terms>
       <term name="chapter" form="short">ch.</term>
       <term name="presented at">presented at the</term>
@@ -100,18 +105,10 @@
         </date>
       </else-if>
       <else-if type="motion_picture" match="any">
-        <date variable="issued" prefix="(" suffix=")">
-          <date-part name="month" form="short" suffix=" "/>
-          <date-part name="day" form="numeric-leading-zeros" suffix=", "/>
-          <date-part name="year"/>
-        </date>
+        <date variable="issued" form="text" prefix="(" suffix=")"/>
       </else-if>
       <else>
-        <date variable="issued">
-          <date-part name="month" form="short" suffix=" "/>
-          <date-part name="day" form="numeric-leading-zeros" suffix=", "/>
-          <date-part name="year"/>
-        </date>
+        <date variable="issued" form="text"/>
       </else>
     </choose>
   </macro>
@@ -213,11 +210,7 @@
               <text variable="URL"/>
               <group delimiter=" " prefix="(" suffix=").">
                 <text term="accessed"/>
-                <date variable="accessed">
-                  <date-part name="month" form="short"/>
-                  <date-part name="day" form="numeric-leading-zeros" prefix=" " suffix=", "/>
-                  <date-part name="year" form="long"/>
-                </date>
+                <date variable="accessed" form="text"/>
               </group>
             </group>
           </if>
@@ -233,19 +226,22 @@
           <!-- Accessed: Mon. DD, YYYY. -->
           <group delimiter=": ">
             <text term="accessed" text-case="capitalize-first"/>
-            <date variable="accessed">
-              <date-part name="month" form="short" suffix=" "/>
-              <date-part name="day" form="numeric-leading-zeros" suffix=", "/>
-              <date-part name="year"/>
-            </date>
+            <date variable="accessed" form="text"/>
           </group>
           <!-- [Online Video]. -->
           <group prefix="[" suffix="]" delimiter=" ">
-            <text term="online" text-case="capitalize-first"/>
             <choose>
-              <if type="motion_picture">
-                <text value="video" text-case="capitalize-first"/>
+              <if variable="medium" match="any">
+                <text variable="medium" text-case="capitalize-first"/>
               </if>
+              <else>
+                <text term="online" text-case="capitalize-first"/>
+                <choose>
+                  <if type="motion_picture">
+                    <text term="video" text-case="capitalize-first"/>
+                  </if>
+                </choose>
+              </else>
             </choose>
           </group>
         </group>

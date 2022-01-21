@@ -42,7 +42,7 @@ import static org.mockito.Mockito.mock;
 class BibEntryWriterTest {
 
     private static ImportFormatPreferences importFormatPreferences;
-    private StringWriter stringWriter = new StringWriter();
+    private final StringWriter stringWriter = new StringWriter();
     private BibWriter bibWriter = new BibWriter(stringWriter, OS.NEWLINE);
     private BibEntryWriter bibEntryWriter;
     private final FileUpdateMonitor fileMonitor = new DummyFileUpdateMonitor();
@@ -50,7 +50,7 @@ class BibEntryWriterTest {
     @BeforeEach
     void setUpWriter() {
         importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
-        FieldWriterPreferences fieldWriterPreferences = mock(FieldWriterPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        FieldWriterPreferences fieldWriterPreferences = new FieldWriterPreferences(true, List.of(StandardField.MONTH), new FieldContentFormatterPreferences());
         bibEntryWriter = new BibEntryWriter(new FieldWriter(fieldWriterPreferences), new BibEntryTypesManager());
     }
 
@@ -554,6 +554,30 @@ class BibEntryWriterTest {
                         "  month = {apr}," + OS.NEWLINE +
                         "}" + OS.NEWLINE,
                 stringWriter.toString());
+    }
+
+    @Test
+    void filenameIsUnmodifiedDuringWrite() throws Exception {
+        // source: https://github.com/JabRef/jabref/issues/7012#issuecomment-707788107
+        String bibtexEntry = "@Book{Hue17," + OS.NEWLINE +
+                "  author    = {Rudolf Huebener}," + OS.NEWLINE +
+                "  date      = {2017}," + OS.NEWLINE +
+                "  title     = {Leiter, Halbleiter, Supraleiter}," + OS.NEWLINE +
+                "  doi       = {10.1007/978-3-662-53281-2}," + OS.NEWLINE +
+                "  publisher = {Springer Berlin Heidelberg}," + OS.NEWLINE +
+                "  file      = {:Hue17 - Leiter # Halbleiter # Supraleiter.pdf:PDF}," + OS.NEWLINE +
+                "  timestamp = {2020.10.13}," + OS.NEWLINE +
+                "}" + OS.NEWLINE;
+
+        // read in bibtex string
+        ParserResult result = new BibtexParser(importFormatPreferences, fileMonitor).parse(new StringReader(bibtexEntry));
+        Collection<BibEntry> entries = result.getDatabase().getEntries();
+        BibEntry entry = entries.iterator().next();
+
+        // write out bibtex string
+        bibEntryWriter.write(entry, bibWriter, BibDatabaseMode.BIBTEX);
+
+        assertEquals(bibtexEntry, stringWriter.toString());
     }
 
     @Test

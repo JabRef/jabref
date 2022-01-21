@@ -70,8 +70,8 @@
   </macro>
   <macro name="container-title">
     <choose>
-      <if type="article-journal">
-        <text variable="container-title" form="short"/>
+      <if type="article-journal article-magazine article" match="any">
+        <text variable="container-title" form="short" text-case="title"/>
       </if>
       <else>
         <text variable="container-title"/>
@@ -90,7 +90,7 @@
   </macro>
   <macro name="volume">
     <choose>
-      <if type="article-journal" match="any">
+      <if type="article-journal article-magazine article" match="any">
         <text variable="volume" suffix=","/>
       </if>
       <else>
@@ -103,13 +103,13 @@
   </macro>
   <macro name="pages">
     <choose>
-      <if type="article-journal article-magazine" match="any">
-        <text variable="page"/>
+      <if type="article-journal article-magazine article" match="any">
+        <text variable="page" form="short"/>
       </if>
       <else>
         <group delimiter=" ">
-          <label variable="page" form="short"/>
-          <text variable="page"/>
+          <label plural="always" variable="page" form="short"/>
+          <text variable="page" form="short"/>
         </group>
       </else>
     </choose>
@@ -135,7 +135,7 @@
         </choose>
         <text macro="container-title"/>
         <text macro="editor"/>
-        <text macro="volume"/>
+        <text macro="volume" suffix=","/>
         <text macro="pages"/>
         <text macro="issuance"/>
         <text macro="access"/>

@@ -1,4 +1,4 @@
-# Implement special fields as seperate fields
+# Implement special fields as separate fields
 
 ## Context and Problem Statement
 

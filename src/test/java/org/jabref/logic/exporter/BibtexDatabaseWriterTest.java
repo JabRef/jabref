@@ -1,5 +1,6 @@
 package org.jabref.logic.exporter;
 
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
@@ -23,6 +24,8 @@ import org.jabref.logic.formatter.casechanger.UpperCaseFormatter;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
+import org.jabref.logic.importer.fileformat.BibtexImporter;
+import org.jabref.logic.importer.fileformat.BibtexImporterTest;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.util.OS;
 import org.jabref.model.database.BibDatabase;
@@ -51,6 +54,7 @@ import org.jabref.preferences.GeneralPreferences;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -58,7 +62,10 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-class BibtexDatabaseWriterTest {
+/**
+ * Tests for reading can be found at {@link org.jabref.logic.importer.fileformat.BibtexImporterTest}
+ */
+public class BibtexDatabaseWriterTest {
 
     private BibtexDatabaseWriter databaseWriter;
     private BibDatabase database;
@@ -101,12 +108,43 @@ class BibtexDatabaseWriterTest {
     }
 
     @Test
-    void writeEncoding() throws Exception {
+    void writeEncodingUsAsciiWhenSetInPreferences() throws Exception {
         when(generalPreferences.getDefaultEncoding()).thenReturn(StandardCharsets.US_ASCII);
 
         databaseWriter.savePartOfDatabase(bibtexContext, Collections.emptyList());
 
         assertEquals("% Encoding: US-ASCII" + OS.NEWLINE, stringWriter.toString());
+    }
+
+    @Test
+    void writeEncodingUsAsciiWhenSetInPreferencesAndHeader() throws Exception {
+        when(generalPreferences.getDefaultEncoding()).thenReturn(StandardCharsets.US_ASCII);
+        metaData.setEncoding(StandardCharsets.US_ASCII);
+
+        databaseWriter.savePartOfDatabase(bibtexContext, Collections.emptyList());
+
+        assertEquals("% Encoding: US-ASCII" + OS.NEWLINE, stringWriter.toString());
+    }
+
+    @Test
+    void writeEncodingWindows1252WhenSetInPreferences() throws Exception {
+        Charset charsetWindows1252 = Charset.forName("windows-1252");
+        when(generalPreferences.getDefaultEncoding()).thenReturn(charsetWindows1252);
+
+        databaseWriter.savePartOfDatabase(bibtexContext, Collections.emptyList());
+
+        assertEquals("% Encoding: windows-1252" + OS.NEWLINE, stringWriter.toString());
+    }
+
+    @Test
+    void writeEncodingWindows1252WhenSetInPreferencesAndHeader() throws Exception {
+        Charset charsetWindows1252 = Charset.forName("windows-1252");
+        when(generalPreferences.getDefaultEncoding()).thenReturn(charsetWindows1252);
+        metaData.setEncoding(charsetWindows1252);
+
+        databaseWriter.savePartOfDatabase(bibtexContext, Collections.emptyList());
+
+        assertEquals("% Encoding: windows-1252" + OS.NEWLINE, stringWriter.toString());
     }
 
     @Test
@@ -372,6 +410,26 @@ class BibtexDatabaseWriterTest {
                 "}" + OS.NEWLINE;
         // @formatter:on
        assertEquals(expected, stringWriter.toString());
+    }
+
+    @Test
+    void roundtripWin1252HeaderKept(@TempDir Path bibFolder) throws Exception {
+        when(generalPreferences.getDefaultEncoding()).thenReturn(StandardCharsets.UTF_8);
+        Path testFile = Path.of(BibtexImporterTest.class.getResource("encoding-windows-1252-with-header.bib").toURI());
+        ParserResult result = new BibtexImporter(importFormatPreferences, fileMonitor).importDatabase(testFile, StandardCharsets.UTF_8);
+        BibDatabaseContext context = new BibDatabaseContext(result.getDatabase(), result.getMetaData());
+
+        Path pathToFile = bibFolder.resolve("JabRef.bib");
+        Path file = Files.createFile(pathToFile);
+        Charset charset = Charset.forName("windows-1252");
+
+        try (BufferedWriter fileWriter = Files.newBufferedWriter(file, charset)) {
+            BibWriter bibWriter = new BibWriter(fileWriter, context.getDatabase().getNewLineSeparator());
+            BibtexDatabaseWriter databaseWriter = new BibtexDatabaseWriter(bibWriter, generalPreferences, savePreferences, entryTypesManager);
+            databaseWriter.saveDatabase(context);
+        }
+
+        assertEquals(Files.readString(testFile, charset), Files.readString(file, charset));
     }
 
     @Test

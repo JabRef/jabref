@@ -23,6 +23,7 @@ import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.keyboard.KeyBindingRepository;
+import org.jabref.gui.theme.ThemeManager;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.pdf.search.indexing.IndexingTaskManager;
 import org.jabref.logic.preview.PreviewLayout;
@@ -41,7 +42,7 @@ public class PreviewPanel extends VBox {
     private final ExternalFilesEntryLinker fileLinker;
     private final KeyBindingRepository keyBindingRepository;
     private final PreviewViewer previewView;
-    private final PreferencesService preferences;
+    private final PreviewPreferences previewPreferences;
     private final DialogService dialogService;
     private final StateManager stateManager;
     private final IndexingTaskManager indexingTaskManager;
@@ -52,19 +53,20 @@ public class PreviewPanel extends VBox {
                         ExternalFileTypes externalFileTypes,
                         KeyBindingRepository keyBindingRepository,
                         PreferencesService preferences,
-                        StateManager stateManager, IndexingTaskManager indexingTaskManager) {
+                        StateManager stateManager,
+                        ThemeManager themeManager,
+                        IndexingTaskManager indexingTaskManager) {
         this.keyBindingRepository = keyBindingRepository;
         this.dialogService = dialogService;
         this.stateManager = stateManager;
-        this.preferences = preferences;
+        this.previewPreferences = preferences.getPreviewPreferences();
         this.indexingTaskManager = indexingTaskManager;
-        fileLinker = new ExternalFilesEntryLinker(externalFileTypes, preferences.getFilePreferences(), database);
+        this.fileLinker = new ExternalFilesEntryLinker(externalFileTypes, preferences.getFilePreferences(), database);
 
         PreviewPreferences previewPreferences = preferences.getPreviewPreferences();
-        previewView = new PreviewViewer(database, dialogService, stateManager);
-        previewView.setLayout(previewPreferences.getCurrentPreviewStyle());
+        previewView = new PreviewViewer(database, dialogService, stateManager, themeManager);
+        previewView.setLayout(previewPreferences.getSelectedPreviewLayout());
         previewView.setContextMenu(createPopupMenu());
-        previewView.setTheme(this.preferences.getTheme());
         previewView.setOnDragDetected(event -> {
             previewView.startFullDrag();
 
@@ -109,24 +111,7 @@ public class PreviewPanel extends VBox {
         this.getChildren().add(previewView);
 
         createKeyBindings();
-        updateLayout(previewPreferences, true);
-    }
-
-    public void updateLayout(PreviewPreferences previewPreferences) {
-        updateLayout(previewPreferences, false);
-    }
-
-    private void updateLayout(PreviewPreferences previewPreferences, boolean init) {
-        PreviewLayout currentPreviewStyle = previewPreferences.getCurrentPreviewStyle();
-        previewView.setLayout(currentPreviewStyle);
-        preferences.storePreviewPreferences(previewPreferences);
-        if (!init) {
-            dialogService.notify(Localization.lang("Preview style changed to: %0", currentPreviewStyle.getDisplayName()));
-        }
-    }
-
-    private void updateLayoutByPreferences(PreferencesService preferences) {
-        previewView.setLayout(preferences.getPreviewPreferences().getCurrentPreviewStyle());
+        previewView.setLayout(previewPreferences.getSelectedPreviewLayout());
     }
 
     private void createKeyBindings() {
@@ -170,8 +155,8 @@ public class PreviewPanel extends VBox {
     }
 
     public void setEntry(BibEntry entry) {
-        updateLayoutByPreferences(preferences);
         this.entry = entry;
+        previewView.setLayout(previewPreferences.getSelectedPreviewLayout());
         previewView.setEntry(entry);
     }
 
@@ -180,19 +165,18 @@ public class PreviewPanel extends VBox {
     }
 
     public void nextPreviewStyle() {
-        cyclePreview(preferences.getPreviewPreferences().getPreviewCyclePosition() + 1);
+        cyclePreview(previewPreferences.getLayoutCyclePosition() + 1);
     }
 
     public void previousPreviewStyle() {
-        cyclePreview(preferences.getPreviewPreferences().getPreviewCyclePosition() - 1);
+        cyclePreview(previewPreferences.getLayoutCyclePosition() - 1);
     }
 
     private void cyclePreview(int newPosition) {
-        PreviewPreferences previewPreferences = preferences
-                .getPreviewPreferences()
-                .getBuilder()
-                .withPreviewCyclePosition(newPosition)
-                .build();
-        updateLayout(previewPreferences);
+        previewPreferences.setLayoutCyclePosition(newPosition);
+
+        PreviewLayout layout = previewPreferences.getSelectedPreviewLayout();
+        previewView.setLayout(layout);
+        dialogService.notify(Localization.lang("Preview style changed to: %0", layout.getDisplayName()));
     }
 }

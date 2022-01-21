@@ -673,11 +673,51 @@
       </if>
     </choose>
   </macro>
+  <macro name="event-note">
+    <text variable="event"/>
+  </macro>
   <macro name="event">
     <group>
       <text term="presented at" suffix=" "/>
       <text variable="event"/>
     </group>
+  </macro>
+  <macro name="originally-published">
+    <group delimiter=", ">
+      <group delimiter=": ">
+        <text variable="original-publisher-place"/>
+        <text variable="original-publisher"/>
+      </group>
+      <choose>
+        <if is-uncertain-date="original-date">
+          <date variable="original-date" form="numeric" date-parts="year" prefix="[" suffix="?]"/>
+        </if>
+        <else>
+          <date variable="original-date" form="numeric" date-parts="year"/>
+        </else>
+      </choose>
+    </group>
+  </macro>
+  <macro name="reprint-note">
+    <!--needs localization-->
+    <choose>
+      <if variable="original-date issued" match="all">
+        <choose>
+          <!--for whatever reason in notes, when we have both original and new publishers, reprint doesn't appear-->
+          <if variable="original-publisher original-publisher-place" match="none">
+            <text value="repr."/>
+          </if>
+        </choose>
+      </if>
+    </choose>
+  </macro>
+  <macro name="reprint">
+    <!--needs localization-->
+    <choose>
+      <if variable="original-date issued" match="all">
+        <text value="repr." text-case="capitalize-first"/>
+      </if>
+    </choose>
   </macro>
   <macro name="publisher">
     <choose>
@@ -877,16 +917,23 @@
         <group prefix=" (" suffix=")">
           <group delimiter=", ">
             <group delimiter=" ">
-              <choose>
-                <if variable="title" match="none"/>
-                <else-if type="thesis speech" match="any">
-                  <text variable="genre"/>
-                </else-if>
-              </choose>
-              <text macro="event"/>
+              <text macro="event-note"/>
+              <group delimiter="">
+                <text macro="originally-published" suffix="; "/>
+                <group delimiter=", ">
+                  <text macro="reprint-note"/>
+                  <text macro="publisher"/>
+                  <choose>
+                    <if variable="title" match="none"/>
+                    <else-if type="thesis speech" match="any">
+                      <text variable="genre"/>
+                    </else-if>
+                  </choose>
+                  <text macro="event"/>
+                </group>
+                <text macro="issued" prefix=", "/>
+              </group>
             </group>
-            <text macro="publisher"/>
-            <text macro="issued"/>
           </group>
         </group>
       </else-if>
@@ -918,7 +965,13 @@
               <text variable="genre" text-case="capitalize-first"/>
             </if>
           </choose>
-          <text macro="publisher"/>
+          <group delimiter=". ">
+            <text macro="originally-published"/>
+            <group delimiter=", ">
+              <text macro="reprint"/>
+              <text macro="publisher"/>
+            </group>
+          </group>
           <text macro="issued"/>
         </group>
       </else-if>
@@ -937,7 +990,14 @@
           <text macro="archive-note"/>
         </else-if>
       </choose>
-      <text variable="URL"/>
+      <choose>
+        <if variable="DOI">
+          <text variable="DOI" prefix="https://doi.org/"/>
+        </if>
+        <else>
+          <text variable="URL"/>
+        </else>
+      </choose>
     </group>
   </macro>
   <macro name="access">
@@ -950,7 +1010,14 @@
           <text macro="archive"/>
         </else-if>
       </choose>
-      <text variable="URL"/>
+      <choose>
+        <if variable="DOI">
+          <text variable="DOI" prefix="https://doi.org/"/>
+        </if>
+        <else>
+          <text variable="URL"/>
+        </else>
+      </choose>
     </group>
   </macro>
   <macro name="unsigned-dictionary-note">
@@ -962,7 +1029,7 @@
         <text variable="collection-number" prefix=" "/>
       </group>
       <group delimiter=" ">
-        <text term="sub verbo" form="short"/>
+        <text term="sub-verbo" form="short"/>
         <text variable="title" text-case="title" quotes="true"/>
       </group>
     </group>

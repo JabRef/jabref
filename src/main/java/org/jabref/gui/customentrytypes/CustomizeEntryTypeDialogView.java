@@ -26,6 +26,7 @@ import org.jabref.gui.DragAndDropDataFormats;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.customentrytypes.CustomEntryTypeDialogViewModel.FieldType;
 import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.CustomLocalDragboard;
@@ -65,6 +66,7 @@ public class CustomizeEntryTypeDialogView extends BaseDialog<Void> {
     @Inject private PreferencesService preferencesService;
     @Inject private StateManager stateManager;
     @Inject private DialogService dialogService;
+    @Inject private ThemeManager themeManager;
 
     private CustomEntryTypeDialogViewModel viewModel;
     private final ControlsFxVisualizer visualizer = new ControlsFxVisualizer();
@@ -85,6 +87,8 @@ public class CustomizeEntryTypeDialogView extends BaseDialog<Void> {
             return null;
         });
         ControlHelper.setAction(resetButton, getDialogPane(), event -> this.resetEntryTypes());
+
+        themeManager.updateFontStyle(getDialogPane().getScene());
     }
 
     @FXML
@@ -92,7 +96,7 @@ public class CustomizeEntryTypeDialogView extends BaseDialog<Void> {
         // As the state manager gets injected it's not available in the constructor
         this.localDragboard = stateManager.getLocalDragboard();
 
-        viewModel = new CustomEntryTypeDialogViewModel(mode, preferencesService, entryTypesManager);
+        viewModel = new CustomEntryTypeDialogViewModel(mode, preferencesService, entryTypesManager, dialogService);
         setupTable();
 
         addNewEntryTypeButton.disableProperty().bind(viewModel.entryTypeValidationStatus().validProperty().not());
@@ -154,7 +158,7 @@ public class CustomizeEntryTypeDialogView extends BaseDialog<Void> {
         viewModel.entryTypeToAddProperty().bindBidirectional(addNewEntryType.textProperty());
 
         addNewField.setItems(viewModel.fieldsForAdding());
-        addNewField.setConverter(viewModel.FIELD_STRING_CONVERTER);
+        addNewField.setConverter(CustomEntryTypeDialogViewModel.FIELD_STRING_CONVERTER);
 
         fieldTypeActionColumn.setSortable(false);
         fieldTypeActionColumn.setReorderable(false);

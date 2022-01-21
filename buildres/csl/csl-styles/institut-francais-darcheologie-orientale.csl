@@ -21,7 +21,7 @@
   <locale xml:lang="fr">
     <terms>
       <term name="no date" form="short">s.d.</term>
-      <term name="sub verbo" form="short">s.v.</term>
+      <term name="sub-verbo" form="short">s.v.</term>
     </terms>
   </locale>
   <macro name="title">
@@ -268,7 +268,7 @@
           <text macro="volume"/>
         </group>
         <group delimiter="&#160;" prefix=", ">
-          <text term="sub verbo" form="short" font-style="italic"/>
+          <text term="sub-verbo" form="short" font-style="italic"/>
           <text macro="title"/>
         </group>
       </else-if>
@@ -486,7 +486,7 @@
               </choose>
               <text macro="pages"/>
               <group delimiter="&#160;">
-                <text term="sub verbo" form="short" font-style="italic"/>
+                <text term="sub-verbo" form="short" font-style="italic"/>
                 <text macro="title"/>
               </group>
             </group>
