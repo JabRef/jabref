@@ -93,7 +93,8 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                 preferencesService,
                 Globals.getFileUpdateMonitor(),
                 undoManager,
-                stateManager);
+                stateManager,
+                dialogService);
 
         localDragboard = stateManager.getLocalDragboard();
 

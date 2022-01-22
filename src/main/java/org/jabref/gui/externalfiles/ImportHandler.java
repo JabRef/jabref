@@ -6,16 +6,21 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import javax.swing.undo.CompoundEdit;
 import javax.swing.undo.UndoManager;
 
+import org.jabref.gui.DialogService;
+import org.jabref.gui.Globals;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.duplicationFinder.DuplicateResolverDialog;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.undo.UndoableInsertEntries;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
+import org.jabref.logic.database.DuplicateCheck;
 import org.jabref.logic.externalfiles.ExternalFilesContentImporter;
 import org.jabref.logic.importer.ImportCleanup;
 import org.jabref.logic.l10n.Localization;
@@ -43,18 +48,21 @@ public class ImportHandler {
     private final ExternalFilesContentImporter contentImporter;
     private final UndoManager undoManager;
     private final StateManager stateManager;
+    private final DialogService dialogService;
 
     public ImportHandler(BibDatabaseContext database,
                          ExternalFileTypes externalFileTypes,
                          PreferencesService preferencesService,
                          FileUpdateMonitor fileupdateMonitor,
                          UndoManager undoManager,
-                         StateManager stateManager) {
+                         StateManager stateManager,
+                         DialogService dialogService) {
 
         this.bibdatabase = database;
         this.preferencesService = preferencesService;
         this.fileUpdateMonitor = fileupdateMonitor;
         this.stateManager = stateManager;
+        this.dialogService = dialogService;
 
         this.linker = new ExternalFilesEntryLinker(externalFileTypes, preferencesService.getFilePreferences(), database);
         this.contentImporter = new ExternalFilesContentImporter(
@@ -169,6 +177,41 @@ public class ImportHandler {
         // Add to group
         addToGroups(entries, stateManager.getSelectedGroup(bibdatabase));
     }
+
+    public void importEntryWithDuplicateCheck(BibDatabaseContext bibDatabaseContext, BibEntry entry) {
+
+        ImportCleanup cleanup = new ImportCleanup(bibDatabaseContext.getMode());
+        cleanup.doPostCleanup(entry);
+        Optional<BibEntry> duplicate = new DuplicateCheck(Globals.entryTypesManager).containsDuplicate(bibDatabaseContext.getDatabase(), entry, bibDatabaseContext.getMode());
+        if (duplicate.isPresent()) {
+            DuplicateResolverDialog dialog = new DuplicateResolverDialog(entry, duplicate.get(), DuplicateResolverDialog.DuplicateResolverType.IMPORT_CHECK, bibDatabaseContext, stateManager);
+            switch (dialogService.showCustomDialogAndWait(dialog).orElse(DuplicateResolverDialog.DuplicateResolverResult.BREAK)) {
+                case KEEP_LEFT:
+                    bibDatabaseContext.getDatabase().removeEntry(duplicate.get());
+                    bibDatabaseContext.getDatabase().insertEntry(entry);
+                    break;
+                case KEEP_BOTH:
+                    bibDatabaseContext.getDatabase().insertEntry(entry);
+                    break;
+                case KEEP_MERGE:
+                    bibDatabaseContext.getDatabase().removeEntry(duplicate.get());
+                    bibDatabaseContext.getDatabase().insertEntry(dialog.getMergedEntry());
+                    break;
+                default:
+                    // Do nothing
+                    break;
+            }
+        } else {
+            // Regenerate CiteKey of imported BibEntry
+
+            // Generate citation keys
+            if (preferencesService.getImporterPreferences().isGenerateNewKeyOnImport()) {
+                generateKeys(List.of(entry));
+            }
+            bibDatabaseContext.getDatabase().insertEntry(entry);
+        }
+    }
+
 
     private void addToGroups(List<BibEntry> entries, Collection<GroupTreeNode> groups) {
         for (GroupTreeNode node : groups) {
