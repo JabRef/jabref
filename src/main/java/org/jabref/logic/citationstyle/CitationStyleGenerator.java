@@ -34,8 +34,7 @@ public class CitationStyleGenerator {
     }
 
     /**
-     * Generates a Citation based on the given entry and style an  bib database
-     * @param html
+     * Generates a Citation based on the given entry and style with a default bib database
      *
      * @implNote the citation is generated using JavaScript which may take some time, better call it from outside the main Thread
      */
@@ -48,7 +47,7 @@ public class CitationStyleGenerator {
      *
      * @implNote the citation is generated using JavaScript which may take some time, better call it from outside the main Thread
      */
-    public static String generateCitation(BibEntry entry, String style, CitationStyleOutputFormat outputFormat, BibDatabase database ) {
+    public static String generateCitation(BibEntry entry, String style, CitationStyleOutputFormat outputFormat, BibDatabase database) {
         return generateCitations(Collections.singletonList(entry), style, outputFormat, database).stream().findFirst().orElse("");
     }
 
