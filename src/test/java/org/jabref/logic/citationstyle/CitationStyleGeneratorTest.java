@@ -49,7 +49,6 @@ class CitationStyleGeneratorTest {
         assertEquals(expected, citation);
     }
 
-
     @Test
     @Disabled("Currently citeproc does not handler number field correctly https://github.com/JabRef/jabref/issues/8372")
     void testHtmlFormat() {
@@ -63,7 +62,6 @@ class CitationStyleGeneratorTest {
         String actualCitation = CitationStyleGenerator.generateCitation(entry, style, format, new BibDatabase());
         assertEquals(expectedCitation, actualCitation);
     }
-
 
     @Test
     @Disabled("Currently citeproc does not handle number field correctly https://github.com/JabRef/jabref/issues/8372")
@@ -106,7 +104,6 @@ class CitationStyleGeneratorTest {
 
     @Test
     void testHandleCrossRefFields() {
-
         BibEntry firstEntry = new BibEntry(StandardEntryType.InCollection)
             .withCitationKey("smit2021")
             .withField(StandardField.AUTHOR, "Smith, Bob")
@@ -128,7 +125,6 @@ class CitationStyleGeneratorTest {
 
         String actualCitation = CitationStyleGenerator.generateCitation(firstEntry, style, CitationStyleOutputFormat.TEXT, bibDatabase);
         assertEquals(expectedCitation, actualCitation);
-
     }
 }
 

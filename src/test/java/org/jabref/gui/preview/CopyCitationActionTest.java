@@ -108,7 +108,6 @@ class CopyCitationActionTest {
         assertEquals(expected, actual);
     }
 
-
     @Test
     void processHtmlAsHtml() throws Exception {
         String expected = "<!DOCTYPE html>" + OS.NEWLINE +
