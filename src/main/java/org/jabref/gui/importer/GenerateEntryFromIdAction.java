@@ -3,19 +3,14 @@ package org.jabref.gui.importer;
 import java.util.Optional;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.Globals;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
-import org.jabref.gui.duplicationFinder.DuplicateResolverDialog;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.JabRefException;
-import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
-import org.jabref.logic.database.DuplicateCheck;
 import org.jabref.logic.importer.CompositeIdFetcher;
 import org.jabref.logic.importer.FetcherException;
-import org.jabref.logic.importer.ImportCleanup;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.types.StandardEntryType;
@@ -64,32 +59,7 @@ public class GenerateEntryFromIdAction extends SimpleCommand {
             Optional<BibEntry> result = bibEntry;
             if (result.isPresent()) {
                 final BibEntry entry = result.get();
-                ImportCleanup cleanup = new ImportCleanup(libraryTab.getBibDatabaseContext().getMode());
-                cleanup.doPostCleanup(entry);
-                Optional<BibEntry> duplicate = new DuplicateCheck(Globals.entryTypesManager).containsDuplicate(libraryTab.getDatabase(), entry, libraryTab.getBibDatabaseContext().getMode());
-                if (duplicate.isPresent()) {
-                    DuplicateResolverDialog dialog = new DuplicateResolverDialog(entry, duplicate.get(), DuplicateResolverDialog.DuplicateResolverType.IMPORT_CHECK, libraryTab.getBibDatabaseContext(), stateManager);
-                    switch (dialogService.showCustomDialogAndWait(dialog).orElse(DuplicateResolverDialog.DuplicateResolverResult.BREAK)) {
-                        case KEEP_LEFT:
-                            libraryTab.getDatabase().removeEntry(duplicate.get());
-                            libraryTab.getDatabase().insertEntry(entry);
-                            break;
-                        case KEEP_BOTH:
-                            libraryTab.getDatabase().insertEntry(entry);
-                            break;
-                        case KEEP_MERGE:
-                            libraryTab.getDatabase().removeEntry(duplicate.get());
-                            libraryTab.getDatabase().insertEntry(dialog.getMergedEntry());
-                            break;
-                        default:
-                            // Do nothing
-                            break;
-                    }
-                } else {
-                    // Regenerate CiteKey of imported BibEntry
-                    new CitationKeyGenerator(libraryTab.getBibDatabaseContext(), preferencesService.getCitationKeyPatternPreferences()).generateAndSetKey(entry);
-                    libraryTab.insertEntry(entry);
-                }
+
             } else {
                 dialogService.notify("No entry found or import canceled");
             }
