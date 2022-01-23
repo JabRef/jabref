@@ -31,6 +31,7 @@ elif subprocess.run(["flatpak", "info", "org.jabref.jabref"], capture_output=Tru
     JABREF_PATH = "flatpak run org.jabref.jabref"
 else:
     logging.error("Could not determine JABREF_PATH")
+    send_message({"message": "error", "output": "Could not find JabRef. Please check that it is installed correctly.})
     sys.exit(-1)
 
 logging_dir = Path.home() / ".mozilla/native-messaging-hosts/"
