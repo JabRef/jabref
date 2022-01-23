@@ -13,7 +13,7 @@ public class CitationStylePreviewLayout implements PreviewLayout {
 
     @Override
     public String generatePreview(BibEntry entry, BibDatabase database) {
-        return CitationStyleGenerator.generateCitation(entry, citationStyle.getSource(), CitationStyleOutputFormat.HTML);
+        return CitationStyleGenerator.generateCitation(entry, citationStyle.getSource(), CitationStyleOutputFormat.HTML, database);
     }
 
     @Override

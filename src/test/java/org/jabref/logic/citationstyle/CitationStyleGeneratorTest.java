@@ -2,6 +2,7 @@ package org.jabref.logic.citationstyle;
 
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TestEntry;
+import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 
@@ -53,7 +54,7 @@ class CitationStyleGeneratorTest {
         String style = CitationStyle.getDefault().getSource();
         CitationStyleOutputFormat format = CitationStyleOutputFormat.ASCII_DOC;
 
-        String actualCitation = CitationStyleGenerator.generateCitation(entry, style, format);
+        String actualCitation = CitationStyleGenerator.generateCitation(entry, style, format, new BibDatabase());
         assertEquals(expectedCitation, actualCitation);
     }
 
@@ -66,7 +67,7 @@ class CitationStyleGeneratorTest {
         String style = CitationStyle.getDefault().getSource();
         CitationStyleOutputFormat format = CitationStyleOutputFormat.HTML;
 
-        String actualCitation = CitationStyleGenerator.generateCitation(entry, style, format);
+        String actualCitation = CitationStyleGenerator.generateCitation(entry, style, format, new BibDatabase());
         assertEquals(expectedCitation, actualCitation);
     }
 
@@ -77,7 +78,7 @@ class CitationStyleGeneratorTest {
         String style = CitationStyle.getDefault().getSource();
         CitationStyleOutputFormat format = CitationStyleOutputFormat.RTF;
 
-        String actualCitation = CitationStyleGenerator.generateCitation(entry, style, format);
+        String actualCitation = CitationStyleGenerator.generateCitation(entry, style, format, new BibDatabase());
         assertEquals(expectedCitation, actualCitation);
     }
 
@@ -88,7 +89,7 @@ class CitationStyleGeneratorTest {
         String style = CitationStyle.getDefault().getSource();
         CitationStyleOutputFormat format = CitationStyleOutputFormat.TEXT;
 
-        String actualCitation = CitationStyleGenerator.generateCitation(entry, style, format);
+        String actualCitation = CitationStyleGenerator.generateCitation(entry, style, format, new BibDatabase());
         assertEquals(expectedCitation, actualCitation);
     }
 
@@ -114,7 +115,7 @@ class CitationStyleGeneratorTest {
         String style = CitationStyle.getDefault().getSource();
         CitationStyleOutputFormat format = CitationStyleOutputFormat.XSL_FO;
 
-        String actualCitation = CitationStyleGenerator.generateCitation(entry, style, format);
+        String actualCitation = CitationStyleGenerator.generateCitation(entry, style, format, new BibDatabase());
         assertEquals(expectedCitation, actualCitation);
     }
 
@@ -139,7 +140,7 @@ class CitationStyleGeneratorTest {
         String style = CitationStyle.getDefault().getSource();
         CitationStyleOutputFormat format = CitationStyleOutputFormat.TEXT;
 
-        String actualCitation = CitationStyleGenerator.generateCitation(entry, style, format);
+        String actualCitation = CitationStyleGenerator.generateCitation(entry, style, format, new BibDatabase());
         assertEquals(expectedCitation, actualCitation);
     }
 }

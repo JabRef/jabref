@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Objects;
 
 import org.jabref.logic.formatter.bibtexfields.RemoveNewlinesFormatter;
+import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.Month;
 import org.jabref.model.entry.field.Field;
@@ -49,9 +50,10 @@ public class CSLAdapter {
     /**
      * Creates the bibliography of the provided items. This method needs to run synchronized because the underlying
      * CSL engine is not thread-safe.
+     * @param database
      */
-    public synchronized List<String> makeBibliography(List<BibEntry> bibEntries, String style, CitationStyleOutputFormat outputFormat) throws IOException, IllegalArgumentException {
-        dataProvider.setData(bibEntries);
+    public synchronized List<String> makeBibliography(List<BibEntry> bibEntries, String style, CitationStyleOutputFormat outputFormat, BibDatabase database) throws IOException, IllegalArgumentException {
+        dataProvider.setData(bibEntries, database);
         initialize(style, outputFormat);
         cslInstance.registerCitationItems(dataProvider.getIds());
         final Bibliography bibliography = cslInstance.makeBibliography();
@@ -86,18 +88,21 @@ public class CSLAdapter {
     private static class JabRefItemDataProvider implements ItemDataProvider {
 
         private final List<BibEntry> data = new ArrayList<>();
+        private BibDatabase bibDatabase;
 
         /**
          * Converts the {@link BibEntry} into {@link CSLItemData}.
          */
-        private static CSLItemData bibEntryToCSLItemData(BibEntry bibEntry) {
+        private static CSLItemData bibEntryToCSLItemData(BibEntry bibEntry, BibDatabase bibDatabase) {
+            bibDatabase = bibDatabase != null ? bibDatabase : new BibDatabase();
+
             String citeKey = bibEntry.getCitationKey().orElse("");
             BibTeXEntry bibTeXEntry = new BibTeXEntry(new Key(bibEntry.getType().getName()), new Key(citeKey));
 
             // Not every field is already generated into latex free fields
             RemoveNewlinesFormatter removeNewlinesFormatter = new RemoveNewlinesFormatter();
             for (Field key : bibEntry.getFieldMap().keySet()) {
-                bibEntry.getField(key)
+                bibEntry.getResolvedFieldOrAlias(key, bibDatabase)
                         .map(removeNewlinesFormatter::format)
                         .map(LatexToUnicodeAdapter::format)
                         .ifPresent(value -> {
@@ -106,21 +111,26 @@ public class CSLAdapter {
                                 value = bibEntry.getMonth().map(Month::getShortName).orElse(value);
                             }
                             bibTeXEntry.addField(new Key(key.getName()), new DigitStringValue(value));
+
+                            if(StandardField.CROSSREF.equals(key)) {
+
+                            }
                         });
             }
             return BIBTEX_CONVERTER.toItemData(bibTeXEntry);
         }
 
-        public void setData(List<BibEntry> data) {
+        public void setData(List<BibEntry> data, BibDatabase database) {
             this.data.clear();
             this.data.addAll(data);
+            this.bibDatabase = database;
         }
 
         @Override
         public CSLItemData retrieveItem(String id) {
             return data.stream()
                        .filter(entry -> entry.getCitationKey().orElse("").equals(id))
-                       .map(JabRefItemDataProvider::bibEntryToCSLItemData)
+                       .map(entry -> JabRefItemDataProvider.bibEntryToCSLItemData(entry, bibDatabase))
                        .findFirst().orElse(null);
         }
 
