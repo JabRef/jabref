@@ -40,10 +40,7 @@ public class LinkedEntriesEditorViewModel extends AbstractEditorViewModel {
 
             @Override
             public String toString(ParsedEntryLink linkedEntry) {
-                if (linkedEntry == null) {
-                    return "";
-                }
-                return linkedEntry.getKey();
+                return linkedEntry == null ? "" : linkedEntry.getKey();
             }
 
             @Override

@@ -1,7 +1,5 @@
 package org.jabref.gui.fieldeditors;
 
-import java.util.stream.Collectors;
-
 import javafx.beans.binding.Bindings;
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
@@ -42,7 +40,7 @@ public class LinkedEntriesEditor extends HBox implements FieldEditorFX {
                 .withText(ParsedEntryLink::getKey);
         chipView.getAutoCompletePopup().setSuggestionsCellFactory(autoCompletionItemFactory);
         chipView.getAutoCompletePopup().setCellLimit(5);
-        chipView.getSuggestions().addAll(suggestionProvider.getPossibleSuggestions().stream().map(ParsedEntryLink::new).collect(Collectors.toList()));
+        chipView.getSuggestions().addAll(suggestionProvider.getPossibleSuggestions().stream().map(ParsedEntryLink::new).toList());
 
         chipView.setChipFactory((view, item) -> {
             JFXChip<ParsedEntryLink> chip = new JFXDefaultChip<>(view, item);
