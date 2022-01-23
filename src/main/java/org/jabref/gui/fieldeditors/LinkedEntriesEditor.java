@@ -5,11 +5,13 @@ import java.util.stream.Collectors;
 import javafx.beans.binding.Bindings;
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.HBox;
 
 import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.integrity.FieldCheckers;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.ParsedEntryLink;
@@ -34,6 +36,7 @@ public class LinkedEntriesEditor extends HBox implements FieldEditorFX {
                   .root(this)
                   .load();
 
+        chipView.setTooltip(new Tooltip(Localization.lang("Jump to entry")));
         chipView.setConverter(viewModel.getStringConverter());
         var autoCompletionItemFactory = new ViewModelListCellFactory<ParsedEntryLink>()
                 .withText(ParsedEntryLink::getKey);
