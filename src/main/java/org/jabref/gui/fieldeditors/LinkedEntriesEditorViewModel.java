@@ -5,6 +5,7 @@ import javafx.beans.property.SimpleListProperty;
 import javafx.collections.FXCollections;
 import javafx.util.StringConverter;
 
+import org.jabref.gui.JabRefGUI;
 import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.logic.integrity.FieldCheckers;
@@ -53,13 +54,12 @@ public class LinkedEntriesEditorViewModel extends AbstractEditorViewModel {
     }
 
     public void jumpToEntry(ParsedEntryLink parsedEntryLink) {
-        // TODO: Implement jump to entry
-        // TODO: Add toolitp for tag: Localization.lang("Jump to entry")
-        // This feature was removed while converting the linked entries editor to JavaFX
-        // Right now there is no nice way to re-implement it as we have no good interface to control the focus of the main table
-        // (except directly using the JabRefFrame class as below)
-        // parsedEntryLink.getLinkedEntry().ifPresent(
-        //        e -> frame.getCurrentBasePanel().highlightEntry(e)
-        // );
+        var linkedEntry = parsedEntryLink.getLinkedEntry();
+        if (linkedEntry.isPresent()) {
+            var currentLibraryTab = JabRefGUI.getMainFrame().getCurrentLibraryTab();
+            if (databaseContext.equals(currentLibraryTab.getBibDatabaseContext())) {
+                currentLibraryTab.clearAndSelect(linkedEntry.get());
+            }
+        }
     }
 }
