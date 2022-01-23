@@ -101,6 +101,11 @@ public class CSLAdapter {
 
             // Not every field is already generated into latex free fields
             RemoveNewlinesFormatter removeNewlinesFormatter = new RemoveNewlinesFormatter();
+
+            // adapted from TexBibEntriesResolver
+            bibDatabase.getReferencedEntry(bibEntry).ifPresent(refEntry ->
+            refEntry.getFields().forEach(field -> bibEntry.getFieldMap().putIfAbsent(field, refEntry.getFieldOrAlias(field).orElse(""))));
+
             for (Field key : bibEntry.getFieldMap().keySet()) {
                 bibEntry.getResolvedFieldOrAlias(key, bibDatabase)
                         .map(removeNewlinesFormatter::format)
@@ -112,9 +117,6 @@ public class CSLAdapter {
                             }
                             bibTeXEntry.addField(new Key(key.getName()), new DigitStringValue(value));
 
-                            if(StandardField.CROSSREF.equals(key)) {
-
-                            }
                         });
             }
             return BIBTEX_CONVERTER.toItemData(bibTeXEntry);

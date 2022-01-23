@@ -13,6 +13,8 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 
 ### Changed
 
+- The CSL preview styles now also support displaying data from cross references entries that are linked via the `crossref` field [#7378](https://github.com/JabRef/jabref/issues/7378)
+
 ### Fixed
 
 - We fixed an issue where an exception could occur when saving the preferences [#7614](https://github.com/JabRef/jabref/issues/7614)
