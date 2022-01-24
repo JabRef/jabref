@@ -108,7 +108,7 @@ public class GroupTreeView extends BorderPane {
         HBox.setHgrow(searchField, Priority.ALWAYS);
         HBox groupFilterBar = new HBox(searchField);
         groupFilterBar.setId("groupFilterBar");
-        this.setTop(groupFilterBar);
+        this.setCenter(groupFilterBar);
 
         mainColumn = new TreeTableColumn<>();
         mainColumn.setId("mainColumn");
@@ -126,7 +126,7 @@ public class GroupTreeView extends BorderPane {
         groupTree.setId("groupTree");
         groupTree.setColumnResizePolicy(TreeTableView.CONSTRAINED_RESIZE_POLICY);
         groupTree.getColumns().addAll(List.of(mainColumn, numberColumn, expansionNodeColumn));
-        this.setCenter(groupTree);
+        this.setBottom(groupTree);
 
         addNewGroup = new Button(Localization.lang("Add group"));
         addNewGroup.setId("addNewGroup");
@@ -137,7 +137,7 @@ public class GroupTreeView extends BorderPane {
 
         HBox groupBar = new HBox(addNewGroup);
         groupBar.setId("groupBar");
-        this.setBottom(groupBar);
+        this.setTop(groupBar);
     }
 
     private void initialize() {
