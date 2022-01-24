@@ -6,10 +6,13 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
+import org.jabref.gui.Globals;
 import org.jabref.logic.formatter.bibtexfields.RemoveNewlinesFormatter;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.Month;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
@@ -102,11 +105,12 @@ public class CSLAdapter {
             // Not every field is already generated into latex free fields
             RemoveNewlinesFormatter removeNewlinesFormatter = new RemoveNewlinesFormatter();
 
-            // adapted from TexBibEntriesResolver
-            bibDatabase.getReferencedEntry(bibEntry).ifPresent(refEntry ->
-            refEntry.getFields().forEach(field -> bibEntry.getFieldMap().putIfAbsent(field, refEntry.getFieldOrAlias(field).orElse(""))));
+            Optional<BibEntryType> entryType = Globals.entryTypesManager.enrich(bibEntry.getType(), bibDatabase.());
+            if (entryType.isPresent()) {
 
-            for (Field key : bibEntry.getFieldMap().keySet()) {
+            }
+
+            for (Field key : bibEntry.getType()..keySet()) {
                 bibEntry.getResolvedFieldOrAlias(key, bibDatabase)
                         .map(removeNewlinesFormatter::format)
                         .map(LatexToUnicodeAdapter::format)
