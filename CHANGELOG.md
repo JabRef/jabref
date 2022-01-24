@@ -13,6 +13,8 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 
 ### Changed
 
+- We changed the position of the Add group button from bottom to top [#8398](https://github.com/JabRef/jabref/issues/8398)
+
 ### Fixed
 
 - We fixed an issue where an exception could occur when saving the preferences [#7614](https://github.com/JabRef/jabref/issues/7614)
