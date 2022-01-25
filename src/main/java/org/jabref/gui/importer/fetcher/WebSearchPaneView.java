@@ -45,7 +45,7 @@ public class WebSearchPaneView extends VBox {
         fetchers.itemsProperty().bind(viewModel.fetchersProperty());
         fetchers.valueProperty().bindBidirectional(viewModel.selectedFetcherProperty());
         fetchers.setMaxWidth(Double.POSITIVE_INFINITY);
-//        setAlignment(Pos.BASELINE_RIGHT);
+
         // Create help button for currently selected fetcher
         StackPane helpButtonContainer = new StackPane();
         ActionFactory factory = new ActionFactory(preferences.getKeyBindingRepository());
