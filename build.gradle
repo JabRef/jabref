@@ -10,7 +10,7 @@ import org.jabref.build.xjc.XjcTask
 plugins {
     id 'application'
 
-    id 'com.github.andygoossens.modernizer' version '1.6.1'
+    id 'com.github.andygoossens.modernizer' version '1.6.2'
 
     id 'me.champeau.gradle.jmh' version '0.5.3'
 
@@ -119,7 +119,7 @@ dependencies {
     implementation 'org.apache.pdfbox:xmpbox:2.0.25'
 
     implementation group: 'org.apache.commons', name: 'commons-csv', version: '1.9.0'
-    implementation 'com.h2database:h2-mvstore:2.0.206'
+    implementation 'com.h2database:h2-mvstore:2.1.210'
 
     implementation group: 'org.apache.tika', name: 'tika-core', version: '2.2.1'
 
@@ -145,7 +145,7 @@ dependencies {
     implementation group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-yaml', version: '2.13.1'
     implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.13.1'
 
-    implementation group: 'org.mariadb.jdbc', name: 'mariadb-java-client', version: '2.7.4'
+    implementation group: 'org.mariadb.jdbc', name: 'mariadb-java-client', version: '2.7.5'
 
     implementation 'org.postgresql:postgresql:42.3.1'
 
@@ -208,9 +208,9 @@ dependencies {
 
     testRuntimeOnly group: 'org.apache.logging.log4j', name: 'log4j-core', version: '3.0.0-SNAPSHOT'
     testRuntimeOnly group: 'org.apache.logging.log4j', name: 'log4j-jul', version: '3.0.0-SNAPSHOT'
-    testImplementation 'org.mockito:mockito-core:4.2.0'
+    testImplementation 'org.mockito:mockito-core:4.3.0'
     testImplementation 'org.xmlunit:xmlunit-core:2.8.4'
-    testImplementation 'org.xmlunit:xmlunit-matchers:2.8.3'
+    testImplementation 'org.xmlunit:xmlunit-matchers:2.8.4'
     testRuntimeOnly 'com.tngtech.archunit:archunit-junit5-engine:0.22.0'
     testImplementation 'com.tngtech.archunit:archunit-junit5-api:0.22.0'
     testImplementation "org.testfx:testfx-core:4.0.17-alpha-SNAPSHOT"
