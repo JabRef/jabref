@@ -24,18 +24,18 @@ public class CitationStyleCache {
     private PreviewLayout citationStyle;
     private final LoadingCache<BibEntry, String> citationStyleCache;
 
-    public CitationStyleCache(BibDatabaseContext database) {
+    public CitationStyleCache(BibDatabaseContext databaseContext) {
         citationStyleCache = CacheBuilder.newBuilder().maximumSize(CACHE_SIZE).build(new CacheLoader<BibEntry, String>() {
             @Override
             public String load(BibEntry entry) {
                 if (citationStyle != null) {
-                    return citationStyle.generatePreview(entry, database.getDatabase());
+                    return citationStyle.generatePreview(entry, databaseContext);
                 } else {
                     return "";
                 }
             }
         });
-        database.getDatabase().registerListener(new BibDatabaseEntryListener());
+        databaseContext.getDatabase().registerListener(new BibDatabaseEntryListener());
     }
 
     /**

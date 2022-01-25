@@ -10,7 +10,7 @@ import java.util.Optional;
 
 import org.jabref.gui.Globals;
 import org.jabref.logic.formatter.bibtexfields.RemoveNewlinesFormatter;
-import org.jabref.model.database.BibDatabase;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.Month;
@@ -53,10 +53,10 @@ public class CSLAdapter {
     /**
      * Creates the bibliography of the provided items. This method needs to run synchronized because the underlying
      * CSL engine is not thread-safe.
-     * @param database
+     * @param databaseContext
      */
-    public synchronized List<String> makeBibliography(List<BibEntry> bibEntries, String style, CitationStyleOutputFormat outputFormat, BibDatabase database) throws IOException, IllegalArgumentException {
-        dataProvider.setData(bibEntries, database);
+    public synchronized List<String> makeBibliography(List<BibEntry> bibEntries, String style, CitationStyleOutputFormat outputFormat, BibDatabaseContext databaseContext) throws IOException, IllegalArgumentException {
+        dataProvider.setData(bibEntries, databaseContext);
         initialize(style, outputFormat);
         cslInstance.registerCitationItems(dataProvider.getIds());
         final Bibliography bibliography = cslInstance.makeBibliography();
@@ -91,13 +91,12 @@ public class CSLAdapter {
     private static class JabRefItemDataProvider implements ItemDataProvider {
 
         private final List<BibEntry> data = new ArrayList<>();
-        private BibDatabase bibDatabase;
+        private BibDatabaseContext bibDatabaseContext;
 
         /**
          * Converts the {@link BibEntry} into {@link CSLItemData}.
          */
-        private static CSLItemData bibEntryToCSLItemData(BibEntry bibEntry, BibDatabase bibDatabase) {
-            bibDatabase = bibDatabase != null ? bibDatabase : new BibDatabase();
+        private static CSLItemData bibEntryToCSLItemData(BibEntry bibEntry, BibDatabaseContext bibDatabaseContext) {
 
             String citeKey = bibEntry.getCitationKey().orElse("");
             BibTeXEntry bibTeXEntry = new BibTeXEntry(new Key(bibEntry.getType().getName()), new Key(citeKey));
@@ -105,13 +104,13 @@ public class CSLAdapter {
             // Not every field is already generated into latex free fields
             RemoveNewlinesFormatter removeNewlinesFormatter = new RemoveNewlinesFormatter();
 
-            Optional<BibEntryType> entryType = Globals.entryTypesManager.enrich(bibEntry.getType(), bibDatabase.());
+            Optional<BibEntryType> entryType = Globals.entryTypesManager.enrich(bibEntry.getType(), bibDatabaseContext.getMode());
             if (entryType.isPresent()) {
 
             }
 
-            for (Field key : bibEntry.getType()..keySet()) {
-                bibEntry.getResolvedFieldOrAlias(key, bibDatabase)
+            for (Field key : bibEntry.getFields()) {
+                bibEntry.getResolvedFieldOrAlias(key, bibDatabaseContext.getDatabase())
                         .map(removeNewlinesFormatter::format)
                         .map(LatexToUnicodeAdapter::format)
                         .ifPresent(value -> {
@@ -122,21 +121,23 @@ public class CSLAdapter {
                             bibTeXEntry.addField(new Key(key.getName()), new DigitStringValue(value));
 
                         });
+
+
             }
             return BIBTEX_CONVERTER.toItemData(bibTeXEntry);
         }
 
-        public void setData(List<BibEntry> data, BibDatabase database) {
+        public void setData(List<BibEntry> data, BibDatabaseContext bibDatabaseContext) {
             this.data.clear();
             this.data.addAll(data);
-            this.bibDatabase = database;
+            this.bibDatabaseContext = bibDatabaseContext;
         }
 
         @Override
         public CSLItemData retrieveItem(String id) {
             return data.stream()
                        .filter(entry -> entry.getCitationKey().orElse("").equals(id))
-                       .map(entry -> JabRefItemDataProvider.bibEntryToCSLItemData(entry, bibDatabase))
+                       .map(entry -> JabRefItemDataProvider.bibEntryToCSLItemData(entry, bibDatabaseContext))
                        .findFirst().orElse(null);
         }
 

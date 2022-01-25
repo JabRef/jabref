@@ -5,7 +5,7 @@ import java.io.StringReader;
 
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preview.PreviewLayout;
-import org.jabref.model.database.BibDatabase;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
 import org.slf4j.Logger;
@@ -43,9 +43,9 @@ public class TextBasedPreviewLayout implements PreviewLayout {
     }
 
     @Override
-    public String generatePreview(BibEntry entry, BibDatabase database) {
+    public String generatePreview(BibEntry entry, BibDatabaseContext databaseContext) {
         if (layout != null) {
-            return layout.doLayout(entry, database);
+            return layout.doLayout(entry, databaseContext.getDatabase());
         } else {
             return "";
         }

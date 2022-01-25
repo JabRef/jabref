@@ -5,7 +5,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.jabref.logic.l10n.Localization;
-import org.jabref.model.database.BibDatabase;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
 import org.jbibtex.TokenMgrException;
@@ -39,7 +39,7 @@ public class CitationStyleGenerator {
      * @implNote the citation is generated using JavaScript which may take some time, better call it from outside the main Thread
      */
     protected static String generateCitation(BibEntry entry, String style) {
-        return generateCitation(entry, style, CitationStyleOutputFormat.HTML, new BibDatabase());
+        return generateCitation(entry, style, CitationStyleOutputFormat.HTML, new BibDatabaseContext());
     }
 
     /**
@@ -47,8 +47,8 @@ public class CitationStyleGenerator {
      *
      * @implNote the citation is generated using JavaScript which may take some time, better call it from outside the main Thread
      */
-    public static String generateCitation(BibEntry entry, String style, CitationStyleOutputFormat outputFormat, BibDatabase database) {
-        return generateCitations(Collections.singletonList(entry), style, outputFormat, database).stream().findFirst().orElse("");
+    public static String generateCitation(BibEntry entry, String style, CitationStyleOutputFormat outputFormat, BibDatabaseContext databaseContext) {
+        return generateCitations(Collections.singletonList(entry), style, outputFormat, databaseContext).stream().findFirst().orElse("");
     }
 
     /**
@@ -56,9 +56,9 @@ public class CitationStyleGenerator {
      *
      * @implNote The citations are generated using JavaScript which may take some time, better call it from outside the main thread.
      */
-    public static List<String> generateCitations(List<BibEntry> bibEntries, String style, CitationStyleOutputFormat outputFormat, BibDatabase database) {
+    public static List<String> generateCitations(List<BibEntry> bibEntries, String style, CitationStyleOutputFormat outputFormat, BibDatabaseContext databaseContext) {
         try {
-            return CSL_ADAPTER.makeBibliography(bibEntries, style, outputFormat, database);
+            return CSL_ADAPTER.makeBibliography(bibEntries, style, outputFormat, databaseContext);
         } catch (IllegalArgumentException e) {
             LOGGER.error("Could not generate BibEntry citation. The CSL engine could not create a preview for your item.", e);
             return Collections.singletonList(Localization.lang("Cannot generate preview based on selected citation style."));
