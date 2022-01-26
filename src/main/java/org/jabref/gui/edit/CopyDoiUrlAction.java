@@ -25,7 +25,7 @@ public class CopyDoiUrlAction extends SimpleCommand {
     public void execute() {
         String identifier = component.getText();
 
-        Optional<String> urlOptional = DOI.parse(identifier).map(DOI::getURIAsASCIIString);
+        Optional<String> urlOptional = DOI.parse(identifier).map(DOI::getDOI);
         if (urlOptional.isPresent()) {
             Globals.getClipboardManager().setContent(urlOptional.get());
             JabRefGUI.getMainFrame().getDialogService().notify(Localization.lang("The link has been copied to the clipboard."));
