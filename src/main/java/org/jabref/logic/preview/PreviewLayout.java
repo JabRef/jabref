@@ -10,7 +10,7 @@ import org.jabref.model.entry.BibEntry;
  */
 public interface PreviewLayout {
 
-    String generatePreview(BibEntry entry,  BibDatabaseContext databaseContext);
+    String generatePreview(BibEntry entry, BibDatabaseContext databaseContext);
 
     String getDisplayName();
 

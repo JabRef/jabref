@@ -8,6 +8,7 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 
@@ -18,6 +19,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class CitationStyleGeneratorTest {
 
+    private final BibEntryTypesManager bibEntryTypesManager = new BibEntryTypesManager();
+
     @Test
     void testIgnoreNewLine() {
         BibEntry entry = new BibEntry();
@@ -27,7 +30,7 @@ class CitationStyleGeneratorTest {
         String expected = "  <div class=\"csl-entry\">\n" +
                 "    <div class=\"csl-left-margin\">[1]</div><div class=\"csl-right-inline\">F. Last and J. Doe, </div>\n" +
                 "  </div>\n";
-        String citation = CitationStyleGenerator.generateCitation(entry, CitationStyle.getDefault());
+        String citation = CitationStyleGenerator.generateCitation(entry, CitationStyle.getDefault(), bibEntryTypesManager);
         assertEquals(expected, citation);
     }
 
@@ -40,14 +43,14 @@ class CitationStyleGeneratorTest {
         String expected = "  <div class=\"csl-entry\">\n" +
                 "    <div class=\"csl-left-margin\">[1]</div><div class=\"csl-right-inline\">F. Last and J. Doe, </div>\n" +
                 "  </div>\n";
-        String citation = CitationStyleGenerator.generateCitation(entry, CitationStyle.getDefault());
+        String citation = CitationStyleGenerator.generateCitation(entry, CitationStyle.getDefault(), bibEntryTypesManager);
         assertEquals(expected, citation);
     }
 
     @Test
     void testMissingCitationStyle() {
         String expected = Localization.lang("Cannot generate preview based on selected citation style.");
-        String citation = CitationStyleGenerator.generateCitation(new BibEntry(), "faulty citation style");
+        String citation = CitationStyleGenerator.generateCitation(new BibEntry(), "faulty citation style", bibEntryTypesManager);
         assertEquals(expected, citation);
     }
 
@@ -62,7 +65,7 @@ class CitationStyleGeneratorTest {
         String style = CitationStyle.getDefault().getSource();
         CitationStyleOutputFormat format = CitationStyleOutputFormat.HTML;
 
-        String actualCitation = CitationStyleGenerator.generateCitation(entry, style, format, new BibDatabaseContext());
+        String actualCitation = CitationStyleGenerator.generateCitation(entry, style, format, new BibDatabaseContext(), bibEntryTypesManager);
         assertEquals(expectedCitation, actualCitation);
     }
 
@@ -74,7 +77,7 @@ class CitationStyleGeneratorTest {
         String style = CitationStyle.getDefault().getSource();
         CitationStyleOutputFormat format = CitationStyleOutputFormat.TEXT;
 
-        String actualCitation = CitationStyleGenerator.generateCitation(entry, style, format, new BibDatabaseContext(new BibDatabase(List.of(entry))));
+        String actualCitation = CitationStyleGenerator.generateCitation(entry, style, format, new BibDatabaseContext(new BibDatabase(List.of(entry))), bibEntryTypesManager);
         assertEquals(expectedCitation, actualCitation);
     }
 
@@ -88,7 +91,7 @@ class CitationStyleGeneratorTest {
         String expected = "  <div class=\"csl-entry\">\n" +
                 "    <div class=\"csl-left-margin\">[1]</div><div class=\"csl-right-inline\">F. L&auml;st and J. Doe, </div>\n" +
                 "  </div>\n";
-        String citation = CitationStyleGenerator.generateCitation(entry, CitationStyle.getDefault());
+        String citation = CitationStyleGenerator.generateCitation(entry, CitationStyle.getDefault(), bibEntryTypesManager);
         assertEquals(expected, citation);
     }
 
@@ -101,7 +104,7 @@ class CitationStyleGeneratorTest {
         String style = CitationStyle.getDefault().getSource();
         CitationStyleOutputFormat format = CitationStyleOutputFormat.TEXT;
 
-        String actualCitation = CitationStyleGenerator.generateCitation(entry, style, format, new BibDatabaseContext());
+        String actualCitation = CitationStyleGenerator.generateCitation(entry, style, format, new BibDatabaseContext(), bibEntryTypesManager);
         assertEquals(expectedCitation, actualCitation);
     }
 
@@ -126,7 +129,7 @@ class CitationStyleGeneratorTest {
         BibDatabaseContext bibDatabaseContext = new BibDatabaseContext(new BibDatabase(List.of(firstEntry, secondEntry)));
         String style = CitationStyle.getDefault().getSource();
 
-        String actualCitation = CitationStyleGenerator.generateCitation(firstEntry, style, CitationStyleOutputFormat.TEXT, bibDatabaseContext);
+        String actualCitation = CitationStyleGenerator.generateCitation(firstEntry, style, CitationStyleOutputFormat.TEXT, bibDatabaseContext, bibEntryTypesManager);
         assertEquals(expectedCitation, actualCitation);
     }
 
@@ -143,7 +146,7 @@ class CitationStyleGeneratorTest {
         BibDatabaseContext bibDatabaseContext = new BibDatabaseContext(new BibDatabase(List.of(entry)));
         bibDatabaseContext.setMode(BibDatabaseMode.BIBTEX);
 
-        String citation = CitationStyleGenerator.generateCitation(entry, CitationStyle.getDefault().getSource(), CitationStyleOutputFormat.TEXT, bibDatabaseContext);
+        String citation = CitationStyleGenerator.generateCitation(entry, CitationStyle.getDefault().getSource(), CitationStyleOutputFormat.TEXT, bibDatabaseContext, bibEntryTypesManager);
         assertEquals(expected, citation);
     }
 
@@ -159,7 +162,7 @@ class CitationStyleGeneratorTest {
         BibDatabaseContext bibDatabaseContext = new BibDatabaseContext(new BibDatabase(List.of(entry)));
         bibDatabaseContext.setMode(BibDatabaseMode.BIBLATEX);
 
-        String citation = CitationStyleGenerator.generateCitation(entry, CitationStyle.getDefault().getSource(), CitationStyleOutputFormat.TEXT, bibDatabaseContext);
+        String citation = CitationStyleGenerator.generateCitation(entry, CitationStyle.getDefault().getSource(), CitationStyleOutputFormat.TEXT, bibDatabaseContext, bibEntryTypesManager);
         assertEquals(expected, citation);
     }
 
@@ -176,7 +179,7 @@ class CitationStyleGeneratorTest {
         bibDatabaseContext.setMode(BibDatabaseMode.BIBLATEX);
 
 
-        String citation = CitationStyleGenerator.generateCitation(entry, CitationStyle.getDefault().getSource(), CitationStyleOutputFormat.TEXT, bibDatabaseContext);
+        String citation = CitationStyleGenerator.generateCitation(entry, CitationStyle.getDefault().getSource(), CitationStyleOutputFormat.TEXT, bibDatabaseContext, bibEntryTypesManager);
         assertEquals(expected, citation);
     }
 
@@ -193,9 +196,28 @@ class CitationStyleGeneratorTest {
         BibDatabaseContext bibDatabaseContext = new BibDatabaseContext(new BibDatabase(List.of(entry)));
         bibDatabaseContext.setMode(BibDatabaseMode.BIBLATEX);
 
-        String citation = CitationStyleGenerator.generateCitation(entry, CitationStyle.getDefault().getSource(), CitationStyleOutputFormat.TEXT, bibDatabaseContext);
+        String citation = CitationStyleGenerator.generateCitation(entry, CitationStyle.getDefault().getSource(), CitationStyleOutputFormat.TEXT, bibDatabaseContext, bibEntryTypesManager);
         assertEquals(expected, citation);
     }
+
+
+    @Test
+    void testBiblatexWithPages() {
+        BibEntry entry = new BibEntry(StandardEntryType.Article);
+        entry.setField(StandardField.AUTHOR, "Last, First and\nDoe, Jane");
+        entry.setField(StandardField.PAGES, "7--8");
+        entry.setField(StandardField.ISSUE, "28");
+
+        // if the default citation style changes this has to be modified
+        String expected = "[1]F. Last and J. Doe, no. 28, pp. 7–8.\n";
+
+        BibDatabaseContext bibDatabaseContext = new BibDatabaseContext(new BibDatabase(List.of(entry)));
+        bibDatabaseContext.setMode(BibDatabaseMode.BIBLATEX);
+
+        String citation = CitationStyleGenerator.generateCitation(entry, CitationStyle.getDefault().getSource(), CitationStyleOutputFormat.TEXT, bibDatabaseContext, bibEntryTypesManager);
+        assertEquals(expected, citation);
+    }
+
 
 }
 

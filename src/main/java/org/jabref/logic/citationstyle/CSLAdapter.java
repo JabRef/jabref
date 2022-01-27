@@ -14,6 +14,7 @@ import org.jabref.logic.formatter.bibtexfields.RemoveNewlinesFormatter;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryType;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.Month;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
@@ -54,10 +55,10 @@ public class CSLAdapter {
     /**
      * Creates the bibliography of the provided items. This method needs to run synchronized because the underlying
      * CSL engine is not thread-safe.
-     * @param databaseContext
+     * @param databaseContex {@link BibDatabaseContext} is used to be able to resolve fields and their aliases
      */
-    public synchronized List<String> makeBibliography(List<BibEntry> bibEntries, String style, CitationStyleOutputFormat outputFormat, BibDatabaseContext databaseContext) throws IOException, IllegalArgumentException {
-        dataProvider.setData(bibEntries, databaseContext);
+    public synchronized List<String> makeBibliography(List<BibEntry> bibEntries, String style, CitationStyleOutputFormat outputFormat, BibDatabaseContext databaseContext, BibEntryTypesManager entryTypesManager) throws IOException, IllegalArgumentException {
+        dataProvider.setData(bibEntries, databaseContext, entryTypesManager);
         initialize(style, outputFormat);
         cslInstance.registerCitationItems(dataProvider.getIds());
         final Bibliography bibliography = cslInstance.makeBibliography();
@@ -93,11 +94,12 @@ public class CSLAdapter {
 
         private final List<BibEntry> data = new ArrayList<>();
         private BibDatabaseContext bibDatabaseContext;
+        private BibEntryTypesManager entryTypesManager;
 
         /**
          * Converts the {@link BibEntry} into {@link CSLItemData}.
          */
-        private static CSLItemData bibEntryToCSLItemData(BibEntry bibEntry, BibDatabaseContext bibDatabaseContext) {
+        private static CSLItemData bibEntryToCSLItemData(BibEntry bibEntry, BibDatabaseContext bibDatabaseContext, BibEntryTypesManager entryTypesManager) {
 
             String citeKey = bibEntry.getCitationKey().orElse("");
             BibTeXEntry bibTeXEntry = new BibTeXEntry(new Key(bibEntry.getType().getName()), new Key(citeKey));
@@ -125,17 +127,18 @@ public class CSLAdapter {
             return BIBTEX_CONVERTER.toItemData(bibTeXEntry);
         }
 
-        public void setData(List<BibEntry> data, BibDatabaseContext bibDatabaseContext) {
+        public void setData(List<BibEntry> data, BibDatabaseContext bibDatabaseContext, BibEntryTypesManager entryTypesManager) {
             this.data.clear();
             this.data.addAll(data);
             this.bibDatabaseContext = bibDatabaseContext;
+            this.entryTypesManager = entryTypesManager;
         }
 
         @Override
         public CSLItemData retrieveItem(String id) {
             return data.stream()
                        .filter(entry -> entry.getCitationKey().orElse("").equals(id))
-                       .map(entry -> JabRefItemDataProvider.bibEntryToCSLItemData(entry, bibDatabaseContext))
+                       .map(entry -> JabRefItemDataProvider.bibEntryToCSLItemData(entry, bibDatabaseContext, entryTypesManager))
                        .findFirst().orElse(null);
         }
 
