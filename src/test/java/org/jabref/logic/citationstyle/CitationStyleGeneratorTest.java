@@ -58,8 +58,7 @@ class CitationStyleGeneratorTest {
     void testHtmlFormat() {
         String expectedCitation =  "  <div class=\"csl-entry\">\n"
             + "    <div class=\"csl-left-margin\">[1]</div><div class=\"csl-right-inline\">B. Smith, B. Jones, and J. Williams, &ldquo;Title of the test entry,&rdquo; <span style=\"font-style: italic\">BibTeX Journal</span>, vol. 34, no. 7, Art. no. 3, 2016-07, doi: 10.1001/bla.blubb.</div>\n"
-            + "  </div>\n"
-            + "";
+            + "  </div>\n";
 
         BibEntry entry = TestEntry.getTestEntry();
         String style = CitationStyle.getDefault().getSource();
@@ -133,7 +132,6 @@ class CitationStyleGeneratorTest {
         assertEquals(expectedCitation, actualCitation);
     }
 
-
     @Test
     void testBibtexWithNumber() {
         BibEntry entry = new BibEntry(StandardEntryType.Article);
@@ -200,7 +198,6 @@ class CitationStyleGeneratorTest {
         assertEquals(expected, citation);
     }
 
-
     @Test
     void testBiblatexWithPages() {
         BibEntry entry = new BibEntry(StandardEntryType.Article);
@@ -217,8 +214,4 @@ class CitationStyleGeneratorTest {
         String citation = CitationStyleGenerator.generateCitation(entry, CitationStyle.getDefault().getSource(), CitationStyleOutputFormat.TEXT, bibDatabaseContext, bibEntryTypesManager);
         assertEquals(expected, citation);
     }
-
-
 }
-
-
