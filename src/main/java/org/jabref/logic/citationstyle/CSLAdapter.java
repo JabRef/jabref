@@ -7,6 +7,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 
 import org.jabref.gui.Globals;
 import org.jabref.logic.formatter.bibtexfields.RemoveNewlinesFormatter;
@@ -105,11 +106,10 @@ public class CSLAdapter {
             RemoveNewlinesFormatter removeNewlinesFormatter = new RemoveNewlinesFormatter();
 
             Optional<BibEntryType> entryType = Globals.entryTypesManager.enrich(bibEntry.getType(), bibDatabaseContext.getMode());
-            if (entryType.isPresent()) {
 
-            }
+            Set<Field> fields = entryType.map(BibEntryType::getAllFields).orElse(bibEntry.getFields());
 
-            for (Field key : bibEntry.getFields()) {
+            for (Field key : fields) {
                 bibEntry.getResolvedFieldOrAlias(key, bibDatabaseContext.getDatabase())
                         .map(removeNewlinesFormatter::format)
                         .map(LatexToUnicodeAdapter::format)
@@ -121,8 +121,6 @@ public class CSLAdapter {
                             bibTeXEntry.addField(new Key(key.getName()), new DigitStringValue(value));
 
                         });
-
-
             }
             return BIBTEX_CONVERTER.toItemData(bibTeXEntry);
         }

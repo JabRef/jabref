@@ -5,6 +5,8 @@ import java.util.List;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TestEntry;
 import org.jabref.model.database.BibDatabase;
+import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
@@ -50,28 +52,29 @@ class CitationStyleGeneratorTest {
     }
 
     @Test
-    @Disabled("Currently citeproc does not handler number field correctly https://github.com/JabRef/jabref/issues/8372")
     void testHtmlFormat() {
-        String expectedCitation = "  <div class=\"csl-entry\">\n" +
-                "    <div class=\"csl-left-margin\">[1]</div><div class=\"csl-right-inline\">B. Smith, B. Jones, and J. Williams, “Title of the test entry,” <i>BibTeX Journal</i>, vol. 34, no. 3, pp. 45–67, Jul. 2016.</div>\n" +
-                "  </div>\n";
+        String expectedCitation =  "  <div class=\"csl-entry\">\n"
+            + "    <div class=\"csl-left-margin\">[1]</div><div class=\"csl-right-inline\">B. Smith, B. Jones, and J. Williams, &ldquo;Title of the test entry,&rdquo; <span style=\"font-style: italic\">BibTeX Journal</span>, vol. 34, no. 7, Art. no. 3, 2016-07, doi: 10.1001/bla.blubb.</div>\n"
+            + "  </div>\n"
+            + "";
+
         BibEntry entry = TestEntry.getTestEntry();
         String style = CitationStyle.getDefault().getSource();
         CitationStyleOutputFormat format = CitationStyleOutputFormat.HTML;
 
-        String actualCitation = CitationStyleGenerator.generateCitation(entry, style, format, new BibDatabase());
+        String actualCitation = CitationStyleGenerator.generateCitation(entry, style, format, new BibDatabaseContext());
         assertEquals(expectedCitation, actualCitation);
     }
 
     @Test
-    @Disabled("Currently citeproc does not handle number field correctly https://github.com/JabRef/jabref/issues/8372")
     void testTextFormat() {
-        String expectedCitation = "[1]B. Smith, B. Jones, and J. Williams, “Title of the test entry,” BibTeX Journal, vol. 34, no. 3, pp. 45–67, Jul. 2016.\n";
+        String expectedCitation = "[1]B. Smith, B. Jones, and J. Williams, “Title of the test entry,” BibTeX Journal, vol. 34, no. 7, Art. no. 3, 2016-07, doi: 10.1001/bla.blubb.\n";
+
         BibEntry entry = TestEntry.getTestEntry();
         String style = CitationStyle.getDefault().getSource();
         CitationStyleOutputFormat format = CitationStyleOutputFormat.TEXT;
 
-        String actualCitation = CitationStyleGenerator.generateCitation(entry, style, format, new BibDatabase());
+        String actualCitation = CitationStyleGenerator.generateCitation(entry, style, format, new BibDatabaseContext(new BibDatabase(List.of(entry))));
         assertEquals(expectedCitation, actualCitation);
     }
 
@@ -98,7 +101,7 @@ class CitationStyleGeneratorTest {
         String style = CitationStyle.getDefault().getSource();
         CitationStyleOutputFormat format = CitationStyleOutputFormat.TEXT;
 
-        String actualCitation = CitationStyleGenerator.generateCitation(entry, style, format, new BibDatabase());
+        String actualCitation = CitationStyleGenerator.generateCitation(entry, style, format, new BibDatabaseContext());
         assertEquals(expectedCitation, actualCitation);
     }
 
@@ -120,11 +123,80 @@ class CitationStyleGeneratorTest {
             .withField(StandardField.ADDRESS, "Somewhere");
 
         String expectedCitation = "[1]B. Smith, “An article,” J. Jones, Ed. Somewhere: Great Publisher, 2021, pp. 1–10.\n";
-        BibDatabase bibDatabase = new BibDatabase(List.of(firstEntry, secondEntry));
+        BibDatabaseContext bibDatabaseContext = new BibDatabaseContext(new BibDatabase(List.of(firstEntry, secondEntry)));
         String style = CitationStyle.getDefault().getSource();
 
-        String actualCitation = CitationStyleGenerator.generateCitation(firstEntry, style, CitationStyleOutputFormat.TEXT, bibDatabase);
+        String actualCitation = CitationStyleGenerator.generateCitation(firstEntry, style, CitationStyleOutputFormat.TEXT, bibDatabaseContext);
         assertEquals(expectedCitation, actualCitation);
     }
+
+
+    @Test
+    void testBibtexWithNumber() {
+        BibEntry entry = new BibEntry(StandardEntryType.Article);
+        entry.setField(StandardField.AUTHOR, "Last, First and\nDoe, Jane");
+        entry.setField(StandardField.NUMBER, "7");
+
+        // if the default citation style changes this has to be modified
+        String expected = "[1]F. Last and J. Doe, Art. no. 7.\n";
+
+        BibDatabaseContext bibDatabaseContext = new BibDatabaseContext(new BibDatabase(List.of(entry)));
+        bibDatabaseContext.setMode(BibDatabaseMode.BIBTEX);
+
+        String citation = CitationStyleGenerator.generateCitation(entry, CitationStyle.getDefault().getSource(), CitationStyleOutputFormat.TEXT, bibDatabaseContext);
+        assertEquals(expected, citation);
+    }
+
+    @Test
+    void testBiblatexWithIssue() {
+        BibEntry entry = new BibEntry(StandardEntryType.Article);
+        entry.setField(StandardField.AUTHOR, "Last, First and\nDoe, Jane");
+        entry.setField(StandardField.ISSUE, "7");
+
+        // if the default citation style changes this has to be modified
+        String expected = "[1]F. Last and J. Doe, no. 7.\n";
+
+        BibDatabaseContext bibDatabaseContext = new BibDatabaseContext(new BibDatabase(List.of(entry)));
+        bibDatabaseContext.setMode(BibDatabaseMode.BIBLATEX);
+
+        String citation = CitationStyleGenerator.generateCitation(entry, CitationStyle.getDefault().getSource(), CitationStyleOutputFormat.TEXT, bibDatabaseContext);
+        assertEquals(expected, citation);
+    }
+
+    @Test
+    void testBiblatexWitNumber() {
+        BibEntry entry = new BibEntry(StandardEntryType.Article);
+        entry.setField(StandardField.AUTHOR, "Last, First and Doe, Jane");
+        entry.setField(StandardField.NUMBER, "7");
+
+        // if the default citation style changes this has to be modified
+        String expected = "[1]F. Last and J. Doe, Art. no. 7.\n";
+
+        BibDatabaseContext bibDatabaseContext = new BibDatabaseContext(new BibDatabase(List.of(entry)));
+        bibDatabaseContext.setMode(BibDatabaseMode.BIBLATEX);
+
+
+        String citation = CitationStyleGenerator.generateCitation(entry, CitationStyle.getDefault().getSource(), CitationStyleOutputFormat.TEXT, bibDatabaseContext);
+        assertEquals(expected, citation);
+    }
+
+    @Test
+    void testBiblatexWithIssueAndNumber() {
+        BibEntry entry = new BibEntry(StandardEntryType.Article);
+        entry.setField(StandardField.AUTHOR, "Last, First and\nDoe, Jane");
+        entry.setField(StandardField.ISSUE, "7");
+        entry.setField(StandardField.ISSUE, "28");
+
+        // if the default citation style changes this has to be modified
+        String expected = "[1]F. Last and J. Doe, no. 28.\n";
+
+        BibDatabaseContext bibDatabaseContext = new BibDatabaseContext(new BibDatabase(List.of(entry)));
+        bibDatabaseContext.setMode(BibDatabaseMode.BIBLATEX);
+
+        String citation = CitationStyleGenerator.generateCitation(entry, CitationStyle.getDefault().getSource(), CitationStyleOutputFormat.TEXT, bibDatabaseContext);
+        assertEquals(expected, citation);
+    }
+
 }
+
 
