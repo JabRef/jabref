@@ -59,7 +59,7 @@ public class CitationStyleGenerator {
      */
     public static List<String> generateCitations(List<BibEntry> bibEntries, String style, CitationStyleOutputFormat outputFormat, BibDatabaseContext databaseContext, BibEntryTypesManager entryTypesManager) {
         try {
-            return CSL_ADAPTER.makeBibliography(bibEntries, style, outputFormat, databaseContext, entryTypesManager );
+            return CSL_ADAPTER.makeBibliography(bibEntries, style, outputFormat, databaseContext, entryTypesManager);
         } catch (IllegalArgumentException e) {
             LOGGER.error("Could not generate BibEntry citation. The CSL engine could not create a preview for your item.", e);
             return Collections.singletonList(Localization.lang("Cannot generate preview based on selected citation style."));

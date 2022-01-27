@@ -9,7 +9,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
-import org.jabref.gui.Globals;
 import org.jabref.logic.formatter.bibtexfields.RemoveNewlinesFormatter;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -55,7 +54,7 @@ public class CSLAdapter {
     /**
      * Creates the bibliography of the provided items. This method needs to run synchronized because the underlying
      * CSL engine is not thread-safe.
-     * @param databaseContex {@link BibDatabaseContext} is used to be able to resolve fields and their aliases
+     * @param databaseContext {@link BibDatabaseContext} is used to be able to resolve fields and their aliases
      */
     public synchronized List<String> makeBibliography(List<BibEntry> bibEntries, String style, CitationStyleOutputFormat outputFormat, BibDatabaseContext databaseContext, BibEntryTypesManager entryTypesManager) throws IOException, IllegalArgumentException {
         dataProvider.setData(bibEntries, databaseContext, entryTypesManager);
@@ -107,7 +106,7 @@ public class CSLAdapter {
             // Not every field is already generated into latex free fields
             RemoveNewlinesFormatter removeNewlinesFormatter = new RemoveNewlinesFormatter();
 
-            Optional<BibEntryType> entryType = Globals.entryTypesManager.enrich(bibEntry.getType(), bibDatabaseContext.getMode());
+            Optional<BibEntryType> entryType = entryTypesManager.enrich(bibEntry.getType(), bibDatabaseContext.getMode());
 
             Set<Field> fields = entryType.map(BibEntryType::getAllFields).orElse(bibEntry.getFields());
 
