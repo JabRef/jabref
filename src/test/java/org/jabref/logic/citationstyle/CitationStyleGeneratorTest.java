@@ -185,10 +185,10 @@ class CitationStyleGeneratorTest {
         BibEntry entry = new BibEntry(StandardEntryType.Article);
         entry.setField(StandardField.AUTHOR, "Last, First and\nDoe, Jane");
         entry.setField(StandardField.ISSUE, "7");
-        entry.setField(StandardField.ISSUE, "28");
+        entry.setField(StandardField.NUMBER, "28");
 
         // if the default citation style changes this has to be modified
-        String expected = "[1]F. Last and J. Doe, no. 28.\n";
+        String expected = "[1]F. Last and J. Doe, no. 7, Art. no. 28.\n";
 
         BibDatabaseContext bibDatabaseContext = new BibDatabaseContext(new BibDatabase(List.of(entry)));
         bibDatabaseContext.setMode(BibDatabaseMode.BIBLATEX);
