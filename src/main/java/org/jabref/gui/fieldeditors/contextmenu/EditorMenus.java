@@ -56,7 +56,7 @@ public class EditorMenus {
     public static Supplier<List<MenuItem>> getDOIMenu(TextArea textArea) {
         return () -> {
             ActionFactory factory = new ActionFactory(Globals.getKeyPrefs());
-            MenuItem copyDoiUrlMenuItem = factory.createMenuItem(StandardActions.COPY_DOI, new CopyDoiUrlAction(textArea));
+            MenuItem copyDoiUrlMenuItem = factory.createMenuItem(StandardActions.COPY_DOI_URL, new CopyDoiUrlAction(textArea));
             List<MenuItem> menuItems = new ArrayList<>();
             menuItems.add(copyDoiUrlMenuItem);
             menuItems.add(new SeparatorMenuItem());
