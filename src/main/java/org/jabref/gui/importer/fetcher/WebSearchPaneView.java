@@ -1,7 +1,6 @@
 package org.jabref.gui.importer.fetcher;
 
 import javafx.css.PseudoClass;
-import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
@@ -88,8 +87,7 @@ public class WebSearchPaneView extends VBox {
         Button search = new Button(Localization.lang("Search"));
         search.setDefaultButton(false);
         search.setOnAction(event -> viewModel.search());
-
-        setAlignment(Pos.CENTER);
+        search.setMaxWidth(Double.MAX_VALUE);
         getChildren().addAll(fetcherContainer, query, search);
     }
 }
