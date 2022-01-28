@@ -104,14 +104,9 @@ public class RightClickMenu {
         // the submenu will behave dependent on what style is currently selected (citation/preview)
         PreviewPreferences previewPreferences = preferencesService.getPreviewPreferences();
         if (previewPreferences.getSelectedPreviewLayout() instanceof CitationStylePreviewLayout) {
-            copySpecialMenu.getItems().add(factory.createMenuItem(StandardActions.COPY_CITATION_HTML, new CopyCitationAction(CitationStyleOutputFormat.HTML, dialogService, stateManager, clipBoardManager, taskExecutor, previewPreferences)));
-            Menu copyCitationMenu = factory.createMenu(StandardActions.COPY_CITATION_MORE);
-            copyCitationMenu.getItems().addAll(
-                    factory.createMenuItem(StandardActions.COPY_CITATION_TEXT, new CopyCitationAction(CitationStyleOutputFormat.TEXT, dialogService, stateManager, clipBoardManager, taskExecutor, previewPreferences)),
-                    factory.createMenuItem(StandardActions.COPY_CITATION_RTF, new CopyCitationAction(CitationStyleOutputFormat.RTF, dialogService, stateManager, clipBoardManager, taskExecutor, previewPreferences)),
-                    factory.createMenuItem(StandardActions.COPY_CITATION_ASCII_DOC, new CopyCitationAction(CitationStyleOutputFormat.ASCII_DOC, dialogService, stateManager, clipBoardManager, taskExecutor, previewPreferences)),
-                    factory.createMenuItem(StandardActions.COPY_CITATION_XSLFO, new CopyCitationAction(CitationStyleOutputFormat.XSL_FO, dialogService, stateManager, clipBoardManager, taskExecutor, previewPreferences)));
-            copySpecialMenu.getItems().add(copyCitationMenu);
+            copySpecialMenu.getItems().addAll(
+                    factory.createMenuItem(StandardActions.COPY_CITATION_HTML, new CopyCitationAction(CitationStyleOutputFormat.HTML, dialogService, stateManager, clipBoardManager, taskExecutor, previewPreferences)),
+                    factory.createMenuItem(StandardActions.COPY_CITATION_TEXT, new CopyCitationAction(CitationStyleOutputFormat.TEXT, dialogService, stateManager, clipBoardManager, taskExecutor, previewPreferences)));
         } else {
             copySpecialMenu.getItems().add(factory.createMenuItem(StandardActions.COPY_CITATION_PREVIEW, new CopyCitationAction(CitationStyleOutputFormat.HTML, dialogService, stateManager, clipBoardManager, taskExecutor, previewPreferences)));
         }
