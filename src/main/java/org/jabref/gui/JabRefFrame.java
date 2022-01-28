@@ -566,7 +566,8 @@ public class JabRefFrame extends BorderPane {
      */
     public List<LibraryTab> getLibraryTabs() {
         return tabbedPane.getTabs().stream()
-                         .map(tab -> (LibraryTab) tab)
+            .filter(LibraryTab.class::isInstance)
+                         .map(LibraryTab.class::cast)
                          .collect(Collectors.toList());
     }
 
