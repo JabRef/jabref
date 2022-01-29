@@ -122,15 +122,12 @@ public class CopyMoreAction extends SimpleCommand {
         List<BibEntry> entries = stateManager.getSelectedEntries();
 
         // Collect all non-null DOI or DOI urls
-        if (action == StandardActions.COPY_DOI_URL)
-        {
+        if (action == StandardActions.COPY_DOI_URL) {
             copyDoiList(entries.stream()
                     .filter(entry -> entry.getDOI().isPresent())
                     .map(entry -> entry.getDOI().get().getURIAsASCIIString())
                     .collect(Collectors.toList()), entries.size());
-        }
-        else
-        {
+        } else {
             copyDoiList(entries.stream()
                     .filter(entry -> entry.getDOI().isPresent())
                     .map(entry -> entry.getDOI().get().getDOI())
@@ -138,8 +135,7 @@ public class CopyMoreAction extends SimpleCommand {
         }
     }
 
-    private void copyDoiList(List<String> dois, int size)
-    {
+    private void copyDoiList(List<String> dois, int size) {
         if (dois.isEmpty()) {
             dialogService.notify(Localization.lang("None of the selected entries have DOIs."));
             return;
