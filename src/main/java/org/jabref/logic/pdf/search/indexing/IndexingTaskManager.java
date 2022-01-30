@@ -82,8 +82,7 @@ public class IndexingTaskManager extends BackgroundTask<Void> {
 
         StringBuilder indexTitle = new StringBuilder();
 
-        if(file.isPresent())
-        {
+        if (file.isPresent()) {
             Path databasePath = file.get();
             String fileName = databasePath.getFileName().toString();
             indexTitle.append(fileName);
