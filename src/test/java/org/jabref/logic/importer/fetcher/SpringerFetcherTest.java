@@ -65,8 +65,21 @@ class SpringerFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSear
                 .withField(StandardField.FILE, ":http\\://link.springer.com/openurl/pdf?id=doi\\:10.1007/s10606-018-9335-z:PDF")
                 .withField(StandardField.ABSTRACT, "An influx of newcomers is critical to the survival, long-term success, and continuity of many Open Source Software (OSS) community-based projects. However, newcomers face many barriers when making their first contribution, leading in many cases to dropouts. Due to the collaborative nature of community-based OSS projects, newcomers may be susceptible to social barriers, such as communication breakdowns and reception issues. In this article, we report a two-phase study aimed at better understanding social barriers faced by newcomers. In the first phase, we qualitatively analyzed the literature and data collected from practitioners to identify barriers that hinder newcomers’ first contribution. We designed a model composed of 58 barriers, including 13 social barriers. In the second phase, based on the barriers model, we developed FLOSScoach, a portal to support newcomers making their first contribution. We evaluated the portal in a diary-based study and found that the portal guided the newcomers and reduced the need for communication. Our results provide insights for communities that want to support newcomers and lay a foundation for building better onboarding tools. The contributions of this paper include identifying and gathering empirical evidence of social barriers faced by newcomers; understanding how social barriers can be reduced or avoided by using a portal that organizes proper information for newcomers (FLOSScoach); presenting guidelines for communities and newcomers on how to reduce or avoid social barriers; and identifying new streams of research.");
 
+        BibEntry thirdArticle = new BibEntry(StandardEntryType.InCollection)
+            .withField(StandardField.AUTHOR, "Serrano Alves, Luiz Philipe and Wiese, Igor Scaliante and Chaves, Ana Paula and Steinmacher, Igor")
+            .withField(StandardField.BOOKTITLE, "Chatbot Research and Design")
+            .withField(StandardField.DATE, "2022-01-01")
+            .withField(StandardField.DOI, "10.1007/978-3-030-94890-0_6")
+            .withField(StandardField.ISBN, "978-3-030-94889-4")
+            .withField(StandardField.FILE, ":http\\://link.springer.com/openurl/pdf?id=doi\\:10.1007/978-3-030-94890-0_6:PDF")
+            .withField(StandardField.MONTH, "#jan#")
+            .withField(StandardField.PUBLISHER, "Springer")
+            .withField(StandardField.YEAR, "2022")
+            .withField(StandardField.TITLE, "How to Find My Task? Chatbot to Assist Newcomers in Choosing Tasks in OSS Projects")
+            .withField(StandardField.ABSTRACT, "Open Source Software (OSS) is making a meteoric rise in the software industry since several big companies have entered this market. Unfortunately, newcomers enter these projects and usually lose interest in contributing because of several factors. This paper aims to reduce the problems users face when they walk their first steps into OSS projects: finding the appropriate task. This paper presents a chatbot that filters tasks to help newcomers choose a task that fits their skills. We performed a quantitative and a qualitative study comparing the chatbot with the current GitHub issue tracker interface, which uses labels to categorize and identify tasks. The results show that users perceived the chatbot as easier to use than the GitHub issue tracker. Additionally, users tend to interpret the use of chatbots as situational, helping mainly newcomers and inexperienced contributors.");
+
         List<BibEntry> fetchedEntries = fetcher.performSearch("JabRef Social Barriers Steinmacher");
-        assertEquals(List.of(firstArticle, secondArticle), fetchedEntries);
+        assertEquals(List.of(thirdArticle, firstArticle, secondArticle), fetchedEntries);
     }
 
     @Test
