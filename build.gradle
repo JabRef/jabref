@@ -566,30 +566,14 @@ jlink {
         uses 'org.controlsfx.glyphfont.GlyphFont'
         uses 'com.airhacks.afterburner.views.ResourceLocator'
         uses 'com.airhacks.afterburner.injection.PresenterFactory'
-        uses 'org.mariadb.jdbc.credential.CredentialPlugin'
-        uses 'org.mariadb.jdbc.authentication.AuthenticationPlugin'
-        uses 'org.mariadb.jdbc.tls.TlsSocketPlugin'
-        uses 'org.mariadb.jdbc.LocalInfileInterceptor'
         uses 'org.eclipse.jgit.transport.SshSessionFactory'
         uses 'org.eclipse.jgit.lib.GpgSigner'
         uses 'javax.xml.bind.JAXBContextFactory'
         provides 'org.apache.lucene.codecs.DocValuesFormat' with 'org.apache.lucene.codecs.lucene80.Lucene80DocValuesFormat'
         provides 'org.controlsfx.glyphfont.GlyphFont' with 'org.controlsfx.glyphfont.FontAwesome'
-        provides 'org.mariadb.jdbc.tls.TlsSocketPlugin' with 'org.mariadb.jdbc.internal.protocol.tls.DefaultTlsSocketPlugin'
         provides 'com.microsoft.applicationinsights.core.dependencies.io.grpc.ServerProvider' with 'com.microsoft.applicationinsights.core.dependencies.io.grpc.netty.shaded.io.grpc.netty.NettyServerProvider'
         provides 'com.microsoft.applicationinsights.core.dependencies.io.grpc.NameResolverProvider' with 'com.microsoft.applicationinsights.core.dependencies.io.grpc.internal.DnsNameResolverProvider'
         provides 'java.sql.Driver' with 'org.postgresql.Driver'
-        provides 'org.mariadb.jdbc.authentication.AuthenticationPlugin' with 'org.mariadb.jdbc.internal.com.send.authentication.CachingSha2PasswordPlugin',
-                'org.mariadb.jdbc.internal.com.send.authentication.ClearPasswordPlugin',
-                'org.mariadb.jdbc.internal.com.send.authentication.Ed25519PasswordPlugin',
-                'org.mariadb.jdbc.internal.com.send.authentication.NativePasswordPlugin',
-                'org.mariadb.jdbc.internal.com.send.authentication.OldPasswordPlugin',
-                'org.mariadb.jdbc.internal.com.send.authentication.SendGssApiAuthPacket',
-                'org.mariadb.jdbc.internal.com.send.authentication.SendPamAuthPacket',
-                'org.mariadb.jdbc.internal.com.send.authentication.Sha256PasswordPlugin'
-        provides 'org.mariadb.jdbc.credential.CredentialPlugin' with 'org.mariadb.jdbc.credential.aws.AwsIamCredentialPlugin',
-                'org.mariadb.jdbc.credential.env.EnvCredentialPlugin',
-                'org.mariadb.jdbc.credential.system.PropertiesCredentialPlugin'
         provides 'java.security.Provider' with 'org.bouncycastle.jce.provider.BouncyCastleProvider',
                 'org.bouncycastle.pqc.jcajce.provider.BouncyCastlePQCProvider'
         provides 'com.microsoft.applicationinsights.core.dependencies.io.grpc.ManagedChannelProvider' with 'com.microsoft.applicationinsights.core.dependencies.io.grpc.netty.shaded.io.grpc.netty.NettyChannelProvider'
