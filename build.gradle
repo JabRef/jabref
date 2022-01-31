@@ -44,8 +44,8 @@ group = "org.jabref"
 version = project.findProperty('projVersion') ?: '100.0.0'
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_16
-    targetCompatibility = JavaVersion.VERSION_16
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
 
     // Workaround needed for Eclipse, probably because of https://github.com/gradle/gradle/issues/16922
     // Should be removed as soon as Gradle 7.0.1 is released ( https://github.com/gradle/gradle/issues/16922#issuecomment-828217060 )
@@ -344,7 +344,7 @@ compileJava {
     options.compilerArgs << "-Xlint:none"
     dependsOn "generateSource"
 
-    options.annotationProcessorGeneratedSourcesDirectory = file("src-gen/main/java")
+    options.generatedSourceOutputDirectory.set(file("src-gen/main/java"))
 
     moduleOptions {
         // TODO: Remove access to internal api
@@ -472,10 +472,10 @@ task copyTestResources(type: Copy) {
 processTestResources.dependsOn copyTestResources
 
 tasks.withType(Test) {
-    reports.html.destination = file("${reporting.baseDir}/${name}")
+    reports.html.outputLocation.set(file("${reporting.baseDir}/${name}"))
 }
 
-task jacocoMergePrep() {
+task jacocoPrepare() {
     doFirst {
         // Ignore failures of tests
         tasks.withType(Test) {
@@ -483,26 +483,21 @@ task jacocoMergePrep() {
         }
     }
 }
-test.mustRunAfter jacocoMergePrep
-databaseTest.mustRunAfter jacocoMergePrep
-fetcherTest.mustRunAfter jacocoMergePrep
+test.mustRunAfter jacocoPrepare
+databaseTest.mustRunAfter jacocoPrepare
+fetcherTest.mustRunAfter jacocoPrepare
 
-task jacocoMerge(type: JacocoMerge) {
+jacocoTestReport {
     executionData files(
             "$buildDir/jacoco/test.exec",
             "$buildDir/jacoco/databaseTest.exec",
             "$buildDir/jacoco/fetcherTest.exec").filter { it.exists() }
-    dependsOn jacocoMergePrep, test, databaseTest, fetcherTest
-}
-
-jacocoTestReport {
-    executionData jacocoMerge.destinationFile
-    dependsOn jacocoMerge
+    dependsOn jacocoPrepare, test, databaseTest, fetcherTest
 
     reports {
-        csv.enabled = true
-        html.enabled = true
-        xml.enabled = true // coveralls plugin depends on xml format report
+        csv.getRequired().set(true)
+        html.getRequired().set(true)
+        xml.getRequired().set(true) // coveralls plugin depends on xml format report
     }
 }
 

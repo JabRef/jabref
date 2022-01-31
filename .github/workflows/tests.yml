@@ -30,8 +30,8 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v2
         with:
-          java-version: 16
-          distribution: 'adopt'
+          java-version: 17
+          distribution: 'temurin'
           cache: 'gradle'
       - name: Run check style reporter
         uses: nikitasavinov/checkstyle-action@master
@@ -54,8 +54,8 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v2
         with:
-          java-version: 16
-          distribution: 'adopt'
+          java-version: 17
+          distribution: 'temurin'
           cache: 'gradle'
       - name: Run tests
         run: xvfb-run --auto-servernum ./gradlew check -x checkstyleJmh -x checkstyleMain -x checkstyleTest
@@ -86,8 +86,8 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v2
         with:
-          java-version: 16
-          distribution: 'adopt'
+          java-version: 17
+          distribution: 'temurin'
           cache: 'gradle'
       - name: Run tests on PostgreSQL
         run: ./gradlew databaseTest --rerun-tasks
@@ -120,8 +120,8 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v2
         with:
-          java-version: 16
-          distribution: 'adopt'
+          java-version: 17
+          distribution: 'temurin'
           cache: 'gradle'
       - name: Run GUI tests
         run: xvfb-run --auto-servernum ./gradlew guiTest
@@ -158,8 +158,8 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v2
         with:
-          java-version: 16
-          distribution: 'adopt'
+          java-version: 17
+          distribution: 'temurin'
           cache: 'gradle'
       - name: Update test coverage metrics
         if: ${{ steps.checksecrets.outputs.secretspresent }}
