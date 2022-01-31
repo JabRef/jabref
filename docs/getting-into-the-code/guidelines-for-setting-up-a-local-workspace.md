@@ -4,7 +4,7 @@ This guide explains how to set up your environment for development of JabRef. It
 
 ```
 The most important step is to configure your IDE.
-In case you know how to install JDK 16 with JavaFX support and to fork JabRef's code,
+In case you know how to install JDK 17 with JavaFX support and to fork JabRef's code,
 please scroll down to the IDE setup.
 ```
 
@@ -16,13 +16,13 @@ For a complete step-by-step guide for Linux using IntelliJ IDEA as the IDE, have
 
 This section list the prerequisites you need to get started to develop JabRef. After this section, you are ready to get the code.
 
-### Java Development Kit 16
+### Java Development Kit 17
 
-A working Java (Development Kit) 16 installation with Java FX support is required. In the command line (terminal in Linux, cmd in Windows) run `javac -version` and make sure that the reported version is Java 16 (e.g., `javac 16`). If `javac` is not found or a wrong version is reported, check your `PATH` environment variable, your `JAVA_HOME` environment variable or install the most recent JDK.
+A working Java (Development Kit) 17 installation with Java FX support is required. In the command line (terminal in Linux, cmd in Windows) run `javac -version` and make sure that the reported version is Java 17 (e.g., `javac 17`). If `javac` is not found or a wrong version is reported, check your `PATH` environment variable, your `JAVA_HOME` environment variable or install the most recent JDK.
 
 [JavaFX is not part of the default JDK any more](https://www.reddit.com/r/java/comments/82qm9x/javafx_will_be_removed_from_the_java_jdk_in_jdk\_11/), it needs to be installed separately if not using a special JDK.
 
-Download and install the JDK from [https://jdk.java.net/](https://jdk.java.net). Afterwards, download the "jmods" JavaFX 16 zip archive from [https://gluonhq.com/products/javafx/](https://gluonhq.com/products/javafx/) and put the `.jmod` files into `C:\Program Files\OpenJDK\jdk-16\jmods`.
+Download and install the JDK from [https://jdk.java.net/](https://jdk.java.net). Afterwards, download the "jmods" JavaFX 17 zip archive from [https://gluonhq.com/products/javafx/](https://gluonhq.com/products/javafx/) and put the `.jmod` files into `C:\Program Files\OpenJDK\jdk-17\jmods`.
 
 ### GitHub Account
 
@@ -102,11 +102,11 @@ To configure IntelliJ IDEA for developing JabRef, you should first ensure that y
 
 * Navigate to **File | Settings | Plugins | Installed** and check that you have the _Gradle_ and _Gradle Extension_ enabled.
 
-After that, you can open `jabref/build.gradle` as a project. It is crucial that Java 16 is used consistently for the JabRef project which includes ensuring the right settings for your project structure, Gradle build, and run configurations.
+After that, you can open `jabref/build.gradle` as a project. It is crucial that Java 17 is used consistently for the JabRef project which includes ensuring the right settings for your project structure, Gradle build, and run configurations.
 
-Ensure you have a Java 16 SDK configured by navigating to **File | Project Structure | Platform Settings | SDKs**. If you don't have one, add a new Java JDK and point it to the location of a JDK 16. ![Project Settings](../.gitbook/assets/intellij-choose-jdk-adoptopenjdk-on-windows-project-settings.png)
+Ensure you have a Java 17 SDK configured by navigating to **File | Project Structure | Platform Settings | SDKs**. If you don't have one, add a new Java JDK and point it to the location of a JDK 17. ![Project Settings](../.gitbook/assets/intellij-choose-jdk-adoptopenjdk-on-windows-project-settings.png)
 
-Navigate to **File | Project Structure | Project** and ensure that the projects' SDK is Java 16 ![Use JDK 16 as project SDK](../.gitbook/assets/intellij-choose-jdk15-project-default.png)
+Navigate to **File | Project Structure | Project** and ensure that the projects' SDK is Java 17 ![Use JDK 17 as project SDK](../.gitbook/assets/intellij-choose-jdk15-project-default.png)
 
 Navigate to **File | Settings | Build, Execution, Deployment | Build Tools | Gradle** and select the "Project SDK" as the Gradle JVM at the bottom.
 
@@ -211,7 +211,7 @@ Finally, ensure that the checkstyle configuration file is in place:
 4. Click "Browse" and choose `config/checkstyle/checkstyle.xml`
 5. Click "Next" and "Finish"
 6. Activate the CheckStyle configuration file by ticking it in the list
-7. Ensure that the [latest CheckStyle version](https://checkstyle.org/releasenotes.html) is selected (8.36 or higher). 8.43 is required for Java 16.
+7. Ensure that the [latest CheckStyle version](https://checkstyle.org/releasenotes.html) is selected (8.36 or higher). 9.21 is required for Java 17.
 8. Set the "Scan Scope" to "Only Java sources (including tests)
 9. Save settings by clicking "OK"
 10. Your configuration should now look like this:
@@ -295,7 +295,7 @@ Got it running? GREAT! You are ready to lurk the code and contribute to JabRef. 
 
 ### Java installation
 
-An indication that `JAVA_HOME` is not correctly set or no JDK 16 is installed is following error message:
+An indication that `JAVA_HOME` is not correctly set or no JDK 17 is installed is following error message:
 
 ```
 compileJava FAILED
@@ -346,9 +346,9 @@ This can include different modules.
 There might be problems with building if you have openjfx libraries in local maven repository, resulting in errors like this:
 
 ```
- > Could not find javafx-fxml-16-mac.jar (org.openjfx:javafx-fxml:16).
+ > Could not find javafx-fxml-17-mac.jar (org.openjfx:javafx-fxml:17).
      Searched in the following locations:
-         file:<your local maven repository path>/repository/org/openjfx/javafx-fxml/16/javafx-fxml-16-mac.jar
+         file:<your local maven repository path>/repository/org/openjfx/javafx-fxml/17/javafx-fxml-17-mac.jar
 ```
 
 As a workaround, you can remove all local openjfx artifacts by deleting the whole openjfx folder from specified location.

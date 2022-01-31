@@ -376,6 +376,7 @@ public class JabRefPreferences implements PreferencesService {
     // Dialog states
     private static final String PREFS_EXPORT_PATH = "prefsExportPath";
     private static final String DOWNLOAD_LINKED_FILES = "downloadLinkedFiles";
+    private static final String FULLTEXT_INDEX_LINKED_FILES = "fulltextIndexLinkedFiles";
 
     // Helper string
     private static final String USER_HOME = System.getProperty("user.home");
@@ -680,6 +681,8 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(IMPORT_FILEDIRPATTERN, "");
         // Download files by default
         defaults.put(DOWNLOAD_LINKED_FILES, true);
+        // Create Fulltext-Index by default
+        defaults.put(FULLTEXT_INDEX_LINKED_FILES, true);
 
         String defaultExpression = "**/.*[citationkey].*\\\\.[extension]";
         defaults.put(AUTOLINK_REG_EXP_SEARCH_EXPRESSION_KEY, defaultExpression);
@@ -2180,6 +2183,7 @@ public class JabRefPreferences implements PreferencesService {
                 get(IMPORT_FILENAMEPATTERN),
                 get(IMPORT_FILEDIRPATTERN),
                 getBoolean(DOWNLOAD_LINKED_FILES),
+                getBoolean(FULLTEXT_INDEX_LINKED_FILES),
                 Path.of(get(WORKING_DIRECTORY))
         );
 
@@ -2188,6 +2192,7 @@ public class JabRefPreferences implements PreferencesService {
         EasyBind.listen(filePreferences.fileNamePatternProperty(), (obs, oldValue, newValue) -> put(IMPORT_FILENAMEPATTERN, newValue));
         EasyBind.listen(filePreferences.fileDirectoryPatternProperty(), (obs, oldValue, newValue) -> put(IMPORT_FILEDIRPATTERN, newValue));
         EasyBind.listen(filePreferences.downloadLinkedFilesProperty(), (obs, oldValue, newValue) -> putBoolean(DOWNLOAD_LINKED_FILES, newValue));
+        EasyBind.listen(filePreferences.fulltextIndexLinkedFilesProperty(), (obs, oldValue, newValue) -> putBoolean(FULLTEXT_INDEX_LINKED_FILES, newValue));
         EasyBind.listen(filePreferences.workingDirectoryProperty(), (obs, oldValue, newValue) -> put(WORKING_DIRECTORY, newValue.toString()));
 
         return filePreferences;
