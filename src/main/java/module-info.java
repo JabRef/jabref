@@ -86,6 +86,8 @@ open module org.jabref {
     requires ojdbc10;
     requires org.postgresql.jdbc;
     requires org.mariadb.jdbc;
+       uses org.mariadb.jdbc.plugin.CredentialPlugin;
+
     requires org.apache.commons.lang3;
     requires org.antlr.antlr4.runtime;
     requires flowless;
