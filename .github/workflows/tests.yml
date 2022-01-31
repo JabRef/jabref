@@ -97,7 +97,7 @@ jobs:
       - name: Shutdown Ubuntu MySQL
         run: sudo service mysql stop # Shutdown the Default MySQL, "sudo" is necessary, please not remove it
       - name: Start custom MySQL
-        uses: mirromutth/mysql-action@v1.1
+        uses: daniellockyer/mysql-action@main
         with:
           host port: 3800
           container port: 3307
