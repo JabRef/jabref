@@ -32,7 +32,7 @@ public class OpenConsoleAction extends SimpleCommand {
      * Using this constructor will result in executing the command on the active database
      */
     public OpenConsoleAction(StateManager stateManager, PreferencesService preferencesService) {
-        this(null, stateManager, preferencesService);
+        this(() -> stateManager.getActiveDatabase().get(), stateManager, preferencesService);
     }
 
     @Override
