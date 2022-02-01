@@ -1,23 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
-<style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" demote-non-dropping-particle="sort-only" page-range-format="expanded" default-locale="en-GB">
+<style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" demote-non-dropping-particle="sort-only" page-range-format="expanded" initialize-with-hyphen="false" default-locale="en-US">
   <info>
-    <title>British Journal of Clinical Pharmacology</title>
-    <title-short>BJCP</title-short>
-    <id>http://www.zotero.org/styles/british-journal-of-clinical-pharmacology</id>
-    <link href="http://www.zotero.org/styles/british-journal-of-clinical-pharmacology" rel="self"/>
+    <title>American Medical Association 11th edition (brackets)</title>
+    <title-short>AMA (11th ed.)</title-short>
+    <id>http://www.zotero.org/styles/american-medical-association-brackets</id>
+    <link href="http://www.zotero.org/styles/american-medical-association-brackets" rel="self"/>
     <link href="http://www.zotero.org/styles/american-medical-association" rel="template"/>
-    <link href="https://bpspubs.onlinelibrary.wiley.com/hub/journal/13652125/author-guidelines.html" rel="documentation"/>
+    <link href="https://westlibrary.txwes.edu/sites/default/files/pdf/AMACitationStyle.pdf" rel="documentation"/>
+    <link href="https://www.amamanualofstyle.com/fileasset/AMAMOS/aaaAMWA%20presentation%20Nov%202019%20FULL.pdf" rel="documentation"/>
+    <author>
+      <name>Julian Onions</name>
+      <email>julian.onions@gmail.com</email>
+    </author>
+    <contributor>
+      <name>Christian Pietsch</name>
+      <uri>http://purl.org/net/pietsch</uri>
+    </contributor>
+    <contributor>
+      <name>Daniel W Chan</name>
+      <email>danwchan@protonmail.com</email>
+    </contributor>
+    <contributor>
+      <name>Patrick O'Brien</name>
+      <email>obrienpat86@gmail.com</email>
+    </contributor>
     <category citation-format="numeric"/>
     <category field="medicine"/>
-    <issn>0306-5251</issn>
-    <eissn>1365-2125</eissn>
-    <summary>AMA style with square-brackets</summary>
-    <updated>2020-04-23T13:38:04+00:00</updated>
+    <summary>The American Medical Association style as used in JAMA. Version 11 as per November-2019.</summary>
+    <updated>2021-10-28T13:38:04+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="en">
     <terms>
       <term name="page-range-delimiter">-</term>
+      <term name="presented at">presented at</term>
     </terms>
   </locale>
   <macro name="editor">
