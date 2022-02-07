@@ -89,7 +89,7 @@ open module org.jabref {
     uses org.mariadb.jdbc.credential.CredentialPlugin;
     requires org.apache.commons.lang3;
     requires org.antlr.antlr4.runtime;
-    requires flowless;
+    requires org.fxmisc.flowless;
     requires org.apache.tika.core;
 
     requires flexmark;
