@@ -10,6 +10,9 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.jabref.gui.Globals;
+import org.jabref.gui.util.BackgroundTask;
+import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPattern;
 import org.jabref.logic.exporter.BibDatabaseWriter;
 import org.jabref.logic.exporter.MetaDataSerializer;
@@ -167,7 +170,10 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
 
         dbmsProcessor.startNotificationListener(this);
         synchronizeLocalMetaData();
-        synchronizeLocalDatabase();
+
+        BackgroundTask.wrap(() -> {
+            synchronizeLocalDatabase();
+        }).executeWith(Globals.TASK_EXECUTOR);
     }
 
     /**
@@ -220,8 +226,12 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
         }
 
         if (!entriesToInsertIntoLocalDatabase.isEmpty()) {
-            // in case entries should be added into the local database, insert them
-            bibDatabase.insertEntries(dbmsProcessor.getSharedEntries(entriesToInsertIntoLocalDatabase), EntriesEventSource.SHARED);
+        	DefaultTaskExecutor.runInJavaFXThread(()-> {
+
+				// in case entries should be added into the local database, insert them
+				bibDatabase.insertEntries(dbmsProcessor.getSharedEntries(entriesToInsertIntoLocalDatabase),
+						EntriesEventSource.SHARED);
+			});
         }
     }
 
