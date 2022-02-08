@@ -20,6 +20,12 @@ public class OpenConsoleAction extends SimpleCommand {
     private final StateManager stateManager;
     private final PreferencesService preferencesService;
 
+    /**
+     * Creates a command that opens the console at the path of the supplied database,
+     * or defaults to the active database. Use
+     * {@link #OpenConsoleAction(StateManager, PreferencesService)} if not supplying
+     * another database.
+     */
     public OpenConsoleAction(Supplier<BibDatabaseContext> databaseContext, StateManager stateManager, PreferencesService preferencesService) {
         this.databaseContext = databaseContext;
         this.stateManager = stateManager;
@@ -29,10 +35,10 @@ public class OpenConsoleAction extends SimpleCommand {
     }
 
     /**
-     * Using this constructor will result in executing the command on the active database
+     * Using this constructor will result in executing the command on the active database.
      */
     public OpenConsoleAction(StateManager stateManager, PreferencesService preferencesService) {
-        this(() -> stateManager.getActiveDatabase().get(), stateManager, preferencesService);
+        this(() -> null, stateManager, preferencesService);
     }
 
     @Override
