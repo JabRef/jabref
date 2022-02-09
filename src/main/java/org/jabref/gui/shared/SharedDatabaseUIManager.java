@@ -44,7 +44,6 @@ public class SharedDatabaseUIManager {
     public SharedDatabaseUIManager(JabRefFrame jabRefFrame) {
         this.jabRefFrame = jabRefFrame;
         this.dialogService = jabRefFrame.getDialogService();
-
     }
 
     @Subscribe

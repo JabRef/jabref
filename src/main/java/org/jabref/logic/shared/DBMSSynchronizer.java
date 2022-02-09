@@ -266,7 +266,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
             BibDatabaseWriter.applySaveActions(bibEntry, metaData); // perform possibly existing save actions
             dbmsProcessor.updateEntry(bibEntry);
         } catch (OfflineLockException exception) {
-            taskExecutor.runInFXThread(()-> {
+            taskExecutor.runInFXThread(() -> {
                 eventBus.post(new UpdateRefusedEvent(bibDatabaseContext, exception.getLocalBibEntry(), exception.getSharedBibEntry()));
             });
         } catch (SQLException e) {
