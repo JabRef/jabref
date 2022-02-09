@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import org.jabref.gui.util.CurrentThreadTaskExecutor;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPattern;
 import org.jabref.logic.cleanup.FieldFormatterCleanup;
 import org.jabref.logic.cleanup.FieldFormatterCleanups;
@@ -61,7 +62,7 @@ public class DBMSSynchronizerTest {
         bibDatabase = new BibDatabase();
         BibDatabaseContext context = new BibDatabaseContext(bibDatabase);
 
-        dbmsSynchronizer = new DBMSSynchronizer(context, ',', pattern, new DummyFileUpdateMonitor());
+        dbmsSynchronizer = new DBMSSynchronizer(context, ',', pattern, new DummyFileUpdateMonitor(), new CurrentThreadTaskExecutor());
         bibDatabase.registerListener(dbmsSynchronizer);
 
         dbmsSynchronizer.openSharedDatabase(dbmsConnection);

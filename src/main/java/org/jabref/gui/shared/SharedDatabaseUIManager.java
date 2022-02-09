@@ -44,6 +44,7 @@ public class SharedDatabaseUIManager {
     public SharedDatabaseUIManager(JabRefFrame jabRefFrame) {
         this.jabRefFrame = jabRefFrame;
         this.dialogService = jabRefFrame.getDialogService();
+
     }
 
     @Subscribe
@@ -141,7 +142,7 @@ public class SharedDatabaseUIManager {
 
         BibDatabaseContext bibDatabaseContext = new BibDatabaseContext();
         bibDatabaseContext.setMode(Globals.prefs.getGeneralPreferences().getDefaultBibDatabaseMode());
-        DBMSSynchronizer synchronizer = new DBMSSynchronizer(bibDatabaseContext, Globals.prefs.getKeywordDelimiter(), Globals.prefs.getGlobalCitationKeyPattern(), Globals.getFileUpdateMonitor());
+        DBMSSynchronizer synchronizer = new DBMSSynchronizer(bibDatabaseContext, Globals.prefs.getKeywordDelimiter(), Globals.prefs.getGlobalCitationKeyPattern(), Globals.getFileUpdateMonitor(), Globals.TASK_EXECUTOR);
         bibDatabaseContext.convertToSharedDatabase(synchronizer);
 
         dbmsSynchronizer = bibDatabaseContext.getDBMSSynchronizer();
@@ -166,7 +167,7 @@ public class SharedDatabaseUIManager {
 
         BibDatabaseContext bibDatabaseContext = new BibDatabaseContext();
         bibDatabaseContext.setMode(Globals.prefs.getGeneralPreferences().getDefaultBibDatabaseMode());
-        DBMSSynchronizer synchronizer = new DBMSSynchronizer(bibDatabaseContext, Globals.prefs.getKeywordDelimiter(), Globals.prefs.getGlobalCitationKeyPattern(), Globals.getFileUpdateMonitor());
+        DBMSSynchronizer synchronizer = new DBMSSynchronizer(bibDatabaseContext, Globals.prefs.getKeywordDelimiter(), Globals.prefs.getGlobalCitationKeyPattern(), Globals.getFileUpdateMonitor(), Globals.TASK_EXECUTOR);
         bibDatabaseContext.convertToSharedDatabase(synchronizer);
 
         bibDatabaseContext.getDatabase().setSharedDatabaseID(sharedDatabaseID);
