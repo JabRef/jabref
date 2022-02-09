@@ -5,8 +5,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import javafx.embed.swing.JFXPanel;
-
 import org.jabref.gui.util.CurrentThreadTaskExecutor;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPattern;
 import org.jabref.logic.cleanup.FieldFormatterCleanup;
@@ -55,9 +53,6 @@ public class DBMSSynchronizerTest {
 
     @BeforeEach
     public void setup() throws Exception {
-        // for init of toolkit
-        JFXPanel panel = new JFXPanel();
-
         this.dbmsType = TestManager.getDBMSTypeTestParameter();
         this.dbmsConnection = TestConnector.getTestDBMSConnection(dbmsType);
         this.dbmsProcessor = DBMSProcessor.getProcessorInstance(this.dbmsConnection);
