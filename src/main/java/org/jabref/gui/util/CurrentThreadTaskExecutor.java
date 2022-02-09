@@ -6,7 +6,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
-import java.util.function.Supplier;
 
 import javafx.concurrent.Task;
 
@@ -108,12 +107,11 @@ public class CurrentThreadTaskExecutor implements TaskExecutor {
         }
     }
 
+    /**
+     *  Executes the runnable on the current thread, used for testing
+     */
     @Override
-    public void runInFXThread(Runnable callable) {
-        try {
-            callable.run();
-        } catch (Exception e) {
-
-        }
+    public void runInFXThread(Runnable runnable) {
+        runnable.run();
     }
 }

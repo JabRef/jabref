@@ -54,6 +54,11 @@ public interface TaskExecutor {
      */
     DelayTaskThrottler createThrottler(int delay);
 
+    /**
+     * If {@link TaskExecutor} is an instance of {@link DefaultTaskExecutor} then it is equivalent of calling {@link DefaultTaskExecutor#runInJavaFXThread(Runnable)}
+     * otherwise it is executed on the same thread as the caller. This is extremely useful for testing code that does calls to the FXThread
+     * @param runnable The runnable to execute
+     */
     void runInFXThread(Runnable runnable);
 
 }
