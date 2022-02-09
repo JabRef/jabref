@@ -53,4 +53,7 @@ public interface TaskExecutor {
      * Creates a new task throttler, and registers it so that it gets properly shutdown.
      */
     DelayTaskThrottler createThrottler(int delay);
+
+    void runInFXThread(Runnable runnable);
+
 }

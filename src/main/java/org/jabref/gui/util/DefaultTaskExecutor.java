@@ -141,7 +141,7 @@ public class DefaultTaskExecutor implements TaskExecutor {
     }
 
     private <V> Task<V> getJavaFXTask(BackgroundTask<V> task) {
-        Task<V> javaTask = new Task<V>() {
+        Task<V> javaTask = new Task<>() {
 
             {
                 this.updateMessage(task.messageProperty().get());
@@ -183,5 +183,10 @@ public class DefaultTaskExecutor implements TaskExecutor {
         } else {
             return new Exception(throwable);
         }
+    }
+
+    @Override
+    public void runInFXThread(Runnable runnable) {
+       DefaultTaskExecutor.runInJavaFXThread(runnable);
     }
 }
