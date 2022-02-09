@@ -90,7 +90,7 @@ jobs:
           distribution: 'temurin'
           cache: 'gradle'
       - name: Run tests on PostgreSQL
-        run: ./gradlew databaseTest --rerun-tasks
+        run: xvfb-run --auto-servernum ./gradlew databaseTest --rerun-tasks
         env:
           CI: "true"
           DBMS: "postgresql"
@@ -107,7 +107,7 @@ jobs:
           mysql database: 'jabref'
           mysql root password: 'root'
       - name: Run tests on MySQL
-        run: ./gradlew databaseTest --rerun-tasks
+        run: xvfb-run --auto-servernum ./gradlew databaseTest --rerun-tasks
         env:
           CI: "true"
           DBMS: "mysql"

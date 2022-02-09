@@ -10,9 +10,9 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.jabref.gui.Globals;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.DefaultTaskExecutor;
+import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPattern;
 import org.jabref.logic.exporter.BibDatabaseWriter;
 import org.jabref.logic.exporter.MetaDataSerializer;
@@ -58,9 +58,10 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
     private final GlobalCitationKeyPattern globalCiteKeyPattern;
     private final FileUpdateMonitor fileMonitor;
     private Optional<BibEntry> lastEntryChanged;
+    private final TaskExecutor taskExecutor;
 
     public DBMSSynchronizer(BibDatabaseContext bibDatabaseContext, Character keywordSeparator,
-                            GlobalCitationKeyPattern globalCiteKeyPattern, FileUpdateMonitor fileMonitor) {
+                            GlobalCitationKeyPattern globalCiteKeyPattern, FileUpdateMonitor fileMonitor, TaskExecutor taskExecutor) {
         this.bibDatabaseContext = Objects.requireNonNull(bibDatabaseContext);
         this.bibDatabase = bibDatabaseContext.getDatabase();
         this.metaData = bibDatabaseContext.getMetaData();
@@ -69,6 +70,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
         this.keywordSeparator = keywordSeparator;
         this.globalCiteKeyPattern = Objects.requireNonNull(globalCiteKeyPattern);
         this.lastEntryChanged = Optional.empty();
+        this.taskExecutor = taskExecutor;
     }
 
     /**
@@ -101,10 +103,12 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
         // While synchronizing the local database (see synchronizeLocalDatabase() below), some EntriesEvents may be posted.
         // In this case DBSynchronizer should not try to update the bibEntry entry again (but it would not harm).
         if (isPresentLocalBibEntry(bibEntry) && isEventSourceAccepted(event) && checkCurrentConnection() && !event.isFilteredOut()) {
-            synchronizeLocalMetaData();
-            pullWithLastEntry();
-            synchronizeSharedEntry(bibEntry);
-            synchronizeLocalDatabase(); // Pull changes for the case that there were some
+            BackgroundTask.wrap(() -> {
+                synchronizeLocalMetaData();
+                pullWithLastEntry();
+                synchronizeSharedEntry(bibEntry);
+                synchronizeLocalDatabase(); // Pull changes for the case that there were some
+            });
         } else {
             // Set new BibEntry that has been changed last
             lastEntryChanged = Optional.of(bibEntry);
@@ -173,7 +177,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
 
         BackgroundTask.wrap(() -> {
             synchronizeLocalDatabase();
-        }).executeWith(Globals.TASK_EXECUTOR);
+        }).executeWith(taskExecutor);
     }
 
     /**
@@ -227,11 +231,10 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
 
         if (!entriesToInsertIntoLocalDatabase.isEmpty()) {
         	DefaultTaskExecutor.runInJavaFXThread(()-> {
-
-				// in case entries should be added into the local database, insert them
-				bibDatabase.insertEntries(dbmsProcessor.getSharedEntries(entriesToInsertIntoLocalDatabase),
-						EntriesEventSource.SHARED);
-			});
+                // in case entries should be added into the local database, insert them
+                bibDatabase.insertEntries(dbmsProcessor.getSharedEntries(entriesToInsertIntoLocalDatabase),
+                                          EntriesEventSource.SHARED);
+            });
         }
     }
 
@@ -265,7 +268,9 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
             BibDatabaseWriter.applySaveActions(bibEntry, metaData); // perform possibly existing save actions
             dbmsProcessor.updateEntry(bibEntry);
         } catch (OfflineLockException exception) {
-            eventBus.post(new UpdateRefusedEvent(bibDatabaseContext, exception.getLocalBibEntry(), exception.getSharedBibEntry()));
+            DefaultTaskExecutor.runInJavaFXThread(()-> {
+                eventBus.post(new UpdateRefusedEvent(bibDatabaseContext, exception.getLocalBibEntry(), exception.getSharedBibEntry()));
+            });
         } catch (SQLException e) {
             LOGGER.error("SQL Error", e);
         }
