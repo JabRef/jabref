@@ -101,10 +101,12 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
         // While synchronizing the local database (see synchronizeLocalDatabase() below), some EntriesEvents may be posted.
         // In this case DBSynchronizer should not try to update the bibEntry entry again (but it would not harm).
         if (isPresentLocalBibEntry(bibEntry) && isEventSourceAccepted(event) && checkCurrentConnection() && !event.isFilteredOut()) {
-            synchronizeLocalMetaData();
-            pullWithLastEntry();
-            synchronizeSharedEntry(bibEntry);
-            synchronizeLocalDatabase(); // Pull changes for the case that there were some
+            BackgroundTask.wrap(() -> {
+                synchronizeLocalMetaData();
+                pullWithLastEntry();
+                synchronizeSharedEntry(bibEntry);
+                synchronizeLocalDatabase(); // Pull changes for the case that there were some
+            });
         } else {
             // Set new BibEntry that has been changed last
             lastEntryChanged = Optional.of(bibEntry);
@@ -265,7 +267,9 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
             BibDatabaseWriter.applySaveActions(bibEntry, metaData); // perform possibly existing save actions
             dbmsProcessor.updateEntry(bibEntry);
         } catch (OfflineLockException exception) {
-            eventBus.post(new UpdateRefusedEvent(bibDatabaseContext, exception.getLocalBibEntry(), exception.getSharedBibEntry()));
+            DefaultTaskExecutor.runInJavaFXThread(()-> {
+                eventBus.post(new UpdateRefusedEvent(bibDatabaseContext, exception.getLocalBibEntry(), exception.getSharedBibEntry()));
+            });
         } catch (SQLException e) {
             LOGGER.error("SQL Error", e);
         }
