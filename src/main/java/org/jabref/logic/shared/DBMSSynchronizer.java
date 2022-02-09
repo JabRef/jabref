@@ -108,7 +108,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
                 pullWithLastEntry();
                 synchronizeSharedEntry(bibEntry);
                 synchronizeLocalDatabase(); // Pull changes for the case that there were some
-            });
+            }).executeWith(taskExecutor);
         } else {
             // Set new BibEntry that has been changed last
             lastEntryChanged = Optional.of(bibEntry);
