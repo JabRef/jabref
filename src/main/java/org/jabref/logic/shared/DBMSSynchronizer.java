@@ -230,11 +230,9 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
         }
 
         if (!entriesToInsertIntoLocalDatabase.isEmpty()) {
-        	DefaultTaskExecutor.runInJavaFXThread(()-> {
-                // in case entries should be added into the local database, insert them
-                bibDatabase.insertEntries(dbmsProcessor.getSharedEntries(entriesToInsertIntoLocalDatabase),
-                                          EntriesEventSource.SHARED);
-            });
+            // in case entries should be added into the local database, insert them
+            DefaultTaskExecutor.runInJavaFXThread(()->
+            bibDatabase.insertEntries(dbmsProcessor.getSharedEntries(entriesToInsertIntoLocalDatabase), EntriesEventSource.SHARED));
         }
     }
 
