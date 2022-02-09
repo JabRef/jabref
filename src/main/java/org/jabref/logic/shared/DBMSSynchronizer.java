@@ -173,11 +173,12 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
         }
 
         dbmsProcessor.startNotificationListener(this);
-        synchronizeLocalMetaData();
 
         BackgroundTask.wrap(() -> {
+            synchronizeLocalMetaData();
             synchronizeLocalDatabase();
         }).executeWith(taskExecutor);
+
     }
 
     /**
@@ -367,7 +368,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
      *
      * @return <code>true</code> if the connection is valid, else <code>false</code>.
      */
-    public boolean checkCurrentConnection() {
+    public synchronized boolean checkCurrentConnection() {
         try {
             boolean isValid = currentConnection.isValid(0);
             if (!isValid) {

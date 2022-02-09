@@ -282,12 +282,12 @@ public abstract class DBMSProcessor {
     }
 
     /**
-     * Updates the whole {@link BibEntry} on shared database.
+     * Updates the whole {@link BibEntry } on shared database.
      *
      * @param localBibEntry {@link BibEntry} affected by changes
      * @throws SQLException
      */
-    public void updateEntry(BibEntry localBibEntry) throws OfflineLockException, SQLException {
+    public synchronized void updateEntry(BibEntry localBibEntry) throws OfflineLockException, SQLException {
         connection.setAutoCommit(false); // disable auto commit due to transaction
 
         try {
