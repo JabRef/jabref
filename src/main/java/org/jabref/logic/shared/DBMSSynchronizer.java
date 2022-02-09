@@ -11,7 +11,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.jabref.gui.util.BackgroundTask;
-import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPattern;
 import org.jabref.logic.exporter.BibDatabaseWriter;
@@ -267,7 +266,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
             BibDatabaseWriter.applySaveActions(bibEntry, metaData); // perform possibly existing save actions
             dbmsProcessor.updateEntry(bibEntry);
         } catch (OfflineLockException exception) {
-            DefaultTaskExecutor.runInJavaFXThread(()-> {
+            taskExecutor.runInFXThread(()-> {
                 eventBus.post(new UpdateRefusedEvent(bibDatabaseContext, exception.getLocalBibEntry(), exception.getSharedBibEntry()));
             });
         } catch (SQLException e) {
