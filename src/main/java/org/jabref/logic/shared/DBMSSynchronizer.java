@@ -231,8 +231,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
 
         if (!entriesToInsertIntoLocalDatabase.isEmpty()) {
             // in case entries should be added into the local database, insert them
-            taskExecutor.runInFXThread(() ->
-            bibDatabase.insertEntries(dbmsProcessor.getSharedEntries(entriesToInsertIntoLocalDatabase), EntriesEventSource.SHARED));
+            bibDatabase.insertEntries(dbmsProcessor.getSharedEntries(entriesToInsertIntoLocalDatabase), EntriesEventSource.SHARED);
         }
     }
 
@@ -266,9 +265,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
             BibDatabaseWriter.applySaveActions(bibEntry, metaData); // perform possibly existing save actions
             dbmsProcessor.updateEntry(bibEntry);
         } catch (OfflineLockException exception) {
-            taskExecutor.runInFXThread(() -> {
                 eventBus.post(new UpdateRefusedEvent(bibDatabaseContext, exception.getLocalBibEntry(), exception.getSharedBibEntry()));
-            });
         } catch (SQLException e) {
             LOGGER.error("SQL Error", e);
         }
@@ -281,7 +278,6 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
         if (!checkCurrentConnection()) {
             return;
         }
-
         try {
             metaData.setEventPropagation(false);
             MetaDataParser parser = new MetaDataParser(fileMonitor);

@@ -1,6 +1,7 @@
 package org.jabref.gui.util;
 
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import javafx.application.Platform;
 import javafx.collections.ListChangeListener;
@@ -29,9 +30,13 @@ class UiThreadList<T> extends TransformationList<T, T> {
             });
 
             try {
-                latch.await();
+                boolean latched = latch.await(3L, TimeUnit.SECONDS);
+                LOGGER.debug("Result from latch {}", latched);
+
             } catch (InterruptedException e) {
                 LOGGER.error("Error while running on JavaFX thread", e);
+            } finally {
+                latch.countDown();
             }
         }
     }

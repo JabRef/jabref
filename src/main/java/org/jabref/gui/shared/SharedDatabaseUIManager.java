@@ -17,6 +17,7 @@ import org.jabref.gui.entryeditor.EntryEditor;
 import org.jabref.gui.exporter.SaveDatabaseAction;
 import org.jabref.gui.mergeentries.MergeEntriesDialog;
 import org.jabref.gui.undo.UndoableRemoveEntries;
+import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.shared.DBMSConnection;
@@ -97,20 +98,23 @@ public class SharedDatabaseUIManager {
 
         ButtonType merge = new ButtonType(Localization.lang("Merge entries"), ButtonBar.ButtonData.YES);
 
-        Optional<ButtonType> response = dialogService.showCustomButtonDialogAndWait(AlertType.CONFIRMATION, Localization.lang("Update refused"), message.toString(), ButtonType.CANCEL, merge);
+        Optional<BibEntry> mergedEntryResp = DefaultTaskExecutor.runInJavaFXThread(() -> {
+            Optional<ButtonType> response = dialogService.showCustomButtonDialogAndWait(AlertType.CONFIRMATION, Localization.lang("Update refused"), message.toString(), ButtonType.CANCEL, merge);
 
-        if (response.isPresent() && response.get().equals(merge)) {
-            MergeEntriesDialog dialog = new MergeEntriesDialog(localBibEntry, sharedBibEntry);
-            Optional<BibEntry> mergedEntry = dialogService.showCustomDialogAndWait(dialog);
+            if (response.isPresent() && response.get().equals(merge)) {
+                MergeEntriesDialog dialog = new MergeEntriesDialog(localBibEntry, sharedBibEntry);
+                Optional<BibEntry> mergedEntry = dialogService.showCustomDialogAndWait(dialog);
 
-            mergedEntry.ifPresent(mergedBibEntry -> {
-                mergedBibEntry.getSharedBibEntryData().setSharedID(sharedBibEntry.getSharedBibEntryData().getSharedID());
-                mergedBibEntry.getSharedBibEntryData().setVersion(sharedBibEntry.getSharedBibEntryData().getVersion());
-
-                dbmsSynchronizer.synchronizeSharedEntry(mergedBibEntry);
-                dbmsSynchronizer.synchronizeLocalDatabase();
-            });
-        }
+                return mergedEntry;
+            }
+            return Optional.empty();
+        });
+        mergedEntryResp.ifPresent(mergedBibEntry -> {
+            mergedBibEntry.getSharedBibEntryData().setSharedID(sharedBibEntry.getSharedBibEntryData().getSharedID());
+            mergedBibEntry.getSharedBibEntryData().setVersion(sharedBibEntry.getSharedBibEntryData().getVersion());
+            dbmsSynchronizer.synchronizeSharedEntry(mergedBibEntry);
+            dbmsSynchronizer.synchronizeLocalDatabase();
+        });
     }
 
     @Subscribe
