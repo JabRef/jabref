@@ -22,7 +22,7 @@ public class IndexingTaskManager extends BackgroundTask<Void> {
 
     private final Queue<Runnable> taskQueue = new ConcurrentLinkedQueue<>();
     private TaskExecutor taskExecutor;
-    private BibDatabaseContext bibDatabaseContext;
+    private final BibDatabaseContext bibDatabaseContext;
     private int numOfIndexedFiles = 0;
 
     private final Object lock = new Object();
@@ -77,22 +77,6 @@ public class IndexingTaskManager extends BackgroundTask<Void> {
         }
     }
 
-    private void updateIndexName() {
-        Optional<Path> file = bibDatabaseContext.getDatabasePath();
-
-        String name = bibDatabaseContext.getDatabasePath()
-                                        .map(file -> file.getFileName().toString())
-                                        .orElse("untitled")
-
-        if (file.isPresent()) {
-            Path databasePath = file.get();
-            String fileName = databasePath.getFileName().toString();
-            indexTitle.append(fileName);
-        }
-
-        DefaultTaskExecutor.runInJavaFXThread(() -> this.titleProperty().set(Localization.lang("Indexing for %0", indexTitle)));
-    }
-
     public AutoCloseable blockNewTasks() {
         synchronized (lock) {
             isBlockingNewTasks = true;
@@ -136,7 +120,29 @@ public class IndexingTaskManager extends BackgroundTask<Void> {
         enqueueTask(() -> removeFromIndex(indexer, entry, entry.getFiles()));
     }
 
+    public void updateDatabaseName() {
+        Optional<Path> file = bibDatabaseContext.getDatabasePath();
+
+        String name = "";
+
+        try {
+            name = bibDatabaseContext.getDatabasePath().toString();
+        } finally {
+            if (file.isPresent()) {
+                Path databasePath = file.get();
+                name = databasePath.getFileName().toString();
+            }
+
+            String fileName = name;
+            DefaultTaskExecutor.runInJavaFXThread(() -> this.titleProperty().set(Localization.lang("Indexing for %0", fileName)));
+        }
+    }
+
+    public void updateDatabaseName(String name) {
+        DefaultTaskExecutor.runInJavaFXThread(() -> this.titleProperty().set(Localization.lang("Indexing for %0", name)));
+    }
+
     public void listen(EntryChangedEvent event) {
-        updateIndexName();
+        updateDatabaseName();
     }
 }
