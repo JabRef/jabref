@@ -16,6 +16,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 ### Fixed
 
 - We fixed an issue where an exception could occur when saving the preferences [#7614](https://github.com/JabRef/jabref/issues/7614)
+- We fixed an issue where modifying a library would trigger reindexing of all PDFs [#8420](https://github.com/JabRef/jabref/issues/8420)
 
 ### Removed
 
