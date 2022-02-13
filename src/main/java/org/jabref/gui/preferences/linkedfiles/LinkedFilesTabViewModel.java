@@ -36,6 +36,7 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
     private final StringProperty autolinkRegexKeyProperty = new SimpleStringProperty("");
     private final ListProperty<String> defaultFileNamePatternsProperty =
             new SimpleListProperty<>(FXCollections.observableArrayList(FilePreferences.DEFAULT_FILENAME_PATTERNS));
+    private final BooleanProperty fulltextIndex = new SimpleBooleanProperty();
     private final StringProperty fileNamePatternProperty = new SimpleStringProperty();
     private final StringProperty fileDirectoryPatternProperty = new SimpleStringProperty();
 
@@ -76,6 +77,7 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
         mainFileDirectoryProperty.setValue(filePreferences.getFileDirectory().orElse(Path.of("")).toString());
         useMainFileDirectoryProperty.setValue(!filePreferences.shouldStoreFilesRelativeToBibFile());
         useBibLocationAsPrimaryProperty.setValue(filePreferences.shouldStoreFilesRelativeToBibFile());
+        fulltextIndex.setValue(filePreferences.shouldFulltextIndexLinkedFiles());
         fileNamePatternProperty.setValue(filePreferences.getFileNamePattern());
         fileDirectoryPatternProperty.setValue(filePreferences.getFileDirectoryPattern());
 
@@ -97,6 +99,7 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
         filePreferences.setFileNamePattern(fileNamePatternProperty.getValue());
         filePreferences.setFileDirectoryPattern(fileDirectoryPatternProperty.getValue());
         filePreferences.setDownloadLinkedFiles(filePreferences.shouldDownloadLinkedFiles()); // set in ImportEntriesViewModel
+        filePreferences.setFulltextIndexLinkedFiles(fulltextIndex.getValue());
 
         // Autolink preferences
         if (autolinkFileStartsBibtexProperty.getValue()) {
@@ -155,6 +158,10 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
 
     public StringProperty autolinkRegexKeyProperty() {
         return autolinkRegexKeyProperty;
+    }
+
+    public BooleanProperty fulltextIndexProperty() {
+        return fulltextIndex;
     }
 
     public ListProperty<String> defaultFileNamePatternsProperty() {

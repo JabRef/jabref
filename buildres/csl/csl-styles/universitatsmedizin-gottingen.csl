@@ -13,14 +13,14 @@
     <category citation-format="author-date"/>
     <category field="medicine"/>
     <summary>Zitierstil für die Universitätsmedizin Göttingen</summary>
-    <updated>2019-09-11T22:00:47+00:00</updated>
+    <updated>2022-01-23T19:13:23+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="de">
     <terms>
       <term name="et-al">et al.</term>
       <term name="editor" form="verb-short">hrsg. v.</term>
-      <term name="retrieved">Zugriff am</term>
+      <term name="retrieved">abgerufen am</term>
     </terms>
   </locale>
   <macro name="author-short">
@@ -89,7 +89,11 @@
         <text variable="publisher"/>
         <text variable="publisher-place"/>
       </group>
-      <text macro="year"/>
+      <choose>
+        <if type="report" match="none">
+          <text macro="year"/>
+        </if>
+      </choose>
     </group>
   </macro>
   <macro name="access">
@@ -173,8 +177,12 @@
         </if>
         <else-if type="report">
           <group delimiter=". ">
-            <text variable="title"/>
+            <group delimiter=": ">
+              <text macro="year" prefix=" (" suffix=")"/>
+              <text variable="title"/>
+            </group>
             <text macro="publisher"/>
+            <text macro="access"/>
           </group>
         </else-if>
         <else-if type="bill book graphic legal_case legislation motion_picture song" match="any">
@@ -196,7 +204,7 @@
             </group>
           </group>
         </else-if>
-        <else-if type="webpage post-weblog" match="any">
+        <else-if type="webpage post-weblog post" match="any">
           <choose>
             <if variable="author editor translator title" match="any">
               <text macro="access" prefix=". "/>

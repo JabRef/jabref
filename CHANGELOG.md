@@ -11,17 +11,24 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 
 ### Added
 
+- We added an extra option when right-clicking an entry in the Entry List to copy either the DOI or the DOI url.
+
 ### Changed
+
+- The CSL preview styles now also support displaying data from cross references entries that are linked via the `crossref` field [#7378](https://github.com/JabRef/jabref/issues/7378)
+- We made the Search button in Web Search wider. We also skewed the panel titles to the left [#8397](https://github.com/JabRef/jabref/issues/8397)
+- We introduced a preference to disable fulltext indexing [#8468](https://github.com/JabRef/jabref/issues/8468)
 
 ### Fixed
 
 - We fixed an issue where an exception could occur when saving the preferences [#7614](https://github.com/JabRef/jabref/issues/7614)
+- We fixed an issue where "Copy DOI url" in the right-click menu of the Entry List would just copy the DOI and not the DOI url. [#8389](https://github.com/JabRef/jabref/issues/8389)
+- We fixed an issue where opening the console from the drop-down menu would cause an exception. [#8466](https://github.com/JabRef/jabref/issues/8466)
 - We fixed an issue where modifying a library would trigger reindexing of all PDFs [#8420](https://github.com/JabRef/jabref/issues/8420)
 
 ### Removed
 
-
-
+- We removed the option to copy CSL Citation styles data as `XSL_FO`, `ASCIIDOC`, and `RTF` as these haven not been working since a long time and are no longe rsupported in the external library used for processing the styles [#7378](https://github.com/JabRef/jabref/issues/7378)
 
 
 

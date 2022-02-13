@@ -26,7 +26,7 @@ public class FileHistoryMenu extends Menu {
         this.preferences = preferences;
         this.dialogService = dialogService;
         this.openDatabaseAction = openDatabaseAction;
-        history = preferences.getFileHistory();
+        history = preferences.getGuiPreferences().getFileHistory();
         if (history.isEmpty()) {
             setDisable(true);
         } else {
@@ -80,10 +80,6 @@ public class FileHistoryMenu extends Menu {
         item.setMnemonicParsing(false);
         item.setOnAction(event -> openFile(file));
         getItems().add(item);
-    }
-
-    public void storeHistory() {
-        preferences.storeFileHistory(history);
     }
 
     public void openFile(Path file) {

@@ -193,7 +193,11 @@
     </group>
   </macro>
   <macro name="publisher">
-    <text variable="publisher"/>
+    <choose>
+      <if type="article-magazine article-newspaper article-journal" match="none">
+        <text variable="publisher"/>
+      </if>
+    </choose>
   </macro>
   <macro name="publication-date">
     <choose>

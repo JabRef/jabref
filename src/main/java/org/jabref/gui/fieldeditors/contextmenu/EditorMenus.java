@@ -48,16 +48,18 @@ public class EditorMenus {
     }
 
     /**
-     * The default context menu with a specific menu copying a DOI URL.
+     * The default context menu with a specific menu copying a DOI/ DOI URL.
      *
      * @param textArea text-area that this menu will be connected to
-     * @return menu containing items of the default menu and an item for copying a DOI URL
+     * @return menu containing items of the default menu and an item for copying a DOI/DOI URL
      */
     public static Supplier<List<MenuItem>> getDOIMenu(TextArea textArea) {
         return () -> {
             ActionFactory factory = new ActionFactory(Globals.getKeyPrefs());
-            MenuItem copyDoiUrlMenuItem = factory.createMenuItem(StandardActions.COPY_DOI, new CopyDoiUrlAction(textArea));
+            MenuItem copyDoiMenuItem = factory.createMenuItem(StandardActions.COPY_DOI, new CopyDoiUrlAction(textArea, StandardActions.COPY_DOI));
+            MenuItem copyDoiUrlMenuItem = factory.createMenuItem(StandardActions.COPY_DOI_URL, new CopyDoiUrlAction(textArea, StandardActions.COPY_DOI_URL));
             List<MenuItem> menuItems = new ArrayList<>();
+            menuItems.add(copyDoiMenuItem);
             menuItems.add(copyDoiUrlMenuItem);
             menuItems.add(new SeparatorMenuItem());
             menuItems.addAll(new DefaultMenu(textArea).get());
