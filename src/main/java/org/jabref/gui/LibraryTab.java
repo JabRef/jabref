@@ -337,10 +337,6 @@ public class LibraryTab extends Tab {
             textProperty().setValue(tabTitle.toString());
             setTooltip(new Tooltip(toolTipText.toString()));
         });
-
-        if (preferencesService.getFilePreferences().shouldFulltextIndexLinkedFiles()) {
-            indexingTaskManager.updateDatabaseName(tabTitle.toString());
-        }
     }
 
     private List<String> collectAllDatabasePaths() {
