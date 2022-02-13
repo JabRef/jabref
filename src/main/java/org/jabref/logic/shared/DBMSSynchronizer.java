@@ -56,7 +56,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
     private final Character keywordSeparator;
     private final GlobalCitationKeyPattern globalCiteKeyPattern;
     private final FileUpdateMonitor fileMonitor;
-    private Optional<BibEntry> lastEntryChanged;
+    private volatile Optional<BibEntry> lastEntryChanged;
     private final TaskExecutor taskExecutor;
 
     public DBMSSynchronizer(BibDatabaseContext bibDatabaseContext, Character keywordSeparator,
@@ -82,12 +82,15 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
         // While synchronizing the local database (see synchronizeLocalDatabase() below), some EntriesEvents may be posted.
         // In this case DBSynchronizer should not try to insert the bibEntry entry again (but it would not harm).
         if (isEventSourceAccepted(event) && checkCurrentConnection()) {
-            synchronizeLocalMetaData();
-            pullWithLastEntry();
-            synchronizeLocalDatabase();
-            dbmsProcessor.insertEntries(event.getBibEntries());
-            // Reset last changed entry because it just has already been synchronized -> Why necessary?
-            lastEntryChanged = Optional.empty();
+            BackgroundTask.wrap(() -> {
+                synchronizeLocalMetaData();
+                pullWithLastEntry();
+                synchronizeLocalDatabase();
+                dbmsProcessor.insertEntries(event.getBibEntries());
+
+                // Reset last changed entry because it just has already been synchronized -> Why necessary?
+                lastEntryChanged = Optional.empty();
+            }).executeWith(taskExecutor);
         }
     }
 
@@ -125,10 +128,12 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
         // While synchronizing the local database (see synchronizeLocalDatabase() below), some EntriesEvents may be posted.
         // In this case DBSynchronizer should not try to delete the bibEntry entry again (but it would not harm).
         if (isEventSourceAccepted(event) && checkCurrentConnection()) {
+            BackgroundTask.wrap(() -> {
             synchronizeLocalMetaData();
             pullWithLastEntry();
             dbmsProcessor.removeEntries(event.getBibEntries());
             synchronizeLocalDatabase();
+            }).executeWith(taskExecutor);
         }
     }
 
@@ -140,10 +145,12 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
     @Subscribe
     public void listen(MetaDataChangedEvent event) {
         if (checkCurrentConnection()) {
-            synchronizeSharedMetaData(event.getMetaData(), globalCiteKeyPattern);
-            synchronizeLocalDatabase();
-            applyMetaData();
-            dbmsProcessor.notifyClients();
+            BackgroundTask.wrap(() -> {
+                synchronizeSharedMetaData(event.getMetaData(), globalCiteKeyPattern);
+                synchronizeLocalDatabase();
+                applyMetaData();
+                dbmsProcessor.notifyClients();
+            }).executeWith(taskExecutor);
         }
     }
 
@@ -177,7 +184,6 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
             synchronizeLocalMetaData();
             synchronizeLocalDatabase();
         }).executeWith(taskExecutor);
-
     }
 
     /**

@@ -125,12 +125,13 @@ public class SharedDatabaseUIManager {
         libraryTab.getUndoManager().addEdit(new UndoableRemoveEntries(libraryTab.getDatabase(), event.getBibEntries()));
 
         if (Objects.nonNull(entryEditor) && (event.getBibEntries().contains(entryEditor.getEntry()))) {
-
-            dialogService.showInformationDialogAndWait(Localization.lang("Shared entry is no longer present"),
-                    Localization.lang("The entry you currently work on has been deleted on the shared side.")
-                            + "\n"
-                            + Localization.lang("You can restore the entry using the \"Undo\" operation."));
-            libraryTab.closeBottomPane();
+            DefaultTaskExecutor.runInJavaFXThread(() -> {
+                dialogService.showInformationDialogAndWait(Localization.lang("Shared entry is no longer present"),
+                                                           Localization.lang("The entry you currently work on has been deleted on the shared side.")
+                                                                                                                   + "\n"
+                                                                                                              + Localization.lang("You can restore the entry using the \"Undo\" operation."));
+                libraryTab.closeBottomPane();
+            });
         }
     }
 
