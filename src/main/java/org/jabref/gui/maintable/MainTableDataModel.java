@@ -41,7 +41,7 @@ public class MainTableDataModel {
         this.fieldValueFormatter = new SimpleObjectProperty<>(
                 new MainTableFieldValueFormatter(preferencesService, bibDatabaseContext));
 
-        ObservableList<BibEntry> allEntries = BindingsHelper.forUI(context.getDatabase().getEntries());
+        ObservableList<BibEntry> allEntries = context.getDatabase().getEntries();
         ObservableList<BibEntryTableViewModel> entriesViewModel = EasyBind.mapBacked(allEntries, entry ->
                 new BibEntryTableViewModel(entry, bibDatabaseContext, fieldValueFormatter));
 
@@ -54,7 +54,7 @@ public class MainTableDataModel {
         resultSize.bind(Bindings.size(entriesFiltered));
         stateManager.setActiveSearchResultSize(context, resultSize);
         // We need to wrap the list since otherwise sorting in the table does not work
-        entriesSorted = new SortedList<>(entriesFiltered);
+        entriesSorted = new SortedList<>(BindingsHelper.forUI(entriesFiltered));
     }
 
     private boolean isMatched(ObservableList<GroupTreeNode> groups, Optional<SearchQuery> query, BibEntryTableViewModel entry) {
