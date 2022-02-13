@@ -80,7 +80,9 @@ public class IndexingTaskManager extends BackgroundTask<Void> {
     private void updateIndexName() {
         Optional<Path> file = bibDatabaseContext.getDatabasePath();
 
-        StringBuilder indexTitle = new StringBuilder();
+        String name = bibDatabaseContext.getDatabasePath()
+                                        .map(file -> file.getFileName().toString())
+                                        .orElse("untitled")
 
         if (file.isPresent()) {
             Path databasePath = file.get();
