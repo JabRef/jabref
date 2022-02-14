@@ -121,7 +121,7 @@ dependencies {
     implementation group: 'org.apache.commons', name: 'commons-csv', version: '1.9.0'
     implementation 'com.h2database:h2-mvstore:2.1.210'
 
-    implementation group: 'org.apache.tika', name: 'tika-core', version: '2.2.1'
+    implementation group: 'org.apache.tika', name: 'tika-core', version: '2.3.0'
 
     // required for reading write-protected PDFs - see https://github.com/JabRef/jabref/pull/942#issuecomment-209252635
     implementation 'org.bouncycastle:bcprov-jdk15on:1.70'
@@ -197,12 +197,12 @@ dependencies {
     }
 
     implementation 'com.vladsch.flexmark:flexmark:0.62.2'
-    implementation 'com.vladsch.flexmark:flexmark-ext-gfm-strikethrough:0.62.2'
+    implementation 'com.vladsch.flexmark:flexmark-ext-gfm-strikethrough:0.64.0'
     implementation 'com.vladsch.flexmark:flexmark-ext-gfm-tasklist:0.62.2'
 
     implementation group: 'net.harawata', name: 'appdirs', version: '1.2.1'
 
-    testImplementation 'io.github.classgraph:classgraph:4.8.138'
+    testImplementation 'io.github.classgraph:classgraph:4.8.139'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.8.2'
     testImplementation 'org.junit.platform:junit-platform-launcher:1.8.2'
 
