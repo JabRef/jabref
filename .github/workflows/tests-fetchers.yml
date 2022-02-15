@@ -27,6 +27,10 @@ env:
   AstrophysicsDataSystemAPIKey: ${{ secrets.AstrophysicsDataSystemAPIKey_FOR_TESTS }}
   IEEEAPIKey: ${{ secrets.IEEEAPIKey_FOR_TESTS }}
 
+concurrency:
+  group: fetcher-tests-${{ github.head_ref }}
+  cancel-in-progress: true
+
 jobs:
   fetchertests:
     name: Fetcher tests
@@ -37,8 +41,8 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v2
         with:
-          java-version: 16
-          distribution: 'adopt'
+          java-version: 17
+          distribution: 'temurin'
           cache: 'gradle'
       - name: Run fetcher tests
         run: ./gradlew fetcherTest

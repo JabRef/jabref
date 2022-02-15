@@ -59,9 +59,9 @@ public class JabRefGUI {
         openWindow(mainStage);
 
         new VersionWorker(Globals.BUILD_INFO.version,
-                preferencesService.getVersionPreferences().getIgnoredVersion(),
                 mainFrame.getDialogService(),
-                Globals.TASK_EXECUTOR)
+                Globals.TASK_EXECUTOR,
+                preferencesService.getInternalPreferences())
                 .checkForNewVersionDelayed();
     }
 
@@ -95,7 +95,7 @@ public class JabRefGUI {
         root.getChildren().add(JabRefGUI.mainFrame);
 
         Scene scene = new Scene(root, 800, 800);
-        preferencesService.getTheme().installCss(scene);
+        Globals.getThemeManager().installCss(scene);
 
         // Handle TextEditor key bindings
         scene.addEventFilter(KeyEvent.KEY_PRESSED, event -> TextInputKeyBindings.call(scene, event));
@@ -128,7 +128,7 @@ public class JabRefGUI {
 
     private void openDatabases() {
         // If the option is enabled, open the last edited libraries, if any.
-        if (!isBlank && preferencesService.getGuiPreferences().shouldOpenLastEdited()) {
+        if (!isBlank && preferencesService.getImportExportPreferences().shouldOpenLastEdited()) {
             openLastEditedDatabases();
         }
 

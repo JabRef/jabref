@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PushbackReader;
 import java.io.Reader;
+import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.Deque;
@@ -21,6 +22,7 @@ import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.jabref.logic.bibtex.FieldContentFormatter;
+import org.jabref.logic.bibtex.FieldWriter;
 import org.jabref.logic.exporter.BibtexDatabaseWriter;
 import org.jabref.logic.exporter.SavePreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
@@ -29,6 +31,7 @@ import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.util.MetaDataParser;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.OS;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.KeyCollisionException;
 import org.jabref.model.entry.BibEntry;
@@ -51,20 +54,24 @@ import org.slf4j.LoggerFactory;
  * <p>
  * Use:
  * <p>
- * BibtexParser parser = new BibtexParser(reader);
+ * <code>BibtexParser parser = new BibtexParser(reader);</code>
  * <p>
- * ParserResult result = parser.parse();
+ * <code>ParserResult result = parser.parse();</code>
  * <p>
  * or
  * <p>
- * ParserResult result = BibtexParser.parse(reader);
+ * <code>ParserResult result = BibtexParser.parse(reader);</code>
  * <p>
  * Can be used stand-alone.
+ * <p>
+ * Main using method: {@link org.jabref.logic.importer.OpenDatabase#loadDatabase(java.nio.file.Path, org.jabref.preferences.GeneralPreferences, org.jabref.logic.importer.ImportFormatPreferences, org.jabref.model.util.FileUpdateMonitor)}
+ * <p>
+ * Opposite class: {@link org.jabref.logic.exporter.BibDatabaseWriter}
  */
 public class BibtexParser implements Parser {
     private static final Logger LOGGER = LoggerFactory.getLogger(BibtexParser.class);
 
-    private static final Integer LOOKAHEAD = 64;
+    private static final Integer LOOKAHEAD = 1024;
     private final FieldContentFormatter fieldContentFormatter;
     private final Deque<Character> pureTextFromFile = new LinkedList<>();
     private final ImportFormatPreferences importFormatPreferences;
@@ -119,21 +126,20 @@ public class BibtexParser implements Parser {
     }
 
     /**
-     * Will parse the BibTex-Data found when reading from reader. Ignores any encoding supplied in the file by "Encoding: myEncoding".
+     * Parses BibTeX data found when reading from reader. Ignores any encoding supplied in the file by "Encoding: myEncoding".
      * <p>
      * The reader will be consumed.
      * <p>
      * Multiple calls to parse() return the same results
-     *
-     * @return ParserResult
-     * @throws IOException
      */
     public ParserResult parse(Reader in) throws IOException {
         Objects.requireNonNull(in);
         pushbackReader = new PushbackReader(in, BibtexParser.LOOKAHEAD);
 
-        // Bibtex related contents.
-        initializeParserResult();
+        String newLineSeparator = determineNewLineSeparator();
+
+        // BibTeX related contents
+        initializeParserResult(newLineSeparator);
 
         parseDatabaseID();
 
@@ -142,14 +148,36 @@ public class BibtexParser implements Parser {
         return parseFileContent();
     }
 
-    private void initializeParserResult() {
+    private String determineNewLineSeparator() throws IOException {
+        String newLineSeparator = OS.NEWLINE;
+        StringWriter stringWriter = new StringWriter(BibtexParser.LOOKAHEAD);
+        int i = 0;
+        int currentChar;
+        do {
+            currentChar = pushbackReader.read();
+            stringWriter.append((char) currentChar);
+            i++;
+        } while ((i < BibtexParser.LOOKAHEAD) && (currentChar != '\r') && (currentChar != '\n'));
+        if (currentChar == '\r') {
+            newLineSeparator = "\r\n";
+        } else if (currentChar == '\n') {
+            newLineSeparator = "\n";
+        }
+
+        // unread all sneaked characters
+        pushbackReader.unread(stringWriter.toString().toCharArray());
+
+        return newLineSeparator;
+    }
+
+    private void initializeParserResult(String newLineSeparator) {
         database = new BibDatabase();
+        database.setNewLineSeparator(newLineSeparator);
         entryTypes = new HashSet<>(); // To store custom entry types parsed.
         parserResult = new ParserResult(database, new MetaData(), entryTypes);
     }
 
     private void parseDatabaseID() throws IOException {
-
         while (!eof) {
             skipWhitespace();
             char c = (char) read();
@@ -185,7 +213,7 @@ public class BibtexParser implements Parser {
 
             if ("preamble".equals(entryType)) {
                 database.setPreamble(parsePreamble());
-                // Consume new line which signals end of preamble
+                // Consume a new line which separates the preamble from the next part (if the file was written with JabRef)
                 skipOneNewline();
                 // the preamble is saved verbatim anyways, so the text read so far can be dropped
                 dumpTextReadSoFarToString();
@@ -233,12 +261,23 @@ public class BibtexParser implements Parser {
             // this is at least `@Type`
             String commentsAndEntryTypeDefinition = dumpTextReadSoFarToString();
 
+            // remove first newline
+            // this is appended by JabRef during writing automatically
+            if (commentsAndEntryTypeDefinition.startsWith("\r\n")) {
+                commentsAndEntryTypeDefinition = commentsAndEntryTypeDefinition.substring(2);
+            } else if (commentsAndEntryTypeDefinition.startsWith("\n")) {
+                commentsAndEntryTypeDefinition = commentsAndEntryTypeDefinition.substring(1);
+            }
+
             BibEntry entry = parseEntry(type);
             // store comments collected without type definition
             entry.setCommentsBeforeEntry(
                     commentsAndEntryTypeDefinition.substring(0, commentsAndEntryTypeDefinition.lastIndexOf('@')));
+
             // store complete parsed serialization (comments, type definition + type contents)
-            entry.setParsedSerialization(commentsAndEntryTypeDefinition + dumpTextReadSoFarToString());
+
+            String parsedSerialization = commentsAndEntryTypeDefinition + dumpTextReadSoFarToString();
+            entry.setParsedSerialization(parsedSerialization);
 
             database.insertEntry(entry);
         } catch (IOException ex) {
@@ -345,7 +384,13 @@ public class BibtexParser implements Parser {
             }
             runningIndex++;
         }
-        return context.substring(runningIndex + 1);
+        // strip empty lines
+        while ((runningIndex < indexOfAt) &&
+                (context.charAt(runningIndex) == '\r' ||
+                        context.charAt(runningIndex) == '\n')) {
+            runningIndex++;
+        }
+        return context.substring(runningIndex);
     }
 
     private String getPureTextFromFile() {
@@ -500,7 +545,10 @@ public class BibtexParser implements Parser {
 
     private String parsePreamble() throws IOException {
         skipWhitespace();
-        return parseBracketedText();
+        String result = parseBracketedText();
+        // also "include" the newline in the preamble
+        skipOneNewline();
+        return result;
     }
 
     private BibEntry parseEntry(String entryType) throws IOException {
@@ -594,6 +642,9 @@ public class BibtexParser implements Parser {
                 String number = parseTextToken();
                 value.append(number);
             } else if (character == '#') {
+                // Here, we hit the case of BibTeX string concatenation. E.g., "author = Kopp # Kolb".
+                // We did NOT hit org.jabref.logic.bibtex.FieldWriter#BIBTEX_STRING_START_END_SYMBOL
+                // See also ADR-0024
                 consume('#');
             } else {
                 String textToken = parseTextToken();
@@ -601,7 +652,7 @@ public class BibtexParser implements Parser {
                     throw new IOException("Error in line " + line + " or above: "
                             + "Empty text token.\nThis could be caused " + "by a missing comma between two fields.");
                 }
-                value.append('#').append(textToken).append('#');
+                value.append(FieldWriter.BIBTEX_STRING_START_END_SYMBOL).append(textToken).append(FieldWriter.BIBTEX_STRING_START_END_SYMBOL);
             }
             skipWhitespace();
         }

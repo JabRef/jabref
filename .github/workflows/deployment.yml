@@ -26,6 +26,11 @@ env:
   GRADLE_OPTS: -Xmx4g -Dorg.gradle.daemon=false -Dorg.gradle.vfs.watch=false
   JAVA_OPTS: -Xmx4g
 
+concurrency:
+  group: ${{ github.ref }}
+  cancel-in-progress: true
+
+
 jobs:
   build:
     strategy:
@@ -45,26 +50,22 @@ jobs:
     runs-on: ${{ matrix.os }}
     name: Create installer and portable version for ${{ matrix.displayName }}
     steps:
-      - name: Cancel Previous Runs
-        uses: styfle/cancel-workflow-action@0.9.1
-        with:
-          access_token: ${{ github.token }}
       - name: Fetch all history for all tags and branches
         uses: actions/checkout@v2
         with:
           fetch-depth: 0
       - name: Install GitVersion
-        uses: gittools/actions/gitversion/setup@v0.9.10
+        uses: gittools/actions/gitversion/setup@v0.9.11
         with:
           versionSpec: "5.x"
       - name: Run GitVersion
         id: gitversion
-        uses: gittools/actions/gitversion/execute@v0.9.10
+        uses: gittools/actions/gitversion/execute@v0.9.11
       - name: Set up JDK
         uses: actions/setup-java@v2
         with:
-          java-version: 16
-          distribution: 'adopt'
+          java-version: 17
+          distribution: 'temurin'
           cache: 'gradle'
       - name: Setup OSX key chain on OSX
         if: matrix.os == 'macos-latest'
@@ -155,12 +156,12 @@ jobs:
       - name: Fetch all history for all tags and branches
         run: git fetch --prune --unshallow
       - name: Install GitVersion
-        uses: gittools/actions/gitversion/setup@v0.9.10
+        uses: gittools/actions/gitversion/setup@v0.9.11
         with:
           versionSpec: '5.x'
       - name: Run GitVersion
         id: gitversion
-        uses: gittools/actions/gitversion/execute@v0.9.10
+        uses: gittools/actions/gitversion/execute@v0.9.11
       - name: Get linux binaries
         uses: actions/download-artifact@master
         with:

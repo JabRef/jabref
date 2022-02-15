@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" demote-non-dropping-particle="sort-only" default-locale="de-DE">
   <info>
-    <title>Deutsche Gesellschaft für Psychologie (Deutsch)</title>
+    <title>Deutsche Gesellschaft für Psychologie 5. Auflage (Deutsch)</title>
+    <title-short>DGP 5. Auflage</title-short>
     <id>http://www.zotero.org/styles/deutsche-gesellschaft-fur-psychologie</id>
     <link href="http://www.zotero.org/styles/deutsche-gesellschaft-fur-psychologie" rel="self"/>
-    <link href="https://www.psychologie.uni-bonn.de/de/studium/richtlinien-zur-manuskriptgestaltung/view" rel="documentation"/>
     <link href="https://github.com/citation-style-language/styles/pull/432" rel="documentation"/>
-    <link href="https://www.hogrefe.de/shop/richtlinien-zur-manuskriptgestaltung-75884.html" rel="documentation"/>
+    <link href="https://doi.org/10.1026/02954-000" rel="documentation"/>
     <author>
       <name>Daniel Hirsbrunner</name>
       <email>dhirsbrunner@gmx.ch</email>
@@ -18,16 +18,21 @@
       <name>Patrick O'Brien</name>
       <email>obrienpat86@gmail.com</email>
     </contributor>
+    <contributor>
+      <name>Tobias Stocker</name>
+      <email>tobistocker@gmail.com</email>
+    </contributor>
     <category citation-format="author-date"/>
     <category field="psychology"/>
-    <summary>Style for the German society for psychology, based on the 4th style manual (Feb-2016).</summary>
-    <updated>2017-03-22T14:15:50+00:00</updated>
+    <summary>Style for the German society for psychology, based on the 5th style manual (2019).</summary>
+    <updated>2022-01-20T12:24:00+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="de">
     <terms>
       <term name="et-al">et al.</term>
       <term name="retrieved">Zugriff am</term>
+      <term name="original-work-published">Original erschienen</term>
     </terms>
     <date form="text">
       <date-part name="year"/>
@@ -279,6 +284,59 @@
       <text variable="locator" prefix=" "/>
     </group>
   </macro>
+  <macro name="issued-citation">
+    <choose>
+      <if variable="issued">
+        <group delimiter="/">
+          <choose>
+            <if variable="original-date">
+              <date variable="original-date">
+                <date-part name="year"/>
+              </date>
+            </if>
+          </choose>
+          <text macro="issued-year"/>
+        </group>
+      </if>
+      <else>
+        <group delimiter="-">
+          <text term="no date" form="short"/>
+          <text variable="year-suffix"/>
+        </group>
+      </else>
+    </choose>
+  </macro>
+  <macro name="original-date">
+    <date variable="original-date">
+      <date-part name="year"/>
+    </date>
+  </macro>
+  <macro name="publication-history">
+    <group prefix="(" suffix=")">
+      <choose>
+        <if variable="references">
+          <text variable="references"/>
+        </if>
+        <else>
+          <choose>
+            <if variable="original-date">
+              <group delimiter=":">
+                <group delimiter=" ">
+                  <text term="original-work-published"/>
+                  <text macro="original-date" prefix=" "/>
+                </group>
+                <choose>
+                  <if variable="translator original-title" match="all">
+                    <text variable="original-title" prefix=" "/>
+                  </if>
+                </choose>
+              </group>
+            </if>
+          </choose>
+        </else>
+      </choose>
+    </group>
+  </macro>
   <citation et-al-min="6" et-al-use-first="1" et-al-subsequent-min="3" et-al-subsequent-use-first="1" disambiguate-add-year-suffix="true" disambiguate-add-names="true" disambiguate-add-givenname="true" collapse="year">
     <sort>
       <key macro="author"/>
@@ -287,7 +345,7 @@
     <layout prefix="(" suffix=")" delimiter="; ">
       <group delimiter=", ">
         <text macro="author-short"/>
-        <text macro="issued-year"/>
+        <text macro="issued-citation"/>
         <text macro="citation-locator"/>
       </group>
     </layout>
@@ -318,6 +376,7 @@
         </group>
       </group>
       <text macro="access" prefix=" "/>
+      <text macro="publication-history" prefix=" "/>
     </layout>
   </bibliography>
 </style>

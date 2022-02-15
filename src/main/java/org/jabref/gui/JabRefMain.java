@@ -25,7 +25,6 @@ import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.remote.client.RemoteClient;
-import org.jabref.logic.util.OS;
 import org.jabref.migrations.PreferencesMigrations;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
@@ -141,10 +140,6 @@ public class JabRefMain extends Application {
 
         // Initialize protected terms loader
         Globals.protectedTermsLoader = new ProtectedTermsLoader(preferences.getProtectedTermsPreferences());
-
-        // Override used newline character with the one stored in the preferences.
-        // The preferences return the system newline character sequence as default.
-        OS.NEWLINE = preferences.getNewLineSeparator().toString();
     }
 
     private static void configureProxy(ProxyPreferences proxyPreferences) {

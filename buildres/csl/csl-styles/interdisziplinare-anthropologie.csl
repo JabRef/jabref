@@ -209,7 +209,7 @@
               </choose>
               <text variable="volume"/>
               <group delimiter=" ">
-                <text term="sub verbo" font-style="italic"/>
+                <text term="sub-verbo" font-style="italic"/>
                 <text macro="title"/>
               </group>
               <text variable="page"/>

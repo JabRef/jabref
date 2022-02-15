@@ -24,6 +24,7 @@ import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.autosaveandbackup.AutosaveManager;
 import org.jabref.logic.autosaveandbackup.BackupManager;
 import org.jabref.logic.exporter.AtomicFileWriter;
+import org.jabref.logic.exporter.BibWriter;
 import org.jabref.logic.exporter.BibtexDatabaseWriter;
 import org.jabref.logic.exporter.SaveException;
 import org.jabref.logic.exporter.SavePreferences;
@@ -159,10 +160,10 @@ public class SaveDatabaseAction {
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                 .addExtensionFilter(StandardFileType.BIBTEX_DB)
                 .withDefaultExtension(StandardFileType.BIBTEX_DB)
-                .withInitialDirectory(preferences.getWorkingDir())
+                .withInitialDirectory(preferences.getFilePreferences().getWorkingDirectory())
                 .build();
         Optional<Path> selectedPath = dialogService.showFileSaveDialog(fileDialogConfiguration);
-        selectedPath.ifPresent(path -> preferences.setWorkingDirectory(path.getParent()));
+        selectedPath.ifPresent(path -> preferences.getFilePreferences().setWorkingDirectory(path.getParent()));
         if (selectedPath.isPresent()) {
             Path savePath = selectedPath.get();
             // Workaround for linux systems not adding file extension
@@ -213,6 +214,7 @@ public class SaveDatabaseAction {
                 libraryTab.getUndoManager().markUnchanged();
                 libraryTab.resetChangedProperties();
             }
+            dialogService.notify(Localization.lang("Library saved"));
             return success;
         } catch (SaveException ex) {
             LOGGER.error(String.format("A problem occurred when trying to save the file %s", targetPath), ex);
@@ -229,12 +231,14 @@ public class SaveDatabaseAction {
         SavePreferences savePreferences = this.preferences.getSavePreferences()
                                                       .withSaveType(saveType);
         try (AtomicFileWriter fileWriter = new AtomicFileWriter(file, encoding, savePreferences.shouldMakeBackup())) {
-            BibtexDatabaseWriter databaseWriter = new BibtexDatabaseWriter(fileWriter, generalPreferences, savePreferences, entryTypesManager);
+            BibDatabaseContext bibDatabaseContext = libraryTab.getBibDatabaseContext();
+            BibWriter bibWriter = new BibWriter(fileWriter, bibDatabaseContext.getDatabase().getNewLineSeparator());
+            BibtexDatabaseWriter databaseWriter = new BibtexDatabaseWriter(bibWriter, generalPreferences, savePreferences, entryTypesManager);
 
             if (selectedOnly) {
-                databaseWriter.savePartOfDatabase(libraryTab.getBibDatabaseContext(), libraryTab.getSelectedEntries());
+                databaseWriter.savePartOfDatabase(bibDatabaseContext, libraryTab.getSelectedEntries());
             } else {
-                databaseWriter.saveDatabase(libraryTab.getBibDatabaseContext());
+                databaseWriter.saveDatabase(bibDatabaseContext);
             }
 
             libraryTab.registerUndoableChanges(databaseWriter.getSaveActionsFieldChanges());
@@ -279,11 +283,10 @@ public class SaveDatabaseAction {
     }
 
     private boolean readyForAutosave(BibDatabaseContext context) {
-        return ((context.getLocation() == DatabaseLocation.SHARED) ||
-                ((context.getLocation() == DatabaseLocation.LOCAL)
-                        && preferences.shouldAutosave()))
-                &&
-                context.getDatabasePath().isPresent();
+        return ((context.getLocation() == DatabaseLocation.SHARED)
+                || ((context.getLocation() == DatabaseLocation.LOCAL)
+                && preferences.getImportExportPreferences().shouldAutoSave()))
+                && context.getDatabasePath().isPresent();
     }
 
     private boolean readyForBackup(BibDatabaseContext context) {

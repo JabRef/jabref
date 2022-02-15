@@ -1,6 +1,7 @@
 package org.jabref.gui.exporter;
 
 import java.nio.file.Path;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -9,7 +10,8 @@ import javafx.stage.FileChooser;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.Globals;
-import org.jabref.gui.JabRefFrame;
+import org.jabref.gui.StateManager;
+import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.FileDialogConfiguration;
@@ -22,6 +24,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.logic.xmp.XmpPreferences;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.PreferencesService;
 
@@ -34,19 +37,26 @@ import org.slf4j.LoggerFactory;
 public class ExportCommand extends SimpleCommand {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ExportCommand.class);
-    private final JabRefFrame frame;
     private final boolean selectedOnly;
+    private final StateManager stateManager;
     private final PreferencesService preferences;
     private final DialogService dialogService;
 
     /**
      * @param selectedOnly true if only the selected entries should be exported, otherwise all entries are exported
      */
-    public ExportCommand(JabRefFrame frame, boolean selectedOnly, PreferencesService preferences) {
-        this.frame = frame;
+    public ExportCommand(boolean selectedOnly,
+                         StateManager stateManager,
+                         DialogService dialogService,
+                         PreferencesService preferences) {
         this.selectedOnly = selectedOnly;
+        this.stateManager = stateManager;
         this.preferences = preferences;
-        this.dialogService = frame.getDialogService();
+        this.dialogService = dialogService;
+
+        this.executable.bind(selectedOnly
+                ? ActionHelper.needsEntriesSelected(stateManager)
+                : ActionHelper.needsDatabase(stateManager));
     }
 
     @Override
@@ -83,18 +93,20 @@ public class ExportCommand extends SimpleCommand {
         List<BibEntry> entries;
         if (selectedOnly) {
             // Selected entries
-            entries = frame.getCurrentLibraryTab().getSelectedEntries();
+            entries = stateManager.getSelectedEntries();
         } else {
             // All entries
-            entries = frame.getCurrentLibraryTab().getDatabase().getEntries();
+            entries = stateManager.getActiveDatabase()
+                                  .map(BibDatabaseContext::getEntries)
+                                  .orElse(Collections.emptyList());
         }
 
         // Set the global variable for this database's file directory before exporting,
         // so formatters can resolve linked files correctly.
         // (This is an ugly hack!)
-        Globals.prefs.fileDirForDatabase = frame.getCurrentLibraryTab()
-                                                .getBibDatabaseContext()
-                                                .getFileDirectories(preferences.getFilePreferences());
+        Globals.prefs.fileDirForDatabase = stateManager.getActiveDatabase()
+                                                       .map(db -> db.getFileDirectories(preferences.getFilePreferences()))
+                                                       .orElse(List.of(preferences.getFilePreferences().getWorkingDirectory()));
 
         // Make sure we remember which filter was used, to set
         // the default for next time:
@@ -104,25 +116,24 @@ public class ExportCommand extends SimpleCommand {
         final List<BibEntry> finEntries = entries;
         BackgroundTask
                 .wrap(() -> {
-                    format.export(frame.getCurrentLibraryTab().getBibDatabaseContext(),
+                    format.export(stateManager.getActiveDatabase().get(),
                             file,
-                            frame.getCurrentLibraryTab()
-                                 .getBibDatabaseContext()
+                            stateManager.getActiveDatabase().get()
                                  .getMetaData()
                                  .getEncoding()
                                  .orElse(preferences.getGeneralPreferences().getDefaultEncoding()),
                             finEntries);
                     return null; // can not use BackgroundTask.wrap(Runnable) because Runnable.run() can't throw Exceptions
                 })
-                .onSuccess(x -> frame.getDialogService().notify(Localization.lang("%0 export successful", format.getName())))
+                .onSuccess(x -> dialogService.notify(Localization.lang("%0 export successful", format.getName())))
                 .onFailure(this::handleError)
                 .executeWith(Globals.TASK_EXECUTOR);
     }
 
     private void handleError(Exception ex) {
         LOGGER.warn("Problem exporting", ex);
-        frame.getDialogService().notify(Localization.lang("Could not save file."));
+        dialogService.notify(Localization.lang("Could not save file."));
         // Need to warn the user that saving failed!
-        frame.getDialogService().showErrorDialogAndWait(Localization.lang("Save library"), Localization.lang("Could not save file."), ex);
+        dialogService.showErrorDialogAndWait(Localization.lang("Save library"), Localization.lang("Could not save file."), ex);
     }
 }

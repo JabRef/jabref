@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<style xmlns="http://purl.org/net/xbiblio/csl" version="1.0" class="in-text" demote-non-dropping-particle="sort-only" default-locale="en-GB" page-range-format="expanded">
+<style xmlns="http://purl.org/net/xbiblio/csl" version="1.0" class="in-text" demote-non-dropping-particle="sort-only" page-range-format="expanded" default-locale="en-GB">
   <info>
     <title>Imperial College London - Harvard</title>
     <id>http://www.zotero.org/styles/harvard-imperial-college-london</id>
@@ -8,15 +8,18 @@
     <author>
       <name>Lawrence Greenfield</name>
     </author>
+    <contributor>
+      <name>S. Mackenzie</name>
+    </contributor>
     <category citation-format="author-date"/>
     <category field="medicine"/>
-    <summary>Harvard author-date style edited for Imperial College London</summary>
-    <updated>2017-04-27T21:09:20+00:00</updated>
+    <summary>Harvard style from Imperial College London Library  - 2021</summary>
+    <updated>2021-09-28T14:37:15+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <macro name="editor">
-    <names variable="editor" delimiter=", ">
-      <name and="symbol" delimiter=", "/>
+    <names variable="editor">
+      <name and="symbol" delimiter=", " initialize-with="."/>
       <label form="short" prefix=" (" suffix=")"/>
     </names>
   </macro>
@@ -36,7 +39,6 @@
   <macro name="author-short">
     <names variable="author">
       <name form="short" and="symbol" delimiter=", " delimiter-precedes-last="never"/>
-      <et-al font-style="italic"/>
       <substitute>
         <names variable="translator"/>
         <text macro="anon"/>
@@ -47,7 +49,6 @@
     <choose>
       <if variable="URL DOI" match="any">
         <group>
-          <text value="Available from: "/>
           <choose>
             <if variable="DOI">
               <text variable="DOI" prefix="doi:"/>
@@ -57,12 +58,16 @@
             </else>
           </choose>
           <group prefix=" [" suffix="]">
-            <text term="accessed" text-case="capitalize-first" suffix=": "/>
-            <date variable="accessed">
-              <date-part name="day" suffix=" "/>
-              <date-part name="month" suffix=" "/>
-              <date-part name="year"/>
-            </date>
+            <choose>
+              <if type="webpage" match="any">
+                <text term="accessed" text-case="capitalize-first" suffix=": "/>
+                <date variable="accessed">
+                  <date-part name="day" suffix=" "/>
+                  <date-part name="month" suffix=" "/>
+                  <date-part name="year"/>
+                </date>
+              </if>
+            </choose>
           </group>
         </group>
       </if>
@@ -83,8 +88,14 @@
   </macro>
   <macro name="publisher">
     <group delimiter=", " suffix=".">
-      <text variable="publisher-place"/>
-      <text variable="publisher"/>
+      <choose>
+        <if type="report" match="none">
+          <group delimiter=", ">
+            <text variable="publisher-place"/>
+            <text variable="publisher"/>
+          </group>
+        </if>
+      </choose>
     </group>
   </macro>
   <macro name="year-date">
@@ -114,15 +125,12 @@
   </macro>
   <macro name="pages">
     <group>
-      <text variable="page"/>
+      <choose>
+        <if type="book" match="none">
+          <text variable="page"/>
+        </if>
+      </choose>
     </group>
-  </macro>
-  <macro name="online">
-    <choose>
-      <if variable="DOI URL" match="any">
-        <text value="[Online]"/>
-      </if>
-    </choose>
   </macro>
   <macro name="issued">
     <choose>
@@ -155,7 +163,7 @@
       </group>
     </layout>
   </citation>
-  <bibliography hanging-indent="true" et-al-min="5" et-al-use-first="4">
+  <bibliography et-al-min="19" et-al-use-first="5">
     <sort>
       <key macro="author"/>
       <key variable="title"/>
@@ -169,7 +177,6 @@
             <text macro="title" font-style="italic"/>
             <text macro="edition"/>
             <text variable="genre"/>
-            <text macro="online"/>
             <text macro="publisher"/>
           </group>
         </if>
@@ -177,7 +184,6 @@
           <group prefix=" " delimiter=". " suffix=".">
             <text macro="title"/>
             <text macro="edition"/>
-            <text macro="online"/>
           </group>
           <group prefix=" " delimiter=". " suffix=".">
             <date variable="issued">
@@ -198,7 +204,6 @@
               <text variable="container-title" font-style="italic" prefix=" " suffix="."/>
             </if>
           </choose>
-          <text macro="online" prefix=" "/>
           <group prefix=" " suffix="." delimiter=", ">
             <group delimiter=" ">
               <text variable="volume"/>
@@ -217,8 +222,6 @@
               <text variable="collection-number"/>
             </group>
             <text macro="edition"/>
-            <text macro="editor"/>
-            <text macro="online"/>
             <text macro="publisher"/>
           </group>
         </else-if>
@@ -230,7 +233,6 @@
             <text variable="container-title" font-style="italic" suffix="."/>
             <text variable="collection-title" suffix="."/>
             <text macro="edition" prefix=" " suffix="."/>
-            <text macro="online" suffix="."/>
             <text macro="issued"/>
             <text macro="publisher" suffix="."/>
             <label variable="page" form="short"/>
@@ -243,7 +245,6 @@
             <text macro="editor"/>
           </group>
           <text variable="container-title" font-style="italic" prefix=" " suffix="."/>
-          <text macro="online" prefix=" " suffix=". "/>
           <group suffix="." delimiter=" ">
             <group>
               <text variable="volume"/>

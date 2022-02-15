@@ -38,7 +38,7 @@
       <term name="paragraph" form="short">§</term>
       <term name="no date">sans date</term>
       <term name="no date" form="short">s. d.</term>
-      <term name="sub verbo" form="short">s. v.</term>
+      <term name="sub-verbo" form="short">s. v.</term>
       <term name="et-al">et alii</term>
       <term name="online">en ligne</term>
     </terms>
@@ -88,7 +88,7 @@
       <term name="paragraph" form="short">§</term>
       <term name="no date">ohne Datum</term>
       <term name="no date" form="short">o.&#160;J.</term>
-      <term name="sub verbo" form="short">s. v.</term>
+      <term name="sub-verbo" form="short">s. v.</term>
       <term name="and">und</term>
       <term name="et-al">et alii</term>
       <term name="open-quote">«</term>
@@ -106,7 +106,7 @@
       <term name="paragraph" form="short">§</term>
       <term name="no date">sin fecha</term>
       <term name="no date" form="short">s. f.</term>
-      <term name="sub verbo" form="short">s. v.</term>
+      <term name="sub-verbo" form="short">s. v.</term>
       <term name="and">y</term>
       <term name="et-al">et alii</term>
       <term name="open-quote">«</term>
@@ -371,7 +371,7 @@
             <group delimiter=", ">
               <text macro="author"/>
               <group delimiter=" ">
-                <text term="sub verbo" form="short" font-style="italic"/>
+                <text term="sub-verbo" form="short" font-style="italic"/>
                 <text macro="title"/>
               </group>
               <group>

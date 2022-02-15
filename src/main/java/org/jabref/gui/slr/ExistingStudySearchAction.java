@@ -10,6 +10,7 @@ import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
+import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.gui.util.TaskExecutor;
@@ -42,6 +43,7 @@ public class ExistingStudySearchAction extends SimpleCommand {
     private final TaskExecutor taskExecutor;
     private final PreferencesService preferencesService;
     private final StateManager stateManager;
+    private final ThemeManager themeManager;
     private final GeneralPreferences generalPreferences;
     private final ImportFormatPreferences importFormatPreferences;
     private final SavePreferences savePreferences;
@@ -51,7 +53,8 @@ public class ExistingStudySearchAction extends SimpleCommand {
                                      FileUpdateMonitor fileUpdateMonitor,
                                      TaskExecutor taskExecutor,
                                      PreferencesService preferencesService,
-                                     StateManager stateManager) {
+                                     StateManager stateManager,
+                                     ThemeManager themeManager) {
         this.frame = frame;
         this.dialogService = frame.getDialogService();
         this.fileUpdateMonitor = fileUpdateMonitor;
@@ -59,12 +62,13 @@ public class ExistingStudySearchAction extends SimpleCommand {
         this.preferencesService = preferencesService;
         this.stateManager = stateManager;
         this.generalPreferences = preferencesService.getGeneralPreferences();
+        this.themeManager = themeManager;
         this.importFormatPreferences = preferencesService.getImportFormatPreferences();
         this.savePreferences = preferencesService.getSavePreferences();
 
         this.workingDirectory = stateManager.getActiveDatabase()
-                                            .map(database -> FileUtil.getInitialDirectory(database, preferencesService))
-                                            .orElse(preferencesService.getWorkingDir());
+                                            .map(database -> FileUtil.getInitialDirectory(database, preferencesService.getFilePreferences().getWorkingDirectory()))
+                                            .orElse(preferencesService.getFilePreferences().getWorkingDirectory());
     }
 
     @Override
@@ -113,7 +117,7 @@ public class ExistingStudySearchAction extends SimpleCommand {
                           dialogService.showErrorDialogAndWait(Localization.lang("Error during persistence of crawling results."), e);
                       })
                       .onSuccess(unused -> {
-                          new OpenDatabaseAction(frame, preferencesService, dialogService, stateManager).openFile(Path.of(studyDirectory.toString(), "studyResult.bib"), true);
+                          new OpenDatabaseAction(frame, preferencesService, dialogService, stateManager, themeManager).openFile(Path.of(studyDirectory.toString(), "studyResult.bib"), true);
                           // If  finished reset command object for next use
                           studyDirectory = null;
                       })

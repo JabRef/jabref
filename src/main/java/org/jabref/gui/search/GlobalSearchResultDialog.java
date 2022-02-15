@@ -5,7 +5,6 @@ import javax.swing.undo.UndoManager;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.SplitPane;
-import javafx.scene.control.TableColumn;
 import javafx.scene.control.ToggleButton;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -14,13 +13,11 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.icon.IconTheme;
-import org.jabref.gui.maintable.BibEntryTableViewModel;
 import org.jabref.gui.maintable.columns.SpecialFieldColumn;
 import org.jabref.gui.preview.PreviewViewer;
+import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.BaseDialog;
-import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.io.FileUtil;
 import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
@@ -37,6 +34,7 @@ public class GlobalSearchResultDialog extends BaseDialog<Void> {
     @Inject private PreferencesService preferencesService;
     @Inject private StateManager stateManager;
     @Inject private DialogService dialogService;
+    @Inject private ThemeManager themeManager;
 
     private GlobalSearchResultDialogViewModel viewModel;
 
@@ -44,6 +42,7 @@ public class GlobalSearchResultDialog extends BaseDialog<Void> {
         this.undoManager = undoManager;
         this.externalFileTypes = externalFileTypes;
 
+        setTitle(Localization.lang("Search results from open libraries"));
         ViewLoader.view(this)
                   .load()
                   .setAsDialogPane(this);
@@ -54,18 +53,12 @@ public class GlobalSearchResultDialog extends BaseDialog<Void> {
     private void initialize() {
         viewModel = new GlobalSearchResultDialogViewModel(preferencesService);
 
-        PreviewViewer previewViewer = new PreviewViewer(viewModel.getSearchDatabaseContext(), dialogService, stateManager);
-        previewViewer.setTheme(preferencesService.getTheme());
-        previewViewer.setLayout(preferencesService.getPreviewPreferences().getCurrentPreviewStyle());
-
-        TableColumn<BibEntryTableViewModel, String> fieldColumn = new TableColumn<>(Localization.lang("Library"));
-        new ValueTableCellFactory<BibEntryTableViewModel, String>().withText(FileUtil::getBaseName)
-                                                                   .install(fieldColumn);
-        fieldColumn.setCellValueFactory(param -> param.getValue().bibDatabaseContextProperty());
+        PreviewViewer previewViewer = new PreviewViewer(viewModel.getSearchDatabaseContext(), dialogService, stateManager, themeManager);
+        previewViewer.setLayout(preferencesService.getPreviewPreferences().getSelectedPreviewLayout());
 
         SearchResultsTableDataModel model = new SearchResultsTableDataModel(viewModel.getSearchDatabaseContext(), preferencesService, stateManager);
         SearchResultsTable resultsTable = new SearchResultsTable(model, viewModel.getSearchDatabaseContext(), preferencesService, undoManager, dialogService, stateManager, externalFileTypes);
-        resultsTable.getColumns().add(0, fieldColumn);
+
         resultsTable.getColumns().removeIf(col -> col instanceof SpecialFieldColumn);
         resultsTable.getSelectionModel().selectFirst();
         resultsTable.getSelectionModel().selectedItemProperty().addListener((obs, old, newValue) -> {

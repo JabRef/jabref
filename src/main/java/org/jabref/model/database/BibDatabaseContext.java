@@ -140,10 +140,7 @@ public class BibDatabaseContext {
         metaData.getDefaultFileDirectory()
                 .ifPresent(metaDataDirectory -> fileDirs.add(getFileDirectoryPath(metaDataDirectory)));
 
-        // 3. Preferences directory
-        preferences.getFileDirectory().ifPresent(fileDirs::add);
-
-        // 4. BIB file directory
+        // 3. BIB file directory or Main file directory
         if (preferences.shouldStoreFilesRelativeToBibFile()) {
             getDatabasePath().ifPresent(dbPath -> {
                 Path parentPath = dbPath.getParent();
@@ -153,6 +150,9 @@ public class BibDatabaseContext {
                 Objects.requireNonNull(parentPath, "BibTeX database parent path is null");
                 fileDirs.add(parentPath);
             });
+        } else {
+            // Main file directory
+            preferences.getFileDirectory().ifPresent(fileDirs::add);
         }
 
         return fileDirs.stream().map(Path::toAbsolutePath).collect(Collectors.toList());
@@ -211,6 +211,14 @@ public class BibDatabaseContext {
 
     public List<BibEntry> getEntries() {
         return database.getEntries();
+    }
+
+    /**
+     * check if the database has any empty entries
+     * @return true if the database has any empty entries; otherwise false
+     */
+    public boolean hasEmptyEntries() {
+        return this.getEntries().stream().anyMatch(entry->entry.getFields().isEmpty());
     }
 
     public static Path getFulltextIndexBasePath() {

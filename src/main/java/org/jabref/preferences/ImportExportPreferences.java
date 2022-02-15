@@ -10,34 +10,49 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
 public class ImportExportPreferences {
+    private final BooleanProperty shouldOpenLastEdited;
     private final StringProperty nonWrappableFields;
-    private final BooleanProperty resolveStringsForStandardBibtexFields;
-    private final BooleanProperty resolveStringsForAllStrings;
-    private final StringProperty nonResolvableFields;
-    private final ObjectProperty<NewLineSeparator> newLineSeparator;
+    private final BooleanProperty resolveStrings;
+    private final StringProperty resolvableFields;
     private final BooleanProperty alwaysReformatOnSave;
     private final ObjectProperty<Path> importWorkingDirectory;
     private final StringProperty lastExportExtension;
     private final ObjectProperty<Path> exportWorkingDirectory;
+    private final BooleanProperty autoSave;
+    private final BooleanProperty warnAboutDuplicatesOnImport;
 
-    public ImportExportPreferences(String nonWrappableFields,
-                                   boolean resolveStringsForStandardBibtexFields,
-                                   boolean resolveStringsForAllStrings,
-                                   String nonResolvableFields,
-                                   NewLineSeparator newLineSeparator,
+    public ImportExportPreferences(boolean shouldOpenLastEdited,
+                                   String nonWrappableFields,
+                                   boolean resolveStrings,
+                                   String resolvableFields,
                                    boolean alwaysReformatOnSave,
                                    Path importWorkingDirectory,
                                    String lastExportExtension,
-                                   Path exportWorkingDirectory) {
+                                   Path exportWorkingDirectory,
+                                   boolean autoSave,
+                                   boolean warnAboutDuplicatesOnImport) {
+        this.shouldOpenLastEdited = new SimpleBooleanProperty(shouldOpenLastEdited);
         this.nonWrappableFields = new SimpleStringProperty(nonWrappableFields);
-        this.resolveStringsForStandardBibtexFields = new SimpleBooleanProperty(resolveStringsForStandardBibtexFields);
-        this.resolveStringsForAllStrings = new SimpleBooleanProperty(resolveStringsForAllStrings);
-        this.nonResolvableFields = new SimpleStringProperty(nonResolvableFields);
-        this.newLineSeparator = new SimpleObjectProperty<>(newLineSeparator);
+        this.resolveStrings = new SimpleBooleanProperty(resolveStrings);
+        this.resolvableFields = new SimpleStringProperty(resolvableFields);
         this.alwaysReformatOnSave = new SimpleBooleanProperty(alwaysReformatOnSave);
         this.importWorkingDirectory = new SimpleObjectProperty<>(importWorkingDirectory);
         this.lastExportExtension = new SimpleStringProperty(lastExportExtension);
         this.exportWorkingDirectory = new SimpleObjectProperty<>(exportWorkingDirectory);
+        this.autoSave = new SimpleBooleanProperty(autoSave);
+        this.warnAboutDuplicatesOnImport = new SimpleBooleanProperty(warnAboutDuplicatesOnImport);
+    }
+
+    public boolean shouldOpenLastEdited() {
+        return shouldOpenLastEdited.get();
+    }
+
+    public BooleanProperty openLastEditedProperty() {
+        return shouldOpenLastEdited;
+    }
+
+    public void setOpenLastEdited(boolean shouldOpenLastEdited) {
+        this.shouldOpenLastEdited.set(shouldOpenLastEdited);
     }
 
     public String getNonWrappableFields() {
@@ -52,52 +67,28 @@ public class ImportExportPreferences {
         this.nonWrappableFields.set(nonWrappableFields);
     }
 
-    public boolean shouldResolveStringsForStandardBibtexFields() {
-        return resolveStringsForStandardBibtexFields.get();
+    public boolean resolveStrings() {
+        return resolveStrings.get();
     }
 
-    public BooleanProperty resolveStringsForStandardBibtexFieldsProperty() {
-        return resolveStringsForStandardBibtexFields;
+    public BooleanProperty resolveStringsProperty() {
+        return resolveStrings;
     }
 
-    public void setResolveStringsForStandardBibtexFields(boolean resolveStringsForStandardBibtexFields) {
-        this.resolveStringsForStandardBibtexFields.set(resolveStringsForStandardBibtexFields);
+    public void setResolveStrings(boolean resolveStrings) {
+        this.resolveStrings.set(resolveStrings);
     }
 
-    public boolean shouldResolveStringsForAllStrings() {
-        return resolveStringsForAllStrings.get();
+    public String getResolvableFields() {
+        return resolvableFields.get();
     }
 
-    public BooleanProperty resolveStringsForAllStringsProperty() {
-        return resolveStringsForAllStrings;
+    public StringProperty resolvableFieldsProperty() {
+        return resolvableFields;
     }
 
-    public void setResolveStringsForAllStrings(boolean resolveStringsForAllStrings) {
-        this.resolveStringsForAllStrings.set(resolveStringsForAllStrings);
-    }
-
-    public String getNonResolvableFields() {
-        return nonResolvableFields.get();
-    }
-
-    public StringProperty nonResolvableFieldsProperty() {
-        return nonResolvableFields;
-    }
-
-    public void setNonResolvableFields(String nonResolvableFields) {
-        this.nonResolvableFields.set(nonResolvableFields);
-    }
-
-    public NewLineSeparator getNewLineSeparator() {
-        return newLineSeparator.get();
-    }
-
-    public ObjectProperty<NewLineSeparator> newLineSeparatorProperty() {
-        return newLineSeparator;
-    }
-
-    public void setNewLineSeparator(NewLineSeparator newLineSeparator) {
-        this.newLineSeparator.set(newLineSeparator);
+    public void setResolvableFields(String resolvableFields) {
+        this.resolvableFields.set(resolvableFields);
     }
 
     public boolean shouldAlwaysReformatOnSave() {
@@ -146,5 +137,29 @@ public class ImportExportPreferences {
 
     public void setExportWorkingDirectory(Path exportWorkingDirectory) {
         this.exportWorkingDirectory.set(exportWorkingDirectory);
+    }
+
+    public boolean shouldAutoSave() {
+        return autoSave.get();
+    }
+
+    public BooleanProperty autoSaveProperty() {
+        return autoSave;
+    }
+
+    public void setAutoSave(boolean shouldAutoSave) {
+        this.autoSave.set(shouldAutoSave);
+    }
+
+    public boolean shouldWarnAboutDuplicatesOnImport() {
+        return warnAboutDuplicatesOnImport.get();
+    }
+
+    public BooleanProperty warnAboutDuplicatesOnImportProperty() {
+        return warnAboutDuplicatesOnImport;
+    }
+
+    public void setWarnAboutDuplicatesOnImport(boolean warnAboutDuplicatesOnImport) {
+        this.warnAboutDuplicatesOnImport.set(warnAboutDuplicatesOnImport);
     }
 }

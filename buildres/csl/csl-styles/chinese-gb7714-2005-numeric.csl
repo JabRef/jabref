@@ -4,7 +4,7 @@
     <title>China National Standard GB/T 7714-2005 (numeric, 中文)</title>
     <id>http://www.zotero.org/styles/chinese-gb7714-2005-numeric</id>
     <link href="http://www.zotero.org/styles/chinese-gb7714-2005-numeric" rel="self"/>
-    <link href="http://gradschool.ustc.edu.cn/ylb/material/xw/wdxz/19.pdf" rel="documentation"/>
+    <link href="http://std.samr.gov.cn/gb/search/gbDetailed?id=71F772D78562D3A7E05397BE0A0AB82A" rel="documentation"/>
     <author>
       <name>heromyth</name>
       <email>zxpmyth@yahoo.com.cn</email>
@@ -14,7 +14,7 @@
     <category field="generic-base"/>
     <category field="science"/>
     <summary>This style just partly implemented what the Chinese GB/T 7714-2005 requires.</summary>
-    <updated>2012-10-11T09:38:41+00:00</updated>
+    <updated>2021-11-21T09:38:41+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <macro name="author">
@@ -119,15 +119,17 @@
  -->
     <text variable="publisher-place" suffix=": "/>
     <group delimiter=", ">
-      <text variable="publisher"/>
-      <choose>
-        <if type="webpage" variable="container-title" match="all">
+       <choose>
+          <if type="bill book chapter graphic legal_case legislation motion_picture paper-conference report song" match="any">
+            <text variable="publisher"/>
+          </if>
+        <else-if type="webpage" variable="container-title" match="all">
           <date variable="issued" suffix=". ">
             <date-part name="year"/>
             <date-part name="month" form="numeric-leading-zeros" prefix="-"/>
             <date-part name="day" form="numeric-leading-zeros" prefix="-"/>
           </date>
-        </if>
+        </else-if>
         <else-if type="webpage"/>
         <else-if type="patent">
           <date variable="issued">

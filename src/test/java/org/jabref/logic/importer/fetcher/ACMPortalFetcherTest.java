@@ -4,6 +4,7 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.List;
+import java.util.Optional;
 
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.fileformat.ACMPortalParser;
@@ -20,7 +21,6 @@ import org.junit.jupiter.api.Test;
 
 import static org.jabref.logic.importer.fetcher.transformers.AbstractQueryTransformer.NO_EXPLICIT_FIELD;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 
 @FetcherTest
 class ACMPortalFetcherTest {
@@ -57,8 +57,7 @@ class ACMPortalFetcherTest {
         for (BibEntry bibEntry : fetchedEntries) {
             bibEntry.clearField(StandardField.ABSTRACT);
         }
-        assertFalse(fetchedEntries.isEmpty());
-        assertEquals(searchEntry, fetchedEntries.get(0));
+        assertEquals(Optional.of(searchEntry), fetchedEntries.stream().findFirst());
     }
 
     @Test

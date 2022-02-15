@@ -12,7 +12,7 @@ body:
     attributes:
       label: JabRef version
       options:
-        - "5.3 (latest release)"
+        - "5.5 (latest release)"
         - "3.8.2"
         - Latest development branch build (please note build date below)
         - Other (please describe below)
@@ -27,7 +27,7 @@ body:
       options:
         - Windows
         - GNU / Linux
-        - mac OS
+        - macOS
         - Other (please describe below)
     validations:
       required: true
@@ -36,7 +36,7 @@ body:
     attributes:
       label: Details on version and operating system
       description: OS Version, distribution, desktop environment, older JabRef version etc.
-      placeholder: Ubuntu 21.04 with Plasma 5.22 / Windows 10 21H1 / Mac OS 10.14
+      placeholder: Ubuntu 21.04 with Plasma 5.22 / Windows 10 21H1 / macOS 10.14
     validations:
       required: false
 

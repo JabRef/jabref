@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<style xmlns="http://purl.org/net/xbiblio/csl" class="note" version="1.0" et-al-min="4" et-al-use-first="1" demote-non-dropping-particle="sort-only" default-locale="de-DE">
+<style xmlns="http://purl.org/net/xbiblio/csl" class="note" version="1.0" demote-non-dropping-particle="sort-only" default-locale="de-DE">
   <!-- This style was edited with the Visual CSL Editor (https://editor.citationstyles.org/visualEditor/) -->
   <info>
     <title>Fachhochschule Südwestfalen (Deutsch)</title>
@@ -15,7 +15,7 @@
     <category citation-format="note"/>
     <category field="generic-base"/>
     <summary>Fachhochschule Südwestfalen Stil nach dem "Studienbuch Wissenschaftliches Arbeiten : Anleitung zur Erstellung von Haus-, Projekt- und Abschlussarbeiten an der Fachhochschule Südwestfalen, Standort Meschede"</summary>
-    <updated>2021-05-18T12:05:02+00:00</updated>
+    <updated>2021-12-30T13:02:21+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="de">
@@ -59,14 +59,15 @@
         <text term="ibid"/>
       </if>
       <else>
-        <names variable="author">
-          <name form="short" delimiter="/" delimiter-precedes-last="never" et-al-min="4" et-al-use-first="1" initialize-with=". "/>
+        <names variable="author" suffix=" ">
+          <name form="short" delimiter="/" delimiter-precedes-last="never" initialize-with=". "/>
           <substitute>
             <names variable="editor"/>
             <names variable="translator"/>
             <text macro="anon"/>
           </substitute>
         </names>
+        <text macro="year-date-blank"/>
       </else>
     </choose>
   </macro>
@@ -158,36 +159,48 @@
     </choose>
   </macro>
   <macro name="author-webpage">
-    <group delimiter=" ">
+    <group>
       <choose>
-        <if match="none" variable="author">
-          <choose>
-            <if match="all" variable="publisher">
-              <text macro="publisher"/>
-            </if>
-            <else>
-              <text macro="anon"/>
-            </else>
-          </choose>
+        <if match="any" position="ibid">
+          <text term="ibid"/>
         </if>
         <else>
-          <text macro="author-short"/>
+          <choose>
+            <if match="none" variable="author">
+              <choose>
+                <if match="all" variable="publisher">
+                  <text macro="publisher"/>
+                </if>
+                <else>
+                  <text macro="anon"/>
+                </else>
+              </choose>
+            </if>
+            <else>
+              <names variable="author" suffix=" ">
+                <name form="short" delimiter="/" delimiter-precedes-last="never" initialize-with="."/>
+                <substitute>
+                  <names variable="editor"/>
+                  <names variable="translator"/>
+                </substitute>
+              </names>
+            </else>
+          </choose>
+          <text macro="year-date" prefix="(" suffix=")"/>
         </else>
       </choose>
-      <text macro="year-date" prefix="(" suffix=")"/>
     </group>
   </macro>
-  <citation name-form="short" et-al-min="4" et-al-use-first="1" disambiguate-add-names="true" disambiguate-add-givenname="true" disambiguate-add-year-suffix="true" givenname-disambiguation-rule="all-names" collapse="year">
-    <layout delimiter="/">
-      <group suffix=".">
+  <citation name-form="short" et-al-min="4" et-al-use-first="1" disambiguate-add-year-suffix="true" givenname-disambiguation-rule="all-names">
+    <layout delimiter="; " suffix=".">
+      <group>
         <choose>
           <if type="webpage post post-weblog" match="any">
             <text macro="author-webpage"/>
           </if>
           <else>
             <group>
-              <text macro="author-short" suffix=" "/>
-              <text macro="year-date-blank"/>
+              <text macro="author-short"/>
             </group>
           </else>
         </choose>
@@ -198,7 +211,7 @@
       </group>
     </layout>
   </citation>
-  <bibliography et-al-min="4" et-al-use-first="1" hanging-indent="true">
+  <bibliography hanging-indent="true">
     <sort>
       <key macro="author"/>
       <key variable="title"/>

@@ -264,11 +264,11 @@
       <key macro="author" names-use-last="true"/>
     </sort>
     <layout suffix=")" delimiter="; " prefix="(">
-      <group delimiter=" ">
-        <text macro="author-short" suffix=","/>
+      <group delimiter=", ">
+        <text macro="author-short"/>
         <text macro="year-date-citation"/>
         <group>
-          <label prefix=": " variable="locator" form="short"/>
+          <label variable="locator" form="short"/>
           <text variable="locator"/>
         </group>
       </group>

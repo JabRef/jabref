@@ -6,6 +6,7 @@ import java.util.Optional;
 
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.crawler.StudyYamlParser;
 import org.jabref.model.study.Study;
@@ -17,8 +18,8 @@ import org.eclipse.jgit.api.errors.GitAPIException;
 public class StartNewStudyAction extends ExistingStudySearchAction {
     Study newStudy;
 
-    public StartNewStudyAction(JabRefFrame frame, FileUpdateMonitor fileUpdateMonitor, TaskExecutor taskExecutor, PreferencesService prefs, StateManager stateManager) {
-        super(frame, fileUpdateMonitor, taskExecutor, prefs, stateManager);
+    public StartNewStudyAction(JabRefFrame frame, FileUpdateMonitor fileUpdateMonitor, TaskExecutor taskExecutor, PreferencesService prefs, StateManager stateManager, ThemeManager themeManager) {
+        super(frame, fileUpdateMonitor, taskExecutor, prefs, stateManager, themeManager);
     }
 
     @Override

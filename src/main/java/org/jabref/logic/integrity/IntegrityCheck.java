@@ -1,5 +1,6 @@
 package org.jabref.logic.integrity;
 
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,6 +21,7 @@ public class IntegrityCheck {
     public IntegrityCheck(BibDatabaseContext bibDatabaseContext,
                           FilePreferences filePreferences,
                           CitationKeyPatternPreferences citationKeyPatternPreferences,
+                          Charset defaultEncoding,
                           JournalAbbreviationRepository journalAbbreviationRepository,
                           boolean allowIntegerEdition) {
         this.bibDatabaseContext = bibDatabaseContext;
@@ -41,8 +43,8 @@ public class IntegrityCheck {
         if (bibDatabaseContext.isBiblatexMode()) {
             entryCheckers.addAll(List.of(
                     new JournalInAbbreviationListChecker(StandardField.JOURNALTITLE, journalAbbreviationRepository),
-                    new UTF8Checker())
-            );
+                    new UTF8Checker(bibDatabaseContext.getMetaData().getEncoding().orElse(defaultEncoding))
+            ));
         } else {
             entryCheckers.addAll(List.of(
                     new JournalInAbbreviationListChecker(StandardField.JOURNAL, journalAbbreviationRepository),

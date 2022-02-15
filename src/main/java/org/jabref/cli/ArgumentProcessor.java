@@ -22,6 +22,7 @@ import org.jabref.logic.bibtex.FieldWriterPreferences;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.exporter.AtomicFileWriter;
 import org.jabref.logic.exporter.BibDatabaseWriter;
+import org.jabref.logic.exporter.BibWriter;
 import org.jabref.logic.exporter.BibtexDatabaseWriter;
 import org.jabref.logic.exporter.EmbeddedBibFilePdfExporter;
 import org.jabref.logic.exporter.Exporter;
@@ -42,7 +43,6 @@ import org.jabref.logic.importer.WebFetchers;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
-import org.jabref.logic.logging.JabRefLogger;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.search.DatabaseSearcher;
 import org.jabref.logic.search.SearchQuery;
@@ -180,7 +180,7 @@ public class ArgumentProcessor {
     private List<ParserResult> processArguments() {
 
         if (!cli.isBlank() && cli.isDebugLogging()) {
-            JabRefLogger.setDebug();
+            System.err.println("use java property -Dtinylog.level=debug");
         }
 
         if ((startupMode == Mode.INITIAL_START) && cli.isShowVersion()) {
@@ -228,7 +228,7 @@ public class ArgumentProcessor {
             automaticallySetFileLinks(loaded);
         }
 
-        if (cli.isWriteXMPtoPdf() && cli.isEmbeddBibfileInPdf() || cli.isWriteMetadatatoPdf() && (cli.isWriteXMPtoPdf() || cli.isEmbeddBibfileInPdf())) {
+        if ((cli.isWriteXMPtoPdf() && cli.isEmbeddBibfileInPdf()) || (cli.isWriteMetadatatoPdf() && (cli.isWriteXMPtoPdf() || cli.isEmbeddBibfileInPdf()))) {
             System.err.println("Give only one of [writeXMPtoPdf, embeddBibfileInPdf, writeMetadatatoPdf]");
         }
 
@@ -309,20 +309,20 @@ public class ArgumentProcessor {
         try {
             if (writeXMP) {
                 if (xmpPdfExporter.exportToAllFilesOfEntry(databaseContext, encoding, filePreferences, entry, List.of(entry))) {
-                    System.out.println(String.format("Successfully written XMP metadata on at least one linked file of %s", citeKey));
+                    System.out.printf("Successfully written XMP metadata on at least one linked file of %s%n", citeKey);
                 } else {
-                    System.err.println(String.format("Cannot write XMP metadata on any linked files of %s. Make sure there is at least one linked file and the path is correct.", citeKey));
+                    System.err.printf("Cannot write XMP metadata on any linked files of %s. Make sure there is at least one linked file and the path is correct.%n", citeKey);
                 }
             }
             if (embeddBibfile) {
                 if (embeddedBibFilePdfExporter.exportToAllFilesOfEntry(databaseContext, encoding, filePreferences, entry, List.of(entry))) {
-                    System.out.println(String.format("Successfully embedded metadata on at least one linked file of %s", citeKey));
+                    System.out.printf("Successfully embedded metadata on at least one linked file of %s%n", citeKey);
                 } else {
-                    System.out.println(String.format("Cannot embedd metadata on any linked files of %s. Make sure there is at least one linked file and the path is correct.", citeKey));
+                    System.out.printf("Cannot embedd metadata on any linked files of %s. Make sure there is at least one linked file and the path is correct.%n", citeKey);
                 }
             }
         } catch (Exception e) {
-            LOGGER.error(String.format("Failed writing metadata on a linked file of %s.", citeKey));
+            LOGGER.error("Failed writing metadata on a linked file of {}.", citeKey);
         }
     }
 
@@ -330,7 +330,7 @@ public class ArgumentProcessor {
         for (String citeKey : citeKeys) {
             List<BibEntry> bibEntryList = dataBase.getEntriesByCitationKey(citeKey);
             if (bibEntryList.isEmpty()) {
-                System.err.println(String.format("Skipped - Cannot find %s in library.", citeKey));
+                System.err.printf("Skipped - Cannot find %s in library.%n", citeKey);
                 continue;
             }
             for (BibEntry entry : bibEntryList) {
@@ -349,25 +349,25 @@ public class ArgumentProcessor {
                 try {
                     if (writeXMP) {
                         if (xmpPdfExporter.exportToFileByPath(databaseContext, dataBase, encoding, filePreferences, filePath)) {
-                            System.out.println(String.format("Successfully written XMP metadata of at least one entry to %s", fileName));
+                            System.out.printf("Successfully written XMP metadata of at least one entry to %s%n", fileName);
                         } else {
-                            System.out.println(String.format("File %s is not linked to any entry in database.", fileName));
+                            System.out.printf("File %s is not linked to any entry in database.%n", fileName);
                         }
                     }
                     if (embeddBibfile) {
                         if (embeddedBibFilePdfExporter.exportToFileByPath(databaseContext, dataBase, encoding, filePreferences, filePath)) {
-                            System.out.println(String.format("Successfully embedded XMP metadata of at least one entry to %s", fileName));
+                            System.out.printf("Successfully embedded XMP metadata of at least one entry to %s%n", fileName);
                         } else {
-                            System.out.println(String.format("File %s is not linked to any entry in database.", fileName));
+                            System.out.printf("File %s is not linked to any entry in database.%n", fileName);
                         }
                     }
                 } catch (IOException e) {
                     LOGGER.error("Error accessing file '{}'.", fileName);
                 } catch (Exception e) {
-                    LOGGER.error(String.format("Error writing entry to %s.", fileName));
+                    LOGGER.error("Error writing entry to {}.", fileName);
                 }
             } else {
-                LOGGER.error(String.format("Skipped - PDF %s does not exist", fileName));
+                LOGGER.error("Skipped - PDF {} does not exist", fileName);
             }
         }
     }
@@ -531,7 +531,8 @@ public class ArgumentProcessor {
             GeneralPreferences generalPreferences = preferencesService.getGeneralPreferences();
             SavePreferences savePreferences = preferencesService.getSavePreferences();
             AtomicFileWriter fileWriter = new AtomicFileWriter(Path.of(subName), generalPreferences.getDefaultEncoding());
-            BibDatabaseWriter databaseWriter = new BibtexDatabaseWriter(fileWriter, generalPreferences, savePreferences, Globals.entryTypesManager);
+            BibWriter bibWriter = new BibWriter(fileWriter, OS.NEWLINE);
+            BibDatabaseWriter databaseWriter = new BibtexDatabaseWriter(bibWriter, generalPreferences, savePreferences, Globals.entryTypesManager);
             databaseWriter.saveDatabase(new BibDatabaseContext(newBase));
 
             // Show just a warning message if encoding did not work for all characters:
