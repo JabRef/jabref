@@ -1,7 +1,6 @@
 package org.jabref.gui.openoffice;
 
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -175,9 +174,7 @@ public class OpenOfficePanel {
         manualConnect.setOnAction(e -> connectManually());
 
         selectDocument.setTooltip(new Tooltip(Localization.lang("Select which open Writer document to work on")));
-        selectDocument.setOnAction(e -> {
-                ooBase.guiActionSelectDocument(false);
-        });
+        selectDocument.setOnAction(e -> ooBase.guiActionSelectDocument(false));
 
         setStyleFile.setMaxWidth(Double.MAX_VALUE);
         setStyleFile.setOnAction(event ->
@@ -218,15 +215,11 @@ public class OpenOfficePanel {
 
         merge.setMaxWidth(Double.MAX_VALUE);
         merge.setTooltip(new Tooltip(Localization.lang("Combine pairs of citations that are separated by spaces only")));
-        merge.setOnAction(e -> {
-                ooBase.guiActionMergeCitationGroups(getBaseList(), style);
-        });
+        merge.setOnAction(e -> ooBase.guiActionMergeCitationGroups(getBaseList(), style));
 
         unmerge.setMaxWidth(Double.MAX_VALUE);
         unmerge.setTooltip(new Tooltip(Localization.lang("Separate merged citations")));
-        unmerge.setOnAction(e -> {
-                ooBase.guiActionSeparateCitations(getBaseList(), style);
-        });
+        unmerge.setOnAction(e -> ooBase.guiActionSeparateCitations(getBaseList(), style));
 
         ContextMenu settingsMenu = createSettingsPopup();
         settingsB.setMaxWidth(Double.MAX_VALUE);
@@ -419,8 +412,7 @@ public class OpenOfficePanel {
         taskExecutor.execute(connectTask);
     }
 
-    private OOBibBase2 createBibBase(Path loPath) throws IOException, InvocationTargetException, IllegalAccessException,
-        BootstrapException, CreationException, ClassNotFoundException {
+    private OOBibBase2 createBibBase(Path loPath) throws BootstrapException, CreationException {
         return new OOBibBase2(loPath, dialogService);
     }
 
@@ -442,39 +434,39 @@ public class OpenOfficePanel {
     }
 
     private void pushEntries(CitationType citationType, boolean addPageInfo) {
-        final String title = Localization.lang("Error pushing entries");
+        final String errorDialogTitle = Localization.lang("Error pushing entries");
 
-        LibraryTab libraryTab = frame.getCurrentLibraryTab();
-        if (libraryTab == null) {
+        if (stateManager.getActiveDatabase().isEmpty()
+                || stateManager.getActiveDatabase().get().getDatabase() == null) {
             OOError.noDataBaseIsOpenForCiting()
-                .setTitle(title)
-                .showErrorDialog(dialogService);
+                   .setTitle(errorDialogTitle)
+                   .showErrorDialog(dialogService);
             return;
         }
 
-        final BibDatabase database = libraryTab.getDatabase();
+        final BibDatabase database = stateManager.getActiveDatabase().get().getDatabase();
         if (database == null) {
             OOError.noDataBaseIsOpenForCiting()
-                .setTitle(title)
+                .setTitle(errorDialogTitle)
                 .showErrorDialog(dialogService);
             return;
         }
 
-        List<BibEntry> entries = libraryTab.getSelectedEntries();
+        List<BibEntry> entries = stateManager.getSelectedEntries();
         if (entries.isEmpty()) {
             OOError.noEntriesSelectedForCitation()
-                .setTitle(title)
+                .setTitle(errorDialogTitle)
                 .showErrorDialog(dialogService);
             return;
         }
 
-        if (getOrUpdateTheStyle(title)) {
+        if (getOrUpdateTheStyle(errorDialogTitle)) {
             return;
         }
 
         String pageInfo = null;
         if (addPageInfo) {
-            Boolean inParenthesis = citationType.inParenthesis();
+            Boolean inParenthesis;
             boolean withText = citationType.withText();
 
             Optional<AdvancedCiteDialogViewModel> citeDialogViewModel = dialogService.showCustomDialogAndWait(new AdvancedCiteDialogView());
@@ -496,7 +488,6 @@ public class OpenOfficePanel {
             // Not all entries have keys and key generation was declined.
             return;
         }
-
 
         Optional<Update.SyncOptions> syncOptions =
             (ooPrefs.getSyncWhenCiting()
