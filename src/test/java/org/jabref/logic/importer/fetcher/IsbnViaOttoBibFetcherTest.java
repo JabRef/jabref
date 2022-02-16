@@ -73,20 +73,15 @@ public class IsbnViaOttoBibFetcherTest extends AbstractIsbnFetcherTest {
         assertEquals(Optional.of(bibEntry), fetchedEntry);
     }
 
+    /**
+     * Checks whether the given ISBN is <emph>NOT</emph> available at any ISBN fetcher
+     */
     @Test
-    public void testISBNNotAvaiableOnEbookDeOrChimbori() throws Exception {
-        bibEntry = new BibEntry();
-        bibEntry.setType(StandardEntryType.Book);
-        bibEntry.setCitationKey("denis2012les");
-        bibEntry.setField(StandardField.TITLE, "Les mots du passé : roman");
-        bibEntry.setField(StandardField.PUBLISHER, "Éd. les Nouveaux auteurs");
-        bibEntry.setField(StandardField.ADDRESS, "Paris");
-        bibEntry.setField(StandardField.YEAR, "2012");
-        bibEntry.setField(StandardField.AUTHOR, "Denis, ");
-        bibEntry.setField(StandardField.ISBN, "9782819502746");
-
-        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("978-2-8195-02746");
-        assertEquals(Optional.of(bibEntry), fetchedEntry);
+    public void testIsbnNeitherAvaiableOnEbookDeNorOrViaChimbori() throws Exception {
+        // In this test, the ISBN needs to be a valid (syntax+checksum) ISBN number
+        // However, the ISBN number must not be assigned to a real book
+        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("978-8-8264-2303-6");
+        assertEquals(Optional.empty(), fetchedEntry);
 
     }
 

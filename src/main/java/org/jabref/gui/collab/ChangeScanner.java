@@ -5,7 +5,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.theme.ThemeManager;
 import org.jabref.logic.bibtex.comparator.BibDatabaseDiff;
 import org.jabref.logic.bibtex.comparator.BibEntryDiff;
 import org.jabref.logic.bibtex.comparator.BibStringDiff;
@@ -14,6 +16,7 @@ import org.jabref.logic.importer.OpenDatabase;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.util.DummyFileUpdateMonitor;
+import org.jabref.preferences.GeneralPreferences;
 import org.jabref.preferences.PreferencesService;
 
 import org.slf4j.Logger;
@@ -23,13 +26,21 @@ public class ChangeScanner {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ChangeScanner.class);
     private final BibDatabaseContext database;
+    private final DialogService dialogService;
     private final PreferencesService preferencesService;
     private final StateManager stateManager;
+    private final ThemeManager themeManager;
 
-    public ChangeScanner(BibDatabaseContext database, PreferencesService preferencesService, StateManager stateManager) {
+    public ChangeScanner(BibDatabaseContext database,
+                         DialogService dialogService,
+                         PreferencesService preferencesService,
+                         StateManager stateManager,
+                         ThemeManager themeManager) {
         this.database = database;
+        this.dialogService = dialogService;
         this.preferencesService = preferencesService;
         this.stateManager = stateManager;
+        this.themeManager = themeManager;
     }
 
     public List<DatabaseChangeViewModel> scanForChanges() {
@@ -43,7 +54,8 @@ public class ChangeScanner {
             // Parse the modified file
             // Important: apply all post-load actions
             ImportFormatPreferences importFormatPreferences = preferencesService.getImportFormatPreferences();
-            ParserResult result = OpenDatabase.loadDatabase(database.getDatabasePath().get(), importFormatPreferences, new DummyFileUpdateMonitor());
+            GeneralPreferences generalPreferences = preferencesService.getGeneralPreferences();
+            ParserResult result = OpenDatabase.loadDatabase(database.getDatabasePath().get(), generalPreferences, importFormatPreferences, new DummyFileUpdateMonitor());
             BibDatabaseContext databaseOnDisk = result.getDatabaseContext();
 
             // Start looking at changes.
@@ -80,7 +92,7 @@ public class ChangeScanner {
 
     private DatabaseChangeViewModel createBibEntryDiff(BibEntryDiff diff) {
         if (diff.getOriginalEntry() == null) {
-            return new EntryAddChangeViewModel(diff.getNewEntry(), preferencesService, stateManager);
+            return new EntryAddChangeViewModel(diff.getNewEntry(), preferencesService, dialogService, stateManager, themeManager);
         }
 
         if (diff.getNewEntry() == null) {

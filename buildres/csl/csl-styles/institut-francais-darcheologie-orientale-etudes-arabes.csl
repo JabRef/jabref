@@ -22,7 +22,7 @@
   <locale xml:lang="fr">
     <terms>
       <term name="no date" form="short">s.d.</term>
-      <term name="sub verbo" form="short">s.v.</term>
+      <term name="sub-verbo" form="short">s.v.</term>
     </terms>
   </locale>
   <macro name="title">

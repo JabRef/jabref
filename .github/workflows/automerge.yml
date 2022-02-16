@@ -21,7 +21,7 @@ jobs:
         with:
           github-token: "${{ secrets.GITHUB_TOKEN }}"
       - name: Merge pull requests
-        uses: pascalgn/automerge-action@v0.14.2
+        uses: pascalgn/automerge-action@v0.14.3
         if: steps.waitforstatuschecks.outputs.status == 'success'
         env:
           MERGE_METHOD: "merge"

@@ -1,6 +1,5 @@
 package org.jabref.gui;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -32,7 +31,7 @@ import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
 import org.jabref.gui.maintable.MainTable;
 import org.jabref.gui.maintable.MainTableDataModel;
-import org.jabref.gui.specialfields.SpecialFieldDatabaseChangeListener;
+import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableFieldChange;
@@ -80,11 +79,11 @@ public class LibraryTab extends Tab {
     private static final Logger LOGGER = LoggerFactory.getLogger(LibraryTab.class);
     private final JabRefFrame frame;
     private final CountingUndoManager undoManager;
-    private final SidePaneManager sidePaneManager;
     private final ExternalFileTypes externalFileTypes;
     private final DialogService dialogService;
     private final PreferencesService preferencesService;
     private final StateManager stateManager;
+    private final ThemeManager themeManager;
     private final BooleanProperty changedProperty = new SimpleBooleanProperty(false);
     private final BooleanProperty nonUndoableChangeProperty = new SimpleBooleanProperty(false);
     private BibDatabaseContext bibDatabaseContext;
@@ -109,11 +108,12 @@ public class LibraryTab extends Tab {
     // initializing it so we prevent NullPointerException
     private BackgroundTask<ParserResult> dataLoadingTask = BackgroundTask.wrap(() -> null);
 
-    private IndexingTaskManager indexingTaskManager = new IndexingTaskManager(Globals.TASK_EXECUTOR);
+    private final IndexingTaskManager indexingTaskManager = new IndexingTaskManager(Globals.TASK_EXECUTOR);
 
     public LibraryTab(JabRefFrame frame,
                       PreferencesService preferencesService,
                       StateManager stateManager,
+                      ThemeManager themeManager,
                       BibDatabaseContext bibDatabaseContext,
                       ExternalFileTypes externalFileTypes) {
         this.frame = Objects.requireNonNull(frame);
@@ -123,11 +123,11 @@ public class LibraryTab extends Tab {
         this.dialogService = frame.getDialogService();
         this.preferencesService = Objects.requireNonNull(preferencesService);
         this.stateManager = Objects.requireNonNull(stateManager);
+        this.themeManager = Objects.requireNonNull(themeManager);
 
         bibDatabaseContext.getDatabase().registerListener(this);
         bibDatabaseContext.getMetaData().registerListener(this);
 
-        this.sidePaneManager = frame.getSidePaneManager();
         this.tableModel = new MainTableDataModel(getBibDatabaseContext(), preferencesService, stateManager);
 
         citationStyleCache = new CitationStyleCache(bibDatabaseContext);
@@ -261,10 +261,10 @@ public class LibraryTab extends Tab {
     }
 
     private boolean isDatabaseReadyForAutoSave(BibDatabaseContext context) {
-        return ((context.getLocation() == DatabaseLocation.SHARED) ||
-                ((context.getLocation() == DatabaseLocation.LOCAL) && preferencesService.shouldAutosave()))
-                &&
-                context.getDatabasePath().isPresent();
+        return ((context.getLocation() == DatabaseLocation.SHARED)
+                || ((context.getLocation() == DatabaseLocation.LOCAL)
+                && preferencesService.getImportExportPreferences().shouldAutoSave()))
+                && context.getDatabasePath().isPresent();
     }
 
     /**
@@ -275,7 +275,7 @@ public class LibraryTab extends Tab {
      * Example: *jabref-authors.bib – testbib
      */
     public void updateTabTitle(boolean isChanged) {
-        boolean isAutosaveEnabled = preferencesService.shouldAutosave();
+        boolean isAutosaveEnabled = preferencesService.getImportExportPreferences().shouldAutoSave();
 
         DatabaseLocation databaseLocation = bibDatabaseContext.getLocation();
         Optional<Path> file = bibDatabaseContext.getDatabasePath();
@@ -311,17 +311,9 @@ public class LibraryTab extends Tab {
             }
 
             // Unique path fragment
-            List<String> uniquePathParts = FileUtil.uniquePathSubstrings(collectAllDatabasePaths());
-            Optional<String> uniquePathPart = uniquePathParts.stream()
-                                                             .filter(part -> databasePath.toString().contains(part)
-                                                                     && !part.equals(fileName) && part.contains(File.separator))
-                                                             .findFirst();
-            if (uniquePathPart.isPresent()) {
-                String uniquePath = uniquePathPart.get();
-                // remove filename
-                uniquePath = uniquePath.substring(0, uniquePath.lastIndexOf(File.separator));
-                tabTitle.append(" \u2013 ").append(uniquePath);
-            }
+            Optional<String> uniquePathPart = FileUtil.getUniquePathFragment(collectAllDatabasePaths(), databasePath);
+            uniquePathPart.ifPresent(part -> tabTitle.append(" \u2013 ").append(part));
+
         } else {
             if (databaseLocation == DatabaseLocation.LOCAL) {
                 tabTitle.append(Localization.lang("untitled"));
@@ -346,7 +338,9 @@ public class LibraryTab extends Tab {
             setTooltip(new Tooltip(toolTipText.toString()));
         });
 
-        indexingTaskManager.updateDatabaseName(tabTitle.toString());
+        if (preferencesService.getFilePreferences().shouldFulltextIndexLinkedFiles()) {
+            indexingTaskManager.updateDatabaseName(tabTitle.toString());
+        }
     }
 
     private List<String> collectAllDatabasePaths() {
@@ -476,8 +470,6 @@ public class LibraryTab extends Tab {
     }
 
     private void createMainTable() {
-        bibDatabaseContext.getDatabase().registerListener(SpecialFieldDatabaseChangeListener.INSTANCE);
-
         mainTable = new MainTable(tableModel,
                 this,
                 bibDatabaseContext,
@@ -702,10 +694,6 @@ public class LibraryTab extends Tab {
         return this.bibDatabaseContext;
     }
 
-    public SidePaneManager getSidePaneManager() {
-        return sidePaneManager;
-    }
-
     public boolean isSaving() {
         return saving;
     }
@@ -751,7 +739,13 @@ public class LibraryTab extends Tab {
 
     public void resetChangeMonitorAndChangePane() {
         changeMonitor.ifPresent(DatabaseChangeMonitor::unregister);
-        changeMonitor = Optional.of(new DatabaseChangeMonitor(bibDatabaseContext, Globals.getFileUpdateMonitor(), Globals.TASK_EXECUTOR, preferencesService, stateManager));
+        changeMonitor = Optional.of(new DatabaseChangeMonitor(bibDatabaseContext,
+                Globals.getFileUpdateMonitor(),
+                Globals.TASK_EXECUTOR,
+                dialogService,
+                preferencesService,
+                stateManager,
+                themeManager));
 
         changePane = new DatabaseChangePane(splitPane, bibDatabaseContext, changeMonitor.get());
 
@@ -797,11 +791,11 @@ public class LibraryTab extends Tab {
     }
 
     public static class Factory {
-        public LibraryTab createLibraryTab(JabRefFrame frame, PreferencesService preferencesService, StateManager stateManager, Path file, BackgroundTask<ParserResult> dataLoadingTask) {
+        public LibraryTab createLibraryTab(JabRefFrame frame, PreferencesService preferencesService, StateManager stateManager, ThemeManager themeManager, Path file, BackgroundTask<ParserResult> dataLoadingTask) {
             BibDatabaseContext context = new BibDatabaseContext();
             context.setDatabasePath(file);
 
-            LibraryTab newTab = new LibraryTab(frame, preferencesService, stateManager, context, ExternalFileTypes.getInstance());
+            LibraryTab newTab = new LibraryTab(frame, preferencesService, stateManager, themeManager, context, ExternalFileTypes.getInstance());
             newTab.setDataLoadingTask(dataLoadingTask);
 
             dataLoadingTask.onRunning(newTab::onDatabaseLoadingStarted)
@@ -863,53 +857,61 @@ public class LibraryTab extends Tab {
     private class IndexUpdateListener {
 
         public IndexUpdateListener() {
-            try {
-                indexingTaskManager.addToIndex(PdfIndexer.of(bibDatabaseContext, preferencesService.getFilePreferences()), bibDatabaseContext);
-            } catch (IOException e) {
-                LOGGER.error("Cannot access lucene index", e);
+            if (preferencesService.getFilePreferences().shouldFulltextIndexLinkedFiles()) {
+                try {
+                    indexingTaskManager.addToIndex(PdfIndexer.of(bibDatabaseContext, preferencesService.getFilePreferences()), bibDatabaseContext);
+                } catch (IOException e) {
+                    LOGGER.error("Cannot access lucene index", e);
+                }
             }
         }
 
         @Subscribe
         public void listen(EntriesAddedEvent addedEntryEvent) {
-            try {
-                PdfIndexer pdfIndexer = PdfIndexer.of(bibDatabaseContext, preferencesService.getFilePreferences());
-                for (BibEntry addedEntry : addedEntryEvent.getBibEntries()) {
-                    indexingTaskManager.addToIndex(pdfIndexer, addedEntry, bibDatabaseContext);
+            if (preferencesService.getFilePreferences().shouldFulltextIndexLinkedFiles()) {
+                try {
+                    PdfIndexer pdfIndexer = PdfIndexer.of(bibDatabaseContext, preferencesService.getFilePreferences());
+                    for (BibEntry addedEntry : addedEntryEvent.getBibEntries()) {
+                        indexingTaskManager.addToIndex(pdfIndexer, addedEntry, bibDatabaseContext);
+                    }
+                } catch (IOException e) {
+                    LOGGER.error("Cannot access lucene index", e);
                 }
-            } catch (IOException e) {
-                LOGGER.error("Cannot access lucene index", e);
             }
         }
 
         @Subscribe
         public void listen(EntriesRemovedEvent removedEntriesEvent) {
-            try {
-                PdfIndexer pdfIndexer = PdfIndexer.of(bibDatabaseContext, preferencesService.getFilePreferences());
-                for (BibEntry removedEntry : removedEntriesEvent.getBibEntries()) {
-                    indexingTaskManager.removeFromIndex(pdfIndexer, removedEntry);
+            if (preferencesService.getFilePreferences().shouldFulltextIndexLinkedFiles()) {
+                try {
+                    PdfIndexer pdfIndexer = PdfIndexer.of(bibDatabaseContext, preferencesService.getFilePreferences());
+                    for (BibEntry removedEntry : removedEntriesEvent.getBibEntries()) {
+                        indexingTaskManager.removeFromIndex(pdfIndexer, removedEntry);
+                    }
+                } catch (IOException e) {
+                    LOGGER.error("Cannot access lucene index", e);
                 }
-            } catch (IOException e) {
-                LOGGER.error("Cannot access lucene index", e);
             }
         }
 
         @Subscribe
         public void listen(FieldChangedEvent fieldChangedEvent) {
-            if (fieldChangedEvent.getField().equals(StandardField.FILE)) {
-                List<LinkedFile> oldFileList = FileFieldParser.parse(fieldChangedEvent.getOldValue());
-                List<LinkedFile> newFileList = FileFieldParser.parse(fieldChangedEvent.getNewValue());
+            if (preferencesService.getFilePreferences().shouldFulltextIndexLinkedFiles()) {
+                if (fieldChangedEvent.getField().equals(StandardField.FILE)) {
+                    List<LinkedFile> oldFileList = FileFieldParser.parse(fieldChangedEvent.getOldValue());
+                    List<LinkedFile> newFileList = FileFieldParser.parse(fieldChangedEvent.getNewValue());
 
-                List<LinkedFile> addedFiles = new ArrayList<>(newFileList);
-                addedFiles.remove(oldFileList);
-                List<LinkedFile> removedFiles = new ArrayList<>(oldFileList);
-                removedFiles.remove(newFileList);
+                    List<LinkedFile> addedFiles = new ArrayList<>(newFileList);
+                    addedFiles.remove(oldFileList);
+                    List<LinkedFile> removedFiles = new ArrayList<>(oldFileList);
+                    removedFiles.remove(newFileList);
 
-                try {
-                    indexingTaskManager.addToIndex(PdfIndexer.of(bibDatabaseContext, preferencesService.getFilePreferences()), fieldChangedEvent.getBibEntry(), addedFiles, bibDatabaseContext);
-                    indexingTaskManager.removeFromIndex(PdfIndexer.of(bibDatabaseContext, preferencesService.getFilePreferences()), fieldChangedEvent.getBibEntry(), removedFiles);
-                } catch (IOException e) {
-                    LOGGER.warn("I/O error when writing lucene index", e);
+                    try {
+                        indexingTaskManager.addToIndex(PdfIndexer.of(bibDatabaseContext, preferencesService.getFilePreferences()), fieldChangedEvent.getBibEntry(), addedFiles, bibDatabaseContext);
+                        indexingTaskManager.removeFromIndex(PdfIndexer.of(bibDatabaseContext, preferencesService.getFilePreferences()), fieldChangedEvent.getBibEntry(), removedFiles);
+                    } catch (IOException e) {
+                        LOGGER.warn("I/O error when writing lucene index", e);
+                    }
                 }
             }
         }

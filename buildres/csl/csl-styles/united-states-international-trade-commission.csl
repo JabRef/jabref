@@ -27,7 +27,7 @@
     <category citation-format="note"/>
     <category field="generic-base"/>
     <summary>A bibliographical style file for the United States International Trade Commission</summary>
-    <updated>2021-06-22T19:55:15+00:00</updated>
+    <updated>2021-10-07T15:21:08+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="en">
@@ -195,7 +195,7 @@
           <choose>
             <if type="article-magazine" match="all" variable="author">
               <names variable="author">
-                <name and="text"/>
+                <name and="text" delimiter-precedes-last="always" name-as-sort-order="first"/>
                 <substitute>
                   <text macro="editor"/>
                 </substitute>

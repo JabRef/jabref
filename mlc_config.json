@@ -31,10 +31,16 @@
             "pattern": "tldrlegal.com"
         },
         {
+            "pattern": "^https://web\.archive\.org"
+        },
+        {
             "pattern": "^https://www\\.slant\\.co/"
         },
         {
             "pattern": "^http://localhost"
+        },
+        {
+            "pattern": "^https://demo.teamscale.com"
         }
     ]
 }

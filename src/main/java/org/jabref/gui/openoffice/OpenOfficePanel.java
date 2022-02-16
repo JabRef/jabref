@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import javax.swing.undo.UndoManager;
+
 import javafx.concurrent.Task;
 import javafx.geometry.Insets;
 import javafx.geometry.Side;
@@ -27,8 +29,8 @@ import javafx.scene.layout.VBox;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.Globals;
-import org.jabref.gui.JabRefFrame;
-import org.jabref.gui.LibraryTab;
+import org.jabref.gui.JabRefGUI;
+import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.help.HelpAction;
@@ -84,21 +86,29 @@ public class OpenOfficePanel {
     private final Button help;
     private final VBox vbox = new VBox();
 
-    private final JabRefFrame frame;
     private final PreferencesService preferencesService;
+    private final StateManager stateManager;
+    private final UndoManager undoManager;
     private final TaskExecutor taskExecutor;
     private final StyleLoader loader;
     private OpenOfficePreferences ooPrefs;
     private OOBibBase2 ooBase;
     private OOBibStyle style;
 
-    public OpenOfficePanel(JabRefFrame frame, PreferencesService preferencesService, OpenOfficePreferences ooPrefs, KeyBindingRepository keyBindingRepository) {
+    public OpenOfficePanel(PreferencesService preferencesService,
+                           OpenOfficePreferences ooPrefs,
+                           KeyBindingRepository keyBindingRepository,
+                           TaskExecutor taskExecutor,
+                           DialogService dialogService,
+                           StateManager stateManager,
+                           UndoManager undoManager) {
         ActionFactory factory = new ActionFactory(keyBindingRepository);
-        this.frame = frame;
         this.ooPrefs = ooPrefs;
         this.preferencesService = preferencesService;
-        this.taskExecutor = Globals.TASK_EXECUTOR;
-        dialogService = frame.getDialogService();
+        this.taskExecutor = taskExecutor;
+        this.dialogService = dialogService;
+        this.stateManager = stateManager;
+        this.undoManager = undoManager;
 
         connect = new Button();
         connect.setGraphic(IconTheme.JabRefIcons.CONNECT_OPEN_OFFICE.getGraphicNode());
@@ -124,8 +134,8 @@ public class OpenOfficePanel {
         update.setMaxWidth(Double.MAX_VALUE);
 
         loader = new StyleLoader(ooPrefs,
-                                 preferencesService.getLayoutFormatterPreferences(Globals.journalAbbreviationRepository),
-                                 preferencesService.getDefaultEncoding());
+                preferencesService.getLayoutFormatterPreferences(Globals.journalAbbreviationRepository),
+                preferencesService.getGeneralPreferences().getDefaultEncoding());
 
         initPanel();
     }
@@ -165,24 +175,22 @@ public class OpenOfficePanel {
         manualConnect.setOnAction(e -> connectManually());
 
         selectDocument.setTooltip(new Tooltip(Localization.lang("Select which open Writer document to work on")));
-
         selectDocument.setOnAction(e -> {
                 ooBase.guiActionSelectDocument(false);
         });
 
         setStyleFile.setMaxWidth(Double.MAX_VALUE);
-        setStyleFile.setOnAction(event -> {
-
-            dialogService.showCustomDialogAndWait(new StyleSelectDialogView(loader)).ifPresent(selectedStyle -> {
-                style = selectedStyle;
-                try {
-                    style.ensureUpToDate();
-                } catch (IOException e) {
-                    LOGGER.warn("Unable to reload style file '" + style.getPath() + "'", e);
-                }
-                dialogService.notify(Localization.lang("Current style is '%0'", style.getName()));
-            });
-        });
+        setStyleFile.setOnAction(event ->
+                dialogService.showCustomDialogAndWait(new StyleSelectDialogView(loader))
+                             .ifPresent(selectedStyle -> {
+                                 style = selectedStyle;
+                                 try {
+                                     style.ensureUpToDate();
+                                 } catch (IOException e) {
+                                     LOGGER.warn("Unable to reload style file '" + style.getPath() + "'", e);
+                                 }
+                                 dialogService.notify(Localization.lang("Current style is '%0'", style.getName()));
+                             }));
 
         pushEntries.setTooltip(new Tooltip(Localization.lang("Cite selected entries between parenthesis")));
         pushEntries.setOnAction(e -> pushEntries(CitationType.AUTHORYEAR_PAR, false));
@@ -261,21 +269,20 @@ public class OpenOfficePanel {
         Optional<BibDatabase> newDatabase = ooBase.exportCitedHelper(databases, returnPartialResult);
         if (newDatabase.isPresent()) {
             BibDatabaseContext databaseContext = new BibDatabaseContext(newDatabase.get());
-            this.frame.addTab(databaseContext, true);
+            JabRefGUI.getMainFrame().addTab(databaseContext, true);
         }
     }
 
     private List<BibDatabase> getBaseList() {
         List<BibDatabase> databases = new ArrayList<>();
         if (ooPrefs.getUseAllDatabases()) {
-            for (LibraryTab libraryTab : frame.getLibraryTabs()) {
-                databases.add(libraryTab.getDatabase());
+            for (BibDatabaseContext database : stateManager.getOpenDatabases()) {
+                databases.add(database.getDatabase());
             }
         } else {
-            LibraryTab libraryTab = frame.getCurrentLibraryTab();
-            if (libraryTab != null) {
-                databases.add(libraryTab.getDatabase());
-            }
+            databases.add(stateManager.getActiveDatabase()
+                                      .map(BibDatabaseContext::getDatabase)
+                                      .orElse(new BibDatabase()));
         }
 
         return databases;
@@ -322,13 +329,9 @@ public class OpenOfficePanel {
 
         if (selectedPath.isPresent()) {
 
-            BackgroundTask.wrap(() -> {
-                return officeInstallation.setOpenOfficePreferences(selectedPath.get());
-
-            }).withInitialMessage("Searching for executable")
-                          .onFailure(ex -> {
-                              dialogService.showErrorDialogAndWait(ex);
-                          }).onSuccess(value -> {
+            BackgroundTask.wrap(() -> officeInstallation.setOpenOfficePreferences(selectedPath.get()))
+                          .withInitialMessage("Searching for executable")
+                          .onFailure(dialogService::showErrorDialogAndWait).onSuccess(value -> {
                               if (value) {
                                   connect();
                               } else {
@@ -494,6 +497,7 @@ public class OpenOfficePanel {
             return;
         }
 
+
         Optional<Update.SyncOptions> syncOptions =
             (ooPrefs.getSyncWhenCiting()
              ? Optional.of(new Update.SyncOptions(getBaseList()))
@@ -531,26 +535,26 @@ public class OpenOfficePanel {
 
         // Ask if keys should be generated
         boolean citePressed = dialogService.showConfirmationDialogAndWait(Localization.lang("Cite"),
-                                                                          Localization.lang("Cannot cite entries without citation keys. Generate keys now?"),
-                                                                          Localization.lang("Generate keys"),
-                                                                          Localization.lang("Cancel"));
+                Localization.lang("Cannot cite entries without citation keys. Generate keys now?"),
+                Localization.lang("Generate keys"),
+                Localization.lang("Cancel"));
 
-        LibraryTab libraryTab = frame.getCurrentLibraryTab();
-        if (citePressed && (libraryTab != null)) {
+        Optional<BibDatabaseContext> databaseContext = stateManager.getActiveDatabase();
+        if (citePressed && databaseContext.isPresent()) {
             // Generate keys
             CitationKeyPatternPreferences prefs = preferencesService.getCitationKeyPatternPreferences();
             NamedCompound undoCompound = new NamedCompound(Localization.lang("Cite"));
             for (BibEntry entry : entries) {
                 if (entry.getCitationKey().isEmpty()) {
                     // Generate key
-                    new CitationKeyGenerator(libraryTab.getBibDatabaseContext(), prefs)
-                                                                                       .generateAndSetKey(entry)
-                                                                                       .ifPresent(change -> undoCompound.addEdit(new UndoableKeyChange(change)));
+                    new CitationKeyGenerator(databaseContext.get(), prefs)
+                            .generateAndSetKey(entry)
+                            .ifPresent(change -> undoCompound.addEdit(new UndoableKeyChange(change)));
                 }
             }
             undoCompound.end();
             // Add all undos
-            libraryTab.getUndoManager().addEdit(undoCompound);
+            undoManager.addEdit(undoCompound);
             // Now every entry has a key
             return true;
         } else {

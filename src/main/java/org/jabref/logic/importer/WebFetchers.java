@@ -164,8 +164,10 @@ public class WebFetchers {
      */
     public static Set<FulltextFetcher> getFullTextFetchers(ImportFormatPreferences importFormatPreferences) {
         Set<FulltextFetcher> fetchers = new HashSet<>();
+
         // Original
-        fetchers.add(new DoiResolution());
+        fetchers.add(new DoiResolution(importFormatPreferences.getDoiPreferences()));
+
         // Publishers
         fetchers.add(new ScienceDirect());
         fetchers.add(new SpringerLink());
@@ -173,6 +175,7 @@ public class WebFetchers {
         fetchers.add(new ArXiv(importFormatPreferences));
         fetchers.add(new IEEE(importFormatPreferences));
         fetchers.add(new ApsFetcher());
+
         // Meta search
         // fetchers.add(new JstorFetcher(importFormatPreferences));
         // fetchers.add(new GoogleScholar(importFormatPreferences));

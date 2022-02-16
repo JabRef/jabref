@@ -4,7 +4,6 @@ import java.util.Arrays;
 
 import javafx.scene.input.ClipboardContent;
 
-import org.jabref.gui.ClipBoardManager;
 import org.jabref.logic.util.OS;
 
 import org.junit.jupiter.api.Test;
@@ -106,94 +105,6 @@ class CopyCitationActionTest {
         ClipboardContent textTransferable = CopyCitationAction.processText(Arrays.asList(citation, citation));
 
         String actual = textTransferable.getString();
-        assertEquals(expected, actual);
-    }
-
-    @Test
-    void processRtf() throws Exception {
-        String expected = "{\\rtf" + OS.NEWLINE +
-                "[1]\\tab B. Smith, B. Jones, and J. Williams, \\uc0\\u8220{}Title of the test entry,\\uc0\\u8221{} {\\i{}BibTeX Journal}, vol. 34, no. 3, pp. 45\\uc0\\u8211{}67, Jul. 2016." + OS.NEWLINE +
-                "\\line" + OS.NEWLINE +
-                "[1]\\tab B. Smith, B. Jones, and J. Williams, \\uc0\\u8220{}Title of the test entry,\\uc0\\u8221{} {\\i{}BibTeX Journal}, vol. 34, no. 3, pp. 45\\uc0\\u8211{}67, Jul. 2016." + OS.NEWLINE +
-                "}";
-
-        String citation = "[1]\\tab B. Smith, B. Jones, and J. Williams, \\uc0\\u8220{}Title of the test entry,\\uc0\\u8221{} {\\i{}BibTeX Journal}, vol. 34, no. 3, pp. 45\\uc0\\u8211{}67, Jul. 2016." + OS.NEWLINE;
-        ClipboardContent content = CopyCitationAction.processRtf(Arrays.asList(citation, citation));
-
-        Object actual = content.getRtf();
-        assertEquals(expected, actual);
-    }
-
-    @Test
-    void processXslFo() throws Exception {
-        String expected = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" + OS.NEWLINE +
-                "<fo:root xmlns:fo=\"http://www.w3.org/1999/XSL/Format\">" + OS.NEWLINE +
-                "   <fo:layout-master-set>" + OS.NEWLINE +
-                "      <fo:simple-page-master master-name=\"citations\">" + OS.NEWLINE +
-                "         <fo:region-body/>" + OS.NEWLINE +
-                "      </fo:simple-page-master>" + OS.NEWLINE +
-                "   </fo:layout-master-set>" + OS.NEWLINE +
-                "   <fo:page-sequence master-reference=\"citations\">" + OS.NEWLINE +
-                "      <fo:flow flow-name=\"xsl-region-body\">" + OS.NEWLINE +
-                OS.NEWLINE +
-                "<fo:block id=\"Smith2016\">" + OS.NEWLINE +
-                "  <fo:table table-layout=\"fixed\" width=\"100%\">" + OS.NEWLINE +
-                "    <fo:table-column column-number=\"1\" column-width=\"2.5em\"/>" + OS.NEWLINE +
-                "    <fo:table-column column-number=\"2\" column-width=\"proportional-column-width(1)\"/>" + OS.NEWLINE +
-                "    <fo:table-body>" + OS.NEWLINE +
-                "      <fo:table-row>" + OS.NEWLINE +
-                "        <fo:table-cell>" + OS.NEWLINE +
-                "          <fo:block>[1]</fo:block>" + OS.NEWLINE +
-                "        </fo:table-cell>" + OS.NEWLINE +
-                "        <fo:table-cell>" + OS.NEWLINE +
-                "          <fo:block>B. Smith, B. Jones, and J. Williams, “Title of the test entry,” <fo:inline font-style=\"italic\">BibTeX Journal</fo:inline>, vol. 34, no. 3, pp. 45–67, Jul. 2016.</fo:block>" + OS.NEWLINE +
-                "        </fo:table-cell>" + OS.NEWLINE +
-                "      </fo:table-row>" + OS.NEWLINE +
-                "    </fo:table-body>" + OS.NEWLINE +
-                "  </fo:table>" + OS.NEWLINE +
-                "</fo:block>" + OS.NEWLINE +
-                OS.NEWLINE +
-                "<fo:block id=\"Smith2016\">" + OS.NEWLINE +
-                "  <fo:table table-layout=\"fixed\" width=\"100%\">" + OS.NEWLINE +
-                "    <fo:table-column column-number=\"1\" column-width=\"2.5em\"/>" + OS.NEWLINE +
-                "    <fo:table-column column-number=\"2\" column-width=\"proportional-column-width(1)\"/>" + OS.NEWLINE +
-                "    <fo:table-body>" + OS.NEWLINE +
-                "      <fo:table-row>" + OS.NEWLINE +
-                "        <fo:table-cell>" + OS.NEWLINE +
-                "          <fo:block>[1]</fo:block>" + OS.NEWLINE +
-                "        </fo:table-cell>" + OS.NEWLINE +
-                "        <fo:table-cell>" + OS.NEWLINE +
-                "          <fo:block>B. Smith, B. Jones, and J. Williams, “Title of the test entry,” <fo:inline font-style=\"italic\">BibTeX Journal</fo:inline>, vol. 34, no. 3, pp. 45–67, Jul. 2016.</fo:block>" + OS.NEWLINE +
-                "        </fo:table-cell>" + OS.NEWLINE +
-                "      </fo:table-row>" + OS.NEWLINE +
-                "    </fo:table-body>" + OS.NEWLINE +
-                "  </fo:table>" + OS.NEWLINE +
-                "</fo:block>" + OS.NEWLINE +
-                OS.NEWLINE +
-                "      </fo:flow>" + OS.NEWLINE +
-                "   </fo:page-sequence>" + OS.NEWLINE +
-                "</fo:root>" + OS.NEWLINE;
-
-        String citation = "<fo:block id=\"Smith2016\">" + OS.NEWLINE +
-                "  <fo:table table-layout=\"fixed\" width=\"100%\">" + OS.NEWLINE +
-                "    <fo:table-column column-number=\"1\" column-width=\"2.5em\"/>" + OS.NEWLINE +
-                "    <fo:table-column column-number=\"2\" column-width=\"proportional-column-width(1)\"/>" + OS.NEWLINE +
-                "    <fo:table-body>" + OS.NEWLINE +
-                "      <fo:table-row>" + OS.NEWLINE +
-                "        <fo:table-cell>" + OS.NEWLINE +
-                "          <fo:block>[1]</fo:block>" + OS.NEWLINE +
-                "        </fo:table-cell>" + OS.NEWLINE +
-                "        <fo:table-cell>" + OS.NEWLINE +
-                "          <fo:block>B. Smith, B. Jones, and J. Williams, “Title of the test entry,” <fo:inline font-style=\"italic\">BibTeX Journal</fo:inline>, vol. 34, no. 3, pp. 45–67, Jul. 2016.</fo:block>" + OS.NEWLINE +
-                "        </fo:table-cell>" + OS.NEWLINE +
-                "      </fo:table-row>" + OS.NEWLINE +
-                "    </fo:table-body>" + OS.NEWLINE +
-                "  </fo:table>" + OS.NEWLINE +
-                "</fo:block>" + OS.NEWLINE;
-
-        ClipboardContent xmlTransferable = CopyCitationAction.processXslFo(Arrays.asList(citation, citation));
-
-        Object actual = xmlTransferable.get(ClipBoardManager.XML);
         assertEquals(expected, actual);
     }
 

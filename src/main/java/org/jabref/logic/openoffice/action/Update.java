@@ -22,7 +22,6 @@ import com.sun.star.text.XTextDocument;
 public class Update {
 
     private Update() {
-        /**/
     }
 
     /**

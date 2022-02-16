@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
 
+import org.jabref.logic.bibtex.FieldContentFormatterPreferences;
 import org.jabref.logic.bibtex.FieldWriterPreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.fileformat.PdfEmbeddedBibFileImporter;
@@ -107,14 +108,14 @@ class EmbeddedBibFilePdfExporterTest {
 
         filePreferences = mock(FilePreferences.class);
         when(filePreferences.getUser()).thenReturn(tempDir.toAbsolutePath().toString());
-        when(filePreferences.shouldStoreFilesRelativeToBib()).thenReturn(false);
+        when(filePreferences.shouldStoreFilesRelativeToBibFile()).thenReturn(false);
 
         importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(importFormatPreferences.getFieldContentFormatterPreferences().getNonWrappableFields()).thenReturn(List.of());
 
         bibDatabaseMode = BibDatabaseMode.BIBTEX;
         bibEntryTypesManager = new BibEntryTypesManager();
-        fieldWriterPreferences = new FieldWriterPreferences();
+        FieldWriterPreferences fieldWriterPreferences = new FieldWriterPreferences(true, List.of(StandardField.MONTH), new FieldContentFormatterPreferences());
 
         importer = new PdfEmbeddedBibFileImporter(importFormatPreferences);
         exporter = new EmbeddedBibFilePdfExporter(bibDatabaseMode, bibEntryTypesManager, fieldWriterPreferences);

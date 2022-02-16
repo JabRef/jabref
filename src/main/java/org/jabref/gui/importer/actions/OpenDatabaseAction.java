@@ -22,6 +22,7 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.dialogs.BackupUIManager;
 import org.jabref.gui.shared.SharedDatabaseUIManager;
+import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.autosaveandbackup.BackupManager;
@@ -53,13 +54,20 @@ public class OpenDatabaseAction extends SimpleCommand {
     private final JabRefFrame frame;
     private final PreferencesService preferencesService;
     private final StateManager stateManager;
+    private final ThemeManager themeManager;
     private final DialogService dialogService;
 
-    public OpenDatabaseAction(JabRefFrame frame, PreferencesService preferencesService, DialogService dialogService, StateManager stateManager) {
+    public OpenDatabaseAction(JabRefFrame frame,
+                              PreferencesService preferencesService,
+                              DialogService dialogService,
+                              StateManager stateManager,
+                              ThemeManager themeManager) {
         this.frame = frame;
         this.preferencesService = preferencesService;
         this.dialogService = dialogService;
         this.stateManager = stateManager;
+        this.themeManager = themeManager;
+
     }
 
     /**
@@ -94,10 +102,10 @@ public class OpenDatabaseAction extends SimpleCommand {
      */
     private Path getInitialDirectory() {
         if (frame.getBasePanelCount() == 0) {
-            return preferencesService.getWorkingDir();
+            return preferencesService.getFilePreferences().getWorkingDirectory();
         } else {
             Optional<Path> databasePath = frame.getCurrentLibraryTab().getBibDatabaseContext().getDatabasePath();
-            return databasePath.map(Path::getParent).orElse(preferencesService.getWorkingDir());
+            return databasePath.map(Path::getParent).orElse(preferencesService.getFilePreferences().getWorkingDirectory());
         }
     }
 
@@ -171,7 +179,7 @@ public class OpenDatabaseAction extends SimpleCommand {
 
         BackgroundTask<ParserResult> backgroundTask = BackgroundTask.wrap(() -> loadDatabase(file));
         LibraryTab.Factory libraryTabFactory = new LibraryTab.Factory();
-        LibraryTab newTab = libraryTabFactory.createLibraryTab(frame, preferencesService, stateManager, file, backgroundTask);
+        LibraryTab newTab = libraryTabFactory.createLibraryTab(frame, preferencesService, stateManager, themeManager, file, backgroundTask);
 
         backgroundTask.onFinished(() -> trackOpenNewDatabase(newTab));
     }
@@ -181,7 +189,7 @@ public class OpenDatabaseAction extends SimpleCommand {
 
         dialogService.notify(Localization.lang("Opening") + ": '" + file + "'");
 
-        preferencesService.setWorkingDirectory(fileToLoad.getParent());
+        preferencesService.getFilePreferences().setWorkingDirectory(fileToLoad.getParent());
 
         if (BackupManager.backupFileDiffers(fileToLoad)) {
             BackupUIManager.showRestoreBackupDialog(dialogService, fileToLoad);
@@ -190,6 +198,7 @@ public class OpenDatabaseAction extends SimpleCommand {
         ParserResult result;
         try {
             result = OpenDatabase.loadDatabase(fileToLoad,
+                    preferencesService.getGeneralPreferences(),
                     preferencesService.getImportFormatPreferences(),
                     Globals.getFileUpdateMonitor());
         } catch (IOException e) {

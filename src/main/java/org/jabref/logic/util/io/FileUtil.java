@@ -24,6 +24,7 @@ import java.util.stream.Stream;
 
 import org.jabref.logic.citationkeypattern.BracketedPattern;
 import org.jabref.model.database.BibDatabase;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.util.OptionalUtil;
 
@@ -104,6 +105,18 @@ public class FileUtil {
      */
     public static Path addExtension(Path path, String extension) {
         return path.resolveSibling(path.getFileName() + extension);
+    }
+
+    public static Optional<String> getUniquePathFragment(List<String> paths, Path databasePath) {
+
+        String fileName = databasePath.getFileName().toString();
+
+        List<String> uniquePathParts = uniquePathSubstrings(paths);
+        return uniquePathParts.stream()
+                              .filter(part -> databasePath.toString().contains(part)
+                                      && !part.equals(fileName) && part.contains(File.separator))
+                              .findFirst()
+                              .map(part -> part.substring(0, part.lastIndexOf(File.separator)));
     }
 
     /**
@@ -350,7 +363,7 @@ public class FileUtil {
      * @return True if file extension is ".bib", false otherwise
      */
     public static boolean isBibFile(Path file) {
-        return getFileExtension(file).filter(type -> "bib".equals(type)).isPresent();
+        return getFileExtension(file).filter("bib"::equals).isPresent();
     }
 
     /**
@@ -360,6 +373,13 @@ public class FileUtil {
      * @return True if file extension is ".bib", false otherwise
      */
     public static boolean isPDFFile(Path file) {
-        return getFileExtension(file).filter(type -> "pdf".equals(type)).isPresent();
+        return getFileExtension(file).filter("pdf"::equals).isPresent();
+    }
+
+    /**
+     * @return Path of current panel database directory or the standard working directory in case the datbase was not saved yet
+     */
+    public static Path getInitialDirectory(BibDatabaseContext databaseContext, Path workingDirectory) {
+        return databaseContext.getDatabasePath().map(Path::getParent).orElse(workingDirectory);
     }
 }

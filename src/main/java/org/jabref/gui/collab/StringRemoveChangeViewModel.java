@@ -28,7 +28,7 @@ class StringRemoveChangeViewModel extends DatabaseChangeViewModel {
             database.getDatabase().removeString(string.getId());
             undoEdit.addEdit(new UndoableRemoveString(database.getDatabase(), string));
         } catch (Exception ex) {
-            LOGGER.warn("Error: could not add string '" + string.getName() + "': " + ex.getMessage(), ex);
+            LOGGER.warn("Error: could not remove string '" + string.getName() + "': " + ex.getMessage(), ex);
         }
     }
 

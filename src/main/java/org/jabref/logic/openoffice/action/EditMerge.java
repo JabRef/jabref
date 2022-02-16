@@ -59,16 +59,16 @@ public class EditMerge {
 
             for (JoinableGroupData joinableGroupData : joinableGroups) {
 
-                List<CitationGroup> cgs = joinableGroupData.group;
+                List<CitationGroup> groups = joinableGroupData.group;
 
-                List<Citation> newCitations = (cgs.stream()
+                List<Citation> newCitations = (groups.stream()
                                                .flatMap(group -> group.citationsInStorageOrder.stream())
                                                .collect(Collectors.toList()));
 
-                CitationType citationType = cgs.get(0).citationType;
-                List<Optional<OOText>> pageInfos = frontend.backend.combinePageInfos(cgs);
+                CitationType citationType = groups.get(0).citationType;
+                List<Optional<OOText>> pageInfos = frontend.backend.combinePageInfos(groups);
 
-                frontend.removeCitationGroups(cgs, doc);
+                frontend.removeCitationGroups(groups, doc);
                 XTextCursor textCursor = joinableGroupData.groupCursor;
                 textCursor.setString(""); // Also remove the spaces between.
 
@@ -206,8 +206,8 @@ public class EditMerge {
 
         // assume: currentGroupCursor.getEnd() == cursorBetween.getEnd()
         if (UnoTextRange.compareEnds(state.cursorBetween, state.currentGroupCursor) != 0) {
-            String msg = ("MergeCitationGroups: cursorBetween.end != currentGroupCursor.end");
-            throw new IllegalStateException(msg);
+            LOGGER.warn("MergeCitationGroups: cursorBetween.end != currentGroupCursor.end");
+            throw new IllegalStateException("MergeCitationGroups failed");
         }
 
         /*
@@ -238,8 +238,8 @@ public class EditMerge {
 
             // These two should move in sync:
             if (UnoTextRange.compareEnds(state.cursorBetween, state.currentGroupCursor) != 0) {
-                String msg = ("MergeCitationGroups: cursorBetween.end != currentGroupCursor.end (during expand)");
-                throw new IllegalStateException(msg);
+                LOGGER.warn("MergeCitationGroups: cursorBetween.end != currentGroupCursor.end (during expand)");
+                throw new IllegalStateException("MergeCitationGroups failed");
             }
         }
 
@@ -278,8 +278,8 @@ public class EditMerge {
         state.currentGroupCursor.goRight((short) (currentRange.getString().length()), true);
 
         if (UnoTextRange.compareEnds(state.cursorBetween, state.currentGroupCursor) != 0) {
-            String msg = ("MergeCitationGroups: cursorBetween.end != currentGroupCursor.end");
-            throw new IllegalStateException(msg);
+            LOGGER.warn("MergeCitationGroups: cursorBetween.end != currentGroupCursor.end");
+            throw new IllegalStateException("MergeCitationGroups failed");
         }
 
         /* Store data about last entry in currentGroup */
@@ -296,14 +296,14 @@ public class EditMerge {
         WrappedTargetException {
         List<JoinableGroupData> result = new ArrayList<>();
 
-        List<CitationGroup> cgs = frontend.getCitationGroupsSortedWithinPartitions(doc, false /* mapFootnotesToFootnoteMarks */);
-        if (cgs.isEmpty()) {
+        List<CitationGroup> groups = frontend.getCitationGroupsSortedWithinPartitions(doc, false /* mapFootnotesToFootnoteMarks */);
+        if (groups.isEmpty()) {
             return result;
         }
 
         ScanState state = new ScanState();
 
-        for (CitationGroup group : cgs) {
+        for (CitationGroup group : groups) {
 
             XTextRange currentRange = (frontend.getMarkRange(doc, group)
                                        .orElseThrow(IllegalStateException::new));

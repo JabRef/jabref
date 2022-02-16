@@ -9,9 +9,11 @@ import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.StandardEntryType;
+import org.jabref.testutils.category.FetcherTest;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -21,6 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+@FetcherTest
 class PdfMergeMetadataImporterTest {
 
     private PdfMergeMetadataImporter importer;
@@ -70,7 +73,7 @@ class PdfMergeMetadataImporterTest {
         expected.setField(StandardField.DOI, "10.1002/9781118257517");
 
         // From ISBN (contained on first page verbatim bib entry)
-        expected.setField(StandardField.DATE, "2018-01-01");
+        expected.setField(StandardField.DATE, "2018-01-31");
         expected.setField(new UnknownField("ean"), "9780134685991");
         expected.setField(StandardField.ISBN, "0134685997");
         expected.setField(StandardField.URL, "https://www.ebook.de/de/product/28983211/joshua_bloch_effective_java.html");
@@ -83,7 +86,7 @@ class PdfMergeMetadataImporterTest {
         expected.setField(StandardField.VOLUME, "1");
 
         // From merge
-        expected.setField(StandardField.FILE, ":" + file.toAbsolutePath().toString() + ":" + StandardFileType.PDF.getName());
+        expected.setFiles(List.of(new LinkedFile("", file.toAbsolutePath(), StandardFileType.PDF.getName())));
 
         assertEquals(Collections.singletonList(expected), result);
     }

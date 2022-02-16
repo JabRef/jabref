@@ -18,13 +18,9 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v2
         with:
-          java-version: 16
-          distribution: 'adopt'
-      - uses: actions/cache@v1
-        name: Restore gradle wrapper
-        with:
-          path: ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-${{ hashFiles('gradle/wrapper/gradle-wrapper.properties') }}
+          java-version: 17
+          distribution: 'temurin'
+          cache: 'gradle'
       - name: Update journal lists
         run: |
           set +o pipefail

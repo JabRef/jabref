@@ -7,7 +7,7 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
 
-import org.jabref.gui.util.Theme;
+import org.jabref.gui.theme.Theme;
 
 public class AppearancePreferences {
     private final BooleanProperty shouldOverrideDefaultFontSize;

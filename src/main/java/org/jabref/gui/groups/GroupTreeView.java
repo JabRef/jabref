@@ -86,7 +86,10 @@ public class GroupTreeView extends BorderPane {
      * Note: This panel is deliberately not created in FXML, since parsing of this took about 500 msecs. In an attempt
      * to speed up the startup time of JabRef, this has been rewritten to plain java.
      */
-    public GroupTreeView(TaskExecutor taskExecutor, StateManager stateManager, PreferencesService preferencesService, DialogService dialogService) {
+    public GroupTreeView(TaskExecutor taskExecutor,
+                         StateManager stateManager,
+                         PreferencesService preferencesService,
+                         DialogService dialogService) {
         this.taskExecutor = taskExecutor;
         this.stateManager = stateManager;
         this.preferencesService = preferencesService;
@@ -162,8 +165,6 @@ public class GroupTreeView extends BorderPane {
         });
         searchField.textProperty().addListener((observable, oldValue, newValue) -> searchTask.restart());
 
-        setNewGroupButtonStyle(groupTree);
-
         groupTree.rootProperty().bind(
                 EasyBind.map(viewModel.rootGroupProperty(),
                         group -> {
@@ -199,9 +200,17 @@ public class GroupTreeView extends BorderPane {
                                 group.allSelectedEntriesMatchedProperty());
                     }
                     Text text = new Text();
-                    if (preferencesService.getDisplayGroupCount()) {
-                        text.textProperty().bind(group.getHits().asString());
-                    }
+                    EasyBind.subscribe(preferencesService.getGroupsPreferences().displayGroupCountProperty(),
+                            (newValue) -> {
+                                if (text.textProperty().isBound()) {
+                                    text.textProperty().unbind();
+                                    text.setText("");
+                                }
+
+                                if (newValue) {
+                                    text.textProperty().bind(group.getHits().asString());
+                                }
+                            });
                     text.getStyleClass().setAll("text");
                     node.getChildren().add(text);
                     node.setMaxWidth(Control.USE_PREF_SIZE);
@@ -234,7 +243,6 @@ public class GroupTreeView extends BorderPane {
         groupTree.setRowFactory(treeTable -> {
             TreeTableRow<GroupNodeViewModel> row = new TreeTableRow<>();
             row.treeItemProperty().addListener((ov, oldTreeItem, newTreeItem) -> {
-                setNewGroupButtonStyle(treeTable);
                 boolean isRoot = newTreeItem == treeTable.getRoot();
                 row.pseudoClassStateChanged(rootPseudoClass, isRoot);
 
@@ -296,9 +304,7 @@ public class GroupTreeView extends BorderPane {
                 }
                 event.consume();
             });
-            row.setOnDragExited(event -> {
-                ControlHelper.removeDroppingPseudoClasses(row);
-            });
+            row.setOnDragExited(event -> ControlHelper.removeDroppingPseudoClasses(row));
 
             row.setOnDragDropped(event -> {
                 Dragboard dragboard = event.getDragboard();
@@ -469,19 +475,6 @@ public class GroupTreeView extends BorderPane {
             m.invoke(null, customTextField, customTextField.rightProperty());
         } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException ex) {
             LOGGER.error("Failed to decorate text field with clear button", ex);
-        }
-    }
-
-    private void setNewGroupButtonStyle(TreeTableView<GroupNodeViewModel> groupTree) {
-        PseudoClass active = PseudoClass.getPseudoClass("active");
-        PseudoClass inactive = PseudoClass.getPseudoClass("inactive");
-
-        if (groupTree.getRoot() != null) {
-            boolean isActive = groupTree.getExpandedItemCount() <= 10;
-            addNewGroup.pseudoClassStateChanged(active, isActive);
-            addNewGroup.pseudoClassStateChanged(inactive, !isActive);
-        } else {
-            addNewGroup.pseudoClassStateChanged(active, true);
         }
     }
 

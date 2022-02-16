@@ -33,7 +33,7 @@ public class RfcFetcherTest {
         bibEntry.setField(StandardField.HOWPUBLISHED, "RFC 1945");
         bibEntry.setField(StandardField.PUBLISHER, "RFC Editor");
         bibEntry.setField(StandardField.DOI, "10.17487/RFC1945");
-        bibEntry.setField(StandardField.URL, "https://rfc-editor.org/rfc/rfc1945.txt");
+        bibEntry.setField(StandardField.URL, "https://www.rfc-editor.org/info/rfc1945");
         bibEntry.setField(StandardField.AUTHOR, "Henrik Nielsen and Roy T. Fielding and Tim Berners-Lee");
         bibEntry.setField(StandardField.TITLE, "{Hypertext Transfer Protocol -- HTTP/1.0}");
         bibEntry.setField(StandardField.PAGETOTAL, "60");
@@ -66,7 +66,7 @@ public class RfcFetcherTest {
         bibDraftEntry.setField(StandardField.URL, "https://datatracker.ietf.org/doc/html/draft-fielding-http-spec-01");
         bibDraftEntry.setField(StandardField.YEAR, "1994");
         bibDraftEntry.setField(StandardField.ABSTRACT, "The Hypertext Transfer Protocol (HTTP) is an application-level protocol with the lightness and speed necessary for distributed, collaborative, hypermedia information systems. It is a generic, stateless, object-oriented protocol which can be used for many tasks, such as name servers and distributed object management systems, through extension of its request methods (commands). A feature of HTTP is the typing and negotiation of data representation, allowing systems to be built independently of the data being transferred. HTTP has been in use by the World-Wide Web global information initiative since 1990. This specification reflects preferred usage of the protocol referred to as 'HTTP/1.0', and is compatible with the most commonly used HTTP server and client programs implemented prior to November 1994.");
-        bibDraftEntry.setCommentsBeforeEntry("%% You should probably cite draft-ietf-http-v10-spec instead of this I-D.");
+        bibDraftEntry.setCommentsBeforeEntry("%% You should probably cite draft-ietf-http-v10-spec instead of this I-D.\n");
 
         assertEquals(Optional.of(bibDraftEntry), fetcher.performSearchById("draft-fielding-http-spec"));
     }

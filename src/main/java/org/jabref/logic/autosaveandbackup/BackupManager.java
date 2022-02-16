@@ -1,6 +1,7 @@
 package org.jabref.logic.autosaveandbackup;
 
 import java.io.IOException;
+import java.io.Writer;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -13,14 +14,17 @@ import java.util.concurrent.ExecutorService;
 
 import org.jabref.logic.bibtex.InvalidFieldValueException;
 import org.jabref.logic.exporter.AtomicFileWriter;
+import org.jabref.logic.exporter.BibWriter;
 import org.jabref.logic.exporter.BibtexDatabaseWriter;
 import org.jabref.logic.exporter.SavePreferences;
 import org.jabref.logic.util.CoarseChangeFilter;
 import org.jabref.logic.util.DelayTaskThrottler;
+import org.jabref.logic.util.OS;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.event.BibDatabaseContextChangedEvent;
 import org.jabref.model.entry.BibEntryTypesManager;
+import org.jabref.preferences.GeneralPreferences;
 import org.jabref.preferences.PreferencesService;
 
 import com.google.common.eventbus.Subscribe;
@@ -130,11 +134,13 @@ public class BackupManager {
 
     private void performBackup(Path backupPath) {
         try {
-            Charset charset = bibDatabaseContext.getMetaData().getEncoding().orElse(preferences.getDefaultEncoding());
+            Charset charset = bibDatabaseContext.getMetaData().getEncoding().orElse(preferences.getGeneralPreferences().getDefaultEncoding());
+            GeneralPreferences generalPreferences = preferences.getGeneralPreferences();
             SavePreferences savePreferences = preferences.getSavePreferences()
-                                                         .withEncoding(charset)
                                                          .withMakeBackup(false);
-            new BibtexDatabaseWriter(new AtomicFileWriter(backupPath, savePreferences.getEncoding()), savePreferences, entryTypesManager)
+            Writer writer = new AtomicFileWriter(backupPath, charset);
+            BibWriter bibWriter = new BibWriter(writer, OS.NEWLINE);
+            new BibtexDatabaseWriter(bibWriter, generalPreferences, savePreferences, entryTypesManager)
                     .saveDatabase(bibDatabaseContext);
         } catch (IOException e) {
             logIfCritical(backupPath, e);

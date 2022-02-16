@@ -1,6 +1,7 @@
 package org.jabref.logic.integrity;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
@@ -139,6 +140,7 @@ class IntegrityCheckTest {
         new IntegrityCheck(context,
                 mock(FilePreferences.class),
                 createCitationKeyPatternPreferences(),
+                StandardCharsets.UTF_8,
                 JournalAbbreviationLoader.loadBuiltInRepository(), false)
                 .check();
 
@@ -172,6 +174,7 @@ class IntegrityCheckTest {
         List<IntegrityMessage> messages = new IntegrityCheck(context,
                 mock(FilePreferences.class),
                 createCitationKeyPatternPreferences(),
+                StandardCharsets.UTF_8,
                 JournalAbbreviationLoader.loadBuiltInRepository(), false)
                 .check();
         assertNotEquals(Collections.emptyList(), messages);
@@ -179,21 +182,13 @@ class IntegrityCheckTest {
 
     private void assertCorrect(BibDatabaseContext context) {
         FilePreferences filePreferencesMock = mock(FilePreferences.class);
-        when(filePreferencesMock.shouldStoreFilesRelativeToBib()).thenReturn(true);
+        when(filePreferencesMock.shouldStoreFilesRelativeToBibFile()).thenReturn(true);
         List<IntegrityMessage> messages = new IntegrityCheck(context,
                 filePreferencesMock,
                 createCitationKeyPatternPreferences(),
+                StandardCharsets.UTF_8,
                 JournalAbbreviationLoader.loadBuiltInRepository(), false
         ).check();
-        assertEquals(Collections.emptyList(), messages);
-    }
-
-    private void assertCorrect(BibDatabaseContext context, boolean allowIntegerEdition) {
-        List<IntegrityMessage> messages = new IntegrityCheck(context,
-                mock(FilePreferences.class),
-                createCitationKeyPatternPreferences(),
-                JournalAbbreviationLoader.loadBuiltInRepository(),
-                allowIntegerEdition).check();
         assertEquals(Collections.emptyList(), messages);
     }
 

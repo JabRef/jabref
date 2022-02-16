@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - master
+    tags-ignore:
+      - '**'
   workflow_dispatch:
     inputs:
       commit_message:
@@ -26,7 +28,7 @@ jobs:
 
     - name: Release branch version
       id: release
-      run: echo ::set-output name=branch::v1.0.1
+      run: echo ::set-output name=branch::v1.0.2
     - name: Checkout release branch
       uses: actions/checkout@v2
       with:
@@ -58,7 +60,7 @@ jobs:
       if: github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && (steps.update.outputs.updated == 'true' || steps.update.outputs.deleted == 'true'))
       uses: ruby/setup-ruby@v1
       with:
-        ruby-version: 3.0.0
+        ruby-version: 3.0.2
     - name: but use cache to speed that up
       if: github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && (steps.update.outputs.updated == 'true' || steps.update.outputs.deleted == 'true'))
       uses: actions/cache@v2

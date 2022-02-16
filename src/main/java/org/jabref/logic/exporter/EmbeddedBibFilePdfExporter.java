@@ -15,6 +15,8 @@ import java.util.Objects;
 import org.jabref.logic.bibtex.BibEntryWriter;
 import org.jabref.logic.bibtex.FieldWriter;
 import org.jabref.logic.bibtex.FieldWriterPreferences;
+import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.OS;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
@@ -63,35 +65,55 @@ public class EmbeddedBibFilePdfExporter extends Exporter {
     }
 
     private void embedBibTex(String bibTeX, Path file, Charset encoding) throws IOException {
-        if (!Files.exists(file) || !StandardFileType.PDF.getExtensions().contains(FileUtil.getFileExtension(file).orElse(""))) {
+        if (!Files.exists(file) || !FileUtil.isPDFFile(file)) {
             return;
         }
         try (PDDocument document = PDDocument.load(file.toFile())) {
             PDDocumentNameDictionary nameDictionary = document.getDocumentCatalog().getNames();
             PDEmbeddedFilesNameTreeNode efTree;
-            Map names;
+            Map<String, PDComplexFileSpecification> names;
 
             if (nameDictionary == null) {
                 efTree = new PDEmbeddedFilesNameTreeNode();
-                names = new HashMap();
+                names = new HashMap<>();
                 nameDictionary = new PDDocumentNameDictionary(document.getDocumentCatalog());
                 nameDictionary.setEmbeddedFiles(efTree);
                 document.getDocumentCatalog().setNames(nameDictionary);
             } else {
                 efTree = nameDictionary.getEmbeddedFiles();
+                if (efTree == null) {
+                    efTree = new PDEmbeddedFilesNameTreeNode();
+                    nameDictionary.setEmbeddedFiles(efTree);
+                }
                 names = efTree.getNames();
+                if (names == null) {
+                    names = new HashMap<>();
+                    efTree.setNames(names);
+                }
             }
 
+            PDComplexFileSpecification fileSpecification;
+            if (names.containsKey(EMBEDDED_FILE_NAME)) {
+                fileSpecification = names.get(EMBEDDED_FILE_NAME);
+            } else {
+                fileSpecification = new PDComplexFileSpecification();
+            }
             if (efTree != null) {
-                PDComplexFileSpecification fileSpecification = new PDComplexFileSpecification();
-                fileSpecification.setFile(EMBEDDED_FILE_NAME);
                 InputStream inputStream = new ByteArrayInputStream(bibTeX.getBytes(encoding));
+                fileSpecification.setFile(EMBEDDED_FILE_NAME);
                 PDEmbeddedFile embeddedFile = new PDEmbeddedFile(document, inputStream);
                 embeddedFile.setSubtype("text/x-bibtex");
                 embeddedFile.setSize(bibTeX.length());
                 fileSpecification.setEmbeddedFile(embeddedFile);
 
-                names.put(EMBEDDED_FILE_NAME, fileSpecification);
+                if (!names.containsKey(EMBEDDED_FILE_NAME)) {
+                    try {
+                        names.put(EMBEDDED_FILE_NAME, fileSpecification);
+                    } catch (UnsupportedOperationException e) {
+                        throw new IOException(Localization.lang("File '%0' is write protected.", file.toString()));
+                    }
+                }
+
                 efTree.setNames(names);
                 nameDictionary.setEmbeddedFiles(efTree);
                 document.getDocumentCatalog().setNames(nameDictionary);
@@ -101,12 +123,13 @@ public class EmbeddedBibFilePdfExporter extends Exporter {
     }
 
     private String getBibString(List<BibEntry> entries) throws IOException {
-        StringWriter stringWriter = new StringWriter(200);
+        StringWriter stringWriter = new StringWriter();
+        BibWriter bibWriter = new BibWriter(stringWriter, OS.NEWLINE);
         FieldWriter fieldWriter = FieldWriter.buildIgnoreHashes(fieldWriterPreferences);
         BibEntryWriter bibEntryWriter = new BibEntryWriter(fieldWriter, bibEntryTypesManager);
         for (BibEntry entry : entries) {
-            bibEntryWriter.writeWithoutPrependedNewlines(entry, stringWriter, bibDatabaseMode);
+            bibEntryWriter.write(entry, bibWriter, bibDatabaseMode);
         }
-        return stringWriter.getBuffer().toString();
+        return stringWriter.toString();
     }
 }

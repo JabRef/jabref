@@ -140,19 +140,19 @@ public class BibDatabaseContext {
         metaData.getDefaultFileDirectory()
                 .ifPresent(metaDataDirectory -> fileDirs.add(getFileDirectoryPath(metaDataDirectory)));
 
-        // 3. Preferences directory
-        preferences.getFileDirectory().ifPresent(fileDirs::add);
-
-        // 4. BIB file directory
-        if (preferences.shouldStoreFilesRelativeToBib()) {
+        // 3. BIB file directory or Main file directory
+        if (preferences.shouldStoreFilesRelativeToBibFile()) {
             getDatabasePath().ifPresent(dbPath -> {
                 Path parentPath = dbPath.getParent();
                 if (parentPath == null) {
                     parentPath = Path.of(System.getProperty("user.dir"));
                 }
                 Objects.requireNonNull(parentPath, "BibTeX database parent path is null");
-                fileDirs.add(0, parentPath);
+                fileDirs.add(parentPath);
             });
+        } else {
+            // Main file directory
+            preferences.getFileDirectory().ifPresent(fileDirs::add);
         }
 
         return fileDirs.stream().map(Path::toAbsolutePath).collect(Collectors.toList());
@@ -213,6 +213,14 @@ public class BibDatabaseContext {
         return database.getEntries();
     }
 
+    /**
+     * check if the database has any empty entries
+     * @return true if the database has any empty entries; otherwise false
+     */
+    public boolean hasEmptyEntries() {
+        return this.getEntries().stream().anyMatch(entry->entry.getFields().isEmpty());
+    }
+
     public static Path getFulltextIndexBasePath() {
         return Path.of(AppDirsFactory.getInstance().getUserDataDir(SEARCH_INDEX_BASE_PATH, SearchFieldConstants.VERSION, "org.jabref"));
     }
@@ -221,7 +229,7 @@ public class BibDatabaseContext {
         Path appData = getFulltextIndexBasePath();
 
         if (getDatabasePath().isPresent()) {
-            LOGGER.info("Index path for {} is {}", getDatabasePath().get(), appData.toString());
+            LOGGER.info("Index path for {} is {}", getDatabasePath().get(), appData);
             return appData.resolve(String.valueOf(this.getDatabasePath().get().hashCode()));
         }
 
