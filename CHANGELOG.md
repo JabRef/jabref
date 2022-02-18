@@ -28,7 +28,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 
 ### Removed
 
-- We removed the option to copy CSL Citation styles data as `XSL_FO`, `ASCIIDOC`, and `RTF` as these have not been working since a long time and are no longe rsupported in the external library used for processing the styles [#7378](https://github.com/JabRef/jabref/issues/7378)
+- We removed the option to copy CSL Citation styles data as `XSL_FO`, `ASCIIDOC`, and `RTF` as these have not been working since a long time and are no longer supported in the external library used for processing the styles [#7378](https://github.com/JabRef/jabref/issues/7378)
 
 
 
