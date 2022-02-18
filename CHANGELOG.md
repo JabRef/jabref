@@ -18,12 +18,16 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - The CSL preview styles now also support displaying data from cross references entries that are linked via the `crossref` field [#7378](https://github.com/JabRef/jabref/issues/7378)
 - We made the Search button in Web Search wider. We also skewed the panel titles to the left [#8397](https://github.com/JabRef/jabref/issues/8397)
 - We introduced a preference to disable fulltext indexing [#8468](https://github.com/JabRef/jabref/issues/8468)
+- When exporting entries, the encoding is always UTF-8
+- When embedding BibTeX data into a PDF, the encoding is always UTF-8
+- JabRef automatically detects the encoding of a `.bib` file and does not need the `% Encoding:` header anymore. [#8417](https://github.com/JabRef/jabref/issues/8417)
 
 ### Fixed
 
 - We fixed an issue where an exception could occur when saving the preferences [#7614](https://github.com/JabRef/jabref/issues/7614)
 - We fixed an issue where "Copy DOI url" in the right-click menu of the Entry List would just copy the DOI and not the DOI url. [#8389](https://github.com/JabRef/jabref/issues/8389)
 - We fixed an issue where opening the console from the drop-down menu would cause an exception. [#8466](https://github.com/JabRef/jabref/issues/8466)
+- We fixed an issue when reading non-UTF-8 encoded. [#8417](https://github.com/JabRef/jabref/issues/8417)
 - We fixed an issue where modifying a library would trigger reindexing of all PDFs [#8420](https://github.com/JabRef/jabref/issues/8420)
 
 ### Removed
@@ -52,9 +56,6 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We moved the search box in preview preferences closer to the available citation styles list. [#8370](https://github.com/JabRef/jabref/pull/8370)
 - Changing the preference to show the preview panel as a separate tab now has effect without restarting JabRef. [#8370](https://github.com/JabRef/jabref/pull/8370)
 - We enabled switching themes in JabRef without the need to restart JabRef. [#7335](https://github.com/JabRef/jabref/pull/7335)
-- When exporting entries, the encoding is always UTF-8
-- When embedding BibTeX data into a PDF, the encoding is always UTF-8
-- JabRef automatically detects the encoding of a `.bib` file and does not need the `% Encoding:` header anymore. [#8417](https://github.com/JabRef/jabref/issues/8417)
 
 ### Fixed
 
@@ -68,7 +69,6 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixed an issue where someone could add a duplicate field in the customize entry type dialog. [#8194](https://github.com/JabRef/jabref/issues/8194)
 - We fixed a typo in the library properties tab: "String constants". There, one can configure [BibTeX string constants](https://docs.jabref.org/advanced/strings).
 - We fixed an issue when writing a non-UTF-8 encoded file: The header is written again. [#8417](https://github.com/JabRef/jabref/issues/8417)
-- We fixed an issue when reading non-UTF-8 encoded. [#8417](https://github.com/JabRef/jabref/issues/8417)
 
 ## [5.4] - 2021-12-20
 
