@@ -22,6 +22,7 @@ public class FilePreferences {
     private final StringProperty fileNamePattern = new SimpleStringProperty();
     private final StringProperty fileDirectoryPattern = new SimpleStringProperty();
     private final BooleanProperty downloadLinkedFiles = new SimpleBooleanProperty();
+    private final BooleanProperty fulltextIndexLinkedFiles = new SimpleBooleanProperty();
     private final ObjectProperty<Path> workingDirectory = new SimpleObjectProperty<>();
 
     public FilePreferences(String user,
@@ -30,6 +31,7 @@ public class FilePreferences {
                            String fileNamePattern,
                            String fileDirectoryPattern,
                            boolean downloadLinkedFiles,
+                           boolean fulltextIndexLinkedFiles,
                            Path workingDirectory) {
         this.user.setValue(user);
         this.mainFileDirectory.setValue(mainFileDirectory);
@@ -37,6 +39,7 @@ public class FilePreferences {
         this.fileNamePattern.setValue(fileNamePattern);
         this.fileDirectoryPattern.setValue(fileDirectoryPattern);
         this.downloadLinkedFiles.setValue(downloadLinkedFiles);
+        this.fulltextIndexLinkedFiles.setValue(fulltextIndexLinkedFiles);
         this.workingDirectory.setValue(workingDirectory);
     }
 
@@ -106,6 +109,18 @@ public class FilePreferences {
 
     public void setDownloadLinkedFiles(boolean shouldDownloadLinkedFiles) {
         this.downloadLinkedFiles.set(shouldDownloadLinkedFiles);
+    }
+
+    public boolean shouldFulltextIndexLinkedFiles() {
+        return fulltextIndexLinkedFiles.get();
+    }
+
+    public BooleanProperty fulltextIndexLinkedFilesProperty() {
+        return fulltextIndexLinkedFiles;
+    }
+
+    public void setFulltextIndexLinkedFiles(boolean shouldFulltextIndexLinkedFiles) {
+        this.fulltextIndexLinkedFiles.set(shouldFulltextIndexLinkedFiles);
     }
 
     public Path getWorkingDirectory() {

@@ -26,6 +26,7 @@ import javafx.scene.input.TransferMode;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.DragAndDropDataFormats;
+import org.jabref.gui.Globals;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.gui.util.BackgroundTask;
@@ -121,7 +122,7 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
 
         BackgroundTask.wrap(CitationStyle::discoverCitationStyles)
                       .onSuccess(styles -> styles.stream()
-                                                 .map(CitationStylePreviewLayout::new)
+                                                 .map(style-> new CitationStylePreviewLayout(style, Globals.entryTypesManager))
                                                  .filter(style -> chosenListProperty.getValue().filtered(item ->
                                                          item.getName().equals(style.getName())).isEmpty())
                                                  .sorted(Comparator.comparing(PreviewLayout::getName))

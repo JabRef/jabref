@@ -85,7 +85,7 @@ public class CopyCitationAction extends SimpleCommand {
         }
 
         if (styleSource != null) {
-            return CitationStyleGenerator.generateCitations(selectedEntries, styleSource, outputFormat);
+            return CitationStyleGenerator.generateCitations(selectedEntries, styleSource, outputFormat, stateManager.getActiveDatabase().get(), Globals.entryTypesManager);
         } else {
             return generateTextBasedPreviewLayoutCitations();
         }
@@ -127,46 +127,6 @@ public class CopyCitationAction extends SimpleCommand {
     }
 
     /**
-     * Converts the citations into the RTF format.
-     */
-    protected static ClipboardContent processRtf(List<String> citations) {
-        String result = "{\\rtf" + OS.NEWLINE +
-                String.join(CitationStyleOutputFormat.RTF.getLineSeparator(), citations) +
-                "}";
-        ClipboardContent content = new ClipboardContent();
-        content.putString(result);
-        content.putRtf(result);
-        return content;
-    }
-
-    /**
-     * Inserts each citation into a XLSFO body and copies it to the clipboard
-     */
-    protected static ClipboardContent processXslFo(List<String> citations) {
-        String result = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" + OS.NEWLINE +
-                "<fo:root xmlns:fo=\"http://www.w3.org/1999/XSL/Format\">" + OS.NEWLINE +
-                "   <fo:layout-master-set>" + OS.NEWLINE +
-                "      <fo:simple-page-master master-name=\"citations\">" + OS.NEWLINE +
-                "         <fo:region-body/>" + OS.NEWLINE +
-                "      </fo:simple-page-master>" + OS.NEWLINE +
-                "   </fo:layout-master-set>" + OS.NEWLINE +
-                "   <fo:page-sequence master-reference=\"citations\">" + OS.NEWLINE +
-                "      <fo:flow flow-name=\"xsl-region-body\">" + OS.NEWLINE + OS.NEWLINE;
-
-        result += String.join(CitationStyleOutputFormat.XSL_FO.getLineSeparator(), citations);
-
-        result += OS.NEWLINE +
-                "      </fo:flow>" + OS.NEWLINE +
-                "   </fo:page-sequence>" + OS.NEWLINE +
-                "</fo:root>" + OS.NEWLINE;
-
-        ClipboardContent content = new ClipboardContent();
-        content.putString(result);
-        content.put(ClipBoardManager.XML, result);
-        return content;
-    }
-
-    /**
      * Inserts each citation into a HTML body and copies it to the clipboard
      */
     protected static ClipboardContent processHtml(List<String> citations) {
@@ -197,9 +157,7 @@ public class CopyCitationAction extends SimpleCommand {
             ClipboardContent content;
             switch (outputFormat) {
                 case HTML -> content = processHtml(citations);
-                case RTF -> content = processRtf(citations);
-                case XSL_FO -> content = processXslFo(citations);
-                case ASCII_DOC, TEXT -> content = processText(citations);
+                case TEXT -> content = processText(citations);
                 default -> {
                     LOGGER.warn("unknown output format: '" + outputFormat + "', processing it via the default.");
                     content = processText(citations);

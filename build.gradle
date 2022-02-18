@@ -8,13 +8,13 @@ import org.jabref.build.xjc.XjcTask
 plugins {
     id 'application'
 
-    id 'com.github.andygoossens.modernizer' version '1.6.1'
+    id 'com.github.andygoossens.modernizer' version '1.6.2'
 
     id 'me.champeau.gradle.jmh' version '0.5.3'
 
     id 'org.javamodularity.moduleplugin' version '1.8.10'
 
-    id 'org.openjfx.javafxplugin' version '0.0.10'
+    id 'org.openjfx.javafxplugin' version '0.0.11'
 
     id 'org.beryx.jlink' version '2.24.4'
 
@@ -42,8 +42,8 @@ group = "org.jabref"
 version = project.findProperty('projVersion') ?: '100.0.0'
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_16
-    targetCompatibility = JavaVersion.VERSION_16
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
 
     // Workaround needed for Eclipse, probably because of https://github.com/gradle/gradle/issues/16922
     // Should be removed as soon as Gradle 7.0.1 is released ( https://github.com/gradle/gradle/issues/16922#issuecomment-828217060 )
@@ -104,7 +104,7 @@ configurations {
 }
 
 javafx {
-    version = "17.0.1"
+    version = "17.0.2"
     modules = [ 'javafx.controls', 'javafx.fxml', 'javafx.web', 'javafx.swing' ]
 }
 
@@ -117,9 +117,9 @@ dependencies {
     implementation 'org.apache.pdfbox:xmpbox:2.0.25'
 
     implementation group: 'org.apache.commons', name: 'commons-csv', version: '1.9.0'
-    implementation 'com.h2database:h2-mvstore:2.0.206'
+    implementation 'com.h2database:h2-mvstore:2.1.210'
 
-    implementation group: 'org.apache.tika', name: 'tika-core', version: '2.2.1'
+    implementation group: 'org.apache.tika', name: 'tika-core', version: '2.3.0'
     implementation 'com.ibm.icu:icu4j-charset:70.1'
 
     // required for reading write-protected PDFs - see https://github.com/JabRef/jabref/pull/942#issuecomment-209252635
@@ -127,8 +127,8 @@ dependencies {
 
     implementation 'commons-cli:commons-cli:1.5.0'
 
-    implementation 'org.libreoffice:libreoffice:7.2.3'
-    implementation 'org.libreoffice:unoloader:7.2.5'
+    implementation 'org.libreoffice:libreoffice:7.3.0'
+    implementation 'org.libreoffice:unoloader:7.3.0'
 
     implementation 'io.github.java-diff-utils:java-diff-utils:4.11'
     implementation 'info.debatty:java-string-similarity:2.0.0'
@@ -144,9 +144,9 @@ dependencies {
     implementation group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-yaml', version: '2.13.1'
     implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.13.1'
 
-    implementation group: 'org.mariadb.jdbc', name: 'mariadb-java-client', version: '2.7.4'
+    implementation group: 'org.mariadb.jdbc', name: 'mariadb-java-client', version: '2.7.5'
 
-    implementation 'org.postgresql:postgresql:42.3.1'
+    implementation 'org.postgresql:postgresql:42.3.2'
 
     implementation ('com.oracle.ojdbc:ojdbc10:19.3.0.0') {
         // causing module issues
@@ -166,7 +166,7 @@ dependencies {
     implementation 'de.saxsys:mvvmfx-validation:1.9.0-SNAPSHOT'
     implementation 'de.saxsys:mvvmfx:1.8.0'
     implementation 'com.tobiasdiez:easybind:2.2'
-    implementation 'org.fxmisc.flowless:flowless:0.6.7'
+    implementation 'org.fxmisc.flowless:flowless:0.6.8'
     implementation 'org.fxmisc.richtext:richtextfx:0.10.7'
     implementation group: 'org.glassfish.hk2.external', name: 'jakarta.inject', version: '2.6.1'
     implementation 'com.jfoenix:jfoenix:9.0.10'
@@ -175,7 +175,7 @@ dependencies {
     implementation 'org.jsoup:jsoup:1.14.3'
     implementation 'com.konghq:unirest-java:3.13.6'
 
-    implementation 'org.slf4j:slf4j-api:2.0.0-alpha5'
+    implementation 'org.slf4j:slf4j-api:2.0.0-alpha6'
     implementation "org.tinylog:tinylog-api:2.4.1"
     implementation "org.tinylog:slf4j-tinylog:2.4.1"
     implementation "org.tinylog:tinylog-impl:2.4.1"
@@ -196,27 +196,27 @@ dependencies {
     }
 
     implementation 'com.vladsch.flexmark:flexmark:0.62.2'
-    implementation 'com.vladsch.flexmark:flexmark-ext-gfm-strikethrough:0.62.2'
+    implementation 'com.vladsch.flexmark:flexmark-ext-gfm-strikethrough:0.64.0'
     implementation 'com.vladsch.flexmark:flexmark-ext-gfm-tasklist:0.62.2'
 
     implementation group: 'net.harawata', name: 'appdirs', version: '1.2.1'
 
-    testImplementation 'io.github.classgraph:classgraph:4.8.138'
+    testImplementation 'io.github.classgraph:classgraph:4.8.139'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.8.2'
     testImplementation 'org.junit.platform:junit-platform-launcher:1.8.2'
 
     testRuntimeOnly group: 'org.apache.logging.log4j', name: 'log4j-core', version: '3.0.0-SNAPSHOT'
     testRuntimeOnly group: 'org.apache.logging.log4j', name: 'log4j-jul', version: '3.0.0-SNAPSHOT'
-    testImplementation 'org.mockito:mockito-core:4.2.0'
+    testImplementation 'org.mockito:mockito-core:4.3.0'
     testImplementation 'org.xmlunit:xmlunit-core:2.8.4'
-    testImplementation 'org.xmlunit:xmlunit-matchers:2.8.3'
+    testImplementation 'org.xmlunit:xmlunit-matchers:2.9.0'
     testRuntimeOnly 'com.tngtech.archunit:archunit-junit5-engine:0.22.0'
     testImplementation 'com.tngtech.archunit:archunit-junit5-api:0.22.0'
     testImplementation "org.testfx:testfx-core:4.0.17-alpha-SNAPSHOT"
     testImplementation "org.testfx:testfx-junit5:4.0.17-alpha-SNAPSHOT"
     testImplementation "org.hamcrest:hamcrest-library:2.2"
 
-    checkstyle 'com.puppycrawl.tools:checkstyle:9.2.1'
+    checkstyle 'com.puppycrawl.tools:checkstyle:9.3'
     xjc group: 'org.glassfish.jaxb', name: 'jaxb-xjc', version: '2.3.3'
 }
 
@@ -343,7 +343,7 @@ compileJava {
     options.compilerArgs << "-Xlint:none"
     dependsOn "generateSource"
 
-    options.annotationProcessorGeneratedSourcesDirectory = file("src-gen/main/java")
+    options.generatedSourceOutputDirectory.set(file("src-gen/main/java"))
 
     moduleOptions {
         // TODO: Remove access to internal api
@@ -471,10 +471,10 @@ task copyTestResources(type: Copy) {
 processTestResources.dependsOn copyTestResources
 
 tasks.withType(Test) {
-    reports.html.destination = file("${reporting.baseDir}/${name}")
+    reports.html.outputLocation.set(file("${reporting.baseDir}/${name}"))
 }
 
-task jacocoMergePrep() {
+task jacocoPrepare() {
     doFirst {
         // Ignore failures of tests
         tasks.withType(Test) {
@@ -482,26 +482,21 @@ task jacocoMergePrep() {
         }
     }
 }
-test.mustRunAfter jacocoMergePrep
-databaseTest.mustRunAfter jacocoMergePrep
-fetcherTest.mustRunAfter jacocoMergePrep
+test.mustRunAfter jacocoPrepare
+databaseTest.mustRunAfter jacocoPrepare
+fetcherTest.mustRunAfter jacocoPrepare
 
-task jacocoMerge(type: JacocoMerge) {
+jacocoTestReport {
     executionData files(
             "$buildDir/jacoco/test.exec",
             "$buildDir/jacoco/databaseTest.exec",
             "$buildDir/jacoco/fetcherTest.exec").filter { it.exists() }
-    dependsOn jacocoMergePrep, test, databaseTest, fetcherTest
-}
-
-jacocoTestReport {
-    executionData jacocoMerge.destinationFile
-    dependsOn jacocoMerge
+    dependsOn jacocoPrepare, test, databaseTest, fetcherTest
 
     reports {
-        csv.enabled = true
-        html.enabled = true
-        xml.enabled = true // coveralls plugin depends on xml format report
+        csv.getRequired().set(true)
+        html.getRequired().set(true)
+        xml.getRequired().set(true) // coveralls plugin depends on xml format report
     }
 }
 
