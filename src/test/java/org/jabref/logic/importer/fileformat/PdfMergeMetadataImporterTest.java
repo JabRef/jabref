@@ -1,6 +1,5 @@
 package org.jabref.logic.importer.fileformat;
 
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;

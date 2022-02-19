@@ -1,6 +1,5 @@
 package org.jabref.logic.importer;
 
-import java.nio.charset.Charset;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Optional;
