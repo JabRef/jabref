@@ -2,8 +2,6 @@ import org.gradle.internal.os.OperatingSystem
 import org.jabref.build.JournalAbbreviationConverter
 import org.jabref.build.xjc.XjcPlugin
 import org.jabref.build.xjc.XjcTask
-// to update the gradle wrapper, execute
-// ./gradlew wrapper --gradle-version=6.0 --distribution-type=bin
 
 plugins {
     id 'application'
