@@ -23,7 +23,14 @@ class UiThreadList<T> extends TransformationList<T, T> {
         } else {
             CountDownLatch latch = new CountDownLatch(1);
             Platform.runLater(() -> {
-                fireChange(change);
+                try {
+                    fireChange(change);
+
+                }
+                finally
+                {
+                    latch.countDown();
+                }
             });
 
             try {

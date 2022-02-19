@@ -5,6 +5,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.WeakInvalidationListener;
 import javafx.beans.binding.Bindings;
@@ -57,7 +58,7 @@ public class GroupNodeViewModel {
     private final BooleanBinding allSelectedEntriesMatched;
     private final TaskExecutor taskExecutor;
     private final CustomLocalDragboard localDragBoard;
-    private final ObservableList<BibEntry> entriesList;
+    private ObservableList<BibEntry> entriesList;
     private final PreferencesService preferencesService;
     private final InvalidationListener onInvalidatedGroup = (listener) -> refreshGroup();
 
@@ -91,8 +92,11 @@ public class GroupNodeViewModel {
 
         // Register listener
         // The wrapper created by the FXCollections will set a weak listener on the wrapped list. This weak listener gets garbage collected. Hence, we need to maintain a reference to this list.
-        entriesList = databaseContext.getDatabase().getEntries();
-        entriesList.addListener(this::onDatabaseChanged);
+        Platform.runLater(()-> {
+           entriesList = databaseContext.getDatabase().getEntries();
+           entriesList.addListener(this::onDatabaseChanged);
+        });
+
 
         EasyObservableList<Boolean> selectedEntriesMatchStatus = EasyBind.map(stateManager.getSelectedEntries(), groupNode::matches);
         anySelectedEntriesMatched = selectedEntriesMatchStatus.anyMatch(matched -> matched);

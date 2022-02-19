@@ -191,7 +191,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
      * {@link BibEntry}.
      */
     @Override
-    public void synchronizeLocalDatabase() {
+    public synchronized void synchronizeLocalDatabase() {
         if (!checkCurrentConnection()) {
             return;
         }
@@ -206,8 +206,8 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
         for (Map.Entry<Integer, Integer> idVersionEntry : idVersionMap.entrySet()) {
             boolean remoteEntryMatchingOneLocalEntryFound = false;
             for (BibEntry localEntry : localEntries) {
-                if (idVersionEntry.getKey().equals(localEntry.getSharedBibEntryData().getSharedID())) {
-                    remoteEntryMatchingOneLocalEntryFound = true;
+                remoteEntryMatchingOneLocalEntryFound = true;
+
                     if (idVersionEntry.getValue() > localEntry.getSharedBibEntryData().getVersion()) {
                         Optional<BibEntry> sharedEntry = dbmsProcessor.getSharedEntry(idVersionEntry.getKey());
                         if (sharedEntry.isPresent()) {
@@ -215,6 +215,11 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
                             localEntry.setType(sharedEntry.get().getType(), EntriesEventSource.SHARED);
                             localEntry.getSharedBibEntryData()
                                       .setVersion(sharedEntry.get().getSharedBibEntryData().getVersion());
+
+
+                            taskExecutor.runInFXThread(()-> {
+
+
                             sharedEntry.get().getFieldMap().forEach(
                                     // copy remote values to local entry
                                     (field, value) -> localEntry.setField(field, value, EntriesEventSource.SHARED)
@@ -226,18 +231,21 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
                                       .forEach(
                                               field -> localEntry.clearField(field, EntriesEventSource.SHARED)
                                       );
+                            });
                         }
                     }
                 }
-            }
+
             if (!remoteEntryMatchingOneLocalEntryFound) {
                 entriesToInsertIntoLocalDatabase.add(idVersionEntry.getKey());
             }
         }
 
         if (!entriesToInsertIntoLocalDatabase.isEmpty()) {
+
+            taskExecutor.runInFXThread( () -> bibDatabase.insertEntries(dbmsProcessor.getSharedEntries(entriesToInsertIntoLocalDatabase), EntriesEventSource.SHARED));
             // in case entries should be added into the local database, insert them
-            bibDatabase.insertEntries(dbmsProcessor.getSharedEntries(entriesToInsertIntoLocalDatabase), EntriesEventSource.SHARED);
+         //   bibDatabase.insertEntries(dbmsProcessor.getSharedEntries(entriesToInsertIntoLocalDatabase), EntriesEventSource.SHARED);
         }
     }
 
