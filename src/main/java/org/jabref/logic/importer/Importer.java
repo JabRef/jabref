@@ -18,11 +18,15 @@ import org.jabref.model.database.BibDatabaseModeDetection;
 
 import com.ibm.icu.text.CharsetDetector;
 import com.ibm.icu.text.CharsetMatch;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Role of an importer for JabRef.
  */
 public abstract class Importer implements Comparable<Importer> {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(Importer.class);
 
     /**
      * Check whether the source is in the correct format for this importer.
@@ -104,7 +108,7 @@ public abstract class Importer implements Comparable<Importer> {
         }
     }
 
-    private static Charset getCharset(BufferedInputStream bufferedInputStream) {
+    protected static Charset getCharset(BufferedInputStream bufferedInputStream) {
         Charset charset = StandardCharsets.UTF_8;
 
         // This reads the first 8000 bytes only, thus the default size of 8192 of the bufferedInputStream is OK.
@@ -117,7 +121,7 @@ public abstract class Importer implements Comparable<Importer> {
                 charset = Charset.forName(charsetMatch.getName());
             }
         } catch (IOException e) {
-            // we use the default charset
+            LOGGER.error("Could not determine charset. Using default one.", e);
         }
         return charset;
     }
