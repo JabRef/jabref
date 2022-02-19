@@ -22,6 +22,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Answers;
 
@@ -149,13 +150,23 @@ public class BibtexImporterTest {
         assertEquals(Optional.of(charset), parserResult.getMetaData().getEncoding());
     }
 
-    @Test
-    public void testParsingOfWindows1252EncodedFileReadsDegreeCharacterCorrectly() throws Exception {
+    @ParameterizedTest
+    @CsvSource({"encoding-windows-1252-with-header.bib", "encoding-windows-1252-without-header.bib"})
+    public void testParsingOfWindows1252EncodedFileReadsDegreeCharacterCorrectly(String filename) throws Exception {
         ParserResult parserResult = importer.importDatabase(
-                Path.of(BibtexImporterTest.class.getResource("encoding-windows-1252-with-header.bib").toURI()));
-        List<BibEntry> bibEntries = parserResult.getDatabase().getEntries();
+                Path.of(BibtexImporterTest.class.getResource(filename).toURI()));
         assertEquals(
                 List.of(new BibEntry(StandardEntryType.Article).withField(StandardField.ABSTRACT, "25° C")),
-                bibEntries);
+                parserResult.getDatabase().getEntries());
+    }
+
+    @ParameterizedTest
+    @CsvSource({"encoding-utf-8-with-header.bib", "encoding-utf-8-without-header.bib"})
+    public void testParsingOfUtf8EncodedFileReadsUmlatCharacterCorrectly(String filename) throws Exception {
+        ParserResult parserResult = importer.importDatabase(
+                Path.of(BibtexImporterTest.class.getResource(filename).toURI()));
+        assertEquals(
+                List.of(new BibEntry(StandardEntryType.Article).withField(StandardField.TITLE, "Ü ist ein Umlaut")),
+                parserResult.getDatabase().getEntries());
     }
 }
