@@ -61,7 +61,7 @@ class XmpUtilReaderTest {
         String bibString = Resources.toString(XmpUtilShared.class.getResource("article_dublinCore.bib"), StandardCharsets.UTF_8);
         Optional<BibEntry> entryFromBibFile = parser.parseSingleEntry(bibString);
 
-        assertEquals(entryFromBibFile.get(), entry.get());
+        assertEquals(entryFromBibFile, entry);
     }
 
     /**
@@ -71,16 +71,16 @@ class XmpUtilReaderTest {
     void testReadArticleDublinCoreReadXmp() throws IOException, URISyntaxException, ParseException {
         Path pathPdf = Path.of(XmpUtilShared.class.getResource("article_dublinCore.pdf").toURI());
         List<BibEntry> entries = XmpUtilReader.readXmp(pathPdf, xmpPreferences);
-        BibEntry entry = entries.get(0);
+        Optional<BibEntry> entry = Optional.ofNullable(entries.get(0));
 
         String bibString = Resources.toString(XmpUtilShared.class.getResource("article_dublinCore.bib"), StandardCharsets.UTF_8);
         Optional<BibEntry> entryFromBibFile = parser.parseSingleEntry(bibString);
-        entryFromBibFile.get().setFiles(Arrays.asList(
+        entryFromBibFile.ifPresent(entryFromFile -> entryFromFile.setFiles(Arrays.asList(
                 new LinkedFile("", Path.of("paper.pdf"), "PDF"),
                 new LinkedFile("", pathPdf.toAbsolutePath(), "PDF"))
-        );
+        ));
 
-        assertEquals(entryFromBibFile.get(), entry);
+        assertEquals(entryFromBibFile, entry);
     }
 
     /**
@@ -102,11 +102,11 @@ class XmpUtilReaderTest {
 
         String bibString = Resources.toString(XmpUtilShared.class.getResource("PD_metadata.bib"), StandardCharsets.UTF_8);
         Optional<BibEntry> entryFromBibFile = parser.parseSingleEntry(bibString);
-        entryFromBibFile.get().setFiles(Collections.singletonList(
+        entryFromBibFile.ifPresent(entry -> entry.setFiles(Collections.singletonList(
                 new LinkedFile("", pathPdf.toAbsolutePath(), "PDF"))
-        );
+        ));
 
-        assertEquals(entryFromBibFile.get(), entries.get(0));
+        assertEquals(entryFromBibFile, Optional.of(entries.get(0)));
     }
 
     /**
