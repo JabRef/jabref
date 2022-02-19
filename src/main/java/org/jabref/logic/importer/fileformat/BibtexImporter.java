@@ -63,13 +63,17 @@ public class BibtexImporter extends Importer {
             bufferedInputStream.mark(8192);
             detectedCharset = getCharset(bufferedInputStream);
             bufferedInputStream.reset();
+            LOGGER.debug("Detected charset: {}", detectedCharset.name());
         }
 
         Charset encoding;
         try (BufferedReader reader = Files.newBufferedReader(filePath, detectedCharset)) {
             Optional<Charset> suppliedEncoding = getSuppliedEncoding(reader);
+            LOGGER.debug("Supplied encoding: {}", suppliedEncoding);
+
             // in case no encoding information is present, use the detected one
             encoding = suppliedEncoding.orElse(detectedCharset);
+            LOGGER.debug("Encoding used to read the file: {}", encoding);
         }
 
         try (BufferedReader reader = Files.newBufferedReader(filePath, encoding)) {
