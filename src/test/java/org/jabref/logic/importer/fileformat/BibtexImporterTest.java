@@ -3,9 +3,11 @@ package org.jabref.logic.importer.fileformat;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParserResult;
@@ -18,6 +20,9 @@ import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -128,11 +133,20 @@ public class BibtexImporterTest {
         assertEquals("13ceoc8dm42f5g1iitao3dj2ap", sharedDatabaseID);
     }
 
-    @Test
-    public void testParsingOfWindows1252EncodedFileReturnsCorrectHeader() throws Exception {
+    static Stream<Arguments> testParsingOfEncodedFileWithHeader() {
+        return Stream.of(
+                Arguments.of(StandardCharsets.US_ASCII, "encoding-us-ascii-with-header.bib"),
+                Arguments.of(StandardCharsets.UTF_8, "encoding-utf-8-with-header.bib"),
+                Arguments.of(Charset.forName("Windows-1252"), "encoding-windows-1252-with-header.bib")
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource
+    public void testParsingOfEncodedFileWithHeader(Charset charset, String fileName) throws Exception {
         ParserResult parserResult = importer.importDatabase(
-                Path.of(BibtexImporterTest.class.getResource("encoding-windows-1252-with-header.bib").toURI()));
-        assertEquals(Optional.of(Charset.forName("Windows-1252")), parserResult.getMetaData().getEncoding());
+                Path.of(BibtexImporterTest.class.getResource(fileName).toURI()));
+        assertEquals(Optional.of(charset), parserResult.getMetaData().getEncoding());
     }
 
     @Test

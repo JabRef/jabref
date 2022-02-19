@@ -109,15 +109,7 @@ public class BibtexParser implements Parser {
     public List<BibEntry> parseEntries(InputStream inputStream) throws ParseException {
         Reader reader;
         try {
-             reader = Importer.getReader(inputStream);
-        } catch (IOException e) {
-            throw new ParseException(e);
-        }
-        return parseEntries(reader);
-    }
-
-    public List<BibEntry> parseEntries(Reader reader) throws ParseException {
-        try {
+            reader = Importer.getReader(inputStream);
             return parse(reader).getDatabase().getEntries();
         } catch (IOException e) {
             throw new ParseException(e);
@@ -134,6 +126,8 @@ public class BibtexParser implements Parser {
      * The reader will be consumed.
      * <p>
      * Multiple calls to parse() return the same results
+     * <p>
+     * Handling of encoding is done at {@link BibtexImporter}
      */
     public ParserResult parse(Reader in) throws IOException {
         Objects.requireNonNull(in);
@@ -218,7 +212,7 @@ public class BibtexParser implements Parser {
                 database.setPreamble(parsePreamble());
                 // Consume a new line which separates the preamble from the next part (if the file was written with JabRef)
                 skipOneNewline();
-                // the preamble is saved verbatim anyways, so the text read so far can be dropped
+                // the preamble is saved verbatim anyway, so the text read so far can be dropped
                 dumpTextReadSoFarToString();
             } else if ("string".equals(entryType)) {
                 parseBibtexString();
@@ -232,7 +226,7 @@ public class BibtexParser implements Parser {
             skipWhitespace();
         }
 
-        // Instantiate meta data:
+        // Instantiate meta data
         try {
             parserResult.setMetaData(metaDataParser.parse(meta, importFormatPreferences.getKeywordSeparator()));
         } catch (ParseException exception) {
@@ -372,8 +366,13 @@ public class BibtexParser implements Parser {
         }
     }
 
+    /**
+     * Purges the given stringToPurge (if it exists) from the given context
+     *
+     * @return a stripped version of the context
+     */
     private String purge(String context, String stringToPurge) {
-        // purge the encoding line if it exists
+        // purge the given string line if it exists
         int runningIndex = context.indexOf(stringToPurge);
         int indexOfAt = context.indexOf("@");
         while (runningIndex < indexOfAt) {
