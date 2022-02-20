@@ -1,8 +1,6 @@
 package org.jabref.logic.pdf.search.indexing;
 
-import java.nio.file.Path;
 import java.util.List;
-import java.util.Optional;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -13,7 +11,6 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
-import org.jabref.model.entry.event.EntryChangedEvent;
 
 /**
  * Wrapper around {@link PdfIndexer} to execute all operations in the background.
@@ -22,16 +19,14 @@ public class IndexingTaskManager extends BackgroundTask<Void> {
 
     private final Queue<Runnable> taskQueue = new ConcurrentLinkedQueue<>();
     private TaskExecutor taskExecutor;
-    private final BibDatabaseContext bibDatabaseContext;
     private int numOfIndexedFiles = 0;
 
     private final Object lock = new Object();
     private boolean isRunning = false;
     private boolean isBlockingNewTasks = false;
 
-    public IndexingTaskManager(TaskExecutor taskExecutor, BibDatabaseContext bibDatabaseContext) {
+    public IndexingTaskManager(TaskExecutor taskExecutor) {
         this.taskExecutor = taskExecutor;
-        this.bibDatabaseContext = bibDatabaseContext;
         showToUser(true);
         DefaultTaskExecutor.runInJavaFXThread(() -> {
             this.updateProgress(1, 1);
@@ -120,29 +115,7 @@ public class IndexingTaskManager extends BackgroundTask<Void> {
         enqueueTask(() -> removeFromIndex(indexer, entry, entry.getFiles()));
     }
 
-    public void updateDatabaseName() {
-        Optional<Path> file = bibDatabaseContext.getDatabasePath();
-
-        String name = "";
-
-        try {
-            name = bibDatabaseContext.getDatabasePath().toString();
-        } finally {
-            if (file.isPresent()) {
-                Path databasePath = file.get();
-                name = databasePath.getFileName().toString();
-            }
-
-            String fileName = name;
-            DefaultTaskExecutor.runInJavaFXThread(() -> this.titleProperty().set(Localization.lang("Indexing for %0", fileName)));
-        }
-    }
-
     public void updateDatabaseName(String name) {
         DefaultTaskExecutor.runInJavaFXThread(() -> this.titleProperty().set(Localization.lang("Indexing for %0", name)));
-    }
-
-    public void listen(EntryChangedEvent event) {
-        updateDatabaseName();
     }
 }

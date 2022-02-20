@@ -108,7 +108,7 @@ public class LibraryTab extends Tab {
     // initializing it so we prevent NullPointerException
     private BackgroundTask<ParserResult> dataLoadingTask = BackgroundTask.wrap(() -> null);
 
-    private final IndexingTaskManager indexingTaskManager = new IndexingTaskManager(Globals.TASK_EXECUTOR, bibDatabaseContext);
+    private final IndexingTaskManager indexingTaskManager = new IndexingTaskManager(Globals.TASK_EXECUTOR);
 
     public LibraryTab(JabRefFrame frame,
                       PreferencesService preferencesService,
@@ -337,6 +337,10 @@ public class LibraryTab extends Tab {
             textProperty().setValue(tabTitle.toString());
             setTooltip(new Tooltip(toolTipText.toString()));
         });
+
+        if (preferencesService.getFilePreferences().shouldFulltextIndexLinkedFiles()) {
+            indexingTaskManager.updateDatabaseName(tabTitle.toString());
+        }
     }
 
     private List<String> collectAllDatabasePaths() {
