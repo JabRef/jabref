@@ -144,11 +144,22 @@ class FileFieldParserTest {
                          "https://books.google.de/"
                 ),
 
+                // url with www
+                Arguments.of(
+                             Collections.singletonList(new LinkedFile(new URL("https://www.google.de/"), "")),
+                             "https://www.google.de/"
+                ),
+
                 // url as file
                 Arguments.of(
                              Collections.singletonList(new LinkedFile("", new URL("http://ceur-ws.org/Vol-438"), "URL")),
                              ":http\\://ceur-ws.org/Vol-438:URL"
-                )
+                ),
+                // url as file with desc
+                Arguments.of(
+                             Collections.singletonList(new LinkedFile("desc", new URL("http://ceur-ws.org/Vol-438"), "URL")),
+                             "desc:http\\://ceur-ws.org/Vol-438:URL"
+               )
         );
     }
 
