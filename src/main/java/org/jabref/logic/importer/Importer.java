@@ -90,7 +90,7 @@ public abstract class Importer implements Comparable<Importer> {
         try (InputStream inputStream = Files.newInputStream(filePath, StandardOpenOption.READ)) {
             BufferedInputStream bufferedInputStream = new BufferedInputStream(inputStream);
 
-            Charset charset = getCharset(bufferedInputStream);
+            Charset charset = Charset.defaultCharset();
 
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(bufferedInputStream, charset));
             ParserResult parserResult = importDatabase(bufferedReader);
