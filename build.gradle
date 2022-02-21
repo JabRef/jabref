@@ -183,7 +183,7 @@ dependencies {
 
     implementation 'de.undercouch:citeproc-java:3.0.0-alpha.3'
 
-    implementation group: 'jakarta.activation', name: 'jakarta.activation-api', version: '1.2.1'
+    implementation group: 'jakarta.activation', name: 'jakarta.activation-api', version: '2.1.0'
     implementation group: 'jakarta.xml.bind', name: 'jakarta.xml.bind-api', version: '2.3.2'
     implementation group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '2.3.2'
 
