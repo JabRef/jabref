@@ -138,6 +138,12 @@ class FileFieldParserTest {
                         "desc:file.pdf:PDF:asdf"
                 ),
 
+                // www inside filename
+                Arguments.of(
+                        Collections.singletonList(new LinkedFile("desc", Path.of("/home/www.google.de.pdf"), "PDF")),
+                        ":/home/www.google.de.pdf"
+                ),
+
                 // url
                 Arguments.of(
                          Collections.singletonList(new LinkedFile(new URL("https://books.google.de/"), "")),
