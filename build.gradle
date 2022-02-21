@@ -114,9 +114,9 @@ dependencies {
     // Include all jar-files in the 'lib' folder as dependencies
     implementation fileTree(dir: 'lib', includes: ['*.jar'])
 
-    implementation 'org.apache.pdfbox:pdfbox:2.0.25'
-    implementation 'org.apache.pdfbox:fontbox:2.0.25'
-    implementation 'org.apache.pdfbox:xmpbox:2.0.25'
+    implementation 'org.apache.pdfbox:pdfbox:3.0.0-RC1'
+    implementation 'org.apache.pdfbox:fontbox:3.0.0-RC1'
+    implementation 'org.apache.pdfbox:xmpbox:3.0.0-RC1'
 
     implementation group: 'org.apache.commons', name: 'commons-csv', version: '1.9.0'
     implementation 'com.h2database:h2-mvstore:2.1.210'

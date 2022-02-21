@@ -26,6 +26,8 @@ import org.jabref.model.strings.StringUtil;
 
 import org.apache.xmpbox.DateConverter;
 import org.apache.xmpbox.schema.DublinCoreSchema;
+import org.apache.xmpbox.type.BadFieldValueException;
+import org.tinylog.Logger;
 
 public class DublinCoreExtractor {
 
@@ -99,7 +101,12 @@ public class DublinCoreExtractor {
      * Abstract in BibTex - Description in DublinCore
      */
     private void extractAbstract() {
-        String description = dcSchema.getDescription();
+        String description = null;
+        try {
+            description = dcSchema.getDescription();
+        } catch (BadFieldValueException e) {
+            Logger.warn("Could not get abstract, e");
+        }
         if (!StringUtil.isNullOrEmpty(description)) {
             bibEntry.setField(StandardField.ABSTRACT, description);
         }
@@ -165,7 +172,12 @@ public class DublinCoreExtractor {
      * Rights are equivalent in both formats (BibTex and DublinCore)
      */
     private void extractRights() {
-        String rights = dcSchema.getRights();
+        String rights = null;
+        try {
+            rights = dcSchema.getRights();
+        } catch (BadFieldValueException e) {
+           Logger.warn("Could not extract rights", e);
+        }
         if (!StringUtil.isNullOrEmpty(rights)) {
             bibEntry.setField(new UnknownField("rights"), rights);
         }
@@ -195,7 +207,12 @@ public class DublinCoreExtractor {
      * Title is equivalent in both formats (BibTex and DublinCore)
      */
     private void extractTitle() {
-        String title = dcSchema.getTitle();
+        String title = null;
+        try {
+            title = dcSchema.getTitle();
+        } catch (BadFieldValueException e) {
+            Logger.warn("Could not extract title", e);
+        }
         if (!StringUtil.isNullOrEmpty(title)) {
             bibEntry.setField(StandardField.TITLE, title);
         }
