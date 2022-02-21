@@ -106,7 +106,6 @@ class XmpUtilReaderTest {
         List<BibEntry> expected = testImporter.importDatabase(bibFile, StandardCharsets.UTF_8).getDatabase().getEntries();
 
         expected.forEach(bibEntry -> bibEntry.setFiles(Arrays.asList(
-                new LinkedFile("", Path.of("paper.pdf"), "PDF"),
                 new LinkedFile("", pathPdf.toAbsolutePath(), "PDF"))
         ));
 

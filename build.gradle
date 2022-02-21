@@ -183,7 +183,7 @@ dependencies {
 
     implementation 'de.undercouch:citeproc-java:3.0.0-alpha.3'
 
-    implementation group: 'jakarta.activation', name: 'jakarta.activation-api', version: '2.1.0'
+    //implementation group: 'jakarta.activation', name: 'jakarta.activation-api', version: '2.1.0'
     implementation group: 'jakarta.xml.bind', name: 'jakarta.xml.bind-api', version: '3.0.1'
     implementation group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '3.0.2'
 
@@ -557,8 +557,6 @@ jlink {
         requires 'jdk.security.jgss'
         requires 'jdk.xml.dom'
         requires 'com.google.gson'
-        requires 'com.sun.xml.fastinfoset'
-        requires 'com.sun.xml.txw2'
         requires 'org.slf4j'
         uses 'org.controlsfx.glyphfont.GlyphFont'
         uses 'com.airhacks.afterburner.views.ResourceLocator'
@@ -569,7 +567,6 @@ jlink {
         uses 'org.mariadb.jdbc.LocalInfileInterceptor'
         uses 'org.eclipse.jgit.transport.SshSessionFactory'
         uses 'org.eclipse.jgit.lib.GpgSigner'
-        uses 'javax.xml.bind.JAXBContextFactory'
         provides 'org.apache.lucene.codecs.DocValuesFormat' with 'org.apache.lucene.codecs.lucene80.Lucene80DocValuesFormat'
         provides 'org.controlsfx.glyphfont.GlyphFont' with 'org.controlsfx.glyphfont.FontAwesome'
         provides 'org.mariadb.jdbc.tls.TlsSocketPlugin' with 'org.mariadb.jdbc.internal.protocol.tls.DefaultTlsSocketPlugin'
