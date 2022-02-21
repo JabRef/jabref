@@ -140,7 +140,7 @@ class FileFieldParserTest {
 
                 // www inside filename
                 Arguments.of(
-                        Collections.singletonList(new LinkedFile("desc", Path.of("/home/www.google.de.pdf"), "PDF")),
+                        Collections.singletonList(new LinkedFile("", Path.of("/home/www.google.de.pdf"), "")),
                         ":/home/www.google.de.pdf"
                 ),
 
