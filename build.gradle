@@ -209,7 +209,7 @@ dependencies {
     testRuntimeOnly group: 'org.apache.logging.log4j', name: 'log4j-core', version: '3.0.0-SNAPSHOT'
     testRuntimeOnly group: 'org.apache.logging.log4j', name: 'log4j-jul', version: '3.0.0-SNAPSHOT'
     testImplementation 'org.mockito:mockito-core:4.3.1'
-    testImplementation 'org.xmlunit:xmlunit-core:2.8.4'
+    testImplementation 'org.xmlunit:xmlunit-core:2.9.0'
     testImplementation 'org.xmlunit:xmlunit-matchers:2.9.0'
     testRuntimeOnly 'com.tngtech.archunit:archunit-junit5-engine:0.22.0'
     testImplementation 'com.tngtech.archunit:archunit-junit5-api:0.22.0'
