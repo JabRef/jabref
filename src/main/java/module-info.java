@@ -50,7 +50,7 @@ open module org.jabref {
 
     // Preferences and XML
     requires java.prefs;
-    requires java.xml.bind;
+    requires jakarta.xml.bind;
     requires jdk.xml.dom;
 
     // Annotations (@PostConstruct)

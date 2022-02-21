@@ -184,8 +184,8 @@ dependencies {
     implementation 'de.undercouch:citeproc-java:3.0.0-alpha.3'
 
     implementation group: 'jakarta.activation', name: 'jakarta.activation-api', version: '2.1.0'
-    implementation group: 'jakarta.xml.bind', name: 'jakarta.xml.bind-api', version: '2.3.2'
-    implementation group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '2.3.2'
+    implementation group: 'jakarta.xml.bind', name: 'jakarta.xml.bind-api', version: '3.0.1'
+    implementation group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '3.0.2'
 
     implementation ('com.github.tomtung:latex2unicode_2.12:0.2.6') {
         exclude module: 'fastparse_2.12'
@@ -218,7 +218,9 @@ dependencies {
     testImplementation "org.hamcrest:hamcrest-library:2.2"
 
     checkstyle 'com.puppycrawl.tools:checkstyle:9.3'
-    xjc group: 'org.glassfish.jaxb', name: 'jaxb-xjc', version: '2.3.3'
+    // xjc needs the runtime as well for the ant task, otherwise it fails
+    xjc group: 'org.glassfish.jaxb', name: 'jaxb-xjc', version: '3.0.2'
+    xjc group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '3.0.2'
 }
 
 clean {
