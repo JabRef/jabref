@@ -70,7 +70,7 @@ public class MSBibExportFormatTestFiles {
                                              .getDatabase()
                                              .getEntries();
 
-        exporter.export(databaseContext, expectedFile, entries);
+        exporter.export(databaseContext, exportedFile, entries);
 
         String expected = String.join("\n", Files.readAllLines(expectedFile));
         String actual = String.join("\n", Files.readAllLines(exportedFile));
