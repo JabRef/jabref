@@ -11,6 +11,7 @@ import java.util.Optional;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 
+import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDDocumentCatalog;
 import org.apache.pdfbox.pdmodel.PDDocumentInformation;
@@ -141,7 +142,7 @@ public class XmpUtilReader {
             try {
                 metaList.add(XmpUtilShared.parseXmpMetadata(new ByteArrayInputStream(xmpMetaString.getBytes())));
             } catch (IOException ex) {
-                LOGGER.error("Problem parsing XMP schema. Continuing with other schemas.", ex);
+                LOGGER.warn("Problem parsing XMP schema. Continuing with other schemas.", ex);
             }
         }
         return metaList;
@@ -156,7 +157,7 @@ public class XmpUtilReader {
     public static PDDocument loadWithAutomaticDecryption(Path path) throws IOException {
         // try to load the document
         // also uses an empty string as default password
-        PDDocument doc = PDDocument.load(path.toFile());
+        PDDocument doc = Loader.loadPDF(path.toFile());
         return doc;
     }
 }

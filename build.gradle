@@ -114,9 +114,9 @@ dependencies {
     // Include all jar-files in the 'lib' folder as dependencies
     implementation fileTree(dir: 'lib', includes: ['*.jar'])
 
-    implementation 'org.apache.pdfbox:pdfbox:2.0.25'
-    implementation 'org.apache.pdfbox:fontbox:2.0.25'
-    implementation 'org.apache.pdfbox:xmpbox:2.0.25'
+    implementation 'org.apache.pdfbox:pdfbox:3.0.0-RC1'
+    implementation 'org.apache.pdfbox:fontbox:3.0.0-RC1'
+    implementation 'org.apache.pdfbox:xmpbox:3.0.0-RC1'
 
     implementation group: 'org.apache.commons', name: 'commons-csv', version: '1.9.0'
     implementation 'com.h2database:h2-mvstore:2.1.210'
@@ -183,9 +183,9 @@ dependencies {
 
     implementation 'de.undercouch:citeproc-java:3.0.0-alpha.3'
 
-    implementation group: 'jakarta.activation', name: 'jakarta.activation-api', version: '1.2.1'
-    implementation group: 'jakarta.xml.bind', name: 'jakarta.xml.bind-api', version: '2.3.2'
-    implementation group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '2.3.2'
+    // jakarta.activation is already depdency of glassfish
+    implementation group: 'jakarta.xml.bind', name: 'jakarta.xml.bind-api', version: '3.0.1'
+    implementation group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '3.0.2'
 
     implementation ('com.github.tomtung:latex2unicode_2.12:0.2.6') {
         exclude module: 'fastparse_2.12'
@@ -218,7 +218,9 @@ dependencies {
     testImplementation "org.hamcrest:hamcrest-library:2.2"
 
     checkstyle 'com.puppycrawl.tools:checkstyle:9.3'
-    xjc group: 'org.glassfish.jaxb', name: 'jaxb-xjc', version: '2.3.3'
+    // xjc needs the runtime as well for the ant task, otherwise it fails
+    xjc group: 'org.glassfish.jaxb', name: 'jaxb-xjc', version: '3.0.2'
+    xjc group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '3.0.2'
 }
 
 clean {
@@ -555,8 +557,6 @@ jlink {
         requires 'jdk.security.jgss'
         requires 'jdk.xml.dom'
         requires 'com.google.gson'
-        requires 'com.sun.xml.fastinfoset'
-        requires 'com.sun.xml.txw2'
         requires 'org.slf4j'
         uses 'org.controlsfx.glyphfont.GlyphFont'
         uses 'com.airhacks.afterburner.views.ResourceLocator'
@@ -567,7 +567,6 @@ jlink {
         uses 'org.mariadb.jdbc.LocalInfileInterceptor'
         uses 'org.eclipse.jgit.transport.SshSessionFactory'
         uses 'org.eclipse.jgit.lib.GpgSigner'
-        uses 'javax.xml.bind.JAXBContextFactory'
         provides 'org.apache.lucene.codecs.DocValuesFormat' with 'org.apache.lucene.codecs.lucene80.Lucene80DocValuesFormat'
         provides 'org.controlsfx.glyphfont.GlyphFont' with 'org.controlsfx.glyphfont.FontAwesome'
         provides 'org.mariadb.jdbc.tls.TlsSocketPlugin' with 'org.mariadb.jdbc.internal.protocol.tls.DefaultTlsSocketPlugin'
