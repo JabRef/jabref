@@ -462,7 +462,6 @@ public class OpenOfficePanel {
 
         String pageInfo = null;
         if (addPageInfo) {
-            Boolean inParenthesis;
             boolean withText = citationType.withText();
 
             Optional<AdvancedCiteDialogViewModel> citeDialogViewModel = dialogService.showCustomDialogAndWait(new AdvancedCiteDialogView());
@@ -472,8 +471,7 @@ public class OpenOfficePanel {
                 if (!model.pageInfoProperty().getValue().isEmpty()) {
                     pageInfo = model.pageInfoProperty().getValue();
                 }
-                inParenthesis = model.citeInParProperty().getValue();
-                citationType = citationTypeFromOptions(withText, inParenthesis);
+                citationType = citationTypeFromOptions(withText, model.citeInParProperty().getValue());
             } else {
                 // user canceled
                 return;
@@ -589,7 +587,13 @@ public class OpenOfficePanel {
             preferencesService.setOpenOfficePreferences(openOfficePreferences);
         });
 
-        contextMenu.getItems().addAll(autoSync, new SeparatorMenuItem(), useActiveBase, useAllBases, new SeparatorMenuItem(), clearConnectionSettings);
+        contextMenu.getItems().addAll(
+                autoSync,
+                new SeparatorMenuItem(),
+                useActiveBase,
+                useAllBases,
+                new SeparatorMenuItem(),
+                clearConnectionSettings);
 
         return contextMenu;
     }
