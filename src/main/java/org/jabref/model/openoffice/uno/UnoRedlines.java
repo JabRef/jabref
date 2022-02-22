@@ -12,13 +12,13 @@ import com.sun.star.lang.WrappedTargetException;
 import com.sun.star.text.XTextDocument;
 
 /**
- *  Change tracking and Redlines
+ * Change tracking and Redlines
  */
 public class UnoRedlines {
 
     public static boolean getRecordChanges(XTextDocument doc)
-        throws
-        WrappedTargetException {
+            throws
+            WrappedTargetException {
 
         // https://wiki.openoffice.org/wiki/Documentation/DevGuide/Text/Settings
         // "Properties of com.sun.star.text.TextDocument"

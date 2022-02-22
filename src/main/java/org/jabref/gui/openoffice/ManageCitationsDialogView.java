@@ -25,7 +25,7 @@ public class ManageCitationsDialogView extends BaseDialog<Void> {
     private static final String HTML_BOLD_END_TAG = "</b>";
     private static final String HTML_BOLD_START_TAG = "<b>";
 
-    private final OOBibBase2 ooBase;
+    private final OOBibBase ooBase;
 
     @FXML private TableView<CitationEntryViewModel> citationsTableView;
     @FXML private TableColumn<CitationEntryViewModel, String> citation;
@@ -35,7 +35,7 @@ public class ManageCitationsDialogView extends BaseDialog<Void> {
 
     private ManageCitationsDialogViewModel viewModel;
 
-    public ManageCitationsDialogView(OOBibBase2 ooBase) {
+    public ManageCitationsDialogView(OOBibBase ooBase) {
         this.ooBase = ooBase;
 
         ViewLoader.view(this)
@@ -67,9 +67,8 @@ public class ManageCitationsDialogView extends BaseDialog<Void> {
 
         citationsTableView.itemsProperty().bindBidirectional(viewModel.citationsProperty());
 
-        extraInfo.setOnEditCommit((CellEditEvent<CitationEntryViewModel, String> cell) -> {
-            cell.getRowValue().setExtraInfo(cell.getNewValue());
-        });
+        extraInfo.setOnEditCommit((CellEditEvent<CitationEntryViewModel, String> cell) ->
+                cell.getRowValue().setExtraInfo(cell.getNewValue()));
         extraInfo.setCellFactory(TextFieldTableCell.forTableColumn());
     }
 
@@ -84,8 +83,7 @@ public class ManageCitationsDialogView extends BaseDialog<Void> {
         inBetweenText.setStyle("-fx-font-weight: bold");
         Text endText = new Text(end);
 
-        FlowPane flow = new FlowPane(startText, inBetweenText, endText);
-        return flow;
+        return new FlowPane(startText, inBetweenText, endText);
     }
 
     public boolean isOkToShowThisDialog() {

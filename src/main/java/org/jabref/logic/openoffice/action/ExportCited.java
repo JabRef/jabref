@@ -19,7 +19,6 @@ import com.sun.star.text.XTextDocument;
 public class ExportCited {
 
     private ExportCited() {
-        /**/
     }
 
     public static class GenerateDatabaseResult {
@@ -36,20 +35,16 @@ public class ExportCited {
     }
 
     /**
-     *
      * @param databases The databases to look up the citation keys in the document from.
      * @return A new database, with cloned entries.
-     *
      * If a key is not found, it is added to result.unresolvedKeys
-     *
-     * Cross references (in StandardField.CROSSREF) are followed (not recursively):
-     * If the referenced entry is found, it is included in the result.
-     * If it is not found, it is silently ignored.
+     * <p>
+     * Cross references (in StandardField.CROSSREF) are followed (not recursively): If the referenced entry is found, it is included in the result. If it is not found, it is silently ignored.
      */
     public static GenerateDatabaseResult generateDatabase(XTextDocument doc, List<BibDatabase> databases)
-        throws
-        NoDocumentException,
-        WrappedTargetException {
+            throws
+            NoDocumentException,
+            WrappedTargetException {
 
         OOFrontend frontend = new OOFrontend(doc);
         CitedKeys citationKeys = frontend.citationGroups.getCitedKeysUnordered();
@@ -77,14 +72,14 @@ public class ExportCited {
 
                 // Check if the cloned entry has a cross-reference field
                 clonedEntry
-                    .getField(StandardField.CROSSREF)
-                    .ifPresent(crossReference -> {
+                        .getField(StandardField.CROSSREF)
+                        .ifPresent(crossReference -> {
                             boolean isNew = !seen.contains(crossReference);
                             if (isNew) {
                                 // Add it if it is in the current library
                                 loopDatabase
-                                    .getEntryByCitationKey(crossReference)
-                                    .ifPresent(entriesToInsert::add);
+                                        .getEntryByCitationKey(crossReference)
+                                        .ifPresent(entriesToInsert::add);
                                 seen.add(crossReference);
                             }
                         });
@@ -94,5 +89,4 @@ public class ExportCited {
         resultDatabase.insertEntries(entriesToInsert);
         return new GenerateDatabaseResult(unresolvedKeys, resultDatabase);
     }
-
 }

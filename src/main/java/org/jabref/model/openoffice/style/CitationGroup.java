@@ -98,7 +98,7 @@ public class CitationGroup {
         }
 
         this.localOrder = OOListUtil.order(citationsInStorageOrder,
-                                           new CompareCitation(entryComparator, true));
+                new CompareCitation(entryComparator, true));
 
         if (dataModel == OODataModel.JabRef52) {
             getCitationsInLocalOrder().get(last).setPageInfo(lastPageInfo);
@@ -114,7 +114,7 @@ public class CitationGroup {
      */
 
     public List<Citation> getCitationsInLocalOrder() {
-        return OOListUtil.map(localOrder, i -> citationsInStorageOrder.get(i));
+        return OOListUtil.map(localOrder, citationsInStorageOrder::get);
     }
 
     /*
@@ -152,5 +152,4 @@ public class CitationGroup {
     public Optional<OOText> getCitationMarker() {
         return this.citationMarker;
     }
-
 }

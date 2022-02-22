@@ -37,7 +37,7 @@ class OOBibBaseConnect {
 
     /**
      * Created when connected to a document.
-     *
+     * <p>
      * Cleared (to null) when we discover we lost the connection.
      */
     private XTextDocument xTextDocument;
@@ -46,18 +46,18 @@ class OOBibBaseConnect {
      * Constructor
      */
     public OOBibBaseConnect(Path loPath, DialogService dialogService)
-        throws
-        BootstrapException,
-        CreationException {
+            throws
+            BootstrapException,
+            CreationException {
 
         this.dialogService = dialogService;
         this.xDesktop = simpleBootstrap(loPath);
     }
 
     private XDesktop simpleBootstrap(Path loPath)
-        throws
-        CreationException,
-        BootstrapException {
+            throws
+            CreationException,
+            BootstrapException {
 
         // Get the office component context:
         XComponentContext context = org.jabref.gui.openoffice.Bootstrap.bootstrap(loPath);
@@ -75,9 +75,9 @@ class OOBibBaseConnect {
     }
 
     private static List<XTextDocument> getTextDocuments(XDesktop desktop)
-        throws
-        NoSuchElementException,
-        WrappedTargetException {
+            throws
+            NoSuchElementException,
+            WrappedTargetException {
 
         List<XTextDocument> result = new ArrayList<>();
 
@@ -88,19 +88,15 @@ class OOBibBaseConnect {
             Object next = compEnum.nextElement();
             XComponent comp = UnoCast.cast(XComponent.class, next).get();
             Optional<XTextDocument> doc = UnoCast.cast(XTextDocument.class, comp);
-            if (doc.isPresent()) {
-                result.add(doc.get());
-            }
+            doc.ifPresent(result::add);
         }
         return result;
     }
 
     /**
-     *  Run a dialog allowing the user to choose among the documents in `list`.
+     * Run a dialog allowing the user to choose among the documents in `list`.
      *
-     * @return Null if no document was selected. Otherwise the
-     *         document selected.
-     *
+     * @return Null if no document was selected. Otherwise the document selected.
      */
     private static XTextDocument selectDocumentDialog(List<XTextDocument> list,
                                                       DialogService dialogService) {
@@ -126,18 +122,18 @@ class OOBibBaseConnect {
         }
 
         List<DocumentTitleViewModel> viewModel = (list.stream()
-                                                  .map(DocumentTitleViewModel::new)
-                                                  .collect(Collectors.toList()));
+                                                      .map(DocumentTitleViewModel::new)
+                                                      .collect(Collectors.toList()));
 
         // This whole method is part of a background task when
         // auto-detecting instances, so we need to show dialog in FX
         // thread
         Optional<DocumentTitleViewModel> selectedDocument =
-            (dialogService
-             .showChoiceDialogAndWait(Localization.lang("Select document"),
-                                      Localization.lang("Found documents:"),
-                                      Localization.lang("Use selected document"),
-                                      viewModel));
+                (dialogService
+                        .showChoiceDialogAndWait(Localization.lang("Select document"),
+                                Localization.lang("Found documents:"),
+                                Localization.lang("Use selected document"),
+                                viewModel));
 
         return (selectedDocument
                 .map(DocumentTitleViewModel::getXtextDocument)
@@ -146,26 +142,20 @@ class OOBibBaseConnect {
 
     /**
      * Choose a document to work with.
-     *
+     * <p>
      * Assumes we have already connected to LibreOffice or OpenOffice.
-     *
-     * If there is a single document to choose from, selects that.
-     * If there are more than one, shows selection dialog.
-     * If there are none, throws NoDocumentFoundException
-     *
-     * After successful selection connects to the selected document
-     * and extracts some frequently used parts (starting points for
-     * managing its content).
-     *
-     * Finally initializes this.xTextDocument with the selected
-     * document and parts extracted.
-     *
+     * <p>
+     * If there is a single document to choose from, selects that. If there are more than one, shows selection dialog. If there are none, throws NoDocumentFoundException
+     * <p>
+     * After successful selection connects to the selected document and extracts some frequently used parts (starting points for managing its content).
+     * <p>
+     * Finally initializes this.xTextDocument with the selected document and parts extracted.
      */
     public void selectDocument(boolean autoSelectForSingle)
-        throws
-        NoDocumentFoundException,
-        NoSuchElementException,
-        WrappedTargetException {
+            throws
+            NoDocumentFoundException,
+            NoSuchElementException,
+            WrappedTargetException {
 
         XTextDocument selected;
         List<XTextDocument> textDocumentList = getTextDocuments(this.xDesktop);
@@ -175,7 +165,7 @@ class OOBibBaseConnect {
             selected = textDocumentList.get(0); // Get the only one
         } else { // Bring up a dialog
             selected = OOBibBaseConnect.selectDocumentDialog(textDocumentList,
-                                                             this.dialogService);
+                    this.dialogService);
         }
 
         if (selected == null) {
@@ -187,7 +177,6 @@ class OOBibBaseConnect {
 
     /**
      * Mark the current document as missing.
-     *
      */
     private void forgetDocument() {
         this.xTextDocument = null;
@@ -195,10 +184,8 @@ class OOBibBaseConnect {
 
     /**
      * A simple test for document availability.
-     *
-     * See also `isDocumentConnectionMissing` for a test
-     * actually attempting to use teh connection.
-     *
+     * <p>
+     * See also `isDocumentConnectionMissing` for a test actually attempting to use teh connection.
      */
     public boolean isConnectedToDocument() {
         return this.xTextDocument != null;
@@ -222,12 +209,11 @@ class OOBibBaseConnect {
     }
 
     /**
-     * Either return a valid XTextDocument or throw
-     * NoDocumentException.
+     * Either return a valid XTextDocument or throw NoDocumentException.
      */
     public XTextDocument getXTextDocumentOrThrow()
-        throws
-        NoDocumentException {
+            throws
+            NoDocumentException {
         if (isDocumentConnectionMissing()) {
             throw new NoDocumentException("Not connected to document");
         }
@@ -242,7 +228,7 @@ class OOBibBaseConnect {
     }
 
     /**
-     *  The title of the current document, or Optional.empty()
+     * The title of the current document, or Optional.empty()
      */
     public Optional<String> getCurrentDocumentTitle() {
         if (isDocumentConnectionMissing()) {
@@ -251,5 +237,4 @@ class OOBibBaseConnect {
             return UnoTextDocument.getFrameTitle(this.xTextDocument);
         }
     }
-
 } // end of OOBibBaseConnect

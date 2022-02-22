@@ -26,13 +26,12 @@ public class UpdateBibliography {
     private static final String BIB_SECTION_END_NAME = "JR_bib_end";
 
     private UpdateBibliography() {
-        /**/
     }
 
     public static Optional<XTextRange> getBibliographyRange(XTextDocument doc)
-        throws
-        NoDocumentException,
-        WrappedTargetException {
+            throws
+            NoDocumentException,
+            WrappedTargetException {
         return UnoTextSection.getAnchor(doc, BIB_SECTION_NAME);
     }
 
@@ -44,28 +43,28 @@ public class UpdateBibliography {
                                              CitedKeys bibliography,
                                              OOBibStyle style,
                                              boolean alwaysAddCitedOnPages)
-        throws
-        WrappedTargetException,
-        CreationException,
-        NoDocumentException {
+            throws
+            WrappedTargetException,
+            CreationException,
+            NoDocumentException {
 
         clearBibTextSectionContent2(doc);
 
         populateBibTextSection(doc,
-                               frontend,
-                               bibliography,
-                               style,
-                               alwaysAddCitedOnPages);
+                frontend,
+                bibliography,
+                style,
+                alwaysAddCitedOnPages);
     }
 
     /**
      * Insert a paragraph break and create a text section for the bibliography.
-     *
+     * <p>
      * Only called from `clearBibTextSectionContent2`
      */
     private static void createBibTextSection2(XTextDocument doc)
-        throws
-        CreationException {
+            throws
+            CreationException {
 
         // Always creating at the end of the document.
         // Alternatively, we could receive a cursor.
@@ -75,23 +74,20 @@ public class UpdateBibliography {
     }
 
     /**
-     *  Find and clear the text section BIB_SECTION_NAME to "",
-     *  or create it.
-     *
+     * Find and clear the text section BIB_SECTION_NAME to "", or create it.
+     * <p>
      * Only called from: `rebuildBibTextSection`
-     *
      */
     private static void clearBibTextSectionContent2(XTextDocument doc)
-        throws
-        CreationException,
-        NoDocumentException,
-        WrappedTargetException {
+            throws
+            CreationException,
+            NoDocumentException,
+            WrappedTargetException {
 
         // Optional<XTextRange> sectionRange = UnoTextSection.getAnchor(doc, BIB_SECTION_NAME);
         Optional<XTextRange> sectionRange = getBibliographyRange(doc);
         if (sectionRange.isEmpty()) {
             createBibTextSection2(doc);
-            return;
         } else {
             // Clear it
             XTextCursor cursor = doc.getText().createTextCursorByRange(sectionRange.get());
@@ -101,7 +97,7 @@ public class UpdateBibliography {
 
     /**
      * Only called from: `rebuildBibTextSection`
-     *
+     * <p>
      * Assumes the section named BIB_SECTION_NAME exists.
      */
     private static void populateBibTextSection(XTextDocument doc,
@@ -109,11 +105,11 @@ public class UpdateBibliography {
                                                CitedKeys bibliography,
                                                OOBibStyle style,
                                                boolean alwaysAddCitedOnPages)
-        throws
-        CreationException,
-        IllegalArgumentException,
-        NoDocumentException,
-        WrappedTargetException {
+            throws
+            CreationException,
+            IllegalArgumentException,
+            NoDocumentException,
+            WrappedTargetException {
 
         XTextRange sectionRange = getBibliographyRange(doc).orElseThrow(IllegalStateException::new);
 
@@ -122,9 +118,9 @@ public class UpdateBibliography {
         // emit the title of the bibliography
         OOTextIntoOO.removeDirectFormatting(cursor);
         OOText bibliographyText = OOFormatBibliography.formatBibliography(frontend.citationGroups,
-                                                                          bibliography,
-                                                                          style,
-                                                                          alwaysAddCitedOnPages);
+                bibliography,
+                style,
+                alwaysAddCitedOnPages);
         OOTextIntoOO.write(doc, cursor, bibliographyText);
         cursor.collapseToEnd();
 
@@ -140,5 +136,4 @@ public class UpdateBibliography {
 
         cursor.collapseToEnd();
     }
-
 }

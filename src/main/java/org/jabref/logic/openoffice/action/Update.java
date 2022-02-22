@@ -34,11 +34,11 @@ public class Update {
                                                FunctionalTextViewCursor fcursor,
                                                boolean doUpdateBibliography,
                                                boolean alwaysAddCitedOnPages)
-        throws
-        CreationException,
-        NoDocumentException,
-        WrappedTargetException,
-        com.sun.star.lang.IllegalArgumentException {
+            throws
+            CreationException,
+            NoDocumentException,
+            WrappedTargetException,
+            com.sun.star.lang.IllegalArgumentException {
 
         final boolean useLockControllers = true;
 
@@ -54,10 +54,10 @@ public class Update {
 
             if (doUpdateBibliography) {
                 UpdateBibliography.rebuildBibTextSection(doc,
-                                                         frontend,
-                                                         frontend.citationGroups.getBibliography().get(),
-                                                         style,
-                                                         alwaysAddCitedOnPages);
+                        frontend,
+                        frontend.citationGroups.getBibliography().get(),
+                        style,
+                        alwaysAddCitedOnPages);
             }
 
             return frontend.citationGroups.getUnresolvedKeys();
@@ -96,19 +96,19 @@ public class Update {
                                                    OOBibStyle style,
                                                    FunctionalTextViewCursor fcursor,
                                                    SyncOptions syncOptions)
-        throws
-        CreationException,
-        NoDocumentException,
-        WrappedTargetException,
-        com.sun.star.lang.IllegalArgumentException {
+            throws
+            CreationException,
+            NoDocumentException,
+            WrappedTargetException,
+            com.sun.star.lang.IllegalArgumentException {
 
         return Update.updateDocument(doc,
-                                     frontend,
-                                     syncOptions.databases,
-                                     style,
-                                     fcursor,
-                                     syncOptions.updateBibliography,
-                                     syncOptions.alwaysAddCitedOnPages);
+                frontend,
+                syncOptions.databases,
+                style,
+                fcursor,
+                syncOptions.updateBibliography,
+                syncOptions.alwaysAddCitedOnPages);
     }
 
     /*
@@ -118,15 +118,14 @@ public class Update {
                                               OOBibStyle style,
                                               FunctionalTextViewCursor fcursor,
                                               SyncOptions syncOptions)
-        throws
-        CreationException,
-        NoDocumentException,
-        WrappedTargetException,
-        com.sun.star.lang.IllegalArgumentException {
+            throws
+            CreationException,
+            NoDocumentException,
+            WrappedTargetException,
+            com.sun.star.lang.IllegalArgumentException {
 
         OOFrontend frontend = new OOFrontend(doc);
 
         return Update.synchronizeDocument(doc, frontend, style, fcursor, syncOptions);
     }
-
 }
