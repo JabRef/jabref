@@ -27,7 +27,7 @@ import org.jabref.model.strings.StringUtil;
 import org.apache.xmpbox.DateConverter;
 import org.apache.xmpbox.schema.DublinCoreSchema;
 import org.apache.xmpbox.type.BadFieldValueException;
-import org.tinylog.Logger;
+import org.slf4j.Logger;
 
 public class DublinCoreExtractor {
 
