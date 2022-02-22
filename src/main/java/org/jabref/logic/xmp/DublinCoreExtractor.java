@@ -28,8 +28,11 @@ import org.apache.xmpbox.DateConverter;
 import org.apache.xmpbox.schema.DublinCoreSchema;
 import org.apache.xmpbox.type.BadFieldValueException;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class DublinCoreExtractor {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(DublinCoreExtractor.class);
 
     private final DublinCoreSchema dcSchema;
     private final XmpPreferences xmpPreferences;
@@ -105,7 +108,7 @@ public class DublinCoreExtractor {
         try {
             description = dcSchema.getDescription();
         } catch (BadFieldValueException e) {
-            Logger.warn("Could not get abstract, e");
+            LOGGER.warn("Could not get abstract, e");
         }
         if (!StringUtil.isNullOrEmpty(description)) {
             bibEntry.setField(StandardField.ABSTRACT, description);
@@ -176,7 +179,7 @@ public class DublinCoreExtractor {
         try {
             rights = dcSchema.getRights();
         } catch (BadFieldValueException e) {
-           Logger.warn("Could not extract rights", e);
+           LOGGER.warn("Could not extract rights", e);
         }
         if (!StringUtil.isNullOrEmpty(rights)) {
             bibEntry.setField(new UnknownField("rights"), rights);
@@ -211,7 +214,7 @@ public class DublinCoreExtractor {
         try {
             title = dcSchema.getTitle();
         } catch (BadFieldValueException e) {
-            Logger.warn("Could not extract title", e);
+            LOGGER.warn("Could not extract title", e);
         }
         if (!StringUtil.isNullOrEmpty(title)) {
             bibEntry.setField(StandardField.TITLE, title);
