@@ -15,6 +15,7 @@
   * [Custom SVG icons](advanced-reading/custom-svg-icons.md)
   * [Recommendations for UI design](advanced-reading/ui-recommendations.md)
   * [Remote Storage](advanced-reading/remote-storage.md)
+  * [Telemetry](advanced-reading/telemetry.md)
   * [Working on fetchers](advanced-reading/fetchers.md)
 * [JabRef and Software Engineering Training](teaching.md)
 * [Readings on Coding](readings-on-coding/README.md)
