@@ -15,6 +15,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -52,6 +53,7 @@ public class PdfXmpImporterTest {
         assertEquals("Wraps the XMPUtility function to be used as an Importer.", importer.getDescription());
     }
 
+    @Disabled("XMP reader prints warnings to the logger when parsing does not work")
     @Test
     public void importEncryptedFileReturnsError() throws URISyntaxException {
         Path file = Path.of(PdfXmpImporterTest.class.getResource("/pdfs/encrypted.pdf").toURI());

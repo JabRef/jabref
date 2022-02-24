@@ -50,7 +50,7 @@ open module org.jabref {
 
     // Preferences and XML
     requires java.prefs;
-    requires java.xml.bind;
+    requires jakarta.xml.bind;
     requires jdk.xml.dom;
 
     // Annotations (@PostConstruct)
@@ -66,7 +66,6 @@ open module org.jabref {
     requires commons.logging;
     requires com.google.common;
     requires jakarta.inject;
-    requires org.apache.pdfbox;
     requires reactfx;
     requires commons.cli;
     requires com.github.tomtung.latex2unicode;
@@ -74,7 +73,6 @@ open module org.jabref {
     requires jbibtex;
     requires citeproc.java;
     requires antlr.runtime;
-    requires org.apache.xmpbox;
     requires de.saxsys.mvvmfx.validation;
     requires com.google.gson;
     requires unirest.java;
@@ -91,6 +89,8 @@ open module org.jabref {
     requires org.antlr.antlr4.runtime;
     requires org.fxmisc.flowless;
     requires org.apache.tika.core;
+    requires pdfbox;
+    requires xmpbox;
     requires com.ibm.icu;
 
     requires flexmark;

@@ -11,12 +11,12 @@ import java.util.Optional;
 
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParseException;
+import org.jabref.logic.importer.fileformat.BibtexImporter;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
-import com.google.common.io.Resources;
 import org.apache.xmpbox.XMPMetadata;
 import org.apache.xmpbox.schema.DublinCoreSchema;
 import org.junit.jupiter.api.BeforeEach;
@@ -31,6 +31,7 @@ class XmpUtilReaderTest {
 
     private XmpPreferences xmpPreferences;
     private BibtexParser parser;
+    private BibtexImporter testImporter;
 
     /**
      * Create a temporary PDF-file with a single empty page.
@@ -44,7 +45,8 @@ class XmpUtilReaderTest {
 
         when(xmpPreferences.getKeywordSeparator()).thenReturn(',');
 
-        parser = new BibtexParser(importFormatPreferences, new DummyFileUpdateMonitor());
+        testImporter = new BibtexImporter(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS), new DummyFileUpdateMonitor());
+
     }
 
     /**
@@ -58,29 +60,29 @@ class XmpUtilReaderTest {
         DublinCoreSchema dcSchema = meta.get(0).getDublinCoreSchema();
         DublinCoreExtractor dcExtractor = new DublinCoreExtractor(dcSchema, xmpPreferences, new BibEntry());
         Optional<BibEntry> entry = dcExtractor.extractBibtexEntry();
-        String bibString = Resources.toString(XmpUtilShared.class.getResource("article_dublinCore.bib"), StandardCharsets.UTF_8);
-        Optional<BibEntry> entryFromBibFile = parser.parseSingleEntry(bibString);
 
-        assertEquals(entryFromBibFile, entry);
+        Path bibFile = Path.of(XmpUtilShared.class.getResource("article_dublinCore.bib").toURI());
+        List<BibEntry> expected = testImporter.importDatabase(bibFile).getDatabase().getEntries();
+
+        assertEquals(expected, Collections.singletonList(entry.get()));
     }
 
     /**
      * Tests reading of dublinCore metadata.
      */
     @Test
-    void testReadArticleDublinCoreReadXmp() throws IOException, URISyntaxException, ParseException {
+    void testReadArticleDublinCoreReadXmp() throws IOException, URISyntaxException {
         Path pathPdf = Path.of(XmpUtilShared.class.getResource("article_dublinCore.pdf").toURI());
         List<BibEntry> entries = XmpUtilReader.readXmp(pathPdf, xmpPreferences);
-        Optional<BibEntry> entry = Optional.ofNullable(entries.get(0));
+        Path bibFile = Path.of(XmpUtilShared.class.getResource("article_dublinCore.bib").toURI());
+        List<BibEntry> expected = testImporter.importDatabase(bibFile).getDatabase().getEntries();
 
-        String bibString = Resources.toString(XmpUtilShared.class.getResource("article_dublinCore.bib"), StandardCharsets.UTF_8);
-        Optional<BibEntry> entryFromBibFile = parser.parseSingleEntry(bibString);
-        entryFromBibFile.ifPresent(entryFromFile -> entryFromFile.setFiles(Arrays.asList(
+        expected.forEach(bibEntry -> bibEntry.setFiles(Arrays.asList(
                 new LinkedFile("", Path.of("paper.pdf"), "PDF"),
                 new LinkedFile("", pathPdf.toAbsolutePath(), "PDF"))
         ));
 
-        assertEquals(entryFromBibFile, entry);
+        assertEquals(expected, entries);
     }
 
     /**
@@ -96,17 +98,18 @@ class XmpUtilReaderTest {
      * Test non XMP metadata. Metadata are included in the PDInformation
      */
     @Test
-    void testReadPDMetadata() throws IOException, URISyntaxException, ParseException {
+    void testReadPDMetadata() throws IOException, URISyntaxException {
         Path pathPdf = Path.of(XmpUtilShared.class.getResource("PD_metadata.pdf").toURI());
         List<BibEntry> entries = XmpUtilReader.readXmp(pathPdf, xmpPreferences);
 
-        String bibString = Resources.toString(XmpUtilShared.class.getResource("PD_metadata.bib"), StandardCharsets.UTF_8);
-        Optional<BibEntry> entryFromBibFile = parser.parseSingleEntry(bibString);
-        entryFromBibFile.ifPresent(entry -> entry.setFiles(Collections.singletonList(
+        Path bibFile = Path.of(XmpUtilShared.class.getResource("PD_metadata.bib").toURI());
+        List<BibEntry> expected = testImporter.importDatabase(bibFile).getDatabase().getEntries();
+
+        expected.forEach(bibEntry -> bibEntry.setFiles(Arrays.asList(
                 new LinkedFile("", pathPdf.toAbsolutePath(), "PDF"))
         ));
 
-        assertEquals(entryFromBibFile, Optional.of(entries.get(0)));
+        assertEquals(expected, entries);
     }
 
     /**
