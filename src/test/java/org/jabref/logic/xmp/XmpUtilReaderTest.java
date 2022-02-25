@@ -15,6 +15,7 @@ import org.jabref.logic.importer.fileformat.BibtexImporter;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
+import org.jabref.model.schema.DublinCoreSchemaCustom;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.apache.xmpbox.XMPMetadata;
@@ -57,7 +58,7 @@ class XmpUtilReaderTest {
         Path path = Path.of(XmpUtilShared.class.getResource("article_dublinCore.pdf").toURI());
         List<XMPMetadata> meta = XmpUtilReader.readRawXmp(path);
 
-        DublinCoreSchema dcSchema = meta.get(0).getDublinCoreSchema();
+        DublinCoreSchema dcSchema = DublinCoreSchemaCustom.copyDublinCoreSchema(meta.get(0).getDublinCoreSchema());
         DublinCoreExtractor dcExtractor = new DublinCoreExtractor(dcSchema, xmpPreferences, new BibEntry());
         Optional<BibEntry> entry = dcExtractor.extractBibtexEntry();
 

@@ -19,6 +19,7 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.schema.DublinCoreSchemaCustom;
 
 import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -160,7 +161,7 @@ public class XmpUtilWriter {
         meta.removeSchema(meta.getDublinCoreSchema());
 
         for (BibEntry entry : resolvedEntries) {
-            DublinCoreSchema dcSchema = meta.createAndAddDublinCoreSchema();
+            DublinCoreSchemaCustom dcSchema = DublinCoreSchemaCustom.copyDublinCoreSchema(meta.createAndAddDublinCoreSchema());
             XmpUtilWriter.writeToDCSchema(dcSchema, entry, null, xmpPreferences);
         }
 

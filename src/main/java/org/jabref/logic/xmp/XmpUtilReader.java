@@ -10,6 +10,7 @@ import java.util.Optional;
 
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
+import org.jabref.model.schema.DublinCoreSchemaCustom;
 
 import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -17,7 +18,6 @@ import org.apache.pdfbox.pdmodel.PDDocumentCatalog;
 import org.apache.pdfbox.pdmodel.PDDocumentInformation;
 import org.apache.pdfbox.pdmodel.common.PDMetadata;
 import org.apache.xmpbox.XMPMetadata;
-import org.apache.xmpbox.schema.DublinCoreSchema;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -77,8 +77,8 @@ public class XmpUtilReader {
             if (!xmpMetaList.isEmpty()) {
                 // Only support Dublin Core since JabRef 4.2
                 for (XMPMetadata xmpMeta : xmpMetaList) {
-                    DublinCoreSchema dcSchema = xmpMeta.getDublinCoreSchema();
 
+                    DublinCoreSchemaCustom dcSchema = DublinCoreSchemaCustom.copyDublinCoreSchema(xmpMeta.getDublinCoreSchema());
                     if (dcSchema != null) {
                         DublinCoreExtractor dcExtractor = new DublinCoreExtractor(dcSchema, xmpPreferences, new BibEntry());
                         Optional<BibEntry> entry = dcExtractor.extractBibtexEntry();
