@@ -534,9 +534,7 @@ public class ArgumentProcessor {
             // Show just a warning message if encoding did not work for all characters:
             if (fileWriter.hasEncodingProblems()) {
                 System.err.println(Localization.lang("Warning") + ": "
-                        + Localization.lang(
-                        "UTF-8 could not be used to encode the following characters:"
-                        + " " + fileWriter.getEncodingProblems()));
+                                   + Localization.lang("UTF-8 could not be used to encode the following characters: %0", fileWriter.getEncodingProblems()));
             }
         } catch (IOException ex) {
             System.err.println(Localization.lang("Could not save file.") + "\n" + ex.getLocalizedMessage());
