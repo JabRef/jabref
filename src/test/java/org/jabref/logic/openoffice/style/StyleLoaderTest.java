@@ -49,11 +49,6 @@ public class StyleLoaderTest {
     }
 
     @Test
-    public void throwNPEWithNullCharset() {
-        assertThrows(NullPointerException.class, () -> loader = new StyleLoader(mock(OpenOfficePreferences.class), layoutPreferences));
-    }
-
-    @Test
     public void testGetStylesWithEmptyExternal() {
         preferences.setExternalStyles(Collections.emptyList());
         loader = new StyleLoader(preferences, layoutPreferences);
