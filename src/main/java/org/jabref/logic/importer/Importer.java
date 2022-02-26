@@ -15,6 +15,7 @@ import java.util.Arrays;
 import java.util.Objects;
 
 import org.jabref.logic.util.FileType;
+import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseModeDetection;
 
 import com.ibm.icu.text.CharsetDetector;
@@ -158,6 +159,11 @@ public abstract class Importer implements Comparable<Importer> {
 
     public static BufferedReader getReader(Path filePath) throws IOException {
         InputStream stream = Files.newInputStream(filePath, StandardOpenOption.READ);
+
+        if (FileUtil.isPDFFile(filePath)) {
+            return new BufferedReader(new InputStreamReader(stream));
+        }
+
         return getReader(stream);
     }
 
