@@ -161,36 +161,6 @@ public class YamlExporterTest {
                 "  issued: 2020-10-14",
                 "  url: http://example.com",
                 "---");
-
         assertEquals(expected, Files.readAllLines(file));
-    }
-
-    @Test
-    void passesModifiedCharsetASCII(@TempDir Path tempFile) throws Exception {
-        BibEntry entry = new BibEntry(StandardEntryType.Article)
-            .withCitationKey("test")
-            .withField(StandardField.AUTHOR, "谷崎 潤一郎")
-            .withField(StandardField.TITLE, "細雪")
-            .withField(StandardField.URL, "http://example.com")
-            .withField(StandardField.DATE, "2020-10-14");
-
-        Path file = tempFile.resolve("RandomFileName");
-        Files.createFile(file);
-        yamlExporter.export(databaseContext, file, Collections.singletonList(entry));
-
-        List<String> expected = List.of(
-                "---",
-                "references:",
-                "- id: test",
-                "  type: article",
-                "  author:",
-                "  - literal: \"?? ???\"",
-                "  title: \"??\"",
-                "  issued: 2020-10-14",
-                "  url: http://example.com",
-                "---");
-
-        assertEquals(expected, Files.readAllLines(file));
-
     }
 }
