@@ -181,7 +181,7 @@ dependencies {
     implementation "org.tinylog:slf4j-tinylog:2.4.1"
     implementation "org.tinylog:tinylog-impl:2.4.1"
 
-    implementation 'de.undercouch:citeproc-java:3.0.0-alpha.3'
+    implementation 'de.undercouch:citeproc-java:3.0.0-alpha.4'
 
     // jakarta.activation is already depdency of glassfish
     implementation group: 'jakarta.xml.bind', name: 'jakarta.xml.bind-api', version: '3.0.1'

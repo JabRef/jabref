@@ -23,6 +23,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.jabref.logic.util.StandardFileType;
 
+import de.undercouch.citeproc.CSL;
 import de.undercouch.citeproc.helper.CSLUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -154,6 +155,14 @@ public class CitationStyle {
         try (Stream<Path> stream = Files.find(path, 1, (file, attr) -> file.toString().endsWith("csl"))) {
             return stream.map(Path::getFileName)
                          .map(Path::toString)
+                         .filter(style -> {
+                             try {
+                                return CSL.canFormatBibliographies(style);
+                            } catch (IOException e) {
+                                LOGGER.warn("Cannot parse CSL style {}", style, e);
+                                return false;
+                            }
+                         })
                          .map(CitationStyle::createCitationStyleFromFile)
                          .filter(Optional::isPresent)
                          .map(Optional::get)
