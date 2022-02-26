@@ -11,6 +11,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+import java.util.Arrays;
 import java.util.Objects;
 
 import org.jabref.logic.util.FileType;
@@ -90,7 +91,7 @@ public abstract class Importer implements Comparable<Importer> {
         try (InputStream inputStream = Files.newInputStream(filePath, StandardOpenOption.READ)) {
             BufferedInputStream bufferedInputStream = new BufferedInputStream(inputStream);
 
-            Charset charset = Charset.defaultCharset();
+            Charset charset = StandardCharsets.UTF_8;
 
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(bufferedInputStream, charset));
             ParserResult parserResult = importDatabase(bufferedReader);
@@ -109,21 +110,33 @@ public abstract class Importer implements Comparable<Importer> {
     }
 
     protected static Charset getCharset(BufferedInputStream bufferedInputStream) {
-        Charset charset = StandardCharsets.UTF_8;
+        Charset defaultCharSet = StandardCharsets.UTF_8;
 
         // This reads the first 8000 bytes only, thus the default size of 8192 of the bufferedInputStream is OK.
         // See https://github.com/unicode-org/icu/blob/06ef8867f35befee7340e35082fefc9d3561d230/icu4j/main/classes/core/src/com/ibm/icu/text/CharsetDetector.java#L125 for details
         CharsetDetector charsetDetector = new CharsetDetector();
         try {
             charsetDetector.setText(bufferedInputStream);
-            CharsetMatch charsetMatch = charsetDetector.detect();
-            if (charsetMatch != null) {
-                charset = Charset.forName(charsetMatch.getName());
+
+            CharsetMatch[] matches = charsetDetector.detectAll();
+            if ((matches == null) || (matches.length == 0)) {
+                return defaultCharSet;
             }
+            if (Arrays.stream(matches).anyMatch(singleCharset -> singleCharset.getName().equals(defaultCharSet.toString()))) {
+                return defaultCharSet;
+            }
+            if (Arrays.stream(matches).anyMatch(singleCharset -> singleCharset.getName().equals(StandardCharsets.UTF_16.toString()))) {
+                return defaultCharSet;
+            }
+
+            if (matches[0] != null) {
+                return Charset.forName(matches[0].getName());
+            }
+
         } catch (IOException e) {
             LOGGER.error("Could not determine charset. Using default one.", e);
         }
-        return charset;
+        return defaultCharSet;
     }
 
     /**
@@ -151,7 +164,7 @@ public abstract class Importer implements Comparable<Importer> {
     public static BufferedReader getReader(InputStream stream) throws IOException {
         BufferedInputStream bufferedInputStream = new BufferedInputStream(stream);
         Charset charset = getCharset(bufferedInputStream);
-        InputStreamReader reader = new InputStreamReader(stream, charset);
+        InputStreamReader reader = new InputStreamReader(bufferedInputStream, charset);
         return new BufferedReader(reader);
     }
 

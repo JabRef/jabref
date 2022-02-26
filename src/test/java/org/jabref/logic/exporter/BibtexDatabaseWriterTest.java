@@ -135,6 +135,7 @@ public class BibtexDatabaseWriterTest {
 
     @Test
     void writePreambleAndEncoding() throws Exception {
+        metaData.setEncoding(StandardCharsets.US_ASCII);
         database.setPreamble("Test preamble");
 
         databaseWriter.savePartOfDatabase(bibtexContext, Collections.emptyList());
@@ -161,6 +162,7 @@ public class BibtexDatabaseWriterTest {
         BibEntry entry = new BibEntry();
         entry.setType(StandardEntryType.Article);
         database.insertEntry(entry);
+        metaData.setEncoding(StandardCharsets.US_ASCII);
 
         databaseWriter.savePartOfDatabase(bibtexContext, Collections.singletonList(entry));
 
@@ -183,6 +185,7 @@ public class BibtexDatabaseWriterTest {
     @Test
     void writeEpilogueAndEncoding() throws Exception {
         database.setEpilog("Test epilog");
+        metaData.setEncoding(StandardCharsets.US_ASCII);
 
         databaseWriter.savePartOfDatabase(bibtexContext, Collections.emptyList());
 
@@ -207,6 +210,7 @@ public class BibtexDatabaseWriterTest {
         DatabaseCitationKeyPattern bibtexKeyPattern = new DatabaseCitationKeyPattern(mock(GlobalCitationKeyPattern.class));
         bibtexKeyPattern.setDefaultValue("test");
         metaData.setCiteKeyPattern(bibtexKeyPattern);
+        metaData.setEncoding(StandardCharsets.US_ASCII);
 
         databaseWriter.savePartOfDatabase(bibtexContext, Collections.emptyList());
 
@@ -236,6 +240,7 @@ public class BibtexDatabaseWriterTest {
         GroupTreeNode groupRoot = GroupTreeNode.fromGroup(new AllEntriesGroup(""));
         groupRoot.addChild(GroupTreeNode.fromGroup(new ExplicitGroup("test", GroupHierarchyType.INCLUDING, ',')));
         metaData.setGroups(groupRoot);
+        metaData.setEncoding(StandardCharsets.US_ASCII);
 
         databaseWriter.savePartOfDatabase(bibtexContext, Collections.emptyList());
 
@@ -261,6 +266,7 @@ public class BibtexDatabaseWriterTest {
 
     @Test
     void writeStringAndEncoding() throws Exception {
+        metaData.setEncoding(StandardCharsets.US_ASCII);
         database.addString(new BibtexString("name", "content"));
 
         databaseWriter.savePartOfDatabase(bibtexContext, Collections.emptyList());

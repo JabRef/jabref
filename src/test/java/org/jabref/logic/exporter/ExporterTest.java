@@ -79,14 +79,4 @@ public class ExporterTest {
             exportFormat.export(null, tmpFile, entries);
         });
     }
-
-    @ParameterizedTest
-    @MethodSource("exportFormats")
-    public void testExportingNullEntriesThrowsNPE(Exporter exportFormat, String name, @TempDir Path testFolder) {
-        assertThrows(NullPointerException.class, () -> {
-            Path tmpFile = testFolder.resolve("ARandomlyNamedFile");
-            Files.createFile(tmpFile);
-            exportFormat.export(databaseContext, tmpFile, Collections.emptyList());
-        });
-    }
 }
