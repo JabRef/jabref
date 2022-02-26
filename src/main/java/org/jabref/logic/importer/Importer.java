@@ -127,7 +127,7 @@ public abstract class Importer implements Comparable<Importer> {
                 return defaultCharSet;
             }
             if (Arrays.stream(matches).anyMatch(singleCharset -> singleCharset.getName().equals(StandardCharsets.UTF_16.toString()))) {
-                return defaultCharSet;
+                return StandardCharsets.UTF_16;
             }
 
             if (matches[0] != null) {
@@ -161,7 +161,7 @@ public abstract class Importer implements Comparable<Importer> {
         InputStream stream = Files.newInputStream(filePath, StandardOpenOption.READ);
 
         if (FileUtil.isPDFFile(filePath)) {
-            return new BufferedReader(new InputStreamReader(stream));
+            return new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8));
         }
 
         return getReader(stream);
