@@ -17,13 +17,11 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.jabref.logic.util.StandardFileType;
 
-import de.undercouch.citeproc.CSL;
 import de.undercouch.citeproc.helper.CSLUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,6 +46,7 @@ public class CitationStyle {
     private final String filePath;
     private final String title;
     private final String source;
+    private static final DocumentBuilderFactory FACTORY = DocumentBuilderFactory.newInstance();
 
     private CitationStyle(final String filename, final String title, final String source) {
         this.filePath = Objects.requireNonNull(filename);
@@ -61,11 +60,10 @@ public class CitationStyle {
     private static Optional<CitationStyle> createCitationStyleFromSource(final String source, final String filename) {
         if ((filename != null) && !filename.isEmpty() && (source != null) && !source.isEmpty()) {
             try {
-                DocumentBuilder db = DocumentBuilderFactory.newInstance().newDocumentBuilder();
                 InputSource is = new InputSource();
                 is.setCharacterStream(new StringReader(stripInvalidProlog(source)));
 
-                Document doc = db.parse(is);
+                Document doc =  FACTORY.newDocumentBuilder().parse(is);
                 NodeList nodes = doc.getElementsByTagName("info");
 
                 NodeList titleNode = ((Element) nodes.item(0)).getElementsByTagName("title");
@@ -101,6 +99,8 @@ public class CitationStyle {
             String text;
             String internalFile = STYLES_ROOT + (styleFile.startsWith("/") ? "" : "/") + styleFile;
             URL url = CitationStyle.class.getResource(internalFile);
+
+            LOGGER.debug("URL is empty? {}",url);
             if (url != null) {
                 text = CSLUtils.readURLToString(url, StandardCharsets.UTF_8.toString());
             } else {
@@ -140,8 +140,8 @@ public class CitationStyle {
 
         try {
             URI uri = url.toURI();
+            LOGGER.debug("Style uri {}", uri);
             Path path = Path.of(uri).getParent();
-
             STYLES.addAll(discoverCitationStylesInPath(path));
 
             return STYLES;
@@ -155,14 +155,6 @@ public class CitationStyle {
         try (Stream<Path> stream = Files.find(path, 1, (file, attr) -> file.toString().endsWith("csl"))) {
             return stream.map(Path::getFileName)
                          .map(Path::toString)
-                         .filter(style -> {
-                             try {
-                                return CSL.canFormatBibliographies(style);
-                            } catch (IOException e) {
-                                LOGGER.warn("Cannot parse CSL style {}", style, e);
-                                return false;
-                            }
-                         })
                          .map(CitationStyle::createCitationStyleFromFile)
                          .filter(Optional::isPresent)
                          .map(Optional::get)
