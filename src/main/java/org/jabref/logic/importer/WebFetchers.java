@@ -33,6 +33,7 @@ import org.jabref.logic.importer.fetcher.Medra;
 import org.jabref.logic.importer.fetcher.OpenAccessDoi;
 import org.jabref.logic.importer.fetcher.RfcFetcher;
 import org.jabref.logic.importer.fetcher.ScienceDirect;
+import org.jabref.logic.importer.fetcher.SemanticScholar;
 import org.jabref.logic.importer.fetcher.SpringerFetcher;
 import org.jabref.logic.importer.fetcher.SpringerLink;
 import org.jabref.logic.importer.fetcher.TitleFetcher;
@@ -107,6 +108,7 @@ public class WebFetchers {
         set.add(new CompositeSearchBasedFetcher(set, 30));
         set.add(new CollectionOfComputerScienceBibliographiesFetcher(importFormatPreferences));
         // set.add(new JstorFetcher(importFormatPreferences));
+//        set.add(new ResearchGate());
         return set;
     }
 
@@ -165,20 +167,22 @@ public class WebFetchers {
         Set<FulltextFetcher> fetchers = new HashSet<>();
 
         // Original
-        fetchers.add(new DoiResolution(importFormatPreferences.getDoiPreferences()));
+//        fetchers.add(new DoiResolution(importFormatPreferences.getDoiPreferences()));
 
         // Publishers
-        fetchers.add(new ScienceDirect());
-        fetchers.add(new SpringerLink());
-        fetchers.add(new ACS());
-        fetchers.add(new ArXiv(importFormatPreferences));
-        fetchers.add(new IEEE(importFormatPreferences));
-        fetchers.add(new ApsFetcher());
+//        fetchers.add(new ScienceDirect());
+//        fetchers.add(new SpringerLink());
+//        fetchers.add(new ACS());
+//        fetchers.add(new ArXiv(importFormatPreferences));
+//        fetchers.add(new IEEE(importFormatPreferences));
+//        fetchers.add(new ApsFetcher());
 
         // Meta search
         // fetchers.add(new JstorFetcher(importFormatPreferences));
         // fetchers.add(new GoogleScholar(importFormatPreferences));
-        fetchers.add(new OpenAccessDoi());
+//        fetchers.add(new OpenAccessDoi());
+
+        fetchers.add(new SemanticScholar());
 
         return fetchers;
     }
