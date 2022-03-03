@@ -161,7 +161,7 @@ public class XmpUtilWriter {
         meta.removeSchema(meta.getDublinCoreSchema());
 
         for (BibEntry entry : resolvedEntries) {
-            DublinCoreSchemaCustom dcSchema = DublinCoreSchemaCustom.copyDublinCoreSchema(meta.createAndAddDublinCoreSchema());
+            DublinCoreSchema dcSchema = DublinCoreSchemaCustom.copyDublinCoreSchema(meta.createAndAddDublinCoreSchema());
             XmpUtilWriter.writeToDCSchema(dcSchema, entry, null, xmpPreferences);
         }
 

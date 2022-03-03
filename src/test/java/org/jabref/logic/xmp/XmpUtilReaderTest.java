@@ -86,6 +86,20 @@ class XmpUtilReaderTest {
         assertEquals(expected, entries);
     }
 
+    @Test
+    void testReadArticleDublinCoreReadXmpPartialDate() throws IOException, URISyntaxException {
+        Path pathPdf = Path.of(XmpUtilShared.class.getResource("article_dublinCore_partial_date.pdf").toURI());
+        List<BibEntry> entries = XmpUtilReader.readXmp(pathPdf, xmpPreferences);
+        Path bibFile = Path.of(XmpUtilShared.class.getResource("article_dublinCore_partial_date.bib").toURI());
+        List<BibEntry> expected = testImporter.importDatabase(bibFile, StandardCharsets.UTF_8).getDatabase().getEntries();
+
+        expected.forEach(bibEntry -> bibEntry.setFiles(Arrays.asList(
+                new LinkedFile("", pathPdf.toAbsolutePath(), "PDF"))
+        ));
+
+        assertEquals(expected, entries);
+    }
+
     /**
      * Tests an pdf file with an empty metadata section.
      */

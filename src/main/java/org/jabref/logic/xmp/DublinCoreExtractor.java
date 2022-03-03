@@ -24,7 +24,6 @@ import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.EntryTypeFactory;
 import org.jabref.model.strings.StringUtil;
 
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.xmpbox.schema.DublinCoreSchema;
 import org.apache.xmpbox.type.BadFieldValueException;
 import org.slf4j.Logger;
@@ -87,16 +86,12 @@ public class DublinCoreExtractor {
         if ((dates != null) && !dates.isEmpty()) {
 
             String date = dates.get(0).trim();
-            try {
-                Date.parse(date)
-                        .ifPresent(dateValue -> {
-                            dateValue.getDay().ifPresent(day -> bibEntry.setField(StandardField.DAY, Integer.toString(day)));
-                            dateValue.getMonth().ifPresent(bibEntry::setMonth);
-                            dateValue.getYear().ifPresent(year -> bibEntry.setField(StandardField.YEAR, Integer.toString(year)));
-                        });
-            } catch (RuntimeException e) {
-                LOGGER.error("Failed To Parse Date\n {}", ExceptionUtils.getStackTrace(e));
-            }
+            Date.parse(date)
+                    .ifPresent(dateValue -> {
+                        dateValue.getDay().ifPresent(day -> bibEntry.setField(StandardField.DAY, Integer.toString(day)));
+                        dateValue.getMonth().ifPresent(bibEntry::setMonth);
+                        dateValue.getYear().ifPresent(year -> bibEntry.setField(StandardField.YEAR, Integer.toString(year)));
+                    });
         }
     }
 

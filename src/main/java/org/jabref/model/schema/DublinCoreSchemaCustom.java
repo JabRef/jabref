@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.apache.xmpbox.XMPMetadata;
 import org.apache.xmpbox.schema.DublinCoreSchema;
@@ -29,22 +28,24 @@ public class DublinCoreSchemaCustom extends DublinCoreSchema {
         super(metadata);
     }
 
-    public static DublinCoreSchemaCustom copyDublinCoreSchema(DublinCoreSchema dcSchema) {
+    public static DublinCoreSchema copyDublinCoreSchema(DublinCoreSchema dcSchema) {
 
         if (Objects.isNull(dcSchema)) {
             return null;
         }
 
-        DublinCoreSchemaCustom dublinCoreSchemaCustom = new DublinCoreSchemaCustom(dcSchema.getMetadata());
-
         try {
+            DublinCoreSchemaCustom dublinCoreSchemaCustom = new DublinCoreSchemaCustom(dcSchema.getMetadata());
             FieldUtils.writeField(dublinCoreSchemaCustom, "container", dcSchema.getContainer(), true);
-            FieldUtils.writeField(dublinCoreSchemaCustom, "attributes", FieldUtils.readField(dcSchema, "attributes", true), true);
-        } catch (Exception e) {
-            LOGGER.error("Error making custom DC Schema\n {}", ExceptionUtils.getStackTrace(e));
-        }
+            FieldUtils.writeField(dublinCoreSchemaCustom, "attributes",
+                    FieldUtils.readField(dcSchema, "attributes", true), true);
 
-        return dublinCoreSchemaCustom;
+            return dublinCoreSchemaCustom;
+
+        } catch (Exception e) {
+            LOGGER.error("Error making custom DC Schema. Using the default", e);
+            return dcSchema;
+        }
     }
 
     /**
