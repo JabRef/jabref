@@ -15,6 +15,7 @@ import org.jabref.model.entry.identifier.DOI;
 import kong.unirest.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -77,14 +78,11 @@ public class SemanticScholar implements FulltextFetcher {
         // Retrieve PDF link from button on the webpage
         // First checked is a drop-down menu, as it has the correct URL if present
         Elements metaLinks = html.getElementsByClass("flex-item alternate-sources__dropdown");
-        String link = metaLinks.toString();
+        String link = metaLinks.select("a").attr("href");
         if (link.length() < 10) {
             metaLinks = html.getElementsByClass("flex-paper-actions__button--primary");
-            link = metaLinks.toString();
+            link = metaLinks.select("a").attr("href");
         }
-        link = link.substring(link.indexOf("href") + 6);
-        link = link.substring(0, link.indexOf("\">"));
-
         LOGGER.info("Fulltext PDF found @ SemanticScholar.");
         return Optional.of(new URL(link));
     }
