@@ -74,12 +74,7 @@ public class DublinCoreExtractor {
     }
 
     /**
-     * Year in BibTex - Date in DublinCore is only the year information, because dc interprets empty months as January.
-     * Tries to extract the month as well. In JabRef the bibtex/month/value is prioritized. <br/> The problem is the
-     * default value of the calendar, which is always January, also if there is no month information in the xmp metdata.
-     * The idea is, to reject all information with YYYY-01-01. In cases, where xmp is written with JabRef the month
-     * property filled with jan will override this behavior and no data is lost. In the cases, where xmp is written by
-     * another service, the assumption is, that the 1st January is not a publication date at all.
+     * Bibtex-Fields : year, [month], [day] - 'dc:date' in DublinCore
      */
     private void extractDate() {
         List<String> dates = dcSchema.getUnqualifiedSequenceValueList("date");
