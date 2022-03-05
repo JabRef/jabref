@@ -31,6 +31,7 @@ import org.jabref.logic.importer.fetcher.MathSciNet;
 import org.jabref.logic.importer.fetcher.MedlineFetcher;
 import org.jabref.logic.importer.fetcher.Medra;
 import org.jabref.logic.importer.fetcher.OpenAccessDoi;
+import org.jabref.logic.importer.fetcher.ResearchGate;
 import org.jabref.logic.importer.fetcher.RfcFetcher;
 import org.jabref.logic.importer.fetcher.ScienceDirect;
 import org.jabref.logic.importer.fetcher.SpringerFetcher;
@@ -165,21 +166,21 @@ public class WebFetchers {
         Set<FulltextFetcher> fetchers = new HashSet<>();
 
         // Original
-        fetchers.add(new DoiResolution(importFormatPreferences.getDoiPreferences()));
+//        fetchers.add(new DoiResolution(importFormatPreferences.getDoiPreferences()));
 
         // Publishers
-        fetchers.add(new ScienceDirect());
-        fetchers.add(new SpringerLink());
-        fetchers.add(new ACS());
-        fetchers.add(new ArXiv(importFormatPreferences));
-        fetchers.add(new IEEE(importFormatPreferences));
-        fetchers.add(new ApsFetcher());
+//        fetchers.add(new ScienceDirect());
+//        fetchers.add(new SpringerLink());
+//        fetchers.add(new ACS());
+//        fetchers.add(new ArXiv(importFormatPreferences));
+//        fetchers.add(new IEEE(importFormatPreferences));
+//        fetchers.add(new ApsFetcher());
 
         // Meta search
         // fetchers.add(new JstorFetcher(importFormatPreferences));
         // fetchers.add(new GoogleScholar(importFormatPreferences));
-        fetchers.add(new OpenAccessDoi());
-
+//        fetchers.add(new OpenAccessDoi());
+        fetchers.add(new ResearchGate());
         return fetchers;
     }
 }
