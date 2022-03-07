@@ -138,17 +138,34 @@ class FileFieldParserTest {
                         "desc:file.pdf:PDF:asdf"
                 ),
 
+                // www inside filename
+                Arguments.of(
+                        Collections.singletonList(new LinkedFile("", Path.of("/home/www.google.de.pdf"), "")),
+                        ":/home/www.google.de.pdf"
+                ),
+
                 // url
                 Arguments.of(
                          Collections.singletonList(new LinkedFile(new URL("https://books.google.de/"), "")),
                          "https://books.google.de/"
                 ),
 
+                // url with www
+                Arguments.of(
+                             Collections.singletonList(new LinkedFile(new URL("https://www.google.de/"), "")),
+                             "https://www.google.de/"
+                ),
+
                 // url as file
                 Arguments.of(
                              Collections.singletonList(new LinkedFile("", new URL("http://ceur-ws.org/Vol-438"), "URL")),
                              ":http\\://ceur-ws.org/Vol-438:URL"
-                )
+                ),
+                // url as file with desc
+                Arguments.of(
+                             Collections.singletonList(new LinkedFile("desc", new URL("http://ceur-ws.org/Vol-438"), "URL")),
+                             "desc:http\\://ceur-ws.org/Vol-438:URL"
+               )
         );
     }
 

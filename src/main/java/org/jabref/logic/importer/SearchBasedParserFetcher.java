@@ -20,7 +20,7 @@ import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
  *     <li>Post-process fetched entries</li>
  * </ol>
  * <p>
- *     This interface is used for web resources which do NOT provide BibTeX data (@link {@link BibEntry)}.
+ *     This interface is used for web resources which do NOT provide BibTeX data {@link BibEntry}.
  *     JabRef's infrastructure to convert arbitrary input data to BibTeX is {@link Parser}.
  * </p>
  * <p>
@@ -30,7 +30,7 @@ import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
  * <p>
  *     Note that this interface "should" be an abstract class.
  *     However, Java does not support multi inheritance with classes (but with interfaces).
- *     We need multi inheritance, because a fetcher might implement multiple query types (such as id fetching {@link IdBasedFetcher)}, complete entry {@link EntryBasedFetcher}, and search-based fetcher (this class).
+ *     We need multi inheritance, because a fetcher might implement multiple query types (such as id fetching {@link IdBasedFetcher}), complete entry {@link EntryBasedFetcher}, and search-based fetcher (this class).
  * </p>
  */
 public interface SearchBasedParserFetcher extends SearchBasedFetcher {
