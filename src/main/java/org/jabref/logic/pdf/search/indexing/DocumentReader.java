@@ -22,6 +22,7 @@ import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.StringField;
 import org.apache.lucene.document.TextField;
+import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotation;
@@ -94,7 +95,7 @@ public final class DocumentReader {
     }
 
     private List<Document> readPdfContents(LinkedFile pdf, Path resolvedPdfPath) throws IOException {
-        try (PDDocument pdfDocument = PDDocument.load(resolvedPdfPath.toFile())) {
+        try (PDDocument pdfDocument = Loader.loadPDF(resolvedPdfPath.toFile())) {
             List<Document> pages = new ArrayList<>();
 
             for (int pageNumber = 0; pageNumber < pdfDocument.getNumberOfPages(); pageNumber++) {

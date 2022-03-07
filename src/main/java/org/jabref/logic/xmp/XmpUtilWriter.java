@@ -20,6 +20,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 
+import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDDocumentCatalog;
 import org.apache.pdfbox.pdmodel.PDDocumentInformation;
@@ -312,7 +313,7 @@ public class XmpUtilWriter {
             resolvedEntries = database.resolveForStrings(bibtexEntries, false);
         }
 
-        try (PDDocument document = PDDocument.load(path.toFile())) {
+        try (PDDocument document = Loader.loadPDF(path.toFile())) {
 
             if (document.isEncrypted()) {
                 throw new EncryptedPdfsNotSupportedException();
