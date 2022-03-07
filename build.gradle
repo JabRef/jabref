@@ -18,7 +18,7 @@ plugins {
 
     id 'org.openjfx.javafxplugin' version '0.0.12'
 
-    id 'org.beryx.jlink' version '2.24.4'
+    id 'org.beryx.jlink' version '2.25.0'
 
     // nicer test outputs during running and completion
     // Homepage: https://github.com/radarsh/gradle-test-logger-plugin
