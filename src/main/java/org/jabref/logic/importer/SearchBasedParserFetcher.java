@@ -20,7 +20,7 @@ import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
  *     <li>Post-process fetched entries</li>
  * </ol>
  * <p>
- *     This interface is used for web resources which do NOT provide BibTeX data (@link {@link BibEntry)}.
+ *     This interface is used for web resources which do NOT provide BibTeX data {@link BibEntry}.
  *     JabRef's infrastructure to convert arbitrary input data to BibTeX is {@link Parser}.
  * </p>
  * <p>
