@@ -72,14 +72,15 @@ public class CSLAdapter {
      * @throws IOException An error occurred in the underlying JavaScript framework
      */
     private void initialize(String newStyle, CitationStyleOutputFormat newFormat) throws IOException {
-        if ((cslInstance == null) || !Objects.equals(newStyle, style)) {
+        final boolean newCslInstanceNeedsToBeCreated = (cslInstance == null) || !Objects.equals(newStyle, style);
+        if (newCslInstanceNeedsToBeCreated) {
             // lang and forceLang are set to the default values of other CSL constructors
             cslInstance = new CSL(dataProvider, new JabRefLocaleProvider(),
                     new DefaultAbbreviationProvider(), newStyle, "en-US");
             style = newStyle;
         }
 
-        if (!Objects.equals(newFormat, format)) {
+        if (newCslInstanceNeedsToBeCreated || (!Objects.equals(newFormat, format))) {
             cslInstance.setOutputFormat(newFormat.getFormat());
             format = newFormat;
         }
