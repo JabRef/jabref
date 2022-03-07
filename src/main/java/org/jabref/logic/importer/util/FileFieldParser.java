@@ -22,7 +22,7 @@ public class FileFieldParser {
             return files;
         }
 
-        if (!value.trim().startsWith(":") && LinkedFile.isOnlineLink(value.trim())) {
+        if (LinkedFile.isOnlineLink(value.trim())) {
             // needs to be modifiable
             try {
                 return List.of(new LinkedFile(new URL(value), ""));
