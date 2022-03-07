@@ -51,7 +51,7 @@ jobs:
     name: Create installer and portable version for ${{ matrix.displayName }}
     steps:
       - name: Fetch all history for all tags and branches
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0
       - name: Install GitVersion
@@ -152,7 +152,7 @@ jobs:
         env:
           BUILDJABREFPRIVATEKEY: ${{ secrets.buildJabRefPrivateKey }}
       - name: Checkout source
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Fetch all history for all tags and branches
         run: git fetch --prune --unshallow
       - name: Install GitVersion
