@@ -1,6 +1,7 @@
 package org.jabref.logic.citationstyle;
 
 import java.util.List;
+import java.util.stream.Stream;
 
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TestEntry;
@@ -14,6 +15,9 @@ import org.jabref.model.entry.types.StandardEntryType;
 
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -57,8 +61,8 @@ class CitationStyleGeneratorTest {
     @Test
     void testHtmlFormat() {
         String expectedCitation = "  <div class=\"csl-entry\">\n" +
-            "    <div class=\"csl-left-margin\">[1]</div><div class=\"csl-right-inline\">B. Smith, B. Jones, and J. Williams, &ldquo;Title of the test entry,&rdquo; <span style=\"font-style: italic\">BibTeX Journal</span>, vol. 34, no. 7, Art. no. 3, 2016-07, doi: 10.1001/bla.blubb.</div>\n" +
-            "  </div>\n";
+                "    <div class=\"csl-left-margin\">[1]</div><div class=\"csl-right-inline\">B. Smith, B. Jones, and J. Williams, &ldquo;Title of the test entry,&rdquo; <span style=\"font-style: italic\">BibTeX Journal</span>, vol. 34, no. 7, Art. no. 3, 2016-07, doi: 10.1001/bla.blubb.</div>\n" +
+                "  </div>\n";
 
         BibEntry entry = TestEntry.getTestEntry();
         String style = CitationStyle.getDefault().getSource();
@@ -110,19 +114,19 @@ class CitationStyleGeneratorTest {
     @Test
     void testHandleCrossRefFields() {
         BibEntry firstEntry = new BibEntry(StandardEntryType.InCollection)
-            .withCitationKey("smit2021")
-            .withField(StandardField.AUTHOR, "Smith, Bob")
-            .withField(StandardField.TITLE, "An article")
-            .withField(StandardField.PAGES, "1-10")
-            .withField(StandardField.CROSSREF, "jone2021");
+                .withCitationKey("smit2021")
+                .withField(StandardField.AUTHOR, "Smith, Bob")
+                .withField(StandardField.TITLE, "An article")
+                .withField(StandardField.PAGES, "1-10")
+                .withField(StandardField.CROSSREF, "jone2021");
 
         BibEntry secondEntry = new BibEntry(StandardEntryType.Book)
-            .withCitationKey("jone2021")
-            .withField(StandardField.EDITOR, "Jones, John")
-            .withField(StandardField.PUBLISHER, "Great Publisher")
-            .withField(StandardField.TITLE, "A book")
-            .withField(StandardField.YEAR, "2021")
-            .withField(StandardField.ADDRESS, "Somewhere");
+                .withCitationKey("jone2021")
+                .withField(StandardField.EDITOR, "Jones, John")
+                .withField(StandardField.PUBLISHER, "Great Publisher")
+                .withField(StandardField.TITLE, "A book")
+                .withField(StandardField.YEAR, "2021")
+                .withField(StandardField.ADDRESS, "Somewhere");
 
         String expectedCitation = "[1]B. Smith, “An article,” J. Jones, Ed. Somewhere: Great Publisher, 2021, pp. 1–10.\n";
         BibDatabaseContext bibDatabaseContext = new BibDatabaseContext(new BibDatabase(List.of(firstEntry, secondEntry)));
@@ -132,85 +136,56 @@ class CitationStyleGeneratorTest {
         assertEquals(expectedCitation, actualCitation);
     }
 
-    @Test
-    void testBibtexWithNumber() {
-        BibEntry entry = new BibEntry(StandardEntryType.Article);
-        entry.setField(StandardField.AUTHOR, "Last, First and\nDoe, Jane");
-        entry.setField(StandardField.NUMBER, "7");
-
+    static Stream<Arguments> testCslMapping() {
         // if the default citation style changes this has to be modified
-        String expected = "[1]F. Last and J. Doe, Art. no. 7.\n";
-
-        BibDatabaseContext bibDatabaseContext = new BibDatabaseContext(new BibDatabase(List.of(entry)));
-        bibDatabaseContext.setMode(BibDatabaseMode.BIBTEX);
-
-        String citation = CitationStyleGenerator.generateCitation(entry, CitationStyle.getDefault().getSource(), CitationStyleOutputFormat.TEXT, bibDatabaseContext, bibEntryTypesManager);
-        assertEquals(expected, citation);
+        return Stream.of(
+                Arguments.of(
+                        "[1]F. Last and J. Doe, Art. no. 7.\n",
+                        BibDatabaseMode.BIBTEX,
+                        new BibEntry(StandardEntryType.Article)
+                                .withField(StandardField.AUTHOR, "Last, First and\nDoe, Jane")
+                                .withField(StandardField.NUMBER, "7"),
+                        "ieee.csl"),
+                Arguments.of(
+                        "[1]F. Last and J. Doe, no. 7.\n",
+                        BibDatabaseMode.BIBLATEX,
+                        new BibEntry(StandardEntryType.Article)
+                                .withField(StandardField.AUTHOR, "Last, First and\nDoe, Jane")
+                                .withField(StandardField.ISSUE, "7"),
+                        "ieee.csl"),
+                Arguments.of(
+                        "[1]F. Last and J. Doe, Art. no. 7.\n",
+                        BibDatabaseMode.BIBLATEX,
+                        new BibEntry(StandardEntryType.Article)
+                                .withField(StandardField.AUTHOR, "Last, First and Doe, Jane")
+                                .withField(StandardField.NUMBER, "7"),
+                        "ieee.csl"),
+                Arguments.of(
+                        "[1]F. Last and J. Doe, no. 7, Art. no. 28.\n",
+                        BibDatabaseMode.BIBLATEX,
+                        new BibEntry(StandardEntryType.Article)
+                                .withField(StandardField.AUTHOR, "Last, First and\nDoe, Jane")
+                                .withField(StandardField.ISSUE, "7")
+                                .withField(StandardField.NUMBER, "28"),
+                        "ieee.csl"),
+                Arguments.of(
+                        "[1]F. Last and J. Doe, no. 28, pp. 7–8.\n",
+                        BibDatabaseMode.BIBLATEX,
+                        new BibEntry(StandardEntryType.Article)
+                                .withField(StandardField.AUTHOR, "Last, First and\nDoe, Jane")
+                                .withField(StandardField.PAGES, "7--8")
+                                .withField(StandardField.ISSUE, "28"),
+                        "ieee.csl")
+        );
     }
 
-    @Test
-    void testBiblatexWithIssue() {
-        BibEntry entry = new BibEntry(StandardEntryType.Article);
-        entry.setField(StandardField.AUTHOR, "Last, First and\nDoe, Jane");
-        entry.setField(StandardField.ISSUE, "7");
-
-        // if the default citation style changes this has to be modified
-        String expected = "[1]F. Last and J. Doe, no. 7.\n";
-
+    @ParameterizedTest
+    @MethodSource
+    void testCslMapping(String expected, BibDatabaseMode mode, BibEntry entry, String cslFileName) throws Exception {
         BibDatabaseContext bibDatabaseContext = new BibDatabaseContext(new BibDatabase(List.of(entry)));
-        bibDatabaseContext.setMode(BibDatabaseMode.BIBLATEX);
+        bibDatabaseContext.setMode(mode);
 
-        String citation = CitationStyleGenerator.generateCitation(entry, CitationStyle.getDefault().getSource(), CitationStyleOutputFormat.TEXT, bibDatabaseContext, bibEntryTypesManager);
-        assertEquals(expected, citation);
-    }
-
-    @Test
-    void testBiblatexWitNumber() {
-        BibEntry entry = new BibEntry(StandardEntryType.Article);
-        entry.setField(StandardField.AUTHOR, "Last, First and Doe, Jane");
-        entry.setField(StandardField.NUMBER, "7");
-
-        // if the default citation style changes this has to be modified
-        String expected = "[1]F. Last and J. Doe, Art. no. 7.\n";
-
-        BibDatabaseContext bibDatabaseContext = new BibDatabaseContext(new BibDatabase(List.of(entry)));
-        bibDatabaseContext.setMode(BibDatabaseMode.BIBLATEX);
-
-        String citation = CitationStyleGenerator.generateCitation(entry, CitationStyle.getDefault().getSource(), CitationStyleOutputFormat.TEXT, bibDatabaseContext, bibEntryTypesManager);
-        assertEquals(expected, citation);
-    }
-
-    @Test
-    void testBiblatexWithIssueAndNumber() {
-        BibEntry entry = new BibEntry(StandardEntryType.Article);
-        entry.setField(StandardField.AUTHOR, "Last, First and\nDoe, Jane");
-        entry.setField(StandardField.ISSUE, "7");
-        entry.setField(StandardField.NUMBER, "28");
-
-        // if the default citation style changes this has to be modified
-        String expected = "[1]F. Last and J. Doe, no. 7, Art. no. 28.\n";
-
-        BibDatabaseContext bibDatabaseContext = new BibDatabaseContext(new BibDatabase(List.of(entry)));
-        bibDatabaseContext.setMode(BibDatabaseMode.BIBLATEX);
-
-        String citation = CitationStyleGenerator.generateCitation(entry, CitationStyle.getDefault().getSource(), CitationStyleOutputFormat.TEXT, bibDatabaseContext, bibEntryTypesManager);
-        assertEquals(expected, citation);
-    }
-
-    @Test
-    void testBiblatexWithPages() {
-        BibEntry entry = new BibEntry(StandardEntryType.Article);
-        entry.setField(StandardField.AUTHOR, "Last, First and\nDoe, Jane");
-        entry.setField(StandardField.PAGES, "7--8");
-        entry.setField(StandardField.ISSUE, "28");
-
-        // if the default citation style changes this has to be modified
-        String expected = "[1]F. Last and J. Doe, no. 28, pp. 7–8.\n";
-
-        BibDatabaseContext bibDatabaseContext = new BibDatabaseContext(new BibDatabase(List.of(entry)));
-        bibDatabaseContext.setMode(BibDatabaseMode.BIBLATEX);
-
-        String citation = CitationStyleGenerator.generateCitation(entry, CitationStyle.getDefault().getSource(), CitationStyleOutputFormat.TEXT, bibDatabaseContext, bibEntryTypesManager);
+        String citation = CitationStyleGenerator.generateCitation(entry, CitationStyle.createCitationStyleFromFile(cslFileName).orElseThrow().getSource(), CitationStyleOutputFormat.TEXT, bibDatabaseContext, bibEntryTypesManager);
         assertEquals(expected, citation);
     }
 }
