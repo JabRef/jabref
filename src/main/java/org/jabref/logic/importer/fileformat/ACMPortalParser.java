@@ -71,8 +71,8 @@ public class ACMPortalParser implements Parser {
             Elements doiHrefs = doc.select("div.issue-item__content-right > h5 > span > a");
 
             for (Element elem : doiHrefs) {
-                String fullSegement = elem.attr("href");
-                String doi = fullSegement.substring(fullSegement.indexOf("10"));
+                String fullSegment = elem.attr("href");
+                String doi = fullSegment.substring(fullSegment.indexOf("10"));
                 doiList.add(doi);
             }
         } catch (IOException ex) {
