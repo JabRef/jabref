@@ -22,17 +22,9 @@ public class UnoProperties {
     private UnoProperties() {
     }
 
-    /*
-     * asPropertySet
-     */
-
     public static Optional<XPropertySet> asPropertySet(XPropertyContainer propertyContainer) {
         return UnoCast.cast(XPropertySet.class, propertyContainer);
     }
-
-    /*
-     * getPropertySetInfo
-     */
 
     public static Optional<XPropertySetInfo> getPropertySetInfo(XPropertySet propertySet) {
         return (Optional.ofNullable(propertySet)
@@ -42,10 +34,6 @@ public class UnoProperties {
     public static Optional<XPropertySetInfo> getPropertySetInfo(XPropertyContainer propertyContainer) {
         return Optional.ofNullable(propertyContainer).flatMap(UnoProperties::getPropertySetInfo);
     }
-
-    /*
-     * getPropertyNames
-     */
 
     public static List<String> getPropertyNames(Property[] properties) {
         Objects.requireNonNull(properties);
@@ -67,10 +55,6 @@ public class UnoProperties {
                 .map(UnoProperties::getPropertyNames)
                 .orElse(new ArrayList<>()));
     }
-
-    /*
-     * getPropertyValue
-     */
 
     public static Optional<Object> getValueAsObject(XPropertySet propertySet, String property)
             throws

@@ -258,7 +258,7 @@ public class CitationGroups {
         return Optional.ofNullable(group);
     }
 
-    /*
+    /**
      * @return true if all citation groups have referenceMarkNameForLinking
      */
     public boolean citationGroupsProvideReferenceMarkNameForLinking() {

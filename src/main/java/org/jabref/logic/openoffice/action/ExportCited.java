@@ -59,7 +59,6 @@ public class ExportCited {
         for (CitedKey citation : citationKeys.values()) {
             if (citation.getLookupResult().isEmpty()) {
                 unresolvedKeys.add(citation.citationKey);
-                continue;
             } else {
                 BibEntry entry = citation.getLookupResult().get().entry;
                 BibDatabase loopDatabase = citation.getLookupResult().get().database;

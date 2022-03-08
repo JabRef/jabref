@@ -295,9 +295,6 @@ public class Backend52 {
         }
     }
 
-    /**
-     *
-     */
     public List<Optional<OOText>> combinePageInfos(List<CitationGroup> joinableGroup) {
         return combinePageInfosCommon(this.dataModel, joinableGroup);
     }
@@ -369,7 +366,7 @@ public class Backend52 {
         namedRange.cleanFillCursor(doc);
     }
 
-    public List<CitationEntry> getCitationEntries(XTextDocument doc, CitationGroups cgs)
+    public List<CitationEntry> getCitationEntries(XTextDocument doc, CitationGroups citationGroups)
             throws
             WrappedTargetException,
             NoDocumentException {
@@ -378,8 +375,8 @@ public class Backend52 {
             case JabRef52:
                 // One context per CitationGroup: Backend52 (DataModel.JabRef52)
                 // For DataModel.JabRef60 (Backend60) we need one context per Citation
-                List<CitationEntry> citations = new ArrayList<>(cgs.numberOfCitationGroups());
-                for (CitationGroup group : cgs.getCitationGroupsUnordered()) {
+                List<CitationEntry> citations = new ArrayList<>(citationGroups.numberOfCitationGroups());
+                for (CitationGroup group : citationGroups.getCitationGroupsUnordered()) {
                     String name = group.groupId.citationGroupIdAsString();
                     XTextCursor cursor = (this
                             .getRawCursorForCitationGroup(group, doc)
@@ -401,7 +398,7 @@ public class Backend52 {
         }
     }
 
-    /*
+    /**
      * Only applies to storage. Citation markers are not changed.
      */
     public void applyCitationEntries(XTextDocument doc, List<CitationEntry> citationEntries)
@@ -423,7 +420,7 @@ public class Backend52 {
                 }
                 break;
             case JabRef60:
-                // xx
+                // ToDo: Implement
                 throw new IllegalStateException("applyCitationEntries for JabRef60 is not implemented yet");
             default:
                 throw new IllegalStateException("applyCitationEntries: unhandled dataModel ");

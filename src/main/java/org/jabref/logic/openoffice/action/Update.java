@@ -111,7 +111,7 @@ public class Update {
                 syncOptions.alwaysAddCitedOnPages);
     }
 
-    /*
+    /**
      * Reread document before sync
      */
     public static List<String> resyncDocument(XTextDocument doc,

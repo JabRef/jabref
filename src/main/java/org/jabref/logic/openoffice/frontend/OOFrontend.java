@@ -244,13 +244,13 @@ public class OOFrontend {
         this.citationGroups.afterRemoveCitationGroup(group);
     }
 
-    public void removeCitationGroups(List<CitationGroup> cgs, XTextDocument doc)
+    public void removeCitationGroups(List<CitationGroup> citationGroups, XTextDocument doc)
             throws
             WrappedTargetException,
             NoDocumentException,
             NotRemoveableException {
 
-        for (CitationGroup group : cgs) {
+        for (CitationGroup group : citationGroups) {
             removeCitationGroup(group, doc);
         }
     }

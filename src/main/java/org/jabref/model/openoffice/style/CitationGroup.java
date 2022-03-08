@@ -29,10 +29,6 @@ public class CitationGroup {
     public final List<Citation> citationsInStorageOrder;
 
     /*
-     * Extra data
-     */
-
-    /*
      * A name of a reference mark to link to by formatCitedOnPages.
      * May be initially empty, if backend does not use reference marks.
      *

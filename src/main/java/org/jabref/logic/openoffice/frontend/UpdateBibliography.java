@@ -17,9 +17,6 @@ import com.sun.star.text.XTextCursor;
 import com.sun.star.text.XTextDocument;
 import com.sun.star.text.XTextRange;
 
-/*
- * Update document: citation marks and bibliography
- */
 public class UpdateBibliography {
 
     private static final String BIB_SECTION_NAME = "JR_bib";

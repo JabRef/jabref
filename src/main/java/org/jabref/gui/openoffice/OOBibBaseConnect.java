@@ -31,7 +31,6 @@ import com.sun.star.uno.XComponentContext;
  */
 class OOBibBaseConnect {
 
-    /* variables  */
     private final DialogService dialogService;
     private final XDesktop xDesktop;
 
@@ -42,9 +41,6 @@ class OOBibBaseConnect {
      */
     private XTextDocument xTextDocument;
 
-    /*
-     * Constructor
-     */
     public OOBibBaseConnect(Path loPath, DialogService dialogService)
             throws
             BootstrapException,

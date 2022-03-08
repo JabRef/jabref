@@ -688,7 +688,7 @@ class OOBibStyleTest {
         OOBibStyle style = new OOBibStyle(StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
                 layoutFormatterPreferences);
 
-        // Question: What should happen if some of the sources is
+        // Question: What should happen if some sources are
         // marked as isFirstAppearanceOfSource?
         // This test documents what is happening now.
 

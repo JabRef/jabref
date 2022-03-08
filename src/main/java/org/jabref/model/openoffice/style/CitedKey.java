@@ -119,19 +119,19 @@ public class CitedKey implements
         this.db = Citation.lookup(databases, this.citationKey);
     }
 
-    void distributeLookupResult(CitationGroups cgs) {
-        cgs.distributeToCitations(where, Citation::setLookupResult, db);
+    void distributeLookupResult(CitationGroups citationGroups) {
+        citationGroups.distributeToCitations(where, Citation::setLookupResult, db);
     }
 
     /*
      * Make unique using a letter or by numbering
      */
 
-    void distributeNumber(CitationGroups cgs) {
-        cgs.distributeToCitations(where, Citation::setNumber, number);
+    void distributeNumber(CitationGroups citationGroups) {
+        citationGroups.distributeToCitations(where, Citation::setNumber, number);
     }
 
-    void distributeUniqueLetter(CitationGroups cgs) {
-        cgs.distributeToCitations(where, Citation::setUniqueLetter, uniqueLetter);
+    void distributeUniqueLetter(CitationGroups citationGroups) {
+        citationGroups.distributeToCitations(where, Citation::setUniqueLetter, uniqueLetter);
     }
 }

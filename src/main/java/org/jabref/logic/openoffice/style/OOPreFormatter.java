@@ -8,8 +8,7 @@ import org.jabref.logic.util.strings.HTMLUnicodeConversionMaps;
 import org.jabref.model.strings.StringUtil;
 
 /**
- * This formatter preprocesses JabRef fields before they are run through the layout of the
- * bibliography style. It handles translation of LaTeX italic/bold commands into HTML tags.
+ * This formatter preprocesses JabRef fields before they are run through the layout of the bibliography style. It handles translation of LaTeX italic/bold commands into HTML tags.
  */
 public class OOPreFormatter implements LayoutFormatter {
 
@@ -46,7 +45,6 @@ public class OOPreFormatter implements LayoutFormatter {
                 currentCommand = new StringBuilder();
             } else if (!incommand && ((c == '{') || (c == '}'))) {
                 // Swallow braces, necessary for replacing encoded characters
-
             } else if (Character.isLetter(c) || (c == '%')
                     || StringUtil.SPECIAL_COMMAND_CHARS.contains(String.valueOf(c))) {
                 escaped = false;
@@ -88,10 +86,7 @@ public class OOPreFormatter implements LayoutFormatter {
                         if ((i + 1) == finalResult.length()) {
                             String command = currentCommand.toString();
                             String result = OOPreFormatter.CHARS.get(command);
-                            /* If found, then use translated version. If not,
-                             * then keep
-                             * the text of the parameter intact.
-                             */
+                            // If found, then use translated version. If not, then keep the text of the parameter intact.
                             sb.append(Objects.requireNonNullElse(result, command));
                         }
                     }
@@ -104,9 +99,7 @@ public class OOPreFormatter implements LayoutFormatter {
                 } else if (Character.isWhitespace(c) || (c == '{') || (c == '}')) {
                     String command = currentCommand.toString();
 
-                    // Test if we are dealing with a formatting
-                    // command.
-                    // If so, handle.
+                    // Test if we are dealing with a formatting command. If so, handle.
                     String tag = getHTMLTag(command);
                     if (!tag.isEmpty()) {
                         String part = StringUtil.getPart(finalResult, i, true);
@@ -118,14 +111,11 @@ public class OOPreFormatter implements LayoutFormatter {
                         argument = part;
                         // handle common case of general latex command
                         String result = OOPreFormatter.CHARS.get(command + argument);
-                        // If found, then use translated version. If not, then keep
-                        // the
-                        // text of the parameter intact.
+                        // If found, then use translated version. If not, then keep the text of the parameter intact.
                         sb.append(Objects.requireNonNullElse(result, argument));
                     } else if (c == '}') {
-                        // This end brace terminates a command. This can be the case in
-                        // constructs like {\aa}. The correct behaviour should be to
-                        // substitute the evaluated command and swallow the brace:
+                        // This end brace terminates a command. This can be the case in constructs like {\aa}. The
+                        // correct behaviour should be to substitute the evaluated command and swallow the brace:
                         String result = OOPreFormatter.CHARS.get(command);
                         // If the command is unknown, just print it:
                         sb.append(Objects.requireNonNullElse(result, command));
@@ -139,13 +129,10 @@ public class OOPreFormatter implements LayoutFormatter {
                     // argument = "";
                 } else {
                     /*
-                     * TODO: this point is reached, apparently, if a command is
-                     * terminated in a strange way, such as with "$\omega$".
-                     * Also, the command "\&" causes us to get here. The former
-                     * issue is maybe a little difficult to address, since it
-                     * involves the LaTeX math mode. We don't have a complete
-                     * LaTeX parser, so maybe it's better to ignore these
-                     * commands?
+                     * TODO: this point is reached, apparently, if a command is terminated in a strange way, such as
+                     *  with "$\omega$". Also, the command "\&" causes us to get here. The former issue is maybe a
+                     *  little difficult to address, since it involves the LaTeX math mode. We don't have a complete
+                     *  LaTeX parser, so maybe it's better to ignore these commands?
                      */
                 }
 
@@ -160,44 +147,17 @@ public class OOPreFormatter implements LayoutFormatter {
     private String getHTMLTag(String latexCommand) {
         String result = "";
         switch (latexCommand) {
-            // Italic
-            case "textit":
-            case "it":
-            case "emph": // Should really separate between emphasized and italic but since in later stages both are converted to italic...
-            case "em":
-                result = "i";
-                break;
-            // Bold font
-            case "textbf":
-            case "bf":
-                result = "b";
-                break;
-            // Small capitals
-            case "textsc":
-                result = "smallcaps"; // Not a proper HTML tag, but used here for convenience
-                break;
-            // Underline
-            case "underline":
-                result = "u";
-                break;
-            // Strikeout, sout is the "standard" command, although it is actually based on the package ulem
-            case "sout":
-                result = "s";
-                break;
-            // Monospace font
-            case "texttt":
-                result = "tt";
-                break;
-            // Superscript
-            case "textsuperscript":
-                result = "sup";
-                break;
-            // Subscript
-            case "textsubscript":
-                result = "sub";
-                break;
-            default:
-                break;
+            // Should really separate between emphasized and italic but since in later stages both are converted to italic...
+            case "textit", "it", "emph", "em" -> result = "i";  // Italic
+            case "textbf", "bf" -> result = "b";                // Bold font
+            case "textsc" -> result = "smallcaps";              // Small caps
+                                                                // Not a proper HTML tag, but used here for convenience
+            case "underline" -> result = "u";                   // Underline
+            case "sout" -> result = "s";                        // Strikeout
+                                                                // sout is the "standard" command, although it is actually based on the package ulem
+            case "texttt" -> result = "tt";                     // Monospace font
+            case "textsuperscript" -> result = "sup";           // Superscript
+            case "textsubscript" -> result = "sub";             // Subscript
         }
         return result;
     }

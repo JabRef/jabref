@@ -447,9 +447,7 @@ public class OOTextIntoOO {
             XPropertySet propertySet = UnoCast.cast(XPropertySet.class, cursor).get();
             XPropertySetInfo propertySetInfo = propertySet.getPropertySetInfo();
 
-            /*
-             * On creation, initialize the property name -- index mapping.
-             */
+            // On creation, initialize the property name -- index mapping.
             this.goodNameToIndex = new HashMap<>();
             int nextIndex = 0;
             for (Property p : propertySetInfo.getProperties()) {
@@ -470,16 +468,13 @@ public class OOTextIntoOO {
                 goodNames[entry.getValue()] = entry.getKey();
             }
 
-            // XMultiPropertySet.setPropertyValues() requires alphabetically sorted property names.
-            // We adjust here:
+            // XMultiPropertySet.setPropertyValues() requires alphabetically sorted property names. We adjust here:
             Arrays.sort(goodNames);
             for (int i = 0; i < goodSize; i++) {
                 this.goodNameToIndex.put(goodNames[i], i);
             }
 
-            /*
-             * Get the initial state of the properties and add the first layer.
-             */
+            // Get the initial state of the properties and add the first layer.
             XMultiPropertyStates mpss = UnoCast.cast(XMultiPropertyStates.class, cursor).get();
             PropertyState[] propertyStates;
             try {
@@ -602,10 +597,8 @@ public class OOTextIntoOO {
         return res;
     }
 
-    /*
-     * We rely on property values being either DIRECT_VALUE or DEFAULT_VALUE (not
-     * AMBIGUOUS_VALUE). If the cursor covers a homogeneous region, or is collapsed, then this is
-     * true.
+    /**
+     * We rely on property values being either DIRECT_VALUE or DEFAULT_VALUE (not AMBIGUOUS_VALUE). If the cursor covers a homogeneous region, or is collapsed, then this is true.
      */
     private static boolean isPropertyDefault(XTextCursor cursor, String propertyName)
             throws
@@ -744,7 +737,7 @@ public class OOTextIntoOO {
                 formatStack);
     }
 
-    /*
+    /**
      * @return true on failure
      */
     public static boolean setParagraphStyle(XTextCursor cursor, String paragraphStyle) {

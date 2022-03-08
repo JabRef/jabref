@@ -36,7 +36,7 @@ public class EditMerge {
     private EditMerge() {
     }
 
-    /*
+    /**
      * @return true if modified document
      */
     public static boolean mergeCitationGroups(XTextDocument doc, OOFrontend frontend, OOBibStyle style)
@@ -121,8 +121,8 @@ public class EditMerge {
         // null if currentGroup.isEmpty()
         XTextCursor currentGroupCursor;
 
-        // A cursor starting at the end of the last CitationGroup in
-        // currentGroup. null if currentGroup.isEmpty()
+        // A cursor starting at the end of the last CitationGroup in currentGroup.
+        // null if currentGroup.isEmpty()
         XTextCursor cursorBetween;
 
         // The last element of currentGroup.

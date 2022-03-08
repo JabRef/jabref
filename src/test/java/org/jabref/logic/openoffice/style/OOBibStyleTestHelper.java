@@ -23,10 +23,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class OOBibStyleTestHelper {
     /*
-     * begin Helpers for testing style.getNumCitationMarker2
-     */
-
-    /*
      * Minimal implementation for CitationMarkerNumericEntry
      */
     static class CitationMarkerNumericEntryImpl implements CitationMarkerNumericEntry {
