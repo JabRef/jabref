@@ -8,6 +8,7 @@ import java.net.URL;
 import java.util.List;
 
 import org.jabref.logic.cleanup.Formatter;
+import org.jabref.logic.importer.fetcher.MedlineFetcher;
 import org.jabref.model.entry.BibEntry;
 
 import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
@@ -26,6 +27,10 @@ import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
  * <p>
  *     This interface inherits {@link SearchBasedFetcher}, because the methods <code>performSearch</code> have to be provided by both.
  *     As non-BibTeX web fetcher one could do "magic" stuff without this helper interface and directly use {@link WebFetcher}, but this is more work.
+ * </p>
+ * <p>
+ *     The idea is the one can reuse an importer in the place of a Parser.
+ *     See {@link MedlineFetcher#getParser()} for an example.
  * </p>
  * <p>
  *     Note that this interface "should" be an abstract class.
