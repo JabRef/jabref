@@ -218,7 +218,7 @@ public class BibDatabaseContext {
      * @return true if the database has any empty entries; otherwise false
      */
     public boolean hasEmptyEntries() {
-        return this.getEntries().stream().anyMatch(entry->entry.getFields().isEmpty());
+        return this.getEntries().stream().anyMatch(entry -> entry.getFields().isEmpty());
     }
 
     public static Path getFulltextIndexBasePath() {
