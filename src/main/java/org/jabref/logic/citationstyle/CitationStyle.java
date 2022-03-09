@@ -100,7 +100,7 @@ public class CitationStyle {
             String internalFile = STYLES_ROOT + (styleFile.startsWith("/") ? "" : "/") + styleFile;
             URL url = CitationStyle.class.getResource(internalFile);
 
-            LOGGER.debug("URL is empty? {}",url);
+            LOGGER.debug("URL is empty? {}", url);
             if (url != null) {
                 text = CSLUtils.readURLToString(url, StandardCharsets.UTF_8.toString());
             } else {
