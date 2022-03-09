@@ -4,7 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
@@ -52,20 +52,19 @@ public class EmbeddedBibFilePdfExporter extends Exporter {
     /**
      * @param databaseContext the database to export from
      * @param file            the file to write to. If it contains "split", then the output is split into different files
-     * @param encoding        the encoding to use
      * @param entries         a list containing all entries that should be exported
      */
     @Override
-    public void export(BibDatabaseContext databaseContext, Path file, Charset encoding, List<BibEntry> entries) throws Exception {
+    public void export(BibDatabaseContext databaseContext, Path file, List<BibEntry> entries) throws Exception {
         Objects.requireNonNull(databaseContext);
         Objects.requireNonNull(file);
         Objects.requireNonNull(entries);
 
         String bibString = getBibString(entries);
-        embedBibTex(bibString, file, encoding);
+        embedBibTex(bibString, file);
     }
 
-    private void embedBibTex(String bibTeX, Path file, Charset encoding) throws IOException {
+    private void embedBibTex(String bibTeX, Path file) throws IOException {
         if (!Files.exists(file) || !FileUtil.isPDFFile(file)) {
             return;
         }
@@ -100,7 +99,7 @@ public class EmbeddedBibFilePdfExporter extends Exporter {
                 fileSpecification = new PDComplexFileSpecification();
             }
             if (efTree != null) {
-                InputStream inputStream = new ByteArrayInputStream(bibTeX.getBytes(encoding));
+                InputStream inputStream = new ByteArrayInputStream(bibTeX.getBytes(StandardCharsets.UTF_8));
                 fileSpecification.setFile(EMBEDDED_FILE_NAME);
                 PDEmbeddedFile embeddedFile = new PDEmbeddedFile(document, inputStream);
                 embeddedFile.setSubtype("text/x-bibtex");

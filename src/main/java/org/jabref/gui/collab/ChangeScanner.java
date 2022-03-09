@@ -55,7 +55,7 @@ public class ChangeScanner {
             // Important: apply all post-load actions
             ImportFormatPreferences importFormatPreferences = preferencesService.getImportFormatPreferences();
             GeneralPreferences generalPreferences = preferencesService.getGeneralPreferences();
-            ParserResult result = OpenDatabase.loadDatabase(database.getDatabasePath().get(), generalPreferences, importFormatPreferences, new DummyFileUpdateMonitor());
+            ParserResult result = OpenDatabase.loadDatabase(database.getDatabasePath().get(), importFormatPreferences, new DummyFileUpdateMonitor());
             BibDatabaseContext databaseOnDisk = result.getDatabaseContext();
 
             // Start looking at changes.

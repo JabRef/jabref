@@ -2,6 +2,7 @@ package org.jabref.logic.exporter;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -183,7 +184,7 @@ public abstract class BibDatabaseWriter {
 
         // Some file formats write something at the start of the file (like the encoding)
         if (savePreferences.getSaveType() != SavePreferences.DatabaseSaveType.PLAIN_BIBTEX) {
-            Charset charset = bibDatabaseContext.getMetaData().getEncoding().orElse(generalPreferences.getDefaultEncoding());
+            Charset charset = bibDatabaseContext.getMetaData().getEncoding().orElse(StandardCharsets.UTF_8);
             writeProlog(bibDatabaseContext, charset);
         }
 

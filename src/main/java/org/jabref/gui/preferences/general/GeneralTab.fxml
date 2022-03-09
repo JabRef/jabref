@@ -27,8 +27,6 @@
         </rowConstraints>
         <Label text="%Language"/>
         <ComboBox fx:id="language" prefWidth="200.0" GridPane.columnIndex="1"/>
-        <Label text="%Default encoding" GridPane.rowIndex="1"/>
-        <ComboBox fx:id="defaultEncoding" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
         <Label text="%Default library mode" GridPane.rowIndex="2"/>
         <ComboBox fx:id="biblatexMode" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
     </GridPane>

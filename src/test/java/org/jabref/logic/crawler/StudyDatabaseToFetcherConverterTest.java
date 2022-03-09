@@ -1,7 +1,6 @@
 package org.jabref.logic.crawler;
 
 import java.net.URL;
-import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.util.List;
 
@@ -42,7 +41,6 @@ class StudyDatabaseToFetcherConverterTest {
         importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
         savePreferences = mock(SavePreferences.class, Answers.RETURNS_DEEP_STUBS);
         timestampPreferences = mock(TimestampPreferences.class);
-        when(generalPreferences.getDefaultEncoding()).thenReturn(Charset.defaultCharset());
         when(savePreferences.getSaveOrder()).thenReturn(new SaveOrderConfig());
         when(savePreferences.takeMetadataSaveOrderInAccount()).thenReturn(true);
         when(importFormatPreferences.getKeywordSeparator()).thenReturn(',');
