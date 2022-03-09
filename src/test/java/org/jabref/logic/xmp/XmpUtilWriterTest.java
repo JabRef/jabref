@@ -8,8 +8,10 @@ import java.util.List;
 import javax.xml.transform.TransformerException;
 
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.Date;
 import org.jabref.model.entry.Month;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.StandardEntryType;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -18,6 +20,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
+import static org.jabref.logic.xmp.DublinCoreExtractor.DC_COVERAGE;
+import static org.jabref.logic.xmp.DublinCoreExtractor.DC_RIGHTS;
+import static org.jabref.logic.xmp.DublinCoreExtractor.DC_SOURCE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -68,6 +73,12 @@ class XmpUtilWriterTest {
         vapnik2000.setField(StandardField.AUTHOR, "Vladimir N. Vapnik");
         vapnik2000.setField(StandardField.DOI, "10.1007/978-1-4757-3264-1");
         vapnik2000.setField(StandardField.OWNER, "Ich");
+        vapnik2000.setField(StandardField.LANGUAGE, "English, Japanese");
+        vapnik2000.setDate(new Date(2000, 5));
+
+        vapnik2000.setField(new UnknownField(DC_COVERAGE), "coverageField");
+        vapnik2000.setField(new UnknownField((DC_SOURCE)), "JabRef");
+        vapnik2000.setField(new UnknownField(DC_RIGHTS), "Right To X");
     }
 
     /**

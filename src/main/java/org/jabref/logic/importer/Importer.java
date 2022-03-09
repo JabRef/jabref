@@ -160,11 +160,12 @@ public abstract class Importer implements Comparable<Importer> {
     public static BufferedReader getReader(Path filePath) throws IOException {
         InputStream stream = Files.newInputStream(filePath, StandardOpenOption.READ);
 
-        if (FileUtil.isPDFFile(filePath)) {
-            return new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8));
+        if (FileUtil.isBibFile(filePath)) {
+            return getReader(stream);
         }
 
-        return getReader(stream);
+        return new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8));
+
     }
 
     public static BufferedReader getReader(InputStream stream) throws IOException {

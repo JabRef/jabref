@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" demote-non-dropping-particle="sort-only" default-locale="en-GB">
+<style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" demote-non-dropping-particle="sort-only">
+  <!-- Polyglot; journal publishes in English, and French -->
   <info>
     <title>Journal de la Société des Océanistes</title>
     <title-short>JSO</title-short>
@@ -314,8 +315,8 @@
       <key macro="issued"/>
       <key macro="author"/>
     </sort>
-    <layout prefix="(" suffix=")" delimiter="; ">
-      <group delimiter=": ">
+    <layout prefix="(" suffix=")" delimiter="&#160;; ">
+      <group delimiter="&#160;: ">
         <group delimiter=", ">
           <text macro="author-short"/>
           <text macro="issued"/>

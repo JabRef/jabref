@@ -310,7 +310,7 @@ public class EndnoteXmlImporter extends Importer implements Parser {
                            .stream()
                            .map(keyword -> keyword.getStyle())
                            .filter(Objects::nonNull)
-                           .map(style->style.getContent())
+                           .map(style -> style.getContent())
                            .collect(Collectors.toList());
         } else {
             return Collections.emptyList();
