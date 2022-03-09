@@ -18,7 +18,7 @@ Please read [https://github.com/cxxr/better-java](https://github.com/cxxr/better
 
 Principles:
 
-* All Exceptions we throw should be or extend `JabRefException`; This is especially important if the message stored in the Exception should be shown to the user. `JabRefException` has already implemented the `getLocalizedMessage()` method which should be used for such cases \(see details below!\).
+* All exceptions we throw should be or extend `JabRefException`; This is especially important if the message stored in the Exception should be shown to the user. `JabRefException` has already implemented the `getLocalizedMessage()` method which should be used for such cases \(see details below!\).
 * Catch and wrap all API exceptions \(such as `IOExceptions`\) and rethrow them
   * Example:
 
@@ -138,7 +138,7 @@ All log messages are passed internally to [tinylog](https://tinylog.org/v2/) whi
   ```
 
 * SLF4J also support parameterized logging, e.g. if you want to print out multiple arguments in a log statement use a pair of curly braces. [Examples](https://www.slf4j.org/faq.html#logging_performance)
-* When running tests, `tinylog-test.properties` is used. It is located under `src/test/resources`
+* When running tests, `tinylog-test.properties` is used. It is located under `src/test/resources`.
   As default, only `info` is logged.
   When developing, it makes sense to use `debug` as log level.
   One can change the log level per class using the pattern `level@class=debug` is set to `debug`.
