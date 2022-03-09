@@ -109,7 +109,7 @@ public class CitationStyle {
             }
             return createCitationStyleFromSource(text, styleFile);
         } catch (NoSuchFileException e) {
-            LOGGER.error("Could not find file: " + styleFile, e);
+            LOGGER.error("Could not find file: {}", styleFile, e);
         } catch (IOException e) {
             LOGGER.error("Error reading source file", e);
         }
