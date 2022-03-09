@@ -21,7 +21,13 @@ import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
  *     <li>Post-process fetched entries</li>
  * </ol>
  * <p>
- *     This interface is used for web resources which do NOT provide BibTeX data {@link BibEntry}.
+ *    Normally, a fetcher invokes an API and then parses the response (to get BibEntries).
+ *    This kind of workflow is supported by the parser-based fetcher.
+ *    Sometimes you need to have more flexibility, i.e. call multiple endpoints and merge the results etc.
+ *    In theses cases, one has to use the non-parser-based fetcher interfaces.
+ * <p>
+ * <p>
+ *     This interface is used for web resources which do NOT provide BibTeX data {@link BibEntry} directly.
  *     JabRef's infrastructure to convert arbitrary input data to BibTeX is {@link Parser}.
  * </p>
  * <p>
