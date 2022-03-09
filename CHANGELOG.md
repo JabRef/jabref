@@ -52,7 +52,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We moved the search box in preview preferences closer to the available citation styles list. [#8370](https://github.com/JabRef/jabref/pull/8370)
 - Changing the preference to show the preview panel as a separate tab now has effect without restarting JabRef. [#8370](https://github.com/JabRef/jabref/pull/8370)
 - We enabled switching themes in JabRef without the need to restart JabRef. [#7335](https://github.com/JabRef/jabref/pull/7335)
-- We added support for the field `day`, `rights`, `coverage` and `language` when reading XMP data in Dublin Core format[#8491](https://github.com/JabRef/jabref/issues/8491)
+- We added support for the field `day`, `rights`, `coverage` and `language` when reading XMP data in Dublin Core format. [#8491](https://github.com/JabRef/jabref/issues/8491)
 
 ### Fixed
 

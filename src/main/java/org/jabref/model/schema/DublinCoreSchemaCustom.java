@@ -17,7 +17,6 @@ import org.slf4j.LoggerFactory;
 /**
  *  A DublinCoreSchema extension Class.
  *  In case anyone intends to alter standard behaviour.
- *
  */
 @StructuredType(preferedPrefix = "dc", namespace = "http://purl.org/dc/elements/1.1/")
 public class DublinCoreSchemaCustom extends DublinCoreSchema {
@@ -29,7 +28,6 @@ public class DublinCoreSchemaCustom extends DublinCoreSchema {
     }
 
     public static DublinCoreSchema copyDublinCoreSchema(DublinCoreSchema dcSchema) {
-
         if (Objects.isNull(dcSchema)) {
             return null;
         }
@@ -39,9 +37,7 @@ public class DublinCoreSchemaCustom extends DublinCoreSchema {
             FieldUtils.writeField(dublinCoreSchemaCustom, "container", dcSchema.getContainer(), true);
             FieldUtils.writeField(dublinCoreSchemaCustom, "attributes",
                     FieldUtils.readField(dcSchema, "attributes", true), true);
-
             return dublinCoreSchemaCustom;
-
         } catch (Exception e) {
             LOGGER.error("Error making custom DC Schema. Using the default", e);
             return dcSchema;
@@ -51,9 +47,6 @@ public class DublinCoreSchemaCustom extends DublinCoreSchema {
     /**
      *  Overloaded XMP Schema method
      *  Behaviour is same except when seqName is "Date". Will return raw value instead
-     *
-     * @param seqName
-     * @return
      */
     @Override
     public List<String> getUnqualifiedSequenceValueList(String seqName) {
@@ -66,7 +59,6 @@ public class DublinCoreSchemaCustom extends DublinCoreSchema {
                         .map(field -> (String) ((DateType) field).getRawValue())
                         .collect(Collectors.toList());
             }
-
             return ((ArrayProperty) abstractProperty).getElementsAsString();
         }
         return null;

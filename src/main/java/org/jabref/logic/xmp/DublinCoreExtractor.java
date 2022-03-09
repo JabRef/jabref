@@ -376,8 +376,6 @@ public class DublinCoreExtractor {
 
     /**
      * BibTex Field : language ; DC Field : dc:language
-     *
-     * @param languages
      */
     private void fillLanguages(String languages) {
         Arrays.stream(languages.split(","))
@@ -386,8 +384,6 @@ public class DublinCoreExtractor {
 
     /**
      * BibTex : Rights (Custom Field); DC Field : dc:rights
-     *
-     * @param rights
      */
     private void fillRights(String rights) {
         dcSchema.addRights(null, rights.split(",")[0]);
@@ -395,8 +391,6 @@ public class DublinCoreExtractor {
 
     /**
      * BibTex : Source (Custom Field); DC Field : Source
-     *
-     * @param source
      */
     private void fillSource(String source) {
         dcSchema.setSource(source);
@@ -463,7 +457,6 @@ public class DublinCoreExtractor {
                         this.fillCustomField(field.getKey(), field.getValue());
                 }
             } else {
-
                 if (DC_COVERAGE.equals(fieldEntry.getName())) {
                     this.fillCoverage(field.getValue());
                 } else if (DC_RIGHTS.equals(fieldEntry.getName())) {

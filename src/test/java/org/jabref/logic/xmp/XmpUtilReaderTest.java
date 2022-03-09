@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Optional;
 
 import org.jabref.logic.importer.ImportFormatPreferences;
-import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.fileformat.BibtexImporter;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.model.entry.BibEntry;
@@ -54,15 +53,15 @@ class XmpUtilReaderTest {
      * Tests reading of dublinCore metadata.
      */
     @Test
-    void testReadArticleDublinCoreReadRawXmp() throws IOException, URISyntaxException, ParseException {
-        Path path = Path.of(XmpUtilShared.class.getResource("article_dublinCore.pdf").toURI());
+    void testReadArticleDublinCoreReadRawXmp() throws IOException, URISyntaxException {
+        Path path = Path.of(XmpUtilShared.class.getResource("article_dublinCore_without_day.pdf").toURI());
         List<XMPMetadata> meta = XmpUtilReader.readRawXmp(path);
 
         DublinCoreSchema dcSchema = DublinCoreSchemaCustom.copyDublinCoreSchema(meta.get(0).getDublinCoreSchema());
         DublinCoreExtractor dcExtractor = new DublinCoreExtractor(dcSchema, xmpPreferences, new BibEntry());
         Optional<BibEntry> entry = dcExtractor.extractBibtexEntry();
 
-        Path bibFile = Path.of(XmpUtilShared.class.getResource("article_dublinCore.bib").toURI());
+        Path bibFile = Path.of(XmpUtilShared.class.getResource("article_dublinCore_without_day.bib").toURI());
         List<BibEntry> expected = testImporter.importDatabase(bibFile, StandardCharsets.UTF_8).getDatabase().getEntries();
 
         assertEquals(expected, Collections.singletonList(entry.get()));
