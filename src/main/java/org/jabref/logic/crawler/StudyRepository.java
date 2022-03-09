@@ -26,6 +26,7 @@ import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.OS;
+import org.jabref.logic.util.io.FileNameCleaner;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntryTypesManager;
@@ -428,7 +429,7 @@ class StudyRepository {
     }
 
     private Path getPathToFetcherResultFile(String query, String fetcherName) {
-        return Path.of(repositoryPath.toString(), trimNameAndAddID(query), fetcherName + ".bib");
+        return Path.of(repositoryPath.toString(), trimNameAndAddID(query), FileNameCleaner.cleanFileName(fetcherName) + ".bib");
     }
 
     private Path getPathToQueryResultFile(String query) {
