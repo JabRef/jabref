@@ -60,7 +60,6 @@ class XmpUtilReaderTest {
         DublinCoreExtractor dcExtractor = new DublinCoreExtractor(dcSchema, xmpPreferences, new BibEntry());
         Optional<BibEntry> entry = dcExtractor.extractBibtexEntry();
 
-
         Path bibFile = Path.of(XmpUtilShared.class.getResource("article_dublinCore_without_day.bib").toURI());
         List<BibEntry> expected = testImporter.importDatabase(bibFile).getDatabase().getEntries();
 
