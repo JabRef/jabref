@@ -38,15 +38,15 @@ import org.xml.sax.SAXException;
 public class CitationStyle {
 
     public static final String DEFAULT = "/ieee.csl";
+
     private static final Logger LOGGER = LoggerFactory.getLogger(CitationStyle.class);
     private static final String STYLES_ROOT = "/csl-styles";
-
     private static final List<CitationStyle> STYLES = new ArrayList<>();
+    private static final DocumentBuilderFactory FACTORY = DocumentBuilderFactory.newInstance();
 
     private final String filePath;
     private final String title;
     private final String source;
-    private static final DocumentBuilderFactory FACTORY = DocumentBuilderFactory.newInstance();
 
     private CitationStyle(final String filename, final String title, final String source) {
         this.filePath = Objects.requireNonNull(filename);
@@ -63,7 +63,7 @@ public class CitationStyle {
                 InputSource is = new InputSource();
                 is.setCharacterStream(new StringReader(stripInvalidProlog(source)));
 
-                Document doc =  FACTORY.newDocumentBuilder().parse(is);
+                Document doc = FACTORY.newDocumentBuilder().parse(is);
                 NodeList nodes = doc.getElementsByTagName("info");
 
                 NodeList titleNode = ((Element) nodes.item(0)).getElementsByTagName("title");
@@ -100,7 +100,7 @@ public class CitationStyle {
             String internalFile = STYLES_ROOT + (styleFile.startsWith("/") ? "" : "/") + styleFile;
             URL url = CitationStyle.class.getResource(internalFile);
 
-            LOGGER.debug("URL is empty? {}",url);
+            LOGGER.debug("URL is empty? {}", url);
             if (url != null) {
                 text = CSLUtils.readURLToString(url, StandardCharsets.UTF_8.toString());
             } else {
@@ -109,7 +109,7 @@ public class CitationStyle {
             }
             return createCitationStyleFromSource(text, styleFile);
         } catch (NoSuchFileException e) {
-            LOGGER.error("Could not find file: " + styleFile, e);
+            LOGGER.error("Could not find file: {}", styleFile, e);
         } catch (IOException e) {
             LOGGER.error("Error reading source file", e);
         }
