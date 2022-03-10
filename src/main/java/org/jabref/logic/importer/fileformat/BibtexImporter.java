@@ -15,6 +15,7 @@ import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.util.StandardFileType;
+import org.jabref.model.database.BibDatabaseModeDetection;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import org.slf4j.Logger;
@@ -79,6 +80,10 @@ public class BibtexImporter extends Importer {
         try (BufferedReader reader = Files.newBufferedReader(filePath, encoding)) {
             ParserResult parserResult = this.importDatabase(reader);
             parserResult.getMetaData().setEncoding(encoding);
+            parserResult.setPath(filePath);
+            if (parserResult.getMetaData().getMode().isEmpty()) {
+                parserResult.getMetaData().setMode(BibDatabaseModeDetection.inferMode(parserResult.getDatabase()));
+            }
             return parserResult;
         }
     }
