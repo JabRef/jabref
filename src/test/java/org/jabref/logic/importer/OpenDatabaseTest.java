@@ -21,7 +21,6 @@ import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 class OpenDatabaseTest {
 
@@ -46,39 +45,36 @@ class OpenDatabaseTest {
     @BeforeEach
     void setUp() {
         generalPreferences = mock(GeneralPreferences.class, Answers.RETURNS_DEEP_STUBS);
-        when(generalPreferences.getDefaultEncoding()).thenReturn(StandardCharsets.UTF_8);
         importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
     }
 
     @Test
     void useFallbackEncodingIfNoHeader() throws IOException {
-        ParserResult result = OpenDatabase.loadDatabase(bibNoHeader, generalPreferences, importFormatPreferences, fileMonitor);
+        ParserResult result = OpenDatabase.loadDatabase(bibNoHeader, importFormatPreferences, fileMonitor);
         assertEquals(defaultEncoding, result.getMetaData().getEncoding().get());
     }
 
     @Test
     void useFallbackEncodingIfUnknownHeader() throws IOException {
-        ParserResult result = OpenDatabase.loadDatabase(bibWrongHeader, generalPreferences, importFormatPreferences, fileMonitor);
+        ParserResult result = OpenDatabase.loadDatabase(bibWrongHeader, importFormatPreferences, fileMonitor);
         assertEquals(defaultEncoding, result.getMetaData().getEncoding().get());
     }
 
     @Test
     void useSpecifiedEncoding() throws IOException {
-        when(generalPreferences.getDefaultEncoding()).thenReturn(StandardCharsets.US_ASCII);
-        ParserResult result = OpenDatabase.loadDatabase(bibHeader, generalPreferences, importFormatPreferences, fileMonitor);
+        ParserResult result = OpenDatabase.loadDatabase(bibHeader, importFormatPreferences, fileMonitor);
         assertEquals(defaultEncoding, result.getMetaData().getEncoding().get());
     }
 
     @Test
     void useSpecifiedEncodingWithSignature() throws IOException {
-        when(generalPreferences.getDefaultEncoding()).thenReturn(StandardCharsets.US_ASCII);
-        ParserResult result = OpenDatabase.loadDatabase(bibHeaderAndSignature, generalPreferences, importFormatPreferences, fileMonitor);
+        ParserResult result = OpenDatabase.loadDatabase(bibHeaderAndSignature, importFormatPreferences, fileMonitor);
         assertEquals(defaultEncoding, result.getMetaData().getEncoding().get());
     }
 
     @Test
     void entriesAreParsedNoHeader() throws IOException {
-        ParserResult result = OpenDatabase.loadDatabase(bibNoHeader, generalPreferences, importFormatPreferences, fileMonitor);
+        ParserResult result = OpenDatabase.loadDatabase(bibNoHeader, importFormatPreferences, fileMonitor);
         BibDatabase db = result.getDatabase();
 
         // Entry
@@ -88,7 +84,7 @@ class OpenDatabaseTest {
 
     @Test
     void entriesAreParsedHeader() throws IOException {
-        ParserResult result = OpenDatabase.loadDatabase(bibHeader, generalPreferences, importFormatPreferences, fileMonitor);
+        ParserResult result = OpenDatabase.loadDatabase(bibHeader, importFormatPreferences, fileMonitor);
         BibDatabase db = result.getDatabase();
 
         // Entry
@@ -98,7 +94,7 @@ class OpenDatabaseTest {
 
     @Test
     void entriesAreParsedHeaderAndSignature() throws IOException {
-        ParserResult result = OpenDatabase.loadDatabase(bibHeaderAndSignature, generalPreferences, importFormatPreferences, fileMonitor);
+        ParserResult result = OpenDatabase.loadDatabase(bibHeaderAndSignature, importFormatPreferences, fileMonitor);
         BibDatabase db = result.getDatabase();
 
         // Entry
@@ -111,7 +107,7 @@ class OpenDatabaseTest {
      */
     @Test
     void correctlyParseEncodingWithoutNewline() throws IOException {
-        ParserResult result = OpenDatabase.loadDatabase(bibEncodingWithoutNewline, generalPreferences, importFormatPreferences, fileMonitor);
+        ParserResult result = OpenDatabase.loadDatabase(bibEncodingWithoutNewline, importFormatPreferences, fileMonitor);
         assertEquals(StandardCharsets.US_ASCII, result.getMetaData().getEncoding().get());
 
         BibDatabase db = result.getDatabase();

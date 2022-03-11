@@ -279,7 +279,6 @@ public class JabRefGUI {
             try {
                 parsedDatabase = OpenDatabase.loadDatabase(
                         dbFile,
-                        preferencesService.getGeneralPreferences(),
                         preferencesService.getImportFormatPreferences(),
                         Globals.getFileUpdateMonitor());
             } catch (IOException ex) {

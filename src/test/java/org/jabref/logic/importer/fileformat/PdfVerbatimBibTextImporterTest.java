@@ -1,6 +1,5 @@
 package org.jabref.logic.importer.fileformat;
 
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
@@ -46,14 +45,14 @@ class PdfVerbatimBibTextImporterTest {
     @Test
     void doesNotHandleEncryptedPdfs() throws Exception {
         Path file = Path.of(PdfVerbatimBibTextImporter.class.getResource("/pdfs/encrypted.pdf").toURI());
-        List<BibEntry> result = importer.importDatabase(file, StandardCharsets.UTF_8).getDatabase().getEntries();
+        List<BibEntry> result = importer.importDatabase(file).getDatabase().getEntries();
         assertEquals(Collections.emptyList(), result);
     }
 
     @Test
     void importTwiceWorksAsExpected() throws Exception {
         Path file = Path.of(PdfVerbatimBibTextImporterTest.class.getResource("mixedMetadata.pdf").toURI());
-        List<BibEntry> result = importer.importDatabase(file, StandardCharsets.UTF_8).getDatabase().getEntries();
+        List<BibEntry> result = importer.importDatabase(file).getDatabase().getEntries();
 
         BibEntry expected = new BibEntry(StandardEntryType.Article);
         expected.setCitationKey("jabreftest2021");
@@ -65,7 +64,7 @@ class PdfVerbatimBibTextImporterTest {
         expected.setField(StandardField.ISBN, "0134685997");
         expected.setFiles(Collections.singletonList(new LinkedFile("", file.toAbsolutePath(), "PDF")));
 
-        List<BibEntry> resultSecondImport = importer.importDatabase(file, StandardCharsets.UTF_8).getDatabase().getEntries();
+        List<BibEntry> resultSecondImport = importer.importDatabase(file).getDatabase().getEntries();
         assertEquals(Collections.singletonList(expected), result);
         assertEquals(Collections.singletonList(expected), resultSecondImport);
     }

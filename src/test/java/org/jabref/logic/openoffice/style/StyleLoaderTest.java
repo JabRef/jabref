@@ -40,23 +40,18 @@ public class StyleLoaderTest {
 
     @Test
     public void throwNPEWithNullPreferences() {
-        assertThrows(NullPointerException.class, () -> loader = new StyleLoader(null, layoutPreferences, mock(Charset.class)));
+        assertThrows(NullPointerException.class, () -> loader = new StyleLoader(null, layoutPreferences));
     }
 
     @Test
     public void throwNPEWithNullLayoutPreferences() {
-        assertThrows(NullPointerException.class, () -> loader = new StyleLoader(mock(OpenOfficePreferences.class), null, mock(Charset.class)));
-    }
-
-    @Test
-    public void throwNPEWithNullCharset() {
-        assertThrows(NullPointerException.class, () -> loader = new StyleLoader(mock(OpenOfficePreferences.class), layoutPreferences, null));
+        assertThrows(NullPointerException.class, () -> loader = new StyleLoader(mock(OpenOfficePreferences.class), null));
     }
 
     @Test
     public void testGetStylesWithEmptyExternal() {
         preferences.setExternalStyles(Collections.emptyList());
-        loader = new StyleLoader(preferences, layoutPreferences, encoding);
+        loader = new StyleLoader(preferences, layoutPreferences);
 
         assertEquals(2, loader.getStyles().size());
     }
@@ -64,7 +59,7 @@ public class StyleLoaderTest {
     @Test
     public void testAddStyleLeadsToOneMoreStyle() throws URISyntaxException {
         preferences.setExternalStyles(Collections.emptyList());
-        loader = new StyleLoader(preferences, layoutPreferences, encoding);
+        loader = new StyleLoader(preferences, layoutPreferences);
 
         String filename = Path.of(StyleLoader.class.getResource(StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH).toURI())
                               .toFile().getPath();
@@ -75,7 +70,7 @@ public class StyleLoaderTest {
     @Test
     public void testAddInvalidStyleLeadsToNoMoreStyle() {
         preferences.setExternalStyles(Collections.emptyList());
-        loader = new StyleLoader(preferences, layoutPreferences, encoding);
+        loader = new StyleLoader(preferences, layoutPreferences);
         int beforeAdding = loader.getStyles().size();
         loader.addStyleIfValid("DefinitelyNotAValidFileNameOrWeAreExtremelyUnlucky");
         assertEquals(beforeAdding, loader.getStyles().size());
@@ -86,7 +81,7 @@ public class StyleLoaderTest {
         String filename = Path.of(StyleLoader.class.getResource(StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH).toURI())
                               .toFile().getPath();
         when(preferences.getExternalStyles()).thenReturn(Collections.singletonList(filename));
-        loader = new StyleLoader(preferences, layoutPreferences, encoding);
+        loader = new StyleLoader(preferences, layoutPreferences);
         assertEquals(NUMBER_OF_INTERNAL_STYLES + 1, loader.getStyles().size());
     }
 
@@ -94,7 +89,7 @@ public class StyleLoaderTest {
     public void testInitalizeWithIncorrectExternalFile() {
         preferences.setExternalStyles(Collections.singletonList("DefinitelyNotAValidFileNameOrWeAreExtremelyUnlucky"));
 
-        loader = new StyleLoader(preferences, layoutPreferences, encoding);
+        loader = new StyleLoader(preferences, layoutPreferences);
         assertEquals(NUMBER_OF_INTERNAL_STYLES, loader.getStyles().size());
     }
 
@@ -104,7 +99,7 @@ public class StyleLoaderTest {
                               .toFile().getPath();
         when(preferences.getExternalStyles()).thenReturn(Collections.singletonList(filename));
 
-        loader = new StyleLoader(preferences, layoutPreferences, encoding);
+        loader = new StyleLoader(preferences, layoutPreferences);
         List<OOBibStyle> toremove = new ArrayList<>();
         int beforeRemoving = loader.getStyles().size();
         for (OOBibStyle style : loader.getStyles()) {
@@ -125,7 +120,7 @@ public class StyleLoaderTest {
                               .toFile().getPath();
         when(preferences.getExternalStyles()).thenReturn(Collections.singletonList(filename));
 
-        loader = new StyleLoader(preferences, layoutPreferences, encoding);
+        loader = new StyleLoader(preferences, layoutPreferences);
         List<OOBibStyle> toremove = new ArrayList<>();
         for (OOBibStyle style : loader.getStyles()) {
             if (!style.isInternalStyle()) {
@@ -143,7 +138,7 @@ public class StyleLoaderTest {
     @Test
     public void testAddSameStyleTwiceLeadsToOneMoreStyle() throws URISyntaxException {
         preferences.setExternalStyles(Collections.emptyList());
-        loader = new StyleLoader(preferences, layoutPreferences, encoding);
+        loader = new StyleLoader(preferences, layoutPreferences);
         int beforeAdding = loader.getStyles().size();
         String filename = Path.of(StyleLoader.class.getResource(StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH).toURI())
                               .toFile().getPath();
@@ -154,7 +149,7 @@ public class StyleLoaderTest {
 
     @Test
     public void testAddNullStyleThrowsNPE() {
-        loader = new StyleLoader(preferences, layoutPreferences, encoding);
+        loader = new StyleLoader(preferences, layoutPreferences);
         assertThrows(NullPointerException.class, () -> loader.addStyleIfValid(null));
     }
 
@@ -162,7 +157,7 @@ public class StyleLoaderTest {
     public void testGetDefaultUsedStyleWhenEmpty() {
         when(preferences.getCurrentStyle()).thenReturn(StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH);
         preferences.clearCurrentStyle();
-        loader = new StyleLoader(preferences, layoutPreferences, encoding);
+        loader = new StyleLoader(preferences, layoutPreferences);
         OOBibStyle style = loader.getUsedStyle();
         assertTrue(style.isValid());
         assertEquals(StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH, style.getPath());
@@ -172,7 +167,7 @@ public class StyleLoaderTest {
     @Test
     public void testGetStoredUsedStyle() {
         when(preferences.getCurrentStyle()).thenReturn(StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH);
-        loader = new StyleLoader(preferences, layoutPreferences, encoding);
+        loader = new StyleLoader(preferences, layoutPreferences);
         OOBibStyle style = loader.getUsedStyle();
         assertTrue(style.isValid());
         assertEquals(StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH, style.getPath());
@@ -182,7 +177,7 @@ public class StyleLoaderTest {
     @Test
     public void testGetDefaultUsedStyleWhenIncorrect() {
         when(preferences.getCurrentStyle()).thenReturn("ljlkjlkjnljnvdlsjniuhwelfhuewfhlkuewhfuwhelu");
-        loader = new StyleLoader(preferences, layoutPreferences, encoding);
+        loader = new StyleLoader(preferences, layoutPreferences);
         OOBibStyle style = loader.getUsedStyle();
         assertTrue(style.isValid());
         assertEquals(StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH, style.getPath());
@@ -192,7 +187,7 @@ public class StyleLoaderTest {
     public void testRemoveInternalStyleReturnsFalseAndDoNotRemove() {
         preferences.setExternalStyles(Collections.emptyList());
 
-        loader = new StyleLoader(preferences, layoutPreferences, encoding);
+        loader = new StyleLoader(preferences, layoutPreferences);
         List<OOBibStyle> toremove = new ArrayList<>();
         for (OOBibStyle style : loader.getStyles()) {
             if (style.isInternalStyle()) {

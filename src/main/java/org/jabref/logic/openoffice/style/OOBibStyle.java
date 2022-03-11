@@ -5,8 +5,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringReader;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
@@ -131,7 +129,6 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
     private final Map<String, Object> citProperties = new HashMap<>();
     private final boolean fromResource;
     private final String path;
-    private final Charset encoding;
     private final LayoutFormatterPreferences prefs;
     private String name = "";
     private Layout defaultBibLayout;
@@ -141,11 +138,9 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
     private String localCopy;
     private boolean isDefaultLayoutPresent;
 
-    public OOBibStyle(Path styleFile, LayoutFormatterPreferences prefs,
-                      Charset encoding) throws IOException {
+    public OOBibStyle(Path styleFile, LayoutFormatterPreferences prefs) throws IOException {
         this.prefs = Objects.requireNonNull(prefs);
         this.styleFile = Objects.requireNonNull(styleFile);
-        this.encoding = Objects.requireNonNull(encoding);
         setDefaultProperties();
         reload();
         fromResource = false;
@@ -155,7 +150,6 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
     public OOBibStyle(String resourcePath, LayoutFormatterPreferences prefs) throws IOException {
         this.prefs = Objects.requireNonNull(prefs);
         Objects.requireNonNull(resourcePath);
-        this.encoding = StandardCharsets.UTF_8;
         setDefaultProperties();
         initialize(OOBibStyle.class.getResourceAsStream(resourcePath));
         fromResource = true;
@@ -238,7 +232,7 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
     private void initialize(InputStream stream) throws IOException {
         Objects.requireNonNull(stream);
 
-        try (Reader reader = new InputStreamReader(stream, encoding)) {
+        try (Reader reader = new InputStreamReader(stream)) {
             readFormatFile(reader);
         }
     }
@@ -264,7 +258,7 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
     private void reload() throws IOException {
         if (styleFile != null) {
             this.styleFileModificationTime = Files.getLastModifiedTime(styleFile).toMillis();
-            try (InputStream stream = Files.newInputStream(styleFile )) {
+            try (InputStream stream = Files.newInputStream(styleFile)) {
                 initialize(stream);
             }
         }

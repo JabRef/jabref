@@ -1,7 +1,6 @@
 package org.jabref.logic.externalfiles;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 
 import org.jabref.logic.importer.ImportFormatPreferences;
@@ -26,13 +25,13 @@ public class ExternalFilesContentImporter {
 
     public ParserResult importPDFContent(Path file) {
         try {
-            return new PdfMergeMetadataImporter(importerPreferences, importFormatPreferences).importDatabase(file, StandardCharsets.UTF_8);
+            return new PdfMergeMetadataImporter(importerPreferences, importFormatPreferences).importDatabase(file);
         } catch (IOException e) {
            return ParserResult.fromError(e);
         }
     }
 
     public ParserResult importFromBibFile(Path bibFile, FileUpdateMonitor fileUpdateMonitor) throws IOException {
-        return OpenDatabase.loadDatabase(bibFile, generalPreferences, importFormatPreferences, fileUpdateMonitor);
+        return OpenDatabase.loadDatabase(bibFile, importFormatPreferences, fileUpdateMonitor);
     }
 }
