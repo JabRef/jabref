@@ -23,6 +23,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.eq;
 
 /**
  * Tests where the remote client and server setup is wrong.
@@ -94,7 +95,7 @@ class RemoteSetupTest {
                 assertFalse(server.isOpen());
                 server.openAndStart(messageHandler, port, preferencesService);
                 assertFalse(server.isOpen());
-                verify(messageHandler, never()).handleCommandLineArguments(any(), preferencesService);
+                verify(messageHandler, never()).handleCommandLineArguments(any(), eq(preferencesService));
             }
         }
     }
