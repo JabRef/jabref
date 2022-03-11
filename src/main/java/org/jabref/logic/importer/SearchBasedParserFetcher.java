@@ -8,7 +8,6 @@ import java.net.URL;
 import java.util.List;
 
 import org.jabref.logic.cleanup.Formatter;
-import org.jabref.logic.importer.fetcher.MedlineFetcher;
 import org.jabref.model.entry.BibEntry;
 
 import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
@@ -21,22 +20,12 @@ import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
  *     <li>Post-process fetched entries</li>
  * </ol>
  * <p>
- *    Normally, a fetcher invokes an API and then parses the response (to get BibEntries).
- *    This kind of workflow is supported by the parser-based fetcher.
- *    Sometimes you need to have more flexibility, i.e. call multiple endpoints and merge the results etc.
- *    In theses cases, one has to use the non-parser-based fetcher interfaces.
- * <p>
- * <p>
- *     This interface is used for web resources which do NOT provide BibTeX data {@link BibEntry} directly.
+ *     This interface is used for web resources which do NOT provide BibTeX data {@link BibEntry}.
  *     JabRef's infrastructure to convert arbitrary input data to BibTeX is {@link Parser}.
  * </p>
  * <p>
  *     This interface inherits {@link SearchBasedFetcher}, because the methods <code>performSearch</code> have to be provided by both.
  *     As non-BibTeX web fetcher one could do "magic" stuff without this helper interface and directly use {@link WebFetcher}, but this is more work.
- * </p>
- * <p>
- *     The idea is the one can reuse an importer in the place of a Parser.
- *     See {@link MedlineFetcher#getParser()} for an example.
  * </p>
  * <p>
  *     Note that this interface "should" be an abstract class.
