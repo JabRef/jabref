@@ -270,7 +270,7 @@ class OOBibBase {
         try {
             boolean recordingChanges = UnoRedlines.getRecordChanges(doc);
             int nRedlines = UnoRedlines.countRedlines(doc);
-            if (recordingChanges || nRedlines > 0) {
+            if (recordingChanges || (nRedlines > 0)) {
                 String msg = "";
                 if (recordingChanges) {
                     msg += Localization.lang("Cannot work with"

@@ -1,6 +1,5 @@
 package org.jabref.logic.openoffice.style;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
@@ -61,8 +60,8 @@ class OOBibStyleTest {
 
     @Test
     void testAuthorYearAsFile() throws URISyntaxException, IOException {
-        File defFile = Path.of(OOBibStyleTest.class.getResource(StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH).toURI())
-                           .toFile();
+        Path defFile = Path.of(OOBibStyleTest.class.getResource(StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH).toURI());
+
         OOBibStyle style = new OOBibStyle(defFile, layoutFormatterPreferences, StandardCharsets.UTF_8);
         assertTrue(style.isValid());
         assertFalse(style.isInternalStyle());

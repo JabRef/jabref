@@ -1,7 +1,5 @@
 package org.jabref.logic.openoffice.style;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -9,6 +7,8 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -136,12 +136,12 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
     private String name = "";
     private Layout defaultBibLayout;
     private boolean valid;
-    private File styleFile;
+    private Path styleFile;
     private long styleFileModificationTime = Long.MIN_VALUE;
     private String localCopy;
     private boolean isDefaultLayoutPresent;
 
-    public OOBibStyle(File styleFile, LayoutFormatterPreferences prefs,
+    public OOBibStyle(Path styleFile, LayoutFormatterPreferences prefs,
                       Charset encoding) throws IOException {
         this.prefs = Objects.requireNonNull(prefs);
         this.styleFile = Objects.requireNonNull(styleFile);
@@ -149,7 +149,7 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
         setDefaultProperties();
         reload();
         fromResource = false;
-        path = styleFile.getPath();
+        path = styleFile.toAbsolutePath().toString();
     }
 
     public OOBibStyle(String resourcePath, LayoutFormatterPreferences prefs) throws IOException {
@@ -227,7 +227,7 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
         return path;
     }
 
-    public File getFile() {
+    public Path getFile() {
         return styleFile;
     }
 
@@ -263,8 +263,8 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
      */
     private void reload() throws IOException {
         if (styleFile != null) {
-            this.styleFileModificationTime = styleFile.lastModified();
-            try (InputStream stream = new FileInputStream(styleFile)) {
+            this.styleFileModificationTime = Files.getLastModifiedTime(styleFile).toMillis();
+            try (InputStream stream = Files.newInputStream(styleFile )) {
                 initialize(stream);
             }
         }
@@ -280,7 +280,11 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
         if (styleFile == null) {
             return true;
         } else {
-            return styleFile.lastModified() == this.styleFileModificationTime;
+            try {
+                return Files.getLastModifiedTime(styleFile).toMillis() == this.styleFileModificationTime;
+            } catch (IOException e) {
+                return false;
+            }
         }
     }
 

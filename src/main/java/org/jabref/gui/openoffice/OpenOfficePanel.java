@@ -433,7 +433,7 @@ public class OpenOfficePanel {
         final String errorDialogTitle = Localization.lang("Error pushing entries");
 
         if (stateManager.getActiveDatabase().isEmpty()
-                || stateManager.getActiveDatabase().get().getDatabase() == null) {
+                || (stateManager.getActiveDatabase().get().getDatabase() == null)) {
             OOError.noDataBaseIsOpenForCiting()
                    .setTitle(errorDialogTitle)
                    .showErrorDialog(dialogService);
