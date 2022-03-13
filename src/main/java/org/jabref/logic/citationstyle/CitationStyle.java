@@ -22,7 +22,6 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.jabref.logic.util.StandardFileType;
 
-import de.undercouch.citeproc.CSL;
 import de.undercouch.citeproc.helper.CSLUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,14 +60,19 @@ public class CitationStyle {
     private static Optional<CitationStyle> createCitationStyleFromSource(final String source, final String filename) {
         if ((filename != null) && !filename.isEmpty() && (source != null) && !source.isEmpty()) {
             try {
-                LOGGER.debug("creating file from source");
                 InputSource is = new InputSource();
                 is.setCharacterStream(new StringReader(stripInvalidProlog(source)));
 
                 Document doc = FACTORY.newDocumentBuilder().parse(is);
 
-                NodeList nodes = doc.getElementsByTagName("info");
+                // See CSL#canFormatBibliographies, checks if the tag exists
+                NodeList bibs = doc.getElementsByTagName("bibliography");
+                if (bibs.getLength() <= 0) {
+                    LOGGER.debug("no bibliography element for file {} ", filename);
+                    return Optional.empty();
+                }
 
+                NodeList nodes = doc.getElementsByTagName("info");
                 NodeList titleNode = ((Element) nodes.item(0)).getElementsByTagName("title");
                 String title = ((CharacterData) titleNode.item(0).getFirstChild()).getData();
 
@@ -99,21 +103,13 @@ public class CitationStyle {
         }
 
         try {
-            CSL.canFormatBibliographies(styleFile);
-        } catch (IOException e1) {
-            LOGGER.debug("cannt load", e1);
-        }
-
-        try {
             String text;
             String internalFile = STYLES_ROOT + (styleFile.startsWith("/") ? "" : "/") + styleFile;
             URL url = CitationStyle.class.getResource(internalFile);
 
-            LOGGER.debug("URL is empty? {}", url);
             if (url != null) {
                 text = CSLUtils.readURLToString(url, StandardCharsets.UTF_8.toString());
             } else {
-                LOGGER.debug("outside of classpath {}", Path.of(styleFile));
                 // if the url is null then the style is located outside the classpath
                 text = new String(Files.readAllBytes(Path.of(styleFile)), StandardCharsets.UTF_8);
             }
