@@ -146,7 +146,6 @@ public class CitationStyle {
 
         try {
             URI uri = url.toURI();
-            LOGGER.debug("Style uri {}", uri);
             Path path = Path.of(uri).getParent();
             STYLES.addAll(discoverCitationStylesInPath(path));
 
