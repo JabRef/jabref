@@ -60,9 +60,10 @@ class StudyDatabaseToFetcherConverterTest {
         StudyDatabaseToFetcherConverter converter = new StudyDatabaseToFetcherConverter(studyRepository.getActiveLibraryEntries(), importFormatPreferences);
         List<SearchBasedFetcher> result = converter.getActiveFetchers();
 
-        Assertions.assertEquals(2, result.size());
+        Assertions.assertEquals(3, result.size());
         Assertions.assertEquals(result.get(0).getName(), "Springer");
         Assertions.assertEquals(result.get(1).getName(), "ArXiv");
+        Assertions.assertEquals(result.get(2).getName(), "Medline/PubMed");
     }
 
     private void copyTestStudyDefinitionFileIntoDirectory(Path destination) throws Exception {
