@@ -2,7 +2,6 @@ package org.jabref.logic.importer.fileformat;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
@@ -48,7 +47,7 @@ public class PdfGrobidImporterTest {
     @Test
     public void testImportEntries() throws URISyntaxException {
         Path file = Path.of(PdfGrobidImporterTest.class.getResource("LNCS-minimal.pdf").toURI());
-        List<BibEntry> bibEntries = importer.importDatabase(file, StandardCharsets.UTF_8).getDatabase().getEntries();
+        List<BibEntry> bibEntries = importer.importDatabase(file).getDatabase().getEntries();
 
         assertEquals(1, bibEntries.size());
 
@@ -60,13 +59,13 @@ public class PdfGrobidImporterTest {
     @Test
     public void testIsRecognizedFormat() throws IOException, URISyntaxException {
         Path file = Path.of(PdfGrobidImporterTest.class.getResource("annotated.pdf").toURI());
-        assertTrue(importer.isRecognizedFormat(file, StandardCharsets.UTF_8));
+        assertTrue(importer.isRecognizedFormat(file));
     }
 
     @Test
     public void testIsRecognizedFormatReject() throws IOException, URISyntaxException {
         Path file = Path.of(PdfGrobidImporterTest.class.getResource("BibtexImporter.examples.bib").toURI());
-        assertFalse(importer.isRecognizedFormat(file, StandardCharsets.UTF_8));
+        assertFalse(importer.isRecognizedFormat(file));
     }
 
     @Test

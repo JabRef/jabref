@@ -91,6 +91,7 @@ open module org.jabref {
     requires org.apache.tika.core;
     requires pdfbox;
     requires xmpbox;
+    requires com.ibm.icu;
 
     requires flexmark;
     requires flexmark.ext.gfm.strikethrough;
@@ -104,5 +105,4 @@ open module org.jabref {
     requires com.fasterxml.jackson.dataformat.yaml;
     requires com.fasterxml.jackson.datatype.jsr310;
     requires net.harawata.appdirs;
-
 }

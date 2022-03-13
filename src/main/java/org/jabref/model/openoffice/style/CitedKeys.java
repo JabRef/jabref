@@ -63,21 +63,21 @@ public class CitedKeys {
         }
     }
 
-    void distributeLookupResults(CitationGroups cgs) {
+    void distributeLookupResults(CitationGroups citationGroups) {
         for (CitedKey ck : this.data.values()) {
-            ck.distributeLookupResult(cgs);
+            ck.distributeLookupResult(citationGroups);
         }
     }
 
-    void distributeNumbers(CitationGroups cgs) {
+    void distributeNumbers(CitationGroups citationGroups) {
         for (CitedKey ck : this.data.values()) {
-            ck.distributeNumber(cgs);
+            ck.distributeNumber(citationGroups);
         }
     }
 
-    public void distributeUniqueLetters(CitationGroups cgs) {
+    public void distributeUniqueLetters(CitationGroups citationGroups) {
         for (CitedKey ck : this.data.values()) {
-            ck.distributeUniqueLetter(cgs);
+            ck.distributeUniqueLetter(citationGroups);
         }
     }
 

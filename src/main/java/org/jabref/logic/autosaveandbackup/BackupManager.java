@@ -3,6 +3,7 @@ package org.jabref.logic.autosaveandbackup;
 import java.io.IOException;
 import java.io.Writer;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
@@ -134,7 +135,7 @@ public class BackupManager {
 
     private void performBackup(Path backupPath) {
         try {
-            Charset charset = bibDatabaseContext.getMetaData().getEncoding().orElse(preferences.getGeneralPreferences().getDefaultEncoding());
+            Charset charset = bibDatabaseContext.getMetaData().getEncoding().orElse(StandardCharsets.UTF_8);
             GeneralPreferences generalPreferences = preferences.getGeneralPreferences();
             SavePreferences savePreferences = preferences.getSavePreferences()
                                                          .withMakeBackup(false);

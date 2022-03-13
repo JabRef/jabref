@@ -37,9 +37,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Backend52, Codec52 and OODataModel.JabRef52 refer to the mode of storage, encoding and
- * what-is-stored in the document under JabRef version 5.2. These basically did not change up to
- * JabRef 5.4.
+ * Backend52, Codec52 and OODataModel.JabRef52 refer to the mode of storage, encoding and what-is-stored in the document under JabRef version 5.2. These basically did not change up to JabRef 5.4.
  */
 public class Backend52 {
     private static final Logger LOGGER = LoggerFactory.getLogger(Backend52.class);
@@ -55,25 +53,21 @@ public class Backend52 {
     }
 
     /**
-     * Get reference mark names from the document matching the pattern
-     * used for JabRef reference mark names.
-     *
+     * Get reference mark names from the document matching the pattern used for JabRef reference mark names.
+     * <p>
      * Note: the names returned are in arbitrary order.
-     *
      */
     public List<String> getJabRefReferenceMarkNames(XTextDocument doc)
-        throws
-        NoDocumentException {
+            throws
+            NoDocumentException {
         List<String> allNames = this.citationStorageManager.getUsedNames(doc);
         return Codec52.filterIsJabRefReferenceMarkName(allNames);
     }
 
     /**
-     * Names of custom properties belonging to us, but without a corresponding reference mark.
-     * These can be deleted.
+     * Names of custom properties belonging to us, but without a corresponding reference mark. These can be deleted.
      *
      * @param citationGroupNames These are the names that are used.
-     *
      */
     private List<String> findUnusedJabrefPropertyNames(XTextDocument doc,
                                                        List<String> citationGroupNames) {
@@ -82,10 +76,10 @@ public class Backend52 {
 
         List<String> pageInfoThrash = new ArrayList<>();
         List<String> jabrefPropertyNames =
-            UnoUserDefinedProperty.getListOfNames(doc)
-            .stream()
-            .filter(Codec52::isJabRefReferenceMarkName)
-            .collect(Collectors.toList());
+                UnoUserDefinedProperty.getListOfNames(doc)
+                                      .stream()
+                                      .filter(Codec52::isJabRefReferenceMarkName)
+                                      .toList();
         for (String pn : jabrefPropertyNames) {
             if (!citationGroupNamesSet.contains(pn)) {
                 pageInfoThrash.add(pn);
@@ -95,21 +89,21 @@ public class Backend52 {
     }
 
     /**
-     *  @return Optional.empty if all is OK, message text otherwise.
+     * @return Optional.empty if all is OK, message text otherwise.
      */
     public Optional<String> healthReport(XTextDocument doc)
-        throws
-        NoDocumentException {
+            throws
+            NoDocumentException {
         List<String> pageInfoThrash =
-            this.findUnusedJabrefPropertyNames(doc, this.getJabRefReferenceMarkNames(doc));
+                this.findUnusedJabrefPropertyNames(doc, this.getJabRefReferenceMarkNames(doc));
         if (pageInfoThrash.isEmpty()) {
             return Optional.empty();
         }
 
-        StringBuilder msg = new StringBuilder("Backend52: found unused pageInfo data, with names listed below.\n");
-        msg.append("In LibreOffice you may remove these in [File]/[Properties]/[Custom Properties]\n");
-        msg.append(String.join("\n", pageInfoThrash));
-        return Optional.of(msg.toString());
+        String msg = "Backend52: found unused pageInfo data, with names listed below.\n"
+                + "In LibreOffice you may remove these in [File]/[Properties]/[Custom Properties]\n"
+                + String.join("\n", pageInfoThrash);
+        return Optional.of(msg);
     }
 
     private static void setPageInfoInDataInitial(List<Citation> citations, Optional<OOText> pageInfo) {
@@ -131,51 +125,44 @@ public class Backend52 {
      * @param markName Reference mark name
      */
     public CitationGroup readCitationGroupFromDocumentOrThrow(XTextDocument doc, String markName)
-        throws
-        WrappedTargetException,
-        NoDocumentException {
+            throws
+            WrappedTargetException,
+            NoDocumentException {
 
         Codec52.ParsedMarkName parsed = Codec52.parseMarkName(markName).orElseThrow(IllegalArgumentException::new);
 
         List<Citation> citations = (parsed.citationKeys.stream()
-                                    .map(Citation::new)
-                                    .collect(Collectors.toList()));
+                                                       .map(Citation::new)
+                                                       .collect(Collectors.toList()));
 
         Optional<OOText> pageInfo = (UnoUserDefinedProperty.getStringValue(doc, markName)
-                                     .map(OOText::fromString));
+                                                           .map(OOText::fromString));
         pageInfo = PageInfo.normalizePageInfo(pageInfo);
 
         setPageInfoInDataInitial(citations, pageInfo);
 
         NamedRange namedRange = (citationStorageManager.getNamedRangeFromDocument(doc, markName)
-                                 .orElseThrow(IllegalArgumentException::new));
+                                                       .orElseThrow(IllegalArgumentException::new));
 
         CitationGroupId groupId = new CitationGroupId(markName);
         CitationGroup group = new CitationGroup(OODataModel.JabRef52,
-                                                groupId,
-                                                parsed.citationType,
-                                                citations,
-                                                Optional.of(markName));
+                groupId,
+                parsed.citationType,
+                citations,
+                Optional.of(markName));
         this.cgidToNamedRange.put(groupId, namedRange);
         return group;
     }
 
     /**
-     *  Create a reference mark at the end of {@code position} in the document.
+     * Create a reference mark at the end of {@code position} in the document.
+     * <p>
+     * On return {@code position} is collapsed, and is after the inserted space, or at the end of the reference mark.
      *
-     *  On return {@code position} is collapsed, and is after the inserted space, or at the end of
-     *  the reference mark.
-     *
-     *  @param citationKeys Keys to be cited.
-     *
-     *  @param pageInfos An optional pageInfo for each citation key.
-     *                   Backend52 only uses and stores the last pageInfo,
-     *                   all others should be Optional.empty()
-     *
-     *  @param position Collapsed to its end.
-     *
-     *  @param insertSpaceAfter We insert a space after the mark, that carries on format of
-     *                          characters from the original position.
+     * @param citationKeys     Keys to be cited.
+     * @param pageInfos        An optional pageInfo for each citation key. Backend52 only uses and stores the last pageInfo, all others should be Optional.empty()
+     * @param position         Collapsed to its end.
+     * @param insertSpaceAfter We insert a space after the mark, that carries on format of characters from the original position.
      */
     public CitationGroup createCitationGroup(XTextDocument doc,
                                              List<String> citationKeys,
@@ -183,13 +170,13 @@ public class Backend52 {
                                              CitationType citationType,
                                              XTextCursor position,
                                              boolean insertSpaceAfter)
-        throws
-        CreationException,
-        NoDocumentException,
-        WrappedTargetException,
-        NotRemoveableException,
-        PropertyVetoException,
-        IllegalTypeException {
+            throws
+            CreationException,
+            NoDocumentException,
+            WrappedTargetException,
+            NotRemoveableException,
+            PropertyVetoException,
+            IllegalTypeException {
 
         Objects.requireNonNull(pageInfos);
         if (pageInfos.size() != citationKeys.size()) {
@@ -213,7 +200,7 @@ public class Backend52 {
                     } else {
                         if (pageInfo.isPresent()) {
                             LOGGER.warn("dataModel JabRef52"
-                                        + " only supports pageInfo for the last citation of a group");
+                                    + " only supports pageInfo for the last citation of a group");
                         }
                     }
                     break;
@@ -231,8 +218,8 @@ public class Backend52 {
          * has to be unique in the document.
          */
         final String markName = Codec52.getUniqueMarkName(new HashSet<>(citationStorageManager.getUsedNames(doc)),
-                                                          citationKeys,
-                                                          citationType);
+                citationKeys,
+                citationType);
 
         final CitationGroupId groupId = new CitationGroupId(markName);
 
@@ -241,10 +228,10 @@ public class Backend52 {
          */
         boolean withoutBrackets = (citationType == CitationType.INVISIBLE_CIT);
         NamedRange namedRange = this.citationStorageManager.createNamedRange(doc,
-                                                                             markName,
-                                                                             position,
-                                                                             insertSpaceAfter,
-                                                                             withoutBrackets);
+                markName,
+                position,
+                insertSpaceAfter,
+                withoutBrackets);
 
         switch (dataModel) {
             case JabRef52:
@@ -258,9 +245,9 @@ public class Backend52 {
                     UnoUserDefinedProperty.removeIfExists(doc, markName);
                 }
                 CitationGroup group = new CitationGroup(OODataModel.JabRef52,
-                                                        groupId,
-                                                        citationType, citations,
-                                                        Optional.of(markName));
+                        groupId,
+                        citationType, citations,
+                        Optional.of(markName));
                 this.cgidToNamedRange.put(groupId, namedRange);
                 return group;
             case JabRef60:
@@ -272,8 +259,7 @@ public class Backend52 {
 
     /**
      * @return A list with a nullable pageInfo entry for each citation in joinableGroups.
-     *
-     *  TODO: JabRef52 combinePageInfos is not reversible. Should warn user to check the result. Or
+     * TODO: JabRef52 combinePageInfos is not reversible. Should warn user to check the result. Or
      *        ask what to do.
      */
     public static List<Optional<OOText>>
@@ -282,18 +268,18 @@ public class Backend52 {
             case JabRef52:
                 // collect to pageInfos
                 List<Optional<OOText>> pageInfos = OOListUtil.map(joinableGroup,
-                                                                  Backend52::getPageInfoFromData);
+                        Backend52::getPageInfoFromData);
 
                 // Try to do something of the pageInfos.
                 String singlePageInfo = (pageInfos.stream()
-                                         .filter(Optional::isPresent)
-                                         .map(pi -> OOText.toString(pi.get()))
-                                         .distinct()
-                                         .collect(Collectors.joining("; ")));
+                                                  .filter(Optional::isPresent)
+                                                  .map(pi -> OOText.toString(pi.get()))
+                                                  .distinct()
+                                                  .collect(Collectors.joining("; ")));
 
                 int totalCitations = (joinableGroup.stream()
-                                      .map(CitationGroup::numberOfCitations)
-                                      .mapToInt(Integer::intValue).sum());
+                                                   .map(CitationGroup::numberOfCitations)
+                                                   .mapToInt(Integer::intValue).sum());
                 if ("".equals(singlePageInfo)) {
                     singlePageInfo = null;
                 }
@@ -301,17 +287,14 @@ public class Backend52 {
 
             case JabRef60:
                 return (joinableGroup.stream()
-                        .flatMap(group -> (group.citationsInStorageOrder.stream()
-                                           .map(Citation::getPageInfo)))
-                        .collect(Collectors.toList()));
+                                     .flatMap(group -> (group.citationsInStorageOrder.stream()
+                                                                                     .map(Citation::getPageInfo)))
+                                     .collect(Collectors.toList()));
             default:
                 throw new IllegalArgumentException("unhandled dataModel here");
         }
     }
 
-    /**
-     *
-     */
     public List<Optional<OOText>> combinePageInfos(List<CitationGroup> joinableGroup) {
         return combinePageInfosCommon(this.dataModel, joinableGroup);
     }
@@ -325,10 +308,10 @@ public class Backend52 {
     }
 
     public void removeCitationGroup(CitationGroup group, XTextDocument doc)
-        throws
-        WrappedTargetException,
-        NoDocumentException,
-        NotRemoveableException {
+            throws
+            WrappedTargetException,
+            NoDocumentException,
+            NotRemoveableException {
         NamedRange namedRange = getNamedRangeOrThrow(group);
         String refMarkName = namedRange.getRangeName();
         namedRange.removeFromDocument(doc);
@@ -340,22 +323,21 @@ public class Backend52 {
      * @return Optional.empty if the reference mark is missing.
      */
     public Optional<XTextRange> getMarkRange(CitationGroup group, XTextDocument doc)
-        throws
-        NoDocumentException,
-        WrappedTargetException {
+            throws
+            NoDocumentException,
+            WrappedTargetException {
 
         NamedRange namedRange = getNamedRangeOrThrow(group);
         return namedRange.getMarkRange(doc);
     }
 
     /**
-     * Cursor for the reference marks as is: not prepared for filling, but does not need
-     * cleanFillCursorForCitationGroup either.
+     * Cursor for the reference marks as is: not prepared for filling, but does not need cleanFillCursorForCitationGroup either.
      */
     public Optional<XTextCursor> getRawCursorForCitationGroup(CitationGroup group, XTextDocument doc)
-        throws
-        NoDocumentException,
-        WrappedTargetException {
+            throws
+            NoDocumentException,
+            WrappedTargetException {
         NamedRange namedRange = getNamedRangeOrThrow(group);
         return namedRange.getRawCursor(doc);
     }
@@ -364,44 +346,46 @@ public class Backend52 {
      * Must be followed by call to cleanFillCursorForCitationGroup
      */
     public XTextCursor getFillCursorForCitationGroup(CitationGroup group, XTextDocument doc)
-        throws
-        NoDocumentException,
-        WrappedTargetException,
-        CreationException {
+            throws
+            NoDocumentException,
+            WrappedTargetException,
+            CreationException {
 
         NamedRange namedRange = getNamedRangeOrThrow(group);
         return namedRange.getFillCursor(doc);
     }
 
-    /** To be called after getFillCursorForCitationGroup */
+    /**
+     * To be called after getFillCursorForCitationGroup
+     */
     public void cleanFillCursorForCitationGroup(CitationGroup group, XTextDocument doc)
-        throws
-        NoDocumentException,
-        WrappedTargetException {
+            throws
+            NoDocumentException,
+            WrappedTargetException {
         NamedRange namedRange = getNamedRangeOrThrow(group);
         namedRange.cleanFillCursor(doc);
     }
 
-    public List<CitationEntry> getCitationEntries(XTextDocument doc, CitationGroups cgs)
-        throws
-        WrappedTargetException,
-        NoDocumentException {
+    public List<CitationEntry> getCitationEntries(XTextDocument doc, CitationGroups citationGroups)
+            throws
+            WrappedTargetException,
+            NoDocumentException {
 
         switch (dataModel) {
             case JabRef52:
                 // One context per CitationGroup: Backend52 (DataModel.JabRef52)
                 // For DataModel.JabRef60 (Backend60) we need one context per Citation
-                List<CitationEntry> citations = new ArrayList<>(cgs.numberOfCitationGroups());
-                for (CitationGroup group : cgs.getCitationGroupsUnordered()) {
+                List<CitationEntry> citations = new ArrayList<>(citationGroups.numberOfCitationGroups());
+                for (CitationGroup group : citationGroups.getCitationGroupsUnordered()) {
                     String name = group.groupId.citationGroupIdAsString();
                     XTextCursor cursor = (this
-                                          .getRawCursorForCitationGroup(group, doc)
-                                          .orElseThrow(IllegalStateException::new));
+                            .getRawCursorForCitationGroup(group, doc)
+                            .orElseThrow(IllegalStateException::new));
                     String context = GetContext.getCursorStringWithContext(cursor, 30, 30, true);
                     Optional<String> pageInfo = (group.numberOfCitations() > 0
-                                                 ? (getPageInfoFromData(group)
-                                                    .map(e -> OOText.toString(e)))
-                                                 : Optional.empty());
+                            ? (getPageInfoFromData(group)
+                            .map(e -> OOText.toString(e)))
+                            : Optional.empty());
                     CitationEntry entry = new CitationEntry(name, context, pageInfo);
                     citations.add(entry);
                 }
@@ -414,15 +398,15 @@ public class Backend52 {
         }
     }
 
-    /*
+    /**
      * Only applies to storage. Citation markers are not changed.
      */
     public void applyCitationEntries(XTextDocument doc, List<CitationEntry> citationEntries)
-        throws
-        PropertyVetoException,
-        IllegalTypeException,
-        IllegalArgumentException,
-        WrappedTargetException {
+            throws
+            PropertyVetoException,
+            IllegalTypeException,
+            IllegalArgumentException,
+            WrappedTargetException {
 
         switch (dataModel) {
             case JabRef52:
@@ -436,12 +420,11 @@ public class Backend52 {
                 }
                 break;
             case JabRef60:
-                // xx
+                // ToDo: Implement
                 throw new IllegalStateException("applyCitationEntries for JabRef60 is not implemented yet");
             default:
                 throw new IllegalStateException("applyCitationEntries: unhandled dataModel ");
         }
     }
-
 }
 

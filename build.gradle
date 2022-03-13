@@ -1,11 +1,7 @@
-import groovy.json.JsonSlurper
 import org.gradle.internal.os.OperatingSystem
 import org.jabref.build.JournalAbbreviationConverter
 import org.jabref.build.xjc.XjcPlugin
 import org.jabref.build.xjc.XjcTask
-
-// to update the gradle wrapper, execute
-// ./gradlew wrapper --gradle-version=6.0 --distribution-type=bin
 
 plugins {
     id 'application'
@@ -123,6 +119,7 @@ dependencies {
     implementation 'com.h2database:h2-mvstore:2.1.210'
 
     implementation group: 'org.apache.tika', name: 'tika-core', version: '2.3.0'
+    implementation 'com.ibm.icu:icu4j-charset:70.1'
 
     // required for reading write-protected PDFs - see https://github.com/JabRef/jabref/pull/942#issuecomment-209252635
     implementation 'org.bouncycastle:bcprov-jdk15on:1.70'
@@ -218,7 +215,7 @@ dependencies {
     testImplementation "org.testfx:testfx-junit5:4.0.17-alpha-SNAPSHOT"
     testImplementation "org.hamcrest:hamcrest-library:2.2"
 
-    checkstyle 'com.puppycrawl.tools:checkstyle:9.3'
+    checkstyle 'com.puppycrawl.tools:checkstyle:10.0'
     // xjc needs the runtime as well for the ant task, otherwise it fails
     xjc group: 'org.glassfish.jaxb', name: 'jaxb-xjc', version: '3.0.2'
     xjc group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '3.0.2'
