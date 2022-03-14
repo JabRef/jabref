@@ -60,10 +60,10 @@ public class CitationStyle {
     private static Optional<CitationStyle> createCitationStyleFromSource(final String source, final String filename) {
         if ((filename != null) && !filename.isEmpty() && (source != null) && !source.isEmpty()) {
             try {
-                InputSource is = new InputSource();
-                is.setCharacterStream(new StringReader(stripInvalidProlog(source)));
+                InputSource inputSource = new InputSource();
+                inputSource.setCharacterStream(new StringReader(stripInvalidProlog(source)));
 
-                Document doc = FACTORY.newDocumentBuilder().parse(is);
+                Document doc = FACTORY.newDocumentBuilder().parse(inputSource);
 
                 // See CSL#canFormatBibliographies, checks if the tag exists
                 NodeList bibs = doc.getElementsByTagName("bibliography");
