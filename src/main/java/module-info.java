@@ -51,6 +51,8 @@ open module org.jabref {
     // Preferences and XML
     requires java.prefs;
     requires jakarta.xml.bind;
+    // needs to be loaded here as it's otherwise not found at runtime
+    requires org.glassfish.jaxb.runtime;
     requires jdk.xml.dom;
 
     // Annotations (@PostConstruct)
