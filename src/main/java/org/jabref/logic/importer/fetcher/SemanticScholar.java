@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+import org.jabref.logic.importer.EntryBasedFetcher;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.FulltextFetcher;
 import org.jabref.logic.importer.PagedSearchBasedParserFetcher;
@@ -37,7 +38,7 @@ import org.slf4j.LoggerFactory;
 
 import static org.jabref.model.entry.field.StandardField.EPRINT;
 
-public class SemanticScholar implements FulltextFetcher, PagedSearchBasedParserFetcher {
+public class SemanticScholar implements FulltextFetcher, PagedSearchBasedParserFetcher, EntryBasedFetcher {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SemanticScholar.class);
 
@@ -48,7 +49,7 @@ public class SemanticScholar implements FulltextFetcher, PagedSearchBasedParserF
     /**
      * Tries to find a fulltext URL for a given BibTex entry.
      * <p>
-     * Currently, only uses the DOI or arXiv identifier if found.
+     * Uses the DOI if present, otherwise the arXiv identifier.
      *
      * @param entry The Bibtex entry
      * @return The fulltext PDF URL Optional, if found, or an empty Optional if not found.
@@ -95,10 +96,9 @@ public class SemanticScholar implements FulltextFetcher, PagedSearchBasedParserF
 
         // Retrieve PDF link from button on the webpage
         // First checked is a drop-down menu, as it has the correct URL if present
+        // Else take the primary button
         Elements metaLinks = html.getElementsByClass("flex-item alternate-sources__dropdown");
-        // TODO verbessern
-        String link = metaLinks.select("a[href^=https]").select("a[href$=.pdf]").attr("href");
-        link = metaLinks.select("a").attr("href");
+        String link = metaLinks.select("a").attr("href");
         if (link.length() < 10) {
             metaLinks = html.getElementsByClass("flex-paper-actions__button--primary");
             link = metaLinks.select("a").attr("href");
@@ -117,7 +117,7 @@ public class SemanticScholar implements FulltextFetcher, PagedSearchBasedParserF
      *
      * @param source the API link that contains the relevant information.
      * @return the correct URL
-     * @throws IOException if error by downloading the page
+     * @throws MalformedURLException if error by downloading the page
      */
     public String getURLBySource(String source) throws IOException {
         URLDownload download = new URLDownload(source);
@@ -163,12 +163,6 @@ public class SemanticScholar implements FulltextFetcher, PagedSearchBasedParserF
             } else if (response.has("next")) {
                 total = Math.min(total, response.getInt("next") - response.getInt("offset"));
             }
-
-//            if (!response.has("data")) {
-//                // Singleton response
-//                BibEntry entry = jsonItemToBibEntry(response);
-//                return Collections.singletonList(entry);
-//            }
 
             // Response contains a list
             JSONArray items = response.getJSONArray("data");
@@ -239,6 +233,12 @@ public class SemanticScholar implements FulltextFetcher, PagedSearchBasedParserF
         return "SemanticScholar";
     }
 
+    /**
+     * Provide a way to modify the number of retrieved element for PagedSearchBasedFetcher.
+     *
+     * Not sure if this is used
+     * @param size the new number of element (default = 20)
+     */
     public void setPageSize(int size) {
         PAGE_SIZE = size;
     }
@@ -247,5 +247,21 @@ public class SemanticScholar implements FulltextFetcher, PagedSearchBasedParserF
     public int getPageSize() {
         return PAGE_SIZE;
     }
+
+    /**
+     * Looks for hits which are matched by the given {@link BibEntry}.
+     *
+     * @param entry entry to search bibliographic information for
+     * @return a list of {@link BibEntry}, which are matched by the query (may be empty)
+     */
+    @Override
+    public List<BibEntry> performSearch(BibEntry entry) throws FetcherException {
+        Optional<String> title = entry.getTitle();
+        if (title.isEmpty()) {
+            return new ArrayList<>();
+        }
+        return performSearch(title.get());
+    }
+
 }
 

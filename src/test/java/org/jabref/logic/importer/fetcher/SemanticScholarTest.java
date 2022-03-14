@@ -28,17 +28,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class SemanticScholarTest implements PagedSearchFetcherTest {
 
 
-    private static final String URL_PDF = "http://dl.ifip.org/db/conf/networking/networking2021/1570714032.pdf";
     private static final String DOI = "10.23919/IFIPNetworking52078.2021.9472772";
-
-    private static final String URL_PDF2 = "https://europepmc.org/articles/pmc4907333?pdf=render";
-    private static final String DOI2 = "10.1038/nrn3241";
-
-    private static final String URL_PDF3 = "https://pdfs.semanticscholar.org/7f6e/61c254bc2df38a784c1228f56c13317caded.pdf";
-    private static final String DOI3 = "10.3390/healthcare9020206";
-
-    private static final String URL_PDF4 = "https://arxiv.org/pdf/1407.3561.pdf";
-    private static final String ARXIV = "1407.3561";
 
     private final BibEntry IGOR_NEWCOMERS = new BibEntry(StandardEntryType.Article)
             .withField(StandardField.AUTHOR, "Igor Steinmacher and Tayana Conte and Christoph Treude and M. Gerosa")
@@ -49,19 +39,12 @@ public class SemanticScholarTest implements PagedSearchFetcherTest {
             .withField(StandardField.VENUE, "2016 IEEE/ACM 38th International Conference on Software Engineering (ICSE)");
 
     private SemanticScholar fetcher;
-    private BibEntry entryfinal;
     private BibEntry entry;
-    private BibEntry entry3;
-    private BibEntry entry4;
 
     @BeforeEach
     void setUp() {
         fetcher = new SemanticScholar();
-        entryfinal = new BibEntry();
-        entry = new BibEntry().withField(StandardField.DOI, DOI);
-        entry3 = new BibEntry().withField(StandardField.DOI, DOI3);
-        entry4 = new BibEntry().withField(StandardField.EPRINT, ARXIV)
-                .withField(StandardField.ARCHIVEPREFIX, "arXiv");
+        entry = new BibEntry();
     }
 
     @Test
@@ -75,10 +58,10 @@ public class SemanticScholarTest implements PagedSearchFetcherTest {
     @Test
     @DisabledOnCIServer("CI server is unreliable")
     void fullTextFindByDOI() throws IOException {
-        entryfinal.withField(StandardField.DOI, DOI2);
+        entry.withField(StandardField.DOI, "10.1038/nrn3241");
         assertEquals(
-                Optional.of(new URL(URL_PDF2)),
-                fetcher.findFullText(entryfinal)
+                Optional.of(new URL("https://europepmc.org/articles/pmc4907333?pdf=render")),
+                fetcher.findFullText(entry)
         );
     }
 
@@ -86,9 +69,9 @@ public class SemanticScholarTest implements PagedSearchFetcherTest {
     @DisabledOnCIServer("CI server is unreliable")
     void fullTextFindByDOIAlternate() throws IOException {
         assertEquals(
-                Optional.of(new URL(URL_PDF3)),
-                fetcher.findFullText(entry3)
-        );
+                Optional.of(new URL("https://pdfs.semanticscholar.org/7f6e/61c254bc2df38a784c1228f56c13317caded.pdf")),
+                fetcher.findFullText(new BibEntry()
+                        .withField(StandardField.DOI, "10.3390/healthcare9020206")));
     }
 
     @Test
@@ -101,6 +84,7 @@ public class SemanticScholarTest implements PagedSearchFetcherTest {
     @Test
     @DisabledOnCIServer("CI server is unreliable")
     void fullTextNotFoundByDOI() throws IOException {
+        entry = new BibEntry().withField(StandardField.DOI, DOI);
         entry.setField(StandardField.DOI, "10.1021/bk-2006-WWW.ch014");
 
         assertEquals(Optional.empty(), fetcher.findFullText(entry));
@@ -109,9 +93,11 @@ public class SemanticScholarTest implements PagedSearchFetcherTest {
     @Test
     @DisabledOnCIServer("CI server is unreliable")
     void fullTextFindByArXiv() throws IOException {
+        entry = new BibEntry().withField(StandardField.EPRINT, "1407.3561")
+                .withField(StandardField.ARCHIVEPREFIX, "arXiv");
         assertEquals(
-                Optional.of(new URL(URL_PDF4)),
-                fetcher.findFullText(entry4)
+                Optional.of(new URL("https://arxiv.org/pdf/1407.3561.pdf")),
+                fetcher.findFullText(entry)
         );
     }
 
@@ -146,10 +132,10 @@ public class SemanticScholarTest implements PagedSearchFetcherTest {
                 .withField(StandardField.YEAR, "2014")
                 .withField(StandardField.EPRINT, "1405.2249")
                 .withField(StandardField.ARCHIVEPREFIX, "arXiv")
-                .withField(StandardField.ABSTRACT, "A general slice theorem for the action of a Fr\\'echet Lie group on a Fr\\'echet manifolds is established. The Nash-Moser theorem provides the fundamental tool to generalize the result of Palais to this infinite-dimensional setting. The presented slice theorem is illustrated by its application to gauge theories: the action of the gauge transformation group admits smooth slices at every point and thus the gauge orbit space is stratified by Fr\\'echet manifolds. \n" +
-                        "Furthermore, a covariant and symplectic formulation of classical field theory is proposed and extensively discussed. At the root of this novel framework is the incorporation of field degrees of freedom F and spacetime M into the product manifold F * M. The induced bigrading of differential forms is used in order to carry over the usual symplectic theory to this new setting. The examples of the Klein-Gordon field and general Yang-Mills theory illustrate that the presented approach conveniently handles the occurring symmetries.")
                 .withField(StandardField.URL, "https://www.semanticscholar.org/paper/4986c1060236e7190b63f934df7806fbf2056cec");
         List<BibEntry> fetchedEntries = fetcher.performSearch("Slice theorem for Fréchet group actions and covariant symplectic");
+        // Abstract should not be included in JabRef tests
+        fetchedEntries.forEach(entry -> entry.clearField(StandardField.ABSTRACT));
         assertEquals(Collections.singletonList(master), fetchedEntries);
     }
 
@@ -167,5 +153,27 @@ public class SemanticScholarTest implements PagedSearchFetcherTest {
         // Abstract should not be included in JabRef tests
         fetchedEntries.forEach(entry -> entry.clearField(StandardField.ABSTRACT));
         assertEquals(Collections.singletonList(IGOR_NEWCOMERS), fetchedEntries);
+    }
+
+    @Test
+    public void performSearchByEmptyQuery() throws Exception {
+        assertEquals(Collections.emptyList(), fetcher.performSearch(""));
+    }
+
+    @Test
+    public void findByEntry() throws Exception {
+        BibEntry barrosEntry = new BibEntry(StandardEntryType.Article)
+                .withField(StandardField.TITLE, "Formalising BPMN Service Interaction Patterns")
+                .withField(StandardField.AUTHOR, "Chiara Muzi and Luise Pufahl and Lorenzo Rossi and M. Weske and F. Tiezzi")
+                .withField(StandardField.YEAR, "2018")
+                .withField(StandardField.DOI, "10.1007/978-3-030-02302-7_1")
+                .withField(StandardField.URL, "https://www.semanticscholar.org/paper/3bb026fd67db7d8e0e25de3189d6b7031b12783e")
+                .withField(StandardField.VENUE, "PoEM");
+
+        entry.withField(StandardField.TITLE, "Formalising BPMN Service Interaction Patterns");
+        BibEntry actual = fetcher.performSearch(entry).get(0);
+        // Abstract should not be included in JabRef tests
+        actual.clearField(StandardField.ABSTRACT);
+        assertEquals(barrosEntry, actual);
     }
 }

@@ -26,6 +26,7 @@ import org.jabref.logic.importer.fetcher.IEEE;
 import org.jabref.logic.importer.fetcher.INSPIREFetcher;
 import org.jabref.logic.importer.fetcher.IacrEprintFetcher;
 import org.jabref.logic.importer.fetcher.IsbnFetcher;
+import org.jabref.logic.importer.fetcher.JstorFetcher;
 import org.jabref.logic.importer.fetcher.LibraryOfCongress;
 import org.jabref.logic.importer.fetcher.MathSciNet;
 import org.jabref.logic.importer.fetcher.MedlineFetcher;
@@ -109,6 +110,7 @@ public class WebFetchers {
         set.add(new CollectionOfComputerScienceBibliographiesFetcher(importFormatPreferences));
         // set.add(new JstorFetcher(importFormatPreferences));
 //        set.add(new ResearchGate());
+        set.add(new SemanticScholar());
         return set;
     }
 
@@ -167,20 +169,20 @@ public class WebFetchers {
         Set<FulltextFetcher> fetchers = new HashSet<>();
 
         // Original
-//        fetchers.add(new DoiResolution(importFormatPreferences.getDoiPreferences()));
+        fetchers.add(new DoiResolution(importFormatPreferences.getDoiPreferences()));
 
         // Publishers
-//        fetchers.add(new ScienceDirect());
-//        fetchers.add(new SpringerLink());
-//        fetchers.add(new ACS());
-//        fetchers.add(new ArXiv(importFormatPreferences));
-//        fetchers.add(new IEEE(importFormatPreferences));
-//        fetchers.add(new ApsFetcher());
+        fetchers.add(new ScienceDirect());
+        fetchers.add(new SpringerLink());
+        fetchers.add(new ACS());
+        fetchers.add(new ArXiv(importFormatPreferences));
+        fetchers.add(new IEEE(importFormatPreferences));
+        fetchers.add(new ApsFetcher());
 
         // Meta search
-        // fetchers.add(new JstorFetcher(importFormatPreferences));
-        // fetchers.add(new GoogleScholar(importFormatPreferences));
-//        fetchers.add(new OpenAccessDoi());
+        fetchers.add(new JstorFetcher(importFormatPreferences));
+//        fetchers.add(new GoogleScholar(importFormatPreferences));
+        fetchers.add(new OpenAccessDoi());
 
         fetchers.add(new SemanticScholar());
 
