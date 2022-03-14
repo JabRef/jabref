@@ -115,6 +115,7 @@ dependencies {
     implementation 'org.apache.pdfbox:xmpbox:3.0.0-RC1'
 
     implementation group: 'org.apache.commons', name: 'commons-csv', version: '1.9.0'
+    implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.12.0'
     implementation 'com.h2database:h2-mvstore:2.1.210'
 
     implementation group: 'org.apache.tika', name: 'tika-core', version: '2.3.0'
@@ -178,7 +179,7 @@ dependencies {
     implementation "org.tinylog:slf4j-tinylog:2.4.1"
     implementation "org.tinylog:tinylog-impl:2.4.1"
 
-    implementation 'de.undercouch:citeproc-java:3.0.0-alpha.3'
+    implementation 'de.undercouch:citeproc-java:3.0.0-alpha.6'
 
     // jakarta.activation is already depdency of glassfish
     implementation group: 'jakarta.xml.bind', name: 'jakarta.xml.bind-api', version: '3.0.1'
