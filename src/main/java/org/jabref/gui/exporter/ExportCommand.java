@@ -1,11 +1,15 @@
 package org.jabref.gui.exporter;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.DialogPane;
 import javafx.stage.FileChooser;
 
 import org.jabref.gui.DialogService;
@@ -13,6 +17,7 @@ import org.jabref.gui.Globals;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
+import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.gui.util.FileFilterConverter;
@@ -114,6 +119,11 @@ public class ExportCommand extends SimpleCommand {
         preferences.getImportExportPreferences().setExportWorkingDirectory(file.getParent());
 
         final List<BibEntry> finEntries = entries;
+
+        DialogPane dialogPane = new DialogPane();
+        Optional<ButtonType> buttonType = dialogService.showCustomDialogAndWait(
+                "Open the folder where the file saved?", dialogPane, ButtonType.YES, ButtonType.NO);
+
         BackgroundTask
                 .wrap(() -> {
                     format.export(stateManager.getActiveDatabase().get(),
@@ -121,7 +131,20 @@ public class ExportCommand extends SimpleCommand {
                             finEntries);
                     return null; // can not use BackgroundTask.wrap(Runnable) because Runnable.run() can't throw Exceptions
                 })
-                .onSuccess(x -> dialogService.notify(Localization.lang("%0 export successful", format.getName())))
+                .onSuccess(
+                        x -> {
+                            buttonType.ifPresent(btn -> {
+                                if (btn == ButtonType.YES) {
+                                    try {
+                                        JabRefDesktop.openFolderAndSelectFile(file, preferences);
+                                    } catch (IOException e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+                            });
+                        }
+
+                )
                 .onFailure(this::handleError)
                 .executeWith(Globals.TASK_EXECUTOR);
     }
