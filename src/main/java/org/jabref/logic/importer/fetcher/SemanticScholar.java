@@ -118,11 +118,15 @@ public class SemanticScholar implements FulltextFetcher, PagedSearchBasedParserF
      * @param source the API link that contains the relevant information.
      * @return the correct URL
      * @throws MalformedURLException if error by downloading the page
+     * @throws NullPointerException if the page does not contain the field URL
      */
-    public String getURLBySource(String source) throws IOException {
+    public String getURLBySource(String source) throws IOException, NullPointerException {
         URLDownload download = new URLDownload(source);
         JSONObject json = new JSONObject(download.asString());
         LOGGER.debug(json.get("url").toString());
+        if (!json.has("url")) {
+            throw new NullPointerException("Page does not contain field \"url\"");
+        }
         return json.get("url").toString();
     }
 
