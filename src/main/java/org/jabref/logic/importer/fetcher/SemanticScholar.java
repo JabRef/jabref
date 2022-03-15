@@ -9,6 +9,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import org.jabref.logic.importer.EntryBasedFetcher;
 import org.jabref.logic.importer.FetcherException;
@@ -19,6 +21,7 @@ import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.fetcher.transformers.DefaultQueryTransformer;
 import org.jabref.logic.importer.util.JsonReader;
 import org.jabref.logic.net.URLDownload;
+import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.ArXivIdentifier;
@@ -118,12 +121,12 @@ public class SemanticScholar implements FulltextFetcher, PagedSearchBasedParserF
      * @param source the API link that contains the relevant information.
      * @return the correct URL
      * @throws MalformedURLException if error by downloading the page
-     * @throws NullPointerException if the page does not contain the field URL
+     * @throws NullPointerException  if the page does not contain the field URL
      */
     public String getURLBySource(String source) throws IOException, NullPointerException {
         URLDownload download = new URLDownload(source);
         JSONObject json = new JSONObject(download.asString());
-        LOGGER.debug(json.get("url").toString());
+        LOGGER.debug("URL for source: {}", json.get("url").toString());
         if (!json.has("url")) {
             throw new NullPointerException("Page does not contain field \"url\"");
         }
@@ -144,7 +147,7 @@ public class SemanticScholar implements FulltextFetcher, PagedSearchBasedParserF
         uriBuilder.addParameter("limit", String.valueOf(Math.min(getPageSize(), 10000 - pageNumber * getPageSize())));
         // All fields need to be specified
         uriBuilder.addParameter("fields", "paperId,externalIds,url,title,abstract,venue,year,authors");
-        LOGGER.debug(uriBuilder.build().toURL().toString());
+        LOGGER.debug("URL for query: {}", uriBuilder.build().toURL());
         return uriBuilder.build().toURL();
     }
 
@@ -156,7 +159,7 @@ public class SemanticScholar implements FulltextFetcher, PagedSearchBasedParserF
         return inputStream -> {
 
             JSONObject response = JsonReader.toJsonObject(inputStream);
-            LOGGER.debug(response.toString());
+            LOGGER.debug("Response for Parser: {}", response);
             if (response.isEmpty()) {
                 return Collections.emptyList();
             }
@@ -196,8 +199,11 @@ public class SemanticScholar implements FulltextFetcher, PagedSearchBasedParserF
             entry.setField(StandardField.VENUE, item.optString("venue"));
             entry.setField(StandardField.YEAR, item.optString("year"));
 
-            entry.setField(StandardField.AUTHOR, toAuthors(item.optJSONArray("authors")));
-
+            entry.setField(StandardField.AUTHOR,
+                    IntStream.range(0, item.optJSONArray("authors").length())
+                            .mapToObj(item.optJSONArray("authors")::getJSONObject)
+                            .map((author) -> author.has("name") ? author.getString("name") : "")
+                            .collect(Collectors.joining(" and ")));
             // TODO: check. I'm not sure about the EPRINT and arXiv fields
             JSONObject externalIds = item.optJSONObject("externalIds");
             entry.setField(StandardField.DOI, externalIds.optString("DOI"));
@@ -206,24 +212,10 @@ public class SemanticScholar implements FulltextFetcher, PagedSearchBasedParserF
                 entry.setField(StandardField.ARCHIVEPREFIX, "arXiv");
             }
             entry.setField(StandardField.PMID, externalIds.optString("PubMed"));
-//            exIds.addAll(externalIds.keySet());
             return entry;
         } catch (JSONException exception) {
             throw new ParseException("SemanticScholar API JSON format has changed", exception);
         }
-    }
-
-    private String toAuthors(JSONArray author) {
-        if (author == null || author.isEmpty()) {
-            return "";
-        }
-        StringBuilder authors = new StringBuilder();
-        for (int i = 0; i < author.length(); i++) {
-            JSONObject item = author.getJSONObject(i);
-            authors.append(item.getString("name")).append(" and ");
-        }
-        authors.delete(authors.length() - 5, authors.length());
-        return authors.toString();
     }
 
     /**
@@ -239,8 +231,9 @@ public class SemanticScholar implements FulltextFetcher, PagedSearchBasedParserF
 
     /**
      * Provide a way to modify the number of retrieved element for PagedSearchBasedFetcher.
-     *
+     * <p>
      * Not sure if this is used
+     *
      * @param size the new number of element (default = 20)
      */
     public void setPageSize(int size) {
@@ -267,5 +260,10 @@ public class SemanticScholar implements FulltextFetcher, PagedSearchBasedParserF
         return performSearch(title.get());
     }
 
+    @Override
+    public void doPostCleanup(BibEntry entry) {
+        entry.getField(StandardField.AUTHOR).ifPresent(AuthorList::parse);
+        PagedSearchBasedParserFetcher.super.doPostCleanup(entry);
+    }
 }
 
