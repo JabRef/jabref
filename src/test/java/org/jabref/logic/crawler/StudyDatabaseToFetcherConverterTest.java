@@ -4,6 +4,7 @@ import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.jabref.logic.bibtex.FieldContentFormatterPreferences;
 import org.jabref.logic.exporter.SavePreferences;
@@ -60,10 +61,10 @@ class StudyDatabaseToFetcherConverterTest {
         StudyDatabaseToFetcherConverter converter = new StudyDatabaseToFetcherConverter(studyRepository.getActiveLibraryEntries(), importFormatPreferences);
         List<SearchBasedFetcher> result = converter.getActiveFetchers();
 
-        Assertions.assertEquals(3, result.size());
-        Assertions.assertEquals(result.get(0).getName(), "Springer");
-        Assertions.assertEquals(result.get(1).getName(), "ArXiv");
-        Assertions.assertEquals(result.get(2).getName(), "Medline/PubMed");
+        Assertions.assertEquals(
+                List.of("Springer", "ArXiv", "Medline/PubMed" ),
+                result.stream().map(SearchBasedFetcher::getName).collect(Collectors.toList())
+        );
     }
 
     private void copyTestStudyDefinitionFileIntoDirectory(Path destination) throws Exception {
