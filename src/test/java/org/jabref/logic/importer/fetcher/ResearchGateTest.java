@@ -1,18 +1,27 @@
 package org.jabref.logic.importer.fetcher;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
-import oracle.jdbc.logging.annotations.DefaultLevel;
+import org.apache.lucene.queryparser.flexible.core.QueryNodeParseException;
+import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
+import org.apache.lucene.queryparser.flexible.core.parser.SyntaxParser;
+import org.apache.lucene.queryparser.flexible.standard.parser.StandardSyntaxParser;
+import org.jabref.logic.importer.FetcherException;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.support.DisabledOnCIServer;
 import org.jabref.testutils.category.FetcherTest;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import static org.jabref.logic.importer.fetcher.transformers.AbstractQueryTransformer.NO_EXPLICIT_FIELD;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -22,12 +31,12 @@ public class ResearchGateTest {
     private static final String URL_PDF = "https://www.researchgate.net/profile/Abdurrazzak-Gehani/publication/4207355_Paranoid_a_global_secure_file_access_control_system/links/5457747d0cf2cf516480995e/Paranoid-a-global-secure-file-access-control-system.pdf";
     private final String URL_PAGE = "https://www.researchgate.net/publication/4207355_Paranoid_a_global_secure_file_access_control_system";
     private final String URL_TITLE = "https://www.researchgate.net/search/publication?q=Paranoid%253A%2Ba%2Bglobal%2Bsecure%2Bfile%2Baccess%2Bcontrol%2Bsystem&_sg=hAMDrqbG_CEiuRGM6Rk6Ljc__OnhF8x3j3y5p4vnpRQ5zkYbGq6Y5zOhHyM0NzH0-CVuHnSPYkEbcb0xVaZPM-DQ6cA";
-    private ResearchGate finder;
+    private ResearchGate fetcher;
     private BibEntry entry;
 
     @BeforeEach
     public void setUp() {
-        finder = new ResearchGate();
+        fetcher = new ResearchGate();
         entry = new BibEntry();
         entry.setField(StandardField.DOI, "10.1109/CSAC.2005.42");
         entry.setField(StandardField.TITLE, "Paranoid: a global secure file access control system");
@@ -35,13 +44,23 @@ public class ResearchGateTest {
 
     @Test
     void getDocumentByDOI() throws IOException {
-        String source = finder.getURLByDoi(entry.getDOI().get());
+        String source = fetcher.getURLByDoi(entry.getDOI().get());
         assertEquals(URL_PAGE, source);
     }
 
     @Test
+    void getURLByQuery() throws IOException, QueryNodeParseException, FetcherException, URISyntaxException {
+        SyntaxParser parser = new StandardSyntaxParser();
+        QueryNode queryNode;
+        queryNode = parser.parse("Paranoid: a global secure file access control system", NO_EXPLICIT_FIELD);
+
+        URL source = fetcher.getURLForQuery(queryNode);
+        assertEquals(URL_PAGE, source.toString());
+    }
+
+    @Test
     void getDocumentByTitle() throws IOException {
-        String source = finder.getURLByTitle(entry.getTitle().get());
+        String source = fetcher.getURLByString(entry.getTitle().get());
         assertTrue(source.startsWith(URL_PAGE));
     }
 
@@ -50,7 +69,7 @@ public class ResearchGateTest {
     void fullTextFoundByDOI() throws IOException {
         assertEquals(
                 Optional.of(new URL(URL_PDF)),
-                finder.findFullText(entry)
+                fetcher.findFullText(entry)
         );
     }
 
@@ -60,11 +79,25 @@ public class ResearchGateTest {
         BibEntry entry2 = new BibEntry();
         entry2.setField(StandardField.DOI, "10.1021/bk-2006-WWW.ch014");
 
-        assertEquals(Optional.empty(), finder.findFullText(entry2));
+        assertEquals(Optional.empty(), fetcher.findFullText(entry2));
     }
 
     @Test
     void trustLevel() {
-        assertEquals(TrustLevel.PUBLISHER, finder.getTrustLevel());
+        assertEquals(TrustLevel.META_SEARCH, fetcher.getTrustLevel());
+    }
+
+    @Test
+    void searchByQueryFindsEntry() throws Exception {
+        BibEntry master = new BibEntry(StandardEntryType.Article)
+                .withField(StandardField.AUTHOR, "Tobias Diez")
+                .withField(StandardField.TITLE, "Slice theorem for Fréchet group actions and covariant symplectic field theory")
+                .withField(StandardField.YEAR, "2014")
+                .withField(StandardField.EPRINT, "1405.2249")
+                .withField(StandardField.ARCHIVEPREFIX, "arXiv");
+        List<BibEntry> fetchedEntries = fetcher.performSearch("Slice theorem for Fréchet group actions and covariant symplectic");
+        // Abstract should not be included in JabRef tests
+        fetchedEntries.forEach(entry -> entry.clearField(StandardField.ABSTRACT));
+        assertEquals(Collections.singletonList(master), fetchedEntries);
     }
 }

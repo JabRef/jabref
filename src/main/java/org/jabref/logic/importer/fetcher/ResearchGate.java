@@ -13,9 +13,7 @@ import kong.unirest.json.JSONException;
 import kong.unirest.json.JSONObject;
 import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 import org.jabref.logic.importer.*;
-import org.jabref.logic.importer.fetcher.transformers.DefaultLuceneQueryTransformer;
-import org.jabref.logic.importer.fetcher.transformers.ResearchGateQueryTransformer;
-import org.jabref.logic.importer.fileformat.BibtexParser;
+import org.jabref.logic.importer.fetcher.transformers.DefaultQueryTransformer;
 import org.jabref.logic.importer.util.JsonReader;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.model.entry.BibEntry;
@@ -23,6 +21,7 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
 
 import org.apache.http.client.utils.URIBuilder;
+import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
@@ -60,8 +59,10 @@ public class ResearchGate implements FulltextFetcher, EntryBasedFetcher, SearchB
         Document html;
         if (title.isPresent()) {
             LOGGER.debug("Search by Title");
-            linkForSearch = getURLByTitle(title.get());
-            html = Jsoup.connect(linkForSearch)
+            linkForSearch = getURLByString(title.get());
+            Connection connection = Jsoup.connect(linkForSearch);
+            html = connection
+                    .cookieStore(connection.cookieStore())
                     .userAgent(URLDownload.USER_AGENT)
                     .referrer("www.google.com")
                     .ignoreHttpErrors(true)
@@ -69,15 +70,15 @@ public class ResearchGate implements FulltextFetcher, EntryBasedFetcher, SearchB
         } else if (doi.isPresent()) {
             LOGGER.debug("Search by DOI");
             // Retrieve PDF link
-            html = Jsoup.connect(getURLByDoi(doi.get()))
+            Connection connection = Jsoup.connect(getURLByDoi(doi.get()));
+            html = connection
+                    .cookieStore(connection.cookieStore())
                     .userAgent(URLDownload.USER_AGENT)
                     .ignoreHttpErrors(true)
                     .get();
         } else {
             return Optional.empty();
-
         }
-
         Elements eLink = html.getElementsByTag("section");
         String link = eLink.select("a[href^=https]").select("a[href$=.pdf]").attr("href");
         LOGGER.trace("PDF link: {}", link);
@@ -88,34 +89,44 @@ public class ResearchGate implements FulltextFetcher, EntryBasedFetcher, SearchB
         return Optional.empty();
     }
 
-    String getURLByTitle(String title) throws IOException {
+    String getURLByString(String query) throws IOException {
         URIBuilder source;
         String link;
         try {
             source = new URIBuilder(SEARCH);
             source.addParameter("type", "publication");
-            source.addParameter("q", title);
-            // TODO: choose one
+            source.addParameter("query", query);
+
             URLDownload urlDownload = new URLDownload(source.toString());
             urlDownload.getCookieFromUrl();
-            Document html = Jsoup.connect(urlDownload.getSource().toString())
+            Connection connection = Jsoup.connect(urlDownload.getSource().toString());
+            Document html = connection
                     .userAgent(URLDownload.USER_AGENT)
                     .referrer("www.google.com")
+                    .cookie("__cf_bm","N5oXjF8mMgVTJjSuKCzhOcaQujSqocqzpcDdXO1maCw-1647365228-0-AbE15gZUfv0Z7yieaG5ln35AFp+yLU8fEV+ruRMzD3tjR0CiZIwZR60iA6QWKPiQy46+uxVbPJeEnLFSkKG9nW8=")
+//                    .cookie("cf_clearance", "_QvF8v6xVPvJqDRtl97MnBJxvWWo4jRAbtKLdD3CTuw-1646656607-0-250")
+//                    .cookie("cili", "_2_ZjFmZWExMDA0NzViNGI3OGRiYWJhNjI0ODc5ZDE4ZTRmMWRlMjYyYmQyYTE1ODYwM2NmMDA5NmEzNDU5NjQ5M18zNjAyMTYwMDsw")
+//                    .cookie("cirgu", "_1_rmlbZbgB3cmzxJPJNo9Ye//0bitKZxE8nES/e2ltjj0D6YRE1mR2V0uvxpuMxtCZV2sNgsT9")
+//                    .cookie("classification", "institution")
+                    .cookie("did", "0Z2LgmYoOAcOljjHyYTef0NDz11SyOxHB01JyB5hnuktaKtn8Sv13J4FZG1iiJdk; ptc=RG1.2339240692281222610.1645453991")
+                    .cookie("isResearcher", "yes")
+//                    .cookie("pl", "gzp4Is0JfoDeKqoEMmnt12Mfxac8VRqBltqtD9iIMeNPMEs3KpaTH7P2unhBQx8fWTag9UUXBwEcY3LoPnIXa5TMBOCCXOT41d4UvMTdpuPDl6PWgwLqabPY1aEc64GK")
+//                    .cookie("ptc", "RG1.2339240692281222610.1645453991")
+//                    .cookie("sid", "bHPY07xfFkDZ0OjZKhfHkdBLoMkvto8lbIqJ0gkhX1FUfr4RUPDW1U17BPZkTKUtj6gFnrv57IpvIClRZUffsrH3cKeWBNhJneUtpgM7VRqu1NtSYdxf23UE1qfsBTb6")
                     .ignoreHttpErrors(true)
                     .get();
 
-//            Document html = Jsoup.connect(source.toString())
-//                    .userAgent(URLDownload.USER_AGENT)
-//                    .referrer("www.google.com")
-//                    .ignoreHttpErrors(true)
-//                    .get();
+            // TODO
+            BufferedWriter bw = new BufferedWriter(new FileWriter("/home/pelirrojito/Documents/JabRef/content.html"));
+            bw.write(html.html());
+            bw.close();
 
-//            BufferedWriter bw = new BufferedWriter(new FileWriter("/home/pelirrojito/Documents/JabRef/search.html"));
-//            bw.write(html.html());
-//            bw.close();
             link = HOST + Objects.requireNonNull(html.getElementById("content"))
                     .select("a[href^=publication/]")
                     .attr("href");
+            if (link.contains("?")) {
+                link = link.substring(0, link.indexOf("?"));
+            }
         } catch (URISyntaxException e) {
             return null;
         }
@@ -127,8 +138,16 @@ public class ResearchGate implements FulltextFetcher, EntryBasedFetcher, SearchB
         URIBuilder source;
         String link;
         try {
+
+            source = new URIBuilder(SEARCH);
+            source.addParameter("type", "publication");
+            source.addParameter("query", doi.getDOI());
+            // TODO: choose one
+
             source = new URIBuilder(GOOGLE_SEARCH + doi.getDOI() + GOOGLE_SITE);
-            Document html = Jsoup.connect(source.toString())
+            Connection connection = Jsoup.connect(source.toString());
+            Document html = connection
+                    .cookieStore(connection.cookieStore())
                     .userAgent(URLDownload.USER_AGENT)
                     .ignoreHttpErrors(true)
                     .get();
@@ -149,10 +168,19 @@ public class ResearchGate implements FulltextFetcher, EntryBasedFetcher, SearchB
      */
     @Override
     public URL getURLForQuery(QueryNode luceneQuery) throws URISyntaxException, MalformedURLException, FetcherException {
-        // TODO: test
-        URIBuilder uriBuilder = new URIBuilder(SEARCH);
-        uriBuilder.addParameter("q", new ResearchGateQueryTransformer().transformLuceneQuery(luceneQuery).orElse(""));
-        return uriBuilder.build().toURL();
+        String query = new DefaultQueryTransformer().transformLuceneQuery(luceneQuery).orElse("");
+        URIBuilder source;
+        String result = "";
+        source = new URIBuilder(SEARCH);
+        source.addParameter("type", "publication");
+        source.addParameter("query", query);
+        try {
+            result = getURLByString(query);
+        } catch (IOException e) {
+            throw new MalformedURLException();
+        }
+        LOGGER.trace("URL for query: {}", result);
+        return new URL(result);
     }
 
     @Override
@@ -168,8 +196,18 @@ public class ResearchGate implements FulltextFetcher, EntryBasedFetcher, SearchB
         // TODO: This is probably wrong, I just copied CrossRef. Is there a better, easier way to do it?
         return inputStream -> {
 
-            LOGGER.debug("Answer");
+            LOGGER.debug("In parser");
+            try {
+                byte[] input = inputStream.readAllBytes();
+//                LOGGER.debug("Answer: {}", new String(input, 0, input.length));
+                BufferedWriter bw = new BufferedWriter(new FileWriter("/home/pelirrojito/Documents/JabRef/parser.html"));
+                bw.write(new String(input, 0, input.length));
+                bw.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
             JSONObject response = JsonReader.toJsonObject(inputStream);
+            LOGGER.debug("Answer: {}", response);
             if (response.isEmpty()) {
                 return Collections.emptyList();
             }
@@ -207,6 +245,7 @@ public class ResearchGate implements FulltextFetcher, EntryBasedFetcher, SearchB
     private BibEntry jsonItemToBibEntry(JSONObject item) throws ParseException {
         try {
             BibEntry entry = new BibEntry();
+            LOGGER.debug("Item: {}", item.toString());
             // TODO: set type
             entry.setField(StandardField.TITLE,
                     Optional.ofNullable(item.optJSONArray("title"))
