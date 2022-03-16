@@ -109,6 +109,7 @@ public class WebFetchers {
         set.add(new CompositeSearchBasedFetcher(set, 30));
         set.add(new CollectionOfComputerScienceBibliographiesFetcher(importFormatPreferences));
         // set.add(new JstorFetcher(importFormatPreferences));
+        set.add(new ResearchGate(importFormatPreferences));
         return set;
     }
 
@@ -181,7 +182,7 @@ public class WebFetchers {
         // fetchers.add(new JstorFetcher(importFormatPreferences));
         // fetchers.add(new GoogleScholar(importFormatPreferences));
 //        fetchers.add(new OpenAccessDoi());
-        fetchers.add(new ResearchGate());
+        fetchers.add(new ResearchGate(importFormatPreferences));
         return fetchers;
     }
 }

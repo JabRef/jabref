@@ -1,26 +1,24 @@
 package org.jabref.logic.importer.fetcher;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
-import kong.unirest.json.JSONArray;
-import kong.unirest.json.JSONException;
-import kong.unirest.json.JSONObject;
 import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 import org.jabref.logic.importer.*;
 import org.jabref.logic.importer.fetcher.transformers.DefaultQueryTransformer;
-import org.jabref.logic.importer.util.JsonReader;
+import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
 
 import org.apache.http.client.utils.URIBuilder;
+import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -29,14 +27,21 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
-public class ResearchGate implements FulltextFetcher, EntryBasedFetcher, SearchBasedParserFetcher {
+public class ResearchGate implements FulltextFetcher, EntryBasedFetcher, SearchBasedFetcher {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ResearchGate.class);
     private static final String HOST = "https://www.researchgate.net/";
     private static final String GOOGLE_SEARCH = "https://www.google.com/search?q=";
     private static final String GOOGLE_SITE = "%20site:researchgate.net";
-    private static final String SEARCH = "https://www.researchgate.net/search.Search.html?type=publication&query=";
+    private static final String SEARCH = "https://www.researchgate.net/search.Search.html?";//type=publication&query=";
+    private final ImportFormatPreferences formatPreferences;
+    private static final String SEARCH_FOR_BIB_ENTRY = "https://www.researchgate.net/lite.publication.PublicationDownloadCitationModal.downloadCitation.html?fileType=BibTeX&citation=citationAndAbstract&publicationUid=";
+
 //    private static final String SEARCH = "https://www.researchgate.net/search/publication?";
+
+    public ResearchGate(ImportFormatPreferences importFormatPreferences) {
+        this.formatPreferences = importFormatPreferences;
+    }
 
     /**
      * Tries to find a fulltext URL for a given BibTex entry.
@@ -99,20 +104,11 @@ public class ResearchGate implements FulltextFetcher, EntryBasedFetcher, SearchB
 
             URLDownload urlDownload = new URLDownload(source.toString());
             urlDownload.getCookieFromUrl();
-            Connection connection = Jsoup.connect(urlDownload.getSource().toString());
-            Document html = connection
+//            Connection connection = Jsoup.connect(urlDownload.getSource().toString());
+//            Document html = connection
+            Document html = Jsoup.connect(source.toString())
                     .userAgent(URLDownload.USER_AGENT)
                     .referrer("www.google.com")
-                    .cookie("__cf_bm","N5oXjF8mMgVTJjSuKCzhOcaQujSqocqzpcDdXO1maCw-1647365228-0-AbE15gZUfv0Z7yieaG5ln35AFp+yLU8fEV+ruRMzD3tjR0CiZIwZR60iA6QWKPiQy46+uxVbPJeEnLFSkKG9nW8=")
-//                    .cookie("cf_clearance", "_QvF8v6xVPvJqDRtl97MnBJxvWWo4jRAbtKLdD3CTuw-1646656607-0-250")
-//                    .cookie("cili", "_2_ZjFmZWExMDA0NzViNGI3OGRiYWJhNjI0ODc5ZDE4ZTRmMWRlMjYyYmQyYTE1ODYwM2NmMDA5NmEzNDU5NjQ5M18zNjAyMTYwMDsw")
-//                    .cookie("cirgu", "_1_rmlbZbgB3cmzxJPJNo9Ye//0bitKZxE8nES/e2ltjj0D6YRE1mR2V0uvxpuMxtCZV2sNgsT9")
-//                    .cookie("classification", "institution")
-                    .cookie("did", "0Z2LgmYoOAcOljjHyYTef0NDz11SyOxHB01JyB5hnuktaKtn8Sv13J4FZG1iiJdk; ptc=RG1.2339240692281222610.1645453991")
-                    .cookie("isResearcher", "yes")
-//                    .cookie("pl", "gzp4Is0JfoDeKqoEMmnt12Mfxac8VRqBltqtD9iIMeNPMEs3KpaTH7P2unhBQx8fWTag9UUXBwEcY3LoPnIXa5TMBOCCXOT41d4UvMTdpuPDl6PWgwLqabPY1aEc64GK")
-//                    .cookie("ptc", "RG1.2339240692281222610.1645453991")
-//                    .cookie("sid", "bHPY07xfFkDZ0OjZKhfHkdBLoMkvto8lbIqJ0gkhX1FUfr4RUPDW1U17BPZkTKUtj6gFnrv57IpvIClRZUffsrH3cKeWBNhJneUtpgM7VRqu1NtSYdxf23UE1qfsBTb6")
                     .ignoreHttpErrors(true)
                     .get();
 
@@ -163,24 +159,26 @@ public class ResearchGate implements FulltextFetcher, EntryBasedFetcher, SearchB
 
     /**
      * Constructs a URL based on the query, size and page number.
+     * <p>
+     * Extract the numerical internal ID and add it to the URL to receive a link to a {@link BibEntry}
      *
-     * @param luceneQuery the search query
+     * @param luceneQuery the search query.
+     * @return A URL that lets us download a .bib file
      */
-    @Override
-    public URL getURLForQuery(QueryNode luceneQuery) throws URISyntaxException, MalformedURLException, FetcherException {
+    public Document getPage(QueryNode luceneQuery) throws URISyntaxException, MalformedURLException, FetcherException {
         String query = new DefaultQueryTransformer().transformLuceneQuery(luceneQuery).orElse("");
-        URIBuilder source;
-        String result = "";
-        source = new URIBuilder(SEARCH);
+        URIBuilder source = new URIBuilder(SEARCH);
         source.addParameter("type", "publication");
         source.addParameter("query", query);
         try {
-            result = getURLByString(query);
+            return Jsoup.connect(source.build().toString())
+                    .userAgent(URLDownload.USER_AGENT)
+                    .referrer("www.google.com")
+                    .ignoreHttpErrors(true)
+                    .get();
         } catch (IOException e) {
             throw new MalformedURLException();
         }
-        LOGGER.trace("URL for query: {}", result);
-        return new URL(result);
     }
 
     @Override
@@ -189,87 +187,62 @@ public class ResearchGate implements FulltextFetcher, EntryBasedFetcher, SearchB
     }
 
     /**
-     * Returns the parser used to convert the response to a list of {@link BibEntry}.
+     * This method is used to send complex queries using fielded search.
+     *
+     * @param luceneQuery the root node of the lucene query
+     * @return a list of {@link BibEntry}, which are matched by the query (may be empty)
      */
     @Override
-    public Parser getParser() {
-        // TODO: This is probably wrong, I just copied CrossRef. Is there a better, easier way to do it?
-        return inputStream -> {
+    public List<BibEntry> performSearch(QueryNode luceneQuery) throws FetcherException {
+        Document html = null;
+        try {
+            html = getPage(luceneQuery);
+        } catch (URISyntaxException | MalformedURLException e) {
+            e.printStackTrace();
+        }
 
-            LOGGER.debug("In parser");
+        LOGGER.debug("Perform search:");
+
+        assert html != null;
+
+        Elements sol = html.getElementsByClass("nova-legacy-v-publication-item__title");
+
+        List<BibEntry> list = new ArrayList<>();
+        BibtexParser parser = new BibtexParser(formatPreferences, new DummyFileUpdateMonitor());
+
+
+        List<String> urls = sol.select("a").eachAttr("href").stream()
+                .filter(stream -> stream.contains("publication/"))
+                .map(resultStream -> resultStream.substring(resultStream.indexOf("publication/") + 12, resultStream.indexOf("_")))
+                .map(idStream -> SEARCH_FOR_BIB_ENTRY + idStream)
+                .toList();
+
+        List<String> bibEntryList = urls.stream()
+                .map(this::getInputStream)
+                .filter(Objects::nonNull)
+                .map(stream -> stream.lines().collect(Collectors.joining("\n")))
+                .toList();
+
+        for (String bib: bibEntryList) {
+            Optional<BibEntry> entry;
             try {
-                byte[] input = inputStream.readAllBytes();
-//                LOGGER.debug("Answer: {}", new String(input, 0, input.length));
-                BufferedWriter bw = new BufferedWriter(new FileWriter("/home/pelirrojito/Documents/JabRef/parser.html"));
-                bw.write(new String(input, 0, input.length));
-                bw.close();
-            } catch (IOException e) {
-                e.printStackTrace();
+                entry = parser.parseSingleEntry(bib);
+                entry.ifPresent(list::add);
+            } catch (ParseException e) {
+                LOGGER.trace(e.getLocalizedMessage());
             }
-            JSONObject response = JsonReader.toJsonObject(inputStream);
-            LOGGER.debug("Answer: {}", response);
-            if (response.isEmpty()) {
-                return Collections.emptyList();
-            }
-
-            response = response.getJSONObject("message");
-            if (response.isEmpty()) {
-                return Collections.emptyList();
-            }
-
-            if (!response.has("items")) {
-                // Singleton response
-                BibEntry entry = jsonItemToBibEntry(response);
-                return Collections.singletonList(entry);
-            }
-
-            // Response contains a list
-            JSONArray items = response.getJSONArray("items");
-            List<BibEntry> entries = new ArrayList<>(items.length());
-            for (int i = 0; i < items.length(); i++) {
-                JSONObject item = items.getJSONObject(i);
-                BibEntry entry = jsonItemToBibEntry(item);
-                entries.add(entry);
-            }
-            return entries;
-        };
+        }
+        return list;
     }
 
-
-    /**
-     * This is copy-paste from CrossRef, need to be checked.
-     *
-     * @param item an entry received, needs to be parsed into a BibEntry
-     * @return The BibEntry that corresponds to the received object
-     */
-    private BibEntry jsonItemToBibEntry(JSONObject item) throws ParseException {
+    private BufferedReader getInputStream(String urlString) {
         try {
-            BibEntry entry = new BibEntry();
-            LOGGER.debug("Item: {}", item.toString());
-            // TODO: set type
-            entry.setField(StandardField.TITLE,
-                    Optional.ofNullable(item.optJSONArray("title"))
-                            .map(array -> array.optString(0)).orElse(""));
-            entry.setField(StandardField.SUBTITLE,
-                    Optional.ofNullable(item.optJSONArray("subtitle"))
-                            .map(array -> array.optString(0)).orElse(""));
-            // TODO: add Author
-//            entry.setField(StandardField.AUTHOR, toAuthors(item.optJSONArray("author")));
-            entry.setField(StandardField.YEAR,
-                    Optional.ofNullable(item.optJSONObject("published-print"))
-                            .map(array -> array.optJSONArray("date-parts"))
-                            .map(array -> array.optJSONArray(0))
-                            .map(array -> array.optInt(0))
-                            .map(year -> Integer.toString(year)).orElse("")
-            );
-            entry.setField(StandardField.DOI, item.getString("DOI"));
-            entry.setField(StandardField.PAGES, item.optString("page"));
-            entry.setField(StandardField.VOLUME, item.optString("volume"));
-            entry.setField(StandardField.ISSN, Optional.ofNullable(item.optJSONArray("ISSN")).map(array -> array.getString(0)).orElse(""));
-            return entry;
-        } catch (JSONException exception) {
-            throw new ParseException("ResearchGate API JSON format has changed", exception);
+            URL url = new URL((urlString));
+            return new BufferedReader(new InputStreamReader(url.openStream()));
+        } catch (IOException e) {
+            e.printStackTrace();
         }
+        return null;
     }
 
     /**
@@ -301,4 +274,10 @@ public class ResearchGate implements FulltextFetcher, EntryBasedFetcher, SearchB
 
 /*
   https://www.researchgate.net/publication/4207355_Paranoid_a_global_secure_file_access_control_system/citation/download
- */
+  https://www.researchgate.net/publication/262225579_Slice_theorem_for_Frechet_group_actions_and_covariant_symplectic_field_theory/citation/download
+  https://www.researchgate.net/publication/262225579_Slice_theorem_for_Frechet_group_actions_and_covariant_symplectic_field_theory
+
+  https://www.researchgate.net/literature.AjaxLiterature.downloadCitation.html?publicationUid=262225579&fileType=BibTeX&citation=citationAndAbstract
+  https://www.researchgate.net/lite.publication.PublicationDownloadCitationModal.downloadCitation.html?fileType=BibTeX&citation=citationAndAbstract&publicationUid=262225579
+
+  */
