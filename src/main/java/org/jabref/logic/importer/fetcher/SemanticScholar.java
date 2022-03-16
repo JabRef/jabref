@@ -21,7 +21,6 @@ import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.fetcher.transformers.DefaultQueryTransformer;
 import org.jabref.logic.importer.util.JsonReader;
 import org.jabref.logic.net.URLDownload;
-import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.ArXivIdentifier;
@@ -47,7 +46,6 @@ public class SemanticScholar implements FulltextFetcher, PagedSearchBasedParserF
 
     private static final String SOURCE_ID_SEARCH = "https://api.semanticscholar.org/v1/paper/";
     private static final String SOURCE_WEB_SEARCH = "https://api.semanticscholar.org/graph/v1/paper/search?";
-    private int PAGE_SIZE = PagedSearchBasedParserFetcher.super.getPageSize();
 
     /**
      * Tries to find a fulltext URL for a given BibTex entry.
@@ -72,10 +70,10 @@ public class SemanticScholar implements FulltextFetcher, PagedSearchBasedParserF
                 // Retrieve PDF link
                 String source = SOURCE_ID_SEARCH + doi.get().getDOI();
                 html = Jsoup.connect(getURLBySource(source))
-                        .userAgent(URLDownload.USER_AGENT)
-                        .referrer("https://www.google.com")
-                        .ignoreHttpErrors(true)
-                        .get();
+                            .userAgent(URLDownload.USER_AGENT)
+                            .referrer("https://www.google.com")
+                            .ignoreHttpErrors(true)
+                            .get();
             } catch (IOException e) {
                 LOGGER.info("Error for pdf lookup with DOI");
             }
@@ -88,10 +86,10 @@ public class SemanticScholar implements FulltextFetcher, PagedSearchBasedParserF
             }
             String source = SOURCE_ID_SEARCH + arXivString;
             html = Jsoup.connect(getURLBySource(source))
-                    .userAgent(URLDownload.USER_AGENT)
-                    .referrer("https://www.google.com")
-                    .ignoreHttpErrors(true)
-                    .get();
+                        .userAgent(URLDownload.USER_AGENT)
+                        .referrer("https://www.google.com")
+                        .ignoreHttpErrors(true)
+                        .get();
         }
         if (html == null) {
             return Optional.empty();
@@ -201,15 +199,15 @@ public class SemanticScholar implements FulltextFetcher, PagedSearchBasedParserF
 
             entry.setField(StandardField.AUTHOR,
                     IntStream.range(0, item.optJSONArray("authors").length())
-                            .mapToObj(item.optJSONArray("authors")::getJSONObject)
-                            .map((author) -> author.has("name") ? author.getString("name") : "")
-                            .collect(Collectors.joining(" and ")));
-            // TODO: check. I'm not sure about the EPRINT and arXiv fields
+                             .mapToObj(item.optJSONArray("authors")::getJSONObject)
+                             .map((author) -> author.has("name") ? author.getString("name") : "")
+                             .collect(Collectors.joining(" and ")));
+
             JSONObject externalIds = item.optJSONObject("externalIds");
             entry.setField(StandardField.DOI, externalIds.optString("DOI"));
             if (externalIds.has("ArXiv")) {
                 entry.setField(EPRINT, externalIds.getString("ArXiv"));
-                entry.setField(StandardField.ARCHIVEPREFIX, "arXiv");
+                entry.setField(StandardField.EPRINTTYPE, "arXiv");
             }
             entry.setField(StandardField.PMID, externalIds.optString("PubMed"));
             return entry;
@@ -219,30 +217,13 @@ public class SemanticScholar implements FulltextFetcher, PagedSearchBasedParserF
     }
 
     /**
-     * Returns the localized name of this fetcher.
-     * The title can be used to display the fetcher in the menu and in the side pane.
+     * Returns the localized name of this fetcher. The title can be used to display the fetcher in the menu and in the side pane.
      *
      * @return the localized name
      */
     @Override
     public String getName() {
         return "SemanticScholar";
-    }
-
-    /**
-     * Provide a way to modify the number of retrieved element for PagedSearchBasedFetcher.
-     * <p>
-     * Not sure if this is used
-     *
-     * @param size the new number of element (default = 20)
-     */
-    public void setPageSize(int size) {
-        PAGE_SIZE = size;
-    }
-
-    @Override
-    public int getPageSize() {
-        return PAGE_SIZE;
     }
 
     /**
@@ -259,11 +240,4 @@ public class SemanticScholar implements FulltextFetcher, PagedSearchBasedParserF
         }
         return performSearch(title.get());
     }
-
-    @Override
-    public void doPostCleanup(BibEntry entry) {
-        entry.getField(StandardField.AUTHOR).ifPresent(AuthorList::parse);
-        PagedSearchBasedParserFetcher.super.doPostCleanup(entry);
-    }
 }
-
