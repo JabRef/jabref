@@ -27,7 +27,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @FetcherTest
 public class SemanticScholarTest implements PagedSearchFetcherTest {
 
-
     private static final String DOI = "10.23919/IFIPNetworking52078.2021.9472772";
 
     private final BibEntry IGOR_NEWCOMERS = new BibEntry(StandardEntryType.Article)
@@ -48,7 +47,7 @@ public class SemanticScholarTest implements PagedSearchFetcherTest {
     }
 
     @Test
-    void getDocument() throws IOException {
+    void getDocument() throws IOException, FetcherException {
         String source = fetcher.getURLBySource(
                 String.format("https://api.semanticscholar.org/v1/paper/%s", DOI));
 
@@ -57,7 +56,7 @@ public class SemanticScholarTest implements PagedSearchFetcherTest {
 
     @Test
     @DisabledOnCIServer("CI server is unreliable")
-    void fullTextFindByDOI() throws IOException {
+    void fullTextFindByDOI() throws IOException, FetcherException {
         entry.withField(StandardField.DOI, "10.1038/nrn3241");
         assertEquals(
                 Optional.of(new URL("https://europepmc.org/articles/pmc4907333?pdf=render")),
@@ -67,7 +66,7 @@ public class SemanticScholarTest implements PagedSearchFetcherTest {
 
     @Test
     @DisabledOnCIServer("CI server is unreliable")
-    void fullTextFindByDOIAlternate() throws IOException {
+    void fullTextFindByDOIAlternate() throws IOException, FetcherException {
         assertEquals(
                 Optional.of(new URL("https://pdfs.semanticscholar.org/7f6e/61c254bc2df38a784c1228f56c13317caded.pdf")),
                 fetcher.findFullText(new BibEntry()
@@ -76,14 +75,14 @@ public class SemanticScholarTest implements PagedSearchFetcherTest {
 
     @Test
     @DisabledOnCIServer("CI server is unreliable")
-    void fullTextSearchOnEmptyEntry() throws IOException {
+    void fullTextSearchOnEmptyEntry() throws IOException, FetcherException {
 
         assertEquals(Optional.empty(), fetcher.findFullText(new BibEntry()));
     }
 
     @Test
     @DisabledOnCIServer("CI server is unreliable")
-    void fullTextNotFoundByDOI() throws IOException {
+    void fullTextNotFoundByDOI() throws IOException, FetcherException {
         entry = new BibEntry().withField(StandardField.DOI, DOI);
         entry.setField(StandardField.DOI, "10.1021/bk-2006-WWW.ch014");
 
@@ -92,7 +91,7 @@ public class SemanticScholarTest implements PagedSearchFetcherTest {
 
     @Test
     @DisabledOnCIServer("CI server is unreliable")
-    void fullTextFindByArXiv() throws IOException {
+    void fullTextFindByArXiv() throws IOException, FetcherException {
         entry = new BibEntry().withField(StandardField.EPRINT, "1407.3561")
                 .withField(StandardField.ARCHIVEPREFIX, "arXiv");
         assertEquals(
@@ -102,7 +101,7 @@ public class SemanticScholarTest implements PagedSearchFetcherTest {
     }
 
     @Test
-    void fullTextEntityWithoutDoi() throws IOException {
+    void fullTextEntityWithoutDoi() throws IOException, FetcherException {
         assertEquals(Optional.empty(), fetcher.findFullText(new BibEntry()));
     }
 

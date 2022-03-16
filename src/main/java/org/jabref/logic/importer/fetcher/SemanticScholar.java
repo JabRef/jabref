@@ -60,7 +60,7 @@ public class SemanticScholar implements FulltextFetcher, PagedSearchBasedParserF
      * @throws IOException          if one of the URL is not correct
      */
     @Override
-    public Optional<URL> findFullText(BibEntry entry) throws IOException {
+    public Optional<URL> findFullText(BibEntry entry) throws IOException, FetcherException {
         Objects.requireNonNull(entry);
 
         Optional<DOI> doi = entry.getField(StandardField.DOI).flatMap(DOI::parse);
@@ -123,12 +123,12 @@ public class SemanticScholar implements FulltextFetcher, PagedSearchBasedParserF
      * @throws MalformedURLException if error by downloading the page
      * @throws NullPointerException  if the page does not contain the field URL
      */
-    public String getURLBySource(String source) throws IOException, NullPointerException {
+    public String getURLBySource(String source) throws IOException, FetcherException {
         URLDownload download = new URLDownload(source);
         JSONObject json = new JSONObject(download.asString());
         LOGGER.debug("URL for source: {}", json.get("url").toString());
         if (!json.has("url")) {
-            throw new NullPointerException("Page does not contain field \"url\"");
+            throw new FetcherException("Page does not contain field \"url\"");
         }
         return json.get("url").toString();
     }
