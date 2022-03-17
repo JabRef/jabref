@@ -38,8 +38,6 @@ import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.jabref.model.entry.field.StandardField.EPRINT;
-
 public class SemanticScholar implements FulltextFetcher, PagedSearchBasedParserFetcher, EntryBasedFetcher {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SemanticScholar.class);
@@ -62,7 +60,7 @@ public class SemanticScholar implements FulltextFetcher, PagedSearchBasedParserF
         Objects.requireNonNull(entry);
 
         Optional<DOI> doi = entry.getField(StandardField.DOI).flatMap(DOI::parse);
-        Optional<ArXivIdentifier> arXiv = entry.getField(EPRINT).flatMap(ArXivIdentifier::parse);
+        Optional<ArXivIdentifier> arXiv = entry.getField(StandardField.EPRINT).flatMap(ArXivIdentifier::parse);
 
         Document html = null;
         if (doi.isPresent()) {
@@ -78,9 +76,9 @@ public class SemanticScholar implements FulltextFetcher, PagedSearchBasedParserF
                 LOGGER.info("Error for pdf lookup with DOI");
             }
         }
-        if (arXiv.isPresent() && entry.getField(EPRINT).isPresent()) {
+        if (arXiv.isPresent() && entry.getField(StandardField.EPRINT).isPresent()) {
             // Check if entry is a match
-            String arXivString = entry.getField(EPRINT).get();
+            String arXivString = entry.getField(StandardField.EPRINT).get();
             if (!arXivString.startsWith("arXiv:")) {
                 arXivString = "arXiv:" + arXivString;
             }
@@ -206,7 +204,7 @@ public class SemanticScholar implements FulltextFetcher, PagedSearchBasedParserF
             JSONObject externalIds = item.optJSONObject("externalIds");
             entry.setField(StandardField.DOI, externalIds.optString("DOI"));
             if (externalIds.has("ArXiv")) {
-                entry.setField(EPRINT, externalIds.getString("ArXiv"));
+                entry.setField(StandardField.EPRINT, externalIds.getString("ArXiv"));
                 entry.setField(StandardField.EPRINTTYPE, "arXiv");
             }
             entry.setField(StandardField.PMID, externalIds.optString("PubMed"));
