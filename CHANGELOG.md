@@ -75,6 +75,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixed an issue where someone could add a duplicate field in the customize entry type dialog. [#8194](https://github.com/JabRef/jabref/issues/8194)
 - We fixed a typo in the library properties tab: "String constants". There, one can configure [BibTeX string constants](https://docs.jabref.org/advanced/strings).
 - We fixed an issue when writing a non-UTF-8 encoded file: The header is written again. [#8417](https://github.com/JabRef/jabref/issues/8417)
+- We fixed an issue where folder creation during systemic literature review failed due to an illegal fetcher name. [#8552](https://github.com/JabRef/jabref/pull/8552)
 
 ## [5.4] - 2021-12-20
 
