@@ -93,7 +93,7 @@ public class SemanticScholarTest implements PagedSearchFetcherTest {
     @DisabledOnCIServer("CI server is unreliable")
     void fullTextFindByArXiv() throws IOException, FetcherException {
         entry = new BibEntry().withField(StandardField.EPRINT, "1407.3561")
-                .withField(StandardField.ARCHIVEPREFIX, "arXiv");
+                              .withField(StandardField.ARCHIVEPREFIX, "arXiv");
         assertEquals(
                 Optional.of(new URL("https://arxiv.org/pdf/1407.3561.pdf")),
                 fetcher.findFullText(entry)
@@ -130,7 +130,7 @@ public class SemanticScholarTest implements PagedSearchFetcherTest {
                 .withField(StandardField.TITLE, "Slice theorem for Fréchet group actions and covariant symplectic field theory")
                 .withField(StandardField.YEAR, "2014")
                 .withField(StandardField.EPRINT, "1405.2249")
-                .withField(StandardField.ARCHIVEPREFIX, "arXiv")
+                .withField(StandardField.EPRINTTYPE, "arXiv")
                 .withField(StandardField.URL, "https://www.semanticscholar.org/paper/4986c1060236e7190b63f934df7806fbf2056cec");
         List<BibEntry> fetchedEntries = fetcher.performSearch("Slice theorem for Fréchet group actions and covariant symplectic");
         // Abstract should not be included in JabRef tests
