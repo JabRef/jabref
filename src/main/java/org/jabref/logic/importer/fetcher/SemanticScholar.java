@@ -52,8 +52,8 @@ public class SemanticScholar implements FulltextFetcher, PagedSearchBasedParserF
      *
      * @param entry The Bibtex entry
      * @return The fulltext PDF URL Optional, if found, or an empty Optional if not found.
-     * @throws NullPointerException if no BibTex entry is given
-     * @throws IOException          if one of the URL is not correct
+     * @throws IOException      if a page could not be fetched correctly
+     * @throws FetcherException if the received page differs from what was expected
      */
     @Override
     public Optional<URL> findFullText(BibEntry entry) throws IOException, FetcherException {
@@ -111,15 +111,7 @@ public class SemanticScholar implements FulltextFetcher, PagedSearchBasedParserF
         return TrustLevel.META_SEARCH;
     }
 
-    /**
-     * Finds the URL for the webpage to look for the link to download the pdf.
-     *
-     * @param source the API link that contains the relevant information.
-     * @return the correct URL
-     * @throws MalformedURLException if error by downloading the page
-     * @throws NullPointerException  if the page does not contain the field URL
-     */
-    public String getURLBySource(String source) throws IOException, FetcherException {
+    String getURLBySource(String source) throws IOException, FetcherException {
         URLDownload download = new URLDownload(source);
         JSONObject json = new JSONObject(download.asString());
         LOGGER.debug("URL for source: {}", json.get("url").toString());
@@ -129,12 +121,6 @@ public class SemanticScholar implements FulltextFetcher, PagedSearchBasedParserF
         return json.get("url").toString();
     }
 
-    /**
-     * Constructs a URL based on the query, size and page number.
-     *
-     * @param luceneQuery the search query
-     * @param pageNumber  the number of the page indexed from 0
-     */
     @Override
     public URL getURLForQuery(QueryNode luceneQuery, int pageNumber) throws URISyntaxException, MalformedURLException, FetcherException {
         URIBuilder uriBuilder = new URIBuilder(SOURCE_WEB_SEARCH);
@@ -185,6 +171,7 @@ public class SemanticScholar implements FulltextFetcher, PagedSearchBasedParserF
      *
      * @param item an entry received, needs to be parsed into a BibEntry
      * @return The BibEntry that corresponds to the received object
+     * @throws ParseException if the JSONObject could not be parsed
      */
     private BibEntry jsonItemToBibEntry(JSONObject item) throws ParseException {
         try {
@@ -229,6 +216,7 @@ public class SemanticScholar implements FulltextFetcher, PagedSearchBasedParserF
      *
      * @param entry entry to search bibliographic information for
      * @return a list of {@link BibEntry}, which are matched by the query (may be empty)
+     * @throws FetcherException if an error linked to the Fetcher applies
      */
     @Override
     public List<BibEntry> performSearch(BibEntry entry) throws FetcherException {
