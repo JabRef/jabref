@@ -5,15 +5,13 @@ import java.nio.file.Path;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.DialogPane;
 import javafx.stage.FileChooser;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.Globals;
+import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
@@ -46,6 +44,7 @@ public class ExportCommand extends SimpleCommand {
     private final StateManager stateManager;
     private final PreferencesService preferences;
     private final DialogService dialogService;
+    private JabRefFrame jabRefFrame;
 
     /**
      * @param selectedOnly true if only the selected entries should be exported, otherwise all entries are exported
@@ -53,7 +52,8 @@ public class ExportCommand extends SimpleCommand {
     public ExportCommand(boolean selectedOnly,
                          StateManager stateManager,
                          DialogService dialogService,
-                         PreferencesService preferences) {
+                         PreferencesService preferences,
+                         JabRefFrame jabRefFrame) {
         this.selectedOnly = selectedOnly;
         this.stateManager = stateManager;
         this.preferences = preferences;
@@ -62,6 +62,8 @@ public class ExportCommand extends SimpleCommand {
         this.executable.bind(selectedOnly
                 ? ActionHelper.needsEntriesSelected(stateManager)
                 : ActionHelper.needsDatabase(stateManager));
+
+        this.jabRefFrame = jabRefFrame;
     }
 
     @Override
@@ -87,6 +89,7 @@ public class ExportCommand extends SimpleCommand {
                      .ifPresent(path -> export(path, fileDialogConfiguration.getSelectedExtensionFilter(), exporters));
     }
 
+    @SuppressWarnings("checkstyle:EmptyLineSeparator")
     private void export(Path file, FileChooser.ExtensionFilter selectedExtensionFilter, List<Exporter> exporters) {
         String selectedExtension = selectedExtensionFilter.getExtensions().get(0).replace("*", "");
         if (!file.endsWith(selectedExtension)) {
@@ -120,10 +123,6 @@ public class ExportCommand extends SimpleCommand {
 
         final List<BibEntry> finEntries = entries;
 
-        DialogPane dialogPane = new DialogPane();
-        Optional<ButtonType> buttonType = dialogService.showCustomDialogAndWait(
-                "Open the folder where the file saved?", dialogPane, ButtonType.YES, ButtonType.NO);
-
         BackgroundTask
                 .wrap(() -> {
                     format.export(stateManager.getActiveDatabase().get(),
@@ -133,18 +132,17 @@ public class ExportCommand extends SimpleCommand {
                 })
                 .onSuccess(
                         x -> {
-                            buttonType.ifPresent(btn -> {
-                                if (btn == ButtonType.YES) {
-                                    try {
-                                        JabRefDesktop.openFolderAndSelectFile(file, preferences);
-                                    } catch (IOException e) {
-                                        e.printStackTrace();
-                                    }
-                                }
+                            jabRefFrame.showNotificationPane(Localization.lang("Do you want to open the file in folder?"),
+                                    Localization.lang("Open"),
+                                    e -> {
+                                        try {
+                                            JabRefDesktop.openFolderAndSelectFile(file, preferences);
+                                            jabRefFrame.hideNotificationPane();
+                                        } catch (IOException ioException) {
+                                            LOGGER.info(Localization.lang("Error occurs when open the folder."));
+                                        }
                             });
-                        }
-
-                )
+                        })
                 .onFailure(this::handleError)
                 .executeWith(Globals.TASK_EXECUTOR);
     }

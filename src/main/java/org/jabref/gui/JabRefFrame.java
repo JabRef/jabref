@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.TimerTask;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -17,8 +18,10 @@ import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.StringBinding;
+import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.concurrent.Task;
+import javafx.event.ActionEvent;
 import javafx.geometry.Orientation;
 import javafx.scene.Group;
 import javafx.scene.Node;
@@ -145,8 +148,10 @@ import com.google.common.eventbus.Subscribe;
 import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.EasyObservableList;
 import com.tobiasdiez.easybind.Subscription;
+import org.controlsfx.control.NotificationPane;
 import org.controlsfx.control.PopOver;
 import org.controlsfx.control.TaskProgressView;
+import org.controlsfx.control.action.Action;
 import org.fxmisc.richtext.CodeArea;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -178,6 +183,7 @@ public class JabRefFrame extends BorderPane {
     private TabPane tabbedPane;
     private PopOver progressViewPopOver;
     private PopOver entryFromIdPopOver;
+    private NotificationPane notificationPane;
 
     private Subscription dividerSubscription;
 
@@ -437,6 +443,8 @@ public class JabRefFrame extends BorderPane {
         head.setSpacing(0d);
         setTop(head);
 
+        // wrap the split pane into notification pane
+        notificationPane = new NotificationPane(splitPane);
         splitPane.getItems().addAll(tabbedPane);
         SplitPane.setResizableWithParent(sidePane, false);
 
@@ -455,7 +463,35 @@ public class JabRefFrame extends BorderPane {
             }
         });
 
-        setCenter(splitPane);
+        setCenter(notificationPane);
+    }
+
+    // pass in the text value on the left, and the buttonName on the right of the notification bar
+    // and an eventHandler that act when the user click the button
+    public void showNotificationPane(String text, String buttonName, Consumer<ActionEvent> eventHandler) {
+        notificationPane.setText(text);
+        ObservableList<Action> actions = notificationPane.getActions();
+        Action action = new Action(buttonName, eventHandler);
+        // avoid multiple actions be added to the notification Pane, only one action is allowed
+        if (actions.isEmpty()) {
+            actions.add(action);
+        } else {
+            actions.set(0, action);
+        }
+        notificationPane.show();
+        // the notification bar will disappear if the user doesn't have actions in 10 seconds
+        new Thread(() -> {
+            try {
+                Thread.sleep(10000);
+            } catch (InterruptedException ex) {
+                // Ignore
+            }
+            Platform.runLater(this::hideNotificationPane);
+        }).start();
+    }
+
+    public void hideNotificationPane() {
+        notificationPane.hide();
     }
 
     private void updateSidePane() {
@@ -710,8 +746,8 @@ public class JabRefFrame extends BorderPane {
                         factory.createMenuItem(StandardActions.IMPORT_INTO_NEW_LIBRARY, new ImportCommand(this, true, prefs, stateManager))),
 
                 factory.createSubMenu(StandardActions.EXPORT,
-                        factory.createMenuItem(StandardActions.EXPORT_ALL, new ExportCommand(false, stateManager, dialogService, prefs)),
-                        factory.createMenuItem(StandardActions.EXPORT_SELECTED, new ExportCommand(true, stateManager, dialogService, prefs)),
+                        factory.createMenuItem(StandardActions.EXPORT_ALL, new ExportCommand(false, stateManager, dialogService, prefs, this)),
+                        factory.createMenuItem(StandardActions.EXPORT_SELECTED, new ExportCommand(true, stateManager, dialogService, prefs, this)),
                         factory.createMenuItem(StandardActions.SAVE_SELECTED_AS_PLAIN_BIBTEX, new SaveAction(SaveAction.SaveMethod.SAVE_SELECTED, this, prefs, stateManager))),
 
                 new SeparatorMenuItem(),
