@@ -19,6 +19,7 @@ import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.logic.importer.fetcher.transformers.DefaultQueryTransformer;
 import org.jabref.logic.importer.fileformat.BibtexParser;
+import org.jabref.logic.layout.format.RTFChars;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.util.OS;
 import org.jabref.model.entry.BibEntry;
@@ -265,7 +266,7 @@ public class ResearchGate implements FulltextFetcher, EntryBasedFetcher, SearchB
         if (title.isEmpty()) {
             return new ArrayList<>();
         }
-        return performSearch(title.get());
+        return performSearch(new RTFChars().format(title.get()));
     }
 }
 

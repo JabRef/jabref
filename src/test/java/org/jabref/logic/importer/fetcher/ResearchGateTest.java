@@ -104,12 +104,34 @@ public class ResearchGateTest {
 
     @Test
     void performSearchWithBibEntry() throws FetcherException {
-        entry.withCitationKey("inproceedings")
-             .withField(StandardField.ISBN, "0-7695-2461-3")
-             .withField(StandardField.MONTH, "01")
-             .withField(StandardField.PAGES, "9 pp.-")
-             .withField(StandardField.YEAR, "2006")
-             .withField(StandardField.AUTHOR, "Zaffar, F. and Kedem, G. and Gehani, Abdurrazzak");
-        assertEquals(Optional.of(entry), fetcher.performSearch(entry).stream().findFirst());
+        BibEntry entryZaffar = new BibEntry().withCitationKey("inproceedings")
+                                             .withField(StandardField.ISBN, "0-7695-2461-3")
+                                             .withField(StandardField.MONTH, "01")
+                                             .withField(StandardField.PAGES, "9 pp.-")
+                                             .withField(StandardField.YEAR, "2006")
+                                             .withField(StandardField.AUTHOR, "Zaffar, F. and Kedem, G. and Gehani, Abdurrazzak");
+        assertEquals(Optional.of(entryZaffar), fetcher.performSearch(entryZaffar).stream().findFirst());
+    }
+
+    @Test
+    void performSearchWithTitleWithCurlyBraces() throws FetcherException {
+        BibEntry entryInput = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("article")
+                .withField(StandardField.TITLE, "Communicating {COVID}-19 against the backdrop of conspiracy ideologies: {HOW} {PUBLIC} {FIGURES} {DISCUSS} {THE} {MATTER} {ON} {FACEBOOK} {AND} {TELEGRAM}");
+
+        BibEntry entryOutput = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("article")
+                .withField(StandardField.TITLE, "Communicating COVID-19 against the backdrop of conspiracy ideologies: HOW PUBLIC FIGURES DISCUSS THE MATTER ON FACEBOOK AND TELEGRAM")
+                .withField(StandardField.MONTH, "05")
+                .withField(StandardField.YEAR, "2021")
+                .withField(StandardField.AUTHOR, "Hohlfeld, Ralf and Bauerfeind, Franziska and Braglia, Ilenia and Butt, Aqib and Dietz, Anna-Lena and Drexel, Denise and Fedlmeier, Julia and Fischer, Lana and Gandl, Vanessa and Glaser, Felia and Haberzettel, Eva and Helling, Teresa and Käsbauer, Isabel and Kast, Matthias and Krieger, Anja and Lächner, Anja and Malkanova, Adriana and Raab, Marie-Kristin and Rech, Anastasia and Weymar, Pia")
+                .withField(StandardField.DOI, "10.13140/RG.2.2.36822.78406");
+
+        // TODO EntryType and CitationKey is automatically set to "unknown"
+        entryInput = fetcher.performSearch(entryInput)
+                            .stream().findFirst().get();
+        entryInput.withCitationKey("article").setType(StandardEntryType.Article);
+
+        assertEquals(entryOutput, entryInput);
     }
 }
