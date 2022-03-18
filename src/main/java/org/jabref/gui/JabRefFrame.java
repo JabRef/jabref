@@ -486,12 +486,12 @@ public class JabRefFrame extends BorderPane {
             } catch (InterruptedException ex) {
                 // Ignore
             }
-            Platform.runLater(this::hideNotificationPane);
+            Platform.runLater(() -> notificationPane.hide());
         }).start();
     }
 
-    public void hideNotificationPane() {
-        notificationPane.hide();
+    public NotificationPane getNotificationPane() {
+        return notificationPane;
     }
 
     private void updateSidePane() {

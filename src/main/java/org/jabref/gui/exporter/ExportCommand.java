@@ -16,6 +16,7 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.desktop.JabRefDesktop;
+import org.jabref.gui.theme.Theme;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.gui.util.FileFilterConverter;
@@ -31,8 +32,12 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.PreferencesService;
 
+import org.controlsfx.control.NotificationPane;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static org.jabref.gui.theme.Theme.Type.DEFAULT;
+import static org.jabref.gui.theme.Theme.Type.EMBEDDED;
 
 /**
  * Performs an export action
@@ -132,12 +137,20 @@ public class ExportCommand extends SimpleCommand {
                 })
                 .onSuccess(
                         x -> {
+                            NotificationPane notificationPane = jabRefFrame.getNotificationPane();
+                            Theme.Type themeType = preferences.getAppearancePreferences().getTheme().getType();
+                            if (themeType == EMBEDDED) {
+                                notificationPane.getStyleClass().add(NotificationPane.STYLE_CLASS_DARK);
+                            }
+                            if (themeType == DEFAULT) {
+                                notificationPane.getStyleClass().remove(NotificationPane.STYLE_CLASS_DARK);
+                            }
                             jabRefFrame.showNotificationPane(Localization.lang("Do you want to open the file in folder?"),
                                     Localization.lang("Open"),
                                     e -> {
                                         try {
                                             JabRefDesktop.openFolderAndSelectFile(file, preferences);
-                                            jabRefFrame.hideNotificationPane();
+                                            notificationPane.hide();
                                         } catch (IOException ioException) {
                                             LOGGER.info(Localization.lang("Error occurs when open the folder."));
                                         }
