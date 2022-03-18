@@ -12,7 +12,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 ### Added
 
 - We added an extra option when right-clicking an entry in the Entry List to copy either the DOI or the DOI url.
-- We added an extra verification of judge newer version. We also lead you to different change log when you click Help/About JabRef/What's new in this version to fit in different unstable subtypes.
+- We  improved the Version check to take also beta version into account and now redirect to the right changelog for the version
 
 ### Changed
 
