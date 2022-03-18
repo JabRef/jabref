@@ -71,31 +71,36 @@ public class ResearchGate implements FulltextFetcher, EntryBasedFetcher, SearchB
         // Retrieve PDF link
         String linkForSearch;
         Document html;
-        if (title.isPresent()) {
-            LOGGER.debug("Search by Title");
-            linkForSearch = getURLByString(title.get());
-            Connection connection = Jsoup.connect(linkForSearch);
-            html = connection
-                    .cookieStore(connection.cookieStore())
-                    .userAgent(URLDownload.USER_AGENT)
-                    .referrer("www.google.com")
-                    .ignoreHttpErrors(true)
-                    .get();
-        } else if (doi.isPresent()) {
-            LOGGER.debug("Search by DOI");
-            // Retrieve PDF link
-            Connection connection = Jsoup.connect(getURLByDoi(doi.get()));
-            html = connection
-                    .cookieStore(connection.cookieStore())
-                    .userAgent(URLDownload.USER_AGENT)
-                    .ignoreHttpErrors(true)
-                    .get();
-        } else {
+        try {
+            if (title.isPresent()) {
+                LOGGER.trace("Search by Title");
+                linkForSearch = getURLByString(title.get());
+                Connection connection = Jsoup.connect(linkForSearch);
+                html = connection
+                        .cookieStore(connection.cookieStore())
+                        .userAgent(URLDownload.USER_AGENT)
+                        .referrer("www.google.com")
+                        .ignoreHttpErrors(true)
+                        .get();
+            } else if (doi.isPresent()) {
+                LOGGER.trace("Search by DOI");
+                // Retrieve PDF link
+                Connection connection = Jsoup.connect(getURLByDoi(doi.get()));
+                html = connection
+                        .cookieStore(connection.cookieStore())
+                        .userAgent(URLDownload.USER_AGENT)
+                        .ignoreHttpErrors(true)
+                        .get();
+            } else {
+                return Optional.empty();
+            }
+        } catch (FetcherException | NullPointerException e) {
+            LOGGER.debug("ResearchGate server is not available");
             return Optional.empty();
         }
         Elements eLink = html.getElementsByTag("section");
         String link = eLink.select("a[href^=https]").select("a[href$=.pdf]").attr("href");
-        LOGGER.trace("PDF link: {}", link);
+        LOGGER.debug("PDF link: {}", link);
 
         if (link.contains("researchgate.net")) {
             return Optional.of(new URL(link));
@@ -103,7 +108,7 @@ public class ResearchGate implements FulltextFetcher, EntryBasedFetcher, SearchB
         return Optional.empty();
     }
 
-    String getURLByString(String query) throws IOException, FetcherException {
+    String getURLByString(String query) throws IOException, FetcherException, NullPointerException {
         URIBuilder source;
         String link;
         try {
@@ -122,10 +127,6 @@ public class ResearchGate implements FulltextFetcher, EntryBasedFetcher, SearchB
             link = HOST + Objects.requireNonNull(html.getElementById("content"))
                                  .select("a[href^=publication/]")
                                  .attr("href");
-            // ResearchGate's server blocks when too many request are made
-            if (link.equals("https://www.researchgate.net/")) {
-                throw new FetcherException("ResearchGate server unavailable");
-            }
             if (link.contains("?")) {
                 link = link.substring(0, link.indexOf("?"));
             }
@@ -136,7 +137,7 @@ public class ResearchGate implements FulltextFetcher, EntryBasedFetcher, SearchB
         return link;
     }
 
-    String getURLByDoi(DOI doi) throws IOException, FetcherException {
+    String getURLByDoi(DOI doi) throws IOException, FetcherException, NullPointerException {
         URIBuilder source;
         String link;
         try {
@@ -144,7 +145,6 @@ public class ResearchGate implements FulltextFetcher, EntryBasedFetcher, SearchB
             source = new URIBuilder(SEARCH);
             source.addParameter("type", "publication");
             source.addParameter("query", doi.getDOI());
-            // TODO: choose one
 
             source = new URIBuilder(GOOGLE_SEARCH + doi.getDOI() + GOOGLE_SITE);
             Connection connection = Jsoup.connect(source.toString());
@@ -156,10 +156,6 @@ public class ResearchGate implements FulltextFetcher, EntryBasedFetcher, SearchB
 
             link = Objects.requireNonNull(html.getElementById("search"))
                           .select("a").attr("href");
-            // ResearchGate's server blocks when too many request are made
-            if (link.equals("https://www.researchgate.net/")) {
-                throw new FetcherException("ResearchGate server unavailable");
-            }
         } catch (URISyntaxException e) {
             return null;
         }
@@ -232,7 +228,7 @@ public class ResearchGate implements FulltextFetcher, EntryBasedFetcher, SearchB
                 entry = parser.parseSingleEntry(bib);
                 entry.ifPresent(list::add);
             } catch (ParseException e) {
-                LOGGER.trace("Entry is not convertible to Bibtex", e);
+                LOGGER.debug("Entry is not convertible to Bibtex", e);
             }
         }
         return list;
@@ -243,7 +239,7 @@ public class ResearchGate implements FulltextFetcher, EntryBasedFetcher, SearchB
             URL url = new URL((urlString));
             return new BufferedReader(new InputStreamReader(url.openStream()));
         } catch (IOException e) {
-            LOGGER.debug("False URL:", e);
+            LOGGER.debug("Wrong URL:", e);
         }
         return null;
     }

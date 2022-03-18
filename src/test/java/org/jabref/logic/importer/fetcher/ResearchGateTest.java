@@ -54,13 +54,13 @@ public class ResearchGateTest {
     }
 
     @Test
-    void getDocumentByTitle() throws IOException, FetcherException {
+    void getDocumentByTitle() throws IOException, FetcherException, NullPointerException {
         String source = fetcher.getURLByString(entry.getTitle().get());
         assertTrue(source.startsWith(URL_PAGE));
     }
 
     @Test
-    void getDocumentByDOI() throws IOException, FetcherException {
+    void getDocumentByDOI() throws IOException, FetcherException, NullPointerException {
         String source = fetcher.getURLByDoi(entry.getDOI().get());
         assertEquals(URL_PAGE, source);
     }
@@ -115,23 +115,20 @@ public class ResearchGateTest {
 
     @Test
     void performSearchWithTitleWithCurlyBraces() throws FetcherException {
-        BibEntry entryInput = new BibEntry(StandardEntryType.Article)
-                .withCitationKey("article")
+        BibEntry entryInput = new BibEntry()
                 .withField(StandardField.TITLE, "Communicating {COVID}-19 against the backdrop of conspiracy ideologies: {HOW} {PUBLIC} {FIGURES} {DISCUSS} {THE} {MATTER} {ON} {FACEBOOK} {AND} {TELEGRAM}");
 
-        BibEntry entryOutput = new BibEntry(StandardEntryType.Article)
-                .withCitationKey("article")
+        BibEntry entryOutput = new BibEntry(StandardEntryType.Misc)
+                .withCitationKey("unknown")
                 .withField(StandardField.TITLE, "Communicating COVID-19 against the backdrop of conspiracy ideologies: HOW PUBLIC FIGURES DISCUSS THE MATTER ON FACEBOOK AND TELEGRAM")
                 .withField(StandardField.MONTH, "05")
                 .withField(StandardField.YEAR, "2021")
                 .withField(StandardField.AUTHOR, "Hohlfeld, Ralf and Bauerfeind, Franziska and Braglia, Ilenia and Butt, Aqib and Dietz, Anna-Lena and Drexel, Denise and Fedlmeier, Julia and Fischer, Lana and Gandl, Vanessa and Glaser, Felia and Haberzettel, Eva and Helling, Teresa and Käsbauer, Isabel and Kast, Matthias and Krieger, Anja and Lächner, Anja and Malkanova, Adriana and Raab, Marie-Kristin and Rech, Anastasia and Weymar, Pia")
                 .withField(StandardField.DOI, "10.13140/RG.2.2.36822.78406");
 
-        // TODO EntryType and CitationKey is automatically set to "unknown"
         entryInput = fetcher.performSearch(entryInput)
                             .stream().findFirst().get();
-        entryInput.withCitationKey("article").setType(StandardEntryType.Article);
-
+        entryInput.setType(StandardEntryType.Misc);
         assertEquals(entryOutput, entryInput);
     }
 }
