@@ -1,6 +1,7 @@
 package org.jabref.gui.preferences.network;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 import javafx.application.Platform;
 import javafx.beans.binding.BooleanBinding;
@@ -23,8 +24,10 @@ import org.jabref.gui.preferences.PreferencesTab;
 import org.jabref.gui.util.IconValidationDecorator;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.net.ssl.SSLCertificate;
 
 import com.airhacks.afterburner.views.ViewLoader;
+import com.tobiasdiez.easybind.EasyBind;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 import org.controlsfx.control.textfield.CustomPasswordField;
 
@@ -53,8 +56,8 @@ public class NetworkTab extends AbstractPreferenceTabView<NetworkTabViewModel> i
     @FXML private TableColumn<CustomCertificateViewModel, String> certIssuer;
     @FXML private TableColumn<CustomCertificateViewModel, String> certSerialNumber;
     @FXML private TableColumn<CustomCertificateViewModel, String> certSignatureAlgorithm;
-    @FXML private TableColumn<CustomCertificateViewModel, LocalDate> certValidFrom;
-    @FXML private TableColumn<CustomCertificateViewModel, LocalDate> certValidTo;
+    @FXML private TableColumn<CustomCertificateViewModel, String> certValidFrom;
+    @FXML private TableColumn<CustomCertificateViewModel, String> certValidTo;
     @FXML private TableColumn<CustomCertificateViewModel, String> certVersion;
 
     private String proxyPasswordText = "";
@@ -64,8 +67,8 @@ public class NetworkTab extends AbstractPreferenceTabView<NetworkTabViewModel> i
 
     public NetworkTab() {
         ViewLoader.view(this)
-                  .root(this)
-                  .load();
+                .root(this)
+                .load();
     }
 
     @Override
@@ -121,6 +124,29 @@ public class NetworkTab extends AbstractPreferenceTabView<NetworkTabViewModel> i
         customCertificatesTable.disableProperty().bind(customCertificatesUse.selectedProperty().not());
         addCertificate.disableProperty().bind(customCertificatesUse.selectedProperty().not());
 
+        certSerialNumber.setCellValueFactory(data -> data.getValue().serialNumberProperty());
+        certIssuer.setCellValueFactory(data -> data.getValue().issuerProperty());
+        certSignatureAlgorithm.setCellValueFactory(data -> data.getValue().signatureAlgorithmProperty());
+        certVersion.setCellValueFactory(data -> data.getValue().versionProperty());
+
+        certValidFrom.setCellValueFactory(data -> EasyBind.map(data.getValue().validFromProperty(), this::formatDate));
+        certValidTo.setCellValueFactory(data -> EasyBind.map(data.getValue().validToProperty(), this::formatDate));
+
+        customCertificatesTable.getItems().add(new CustomCertificateViewModel(
+                new SSLCertificate("azerty123", "Brens", LocalDate.of(2020, 5, 30), LocalDate.of(
+                        2030, 8, 12), "SHA-3", 2
+                ))
+        );
+
+        customCertificatesTable.getItems().add(new CustomCertificateViewModel(
+                new SSLCertificate("tui4a5r2", "Ahmed", LocalDate.of(2017, 3, 30), LocalDate.of(
+                        2026, 4, 12), "SHA-1", 3
+                ))
+        );
+    }
+
+    public String formatDate(LocalDate localDate) {
+        return localDate.format(DateTimeFormatter.ofPattern("dd-MMM-yyyy"));
     }
 
     private void proxyPasswordReveal(MouseEvent event) {
