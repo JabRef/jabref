@@ -36,10 +36,6 @@ import org.controlsfx.control.NotificationPane;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.jabref.gui.theme.Theme.Type.CUSTOM;
-import static org.jabref.gui.theme.Theme.Type.DEFAULT;
-import static org.jabref.gui.theme.Theme.Type.EMBEDDED;
-
 /**
  * Performs an export action
  */
@@ -137,18 +133,14 @@ public class ExportCommand extends SimpleCommand {
                     return null; // can not use BackgroundTask.wrap(Runnable) because Runnable.run() can't throw Exceptions
                 })
                 .onSuccess(
-                        x -> {
+                        save -> {
                             NotificationPane notificationPane = jabRefFrame.getNotificationPane();
                             Theme.Type themeType = preferences.getAppearancePreferences().getTheme().getType();
-                            if (themeType == EMBEDDED) {
-                                notificationPane.getStyleClass().add(NotificationPane.STYLE_CLASS_DARK);
-                            }
-                            if (themeType == DEFAULT) {
-                                notificationPane.getStyleClass().removeAll(NotificationPane.STYLE_CLASS_DARK,
+                            switch (themeType) {
+                                case EMBEDDED -> notificationPane.getStyleClass().add(NotificationPane.STYLE_CLASS_DARK);
+                                case CUSTOM -> notificationPane.getStyleClass().add(notificationPane.getUserAgentStylesheet());
+                                case DEFAULT -> notificationPane.getStyleClass().removeAll(NotificationPane.STYLE_CLASS_DARK,
                                         notificationPane.getUserAgentStylesheet());
-                            }
-                            if (themeType == CUSTOM) {
-                                notificationPane.getStyleClass().add(notificationPane.getUserAgentStylesheet());
                             }
                             jabRefFrame.showNotificationPane(
                                     Localization.lang("Press \"Open\" to reveal the folder holding the saved file."),
