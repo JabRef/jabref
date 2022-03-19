@@ -64,36 +64,9 @@ public class ResearchGate implements FulltextFetcher, EntryBasedFetcher, SearchB
     public Optional<URL> findFullText(BibEntry entry) throws IOException, FetcherException {
         Objects.requireNonNull(entry);
 
-        // DOI search
-        Optional<String> title = entry.getField(StandardField.TITLE);
-        Optional<DOI> doi = entry.getField(StandardField.DOI).flatMap(DOI::parse);
-
-        // Retrieve PDF link
-        String linkForSearch;
         Document html;
         try {
-            if (title.isPresent()) {
-                LOGGER.trace("Search by Title");
-                linkForSearch = getURLByString(title.get());
-                Connection connection = Jsoup.connect(linkForSearch);
-                html = connection
-                        .cookieStore(connection.cookieStore())
-                        .userAgent(URLDownload.USER_AGENT)
-                        .referrer("www.google.com")
-                        .ignoreHttpErrors(true)
-                        .get();
-            } else if (doi.isPresent()) {
-                LOGGER.trace("Search by DOI");
-                // Retrieve PDF link
-                Connection connection = Jsoup.connect(getURLByDoi(doi.get()));
-                html = connection
-                        .cookieStore(connection.cookieStore())
-                        .userAgent(URLDownload.USER_AGENT)
-                        .ignoreHttpErrors(true)
-                        .get();
-            } else {
-                return Optional.empty();
-            }
+            html = getHTML(entry);
         } catch (FetcherException | NullPointerException e) {
             LOGGER.debug("ResearchGate server is not available");
             return Optional.empty();
@@ -108,7 +81,43 @@ public class ResearchGate implements FulltextFetcher, EntryBasedFetcher, SearchB
         return Optional.empty();
     }
 
-    String getURLByString(String query) throws IOException, FetcherException, NullPointerException {
+    private Document getHTML(BibEntry entry) throws FetcherException, IOException {
+        // DOI search
+        Optional<String> title = entry.getField(StandardField.TITLE);
+        Optional<DOI> doi = entry.getField(StandardField.DOI).flatMap(DOI::parse);
+
+        // Retrieve PDF link
+        Optional<String> linkForSearch;
+        if (title.isPresent()) {
+            LOGGER.trace("Search by Title");
+            linkForSearch = getURLByString(title.get());
+            if (linkForSearch.isPresent()) {
+                Connection connection = Jsoup.connect(linkForSearch.get());
+                return connection
+                        .cookieStore(connection.cookieStore())
+                        .userAgent(URLDownload.USER_AGENT)
+                        .referrer("www.google.com")
+                        .ignoreHttpErrors(true)
+                        .get();
+            }
+        }
+        if (doi.isPresent()) {
+            LOGGER.trace("Search by DOI");
+            // Retrieve PDF link
+            linkForSearch = getURLByDoi(doi.get());
+            if (linkForSearch.isPresent()) {
+                Connection connection = Jsoup.connect(linkForSearch.get());
+                return connection
+                        .cookieStore(connection.cookieStore())
+                        .userAgent(URLDownload.USER_AGENT)
+                        .ignoreHttpErrors(true)
+                        .get();
+            }
+        }
+        throw new FetcherException("Could not find a pdf");
+    }
+
+    Optional<String> getURLByString(String query) throws IOException, NullPointerException {
         URIBuilder source;
         String link;
         try {
@@ -131,18 +140,16 @@ public class ResearchGate implements FulltextFetcher, EntryBasedFetcher, SearchB
                 link = link.substring(0, link.indexOf("?"));
             }
         } catch (URISyntaxException e) {
-            return null;
+            return Optional.empty();
         }
         LOGGER.trace("URL for page: {}", link);
-        return link;
+        return Optional.of(link);
     }
 
-    String getURLByDoi(DOI doi) throws IOException, FetcherException, NullPointerException {
-        URIBuilder source;
+    Optional<String> getURLByDoi(DOI doi) throws IOException, NullPointerException {
         String link;
         try {
-
-            source = new URIBuilder(SEARCH);
+            URIBuilder source = new URIBuilder(SEARCH);
             source.addParameter("type", "publication");
             source.addParameter("query", doi.getDOI());
 
@@ -157,10 +164,10 @@ public class ResearchGate implements FulltextFetcher, EntryBasedFetcher, SearchB
             link = Objects.requireNonNull(html.getElementById("search"))
                           .select("a").attr("href");
         } catch (URISyntaxException e) {
-            return null;
+            return Optional.empty();
         }
         LOGGER.trace("URL for page: {}", link);
-        return link;
+        return Optional.of(link);
     }
 
     /**
