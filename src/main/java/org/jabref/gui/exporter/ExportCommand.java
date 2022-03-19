@@ -36,6 +36,7 @@ import org.controlsfx.control.NotificationPane;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static org.jabref.gui.theme.Theme.Type.CUSTOM;
 import static org.jabref.gui.theme.Theme.Type.DEFAULT;
 import static org.jabref.gui.theme.Theme.Type.EMBEDDED;
 
@@ -143,9 +144,14 @@ public class ExportCommand extends SimpleCommand {
                                 notificationPane.getStyleClass().add(NotificationPane.STYLE_CLASS_DARK);
                             }
                             if (themeType == DEFAULT) {
-                                notificationPane.getStyleClass().remove(NotificationPane.STYLE_CLASS_DARK);
+                                notificationPane.getStyleClass().removeAll(NotificationPane.STYLE_CLASS_DARK,
+                                        notificationPane.getUserAgentStylesheet());
                             }
-                            jabRefFrame.showNotificationPane(Localization.lang("Do you want to open the file in folder?"),
+                            if (themeType == CUSTOM) {
+                                notificationPane.getStyleClass().add(notificationPane.getUserAgentStylesheet());
+                            }
+                            jabRefFrame.showNotificationPane(
+                                    Localization.lang("Press \"Open\" to reveal the folder holding the saved file."),
                                     Localization.lang("Open"),
                                     e -> {
                                         try {
@@ -154,7 +160,7 @@ public class ExportCommand extends SimpleCommand {
                                         } catch (IOException ioException) {
                                             LOGGER.info(Localization.lang("Error occurs when open the folder."));
                                         }
-                            });
+                                    });
                         })
                 .onFailure(this::handleError)
                 .executeWith(Globals.TASK_EXECUTOR);

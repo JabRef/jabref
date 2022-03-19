@@ -153,6 +153,8 @@ import org.controlsfx.control.PopOver;
 import org.controlsfx.control.TaskProgressView;
 import org.controlsfx.control.action.Action;
 import org.fxmisc.richtext.CodeArea;
+import org.reactfx.util.FxTimer;
+import org.reactfx.util.Timer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -479,15 +481,9 @@ public class JabRefFrame extends BorderPane {
             actions.set(0, action);
         }
         notificationPane.show();
-        // the notification bar will disappear if the user doesn't have actions in 10 seconds
-        new Thread(() -> {
-            try {
-                Thread.sleep(10000);
-            } catch (InterruptedException ex) {
-                // Ignore
-            }
-            Platform.runLater(() -> notificationPane.hide());
-        }).start();
+        // the notification bar will disappear if the user doesn't take action in 10 seconds
+        Timer searchTask = FxTimer.create(java.time.Duration.ofMillis(10000), () -> notificationPane.hide());
+        searchTask.restart();
     }
 
     public NotificationPane getNotificationPane() {
