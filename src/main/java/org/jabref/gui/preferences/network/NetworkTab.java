@@ -1,6 +1,6 @@
 package org.jabref.gui.preferences.network;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 import javafx.application.Platform;
 import javafx.beans.binding.BooleanBinding;
@@ -53,8 +53,8 @@ public class NetworkTab extends AbstractPreferenceTabView<NetworkTabViewModel> i
     @FXML private TableColumn<CustomCertificateViewModel, String> certIssuer;
     @FXML private TableColumn<CustomCertificateViewModel, String> certSerialNumber;
     @FXML private TableColumn<CustomCertificateViewModel, String> certSignatureAlgorithm;
-    @FXML private TableColumn<CustomCertificateViewModel, LocalDateTime> certValidFrom;
-    @FXML private TableColumn<CustomCertificateViewModel, LocalDateTime> certValidTo;
+    @FXML private TableColumn<CustomCertificateViewModel, LocalDate> certValidFrom;
+    @FXML private TableColumn<CustomCertificateViewModel, LocalDate> certValidTo;
     @FXML private TableColumn<CustomCertificateViewModel, String> certVersion;
 
     private String proxyPasswordText = "";
