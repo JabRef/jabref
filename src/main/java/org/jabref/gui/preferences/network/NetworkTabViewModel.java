@@ -39,6 +39,7 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty proxyUseAuthenticationProperty = new SimpleBooleanProperty();
     private final StringProperty proxyUsernameProperty = new SimpleStringProperty("");
     private final StringProperty proxyPasswordProperty = new SimpleStringProperty("");
+    private final BooleanProperty customCertificatesUseProperty = new SimpleBooleanProperty();
 
     private final Validator remotePortValidator;
     private final Validator proxyHostnameValidator;
@@ -308,5 +309,9 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
 
     public StringProperty proxyPasswordProperty() {
         return proxyPasswordProperty;
+    }
+
+    public BooleanProperty customCertificatesUseProperty() {
+        return customCertificatesUseProperty;
     }
 }

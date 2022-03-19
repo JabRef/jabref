@@ -9,6 +9,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 
@@ -46,6 +47,9 @@ public class NetworkTab extends AbstractPreferenceTabView<NetworkTabViewModel> i
     @FXML private Label proxyAttentionLabel;
     @FXML private Button checkConnectionButton;
 
+    @FXML private Button addCertificate;
+    @FXML private CheckBox customCertificatesUse;
+    @FXML private TableView<CustomCertificateViewModel> customCertificatesTable;
     @FXML private TableColumn<CustomCertificateViewModel, String> certIssuer;
     @FXML private TableColumn<CustomCertificateViewModel, String> certSerialNumber;
     @FXML private TableColumn<CustomCertificateViewModel, String> certSignatureAlgorithm;
@@ -112,6 +116,11 @@ public class NetworkTab extends AbstractPreferenceTabView<NetworkTabViewModel> i
             validationVisualizer.initVisualization(viewModel.proxyUsernameValidationStatus(), proxyUsername);
             validationVisualizer.initVisualization(viewModel.proxyPasswordValidationStatus(), proxyPassword);
         });
+
+        customCertificatesUse.selectedProperty().bindBidirectional(viewModel.customCertificatesUseProperty());
+        customCertificatesTable.disableProperty().bind(customCertificatesUse.selectedProperty().not());
+        addCertificate.disableProperty().bind(customCertificatesUse.selectedProperty().not());
+
     }
 
     private void proxyPasswordReveal(MouseEvent event) {
@@ -134,5 +143,10 @@ public class NetworkTab extends AbstractPreferenceTabView<NetworkTabViewModel> i
     @FXML
     void checkConnection() {
         viewModel.checkConnection();
+    }
+
+    @FXML
+    void addCertificateFile() {
+
     }
 }

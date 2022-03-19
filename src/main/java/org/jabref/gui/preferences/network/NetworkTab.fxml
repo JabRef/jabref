@@ -73,8 +73,8 @@
          <RowConstraints />
       </rowConstraints>
       <children>
-         <CheckBox fx:id="customSSLUse" text="Enable custom SSL certificates" GridPane.columnSpan="3" GridPane.rowIndex="0" />
-         <TableView prefHeight="200.0" GridPane.columnSpan="3" GridPane.rowIndex="1">
+         <CheckBox fx:id="customCertificatesUse" text="Enable custom SSL certificates" GridPane.columnSpan="3" GridPane.rowIndex="0" />
+         <TableView fx:id="customCertificatesTable" prefHeight="200.0" GridPane.columnSpan="3" GridPane.rowIndex="1">
            <columns>
              <TableColumn fx:id="certSerialNumber" prefWidth="75.0" text="Serial number" />
              <TableColumn fx:id="certIssuer" prefWidth="75.0" text="Issuer" />
@@ -87,7 +87,7 @@
                <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
             </columnResizePolicy>
          </TableView>
-         <Button mnemonicParsing="false" text="Add certificate" GridPane.columnIndex="2" GridPane.halignment="RIGHT" GridPane.rowIndex="2" GridPane.valignment="TOP">
+         <Button fx:id="addCertificate" mnemonicParsing="false" onAction="#addCertificateFile" text="Add certificate" GridPane.columnIndex="2" GridPane.halignment="RIGHT" GridPane.rowIndex="2" GridPane.valignment="TOP">
             <GridPane.margin>
                <Insets right="16.0" />
             </GridPane.margin>
