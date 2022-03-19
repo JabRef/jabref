@@ -1,11 +1,14 @@
 package org.jabref.gui.preferences.network;
 
+import java.time.LocalDateTime;
+
 import javafx.application.Platform;
 import javafx.beans.binding.BooleanBinding;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.TableColumn;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 
@@ -19,6 +22,7 @@ import org.jabref.gui.preferences.PreferencesTab;
 import org.jabref.gui.util.IconValidationDecorator;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.model.entry.Date;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
@@ -42,6 +46,13 @@ public class NetworkTab extends AbstractPreferenceTabView<NetworkTabViewModel> i
     @FXML private CustomPasswordField proxyPassword;
     @FXML private Label proxyAttentionLabel;
     @FXML private Button checkConnectionButton;
+
+    @FXML private TableColumn<CustomCertificateViewModel, String> certIssuer;
+    @FXML private TableColumn<CustomCertificateViewModel, String> certSerialNumber;
+    @FXML private TableColumn<CustomCertificateViewModel, String> certSignatureAlgorithm;
+    @FXML private TableColumn<CustomCertificateViewModel, LocalDateTime> certValidFrom;
+    @FXML private TableColumn<CustomCertificateViewModel, LocalDateTime> certValidTo;
+    @FXML private TableColumn<CustomCertificateViewModel, String> certVersion;
 
     private String proxyPasswordText = "";
     private int proxyPasswordCaretPosition = 0;
