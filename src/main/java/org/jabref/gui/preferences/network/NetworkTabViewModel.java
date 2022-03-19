@@ -19,6 +19,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.ProxyPreferences;
 import org.jabref.logic.net.ProxyRegisterer;
 import org.jabref.logic.net.URLDownload;
+import org.jabref.logic.net.ssl.SSLCertificate;
 import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.remote.RemoteUtil;
 import org.jabref.logic.util.StandardFileType;
@@ -31,8 +32,12 @@ import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
 import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
 import de.saxsys.mvvmfx.utils.validation.Validator;
 import kong.unirest.UnirestException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class NetworkTabViewModel implements PreferenceTabViewModel {
+    private static final Logger LOGGER = LoggerFactory.getLogger(NetworkTabViewModel.class);
+
     private final BooleanProperty remoteServerProperty = new SimpleBooleanProperty();
     private final StringProperty remotePortProperty = new SimpleStringProperty("");
     private final BooleanProperty proxyUseProperty = new SimpleBooleanProperty();
@@ -324,8 +329,10 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
                 .withInitialDirectory(preferences.getFilePreferences().getWorkingDirectory())
                 .build();
 
-        dialogService.showFileOpenDialog(fileDialogConfiguration)
-                .ifPresent(file -> {
-                });
+        dialogService.showFileOpenDialog(fileDialogConfiguration).flatMap(SSLCertificate::fromPath).ifPresent(sslCertificate -> {
+            LOGGER.info("Issuer: {}", sslCertificate.getIssuer());
+            LOGGER.info("Version: V{}", sslCertificate.getVersion());
+            LOGGER.info("Serial Number: {}", sslCertificate.getSerialNumber());
+        });
     }
 }
