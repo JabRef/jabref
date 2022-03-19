@@ -173,6 +173,6 @@ public class NetworkTab extends AbstractPreferenceTabView<NetworkTabViewModel> i
 
     @FXML
     void addCertificateFile() {
-
+        viewModel.addCertificateFile();
     }
 }

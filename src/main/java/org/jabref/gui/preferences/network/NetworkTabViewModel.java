@@ -14,12 +14,14 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.Globals;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.gui.remote.JabRefMessageHandler;
+import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.ProxyPreferences;
 import org.jabref.logic.net.ProxyRegisterer;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.remote.RemoteUtil;
+import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.preferences.PreferencesService;
 
@@ -313,5 +315,17 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
 
     public BooleanProperty customCertificatesUseProperty() {
         return customCertificatesUseProperty;
+    }
+
+    public void addCertificateFile() {
+        FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
+                .addExtensionFilter(Localization.lang("SSL certificate file"), StandardFileType.CER)
+                .withDefaultExtension(Localization.lang("SSL certificate file"), StandardFileType.CER)
+                .withInitialDirectory(preferences.getFilePreferences().getWorkingDirectory())
+                .build();
+
+        dialogService.showFileOpenDialog(fileDialogConfiguration)
+                .ifPresent(file -> {
+                });
     }
 }
