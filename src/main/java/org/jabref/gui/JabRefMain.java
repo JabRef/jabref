@@ -153,6 +153,12 @@ public class JabRefMain extends Application {
         Path currentIndexPath = BibDatabaseContext.getFulltextIndexBasePath();
         Path appData = currentIndexPath.getParent();
 
+        try {
+            Files.createDirectories(currentIndexPath);
+        } catch (IOException e) {
+            LOGGER.error("Could not create index directory {}", appData, e);
+        }
+
         try (DirectoryStream<Path> stream = Files.newDirectoryStream(appData)) {
             for (Path path : stream) {
                 if (Files.isDirectory(path) && !path.equals(currentIndexPath)) {
@@ -161,7 +167,6 @@ public class JabRefMain extends Application {
                          .sorted(Comparator.reverseOrder())
                          .map(Path::toFile)
                          .forEach(File::delete);
-
                 }
             }
         } catch (IOException e) {

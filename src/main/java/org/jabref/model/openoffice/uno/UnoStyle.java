@@ -18,11 +18,12 @@ public class UnoStyle {
     public static final String CHARACTER_STYLES = "CharacterStyles";
     public static final String PARAGRAPH_STYLES = "ParagraphStyles";
 
-    private UnoStyle() { }
+    private UnoStyle() {
+    }
 
     private static Optional<XStyle> getStyleFromFamily(XTextDocument doc, String familyName, String styleName)
-        throws
-        WrappedTargetException {
+            throws
+            WrappedTargetException {
 
         XStyleFamiliesSupplier fss = UnoCast.cast(XStyleFamiliesSupplier.class, doc).get();
         XNameAccess families = UnoCast.cast(XNameAccess.class, fss.getStyleFamilies()).get();
@@ -43,34 +44,34 @@ public class UnoStyle {
     }
 
     public static Optional<XStyle> getParagraphStyle(XTextDocument doc, String styleName)
-        throws
-        WrappedTargetException {
+            throws
+            WrappedTargetException {
         return getStyleFromFamily(doc, PARAGRAPH_STYLES, styleName);
     }
 
     public static Optional<XStyle> getCharacterStyle(XTextDocument doc, String styleName)
-        throws
-        WrappedTargetException {
+            throws
+            WrappedTargetException {
         return getStyleFromFamily(doc, CHARACTER_STYLES, styleName);
     }
 
     public static Optional<String> getInternalNameOfStyle(XTextDocument doc, String familyName,
                                                           String name)
-        throws
-        WrappedTargetException {
+            throws
+            WrappedTargetException {
         return (getStyleFromFamily(doc, familyName, name)
                 .map(XStyle::getName));
     }
 
     public static Optional<String> getInternalNameOfParagraphStyle(XTextDocument doc, String name)
-        throws
-        WrappedTargetException {
+            throws
+            WrappedTargetException {
         return getInternalNameOfStyle(doc, PARAGRAPH_STYLES, name);
     }
 
     public static Optional<String> getInternalNameOfCharacterStyle(XTextDocument doc, String name)
-        throws
-        WrappedTargetException {
+            throws
+            WrappedTargetException {
         return getInternalNameOfStyle(doc, CHARACTER_STYLES, name);
     }
 }

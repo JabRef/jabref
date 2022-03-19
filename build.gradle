@@ -18,7 +18,7 @@ plugins {
 
     // nicer test outputs during running and completion
     // Homepage: https://github.com/radarsh/gradle-test-logger-plugin
-    id 'com.adarshr.test-logger' version '3.1.0'
+    id 'com.adarshr.test-logger' version '3.2.0'
 
     id 'jacoco'
 
@@ -102,7 +102,7 @@ configurations {
 }
 
 javafx {
-    version = "17.0.2"
+    version = "18"
     modules = [ 'javafx.controls', 'javafx.fxml', 'javafx.web', 'javafx.swing' ]
 }
 
@@ -115,6 +115,7 @@ dependencies {
     implementation 'org.apache.pdfbox:xmpbox:3.0.0-RC1'
 
     implementation group: 'org.apache.commons', name: 'commons-csv', version: '1.9.0'
+    implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.12.0'
     implementation 'com.h2database:h2-mvstore:2.1.210'
 
     implementation group: 'org.apache.tika', name: 'tika-core', version: '2.3.0'
@@ -125,7 +126,7 @@ dependencies {
 
     implementation 'commons-cli:commons-cli:1.5.0'
 
-    implementation 'org.libreoffice:libreoffice:7.3.0'
+    implementation 'org.libreoffice:libreoffice:7.3.1'
     implementation 'org.libreoffice:unoloader:7.3.0'
 
     implementation 'io.github.java-diff-utils:java-diff-utils:4.11'
@@ -137,10 +138,10 @@ dependencies {
     antlr4 'org.antlr:antlr4:4.9.3'
     implementation 'org.antlr:antlr4-runtime:4.9.3'
 
-    implementation group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: '6.0.0.202111291000-r'
+    implementation group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: '6.1.0.202203080745-r'
 
-    implementation group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-yaml', version: '2.13.1'
-    implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.13.1'
+    implementation group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-yaml', version: '2.13.2'
+    implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.13.2'
 
     implementation group: 'org.mariadb.jdbc', name: 'mariadb-java-client', version: '2.7.5'
 
@@ -178,7 +179,7 @@ dependencies {
     implementation "org.tinylog:slf4j-tinylog:2.4.1"
     implementation "org.tinylog:tinylog-impl:2.4.1"
 
-    implementation 'de.undercouch:citeproc-java:3.0.0-alpha.3'
+    implementation 'de.undercouch:citeproc-java:3.0.0-alpha.6'
 
     // jakarta.activation is already depdency of glassfish
     implementation group: 'jakarta.xml.bind', name: 'jakarta.xml.bind-api', version: '3.0.1'
@@ -555,6 +556,7 @@ jlink {
         requires 'jdk.xml.dom'
         requires 'com.google.gson'
         requires 'org.slf4j'
+        requires 'jakarta.xml.bind'
         uses 'org.controlsfx.glyphfont.GlyphFont'
         uses 'com.airhacks.afterburner.views.ResourceLocator'
         uses 'com.airhacks.afterburner.injection.PresenterFactory'

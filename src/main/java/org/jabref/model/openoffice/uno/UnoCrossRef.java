@@ -14,7 +14,8 @@ import com.sun.star.util.XRefreshable;
 
 public class UnoCrossRef {
 
-    private UnoCrossRef() { }
+    private UnoCrossRef() {
+    }
 
     /**
      * Update TextFields, etc. We use it to refresh cross-references in the document.
@@ -26,17 +27,16 @@ public class UnoCrossRef {
     }
 
     /**
-     * Insert a clickable cross-reference to a reference mark, with a label containing the target's
-     * page number.
-     *
+     * Insert a clickable cross-reference to a reference mark, with a label containing the target's page number.
+     * <p>
      * May need a documentConnection.refresh() after, to update the text shown.
      */
     public static void insertReferenceToPageNumberOfReferenceMark(XTextDocument doc,
                                                                   String referenceMarkName,
                                                                   XTextRange cursor)
-        throws
-        CreationException,
-        WrappedTargetException {
+            throws
+            CreationException,
+            WrappedTargetException {
 
         // based on: https://wiki.openoffice.org/wiki/Documentation/DevGuide/Text/Reference_Marks
         XMultiServiceFactory msf = UnoCast.cast(XMultiServiceFactory.class, doc).get();
@@ -62,20 +62,20 @@ public class UnoCrossRef {
         try {
             // specify that the source is a reference mark (could also be a footnote,
             // bookmark or sequence field)
-            xFieldProps.setPropertyValue("ReferenceFieldSource", Short.valueOf(ReferenceFieldSource.REFERENCE_MARK));
+            xFieldProps.setPropertyValue("ReferenceFieldSource", ReferenceFieldSource.REFERENCE_MARK);
         } catch (UnknownPropertyException ex) {
             throw new java.lang.IllegalStateException("The created GetReference does not have property"
-                                                      + " 'ReferenceFieldSource'");
+                    + " 'ReferenceFieldSource'");
         } catch (PropertyVetoException ex) {
             throw new java.lang.IllegalStateException("Caught PropertyVetoException on 'ReferenceFieldSource'");
         }
 
         try {
             // We want the reference displayed as page number
-            xFieldProps.setPropertyValue("ReferenceFieldPart", Short.valueOf(ReferenceFieldPart.PAGE));
+            xFieldProps.setPropertyValue("ReferenceFieldPart", ReferenceFieldPart.PAGE);
         } catch (UnknownPropertyException ex) {
             throw new java.lang.IllegalStateException("The created GetReference does not have property"
-                                                      + " 'ReferenceFieldPart'");
+                    + " 'ReferenceFieldPart'");
         } catch (PropertyVetoException ex) {
             throw new java.lang.IllegalStateException("Caught PropertyVetoException on 'ReferenceFieldPart'");
         }

@@ -12,5 +12,6 @@ queries:
 databases:
   - name: Springer
   - name: ArXiv
+  - name: Medline/PubMed
   - name: IEEEXplore
     enabled: false
