@@ -529,6 +529,11 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(PROXY_USERNAME, "");
         defaults.put(PROXY_PASSWORD, "");
 
+        // SSL
+        defaults.put(CUSTOM_CERTIFICATE_USE, Boolean.FALSE);
+        defaults.put(CUSTOM_CERTIFICATE_ALIAS, "");
+        defaults.put(CUSTOM_CERTIFICATE_VERSION, "");
+
         defaults.put(POS_X, 0);
         defaults.put(POS_Y, 0);
         defaults.put(SIZE_X, 1024);
