@@ -82,6 +82,7 @@ import org.jabref.logic.layout.TextBasedPreviewLayout;
 import org.jabref.logic.layout.format.FileLinkPreferences;
 import org.jabref.logic.layout.format.NameFormatterPreferences;
 import org.jabref.logic.net.ProxyPreferences;
+import org.jabref.logic.net.ssl.SSLPreferences;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
 import org.jabref.logic.openoffice.style.StyleLoader;
 import org.jabref.logic.preferences.DOIPreferences;
@@ -350,6 +351,11 @@ public class JabRefPreferences implements PreferencesService {
     private static final String PROXY_PASSWORD = "proxyPassword";
     private static final String PROXY_USE_AUTHENTICATION = "useProxyAuthentication";
 
+    // SSL
+    private static final String CUSTOM_CERTIFICATE_USE = "customCertificateUse";
+    private static final String CUSTOM_CERTIFICATE_ALIAS = "customCertificatesAlias";
+    private static final String CUSTOM_CERTIFICATE_VERSION = "customCertificatesVersion";
+
     // Auto completion
     private static final String AUTO_COMPLETE = "autoComplete";
     private static final String AUTOCOMPLETER_FIRSTNAME_MODE = "autoCompFirstNameMode";
@@ -439,6 +445,7 @@ public class JabRefPreferences implements PreferencesService {
     private GuiPreferences guiPreferences;
     private RemotePreferences remotePreferences;
     private ProxyPreferences proxyPreferences;
+    private SSLPreferences sslPreferences;
     private SearchPreferences searchPreferences;
     private AutoLinkPreferences autoLinkPreferences;
     private ImportExportPreferences importExportPreferences;
@@ -1602,6 +1609,28 @@ public class JabRefPreferences implements PreferencesService {
         EasyBind.listen(proxyPreferences.passwordProperty(), (obs, oldValue, newValue) -> put(PROXY_PASSWORD, newValue));
 
         return proxyPreferences;
+    }
+
+    @Override
+    public SSLPreferences getSSLPreferences() {
+        if (Objects.nonNull(sslPreferences)) {
+            return sslPreferences;
+        }
+
+        sslPreferences = new SSLPreferences(
+                getBoolean(CUSTOM_CERTIFICATE_USE),
+                getStringList(CUSTOM_CERTIFICATE_ALIAS),
+                getStringList(CUSTOM_CERTIFICATE_VERSION)
+        );
+
+        EasyBind.subscribe(sslPreferences.useCustomCertificatesProperty(), (newValue -> putBoolean(CUSTOM_CERTIFICATE_USE, newValue)));
+        sslPreferences.getCustomCertificateAlias().addListener((InvalidationListener) change -> putStringList(CUSTOM_CERTIFICATE_ALIAS,
+                sslPreferences.getCustomCertificateAlias()));
+
+        sslPreferences.getCustomCertificateVersion().addListener((InvalidationListener) change -> putStringList(CUSTOM_CERTIFICATE_VERSION,
+                sslPreferences.getCustomCertificateVersion()));
+
+        return sslPreferences;
     }
 
     //*************************************************************************************************************
