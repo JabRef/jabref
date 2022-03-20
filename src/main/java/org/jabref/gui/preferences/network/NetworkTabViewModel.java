@@ -63,6 +63,7 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
     private final RemotePreferences remotePreferences;
     private final ProxyPreferences proxyPreferences;
     private final ProxyPreferences backupProxyPreferences;
+    private final SSLPreferences sslPreferences;
 
     private final List<String> restartWarning = new ArrayList<>();
 
@@ -75,6 +76,7 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
         this.preferences = preferences;
         this.remotePreferences = preferences.getRemotePreferences();
         this.proxyPreferences = preferences.getProxyPreferences();
+        this.sslPreferences = preferences.getSSLPreferences();
 
         backupProxyPreferences = new ProxyPreferences(
                 proxyPreferences.shouldUseProxy(),
@@ -137,6 +139,7 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
         remotePortProperty.setValue(String.valueOf(remotePreferences.getPort()));
 
         setProxyValues();
+        setSSLValues();
     }
 
     private void setProxyValues() {
@@ -146,6 +149,10 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
         proxyUseAuthenticationProperty.setValue(proxyPreferences.shouldUseAuthentication());
         proxyUsernameProperty.setValue(proxyPreferences.getUsername());
         proxyPasswordProperty.setValue(proxyPreferences.getPassword());
+    }
+
+    private void setSSLValues() {
+        customCertificatesUseProperty.setValue(sslPreferences.shouldUseCustomCertificates());
     }
 
     public void storeSettings() {
@@ -159,6 +166,7 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
                 proxyUsernameProperty.getValue().trim(),
                 proxyPasswordProperty.getValue()
         ));
+        storeSSLSettings();
     }
 
     private void storeRemoteSettings() {
@@ -193,6 +201,10 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
         proxyPreferences.setUseAuthentication(newProxyPreferences.shouldUseAuthentication());
         proxyPreferences.setUsername(newProxyPreferences.getUsername());
         proxyPreferences.setPassword(newProxyPreferences.getPassword());
+    }
+
+    public void storeSSLSettings() {
+        sslPreferences.setUseCustomCertificates(customCertificatesUseProperty.getValue());
     }
 
     private Optional<Integer> getPortAsInt(String value) {
