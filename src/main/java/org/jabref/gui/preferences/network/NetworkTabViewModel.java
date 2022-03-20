@@ -4,6 +4,7 @@ import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Random;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -329,10 +330,14 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
                 .withInitialDirectory(preferences.getFilePreferences().getWorkingDirectory())
                 .build();
 
-        dialogService.showFileOpenDialog(fileDialogConfiguration).flatMap(SSLCertificate::fromPath).ifPresent(sslCertificate -> {
+        dialogService.showFileOpenDialog(fileDialogConfiguration).flatMap(path -> SSLCertificate.fromPath(genRandomAlias(), path)).ifPresent(sslCertificate -> {
             LOGGER.info("Issuer: {}", sslCertificate.getIssuer());
             LOGGER.info("Version: V{}", sslCertificate.getVersion());
             LOGGER.info("Serial Number: {}", sslCertificate.getSerialNumber());
         });
+    }
+
+    private String genRandomAlias() {
+        return String.format("[JabRef %d]", new Random().nextInt(99999999));
     }
 }

@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 public class SSLCertificate {
     private static final Logger LOGGER = LoggerFactory.getLogger(SSLCertificate.class);
 
+    private final String alias;
     private final String serialNumber;
     private final String issuer;
     private final LocalDate validFrom;
@@ -24,7 +25,8 @@ public class SSLCertificate {
     private final String signatureAlgorithm;
     private final int version;
 
-    public SSLCertificate(String serialNumber, String issuer, LocalDate validFrom, LocalDate validTo, String signatureAlgorithm, int version) {
+    public SSLCertificate(String alias, String serialNumber, String issuer, LocalDate validFrom, LocalDate validTo, String signatureAlgorithm, int version) {
+        this.alias = alias;
         this.serialNumber = serialNumber;
         this.issuer = issuer;
         this.validFrom = validFrom;
@@ -57,10 +59,14 @@ public class SSLCertificate {
         return version;
     }
 
-    public static Optional<SSLCertificate> fromX509(X509Certificate x509Certificate) {
+    public String getAlias() {
+        return alias;
+    }
+
+    public static Optional<SSLCertificate> fromX509(String alias, X509Certificate x509Certificate) {
         Objects.requireNonNull(x509Certificate);
 
-        return Optional.of(new SSLCertificate(x509Certificate.getSerialNumber().toString(),
+        return Optional.of(new SSLCertificate(alias, x509Certificate.getSerialNumber().toString(),
                 x509Certificate.getIssuerX500Principal().getName(),
                 LocalDate.ofInstant(x509Certificate.getNotBefore().toInstant(), ZoneId.systemDefault()),
                 LocalDate.ofInstant(x509Certificate.getNotAfter().toInstant(), ZoneId.systemDefault()),
@@ -68,11 +74,11 @@ public class SSLCertificate {
                 x509Certificate.getVersion()));
     }
 
-    public static Optional<SSLCertificate> fromPath(Path certPath) {
+    public static Optional<SSLCertificate> fromPath(String alias, Path certPath) {
         Objects.requireNonNull(certPath);
         try {
             CertificateFactory certificateFactory = CertificateFactory.getInstance("X509");
-            return fromX509((X509Certificate) certificateFactory.generateCertificate(new FileInputStream(certPath.toFile())));
+            return fromX509(alias, (X509Certificate) certificateFactory.generateCertificate(new FileInputStream(certPath.toFile())));
         } catch (CertificateException e) {
             LOGGER.warn("Certificate doesn't follow X.509 format", e);
         } catch (FileNotFoundException e) {

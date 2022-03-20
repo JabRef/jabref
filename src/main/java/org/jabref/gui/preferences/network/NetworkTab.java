@@ -67,8 +67,8 @@ public class NetworkTab extends AbstractPreferenceTabView<NetworkTabViewModel> i
 
     public NetworkTab() {
         ViewLoader.view(this)
-                .root(this)
-                .load();
+                  .root(this)
+                  .load();
     }
 
     @Override
@@ -133,13 +133,13 @@ public class NetworkTab extends AbstractPreferenceTabView<NetworkTabViewModel> i
         certValidTo.setCellValueFactory(data -> EasyBind.map(data.getValue().validToProperty(), this::formatDate));
 
         customCertificatesTable.getItems().add(new CustomCertificateViewModel(
-                new SSLCertificate("azerty123", "Brens", LocalDate.of(2020, 5, 30), LocalDate.of(
+                new SSLCertificate("", "azerty123", "Brens", LocalDate.of(2020, 5, 30), LocalDate.of(
                         2030, 8, 12), "SHA-3", 2
                 ))
         );
 
         customCertificatesTable.getItems().add(new CustomCertificateViewModel(
-                new SSLCertificate("tui4a5r2", "Ahmed", LocalDate.of(2017, 3, 30), LocalDate.of(
+                new SSLCertificate("", "tui4a5r2", "Ahmed", LocalDate.of(2017, 3, 30), LocalDate.of(
                         2026, 4, 12), "SHA-1", 3
                 ))
         );
