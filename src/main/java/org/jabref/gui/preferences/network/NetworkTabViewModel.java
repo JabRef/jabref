@@ -1,6 +1,7 @@
 package org.jabref.gui.preferences.network;
 
 import java.net.MalformedURLException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -20,10 +21,10 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.ProxyPreferences;
 import org.jabref.logic.net.ProxyRegisterer;
 import org.jabref.logic.net.URLDownload;
-import org.jabref.logic.net.ssl.SSLCertificate;
 import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.remote.RemoteUtil;
 import org.jabref.logic.util.StandardFileType;
+import org.jabref.model.pdf.search.SearchFieldConstants;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.preferences.PreferencesService;
 
@@ -33,6 +34,7 @@ import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
 import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
 import de.saxsys.mvvmfx.utils.validation.Validator;
 import kong.unirest.UnirestException;
+import net.harawata.appdirs.AppDirsFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -62,6 +64,10 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
     private final ProxyPreferences backupProxyPreferences;
 
     private final List<String> restartWarning = new ArrayList<>();
+
+    private final TrustStoreManager trustStoreManager = new TrustStoreManager(
+            Path.of(AppDirsFactory.getInstance().getUserDataDir("ssl", SearchFieldConstants.VERSION, "org.jabref")).resolveSibling("truststore.jks")
+    );
 
     public NetworkTabViewModel(DialogService dialogService, PreferencesService preferences) {
         this.dialogService = dialogService;
@@ -330,10 +336,8 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
                 .withInitialDirectory(preferences.getFilePreferences().getWorkingDirectory())
                 .build();
 
-        dialogService.showFileOpenDialog(fileDialogConfiguration).flatMap(path -> SSLCertificate.fromPath(genRandomAlias(), path)).ifPresent(sslCertificate -> {
-            LOGGER.info("Issuer: {}", sslCertificate.getIssuer());
-            LOGGER.info("Version: V{}", sslCertificate.getVersion());
-            LOGGER.info("Serial Number: {}", sslCertificate.getSerialNumber());
+        dialogService.showFileOpenDialog(fileDialogConfiguration).ifPresent(certPath -> {
+            trustStoreManager.addCertificate(genRandomAlias(), certPath);
         });
     }
 
