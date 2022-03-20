@@ -54,15 +54,15 @@ public class ResearchGateTest {
     }
 
     @Test
-    void getDocumentByTitle() throws IOException, FetcherException, NullPointerException {
-        String source = fetcher.getURLByString(entry.getTitle().get());
-        assertTrue(source.startsWith(URL_PAGE));
+    void getDocumentByTitle() throws IOException, NullPointerException {
+        Optional<String> source = fetcher.getURLByString(entry.getTitle().get());
+        assertTrue(source.isPresent() && source.get().startsWith(URL_PAGE));
     }
 
     @Test
-    void getDocumentByDOI() throws IOException, FetcherException, NullPointerException {
-        String source = fetcher.getURLByDoi(entry.getDOI().get());
-        assertEquals(URL_PAGE, source);
+    void getDocumentByDOI() throws IOException, NullPointerException {
+        Optional<String> source = fetcher.getURLByDoi(entry.getDOI().get());
+        assertEquals(URL_PAGE, source.orElse(""));
     }
 
     @Test
@@ -104,12 +104,17 @@ public class ResearchGateTest {
 
     @Test
     void performSearchWithBibEntry() throws FetcherException {
-        BibEntry entryZaffar = new BibEntry().withCitationKey("inproceedings")
-                                             .withField(StandardField.ISBN, "0-7695-2461-3")
-                                             .withField(StandardField.MONTH, "01")
-                                             .withField(StandardField.PAGES, "9 pp.-")
-                                             .withField(StandardField.YEAR, "2006")
-                                             .withField(StandardField.AUTHOR, "Zaffar, F. and Kedem, G. and Gehani, Abdurrazzak");
+        BibEntry entryZaffar = new BibEntry(StandardEntryType.InProceedings)
+                .withCitationKey("inproceedings")
+                .withField(StandardField.ISBN, "0-7695-2461-3")
+                .withField(StandardField.TITLE, "Looking Back at the Bell-La Padula Model")
+                .withField(StandardField.MONTH, "01")
+                .withField(StandardField.PAGES, "15 pp. - 351")
+                .withField(StandardField.DOI, "10.1109/CSAC.2005.37")
+                .withField(StandardField.VOLUME, "2005")
+                .withField(StandardField.YEAR, "2006")
+                .withField(StandardField.JOURNAL, "Proceedings - Annual Computer Security Applications Conference, ACSAC")
+                .withField(StandardField.AUTHOR, "Bell, D.E.");
         assertEquals(Optional.of(entryZaffar), fetcher.performSearch(entryZaffar).stream().findFirst());
     }
 
