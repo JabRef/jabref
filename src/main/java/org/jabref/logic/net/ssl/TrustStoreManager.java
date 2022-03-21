@@ -1,4 +1,4 @@
-package org.jabref.gui.preferences.network;
+package org.jabref.logic.net.ssl;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
