@@ -228,6 +228,7 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
     }
 
     public void storeSSLSettings() {
+        trustStoreManager.flush();
         sslPreferences.setUseCustomCertificates(customCertificatesUseProperty.getValue());
         sslPreferences.setCustomCertificateVersion(customCertificateListProperty.stream()
                                                                                 .map(CustomCertificateViewModel::getVersion)
@@ -398,6 +399,7 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
             SSLCertificate.fromPath(certPath).ifPresent(sslCertificate -> {
                 if (!trustStoreManager.isCertificateExist(sslCertificate.getSHA256Thumbprint())) {
                     trustStoreManager.addCertificate(sslCertificate.getSHA256Thumbprint(), certPath);
+
                     customCertificateListProperty.add(CustomCertificateViewModel.fromSSLCertificate(sslCertificate));
                 } else {
                     // TODO('Show a dialog or toast message indicating that the user is trying to add a duplicate certificate')

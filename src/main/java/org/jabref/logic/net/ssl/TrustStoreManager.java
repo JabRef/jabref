@@ -56,7 +56,6 @@ public class TrustStoreManager {
         try {
             CertificateFactory certificateFactory = CertificateFactory.getInstance("X509");
             store.setCertificateEntry(alias, certificateFactory.generateCertificate(new FileInputStream(certPath.toFile())));
-            flush();
         } catch (KeyStoreException | CertificateException | IOException e) {
             LOGGER.warn("Error while adding a new certificate to the truststore: {}", alias, e);
         }
@@ -66,7 +65,6 @@ public class TrustStoreManager {
         Objects.requireNonNull(alias);
         try {
             store.deleteEntry(alias);
-            flush();
         } catch (KeyStoreException e) {
             LOGGER.warn("Error while deleting certificate entry with alias: {}", alias, e);
         }
@@ -100,7 +98,7 @@ public class TrustStoreManager {
         return 0;
     }
 
-    private void flush() {
+    public void flush() {
         try {
             store.store(new FileOutputStream(storePath.toFile()), STORE_PASSWORD.toCharArray());
         } catch (KeyStoreException | IOException | NoSuchAlgorithmException | CertificateException e) {
