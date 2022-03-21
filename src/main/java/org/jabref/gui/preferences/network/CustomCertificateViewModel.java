@@ -20,13 +20,16 @@ public class CustomCertificateViewModel extends AbstractViewModel {
     private final StringProperty signatureAlgorithmProperty = new SimpleStringProperty("");
     private final StringProperty versionProperty = new SimpleStringProperty("");
 
-    public CustomCertificateViewModel(SSLCertificate sslCertificate) {
-        serialNumberProperty.setValue(sslCertificate.getSerialNumber());
-        issuerProperty.setValue(sslCertificate.getIssuer());
-        validFromProperty.setValue(sslCertificate.getValidFrom());
-        validToProperty.setValue(sslCertificate.getValidTo());
-        signatureAlgorithmProperty.setValue(sslCertificate.getSignatureAlgorithm());
-        versionProperty.setValue(String.valueOf(sslCertificate.getVersion()));
+    private final StringProperty thumbprintProperty = new SimpleStringProperty("");
+
+    public CustomCertificateViewModel(String thumbprint, String serialNumber, String issuer, LocalDate validFrom, LocalDate validTo, String sigAlgorithm, String version) {
+        serialNumberProperty.setValue(serialNumber);
+        issuerProperty.setValue(issuer);
+        validFromProperty.setValue(validFrom);
+        validToProperty.setValue(validTo);
+        signatureAlgorithmProperty.setValue(sigAlgorithm);
+        versionProperty.setValue(version);
+        thumbprintProperty.setValue(thumbprint);
     }
 
     public ReadOnlyStringProperty serialNumberProperty() {
@@ -51,5 +54,32 @@ public class CustomCertificateViewModel extends AbstractViewModel {
 
     public ReadOnlyStringProperty versionProperty() {
         return versionProperty;
+    }
+
+    public String getVersion() {
+        return versionProperty.getValue();
+    }
+
+    public String getThumbprint() {
+        return thumbprintProperty.getValue();
+    }
+
+    public LocalDate getValidFrom() {
+        return validFromProperty.getValue();
+    }
+
+    public LocalDate getValidTo() {
+        return validToProperty.getValue();
+    }
+
+    public static CustomCertificateViewModel fromSSLCertificate(SSLCertificate sslCertificate) {
+        return new CustomCertificateViewModel(
+                sslCertificate.getSHA256Thumbprint(),
+                sslCertificate.getSerialNumber(),
+                sslCertificate.getIssuer(),
+                sslCertificate.getValidFrom(),
+                sslCertificate.getValidTo(),
+                sslCertificate.getSignatureAlgorithm(),
+                sslCertificate.getVersion().toString());
     }
 }

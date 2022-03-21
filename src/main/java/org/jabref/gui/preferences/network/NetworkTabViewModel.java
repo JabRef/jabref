@@ -2,9 +2,11 @@ package org.jabref.gui.preferences.network;
 
 import java.net.MalformedURLException;
 import java.nio.file.Path;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ListProperty;
@@ -137,6 +139,10 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
                         Localization.lang("Network"),
                         Localization.lang("Proxy configuration"),
                         Localization.lang("Please specify a password"))));
+   /*     sslPreferences.setCustomCertificateVersion(Collections.emptyList());
+        sslPreferences.setCustomCertificateThumbprint(Collections.emptyList());
+        sslPreferences.setCustomCertificateValidFrom(Collections.emptyList());
+        sslPreferences.setCustomCertificateValidTo(Collections.emptyList());*/
     }
 
     public void setValues() {
@@ -158,6 +164,22 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
 
     private void setSSLValues() {
         customCertificatesUseProperty.setValue(sslPreferences.shouldUseCustomCertificates());
+        List<String> versions = sslPreferences.getCustomCertificateVersion();
+        List<String> thumbprints = sslPreferences.getCustomCertificateThumbprint();
+        List<String> validFrom = sslPreferences.getCustomCertificateValidFrom();
+        List<String> validTo = sslPreferences.getCustomCertificateValidTo();
+
+        for (int i = 0; i < versions.size(); i++) {
+            customCertificateListProperty.add(new CustomCertificateViewModel(
+                    thumbprints.get(i),
+                    "",
+                    "",
+                    LocalDate.ofEpochDay(Long.parseLong(validFrom.get(i))),
+                    LocalDate.ofEpochDay(Long.parseLong(validTo.get(i))),
+                    "",
+                    versions.get(i)
+            ));
+        }
     }
 
     public void storeSettings() {
@@ -210,6 +232,22 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
 
     public void storeSSLSettings() {
         sslPreferences.setUseCustomCertificates(customCertificatesUseProperty.getValue());
+        sslPreferences.setCustomCertificateVersion(customCertificateListProperty.stream()
+                                                                                .map(CustomCertificateViewModel::getVersion)
+                                                                                .collect(Collectors.toList()));
+        sslPreferences.setCustomCertificateThumbprint(customCertificateListProperty.stream().map(CustomCertificateViewModel::getThumbprint).collect(Collectors.toList()));
+        sslPreferences.setCustomCertificateValidFrom(customCertificateListProperty.stream()
+                                                                                  .map(CustomCertificateViewModel::getValidFrom)
+                                                                                  .map(this::localDateToEpochDayStr)
+                                                                                  .collect(Collectors.toList()));
+        sslPreferences.setCustomCertificateValidTo(customCertificateListProperty.stream()
+                                                                                .map(CustomCertificateViewModel::getValidTo)
+                                                                                .map(this::localDateToEpochDayStr)
+                                                                                .collect(Collectors.toList()));
+    }
+
+    private String localDateToEpochDayStr(LocalDate date) {
+        return String.valueOf(date.toEpochDay());
     }
 
     private Optional<Integer> getPortAsInt(String value) {
@@ -360,11 +398,10 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
             SSLCertificate.fromPath(certPath).ifPresent(sslCertificate -> {
                 if (!trustStoreManager.isCertificateExist(sslCertificate.getSHA256Thumbprint())) {
                     trustStoreManager.addCertificate(sslCertificate.getSHA256Thumbprint(), certPath);
-                    customCertificateListProperty.add(new CustomCertificateViewModel(sslCertificate));
+                    customCertificateListProperty.add(CustomCertificateViewModel.fromSSLCertificate(sslCertificate));
                 } else {
                     // TODO('Show a dialog or toast message indicating that the user is trying to add a duplicate certificate')
                 }
-
             });
         });
     }

@@ -355,6 +355,8 @@ public class JabRefPreferences implements PreferencesService {
     private static final String CUSTOM_CERTIFICATE_USE = "customCertificateUse";
     private static final String CUSTOM_CERTIFICATE_THUMBPRINT = "customCertificatesThumbprint";
     private static final String CUSTOM_CERTIFICATE_VERSION = "customCertificatesVersion";
+    private static final String CUSTOM_CERTIFICATE_VALID_FROM = "customCertificatesValidFrom";
+    private static final String CUSTOM_CERTIFICATE_VALID_TO = "customCertificatesValidTo";
 
     // Auto completion
     private static final String AUTO_COMPLETE = "autoComplete";
@@ -533,6 +535,8 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(CUSTOM_CERTIFICATE_USE, Boolean.FALSE);
         defaults.put(CUSTOM_CERTIFICATE_THUMBPRINT, "");
         defaults.put(CUSTOM_CERTIFICATE_VERSION, "");
+        defaults.put(CUSTOM_CERTIFICATE_VALID_FROM, "");
+        defaults.put(CUSTOM_CERTIFICATE_VALID_TO, "");
 
         defaults.put(POS_X, 0);
         defaults.put(POS_Y, 0);
@@ -1625,15 +1629,20 @@ public class JabRefPreferences implements PreferencesService {
         sslPreferences = new SSLPreferences(
                 getBoolean(CUSTOM_CERTIFICATE_USE),
                 getStringList(CUSTOM_CERTIFICATE_THUMBPRINT),
-                getStringList(CUSTOM_CERTIFICATE_VERSION)
+                getStringList(CUSTOM_CERTIFICATE_VERSION),
+                getStringList(CUSTOM_CERTIFICATE_VALID_FROM),
+                getStringList(CUSTOM_CERTIFICATE_VALID_TO)
         );
 
         EasyBind.subscribe(sslPreferences.useCustomCertificatesProperty(), (newValue -> putBoolean(CUSTOM_CERTIFICATE_USE, newValue)));
         sslPreferences.getCustomCertificateThumbprint().addListener((InvalidationListener) change -> putStringList(CUSTOM_CERTIFICATE_THUMBPRINT,
                 sslPreferences.getCustomCertificateThumbprint()));
-
         sslPreferences.getCustomCertificateVersion().addListener((InvalidationListener) change -> putStringList(CUSTOM_CERTIFICATE_VERSION,
                 sslPreferences.getCustomCertificateVersion()));
+        sslPreferences.getCustomCertificateValidFrom().addListener((InvalidationListener) change -> putStringList(CUSTOM_CERTIFICATE_VALID_FROM,
+                sslPreferences.getCustomCertificateValidFrom()));
+        sslPreferences.getCustomCertificateValidTo().addListener((InvalidationListener) change -> putStringList(CUSTOM_CERTIFICATE_VALID_TO,
+                sslPreferences.getCustomCertificateValidTo()));
 
         return sslPreferences;
     }

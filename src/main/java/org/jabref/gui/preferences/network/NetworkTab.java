@@ -139,7 +139,7 @@ public class NetworkTab extends AbstractPreferenceTabView<NetworkTabViewModel> i
     }
 
     private String formatVersion(String version) {
-        return String.format("v%s", version);
+        return String.format("V%s", version);
     }
 
     private void proxyPasswordReveal(MouseEvent event) {
