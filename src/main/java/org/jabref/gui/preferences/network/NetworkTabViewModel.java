@@ -7,9 +7,12 @@ import java.util.List;
 import java.util.Optional;
 
 import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.ListProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.collections.FXCollections;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.Globals;
@@ -51,6 +54,7 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
     private final StringProperty proxyUsernameProperty = new SimpleStringProperty("");
     private final StringProperty proxyPasswordProperty = new SimpleStringProperty("");
     private final BooleanProperty customCertificatesUseProperty = new SimpleBooleanProperty();
+    private final ListProperty<CustomCertificateViewModel> customCertificateListProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
 
     private final Validator remotePortValidator;
     private final Validator proxyHostnameValidator;
@@ -340,6 +344,10 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
         return customCertificatesUseProperty;
     }
 
+    public ListProperty<CustomCertificateViewModel> customCertificateListProperty() {
+        return customCertificateListProperty;
+    }
+
     public void addCertificateFile() {
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                 .addExtensionFilter(Localization.lang("SSL certificate file"), StandardFileType.CER)
@@ -349,7 +357,13 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
 
         dialogService.showFileOpenDialog(fileDialogConfiguration).ifPresent(certPath -> {
             SSLCertificate.fromPath(certPath).ifPresent(sslCertificate -> {
-                trustStoreManager.addCertificate(sslCertificate.getSHA256Thumbprint(), certPath);
+                if (!trustStoreManager.isCertificateExist(sslCertificate.getSHA256Thumbprint())) {
+                    trustStoreManager.addCertificate(sslCertificate.getSHA256Thumbprint(), certPath);
+                    customCertificateListProperty.add(new CustomCertificateViewModel(sslCertificate));
+                } else {
+                    // TODO('Show a dialog or toast message indicating that the user is trying to add a duplicate certificate')
+                }
+
             });
         });
     }
