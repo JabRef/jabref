@@ -165,7 +165,7 @@ dependencies {
     implementation 'de.saxsys:mvvmfx-validation:1.9.0-SNAPSHOT'
     implementation 'de.saxsys:mvvmfx:1.8.0'
     implementation 'com.tobiasdiez:easybind:2.2'
-    implementation 'org.fxmisc.flowless:flowless:0.6.8'
+    implementation 'org.fxmisc.flowless:flowless:0.6.9'
     implementation 'org.fxmisc.richtext:richtextfx:0.10.9'
     implementation group: 'org.glassfish.hk2.external', name: 'jakarta.inject', version: '2.6.1'
     implementation 'com.jfoenix:jfoenix:9.0.10'
