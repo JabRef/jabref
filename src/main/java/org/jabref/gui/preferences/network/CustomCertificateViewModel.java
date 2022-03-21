@@ -72,6 +72,18 @@ public class CustomCertificateViewModel extends AbstractViewModel {
         return validToProperty.getValue();
     }
 
+    public String getSerialNumber() {
+        return serialNumberProperty.getValue();
+    }
+
+    public String getIssuer() {
+        return issuerProperty.getValue();
+    }
+
+    public String getSignatureAlgorithm() {
+        return signatureAlgorithmProperty.getValue();
+    }
+
     public static CustomCertificateViewModel fromSSLCertificate(SSLCertificate sslCertificate) {
         return new CustomCertificateViewModel(
                 sslCertificate.getSHA256Thumbprint(),

@@ -4,6 +4,7 @@ import java.net.MalformedURLException;
 import java.nio.file.Path;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -139,10 +140,6 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
                         Localization.lang("Network"),
                         Localization.lang("Proxy configuration"),
                         Localization.lang("Please specify a password"))));
-   /*     sslPreferences.setCustomCertificateVersion(Collections.emptyList());
-        sslPreferences.setCustomCertificateThumbprint(Collections.emptyList());
-        sslPreferences.setCustomCertificateValidFrom(Collections.emptyList());
-        sslPreferences.setCustomCertificateValidTo(Collections.emptyList());*/
     }
 
     public void setValues() {
@@ -168,15 +165,18 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
         List<String> thumbprints = sslPreferences.getCustomCertificateThumbprint();
         List<String> validFrom = sslPreferences.getCustomCertificateValidFrom();
         List<String> validTo = sslPreferences.getCustomCertificateValidTo();
+        List<String> serialNumbers = sslPreferences.getCustomCertificateSerialNumber();
+        List<String> issuers = sslPreferences.getCustomCertificateIssuer();
+        List<String> sigAlgorithms = sslPreferences.getCustomCertificateSigAlgorithm();
 
         for (int i = 0; i < versions.size(); i++) {
             customCertificateListProperty.add(new CustomCertificateViewModel(
                     thumbprints.get(i),
-                    "",
-                    "",
+                    serialNumbers.get(i),
+                    issuers.get(i),
                     LocalDate.ofEpochDay(Long.parseLong(validFrom.get(i))),
                     LocalDate.ofEpochDay(Long.parseLong(validTo.get(i))),
-                    "",
+                    sigAlgorithms.get(i),
                     versions.get(i)
             ));
         }
@@ -244,6 +244,9 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
                                                                                 .map(CustomCertificateViewModel::getValidTo)
                                                                                 .map(this::localDateToEpochDayStr)
                                                                                 .collect(Collectors.toList()));
+        sslPreferences.setCustomCertificateSerialNumber(customCertificateListProperty.stream().map(CustomCertificateViewModel::getSerialNumber).collect(Collectors.toList()));
+        sslPreferences.setCustomCertificateIssuer(customCertificateListProperty.stream().map(CustomCertificateViewModel::getIssuer).collect(Collectors.toList()));
+        sslPreferences.setCustomCertificateSigAlgorithm(customCertificateListProperty.stream().map(CustomCertificateViewModel::getSignatureAlgorithm).collect(Collectors.toList()));
     }
 
     private String localDateToEpochDayStr(LocalDate date) {

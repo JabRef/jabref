@@ -13,14 +13,21 @@ public class SSLPreferences {
     private final ObservableList<String> customCertificateVersion;
     private final ObservableList<String> customCertificateValidFrom;
     private final ObservableList<String> customCertificateValidTo;
+    private final ObservableList<String> customCertificateSerialNumber;
+    private final ObservableList<String> customCertificateIssuer;
+    private final ObservableList<String> customCertificateSigAlgorithm;
 
     public SSLPreferences(Boolean useCustomCertificates, List<String> customCertificateThumbprint, List<String> customCertificateVersion,
-                          List<String> customCertificateValidFrom, List<String> customCertificateValidTo) {
+                          List<String> customCertificateValidFrom, List<String> customCertificateValidTo, List<String> customCertificateSerialNumber,
+                          List<String> customCertificateIssuer, List<String> customCertificateSigAlgorithm) {
         this.useCustomCertificates = new SimpleBooleanProperty(useCustomCertificates);
         this.customCertificateThumbprint = FXCollections.observableList(customCertificateThumbprint);
         this.customCertificateVersion = FXCollections.observableList(customCertificateVersion);
         this.customCertificateValidFrom = FXCollections.observableList(customCertificateValidFrom);
         this.customCertificateValidTo = FXCollections.observableList(customCertificateValidTo);
+        this.customCertificateSerialNumber = FXCollections.observableList(customCertificateSerialNumber);
+        this.customCertificateIssuer = FXCollections.observableList(customCertificateIssuer);
+        this.customCertificateSigAlgorithm = FXCollections.observableList(customCertificateSigAlgorithm);
     }
 
     public boolean shouldUseCustomCertificates() {
@@ -51,6 +58,18 @@ public class SSLPreferences {
         return customCertificateValidTo;
     }
 
+    public ObservableList<String> getCustomCertificateSerialNumber() {
+        return customCertificateSerialNumber;
+    }
+
+    public ObservableList<String> getCustomCertificateIssuer() {
+        return customCertificateIssuer;
+    }
+
+    public ObservableList<String> getCustomCertificateSigAlgorithm() {
+        return customCertificateSigAlgorithm;
+    }
+
     public void setCustomCertificateThumbprint(List<String> list) {
         customCertificateThumbprint.clear();
         customCertificateThumbprint.addAll(list);
@@ -64,6 +83,21 @@ public class SSLPreferences {
     public void setCustomCertificateValidFrom(List<String> list) {
         customCertificateValidFrom.clear();
         customCertificateValidFrom.addAll(list);
+    }
+
+    public void setCustomCertificateSerialNumber(List<String> list) {
+        customCertificateSerialNumber.clear();
+        customCertificateSerialNumber.addAll(list);
+    }
+
+    public void setCustomCertificateIssuer(List<String> list) {
+        customCertificateIssuer.clear();
+        customCertificateIssuer.addAll(list);
+    }
+
+    public void setCustomCertificateSigAlgorithm(List<String> list) {
+        customCertificateSigAlgorithm.clear();
+        customCertificateSigAlgorithm.addAll(list);
     }
 
     public void setCustomCertificateValidTo(List<String> list) {

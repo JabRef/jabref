@@ -357,6 +357,9 @@ public class JabRefPreferences implements PreferencesService {
     private static final String CUSTOM_CERTIFICATE_VERSION = "customCertificatesVersion";
     private static final String CUSTOM_CERTIFICATE_VALID_FROM = "customCertificatesValidFrom";
     private static final String CUSTOM_CERTIFICATE_VALID_TO = "customCertificatesValidTo";
+    private static final String CUSTOM_CERTIFICATE_SERIAL_NUMBER = "customCertificatesValidTo";
+    private static final String CUSTOM_CERTIFICATE_ISSUER = "customCertificatesValidTo";
+    private static final String CUSTOM_CERTIFICATE_SIG_ALGORITHM = "customCertificatesSignatureAlgorithm";
 
     // Auto completion
     private static final String AUTO_COMPLETE = "autoComplete";
@@ -537,6 +540,9 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(CUSTOM_CERTIFICATE_VERSION, "");
         defaults.put(CUSTOM_CERTIFICATE_VALID_FROM, "");
         defaults.put(CUSTOM_CERTIFICATE_VALID_TO, "");
+        defaults.put(CUSTOM_CERTIFICATE_SERIAL_NUMBER, "");
+        defaults.put(CUSTOM_CERTIFICATE_ISSUER, "");
+        defaults.put(CUSTOM_CERTIFICATE_SIG_ALGORITHM, "");
 
         defaults.put(POS_X, 0);
         defaults.put(POS_Y, 0);
@@ -1631,7 +1637,10 @@ public class JabRefPreferences implements PreferencesService {
                 getStringList(CUSTOM_CERTIFICATE_THUMBPRINT),
                 getStringList(CUSTOM_CERTIFICATE_VERSION),
                 getStringList(CUSTOM_CERTIFICATE_VALID_FROM),
-                getStringList(CUSTOM_CERTIFICATE_VALID_TO)
+                getStringList(CUSTOM_CERTIFICATE_VALID_TO),
+                getStringList(CUSTOM_CERTIFICATE_SERIAL_NUMBER),
+                getStringList(CUSTOM_CERTIFICATE_ISSUER),
+                getStringList(CUSTOM_CERTIFICATE_SIG_ALGORITHM)
         );
 
         EasyBind.subscribe(sslPreferences.useCustomCertificatesProperty(), (newValue -> putBoolean(CUSTOM_CERTIFICATE_USE, newValue)));
@@ -1643,6 +1652,12 @@ public class JabRefPreferences implements PreferencesService {
                 sslPreferences.getCustomCertificateValidFrom()));
         sslPreferences.getCustomCertificateValidTo().addListener((InvalidationListener) change -> putStringList(CUSTOM_CERTIFICATE_VALID_TO,
                 sslPreferences.getCustomCertificateValidTo()));
+        sslPreferences.getCustomCertificateSerialNumber().addListener((InvalidationListener) change -> putStringList(CUSTOM_CERTIFICATE_SERIAL_NUMBER,
+                sslPreferences.getCustomCertificateSerialNumber()));
+        sslPreferences.getCustomCertificateIssuer().addListener((InvalidationListener) change -> putStringList(CUSTOM_CERTIFICATE_ISSUER,
+                sslPreferences.getCustomCertificateIssuer()));
+        sslPreferences.getCustomCertificateSigAlgorithm().addListener((InvalidationListener) change -> putStringList(CUSTOM_CERTIFICATE_SIG_ALGORITHM,
+                sslPreferences.getCustomCertificateSigAlgorithm()));
 
         return sslPreferences;
     }
