@@ -51,7 +51,6 @@ public class JabRefMain extends Application {
 
     @Override
     public void start(Stage mainStage) {
-        URLDownload.bypassSSLVerification();
         try {
             FallbackExceptionHandler.installExceptionHandler();
 
