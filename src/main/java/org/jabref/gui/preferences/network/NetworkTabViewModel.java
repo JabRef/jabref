@@ -15,6 +15,7 @@ import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.stage.FileChooser;
 
 import org.jabref.gui.DialogService;
@@ -157,6 +158,8 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
     }
 
     private void setSSLValues() {
+        customCertificateListProperty.clear();
+
         customCertificatesUseProperty.setValue(sslPreferences.shouldUseCustomCertificates());
         List<String> versions = sslPreferences.getCustomCertificateVersion();
         List<String> thumbprints = sslPreferences.getCustomCertificateThumbprint();

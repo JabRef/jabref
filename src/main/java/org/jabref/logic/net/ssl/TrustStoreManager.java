@@ -61,7 +61,7 @@ public class TrustStoreManager {
         }
     }
 
-    public void removeCertificate(String alias) {
+    public void deleteCertificate(String alias) {
         Objects.requireNonNull(alias);
         try {
             store.deleteEntry(alias);
@@ -104,5 +104,17 @@ public class TrustStoreManager {
         } catch (KeyStoreException | IOException | NoSuchAlgorithmException | CertificateException e) {
             LOGGER.warn("Error while flushing trust store", e);
         }
+    }
+
+    private Boolean isCustomCertificate(String alias) {
+        return !alias.endsWith("[jdk]");
+    }
+
+    /**
+     * Deletes all non-jdk default certificates and flushes the resulted truststore, JDK certificates are certificates with alias that ends with {@code [jdk]}
+     */
+    public void deleteAllCustomCertificates() {
+        getAliases().stream().filter(this::isCustomCertificate).forEach(this::deleteCertificate);
+        flush();
     }
 }
