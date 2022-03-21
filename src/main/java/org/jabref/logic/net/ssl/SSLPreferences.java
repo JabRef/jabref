@@ -4,6 +4,8 @@ import java.util.List;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
@@ -16,10 +18,11 @@ public class SSLPreferences {
     private final ObservableList<String> customCertificateSerialNumber;
     private final ObservableList<String> customCertificateIssuer;
     private final ObservableList<String> customCertificateSigAlgorithm;
+    private final StringProperty truststorePath;
 
     public SSLPreferences(Boolean useCustomCertificates, List<String> customCertificateThumbprint, List<String> customCertificateVersion,
                           List<String> customCertificateValidFrom, List<String> customCertificateValidTo, List<String> customCertificateSerialNumber,
-                          List<String> customCertificateIssuer, List<String> customCertificateSigAlgorithm) {
+                          List<String> customCertificateIssuer, List<String> customCertificateSigAlgorithm, String truststorePath) {
         this.useCustomCertificates = new SimpleBooleanProperty(useCustomCertificates);
         this.customCertificateThumbprint = FXCollections.observableList(customCertificateThumbprint);
         this.customCertificateVersion = FXCollections.observableList(customCertificateVersion);
@@ -28,6 +31,7 @@ public class SSLPreferences {
         this.customCertificateSerialNumber = FXCollections.observableList(customCertificateSerialNumber);
         this.customCertificateIssuer = FXCollections.observableList(customCertificateIssuer);
         this.customCertificateSigAlgorithm = FXCollections.observableList(customCertificateSigAlgorithm);
+        this.truststorePath = new SimpleStringProperty(truststorePath);
     }
 
     public boolean shouldUseCustomCertificates() {
@@ -68,6 +72,14 @@ public class SSLPreferences {
 
     public ObservableList<String> getCustomCertificateSigAlgorithm() {
         return customCertificateSigAlgorithm;
+    }
+
+    public StringProperty truststorePathProperty() {
+        return truststorePath;
+    }
+
+    public String getTruststorePath() {
+        return truststorePath.getValue();
     }
 
     public void setCustomCertificateThumbprint(List<String> list) {

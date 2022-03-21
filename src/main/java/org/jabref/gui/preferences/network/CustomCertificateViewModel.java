@@ -19,7 +19,6 @@ public class CustomCertificateViewModel extends AbstractViewModel {
     private final ObjectProperty<LocalDate> validToProperty = new SimpleObjectProperty<>();
     private final StringProperty signatureAlgorithmProperty = new SimpleStringProperty("");
     private final StringProperty versionProperty = new SimpleStringProperty("");
-
     private final StringProperty thumbprintProperty = new SimpleStringProperty("");
 
     public CustomCertificateViewModel(String thumbprint, String serialNumber, String issuer, LocalDate validFrom, LocalDate validTo, String sigAlgorithm, String version) {

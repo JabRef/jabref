@@ -108,11 +108,13 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.EntryTypeFactory;
 import org.jabref.model.metadata.SaveOrderConfig;
+import org.jabref.model.pdf.search.SearchFieldConstants;
 import org.jabref.model.push.PushToApplicationConstants;
 import org.jabref.model.search.rules.SearchRules;
 import org.jabref.model.strings.StringUtil;
 
 import com.tobiasdiez.easybind.EasyBind;
+import net.harawata.appdirs.AppDirsFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -357,9 +359,10 @@ public class JabRefPreferences implements PreferencesService {
     private static final String CUSTOM_CERTIFICATE_VERSION = "customCertificatesVersion";
     private static final String CUSTOM_CERTIFICATE_VALID_FROM = "customCertificatesValidFrom";
     private static final String CUSTOM_CERTIFICATE_VALID_TO = "customCertificatesValidTo";
-    private static final String CUSTOM_CERTIFICATE_SERIAL_NUMBER = "customCertificatesValidTo";
-    private static final String CUSTOM_CERTIFICATE_ISSUER = "customCertificatesValidTo";
+    private static final String CUSTOM_CERTIFICATE_SERIAL_NUMBER = "customCertificatesSerialNumber";
+    private static final String CUSTOM_CERTIFICATE_ISSUER = "customCertificatesIssuer";
     private static final String CUSTOM_CERTIFICATE_SIG_ALGORITHM = "customCertificatesSignatureAlgorithm";
+    private static final String TRUSTSTORE_PATH = "truststorePath";
 
     // Auto completion
     private static final String AUTO_COMPLETE = "autoComplete";
@@ -543,6 +546,7 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(CUSTOM_CERTIFICATE_SERIAL_NUMBER, "");
         defaults.put(CUSTOM_CERTIFICATE_ISSUER, "");
         defaults.put(CUSTOM_CERTIFICATE_SIG_ALGORITHM, "");
+        defaults.put(TRUSTSTORE_PATH, Path.of(AppDirsFactory.getInstance().getUserDataDir("ssl", SearchFieldConstants.VERSION, "org.jabref")).resolveSibling("truststore.jks").toString());
 
         defaults.put(POS_X, 0);
         defaults.put(POS_Y, 0);
@@ -1640,7 +1644,8 @@ public class JabRefPreferences implements PreferencesService {
                 getStringList(CUSTOM_CERTIFICATE_VALID_TO),
                 getStringList(CUSTOM_CERTIFICATE_SERIAL_NUMBER),
                 getStringList(CUSTOM_CERTIFICATE_ISSUER),
-                getStringList(CUSTOM_CERTIFICATE_SIG_ALGORITHM)
+                getStringList(CUSTOM_CERTIFICATE_SIG_ALGORITHM),
+                get(TRUSTSTORE_PATH)
         );
 
         EasyBind.subscribe(sslPreferences.useCustomCertificatesProperty(), (newValue -> putBoolean(CUSTOM_CERTIFICATE_USE, newValue)));
