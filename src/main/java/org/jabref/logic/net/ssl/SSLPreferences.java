@@ -9,12 +9,12 @@ import javafx.collections.ObservableList;
 
 public class SSLPreferences {
     private final BooleanProperty useCustomCertificates;
-    private final ObservableList<String> customCertificateAlias;
+    private final ObservableList<String> customCertificateThumbprint;
     private final ObservableList<String> customCertificateVersion;
 
-    public SSLPreferences(Boolean useCustomCertificates, List<String> customCertificateAlias, List<String> customCertificateVersion) {
+    public SSLPreferences(Boolean useCustomCertificates, List<String> customCertificateThumbprint, List<String> customCertificateVersion) {
         this.useCustomCertificates = new SimpleBooleanProperty(useCustomCertificates);
-        this.customCertificateAlias = FXCollections.observableList(customCertificateAlias);
+        this.customCertificateThumbprint = FXCollections.observableList(customCertificateThumbprint);
         this.customCertificateVersion = FXCollections.observableList(customCertificateVersion);
     }
 
@@ -30,17 +30,17 @@ public class SSLPreferences {
         this.useCustomCertificates.set(useCustomCertificates);
     }
 
-    public ObservableList<String> getCustomCertificateAlias() {
-        return customCertificateAlias;
+    public ObservableList<String> getCustomCertificateThumbprint() {
+        return customCertificateThumbprint;
     }
 
     public ObservableList<String> getCustomCertificateVersion() {
         return customCertificateVersion;
     }
 
-    public void setCustomCertificateAlias(List<String> list) {
-        customCertificateAlias.clear();
-        customCertificateAlias.addAll(list);
+    public void setCustomCertificateThumbprint(List<String> list) {
+        customCertificateThumbprint.clear();
+        customCertificateThumbprint.addAll(list);
     }
 
     public void setCustomCertificateVersion(List<String> list) {

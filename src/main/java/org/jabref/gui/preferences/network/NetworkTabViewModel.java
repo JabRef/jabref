@@ -5,7 +5,6 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.Random;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -21,6 +20,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.ProxyPreferences;
 import org.jabref.logic.net.ProxyRegisterer;
 import org.jabref.logic.net.URLDownload;
+import org.jabref.logic.net.ssl.SSLCertificate;
 import org.jabref.logic.net.ssl.SSLPreferences;
 import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.remote.RemoteUtil;
@@ -262,9 +262,7 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
     }
 
     /**
-     * Check the connection by using the given url. Used for validating the http proxy.
-     * The checking result will be appear when request finished.
-     * The checking result could be either success or fail, if fail, the cause will be displayed.
+     * Check the connection by using the given url. Used for validating the http proxy. The checking result will be appear when request finished. The checking result could be either success or fail, if fail, the cause will be displayed.
      */
     public void checkConnection() {
         final String connectionSuccessText = Localization.lang("Connection successful!");
@@ -350,11 +348,9 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
                 .build();
 
         dialogService.showFileOpenDialog(fileDialogConfiguration).ifPresent(certPath -> {
-            trustStoreManager.addCertificate(genRandomAlias(), certPath);
+            SSLCertificate.fromPath(certPath).ifPresent(sslCertificate -> {
+                trustStoreManager.addCertificate(sslCertificate.getSHA256Thumbprint(), certPath);
+            });
         });
-    }
-
-    private String genRandomAlias() {
-        return String.format("[JabRef %d]", new Random().nextInt(99999999));
     }
 }
