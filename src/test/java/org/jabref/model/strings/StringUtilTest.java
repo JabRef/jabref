@@ -148,7 +148,10 @@ class StringUtilTest {
 
     @Test
     void testGetPart() {
-        // Should be added
+        assertEquals("{roupa}", StringUtil.getPart( "O rato roeu a {roupa} do rei de roma", 13, false));
+        assertEquals("", StringUtil.getPart( "", 0, false));
+        assertEquals("", StringUtil.getPart( "Um passo por }dia}", 12, false));
+        assertEquals("dia", StringUtil.getPart( "Um passo por dia", 12, true));
     }
 
     @Test
