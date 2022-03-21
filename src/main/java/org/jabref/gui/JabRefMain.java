@@ -21,7 +21,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.ProxyAuthenticator;
 import org.jabref.logic.net.ProxyPreferences;
 import org.jabref.logic.net.ProxyRegisterer;
-import org.jabref.logic.net.URLDownload;
+import org.jabref.logic.net.ssl.SSLPreferences;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.remote.client.RemoteClient;
@@ -61,6 +61,8 @@ public class JabRefMain extends Application {
             PreferencesMigrations.runMigrations();
 
             configureProxy(preferences.getProxyPreferences());
+
+            configureSSL(preferences.getSSLPreferences());
 
             Globals.startBackgroundTasks();
 
@@ -146,6 +148,11 @@ public class JabRefMain extends Application {
         if (proxyPreferences.shouldUseProxy() && proxyPreferences.shouldUseAuthentication()) {
             Authenticator.setDefault(new ProxyAuthenticator());
         }
+    }
+
+    private static void configureSSL(SSLPreferences sslPreferences) {
+        System.setProperty("javax.net.ssl.trustStore", sslPreferences.getTruststorePath());
+        System.setProperty("javax.net.ssl.trustStorePassword", "changeit");
     }
 
     private static void clearOldSearchIndices() {
