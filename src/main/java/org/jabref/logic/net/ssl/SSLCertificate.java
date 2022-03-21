@@ -25,9 +25,9 @@ public class SSLCertificate {
     private final LocalDate validFrom;
     private final LocalDate validTo;
     private final String signatureAlgorithm;
-    private final int version;
+    private final Integer version;
 
-    public SSLCertificate(byte[] encoded, String serialNumber, String issuer, LocalDate validFrom, LocalDate validTo, String signatureAlgorithm, int version) {
+    public SSLCertificate(byte[] encoded, String serialNumber, String issuer, LocalDate validFrom, LocalDate validTo, String signatureAlgorithm, Integer version) {
         this.serialNumber = serialNumber;
         this.issuer = issuer;
         this.validFrom = validFrom;
@@ -57,7 +57,7 @@ public class SSLCertificate {
         return signatureAlgorithm;
     }
 
-    public int getVersion() {
+    public Integer getVersion() {
         return version;
     }
 
