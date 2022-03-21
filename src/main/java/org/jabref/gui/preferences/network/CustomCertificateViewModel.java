@@ -26,11 +26,7 @@ public class CustomCertificateViewModel extends AbstractViewModel {
         validFromProperty.setValue(sslCertificate.getValidFrom());
         validToProperty.setValue(sslCertificate.getValidTo());
         signatureAlgorithmProperty.setValue(sslCertificate.getSignatureAlgorithm());
-        versionProperty.setValue(formatVersion(sslCertificate.getVersion()));
-    }
-
-    private String formatVersion(int version) {
-        return String.format("v%d", version);
+        versionProperty.setValue(String.valueOf(sslCertificate.getVersion()));
     }
 
     public ReadOnlyStringProperty serialNumberProperty() {

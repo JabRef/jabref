@@ -126,7 +126,7 @@ public class NetworkTab extends AbstractPreferenceTabView<NetworkTabViewModel> i
         certSerialNumber.setCellValueFactory(data -> data.getValue().serialNumberProperty());
         certIssuer.setCellValueFactory(data -> data.getValue().issuerProperty());
         certSignatureAlgorithm.setCellValueFactory(data -> data.getValue().signatureAlgorithmProperty());
-        certVersion.setCellValueFactory(data -> data.getValue().versionProperty());
+        certVersion.setCellValueFactory(data -> EasyBind.map(data.getValue().versionProperty(), this::formatVersion));
 
         certValidFrom.setCellValueFactory(data -> EasyBind.map(data.getValue().validFromProperty(), this::formatDate));
         certValidTo.setCellValueFactory(data -> EasyBind.map(data.getValue().validToProperty(), this::formatDate));
@@ -136,6 +136,10 @@ public class NetworkTab extends AbstractPreferenceTabView<NetworkTabViewModel> i
 
     public String formatDate(LocalDate localDate) {
         return localDate.format(DateTimeFormatter.ofPattern("dd-MMM-yyyy"));
+    }
+
+    private String formatVersion(String version) {
+        return String.format("v%s", version);
     }
 
     private void proxyPasswordReveal(MouseEvent event) {
