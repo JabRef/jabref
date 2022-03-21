@@ -4,7 +4,6 @@ import java.net.MalformedURLException;
 import java.nio.file.Path;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -16,6 +15,7 @@ import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
+import javafx.stage.FileChooser;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.Globals;
@@ -32,7 +32,6 @@ import org.jabref.logic.net.ssl.TrustStoreManager;
 import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.remote.RemoteUtil;
 import org.jabref.logic.util.StandardFileType;
-import org.jabref.model.pdf.search.SearchFieldConstants;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.preferences.PreferencesService;
 
@@ -42,7 +41,6 @@ import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
 import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
 import de.saxsys.mvvmfx.utils.validation.Validator;
 import kong.unirest.UnirestException;
-import net.harawata.appdirs.AppDirsFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -75,9 +73,7 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
 
     private final List<String> restartWarning = new ArrayList<>();
 
-    private final TrustStoreManager trustStoreManager = new TrustStoreManager(
-            Path.of(AppDirsFactory.getInstance().getUserDataDir("ssl", SearchFieldConstants.VERSION, "org.jabref")).resolveSibling("truststore.jks")
-    );
+    private final TrustStoreManager trustStoreManager;
 
     public NetworkTabViewModel(DialogService dialogService, PreferencesService preferences) {
         this.dialogService = dialogService;
@@ -140,6 +136,7 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
                         Localization.lang("Network"),
                         Localization.lang("Proxy configuration"),
                         Localization.lang("Please specify a password"))));
+        this.trustStoreManager = new TrustStoreManager(Path.of(sslPreferences.getTruststorePath()));
     }
 
     public void setValues() {
@@ -392,7 +389,7 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
 
     public void addCertificateFile() {
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
-                .addExtensionFilter(Localization.lang("SSL certificate file"), StandardFileType.CER)
+                .addExtensionFilter(new FileChooser.ExtensionFilter(Localization.lang("SSL certificate file"), "*.crt", "*.cer"))
                 .withDefaultExtension(Localization.lang("SSL certificate file"), StandardFileType.CER)
                 .withInitialDirectory(preferences.getFilePreferences().getWorkingDirectory())
                 .build();
