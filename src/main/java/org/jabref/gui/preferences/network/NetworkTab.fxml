@@ -128,7 +128,7 @@
                 <TableColumn
                         fx:id="certVersion"
                         prefWidth="136.0"
-                        text="%Certificate Version"/>
+                        text="%Version"/>
             </columns>
            <columnResizePolicy>
                <TableView
