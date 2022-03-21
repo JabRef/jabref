@@ -53,45 +53,99 @@
         <Label fx:id="proxyAttentionLabel" styleClass="warning-message" text="%Attention: Password is stored in plain text!" GridPane.columnIndex="2" GridPane.rowIndex="5" />
         <Button fx:id="checkConnectionButton" onAction="#checkConnection" prefWidth="200.0" text="%Check connection" GridPane.columnIndex="1" GridPane.rowIndex="6" />
     </GridPane>
-   <Label styleClass="sectionHeader" text="SSL Configuration" />
-   <GridPane hgap="10.0" vgap="10.0">
-      <columnConstraints>
-         <ColumnConstraints hgrow="SOMETIMES" />
-         <ColumnConstraints hgrow="SOMETIMES" />
-         <ColumnConstraints hgrow="SOMETIMES" />
-      </columnConstraints>
-      <rowConstraints>
-         <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
-         <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
-         <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
-         <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
-         <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
-         <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
-         <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
-         <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
-         <RowConstraints />
-         <RowConstraints />
-      </rowConstraints>
-      <children>
-         <CheckBox fx:id="customCertificatesUse" text="Enable custom SSL certificates" GridPane.columnSpan="3" GridPane.rowIndex="0" />
-         <TableView fx:id="customCertificatesTable" prefHeight="200.0" GridPane.columnSpan="3" GridPane.rowIndex="1">
-           <columns>
-             <TableColumn fx:id="certSerialNumber" prefWidth="75.0" text="Serial number" />
-             <TableColumn fx:id="certIssuer" prefWidth="75.0" text="Issuer" />
-               <TableColumn fx:id="certValidFrom" prefWidth="50.0" text="Valid from" />
-               <TableColumn fx:id="certValidTo" prefWidth="50.0" text="Valid to" />
-               <TableColumn fx:id="certSignatureAlgorithm" minWidth="40.0" prefWidth="100.0" text="Signature algorithm" />
-               <TableColumn fx:id="certVersion" prefWidth="136.0" text="Version" />
-           </columns>
-            <columnResizePolicy>
-               <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
-            </columnResizePolicy>
-         </TableView>
-         <Button fx:id="addCertificate" mnemonicParsing="false" onAction="#addCertificateFile" text="Add certificate" GridPane.columnIndex="2" GridPane.halignment="RIGHT" GridPane.rowIndex="2" GridPane.valignment="TOP">
-            <GridPane.margin>
-               <Insets right="16.0" />
-            </GridPane.margin>
-         </Button>
-      </children>
-   </GridPane>
+   <Label styleClass="sectionHeader" text="%SSL Configuration" />
+    <GridPane
+            hgap="10.0"
+            vgap="10.0">
+        <columnConstraints>
+            <ColumnConstraints
+                    hgrow="SOMETIMES"/>
+            <ColumnConstraints
+                    hgrow="SOMETIMES"/>
+            <ColumnConstraints
+                    hgrow="SOMETIMES"/>
+        </columnConstraints>
+        <rowConstraints>
+            <RowConstraints
+                    minHeight="10.0"
+                    vgrow="SOMETIMES"/>
+            <RowConstraints
+                    minHeight="10.0"
+                    vgrow="SOMETIMES"/>
+            <RowConstraints
+                    minHeight="10.0"
+                    vgrow="SOMETIMES"/>
+            <RowConstraints
+                    minHeight="10.0"
+                    vgrow="SOMETIMES"/>
+            <RowConstraints
+                    minHeight="10.0"
+                    vgrow="SOMETIMES"/>
+            <RowConstraints
+                    minHeight="10.0"
+                    vgrow="SOMETIMES"/>
+            <RowConstraints
+                    minHeight="10.0"
+                    vgrow="SOMETIMES"/>
+            <RowConstraints
+                    minHeight="10.0"
+                    vgrow="SOMETIMES"/>
+            <RowConstraints/>
+            <RowConstraints/>
+        </rowConstraints>
+        <CheckBox
+                fx:id="customCertificatesUse"
+                text="%Enable custom SSL certificates"
+                GridPane.columnSpan="3"
+                GridPane.rowIndex="0"/>
+        <TableView
+                fx:id="customCertificatesTable"
+                prefHeight="200.0"
+                GridPane.columnSpan="3"
+                GridPane.rowIndex="1">
+            <columns>
+                <TableColumn
+                        fx:id="certSerialNumber"
+                        prefWidth="75.0"
+                        text="%Serial number"/>
+                <TableColumn
+                        fx:id="certIssuer"
+                        prefWidth="75.0"
+                        text="%Issuer"/>
+                <TableColumn
+                        fx:id="certValidFrom"
+                        prefWidth="50.0"
+                        text="%Valid from"/>
+                <TableColumn
+                        fx:id="certValidTo"
+                        prefWidth="50.0"
+                        text="%Valid to"/>
+                <TableColumn
+                        fx:id="certSignatureAlgorithm"
+                        minWidth="40.0"
+                        prefWidth="100.0"
+                        text="%Signature algorithm"/>
+                <TableColumn
+                        fx:id="certVersion"
+                        prefWidth="136.0"
+                        text="%Certificate Version"/>
+            </columns>
+           <columnResizePolicy>
+               <TableView
+                       fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+           </columnResizePolicy>
+        </TableView>
+        <Button fx:id="addCertificate"
+                mnemonicParsing="false"
+                onAction="#addCertificateFile"
+                text="%Add certificate"
+                GridPane.columnIndex="2"
+                GridPane.halignment="RIGHT"
+                GridPane.rowIndex="2"
+                GridPane.valignment="TOP">
+           <GridPane.margin>
+               <Insets right="16.0"/>
+           </GridPane.margin>
+        </Button>
+    </GridPane>
 </fx:root>
