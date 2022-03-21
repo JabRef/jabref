@@ -161,7 +161,7 @@ dependencies {
 
     // JavaFX stuff
     implementation 'org.kordamp.ikonli:ikonli-javafx:12.3.1'
-    implementation 'org.kordamp.ikonli:ikonli-materialdesign2-pack:12.3.0'
+    implementation 'org.kordamp.ikonli:ikonli-materialdesign2-pack:12.3.1'
     implementation 'de.saxsys:mvvmfx-validation:1.9.0-SNAPSHOT'
     implementation 'de.saxsys:mvvmfx:1.8.0'
     implementation 'com.tobiasdiez:easybind:2.2'
@@ -206,7 +206,7 @@ dependencies {
 
     testRuntimeOnly group: 'org.apache.logging.log4j', name: 'log4j-core', version: '3.0.0-SNAPSHOT'
     testRuntimeOnly group: 'org.apache.logging.log4j', name: 'log4j-jul', version: '3.0.0-SNAPSHOT'
-    testImplementation 'org.mockito:mockito-core:4.3.1'
+    testImplementation 'org.mockito:mockito-core:4.4.0'
     testImplementation 'org.xmlunit:xmlunit-core:2.9.0'
     testImplementation 'org.xmlunit:xmlunit-matchers:2.9.0'
     testRuntimeOnly 'com.tngtech.archunit:archunit-junit5-engine:0.23.1'
