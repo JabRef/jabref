@@ -1,5 +1,6 @@
 package org.jabref.logic.citationkeypattern;
 
+import java.io.IOException;
 import java.util.Optional;
 
 import org.jabref.logic.importer.ImportFormatPreferences;
@@ -95,7 +96,7 @@ class CitationKeyGeneratorTest {
     }
 
     @Test
-    void testAndInAuthorName() throws ParseException {
+    void testAndInAuthorName() throws ParseException, IOException {
         Optional<BibEntry> entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Simon Holland}}",
                 importFormatPreferences, fileMonitor);
         assertEquals("Holland",
@@ -119,7 +120,7 @@ class CitationKeyGeneratorTest {
     }
 
     @Test
-    void testAndAuthorNames() throws ParseException {
+    void testAndAuthorNames() throws ParseException, IOException {
         String bibtexString = "@ARTICLE{whatevery, author={Mari D. Herland and Mona-Iren Hauge and Ingeborg M. Helgeland}}";
         Optional<BibEntry> entry = BibtexParser.singleFromString(bibtexString, importFormatPreferences, fileMonitor);
         assertEquals("HerlandHaugeHelgeland",
@@ -144,7 +145,7 @@ class CitationKeyGeneratorTest {
     }
 
     @Test
-    void testSpecialLatexCharacterInAuthorName() throws ParseException {
+    void testSpecialLatexCharacterInAuthorName() throws ParseException, IOException {
         Optional<BibEntry> entry = BibtexParser.singleFromString(
                 "@ARTICLE{kohn, author={Simon Popovi\\v{c}ov\\'{a}}}", importFormatPreferences, fileMonitor);
         assertEquals("Popovicova",
@@ -157,7 +158,7 @@ class CitationKeyGeneratorTest {
      * Ć ć É é Í í Ĺ ĺ Ń ń Ó ó Ŕ ŕ Ś ś Ú ú Ý ý Ź ź
      */
     @Test
-    void testMakeLabelAndCheckLegalKeys() throws ParseException {
+    void testMakeLabelAndCheckLegalKeys() throws ParseException, IOException {
 
         Optional<BibEntry> entry0 = BibtexParser.singleFromString(
                 "@ARTICLE{kohn, author={Andreas Köning}, year={2000}}", importFormatPreferences, fileMonitor);
@@ -236,7 +237,7 @@ class CitationKeyGeneratorTest {
      * Test the Labelmaker and with accent grave Chars to test: "ÀÈÌÒÙ";
      */
     @Test
-    void testMakeLabelAndCheckLegalKeysAccentGrave() throws ParseException {
+    void testMakeLabelAndCheckLegalKeysAccentGrave() throws ParseException, IOException {
         Optional<BibEntry> entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Andreas Àöning}, year={2000}}",
                 importFormatPreferences, fileMonitor);
         assertEquals("Aoe",
@@ -362,7 +363,7 @@ class CitationKeyGeneratorTest {
     }
 
     @Test
-    void testUniversity() throws ParseException {
+    void testUniversity() throws ParseException, IOException {
         Optional<BibEntry> entry = BibtexParser.singleFromString(
                 "@ARTICLE{kohn, author={{Link{\\\"{o}}ping University}}}", importFormatPreferences, fileMonitor);
         assertEquals("UniLinkoeping",
@@ -387,7 +388,7 @@ class CitationKeyGeneratorTest {
     }
 
     @Test
-    void testDepartment() throws ParseException {
+    void testDepartment() throws ParseException, IOException {
         Optional<BibEntry> entry = BibtexParser.singleFromString(
                 "@ARTICLE{kohn, author={{Link{\\\"{o}}ping University, Department of Electrical Engineering}}}",
                 importFormatPreferences, fileMonitor);
@@ -413,7 +414,7 @@ class CitationKeyGeneratorTest {
     }
 
     @Test
-    void testSchool() throws ParseException {
+    void testSchool() throws ParseException, IOException {
         Optional<BibEntry> entry = BibtexParser.singleFromString(
                 "@ARTICLE{kohn, author={{Link{\\\"{o}}ping University, School of Computer Engineering}}}",
                 importFormatPreferences, fileMonitor);
@@ -423,7 +424,7 @@ class CitationKeyGeneratorTest {
     }
 
     @Test
-    void generateKeyAbbreviateCorporateAuthorDepartmentWithoutAcademicInstitute() throws ParseException {
+    void generateKeyAbbreviateCorporateAuthorDepartmentWithoutAcademicInstitute() throws ParseException, IOException {
         Optional<BibEntry> entry = BibtexParser.singleFromString(
                 "@ARTICLE{null, author={{Department of Localhost NullGenerators}}}",
                 importFormatPreferences, fileMonitor);
@@ -433,7 +434,7 @@ class CitationKeyGeneratorTest {
     }
 
     @Test
-    void generateKeyAbbreviateCorporateAuthorSchoolWithoutAcademicInstitute() throws ParseException {
+    void generateKeyAbbreviateCorporateAuthorSchoolWithoutAcademicInstitute() throws ParseException, IOException {
         Optional<BibEntry> entry = BibtexParser.singleFromString(
                 "@ARTICLE{null, author={{The School of Null}}}",
                 importFormatPreferences, fileMonitor);
@@ -459,7 +460,7 @@ class CitationKeyGeneratorTest {
     }
 
     @Test
-    void testInstituteOfTechnology() throws ParseException {
+    void testInstituteOfTechnology() throws ParseException, IOException {
         Optional<BibEntry> entry = BibtexParser.singleFromString(
                 "@ARTICLE{kohn, author={{Massachusetts Institute of Technology}}}", importFormatPreferences, fileMonitor);
         assertEquals("MIT",

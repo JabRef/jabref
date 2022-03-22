@@ -80,7 +80,10 @@ public class IacrEprintFetcher implements IdBasedFetcher {
             return BibtexParser.singleFromString(actualEntry, prefs, new DummyFileUpdateMonitor());
         } catch (ParseException e) {
             throw new FetcherException(Localization.lang("Entry from %0 could not be parsed.", "IACR"), e);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
+        return null;
     }
 
     private void setAdditionalFields(BibEntry entry, String identifier) throws FetcherException {

@@ -103,7 +103,7 @@ public class ArgumentProcessor {
             ParserResult result = new ParserResult(entries);
             result.setToOpenTab();
             return Optional.of(result);
-        } catch (ParseException e) {
+        } catch (ParseException | IOException e) {
             System.err.println(Localization.lang("Error occurred when parsing entry") + ": " + e.getLocalizedMessage());
             return Optional.empty();
         }
