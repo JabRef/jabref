@@ -2,11 +2,9 @@ package org.jabref.gui.preferences.network;
 
 import java.net.MalformedURLException;
 import java.nio.file.Path;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ListProperty;
@@ -159,27 +157,21 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
 
     private void setSSLValues() {
         customCertificateListProperty.clear();
-
         customCertificatesUseProperty.setValue(sslPreferences.shouldUseCustomCertificates());
-        List<String> versions = sslPreferences.getCustomCertificateVersion();
-        List<String> thumbprints = sslPreferences.getCustomCertificateThumbprint();
-        List<String> validFrom = sslPreferences.getCustomCertificateValidFrom();
-        List<String> validTo = sslPreferences.getCustomCertificateValidTo();
-        List<String> serialNumbers = sslPreferences.getCustomCertificateSerialNumber();
-        List<String> issuers = sslPreferences.getCustomCertificateIssuer();
-        List<String> sigAlgorithms = sslPreferences.getCustomCertificateSigAlgorithm();
 
-        for (int i = 0; i < versions.size(); i++) {
-            customCertificateListProperty.add(new CustomCertificateViewModel(
-                    thumbprints.get(i),
-                    serialNumbers.get(i),
-                    issuers.get(i),
-                    LocalDate.ofEpochDay(Long.parseLong(validFrom.get(i))),
-                    LocalDate.ofEpochDay(Long.parseLong(validTo.get(i))),
-                    sigAlgorithms.get(i),
-                    versions.get(i)
-            ));
-        }
+        trustStoreManager.getCustomCertificates().forEach(cert -> customCertificateListProperty.add(CustomCertificateViewModel.fromSSLCertificate(cert)));
+        customCertificateListProperty.addListener((ListChangeListener<CustomCertificateViewModel>) c -> {
+            while (c.next()) {
+                if (c.wasAdded()) {
+                    CustomCertificateViewModel certificate = c.getAddedSubList().get(0);
+                    certificate.getPath().ifPresent(path -> trustStoreManager
+                            .addCertificate(formatCustomAlias(certificate.getThumbprint()), Path.of(path)));
+                } else if (c.wasRemoved()) {
+                    CustomCertificateViewModel certificate = c.getRemoved().get(0);
+                    trustStoreManager.deleteCertificate(formatCustomAlias(certificate.getThumbprint()));
+                }
+            }
+        });
     }
 
     public void storeSettings() {
@@ -233,25 +225,6 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
     public void storeSSLSettings() {
         trustStoreManager.flush();
         sslPreferences.setUseCustomCertificates(customCertificatesUseProperty.getValue());
-        sslPreferences.setCustomCertificateVersion(customCertificateListProperty.stream()
-                                                                                .map(CustomCertificateViewModel::getVersion)
-                                                                                .collect(Collectors.toList()));
-        sslPreferences.setCustomCertificateThumbprint(customCertificateListProperty.stream().map(CustomCertificateViewModel::getThumbprint).collect(Collectors.toList()));
-        sslPreferences.setCustomCertificateValidFrom(customCertificateListProperty.stream()
-                                                                                  .map(CustomCertificateViewModel::getValidFrom)
-                                                                                  .map(this::localDateToEpochDayStr)
-                                                                                  .collect(Collectors.toList()));
-        sslPreferences.setCustomCertificateValidTo(customCertificateListProperty.stream()
-                                                                                .map(CustomCertificateViewModel::getValidTo)
-                                                                                .map(this::localDateToEpochDayStr)
-                                                                                .collect(Collectors.toList()));
-        sslPreferences.setCustomCertificateSerialNumber(customCertificateListProperty.stream().map(CustomCertificateViewModel::getSerialNumber).collect(Collectors.toList()));
-        sslPreferences.setCustomCertificateIssuer(customCertificateListProperty.stream().map(CustomCertificateViewModel::getIssuer).collect(Collectors.toList()));
-        sslPreferences.setCustomCertificateSigAlgorithm(customCertificateListProperty.stream().map(CustomCertificateViewModel::getSignatureAlgorithm).collect(Collectors.toList()));
-    }
-
-    private String localDateToEpochDayStr(LocalDate date) {
-        return String.valueOf(date.toEpochDay());
     }
 
     private Optional<Integer> getPortAsInt(String value) {
@@ -398,16 +371,22 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
                 .withInitialDirectory(preferences.getFilePreferences().getWorkingDirectory())
                 .build();
 
-        dialogService.showFileOpenDialog(fileDialogConfiguration).ifPresent(certPath -> {
-            SSLCertificate.fromPath(certPath).ifPresent(sslCertificate -> {
-                if (!trustStoreManager.isCertificateExist(sslCertificate.getSHA256Thumbprint())) {
-                    trustStoreManager.addCertificate(sslCertificate.getSHA256Thumbprint(), certPath);
+        dialogService.showFileOpenDialog(fileDialogConfiguration).ifPresent(certPath -> SSLCertificate.fromPath(certPath).ifPresent(sslCertificate -> {
+            LOGGER.info(sslCertificate.getSHA256Thumbprint());
+            if (!trustStoreManager.isCertificateExist(formatCustomAlias(sslCertificate.getSHA256Thumbprint()))) {
+                customCertificateListProperty.add(CustomCertificateViewModel.fromSSLCertificate(sslCertificate)
+                                                                            .setPath(certPath.toAbsolutePath().toString()));
+            } else {
+                // TODO('Show a dialog or toast message indicating that the user is trying to add a duplicate certificate')
+            }
+        }));
+    }
 
-                    customCertificateListProperty.add(CustomCertificateViewModel.fromSSLCertificate(sslCertificate));
-                } else {
-                    // TODO('Show a dialog or toast message indicating that the user is trying to add a duplicate certificate')
-                }
-            });
-        });
+    public void removeCertificate(String thumbprint) {
+        customCertificateListProperty.removeIf(cert -> cert.getThumbprint().equals(thumbprint));
+    }
+
+    private String formatCustomAlias(String thumbprint) {
+        return String.format("%s[custom]", thumbprint);
     }
 }

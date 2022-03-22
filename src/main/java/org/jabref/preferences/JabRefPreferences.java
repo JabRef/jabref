@@ -356,13 +356,6 @@ public class JabRefPreferences implements PreferencesService {
 
     // SSL
     private static final String CUSTOM_CERTIFICATE_USE = "customCertificateUse";
-    private static final String CUSTOM_CERTIFICATE_THUMBPRINT = "customCertificatesThumbprint";
-    private static final String CUSTOM_CERTIFICATE_VERSION = "customCertificatesVersion";
-    private static final String CUSTOM_CERTIFICATE_VALID_FROM = "customCertificatesValidFrom";
-    private static final String CUSTOM_CERTIFICATE_VALID_TO = "customCertificatesValidTo";
-    private static final String CUSTOM_CERTIFICATE_SERIAL_NUMBER = "customCertificatesSerialNumber";
-    private static final String CUSTOM_CERTIFICATE_ISSUER = "customCertificatesIssuer";
-    private static final String CUSTOM_CERTIFICATE_SIG_ALGORITHM = "customCertificatesSignatureAlgorithm";
     private static final String TRUSTSTORE_PATH = "truststorePath";
 
     // Auto completion
@@ -540,13 +533,6 @@ public class JabRefPreferences implements PreferencesService {
 
         // SSL
         defaults.put(CUSTOM_CERTIFICATE_USE, Boolean.FALSE);
-        defaults.put(CUSTOM_CERTIFICATE_THUMBPRINT, "");
-        defaults.put(CUSTOM_CERTIFICATE_VERSION, "");
-        defaults.put(CUSTOM_CERTIFICATE_VALID_FROM, "");
-        defaults.put(CUSTOM_CERTIFICATE_VALID_TO, "");
-        defaults.put(CUSTOM_CERTIFICATE_SERIAL_NUMBER, "");
-        defaults.put(CUSTOM_CERTIFICATE_ISSUER, "");
-        defaults.put(CUSTOM_CERTIFICATE_SIG_ALGORITHM, "");
         defaults.put(TRUSTSTORE_PATH, Path.of(AppDirsFactory.getInstance().getUserDataDir("ssl", SearchFieldConstants.VERSION, "org.jabref")).resolveSibling("truststore.jks").toString());
 
         defaults.put(POS_X, 0);
@@ -980,7 +966,7 @@ public class JabRefPreferences implements PreferencesService {
 
     private void clearTruststoreFromCustomCertificates() {
         TrustStoreManager trustStoreManager = new TrustStoreManager(Path.of(defaults.get(TRUSTSTORE_PATH).toString()));
-        trustStoreManager.deleteAllCustomCertificates();
+        trustStoreManager.clearCustomCertificates();
     }
 
     /**
@@ -1645,31 +1631,10 @@ public class JabRefPreferences implements PreferencesService {
 
         sslPreferences = new SSLPreferences(
                 getBoolean(CUSTOM_CERTIFICATE_USE),
-                getStringList(CUSTOM_CERTIFICATE_THUMBPRINT),
-                getStringList(CUSTOM_CERTIFICATE_VERSION),
-                getStringList(CUSTOM_CERTIFICATE_VALID_FROM),
-                getStringList(CUSTOM_CERTIFICATE_VALID_TO),
-                getStringList(CUSTOM_CERTIFICATE_SERIAL_NUMBER),
-                getStringList(CUSTOM_CERTIFICATE_ISSUER),
-                getStringList(CUSTOM_CERTIFICATE_SIG_ALGORITHM),
                 get(TRUSTSTORE_PATH)
         );
 
         EasyBind.subscribe(sslPreferences.useCustomCertificatesProperty(), (newValue -> putBoolean(CUSTOM_CERTIFICATE_USE, newValue)));
-        sslPreferences.getCustomCertificateThumbprint().addListener((InvalidationListener) change -> putStringList(CUSTOM_CERTIFICATE_THUMBPRINT,
-                sslPreferences.getCustomCertificateThumbprint()));
-        sslPreferences.getCustomCertificateVersion().addListener((InvalidationListener) change -> putStringList(CUSTOM_CERTIFICATE_VERSION,
-                sslPreferences.getCustomCertificateVersion()));
-        sslPreferences.getCustomCertificateValidFrom().addListener((InvalidationListener) change -> putStringList(CUSTOM_CERTIFICATE_VALID_FROM,
-                sslPreferences.getCustomCertificateValidFrom()));
-        sslPreferences.getCustomCertificateValidTo().addListener((InvalidationListener) change -> putStringList(CUSTOM_CERTIFICATE_VALID_TO,
-                sslPreferences.getCustomCertificateValidTo()));
-        sslPreferences.getCustomCertificateSerialNumber().addListener((InvalidationListener) change -> putStringList(CUSTOM_CERTIFICATE_SERIAL_NUMBER,
-                sslPreferences.getCustomCertificateSerialNumber()));
-        sslPreferences.getCustomCertificateIssuer().addListener((InvalidationListener) change -> putStringList(CUSTOM_CERTIFICATE_ISSUER,
-                sslPreferences.getCustomCertificateIssuer()));
-        sslPreferences.getCustomCertificateSigAlgorithm().addListener((InvalidationListener) change -> putStringList(CUSTOM_CERTIFICATE_SIG_ALGORITHM,
-                sslPreferences.getCustomCertificateSigAlgorithm()));
 
         return sslPreferences;
     }

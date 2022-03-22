@@ -11,9 +11,12 @@ import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -80,7 +83,7 @@ public class TrustStoreManager {
         return false;
     }
 
-    public List<String> getAliases() {
+    public List<String> aliases() {
         try {
             return Collections.list(store.aliases());
         } catch (KeyStoreException e) {
@@ -106,15 +109,36 @@ public class TrustStoreManager {
         }
     }
 
+    /**
+     * Custom certificates are certificates with alias that ends with {@code [custom]}
+     */
     private Boolean isCustomCertificate(String alias) {
-        return !alias.endsWith("[jdk]");
+        return alias.endsWith("[custom]");
     }
 
     /**
-     * Deletes all non-jdk default certificates and flushes the resulted truststore, JDK certificates are certificates with alias that ends with {@code [jdk]}
+     * Deletes all custom certificates, Custom certificates are certificates with alias that ends with {@code [custom]}
      */
-    public void deleteAllCustomCertificates() {
-        getAliases().stream().filter(this::isCustomCertificate).forEach(this::deleteCertificate);
+    public void clearCustomCertificates() {
+        aliases().stream().filter(this::isCustomCertificate).forEach(this::deleteCertificate);
         flush();
+    }
+
+    public List<SSLCertificate> getCustomCertificates() {
+        return aliases().stream()
+                        .filter(this::isCustomCertificate)
+                        .map(this::getCertificate)
+                        .map(SSLCertificate::fromX509)
+                        .flatMap(Optional::stream)
+                        .collect(Collectors.toList());
+    }
+
+    public X509Certificate getCertificate(String alias) {
+        try {
+            return (X509Certificate) store.getCertificate(alias);
+        } catch (KeyStoreException e) {
+            LOGGER.warn("Error while getting certificate of alias: {}", alias, e);
+        }
+        return null;
     }
 }

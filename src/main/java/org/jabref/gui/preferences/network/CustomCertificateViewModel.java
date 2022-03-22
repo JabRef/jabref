@@ -1,6 +1,7 @@
 package org.jabref.gui.preferences.network;
 
 import java.time.LocalDate;
+import java.util.Optional;
 
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyObjectProperty;
@@ -20,6 +21,7 @@ public class CustomCertificateViewModel extends AbstractViewModel {
     private final StringProperty signatureAlgorithmProperty = new SimpleStringProperty("");
     private final StringProperty versionProperty = new SimpleStringProperty("");
     private final StringProperty thumbprintProperty = new SimpleStringProperty("");
+    private final StringProperty pathProperty = new SimpleStringProperty("");
 
     public CustomCertificateViewModel(String thumbprint, String serialNumber, String issuer, LocalDate validFrom, LocalDate validTo, String sigAlgorithm, String version) {
         serialNumberProperty.setValue(serialNumber);
@@ -69,6 +71,23 @@ public class CustomCertificateViewModel extends AbstractViewModel {
 
     public LocalDate getValidTo() {
         return validToProperty.getValue();
+    }
+
+    public StringProperty pathPropertyProperty() {
+        return pathProperty;
+    }
+
+    public Optional<String> getPath() {
+        if (pathProperty.getValue() == null || pathProperty.getValue().isEmpty()) {
+            return Optional.empty();
+        } else {
+            return Optional.of(pathProperty.getValue());
+        }
+    }
+
+    public CustomCertificateViewModel setPath(String path) {
+        pathProperty.setValue(path);
+        return this;
     }
 
     public String getSerialNumber() {
