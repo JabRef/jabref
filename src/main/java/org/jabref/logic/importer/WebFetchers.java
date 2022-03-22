@@ -31,6 +31,7 @@ import org.jabref.logic.importer.fetcher.MathSciNet;
 import org.jabref.logic.importer.fetcher.MedlineFetcher;
 import org.jabref.logic.importer.fetcher.Medra;
 import org.jabref.logic.importer.fetcher.OpenAccessDoi;
+import org.jabref.logic.importer.fetcher.ResearchGate;
 import org.jabref.logic.importer.fetcher.RfcFetcher;
 import org.jabref.logic.importer.fetcher.ScienceDirect;
 import org.jabref.logic.importer.fetcher.SpringerFetcher;
@@ -107,6 +108,7 @@ public class WebFetchers {
         set.add(new CompositeSearchBasedFetcher(set, 30));
         set.add(new CollectionOfComputerScienceBibliographiesFetcher(importFormatPreferences));
         // set.add(new JstorFetcher(importFormatPreferences));
+        set.add(new ResearchGate(importFormatPreferences));
         return set;
     }
 
@@ -145,6 +147,7 @@ public class WebFetchers {
         set.add(new CrossRef());
         set.add(new ZbMATH(importFormatPreferences));
         set.add(new PdfMergeMetadataImporter.EntryBasedFetcherWrapper(importerPreferences, importFormatPreferences, filePreferences, databaseContext));
+        set.add(new ResearchGate(importFormatPreferences));
         return set;
     }
 
@@ -179,7 +182,7 @@ public class WebFetchers {
         // fetchers.add(new JstorFetcher(importFormatPreferences));
         // fetchers.add(new GoogleScholar(importFormatPreferences));
         fetchers.add(new OpenAccessDoi());
-
+        fetchers.add(new ResearchGate(importFormatPreferences));
         return fetchers;
     }
 }
