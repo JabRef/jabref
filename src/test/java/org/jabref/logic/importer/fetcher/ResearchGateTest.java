@@ -131,8 +131,10 @@ public class ResearchGateTest {
                 .withField(StandardField.AUTHOR, "Hohlfeld, Ralf and Bauerfeind, Franziska and Braglia, Ilenia and Butt, Aqib and Dietz, Anna-Lena and Drexel, Denise and Fedlmeier, Julia and Fischer, Lana and Gandl, Vanessa and Glaser, Felia and Haberzettel, Eva and Helling, Teresa and Käsbauer, Isabel and Kast, Matthias and Krieger, Anja and Lächner, Anja and Malkanova, Adriana and Raab, Marie-Kristin and Rech, Anastasia and Weymar, Pia")
                 .withField(StandardField.DOI, "10.13140/RG.2.2.36822.78406");
 
-        entryInput = fetcher.performSearch(entryInput)
-                            .stream().findFirst().get();
+        Optional<BibEntry> optionalBibEntry = fetcher.performSearch(entryInput)
+                                                     .stream().findFirst();
+        assert (optionalBibEntry.isPresent());
+        entryInput = optionalBibEntry.get();
         entryInput.setType(StandardEntryType.Misc);
         assertEquals(entryOutput, entryInput);
     }
