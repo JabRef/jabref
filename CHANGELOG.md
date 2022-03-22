@@ -12,7 +12,8 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 ### Added
 
 - We added an extra option when right-clicking an entry in the Entry List to copy either the DOI or the DOI url.
-- We added a new section to network preferences to allow using custom SSL certificates.
+- We added a new section to network preferences to allow using custom SSL certificates [#8126](https://github.com/JabRef/jabref/issues/8126)
+- We added two new web and fulltext fetchers: SemanticScholar and ResearchGate.
 
 ### Changed
 
