@@ -179,8 +179,8 @@ public class WebFetchers {
         fetchers.add(new ApsFetcher());
 
         // Meta search
-//         fetchers.add(new JstorFetcher(importFormatPreferences));
-//         fetchers.add(new GoogleScholar(importFormatPreferences));
+        // fetchers.add(new JstorFetcher(importFormatPreferences));
+        // fetchers.add(new GoogleScholar(importFormatPreferences));
         fetchers.add(new OpenAccessDoi());
         fetchers.add(new ResearchGate(importFormatPreferences));
         return fetchers;
