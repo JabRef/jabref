@@ -10,6 +10,7 @@ import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
+import org.jabref.model.entry.types.UnknownEntryType;
 import org.jabref.support.DisabledOnCIServer;
 import org.jabref.testutils.category.FetcherTest;
 
@@ -119,24 +120,20 @@ public class ResearchGateTest {
     }
 
     @Test
-    @DisabledOnCIServer("CI server is unreliable")
     void performSearchWithTitleWithCurlyBraces() throws FetcherException {
-        BibEntry entryInput = new BibEntry()
+        BibEntry entryInput = new BibEntry(StandardEntryType.Misc)
                 .withField(StandardField.TITLE, "Communicating {COVID}-19 against the backdrop of conspiracy ideologies: {HOW} {PUBLIC} {FIGURES} {DISCUSS} {THE} {MATTER} {ON} {FACEBOOK} {AND} {TELEGRAM}");
 
-        BibEntry entryOutput = new BibEntry(StandardEntryType.Misc)
+        Optional<BibEntry> expected = Optional.of(new BibEntry(new UnknownEntryType("unknown"))
                 .withCitationKey("unknown")
                 .withField(StandardField.TITLE, "Communicating COVID-19 against the backdrop of conspiracy ideologies: HOW PUBLIC FIGURES DISCUSS THE MATTER ON FACEBOOK AND TELEGRAM")
                 .withField(StandardField.MONTH, "05")
                 .withField(StandardField.YEAR, "2021")
                 .withField(StandardField.AUTHOR, "Hohlfeld, Ralf and Bauerfeind, Franziska and Braglia, Ilenia and Butt, Aqib and Dietz, Anna-Lena and Drexel, Denise and Fedlmeier, Julia and Fischer, Lana and Gandl, Vanessa and Glaser, Felia and Haberzettel, Eva and Helling, Teresa and Käsbauer, Isabel and Kast, Matthias and Krieger, Anja and Lächner, Anja and Malkanova, Adriana and Raab, Marie-Kristin and Rech, Anastasia and Weymar, Pia")
-                .withField(StandardField.DOI, "10.13140/RG.2.2.36822.78406");
+                .withField(StandardField.DOI, "10.13140/RG.2.2.36822.78406"));
 
-        Optional<BibEntry> optionalBibEntry = fetcher.performSearch(entryInput)
+        Optional<BibEntry> actual = fetcher.performSearch(entryInput)
                                                      .stream().findFirst();
-        assert (optionalBibEntry.isPresent());
-        entryInput = optionalBibEntry.get();
-        entryInput.setType(StandardEntryType.Misc);
-        assertEquals(entryOutput, entryInput);
+        assertEquals(expected, actual);
     }
 }
