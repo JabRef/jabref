@@ -372,18 +372,13 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
                 .build();
 
         dialogService.showFileOpenDialog(fileDialogConfiguration).ifPresent(certPath -> SSLCertificate.fromPath(certPath).ifPresent(sslCertificate -> {
-            LOGGER.info(sslCertificate.getSHA256Thumbprint());
             if (!trustStoreManager.isCertificateExist(formatCustomAlias(sslCertificate.getSHA256Thumbprint()))) {
                 customCertificateListProperty.add(CustomCertificateViewModel.fromSSLCertificate(sslCertificate)
                                                                             .setPath(certPath.toAbsolutePath().toString()));
             } else {
-                // TODO('Show a dialog or toast message indicating that the user is trying to add a duplicate certificate')
+                dialogService.showWarningDialogAndWait(Localization.lang("Duplicate Certificates"), Localization.lang("You already added this certificate"));
             }
         }));
-    }
-
-    public void removeCertificate(String thumbprint) {
-        customCertificateListProperty.removeIf(cert -> cert.getThumbprint().equals(thumbprint));
     }
 
     private String formatCustomAlias(String thumbprint) {

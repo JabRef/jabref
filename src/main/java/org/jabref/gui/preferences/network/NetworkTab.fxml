@@ -104,6 +104,9 @@
                 prefHeight="200.0"
                 GridPane.columnSpan="3"
                 GridPane.rowIndex="1">
+            <GridPane.margin>
+                <Insets right="16.0"/>
+            </GridPane.margin>
             <columns>
                 <TableColumn
                         fx:id="certSerialNumber"

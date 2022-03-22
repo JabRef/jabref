@@ -134,7 +134,7 @@ public class NetworkTab extends AbstractPreferenceTabView<NetworkTabViewModel> i
         customCertificatesTable.itemsProperty().set(viewModel.customCertificateListProperty());
     }
 
-    public String formatDate(LocalDate localDate) {
+    private String formatDate(LocalDate localDate) {
         return localDate.format(DateTimeFormatter.ofPattern("dd-MMM-yyyy"));
     }
 
