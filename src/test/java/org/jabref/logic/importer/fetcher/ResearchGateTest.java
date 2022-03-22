@@ -119,6 +119,7 @@ public class ResearchGateTest {
     }
 
     @Test
+    @DisabledOnCIServer("CI server is unreliable")
     void performSearchWithTitleWithCurlyBraces() throws FetcherException {
         BibEntry entryInput = new BibEntry()
                 .withField(StandardField.TITLE, "Communicating {COVID}-19 against the backdrop of conspiracy ideologies: {HOW} {PUBLIC} {FIGURES} {DISCUSS} {THE} {MATTER} {ON} {FACEBOOK} {AND} {TELEGRAM}");
