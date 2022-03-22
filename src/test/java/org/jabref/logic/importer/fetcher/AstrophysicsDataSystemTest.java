@@ -134,6 +134,7 @@ public class AstrophysicsDataSystemTest implements PagedSearchFetcherTest {
         luceyPaulEntry.setField(StandardField.URL, "https://ui.adsabs.harvard.edu/abs/2000JGR...10520297L");
         luceyPaulEntry.setField(StandardField.MONTH, "#jan#");
         luceyPaulEntry.setField(StandardField.NUMBER, "E8");
+        luceyPaulEntry.setField(StandardField.ABSTRACT, "The Clementine mission to the Moon returned global imaging data         collected by the ultraviolet visible (UVVIS) camera. This data         set is now in a final state of calibration, and a five-band         multispectral digital image model (DIM) of the lunar surface         will soon be available to the science community. We have used         observations of the lunar sample-return sites and stations         extracted from the final DIM in conjunction with compositional         information for returned lunar soils to revise our previously         published algorithms for the spectral determination of the FeO         and TiO$_{2}$ content of the lunar surface. The algorithms         successfully normalize the effects of space weathering so that         composition may be determined without regard to a surface's         state of maturity. These algorithms permit anyone with access to         the standard archived DIM to construct high spatial resolution         maps of FeO and TiO$_{2}$ abundance. Such maps will be of great         utility in a variety of lunar geologic studies.");
     }
 
     @Test
