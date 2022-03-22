@@ -10,6 +10,7 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.testutils.category.FetcherTest;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -39,6 +40,7 @@ class DoiResolutionTest {
         );
     }
 
+    @Disabled("Cannot fetch due to Cloudfare protection")
     @Test
     void linkWithPdfStringLeadsToFulltext() throws IOException {
         entry.setField(StandardField.DOI, "10.1002/acr2.11101");
