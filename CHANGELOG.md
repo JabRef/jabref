@@ -13,6 +13,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 
 - We added an extra option when right-clicking an entry in the Entry List to copy either the DOI or the DOI url.
 - We added an extra option to ask the user whether they want to open to reveal the folder holding the saved file with the file selected. [#8195]([https://github.com/JabRef/jabref/issues/8195][#8195])
+- We added two new web and fulltext fetchers: SemanticScholar and ResearchGate
 
 ### Changed
 
@@ -34,6 +35,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixed an issue when reading non-UTF-8 encoded. When no encoding header is present, the encoding is now detected from the file content (and the preference option is disregarded) [#8417](https://github.com/JabRef/jabref/issues/8417)
 - We fixed an issue where pasting a URL was replacing + signs by spaces making the URL unreachable. [#8448](https://github.com/JabRef/jabref/issues/8448)
 - We fixed an issue where creating subsidiary files from aux files created with some versions of biblatex would produce incorrect results. [#8513](https://github.com/JabRef/jabref/issues/8513)
+- We fixed an issue where not all found unlinked local files were imported correctly due to some race condition. [#8444](https://github.com/JabRef/jabref/issues/8444)
 
 ### Removed
 
