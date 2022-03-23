@@ -9,6 +9,11 @@ public class NumericFieldComparatorTest {
     private final NumericFieldComparator comparator = new NumericFieldComparator();
 
     @Test
+    public void compareTwoNumericInputs() {
+        assertEquals(2, comparator.compare("4", "2"));
+    }
+
+    @Test
     public void compareTwoNullInputs() {
         assertEquals(0, comparator.compare(null, null));
     }
