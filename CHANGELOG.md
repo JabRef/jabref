@@ -35,6 +35,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixed an issue where pasting a URL was replacing + signs by spaces making the URL unreachable. [#8448](https://github.com/JabRef/jabref/issues/8448)
 - We fixed an issue where creating subsidiary files from aux files created with some versions of biblatex would produce incorrect results. [#8513](https://github.com/JabRef/jabref/issues/8513)
 - We fixed an issue where not all found unlinked local files were imported correctly due to some race condition. [#8444](https://github.com/JabRef/jabref/issues/8444)
+- We fixed an issue where Merge entries dialog exceeds screen boundaries.
 
 ### Removed
 
