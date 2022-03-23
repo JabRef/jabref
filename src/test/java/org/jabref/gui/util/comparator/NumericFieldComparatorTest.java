@@ -9,11 +9,6 @@ public class NumericFieldComparatorTest {
     private final NumericFieldComparator comparator = new NumericFieldComparator();
 
     @Test
-    public void compareTwoNumericInputs() {
-        assertEquals(2, comparator.compare("4", "2"));
-    }
-
-    @Test
     public void compareTwoNullInputs() {
         assertEquals(0, comparator.compare(null, null));
     }
@@ -62,4 +57,15 @@ public class NumericFieldComparatorTest {
     public void compareWordWithMinus() {
         assertEquals(-1, comparator.compare("-abc", "-5"));
     }
+
+    @Test
+    void compareNumericSignalWithoutNumberWithLenghtBiggerThanOne() {
+        assertEquals(2, comparator.compare("- ", "+ "));
+    }
+
+    @Test
+    void compareNumericSignalAfterNumber() {
+        assertEquals(-2, comparator.compare("5- ", "7+ "));
+    }
+
 }
