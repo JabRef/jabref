@@ -12,6 +12,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 ### Added
 
 - We added an extra option when right-clicking an entry in the Entry List to copy either the DOI or the DOI url.
+- We added two new web and fulltext fetchers: SemanticScholar and ResearchGate
 
 ### Changed
 
@@ -24,7 +25,8 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 
 ### Fixed
 
-- We fixed an issue wehre long article numbers in the `pages` field would cause an exception and preventing the citation style to display [#8381](https://github.com/JabRef/jabref/issues/8381), [citeproc-java](https://github.com/michel-kraemer/citeproc-java/issues/114)
+- We fixed an issue where JabRef could not start due to a missing directory for the fulltex index [#8579](https://github.com/JabRef/jabref/issues/8579)
+- We fixed an issue where long article numbers in the `pages` field would cause an exception and preventing the citation style to display [#8381](https://github.com/JabRef/jabref/issues/8381), [citeproc-java](https://github.com/michel-kraemer/citeproc-java/issues/114)
 - We fixed an issue where online links in the file field were not detected correctly and could produce an exception [#8150](https://github.com/JabRef/jabref/issues/8510)
 - We fixed an issue where an exception could occur when saving the preferences [#7614](https://github.com/JabRef/jabref/issues/7614)
 - We fixed an issue where "Copy DOI url" in the right-click menu of the Entry List would just copy the DOI and not the DOI url. [#8389](https://github.com/JabRef/jabref/issues/8389)
@@ -32,6 +34,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixed an issue when reading non-UTF-8 encoded. When no encoding header is present, the encoding is now detected from the file content (and the preference option is disregarded) [#8417](https://github.com/JabRef/jabref/issues/8417)
 - We fixed an issue where pasting a URL was replacing + signs by spaces making the URL unreachable. [#8448](https://github.com/JabRef/jabref/issues/8448)
 - We fixed an issue where creating subsidiary files from aux files created with some versions of biblatex would produce incorrect results. [#8513](https://github.com/JabRef/jabref/issues/8513)
+- We fixed an issue where not all found unlinked local files were imported correctly due to some race condition. [#8444](https://github.com/JabRef/jabref/issues/8444)
 - We fixed an issue where Merge entries dialog exceeds screen boundaries.
 
 ### Removed

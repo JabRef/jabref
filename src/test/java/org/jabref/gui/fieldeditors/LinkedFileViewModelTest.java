@@ -225,8 +225,8 @@ class LinkedFileViewModelTest {
     @FetcherTest
     @Test
     void downloadHtmlWhenLinkedFilePointsToHtml() throws MalformedURLException {
-        // the link mentioned in issue #7452
-        String url = "https://onlinelibrary.wiley.com/doi/abs/10.1002/0470862106.ia615";
+        // use google as test url, wiley is protected by clooudfare
+        String url = "https://google.com";
         String fileType = StandardExternalFileType.URL.getName();
         linkedFile = new LinkedFile(new URL(url), fileType);
 
