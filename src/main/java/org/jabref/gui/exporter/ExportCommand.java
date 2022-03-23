@@ -91,7 +91,6 @@ public class ExportCommand extends SimpleCommand {
                      .ifPresent(path -> export(path, fileDialogConfiguration.getSelectedExtensionFilter(), exporters));
     }
 
-    @SuppressWarnings("checkstyle:EmptyLineSeparator")
     private void export(Path file, FileChooser.ExtensionFilter selectedExtensionFilter, List<Exporter> exporters) {
         String selectedExtension = selectedExtensionFilter.getExtensions().get(0).replace("*", "");
         if (!file.endsWith(selectedExtension)) {
@@ -145,12 +144,12 @@ public class ExportCommand extends SimpleCommand {
                             jabRefFrame.showNotificationPane(
                                     Localization.lang("Press \"Open\" to reveal the folder holding the saved file."),
                                     Localization.lang("Open"),
-                                    e -> {
+                                    event -> {
                                         try {
                                             JabRefDesktop.openFolderAndSelectFile(file, preferences);
                                             notificationPane.hide();
                                         } catch (IOException ioException) {
-                                            LOGGER.info(Localization.lang("Error occurs when open the folder."));
+                                            LOGGER.error(Localization.lang("Could not open export folder."), ioException);
                                         }
                                     });
                         })

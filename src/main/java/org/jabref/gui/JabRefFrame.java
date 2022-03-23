@@ -482,7 +482,7 @@ public class JabRefFrame extends BorderPane {
         }
         notificationPane.show();
         // the notification bar will disappear if the user doesn't take action in 10 seconds
-        Timer searchTask = FxTimer.create(java.time.Duration.ofMillis(10000), () -> notificationPane.hide());
+        Timer searchTask = FxTimer.create(java.time.Duration.ofMillis(5000), () -> notificationPane.hide());
         searchTask.restart();
     }
 
