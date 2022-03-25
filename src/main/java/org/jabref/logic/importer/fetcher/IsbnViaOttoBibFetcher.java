@@ -70,8 +70,6 @@ public class IsbnViaOttoBibFetcher extends AbstractIsbnFetcher {
             entry = BibtexParser.singleFromString(textArea.text(), importFormatPreferences, new DummyFileUpdateMonitor());
         } catch (ParseException e) {
             throw new FetcherException("An internal parser error occurred", e);
-        } catch (IOException e) {
-            e.printStackTrace();
         }
         entry.ifPresent(bibEntry -> doPostCleanup(bibEntry));
         return entry;

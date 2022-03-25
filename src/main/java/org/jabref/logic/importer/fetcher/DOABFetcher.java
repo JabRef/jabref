@@ -1,7 +1,5 @@
 package org.jabref.logic.importer.fetcher;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -13,10 +11,10 @@ import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.SearchBasedParserFetcher;
 import org.jabref.logic.importer.fetcher.transformers.DefaultQueryTransformer;
+import org.jabref.logic.importer.util.JsonReader;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 
-import com.google.common.base.Charsets;
 import kong.unirest.json.JSONArray;
 import kong.unirest.json.JSONObject;
 import org.apache.http.client.utils.URIBuilder;
@@ -55,7 +53,7 @@ public class DOABFetcher implements SearchBasedParserFetcher {
             // can't use this method JsonReader.toJsonObject(inputStream) because the results are sent in an array
             // like format resulting in an error when trying to convert them into a json object
             // created a similar method suitable for this case "toJsonArray"
-            JSONArray response = toJsonArray(InputStream);
+            JSONArray response = JsonReader.toJsonArray(InputStream);
             if (response.isEmpty()) {
                 return Collections.emptyList();
             }
@@ -79,35 +77,35 @@ public class DOABFetcher implements SearchBasedParserFetcher {
         };
     }
 
-    private JSONArray toJsonArray(InputStream stream) throws IOException {
-        String inpStr = new String((stream.readAllBytes()), Charsets.UTF_8);
-        if (inpStr.isBlank()) {
-            return new JSONArray();
-        }
-        return new JSONArray(inpStr);
-    }
-
     private BibEntry JsonToBibEntry(JSONArray metadataArray) {
         BibEntry entry = new BibEntry();
         for (int i = 0; i < metadataArray.length(); i++) {
             JSONObject dataObject = metadataArray.getJSONObject(i);
-            if (dataObject.getString("key").equals("dc.type")) {
-                entry.setField(StandardField.TYPE, dataObject.getString("value"));
-            }
-            if (dataObject.getString("key").equals("dc.title")) {
-                entry.setField(StandardField.TITLE, dataObject.getString("value"));
-            }
-            if (dataObject.getString("key").equals("dc.contributor.author")) {
-                entry.setField(StandardField.AUTHOR, dataObject.getString("value"));
-            }
-            if (dataObject.getString("key").equals("dc.date.issued")) {
-                entry.setField(StandardField.YEAR, String.valueOf(dataObject.getInt("value")));
-            }
-            if (dataObject.getString("key").equals("oapen.identifier.doi")) {
-                entry.setField(StandardField.DOI, dataObject.getString("value"));
-            }
-            if (dataObject.getString("key").equals("oapen.pages")) {
-                entry.setField(StandardField.PAGES, String.valueOf(dataObject.getInt("value")));
+            switch (dataObject.getString("key")) {
+                case "dc.contributor.author" -> entry.setField(StandardField.AUTHOR,
+                        dataObject.getString("value"));
+                case "dc.type" -> entry.setField(StandardField.TYPE,
+                        dataObject.getString("value"));
+                case "dc.date.issued" -> entry.setField(StandardField.YEAR, String.valueOf(
+                        dataObject.getInt("value")));
+                case "oapen.identifier.doi" -> entry.setField(StandardField.DOI,
+                        dataObject.getString("value"));
+                case "dc.title" -> entry.setField(StandardField.TITLE,
+                        dataObject.getString("value"));
+                case "oapen.pages" -> entry.setField(StandardField.PAGES, String.valueOf(
+                        dataObject.getInt("value")));
+                case "dc.description.abstract" -> entry.setField(StandardField.ABSTRACT,
+                        dataObject.getString("value"));
+                case "dc.language" -> entry.setField(StandardField.LANGUAGE,
+                        dataObject.getString("value"));
+                case "publisher.name" -> entry.setField(StandardField.PUBLISHER,
+                        dataObject.getString("value"));
+                case "dc.identifier.uri" -> entry.setField(StandardField.URI,
+                        dataObject.getString("value"));
+                case "dc.subject.other" -> entry.setField(StandardField.KEYWORDS,
+                        dataObject.getString("value"));
+                case "dc.contributor.editor" -> entry.setField(StandardField.EDITOR,
+                        dataObject.getString("value"));
             }
         }
         return entry;

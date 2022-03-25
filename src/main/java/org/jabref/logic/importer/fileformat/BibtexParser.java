@@ -99,7 +99,7 @@ public class BibtexParser implements Parser {
      * @return An Optional&lt;BibEntry>. Optional.empty() if non was found or an error occurred.
      * @throws ParseException
      */
-    public static Optional<BibEntry> singleFromString(String bibtexString, ImportFormatPreferences importFormatPreferences, FileUpdateMonitor fileMonitor) throws ParseException, IOException {
+    public static Optional<BibEntry> singleFromString(String bibtexString, ImportFormatPreferences importFormatPreferences, FileUpdateMonitor fileMonitor) throws ParseException {
         Collection<BibEntry> entries = new BibtexParser(importFormatPreferences, fileMonitor).parseEntries(bibtexString);
         if ((entries == null) || entries.isEmpty()) {
             return Optional.empty();
@@ -121,7 +121,7 @@ public class BibtexParser implements Parser {
         }
     }
 
-    public Optional<BibEntry> parseSingleEntry(String bibtexString) throws ParseException, IOException {
+    public Optional<BibEntry> parseSingleEntry(String bibtexString) throws ParseException {
         return parseEntries(bibtexString).stream().findFirst();
     }
 
