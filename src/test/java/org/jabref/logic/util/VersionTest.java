@@ -201,10 +201,10 @@ public class VersionTest {
     }
 
     @Test
-    public void versionNotNewerDevelopmentNumber() {
-        Version older = Version.parse("4.2-beta2");
-        Version newer = Version.parse("4.2-beta2");
-        assertFalse(newer.isNewerThan(older));
+    public void versionNotNewerThanSameVersionWithBeta() {
+        Version version1 = Version.parse("4.2-beta2");
+        Version version2 = Version.parse("4.2-beta2");
+        assertFalse(version2.isNewerThan(version1));
     }
 
     @Test
