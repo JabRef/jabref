@@ -26,6 +26,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 
 ### Fixed
 
+- We fixed an issue where custom "Protected terms" files were missing after a restart of JabRef [#8608](https://github.com/JabRef/jabref/issues/8608)
 - We fixed an issue where JabRef could not start due to a missing directory for the fulltex index [#8579](https://github.com/JabRef/jabref/issues/8579)
 - We fixed an issue where long article numbers in the `pages` field would cause an exception and preventing the citation style to display [#8381](https://github.com/JabRef/jabref/issues/8381), [citeproc-java](https://github.com/michel-kraemer/citeproc-java/issues/114)
 - We fixed an issue where online links in the file field were not detected correctly and could produce an exception [#8150](https://github.com/JabRef/jabref/issues/8510)
