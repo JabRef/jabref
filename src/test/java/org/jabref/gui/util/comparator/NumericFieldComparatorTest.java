@@ -62,4 +62,15 @@ public class NumericFieldComparatorTest {
     public void compareWordWithMinus() {
         assertEquals(-1, comparator.compare("-abc", "-5"));
     }
+
+    @Test
+    void compareNumericSignalWithoutNumberWithLenghtBiggerThanOne() {
+        assertEquals(2, comparator.compare("- ", "+ "));
+    }
+
+    @Test
+    void compareNumericSignalAfterNumber() {
+        assertEquals(-2, comparator.compare("5- ", "7+ "));
+    }
+
 }
