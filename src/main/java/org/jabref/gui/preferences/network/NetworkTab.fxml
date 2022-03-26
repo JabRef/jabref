@@ -128,6 +128,10 @@
                         fx:id="certVersion"
                         prefWidth="136.0"
                         text="%Version"/>
+                <TableColumn
+                        fx:id="actionsColumn" maxWidth="35.0" minWidth="35.0" prefWidth="35.0"
+                        editable="false" resizable="false" reorderable="false"
+                />
             </columns>
            <columnResizePolicy>
                <TableView

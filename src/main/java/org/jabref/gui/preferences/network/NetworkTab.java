@@ -5,6 +5,7 @@ import java.time.format.DateTimeFormatter;
 
 import javafx.application.Platform;
 import javafx.beans.binding.BooleanBinding;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
@@ -22,6 +23,7 @@ import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.preferences.PreferencesTab;
 import org.jabref.gui.util.IconValidationDecorator;
+import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
 
@@ -56,6 +58,8 @@ public class NetworkTab extends AbstractPreferenceTabView<NetworkTabViewModel> i
     @FXML private TableColumn<CustomCertificateViewModel, String> certValidFrom;
     @FXML private TableColumn<CustomCertificateViewModel, String> certValidTo;
     @FXML private TableColumn<CustomCertificateViewModel, String> certVersion;
+    @FXML private TableColumn<CustomCertificateViewModel, String> actionsColumn;
+
 
     private String proxyPasswordText = "";
     private int proxyPasswordCaretPosition = 0;
@@ -126,6 +130,14 @@ public class NetworkTab extends AbstractPreferenceTabView<NetworkTabViewModel> i
         certValidTo.setCellValueFactory(data -> EasyBind.map(data.getValue().validToProperty(), this::formatDate));
 
         customCertificatesTable.itemsProperty().set(viewModel.customCertificateListProperty());
+
+        actionsColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getThumbprint()));
+        new ValueTableCellFactory<CustomCertificateViewModel, String>()
+                .withGraphic(name -> IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode())
+                .withTooltip(name -> Localization.lang("Remove formatter '%0'", name))
+                .withOnMouseClickedEvent(thumbprint -> evt -> viewModel.customCertificateListProperty().removeIf(cert -> cert.getThumbprint().equals(thumbprint)))
+                .install(actionsColumn);
+
     }
 
     private String formatDate(LocalDate localDate) {
