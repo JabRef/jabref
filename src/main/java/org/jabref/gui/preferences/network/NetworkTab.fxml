@@ -94,16 +94,11 @@
             <RowConstraints/>
             <RowConstraints/>
         </rowConstraints>
-        <CheckBox
-                fx:id="customCertificatesUse"
-                text="%Enable custom SSL certificates"
-                GridPane.columnSpan="3"
-                GridPane.rowIndex="0"/>
         <TableView
                 fx:id="customCertificatesTable"
                 prefHeight="200.0"
                 GridPane.columnSpan="3"
-                GridPane.rowIndex="1">
+                GridPane.rowIndex="0">
             <GridPane.margin>
                 <Insets right="16.0"/>
             </GridPane.margin>
@@ -145,7 +140,7 @@
                 text="%Add certificate"
                 GridPane.columnIndex="2"
                 GridPane.halignment="RIGHT"
-                GridPane.rowIndex="2"
+                GridPane.rowIndex="1"
                 GridPane.valignment="TOP">
            <GridPane.margin>
                <Insets right="16.0"/>

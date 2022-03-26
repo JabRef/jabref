@@ -54,7 +54,6 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty proxyUseAuthenticationProperty = new SimpleBooleanProperty();
     private final StringProperty proxyUsernameProperty = new SimpleStringProperty("");
     private final StringProperty proxyPasswordProperty = new SimpleStringProperty("");
-    private final BooleanProperty customCertificatesUseProperty = new SimpleBooleanProperty();
     private final ListProperty<CustomCertificateViewModel> customCertificateListProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
 
     private final Validator remotePortValidator;
@@ -157,7 +156,6 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
 
     private void setSSLValues() {
         customCertificateListProperty.clear();
-        customCertificatesUseProperty.setValue(sslPreferences.shouldUseCustomCertificates());
 
         trustStoreManager.getCustomCertificates().forEach(cert -> customCertificateListProperty.add(CustomCertificateViewModel.fromSSLCertificate(cert)));
         customCertificateListProperty.addListener((ListChangeListener<CustomCertificateViewModel>) c -> {
@@ -224,7 +222,6 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
 
     public void storeSSLSettings() {
         trustStoreManager.flush();
-        sslPreferences.setUseCustomCertificates(customCertificatesUseProperty.getValue());
     }
 
     private Optional<Integer> getPortAsInt(String value) {
@@ -354,10 +351,6 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
 
     public StringProperty proxyPasswordProperty() {
         return proxyPasswordProperty;
-    }
-
-    public BooleanProperty customCertificatesUseProperty() {
-        return customCertificatesUseProperty;
     }
 
     public ListProperty<CustomCertificateViewModel> customCertificateListProperty() {

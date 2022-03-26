@@ -355,7 +355,6 @@ public class JabRefPreferences implements PreferencesService {
     private static final String PROXY_USE_AUTHENTICATION = "useProxyAuthentication";
 
     // SSL
-    private static final String CUSTOM_CERTIFICATE_USE = "customCertificateUse";
     private static final String TRUSTSTORE_PATH = "truststorePath";
 
     // Auto completion
@@ -532,7 +531,6 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(PROXY_PASSWORD, "");
 
         // SSL
-        defaults.put(CUSTOM_CERTIFICATE_USE, Boolean.FALSE);
         defaults.put(TRUSTSTORE_PATH, Path.of(AppDirsFactory.getInstance().getUserDataDir("ssl", SearchFieldConstants.VERSION, "org.jabref")).resolveSibling("truststore.jks").toString());
 
         defaults.put(POS_X, 0);
@@ -1630,11 +1628,8 @@ public class JabRefPreferences implements PreferencesService {
         }
 
         sslPreferences = new SSLPreferences(
-                getBoolean(CUSTOM_CERTIFICATE_USE),
                 get(TRUSTSTORE_PATH)
         );
-
-        EasyBind.subscribe(sslPreferences.useCustomCertificatesProperty(), (newValue -> putBoolean(CUSTOM_CERTIFICATE_USE, newValue)));
 
         return sslPreferences;
     }

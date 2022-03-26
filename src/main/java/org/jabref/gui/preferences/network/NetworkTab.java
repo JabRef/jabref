@@ -49,8 +49,6 @@ public class NetworkTab extends AbstractPreferenceTabView<NetworkTabViewModel> i
     @FXML private Label proxyAttentionLabel;
     @FXML private Button checkConnectionButton;
 
-    @FXML private Button addCertificate;
-    @FXML private CheckBox customCertificatesUse;
     @FXML private TableView<CustomCertificateViewModel> customCertificatesTable;
     @FXML private TableColumn<CustomCertificateViewModel, String> certIssuer;
     @FXML private TableColumn<CustomCertificateViewModel, String> certSerialNumber;
@@ -118,10 +116,6 @@ public class NetworkTab extends AbstractPreferenceTabView<NetworkTabViewModel> i
             validationVisualizer.initVisualization(viewModel.proxyUsernameValidationStatus(), proxyUsername);
             validationVisualizer.initVisualization(viewModel.proxyPasswordValidationStatus(), proxyPassword);
         });
-
-        customCertificatesUse.selectedProperty().bindBidirectional(viewModel.customCertificatesUseProperty());
-        customCertificatesTable.disableProperty().bind(customCertificatesUse.selectedProperty().not());
-        addCertificate.disableProperty().bind(customCertificatesUse.selectedProperty().not());
 
         certSerialNumber.setCellValueFactory(data -> data.getValue().serialNumberProperty());
         certIssuer.setCellValueFactory(data -> data.getValue().issuerProperty());
