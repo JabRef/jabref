@@ -565,7 +565,7 @@ public class JabRefFrame extends BorderPane {
      */
     public List<LibraryTab> getLibraryTabs() {
         return tabbedPane.getTabs().stream()
-            .filter(LibraryTab.class::isInstance)
+                         .filter(LibraryTab.class::isInstance)
                          .map(LibraryTab.class::cast)
                          .collect(Collectors.toList());
     }
@@ -892,7 +892,7 @@ public class JabRefFrame extends BorderPane {
                         new SeparatorMenuItem(),
 
                         factory.createMenuItem(StandardActions.OPEN_DEV_VERSION_LINK, new OpenBrowserAction("https://builds.jabref.org/master/")),
-                        factory.createMenuItem(StandardActions.OPEN_CHANGELOG, new OpenBrowserAction("https://github.com/JabRef/jabref/blob/master/CHANGELOG.md"))
+                        factory.createMenuItem(StandardActions.OPEN_CHANGELOG, new OpenBrowserAction("https://github.com/JabRef/jabref/blob/main/CHANGELOG.md"))
                 ),
                 factory.createMenuItem(StandardActions.ABOUT, new AboutAction())
         );
