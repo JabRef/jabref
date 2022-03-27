@@ -10,7 +10,7 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
 public class ImportExportPreferences {
-
+    private final BooleanProperty shouldOpenLastEdited;
     private final StringProperty nonWrappableFields;
     private final BooleanProperty resolveStrings;
     private final StringProperty resolvableFields;
@@ -18,14 +18,20 @@ public class ImportExportPreferences {
     private final ObjectProperty<Path> importWorkingDirectory;
     private final StringProperty lastExportExtension;
     private final ObjectProperty<Path> exportWorkingDirectory;
+    private final BooleanProperty autoSave;
+    private final BooleanProperty warnAboutDuplicatesOnImport;
 
-    public ImportExportPreferences(String nonWrappableFields,
+    public ImportExportPreferences(boolean shouldOpenLastEdited,
+                                   String nonWrappableFields,
                                    boolean resolveStrings,
                                    String resolvableFields,
                                    boolean alwaysReformatOnSave,
                                    Path importWorkingDirectory,
                                    String lastExportExtension,
-                                   Path exportWorkingDirectory) {
+                                   Path exportWorkingDirectory,
+                                   boolean autoSave,
+                                   boolean warnAboutDuplicatesOnImport) {
+        this.shouldOpenLastEdited = new SimpleBooleanProperty(shouldOpenLastEdited);
         this.nonWrappableFields = new SimpleStringProperty(nonWrappableFields);
         this.resolveStrings = new SimpleBooleanProperty(resolveStrings);
         this.resolvableFields = new SimpleStringProperty(resolvableFields);
@@ -33,6 +39,20 @@ public class ImportExportPreferences {
         this.importWorkingDirectory = new SimpleObjectProperty<>(importWorkingDirectory);
         this.lastExportExtension = new SimpleStringProperty(lastExportExtension);
         this.exportWorkingDirectory = new SimpleObjectProperty<>(exportWorkingDirectory);
+        this.autoSave = new SimpleBooleanProperty(autoSave);
+        this.warnAboutDuplicatesOnImport = new SimpleBooleanProperty(warnAboutDuplicatesOnImport);
+    }
+
+    public boolean shouldOpenLastEdited() {
+        return shouldOpenLastEdited.get();
+    }
+
+    public BooleanProperty openLastEditedProperty() {
+        return shouldOpenLastEdited;
+    }
+
+    public void setOpenLastEdited(boolean shouldOpenLastEdited) {
+        this.shouldOpenLastEdited.set(shouldOpenLastEdited);
     }
 
     public String getNonWrappableFields() {
@@ -119,4 +139,27 @@ public class ImportExportPreferences {
         this.exportWorkingDirectory.set(exportWorkingDirectory);
     }
 
+    public boolean shouldAutoSave() {
+        return autoSave.get();
+    }
+
+    public BooleanProperty autoSaveProperty() {
+        return autoSave;
+    }
+
+    public void setAutoSave(boolean shouldAutoSave) {
+        this.autoSave.set(shouldAutoSave);
+    }
+
+    public boolean shouldWarnAboutDuplicatesOnImport() {
+        return warnAboutDuplicatesOnImport.get();
+    }
+
+    public BooleanProperty warnAboutDuplicatesOnImportProperty() {
+        return warnAboutDuplicatesOnImport;
+    }
+
+    public void setWarnAboutDuplicatesOnImport(boolean warnAboutDuplicatesOnImport) {
+        this.warnAboutDuplicatesOnImport.set(warnAboutDuplicatesOnImport);
+    }
 }

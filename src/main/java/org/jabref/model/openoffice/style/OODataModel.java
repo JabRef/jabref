@@ -6,13 +6,19 @@ import java.util.Optional;
 
 import org.jabref.model.openoffice.ootext.OOText;
 
-/**   What is the data stored?   */
+/**
+ * What is the data stored?
+ */
 public enum OODataModel {
 
-    /** JabRef52: pageInfo belongs to CitationGroup, not Citation. */
+    /**
+     * JabRef52: pageInfo belongs to CitationGroup, not Citation.
+     */
     JabRef52,
 
-    /** JabRef60: pageInfo belongs to Citation. */
+    /**
+     * JabRef60: pageInfo belongs to Citation.
+     */
     JabRef60;
 
     /**

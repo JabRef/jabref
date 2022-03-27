@@ -7,7 +7,6 @@ import org.jabref.model.openoffice.ootext.OOText;
 public class PageInfo {
 
     private PageInfo() {
-        // hide public constructor
     }
 
     /*
@@ -27,7 +26,7 @@ public class PageInfo {
 
     /**
      * Defines sort order for pageInfo strings.
-     *
+     * <p>
      * Optional.empty comes before non-empty.
      */
     public static int comparePageInfo(Optional<OOText> a, Optional<OOText> b) {

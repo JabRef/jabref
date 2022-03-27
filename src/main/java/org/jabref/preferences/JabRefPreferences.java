@@ -8,7 +8,6 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -52,7 +51,7 @@ import org.jabref.gui.maintable.MainTableNameFormatPreferences;
 import org.jabref.gui.maintable.MainTableNameFormatPreferences.AbbreviationStyle;
 import org.jabref.gui.maintable.MainTableNameFormatPreferences.DisplayStyle;
 import org.jabref.gui.maintable.MainTablePreferences;
-import org.jabref.gui.mergeentries.MergeEntries;
+import org.jabref.gui.mergeentries.DiffMode;
 import org.jabref.gui.search.SearchDisplayMode;
 import org.jabref.gui.sidepane.SidePaneType;
 import org.jabref.gui.specialfields.SpecialFieldsPreferences;
@@ -83,6 +82,8 @@ import org.jabref.logic.layout.TextBasedPreviewLayout;
 import org.jabref.logic.layout.format.FileLinkPreferences;
 import org.jabref.logic.layout.format.NameFormatterPreferences;
 import org.jabref.logic.net.ProxyPreferences;
+import org.jabref.logic.net.ssl.SSLPreferences;
+import org.jabref.logic.net.ssl.TrustStoreManager;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
 import org.jabref.logic.openoffice.style.StyleLoader;
 import org.jabref.logic.preferences.DOIPreferences;
@@ -108,11 +109,13 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.EntryTypeFactory;
 import org.jabref.model.metadata.SaveOrderConfig;
+import org.jabref.model.pdf.search.SearchFieldConstants;
 import org.jabref.model.push.PushToApplicationConstants;
 import org.jabref.model.search.rules.SearchRules;
 import org.jabref.model.strings.StringUtil;
 
 import com.tobiasdiez.easybind.EasyBind;
+import net.harawata.appdirs.AppDirsFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -351,6 +354,9 @@ public class JabRefPreferences implements PreferencesService {
     private static final String PROXY_PASSWORD = "proxyPassword";
     private static final String PROXY_USE_AUTHENTICATION = "useProxyAuthentication";
 
+    // SSL
+    private static final String TRUSTSTORE_PATH = "truststorePath";
+
     // Auto completion
     private static final String AUTO_COMPLETE = "autoComplete";
     private static final String AUTOCOMPLETER_FIRSTNAME_MODE = "autoCompFirstNameMode";
@@ -376,6 +382,7 @@ public class JabRefPreferences implements PreferencesService {
     // Dialog states
     private static final String PREFS_EXPORT_PATH = "prefsExportPath";
     private static final String DOWNLOAD_LINKED_FILES = "downloadLinkedFiles";
+    private static final String FULLTEXT_INDEX_LINKED_FILES = "fulltextIndexLinkedFiles";
 
     // Helper string
     private static final String USER_HOME = System.getProperty("user.home");
@@ -439,6 +446,7 @@ public class JabRefPreferences implements PreferencesService {
     private GuiPreferences guiPreferences;
     private RemotePreferences remotePreferences;
     private ProxyPreferences proxyPreferences;
+    private SSLPreferences sslPreferences;
     private SearchPreferences searchPreferences;
     private AutoLinkPreferences autoLinkPreferences;
     private ImportExportPreferences importExportPreferences;
@@ -522,6 +530,9 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(PROXY_USERNAME, "");
         defaults.put(PROXY_PASSWORD, "");
 
+        // SSL
+        defaults.put(TRUSTSTORE_PATH, Path.of(AppDirsFactory.getInstance().getUserDataDir("ssl", SearchFieldConstants.VERSION, "org.jabref")).resolveSibling("truststore.jks").toString());
+
         defaults.put(POS_X, 0);
         defaults.put(POS_Y, 0);
         defaults.put(SIZE_X, 1024);
@@ -572,7 +583,7 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(LAST_FOCUSED, "");
         defaults.put(DEFAULT_SHOW_SOURCE, Boolean.FALSE);
 
-        defaults.put(MERGE_ENTRIES_DIFF_MODE, MergeEntries.DiffMode.WORD.name());
+        defaults.put(MERGE_ENTRIES_DIFF_MODE, DiffMode.WORD.name());
 
         defaults.put(SHOW_RECOMMENDATIONS, Boolean.TRUE);
         defaults.put(ACCEPT_RECOMMENDATIONS, Boolean.FALSE);
@@ -680,6 +691,8 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(IMPORT_FILEDIRPATTERN, "");
         // Download files by default
         defaults.put(DOWNLOAD_LINKED_FILES, true);
+        // Create Fulltext-Index by default
+        defaults.put(FULLTEXT_INDEX_LINKED_FILES, true);
 
         String defaultExpression = "**/.*[citationkey].*\\\\.[extension]";
         defaults.put(AUTOLINK_REG_EXP_SEARCH_EXPRESSION_KEY, defaultExpression);
@@ -944,8 +957,14 @@ public class JabRefPreferences implements PreferencesService {
     public void clear() throws BackingStoreException {
         clearAllBibEntryTypes();
         clearCitationKeyPatterns();
+        clearTruststoreFromCustomCertificates();
         prefs.clear();
         new SharedDatabasePreferences().clear();
+    }
+
+    private void clearTruststoreFromCustomCertificates() {
+        TrustStoreManager trustStoreManager = new TrustStoreManager(Path.of(defaults.get(TRUSTSTORE_PATH).toString()));
+        trustStoreManager.clearCustomCertificates();
     }
 
     /**
@@ -1121,7 +1140,7 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public JournalAbbreviationPreferences getJournalAbbreviationPreferences() {
-        return new JournalAbbreviationPreferences(getStringList(EXTERNAL_JOURNAL_LISTS), getGeneralPreferences().getDefaultEncoding());
+        return new JournalAbbreviationPreferences(getStringList(EXTERNAL_JOURNAL_LISTS), StandardCharsets.UTF_8);
     }
 
     @Override
@@ -1177,16 +1196,6 @@ public class JabRefPreferences implements PreferencesService {
 
     public String getPreviewStyle() {
         return get(PREVIEW_STYLE);
-    }
-
-    @Override
-    public boolean shouldWarnAboutDuplicatesForImport() {
-        return getBoolean(WARN_ABOUT_DUPLICATES_IN_INSPECTION);
-    }
-
-    @Override
-    public void setShouldWarnAboutDuplicatesForImport(boolean value) {
-        putBoolean(WARN_ABOUT_DUPLICATES_IN_INSPECTION, value);
     }
 
     @Override
@@ -1301,14 +1310,12 @@ public class JabRefPreferences implements PreferencesService {
         }
 
         generalPreferences = new GeneralPreferences(
-                Charset.forName(get(DEFAULT_ENCODING)),
                 getBoolean(BIBLATEX_DEFAULT_MODE) ? BibDatabaseMode.BIBLATEX : BibDatabaseMode.BIBTEX,
                 getBoolean(WARN_ABOUT_DUPLICATES_IN_INSPECTION),
                 getBoolean(CONFIRM_DELETE),
                 getBoolean(MEMORY_STICK_MODE),
                 getBoolean(SHOW_ADVANCED_HINTS));
 
-        EasyBind.listen(generalPreferences.defaultEncodingProperty(), (obs, oldValue, newValue) -> put(DEFAULT_ENCODING, newValue.name()));
         EasyBind.listen(generalPreferences.defaultBibDatabaseModeProperty(), (obs, oldValue, newValue) -> putBoolean(BIBLATEX_DEFAULT_MODE, (newValue == BibDatabaseMode.BIBLATEX)));
         EasyBind.listen(generalPreferences.isWarnAboutDuplicatesInInspectionProperty(), (obs, oldValue, newValue) -> putBoolean(WARN_ABOUT_DUPLICATES_IN_INSPECTION, newValue));
         EasyBind.listen(generalPreferences.confirmDeleteProperty(), (obs, oldValue, newValue) -> putBoolean(CONFIRM_DELETE, newValue));
@@ -1612,6 +1619,19 @@ public class JabRefPreferences implements PreferencesService {
         EasyBind.listen(proxyPreferences.passwordProperty(), (obs, oldValue, newValue) -> put(PROXY_PASSWORD, newValue));
 
         return proxyPreferences;
+    }
+
+    @Override
+    public SSLPreferences getSSLPreferences() {
+        if (Objects.nonNull(sslPreferences)) {
+            return sslPreferences;
+        }
+
+        sslPreferences = new SSLPreferences(
+                get(TRUSTSTORE_PATH)
+        );
+
+        return sslPreferences;
     }
 
     //*************************************************************************************************************
@@ -2164,16 +2184,6 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     @Override
-    public boolean shouldOpenLastFilesOnStartup() {
-        return getBoolean(OPEN_LAST_EDITED);
-    }
-
-    @Override
-    public void storeOpenLastFilesOnStartup(boolean openLastFilesOnStartup) {
-        putBoolean(OPEN_LAST_EDITED, openLastFilesOnStartup);
-    }
-
-    @Override
     public FieldContentFormatterPreferences getFieldContentParserPreferences() {
         return new FieldContentFormatterPreferences(
                 getStringList(NON_WRAPPABLE_FIELDS).stream().map(FieldFactory::parseField).collect(Collectors.toList()));
@@ -2185,22 +2195,6 @@ public class JabRefPreferences implements PreferencesService {
                 !getBoolean(DO_NOT_RESOLVE_STRINGS),
                 getStringList(RESOLVE_STRINGS_FOR_FIELDS).stream().map(FieldFactory::parseField).collect(Collectors.toList()),
                 getFieldContentParserPreferences());
-    }
-
-    @Override
-    public FileHistory getFileHistory() {
-        return new FileHistory(getStringList(RECENT_DATABASES).stream().map(Path::of).collect(Collectors.toList()));
-    }
-
-    @Override
-    public void storeFileHistory(FileHistory history) {
-        if (!history.isEmpty()) {
-            putStringList(RECENT_DATABASES, history.getHistory()
-                                                   .stream()
-                                                   .map(Path::toAbsolutePath)
-                                                   .map(Path::toString)
-                                                   .collect(Collectors.toList()));
-        }
     }
 
     @Override
@@ -2216,6 +2210,7 @@ public class JabRefPreferences implements PreferencesService {
                 get(IMPORT_FILENAMEPATTERN),
                 get(IMPORT_FILEDIRPATTERN),
                 getBoolean(DOWNLOAD_LINKED_FILES),
+                getBoolean(FULLTEXT_INDEX_LINKED_FILES),
                 Path.of(get(WORKING_DIRECTORY))
         );
 
@@ -2224,6 +2219,7 @@ public class JabRefPreferences implements PreferencesService {
         EasyBind.listen(filePreferences.fileNamePatternProperty(), (obs, oldValue, newValue) -> put(IMPORT_FILENAMEPATTERN, newValue));
         EasyBind.listen(filePreferences.fileDirectoryPatternProperty(), (obs, oldValue, newValue) -> put(IMPORT_FILEDIRPATTERN, newValue));
         EasyBind.listen(filePreferences.downloadLinkedFilesProperty(), (obs, oldValue, newValue) -> putBoolean(DOWNLOAD_LINKED_FILES, newValue));
+        EasyBind.listen(filePreferences.fulltextIndexLinkedFilesProperty(), (obs, oldValue, newValue) -> putBoolean(FULLTEXT_INDEX_LINKED_FILES, newValue));
         EasyBind.listen(filePreferences.workingDirectoryProperty(), (obs, oldValue, newValue) -> put(WORKING_DIRECTORY, newValue.toString()));
 
         return filePreferences;
@@ -2272,16 +2268,6 @@ public class JabRefPreferences implements PreferencesService {
         return autoLinkPreferences;
     }
 
-    @Override
-    public boolean shouldAutosave() {
-        return getBoolean(LOCAL_AUTO_SAVE);
-    }
-
-    @Override
-    public void storeShouldAutosave(boolean shouldAutosave) {
-        putBoolean(LOCAL_AUTO_SAVE, shouldAutosave);
-    }
-
     //*************************************************************************************************************
     // Import/Export preferences
     //*************************************************************************************************************
@@ -2293,14 +2279,18 @@ public class JabRefPreferences implements PreferencesService {
         }
 
         importExportPreferences = new ImportExportPreferences(
+                getBoolean(OPEN_LAST_EDITED),
                 get(NON_WRAPPABLE_FIELDS),
                 !getBoolean(DO_NOT_RESOLVE_STRINGS),
                 get(RESOLVE_STRINGS_FOR_FIELDS),
                 getBoolean(REFORMAT_FILE_ON_SAVE_AND_EXPORT),
                 Path.of(get(IMPORT_WORKING_DIRECTORY)),
                 get(LAST_USED_EXPORT),
-                Path.of(get(EXPORT_WORKING_DIRECTORY)));
+                Path.of(get(EXPORT_WORKING_DIRECTORY)),
+                getBoolean(LOCAL_AUTO_SAVE),
+                getBoolean(WARN_ABOUT_DUPLICATES_IN_INSPECTION));
 
+        EasyBind.listen(importExportPreferences.openLastEditedProperty(), (obs, oldValue, newValue) -> putBoolean(OPEN_LAST_EDITED, newValue));
         EasyBind.listen(importExportPreferences.nonWrappableFieldsProperty(), (obs, oldValue, newValue) -> put(NON_WRAPPABLE_FIELDS, newValue));
         EasyBind.listen(importExportPreferences.resolveStringsProperty(), (obs, oldValue, newValue) -> putBoolean(DO_NOT_RESOLVE_STRINGS, !newValue));
         EasyBind.listen(importExportPreferences.resolvableFieldsProperty(), (obs, oldValue, newValue) -> put(RESOLVE_STRINGS_FOR_FIELDS, newValue));
@@ -2308,6 +2298,8 @@ public class JabRefPreferences implements PreferencesService {
         EasyBind.listen(importExportPreferences.importWorkingDirectoryProperty(), (obs, oldValue, newValue) -> put(IMPORT_WORKING_DIRECTORY, newValue.toString()));
         EasyBind.listen(importExportPreferences.lastExportExtensionProperty(), (obs, oldValue, newValue) -> put(LAST_USED_EXPORT, newValue));
         EasyBind.listen(importExportPreferences.exportWorkingDirectoryProperty(), (obs, oldValue, newValue) -> put(EXPORT_WORKING_DIRECTORY, newValue.toString()));
+        EasyBind.listen(importExportPreferences.autoSaveProperty(), (obs, oldValue, newValue) -> putBoolean(LOCAL_AUTO_SAVE, newValue));
+        EasyBind.listen(importExportPreferences.warnAboutDuplicatesOnImportProperty(), (obs, oldValue, newValue) -> putBoolean(WARN_ABOUT_DUPLICATES_IN_INSPECTION, newValue));
 
         return importExportPreferences;
     }
@@ -2460,7 +2452,7 @@ public class JabRefPreferences implements PreferencesService {
                     .map(layout -> {
                         if (CitationStyle.isCitationStyleFile(layout)) {
                             return CitationStyle.createCitationStyleFromFile(layout)
-                                                .map(file -> (PreviewLayout) new CitationStylePreviewLayout(file))
+                                                .map(file -> (PreviewLayout) new CitationStylePreviewLayout(file, Globals.entryTypesManager))
                                                 .orElse(null);
                         } else {
                             return new TextBasedPreviewLayout(style, getLayoutFormatterPreferences(Globals.journalAbbreviationRepository));
@@ -2574,9 +2566,11 @@ public class JabRefPreferences implements PreferencesService {
                 getDouble(SIZE_X),
                 getDouble(SIZE_Y),
                 getBoolean(WINDOW_MAXIMISED),
-                getBoolean(OPEN_LAST_EDITED),
                 getStringList(LAST_EDITED),
                 Path.of(get(LAST_FOCUSED)),
+                getFileHistory(),
+                get(ID_ENTRY_GENERATOR),
+                DiffMode.parse(get(MERGE_ENTRIES_DIFF_MODE)),
                 getDouble(SIDE_PANE_WIDTH));
 
         EasyBind.listen(guiPreferences.positionXProperty(), (obs, oldValue, newValue) -> putDouble(POS_X, newValue.doubleValue()));
@@ -2584,7 +2578,6 @@ public class JabRefPreferences implements PreferencesService {
         EasyBind.listen(guiPreferences.sizeXProperty(), (obs, oldValue, newValue) -> putDouble(SIZE_X, newValue.doubleValue()));
         EasyBind.listen(guiPreferences.sizeYProperty(), (obs, oldValue, newValue) -> putDouble(SIZE_Y, newValue.doubleValue()));
         EasyBind.listen(guiPreferences.windowMaximisedProperty(), (obs, oldValue, newValue) -> putBoolean(WINDOW_MAXIMISED, newValue));
-        EasyBind.listen(guiPreferences.openLastEditedProperty(), (obs, oldValue, newValue) -> putBoolean(OPEN_LAST_EDITED, newValue));
         guiPreferences.getLastFilesOpened().addListener((InvalidationListener) change ->
                 putStringList(LAST_EDITED, guiPreferences.getLastFilesOpened()));
         EasyBind.listen(guiPreferences.lastFocusedFileProperty(), (obs, oldValue, newValue) -> {
@@ -2594,9 +2587,28 @@ public class JabRefPreferences implements PreferencesService {
                 remove(LAST_EDITED);
             }
         });
+        guiPreferences.getFileHistory().getHistory().addListener((InvalidationListener) change -> storeFileHistory(guiPreferences.getFileHistory()));
+        EasyBind.listen(guiPreferences.lastSelectedIdBasedFetcherProperty(), (obs, oldValue, newValue) -> put(ID_ENTRY_GENERATOR, newValue));
+        EasyBind.listen(guiPreferences.mergeDiffModeProperty(), (obs, oldValue, newValue) -> put(MERGE_ENTRIES_DIFF_MODE, newValue.name()));
         EasyBind.listen(guiPreferences.sidePaneWidthProperty(), (obs, oldValue, newValue) -> putDouble(SIDE_PANE_WIDTH, newValue.doubleValue()));
 
         return guiPreferences;
+    }
+
+    private FileHistory getFileHistory() {
+        return new FileHistory(getStringList(RECENT_DATABASES).stream()
+                                                              .map(Path::of)
+                                                              .collect(Collectors.toList()));
+    }
+
+    private void storeFileHistory(FileHistory history) {
+        if (!history.isEmpty()) {
+            putStringList(RECENT_DATABASES, history.getHistory()
+                                                   .stream()
+                                                   .map(Path::toAbsolutePath)
+                                                   .map(Path::toString)
+                                                   .collect(Collectors.toList()));
+        }
     }
 
     @Override
@@ -2761,16 +2773,6 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     @Override
-    public Optional<String> getMergeDiffMode() {
-        return getAsOptional(MERGE_ENTRIES_DIFF_MODE);
-    }
-
-    @Override
-    public void storeMergeDiffMode(String diffMode) {
-        put(MERGE_ENTRIES_DIFF_MODE, diffMode);
-    }
-
-    @Override
     public MrDlibPreferences getMrDlibPreferences() {
         if (Objects.nonNull(mrDlibPreferences)) {
             return mrDlibPreferences;
@@ -2788,16 +2790,6 @@ public class JabRefPreferences implements PreferencesService {
         EasyBind.listen(mrDlibPreferences.sendTimezoneProperty(), (obs, oldValue, newValue) -> putBoolean(SEND_TIMEZONE_DATA, newValue));
 
         return mrDlibPreferences;
-    }
-
-    @Override
-    public String getIdBasedFetcherForEntryGenerator() {
-        return get(ID_ENTRY_GENERATOR);
-    }
-
-    @Override
-    public void storeIdBasedFetcherForEntryGenerator(String fetcherName) {
-        put(ID_ENTRY_GENERATOR, fetcherName);
     }
 
     @Override

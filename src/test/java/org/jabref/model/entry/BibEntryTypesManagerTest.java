@@ -172,7 +172,7 @@ class BibEntryTypesManagerTest {
                                                    Collections.emptySet());
 
         entryTypesManager.addCustomOrModifiedType(overwrittenStandardType, mode);
-        assertEquals(Collections.singletonList(overwrittenStandardType), entryTypesManager.getAllTypes(mode).stream().filter(t->t.getType().getName().equals("article")).collect(Collectors.toList()));
+        assertEquals(Collections.singletonList(overwrittenStandardType), entryTypesManager.getAllTypes(mode).stream().filter(t -> t.getType().getName().equals("article")).collect(Collectors.toList()));
     }
 
     @ParameterizedTest

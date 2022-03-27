@@ -4,8 +4,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
 import java.net.URISyntaxException;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
@@ -62,7 +60,7 @@ public class EndnoteImporterTest {
 
         for (String string : list) {
             Path file = Path.of(EndnoteImporterTest.class.getResource(string).toURI());
-            assertTrue(importer.isRecognizedFormat(file, StandardCharsets.UTF_8));
+            assertTrue(importer.isRecognizedFormat(file));
         }
     }
 
@@ -74,14 +72,14 @@ public class EndnoteImporterTest {
 
         for (String string : list) {
             Path file = Path.of(EndnoteImporterTest.class.getResource(string).toURI());
-            assertFalse(importer.isRecognizedFormat(file, Charset.defaultCharset()));
+            assertFalse(importer.isRecognizedFormat(file));
         }
     }
 
     @Test
     public void testImportEntries0() throws IOException, URISyntaxException {
         Path file = Path.of(EndnoteImporterTest.class.getResource("Endnote.entries.enw").toURI());
-        List<BibEntry> bibEntries = importer.importDatabase(file, StandardCharsets.UTF_8).getDatabase().getEntries();
+        List<BibEntry> bibEntries = importer.importDatabase(file).getDatabase().getEntries();
 
         assertEquals(5, bibEntries.size());
 
@@ -141,7 +139,7 @@ public class EndnoteImporterTest {
     @Test
     public void testImportEntriesBookExample() throws IOException, URISyntaxException {
         Path file = Path.of(EndnoteImporterTest.class.getResource("Endnote.book.example.enw").toURI());
-        List<BibEntry> bibEntries = importer.importDatabase(file, StandardCharsets.UTF_8).getDatabase().getEntries();
+        List<BibEntry> bibEntries = importer.importDatabase(file).getDatabase().getEntries();
 
         BibEntry entry = bibEntries.get(0);
 

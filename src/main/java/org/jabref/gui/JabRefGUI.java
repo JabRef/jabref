@@ -128,7 +128,7 @@ public class JabRefGUI {
 
     private void openDatabases() {
         // If the option is enabled, open the last edited libraries, if any.
-        if (!isBlank && preferencesService.getGuiPreferences().shouldOpenLastEdited()) {
+        if (!isBlank && preferencesService.getImportExportPreferences().shouldOpenLastEdited()) {
             openLastEditedDatabases();
         }
 
@@ -279,7 +279,6 @@ public class JabRefGUI {
             try {
                 parsedDatabase = OpenDatabase.loadDatabase(
                         dbFile,
-                        preferencesService.getGeneralPreferences(),
                         preferencesService.getImportFormatPreferences(),
                         Globals.getFileUpdateMonitor());
             } catch (IOException ex) {

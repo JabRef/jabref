@@ -24,6 +24,7 @@ public class AdvancedCiteDialogView extends BaseDialog<AdvancedCiteDialogViewMod
         ViewLoader.view(this)
                   .load()
                   .setAsDialogPane(this);
+
         setResultConverter(btn -> {
             if (btn == ButtonType.OK) {
                 return viewModel;

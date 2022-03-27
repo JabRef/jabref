@@ -76,18 +76,17 @@ public class ImportHandler {
         return linker;
     }
 
-    public BackgroundTask<List<ImportFilesResultItemViewModel>> importFilesInBackground(List<Path> files) {
+    public BackgroundTask<List<ImportFilesResultItemViewModel>> importFilesInBackground(final List<Path> files) {
         return new BackgroundTask<>() {
             private int counter;
-            private List<BibEntry> entriesToAdd;
             private final List<ImportFilesResultItemViewModel> results = new ArrayList<>();
 
             @Override
             protected List<ImportFilesResultItemViewModel> call() {
                 counter = 1;
                 CompoundEdit ce = new CompoundEdit();
-                for (Path file: files) {
-                    entriesToAdd = Collections.emptyList();
+                for (final Path file : files) {
+                    final List<BibEntry> entriesToAdd = new ArrayList<>();
 
                     if (isCanceled()) {
                         break;
@@ -95,7 +94,7 @@ public class ImportHandler {
 
                     DefaultTaskExecutor.runInJavaFXThread(() -> {
                         updateMessage(Localization.lang("Processing file %0", file.getFileName()));
-                        updateProgress(counter, files.size() - 1);
+                        updateProgress(counter, files.size() - 1d);
                     });
 
                     try {
@@ -108,10 +107,10 @@ public class ImportHandler {
                             }
 
                             if (!pdfEntriesInFile.isEmpty()) {
-                                entriesToAdd = pdfEntriesInFile;
+                                entriesToAdd.addAll(pdfEntriesInFile);
                                 addResultToList(file, true, Localization.lang("Importing using extracted PDF data"));
                             } else {
-                                entriesToAdd = Collections.singletonList(createEmptyEntryWithLink(file));
+                                entriesToAdd.add(createEmptyEntryWithLink(file));
                                 addResultToList(file, false, Localization.lang("No metadata found. Creating empty entry with file link"));
                             }
                         } else if (FileUtil.isBibFile(file)) {
@@ -120,10 +119,10 @@ public class ImportHandler {
                                 addResultToList(file, false, bibtexParserResult.getErrorMessage());
                             }
 
-                            entriesToAdd = bibtexParserResult.getDatabaseContext().getEntries();
+                            entriesToAdd.addAll(bibtexParserResult.getDatabaseContext().getEntries());
                             addResultToList(file, false, Localization.lang("Importing bib entry"));
                         } else {
-                            entriesToAdd = Collections.singletonList(createEmptyEntryWithLink(file));
+                            entriesToAdd.add(createEmptyEntryWithLink(file));
                             addResultToList(file, false, Localization.lang("No BibTeX data found. Creating empty entry with file link"));
                         }
                     } catch (IOException ex) {

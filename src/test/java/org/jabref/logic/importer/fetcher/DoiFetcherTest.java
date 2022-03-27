@@ -34,7 +34,7 @@ public class DoiFetcherTest {
         bibEntryBurd2011.setType(StandardEntryType.Book);
         bibEntryBurd2011.setCitationKey("Burd_2011");
         bibEntryBurd2011.setField(StandardField.TITLE, "Java{\\textregistered} For Dummies{\\textregistered}");
-        bibEntryBurd2011.setField(StandardField.PUBLISHER, "Wiley Publishing, Inc.");
+        bibEntryBurd2011.setField(StandardField.PUBLISHER, "Wiley");
         bibEntryBurd2011.setField(StandardField.YEAR, "2011");
         bibEntryBurd2011.setField(StandardField.AUTHOR, "Barry Burd");
         bibEntryBurd2011.setField(StandardField.MONTH, "jul");

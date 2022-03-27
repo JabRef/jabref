@@ -17,25 +17,26 @@ import com.sun.star.text.XTextRange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-// was StorageBaseRefMark
-
 class NamedRangeReferenceMark implements NamedRange {
 
     private static final String ZERO_WIDTH_SPACE = "\u200b";
 
     // for debugging we may want visible bracket
     private static final boolean
-    REFERENCE_MARK_USE_INVISIBLE_BRACKETS = true; // !debug;
+            REFERENCE_MARK_USE_INVISIBLE_BRACKETS = true; // !debug;
 
     public static final String
-    REFERENCE_MARK_LEFT_BRACKET = REFERENCE_MARK_USE_INVISIBLE_BRACKETS ? ZERO_WIDTH_SPACE : "<";
+            REFERENCE_MARK_LEFT_BRACKET = REFERENCE_MARK_USE_INVISIBLE_BRACKETS ? ZERO_WIDTH_SPACE : "<";
 
     public static final String
-    REFERENCE_MARK_RIGHT_BRACKET = REFERENCE_MARK_USE_INVISIBLE_BRACKETS ? ZERO_WIDTH_SPACE : ">";
+            REFERENCE_MARK_RIGHT_BRACKET = REFERENCE_MARK_USE_INVISIBLE_BRACKETS ? ZERO_WIDTH_SPACE : ">";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(NamedRangeReferenceMark.class);
 
-    private String rangeId; /* reference mark name */
+    /**
+     * reference mark name
+     */
+    private final String rangeId;
 
     private NamedRangeReferenceMark(String rangeId) {
         this.rangeId = rangeId;
@@ -46,20 +47,15 @@ class NamedRangeReferenceMark implements NamedRange {
     }
 
     /**
-     *  Insert {@code n} spaces in a way that reference marks just before or just after the cursor
-     *  are not affected.
+     * Insert {@code n} spaces in a way that reference marks just before or just after the cursor are not affected.
+     * <p>
+     * This is based on the observation, that starting two new paragraphs separates us from reference marks on either side.
+     * <p>
+     * The pattern used is: {@code safeInsertSpaces(n): para, para, left, space(n), right-delete, left(n), left-delete}
      *
-     *  This is based on the observation, that starting two new paragraphs separates us from
-     *  reference marks on either side.
-     *
-     *  The pattern used is:
-     *  {@code safeInsertSpaces(n): para, para, left, space(n), right-delete, left(n), left-delete}
-     *
-     *  @param position Where to insert (at position.getStart())
-     *  @param numSpaces  Number of spaces to insert.
-     *
-     *  @return a new cursor, covering the just-inserted spaces.
-     *
+     * @param position  Where to insert (at position.getStart())
+     * @param numSpaces Number of spaces to insert.
+     * @return a new cursor, covering the just-inserted spaces.
      */
     private static XTextCursor safeInsertSpacesBetweenReferenceMarks(XTextRange position, int numSpaces) {
         // Start with an empty cursor at position.getStart();
@@ -82,8 +78,8 @@ class NamedRangeReferenceMark implements NamedRange {
                                              XTextCursor position,
                                              boolean insertSpaceAfter,
                                              boolean withoutBrackets)
-        throws
-        CreationException {
+            throws
+            CreationException {
 
         // The cursor we received: we push it before us.
         position.collapseToEnd();
@@ -101,8 +97,8 @@ class NamedRangeReferenceMark implements NamedRange {
         final String left = NamedRangeReferenceMark.REFERENCE_MARK_LEFT_BRACKET;
         final String right = NamedRangeReferenceMark.REFERENCE_MARK_RIGHT_BRACKET;
         String bracketedContent = (withoutBrackets
-                                   ? ""
-                                   : left + right);
+                ? ""
+                : left + right);
 
         cursor.getText().insertString(cursor, bracketedContent, true);
 
@@ -123,8 +119,8 @@ class NamedRangeReferenceMark implements NamedRange {
                                           XTextCursor position,
                                           boolean insertSpaceAfter,
                                           boolean withoutBrackets)
-        throws
-        CreationException {
+            throws
+            CreationException {
 
         createReprInDocument(doc, refMarkName, position, insertSpaceAfter, withoutBrackets);
         return new NamedRangeReferenceMark(refMarkName);
@@ -134,23 +130,23 @@ class NamedRangeReferenceMark implements NamedRange {
      * @return Optional.empty if there is no corresponding range.
      */
     static Optional<NamedRangeReferenceMark> getFromDocument(XTextDocument doc, String refMarkName)
-        throws
-        NoDocumentException,
-        WrappedTargetException {
+            throws
+            NoDocumentException,
+            WrappedTargetException {
         return (UnoReferenceMark.getAnchor(doc, refMarkName)
-                .map(e -> new NamedRangeReferenceMark(refMarkName)));
+                                .map(e -> new NamedRangeReferenceMark(refMarkName)));
     }
 
     /**
      * Remove it from the document.
-     *
+     * <p>
      * See: removeCitationGroups
      */
     @Override
     public void removeFromDocument(XTextDocument doc)
-        throws
-        WrappedTargetException,
-        NoDocumentException {
+            throws
+            WrappedTargetException,
+            NoDocumentException {
         UnoReferenceMark.removeIfExists(doc, this.getRangeName());
     }
 
@@ -160,34 +156,27 @@ class NamedRangeReferenceMark implements NamedRange {
     }
 
     /**
-     *
-     * @return Optional.empty if the reference mark is missing.
-     *
-     * See: UnoReferenceMark.getAnchor
+     * @return Optional.empty if the reference mark is missing. See: UnoReferenceMark.getAnchor
      */
     @Override
     public Optional<XTextRange> getMarkRange(XTextDocument doc)
-        throws
-        NoDocumentException,
-        WrappedTargetException {
+            throws
+            NoDocumentException,
+            WrappedTargetException {
         String name = this.getRangeName();
         return UnoReferenceMark.getAnchor(doc, name);
     }
 
     /**
-     * Cursor for the reference marks as is, not prepared for filling, but does not need
-     * cleanFillCursor either.
+     * Cursor for the reference marks as is, not prepared for filling, but does not need cleanFillCursor either.
      *
-     * @return Optional.empty() if reference mark is missing from the document,
-     *                          otherwise an XTextCursor for getMarkRange
-     *
-     * See: getRawCursorForCitationGroup
+     * @return Optional.empty() if reference mark is missing from the document, otherwise an XTextCursor for getMarkRange See: getRawCursorForCitationGroup
      */
     @Override
     public Optional<XTextCursor> getRawCursor(XTextDocument doc)
-        throws
-        NoDocumentException,
-        WrappedTargetException {
+            throws
+            NoDocumentException,
+            WrappedTargetException {
 
         String name = this.getRangeName();
 
@@ -210,10 +199,10 @@ class NamedRangeReferenceMark implements NamedRange {
      */
     @Override
     public XTextCursor getFillCursor(XTextDocument doc)
-        throws
-        NoDocumentException,
-        WrappedTargetException,
-        CreationException {
+            throws
+            NoDocumentException,
+            WrappedTargetException,
+            CreationException {
 
         String name = this.getRangeName();
 
@@ -357,8 +346,8 @@ class NamedRangeReferenceMark implements NamedRange {
             alpha.goLeft(leftLength, true);
             if (!left.equals(alpha.getString())) {
                 String msg = String.format("checkFillCursor:"
-                                           + " ('%s') is not prefixed with REFERENCE_MARK_LEFT_BRACKET, has '%s'",
-                                           cursor.getString(), alpha.getString());
+                                + " ('%s') is not prefixed with REFERENCE_MARK_LEFT_BRACKET, has '%s'",
+                        cursor.getString(), alpha.getString());
                 throw new IllegalStateException(msg);
             }
         }
@@ -369,24 +358,23 @@ class NamedRangeReferenceMark implements NamedRange {
             omega.goRight(rightLength, true);
             if (!right.equals(omega.getString())) {
                 String msg = String.format("checkFillCursor:"
-                                           + " ('%s') is not followed by REFERENCE_MARK_RIGHT_BRACKET, has '%s'",
-                                           cursor.getString(), omega.getString());
+                                + " ('%s') is not followed by REFERENCE_MARK_RIGHT_BRACKET, has '%s'",
+                        cursor.getString(), omega.getString());
                 throw new IllegalStateException(msg);
             }
         }
     }
 
     /**
-     * Remove brackets, but if the result would become empty, leave them; if the result would be a
-     * single characer, leave the left bracket.
-     *
+     * Remove brackets, but if the result would become empty, leave them; if the result would be a single characer, leave the left bracket.
+     * <p>
      * See: cleanFillCursorForCitationGroup
      */
     @Override
     public void cleanFillCursor(XTextDocument doc)
-        throws
-        NoDocumentException,
-        WrappedTargetException {
+            throws
+            NoDocumentException,
+            WrappedTargetException {
 
         // alwaysRemoveBrackets : full compatibility with JabRef 5.2: brackets are temporary, only
         // exist between getFillCursor and cleanFillCursor.
@@ -422,12 +410,12 @@ class NamedRangeReferenceMark implements NamedRange {
         }
 
         boolean removeRight = ((contentLength >= 1)
-                               || ((contentLength == 0) && removeBracketsFromEmpty)
-                               || alwaysRemoveBrackets);
+                || ((contentLength == 0) && removeBracketsFromEmpty)
+                || alwaysRemoveBrackets);
 
         boolean removeLeft = ((contentLength >= 2)
-                              || ((contentLength == 0) && removeBracketsFromEmpty)
-                              || alwaysRemoveBrackets);
+                || ((contentLength == 0) && removeBracketsFromEmpty)
+                || alwaysRemoveBrackets);
 
         if (removeRight) {
             XTextCursor omega = full.getText().createTextCursorByRange(full);

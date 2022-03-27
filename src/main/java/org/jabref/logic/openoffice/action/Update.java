@@ -21,10 +21,7 @@ import com.sun.star.text.XTextDocument;
  */
 public class Update {
 
-    static final boolean USE_LOCK_CONTROLLERS = true;
-    
     private Update() {
-        /**/
     }
 
     /**
@@ -37,17 +34,19 @@ public class Update {
                                                FunctionalTextViewCursor fcursor,
                                                boolean doUpdateBibliography,
                                                boolean alwaysAddCitedOnPages)
-        throws
-        CreationException,
-        NoDocumentException,
-        WrappedTargetException,
-        com.sun.star.lang.IllegalArgumentException {
+            throws
+            CreationException,
+            NoDocumentException,
+            WrappedTargetException,
+            com.sun.star.lang.IllegalArgumentException {
+
+        final boolean useLockControllers = true;
 
         frontend.imposeGlobalOrder(doc, fcursor);
         OOProcess.produceCitationMarkers(frontend.citationGroups, databases, style);
 
         try {
-            if (USE_LOCK_CONTROLLERS) {
+            if (useLockControllers) {
                 UnoScreenRefresh.lockControllers(doc);
             }
 
@@ -55,15 +54,15 @@ public class Update {
 
             if (doUpdateBibliography) {
                 UpdateBibliography.rebuildBibTextSection(doc,
-                                                         frontend,
-                                                         frontend.citationGroups.getBibliography().get(),
-                                                         style,
-                                                         alwaysAddCitedOnPages);
+                        frontend,
+                        frontend.citationGroups.getBibliography().get(),
+                        style,
+                        alwaysAddCitedOnPages);
             }
 
             return frontend.citationGroups.getUnresolvedKeys();
         } finally {
-            if (USE_LOCK_CONTROLLERS && UnoScreenRefresh.hasControllersLocked(doc)) {
+            if (useLockControllers && UnoScreenRefresh.hasControllersLocked(doc)) {
                 UnoScreenRefresh.unlockControllers(doc);
             }
         }
@@ -97,37 +96,36 @@ public class Update {
                                                    OOBibStyle style,
                                                    FunctionalTextViewCursor fcursor,
                                                    SyncOptions syncOptions)
-        throws
-        CreationException,
-        NoDocumentException,
-        WrappedTargetException,
-        com.sun.star.lang.IllegalArgumentException {
+            throws
+            CreationException,
+            NoDocumentException,
+            WrappedTargetException,
+            com.sun.star.lang.IllegalArgumentException {
 
         return Update.updateDocument(doc,
-                                     frontend,
-                                     syncOptions.databases,
-                                     style,
-                                     fcursor,
-                                     syncOptions.updateBibliography,
-                                     syncOptions.alwaysAddCitedOnPages);
+                frontend,
+                syncOptions.databases,
+                style,
+                fcursor,
+                syncOptions.updateBibliography,
+                syncOptions.alwaysAddCitedOnPages);
     }
 
-    /*
+    /**
      * Reread document before sync
      */
     public static List<String> resyncDocument(XTextDocument doc,
                                               OOBibStyle style,
                                               FunctionalTextViewCursor fcursor,
                                               SyncOptions syncOptions)
-        throws
-        CreationException,
-        NoDocumentException,
-        WrappedTargetException,
-        com.sun.star.lang.IllegalArgumentException {
+            throws
+            CreationException,
+            NoDocumentException,
+            WrappedTargetException,
+            com.sun.star.lang.IllegalArgumentException {
 
         OOFrontend frontend = new OOFrontend(doc);
 
         return Update.synchronizeDocument(doc, frontend, style, fcursor, syncOptions);
     }
-
 }

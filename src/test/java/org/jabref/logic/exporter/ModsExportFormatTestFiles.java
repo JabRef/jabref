@@ -67,10 +67,10 @@ public class ModsExportFormatTestFiles {
     public final void testPerformExport(String filename) throws Exception {
         importFile = Path.of(ModsExportFormatTestFiles.class.getResource(filename).toURI());
         String xmlFileName = filename.replace(".bib", ".xml");
-        List<BibEntry> entries = bibtexImporter.importDatabase(importFile, charset).getDatabase().getEntries();
+        List<BibEntry> entries = bibtexImporter.importDatabase(importFile).getDatabase().getEntries();
         Path expectedFile = Path.of(ModsExportFormatTestFiles.class.getResource(xmlFileName).toURI());
 
-        exporter.export(databaseContext, exportedFile, charset, entries);
+        exporter.export(databaseContext, exportedFile, entries);
 
         assertEquals(
                 String.join("\n", Files.readAllLines(expectedFile)),
@@ -81,9 +81,9 @@ public class ModsExportFormatTestFiles {
     @MethodSource("fileNames")
     public final void testExportAsModsAndThenImportAsMods(String filename) throws Exception {
         importFile = Path.of(ModsExportFormatTestFiles.class.getResource(filename).toURI());
-        List<BibEntry> entries = bibtexImporter.importDatabase(importFile, charset).getDatabase().getEntries();
+        List<BibEntry> entries = bibtexImporter.importDatabase(importFile).getDatabase().getEntries();
 
-        exporter.export(databaseContext, exportedFile, charset, entries);
+        exporter.export(databaseContext, exportedFile, entries);
         BibEntryAssert.assertEquals(entries, exportedFile, modsImporter);
     }
 
@@ -94,9 +94,9 @@ public class ModsExportFormatTestFiles {
         String xmlFileName = filename.replace(".bib", ".xml");
         Path xmlFile = Path.of(ModsExportFormatTestFiles.class.getResource(xmlFileName).toURI());
 
-        List<BibEntry> entries = modsImporter.importDatabase(xmlFile, charset).getDatabase().getEntries();
+        List<BibEntry> entries = modsImporter.importDatabase(xmlFile).getDatabase().getEntries();
 
-        exporter.export(databaseContext, exportedFile, charset, entries);
+        exporter.export(databaseContext, exportedFile, entries);
 
         assertEquals(
                 String.join("\n", Files.readAllLines(xmlFile)),

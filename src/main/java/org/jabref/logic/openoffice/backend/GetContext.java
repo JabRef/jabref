@@ -12,21 +12,17 @@ public class GetContext {
     private static final Logger LOGGER = LoggerFactory.getLogger(GetContext.class);
 
     private GetContext() {
-        // Just to hide the public constructor
     }
 
     /**
-     *  Get the text belonging to cursor with up to
-     *  charBefore and charAfter characters of context.
+     * Get the text belonging to cursor with up to charBefore and charAfter characters of context.
+     * <p>
+     * The actual context may be smaller than requested.
      *
-     *  The actual context may be smaller than requested.
-     *
-     *  @param cursor
-     *  @param charBefore Number of characters requested.
-     *  @param charAfter  Number of characters requested.
-     *  @param htmlMarkup If true, the text belonging to the reference mark is surrounded by bold
-     *                    html tag.
-     *
+     * @param cursor
+     * @param charBefore Number of characters requested.
+     * @param charAfter  Number of characters requested.
+     * @param htmlMarkup If true, the text belonging to the reference mark is surrounded by bold html tag.
      */
     public static String getCursorStringWithContext(XTextCursor cursor,
                                                     int charBefore,
@@ -43,7 +39,7 @@ public class GetContext {
                 // If we are close to charBefore and see a space, then cut here. Might avoid cutting
                 // a word in half.
                 if ((i >= (charBefore - flex))
-                    && Character.isWhitespace(cursor.getString().charAt(0))) {
+                        && Character.isWhitespace(cursor.getString().charAt(0))) {
                     break;
                 }
             } catch (IndexOutOfBoundsException ex) {
@@ -72,10 +68,9 @@ public class GetContext {
         String result = cursor.getString();
         if (htmlMarkup) {
             result = (result.substring(0, addedBefore)
-                      + "<b>" + citPart + "</b>"
-                      + result.substring(lengthWithBefore));
+                    + "<b>" + citPart + "</b>"
+                    + result.substring(lengthWithBefore));
         }
         return result.trim();
     }
-
 }

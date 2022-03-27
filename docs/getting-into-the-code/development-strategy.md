@@ -45,4 +45,4 @@ JabRef 3.x is the effort to try to fix a lot of these issues. Much has been achi
 
 We currently use two approaches: a) rewrite and put under test to improve quality and fix bugs, b) increase code quality. This leads to pull requests being reviewed by two JabRef developers to ensure i) code quality, ii) fit within the JabRef architecture, iii) high test coverage.
 
-Code quality includes using latest Java8 features, but also readability.
+Code quality includes using latest Java features, but also readability.

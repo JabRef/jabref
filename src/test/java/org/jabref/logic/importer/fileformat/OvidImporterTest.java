@@ -3,7 +3,6 @@ package org.jabref.logic.importer.fileformat;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
@@ -83,14 +82,14 @@ public class OvidImporterTest {
     @Test
     public void testImportEmpty() throws IOException, URISyntaxException {
         Path file = Path.of(OvidImporter.class.getResource("Empty.txt").toURI());
-        List<BibEntry> entries = importer.importDatabase(file, StandardCharsets.UTF_8).getDatabase().getEntries();
+        List<BibEntry> entries = importer.importDatabase(file).getDatabase().getEntries();
         assertEquals(Collections.emptyList(), entries);
     }
 
     @Test
     public void testImportEntries1() throws IOException, URISyntaxException {
         Path file = Path.of(OvidImporter.class.getResource("OvidImporterTest1.txt").toURI());
-        List<BibEntry> entries = importer.importDatabase(file, StandardCharsets.UTF_8).getDatabase().getEntries();
+        List<BibEntry> entries = importer.importDatabase(file).getDatabase().getEntries();
         assertEquals(5, entries.size());
 
         BibEntry entry = entries.get(0);
@@ -143,7 +142,7 @@ public class OvidImporterTest {
     @Test
     public void testImportEntries2() throws IOException, URISyntaxException {
         Path file = Path.of(OvidImporter.class.getResource("OvidImporterTest2Invalid.txt").toURI());
-        List<BibEntry> entries = importer.importDatabase(file, StandardCharsets.UTF_8).getDatabase().getEntries();
+        List<BibEntry> entries = importer.importDatabase(file).getDatabase().getEntries();
         assertEquals(Collections.emptyList(), entries);
     }
 
@@ -153,7 +152,7 @@ public class OvidImporterTest {
         for (int n = 3; n <= 7; n++) {
             Path file = Path.of(OvidImporter.class.getResource("OvidImporterTest" + n + ".txt").toURI());
             try (InputStream nis = OvidImporter.class.getResourceAsStream("OvidImporterTestBib" + n + ".bib")) {
-                List<BibEntry> entries = importer.importDatabase(file, StandardCharsets.UTF_8).getDatabase()
+                List<BibEntry> entries = importer.importDatabase(file).getDatabase()
                                                  .getEntries();
                 assertNotNull(entries);
                 assertEquals(1, entries.size());
