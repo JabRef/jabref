@@ -178,37 +178,40 @@ public class ImportHandler {
     }
 
     public void importEntryWithDuplicateCheck(BibDatabaseContext bibDatabaseContext, BibEntry entry) {
-
         ImportCleanup cleanup = new ImportCleanup(bibDatabaseContext.getMode());
-        cleanup.doPostCleanup(entry);
+        BibEntry cleanedEntry = cleanup.doPostCleanup(entry);
+        BibEntry entryToInsert = cleanedEntry;
+
         Optional<BibEntry> duplicate = new DuplicateCheck(Globals.entryTypesManager).containsDuplicate(bibDatabaseContext.getDatabase(), entry, bibDatabaseContext.getMode());
         if (duplicate.isPresent()) {
             DuplicateResolverDialog dialog = new DuplicateResolverDialog(entry, duplicate.get(), DuplicateResolverDialog.DuplicateResolverType.IMPORT_CHECK, bibDatabaseContext, stateManager);
             switch (dialogService.showCustomDialogAndWait(dialog).orElse(DuplicateResolverDialog.DuplicateResolverResult.BREAK)) {
                 case KEEP_LEFT:
                     bibDatabaseContext.getDatabase().removeEntry(duplicate.get());
-                    bibDatabaseContext.getDatabase().insertEntry(entry);
                     break;
                 case KEEP_BOTH:
-                    bibDatabaseContext.getDatabase().insertEntry(entry);
                     break;
                 case KEEP_MERGE:
                     bibDatabaseContext.getDatabase().removeEntry(duplicate.get());
-                    bibDatabaseContext.getDatabase().insertEntry(dialog.getMergedEntry());
+                    entryToInsert = dialog.getMergedEntry();
                     break;
                 default:
                     // Do nothing
                     break;
             }
-        } else {
-            // Regenerate CiteKey of imported BibEntry
-
-            // Generate citation keys
-            if (preferencesService.getImporterPreferences().isGenerateNewKeyOnImport()) {
-                generateKeys(List.of(entry));
-            }
-            bibDatabaseContext.getDatabase().insertEntry(entry);
         }
+        // Regenerate CiteKey of imported BibEntry
+        if (preferencesService.getImporterPreferences().isGenerateNewKeyOnImport()) {
+            generateKeys(List.of(entryToInsert));
+        }
+        bibDatabaseContext.getDatabase().insertEntry(entryToInsert);
+
+        // Set owner/timestamp
+        UpdateField.setAutomaticFields(List.of(entryToInsert),
+                                       preferencesService.getOwnerPreferences(),
+                                       preferencesService.getTimestampPreferences());
+
+        addToGroups(List.of(entry), stateManager.getSelectedGroup(bibdatabase));
     }
 
 

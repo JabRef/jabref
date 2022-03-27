@@ -3,9 +3,12 @@ package org.jabref.gui.importer;
 import java.util.Optional;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.Globals;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
+import org.jabref.gui.externalfiles.ImportHandler;
+import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.JabRefException;
@@ -40,6 +43,7 @@ public class GenerateEntryFromIdAction extends SimpleCommand {
 
     @Override
     public void execute() {
+
         BackgroundTask<Optional<BibEntry>> backgroundTask = searchAndImportEntryInBackground();
         backgroundTask.titleProperty().set(Localization.lang("Import by ID"));
         backgroundTask.showToUser(true);
@@ -59,13 +63,13 @@ public class GenerateEntryFromIdAction extends SimpleCommand {
             Optional<BibEntry> result = bibEntry;
             if (result.isPresent()) {
                 final BibEntry entry = result.get();
-
+                ImportHandler handler = new ImportHandler(libraryTab.getBibDatabaseContext(), ExternalFileTypes.getInstance(), preferencesService, Globals.getFileUpdateMonitor(), libraryTab.getUndoManager(), stateManager, dialogService);
+                handler.importEntryWithDuplicateCheck(libraryTab.getBibDatabaseContext(), entry);
             } else {
                 dialogService.notify("No entry found or import canceled");
             }
 
             entryFromIdPopOver.hide();
-
         });
 
         /*
