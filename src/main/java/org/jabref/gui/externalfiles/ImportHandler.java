@@ -214,7 +214,6 @@ public class ImportHandler {
         addToGroups(List.of(entry), stateManager.getSelectedGroup(bibdatabase));
     }
 
-
     private void addToGroups(List<BibEntry> entries, Collection<GroupTreeNode> groups) {
         for (GroupTreeNode node : groups) {
             if (node.getGroup() instanceof GroupEntryChanger entryChanger) {

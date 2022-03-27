@@ -306,8 +306,8 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         // Find entries in clipboard
         List<BibEntry> entriesToAdd = Globals.getClipboardManager().extractData();
 
-        for(BibEntry entry: entriesToAdd) {
-           importHandler.importEntryWithDuplicateCheck(database, entry);
+        for (BibEntry entry : entriesToAdd) {
+            importHandler.importEntryWithDuplicateCheck(database, entry);
         }
         if (!entriesToAdd.isEmpty()) {
             this.requestFocus();
