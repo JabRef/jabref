@@ -44,7 +44,7 @@ class ZbMATHTest {
         donaldsonEntry.setField(StandardField.TITLE, "An application of gauge theory to four dimensional topology");
         donaldsonEntry.setField(StandardField.VOLUME, "18");
         donaldsonEntry.setField(StandardField.YEAR, "1983");
-        donaldsonEntry.setField(new UnknownField("zbl"), "0507.57010");
+        donaldsonEntry.setField(StandardField.ZBL_NUMBER, "0507.57010");
         donaldsonEntry.setField(new UnknownField("zbmath"), "3800580");
     }
 
