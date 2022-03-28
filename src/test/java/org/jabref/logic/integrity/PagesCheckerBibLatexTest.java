@@ -28,6 +28,11 @@ class PagesCheckerBibLatexTest {
     }
 
     @Test
+    void rejectsHexNumber() {
+        assertNotEquals(Optional.empty(), checker.checkValue("777e23"));
+    }
+
+    @Test
     void acceptsSinglePageRange() {
         assertEquals(Optional.empty(), checker.checkValue("12-15"));
     }

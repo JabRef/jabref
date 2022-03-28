@@ -10,6 +10,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import org.jabref.logic.formatter.bibtexfields.RemoveNewlinesFormatter;
+import org.jabref.logic.integrity.PagesChecker;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryType;
@@ -17,6 +18,7 @@ import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.Month;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.strings.LatexToUnicodeAdapter;
 
 import de.undercouch.citeproc.CSL;
@@ -99,7 +101,10 @@ public class CSLAdapter {
         /**
          * Converts the {@link BibEntry} into {@link CSLItemData}.
          */
-        private static CSLItemData bibEntryToCSLItemData(BibEntry bibEntry, BibDatabaseContext bibDatabaseContext, BibEntryTypesManager entryTypesManager) {
+        private static CSLItemData bibEntryToCSLItemData(BibEntry originalBibEntry, BibDatabaseContext bibDatabaseContext, BibEntryTypesManager entryTypesManager) {
+            // We need to make a deep copy, because we modify the entry according to the logic presented at
+            // https://github.com/JabRef/jabref/issues/8372#issuecomment-1014941935
+            BibEntry bibEntry = (BibEntry) originalBibEntry.clone();
 
             String citeKey = bibEntry.getCitationKey().orElse("");
             BibTeXEntry bibTeXEntry = new BibTeXEntry(new Key(bibEntry.getType().getName()), new Key(citeKey));
@@ -109,8 +114,41 @@ public class CSLAdapter {
 
             Optional<BibEntryType> entryType = entryTypesManager.enrich(bibEntry.getType(), bibDatabaseContext.getMode());
 
-            Set<Field> fields = entryType.map(BibEntryType::getAllFields).orElse(bibEntry.getFields());
+            if (bibEntry.getType().equals(StandardEntryType.Article)) {
+                // Patch bibEntry to contain the right BibTeX (not BibLaTeX) fields
+                // Note that we do not need to convert from "pages" to "page", because CiteProc already handles it
+                // See BibTeXConverter
+                if (bibDatabaseContext.isBiblatexMode()) {
+                    // Move "number" to "issue" if "issue" does not exist
+                    Optional<String> numberField = bibEntry.getField(StandardField.NUMBER);
+                    numberField.ifPresent(number -> {
+                        if (!bibEntry.hasField(StandardField.ISSUE)) {
+                            bibEntry.setField(StandardField.ISSUE, number);
+                            bibEntry.clearField(StandardField.NUMBER);
+                        }
+                    });
+                    bibEntry.getField(StandardField.EID).ifPresent(eid -> {
+                        bibEntry.setField(StandardField.NUMBER, eid);
+                        bibEntry.clearField(StandardField.EID);
+                    });
+                } else {
+                    bibEntry.getField(StandardField.NUMBER).ifPresent(number -> {
+                        bibEntry.setField(StandardField.ISSUE, number);
+                        bibEntry.clearField(StandardField.NUMBER);
+                    });
+                    bibEntry.getField(StandardField.PAGES).ifPresent(pages -> {
+                        if (new PagesChecker(bibDatabaseContext).checkValue(pages).isPresent()) {
+                            // pages field contains no valid pages range
+                            if (!pages.startsWith("Article")) {
+                                bibEntry.setField(StandardField.PAGES, "Article " + pages);
+                            }
+                        }
+                    });
+                }
+            }
 
+            Set<Field> fields = entryType.map(BibEntryType::getAllFields).orElse(bibEntry.getFields());
+            fields.addAll(bibEntry.getFields());
             for (Field key : fields) {
                 bibEntry.getResolvedFieldOrAlias(key, bibDatabaseContext.getDatabase())
                         .map(removeNewlinesFormatter::format)

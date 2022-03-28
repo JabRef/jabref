@@ -140,11 +140,11 @@ class CitationStyleGeneratorTest {
         // if the default citation style changes this has to be modified
         return Stream.of(
                 Arguments.of(
-                        "[1]F. Last and J. Doe, Art. no. 7.\n",
+                        "[1]F. Last and J. Doe, no. 28.\n",
                         BibDatabaseMode.BIBTEX,
                         new BibEntry(StandardEntryType.Article)
                                 .withField(StandardField.AUTHOR, "Last, First and\nDoe, Jane")
-                                .withField(StandardField.NUMBER, "7"),
+                                .withField(StandardField.NUMBER, "28"),
                         "ieee.csl"),
                 Arguments.of(
                         "[1]F. Last and J. Doe, no. 7.\n",
@@ -154,11 +154,11 @@ class CitationStyleGeneratorTest {
                                 .withField(StandardField.ISSUE, "7"),
                         "ieee.csl"),
                 Arguments.of(
-                        "[1]F. Last and J. Doe, Art. no. 7.\n",
+                        "[1]F. Last and J. Doe, no. 28.\n",
                         BibDatabaseMode.BIBLATEX,
                         new BibEntry(StandardEntryType.Article)
                                 .withField(StandardField.AUTHOR, "Last, First and Doe, Jane")
-                                .withField(StandardField.NUMBER, "7"),
+                                .withField(StandardField.NUMBER, "28"),
                         "ieee.csl"),
                 Arguments.of(
                         "[1]F. Last and J. Doe, no. 7, Art. no. 28.\n",
@@ -169,12 +169,12 @@ class CitationStyleGeneratorTest {
                                 .withField(StandardField.NUMBER, "28"),
                         "ieee.csl"),
                 Arguments.of(
-                        "[1]F. Last and J. Doe, no. 28, pp. 7–8.\n",
+                        "[1]F. Last and J. Doe, no. 33, pp. 7–8.\n",
                         BibDatabaseMode.BIBLATEX,
                         new BibEntry(StandardEntryType.Article)
                                 .withField(StandardField.AUTHOR, "Last, First and\nDoe, Jane")
                                 .withField(StandardField.PAGES, "7--8")
-                                .withField(StandardField.ISSUE, "28"),
+                                .withField(StandardField.ISSUE, "33"),
                         "ieee.csl"),
 
                 Arguments.of(
@@ -192,7 +192,7 @@ class CitationStyleGeneratorTest {
                         "apa-6th-edition.csl"),
 
                 Arguments.of(
-                        "Foo, B. (n.d.). volume + issue + pages. Bib(La)TeX Journal, 1, 45–67.\n",
+                        "Foo, B. (n.d.). volume + issue + pages. Bib(La)TeX Journal, 1(9), 45–67.\n",
                         BibDatabaseMode.BIBTEX,
                         new BibEntry(StandardEntryType.Article)
                                 .withField(StandardField.AUTHOR, "Foo, Bar")
@@ -201,7 +201,7 @@ class CitationStyleGeneratorTest {
                                 .withField(StandardField.TITLE, "volume + issue + pages")
                                 .withField(StandardField.VOLUME, "1")
                                 .withField(StandardField.COMMENT, "The issue field does not exist in Bibtex standard, therefore there is no need to render it (The issue field exists in biblatex standard though.). Since, for this entry, there is no number field present and therefore no data will be overwriten, enabling the user to be able to move the data within the issue field to the number field via cleanup action is something worth pursuing.")
-                                .withField(StandardField.ISSUE, "9issue"),
+                                .withField(StandardField.ISSUE, "9"),
                         "apa-6th-edition.csl"),
 
                 Arguments.of(
@@ -227,19 +227,19 @@ class CitationStyleGeneratorTest {
 
                 // The issue field does not exist in bibtex standard, therefore there is no need to render it (it exists in biblatex standard though). Since, for this entry, there is no number field present and therefore no data will be overwriten, enabling the user to be able to move the data within the issue field to the number field via cleanup action is something worth pursuing.
                 Arguments.of(
-                        "Foo, B. (n.d.). issue + pages. Bib(La)TeX Journal, 45–67.\n",
+                        "Foo, B. (n.d.). issue + pages. Bib(La)TeX Journal, (9), 45–67.\n",
                         BibDatabaseMode.BIBTEX,
                         new BibEntry(StandardEntryType.Article)
                                 .withField(StandardField.AUTHOR, "Foo, Bar")
                                 .withField(StandardField.JOURNAL, "Bib(La)TeX Journal")
                                 .withField(StandardField.PAGES, "45--67")
                                 .withField(StandardField.TITLE, "issue + pages")
-                                .withField(StandardField.ISSUE, "9issue"),
+                                .withField(StandardField.ISSUE, "9"),
                         "apa-6th-edition.csl"),
 
                 // The issue field does not exist in bibtex standard, therefore there is no need to render it (it exists in biblatex standard though)
                 Arguments.of(
-                        "Foo, B. (n.d.). issue + number. Bib(La)TeX Journal, (3number), 45–67.\n",
+                        "Foo, B. (n.d.). issue + number. Bib(La)TeX Journal, (3number).\n",
                         BibDatabaseMode.BIBTEX,
                         new BibEntry(StandardEntryType.Article)
                                 .withField(StandardField.AUTHOR, "Foo, Bar")
@@ -271,12 +271,13 @@ class CitationStyleGeneratorTest {
                                 .withField(StandardField.JOURNAL, "Bib(La)TeX Journal")
                                 .withField(StandardField.NUMBER, "3number")
                                 .withField(StandardField.PAGES, "Article 777")
-                                .withField(StandardField.TITLE, "number + article-number WITH the word article instead of pagerange"),
+                                .withField(StandardField.TITLE, "number + pages")
+                                .withField(StandardField.COMMENT, "number + article-number WITH the word article instead of pagerange"),
                         "apa-6th-edition.csl"),
 
                 // "The issue field does not exist in bibtex standard, therefore there is no need to render it (it exists in biblatex standard though). Since, for this entry, there is no number field present and therefore no data will be overwriten, enabling the user to be able to move the data within the issue field to the number field via cleanup action is something worth pursuing."
                 Arguments.of(
-                        "Foo, B. (n.d.). issue. Bib(La)TeX Journal.\n",
+                        "Foo, B. (n.d.). issue. Bib(La)TeX Journal, (9issue).\n",
                         BibDatabaseMode.BIBTEX,
                         new BibEntry(StandardEntryType.Article)
                                 .withField(StandardField.AUTHOR, "Foo, Bar")
@@ -305,7 +306,8 @@ class CitationStyleGeneratorTest {
                                 .withField(StandardField.JOURNAL, "Bib(La)TeX Journal")
                                 .withField(StandardField.NUMBER, "3number")
                                 .withField(StandardField.PAGES, "777e23")
-                                .withField(StandardField.TITLE, "number + article-number WITHOUT the word article instead of pagerange"),
+                                .withField(StandardField.TITLE, "number + pages")
+                                .withField(StandardField.COMMENT, "number + article-number WITHOUT the word article instead of pagerange"),
                         "apa-6th-edition.csl"),
 
                 // Not rendering the "eid" field here, is correct. The "eid" field(short for: electronic identifier) does not exist in Bibtex standard. It exists in Biblatex standard though and is the field, in which the "article number" should be entered into. "Article number" is a field that does not exist in Bibtex and also not in Biblatex standard. As a workaround, some Journals have opted to put the article number into the pages field. APA 7th Style recommends following procedure: "If the journal article has an article number instead of a page range, include the word "Article" and then the article number instead of the page range." - Source: https://apastyle.apa.org/style-grammar-guidelines/references/examples/journal-article-references#2. Additionally the APA style (7th edition) created by the CSL community "prints the issue (= the "number" field" in Biblatex)  whenever it is in the data and the number (= the "eid" field in Biblatex) when no page range is present, entirely independent of the issue number" - Source: https://github.com/citation-style-language/styles/issues/5827#issuecomment-1006011280). I personally think the "eid" field SHOULD be rendered here SOMEWHERE, maybe even IN ADDITION to the page range, because we have the data, right? Why not show it? - But this is just my humble opinion and may not be coherent with the current APA Style 7th edition. Not rendering the "issue" field here is sufficient for APA 7th edition. Under current circumstances the "number" field takes priority over the "issue" field (see https://github.com/JabRef/jabref/issues/8372#issuecomment-1023768144). [Keyword: IS RENDERING BOTH VIABLE?]. Ideally, they would coexist: "Roughly speaking number subdivides volume and issue is much closer to subdividing year. I don't think I would want to say that issue is subordinate to number or vice versa. They sort of operate on a similar level." (Source: https://github.com/plk/biblatex/issues/726#issuecomment-1010264258)
