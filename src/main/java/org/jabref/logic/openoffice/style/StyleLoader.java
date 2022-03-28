@@ -1,8 +1,8 @@
 package org.jabref.logic.openoffice.style;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -55,7 +55,7 @@ public class StyleLoader {
     public boolean addStyleIfValid(String filename) {
         Objects.requireNonNull(filename);
         try {
-            OOBibStyle newStyle = new OOBibStyle(new File(filename), layoutFormatterPreferences);
+            OOBibStyle newStyle = new OOBibStyle(Path.of(filename), layoutFormatterPreferences);
             if (externalStyles.contains(newStyle)) {
                 LOGGER.info("External style file {} already existing.", filename);
             } else if (newStyle.isValid()) {
@@ -80,7 +80,7 @@ public class StyleLoader {
         List<String> lists = openOfficePreferences.getExternalStyles();
         for (String filename : lists) {
             try {
-                OOBibStyle style = new OOBibStyle(new File(filename), layoutFormatterPreferences);
+                OOBibStyle style = new OOBibStyle(Path.of(filename), layoutFormatterPreferences);
                 if (style.isValid()) { // Problem!
                     externalStyles.add(style);
                 } else {

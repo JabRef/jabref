@@ -19,15 +19,14 @@ import org.slf4j.LoggerFactory;
 
 /**
  * CitationGroups : the set of citation groups in the document.
- *
+ * <p>
  * This is the main input (as well as output) for creating citation markers and bibliography.
- *
  */
 public class CitationGroups {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CitationGroups.class);
 
-    private Map<CitationGroupId, CitationGroup> citationGroupsUnordered;
+    private final Map<CitationGroupId, CitationGroup> citationGroupsUnordered;
 
     /**
      * Provides order of appearance for the citation groups.
@@ -35,7 +34,7 @@ public class CitationGroups {
     private Optional<List<CitationGroupId>> globalOrder;
 
     /**
-     *  This is going to be the bibliography
+     * This is going to be the bibliography
      */
     private Optional<CitedKeys> bibliography;
 
@@ -114,13 +113,12 @@ public class CitationGroups {
         if (globalOrder.isEmpty()) {
             throw new IllegalStateException("getCitationGroupsInGlobalOrder: not ordered yet");
         }
-        return OOListUtil.map(globalOrder.get(), groupId -> citationGroupsUnordered.get(groupId));
+        return OOListUtil.map(globalOrder.get(), citationGroupsUnordered::get);
     }
 
     /**
-     * Impose an order of citation groups by providing the order of their citation group
-     * idendifiers.
-     *
+     * Impose an order of citation groups by providing the order of their citation group idendifiers.
+     * <p>
      * Also set indexInGlobalOrder for each citation group.
      */
     public void setGlobalOrder(List<CitationGroupId> globalOrder) {
@@ -151,8 +149,7 @@ public class CitationGroups {
     }
 
     /**
-     * Collect citations into a list of cited sources using neither CitationGroup.globalOrder or
-     * Citation.localOrder
+     * Collect citations into a list of cited sources using neither CitationGroup.globalOrder or Citation.localOrder
      */
     public CitedKeys getCitedKeysUnordered() {
         LinkedHashMap<String, CitedKey> res = new LinkedHashMap<>();
@@ -216,9 +213,9 @@ public class CitationGroups {
     }
 
     public void createNumberedBibliographySortedInOrderOfAppearance() {
-        if (!bibliography.isEmpty()) {
+        if (bibliography.isPresent()) {
             throw new IllegalStateException("createNumberedBibliographySortedInOrderOfAppearance:"
-                                            + " already have a bibliography");
+                    + " already have a bibliography");
         }
         CitedKeys citedKeys = getCitedKeysSortedInOrderOfAppearance();
         citedKeys.numberCitedKeysInCurrentOrder();
@@ -230,7 +227,7 @@ public class CitationGroups {
      * precondition: database lookup already performed (otherwise we just sort citation keys)
      */
     public void createPlainBibliographySortedByComparator(Comparator<BibEntry> entryComparator) {
-        if (!bibliography.isEmpty()) {
+        if (bibliography.isPresent()) {
             throw new IllegalStateException("createPlainBibliographySortedByComparator: already have a bibliography");
         }
         CitedKeys citedKeys = getCitedKeysUnordered();
@@ -242,7 +239,7 @@ public class CitationGroups {
      * precondition: database lookup already performed (otherwise we just sort citation keys)
      */
     public void createNumberedBibliographySortedByComparator(Comparator<BibEntry> entryComparator) {
-        if (!bibliography.isEmpty()) {
+        if (bibliography.isPresent()) {
             throw new IllegalStateException("createNumberedBibliographySortedByComparator: already have a bibliography");
         }
         CitedKeys citedKeys = getCitedKeysUnordered();
@@ -261,7 +258,7 @@ public class CitationGroups {
         return Optional.ofNullable(group);
     }
 
-    /*
+    /**
      * @return true if all citation groups have referenceMarkNameForLinking
      */
     public boolean citationGroupsProvideReferenceMarkNameForLinking() {
@@ -290,5 +287,4 @@ public class CitationGroups {
 
         bibliography = Optional.empty();
     }
-
 }

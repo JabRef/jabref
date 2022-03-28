@@ -16,7 +16,6 @@ public class OOProcess {
     static final Comparator<BibEntry> YEAR_AUTHOR_TITLE_COMPARATOR = makeYearAuthorTitleComparator();
 
     private OOProcess() {
-        /**/
     }
 
     private static Comparator<BibEntry> makeAuthorYearTitleComparator() {
@@ -51,25 +50,25 @@ public class OOProcess {
     }
 
     /**
-     *  Fill cgs.bibliography and cgs.citationGroupsUnordered//CitationMarker
+     *  Fill citationGroups.bibliography and cgs.citationGroupsUnordered//CitationMarker
      *  according to style.
      */
-    public static void produceCitationMarkers(CitationGroups cgs, List<BibDatabase> databases, OOBibStyle style) {
+    public static void produceCitationMarkers(CitationGroups citationGroups, List<BibDatabase> databases, OOBibStyle style) {
 
-        if (!cgs.hasGlobalOrder()) {
-            throw new IllegalStateException("produceCitationMarkers: globalOrder is misssing in cgs");
+        if (!citationGroups.hasGlobalOrder()) {
+            throw new IllegalStateException("produceCitationMarkers: globalOrder is misssing in citationGroups");
         }
 
-        cgs.lookupCitations(databases);
-        cgs.imposeLocalOrder(comparatorForMulticite(style));
+        citationGroups.lookupCitations(databases);
+        citationGroups.imposeLocalOrder(comparatorForMulticite(style));
 
         // fill CitationGroup.citationMarker
         if (style.isCitationKeyCiteMarkers()) {
-            OOProcessCitationKeyMarkers.produceCitationMarkers(cgs, style);
+            OOProcessCitationKeyMarkers.produceCitationMarkers(citationGroups, style);
         } else if (style.isNumberEntries()) {
-            OOProcessNumericMarkers.produceCitationMarkers(cgs, style);
+            OOProcessNumericMarkers.produceCitationMarkers(citationGroups, style);
         } else {
-            OOProcessAuthorYearMarkers.produceCitationMarkers(cgs, style);
+            OOProcessAuthorYearMarkers.produceCitationMarkers(citationGroups, style);
         }
     }
 

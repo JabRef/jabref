@@ -21,4 +21,10 @@
 * [Readings on Coding](readings-on-coding/README.md)
   * [Readings on JavaFX](readings-on-coding/javafx.md)
   * [Useful development tooling](readings-on-coding/tools.md)
-
+* [The OpenOffice/LibreOffice panel](openoffice/README.md)
+  * [Overview](openoffice/overview.md)
+  * [Order of appearance of citation groups](openoffice/order-of-appearance.md)
+  * [Problems](openoffice/problems.md)
+  * [Code reorganization](openoffice/code-reorganization.md)
+  * [About `OOError`, `OOResult` and `OOVoidResult`](openoffice/ooresult-ooerror.md)
+    * [Alternatives to using OOResult and OOVoidResult in OOBibBase](openoffice/ooresult-alternatives.md)
