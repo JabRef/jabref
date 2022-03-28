@@ -148,10 +148,14 @@ class StringUtilTest {
 
     @Test
     void testGetPart() {
-        assertEquals("{roupa}", StringUtil.getPart("O rato roeu a {roupa} do rei de roma", 13, false));
+        // Get word between braces
+        assertEquals("{makes}", StringUtil.getPart("Practice {makes} perfect", 8, false));
+        // When the string is empty and start Index equal zero
         assertEquals("", StringUtil.getPart("", 0, false));
-        assertEquals("", StringUtil.getPart("Um passo por }dia}", 12, false));
-        assertEquals("dia", StringUtil.getPart("Um passo por dia", 12, true));
+        // When the word are in between close curly bracket
+        assertEquals("", StringUtil.getPart("A closed mouth catches no }flies}", 25, false));
+        // Get the word from the end of the sentence
+        assertEquals("bite", StringUtil.getPart("Barking dogs seldom bite", 19, true));
     }
 
     @Test
