@@ -20,7 +20,7 @@ This section list the prerequisites you need to get started to develop JabRef. A
 
 A working Java (Development Kit) 17 installation with Java FX support is required. In the command line (terminal in Linux, cmd in Windows) run `javac -version` and make sure that the reported version is Java 17 (e.g., `javac 17`). If `javac` is not found or a wrong version is reported, check your `PATH` environment variable, your `JAVA_HOME` environment variable or install the most recent JDK.
 
-[JavaFX is not part of the default JDK any more](https://www.reddit.com/r/java/comments/82qm9x/javafx_will_be_removed_from_the_java_jdk_in_jdk\_11/), it needs to be installed separately if not using a special JDK.
+[JavaFX is not part of the default JDK any more](https://www.reddit.com/r/java/comments/82qm9x/javafx\_will\_be\_removed\_from\_the\_java\_jdk\_in\_jdk\_11/), it needs to be installed separately if not using a special JDK.
 
 Download and install the JDK from [https://jdk.java.net/](https://jdk.java.net). Afterwards, download the "jmods" JavaFX 17 zip archive from [https://gluonhq.com/products/javafx/](https://gluonhq.com/products/javafx/) and put the `.jmod` files into `C:\Program Files\OpenJDK\jdk-17\jmods`.
 
@@ -41,7 +41,7 @@ Most developers, though, do not hide their email address. They use one which may
 Examples:
 
 * Same login as in GitHub (see above). Example: `koppor@gmail.com`
-* "`it`" in the name. Example:  `kopp.it@gmail.com`
+* "`it`" in the name. Example: `kopp.it@gmail.com`
 * Use the university login. Example: `st342435@stud.uni-stuttgart.de`
 
 ### git
@@ -62,7 +62,7 @@ We recommend to install IntelliJ IDEA using [JetBrains Toolbox App](https://www.
 
 #### Eclipse
 
-On Ubuntu Linux, you can follow the [documentation from the Ubuntu Community](https://help.ubuntu.com/community/EclipseIDE#Download_Eclipse) or the [step-by-step guideline from Krizna](https://www.krizna.com/ubuntu/install-eclipse-in-ubuntu-12-04/) to install Eclipse. On Windows, download it from [www.eclipse.org](http://www.eclipse.org/downloads/) and run the installer.
+On Ubuntu Linux, you can follow the [documentation from the Ubuntu Community](https://help.ubuntu.com/community/EclipseIDE#Download\_Eclipse) or the [step-by-step guideline from Krizna](https://www.krizna.com/ubuntu/install-eclipse-in-ubuntu-12-04/) to install Eclipse. On Windows, download it from [www.eclipse.org](http://www.eclipse.org/downloads/) and run the installer.
 
 Eclipse JEE 2020-12 or newer is required.
 
@@ -92,7 +92,7 @@ This section explains how you get the JabRef code onto your machine in a form al
 
 ## Configure your IDE
 
-These steps are very important. They allow you to focus on the content and ensure that the code formatting always goes well. Did you know that [IntelliJ allows for reformatting selected code](https://www.jetbrains.com/help/idea/reformat-and-rearrange-code.html#reformat_code) if you press Ctrl + Alt + L?
+These steps are very important. They allow you to focus on the content and ensure that the code formatting always goes well. Did you know that [IntelliJ allows for reformatting selected code](https://www.jetbrains.com/help/idea/reformat-and-rearrange-code.html#reformat\_code) if you press Ctrl + Alt + L?
 
 ### Configuration of IntelliJ IDEA
 
@@ -122,7 +122,7 @@ To prepare IntelliJ's build system two additional steps are required:
     Note that you need to focus another UI element before pressing OK. Otherwise, the setting will be empty.
 *   Enable annotation processors by navigating to **File | Settings | Build, Execution, Deployment | Compiler | Annotation processors** and check "Enable annotation processing"
 
-    ![Enable annotation processing](<../.gitbook/assets/intellij-enable-annotation-processing (1).png>)
+    ![Enable annotation processing](<../.gitbook/assets/intellij-enable-annotation-processing (1) (1).png>)
 
 To have autoformat working properly in the context of line wrapping, "Wrap at right margin" has to be disabled as shown below. Details are found in [IntelliJ issue 240517](https://youtrack.jetbrains.com/issue/IDEA-240517).
 
@@ -160,21 +160,16 @@ To use IntelliJ IDEA's internal build system when you build JabRef through **Bui
 
     ![Ignore the Gradle project "buildSrc"](<../.gitbook/assets/intellij-gradle-config-ignore-buildSrc (2) (2) (2) (3) (3) (6) (4).png>)
 * Add `src-gen` as root:
-  1. Right click on the project "jabref".  
-  2. Select "Open Module Settings"  
-  3. Expand "JabRef"  
-  4. Select "main"  
-  5. Select tab "Sources"  
-  6. Click "+ Add Content Root"  
-  7. Select the `src-gen` directory  
-  8. Click "OK". When expanding "main", "java" should have been selected as source  
+  1. Right click on the project "jabref".
+  2. Select "Open Module Settings"
+  3. Expand "JabRef"
+  4. Select "main"
+  5. Select tab "Sources"
+  6. Click "+ Add Content Root"
+  7. Select the `src-gen` directory
+  8. Click "OK". When expanding "main", "java" should have been selected as source
   9. Click "OK" to save the changes
 * In case the above step does not work, run with gradle, import gradle project again, and try again.
-* Delete `org.jabref.gui.logging.plugins.Log4jPlugins` (location: `src-gen/main/java/org/jabref/gui/logging/plugins/Log4jPlugins.java`). \
-  \
-  Hint: You can use Ctrl+Shift+N to search for the name `Log4jPlugins`.  After opening the file, you can use Alt+F1 and then Enter to focus the file in the project explorer. Then press Del and confirm with Enter. -- In case you find two files, delete both files. \
-  \
-  If the class is not deleted, you will see following error:
 
 ```
 Error:java: Unable to create Plugin Service Class org.jabref.gui.logging.plugins.Log4jPlugins
@@ -216,7 +211,7 @@ Finally, ensure that the checkstyle configuration file is in place:
 9. Save settings by clicking "OK"
 10. Your configuration should now look like this:
 
-    ![checkstyle settings](<../.gitbook/assets/intellij-checkstyle-settings (1).png>)
+    ![checkstyle settings](<../.gitbook/assets/intellij-checkstyle-settings (1) (1).png>)
 
 ### Setup for Eclipse
 
@@ -365,7 +360,7 @@ If that does not help:
 4. Execute `./gradlew run`
 5. Start IntelliJ and try again.
 
-### Issue with org/jabref/build/JournalAbbreviationConverter$\_convert_closure1$\_closure2.class is a duplicate but no duplicate handling strategy has been set
+### Issue with org/jabref/build/JournalAbbreviationConverter$\_convert\_closure1$\_closure2.class is a duplicate but no duplicate handling strategy has been set
 
 After changing the contents of `build.gradle`, on might get following error:
 
