@@ -12,7 +12,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 ### Added
 
 - We added an extra option when right-clicking an entry in the Entry List to copy either the DOI or the DOI url.
-- We added an extra option to ask the user whether they want to open to reveal the folder holding the saved file with the file selected. [#8195]([https://github.com/JabRef/jabref/issues/8195][#8195])
+- We added an extra option to ask the user whether they want to open to reveal the folder holding the saved file with the file selected. [#8195]([https://github.com/JabRef/jabref/issues/8195][#8195]) 
 - We added two new web and fulltext fetchers: SemanticScholar and ResearchGate
 
 ### Changed
@@ -776,5 +776,3 @@ The changelog of JabRef 2.11 and all previous versions is available as [text fil
 [5.0-alpha]: https://github.com/JabRef/jabref/compare/v4.3...v5.0-alpha
 
 <!-- markdownlint-disable-file MD012 MD024 MD033 -->
-
-[#8195]: https://github.com/JabRef/jabref/issues/8195
