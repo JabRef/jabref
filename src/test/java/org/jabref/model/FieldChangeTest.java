@@ -6,10 +6,8 @@ import org.jabref.model.entry.field.StandardField;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class FieldChangeTest {
 
@@ -42,25 +40,25 @@ class FieldChangeTest {
     @Test
     void selfEqualsFieldchangeSameParameters() {
         FieldChange fcBlankNewValue = new FieldChange(entry, StandardField.DOI, "foo", "bar");
-        assertTrue(fc.equals(fcBlankNewValue));
+        assertEquals(true, fc.equals(fcBlankNewValue));
     }
 
     @Test
     void selfEqualsFieldchangeDifferentNewValue() {
         FieldChange fcBlankNewValue = new FieldChange(entry, StandardField.DOI, "foo", null);
-        assertFalse(fc.equals(fcBlankNewValue));
+        assertEquals(false, fc.equals(fcBlankNewValue));
     }
 
     @Test
     void selfEqualsFieldchangeDifferentOldValue() {
         FieldChange fcBlankNewValue = new FieldChange(entry, StandardField.DOI, null, "bar");
-        assertFalse(fc.equals(fcBlankNewValue));
+        assertEquals(false, fc.equals(fcBlankNewValue));
     }
 
     @Test
     void selfEqualsFieldchangeDifferentEntry() {
         FieldChange fcBlankNewValue = new FieldChange(entryOther, StandardField.DOI, "foo", "bar");
-        assertFalse(fc.equals(fcBlankNewValue));
+        assertEquals(false,fc.equals(fcBlankNewValue));
     }
 
     @Test
