@@ -18,6 +18,7 @@ import javafx.scene.web.WebView;
 import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.Globals;
+import org.jabref.gui.JabRefMain;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.theme.ThemeManager;
@@ -133,7 +134,7 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
 
         setFitToHeight(true);
         setFitToWidth(true);
-        previewView = new WebView();
+        previewView = JabRefMain.fetchPreloadedWebView().orElse(new WebView());
         setContent(previewView);
         previewView.setContextMenuEnabled(false);
 
