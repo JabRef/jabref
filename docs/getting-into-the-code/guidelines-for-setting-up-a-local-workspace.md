@@ -122,7 +122,7 @@ To prepare IntelliJ's build system two additional steps are required:
     Note that you need to focus another UI element before pressing OK. Otherwise, the setting will be empty.
 *   Enable annotation processors by navigating to **File | Settings | Build, Execution, Deployment | Compiler | Annotation processors** and check "Enable annotation processing"
 
-    ![Enable annotation processing](<../.gitbook/assets/intellij-enable-annotation-processing (1) (1).png>)
+    ![Enable annotation processing](<../.gitbook/assets/intellij-enable-annotation-processing (1).png>)
 
 To have autoformat working properly in the context of line wrapping, "Wrap at right margin" has to be disabled as shown below. Details are found in [IntelliJ issue 240517](https://youtrack.jetbrains.com/issue/IDEA-240517).
 
@@ -171,16 +171,6 @@ To use IntelliJ IDEA's internal build system when you build JabRef through **Bui
   9. Click "OK" to save the changes
 * In case the above step does not work, run with gradle, import gradle project again, and try again.
 
-```
-Error:java: Unable to create Plugin Service Class org.jabref.gui.logging.plugins.Log4jPlugins
-```
-
-or following error:
-
-```
-Error:(16, 25) java: package org.jabref.search does not exist
-```
-
 Essentially, you now have the best of both worlds: You can run Gradle tasks using the Gradle Tool Window and unless you haven't made changes to input files that generate sources, you can compile and run with IntelliJ's faster internal build system.
 
 In case all steps are followed, and there are still issues with `SearchBaseVisitor` (e.g., `Error:(16, 25) java: package org.jabref.search does not exist`), you have to delete `src\main\generated\org\jabref\gui\logging\plugins\Log4jPlugins.java`. This is independent of having enabled or disabled Annotation Processing (see above at "Enable Annotation Processing").
@@ -211,7 +201,7 @@ Finally, ensure that the checkstyle configuration file is in place:
 9. Save settings by clicking "OK"
 10. Your configuration should now look like this:
 
-    ![checkstyle settings](<../.gitbook/assets/intellij-checkstyle-settings (1) (1).png>)
+    ![checkstyle settings](<../.gitbook/assets/intellij-checkstyle-settings (1).png>)
 
 ### Setup for Eclipse
 
@@ -228,7 +218,7 @@ Make sure your Eclipse installation us up to date.
 4. Create a run/debug configuration for the main class `org.jabref.gui.JabRefLauncher` and/or for `org.jabref.gui.JabRefMain` (both can be used equivalently)
    *   Remark: The run/debug configuration needs to be added by right clicking the class (e.g. JabRefLauncher or JabRefMain) otherwise it will not work.
 
-       ![Creating the run/debug configuration by right clicking on the class](<../.gitbook/assets/eclipse-create-run-config (1) (3) (3) (4) (4) (3) (11).png>)
+       ![Creating the run/debug configuration by right clicking on the class](<../.gitbook/assets/eclipse-create-run-config (1) (3) (3) (4) (4) (3) (11) (2).png>)
    *   In the tab "Arguments" of the run/debug configuration, enter the following runtime VM arguments:
 
        ```
