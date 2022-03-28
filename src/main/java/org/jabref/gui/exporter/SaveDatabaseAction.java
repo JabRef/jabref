@@ -135,8 +135,8 @@ public class SaveDatabaseAction {
             context.setDatabasePath(file);
             libraryTab.updateTabTitle(false);
 
-            // Reinstall AutosaveManager and BackupManager for the new file name
-            libraryTab.resetChangeMonitorAndChangePane();
+            // Reset (here: uninstall and install again) AutosaveManager and BackupManager for the new file name
+            libraryTab.resetChangeMonitor();
             if (readyForAutosave(context)) {
                 AutosaveManager autosaver = AutosaveManager.start(context);
                 autosaver.registerListener(new AutosaveUiManager(libraryTab));
