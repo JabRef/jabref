@@ -33,6 +33,11 @@ public class PagesCheckerTest {
     }
 
     @Test
+    void rejectsHexNumber() {
+        assertNotEquals(Optional.empty(), checker.checkValue("777e23"));
+    }
+
+    @Test
     void bibTexDoesNotAcceptRangeOfNumbersWithSingleDash() {
         assertNotEquals(Optional.empty(), checker.checkValue("1-2"));
     }

@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -139,9 +140,12 @@ public class CSLAdapter {
                     bibEntry.getField(StandardField.PAGES).ifPresent(pages -> {
                         if (new PagesChecker(bibDatabaseContext).checkValue(pages).isPresent()) {
                             // pages field contains no valid pages range
-                            if (!pages.startsWith("Article")) {
-                                bibEntry.setField(StandardField.PAGES, "Article " + pages);
+                            // cut off "Article " if exists.
+                            if (pages.toLowerCase(Locale.ROOT).startsWith("article ")) {
+                                pages = pages.substring("Article ".length());
                             }
+                            bibEntry.setField(StandardField.NUMBER, pages);
+                            bibEntry.clearField(StandardField.PAGES);
                         }
                     });
                 }
