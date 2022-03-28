@@ -13,6 +13,7 @@ import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.push.PushToApplicationConstants;
 import org.jabref.preferences.PreferencesService;
 import org.jabref.preferences.PushToApplicationPreferences;
 
@@ -21,7 +22,7 @@ import org.slf4j.LoggerFactory;
 
 public class PushToVim extends AbstractPushToApplication implements PushToApplication {
 
-    public static final String NAME = "Vim";
+    public static final String NAME = PushToApplicationConstants.VIM;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PushToVim.class);
 
@@ -41,7 +42,7 @@ public class PushToVim extends AbstractPushToApplication implements PushToApplic
 
     @Override
     public PushToApplicationSettings getSettings(PushToApplication application, ObjectProperty<PushToApplicationPreferences> preferences) {
-        return new PushToVimSettings(application, dialogService, preferencesService, preferences);
+        return new PushToVimSettings(application, dialogService, preferencesService.getFilePreferences(), preferences);
     }
 
     @Override

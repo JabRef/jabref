@@ -19,9 +19,6 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.strings.StringUtil;
 
 import com.airhacks.afterburner.views.ViewLoader;
-import com.sun.star.beans.UnknownPropertyException;
-import com.sun.star.container.NoSuchElementException;
-import com.sun.star.lang.WrappedTargetException;
 
 public class ManageCitationsDialogView extends BaseDialog<Void> {
 
@@ -56,7 +53,7 @@ public class ManageCitationsDialogView extends BaseDialog<Void> {
     }
 
     @FXML
-    private void initialize() throws NoSuchElementException, WrappedTargetException, UnknownPropertyException {
+    private void initialize() {
 
         viewModel = new ManageCitationsDialogViewModel(ooBase, dialogService);
 
@@ -70,9 +67,8 @@ public class ManageCitationsDialogView extends BaseDialog<Void> {
 
         citationsTableView.itemsProperty().bindBidirectional(viewModel.citationsProperty());
 
-        extraInfo.setOnEditCommit((CellEditEvent<CitationEntryViewModel, String> cell) -> {
-            cell.getRowValue().setExtraInfo(cell.getNewValue());
-        });
+        extraInfo.setOnEditCommit((CellEditEvent<CitationEntryViewModel, String> cell) ->
+                cell.getRowValue().setExtraInfo(cell.getNewValue()));
         extraInfo.setCellFactory(TextFieldTableCell.forTableColumn());
     }
 
@@ -87,7 +83,13 @@ public class ManageCitationsDialogView extends BaseDialog<Void> {
         inBetweenText.setStyle("-fx-font-weight: bold");
         Text endText = new Text(end);
 
-        FlowPane flow = new FlowPane(startText, inBetweenText, endText);
-        return flow;
+        return new FlowPane(startText, inBetweenText, endText);
+    }
+
+    public boolean isOkToShowThisDialog() {
+        if (viewModel == null || viewModel.failedToGetCitationEntries) {
+            return false;
+        }
+        return true;
     }
 }

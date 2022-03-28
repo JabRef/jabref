@@ -71,8 +71,7 @@ public class CleanupAction extends SimpleCommand {
                         Localization.lang("Autogenerate PDF Names"),
                         Localization.lang("Cancel"),
                         Localization.lang("Do not ask again"),
-                        optOut -> preferences.storeAutoLinkPreferences(preferences.getAutoLinkPreferences()
-                                                                                  .withAskAutoNamingPdfs(!optOut)));
+                        optOut -> preferences.getAutoLinkPreferences().setAskAutoNamingPdfs(!optOut));
                 if (!confirmed) {
                     isCanceled = true;
                     return;

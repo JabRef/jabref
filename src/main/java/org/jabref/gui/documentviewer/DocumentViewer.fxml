@@ -31,7 +31,7 @@
                                 <Tooltip text="%Show the document of the currently selected entry."/>
                             </tooltip>
                         </ToggleButton>
-                        <ToggleButton mnemonicParsing="false" styleClass="icon-button" text="%Locked"
+                        <ToggleButton fx:id="modeLock" mnemonicParsing="false" styleClass="icon-button" text="%Locked"
                                       toggleGroup="$toggleGroupMode">
                             <tooltip>
                                 <Tooltip text="%Show this document until unlocked."/>

@@ -23,7 +23,6 @@ import org.jabref.model.strings.StringUtil;
 class OOBibStyleGetCitationMarker {
 
     private OOBibStyleGetCitationMarker() {
-        /**/
     }
 
     /**
@@ -38,21 +37,21 @@ class OOBibStyleGetCitationMarker {
      * @return The author name, or an empty String if inapplicable.
      */
     private static String getAuthorLastName(AuthorList authorList, int number) {
-        StringBuilder sb = new StringBuilder();
+        StringBuilder stringBuilder = new StringBuilder();
 
         if (authorList.getNumberOfAuthors() > number) {
             Author author = authorList.getAuthor(number);
             // "von " if von exists
             Optional<String> von = author.getVon();
             if (von.isPresent() && !von.get().isEmpty()) {
-                sb.append(von.get());
-                sb.append(' ');
+                stringBuilder.append(von.get());
+                stringBuilder.append(' ');
             }
             // last name if it exists
-            sb.append(author.getLast().orElse(""));
+            stringBuilder.append(author.getLast().orElse(""));
         }
 
-        return sb.toString();
+        return stringBuilder.toString();
     }
 
     private static String markupAuthorName(OOBibStyle style, String name) {
@@ -127,7 +126,7 @@ class OOBibStyleGetCitationMarker {
         // of three or more authors: (A, B[,] and C)
         String oxfordComma = style.getOxfordComma();
 
-        StringBuilder sb = new StringBuilder();
+        StringBuilder stringBuilder = new StringBuilder();
 
         final int nAuthors = authorList.getNumberOfAuthors();
 
@@ -149,11 +148,11 @@ class OOBibStyleGetCitationMarker {
                               : Math.min(maxAuthorsBeforeEtAl, nAuthors));
 
         if (nAuthorsToEmit >= 1) {
-            sb.append(style.getAuthorsPartMarkupBefore());
-            sb.append(style.getAuthorNamesListMarkupBefore());
+            stringBuilder.append(style.getAuthorsPartMarkupBefore());
+            stringBuilder.append(style.getAuthorNamesListMarkupBefore());
             // The first author
             String name = getAuthorLastName(authorList, 0);
-            sb.append(markupAuthorName(style, name));
+            stringBuilder.append(markupAuthorName(style, name));
         }
 
         if (nAuthors >= 2) {
@@ -162,19 +161,19 @@ class OOBibStyleGetCitationMarker {
                 // Emit last names, except for the last author
                 int j = 1;
                 while (j < (nAuthors - 1)) {
-                    sb.append(authorSep);
+                    stringBuilder.append(authorSep);
                     String name = getAuthorLastName(authorList, j);
-                    sb.append(markupAuthorName(style, name));
+                    stringBuilder.append(markupAuthorName(style, name));
                     j++;
                 }
                 // oxfordComma if at least 3 authors
                 if (nAuthors >= 3) {
-                    sb.append(oxfordComma);
+                    stringBuilder.append(oxfordComma);
                 }
                 // Emit " and "+"LastAuthor"
-                sb.append(andString);
+                stringBuilder.append(andString);
                 String name = getAuthorLastName(authorList, nAuthors - 1);
-                sb.append(markupAuthorName(style, name));
+                stringBuilder.append(markupAuthorName(style, name));
 
             } else {
                 // Emit last names up to nAuthorsToEmit.
@@ -185,9 +184,9 @@ class OOBibStyleGetCitationMarker {
                 if (maxAuthorsBeforeEtAl > 1) {
                     int j = 1;
                     while (j < nAuthorsToEmit) {
-                        sb.append(authorSep);
+                        stringBuilder.append(authorSep);
                         String name = getAuthorLastName(authorList, j);
-                        sb.append(markupAuthorName(style, name));
+                        stringBuilder.append(markupAuthorName(style, name));
                         j++;
                     }
                 }
@@ -195,15 +194,15 @@ class OOBibStyleGetCitationMarker {
         }
 
         if (nAuthorsToEmit >= 1) {
-            sb.append(style.getAuthorNamesListMarkupAfter());
+            stringBuilder.append(style.getAuthorNamesListMarkupAfter());
         }
 
         if (nAuthors >= 2 && !emitAllAuthors) {
-            sb.append(etAlString);
+            stringBuilder.append(etAlString);
         }
 
-        sb.append(style.getAuthorsPartMarkupAfter());
-        return sb.toString();
+        stringBuilder.append(style.getAuthorsPartMarkupAfter());
+        return stringBuilder.toString();
     }
 
     /**
@@ -279,15 +278,15 @@ class OOBibStyleGetCitationMarker {
             return "";
         }
 
-        FieldAndContent fc = optionalFieldAndContent.get();
-        String result = style.getFieldFormatter().format(fc.content);
+        FieldAndContent fieldAndContent = optionalFieldAndContent.get();
+        String result = style.getFieldFormatter().format(fieldAndContent.content);
 
         // If the field we found is mentioned in authorFieldNames and
         // content has a pair of braces around it, we add a pair of
         // braces around the result, so that AuthorList.parse does not split
         // the content.
         final OrFields fieldsToRebrace = style.getAuthorFieldNames();
-        if (fieldsToRebrace.contains(fc.field) && StringUtil.isInCurlyBrackets(fc.content)) {
+        if (fieldsToRebrace.contains(fieldAndContent.field) && StringUtil.isInCurlyBrackets(fieldAndContent.content)) {
             result = "{" + result + "}";
         }
         return result;
@@ -406,11 +405,11 @@ class OOBibStyleGetCitationMarker {
         String pageInfoSeparator = style.getPageInfoSeparator();
         String uniquefierSeparator = style.getUniquefierSeparator();
 
-        StringBuilder sb = new StringBuilder();
-        sb.append(style.getCitationGroupMarkupBefore());
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append(style.getCitationGroupMarkupBefore());
 
         if (inParenthesis) {
-            sb.append(startBrace); // shared parenthesis
+            stringBuilder.append(startBrace); // shared parenthesis
         }
 
         for (int j = 0; j < entries.size(); j++) {
@@ -422,19 +421,19 @@ class OOBibStyleGetCitationMarker {
                 // Just add our uniqueLetter
                 String uniqueLetter = entry.getUniqueLetter().orElse(null);
                 if (uniqueLetter != null) {
-                    sb.append(uniquefierSeparator);
-                    sb.append(uniqueLetter);
+                    stringBuilder.append(uniquefierSeparator);
+                    stringBuilder.append(uniqueLetter);
                 }
 
                 // And close the brace, if we are the last in the group.
                 if (!inParenthesis && endingAGroup) {
-                    sb.append(endBrace);
+                    stringBuilder.append(endBrace);
                 }
                 continue;
             }
 
             if (j > 0) {
-                sb.append(citationSeparator);
+                stringBuilder.append(citationSeparator);
             }
 
             StringBuilder pageInfoPart = new StringBuilder("");
@@ -449,9 +448,9 @@ class OOBibStyleGetCitationMarker {
 
             final boolean isUnresolved = entry.getLookupResult().isEmpty();
             if (isUnresolved) {
-                sb.append(String.format("Unresolved(%s)", entry.getCitationKey()));
+                stringBuilder.append(String.format("Unresolved(%s)", entry.getCitationKey()));
                 if (purpose != AuthorYearMarkerPurpose.NORMALIZED) {
-                    sb.append(pageInfoPart);
+                    stringBuilder.append(pageInfoPart);
                 }
             } else {
 
@@ -467,40 +466,40 @@ class OOBibStyleGetCitationMarker {
 
                 AuthorList authorList = getAuthorList(style, db);
                 String authorString = formatAuthorList(style, authorList, maxAuthors, andString);
-                sb.append(authorString);
-                sb.append(yearSep);
+                stringBuilder.append(authorString);
+                stringBuilder.append(yearSep);
 
                 if (!inParenthesis) {
-                    sb.append(startBrace); // parenthesis before year
+                    stringBuilder.append(startBrace); // parenthesis before year
                 }
 
                 String year = getCitationMarkerField(style, db, yearFieldNames);
                 if (year != null) {
-                    sb.append(year);
+                    stringBuilder.append(year);
                 }
 
                 if (purpose != AuthorYearMarkerPurpose.NORMALIZED) {
                     String uniqueLetter = entry.getUniqueLetter().orElse(null);
                     if (uniqueLetter != null) {
-                        sb.append(uniqueLetter);
+                        stringBuilder.append(uniqueLetter);
                     }
                 }
 
                 if (purpose != AuthorYearMarkerPurpose.NORMALIZED) {
-                    sb.append(pageInfoPart);
+                    stringBuilder.append(pageInfoPart);
                 }
 
                 if (!inParenthesis && endingAGroup) {
-                    sb.append(endBrace);  // parenthesis after year
+                    stringBuilder.append(endBrace);  // parenthesis after year
                 }
             }
         } // for j
 
         if (inParenthesis) {
-            sb.append(endBrace); // shared parenthesis
+            stringBuilder.append(endBrace); // shared parenthesis
         }
-        sb.append(style.getCitationGroupMarkupAfter());
-        return OOText.fromString(sb.toString());
+        stringBuilder.append(style.getCitationGroupMarkupAfter());
+        return OOText.fromString(stringBuilder.toString());
     }
 
     /**
@@ -638,9 +637,9 @@ class OOBibStyleGetCitationMarker {
         int[] nAuthorsToEmitRevised = new int[nEntries];
         for (int i = 0; i < nEntries; i++) {
             CitationMarkerEntry entry = citationMarkerEntries.get(i);
-            int n = calculateNAuthorsToEmit(style, entry);
-            nAuthorsToEmit[i] = n;
-            nAuthorsToEmitRevised[i] = n;
+            int nAuthors = calculateNAuthorsToEmit(style, entry);
+            nAuthorsToEmit[i] = nAuthors;
+            nAuthorsToEmitRevised[i] = nAuthors;
         }
 
         boolean[] startsNewGroup = new boolean[nEntries];

@@ -31,16 +31,21 @@ import org.jabref.logic.importer.fetcher.MathSciNet;
 import org.jabref.logic.importer.fetcher.MedlineFetcher;
 import org.jabref.logic.importer.fetcher.Medra;
 import org.jabref.logic.importer.fetcher.OpenAccessDoi;
+import org.jabref.logic.importer.fetcher.ResearchGate;
 import org.jabref.logic.importer.fetcher.RfcFetcher;
 import org.jabref.logic.importer.fetcher.ScienceDirect;
+import org.jabref.logic.importer.fetcher.SemanticScholar;
 import org.jabref.logic.importer.fetcher.SpringerFetcher;
 import org.jabref.logic.importer.fetcher.SpringerLink;
 import org.jabref.logic.importer.fetcher.TitleFetcher;
 import org.jabref.logic.importer.fetcher.ZbMATH;
+import org.jabref.logic.importer.fileformat.PdfMergeMetadataImporter;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.entry.identifier.Identifier;
+import org.jabref.preferences.FilePreferences;
 
 import static org.jabref.model.entry.field.StandardField.EPRINT;
 import static org.jabref.model.entry.field.StandardField.ISBN;
@@ -104,7 +109,9 @@ public class WebFetchers {
         set.add(new CompositeSearchBasedFetcher(set, 30));
         set.add(new CollectionOfComputerScienceBibliographiesFetcher(importFormatPreferences));
         // set.add(new JstorFetcher(importFormatPreferences));
-        return set;
+        set.add(new SemanticScholar());
+        set.add(new ResearchGate(importFormatPreferences));
+      return set;
     }
 
     /**
@@ -133,7 +140,7 @@ public class WebFetchers {
     /**
      * @return sorted set containing entry based fetchers
      */
-    public static SortedSet<EntryBasedFetcher> getEntryBasedFetchers(ImportFormatPreferences importFormatPreferences) {
+    public static SortedSet<EntryBasedFetcher> getEntryBasedFetchers(ImporterPreferences importerPreferences, ImportFormatPreferences importFormatPreferences, FilePreferences filePreferences, BibDatabaseContext databaseContext) {
         SortedSet<EntryBasedFetcher> set = new TreeSet<>(Comparator.comparing(WebFetcher::getName));
         set.add(new AstrophysicsDataSystem(importFormatPreferences));
         set.add(new DoiFetcher(importFormatPreferences));
@@ -141,6 +148,9 @@ public class WebFetchers {
         set.add(new MathSciNet(importFormatPreferences));
         set.add(new CrossRef());
         set.add(new ZbMATH(importFormatPreferences));
+        set.add(new PdfMergeMetadataImporter.EntryBasedFetcherWrapper(importerPreferences, importFormatPreferences, filePreferences, databaseContext));
+        set.add(new SemanticScholar());
+        set.add(new ResearchGate(importFormatPreferences));
         return set;
     }
 
@@ -159,8 +169,10 @@ public class WebFetchers {
      */
     public static Set<FulltextFetcher> getFullTextFetchers(ImportFormatPreferences importFormatPreferences) {
         Set<FulltextFetcher> fetchers = new HashSet<>();
+
         // Original
-        fetchers.add(new DoiResolution());
+        fetchers.add(new DoiResolution(importFormatPreferences.getDoiPreferences()));
+
         // Publishers
         fetchers.add(new ScienceDirect());
         fetchers.add(new SpringerLink());
@@ -168,11 +180,13 @@ public class WebFetchers {
         fetchers.add(new ArXiv(importFormatPreferences));
         fetchers.add(new IEEE(importFormatPreferences));
         fetchers.add(new ApsFetcher());
+
         // Meta search
         // fetchers.add(new JstorFetcher(importFormatPreferences));
         // fetchers.add(new GoogleScholar(importFormatPreferences));
         fetchers.add(new OpenAccessDoi());
-
+        fetchers.add(new SemanticScholar());
+        fetchers.add(new ResearchGate(importFormatPreferences));
         return fetchers;
     }
 }

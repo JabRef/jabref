@@ -4,6 +4,7 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.List;
+import java.util.Optional;
 
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.fileformat.ACMPortalParser;
@@ -33,8 +34,7 @@ class ACMPortalFetcherTest {
     @Test
     void searchByQueryFindsEntry() throws Exception {
 
-        List<BibEntry> searchEntryList = List.of(
-                new BibEntry(StandardEntryType.Conference)
+        BibEntry searchEntry = new BibEntry(StandardEntryType.Conference)
                         .withField(StandardField.AUTHOR, "Tobias Olsson and Morgan Ericsson and Anna Wingkvist")
                         .withField(StandardField.YEAR, "2017")
                         .withField(StandardField.MONTH, "9")
@@ -50,16 +50,14 @@ class ACMPortalFetcherTest {
                         .withField(StandardField.TITLE, "The relationship of code churn and architectural violations in the open source software JabRef")
                         .withField(StandardField.URL, "https://doi.org/10.1145/3129790.3129810")
                         .withField(StandardField.PAGETOTAL, "7")
-                        .withField(StandardField.PAGES, "152–158")
-        );
+                        .withField(StandardField.PAGES, "152–158");
 
         List<BibEntry> fetchedEntries = fetcher.performSearch("The relationship of code churn and architectural violations in the open source software JabRef");
         // we clear the abstract due to copyright reasons (JabRef's code should not contain copyrighted abstracts)
         for (BibEntry bibEntry : fetchedEntries) {
             bibEntry.clearField(StandardField.ABSTRACT);
         }
-        // check for a) that a single entry is returned and b) that the entry itself is the expected one
-        assertEquals(searchEntryList, fetchedEntries);
+        assertEquals(Optional.of(searchEntry), fetchedEntries.stream().findFirst());
     }
 
     @Test

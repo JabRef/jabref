@@ -10,15 +10,21 @@ import java.util.Optional;
 
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
+import org.jabref.model.schema.DublinCoreSchemaCustom;
 
+import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDDocumentCatalog;
 import org.apache.pdfbox.pdmodel.PDDocumentInformation;
 import org.apache.pdfbox.pdmodel.common.PDMetadata;
 import org.apache.xmpbox.XMPMetadata;
 import org.apache.xmpbox.schema.DublinCoreSchema;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class XmpUtilReader {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(XmpUtilReader.class);
 
     private static final String START_TAG = "<rdf:Description";
     private static final String END_TAG = "</rdf:Description>";
@@ -72,8 +78,8 @@ public class XmpUtilReader {
             if (!xmpMetaList.isEmpty()) {
                 // Only support Dublin Core since JabRef 4.2
                 for (XMPMetadata xmpMeta : xmpMetaList) {
-                    DublinCoreSchema dcSchema = xmpMeta.getDublinCoreSchema();
 
+                    DublinCoreSchema dcSchema = DublinCoreSchemaCustom.copyDublinCoreSchema(xmpMeta.getDublinCoreSchema());
                     if (dcSchema != null) {
                         DublinCoreExtractor dcExtractor = new DublinCoreExtractor(dcSchema, xmpPreferences, new BibEntry());
                         Optional<BibEntry> entry = dcExtractor.extractBibtexEntry();
@@ -120,7 +126,7 @@ public class XmpUtilReader {
         int startDescriptionSection = xmp.indexOf(START_TAG);
         int endDescriptionSection = xmp.lastIndexOf(END_TAG) + END_TAG.length();
 
-        if (startDescriptionSection < 0 || startDescriptionSection > endDescriptionSection || endDescriptionSection == END_TAG.length() - 1) {
+        if ((startDescriptionSection < 0) || (startDescriptionSection > endDescriptionSection) || (endDescriptionSection == (END_TAG.length() - 1))) {
             return metaList;
         }
 
@@ -134,7 +140,11 @@ public class XmpUtilReader {
         for (String s : descriptionsArray) {
             // END_TAG is appended, because of the split operation above
             String xmpMetaString = start + s + END_TAG + end;
-            metaList.add(XmpUtilShared.parseXmpMetadata(new ByteArrayInputStream(xmpMetaString.getBytes())));
+            try {
+                metaList.add(XmpUtilShared.parseXmpMetadata(new ByteArrayInputStream(xmpMetaString.getBytes())));
+            } catch (IOException ex) {
+                LOGGER.warn("Problem parsing XMP schema. Continuing with other schemas.", ex);
+            }
         }
         return metaList;
     }
@@ -148,7 +158,7 @@ public class XmpUtilReader {
     public static PDDocument loadWithAutomaticDecryption(Path path) throws IOException {
         // try to load the document
         // also uses an empty string as default password
-        PDDocument doc = PDDocument.load(path.toFile());
+        PDDocument doc = Loader.loadPDF(path.toFile());
         return doc;
     }
 }

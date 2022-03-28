@@ -2,6 +2,8 @@ package org.jabref.logic.remote.server;
 
 import java.io.IOException;
 
+import org.jabref.preferences.PreferencesService;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,8 +16,8 @@ public class RemoteListenerServerThread extends Thread {
 
     private final RemoteListenerServer server;
 
-    public RemoteListenerServerThread(MessageHandler messageHandler, int port) throws IOException {
-        this.server = new RemoteListenerServer(messageHandler, port);
+    public RemoteListenerServerThread(MessageHandler messageHandler, int port, PreferencesService preferencesService) throws IOException {
+        this.server = new RemoteListenerServer(messageHandler, port, preferencesService);
         this.setName("JabRef - Remote Listener Server on port " + port);
     }
 

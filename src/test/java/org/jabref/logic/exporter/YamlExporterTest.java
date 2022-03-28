@@ -11,7 +11,9 @@ import java.util.List;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 
@@ -35,7 +37,8 @@ public class YamlExporterTest {
         LayoutFormatterPreferences layoutPreferences = mock(LayoutFormatterPreferences.class, Answers.RETURNS_DEEP_STUBS);
         SavePreferences savePreferences = mock(SavePreferences.class);
         XmpPreferences xmpPreferences = mock(XmpPreferences.class);
-        ExporterFactory exporterFactory = ExporterFactory.create(customFormats, layoutPreferences, savePreferences, xmpPreferences);
+        BibEntryTypesManager entryTypesManager = mock(BibEntryTypesManager.class);
+        ExporterFactory exporterFactory = ExporterFactory.create(customFormats, layoutPreferences, savePreferences, xmpPreferences, BibDatabaseMode.BIBTEX, entryTypesManager);
 
         databaseContext = new BibDatabaseContext();
         charset = StandardCharsets.UTF_8;
@@ -46,7 +49,7 @@ public class YamlExporterTest {
     public final void exportForNoEntriesWritesNothing(@TempDir Path tempFile) throws Exception {
         Path file = tempFile.resolve("ThisIsARandomlyNamedFile");
         Files.createFile(file);
-        yamlExporter.export(databaseContext, tempFile, charset, Collections.emptyList());
+        yamlExporter.export(databaseContext, tempFile, Collections.emptyList());
         assertEquals(Collections.emptyList(), Files.readAllLines(file));
     }
 
@@ -61,7 +64,7 @@ public class YamlExporterTest {
 
         Path file = tempFile.resolve("RandomFileName");
         Files.createFile(file);
-        yamlExporter.export(databaseContext, file, charset, Collections.singletonList(entry));
+        yamlExporter.export(databaseContext, file, Collections.singletonList(entry));
 
         List<String> expected = List.of(
                 "---",
@@ -89,7 +92,7 @@ public class YamlExporterTest {
 
         Path file = tempFile.resolve("RandomFileName");
         Files.createFile(file);
-        yamlExporter.export(databaseContext, file, charset, Collections.singletonList(entry));
+        yamlExporter.export(databaseContext, file, Collections.singletonList(entry));
 
         List<String> expected = List.of(
                 "---",
@@ -117,7 +120,7 @@ public class YamlExporterTest {
 
         Path file = tempFile.resolve("RandomFileName");
         Files.createFile(file);
-        yamlExporter.export(databaseContext, file, StandardCharsets.UTF_8, Collections.singletonList(entry));
+        yamlExporter.export(databaseContext, file, Collections.singletonList(entry));
 
         List<String> expected = List.of(
                 "---",
@@ -145,7 +148,7 @@ public class YamlExporterTest {
 
         Path file = tempFile.resolve("RandomFileName");
         Files.createFile(file);
-        yamlExporter.export(databaseContext, file, null, Collections.singletonList(entry));
+        yamlExporter.export(databaseContext, file, Collections.singletonList(entry));
 
         List<String> expected = List.of(
                 "---",
@@ -158,36 +161,6 @@ public class YamlExporterTest {
                 "  issued: 2020-10-14",
                 "  url: http://example.com",
                 "---");
-
         assertEquals(expected, Files.readAllLines(file));
-    }
-
-    @Test
-    void passesModifiedCharsetASCII(@TempDir Path tempFile) throws Exception {
-        BibEntry entry = new BibEntry(StandardEntryType.Article)
-            .withCitationKey("test")
-            .withField(StandardField.AUTHOR, "谷崎 潤一郎")
-            .withField(StandardField.TITLE, "細雪")
-            .withField(StandardField.URL, "http://example.com")
-            .withField(StandardField.DATE, "2020-10-14");
-
-        Path file = tempFile.resolve("RandomFileName");
-        Files.createFile(file);
-        yamlExporter.export(databaseContext, file, StandardCharsets.US_ASCII, Collections.singletonList(entry));
-
-        List<String> expected = List.of(
-                "---",
-                "references:",
-                "- id: test",
-                "  type: article",
-                "  author:",
-                "  - literal: \"?? ???\"",
-                "  title: \"??\"",
-                "  issued: 2020-10-14",
-                "  url: http://example.com",
-                "---");
-
-        assertEquals(expected, Files.readAllLines(file));
-
     }
 }

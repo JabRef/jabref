@@ -86,11 +86,6 @@ public class ExternalTab extends AbstractPreferenceTabView<ExternalTabViewModel>
     }
 
     @FXML
-    void manageExternalFileTypes() {
-        viewModel.manageExternalFileTypes();
-    }
-
-    @FXML
     void useTerminalCommandBrowse() {
         viewModel.customTerminalBrowse();
     }

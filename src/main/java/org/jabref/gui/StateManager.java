@@ -17,6 +17,7 @@ import javafx.collections.ObservableMap;
 import javafx.concurrent.Task;
 import javafx.scene.Node;
 
+import org.jabref.gui.sidepane.SidePaneType;
 import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.gui.util.DialogWindowState;
 import org.jabref.gui.util.OptionalObjectProperty;
@@ -52,13 +53,18 @@ public class StateManager {
     private final OptionalObjectProperty<SearchQuery> activeSearchQuery = OptionalObjectProperty.empty();
     private final ObservableMap<BibDatabaseContext, IntegerProperty> searchResultMap = FXCollections.observableHashMap();
     private final OptionalObjectProperty<Node> focusOwner = OptionalObjectProperty.empty();
-    private final ObservableList<Task<?>> backgroundTasks = FXCollections.observableArrayList(task -> new Observable[]{task.progressProperty(), task.runningProperty()});
+    private final ObservableList<Task<?>> backgroundTasks = FXCollections.observableArrayList(task -> new Observable[] {task.progressProperty(), task.runningProperty()});
     private final EasyBinding<Boolean> anyTaskRunning = EasyBind.reduce(backgroundTasks, tasks -> tasks.anyMatch(Task::isRunning));
     private final EasyBinding<Double> tasksProgress = EasyBind.reduce(backgroundTasks, tasks -> tasks.filter(Task::isRunning).mapToDouble(Task::getProgress).average().orElse(1));
     private final ObservableMap<String, DialogWindowState> dialogWindowStates = FXCollections.observableHashMap();
+    private final ObservableList<SidePaneType> visibleSidePanes = FXCollections.observableArrayList();
 
     public StateManager() {
         activeGroups.bind(Bindings.valueAt(selectedGroups, activeDatabase.orElse(null)));
+    }
+
+    public ObservableList<SidePaneType> getVisibleSidePaneComponents() {
+        return visibleSidePanes;
     }
 
     public CustomLocalDragboard getLocalDragboard() {

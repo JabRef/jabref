@@ -7,8 +7,7 @@
 
 // This needs to be in the src/main/java to ensure that the Namespace is mapped to the prefix "mods"
 // this cannot be done by a gradle task at the moment
-@javax.xml.bind.annotation.XmlSchema(namespace = "http://www.loc.gov/mods/v3", xmlns = {
-        @XmlNs(prefix = "mods", namespaceURI = "http://www.loc.gov/mods/v3")}, elementFormDefault = javax.xml.bind.annotation.XmlNsForm.QUALIFIED)
+@jakarta.xml.bind.annotation.XmlSchema(namespace = "http://www.loc.gov/mods/v3", xmlns = {
+        @jakarta.xml.bind.annotation.XmlNs(prefix = "mods", namespaceURI = "http://www.loc.gov/mods/v3")}, elementFormDefault = jakarta.xml.bind.annotation.XmlNsForm.QUALIFIED)
 package org.jabref.logic.importer.fileformat.mods;
 
-import javax.xml.bind.annotation.XmlNs;

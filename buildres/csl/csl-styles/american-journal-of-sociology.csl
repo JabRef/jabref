@@ -14,7 +14,7 @@
     <category field="sociology"/>
     <issn>0002-9602</issn>
     <eissn>1537-5390</eissn>
-    <updated>2021-08-10T10:27:52+00:00</updated>
+    <updated>2021-08-21T15:46:13+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="en">
@@ -56,10 +56,10 @@
   <macro name="title">
     <choose>
       <if type="book report" match="any">
-        <text variable="title" font-style="italic"/>
+        <text variable="title" text-case="title" font-style="italic"/>
       </if>
       <else>
-        <text variable="title" quotes="true"/>
+        <text variable="title" text-case="title" quotes="true"/>
       </else>
     </choose>
   </macro>
@@ -158,18 +158,18 @@
       </else-if>
       <else-if type="chapter paper-conference" match="any">
         <group delimiter=". " prefix=". ">
-          <group delimiter=" ">
-            <group delimiter=": ">
-              <text term="in" text-case="capitalize-first" font-style="normal"/>
-              <text variable="container-title" font-style="italic"/>
+          <group delimiter=", ">
+            <group delimiter=" ">
+              <group delimiter=" ">
+                <label text-case="capitalize-first" variable="page" form="short"/>
+                <text variable="page"/>
+              </group>
+              <text term="in" font-style="normal"/>
+              <text variable="container-title" text-case="title" font-style="italic"/>
             </group>
-            <text macro="editors" prefix="(" suffix=")"/>
+            <text macro="editors"/>
           </group>
           <text macro="edition"/>
-          <group delimiter=" ">
-            <label text-case="capitalize-first" variable="page" form="short"/>
-            <text variable="page"/>
-          </group>
         </group>
       </else-if>
       <else-if type="webpage post post-weblog" match="any">
@@ -185,8 +185,8 @@
   </macro>
   <macro name="editors">
     <names variable="editor translator" delimiter=", ">
-      <label form="short"/>
-      <name prefix=" " and="text" name-as-sort-order="first"/>
+      <label form="verb"/>
+      <name prefix=" " and="text" initialize-with=". "/>
     </names>
   </macro>
   <citation et-al-min="3" et-al-use-first="1" disambiguate-add-year-suffix="true" collapse="year">
@@ -204,7 +204,7 @@
       </group>
     </layout>
   </citation>
-  <bibliography et-al-min="4" et-al-use-first="1" subsequent-author-substitute="&#8212;&#8212;&#8212;" entry-spacing="0" hanging-indent="true">
+  <bibliography et-al-subsequent-min="4" et-al-subsequent-use-first="1" subsequent-author-substitute="&#8212;&#8212;&#8212;" entry-spacing="0" hanging-indent="true">
     <sort>
       <key macro="author"/>
       <key variable="issued"/>

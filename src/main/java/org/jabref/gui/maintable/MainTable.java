@@ -35,6 +35,7 @@ import org.jabref.gui.externalfiles.ImportHandler;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.keyboard.KeyBindingRepository;
+import org.jabref.gui.maintable.columns.LibraryColumn;
 import org.jabref.gui.maintable.columns.MainTableColumn;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.CustomLocalDragboard;
@@ -42,7 +43,6 @@ import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.ViewModelTableRowFactory;
 import org.jabref.logic.importer.ImportCleanup;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.OS;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.database.event.EntriesAddedEvent;
@@ -59,6 +59,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
     private final LibraryTab libraryTab;
     private final DialogService dialogService;
+    private final StateManager stateManager;
     private final BibDatabaseContext database;
     private final MainTableDataModel model;
 
@@ -80,6 +81,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
         this.libraryTab = libraryTab;
         this.dialogService = dialogService;
+        this.stateManager = stateManager;
         this.database = Objects.requireNonNull(database);
         this.model = model;
         UndoManager undoManager = libraryTab.getUndoManager();
@@ -101,10 +103,13 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                 new MainTableColumnFactory(
                         database,
                         preferencesService,
+                        preferencesService.getColumnPreferences(),
                         externalFileTypes,
                         libraryTab.getUndoManager(),
                         dialogService,
                         stateManager).createColumns());
+
+        this.getColumns().removeIf(col -> col instanceof LibraryColumn);
 
         new ViewModelTableRowFactory<BibEntryTableViewModel>()
                 .withOnMouseClickedEvent((entry, event) -> {
@@ -119,7 +124,8 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                         stateManager,
                         preferencesService,
                         undoManager,
-                        Globals.getClipboardManager()))
+                        Globals.getClipboardManager(),
+                        Globals.TASK_EXECUTOR))
                 .setOnDragDetected(this::handleOnDragDetected)
                 .setOnDragDropped(this::handleOnDragDropped)
                 .setOnDragOver(this::handleOnDragOver)
@@ -242,7 +248,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     }
 
     private void setupKeyBindings(KeyBindingRepository keyBindings) {
-        this.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
+        this.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
             if (event.getCode() == KeyCode.ENTER) {
                 getSelectedEntries().stream()
                                     .findFirst()
@@ -263,21 +269,19 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                         event.consume();
                         break;
                     case PASTE:
-                        if (!OS.OS_X) {
-                            new EditAction(StandardActions.PASTE, libraryTab.frame(), Globals.stateManager).execute();
-                        }
+                        new EditAction(StandardActions.PASTE, libraryTab.frame(), stateManager).execute();
                         event.consume();
                         break;
                     case COPY:
-                        new EditAction(StandardActions.COPY, libraryTab.frame(), Globals.stateManager).execute();
+                        new EditAction(StandardActions.COPY, libraryTab.frame(), stateManager).execute();
                         event.consume();
                         break;
                     case CUT:
-                        new EditAction(StandardActions.CUT, libraryTab.frame(), Globals.stateManager).execute();
+                        new EditAction(StandardActions.CUT, libraryTab.frame(), stateManager).execute();
                         event.consume();
                         break;
                     case DELETE_ENTRY:
-                        new EditAction(StandardActions.DELETE_ENTRY, libraryTab.frame(), Globals.stateManager).execute();
+                        new EditAction(StandardActions.DELETE_ENTRY, libraryTab.frame(), stateManager).execute();
                         event.consume();
                         break;
                     default:
@@ -379,11 +383,11 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                         }
                         case MOVE -> {
                             LOGGER.debug("Mode MOVE"); // alt on win
-                            importHandler.getLinker().moveFilesToFileDirAndAddToEntry(entry, files);
+                            importHandler.getLinker().moveFilesToFileDirAndAddToEntry(entry, files, libraryTab.getIndexingTaskManager());
                         }
                         case COPY -> {
                             LOGGER.debug("Mode Copy"); // ctrl on win
-                            importHandler.getLinker().copyFilesToFileDirAndAddToEntry(entry, files);
+                            importHandler.getLinker().copyFilesToFileDirAndAddToEntry(entry, files, libraryTab.getIndexingTaskManager());
                         }
                     }
                 }

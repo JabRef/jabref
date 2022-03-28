@@ -21,6 +21,7 @@ import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.LinkedFile;
+import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
 
@@ -30,11 +31,14 @@ public class DocumentViewerView extends BaseDialog<Void> {
     @FXML private ComboBox<LinkedFile> fileChoice;
     @FXML private BorderPane mainPane;
     @FXML private ToggleButton modeLive;
+    @FXML private ToggleButton modeLock;
     @FXML private TextField currentPage;
     @FXML private Label maxPages;
 
     @Inject private StateManager stateManager;
     @Inject private TaskExecutor taskExecutor;
+    @Inject private PreferencesService preferencesService;
+
     private DocumentViewerControl viewer;
     private DocumentViewerViewModel viewModel;
 
@@ -53,7 +57,7 @@ public class DocumentViewerView extends BaseDialog<Void> {
 
     @FXML
     private void initialize() {
-        viewModel = new DocumentViewerViewModel(stateManager);
+        viewModel = new DocumentViewerViewModel(stateManager, preferencesService);
 
         setupViewer();
         setupScrollbar();
@@ -64,6 +68,7 @@ public class DocumentViewerView extends BaseDialog<Void> {
 
     private void setupModeButtons() {
         viewModel.liveModeProperty().bind(modeLive.selectedProperty());
+        modeLock.selectedProperty().bind(modeLive.selectedProperty().not());
     }
 
     private void setupScrollbar() {
@@ -101,6 +106,14 @@ public class DocumentViewerView extends BaseDialog<Void> {
         });
         viewModel.currentPageProperty().bindBidirectional(viewer.currentPageProperty());
         mainPane.setCenter(viewer);
+    }
+
+    public void setLiveMode(boolean liveMode) {
+        modeLive.setSelected(liveMode);
+    }
+
+    public void gotoPage(int pageNumber) {
+        viewModel.showPage(pageNumber);
     }
 
     public void nextPage(ActionEvent actionEvent) {

@@ -1,6 +1,5 @@
 package org.jabref.gui.importer;
 
-import java.io.File;
 import java.util.List;
 import java.util.Optional;
 
@@ -30,7 +29,6 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.util.FileUpdateMonitor;
-import org.jabref.preferences.FilePreferences;
 import org.jabref.preferences.PreferencesService;
 
 import org.slf4j.Logger;
@@ -114,7 +112,7 @@ public class ImportEntriesViewModel extends AbstractViewModel {
     public void importEntries(List<BibEntry> entriesToImport, boolean shouldDownloadFiles) {
         // Check if we are supposed to warn about duplicates.
         // If so, then see if there are duplicates, and warn if yes.
-        if (preferences.shouldWarnAboutDuplicatesForImport()) {
+        if (preferences.getImportExportPreferences().shouldWarnAboutDuplicatesOnImport()) {
             BackgroundTask.wrap(() -> entriesToImport.stream()
                                                      .anyMatch(this::hasDuplicate)).onSuccess(duplicateFound -> {
                 if (duplicateFound) {
@@ -123,7 +121,7 @@ public class ImportEntriesViewModel extends AbstractViewModel {
                             Localization.lang("Continue with import"),
                             Localization.lang("Cancel import"),
                             Localization.lang("Do not ask again"),
-                            optOut -> preferences.setShouldWarnAboutDuplicatesForImport(!optOut));
+                            optOut -> preferences.getImportExportPreferences().setWarnAboutDuplicatesOnImport(!optOut));
 
                     if (!continueImport) {
                         dialogService.notify(Localization.lang("Import canceled"));
@@ -139,31 +137,26 @@ public class ImportEntriesViewModel extends AbstractViewModel {
         }
 
         // Remember the selection in the dialog
-        FilePreferences filePreferences = preferences.getFilePreferences()
-                                                     .withShouldDownloadLinkedFiles(shouldDownloadFiles);
-        preferences.storeFilePreferences(filePreferences);
+        preferences.getFilePreferences().setDownloadLinkedFiles(shouldDownloadFiles);
 
         if (shouldDownloadFiles) {
             for (BibEntry bibEntry : entriesToImport) {
-                for (LinkedFile linkedFile : bibEntry.getFiles()) {
-                    LinkedFileViewModel linkedFileViewModel = new LinkedFileViewModel(
-                            linkedFile,
-                            bibEntry,
-                            databaseContext,
-                            taskExecutor,
-                            dialogService,
-                            preferences.getXmpPreferences(),
-                            filePreferences,
-                            ExternalFileTypes.getInstance());
-                    linkedFileViewModel.download();
-                }
+                bibEntry.getFiles().stream().filter(LinkedFile::isOnlineLink).forEach(linkedFile ->
+                        new LinkedFileViewModel(
+                                linkedFile,
+                                bibEntry,
+                                databaseContext,
+                                taskExecutor,
+                                dialogService,
+                                preferences,
+                                ExternalFileTypes.getInstance()).download());
             }
         }
 
         new DatabaseMerger(preferences.getKeywordDelimiter()).mergeStrings(databaseContext.getDatabase(), parserResult.getDatabase());
         new DatabaseMerger(preferences.getKeywordDelimiter()).mergeMetaData(databaseContext.getMetaData(),
                 parserResult.getMetaData(),
-                parserResult.getFile().map(File::getName).orElse("unknown"),
+                parserResult.getPath().map(path -> path.getFileName().toString()).orElse("unknown"),
                 parserResult.getDatabase().getEntries());
 
         JabRefGUI.getMainFrame().getCurrentLibraryTab().markBaseChanged();

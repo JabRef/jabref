@@ -6,7 +6,7 @@ import javafx.scene.control.TextField;
 
 import org.jabref.gui.DialogService;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.FilePreferences;
 import org.jabref.preferences.PushToApplicationPreferences;
 
 public class PushToEmacsSettings extends PushToApplicationSettings {
@@ -15,9 +15,9 @@ public class PushToEmacsSettings extends PushToApplicationSettings {
 
     public PushToEmacsSettings(PushToApplication application,
                                DialogService dialogService,
-                               PreferencesService preferencesService,
+                               FilePreferences filePreferences,
                                ObjectProperty<PushToApplicationPreferences> preferences) {
-        super(application, dialogService, preferencesService, preferences);
+        super(application, dialogService, filePreferences, preferences);
 
         settingsPane.add(new Label(Localization.lang("Additional parameters") + ":"), 0, 1);
         settingsPane.add(additionalParams, 1, 1);

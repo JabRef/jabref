@@ -19,15 +19,14 @@ import org.slf4j.LoggerFactory;
 
 /**
  * CitationGroups : the set of citation groups in the document.
- *
+ * <p>
  * This is the main input (as well as output) for creating citation markers and bibliography.
- *
  */
 public class CitationGroups {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CitationGroups.class);
 
-    private Map<CitationGroupId, CitationGroup> citationGroupsUnordered;
+    private final Map<CitationGroupId, CitationGroup> citationGroupsUnordered;
 
     /**
      * Provides order of appearance for the citation groups.
@@ -35,7 +34,7 @@ public class CitationGroups {
     private Optional<List<CitationGroupId>> globalOrder;
 
     /**
-     *  This is going to be the bibliography
+     * This is going to be the bibliography
      */
     private Optional<CitedKeys> bibliography;
 
@@ -62,12 +61,12 @@ public class CitationGroups {
                                           T value) {
 
         for (CitationPath p : where) {
-            CitationGroup cg = citationGroupsUnordered.get(p.group);
-            if (cg == null) {
+            CitationGroup group = citationGroupsUnordered.get(p.group);
+            if (group == null) {
                 LOGGER.warn("CitationGroups.distributeToCitations: group missing");
                 continue;
             }
-            Citation cit = cg.citationsInStorageOrder.get(p.storageIndexInGroup);
+            Citation cit = group.citationsInStorageOrder.get(p.storageIndexInGroup);
             fun.accept(new OOPair<>(cit, value));
         }
     }
@@ -96,8 +95,8 @@ public class CitationGroups {
         // right thing. Seems to work. But what we gained from avoiding collect-and-distribute
         // may be lost in more complicated consistency checking in addPath.
         //
-        ///            for (CitationGroup cg : getCitationGroupsUnordered()) {
-        ///                for (Citation cit : cg.citationsInStorageOrder) {
+        ///            for (CitationGroup group : getCitationGroupsUnordered()) {
+        ///                for (Citation cit : group.citationsInStorageOrder) {
         ///                    cit.lookupInDatabases(databases);
         ///                }
         ///            }
@@ -114,13 +113,12 @@ public class CitationGroups {
         if (globalOrder.isEmpty()) {
             throw new IllegalStateException("getCitationGroupsInGlobalOrder: not ordered yet");
         }
-        return OOListUtil.map(globalOrder.get(), cgid -> citationGroupsUnordered.get(cgid));
+        return OOListUtil.map(globalOrder.get(), citationGroupsUnordered::get);
     }
 
     /**
-     * Impose an order of citation groups by providing the order of their citation group
-     * idendifiers.
-     *
+     * Impose an order of citation groups by providing the order of their citation group idendifiers.
+     * <p>
      * Also set indexInGlobalOrder for each citation group.
      */
     public void setGlobalOrder(List<CitationGroupId> globalOrder) {
@@ -131,10 +129,9 @@ public class CitationGroups {
         this.globalOrder = Optional.of(globalOrder);
 
         // Propagate to each CitationGroup
-        int i = 0;
-        for (CitationGroupId cgid : globalOrder) {
-            citationGroupsUnordered.get(cgid).setIndexInGlobalOrder(Optional.of(i));
-            i++;
+        for (int i = 0; i < globalOrder.size(); i++) {
+            CitationGroupId groupId = globalOrder.get(i);
+            citationGroupsUnordered.get(groupId).setIndexInGlobalOrder(Optional.of(i));
         }
     }
 
@@ -146,22 +143,21 @@ public class CitationGroups {
      * Impose an order for citations within each group.
      */
     public void imposeLocalOrder(Comparator<BibEntry> entryComparator) {
-        for (CitationGroup cg : citationGroupsUnordered.values()) {
-            cg.imposeLocalOrder(entryComparator);
+        for (CitationGroup group : citationGroupsUnordered.values()) {
+            group.imposeLocalOrder(entryComparator);
         }
     }
 
     /**
-     * Collect citations into a list of cited sources using neither CitationGroup.globalOrder or
-     * Citation.localOrder
+     * Collect citations into a list of cited sources using neither CitationGroup.globalOrder or Citation.localOrder
      */
     public CitedKeys getCitedKeysUnordered() {
         LinkedHashMap<String, CitedKey> res = new LinkedHashMap<>();
-        for (CitationGroup cg : citationGroupsUnordered.values()) {
+        for (CitationGroup group : citationGroupsUnordered.values()) {
             int storageIndexInGroup = 0;
-            for (Citation cit : cg.citationsInStorageOrder) {
+            for (Citation cit : group.citationsInStorageOrder) {
                 String key = cit.citationKey;
-                CitationPath path = new CitationPath(cg.cgid, storageIndexInGroup);
+                CitationPath path = new CitationPath(group.groupId, storageIndexInGroup);
                 if (res.containsKey(key)) {
                     res.get(key).addPath(path, cit);
                 } else {
@@ -181,11 +177,11 @@ public class CitationGroups {
             throw new IllegalStateException("getSortedCitedKeys: no globalOrder");
         }
         LinkedHashMap<String, CitedKey> res = new LinkedHashMap<>();
-        for (CitationGroup cg : getCitationGroupsInGlobalOrder()) {
-            for (int i : cg.getLocalOrder()) {
-                Citation cit = cg.citationsInStorageOrder.get(i);
+        for (CitationGroup group : getCitationGroupsInGlobalOrder()) {
+            for (int i : group.getLocalOrder()) {
+                Citation cit = group.citationsInStorageOrder.get(i);
                 String citationKey = cit.citationKey;
-                CitationPath path = new CitationPath(cg.cgid, i);
+                CitationPath path = new CitationPath(group.groupId, i);
                 if (res.containsKey(citationKey)) {
                     res.get(citationKey).addPath(path, cit);
                 } else {
@@ -217,9 +213,9 @@ public class CitationGroups {
     }
 
     public void createNumberedBibliographySortedInOrderOfAppearance() {
-        if (!bibliography.isEmpty()) {
+        if (bibliography.isPresent()) {
             throw new IllegalStateException("createNumberedBibliographySortedInOrderOfAppearance:"
-                                            + " already have a bibliography");
+                    + " already have a bibliography");
         }
         CitedKeys citedKeys = getCitedKeysSortedInOrderOfAppearance();
         citedKeys.numberCitedKeysInCurrentOrder();
@@ -231,7 +227,7 @@ public class CitationGroups {
      * precondition: database lookup already performed (otherwise we just sort citation keys)
      */
     public void createPlainBibliographySortedByComparator(Comparator<BibEntry> entryComparator) {
-        if (!bibliography.isEmpty()) {
+        if (bibliography.isPresent()) {
             throw new IllegalStateException("createPlainBibliographySortedByComparator: already have a bibliography");
         }
         CitedKeys citedKeys = getCitedKeysUnordered();
@@ -243,7 +239,7 @@ public class CitationGroups {
      * precondition: database lookup already performed (otherwise we just sort citation keys)
      */
     public void createNumberedBibliographySortedByComparator(Comparator<BibEntry> entryComparator) {
-        if (!bibliography.isEmpty()) {
+        if (bibliography.isPresent()) {
             throw new IllegalStateException("createNumberedBibliographySortedByComparator: already have a bibliography");
         }
         CitedKeys citedKeys = getCitedKeysUnordered();
@@ -257,17 +253,17 @@ public class CitationGroups {
      * Query by CitationGroupId
      */
 
-    public Optional<CitationGroup> getCitationGroup(CitationGroupId cgid) {
-        CitationGroup cg = citationGroupsUnordered.get(cgid);
-        return Optional.ofNullable(cg);
+    public Optional<CitationGroup> getCitationGroup(CitationGroupId groupId) {
+        CitationGroup group = citationGroupsUnordered.get(groupId);
+        return Optional.ofNullable(group);
     }
 
-    /*
+    /**
      * @return true if all citation groups have referenceMarkNameForLinking
      */
     public boolean citationGroupsProvideReferenceMarkNameForLinking() {
-        for (CitationGroup cg : citationGroupsUnordered.values()) {
-            if (cg.getReferenceMarkNameForLinking().isEmpty()) {
+        for (CitationGroup group : citationGroupsUnordered.values()) {
+            if (group.getReferenceMarkNameForLinking().isEmpty()) {
                 return false;
             }
         }
@@ -278,18 +274,17 @@ public class CitationGroups {
      * Callbacks.
      */
 
-    public void afterCreateCitationGroup(CitationGroup cg) {
-        citationGroupsUnordered.put(cg.cgid, cg);
+    public void afterCreateCitationGroup(CitationGroup group) {
+        citationGroupsUnordered.put(group.groupId, group);
 
         globalOrder = Optional.empty();
         bibliography = Optional.empty();
     }
 
-    public void afterRemoveCitationGroup(CitationGroup cg) {
-        citationGroupsUnordered.remove(cg.cgid);
-        globalOrder.map(l -> l.remove(cg.cgid));
+    public void afterRemoveCitationGroup(CitationGroup group) {
+        citationGroupsUnordered.remove(group.groupId);
+        globalOrder.map(l -> l.remove(group.groupId));
 
         bibliography = Optional.empty();
     }
-
 }

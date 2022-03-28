@@ -36,7 +36,7 @@
   </macro>
   <macro name="sort-key">
     <choose>
-      <if type="bill" match="any">
+      <if type="bill legislation" match="any">
         <text value="3"/>
       </if>
       <else-if type="legal_case" match="any">
@@ -75,7 +75,7 @@
   <citation et-al-min="4" et-al-use-first="1" disambiguate-add-names="true" givenname-disambiguation-rule="all-names-with-initials" disambiguate-add-givenname="true">
     <layout suffix="." delimiter="; ">
       <choose>
-        <if type="bill">
+        <if type="bill legislation" match="any">
           <choose>
             <if variable="genre" match="all">
               <!-- Verordnung oder Richtlinie der Europäischen Union -->
@@ -334,7 +334,7 @@
     </sort>
     <layout>
       <choose>
-        <if type="bill">
+        <if type="bill legislation" match="any">
           <choose>
             <if variable="genre" match="all">
               <!-- Verordnung oder Richtlinie der Europäischen Union -->

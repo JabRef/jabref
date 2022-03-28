@@ -10,7 +10,7 @@
     <category citation-format="author-date"/>
     <category field="psychology"/>
     <category field="generic-base"/>
-    <updated>2020-10-28T12:00:00+00:00</updated>
+    <updated>2022-01-31T14:30:00+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="en">
@@ -240,22 +240,7 @@
     </choose>
   </macro>
   <macro name="date-sort-date">
-    <choose>
-      <if type="article-magazine article-newspaper broadcast interview pamphlet personal_communication post post-weblog speech treaty webpage" match="any">
-        <date variable="issued" form="numeric"/>
-      </if>
-      <else-if type="paper-conference">
-        <!-- Capture 'speech' stored as 'paper-conference' -->
-        <choose>
-          <if variable="collection-editor editor editorial-director issue page volume" match="none">
-            <date variable="issued" form="numeric"/>
-          </if>
-        </choose>
-      </else-if>
-      <else>
-        <date variable="issued" form="numeric"/>
-      </else>
-    </choose>
+    <date variable="issued" form="numeric"/>
   </macro>
   <macro name="date-intext">
     <choose>

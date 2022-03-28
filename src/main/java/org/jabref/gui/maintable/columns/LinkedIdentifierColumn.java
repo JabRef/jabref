@@ -35,7 +35,6 @@ public class LinkedIdentifierColumn extends MainTableColumn<Map<Field, String>> 
     private final CellFactory cellFactory;
     private final DialogService dialogService;
     private final PreferencesService preferences;
-    private final StateManager stateManager;
 
     public LinkedIdentifierColumn(MainTableColumnModel model,
                                   CellFactory cellFactory,
@@ -48,7 +47,6 @@ public class LinkedIdentifierColumn extends MainTableColumn<Map<Field, String>> 
         this.cellFactory = cellFactory;
         this.dialogService = dialogService;
         this.preferences = preferences;
-        this.stateManager = stateManager;
 
         Node headerGraphic = IconTheme.JabRefIcons.WWW.getGraphicNode();
         Tooltip.install(headerGraphic, new Tooltip(Localization.lang("Linked identifiers")));
@@ -98,7 +96,7 @@ public class LinkedIdentifierColumn extends MainTableColumn<Map<Field, String>> 
                     cellFactory.getTableIcon(field));
             menuItem.setOnAction(event -> {
                 try {
-                    JabRefDesktop.openExternalViewer(database, values.get(field), field);
+                    JabRefDesktop.openExternalViewer(database, preferences, values.get(field), field);
                 } catch (IOException e) {
                     dialogService.showErrorDialogAndWait(Localization.lang("Unable to open link."), e);
                 }

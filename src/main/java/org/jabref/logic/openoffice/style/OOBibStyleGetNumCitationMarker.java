@@ -12,13 +12,10 @@ import org.jabref.model.openoffice.util.OOListUtil;
 
 class OOBibStyleGetNumCitationMarker {
 
-    /*
-     * The number encoding "this entry is unresolved"
-     */
+    // The number encoding "this entry is unresolved"
     public final static int UNRESOLVED_ENTRY_NUMBER = 0;
 
     private OOBibStyleGetNumCitationMarker() {
-        /**/
     }
 
     /**
@@ -53,23 +50,23 @@ class OOBibStyleGetNumCitationMarker {
         // prefer BRACKET_BEFORE_IN_LIST and BRACKET_AFTER_IN_LIST
         String bracketBefore = style.getBracketBeforeInListWithFallBack();
         String bracketAfter = style.getBracketAfterInListWithFallBack();
-        StringBuilder sb = new StringBuilder();
-        sb.append(style.getCitationGroupMarkupBefore());
-        sb.append(bracketBefore);
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append(style.getCitationGroupMarkupBefore());
+        stringBuilder.append(bracketBefore);
         final Optional<Integer> current = entry.getNumber();
-        sb.append(current.isPresent()
+        stringBuilder.append(current.isPresent()
                   ? String.valueOf(current.get())
                   : (OOBibStyle.UNDEFINED_CITATION_MARKER + entry.getCitationKey()));
-        sb.append(bracketAfter);
-        sb.append(style.getCitationGroupMarkupAfter());
-        return OOText.fromString(sb.toString());
+        stringBuilder.append(bracketAfter);
+        stringBuilder.append(style.getCitationGroupMarkupAfter());
+        return OOText.fromString(stringBuilder.toString());
     }
 
     /*
      * emitBlock : a helper for getNumCitationMarker2
      *
      * Given a block containing either a single entry or two or more
-     * entries that are joinable into an "i-j" form, append to {@code sb} the
+     * entries that are joinable into an "i-j" form, append to {@code stringBuilder} the
      * formatted text.
      *
      * Assumes:
@@ -91,7 +88,7 @@ class OOBibStyleGetNumCitationMarker {
     private static void emitBlock(List<CitationMarkerNumericEntry> block,
                                   OOBibStyle style,
                                   int minGroupingCount,
-                                  StringBuilder sb) {
+                                  StringBuilder stringBuilder) {
 
         final int blockSize = block.size();
         if (blockSize == 0) {
@@ -102,14 +99,14 @@ class OOBibStyleGetNumCitationMarker {
             // Add single entry:
             CitationMarkerNumericEntry entry = block.get(0);
             final Optional<Integer> num = entry.getNumber();
-            sb.append(num.isEmpty()
-                      ? (OOBibStyle.UNDEFINED_CITATION_MARKER + entry.getCitationKey())
-                      : String.valueOf(num.get()));
+            stringBuilder.append(num.isEmpty()
+                                 ? (OOBibStyle.UNDEFINED_CITATION_MARKER + entry.getCitationKey())
+                                 : String.valueOf(num.get()));
             // Emit pageInfo
             Optional<OOText> pageInfo = entry.getPageInfo();
             if (pageInfo.isPresent()) {
-                sb.append(style.getPageInfoSeparator());
-                sb.append(OOText.toString(pageInfo.get()));
+                stringBuilder.append(style.getPageInfoSeparator());
+                stringBuilder.append(OOText.toString(pageInfo.get()));
             }
             return;
         }
@@ -146,20 +143,19 @@ class OOBibStyleGetNumCitationMarker {
                 }
 
                 // Emit: "first-last"
-                sb.append(first);
-                sb.append(style.getGroupedNumbersSeparator());
-                sb.append(last);
+                stringBuilder.append(first);
+                stringBuilder.append(style.getGroupedNumbersSeparator());
+                stringBuilder.append(last);
             } else {
 
                 // Emit: first, first+1,..., last
                 for (int j = 0; j < blockSize; j++) {
                     if (j > 0) {
-                        sb.append(style.getCitationSeparator());
+                        stringBuilder.append(style.getCitationSeparator());
                     }
-                    sb.append(block.get(j).getNumber().get());
+                    stringBuilder.append(block.get(j).getNumber().get());
                 }
             }
-            return;
         }
     }
 
@@ -194,15 +190,15 @@ class OOBibStyleGetNumCitationMarker {
         final boolean joinIsDisabled = (minGroupingCount <= 0);
         final int nCitations = entries.size();
 
-        String bracketBefore = style.getBracketBefore();
-        String bracketAfter = style.getBracketAfter();
+        final String bracketBefore = style.getBracketBefore();
+        final String bracketAfter = style.getBracketAfter();
 
         // Sort a copy of entries
         List<CitationMarkerNumericEntry> sorted = OOListUtil.map(entries, e -> e);
         sorted.sort(OOBibStyleGetNumCitationMarker::compareCitationMarkerNumericEntry);
 
         // "["
-        StringBuilder sb = new StringBuilder(bracketBefore);
+        StringBuilder stringBuilder = new StringBuilder(bracketBefore);
 
         /*
          *  Original:
@@ -248,12 +244,12 @@ class OOBibStyleGetNumCitationMarker {
                 }
             }
 
-            if (nextBlock.size() > 0) {
+            if (!nextBlock.isEmpty()) {
                 // emit current block
                 if (blocksEmitted) {
-                    sb.append(style.getCitationSeparator());
+                    stringBuilder.append(style.getCitationSeparator());
                 }
-                emitBlock(currentBlock, style, minGroupingCount, sb);
+                emitBlock(currentBlock, style, minGroupingCount, stringBuilder);
                 blocksEmitted = true;
                 currentBlock = nextBlock;
                 nextBlock = new ArrayList<>();
@@ -261,21 +257,21 @@ class OOBibStyleGetNumCitationMarker {
 
         }
 
-        if (nextBlock.size() != 0) {
+        if (!nextBlock.isEmpty()) {
             throw new IllegalStateException("impossible: (nextBlock.size() != 0) after loop");
         }
 
-        if (currentBlock.size() > 0) {
+        if (!currentBlock.isEmpty()) {
             // We are emitting a block
             if (blocksEmitted) {
-                sb.append(style.getCitationSeparator());
+                stringBuilder.append(style.getCitationSeparator());
             }
-            emitBlock(currentBlock, style, minGroupingCount, sb);
+            emitBlock(currentBlock, style, minGroupingCount, stringBuilder);
         }
 
         // Emit: "]"
-        sb.append(bracketAfter);
-        return OOText.fromString(sb.toString());
+        stringBuilder.append(bracketAfter);
+        return OOText.fromString(stringBuilder.toString());
     }
 
 }

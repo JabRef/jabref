@@ -18,7 +18,7 @@ Please read [https://github.com/cxxr/better-java](https://github.com/cxxr/better
 
 Principles:
 
-* All Exceptions we throw should be or extend `JabRefException`; This is especially important if the message stored in the Exception should be shown to the user. `JabRefException` has already implemented the `getLocalizedMessage()` method which should be used for such cases \(see details below!\).
+* All exceptions we throw should be or extend `JabRefException`; This is especially important if the message stored in the Exception should be shown to the user. `JabRefException` has already implemented the `getLocalizedMessage()` method which should be used for such cases \(see details below!\).
 * Catch and wrap all API exceptions \(such as `IOExceptions`\) and rethrow them
   * Example:
 
@@ -119,7 +119,8 @@ If you want to catch the event you'll have to register your listener class with 
 
 ## Logging
 
-JabRef uses the logging facade [SLF4j](https://www.slf4j.org/). All log messages are passed internally to [log4j2](https://logging.apache.org/log4j/2.x/) which handles any filtering, formatting and writing of log messages.
+JabRef uses the logging facade [SLF4j](https://www.slf4j.org/).
+All log messages are passed internally to [tinylog](https://tinylog.org/v2/) which handles any filtering, formatting and writing of log messages.
 
 * Obtaining a logger for a class:
 
@@ -137,6 +138,11 @@ JabRef uses the logging facade [SLF4j](https://www.slf4j.org/). All log messages
   ```
 
 * SLF4J also support parameterized logging, e.g. if you want to print out multiple arguments in a log statement use a pair of curly braces. [Examples](https://www.slf4j.org/faq.html#logging_performance)
+* When running tests, `tinylog-test.properties` is used. It is located under `src/test/resources`.
+  As default, only `info` is logged.
+  When developing, it makes sense to use `debug` as log level.
+  One can change the log level per class using the pattern `level@class=debug` is set to `debug`.
+  In the `.properties` file, this is done for `org.jabref.model.entry.BibEntry`.
 
 ## Using Localization correctly
 

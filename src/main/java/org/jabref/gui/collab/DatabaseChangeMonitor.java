@@ -4,6 +4,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.jabref.gui.DialogService;
+import org.jabref.gui.StateManager;
+import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
@@ -22,16 +25,26 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
     private final FileUpdateMonitor fileMonitor;
     private final List<DatabaseChangeListener> listeners;
     private final TaskExecutor taskExecutor;
+    private final DialogService dialogService;
     private final PreferencesService preferencesService;
+    private final StateManager stateManager;
+    private final ThemeManager themeManager;
 
     public DatabaseChangeMonitor(BibDatabaseContext database,
                                  FileUpdateMonitor fileMonitor,
                                  TaskExecutor taskExecutor,
-                                 PreferencesService preferencesService) {
+                                 DialogService dialogService,
+                                 PreferencesService preferencesService,
+                                 StateManager stateManager,
+                                 ThemeManager themeManager) {
         this.database = database;
         this.fileMonitor = fileMonitor;
         this.taskExecutor = taskExecutor;
+        this.dialogService = dialogService;
         this.preferencesService = preferencesService;
+        this.stateManager = stateManager;
+        this.themeManager = themeManager;
+
         this.listeners = new ArrayList<>();
 
         this.database.getDatabasePath().ifPresent(path -> {
@@ -46,7 +59,7 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
     @Override
     public void fileUpdated() {
         // File on disk has changed, thus look for notable changes and notify listeners in case there are such changes
-        ChangeScanner scanner = new ChangeScanner(database, preferencesService);
+        ChangeScanner scanner = new ChangeScanner(database, dialogService, preferencesService, stateManager, themeManager);
         BackgroundTask.wrap(scanner::scanForChanges)
                       .onSuccess(changes -> {
                           if (!changes.isEmpty()) {

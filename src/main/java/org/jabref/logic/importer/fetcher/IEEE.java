@@ -289,8 +289,6 @@ public class IEEE implements FulltextFetcher, PagedSearchBasedParserFetcher {
         // Starts to index at 1 for the first entry
         uriBuilder.addParameter("start_record", String.valueOf(getPageSize() * pageNumber) + 1);
 
-        URLDownload.bypassSSLVerification();
-
         return uriBuilder.build().toURL();
     }
 }

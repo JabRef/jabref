@@ -98,7 +98,9 @@ public class URLDownload {
      * security-relevant information this is kind of OK (no, actually it is not...).
      * <p>
      * Taken from http://stackoverflow.com/a/6055903/873661 and https://stackoverflow.com/a/19542614/873661
+     * @deprecated
      */
+    @Deprecated
     public static void bypassSSLVerification() {
         LOGGER.warn("Fix SSL exceptions by accepting ALL certificates");
 
@@ -200,7 +202,7 @@ public class URLDownload {
         Unirest.config().setDefaultHeader("User-Agent", "Mozilla/5.0 (Windows; U; WindowsNT 5.1; en-US; rv1.8.1.6) Gecko/20070725 Firefox/2.0.0.6");
 
         int statusCode = Unirest.head(source.toString()).asString().getStatus();
-        return statusCode >= 200 && statusCode < 300;
+        return (statusCode >= 200) && (statusCode < 300);
     }
 
     public boolean isMimeType(String type) {

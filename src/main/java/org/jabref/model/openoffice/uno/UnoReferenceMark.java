@@ -17,17 +17,17 @@ import com.sun.star.text.XTextRange;
 
 public class UnoReferenceMark {
 
-    private UnoReferenceMark() { }
+    private UnoReferenceMark() {
+    }
 
     /**
      * @throws NoDocumentException If cannot get reference marks
-     *
-     * Note: also used by `isDocumentConnectionMissing` to test if we have a working connection.
-     *
+     *                             <p>
+     *                             Note: also used by `isDocumentConnectionMissing` to test if we have a working connection.
      */
     public static XNameAccess getNameAccess(XTextDocument doc)
-        throws
-        NoDocumentException {
+            throws
+            NoDocumentException {
 
         XReferenceMarksSupplier supplier = UnoCast.cast(XReferenceMarksSupplier.class, doc).get();
 
@@ -40,11 +40,11 @@ public class UnoReferenceMark {
 
     /**
      * Names of all reference marks.
-     *
+     * <p>
      * Empty list for nothing.
      */
     public static List<String> getListOfNames(XTextDocument doc)
-        throws NoDocumentException {
+            throws NoDocumentException {
 
         XNameAccess nameAccess = UnoReferenceMark.getNameAccess(doc);
         String[] names = nameAccess.getElementNames();
@@ -56,13 +56,13 @@ public class UnoReferenceMark {
 
     /**
      * Remove the named reference mark.
-     *
+     * <p>
      * Removes both the text and the mark itself.
      */
     public static void removeIfExists(XTextDocument doc, String name)
-        throws
-        WrappedTargetException,
-        NoDocumentException {
+            throws
+            WrappedTargetException,
+            NoDocumentException {
 
         XNameAccess xReferenceMarks = UnoReferenceMark.getNameAccess(doc);
 
@@ -80,46 +80,41 @@ public class UnoReferenceMark {
     }
 
     /**
-     *  @return reference mark as XTextContent, Optional.empty if not found.
+     * @return reference mark as XTextContent, Optional.empty if not found.
      */
     public static Optional<XTextContent> getAsTextContent(XTextDocument doc, String name)
-        throws
-        NoDocumentException,
-        WrappedTargetException {
+            throws
+            NoDocumentException,
+            WrappedTargetException {
 
         XNameAccess nameAccess = UnoReferenceMark.getNameAccess(doc);
         return UnoNameAccess.getTextContentByName(nameAccess, name);
     }
 
     /**
-     *  XTextRange for the named reference mark, Optional.empty if not found.
+     * XTextRange for the named reference mark, Optional.empty if not found.
      */
     public static Optional<XTextRange> getAnchor(XTextDocument doc, String name)
-        throws
-        NoDocumentException,
-        WrappedTargetException {
+            throws
+            NoDocumentException,
+            WrappedTargetException {
         return (UnoReferenceMark.getAsTextContent(doc, name)
-                .map(XTextContent::getAnchor));
+                                .map(XTextContent::getAnchor));
     }
 
     /**
      * Insert a new reference mark at the provided cursor position.
+     * <p>
+     * If {@code absorb} is true, the text in the cursor range will become the text with gray background.
+     * <p>
+     * Note: LibreOffice 6.4.6.2 will create multiple reference marks with the same name without error or renaming. Its GUI does not allow this, but we can create them programmatically. In the GUI, clicking on any of those identical names will move the cursor to the same mark.
      *
-     * If {@code absorb} is true, the text in the cursor range will become the text with gray
-     * background.
-     *
-     * Note: LibreOffice 6.4.6.2 will create multiple reference marks with the same name without
-     *       error or renaming.
-     *       Its GUI does not allow this, but we can create them programmatically.
-     *       In the GUI, clicking on any of those identical names will move the cursor to the same
-     *       mark.
-     *
-     * @param name     For the reference mark.
+     * @param name  For the reference mark.
      * @param range Cursor marking the location or range for the reference mark.
      */
     public static XNamed create(XTextDocument doc, String name, XTextRange range, boolean absorb)
-        throws
-        CreationException {
+            throws
+            CreationException {
         return UnoNamed.insertNamedTextContent(doc, "com.sun.star.text.ReferenceMark", name, range, absorb);
     }
 }

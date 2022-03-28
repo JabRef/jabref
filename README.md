@@ -96,4 +96,8 @@ For IntelliJ IDEA, just import the project via a Gradle Import by pointing at th
 
 `gradlew test` executes all tests. We use [Github Actions](https://github.com/JabRef/jabref/actions) for executing the tests after each commit. For developing, it is sufficient to locally only run the associated test for the classes you changed. Github will report any other failure.
 
+## Sponsoring
+
+JabRef development is powered by YourKit Java Profiler [![YourKit Java Profiler](https://www.yourkit.com/images/yk_logo.png)](https://www.yourkit.com/java/profiler/)
+
 [JabRef]: https://www.jabref.org

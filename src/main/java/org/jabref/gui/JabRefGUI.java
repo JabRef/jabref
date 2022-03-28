@@ -1,6 +1,8 @@
 package org.jabref.gui;
 
-import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,6 +29,7 @@ import org.jabref.logic.shared.DatabaseNotSupportedException;
 import org.jabref.logic.shared.exception.InvalidDBMSConnectionPropertiesException;
 import org.jabref.logic.shared.exception.NotASharedDatabaseException;
 import org.jabref.preferences.GuiPreferences;
+import org.jabref.preferences.PreferencesService;
 
 import impl.org.controlsfx.skin.DecorationPane;
 import org.slf4j.Logger;
@@ -37,6 +40,7 @@ public class JabRefGUI {
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefGUI.class);
 
     private static JabRefFrame mainFrame;
+    private final PreferencesService preferencesService;
 
     private final List<ParserResult> bibDatabases;
     private final boolean isBlank;
@@ -44,24 +48,28 @@ public class JabRefGUI {
     private final List<ParserResult> failed = new ArrayList<>();
     private final List<ParserResult> toOpenTab = new ArrayList<>();
 
-    public JabRefGUI(Stage mainStage, List<ParserResult> databases, boolean isBlank) {
+    public JabRefGUI(Stage mainStage, List<ParserResult> databases, boolean isBlank, PreferencesService preferencesService) {
         this.bibDatabases = databases;
         this.isBlank = isBlank;
+        this.preferencesService = preferencesService;
         this.correctedWindowPos = false;
 
         mainFrame = new JabRefFrame(mainStage);
 
         openWindow(mainStage);
-        new VersionWorker(Globals.BUILD_INFO.version, Globals.prefs.getVersionPreferences().getIgnoredVersion(), mainFrame.getDialogService(), Globals.TASK_EXECUTOR)
+
+        new VersionWorker(Globals.BUILD_INFO.version,
+                mainFrame.getDialogService(),
+                Globals.TASK_EXECUTOR,
+                preferencesService.getInternalPreferences())
                 .checkForNewVersionDelayed();
     }
 
     private void openWindow(Stage mainStage) {
-
         LOGGER.debug("Initializing frame");
         mainFrame.init();
 
-        GuiPreferences guiPreferences = Globals.prefs.getGuiPreferences();
+        GuiPreferences guiPreferences = preferencesService.getGuiPreferences();
         // Restore window location and/or maximised state
         if (guiPreferences.isWindowMaximised()) {
             mainStage.setMaximized(true);
@@ -87,7 +95,7 @@ public class JabRefGUI {
         root.getChildren().add(JabRefGUI.mainFrame);
 
         Scene scene = new Scene(root, 800, 800);
-        Globals.prefs.getTheme().installCss(scene);
+        Globals.getThemeManager().installCss(scene);
 
         // Handle TextEditor key bindings
         scene.addEventFilter(KeyEvent.KEY_PRESSED, event -> TextInputKeyBindings.call(scene, event));
@@ -111,16 +119,16 @@ public class JabRefGUI {
         Platform.runLater(this::openDatabases);
 
         if (!(Globals.getFileUpdateMonitor().isActive())) {
-            this.getMainFrame().getDialogService()
-                    .showErrorDialogAndWait(Localization.lang("Unable to monitor file changes. Please close files " +
-                            "and processes and restart. You may encounter errors if you continue " +
-                            "with this session."));
+            getMainFrame().getDialogService()
+                          .showErrorDialogAndWait(Localization.lang("Unable to monitor file changes. Please close files " +
+                                  "and processes and restart. You may encounter errors if you continue " +
+                                  "with this session."));
         }
     }
 
     private void openDatabases() {
         // If the option is enabled, open the last edited libraries, if any.
-        if (!isBlank && Globals.prefs.getGuiPreferences().shouldOpenLastEdited()) {
+        if (!isBlank && preferencesService.getImportExportPreferences().shouldOpenLastEdited()) {
             openLastEditedDatabases();
         }
 
@@ -132,20 +140,18 @@ public class JabRefGUI {
         bibDatabases.removeAll(invalidDatabases);
 
         // passed file (we take the first one) should be focused
-        String focusedFile = bibDatabases.stream()
-                                         .findFirst()
-                                         .flatMap(ParserResult::getFile)
-                                         .map(File::getAbsolutePath)
-                                         .orElse(Globals.prefs.getGuiPreferences()
-                                                              .getLastFocusedFile()
-                                                              .toAbsolutePath()
-                                                              .toString());
+        Path focusedFile = bibDatabases.stream()
+                                       .findFirst()
+                                       .flatMap(ParserResult::getPath)
+                                       .orElse(preferencesService.getGuiPreferences()
+                                                                 .getLastFocusedFile())
+                                       .toAbsolutePath();
 
         // Add all bibDatabases databases to the frame:
         boolean first = false;
         for (ParserResult pr : bibDatabases) {
             // Define focused tab
-            if (pr.getFile().filter(path -> path.getAbsolutePath().equals(focusedFile)).isPresent()) {
+            if (pr.getPath().filter(path -> path.toAbsolutePath().equals(focusedFile)).isPresent()) {
                 first = true;
             }
 
@@ -181,8 +187,9 @@ public class JabRefGUI {
         }
 
         for (ParserResult pr : failed) {
-            String message = Localization.lang("Error opening file '%0'.", pr.getFile().get().getName()) + "\n"
-                    + pr.getErrorMessage();
+            String message = Localization.lang("Error opening file '%0'.",
+                    pr.getPath().map(Path::toString).orElse("(File name unknown)")) + "\n" +
+                    pr.getErrorMessage();
 
             mainFrame.getDialogService().showErrorDialogAndWait(Localization.lang("Error opening file"), message);
         }
@@ -213,17 +220,12 @@ public class JabRefGUI {
     }
 
     private void saveWindowState(Stage mainStage) {
-        GuiPreferences preferences = Globals.prefs.getGuiPreferences();
-        Globals.prefs.storeGuiPreferences(new GuiPreferences(
-                mainStage.getX(),
-                mainStage.getY(),
-                mainStage.getWidth(),
-                mainStage.getHeight(),
-                mainStage.isMaximized(),
-                preferences.shouldOpenLastEdited(),
-                preferences.getLastFilesOpened(),
-                preferences.getLastFocusedFile(),
-                preferences.getSidePaneWidth()));
+        GuiPreferences preferences = preferencesService.getGuiPreferences();
+        preferences.setPositionX(mainStage.getX());
+        preferences.setPositionY(mainStage.getY());
+        preferences.setSizeX(mainStage.getWidth());
+        preferences.setSizeY(mainStage.getHeight());
+        preferences.setWindowMaximised(mainStage.isMaximized());
         debugLogWindowState(mainStage);
     }
 
@@ -251,46 +253,44 @@ public class JabRefGUI {
      */
     private boolean isWindowPositionOutOfBounds() {
         return !Screen.getPrimary().getBounds().contains(
-                Globals.prefs.getGuiPreferences().getPositionX(),
-                Globals.prefs.getGuiPreferences().getPositionY());
+                preferencesService.getGuiPreferences().getPositionX(),
+                preferencesService.getGuiPreferences().getPositionY());
     }
 
     private void openLastEditedDatabases() {
-        List<String> lastFiles = Globals.prefs.getGuiPreferences().getLastFilesOpened();
+        List<String> lastFiles = preferencesService.getGuiPreferences().getLastFilesOpened();
         if (lastFiles.isEmpty()) {
             return;
         }
 
         for (String fileName : lastFiles) {
-            File dbFile = new File(fileName);
+            Path dbFile = Path.of(fileName);
 
             // Already parsed via command line parameter, e.g., "jabref.jar somefile.bib"
-            if (isLoaded(dbFile) || !dbFile.exists()) {
+            if (isLoaded(dbFile) || !Files.exists(dbFile)) {
                 continue;
             }
 
-            if (BackupManager.backupFileDiffers(dbFile.toPath())) {
-                BackupUIManager.showRestoreBackupDialog(mainFrame.getDialogService(), dbFile.toPath());
+            if (BackupManager.backupFileDiffers(dbFile)) {
+                BackupUIManager.showRestoreBackupDialog(mainFrame.getDialogService(), dbFile);
             }
 
-            ParserResult parsedDatabase = OpenDatabase.loadDatabase(fileName,
-                    Globals.prefs.getImportFormatPreferences(), Globals.prefs.getTimestampPreferences(), Globals.getFileUpdateMonitor());
-
-            if (parsedDatabase.isEmpty()) {
-                LOGGER.error(Localization.lang("Error opening file") + " '" + dbFile.getPath() + "'");
-            } else {
-                bibDatabases.add(parsedDatabase);
+            ParserResult parsedDatabase;
+            try {
+                parsedDatabase = OpenDatabase.loadDatabase(
+                        dbFile,
+                        preferencesService.getImportFormatPreferences(),
+                        Globals.getFileUpdateMonitor());
+            } catch (IOException ex) {
+                LOGGER.error("Error opening file '{}'", dbFile, ex);
+                parsedDatabase = ParserResult.fromError(ex);
             }
+            bibDatabases.add(parsedDatabase);
         }
     }
 
-    private boolean isLoaded(File fileToOpen) {
-        for (ParserResult pr : bibDatabases) {
-            if (pr.getFile().isPresent() && pr.getFile().get().equals(fileToOpen)) {
-                return true;
-            }
-        }
-        return false;
+    private boolean isLoaded(Path fileToOpen) {
+        return bibDatabases.stream().anyMatch(pr -> pr.getPath().isPresent() && pr.getPath().get().equals(fileToOpen));
     }
 
     public static JabRefFrame getMainFrame() {

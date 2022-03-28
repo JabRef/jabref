@@ -1,5 +1,6 @@
 package org.jabref.logic.texparser;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Map;
 import java.util.Set;
@@ -9,25 +10,31 @@ import java.util.stream.Stream;
 
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.OpenDatabase;
-import org.jabref.logic.preferences.TimestampPreferences;
+import org.jabref.logic.importer.ParserResult;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.texparser.Citation;
 import org.jabref.model.texparser.LatexBibEntriesResolverResult;
 import org.jabref.model.texparser.LatexParserResult;
 import org.jabref.model.util.FileUpdateMonitor;
+import org.jabref.preferences.GeneralPreferences;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class TexBibEntriesResolver {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(TexBibEntriesResolver.class);
+
     private final BibDatabase masterDatabase;
+    private final GeneralPreferences generalPreferences;
     private final ImportFormatPreferences importFormatPreferences;
-    private final TimestampPreferences timestampPreferences;
     private final FileUpdateMonitor fileMonitor;
 
-    public TexBibEntriesResolver(BibDatabase masterDatabase, ImportFormatPreferences importFormatPreferences, TimestampPreferences timestampPreferences, FileUpdateMonitor fileMonitor) {
+    public TexBibEntriesResolver(BibDatabase masterDatabase, GeneralPreferences generalPreferences, ImportFormatPreferences importFormatPreferences, FileUpdateMonitor fileMonitor) {
         this.masterDatabase = masterDatabase;
+        this.generalPreferences = generalPreferences;
         this.importFormatPreferences = importFormatPreferences;
-        this.timestampPreferences = timestampPreferences;
         this.fileMonitor = fileMonitor;
     }
 
@@ -39,7 +46,14 @@ public class TexBibEntriesResolver {
 
         // Preload databases from BIB files.
         Map<Path, BibDatabase> bibDatabases = resolverResult.getBibFiles().values().stream().distinct().collect(Collectors.toMap(
-                Function.identity(), path -> OpenDatabase.loadDatabase(path.toString(), importFormatPreferences, timestampPreferences, fileMonitor).getDatabase()));
+                Function.identity(), path -> {
+                    try {
+                        return OpenDatabase.loadDatabase(path, importFormatPreferences, fileMonitor).getDatabase();
+                    } catch (IOException e) {
+                        LOGGER.error("Error opening file '{}'", path, e);
+                        return ParserResult.fromError(e).getDatabase();
+                    }
+                }));
 
         // Get all pairs Entry<String entryKey, Citation>.
         Stream<Map.Entry<String, Citation>> citationsStream = latexParserResult.getCitations().entries().stream().distinct();

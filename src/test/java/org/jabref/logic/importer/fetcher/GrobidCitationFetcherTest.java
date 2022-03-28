@@ -8,6 +8,8 @@ import java.util.stream.Stream;
 
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.logic.importer.ImporterPreferences;
+import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.util.GrobidService;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
@@ -31,22 +33,27 @@ import static org.mockito.Mockito.when;
 public class GrobidCitationFetcherTest {
 
     static ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
-    static GrobidCitationFetcher grobidCitationFetcher = new GrobidCitationFetcher(importFormatPreferences);
+    static ImporterPreferences importerPreferences = new ImporterPreferences(false, true, false, "http://grobid.jabref.org:8070");
+    static GrobidCitationFetcher grobidCitationFetcher = new GrobidCitationFetcher(importerPreferences, importFormatPreferences);
 
     static String example1 = "Derwing, T. M., Rossiter, M. J., & Munro, M. J. (2002). Teaching native speakers to listen to foreign-accented speech. Journal of Multilingual and Multicultural Development, 23(4), 245-259.";
     static BibEntry example1AsBibEntry = new BibEntry(StandardEntryType.Article).withCitationKey("-1")
-                                                                                .withField(StandardField.AUTHOR, "Derwing, T and Rossiter, M and Munro, M")
-                                                                                .withField(StandardField.TITLE, "Teaching native speakers to listen to foreign-accented speech")
+                                                                                .withField(StandardField.AUTHOR, "Derwing, T. and Rossiter, M. and Munro, M.")
+                                                                                .withField(StandardField.TITLE, "Teaching Native Speakers to Listen to Foreign-accented Speech")
                                                                                 .withField(StandardField.JOURNAL, "Journal of Multilingual and Multicultural Development")
+                                                                                .withField(StandardField.DOI, "10.1080/01434630208666468")
+                                                                                .withField(StandardField.DATE, "2002")
                                                                                 .withField(StandardField.YEAR, "2002")
-                                                                                .withField(StandardField.PAGES, "245--259")
+                                                                                .withField(StandardField.PAGES, "245-259")
                                                                                 .withField(StandardField.VOLUME, "23")
+                                                                                .withField(StandardField.PUBLISHER, "Informa UK Limited")
                                                                                 .withField(StandardField.NUMBER, "4");
 
     static String example2 = "Thomas, H. K. (2004). Training strategies for improving listeners' comprehension of foreign-accented speech (Doctoral dissertation). University of Colorado, Boulder.";
     static BibEntry example2AsBibEntry = new BibEntry(BibEntry.DEFAULT_TYPE).withCitationKey("-1")
                                                                             .withField(StandardField.AUTHOR, "Thomas, H")
                                                                             .withField(StandardField.TITLE, "Training strategies for improving listeners' comprehension of foreign-accented speech (Doctoral dissertation)")
+                                                                            .withField(StandardField.DATE, "2004")
                                                                             .withField(StandardField.YEAR, "2004")
                                                                             .withField(StandardField.ADDRESS, "Boulder");
 
@@ -55,6 +62,7 @@ public class GrobidCitationFetcherTest {
                                                                             .withField(StandardField.AUTHOR, "Turk, J and Graham, P and Verhulst, F")
                                                                             .withField(StandardField.TITLE, "Child and adolescent psychiatry : A developmental approach")
                                                                             .withField(StandardField.PUBLISHER, "Oxford University Press")
+                                                                            .withField(StandardField.DATE, "2007")
                                                                             .withField(StandardField.YEAR, "2007")
                                                                             .withField(StandardField.ADDRESS, "Oxford, England");
 
@@ -63,6 +71,7 @@ public class GrobidCitationFetcherTest {
                                                                                .withField(StandardField.AUTHOR, "Carr, I and Kidner, R")
                                                                                .withField(StandardField.BOOKTITLE, "Statutes and conventions on international trade law")
                                                                                .withField(StandardField.PUBLISHER, "Cavendish")
+                                                                               .withField(StandardField.DATE, "2003")
                                                                                .withField(StandardField.YEAR, "2003")
                                                                                .withField(StandardField.ADDRESS, "London, England");
 
@@ -109,13 +118,12 @@ public class GrobidCitationFetcherTest {
     }
 
     @Test
-    public void performSearchThrowsExceptionInCaseOfConnectionIssues() throws IOException {
+    public void performSearchThrowsExceptionInCaseOfConnectionIssues() throws IOException, ParseException {
         GrobidService grobidServiceMock = mock(GrobidService.class);
-        when(grobidServiceMock.processCitation(anyString(), any())).thenThrow(new SocketTimeoutException("Timeout"));
+        when(grobidServiceMock.processCitation(anyString(), any(), any())).thenThrow(new SocketTimeoutException("Timeout"));
         grobidCitationFetcher = new GrobidCitationFetcher(importFormatPreferences, grobidServiceMock);
 
-        assertThrows(FetcherException.class, () -> {
-            grobidCitationFetcher.performSearch("any text");
-        }, "performSearch should throw an FetcherException, when there are underlying IOException.");
+        assertThrows(FetcherException.class, () ->
+                grobidCitationFetcher.performSearch("any text"), "performSearch should throw an FetcherException, when there are underlying IOException.");
     }
 }

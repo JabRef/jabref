@@ -45,11 +45,11 @@ public class CitedKeys {
     }
 
     void numberCitedKeysInCurrentOrder() {
-        int i = 1;
+        int index = 1;
         for (CitedKey ck : data.values()) {
             if (ck.getLookupResult().isPresent()) {
-                ck.setNumber(Optional.of(i));
-                i++;
+                ck.setNumber(Optional.of(index));
+                index++;
             } else {
                 // Unresolved citations do not get a number.
                 ck.setNumber(Optional.empty());
@@ -63,21 +63,21 @@ public class CitedKeys {
         }
     }
 
-    void distributeLookupResults(CitationGroups cgs) {
+    void distributeLookupResults(CitationGroups citationGroups) {
         for (CitedKey ck : this.data.values()) {
-            ck.distributeLookupResult(cgs);
+            ck.distributeLookupResult(citationGroups);
         }
     }
 
-    void distributeNumbers(CitationGroups cgs) {
+    void distributeNumbers(CitationGroups citationGroups) {
         for (CitedKey ck : this.data.values()) {
-            ck.distributeNumber(cgs);
+            ck.distributeNumber(citationGroups);
         }
     }
 
-    public void distributeUniqueLetters(CitationGroups cgs) {
+    public void distributeUniqueLetters(CitationGroups citationGroups) {
         for (CitedKey ck : this.data.values()) {
-            ck.distributeUniqueLetter(cgs);
+            ck.distributeUniqueLetter(citationGroups);
         }
     }
 

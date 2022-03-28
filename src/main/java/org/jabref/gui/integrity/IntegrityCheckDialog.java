@@ -2,6 +2,8 @@ package org.jabref.gui.integrity;
 
 import java.util.List;
 
+import javax.inject.Inject;
+
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.collections.ListChangeListener;
 import javafx.fxml.FXML;
@@ -13,6 +15,7 @@ import javafx.scene.input.MouseButton;
 import javafx.stage.Modality;
 
 import org.jabref.gui.LibraryTab;
+import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.logic.integrity.IntegrityMessage;
 import org.jabref.logic.l10n.Localization;
@@ -22,8 +25,6 @@ import org.controlsfx.control.table.TableFilter;
 
 public class IntegrityCheckDialog extends BaseDialog<Void> {
 
-    private final List<IntegrityMessage> messages;
-    private final LibraryTab libraryTab;
     @FXML private TableView<IntegrityMessage> messagesTable;
     @FXML private TableColumn<IntegrityMessage, String> keyColumn;
     @FXML private TableColumn<IntegrityMessage, String> fieldColumn;
@@ -31,6 +32,11 @@ public class IntegrityCheckDialog extends BaseDialog<Void> {
     @FXML private MenuButton keyFilterButton;
     @FXML private MenuButton fieldFilterButton;
     @FXML private MenuButton messageFilterButton;
+
+    @Inject private ThemeManager themeManager;
+
+    private final List<IntegrityMessage> messages;
+    private final LibraryTab libraryTab;
     private IntegrityCheckDialogViewModel viewModel;
     private TableFilter<IntegrityMessage> tableFilter;
 
@@ -43,6 +49,8 @@ public class IntegrityCheckDialog extends BaseDialog<Void> {
         ViewLoader.view(this)
                   .load()
                   .setAsDialogPane(this);
+
+        themeManager.updateFontStyle(getDialogPane().getScene());
     }
 
     private void onSelectionChanged(ListChangeListener.Change<? extends IntegrityMessage> change) {

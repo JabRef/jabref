@@ -18,9 +18,9 @@ jobs:
       uses: actions/checkout@v2
       if: contains(github.event.pull_request.labels.*.name, 'safe to test')
       with:
-        ref: ${{ github.event.pull_request.head.sha }}
+        ref: ${{ github.event.pull_request.head.ref }}
 
-    # otherwise, checkout the current master, and the pr to the subdirectory 'pr'
+    # otherwise, checkout the current master, and the pr to the subdirectory 'pull-request'
     - name: Checkout base repo for pull-request test
       uses: actions/checkout@v2
       if: "! contains(github.event.pull_request.labels.*.name, 'safe to test')"
@@ -28,8 +28,10 @@ jobs:
       uses: actions/checkout@v2
       if: "! contains(github.event.pull_request.labels.*.name, 'safe to test')"
       with:
+        repository: ${{ github.event.pull_request.head.repo.full_name }}
         path: pull-request
-        ref: ${{ github.event.pull_request.head.sha }}
+        ref: ${{ github.event.pull_request.head.ref }}
+        token: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Check for relevant changes
       uses: dorny/paths-filter@v2
@@ -50,7 +52,7 @@ jobs:
     - name: Set up Ruby
       uses: ruby/setup-ruby@v1
       with:
-        ruby-version: 3.0.0
+        ruby-version: 3.0.2
     - name: but use cache to speed that up
       uses: actions/cache@v2
       with:
@@ -73,3 +75,13 @@ jobs:
     - name: report
       if: (failure() || success()) && steps.changed.outputs.style == 'true'
       run: bundle exec sheldon --token=$GITHUB_TOKEN --${{ job.status }} --verbose
+
+    - name: commit reindented styles
+      if: github.repository == 'citation-style-language/styles' && steps.changed.outputs.style == 'true'
+      continue-on-error: true
+      uses: stefanzweifel/git-auto-commit-action@v4
+      with:
+        commit_message: Re-indent CSL styles
+        file_pattern: ${{ steps.changed.outputs.style_files }}
+        repository: pull-request
+        skip_dirty_check: false

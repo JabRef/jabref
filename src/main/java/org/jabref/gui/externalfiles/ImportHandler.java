@@ -57,7 +57,10 @@ public class ImportHandler {
         this.stateManager = stateManager;
 
         this.linker = new ExternalFilesEntryLinker(externalFileTypes, preferencesService.getFilePreferences(), database);
-        this.contentImporter = new ExternalFilesContentImporter(preferencesService.getImportFormatPreferences(), preferencesService.getTimestampPreferences());
+        this.contentImporter = new ExternalFilesContentImporter(
+                preferencesService.getGeneralPreferences(),
+                preferencesService.getImporterPreferences(),
+                preferencesService.getImportFormatPreferences());
         this.undoManager = undoManager;
     }
 
@@ -65,18 +68,17 @@ public class ImportHandler {
         return linker;
     }
 
-    public BackgroundTask<List<ImportFilesResultItemViewModel>> importFilesInBackground(List<Path> files) {
+    public BackgroundTask<List<ImportFilesResultItemViewModel>> importFilesInBackground(final List<Path> files) {
         return new BackgroundTask<>() {
             private int counter;
-            private List<BibEntry> entriesToAdd;
             private final List<ImportFilesResultItemViewModel> results = new ArrayList<>();
 
             @Override
             protected List<ImportFilesResultItemViewModel> call() {
                 counter = 1;
                 CompoundEdit ce = new CompoundEdit();
-                for (Path file: files) {
-                    entriesToAdd = Collections.emptyList();
+                for (final Path file : files) {
+                    final List<BibEntry> entriesToAdd = new ArrayList<>();
 
                     if (isCanceled()) {
                         break;
@@ -84,38 +86,24 @@ public class ImportHandler {
 
                     DefaultTaskExecutor.runInJavaFXThread(() -> {
                         updateMessage(Localization.lang("Processing file %0", file.getFileName()));
-                        updateProgress(counter, files.size() - 1);
+                        updateProgress(counter, files.size() - 1d);
                     });
 
                     try {
                         if (FileUtil.isPDFFile(file)) {
+                            var pdfImporterResult = contentImporter.importPDFContent(file);
+                            List<BibEntry> pdfEntriesInFile = pdfImporterResult.getDatabase().getEntries();
 
-                            var xmpParserResult = contentImporter.importXMPContent(file);
-                            List<BibEntry> xmpEntriesInFile = xmpParserResult.getDatabase().getEntries();
-
-                            if (xmpParserResult.hasWarnings()) {
-                                addResultToList(file, false, Localization.lang("Error reading XMP content: %0", xmpParserResult.getErrorMessage()));
+                            if (pdfImporterResult.hasWarnings()) {
+                                addResultToList(file, false, Localization.lang("Error reading PDF content: %0", pdfImporterResult.getErrorMessage()));
                             }
 
-                            // First try xmp import, if empty try pdf import, otherwise create empty entry
-                            if (!xmpEntriesInFile.isEmpty()) {
-                                entriesToAdd = xmpEntriesInFile;
-                                addResultToList(file, true, Localization.lang("Importing using XMP data..."));
+                            if (!pdfEntriesInFile.isEmpty()) {
+                                entriesToAdd.addAll(pdfEntriesInFile);
+                                addResultToList(file, true, Localization.lang("Importing using extracted PDF data"));
                             } else {
-                                var pdfImporterResult = contentImporter.importPDFContent(file);
-                                List<BibEntry> pdfEntriesInFile = pdfImporterResult.getDatabase().getEntries();
-
-                                if (pdfImporterResult.hasWarnings()) {
-                                    addResultToList(file, false, Localization.lang("Error reading PDF content: %0", pdfImporterResult.getErrorMessage()));
-                                }
-
-                                if (!pdfEntriesInFile.isEmpty()) {
-                                    entriesToAdd = pdfEntriesInFile;
-                                    addResultToList(file, true, Localization.lang("Importing using extracted PDF data"));
-                                } else {
-                                    entriesToAdd = Collections.singletonList(createEmptyEntryWithLink(file));
-                                    addResultToList(file, false, Localization.lang("No metadata found. Creating empty entry with file link"));
-                                }
+                                entriesToAdd.add(createEmptyEntryWithLink(file));
+                                addResultToList(file, false, Localization.lang("No metadata found. Creating empty entry with file link"));
                             }
                         } else if (FileUtil.isBibFile(file)) {
                             var bibtexParserResult = contentImporter.importFromBibFile(file, fileUpdateMonitor);
@@ -123,10 +111,10 @@ public class ImportHandler {
                                 addResultToList(file, false, bibtexParserResult.getErrorMessage());
                             }
 
-                            entriesToAdd = bibtexParserResult.getDatabaseContext().getEntries();
+                            entriesToAdd.addAll(bibtexParserResult.getDatabaseContext().getEntries());
                             addResultToList(file, false, Localization.lang("Importing bib entry"));
                         } else {
-                            entriesToAdd = Collections.singletonList(createEmptyEntryWithLink(file));
+                            entriesToAdd.add(createEmptyEntryWithLink(file));
                             addResultToList(file, false, Localization.lang("No BibTeX data found. Creating empty entry with file link"));
                         }
                     } catch (IOException ex) {
@@ -173,7 +161,7 @@ public class ImportHandler {
                 preferencesService.getTimestampPreferences());
 
         // Generate citation keys
-        if (preferencesService.getImportSettingsPreferences().generateNewKeyOnImport()) {
+        if (preferencesService.getImporterPreferences().isGenerateNewKeyOnImport()) {
             generateKeys(entries);
         }
 
@@ -183,8 +171,7 @@ public class ImportHandler {
 
     private void addToGroups(List<BibEntry> entries, Collection<GroupTreeNode> groups) {
         for (GroupTreeNode node : groups) {
-            if (node.getGroup() instanceof GroupEntryChanger) {
-                GroupEntryChanger entryChanger = (GroupEntryChanger) node.getGroup();
+            if (node.getGroup() instanceof GroupEntryChanger entryChanger) {
                 List<FieldChange> undo = entryChanger.add(entries);
                 // TODO: Add undo
                 // if (!undo.isEmpty()) {

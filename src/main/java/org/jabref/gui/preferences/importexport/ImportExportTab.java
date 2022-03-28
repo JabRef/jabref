@@ -20,11 +20,16 @@ public class ImportExportTab extends AbstractPreferenceTabView<ImportExportTabVi
     @FXML private CheckBox generateNewKeyOnImport;
     @FXML private CheckBox useCustomDOI;
     @FXML private TextField useCustomDOIName;
+
     @FXML private SaveOrderConfigPanel exportOrderPanel;
+
     @FXML private ComboBox<CustomApiKeyPreferences> customApiKeyNameComboBox;
     @FXML private TextField useCustomApiKeyText;
     @FXML private CheckBox useCustomApiKeyCheckBox;
     @FXML private Button checkCustomApiKeyButton;
+
+    @FXML private CheckBox grobidEnabled;
+    @FXML private TextField grobidURL;
 
     public ImportExportTab() {
         ViewLoader.view(this)
@@ -38,7 +43,7 @@ public class ImportExportTab extends AbstractPreferenceTabView<ImportExportTabVi
     }
 
     public void initialize() {
-        this.viewModel = new ImportExportTabViewModel(preferencesService, dialogService);
+        this.viewModel = new ImportExportTabViewModel(preferencesService, preferencesService.getDOIPreferences());
 
         useCustomDOI.selectedProperty().bindBidirectional(viewModel.useCustomDOIProperty());
         useCustomDOIName.textProperty().bindBidirectional(viewModel.useCustomDOINameProperty());
@@ -52,6 +57,10 @@ public class ImportExportTab extends AbstractPreferenceTabView<ImportExportTabVi
         exportOrderPanel.sortableFieldsProperty().bind(viewModel.sortableFieldsProperty());
         exportOrderPanel.sortCriteriaProperty().bindBidirectional(viewModel.sortCriteriaProperty());
         exportOrderPanel.setCriteriaLimit(3);
+
+        grobidEnabled.selectedProperty().bindBidirectional(viewModel.grobidEnabledProperty());
+        grobidURL.textProperty().bindBidirectional(viewModel.grobidURLProperty());
+        grobidURL.disableProperty().bind(grobidEnabled.selectedProperty().not());
 
         viewModel.customApiKeyText().bind(useCustomApiKeyText.textProperty());
         viewModel.useCustomApiKeyProperty().bind(useCustomApiKeyCheckBox.selectedProperty());

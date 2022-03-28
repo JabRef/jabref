@@ -33,6 +33,7 @@ import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.icon.JabRefIcon;
+import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.FileNodeViewModel;
 import org.jabref.gui.util.IconValidationDecorator;
@@ -79,6 +80,7 @@ public class UnlinkedFilesDialogView extends BaseDialog<Void> {
     @Inject private UndoManager undoManager;
     @Inject private TaskExecutor taskExecutor;
     @Inject private FileUpdateMonitor fileUpdateMonitor;
+    @Inject private ThemeManager themeManager;
 
     private final ControlsFxVisualizer validationVisualizer;
     private UnlinkedFilesDialogViewModel viewModel;
@@ -98,6 +100,8 @@ public class UnlinkedFilesDialogView extends BaseDialog<Void> {
             }
             return null;
         });
+
+        themeManager.updateFontStyle(getDialogPane().getScene());
     }
 
     @FXML

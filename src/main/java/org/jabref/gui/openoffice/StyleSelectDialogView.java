@@ -12,9 +12,10 @@ import javafx.scene.control.TableView;
 import javafx.scene.layout.VBox;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.Globals;
+import org.jabref.gui.StateManager;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.preview.PreviewViewer;
+import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.gui.util.ViewModelTableRowFactory;
@@ -35,6 +36,7 @@ public class StyleSelectDialogView extends BaseDialog<OOBibStyle> {
     private final MenuItem edit = new MenuItem(Localization.lang("Edit"));
     private final MenuItem reload = new MenuItem(Localization.lang("Reload"));
     private final StyleLoader loader;
+
     @FXML private TableColumn<StyleSelectItemViewModel, String> colName;
     @FXML private TableView<StyleSelectItemViewModel> tvStyles;
     @FXML private TableColumn<StyleSelectItemViewModel, String> colJournals;
@@ -42,8 +44,12 @@ public class StyleSelectDialogView extends BaseDialog<OOBibStyle> {
     @FXML private TableColumn<StyleSelectItemViewModel, Boolean> colDeleteIcon;
     @FXML private Button add;
     @FXML private VBox vbox;
+
     @Inject private PreferencesService preferencesService;
     @Inject private DialogService dialogService;
+    @Inject private StateManager stateManager;
+    @Inject private ThemeManager themeManager;
+
     private StyleSelectDialogViewModel viewModel;
     private PreviewViewer previewArticle;
     private PreviewViewer previewBook;
@@ -70,16 +76,13 @@ public class StyleSelectDialogView extends BaseDialog<OOBibStyle> {
     private void initialize() {
         viewModel = new StyleSelectDialogViewModel(dialogService, loader, preferencesService);
 
-        previewArticle = new PreviewViewer(new BibDatabaseContext(), dialogService, Globals.stateManager);
+        previewArticle = new PreviewViewer(new BibDatabaseContext(), dialogService, stateManager, themeManager);
         previewArticle.setEntry(TestEntry.getTestEntry());
         vbox.getChildren().add(previewArticle);
 
-        previewBook = new PreviewViewer(new BibDatabaseContext(), dialogService, Globals.stateManager);
+        previewBook = new PreviewViewer(new BibDatabaseContext(), dialogService, stateManager, themeManager);
         previewBook.setEntry(TestEntry.getTestEntryBook());
         vbox.getChildren().add(previewBook);
-
-        previewArticle.setTheme(preferencesService.getTheme());
-        previewBook.setTheme(preferencesService.getTheme());
 
         colName.setCellValueFactory(cellData -> cellData.getValue().nameProperty());
         colJournals.setCellValueFactory(cellData -> cellData.getValue().journalsProperty());

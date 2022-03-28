@@ -27,6 +27,13 @@
     <Label styleClass="sectionHeader" text="%Export sort order"/>
     <SaveOrderConfigPanel fx:id="exportOrderPanel"/>
 
+    <Label styleClass="sectionHeader" text="%Remote services"/>
+    <CheckBox fx:id="grobidEnabled" text="%Allow sending PDF files and raw citation strings to a JabRef online service (Grobid) to determine Metadata. This produces better results."/>
+    <HBox alignment="CENTER_LEFT" spacing="10.0">
+        <Label text="%Grobid URL" />
+        <TextField fx:id="grobidURL" HBox.hgrow="ALWAYS"/>
+    </HBox>
+
     <Label styleClass="sectionHeader" text="%Custom API key"/>
     <HBox alignment="CENTER_LEFT" spacing="10.0">
         <ComboBox fx:id="customApiKeyNameComboBox" prefWidth="200.0" GridPane.columnIndex="1"/>

@@ -62,7 +62,7 @@ public class StyleSelectDialogViewModel {
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                 .addExtensionFilter(Localization.lang("Style file"), StandardFileType.JSTYLE)
                 .withDefaultExtension(Localization.lang("Style file"), StandardFileType.JSTYLE)
-                .withInitialDirectory(preferencesService.getWorkingDir())
+                .withInitialDirectory(preferencesService.getFilePreferences().getWorkingDirectory())
                 .build();
         Optional<Path> path = dialogService.showFileOpenDialog(fileDialogConfiguration);
         path.map(Path::toAbsolutePath).map(Path::toString).ifPresent(stylePath -> {
@@ -96,7 +96,7 @@ public class StyleSelectDialogViewModel {
         OOBibStyle style = selectedItem.getValue().getStyle();
         Optional<ExternalFileType> type = ExternalFileTypes.getInstance().getExternalFileTypeByExt("jstyle");
         try {
-            JabRefDesktop.openExternalFileAnyFormat(new BibDatabaseContext(), style.getPath(), type);
+            JabRefDesktop.openExternalFileAnyFormat(new BibDatabaseContext(), preferencesService, style.getPath(), type);
         } catch (IOException e) {
             dialogService.showErrorDialogAndWait(e);
         }

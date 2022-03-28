@@ -38,16 +38,21 @@ open module org.jabref {
 
     // Logging
     requires org.slf4j;
-    requires org.apache.logging.log4j;
-    requires org.apache.logging.log4j.core;
-    requires org.apache.logging.log4j.plugins;
+    requires org.tinylog.api;
+    requires org.tinylog.api.slf4j;
+    requires org.tinylog.impl;
+
+    provides org.tinylog.writers.Writer
+    with org.jabref.gui.logging.GuiWriter,
+         org.jabref.gui.logging.ApplicationInsightsWriter;
+
     requires applicationinsights.logging.log4j2;
-    provides org.apache.logging.log4j.plugins.processor.PluginService
-            with org.jabref.gui.logging.plugins.Log4jPlugins;
 
     // Preferences and XML
     requires java.prefs;
-    requires java.xml.bind;
+    requires jakarta.xml.bind;
+    // needs to be loaded here as it's otherwise not found at runtime
+    requires org.glassfish.jaxb.runtime;
     requires jdk.xml.dom;
 
     // Annotations (@PostConstruct)
@@ -63,7 +68,6 @@ open module org.jabref {
     requires commons.logging;
     requires com.google.common;
     requires jakarta.inject;
-    requires org.apache.pdfbox;
     requires reactfx;
     requires commons.cli;
     requires com.github.tomtung.latex2unicode;
@@ -71,7 +75,6 @@ open module org.jabref {
     requires jbibtex;
     requires citeproc.java;
     requires antlr.runtime;
-    requires org.apache.xmpbox;
     requires de.saxsys.mvvmfx.validation;
     requires com.google.gson;
     requires unirest.java;
@@ -86,8 +89,11 @@ open module org.jabref {
     uses org.mariadb.jdbc.credential.CredentialPlugin;
     requires org.apache.commons.lang3;
     requires org.antlr.antlr4.runtime;
-    requires flowless;
-    requires tika.core;
+    requires org.fxmisc.flowless;
+    requires org.apache.tika.core;
+    requires pdfbox;
+    requires xmpbox;
+    requires com.ibm.icu;
 
     requires flexmark;
     requires flexmark.ext.gfm.strikethrough;

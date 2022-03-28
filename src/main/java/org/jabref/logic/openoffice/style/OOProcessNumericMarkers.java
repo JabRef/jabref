@@ -12,7 +12,6 @@ import org.jabref.model.openoffice.util.OOListUtil;
 class OOProcessNumericMarkers {
 
     private OOProcessNumericMarkers() {
-        /**/
     }
 
     /**
@@ -23,24 +22,24 @@ class OOProcessNumericMarkers {
      * Numbering is according to first appearance.
      * Assumes global order and local order are already applied.
      *
-     * @param cgs
+     * @param citationGroups
      * @param style
      *
      */
-    static void produceCitationMarkers(CitationGroups cgs, OOBibStyle style) {
+    static void produceCitationMarkers(CitationGroups citationGroups, OOBibStyle style) {
 
         assert style.isNumberEntries();
 
         if (style.isSortByPosition()) {
-            cgs.createNumberedBibliographySortedInOrderOfAppearance();
+            citationGroups.createNumberedBibliographySortedInOrderOfAppearance();
         } else {
-            cgs.createNumberedBibliographySortedByComparator(OOProcess.AUTHOR_YEAR_TITLE_COMPARATOR);
+            citationGroups.createNumberedBibliographySortedByComparator(OOProcess.AUTHOR_YEAR_TITLE_COMPARATOR);
         }
 
-        for (CitationGroup cg : cgs.getCitationGroupsInGlobalOrder()) {
-            List<CitationMarkerNumericEntry> cits = OOListUtil.map(cg.getCitationsInLocalOrder(), e -> e);
+        for (CitationGroup group : citationGroups.getCitationGroupsInGlobalOrder()) {
+            List<CitationMarkerNumericEntry> cits = OOListUtil.map(group.getCitationsInLocalOrder(), e -> e);
             OOText citMarker = style.getNumCitationMarker2(cits);
-            cg.setCitationMarker(Optional.of(citMarker));
+            group.setCitationMarker(Optional.of(citMarker));
         }
     }
 

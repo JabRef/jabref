@@ -54,8 +54,8 @@ Versioning and style distribution
 
 We currently only actively maintain CSL styles in the "master" branch for the latest released version of CSL.
 
-In addition, in order to provide a stable location for styles of a given CSL version, styles in "master" are automatically copied to a branch named after the latest version of CSL (e.g. "v1.0.1" when CSL 1.0.1 is the latest version).
-Once a new version of CSL is released (e.g. CSL 1.0.2), "master" will upgrade to that version, after which styles will be copied from "master" to a new version branch ("v1.0.2").
+In addition, in order to provide a stable location for styles of a given CSL version, styles in "master" are automatically copied to a branch named after the latest version of CSL (e.g. "v1.0.2" when CSL 1.0.2 is the latest version).
+Once a new version of CSL is released (e.g. CSL 1.1.0), "master" will upgrade to that version, after which styles will be copied from "master" to a new version branch ("v1.1.0").
 Version branches for old versions of CSL are kept but typically become dormant, as for these branches we generally stop maintenance, won't accept third-party contributions via pull requests, nor backport changes made to styles in "master".
 
 Starting with branch "v1.0.1", the version branches differ from "master" in the following ways:
@@ -64,10 +64,11 @@ Starting with branch "v1.0.1", the version branches differ from "master" in the 
 * `<updated/>` timestamps of styles in the version branch are changed to match the git modification date of each individual style in "master"
 * superfluous files present in "master", e.g. for style testing, are removed.
 
-As such, especially for downstream integrators, you are encouraged to obtain your CSL styles from the appropriate version branch (e.g. "v1.0.1" for CSL 1.0.1 styles).
+As such, especially for downstream integrators, you are encouraged to obtain your CSL styles from the appropriate version branch (e.g. "v1.0.2" for CSL 1.0.2 styles).
 Currently, the styles repository includes the following (protected) branches:
 
 * "master"
+* "v1.0.2" (for CSL 1.0.2 styles)
 * "v1.0.1" (for CSL 1.0.1 styles)
 * "v1.0" (for CSL 1.0 styles)
 

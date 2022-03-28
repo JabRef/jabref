@@ -1,15 +1,13 @@
 package org.jabref.logic.openoffice.style;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringReader;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -25,11 +23,6 @@ import org.jabref.logic.layout.Layout;
 import org.jabref.logic.layout.LayoutFormatter;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.layout.LayoutHelper;
-import org.jabref.model.database.BibDatabase;
-import org.jabref.model.entry.Author;
-import org.jabref.model.entry.AuthorList;
-import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.OrFields;
 import org.jabref.model.entry.field.StandardField;
@@ -42,7 +35,6 @@ import org.jabref.model.openoffice.style.CitationMarkerNormEntry;
 import org.jabref.model.openoffice.style.CitationMarkerNumericBibEntry;
 import org.jabref.model.openoffice.style.CitationMarkerNumericEntry;
 import org.jabref.model.openoffice.style.NonUniqueCitationMarker;
-import org.jabref.model.strings.StringUtil;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -138,31 +130,27 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
     private final Map<String, Object> citProperties = new HashMap<>();
     private final boolean fromResource;
     private final String path;
-    private final Charset encoding;
     private final LayoutFormatterPreferences prefs;
     private String name = "";
     private Layout defaultBibLayout;
     private boolean valid;
-    private File styleFile;
+    private Path styleFile;
     private long styleFileModificationTime = Long.MIN_VALUE;
     private String localCopy;
     private boolean isDefaultLayoutPresent;
 
-    public OOBibStyle(File styleFile, LayoutFormatterPreferences prefs,
-                      Charset encoding) throws IOException {
+    public OOBibStyle(Path styleFile, LayoutFormatterPreferences prefs) throws IOException {
         this.prefs = Objects.requireNonNull(prefs);
         this.styleFile = Objects.requireNonNull(styleFile);
-        this.encoding = Objects.requireNonNull(encoding);
         setDefaultProperties();
         reload();
         fromResource = false;
-        path = styleFile.getPath();
+        path = styleFile.toAbsolutePath().toString();
     }
 
     public OOBibStyle(String resourcePath, LayoutFormatterPreferences prefs) throws IOException {
         this.prefs = Objects.requireNonNull(prefs);
         Objects.requireNonNull(resourcePath);
-        this.encoding = StandardCharsets.UTF_8;
         setDefaultProperties();
         initialize(OOBibStyle.class.getResourceAsStream(resourcePath));
         fromResource = true;
@@ -234,7 +222,7 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
         return path;
     }
 
-    public File getFile() {
+    public Path getFile() {
         return styleFile;
     }
 
@@ -245,7 +233,7 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
     private void initialize(InputStream stream) throws IOException {
         Objects.requireNonNull(stream);
 
-        try (Reader reader = new InputStreamReader(stream, encoding)) {
+        try (Reader reader = new InputStreamReader(stream, StandardCharsets.UTF_8)) {
             readFormatFile(reader);
         }
     }
@@ -270,8 +258,8 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
      */
     private void reload() throws IOException {
         if (styleFile != null) {
-            this.styleFileModificationTime = styleFile.lastModified();
-            try (InputStream stream = new FileInputStream(styleFile)) {
+            this.styleFileModificationTime = Files.getLastModifiedTime(styleFile).toMillis();
+            try (InputStream stream = Files.newInputStream(styleFile)) {
                 initialize(stream);
             }
         }
@@ -287,24 +275,28 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
         if (styleFile == null) {
             return true;
         } else {
-            return styleFile.lastModified() == this.styleFileModificationTime;
+            try {
+                return Files.getLastModifiedTime(styleFile).toMillis() == this.styleFileModificationTime;
+            } catch (IOException e) {
+                return false;
+            }
         }
     }
 
-    private void readFormatFile(Reader in) throws IOException {
+    private void readFormatFile(Reader input) throws IOException {
 
         // First read all the contents of the file:
-        StringBuilder sb = new StringBuilder();
-        int c;
-        while ((c = in.read()) != -1) {
-            sb.append((char) c);
+        StringBuilder stringBuilder = new StringBuilder();
+        int chr;
+        while ((chr = input.read()) != -1) {
+            stringBuilder.append((char) chr);
         }
 
         // Store a local copy for viewing
-        localCopy = sb.toString();
+        localCopy = stringBuilder.toString();
 
         // Break into separate lines:
-        String[] lines = sb.toString().split("\n");
+        String[] lines = stringBuilder.toString().split("\n");
         BibStyleMode mode = BibStyleMode.NONE;
 
         for (String line1 : lines) {
@@ -386,11 +378,12 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
         if ((index > 0) && (index < (line.length() - 1))) {
 
             try {
-                String formatString = line.substring(index + 1);
+                final String typeName = line.substring(0, index);
+                final String formatString = line.substring(index + 1);
                 Layout layout = new LayoutHelper(new StringReader(formatString), this.prefs).getLayoutFromText();
-                EntryType type = EntryTypeFactory.parse(line.substring(0, index));
+                EntryType type = EntryTypeFactory.parse(typeName);
 
-                if (!isDefaultLayoutPresent && line.substring(0, index).equals(OOBibStyle.DEFAULT_MARK)) {
+                if (!isDefaultLayoutPresent && OOBibStyle.DEFAULT_MARK.equals(typeName)) {
                     isDefaultLayoutPresent = true;
                     defaultBibLayout = layout;
                 } else {
@@ -437,358 +430,13 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
     }
 
     public Layout getReferenceFormat(EntryType type) {
-        Layout l = bibLayout.get(type);
-        if (l == null) {
+        Layout layout = bibLayout.get(type);
+        if (layout == null) {
             return defaultBibLayout;
         } else {
-            return l;
+            return layout;
         }
     }
-
-    /* begin_old */
-    /**
-     * Format a number-based citation marker for the given number.
-     *
-     * @param number The citation numbers.
-     * @return The text for the citation.
-     */
-    public String getNumCitationMarker(List<Integer> number, int minGroupingCount, boolean inList) {
-        String bracketBefore = getStringCitProperty(BRACKET_BEFORE);
-        if (inList && (citProperties.containsKey(BRACKET_BEFORE_IN_LIST))) {
-            bracketBefore = getStringCitProperty(BRACKET_BEFORE_IN_LIST);
-        }
-        String bracketAfter = getStringCitProperty(BRACKET_AFTER);
-        if (inList && (citProperties.containsKey(BRACKET_AFTER_IN_LIST))) {
-            bracketAfter = getStringCitProperty(BRACKET_AFTER_IN_LIST);
-        }
-        // Sort the numbers:
-        List<Integer> lNum = new ArrayList<>(number);
-        Collections.sort(lNum);
-        StringBuilder sb = new StringBuilder(bracketBefore);
-        int combineFrom = -1;
-        int written = 0;
-        for (int i = 0; i < lNum.size(); i++) {
-            int i1 = lNum.get(i);
-            if (combineFrom < 0) {
-                // Check if next entry is the next in the ref list:
-                if ((i < (lNum.size() - 1)) && (lNum.get(i + 1) == (i1 + 1)) && (i1 > 0)) {
-                    combineFrom = i1;
-                } else {
-                    // Add single entry:
-                    if (i > 0) {
-                        sb.append(getStringCitProperty(CITATION_SEPARATOR));
-                    }
-                    sb.append(lNum.get(i) > 0 ? String.valueOf(lNum.get(i)) : OOBibStyle.UNDEFINED_CITATION_MARKER);
-                    written++;
-                }
-            } else {
-                // We are building a list of combined entries.
-                // Check if it ends here:
-                if ((i == (lNum.size() - 1)) || (lNum.get(i + 1) != (i1 + 1))) {
-                    if (written > 0) {
-                        sb.append(getStringCitProperty(CITATION_SEPARATOR));
-                    }
-                    if ((minGroupingCount > 0) && (((i1 + 1) - combineFrom) >= minGroupingCount)) {
-                        sb.append(combineFrom);
-                        sb.append(getStringCitProperty(GROUPED_NUMBERS_SEPARATOR));
-                        sb.append(i1);
-                        written++;
-                    } else {
-                        // Either we should never group, or there aren't enough
-                        // entries in this case to group. Output all:
-                        for (int jj = combineFrom; jj <= i1; jj++) {
-                            sb.append(jj);
-                            if (jj < i1) {
-                                sb.append(getStringCitProperty(CITATION_SEPARATOR));
-                            }
-                            written++;
-                        }
-                    }
-                    combineFrom = -1;
-                }
-                // If it doesn't end here, just keep iterating.
-            }
-        }
-        sb.append(bracketAfter);
-        return sb.toString();
-    }
-    /* end_old */
-
-    /* begin_old */
-    public String getCitationMarker(List<BibEntry> entries, Map<BibEntry, BibDatabase> database, boolean inParenthesis,
-                                    String[] uniquefiers, int[] unlimAuthors) {
-        // Look for groups of uniquefied entries that should be combined in the output.
-        // E.g. (Olsen, 2005a, b) should be output instead of (Olsen, 2005a; Olsen, 2005b).
-        int piv = -1;
-        String tmpMarker = null;
-        if (uniquefiers != null) {
-            for (int i = 0; i < uniquefiers.length; i++) {
-
-                if ((uniquefiers[i] == null) || uniquefiers[i].isEmpty()) {
-                    // This entry has no uniquefier.
-                    // Check if we just passed a group of more than one entry with uniquefier:
-                    if ((piv > -1) && (i > (piv + 1))) {
-                        // Do the grouping:
-                        group(entries, uniquefiers, piv, i - 1);
-                    }
-
-                    piv = -1;
-                } else {
-                    BibEntry currentEntry = entries.get(i);
-                    if (piv == -1) {
-                        piv = i;
-                        tmpMarker = getAuthorYearParenthesisMarker(Collections.singletonList(currentEntry), database,
-                                null, unlimAuthors);
-                    } else {
-                        // See if this entry can go into a group with the previous one:
-                        String thisMarker = getAuthorYearParenthesisMarker(Collections.singletonList(currentEntry),
-                                database, null, unlimAuthors);
-
-                        String authorField = getStringCitProperty(AUTHOR_FIELD);
-                        int maxAuthors = getIntCitProperty(MAX_AUTHORS);
-                        String author = getCitationMarkerField(currentEntry, database.get(currentEntry),
-                                authorField);
-                        AuthorList al = AuthorList.parse(author);
-                        int prevALim = unlimAuthors[i - 1]; // i always at least 1 here
-                        if (!thisMarker.equals(tmpMarker)
-                                || ((al.getNumberOfAuthors() > maxAuthors) && (unlimAuthors[i] != prevALim))) {
-                            // No match. Update piv to exclude the previous entry. But first check if the
-                            // previous entry was part of a group:
-                            if ((piv > -1) && (i > (piv + 1))) {
-                                // Do the grouping:
-                                group(entries, uniquefiers, piv, i - 1);
-                            }
-                            tmpMarker = thisMarker;
-                            piv = i;
-                        }
-                    }
-                }
-
-            }
-            // Finished with the loop. See if the last entries form a group:
-            if (piv >= 0) {
-                // Do the grouping:
-                group(entries, uniquefiers, piv, uniquefiers.length - 1);
-            }
-        }
-
-        if (inParenthesis) {
-            return getAuthorYearParenthesisMarker(entries, database, uniquefiers, unlimAuthors);
-        } else {
-            return getAuthorYearInTextMarker(entries, database, uniquefiers, unlimAuthors);
-        }
-    }
-    /* end_old */
-
-    /* begin_old */
-    /**
-     * Modify entry and uniquefier arrays to facilitate a grouped presentation of uniquefied entries.
-     *
-     * @param entries     The entry array.
-     * @param uniquefiers The uniquefier array.
-     * @param from        The first index to group (inclusive)
-     * @param to          The last index to group (inclusive)
-     */
-    private void group(List<BibEntry> entries, String[] uniquefiers, int from, int to) {
-        String separator = getStringCitProperty(UNIQUEFIER_SEPARATOR);
-        StringBuilder sb = new StringBuilder(uniquefiers[from]);
-        for (int i = from + 1; i <= to; i++) {
-            sb.append(separator);
-            sb.append(uniquefiers[i]);
-            entries.set(i, null);
-        }
-        uniquefiers[from] = sb.toString();
-    }
-    /* end_old */
-
-    /* begin_old */
-    /**
-     * This method produces (Author, year) style citation strings in many different forms.
-     *
-     * @param entries           The list of BibEntry to get fields from.
-     * @param database          A map of BibEntry-BibDatabase pairs.
-     * @param uniquifiers       Optional parameter to separate similar citations. Elements can be null if not needed.
-     * @return The formatted citation.
-     */
-    private String getAuthorYearParenthesisMarker(List<BibEntry> entries, Map<BibEntry, BibDatabase> database,
-                                                  String[] uniquifiers, int[] unlimAuthors) {
-
-        String authorField = getStringCitProperty(AUTHOR_FIELD); // The bibtex field providing author names, e.g. "author" or "editor".
-        int maxA = getIntCitProperty(MAX_AUTHORS); // The maximum number of authors to write out in full without using etal. Set to
-                                                   // -1 to always write out all authors.
-        String yearSep = getStringCitProperty(YEAR_SEPARATOR); // The String to separate authors from year, e.g. "; ".
-        String startBrace = getStringCitProperty(BRACKET_BEFORE); // The opening parenthesis.
-        String endBrace = getStringCitProperty(BRACKET_AFTER); // The closing parenthesis.
-        String citationSeparator = getStringCitProperty(CITATION_SEPARATOR); // The String to separate citations from each other.
-        String yearField = getStringCitProperty(YEAR_FIELD); // The bibtex field providing the year, e.g. "year".
-        String andString = getStringCitProperty(AUTHOR_LAST_SEPARATOR); // The String to add between the two last author names, e.g. " & ".
-        StringBuilder sb = new StringBuilder(startBrace);
-        for (int j = 0; j < entries.size(); j++) {
-            BibEntry currentEntry = entries.get(j);
-
-            // Check if this entry has been nulled due to grouping with the previous entry(ies):
-            if (currentEntry == null) {
-                continue;
-            }
-
-            if (j > 0) {
-                sb.append(citationSeparator);
-            }
-
-            BibDatabase currentDatabase = database.get(currentEntry);
-            int unlimA = unlimAuthors == null ? -1 : unlimAuthors[j];
-            int maxAuthors = unlimA > 0 ? unlimA : maxA;
-
-            String author = getCitationMarkerField(currentEntry, currentDatabase, authorField);
-            String authorString = createAuthorList(author, maxAuthors, andString, yearSep);
-            sb.append(authorString);
-            String year = getCitationMarkerField(currentEntry, currentDatabase, yearField);
-            if (year != null) {
-                sb.append(year);
-            }
-            if ((uniquifiers != null) && (uniquifiers[j] != null)) {
-                sb.append(uniquifiers[j]);
-            }
-        }
-        sb.append(endBrace);
-        return sb.toString();
-    }
-    /* end_old */
-
-    /* begin_old */
-    /**
-     * This method produces "Author (year)" style citation strings in many different forms.
-     *
-     * @param entries     The list of BibEntry to get fields from.
-     * @param database    A map of BibEntry-BibDatabase pairs.
-     * @param uniquefiers Optional parameters to separate similar citations. Can be null if not needed.
-     * @return The formatted citation.
-     */
-    private String getAuthorYearInTextMarker(List<BibEntry> entries, Map<BibEntry, BibDatabase> database,
-                                             String[] uniquefiers,
-                                             int[] unlimAuthors) {
-        String authorField = getStringCitProperty(AUTHOR_FIELD); // The bibtex field providing author names, e.g. "author" or "editor".
-        int maxA = getIntCitProperty(MAX_AUTHORS); // The maximum number of authors to write out in full without using etal. Set to
-                                                   // -1 to always write out all authors.
-        String yearSep = getStringCitProperty(IN_TEXT_YEAR_SEPARATOR); // The String to separate authors from year, e.g. "; ".
-        String startBrace = getStringCitProperty(BRACKET_BEFORE); // The opening parenthesis.
-        String endBrace = getStringCitProperty(BRACKET_AFTER); // The closing parenthesis.
-        String citationSeparator = getStringCitProperty(CITATION_SEPARATOR); // The String to separate citations from each other.
-        String yearField = getStringCitProperty(YEAR_FIELD); // The bibtex field providing the year, e.g. "year".
-        String andString = getStringCitProperty(AUTHOR_LAST_SEPARATOR_IN_TEXT); // The String to add between the two last author names, e.g. " & ".
-
-        if (andString == null) {
-            // Use the default one if no explicit separator for text is defined
-            andString = getStringCitProperty(AUTHOR_LAST_SEPARATOR);
-        }
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < entries.size(); i++) {
-            BibEntry currentEntry = entries.get(i);
-
-            // Check if this entry has been nulled due to grouping with the previous entry(ies):
-            if (currentEntry == null) {
-                continue;
-            }
-
-            BibDatabase currentDatabase = database.get(currentEntry);
-            int unlimA = unlimAuthors == null ? -1 : unlimAuthors[i];
-            int maxAuthors = unlimA > 0 ? unlimA : maxA;
-
-            if (i > 0) {
-                sb.append(citationSeparator);
-            }
-            String author = getCitationMarkerField(currentEntry, currentDatabase, authorField);
-            String authorString = createAuthorList(author, maxAuthors, andString, yearSep);
-            sb.append(authorString);
-            sb.append(startBrace);
-            String year = getCitationMarkerField(currentEntry, currentDatabase, yearField);
-            if (year != null) {
-                sb.append(year);
-            }
-            if ((uniquefiers != null) && (uniquefiers[i] != null)) {
-                sb.append(uniquefiers[i]);
-            }
-            sb.append(endBrace);
-        }
-        return sb.toString();
-
-    }
-    /* end_old */
-
-    /* begin_old */
-    /* moved to OOBibStyleGetCitationMarker */
-    /**
-     * This method looks up a field for an entry in a database. Any number of backup fields can be used
-     * if the primary field is empty.
-     *
-     * @param entry    The entry.
-     * @param database The database the entry belongs to.
-     * @param fields   The field, or succession of fields, to look up. If backup fields are needed, separate
-     *                 field names by /. E.g. to use "author" with "editor" as backup, specify StandardField.orFields(StandardField.AUTHOR, StandardField.EDITOR).
-     * @return The resolved field content, or an empty string if the field(s) were empty.
-     */
-    private String getCitationMarkerField(BibEntry entry, BibDatabase database, String fields) {
-        Objects.requireNonNull(entry, "Entry cannot be null");
-        Objects.requireNonNull(database, "database cannot be null");
-
-        Set<Field> authorFields = FieldFactory.parseOrFields(getStringCitProperty(AUTHOR_FIELD));
-        for (Field field : FieldFactory.parseOrFields(fields)) {
-            Optional<String> content = entry.getResolvedFieldOrAlias(field, database);
-
-            if ((content.isPresent()) && !content.get().trim().isEmpty()) {
-                if (authorFields.contains(field) && StringUtil.isInCurlyBrackets(content.get())) {
-                    return "{" + fieldFormatter.format(content.get()) + "}";
-                }
-                return fieldFormatter.format(content.get());
-            }
-        }
-        // No luck? Return an empty string:
-        return "";
-    }
-    /* end_old */
-
-    /* begin_old */
-    /* moved to OOBibStyleGetCitationMarker */
-    /**
-     * Look up the nth author and return the proper last name for citation markers.
-     *
-     * @param al     The author list.
-     * @param number The number of the author to return.
-     * @return The author name, or an empty String if inapplicable.
-     */
-    private String getAuthorLastName(AuthorList al, int number) {
-        StringBuilder sb = new StringBuilder();
-
-        if (al.getNumberOfAuthors() > number) {
-            Author a = al.getAuthor(number);
-            a.getVon().filter(von -> !von.isEmpty()).ifPresent(von -> sb.append(von).append(' '));
-            sb.append(a.getLast().orElse(""));
-        }
-
-        return sb.toString();
-    }
-    /* end_old */
-
-    /* begin_old */
-    /* to be removed */
-    /**
-     * Take a finished citation and insert a string at the end (but inside the end bracket)
-     * separated by "PageInfoSeparator"
-     *
-     * @param citation
-     * @param pageInfo
-     * @return
-     */
-    public String insertPageInfo(String citation, String pageInfo) {
-        String bracketAfter = getStringCitProperty(BRACKET_AFTER);
-        if (citation.endsWith(bracketAfter)) {
-            String first = citation.substring(0, citation.length() - bracketAfter.length());
-            return first + getStringCitProperty(PAGE_INFO_SEPARATOR) + pageInfo + bracketAfter;
-        } else {
-            return citation + getStringCitProperty(PAGE_INFO_SEPARATOR) + pageInfo;
-        }
-    }
-    /* end_old */
 
     /**
      * Convenience method for checking the property for whether we use number citations or
@@ -896,12 +544,12 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) {
+    public boolean equals(Object object) {
+        if (this == object) {
             return true;
         }
-        if (o instanceof OOBibStyle) {
-            OOBibStyle otherStyle = (OOBibStyle) o;
+        if (object instanceof OOBibStyle) {
+            OOBibStyle otherStyle = (OOBibStyle) object;
             return Objects.equals(path, otherStyle.path)
                     && Objects.equals(name, otherStyle.name)
                     && Objects.equals(citProperties, otherStyle.citProperties)
@@ -914,39 +562,6 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
     public int hashCode() {
         return Objects.hash(path, name, citProperties, properties);
     }
-
-    /* begin_old */
-    /* moved to OOBibStyleGetCitationMarker as formatAuthorList */
-    private String createAuthorList(String author, int maxAuthors, String andString,
-                                    String yearSep) {
-        Objects.requireNonNull(author);
-        String etAlString = getStringCitProperty(ET_AL_STRING); //  The String to represent authors that are not mentioned, e.g. " et al."
-        String authorSep = getStringCitProperty(AUTHOR_SEPARATOR); // The String to add between author names except the last two, e.g. ", ".
-        String oxfordComma = getStringCitProperty(OXFORD_COMMA); // The String to put after the second to last author in case of three or more authors
-        StringBuilder sb = new StringBuilder();
-        AuthorList al = AuthorList.parse(author);
-        if (!al.isEmpty()) {
-            sb.append(getAuthorLastName(al, 0));
-        }
-        if ((al.getNumberOfAuthors() > 1) && ((al.getNumberOfAuthors() <= maxAuthors) || (maxAuthors < 0))) {
-            int j = 1;
-            while (j < (al.getNumberOfAuthors() - 1)) {
-                sb.append(authorSep);
-                sb.append(getAuthorLastName(al, j));
-                j++;
-            }
-            if (al.getNumberOfAuthors() > 2) {
-                sb.append(oxfordComma);
-            }
-            sb.append(andString);
-            sb.append(getAuthorLastName(al, al.getNumberOfAuthors() - 1));
-        } else if (al.getNumberOfAuthors() > maxAuthors) {
-            sb.append(etAlString);
-        }
-        sb.append(yearSep);
-        return sb.toString();
-    }
-    /* end_old */
 
     enum BibStyleMode {
         NONE,
@@ -1078,8 +693,8 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
         return OOBibStyleGetNumCitationMarker.getNumCitationMarkerForBibliography(this, entry);
     }
 
-    public OOText getNormalizedCitationMarker(CitationMarkerNormEntry ce) {
-        return OOBibStyleGetCitationMarker.getNormalizedCitationMarker(this, ce, Optional.empty());
+    public OOText getNormalizedCitationMarker(CitationMarkerNormEntry entry) {
+        return OOBibStyleGetCitationMarker.getNormalizedCitationMarker(this, entry, Optional.empty());
     }
 
     /**
@@ -1156,10 +771,6 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
      */
     public String getGroupedNumbersSeparator() {
         return getStringCitProperty(OOBibStyle.GROUPED_NUMBERS_SEPARATOR);
-    }
-
-    private boolean getBooleanProperty(String propName) {
-        return (Boolean) properties.get(propName);
     }
 
     private String getStringProperty(String propName) {
@@ -1308,12 +919,9 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
         OOBibStyle style = this;
         OOText title = style.getReferenceHeaderText();
         String parStyle = style.getReferenceHeaderParagraphFormat();
-        if (parStyle != null) {
-            title = OOFormat.paragraph(title, parStyle);
-        } else {
-            title = OOFormat.paragraph(title);
-        }
-        return title;
+        return (parStyle == null
+                ? OOFormat.paragraph(title)
+                : OOFormat.paragraph(title, parStyle));
     }
 
 }

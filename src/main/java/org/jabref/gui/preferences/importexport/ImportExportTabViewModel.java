@@ -26,10 +26,7 @@ import javafx.collections.FXCollections;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.commonfxcontrols.SortCriterionViewModel;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
-import org.jabref.logic.importer.importsettings.ImportSettingsPreferences;
-import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.net.URLDownload;
-import org.jabref.logic.preferences.CustomApiKeyPreferences;
+import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.preferences.DOIPreferences;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
@@ -41,6 +38,7 @@ public class ImportExportTabViewModel implements PreferenceTabViewModel {
     private final static Map<String, String> API_KEY_NAME_URL = new TreeMap<>();
 
     private final BooleanProperty generateKeyOnImportProperty = new SimpleBooleanProperty();
+
     private final BooleanProperty useCustomDOIProperty = new SimpleBooleanProperty();
     private final StringProperty useCustomDOINameProperty = new SimpleStringProperty("");
 
@@ -51,6 +49,9 @@ public class ImportExportTabViewModel implements PreferenceTabViewModel {
     private final ListProperty<Field> sortableFieldsProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final ListProperty<SortCriterionViewModel> sortCriteriaProperty = new SimpleListProperty<>(FXCollections.observableArrayList(new ArrayList<>()));
 
+    private final BooleanProperty grobidEnabledProperty = new SimpleBooleanProperty();
+    private final StringProperty grobidURLProperty = new SimpleStringProperty("");
+
     private final ListProperty<CustomApiKeyPreferences> customApiKeyPreferencesListProperty = new SimpleListProperty<>();
     private final ObjectProperty<CustomApiKeyPreferences> selectedCustomApiKeyPreferencesProperty = new SimpleObjectProperty<>();
     private final BooleanProperty useCustomApiKeyProperty = new SimpleBooleanProperty();
@@ -58,15 +59,15 @@ public class ImportExportTabViewModel implements PreferenceTabViewModel {
 
     private final DialogService dialogService;
     private final PreferencesService preferencesService;
-    private final DOIPreferences initialDOIPreferences;
-    private final ImportSettingsPreferences initialImportSettingsPreferences;
+    private final DOIPreferences doiPreferences;
+    private final ImporterPreferences importerPreferences;
     private final SaveOrderConfig initialExportOrder;
 
-    public ImportExportTabViewModel(PreferencesService preferencesService, DialogService dialogService) {
+    public ImportExportTabViewModel(PreferencesService preferencesService, DOIPreferences doiPreferences, DialogService dialogService) {
         this.dialogService = dialogService;
         this.preferencesService = preferencesService;
-        this.initialImportSettingsPreferences = preferencesService.getImportSettingsPreferences();
-        this.initialDOIPreferences = preferencesService.getDOIPreferences();
+        this.importerPreferences = preferencesService.getImporterPreferences();
+        this.doiPreferences = doiPreferences;
         this.initialExportOrder = preferencesService.getExportSaveOrder();
     }
 
@@ -80,9 +81,9 @@ public class ImportExportTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public void setValues() {
-        generateKeyOnImportProperty.setValue(initialImportSettingsPreferences.generateNewKeyOnImport());
-        useCustomDOIProperty.setValue(initialDOIPreferences.isUseCustom());
-        useCustomDOINameProperty.setValue(initialDOIPreferences.getDefaultBaseURI());
+        generateKeyOnImportProperty.setValue(importerPreferences.isGenerateNewKeyOnImport());
+        useCustomDOIProperty.setValue(doiPreferences.isUseCustom());
+        useCustomDOINameProperty.setValue(doiPreferences.getDefaultBaseURI());
 
         switch (initialExportOrder.getOrderType()) {
             case SPECIFIED -> exportInSpecifiedOrderProperty.setValue(true);
@@ -98,6 +99,9 @@ public class ImportExportTabViewModel implements PreferenceTabViewModel {
                                                       .map(SortCriterionViewModel::new)
                                                       .collect(Collectors.toList()));
 
+        grobidEnabledProperty.setValue(importerPreferences.isGrobidEnabled());
+        grobidURLProperty.setValue(importerPreferences.getGrobidURL());
+
         // API keys
         ArrayList<CustomApiKeyPreferences> customApiKeyPreferencesList = new ArrayList<>();
         for (String name : API_KEY_NAME_URL.keySet()) {
@@ -109,12 +113,13 @@ public class ImportExportTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public void storeSettings() {
-        preferencesService.storeImportSettingsPreferences(new ImportSettingsPreferences(
-                generateKeyOnImportProperty.getValue()));
+        importerPreferences.setGenerateNewKeyOnImport(generateKeyOnImportProperty.getValue());
+        importerPreferences.setGrobidEnabled(grobidEnabledProperty.getValue());
+        importerPreferences.setGrobidOptOut(importerPreferences.isGrobidOptOut());
+        importerPreferences.setGrobidURL(grobidURLProperty.getValue());
 
-        preferencesService.storeDOIPreferences(new DOIPreferences(
-                useCustomDOIProperty.getValue(),
-                useCustomDOINameProperty.getValue().trim()));
+        doiPreferences.setUseCustom(useCustomDOIProperty.get());
+        doiPreferences.setDefaultBaseURI(useCustomDOINameProperty.getValue().trim());
 
         SaveOrderConfig newSaveOrderConfig = new SaveOrderConfig(
                 SaveOrderConfig.OrderType.fromBooleans(exportInSpecifiedOrderProperty.getValue(), exportInTableOrderProperty.getValue()),
@@ -165,6 +170,14 @@ public class ImportExportTabViewModel implements PreferenceTabViewModel {
 
     public ListProperty<SortCriterionViewModel> sortCriteriaProperty() {
         return sortCriteriaProperty;
+    }
+
+    public BooleanProperty grobidEnabledProperty() {
+        return grobidEnabledProperty;
+    }
+
+    public StringProperty grobidURLProperty() {
+        return grobidURLProperty;
     }
 
     public ListProperty<CustomApiKeyPreferences> customApiKeyPrefsProperty() {

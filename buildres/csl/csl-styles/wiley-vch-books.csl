@@ -65,7 +65,7 @@
       <text variable="citation-number" suffix="."/>
       <text macro="authors"/>
       <choose>
-        <if match="all" is-uncertain-date="issued accessed original-date container">
+        <if match="all" is-uncertain-date="issued accessed original-date">
           <text term="in press" prefix=" (" suffix=")"/>
         </if>
         <else>

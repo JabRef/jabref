@@ -27,7 +27,7 @@
       <term name="from">Elérhető</term>
       <term name="accessed">Letöltve</term>
       <term name="and">&#8211;</term>
-      <term name="et-al"> et al.</term>
+      <term name="et-al">et al.</term>
     </terms>
   </locale>
   <macro name="container-contributors">
@@ -58,7 +58,7 @@
     <names variable="author" delimiter="&#8211;">
       <name delimiter=" &#8211; " delimiter-precedes-et-al="always" delimiter-precedes-last="always" et-al-use-last="true" initialize-with=". " name-as-sort-order="all"/>
       <label form="short" text-case="lowercase" prefix=" (" suffix=")."/>
-      <et-al prefix=" " font-style="italic"/>
+      <et-al font-style="italic"/>
       <substitute>
         <names variable="editor" delimiter=" &#8211; "/>
         <names variable="translator" delimiter=" &#8211; "/>
@@ -120,7 +120,7 @@
       <else>
         <choose>
           <if variable="DOI">
-            <text variable="DOI" prefix="http://dx.doi.org/"/>
+            <text variable="DOI" prefix="https://doi.org/"/>
           </if>
           <else>
             <choose>
