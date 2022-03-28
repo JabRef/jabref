@@ -938,4 +938,8 @@ public class LibraryTab extends Tab {
             }
         }
     }
+
+    public DatabaseNotification getNotificationPane() {
+        return databaseNotificationPane;
+    }
 }

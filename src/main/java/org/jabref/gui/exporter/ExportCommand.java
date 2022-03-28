@@ -8,15 +8,17 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import javafx.stage.FileChooser;
+import javafx.util.Duration;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.Globals;
 import org.jabref.gui.JabRefFrame;
+import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.desktop.JabRefDesktop;
-import org.jabref.gui.theme.Theme;
+import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.gui.util.FileFilterConverter;
@@ -32,7 +34,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.PreferencesService;
 
-import org.controlsfx.control.NotificationPane;
+import org.controlsfx.control.action.Action;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,31 +43,30 @@ import org.slf4j.LoggerFactory;
  */
 public class ExportCommand extends SimpleCommand {
 
+    public enum ExportMethod { EXPORT_ALL, EXPORT_SELECTED }
+
     private static final Logger LOGGER = LoggerFactory.getLogger(ExportCommand.class);
-    private final boolean selectedOnly;
+
+    private final ExportMethod exportMethod;
+    private final JabRefFrame frame;
     private final StateManager stateManager;
     private final PreferencesService preferences;
     private final DialogService dialogService;
-    private JabRefFrame jabRefFrame;
 
-    /**
-     * @param selectedOnly true if only the selected entries should be exported, otherwise all entries are exported
-     */
-    public ExportCommand(boolean selectedOnly,
+    public ExportCommand(ExportMethod exportMethod,
+                         JabRefFrame frame,
                          StateManager stateManager,
                          DialogService dialogService,
-                         PreferencesService preferences,
-                         JabRefFrame jabRefFrame) {
-        this.selectedOnly = selectedOnly;
+                         PreferencesService preferences) {
+        this.exportMethod = exportMethod;
+        this.frame = frame;
         this.stateManager = stateManager;
         this.preferences = preferences;
         this.dialogService = dialogService;
 
-        this.executable.bind(selectedOnly
+        this.executable.bind(exportMethod == ExportMethod.EXPORT_SELECTED
                 ? ActionHelper.needsEntriesSelected(stateManager)
                 : ActionHelper.needsDatabase(stateManager));
-
-        this.jabRefFrame = jabRefFrame;
     }
 
     @Override
@@ -100,7 +101,7 @@ public class ExportCommand extends SimpleCommand {
         final Exporter format = FileFilterConverter.getExporter(selectedExtensionFilter, exporters)
                                                    .orElseThrow(() -> new IllegalStateException("User didn't selected a file type for the extension"));
         List<BibEntry> entries;
-        if (selectedOnly) {
+        if (exportMethod == ExportMethod.EXPORT_SELECTED) {
             // Selected entries
             entries = stateManager.getSelectedEntries();
         } else {
@@ -131,28 +132,21 @@ public class ExportCommand extends SimpleCommand {
                             finEntries);
                     return null; // can not use BackgroundTask.wrap(Runnable) because Runnable.run() can't throw Exceptions
                 })
-                .onSuccess(
-                        save -> {
-                            NotificationPane notificationPane = jabRefFrame.getNotificationPane();
-                            Theme.Type themeType = preferences.getAppearancePreferences().getTheme().getType();
-                            switch (themeType) {
-                                case EMBEDDED -> notificationPane.getStyleClass().add(NotificationPane.STYLE_CLASS_DARK);
-                                case CUSTOM -> notificationPane.getStyleClass().add(notificationPane.getUserAgentStylesheet());
-                                case DEFAULT -> notificationPane.getStyleClass().removeAll(NotificationPane.STYLE_CLASS_DARK,
-                                        notificationPane.getUserAgentStylesheet());
-                            }
-                            jabRefFrame.showNotificationPane(
-                                    Localization.lang("Press \"Open\" to reveal the folder holding the saved file."),
-                                    Localization.lang("Open"),
-                                    event -> {
-                                        try {
-                                            JabRefDesktop.openFolderAndSelectFile(file, preferences);
-                                            notificationPane.hide();
-                                        } catch (IOException ioException) {
-                                            LOGGER.error(Localization.lang("Could not open export folder."), ioException);
-                                        }
-                                    });
-                        })
+                .onSuccess(save -> {
+                    LibraryTab.DatabaseNotification notificationPane = frame.getCurrentLibraryTab().getNotificationPane();
+                    notificationPane.notify(
+                            IconTheme.JabRefIcons.FOLDER.getGraphicNode(),
+                            Localization.lang("Open the folder containing the saved file?"),
+                            List.of(new Action(Localization.lang("Open"), event -> {
+                                try {
+                                    JabRefDesktop.openFolderAndSelectFile(file, preferences);
+                                } catch (IOException e) {
+                                    LOGGER.error("Could not open export folder.", e);
+                                }
+                                notificationPane.hide();
+                            })),
+                            Duration.seconds(5));
+                })
                 .onFailure(this::handleError)
                 .executeWith(Globals.TASK_EXECUTOR);
     }
