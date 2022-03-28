@@ -40,25 +40,19 @@ class FieldChangeTest {
     @Test
     void selfEqualsFieldchangeSameParameters() {
         FieldChange fcBlankNewValue = new FieldChange(entry, StandardField.DOI, "foo", "bar");
-        assertEquals(true, fc.equals(fcBlankNewValue));
-    }
-
-    @Test
-    void selfEqualsFieldchangeDifferentNewValue() {
-        FieldChange fcBlankNewValue = new FieldChange(entry, StandardField.DOI, "foo", null);
-        assertEquals(false, fc.equals(fcBlankNewValue));
+        assertEquals(fc, fcBlankNewValue);
     }
 
     @Test
     void selfEqualsFieldchangeDifferentOldValue() {
         FieldChange fcBlankNewValue = new FieldChange(entry, StandardField.DOI, null, "bar");
-        assertEquals(false, fc.equals(fcBlankNewValue));
+        assertNotEquals(fc, fcBlankNewValue);
     }
 
     @Test
     void selfEqualsFieldchangeDifferentEntry() {
         FieldChange fcBlankNewValue = new FieldChange(entryOther, StandardField.DOI, "foo", "bar");
-        assertEquals(false,fc.equals(fcBlankNewValue));
+        assertNotEquals(fc, fcBlankNewValue);
     }
 
     @Test
