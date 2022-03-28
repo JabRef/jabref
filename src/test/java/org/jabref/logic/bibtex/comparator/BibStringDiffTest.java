@@ -31,4 +31,41 @@ public class BibStringDiffTest {
         List<BibStringDiff> result = BibStringDiff.compare(originalDataBase, newDataBase);
         assertEquals(List.of(diff), result);
     }
+
+    @Test
+    void compareWithNullObject() {
+
+        assertEquals(this.diff.equals(null), false);
+    }
+
+    @Test
+    void compareWithDifferentClass() {
+        assertEquals(this.diff.equals(this.newDataBase), false);
+    }
+
+    @Test
+    void compareWithDifferentNewString() {
+        final BibStringDiff other = new BibStringDiff(new BibtexString("name2", "content2"), new BibtexString("name1", "content1"));
+
+        assertEquals(this.diff.equals(other), false);
+    }
+
+    @Test
+    void compareWithDifferentOriginalString() {
+        final BibStringDiff other = new BibStringDiff(new BibtexString("name1", "content1"), new BibtexString("name2", "content3"));
+
+        assertEquals(this.diff.equals(other), false);
+    }
+
+    @Test
+    void compareWithSameObject() {
+        assertEquals(this.diff.equals(this.diff), true);
+    }
+
+    @Test
+    void compareWithEqualObject() {
+        final BibStringDiff other = new BibStringDiff(new BibtexString("name2", "content2"), new BibtexString("name2", "content3"));
+
+        assertEquals(this.diff.equals(other), true);
+    }
 }
