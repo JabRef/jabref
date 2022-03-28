@@ -201,6 +201,7 @@ class StringUtilTest {
         assertFalse(StringUtil.isInCurlyBrackets("}"));
         assertFalse(StringUtil.isInCurlyBrackets("a{}a"));
         assertFalse(StringUtil.isInCurlyBrackets("{\\AA}sa {\\AA}Stor{\\aa}"));
+        assertFalse(StringUtil.isInCurlyBrackets("{}a}"));
     }
 
     @Test

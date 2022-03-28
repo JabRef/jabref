@@ -432,9 +432,12 @@ public class StringUtil {
                     } else if (c == '}') {
                         brackets--;
                     }
+                    if (count > 1){
+                        return false;
+                    }
                 }
 
-                return count == 1;
+                return brackets == 0;
             }
             return false;
         }
