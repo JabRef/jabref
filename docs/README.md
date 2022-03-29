@@ -17,7 +17,7 @@ For users documentation, please head to [https://docs.jabref.org](https://docs.j
 
 ## Teaching Exercises
 
-We are very happy that JabRef is part of [Software Engineering](https://en.wikipedia.org/wiki/Software_engineering) trainings. Please head to [Teaching](teaching.md) for more information on using JabRef as a teaching object and on previous courses where JabRef was used.
+We are very happy that JabRef is part of [Software Engineering](https://en.wikipedia.org/wiki/Software\_engineering) trainings. Please head to [Teaching](teaching.md) for more information on using JabRef as a teaching object and on previous courses where JabRef was used.
 
 ## Miscellaneous Hints
 
@@ -27,7 +27,7 @@ The package `org.jabref.cli` is responsible for handling the command line option
 
 During development, one can configure IntelliJ to pass command line parameters:
 
-![IntelliJ-run-configuration](<.gitbook/assets/intellij-run-configuration-command-line (2) (2) (3).png>)
+![IntelliJ-run-configuration](<.gitbook/assets/intellij-run-configuration-command-line (2) (2) (3) (2).png>)
 
 Passing command line arguments using gradle is currently not possible as all arguments (such as `-Dfile.encoding=windows-1252`) are passed to the application.
 
