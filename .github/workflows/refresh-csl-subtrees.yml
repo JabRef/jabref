@@ -42,7 +42,7 @@ jobs:
           cp buildres/csl/csl-locales/locales-en-US.xml src/main/resources/csl-locales/
           git add .
           git commit -m"Refresh example styles" || true
-      - uses: peter-evans/create-pull-request@v3
+      - uses: peter-evans/create-pull-request@v4
         with:
           token: ${{ secrets.GH_TOKEN_UPDATE_GRADLE_WRAPPER }}
           branch: refresh-csl

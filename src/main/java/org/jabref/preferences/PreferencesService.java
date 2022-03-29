@@ -34,6 +34,7 @@ import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.layout.format.FileLinkPreferences;
 import org.jabref.logic.layout.format.NameFormatterPreferences;
 import org.jabref.logic.net.ProxyPreferences;
+import org.jabref.logic.net.ssl.SSLPreferences;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
 import org.jabref.logic.preferences.DOIPreferences;
 import org.jabref.logic.preferences.OwnerPreferences;
@@ -154,6 +155,8 @@ public interface PreferencesService {
     RemotePreferences getRemotePreferences();
 
     ProxyPreferences getProxyPreferences();
+
+    SSLPreferences getSSLPreferences();
 
     //*************************************************************************************************************
     // CitationKeyPatternPreferences

@@ -55,12 +55,12 @@ jobs:
         with:
           fetch-depth: 0
       - name: Install GitVersion
-        uses: gittools/actions/gitversion/setup@v0.9.11
+        uses: gittools/actions/gitversion/setup@v0.9.13
         with:
           versionSpec: "5.x"
       - name: Run GitVersion
         id: gitversion
-        uses: gittools/actions/gitversion/execute@v0.9.11
+        uses: gittools/actions/gitversion/execute@v0.9.13
       - name: Set up JDK
         uses: actions/setup-java@v2
         with:
@@ -156,12 +156,12 @@ jobs:
       - name: Fetch all history for all tags and branches
         run: git fetch --prune --unshallow
       - name: Install GitVersion
-        uses: gittools/actions/gitversion/setup@v0.9.11
+        uses: gittools/actions/gitversion/setup@v0.9.13
         with:
           versionSpec: '5.x'
       - name: Run GitVersion
         id: gitversion
-        uses: gittools/actions/gitversion/execute@v0.9.11
+        uses: gittools/actions/gitversion/execute@v0.9.13
       - name: Get linux binaries
         uses: actions/download-artifact@master
         with:
