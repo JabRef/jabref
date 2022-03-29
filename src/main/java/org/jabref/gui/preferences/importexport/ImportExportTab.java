@@ -11,7 +11,7 @@ import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.preferences.PreferencesTab;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.preferences.CustomApiKeyPreferences;
+import org.jabref.logic.preferences.FetcherApiKey;
 
 import com.airhacks.afterburner.views.ViewLoader;
 
@@ -23,10 +23,10 @@ public class ImportExportTab extends AbstractPreferenceTabView<ImportExportTabVi
 
     @FXML private SaveOrderConfigPanel exportOrderPanel;
 
-    @FXML private ComboBox<CustomApiKeyPreferences> customApiKeyNameComboBox;
-    @FXML private TextField useCustomApiKeyText;
-    @FXML private CheckBox useCustomApiKeyCheckBox;
-    @FXML private Button checkCustomApiKeyButton;
+    @FXML private ComboBox<FetcherApiKey> apiKeyName;
+    @FXML private TextField customApiKey;
+    @FXML private CheckBox useCustomApiKey;
+    @FXML private Button checkCustomApiKey;
 
     @FXML private CheckBox grobidEnabled;
     @FXML private TextField grobidURL;
@@ -43,7 +43,7 @@ public class ImportExportTab extends AbstractPreferenceTabView<ImportExportTabVi
     }
 
     public void initialize() {
-        this.viewModel = new ImportExportTabViewModel(preferencesService, preferencesService.getDOIPreferences());
+        this.viewModel = new ImportExportTabViewModel(preferencesService, preferencesService.getDOIPreferences(), dialogService);
 
         useCustomDOI.selectedProperty().bindBidirectional(viewModel.useCustomDOIProperty());
         useCustomDOIName.textProperty().bindBidirectional(viewModel.useCustomDOINameProperty());
@@ -62,32 +62,32 @@ public class ImportExportTab extends AbstractPreferenceTabView<ImportExportTabVi
         grobidURL.textProperty().bindBidirectional(viewModel.grobidURLProperty());
         grobidURL.disableProperty().bind(grobidEnabled.selectedProperty().not());
 
-        viewModel.customApiKeyText().bind(useCustomApiKeyText.textProperty());
-        viewModel.useCustomApiKeyProperty().bind(useCustomApiKeyCheckBox.selectedProperty());
-        useCustomApiKeyText.disableProperty().bind(useCustomApiKeyCheckBox.selectedProperty().not());
-        checkCustomApiKeyButton.disableProperty().bind(useCustomApiKeyCheckBox.selectedProperty().not());
+        viewModel.customApiKeyText().bind(customApiKey.textProperty());
+        viewModel.useCustomApiKeyProperty().bind(useCustomApiKey.selectedProperty());
+        customApiKey.disableProperty().bind(useCustomApiKey.selectedProperty().not());
+        checkCustomApiKey.disableProperty().bind(useCustomApiKey.selectedProperty().not());
 
-        new ViewModelListCellFactory<CustomApiKeyPreferences>()
-                .withText(CustomApiKeyPreferences::getName)
-                .install(customApiKeyNameComboBox);
+        new ViewModelListCellFactory<FetcherApiKey>()
+                .withText(FetcherApiKey::getName)
+                .install(apiKeyName);
 
-        customApiKeyNameComboBox.itemsProperty().bind(viewModel.customApiKeyPrefsProperty());
-        customApiKeyNameComboBox.valueProperty().bindBidirectional(viewModel.selectedCustomApiKeyPreferencesProperty());
-        customApiKeyNameComboBox.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+        apiKeyName.itemsProperty().bind(viewModel.customApiKeyPrefsProperty());
+        apiKeyName.valueProperty().bindBidirectional(viewModel.selectedCustomApiKeyPreferencesProperty());
+        apiKeyName.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             if (oldValue != null) {
-                oldValue.shouldUseCustomKey(useCustomApiKeyCheckBox.isSelected());
-                oldValue.setCustomApiKey(useCustomApiKeyText.getText().trim());
+                oldValue.shouldUseCustomKey(useCustomApiKey.isSelected());
+                oldValue.setCustomApiKey(customApiKey.getText().trim());
             }
             if (newValue != null) {
-                useCustomApiKeyCheckBox.setSelected(newValue.shouldUseCustom());
-                useCustomApiKeyText.setText(newValue.getCustomApiKey());
+                useCustomApiKey.setSelected(newValue.shouldUseCustom());
+                customApiKey.setText(newValue.getCustomApiKey());
             }
         });
+        apiKeyName.getSelectionModel().selectFirst();
     }
 
     @FXML
     void checkCustomApiKey() {
         viewModel.checkCustomApiKey();
     }
-
 }

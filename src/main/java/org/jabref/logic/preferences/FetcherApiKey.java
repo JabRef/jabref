@@ -1,11 +1,11 @@
 package org.jabref.logic.preferences;
 
-public class CustomApiKeyPreferences {
+public class FetcherApiKey {
     private final String name;
     private boolean useCustom;
     private String customApiKey;
 
-    public CustomApiKeyPreferences(String name, boolean useCustom, String customApiKey) {
+    public FetcherApiKey(String name, boolean useCustom, String customApiKey) {
         this.name = name;
         this.useCustom = useCustom;
         this.customApiKey = customApiKey;
@@ -30,5 +30,4 @@ public class CustomApiKeyPreferences {
     public void setCustomApiKey(String customApiKey) {
         this.customApiKey = customApiKey;
     }
-
 }

@@ -7,7 +7,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.stream.Collectors;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
@@ -27,7 +26,10 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.commonfxcontrols.SortCriterionViewModel;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.logic.importer.ImporterPreferences;
+import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.preferences.DOIPreferences;
+import org.jabref.logic.preferences.FetcherApiKey;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.metadata.SaveOrderConfig;
@@ -52,8 +54,8 @@ public class ImportExportTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty grobidEnabledProperty = new SimpleBooleanProperty();
     private final StringProperty grobidURLProperty = new SimpleStringProperty("");
 
-    private final ListProperty<CustomApiKeyPreferences> customApiKeyPreferencesListProperty = new SimpleListProperty<>();
-    private final ObjectProperty<CustomApiKeyPreferences> selectedCustomApiKeyPreferencesProperty = new SimpleObjectProperty<>();
+    private final ListProperty<FetcherApiKey> keysProperty = new SimpleListProperty<>();
+    private final ObjectProperty<FetcherApiKey> selectedCustomApiKeyPreferencesProperty = new SimpleObjectProperty<>();
     private final BooleanProperty useCustomApiKeyProperty = new SimpleBooleanProperty();
     private final StringProperty customApiKeyTextProperty = new SimpleStringProperty();
 
@@ -97,18 +99,15 @@ public class ImportExportTabViewModel implements PreferenceTabViewModel {
         sortableFieldsProperty.addAll(fieldNames);
         sortCriteriaProperty.addAll(initialExportOrder.getSortCriteria().stream()
                                                       .map(SortCriterionViewModel::new)
-                                                      .collect(Collectors.toList()));
+                                                      .toList());
 
         grobidEnabledProperty.setValue(importerPreferences.isGrobidEnabled());
         grobidURLProperty.setValue(importerPreferences.getGrobidURL());
 
         // API keys
-        ArrayList<CustomApiKeyPreferences> customApiKeyPreferencesList = new ArrayList<>();
         for (String name : API_KEY_NAME_URL.keySet()) {
-            customApiKeyPreferencesList.add(preferencesService.getCustomApiKeyPreferences(name));
+            keysProperty.add(preferencesService.getCustomApiKeyPreferences(name));
         }
-        customApiKeyPreferencesListProperty.setValue(FXCollections.observableArrayList(customApiKeyPreferencesList));
-        selectedCustomApiKeyPreferencesProperty.setValue(customApiKeyPreferencesList.get(0));
     }
 
     @Override
@@ -129,7 +128,7 @@ public class ImportExportTabViewModel implements PreferenceTabViewModel {
         // API keys
         selectedCustomApiKeyPreferencesProperty.get().shouldUseCustomKey(useCustomApiKeyProperty.get());
         selectedCustomApiKeyPreferencesProperty.get().setCustomApiKey(customApiKeyTextProperty.get());
-        for (CustomApiKeyPreferences apiKeyPreferences : customApiKeyPreferencesListProperty.get()) {
+        for (FetcherApiKey apiKeyPreferences : keysProperty.get()) {
             if (apiKeyPreferences.getCustomApiKey().isEmpty()) {
                 preferencesService.clearCustomApiKeyPreferences(apiKeyPreferences.getName());
             } else {
@@ -180,11 +179,11 @@ public class ImportExportTabViewModel implements PreferenceTabViewModel {
         return grobidURLProperty;
     }
 
-    public ListProperty<CustomApiKeyPreferences> customApiKeyPrefsProperty() {
-        return this.customApiKeyPreferencesListProperty;
+    public ListProperty<FetcherApiKey> customApiKeyPrefsProperty() {
+        return this.keysProperty;
     }
 
-    public ObjectProperty<CustomApiKeyPreferences> selectedCustomApiKeyPreferencesProperty() {
+    public ObjectProperty<FetcherApiKey> selectedCustomApiKeyPreferencesProperty() {
         return this.selectedCustomApiKeyPreferencesProperty;
     }
 

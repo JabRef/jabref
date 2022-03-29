@@ -24,7 +24,7 @@ import org.jabref.logic.importer.PagedSearchBasedParserFetcher;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.fetcher.transformers.IEEEQueryTransformer;
 import org.jabref.logic.net.URLDownload;
-import org.jabref.logic.preferences.CustomApiKeyPreferences;
+import org.jabref.logic.preferences.FetcherApiKey;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.OS;
 import org.jabref.model.entry.BibEntry;
@@ -254,7 +254,7 @@ public class IEEE implements FulltextFetcher, PagedSearchBasedParserFetcher {
      */
     private String getApiKey() {
         String apiKey = API_KEY;
-        CustomApiKeyPreferences apiKeyPreferences = Globals.prefs.getCustomApiKeyPreferences(getName());
+        FetcherApiKey apiKeyPreferences = Globals.prefs.getCustomApiKeyPreferences(getName());
         if (apiKeyPreferences != null && apiKeyPreferences.shouldUseCustom()) {
             apiKey = apiKeyPreferences.getCustomApiKey();
         }

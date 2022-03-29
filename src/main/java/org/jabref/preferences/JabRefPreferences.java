@@ -86,8 +86,8 @@ import org.jabref.logic.net.ssl.SSLPreferences;
 import org.jabref.logic.net.ssl.TrustStoreManager;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
 import org.jabref.logic.openoffice.style.StyleLoader;
-import org.jabref.logic.preferences.CustomApiKeyPreferences;
 import org.jabref.logic.preferences.DOIPreferences;
+import org.jabref.logic.preferences.FetcherApiKey;
 import org.jabref.logic.preferences.OwnerPreferences;
 import org.jabref.logic.preferences.TimestampPreferences;
 import org.jabref.logic.preview.PreviewLayout;
@@ -1380,8 +1380,8 @@ public class JabRefPreferences implements PreferencesService {
      * @return CustomAPIKeyPreferences
      */
     @Override
-    public CustomApiKeyPreferences getCustomApiKeyPreferences(String name) {
-        return new CustomApiKeyPreferences(name,
+    public FetcherApiKey getCustomApiKeyPreferences(String name) {
+        return new FetcherApiKey(name,
                 getBoolean(USE_CUSTOM_API_KEY + name, false),
                 get(CUSTOM_API_KEY + name, ""));
     }
@@ -1392,7 +1392,7 @@ public class JabRefPreferences implements PreferencesService {
      * @param preferences CustomApiKeyPreferences
      */
     @Override
-    public void storeCustomApiKeyPreferences(CustomApiKeyPreferences preferences) {
+    public void storeCustomApiKeyPreferences(FetcherApiKey preferences) {
         String keyName = preferences.getName();
         putBoolean(USE_CUSTOM_API_KEY + keyName, preferences.shouldUseCustom());
         put(CUSTOM_API_KEY + keyName, preferences.getCustomApiKey());
@@ -1581,7 +1581,7 @@ public class JabRefPreferences implements PreferencesService {
                 break;
             }
 
-            customFields.addAll(Arrays.stream(fields.split(STRINGLIST_DELIMITER.toString())).map(FieldFactory::parseField).collect(Collectors.toList()));
+            customFields.addAll(Arrays.stream(fields.split(STRINGLIST_DELIMITER.toString())).map(FieldFactory::parseField).toList());
             defNumber++;
         }
         return customFields;
@@ -1960,21 +1960,19 @@ public class JabRefPreferences implements PreferencesService {
     public List<MainTableColumnModel> updateColumns(String columnNamesList, String columnWidthList, String sortTypeList, double defaultWidth) {
         List<String> columnNames = getStringList(columnNamesList);
         List<Double> columnWidths = getStringList(columnWidthList)
-                                                                  .stream()
-                                                                  .map(string -> {
-                                                                      try {
-                                                                          return Double.parseDouble(string);
-                                                                      } catch (NumberFormatException e) {
-                                                                          LOGGER.error("Exception while parsing column widths. Choosing default.", e);
-                                                                          return defaultWidth;
-                                                                      }
-                                                                  })
-                                                                  .collect(Collectors.toList());
+                .stream()
+                .map(string -> {
+                    try {
+                        return Double.parseDouble(string);
+                    } catch (NumberFormatException e) {
+                        LOGGER.error("Exception while parsing column widths. Choosing default.", e);
+                        return defaultWidth;
+                    }
+                }).toList();
 
         List<SortType> columnSortTypes = getStringList(sortTypeList)
-                                                                    .stream()
-                                                                    .map(SortType::valueOf)
-                                                                    .collect(Collectors.toList());
+                .stream()
+                .map(SortType::valueOf).toList();
 
         List<MainTableColumnModel> columns = new ArrayList<>();
         for (int i = 0; i < columnNames.size(); i++) {

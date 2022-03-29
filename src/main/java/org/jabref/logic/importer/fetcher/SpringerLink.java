@@ -7,7 +7,7 @@ import java.util.Optional;
 
 import org.jabref.gui.Globals;
 import org.jabref.logic.importer.FulltextFetcher;
-import org.jabref.logic.preferences.CustomApiKeyPreferences;
+import org.jabref.logic.preferences.FetcherApiKey;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
@@ -39,7 +39,7 @@ public class SpringerLink implements FulltextFetcher {
 
     private String getApiKey() {
         String apiKey = API_KEY;
-        CustomApiKeyPreferences apiKeyPreferences = Globals.prefs.getCustomApiKeyPreferences(NAME);
+        FetcherApiKey apiKeyPreferences = Globals.prefs.getCustomApiKeyPreferences(NAME);
         if (apiKeyPreferences != null && apiKeyPreferences.shouldUseCustom()) {
             apiKey = apiKeyPreferences.getCustomApiKey();
         }
