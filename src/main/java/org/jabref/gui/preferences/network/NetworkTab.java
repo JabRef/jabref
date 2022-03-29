@@ -1,11 +1,17 @@
 package org.jabref.gui.preferences.network;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+
 import javafx.application.Platform;
 import javafx.beans.binding.BooleanBinding;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 
@@ -17,10 +23,12 @@ import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.preferences.PreferencesTab;
 import org.jabref.gui.util.IconValidationDecorator;
+import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
 
 import com.airhacks.afterburner.views.ViewLoader;
+import com.tobiasdiez.easybind.EasyBind;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 import org.controlsfx.control.textfield.CustomPasswordField;
 
@@ -42,6 +50,16 @@ public class NetworkTab extends AbstractPreferenceTabView<NetworkTabViewModel> i
     @FXML private CustomPasswordField proxyPassword;
     @FXML private Label proxyAttentionLabel;
     @FXML private Button checkConnectionButton;
+
+    @FXML private TableView<CustomCertificateViewModel> customCertificatesTable;
+    @FXML private TableColumn<CustomCertificateViewModel, String> certIssuer;
+    @FXML private TableColumn<CustomCertificateViewModel, String> certSerialNumber;
+    @FXML private TableColumn<CustomCertificateViewModel, String> certSignatureAlgorithm;
+    @FXML private TableColumn<CustomCertificateViewModel, String> certValidFrom;
+    @FXML private TableColumn<CustomCertificateViewModel, String> certValidTo;
+    @FXML private TableColumn<CustomCertificateViewModel, String> certVersion;
+    @FXML private TableColumn<CustomCertificateViewModel, String> actionsColumn;
+
 
     private String proxyPasswordText = "";
     private int proxyPasswordCaretPosition = 0;
@@ -102,6 +120,32 @@ public class NetworkTab extends AbstractPreferenceTabView<NetworkTabViewModel> i
             validationVisualizer.initVisualization(viewModel.proxyUsernameValidationStatus(), proxyUsername);
             validationVisualizer.initVisualization(viewModel.proxyPasswordValidationStatus(), proxyPassword);
         });
+
+        certSerialNumber.setCellValueFactory(data -> data.getValue().serialNumberProperty());
+        certIssuer.setCellValueFactory(data -> data.getValue().issuerProperty());
+        certSignatureAlgorithm.setCellValueFactory(data -> data.getValue().signatureAlgorithmProperty());
+        certVersion.setCellValueFactory(data -> EasyBind.map(data.getValue().versionProperty(), this::formatVersion));
+
+        certValidFrom.setCellValueFactory(data -> EasyBind.map(data.getValue().validFromProperty(), this::formatDate));
+        certValidTo.setCellValueFactory(data -> EasyBind.map(data.getValue().validToProperty(), this::formatDate));
+
+        customCertificatesTable.itemsProperty().set(viewModel.customCertificateListProperty());
+
+        actionsColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getThumbprint()));
+        new ValueTableCellFactory<CustomCertificateViewModel, String>()
+                .withGraphic(name -> IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode())
+                .withTooltip(name -> Localization.lang("Remove formatter '%0'", name))
+                .withOnMouseClickedEvent(thumbprint -> evt -> viewModel.customCertificateListProperty().removeIf(cert -> cert.getThumbprint().equals(thumbprint)))
+                .install(actionsColumn);
+
+    }
+
+    private String formatDate(LocalDate localDate) {
+        return localDate.format(DateTimeFormatter.ofPattern("dd-MMM-yyyy"));
+    }
+
+    private String formatVersion(String version) {
+        return String.format("V%s", version);
     }
 
     private void proxyPasswordReveal(MouseEvent event) {
@@ -124,5 +168,10 @@ public class NetworkTab extends AbstractPreferenceTabView<NetworkTabViewModel> i
     @FXML
     void checkConnection() {
         viewModel.checkConnection();
+    }
+
+    @FXML
+    void addCertificateFile() {
+        viewModel.addCertificateFile();
     }
 }

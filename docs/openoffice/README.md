@@ -1,1 +1,2 @@
-# OpenOffice/LibreOffice integration
+# The OpenOffice/LibreOffice panel
+

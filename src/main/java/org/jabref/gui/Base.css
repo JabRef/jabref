@@ -1277,3 +1277,7 @@ TextFlow * {
 .text-field:invalid {
     -fx-background-color: rgba(240, 128, 128, 0.5);
 }
+
+.notification-pane .notification-bar > .pane .label {
+    -fx-text-fill: -fx-mid-text-color;
+}
