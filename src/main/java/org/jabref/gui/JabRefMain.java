@@ -162,10 +162,8 @@ public class JabRefMain extends Application {
                 preferences.getGeneralPreferences().getDefaultBibDatabaseMode(),
                 Globals.entryTypesManager);
 
-        LOGGER.info(preferences.getProtectedTermsPreferences().getEnabledExternalTermLists().toString());
         // Initialize protected terms loader
         Globals.protectedTermsLoader = new ProtectedTermsLoader(preferences.getProtectedTermsPreferences());
-        // preferences.getPreviewPreferences();
     }
 
     private static void configureProxy(ProxyPreferences proxyPreferences) {
