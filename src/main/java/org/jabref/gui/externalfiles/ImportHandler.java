@@ -182,9 +182,9 @@ public class ImportHandler {
         BibEntry cleanedEntry = cleanup.doPostCleanup(entry);
         BibEntry entryToInsert = cleanedEntry;
 
-        Optional<BibEntry> duplicate = new DuplicateCheck(Globals.entryTypesManager).containsDuplicate(bibDatabaseContext.getDatabase(), entry, bibDatabaseContext.getMode());
+        Optional<BibEntry> duplicate = new DuplicateCheck(Globals.entryTypesManager).containsDuplicate(bibDatabaseContext.getDatabase(), entryToInsert, bibDatabaseContext.getMode());
         if (duplicate.isPresent()) {
-            DuplicateResolverDialog dialog = new DuplicateResolverDialog(entry, duplicate.get(), DuplicateResolverDialog.DuplicateResolverType.IMPORT_CHECK, bibDatabaseContext, stateManager);
+            DuplicateResolverDialog dialog = new DuplicateResolverDialog(entryToInsert, duplicate.get(), DuplicateResolverDialog.DuplicateResolverType.IMPORT_CHECK, bibDatabaseContext, stateManager);
             switch (dialogService.showCustomDialogAndWait(dialog).orElse(DuplicateResolverDialog.DuplicateResolverResult.BREAK)) {
                 case KEEP_LEFT:
                     bibDatabaseContext.getDatabase().removeEntry(duplicate.get());
@@ -196,8 +196,7 @@ public class ImportHandler {
                     entryToInsert = dialog.getMergedEntry();
                     break;
                 default:
-                    // Do nothing
-                    break;
+                   return;
             }
         }
         // Regenerate CiteKey of imported BibEntry
