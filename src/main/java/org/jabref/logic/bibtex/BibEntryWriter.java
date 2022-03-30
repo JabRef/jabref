@@ -26,7 +26,11 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.strings.StringUtil;
 
+import org.slf4j.LoggerFactory;
+
 public class BibEntryWriter {
+
+    private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(BibEntryWriter.class);
 
     private final BibEntryTypesManager entryTypesManager;
     private final FieldWriter fieldWriter;
@@ -161,6 +165,7 @@ public class BibEntryWriter {
             try {
                 out.write(fieldWriter.write(field, value.get()));
             } catch (InvalidFieldValueException ex) {
+                LOGGER.warn("Invalid field value {} of field {} of entry {]", value.get(), field, entry.getCitationKey().orElse(""), ex);
                 throw new IOException("Error in field '" + field + " of entry " + entry.getCitationKey().orElse("") + "': " + ex.getMessage(), ex);
             }
             out.writeLine(",");

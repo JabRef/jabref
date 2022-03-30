@@ -185,7 +185,7 @@
           <text macro="editor"/>
           <text macro="translator"/>
           <choose>
-            <if type="webpage post-weblog" match="any">
+            <if type="article-magazine article-newspaper webpage post-weblog" match="any">
               <text variable="container-title"/>
             </if>
           </choose>

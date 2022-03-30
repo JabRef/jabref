@@ -233,7 +233,7 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
         ExporterFactory.entryNumber = 1; // Set entry number in case that is included in the preview layout.
 
         BackgroundTask
-                .wrap(() -> layout.generatePreview(entry.get(), database.getDatabase()))
+                .wrap(() -> layout.generatePreview(entry.get(), database))
                 .onRunning(() -> setPreviewText("<i>" + Localization.lang("Processing %0", Localization.lang("Citation Style")) + ": " + layout.getDisplayName() + " ..." + "</i>"))
                 .onSuccess(this::setPreviewText)
                 .onFailure(exception -> {

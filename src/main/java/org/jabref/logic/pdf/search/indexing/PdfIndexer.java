@@ -118,8 +118,7 @@ public class PdfIndexer {
         try (IndexWriter indexWriter = new IndexWriter(
                 directoryToIndex,
                 new IndexWriterConfig(
-                        new EnglishStemAnalyzer()).setOpenMode(IndexWriterConfig.OpenMode.CREATE_OR_APPEND))
-        ) {
+                        new EnglishStemAnalyzer()).setOpenMode(IndexWriterConfig.OpenMode.CREATE_OR_APPEND))) {
             if (!entry.getFiles().isEmpty()) {
                 indexWriter.deleteDocuments(new Term(SearchFieldConstants.PATH, linkedFile.getLink()));
             }

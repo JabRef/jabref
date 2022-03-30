@@ -12,6 +12,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.jabref.architecture.ApacheCommonsLang3Allowed;
+import org.jabref.logic.bibtex.FieldWriter;
 
 import com.google.common.base.CharMatcher;
 import org.apache.commons.lang3.StringUtils;
@@ -323,7 +324,7 @@ public class StringUtil {
                 inBrace++;
             } else if (c == '}') {
                 inBrace--;
-            } else if (!escaped && (c == '#')) {
+            } else if (!escaped && (c == FieldWriter.BIBTEX_STRING_START_END_SYMBOL)) {
                 inString = !inString;
             }
 

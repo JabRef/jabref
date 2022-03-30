@@ -13,22 +13,17 @@ import com.sun.star.text.XText;
 import com.sun.star.text.XTextRangeCompare;
 
 /**
- * RangeSort provides sorting based on XTextRangeCompare, which only provides comparison
- * between XTextRange values within the same XText.
+ * RangeSort provides sorting based on XTextRangeCompare, which only provides comparison between XTextRange values within the same XText.
  */
 public class RangeSort {
 
     private RangeSort() {
-        /**/
     }
 
     /**
      * Compare two RangeHolders (using RangeHolder.getRange()) within an XText.
-     *
-     * Note: since we only look at the ranges, this comparison is generally not consistent with
-     * `equals` on the RangeHolders. Probably should not be used for key comparison in
-     * {@code TreeMap<RangeHolder>} or {@code Set<RangeHolder>}
-     *
+     * <p>
+     * Note: since we only look at the ranges, this comparison is generally not consistent with `equals` on the RangeHolders. Probably should not be used for key comparison in {@code TreeMap<RangeHolder>} or {@code Set<RangeHolder>}
      */
     private static class HolderComparatorWithinPartition implements Comparator<RangeHolder> {
 
@@ -36,7 +31,7 @@ public class RangeSort {
 
         HolderComparatorWithinPartition(XText text) {
             cmp = (UnoCast.cast(XTextRangeCompare.class, text)
-                   .orElseThrow(java.lang.IllegalArgumentException::new));
+                          .orElseThrow(java.lang.IllegalArgumentException::new));
         }
 
         /**
@@ -50,7 +45,7 @@ public class RangeSort {
 
     /**
      * Sort a list of RangeHolder values known to share the same getText().
-     *
+     * <p>
      * Note: RangeHolder.getRange() is called many times.
      */
     public static <V extends RangeHolder> void sortWithinPartition(List<V> rangeHolders) {
@@ -83,7 +78,7 @@ public class RangeSort {
     }
 
     /**
-     *  Partition RangeHolders by the corresponding XText.
+     * Partition RangeHolders by the corresponding XText.
      */
     public static <V extends RangeHolder> RangePartitions<V> partitionRanges(List<V> holders) {
         RangePartitions<V> result = new RangePartitions<>();

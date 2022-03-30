@@ -21,10 +21,11 @@ public class FileTab extends AbstractPreferenceTabView<FileTabViewModel> impleme
 
     @FXML private CheckBox openLastStartup;
     @FXML private TextField noWrapFiles;
-    @FXML private RadioButton resolveStringsBibTex;
-    @FXML private RadioButton resolveStringsAll;
-    @FXML private TextField resolveStringsExcept;
+    @FXML private RadioButton doNotResolveStrings;
+    @FXML private RadioButton resolveStrings;
+    @FXML private TextField resolveStringsForFields;
     @FXML private CheckBox alwaysReformatBib;
+    @FXML private CheckBox warnAboutDuplicatesOnImport;
 
     @FXML private CheckBox autosaveLocalLibraries;
     @FXML private Button autosaveLocalLibrariesHelp;
@@ -36,15 +37,18 @@ public class FileTab extends AbstractPreferenceTabView<FileTabViewModel> impleme
     }
 
     public void initialize() {
-        this.viewModel = new FileTabViewModel(preferencesService);
+        this.viewModel = new FileTabViewModel(preferencesService.getImportExportPreferences());
+
         openLastStartup.selectedProperty().bindBidirectional(viewModel.openLastStartupProperty());
         noWrapFiles.textProperty().bindBidirectional(viewModel.noWrapFilesProperty());
-        resolveStringsBibTex.selectedProperty().bindBidirectional(viewModel.resolveStringsBibTexProperty());
-        resolveStringsAll.selectedProperty().bindBidirectional(viewModel.resolveStringsAllProperty());
-        resolveStringsExcept.textProperty().bindBidirectional(viewModel.resolveStringsExceptProperty());
-        resolveStringsExcept.disableProperty().bind(resolveStringsAll.selectedProperty().not());
-        alwaysReformatBib.selectedProperty().bindBidirectional(viewModel.alwaysReformatBibProperty());
 
+        doNotResolveStrings.selectedProperty().bindBidirectional(viewModel.doNotResolveStringsProperty());
+        resolveStrings.selectedProperty().bindBidirectional(viewModel.resolveStringsProperty());
+        resolveStringsForFields.textProperty().bindBidirectional(viewModel.resolveStringsForFieldsProperty());
+        resolveStringsForFields.disableProperty().bind(doNotResolveStrings.selectedProperty());
+
+        alwaysReformatBib.selectedProperty().bindBidirectional(viewModel.alwaysReformatBibProperty());
+        warnAboutDuplicatesOnImport.selectedProperty().bindBidirectional(viewModel.warnAboutDuplicatesOnImportProperty());
         autosaveLocalLibraries.selectedProperty().bindBidirectional(viewModel.autosaveLocalLibrariesProperty());
 
         ActionFactory actionFactory = new ActionFactory(Globals.getKeyPrefs());

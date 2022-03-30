@@ -17,11 +17,11 @@ import com.sun.star.uno.Any;
 public class UnoTextSection {
 
     /**
-     *  @return An XNameAccess to find sections by name.
+     * @return An XNameAccess to find sections by name.
      */
     public static XNameAccess getNameAccess(XTextDocument doc)
-        throws
-        NoDocumentException {
+            throws
+            NoDocumentException {
 
         XTextSectionsSupplier supplier = UnoCast.cast(XTextSectionsSupplier.class, doc).get();
         try {
@@ -32,12 +32,12 @@ public class UnoTextSection {
     }
 
     /**
-     *  Get an XTextSection by name.
+     * Get an XTextSection by name.
      */
     public static Optional<XTextSection> getByName(XTextDocument doc, String name)
-        throws
-        WrappedTargetException,
-        NoDocumentException {
+            throws
+            WrappedTargetException,
+            NoDocumentException {
         XNameAccess nameAccess = getNameAccess(doc);
         try {
             return Optional.ofNullable((XTextSection) ((Any) nameAccess.getByName(name)).getObject());
@@ -53,26 +53,25 @@ public class UnoTextSection {
      * @return The XTextRange for the section, or Optional.empty().
      */
     public static Optional<XTextRange> getAnchor(XTextDocument doc, String name)
-        throws
-        WrappedTargetException,
-        NoDocumentException {
+            throws
+            WrappedTargetException,
+            NoDocumentException {
 
         XNameAccess nameAccess = getNameAccess(doc);
         return (UnoNameAccess.getTextContentByName(nameAccess, name).map(XTextContent::getAnchor));
     }
 
     /**
-     *  Create a text section with the provided name and insert it at the provided cursor.
+     * Create a text section with the provided name and insert it at the provided cursor.
      *
-     *  @param name  The desired name for the section.
-     *  @param range The location to insert at.
-     *
-     *  If an XTextSection by that name already exists, LibreOffice (6.4.6.2) creates a section with
-     *  a name different from what we requested, in "Section {number}" format.
+     * @param name  The desired name for the section.
+     * @param range The location to insert at.
+     *              <p>
+     *              If an XTextSection by that name already exists, LibreOffice (6.4.6.2) creates a section with a name different from what we requested, in "Section {number}" format.
      */
     public static XNamed create(XTextDocument doc, String name, XTextRange range, boolean absorb)
-        throws
-        CreationException {
+            throws
+            CreationException {
 
         return UnoNamed.insertNamedTextContent(doc, "com.sun.star.text.TextSection", name, range, absorb);
     }

@@ -1,7 +1,6 @@
 package org.jabref.logic.exporter;
 
 import java.math.BigInteger;
-import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.util.Comparator;
 import java.util.List;
@@ -9,10 +8,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.TreeMap;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
 import javax.xml.namespace.QName;
 
 import org.jabref.logic.importer.fileformat.mods.AbstractDefinition;
@@ -52,6 +47,11 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.EntryType;
 
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBElement;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.Marshaller;
+
 /**
  * TemplateExporter for exporting in MODS XML format.
  */
@@ -68,7 +68,7 @@ class ModsExporter extends Exporter {
     }
 
     @Override
-    public void export(final BibDatabaseContext databaseContext, final Path file, final Charset encoding, List<BibEntry> entries) throws SaveException {
+    public void export(final BibDatabaseContext databaseContext, final Path file, List<BibEntry> entries) throws SaveException {
         Objects.requireNonNull(databaseContext);
         Objects.requireNonNull(entries);
         if (entries.isEmpty()) { // Only export if entries exist

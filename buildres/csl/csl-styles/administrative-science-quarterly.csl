@@ -14,7 +14,7 @@
     <category field="social_science"/>
     <issn>0001-8392</issn>
     <eissn>1930-3815</eissn>
-    <updated>2012-09-27T22:06:38+00:00</updated>
+    <updated>2022-01-07T15:49:10+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="en">
@@ -179,6 +179,7 @@
           <text variable="publisher-place"/>
         </group>
       </else-if>
+      <else-if type="article-journal" match="any"/>
       <else>
         <choose>
           <if variable="event" match="none">

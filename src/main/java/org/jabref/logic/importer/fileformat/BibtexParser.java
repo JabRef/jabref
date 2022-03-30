@@ -1,13 +1,10 @@
 package org.jabref.logic.importer.fileformat;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.PushbackReader;
 import java.io.Reader;
 import java.io.StringWriter;
-import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.Deque;
 import java.util.HashMap;
@@ -22,9 +19,11 @@ import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.jabref.logic.bibtex.FieldContentFormatter;
+import org.jabref.logic.bibtex.FieldWriter;
 import org.jabref.logic.exporter.BibtexDatabaseWriter;
 import org.jabref.logic.exporter.SavePreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.ParserResult;
@@ -53,15 +52,19 @@ import org.slf4j.LoggerFactory;
  * <p>
  * Use:
  * <p>
- * BibtexParser parser = new BibtexParser(reader);
+ * <code>BibtexParser parser = new BibtexParser(reader);</code>
  * <p>
- * ParserResult result = parser.parse();
+ * <code>ParserResult result = parser.parse();</code>
  * <p>
  * or
  * <p>
- * ParserResult result = BibtexParser.parse(reader);
+ * <code>ParserResult result = BibtexParser.parse(reader);</code>
  * <p>
  * Can be used stand-alone.
+ * <p>
+ * Main using method: {@link org.jabref.logic.importer.OpenDatabase#loadDatabase(java.nio.file.Path, org.jabref.preferences.GeneralPreferences, org.jabref.logic.importer.ImportFormatPreferences, org.jabref.model.util.FileUpdateMonitor)}
+ * <p>
+ * Opposite class: {@link org.jabref.logic.exporter.BibDatabaseWriter}
  */
 public class BibtexParser implements Parser {
     private static final Logger LOGGER = LoggerFactory.getLogger(BibtexParser.class);
@@ -104,12 +107,9 @@ public class BibtexParser implements Parser {
 
     @Override
     public List<BibEntry> parseEntries(InputStream inputStream) throws ParseException {
-        BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
-        return parseEntries(reader);
-    }
-
-    public List<BibEntry> parseEntries(Reader reader) throws ParseException {
+        Reader reader;
         try {
+            reader = Importer.getReader(inputStream);
             return parse(reader).getDatabase().getEntries();
         } catch (IOException e) {
             throw new ParseException(e);
@@ -121,14 +121,13 @@ public class BibtexParser implements Parser {
     }
 
     /**
-     * Will parse the BibTex-Data found when reading from reader. Ignores any encoding supplied in the file by "Encoding: myEncoding".
+     * Parses BibTeX data found when reading from reader.
      * <p>
      * The reader will be consumed.
      * <p>
      * Multiple calls to parse() return the same results
-     *
-     * @return ParserResult
-     * @throws IOException
+     * <p>
+     * Handling of encoding is done at {@link BibtexImporter}
      */
     public ParserResult parse(Reader in) throws IOException {
         Objects.requireNonNull(in);
@@ -136,7 +135,7 @@ public class BibtexParser implements Parser {
 
         String newLineSeparator = determineNewLineSeparator();
 
-        // BibTeX related contents.
+        // BibTeX related contents
         initializeParserResult(newLineSeparator);
 
         parseDatabaseID();
@@ -213,7 +212,7 @@ public class BibtexParser implements Parser {
                 database.setPreamble(parsePreamble());
                 // Consume a new line which separates the preamble from the next part (if the file was written with JabRef)
                 skipOneNewline();
-                // the preamble is saved verbatim anyways, so the text read so far can be dropped
+                // the preamble is saved verbatim anyway, so the text read so far can be dropped
                 dumpTextReadSoFarToString();
             } else if ("string".equals(entryType)) {
                 parseBibtexString();
@@ -227,7 +226,7 @@ public class BibtexParser implements Parser {
             skipWhitespace();
         }
 
-        // Instantiate meta data:
+        // Instantiate meta data
         try {
             parserResult.setMetaData(metaDataParser.parse(meta, importFormatPreferences.getKeywordSeparator()));
         } catch (ParseException exception) {
@@ -367,8 +366,13 @@ public class BibtexParser implements Parser {
         }
     }
 
+    /**
+     * Purges the given stringToPurge (if it exists) from the given context
+     *
+     * @return a stripped version of the context
+     */
     private String purge(String context, String stringToPurge) {
-        // purge the encoding line if it exists
+        // purge the given string line if it exists
         int runningIndex = context.indexOf(stringToPurge);
         int indexOfAt = context.indexOf("@");
         while (runningIndex < indexOfAt) {
@@ -640,6 +644,9 @@ public class BibtexParser implements Parser {
                 String number = parseTextToken();
                 value.append(number);
             } else if (character == '#') {
+                // Here, we hit the case of BibTeX string concatenation. E.g., "author = Kopp # Kolb".
+                // We did NOT hit org.jabref.logic.bibtex.FieldWriter#BIBTEX_STRING_START_END_SYMBOL
+                // See also ADR-0024
                 consume('#');
             } else {
                 String textToken = parseTextToken();
@@ -647,7 +654,7 @@ public class BibtexParser implements Parser {
                     throw new IOException("Error in line " + line + " or above: "
                             + "Empty text token.\nThis could be caused " + "by a missing comma between two fields.");
                 }
-                value.append('#').append(textToken).append('#');
+                value.append(FieldWriter.BIBTEX_STRING_START_END_SYMBOL).append(textToken).append(FieldWriter.BIBTEX_STRING_START_END_SYMBOL);
             }
             skipWhitespace();
         }

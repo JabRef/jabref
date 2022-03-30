@@ -1,0 +1,2 @@
+# The OpenOffice/LibreOffice panel
+

@@ -1,6 +1,5 @@
 package org.jabref.gui.exporter;
 
-import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
@@ -50,7 +49,6 @@ public class WriteMetadataToPdfAction extends SimpleCommand {
     private final FilePreferences filePreferences;
     private final XmpPreferences xmpPreferences;
     private final EmbeddedBibFilePdfExporter embeddedBibExporter;
-    private final Charset encoding;
 
     private OptionsDialog optionsDialog;
 
@@ -62,13 +60,12 @@ public class WriteMetadataToPdfAction extends SimpleCommand {
     private int entriesChanged;
     private int errors;
 
-    public WriteMetadataToPdfAction(StateManager stateManager, BibDatabaseMode databaseMode, BibEntryTypesManager entryTypesManager, FieldWriterPreferences fieldWriterPreferences, DialogService dialogService, TaskExecutor taskExecutor, FilePreferences filePreferences, XmpPreferences xmpPreferences, Charset encoding) {
+    public WriteMetadataToPdfAction(StateManager stateManager, BibDatabaseMode databaseMode, BibEntryTypesManager entryTypesManager, FieldWriterPreferences fieldWriterPreferences, DialogService dialogService, TaskExecutor taskExecutor, FilePreferences filePreferences, XmpPreferences xmpPreferences) {
         this.stateManager = stateManager;
         this.dialogService = dialogService;
         this.taskExecutor = taskExecutor;
         this.filePreferences = filePreferences;
         this.xmpPreferences = xmpPreferences;
-        this.encoding = encoding;
         this.embeddedBibExporter = new EmbeddedBibFilePdfExporter(databaseMode, entryTypesManager, fieldWriterPreferences);
 
         this.executable.bind(needsDatabase(stateManager));
@@ -191,12 +188,12 @@ public class WriteMetadataToPdfAction extends SimpleCommand {
                 String.valueOf(entriesChanged), String.valueOf(skipped), String.valueOf(errors)));
     }
 
+    /**
+     * This writes both XMP data and embeddeds the .bib file
+     */
     private void writeMetadataToFile(Path file, BibEntry entry, BibDatabaseContext databaseContext, BibDatabase database) throws Exception {
-        // XMP
         XmpUtilWriter.writeXmp(file, entry, database, xmpPreferences);
-
-        // Embedded Bib File
-        embeddedBibExporter.exportToFileByPath(databaseContext, database, encoding, filePreferences, file);
+        embeddedBibExporter.exportToFileByPath(databaseContext, database, filePreferences, file);
     }
 
     class OptionsDialog extends FXDialog {

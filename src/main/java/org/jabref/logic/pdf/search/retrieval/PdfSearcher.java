@@ -63,12 +63,11 @@ public final class PdfSearcher {
         List<SearchResult> resultDocs = new LinkedList<>();
 
         if (!DirectoryReader.indexExists(indexDirectory)) {
-            LOGGER.warn("Index dirrectory {} does not exist", indexDirectory);
+            LOGGER.debug("Index directory {} does not yet exist", indexDirectory);
             return new PdfSearchResults();
         }
 
         try (IndexReader reader = DirectoryReader.open(indexDirectory)) {
-
             IndexSearcher searcher = new IndexSearcher(reader);
             Query query = new MultiFieldQueryParser(PDF_FIELDS, new EnglishStemAnalyzer()).parse(searchString);
             TopDocs results = searcher.search(query, maxHits);
@@ -78,7 +77,7 @@ public final class PdfSearcher {
             return new PdfSearchResults(resultDocs);
 
         } catch (ParseException e) {
-            LOGGER.warn("Could not parse query: '" + searchString + "'! \n" + e.getMessage());
+            LOGGER.warn("Could not parse query: '{}'!\n{}", searchString, e.getMessage());
             return new PdfSearchResults();
         }
     }

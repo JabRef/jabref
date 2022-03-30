@@ -5,6 +5,7 @@ package org.jabref.model.openoffice.style;
  */
 public class CitationGroupId {
     String groupId;
+
     public CitationGroupId(String groupId) {
         this.groupId = groupId;
     }

@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Fetch all history for all tags and branches
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           ref: main
           persist-credentials: false
@@ -18,8 +18,8 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v2
         with:
-          java-version: 16
-          distribution: 'adopt'
+          java-version: 17
+          distribution: 'temurin'
           cache: 'gradle'
       - name: Update journal lists
         run: |
@@ -46,7 +46,7 @@ jobs:
           # create .mv file
           cd $GITHUB_WORKSPACE
           ./gradlew generateJournalAbbreviationList
-      - uses: peter-evans/create-pull-request@v3
+      - uses: peter-evans/create-pull-request@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           branch: update-journallist

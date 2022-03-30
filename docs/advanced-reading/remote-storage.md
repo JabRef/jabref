@@ -2,8 +2,6 @@
 
 ## Using a shared PostgreSQL database
 
-...
-
 ## Handling large shared databases
 
 Synchronization times may get long when working with a large database containing several thousand entries. Therefore, synchronization only happens if several conditions are fulfilled:
@@ -17,4 +15,3 @@ Remaining changes that has not been synchronized yet are saved at closing the da
 
 * `pullChanges` synchronizes the database unconditionally.
 * `pullLastEntryChanges` synchronizes only if there are remaining entry changes. It is invoked when closing the shared database (`closeSharedDatabase`).
-
