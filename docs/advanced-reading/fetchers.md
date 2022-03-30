@@ -31,11 +31,11 @@ There are more fetchers supported by JabRef. Investigate the package `org.jabref
 
 ### Trust Levels
 
-* `SOURCE `(highest): definitive URL for a particular paper
+* `SOURCE` (highest): definitive URL for a particular paper
 * `PUBLISHER`: any publisher library
 * `PREPRINT`: any preprint library that might include non final publications of a paper
 * `META_SEARCH`: meta search engines
-* `UNKNOWN `(lowest): anything else not fitting the above categories
+* `UNKNOWN` (lowest): anything else not fitting the above categories
 
 ### Current trust levels
 
@@ -46,9 +46,9 @@ All fetchers are contained in the package `org.jabref.logic.importer.fetcher`. H
 * Springer: Publisher
 * ACS: Publisher
 * IEEE: Publisher
-* Google Scholar: META_SEARCH, because it is a search engine
+* Google Scholar: META\_SEARCH, because it is a search engine
 * Arxiv: PREPRINT, because preprints are published there
-* OpenAccessDOI: META_SEARCH
+* OpenAccessDOI: META\_SEARCH
 
 Reasoning:
 

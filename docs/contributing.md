@@ -51,7 +51,7 @@ Your contribution is considered being made under [MIT license](https://tldrlegal
 
 #### Write a good commit message
 
-See [good commit message](https://github.com/joelparkerhenderson/git_commit_message) or [commit guidelines section of Pro Git](http://git-scm.com/book/en/Distributed-Git-Contributing-to-a-Project#Commit-Guidelines). The first line of your commit message is automatically taken as the title for the pull-request. All other lines make up the body of the pull request. Add the words `fixes #xxx` to your PR to auto-close the corresponding issue.
+See [good commit message](https://github.com/joelparkerhenderson/git\_commit\_message) or [commit guidelines section of Pro Git](http://git-scm.com/book/en/Distributed-Git-Contributing-to-a-Project#Commit-Guidelines). The first line of your commit message is automatically taken as the title for the pull-request. All other lines make up the body of the pull request. Add the words `fixes #xxx` to your PR to auto-close the corresponding issue.
 
 #### Test your code
 
