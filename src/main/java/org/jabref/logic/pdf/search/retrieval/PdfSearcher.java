@@ -36,7 +36,7 @@ public final class PdfSearcher {
 
     private PdfSearcher(Directory indexDirectory) {
         this.indexDirectory = indexDirectory;
-        Codec.forName("Lucene90");
+        Codec.forName("Lucene91");
 
     }
 
