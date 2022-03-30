@@ -182,17 +182,17 @@ public class ImportHandler {
         BibEntry cleanedEntry = cleanup.doPostCleanup(entry);
         BibEntry entryToInsert = cleanedEntry;
 
-        Optional<BibEntry> duplicate = new DuplicateCheck(Globals.entryTypesManager).containsDuplicate(bibDatabaseContext.getDatabase(), entryToInsert, bibDatabaseContext.getMode());
-        if (duplicate.isPresent()) {
-            DuplicateResolverDialog dialog = new DuplicateResolverDialog(entryToInsert, duplicate.get(), DuplicateResolverDialog.DuplicateResolverType.IMPORT_CHECK, bibDatabaseContext, stateManager);
+        Optional<BibEntry> existingDuplicateInLibrary = new DuplicateCheck(Globals.entryTypesManager).containsDuplicate(bibDatabaseContext.getDatabase(), entryToInsert, bibDatabaseContext.getMode());
+        if (existingDuplicateInLibrary.isPresent()) {
+            DuplicateResolverDialog dialog = new DuplicateResolverDialog(existingDuplicateInLibrary.get(), entryToInsert, DuplicateResolverDialog.DuplicateResolverType.IMPORT_CHECK, bibDatabaseContext, stateManager);
             switch (dialogService.showCustomDialogAndWait(dialog).orElse(DuplicateResolverDialog.DuplicateResolverResult.BREAK)) {
                 case KEEP_LEFT:
-                    bibDatabaseContext.getDatabase().removeEntry(duplicate.get());
+                    bibDatabaseContext.getDatabase().removeEntry(existingDuplicateInLibrary.get());
                     break;
                 case KEEP_BOTH:
                     break;
                 case KEEP_MERGE:
-                    bibDatabaseContext.getDatabase().removeEntry(duplicate.get());
+                    bibDatabaseContext.getDatabase().removeEntry(existingDuplicateInLibrary.get());
                     entryToInsert = dialog.getMergedEntry();
                     break;
                 default:
