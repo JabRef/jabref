@@ -64,7 +64,7 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v2
         with:
-          java-version: 17
+          java-version: 18
           distribution: 'temurin'
           cache: 'gradle'
       - name: Setup OSX key chain on OSX

@@ -37,7 +37,7 @@ See also: [https://help.github.com/articles/syncing-a-fork/](https://help.github
 2. `choco install git`
 3. `choco install conemu clink`
 4. `choco install notepadplusplus`
-5. If you want to have your jdk also managed via chocolatey: `choco install jdk8`
+5. If you want to have your jdk also managed via chocolatey: `choco install oraclejdk`
 
 Then, each weak do `choco upgrade all` to ensure all tooling is uptodate.
 
