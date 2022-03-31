@@ -26,5 +26,5 @@
   * [Order of appearance of citation groups](openoffice/order-of-appearance.md)
   * [Problems](openoffice/problems.md)
   * [Code reorganization](openoffice/code-reorganization.md)
-  * [About `OOError`, `OOResult` and `OOVoidResult`](openoffice/ooresult-ooerror.md)
+  * [About OOError, OOResult and OOVoidResult](openoffice/ooresult-ooerror.md)
     * [Alternatives to using OOResult and OOVoidResult in OOBibBase](openoffice/ooresult-alternatives.md)
