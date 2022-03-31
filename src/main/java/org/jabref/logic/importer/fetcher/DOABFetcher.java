@@ -6,12 +6,15 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.StringJoiner;
 
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.SearchBasedParserFetcher;
 import org.jabref.logic.importer.fetcher.transformers.DefaultQueryTransformer;
 import org.jabref.logic.importer.util.JsonReader;
+import org.jabref.model.entry.Author;
+import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 
@@ -79,11 +82,13 @@ public class DOABFetcher implements SearchBasedParserFetcher {
 
     private BibEntry JsonToBibEntry(JSONArray metadataArray) {
         BibEntry entry = new BibEntry();
+        List<Author> authorsList = new ArrayList<>();
+        List<Author> editorsList = new ArrayList<>();
+        StringJoiner keywordJoiner = new StringJoiner(",");
         for (int i = 0; i < metadataArray.length(); i++) {
             JSONObject dataObject = metadataArray.getJSONObject(i);
             switch (dataObject.getString("key")) {
-                case "dc.contributor.author" -> entry.setField(StandardField.AUTHOR,
-                        dataObject.getString("value"));
+                case "dc.contributor.author" -> authorsList.add(toAuthor(dataObject.getString("value")));
                 case "dc.type" -> entry.setField(StandardField.TYPE,
                         dataObject.getString("value"));
                 case "dc.date.issued" -> entry.setField(StandardField.YEAR, String.valueOf(
@@ -102,13 +107,23 @@ public class DOABFetcher implements SearchBasedParserFetcher {
                         dataObject.getString("value"));
                 case "dc.identifier.uri" -> entry.setField(StandardField.URI,
                         dataObject.getString("value"));
-                case "dc.subject.other" -> entry.setField(StandardField.KEYWORDS,
-                        dataObject.getString("value"));
-                case "dc.contributor.editor" -> entry.setField(StandardField.EDITOR,
-                        dataObject.getString("value"));
+                case "dc.subject.other" -> keywordJoiner.add(dataObject.getString("value"));
+                case "dc.contributor.editor" -> editorsList.add(toAuthor(dataObject.getString("value")));
             }
         }
+        entry.setField(StandardField.AUTHOR, toAuthorList(authorsList));
+        entry.setField(StandardField.EDITOR, toAuthorList(editorsList));
+        entry.setField(StandardField.KEYWORDS, String.valueOf(keywordJoiner));
         return entry;
     }
 
+    private Author toAuthor(String author) {
+        String[] names = author.split(" ");
+        names[0] = String.valueOf(new StringBuilder(names[0]).deleteCharAt(names[0].length() - 1));
+        return new Author(names[1], "", "", names[0], "");
+    }
+
+    private String toAuthorList(List<Author> authorsList) {
+        return AuthorList.of(authorsList).getAsFirstLastNamesWithAnd();
+    }
 }

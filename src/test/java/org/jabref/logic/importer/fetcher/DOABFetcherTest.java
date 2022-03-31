@@ -19,13 +19,14 @@ public class DOABFetcherTest {
     private DOABFetcher fetcher;
     private BibEntry David_Opal;
     private BibEntry Ronald_Snijder;
+    private BibEntry Andrew_Perrin;
 
     @BeforeEach
     public void setUp() throws Exception {
         fetcher = new DOABFetcher();
 
         David_Opal = new BibEntry();
-        David_Opal.setField(StandardField.AUTHOR, "Pol, David");
+        David_Opal.setField(StandardField.AUTHOR, "David Pol");
         David_Opal.setField(StandardField.TITLE, "I Open Fire");
         David_Opal.setField(StandardField.TYPE, "book");
         David_Opal.setField(StandardField.DOI, "10.21983/P3.0086.1.00");
@@ -46,11 +47,11 @@ public class DOABFetcherTest {
                 " interpersonal connection — in a world in unprecedentedly critical condition. “And when the night" +
                 " goes off the shock wave throws us apart toward each other.”");
         David_Opal.setField(StandardField.LANGUAGE, "English");
-        David_Opal.setField(StandardField.KEYWORDS, "warfare");
+        David_Opal.setField(StandardField.KEYWORDS, "poetry,love,warfare");
         David_Opal.setField(StandardField.PUBLISHER, "punctum books");
 
         Ronald_Snijder = new BibEntry();
-        Ronald_Snijder.setField(StandardField.AUTHOR, "Snijder, Ronald");
+        Ronald_Snijder.setField(StandardField.AUTHOR, "Ronald Snijder");
         Ronald_Snijder.setField(StandardField.TITLE, "The deliverance of open access books");
         Ronald_Snijder.setField(StandardField.TYPE, "book");
         Ronald_Snijder.setField(StandardField.DOI, "10.26530/OAPEN_1004809");
@@ -67,8 +68,33 @@ public class DOABFetcherTest {
                 " open licenses, user communities, measuring usage, developing countries and the effects on" +
                 " citations and social media.");
         Ronald_Snijder.setField(StandardField.LANGUAGE, "English");
-        Ronald_Snijder.setField(StandardField.KEYWORDS, "Directory of Open Access Books");
+        Ronald_Snijder.setField(StandardField.KEYWORDS, "Open Access,Monographs,OAPEN Library," +
+                "Directory of Open Access Books");
         Ronald_Snijder.setField(StandardField.PUBLISHER, "Amsterdam University Press");
+
+        Andrew_Perrin = new BibEntry();
+        Andrew_Perrin.setField(StandardField.EDITOR, "Andrew Perrin and Loren Stuckenbruck");
+        Andrew_Perrin.setField(StandardField.TITLE, "Four Kingdom Motifs before and beyond the Book of Daniel");
+        Andrew_Perrin.setField(StandardField.TYPE, "book");
+        Andrew_Perrin.setField(StandardField.DOI, "10.1163/9789004443280");
+        Andrew_Perrin.setField(StandardField.PAGES, "354");
+        Andrew_Perrin.setField(StandardField.YEAR, "2020");
+        Andrew_Perrin.setField(StandardField.URI, "https://directory.doabooks.org/handle/20.500.12854/68086");
+        Andrew_Perrin.setField(StandardField.ABSTRACT, "The four kingdoms motif enabled writers of various " +
+                "cultures, times, and places, to periodize history as the staged succession of empires " +
+                "barrelling towards an utopian age. The motif provided order to lived experiences under empire" +
+                " (the present), in view of ancestral traditions and cultural heritage (the past), and inspired" +
+                " outlooks assuring hope, deliverance, and restoration (the future). Four Kingdom Motifs before" +
+                " and beyond the Book of Daniel includes thirteen essays that explore the reach and redeployment" +
+                " of the motif in classical and ancient Near Eastern writings, Jewish and Christian scriptures," +
+                " texts among the Dead Sea Scrolls, Apocrypha and pseudepigrapha, depictions in European" +
+                " architecture and cartography, as well as patristic, rabbinic, Islamic, and African writings " +
+                "from antiquity through the Mediaeval eras. Readership: Advanced students and scholars of the " +
+                "textual formation, apocalyptic theology, and historiographies of the book of Daniel and its " +
+                "diverse reception by writers and communities.");
+        Andrew_Perrin.setField(StandardField.LANGUAGE, "English");
+        Andrew_Perrin.setField(StandardField.KEYWORDS, "Religion");
+        Andrew_Perrin.setField(StandardField.PUBLISHER, "Brill");
 
     }
 
@@ -91,6 +117,14 @@ public class DOABFetcherTest {
         entries = fetcher.performSearch("the deliverance of open access books");
         assertFalse(entries.isEmpty());
         assertTrue(entries.contains(Ronald_Snijder));
+    }
+
+    @Test
+    public void TestPerformSearch3() throws FetcherException {
+        List<BibEntry> entries;
+        entries = fetcher.performSearch("Four Kingdom Motifs before and beyond the Book of Daniel");
+        assertFalse(entries.isEmpty());
+        assertTrue(entries.contains(Andrew_Perrin));
     }
 
 }
