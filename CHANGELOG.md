@@ -11,10 +11,6 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 
 ### Added
 
-- We added the option to copy the DOI of an entry directly from the context menu copy submenu. [#7826](https://github.com/JabRef/jabref/issues/7826)
-- We added a fulltext search feature. [#2838](https://github.com/JabRef/jabref/pull/2838)
-- We added unprotect_terms to the list of bracketed pattern modifiers [#7826](https://github.com/JabRef/jabref/pull/7960)
-- We added an icon picker in group edit dialog. [#6142](https://github.com/JabRef/jabref/issues/6142)
 - We enabled the user to customize the API Key for some fetchers. [#6877](https://github.com/JabRef/jabref/issues/6877)
 - We added an extra option when right-clicking an entry in the Entry List to copy either the DOI or the DOI url.
 - We added a new section to network preferences to allow using custom SSL certificates [#8126](https://github.com/JabRef/jabref/issues/8126)
