@@ -563,7 +563,6 @@ jlink {
         requires 'com.google.gson'
         requires 'org.slf4j'
         requires 'jakarta.xml.bind'
-        uses 'org.controlsfx.glyphfont.GlyphFont'
         uses 'com.airhacks.afterburner.views.ResourceLocator'
         uses 'com.airhacks.afterburner.injection.PresenterFactory'
         uses 'org.mariadb.jdbc.credential.CredentialPlugin'
@@ -572,9 +571,7 @@ jlink {
         uses 'org.mariadb.jdbc.LocalInfileInterceptor'
         uses 'org.eclipse.jgit.transport.SshSessionFactory'
         uses 'org.eclipse.jgit.lib.GpgSigner'
-        provides 'org.controlsfx.glyphfont.GlyphFont' with 'org.controlsfx.glyphfont.FontAwesome'
         provides 'org.mariadb.jdbc.tls.TlsSocketPlugin' with 'org.mariadb.jdbc.internal.protocol.tls.DefaultTlsSocketPlugin'
-        provides 'com.microsoft.applicationinsights.core.dependencies.io.grpc.NameResolverProvider' with 'com.microsoft.applicationinsights.core.dependencies.io.grpc.internal.DnsNameResolverProvider'
         provides 'java.sql.Driver' with 'org.postgresql.Driver'
         provides 'org.mariadb.jdbc.authentication.AuthenticationPlugin' with 'org.mariadb.jdbc.internal.com.send.authentication.CachingSha2PasswordPlugin',
                 'org.mariadb.jdbc.internal.com.send.authentication.ClearPasswordPlugin',
@@ -588,9 +585,7 @@ jlink {
                 'org.mariadb.jdbc.credential.env.EnvCredentialPlugin',
                 'org.mariadb.jdbc.credential.system.PropertiesCredentialPlugin'
         provides 'java.security.Provider' with 'org.bouncycastle.jce.provider.BouncyCastleProvider',
-                'org.bouncycastle.pqc.jcajce.provider.BouncyCastlePQCProvider'
-        provides 'com.microsoft.applicationinsights.core.dependencies.io.grpc.ManagedChannelProvider' with 'com.microsoft.applicationinsights.core.dependencies.io.grpc.netty.shaded.io.grpc.netty.NettyChannelProvider'
-    }
+                'org.bouncycastle.pqc.jcajce.provider.BouncyCastlePQCProvider'    }
 
     jpackage {
         outputDir = "distribution"

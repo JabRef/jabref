@@ -46,8 +46,6 @@ open module org.jabref {
     with org.jabref.gui.logging.GuiWriter,
          org.jabref.gui.logging.ApplicationInsightsWriter;
 
-    requires applicationinsights.logging.log4j2;
-
     // Preferences and XML
     requires java.prefs;
     requires jakarta.xml.bind;
@@ -65,7 +63,6 @@ open module org.jabref {
     requires org.libreoffice.uno;
 
     // Other modules
-    requires commons.logging;
     requires com.google.common;
     requires jakarta.inject;
     requires reactfx;
@@ -107,6 +104,7 @@ open module org.jabref {
     uses org.apache.lucene.codecs.lucene91.Lucene91Codec;
 
     requires org.apache.lucene.queryparser;
+    uses org.apache.lucene.queryparser.classic.MultiFieldQueryParser;
     requires org.apache.lucene.analysis.common;
     requires org.apache.lucene.highlighter;
 
