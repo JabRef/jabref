@@ -31,19 +31,7 @@ public class TrustStoreManager {
 
     public TrustStoreManager(Path storePath) {
         this.storePath = storePath;
-        try {
-            LOGGER.info("Trust store path: {}", storePath.toAbsolutePath());
-            Path storeResourcePath = Path.of(TrustStoreManager.class.getResource("/ssl/truststore.jks").toURI());
-            Files.createDirectories(storePath.getParent());
-            if (Files.notExists(storePath)) {
-                Files.copy(storeResourcePath, storePath);
-            }
-        } catch (IOException e) {
-            LOGGER.warn("Bad truststore path", e);
-        } catch (URISyntaxException e) {
-            LOGGER.warn("Bad resource path", e);
-        }
-
+        createTruststoreFileIfNotExist(storePath);
         try {
             store = KeyStore.getInstance(KeyStore.getDefaultType());
             store.load(new FileInputStream(storePath.toFile()), STORE_PASSWORD.toCharArray());
@@ -140,5 +128,26 @@ public class TrustStoreManager {
             LOGGER.warn("Error while getting certificate of alias: {}", alias, e);
         }
         return null;
+    }
+
+    /**
+     * This method checks to see if the truststore is present in {@code storePath},
+     * and if it isn't, it copies the default JDK truststore to the specified location.
+     *
+     * @param storePath path of the truststore
+     */
+    public static void createTruststoreFileIfNotExist(Path storePath) {
+        try {
+            LOGGER.info("Trust store path: {}", storePath.toAbsolutePath());
+            Path storeResourcePath = Path.of(TrustStoreManager.class.getResource("/ssl/truststore.jks").toURI());
+            Files.createDirectories(storePath.getParent());
+            if (Files.notExists(storePath)) {
+                Files.copy(storeResourcePath, storePath);
+            }
+        } catch (IOException e) {
+            LOGGER.warn("Bad truststore path", e);
+        } catch (URISyntaxException e) {
+            LOGGER.warn("Bad resource path", e);
+        }
     }
 }
