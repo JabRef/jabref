@@ -719,8 +719,6 @@ public class BracketedPattern {
                          .findFirst()
                          .flatMap(author -> author.getLast().isPresent() ? author.getLast() : author.getVon())
                          .orElse("");
-
-
     }
 
     /**
