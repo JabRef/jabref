@@ -88,7 +88,13 @@ public class DOABFetcher implements SearchBasedParserFetcher {
         for (int i = 0; i < metadataArray.length(); i++) {
             JSONObject dataObject = metadataArray.getJSONObject(i);
             switch (dataObject.getString("key")) {
-                case "dc.contributor.author" -> authorsList.add(toAuthor(dataObject.getString("value")));
+                case "dc.contributor.author" -> {
+                    if (dataObject.getString("value").contains("(Ed.)")) {
+                       editorsList.add(toAuthor(namePreprocessing(dataObject.getString("value"))));
+                    } else {
+                        authorsList.add(toAuthor(dataObject.getString("value")));
+                    }
+                }
                 case "dc.type" -> entry.setField(StandardField.TYPE,
                         dataObject.getString("value"));
                 case "dc.date.issued" -> entry.setField(StandardField.YEAR, String.valueOf(
@@ -111,19 +117,19 @@ public class DOABFetcher implements SearchBasedParserFetcher {
                 case "dc.contributor.editor" -> editorsList.add(toAuthor(dataObject.getString("value")));
             }
         }
-        entry.setField(StandardField.AUTHOR, toAuthorList(authorsList));
-        entry.setField(StandardField.EDITOR, toAuthorList(editorsList));
+        entry.setField(StandardField.AUTHOR, AuthorList.of(authorsList).getAsFirstLastNamesWithAnd());
+        entry.setField(StandardField.EDITOR, AuthorList.of(editorsList).getAsFirstLastNamesWithAnd());
         entry.setField(StandardField.KEYWORDS, String.valueOf(keywordJoiner));
         return entry;
     }
 
     private Author toAuthor(String author) {
-        String[] names = author.split(" ");
-        names[0] = String.valueOf(new StringBuilder(names[0]).deleteCharAt(names[0].length() - 1));
-        return new Author(names[1], "", "", names[0], "");
+        return AuthorList.parse((author)).getAuthor(0);
     }
 
-    private String toAuthorList(List<Author> authorsList) {
-        return AuthorList.of(authorsList).getAsFirstLastNamesWithAnd();
+    private String namePreprocessing(String name) {
+        name = String.valueOf(new StringBuilder(name).delete(name.length() - 5, name.length()));
+        return name;
     }
+
 }
