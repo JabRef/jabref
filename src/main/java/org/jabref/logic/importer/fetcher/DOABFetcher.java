@@ -60,27 +60,25 @@ public class DOABFetcher implements SearchBasedParserFetcher {
             if (response.isEmpty()) {
                 return Collections.emptyList();
             }
-            // single result case
             if (response.length() == 1) {
 
                 // the information used for bibtex entries are in an array inside the resulting jsonarray
                 // see this query for reference https://directory.doabooks.org/rest/search?query="i open fire"&expand=metadata
                 JSONArray metadataArray = response.getJSONObject(0).getJSONArray("metadata");
-                BibEntry entry = JsonToBibEntry(metadataArray);
+                BibEntry entry = jsonToBibEntry(metadataArray);
                 return Collections.singletonList(entry);
             }
-            // multiple results
             List<BibEntry> entries = new ArrayList<>(response.length());
             for (int i = 0; i < response.length(); i++) {
                 JSONArray metadataArray = response.getJSONObject(i).getJSONArray("metadata");
-                BibEntry entry = JsonToBibEntry(metadataArray);
+                BibEntry entry = jsonToBibEntry(metadataArray);
                 entries.add(entry);
             }
             return entries;
         };
     }
 
-    private BibEntry JsonToBibEntry(JSONArray metadataArray) {
+    private BibEntry jsonToBibEntry(JSONArray metadataArray) {
         BibEntry entry = new BibEntry();
         List<Author> authorsList = new ArrayList<>();
         List<Author> editorsList = new ArrayList<>();
@@ -128,8 +126,7 @@ public class DOABFetcher implements SearchBasedParserFetcher {
     }
 
     private String namePreprocessing(String name) {
-        name = String.valueOf(new StringBuilder(name).delete(name.length() - 5, name.length()));
-        return name;
+        return name.replace("(Ed.)", "");
     }
 
 }
