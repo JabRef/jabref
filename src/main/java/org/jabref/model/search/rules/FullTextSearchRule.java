@@ -6,6 +6,7 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.jabref.architecture.AllowedToUseLogic;
 import org.jabref.gui.Globals;
 import org.jabref.logic.pdf.search.retrieval.PdfSearcher;
 import org.jabref.model.database.BibDatabaseContext;
@@ -21,6 +22,7 @@ import org.slf4j.LoggerFactory;
  * <p>
  * Some kind of caching of the full text search results is implemented.
  */
+@AllowedToUseLogic("Because access to the lucene index is needed")
 public abstract class FullTextSearchRule implements SearchRule {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FullTextSearchRule.class);
@@ -66,5 +68,4 @@ public abstract class FullTextSearchRule implements SearchRule {
                                                      .filter(searchResult -> searchResult.isResultFor(bibEntry))
                                                      .collect(Collectors.toList()));
     }
-
 }
