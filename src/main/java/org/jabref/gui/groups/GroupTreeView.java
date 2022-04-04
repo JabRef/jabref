@@ -108,7 +108,7 @@ public class GroupTreeView extends BorderPane {
         HBox.setHgrow(searchField, Priority.ALWAYS);
         HBox groupFilterBar = new HBox(searchField);
         groupFilterBar.setId("groupFilterBar");
-        this.setCenter(groupFilterBar);
+        this.setTop(groupFilterBar);
 
         mainColumn = new TreeTableColumn<>();
         mainColumn.setId("mainColumn");
@@ -137,7 +137,7 @@ public class GroupTreeView extends BorderPane {
 
         HBox groupBar = new HBox(addNewGroup);
         groupBar.setId("groupBar");
-        this.setTop(groupBar);
+        this.setCenter(groupBar);
     }
 
     private void initialize() {
