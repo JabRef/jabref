@@ -7,7 +7,6 @@ import javafx.beans.property.StringProperty;
 
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.preferences.ImportExportPreferences;
-import org.jabref.preferences.PreferencesService;
 
 public class FileTabViewModel implements PreferenceTabViewModel {
 
@@ -17,38 +16,37 @@ public class FileTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty resolveStringsProperty = new SimpleBooleanProperty();
     private final StringProperty resolveStringsForFieldsProperty = new SimpleStringProperty("");
     private final BooleanProperty alwaysReformatBibProperty = new SimpleBooleanProperty();
+    private final BooleanProperty warnAboutDuplicatesOnImportProperty = new SimpleBooleanProperty();
     private final BooleanProperty autosaveLocalLibraries = new SimpleBooleanProperty();
 
-    private final PreferencesService preferences;
     private final ImportExportPreferences importExportPreferences;
 
-    FileTabViewModel(PreferencesService preferences) {
-        this.preferences = preferences;
-        this.importExportPreferences = preferences.getImportExportPreferences();
+    FileTabViewModel(ImportExportPreferences importExportPreferences) {
+        this.importExportPreferences = importExportPreferences;
     }
 
     @Override
     public void setValues() {
-        openLastStartupProperty.setValue(preferences.shouldOpenLastFilesOnStartup());
+        openLastStartupProperty.setValue(importExportPreferences.shouldOpenLastEdited());
         noWrapFilesProperty.setValue(importExportPreferences.getNonWrappableFields());
 
         doNotResolveStringsProperty.setValue(!importExportPreferences.resolveStrings());
         resolveStringsProperty.setValue(importExportPreferences.resolveStrings());
         resolveStringsForFieldsProperty.setValue(importExportPreferences.getResolvableFields());
         alwaysReformatBibProperty.setValue(importExportPreferences.shouldAlwaysReformatOnSave());
-        autosaveLocalLibraries.setValue(preferences.shouldAutosave());
+        warnAboutDuplicatesOnImportProperty.setValue(importExportPreferences.shouldWarnAboutDuplicatesOnImport());
+        autosaveLocalLibraries.setValue(importExportPreferences.shouldAutoSave());
     }
 
     @Override
     public void storeSettings() {
-        preferences.storeOpenLastFilesOnStartup(openLastStartupProperty.getValue());
-
+        importExportPreferences.setOpenLastEdited(openLastStartupProperty.getValue());
         importExportPreferences.setResolveStrings(!doNotResolveStringsProperty.getValue());
         importExportPreferences.setNonWrappableFields(noWrapFilesProperty.getValue().trim());
         importExportPreferences.setResolvableFields(resolveStringsForFieldsProperty.getValue().trim());
         importExportPreferences.setAlwaysReformatOnSave(alwaysReformatBibProperty.getValue());
-
-        preferences.storeShouldAutosave(autosaveLocalLibraries.getValue());
+        importExportPreferences.setWarnAboutDuplicatesOnImport(warnAboutDuplicatesOnImportProperty.getValue());
+        importExportPreferences.setAutoSave(autosaveLocalLibraries.getValue());
     }
 
     // General
@@ -77,6 +75,10 @@ public class FileTabViewModel implements PreferenceTabViewModel {
 
     public BooleanProperty alwaysReformatBibProperty() {
         return alwaysReformatBibProperty;
+    }
+
+    public BooleanProperty warnAboutDuplicatesOnImportProperty() {
+        return warnAboutDuplicatesOnImportProperty;
     }
 
     // Autosave

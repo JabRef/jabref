@@ -20,18 +20,19 @@ public class Date {
     private static final DateTimeFormatter SIMPLE_DATE_FORMATS;
     static {
         List<String> formatStrings = Arrays.asList(
-                "uuuu-M-d",     // covers 2009-1-15
-                "uuuu-M",       // covers 2009-11
-                "d-M-uuuu",     // covers 15-1-2012
-                "M-uuuu",       // covers 1-2012
-                "M/uuuu",       // covers 9/2015 and 09/2015
-                "M/uu",         // covers 9/15
-                "MMMM d, uuuu", // covers September 1, 2015
-                "MMMM, uuuu",   // covers September, 2015
-                "d.M.uuuu",     // covers 15.1.2015
-                "uuuu.M.d",     // covers 2015.1.15
-                "uuuu",         // covers 2015
-                "MMM, uuuu");   // covers Jan, 2020
+                "uuuu-MM-dd'T'HH:mm:ss[xxx][xx][X]",    // covers 2018-10-03T07:24:14+03:00
+                "uuuu-M-d",                             // covers 2009-1-15
+                "uuuu-M",                               // covers 2009-11
+                "d-M-uuuu",                             // covers 15-1-2012
+                "M-uuuu",                               // covers 1-2012
+                "M/uuuu",                               // covers 9/2015 and 09/2015
+                "M/uu",                                 // covers 9/15
+                "MMMM d, uuuu",                         // covers September 1, 2015
+                "MMMM, uuuu",                           // covers September, 2015
+                "d.M.uuuu",                             // covers 15.1.2015
+                "uuuu.M.d",                             // covers 2015.1.15
+                "uuuu",                                 // covers 2015
+                "MMM, uuuu");                           // covers Jan, 2020
 
         SIMPLE_DATE_FORMATS = formatStrings.stream()
                                            .map(DateTimeFormatter::ofPattern)

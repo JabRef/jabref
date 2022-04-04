@@ -21,7 +21,8 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.ProxyAuthenticator;
 import org.jabref.logic.net.ProxyPreferences;
 import org.jabref.logic.net.ProxyRegisterer;
-import org.jabref.logic.net.URLDownload;
+import org.jabref.logic.net.ssl.SSLPreferences;
+import org.jabref.logic.net.ssl.TrustStoreManager;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.remote.client.RemoteClient;
@@ -51,7 +52,6 @@ public class JabRefMain extends Application {
 
     @Override
     public void start(Stage mainStage) {
-        URLDownload.bypassSSLVerification();
         try {
             FallbackExceptionHandler.installExceptionHandler();
 
@@ -62,6 +62,8 @@ public class JabRefMain extends Application {
             PreferencesMigrations.runMigrations();
 
             configureProxy(preferences.getProxyPreferences());
+
+            configureSSL(preferences.getSSLPreferences());
 
             Globals.startBackgroundTasks();
 
@@ -149,9 +151,21 @@ public class JabRefMain extends Application {
         }
     }
 
+    private static void configureSSL(SSLPreferences sslPreferences) {
+        TrustStoreManager.createTruststoreFileIfNotExist(Path.of(sslPreferences.getTruststorePath()));
+        System.setProperty("javax.net.ssl.trustStore", sslPreferences.getTruststorePath());
+        System.setProperty("javax.net.ssl.trustStorePassword", "changeit");
+    }
+
     private static void clearOldSearchIndices() {
         Path currentIndexPath = BibDatabaseContext.getFulltextIndexBasePath();
         Path appData = currentIndexPath.getParent();
+
+        try {
+            Files.createDirectories(currentIndexPath);
+        } catch (IOException e) {
+            LOGGER.error("Could not create index directory {}", appData, e);
+        }
 
         try (DirectoryStream<Path> stream = Files.newDirectoryStream(appData)) {
             for (Path path : stream) {
@@ -161,7 +175,6 @@ public class JabRefMain extends Application {
                          .sorted(Comparator.reverseOrder())
                          .map(Path::toFile)
                          .forEach(File::delete);
-
                 }
             }
         } catch (IOException e) {

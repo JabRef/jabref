@@ -21,15 +21,15 @@ public class DiffHighlightingEllipsingTextFlow extends TextFlow {
     private final static String DEFAULT_ELLIPSIS_STRING = "...";
     private StringProperty ellipsisString;
 
-    private ObservableList<Node> allChildren = FXCollections.observableArrayList();
-    private ChangeListener sizeChangeListener = (observableValue, number, t1) -> adjustText();
-    private ListChangeListener<Node> listChangeListener = this::adjustChildren;
+    private final ObservableList<Node> allChildren = FXCollections.observableArrayList();
+    private final ChangeListener<Number> sizeChangeListener = (observableValue, number, t1) -> adjustText();
+    private final ListChangeListener<Node> listChangeListener = this::adjustChildren;
 
     private final String fullText;
     private final EasyObservableValue<String> comparisonString;
-    private final ObjectProperty<MergeEntries.DiffMode> diffMode;
+    private final ObjectProperty<DiffMode> diffMode;
 
-    public DiffHighlightingEllipsingTextFlow(String fullText, EasyObservableValue<String> comparisonString, ObjectProperty<MergeEntries.DiffMode> diffMode) {
+    public DiffHighlightingEllipsingTextFlow(String fullText, EasyObservableValue<String> comparisonString, ObjectProperty<DiffMode> diffMode) {
         this.fullText = fullText;
         allChildren.addListener(listChangeListener);
         widthProperty().addListener(sizeChangeListener);

@@ -260,8 +260,15 @@
             <text macro="nor-legislation"/>
           </else-if>
           <else-if type="report">
-            <text macro="author-short"/>
-            <text macro="issued"/>
+            <choose>
+              <if variable="author" match="none">
+                <text variable="title"/>
+              </if>
+              <else>
+                <text macro="author-short"/>
+                <text macro="issued"/>
+              </else>
+            </choose>
           </else-if>
           <else>
             <text variable="title"/>

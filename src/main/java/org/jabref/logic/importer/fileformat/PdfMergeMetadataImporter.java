@@ -2,7 +2,6 @@ package org.jabref.logic.importer.fileformat;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -74,11 +73,11 @@ public class PdfMergeMetadataImporter extends Importer {
     }
 
     @Override
-    public ParserResult importDatabase(Path filePath, Charset defaultEncoding) throws IOException {
+    public ParserResult importDatabase(Path filePath) throws IOException {
         List<BibEntry> candidates = new ArrayList<>();
 
         for (Importer metadataImporter : metadataImporters) {
-            List<BibEntry> extractedEntries = metadataImporter.importDatabase(filePath, defaultEncoding).getDatabase().getEntries();
+            List<BibEntry> extractedEntries = metadataImporter.importDatabase(filePath).getDatabase().getEntries();
             if (extractedEntries.size() == 0) {
                 continue;
             }
@@ -149,13 +148,11 @@ public class PdfMergeMetadataImporter extends Importer {
         private static final Logger LOGGER = LoggerFactory.getLogger(DefaultInjector.class);
         private final FilePreferences filePreferences;
         private final BibDatabaseContext databaseContext;
-        private final Charset defaultEncoding;
 
-        public EntryBasedFetcherWrapper(ImporterPreferences importerPreferences, ImportFormatPreferences importFormatPreferences, FilePreferences filePreferences, BibDatabaseContext context, Charset defaultEncoding) {
+        public EntryBasedFetcherWrapper(ImporterPreferences importerPreferences, ImportFormatPreferences importFormatPreferences, FilePreferences filePreferences, BibDatabaseContext context) {
             super(importerPreferences, importFormatPreferences);
             this.filePreferences = filePreferences;
             this.databaseContext = context;
-            this.defaultEncoding = defaultEncoding;
         }
 
         @Override
@@ -164,7 +161,7 @@ public class PdfMergeMetadataImporter extends Importer {
                 Optional<Path> filePath = file.findIn(databaseContext, filePreferences);
                 if (filePath.isPresent()) {
                     try {
-                        ParserResult result = importDatabase(filePath.get(), defaultEncoding);
+                        ParserResult result = importDatabase(filePath.get());
                         if (!result.isEmpty()) {
                             return result.getDatabase().getEntries();
                         }

@@ -28,14 +28,8 @@ try {
     }
 
     if (-not (Test-Path $jabRefExe)) {
-        $wshell = New-Object -ComObject Wscript.Shell
-        $popup = "Unable to locate '$jabRefExe'."
-        $wshell.Popup($popup,0,"JabRef", 0x0 + 0x30)
-        return
+        return Respond @{message="jarNotFound"; output="Unable to locate '$jabRefExe'."}
     }
-
-    #$wshell = New-Object -ComObject Wscript.Shell
-    #$wshell.Popup($message.Text,0,"JabRef", 0x0 + 0x30)
 
     $messageText = $message.Text.replace("`n"," ").replace("`r"," ")
     $tempfile = New-TemporaryFile
@@ -44,10 +38,18 @@ try {
     [IO.File]::WriteAllLines($tempfile, $messageText)
     $output = & $jabRefExe -importToOpen $tempfile *>&1
     Remove-Item $tempfile
+    # For debugging: uncomment the following lines to get the output of JabRef be displayed as a popup
     #$output = "$messageText"
     #$wshell = New-Object -ComObject Wscript.Shell
     #$wshell.Popup($output,0,"JabRef", 0x0 + 0x30)
-    return Respond @{message="ok";output="$output"}
-} finally {
+    return Respond @{message="ok"; output="$output"}
+} 
+catch {
+    $err = $PSItem
+    Respond @{message="error"; output="$($err.Exception.Message)"; stacktrace="$($err.ScriptStackTrace)"}
+    # Still print the error to the console so that it is picked up by the browser in addition
+    throw $err
+}
+finally {
     $reader.Dispose()
 }

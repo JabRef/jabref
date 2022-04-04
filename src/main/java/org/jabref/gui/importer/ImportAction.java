@@ -132,7 +132,7 @@ public class ImportAction {
                         frame.getDialogService().notify(Localization.lang("Importing in %0 format", importer.get().getName()) + "...");
                     });
                     // Specific importer:
-                    ParserResult pr = importer.get().importDatabase(filename, prefs.getGeneralPreferences().getDefaultEncoding());
+                    ParserResult pr = importer.get().importDatabase(filename);
                     imports.add(new ImportFormatReader.UnknownFormatImport(importer.get().getName(), pr));
                 }
             } catch (ImportException | IOException e) {

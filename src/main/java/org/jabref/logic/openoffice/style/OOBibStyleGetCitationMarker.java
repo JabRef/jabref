@@ -23,7 +23,6 @@ import org.jabref.model.strings.StringUtil;
 class OOBibStyleGetCitationMarker {
 
     private OOBibStyleGetCitationMarker() {
-        /**/
     }
 
     /**

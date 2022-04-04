@@ -1,7 +1,7 @@
 package org.jabref.cli;
 
 import java.io.IOException;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -236,7 +236,6 @@ public class ArgumentProcessor {
             if (!loaded.isEmpty()) {
                 writeMetadatatoPdf(loaded,
                         cli.getWriteMetadatatoPdf(),
-                        preferencesService.getGeneralPreferences().getDefaultEncoding(),
                         preferencesService.getXmpPreferences(),
                         preferencesService.getFilePreferences(),
                         preferencesService.getGeneralPreferences().getDefaultBibDatabaseMode(),
@@ -271,7 +270,7 @@ public class ArgumentProcessor {
         return loaded;
     }
 
-    private void writeMetadatatoPdf(List<ParserResult> loaded, String filesAndCitekeys, Charset encoding, XmpPreferences xmpPreferences, FilePreferences filePreferences, BibDatabaseMode databaseMode, BibEntryTypesManager entryTypesManager, FieldWriterPreferences fieldWriterPreferences, boolean writeXMP, boolean embeddBibfile) {
+    private void writeMetadatatoPdf(List<ParserResult> loaded, String filesAndCitekeys, XmpPreferences xmpPreferences, FilePreferences filePreferences, BibDatabaseMode databaseMode, BibEntryTypesManager entryTypesManager, FieldWriterPreferences fieldWriterPreferences, boolean writeXMP, boolean embeddBibfile) {
         if (loaded.isEmpty()) {
             LOGGER.error("The write xmp option depends on a valid import option.");
             return;
@@ -285,7 +284,7 @@ public class ArgumentProcessor {
 
         if ("all".equals(filesAndCitekeys)) {
             for (BibEntry entry : dataBase.getEntries()) {
-                writeMetadatatoPDFsOfEntry(databaseContext, entry.getCitationKey().orElse("<no cite key defined>"), entry, encoding, filePreferences, xmpPdfExporter, embeddedBibFilePdfExporter, writeXMP, embeddBibfile);
+                writeMetadatatoPDFsOfEntry(databaseContext, entry.getCitationKey().orElse("<no cite key defined>"), entry, filePreferences, xmpPdfExporter, embeddedBibFilePdfExporter, writeXMP, embeddBibfile);
             }
             return;
         }
@@ -300,22 +299,22 @@ public class ArgumentProcessor {
             }
         }
 
-        writeMetadatatoPdfByCitekey(databaseContext, dataBase, citeKeys, encoding, filePreferences, xmpPdfExporter, embeddedBibFilePdfExporter, writeXMP, embeddBibfile);
-        writeMetadatatoPdfByFileNames(databaseContext, dataBase, pdfs, encoding, filePreferences, xmpPdfExporter, embeddedBibFilePdfExporter, writeXMP, embeddBibfile);
+        writeMetadatatoPdfByCitekey(databaseContext, dataBase, citeKeys, filePreferences, xmpPdfExporter, embeddedBibFilePdfExporter, writeXMP, embeddBibfile);
+        writeMetadatatoPdfByFileNames(databaseContext, dataBase, pdfs, filePreferences, xmpPdfExporter, embeddedBibFilePdfExporter, writeXMP, embeddBibfile);
 
     }
 
-    private void writeMetadatatoPDFsOfEntry(BibDatabaseContext databaseContext, String citeKey, BibEntry entry, Charset encoding, FilePreferences filePreferences, XmpPdfExporter xmpPdfExporter, EmbeddedBibFilePdfExporter embeddedBibFilePdfExporter, boolean writeXMP, boolean embeddBibfile) {
+    private void writeMetadatatoPDFsOfEntry(BibDatabaseContext databaseContext, String citeKey, BibEntry entry, FilePreferences filePreferences, XmpPdfExporter xmpPdfExporter, EmbeddedBibFilePdfExporter embeddedBibFilePdfExporter, boolean writeXMP, boolean embeddBibfile) {
         try {
             if (writeXMP) {
-                if (xmpPdfExporter.exportToAllFilesOfEntry(databaseContext, encoding, filePreferences, entry, List.of(entry))) {
+                if (xmpPdfExporter.exportToAllFilesOfEntry(databaseContext, filePreferences, entry, List.of(entry))) {
                     System.out.printf("Successfully written XMP metadata on at least one linked file of %s%n", citeKey);
                 } else {
                     System.err.printf("Cannot write XMP metadata on any linked files of %s. Make sure there is at least one linked file and the path is correct.%n", citeKey);
                 }
             }
             if (embeddBibfile) {
-                if (embeddedBibFilePdfExporter.exportToAllFilesOfEntry(databaseContext, encoding, filePreferences, entry, List.of(entry))) {
+                if (embeddedBibFilePdfExporter.exportToAllFilesOfEntry(databaseContext, filePreferences, entry, List.of(entry))) {
                     System.out.printf("Successfully embedded metadata on at least one linked file of %s%n", citeKey);
                 } else {
                     System.out.printf("Cannot embedd metadata on any linked files of %s. Make sure there is at least one linked file and the path is correct.%n", citeKey);
@@ -326,7 +325,7 @@ public class ArgumentProcessor {
         }
     }
 
-    private void writeMetadatatoPdfByCitekey(BibDatabaseContext databaseContext, BibDatabase dataBase, Vector<String> citeKeys, Charset encoding, FilePreferences filePreferences, XmpPdfExporter xmpPdfExporter, EmbeddedBibFilePdfExporter embeddedBibFilePdfExporter, boolean writeXMP, boolean embeddBibfile) {
+    private void writeMetadatatoPdfByCitekey(BibDatabaseContext databaseContext, BibDatabase dataBase, Vector<String> citeKeys, FilePreferences filePreferences, XmpPdfExporter xmpPdfExporter, EmbeddedBibFilePdfExporter embeddedBibFilePdfExporter, boolean writeXMP, boolean embeddBibfile) {
         for (String citeKey : citeKeys) {
             List<BibEntry> bibEntryList = dataBase.getEntriesByCitationKey(citeKey);
             if (bibEntryList.isEmpty()) {
@@ -334,12 +333,12 @@ public class ArgumentProcessor {
                 continue;
             }
             for (BibEntry entry : bibEntryList) {
-                writeMetadatatoPDFsOfEntry(databaseContext, citeKey, entry, encoding, filePreferences, xmpPdfExporter, embeddedBibFilePdfExporter, writeXMP, embeddBibfile);
+                writeMetadatatoPDFsOfEntry(databaseContext, citeKey, entry, filePreferences, xmpPdfExporter, embeddedBibFilePdfExporter, writeXMP, embeddBibfile);
             }
         }
     }
 
-    private void writeMetadatatoPdfByFileNames(BibDatabaseContext databaseContext, BibDatabase dataBase, Vector<String> fileNames, Charset encoding, FilePreferences filePreferences, XmpPdfExporter xmpPdfExporter, EmbeddedBibFilePdfExporter embeddedBibFilePdfExporter, boolean writeXMP, boolean embeddBibfile) {
+    private void writeMetadatatoPdfByFileNames(BibDatabaseContext databaseContext, BibDatabase dataBase, Vector<String> fileNames, FilePreferences filePreferences, XmpPdfExporter xmpPdfExporter, EmbeddedBibFilePdfExporter embeddedBibFilePdfExporter, boolean writeXMP, boolean embeddBibfile) {
         for (String fileName : fileNames) {
             Path filePath = Path.of(fileName);
             if (!filePath.isAbsolute()) {
@@ -348,14 +347,14 @@ public class ArgumentProcessor {
             if (Files.exists(filePath)) {
                 try {
                     if (writeXMP) {
-                        if (xmpPdfExporter.exportToFileByPath(databaseContext, dataBase, encoding, filePreferences, filePath)) {
+                        if (xmpPdfExporter.exportToFileByPath(databaseContext, dataBase, filePreferences, filePath)) {
                             System.out.printf("Successfully written XMP metadata of at least one entry to %s%n", fileName);
                         } else {
                             System.out.printf("File %s is not linked to any entry in database.%n", fileName);
                         }
                     }
                     if (embeddBibfile) {
-                        if (embeddedBibFilePdfExporter.exportToFileByPath(databaseContext, dataBase, encoding, filePreferences, filePath)) {
+                        if (embeddedBibFilePdfExporter.exportToFileByPath(databaseContext, dataBase, filePreferences, filePath)) {
                             System.out.printf("Successfully embedded XMP metadata of at least one entry to %s%n", fileName);
                         } else {
                             System.out.printf("File %s is not linked to any entry in database.%n", fileName);
@@ -410,9 +409,7 @@ public class ArgumentProcessor {
                 // We have an TemplateExporter instance:
                 try {
                     System.out.println(Localization.lang("Exporting") + ": " + data[1]);
-                    exporter.get().export(databaseContext, Path.of(data[1]),
-                            databaseContext.getMetaData().getEncoding().orElse(preferencesService.getGeneralPreferences().getDefaultEncoding()),
-                            matches);
+                    exporter.get().export(databaseContext, Path.of(data[1]), matches);
                 } catch (Exception ex) {
                     System.err.println(Localization.lang("Could not export file") + " '" + data[1] + "': "
                             + Throwables.getStackTraceAsString(ex));
@@ -455,7 +452,6 @@ public class ArgumentProcessor {
                     try {
                         pr = OpenDatabase.loadDatabase(
                                 Path.of(aLeftOver),
-                                preferencesService.getGeneralPreferences(),
                                 preferencesService.getImportFormatPreferences(),
                                 Globals.getFileUpdateMonitor());
                     } catch (IOException ex) {
@@ -530,7 +526,7 @@ public class ArgumentProcessor {
             System.out.println(Localization.lang("Saving") + ": " + subName);
             GeneralPreferences generalPreferences = preferencesService.getGeneralPreferences();
             SavePreferences savePreferences = preferencesService.getSavePreferences();
-            AtomicFileWriter fileWriter = new AtomicFileWriter(Path.of(subName), generalPreferences.getDefaultEncoding());
+            AtomicFileWriter fileWriter = new AtomicFileWriter(Path.of(subName), StandardCharsets.UTF_8);
             BibWriter bibWriter = new BibWriter(fileWriter, OS.NEWLINE);
             BibDatabaseWriter databaseWriter = new BibtexDatabaseWriter(bibWriter, generalPreferences, savePreferences, Globals.entryTypesManager);
             databaseWriter.saveDatabase(new BibDatabaseContext(newBase));
@@ -538,10 +534,7 @@ public class ArgumentProcessor {
             // Show just a warning message if encoding did not work for all characters:
             if (fileWriter.hasEncodingProblems()) {
                 System.err.println(Localization.lang("Warning") + ": "
-                        + Localization.lang(
-                        "The chosen encoding '%0' could not encode the following characters:",
-                        generalPreferences.getDefaultEncoding().displayName())
-                        + " " + fileWriter.getEncodingProblems());
+                                   + Localization.lang("UTF-8 could not be used to encode the following characters: %0", fileWriter.getEncodingProblems()));
             }
         } catch (IOException ex) {
             System.err.println(Localization.lang("Could not save file.") + "\n" + ex.getLocalizedMessage());
@@ -581,8 +574,6 @@ public class ArgumentProcessor {
                 // We have an exporter:
                 try {
                     exporter.get().export(pr.getDatabaseContext(), Path.of(data[0]),
-                            pr.getDatabaseContext().getMetaData().getEncoding()
-                              .orElse(preferencesService.getGeneralPreferences().getDefaultEncoding()),
                             pr.getDatabaseContext().getDatabase().getEntries());
                 } catch (Exception ex) {
                     System.err.println(Localization.lang("Could not export file") + " '" + data[0] + "': "

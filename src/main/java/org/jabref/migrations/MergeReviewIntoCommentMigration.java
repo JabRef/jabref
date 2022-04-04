@@ -13,7 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class MergeReviewIntoCommentMigration {
-    public static final Logger LOGGER = LoggerFactory.getLogger(MergeReviewIntoCommentMigration.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MergeReviewIntoCommentMigration.class);
 
     public static boolean needsMigration(ParserResult parserResult) {
         return parserResult.getDatabase().getEntries().stream()

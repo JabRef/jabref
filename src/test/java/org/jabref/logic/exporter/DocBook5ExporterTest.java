@@ -71,7 +71,7 @@ public class DocBook5ExporterTest {
     void testPerformExportForSingleEntry(@TempDir Path testFolder) throws Exception {
         Path path = testFolder.resolve("ThisIsARandomlyNamedFile");
 
-        exporter.export(databaseContext, path, charset, entries);
+        exporter.export(databaseContext, path, entries);
 
         Builder control = Input.from(Files.newInputStream(xmlFile));
         Builder test = Input.from(Files.newInputStream(path));

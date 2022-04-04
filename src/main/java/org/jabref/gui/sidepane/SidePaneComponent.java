@@ -61,7 +61,7 @@ public class SidePaneComponent extends BorderPane {
         Label label = new Label(sidePaneType.getTitle());
 
         BorderPane headerView = new BorderPane();
-        headerView.setCenter(label);
+        headerView.setLeft(label);
         headerView.setRight(buttonContainer);
         headerView.getStyleClass().add("sidePaneComponentHeader");
 

@@ -26,12 +26,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Set up JDK
         uses: actions/setup-java@v2
         with:
-          java-version: 16
-          distribution: 'adopt'
+          java-version: 17
+          distribution: 'temurin'
           cache: 'gradle'
       - name: Run check style reporter
         uses: nikitasavinov/checkstyle-action@master
@@ -50,12 +50,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Set up JDK
         uses: actions/setup-java@v2
         with:
-          java-version: 16
-          distribution: 'adopt'
+          java-version: 17
+          distribution: 'temurin'
           cache: 'gradle'
       - name: Run tests
         run: xvfb-run --auto-servernum ./gradlew check -x checkstyleJmh -x checkstyleMain -x checkstyleTest
@@ -82,12 +82,12 @@ jobs:
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
     steps:
       - name: Checkout source
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Set up JDK
         uses: actions/setup-java@v2
         with:
-          java-version: 16
-          distribution: 'adopt'
+          java-version: 17
+          distribution: 'temurin'
           cache: 'gradle'
       - name: Run tests on PostgreSQL
         run: ./gradlew databaseTest --rerun-tasks
@@ -116,12 +116,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Set up JDK
         uses: actions/setup-java@v2
         with:
-          java-version: 16
-          distribution: 'adopt'
+          java-version: 17
+          distribution: 'temurin'
           cache: 'gradle'
       - name: Run GUI tests
         run: xvfb-run --auto-servernum ./gradlew guiTest
@@ -154,12 +154,12 @@ jobs:
         env:
           SNAPCRAFT_LOGIN_FILE: ${{ secrets.CODECOV_TOKEN }}
       - name: Checkout source
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Set up JDK
         uses: actions/setup-java@v2
         with:
-          java-version: 16
-          distribution: 'adopt'
+          java-version: 17
+          distribution: 'temurin'
           cache: 'gradle'
       - name: Update test coverage metrics
         if: ${{ steps.checksecrets.outputs.secretspresent }}
@@ -174,5 +174,5 @@ jobs:
     name: "Validate Gradle Wrapper"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: gradle/wrapper-validation-action@v1

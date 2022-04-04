@@ -52,7 +52,7 @@ public class DocbookExporterTest {
 
         List<BibEntry> entries = Arrays.asList(entry);
 
-        exportFormat.export(databaseContext, tmpFile, charset, entries);
+        exportFormat.export(databaseContext, tmpFile, entries);
 
         List<String> lines = Files.readAllLines(tmpFile);
         assertEquals(20, lines.size());
@@ -68,7 +68,7 @@ public class DocbookExporterTest {
 
         List<BibEntry> entries = Arrays.asList(entry);
 
-        exportFormat.export(databaseContext, tmpFile, charset, entries);
+        exportFormat.export(databaseContext, tmpFile, entries);
 
         List<String> lines = Files.readAllLines(tmpFile);
         assertEquals(20, lines.size());

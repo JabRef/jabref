@@ -132,13 +132,13 @@ class EmbeddedBibFilePdfExporterTest {
     @ParameterizedTest
     @MethodSource("provideBibEntriesWithValidPdfFileLinks")
     void successfulExportToAllFilesOfEntry(BibEntry bibEntryWithValidPdfFileLink) throws Exception {
-        assertTrue(exporter.exportToAllFilesOfEntry(databaseContext, encoding, filePreferences, bibEntryWithValidPdfFileLink, Arrays.asList(olly2018)));
+        assertTrue(exporter.exportToAllFilesOfEntry(databaseContext, filePreferences, bibEntryWithValidPdfFileLink, Arrays.asList(olly2018)));
     }
 
     @ParameterizedTest
     @MethodSource("provideBibEntriesWithInvalidPdfFileLinks")
     void unsuccessfulExportToAllFilesOfEntry(BibEntry bibEntryWithValidPdfFileLink) throws Exception {
-        assertFalse(exporter.exportToAllFilesOfEntry(databaseContext, encoding, filePreferences, bibEntryWithValidPdfFileLink, Arrays.asList(olly2018)));
+        assertFalse(exporter.exportToAllFilesOfEntry(databaseContext, filePreferences, bibEntryWithValidPdfFileLink, Arrays.asList(olly2018)));
     }
 
     public static Stream<Arguments> provideBibEntriesWithValidPdfFileLinks() {
@@ -152,13 +152,13 @@ class EmbeddedBibFilePdfExporterTest {
     @ParameterizedTest
     @MethodSource("providePathsToValidPDFs")
     void successfulExportToFileByPath(Path path) throws Exception {
-        assertTrue(exporter.exportToFileByPath(databaseContext, dataBase, encoding, filePreferences, path));
+        assertTrue(exporter.exportToFileByPath(databaseContext, dataBase, filePreferences, path));
     }
 
     @ParameterizedTest
     @MethodSource("providePathsToInvalidPDFs")
     void unsuccessfulExportToFileByPath(Path path) throws Exception {
-        assertFalse(exporter.exportToFileByPath(databaseContext, dataBase, encoding, filePreferences, path));
+        assertFalse(exporter.exportToFileByPath(databaseContext, dataBase, filePreferences, path));
     }
 
     public static Stream<Arguments> providePathsToValidPDFs() {
