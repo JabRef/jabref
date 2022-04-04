@@ -185,7 +185,7 @@ dependencies {
     implementation group: 'jakarta.xml.bind', name: 'jakarta.xml.bind-api', version: '3.0.1'
     implementation group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '3.0.2'
 
-    implementation ('com.github.tomtung:latex2unicode_2.12:0.2.6') {
+    implementation ('com.github.tomtung:latex2unicode_2.12:0.3.0') {
         exclude module: 'fastparse_2.12'
     }
 
