@@ -353,7 +353,7 @@
       <key variable="issued"/>
       <key macro="contributors-short"/>
     </sort>
-    <layout delimiter="; ">
+    <layout delimiter="; " suffix=".">
       <group delimiter=", ">
         <group delimiter=" ">
           <text macro="contributors-short"/>
