@@ -195,6 +195,9 @@ public class ImportHandler {
                     bibDatabaseContext.getDatabase().removeEntry(existingDuplicateInLibrary.get());
                     entryToInsert = dialog.getMergedEntry();
                     break;
+                case KEEP_RIGHT:
+                case AUTOREMOVE_EXACT:
+                case BREAK:
                 default:
                    return;
             }
