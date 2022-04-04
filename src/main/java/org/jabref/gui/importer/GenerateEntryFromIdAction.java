@@ -71,14 +71,6 @@ public class GenerateEntryFromIdAction extends SimpleCommand {
 
             entryFromIdPopOver.hide();
         });
-
-        /*
-        bibEntry.ifPresentOrElse((entry) -> {
-                libraryTab.insertEntry(entry);
-                entryFromIdPopOver.hide();
-                dialogService.notify(Localization.lang("Imported one entry"));
-                },
-                () -> dialogService.notify(Localization.lang("Import canceled")) */
         backgroundTask.executeWith(taskExecutor);
     }
 
