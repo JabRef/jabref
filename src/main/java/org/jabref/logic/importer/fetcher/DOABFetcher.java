@@ -82,7 +82,7 @@ public class DOABFetcher implements SearchBasedParserFetcher {
         BibEntry entry = new BibEntry();
         List<Author> authorsList = new ArrayList<>();
         List<Author> editorsList = new ArrayList<>();
-        StringJoiner keywordJoiner = new StringJoiner(",");
+        StringJoiner keywordJoiner = new StringJoiner(", ");
         for (int i = 0; i < metadataArray.length(); i++) {
             JSONObject dataObject = metadataArray.getJSONObject(i);
             switch (dataObject.getString("key")) {

@@ -48,7 +48,7 @@ public class DOABFetcherTest {
                 " interpersonal connection — in a world in unprecedentedly critical condition. “And when the night" +
                 " goes off the shock wave throws us apart toward each other.”");
         David_Opal.setField(StandardField.LANGUAGE, "English");
-        David_Opal.setField(StandardField.KEYWORDS, "poetry,love,warfare");
+        David_Opal.setField(StandardField.KEYWORDS, "poetry, love, warfare");
         David_Opal.setField(StandardField.PUBLISHER, "punctum books");
 
         Ronald_Snijder = new BibEntry();
@@ -69,7 +69,7 @@ public class DOABFetcherTest {
                 " open licenses, user communities, measuring usage, developing countries and the effects on" +
                 " citations and social media.");
         Ronald_Snijder.setField(StandardField.LANGUAGE, "English");
-        Ronald_Snijder.setField(StandardField.KEYWORDS, "Open Access,Monographs,OAPEN Library," +
+        Ronald_Snijder.setField(StandardField.KEYWORDS, "Open Access, Monographs, OAPEN Library, " +
                 "Directory of Open Access Books");
         Ronald_Snijder.setField(StandardField.PUBLISHER, "Amsterdam University Press");
 
@@ -119,7 +119,7 @@ public class DOABFetcherTest {
                 " chemical, biological, and natural disaster phenomena; fire prevention, flood prevention;" +
                 " volcanic monitoring, pollution monitoring, micro-climates and land use");
         Felipe_Gonzalez.setField(StandardField.LANGUAGE, "English");
-        Felipe_Gonzalez.setField(StandardField.KEYWORDS, "UAV sensors,Environmental Monitoring,drones,unmanned aerial vehicles");
+        Felipe_Gonzalez.setField(StandardField.KEYWORDS, "UAV sensors, Environmental Monitoring, drones, unmanned aerial vehicles");
         Felipe_Gonzalez.setField(StandardField.PUBLISHER, "MDPI - Multidisciplinary Digital Publishing Institute");
 
         Carl_Marnewick = new BibEntry();
@@ -162,7 +162,7 @@ public class DOABFetcherTest {
                 " previously published. Comments resulted from the blind peer review process were carefully" +
                 " considered and incorporated accordingly.");
         Carl_Marnewick.setField(StandardField.LANGUAGE, "English");
-        Carl_Marnewick.setField(StandardField.KEYWORDS, "agile,structural equation modelling,information technology,success,models,strategic alignment,complexity,waterfall,project management,quantitative,Agile software development,Change management,Deliverable,Exploratory factor analysis,South Africa");
+        Carl_Marnewick.setField(StandardField.KEYWORDS, "agile, structural equation modelling, information technology, success, models, strategic alignment, complexity, waterfall, project management, quantitative, Agile software development, Change management, Deliverable, Exploratory factor analysis, South Africa");
         Carl_Marnewick.setField(StandardField.PUBLISHER, "AOSIS");
 
     }
