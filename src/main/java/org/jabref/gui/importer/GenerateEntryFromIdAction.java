@@ -43,7 +43,6 @@ public class GenerateEntryFromIdAction extends SimpleCommand {
 
     @Override
     public void execute() {
-
         BackgroundTask<Optional<BibEntry>> backgroundTask = searchAndImportEntryInBackground();
         backgroundTask.titleProperty().set(Localization.lang("Import by ID"));
         backgroundTask.showToUser(true);
