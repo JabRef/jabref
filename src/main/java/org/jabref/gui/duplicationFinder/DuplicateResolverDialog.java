@@ -133,6 +133,6 @@ public class DuplicateResolverDialog extends BaseDialog<DuplicateResolverResult>
     }
 
     public BibEntry getMergedEntry() {
-        return mergeEntries.getMergeEntry();
+        return mergeEntries.getMergedEntry();
     }
 }
