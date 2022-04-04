@@ -41,7 +41,7 @@ import org.slf4j.LoggerFactory;
 public class ImportHandler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ImportHandler.class);
-    private final BibDatabaseContext bibdatabase;
+    private final BibDatabaseContext bibDatabaseContext;
     private final PreferencesService preferencesService;
     private final FileUpdateMonitor fileUpdateMonitor;
     private final ExternalFilesEntryLinker linker;
@@ -58,7 +58,7 @@ public class ImportHandler {
                          StateManager stateManager,
                          DialogService dialogService) {
 
-        this.bibdatabase = database;
+        this.bibDatabaseContext = database;
         this.preferencesService = preferencesService;
         this.fileUpdateMonitor = fileupdateMonitor;
         this.stateManager = stateManager;
@@ -135,7 +135,7 @@ public class ImportHandler {
                     // We need to run the actual import on the FX Thread, otherwise we will get some deadlocks with the UIThreadList
                     DefaultTaskExecutor.runInJavaFXThread(() -> importEntries(entriesToAdd));
 
-                    ce.addEdit(new UndoableInsertEntries(bibdatabase.getDatabase(), entriesToAdd));
+                    ce.addEdit(new UndoableInsertEntries(bibDatabaseContext.getDatabase(), entriesToAdd));
                     ce.end();
                     undoManager.addEdit(ce);
 
@@ -159,9 +159,9 @@ public class ImportHandler {
     }
 
     public void importEntries(List<BibEntry> entries) {
-        ImportCleanup cleanup = new ImportCleanup(bibdatabase.getMode());
+        ImportCleanup cleanup = new ImportCleanup(bibDatabaseContext.getMode());
         cleanup.doPostCleanup(entries);
-        bibdatabase.getDatabase().insertEntries(entries);
+        bibDatabaseContext.getDatabase().insertEntries(entries);
 
         // Set owner/timestamp
         UpdateField.setAutomaticFields(entries,
@@ -174,7 +174,7 @@ public class ImportHandler {
         }
 
         // Add to group
-        addToGroups(entries, stateManager.getSelectedGroup(bibdatabase));
+        addToGroups(entries, stateManager.getSelectedGroup(bibDatabaseContext));
     }
 
     public void importEntryWithDuplicateCheck(BibDatabaseContext bibDatabaseContext, BibEntry entry) {
@@ -210,7 +210,7 @@ public class ImportHandler {
                                        preferencesService.getOwnerPreferences(),
                                        preferencesService.getTimestampPreferences());
 
-        addToGroups(List.of(entry), stateManager.getSelectedGroup(bibdatabase));
+        addToGroups(List.of(entry), stateManager.getSelectedGroup(this.bibDatabaseContext));
     }
 
     private void addToGroups(List<BibEntry> entries, Collection<GroupTreeNode> groups) {
@@ -233,9 +233,9 @@ public class ImportHandler {
      */
     private void generateKeys(List<BibEntry> entries) {
         CitationKeyGenerator keyGenerator = new CitationKeyGenerator(
-                bibdatabase.getMetaData().getCiteKeyPattern(preferencesService.getCitationKeyPatternPreferences()
-                                                                              .getKeyPattern()),
-                bibdatabase.getDatabase(),
+                bibDatabaseContext.getMetaData().getCiteKeyPattern(preferencesService.getCitationKeyPatternPreferences()
+                                                                                     .getKeyPattern()),
+                bibDatabaseContext.getDatabase(),
                 preferencesService.getCitationKeyPatternPreferences());
 
         for (BibEntry entry : entries) {
