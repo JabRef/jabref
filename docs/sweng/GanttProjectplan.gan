@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8"?><project name="jabref implement better search" company="" webLink="http://" view-date="2021-10-22" view-index="0" gantt-divider-location="440" resource-divider-location="260" version="2.8.11" locale="en_US">
+    <description><![CDATA[Implement better search]]></description>
+    <view zooming-state="default:3" id="gantt-chart">
+        <field id="tpd3" name="Name" width="208" order="0"/>
+        <field id="tpd4" name="Begin date" width="107" order="1"/>
+        <field id="tpd5" name="End date" width="106" order="2"/>
+        <option id="color.recent"><![CDATA[#3333ff #333333 #ff0000]]></option>
+    </view>
+    <view id="resource-table">
+        <field id="0" name="Name" width="177" order="0"/>
+        <field id="1" name="Default role" width="79" order="1"/>
+    </view>
+    <!-- -->
+    <calendars>
+        <day-types>
+            <day-type id="0"/>
+            <day-type id="1"/>
+            <default-week id="1" name="default" sun="0" mon="0" tue="0" wed="0" thu="0" fri="0" sat="0"/>
+            <only-show-weekends value="false"/>
+            <overriden-day-types/>
+            <days/>
+        </day-types>
+    </calendars>
+    <tasks empty-milestones="true">
+        <taskproperties>
+            <taskproperty id="tpd0" name="type" type="default" valuetype="icon"/>
+            <taskproperty id="tpd1" name="priority" type="default" valuetype="icon"/>
+            <taskproperty id="tpd2" name="info" type="default" valuetype="icon"/>
+            <taskproperty id="tpd3" name="name" type="default" valuetype="text"/>
+            <taskproperty id="tpd4" name="begindate" type="default" valuetype="date"/>
+            <taskproperty id="tpd5" name="enddate" type="default" valuetype="date"/>
+            <taskproperty id="tpd6" name="duration" type="default" valuetype="int"/>
+            <taskproperty id="tpd7" name="completion" type="default" valuetype="int"/>
+            <taskproperty id="tpd8" name="coordinator" type="default" valuetype="text"/>
+            <taskproperty id="tpd9" name="predecessorsr" type="default" valuetype="text"/>
+        </taskproperties>
+        <task id="0" name="Pflichtenheft/Projektplan erstellen" color="#3333ff" meeting="false" start="2021-10-29" duration="12" complete="0" thirdDate="2021-10-29" thirdDate-constraint="0" expand="true">
+            <task id="101" name="Start 1" color="#ff0000" meeting="true" start="2021-10-29" duration="0" complete="0" thirdDate="2021-10-15" thirdDate-constraint="0" expand="true"/>
+            <task id="9" name="Abgabe 1" color="#ff0000" meeting="true" start="2021-10-31" duration="0" complete="0" thirdDate="2021-10-22" thirdDate-constraint="0" expand="true"/>
+            <task id="10" name="Besprechung 1" color="#ff0000" meeting="true" start="2021-11-03" duration="0" complete="0" thirdDate="2021-10-22" thirdDate-constraint="0" expand="true"/>
+            <task id="11" name="Finale Version 1" color="#ff0000" meeting="true" start="2021-11-10" duration="0" complete="0" thirdDate="2021-10-22" thirdDate-constraint="0" expand="true"/>
+            <task id="16" name="Pflichtenheft erstellen" color="#8cb6ce" meeting="false" start="2021-10-29" duration="5" complete="0" thirdDate="2021-10-18" thirdDate-constraint="0" expand="true">
+                <notes><![CDATA[Bereich 1 und 2 ausfüllen
+]]></notes>
+                <depend id="262" type="2" difference="0" hardness="Strong"/>
+            </task>
+            <task id="73" name="Projektplan erstellen" color="#8cb6ce" meeting="false" start="2021-10-29" duration="5" complete="0" thirdDate="2021-10-18" thirdDate-constraint="0" expand="true">
+                <depend id="262" type="2" difference="0" hardness="Strong"/>
+            </task>
+            <task id="124" name="Organisation" meeting="false" start="2021-10-29" duration="5" complete="0" expand="true">
+                <task id="127" name="Workflow Repo" color="#8cb6ce" meeting="false" start="2021-10-29" duration="2" complete="0" thirdDate="2021-10-20" thirdDate-constraint="0" expand="true"/>
+                <task id="129" name="Kommunikations Infastruktur" color="#8cb6ce" meeting="false" start="2021-10-29" duration="2" complete="0" thirdDate="2021-10-19" thirdDate-constraint="0" expand="true"/>
+                <task id="131" name="Team Wofklow Dokument erstellen" color="#8cb6ce" meeting="false" start="2021-10-31" duration="3" complete="1" thirdDate="2021-10-29" thirdDate-constraint="0" expand="true"/>
+            </task>
+            <task id="149" name="Code Review" meeting="false" start="2021-10-29" duration="6" complete="0" expand="true">
+                <task id="153" name="Global Search Bar" color="#8cb6ce" meeting="false" start="2021-10-29" duration="6" complete="0" thirdDate="2021-10-25" thirdDate-constraint="0" expand="true"/>
+                <task id="170" name="Query Parsing" color="#8cb6ce" meeting="false" start="2021-10-29" duration="6" complete="0" thirdDate="2021-10-25" thirdDate-constraint="0" expand="true"/>
+                <task id="154" name="GUI" color="#8cb6ce" meeting="false" start="2021-10-29" duration="6" complete="0" thirdDate="2021-10-25" thirdDate-constraint="0" expand="true"/>
+                <task id="155" name="Lucene Logic" color="#8cb6ce" meeting="false" start="2021-10-29" duration="6" complete="0" thirdDate="2021-10-25" thirdDate-constraint="0" expand="true"/>
+            </task>
+        </task>
+        <task id="4" name="Design und Prototyp erstellen" color="#3333ff" meeting="false" start="2021-11-01" duration="23" complete="0" thirdDate="2021-10-29" thirdDate-constraint="0" expand="true">
+            <task id="104" name="Start 2" color="#ff0000" meeting="true" start="2021-11-01" duration="0" complete="0" thirdDate="2021-10-23" thirdDate-constraint="0" expand="true"/>
+            <task id="25" name="Abgabe 2" color="#ff0000" meeting="true" start="2021-11-14" duration="0" complete="0" thirdDate="2021-10-24" thirdDate-constraint="0" expand="true"/>
+            <task id="26" name="Besprechung 2" color="#ff0000" meeting="true" start="2021-11-17" duration="0" complete="0" thirdDate="2021-10-24" thirdDate-constraint="0" expand="true"/>
+            <task id="24" name="Finale Version 2" color="#ff0000" meeting="true" start="2021-11-24" duration="0" complete="0" thirdDate="2021-10-24" thirdDate-constraint="0" expand="true"/>
+            <task id="262" name="Prototypen" meeting="false" start="2021-11-03" duration="11" complete="0" expand="true">
+                <depend id="236" type="2" difference="0" hardness="Strong"/>
+                <task id="93" name="Dropdown menu for Lucene query" color="#8cb6ce" meeting="false" start="2021-11-03" duration="11" complete="0" thirdDate="2021-10-22" thirdDate-constraint="0" expand="true"/>
+                <task id="94" name="Lucene Syntax" color="#8cb6ce" meeting="false" start="2021-11-03" duration="11" complete="0" thirdDate="2021-10-22" thirdDate-constraint="0" expand="true"/>
+                <task id="95" name="Chipview Design" color="#8cb6ce" meeting="false" start="2021-11-07" duration="5" complete="0" thirdDate="2021-10-22" thirdDate-constraint="0" expand="true"/>
+                <task id="96" name="Autocompletion" color="#8cb6ce" meeting="false" start="2021-11-07" duration="5" complete="0" thirdDate="2021-10-22" thirdDate-constraint="0" expand="true"/>
+                <task id="177" name="Working Highlighting" color="#8cb6ce" meeting="false" start="2021-11-09" duration="4" complete="0" thirdDate="2021-11-09" thirdDate-constraint="0" expand="true"/>
+                <task id="175" name="Recent Search" color="#8cb6ce" meeting="false" start="2021-11-10" duration="3" complete="0" thirdDate="2021-11-10" thirdDate-constraint="0" expand="true"/>
+            </task>
+            <task id="219" name="Dokumentation" meeting="false" start="2021-11-03" duration="11" complete="0" expand="true">
+                <task id="220" name="UML Klassendiagram" color="#8cb6ce" meeting="false" start="2021-11-10" duration="4" complete="0" thirdDate="2021-10-10" thirdDate-constraint="0" expand="true"/>
+                <task id="229" name="OCL Constraints" color="#8cb6ce" meeting="false" start="2021-11-10" duration="4" complete="0" thirdDate="2021-10-10" thirdDate-constraint="0" expand="true">
+                    <notes><![CDATA[Pro Mitglied 2 Constraints formulieren
+-> 8 Constraints
+]]></notes>
+                </task>
+                <task id="222" name="Diagramme" color="#333333" meeting="false" start="2021-11-03" duration="4" complete="0" thirdDate="2021-10-10" thirdDate-constraint="0" expand="true">
+                    <notes><![CDATA[Pro Gruppenmitglied soll jeweils die Dynamik für einen Teilaspekt mithilfe von Sequenz/Kollaborationsdiagrammen, Aktivitätsdiagrammen oder Zustandsdiagrammen spezifiziert werden. (In einer 4er Gruppe, sollen also 4 dynamische Diagramme erstellt werden. Wählen Sie die jeweils passendste Diagrammart für jeden zu spezifizierenden Teilaspekt ihres Systems).]]></notes>
+                    <task id="254" name="Lucene Syntax Diagramm" color="#8cb6ce" meeting="false" start="2021-11-03" duration="4" complete="0" thirdDate="2021-10-31" thirdDate-constraint="0" expand="true"/>
+                    <task id="252" name="GUI Diagramm" color="#8cb6ce" meeting="false" start="2021-11-03" duration="4" complete="0" thirdDate="2021-10-31" thirdDate-constraint="0" expand="true"/>
+                    <task id="257" name="Global Search Field Diagramm" color="#8cb6ce" meeting="false" start="2021-11-03" duration="4" complete="0" thirdDate="2021-10-31" thirdDate-constraint="0" expand="true"/>
+                    <task id="261" name="Autocomplete Diagramm" color="#8cb6ce" meeting="false" start="2021-11-03" duration="4" complete="0" thirdDate="2021-10-31" thirdDate-constraint="0" expand="true"/>
+                </task>
+            </task>
+        </task>
+        <task id="5" name="Testplan erstellen" color="#3333ff" meeting="false" start="2021-11-15" duration="23" complete="0" thirdDate="2021-10-29" thirdDate-constraint="0" expand="true">
+            <task id="107" name="Start 3" color="#ff0000" meeting="true" start="2021-11-15" duration="0" complete="0" thirdDate="2021-10-22" thirdDate-constraint="0" expand="true"/>
+            <task id="42" name="Abgabe 3" color="#ff0000" meeting="true" start="2021-11-28" duration="0" complete="0" thirdDate="2021-10-24" thirdDate-constraint="0" expand="true"/>
+            <task id="44" name="Besprechung 3" color="#ff0000" meeting="true" start="2021-12-01" duration="0" complete="0" thirdDate="2021-10-24" thirdDate-constraint="0" expand="true"/>
+            <task id="46" name="Finale Version 3" color="#ff0000" meeting="true" start="2021-12-08" duration="0" complete="0" thirdDate="2021-10-24" thirdDate-constraint="0" expand="true"/>
+            <task id="236" name="Testplan erstellen" color="#333333" meeting="false" start="2021-11-15" duration="13" complete="0" thirdDate="2021-10-24" thirdDate-constraint="0" expand="true">
+                <notes><![CDATA[Pro Mitglied 3 Modultests und 3 Funktionstests]]></notes>
+                <depend id="6" type="2" difference="0" hardness="Strong"/>
+                <task id="179" name="Unit Tests" meeting="false" start="2021-11-15" duration="13" complete="0" expand="true">
+                    <depend id="6" type="2" difference="0" hardness="Strong"/>
+                    <task id="184" name="Dropdown menu for Lucene" color="#8cb6ce" meeting="false" start="2021-11-15" duration="13" complete="0" thirdDate="2021-10-17" thirdDate-constraint="0" expand="true"/>
+                    <task id="181" name="Lucene Syntax" color="#8cb6ce" meeting="false" start="2021-11-15" duration="13" complete="0" thirdDate="2021-10-17" thirdDate-constraint="0" expand="true"/>
+                    <task id="183" name="Chipview Design" color="#8cb6ce" meeting="false" start="2021-11-15" duration="13" complete="0" thirdDate="2021-10-03" thirdDate-constraint="0" expand="true"/>
+                    <task id="185" name="Autocompletion" color="#8cb6ce" meeting="false" start="2021-11-15" duration="13" complete="0" thirdDate="2021-10-17" thirdDate-constraint="0" expand="true"/>
+                    <task id="205" name="Working Highlighting" color="#8cb6ce" meeting="false" start="2021-11-20" duration="8" complete="0" thirdDate="2021-10-17" thirdDate-constraint="0" expand="true"/>
+                    <task id="192" name="Recent Search" color="#8cb6ce" meeting="false" start="2021-11-22" duration="6" complete="0" thirdDate="2021-10-17" thirdDate-constraint="0" expand="true"/>
+                </task>
+            </task>
+            <task id="240" name="Testcoverage" color="#8cb6ce" meeting="false" start="2021-11-22" duration="6" complete="0" thirdDate="2021-10-24" thirdDate-constraint="0" expand="true"/>
+        </task>
+        <task id="6" name="Abschlusspräsentation" color="#3333ff" meeting="false" start="2021-11-29" duration="16" complete="0" thirdDate="2021-10-29" thirdDate-constraint="0" expand="true">
+            <task id="248" name="Start 4" color="#ff0000" meeting="true" start="2021-11-29" duration="0" complete="0" thirdDate="2021-11-07" thirdDate-constraint="0" expand="true"/>
+            <task id="48" name="Abgabe" color="#ff0000" meeting="true" start="2021-12-15" duration="0" complete="0" thirdDate="2021-10-24" thirdDate-constraint="0" expand="true"/>
+            <task id="243" name="Präsentation" color="#000000" meeting="false" start="2021-11-29" duration="16" complete="0" thirdDate="2021-11-29" thirdDate-constraint="0" expand="true">
+                <notes><![CDATA[Die Präsentation sollte mindestens folgende Punkte ansprechen:
+
+    Welches Problem sollte ihre Erweiterung lösen?
+        Was ist die Vision, das Ziel?
+        Was sind die wichtigsten Anforderungen an die Software?
+    Wie ist die Architektur / das Design der Software?
+        Was waren die wichtigsten Designentscheidungen?
+    Live-demo Ihrer Erweiterung
+    Reflexion / Lessons learned
+        Welche Probleme sind während dem Projekt aufgetaucht?
+        Was war einfacher, was schwieriger als erwartet?
+        Was würden Sie beim nächsten mal anders machen?
+        Was ist die wichtigste Einsicht die Sie erlangt haben?
+]]></notes>
+                <task id="244" name="Slides" color="#8cb6ce" meeting="false" start="2021-11-29" duration="16" complete="0" thirdDate="2021-10-17" thirdDate-constraint="0" expand="true"/>
+                <task id="245" name="Software Demo" color="#8cb6ce" meeting="false" start="2021-11-29" duration="16" complete="0" thirdDate="2021-10-17" thirdDate-constraint="0" expand="true"/>
+            </task>
+        </task>
+        <task id="7" name="Finale Abgabe ganzes Projekt" color="#3333ff" meeting="false" start="2021-12-22" duration="1" complete="0" thirdDate="2021-10-29" thirdDate-constraint="0" expand="true">
+            <task id="54" name="Abgabe" color="#ff0000" meeting="true" start="2021-12-22" duration="0" complete="0" thirdDate="2021-10-24" thirdDate-constraint="0" expand="true"/>
+        </task>
+    </tasks>
+    <resources>
+        <resource id="0" name="Julian Bopp" function="Default:0" contacts="" phone=""/>
+        <resource id="1" name="Albert Jasari" function="Default:0" contacts="" phone=""/>
+        <resource id="2" name="Mark Starzynski" function="Default:0" contacts="" phone=""/>
+        <resource id="3" name="Daniel Madoery" function="Default:0" contacts="" phone=""/>
+    </resources>
+    <allocations>
+        <allocation task-id="73" resource-id="0" function="Default:0" responsible="false" load="100.0"/>
+        <allocation task-id="93" resource-id="0" function="Default:0" responsible="true" load="100.0"/>
+        <allocation task-id="127" resource-id="0" function="Default:0" responsible="true" load="100.0"/>
+        <allocation task-id="153" resource-id="0" function="Default:0" responsible="true" load="100.0"/>
+        <allocation task-id="184" resource-id="0" function="Default:0" responsible="true" load="100.0"/>
+        <allocation task-id="177" resource-id="0" function="Default:0" responsible="true" load="100.0"/>
+        <allocation task-id="205" resource-id="0" function="Default:0" responsible="true" load="100.0"/>
+        <allocation task-id="220" resource-id="0" function="Default:0" responsible="true" load="100.0"/>
+        <allocation task-id="229" resource-id="0" function="Default:0" responsible="true" load="100.0"/>
+        <allocation task-id="245" resource-id="0" function="Default:0" responsible="true" load="100.0"/>
+        <allocation task-id="257" resource-id="0" function="Default:0" responsible="true" load="100.0"/>
+        <allocation task-id="16" resource-id="1" function="Default:0" responsible="false" load="100.0"/>
+        <allocation task-id="94" resource-id="1" function="Default:0" responsible="true" load="100.0"/>
+        <allocation task-id="170" resource-id="1" function="Default:0" responsible="true" load="100.0"/>
+        <allocation task-id="181" resource-id="1" function="Default:0" responsible="true" load="100.0"/>
+        <allocation task-id="175" resource-id="1" function="Default:0" responsible="true" load="100.0"/>
+        <allocation task-id="192" resource-id="1" function="Default:0" responsible="true" load="100.0"/>
+        <allocation task-id="220" resource-id="1" function="Default:0" responsible="false" load="100.0"/>
+        <allocation task-id="229" resource-id="1" function="Default:0" responsible="false" load="100.0"/>
+        <allocation task-id="240" resource-id="1" function="Default:0" responsible="true" load="100.0"/>
+        <allocation task-id="244" resource-id="1" function="Default:0" responsible="true" load="100.0"/>
+        <allocation task-id="254" resource-id="1" function="Default:0" responsible="true" load="100.0"/>
+        <allocation task-id="16" resource-id="2" function="Default:0" responsible="false" load="100.0"/>
+        <allocation task-id="96" resource-id="2" function="Default:0" responsible="true" load="100.0"/>
+        <allocation task-id="129" resource-id="2" function="Default:0" responsible="true" load="100.0"/>
+        <allocation task-id="131" resource-id="2" function="Default:0" responsible="true" load="100.0"/>
+        <allocation task-id="73" resource-id="2" function="Default:0" responsible="false" load="100.0"/>
+        <allocation task-id="155" resource-id="2" function="Default:0" responsible="true" load="100.0"/>
+        <allocation task-id="185" resource-id="2" function="Default:0" responsible="true" load="100.0"/>
+        <allocation task-id="175" resource-id="2" function="Default:0" responsible="false" load="100.0"/>
+        <allocation task-id="192" resource-id="2" function="Default:0" responsible="false" load="100.0"/>
+        <allocation task-id="220" resource-id="2" function="Default:0" responsible="false" load="100.0"/>
+        <allocation task-id="229" resource-id="2" function="Default:0" responsible="false" load="100.0"/>
+        <allocation task-id="261" resource-id="2" function="Default:0" responsible="true" load="100.0"/>
+        <allocation task-id="16" resource-id="3" function="Default:0" responsible="false" load="100.0"/>
+        <allocation task-id="95" resource-id="3" function="Default:0" responsible="true" load="100.0"/>
+        <allocation task-id="129" resource-id="3" function="Default:0" responsible="false" load="100.0"/>
+        <allocation task-id="154" resource-id="3" function="Default:0" responsible="true" load="100.0"/>
+        <allocation task-id="183" resource-id="3" function="Default:0" responsible="true" load="100.0"/>
+        <allocation task-id="177" resource-id="3" function="Default:0" responsible="false" load="100.0"/>
+        <allocation task-id="205" resource-id="3" function="Default:0" responsible="false" load="100.0"/>
+        <allocation task-id="220" resource-id="3" function="Default:0" responsible="false" load="100.0"/>
+        <allocation task-id="229" resource-id="3" function="Default:0" responsible="false" load="100.0"/>
+        <allocation task-id="252" resource-id="3" function="Default:0" responsible="true" load="100.0"/>
+    </allocations>
+    <vacations/>
+    <previous/>
+    <roles roleset-name="Default"/>
+</project>

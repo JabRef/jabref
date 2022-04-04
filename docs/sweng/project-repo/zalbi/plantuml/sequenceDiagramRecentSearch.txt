@@ -1,0 +1,8 @@
+@startuml
+mainframe **Sequence Diagram: Autocomplete  **
+actor User
+User -> AutoCompletePopup: bindAutoCompletion()
+AutoCompletePopup -> AutoCompletionTextInputBinding: convertSuggestionsToStrings
+AutoCompletionTextInputBinding -> GlobalSearchBar: provideSuggestionsInGlobalSearch
+GlobalSearchBar -> AutoCompletePopup: bindAutoCompletion()
+@enduml

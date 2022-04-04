@@ -183,6 +183,7 @@ public class JabRefFrame extends BorderPane {
 
     private final TaskExecutor taskExecutor;
 
+
     public JabRefFrame(Stage mainStage) {
         this.mainStage = mainStage;
         this.stateManager = Globals.stateManager;
@@ -200,6 +201,7 @@ public class JabRefFrame extends BorderPane {
                 }
             }
         });
+
     }
 
     private void initDragAndDrop() {
