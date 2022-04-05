@@ -421,23 +421,22 @@ public class LinkedFileViewModel extends AbstractViewModel {
         BackgroundTask<Void> writeTask = BackgroundTask.wrap(() -> {
             Optional<Path> file = linkedFile.findIn(databaseContext, preferences.getFilePreferences());
             if (file.isEmpty()) {
-                // TODO: Print error message
-                // Localization.lang("PDF does not exist");
+                dialogService.notify(Localization.lang("File not found"));
             } else {
                 try {
                     XmpUtilWriter.writeXmp(file.get(), entry, databaseContext.getDatabase(), preferences.getXmpPreferences());
 
                     EmbeddedBibFilePdfExporter embeddedBibExporter = new EmbeddedBibFilePdfExporter(preferences.getGeneralPreferences().getDefaultBibDatabaseMode(), Globals.entryTypesManager, preferences.getFieldWriterPreferences());
                     embeddedBibExporter.exportToFileByPath(databaseContext, databaseContext.getDatabase(), preferences.getFilePreferences(), file.get());
+                    
+                    dialogService.notify(Localization.lang("Finished writing metadata!"));
                 } catch (IOException | TransformerException ex) {
-                    // TODO: Print error message
-                    // Localization.lang("Error while writing") + " '" + file.toString() + "': " + ex;
+                    dialogService.notify(Localization.lang("Error while writing") + " '" + file.toString() + "': " + ex);
                 }
             }
             return null;
         });
 
-        // TODO: Show progress
         taskExecutor.execute(writeTask);
     }
 
