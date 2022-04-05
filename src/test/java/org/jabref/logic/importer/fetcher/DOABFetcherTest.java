@@ -21,6 +21,7 @@ public class DOABFetcherTest {
     private BibEntry Andrew_Perrin;
     private BibEntry Felipe_Gonzalez;
     private BibEntry Carl_Marnewick;
+    private BibEntry Antonios_Tsourdos;
 
     @BeforeEach
     public void setUp() throws Exception {
@@ -165,6 +166,32 @@ public class DOABFetcherTest {
         Carl_Marnewick.setField(StandardField.KEYWORDS, "agile, structural equation modelling, information technology, success, models, strategic alignment, complexity, waterfall, project management, quantitative, Agile software development, Change management, Deliverable, Exploratory factor analysis, South Africa");
         Carl_Marnewick.setField(StandardField.PUBLISHER, "AOSIS");
 
+        Antonios_Tsourdos = new BibEntry();
+        Antonios_Tsourdos.setField(StandardField.EDITOR, "Felipe Gonzalez Toro and Antonios Tsourdos");
+        Antonios_Tsourdos.setField(StandardField.TITLE, "UAV‐Based Remote Sensing Volume 2");
+        Antonios_Tsourdos.setField(StandardField.TYPE, "book");
+        Antonios_Tsourdos.setField(StandardField.PAGES, "VIII, 396");
+        Antonios_Tsourdos.setField(StandardField.YEAR, "2018");
+        Antonios_Tsourdos.setField(StandardField.URI, "https://directory.doabooks.org/handle/20.500.12854/61443");
+        Antonios_Tsourdos.setField(StandardField.ABSTRACT, "ctive technological development has fuelled " +
+                "rapid growth in the number of Unmanned Aerial Vehicle (UAV) platforms being deployed around" +
+                " the globe. Novel UAV platforms, UAV-based sensors, robotic sensing and imaging techniques," +
+                " the development of processing workflows, as well as the capacity of ultra-high temporal and" +
+                " spatial resolution data, provide both opportunities and challenges that will allow engineers" +
+                " and scientists to address novel and important scientific questions in UAV and sensor design," +
+                " remote sensing and environmental monitoring. This work features papers on UAV sensor design," +
+                " improvements in UAV sensor technology, obstacle detection, methods for measuring optical " +
+                "flow, target tracking, gimbal influence on the stability of UAV images, augmented reality " +
+                "tools, segmentation in digital surface models for 3D reconstruction, detection, location and " +
+                "grasping objects, multi-target localization, vision-based tracking in cooperative multi-UAV " +
+                "systems, noise suppression techniques , rectification for oblique images, two-UAV " +
+                "communication system, fuzzy-based hybrid control algorithms, pedestrian detection and tracking" +
+                " as well as a range of atmospheric, geological, , agricultural, ecological, reef, wildlife, " +
+                "building and construction, coastal area coverage, search and rescue (SAR), water plume " +
+                "temperature measurements, aeromagnetic and archaeological surveys applications");
+        Antonios_Tsourdos.setField(StandardField.LANGUAGE, "English");
+        Antonios_Tsourdos.setField(StandardField.KEYWORDS, "UAV-Based Remote Sensing, drones, pedestrian detection and tracking as well as a range of atmospheric, UAV images, fuzzy-based hybrid control algorithms, water plume temperature measurements, aeromagnetic and archaeological surveys, geological, two-UAV communication system, agricultural, wildlife, reef, detection, multi-target localization, ecological, search and rescue (SAR), coastal area coverage, remote sensing, environmental science, segmentation in digital surface models for 3D reconstruction, location and grasping objects, augmented reality tools, building and construction, aerial robotics, noise suppression techniques, rectification for oblique images, vision-based tracking in cooperative multi-UAV systems");
+        Antonios_Tsourdos.setField(StandardField.PUBLISHER, "MDPI - Multidisciplinary Digital Publishing Institute");
     }
 
     @Test
@@ -205,6 +232,13 @@ public class DOABFetcherTest {
         List<BibEntry> entries;
         entries = fetcher.performSearch("The symbiosis between information system project complexity and information system project success");
         assertEquals(Collections.singletonList(Carl_Marnewick), entries);
+    }
+
+    @Test
+    public void TestPerformSearch6() throws FetcherException {
+        List<BibEntry> entries;
+        entries = fetcher.performSearch("UAV‐Based Remote Sensing Volume 2");
+        assertEquals(Collections.singletonList(Antonios_Tsourdos), entries);
     }
 
 }

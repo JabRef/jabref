@@ -19,6 +19,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 
 import kong.unirest.json.JSONArray;
+import kong.unirest.json.JSONException;
 import kong.unirest.json.JSONObject;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
@@ -30,7 +31,6 @@ import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 
 public class DOABFetcher implements SearchBasedParserFetcher {
     private static final String SEARCH_URL = "https://directory.doabooks.org/rest/search?";
-    // private static final String PEER_REVIEW_URL = " https://directory.doabooks.org/rest/peerReviews?";
 
     @Override
     public String getName() {
@@ -101,8 +101,13 @@ public class DOABFetcher implements SearchBasedParserFetcher {
                         dataObject.getString("value"));
                 case "dc.title" -> entry.setField(StandardField.TITLE,
                         dataObject.getString("value"));
-                case "oapen.pages" -> entry.setField(StandardField.PAGES, String.valueOf(
-                        dataObject.getInt("value")));
+                case "oapen.pages" -> {
+                    try {
+                        entry.setField(StandardField.PAGES, String.valueOf(dataObject.getInt("value")));
+                    } catch (JSONException e) {
+                        entry.setField(StandardField.PAGES, dataObject.getString("value"));
+                    }
+                }
                 case "dc.description.abstract" -> entry.setField(StandardField.ABSTRACT,
                         dataObject.getString("value"));
                 case "dc.language" -> entry.setField(StandardField.LANGUAGE,
