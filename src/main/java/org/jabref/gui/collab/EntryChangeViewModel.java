@@ -47,7 +47,7 @@ class EntryChangeViewModel extends DatabaseChangeViewModel {
     public void makeChange(BibDatabaseContext database, NamedCompound undoEdit) {
         this.description(); // Init dialog to prevent NPE
         database.getDatabase().removeEntry(oldEntry);
-        BibEntry mergedEntry = mergePanel.getMergeEntry();
+        BibEntry mergedEntry = mergePanel.getMergedEntry();
         mergedEntry.setId(oldEntry.getId()); // Keep ID
         database.getDatabase().insertEntry(mergedEntry);
         undoEdit.addEdit(new UndoableInsertEntries(database.getDatabase(), oldEntry));
