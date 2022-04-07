@@ -421,7 +421,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
         BackgroundTask<Void> writeTask = BackgroundTask.wrap(() -> {
             Optional<Path> file = linkedFile.findIn(databaseContext, preferences.getFilePreferences());
             if (file.isEmpty()) {
-                dialogService.notify(Localization.lang("File not found"));
+                dialogService.notify(Localization.lang("Failed to write metadata, file not found."));
             } else {
                 try {
                     XmpUtilWriter.writeXmp(file.get(), entry, databaseContext.getDatabase(), preferences.getXmpPreferences());
@@ -429,9 +429,10 @@ public class LinkedFileViewModel extends AbstractViewModel {
                     EmbeddedBibFilePdfExporter embeddedBibExporter = new EmbeddedBibFilePdfExporter(preferences.getGeneralPreferences().getDefaultBibDatabaseMode(), Globals.entryTypesManager, preferences.getFieldWriterPreferences());
                     embeddedBibExporter.exportToFileByPath(databaseContext, databaseContext.getDatabase(), preferences.getFilePreferences(), file.get());
                     
-                    dialogService.notify(Localization.lang("Finished writing metadata!"));
+                    dialogService.notify(Localization.lang("Success! Finished writing metadata."));
                 } catch (IOException | TransformerException ex) {
-                    dialogService.notify(Localization.lang("Error while writing") + " '" + file.toString() + "': " + ex);
+                    dialogService.notify(Localization.lang("Error while writing metadata. See the error log for details."));
+                    LOGGER.error("Error while writing metadata in" + " '" + file.toString() + "'", ex);
                 }
             }
             return null;
