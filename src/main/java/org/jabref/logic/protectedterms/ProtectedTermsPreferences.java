@@ -23,19 +23,19 @@ public class ProtectedTermsPreferences {
     }
 
     public ObservableList<String> getEnabledInternalTermLists() {
-        return FXCollections.unmodifiableObservableList(enabledInternalTermLists);
+        return enabledInternalTermLists;
     }
 
     public ObservableList<String> getEnabledExternalTermLists() {
-        return FXCollections.unmodifiableObservableList(enabledExternalTermLists);
+        return enabledExternalTermLists;
     }
 
     public ObservableList<String> getDisabledInternalTermLists() {
-        return FXCollections.unmodifiableObservableList(disabledInternalTermLists);
+        return disabledInternalTermLists;
     }
 
     public ObservableList<String> getDisabledExternalTermLists() {
-        return FXCollections.unmodifiableObservableList(disabledExternalTermLists);
+        return disabledExternalTermLists;
     }
 
     public void setEnabledInternalTermLists(List<String> list) {

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<style xmlns="http://purl.org/net/xbiblio/csl" version="1.0" default-locale="en-GB">
+  <info>
+    <title>BioScientific Review</title>
+    <id>http://www.zotero.org/styles/bioscientific-review</id>
+    <link href="http://www.zotero.org/styles/bioscientific-review" rel="self"/>
+    <link href="http://www.zotero.org/styles/american-medical-association-brackets" rel="independent-parent"/>
+    <link href="https://journals.umt.edu.pk/index.php/BSR/Guidelines-for-Authors" rel="documentation"/>
+    <category citation-format="numeric"/>
+    <category field="medicine"/>
+    <issn>2663-4198</issn>
+    <eissn>2663-4201</eissn>
+    <summary>AMA style with square-brackets</summary>
+    <updated>2020-04-23T13:38:04+00:00</updated>
+    <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
+  </info>
+</style>

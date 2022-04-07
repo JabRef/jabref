@@ -11,22 +11,22 @@ import com.sun.star.text.XTextViewCursorSupplier;
 
 public class UnoCursor {
 
-    private UnoCursor() { }
+    private UnoCursor() {
+    }
 
     /**
      * Get the cursor positioned by the user.
      */
     public static Optional<XTextViewCursor> getViewCursor(XTextDocument doc) {
         return (UnoTextDocument.getCurrentController(doc)
-                .flatMap(e -> UnoCast.cast(XTextViewCursorSupplier.class, e))
-                .map(XTextViewCursorSupplier::getViewCursor));
+                               .flatMap(e -> UnoCast.cast(XTextViewCursorSupplier.class, e))
+                               .map(XTextViewCursorSupplier::getViewCursor));
     }
 
     /**
      * Create a text cursor for a textContent.
      *
      * @return Optional.empty if mark is null, otherwise cursor.
-     *
      */
     public static Optional<XTextCursor> getTextCursorOfTextContentAnchor(XTextContent mark) {
         if (mark == null) {

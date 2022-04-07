@@ -6,15 +6,15 @@
     <id>http://www.zotero.org/styles/the-journal-of-egyptian-archaeology</id>
     <link href="http://www.zotero.org/styles/the-journal-of-egyptian-archaeology" rel="self"/>
     <link href="http://www.zotero.org/styles/journal-of-the-history-of-collections" rel="template"/>
-    <link href="http://www.ees.ac.uk/publications/journal-egyptian-archaeology.html" rel="documentation"/>
+    <link href="https://www.ees.ac.uk/writing-for-the-jea" rel="documentation"/>
+    <link href="https://journals.sagepub.com/pb-assets/cmscontent/EGA/JEA_Referencing_Style.pdf" rel="documentation"/>
     <author>
       <name>Patrick O'Brien</name>
-      <email>obrienpat86@gmail.com</email>
     </author>
     <category citation-format="note"/>
     <category field="history"/>
     <issn>0307-5133</issn>
-    <updated>2018-01-04T11:08:07+00:00</updated>
+    <updated>2022-03-18T08:56:24+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="en">
@@ -28,6 +28,10 @@
       <term name="close-quote">’</term>
       <term name="open-inner-quote">“</term>
       <term name="close-inner-quote">”</term>
+      <term name="editor" form="short">
+        <single>ed.</single>
+        <multiple>eds</multiple>
+      </term>
     </terms>
   </locale>
   <macro name="author">
@@ -79,7 +83,7 @@
     <group delimiter=" ">
       <text term="in" suffix=" "/>
       <names variable="editor">
-        <name form="short" and="text" initialize-with=". "/>
+        <name form="short" and="text" et-al-min="2" et-al-use-first="1" initialize-with=". "/>
         <label form="short" prefix=" (" suffix=")" strip-periods="false"/>
         <substitute>
           <names variable="editor"/>
@@ -151,10 +155,6 @@
       </if>
     </choose>
   </macro>
-  <macro name="pageref-subsequent">
-    <label variable="locator" form="short" suffix=" "/>
-    <text variable="locator"/>
-  </macro>
   <macro name="volref">
     <group delimiter=" ">
       <text variable="volume"/>
@@ -206,7 +206,7 @@
         <choose>
           <if variable="URL" match="any">
             <group delimiter=" ">
-              <text variable="URL" prefix="&lt;" suffix="&gt;"/>
+              <text variable="URL" prefix="&lt;" suffix=">"/>
               <text term="accessed" suffix=" "/>
             </group>
             <date variable="accessed">
@@ -226,7 +226,7 @@
           <group delimiter=", ">
             <text macro="author-short"/>
             <text macro="container-short"/>
-            <text macro="pageref-subsequent"/>
+            <text macro="pageref"/>
           </group>
         </if>
         <else>

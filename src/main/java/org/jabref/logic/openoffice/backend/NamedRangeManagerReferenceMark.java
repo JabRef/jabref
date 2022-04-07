@@ -21,23 +21,23 @@ public class NamedRangeManagerReferenceMark implements NamedRangeManager {
                                        XTextCursor position,
                                        boolean insertSpaceAfter,
                                        boolean withoutBrackets)
-        throws
-        CreationException {
+            throws
+            CreationException {
         return NamedRangeReferenceMark.create(doc, refMarkName, position, insertSpaceAfter, withoutBrackets);
     }
 
     @Override
     public List<String> getUsedNames(XTextDocument doc)
-        throws
-        NoDocumentException {
+            throws
+            NoDocumentException {
         return UnoReferenceMark.getListOfNames(doc);
     }
 
     @Override
     public Optional<NamedRange> getNamedRangeFromDocument(XTextDocument doc, String refMarkName)
-        throws
-        NoDocumentException,
-        WrappedTargetException {
+            throws
+            NoDocumentException,
+            WrappedTargetException {
         return (NamedRangeReferenceMark
                 .getFromDocument(doc, refMarkName)
                 .map(x -> x));

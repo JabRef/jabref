@@ -14,13 +14,14 @@ import com.sun.star.text.XTextRangeCompare;
 
 public class RangeOverlapBetween {
 
-    private RangeOverlapBetween() { }
+    private RangeOverlapBetween() {
+    }
 
     /**
      * Check for any overlap between two sets of XTextRange values.
-     *
+     * <p>
      * Assume fewHolders is small (usually a single element, for checking the cursor)
-     *
+     * <p>
      * Returns on first problem found.
      */
     public static <V extends RangeHolder>
@@ -44,8 +45,8 @@ public class RangeOverlapBetween {
         for (V aHolder : fewHolders) {
             XText aText = aHolder.getRange().getText();
             fewTuples.add(new OOTuple3<>(aText,
-                                         UnoCast.cast(XTextRangeCompare.class, aText).get(),
-                                         aHolder));
+                    UnoCast.cast(XTextRangeCompare.class, aText).get(),
+                    aHolder));
         }
 
         /*
@@ -81,14 +82,14 @@ public class RangeOverlapBetween {
                 //
                 // We return EQUAL_RANGE
                 RangeOverlapKind kind = (equal ? RangeOverlapKind.EQUAL_RANGE
-                                         : (touching ? RangeOverlapKind.TOUCH
-                                            : RangeOverlapKind.OVERLAP));
+                        : (touching ? RangeOverlapKind.TOUCH
+                        : RangeOverlapKind.OVERLAP));
 
                 List<V> valuesForOverlappingRanges = new ArrayList<>();
                 valuesForOverlappingRanges.add(aHolder);
                 valuesForOverlappingRanges.add(bHolder);
 
-                result.add(new RangeOverlap<V>(kind, valuesForOverlappingRanges));
+                result.add(new RangeOverlap<>(kind, valuesForOverlappingRanges));
                 return result;
             }
         }
