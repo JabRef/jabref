@@ -35,6 +35,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 
 import org.jabref.gui.DialogService;
@@ -108,7 +109,18 @@ public class GroupTreeView extends BorderPane {
         HBox.setHgrow(searchField, Priority.ALWAYS);
         HBox groupFilterBar = new HBox(searchField);
         groupFilterBar.setId("groupFilterBar");
-        this.setTop(groupFilterBar);
+
+        addNewGroup = new Button(Localization.lang("Add group"));
+        addNewGroup.setId("addNewGroup");
+        addNewGroup.setMaxWidth(Double.MAX_VALUE);
+        HBox.setHgrow(addNewGroup, Priority.ALWAYS);
+        addNewGroup.setTooltip(new Tooltip(Localization.lang("New group")));
+        addNewGroup.setOnAction(event -> addNewGroup());
+        HBox groupBar = new HBox(addNewGroup);
+        groupBar.setId("groupBar");
+
+        VBox filterAndButton = new VBox(groupFilterBar, groupBar);
+        this.setTop(filterAndButton);
 
         mainColumn = new TreeTableColumn<>();
         mainColumn.setId("mainColumn");
@@ -126,18 +138,10 @@ public class GroupTreeView extends BorderPane {
         groupTree.setId("groupTree");
         groupTree.setColumnResizePolicy(TreeTableView.CONSTRAINED_RESIZE_POLICY);
         groupTree.getColumns().addAll(List.of(mainColumn, numberColumn, expansionNodeColumn));
-        this.setBottom(groupTree);
+        this.setCenter(groupTree);
 
-        addNewGroup = new Button(Localization.lang("Add group"));
-        addNewGroup.setId("addNewGroup");
-        addNewGroup.setMaxWidth(Double.MAX_VALUE);
-        HBox.setHgrow(addNewGroup, Priority.ALWAYS);
-        addNewGroup.setTooltip(new Tooltip(Localization.lang("New group")));
-        addNewGroup.setOnAction(event -> addNewGroup());
-
-        HBox groupBar = new HBox(addNewGroup);
-        groupBar.setId("groupBar");
-        this.setCenter(groupBar);
+        HBox placeholder = new HBox();
+        this.setBottom(placeholder);
     }
 
     private void initialize() {
