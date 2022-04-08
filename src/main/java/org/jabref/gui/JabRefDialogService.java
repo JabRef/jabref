@@ -323,7 +323,7 @@ public class JabRefDialogService implements DialogService {
         alert.initOwner(mainWindow);
         themeManager.installCss(alert.getDialogPane().getScene());
 
-        stateManager.getAnyTaskRunning().addListener((observable, oldValue, newValue) -> {
+        stateManager.getAnyTasksThatWillNotBeRecoveredRunning().addListener((observable, oldValue, newValue) -> {
             if (!newValue) {
                 alert.setResult(ButtonType.YES);
                 alert.close();
