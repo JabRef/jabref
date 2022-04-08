@@ -381,4 +381,10 @@ class StringUtilTest {
     void testGuoteStringIfSpaceIsContained(String expected, String source) {
         assertEquals(expected, StringUtil.quoteStringIfSpaceIsContained(source));
     }
+
+    @Test
+    void testStripAccents() {
+        assertEquals("aAoeee", StringUtil.stripAccents("åÄöéèë"));
+        assertEquals("Muhlbach", StringUtil.stripAccents("Mühlbach"));
+    }
 }

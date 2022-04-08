@@ -44,6 +44,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixed an issue where not all found unlinked local files were imported correctly due to some race condition. [#8444](https://github.com/JabRef/jabref/issues/8444)
 - We fixed an issue where Merge entries dialog exceeds screen boundaries.
 - We fixed an issue where no citationkey was generated on import, pasting a doi or an entry on the main table [8406](https://github.com/JabRef/jabref/issues/8406), [koppor#553](https://github.com/koppor/jabref/issues/553)
+- We fixed an issue where accent search does not perform consistently. [#6815](https://github.com/JabRef/jabref/issues/6815)
 
 ### Removed
 
