@@ -5,6 +5,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -15,6 +16,7 @@ import java.util.stream.Collectors;
 
 import javax.xml.transform.TransformerException;
 
+import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
@@ -328,7 +330,10 @@ public class XmpUtilWriter {
 
             // Save
             try {
-                document.save(path.toFile());
+                Path newFile = Path.of(path.toAbsolutePath().toString() + ".copy");
+                document.save(newFile.toFile());
+                FileUtil.copyFile(newFile, path, true);
+                Files.delete(newFile);
             } catch (IOException e) {
                 LOGGER.debug("Could not write XMP metadata", e);
                 throw new TransformerException("Could not write XMP metadata: " + e.getLocalizedMessage(), e);
