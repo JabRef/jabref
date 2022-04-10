@@ -423,16 +423,19 @@ public class LinkedFileViewModel extends AbstractViewModel {
             if (file.isEmpty()) {
                 dialogService.notify(Localization.lang("Failed to write metadata, file %1 not found.", file.map(Path::toString).orElse("")));
             } else {
-                try {
-                    XmpUtilWriter.writeXmp(file.get(), entry, databaseContext.getDatabase(), preferences.getXmpPreferences());
+                synchronized (file) {
+                    try {
+                        // Similar code can be found at {@link org.jabref.gui.exporter.WriteMetadataToPdfAction.writeMetadataToFile}
+                        XmpUtilWriter.writeXmp(file.get(), entry, databaseContext.getDatabase(), preferences.getXmpPreferences());
 
-                    EmbeddedBibFilePdfExporter embeddedBibExporter = new EmbeddedBibFilePdfExporter(preferences.getGeneralPreferences().getDefaultBibDatabaseMode(), Globals.entryTypesManager, preferences.getFieldWriterPreferences());
-                    embeddedBibExporter.exportToFileByPath(databaseContext, databaseContext.getDatabase(), preferences.getFilePreferences(), file.get());
+                        EmbeddedBibFilePdfExporter embeddedBibExporter = new EmbeddedBibFilePdfExporter(preferences.getGeneralPreferences().getDefaultBibDatabaseMode(), Globals.entryTypesManager, preferences.getFieldWriterPreferences());
+                        embeddedBibExporter.exportToFileByPath(databaseContext, databaseContext.getDatabase(), preferences.getFilePreferences(), file.get());
 
-                    dialogService.notify(Localization.lang("Success! Finished writing metadata."));
-                } catch (IOException | TransformerException ex) {
-                    dialogService.notify(Localization.lang("Error while writing metadata. See the error log for details."));
-                    LOGGER.error("Error while writing metadata to {}", file.map(Path::toString).orElse(""), ex);
+                        dialogService.notify(Localization.lang("Success! Finished writing metadata."));
+                    } catch (IOException | TransformerException ex) {
+                        dialogService.notify(Localization.lang("Error while writing metadata. See the error log for details."));
+                        LOGGER.error("Error while writing metadata to {}", file.map(Path::toString).orElse(""), ex);
+                    }
                 }
             }
             return null;
