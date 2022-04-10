@@ -16,6 +16,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We added a new section to network preferences to allow using custom SSL certificates. [#8126](https://github.com/JabRef/jabref/issues/8126)
 - We improved the version check to take also beta version into account and now redirect to the right changelog for the version.
 - We added two new web and fulltext fetchers: SemanticScholar and ResearchGate.
+- We added notifications on sucess and failure when writing metadata to a PDF-file [#8276](https://github.com/JabRef/jabref/issues/8276)
 
 ### Changed
 
