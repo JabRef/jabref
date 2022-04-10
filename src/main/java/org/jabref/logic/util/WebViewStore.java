@@ -44,10 +44,10 @@ public class WebViewStore {
         if (!isInitialized) {
             throw new IllegalStateException("WebViewStore is uninitialized");
         }
+        if (WEB_VIEWS.size() <= config.getMinimumNumberOfInstances()) {
+            addWebViewLater();
+        }
         if (hasMore()) {
-            if (WEB_VIEWS.size() - 1 <= config.getMinimumNumberOfInstances()) {
-                addWebViewLater();
-            }
             return WEB_VIEWS.poll();
         } else {
             return new WebView();
