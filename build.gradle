@@ -181,6 +181,10 @@ dependencies {
     implementation 'com.konghq:unirest-java:3.13.7'
 
     implementation 'org.slf4j:slf4j-api:2.0.0-alpha7'
+    // We have libraries logging using Apache Commons Logging
+    // We need to route that through our logs
+    // See https://www.slf4j.org/legacy.html#log4j-over-slf4j for details
+    implementation group: 'org.slf4j', name: 'log4j-over-slf4j', version: '2.0.0-alpha7'
     implementation "org.tinylog:tinylog-api:2.4.1"
     implementation "org.tinylog:slf4j-tinylog:2.4.1"
     implementation "org.tinylog:tinylog-impl:2.4.1"
