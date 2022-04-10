@@ -106,7 +106,7 @@ public class DefaultTaskExecutor implements TaskExecutor {
     public <V> Future<V> execute(BackgroundTask<V> task) {
         Task<V> javafxTask = getJavaFXTask(task);
         if (task.showToUser()) {
-            stateManager.addBackgroundTask(javafxTask);
+            stateManager.addBackgroundTask(task, javafxTask);
         }
         return execute(javafxTask);
     }

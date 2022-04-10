@@ -1,0 +1,16 @@
+name: 'Automated tagging for PRs and issues'
+
+on:
+  issues:
+    types: [opened, edited, closed]
+  issue_comment:
+    types: [created, edited, closed]
+
+jobs:
+  label:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: retorquere/label-gun@main
+        with:
+          token: ${{ github.token }}
+          label.awaiting: "waiting-for-response-from-contributor"
