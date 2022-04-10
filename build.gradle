@@ -110,9 +110,13 @@ dependencies {
     // Include all jar-files in the 'lib' folder as dependencies
     implementation fileTree(dir: 'lib', includes: ['*.jar'])
 
-    implementation 'org.apache.pdfbox:pdfbox:3.0.0-RC1'
-    implementation 'org.apache.pdfbox:fontbox:3.0.0-RC1'
-    implementation 'org.apache.pdfbox:xmpbox:3.0.0-RC1'
+    implementation('org.apache.pdfbox:pdfbox:3.0.0-RC1') {
+        exclude module: "log4j-core"
+    }
+    implementation'org.apache.pdfbox:fontbox:3.0.0-RC1'
+    implementation('org.apache.pdfbox:xmpbox:3.0.0-RC1') {
+        exclude module: "log4j-core"
+    }
 
     implementation 'org.apache.lucene:lucene-core:9.1.0'
     implementation 'org.apache.lucene:lucene-queryparser:9.1.0'
@@ -214,8 +218,6 @@ dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter:5.8.2'
     testImplementation 'org.junit.platform:junit-platform-launcher:1.8.2'
 
-    testRuntimeOnly group: 'org.apache.logging.log4j', name: 'log4j-core', version: '3.0.0-SNAPSHOT'
-    testRuntimeOnly group: 'org.apache.logging.log4j', name: 'log4j-jul', version: '3.0.0-SNAPSHOT'
     testImplementation 'org.mockito:mockito-core:4.4.0'
     testImplementation 'org.xmlunit:xmlunit-core:2.9.0'
     testImplementation 'org.xmlunit:xmlunit-matchers:2.9.0'
