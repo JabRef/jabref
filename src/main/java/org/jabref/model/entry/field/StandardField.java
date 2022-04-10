@@ -135,10 +135,9 @@ public enum StandardField implements Field {
     YEAR("year", FieldProperty.NUMERIC),
     YEARFILED("yearfiled"),
     MR_NUMBER("mrnumber"),
+    ZBL_NUMBER("zbl"), // needed for fetcher
     XDATA("xdata", FieldProperty.MULTIPLE_ENTRY_LINK),
     XREF("xref", FieldProperty.SINGLE_ENTRY_LINK),
-    // needed for the fetcher
-    ZBL_NUMBER("zbl"),
 
     // JabRef-specific fields
     GROUPS("groups"),

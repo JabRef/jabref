@@ -757,7 +757,7 @@ public class LibraryTab extends Tab {
     }
 
     public void paste() {
-        mainTable.paste(this.bibDatabaseContext.getMode());
+        mainTable.paste();
     }
 
     public void cut() {
