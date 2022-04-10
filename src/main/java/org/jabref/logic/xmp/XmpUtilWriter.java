@@ -330,7 +330,7 @@ public class XmpUtilWriter {
 
             // Save
             try {
-                Path newFile = Path.of(path.toAbsolutePath().toString() + ".copy");
+                Path newFile = Files.createTempFile("JabRef", "pdf");
                 document.save(newFile.toFile());
                 FileUtil.copyFile(newFile, path, true);
                 Files.delete(newFile);

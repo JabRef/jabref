@@ -119,7 +119,7 @@ public class EmbeddedBibFilePdfExporter extends Exporter {
                 nameDictionary.setEmbeddedFiles(efTree);
                 document.getDocumentCatalog().setNames(nameDictionary);
             }
-            Path newFile = Path.of(file.toAbsolutePath().toString() + ".copy");
+            Path newFile = Files.createTempFile("JabRef", "pdf");
             document.save(newFile.toFile());
             FileUtil.copyFile(newFile, file, true);
             Files.delete(newFile);
