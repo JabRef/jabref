@@ -46,8 +46,6 @@ open module org.jabref {
     with org.jabref.gui.logging.GuiWriter,
          org.jabref.gui.logging.ApplicationInsightsWriter;
 
-    requires applicationinsights.logging.log4j2;
-
     // Preferences and XML
     requires java.prefs;
     requires jakarta.xml.bind;
@@ -65,7 +63,6 @@ open module org.jabref {
     requires org.libreoffice.uno;
 
     // Other modules
-    requires commons.logging;
     requires com.google.common;
     requires jakarta.inject;
     requires reactfx;
@@ -101,10 +98,20 @@ open module org.jabref {
     requires flexmark.util.ast;
     requires flexmark.util.data;
     requires com.h2database.mvstore;
-    requires lucene;
-    requires org.eclipse.jgit;
+
+    // fulltext search
+    requires org.apache.lucene.core;
+    uses org.apache.lucene.codecs.lucene91.Lucene91Codec;
+
+    requires org.apache.lucene.queryparser;
+    uses org.apache.lucene.queryparser.classic.MultiFieldQueryParser;
+    requires org.apache.lucene.analysis.common;
+    requires org.apache.lucene.highlighter;
+
+
     requires com.fasterxml.jackson.databind;
     requires com.fasterxml.jackson.dataformat.yaml;
     requires com.fasterxml.jackson.datatype.jsr310;
     requires net.harawata.appdirs;
+
 }
