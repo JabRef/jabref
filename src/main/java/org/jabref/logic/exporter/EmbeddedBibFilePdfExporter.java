@@ -68,6 +68,7 @@ public class EmbeddedBibFilePdfExporter extends Exporter {
         if (!Files.exists(file) || !FileUtil.isPDFFile(file)) {
             return;
         }
+
         try (PDDocument document = Loader.loadPDF(file.toFile())) {
             PDDocumentNameDictionary nameDictionary = document.getDocumentCatalog().getNames();
             PDEmbeddedFilesNameTreeNode efTree;
@@ -118,7 +119,10 @@ public class EmbeddedBibFilePdfExporter extends Exporter {
                 nameDictionary.setEmbeddedFiles(efTree);
                 document.getDocumentCatalog().setNames(nameDictionary);
             }
-            document.save(file.toFile());
+            Path newFile = Files.createTempFile("JabRef", "pdf");
+            document.save(newFile.toFile());
+            FileUtil.copyFile(newFile, file, true);
+            Files.delete(newFile);
         }
     }
 

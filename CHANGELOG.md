@@ -16,6 +16,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We added a new section to network preferences to allow using custom SSL certificates. [#8126](https://github.com/JabRef/jabref/issues/8126)
 - We improved the version check to take also beta version into account and now redirect to the right changelog for the version.
 - We added two new web and fulltext fetchers: SemanticScholar and ResearchGate.
+- We added notifications on sucess and failure when writing metadata to a PDF-file [#8276](https://github.com/JabRef/jabref/issues/8276)
 
 ### Changed
 
@@ -25,6 +26,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We introduced a preference to disable fulltext indexing [#8468](https://github.com/JabRef/jabref/issues/8468)
 - When exporting entries, the encoding is always UTF-8
 - When embedding BibTeX data into a PDF, the encoding is always UTF-8
+- We now only show a warning when exiting for tasks that will not be recovered automatically upon relaunch of JabRef. [#8468](https://github.com/JabRef/jabref/issues/8468)
 
 ### Fixed
 
@@ -43,6 +45,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixed an issue where not all found unlinked local files were imported correctly due to some race condition. [#8444](https://github.com/JabRef/jabref/issues/8444)
 - We fixed an issue where Merge entries dialog exceeds screen boundaries.
 - We fixed an issue where no citationkey was generated on import, pasting a doi or an entry on the main table [8406](https://github.com/JabRef/jabref/issues/8406), [koppor#553](https://github.com/koppor/jabref/issues/553)
+- We fixed an issue where accent search does not perform consistently. [#6815](https://github.com/JabRef/jabref/issues/6815)
 
 ### Removed
 
