@@ -64,12 +64,13 @@ public class EmbeddedBibFilePdfExporter extends Exporter {
         embedBibTex(bibString, file);
     }
 
-    private void embedBibTex(String bibTeX, Path file) throws IOException {
-        if (!Files.exists(file) || !FileUtil.isPDFFile(file)) {
+    private void embedBibTex(String bibTeX, Path path) throws IOException {
+        if (!Files.exists(path) || !FileUtil.isPDFFile(path)) {
             return;
         }
 
-        try (PDDocument document = Loader.loadPDF(file.toFile())) {
+        Path newFile;
+        try (PDDocument document = Loader.loadPDF(path.toFile())) {
             PDDocumentNameDictionary nameDictionary = document.getDocumentCatalog().getNames();
             PDEmbeddedFilesNameTreeNode efTree;
             Map<String, PDComplexFileSpecification> names;
@@ -111,7 +112,7 @@ public class EmbeddedBibFilePdfExporter extends Exporter {
                     try {
                         names.put(EMBEDDED_FILE_NAME, fileSpecification);
                     } catch (UnsupportedOperationException e) {
-                        throw new IOException(Localization.lang("File '%0' is write protected.", file.toString()));
+                        throw new IOException(Localization.lang("File '%0' is write protected.", path.toString()));
                     }
                 }
 
@@ -119,11 +120,11 @@ public class EmbeddedBibFilePdfExporter extends Exporter {
                 nameDictionary.setEmbeddedFiles(efTree);
                 document.getDocumentCatalog().setNames(nameDictionary);
             }
-            Path newFile = Files.createTempFile("JabRef", "pdf");
+            newFile = Files.createTempFile("JabRef", "pdf");
             document.save(newFile.toFile());
-            FileUtil.copyFile(newFile, file, true);
-            Files.delete(newFile);
         }
+        FileUtil.copyFile(newFile, path, true);
+        Files.delete(newFile);
     }
 
     private String getBibString(List<BibEntry> entries) throws IOException {

@@ -316,8 +316,8 @@ public class XmpUtilWriter {
             resolvedEntries = database.resolveForStrings(bibtexEntries, false);
         }
 
+        Path newFile;
         try (PDDocument document = Loader.loadPDF(path.toFile())) {
-
             if (document.isEncrypted()) {
                 throw new EncryptedPdfsNotSupportedException();
             }
@@ -330,15 +330,15 @@ public class XmpUtilWriter {
 
             // Save
             try {
-                Path newFile = Files.createTempFile("JabRef", "pdf");
+                newFile = Files.createTempFile("JabRef", "pdf");
                 document.save(newFile.toFile());
-                FileUtil.copyFile(newFile, path, true);
-                Files.delete(newFile);
             } catch (IOException e) {
                 LOGGER.debug("Could not write XMP metadata", e);
                 throw new TransformerException("Could not write XMP metadata: " + e.getLocalizedMessage(), e);
             }
         }
+        FileUtil.copyFile(newFile, path, true);
+        Files.delete(newFile);
     }
 
     private static BibEntry getDefaultOrDatabaseEntry(BibEntry defaultEntry, BibDatabase database) {
