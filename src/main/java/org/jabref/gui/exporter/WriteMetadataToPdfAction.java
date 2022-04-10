@@ -191,7 +191,7 @@ public class WriteMetadataToPdfAction extends SimpleCommand {
     /**
      * This writes both XMP data and embeds a corresponding .bib file
      */
-    private void writeMetadataToFile(Path file, BibEntry entry, BibDatabaseContext databaseContext, BibDatabase database) throws Exception {
+    synchronized private void writeMetadataToFile(Path file, BibEntry entry, BibDatabaseContext databaseContext, BibDatabase database) throws Exception {
         XmpUtilWriter.writeXmp(file, entry, database, xmpPreferences);
         embeddedBibExporter.exportToFileByPath(databaseContext, database, filePreferences, file);
     }
