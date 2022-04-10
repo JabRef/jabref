@@ -19,6 +19,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.OS;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.io.FileUtil;
+import org.jabref.logic.xmp.XmpUtilWriter;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
@@ -64,13 +65,20 @@ public class EmbeddedBibFilePdfExporter extends Exporter {
         embedBibTex(bibString, file);
     }
 
+    /**
+     * Similar method: {@link XmpUtilWriter#writeXmp(java.nio.file.Path, java.util.List, org.jabref.model.database.BibDatabase, org.jabref.logic.xmp.XmpPreferences)}
+     */
     private void embedBibTex(String bibTeX, Path path) throws IOException {
         if (!Files.exists(path) || !FileUtil.isPDFFile(path)) {
             return;
         }
 
-        Path newFile;
-        try (PDDocument document = Loader.loadPDF(path.toFile())) {
+        // Read from another file
+        // Reason: Apache PDFBox does not support writing while the file is opened
+        // See https://issues.apache.org/jira/browse/PDFBOX-4028
+        Path newFile = Files.createTempFile("JabRef", "pdf");
+        FileUtil.copyFile(path, newFile, true);
+        try (PDDocument document = Loader.loadPDF(newFile.toFile())) {
             PDDocumentNameDictionary nameDictionary = document.getDocumentCatalog().getNames();
             PDEmbeddedFilesNameTreeNode efTree;
             Map<String, PDComplexFileSpecification> names;
@@ -120,14 +128,8 @@ public class EmbeddedBibFilePdfExporter extends Exporter {
                 nameDictionary.setEmbeddedFiles(efTree);
                 document.getDocumentCatalog().setNames(nameDictionary);
             }
-            // Save updates to temporary file
-            // Reason: Apache PDFBox does not support writing while the file is opened
-            // See https://issues.apache.org/jira/browse/PDFBOX-4028
-            newFile = Files.createTempFile("JabRef", "pdf");
-            document.save(newFile.toFile());
+            document.save(path.toFile());
         }
-        // Copy the temporary file to the original file
-        FileUtil.copyFile(newFile, path, true);
         Files.delete(newFile);
     }
 
