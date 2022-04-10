@@ -308,7 +308,6 @@ public class XmpUtilWriter {
     public static void writeXmp(Path path,
                                 List<BibEntry> bibtexEntries, BibDatabase database,
                                 XmpPreferences xmpPreferences) throws IOException, TransformerException {
-
         List<BibEntry> resolvedEntries;
         if (database == null) {
             resolvedEntries = bibtexEntries;
