@@ -316,8 +316,12 @@ public class XmpUtilWriter {
             resolvedEntries = database.resolveForStrings(bibtexEntries, false);
         }
 
-        Path newFile;
-        try (PDDocument document = Loader.loadPDF(path.toFile())) {
+        // Read from another file
+        // Reason: Apache PDFBox does not support writing while the file is opened
+        // See https://issues.apache.org/jira/browse/PDFBOX-4028
+        Path newFile = Files.createTempFile("JabRef", "pdf");
+        FileUtil.copyFile(path, newFile, true);
+        try (PDDocument document = Loader.loadPDF(newFile.toFile())) {
             if (document.isEncrypted()) {
                 throw new EncryptedPdfsNotSupportedException();
             }
@@ -328,19 +332,14 @@ public class XmpUtilWriter {
                 XmpUtilWriter.writeDublinCore(document, resolvedEntries, null, xmpPreferences);
             }
 
-            // Save updates to temporary file
-            // Reason: Apache PDFBox does not support writing while the file is opened
-            // See https://issues.apache.org/jira/browse/PDFBOX-4028
+            // Save updates to original file
             try {
-                newFile = Files.createTempFile("JabRef", "pdf");
-                document.save(newFile.toFile());
+                document.save(path.toFile());
             } catch (IOException e) {
                 LOGGER.debug("Could not write XMP metadata", e);
                 throw new TransformerException("Could not write XMP metadata: " + e.getLocalizedMessage(), e);
             }
         }
-        // Copy the temporary file to the original file
-        FileUtil.copyFile(newFile, path, true);
         Files.delete(newFile);
     }
 
