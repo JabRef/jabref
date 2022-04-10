@@ -6,15 +6,10 @@ import java.net.Authenticator;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
 
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.scene.web.WebView;
 import javafx.stage.Stage;
 
 import org.jabref.cli.ArgumentProcessor;
@@ -30,6 +25,7 @@ import org.jabref.logic.net.ssl.SSLPreferences;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.remote.client.RemoteClient;
+import org.jabref.logic.util.WebViewStore;
 import org.jabref.migrations.PreferencesMigrations;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
@@ -46,21 +42,7 @@ import org.slf4j.LoggerFactory;
 public class JabRefMain extends Application {
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefMain.class);
 
-    private static final List<WebView> PRELOADED_WEBVIEWS = Collections.synchronizedList(new ArrayList<>());
-    private static volatile int usedPreloadedWebViewsCount = 0;
-
     private static String[] arguments;
-
-    public static synchronized Optional<WebView> fetchPreloadedWebView() {
-        synchronized (PRELOADED_WEBVIEWS) {
-            try {
-                return Optional.of(PRELOADED_WEBVIEWS.get(usedPreloadedWebViewsCount++));
-            } catch (IndexOutOfBoundsException e) {
-                LOGGER.error("All web views are used; please increase the number of preloaded web views and restart");
-            }
-            return Optional.empty();
-        }
-    }
 
     public static void main(String[] args) {
         arguments = args;
@@ -71,12 +53,6 @@ public class JabRefMain extends Application {
     public void start(Stage mainStage) {
         try {
             FallbackExceptionHandler.installExceptionHandler();
-
-            Platform.runLater(() -> {
-                for (int i = 0; i < 10; i++) {
-                    PRELOADED_WEBVIEWS.add(new WebView());
-                }
-            });
 
             // Init preferences
             final JabRefPreferences preferences = JabRefPreferences.getInstance();
@@ -93,6 +69,8 @@ public class JabRefMain extends Application {
             applyPreferences(preferences);
 
             clearOldSearchIndices();
+
+            WebViewStore.init();
 
             try {
                 // Process arguments

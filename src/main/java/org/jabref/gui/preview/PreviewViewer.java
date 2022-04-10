@@ -18,7 +18,6 @@ import javafx.scene.web.WebView;
 import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.Globals;
-import org.jabref.gui.JabRefMain;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.theme.ThemeManager;
@@ -28,6 +27,7 @@ import org.jabref.logic.exporter.ExporterFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preview.PreviewLayout;
 import org.jabref.logic.search.SearchQuery;
+import org.jabref.logic.util.WebViewStore;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
@@ -134,7 +134,7 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
 
         setFitToHeight(true);
         setFitToWidth(true);
-        previewView = JabRefMain.fetchPreloadedWebView().orElse(new WebView());
+        previewView = WebViewStore.get();
         setContent(previewView);
         previewView.setContextMenuEnabled(false);
 

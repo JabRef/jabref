@@ -6,8 +6,8 @@ import javafx.scene.control.ProgressIndicator;
 import javafx.scene.layout.StackPane;
 import javafx.scene.web.WebView;
 
-import org.jabref.gui.JabRefMain;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.WebViewStore;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.MathSciNetId;
@@ -26,7 +26,7 @@ public class MathSciNetTab extends EntryEditorTab {
         StackPane root = new StackPane();
         ProgressIndicator progress = new ProgressIndicator();
         progress.setMaxSize(100, 100);
-        WebView browser = JabRefMain.fetchPreloadedWebView().orElse(new WebView());
+        WebView browser = WebViewStore.get();
 
         // Quick hack to disable navigating
         browser.addEventFilter(javafx.scene.input.MouseEvent.ANY, javafx.scene.input.MouseEvent::consume);
