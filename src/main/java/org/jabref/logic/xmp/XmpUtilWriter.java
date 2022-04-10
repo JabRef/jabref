@@ -328,7 +328,9 @@ public class XmpUtilWriter {
                 XmpUtilWriter.writeDublinCore(document, resolvedEntries, null, xmpPreferences);
             }
 
-            // Save
+            // Save updates to temporary file
+            // Reason: Apache PDFBox does not support writing while the file is opened
+            // See https://issues.apache.org/jira/browse/PDFBOX-4028
             try {
                 newFile = Files.createTempFile("JabRef", "pdf");
                 document.save(newFile.toFile());
@@ -337,6 +339,7 @@ public class XmpUtilWriter {
                 throw new TransformerException("Could not write XMP metadata: " + e.getLocalizedMessage(), e);
             }
         }
+        // Copy the temporary file to the original file
         FileUtil.copyFile(newFile, path, true);
         Files.delete(newFile);
     }

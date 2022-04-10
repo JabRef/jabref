@@ -120,9 +120,13 @@ public class EmbeddedBibFilePdfExporter extends Exporter {
                 nameDictionary.setEmbeddedFiles(efTree);
                 document.getDocumentCatalog().setNames(nameDictionary);
             }
+            // Save updates to temporary file
+            // Reason: Apache PDFBox does not support writing while the file is opened
+            // See https://issues.apache.org/jira/browse/PDFBOX-4028
             newFile = Files.createTempFile("JabRef", "pdf");
             document.save(newFile.toFile());
         }
+        // Copy the temporary file to the original file
         FileUtil.copyFile(newFile, path, true);
         Files.delete(newFile);
     }
