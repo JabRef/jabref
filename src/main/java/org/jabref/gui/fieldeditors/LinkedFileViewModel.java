@@ -423,7 +423,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
             if (file.isEmpty()) {
                 dialogService.notify(Localization.lang("Failed to write metadata, file %1 not found.", file.map(Path::toString).orElse("")));
             } else {
-                synchronized (file) {
+                synchronized (linkedFile) {
                     try {
                         // Similar code can be found at {@link org.jabref.gui.exporter.WriteMetadataToPdfAction.writeMetadataToFile}
                         XmpUtilWriter.writeXmp(file.get(), entry, databaseContext.getDatabase(), preferences.getXmpPreferences());
