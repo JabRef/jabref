@@ -16,18 +16,23 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We added a new section to network preferences to allow using custom SSL certificates. [#8126](https://github.com/JabRef/jabref/issues/8126)
 - We improved the version check to take also beta version into account and now redirect to the right changelog for the version.
 - We added two new web and fulltext fetchers: SemanticScholar and ResearchGate.
+- We added notifications on sucess and failure when writing metadata to a PDF-file [#8276](https://github.com/JabRef/jabref/issues/8276)
 
 ### Changed
 
+- We upgraded to Lucene 9.1 for the fulltext search. Thus, the now created search index cannot be read from older versions of JabRef anylonger and would need to be recreated if you switch back to an older version [#8362](https://github.com/JabRef/jabref/pull/8362)
 - We changed the list of CSL styles to those that support formatting bibliographies [#8421](https://github.com/JabRef/jabref/issues/8421) [citeproc-java#116](https://github.com/michel-kraemer/citeproc-java/issues/116)
 - The CSL preview styles now also support displaying data from cross references entries that are linked via the `crossref` field [#7378](https://github.com/JabRef/jabref/issues/7378)
 - We made the Search button in Web Search wider. We also skewed the panel titles to the left [#8397](https://github.com/JabRef/jabref/issues/8397)
 - We introduced a preference to disable fulltext indexing [#8468](https://github.com/JabRef/jabref/issues/8468)
 - When exporting entries, the encoding is always UTF-8
 - When embedding BibTeX data into a PDF, the encoding is always UTF-8
+- We now only show a warning when exiting for tasks that will not be recovered automatically upon relaunch of JabRef. [#8468](https://github.com/JabRef/jabref/issues/8468)
 
 ### Fixed
 
+- We fixed an issue where it was no longer possible to add or delete multiple files in the `file` field in the entry editor [#8659](https://github.com/JabRef/jabref/issues/8659)
+- We fixed an issue where the author's lastname was not used for the citation key generation if it started with a lowercase letter [#8601](https://github.com/JabRef/jabref/issues/8601)
 - We fixed an issue where custom "Protected terms" files were missing after a restart of JabRef [#8608](https://github.com/JabRef/jabref/issues/8608)
 - We fixed an issue where JabRef could not start due to a missing directory for the fulltex index [#8579](https://github.com/JabRef/jabref/issues/8579)
 - We fixed an issue where long article numbers in the `pages` field would cause an exception and preventing the citation style to display [#8381](https://github.com/JabRef/jabref/issues/8381), [citeproc-java](https://github.com/michel-kraemer/citeproc-java/issues/114)
@@ -41,6 +46,9 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixed an issue where opening the changelog from withing JabRef led to a 404 error [#8563](https://github.com/JabRef/jabref/issues/8563)
 - We fixed an issue where not all found unlinked local files were imported correctly due to some race condition. [#8444](https://github.com/JabRef/jabref/issues/8444)
 - We fixed an issue where Merge entries dialog exceeds screen boundaries.
+- We fixed an issue where the app lags when selecting an entry after a fresh start. [#8446](https://github.com/JabRef/jabref/issues/8446)
+- We fixed an issue where no citationkey was generated on import, pasting a doi or an entry on the main table [8406](https://github.com/JabRef/jabref/issues/8406), [koppor#553](https://github.com/koppor/jabref/issues/553)
+- We fixed an issue where accent search does not perform consistently. [#6815](https://github.com/JabRef/jabref/issues/6815)
 
 ### Removed
 

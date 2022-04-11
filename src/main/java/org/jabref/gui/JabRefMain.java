@@ -22,6 +22,7 @@ import org.jabref.logic.net.ProxyAuthenticator;
 import org.jabref.logic.net.ProxyPreferences;
 import org.jabref.logic.net.ProxyRegisterer;
 import org.jabref.logic.net.ssl.SSLPreferences;
+import org.jabref.logic.net.ssl.TrustStoreManager;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.remote.client.RemoteClient;
@@ -39,7 +40,6 @@ import org.slf4j.LoggerFactory;
  * JabRef's main class to process command line options and to start the UI
  */
 public class JabRefMain extends Application {
-
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefMain.class);
 
     private static String[] arguments;
@@ -151,6 +151,7 @@ public class JabRefMain extends Application {
     }
 
     private static void configureSSL(SSLPreferences sslPreferences) {
+        TrustStoreManager.createTruststoreFileIfNotExist(Path.of(sslPreferences.getTruststorePath()));
         System.setProperty("javax.net.ssl.trustStore", sslPreferences.getTruststorePath());
         System.setProperty("javax.net.ssl.trustStorePassword", "changeit");
     }

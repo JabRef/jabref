@@ -19,6 +19,7 @@ import javafx.collections.ListChangeListener;
 
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.StateManager;
+import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.preferences.PreferencesService;
@@ -105,10 +106,13 @@ public class DocumentViewerViewModel extends AbstractViewModel {
     }
 
     private void setCurrentDocument(Path path) {
-        try (PDDocument document = Loader.loadPDF(path.toFile())) {
-            currentDocument.set(new PdfDocumentViewModel(document));
+        try {
+            if (FileUtil.isPDFFile(path)) {
+                PDDocument document = Loader.loadPDF(path.toFile());
+                currentDocument.set(new PdfDocumentViewModel(document));
+            }
         } catch (IOException e) {
-            LOGGER.error("Could not set Document Viewer", e);
+            LOGGER.error("Could not set Document Viewer for path {}", path, e);
         }
     }
 
