@@ -133,7 +133,7 @@ dependencies {
     implementation 'commons-cli:commons-cli:1.5.0'
 
     implementation 'org.libreoffice:libreoffice:7.3.1'
-    implementation 'org.libreoffice:unoloader:7.3.0'
+    implementation 'org.libreoffice:unoloader:7.3.2'
 
     implementation 'io.github.java-diff-utils:java-diff-utils:4.11'
     implementation 'info.debatty:java-string-similarity:2.0.0'
