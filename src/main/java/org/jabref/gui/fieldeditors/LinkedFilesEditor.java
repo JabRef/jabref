@@ -13,6 +13,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.ListView;
 import javafx.scene.control.ProgressBar;
+import javafx.scene.control.SelectionMode;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.ClipboardContent;
@@ -92,6 +93,7 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
                 .withValidation(LinkedFileViewModel::fileExistsValidationStatus);
 
         listView.setCellFactory(cellFactory);
+        listView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
         decoratedModelList = new UiThreadObservableList<>(viewModel.filesProperty());
         Bindings.bindContentBidirectional(listView.itemsProperty().get(), decoratedModelList);
@@ -204,8 +206,8 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
             if (keyBinding.isPresent()) {
                 switch (keyBinding.get()) {
                     case DELETE_ENTRY:
-                        LinkedFileViewModel selectedItem = listView.getSelectionModel().getSelectedItem();
-                        if (selectedItem != null) {
+                        ObservableList<LinkedFileViewModel> selectedItems = listView.getSelectionModel().getSelectedItems();
+                        for (LinkedFileViewModel selectedItem : selectedItems) {
                             viewModel.deleteFile(selectedItem);
                         }
                         event.consume();

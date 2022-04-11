@@ -31,6 +31,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 
 ### Fixed
 
+- We fixed an issue where it was no longer possible to add or delete multiple files in the `file` field in the entry editor [#8659](https://github.com/JabRef/jabref/issues/8659)
 - We fixed an issue where the author's lastname was not used for the citation key generation if it started with a lowercase letter [#8601](https://github.com/JabRef/jabref/issues/8601)
 - We fixed an issue where custom "Protected terms" files were missing after a restart of JabRef [#8608](https://github.com/JabRef/jabref/issues/8608)
 - We fixed an issue where JabRef could not start due to a missing directory for the fulltex index [#8579](https://github.com/JabRef/jabref/issues/8579)
