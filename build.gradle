@@ -138,7 +138,7 @@ dependencies {
     implementation 'io.github.java-diff-utils:java-diff-utils:4.11'
     implementation 'info.debatty:java-string-similarity:2.0.0'
 
-    antlr3 'org.antlr:antlr:3.5.2'
+    antlr3 'org.antlr:antlr:3.5.3'
     implementation 'org.antlr:antlr-runtime:3.5.2'
 
     antlr4 'org.antlr:antlr4:4.9.3'
