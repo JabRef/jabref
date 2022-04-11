@@ -163,7 +163,7 @@ dependencies {
         exclude module: "jsr305"
     }
 
-    implementation group: 'jakarta.annotation', name: 'jakarta.annotation-api', version: '2.1.0'
+    implementation group: 'jakarta.annotation', name: 'jakarta.annotation-api', version: '1.3.5'
 
     // JavaFX stuff
     implementation 'org.kordamp.ikonli:ikonli-javafx:12.3.1'
