@@ -53,11 +53,6 @@ application {
     mainModule.set('org.jabref')
 }
 
-// TODO: Ugly workaround to temporarily ignore build errors to dependencies of latex2unicode
-// These should be removed, as well as the files in the lib folder, as soon as they have valid module names
-modularity.patchModule("fastparse", "sourcecode_2.13-0.2.3")
-
-
 // Workaround for https://github.com/openjfx/javafx-gradle-plugin/issues/89
 // See also https://github.com/java9-modularity/gradle-modules-plugin/issues/165
 modularity.disableEffectiveArgumentsAdjustment()
