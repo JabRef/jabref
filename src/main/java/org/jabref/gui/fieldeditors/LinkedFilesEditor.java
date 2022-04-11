@@ -1,5 +1,6 @@
 package org.jabref.gui.fieldeditors;
 
+import java.util.List;
 import java.util.Optional;
 
 import javafx.beans.binding.Bindings;
@@ -206,8 +207,8 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
             if (keyBinding.isPresent()) {
                 switch (keyBinding.get()) {
                     case DELETE_ENTRY:
-                        ObservableList<LinkedFileViewModel> selectedItems = listView.getSelectionModel().getSelectedItems();
-                        for (LinkedFileViewModel selectedItem : selectedItems) {
+                        List<LinkedFileViewModel> toBeDeleted = List.copyOf(listView.getSelectionModel().getSelectedItems());
+                        for (LinkedFileViewModel selectedItem : toBeDeleted) {
                             viewModel.deleteFile(selectedItem);
                         }
                         event.consume();
@@ -250,7 +251,6 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
     }
 
     private void handleItemMouseClick(LinkedFileViewModel linkedFile, MouseEvent event) {
-
         if (event.getButton().equals(MouseButton.PRIMARY) && (event.getClickCount() == 2)) {
             // Double click -> open
             linkedFile.open();
