@@ -126,7 +126,7 @@ dependencies {
 
     implementation group: 'org.apache.commons', name: 'commons-csv', version: '1.9.0'
     implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.12.0'
-    implementation 'com.h2database:h2-mvstore:2.1.210'
+    implementation 'com.h2database:h2-mvstore:2.1.212'
 
     implementation group: 'org.apache.tika', name: 'tika-core', version: '2.3.0'
     implementation 'com.ibm.icu:icu4j-charset:70.1'
@@ -137,12 +137,12 @@ dependencies {
     implementation 'commons-cli:commons-cli:1.5.0'
 
     implementation 'org.libreoffice:libreoffice:7.3.1'
-    implementation 'org.libreoffice:unoloader:7.3.0'
+    implementation 'org.libreoffice:unoloader:7.3.2'
 
     implementation 'io.github.java-diff-utils:java-diff-utils:4.11'
     implementation 'info.debatty:java-string-similarity:2.0.0'
 
-    antlr3 'org.antlr:antlr:3.5.2'
+    antlr3 'org.antlr:antlr:3.5.3'
     implementation 'org.antlr:antlr-runtime:3.5.2'
 
     antlr4 'org.antlr:antlr4:4.9.3'
