@@ -119,10 +119,11 @@ dependencies {
     implementation 'org.apache.lucene:lucene-queries:9.1.0'
     implementation 'org.apache.lucene:lucene-analysis-common:9.1.0'
     implementation 'org.apache.lucene:lucene-highlighter:9.1.0'
+    implementation 'org.apache.lucene:lucene-backward-codecs:9.1.0'
 
     implementation group: 'org.apache.commons', name: 'commons-csv', version: '1.9.0'
     implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.12.0'
-    implementation 'com.h2database:h2-mvstore:2.1.212'
+    implementation 'com.h2database:h2-mvstore:2.1.210'
 
     implementation group: 'org.apache.tika', name: 'tika-core', version: '2.3.0'
     implementation 'com.ibm.icu:icu4j-charset:70.1'
@@ -187,7 +188,7 @@ dependencies {
 
     implementation 'de.undercouch:citeproc-java:3.0.0-alpha.6'
 
-    // jakarta.activation is already depdency of glassfish
+    // jakarta.activation is already dependency of glassfish
     implementation group: 'jakarta.xml.bind', name: 'jakarta.xml.bind-api', version: '3.0.1'
     implementation group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '3.0.2'
 
