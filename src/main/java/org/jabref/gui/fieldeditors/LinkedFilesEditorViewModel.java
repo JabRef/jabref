@@ -144,7 +144,7 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
                 .build();
 
         List<Path> fileDirectories = databaseContext.getFileDirectories(preferences.getFilePreferences());
-        dialogService.showFileOpenDialog(fileDialogConfiguration).ifPresent(newFile -> {
+        dialogService.showFileOpenDialogAndGetMultipleFiles(fileDialogConfiguration).forEach(newFile -> {
             LinkedFile newLinkedFile = fromFile(newFile, fileDirectories, externalFileTypes);
             files.add(new LinkedFileViewModel(
                     newLinkedFile,
