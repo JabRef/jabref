@@ -26,7 +26,6 @@ import org.jabref.logic.net.ssl.TrustStoreManager;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.remote.client.RemoteClient;
-import org.jabref.logic.util.WebViewStore;
 import org.jabref.migrations.PreferencesMigrations;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
@@ -70,8 +69,6 @@ public class JabRefMain extends Application {
             applyPreferences(preferences);
 
             clearOldSearchIndices();
-
-            WebViewStore.init();
 
             try {
                 // Process arguments
