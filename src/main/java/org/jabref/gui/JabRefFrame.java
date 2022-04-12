@@ -1,17 +1,9 @@
 package org.jabref.gui;
 
-import java.io.IOException;
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.TimerTask;
-import java.util.function.Supplier;
-import java.util.stream.Collectors;
-
+import com.google.common.eventbus.Subscribe;
+import com.tobiasdiez.easybind.EasyBind;
+import com.tobiasdiez.easybind.EasyObservableList;
+import com.tobiasdiez.easybind.Subscription;
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
@@ -22,33 +14,16 @@ import javafx.concurrent.Task;
 import javafx.geometry.Orientation;
 import javafx.scene.Group;
 import javafx.scene.Node;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.ButtonBar;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.ContextMenu;
-import javafx.scene.control.Menu;
-import javafx.scene.control.MenuBar;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.ProgressIndicator;
-import javafx.scene.control.Separator;
-import javafx.scene.control.SeparatorMenuItem;
-import javafx.scene.control.SplitPane;
-import javafx.scene.control.Tab;
-import javafx.scene.control.TabPane;
-import javafx.scene.control.ToolBar;
-import javafx.scene.control.Tooltip;
+import javafx.scene.control.*;
 import javafx.scene.control.skin.TabPaneSkin;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.TransferMode;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.Region;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
-
+import org.controlsfx.control.PopOver;
+import org.controlsfx.control.TaskProgressView;
+import org.fxmisc.richtext.CodeArea;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
@@ -64,20 +39,10 @@ import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.dialogs.AutosaveUiManager;
 import org.jabref.gui.documentviewer.ShowDocumentViewerAction;
 import org.jabref.gui.duplicationFinder.DuplicateSearch;
-import org.jabref.gui.edit.CopyMoreAction;
-import org.jabref.gui.edit.EditAction;
-import org.jabref.gui.edit.ManageKeywordsAction;
-import org.jabref.gui.edit.MassSetFieldsAction;
-import org.jabref.gui.edit.OpenBrowserAction;
-import org.jabref.gui.edit.ReplaceStringAction;
+import org.jabref.gui.edit.*;
 import org.jabref.gui.entryeditor.OpenEntryEditorAction;
 import org.jabref.gui.entryeditor.PreviewSwitchAction;
-import org.jabref.gui.exporter.ExportCommand;
-import org.jabref.gui.exporter.ExportToClipboardAction;
-import org.jabref.gui.exporter.SaveAction;
-import org.jabref.gui.exporter.SaveAllAction;
-import org.jabref.gui.exporter.SaveDatabaseAction;
-import org.jabref.gui.exporter.WriteMetadataToPdfAction;
+import org.jabref.gui.exporter.*;
 import org.jabref.gui.externalfiles.AutoLinkFilesAction;
 import org.jabref.gui.externalfiles.DownloadFullTextAction;
 import org.jabref.gui.externalfiles.FindUnlinkedFilesAction;
@@ -87,11 +52,7 @@ import org.jabref.gui.help.ErrorConsoleAction;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.help.SearchForUpdateAction;
 import org.jabref.gui.icon.IconTheme;
-import org.jabref.gui.importer.GenerateEntryFromIdDialog;
-import org.jabref.gui.importer.ImportCommand;
-import org.jabref.gui.importer.ImportEntriesDialog;
-import org.jabref.gui.importer.NewDatabaseAction;
-import org.jabref.gui.importer.NewEntryAction;
+import org.jabref.gui.importer.*;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
 import org.jabref.gui.importer.fetcher.LookupIdentifierAction;
 import org.jabref.gui.integrity.IntegrityCheckAction;
@@ -140,16 +101,14 @@ import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.preferences.PreferencesService;
 import org.jabref.preferences.TelemetryPreferences;
-
-import com.google.common.eventbus.Subscribe;
-import com.tobiasdiez.easybind.EasyBind;
-import com.tobiasdiez.easybind.EasyObservableList;
-import com.tobiasdiez.easybind.Subscription;
-import org.controlsfx.control.PopOver;
-import org.controlsfx.control.TaskProgressView;
-import org.fxmisc.richtext.CodeArea;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.nio.file.Path;
+import java.util.*;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 /**
  * The main window of the application.
@@ -827,6 +786,7 @@ public class JabRefFrame extends BorderPane {
                 new SeparatorMenuItem(),
 
                 factory.createMenuItem(StandardActions.WRITE_METADATA_TO_PDF, new WriteMetadataToPdfAction(stateManager, prefs.getGeneralPreferences().getDefaultBibDatabaseMode(), Globals.entryTypesManager, prefs.getFieldWriterPreferences(), dialogService, taskExecutor, prefs.getFilePreferences(), prefs.getXmpPreferences())),
+                factory.createMenuItem(StandardActions.DELETE_METADATA, new DeleteMetadataAction(stateManager, prefs.getGeneralPreferences().getDefaultBibDatabaseMode(), Globals.entryTypesManager, prefs.getFieldWriterPreferences(), dialogService, taskExecutor, prefs.getFilePreferences(), prefs.getXmpPreferences())),
                 factory.createMenuItem(StandardActions.COPY_LINKED_FILES, new CopyFilesAction(dialogService, prefs, stateManager)),
 
                 new SeparatorMenuItem(),
