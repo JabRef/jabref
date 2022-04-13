@@ -133,7 +133,7 @@ public class CitationKeyGenerator extends BracketedPattern {
     private String appendLettersToKey(String key, String oldKey) {
         long occurrences = database.getNumberOfCitationKeyOccurrences(key);
 
-        if (Objects.equals(oldKey, key)) {
+        if ((occurrences > 0) && Objects.equals(oldKey, key)) {
             occurrences--; // No change, so we can accept one dupe.
         }
 

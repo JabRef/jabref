@@ -11,7 +11,7 @@ Why
 
 ### Layers
 
-![Layers](../.gitbook/assets/layers-v1.svg)
+![Layers](layers-v1.svg)
 
 ### By directories
 

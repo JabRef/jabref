@@ -14,13 +14,11 @@ import javafx.collections.FXCollections;
 import javafx.concurrent.Task;
 import javafx.concurrent.Worker;
 
-import org.jabref.gui.duplicationFinder.DuplicateResolverDialog;
+import org.jabref.gui.externalfiles.ImportHandler;
+import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.importer.NewEntryAction;
-import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
-import org.jabref.logic.database.DuplicateCheck;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.IdBasedFetcher;
-import org.jabref.logic.importer.ImportCleanup;
 import org.jabref.logic.importer.WebFetchers;
 import org.jabref.logic.importer.fetcher.DoiFetcher;
 import org.jabref.logic.l10n.Localization;
@@ -153,28 +151,10 @@ public class EntryTypeViewModel {
             Optional<BibEntry> result = fetcherWorker.getValue();
             if (result.isPresent()) {
                 final BibEntry entry = result.get();
-                ImportCleanup cleanup = new ImportCleanup(libraryTab.getBibDatabaseContext().getMode());
-                cleanup.doPostCleanup(entry);
-                Optional<BibEntry> duplicate = new DuplicateCheck(Globals.entryTypesManager).containsDuplicate(libraryTab.getDatabase(), entry, libraryTab.getBibDatabaseContext().getMode());
-                if (duplicate.isPresent()) {
-                    DuplicateResolverDialog dialog = new DuplicateResolverDialog(entry, duplicate.get(), DuplicateResolverDialog.DuplicateResolverType.IMPORT_CHECK, libraryTab.getBibDatabaseContext(), stateManager);
-                    switch (dialogService.showCustomDialogAndWait(dialog)
-                                         .orElse(DuplicateResolverDialog.DuplicateResolverResult.BREAK)) {
-                        case KEEP_LEFT -> {
-                            libraryTab.getDatabase().removeEntry(duplicate.get());
-                            libraryTab.getDatabase().insertEntry(entry);
-                        }
-                        case KEEP_BOTH -> libraryTab.getDatabase().insertEntry(entry);
-                        case KEEP_MERGE -> {
-                            libraryTab.getDatabase().removeEntry(duplicate.get());
-                            libraryTab.getDatabase().insertEntry(dialog.getMergedEntry());
-                        }
-                    }
-                } else {
-                    // Regenerate CiteKey of imported BibEntry
-                    new CitationKeyGenerator(libraryTab.getBibDatabaseContext(), preferencesService.getCitationKeyPatternPreferences()).generateAndSetKey(entry);
-                    libraryTab.insertEntry(entry);
-                }
+
+                ImportHandler handler = new ImportHandler(libraryTab.getBibDatabaseContext(), ExternalFileTypes.getInstance(), preferencesService, Globals.getFileUpdateMonitor(), libraryTab.getUndoManager(), stateManager, dialogService);
+                handler.importEntryWithDuplicateCheck(libraryTab.getBibDatabaseContext(), entry);
+
                 searchSuccesfulProperty.set(true);
             } else if (StringUtil.isBlank(idText.getValue())) {
                 dialogService.showWarningDialogAndWait(Localization.lang("Empty search ID"), Localization.lang("The given search ID was empty."));

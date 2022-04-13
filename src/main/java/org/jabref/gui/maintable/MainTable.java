@@ -41,10 +41,8 @@ import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.ViewModelTableRowFactory;
-import org.jabref.logic.importer.ImportCleanup;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.database.event.EntriesAddedEvent;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.PreferencesService;
@@ -92,7 +90,8 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                 preferencesService,
                 Globals.getFileUpdateMonitor(),
                 undoManager,
-                stateManager);
+                stateManager,
+                dialogService);
 
         localDragboard = stateManager.getLocalDragboard();
 
@@ -303,12 +302,13 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         scrollTo(getItems().size() - 1);
     }
 
-    public void paste(BibDatabaseMode bibDatabaseMode) {
+    public void paste() {
         // Find entries in clipboard
         List<BibEntry> entriesToAdd = Globals.getClipboardManager().extractData();
-        ImportCleanup cleanup = new ImportCleanup(bibDatabaseMode);
-        cleanup.doPostCleanup(entriesToAdd);
-        libraryTab.insertEntries(entriesToAdd);
+
+        for (BibEntry entry : entriesToAdd) {
+            importHandler.importEntryWithDuplicateCheck(database, entry);
+        }
         if (!entriesToAdd.isEmpty()) {
             this.requestFocus();
         }
