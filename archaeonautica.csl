@@ -9,7 +9,7 @@
     <link href="https://journals.openedition.org/archaeonautica/279" rel="documentation"/>
     <author>
       <name>Antonio Mendes da Silva</name>
-      <email>mendes@mmsh.univ-aix.fr</email>
+      <email>antonio.mendes@cnrs.fr</email>
     </author>
     <category citation-format="author-date"/>
     <category field="humanities"/>
@@ -18,7 +18,7 @@
     <eissn>2117-6973</eissn>
     <summary>Style conçu pour la revue Archaeonautica. L’archéologie maritime et navale de la
             préhistoire à l’époque contemporaine. Centre Camille Jullian, CNRS</summary>
-    <updated>2020-05-04T12:23:43+00:00</updated>
+    <updated>2020-05-10T04:06:42+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="fr">
@@ -346,8 +346,9 @@
     </choose>
   </macro>
   <macro name="year-date">
+    <!-- Une tabulation après la date -->
     <group suffix="&#9;">
-      <!-- Une tabulation après la date -->
+      <!-- Fin de la tabulation -->
       <choose>
         <if variable="issued">
           <date variable="issued">
@@ -462,19 +463,28 @@
       </date>
     </group>
   </macro>
-  <citation et-al-min="3" et-al-use-first="1" disambiguate-add-year-suffix="true" collapse="year" year-suffix-delimiter=", " after-collapse-delimiter="&amp;#160;; " name-delimiter=", " initialize-with=". " delimiter-precedes-last="never" name-as-sort-order="all" sort-separator=" ">
+  <macro name="archive">
+    <group suffix="." prefix=". ">
+      <group delimiter=", ">
+        <text variable="archive"/>
+        <text variable="archive_location"/>
+        <text variable="call-number"/>
+      </group>
+    </group>
+  </macro>
+  <citation et-al-min="3" et-al-use-first="1" disambiguate-add-year-suffix="true" collapse="year" year-suffix-delimiter=", " after-collapse-delimiter="&#160;; " name-delimiter=", " initialize-with=". " delimiter-precedes-last="never" name-as-sort-order="all" sort-separator=" ">
     <sort>
       <key variable="issued" sort="descending"/>
       <key macro="author-citation"/>
       <key macro="title"/>
     </sort>
-    <layout delimiter="&amp;#160;; ">
-      <group delimiter=",&amp;#160;">
+    <layout delimiter="&#160;; " prefix="(" suffix=")">
+      <group delimiter=",&#160;">
         <group delimiter=" ">
           <text macro="author-citation"/>
           <text macro="year-date-short"/>
         </group>
-        <group delimiter="&amp;#160;">
+        <group delimiter="&#160;">
           <label variable="locator" form="short"/>
           <text variable="locator"/>
         </group>
@@ -500,6 +510,7 @@
         <text macro="publisher"/>
         <text macro="collection"/>
         <text macro="page-bib"/>
+        <text macro="archive"/>
       </group>
       <text macro="accessed"/>
     </layout>

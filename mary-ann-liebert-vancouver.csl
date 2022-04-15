@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" and="text" demote-non-dropping-particle="sort-only" default-locale="en-US">
-  <!-- This style was edited with the Visual CSL Editor (https://editor.citationstyles.org/visualEditor/) -->
   <info>
     <title>Mary Ann Liebert - Vancouver</title>
     <title-short>MAL</title-short>
@@ -14,7 +13,7 @@
     </author>
     <category citation-format="numeric"/>
     <category field="generic-base"/>
-    <updated>2022-03-09T16:51:49+00:00</updated>
+    <updated>2022-03-23T07:53:38+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="en">
@@ -125,13 +124,9 @@
       <text variable="citation-number"/>
     </layout>
   </citation>
-  <bibliography et-al-min="4" et-al-use-first="3">
-    <sort>
-      <key macro="author"/>
-      <key macro="year-date"/>
-      <key variable="title"/>
-    </sort>
+  <bibliography et-al-min="4" et-al-use-first="3" second-field-align="flush">
     <layout suffix=".">
+      <text variable="citation-number" suffix="."/>
       <group delimiter=". ">
         <text macro="author"/>
         <choose>
