@@ -34,7 +34,6 @@ import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.logic.xmp.XmpUtilWriter;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.preferences.FilePreferences;
@@ -44,11 +43,12 @@ import static org.jabref.gui.actions.ActionHelper.needsDatabase;
 public class WriteMetadataToPdfAction extends SimpleCommand {
 
     private final StateManager stateManager;
+    private final BibEntryTypesManager entryTypesManager;
+    private final FieldWriterPreferences fieldWriterPreferences;
     private final DialogService dialogService;
     private final TaskExecutor taskExecutor;
     private final FilePreferences filePreferences;
     private final XmpPreferences xmpPreferences;
-    private final EmbeddedBibFilePdfExporter embeddedBibExporter;
 
     private OptionsDialog optionsDialog;
 
@@ -60,13 +60,14 @@ public class WriteMetadataToPdfAction extends SimpleCommand {
     private int entriesChanged;
     private int errors;
 
-    public WriteMetadataToPdfAction(StateManager stateManager, BibDatabaseMode databaseMode, BibEntryTypesManager entryTypesManager, FieldWriterPreferences fieldWriterPreferences, DialogService dialogService, TaskExecutor taskExecutor, FilePreferences filePreferences, XmpPreferences xmpPreferences) {
+    public WriteMetadataToPdfAction(StateManager stateManager, BibEntryTypesManager entryTypesManager, FieldWriterPreferences fieldWriterPreferences, DialogService dialogService, TaskExecutor taskExecutor, FilePreferences filePreferences, XmpPreferences xmpPreferences) {
         this.stateManager = stateManager;
+        this.entryTypesManager = entryTypesManager;
+        this.fieldWriterPreferences = fieldWriterPreferences;
         this.dialogService = dialogService;
         this.taskExecutor = taskExecutor;
         this.filePreferences = filePreferences;
         this.xmpPreferences = xmpPreferences;
-        this.embeddedBibExporter = new EmbeddedBibFilePdfExporter(databaseMode, entryTypesManager, fieldWriterPreferences);
 
         this.executable.bind(needsDatabase(stateManager));
     }
@@ -189,10 +190,12 @@ public class WriteMetadataToPdfAction extends SimpleCommand {
     }
 
     /**
-     * This writes both XMP data and embeddeds the .bib file
+     * This writes both XMP data and embeds a corresponding .bib file
      */
-    private void writeMetadataToFile(Path file, BibEntry entry, BibDatabaseContext databaseContext, BibDatabase database) throws Exception {
+    synchronized private void writeMetadataToFile(Path file, BibEntry entry, BibDatabaseContext databaseContext, BibDatabase database) throws Exception {
         XmpUtilWriter.writeXmp(file, entry, database, xmpPreferences);
+
+        EmbeddedBibFilePdfExporter embeddedBibExporter = new EmbeddedBibFilePdfExporter(databaseContext.getMode(), entryTypesManager, fieldWriterPreferences);
         embeddedBibExporter.exportToFileByPath(databaseContext, database, filePreferences, file);
     }
 
