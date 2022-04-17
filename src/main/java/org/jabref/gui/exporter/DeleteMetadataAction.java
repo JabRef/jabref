@@ -92,13 +92,13 @@ public class DeleteMetadataAction extends SimpleCommand {
 
             if (entries.isEmpty()) {
                 dialogService.showErrorDialogAndWait(
-                        Localization.lang("Delete metadata to PDFs"),
+                        Localization.lang("Delete metadata from PDFs"),
                         Localization.lang("This operation requires one or more entries to be selected."));
                 shouldContinue = false;
                 return;
             } else {
                 boolean confirm = dialogService.showConfirmationDialogAndWait(
-                        Localization.lang("Delete metadata to PDFs"),
+                        Localization.lang("Delete metadata from PDFs"),
                         Localization.lang("Delete metadata for all PDFs in current library?"));
                 if (confirm) {
                     shouldContinue = false;
