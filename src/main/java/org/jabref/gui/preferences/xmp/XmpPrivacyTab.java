@@ -27,6 +27,7 @@ import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 public class XmpPrivacyTab extends AbstractPreferenceTabView<XmpPrivacyTabViewModel> implements PreferencesTab {
 
     @FXML private CheckBox enableXmpFilter;
+    @FXML private CheckBox selectAllFields;
     @FXML private TableView<Field> filterList;
     @FXML private TableColumn<Field, Field> fieldColumn;
     @FXML private TableColumn<Field, Field> actionsColumn;
@@ -50,9 +51,16 @@ public class XmpPrivacyTab extends AbstractPreferenceTabView<XmpPrivacyTabViewMo
         this.viewModel = new XmpPrivacyTabViewModel(dialogService, preferencesService.getXmpPreferences());
 
         enableXmpFilter.selectedProperty().bindBidirectional(viewModel.xmpFilterEnabledProperty());
+        selectAllFields.selectedProperty().bindBidirectional(viewModel.allFieldsSelectedProperty());
+        selectAllFields.disableProperty().bind(viewModel.xmpFilterEnabledProperty().not());
+
         filterList.disableProperty().bind(viewModel.xmpFilterEnabledProperty().not());
         addFieldName.disableProperty().bind(viewModel.xmpFilterEnabledProperty().not());
         addField.disableProperty().bind(viewModel.xmpFilterEnabledProperty().not());
+        // these are only enabled if and only if xmp-filter is checked and select-all-field is not checked
+        filterList.disableProperty().bind(viewModel.allFieldsSelectedProperty());
+        addFieldName.disableProperty().bind(viewModel.allFieldsSelectedProperty());
+        addField.disableProperty().bind(viewModel.allFieldsSelectedProperty());
 
         fieldColumn.setSortable(true);
         fieldColumn.setReorderable(false);

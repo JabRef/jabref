@@ -1,14 +1,8 @@
 package org.jabref.logic.exporter;
 
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.file.Path;
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Stream;
-
 import javafx.beans.property.SimpleObjectProperty;
-
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDPage;
 import org.jabref.logic.importer.fileformat.PdfXmpImporter;
 import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.database.BibDatabase;
@@ -19,14 +13,18 @@ import org.jabref.model.entry.Month;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.preferences.FilePreferences;
-
-import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.pdmodel.PDPage;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.file.Path;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -98,7 +96,7 @@ class XmpPdfExporterTest {
      */
     @BeforeEach
     void setUp() throws IOException {
-        xmpPreferences = new XmpPreferences(false, Collections.emptySet(), new SimpleObjectProperty<>(','));
+        xmpPreferences = new XmpPreferences(false, Collections.emptySet(), new SimpleObjectProperty<>(','), false);
 
         encoding = Charset.defaultCharset();
 

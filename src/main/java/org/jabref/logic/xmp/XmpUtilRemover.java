@@ -79,23 +79,30 @@ public class XmpUtilRemover {
             Field field = fieldValuePair.getKey();
             String fieldContent = fieldValuePair.getValue();
 
-            if (useXmpPrivacyFilter && xmpPreferences.getXmpPrivacyFilter().contains(field)) {
+            if (useXmpPrivacyFilter && xmpPreferences.getSelectAllFields().getValue()) {
+                // if delete all, no need to check if field is contained in xmp preference
+                deleteField(di, field);
+            } else if (useXmpPrivacyFilter && xmpPreferences.getXmpPrivacyFilter().contains(field)) {
                 // erase field instead of adding it
-                if (StandardField.AUTHOR.equals(field)) {
-                    di.setAuthor(null);
-                } else if (StandardField.TITLE.equals(field)) {
-                    di.setTitle(null);
-                } else if (StandardField.KEYWORDS.equals(field)) {
-                    di.setKeywords(null);
-                } else if (StandardField.ABSTRACT.equals(field)) {
-                    di.setSubject(null);
-                } else {
-                    di.setCustomMetadataValue("bibtex/" + field, null);
-                }
+                deleteField(di, field);
             }
         }
-
     }
+
+    private static void deleteField(PDDocumentInformation di, Field field) {
+        if (StandardField.AUTHOR.equals(field)) {
+            di.setAuthor(null);
+        } else if (StandardField.TITLE.equals(field)) {
+            di.setTitle(null);
+        } else if (StandardField.KEYWORDS.equals(field)) {
+            di.setKeywords(null);
+        } else if (StandardField.ABSTRACT.equals(field)) {
+            di.setSubject(null);
+        } else {
+            di.setCustomMetadataValue("bibtex/" + field, null);
+        }
+    }
+
     private static BibEntry getDefaultOrDatabaseEntry(BibEntry defaultEntry, BibDatabase database) {
         if (database == null) {
             return defaultEntry;
