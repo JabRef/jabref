@@ -5,6 +5,7 @@ import java.nio.file.Path;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.StringJoiner;
 import java.util.stream.Collectors;
 
 import javafx.application.Platform;
@@ -108,7 +109,9 @@ public class DeleteMetadataAction extends SimpleCommand {
             }
         }
 
-        errors = entriesChanged = skipped = 0;
+        errors = 0;
+        entriesChanged = 0;
+        skipped = 0;
 
         if (optionsDialog == null) {
             optionsDialog = new OptionsDialog();
@@ -118,6 +121,8 @@ public class DeleteMetadataAction extends SimpleCommand {
     }
 
     private void deleteMetadata() {
+        // use StringJoiner for messages
+        StringJoiner stringJoiner = new StringJoiner("\n");
         if (!shouldContinue || stateManager.getActiveDatabase().isEmpty()) {
             return;
         }
@@ -131,47 +136,38 @@ public class DeleteMetadataAction extends SimpleCommand {
                                     .collect(Collectors.toList());
             if (files.isEmpty()) {
                 skipped++;
-                Platform.runLater(() -> optionsDialog.getProgressArea()
-                                                     .appendText("  " + Localization.lang("Skipped - No PDF linked") + ".\n"));
+                stringJoiner.add("  " + Localization.lang("Skipped - No PDF linked") + ".");
             } else {
                 for (Path file : files) {
                     if (Files.exists(file)) {
                         try {
                             DeleteMetadataFromFile(file, entry, stateManager.getActiveDatabase().get(), database);
-                            Platform.runLater(
-                                    () -> optionsDialog.getProgressArea().appendText("  " + Localization.lang("OK") + ".\n"));
+                            stringJoiner.add("  " + Localization.lang("OK") + ".");
                             entriesChanged++;
                         } catch (Exception e) {
-                            Platform.runLater(() -> {
 
-                                optionsDialog.getProgressArea().appendText("  " + Localization.lang("Error while deleting") + " '"
-                                        + file.toString() + "':\n");
-                                optionsDialog.getProgressArea().appendText("    " + e.getLocalizedMessage() + "\n");
-                            });
+                            stringJoiner.add("  " + Localization.lang("Error while deleting '%0'", file.toString()) + ":");
+                            stringJoiner.add("    " + e.getLocalizedMessage() + "");
                             errors++;
                         }
                     } else {
                         skipped++;
-                        Platform.runLater(() -> {
-                            optionsDialog.getProgressArea()
-                                         .appendText("  " + Localization.lang("Skipped - PDF does not exist") + ":\n");
-                            optionsDialog.getProgressArea().appendText("    " + file.toString() + "\n");
-                        });
+                        stringJoiner.add("  " + Localization.lang("Skipped - PDF does not exist") + ":");
+                        stringJoiner.add("    " + file.toString() + "");
                     }
                 }
             }
             if (optionsDialog.isCanceled()) {
-                Platform.runLater(
-                        () -> optionsDialog.getProgressArea().appendText("\n" + Localization.lang("Operation canceled.") + "\n"));
+                stringJoiner.add("\n" + Localization.lang("Operation canceled."));
                 break;
             }
         }
+        stringJoiner.add("\n"
+                + Localization.lang("Finished deleting metadata for %0 file (%1 skipped, %2 errors).", String
+                .valueOf(entriesChanged), String.valueOf(skipped), String.valueOf(errors)));
         Platform.runLater(() -> {
             optionsDialog.getProgressArea()
-                         .appendText("\n"
-                                 // lang
-                                 + Localization.lang("Finished deleting metadata for %0 file (%1 skipped, %2 errors).", String
-                                 .valueOf(entriesChanged), String.valueOf(skipped), String.valueOf(errors)));
+                         .appendText(stringJoiner.toString());
             optionsDialog.done();
         });
 
@@ -181,8 +177,8 @@ public class DeleteMetadataAction extends SimpleCommand {
         dialogService.notify(Localization.lang("Finished deleting metadata for %0 file (%1 skipped, %2 errors).",
                 String.valueOf(entriesChanged), String.valueOf(skipped), String.valueOf(errors)));
     }
-
-    private void DeleteMetadataFromFile(Path file, BibEntry entry, BibDatabaseContext databaseContext, BibDatabase database) throws Exception {
+    // similar fix to
+    synchronized private void DeleteMetadataFromFile(Path file, BibEntry entry, BibDatabaseContext databaseContext, BibDatabase database) throws Exception {
         XmpUtilRemover.deleteXmp(file, entry, database, xmpPreferences);
         embeddedBibExporter.exportToFileByPath(databaseContext, database, filePreferences, file);
     }
