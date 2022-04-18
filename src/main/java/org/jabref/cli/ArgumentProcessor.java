@@ -178,7 +178,6 @@ public class ArgumentProcessor {
     }
 
     private List<ParserResult> processArguments() {
-
         if (!cli.isBlank() && cli.isDebugLogging()) {
             System.err.println("use java property -Dtinylog.level=debug");
         }
@@ -301,7 +300,6 @@ public class ArgumentProcessor {
 
         writeMetadatatoPdfByCitekey(databaseContext, dataBase, citeKeys, filePreferences, xmpPdfExporter, embeddedBibFilePdfExporter, writeXMP, embeddBibfile);
         writeMetadatatoPdfByFileNames(databaseContext, dataBase, pdfs, filePreferences, xmpPdfExporter, embeddedBibFilePdfExporter, writeXMP, embeddBibfile);
-
     }
 
     private void writeMetadatatoPDFsOfEntry(BibDatabaseContext databaseContext, String citeKey, BibEntry entry, FilePreferences filePreferences, XmpPdfExporter xmpPdfExporter, EmbeddedBibFilePdfExporter embeddedBibFilePdfExporter, boolean writeXMP, boolean embeddBibfile) {

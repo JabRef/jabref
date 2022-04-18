@@ -27,7 +27,6 @@ public class CitedKey implements
     private Optional<OOText> normCitMarker;  // For AuthorYear citation styles.
 
     CitedKey(String citationKey, CitationPath path, Citation citation) {
-
         this.citationKey = citationKey;
         this.where = new ArrayList<>(); // remember order
         this.where.add(path);

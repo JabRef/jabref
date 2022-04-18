@@ -77,12 +77,10 @@ public class IsbnViaOttoBibFetcherTest extends AbstractIsbnFetcherTest {
      * Checks whether the given ISBN is <emph>NOT</emph> available at any ISBN fetcher
      */
     @Test
-    public void testIsbnNeitherAvaiableOnEbookDeNorOrViaChimbori() throws Exception {
+    public void testIsbnNeitherAvailableOnEbookDeNorOrViaChimbori() throws Exception {
         // In this test, the ISBN needs to be a valid (syntax+checksum) ISBN number
         // However, the ISBN number must not be assigned to a real book
         Optional<BibEntry> fetchedEntry = fetcher.performSearchById("978-8-8264-2303-6");
         assertEquals(Optional.empty(), fetchedEntry);
-
     }
-
 }

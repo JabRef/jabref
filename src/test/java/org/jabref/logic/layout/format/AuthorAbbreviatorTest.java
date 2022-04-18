@@ -13,7 +13,6 @@ public class AuthorAbbreviatorTest {
 
     @Test
     public void testFormat() {
-
         LayoutFormatter a = new AuthorLastFirstAbbreviator();
         LayoutFormatter b = new AuthorAbbreviator();
 

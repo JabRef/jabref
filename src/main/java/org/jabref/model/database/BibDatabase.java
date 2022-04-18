@@ -437,7 +437,6 @@ public class BibDatabase {
      * given BibtexEntries is modified.
      */
     public BibEntry resolveForStrings(BibEntry entry, boolean inPlace) {
-
         BibEntry resultingEntry;
         if (inPlace) {
             resultingEntry = entry;
@@ -504,7 +503,6 @@ public class BibDatabase {
             int piv = 0;
             int next;
             while ((next = res.indexOf(FieldWriter.BIBTEX_STRING_START_END_SYMBOL, piv)) >= 0) {
-
                 // We found the next string ref. Append the text
                 // up to it.
                 if (next > 0) {
@@ -646,5 +644,4 @@ public class BibDatabase {
     public String getNewLineSeparator() {
         return newLineSeparator;
     }
-
 }

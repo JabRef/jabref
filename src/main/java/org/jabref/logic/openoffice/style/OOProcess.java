@@ -54,7 +54,6 @@ public class OOProcess {
      *  according to style.
      */
     public static void produceCitationMarkers(CitationGroups citationGroups, List<BibDatabase> databases, OOBibStyle style) {
-
         if (!citationGroups.hasGlobalOrder()) {
             throw new IllegalStateException("produceCitationMarkers: globalOrder is misssing in citationGroups");
         }
@@ -71,5 +70,4 @@ public class OOProcess {
             OOProcessAuthorYearMarkers.produceCitationMarkers(citationGroups, style);
         }
     }
-
 }

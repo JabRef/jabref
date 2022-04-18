@@ -41,7 +41,6 @@ public class HtmlToLatexFormatter extends Formatter implements LayoutFormatter {
         // Note that (at least) the IEEE Xplore fetcher must be fixed as it relies on the current way to
         // remove tags for its image alt-tag to equation converter
         for (int i = 0; i < result.length(); i++) {
-
             int c = result.charAt(i);
 
             if (c == '<') {

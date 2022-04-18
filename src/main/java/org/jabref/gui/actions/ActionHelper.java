@@ -57,7 +57,6 @@ public class ActionHelper {
     }
 
     public static BooleanExpression isFilePresentForSelectedEntry(StateManager stateManager, PreferencesService preferencesService) {
-
         ObservableList<BibEntry> selectedEntries = stateManager.getSelectedEntries();
         Binding<Boolean> fileIsPresent = EasyBind.valueAt(selectedEntries, 0).map(entry -> {
             List<LinkedFile> files = entry.getFiles();
@@ -75,7 +74,6 @@ public class ActionHelper {
             } else {
                 return false;
             }
-
         }).orElse(false);
 
         return BooleanExpression.booleanExpression(fileIsPresent);

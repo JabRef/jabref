@@ -142,7 +142,6 @@ public class DefaultTaskExecutor implements TaskExecutor {
 
     private <V> Task<V> getJavaFXTask(BackgroundTask<V> task) {
         Task<V> javaTask = new Task<V>() {
-
             {
                 this.updateMessage(task.messageProperty().get());
                 this.updateTitle(task.titleProperty().get());

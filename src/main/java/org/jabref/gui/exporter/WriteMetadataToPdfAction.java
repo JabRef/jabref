@@ -89,7 +89,6 @@ public class WriteMetadataToPdfAction extends SimpleCommand {
         entries = stateManager.getSelectedEntries();
 
         if (entries.isEmpty()) {
-
             entries = database.getEntries();
 
             if (entries.isEmpty()) {

@@ -86,5 +86,4 @@ public class IsbnViaEbookDeFetcherTest extends AbstractIsbnFetcherTest {
         Optional<BibEntry> fetchedEntry = fetcher.performSearchById("3728128155");
         assertEquals(Optional.empty(), fetchedEntry);
     }
-
 }

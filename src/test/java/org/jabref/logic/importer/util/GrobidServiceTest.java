@@ -89,5 +89,4 @@ public class GrobidServiceTest {
         assertEquals(Optional.of("Paper Title"), be0.getField(StandardField.TITLE));
         assertEquals(Optional.of("2014-10-05"), be0.getField(StandardField.DATE));
     }
-
 }

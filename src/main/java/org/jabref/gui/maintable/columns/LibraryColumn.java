@@ -21,5 +21,4 @@ public class LibraryColumn extends MainTableColumn<String> {
     public LibraryColumn() {
         this(new MainTableColumnModel(Type.LIBRARY_NAME));
     }
-
 }

@@ -16,5 +16,4 @@ public interface ParamLayoutFormatter extends LayoutFormatter {
      * @param arg A String argument.
      */
     void setArgument(String arg);
-
 }
