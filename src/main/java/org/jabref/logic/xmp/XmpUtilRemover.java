@@ -3,17 +3,14 @@ package org.jabref.logic.xmp;
 import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDDocumentInformation;
-
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.xml.transform.TransformerException;
-
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -26,16 +23,16 @@ public class XmpUtilRemover {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(XmpUtilWriter.class);
 
+
     public static void deleteXmp(Path file, BibEntry entry,
-                                 BibDatabase database, XmpPreferences xmpPreferences) throws IOException, TransformerException {
+                                BibDatabase database, XmpPreferences xmpPreferences) throws IOException, TransformerException {
         List<BibEntry> bibEntryList = new ArrayList<>();
         bibEntryList.add(entry);
         XmpUtilRemover.deleteXmp(file, bibEntryList, database, xmpPreferences);
     }
-
     public static void deleteXmp(Path path,
-                                 List<BibEntry> bibtexEntries, BibDatabase database,
-                                 XmpPreferences xmpPreferences) throws IOException, TransformerException {
+                                List<BibEntry> bibtexEntries, BibDatabase database,
+                                XmpPreferences xmpPreferences) throws IOException, TransformerException {
 
         List<BibEntry> resolvedEntries;
         if (database == null) {
@@ -53,6 +50,7 @@ public class XmpUtilRemover {
             // Write schemas (PDDocumentInformation and DublinCoreSchema) to the document metadata
             if (resolvedEntries.size() > 0) {
                 XmpUtilRemover.deleteDocumentInformation(document, resolvedEntries.get(0), null, xmpPreferences);
+
             }
 
             // Save
@@ -67,7 +65,7 @@ public class XmpUtilRemover {
     }
 
     private static void deleteDocumentInformation(PDDocument document,
-                                                  BibEntry entry, BibDatabase database, XmpPreferences xmpPreferences) {
+                                                 BibEntry entry, BibDatabase database, XmpPreferences xmpPreferences) {
 
         PDDocumentInformation di = document.getDocumentInformation();
 
@@ -112,4 +110,5 @@ public class XmpUtilRemover {
             return database.resolveForStrings(defaultEntry, false);
         }
     }
+
 }

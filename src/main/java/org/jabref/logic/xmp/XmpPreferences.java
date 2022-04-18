@@ -1,13 +1,13 @@
 package org.jabref.logic.xmp;
 
-import java.util.Set;
-
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableSet;
 import org.jabref.model.entry.field.Field;
+
+import java.util.Set;
 
 public class XmpPreferences {
 
