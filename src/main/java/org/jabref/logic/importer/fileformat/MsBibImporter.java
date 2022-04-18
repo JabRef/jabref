@@ -93,6 +93,7 @@ public class MsBibImporter extends Importer {
     /**
      * DocumentBuilderFactory makes a XXE safe Builder factory from dBuild. If not supported by current
      * XML then returns original builder given and logs error.
+     *
      * @param dBuild | DocumentBuilderFactory to be made XXE safe.
      * @return If supported, XXE safe DocumentBuilderFactory. Else, returns original builder given
      */

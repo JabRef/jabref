@@ -925,7 +925,6 @@ public class VM implements Warn {
      * field variable is marked as missing for the entry.
      * <p>
      * We use null for the missing entry designator.
-     * @param bibDatabase
      */
     private void read(BibDatabase bibDatabase) {
         FieldWriter fieldWriter = new FieldWriter(new FieldWriterPreferences(true, List.of(StandardField.MONTH), new FieldContentFormatterPreferences()));

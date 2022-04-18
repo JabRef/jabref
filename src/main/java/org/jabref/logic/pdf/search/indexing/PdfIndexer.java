@@ -111,6 +111,7 @@ public class PdfIndexer {
 
     /**
      * Removes a pdf file linked to one entry in the database from the index
+     *
      * @param entry the entry the file is linked to
      * @param linkedFile the link to the file to be removed
      */
@@ -130,6 +131,7 @@ public class PdfIndexer {
 
     /**
      * Removes  all files linked to a bib-entry from the index
+     *
      * @param entry the entry documents are linked to
      */
     public void removeFromIndex(BibEntry entry) {
@@ -138,6 +140,7 @@ public class PdfIndexer {
 
     /**
      * Removes a list of files linked to a bib-entry from the index
+     *
      * @param entry the entry documents are linked to
      */
     public void removeFromIndex(BibEntry entry, List<LinkedFile> linkedFiles) {
@@ -162,6 +165,7 @@ public class PdfIndexer {
     /**
      * Writes all files linked to an entry to the index if the files are not yet in the index or the files on the fs are
      * newer than the one in the index.
+     *
      * @param entry the entry associated with the file
      */
     private void writeToIndex(BibEntry entry) {
@@ -173,6 +177,7 @@ public class PdfIndexer {
     /**
      * Writes the file to the index if the file is not yet in the index or the file on the fs is newer than the one in
      * the index.
+     *
      * @param entry the entry associated with the file
      * @param linkedFile the file to write to the index
      */

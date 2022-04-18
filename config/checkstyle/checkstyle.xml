@@ -32,6 +32,7 @@
             <property name="allowMissingParamTags" value="true"/>
             <property name="allowMissingReturnTag" value="true"/>
         </module>
+        <module name="RequireEmptyLineBeforeBlockTagGroup"/>
 
         <!-- Checks for imports: https://checkstyle.org/config_import.html -->
 

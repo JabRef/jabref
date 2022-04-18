@@ -258,6 +258,7 @@ public class StringUtil {
      * Decodes an encoded double String array back into array form. The array
      * is assumed to be square, and delimited by the characters ';' (first dim) and
      * ':' (second dim).
+     *
      * @param value The encoded String to be decoded.
      * @return The decoded String array.
      */
@@ -413,6 +414,7 @@ public class StringUtil {
     /**
      * Checks if the given String has exactly one pair of surrounding curly braces <br>
      * Strings with escaped characters in curly braces at the beginning and end are respected, too
+     *
      * @param toCheck The string to check
      * @return True, if the check was succesful. False otherwise.
      */

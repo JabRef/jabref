@@ -293,6 +293,7 @@ public class BibDatabase {
     /**
      * Replaces the existing lists of BibTexString with the given one
      * Duplicates throw KeyCollisionException
+     *
      * @param stringsToAdd The collection of strings to set
      */
     public void setStrings(List<BibtexString> stringsToAdd) {
@@ -634,6 +635,7 @@ public class BibDatabase {
 
     /**
      * Set the newline separator.
+     *
      * @param newLineSeparator
      */
     public void setNewLineSeparator(String newLineSeparator) {
