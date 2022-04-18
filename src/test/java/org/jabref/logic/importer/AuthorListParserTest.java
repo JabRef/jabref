@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class AuthorListParserTest {
 
-    private static Stream<Arguments> data() {
+    private static Stream<Arguments> parseCorrectlySingleAuthors() {
         return Stream.of(
                 Arguments.of("王, 军", new Author("军", "军.", null, "王", null)),
                 Arguments.of("Doe, John", new Author("John", "J.", null, "Doe", null)),
@@ -30,16 +30,44 @@ class AuthorListParserTest {
     }
 
     @ParameterizedTest
-    @MethodSource("data")
-    void parseCorrectly(String authorsString, Author authorsParsed) {
+    @MethodSource
+    void parseCorrectlySingleAuthors(String authorsString, Author authorsParsed) {
         AuthorListParser parser = new AuthorListParser();
         Assertions.assertEquals(AuthorList.of(authorsParsed), parser.parse(authorsString));
     }
 
+    private static Stream<Arguments> parseCorrectlyMultipleAuthors() {
+        return Stream.of(
+                Arguments.of("First Habermann, Frank Leymann",
+                        AuthorList.of(
+                                new Author("First", "F.", null, "Habermann", null),
+                                new Author("Frank", "F.", null, "Leymann", null)
+                        )),
+                Arguments.of("Hans-Joachim Habermann, Frank Leymann",
+                        AuthorList.of(
+                                new Author("Hans-Joachim", "H.-J.", null, "Habermann", null),
+                                new Author("Frank", "F.", null, "Leymann", null)
+                        )),
+                // Example from code comment
+                Arguments.of("Ali Babar, M., Dingsøyr, T., Lago, P., van der Vliet, H.",
+                        AuthorList.of(
+                                new Author("M.", "M.", null, "Ali Babar", null),
+                                new Author("T.", "T.", null, "Dingsøyr", null),
+                                new Author("P.", "P.", null, "Lago", null),
+                                new Author("H.", "H.", "van der", "Vliet", null)
+                        )));
+    }
+
+    @ParameterizedTest
+    @MethodSource
+    void parseCorrectlyMultipleAuthors(String authorsString, AuthorList authorsParsed) {
+        AuthorListParser parser = new AuthorListParser();
+        Assertions.assertEquals(authorsParsed, parser.parse(authorsString));
+    }
+
     @Test
     public void parseAuthorWithFirstNameAbbreviationContainingUmlaut() {
-        assertEquals(AuthorList.of(
-                new Author("{\\OE}rjan", "{\\OE}.", null, "Umlauts", null)),
+        assertEquals(AuthorList.of(new Author("{\\OE}rjan", "{\\OE}.", null, "Umlauts", null)),
                 new AuthorListParser().parse("{\\OE}rjan Umlauts"));
     }
 }

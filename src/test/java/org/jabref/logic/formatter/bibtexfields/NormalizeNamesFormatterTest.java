@@ -1,7 +1,12 @@
 package org.jabref.logic.formatter.bibtexfields;
 
+import java.util.stream.Stream;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -134,10 +139,19 @@ public class NormalizeNamesFormatterTest {
         assertEquals("Mair, Jr, Daniel and Brühl, Sr, Daniel", formatter.format("Mair, Jr, Daniel, Brühl, Sr, Daniel"));
     }
 
-    @Test
-    public void testCommaSeperatedNames() {
-        assertEquals("Bosoi, Cristina and Oliveira, Mariana and Sanchez, Rafael Ochoa and Tremblay, Mélanie and TenHave, Gabrie and Deutz, Nicoolas and Rose, Christopher F. and Bemeur, Chantal",
-                formatter.format("Cristina Bosoi, Mariana Oliveira, Rafael Ochoa Sanchez, Mélanie Tremblay, Gabrie TenHave, Nicoolas Deutz, Christopher F. Rose, Chantal Bemeur"));
+    public static Stream<Arguments> testCommaSeperatedNames() {
+        return Stream.of(
+                Arguments.of("Bosoi, Cristina and Oliveira, Mariana and Sanchez, Rafael Ochoa and Tremblay, Mélanie and TenHave, Gabrie and Deutz, Nicoolas and Rose, Christopher F. and Bemeur, Chantal",
+                        "Cristina Bosoi, Mariana Oliveira, Rafael Ochoa Sanchez, Mélanie Tremblay, Gabrie TenHave, Nicoolas Deutz, Christopher F. Rose, Chantal Bemeur"),
+                Arguments.of("Habermann, Hans-Joachim  and Leymann, Frank",
+                        "Hans-Joachim Habermann, Frank Leymann")
+        );
+    }
+
+    @MethodSource
+    @ParameterizedTest
+    public void testCommaSeperatedNames(String expected, String source) {
+        assertEquals(expected, formatter.format(source));
     }
 
     @Test

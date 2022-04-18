@@ -101,41 +101,50 @@ public class AuthorListParser {
         final boolean authorsContainAND = listOfNames.toUpperCase(Locale.ENGLISH).contains(" AND ");
         final boolean authorsContainOpeningBrace = listOfNames.contains("{");
         final boolean authorsContainSemicolon = listOfNames.contains(";");
-        final boolean authorsContainTwoOrMoreCommas = (listOfNames.length() - listOfNames.replace(",", "").length()) >= 2;
-        if (!authorsContainAND && !authorsContainOpeningBrace && !authorsContainSemicolon && authorsContainTwoOrMoreCommas) {
-            List<String> arrayNameList = Arrays.asList(listOfNames.split(","));
+        if (!authorsContainAND && !authorsContainOpeningBrace && !authorsContainSemicolon) {
+            final boolean authorsContainTwoOrMoreCommas = (listOfNames.length() - listOfNames.replace(",", "").length()) >= 2;
+            if (authorsContainTwoOrMoreCommas) {
+                List<String> arrayNameList = Arrays.asList(listOfNames.split(","));
 
-            // Delete spaces for correct case identification
-            arrayNameList.replaceAll(String::trim);
+                // Delete spaces for correct case identification
+                arrayNameList.replaceAll(String::trim);
 
-            // Looking for space between pre- and lastname
-            boolean spaceInAllParts = arrayNameList.stream().filter(name -> name.contains(" "))
-                                                   .count() == arrayNameList.size();
+                // Looking for space between pre- and lastname
+                boolean spaceInAllParts = arrayNameList.stream().filter(name -> name.contains(" "))
+                                                       .count() == arrayNameList.size();
 
-            // We hit the comma name separator case
-            // Usually the getAsLastFirstNamesWithAnd method would separate them if pre- and lastname are separated with "and"
-            // If not, we check if spaces separate pre- and lastname
-            if (spaceInAllParts) {
-                listOfNames = listOfNames.replaceAll(",", " and");
-            } else {
-                // Looking for name affixes to avoid
-                // arrayNameList needs to reduce by the count off avoiding terms
-                // valuePartsCount holds the count of name parts without the avoided terms
+                // We hit the comma name separator case
+                // Usually the getAsLastFirstNamesWithAnd method would separate them if pre- and lastname are separated with "and"
+                // If not, we check if spaces separate pre- and lastname
+                if (spaceInAllParts) {
+                    listOfNames = listOfNames.replaceAll(",", " and");
+                } else {
+                    // Looking for name affixes to avoid
+                    // arrayNameList needs to reduce by the count off avoiding terms
+                    // valuePartsCount holds the count of name parts without the avoided terms
 
-                int valuePartsCount = arrayNameList.size();
-                // Holds the index of each term which needs to be avoided
-                Collection<Integer> avoidIndex = new HashSet<>();
+                    int valuePartsCount = arrayNameList.size();
+                    // Holds the index of each term which needs to be avoided
+                    Collection<Integer> avoidIndex = new HashSet<>();
 
-                for (int i = 0; i < arrayNameList.size(); i++) {
-                    if (AVOID_TERMS_IN_LOWER_CASE.contains(arrayNameList.get(i).toLowerCase(Locale.ROOT))) {
-                        avoidIndex.add(i);
-                        valuePartsCount--;
+                    for (int i = 0; i < arrayNameList.size(); i++) {
+                        if (AVOID_TERMS_IN_LOWER_CASE.contains(arrayNameList.get(i).toLowerCase(Locale.ROOT))) {
+                            avoidIndex.add(i);
+                            valuePartsCount--;
+                        }
+                    }
+
+                    if ((valuePartsCount % 2) == 0) {
+                        // We hit the described special case with name affix like Jr
+                        listOfNames = buildWithAffix(avoidIndex, arrayNameList).toString();
                     }
                 }
-
-                if ((valuePartsCount % 2) == 0) {
-                    // We hit the described special case with name affix like Jr
-                    listOfNames = buildWithAffix(avoidIndex, arrayNameList).toString();
+            } else {
+                // special case: one comma
+                // This could be i) "Firstname Lastname, Firstname2 Lastname2" or ii) "Lastname, Firstname"
+                final long countOfSpace = listOfNames.chars().filter(ch -> ch == ' ').count();
+                if (countOfSpace == 3) {
+                    listOfNames = listOfNames.replaceAll(", ", " AND ");
                 }
             }
         }
