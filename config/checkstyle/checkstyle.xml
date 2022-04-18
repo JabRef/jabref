@@ -33,6 +33,7 @@
             <property name="allowMissingReturnTag" value="true"/>
         </module>
         <module name="RequireEmptyLineBeforeBlockTagGroup"/>
+        <module name="JavadocMissingLeadingAsteriskCheck"/>
 
         <!-- Checks for imports: https://checkstyle.org/config_import.html -->
 
