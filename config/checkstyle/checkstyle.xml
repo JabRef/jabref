@@ -137,5 +137,7 @@
 
         <module name="MissingDeprecated"/>
 
+        <!-- Checks for illegal usage of reserved names as identifier names, such as "var", "record" - https://checkstyle.sourceforge.io/config_naming.html#IllegalIdentifierName -->
+        <module name="IllegalIdentifierName"/>
     </module>
 </module>
