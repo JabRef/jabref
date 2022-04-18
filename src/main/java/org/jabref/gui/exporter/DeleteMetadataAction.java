@@ -1,5 +1,12 @@
 package org.jabref.gui.exporter;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
 import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
@@ -12,6 +19,7 @@ import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
+
 import org.jabref.gui.DialogService;
 import org.jabref.gui.FXDialog;
 import org.jabref.gui.StateManager;
@@ -30,13 +38,6 @@ import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.preferences.FilePreferences;
-
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static org.jabref.gui.actions.ActionHelper.needsDatabase;
 
@@ -74,7 +75,7 @@ public class DeleteMetadataAction extends SimpleCommand {
     public void execute() {
         init();
         BackgroundTask.wrap(this::deleteMetadata)
-                .executeWith(taskExecutor);
+                      .executeWith(taskExecutor);
     }
 
     public void init() {
@@ -116,6 +117,7 @@ public class DeleteMetadataAction extends SimpleCommand {
         //lang
         dialogService.notify(Localization.lang("Deleting metadata..."));
     }
+
     private void deleteMetadata() {
         if (!shouldContinue || stateManager.getActiveDatabase().isEmpty()) {
             return;
@@ -123,15 +125,15 @@ public class DeleteMetadataAction extends SimpleCommand {
         for (BibEntry entry : entries) {
             // Make a list of all PDFs linked from this entry:
             List<Path> files = entry.getFiles().stream()
-                    .map(file -> file.findIn(stateManager.getActiveDatabase().get(), filePreferences))
-                    .filter(Optional::isPresent)
-                    .map(Optional::get)
-                    .filter(path -> FileUtil.isPDFFile(path))
-                    .collect(Collectors.toList());
+                                    .map(file -> file.findIn(stateManager.getActiveDatabase().get(), filePreferences))
+                                    .filter(Optional::isPresent)
+                                    .map(Optional::get)
+                                    .filter(path -> FileUtil.isPDFFile(path))
+                                    .collect(Collectors.toList());
             if (files.isEmpty()) {
                 skipped++;
                 Platform.runLater(() -> optionsDialog.getProgressArea()
-                        .appendText("  " + Localization.lang("Skipped - No PDF linked") + ".\n"));
+                                                     .appendText("  " + Localization.lang("Skipped - No PDF linked") + ".\n"));
             } else {
                 for (Path file : files) {
                     if (Files.exists(file)) {
@@ -153,7 +155,7 @@ public class DeleteMetadataAction extends SimpleCommand {
                         skipped++;
                         Platform.runLater(() -> {
                             optionsDialog.getProgressArea()
-                                    .appendText("  " + Localization.lang("Skipped - PDF does not exist") + ":\n");
+                                         .appendText("  " + Localization.lang("Skipped - PDF does not exist") + ":\n");
                             optionsDialog.getProgressArea().appendText("    " + file.toString() + "\n");
                         });
                     }
@@ -167,10 +169,10 @@ public class DeleteMetadataAction extends SimpleCommand {
         }
         Platform.runLater(() -> {
             optionsDialog.getProgressArea()
-                    .appendText("\n"
-                            // lang
-                            + Localization.lang("Finished deleting metadata for %0 file (%1 skipped, %2 errors).", String
-                            .valueOf(entriesChanged), String.valueOf(skipped), String.valueOf(errors)));
+                         .appendText("\n"
+                                 // lang
+                                 + Localization.lang("Finished deleting metadata for %0 file (%1 skipped, %2 errors).", String
+                                 .valueOf(entriesChanged), String.valueOf(skipped), String.valueOf(errors)));
             optionsDialog.done();
         });
 
@@ -179,13 +181,12 @@ public class DeleteMetadataAction extends SimpleCommand {
         }
         dialogService.notify(Localization.lang("Finished deleting metadata for %0 file (%1 skipped, %2 errors).",
                 String.valueOf(entriesChanged), String.valueOf(skipped), String.valueOf(errors)));
-
     }
+
     private void DeleteMetadataFromFile(Path file, BibEntry entry, BibDatabaseContext databaseContext, BibDatabase database) throws Exception {
         XmpUtilRemover.deleteXmp(file, entry, database, xmpPreferences);
         embeddedBibExporter.exportToFileByPath(databaseContext, database, filePreferences, file);
     }
-
 
     class OptionsDialog extends FXDialog {
 

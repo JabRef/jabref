@@ -1,10 +1,42 @@
 package org.jabref.preferences;
 
-import com.tobiasdiez.easybind.EasyBind;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.Reader;
+import java.io.StringReader;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.UUID;
+import java.util.prefs.BackingStoreException;
+import java.util.prefs.InvalidPreferencesFormatException;
+import java.util.prefs.Preferences;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import javafx.beans.InvalidationListener;
 import javafx.collections.SetChangeListener;
 import javafx.scene.control.TableColumn.SortType;
-import net.harawata.appdirs.AppDirsFactory;
+
 import org.jabref.gui.Globals;
 import org.jabref.gui.autocompleter.AutoCompleteFirstNameMode;
 import org.jabref.gui.autocompleter.AutoCompletePreferences;
@@ -81,31 +113,18 @@ import org.jabref.model.pdf.search.SearchFieldConstants;
 import org.jabref.model.push.PushToApplicationConstants;
 import org.jabref.model.search.rules.SearchRules;
 import org.jabref.model.strings.StringUtil;
+
+import com.tobiasdiez.easybind.EasyBind;
+import net.harawata.appdirs.AppDirsFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.*;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.*;
-import java.util.prefs.BackingStoreException;
-import java.util.prefs.InvalidPreferencesFormatException;
-import java.util.prefs.Preferences;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
 /**
- * The {@code JabRefPreferences} class provides the preferences and their defaults using the JDK {@code java.util.prefs}
- * class.
+ * The {@code JabRefPreferences} class provides the preferences and their defaults using the JDK {@code java.util.prefs} class.
  * <p>
- * Internally it defines symbols used to pick a value from the {@code java.util.prefs} interface and keeps a hashmap
- * with all the default values.
+ * Internally it defines symbols used to pick a value from the {@code java.util.prefs} interface and keeps a hashmap with all the default values.
  * <p>
- * There are still some similar preferences classes (OpenOfficePreferences and SharedDatabasePreferences) which also use
- * the {@code java.util.prefs} API.
+ * There are still some similar preferences classes (OpenOfficePreferences and SharedDatabasePreferences) which also use the {@code java.util.prefs} API.
  */
 public class JabRefPreferences implements PreferencesService {
 
@@ -275,16 +294,7 @@ public class JabRefPreferences implements PreferencesService {
     public static final String VALIDATE_IN_ENTRY_EDITOR = "validateInEntryEditor";
 
     /**
-     * The OpenOffice/LibreOffice connection preferences are:
-     * OO_PATH main directory for OO/LO installation, used to detect location on Win/macOS when using manual connect
-     * OO_EXECUTABLE_PATH path to soffice-file
-     * OO_JARS_PATH directory that contains juh.jar, jurt.jar, ridl.jar, unoil.jar
-     * OO_SYNC_WHEN_CITING true if the reference list is updated when adding a new citation
-     * OO_SHOW_PANEL true if the OO panel is shown on startup
-     * OO_USE_ALL_OPEN_DATABASES true if all databases should be used when citing
-     * OO_BIBLIOGRAPHY_STYLE_FILE path to the used style file
-     * OO_EXTERNAL_STYLE_FILES list with paths to external style files
-     * STYLES_*_* size and position of "Select style" dialog
+     * The OpenOffice/LibreOffice connection preferences are: OO_PATH main directory for OO/LO installation, used to detect location on Win/macOS when using manual connect OO_EXECUTABLE_PATH path to soffice-file OO_JARS_PATH directory that contains juh.jar, jurt.jar, ridl.jar, unoil.jar OO_SYNC_WHEN_CITING true if the reference list is updated when adding a new citation OO_SHOW_PANEL true if the OO panel is shown on startup OO_USE_ALL_OPEN_DATABASES true if all databases should be used when citing OO_BIBLIOGRAPHY_STYLE_FILE path to the used style file OO_EXTERNAL_STYLE_FILES list with paths to external style files STYLES_*_* size and position of "Select style" dialog
      */
     public static final String OO_EXECUTABLE_PATH = "ooExecutablePath";
     public static final String OO_PATH = "ooPath";
@@ -894,8 +904,7 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     /**
-     * Puts a list of strings into the Preferences, by linking its elements with a STRINGLIST_DELIMITER into a single
-     * string. Escape characters make the process transparent even if strings contains a STRINGLIST_DELIMITER.
+     * Puts a list of strings into the Preferences, by linking its elements with a STRINGLIST_DELIMITER into a single string. Escape characters make the process transparent even if strings contains a STRINGLIST_DELIMITER.
      */
     public void putStringList(String key, List<String> value) {
         if (value == null) {
@@ -1062,8 +1071,7 @@ public class JabRefPreferences implements PreferencesService {
      * Imports Preferences from an XML file.
      *
      * @param file Path of file to import from
-     * @throws JabRefException thrown if importing the preferences failed due to an InvalidPreferencesFormatException or
-     *                         an IOException
+     * @throws JabRefException thrown if importing the preferences failed due to an InvalidPreferencesFormatException or an IOException
      */
     @Override
     public void importPreferences(Path file) throws JabRefException {
@@ -1901,21 +1909,21 @@ public class JabRefPreferences implements PreferencesService {
     public List<MainTableColumnModel> updateColumns(String columnNamesList, String columnWidthList, String sortTypeList, double defaultWidth) {
         List<String> columnNames = getStringList(columnNamesList);
         List<Double> columnWidths = getStringList(columnWidthList)
-                                                                  .stream()
-                                                                  .map(string -> {
-                                                                      try {
-                                                                          return Double.parseDouble(string);
-                                                                      } catch (NumberFormatException e) {
-                                                                          LOGGER.error("Exception while parsing column widths. Choosing default.", e);
-                                                                          return defaultWidth;
-                                                                      }
-                                                                  })
-                                                                  .collect(Collectors.toList());
+                .stream()
+                .map(string -> {
+                    try {
+                        return Double.parseDouble(string);
+                    } catch (NumberFormatException e) {
+                        LOGGER.error("Exception while parsing column widths. Choosing default.", e);
+                        return defaultWidth;
+                    }
+                })
+                .collect(Collectors.toList());
 
         List<SortType> columnSortTypes = getStringList(sortTypeList)
-                                                                    .stream()
-                                                                    .map(SortType::valueOf)
-                                                                    .collect(Collectors.toList());
+                .stream()
+                .map(SortType::valueOf)
+                .collect(Collectors.toList());
 
         List<MainTableColumnModel> columns = new ArrayList<>();
         for (int i = 0; i < columnNames.size(); i++) {
@@ -1968,8 +1976,8 @@ public class JabRefPreferences implements PreferencesService {
     @Override
     public ColumnPreferences getSearchDialogColumnPreferences() {
         return new ColumnPreferences(
-                                     createSearchDialogColumns(),
-                                     createSearchDialogColumnSortOrder());
+                createSearchDialogColumns(),
+                createSearchDialogColumnSortOrder());
     }
 
     /**
