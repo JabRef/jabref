@@ -61,7 +61,6 @@ public class EditExternalFileTypeViewModel {
     }
 
     public void storeSettings() {
-
         fileType.setName(nameProperty.getValue().trim());
         fileType.setMimeType(mimeTypeProperty.getValue().trim());
 

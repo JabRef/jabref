@@ -148,7 +148,6 @@ public class ModsImporter extends Importer implements Parser {
         List<String> notes = new ArrayList<>();
 
         for (Object groupElement : modsGroup) {
-
             // Get the element. Only one of the elements should be not an empty optional.
             Optional<AbstractDefinition> abstractDefinition = getElement(groupElement, AbstractDefinition.class);
             Optional<GenreDefinition> genreDefinition = getElement(groupElement, GenreDefinition.class);
@@ -195,7 +194,6 @@ public class ModsImporter extends Importer implements Parser {
             identifierDefinition.ifPresent(identifier -> parseIdentifier(fields, identifier, entry));
 
             titleInfoDefinition.ifPresent(titleInfo -> parseTitle(fields, titleInfo.getTitleOrSubTitleOrPartNumber()));
-
         }
 
         // The element subject can appear more than one time, that's why the keywords has to be put out of the for loop
@@ -203,7 +201,6 @@ public class ModsImporter extends Importer implements Parser {
         // same goes for authors and notes
         putIfListIsNotEmpty(fields, authors, StandardField.AUTHOR, " and ");
         putIfListIsNotEmpty(fields, notes, StandardField.NOTE, ", ");
-
     }
 
     private void parseTitle(Map<Field, String> fields, List<Object> titleOrSubTitleOrPartNumber) {
@@ -394,7 +391,6 @@ public class ModsImporter extends Importer implements Parser {
     private void putDate(Map<Field, String> fields, String elementName, DateDefinition date) {
         if (date.getValue() != null) {
             switch (elementName) {
-
                 case "dateIssued":
                     // The first 4 digits of dateIssued should be the year
                     fields.put(StandardField.YEAR, date.getValue().replaceAll("[^0-9]*", "").replaceAll("\\(\\d?\\d?\\d?\\d?.*\\)", "\1"));

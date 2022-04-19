@@ -42,7 +42,6 @@ public class FieldFormatterCleanupsTest {
 
     @Test
     public void checkSimpleUseCase() {
-
         FieldFormatterCleanups actions = new FieldFormatterCleanups(true, Cleanups.parse("title[identity]"));
 
         FieldFormatterCleanup identityInTitle = new FieldFormatterCleanup(StandardField.TITLE, new IdentityFormatter());
@@ -66,7 +65,6 @@ public class FieldFormatterCleanupsTest {
 
     @Test
     public void checkLowerCaseSaveAction() {
-
         FieldFormatterCleanups actions = new FieldFormatterCleanups(true, Cleanups.parse("title[lower_case]"));
 
         FieldFormatterCleanup lowerCaseTitle = new FieldFormatterCleanup(StandardField.TITLE, new LowerCaseFormatter());
@@ -92,7 +90,6 @@ public class FieldFormatterCleanupsTest {
 
     @Test
     public void checkThreeSaveActionsForOneField() {
-
         FieldFormatterCleanups actions = new FieldFormatterCleanups(true, Cleanups.parse("title[lower_case,identity,normalize_date]"));
 
         FieldFormatterCleanup lowerCaseTitle = new FieldFormatterCleanup(StandardField.TITLE, new LowerCaseFormatter());
@@ -107,7 +104,6 @@ public class FieldFormatterCleanupsTest {
 
     @Test
     public void checkMultipleSaveActions() {
-
         FieldFormatterCleanups actions = new FieldFormatterCleanups(true, Cleanups.parse("pages[normalize_page_numbers]title[lower_case]"));
         List<FieldFormatterCleanup> formatterCleanups = actions.getConfiguredActions();
 
@@ -123,7 +119,6 @@ public class FieldFormatterCleanupsTest {
 
     @Test
     public void checkMultipleSaveActionsWithMultipleFormatters() {
-
         FieldFormatterCleanups actions = new FieldFormatterCleanups(true,
                 Cleanups.parse("pages[normalize_page_numbers,normalize_date]title[lower_case]"));
         List<FieldFormatterCleanup> formatterCleanups = actions.getConfiguredActions();

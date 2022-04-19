@@ -335,5 +335,4 @@ public class SourceTab extends EntryEditorTab {
             }
         });
     }
-
 }

@@ -139,7 +139,6 @@ public class IEEE implements FulltextFetcher, PagedSearchBasedParserFetcher, Cus
         // Try URL first -- will primarily work for entries from the old IEEE search
         Optional<String> urlString = entry.getField(StandardField.URL);
         if (urlString.isPresent()) {
-
             Matcher documentUrlMatcher = DOCUMENT_PATTERN.matcher(urlString.get());
             if (documentUrlMatcher.find()) {
                 String docId = documentUrlMatcher.group(1);

@@ -17,5 +17,4 @@ public class SSLPreferences {
     public String getTruststorePath() {
         return truststorePath.getValue();
     }
-
 }

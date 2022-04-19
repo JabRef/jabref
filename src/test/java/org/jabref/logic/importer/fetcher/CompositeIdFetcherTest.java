@@ -111,5 +111,4 @@ class CompositeIdFetcherTest {
     void performSearchByIdReturnsCorrectEntryForIdentifier(String name, BibEntry bibEntry, String identifier) throws FetcherException {
         assertEquals(Optional.of(bibEntry), compositeIdFetcher.performSearchById(identifier));
     }
-
 }

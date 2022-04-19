@@ -82,7 +82,6 @@ public class DoiFetcherTest {
         bibEntryStenzel2020.setField(StandardField.PUBLISHER, "American Physical Society ({APS})");
         bibEntryStenzel2020.setField(StandardField.PAGES, "023315");
         bibEntryStenzel2020.setField(StandardField.NUMBER, "2");
-
     }
 
     @Test

@@ -43,7 +43,6 @@ class WebFetchersTest {
         Set<IdBasedFetcher> idFetchers = WebFetchers.getIdBasedFetchers(importFormatPreferences);
 
         try (ScanResult scanResult = classGraph.scan()) {
-
             ClassInfoList controlClasses = scanResult.getClassesImplementing(IdBasedFetcher.class.getCanonicalName());
             Set<Class<?>> expected = new HashSet<>(controlClasses.loadClasses());
 
