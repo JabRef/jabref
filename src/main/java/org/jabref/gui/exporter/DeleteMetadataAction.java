@@ -113,9 +113,7 @@ public class DeleteMetadataAction extends SimpleCommand {
         entriesChanged = 0;
         skipped = 0;
 
-        if (optionsDialog == null) {
-            optionsDialog = new OptionsDialog();
-        }
+        optionsDialog = new OptionsDialog();
         optionsDialog.open();
         dialogService.notify(Localization.lang("Deleting metadata..."));
     }
@@ -184,7 +182,6 @@ public class DeleteMetadataAction extends SimpleCommand {
      */
     synchronized private void DeleteMetadataFromFile(Path file, BibEntry entry, BibDatabaseContext databaseContext, BibDatabase database) throws Exception {
         XmpUtilRemover.deleteXmp(file, entry, database, xmpPreferences);
-        embeddedBibExporter.exportToFileByPath(databaseContext, database, filePreferences, file);
     }
 
     class OptionsDialog extends FXDialog {
