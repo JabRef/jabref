@@ -1,14 +1,12 @@
 package org.jabref.logic.formatter.bibtexfields;
 
-import org.jabref.logic.cleanup.Formatter;
-import org.jabref.logic.l10n.Localization;
-
 import java.util.Objects;
 import java.util.regex.Matcher;
 
-public class EscapeCurrencySymbolsFormatter extends Formatter {
+import org.jabref.logic.cleanup.Formatter;
+import org.jabref.logic.l10n.Localization;
 
-//    private static final Pattern CURRENCYSYMBOLS = Pattern.compile("\\$");
+public class EscapeCurrencySymbolsFormatter extends Formatter {
 
     @Override
     public String getName() {

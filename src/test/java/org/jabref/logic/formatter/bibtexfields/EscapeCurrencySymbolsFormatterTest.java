@@ -26,6 +26,6 @@ class EscapeCurrencySymbolsFormatterTest {
 
     @Test
     void formatExample() {
-        assertEquals("Text\\\\$with\\\\$currency$symbols", formatter.format(formatter.getExampleInput()));
+        assertEquals("Text\\\\$with\\\\$currency\\\\$symbols", formatter.format(formatter.getExampleInput()));
     }
 }
