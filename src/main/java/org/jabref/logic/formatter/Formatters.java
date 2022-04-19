@@ -76,6 +76,7 @@ public class Formatters {
                 new UnitsToLatexFormatter(),
                 new EscapeUnderscoresFormatter(),
                 new EscapeAmpersandsFormatter(),
+                new EscapeCurrencySymbolsFormatter(),
                 new ShortenDOIFormatter(),
                 new UnprotectTermsFormatter()
         );
