@@ -10,6 +10,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 ## [Unreleased]
 
 ### Added
+
 - We added a checkbox to select all fields inside XmpPreference Tab [#8277](https://github.com/JabRef/jabref/issues/8277)
 - We added a button to delete metadata of selected fields inside XmpPreference Tab without overwriting other fields [#8277](https://github.com/JabRef/jabref/issues/8277)
 - We added an extra option when right-clicking an entry in the Entry List to copy either the DOI or the DOI url.
