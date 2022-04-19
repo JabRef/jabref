@@ -58,6 +58,7 @@ open module org.jabref {
 
     // Microsoft application insights
     requires applicationinsights.core;
+    requires applicationinsights.logging.log4j2;
 
     // Libre Office
     requires org.libreoffice.uno;
@@ -71,7 +72,6 @@ open module org.jabref {
     requires fastparse;
     requires jbibtex;
     requires citeproc.java;
-    requires antlr.runtime;
     requires de.saxsys.mvvmfx.validation;
     requires com.google.gson;
     requires unirest.java;
@@ -110,10 +110,13 @@ open module org.jabref {
     requires org.apache.lucene.analysis.common;
     requires org.apache.lucene.highlighter;
 
-
     requires com.fasterxml.jackson.databind;
     requires com.fasterxml.jackson.dataformat.yaml;
     requires com.fasterxml.jackson.datatype.jsr310;
     requires net.harawata.appdirs;
+
+    requires org.eclipse.jgit;
+    uses org.eclipse.jgit.transport.SshSessionFactory;
+    uses org.eclipse.jgit.lib.GpgSigner;
 
 }
