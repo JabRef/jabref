@@ -32,6 +32,8 @@
             <property name="allowMissingParamTags" value="true"/>
             <property name="allowMissingReturnTag" value="true"/>
         </module>
+        <module name="RequireEmptyLineBeforeBlockTagGroup"/>
+        <module name="JavadocMissingLeadingAsteriskCheck"/>
 
         <!-- Checks for imports: https://checkstyle.org/config_import.html -->
 
@@ -67,6 +69,7 @@
             <property name="tokens" value="COMMA, SEMI, ELLIPSIS, ARRAY_DECLARATOR, RBRACK, METHOD_REF"/>
         </module>
         <module name="SingleSpaceSeparator"/>
+        <module name="NoWhitespaceBeforeCaseDefaultColon"/>
         <module name="WhitespaceAfter"/>
         <module name="WhitespaceAround">
             <!-- RCULRY causes issues if classes are nested within arrays, therefore not activated -->
@@ -83,6 +86,8 @@
         <module name="ConstantName">
             <property name="format" value="^log(ger)?|[A-Z][A-Z0-9]*(_[A-Z0-9]+)*$"/>
         </module>
+        <module name="PatternVariableName" />
+        <module name="RecordComponentName"/>
 
         <!-- Checks for blocks: https://checkstyle.org/config_blocks.html -->
 
@@ -137,5 +142,9 @@
 
         <module name="MissingDeprecated"/>
 
+        <!-- Checks for illegal usage of reserved names as identifier names, such as "var", "record" - https://checkstyle.sourceforge.io/config_naming.html#IllegalIdentifierName -->
+        <module name="IllegalIdentifierName"/>
+
+        <module name="RecordTypeParameterNameCheck"/>
     </module>
 </module>
