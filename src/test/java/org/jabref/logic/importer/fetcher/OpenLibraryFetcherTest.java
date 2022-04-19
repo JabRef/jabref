@@ -74,5 +74,4 @@ public class OpenLibraryFetcherTest extends AbstractIsbnFetcherTest {
         Optional<BibEntry> fetchedEntry = fetcher.performSearchById("978-8-8264-2303-6");
         assertEquals(Optional.empty(), fetchedEntry);
     }
-
 }
