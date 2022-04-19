@@ -21,11 +21,11 @@ class EscapeCurrencySymbolsFormatterTest {
 
     @Test
     void formatEscapesCurrencySymbolsIfPresent() throws Exception {
-        assertEquals("Lorem\\$ipsum", formatter.format("Lorem$ipsum"));
+        assertEquals("Lorem\\\\$ipsum", formatter.format("Lorem$ipsum"));
     }
 
     @Test
     void formatExample() {
-        assertEquals("Text\\$with\\$currency$symbols", formatter.format(formatter.getExampleInput()));
+        assertEquals("Text\\\\$with\\\\$currency$symbols", formatter.format(formatter.getExampleInput()));
     }
 }
