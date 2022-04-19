@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.FXCollections;
 
 import org.jabref.logic.xmp.XmpPreferences;
@@ -184,6 +185,7 @@ public class XmpExporterTest {
     public void exportSingleEntryWithPrivacyFilter(@TempDir Path testFolder) throws Exception {
         when(xmpPreferences.getXmpPrivacyFilter()).thenReturn(FXCollections.observableSet(Collections.singleton(StandardField.AUTHOR)));
         when(xmpPreferences.shouldUseXmpPrivacyFilter()).thenReturn(true);
+        when(xmpPreferences.getSelectAllFields()).thenReturn(new SimpleBooleanProperty(false));
 
         Path file = testFolder.resolve("ThisIsARandomlyNamedFile");
         Files.createFile(file);
