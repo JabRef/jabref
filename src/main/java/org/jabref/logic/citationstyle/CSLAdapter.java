@@ -54,6 +54,7 @@ public class CSLAdapter {
     /**
      * Creates the bibliography of the provided items. This method needs to run synchronized because the underlying
      * CSL engine is not thread-safe.
+     *
      * @param databaseContext {@link BibDatabaseContext} is used to be able to resolve fields and their aliases
      */
     public synchronized List<String> makeBibliography(List<BibEntry> bibEntries, String style, CitationStyleOutputFormat outputFormat, BibDatabaseContext databaseContext, BibEntryTypesManager entryTypesManager) throws IOException, IllegalArgumentException {

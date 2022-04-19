@@ -269,6 +269,7 @@ public class GroupDialogViewModel {
 
     /**
      * Gets the absolute path relative to the LatexFileDirectory, if given a relative path
+     *
      * @param input the user input path
      * @return an absolute path if LatexFileDirectory exists; otherwise, returns input
      */

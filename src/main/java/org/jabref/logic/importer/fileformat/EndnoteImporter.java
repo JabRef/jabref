@@ -271,6 +271,7 @@ public class EndnoteImporter extends Importer {
      * separated by " and ". This is the correct behaviour.
      * One source lists the names separated by comma, with a comma at the end. We can detect
      * this format and fix it.
+     *
      * @param s The author string
      * @return The fixed author string
      */

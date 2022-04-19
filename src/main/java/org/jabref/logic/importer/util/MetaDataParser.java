@@ -110,6 +110,7 @@ public class MetaDataParser {
     /**
      * Returns the first item in the list.
      * If the specified list does not contain exactly one item, then a {@link ParseException} will be thrown.
+     *
      * @param value
      * @return
      */
