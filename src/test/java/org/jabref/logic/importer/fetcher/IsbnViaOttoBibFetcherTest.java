@@ -21,15 +21,14 @@ public class IsbnViaOttoBibFetcherTest extends AbstractIsbnFetcherTest {
 
     @BeforeEach
     public void setUp() {
-        bibEntry = new BibEntry();
-        bibEntry.setType(StandardEntryType.Book);
-        bibEntry.setCitationKey("bloch2008effective");
-        bibEntry.setField(StandardField.TITLE, "Effective Java");
-        bibEntry.setField(StandardField.PUBLISHER, "Addison-Wesley");
-        bibEntry.setField(StandardField.YEAR, "2008");
-        bibEntry.setField(StandardField.AUTHOR, "Bloch, Joshua");
-        bibEntry.setField(StandardField.ISBN, "9780321356680");
-        bibEntry.setField(StandardField.ADDRESS, "Upper Saddle River, NJ");
+        bibEntryEffectiveJava = new BibEntry(StandardEntryType.Book)
+                .withCitationKey("bloch2008effective")
+                .withField(StandardField.TITLE, "Effective Java")
+                .withField(StandardField.PUBLISHER, "Addison-Wesley")
+                .withField(StandardField.YEAR, "2008")
+                .withField(StandardField.AUTHOR, "Bloch, Joshua")
+                .withField(StandardField.ISBN, "9780321356680")
+                .withField(StandardField.ADDRESS, "Upper Saddle River, NJ");
 
         fetcher = new IsbnViaOttoBibFetcher(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS));
     }
@@ -44,31 +43,29 @@ public class IsbnViaOttoBibFetcherTest extends AbstractIsbnFetcherTest {
     @Override
     public void searchByIdSuccessfulWithShortISBN() throws FetcherException {
         Optional<BibEntry> fetchedEntry = fetcher.performSearchById("0321356683");
-        bibEntry.setField(StandardField.ISBN, "0321356683");
-        assertEquals(Optional.of(bibEntry), fetchedEntry);
+        bibEntryEffectiveJava.setField(StandardField.ISBN, "0321356683");
+        assertEquals(Optional.of(bibEntryEffectiveJava), fetchedEntry);
     }
 
     @Test
     @Override
     public void searchByIdSuccessfulWithLongISBN() throws FetcherException {
         Optional<BibEntry> fetchedEntry = fetcher.performSearchById("9780321356680");
-        bibEntry.setField(StandardField.ISBN, "9780321356680");
-        assertEquals(Optional.of(bibEntry), fetchedEntry);
+        bibEntryEffectiveJava.setField(StandardField.ISBN, "9780321356680");
+        assertEquals(Optional.of(bibEntryEffectiveJava), fetchedEntry);
     }
 
     @Test
     @Override
     public void authorsAreCorrectlyFormatted() throws Exception {
-        bibEntry = new BibEntry();
-        bibEntry.setType(StandardEntryType.Book);
-        bibEntry.setCitationKey("dumas2018fundamentals");
-        bibEntry.setField(StandardField.TITLE, "Fundamentals of business process management");
-        bibEntry.setField(StandardField.PUBLISHER, "Springer");
-        bibEntry.setField(StandardField.AUTHOR, "Dumas, Marlon");
-        bibEntry.setField(StandardField.ADDRESS, "Berlin, Germany");
-        bibEntry.setField(StandardField.ISBN, "9783662565094");
-        bibEntry.setField(StandardField.YEAR, "2018");
-
+        BibEntry bibEntry = new BibEntry(StandardEntryType.Book)
+                .withCitationKey("dumas2018fundamentals")
+                .withField(StandardField.TITLE, "Fundamentals of business process management")
+                .withField(StandardField.PUBLISHER, "Springer")
+                .withField(StandardField.AUTHOR, "Dumas, Marlon")
+                .withField(StandardField.ADDRESS, "Berlin, Germany")
+                .withField(StandardField.ISBN, "9783662565094")
+                .withField(StandardField.YEAR, "2018");
         Optional<BibEntry> fetchedEntry = fetcher.performSearchById("978-3-662-56509-4");
         assertEquals(Optional.of(bibEntry), fetchedEntry);
     }
@@ -77,12 +74,10 @@ public class IsbnViaOttoBibFetcherTest extends AbstractIsbnFetcherTest {
      * Checks whether the given ISBN is <emph>NOT</emph> available at any ISBN fetcher
      */
     @Test
-    public void testIsbnNeitherAvaiableOnEbookDeNorOrViaChimbori() throws Exception {
+    public void testIsbnNeitherAvailableOnEbookDeNorOrViaChimbori() throws Exception {
         // In this test, the ISBN needs to be a valid (syntax+checksum) ISBN number
         // However, the ISBN number must not be assigned to a real book
         Optional<BibEntry> fetchedEntry = fetcher.performSearchById("978-8-8264-2303-6");
         assertEquals(Optional.empty(), fetchedEntry);
-
     }
-
 }
