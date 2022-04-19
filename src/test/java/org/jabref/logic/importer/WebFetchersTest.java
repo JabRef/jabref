@@ -10,9 +10,9 @@ import org.jabref.logic.importer.fetcher.AbstractIsbnFetcher;
 import org.jabref.logic.importer.fetcher.GoogleScholar;
 import org.jabref.logic.importer.fetcher.GrobidCitationFetcher;
 import org.jabref.logic.importer.fetcher.IsbnViaEbookDeFetcher;
-import org.jabref.logic.importer.fetcher.IsbnViaOttoBibFetcher;
 import org.jabref.logic.importer.fetcher.JstorFetcher;
 import org.jabref.logic.importer.fetcher.MrDLibFetcher;
+import org.jabref.logic.importer.fetcher.OpenLibraryFetcher;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.preferences.FilePreferences;
 
@@ -50,8 +50,8 @@ class WebFetchersTest {
             expected.remove(IdBasedParserFetcher.class);
 
             // Remove special ISBN fetcher since we don't want to expose them to the user
+            expected.remove(OpenLibraryFetcher.class);
             expected.remove(IsbnViaEbookDeFetcher.class);
-            expected.remove(IsbnViaOttoBibFetcher.class);
 
             // Remove the following, because they don't work at the moment
             expected.remove(JstorFetcher.class);
