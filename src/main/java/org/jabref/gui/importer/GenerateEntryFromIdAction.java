@@ -75,7 +75,6 @@ public class GenerateEntryFromIdAction extends SimpleCommand {
 
     private BackgroundTask<Optional<BibEntry>> searchAndImportEntryInBackground() {
         return new BackgroundTask<>() {
-
             @Override
             protected Optional<BibEntry> call() throws JabRefException {
                 if (isCanceled()) {
@@ -85,12 +84,10 @@ public class GenerateEntryFromIdAction extends SimpleCommand {
                 updateMessage(Localization.lang("Searching..."));
                 try {
                     return new CompositeIdFetcher(preferencesService.getImportFormatPreferences()).performSearchById(identifier);
-
                 } catch (FetcherException fetcherException) {
                     throw new JabRefException("Fetcher error: %s".formatted(fetcherException.getMessage()));
                 }
             }
         };
     }
-
 }

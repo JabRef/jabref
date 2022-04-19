@@ -305,7 +305,6 @@ public class EndnoteXmlImporter extends Importer implements Parser {
     private List<String> getKeywords(Record endNoteRecord) {
         Keywords keywords = endNoteRecord.getKeywords();
         if (keywords != null) {
-
             return keywords.getKeyword()
                            .stream()
                            .map(keyword -> keyword.getStyle())

@@ -294,7 +294,6 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
      * @return highlighted span for codeArea
      */
     public StyleSpans<Collection<String>> computeHighlighting(String text) {
-
         final Pattern XML_TAG = Pattern.compile("(?<ELEMENT>(</?\\h*)(\\w+)([^<>]*)(\\h*/?>))"
                 + "|(?<COMMENT><!--[^<>]+-->)");
         final Pattern ATTRIBUTES = Pattern.compile("(\\w+\\h*)(=)(\\h*\"[^\"]+\")");
@@ -311,7 +310,6 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
         int lastKeywordEnd = 0;
         StyleSpansBuilder<Collection<String>> spansBuilder = new StyleSpansBuilder<>();
         while (matcher.find()) {
-
             spansBuilder.add(Collections.emptyList(), matcher.start() - lastKeywordEnd);
             if (matcher.group("COMMENT") != null) {
                 spansBuilder.add(Collections.singleton("comment"), matcher.end() - matcher.start());
@@ -323,7 +321,6 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
                     spansBuilder.add(Collections.singleton("anytag"), matcher.end(GROUP_ELEMENT_NAME) - matcher.end(GROUP_OPEN_BRACKET));
 
                     if (!attributesText.isEmpty()) {
-
                         lastKeywordEnd = 0;
 
                         Matcher attributesMatcher = ATTRIBUTES.matcher(attributesText);

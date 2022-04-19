@@ -198,7 +198,6 @@ public class StringUtil {
         // remove all whitespace at the end of the string, this especially includes \r created when the field content has \r\n as line separator
         addWrappedLine(result, CharMatcher.whitespace().trimTrailingFrom(lines[0]), wrapAmount, newline);
         for (int i = 1; i < lines.length; i++) {
-
             if (lines[i].trim().isEmpty()) {
                 result.append(newline);
                 result.append('\t');
@@ -312,7 +311,6 @@ public class StringUtil {
      * @return The resulting string after wrapping capitals.
      */
     public static String putBracesAroundCapitals(String s) {
-
         boolean inString = false;
         boolean isBracing = false;
         boolean escaped = false;
@@ -332,14 +330,12 @@ public class StringUtil {
             // See if we should start bracing:
             if ((inBrace == 0) && !isBracing && !inString && Character.isLetter((char) c)
                     && Character.isUpperCase((char) c)) {
-
                 buf.append('{');
                 isBracing = true;
             }
 
             // See if we should close a brace set:
             if (isBracing && !(Character.isLetter((char) c) && Character.isUpperCase((char) c))) {
-
                 buf.append('}');
                 isBracing = false;
             }
@@ -707,7 +703,6 @@ public class StringUtil {
         } else {
             return toCapitalize.toUpperCase(Locale.ROOT);
         }
-
     }
 
     /**

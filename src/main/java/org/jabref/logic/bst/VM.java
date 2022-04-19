@@ -594,7 +594,6 @@ public class VM implements Warn {
          * messages issued.
          */
         buildInFunctions.put("warning$", new BstFunction() {
-
             int warning = 1;
 
             @Override
@@ -804,7 +803,6 @@ public class VM implements Warn {
     }
 
     private boolean assign(BstEntry context, Object o1, Object o2) {
-
         if (!(o1 instanceof Identifier) || !((o2 instanceof String) || (o2 instanceof Integer))) {
             throw new VMException("Invalid parameters");
         }
@@ -812,7 +810,6 @@ public class VM implements Warn {
         String name = ((Identifier) o1).getName();
 
         if (o2 instanceof String) {
-
             if ((context != null) && context.localStrings.containsKey(name)) {
                 context.localStrings.put(name, (String) o2);
                 return true;
@@ -1036,7 +1033,6 @@ public class VM implements Warn {
     }
 
     private void reverse(Tree child) {
-
         BstFunction f = functions.get(child.getChild(0).getText());
 
         ListIterator<BstEntry> i = entries.listIterator(entries.size());
@@ -1087,9 +1083,7 @@ public class VM implements Warn {
 
         @Override
         public void execute(BstEntry context) {
-
             for (int i = 0; i < localTree.getChildCount(); i++) {
-
                 Tree c = localTree.getChild(i);
                 try {
 
@@ -1129,9 +1123,7 @@ public class VM implements Warn {
     }
 
     private void execute(String name, BstEntry context) {
-
         if (context != null) {
-
             if (context.fields.containsKey(name)) {
                 stack.push(context.fields.get(name));
                 return;

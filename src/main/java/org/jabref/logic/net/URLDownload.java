@@ -107,7 +107,6 @@ public class URLDownload {
 
         // Create a trust manager that does not validate certificate chains
         TrustManager[] trustAllCerts = {new X509TrustManager() {
-
             @Override
             public void checkClientTrusted(X509Certificate[] chain, String authType) {
             }
@@ -327,7 +326,6 @@ public class URLDownload {
     private void copy(InputStream in, Writer out, Charset encoding) throws IOException {
         Reader r = new InputStreamReader(in, encoding);
         try (BufferedReader read = new BufferedReader(r)) {
-
             String line;
             while ((line = read.readLine()) != null) {
                 out.write(line);

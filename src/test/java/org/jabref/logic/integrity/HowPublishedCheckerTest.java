@@ -55,5 +55,4 @@ public class HowPublishedCheckerTest {
     void bibLaTexAcceptsStringWithLowercaseFirstLetter() {
         assertEquals(Optional.empty(), checkerBiblatex.checkValue("lorem ipsum"));
     }
-
 }

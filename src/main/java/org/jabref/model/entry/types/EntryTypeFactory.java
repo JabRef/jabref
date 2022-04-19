@@ -47,7 +47,6 @@ public class EntryTypeFactory {
     }
 
     public static EntryType parse(String typeName) {
-
         List<EntryType> types = new ArrayList<>(Arrays.<EntryType>asList(StandardEntryType.values()));
         types.addAll(Arrays.<EntryType>asList(IEEETranEntryType.values()));
         types.addAll(Arrays.<EntryType>asList(SystematicLiteratureReviewStudyEntryType.values()));

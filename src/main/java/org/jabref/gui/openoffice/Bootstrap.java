@@ -334,9 +334,7 @@ public class Bootstrap {
     }
 
     private static void pipe(final InputStream in, final PrintStream out, final String prefix) {
-
         new Thread("Pipe: " + prefix) {
-
             @Override
             public void run() {
                 try {

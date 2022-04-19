@@ -302,7 +302,6 @@ public class BibtexParser implements Parser {
 
         String comment = buffer.toString().replaceAll("[\\x0d\\x0a]", "");
         if (comment.substring(0, Math.min(comment.length(), MetaData.META_FLAG.length())).equals(MetaData.META_FLAG)) {
-
             if (comment.startsWith(MetaData.META_FLAG)) {
                 String rest = comment.substring(MetaData.META_FLAG.length());
 
@@ -410,7 +409,6 @@ public class BibtexParser implements Parser {
      * @return a String without eof characters
      */
     private String purgeEOFCharacters(String input) {
-
         StringBuilder remainingText = new StringBuilder();
         for (Character character : input.toCharArray()) {
             if (!(isEOFCharacter(character))) {
@@ -726,7 +724,6 @@ public class BibtexParser implements Parser {
                     // Begin of entryfieldname (e.g. author) -> push back:
                     unread(currentChar);
                     if ((currentChar == ' ') || (currentChar == '\n')) {
-
                         /*
                          * found whitespaces, entryfieldname completed -> key in
                          * keybuffer, skip whitespaces
@@ -816,7 +813,6 @@ public class BibtexParser implements Parser {
                     || (character == ':') || ("#{}~,=\uFFFD".indexOf(character) == -1))) {
                 token.append((char) character);
             } else {
-
                 if (Character.isWhitespace((char) character)) {
                     // We have encountered white space instead of the comma at
                     // the end of
@@ -847,7 +843,6 @@ public class BibtexParser implements Parser {
         int brackets = 0;
 
         while (!((isClosingBracketNext()) && (brackets == 0))) {
-
             int character = read();
             if (isEOFCharacter(character)) {
                 throw new IOException("Error in line " + line + ": EOF in mid-string");

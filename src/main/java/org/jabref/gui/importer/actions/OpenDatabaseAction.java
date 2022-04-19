@@ -68,7 +68,6 @@ public class OpenDatabaseAction extends SimpleCommand {
         this.dialogService = dialogService;
         this.stateManager = stateManager;
         this.themeManager = themeManager;
-
     }
 
     /**

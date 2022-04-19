@@ -99,7 +99,6 @@ public class JabRefDialogService implements DialogService {
         // Create a new dialog pane that has a checkbox instead of the hide/show details button
         // Use the supplied callback for the action of the checkbox
         alert.setDialogPane(new DialogPane() {
-
             @Override
             protected Node createDetailsButton() {
                 CheckBox optOut = new CheckBox();

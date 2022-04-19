@@ -58,7 +58,6 @@ public class UTF8CheckerTest {
     void NonUTF8EncodingCheckerTest() throws UnsupportedEncodingException {
         String NonUTF8 = new String("你好，这条语句使用GBK字符集".getBytes(), "GBK");
             assertFalse(UTF8Checker.UTF8EncodingChecker(NonUTF8.getBytes("GBK")));
-
     }
 
     /**

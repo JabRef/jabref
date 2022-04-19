@@ -43,7 +43,6 @@ public class MsBibImporter extends Importer {
         try {
             DocumentBuilder dbuild = makeSafeDocBuilderFactory(DocumentBuilderFactory.newInstance()).newDocumentBuilder();
             dbuild.setErrorHandler(new ErrorHandler() {
-
                 @Override
                 public void warning(SAXParseException exception) throws SAXException {
                     // ignore warnings

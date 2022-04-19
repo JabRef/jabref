@@ -100,7 +100,6 @@ public class CSLAdapter {
          * Converts the {@link BibEntry} into {@link CSLItemData}.
          */
         private static CSLItemData bibEntryToCSLItemData(BibEntry bibEntry, BibDatabaseContext bibDatabaseContext, BibEntryTypesManager entryTypesManager) {
-
             String citeKey = bibEntry.getCitationKey().orElse("");
             BibTeXEntry bibTeXEntry = new BibTeXEntry(new Key(bibEntry.getType().getName()), new Key(citeKey));
 
@@ -121,7 +120,6 @@ public class CSLAdapter {
                                 value = bibEntry.getMonth().map(Month::getShortName).orElse(value);
                             }
                             bibTeXEntry.addField(new Key(key.getName()), new DigitStringValue(value));
-
                         });
             }
             return BIBTEX_CONVERTER.toItemData(bibTeXEntry);

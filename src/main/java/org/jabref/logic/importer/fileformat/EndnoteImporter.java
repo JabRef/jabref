@@ -111,7 +111,6 @@ public class EndnoteImporter extends Importer {
             boolean isEditedBook = false;
             String[] fields = entry.trim().substring(1).split("\n%");
             for (String field : fields) {
-
                 if (field.length() < 3) {
                     continue;
                 }

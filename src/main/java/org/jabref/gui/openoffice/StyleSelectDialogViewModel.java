@@ -85,7 +85,6 @@ public class StyleSelectDialogViewModel {
     }
 
     public void deleteStyle() {
-
         OOBibStyle style = selectedItem.getValue().getStyle();
         if (loader.removeStyle(style)) {
             styles.remove(selectedItem.get());

@@ -62,5 +62,4 @@ public class ACMPortalFetcher implements SearchBasedParserFetcher {
     public Parser getParser() {
         return new ACMPortalParser();
     }
-
 }

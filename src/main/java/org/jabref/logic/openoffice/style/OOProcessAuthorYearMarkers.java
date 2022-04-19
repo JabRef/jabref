@@ -28,7 +28,6 @@ class OOProcessAuthorYearMarkers {
      *  Fills {@code sortedCitedKeys//normCitMarker}
      */
     private static void createNormalizedCitationMarkers(CitedKeys sortedCitedKeys, OOBibStyle style) {
-
         for (CitedKey ck : sortedCitedKeys.values()) {
             ck.setNormalizedCitationMarker(Optional.of(style.getNormalizedCitationMarker(ck)));
         }
@@ -50,7 +49,6 @@ class OOProcessAuthorYearMarkers {
      *  Depends on: style, citations and their order.
      */
     private static void createUniqueLetters(CitedKeys sortedCitedKeys, CitationGroups citationGroups) {
-
         // The entries in the clashingKeys lists preserve
         // firstAppearance order from sortedCitedKeys.values().
         //
@@ -130,7 +128,6 @@ class OOProcessAuthorYearMarkers {
      * @param style              Bibliography style.
      */
     static void produceCitationMarkers(CitationGroups citationGroups, OOBibStyle style) {
-
         assert !style.isCitationKeyCiteMarkers();
         assert !style.isNumberEntries();
         // Citations in (Au1, Au2 2000) form
@@ -145,7 +142,6 @@ class OOProcessAuthorYearMarkers {
         setIsFirstAppearanceOfSourceInCitations(citationGroups);
 
         for (CitationGroup group : citationGroups.getCitationGroupsInGlobalOrder()) {
-
             final boolean inParenthesis = (group.citationType == CitationType.AUTHORYEAR_PAR);
             final NonUniqueCitationMarker strictlyUnique = NonUniqueCitationMarker.THROWS;
 
@@ -157,5 +153,4 @@ class OOProcessAuthorYearMarkers {
             group.setCitationMarker(Optional.of(citMarker));
         }
     }
-
 }
