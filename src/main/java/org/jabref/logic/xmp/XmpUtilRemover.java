@@ -27,6 +27,24 @@ public class XmpUtilRemover {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(XmpUtilWriter.class);
 
+    /**
+     * Tries to delete the given BibTexEntry in the XMP-stream of the given
+     * PDF-file.
+     *
+     * Throws an IOException if the file cannot be read or written, so the user
+     * can remove a lock or cancel the operation.
+     *
+     * The method will only overwrite BibTeX-XMP-data specified in the Xmp Preference
+     * Tab, all other metadata are untouched.
+     *
+     * @param file The filename from which to open the file.
+     * @param entry    The entries for file to reference given a select all.
+     * @param database (maybe null) An optional database which the given bibtex entries belong to, which will be used to
+     *                 resolve strings. If the database is null the strings will not be resolved.
+     * @throws TransformerException If the entry was malformed or unsupported.
+     * @throws IOException          If the file could not be written to or could not be found.
+     */
+
     public static void deleteXmp(Path file, BibEntry entry,
                                  BibDatabase database, XmpPreferences xmpPreferences) throws IOException, TransformerException {
         List<BibEntry> bibEntryList = new ArrayList<>();
@@ -34,7 +52,24 @@ public class XmpUtilRemover {
         XmpUtilRemover.deleteXmp(file, bibEntryList, database, xmpPreferences);
     }
 
-
+    /**
+     * Tries to delete the given BibTexEntry in the XMP-stream of the given
+     * PDF-file.
+     *
+     * Throws an IOException if the file cannot be read or written, so the user
+     * can remove a lock or cancel the operation.
+     *
+     * The method will only overwrite BibTeX-XMP-data specified in the Xmp Preference
+     * Tab, all other metadata are untouched.
+     *
+     * @param path          The file to write the entries to.
+     * @param bibtexEntries The entries for file to reference given a select all.
+     * @param database      maybenull An optional database which the given bibtex entries belong to, which will be used
+     *                      to resolve strings. If the database is null the strings will not be resolved.
+     * @param xmpPreferences  Write information also in PDF document properties
+     * @throws TransformerException If the entry was malformed or unsupported.
+     * @throws IOException          If the file could not be written to or could not be found.
+     */
     public static void deleteXmp(Path path,
                                  List<BibEntry> bibtexEntries, BibDatabase database,
                                  XmpPreferences xmpPreferences) throws IOException, TransformerException {
@@ -73,6 +108,16 @@ public class XmpUtilRemover {
             }
         }
     }
+    /**
+     * Tries to delete the entries of the fields listed in the privacy filter. If "select all fields" is checked,
+     * any given fields in the BibTex Entry is deleted.
+     *
+     *
+     * @param document The pdf document to write to.
+     * @param entry    The Bibtex entry that is written into the PDF properties. *
+     * @param database maybenull An optional database which the given bibtex entries belong to, which will be used to
+     *                 resolve strings. If the database is null the strings will not be resolved.
+     */
 
     private static void deleteDocumentInformation(PDDocument document,
                                                   BibEntry entry, BibDatabase database, XmpPreferences xmpPreferences) {
@@ -98,6 +143,12 @@ public class XmpUtilRemover {
             }
         }
     }
+    /**
+     * Deletes field from document.
+     *
+     * @param di    The document to delete from.
+     * @param field The field to delete.
+     */
 
     private static void deleteField(PDDocumentInformation di, Field field) {
         if (StandardField.AUTHOR.equals(field)) {
@@ -112,6 +163,12 @@ public class XmpUtilRemover {
             di.setCustomMetadataValue("bibtex/" + field, null);
         }
     }
+    /**
+     * Resolve entry with database
+     *
+     * @param defaultEntry  The entry to resolve.
+     * @param database      The database to check for resolutions.
+     */
 
     private static BibEntry getDefaultOrDatabaseEntry(BibEntry defaultEntry, BibDatabase database) {
         if (database == null) {

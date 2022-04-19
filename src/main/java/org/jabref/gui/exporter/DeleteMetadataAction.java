@@ -176,7 +176,12 @@ public class DeleteMetadataAction extends SimpleCommand {
         dialogService.notify(Localization.lang("Finished deleting metadata for %0 file (%1 skipped, %2 errors).",
                 String.valueOf(entriesChanged), String.valueOf(skipped), String.valueOf(errors)));
     }
-    // similar fix to
+
+    /**
+     * This deletes XMP data
+     * @param file The file to delete metadata from
+     * @param entry The entry that is related to the file selected
+     */
     synchronized private void DeleteMetadataFromFile(Path file, BibEntry entry, BibDatabaseContext databaseContext, BibDatabase database) throws Exception {
         XmpUtilRemover.deleteXmp(file, entry, database, xmpPreferences);
         embeddedBibExporter.exportToFileByPath(databaseContext, database, filePreferences, file);
