@@ -414,7 +414,7 @@ public class DublinCoreExtractor {
         fieldValues.addAll(bibEntry.getFieldMap().entrySet());
         boolean hasStandardYearField = fieldValues.stream().anyMatch(field -> StandardField.YEAR.equals(field.getKey()));
         for (Entry<Field, String> field : fieldValues) {
-            if (useXmpPrivacyFilter && xmpPreferences.getXmpPrivacyFilter().contains(field.getKey())) {
+            if (useXmpPrivacyFilter && (xmpPreferences.getSelectAllFields().getValue() || xmpPreferences.getXmpPrivacyFilter().contains(field.getKey()))) {
                 continue;
             }
 

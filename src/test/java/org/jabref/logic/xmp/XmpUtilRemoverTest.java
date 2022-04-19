@@ -7,7 +7,6 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import javax.xml.transform.TransformerException;
@@ -35,10 +34,11 @@ import static org.jabref.logic.xmp.DublinCoreExtractor.DC_RIGHTS;
 import static org.jabref.logic.xmp.DublinCoreExtractor.DC_SOURCE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class XmpUtilRemoveTest {
+public class XmpUtilRemoverTest {
     private static BibEntry olly2018;
     private static BibEntry toral2006;
     private static BibEntry vapnik2000;
@@ -99,18 +99,15 @@ public class XmpUtilRemoveTest {
         xmpPreferences = mock(XmpPreferences.class);
         // The code assumes privacy filters to be off
         when(xmpPreferences.shouldUseXmpPrivacyFilter()).thenReturn(false);
-        when(xmpPreferences.getXmpPrivacyFilter()).thenReturn(FXCollections.observableSet(new HashSet<Field>()));
+        when(xmpPreferences.getXmpPrivacyFilter()).thenReturn(FXCollections.observableSet(new HashSet<>()));
         when(xmpPreferences.getSelectAllFields()).thenReturn(new SimpleBooleanProperty(false));
         when(xmpPreferences.getKeywordSeparator()).thenReturn(',');
 
         this.initBibEntries();
     }
 
-    /**
-     * Test for deleting metadata from a PDF file with a single DublinCore metadata entry.
-     */
     @Test
-    void testDeleteXmp() throws IOException, URISyntaxException {
+    void testDeleteXmpSingleField() throws IOException, URISyntaxException {
         Path tempFile = Files.createTempFile("JabRef", "pdf");
         Path pathPdf = Path.of((XmpUtilShared.class.getResource("PD_metadata.pdf").toURI()));
         // copy data to temp file for testing
@@ -142,12 +139,12 @@ public class XmpUtilRemoveTest {
             // assert
             assertEquals(expectedEntry, modifiedEntry);
         } catch (IOException | TransformerException e) {
-            assertTrue(false);
+            fail();
         }
     }
 
     @Test
-    void testDeleteAllXmp() throws IOException, URISyntaxException {
+    void testDeleteXmpAllFields() throws IOException, URISyntaxException {
         Path tempFile = Files.createTempFile("JabRef", "pdf");
         Path pathPdf = Path.of((XmpUtilShared.class.getResource("PD_metadata.pdf").toURI()));
         // copy data to temp file for testing
@@ -166,23 +163,22 @@ public class XmpUtilRemoveTest {
             XmpUtilRemover.deleteXmp(tempFile, expectedEntry, null, xmpPreferences);
             List<BibEntry> modifiedEntries = XmpUtilReader.readXmp(tempFile.toAbsolutePath().toString(), xmpPreferences);
 
-            for (Map.Entry<Field, String> fieldValuePair : expectedEntry.getFieldMap().entrySet()) {
-                Field field = fieldValuePair.getKey();
-                expectedEntry.clearField(field);
-            }
-
             // assert
             assertEquals(0, modifiedEntries.size());
         } catch (IOException | TransformerException e) {
-            assertTrue(false);
+            fail();
         }
     }
 
     @Test
-    void testDeleteXmpWithMultipleEntries(@TempDir Path tempDir) throws IOException, URISyntaxException, TransformerException {
+    void testDeleteXmpWithMultipleEntries(@TempDir Path tempDir) throws IOException {
         List<BibEntry> entries = Arrays.asList(olly2018, vapnik2000, toral2006);
         Path tempFile = this.createDefaultFile("banana.pdf", tempDir);
-        XmpUtilWriter.writeXmp(Path.of(tempFile.toAbsolutePath().toString()), entries, null, xmpPreferences);
+        try {
+            XmpUtilWriter.writeXmp(Path.of(tempFile.toAbsolutePath().toString()), entries, null, xmpPreferences);
+        } catch (TransformerException e) {
+            fail();
+        }
 
         List<BibEntry> expectedEntries = XmpUtilReader.readXmp(tempFile.toAbsolutePath().toString(), xmpPreferences);
 
@@ -193,57 +189,18 @@ public class XmpUtilRemoveTest {
         // filter author field
         when(xmpPreferences.getXmpPrivacyFilter()).thenReturn(FXCollections.observableSet(fields));
 
-        // delete all xmp metadata fields
+        // delete all author field from all entries in metadata
         try {
-            XmpUtilRemover.deleteXmp(tempFile, entries.get(0), null, xmpPreferences);
+            XmpUtilRemover.deleteXmp(tempFile, expectedEntries, null, xmpPreferences);
             List<BibEntry> modifiedEntries = XmpUtilReader.readXmp(tempFile.toAbsolutePath().toString(), xmpPreferences);
-            expectedEntries.get(0).clearField(StandardField.AUTHOR);
-            assertEquals(expectedEntries.get(0), modifiedEntries.get(0));
-//            for (int i = 0; i < 3; i++) {
-//                expectedEntries.get(i).clearField(StandardField.AUTHOR);
-//                expectedEntries.get(i).clearField(StandardField.FILE);
-//                modifiedEntries.get(i).clearField(StandardField.FILE);
-//                assertEquals(expectedEntries.get(i), modifiedEntries.get(i));
-//            }
 
-        } catch (IOException | TransformerException e) {
-            assertTrue(false);
-        }
-    }
+            for (int i = 0; i < modifiedEntries.size(); i++) {
+                expectedEntries.get(i).clearField(StandardField.AUTHOR);
+                expectedEntries.get(i).clearField(StandardField.FILE);
+                modifiedEntries.get(i).clearField(StandardField.FILE);
+                assertEquals(expectedEntries.get(i), modifiedEntries.get(i));
+            }
 
-    @Test
-    void testDeleteXmpMultiple(@TempDir Path tempDir) throws IOException, URISyntaxException, TransformerException {
-        List<BibEntry> entries = Arrays.asList(olly2018, vapnik2000, toral2006);
-        Path tempFile = this.createDefaultFile("JabRef.pdf", tempDir);
-        XmpUtilWriter.writeXmp(Path.of(tempFile.toAbsolutePath().toString()), entries, null, xmpPreferences);
-
-        // copy data to temp file for testing
-
-        // entries in odc
-        List<BibEntry> originalEntries = XmpUtilReader.readXmp(tempFile.toAbsolutePath().toString(), xmpPreferences);
-        BibEntry expectedEntry = originalEntries.get(0);
-
-        // turn filters on
-        when(xmpPreferences.shouldUseXmpPrivacyFilter()).thenReturn(true);
-        Set<Field> fields = new HashSet<>();
-        fields.add(StandardField.AUTHOR);
-        // filter author field
-        when(xmpPreferences.getXmpPrivacyFilter()).thenReturn(FXCollections.observableSet(fields));
-
-        // delete author field from the PDF xmp metadata
-        try {
-            XmpUtilRemover.deleteXmp(tempFile, expectedEntry, null, xmpPreferences);
-            List<BibEntry> modifiedEntries = XmpUtilReader.readXmp(tempFile.toAbsolutePath().toString(), xmpPreferences);
-            BibEntry modifiedEntry = modifiedEntries.get(0);
-
-            expectedEntry.clearField(StandardField.AUTHOR);
-
-            // not comparing temp file and original file
-            expectedEntry.clearField(StandardField.FILE);
-            modifiedEntry.clearField(StandardField.FILE);
-
-            // assert
-            assertEquals(expectedEntry, modifiedEntry);
         } catch (IOException | TransformerException e) {
             assertTrue(false);
         }
@@ -260,19 +217,4 @@ public class XmpUtilRemoveTest {
 
         return pdfFile;
     }
-
-
-
-
-//    private Path createDefaultFile(String fileName, Path tempDir) throws IOException {
-//        // create a default PDF
-//        Path pdfFile = tempDir.resolve(fileName);
-//        try (PDDocument pdf = new PDDocument()) {
-//            // Need a single page to open in Acrobat
-//            pdf.addPage(new PDPage());
-//            pdf.save(pdfFile.toAbsolutePath().toString());
-//        }
-//
-//        return pdfFile;
-//    }
 }
