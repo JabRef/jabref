@@ -145,15 +145,14 @@ public class DeleteMetadataAction extends SimpleCommand {
                             stringJoiner.add("  " + Localization.lang("OK") + ".");
                             entriesChanged++;
                         } catch (Exception e) {
-
                             stringJoiner.add("  " + Localization.lang("Error while deleting '%0'", file.toString()) + ":");
-                            stringJoiner.add("    " + e.getLocalizedMessage() + "");
+                            stringJoiner.add("    " + e.getLocalizedMessage());
                             errors++;
                         }
                     } else {
                         skipped++;
                         stringJoiner.add("  " + Localization.lang("Skipped - PDF does not exist") + ":");
-                        stringJoiner.add("    " + file.toString() + "");
+                        stringJoiner.add("    " + file.toString());
                     }
                 }
             }

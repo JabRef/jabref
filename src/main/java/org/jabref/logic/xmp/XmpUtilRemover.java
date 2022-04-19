@@ -1,6 +1,7 @@
 package org.jabref.logic.xmp;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -8,6 +9,7 @@ import java.util.Map;
 
 import javax.xml.transform.TransformerException;
 
+import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
@@ -32,6 +34,7 @@ public class XmpUtilRemover {
         XmpUtilRemover.deleteXmp(file, bibEntryList, database, xmpPreferences);
     }
 
+
     public static void deleteXmp(Path path,
                                  List<BibEntry> bibtexEntries, BibDatabase database,
                                  XmpPreferences xmpPreferences) throws IOException, TransformerException {
@@ -42,21 +45,28 @@ public class XmpUtilRemover {
         } else {
             resolvedEntries = database.resolveForStrings(bibtexEntries, false);
         }
-
+        // uses same hack as PR #8658
+        // See: src/main/java/org/jabref/logic/xmp/XmpUtilWriter.java
+        // Restating the comment
+        // Read from another file
+        // Reason: Apache PDFBox does not support writing while the file is opened
+        // See https://issues.apache.org/jira/browse/PDFBOX-4028
+        Path newFile = Files.createTempFile("JabRef", "pdf");
         try (PDDocument document = Loader.loadPDF(path.toFile())) {
 
             if (document.isEncrypted()) {
                 throw new EncryptedPdfsNotSupportedException();
             }
 
-            // Write schemas (PDDocumentInformation and DublinCoreSchema) to the document metadata
+            // Delete schemas (PDDocumentInformation) from the document metadata
             if (resolvedEntries.size() > 0) {
                 XmpUtilRemover.deleteDocumentInformation(document, resolvedEntries.get(0), null, xmpPreferences);
             }
 
-            // Save
+            // Save updates to original file
             try {
-                document.save(path.toFile());
+                document.save(newFile.toFile());
+                FileUtil.copyFile(newFile, path, true);
             } catch (IOException e) {
                 LOGGER.debug("Could not delete XMP metadata", e);
                 throw new TransformerException("Could not delete XMP metadata: " + e.getLocalizedMessage(), e);
