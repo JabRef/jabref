@@ -62,6 +62,8 @@ public class ImportExportTab extends AbstractPreferenceTabView<ImportExportTabVi
         grobidURL.textProperty().bindBidirectional(viewModel.grobidURLProperty());
         grobidURL.disableProperty().bind(grobidEnabled.selectedProperty().not());
 
+        customApiKey.textProperty().bindBidirectional(viewModel.customApiKeyText());
+
         viewModel.customApiKeyText().bind(customApiKey.textProperty());
         viewModel.useCustomApiKeyProperty().bind(useCustomApiKey.selectedProperty());
         customApiKey.disableProperty().bind(useCustomApiKey.selectedProperty().not());

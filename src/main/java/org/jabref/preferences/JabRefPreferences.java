@@ -214,8 +214,10 @@ public class JabRefPreferences implements PreferencesService {
 
     public static final String BASE_DOI_URI = "baseDOIURI";
     public static final String USE_CUSTOM_DOI_URI = "useCustomDOIURI";
-    public static final String CUSTOM_API_KEY = "customApiKey";
-    public static final String USE_CUSTOM_API_KEY = "useCustomApiKey";
+
+    public static final String FETCHER_CUSTOM_KEY_NAMES = "fetcherCustomKeyNames";
+    public static final String FETCHER_CUSTOM_KEY_USES = "fetcherCustomKeyUses";
+    public static final String FETCHER_CUSTOM_KEYS = "fetcherCustomKeys";
 
     public static final String USE_OWNER = "useOwner";
     public static final String DEFAULT_OWNER = "defaultOwner";
@@ -299,16 +301,7 @@ public class JabRefPreferences implements PreferencesService {
     public static final String VALIDATE_IN_ENTRY_EDITOR = "validateInEntryEditor";
 
     /**
-     * The OpenOffice/LibreOffice connection preferences are:
-     * OO_PATH main directory for OO/LO installation, used to detect location on Win/macOS when using manual connect
-     * OO_EXECUTABLE_PATH path to soffice-file
-     * OO_JARS_PATH directory that contains juh.jar, jurt.jar, ridl.jar, unoil.jar
-     * OO_SYNC_WHEN_CITING true if the reference list is updated when adding a new citation
-     * OO_SHOW_PANEL true if the OO panel is shown on startup
-     * OO_USE_ALL_OPEN_DATABASES true if all databases should be used when citing
-     * OO_BIBLIOGRAPHY_STYLE_FILE path to the used style file
-     * OO_EXTERNAL_STYLE_FILES list with paths to external style files
-     * STYLES_*_* size and position of "Select style" dialog
+     * The OpenOffice/LibreOffice connection preferences are: OO_PATH main directory for OO/LO installation, used to detect location on Win/macOS when using manual connect OO_EXECUTABLE_PATH path to soffice-file OO_JARS_PATH directory that contains juh.jar, jurt.jar, ridl.jar, unoil.jar OO_SYNC_WHEN_CITING true if the reference list is updated when adding a new citation OO_SHOW_PANEL true if the OO panel is shown on startup OO_USE_ALL_OPEN_DATABASES true if all databases should be used when citing OO_BIBLIOGRAPHY_STYLE_FILE path to the used style file OO_EXTERNAL_STYLE_FILES list with paths to external style files STYLES_*_* size and position of "Select style" dialog
      */
     public static final String OO_EXECUTABLE_PATH = "ooExecutablePath";
     public static final String OO_PATH = "ooPath";
@@ -917,8 +910,7 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     /**
-     * Puts a list of strings into the Preferences, by linking its elements with a STRINGLIST_DELIMITER into a single
-     * string. Escape characters make the process transparent even if strings contains a STRINGLIST_DELIMITER.
+     * Puts a list of strings into the Preferences, by linking its elements with a STRINGLIST_DELIMITER into a single string. Escape characters make the process transparent even if strings contains a STRINGLIST_DELIMITER.
      */
     public void putStringList(String key, List<String> value) {
         if (value == null) {
@@ -1085,8 +1077,7 @@ public class JabRefPreferences implements PreferencesService {
      * Imports Preferences from an XML file.
      *
      * @param file Path of file to import from
-     * @throws JabRefException thrown if importing the preferences failed due to an InvalidPreferencesFormatException or
-     *                         an IOException
+     * @throws JabRefException thrown if importing the preferences failed due to an InvalidPreferencesFormatException or an IOException
      */
     @Override
     public void importPreferences(Path file) throws JabRefException {
@@ -1371,42 +1362,6 @@ public class JabRefPreferences implements PreferencesService {
         EasyBind.listen(doiPreferences.defaultBaseURIProperty(), (obs, oldValue, newValue) -> put(BASE_DOI_URI, newValue));
 
         return doiPreferences;
-    }
-
-    /**
-     * Gets the CustomAPIKeyPreferences that contains information: the custom API key and whether to use it
-     *
-     * @param name the key name of API key
-     * @return CustomAPIKeyPreferences
-     */
-    @Override
-    public FetcherApiKey getCustomApiKeyPreferences(String name) {
-        return new FetcherApiKey(name,
-                getBoolean(USE_CUSTOM_API_KEY + name, false),
-                get(CUSTOM_API_KEY + name, ""));
-    }
-
-    /**
-     * Saves CustomAPIKeyPreferences information: the custom custom API key and whether to use it
-     *
-     * @param preferences CustomApiKeyPreferences
-     */
-    @Override
-    public void storeCustomApiKeyPreferences(FetcherApiKey preferences) {
-        String keyName = preferences.getName();
-        putBoolean(USE_CUSTOM_API_KEY + keyName, preferences.shouldUseCustom());
-        put(CUSTOM_API_KEY + keyName, preferences.getCustomApiKey());
-    }
-
-    /**
-     * Removes the value associated with the specified custom api key in this preference node, if any.
-     *
-     * @param name the name of custom api key
-     */
-    @Override
-    public void clearCustomApiKeyPreferences(String name) {
-        prefs.remove(USE_CUSTOM_API_KEY + name);
-        prefs.remove(CUSTOM_API_KEY + name);
     }
 
     @Override
@@ -2025,8 +1980,8 @@ public class JabRefPreferences implements PreferencesService {
     @Override
     public ColumnPreferences getSearchDialogColumnPreferences() {
         return new ColumnPreferences(
-                                     createSearchDialogColumns(),
-                                     createSearchDialogColumnSortOrder());
+                createSearchDialogColumns(),
+                createSearchDialogColumnSortOrder());
     }
 
     /**
@@ -2868,14 +2823,52 @@ public class JabRefPreferences implements PreferencesService {
                 getBoolean(GENERATE_KEY_ON_IMPORT),
                 getBoolean(GROBID_ENABLED),
                 getBoolean(GROBID_OPT_OUT),
-                get(GROBID_URL)
+                get(GROBID_URL),
+                getFetcherKeys()
         );
 
         EasyBind.listen(importerPreferences.generateNewKeyOnImportProperty(), (obs, oldValue, newValue) -> putBoolean(GENERATE_KEY_ON_IMPORT, newValue));
         EasyBind.listen(importerPreferences.grobidEnabledProperty(), (obs, oldValue, newValue) -> putBoolean(GROBID_ENABLED, newValue));
         EasyBind.listen(importerPreferences.grobidOptOutProperty(), (obs, oldValue, newValue) -> putBoolean(GROBID_OPT_OUT, newValue));
         EasyBind.listen(importerPreferences.grobidURLProperty(), (obs, oldValue, newValue) -> put(GROBID_URL, newValue));
+        importerPreferences.getApiKeys().addListener((InvalidationListener) c -> storeFetcherKeys(importerPreferences.getApiKeys()));
 
         return importerPreferences;
+    }
+
+    private Set<FetcherApiKey> getFetcherKeys() {
+        Set<FetcherApiKey> fetcherApiKeys = new HashSet<>();
+
+        List<String> names = getStringList(FETCHER_CUSTOM_KEY_NAMES);
+        List<String> uses = getStringList(FETCHER_CUSTOM_KEY_USES);
+        List<String> keys = getStringList(FETCHER_CUSTOM_KEYS);
+
+        if (names.size() != uses.size() || names.size() != keys.size()) {
+            LOGGER.error("Failed to parse customized fetcher api keys.");
+            return Collections.emptySet();
+        }
+
+        for (int i = 0; i < names.size(); i++) {
+            FetcherApiKey apiKey = new FetcherApiKey(names.get(i), Boolean.parseBoolean(uses.get(i)), keys.get(i));
+            fetcherApiKeys.add(apiKey);
+        }
+
+        return fetcherApiKeys;
+    }
+
+    private void storeFetcherKeys(Set<FetcherApiKey> fetcherApiKeys) {
+        List<String> names = new ArrayList<>();
+        List<String> uses = new ArrayList<>();
+        List<String> keys = new ArrayList<>();
+
+        for (FetcherApiKey apiKey : fetcherApiKeys) {
+            names.add(apiKey.getName());
+            uses.add(String.valueOf(apiKey.shouldUseCustom()));
+            keys.add(apiKey.getCustomApiKey());
+        }
+
+        putStringList(FETCHER_CUSTOM_KEY_NAMES, names);
+        putStringList(FETCHER_CUSTOM_KEY_USES, uses);
+        putStringList(FETCHER_CUSTOM_KEYS, keys);
     }
 }

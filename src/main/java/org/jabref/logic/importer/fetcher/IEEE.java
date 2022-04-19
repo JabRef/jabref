@@ -15,7 +15,6 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.jabref.gui.Globals;
-import org.jabref.gui.preferences.importexport.ImportExportTabViewModel;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.FulltextFetcher;
@@ -47,7 +46,7 @@ import org.slf4j.LoggerFactory;
  *
  * @implNote <a href="https://developer.ieee.org/docs">API documentation</a>
  */
-public class IEEE implements FulltextFetcher, PagedSearchBasedParserFetcher {
+public class IEEE implements FulltextFetcher, PagedSearchBasedParserFetcher, CustomizeableKeyFetcher {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(IEEE.class);
     private static final String STAMP_BASE_STRING_DOCUMENT = "/stamp/stamp.jsp?tp=&arnumber=";
@@ -57,7 +56,7 @@ public class IEEE implements FulltextFetcher, PagedSearchBasedParserFetcher {
     private static final Pattern PDF_PATTERN = Pattern.compile("\"(https://ieeexplore.ieee.org/ielx[0-9/]+\\.pdf[^\"]+)\"");
     private static final String IEEE_DOI = "10.1109";
     private static final String BASE_URL = "https://ieeexplore.ieee.org";
-    private static final String API_KEY = new BuildInfo().ieeeAPIKey;
+
     private static final String TEST_URL_WITHOUT_API_KEY = "https://ieeexploreapi.ieee.org/api/v1/search/articles?max_records=0&apikey=";
 
     private final ImportFormatPreferences importFormatPreferences;
@@ -66,7 +65,6 @@ public class IEEE implements FulltextFetcher, PagedSearchBasedParserFetcher {
 
     public IEEE(ImportFormatPreferences preferences) {
         this.importFormatPreferences = Objects.requireNonNull(preferences);
-        ImportExportTabViewModel.registerApiKeyCustom(this.getName(), TEST_URL_WITHOUT_API_KEY);
     }
 
     /**
@@ -247,18 +245,21 @@ public class IEEE implements FulltextFetcher, PagedSearchBasedParserFetcher {
         return Optional.of(HelpFile.FETCHER_IEEEXPLORE);
     }
 
-    /**
-     * Gets IEEE api key, use key if it customized it in the preferences, otherwise use the default
-     *
-     * @return IEEE API Key
-     */
-    private String getApiKey() {
-        String apiKey = API_KEY;
-        FetcherApiKey apiKeyPreferences = Globals.prefs.getCustomApiKeyPreferences(getName());
-        if (apiKeyPreferences != null && apiKeyPreferences.shouldUseCustom()) {
-            apiKey = apiKeyPreferences.getCustomApiKey();
-        }
-        return apiKey;
+    @Override
+    public String getApiKey() {
+        return Globals.prefs.getImporterPreferences()
+                            .getApiKeys()
+                            .stream()
+                            .filter(key -> key.getName().equalsIgnoreCase(this.getName()))
+                            .filter(FetcherApiKey::shouldUseCustom)
+                            .findFirst()
+                            .map(key -> getApiKey())
+                            .orElse(new BuildInfo().ieeeAPIKey);
+    }
+
+    @Override
+    public String getTestUrl() {
+        return TEST_URL_WITHOUT_API_KEY;
     }
 
     @Override

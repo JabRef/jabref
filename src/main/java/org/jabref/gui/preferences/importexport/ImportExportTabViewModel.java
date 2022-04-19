@@ -17,7 +17,6 @@ import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleListProperty;
-import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
@@ -37,7 +36,7 @@ import org.jabref.preferences.PreferencesService;
 
 public class ImportExportTabViewModel implements PreferenceTabViewModel {
 
-    private final static Map<String, String> API_KEY_NAME_URL = new TreeMap<>();
+    private final Map<String, String> apiKeys = new TreeMap<>();
 
     private final BooleanProperty generateKeyOnImportProperty = new SimpleBooleanProperty();
 
@@ -54,11 +53,6 @@ public class ImportExportTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty grobidEnabledProperty = new SimpleBooleanProperty();
     private final StringProperty grobidURLProperty = new SimpleStringProperty("");
 
-    private final ListProperty<FetcherApiKey> keysProperty = new SimpleListProperty<>();
-    private final ObjectProperty<FetcherApiKey> selectedCustomApiKeyPreferencesProperty = new SimpleObjectProperty<>();
-    private final BooleanProperty useCustomApiKeyProperty = new SimpleBooleanProperty();
-    private final StringProperty customApiKeyTextProperty = new SimpleStringProperty();
-
     private final DialogService dialogService;
     private final PreferencesService preferencesService;
     private final DOIPreferences doiPreferences;
@@ -71,14 +65,6 @@ public class ImportExportTabViewModel implements PreferenceTabViewModel {
         this.importerPreferences = preferencesService.getImporterPreferences();
         this.doiPreferences = doiPreferences;
         this.initialExportOrder = preferencesService.getExportSaveOrder();
-    }
-
-    public static void registerApiKeyCustom(String key, String testUrlWithoutApiKey) {
-        API_KEY_NAME_URL.put(key, testUrlWithoutApiKey);
-    }
-
-    public ArrayList<String> getCustomApiKeyFetchers() {
-        return new ArrayList<>(API_KEY_NAME_URL.keySet());
     }
 
     @Override
@@ -104,8 +90,11 @@ public class ImportExportTabViewModel implements PreferenceTabViewModel {
         grobidEnabledProperty.setValue(importerPreferences.isGrobidEnabled());
         grobidURLProperty.setValue(importerPreferences.getGrobidURL());
 
+        for (String fetcher : preferencesService.getCustomApiKeyPreferences())
+        apiKeys.put(preferencesService.get)
+
         // API keys
-        for (String name : API_KEY_NAME_URL.keySet()) {
+        for (String name : apiKeys.keySet()) {
             keysProperty.add(preferencesService.getCustomApiKeyPreferences(name));
         }
     }
@@ -197,7 +186,7 @@ public class ImportExportTabViewModel implements PreferenceTabViewModel {
 
     public void checkCustomApiKey() {
         final String apiKeyName = selectedCustomApiKeyPreferencesProperty.get().getName();
-        final String testUrlWithoutApiKey = API_KEY_NAME_URL.get(apiKeyName);
+        final String testUrlWithoutApiKey = apiKeys.get(apiKeyName);
         final String apiKey = customApiKeyTextProperty.get();
 
         boolean valid;
