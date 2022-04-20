@@ -36,7 +36,6 @@ public class PdfAnnotationImporter implements AnnotationImporter {
      */
     @Override
     public List<FileAnnotation> importAnnotations(final Path path) {
-
         if (!validatePath(path)) {
             // Path could not be validated, return default result
             return Collections.emptyList();

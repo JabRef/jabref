@@ -12,6 +12,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 ### Added
 
 - We added an extra option when right-clicking an entry in the Entry List to copy either the DOI or the DOI url.
+- We added a fetcher for [Directory of Open Access Books (DOAB)](https://doabooks.org/) [8576](https://github.com/JabRef/jabref/issues/8576)
 - We added an extra option to ask the user whether they want to open to reveal the folder holding the saved file with the file selected. [#8195](https://github.com/JabRef/jabref/issues/8195)
 - We added a new section to network preferences to allow using custom SSL certificates. [#8126](https://github.com/JabRef/jabref/issues/8126)
 - We improved the version check to take also beta version into account and now redirect to the right changelog for the version.

@@ -55,7 +55,6 @@ public class EditSeparate {
             UnoScreenRefresh.lockControllers(doc);
 
             for (CitationGroup group : groups) {
-
                 XTextRange range1 = (frontend
                         .getMarkRange(doc, group)
                         .orElseThrow(IllegalStateException::new));

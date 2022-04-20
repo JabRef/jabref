@@ -58,7 +58,6 @@ public class BibtexImporterTest {
         assertEquals(4, bibEntries.size());
 
         for (BibEntry entry : bibEntries) {
-
             if (entry.getCitationKey().get().equals("aksin")) {
                 assertEquals(
                         Optional.of(

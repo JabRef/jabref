@@ -27,7 +27,6 @@ class OOProcessNumericMarkers {
      *
      */
     static void produceCitationMarkers(CitationGroups citationGroups, OOBibStyle style) {
-
         assert style.isNumberEntries();
 
         if (style.isSortByPosition()) {
@@ -42,5 +41,4 @@ class OOProcessNumericMarkers {
             group.setCitationMarker(Optional.of(citMarker));
         }
     }
-
 }

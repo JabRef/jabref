@@ -21,7 +21,6 @@ public class BibtexPurify {
      * @return
      */
     public static String purify(String toPurify, Warn warn) {
-
         StringBuilder sb = new StringBuilder();
 
         char[] cs = toPurify.toCharArray();

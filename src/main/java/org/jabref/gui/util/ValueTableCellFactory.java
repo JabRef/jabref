@@ -92,7 +92,6 @@ public class ValueTableCellFactory<S, T> implements Callback<TableColumn<S, T>, 
     @Override
     public TableCell<S, T> call(TableColumn<S, T> param) {
         return new TableCell<>() {
-
             @Override
             protected void updateItem(T item, boolean empty) {
                 super.updateItem(item, empty);

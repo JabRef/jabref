@@ -69,7 +69,6 @@ public class FunctionalTextViewCursor {
      * instance.restore() after finished using the cursor.
      */
     public static OOResult<FunctionalTextViewCursor, String> get(XTextDocument doc) {
-
         Objects.requireNonNull(doc);
 
         XTextRange initialPosition = null;

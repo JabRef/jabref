@@ -80,7 +80,6 @@ public class ErrorConsoleView extends BaseDialog<Void> {
 
     private Callback<ListView<LogEventViewModel>, ListCell<LogEventViewModel>> createCellFactory() {
         return cell -> new ListCell<>() {
-
             private HBox graphic;
             private Node icon;
             private VBox message;

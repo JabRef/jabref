@@ -56,7 +56,6 @@ public class LinkedFilesEditDialogViewModel extends AbstractViewModel {
 
     private void setExternalFileTypeByExtension(String link) {
         if (!link.isEmpty()) {
-
             // Check if this looks like a remote link:
             if (REMOTE_LINK_PATTERN.matcher(link).matches()) {
                 externalFileTypes.getExternalFileTypeByExt("html").ifPresent(selectedExternalFileType::setValue);

@@ -133,7 +133,6 @@ public abstract class Importer implements Comparable<Importer> {
             if (matches[0] != null) {
                 return Charset.forName(matches[0].getName());
             }
-
         } catch (IOException e) {
             LOGGER.error("Could not determine charset. Using default one.", e);
         }
@@ -165,7 +164,6 @@ public abstract class Importer implements Comparable<Importer> {
         }
 
         return new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8));
-
     }
 
     public static BufferedReader getReader(InputStream stream) throws IOException {

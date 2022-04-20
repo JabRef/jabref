@@ -95,7 +95,6 @@ public class RangeSortVisual {
     }
 
     private static <T> int compareTopToBottomLeftToRight(ComparableMark<T> a, ComparableMark<T> b) {
-
         if (a.position.Y != b.position.Y) {
             return a.position.Y - b.position.Y;
         }

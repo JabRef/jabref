@@ -75,7 +75,6 @@ public class CffImporter extends Importer {
         private void setValues(String key, String value) {
             values.put(key, value);
         }
-
     }
 
     private static class CffIdentifier {
