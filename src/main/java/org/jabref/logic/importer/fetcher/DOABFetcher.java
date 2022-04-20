@@ -17,6 +17,7 @@ import org.jabref.model.entry.Author;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.types.StandardEntryType;
 
 import kong.unirest.json.JSONArray;
 import kong.unirest.json.JSONException;
@@ -24,9 +25,9 @@ import kong.unirest.json.JSONObject;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 
-/*
- fetches books from https://www.doabooks.org/ through their API at
- https://www.doabooks.org/en/resources/metadata-harvesting-and-content-dissemination
+/**
+ * fetches books from https://www.doabooks.org/ through
+ * <a href="https://www.doabooks.org/en/resources/metadata-harvesting-and-content-dissemination">their API</a>.
  */
 
 public class DOABFetcher implements SearchBasedParserFetcher {
@@ -93,8 +94,7 @@ public class DOABFetcher implements SearchBasedParserFetcher {
                         authorsList.add(toAuthor(dataObject.getString("value")));
                     }
                 }
-                case "dc.type" -> entry.setField(StandardField.TYPE,
-                        dataObject.getString("value"));
+                case "dc.type" -> entry.setType(StandardEntryType.Book);
                 case "dc.date.issued" -> entry.setField(StandardField.YEAR, String.valueOf(
                         dataObject.getInt("value")));
                 case "oapen.identifier.doi" -> entry.setField(StandardField.DOI,
@@ -116,8 +116,19 @@ public class DOABFetcher implements SearchBasedParserFetcher {
                         dataObject.getString("value"));
                 case "dc.identifier.uri" -> entry.setField(StandardField.URI,
                         dataObject.getString("value"));
+                case "dc.identifier" -> {
+                    if (dataObject.getString("value").contains("http")) {
+                       entry.setField(StandardField.URL, dataObject.getString("value"));
+                    }
+                }
                 case "dc.subject.other" -> keywordJoiner.add(dataObject.getString("value"));
                 case "dc.contributor.editor" -> editorsList.add(toAuthor(dataObject.getString("value")));
+                case "oapen.volume" -> entry.setField(StandardField.VOLUME,
+                        dataObject.getString("value"));
+                case "oapen.relation.isbn" -> entry.setField(StandardField.ISBN,
+                        dataObject.getString("value"));
+                case "dc.title.alternative" -> entry.setField(StandardField.SUBTITLE,
+                        dataObject.getString("value"));
             }
         }
         entry.setField(StandardField.AUTHOR, AuthorList.of(authorsList).getAsFirstLastNamesWithAnd());

@@ -1,41 +1,46 @@
 package org.jabref.logic.importer.fetcher;
 
-import java.util.Collections;
 import java.util.List;
 
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.testutils.category.FetcherTest;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @FetcherTest
 public class DOABFetcherTest {
     private DOABFetcher fetcher;
-    private BibEntry David_Opal;
+    private BibEntry David_Pol;
     private BibEntry Ronald_Snijder;
     private BibEntry Andrew_Perrin;
     private BibEntry Felipe_Gonzalez;
     private BibEntry Carl_Marnewick;
     private BibEntry Antonios_Tsourdos;
+    private List<BibEntry> bibs;
 
     @BeforeEach
     public void setUp() throws Exception {
         fetcher = new DOABFetcher();
 
-        David_Opal = new BibEntry();
-        David_Opal.setField(StandardField.AUTHOR, "David Pol");
-        David_Opal.setField(StandardField.TITLE, "I Open Fire");
-        David_Opal.setField(StandardField.TYPE, "book");
-        David_Opal.setField(StandardField.DOI, "10.21983/P3.0086.1.00");
-        David_Opal.setField(StandardField.PAGES, "56");
-        David_Opal.setField(StandardField.YEAR, "2014");
-        David_Opal.setField(StandardField.URI, "https://directory.doabooks.org/handle/20.500.12854/34739");
-        David_Opal.setField(StandardField.ABSTRACT, "David Pol presents an ontology of war in the form of " +
+        David_Pol = new BibEntry();
+        David_Pol.setType(StandardEntryType.Book);
+        David_Pol.withField(StandardField.AUTHOR, "David Pol");
+        David_Pol.withField(StandardField.TITLE, "I Open Fire");
+        David_Pol.withField(StandardField.DOI, "10.21983/P3.0086.1.00");
+        David_Pol.withField(StandardField.PAGES, "56");
+        David_Pol.withField(StandardField.YEAR, "2014");
+        David_Pol.withField(StandardField.URL, "http://library.oapen.org/handle/20.500.12657/25535");
+        David_Pol.withField(StandardField.URI, "https://directory.doabooks.org/handle/20.500.12854/34739");
+        David_Pol.withField(StandardField.ABSTRACT, "David Pol presents an ontology of war in the form of " +
                 "the lyric poem. “Do you hear what I’m shooting at you?” In I Open Fire, all relation is " +
                 "warfare. Minefields compromise movement. Intention aims. Touch burns. Sex explodes bodies. " +
                 "Time ticks in bomb countdowns. Sound is sirens. Plenitude is debris. All of it under " +
@@ -48,19 +53,21 @@ public class DOABFetcherTest {
                 " up the themes of love, sex, marriage, touch, hope — in short, the many dimensions of" +
                 " interpersonal connection — in a world in unprecedentedly critical condition. “And when the night" +
                 " goes off the shock wave throws us apart toward each other.”");
-        David_Opal.setField(StandardField.LANGUAGE, "English");
-        David_Opal.setField(StandardField.KEYWORDS, "poetry, love, warfare");
-        David_Opal.setField(StandardField.PUBLISHER, "punctum books");
+        David_Pol.withField(StandardField.LANGUAGE, "English");
+        David_Pol.withField(StandardField.KEYWORDS, "poetry, love, warfare");
+        David_Pol.withField(StandardField.PUBLISHER, "punctum books");
 
         Ronald_Snijder = new BibEntry();
-        Ronald_Snijder.setField(StandardField.AUTHOR, "Ronald Snijder");
-        Ronald_Snijder.setField(StandardField.TITLE, "The deliverance of open access books");
-        Ronald_Snijder.setField(StandardField.TYPE, "book");
-        Ronald_Snijder.setField(StandardField.DOI, "10.26530/OAPEN_1004809");
-        Ronald_Snijder.setField(StandardField.PAGES, "234");
-        Ronald_Snijder.setField(StandardField.YEAR, "2019");
-        Ronald_Snijder.setField(StandardField.URI, "https://directory.doabooks.org/handle/20.500.12854/26303");
-        Ronald_Snijder.setField(StandardField.ABSTRACT, "In many scholarly disciplines, books - not articles" +
+        Ronald_Snijder.setType(StandardEntryType.Book);
+        Ronald_Snijder.withField(StandardField.AUTHOR, "Ronald Snijder");
+        Ronald_Snijder.withField(StandardField.TITLE, "The deliverance of open access books");
+        Ronald_Snijder.withField(StandardField.SUBTITLE, "Examining usage and dissemination");
+        Ronald_Snijder.withField(StandardField.DOI, "10.26530/OAPEN_1004809");
+        Ronald_Snijder.withField(StandardField.PAGES, "234");
+        Ronald_Snijder.withField(StandardField.YEAR, "2019");
+        Ronald_Snijder.withField(StandardField.URL, "http://library.oapen.org/handle/20.500.12657/25287");
+        Ronald_Snijder.withField(StandardField.URI, "https://directory.doabooks.org/handle/20.500.12854/26303");
+        Ronald_Snijder.withField(StandardField.ABSTRACT, "In many scholarly disciplines, books - not articles" +
                 " - are the norm. As print runs become smaller, the question arises whether publishing monographs" +
                 " in open access helps to make their contents globally accessible. To answer this question, the" +
                 " results of multiple studies on the usage of open access books are presented. The research" +
@@ -69,20 +76,21 @@ public class DOABFetcherTest {
                 " societal influence. Each chapter reviews a different aspect: book sales, digital dissemination," +
                 " open licenses, user communities, measuring usage, developing countries and the effects on" +
                 " citations and social media.");
-        Ronald_Snijder.setField(StandardField.LANGUAGE, "English");
-        Ronald_Snijder.setField(StandardField.KEYWORDS, "Open Access, Monographs, OAPEN Library, " +
+        Ronald_Snijder.withField(StandardField.LANGUAGE, "English");
+        Ronald_Snijder.withField(StandardField.KEYWORDS, "Open Access, Monographs, OAPEN Library, " +
                 "Directory of Open Access Books");
-        Ronald_Snijder.setField(StandardField.PUBLISHER, "Amsterdam University Press");
+        Ronald_Snijder.withField(StandardField.PUBLISHER, "Amsterdam University Press");
 
         Andrew_Perrin = new BibEntry();
-        Andrew_Perrin.setField(StandardField.EDITOR, "Andrew Perrin and Loren T. Stuckenbruck");
-        Andrew_Perrin.setField(StandardField.TITLE, "Four Kingdom Motifs before and beyond the Book of Daniel");
-        Andrew_Perrin.setField(StandardField.TYPE, "book");
-        Andrew_Perrin.setField(StandardField.DOI, "10.1163/9789004443280");
-        Andrew_Perrin.setField(StandardField.PAGES, "354");
-        Andrew_Perrin.setField(StandardField.YEAR, "2020");
-        Andrew_Perrin.setField(StandardField.URI, "https://directory.doabooks.org/handle/20.500.12854/68086");
-        Andrew_Perrin.setField(StandardField.ABSTRACT, "The four kingdoms motif enabled writers of various " +
+        Andrew_Perrin.setType(StandardEntryType.Book);
+        Andrew_Perrin.withField(StandardField.EDITOR, "Andrew Perrin and Loren T. Stuckenbruck");
+        Andrew_Perrin.withField(StandardField.TITLE, "Four Kingdom Motifs before and beyond the Book of Daniel");
+        Andrew_Perrin.withField(StandardField.DOI, "10.1163/9789004443280");
+        Andrew_Perrin.withField(StandardField.PAGES, "354");
+        Andrew_Perrin.withField(StandardField.YEAR, "2020");
+        Andrew_Perrin.withField(StandardField.URL, "https://library.oapen.org/handle/20.500.12657/48312");
+        Andrew_Perrin.withField(StandardField.URI, "https://directory.doabooks.org/handle/20.500.12854/68086");
+        Andrew_Perrin.withField(StandardField.ABSTRACT, "The four kingdoms motif enabled writers of various " +
                 "cultures, times, and places, to periodize history as the staged succession of empires " +
                 "barrelling towards an utopian age. The motif provided order to lived experiences under empire" +
                 " (the present), in view of ancestral traditions and cultural heritage (the past), and inspired" +
@@ -94,19 +102,19 @@ public class DOABFetcherTest {
                 "from antiquity through the Mediaeval eras. Readership: Advanced students and scholars of the " +
                 "textual formation, apocalyptic theology, and historiographies of the book of Daniel and its " +
                 "diverse reception by writers and communities.");
-        Andrew_Perrin.setField(StandardField.LANGUAGE, "English");
-        Andrew_Perrin.setField(StandardField.KEYWORDS, "Religion");
-        Andrew_Perrin.setField(StandardField.PUBLISHER, "Brill");
+        Andrew_Perrin.withField(StandardField.LANGUAGE, "English");
+        Andrew_Perrin.withField(StandardField.KEYWORDS, "Religion");
+        Andrew_Perrin.withField(StandardField.PUBLISHER, "Brill");
 
         Felipe_Gonzalez = new BibEntry();
-        Felipe_Gonzalez.setField(StandardField.EDITOR, "Felipe Gonzalez Toro and Antonios Tsourdos");
-        Felipe_Gonzalez.setField(StandardField.TITLE, "UAV Sensors for Environmental Monitoring");
-        Felipe_Gonzalez.setField(StandardField.TYPE, "book");
-        Felipe_Gonzalez.setField(StandardField.DOI, "10.3390/books978-3-03842-754-4");
-        Felipe_Gonzalez.setField(StandardField.PAGES, "670");
-        Felipe_Gonzalez.setField(StandardField.YEAR, "2018");
-        Felipe_Gonzalez.setField(StandardField.URI, "https://directory.doabooks.org/handle/20.500.12854/39793");
-        Felipe_Gonzalez.setField(StandardField.ABSTRACT, "The rapid development and growth of UAVs as a " +
+        Felipe_Gonzalez.setType(StandardEntryType.Book);
+        Felipe_Gonzalez.withField(StandardField.EDITOR, "Felipe Gonzalez Toro and Antonios Tsourdos");
+        Felipe_Gonzalez.withField(StandardField.TITLE, "UAV Sensors for Environmental Monitoring");
+        Felipe_Gonzalez.withField(StandardField.DOI, "10.3390/books978-3-03842-754-4");
+        Felipe_Gonzalez.withField(StandardField.PAGES, "670");
+        Felipe_Gonzalez.withField(StandardField.YEAR, "2018");
+        Felipe_Gonzalez.withField(StandardField.URI, "https://directory.doabooks.org/handle/20.500.12854/39793");
+        Felipe_Gonzalez.withField(StandardField.ABSTRACT, "The rapid development and growth of UAVs as a " +
                 "remote sensing platform, as well as advances in the miniaturization of instrumentation and data" +
                 " systems, are catalyzing a renaissance in remote sensing in a variety of fields and disciplines" +
                 " from precision agriculture to ecology, atmospheric research, and disaster response. This" +
@@ -119,19 +127,20 @@ public class DOABFetcherTest {
                 " mammal species tracking search and rescue; target tracking, the monitoring of the atmosphere;" +
                 " chemical, biological, and natural disaster phenomena; fire prevention, flood prevention;" +
                 " volcanic monitoring, pollution monitoring, micro-climates and land use");
-        Felipe_Gonzalez.setField(StandardField.LANGUAGE, "English");
-        Felipe_Gonzalez.setField(StandardField.KEYWORDS, "UAV sensors, Environmental Monitoring, drones, unmanned aerial vehicles");
-        Felipe_Gonzalez.setField(StandardField.PUBLISHER, "MDPI - Multidisciplinary Digital Publishing Institute");
+        Felipe_Gonzalez.withField(StandardField.LANGUAGE, "English");
+        Felipe_Gonzalez.withField(StandardField.KEYWORDS, "UAV sensors, Environmental Monitoring, drones, unmanned aerial vehicles");
+        Felipe_Gonzalez.withField(StandardField.PUBLISHER, "MDPI - Multidisciplinary Digital Publishing Institute");
 
         Carl_Marnewick = new BibEntry();
-        Carl_Marnewick.setField(StandardField.AUTHOR, "Carl Marnewick and Wikus Erasmus and Joseph Nazeer");
-        Carl_Marnewick.setField(StandardField.TITLE, "The symbiosis between information system project complexity and information system project success");
-        Carl_Marnewick.setField(StandardField.TYPE, "book");
-        Carl_Marnewick.setField(StandardField.DOI, "10.4102/aosis.2017.itpsc45");
-        Carl_Marnewick.setField(StandardField.PAGES, "184");
-        Carl_Marnewick.setField(StandardField.YEAR, "2017");
-        Carl_Marnewick.setField(StandardField.URI, "https://directory.doabooks.org/handle/20.500.12854/38792");
-        Carl_Marnewick.setField(StandardField.ABSTRACT, "Project success is widely covered, and the " +
+        Carl_Marnewick.setType(StandardEntryType.Book);
+        Carl_Marnewick.withField(StandardField.AUTHOR, "Carl Marnewick and Wikus Erasmus and Joseph Nazeer");
+        Carl_Marnewick.withField(StandardField.TITLE, "The symbiosis between information system project complexity and information system project success");
+        Carl_Marnewick.withField(StandardField.DOI, "10.4102/aosis.2017.itpsc45");
+        Carl_Marnewick.withField(StandardField.PAGES, "184");
+        Carl_Marnewick.withField(StandardField.YEAR, "2017");
+        Carl_Marnewick.withField(StandardField.URL, "http://library.oapen.org/handle/20.500.12657/30652");
+        Carl_Marnewick.withField(StandardField.URI, "https://directory.doabooks.org/handle/20.500.12854/38792");
+        Carl_Marnewick.withField(StandardField.ABSTRACT, "Project success is widely covered, and the " +
                 "discourse on project complexity is proliferating. The purpose of this book is to merge and" +
                 " investigate the two concepts within the context of information system (IS) projects and" +
                 " understand the symbiosis between success and complexity in these projects. In this original" +
@@ -162,18 +171,18 @@ public class DOABFetcherTest {
                 " not been plagiarised or presented before. It is not a revised version of a thesis or research" +
                 " previously published. Comments resulted from the blind peer review process were carefully" +
                 " considered and incorporated accordingly.");
-        Carl_Marnewick.setField(StandardField.LANGUAGE, "English");
-        Carl_Marnewick.setField(StandardField.KEYWORDS, "agile, structural equation modelling, information technology, success, models, strategic alignment, complexity, waterfall, project management, quantitative, Agile software development, Change management, Deliverable, Exploratory factor analysis, South Africa");
-        Carl_Marnewick.setField(StandardField.PUBLISHER, "AOSIS");
+        Carl_Marnewick.withField(StandardField.LANGUAGE, "English");
+        Carl_Marnewick.withField(StandardField.KEYWORDS, "agile, structural equation modelling, information technology, success, models, strategic alignment, complexity, waterfall, project management, quantitative, Agile software development, Change management, Deliverable, Exploratory factor analysis, South Africa");
+        Carl_Marnewick.withField(StandardField.PUBLISHER, "AOSIS");
 
         Antonios_Tsourdos = new BibEntry();
-        Antonios_Tsourdos.setField(StandardField.EDITOR, "Felipe Gonzalez Toro and Antonios Tsourdos");
-        Antonios_Tsourdos.setField(StandardField.TITLE, "UAV‐Based Remote Sensing Volume 2");
-        Antonios_Tsourdos.setField(StandardField.TYPE, "book");
-        Antonios_Tsourdos.setField(StandardField.PAGES, "VIII, 396");
-        Antonios_Tsourdos.setField(StandardField.YEAR, "2018");
-        Antonios_Tsourdos.setField(StandardField.URI, "https://directory.doabooks.org/handle/20.500.12854/61443");
-        Antonios_Tsourdos.setField(StandardField.ABSTRACT, "ctive technological development has fuelled " +
+        Antonios_Tsourdos.setType(StandardEntryType.Book);
+        Antonios_Tsourdos.withField(StandardField.EDITOR, "Felipe Gonzalez Toro and Antonios Tsourdos");
+        Antonios_Tsourdos.withField(StandardField.TITLE, "UAV‐Based Remote Sensing Volume 2");
+        Antonios_Tsourdos.withField(StandardField.PAGES, "VIII, 396");
+        Antonios_Tsourdos.withField(StandardField.YEAR, "2018");
+        Antonios_Tsourdos.withField(StandardField.URI, "https://directory.doabooks.org/handle/20.500.12854/61443");
+        Antonios_Tsourdos.withField(StandardField.ABSTRACT, "ctive technological development has fuelled " +
                 "rapid growth in the number of Unmanned Aerial Vehicle (UAV) platforms being deployed around" +
                 " the globe. Novel UAV platforms, UAV-based sensors, robotic sensing and imaging techniques," +
                 " the development of processing workflows, as well as the capacity of ultra-high temporal and" +
@@ -189,56 +198,30 @@ public class DOABFetcherTest {
                 " as well as a range of atmospheric, geological, , agricultural, ecological, reef, wildlife, " +
                 "building and construction, coastal area coverage, search and rescue (SAR), water plume " +
                 "temperature measurements, aeromagnetic and archaeological surveys applications");
-        Antonios_Tsourdos.setField(StandardField.LANGUAGE, "English");
-        Antonios_Tsourdos.setField(StandardField.KEYWORDS, "UAV-Based Remote Sensing, drones, pedestrian detection and tracking as well as a range of atmospheric, UAV images, fuzzy-based hybrid control algorithms, water plume temperature measurements, aeromagnetic and archaeological surveys, geological, two-UAV communication system, agricultural, wildlife, reef, detection, multi-target localization, ecological, search and rescue (SAR), coastal area coverage, remote sensing, environmental science, segmentation in digital surface models for 3D reconstruction, location and grasping objects, augmented reality tools, building and construction, aerial robotics, noise suppression techniques, rectification for oblique images, vision-based tracking in cooperative multi-UAV systems");
-        Antonios_Tsourdos.setField(StandardField.PUBLISHER, "MDPI - Multidisciplinary Digital Publishing Institute");
+        Antonios_Tsourdos.withField(StandardField.LANGUAGE, "English");
+        Antonios_Tsourdos.withField(StandardField.VOLUME, "2");
+        Antonios_Tsourdos.withField(StandardField.KEYWORDS, "UAV-Based Remote Sensing, drones, pedestrian detection and tracking as well as a range of atmospheric, UAV images, fuzzy-based hybrid control algorithms, water plume temperature measurements, aeromagnetic and archaeological surveys, geological, two-UAV communication system, agricultural, wildlife, reef, detection, multi-target localization, ecological, search and rescue (SAR), coastal area coverage, remote sensing, environmental science, segmentation in digital surface models for 3D reconstruction, location and grasping objects, augmented reality tools, building and construction, aerial robotics, noise suppression techniques, rectification for oblique images, vision-based tracking in cooperative multi-UAV systems");
+        Antonios_Tsourdos.withField(StandardField.PUBLISHER, "MDPI - Multidisciplinary Digital Publishing Institute");
+
+        bibs = List.of(David_Pol, Ronald_Snijder, Felipe_Gonzalez, Antonios_Tsourdos, Carl_Marnewick,
+                Andrew_Perrin);
     }
 
     @Test
-    public void TestGetName() {
+    public void testGetName() {
         assertEquals("DOAB", fetcher.getName());
     }
 
-    @Test
-    public void TestPerformSearch() throws FetcherException {
+    @ParameterizedTest
+    @ValueSource(strings = {"i open fire", "the deliverance of open access books",
+    "UAV Sensors for Environmental Monitoring", "Four Kingdom Motifs before and beyond the Book of Daniel",
+    "The symbiosis between information system project complexity and information system project success",
+    "UAV‐Based Remote Sensing Volume 2"})
+    public void testPerformSearch(String query) throws FetcherException {
         List<BibEntry> entries;
-        entries = fetcher.performSearch("i open fire");
-        assertEquals(Collections.singletonList(David_Opal), entries);
-    }
-
-     @Test
-    public void TestPerformSearch2() throws FetcherException {
-        List<BibEntry> entries;
-        entries = fetcher.performSearch("the deliverance of open access books");
-        assertEquals(Collections.singletonList(Ronald_Snijder), entries);
-    }
-
-    @Test
-    public void TestPerformSearch3() throws FetcherException {
-        List<BibEntry> entries;
-        entries = fetcher.performSearch("Four Kingdom Motifs before and beyond the Book of Daniel");
-        assertEquals(Collections.singletonList(Andrew_Perrin), entries);
-    }
-
-    @Test
-    public void TestPerformSearch4() throws FetcherException {
-        List<BibEntry> entries;
-        entries = fetcher.performSearch("UAV Sensors for Environmental Monitoring");
-        assertEquals(Collections.singletonList(Felipe_Gonzalez), entries);
-    }
-
-    @Test
-    public void TestPerformSearch5() throws FetcherException {
-        List<BibEntry> entries;
-        entries = fetcher.performSearch("The symbiosis between information system project complexity and information system project success");
-        assertEquals(Collections.singletonList(Carl_Marnewick), entries);
-    }
-
-    @Test
-    public void TestPerformSearch6() throws FetcherException {
-        List<BibEntry> entries;
-        entries = fetcher.performSearch("UAV‐Based Remote Sensing Volume 2");
-        assertEquals(Collections.singletonList(Antonios_Tsourdos), entries);
+        entries = fetcher.performSearch(query);
+        assertTrue(bibs.contains(entries.get(0)));
+        // assertEquals(David_Pol, entries);
     }
 
 }
