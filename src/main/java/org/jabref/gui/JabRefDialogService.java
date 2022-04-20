@@ -13,6 +13,7 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import javafx.concurrent.Task;
+import javafx.geometry.Pos;
 import javafx.print.PrinterJob;
 import javafx.scene.Group;
 import javafx.scene.Node;
@@ -43,10 +44,8 @@ import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.gui.util.ZipFileChooser;
 import org.jabref.logic.l10n.Localization;
 
-import com.jfoenix.controls.JFXSnackbar;
-import com.jfoenix.controls.JFXSnackbar.SnackbarEvent;
-import com.jfoenix.controls.JFXSnackbarLayout;
 import com.tobiasdiez.easybind.EasyBind;
+import org.controlsfx.control.Notifications;
 import org.controlsfx.control.TaskProgressView;
 import org.controlsfx.dialog.ExceptionDialog;
 import org.controlsfx.dialog.ProgressDialog;
@@ -70,13 +69,11 @@ public class JabRefDialogService implements DialogService {
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefDialogService.class);
 
     private final Window mainWindow;
-    private final JFXSnackbar statusLine;
     private final ThemeManager themeManager;
 
     public JabRefDialogService(Window mainWindow, Pane mainPane, ThemeManager themeManager) {
         this.mainWindow = mainWindow;
         this.themeManager = themeManager;
-        this.statusLine = new JFXSnackbar(mainPane);
     }
 
     private FXDialog createDialog(AlertType type, String title, String content) {
@@ -336,7 +333,16 @@ public class JabRefDialogService implements DialogService {
     @Override
     public void notify(String message) {
         LOGGER.info(message);
-        statusLine.fireEvent(new SnackbarEvent(new JFXSnackbarLayout(message), TOAST_MESSAGE_DISPLAY_TIME, null));
+        Notifications thresholdNotification = Notifications.create()
+                                                           .text("Too much happening.. Hang on..")
+                                                           .hideAfter(TOAST_MESSAGE_DISPLAY_TIME);
+        Notifications.create()
+                .text(message)
+                .position(Pos.BOTTOM_CENTER)
+                .threshold(5, thresholdNotification)
+                .hideAfter(TOAST_MESSAGE_DISPLAY_TIME)
+                .hideCloseButton()
+                .show();
     }
 
     @Override
