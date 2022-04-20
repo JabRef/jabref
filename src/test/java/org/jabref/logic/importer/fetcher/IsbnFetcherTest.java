@@ -31,7 +31,7 @@ class IsbnFetcherTest {
         fetcher = new IsbnFetcher(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS));
 
         bibEntry = new BibEntry(StandardEntryType.Book)
-                // .withField(StandardField.AUTHOR, "Bloch, Joshua")
+                .withField(StandardField.AUTHOR, "Bloch, Joshua")
                 .withField(StandardField.TITLE, "Effective Java")
                 .withField(StandardField.PUBLISHER, "Addison-Wesley Professional")
                 .withField(StandardField.YEAR, "2017")
