@@ -6,7 +6,9 @@ import java.net.URL;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import org.jabref.logic.importer.AuthorListParser;
 import org.jabref.logic.importer.FetcherException;
@@ -81,7 +83,12 @@ public class OpenLibraryFetcher extends AbstractIsbnFetcher {
     private BibEntry jsonItemToBibEntry(JSONObject item) throws ParseException {
         try {
             BibEntry entry = new BibEntry(StandardEntryType.Book);
-            entry.setField(StandardField.AUTHOR, toAuthors(item.optJSONArray("authors")));
+            String authors = toAuthors(item.optJSONArray("authors"));
+            if (authors.isEmpty()) {
+                JSONArray works = item.optJSONArray("works");
+                authors = fromWorksToAuthors(works);
+            }
+            entry.setField(StandardField.AUTHOR, authors);
             entry.setField(StandardField.PAGES, item.optString("number_of_pages"));
             entry.setField(StandardField.ISBN,
                     Optional.ofNullable(item.optJSONArray("isbn_13")).map(array -> array.getString(0))
@@ -131,5 +138,31 @@ public class OpenLibraryFetcher extends AbstractIsbnFetcher {
         AuthorListParser authorListParser = new AuthorListParser();
         AuthorList authorList = authorListParser.parse(nameOptional.get());
         return authorList.getAuthor(0);
+    }
+
+    private String fromWorksToAuthors(JSONArray works) {
+        if (works == null) {
+            return "";
+        }
+
+        List<Author> authors = IntStream.range(0, works.length())
+                                          .mapToObj(works::getJSONObject)
+                                          .map(obj -> obj.getString("key"))
+                                          .map(worksLink -> BASE_URL + worksLink + ".json")
+                                          .flatMap(link -> fromWorkToAuthors(link))
+                                          .collect(Collectors.toList());
+        return AuthorList.of(authors).getAsLastFirstNamesWithAnd(false);
+    }
+
+    private Stream<Author> fromWorkToAuthors(String link) {
+        JsonNode body = Unirest.get(link).asJson().getBody();
+        JSONArray authors = body.getObject().optJSONArray("authors");
+        if (authors == null) {
+            return Stream.empty();
+        }
+
+        return IntStream.range(0, authors.length())
+                        .mapToObj(authors::getJSONObject)
+                        .map(authorObject -> toAuthor(authorObject.getJSONObject("author").getString("key")));
     }
 }
