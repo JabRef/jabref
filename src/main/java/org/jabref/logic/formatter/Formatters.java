@@ -11,7 +11,7 @@ import org.jabref.logic.cleanup.Formatter;
 import org.jabref.logic.formatter.bibtexfields.CleanupUrlFormatter;
 import org.jabref.logic.formatter.bibtexfields.ClearFormatter;
 import org.jabref.logic.formatter.bibtexfields.EscapeAmpersandsFormatter;
-import org.jabref.logic.formatter.bibtexfields.EscapeCurrencySymbolsFormatter;
+import org.jabref.logic.formatter.bibtexfields.EscapeDollarSignFormatter;
 import org.jabref.logic.formatter.bibtexfields.EscapeUnderscoresFormatter;
 import org.jabref.logic.formatter.bibtexfields.HtmlToLatexFormatter;
 import org.jabref.logic.formatter.bibtexfields.HtmlToUnicodeFormatter;
@@ -76,7 +76,7 @@ public class Formatters {
                 new UnitsToLatexFormatter(),
                 new EscapeUnderscoresFormatter(),
                 new EscapeAmpersandsFormatter(),
-                new EscapeCurrencySymbolsFormatter(),
+                new EscapeDollarSignFormatter(),
                 new ShortenDOIFormatter(),
                 new UnprotectTermsFormatter()
         );
