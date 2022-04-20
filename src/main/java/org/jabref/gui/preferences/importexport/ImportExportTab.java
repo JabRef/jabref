@@ -73,8 +73,8 @@ public class ImportExportTab extends AbstractPreferenceTabView<ImportExportTabVi
                 .withText(FetcherApiKey::getName)
                 .install(apiKeyName);
 
-        apiKeyName.itemsProperty().bind(viewModel.customApiKeyPrefsProperty());
-        apiKeyName.valueProperty().bindBidirectional(viewModel.selectedCustomApiKeyPreferencesProperty());
+        apiKeyName.itemsProperty().bind(viewModel.fetcherApiKeys());
+        apiKeyName.valueProperty().bindBidirectional(viewModel.selectedApiKeyProperty());
         apiKeyName.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             if (oldValue != null) {
                 oldValue.shouldUseCustomKey(useCustomApiKey.isSelected());

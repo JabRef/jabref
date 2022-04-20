@@ -5,8 +5,6 @@ import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
@@ -17,6 +15,7 @@ import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleListProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
@@ -36,7 +35,8 @@ import org.jabref.preferences.PreferencesService;
 
 public class ImportExportTabViewModel implements PreferenceTabViewModel {
 
-    private final Map<String, String> apiKeys = new TreeMap<>();
+    private final ListProperty<FetcherApiKey> apiKeys = new SimpleListProperty<>();
+    private final ObjectProperty<FetcherApiKey> selectedApiKeyProperty = new SimpleObjectProperty<>();
 
     private final BooleanProperty generateKeyOnImportProperty = new SimpleBooleanProperty();
 
@@ -90,13 +90,8 @@ public class ImportExportTabViewModel implements PreferenceTabViewModel {
         grobidEnabledProperty.setValue(importerPreferences.isGrobidEnabled());
         grobidURLProperty.setValue(importerPreferences.getGrobidURL());
 
-        for (String fetcher : preferencesService.getCustomApiKeyPreferences())
-        apiKeys.put(preferencesService.get)
-
-        // API keys
-        for (String name : apiKeys.keySet()) {
-            keysProperty.add(preferencesService.getCustomApiKeyPreferences(name));
-        }
+        apiKeys.clear();
+        apiKeys.addAll(preferencesService.getImporterPreferences().getApiKeys());
     }
 
     @Override
@@ -115,15 +110,8 @@ public class ImportExportTabViewModel implements PreferenceTabViewModel {
         preferencesService.storeExportSaveOrder(newSaveOrderConfig);
 
         // API keys
-        selectedCustomApiKeyPreferencesProperty.get().shouldUseCustomKey(useCustomApiKeyProperty.get());
-        selectedCustomApiKeyPreferencesProperty.get().setCustomApiKey(customApiKeyTextProperty.get());
-        for (FetcherApiKey apiKeyPreferences : keysProperty.get()) {
-            if (apiKeyPreferences.getCustomApiKey().isEmpty()) {
-                preferencesService.clearCustomApiKeyPreferences(apiKeyPreferences.getName());
-            } else {
-                preferencesService.storeCustomApiKeyPreferences(apiKeyPreferences);
-            }
-        }
+        preferencesService.getImporterPreferences().getApiKeys().clear();
+        preferencesService.getImporterPreferences().getApiKeys().addAll(apiKeys);
     }
 
     public BooleanProperty generateKeyOnImportProperty() {
@@ -168,20 +156,12 @@ public class ImportExportTabViewModel implements PreferenceTabViewModel {
         return grobidURLProperty;
     }
 
-    public ListProperty<FetcherApiKey> customApiKeyPrefsProperty() {
-        return this.keysProperty;
+    public ListProperty<FetcherApiKey> fetcherApiKeys() {
+        return apiKeys;
     }
 
-    public ObjectProperty<FetcherApiKey> selectedCustomApiKeyPreferencesProperty() {
-        return this.selectedCustomApiKeyPreferencesProperty;
-    }
-
-    public BooleanProperty useCustomApiKeyProperty() {
-        return this.useCustomApiKeyProperty;
-    }
-
-    public StringProperty customApiKeyText() {
-        return this.customApiKeyTextProperty;
+    public ObjectProperty<FetcherApiKey> selectedApiKeyProperty() {
+        return selectedApiKeyProperty;
     }
 
     public void checkCustomApiKey() {
@@ -195,7 +175,6 @@ public class ImportExportTabViewModel implements PreferenceTabViewModel {
             try {
                 SSLSocketFactory defaultSslSocketFactory = HttpsURLConnection.getDefaultSSLSocketFactory();
                 HostnameVerifier defaultHostnameVerifier = HttpsURLConnection.getDefaultHostnameVerifier();
-                URLDownload.bypassSSLVerification();
 
                 urlDownload = new URLDownload(testUrlWithoutApiKey + apiKey);
                 // The HEAD request cannot be used because its response is not 200 (maybe 404 or 596...).

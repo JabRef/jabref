@@ -11,7 +11,6 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.jabref.gui.Globals;
-import org.jabref.gui.preferences.importexport.ImportExportTabViewModel;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.PagedSearchBasedParserFetcher;
@@ -47,10 +46,6 @@ public class SpringerFetcher implements PagedSearchBasedParserFetcher {
     private static final String API_KEY = new BuildInfo().springerNatureAPIKey;
     // Springer query using the parameter 'q=doi:10.1007/s11276-008-0131-4s=1' will respond faster
     private static final String TEST_URL_WITHOUT_API_KEY = "https://api.springernature.com/meta/v1/json?q=doi:10.1007/s11276-008-0131-4s=1&p=1&api_key=";
-
-    public SpringerFetcher() {
-        ImportExportTabViewModel.registerApiKeyCustom(this.getName(), TEST_URL_WITHOUT_API_KEY);
-    }
 
     /**
      * Convert a JSONObject obtained from http://api.springer.com/metadata/json to a BibEntry
