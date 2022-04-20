@@ -75,10 +75,10 @@ public class CompositeSearchBasedFetcherTest {
                 Assertions.assertTrue(compositeResult.containsAll(fetcherResult));
             } catch (FetcherException e) {
                 /* We catch the Fetcher exception here, since the failing fetcher also fails in the CompositeFetcher
-                 * and just leads to no additional results in the returned list. Therefore the test should not fail
+                 * and just leads to no additional results in the returned list. Therefore, the test should not fail
                  * due to the fetcher exception
                  */
-                LOGGER.debug(String.format("Fetcher %s failed ", fetcher.getName()), e);
+                LOGGER.debug("Fetcher {} failed ", fetcher.getName(), e);
             }
         }
     }
@@ -93,25 +93,26 @@ public class CompositeSearchBasedFetcherTest {
         when(importFormatPreferences.getFieldContentFormatterPreferences())
                 .thenReturn(mock(FieldContentFormatterPreferences.class));
         List<Set<SearchBasedFetcher>> fetcherParameters = new ArrayList<>();
-        List<SearchBasedFetcher> list = new ArrayList<>();
 
-        list.add(new ArXiv(importFormatPreferences));
-        list.add(new INSPIREFetcher(importFormatPreferences));
-        list.add(new GvkFetcher());
-        list.add(new AstrophysicsDataSystem(importFormatPreferences));
-        list.add(new MathSciNet(importFormatPreferences));
-        list.add(new ZbMATH(importFormatPreferences));
-        list.add(new GoogleScholar(importFormatPreferences));
-        list.add(new DBLPFetcher(importFormatPreferences));
-        list.add(new SpringerFetcher());
-        list.add(new CrossRef());
-        list.add(new CiteSeer());
-        list.add(new DOAJFetcher(importFormatPreferences));
-        list.add(new IEEE(importFormatPreferences));
+        List<SearchBasedFetcher> list = List.of(
+                new ArXiv(importFormatPreferences),
+                new INSPIREFetcher(importFormatPreferences),
+                new GvkFetcher(),
+                new AstrophysicsDataSystem(importFormatPreferences),
+                new MathSciNet(importFormatPreferences),
+                new ZbMATH(importFormatPreferences),
+                new GoogleScholar(importFormatPreferences),
+                new DBLPFetcher(importFormatPreferences),
+                new SpringerFetcher(),
+                new CrossRef(),
+                new CiteSeer(),
+                new DOAJFetcher(importFormatPreferences),
+                new IEEE(importFormatPreferences));
+
         /* Disabled due to an issue regarding comparison: Title fields of the entries that otherwise are equivalent differ
          * due to different JAXBElements.
          */
-        // list.add(new MedlineFetcher());
+        // new MedlineFetcher()
 
         // Create different sized sets of fetchers to use in the composite fetcher.
         // Selected 1173 to have differencing sets

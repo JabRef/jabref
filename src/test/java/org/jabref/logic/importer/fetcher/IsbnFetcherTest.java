@@ -8,7 +8,6 @@ import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.testutils.category.FetcherTest;
 
@@ -31,17 +30,13 @@ class IsbnFetcherTest {
     void setUp() {
         fetcher = new IsbnFetcher(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS));
 
-        bibEntry = new BibEntry();
-        bibEntry.setType(StandardEntryType.Book);
-        bibEntry.setCitationKey("9780134685991");
-        bibEntry.setField(StandardField.TITLE, "Effective Java");
-        bibEntry.setField(StandardField.PUBLISHER, "Addison Wesley");
-        bibEntry.setField(StandardField.YEAR, "2018");
-        bibEntry.setField(StandardField.AUTHOR, "Bloch, Joshua");
-        bibEntry.setField(StandardField.DATE, "2018-01-31");
-        bibEntry.setField(new UnknownField("ean"), "9780134685991");
-        bibEntry.setField(StandardField.ISBN, "0134685997");
-        bibEntry.setField(StandardField.URL, "https://www.ebook.de/de/product/28983211/joshua_bloch_effective_java.html");
+        bibEntry = new BibEntry(StandardEntryType.Book)
+                // .withField(StandardField.AUTHOR, "Bloch, Joshua")
+                .withField(StandardField.TITLE, "Effective Java")
+                .withField(StandardField.PUBLISHER, "Addison-Wesley Professional")
+                .withField(StandardField.YEAR, "2017")
+                .withField(StandardField.PAGES, "416")
+                .withField(StandardField.ISBN, "9780134685991");
     }
 
     @Test
