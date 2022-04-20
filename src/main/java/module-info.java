@@ -46,11 +46,11 @@ open module org.jabref {
     with org.jabref.gui.logging.GuiWriter,
          org.jabref.gui.logging.ApplicationInsightsWriter;
 
-    requires applicationinsights.logging.log4j2;
-
     // Preferences and XML
     requires java.prefs;
     requires jakarta.xml.bind;
+    // needs to be loaded here as it's otherwise not found at runtime
+    requires org.glassfish.jaxb.runtime;
     requires jdk.xml.dom;
 
     // Annotations (@PostConstruct)
@@ -58,12 +58,12 @@ open module org.jabref {
 
     // Microsoft application insights
     requires applicationinsights.core;
+    requires applicationinsights.logging.log4j2;
 
     // Libre Office
     requires org.libreoffice.uno;
 
     // Other modules
-    requires commons.logging;
     requires com.google.common;
     requires jakarta.inject;
     requires reactfx;
@@ -72,7 +72,6 @@ open module org.jabref {
     requires fastparse;
     requires jbibtex;
     requires citeproc.java;
-    requires antlr.runtime;
     requires de.saxsys.mvvmfx.validation;
     requires com.google.gson;
     requires unirest.java;
@@ -91,6 +90,7 @@ open module org.jabref {
     requires org.apache.tika.core;
     requires pdfbox;
     requires xmpbox;
+    requires com.ibm.icu;
 
     requires flexmark;
     requires flexmark.ext.gfm.strikethrough;
@@ -98,11 +98,25 @@ open module org.jabref {
     requires flexmark.util.ast;
     requires flexmark.util.data;
     requires com.h2database.mvstore;
-    requires lucene;
-    requires org.eclipse.jgit;
+
+    // fulltext search
+    requires org.apache.lucene.core;
+    uses org.apache.lucene.codecs.lucene91.Lucene91Codec;
+    requires org.apache.lucene.backward_codecs;
+    uses org.apache.lucene.backward_codecs.lucene87.Lucene87Codec;
+
+    requires org.apache.lucene.queryparser;
+    uses org.apache.lucene.queryparser.classic.MultiFieldQueryParser;
+    requires org.apache.lucene.analysis.common;
+    requires org.apache.lucene.highlighter;
+
     requires com.fasterxml.jackson.databind;
     requires com.fasterxml.jackson.dataformat.yaml;
     requires com.fasterxml.jackson.datatype.jsr310;
     requires net.harawata.appdirs;
+
+    requires org.eclipse.jgit;
+    uses org.eclipse.jgit.transport.SshSessionFactory;
+    uses org.eclipse.jgit.lib.GpgSigner;
 
 }

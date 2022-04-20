@@ -469,7 +469,7 @@ public class BibEntry implements Cloneable {
                 }
             } else {
                 // Date field not in valid format
-                LOGGER.debug("Could not parse date " + date.get());
+                LOGGER.debug("Could not parse date {}", date.get());
                 return Optional.empty();
             }
         }
@@ -1007,5 +1007,4 @@ public class BibEntry implements Cloneable {
         }
         entry.setFiles(linkedFiles);
     }
-
 }

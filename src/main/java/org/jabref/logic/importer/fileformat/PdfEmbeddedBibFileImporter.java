@@ -2,7 +2,6 @@ package org.jabref.logic.importer.fileformat;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -64,7 +63,7 @@ public class PdfEmbeddedBibFileImporter extends Importer {
     }
 
     @Override
-    public ParserResult importDatabase(Path filePath, Charset defaultEncoding) {
+    public ParserResult importDatabase(Path filePath) {
         try (PDDocument document = XmpUtilReader.loadWithAutomaticDecryption(filePath)) {
             return new ParserResult(getEmbeddedBibFileEntries(document));
         } catch (EncryptedPdfsNotSupportedException e) {
@@ -164,5 +163,4 @@ public class PdfEmbeddedBibFileImporter extends Importer {
     public String getDescription() {
         return "PdfEmbeddedBibFileImporter imports an embedded Bib-File from the PDF.";
     }
-
 }

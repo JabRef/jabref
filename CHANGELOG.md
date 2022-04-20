@@ -13,25 +13,49 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 
 - We added an extra option when right-clicking an entry in the Entry List to copy either the DOI or the DOI url.
 - We added a fetcher for [Directory of Open Access Books (DOAB)](https://doabooks.org/) [8576](https://github.com/JabRef/jabref/issues/8576)
+- We added an extra option to ask the user whether they want to open to reveal the folder holding the saved file with the file selected. [#8195](https://github.com/JabRef/jabref/issues/8195)
+- We added a new section to network preferences to allow using custom SSL certificates. [#8126](https://github.com/JabRef/jabref/issues/8126)
+- We improved the version check to take also beta version into account and now redirect to the right changelog for the version.
+- We added two new web and fulltext fetchers: SemanticScholar and ResearchGate.
+- We added notifications on sucess and failure when writing metadata to a PDF-file [#8276](https://github.com/JabRef/jabref/issues/8276)
 
 ### Changed
 
+- We upgraded to Lucene 9.1 for the fulltext search. Thus, the now created search index cannot be read from older versions of JabRef anylonger and would need to be recreated if you switch back to an older version [#8362](https://github.com/JabRef/jabref/pull/8362)
+- We changed the list of CSL styles to those that support formatting bibliographies [#8421](https://github.com/JabRef/jabref/issues/8421) [citeproc-java#116](https://github.com/michel-kraemer/citeproc-java/issues/116)
 - The CSL preview styles now also support displaying data from cross references entries that are linked via the `crossref` field [#7378](https://github.com/JabRef/jabref/issues/7378)
 - We made the Search button in Web Search wider. We also skewed the panel titles to the left [#8397](https://github.com/JabRef/jabref/issues/8397)
 - We introduced a preference to disable fulltext indexing [#8468](https://github.com/JabRef/jabref/issues/8468)
+- When exporting entries, the encoding is always UTF-8
+- When embedding BibTeX data into a PDF, the encoding is always UTF-8
+- We now only show a warning when exiting for tasks that will not be recovered automatically upon relaunch of JabRef. [#8468](https://github.com/JabRef/jabref/issues/8468)
 
 ### Fixed
 
+- We fixed an issue where right clicking multiple entries and pressing "Change entry type" would only change one entry. [#8654](https://github.com/JabRef/jabref/issues/8654)
+- We fixed an issue where it was no longer possible to add or delete multiple files in the `file` field in the entry editor [#8659](https://github.com/JabRef/jabref/issues/8659)
+- We fixed an issue where the author's lastname was not used for the citation key generation if it started with a lowercase letter [#8601](https://github.com/JabRef/jabref/issues/8601)
+- We fixed an issue where custom "Protected terms" files were missing after a restart of JabRef [#8608](https://github.com/JabRef/jabref/issues/8608)
+- We fixed an issue where JabRef could not start due to a missing directory for the fulltex index [#8579](https://github.com/JabRef/jabref/issues/8579)
+- We fixed an issue where long article numbers in the `pages` field would cause an exception and preventing the citation style to display [#8381](https://github.com/JabRef/jabref/issues/8381), [citeproc-java](https://github.com/michel-kraemer/citeproc-java/issues/114)
 - We fixed an issue where online links in the file field were not detected correctly and could produce an exception [#8150](https://github.com/JabRef/jabref/issues/8510)
 - We fixed an issue where an exception could occur when saving the preferences [#7614](https://github.com/JabRef/jabref/issues/7614)
 - We fixed an issue where "Copy DOI url" in the right-click menu of the Entry List would just copy the DOI and not the DOI url. [#8389](https://github.com/JabRef/jabref/issues/8389)
 - We fixed an issue where opening the console from the drop-down menu would cause an exception. [#8466](https://github.com/JabRef/jabref/issues/8466)
+- We fixed an issue when reading non-UTF-8 encoded. When no encoding header is present, the encoding is now detected from the file content (and the preference option is disregarded) [#8417](https://github.com/JabRef/jabref/issues/8417)
 - We fixed an issue where pasting a URL was replacing + signs by spaces making the URL unreachable. [#8448](https://github.com/JabRef/jabref/issues/8448)
 - We fixed an issue where creating subsidiary files from aux files created with some versions of biblatex would produce incorrect results. [#8513](https://github.com/JabRef/jabref/issues/8513)
+- We fixed an issue where opening the changelog from withing JabRef led to a 404 error [#8563](https://github.com/JabRef/jabref/issues/8563)
+- We fixed an issue where not all found unlinked local files were imported correctly due to some race condition. [#8444](https://github.com/JabRef/jabref/issues/8444)
+- We fixed an issue where Merge entries dialog exceeds screen boundaries.
+- We fixed an issue where the app lags when selecting an entry after a fresh start. [#8446](https://github.com/JabRef/jabref/issues/8446)
+- We fixed an issue where no citationkey was generated on import, pasting a doi or an entry on the main table [8406](https://github.com/JabRef/jabref/issues/8406), [koppor#553](https://github.com/koppor/jabref/issues/553)
+- We fixed an issue where accent search does not perform consistently. [#6815](https://github.com/JabRef/jabref/issues/6815)
 
 ### Removed
 
 - We removed the option to copy CSL Citation styles data as `XSL_FO`, `ASCIIDOC`, and `RTF` as these have not been working since a long time and are no longer supported in the external library used for processing the styles [#7378](https://github.com/JabRef/jabref/issues/7378)
+- We removed the option to configure the default encoding. The default encoding is now hard-coded to the modern UTF-8 encoding.
 
 
 
@@ -55,6 +79,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We moved the search box in preview preferences closer to the available citation styles list. [#8370](https://github.com/JabRef/jabref/pull/8370)
 - Changing the preference to show the preview panel as a separate tab now has effect without restarting JabRef. [#8370](https://github.com/JabRef/jabref/pull/8370)
 - We enabled switching themes in JabRef without the need to restart JabRef. [#7335](https://github.com/JabRef/jabref/pull/7335)
+- We added support for the field `day`, `rights`, `coverage` and `language` when reading XMP data in Dublin Core format. [#8491](https://github.com/JabRef/jabref/issues/8491)
 
 ### Fixed
 
@@ -68,6 +93,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixed an issue where someone could add a duplicate field in the customize entry type dialog. [#8194](https://github.com/JabRef/jabref/issues/8194)
 - We fixed a typo in the library properties tab: "String constants". There, one can configure [BibTeX string constants](https://docs.jabref.org/advanced/strings).
 - We fixed an issue when writing a non-UTF-8 encoded file: The header is written again. [#8417](https://github.com/JabRef/jabref/issues/8417)
+- We fixed an issue where folder creation during systemic literature review failed due to an illegal fetcher name. [#8552](https://github.com/JabRef/jabref/pull/8552)
 
 ## [5.4] - 2021-12-20
 

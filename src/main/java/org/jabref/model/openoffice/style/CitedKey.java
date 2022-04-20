@@ -10,14 +10,13 @@ import org.jabref.model.openoffice.ootext.OOText;
 
 /**
  * Cited keys are collected from the citations in citation groups.
- *
- * They contain backreferences to the corresponding citations in {@code where}. This allows the
- * extra information generated using CitedKeys to be distributed back to the in-text citations.
+ * <p>
+ * They contain backreferences to the corresponding citations in {@code where}. This allows the extra information generated using CitedKeys to be distributed back to the in-text citations.
  */
 public class CitedKey implements
-                      ComparableCitedKey,
-                      CitationMarkerNormEntry,
-                      CitationMarkerNumericBibEntry {
+        ComparableCitedKey,
+        CitationMarkerNormEntry,
+        CitationMarkerNumericBibEntry {
 
     public final String citationKey;
     private final List<CitationPath> where;
@@ -27,16 +26,15 @@ public class CitedKey implements
     private Optional<String> uniqueLetter; // For AuthorYear citation styles.
     private Optional<OOText> normCitMarker;  // For AuthorYear citation styles.
 
-    CitedKey(String citationKey, CitationPath path, Citation cit) {
-
+    CitedKey(String citationKey, CitationPath path, Citation citation) {
         this.citationKey = citationKey;
         this.where = new ArrayList<>(); // remember order
         this.where.add(path);
 
         // synchronized with Citation
-        this.db = cit.getLookupResult();
-        this.number = cit.getNumber();
-        this.uniqueLetter = cit.getUniqueLetter();
+        this.db = citation.getLookupResult();
+        this.number = citation.getNumber();
+        this.uniqueLetter = citation.getUniqueLetter();
 
         // CitedKey only
         this.normCitMarker = Optional.empty();
@@ -120,19 +118,19 @@ public class CitedKey implements
         this.db = Citation.lookup(databases, this.citationKey);
     }
 
-    void distributeLookupResult(CitationGroups cgs) {
-        cgs.distributeToCitations(where, Citation::setLookupResult, db);
+    void distributeLookupResult(CitationGroups citationGroups) {
+        citationGroups.distributeToCitations(where, Citation::setLookupResult, db);
     }
 
     /*
      * Make unique using a letter or by numbering
      */
 
-    void distributeNumber(CitationGroups cgs) {
-        cgs.distributeToCitations(where, Citation::setNumber, number);
+    void distributeNumber(CitationGroups citationGroups) {
+        citationGroups.distributeToCitations(where, Citation::setNumber, number);
     }
 
-    void distributeUniqueLetter(CitationGroups cgs) {
-        cgs.distributeToCitations(where, Citation::setUniqueLetter, uniqueLetter);
+    void distributeUniqueLetter(CitationGroups citationGroups) {
+        citationGroups.distributeToCitations(where, Citation::setUniqueLetter, uniqueLetter);
     }
 }

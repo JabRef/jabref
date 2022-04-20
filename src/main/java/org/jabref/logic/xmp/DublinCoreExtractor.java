@@ -1,7 +1,6 @@
 package org.jabref.logic.xmp;
 
-import java.io.IOException;
-import java.util.Calendar;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map.Entry;
@@ -16,6 +15,7 @@ import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.Author;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.Date;
 import org.jabref.model.entry.Month;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
@@ -24,13 +24,16 @@ import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.EntryTypeFactory;
 import org.jabref.model.strings.StringUtil;
 
-import org.apache.xmpbox.DateConverter;
 import org.apache.xmpbox.schema.DublinCoreSchema;
 import org.apache.xmpbox.type.BadFieldValueException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class DublinCoreExtractor {
+
+    public static final String DC_COVERAGE = "coverage";
+    public static final String DC_RIGHTS = "rights";
+    public static final String DC_SOURCE = "source";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DublinCoreExtractor.class);
 
@@ -71,32 +74,18 @@ public class DublinCoreExtractor {
     }
 
     /**
-     * Year in BibTex - Date in DublinCore is only the year information, because dc interprets empty months as January.
-     * Tries to extract the month as well. In JabRef the bibtex/month/value is prioritized. <br/> The problem is the
-     * default value of the calendar, which is always January, also if there is no month information in the xmp metdata.
-     * The idea is, to reject all information with YYYY-01-01. In cases, where xmp is written with JabRef the month
-     * property filled with jan will override this behavior and no data is lost. In the cases, where xmp is written by
-     * another service, the assumption is, that the 1st January is not a publication date at all.
+     * Bibtex-Fields : year, [month], [day] - 'dc:date' in DublinCore
      */
-    private void extractYearAndMonth() {
+    private void extractDate() {
         List<String> dates = dcSchema.getUnqualifiedSequenceValueList("date");
         if ((dates != null) && !dates.isEmpty()) {
             String date = dates.get(0).trim();
-            Calendar calender = null;
-            try {
-                calender = DateConverter.toCalendar(date);
-            } catch (IOException ignored) {
-                // Ignored
-            }
-            if (calender != null) {
-                bibEntry.setField(StandardField.YEAR, String.valueOf(calender.get(Calendar.YEAR)));
-                int monthNumber = calender.get(Calendar.MONTH) + 1;
-                // not the 1st of January
-                if (!((monthNumber == 1) && (calender.get(Calendar.DAY_OF_MONTH) == 1))) {
-                    Month.getMonthByNumber(monthNumber)
-                         .ifPresent(month -> bibEntry.setMonth(month));
-                }
-            }
+            Date.parse(date)
+                    .ifPresent(dateValue -> {
+                        dateValue.getDay().ifPresent(day -> bibEntry.setField(StandardField.DAY, Integer.toString(day)));
+                        dateValue.getMonth().ifPresent(bibEntry::setMonth);
+                        dateValue.getYear().ifPresent(year -> bibEntry.setField(StandardField.YEAR, Integer.toString(year)));
+                    });
         }
     }
 
@@ -108,7 +97,7 @@ public class DublinCoreExtractor {
         try {
             description = dcSchema.getDescription();
         } catch (BadFieldValueException e) {
-            LOGGER.warn("Could not get abstract, e");
+            LOGGER.warn("Could not get abstract", e);
         }
         if (!StringUtil.isNullOrEmpty(description)) {
             bibEntry.setField(StandardField.ABSTRACT, description);
@@ -182,7 +171,7 @@ public class DublinCoreExtractor {
            LOGGER.warn("Could not extract rights", e);
         }
         if (!StringUtil.isNullOrEmpty(rights)) {
-            bibEntry.setField(new UnknownField("rights"), rights);
+            bibEntry.setField(new UnknownField(DC_RIGHTS), rights);
         }
     }
 
@@ -192,7 +181,7 @@ public class DublinCoreExtractor {
     private void extractSource() {
         String source = dcSchema.getSource();
         if (!StringUtil.isNullOrEmpty(source)) {
-            bibEntry.setField(new UnknownField("source"), source);
+            bibEntry.setField(new UnknownField(DC_SOURCE), source);
         }
     }
 
@@ -235,6 +224,29 @@ public class DublinCoreExtractor {
     }
 
     /**
+     * No Equivalent in BibTex. Will create an Unknown "Coverage" Field
+     */
+    private void extractCoverage() {
+        String coverage = dcSchema.getCoverage();
+        if (!StringUtil.isNullOrEmpty(coverage)) {
+            bibEntry.setField(FieldFactory.parseField(DC_COVERAGE), coverage);
+        }
+    }
+
+    /**
+     *  Language is equivalent in both formats (BibTex and DublinCore)
+     */
+    private void extractLanguages() {
+        StringBuilder builder = new StringBuilder();
+
+        List<String> languages = dcSchema.getLanguages();
+        if (languages != null && !languages.isEmpty()) {
+            languages.forEach(language -> builder.append(",").append(language));
+            bibEntry.setField(StandardField.LANGUAGE, builder.substring(1));
+        }
+    }
+
+    /**
      * Helper function for retrieving a BibEntry from the DublinCore metadata in a PDF file.
      * <p>
      * To understand how to get hold of a DublinCore have a look in the test cases for XMPUtil.
@@ -252,7 +264,7 @@ public class DublinCoreExtractor {
         // then extract all "standard" dublin core entries
         this.extractEditor();
         this.extractAuthor();
-        this.extractYearAndMonth();
+        this.extractDate();
         this.extractAbstract();
         this.extractDOI();
         this.extractPublisher();
@@ -261,6 +273,8 @@ public class DublinCoreExtractor {
         this.extractSubject();
         this.extractTitle();
         this.extractType();
+        this.extractCoverage();
+        this.extractLanguages();
 
         // we pass a new BibEntry in the constructor which is never empty as it already consists of "@misc"
         if (bibEntry.getFieldMap().isEmpty()) {
@@ -351,6 +365,37 @@ public class DublinCoreExtractor {
     }
 
     /**
+     * BibTex : Coverage (Custom Field); DC Field : Coverage
+     *
+     * @param coverage
+     */
+    private void fillCoverage(String coverage) {
+        dcSchema.setCoverage(coverage);
+    }
+
+    /**
+     * BibTex Field : language ; DC Field : dc:language
+     */
+    private void fillLanguages(String languages) {
+        Arrays.stream(languages.split(","))
+                .forEach(dcSchema::addLanguage);
+    }
+
+    /**
+     * BibTex : Rights (Custom Field); DC Field : dc:rights
+     */
+    private void fillRights(String rights) {
+        dcSchema.addRights(null, rights.split(",")[0]);
+    }
+
+    /**
+     * BibTex : Source (Custom Field); DC Field : Source
+     */
+    private void fillSource(String source) {
+        dcSchema.setSource(source);
+    }
+
+    /**
      * All others (+ citation key) get packaged in the relation attribute
      *
      * @param field Key of the metadata attribute
@@ -366,29 +411,60 @@ public class DublinCoreExtractor {
 
         Set<Entry<Field, String>> fieldValues = new TreeSet<>(Comparator.comparing(fieldStringEntry -> fieldStringEntry.getKey().getName()));
         fieldValues.addAll(bibEntry.getFieldMap().entrySet());
+        boolean hasStandardYearField = fieldValues.stream().anyMatch(field -> StandardField.YEAR.equals(field.getKey()));
         for (Entry<Field, String> field : fieldValues) {
             if (useXmpPrivacyFilter && xmpPreferences.getXmpPrivacyFilter().contains(field.getKey())) {
                 continue;
             }
 
-            if (StandardField.EDITOR.equals(field.getKey())) {
-                this.fillContributor(field.getValue());
-            } else if (StandardField.AUTHOR.equals(field.getKey())) {
-                this.fillCreator(field.getValue());
-            } else if (StandardField.YEAR.equals(field.getKey())) {
-                this.fillDate();
-            } else if (StandardField.ABSTRACT.equals(field.getKey())) {
-                this.fillDescription(field.getValue());
-            } else if (StandardField.DOI.equals(field.getKey())) {
-                this.fillIdentifier(field.getValue());
-            } else if (StandardField.PUBLISHER.equals(field.getKey())) {
-                this.fillPublisher(field.getValue());
-            } else if (StandardField.KEYWORDS.equals(field.getKey())) {
-                this.fillKeywords(field.getValue());
-            } else if (StandardField.TITLE.equals(field.getKey())) {
-                this.fillTitle(field.getValue());
+            Field fieldEntry = field.getKey();
+            if (fieldEntry instanceof StandardField) {
+                switch ((StandardField) fieldEntry) {
+                    case EDITOR:
+                        this.fillContributor(field.getValue());
+                        break;
+                    case AUTHOR:
+                        this.fillCreator(field.getValue());
+                        break;
+                    case YEAR:
+                        this.fillDate();
+                        break;
+                    case ABSTRACT:
+                        this.fillDescription(field.getValue());
+                        break;
+                    case DOI:
+                        this.fillIdentifier(field.getValue());
+                        break;
+                    case PUBLISHER:
+                        this.fillPublisher(field.getValue());
+                        break;
+                    case KEYWORDS:
+                        this.fillKeywords(field.getValue());
+                        break;
+                    case TITLE:
+                        this.fillTitle(field.getValue());
+                        break;
+                    case LANGUAGE:
+                        this.fillLanguages(field.getValue());
+                        break;
+                    case DAY:
+                    case MONTH:
+                        if (hasStandardYearField) {
+                            break;
+                        }
+                    default:
+                        this.fillCustomField(field.getKey(), field.getValue());
+                }
             } else {
-                this.fillCustomField(field.getKey(), field.getValue());
+                if (DC_COVERAGE.equals(fieldEntry.getName())) {
+                    this.fillCoverage(field.getValue());
+                } else if (DC_RIGHTS.equals(fieldEntry.getName())) {
+                    this.fillRights(field.getValue());
+                } else if (DC_SOURCE.equals(fieldEntry.getName())) {
+                    this.fillSource(field.getValue());
+                } else {
+                    this.fillCustomField(field.getKey(), field.getValue());
+                }
             }
         }
 

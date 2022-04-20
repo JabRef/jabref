@@ -1,9 +1,9 @@
 package org.jabref.logic.crawler;
 
 import java.net.URL;
-import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.jabref.logic.bibtex.FieldContentFormatterPreferences;
 import org.jabref.logic.exporter.SavePreferences;
@@ -42,7 +42,6 @@ class StudyDatabaseToFetcherConverterTest {
         importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
         savePreferences = mock(SavePreferences.class, Answers.RETURNS_DEEP_STUBS);
         timestampPreferences = mock(TimestampPreferences.class);
-        when(generalPreferences.getDefaultEncoding()).thenReturn(Charset.defaultCharset());
         when(savePreferences.getSaveOrder()).thenReturn(new SaveOrderConfig());
         when(savePreferences.takeMetadataSaveOrderInAccount()).thenReturn(true);
         when(importFormatPreferences.getKeywordSeparator()).thenReturn(',');
@@ -60,9 +59,10 @@ class StudyDatabaseToFetcherConverterTest {
         StudyDatabaseToFetcherConverter converter = new StudyDatabaseToFetcherConverter(studyRepository.getActiveLibraryEntries(), importFormatPreferences);
         List<SearchBasedFetcher> result = converter.getActiveFetchers();
 
-        Assertions.assertEquals(2, result.size());
-        Assertions.assertEquals(result.get(0).getName(), "Springer");
-        Assertions.assertEquals(result.get(1).getName(), "ArXiv");
+        Assertions.assertEquals(
+                List.of("Springer", "ArXiv", "Medline/PubMed"),
+                result.stream().map(SearchBasedFetcher::getName).collect(Collectors.toList())
+        );
     }
 
     private void copyTestStudyDefinitionFileIntoDirectory(Path destination) throws Exception {

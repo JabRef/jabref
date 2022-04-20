@@ -1,7 +1,5 @@
 package org.jabref.preferences;
 
-import java.nio.charset.Charset;
-
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -10,7 +8,6 @@ import javafx.beans.property.SimpleObjectProperty;
 import org.jabref.model.database.BibDatabaseMode;
 
 public class GeneralPreferences {
-    private final ObjectProperty<Charset> defaultEncoding;
     private final ObjectProperty<BibDatabaseMode> defaultBibDatabaseMode;
     private final BooleanProperty warnAboutDuplicatesInInspection;
     private final BooleanProperty confirmDelete;
@@ -18,31 +15,17 @@ public class GeneralPreferences {
     private final BooleanProperty memoryStickMode;
     private final BooleanProperty showAdvancedHints;
 
-    public GeneralPreferences(Charset defaultEncoding,
-                              BibDatabaseMode defaultBibDatabaseMode,
+    public GeneralPreferences(BibDatabaseMode defaultBibDatabaseMode,
                               boolean warnAboutDuplicatesInInspection,
                               boolean confirmDelete,
                               boolean memoryStickMode,
                               boolean showAdvancedHints) {
-        this.defaultEncoding = new SimpleObjectProperty<>(defaultEncoding);
         this.defaultBibDatabaseMode = new SimpleObjectProperty<>(defaultBibDatabaseMode);
         this.warnAboutDuplicatesInInspection = new SimpleBooleanProperty(warnAboutDuplicatesInInspection);
         this.confirmDelete = new SimpleBooleanProperty(confirmDelete);
 
         this.memoryStickMode = new SimpleBooleanProperty(memoryStickMode);
         this.showAdvancedHints = new SimpleBooleanProperty(showAdvancedHints);
-    }
-
-    public Charset getDefaultEncoding() {
-        return defaultEncoding.get();
-    }
-
-    public ObjectProperty<Charset> defaultEncodingProperty() {
-        return defaultEncoding;
-    }
-
-    public void setDefaultEncoding(Charset defaultEncoding) {
-        this.defaultEncoding.set(defaultEncoding);
     }
 
     public BibDatabaseMode getDefaultBibDatabaseMode() {

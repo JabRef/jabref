@@ -4,7 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
@@ -19,6 +19,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.OS;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.io.FileUtil;
+import org.jabref.logic.xmp.XmpUtilWriter;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
@@ -52,24 +53,31 @@ public class EmbeddedBibFilePdfExporter extends Exporter {
     /**
      * @param databaseContext the database to export from
      * @param file            the file to write to. If it contains "split", then the output is split into different files
-     * @param encoding        the encoding to use
      * @param entries         a list containing all entries that should be exported
      */
     @Override
-    public void export(BibDatabaseContext databaseContext, Path file, Charset encoding, List<BibEntry> entries) throws Exception {
+    public void export(BibDatabaseContext databaseContext, Path file, List<BibEntry> entries) throws Exception {
         Objects.requireNonNull(databaseContext);
         Objects.requireNonNull(file);
         Objects.requireNonNull(entries);
 
         String bibString = getBibString(entries);
-        embedBibTex(bibString, file, encoding);
+        embedBibTex(bibString, file);
     }
 
-    private void embedBibTex(String bibTeX, Path file, Charset encoding) throws IOException {
-        if (!Files.exists(file) || !FileUtil.isPDFFile(file)) {
+    /**
+     * Similar method: {@link XmpUtilWriter#writeXmp(java.nio.file.Path, java.util.List, org.jabref.model.database.BibDatabase, org.jabref.logic.xmp.XmpPreferences)}
+     */
+    private void embedBibTex(String bibTeX, Path path) throws IOException {
+        if (!Files.exists(path) || !FileUtil.isPDFFile(path)) {
             return;
         }
-        try (PDDocument document = Loader.loadPDF(file.toFile())) {
+
+        // Read from another file
+        // Reason: Apache PDFBox does not support writing while the file is opened
+        // See https://issues.apache.org/jira/browse/PDFBOX-4028
+        Path newFile = Files.createTempFile("JabRef", "pdf");
+        try (PDDocument document = Loader.loadPDF(path.toFile())) {
             PDDocumentNameDictionary nameDictionary = document.getDocumentCatalog().getNames();
             PDEmbeddedFilesNameTreeNode efTree;
             Map<String, PDComplexFileSpecification> names;
@@ -100,7 +108,7 @@ public class EmbeddedBibFilePdfExporter extends Exporter {
                 fileSpecification = new PDComplexFileSpecification();
             }
             if (efTree != null) {
-                InputStream inputStream = new ByteArrayInputStream(bibTeX.getBytes(encoding));
+                InputStream inputStream = new ByteArrayInputStream(bibTeX.getBytes(StandardCharsets.UTF_8));
                 fileSpecification.setFile(EMBEDDED_FILE_NAME);
                 PDEmbeddedFile embeddedFile = new PDEmbeddedFile(document, inputStream);
                 embeddedFile.setSubtype("text/x-bibtex");
@@ -111,7 +119,7 @@ public class EmbeddedBibFilePdfExporter extends Exporter {
                     try {
                         names.put(EMBEDDED_FILE_NAME, fileSpecification);
                     } catch (UnsupportedOperationException e) {
-                        throw new IOException(Localization.lang("File '%0' is write protected.", file.toString()));
+                        throw new IOException(Localization.lang("File '%0' is write protected.", path.toString()));
                     }
                 }
 
@@ -119,8 +127,10 @@ public class EmbeddedBibFilePdfExporter extends Exporter {
                 nameDictionary.setEmbeddedFiles(efTree);
                 document.getDocumentCatalog().setNames(nameDictionary);
             }
-            document.save(file.toFile());
+            document.save(newFile.toFile());
+            FileUtil.copyFile(newFile, path, true);
         }
+        Files.delete(newFile);
     }
 
     private String getBibString(List<BibEntry> entries) throws IOException {

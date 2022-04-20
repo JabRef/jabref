@@ -3,7 +3,6 @@ package org.jabref.logic.exporter;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.math.BigInteger;
-import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
@@ -65,7 +64,7 @@ public class BibTeXMLExporter extends Exporter {
     }
 
     @Override
-    public void export(final BibDatabaseContext databaseContext, final Path resultFile, final Charset encoding,
+    public void export(final BibDatabaseContext databaseContext, final Path resultFile,
                        List<BibEntry> entries) throws SaveException {
         Objects.requireNonNull(databaseContext);
         Objects.requireNonNull(entries);

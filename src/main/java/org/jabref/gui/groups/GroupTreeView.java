@@ -392,7 +392,6 @@ public class GroupTreeView extends BorderPane {
     }
 
     private ContextMenu createContextMenuForGroup(GroupNodeViewModel group) {
-
         ContextMenu menu = new ContextMenu();
         Menu removeGroup = new Menu(Localization.lang("Remove group"));
 

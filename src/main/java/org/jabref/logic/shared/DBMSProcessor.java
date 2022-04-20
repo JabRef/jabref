@@ -199,7 +199,6 @@ public abstract class DBMSProcessor {
      * @return <code>true</code> if existent, else <code>false</code>
      */
     private List<BibEntry> getNotYetExistingEntries(List<BibEntry> bibEntries) {
-
         List<Integer> remoteIds = new ArrayList<>();
         List<Integer> localIds = bibEntries.stream()
                                            .map(BibEntry::getSharedBibEntryData)
@@ -305,7 +304,6 @@ public abstract class DBMSProcessor {
             // update only if local version is higher or the entries are equal
             if ((localBibEntry.getSharedBibEntryData().getVersion() >= sharedBibEntry.getSharedBibEntryData()
                                                                                      .getVersion()) || localBibEntry.equals(sharedBibEntry)) {
-
                 insertOrUpdateFields(localBibEntry);
 
                 // updating entry type

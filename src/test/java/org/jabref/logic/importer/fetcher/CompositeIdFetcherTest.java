@@ -81,7 +81,7 @@ class CompositeIdFetcherTest {
                         "performSearchByIdReturnsCorrectEntryForDoiId",
                         new BibEntry(StandardEntryType.Book)
                                 .withField(StandardField.TITLE, "Java{\\textregistered} For Dummies{\\textregistered}")
-                                .withField(StandardField.PUBLISHER, "Wiley Publishing, Inc.")
+                                .withField(StandardField.PUBLISHER, "Wiley")
                                 .withField(StandardField.YEAR, "2011")
                                 .withField(StandardField.AUTHOR, "Barry Burd")
                                 .withField(StandardField.MONTH, "jul")
@@ -111,5 +111,4 @@ class CompositeIdFetcherTest {
     void performSearchByIdReturnsCorrectEntryForIdentifier(String name, BibEntry bibEntry, String identifier) throws FetcherException {
         assertEquals(Optional.of(bibEntry), compositeIdFetcher.performSearchById(identifier));
     }
-
 }
