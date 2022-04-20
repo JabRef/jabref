@@ -29,7 +29,6 @@ import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
  * fetches books from https://www.doabooks.org/ through
  * <a href="https://www.doabooks.org/en/resources/metadata-harvesting-and-content-dissemination">their API</a>.
  */
-
 public class DOABFetcher implements SearchBasedParserFetcher {
     private static final String SEARCH_URL = "https://directory.doabooks.org/rest/search?";
 
@@ -62,7 +61,6 @@ public class DOABFetcher implements SearchBasedParserFetcher {
                 return Collections.emptyList();
             }
             if (response.length() == 1) {
-
                 // the information used for bibtex entries are in an array inside the resulting jsonarray
                 // see this query for reference https://directory.doabooks.org/rest/search?query="i open fire"&expand=metadata
                 JSONArray metadataArray = response.getJSONObject(0).getJSONArray("metadata");
@@ -144,5 +142,4 @@ public class DOABFetcher implements SearchBasedParserFetcher {
     private String namePreprocessing(String name) {
         return name.replace("(Ed.)", "");
     }
-
 }

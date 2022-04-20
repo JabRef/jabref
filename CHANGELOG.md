@@ -12,6 +12,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 ### Added
 
 - We added an extra option when right-clicking an entry in the Entry List to copy either the DOI or the DOI url.
+- We added a fetcher for [Directory of Open Access Books (DOAB)](https://doabooks.org/) [8576](https://github.com/JabRef/jabref/issues/8576)
 
 ### Changed
 
