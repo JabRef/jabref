@@ -5,6 +5,7 @@ import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
@@ -24,6 +25,8 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.commonfxcontrols.SortCriterionViewModel;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.logic.importer.ImporterPreferences;
+import org.jabref.logic.importer.WebFetchers;
+import org.jabref.logic.importer.fetcher.CustomizeableKeyFetcher;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.preferences.DOIPreferences;
@@ -90,8 +93,7 @@ public class ImportExportTabViewModel implements PreferenceTabViewModel {
         grobidEnabledProperty.setValue(importerPreferences.isGrobidEnabled());
         grobidURLProperty.setValue(importerPreferences.getGrobidURL());
 
-        apiKeys.clear();
-        apiKeys.addAll(preferencesService.getImporterPreferences().getApiKeys());
+        apiKeys.setValue(FXCollections.observableArrayList(preferencesService.getImporterPreferences().getApiKeys()));
     }
 
     @Override
@@ -165,11 +167,22 @@ public class ImportExportTabViewModel implements PreferenceTabViewModel {
     }
 
     public void checkCustomApiKey() {
-        final String apiKeyName = selectedCustomApiKeyPreferencesProperty.get().getName();
-        final String testUrlWithoutApiKey = apiKeys.get(apiKeyName);
-        final String apiKey = customApiKeyTextProperty.get();
+        final String apiKeyName = selectedApiKeyProperty.get().getName();
 
-        boolean valid;
+        final Optional<CustomizeableKeyFetcher> fetcherOpt =
+                WebFetchers.getCustomizableKeyFetchers(preferencesService.getImportFormatPreferences()).stream()
+                           .filter(fetcher -> fetcher.getName().equals(apiKeyName))
+                           .findFirst();
+
+        if (fetcherOpt.isEmpty()) {
+            dialogService.showErrorDialogAndWait(Localization.lang("Check %0 API Key Setting", apiKeyName), Localization.lang("Fetcher unknown!"));
+            return;
+        }
+
+        final String testUrlWithoutApiKey = fetcherOpt.get().getTestUrl();
+        final String apiKey = selectedApiKeyProperty.get().getKey();
+
+        boolean keyValid;
         if (!apiKey.isEmpty()) {
             URLDownload urlDownload;
             try {
@@ -179,17 +192,17 @@ public class ImportExportTabViewModel implements PreferenceTabViewModel {
                 urlDownload = new URLDownload(testUrlWithoutApiKey + apiKey);
                 // The HEAD request cannot be used because its response is not 200 (maybe 404 or 596...).
                 int statusCode = ((HttpURLConnection) urlDownload.getSource().openConnection()).getResponseCode();
-                valid = statusCode >= 200 && statusCode < 300;
+                keyValid = statusCode >= 200 && statusCode < 300;
 
                 URLDownload.setSSLVerification(defaultSslSocketFactory, defaultHostnameVerifier);
             } catch (IOException | kong.unirest.UnirestException e) {
-                valid = false;
+                keyValid = false;
             }
         } else {
-            valid = false;
+            keyValid = false;
         }
 
-        if (valid) {
+        if (keyValid) {
             dialogService.showInformationDialogAndWait(Localization.lang("Check %0 API Key Setting", apiKeyName), Localization.lang("Connection successful!"));
         } else {
             dialogService.showErrorDialogAndWait(Localization.lang("Check %0 API Key Setting", apiKeyName), Localization.lang("Connection failed!"));

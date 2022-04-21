@@ -23,10 +23,10 @@ public class ImportExportTab extends AbstractPreferenceTabView<ImportExportTabVi
 
     @FXML private SaveOrderConfigPanel exportOrderPanel;
 
-    @FXML private ComboBox<FetcherApiKey> apiKeyName;
+    @FXML private ComboBox<FetcherApiKey> apiKeySelector;
     @FXML private TextField customApiKey;
     @FXML private CheckBox useCustomApiKey;
-    @FXML private Button checkCustomApiKey;
+    @FXML private Button testCustomApiKey;
 
     @FXML private CheckBox grobidEnabled;
     @FXML private TextField grobidURL;
@@ -62,30 +62,27 @@ public class ImportExportTab extends AbstractPreferenceTabView<ImportExportTabVi
         grobidURL.textProperty().bindBidirectional(viewModel.grobidURLProperty());
         grobidURL.disableProperty().bind(grobidEnabled.selectedProperty().not());
 
-        customApiKey.textProperty().bindBidirectional(viewModel.customApiKeyText());
-
-        viewModel.customApiKeyText().bind(customApiKey.textProperty());
-        viewModel.useCustomApiKeyProperty().bind(useCustomApiKey.selectedProperty());
-        customApiKey.disableProperty().bind(useCustomApiKey.selectedProperty().not());
-        checkCustomApiKey.disableProperty().bind(useCustomApiKey.selectedProperty().not());
-
         new ViewModelListCellFactory<FetcherApiKey>()
                 .withText(FetcherApiKey::getName)
-                .install(apiKeyName);
-
-        apiKeyName.itemsProperty().bind(viewModel.fetcherApiKeys());
-        apiKeyName.valueProperty().bindBidirectional(viewModel.selectedApiKeyProperty());
-        apiKeyName.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+                .install(apiKeySelector);
+        apiKeySelector.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             if (oldValue != null) {
-                oldValue.shouldUseCustomKey(useCustomApiKey.isSelected());
-                oldValue.setCustomApiKey(customApiKey.getText().trim());
+                oldValue.setUse(useCustomApiKey.isSelected());
+                oldValue.setKey(customApiKey.getText().trim());
             }
             if (newValue != null) {
-                useCustomApiKey.setSelected(newValue.shouldUseCustom());
-                customApiKey.setText(newValue.getCustomApiKey());
+                useCustomApiKey.setSelected(newValue.shouldUse());
+                customApiKey.setText(newValue.getKey());
             }
         });
-        apiKeyName.getSelectionModel().selectFirst();
+        customApiKey.disableProperty().bind(useCustomApiKey.selectedProperty().not());
+        testCustomApiKey.disableProperty().bind(useCustomApiKey.selectedProperty().not());
+
+        apiKeySelector.setItems(viewModel.fetcherApiKeys());
+        viewModel.selectedApiKeyProperty().bind(apiKeySelector.valueProperty());
+
+        // Content is set later
+        apiKeySelector.itemsProperty().addListener(change -> apiKeySelector.getSelectionModel().selectFirst());
     }
 
     @FXML

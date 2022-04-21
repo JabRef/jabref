@@ -24,7 +24,7 @@ import org.slf4j.LoggerFactory;
 /**
  * FulltextFetcher implementation that attempts to find a PDF URL at SpringerLink.
  * <p>
- * Uses Springer API, see @link{https://dev.springer.com}
+ * Uses Springer API, see <a href="https://dev.springer.com">https://dev.springer.com</a>
  */
 public class SpringerLink implements FulltextFetcher {
     private static final Logger LOGGER = LoggerFactory.getLogger(SpringerLink.class);
@@ -32,18 +32,20 @@ public class SpringerLink implements FulltextFetcher {
     private static final String API_URL = "https://api.springer.com/meta/v1/json";
     private static final String API_KEY = new BuildInfo().springerNatureAPIKey;
     private static final String CONTENT_HOST = "link.springer.com";
-    private static final String NAME = "Springer";
+    private static final String FETCHER_NAME = "Springer";
 
     public SpringerLink() {
     }
 
     private String getApiKey() {
-        String apiKey = API_KEY;
-        FetcherApiKey apiKeyPreferences = Globals.prefs.getCustomApiKeyPreferences(NAME);
-        if (apiKeyPreferences != null && apiKeyPreferences.shouldUseCustom()) {
-            apiKey = apiKeyPreferences.getCustomApiKey();
-        }
-        return apiKey;
+        return Globals.prefs.getImporterPreferences()
+                            .getApiKeys()
+                            .stream()
+                            .filter(key -> key.getName().equalsIgnoreCase(FETCHER_NAME))
+                            .filter(FetcherApiKey::shouldUse)
+                            .findFirst()
+                            .map(FetcherApiKey::getKey)
+                            .orElse(API_KEY);
     }
 
     @Override

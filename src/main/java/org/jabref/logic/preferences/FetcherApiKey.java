@@ -1,33 +1,46 @@
 package org.jabref.logic.preferences;
 
-public class FetcherApiKey {
-    private final String name;
-    private boolean useCustom;
-    private String customApiKey;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 
-    public FetcherApiKey(String name, boolean useCustom, String customApiKey) {
-        this.name = name;
-        this.useCustom = useCustom;
-        this.customApiKey = customApiKey;
+public class FetcherApiKey {
+    private final StringProperty name;
+    private final BooleanProperty use;
+    private final StringProperty key;
+
+    public FetcherApiKey(String name, boolean use, String key) {
+        this.name = new SimpleStringProperty(name);
+        this.use = new SimpleBooleanProperty(use);
+        this.key = new SimpleStringProperty(key);
     }
 
     public String getName() {
-        return name;
+        return name.getValue();
     }
 
-    public boolean shouldUseCustom() {
-        return useCustom;
+    public boolean shouldUse() {
+        return use.getValue();
     }
 
-    public String getCustomApiKey() {
-        return customApiKey;
+    public BooleanProperty useProperty() {
+        return use;
     }
 
-    public void shouldUseCustomKey(boolean useCustom) {
-        this.useCustom = useCustom;
+    public void setUse(boolean useCustom) {
+        this.use.setValue(useCustom);
     }
 
-    public void setCustomApiKey(String customApiKey) {
-        this.customApiKey = customApiKey;
+    public String getKey() {
+        return key.getValue();
+    }
+
+    public StringProperty keyProperty() {
+        return key;
+    }
+
+    public void setKey(String key) {
+        this.key.setValue(key);
     }
 }

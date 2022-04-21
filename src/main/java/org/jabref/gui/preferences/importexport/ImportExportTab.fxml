@@ -35,13 +35,13 @@
 
     <Label styleClass="sectionHeader" text="%Custom API key"/>
     <HBox alignment="CENTER_LEFT" spacing="10.0">
-        <ComboBox fx:id="apiKeyName" prefWidth="200.0" GridPane.columnIndex="1"/>
+        <ComboBox fx:id="apiKeySelector" prefWidth="200.0" GridPane.columnIndex="1"/>
         <TextField fx:id="customApiKey" HBox.hgrow="ALWAYS"/>
         <CheckBox fx:id="useCustomApiKey" text="%Custom">
         </CheckBox>
     </HBox>
     <HBox alignment="CENTER_LEFT" >
-        <Button fx:id="checkCustomApiKey" text="%Check connection" onAction="#checkCustomApiKey"
+        <Button fx:id="testCustomApiKey" text="%Check connection" onAction="#checkCustomApiKey"
                 prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="6"/>
     </HBox>
 </fx:root>

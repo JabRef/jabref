@@ -38,7 +38,7 @@ import org.slf4j.LoggerFactory;
  *
  * @implNote see <a href="https://dev.springernature.com/">API documentation</a> for more details
  */
-public class SpringerFetcher implements PagedSearchBasedParserFetcher {
+public class SpringerFetcher implements PagedSearchBasedParserFetcher, CustomizeableKeyFetcher {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SpringerFetcher.class);
 
@@ -46,9 +46,10 @@ public class SpringerFetcher implements PagedSearchBasedParserFetcher {
     private static final String API_KEY = new BuildInfo().springerNatureAPIKey;
     // Springer query using the parameter 'q=doi:10.1007/s11276-008-0131-4s=1' will respond faster
     private static final String TEST_URL_WITHOUT_API_KEY = "https://api.springernature.com/meta/v1/json?q=doi:10.1007/s11276-008-0131-4s=1&p=1&api_key=";
+    private static final String FETCHER_NAME = "Springer";
 
     /**
-     * Convert a JSONObject obtained from http://api.springer.com/metadata/json to a BibEntry
+     * Convert a JSONObject obtained from <a href="http://api.springer.com/metadata/json">http://api.springer.com/metadata/json</a> to a BibEntry
      *
      * @param springerJsonEntry the JSONObject from search results
      * @return the converted BibEntry
@@ -156,7 +157,7 @@ public class SpringerFetcher implements PagedSearchBasedParserFetcher {
 
     @Override
     public String getName() {
-        return "Springer";
+        return FETCHER_NAME;
     }
 
     @Override
@@ -165,12 +166,19 @@ public class SpringerFetcher implements PagedSearchBasedParserFetcher {
     }
 
     private String getApiKey() {
-        String apiKey = API_KEY;
-        FetcherApiKey apiKeyPreferences = Globals.prefs.getCustomApiKeyPreferences(getName());
-        if (apiKeyPreferences != null && apiKeyPreferences.shouldUseCustom()) {
-            apiKey = apiKeyPreferences.getCustomApiKey();
-        }
-        return apiKey;
+        return Globals.prefs.getImporterPreferences()
+                            .getApiKeys()
+                            .stream()
+                            .filter(key -> key.getName().equalsIgnoreCase(FETCHER_NAME))
+                            .filter(FetcherApiKey::shouldUse)
+                            .findFirst()
+                            .map(FetcherApiKey::getKey)
+                            .orElse(API_KEY);
+    }
+
+    @Override
+    public String getTestUrl() {
+        return TEST_URL_WITHOUT_API_KEY;
     }
 
     /**

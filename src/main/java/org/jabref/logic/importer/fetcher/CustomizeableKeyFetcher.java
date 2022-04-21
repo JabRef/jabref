@@ -1,12 +1,7 @@
 package org.jabref.logic.importer.fetcher;
 
-public interface CustomizeableKeyFetcher {
-    /**
-     * Gets API key, which may be customized in the preferences
-     *
-     * @return api key
-     */
-    String getApiKey();
+import org.jabref.logic.importer.WebFetcher;
 
+public interface CustomizeableKeyFetcher extends WebFetcher {
     String getTestUrl();
 }

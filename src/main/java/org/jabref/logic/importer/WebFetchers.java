@@ -197,6 +197,7 @@ public class WebFetchers {
     public static Set<CustomizeableKeyFetcher> getCustomizableKeyFetchers(ImportFormatPreferences importFormatPreferences) {
         Set<CustomizeableKeyFetcher> fetchers = new HashSet<>();
         fetchers.add(new IEEE(importFormatPreferences));
+        fetchers.add(new SpringerFetcher());
         return fetchers;
     }
 }

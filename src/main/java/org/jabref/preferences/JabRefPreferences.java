@@ -629,6 +629,10 @@ public class JabRefPreferences implements PreferencesService {
 
         defaults.put(SPECIALFIELDSENABLED, Boolean.TRUE);
 
+        defaults.put(FETCHER_CUSTOM_KEY_NAMES, "Springer;IEEEXplore");
+        defaults.put(FETCHER_CUSTOM_KEY_USES, "FALSE;FALSE");
+        defaults.put(FETCHER_CUSTOM_KEYS, ";aaa");
+
         defaults.put(USE_OWNER, Boolean.FALSE);
         defaults.put(OVERWRITE_OWNER, Boolean.FALSE);
         defaults.put(AVOID_OVERWRITING_KEY, Boolean.FALSE);
@@ -2863,8 +2867,8 @@ public class JabRefPreferences implements PreferencesService {
 
         for (FetcherApiKey apiKey : fetcherApiKeys) {
             names.add(apiKey.getName());
-            uses.add(String.valueOf(apiKey.shouldUseCustom()));
-            keys.add(apiKey.getCustomApiKey());
+            uses.add(String.valueOf(apiKey.shouldUse()));
+            keys.add(apiKey.getKey());
         }
 
         putStringList(FETCHER_CUSTOM_KEY_NAMES, names);

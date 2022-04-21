@@ -49,6 +49,9 @@ import org.slf4j.LoggerFactory;
 public class IEEE implements FulltextFetcher, PagedSearchBasedParserFetcher, CustomizeableKeyFetcher {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(IEEE.class);
+
+    private static final String FETCHER_NAME = "IEEEXplore";
+
     private static final String STAMP_BASE_STRING_DOCUMENT = "/stamp/stamp.jsp?tp=&arnumber=";
     private static final Pattern STAMP_PATTERN = Pattern.compile("(/stamp/stamp.jsp\\?t?p?=?&?arnumber=[0-9]+)");
     private static final Pattern DOCUMENT_PATTERN = Pattern.compile("document/([0-9]+)/");
@@ -56,7 +59,7 @@ public class IEEE implements FulltextFetcher, PagedSearchBasedParserFetcher, Cus
     private static final Pattern PDF_PATTERN = Pattern.compile("\"(https://ieeexplore.ieee.org/ielx[0-9/]+\\.pdf[^\"]+)\"");
     private static final String IEEE_DOI = "10.1109";
     private static final String BASE_URL = "https://ieeexplore.ieee.org";
-
+    private static final String API_KEY = new BuildInfo().ieeeAPIKey;
     private static final String TEST_URL_WITHOUT_API_KEY = "https://ieeexploreapi.ieee.org/api/v1/search/articles?max_records=0&apikey=";
 
     private final ImportFormatPreferences importFormatPreferences;
@@ -236,7 +239,7 @@ public class IEEE implements FulltextFetcher, PagedSearchBasedParserFetcher, Cus
 
     @Override
     public String getName() {
-        return "IEEEXplore";
+        return FETCHER_NAME;
     }
 
     @Override
@@ -244,16 +247,15 @@ public class IEEE implements FulltextFetcher, PagedSearchBasedParserFetcher, Cus
         return Optional.of(HelpFile.FETCHER_IEEEXPLORE);
     }
 
-    @Override
-    public String getApiKey() {
+    private String getApiKey() {
         return Globals.prefs.getImporterPreferences()
                             .getApiKeys()
                             .stream()
                             .filter(key -> key.getName().equalsIgnoreCase(this.getName()))
-                            .filter(FetcherApiKey::shouldUseCustom)
+                            .filter(FetcherApiKey::shouldUse)
                             .findFirst()
-                            .map(key -> getApiKey())
-                            .orElse(new BuildInfo().ieeeAPIKey);
+                            .map(FetcherApiKey::getKey)
+                            .orElse(API_KEY);
     }
 
     @Override
