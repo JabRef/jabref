@@ -14,7 +14,10 @@
          xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
          fx:controller="org.jabref.gui.preferences.xmp.XmpPrivacyTab">
     <Label styleClass="titleHeader" text="%XMP export privacy settings"/>
-    <CheckBox fx:id="enableXmpFilter" text="%Do not write the following fields to XMP Metadata"/>
+    <CheckBox fx:id="enableXmpFilter" text="%Prevent writing following metadata fields from PDFs / Removing following metadata fields from PDFs"/>
+    <Label fx:id="descriptionLabel" styleClass="info-section"
+           text="%privacy description"
+           wrapText="true"/>
     <CheckBox fx:id="selectAllFields" text="%Select all fields"/>
     <HBox alignment="BOTTOM_LEFT" spacing="4.0">
         <VBox spacing="4.0">

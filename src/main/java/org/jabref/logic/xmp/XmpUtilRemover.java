@@ -5,14 +5,13 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.xml.transform.TransformerException;
 
 import org.jabref.logic.util.io.FileUtil;
-import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
@@ -42,52 +41,15 @@ public class XmpUtilRemover {
      * Throws an IOException if the file cannot be read or written, so the user
      * can remove a lock or cancel the operation.
      *
-     * The method will only overwrite BibTeX-XMP-data specified in the Xmp Preference
-     * Tab, all other metadata are untouched.
-     *
-     * @param file The filename from which to open the file.
-     * @param entry    The entries for file to reference given a select all.
-     * @param database (maybe null) An optional database which the given bibtex entries belong to, which will be used to
-     *                 resolve strings. If the database is null the strings will not be resolved.
-     * @throws TransformerException If the entry was malformed or unsupported.
-     * @throws IOException          If the file could not be written to or could not be found.
-     */
-
-    public static void deleteXmp(Path file, BibEntry entry,
-                                 BibDatabase database, XmpPreferences xmpPreferences) throws IOException, TransformerException {
-        List<BibEntry> bibEntryList = new ArrayList<>();
-        bibEntryList.add(entry);
-        XmpUtilRemover.deleteXmp(file, bibEntryList, database, xmpPreferences);
-    }
-
-    /**
-     * Tries to delete the given BibTexEntry in the XMP-stream of the given
-     * PDF-file.
-     *
-     * Throws an IOException if the file cannot be read or written, so the user
-     * can remove a lock or cancel the operation.
-     *
-     * The method will only overwrite BibTeX-XMP-data specified in the Xmp Preference
+     * The method will only delete BibTeX-XMP-data specified in the Xmp Preference
      * Tab, all other metadata are untouched.
      *
      * @param path          The file to write the entries to.
-     * @param bibtexEntries The entries for file to reference given a select all.
-     * @param database      maybenull An optional database which the given bibtex entries belong to, which will be used
-     *                      to resolve strings. If the database is null the strings will not be resolved.
-     * @param xmpPreferences  Write information also in PDF document properties
+     * @param xmpPreferences  Delete information also in PDF document properties.
      * @throws TransformerException If the entry was malformed or unsupported.
      * @throws IOException          If the file could not be written to or could not be found.
      */
-    public static void deleteXmp(Path path,
-                                 List<BibEntry> bibtexEntries, BibDatabase database,
-                                 XmpPreferences xmpPreferences) throws IOException, TransformerException {
-
-        List<BibEntry> resolvedEntries;
-        if (database == null) {
-            resolvedEntries = bibtexEntries;
-        } else {
-            resolvedEntries = database.resolveForStrings(bibtexEntries, false);
-        }
+    public static void deleteXmp(Path path, XmpPreferences xmpPreferences) throws IOException, TransformerException {
         // uses same hack as PR #8658
         // See: src/main/java/org/jabref/logic/xmp/XmpUtilWriter.java
         // Restating the comment
@@ -95,15 +57,22 @@ public class XmpUtilRemover {
         // Reason: Apache PDFBox does not support writing while the file is opened
         // See https://issues.apache.org/jira/browse/PDFBOX-4028
         Path newFile = Files.createTempFile("JabRef", "pdf");
+
+        // extract entries from PDF file's XMP metadata
+        List<BibEntry> entries = XmpUtilReader.readXmp(path, xmpPreferences);
+
+        // get the union of all entries' fields
+        Set<Field> fields = entries.stream().flatMap(entry -> entry.getFieldMap().keySet().stream()).collect(Collectors.toSet());
+
         try (PDDocument document = Loader.loadPDF(path.toFile())) {
             if (document.isEncrypted()) {
                 throw new EncryptedPdfsNotSupportedException();
             }
 
             // Delete schemas (PDDocumentInformation) from the document metadata
-            if (resolvedEntries.size() > 0) {
-                XmpUtilRemover.deleteDocumentInformation(document, resolvedEntries.get(0), null, xmpPreferences);
-                XmpUtilRemover.rewriteDublinCore(document, resolvedEntries, null, xmpPreferences);
+            if (entries.size() > 0) {
+                XmpUtilRemover.deleteDocumentInformation(document, fields, xmpPreferences);
+                XmpUtilRemover.rewriteDublinCore(entries, document, xmpPreferences);
             }
 
             // Save updates to original file
@@ -122,26 +91,18 @@ public class XmpUtilRemover {
      *
      *
      * @param document The pdf document to write to.
-     * @param entry    The Bibtex entry that is written into the PDF properties. *
-     * @param database maybenull An optional database which the given bibtex entries belong to, which will be used to
-     *                 resolve strings. If the database is null the strings will not be resolved.
+     * @param fields    The XMP metadata fields to delete.
+     * @param xmpPreferences  Delete information also in PDF document properties.
      */
 
-    private static void deleteDocumentInformation(PDDocument document,
-                                                  BibEntry entry, BibDatabase database, XmpPreferences xmpPreferences) {
-
+    private static void deleteDocumentInformation(PDDocument document, Set<Field> fields, XmpPreferences xmpPreferences) {
         PDDocumentInformation di = document.getDocumentInformation();
-
-        BibEntry resolvedEntry = XmpUtilRemover.getDefaultOrDatabaseEntry(entry, database);
 
         // Query privacy filter settings
         boolean useXmpPrivacyFilter = xmpPreferences.shouldUseXmpPrivacyFilter();
 
         // Set all the values including key and entryType
-        for (Map.Entry<Field, String> fieldValuePair : resolvedEntry.getFieldMap().entrySet()) {
-            Field field = fieldValuePair.getKey();
-            String fieldContent = fieldValuePair.getValue();
-
+        for (Field field: fields) {
             if (useXmpPrivacyFilter && xmpPreferences.getSelectAllFields().getValue()) {
                 // if delete all, no need to check if field is contained in xmp preference
                 deleteField(di, field);
@@ -155,7 +116,7 @@ public class XmpUtilRemover {
      * Deletes field from document.
      *
      * @param di    The document to delete from.
-     * @param field The field to delete.
+     * @param field The name of field to delete.
      */
 
     private static void deleteField(PDDocumentInformation di, Field field) {
@@ -171,32 +132,16 @@ public class XmpUtilRemover {
             di.setCustomMetadataValue("bibtex/" + field, null);
         }
     }
+
     /**
-     * Resolve entry with database
+     * Try to write the given BibTexEntries as DublinCore XMP Schemas
      *
-     * @param defaultEntry  The entry to resolve.
-     * @param database      The database to check for resolutions.
+     * Existing DublinCore schemas in the document are removed
+     *
+     * @param document The pdf document to write to.
+     * @param entries  The entries in XMP metadata.
      */
-
-    private static BibEntry getDefaultOrDatabaseEntry(BibEntry defaultEntry, BibDatabase database) {
-        if (database == null) {
-            return defaultEntry;
-        } else {
-            return database.resolveForStrings(defaultEntry, false);
-        }
-    }
-
-    static void rewriteDublinCore(PDDocument document,
-                                List<BibEntry> entries, BibDatabase database, XmpPreferences xmpPreferences)
-            throws IOException, TransformerException {
-
-        List<BibEntry> resolvedEntries;
-        if (database == null) {
-            resolvedEntries = entries;
-        } else {
-            resolvedEntries = database.resolveForStrings(entries, false);
-        }
-
+    static void rewriteDublinCore(List<BibEntry> entries, PDDocument document, XmpPreferences xmpPreferences) throws IOException, TransformerException {
         PDDocumentCatalog catalog = document.getDocumentCatalog();
         PDMetadata metaRaw = catalog.getMetadata();
 
@@ -217,9 +162,9 @@ public class XmpUtilRemover {
         // Remove all current Dublin-Core schemas
         meta.removeSchema(meta.getDublinCoreSchema());
 
-        for (BibEntry entry : resolvedEntries) {
+        for (BibEntry entry : entries) {
             DublinCoreSchema dcSchema = DublinCoreSchemaCustom.copyDublinCoreSchema(meta.createAndAddDublinCoreSchema());
-            XmpUtilRemover.rewriteToDCSchema(dcSchema, entry, null, xmpPreferences);
+            XmpUtilRemover.rewriteToDCSchema(dcSchema, entry, xmpPreferences);
         }
 
         // Save to stream and then input that stream to the PDF
@@ -229,24 +174,6 @@ public class XmpUtilRemover {
         ByteArrayInputStream is = new ByteArrayInputStream(os.toByteArray());
         PDMetadata metadataStream = new PDMetadata(document, is);
         catalog.setMetadata(metadataStream);
-    }
-
-    /**
-     * Writes the information of the bib entry to the dublin core schema using
-     * a custom extractor.
-     *
-     * @param dcSchema  Dublin core schema, which is filled with the bib entry.
-     * @param entry     The entry, which is added to the dublin core metadata.
-     * @param database  maybenull An optional database which the given bibtex entries belong to, which will be used to
-     *                  resolve strings. If the database is null the strings will not be resolved.
-     * @param xmpPreferences    The user's xmp preferences.
-     */
-    private static void rewriteToDCSchema(DublinCoreSchema dcSchema, BibEntry entry, BibDatabase database,
-                                        XmpPreferences xmpPreferences) {
-
-        BibEntry resolvedEntry = XmpUtilRemover.getDefaultOrDatabaseEntry(entry, database);
-
-        rewriteToDCSchema(dcSchema, resolvedEntry, xmpPreferences);
     }
 
     /**

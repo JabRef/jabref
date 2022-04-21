@@ -34,7 +34,6 @@ import org.jabref.logic.util.io.FileUtil;
 import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.logic.xmp.XmpUtilRemover;
 import org.jabref.model.database.BibDatabase;
-import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
@@ -137,7 +136,7 @@ public class DeleteMetadataAction extends SimpleCommand {
                 for (Path file : files) {
                     if (Files.exists(file)) {
                         try {
-                            DeleteMetadataFromFile(file, entry, stateManager.getActiveDatabase().get(), database);
+                            DeleteMetadataFromFile(file);
                             stringJoiner.add("  " + Localization.lang("OK") + ".");
                             entriesChanged++;
                         } catch (Exception e) {
@@ -177,10 +176,9 @@ public class DeleteMetadataAction extends SimpleCommand {
      * This deletes XMP data
      *
      * @param file The file to delete metadata from
-     * @param entry The entry that is related to the file selected
      */
-    synchronized private void DeleteMetadataFromFile(Path file, BibEntry entry, BibDatabaseContext databaseContext, BibDatabase database) throws Exception {
-        XmpUtilRemover.deleteXmp(file, entry, database, xmpPreferences);
+    synchronized private void DeleteMetadataFromFile(Path file) throws Exception {
+        XmpUtilRemover.deleteXmp(file, xmpPreferences);
     }
 
     class OptionsDialog extends FXDialog {
