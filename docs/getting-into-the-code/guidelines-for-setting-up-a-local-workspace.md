@@ -83,7 +83,7 @@ This section explains how you get the JabRef code onto your machine in a form al
 
 ### Clone your forked repository on your local machine
 
-* In a command line, navigate to the folder where you want to place the source code (parent folder of `jabref/`). To prevent issues along the way, it is strongly recommend to choose a path that does not contain any special (non-ASCII or whitespace) characters.
+* In a command line, navigate to the folder where you want to place the source code (parent folder of `jabref/`). To prevent issues along the way, it is strongly recommend to choose a path that does not contain any special (non-ASCII or whitespace) characters. Note that placing jabref folder directly in the disk root directory may cause an error.  
 * Run `git clone --depth=10 https://github.com/YOUR_USERNAME/jabref.git`. The `--depth--10` is used to limit the download to \~20 MB instead of downloading the complete history (\~800 MB). If you want to dig in our commit history, feel free to download everything.
 * Go to the newly created jabref folder: `cd jabref`
 * Generate additional source code: `./gradlew assemble`

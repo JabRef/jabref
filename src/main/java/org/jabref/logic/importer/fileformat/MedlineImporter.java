@@ -129,7 +129,6 @@ public class MedlineImporter extends Importer implements Parser {
         String str;
         int i = 0;
         while (((str = reader.readLine()) != null) && (i < 50)) {
-
             if (str.toLowerCase(ENGLISH).contains("<pubmedarticle>")
                     || str.toLowerCase(ENGLISH).contains("<pubmedbookarticle>")) {
                 return true;

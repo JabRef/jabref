@@ -14,11 +14,13 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We added a checkbox to select all fields inside XmpPreference Tab [#8277](https://github.com/JabRef/jabref/issues/8277)
 - We added a button to delete metadata of selected fields inside XmpPreference Tab without overwriting other fields [#8277](https://github.com/JabRef/jabref/issues/8277)
 - We added an extra option when right-clicking an entry in the Entry List to copy either the DOI or the DOI url.
+- We added a fetcher for [Directory of Open Access Books (DOAB)](https://doabooks.org/) [8576](https://github.com/JabRef/jabref/issues/8576)
 - We added an extra option to ask the user whether they want to open to reveal the folder holding the saved file with the file selected. [#8195](https://github.com/JabRef/jabref/issues/8195)
 - We added a new section to network preferences to allow using custom SSL certificates. [#8126](https://github.com/JabRef/jabref/issues/8126)
 - We improved the version check to take also beta version into account and now redirect to the right changelog for the version.
 - We added two new web and fulltext fetchers: SemanticScholar and ResearchGate.
-- We added notifications on sucess and failure when writing metadata to a PDF-file [#8276](https://github.com/JabRef/jabref/issues/8276)
+- We added notifications on success and failure when writing metadata to a PDF-file [#8276](https://github.com/JabRef/jabref/issues/8276)
+- We added a cleanup action that escapes `$` (by adding a backslash in front) [#8673](https://github.com/JabRef/jabref/issues/8673)
 
 ### Changed
 
@@ -29,6 +31,8 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We introduced a preference to disable fulltext indexing [#8468](https://github.com/JabRef/jabref/issues/8468)
 - When exporting entries, the encoding is always UTF-8
 - When embedding BibTeX data into a PDF, the encoding is always UTF-8
+- We replaced the [OttoBib](https://en.wikipedia.org/wiki/OttoBib) fetcher by a fetcher by [OpenLibrary](https://openlibrary.org/dev/docs/api/books). [#8652](https://github.com/JabRef/jabref/issues/8652)
+- We first fetch ISBN data from OpenLibrary, if nothing found, ebook.de is tried.
 - We now only show a warning when exiting for tasks that will not be recovered automatically upon relaunch of JabRef. [#8468](https://github.com/JabRef/jabref/issues/8468)
 
 ### Fixed

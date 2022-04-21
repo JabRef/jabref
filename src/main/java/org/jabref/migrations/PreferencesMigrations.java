@@ -136,7 +136,6 @@ public class PreferencesMigrations {
      * exist
      */
     private static void upgradeSortOrder(JabRefPreferences prefs) {
-
         if (prefs.get(JabRefPreferences.EXPORT_IN_SPECIFIED_ORDER, null) == null) {
             if (prefs.getBoolean("exportInStandardOrder", false)) {
                 prefs.putBoolean(JabRefPreferences.EXPORT_IN_SPECIFIED_ORDER, true);
@@ -163,7 +162,6 @@ public class PreferencesMigrations {
      * Migrate all customized entry types from versions <=3.7
      */
     private static void upgradeStoredBibEntryTypes(JabRefPreferences prefs, Preferences mainPrefsNode) {
-
         try {
             if (mainPrefsNode.nodeExists(JabRefPreferences.CUSTOMIZED_BIBTEX_TYPES) ||
                     mainPrefsNode.nodeExists(JabRefPreferences.CUSTOMIZED_BIBLATEX_TYPES)) {
@@ -181,7 +179,6 @@ public class PreferencesMigrations {
      * Migrate LabelPattern configuration from versions <=3.5 to new CitationKeyPatterns
      */
     private static void upgradeLabelPatternToCitationKeyPattern(JabRefPreferences prefs) {
-
         try {
             Preferences mainPrefsNode = Preferences.userRoot().node("/org/jabref");
 
@@ -242,11 +239,9 @@ public class PreferencesMigrations {
     }
 
     static void upgradeImportFileAndDirePatterns(JabRefPreferences prefs, Preferences mainPrefsNode) {
-
         // Migrate Import patterns
         // Check for prefs node for Version <= 4.0
         if (mainPrefsNode.get(JabRefPreferences.IMPORT_FILENAMEPATTERN, null) != null) {
-
             String[] oldStylePatterns = new String[]{
                     "\\bibtexkey",
                     "\\bibtexkey\\begin{title} - \\format[RemoveBrackets]{\\title}\\end{title}"};

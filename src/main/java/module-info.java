@@ -58,6 +58,7 @@ open module org.jabref {
 
     // Microsoft application insights
     requires applicationinsights.core;
+    requires applicationinsights.logging.log4j2;
 
     // Libre Office
     requires org.libreoffice.uno;
@@ -71,7 +72,6 @@ open module org.jabref {
     requires fastparse;
     requires jbibtex;
     requires citeproc.java;
-    requires antlr.runtime;
     requires de.saxsys.mvvmfx.validation;
     requires com.google.gson;
     requires unirest.java;
@@ -85,9 +85,11 @@ open module org.jabref {
     requires org.mariadb.jdbc;
     uses org.mariadb.jdbc.credential.CredentialPlugin;
     requires org.apache.commons.lang3;
+    requires antlr.runtime;
     requires org.antlr.antlr4.runtime;
     requires org.fxmisc.flowless;
     requires org.apache.tika.core;
+    uses org.apache.tika.detect.AutoDetectReader;
     requires pdfbox;
     requires xmpbox;
     requires com.ibm.icu;
@@ -110,10 +112,13 @@ open module org.jabref {
     requires org.apache.lucene.analysis.common;
     requires org.apache.lucene.highlighter;
 
-
     requires com.fasterxml.jackson.databind;
     requires com.fasterxml.jackson.dataformat.yaml;
     requires com.fasterxml.jackson.datatype.jsr310;
     requires net.harawata.appdirs;
+
+    requires org.eclipse.jgit;
+    uses org.eclipse.jgit.transport.SshSessionFactory;
+    uses org.eclipse.jgit.lib.GpgSigner;
 
 }

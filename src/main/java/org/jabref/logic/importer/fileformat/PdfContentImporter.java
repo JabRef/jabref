@@ -216,7 +216,6 @@ public class PdfContentImporter extends Importer {
 
     // make this method package visible so we can test it
     Optional<BibEntry> getEntryFromPDFContent(String firstpageContents, String lineSeparator) {
-
         // idea: split[] contains the different lines
         // blocks are separated by empty lines
         // treat each block
@@ -605,5 +604,4 @@ public class PdfContentImporter extends Importer {
     public String getDescription() {
         return "PdfContentImporter parses data of the first page of the PDF and creates a BibTeX entry. Currently, Springer and IEEE formats are supported.";
     }
-
 }

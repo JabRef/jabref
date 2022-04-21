@@ -98,5 +98,4 @@ public class PdfVerbatimBibTextImporter extends Importer {
     public String getDescription() {
         return "PdfVerbatimBibTextImporter imports a verbatim BibTeX entry from the first page of the PDF.";
     }
-
 }
