@@ -89,9 +89,7 @@ public class DeleteMetadataAction extends SimpleCommand {
         entries = stateManager.getSelectedEntries();
 
         if (entries.isEmpty()) {
-
             entries = database.getEntries();
-
             if (entries.isEmpty()) {
                 dialogService.showErrorDialogAndWait(
                         Localization.lang("Delete metadata from PDFs"),
@@ -177,6 +175,7 @@ public class DeleteMetadataAction extends SimpleCommand {
 
     /**
      * This deletes XMP data
+     *
      * @param file The file to delete metadata from
      * @param entry The entry that is related to the file selected
      */

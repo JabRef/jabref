@@ -200,7 +200,6 @@ public class XmpUtilRemoverTest {
                 modifiedEntries.get(i).clearField(StandardField.FILE);
                 assertEquals(expectedEntries.get(i), modifiedEntries.get(i));
             }
-
         } catch (IOException | TransformerException e) {
             assertTrue(false);
         }

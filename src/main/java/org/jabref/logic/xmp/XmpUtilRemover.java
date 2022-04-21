@@ -96,7 +96,6 @@ public class XmpUtilRemover {
         // See https://issues.apache.org/jira/browse/PDFBOX-4028
         Path newFile = Files.createTempFile("JabRef", "pdf");
         try (PDDocument document = Loader.loadPDF(path.toFile())) {
-
             if (document.isEncrypted()) {
                 throw new EncryptedPdfsNotSupportedException();
             }
