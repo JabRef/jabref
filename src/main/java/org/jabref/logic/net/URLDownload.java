@@ -86,7 +86,6 @@ public class URLDownload {
     public URLDownload(URL source) {
         this.source = source;
         this.addHeader("User-Agent", URLDownload.USER_AGENT);
-        bypassSSLVerification();
     }
 
     /**
@@ -99,13 +98,15 @@ public class URLDownload {
      * security-relevant information this is kind of OK (no, actually it is not...).
      * <p>
      * Taken from http://stackoverflow.com/a/6055903/873661 and https://stackoverflow.com/a/19542614/873661
+     *
+     * @deprecated
      */
+    @Deprecated
     public static void bypassSSLVerification() {
         LOGGER.warn("Fix SSL exceptions by accepting ALL certificates");
 
         // Create a trust manager that does not validate certificate chains
         TrustManager[] trustAllCerts = {new X509TrustManager() {
-
             @Override
             public void checkClientTrusted(X509Certificate[] chain, String authType) {
             }
@@ -325,7 +326,6 @@ public class URLDownload {
     private void copy(InputStream in, Writer out, Charset encoding) throws IOException {
         Reader r = new InputStreamReader(in, encoding);
         try (BufferedReader read = new BufferedReader(r)) {
-
             String line;
             while ((line = read.readLine()) != null) {
                 out.write(line);

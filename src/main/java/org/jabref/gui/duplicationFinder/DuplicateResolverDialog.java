@@ -38,7 +38,7 @@ public class DuplicateResolverDialog extends BaseDialog<DuplicateResolverResult>
         BREAK
     }
 
-    private MergeEntries me;
+    private MergeEntries mergeEntries;
 
     public DuplicateResolverDialog(BibEntry one, BibEntry two, DuplicateResolverType type, BibDatabaseContext database, StateManager stateManager) {
         this.setTitle(Localization.lang("Possible duplicate entries"));
@@ -48,7 +48,6 @@ public class DuplicateResolverDialog extends BaseDialog<DuplicateResolverResult>
     }
 
     private void init(BibEntry one, BibEntry two, DuplicateResolverType type) {
-
         HelpAction helpCommand = new HelpAction(HelpFile.FIND_DUPLICATES);
         ButtonType help = new ButtonType(Localization.lang("Help"), ButtonData.HELP);
 
@@ -67,13 +66,13 @@ public class DuplicateResolverDialog extends BaseDialog<DuplicateResolverResult>
                 first = new ButtonType(Localization.lang("Keep left"), ButtonData.APPLY);
                 second = new ButtonType(Localization.lang("Keep right"), ButtonData.APPLY);
                 both = new ButtonType(Localization.lang("Keep both"), ButtonData.APPLY);
-                me = new MergeEntries(one, two);
+                mergeEntries = new MergeEntries(one, two);
                 break;
             case INSPECTION:
                 first = new ButtonType(Localization.lang("Remove old entry"), ButtonData.APPLY);
                 second = new ButtonType(Localization.lang("Remove entry from import"), ButtonData.APPLY);
                 both = new ButtonType(Localization.lang("Keep both"), ButtonData.APPLY);
-                me = new MergeEntries(one, two, Localization.lang("Old entry"),
+                mergeEntries = new MergeEntries(one, two, Localization.lang("Old entry"),
                         Localization.lang("From import"));
                 break;
             case DUPLICATE_SEARCH_WITH_EXACT:
@@ -83,13 +82,13 @@ public class DuplicateResolverDialog extends BaseDialog<DuplicateResolverResult>
 
                 removeExactVisible = true;
 
-                me = new MergeEntries(one, two);
+                mergeEntries = new MergeEntries(one, two);
                 break;
             default:
                 first = new ButtonType(Localization.lang("Import and remove old entry"), ButtonData.APPLY);
                 second = new ButtonType(Localization.lang("Do not import entry"), ButtonData.APPLY);
                 both = new ButtonType(Localization.lang("Import and keep old entry"), ButtonData.APPLY);
-                me = new MergeEntries(one, two, Localization.lang("Old entry"),
+                mergeEntries = new MergeEntries(one, two, Localization.lang("Old entry"),
                         Localization.lang("From import"));
                 break;
         }
@@ -107,7 +106,7 @@ public class DuplicateResolverDialog extends BaseDialog<DuplicateResolverResult>
             this.setY(state.getY());
         }
 
-        BorderPane borderPane = new BorderPane(me);
+        BorderPane borderPane = new BorderPane(mergeEntries);
         borderPane.setBottom(options);
 
         this.setResultConverter(button -> {
@@ -134,6 +133,6 @@ public class DuplicateResolverDialog extends BaseDialog<DuplicateResolverResult>
     }
 
     public BibEntry getMergedEntry() {
-        return me.getMergeEntry();
+        return mergeEntries.getMergedEntry();
     }
 }

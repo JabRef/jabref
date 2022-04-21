@@ -50,7 +50,6 @@ public class IdentifierEditor extends HBox implements FieldEditorFX {
                 new Tooltip(Localization.lang("Look up %0", field.getDisplayName())));
 
         if (field.equals(StandardField.DOI)) {
-
             textArea.initContextMenu(EditorMenus.getDOIMenu(textArea));
         } else {
             textArea.initContextMenu(new DefaultMenu(textArea));

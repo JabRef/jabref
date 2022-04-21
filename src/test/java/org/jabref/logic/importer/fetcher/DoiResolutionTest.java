@@ -10,6 +10,7 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.testutils.category.FetcherTest;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -39,6 +40,7 @@ class DoiResolutionTest {
         );
     }
 
+    @Disabled("Cannot fetch due to Cloudfare protection")
     @Test
     void linkWithPdfStringLeadsToFulltext() throws IOException {
         entry.setField(StandardField.DOI, "10.1002/acr2.11101");
@@ -48,7 +50,7 @@ class DoiResolutionTest {
     @Test
     void citationMetaTagLeadsToFulltext() throws IOException {
         entry.setField(StandardField.DOI, "10.1007/978-3-319-89963-3_28");
-        assertEquals(Optional.of(new URL("https://link.springer.com/content/pdf/10.1007%2F978-3-319-89963-3_28.pdf")), finder.findFullText(entry));
+        assertEquals(Optional.of(new URL("https://link.springer.com/content/pdf/10.1007/978-3-319-89963-3_28.pdf")), finder.findFullText(entry));
     }
 
     @Test
@@ -63,7 +65,7 @@ class DoiResolutionTest {
         // even if the user does not have access
         // We cannot easily handle this case, because other publisher return the wrong media type.
         entry.setField(StandardField.DOI, "10.1007/978-3-319-62594-2_12");
-        assertEquals(Optional.of(new URL("https://link.springer.com/content/pdf/10.1007%2F978-3-319-62594-2_12.pdf")), finder.findFullText(entry));
+        assertEquals(Optional.of(new URL("https://link.springer.com/content/pdf/10.1007/978-3-319-62594-2_12.pdf")), finder.findFullText(entry));
     }
 
     @Test

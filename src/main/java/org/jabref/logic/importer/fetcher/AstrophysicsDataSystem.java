@@ -309,5 +309,4 @@ public class AstrophysicsDataSystem implements IdBasedParserFetcher, PagedSearch
         urlDownload.addHeader("Authorization", "Bearer " + API_KEY);
         return urlDownload;
     }
-
 }

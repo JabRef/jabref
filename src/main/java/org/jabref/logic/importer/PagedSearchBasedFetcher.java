@@ -55,5 +55,4 @@ public interface PagedSearchBasedFetcher extends SearchBasedFetcher {
     default List<BibEntry> performSearch(QueryNode luceneQuery) throws FetcherException {
         return new ArrayList<>(performSearchPaged(luceneQuery, 0).getContent());
     }
-
 }

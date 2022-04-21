@@ -1007,5 +1007,4 @@ public class BibEntry implements Cloneable {
         }
         entry.setFiles(linkedFiles);
     }
-
 }

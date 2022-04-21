@@ -85,7 +85,6 @@ public class DocumentInformationExtractor {
      * @return The bibtex entry found in the document information.
      */
     public Optional<BibEntry> extractBibtexEntry() {
-
         bibEntry.setType(BibEntry.DEFAULT_TYPE);
 
         this.extractAuthor();

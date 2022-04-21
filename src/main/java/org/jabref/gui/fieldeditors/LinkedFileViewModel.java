@@ -421,23 +421,26 @@ public class LinkedFileViewModel extends AbstractViewModel {
         BackgroundTask<Void> writeTask = BackgroundTask.wrap(() -> {
             Optional<Path> file = linkedFile.findIn(databaseContext, preferences.getFilePreferences());
             if (file.isEmpty()) {
-                // TODO: Print error message
-                // Localization.lang("PDF does not exist");
+                dialogService.notify(Localization.lang("Failed to write metadata, file %1 not found.", file.map(Path::toString).orElse("")));
             } else {
-                try {
-                    XmpUtilWriter.writeXmp(file.get(), entry, databaseContext.getDatabase(), preferences.getXmpPreferences());
+                synchronized (linkedFile) {
+                    try {
+                        // Similar code can be found at {@link org.jabref.gui.exporter.WriteMetadataToPdfAction.writeMetadataToFile}
+                        XmpUtilWriter.writeXmp(file.get(), entry, databaseContext.getDatabase(), preferences.getXmpPreferences());
 
-                    EmbeddedBibFilePdfExporter embeddedBibExporter = new EmbeddedBibFilePdfExporter(preferences.getGeneralPreferences().getDefaultBibDatabaseMode(), Globals.entryTypesManager, preferences.getFieldWriterPreferences());
-                    embeddedBibExporter.exportToFileByPath(databaseContext, databaseContext.getDatabase(), preferences.getFilePreferences(), file.get());
-                } catch (IOException | TransformerException ex) {
-                    // TODO: Print error message
-                    // Localization.lang("Error while writing") + " '" + file.toString() + "': " + ex;
+                        EmbeddedBibFilePdfExporter embeddedBibExporter = new EmbeddedBibFilePdfExporter(databaseContext.getMode(), Globals.entryTypesManager, preferences.getFieldWriterPreferences());
+                        embeddedBibExporter.exportToFileByPath(databaseContext, databaseContext.getDatabase(), preferences.getFilePreferences(), file.get());
+
+                        dialogService.notify(Localization.lang("Success! Finished writing metadata."));
+                    } catch (IOException | TransformerException ex) {
+                        dialogService.notify(Localization.lang("Error while writing metadata. See the error log for details."));
+                        LOGGER.error("Error while writing metadata to {}", file.map(Path::toString).orElse(""), ex);
+                    }
                 }
             }
             return null;
         });
 
-        // TODO: Show progress
         taskExecutor.execute(writeTask);
     }
 
@@ -485,6 +488,10 @@ public class LinkedFileViewModel extends AbstractViewModel {
             downloadTask.messageProperty().set(
                     Localization.lang("Fulltext for") + ": " + entry.getCitationKey().orElse(Localization.lang("New entry")));
             downloadTask.showToUser(true);
+            downloadTask.onFailure(ex -> {
+                LOGGER.error("Error downloading", ex);
+                dialogService.showErrorDialogAndWait(Localization.lang("Error downloading"), ex);
+            });
             taskExecutor.execute(downloadTask);
         } catch (MalformedURLException exception) {
             dialogService.showErrorDialogAndWait(Localization.lang("Invalid URL"), exception);
@@ -524,8 +531,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
                     return targetDirectory.resolve(fulltextDir).resolve(suggestedName);
                 })
                 .then(destination -> new FileDownloadTask(urlDownload.getSource(), destination))
-                .onFinished(() -> URLDownload.setSSLVerification(defaultSSLSocketFactory, defaultHostnameVerifier))
-                .onFailure(exception -> dialogService.showErrorDialogAndWait("Download failed", exception));
+                .onFinished(() -> URLDownload.setSSLVerification(defaultSSLSocketFactory, defaultHostnameVerifier));
         return downloadTask;
     }
 

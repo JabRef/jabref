@@ -112,7 +112,6 @@ public class ProtectedTermsTabViewModel implements PreferenceTabViewModel {
                 Localization.lang("Are you sure you want to remove the protected terms file?"),
                 Localization.lang("Remove protected terms file"),
                 Localization.lang("Cancel"))) {
-
             itemModel.enabledProperty().setValue(false);
             if (!termsFilesProperty.remove(itemModel)) {
                 LOGGER.info("Problem removing protected terms file");

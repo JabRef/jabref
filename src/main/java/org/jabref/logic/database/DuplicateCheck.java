@@ -319,10 +319,6 @@ public class DuplicateCheck {
 
     /**
      * Checks if the two entries represent the same publication.
-     *
-     * @param one BibEntry
-     * @param two BibEntry
-     * @return boolean
      */
     public boolean isDuplicate(final BibEntry one, final BibEntry two, final BibDatabaseMode bibDatabaseMode) {
         if (haveSameIdentifier(one, two)) {

@@ -82,6 +82,8 @@ import org.jabref.logic.layout.TextBasedPreviewLayout;
 import org.jabref.logic.layout.format.FileLinkPreferences;
 import org.jabref.logic.layout.format.NameFormatterPreferences;
 import org.jabref.logic.net.ProxyPreferences;
+import org.jabref.logic.net.ssl.SSLPreferences;
+import org.jabref.logic.net.ssl.TrustStoreManager;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
 import org.jabref.logic.openoffice.style.StyleLoader;
 import org.jabref.logic.preferences.DOIPreferences;
@@ -107,11 +109,13 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.EntryTypeFactory;
 import org.jabref.model.metadata.SaveOrderConfig;
+import org.jabref.model.pdf.search.SearchFieldConstants;
 import org.jabref.model.push.PushToApplicationConstants;
 import org.jabref.model.search.rules.SearchRules;
 import org.jabref.model.strings.StringUtil;
 
 import com.tobiasdiez.easybind.EasyBind;
+import net.harawata.appdirs.AppDirsFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -350,6 +354,9 @@ public class JabRefPreferences implements PreferencesService {
     private static final String PROXY_PASSWORD = "proxyPassword";
     private static final String PROXY_USE_AUTHENTICATION = "useProxyAuthentication";
 
+    // SSL
+    private static final String TRUSTSTORE_PATH = "truststorePath";
+
     // Auto completion
     private static final String AUTO_COMPLETE = "autoComplete";
     private static final String AUTOCOMPLETER_FIRSTNAME_MODE = "autoCompFirstNameMode";
@@ -439,6 +446,7 @@ public class JabRefPreferences implements PreferencesService {
     private GuiPreferences guiPreferences;
     private RemotePreferences remotePreferences;
     private ProxyPreferences proxyPreferences;
+    private SSLPreferences sslPreferences;
     private SearchPreferences searchPreferences;
     private AutoLinkPreferences autoLinkPreferences;
     private ImportExportPreferences importExportPreferences;
@@ -521,6 +529,9 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(PROXY_USE_AUTHENTICATION, Boolean.FALSE);
         defaults.put(PROXY_USERNAME, "");
         defaults.put(PROXY_PASSWORD, "");
+
+        // SSL
+        defaults.put(TRUSTSTORE_PATH, Path.of(AppDirsFactory.getInstance().getUserDataDir("ssl", SearchFieldConstants.VERSION, "org.jabref")).resolveSibling("truststore.jks").toString());
 
         defaults.put(POS_X, 0);
         defaults.put(POS_Y, 0);
@@ -946,8 +957,14 @@ public class JabRefPreferences implements PreferencesService {
     public void clear() throws BackingStoreException {
         clearAllBibEntryTypes();
         clearCitationKeyPatterns();
+        clearTruststoreFromCustomCertificates();
         prefs.clear();
         new SharedDatabasePreferences().clear();
+    }
+
+    private void clearTruststoreFromCustomCertificates() {
+        TrustStoreManager trustStoreManager = new TrustStoreManager(Path.of(defaults.get(TRUSTSTORE_PATH).toString()));
+        trustStoreManager.clearCustomCertificates();
     }
 
     /**
@@ -1602,6 +1619,19 @@ public class JabRefPreferences implements PreferencesService {
         EasyBind.listen(proxyPreferences.passwordProperty(), (obs, oldValue, newValue) -> put(PROXY_PASSWORD, newValue));
 
         return proxyPreferences;
+    }
+
+    @Override
+    public SSLPreferences getSSLPreferences() {
+        if (Objects.nonNull(sslPreferences)) {
+            return sslPreferences;
+        }
+
+        sslPreferences = new SSLPreferences(
+                get(TRUSTSTORE_PATH)
+        );
+
+        return sslPreferences;
     }
 
     //*************************************************************************************************************
