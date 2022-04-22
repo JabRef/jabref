@@ -15,8 +15,11 @@
          fx:controller="org.jabref.gui.preferences.xmp.XmpPrivacyTab">
     <Label styleClass="titleHeader" text="%XMP export privacy settings"/>
     <CheckBox fx:id="enableXmpFilter" text="%Prevent writing following metadata fields from PDFs / Removing following metadata fields from PDFs"/>
-    <Label fx:id="descriptionLabel" styleClass="info-section"
-           text="%privacy description"
+    <Label fx:id="descriptionLabel1" styleClass="info-section"
+           text="%-Do not write the following XMP metadata fields to PDFs, when using &quot;write metadata to PDF files &quot;. Additionally, choosing this option and using  &quot;write metadata to PDF files &quot; will also remove existing metadata from PDFs, if one or multiple of the following fields are ALSO present in the entry, whose metadata is supposed to be written to PDF."
+           wrapText="true"/>
+    <Label fx:id="descriptionLabel2" styleClass="info-section"
+           text="%-Selected XMP metadata fields will be completely removed from PDFs if choosing  &quot;Delete metadata from PDFs &quot;."
            wrapText="true"/>
     <CheckBox fx:id="selectAllFields" text="%Select all fields"/>
     <HBox alignment="BOTTOM_LEFT" spacing="4.0">
