@@ -18,6 +18,7 @@ import org.jabref.logic.importer.fetcher.CompositeSearchBasedFetcher;
 import org.jabref.logic.importer.fetcher.CrossRef;
 import org.jabref.logic.importer.fetcher.CustomizableKeyFetcher;
 import org.jabref.logic.importer.fetcher.DBLPFetcher;
+import org.jabref.logic.importer.fetcher.DOABFetcher;
 import org.jabref.logic.importer.fetcher.DOAJFetcher;
 import org.jabref.logic.importer.fetcher.DiVA;
 import org.jabref.logic.importer.fetcher.DoiFetcher;
@@ -109,6 +110,7 @@ public class WebFetchers {
         set.add(new IEEE(importFormatPreferences, importerPreferences));
         set.add(new CompositeSearchBasedFetcher(set, 30));
         set.add(new CollectionOfComputerScienceBibliographiesFetcher(importFormatPreferences));
+        set.add(new DOABFetcher());
         // set.add(new JstorFetcher(importFormatPreferences));
         set.add(new SemanticScholar());
         set.add(new ResearchGate(importFormatPreferences));
