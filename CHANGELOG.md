@@ -54,6 +54,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixed an issue where the app lags when selecting an entry after a fresh start. [#8446](https://github.com/JabRef/jabref/issues/8446)
 - We fixed an issue where no citationkey was generated on import, pasting a doi or an entry on the main table [8406](https://github.com/JabRef/jabref/issues/8406), [koppor#553](https://github.com/koppor/jabref/issues/553)
 - We fixed an issue where accent search does not perform consistently. [#6815](https://github.com/JabRef/jabref/issues/6815)
+- We fixed an issue where right clicking a group and choosing "remove selected entries from this group" leads to error when {}Bibtex source is selected [#8012](https://github.com/JabRef/jabref/issues/8012)
 
 ### Removed
 
