@@ -27,8 +27,6 @@ plugins {
     id 'project-report'
 
     id 'idea'
-
-    id 'org.kordamp.gradle.jdeps' version '0.19.0'
 }
 
 // Enable following for debugging
@@ -507,13 +505,6 @@ jacocoTestReport {
         html.getRequired().set(true)
         xml.getRequired().set(true) // coveralls plugin depends on xml format report
     }
-}
-
-
-jdepsReport {
-    ignoreMissingDeps = true
-    missingDeps = true;
-    modular = true;
 }
 
 // Code quality tasks
