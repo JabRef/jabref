@@ -11,6 +11,7 @@ import org.jabref.logic.citationkeypattern.GlobalCitationKeyPattern;
 import org.jabref.logic.exporter.SavePreferences;
 import org.jabref.logic.git.SlrGitHandler;
 import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.metadata.SaveOrderConfig;
@@ -34,6 +35,7 @@ class CrawlerTest {
     @TempDir
     Path tempRepositoryDirectory;
     ImportFormatPreferences importFormatPreferences;
+    ImporterPreferences importerPreferences;
     SavePreferences savePreferences;
     BibEntryTypesManager entryTypesManager;
     SlrGitHandler gitHandler = mock(SlrGitHandler.class, Answers.RETURNS_DEFAULTS);
@@ -45,7 +47,14 @@ class CrawlerTest {
     @Test
     public void testWhetherAllFilesAreCreated() throws Exception {
         setUp();
-        Crawler testCrawler = new Crawler(getPathToStudyDefinitionFile(), gitHandler, generalPreferences, importFormatPreferences, savePreferences, entryTypesManager, new DummyFileUpdateMonitor());
+        Crawler testCrawler = new Crawler(getPathToStudyDefinitionFile(),
+                gitHandler,
+                generalPreferences,
+                importFormatPreferences,
+                importerPreferences,
+                savePreferences,
+                entryTypesManager,
+                new DummyFileUpdateMonitor());
 
         testCrawler.performCrawl();
 
@@ -83,6 +92,7 @@ class CrawlerTest {
                 ',');
 
         importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        importerPreferences = mock(ImporterPreferences.class);
         savePreferences = mock(SavePreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(savePreferences.getSaveOrder()).thenReturn(new SaveOrderConfig());
         when(savePreferences.takeMetadataSaveOrderInAccount()).thenReturn(true);

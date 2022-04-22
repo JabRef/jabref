@@ -3,8 +3,8 @@ package org.jabref.logic.importer.fetcher;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
+import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.PagedSearchBasedFetcher;
 import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.model.entry.BibEntry;
@@ -20,6 +20,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
 
 @FetcherTest
 class SpringerFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSearchFetcherTest {
@@ -28,7 +29,7 @@ class SpringerFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSear
 
     @BeforeEach
     void setUp() {
-        fetcher = new SpringerFetcher();
+        fetcher = new SpringerFetcher(mock(ImporterPreferences.class));
     }
 
     @Test
@@ -170,8 +171,10 @@ class SpringerFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSear
 
         Assertions.assertTrue(resultJustByAuthor.containsAll(result));
         List<BibEntry> allEntriesFromCSCW = result.stream()
-                                                  .filter(bibEntry -> bibEntry.getField(StandardField.JOURNAL).orElse("").equals("Computer Supported Cooperative Work (CSCW)"))
-                                                  .collect(Collectors.toList());
+                                                  .filter(bibEntry -> bibEntry.getField(StandardField.JOURNAL)
+                                                                              .orElse("")
+                                                                              .equals("Computer Supported Cooperative Work (CSCW)"))
+                                                  .toList();
         allEntriesFromCSCW.stream()
                           .map(bibEntry -> bibEntry.getField(StandardField.AUTHOR))
                           .filter(Optional::isPresent)

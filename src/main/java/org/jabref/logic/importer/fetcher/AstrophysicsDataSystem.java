@@ -12,7 +12,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.jabref.gui.Globals;
 import org.jabref.logic.cleanup.FieldFormatterCleanup;
 import org.jabref.logic.cleanup.MoveFieldCleanup;
 import org.jabref.logic.formatter.bibtexfields.ClearFormatter;
@@ -25,6 +24,7 @@ import org.jabref.logic.importer.EntryBasedParserFetcher;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.IdBasedParserFetcher;
 import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.PagedSearchBasedParserFetcher;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.Parser;
@@ -47,7 +47,7 @@ import org.apache.http.client.utils.URIBuilder;
 import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 
 /**
- * Fetches data from the SAO/NASA Astrophysics Data System (https://ui.adsabs.harvard.edu/)
+ * Fetches data from the SAO/NASA Astrophysics Data System (<a href="https://ui.adsabs.harvard.edu/">https://ui.adsabs.harvard.edu/</a>)
  */
 public class AstrophysicsDataSystem
         implements IdBasedParserFetcher, PagedSearchBasedParserFetcher, EntryBasedParserFetcher, CustomizableKeyFetcher {
@@ -57,9 +57,11 @@ public class AstrophysicsDataSystem
 
     private static final String API_KEY = new BuildInfo().astrophysicsDataSystemAPIKey;
     private final ImportFormatPreferences preferences;
+    private final ImporterPreferences importerPreferences;
 
-    public AstrophysicsDataSystem(ImportFormatPreferences preferences) {
+    public AstrophysicsDataSystem(ImportFormatPreferences preferences, ImporterPreferences importerPreferences) {
         this.preferences = Objects.requireNonNull(preferences);
+        this.importerPreferences = importerPreferences;
     }
 
     /**
@@ -89,14 +91,13 @@ public class AstrophysicsDataSystem
     }
 
     private String getApiKey() {
-        return Globals.prefs.getImporterPreferences()
-                            .getApiKeys()
-                            .stream()
-                            .filter(key -> key.getName().equalsIgnoreCase(this.getName()))
-                            .filter(FetcherApiKey::shouldUse)
-                            .findFirst()
-                            .map(FetcherApiKey::getKey)
-                            .orElse(API_KEY);
+        return importerPreferences.getApiKeys()
+                                  .stream()
+                                  .filter(key -> key.getName().equalsIgnoreCase(this.getName()))
+                                  .filter(FetcherApiKey::shouldUse)
+                                  .findFirst()
+                                  .map(FetcherApiKey::getKey)
+                                  .orElse(API_KEY);
     }
 
     /**

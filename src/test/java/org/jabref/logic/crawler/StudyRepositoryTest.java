@@ -17,6 +17,7 @@ import org.jabref.logic.database.DatabaseMerger;
 import org.jabref.logic.exporter.SavePreferences;
 import org.jabref.logic.git.SlrGitHandler;
 import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.preferences.TimestampPreferences;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabase;
@@ -48,6 +49,7 @@ class StudyRepositoryTest {
     CitationKeyPatternPreferences citationKeyPatternPreferences;
     GeneralPreferences generalPreferences;
     ImportFormatPreferences importFormatPreferences;
+    ImporterPreferences importerPreferences;
     SavePreferences savePreferences;
     TimestampPreferences timestampPreferences;
     BibEntryTypesManager entryTypesManager;
@@ -67,6 +69,7 @@ class StudyRepositoryTest {
         generalPreferences = mock(GeneralPreferences.class, Answers.RETURNS_DEEP_STUBS);
         savePreferences = mock(SavePreferences.class, Answers.RETURNS_DEEP_STUBS);
         importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        importerPreferences = mock(ImporterPreferences.class);
         timestampPreferences = mock(TimestampPreferences.class);
         citationKeyPatternPreferences = new CitationKeyPatternPreferences(
                 false,
@@ -92,14 +95,22 @@ class StudyRepositoryTest {
     void providePathToNonExistentRepositoryThrowsException() {
         Path nonExistingRepositoryDirectory = tempRepositoryDirectory.resolve(NON_EXISTING_DIRECTORY);
 
-        assertThrows(IOException.class, () -> new StudyRepository(nonExistingRepositoryDirectory, gitHandler, generalPreferences, importFormatPreferences, new DummyFileUpdateMonitor(), savePreferences, entryTypesManager));
+        assertThrows(IOException.class, () -> new StudyRepository(
+                nonExistingRepositoryDirectory,
+                gitHandler,
+                generalPreferences,
+                importFormatPreferences,
+                importerPreferences,
+                new DummyFileUpdateMonitor(),
+                savePreferences,
+                entryTypesManager));
     }
 
     /**
      * Tests whether the file structure of the repository is created correctly from the study definitions file.
      */
     @Test
-    void repositoryStructureCorrectlyCreated() throws Exception {
+    void repositoryStructureCorrectlyCreated() {
 
         // When repository is instantiated the directory structure is created
         assertTrue(Files.exists(Path.of(tempRepositoryDirectory.toString(), hashCodeQuantum + " - Quantum")));
@@ -172,7 +183,15 @@ class StudyRepositoryTest {
 
     private StudyRepository getTestStudyRepository() throws Exception {
         setUpTestStudyDefinitionFile();
-        studyRepository = new StudyRepository(tempRepositoryDirectory, gitHandler, generalPreferences, importFormatPreferences, new DummyFileUpdateMonitor(), savePreferences, entryTypesManager);
+        studyRepository = new StudyRepository(
+                tempRepositoryDirectory,
+                gitHandler,
+                generalPreferences,
+                importFormatPreferences,
+                importerPreferences,
+                new DummyFileUpdateMonitor(),
+                savePreferences,
+                entryTypesManager);
         return studyRepository;
     }
 

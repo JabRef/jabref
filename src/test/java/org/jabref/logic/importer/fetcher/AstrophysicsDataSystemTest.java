@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import org.jabref.logic.bibtex.FieldContentFormatterPreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.PagedSearchBasedFetcher;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
@@ -35,9 +36,10 @@ public class AstrophysicsDataSystemTest implements PagedSearchFetcherTest {
     @BeforeEach
     public void setUp() throws Exception {
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class);
+        ImporterPreferences importerPreferences = mock(ImporterPreferences.class);
         when(importFormatPreferences.getFieldContentFormatterPreferences()).thenReturn(
                 mock(FieldContentFormatterPreferences.class));
-        fetcher = new AstrophysicsDataSystem(importFormatPreferences);
+        fetcher = new AstrophysicsDataSystem(importFormatPreferences, importerPreferences);
 
         diezSliceTheoremEntry = new BibEntry();
         diezSliceTheoremEntry.setType(StandardEntryType.Article);

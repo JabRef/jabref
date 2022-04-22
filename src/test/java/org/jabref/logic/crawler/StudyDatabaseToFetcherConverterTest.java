@@ -9,6 +9,7 @@ import org.jabref.logic.bibtex.FieldContentFormatterPreferences;
 import org.jabref.logic.exporter.SavePreferences;
 import org.jabref.logic.git.SlrGitHandler;
 import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.logic.preferences.TimestampPreferences;
 import org.jabref.logic.util.io.FileUtil;
@@ -29,6 +30,7 @@ import static org.mockito.Mockito.when;
 class StudyDatabaseToFetcherConverterTest {
     GeneralPreferences generalPreferences;
     ImportFormatPreferences importFormatPreferences;
+    ImporterPreferences importerPreferences;
     SavePreferences savePreferences;
     TimestampPreferences timestampPreferences;
     BibEntryTypesManager entryTypesManager;
@@ -40,6 +42,7 @@ class StudyDatabaseToFetcherConverterTest {
     void setUpMocks() {
         generalPreferences = mock(GeneralPreferences.class, Answers.RETURNS_DEEP_STUBS);
         importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        importerPreferences = mock(ImporterPreferences.class);
         savePreferences = mock(SavePreferences.class, Answers.RETURNS_DEEP_STUBS);
         timestampPreferences = mock(TimestampPreferences.class);
         when(savePreferences.getSaveOrder()).thenReturn(new SaveOrderConfig());
@@ -55,8 +58,19 @@ class StudyDatabaseToFetcherConverterTest {
         Path studyDefinition = tempRepositoryDirectory.resolve("study.yml");
         copyTestStudyDefinitionFileIntoDirectory(studyDefinition);
 
-        StudyRepository studyRepository = new StudyRepository(tempRepositoryDirectory, gitHandler, generalPreferences, importFormatPreferences, new DummyFileUpdateMonitor(), savePreferences, entryTypesManager);
-        StudyDatabaseToFetcherConverter converter = new StudyDatabaseToFetcherConverter(studyRepository.getActiveLibraryEntries(), importFormatPreferences);
+        StudyRepository studyRepository = new StudyRepository(
+                tempRepositoryDirectory,
+                gitHandler,
+                generalPreferences,
+                importFormatPreferences,
+                importerPreferences,
+                new DummyFileUpdateMonitor(),
+                savePreferences,
+                entryTypesManager);
+        StudyDatabaseToFetcherConverter converter = new StudyDatabaseToFetcherConverter(
+                studyRepository.getActiveLibraryEntries(),
+                importFormatPreferences,
+                importerPreferences);
         List<SearchBasedFetcher> result = converter.getActiveFetchers();
 
         Assertions.assertEquals(

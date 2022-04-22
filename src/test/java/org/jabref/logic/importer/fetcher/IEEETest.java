@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.PagedSearchBasedFetcher;
 import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.model.entry.BibEntry;
@@ -47,7 +48,8 @@ class IEEETest implements SearchBasedFetcherCapabilityTest, PagedSearchFetcherTe
     void setUp() {
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class);
         when(importFormatPreferences.getKeywordSeparator()).thenReturn(',');
-        fetcher = new IEEE(importFormatPreferences);
+        ImporterPreferences importerPreferences = mock(ImporterPreferences.class);
+        fetcher = new IEEE(importFormatPreferences, importerPreferences);
         entry = new BibEntry();
     }
 

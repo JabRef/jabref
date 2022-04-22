@@ -6,6 +6,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.logic.importer.WebFetchers;
 import org.jabref.model.study.StudyDatabase;
@@ -16,10 +17,14 @@ import org.jabref.model.study.StudyDatabase;
 class StudyDatabaseToFetcherConverter {
     private final List<StudyDatabase> libraryEntries;
     private final ImportFormatPreferences importFormatPreferences;
+    private final ImporterPreferences importerPreferences;
 
-    public StudyDatabaseToFetcherConverter(List<StudyDatabase> libraryEntries, ImportFormatPreferences importFormatPreferences) {
+    public StudyDatabaseToFetcherConverter(List<StudyDatabase> libraryEntries,
+                                           ImportFormatPreferences importFormatPreferences,
+                                           ImporterPreferences importerPreferences) {
         this.libraryEntries = libraryEntries;
         this.importFormatPreferences = importFormatPreferences;
+        this.importerPreferences = importerPreferences;
     }
 
     /**
@@ -53,7 +58,7 @@ class StudyDatabaseToFetcherConverter {
      * @return An instance of the fetcher defined by the library entry.
      */
     private SearchBasedFetcher createFetcherFromLibraryEntry(StudyDatabase studyDatabase) {
-        Set<SearchBasedFetcher> searchBasedFetchers = WebFetchers.getSearchBasedFetchers(importFormatPreferences);
+        Set<SearchBasedFetcher> searchBasedFetchers = WebFetchers.getSearchBasedFetchers(importFormatPreferences, importerPreferences);
         String libraryNameFromFetcher = studyDatabase.getName();
         return searchBasedFetchers.stream()
                                   .filter(searchBasedFetcher -> searchBasedFetcher.getName().equalsIgnoreCase(libraryNameFromFetcher))

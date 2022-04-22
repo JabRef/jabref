@@ -170,7 +170,10 @@ public class ImportExportTabViewModel implements PreferenceTabViewModel {
         final String apiKeyName = selectedApiKeyProperty.get().getName();
 
         final Optional<CustomizableKeyFetcher> fetcherOpt =
-                WebFetchers.getCustomizableKeyFetchers(preferencesService.getImportFormatPreferences()).stream()
+                WebFetchers.getCustomizableKeyFetchers(
+                                   preferencesService.getImportFormatPreferences(),
+                                   preferencesService.getImporterPreferences())
+                           .stream()
                            .filter(fetcher -> fetcher.getName().equals(apiKeyName))
                            .findFirst();
 

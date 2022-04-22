@@ -7,8 +7,8 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.jabref.gui.Globals;
 import org.jabref.logic.importer.FulltextFetcher;
+import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.preferences.FetcherApiKey;
 import org.jabref.logic.util.BuildInfo;
@@ -40,6 +40,12 @@ public class ScienceDirect implements FulltextFetcher, CustomizableKeyFetcher {
     private static final String API_URL = "https://api.elsevier.com/content/article/doi/";
     private static final String API_KEY = new BuildInfo().scienceDirectApiKey;
     private static final String FETCHER_NAME = "ScienceDirect";
+
+    private final ImporterPreferences importerPreferences;
+
+    public ScienceDirect(ImporterPreferences importerPreferences) {
+        this.importerPreferences = importerPreferences;
+    }
 
     @Override
     public Optional<URL> findFullText(BibEntry entry) throws IOException {
@@ -167,13 +173,12 @@ public class ScienceDirect implements FulltextFetcher, CustomizableKeyFetcher {
     }
 
     private String getApiKey() {
-        return Globals.prefs.getImporterPreferences()
-                            .getApiKeys()
-                            .stream()
-                            .filter(key -> key.getName().equalsIgnoreCase(this.getName()))
-                            .filter(FetcherApiKey::shouldUse)
-                            .findFirst()
-                            .map(FetcherApiKey::getKey)
-                            .orElse(API_KEY);
+        return importerPreferences.getApiKeys()
+                                  .stream()
+                                  .filter(key -> key.getName().equalsIgnoreCase(this.getName()))
+                                  .filter(FetcherApiKey::shouldUse)
+                                  .findFirst()
+                                  .map(FetcherApiKey::getKey)
+                                  .orElse(API_KEY);
     }
 }

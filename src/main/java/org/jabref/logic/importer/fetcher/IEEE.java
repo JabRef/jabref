@@ -14,11 +14,11 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import org.jabref.gui.Globals;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.FulltextFetcher;
 import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.PagedSearchBasedParserFetcher;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.fetcher.transformers.IEEEQueryTransformer;
@@ -63,11 +63,13 @@ public class IEEE implements FulltextFetcher, PagedSearchBasedParserFetcher, Cus
     private static final String TEST_URL_WITHOUT_API_KEY = "https://ieeexploreapi.ieee.org/api/v1/search/articles?max_records=0&apikey=";
 
     private final ImportFormatPreferences importFormatPreferences;
+    private final ImporterPreferences importerPreferences;
 
     private IEEEQueryTransformer transformer;
 
-    public IEEE(ImportFormatPreferences preferences) {
-        this.importFormatPreferences = Objects.requireNonNull(preferences);
+    public IEEE(ImportFormatPreferences importFormatPreferences, ImporterPreferences importerPreferences) {
+        this.importFormatPreferences = Objects.requireNonNull(importFormatPreferences);
+        this.importerPreferences = Objects.requireNonNull(importerPreferences);
     }
 
     /**
@@ -248,14 +250,13 @@ public class IEEE implements FulltextFetcher, PagedSearchBasedParserFetcher, Cus
     }
 
     private String getApiKey() {
-        return Globals.prefs.getImporterPreferences()
-                            .getApiKeys()
-                            .stream()
-                            .filter(key -> key.getName().equalsIgnoreCase(this.getName()))
-                            .filter(FetcherApiKey::shouldUse)
-                            .findFirst()
-                            .map(FetcherApiKey::getKey)
-                            .orElse(API_KEY);
+        return importerPreferences.getApiKeys()
+                                  .stream()
+                                  .filter(key -> key.getName().equalsIgnoreCase(this.getName()))
+                                  .filter(FetcherApiKey::shouldUse)
+                                  .findFirst()
+                                  .map(FetcherApiKey::getKey)
+                                  .orElse(API_KEY);
     }
 
     @Override

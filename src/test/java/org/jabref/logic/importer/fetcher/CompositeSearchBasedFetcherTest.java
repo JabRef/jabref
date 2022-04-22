@@ -11,6 +11,7 @@ import org.jabref.logic.bibtex.FieldContentFormatterPreferences;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportCleanup;
 import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
@@ -90,6 +91,7 @@ public class CompositeSearchBasedFetcherTest {
      */
     static Stream<Arguments> performSearchParameters() {
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class);
+        ImporterPreferences importerPreferences = mock(ImporterPreferences.class);
         when(importFormatPreferences.getFieldContentFormatterPreferences())
                 .thenReturn(mock(FieldContentFormatterPreferences.class));
         List<Set<SearchBasedFetcher>> fetcherParameters = new ArrayList<>();
@@ -98,16 +100,16 @@ public class CompositeSearchBasedFetcherTest {
         list.add(new ArXiv(importFormatPreferences));
         list.add(new INSPIREFetcher(importFormatPreferences));
         list.add(new GvkFetcher());
-        list.add(new AstrophysicsDataSystem(importFormatPreferences));
+        list.add(new AstrophysicsDataSystem(importFormatPreferences, importerPreferences));
         list.add(new MathSciNet(importFormatPreferences));
         list.add(new ZbMATH(importFormatPreferences));
         list.add(new GoogleScholar(importFormatPreferences));
         list.add(new DBLPFetcher(importFormatPreferences));
-        list.add(new SpringerFetcher());
+        list.add(new SpringerFetcher(importerPreferences));
         list.add(new CrossRef());
         list.add(new CiteSeer());
         list.add(new DOAJFetcher(importFormatPreferences));
-        list.add(new IEEE(importFormatPreferences));
+        list.add(new IEEE(importFormatPreferences, importerPreferences));
         /* Disabled due to an issue regarding comparison: Title fields of the entries that otherwise are equivalent differ
          * due to different JAXBElements.
          */

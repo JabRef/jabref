@@ -10,9 +10,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.jabref.gui.Globals;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.FetcherException;
+import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.PagedSearchBasedParserFetcher;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.fetcher.transformers.SpringerQueryTransformer;
@@ -47,6 +47,12 @@ public class SpringerFetcher implements PagedSearchBasedParserFetcher, Customiza
     // Springer query using the parameter 'q=doi:10.1007/s11276-008-0131-4s=1' will respond faster
     private static final String TEST_URL_WITHOUT_API_KEY = "https://api.springernature.com/meta/v1/json?q=doi:10.1007/s11276-008-0131-4s=1&p=1&api_key=";
     private static final String FETCHER_NAME = "Springer";
+
+    private final ImporterPreferences importerPreferences;
+
+    public SpringerFetcher(ImporterPreferences importerPreferences) {
+        this.importerPreferences = importerPreferences;
+    }
 
     /**
      * Convert a JSONObject obtained from <a href="http://api.springer.com/metadata/json">http://api.springer.com/metadata/json</a> to a BibEntry
@@ -166,14 +172,13 @@ public class SpringerFetcher implements PagedSearchBasedParserFetcher, Customiza
     }
 
     private String getApiKey() {
-        return Globals.prefs.getImporterPreferences()
-                            .getApiKeys()
-                            .stream()
-                            .filter(key -> key.getName().equalsIgnoreCase(FETCHER_NAME))
-                            .filter(FetcherApiKey::shouldUse)
-                            .findFirst()
-                            .map(FetcherApiKey::getKey)
-                            .orElse(API_KEY);
+        return importerPreferences.getApiKeys()
+                                  .stream()
+                                  .filter(key -> key.getName().equalsIgnoreCase(FETCHER_NAME))
+                                  .filter(FetcherApiKey::shouldUse)
+                                  .findFirst()
+                                  .map(FetcherApiKey::getKey)
+                                  .orElse(API_KEY);
     }
 
     @Override
