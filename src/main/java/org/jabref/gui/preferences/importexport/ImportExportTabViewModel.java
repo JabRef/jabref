@@ -182,6 +182,13 @@ public class ImportExportTabViewModel implements PreferenceTabViewModel {
         }
 
         final String testUrlWithoutApiKey = fetcherOpt.get().getTestUrl();
+        if (testUrlWithoutApiKey == null) {
+            dialogService.showWarningDialogAndWait(
+                    Localization.lang("Check %0 API Key Setting", apiKeyName),
+                    Localization.lang("Fetcher cannot be tested!"));
+            return;
+        }
+
         final String apiKey = selectedApiKeyProperty.get().getKey();
 
         boolean keyValid;
