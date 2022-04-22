@@ -235,9 +235,7 @@ public class SourceTab extends EntryEditorTab {
 
     @Override
     protected void bindToEntry(BibEntry entry) {
-//        if (entry.isRemoved()){
-//            return;
-//        }
+
         if ((previousEntry != null) && (codeArea != null)) {
             storeSource(previousEntry, codeArea.textProperty().getValue());
         }
