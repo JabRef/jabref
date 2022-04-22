@@ -111,7 +111,6 @@ class StudyRepositoryTest {
      */
     @Test
     void repositoryStructureCorrectlyCreated() {
-
         // When repository is instantiated the directory structure is created
         assertTrue(Files.exists(Path.of(tempRepositoryDirectory.toString(), hashCodeQuantum + " - Quantum")));
         assertTrue(Files.exists(Path.of(tempRepositoryDirectory.toString(), hashCodeCloudComputing + " - Cloud Computing")));

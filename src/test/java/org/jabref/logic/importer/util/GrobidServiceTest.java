@@ -30,13 +30,13 @@ import static org.mockito.Mockito.when;
 @FetcherTest
 public class GrobidServiceTest {
 
-    private static GrobidService grobidService;
     private static final ImporterPreferences importerPreferences = new ImporterPreferences(
             false,
             true,
             false,
             "http://grobid.jabref.org:8070",
             Collections.emptySet());
+    private static GrobidService grobidService;
     private static ImportFormatPreferences importFormatPreferences;
 
     @BeforeAll
