@@ -98,6 +98,16 @@ public class BibEntry implements Cloneable {
      */
     private boolean changed;
 
+    public boolean isRemoved() {
+        return removed;
+    }
+
+    public void setRemoved(boolean removed) {
+        this.removed = removed;
+    }
+
+    private boolean removed;
+
     /**
      * Constructs a new BibEntry. The internal ID is set to IdGenerator.next()
      */
@@ -542,6 +552,7 @@ public class BibEntry implements Cloneable {
      * @param eventSource Source the event is sent from
      */
     public Optional<FieldChange> setField(Field field, String value, EntriesEventSource eventSource) {
+
         Objects.requireNonNull(field, "field name must not be null");
         Objects.requireNonNull(value, "field value must not be null");
 
@@ -1007,4 +1018,5 @@ public class BibEntry implements Cloneable {
         }
         entry.setFiles(linkedFiles);
     }
+
 }

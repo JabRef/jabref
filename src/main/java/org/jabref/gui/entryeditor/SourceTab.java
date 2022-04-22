@@ -235,6 +235,9 @@ public class SourceTab extends EntryEditorTab {
 
     @Override
     protected void bindToEntry(BibEntry entry) {
+//        if (entry.isRemoved()){
+//            return;
+//        }
         if ((previousEntry != null) && (codeArea != null)) {
             storeSource(previousEntry, codeArea.textProperty().getValue());
         }
@@ -248,6 +251,9 @@ public class SourceTab extends EntryEditorTab {
 
     private void storeSource(BibEntry outOfFocusEntry, String text) {
         if ((outOfFocusEntry == null) || text.isEmpty()) {
+            return;
+        }
+        if(outOfFocusEntry.isRemoved()){
             return;
         }
 
@@ -304,7 +310,6 @@ public class SourceTab extends EntryEditorTab {
                 if (!Objects.equals(oldValue, newValue)) {
                     // Test if the field is legally set.
                     new FieldWriter(fieldWriterPreferences).write(fieldName, newValue);
-
                     compound.addEdit(new UndoableFieldChange(outOfFocusEntry, fieldName, oldValue, newValue));
                     outOfFocusEntry.setField(fieldName, newValue);
                 }
@@ -335,4 +340,5 @@ public class SourceTab extends EntryEditorTab {
             }
         });
     }
+
 }

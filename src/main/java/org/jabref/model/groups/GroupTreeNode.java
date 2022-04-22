@@ -300,6 +300,9 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
      */
     public List<FieldChange> removeEntriesFromGroup(List<BibEntry> entries) {
         if (getGroup() instanceof GroupEntryChanger) {
+            for (BibEntry entry:entries){
+                entry.setRemoved(true);
+            }
             return ((GroupEntryChanger) getGroup()).remove(entries);
         } else {
             return Collections.emptyList();
