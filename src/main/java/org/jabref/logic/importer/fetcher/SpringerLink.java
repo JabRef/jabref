@@ -5,8 +5,8 @@ import java.net.URL;
 import java.util.Objects;
 import java.util.Optional;
 
-import org.jabref.gui.Globals;
 import org.jabref.logic.importer.FulltextFetcher;
+import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.preferences.FetcherApiKey;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.model.entry.BibEntry;
@@ -34,18 +34,20 @@ public class SpringerLink implements FulltextFetcher {
     private static final String CONTENT_HOST = "link.springer.com";
     private static final String FETCHER_NAME = "Springer";
 
-    public SpringerLink() {
+    private final ImporterPreferences importerPreferences;
+
+    public SpringerLink(ImporterPreferences importerPreferences) {
+        this.importerPreferences = importerPreferences;
     }
 
     private String getApiKey() {
-        return Globals.prefs.getImporterPreferences()
-                            .getApiKeys()
-                            .stream()
-                            .filter(key -> key.getName().equalsIgnoreCase(FETCHER_NAME))
-                            .filter(FetcherApiKey::shouldUse)
-                            .findFirst()
-                            .map(FetcherApiKey::getKey)
-                            .orElse(API_KEY);
+        return importerPreferences.getApiKeys()
+                                  .stream()
+                                  .filter(key -> key.getName().equalsIgnoreCase(FETCHER_NAME))
+                                  .filter(FetcherApiKey::shouldUse)
+                                  .findFirst()
+                                  .map(FetcherApiKey::getKey)
+                                  .orElse(API_KEY);
     }
 
     @Override

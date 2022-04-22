@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.Optional;
 
+import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.support.DisabledOnCIServer;
@@ -14,6 +15,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.mock;
 
 @FetcherTest
 public class SpringerLinkTest {
@@ -23,7 +25,7 @@ public class SpringerLinkTest {
 
     @BeforeEach
     public void setUp() {
-        finder = new SpringerLink();
+        finder = new SpringerLink(mock(ImporterPreferences.class));
         entry = new BibEntry();
     }
 

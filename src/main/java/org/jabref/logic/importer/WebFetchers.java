@@ -177,7 +177,7 @@ public class WebFetchers {
 
         // Publishers
         fetchers.add(new ScienceDirect(importerPreferences));
-        fetchers.add(new SpringerLink());
+        fetchers.add(new SpringerLink(importerPreferences));
         fetchers.add(new ACS());
         fetchers.add(new ArXiv(importFormatPreferences));
         fetchers.add(new IEEE(importFormatPreferences, importerPreferences));
