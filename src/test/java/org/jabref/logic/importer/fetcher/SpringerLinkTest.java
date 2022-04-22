@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.Optional;
 
+import javafx.collections.FXCollections;
+
 import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
@@ -16,16 +18,19 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 @FetcherTest
 public class SpringerLinkTest {
 
+    private final ImporterPreferences importerPreferences = mock(ImporterPreferences.class);
     private SpringerLink finder;
     private BibEntry entry;
 
     @BeforeEach
     public void setUp() {
-        finder = new SpringerLink(mock(ImporterPreferences.class));
+        when(importerPreferences.getApiKeys()).thenReturn(FXCollections.emptyObservableSet());
+        finder = new SpringerLink(importerPreferences);
         entry = new BibEntry();
     }
 

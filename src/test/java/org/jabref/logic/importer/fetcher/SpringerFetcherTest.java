@@ -4,6 +4,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+import javafx.collections.FXCollections;
+
 import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.PagedSearchBasedFetcher;
 import org.jabref.logic.importer.SearchBasedFetcher;
@@ -21,15 +23,18 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 @FetcherTest
 class SpringerFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSearchFetcherTest {
 
+    ImporterPreferences importerPreferences = mock(ImporterPreferences.class);
     SpringerFetcher fetcher;
 
     @BeforeEach
     void setUp() {
-        fetcher = new SpringerFetcher(mock(ImporterPreferences.class));
+        when(importerPreferences.getApiKeys()).thenReturn(FXCollections.emptyObservableSet());
+        fetcher = new SpringerFetcher(importerPreferences);
     }
 
     @Test

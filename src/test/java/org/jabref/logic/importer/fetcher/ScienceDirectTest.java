@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.Optional;
 
+import javafx.collections.FXCollections;
+
 import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
@@ -15,16 +17,19 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 @FetcherTest
 class ScienceDirectTest {
 
+    private final ImporterPreferences importerPreferences = mock(ImporterPreferences.class);
     private ScienceDirect finder;
     private BibEntry entry;
 
     @BeforeEach
     void setUp() {
-        finder = new ScienceDirect(mock(ImporterPreferences.class));
+        when(importerPreferences.getApiKeys()).thenReturn(FXCollections.emptyObservableSet());
+        finder = new ScienceDirect(importerPreferences);
         entry = new BibEntry();
     }
 

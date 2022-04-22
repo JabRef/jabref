@@ -5,6 +5,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
+import javafx.collections.FXCollections;
+
 import org.jabref.logic.bibtex.FieldContentFormatterPreferences;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPattern;
@@ -97,6 +99,7 @@ class CrawlerTest {
         when(savePreferences.getSaveOrder()).thenReturn(new SaveOrderConfig());
         when(savePreferences.takeMetadataSaveOrderInAccount()).thenReturn(true);
         when(savePreferences.getCitationKeyPatternPreferences()).thenReturn(citationKeyPatternPreferences);
+        when(importerPreferences.getApiKeys()).thenReturn(FXCollections.emptyObservableSet());
         when(importFormatPreferences.getKeywordSeparator()).thenReturn(',');
         when(importFormatPreferences.getFieldContentFormatterPreferences()).thenReturn(new FieldContentFormatterPreferences());
         entryTypesManager = new BibEntryTypesManager();

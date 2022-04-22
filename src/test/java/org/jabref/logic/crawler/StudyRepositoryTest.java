@@ -9,6 +9,8 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
+import javafx.collections.FXCollections;
+
 import org.jabref.logic.bibtex.FieldContentFormatterPreferences;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
@@ -84,6 +86,7 @@ class StudyRepositoryTest {
         when(savePreferences.getSaveOrder()).thenReturn(new SaveOrderConfig());
         when(savePreferences.takeMetadataSaveOrderInAccount()).thenReturn(true);
         when(savePreferences.getCitationKeyPatternPreferences()).thenReturn(citationKeyPatternPreferences);
+        when(importerPreferences.getApiKeys()).thenReturn(FXCollections.emptyObservableSet());
         when(importFormatPreferences.getKeywordSeparator()).thenReturn(',');
         when(importFormatPreferences.getFieldContentFormatterPreferences()).thenReturn(new FieldContentFormatterPreferences());
         when(timestampPreferences.getTimestampField()).then(invocation -> StandardField.TIMESTAMP);

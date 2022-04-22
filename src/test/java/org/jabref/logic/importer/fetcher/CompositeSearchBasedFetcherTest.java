@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
 
+import javafx.collections.FXCollections;
+
 import org.jabref.logic.bibtex.FieldContentFormatterPreferences;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportCleanup;
@@ -92,6 +94,7 @@ public class CompositeSearchBasedFetcherTest {
     static Stream<Arguments> performSearchParameters() {
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class);
         ImporterPreferences importerPreferences = mock(ImporterPreferences.class);
+        when(importerPreferences.getApiKeys()).thenReturn(FXCollections.emptyObservableSet());
         when(importFormatPreferences.getFieldContentFormatterPreferences())
                 .thenReturn(mock(FieldContentFormatterPreferences.class));
         List<Set<SearchBasedFetcher>> fetcherParameters = new ArrayList<>();

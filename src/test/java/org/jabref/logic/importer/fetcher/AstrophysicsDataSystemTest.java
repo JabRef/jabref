@@ -3,6 +3,8 @@ package org.jabref.logic.importer.fetcher;
 import java.util.List;
 import java.util.Optional;
 
+import javafx.collections.FXCollections;
+
 import org.jabref.logic.bibtex.FieldContentFormatterPreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ImporterPreferences;
@@ -37,6 +39,7 @@ public class AstrophysicsDataSystemTest implements PagedSearchFetcherTest {
     public void setUp() throws Exception {
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class);
         ImporterPreferences importerPreferences = mock(ImporterPreferences.class);
+        when(importerPreferences.getApiKeys()).thenReturn(FXCollections.emptyObservableSet());
         when(importFormatPreferences.getFieldContentFormatterPreferences()).thenReturn(
                 mock(FieldContentFormatterPreferences.class));
         fetcher = new AstrophysicsDataSystem(importFormatPreferences, importerPreferences);
