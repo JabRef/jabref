@@ -1,5 +1,6 @@
 package org.jabref.gui.preferences.importexport;
 
+import javafx.beans.InvalidationListener;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
@@ -67,14 +68,15 @@ public class ImportExportTab extends AbstractPreferenceTabView<ImportExportTabVi
                 .install(apiKeySelector);
         apiKeySelector.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             if (oldValue != null) {
-                oldValue.setUse(useCustomApiKey.isSelected());
-                oldValue.setKey(customApiKey.getText().trim());
+                updateFetcherApiKey(oldValue);
             }
             if (newValue != null) {
                 useCustomApiKey.setSelected(newValue.shouldUse());
                 customApiKey.setText(newValue.getKey());
             }
         });
+        customApiKey.textProperty().addListener(listener -> updateFetcherApiKey(apiKeySelector.valueProperty().get()));
+
         customApiKey.disableProperty().bind(useCustomApiKey.selectedProperty().not());
         testCustomApiKey.disableProperty().bind(useCustomApiKey.selectedProperty().not());
 
@@ -82,7 +84,14 @@ public class ImportExportTab extends AbstractPreferenceTabView<ImportExportTabVi
         viewModel.selectedApiKeyProperty().bind(apiKeySelector.valueProperty());
 
         // Content is set later
-        apiKeySelector.itemsProperty().addListener(change -> apiKeySelector.getSelectionModel().selectFirst());
+        viewModel.fetcherApiKeys().addListener((InvalidationListener) change -> apiKeySelector.getSelectionModel().selectFirst());
+    }
+
+    private void updateFetcherApiKey(FetcherApiKey apiKey) {
+        if (apiKey != null) {
+            apiKey.setUse(useCustomApiKey.isSelected());
+            apiKey.setKey(customApiKey.getText().trim());
+        }
     }
 
     @FXML

@@ -7,8 +7,10 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.jabref.gui.Globals;
 import org.jabref.logic.importer.FulltextFetcher;
 import org.jabref.logic.net.URLDownload;
+import org.jabref.logic.preferences.FetcherApiKey;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
@@ -32,11 +34,12 @@ import org.slf4j.LoggerFactory;
  * FulltextFetcher implementation that attempts to find a PDF URL at <a href="https://www.sciencedirect.com/">ScienceDirect</a>.
  * See <a href="https://dev.elsevier.com/">https://dev.elsevier.com/</a>.
  */
-public class ScienceDirect implements FulltextFetcher {
+public class ScienceDirect implements FulltextFetcher, CustomizableKeyFetcher {
     private static final Logger LOGGER = LoggerFactory.getLogger(ScienceDirect.class);
 
     private static final String API_URL = "https://api.elsevier.com/content/article/doi/";
     private static final String API_KEY = new BuildInfo().scienceDirectApiKey;
+    private static final String FETCHER_NAME = "ScienceDirect";
 
     @Override
     public Optional<URL> findFullText(BibEntry entry) throws IOException {
@@ -131,7 +134,7 @@ public class ScienceDirect implements FulltextFetcher {
         try {
             String request = API_URL + doi;
             HttpResponse<JsonNode> jsonResponse = Unirest.get(request)
-                                                         .header("X-ELS-APIKey", API_KEY)
+                                                         .header("X-ELS-APIKey", this.getApiKey())
                                                          .queryString("httpAccept", "application/json")
                                                          .asJson();
 
@@ -151,5 +154,26 @@ public class ScienceDirect implements FulltextFetcher {
             LOGGER.debug("No ScienceDirect link found in API request", e);
             return sciLink;
         }
+    }
+
+    @Override
+    public String getTestUrl() {
+        return null;
+    }
+
+    @Override
+    public String getName() {
+        return FETCHER_NAME;
+    }
+
+    private String getApiKey() {
+        return Globals.prefs.getImporterPreferences()
+                            .getApiKeys()
+                            .stream()
+                            .filter(key -> key.getName().equalsIgnoreCase(this.getName()))
+                            .filter(FetcherApiKey::shouldUse)
+                            .findFirst()
+                            .map(FetcherApiKey::getKey)
+                            .orElse(API_KEY);
     }
 }

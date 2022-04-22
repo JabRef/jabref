@@ -46,7 +46,7 @@ import org.slf4j.LoggerFactory;
  *
  * @implNote <a href="https://developer.ieee.org/docs">API documentation</a>
  */
-public class IEEE implements FulltextFetcher, PagedSearchBasedParserFetcher, CustomizeableKeyFetcher {
+public class IEEE implements FulltextFetcher, PagedSearchBasedParserFetcher, CustomizableKeyFetcher {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(IEEE.class);
 

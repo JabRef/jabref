@@ -629,9 +629,9 @@ public class JabRefPreferences implements PreferencesService {
 
         defaults.put(SPECIALFIELDSENABLED, Boolean.TRUE);
 
-        defaults.put(FETCHER_CUSTOM_KEY_NAMES, "Springer;IEEEXplore");
-        defaults.put(FETCHER_CUSTOM_KEY_USES, "FALSE;FALSE");
-        defaults.put(FETCHER_CUSTOM_KEYS, ";aaa");
+        defaults.put(FETCHER_CUSTOM_KEY_NAMES, "Springer;IEEEXplore;SAO/NASA ADS;ScienceDirect");
+        defaults.put(FETCHER_CUSTOM_KEY_USES, "FALSE;FALSE;FALSE;FALSE");
+        defaults.put(FETCHER_CUSTOM_KEYS, "");
 
         defaults.put(USE_OWNER, Boolean.FALSE);
         defaults.put(OVERWRITE_OWNER, Boolean.FALSE);
@@ -1914,9 +1914,9 @@ public class JabRefPreferences implements PreferencesService {
 
     //*************************************************************************************************************
     // Generic Column Handling
-    //***********************************************s**************************************************************
+    //*************************************************************************************************************
 
-    public List<MainTableColumnModel> updateColumns(String columnNamesList, String columnWidthList, String sortTypeList, double defaultWidth) {
+    private List<MainTableColumnModel> updateColumns(String columnNamesList, String columnWidthList, String sortTypeList, double defaultWidth) {
         List<String> columnNames = getStringList(columnNamesList);
         List<Double> columnWidths = getStringList(columnWidthList)
                 .stream()
@@ -2847,14 +2847,12 @@ public class JabRefPreferences implements PreferencesService {
         List<String> uses = getStringList(FETCHER_CUSTOM_KEY_USES);
         List<String> keys = getStringList(FETCHER_CUSTOM_KEYS);
 
-        if (names.size() != uses.size() || names.size() != keys.size()) {
-            LOGGER.error("Failed to parse customized fetcher api keys.");
-            return Collections.emptySet();
-        }
-
         for (int i = 0; i < names.size(); i++) {
-            FetcherApiKey apiKey = new FetcherApiKey(names.get(i), Boolean.parseBoolean(uses.get(i)), keys.get(i));
-            fetcherApiKeys.add(apiKey);
+            fetcherApiKeys.add(new FetcherApiKey(
+                    names.get(i),
+                    // i < uses.size() ? Boolean.parseBoolean(uses.get(i)) : false
+                    i < uses.size() && Boolean.parseBoolean(uses.get(i)),
+                    i < keys.size() ? keys.get(i) : ""));
         }
 
         return fetcherApiKeys;

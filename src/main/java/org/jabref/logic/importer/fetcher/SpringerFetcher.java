@@ -38,7 +38,7 @@ import org.slf4j.LoggerFactory;
  *
  * @implNote see <a href="https://dev.springernature.com/">API documentation</a> for more details
  */
-public class SpringerFetcher implements PagedSearchBasedParserFetcher, CustomizeableKeyFetcher {
+public class SpringerFetcher implements PagedSearchBasedParserFetcher, CustomizableKeyFetcher {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SpringerFetcher.class);
 

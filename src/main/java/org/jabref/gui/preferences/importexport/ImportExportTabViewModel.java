@@ -26,7 +26,7 @@ import org.jabref.gui.commonfxcontrols.SortCriterionViewModel;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.WebFetchers;
-import org.jabref.logic.importer.fetcher.CustomizeableKeyFetcher;
+import org.jabref.logic.importer.fetcher.CustomizableKeyFetcher;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.preferences.DOIPreferences;
@@ -169,13 +169,15 @@ public class ImportExportTabViewModel implements PreferenceTabViewModel {
     public void checkCustomApiKey() {
         final String apiKeyName = selectedApiKeyProperty.get().getName();
 
-        final Optional<CustomizeableKeyFetcher> fetcherOpt =
+        final Optional<CustomizableKeyFetcher> fetcherOpt =
                 WebFetchers.getCustomizableKeyFetchers(preferencesService.getImportFormatPreferences()).stream()
                            .filter(fetcher -> fetcher.getName().equals(apiKeyName))
                            .findFirst();
 
         if (fetcherOpt.isEmpty()) {
-            dialogService.showErrorDialogAndWait(Localization.lang("Check %0 API Key Setting", apiKeyName), Localization.lang("Fetcher unknown!"));
+            dialogService.showErrorDialogAndWait(
+                    Localization.lang("Check %0 API Key Setting", apiKeyName),
+                    Localization.lang("Fetcher unknown!"));
             return;
         }
 
