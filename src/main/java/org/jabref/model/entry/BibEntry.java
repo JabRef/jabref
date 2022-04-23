@@ -98,6 +98,9 @@ public class BibEntry implements Cloneable {
      */
     private boolean changed;
 
+    private boolean removed;
+
+
     public boolean isRemoved() {
         return removed;
     }
@@ -106,7 +109,6 @@ public class BibEntry implements Cloneable {
         this.removed = removed;
     }
 
-    private boolean removed;
 
     /**
      * Constructs a new BibEntry. The internal ID is set to IdGenerator.next()
