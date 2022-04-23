@@ -109,7 +109,6 @@ public class CustomizeEntryTypeDialogView extends BaseDialog<Void> {
     }
 
     private void setupTable() {
-
         // Table View must be editable, otherwise the change of the Radiobuttons does not propagate the commit event
         fields.setEditable(true);
         entryTypColumn.setCellValueFactory(cellData -> new ReadOnlyStringWrapper(cellData.getValue().entryType().get().getType().getDisplayName()));
@@ -213,7 +212,6 @@ public class CustomizeEntryTypeDialogView extends BaseDialog<Void> {
     }
 
     private void handleOnDragDropped(TableRow<FieldViewModel> row, FieldViewModel originalItem, DragEvent event) {
-
         if (localDragboard.hasType(FieldViewModel.class)) {
             FieldViewModel field = localDragboard.getValue(FieldViewModel.class);
             fields.getItems().remove(field);
@@ -256,6 +254,5 @@ public class CustomizeEntryTypeDialogView extends BaseDialog<Void> {
             viewModel.addAllTypes();
             this.entryTypes.refresh();
         }
-
     }
 }

@@ -61,7 +61,6 @@ public class AbbreviateAction extends SimpleCommand {
 
     @Override
     public void execute() {
-
         if (action == StandardActions.ABBREVIATE_DEFAULT
                 || action == StandardActions.ABBREVIATE_MEDLINE
                 || action == StandardActions.ABBREVIATE_SHORTEST_UNIQUE) {
@@ -72,7 +71,6 @@ public class AbbreviateAction extends SimpleCommand {
                                   .onSuccess(dialogService::notify)
                                   .executeWith(Globals.TASK_EXECUTOR));
         } else if (action == StandardActions.UNABBREVIATE) {
-
             dialogService.notify(Localization.lang("Unabbreviating..."));
             stateManager.getActiveDatabase().ifPresent(databaseContext ->
                     BackgroundTask.wrap(() -> unabbreviate(stateManager.getActiveDatabase().get(), stateManager.getSelectedEntries()))

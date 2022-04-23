@@ -114,9 +114,16 @@ dependencies {
     implementation 'org.apache.pdfbox:fontbox:3.0.0-RC1'
     implementation 'org.apache.pdfbox:xmpbox:3.0.0-RC1'
 
+    implementation 'org.apache.lucene:lucene-core:9.1.0'
+    implementation 'org.apache.lucene:lucene-queryparser:9.1.0'
+    implementation 'org.apache.lucene:lucene-queries:9.1.0'
+    implementation 'org.apache.lucene:lucene-analysis-common:9.1.0'
+    implementation 'org.apache.lucene:lucene-highlighter:9.1.0'
+    implementation 'org.apache.lucene:lucene-backward-codecs:9.1.0'
+
     implementation group: 'org.apache.commons', name: 'commons-csv', version: '1.9.0'
     implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.12.0'
-    implementation 'com.h2database:h2-mvstore:2.1.210'
+    implementation 'com.h2database:h2-mvstore:2.1.212'
 
     implementation group: 'org.apache.tika', name: 'tika-core', version: '2.3.0'
     implementation 'com.ibm.icu:icu4j-charset:70.1'
@@ -126,13 +133,13 @@ dependencies {
 
     implementation 'commons-cli:commons-cli:1.5.0'
 
-    implementation 'org.libreoffice:libreoffice:7.3.1'
-    implementation 'org.libreoffice:unoloader:7.3.0'
+    implementation 'org.libreoffice:libreoffice:7.3.2'
+    implementation 'org.libreoffice:unoloader:7.3.2'
 
     implementation 'io.github.java-diff-utils:java-diff-utils:4.11'
     implementation 'info.debatty:java-string-similarity:2.0.0'
 
-    antlr3 'org.antlr:antlr:3.5.2'
+    antlr3 'org.antlr:antlr:3.5.3'
     implementation 'org.antlr:antlr-runtime:3.5.2'
 
     antlr4 'org.antlr:antlr4:4.9.3'
@@ -172,7 +179,7 @@ dependencies {
     implementation 'org.controlsfx:controlsfx:11.1.1'
 
     implementation 'org.jsoup:jsoup:1.14.3'
-    implementation 'com.konghq:unirest-java:3.13.7'
+    implementation 'com.konghq:unirest-java:3.13.8'
 
     implementation 'org.slf4j:slf4j-api:2.0.0-alpha7'
     implementation "org.tinylog:tinylog-api:2.4.1"
@@ -181,7 +188,7 @@ dependencies {
 
     implementation 'de.undercouch:citeproc-java:3.0.0-alpha.6'
 
-    // jakarta.activation is already depdency of glassfish
+    // jakarta.activation is already dependency of glassfish
     implementation group: 'jakarta.xml.bind', name: 'jakarta.xml.bind-api', version: '3.0.1'
     implementation group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '3.0.2'
 
@@ -194,13 +201,13 @@ dependencies {
         exclude module: "log4j-core"
     }
 
-    implementation 'com.vladsch.flexmark:flexmark:0.62.2'
+    implementation 'com.vladsch.flexmark:flexmark:0.64.0'
     implementation 'com.vladsch.flexmark:flexmark-ext-gfm-strikethrough:0.64.0'
     implementation 'com.vladsch.flexmark:flexmark-ext-gfm-tasklist:0.64.0'
 
     implementation group: 'net.harawata', name: 'appdirs', version: '1.2.1'
 
-    testImplementation 'io.github.classgraph:classgraph:4.8.141'
+    testImplementation 'io.github.classgraph:classgraph:4.8.146'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.8.2'
     testImplementation 'org.junit.platform:junit-platform-launcher:1.8.2'
 
@@ -215,7 +222,7 @@ dependencies {
     testImplementation "org.testfx:testfx-junit5:4.0.17-alpha-SNAPSHOT"
     testImplementation "org.hamcrest:hamcrest-library:2.2"
 
-    checkstyle 'com.puppycrawl.tools:checkstyle:10.0'
+    checkstyle 'com.puppycrawl.tools:checkstyle:10.1'
     // xjc needs the runtime as well for the ant task, otherwise it fails
     xjc group: 'org.glassfish.jaxb', name: 'jaxb-xjc', version: '3.0.2'
     xjc group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '3.0.2'
@@ -557,7 +564,6 @@ jlink {
         requires 'com.google.gson'
         requires 'org.slf4j'
         requires 'jakarta.xml.bind'
-        uses 'org.controlsfx.glyphfont.GlyphFont'
         uses 'com.airhacks.afterburner.views.ResourceLocator'
         uses 'com.airhacks.afterburner.injection.PresenterFactory'
         uses 'org.mariadb.jdbc.credential.CredentialPlugin'
@@ -566,11 +572,7 @@ jlink {
         uses 'org.mariadb.jdbc.LocalInfileInterceptor'
         uses 'org.eclipse.jgit.transport.SshSessionFactory'
         uses 'org.eclipse.jgit.lib.GpgSigner'
-        provides 'org.apache.lucene.codecs.DocValuesFormat' with 'org.apache.lucene.codecs.lucene80.Lucene80DocValuesFormat'
-        provides 'org.controlsfx.glyphfont.GlyphFont' with 'org.controlsfx.glyphfont.FontAwesome'
         provides 'org.mariadb.jdbc.tls.TlsSocketPlugin' with 'org.mariadb.jdbc.internal.protocol.tls.DefaultTlsSocketPlugin'
-        provides 'com.microsoft.applicationinsights.core.dependencies.io.grpc.ServerProvider' with 'com.microsoft.applicationinsights.core.dependencies.io.grpc.netty.shaded.io.grpc.netty.NettyServerProvider'
-        provides 'com.microsoft.applicationinsights.core.dependencies.io.grpc.NameResolverProvider' with 'com.microsoft.applicationinsights.core.dependencies.io.grpc.internal.DnsNameResolverProvider'
         provides 'java.sql.Driver' with 'org.postgresql.Driver'
         provides 'org.mariadb.jdbc.authentication.AuthenticationPlugin' with 'org.mariadb.jdbc.internal.com.send.authentication.CachingSha2PasswordPlugin',
                 'org.mariadb.jdbc.internal.com.send.authentication.ClearPasswordPlugin',
@@ -584,9 +586,7 @@ jlink {
                 'org.mariadb.jdbc.credential.env.EnvCredentialPlugin',
                 'org.mariadb.jdbc.credential.system.PropertiesCredentialPlugin'
         provides 'java.security.Provider' with 'org.bouncycastle.jce.provider.BouncyCastleProvider',
-                'org.bouncycastle.pqc.jcajce.provider.BouncyCastlePQCProvider'
-        provides 'com.microsoft.applicationinsights.core.dependencies.io.grpc.ManagedChannelProvider' with 'com.microsoft.applicationinsights.core.dependencies.io.grpc.netty.shaded.io.grpc.netty.NettyChannelProvider'
-    }
+                'org.bouncycastle.pqc.jcajce.provider.BouncyCastlePQCProvider'    }
 
     jpackage {
         outputDir = "distribution"

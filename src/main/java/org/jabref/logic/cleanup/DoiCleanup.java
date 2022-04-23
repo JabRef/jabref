@@ -25,7 +25,6 @@ public class DoiCleanup implements CleanupJob {
 
     @Override
     public List<FieldChange> cleanup(BibEntry entry) {
-
         List<FieldChange> changes = new ArrayList<>();
 
         // First check if the Doi Field is empty

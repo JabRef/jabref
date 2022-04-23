@@ -31,6 +31,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
+import javafx.stage.Screen;
 
 import org.jabref.gui.Globals;
 import org.jabref.gui.icon.IconTheme.JabRefIcons;
@@ -142,7 +143,8 @@ public class MergeEntries extends BorderPane {
      * Main function for building the merge entry JPanel
      */
     private void initialize() {
-        setPrefWidth(800);
+        this.setPrefHeight(Screen.getPrimary().getBounds().getHeight() * 0.75);
+        this.setPrefWidth(Screen.getPrimary().getBounds().getWidth() * 0.75);
 
         setupFields();
 
@@ -370,16 +372,10 @@ public class MergeEntries extends BorderPane {
         }
     }
 
-    /**
-     * @return Merged BibEntry
-     */
-    public BibEntry getMergeEntry() {
+    public BibEntry getMergedEntry() {
         return mergedEntry;
     }
 
-    /**
-     * Update the merged entry
-     */
     private void updateMergedEntry() {
         // Check if the type has changed
         if (!identicalTypes && !typeRadioButtons.isEmpty() && typeRadioButtons.get(0).isSelected()) {

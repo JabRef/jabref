@@ -16,7 +16,7 @@ jobs:
           persist-credentials: false
           fetch-depth: 0
       - name: Set up JDK
-        uses: actions/setup-java@v2
+        uses: actions/setup-java@v3
         with:
           java-version: 17
           distribution: 'temurin'
@@ -46,7 +46,7 @@ jobs:
           # create .mv file
           cd $GITHUB_WORKSPACE
           ./gradlew generateJournalAbbreviationList
-      - uses: peter-evans/create-pull-request@v3
+      - uses: peter-evans/create-pull-request@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           branch: update-journallist

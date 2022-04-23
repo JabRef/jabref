@@ -12,7 +12,7 @@ import java.util.stream.Stream;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.search.SearchMatcher;
-import org.jabref.model.search.rules.ContainBasedSearchRule;
+import org.jabref.model.search.rules.ContainsBasedSearchRule;
 import org.jabref.model.search.rules.GrammarBasedSearchRule;
 import org.jabref.model.search.rules.SearchRule;
 import org.jabref.model.search.rules.SearchRules;
@@ -82,7 +82,7 @@ public class SearchQuery implements SearchMatcher {
     }
 
     public boolean isContainsBasedSearch() {
-        return rule instanceof ContainBasedSearchRule;
+        return rule instanceof ContainsBasedSearchRule;
     }
 
     private String getCaseSensitiveDescription() {

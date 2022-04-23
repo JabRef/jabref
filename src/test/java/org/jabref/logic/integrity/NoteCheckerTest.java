@@ -24,7 +24,6 @@ public class NoteCheckerTest {
         checker = new NoteChecker(database);
         databaseBiblatex.setMode(BibDatabaseMode.BIBLATEX);
         checkerBiblatex = new NoteChecker(databaseBiblatex);
-
     }
 
     @Test
@@ -56,5 +55,4 @@ public class NoteCheckerTest {
     void bibLaTexAcceptsFirstLowercaseLetter() {
         assertEquals(Optional.empty(), checkerBiblatex.checkValue("lorem ipsum"));
     }
-
 }
