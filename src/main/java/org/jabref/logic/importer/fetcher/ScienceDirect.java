@@ -163,11 +163,6 @@ public class ScienceDirect implements FulltextFetcher, CustomizableKeyFetcher {
     }
 
     @Override
-    public String getTestUrl() {
-        return null;
-    }
-
-    @Override
     public String getName() {
         return FETCHER_NAME;
     }

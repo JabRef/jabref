@@ -85,11 +85,6 @@ public class AstrophysicsDataSystem
         return "SAO/NASA ADS";
     }
 
-    @Override
-    public String getTestUrl() {
-        return null;
-    }
-
     private String getApiKey() {
         return importerPreferences.getApiKeys()
                                   .stream()
