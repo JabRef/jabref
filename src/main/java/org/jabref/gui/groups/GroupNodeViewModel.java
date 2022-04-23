@@ -1,10 +1,7 @@
 package org.jabref.gui.groups;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
+import com.tobiasdiez.easybind.EasyBind;
+import com.tobiasdiez.easybind.EasyObservableList;
 import javafx.beans.InvalidationListener;
 import javafx.beans.WeakInvalidationListener;
 import javafx.beans.binding.Bindings;
@@ -16,31 +13,25 @@ import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.scene.input.Dragboard;
 import javafx.scene.paint.Color;
-
 import org.jabref.gui.DragAndDropDataFormats;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIcon;
-import org.jabref.gui.util.BackgroundTask;
-import org.jabref.gui.util.CustomLocalDragboard;
-import org.jabref.gui.util.DefaultTaskExecutor;
-import org.jabref.gui.util.DroppingMouseLocation;
-import org.jabref.gui.util.TaskExecutor;
+import org.jabref.gui.util.*;
 import org.jabref.logic.groups.DefaultGroupsFactory;
 import org.jabref.logic.layout.format.LatexToUnicodeFormatter;
 import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.groups.AbstractGroup;
-import org.jabref.model.groups.AutomaticGroup;
-import org.jabref.model.groups.GroupEntryChanger;
-import org.jabref.model.groups.GroupTreeNode;
-import org.jabref.model.groups.TexGroup;
+import org.jabref.model.groups.*;
 import org.jabref.model.strings.StringUtil;
+import org.jabref.model.util.TreeCollector;
 import org.jabref.preferences.PreferencesService;
 
-import com.tobiasdiez.easybind.EasyBind;
-import com.tobiasdiez.easybind.EasyObservableList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class GroupNodeViewModel {
 
@@ -249,7 +240,23 @@ public class GroupNodeViewModel {
             }
         }
     }
+    /**
+     * It works, but it's very inefficient. Tree structure is required to provide efficient delete and add interfaces.
+     *
+     * @param newDatabase The datasetChange
+     *
+     */
+    public void setObservableList(BibDatabaseContext newDatabase) {
+        AutomaticGroup automaticGroup = (AutomaticGroup) groupNode.getGroup();
+        this.children.setAll(newDatabase.getDatabase().getEntries().stream()
+                .flatMap(entry -> automaticGroup.createSubgroups(entry).stream())
+                .collect(TreeCollector.mergeIntoTree(GroupTreeNode::isSameGroupAs))
+                .stream()
+                .map(this::toViewModel)
+                .sorted((group1, group2) -> group1.getDisplayName().compareToIgnoreCase(group2.getDisplayName()))
+                .collect(Collectors.toCollection(FXCollections::observableArrayList)));
 
+    }
     private void refreshGroup() {
         DefaultTaskExecutor.runInJavaFXThread(() -> {
             updateMatchedEntries(); // Update the entries matched by the group

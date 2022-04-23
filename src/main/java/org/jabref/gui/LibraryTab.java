@@ -1,13 +1,8 @@
 package org.jabref.gui;
 
-import java.io.IOException;
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-
+import com.google.common.eventbus.Subscribe;
+import com.tobiasdiez.easybind.EasyBind;
+import com.tobiasdiez.easybind.Subscription;
 import javafx.animation.PauseTransition;
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
@@ -21,7 +16,8 @@ import javafx.scene.control.Tab;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.BorderPane;
 import javafx.util.Duration;
-
+import org.controlsfx.control.NotificationPane;
+import org.controlsfx.control.action.Action;
 import org.jabref.gui.autocompleter.AutoCompletePreferences;
 import org.jabref.gui.autocompleter.PersonNameSuggestionProvider;
 import org.jabref.gui.autocompleter.SuggestionProviders;
@@ -33,11 +29,7 @@ import org.jabref.gui.importer.actions.OpenDatabaseAction;
 import org.jabref.gui.maintable.MainTable;
 import org.jabref.gui.maintable.MainTableDataModel;
 import org.jabref.gui.theme.ThemeManager;
-import org.jabref.gui.undo.CountingUndoManager;
-import org.jabref.gui.undo.NamedCompound;
-import org.jabref.gui.undo.UndoableFieldChange;
-import org.jabref.gui.undo.UndoableInsertEntries;
-import org.jabref.gui.undo.UndoableRemoveEntries;
+import org.jabref.gui.undo.*;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.autosaveandbackup.AutosaveManager;
@@ -68,14 +60,12 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.preferences.PreferencesService;
-
-import com.google.common.eventbus.Subscribe;
-import com.tobiasdiez.easybind.EasyBind;
-import com.tobiasdiez.easybind.Subscription;
-import org.controlsfx.control.NotificationPane;
-import org.controlsfx.control.action.Action;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.nio.file.Path;
+import java.util.*;
 
 public class LibraryTab extends Tab {
 
@@ -143,7 +133,7 @@ public class LibraryTab extends Tab {
         this.getDatabase().registerListener(new SearchListener());
         this.getDatabase().registerListener(new IndexUpdateListener());
         this.getDatabase().registerListener(new EntriesRemovedListener());
-
+        this.getDatabase().registerListener(new FieldKeywordChangeListener());
         // ensure that at each addition of a new entry, the entry is added to the groups interface
         this.bibDatabaseContext.getDatabase().registerListener(new GroupTreeListener());
         // ensure that all entry changes mark the panel as changed
@@ -852,6 +842,19 @@ public class LibraryTab extends Tab {
         }
     }
 
+    /**
+     * Listen whether field of "keywords" changed.
+     */
+    private class FieldKeywordChangeListener {
+
+        @Subscribe
+        public void listen(FieldChangedEvent fieldChangedEvent) {
+            if (fieldChangedEvent.getField().getName().equals("keywords")) {
+                stateManager.fieldKeywordChangedProperty().set(Optional.of(fieldChangedEvent));
+            }
+        }
+    }
+    
     private class IndexUpdateListener {
 
         public IndexUpdateListener() {
@@ -863,6 +866,7 @@ public class LibraryTab extends Tab {
                 }
             }
         }
+
 
         @Subscribe
         public void listen(EntriesAddedEvent addedEntryEvent) {
