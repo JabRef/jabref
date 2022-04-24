@@ -19,6 +19,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We added two new web and fulltext fetchers: SemanticScholar and ResearchGate.
 - We added notifications on success and failure when writing metadata to a PDF-file [#8276](https://github.com/JabRef/jabref/issues/8276)
 - We added a cleanup action that escapes `$` (by adding a backslash in front) [#8673](https://github.com/JabRef/jabref/issues/8673)
+- We added a checkbox that prevent enclosing braces from being written to metadata [#8452](https://github.com/JabRef/jabref/issues/8452)
 
 ### Changed
 
