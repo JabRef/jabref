@@ -120,38 +120,20 @@ class XmpUtilWriterTest {
      * Test for writing a PDF file with a single DublinCore metadata entry.
      */
     @Test
-    void testWriteXmp(@TempDir Path tempDir) throws Exception {
-        BibDatabaseMode bibDatabaseMode = BibDatabaseMode.BIBTEX;
-        BibEntryTypesManager bibEntryTypesManager = new BibEntryTypesManager();
-        FieldWriterPreferences fieldWriterPreferences = new FieldWriterPreferences(true, List.of(StandardField.MONTH), new FieldContentFormatterPreferences());
-        BibDatabaseContext databaseContext = new BibDatabaseContext();
-        BibDatabase database = databaseContext.getDatabase();
+    void testWriteXmp(@TempDir Path tempDir) throws IOException, TransformerException {
+        Path pdfFile = this.createDefaultFile("JabRef_writeSingle.pdf", tempDir);
 
-        FilePreferences filePreferences = mock(FilePreferences.class);
-        when(filePreferences.getUser()).thenReturn(tempDir.toAbsolutePath().toString());
-        when(filePreferences.shouldStoreFilesRelativeToBibFile()).thenReturn(false);
-
-//        Path pdfFile = this.createDefaultFile("JabRef_writeSingle.pdf", tempDir);
-        Path pdfFile = tempDir.resolve("existing.pdf").toAbsolutePath();
         // read a bib entry from the tests before
         BibEntry entry = vapnik2000;
-        LinkedFile linkedFile = createDefaultLinkedFile("existing.pdf", tempDir);
-        entry.setFiles(Arrays.asList(linkedFile));
-        database.insertEntry(entry);
+        entry.setCitationKey("WriteXMPTest");
+        entry.setId("ID4711");
 
         // write the changed bib entry to the PDF
         XmpUtilWriter.writeXmp(pdfFile.toAbsolutePath().toString(), entry, null, xmpPreferences);
 
-        // export
-        EmbeddedBibFilePdfExporter embeddedBibExporter = new EmbeddedBibFilePdfExporter(bibDatabaseMode, bibEntryTypesManager, fieldWriterPreferences, xmpPreferences);
-        embeddedBibExporter.exportToFileByPath(databaseContext, database, filePreferences, pdfFile);
-
         // read entry again
         List<BibEntry> entriesWritten = XmpUtilReader.readXmp(pdfFile.toAbsolutePath().toString(), xmpPreferences);
         BibEntry entryWritten = entriesWritten.get(0);
-
-        System.out.println(entryWritten);
-
         entryWritten.clearField(StandardField.FILE);
 
         // compare the two entries
