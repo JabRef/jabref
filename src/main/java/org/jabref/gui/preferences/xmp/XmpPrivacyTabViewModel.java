@@ -25,6 +25,7 @@ import de.saxsys.mvvmfx.utils.validation.Validator;
 public class XmpPrivacyTabViewModel implements PreferenceTabViewModel {
 
     private final BooleanProperty xmpFilterEnabledProperty = new SimpleBooleanProperty();
+    private final BooleanProperty enclosingBracketsFilterEnabledProperty = new SimpleBooleanProperty();
     private final ListProperty<Field> xmpFilterListProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final ListProperty<Field> availableFieldsProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final ObjectProperty<Field> addFieldProperty = new SimpleObjectProperty<>();
@@ -50,6 +51,7 @@ public class XmpPrivacyTabViewModel implements PreferenceTabViewModel {
     @Override
     public void setValues() {
         xmpFilterEnabledProperty.setValue(xmpPreferences.shouldUseXmpPrivacyFilter());
+        enclosingBracketsFilterEnabledProperty.setValue(xmpPreferences.shouldEnableEnclosingBracketsFilter());
 
         xmpFilterListProperty.clear();
         xmpFilterListProperty.addAll(xmpPreferences.getXmpPrivacyFilter());
@@ -61,6 +63,7 @@ public class XmpPrivacyTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public void storeSettings() {
+        xmpPreferences.setEnableEnclosingBracketsFilter(enclosingBracketsFilterEnabledProperty.getValue());
         xmpPreferences.setUseXmpPrivacyFilter(xmpFilterEnabledProperty.getValue());
         xmpPreferences.getXmpPrivacyFilter().clear();
         xmpPreferences.getXmpPrivacyFilter().addAll(xmpFilterListProperty.getValue());
@@ -98,6 +101,9 @@ public class XmpPrivacyTabViewModel implements PreferenceTabViewModel {
 
     public BooleanProperty xmpFilterEnabledProperty() {
         return xmpFilterEnabledProperty;
+    }
+    public BooleanProperty enclosingBracketsFilterEnabledProperty() {
+        return enclosingBracketsFilterEnabledProperty;
     }
 
     public ListProperty<Field> filterListProperty() {

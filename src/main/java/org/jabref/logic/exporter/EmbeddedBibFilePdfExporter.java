@@ -19,6 +19,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.OS;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.io.FileUtil;
+import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.logic.xmp.XmpUtilWriter;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
@@ -42,12 +43,21 @@ public class EmbeddedBibFilePdfExporter extends Exporter {
     private final BibDatabaseMode bibDatabaseMode;
     private final BibEntryTypesManager bibEntryTypesManager;
     private final FieldWriterPreferences fieldWriterPreferences;
+    private final XmpPreferences xmpPreferences;
 
     public EmbeddedBibFilePdfExporter(BibDatabaseMode bibDatabaseMode, BibEntryTypesManager bibEntryTypesManager, FieldWriterPreferences fieldWriterPreferences) {
         super("bib", "Embedded BibTeX", StandardFileType.PDF);
         this.bibDatabaseMode = bibDatabaseMode;
         this.bibEntryTypesManager = bibEntryTypesManager;
         this.fieldWriterPreferences = fieldWriterPreferences;
+        this.xmpPreferences = null;
+    }
+    public EmbeddedBibFilePdfExporter(BibDatabaseMode bibDatabaseMode, BibEntryTypesManager bibEntryTypesManager, FieldWriterPreferences fieldWriterPreferences, XmpPreferences xmpPreferences) {
+        super("bib", "Embedded BibTeX", StandardFileType.PDF);
+        this.bibDatabaseMode = bibDatabaseMode;
+        this.bibEntryTypesManager = bibEntryTypesManager;
+        this.fieldWriterPreferences = fieldWriterPreferences;
+        this.xmpPreferences = xmpPreferences;
     }
 
     /**
@@ -136,7 +146,7 @@ public class EmbeddedBibFilePdfExporter extends Exporter {
     private String getBibString(List<BibEntry> entries) throws IOException {
         StringWriter stringWriter = new StringWriter();
         BibWriter bibWriter = new BibWriter(stringWriter, OS.NEWLINE);
-        FieldWriter fieldWriter = FieldWriter.buildIgnoreHashes(fieldWriterPreferences);
+        FieldWriter fieldWriter = FieldWriter.buildIgnoreHashes(fieldWriterPreferences, xmpPreferences);
         BibEntryWriter bibEntryWriter = new BibEntryWriter(fieldWriter, bibEntryTypesManager);
         for (BibEntry entry : entries) {
             bibEntryWriter.write(entry, bibWriter, bibDatabaseMode);

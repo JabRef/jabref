@@ -26,6 +26,7 @@ import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 
 public class XmpPrivacyTab extends AbstractPreferenceTabView<XmpPrivacyTabViewModel> implements PreferencesTab {
 
+    @FXML public CheckBox enableEnclosingBracketsFilter;
     @FXML private CheckBox enableXmpFilter;
     @FXML private TableView<Field> filterList;
     @FXML private TableColumn<Field, Field> fieldColumn;
@@ -50,6 +51,8 @@ public class XmpPrivacyTab extends AbstractPreferenceTabView<XmpPrivacyTabViewMo
         this.viewModel = new XmpPrivacyTabViewModel(dialogService, preferencesService.getXmpPreferences());
 
         enableXmpFilter.selectedProperty().bindBidirectional(viewModel.xmpFilterEnabledProperty());
+        enableEnclosingBracketsFilter.selectedProperty().bindBidirectional(viewModel.enclosingBracketsFilterEnabledProperty());
+
         filterList.disableProperty().bind(viewModel.xmpFilterEnabledProperty().not());
         addFieldName.disableProperty().bind(viewModel.xmpFilterEnabledProperty().not());
         addField.disableProperty().bind(viewModel.xmpFilterEnabledProperty().not());

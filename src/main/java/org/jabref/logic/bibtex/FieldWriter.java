@@ -1,6 +1,11 @@
 package org.jabref.logic.bibtex;
 
+import java.util.HashSet;
+
+import javafx.beans.property.SimpleObjectProperty;
+
 import org.jabref.logic.util.OS;
+import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.strings.StringUtil;
 
@@ -23,20 +28,29 @@ public class FieldWriter {
     private final boolean neverFailOnHashes;
     private final FieldWriterPreferences preferences;
     private final FieldContentFormatter formatter;
+    private final XmpPreferences xmpPreferences;
 
     public FieldWriter(FieldWriterPreferences preferences) {
-        this(true, preferences);
+        this(true, preferences, new XmpPreferences(false, new HashSet<>(), new SimpleObjectProperty<>(','), false));
+    }
+    public FieldWriter(FieldWriterPreferences preferences, XmpPreferences xmpPreferences) {
+        this(true, preferences, xmpPreferences);
     }
 
-    private FieldWriter(boolean neverFailOnHashes, FieldWriterPreferences preferences) {
+
+    private FieldWriter(boolean neverFailOnHashes, FieldWriterPreferences preferences, XmpPreferences xmpPreferences) {
         this.neverFailOnHashes = neverFailOnHashes;
         this.preferences = preferences;
+        this.xmpPreferences = xmpPreferences;
 
         formatter = new FieldContentFormatter(preferences.getFieldContentFormatterPreferences());
     }
 
     public static FieldWriter buildIgnoreHashes(FieldWriterPreferences prefs) {
-        return new FieldWriter(true, prefs);
+        return new FieldWriter(true, prefs, new XmpPreferences(false, new HashSet<>(), new SimpleObjectProperty<>(','), false));
+    }
+    public static FieldWriter buildIgnoreHashes(FieldWriterPreferences prefs, XmpPreferences xmpPreferences) {
+        return new FieldWriter(true, prefs, xmpPreferences);
     }
 
     private static void checkBraces(String text) throws InvalidFieldValueException {
@@ -83,15 +97,18 @@ public class FieldWriter {
      * @throws InvalidFieldValueException if s is not a correct bibtex string, e.g., because of improperly balanced braces or using # not paired
      */
     public String write(Field field, String content) throws InvalidFieldValueException {
-        if (content == null) {
-            return FIELD_START + String.valueOf(FIELD_END);
-        }
+            if (content == null) {
+                if (xmpPreferences.shouldEnableEnclosingBracketsFilter()) {
+                    return "";
+                }
+                return FIELD_START + String.valueOf(FIELD_END);
+            }
 
-        if (!shouldResolveStrings(field)) {
-            return formatWithoutResolvingStrings(content, field);
-        }
+            if (!shouldResolveStrings(field)) {
+                return formatWithoutResolvingStrings(content, field);
+            }
+            return formatAndResolveStrings(content, field);
 
-        return formatAndResolveStrings(content, field);
     }
 
     /**
@@ -177,10 +194,14 @@ public class FieldWriter {
 
     private String formatWithoutResolvingStrings(String content, Field field) throws InvalidFieldValueException {
         checkBraces(content);
-
-        StringBuilder stringBuilder = new StringBuilder(String.valueOf(FIELD_START));
-        stringBuilder.append(formatter.format(content, field));
-        stringBuilder.append(FIELD_END);
+        StringBuilder stringBuilder = new StringBuilder();
+        if (xmpPreferences.shouldEnableEnclosingBracketsFilter()) {
+            stringBuilder.append(formatter.format(content, field));
+        } else {
+            stringBuilder.append(FIELD_START);
+            stringBuilder.append(formatter.format(content, field));
+            stringBuilder.append(FIELD_END);
+        }
         return stringBuilder.toString();
     }
 
@@ -189,9 +210,14 @@ public class FieldWriter {
      * @param text          the text to append
      */
     private void writeText(StringBuilder stringBuilder, String text, int startPos, int endPos) {
-        stringBuilder.append(FIELD_START);
-        stringBuilder.append(text, startPos, endPos);
-        stringBuilder.append(FIELD_END);
+        if (xmpPreferences.shouldEnableEnclosingBracketsFilter()) {
+            stringBuilder.append(text, startPos, endPos);
+        } else {
+            stringBuilder.append(FIELD_START);
+            stringBuilder.append(text, startPos, endPos);
+            stringBuilder.append(FIELD_END);
+        }
+  ;
     }
 
     /**

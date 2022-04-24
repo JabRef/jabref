@@ -98,7 +98,7 @@ class XmpPdfExporterTest {
      */
     @BeforeEach
     void setUp() throws IOException {
-        xmpPreferences = new XmpPreferences(false, Collections.emptySet(), new SimpleObjectProperty<>(','));
+        xmpPreferences = new XmpPreferences(false, Collections.emptySet(), new SimpleObjectProperty<>(','), false);
 
         encoding = Charset.defaultCharset();
 
