@@ -100,7 +100,6 @@ public class BibEntry implements Cloneable {
 
     private boolean removed;
 
-
     public boolean isRemoved() {
         return removed;
     }
