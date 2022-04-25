@@ -13,6 +13,7 @@ import java.util.Set;
 import org.jabref.logic.formatter.bibtexfields.RemoveNewlinesFormatter;
 import org.jabref.logic.integrity.PagesChecker;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.BibEntryTypesManager;
@@ -99,11 +100,12 @@ public class CSLAdapter {
         private final List<BibEntry> data = new ArrayList<>();
         private BibDatabaseContext bibDatabaseContext;
         private BibEntryTypesManager entryTypesManager;
+        private PagesChecker pagesChecker;
 
         /**
          * Converts the {@link BibEntry} into {@link CSLItemData}.
          */
-        private static CSLItemData bibEntryToCSLItemData(BibEntry originalBibEntry, BibDatabaseContext bibDatabaseContext, BibEntryTypesManager entryTypesManager) {
+        private CSLItemData bibEntryToCSLItemData(BibEntry originalBibEntry, BibDatabaseContext bibDatabaseContext, BibEntryTypesManager entryTypesManager) {
             // We need to make a deep copy, because we modify the entry according to the logic presented at
             // https://github.com/JabRef/jabref/issues/8372#issuecomment-1014941935
             BibEntry bibEntry = (BibEntry) originalBibEntry.clone();
@@ -133,17 +135,17 @@ public class CSLAdapter {
                         bibEntry.clearField(StandardField.EID);
                     });
                 } else {
+                    // BibTeX mode
                     bibEntry.getField(StandardField.NUMBER).ifPresent(number -> {
                         bibEntry.setField(StandardField.ISSUE, number);
                         bibEntry.clearField(StandardField.NUMBER);
                     });
                     bibEntry.getField(StandardField.PAGES).ifPresent(pages -> {
-                        if (new PagesChecker(bibDatabaseContext).checkValue(pages).isPresent()) {
-                            // pages field contains no valid pages range
-                            // cut off "Article " if exists.
-                            if (pages.toLowerCase(Locale.ROOT).startsWith("article ")) {
-                                pages = pages.substring("Article ".length());
-                            }
+                        if (pages.toLowerCase(Locale.ROOT).startsWith("article ")) {
+                            pages = pages.substring("Article ".length());
+                            bibEntry.setField(StandardField.NUMBER, pages);
+                        } else if (!pagesChecker.checkValue(pages).isEmpty()) {
+                            // pages field contains no valid pages range (an error es present in the validation)
                             bibEntry.setField(StandardField.NUMBER, pages);
                             bibEntry.clearField(StandardField.PAGES);
                         }
@@ -173,13 +175,19 @@ public class CSLAdapter {
             this.data.addAll(data);
             this.bibDatabaseContext = bibDatabaseContext;
             this.entryTypesManager = entryTypesManager;
+
+            // Quick solution to always use BibLaTeX mode at the checker to allow pages ranges with single dash, too
+            // Example: pages = {1-2}
+            BibDatabaseContext ctx = new BibDatabaseContext();
+            ctx.setMode(BibDatabaseMode.BIBLATEX);
+            this.pagesChecker = new PagesChecker(ctx);
         }
 
         @Override
         public CSLItemData retrieveItem(String id) {
             return data.stream()
                        .filter(entry -> entry.getCitationKey().orElse("").equals(id))
-                       .map(entry -> JabRefItemDataProvider.bibEntryToCSLItemData(entry, bibDatabaseContext, entryTypesManager))
+                       .map(entry -> bibEntryToCSLItemData(entry, bibDatabaseContext, entryTypesManager))
                        .findFirst().orElse(null);
         }
 

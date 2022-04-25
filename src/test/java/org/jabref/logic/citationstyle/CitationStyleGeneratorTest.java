@@ -299,11 +299,11 @@ class CitationStyleGeneratorTest {
 
                 // "Article number" is not a field that exists in Bibtex standard. Printing the article number in the pages field is a workaround. Some Journals have opted to put the article number into the pages field. APA 7th Style recommends following procedure: If the journal article has an article number instead of a page range, include the word "Article" and then the article number instead of the page range. Question: Should it be rendered WITH Article or WITHOUT the Word Article in Front? I guess without?
                 Arguments.of(
-                        "Foo, B. (n.d.). number + pages. Bib(La)TeX Journal, (3number), Article 777e23.\n",
+                        "Foo, B. (n.d.). number + pages. BibTeX Journal, (3number), 777e23.\n",
                         BibDatabaseMode.BIBTEX,
                         new BibEntry(StandardEntryType.Article)
                                 .withField(StandardField.AUTHOR, "Foo, Bar")
-                                .withField(StandardField.JOURNAL, "Bib(La)TeX Journal")
+                                .withField(StandardField.JOURNAL, "BibTeX Journal")
                                 .withField(StandardField.NUMBER, "3number")
                                 .withField(StandardField.PAGES, "777e23")
                                 .withField(StandardField.TITLE, "number + pages")
