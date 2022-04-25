@@ -312,11 +312,11 @@ class CitationStyleGeneratorTest {
 
                 // Not rendering the "eid" field here, is correct. The "eid" field(short for: electronic identifier) does not exist in Bibtex standard. It exists in Biblatex standard though and is the field, in which the "article number" should be entered into. "Article number" is a field that does not exist in Bibtex and also not in Biblatex standard. As a workaround, some Journals have opted to put the article number into the pages field. APA 7th Style recommends following procedure: "If the journal article has an article number instead of a page range, include the word "Article" and then the article number instead of the page range." - Source: https://apastyle.apa.org/style-grammar-guidelines/references/examples/journal-article-references#2. Additionally the APA style (7th edition) created by the CSL community "prints the issue (= the "number" field" in Biblatex)  whenever it is in the data and the number (= the "eid" field in Biblatex) when no page range is present, entirely independent of the issue number" - Source: https://github.com/citation-style-language/styles/issues/5827#issuecomment-1006011280). I personally think the "eid" field SHOULD be rendered here SOMEWHERE, maybe even IN ADDITION to the page range, because we have the data, right? Why not show it? - But this is just my humble opinion and may not be coherent with the current APA Style 7th edition. Not rendering the "issue" field here is sufficient for APA 7th edition. Under current circumstances the "number" field takes priority over the "issue" field (see https://github.com/JabRef/jabref/issues/8372#issuecomment-1023768144). [Keyword: IS RENDERING BOTH VIABLE?]. Ideally, they would coexist: "Roughly speaking number subdivides volume and issue is much closer to subdividing year. I don't think I would want to say that issue is subordinate to number or vice versa. They sort of operate on a similar level." (Source: https://github.com/plk/biblatex/issues/726#issuecomment-1010264258)
                 Arguments.of(
-                        "Foo, B. (n.d.). eid + issue + number + pages. Bib(La)TeX Journal, (3number), 45–67.\n",
+                        "Foo, B. (n.d.). eid + issue + number + pages. BibTeX Journal, (3number), 45–67.\n",
                         BibDatabaseMode.BIBTEX,
                         new BibEntry(StandardEntryType.Article)
                                 .withField(StandardField.AUTHOR, "Foo, Bar")
-                                .withField(StandardField.JOURNAL, "Bib(La)TeX Journal")
+                                .withField(StandardField.JOURNAL, "BibTeX Journal")
                                 .withField(StandardField.NUMBER, "3number")
                                 .withField(StandardField.PAGES, "45--67")
                                 .withField(StandardField.TITLE, "eid + issue + number + pages")
@@ -332,11 +332,11 @@ class CitationStyleGeneratorTest {
                         Since, for this entry, there is no number field present and therefore no data will be overwritten, enabling the user to be able to move the data within the issue field to the number field via cleanup action is something worth pursuing.
                  */
                 Arguments.of(
-                        "Foo, B. (n.d.). eid + issue. Bib(La)TeX Journal, (9issue), Article 6eid.\n",
+                        "Foo, B. (n.d.). eid + issue. BibTeX Journal, (9issue), Article 6eid.\n",
                         BibDatabaseMode.BIBTEX,
                         new BibEntry(StandardEntryType.Article)
                                 .withField(StandardField.AUTHOR, "Foo, Bar")
-                                .withField(StandardField.JOURNAL, "Bib(La)TeX Journal")
+                                .withField(StandardField.JOURNAL, "BibTeX Journal")
                                 .withField(StandardField.TITLE, "eid + issue")
                                 .withField(StandardField.COMMENT, "")
                                 .withField(StandardField.EID, "Article 6eid")

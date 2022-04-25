@@ -144,10 +144,12 @@ public class CSLAdapter {
                         if (pages.toLowerCase(Locale.ROOT).startsWith("article ")) {
                             pages = pages.substring("Article ".length());
                             bibEntry.setField(StandardField.NUMBER, pages);
-                        } else if (!pagesChecker.checkValue(pages).isEmpty()) {
-                            // pages field contains no valid pages range (an error es present in the validation)
-                            bibEntry.setField(StandardField.NUMBER, pages);
-                            bibEntry.clearField(StandardField.PAGES);
+                        }
+                    });
+                    bibEntry.getField(StandardField.EID).ifPresent(eid -> {
+                        if (!bibEntry.hasField(StandardField.PAGES)) {
+                            bibEntry.setField(StandardField.PAGES, eid);
+                            bibEntry.clearField(StandardField.EID);
                         }
                     });
                 }
