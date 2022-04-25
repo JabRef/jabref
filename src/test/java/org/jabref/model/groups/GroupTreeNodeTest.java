@@ -344,7 +344,36 @@ public class GroupTreeNodeTest {
     void removeEntriesFromGroupWorksNotForGroupsNotSupportingExplicitRemovalOfEntries() {
         GroupTreeNode searchGroup = new GroupTreeNode(new SearchGroup("Search A", GroupHierarchyType.INCLUDING, "searchExpression", EnumSet.of(SearchRules.SearchFlags.CASE_SENSITIVE)));
         List<FieldChange> fieldChanges = searchGroup.removeEntriesFromGroup(entries);
-
         assertEquals(Collections.emptyList(), fieldChanges);
+    }
+
+    @Test
+    void removeTheLastEntryFromExplicitGroupWhenBibtexSourceTabSelected() {
+        AbstractGroup newGroup = new ExplicitGroup("NewGroup", GroupHierarchyType.INDEPENDENT, ',');
+        GroupTreeNode searchGroup = new GroupTreeNode(newGroup);
+        searchGroup.addEntriesToGroup(entries);
+        BibEntry entryToRemove = entries.get(entries.size() - 1);
+        entryToRemove.setField(StandardField.KEYWORDS, "test");
+        List<BibEntry> entriesToRemove = new ArrayList<>();
+        entriesToRemove.add(entryToRemove);
+        List<FieldChange> fieldChanges = searchGroup.removeEntriesFromGroup(entriesToRemove);
+        for (BibEntry entry1 : entriesToRemove) {
+            assertTrue(entry1.isRemoved());
+        }
+    }
+
+    @Test
+    void removeTheLastFromWordKeywordGroupWhenBibtexSourceTabSelected() {
+        AbstractGroup newGroup = new WordKeywordGroup("name", GroupHierarchyType.INDEPENDENT, StandardField.KEYWORDS, "test", false, ',', false);
+        GroupTreeNode searchGroup = new GroupTreeNode(newGroup);
+        searchGroup.addEntriesToGroup(entries);
+        BibEntry entryToRemove = entries.get(entries.size() - 1);
+        entryToRemove.setField(StandardField.KEYWORDS, "test");
+        List<BibEntry> entriesToRemove = new ArrayList<>();
+        entriesToRemove.add(entryToRemove);
+        List<FieldChange> fieldChanges = searchGroup.removeEntriesFromGroup(entriesToRemove);
+        for (BibEntry entry1 : entriesToRemove) {
+            assertTrue(entry1.isRemoved());
+        }
     }
 }

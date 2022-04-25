@@ -54,6 +54,14 @@ class BibEntryTest {
     }
 
     @Test
+    void IsRemoved() {
+        entry.setRemoved(false);
+        assertFalse(entry.isRemoved());
+        entry.setRemoved(true);
+        assertTrue(entry.isRemoved());
+    }
+
+    @Test
     void settingTypeToNullThrowsException() {
         assertThrows(NullPointerException.class, () -> entry.setType(null));
     }
