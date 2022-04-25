@@ -103,6 +103,7 @@ open module org.jabref {
 
     // fulltext search
     requires org.apache.lucene.core;
+    // In case the version is updated, please also adapt SearchFieldConstants#VERSION to the newly used version
     uses org.apache.lucene.codecs.lucene91.Lucene91Codec;
 
     requires org.apache.lucene.queryparser;
