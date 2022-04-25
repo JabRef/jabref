@@ -26,7 +26,7 @@ import org.slf4j.LoggerFactory;
  * This class monitors a set of files for changes. Upon detecting a change it notifies the registered {@link
  * FileUpdateListener}s.
  * <p>
- * Implementation based on https://stackoverflow.com/questions/16251273/can-i-watch-for-single-file-change-with-watchservice-not-the-whole-directory
+ * Implementation based on <a href="https://stackoverflow.com/questions/16251273/can-i-watch-for-single-file-change-with-watchservice-not-the-whole-directory">https://stackoverflow.com/questions/16251273/can-i-watch-for-single-file-change-with-watchservice-not-the-whole-directory</a>.
  */
 public class DefaultFileUpdateMonitor implements Runnable, FileUpdateMonitor {
 
@@ -113,6 +113,5 @@ public class DefaultFileUpdateMonitor implements Runnable, FileUpdateMonitor {
         } catch (IOException e) {
             LOGGER.error("error closing watcher", e);
         }
-
     }
 }

@@ -133,7 +133,6 @@ public class ExternalFileTypes {
      * @param types The new List of external file types. This is the complete list, not just new entries.
      */
     public void setExternalFileTypes(List<ExternalFileType> types) {
-
         // First find a list of the default types:
         List<ExternalFileType> defTypes = new ArrayList<>(getDefaultExternalFileTypes());
         // Make a list of types that are unchanged:

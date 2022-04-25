@@ -162,7 +162,6 @@ class BibEntryTypesManagerTest {
     @ParameterizedTest
     @MethodSource("mode")
     void testsModifyingArticle(BibDatabaseMode mode) {
-
         overwrittenStandardType = new BibEntryType(
                                                    StandardEntryType.Article,
                                                    List.of(new BibField(StandardField.TITLE, FieldPriority.IMPORTANT),
@@ -178,7 +177,6 @@ class BibEntryTypesManagerTest {
     @ParameterizedTest
     @MethodSource("mode")
     void testsModifyingArticleWithParsing(BibDatabaseMode mode) {
-
         overwrittenStandardType = new BibEntryType(
                                                    StandardEntryType.Article,
                                                    List.of(new BibField(StandardField.TITLE, FieldPriority.IMPORTANT),
@@ -197,7 +195,6 @@ class BibEntryTypesManagerTest {
     @ParameterizedTest
     @MethodSource("mode")
     void testsModifyingArticleWithParsingKeepsListOrder(BibDatabaseMode mode) {
-
         overwrittenStandardType = new BibEntryType(
                                                    StandardEntryType.Article,
                                                    List.of(new BibField(StandardField.TITLE, FieldPriority.IMPORTANT),

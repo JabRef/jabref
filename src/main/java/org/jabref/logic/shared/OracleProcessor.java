@@ -72,7 +72,6 @@ public class OracleProcessor extends DBMSProcessor {
 
     @Override
     public void startNotificationListener(DBMSSynchronizer dbmsSynchronizer) {
-
         this.listener = new OracleNotificationListener(dbmsSynchronizer);
 
         try {

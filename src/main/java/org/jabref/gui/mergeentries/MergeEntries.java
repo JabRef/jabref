@@ -372,16 +372,10 @@ public class MergeEntries extends BorderPane {
         }
     }
 
-    /**
-     * @return Merged BibEntry
-     */
-    public BibEntry getMergeEntry() {
+    public BibEntry getMergedEntry() {
         return mergedEntry;
     }
 
-    /**
-     * Update the merged entry
-     */
     private void updateMergedEntry() {
         // Check if the type has changed
         if (!identicalTypes && !typeRadioButtons.isEmpty() && typeRadioButtons.get(0).isSelected()) {

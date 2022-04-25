@@ -99,7 +99,6 @@ public class JabRefDialogService implements DialogService {
         // Create a new dialog pane that has a checkbox instead of the hide/show details button
         // Use the supplied callback for the action of the checkbox
         alert.setDialogPane(new DialogPane() {
-
             @Override
             protected Node createDetailsButton() {
                 CheckBox optOut = new CheckBox();
@@ -323,7 +322,7 @@ public class JabRefDialogService implements DialogService {
         alert.initOwner(mainWindow);
         themeManager.installCss(alert.getDialogPane().getScene());
 
-        stateManager.getAnyTaskRunning().addListener((observable, oldValue, newValue) -> {
+        stateManager.getAnyTasksThatWillNotBeRecoveredRunning().addListener((observable, oldValue, newValue) -> {
             if (!newValue) {
                 alert.setResult(ButtonType.YES);
                 alert.close();

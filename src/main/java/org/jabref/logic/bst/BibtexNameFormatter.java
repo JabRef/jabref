@@ -52,7 +52,6 @@ public class BibtexNameFormatter {
      * @param warn collects the warnings, may-be-null
      */
     public static String formatName(Author author, String format, Warn warn) {
-
         StringBuilder sb = new StringBuilder();
 
         char[] c = format.toCharArray();
@@ -156,7 +155,6 @@ public class BibtexNameFormatter {
                 int groupStart = sb.length();
 
                 for (int j = 0; j < d.length; j++) {
-
                     if (Character.isLetter(d[j]) && (bLevel == 1)) {
                         groupStart = sb.length();
                         if (!abbreviateThatIsSingleLetter) {
@@ -240,14 +238,8 @@ public class BibtexNameFormatter {
 
     /**
      * Including the matching brace.
-     *
-     * @param interTokenSb
-     * @param c
-     * @param pos
-     * @return
      */
     public static int consumeToMatchingBrace(StringBuilder interTokenSb, char[] c, int pos) {
-
         int braceLevel = 0;
 
         for (int i = pos; i < c.length; i++) {
@@ -267,9 +259,6 @@ public class BibtexNameFormatter {
 
     /**
      * Takes care of special characters too
-     *
-     * @param s
-     * @return
      */
     public static String getFirstCharOfString(String s) {
         char[] c = s.toCharArray();

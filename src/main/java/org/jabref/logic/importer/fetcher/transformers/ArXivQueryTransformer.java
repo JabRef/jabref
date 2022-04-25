@@ -47,5 +47,4 @@ public class ArXivQueryTransformer extends YearRangeByFilteringQueryTransformer 
     protected Optional<String> handleUnFieldedTerm(String term) {
         return Optional.of(createKeyValuePair("all", term));
     }
-
 }

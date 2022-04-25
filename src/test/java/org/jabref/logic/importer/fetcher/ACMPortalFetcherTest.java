@@ -33,7 +33,6 @@ class ACMPortalFetcherTest {
 
     @Test
     void searchByQueryFindsEntry() throws Exception {
-
         BibEntry searchEntry = new BibEntry(StandardEntryType.Conference)
                         .withField(StandardField.AUTHOR, "Tobias Olsson and Morgan Ericsson and Anna Wingkvist")
                         .withField(StandardField.YEAR, "2017")
@@ -74,5 +73,4 @@ class ACMPortalFetcherTest {
         ACMPortalParser expected = new ACMPortalParser();
         assertEquals(expected.getClass(), fetcher.getParser().getClass());
     }
-
 }

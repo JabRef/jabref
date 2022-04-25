@@ -96,7 +96,6 @@ public class Date {
             } catch (DateTimeParseException ignored) {
                 return Optional.empty();
             }
-
         }
 
         try {

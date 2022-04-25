@@ -75,5 +75,4 @@ public class InternalMaterialDesignIcon implements JabRefIcon {
     public Ikon getIkon() {
         return icons.get(0);
     }
-
 }

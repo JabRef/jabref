@@ -151,9 +151,7 @@ public class ViewModelListCellFactory<T> implements Callback<ListView<T>, ListCe
 
     @Override
     public ListCell<T> call(ListView<T> param) {
-
         return new ListCell<>() {
-
             final List<Subscription> subscriptions = new ArrayList<>();
 
             @Override

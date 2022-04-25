@@ -21,6 +21,18 @@
     <module name="FileTabCharacter"/>
     <module name="NewlineAtEndOfFile"/>
 
+    <!-- Prevent empty start and end of blocks - source: comments to https://stackoverflow.com/a/48027770/873282 -->
+    <module name="RegexpMultiline">
+        <property name="message" value="Blank line at start of block should be removed" />
+        <property name="format" value="(\(.*\)|else)\s*\{\s*[\r]?\n\s*[\r]?\n" />
+        <property name="fileExtensions" value="groovy,java" />
+    </module>
+    <module name="RegexpMultiline">
+        <property name="message" value="Blank line at end of block should be removed" />
+        <property name="format" value="[\r]?\n\s*[\r]?\n\s*\}" />
+        <property name="fileExtensions" value="groovy,java" />
+    </module>
+
     <!-- Checks for size violations: https://checkstyle.sourceforge.io/config_sizes.html -->
 
     <!-- LineLength not in place as PreviewerViewer and RelatedArticlesTab have line length with more than 500 charachters -->
@@ -32,6 +44,8 @@
             <property name="allowMissingParamTags" value="true"/>
             <property name="allowMissingReturnTag" value="true"/>
         </module>
+        <module name="RequireEmptyLineBeforeBlockTagGroup"/>
+        <module name="JavadocMissingLeadingAsteriskCheck"/>
 
         <!-- Checks for imports: https://checkstyle.org/config_import.html -->
 
@@ -67,6 +81,7 @@
             <property name="tokens" value="COMMA, SEMI, ELLIPSIS, ARRAY_DECLARATOR, RBRACK, METHOD_REF"/>
         </module>
         <module name="SingleSpaceSeparator"/>
+        <module name="NoWhitespaceBeforeCaseDefaultColon"/>
         <module name="WhitespaceAfter"/>
         <module name="WhitespaceAround">
             <!-- RCULRY causes issues if classes are nested within arrays, therefore not activated -->
@@ -83,6 +98,8 @@
         <module name="ConstantName">
             <property name="format" value="^log(ger)?|[A-Z][A-Z0-9]*(_[A-Z0-9]+)*$"/>
         </module>
+        <module name="PatternVariableName" />
+        <module name="RecordComponentName"/>
 
         <!-- Checks for blocks: https://checkstyle.org/config_blocks.html -->
 
@@ -137,5 +154,9 @@
 
         <module name="MissingDeprecated"/>
 
+        <!-- Checks for illegal usage of reserved names as identifier names, such as "var", "record" - https://checkstyle.sourceforge.io/config_naming.html#IllegalIdentifierName -->
+        <module name="IllegalIdentifierName"/>
+
+        <module name="RecordTypeParameterNameCheck"/>
     </module>
 </module>
