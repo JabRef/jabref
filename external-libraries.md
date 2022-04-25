@@ -135,13 +135,6 @@ License: BSD-3-Clause (with copyright as described in Eclipse Distribution Licen
 ```
 
 ```yaml
-Id:      com.sun.xml.fastinfoset:FastInfoset
-Project: Fast Infoset
-URL:     https://github.com/eclipse-ee4j/jaxb-fi
-License: Apache-2.0
-```
-
-```yaml
 Id:      com.tobiasdiez:easybind
 Project: EasyBind
 URL:     https://github.com/tobiasdiez/EasyBind
@@ -226,15 +219,15 @@ License: Apache-2.0
 ```
 
 ```yaml
-Id:      jakarta.activation:jakarata.activation-api
-Project: Jakarta Activation
-URL:     https://eclipse-ee4j.github.io/jaf/
-License: BSD-3-Clause
+Id:      jakarta.annotation:jakarata.annotation-api
+Project: Jakarta Annotations
+URL:     https://projects.eclipse.org/projects/ee4j.ca
+License: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
 ```
 
 ```yaml
-Id:      jakarta.annotation:jakarata.annotation-api
-Project: Jakarta Annotations
+Id:      jakarta.activation:jakarata.activation-api
+Project: Jakarta Activation
 URL:     https://projects.eclipse.org/projects/ee4j.ca
 License: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
 ```
@@ -310,28 +303,7 @@ License: Apache-2.0
 ```
 
 ```yaml
-Id:      org.apache.commons:commons-text
-Project: Apache Commons Text
-URL:     https://commons.apache.org/proper/commons-text/
-License: Apache-2.0
-```
-
-```yaml
-Id:      org.apache.lucene:lucene-core
-Project: Apache Lucene
-URL:     https://lucene.apache.org/
-License: Apache-2.0
-```
-
-```yaml
-Id:      org.apache.lucene:lucene-queries
-Project: Apache Lucene
-URL:     https://lucene.apache.org/
-License: Apache-2.0
-```
-
-```yaml
-Id:      org.apache.lucene:lucene-queryparser
+Id:      org.apache.lucene:*
 Project: Apache Lucene
 URL:     https://lucene.apache.org/
 License: Apache-2.0
@@ -412,6 +384,20 @@ Id:      org.fxmisc.richtext:richtextfx
 Project: RichTextFX
 URL:     https://github.com/TomasMikula/RichTextFX
 License: BSD-2-Clause
+```
+
+```yaml
+Id:      org.glassfish.*
+Project: Eclipse GlassFish
+URL:     https://glassfish.org/
+License: BSD-3-Clause (with copyright as described in Eclipse Distribution License - v 1.0 - see https://wiki.spdx.org/view/Legal_Team/License_List/Licenses_Under_Consideration for details)
+```
+
+```yaml
+Id:      com.ibm.icu:*
+Project: International Components for Unicode
+URL:     https://icu.unicode.org/
+License: Unicode License (https://www.unicode.org/copyright.html)
 ```
 
 ```yaml
@@ -548,6 +534,8 @@ com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava
 com.google.j2objc:j2objc-annotations:1.3
 com.googlecode.javaewah:JavaEWAH:1.1.13
 com.h2database:h2-mvstore:2.1.212
+com.ibm.icu:icu4j-charset:70.1
+com.ibm.icu:icu4j:70.1
 com.jfoenix:jfoenix:9.0.10
 com.konghq:unirest-java:3.13.8
 com.microsoft.azure:applicationinsights-core:2.4.1
@@ -558,8 +546,8 @@ com.oracle.ojdbc:osdt_cert:19.3.0.0
 com.oracle.ojdbc:osdt_core:19.3.0.0
 com.oracle.ojdbc:simplefan:19.3.0.0
 com.oracle.ojdbc:ucp:19.3.0.0
-com.sun.istack:istack-commons-runtime:3.0.8
-com.sun.xml.fastinfoset:FastInfoset:1.2.16
+com.sun.activation:jakarta.activation:2.0.1
+com.sun.istack:istack-commons-runtime:4.0.1
 com.tobiasdiez:easybind:2.2
 com.vladsch.flexmark:flexmark-ext-gfm-strikethrough:0.64.0
 com.vladsch.flexmark:flexmark-ext-gfm-tasklist:0.64.0
@@ -586,7 +574,6 @@ de.undercouch:citeproc-java:3.0.0-alpha.6
 eu.lestard:doc-annotations:0.2
 info.debatty:java-string-similarity:2.0.0
 io.github.java-diff-utils:java-diff-utils:4.11
-jakarta.activation:jakarta.activation-api:1.2.1
 jakarta.annotation:jakarta.annotation-api:1.3.5
 jakarta.xml.bind:jakarta.xml.bind-api:3.0.1
 net.harawata:appdirs:1.2.1
@@ -598,12 +585,18 @@ org.antlr:antlr-runtime:3.5.2
 org.antlr:antlr4-runtime:4.9.3
 org.apache.commons:commons-csv:1.9.0
 org.apache.commons:commons-lang3:3.12.0
-org.apache.commons:commons-text:1.8
 org.apache.httpcomponents:httpasyncclient:4.1.5
 org.apache.httpcomponents:httpclient:4.5.13
 org.apache.httpcomponents:httpcore-nio:4.4.13
 org.apache.httpcomponents:httpcore:4.4.13
 org.apache.httpcomponents:httpmime:4.5.13
+org.apache.lucene:lucene-analysis-common:9.1.0
+org.apache.lucene:lucene-backward-codecs:9.1.0
+org.apache.lucene:lucene-core:9.1.0
+org.apache.lucene:lucene-highlighter:9.1.0
+org.apache.lucene:lucene-queries:9.1.0
+org.apache.lucene:lucene-queryparser:9.1.0
+org.apache.lucene:lucene-sandbox:9.1.0
 org.apache.pdfbox:fontbox:3.0.0-RC1
 org.apache.pdfbox:pdfbox:3.0.0-RC1
 org.apache.pdfbox:xmpbox:3.0.0-RC1
@@ -618,6 +611,7 @@ org.fxmisc.richtext:richtextfx:0.10.9
 org.fxmisc.undo:undofx:2.1.1
 org.fxmisc.wellbehaved:wellbehavedfx:0.3.3
 org.glassfish.hk2.external:jakarta.inject:2.6.1
+org.glassfish.jaxb:jaxb-core:3.0.2
 org.glassfish.jaxb:jaxb-runtime:3.0.2
 org.glassfish.jaxb:txw2:3.0.2
 org.jbibtex:jbibtex:1.0.19
@@ -629,7 +623,6 @@ org.kordamp.ikonli:ikonli-materialdesign2-pack:12.3.1
 org.libreoffice:libreoffice:7.3.2
 org.libreoffice:unoloader:7.3.2
 org.mariadb.jdbc:mariadb-java-client:2.7.5
-org.jvnet.staxex:stax-ex:1.8.1
 org.openjfx:javafx-base:18
 org.openjfx:javafx-controls:18
 org.openjfx:javafx-fxml:18
