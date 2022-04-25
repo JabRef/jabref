@@ -7,6 +7,28 @@ In case, there is no issue present, the pull request implementing the feature is
 
 Note that this project **does not** adhere to [Semantic Versioning](http://semver.org/).
 
+## [Unreleased]
+
+### Added
+
+### Changed
+
+### Fixed
+
+### Removed
+
+
+
+
+
+
+
+
+
+
+
+
+
 ## [5.6] - 2022-04-25
 
 ### Added
