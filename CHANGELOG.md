@@ -22,7 +22,11 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 
 ### Changed
 
-- We upgraded to Lucene 9.1 for the fulltext search. Thus, the now created search index cannot be read from older versions of JabRef anylonger and would need to be recreated if you switch back to an older version [#8362](https://github.com/JabRef/jabref/pull/8362)
+- We upgraded to Lucene 9.1 for the fulltext search.
+  Thus, the now created search index cannot be read from older versions of JabRef anylonger.
+  ⚠️ JabRef will recreate the index in a new folder for new files and this will take a long time for a huge library.
+  Moreover, switching back and forth JabRef versions and meanwhile adding PDFs also requires rebuilding the index now and then.
+  [#8362](https://github.com/JabRef/jabref/pull/8362)
 - We changed the list of CSL styles to those that support formatting bibliographies [#8421](https://github.com/JabRef/jabref/issues/8421) [citeproc-java#116](https://github.com/michel-kraemer/citeproc-java/issues/116)
 - The CSL preview styles now also support displaying data from cross references entries that are linked via the `crossref` field [#7378](https://github.com/JabRef/jabref/issues/7378)
 - We made the Search button in Web Search wider. We also skewed the panel titles to the left [#8397](https://github.com/JabRef/jabref/issues/8397)
