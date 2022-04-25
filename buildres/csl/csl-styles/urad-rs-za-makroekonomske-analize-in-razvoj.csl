@@ -13,7 +13,7 @@
     </author>
     <category citation-format="author-date"/>
     <category field="generic-base"/>
-    <updated>2021-09-22T16:14:55+00:00</updated>
+    <updated>2022-03-15T10:15:20+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <macro name="container-contributors-booklike">
@@ -446,8 +446,14 @@
           <else-if type="post post-weblog webpage" variable="container-title" match="any">
             <text variable="title"/>
           </else-if>
-          <else-if type="legislation book" match="any">
+          <else-if type="book" match="any">
             <text variable="title" font-style="italic"/>
+          </else-if>
+          <else-if type="legislation" match="any">
+            <group delimiter=" &#8211; ">
+              <text variable="title-short"/>
+              <text variable="title"/>
+            </group>
           </else-if>
           <else>
             <text variable="title" font-style="normal"/>
@@ -809,9 +815,9 @@
         <choose>
           <if variable="collection-editor editor issue page volume" match="none">
             <group delimiter=" ">
-              <group delimiter=" ">
+              <group>
                 <text term="presented at" text-case="capitalize-first"/>
-                <text variable="event"/>
+                <text variable="event" prefix=" "/>
                 <choose>
                   <if match="any" variable="note">
                     <group delimiter=" ">
@@ -823,9 +829,9 @@
                     </group>
                   </if>
                   <else>
-                    <group>
+                    <group delimiter=", " prefix=", ">
                       <text variable="genre"/>
-                      <text variable="event-place" prefix=", "/>
+                      <text variable="event-place"/>
                     </group>
                   </else>
                 </choose>

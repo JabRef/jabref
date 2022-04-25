@@ -75,5 +75,4 @@ class AuthorTest {
     void addDotIfAbbreviationIfStartsWithNumber(String input) {
         assertEquals(input, Author.addDotIfAbbreviation(input));
     }
-
 }

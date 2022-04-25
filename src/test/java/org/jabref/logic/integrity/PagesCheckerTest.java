@@ -66,5 +66,4 @@ public class PagesCheckerTest {
     void bibTexAcceptsMorePageNumbersWithRangeOfNumbers() {
         assertEquals(Optional.empty(), checker.checkValue("7+,41--43,73"));
     }
-
 }

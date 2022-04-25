@@ -55,6 +55,5 @@ public class ApplicationInsightsWriter extends AbstractFormatPatternWriter {
 
     @Override
     public void close() throws Exception {
-
     }
 }

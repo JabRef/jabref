@@ -45,7 +45,6 @@ class XmpUtilReaderTest {
         when(xmpPreferences.getKeywordSeparator()).thenReturn(',');
 
         testImporter = new BibtexImporter(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS), new DummyFileUpdateMonitor());
-
     }
 
     /**

@@ -11,5 +11,4 @@ public class PushToApplicationConstants {
 
     private PushToApplicationConstants() {
     }
-
 }

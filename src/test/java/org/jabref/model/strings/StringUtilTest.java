@@ -109,7 +109,6 @@ class StringUtilTest {
 
     @Test
     void testShaveString() {
-
         assertEquals("", StringUtil.shaveString(null));
         assertEquals("", StringUtil.shaveString(""));
         assertEquals("aaa", StringUtil.shaveString("   aaa\t\t\n\r"));
@@ -380,5 +379,11 @@ class StringUtilTest {
     @MethodSource("getQuoteStringIfSpaceIsContainedData")
     void testGuoteStringIfSpaceIsContained(String expected, String source) {
         assertEquals(expected, StringUtil.quoteStringIfSpaceIsContained(source));
+    }
+
+    @Test
+    void testStripAccents() {
+        assertEquals("aAoeee", StringUtil.stripAccents("åÄöéèë"));
+        assertEquals("Muhlbach", StringUtil.stripAccents("Mühlbach"));
     }
 }

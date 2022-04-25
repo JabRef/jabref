@@ -80,5 +80,4 @@ public class CitedKeys {
             ck.distributeUniqueLetter(citationGroups);
         }
     }
-
 }

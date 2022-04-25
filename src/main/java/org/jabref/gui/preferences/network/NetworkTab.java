@@ -137,7 +137,6 @@ public class NetworkTab extends AbstractPreferenceTabView<NetworkTabViewModel> i
                 .withTooltip(name -> Localization.lang("Remove formatter '%0'", name))
                 .withOnMouseClickedEvent(thumbprint -> evt -> viewModel.customCertificateListProperty().removeIf(cert -> cert.getThumbprint().equals(thumbprint)))
                 .install(actionsColumn);
-
     }
 
     private String formatDate(LocalDate localDate) {

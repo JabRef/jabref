@@ -15,7 +15,6 @@ public class HTMLParagraphs implements LayoutFormatter {
 
     @Override
     public String format(String fieldText) {
-
         if (fieldText == null) {
             return fieldText;
         }

@@ -127,7 +127,6 @@ class LayoutTest {
                 "\\begin{editor&&!author}\\format[HTMLChars]{\\editor} (eds.)\\end{editor&&!author}", entry);
 
         assertEquals("Author", layoutText);
-
     }
 
     /**

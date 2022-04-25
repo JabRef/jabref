@@ -11,8 +11,8 @@
       <name>Emma Delaney</name>
     </contributor>
     <category citation-format="author-date"/>
-    <summary>Harvard author-date style edited for University of the West of England (UWE)</summary>
-    <updated>2021-04-07T03:48:18+00:00</updated>
+    <summary>Harvard author-date style updated for University of the West of England (UWE) (et-al format updated to comply with UWE Harvard Referencing</summary>
+    <updated>2022-04-10T15:09:45+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <macro name="editor">
@@ -22,18 +22,19 @@
     </names>
   </macro>
   <macro name="author">
-    <names variable="author">
-      <name and="text" delimiter-precedes-et-al="never" delimiter-precedes-last="never" initialize-with="." name-as-sort-order="all"/>
-      <label form="short" prefix=" "/>
+    <names variable="author" font-style="normal">
+      <name font-style="normal" and="text" delimiter-precedes-et-al="never" delimiter-precedes-last="never" et-al-min="10" et-al-use-first="1" initialize-with="." name-as-sort-order="all"/>
+      <et-al font-style="italic"/>
+      <label form="short" font-style="normal" prefix=" "/>
       <substitute>
-        <text macro="substitute-author"/>
+        <text macro="substitute-author" font-style="normal"/>
       </substitute>
     </names>
   </macro>
   <macro name="author-short">
     <names variable="author">
-      <name form="short" and="text" delimiter-precedes-last="never"/>
-      <et-al font-style="normal"/>
+      <name form="short" and="text" delimiter-precedes-last="never" et-al-min="4"/>
+      <et-al font-style="italic"/>
       <substitute>
         <names variable="translator"/>
         <text macro="substitute-author"/>
@@ -261,7 +262,7 @@
   </macro>
   <citation et-al-min="4" et-al-use-first="1" sort-separator="," disambiguate-add-year-suffix="true" collapse="year">
     <sort>
-      <key macro="author" names-use-last="true"/>
+      <key macro="year-date-citation" names-use-last="true" sort="descending"/>
     </sort>
     <layout suffix=")" delimiter="; " prefix="(">
       <group delimiter=", ">
@@ -274,13 +275,13 @@
       </group>
     </layout>
   </citation>
-  <bibliography et-al-min="4" et-al-use-first="1" hanging-indent="false">
+  <bibliography et-al-min="10" et-al-use-first="1">
     <sort>
       <key macro="author"/>
       <key variable="title"/>
     </sort>
     <layout>
-      <text macro="author"/>
+      <text macro="author" font-style="normal"/>
       <text macro="year-date-bibliography" prefix=" (" suffix=")"/>
       <choose>
         <if match="all" variable="author collection-title">

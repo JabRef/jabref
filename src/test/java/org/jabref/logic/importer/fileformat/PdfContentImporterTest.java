@@ -62,7 +62,6 @@ class PdfContentImporterTest {
 
     @Test
     void testParsingEditorWithoutPagesorSeriesInformation() {
-
         BibEntry entry = new BibEntry(StandardEntryType.InProceedings);
         entry.setField(StandardField.AUTHOR, "Anke Lüdeling and Merja Kytö (Eds.)");
         entry.setField(StandardField.EDITOR, "Anke Lüdeling and Merja Kytö");
@@ -107,6 +106,5 @@ class PdfContentImporterTest {
                                    + "Master of Research (MRes) thesis, University of Kent,.";
 
         assertEquals(Optional.of(entry), importer.getEntryFromPDFContent(firstPageContents, "\n"));
-
     }
 }

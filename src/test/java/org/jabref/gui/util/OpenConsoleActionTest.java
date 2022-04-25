@@ -52,5 +52,4 @@ public class OpenConsoleActionTest {
         verify(stateManager, times(1)).getActiveDatabase();
         verify(current, times(1)).getDatabasePath();
     }
-
 }

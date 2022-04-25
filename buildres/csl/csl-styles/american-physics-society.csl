@@ -15,15 +15,18 @@
     <author>
       <name>Brenton M. Wiernik</name>
     </author>
+    <contributor>
+      <name>Anna C. Véron</name>
+    </contributor>
     <category citation-format="numeric"/>
     <category field="physics"/>
     <summary>Common style use by APS publications.</summary>
-    <updated>2012-09-27T22:06:38+00:00</updated>
+    <updated>2022-03-02T11:58:54+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <macro name="author">
     <names variable="author">
-      <name delimiter=", " initialize-with=". " and="text"/>
+      <name and="text" et-al-min="11" et-al-use-first="1" initialize-with=". " delimiter=", "/>
       <label form="long" prefix=", " suffix=" "/>
       <substitute>
         <names variable="editor"/>
