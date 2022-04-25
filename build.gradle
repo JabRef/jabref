@@ -140,9 +140,9 @@ dependencies {
     implementation 'info.debatty:java-string-similarity:2.0.0'
 
     antlr3 'org.antlr:antlr:3.5.3'
-    implementation 'org.antlr:antlr-runtime:3.5.2'
+    implementation 'org.antlr:antlr-runtime:3.5.3'
 
-    antlr4 'org.antlr:antlr4:4.9.3'
+    antlr4 'org.antlr:antlr4:4.10.1'
     implementation 'org.antlr:antlr4-runtime:4.10.1'
 
     implementation group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: '6.1.0.202203080745-r'
