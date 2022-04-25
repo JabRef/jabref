@@ -3,6 +3,7 @@ package org.jabref.logic.importer.util;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -30,7 +31,12 @@ import static org.mockito.Mockito.when;
 public class GrobidServiceTest {
 
     private static GrobidService grobidService;
-    private static ImporterPreferences importerPreferences = new ImporterPreferences(false, true, false, "http://grobid.jabref.org:8070");
+    private static ImporterPreferences importerPreferences = new ImporterPreferences(
+            false,
+            true,
+            false,
+            "http://grobid.jabref.org:8070",
+            Collections.emptySet());
     private static ImportFormatPreferences importFormatPreferences;
 
     @BeforeAll
@@ -70,12 +76,20 @@ public class GrobidServiceTest {
 
     @Test
     public void processInvalidCitationTest() {
-        assertThrows(IOException.class, () -> grobidService.processCitation("iiiiiiiiiiiiiiiiiiiiiiii", importFormatPreferences, GrobidService.ConsolidateCitations.WITH_METADATA));
+        assertThrows(IOException.class, () -> grobidService.processCitation(
+                "iiiiiiiiiiiiiiiiiiiiiiii",
+                importFormatPreferences,
+                GrobidService.ConsolidateCitations.WITH_METADATA));
     }
 
     @Test
     public void failsWhenGrobidDisabled() {
-        ImporterPreferences importSettingsWithGrobidDisabled = new ImporterPreferences(false, false, false, "http://grobid.jabref.org:8070");
+        ImporterPreferences importSettingsWithGrobidDisabled = new ImporterPreferences(
+                false,
+                false,
+                false,
+                "http://grobid.jabref.org:8070",
+                Collections.emptySet());
         assertThrows(UnsupportedOperationException.class, () -> new GrobidService(importSettingsWithGrobidDisabled));
     }
 
