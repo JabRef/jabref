@@ -46,12 +46,12 @@ public class CitaviXmlImporter extends Importer implements Parser {
 
     @Override
     public String getName() {
-        return "Citavi XML";
+        return "Citavi";
     }
 
     @Override
     public StandardFileType getFileType() {
-        return StandardFileType.XML;
+        return StandardFileType.CIVTAVI;
     }
 
     @Override
