@@ -417,7 +417,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
         });
     }
 
-    public void writeMetadataToPdf() {
+    public void writeMetadataToPdf(Runnable preWrite, Runnable postWrite) {
         BackgroundTask<Void> writeTask = BackgroundTask.wrap(() -> {
             Optional<Path> file = linkedFile.findIn(databaseContext, preferences.getFilePreferences());
             if (file.isEmpty()) {
@@ -440,7 +440,9 @@ public class LinkedFileViewModel extends AbstractViewModel {
             }
             return null;
         });
-
+        writeTask
+                .onRunning(preWrite)
+                .onFinished(postWrite);
         taskExecutor.execute(writeTask);
     }
 

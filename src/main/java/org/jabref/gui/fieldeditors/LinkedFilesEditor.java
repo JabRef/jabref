@@ -3,6 +3,7 @@ package org.jabref.gui.fieldeditors;
 import java.util.List;
 import java.util.Optional;
 
+import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ObservableList;
@@ -181,8 +182,10 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
         Button writeMetadataToPdf = IconTheme.JabRefIcons.IMPORT.asButton();
         writeMetadataToPdf.setTooltip(new Tooltip(Localization.lang("Write BibTeXEntry metadata to PDF.")));
         writeMetadataToPdf.visibleProperty().bind(linkedFile.isOfflinePdfProperty());
-        writeMetadataToPdf.setOnAction(event -> linkedFile.writeMetadataToPdf());
         writeMetadataToPdf.getStyleClass().setAll("icon-button");
+        Runnable disableButtonBeforeWriteStarts = () -> Platform.runLater(() -> writeMetadataToPdf.setDisable(true));
+        Runnable enableButtonAfterWriteCompletes = () -> Platform.runLater(() -> writeMetadataToPdf.setDisable(false));
+        writeMetadataToPdf.setOnAction(event -> linkedFile.writeMetadataToPdf(disableButtonBeforeWriteStarts, enableButtonAfterWriteCompletes));
 
         Button parsePdfMetadata = IconTheme.JabRefIcons.FILE_SEARCH.asButton();
         parsePdfMetadata.setTooltip(new Tooltip(Localization.lang("Parse Metadata from PDF.")));
