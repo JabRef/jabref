@@ -127,20 +127,19 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
         ObservableList<LinkedFileViewModel> items = listView.itemsProperty().get();
 
         if (dragboard.hasContent(DragAndDropDataFormats.LINKED_FILE)) {
-
             LinkedFile linkedFile = (LinkedFile) dragboard.getContent(DragAndDropDataFormats.LINKED_FILE);
-            LinkedFileViewModel transferedItem = null;
+            LinkedFileViewModel transferredItem = null;
             int draggedIdx = 0;
             for (int i = 0; i < items.size(); i++) {
                 if (items.get(i).getFile().equals(linkedFile)) {
                     draggedIdx = i;
-                    transferedItem = items.get(i);
+                    transferredItem = items.get(i);
                     break;
                 }
             }
             int thisIdx = items.indexOf(originalItem);
             items.set(draggedIdx, originalItem);
-            items.set(thisIdx, transferedItem);
+            items.set(thisIdx, transferredItem);
             success = true;
         }
 

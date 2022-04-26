@@ -55,7 +55,6 @@ class DateTest {
     @MethodSource("provideInvalidCornerCaseArguments")
     public void nonExistentDates(String invalidDate, String errorMessage) {
         assertEquals(Optional.empty(), Date.parse(invalidDate), errorMessage);
-
     }
 
     private static Stream<Arguments> provideInvalidCornerCaseArguments() {

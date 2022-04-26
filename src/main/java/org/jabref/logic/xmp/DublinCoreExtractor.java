@@ -79,7 +79,6 @@ public class DublinCoreExtractor {
     private void extractDate() {
         List<String> dates = dcSchema.getUnqualifiedSequenceValueList("date");
         if ((dates != null) && !dates.isEmpty()) {
-
             String date = dates.get(0).trim();
             Date.parse(date)
                     .ifPresent(dateValue -> {

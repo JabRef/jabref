@@ -33,5 +33,4 @@ class UnicodeToLatexFormatterTest {
     void testFormat(String expectedResult, String input) {
         assertEquals(expectedResult, formatter.format(input));
     }
-
 }

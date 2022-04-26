@@ -57,7 +57,6 @@ public class EditAction extends SimpleCommand {
                     case DELETE_ENTRY -> textInput.deleteNextChar();
                     default -> throw new IllegalStateException("Only cut/copy/paste supported in TextInputControl but got " + action);
                 }
-
             } else if ((focusOwner instanceof CodeArea) || (focusOwner instanceof WebView)) {
                 return;
             } else {

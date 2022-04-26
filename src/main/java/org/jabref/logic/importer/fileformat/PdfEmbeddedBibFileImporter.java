@@ -163,5 +163,4 @@ public class PdfEmbeddedBibFileImporter extends Importer {
     public String getDescription() {
         return "PdfEmbeddedBibFileImporter imports an embedded Bib-File from the PDF.";
     }
-
 }

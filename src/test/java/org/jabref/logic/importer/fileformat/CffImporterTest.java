@@ -85,7 +85,6 @@ public class CffImporterTest {
         BibEntry expected = getPopulatedEntry();
 
         assertEquals(entry, expected);
-
     }
 
     @Test

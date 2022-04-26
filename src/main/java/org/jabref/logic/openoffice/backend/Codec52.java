@@ -105,7 +105,6 @@ class Codec52 {
      * @return Optional.empty() on failure.
      */
     public static Optional<ParsedMarkName> parseMarkName(String refMarkName) {
-
         Matcher citeMatcher = CITE_PATTERN.matcher(refMarkName);
         if (!citeMatcher.find()) {
             return Optional.empty();
