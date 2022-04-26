@@ -57,7 +57,6 @@ public class ActionHelper {
     }
 
     public static BooleanExpression isFilePresentForSelectedEntry(StateManager stateManager, PreferencesService preferencesService) {
-
         ObservableList<BibEntry> selectedEntries = stateManager.getSelectedEntries();
         Binding<Boolean> fileIsPresent = EasyBind.valueAt(selectedEntries, 0).map(entry -> {
             List<LinkedFile> files = entry.getFiles();
@@ -75,7 +74,6 @@ public class ActionHelper {
             } else {
                 return false;
             }
-
         }).orElse(false);
 
         return BooleanExpression.booleanExpression(fileIsPresent);
@@ -85,6 +83,7 @@ public class ActionHelper {
      * Check if at least one of the selected entries has linked files
      * <br>
      * Used in {@link org.jabref.gui.maintable.OpenExternalFileAction} when multiple entries selected
+     *
      * @param stateManager manager for the state of the GUI
      * @return a boolean binding
      */

@@ -30,7 +30,6 @@ public class TestArchitectureTests {
     private final List<String> exceptions;
 
     public TestArchitectureTests() {
-
         // Add exceptions for the architectural test here
         // Note that bending the architectural constraints should not be done inconsiderately
         exceptions = new ArrayList<>();

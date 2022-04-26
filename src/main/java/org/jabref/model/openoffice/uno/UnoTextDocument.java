@@ -24,7 +24,6 @@ public class UnoTextDocument {
      * @return True if we cannot reach the current document.
      */
     public static boolean isDocumentConnectionMissing(XTextDocument doc) {
-
         boolean missing = doc == null;
 
         // Attempt to check document is really available
@@ -55,7 +54,6 @@ public class UnoTextDocument {
      * @return The title or Optional.empty()
      */
     public static Optional<String> getFrameTitle(XTextDocument doc) {
-
         Optional<XFrame> frame = getCurrentController(doc).map(XController::getFrame);
         if (frame.isEmpty()) {
             return Optional.empty();

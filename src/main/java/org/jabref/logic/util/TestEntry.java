@@ -12,7 +12,6 @@ public class TestEntry {
     }
 
     public static BibEntry getTestEntry() {
-
         BibEntry entry = new BibEntry(StandardEntryType.Article);
         entry.setCitationKey("Smith2016");
         entry.setField(StandardField.AUTHOR, "Smith, Bill and Jones, Bob and Williams, Jeff");

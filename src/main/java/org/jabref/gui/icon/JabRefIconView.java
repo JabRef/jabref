@@ -29,7 +29,6 @@ public class JabRefIconView extends FontIcon {
     }
 
     public JabRefIconView(IconTheme.JabRefIcons icon) {
-
         super(icon.getIkon());
         Size size = new Size(1.0, SizeUnits.EM);
         this.glyph = new SimpleObjectProperty<>(icon);

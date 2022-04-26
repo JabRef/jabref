@@ -62,6 +62,7 @@ public abstract class Exporter {
 
     /**
      * Exports to all files linked to a given entry
+     *
      * @param databaseContext   the database to export from
      * @param filePreferences   the filePreferences to use for resolving paths
      * @param entryToWriteOn    the entry for which we want to write on all linked pdfs
@@ -90,6 +91,7 @@ public abstract class Exporter {
      * Behaviour in case the file is linked to different bib-entries depends on the implementation of {@link #export}.
      * If it overwrites any existing information, only the last found bib-entry will be exported (as the previous exports are overwritten).
      * If it extends existing information, all found bib-entries will be exported.
+     *
      * @param databaseContext   the database-context to export from
      * @param dataBase          the database to export from
      * @param filePreferences   the filePreferences to use for resolving paths

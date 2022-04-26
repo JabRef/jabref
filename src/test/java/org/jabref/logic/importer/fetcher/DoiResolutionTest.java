@@ -50,7 +50,7 @@ class DoiResolutionTest {
     @Test
     void citationMetaTagLeadsToFulltext() throws IOException {
         entry.setField(StandardField.DOI, "10.1007/978-3-319-89963-3_28");
-        assertEquals(Optional.of(new URL("https://link.springer.com/content/pdf/10.1007%2F978-3-319-89963-3_28.pdf")), finder.findFullText(entry));
+        assertEquals(Optional.of(new URL("https://link.springer.com/content/pdf/10.1007/978-3-319-89963-3_28.pdf")), finder.findFullText(entry));
     }
 
     @Test
@@ -65,7 +65,7 @@ class DoiResolutionTest {
         // even if the user does not have access
         // We cannot easily handle this case, because other publisher return the wrong media type.
         entry.setField(StandardField.DOI, "10.1007/978-3-319-62594-2_12");
-        assertEquals(Optional.of(new URL("https://link.springer.com/content/pdf/10.1007%2F978-3-319-62594-2_12.pdf")), finder.findFullText(entry));
+        assertEquals(Optional.of(new URL("https://link.springer.com/content/pdf/10.1007/978-3-319-62594-2_12.pdf")), finder.findFullText(entry));
     }
 
     @Test

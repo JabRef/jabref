@@ -164,5 +164,4 @@ public class SynchronizationTestSimulator {
         // In this case an BibEntry merge dialog pops up.
         assertNotNull(eventListenerB.getUpdateRefusedEvent());
     }
-
 }

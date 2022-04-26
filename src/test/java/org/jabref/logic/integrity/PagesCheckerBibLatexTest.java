@@ -111,5 +111,4 @@ class PagesCheckerBibLatexTest {
     void bibLaTexAcceptsMorePageNumbersWithRangeOfNumbers() {
         assertEquals(Optional.empty(), checker.checkValue("7+,41--43,73"));
     }
-
 }
