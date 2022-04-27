@@ -8,6 +8,8 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -168,23 +170,18 @@ public class CitaviXmlImporter extends Importer implements Parser {
         ZipInputStream zis = new ZipInputStream(new FileInputStream(filePath.toFile()));
         ZipEntry zipEntry = zis.getNextEntry();
 
+        Path newFile = Files.createTempFile("citavicontent", "xml");
+
         while (zipEntry != null) {
-            Path newFile = Files.createTempFile("citavicontent", "xml");
+            Files.copy(zis, newFile, StandardCopyOption.REPLACE_EXISTING);
 
+            zipEntry = zis.getNextEntry();
         }
-
-        // todo add unzip and transfer buffered reader logic
 
         zis.closeEntry();
 
-//        InputStream stream = Files.newInputStream(filePath, StandardOpenOption.READ);
-//
-//        if (FileUtil.isBibFile(filePath)) {
-//            return getReader(stream);
-//        }
-//
-//        return new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8));
+        InputStream stream = Files.newInputStream(newFile, StandardOpenOption.READ);
 
-        return null;
+        return new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8));
     }
 }
