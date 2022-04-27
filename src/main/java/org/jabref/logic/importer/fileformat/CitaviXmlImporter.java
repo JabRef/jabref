@@ -61,6 +61,12 @@ public class CitaviXmlImporter extends Importer implements Parser {
 
     @Override
     public boolean isRecognizedFormat(BufferedReader reader) throws IOException {
+        Objects.requireNonNull(reader);
+        return false;
+    }
+
+    @Override
+    public boolean isRecognizedFormat(Path filePath) throws IOException {
 //        String str;
 //        int i = 0;
 //        while (((str = reader.readLine()) != null) && (i < 50)) {
@@ -71,6 +77,8 @@ public class CitaviXmlImporter extends Importer implements Parser {
 //            i++;
 //        }
 //        return false;
+        BufferedReader reader = getReaderFromZip(filePath);
+
         // todo recognized logic
         return true;
     }
