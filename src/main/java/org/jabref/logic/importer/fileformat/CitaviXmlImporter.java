@@ -46,7 +46,7 @@ public class CitaviXmlImporter extends Importer implements Parser {
 
     @Override
     public StandardFileType getFileType() {
-        return StandardFileType.CIVTAVI;
+        return StandardFileType.CITAVI;
     }
 
     @Override
