@@ -118,7 +118,11 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
 
     @FXML
     private void initialize() {
-        viewModel = new ManageStudyDefinitionViewModel(study, workingDirectory, prefs.getImportFormatPreferences());
+        viewModel = new ManageStudyDefinitionViewModel(
+                study,
+                workingDirectory,
+                prefs.getImportFormatPreferences(),
+                prefs.getImporterPreferences());
 
         // Listen whether any databases are removed from selection -> Add back to the database selector
         studyTitle.textProperty().bindBidirectional(viewModel.titleProperty());

@@ -85,7 +85,9 @@ public class DownloadFullTextAction extends SimpleCommand {
                 Map<BibEntry, Optional<URL>> downloads = new ConcurrentHashMap<>();
                 int count = 0;
                 for (BibEntry entry : entries) {
-                    FulltextFetchers fetchers = new FulltextFetchers(preferences.getImportFormatPreferences());
+                    FulltextFetchers fetchers = new FulltextFetchers(
+                            preferences.getImportFormatPreferences(),
+                            preferences.getImporterPreferences());
                     downloads.put(entry, fetchers.findFullTextPDF(entry));
                     updateProgress(++count, entries.size());
                 }

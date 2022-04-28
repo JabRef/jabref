@@ -71,7 +71,7 @@ public class OpenLibraryFetcherTest extends AbstractIsbnFetcherTest {
     public void testIsbnNeitherAvailableOnEbookDeNorOrViaOpenLibrary() throws Exception {
         // In this test, the ISBN needs to be a valid (syntax+checksum) ISBN number
         // However, the ISBN number must not be assigned to a real book
-        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("978-8-8264-2303-6");
+        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("9785646216541");
         assertEquals(Optional.empty(), fetchedEntry);
     }
 }
