@@ -1,3 +1,7 @@
+---
+parent: Getting into the code
+nav_order: 1
+---
 # Set up a local workspace
 
 This guide explains how to set up your environment for development of JabRef. It includes information about prerequisites, configuring your IDE, and running JabRef locally to verify your setup.

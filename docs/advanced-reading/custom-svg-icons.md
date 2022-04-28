@@ -1,3 +1,7 @@
+---
+nav_order: 3
+parent: Advanced Reading
+---
 # Custom SVG icons
 
 JabRef uses [Material Design Icons](https://materialdesignicons.com) for most buttons on toolbars and panels. While most required icons are available, some specific ones cannot be found in the standard set, like Vim, Emacs, etc. Although custom icons might not fit the existing icons perfectly in style and level of detail, they will fit much better into JabRef than having a color pixel icon between all Material Design Icons.

@@ -1,3 +1,6 @@
+---
+nav_order: 6
+---
 # JabRef and Software Engineering Training
 
 By using JabRef as training object in exercises and labs, students can level-up their coding and project management skills. When taking part in JabRef development, one will learn modern Java coding practices, how code reviews work and how to properly address reviewing feedback.

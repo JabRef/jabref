@@ -1,20 +1,19 @@
-
-# Alternatives to `OOResult` during precondition checking in `OOBibBase`
+---
+parent: About OOError, OOResult, and OOVoidResult
+---
+# Alternatives to using OOResult and OOVoidResult in OOBibBase
 
 (Talk about ADRs prompted me to think about alternatives to what I used.)
 
 Situation:
 
-- some tests return no data, only report problems
-- we may need to get some resources that might not be available
-  (for example: connection to a document, a functional textview cursor)
-- some test depend on these resources
+* some tests return no data, only report problems
+* we may need to get some resources that might not be available (for example: connection to a document, a functional textview cursor)
+* some test depend on these resources
 
+One strategy could be to use a single try-catch around the whole body, then showing a message based on the type of exceptions thrown.
 
-One strategy could be to use a single try-catch around the whole body,
-then showing a message based on the type of exceptions thrown.
-
-## [base case]
+## \[base case]
 
 ```java
 try {
@@ -32,17 +31,12 @@ try {
 
 This our base case.
 
-It is not clear from the code, nor within the catch branches (unless
-we start looking into stack traces) which call (`f()`, `g(a)` or
-`realAction(a,b)`) resulted in the exception. This limits the
-specificity of the message and makes it hard to think about the "why"
-can we get this exception here?
+It is not clear from the code, nor within the catch branches (unless we start looking into stack traces) which call (`f()`, `g(a)` or `realAction(a,b)`) resulted in the exception. This limits the specificity of the message and makes it hard to think about the "why" can we get this exception here?
 
 ## Catch around each call?
 
-A more detailed strategy would be to try-catch around each call.  
-In case we need a result from the call, this means either increasingly indented
-code (try-in-try).
+A more detailed strategy would be to try-catch around each call.\
+In case we need a result from the call, this means either increasingly indented code (try-in-try).
 
 ```java
 try {
@@ -91,22 +85,18 @@ In either case, the code becomes littered with exception handling code.
 
 ## Catch in wrappers?
 
-We might push the try-catch into its own function.  
-If the wrapper is called multiple times, this may reduce duplication of the
-catch-and-assign-message part.
+We might push the try-catch into its own function.\
+If the wrapper is called multiple times, this may reduce duplication of the catch-and-assign-message part.
 
-We can show an error dialog here: `title` carries some information
-from the caller, the exeption caught brings some from below.
+We can show an error dialog here: `title` carries some information from the caller, the exeption caught brings some from below.
 
-We still need to notify the action handler (the caller) about
-failure. Since we have shown the dialog, we do not need to provide a
-message.
+We still need to notify the action handler (the caller) about failure. Since we have shown the dialog, we do not need to provide a message.
 
 ### Notify caller with `Optional` result
 
 With `Optional` we get something like this:
 
-#### [dialog in wrap, return Optional]
+#### \[dialog in wrap, return Optional]
 
 ```java
 Optional<A> wrap_f(String title) {
@@ -162,7 +152,7 @@ try {
 
 With `Result` we get something like this:
 
-#### [dialog in wrap, return OOResult]
+#### \[dialog in wrap, return OOResult]
 
 ```java
 OOResult<A, OOError> wrap_f() {
@@ -226,10 +216,9 @@ try {
 
 Or we can throw an exception to notify the caller.
 
-To simplify code in the caller, I assume we are using an exception
-type not used elsewhere, but shared by all precondition checks.
+To simplify code in the caller, I assume we are using an exception type not used elsewhere, but shared by all precondition checks.
 
-#### [dialog in wrap, PreconditionException]
+#### \[dialog in wrap, PreconditionException]
 
 ```java
 A wrap_f(String title) throws PreconditionException {
@@ -301,9 +290,9 @@ try {
 }
 ```
 
-or to reduce passing around the title part:  
+or to reduce passing around the title part:
 
-#### [PreconditionException, dialog in catch]
+#### \[PreconditionException, dialog in catch]
 
 ```java
 A wrap_f() throws PreconditionException {
@@ -355,13 +344,9 @@ try {
 }
 ```
 
-
 ## Push associating the message further down
 
-As [the developers guide](https://jabref.readthedocs.io/en/latest/getting-into-the-code/code-howtos/#throwing-and-catching-exceptions)
-suggest, we could "Catch and wrap all API exceptions" and rethrow them
-as a `JabRefException` or some exception derived from it. In this case the try-catch part goes even further down, and
-in principle we could just
+As [the developers guide](https://jabref.readthedocs.io/en/latest/getting-into-the-code/code-howtos/#throwing-and-catching-exceptions) suggest, we could "Catch and wrap all API exceptions" and rethrow them as a `JabRefException` or some exception derived from it. In this case the try-catch part goes even further down, and in principle we could just
 
 ```java
 try {
@@ -376,16 +361,11 @@ try {
 
 Constraints:
 
-- conversion to `JabRefException` cannot be done in `model` (since JabRefException is in `logic`)
-- `JabRefException` expects a localized message. Or we need to remember
-which `JabRefException` instances are localized and which need to be caught
-for localizing the message.
-- At the bottom we usually have very little information on higher level
-contexts: at a failure like `NoSuchProperty` we cannot tell which set
-of properties did we look in and why.  
-For messages originating too deeply, we might want to override or extend the message anyway.
-- for each exeption we might want to handle programmatically, we need a variant based
-on `JabRefException`
+* conversion to `JabRefException` cannot be done in `model` (since JabRefException is in `logic`)
+* `JabRefException` expects a localized message. Or we need to remember which `JabRefException` instances are localized and which need to be caught for localizing the message.
+* At the bottom we usually have very little information on higher level contexts: at a failure like `NoSuchProperty` we cannot tell which set of properties did we look in and why.\
+  For messages originating too deeply, we might want to override or extend the message anyway.
+* for each exeption we might want to handle programmatically, we need a variant based on `JabRefException`
 
 So we might end up:
 
@@ -409,44 +389,32 @@ try {
 
 which looks very similar to the original version.
 
-This again loses the information: can `GDerivedFromJabRefException`
-come from `realAction` or `f` or not? This is because we have pushed
-down the last catch/throw indefinitely (eliminating `wrap_f`) into a
-depth, where we cannot necessarily assign an appropriate message.
+This again loses the information: can `GDerivedFromJabRefException` come from `realAction` or `f` or not? This is because we have pushed down the last catch/throw indefinitely (eliminating `wrap_f`) into a depth, where we cannot necessarily assign an appropriate message.
 
-To a lesser extent this also happens in `wrap_f`: it only knows about
-the action that called it what we provide (`title` or nothing). It knows
-the precondition it checks: probably an optimal location to assign a message.
+To a lesser extent this also happens in `wrap_f`: it only knows about the action that called it what we provide (`title` or nothing). It knows the precondition it checks: probably an optimal location to assign a message.
 
-**Summary**: going from top to bottom, we move to increasingly more local context,
-our knowledge shifts towards the "in which part of the code did we have a problem"
-and away from the high level ("which action").
+**Summary**: going from top to bottom, we move to increasingly more local context, our knowledge shifts towards the "in which part of the code did we have a problem" and away from the high level ("which action").
 
-One natural point to meet information from these to levels
-is the top level of action handlers. For precondition checking code
-a wrapper around code elsewhere may be considered.
-Using such wrappers may reduce duplication if called in multiple actions.
+One natural point to meet information from these to levels is the top level of action handlers. For precondition checking code a wrapper around code elsewhere may be considered. Using such wrappers may reduce duplication if called in multiple actions.
 
-We still have to signal failure to the action handler: the options considered
-above were using an `Optional` and throwing an exception with the appropriate message.
+We still have to signal failure to the action handler: the options considered above were using an `Optional` and throwing an exception with the appropriate message.
 
 The more promising variants were
 
-- **[dialog in wrap, return Optional]**  
+* **\[dialog in wrap, return Optional]**\
   `Optional<A> wrap_f(String title)` (showDialog inside)
-  - pro: explicit return in caller
-  - con: explicit return in caller (boilerplate)
-  - con: passing in the title is repeated
-    - would be 'pro' if we wanted title to vary within an action
-
-- **[PreconditionException, dialog in catch]**  
-  `A wrap_f() throws PreconditionException`  
+  * pro: explicit return in caller
+  * con: explicit return in caller (boilerplate)
+  * con: passing in the title is repeated
+    * would be 'pro' if we wanted title to vary within an action
+* **\[PreconditionException, dialog in catch]**\
+  `A wrap_f() throws PreconditionException`\
   (with `showDialog` under `catch(PreconditionException ex)`)
-  - con: hidden control flow
-  - pro: no repeated `if(){return}` boilerplate
-  - pro: title used only once
+  * con: hidden control flow
+  * pro: no repeated `if(){return}` boilerplate
+  * pro: title used only once
 
-### [using OOResult]
+### \[using OOResult]
 
 ```java
 final String title = "Could not insert citation";
@@ -473,8 +441,7 @@ if (testDialog(title, cursor)) {
 ...
 ```
 
-
-### [using PreconditionException, dialog in catch]
+### \[using PreconditionException, dialog in catch]
 
 ```java
 final String title = "Could not insert citation";
@@ -494,12 +461,7 @@ try {
 
 I would suggest using the latter,
 
-- probably using `OOError` for `PreconditionException`
-  - In this case `OOError` being in `gui` becomes an asset: we can be sure
-    code in `logic` cannot throw it.
-- We lose the capability to collect mmessages in a single dialog (we
-  stop processing at the first problem).
-- The division between precondition checking (only throws
-  PreconditionException) and `realAction`becomes invisible in the
-  action code.
-
+* probably using `OOError` for `PreconditionException`
+  * In this case `OOError` being in `gui` becomes an asset: we can be sure code in `logic` cannot throw it.
+* We lose the capability to collect mmessages in a single dialog (we stop processing at the first problem).
+* The division between precondition checking (only throws PreconditionException) and `realAction`becomes invisible in the action code.

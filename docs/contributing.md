@@ -1,3 +1,6 @@
+---
+nav_order: 2
+---
 # Contributing
 
 After reading through this guide, check out some good first issues to contribute to by clicking here: [Good First Issues](https://github.com/JabRef/jabref/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22)
@@ -107,12 +110,13 @@ If you want to indicate that a pull request is not yet complete **before** creat
 
 ## How to improve the developer's documentation
 
-For improving developer's documentation, go on at the [docs/ subdirectory of JabRef's code](https://github.com/JabRef/jabref/tree/master/docs) and edit the file. GitHub offers a good guide at [Editing files in another user's repository](https://help.github.com/en/github/managing-files-in-a-repository/editing-files-in-another-users-repository).
+For improving developer's documentation, go on at the [docs/ subdirectory of JabRef's code](https://github.com/JabRef/jabref/tree/main/docs) and edit the file.
+GitHub offers a good guide at [Editing files in another user's repository](https://help.github.com/en/github/managing-files-in-a-repository/editing-files-in-another-users-repository).
 
-In case you use some gitbook special features, and you want to test them, checkout JabRef's code locally, and execute following steps:
+You can also host Jekyll locally.
 
-1. `npm install -g gitbook`
-2. `cd docs`
-3. `gitbook serve`
+    docker run --rm -it \
+      --volume="$pwd:/srv/jekyll" \
+      jekyll/builder:latest /bin/bash -c "gem install && bundle exec jekyll build && bundle exec rake search:init && jekyll serve"
 
-Then, you can see a near-to-reality rendering of the development documentation at [http://localhost:4000](http://localhost:4000).
+Then, you can see a near-to-reality rendering of the development documentation at <http://localhost:4000>.

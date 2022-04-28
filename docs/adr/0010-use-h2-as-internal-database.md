@@ -1,3 +1,7 @@
+---
+parent: Architectural Decisions
+nav_order: 10
+---
 # Use H2 as Internal SQL Database
 
 ## Context and Problem Statement
