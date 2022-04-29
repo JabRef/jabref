@@ -1,7 +1,7 @@
 repository: JabRef/jabref
 title: "Developer Documentation"
 remote_theme: just-the-docs/just-the-docs
-color_scheme: dark
+color_scheme: light
 
 # Hint by https://github.com/just-the-docs/just-the-docs/issues/374#issuecomment-680273258
 # Theme read from https://github.com/StylishThemes/Syntax-Themes/blob/master/pygments/css-github/
