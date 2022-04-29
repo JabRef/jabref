@@ -1,3 +1,7 @@
+---
+parent: Architectural Decisions
+nav_order: 19
+---
 # Implement special fields as separate fields
 
 ## Context and Problem Statement

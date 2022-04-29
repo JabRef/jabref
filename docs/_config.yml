@@ -1,0 +1,37 @@
+repository: JabRef/jabref
+title: "Developer Documentation"
+remote_theme: just-the-docs/just-the-docs
+color_scheme: dark
+
+# Hint by https://github.com/just-the-docs/just-the-docs/issues/374#issuecomment-680273258
+# Theme read from https://github.com/StylishThemes/Syntax-Themes/blob/master/pygments/css-github/
+# Browse alternative themes at https://stylishthemes.github.io/Syntax-Themes/pygments/
+highlight_theme: tomorrow-night
+
+search_enabled: true
+button: true
+aux_links:
+  "Gitter Chat":
+    - "https://gitter.im/JabRef/jabref"
+  "Discussion Forum":
+    - "https://discourse.jabref.org/"
+  "Code Repository":
+    - "https://github.com/jabref/jabref/"
+aux_links_new_tab: false
+last_edit_timestamp: false # show or hide edit time - page must have `last_modified_date` defined in the frontmatter
+last_edit_time_format: "%b %e %Y at %I:%M %p" # uses ruby's time format: https://ruby-doc.org/stdlib-2.7.0/libdoc/time/rdoc/Time.html
+gh_edit_link: true
+gh_edit_link_text: "Edit this page on GitHub."
+gh_edit_repository: "https://github.com/jabref/jabref"
+gh_edit_branch: "main"
+gh_edit_source: "docs"
+gh_edit_view_mode: "edit"
+
+# ga_tracking: UA-5555555-55
+# ga_tracking_anonymize_ip: true
+
+baseurl: ""
+url: ""
+
+plugins:
+  - jekyll-remote-theme

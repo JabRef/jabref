@@ -1,3 +1,7 @@
+---
+parent: Getting into the code
+nav_order: 4
+---
 # Code Howtos
 
 This page provides some development support in the form of howtos. See also [High Level Documentation](high-level-documentation.md).

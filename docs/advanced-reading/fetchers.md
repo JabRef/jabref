@@ -1,3 +1,7 @@
+---
+nav_order: 7
+parent: Advanced Reading
+---
 # Working on fetchers
 
 Fetchers are the implementation of the [search using online services](https://docs.jabref.org/collect/import-using-online-bibliographic-database). Some fetchers require API keys to get them working. To get the fetchers running in a JabRef development setup, the keys need to be placed in the respective environment variable. The following table lists the respective fetchers, where to get the key from and the environment variable where the key has to be placed.

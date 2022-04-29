@@ -1,3 +1,7 @@
+---
+parent: Architectural Decisions
+nav_order: 100
+---
 # MADR Template
 
 The template of [MADR](https://adr.github.io/madr/) is available at <https://github.com/adr/madr#the-template>.

@@ -1,3 +1,7 @@
+---
+parent: Architectural Decisions
+nav_order: 3
+---
 # Use Gradle as build tool
 
 ## Context and Problem Statement
