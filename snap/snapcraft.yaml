@@ -6,7 +6,7 @@ summary: Bibliography manager
 description: |
   JabRef is an open source bibliography reference manager.
   The native file format used by JabRef is BibTeX, the standard LaTeX bibliography format.
-  To access files in external media (i.e. usb drives) you must run:
+  To access files in external media (i.e., USB drives) you must run:
   `snap connect jabref:removable-media`
 grade: stable
 confinement: strict
@@ -57,7 +57,7 @@ environment:
 parts:
   jabref:
     plugin: dump
-    source: https://builds.jabref.org/main/JabRef-5.6-portable_linux.tar.gz
+    source: https://builds.jabref.org/main/JabRef-5.7-portable_linux.tar.gz
     stage-packages:
       - x11-utils
     override-build: |

@@ -1,3 +1,7 @@
+---
+parent: Architectural Decisions
+nav_order: 15
+---
 # Query syntax design
 
 ## Context and Problem Statement

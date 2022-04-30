@@ -7,10 +7,13 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
 
+import javafx.collections.FXCollections;
+
 import org.jabref.logic.bibtex.FieldContentFormatterPreferences;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportCleanup;
 import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
@@ -90,6 +93,8 @@ public class CompositeSearchBasedFetcherTest {
      */
     static Stream<Arguments> performSearchParameters() {
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class);
+        ImporterPreferences importerPreferences = mock(ImporterPreferences.class);
+        when(importerPreferences.getApiKeys()).thenReturn(FXCollections.emptyObservableSet());
         when(importFormatPreferences.getFieldContentFormatterPreferences())
                 .thenReturn(mock(FieldContentFormatterPreferences.class));
         List<Set<SearchBasedFetcher>> fetcherParameters = new ArrayList<>();
@@ -98,16 +103,16 @@ public class CompositeSearchBasedFetcherTest {
                 new ArXiv(importFormatPreferences),
                 new INSPIREFetcher(importFormatPreferences),
                 new GvkFetcher(),
-                new AstrophysicsDataSystem(importFormatPreferences),
+                new AstrophysicsDataSystem(importFormatPreferences, importerPreferences),
                 new MathSciNet(importFormatPreferences),
                 new ZbMATH(importFormatPreferences),
                 new GoogleScholar(importFormatPreferences),
                 new DBLPFetcher(importFormatPreferences),
-                new SpringerFetcher(),
+                new SpringerFetcher(importerPreferences),
                 new CrossRef(),
                 new CiteSeer(),
                 new DOAJFetcher(importFormatPreferences),
-                new IEEE(importFormatPreferences));
+                new IEEE(importFormatPreferences, importerPreferences));
 
         /* Disabled due to an issue regarding comparison: Title fields of the entries that otherwise are equivalent differ
          * due to different JAXBElements.

@@ -1,3 +1,7 @@
+---
+parent: Architectural Decisions
+nav_order: 7
+---
 # Provide a human-readable changelog
 
 ## Context and Problem Statement
