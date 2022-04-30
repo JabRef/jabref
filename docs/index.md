@@ -4,14 +4,13 @@ nav_order: 1
 # Overview on Developing JabRef
 
 This page presents all development information around JabRef.
+In case you are a end user, please head to the [user documentation](https://docs.jabref.org) or to the [general homepage](https://www.jabref.org) of JabRef.
 
-## Starting point for newcomers
+## Starting point for new developers
 
-Go to [Setting up a local workspace](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace)
-
-## User documentation
-
-For users documentation, please head to [https://docs.jabref.org](https://docs.jabref.org).
+On the page [Setting up a local workspace](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace), we wrote about the initial steps to get your IDE running.
+We strongly recommend to continue reading there.
+After you successfully clonded and build JabRef, you are invited to continue reading here.
 
 ## How tos
 
@@ -55,5 +54,3 @@ For new ADRs, please use [template.md](https://github.com/JabRef/jabref/tree/3b3
     Also filed as IntelliJ issue [IDEA-240250](https://youtrack.jetbrains.com/issue/IDEA-240250).
 *   Q: I get `Execution failed for task ':buildSrc:jar'. Entry org/jabref/build/JournalAbbreviationConverter$_convert_closure1$_closure2.class is a duplicate but no duplicate handling strategy has been set. Please refer to https://docs.gradle.org/7.4.2/dsl/org.gradle.api.tasks.Copy.html#org.gradle.api.tasks.Copy:duplicatesStrategy for details.` What can I do?\
     A: You have to delete directory `buildSrc/build`.
-
-    >
