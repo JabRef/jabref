@@ -6,7 +6,7 @@ color_scheme: light
 # Hint by https://github.com/just-the-docs/just-the-docs/issues/374#issuecomment-680273258
 # Theme read from https://github.com/StylishThemes/Syntax-Themes/blob/master/pygments/css-github/
 # Browse alternative themes at https://stylishthemes.github.io/Syntax-Themes/pygments/
-highlight_theme: tomorrow-night
+highlight_theme: jellybeans
 
 search_enabled: true
 button: true
