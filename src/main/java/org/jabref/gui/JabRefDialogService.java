@@ -332,13 +332,10 @@ public class JabRefDialogService implements DialogService {
     @Override
     public void notify(String message) {
         LOGGER.info(message);
-        Notifications thresholdNotification = Notifications.create()
-                                                           .text("Too much happening.. Hang on..")
-                                                           .hideAfter(TOAST_MESSAGE_DISPLAY_TIME);
+
         Notifications.create()
                 .text(message)
                 .position(Pos.BOTTOM_CENTER)
-                .threshold(5, thresholdNotification)
                 .hideAfter(TOAST_MESSAGE_DISPLAY_TIME)
                 .hideCloseButton()
                 .show();
