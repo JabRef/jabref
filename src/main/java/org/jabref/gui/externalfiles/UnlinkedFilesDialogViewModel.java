@@ -55,6 +55,7 @@ public class UnlinkedFilesDialogViewModel {
     private final ImportHandler importHandler;
     private final StringProperty directoryPath = new SimpleStringProperty("");
     private final ObjectProperty<FileExtensionViewModel> selectedExtension = new SimpleObjectProperty<>();
+    private final ObjectProperty<FileIgnoreUnlinkedFiles> selectedFileIgnore = new SimpleObjectProperty<>();
     private final ObjectProperty<DateRange> selectedDate = new SimpleObjectProperty<>();
     private final ObjectProperty<ExternalFileSorter> selectedSort = new SimpleObjectProperty<>();
 
@@ -69,6 +70,7 @@ public class UnlinkedFilesDialogViewModel {
     private final ObservableList<FileExtensionViewModel> fileFilterList;
     private final ObservableList<DateRange> dateFilterList;
     private final ObservableList<ExternalFileSorter> fileSortList;
+    private final ObservableList<FileIgnoreUnlinkedFiles> unlinkedFileFilter;
 
     private final DialogService dialogService;
     private final PreferencesService preferences;
@@ -104,6 +106,10 @@ public class UnlinkedFilesDialogViewModel {
                 new FileExtensionViewModel(StandardFileType.ANY_FILE, externalFileTypes),
                 new FileExtensionViewModel(StandardFileType.BIBTEX_DB, externalFileTypes),
                 new FileExtensionViewModel(StandardFileType.PDF, externalFileTypes));
+
+        this.unlinkedFileFilter = FXCollections.observableArrayList(
+                new FileIgnoreUnlinkedFiles(StandardFileType.DEF),
+                new FileIgnoreUnlinkedFiles(StandardFileType.IUF));
 
         this.dateFilterList = FXCollections.observableArrayList(DateRange.values());
 
@@ -205,6 +211,10 @@ public class UnlinkedFilesDialogViewModel {
         return this.fileFilterList;
     }
 
+    public ObservableList<FileIgnoreUnlinkedFiles> unlinkedFileFilter() {
+        return this.unlinkedFileFilter;
+    }
+
     public ObservableList<DateRange> getDateFilters() {
         return this.dateFilterList;
     }
@@ -264,6 +274,10 @@ public class UnlinkedFilesDialogViewModel {
 
     public ObjectProperty<ExternalFileSorter> selectedSortProperty() {
         return this.selectedSort;
+    }
+
+    public ObjectProperty<FileIgnoreUnlinkedFiles> selectedFileIgnoreProperty() {
+        return this.selectedFileIgnore;
     }
 
     public StringProperty directoryPathProperty() {

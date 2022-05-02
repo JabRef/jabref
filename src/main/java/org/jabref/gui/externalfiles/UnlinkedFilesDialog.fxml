@@ -52,12 +52,14 @@
 
                 <Label text="%File type" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
                 <ComboBox fx:id="fileTypeCombo" maxWidth="Infinity" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
-                <Label text="%Last edited:" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
-                <ComboBox fx:id="fileDateCombo" maxWidth="Infinity" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
-                <Label text="%Sort by:" GridPane.columnIndex="0" GridPane.rowIndex="3"/>
-                <ComboBox fx:id="fileSortCombo" maxWidth="Infinity" GridPane.columnIndex="1" GridPane.rowIndex="3"/>
+                <Label text="%Ignore Unlinked Files" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
+                <ComboBox fx:id="unlinkedFileCombo" maxWidth="Infinity" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+                <Label text="%Last edited:" GridPane.columnIndex="0" GridPane.rowIndex="3"/>
+                <ComboBox fx:id="fileDateCombo" maxWidth="Infinity" GridPane.columnIndex="1" GridPane.rowIndex="3"/>
+                <Label text="%Sort by:" GridPane.columnIndex="0" GridPane.rowIndex="4"/>
+                <ComboBox fx:id="fileSortCombo" maxWidth="Infinity" GridPane.columnIndex="1" GridPane.rowIndex="4"/>
                 <Button fx:id="scanButton" onAction="#scanFiles" text="%Search"
-                        GridPane.columnIndex="2" GridPane.rowIndex="3">
+                        GridPane.columnIndex="2" GridPane.rowIndex="4">
                     <tooltip>
                         <Tooltip text="%Searches the selected directory for unlinked files."/>
                     </tooltip>
