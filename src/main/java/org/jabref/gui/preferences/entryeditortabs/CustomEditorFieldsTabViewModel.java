@@ -8,6 +8,7 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.entryeditor.EntryEditorPreferences;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.l10n.Localization;
@@ -21,15 +22,17 @@ public class CustomEditorFieldsTabViewModel implements PreferenceTabViewModel {
 
     private final DialogService dialogService;
     private final PreferencesService preferences;
+    private final EntryEditorPreferences entryEditorPreferences;
 
     public CustomEditorFieldsTabViewModel(DialogService dialogService, PreferencesService preferences) {
         this.dialogService = dialogService;
         this.preferences = preferences;
+        this.entryEditorPreferences = preferences.getEntryEditorPreferences();
     }
 
     @Override
     public void setValues() {
-        setFields(preferences.getEntryEditorTabList());
+        setFields(entryEditorPreferences.getEntryEditorTabList());
     }
 
     public void resetToDefaults() {
@@ -79,7 +82,7 @@ public class CustomEditorFieldsTabViewModel implements PreferenceTabViewModel {
             customTabsMap.put(parts[0], FieldFactory.parseFieldList(parts[1]));
         }
 
-        preferences.storeEntryEditorTabList(customTabsMap);
+        entryEditorPreferences.setEntryEditorTabList(customTabsMap);
     }
 
     public StringProperty fieldsProperty() {

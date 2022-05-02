@@ -2,7 +2,7 @@
 <style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" delimiter-precedes-et-al="never" delimiter-precedes-last="never" page-range-format="expanded" demote-non-dropping-particle="never" default-locale="fr-FR">
   <!-- This style was edited with the Visual CSL Editor (https://editor.citationstyles.org/visualEditor/) -->
   <info>
-    <title>ArchéoSciences (Français)</title>
+    <title>ArcheoSciences (Français)</title>
     <id>http://www.zotero.org/styles/archeosciences</id>
     <link href="http://www.zotero.org/styles/archeosciences" rel="self"/>
     <link href="http://www.zotero.org/styles/archeologie-medievale" rel="template"/>
@@ -16,8 +16,8 @@
     <category field="science"/>
     <issn>1960-1360</issn>
     <eissn>2104-3728</eissn>
-    <summary>Style pour ArchéoSciences, revue d'Archéométrie.</summary>
-    <updated>2020-04-09T17:01:16+00:00</updated>
+    <summary>Style pour ArcheoSciences, revue d'Archéométrie.</summary>
+    <updated>2021-06-14T14:16:12+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="fr">
@@ -118,7 +118,7 @@
     </choose>
   </macro>
   <macro name="DOI">
-    <text variable="DOI" prefix="DOI : "/>
+    <text variable="DOI" prefix="DOI&#160;: "/>
   </macro>
   <macro name="collection">
     <group delimiter=" " suffix=".">
@@ -159,11 +159,13 @@
         <text macro="title"/>
         <choose>
           <if type="article-journal article-magazine article-newspaper" match="any">
-            <group>
-              <text variable="container-title" font-style="italic" suffix=", "/>
-              <text variable="volume" suffix=", "/>
-              <text variable="issue" suffix=" "/>
-              <text macro="pages" prefix=": "/>
+            <group delimiter="&#160;: ">
+              <group delimiter=", ">
+                <text variable="container-title" font-style="italic"/>
+                <text variable="volume"/>
+                <text variable="issue"/>
+              </group>
+              <text macro="pages"/>
             </group>
           </if>
           <else-if type="book" match="any">
@@ -195,7 +197,7 @@
             <text variable="version" prefix="Version "/>
             <text macro="collection"/>
             <text macro="publisher"/>
-            <text variable="URL" prefix="URL : "/>
+            <text variable="URL" prefix="URL&#160;: "/>
           </else-if>
           <else-if type="webpage">
             <text macro="URL"/>

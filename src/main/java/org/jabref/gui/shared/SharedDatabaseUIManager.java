@@ -48,7 +48,6 @@ public class SharedDatabaseUIManager {
 
     @Subscribe
     public void listen(ConnectionLostEvent connectionLostEvent) {
-
         ButtonType reconnect = new ButtonType(Localization.lang("Reconnect"), ButtonData.YES);
         ButtonType workOffline = new ButtonType(Localization.lang("Work offline"), ButtonData.NO);
         ButtonType closeLibrary = new ButtonType(Localization.lang("Close library"), ButtonData.CANCEL_CLOSE);
@@ -76,7 +75,6 @@ public class SharedDatabaseUIManager {
 
     @Subscribe
     public void listen(UpdateRefusedEvent updateRefusedEvent) {
-
         jabRefFrame.getDialogService().notify(Localization.lang("Update refused."));
 
         BibEntry localBibEntry = updateRefusedEvent.getLocalBibEntry();
@@ -121,7 +119,6 @@ public class SharedDatabaseUIManager {
         libraryTab.getUndoManager().addEdit(new UndoableRemoveEntries(libraryTab.getDatabase(), event.getBibEntries()));
 
         if (Objects.nonNull(entryEditor) && (event.getBibEntries().contains(entryEditor.getEntry()))) {
-
             dialogService.showInformationDialogAndWait(Localization.lang("Shared entry is no longer present"),
                     Localization.lang("The entry you currently work on has been deleted on the shared side.")
                             + "\n"
@@ -140,7 +137,7 @@ public class SharedDatabaseUIManager {
             throws SQLException, DatabaseNotSupportedException, InvalidDBMSConnectionPropertiesException {
 
         BibDatabaseContext bibDatabaseContext = new BibDatabaseContext();
-        bibDatabaseContext.setMode(Globals.prefs.getDefaultBibDatabaseMode());
+        bibDatabaseContext.setMode(Globals.prefs.getGeneralPreferences().getDefaultBibDatabaseMode());
         DBMSSynchronizer synchronizer = new DBMSSynchronizer(bibDatabaseContext, Globals.prefs.getKeywordDelimiter(), Globals.prefs.getGlobalCitationKeyPattern(), Globals.getFileUpdateMonitor());
         bibDatabaseContext.convertToSharedDatabase(synchronizer);
 
@@ -165,7 +162,7 @@ public class SharedDatabaseUIManager {
         DBMSConnectionProperties dbmsConnectionProperties = new DBMSConnectionProperties(new SharedDatabasePreferences(sharedDatabaseID));
 
         BibDatabaseContext bibDatabaseContext = new BibDatabaseContext();
-        bibDatabaseContext.setMode(Globals.prefs.getDefaultBibDatabaseMode());
+        bibDatabaseContext.setMode(Globals.prefs.getGeneralPreferences().getDefaultBibDatabaseMode());
         DBMSSynchronizer synchronizer = new DBMSSynchronizer(bibDatabaseContext, Globals.prefs.getKeywordDelimiter(), Globals.prefs.getGlobalCitationKeyPattern(), Globals.getFileUpdateMonitor());
         bibDatabaseContext.convertToSharedDatabase(synchronizer);
 

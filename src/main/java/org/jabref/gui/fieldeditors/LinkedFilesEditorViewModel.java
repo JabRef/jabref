@@ -106,8 +106,7 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
                 databaseContext,
                 taskExecutor,
                 dialogService,
-                preferences.getXmpPreferences(),
-                preferences.getFilePreferences(),
+                preferences,
                 externalFileTypes);
     }
 
@@ -123,8 +122,7 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
                                       databaseContext,
                                       taskExecutor,
                                       dialogService,
-                                      preferences.getXmpPreferences(),
-                                      preferences.getFilePreferences(),
+                                      preferences,
                                       externalFileTypes))
                               .collect(Collectors.toList());
     }
@@ -139,14 +137,14 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
 
     public void addNewFile() {
         Path workingDirectory = databaseContext.getFirstExistingFileDir(preferences.getFilePreferences())
-                                               .orElse(preferences.getWorkingDir());
+                                               .orElse(preferences.getFilePreferences().getWorkingDirectory());
 
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                 .withInitialDirectory(workingDirectory)
                 .build();
 
         List<Path> fileDirectories = databaseContext.getFileDirectories(preferences.getFilePreferences());
-        dialogService.showFileOpenDialog(fileDialogConfiguration).ifPresent(newFile -> {
+        dialogService.showFileOpenDialogAndGetMultipleFiles(fileDialogConfiguration).forEach(newFile -> {
             LinkedFile newLinkedFile = fromFile(newFile, fileDirectories, externalFileTypes);
             files.add(new LinkedFileViewModel(
                     newLinkedFile,
@@ -154,8 +152,7 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
                     databaseContext,
                     taskExecutor,
                     dialogService,
-                    preferences.getXmpPreferences(),
-                    preferences.getFilePreferences(),
+                    preferences,
                     externalFileTypes));
         });
     }
@@ -192,8 +189,7 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
                         databaseContext,
                         taskExecutor,
                         dialogService,
-                        preferences.getXmpPreferences(),
-                        preferences.getFilePreferences(),
+                        preferences,
                         externalFileTypes);
                 newLinkedFile.markAsAutomaticallyFound();
                 result.add(newLinkedFile);
@@ -206,7 +202,9 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
     }
 
     public void fetchFulltext() {
-        FulltextFetchers fetcher = new FulltextFetchers(preferences.getImportFormatPreferences());
+        FulltextFetchers fetcher = new FulltextFetchers(
+                preferences.getImportFormatPreferences(),
+                preferences.getImporterPreferences());
         BackgroundTask
                 .wrap(() -> fetcher.findFullTextPDF(entry))
                 .onRunning(() -> fulltextLookupInProgress.setValue(true))
@@ -243,8 +241,7 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
                 databaseContext,
                 taskExecutor,
                 dialogService,
-                preferences.getXmpPreferences(),
-                preferences.getFilePreferences(),
+                preferences,
                 externalFileTypes);
         files.add(onlineFile);
         onlineFile.download();

@@ -14,7 +14,8 @@
     <category citation-format="note"/>
     <category field="theology"/>
     <category field="humanities"/>
-    <updated>2017-07-16T01:54:37+00:00</updated>
+    <summary>Version 4-3</summary>
+    <updated>2021-04-07T09:00:19+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="fr">
@@ -23,7 +24,7 @@
       <term name="cited">op. cit.</term>
       <term name="page" form="short">
         <single>p.</single>
-        <multiple>pp.</multiple>
+        <multiple>p.</multiple>
       </term>
       <term name="editor" form="short">
         <single>éd.</single>
@@ -35,8 +36,8 @@
   <macro name="author">
     <choose>
       <if variable="author">
-        <names variable="author" font-variant="normal" suffix=", ">
-          <name font-style="normal" delimiter-precedes-et-al="always" delimiter-precedes-last="always" et-al-min="4" et-al-use-first="3" et-al-subsequent-min="3" et-al-subsequent-use-first="1" initialize="false" sort-separator=" ">
+        <names variable="author" suffix=", ">
+          <name delimiter-precedes-et-al="always" delimiter-precedes-last="always" et-al-min="4" et-al-use-first="3" et-al-subsequent-min="3" et-al-subsequent-use-first="1" initialize="false" sort-separator=" ">
             <name-part name="family" text-case="sentence" font-variant="small-caps"/>
           </name>
           <et-al font-style="italic"/>
@@ -44,7 +45,7 @@
       </if>
       <else-if variable="editor">
         <names variable="editor" suffix=", ">
-          <name font-style="normal" delimiter-precedes-last="never" et-al-min="4" et-al-use-first="3" et-al-subsequent-min="3" et-al-subsequent-use-first="1" sort-separator=" ">
+          <name delimiter-precedes-last="never" et-al-min="4" et-al-use-first="3" et-al-subsequent-min="3" et-al-subsequent-use-first="1" sort-separator=" ">
             <name-part name="family" font-variant="small-caps"/>
           </name>
           <label form="short" prefix="&#160;(" suffix=".)"/>
@@ -133,7 +134,6 @@
             </else>
           </choose>
           <text variable="container-title" font-style="italic"/>
-          <text macro="number"/>
         </group>
       </else-if>
       <else-if type="manuscript" match="any">
@@ -336,8 +336,8 @@
       <if type="motion_picture map entry-dictionary entry-encyclopedia book speech paper-conference chapter" match="any">
         <group prefix=", ">
           <group delimiter="">
-            <text variable="collection-title"/>
-            <text variable="collection-number" prefix="&#160;n°&#160;"/>
+            <text variable="collection-title" quotes="true" prefix="coll.&#160;"/>
+            <text variable="collection-number" prefix="&#160;n°"/>
           </group>
         </group>
       </if>
@@ -451,16 +451,6 @@
       </else>
     </choose>
   </macro>
-  <macro name="number">
-    <choose>
-      <if is-numeric="number">
-        <text variable="number" prefix="n°&#160;"/>
-      </if>
-      <else>
-        <text variable="number"/>
-      </else>
-    </choose>
-  </macro>
   <macro name="issue">
     <choose>
       <if is-numeric="issue">
@@ -486,8 +476,8 @@
       <text variable="URL" text-decoration="none" prefix=", disponible sur&#160;&lt;" suffix="&gt;"/>
     </group>
     <group delimiter=" " font-style="normal">
-      <text value="(consulté le" prefix=", "/>
-      <date form="text" variable="accessed" suffix=")">
+      <text value="consulté le" prefix=", ["/>
+      <date form="text" variable="accessed" suffix="]">
         <date-part name="day"/>
         <date-part name="month"/>
         <date-part name="year"/>
@@ -505,8 +495,8 @@
     <label plural="never" suffix=" " variable="page" form="short"/>
     <text variable="locator" form="short"/>
   </macro>
-  <citation et-al-min="4" et-al-use-first="3" et-al-subsequent-min="3" et-al-subsequent-use-first="1">
-    <layout suffix="." delimiter="&#160;; ">
+  <citation et-al-min="4" et-al-use-first="1">
+    <layout delimiter="&#160;; " suffix=".">
       <choose>
         <if position="ibid-with-locator">
           <group delimiter=", ">
@@ -522,13 +512,18 @@
           <group delimiter=", ">
             <choose>
               <if type="book graphic report" match="any">
-                <text macro="title" font-style="normal"/>
+                <text macro="title"/>
+                <text term="cited" font-style="italic" suffix="."/>
               </if>
+              <else-if type="article-journal article-newspaper article-magazine" match="any">
+                <text variable="title" text-case="capitalize-first" form="short" quotes="true"/>
+                <text value="art. cit."/>
+              </else-if>
               <else>
-                <text macro="title" text-case="capitalize-first" quotes="false" font-style="normal"/>
+                <text macro="title" text-case="capitalize-first"/>
+                <text term="cited" font-style="italic" suffix="."/>
               </else>
             </choose>
-            <text term="cited" font-style="italic" suffix="."/>
             <group delimiter="&#160;">
               <text macro="pages-citation"/>
             </group>

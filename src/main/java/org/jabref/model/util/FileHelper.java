@@ -17,6 +17,7 @@ import org.jabref.preferences.FilePreferences;
 import org.apache.tika.config.TikaConfig;
 import org.apache.tika.detect.Detector;
 import org.apache.tika.metadata.Metadata;
+import org.apache.tika.metadata.TikaCoreProperties;
 import org.apache.tika.mime.MediaType;
 import org.apache.tika.mime.MimeType;
 import org.apache.tika.mime.MimeTypeException;
@@ -42,7 +43,7 @@ public class FileHelper {
      */
     public static Optional<String> getFileExtension(String fileName) {
         Metadata metadata = new Metadata();
-        metadata.add(Metadata.RESOURCE_NAME_KEY, fileName);
+        metadata.add(TikaCoreProperties.RESOURCE_NAME_KEY, fileName);
 
         if (isUrl(fileName)) {
             try (InputStream is = new URL(fileName).openStream()) {

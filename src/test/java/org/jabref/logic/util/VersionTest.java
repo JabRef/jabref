@@ -1,13 +1,18 @@
 package org.jabref.logic.util;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+
+import org.jabref.support.DisabledOnCIServer;
+import org.jabref.testutils.category.FetcherTest;
 
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class VersionTest {
@@ -189,6 +194,20 @@ public class VersionTest {
     }
 
     @Test
+    public void versionNewerDevelopmentNumber() {
+        Version older = Version.parse("4.2-beta1");
+        Version newer = Version.parse("4.2-beta2");
+        assertFalse(older.isNewerThan(newer));
+    }
+
+    @Test
+    public void versionNotNewerThanSameVersionWithBeta() {
+        Version version1 = Version.parse("4.2-beta2");
+        Version version2 = Version.parse("4.2-beta2");
+        assertFalse(version2.isNewerThan(version1));
+    }
+
+    @Test
     public void equalVersionsNotNewer() {
         Version version1 = Version.parse("4.2.2");
         Version version2 = Version.parse("4.2.2");
@@ -198,13 +217,25 @@ public class VersionTest {
     @Test
     public void changelogOfDevelopmentVersionWithDash() {
         Version version = Version.parse("4.0-dev");
-        assertEquals("https://github.com/JabRef/jabref/blob/master/CHANGELOG.md#unreleased", version.getChangelogUrl());
+        assertEquals("https://github.com/JabRef/jabref/blob/main/CHANGELOG.md#unreleased", version.getChangelogUrl());
     }
 
     @Test
     public void changelogOfDevelopmentVersionWithoutDash() {
         Version version = Version.parse("3.7dev");
-        assertEquals("https://github.com/JabRef/jabref/blob/master/CHANGELOG.md#unreleased", version.getChangelogUrl());
+        assertEquals("https://github.com/JabRef/jabref/blob/main/CHANGELOG.md#unreleased", version.getChangelogUrl());
+    }
+
+    @Test
+    public void changelogOfDevelopmentStageSubNumber() {
+        Version version1 = Version.parse("4.0");
+        Version version2 = Version.parse("4.0-beta");
+        Version version3 = Version.parse("4.0-beta2");
+        Version version4 = Version.parse("4.0-beta3");
+        assertEquals("https://github.com/JabRef/jabref/blob/v4.0/CHANGELOG.md", version1.getChangelogUrl());
+        assertEquals("https://github.com/JabRef/jabref/blob/v4.0-beta/CHANGELOG.md", version2.getChangelogUrl());
+        assertEquals("https://github.com/JabRef/jabref/blob/v4.0-beta2/CHANGELOG.md", version3.getChangelogUrl());
+        assertEquals("https://github.com/JabRef/jabref/blob/v4.0-beta3/CHANGELOG.md", version4.getChangelogUrl());
     }
 
     @Test
@@ -293,5 +324,12 @@ public class VersionTest {
     public void ciSuffixShouldBeRemovedIfDateIsPresent() {
         Version v50ci = Version.parse("5.0-ci.1--2020-03-06--289142f");
         assertEquals("5.0--2020-03-06--289142f", v50ci.getFullVersion());
+    }
+
+    @Test
+    @FetcherTest
+    @DisabledOnCIServer("GitHub puts a low rate limit on unauthenticated calls")
+    public void getAllAvailableVersionsReturnsSomething() throws Exception {
+        assertNotEquals(Collections.emptyList(), Version.getAllAvailableVersions());
     }
 }

@@ -272,6 +272,10 @@
     -fx-fill: -fx-text-base-color;
 }
 
+.ikonli-font-icon {
+    -fx-icon-color: -fx-text-base-color;
+}
+
 .tooltip {
     -fx-background-color: -jr-tooltip-bg;
     -fx-opacity: 95%;
@@ -283,15 +287,15 @@
     -fx-font-size: 1em;
 }
 
-.tooltip > TextFlow > .tooltip-text-bold {
+TextFlow > .tooltip-text-bold {
     -fx-font-weight: bold;
 }
 
-.tooltip > TextFlow > .tooltip-text-italic {
+TextFlow > .tooltip-text-italic {
     -fx-font-style: italic;
 }
 
-.tooltip > TextFlow > .tooltip-text-monospaced {
+TextFlow > .tooltip-text-monospaced {
     -fx-font-family: monospace;
 }
 
@@ -859,10 +863,12 @@
     -fx-padding: 0.3em 0.9em 0.3em 0.9em;
 }
 
-.sidePaneComponentHeader .glyph-icon {
+.sidePaneComponentHeader .glyph-icon,
+.sidePaneComponentHeader .ikonli-font-icon {
     -fx-fill: -jr-sidepane-header-color;
     -fx-text-fill: -jr-sidepane-header-color;
     -fx-font-size: 16px;
+    -fx-icon-color: -jr-theme-text;
 }
 
 .mainMenu {
@@ -938,10 +944,12 @@
     -fx-border-width: 0;
 }
 
-.mainToolbar .glyph-icon {
+.mainToolbar .glyph-icon,
+.mainToolbar .ikonli-font-icon {
     -fx-font-size: 1.7em;
     -fx-fill: -jr-theme-text;
     -fx-text-fill: -jr-theme-text;
+    -fx-icon-color: -jr-theme-text;
 }
 
 .mainToolbar .search-field {
@@ -950,6 +958,12 @@
     -fx-border-color: -jr-separator;
     -fx-border-radius: 2;
     -fx-fill: -jr-search-text;
+}
+
+.mainToolbar .search-field .button .glyph-icon {
+    -fx-fill: -jr-search-text;
+    -fx-text-fill: -jr-search-text;
+    -fx-icon-color: -jr-search-text;
 }
 
 /* magnifier glass */
@@ -971,11 +985,13 @@
 .mainToolbar .search-field .toggle-button .glyph-icon {
     -fx-fill: derive(-jr-search-text, 80%);
     -fx-text-fill: derive(-jr-search-text, 80%);
+    -fx-icon-color: derive(-jr-search-text, 80%);
 }
 
 .mainToolbar .search-field .toggle-button:selected .glyph-icon {
     -fx-fill: -jr-search-text;
     -fx-text-fill: -jr-search-text;
+    -fx-icon-color: -jr-search-text;
 }
 
 /* search text */
@@ -1037,6 +1053,27 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-cell-size: 4.0em;
     -fx-text-fill: -fx-text-background-color;
     -fx-fill: -fx-text-background-color;
+}
+
+/* Drag and drop colored indicator */
+
+.table-row-cell:dragOver-bottom {
+    -fx-border-color: -jr-drag-target;
+    -fx-border-width: 0 0 2 0;
+    -fx-padding: 0 0 -2 0;
+}
+
+.table-row-cell:dragOver-center {
+    -fx-border-color: -jr-drag-target;
+    -fx-border-width: 1 1 1 1;
+    -fx-padding: -1 -1 -1 -1;
+    -fx-background-color: -jr-drag-target-hover;
+}
+
+.table-row-cell:dragOver-top {
+    -fx-border-color: -jr-drag-target;
+    -fx-border-width: 2 0 0 0;
+    -fx-padding: -2 0 0 0;
 }
 
 /* Improve the context menu of the main toolbar, when icons don't fit and you have to press the little arrow to see them */
@@ -1235,4 +1272,12 @@ TextFlow * {
 
 .fontsizeSpinner{
     -fx-pref-width: 5em;
+}
+
+.text-field:invalid {
+    -fx-background-color: rgba(240, 128, 128, 0.5);
+}
+
+.notification-pane .notification-bar > .pane .label {
+    -fx-text-fill: -fx-mid-text-color;
 }

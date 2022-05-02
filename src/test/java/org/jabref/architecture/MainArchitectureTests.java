@@ -117,7 +117,12 @@ class MainArchitectureTests {
 
     @ArchTest
     public static void restrictUsagesInModel(JavaClasses classes) {
-        noClasses().that().resideInAPackage(PACKAGE_ORG_JABREF_MODEL)
+        // Until we switch to Lucene, we need to access Globals.stateManager().getActiveDatabase() from the search classes,
+        // because the PDFSearch needs to access the index of the corresponding database
+        noClasses().that().areNotAssignableFrom("org.jabref.model.search.rules.ContainBasedSearchRule")
+                   .and().areNotAssignableFrom("org.jabref.model.search.rules.RegexBasedSearchRule")
+                   .and().areNotAssignableFrom("org.jabref.model.search.rules.GrammarBasedSearchRule")
+                   .and().resideInAPackage(PACKAGE_ORG_JABREF_MODEL)
                    .should().dependOnClassesThat().resideInAPackage(PACKAGE_JAVAX_SWING)
                    .orShould().dependOnClassesThat().haveFullyQualifiedName(CLASS_ORG_JABREF_GLOBALS)
                    .check(classes);

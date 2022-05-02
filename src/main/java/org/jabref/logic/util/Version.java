@@ -27,7 +27,7 @@ public class Version {
 
     private static final Version UNKNOWN_VERSION = new Version();
 
-    private final static Pattern VERSION_PATTERN = Pattern.compile("(?<major>\\d+)(\\.(?<minor>\\d+))?(\\.(?<patch>\\d+))?(?<stage>-alpha|-beta)?(?<dev>-?dev)?.*");
+    private final static Pattern VERSION_PATTERN = Pattern.compile("(?<major>\\d+)(\\.(?<minor>\\d+))?(\\.(?<patch>\\d+))?(?<stage>-alpha|-beta)?(?<num>\\d+)?(?<dev>-?dev)?.*");
     private final static Pattern CI_SUFFIX_PATTERN = Pattern.compile("-ci\\.\\d+");
 
     private static final String JABREF_GITHUB_RELEASES = "https://api.github.com/repos/JabRef/JabRef/releases";
@@ -37,6 +37,7 @@ public class Version {
     private int minor = -1;
     private int patch = -1;
     private DevelopmentStage developmentStage = DevelopmentStage.UNKNOWN;
+    private int developmentNum = -1;
     private boolean isDevelopmentVersion;
 
     /**
@@ -75,6 +76,10 @@ public class Version {
 
                 String versionStageString = matcher.group("stage");
                 parsedVersion.developmentStage = versionStageString == null ? DevelopmentStage.STABLE : DevelopmentStage.parse(versionStageString);
+
+                String stageNumString = matcher.group("num");
+                parsedVersion.developmentNum = stageNumString == null ? 0 : Integer.parseInt(stageNumString);
+
                 parsedVersion.isDevelopmentVersion = matcher.group("dev") != null;
             } catch (NumberFormatException e) {
                 LOGGER.warn("Invalid version string used: " + version, e);
@@ -97,9 +102,8 @@ public class Version {
         HttpURLConnection connection = (HttpURLConnection) new URL(JABREF_GITHUB_RELEASES).openConnection();
         connection.setRequestProperty("Accept-Charset", "UTF-8");
         try (BufferedReader rd = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
-
-            List<Version> versions = new ArrayList<>();
             JSONArray objects = new JSONArray(rd.readLine());
+            List<Version> versions = new ArrayList<>(objects.length());
             for (int i = 0; i < objects.length(); i++) {
                 JSONObject jsonObject = objects.getJSONObject(i);
                 Version version = Version.parse(jsonObject.getString("tag_name").replaceFirst("v", ""));
@@ -139,8 +143,13 @@ public class Version {
                     if (this.developmentStage.isMoreStableThan(otherVersion.developmentStage)) {
                         return true;
                     } else if (this.developmentStage == otherVersion.developmentStage) {
-                        // if the stage is equal check if this version is in development and the other is not
-                        return !this.isDevelopmentVersion && otherVersion.isDevelopmentVersion;
+                        // if the development stage are equal compare the development number
+                        if (this.getDevelopmentNum() > otherVersion.getDevelopmentNum()) {
+                            return true;
+                        } else if (this.getDevelopmentNum() == otherVersion.getDevelopmentNum()) {
+                            // if the stage is equal check if this version is in development and the other is not
+                            return !this.isDevelopmentVersion && otherVersion.isDevelopmentVersion;
+                        }
                     }
                 }
             }
@@ -149,8 +158,7 @@ public class Version {
     }
 
     /**
-     * Checks if this version should be updated to one of the given ones.
-     * Ignoring the other Version if this one is Stable and the other one is not.
+     * Checks if this version should be updated to one of the given ones. Ignoring the other Version if this one is Stable and the other one is not.
      *
      * @return The version this one should be updated to, or an empty Optional
      */
@@ -166,8 +174,7 @@ public class Version {
     }
 
     /**
-     * Checks if this version should be updated to the given one.
-     * Ignoring the other Version if this one is Stable and the other one is not.
+     * Checks if this version should be updated to the given one. Ignoring the other Version if this one is Stable and the other one is not.
      *
      * @return True if this version should be updated to the given one
      */
@@ -198,6 +205,10 @@ public class Version {
         return patch;
     }
 
+    public int getDevelopmentNum() {
+        return developmentNum;
+    }
+
     public boolean isDevelopmentVersion() {
         return isDevelopmentVersion;
     }
@@ -207,7 +218,7 @@ public class Version {
      */
     public String getChangelogUrl() {
         if (isDevelopmentVersion) {
-            return "https://github.com/JabRef/jabref/blob/master/CHANGELOG.md#unreleased";
+            return "https://github.com/JabRef/jabref/blob/main/CHANGELOG.md#unreleased";
         } else {
             StringBuilder changelogLink = new StringBuilder()
                     .append("https://github.com/JabRef/jabref/blob/v")
@@ -222,8 +233,14 @@ public class Version {
             }
 
             changelogLink
-                    .append(this.developmentStage.stage)
-                    .append("/CHANGELOG.md");
+                    .append(this.developmentStage.stage);
+
+            if (this.getDevelopmentNum() != 0) {
+                changelogLink
+                        .append(this.getDevelopmentNum());
+            }
+
+            changelogLink.append("/CHANGELOG.md");
 
             return changelogLink.toString();
         }

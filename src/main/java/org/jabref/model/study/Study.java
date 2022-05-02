@@ -127,6 +127,31 @@ public class Study {
         return getDatabases() != null ? getDatabases().equals(study.getDatabases()) : study.getDatabases() == null;
     }
 
+    public boolean equalsBesideLastSearchDate(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        Study study = (Study) o;
+
+        if (getAuthors() != null ? !getAuthors().equals(study.getAuthors()) : study.getAuthors() != null) {
+            return false;
+        }
+        if (getTitle() != null ? !getTitle().equals(study.getTitle()) : study.getTitle() != null) {
+            return false;
+        }
+        if (getResearchQuestions() != null ? !getResearchQuestions().equals(study.getResearchQuestions()) : study.getResearchQuestions() != null) {
+            return false;
+        }
+        if (getQueries() != null ? !getQueries().equals(study.getQueries()) : study.getQueries() != null) {
+            return false;
+        }
+        return getDatabases() != null ? getDatabases().equals(study.getDatabases()) : study.getDatabases() == null;
+    }
+
     @Override
     public int hashCode() {
         return Objects.hashCode(this);

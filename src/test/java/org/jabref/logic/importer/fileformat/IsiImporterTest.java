@@ -2,7 +2,6 @@ package org.jabref.logic.importer.fileformat;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.List;
@@ -127,7 +126,7 @@ public class IsiImporterTest {
     @Test
     public void testImportEntries1() throws IOException, URISyntaxException {
         Path file = Path.of(IsiImporterTest.class.getResource("IsiImporterTest1.isi").toURI());
-        List<BibEntry> entries = importer.importDatabase(file, StandardCharsets.UTF_8).getDatabase().getEntries();
+        List<BibEntry> entries = importer.importDatabase(file).getDatabase().getEntries();
         BibEntry entry = entries.get(0);
 
         assertEquals(1, entries.size());
@@ -148,7 +147,7 @@ public class IsiImporterTest {
     @Test
     public void testImportEntries2() throws IOException, URISyntaxException {
         Path file = Path.of(IsiImporterTest.class.getResource("IsiImporterTest2.isi").toURI());
-        List<BibEntry> entries = importer.importDatabase(file, StandardCharsets.UTF_8).getDatabase().getEntries();
+        List<BibEntry> entries = importer.importDatabase(file).getDatabase().getEntries();
         BibEntry entry = entries.get(0);
 
         assertEquals(3, entries.size());
@@ -165,7 +164,7 @@ public class IsiImporterTest {
     @Test
     public void testImportEntriesINSPEC() throws IOException, URISyntaxException {
         Path file = Path.of(IsiImporterTest.class.getResource("IsiImporterTestInspec.isi").toURI());
-        List<BibEntry> entries = importer.importDatabase(file, StandardCharsets.UTF_8).getDatabase().getEntries();
+        List<BibEntry> entries = importer.importDatabase(file).getDatabase().getEntries();
 
         BibEntry first = entries.get(0);
         BibEntry second = entries.get(1);
@@ -202,7 +201,7 @@ public class IsiImporterTest {
     @Test
     public void testImportEntriesWOS() throws IOException, URISyntaxException {
         Path file = Path.of(IsiImporterTest.class.getResource("IsiImporterTestWOS.isi").toURI());
-        List<BibEntry> entries = importer.importDatabase(file, StandardCharsets.UTF_8).getDatabase().getEntries();
+        List<BibEntry> entries = importer.importDatabase(file).getDatabase().getEntries();
 
         BibEntry first = entries.get(0);
         BibEntry second = entries.get(1);
@@ -258,7 +257,7 @@ public class IsiImporterTest {
     @Test
     public void testImportIEEEExport() throws IOException, URISyntaxException {
         Path file = Path.of(IsiImporterTest.class.getResource("IEEEImport1.txt").toURI());
-        List<BibEntry> entries = importer.importDatabase(file, StandardCharsets.UTF_8).getDatabase().getEntries();
+        List<BibEntry> entries = importer.importDatabase(file).getDatabase().getEntries();
         BibEntry entry = entries.get(0);
 
         assertEquals(1, entries.size());
@@ -281,7 +280,7 @@ public class IsiImporterTest {
     @Test
     public void testIEEEImport() throws IOException, URISyntaxException {
         Path file = Path.of(IsiImporterTest.class.getResource("IEEEImport1.txt").toURI());
-        List<BibEntry> entries = importer.importDatabase(file, StandardCharsets.UTF_8).getDatabase().getEntries();
+        List<BibEntry> entries = importer.importDatabase(file).getDatabase().getEntries();
         BibEntry entry = entries.get(0);
 
         assertEquals(1, entries.size());
@@ -305,7 +304,7 @@ public class IsiImporterTest {
     @Test
     public void testImportEntriesMedline() throws IOException, URISyntaxException {
         Path file = Path.of(IsiImporterTest.class.getResource("IsiImporterTestMedline.isi").toURI());
-        List<BibEntry> entries = importer.importDatabase(file, StandardCharsets.UTF_8).getDatabase().getEntries();
+        List<BibEntry> entries = importer.importDatabase(file).getDatabase().getEntries();
 
         BibEntry first = entries.get(0);
         BibEntry second = entries.get(1);
@@ -342,7 +341,7 @@ public class IsiImporterTest {
     public void testImportEntriesEmpty() throws IOException, URISyntaxException {
         Path file = Path.of(IsiImporterTest.class.getResource("IsiImporterTestEmpty.isi").toURI());
 
-        List<BibEntry> entries = importer.importDatabase(file, StandardCharsets.UTF_8).getDatabase().getEntries();
+        List<BibEntry> entries = importer.importDatabase(file).getDatabase().getEntries();
 
         assertEquals(1, entries.size());
     }

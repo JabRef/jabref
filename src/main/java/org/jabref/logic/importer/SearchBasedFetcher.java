@@ -15,6 +15,9 @@ import static org.jabref.logic.importer.fetcher.transformers.AbstractQueryTransf
 /**
  * Searches web resources for bibliographic information based on a free-text query.
  * May return multiple search hits.
+ * <p>
+ *    This interface is used for web resources which directly return BibTeX data ({@link BibEntry})
+ * </p>
  */
 public interface SearchBasedFetcher extends WebFetcher {
 
@@ -36,12 +39,15 @@ public interface SearchBasedFetcher extends WebFetcher {
         if (searchQuery.isBlank()) {
             return Collections.emptyList();
         }
-        SyntaxParser parser = new StandardSyntaxParser();
 
+        SyntaxParser parser = new StandardSyntaxParser();
+        QueryNode queryNode;
         try {
-            return this.performSearch(parser.parse(searchQuery, NO_EXPLICIT_FIELD));
+            queryNode = parser.parse(searchQuery, NO_EXPLICIT_FIELD);
         } catch (QueryNodeParseException e) {
             throw new FetcherException("An error occurred when parsing the query");
         }
+
+        return this.performSearch(queryNode);
     }
 }

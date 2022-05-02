@@ -84,11 +84,11 @@ public class UndoableAddOrRemoveGroup extends AbstractUndoableJabRefEdit {
     public String getPresentationName() {
         switch (m_editType) {
             case ADD_NODE:
-                return Localization.lang("add group");
+                return Localization.lang("Add group");
             case REMOVE_NODE_KEEP_CHILDREN:
-                return Localization.lang("remove group (keep subgroups)");
+                return Localization.lang("Keep subgroups)");
             case REMOVE_NODE_AND_CHILDREN:
-                return Localization.lang("remove group and subgroups");
+                return Localization.lang("Also remove subgroups");
             default:
                 break;
         }

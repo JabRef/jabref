@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" demote-non-dropping-particle="sort-only" default-locale="de-DE">
   <info>
-    <title>Hochschule Bonn-Rhein-Sieg (Deutsch)</title>
+    <title>Hochschule Bonn-Rhein-Sieg (Harvard, Deutsch)</title>
     <id>http://www.zotero.org/styles/hochschule-bonn-rhein-sieg</id>
     <link href="http://www.zotero.org/styles/hochschule-bonn-rhein-sieg" rel="self"/>
     <link href="http://www.zotero.org/styles/deutsche-gesellschaft-fur-psychologie" rel="template"/>
@@ -12,7 +12,7 @@
     </author>
     <category citation-format="author-date"/>
     <category field="science"/>
-    <summary>Style für HBRS Studenten, angepasst auf Basis des Zitierstils der deutschen Gesellschaft für Psychologie</summary>
+    <summary>Harvard Zitierstil für Studenten der Hochschule Bonn-Rhein-Sieg, angepasst auf Basis des Zitierstils der deutschen Gesellschaft für Psychologie</summary>
     <updated>2017-03-22T14:29:59+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<style xmlns="http://purl.org/net/xbiblio/csl" version="1.0" default-locale="en-US">
+  <info>
+    <title>AFTE Journal</title>
+    <id>http://www.zotero.org/styles/afte-journal</id>
+    <link href="http://www.zotero.org/styles/afte-journal" rel="self"/>
+    <link href="http://www.zotero.org/styles/council-of-science-editors-brackets" rel="independent-parent"/>
+    <link href="https://afte.org/afte-journal/information-for-authors" rel="documentation"/>
+    <category citation-format="numeric"/>
+    <category field="chemistry"/>
+    <issn>1048-9959</issn>
+    <updated>2021-08-12T12:00:00+00:00</updated>
+    <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
+  </info>
+</style>

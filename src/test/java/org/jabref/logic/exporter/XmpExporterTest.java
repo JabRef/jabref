@@ -1,12 +1,12 @@
 package org.jabref.logic.exporter;
 
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+
+import javafx.collections.FXCollections;
 
 import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.database.BibDatabaseContext;
@@ -25,7 +25,6 @@ public class XmpExporterTest {
 
     private Exporter exporter;
     private BibDatabaseContext databaseContext;
-    private Charset encoding;
     private final XmpPreferences xmpPreferences = mock(XmpPreferences.class);
 
     @BeforeEach
@@ -33,7 +32,6 @@ public class XmpExporterTest {
         exporter = new XmpExporter(xmpPreferences);
 
         databaseContext = new BibDatabaseContext();
-        encoding = StandardCharsets.UTF_8;
     }
 
     @Test
@@ -44,7 +42,7 @@ public class XmpExporterTest {
         BibEntry entry = new BibEntry();
         entry.setField(StandardField.AUTHOR, "Alan Turing");
 
-        exporter.export(databaseContext, file, encoding, Collections.singletonList(entry));
+        exporter.export(databaseContext, file, Collections.singletonList(entry));
         String actual = String.join("\n", Files.readAllLines(file)); // we are using \n to join, so we need it in the expected string as well, \r\n would fail
         String expected = "  <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n" +
                 "    <rdf:Description xmlns:dc=\"http://purl.org/dc/elements/1.1/\" rdf:about=\"\">\n" +
@@ -76,7 +74,7 @@ public class XmpExporterTest {
         entryArmbrust.setField(StandardField.AUTHOR, "Michael Armbrust");
         entryArmbrust.setCitationKey("Armbrust2010");
 
-        exporter.export(databaseContext, file, encoding, Arrays.asList(entryTuring, entryArmbrust));
+        exporter.export(databaseContext, file, Arrays.asList(entryTuring, entryArmbrust));
 
         String actual = String.join("\n", Files.readAllLines(file)); // we are using \n to join, so we need it in the expected string as well, \r\n would fail
 
@@ -129,7 +127,7 @@ public class XmpExporterTest {
                 .withField(StandardField.AUTHOR, "Michael Armbrust")
                 .withCitationKey("Armbrust2010");
 
-        exporter.export(databaseContext, file, encoding, List.of(entryTuring, entryArmbrust));
+        exporter.export(databaseContext, file, List.of(entryTuring, entryArmbrust));
 
         List<String> lines = Files.readAllLines(file);
         assertEquals(Collections.emptyList(), lines);
@@ -184,7 +182,7 @@ public class XmpExporterTest {
 
     @Test
     public void exportSingleEntryWithPrivacyFilter(@TempDir Path testFolder) throws Exception {
-        when(xmpPreferences.getXmpPrivacyFilter()).thenReturn(Collections.singleton(StandardField.AUTHOR));
+        when(xmpPreferences.getXmpPrivacyFilter()).thenReturn(FXCollections.observableSet(Collections.singleton(StandardField.AUTHOR)));
         when(xmpPreferences.shouldUseXmpPrivacyFilter()).thenReturn(true);
 
         Path file = testFolder.resolve("ThisIsARandomlyNamedFile");
@@ -193,7 +191,7 @@ public class XmpExporterTest {
         BibEntry entry = new BibEntry();
         entry.setField(StandardField.AUTHOR, "Alan Turing");
 
-        exporter.export(databaseContext, file, encoding, Collections.singletonList(entry));
+        exporter.export(databaseContext, file, Collections.singletonList(entry));
         String actual = String.join("\n", Files.readAllLines(file));
         String expected = "  <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n" +
                 "    <rdf:Description xmlns:dc=\"http://purl.org/dc/elements/1.1/\" rdf:about=\"\">\n" +

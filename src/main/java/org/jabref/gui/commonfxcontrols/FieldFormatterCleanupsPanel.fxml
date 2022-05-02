@@ -13,7 +13,7 @@
 <fx:root spacing="10.0" type="VBox"
          xmlns="http://javafx.com/javafx/10.0.2-internal" xmlns:fx="http://javafx.com/fxml/1"
          fx:controller="org.jabref.gui.commonfxcontrols.FieldFormatterCleanupsPanel">
-    <CheckBox fx:id="cleanupsEnabled" text="Enable field formatters"/>
+    <CheckBox fx:id="cleanupsEnabled" text="%Enable field formatters"/>
     <HBox spacing="4.0">
         <VBox spacing="4.0" HBox.hgrow="ALWAYS">
             <TableView fx:id="cleanupsList" minHeight="200.0" disable="${!cleanupsEnabled.selected}">

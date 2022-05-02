@@ -82,9 +82,6 @@
     </layout>
   </citation>
   <bibliography and="text" second-field-align="flush" entry-spacing="0">
-    <sort>
-      <key variable="author"/>
-    </sort>
     <layout suffix=".">
       <text variable="citation-number" prefix="[" suffix="]"/>
       <text macro="author" suffix=", "/>

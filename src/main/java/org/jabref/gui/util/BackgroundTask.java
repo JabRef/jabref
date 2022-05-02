@@ -47,6 +47,7 @@ public abstract class BackgroundTask<V> {
     private final StringProperty title = new SimpleStringProperty(this.getClass().getSimpleName());
     private final DoubleProperty workDonePercentage = new SimpleDoubleProperty(0);
     private final BooleanProperty showToUser = new SimpleBooleanProperty(false);
+    private final BooleanProperty willBeRecoveredAutomatically = new SimpleBooleanProperty(false);
 
     public BackgroundTask() {
         workDonePercentage.bind(EasyBind.map(progress, BackgroundTask.BackgroundProgress::getWorkDonePercentage));
@@ -64,7 +65,7 @@ public abstract class BackgroundTask<V> {
     public static BackgroundTask<Void> wrap(Runnable runnable) {
         return new BackgroundTask<>() {
             @Override
-            protected Void call() throws Exception {
+            protected Void call() {
                 runnable.run();
                 return null;
             }
@@ -128,6 +129,14 @@ public abstract class BackgroundTask<V> {
 
     public void showToUser(boolean show) {
         showToUser.set(show);
+    }
+
+    public boolean willBeRecoveredAutomatically() {
+        return willBeRecoveredAutomatically.get();
+    }
+
+    public void willBeRecoveredAutomatically(boolean willBeRecoveredAutomatically) {
+        this.willBeRecoveredAutomatically.set(willBeRecoveredAutomatically);
     }
 
     /**

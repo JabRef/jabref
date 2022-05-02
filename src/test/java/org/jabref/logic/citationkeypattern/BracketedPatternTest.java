@@ -1,5 +1,7 @@
 package org.jabref.logic.citationkeypattern;
 
+import java.util.stream.Stream;
+
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibtexString;
@@ -8,6 +10,9 @@ import org.jabref.model.entry.types.StandardEntryType;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -379,5 +384,34 @@ class BracketedPatternTest {
         assertEquals(
                 "Eric von Hippel and Georg von Krogh have published Open Source Software and the \"Private Collective\" Innovation Model: Issues for Organization Science in Organization Science.",
                 BracketedPattern.expandBrackets("[author] have published [title] in [journal].", ',', entry, database));
+    }
+
+    @Test
+    void expandBracketsWithoutProtectiveBracesUsingUnprotectTermsModifier() {
+        BibEntry bibEntry = new BibEntry()
+                .withField(StandardField.JOURNAL, "{ACS} Medicinal Chemistry Letters");
+        assertEquals("ACS Medicinal Chemistry Letters", BracketedPattern.expandBrackets("[JOURNAL:unprotect_terms]", null, bibEntry, null));
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideArgumentsForFallback")
+    void expandBracketsWithFallback(String expandResult, String pattern) {
+        BibEntry bibEntry = new BibEntry()
+                .withField(StandardField.YEAR, "2021").withField(StandardField.EPRINT, "2105.02891");
+        BracketedPattern bracketedPattern = new BracketedPattern(pattern);
+
+        assertEquals(expandResult, bracketedPattern.expand(bibEntry));
+    }
+
+    private static Stream<Arguments> provideArgumentsForFallback() {
+        return Stream.of(
+                Arguments.of("auth", "[title:(auth)]"),
+                Arguments.of("auth2021", "[title:(auth[YEAR])]"),
+                Arguments.of("not2021", "[title:(not[YEAR])]"),
+                Arguments.of("", "[title:([YEAR)]"),
+                Arguments.of(")]", "[title:(YEAR])]"),
+                Arguments.of("2105.02891", "[title:([EPRINT:([YEAR])])]"),
+                Arguments.of("2021", "[title:([auth:([YEAR])])]")
+        );
     }
 }

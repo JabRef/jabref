@@ -20,7 +20,7 @@
   </info>
   <macro name="author">
     <names variable="author" suffix=".">
-      <name sort-separator=", " initialize-with=". " and="text" name-as-sort-order="first" delimiter=", " delimiter-precedes-last="always"/>
+      <name sort-separator=", " initialize-with=". " and="text" name-as-sort-order="first" delimiter=", " delimiter-precedes-last="never"/>
       <label form="long" prefix=", "/>
       <substitute>
         <names variable="editor"/>

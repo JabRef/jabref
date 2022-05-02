@@ -3,7 +3,7 @@ package org.jabref.gui.openoffice;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
-import org.jabref.logic.openoffice.CitationEntry;
+import org.jabref.model.openoffice.CitationEntry;
 
 public class CitationEntryViewModel {
 

@@ -199,4 +199,9 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
             }
         }
     }
+
+    public void selectAllEntries() {
+        unselectAll();
+        entriesListView.getCheckModel().checkAll();
+    }
 }

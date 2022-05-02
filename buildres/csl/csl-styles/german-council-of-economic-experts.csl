@@ -30,7 +30,7 @@
     <category citation-format="author-date"/>
     <category field="political_science"/>
     <summary>Style for the German Council of Economic Experts</summary>
-    <updated>2018-10-26T14:00:00+02:00</updated>
+    <updated>2021-09-13T14:00:00+02:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="de">
@@ -288,7 +288,17 @@
     </choose>
   </macro>
   <macro name="citation-locator">
-    <text variable="locator"/>
+    <group delimiter=" ">
+      <choose>
+        <if locator="page">
+          <label variable="locator" form="short"/>
+        </if>
+        <else>
+          <label variable="locator" form="short" text-case="capitalize-first"/>
+        </else>
+      </choose>
+      <text variable="locator"/>
+    </group>
   </macro>
   <macro name="exact-date">
     <choose>
@@ -313,11 +323,9 @@
       <key macro="contributors-long"/>
     </sort>
     <layout prefix="(" suffix=")" delimiter="; ">
-      <group delimiter=": ">
-        <group delimiter=", ">
-          <text macro="contributors-short"/>
-          <text macro="date"/>
-        </group>
+      <group delimiter=", ">
+        <text macro="contributors-short"/>
+        <text macro="date"/>
         <text macro="citation-locator"/>
       </group>
     </layout>

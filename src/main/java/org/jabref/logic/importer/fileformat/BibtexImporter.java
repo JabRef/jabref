@@ -1,8 +1,11 @@
 package org.jabref.logic.importer.fileformat;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Objects;
 import java.util.Optional;
@@ -12,15 +15,18 @@ import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.util.StandardFileType;
+import org.jabref.model.database.BibDatabaseModeDetection;
 import org.jabref.model.util.FileUpdateMonitor;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
- * This importer exists only to enable `--importToOpen someEntry.bib`
- *
- * It is NOT intended to import a BIB file. This is done via the option action, which treats the metadata fields
- * The metadata is not required to be read here, as this class is NOT called at --import
+ * This is a full class to read .bib files. It is used for <code>--import</code> and <code>--importToOpen </code>, too.
  */
 public class BibtexImporter extends Importer {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(BibtexImporter.class);
 
     // Signature written at the top of the .bib file in earlier versions.
     private static final String SIGNATURE = "This file was created with JabRef";
@@ -44,30 +50,48 @@ public class BibtexImporter extends Importer {
     }
 
     @Override
-    public ParserResult importDatabase(Path filePath, Charset defaultEncoding) throws IOException {
-        // We want to check if there is a JabRef signature in the file, because that would tell us
-        // which character encoding is used. However, to read the signature we must be using a compatible
-        // encoding in the first place. Since the signature doesn't contain any fancy characters, we can
-        // read it regardless of encoding, with either UTF-8 or UTF-16. That's the hypothesis, at any rate.
-        // 8 bit is most likely, so we try that first:
-        Optional<Charset> suppliedEncoding;
-        try (BufferedReader utf8Reader = getUTF8Reader(filePath)) {
-            suppliedEncoding = getSuppliedEncoding(utf8Reader);
-        }
-        // Now if that did not get us anywhere, we check with the 16 bit encoding:
-        if (!suppliedEncoding.isPresent()) {
-            try (BufferedReader utf16Reader = getUTF16Reader(filePath)) {
-                suppliedEncoding = getSuppliedEncoding(utf16Reader);
-            }
+    public ParserResult importDatabase(Path filePath) throws IOException {
+        // We want to check if there is a JabRef encoding heading in the file, because that would tell us
+        // which character encoding is used.
+
+        // In general, we have to use InputStream and not a Reader, because a Reader requires an encoding specification.
+        // We do not want to do a byte-by-byte reading or doing wild try/catch magic.
+        // We therefore use a charset detection library and then read JabRefs "% Encoding" mark
+
+        Charset detectedCharset;
+        try (InputStream inputStream = Files.newInputStream(filePath)) {
+            BufferedInputStream bufferedInputStream = new BufferedInputStream(inputStream);
+            bufferedInputStream.mark(8192);
+            detectedCharset = getCharset(bufferedInputStream);
+            bufferedInputStream.reset();
+            LOGGER.debug("Detected charset: {}", detectedCharset.name());
         }
 
-        if (suppliedEncoding.isPresent()) {
-            return super.importDatabase(filePath, suppliedEncoding.get());
-        } else {
-            return super.importDatabase(filePath, defaultEncoding);
+        Charset encoding;
+        try (BufferedReader reader = Files.newBufferedReader(filePath, detectedCharset)) {
+            Optional<Charset> suppliedEncoding = getSuppliedEncoding(reader);
+            LOGGER.debug("Supplied encoding: {}", suppliedEncoding);
+
+            // in case no encoding information is present, use the detected one
+            encoding = suppliedEncoding.orElse(detectedCharset);
+            LOGGER.debug("Encoding used to read the file: {}", encoding);
+        }
+
+        try (BufferedReader reader = Files.newBufferedReader(filePath, encoding)) {
+            ParserResult parserResult = this.importDatabase(reader);
+            parserResult.getMetaData().setEncoding(encoding);
+            parserResult.setPath(filePath);
+            if (parserResult.getMetaData().getMode().isEmpty()) {
+                parserResult.getMetaData().setMode(BibDatabaseModeDetection.inferMode(parserResult.getDatabase()));
+            }
+            return parserResult;
         }
     }
 
+    /**
+     * This method does not set the metadata encoding information. The caller needs to set the encoding of the supplied
+     * reader manually to the meta data
+     */
     @Override
     public ParserResult importDatabase(BufferedReader reader) throws IOException {
         return new BibtexParser(importFormatPreferences, fileMonitor).parse(reader);
@@ -85,9 +109,7 @@ public class BibtexImporter extends Importer {
 
     @Override
     public String getDescription() {
-        return "This importer exists only to enable `--importToOpen someEntry.bib`\n" +
-                "It is NOT intended to import a BIB file. This is done via the option action, which treats the metadata fields.\n" +
-                "The metadata is not required to be read here, as this class is NOT called at --import.";
+        return "This importer enables `--importToOpen someEntry.bib`";
     }
 
     /**
@@ -127,7 +149,7 @@ public class BibtexImporter extends Importer {
                 }
             }
         } catch (IOException ignored) {
-            // Ignored
+            LOGGER.error("Supplied encoding could not be determined", ignored);
         }
         return Optional.empty();
     }

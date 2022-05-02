@@ -1,13 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" demote-non-dropping-particle="sort-only">
-  <!-- Polyglot; journal publishes in English and Spanish -->
+  <!--
+ Polyglot; journal publishes in English and Spanish 
+-->
   <info>
     <title>Society for American Archaeology</title>
     <title-short>SAA</title-short>
     <id>http://www.zotero.org/styles/society-for-american-archaeology</id>
     <link href="http://www.zotero.org/styles/society-for-american-archaeology" rel="self"/>
     <link href="https://www.saa.org/publications" rel="documentation"/>
-    <link href="https://documents.saa.org/container/docs/default-source/doc-publications/style-guide/saa-style-guide_updated-july-2018c5062f7e55154959ab57564384bda7de.pdf?sfvrsn=8247640e_6" rel="documentation"/>
+    <link href="https://documents.saa.org/container/docs/default-source/doc-publications/style-guide/saa-style-guide_english_updated_2021_final08023c15928949dabd02faafb269fb1c.pdf?sfvrsn=c1f41c1b_2" rel="documentation"/>
+    <link href="https://documents.saa.org/container/docs/default-source/doc-publications/style-guide/saa_guia_de_estilo_updated_2021_final770fea7e32154c1e80ed075cb9de3333.pdf?sfvrsn=7250a084_2" rel="documentation"/>
     <author>
       <name>Michael Barton</name>
       <email>michael.barton@asu.edu</email>
@@ -25,7 +28,7 @@
     </contributor>
     <category citation-format="author-date"/>
     <category field="anthropology"/>
-    <updated>2020-11-23T22:11:55+00:00</updated>
+    <updated>2022-02-22T08:50:31+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale>
@@ -139,7 +142,7 @@
             </group>
           </group>
         </else-if>
-        <else-if type="webpage post-weblog post" match="any">
+        <else-if type="webpage post-weblog post article-magazine article-newspaper" match="any">
           <group delimiter=", ">
             <text variable="genre"/>
             <text variable="URL"/>
@@ -341,7 +344,7 @@
   <macro name="original-date">
     <date date-parts="year" form="text" variable="original-date"/>
   </macro>
-  <citation et-al-min="3" et-al-use-first="1" disambiguate-add-year-suffix="true" disambiguate-add-names="true" disambiguate-add-givenname="false" collapse="year">
+  <citation et-al-min="3" et-al-use-first="1" disambiguate-add-year-suffix="true" disambiguate-add-names="true" disambiguate-add-givenname="true" collapse="year">
     <sort>
       <key macro="contributors"/>
       <key variable="issued"/>

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<style xmlns="http://purl.org/net/xbiblio/csl" class="note" version="1.0" demote-non-dropping-particle="sort-only" page-range-format="chicago" default-locale="en-GB">
+<style xmlns="http://purl.org/net/xbiblio/csl" class="note" version="1.0" demote-non-dropping-particle="sort-only" page-range-format="minimal" default-locale="en-GB">
   <info>
     <title>Manchester University Press monographs (note)</title>
     <id>http://www.zotero.org/styles/manchester-university-press</id>
@@ -22,7 +22,7 @@
     <category citation-format="note"/>
     <category field="generic-base"/>
     <summary>Manchester University Press monograph style with full notes and bibliography</summary>
-    <updated>2020-06-19T12:00:00+00:00</updated>
+    <updated>2021-08-08T12:00:00+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="en">
@@ -158,7 +158,7 @@
   <macro name="container-contributors-note">
     <choose>
       <if type="chapter paper-conference" match="any">
-        <names variable="editor" prefix="in ">
+        <names variable="editor translator" prefix="in " delimiter=", ">
           <name and="text" initialize-with=". " delimiter=", "/>
           <label form="short" prefix=" (" suffix=")"/>
         </names>
@@ -416,7 +416,7 @@
     </group>
     <choose>
       <if variable="DOI">
-        <text variable="DOI" prefix=", https://doi.org/"/>
+        <text variable="DOI" prefix=", doi: "/>
       </if>
       <else>
         <choose>
@@ -448,14 +448,23 @@
   <citation et-al-min="4" et-al-use-first="1" disambiguate-add-names="true" disambiguate-add-givenname="true">
     <layout suffix="." delimiter="; ">
       <choose>
-        <if position="subsequent">
+        <if position="ibid-with-locator">
+          <group delimiter=", ">
+            <text term="ibid" font-style="italic"/>
+            <text macro="point-locators-subsequent"/>
+          </group>
+        </if>
+        <else-if position="ibid">
+          <text term="ibid" font-style="italic"/>
+        </else-if>
+        <else-if position="subsequent">
           <group delimiter=", ">
             <text macro="contributors-short"/>
             <text macro="title-short"/>
             <text macro="locators-specific-note"/>
           </group>
           <text macro="point-locators-subsequent"/>
-        </if>
+        </else-if>
         <else>
           <group delimiter=", ">
             <text macro="contributors-note"/>

@@ -3,77 +3,135 @@ package org.jabref.preferences;
 import java.nio.file.Path;
 import java.util.Optional;
 
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
+
 import org.jabref.model.strings.StringUtil;
 
 public class FilePreferences {
 
     public static final String[] DEFAULT_FILENAME_PATTERNS = new String[] {"[bibtexkey]", "[bibtexkey] - [title]"};
 
-    private final String user;
-    private final String mainFileDirectory;
-    private final boolean shouldStoreFilesRelativeToBibFile;
-    private final String fileNamePattern;
-    private final String fileDirPattern;
-    private boolean shouldDownloadLinkedFiles;
-    private final boolean shouldSearchFilesOnOpen;
-    private final boolean shouldOpenBrowseOnCreate;
+    private final StringProperty user = new SimpleStringProperty();
+    private final SimpleStringProperty mainFileDirectory = new SimpleStringProperty();
+    private final BooleanProperty storeFilesRelativeToBibFile = new SimpleBooleanProperty();
+    private final StringProperty fileNamePattern = new SimpleStringProperty();
+    private final StringProperty fileDirectoryPattern = new SimpleStringProperty();
+    private final BooleanProperty downloadLinkedFiles = new SimpleBooleanProperty();
+    private final BooleanProperty fulltextIndexLinkedFiles = new SimpleBooleanProperty();
+    private final ObjectProperty<Path> workingDirectory = new SimpleObjectProperty<>();
 
     public FilePreferences(String user,
                            String mainFileDirectory,
-                           boolean shouldStoreFilesRelativeToBibFile,
+                           boolean storeFilesRelativeToBibFile,
                            String fileNamePattern,
-                           String fileDirPattern,
-                           boolean shouldDownloadLinkedFiles,
-                           boolean shouldSearchFilesOnOpen,
-                           boolean shouldOpenBrowseOnCreate) {
-        this.user = user;
-        this.mainFileDirectory = mainFileDirectory;
-        this.shouldStoreFilesRelativeToBibFile = shouldStoreFilesRelativeToBibFile;
-        this.fileNamePattern = fileNamePattern;
-        this.fileDirPattern = fileDirPattern;
-        this.shouldDownloadLinkedFiles = shouldDownloadLinkedFiles;
-        this.shouldSearchFilesOnOpen = shouldSearchFilesOnOpen;
-        this.shouldOpenBrowseOnCreate = shouldOpenBrowseOnCreate;
+                           String fileDirectoryPattern,
+                           boolean downloadLinkedFiles,
+                           boolean fulltextIndexLinkedFiles,
+                           Path workingDirectory) {
+        this.user.setValue(user);
+        this.mainFileDirectory.setValue(mainFileDirectory);
+        this.storeFilesRelativeToBibFile.setValue(storeFilesRelativeToBibFile);
+        this.fileNamePattern.setValue(fileNamePattern);
+        this.fileDirectoryPattern.setValue(fileDirectoryPattern);
+        this.downloadLinkedFiles.setValue(downloadLinkedFiles);
+        this.fulltextIndexLinkedFiles.setValue(fulltextIndexLinkedFiles);
+        this.workingDirectory.setValue(workingDirectory);
     }
 
-    public String getUser() {
-        return user;
+    public String getUser() { // Read only
+        return user.getValue();
     }
 
     public Optional<Path> getFileDirectory() {
-        if (StringUtil.isBlank(mainFileDirectory)) {
+        if (StringUtil.isBlank(mainFileDirectory.getValue())) {
             return Optional.empty();
         } else {
-            return Optional.of(Path.of(mainFileDirectory));
+            return Optional.of(Path.of(mainFileDirectory.getValue()));
         }
     }
 
-    public boolean shouldStoreFilesRelativeToBib() {
-        return shouldStoreFilesRelativeToBibFile;
+    public StringProperty mainFileDirectoryProperty() {
+        return mainFileDirectory;
+    }
+
+    public void setMainFileDirectory(String mainFileDirectory) {
+        this.mainFileDirectory.set(mainFileDirectory);
+    }
+
+    public boolean shouldStoreFilesRelativeToBibFile() {
+        return storeFilesRelativeToBibFile.get();
+    }
+
+    public BooleanProperty storeFilesRelativeToBibFileProperty() {
+        return storeFilesRelativeToBibFile;
+    }
+
+    public void setStoreFilesRelativeToBibFile(boolean shouldStoreFilesRelativeToBibFile) {
+        this.storeFilesRelativeToBibFile.set(shouldStoreFilesRelativeToBibFile);
     }
 
     public String getFileNamePattern() {
+        return fileNamePattern.get();
+    }
+
+    public StringProperty fileNamePatternProperty() {
         return fileNamePattern;
     }
 
+    public void setFileNamePattern(String fileNamePattern) {
+        this.fileNamePattern.set(fileNamePattern);
+    }
+
     public String getFileDirectoryPattern() {
-        return fileDirPattern;
+        return fileDirectoryPattern.get();
+    }
+
+    public StringProperty fileDirectoryPatternProperty() {
+        return fileDirectoryPattern;
+    }
+
+    public void setFileDirectoryPattern(String fileDirectoryPattern) {
+        this.fileDirectoryPattern.set(fileDirectoryPattern);
     }
 
     public boolean shouldDownloadLinkedFiles() {
-        return shouldDownloadLinkedFiles;
+        return downloadLinkedFiles.get();
     }
 
-    public FilePreferences withShouldDownloadLinkedFiles(boolean newShouldDownloadLinkedFiles) {
-        this.shouldDownloadLinkedFiles = newShouldDownloadLinkedFiles;
-        return this;
+    public BooleanProperty downloadLinkedFilesProperty() {
+        return downloadLinkedFiles;
     }
 
-    public boolean shouldSearchFilesOnOpen() {
-        return shouldSearchFilesOnOpen;
+    public void setDownloadLinkedFiles(boolean shouldDownloadLinkedFiles) {
+        this.downloadLinkedFiles.set(shouldDownloadLinkedFiles);
     }
 
-    public boolean shouldOpenBrowseOnCreate() {
-        return shouldOpenBrowseOnCreate;
+    public boolean shouldFulltextIndexLinkedFiles() {
+        return fulltextIndexLinkedFiles.get();
+    }
+
+    public BooleanProperty fulltextIndexLinkedFilesProperty() {
+        return fulltextIndexLinkedFiles;
+    }
+
+    public void setFulltextIndexLinkedFiles(boolean shouldFulltextIndexLinkedFiles) {
+        this.fulltextIndexLinkedFiles.set(shouldFulltextIndexLinkedFiles);
+    }
+
+    public Path getWorkingDirectory() {
+        return workingDirectory.get();
+    }
+
+    public ObjectProperty<Path> workingDirectoryProperty() {
+        return workingDirectory;
+    }
+
+    public void setWorkingDirectory(Path workingDirectory) {
+        this.workingDirectory.set(workingDirectory);
     }
 }

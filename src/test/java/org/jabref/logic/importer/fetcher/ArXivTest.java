@@ -6,7 +6,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.PagedSearchBasedFetcher;
 import org.jabref.logic.importer.SearchBasedFetcher;
@@ -99,7 +98,7 @@ class ArXivTest implements SearchBasedFetcherCapabilityTest, PagedSearchFetcherT
     void findFullTextByTitleWithCurlyBracket() throws IOException {
         entry.setField(StandardField.TITLE, "Machine versus {Human} {Attention} in {Deep} {Reinforcement} {Learning} {Tasks}");
 
-        assertEquals(Optional.of(new URL("http://arxiv.org/pdf/2010.15942v2")), fetcher.findFullText(entry));
+        assertEquals(Optional.of(new URL("http://arxiv.org/pdf/2010.15942v3")), fetcher.findFullText(entry));
     }
 
     @Test
@@ -131,7 +130,7 @@ class ArXivTest implements SearchBasedFetcherCapabilityTest, PagedSearchFetcherT
         entry.setField(StandardField.TITLE, "Machine versus {Human} {Attention} in {Deep} {Reinforcement} {Learning} {Tasks}");
         entry.setField(StandardField.AUTHOR, "Zhang, Ruohan and Guo");
 
-        assertEquals(Optional.of(new URL("http://arxiv.org/pdf/2010.15942v2")), fetcher.findFullText(entry));
+        assertEquals(Optional.of(new URL("http://arxiv.org/pdf/2010.15942v3")), fetcher.findFullText(entry));
     }
 
     @Test
@@ -223,7 +222,7 @@ class ArXivTest implements SearchBasedFetcherCapabilityTest, PagedSearchFetcherT
 
     @Test
     void searchWithMalformedIdThrowsException() throws Exception {
-        assertThrows(FetcherException.class, () -> fetcher.performSearchById("123412345"));
+        assertEquals(Optional.empty(), fetcher.performSearchById("123412345"));
     }
 
     @Test
@@ -273,7 +272,6 @@ class ArXivTest implements SearchBasedFetcherCapabilityTest, PagedSearchFetcherT
     @Test
     @Override
     public void supportsYearRangeSearch() throws Exception {
-
     }
 
     @Override

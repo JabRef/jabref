@@ -12,6 +12,7 @@ import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
+import org.jabref.support.DisabledOnCIServer;
 import org.jabref.testutils.category.FetcherTest;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -30,6 +31,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
 @FetcherTest
+@DisabledOnCIServer("eprint.iacr.org blocks with 500 when there are too many calls from the same IP address.")
 public class IacrEprintFetcherTest {
 
     private IacrEprintFetcher fetcher;
@@ -48,7 +50,7 @@ public class IacrEprintFetcherTest {
         abram2017.setField(StandardField.AUTHOR, "Ittai Abraham and Dahlia Malkhi and Kartik Nayak and Ling Ren and Alexander Spiegelman");
         abram2017.setField(StandardField.DATE, "2017-11-18");
         abram2017.setField(StandardField.HOWPUBLISHED, "Cryptology ePrint Archive, Report 2017/1118");
-        abram2017.setField(StandardField.NOTE, "\\url{https://eprint.iacr.org/2017/1118}");
+        abram2017.setField(StandardField.NOTE, "\\url{https://ia.cr/2017/1118}");
         abram2017.setField(StandardField.TITLE, "Solida: A Blockchain Protocol Based on Reconfigurable Byzantine Consensus");
         abram2017.setField(StandardField.URL, "https://eprint.iacr.org/2017/1118/20171124:064527");
         abram2017.setField(StandardField.VERSION, "20171124:064527");
@@ -61,7 +63,7 @@ public class IacrEprintFetcherTest {
         beierle2016.setField(StandardField.AUTHOR, "Christof Beierle and Thorsten Kranz and Gregor Leander");
         beierle2016.setField(StandardField.DATE, "2017-02-17");
         beierle2016.setField(StandardField.HOWPUBLISHED, "Cryptology ePrint Archive, Report 2016/119");
-        beierle2016.setField(StandardField.NOTE, "\\url{https://eprint.iacr.org/2016/119}");
+        beierle2016.setField(StandardField.NOTE, "\\url{https://ia.cr/2016/119}");
         beierle2016.setField(StandardField.TITLE, "Lightweight Multiplication in GF(2^n) with Applications to MDS Matrices");
         beierle2016.setField(StandardField.URL, "https://eprint.iacr.org/2016/119/20170217:150415");
         beierle2016.setField(StandardField.VERSION, "20170217:150415");
@@ -74,7 +76,7 @@ public class IacrEprintFetcherTest {
         delgado2017.setField(StandardField.AUTHOR, "Sergi Delgado-Segura and Cristina Pérez-Solà and Guillermo Navarro-Arribas and Jordi Herrera-Joancomartí");
         delgado2017.setField(StandardField.DATE, "2018-01-19");
         delgado2017.setField(StandardField.HOWPUBLISHED, "Cryptology ePrint Archive, Report 2017/1095");
-        delgado2017.setField(StandardField.NOTE, "\\url{https://eprint.iacr.org/2017/1095}");
+        delgado2017.setField(StandardField.NOTE, "\\url{https://ia.cr/2017/1095}");
         delgado2017.setField(StandardField.TITLE, "Analysis of the Bitcoin UTXO set");
         delgado2017.setField(StandardField.URL, "https://eprint.iacr.org/2017/1095/20180119:113352");
         delgado2017.setField(StandardField.VERSION, "20180119:113352");

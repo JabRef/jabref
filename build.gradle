@@ -1,30 +1,24 @@
-import groovy.json.JsonSlurper
 import org.gradle.internal.os.OperatingSystem
 import org.jabref.build.JournalAbbreviationConverter
 import org.jabref.build.xjc.XjcPlugin
 import org.jabref.build.xjc.XjcTask
 
-// to update the gradle wrapper, execute
-// ./gradlew wrapper --gradle-version=6.0 --distribution-type=bin
-
 plugins {
     id 'application'
 
-    id "com.simonharrer.modernizer" version '2.1.0-1'
+    id 'com.github.andygoossens.modernizer' version '1.6.2'
 
     id 'me.champeau.gradle.jmh' version '0.5.3'
 
-    id 'com.github.ben-manes.versions' version '0.38.0'
+    id 'org.javamodularity.moduleplugin' version '1.8.10'
 
-    id 'org.javamodularity.moduleplugin' version '1.8.3'
+    id 'org.openjfx.javafxplugin' version '0.0.13'
 
-    id 'org.openjfx.javafxplugin' version '0.0.9'
-
-    id 'org.beryx.jlink' version '2.23.7'
+    id 'org.beryx.jlink' version '2.25.0'
 
     // nicer test outputs during running and completion
     // Homepage: https://github.com/radarsh/gradle-test-logger-plugin
-    id 'com.adarshr.test-logger' version '3.0.0'
+    id 'com.adarshr.test-logger' version '3.2.0'
 
     id 'jacoco'
 
@@ -46,8 +40,8 @@ group = "org.jabref"
 version = project.findProperty('projVersion') ?: '100.0.0'
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_14
-    targetCompatibility = JavaVersion.VERSION_14
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
 
     // Workaround needed for Eclipse, probably because of https://github.com/gradle/gradle/issues/16922
     // Should be removed as soon as Gradle 7.0.1 is released ( https://github.com/gradle/gradle/issues/16922#issuecomment-828217060 )
@@ -58,12 +52,6 @@ application {
     mainClass.set('org.jabref.gui.JabRefLauncher')
     mainModule.set('org.jabref')
 }
-
-// TODO: Ugly workaround to temporarily ignore build errors to dependencies of latex2unicode
-// These should be removed, as well as the files in the lib folder, as soon as they have valid module names
-modularity.patchModule("test", "fastparse_2.12-1.0.0.jar")
-modularity.patchModule("test2", "fastparse-utils_2.12-1.0.0.jar")
-modularity.patchModule("test3", "sourcecode_2.12-0.1.4.jar")
 
 // Workaround for https://github.com/openjfx/javafx-gradle-plugin/issues/89
 // See also https://github.com/java9-modularity/gradle-modules-plugin/issues/165
@@ -108,7 +96,7 @@ configurations {
 }
 
 javafx {
-    version = "16"
+    version = "18"
     modules = [ 'javafx.controls', 'javafx.fxml', 'javafx.web', 'javafx.swing' ]
 }
 
@@ -116,51 +104,55 @@ dependencies {
     // Include all jar-files in the 'lib' folder as dependencies
     implementation fileTree(dir: 'lib', includes: ['*.jar'])
 
-    implementation 'org.apache.pdfbox:pdfbox:2.0.23'
-    implementation 'org.apache.pdfbox:fontbox:2.0.23'
-    implementation 'org.apache.pdfbox:xmpbox:2.0.23'
+    implementation 'org.apache.pdfbox:pdfbox:3.0.0-RC1'
+    implementation 'org.apache.pdfbox:fontbox:3.0.0-RC1'
+    implementation 'org.apache.pdfbox:xmpbox:3.0.0-RC1'
 
-    implementation group: 'org.apache.commons', name: 'commons-csv', version: '1.8'
-    implementation 'com.h2database:h2-mvstore:1.4.200'
+    implementation 'org.apache.lucene:lucene-core:9.1.0'
+    implementation 'org.apache.lucene:lucene-queryparser:9.1.0'
+    implementation 'org.apache.lucene:lucene-queries:9.1.0'
+    implementation 'org.apache.lucene:lucene-analysis-common:9.1.0'
+    implementation 'org.apache.lucene:lucene-highlighter:9.1.0'
 
-    implementation group: 'org.apache.tika', name: 'tika-core', version: '1.26'
+    implementation group: 'org.apache.commons', name: 'commons-csv', version: '1.9.0'
+    implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.12.0'
+    implementation 'com.h2database:h2-mvstore:2.1.212'
+
+    implementation group: 'org.apache.tika', name: 'tika-core', version: '2.3.0'
+    implementation 'com.ibm.icu:icu4j-charset:70.1'
 
     // required for reading write-protected PDFs - see https://github.com/JabRef/jabref/pull/942#issuecomment-209252635
-    implementation 'org.bouncycastle:bcprov-jdk15on:1.68'
+    implementation 'org.bouncycastle:bcprov-jdk15on:1.70'
 
-    implementation 'commons-cli:commons-cli:1.4'
+    implementation 'commons-cli:commons-cli:1.5.0'
 
-    implementation 'org.libreoffice:libreoffice:7.1.2'
-    implementation 'org.libreoffice:unoloader:7.1.2'
+    implementation 'org.libreoffice:libreoffice:7.3.2'
+    implementation 'org.libreoffice:unoloader:7.3.2'
 
-    implementation 'io.github.java-diff-utils:java-diff-utils:4.10'
+    implementation 'io.github.java-diff-utils:java-diff-utils:4.11'
     implementation 'info.debatty:java-string-similarity:2.0.0'
 
-    antlr3 'org.antlr:antlr:3.5.2'
+    antlr3 'org.antlr:antlr:3.5.3'
     implementation 'org.antlr:antlr-runtime:3.5.2'
 
-    antlr4 'org.antlr:antlr4:4.9.2'
-    implementation 'org.antlr:antlr4-runtime:4.9.2'
+    antlr4 'org.antlr:antlr4:4.9.3'
+    implementation 'org.antlr:antlr4-runtime:4.9.3'
 
-    implementation (group: 'org.apache.lucene', name: 'lucene-queryparser', version: '8.8.2') {
-        exclude group: 'org.apache.lucene', module: 'lucene-sandbox'
-    }
+    implementation group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: '6.1.0.202203080745-r'
 
-    implementation group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: '5.11.0.202103091610-r'
+    implementation group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-yaml', version: '2.13.2'
+    implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.13.2'
 
-    implementation group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-yaml', version: '2.12.3'
-    implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.12.3'
+    implementation group: 'org.mariadb.jdbc', name: 'mariadb-java-client', version: '2.7.5'
 
-    implementation group: 'org.mariadb.jdbc', name: 'mariadb-java-client', version: '2.7.2'
-
-    implementation 'org.postgresql:postgresql:42.2.20'
+    implementation 'org.postgresql:postgresql:42.3.4'
 
     implementation ('com.oracle.ojdbc:ojdbc10:19.3.0.0') {
         // causing module issues
         exclude module: 'oraclepki'
     }
 
-    implementation ('com.google.guava:guava:30.1.1-jre') {
+    implementation ('com.google.guava:guava:31.1-jre') {
         // TODO: Remove this as soon as https://github.com/google/guava/issues/2960 is fixed
         exclude module: "jsr305"
     }
@@ -168,38 +160,33 @@ dependencies {
     implementation group: 'jakarta.annotation', name: 'jakarta.annotation-api', version: '1.3.5'
 
     // JavaFX stuff
-    implementation 'org.kordamp.ikonli:ikonli-javafx:12.2.0'
-    implementation 'org.kordamp.ikonli:ikonli-materialdesign2-pack:12.2.0'
+    implementation 'org.kordamp.ikonli:ikonli-javafx:12.3.1'
+    implementation 'org.kordamp.ikonli:ikonli-materialdesign2-pack:12.3.1'
     implementation 'de.saxsys:mvvmfx-validation:1.9.0-SNAPSHOT'
     implementation 'de.saxsys:mvvmfx:1.8.0'
-    implementation 'com.tobiasdiez:easybind:2.1.0'
-    implementation 'org.fxmisc.flowless:flowless:0.6.3'
-    implementation 'org.fxmisc.richtext:richtextfx:0.10.6'
+    implementation 'com.tobiasdiez:easybind:2.2'
+    implementation 'org.fxmisc.flowless:flowless:0.6.9'
+    implementation 'org.fxmisc.richtext:richtextfx:0.10.9'
     implementation group: 'org.glassfish.hk2.external', name: 'jakarta.inject', version: '2.6.1'
     implementation 'com.jfoenix:jfoenix:9.0.10'
-    implementation 'org.controlsfx:controlsfx:11.1.0'
+    implementation 'org.controlsfx:controlsfx:11.1.1'
 
-    implementation 'org.jsoup:jsoup:1.13.1'
-    implementation 'com.konghq:unirest-java:3.11.11'
+    implementation 'org.jsoup:jsoup:1.14.3'
+    implementation 'com.konghq:unirest-java:3.13.8'
 
-    implementation 'org.slf4j:slf4j-api:2.0.0-alpha1'
-    implementation group: 'org.apache.logging.log4j', name: 'log4j-jcl', version: '3.0.0-SNAPSHOT'
-    implementation group: 'org.apache.logging.log4j', name: 'log4j-slf4j18-impl', version: '3.0.0-SNAPSHOT'
-    implementation group: 'org.apache.logging.log4j', name: 'log4j-plugins', version: '3.0.0-SNAPSHOT'
-    implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '3.0.0-SNAPSHOT'
-    implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: '3.0.0-SNAPSHOT'
-    annotationProcessor group: 'org.apache.logging.log4j', name: 'log4j-core', version: '3.0.0-SNAPSHOT'
+    implementation 'org.slf4j:slf4j-api:2.0.0-alpha7'
+    implementation "org.tinylog:tinylog-api:2.4.1"
+    implementation "org.tinylog:slf4j-tinylog:2.4.1"
+    implementation "org.tinylog:tinylog-impl:2.4.1"
 
-    // SNAPSHOT is required because of plain-java support
-    // See https://github.com/michel-kraemer/citeproc-java/issues/92 for details
-    implementation 'de.undercouch:citeproc-java:3.0.0-SNAPSHOT'
+    implementation 'de.undercouch:citeproc-java:3.0.0-alpha.6'
 
-    implementation group: 'jakarta.activation', name: 'jakarta.activation-api', version: '1.2.1'
-    implementation group: 'jakarta.xml.bind', name: 'jakarta.xml.bind-api', version: '2.3.2'
-    implementation group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '2.3.2'
+    // jakarta.activation is already dependency of glassfish
+    implementation group: 'jakarta.xml.bind', name: 'jakarta.xml.bind-api', version: '3.0.1'
+    implementation group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '3.0.2'
 
-    implementation ('com.github.tomtung:latex2unicode_2.12:0.2.6') {
-        exclude module: 'fastparse_2.12'
+    implementation ('com.github.tomtung:latex2unicode_2.13:0.3.2') {
+        exclude module: 'fastparse_2.13'
     }
 
     implementation group: 'com.microsoft.azure', name: 'applicationinsights-core', version: '2.4.1'
@@ -207,69 +194,31 @@ dependencies {
         exclude module: "log4j-core"
     }
 
-    implementation 'com.vladsch.flexmark:flexmark:0.62.2'
-    implementation 'com.vladsch.flexmark:flexmark-ext-gfm-strikethrough:0.62.2'
-    implementation 'com.vladsch.flexmark:flexmark-ext-gfm-tasklist:0.62.2'
+    implementation 'com.vladsch.flexmark:flexmark:0.64.0'
+    implementation 'com.vladsch.flexmark:flexmark-ext-gfm-strikethrough:0.64.0'
+    implementation 'com.vladsch.flexmark:flexmark-ext-gfm-tasklist:0.64.0'
 
-    testImplementation 'io.github.classgraph:classgraph:4.8.105'
-    testImplementation 'org.junit.jupiter:junit-jupiter:5.7.1'
-    testRuntimeOnly 'org.junit.vintage:junit-vintage-engine:5.7.1'
-    testImplementation 'org.junit.platform:junit-platform-launcher:1.7.1'
+    implementation group: 'net.harawata', name: 'appdirs', version: '1.2.1'
 
-    testImplementation 'net.bytebuddy:byte-buddy-parent:1.11.0'
+    testImplementation 'io.github.classgraph:classgraph:4.8.146'
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.8.2'
+    testImplementation 'org.junit.platform:junit-platform-launcher:1.8.2'
+
     testRuntimeOnly group: 'org.apache.logging.log4j', name: 'log4j-core', version: '3.0.0-SNAPSHOT'
     testRuntimeOnly group: 'org.apache.logging.log4j', name: 'log4j-jul', version: '3.0.0-SNAPSHOT'
-    testImplementation 'org.mockito:mockito-core:3.9.0'
-    testImplementation 'org.xmlunit:xmlunit-core:2.8.2'
-    testImplementation 'org.xmlunit:xmlunit-matchers:2.8.2'
-    testRuntimeOnly 'com.tngtech.archunit:archunit-junit5-engine:0.18.0'
-    testImplementation 'com.tngtech.archunit:archunit-junit5-api:0.17.0'
+    testImplementation 'org.mockito:mockito-core:4.5.1'
+    testImplementation 'org.xmlunit:xmlunit-core:2.9.0'
+    testImplementation 'org.xmlunit:xmlunit-matchers:2.9.0'
+    testRuntimeOnly 'com.tngtech.archunit:archunit-junit5-engine:0.23.1'
+    testImplementation 'com.tngtech.archunit:archunit-junit5-api:0.23.1'
     testImplementation "org.testfx:testfx-core:4.0.17-alpha-SNAPSHOT"
     testImplementation "org.testfx:testfx-junit5:4.0.17-alpha-SNAPSHOT"
     testImplementation "org.hamcrest:hamcrest-library:2.2"
 
-    checkstyle 'com.puppycrawl.tools:checkstyle:8.42'
-    xjc group: 'org.glassfish.jaxb', name: 'jaxb-xjc', version: '2.3.3'
-}
-
-dependencyUpdates {
-    outputFormatter = "json"
-}
-
-// We have some dependencies which cannot be updated due to various reasons.
-dependencyUpdates.resolutionStrategy {
-    componentSelection { rules ->
-        rules.all { ComponentSelection selection ->
-            boolean rejected = ['alpha', 'snapshot', 'beta', 'rc', 'cr', 'm', 'preview', 'b', 'ea'].any { qualifier ->
-                selection.candidate.version ==~ /(?i).*[.-]$qualifier[.\d-+]*/
-            }
-            if (rejected) {
-                selection.reject('Release candidate')
-            }
-        }
-        rules.withModule("org.javamodularity.moduleplugin:org.javamodularity.moduleplugin.gradle.plugin") { ComponentSelection selection ->
-            if (selection.candidate.version ==~ /1.6.0/) {
-                selection.reject("Does not work due to bug, see https://github.com/JabRef/jabref/pull/5270")
-            }
-        }
-        rules.withModule("com.microsoft.azure:applicationinsights-core") { ComponentSelection selection ->
-            if (selection.candidate.version ==~ /2.5.0/ || selection.candidate.version ==~ /2.5.1/) {
-                selection.reject("Does not work due to bug, see https://github.com/JabRef/jabref/pull/5596")
-            }
-        }
-        rules.withModule("com.microsoft.azure:applicationinsights-logging-log4j2") { ComponentSelection selection ->
-            if (selection.candidate.version ==~ /2.5.0/ || selection.candidate.version ==~ /2.5.1/) {
-                selection.reject("Does not work due to bug, see https://github.com/JabRef/jabref/pull/5596")
-            }
-        }
-    }
-}
-
-task checkOutdatedDependencies(dependsOn: dependencyUpdates) {
-    doLast {
-        def dependencyReport = new JsonSlurper().parseText(new File("build/dependencyUpdates/report.json").text)
-        assert dependencyReport.outdated.count == 0: "There are outdated dependencies in build.gradle!\n Run ./gradlew dependencyUpdates to see which"
-    }
+    checkstyle 'com.puppycrawl.tools:checkstyle:10.1'
+    // xjc needs the runtime as well for the ant task, otherwise it fails
+    xjc group: 'org.glassfish.jaxb', name: 'jaxb-xjc', version: '3.0.2'
+    xjc group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '3.0.2'
 }
 
 clean {
@@ -395,7 +344,7 @@ compileJava {
     options.compilerArgs << "-Xlint:none"
     dependsOn "generateSource"
 
-    options.annotationProcessorGeneratedSourcesDirectory = file("src-gen/main/java")
+    options.generatedSourceOutputDirectory.set(file("src-gen/main/java"))
 
     moduleOptions {
         // TODO: Remove access to internal api
@@ -523,10 +472,10 @@ task copyTestResources(type: Copy) {
 processTestResources.dependsOn copyTestResources
 
 tasks.withType(Test) {
-    reports.html.destination = file("${reporting.baseDir}/${name}")
+    reports.html.outputLocation.set(file("${reporting.baseDir}/${name}"))
 }
 
-task jacocoMergePrep() {
+task jacocoPrepare() {
     doFirst {
         // Ignore failures of tests
         tasks.withType(Test) {
@@ -534,26 +483,21 @@ task jacocoMergePrep() {
         }
     }
 }
-test.mustRunAfter jacocoMergePrep
-databaseTest.mustRunAfter jacocoMergePrep
-fetcherTest.mustRunAfter jacocoMergePrep
+test.mustRunAfter jacocoPrepare
+databaseTest.mustRunAfter jacocoPrepare
+fetcherTest.mustRunAfter jacocoPrepare
 
-task jacocoMerge(type: JacocoMerge) {
+jacocoTestReport {
     executionData files(
             "$buildDir/jacoco/test.exec",
             "$buildDir/jacoco/databaseTest.exec",
             "$buildDir/jacoco/fetcherTest.exec").filter { it.exists() }
-    dependsOn jacocoMergePrep, test, databaseTest, fetcherTest
-}
-
-jacocoTestReport {
-    executionData jacocoMerge.destinationFile
-    dependsOn jacocoMerge
+    dependsOn jacocoPrepare, test, databaseTest, fetcherTest
 
     reports {
-        csv.enabled = true
-        html.enabled = true
-        xml.enabled = true // coveralls plugin depends on xml format report
+        csv.getRequired().set(true)
+        html.getRequired().set(true)
+        xml.getRequired().set(true) // coveralls plugin depends on xml format report
     }
 }
 
@@ -611,35 +555,18 @@ jlink {
         requires 'jdk.security.jgss'
         requires 'jdk.xml.dom'
         requires 'com.google.gson'
-        requires 'com.sun.xml.fastinfoset'
-        requires 'com.sun.xml.txw2'
         requires 'org.slf4j'
-        uses 'org.apache.logging.log4j.util.PropertySource'
-        uses 'org.apache.logging.log4j.core.util.WatchEventService'
-        uses 'org.apache.logging.log4j.plugins.processor.PluginService'
-        uses 'org.controlsfx.glyphfont.GlyphFont'
+        requires 'jakarta.xml.bind'
         uses 'com.airhacks.afterburner.views.ResourceLocator'
-        uses 'org.apache.logging.log4j.message.ThreadDumpMessage.ThreadInfoFactory'
         uses 'com.airhacks.afterburner.injection.PresenterFactory'
-        uses 'org.apache.logging.log4j.spi.Provider'
         uses 'org.mariadb.jdbc.credential.CredentialPlugin'
         uses 'org.mariadb.jdbc.authentication.AuthenticationPlugin'
         uses 'org.mariadb.jdbc.tls.TlsSocketPlugin'
         uses 'org.mariadb.jdbc.LocalInfileInterceptor'
         uses 'org.eclipse.jgit.transport.SshSessionFactory'
         uses 'org.eclipse.jgit.lib.GpgSigner'
-        uses 'javax.xml.bind.JAXBContextFactory'
-        provides 'org.apache.lucene.codecs.DocValuesFormat' with 'org.apache.lucene.codecs.lucene80.Lucene80DocValuesFormat'
-        provides 'javax.annotation.processing.Processor' with 'org.apache.logging.log4j.plugins.processor.PluginProcessor'
-        provides 'org.controlsfx.glyphfont.GlyphFont' with 'org.controlsfx.glyphfont.FontAwesome'
-        provides 'org.apache.logging.log4j.message.ThreadDumpMessage.ThreadInfoFactory' with 'org.apache.logging.log4j.core.message.ExtendedThreadInfoFactory'
         provides 'org.mariadb.jdbc.tls.TlsSocketPlugin' with 'org.mariadb.jdbc.internal.protocol.tls.DefaultTlsSocketPlugin'
-        provides 'com.microsoft.applicationinsights.core.dependencies.io.grpc.ServerProvider' with 'com.microsoft.applicationinsights.core.dependencies.io.grpc.netty.shaded.io.grpc.netty.NettyServerProvider'
-        provides 'com.microsoft.applicationinsights.core.dependencies.io.grpc.NameResolverProvider' with 'com.microsoft.applicationinsights.core.dependencies.io.grpc.internal.DnsNameResolverProvider'
-        provides 'org.apache.logging.log4j.util.PropertySource' with 'org.apache.logging.log4j.util.EnvironmentPropertySource',
-                'org.apache.logging.log4j.util.SystemPropertiesPropertySource'
         provides 'java.sql.Driver' with 'org.postgresql.Driver'
-        provides 'org.apache.logging.log4j.plugins.processor.PluginService' with 'org.apache.logging.log4j.plugins.convert.plugins.Log4jPlugins'
         provides 'org.mariadb.jdbc.authentication.AuthenticationPlugin' with 'org.mariadb.jdbc.internal.com.send.authentication.CachingSha2PasswordPlugin',
                 'org.mariadb.jdbc.internal.com.send.authentication.ClearPasswordPlugin',
                 'org.mariadb.jdbc.internal.com.send.authentication.Ed25519PasswordPlugin',
@@ -651,13 +578,8 @@ jlink {
         provides 'org.mariadb.jdbc.credential.CredentialPlugin' with 'org.mariadb.jdbc.credential.aws.AwsIamCredentialPlugin',
                 'org.mariadb.jdbc.credential.env.EnvCredentialPlugin',
                 'org.mariadb.jdbc.credential.system.PropertiesCredentialPlugin'
-        provides 'org.apache.commons.logging.LogFactory' with 'org.apache.logging.log4j.jcl.LogFactoryImpl'
-        provides 'org.slf4j.spi.SLF4JServiceProvider' with 'org.apache.logging.slf4j.SLF4JServiceProvider'
-        provides 'org.apache.logging.log4j.spi.Provider' with 'org.apache.logging.log4j.core.impl.Log4jProvider'
         provides 'java.security.Provider' with 'org.bouncycastle.jce.provider.BouncyCastleProvider',
-                'org.bouncycastle.pqc.jcajce.provider.BouncyCastlePQCProvider'
-        provides 'com.microsoft.applicationinsights.core.dependencies.io.grpc.ManagedChannelProvider' with 'com.microsoft.applicationinsights.core.dependencies.io.grpc.netty.shaded.io.grpc.netty.NettyChannelProvider'
-    }
+                'org.bouncycastle.pqc.jcajce.provider.BouncyCastlePQCProvider'    }
 
     jpackage {
         outputDir = "distribution"

@@ -1,3 +1,7 @@
+---
+parent: Architectural Decisions
+nav_order: 13
+---
 # Add Native Support for BibLatex-Software
 
 * Deciders: Oliver Kopp
@@ -16,12 +20,12 @@ With citing software becoming fairly common, native support is helpful.
 ## Considered Options
 
 * Add the new entry types to the existing biblatex types
-* Add a divider with label Biblatex-Software under which the new entries are listed : Native support for Biblatex-Software
-* Support via customized entry types : A user can load a customized bib file
+* Add a divider with label Biblatex-Software under which the new entries are listed: Native support for Biblatex-Software
+* Support via customized entry types: A user can load a customized bib file
 
 ## Decision Outcome
 
-Chosen option: Add a new divider, because comes out best (see below).
+Chosen option: "Add a new divider", because comes out best (see below).
 
 ### Positive Consequences
 
@@ -33,15 +37,16 @@ Chosen option: Add a new divider, because comes out best (see below).
 
 ## Pros and Cons of the Options
 
-### Adding the new entry types to the existing biblatex types
+### Add the new entry types to the existing biblatex types
 
 * Good, because there is no need for a new category in the add entry pane
 
-### Add a divider with label Biblatex-Software with relevant types
+### Add a divider with label Biblatex-Software under which the new entries are listed: Native support for Biblatex-Software
 
 * Good, since this gives the user a bit more clarity
 
-### Support via customized entry types
+
+### Support via customized entry types: A user can load a customized bib file
 
 * Good, because no code needs to be changed
 * Bad, because documentation is needed

@@ -11,14 +11,14 @@
       <name>Alex Ball</name>
       <email>ab318@bath.ac.uk</email>
     </author>
-    <author>
+    <contributor>
       <name>Rob Fuller</name>
       <email>rob.fuller1@gmail.com</email>
-    </author>
+    </contributor>
     <category citation-format="author-date"/>
     <category field="generic-base"/>
     <summary>Adaptation of Harvard referencing style used at the University of Bath.</summary>
-    <updated>2021-02-24T15:00:00+00:00</updated>
+    <updated>2022-03-04T14:00:00+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="en">
@@ -84,14 +84,17 @@
   </macro>
   <macro name="access">
     <choose>
-      <if variable="URL DOI" match="any">
+      <if variable="URL DOI accessed" match="any">
         <text term="available at" text-case="capitalize-first" suffix=": "/>
         <choose>
           <if variable="DOI">
             <text variable="DOI" prefix="https://doi.org/"/>
           </if>
-          <else>
+          <else-if variable="URL">
             <text variable="URL"/>
+          </else-if>
+          <else>
+            <text variable="archive"/>
           </else>
         </choose>
         <group prefix=" [" suffix="]">
@@ -137,45 +140,131 @@
     </group>
   </macro>
   <macro name="title">
-    <choose>
-      <if type="bill broadcast book dataset graphic legal_case map motion_picture musical_score patent report song speech webpage thesis" match="any">
-        <text variable="title" font-style="italic"/>
-      </if>
-      <else-if type="legislation legal_case" match="any">
-        <choose>
-          <if variable="container-title">
-            <text variable="title"/>
-          </if>
-          <else>
-            <text variable="title" font-style="italic"/>
-          </else>
-        </choose>
-      </else-if>
-      <else>
-        <text variable="title"/>
-      </else>
-    </choose>
-    <text variable="original-title" prefix=" [" suffix="]"/>
-    <group prefix=" (" suffix=")">
-      <text term="version" form="short"/>
-      <text variable="version"/>
+    <group delimiter=" ">
+      <choose>
+        <if type="bill book dataset entry graphic legal_case map motion_picture musical_score patent report software song speech standard webpage thesis" match="any">
+          <text variable="title" font-style="italic"/>
+        </if>
+        <else-if type="legislation pamphlet post regulation" match="any">
+          <choose>
+            <if variable="container-title">
+              <text variable="title"/>
+            </if>
+            <else>
+              <text variable="title" font-style="italic"/>
+            </else>
+          </choose>
+        </else-if>
+        <else>
+          <text variable="title"/>
+        </else>
+      </choose>
+      <text variable="original-title" prefix="[" suffix="]"/>
+      <group prefix="(" suffix=")">
+        <text term="version" form="short"/>
+        <text variable="version"/>
+      </group>
+      <choose>
+        <if type="broadcast motion_picture thesis" match="any"/>
+        <else-if type="report" variable="number"/>
+        <else-if type="standard" variable="number"/>
+        <else-if type="patent" variable="number"/>
+        <else-if type="bill" variable="number"/>
+        <else>
+          <text variable="genre" prefix="[" suffix="]"/>
+        </else>
+      </choose>
+      <choose>
+        <if type="bill entry legal_case legislation regulation" match="any">
+          <text macro="online"/>
+        </if>
+        <else-if type="book">
+          <choose>
+            <if variable="title">
+              <text macro="online"/>
+            </if>
+          </choose>
+        </else-if>
+        <else-if variable="container-title" match="none">
+          <choose>
+            <if type="software" match="any"/>
+            <else-if variable="author editor" match="any">
+              <choose>
+                <if type="broadcast">
+                  <choose>
+                    <if variable="collection-title" match="none">
+                      <text macro="online"/>
+                    </if>
+                  </choose>
+                </if>
+                <else-if type="graphic motion_picture song" match="any">
+                  <text macro="online"/>
+                </else-if>
+                <else-if variable="archive" match="none">
+                  <text macro="online"/>
+                </else-if>
+              </choose>
+            </else-if>
+          </choose>
+        </else-if>
+      </choose>
     </group>
+  </macro>
+  <macro name="title-label">
     <choose>
-      <if type="thesis motion_picture broadcast" match="any"/>
-      <else-if type="report" variable="number"/>
-      <else-if type="patent" variable="number"/>
-      <else-if type="bill" variable="number"/>
+      <if type="entry">
+        <text variable="container-title"/>
+      </if>
       <else>
-        <text variable="genre" prefix=" [" suffix="]"/>
+        <group delimiter=" ">
+          <choose>
+            <if type="bill dataset graphic legal_case map motion_picture musical_score patent report software song speech standard webpage thesis" match="any">
+              <text variable="title" font-style="italic"/>
+            </if>
+            <else-if type="legislation pamphlet post regulation" match="any">
+              <choose>
+                <if variable="container-title">
+                  <text variable="title"/>
+                </if>
+                <else>
+                  <text variable="title" font-style="italic"/>
+                </else>
+              </choose>
+            </else-if>
+            <else>
+              <text variable="title"/>
+            </else>
+          </choose>
+          <choose>
+            <if variable="container-title" match="none">
+              <choose>
+                <if type="bill legal_case legislation regulation software" match="any"/>
+                <else-if type="broadcast">
+                  <choose>
+                    <if variable="collection-title" match="none">
+                      <text macro="online"/>
+                    </if>
+                  </choose>
+                </else-if>
+                <else-if type="graphic motion_picture song" match="any">
+                  <text macro="online"/>
+                </else-if>
+                <else-if variable="archive" match="none">
+                  <text macro="online"/>
+                </else-if>
+              </choose>
+            </if>
+          </choose>
+        </group>
       </else>
     </choose>
   </macro>
   <macro name="title-short">
     <choose>
-      <if type="bill broadcast dataset graphic map motion_picture musical_score patent report song webpage thesis" match="any">
+      <if type="bill dataset graphic legal_case map motion_picture musical_score patent report software song speech standard webpage thesis" match="any">
         <text variable="title" form="short" font-style="italic"/>
       </if>
-      <else-if type="legislation legal_case" match="any">
+      <else-if type="legislation pamphlet post regulation" match="any">
         <choose>
           <if variable="container-title">
             <text variable="title" form="short"/>
@@ -193,29 +282,6 @@
       </else>
     </choose>
   </macro>
-  <macro name="title-label">
-    <choose>
-      <if type="entry">
-        <text variable="container-title"/>
-      </if>
-      <else-if type="bill broadcast dataset graphic legal_case map motion_picture musical_score patent report song speech webpage thesis" match="any">
-        <text variable="title" font-style="italic"/>
-      </else-if>
-      <else-if type="legislation legal_case" match="any">
-        <choose>
-          <if variable="container-title">
-            <text variable="title"/>
-          </if>
-          <else>
-            <text variable="title" font-style="italic"/>
-          </else>
-        </choose>
-      </else-if>
-      <else>
-        <text variable="title"/>
-      </else>
-    </choose>
-  </macro>
   <macro name="translator">
     <names variable="translator" prefix="(" suffix=")">
       <name and="text" delimiter-precedes-last="never" initialize-with="."/>
@@ -224,7 +290,7 @@
   </macro>
   <macro name="online">
     <choose>
-      <if variable="URL DOI" match="any">
+      <if variable="URL DOI accessed" match="any">
         <text term="online" text-case="capitalize-first" prefix="[" suffix="]"/>
       </if>
     </choose>
@@ -240,11 +306,20 @@
       <if variable="issued">
         <choose>
           <if type="post">
-            <date variable="issued">
-              <date-part name="day" suffix=" "/>
-              <date-part name="month" suffix=" "/>
-              <date-part name="year"/>
-            </date>
+            <choose>
+              <if variable="container-title">
+                <date variable="issued">
+                  <date-part name="day" suffix=" "/>
+                  <date-part name="month" suffix=" "/>
+                  <date-part name="year"/>
+                </date>
+              </if>
+              <else>
+                <date variable="issued">
+                  <date-part name="year"/>
+                </date>
+              </else>
+            </choose>
           </if>
           <else>
             <date variable="issued">
@@ -301,7 +376,7 @@
       <text variable="page"/>
     </group>
   </macro>
-  <citation et-al-min="3" et-al-use-first="1" disambiguate-add-year-suffix="true" disambiguate-add-names="true" disambiguate-add-givenname="true">
+  <citation et-al-min="4" et-al-use-first="1" disambiguate-add-year-suffix="true" disambiguate-add-names="true" disambiguate-add-givenname="true">
     <layout prefix="(" suffix=")" delimiter="; ">
       <group delimiter=", ">
         <text macro="author-short"/>
@@ -313,7 +388,7 @@
       </group>
     </layout>
   </citation>
-  <bibliography entry-spacing="0" hanging-indent="true">
+  <bibliography entry-spacing="1" hanging-indent="false">
     <sort>
       <key macro="author"/>
       <key variable="issued"/>
@@ -321,7 +396,7 @@
     </sort>
     <layout>
       <choose>
-        <if type="legislation">
+        <if type="legislation regulation" match="any">
           <group suffix=".">
             <group delimiter=" ">
               <text macro="author"/>
@@ -334,8 +409,7 @@
                 </else>
               </choose>
             </group>
-            <text macro="title" prefix=", "/>
-            <text macro="online" prefix=" "/>
+            <text macro="title" prefix=" "/>
             <choose>
               <if variable="container-title">
                 <group prefix=" " delimiter=" ">
@@ -391,7 +465,6 @@
                 <text variable="number" prefix="(" suffix=")"/>
                 <text macro="year-date" prefix="[" suffix="]"/>
                 <text macro="title"/>
-                <text macro="online"/>
                 <choose>
                   <if variable="container-title">
                     <text variable="container-title" font-style="italic"/>
@@ -424,10 +497,7 @@
                     <text macro="year-date" prefix="[" suffix="]"/>
                   </else>
                 </choose>
-                <group delimiter=" ">
-                  <text macro="title"/>
-                  <text macro="online"/>
-                </group>
+                <text macro="title"/>
                 <choose>
                   <if variable="container-title">
                     <group delimiter=" ">
@@ -459,30 +529,19 @@
         </else>
       </choose>
       <choose>
-        <if type="legislation legal_case" match="any"/>
+        <if type="legal_case legislation regulation" match="any"/>
         <else-if type="book motion_picture musical_score song speech" match="any">
           <group prefix=" " suffix="." delimiter=" ">
             <text macro="title"/>
-            <choose>
-              <if variable="author editor" match="any">
-                <text macro="online"/>
-              </if>
-            </choose>
             <text macro="translator"/>
           </group>
           <group prefix=" " suffix="." delimiter=". ">
             <text macro="edition"/>
             <text macro="series"/>
+            <text variable="medium" text-case="capitalize-first"/>
             <choose>
               <if type="motion_picture">
-                <group delimiter=" ">
-                  <text variable="genre"/>
-                  <choose>
-                    <if variable="author editor" match="none">
-                      <text macro="online"/>
-                    </if>
-                  </choose>
-                </group>
+                <text variable="genre" text-case="capitalize-first"/>
               </if>
             </choose>
             <text macro="editor"/>
@@ -494,10 +553,7 @@
           <group prefix=" " suffix="." delimiter=". ">
             <text macro="byeditor"/>
             <text macro="edition"/>
-            <group delimiter=" ">
-              <text variable="title" font-style="italic"/>
-              <text macro="online"/>
-            </group>
+            <text macro="title"/>
             <text macro="series"/>
             <text macro="status"/>
             <text macro="publisher"/>
@@ -543,16 +599,9 @@
             </group>
           </group>
         </else-if>
-        <else-if type="bill report webpage" match="any">
-          <group prefix=" " suffix="." delimiter=" ">
-            <text macro="title"/>
-            <choose>
-              <if variable="archive" match="none">
-                <text macro="online"/>
-              </if>
-            </choose>
-          </group>
+        <else-if type="bill report standard webpage" match="any">
           <group prefix=" " suffix="." delimiter=". ">
+            <text macro="title"/>
             <text macro="edition"/>
             <choose>
               <if variable="number" match="none">
@@ -577,12 +626,11 @@
           </choose>
         </else-if>
         <else-if type="patent" match="any">
-          <group prefix=" " suffix="." delimiter=" ">
+          <group prefix=" " suffix="." delimiter=". ">
             <text macro="title"/>
-            <text macro="online"/>
+            <text macro="series-genre"/>
+            <text macro="publisher"/>
           </group>
-          <text macro="series-genre" prefix=" " suffix="."/>
-          <text macro="publisher" prefix=" " suffix="."/>
         </else-if>
         <else-if type="chapter paper-conference" match="any">
           <text macro="title" prefix=" " suffix="."/>
@@ -620,37 +668,32 @@
         </else-if>
         <else-if type="graphic map" match="any">
           <group prefix=" " suffix="." delimiter=", ">
-            <group delimiter=" ">
-              <text macro="title"/>
-              <text macro="online"/>
-            </group>
+            <text macro="title"/>
             <text variable="scale"/>
           </group>
           <group prefix=" " suffix="." delimiter=". ">
             <text macro="edition"/>
             <text macro="series"/>
             <text macro="editor"/>
+            <text macro="publisher"/>
+            <text macro="archive"/>
           </group>
-          <text prefix=" " suffix="." macro="publisher"/>
-          <text prefix=" " suffix="." macro="archive"/>
         </else-if>
         <else-if type="broadcast">
-          <group prefix=" " suffix="." delimiter=" ">
+          <group prefix=" " suffix="." delimiter=". ">
             <text macro="title"/>
-            <choose>
-              <if variable="author editor" match="any">
-                <text macro="online"/>
-              </if>
-            </choose>
-          </group>
-          <text macro="series-genre" prefix=" " suffix="."/>
-          <group prefix=" " suffix="." delimiter=" ">
-            <text variable="medium"/>
-            <choose>
-              <if variable="author editor" match="none">
-                <text macro="online"/>
-              </if>
-            </choose>
+            <group delimiter=" ">
+              <group delimiter=", ">
+                <text variable="collection-title" font-style="italic"/>
+                <text variable="number" font-style="italic" text-case="capitalize-first"/>
+              </group>
+              <choose>
+                <if variable="collection-title" match="any">
+                  <text macro="online"/>
+                </if>
+              </choose>
+            </group>
+            <text variable="medium" text-case="capitalize-first"/>
           </group>
           <group prefix=" " suffix="." delimiter=", ">
             <text macro="publisher"/>
@@ -660,16 +703,32 @@
             </date>
           </group>
         </else-if>
+        <else-if type="post">
+          <choose>
+            <if variable="container-title">
+              <group prefix=" " suffix="." delimiter=". ">
+                <text macro="title"/>
+                <group delimiter=" ">
+                  <text variable="container-title" font-style="italic"/>
+                  <text macro="online"/>
+                </group>
+              </group>
+            </if>
+            <else>
+              <group prefix=" " suffix="." delimiter=", ">
+                <text macro="title"/>
+                <date variable="issued">
+                  <date-part name="day" suffix=" "/>
+                  <date-part name="month"/>
+                </date>
+              </group>
+            </else>
+          </choose>
+          <text prefix=" " suffix="." macro="publisher"/>
+        </else-if>
         <else>
-          <group prefix=" " suffix="." delimiter=" ">
-            <text macro="title"/>
-            <choose>
-              <if variable="container-title" match="none">
-                <text macro="online"/>
-              </if>
-            </choose>
-          </group>
           <group prefix=" " suffix="." delimiter=". ">
+            <text macro="title"/>
             <text macro="editor"/>
             <text macro="edition"/>
             <text macro="series"/>

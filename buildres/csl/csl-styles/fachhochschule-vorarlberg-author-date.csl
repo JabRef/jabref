@@ -29,7 +29,7 @@
     <category citation-format="author-date"/>
     <category field="generic-base"/>
     <summary>Citation Style of the University of Applied Sciences Vorarlberg/Austria, based on A Harvard author-date style variant, mostly german</summary>
-    <updated>2019-09-04T16:00:00+00:00</updated>
+    <updated>2021-06-12T09:00:00+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="de">
@@ -400,6 +400,7 @@
   <bibliography hanging-indent="true" et-al-min="4" et-al-use-first="1">
     <sort>
       <key macro="author"/>
+      <key macro="year-date"/>
       <key variable="title"/>
     </sort>
     <layout>

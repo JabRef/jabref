@@ -34,4 +34,9 @@ public class RemoveBracketsTest {
     public void bracePairWithEscapedBackslashCorrectlyRemoved() throws Exception {
         assertEquals("\\some text\\", formatter.format("\\{some text\\}"));
     }
+
+    @Test
+    public void withoutBracketsUnmodified() throws Exception {
+        assertEquals("some text", formatter.format("some text"));
+    }
 }

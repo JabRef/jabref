@@ -12,18 +12,18 @@
     <category citation-format="author-date"/>
     <category field="biology"/>
     <eissn>1940-3372</eissn>
-    <updated>2017-08-16T13:03:54+00:00</updated>
+    <updated>2021-05-05T12:00:00+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <macro name="editor">
     <names variable="editor" delimiter=", ">
-      <name and="text" initialize-with="." delimiter=", "/>
-      <label form="short" plural="never" prefix=", "/>
+      <name and="symbol" initialize-with="." delimiter=", " delimiter-precedes-last="never"/>
+      <label form="short" text-case="capitalize-first" prefix=" (" suffix=")"/>
     </names>
   </macro>
   <macro name="author">
     <names variable="author">
-      <name name-as-sort-order="first" and="text" sort-separator=", " initialize-with="." delimiter=", " delimiter-precedes-last="always"/>
+      <name name-as-sort-order="all" and="symbol" sort-separator=", " initialize-with="." delimiter=", " delimiter-precedes-last="always"/>
       <label form="short" prefix=" "/>
       <substitute>
         <names variable="editor"/>
@@ -33,7 +33,7 @@
   </macro>
   <macro name="author-short">
     <names variable="author">
-      <name form="short" and="text" delimiter=", " initialize-with="."/>
+      <name form="short" and="symbol" delimiter=", " initialize-with="."/>
       <substitute>
         <names variable="editor"/>
         <names variable="translator"/>
@@ -44,7 +44,7 @@
   <macro name="title">
     <choose>
       <if type="book webpage" match="any">
-        <text variable="title" text-case="title"/>
+        <text variable="title" text-case="title" font-style="italic"/>
       </if>
       <else>
         <text variable="title"/>
@@ -88,7 +88,7 @@
       </group>
     </layout>
   </citation>
-  <bibliography line-spacing="2" hanging-indent="true">
+  <bibliography line-spacing="1" hanging-indent="true">
     <sort>
       <key macro="author" names-use-last="true"/>
       <key macro="year-date" names-use-last="true"/>
@@ -97,16 +97,16 @@
       <group delimiter=". ">
         <text macro="author"/>
         <date variable="issued">
-          <date-part name="year"/>
+          <date-part name="year" prefix="(" suffix=")"/>
         </date>
         <choose>
           <if type="book report chapter" match="any">
-            <group delimiter=". " prefix=" ">
-              <text macro="title"/>
+            <group delimiter=" ">
+              <text macro="title" suffix="."/>
               <text macro="edition"/>
-              <text macro="editor"/>
-              <text variable="collection-title"/>
-              <text variable="collection-number" prefix="No. "/>
+              <text macro="editor" prefix=" In " suffix=","/>
+              <text variable="container-title" font-style="italic"/>
+              <text variable="page" prefix="(pp. " suffix=")."/>
               <text macro="publisher"/>
             </group>
           </if>
@@ -145,8 +145,8 @@
           </else-if>
           <else-if type="thesis" match="any">
             <group prefix=" ">
-              <text macro="title" suffix="."/>
-              <text variable="genre" prefix=" " suffix=" Thesis."/>
+              <text macro="title" font-style="italic"/>
+              <text variable="genre" prefix=" [" suffix="]."/>
               <text variable="publisher" form="short" prefix=" " suffix=","/>
               <text variable="publisher-place" prefix=" "/>
             </group>
@@ -164,12 +164,12 @@
           <else>
             <group prefix=" ">
               <text macro="title"/>
-              <text variable="container-title" form="short" font-style="normal" prefix=". "/>
-              <group delimiter=":" prefix=" ">
-                <text variable="volume"/>
+              <text variable="container-title" font-style="italic" prefix=". " suffix=", "/>
+              <group delimiter=", " prefix=" ">
+                <text variable="volume" font-style="italic"/>
                 <text variable="page"/>
               </group>
-              <text variable="DOI" prefix=". doi:"/>
+              <text variable="DOI" prefix=". https://doi.org/"/>
             </group>
           </else>
         </choose>

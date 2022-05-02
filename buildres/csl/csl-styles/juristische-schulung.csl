@@ -144,7 +144,16 @@
               <text macro="edition"/>
             </else>
           </choose>
-          <text variable="locator" prefix=", "/>
+          <choose>
+            <!-- "S." as a locator is ommited. Many books however are instead cited by § plus margin number. The § has to appear. -->
+            <if locator="page">
+              <text variable="locator" prefix=", "/>
+            </if>
+            <else>
+              <label variable="locator" form="symbol" prefix=", "/>
+              <text variable="locator" prefix=" "/>
+            </else>
+          </choose>
         </else-if>
         <!-- Legal commentary or handbook should be of publication type "entry-encyclopedia"
         - The term "Bearbeiter" (author of a certain chapter) in the following examples should be added by you and is not governed by this stylesheet

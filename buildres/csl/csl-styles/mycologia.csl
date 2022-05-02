@@ -10,10 +10,15 @@
       <name>Franck Stefani</name>
       <email>fopstefani@gmail.com</email>
     </author>
+    <contributor>
+      <name>Jesper Svedberg</name>
+      <email>jsvedberg@gmail.com</email>
+    </contributor>
     <category citation-format="author-date"/>
     <category field="biology"/>
     <issn>0027-5514</issn>
-    <updated>2014-01-10T17:16:40+00:00</updated>
+    <eissn>1557-2536</eissn>
+    <updated>2021-07-09T12:23:00+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <macro name="author-short">
@@ -57,7 +62,7 @@
       <key macro="issued"/>
       <key macro="author"/>
     </sort>
-    <layout delimiter=", " prefix="(" suffix=")">
+    <layout delimiter="; " prefix="(" suffix=")">
       <group delimiter=" ">
         <text macro="author-short"/>
         <text macro="issued"/>
@@ -77,13 +82,12 @@
         <choose>
           <if type="article article-magazine article-newspaper article-journal review" match="any">
             <text variable="title" suffix="."/>
-            <text variable="container-title" form="short" text-case="title" strip-periods="true"/>
-            <group delimiter=", ">
+            <group delimiter=" ">
+              <text variable="container-title" text-case="title" strip-periods="true"/>
               <group delimiter=":">
                 <text variable="volume"/>
                 <text variable="page"/>
               </group>
-              <text variable="DOI" prefix="doi:"/>
             </group>
           </if>
           <else-if type="chapter paper-conference" match="any">
@@ -92,7 +96,7 @@
               <text macro="editor"/>
               <text variable="container-title" text-case="title" strip-periods="true"/>
               <text macro="publisher"/>
-              <label variable="page" form="short" strip-periods="true"/>
+              <label variable="page" form="short" strip-periods="true" plural="never"/>
               <text variable="page"/>
             </group>
           </else-if>

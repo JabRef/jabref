@@ -21,12 +21,12 @@
     <content>
         <VBox prefHeight="200.0" prefWidth="400.0">
             <children>
-                <TitledPane fx:id="recommendedEntriesTitlePane" animated="false" collapsible="false" text="Recommended">
+                <TitledPane fx:id="recommendedEntriesTitlePane" animated="false" collapsible="false" text="%Recommended">
                     <content>
                         <FlowPane fx:id="recommendedEntriesPane" prefHeight="50.0" prefWidth="200.0"/>
                     </content>
                 </TitledPane>
-                <TitledPane fx:id="otherEntriesTitlePane" animated="false" collapsible="true" expanded="false" text="Others">
+                <TitledPane fx:id="otherEntriesTitlePane" animated="false" collapsible="true" expanded="false" text="%Others">
                     <content>
                         <FlowPane fx:id="otherEntriesPane" prefHeight="100.0" prefWidth="200.0"/>
                     </content>

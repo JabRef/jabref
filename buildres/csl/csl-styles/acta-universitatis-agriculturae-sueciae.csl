@@ -4,19 +4,18 @@
     <title>Acta Universitatis Agriculturae Sueciae (Swedish University of Agricultural Sciences)</title>
     <id>http://www.zotero.org/styles/acta-universitatis-agriculturae-sueciae</id>
     <link href="http://www.zotero.org/styles/acta-universitatis-agriculturae-sueciae" rel="self"/>
-    <link href="https://www.slu.se/en/subweb/library/write-and-cite2/writing-references/referencelist-according-to-the-harvard-system/" rel="documentation"/>
-    <link href="https://www.slu.se/site/bibliotek/skriva-och-referera/skriva-referenser/referenslista-enligt-harvard/" rel="documentation"/>
+    <link href="https://www.slu.se/en/subweb/library/write-and-cite/writing-references/referenslista-enligt-harvard/" rel="documentation"/>
+    <link href="https://www.slu.se/en/subweb/library/write-and-cite/writing-references/in-text-citations-using-the-harvard-system/" rel="documentation"/>
     <author>
       <name>Rintze Zelle</name>
       <uri>http://twitter.com/rintzezelle</uri>
     </author>
     <contributor>
       <name>Patrick O'Brien</name>
-      <uri>https://twitter.com/patobrien333/</uri>
     </contributor>
     <category citation-format="author-date"/>
     <summary>Style as per the May 2019 guidelines.</summary>
-    <updated>2019-05-23T13:14:19+00:00</updated>
+    <updated>2021-11-10T10:39:01+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="en">
@@ -124,15 +123,31 @@
   </macro>
   <macro name="issued">
     <group prefix=" (" suffix=").">
-      <date variable="issued">
-        <date-part name="year"/>
-      </date>
+      <choose>
+        <if match="any" variable="issued">
+          <date variable="issued">
+            <date-part name="year"/>
+          </date>
+        </if>
+        <else>
+          <text term="no date" form="short"/>
+        </else>
+      </choose>
+      <text variable="year-suffix"/>
     </group>
   </macro>
   <macro name="issued-year">
-    <date variable="issued">
-      <date-part name="year"/>
-    </date>
+    <choose>
+      <if variable="issued" match="any">
+        <date variable="issued">
+          <date-part name="year"/>
+        </date>
+      </if>
+      <else>
+        <text term="no date" form="short"/>
+      </else>
+    </choose>
+    <text variable="year-suffix"/>
   </macro>
   <macro name="edition">
     <choose>
@@ -264,20 +279,12 @@
           <group delimiter=". " suffix=".">
             <text macro="title" prefix=", "/>
             <text variable="number"/>
-            <date variable="issued">
-              <date-part name="year"/>
-              <date-part name="month" form="numeric-leading-zeros" prefix="-"/>
-              <date-part name="day" form="numeric-leading-zeros" prefix="-"/>
-            </date>
+            <text macro="issued"/>
           </group>
         </else-if>
         <else-if type="webpage post-weblog post" match="any">
           <group delimiter=". " prefix=" ">
-            <date variable="issued" prefix="(" suffix=")">
-              <date-part name="year"/>
-              <date-part name="month" form="numeric-leading-zeros" prefix="-"/>
-              <date-part name="day" form="numeric-leading-zeros" prefix="-"/>
-            </date>
+            <text macro="issued"/>
             <text macro="title"/>
             <text variable="container-title" font-style="italic"/>
             <text variable="genre" prefix="[" suffix="]"/>

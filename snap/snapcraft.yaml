@@ -6,11 +6,12 @@ summary: Bibliography manager
 description: |
   JabRef is an open source bibliography reference manager.
   The native file format used by JabRef is BibTeX, the standard LaTeX bibliography format.
-  To access files in external media (i.e. usb drives) you must run:
+  To access files in external media (i.e., USB drives) you must run:
   `snap connect jabref:removable-media`
 grade: stable
 confinement: strict
-base: core18
+base: core20
+compression: lzo
 architectures:
   - build-on: amd64
 
@@ -37,13 +38,17 @@ plugs:
     write:
     - /etc/chromium/native-messaging-hosts/org.jabref.jabref.json
 
+layout:
+  /usr/share/libdrm:
+    bind: $SNAP/gnome-platform/usr/share/libdrm
+
 apps:
   jabref:
     command: bin/JabRef
-    extensions: [gnome-3-34]
+    extensions: [gnome-3-38]
   browser-proxy:
     command: lib/jabrefHost.py
-    extensions: [gnome-3-34]
+    extensions: [gnome-3-38]
 
 environment:
   _JAVA_OPTIONS: "-Duser.home=$SNAP_USER_DATA"
@@ -52,7 +57,7 @@ environment:
 parts:
   jabref:
     plugin: dump
-    source: https://builds.jabref.org/main/JabRef-5.3-portable_linux.tar.gz
+    source: https://builds.jabref.org/main/JabRef-5.7-portable_linux.tar.gz
     stage-packages:
       - x11-utils
     override-build: |
@@ -69,3 +74,20 @@ parts:
     plugin: dump
     organize:
       JabRef-launcher: bin/JabRef
+  cleanup:
+    after:
+      - jabref
+      - jabref-launcher
+    plugin: nil
+    build-snaps:
+      - gnome-3-38-2004
+    override-prime: |
+      set -eux
+      for snap in "gnome-3-38-2004"; do  # List all content-snaps you're using here
+          cd "/snap/$snap/current" && find . -type f,l -exec rm -f "$SNAPCRAFT_PRIME/{}" "$SNAPCRAFT_PRIME/usr/{}" \;
+      done
+      for CRUFT in bug lintian man; do
+          rm -rf $SNAPCRAFT_PRIME/usr/share/$CRUFT
+      done
+      find $SNAPCRAFT_PRIME/usr/share/doc/ -type f -not -name 'copyright' -delete
+      find $SNAPCRAFT_PRIME/usr/share -type d -empty -delete

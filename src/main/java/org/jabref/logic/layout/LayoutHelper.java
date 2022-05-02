@@ -175,20 +175,18 @@ public class LayoutHelper {
                 }
 
                 if (start) {
-
                     // changed section begin - arudert
                     // keep the backslash so we know wether this is a fieldname or an ordinary parameter
                     // if (c != '\\') {
                     buffer.append((char) c);
                     // }
                     // changed section end - arudert
-
                 }
             }
         }
     }
 
-    private void parse() throws IOException, StringIndexOutOfBoundsException {
+    private void parse() throws IOException {
         skipWhitespace();
 
         int c;
@@ -254,11 +252,15 @@ public class LayoutHelper {
 
                 if (name.isEmpty()) {
                     StringBuilder lastFive = new StringBuilder(10);
-                    for (StringInt entry : parsedEntries.subList(Math.max(0, parsedEntries.size() - 6),
-                            parsedEntries.size() - 1)) {
-                        lastFive.append(entry.s);
+                    if (parsedEntries.isEmpty()) {
+                        lastFive.append("unknown");
+                    } else {
+                        for (StringInt entry : parsedEntries.subList(Math.max(0, parsedEntries.size() - 6),
+                                parsedEntries.size() - 1)) {
+                            lastFive.append(entry.s);
+                        }
                     }
-                    throw new StringIndexOutOfBoundsException(
+                    throw new IOException(
                             "Backslash parsing error near \'" + lastFive.toString().replace("\n", " ") + '\'');
                 }
 

@@ -69,7 +69,7 @@
       </choose>
     </layout>
   </citation>
-  <bibliography>
+  <bibliography hanging-indent="true">
     <sort>
       <key macro="creator" names-min="3" names-use-first="3"/>
       <key variable="issued" sort="descending"/>

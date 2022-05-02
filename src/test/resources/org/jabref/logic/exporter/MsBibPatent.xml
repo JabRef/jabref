@@ -7,14 +7,14 @@
         <b:Title>The Vampire hunter</b:Title>
         <b:Tag>Lincoln1978</b:Tag>
         <b:Author>
-            <b:Author>
+            <b:Inventor>
                 <b:NameList>
                     <b:Person>
                         <b:Last>Lincoln</b:Last>
                         <b:First>Abraham</b:First>
                     </b:Person>
                 </b:NameList>
-            </b:Author>
+            </b:Inventor>
         </b:Author>
         <b:PatentNumber>12345677</b:PatentNumber>
     </b:Source>

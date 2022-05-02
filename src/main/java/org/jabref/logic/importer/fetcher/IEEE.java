@@ -18,10 +18,12 @@ import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.FulltextFetcher;
 import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.PagedSearchBasedParserFetcher;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.fetcher.transformers.IEEEQueryTransformer;
 import org.jabref.logic.net.URLDownload;
+import org.jabref.logic.preferences.FetcherApiKey;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.OS;
 import org.jabref.model.entry.BibEntry;
@@ -44,9 +46,12 @@ import org.slf4j.LoggerFactory;
  *
  * @implNote <a href="https://developer.ieee.org/docs">API documentation</a>
  */
-public class IEEE implements FulltextFetcher, PagedSearchBasedParserFetcher {
+public class IEEE implements FulltextFetcher, PagedSearchBasedParserFetcher, CustomizableKeyFetcher {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(IEEE.class);
+
+    private static final String FETCHER_NAME = "IEEEXplore";
+
     private static final String STAMP_BASE_STRING_DOCUMENT = "/stamp/stamp.jsp?tp=&arnumber=";
     private static final Pattern STAMP_PATTERN = Pattern.compile("(/stamp/stamp.jsp\\?t?p?=?&?arnumber=[0-9]+)");
     private static final Pattern DOCUMENT_PATTERN = Pattern.compile("document/([0-9]+)/");
@@ -55,17 +60,22 @@ public class IEEE implements FulltextFetcher, PagedSearchBasedParserFetcher {
     private static final String IEEE_DOI = "10.1109";
     private static final String BASE_URL = "https://ieeexplore.ieee.org";
     private static final String API_KEY = new BuildInfo().ieeeAPIKey;
+    private static final String TEST_URL_WITHOUT_API_KEY = "https://ieeexploreapi.ieee.org/api/v1/search/articles?max_records=0&apikey=";
 
-    private final ImportFormatPreferences preferences;
+    private final ImportFormatPreferences importFormatPreferences;
+    private final ImporterPreferences importerPreferences;
 
-    public IEEE(ImportFormatPreferences preferences) {
-        this.preferences = Objects.requireNonNull(preferences);
+    private IEEEQueryTransformer transformer;
+
+    public IEEE(ImportFormatPreferences importFormatPreferences, ImporterPreferences importerPreferences) {
+        this.importFormatPreferences = Objects.requireNonNull(importFormatPreferences);
+        this.importerPreferences = Objects.requireNonNull(importerPreferences);
     }
 
     /**
      * @implNote <a href="https://developer.ieee.org/docs/read/Metadata_API_responses">documentation</a>
      */
-    private static BibEntry parseJsonRespone(JSONObject jsonEntry, Character keywordSeparator) {
+    private static BibEntry parseJsonResponse(JSONObject jsonEntry, Character keywordSeparator) {
         BibEntry entry = new BibEntry();
 
         switch (jsonEntry.optString("content_type")) {
@@ -134,7 +144,6 @@ public class IEEE implements FulltextFetcher, PagedSearchBasedParserFetcher {
         // Try URL first -- will primarily work for entries from the old IEEE search
         Optional<String> urlString = entry.getField(StandardField.URL);
         if (urlString.isPresent()) {
-
             Matcher documentUrlMatcher = DOCUMENT_PATTERN.matcher(urlString.get());
             if (documentUrlMatcher.find()) {
                 String docId = documentUrlMatcher.group(1);
@@ -205,8 +214,24 @@ public class IEEE implements FulltextFetcher, PagedSearchBasedParserFetcher {
                 JSONArray results = jsonObject.getJSONArray("articles");
                 for (int i = 0; i < results.length(); i++) {
                     JSONObject jsonEntry = results.getJSONObject(i);
-                    BibEntry entry = parseJsonRespone(jsonEntry, preferences.getKeywordSeparator());
-                    entries.add(entry);
+                    BibEntry entry = parseJsonResponse(jsonEntry, importFormatPreferences.getKeywordSeparator());
+                    boolean addEntry;
+                    // In case entry has no year, add it
+                    // In case an entry has a year, check if its in the year range
+                    // The implementation uses some Java 8 Optional magic to implement that
+                    if (entry.hasField(StandardField.YEAR)) {
+                        addEntry = entry.getField(StandardField.YEAR).filter(year -> {
+                            int yearAsInteger = Integer.parseInt(year);
+                            return
+                                    transformer.getStartYear().map(startYear -> yearAsInteger >= startYear).orElse(true) &&
+                                            transformer.getEndYear().map(endYear -> yearAsInteger <= endYear).orElse(true);
+                        }).isPresent();
+                    } else {
+                        addEntry = true;
+                    }
+                    if (addEntry) {
+                        entries.add(entry);
+                    }
                 }
             }
 
@@ -216,7 +241,7 @@ public class IEEE implements FulltextFetcher, PagedSearchBasedParserFetcher {
 
     @Override
     public String getName() {
-        return "IEEEXplore";
+        return FETCHER_NAME;
     }
 
     @Override
@@ -224,12 +249,29 @@ public class IEEE implements FulltextFetcher, PagedSearchBasedParserFetcher {
         return Optional.of(HelpFile.FETCHER_IEEEXPLORE);
     }
 
+    private String getApiKey() {
+        return importerPreferences.getApiKeys()
+                                  .stream()
+                                  .filter(key -> key.getName().equalsIgnoreCase(this.getName()))
+                                  .filter(FetcherApiKey::shouldUse)
+                                  .findFirst()
+                                  .map(FetcherApiKey::getKey)
+                                  .orElse(API_KEY);
+    }
+
+    @Override
+    public String getTestUrl() {
+        return TEST_URL_WITHOUT_API_KEY;
+    }
+
     @Override
     public URL getURLForQuery(QueryNode luceneQuery, int pageNumber) throws URISyntaxException, MalformedURLException, FetcherException {
-        IEEEQueryTransformer transformer = new IEEEQueryTransformer();
+        // transformer is stored globally, because we need to filter out the bib entries by the year manually
+        // the transformer stores the min and max year
+        transformer = new IEEEQueryTransformer();
         String transformedQuery = transformer.transformLuceneQuery(luceneQuery).orElse("");
         URIBuilder uriBuilder = new URIBuilder("https://ieeexploreapi.ieee.org/api/v1/search/articles");
-        uriBuilder.addParameter("apikey", API_KEY);
+        uriBuilder.addParameter("apikey", getApiKey());
         if (!transformedQuery.isBlank()) {
             uriBuilder.addParameter("querytext", transformedQuery);
         }
@@ -249,8 +291,6 @@ public class IEEE implements FulltextFetcher, PagedSearchBasedParserFetcher {
         }
         // Starts to index at 1 for the first entry
         uriBuilder.addParameter("start_record", String.valueOf(getPageSize() * pageNumber) + 1);
-
-        URLDownload.bypassSSLVerification();
 
         return uriBuilder.build().toURL();
     }

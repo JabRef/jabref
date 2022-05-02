@@ -17,9 +17,8 @@ class AutomaticKeywordGroupTest {
         AutomaticKeywordGroup keywordsGroup = new AutomaticKeywordGroup("Keywords", GroupHierarchyType.INDEPENDENT, StandardField.KEYWORDS, ',', '>');
         BibEntry entry = new BibEntry().withField(StandardField.KEYWORDS, "A, B");
 
-        Set<GroupTreeNode> expected = new HashSet<>();
-        expected.add(GroupTreeNode.fromGroup(new WordKeywordGroup("A", GroupHierarchyType.INCLUDING, StandardField.KEYWORDS, "A", true, ',', true)));
-        expected.add(GroupTreeNode.fromGroup(new WordKeywordGroup("B", GroupHierarchyType.INCLUDING, StandardField.KEYWORDS, "B", true, ',', true)));
+        Set<GroupTreeNode> expected = createIncludingKeywordsSubgroup();
+
         assertEquals(expected, keywordsGroup.createSubgroups(entry));
     }
 
@@ -28,9 +27,16 @@ class AutomaticKeywordGroupTest {
         AutomaticKeywordGroup keywordsGroup = new AutomaticKeywordGroup("Keywords", GroupHierarchyType.INDEPENDENT, StandardField.KEYWORDS, ',', '>');
         BibEntry entry = new BibEntry().withField(StandardField.KEYWORDS, "A, ,B");
 
-        Set<GroupTreeNode> expected = new HashSet<>();
-        expected.add(GroupTreeNode.fromGroup(new WordKeywordGroup("A", GroupHierarchyType.INCLUDING, StandardField.KEYWORDS, "A", true, ',', true)));
-        expected.add(GroupTreeNode.fromGroup(new WordKeywordGroup("B", GroupHierarchyType.INCLUDING, StandardField.KEYWORDS, "B", true, ',', true)));
+        Set<GroupTreeNode> expected = createIncludingKeywordsSubgroup();
+
         assertEquals(expected, keywordsGroup.createSubgroups(entry));
+    }
+
+    private Set<GroupTreeNode> createIncludingKeywordsSubgroup() {
+        Set<GroupTreeNode> expectedKeywordsSubgroup = new HashSet<>();
+        expectedKeywordsSubgroup.add(GroupTreeNode.fromGroup(new WordKeywordGroup("A", GroupHierarchyType.INCLUDING, StandardField.KEYWORDS, "A", true, ',', true)));
+        expectedKeywordsSubgroup.add(GroupTreeNode.fromGroup(new WordKeywordGroup("B", GroupHierarchyType.INCLUDING, StandardField.KEYWORDS, "B", true, ',', true)));
+
+        return expectedKeywordsSubgroup;
     }
 }

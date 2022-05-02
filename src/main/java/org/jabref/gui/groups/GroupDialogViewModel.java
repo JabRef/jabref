@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
@@ -48,6 +49,8 @@ import org.jabref.model.groups.SearchGroup;
 import org.jabref.model.groups.TexGroup;
 import org.jabref.model.groups.WordKeywordGroup;
 import org.jabref.model.metadata.MetaData;
+import org.jabref.model.search.rules.SearchRules;
+import org.jabref.model.search.rules.SearchRules.SearchFlags;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.preferences.PreferencesService;
 
@@ -80,8 +83,7 @@ public class GroupDialogViewModel {
     private final BooleanProperty keywordGroupRegexProperty = new SimpleBooleanProperty();
 
     private final StringProperty searchGroupSearchTermProperty = new SimpleStringProperty("");
-    private final BooleanProperty searchGroupCaseSensitiveProperty = new SimpleBooleanProperty();
-    private final BooleanProperty searchGroupRegexProperty = new SimpleBooleanProperty();
+    private final ObjectProperty<EnumSet<SearchFlags>> searchFlagsProperty = new SimpleObjectProperty<>(EnumSet.noneOf(SearchFlags.class));
 
     private final BooleanProperty autoGroupKeywordsOptionProperty = new SimpleBooleanProperty();
     private final StringProperty autoGroupKeywordsFieldProperty = new SimpleStringProperty("");
@@ -107,12 +109,14 @@ public class GroupDialogViewModel {
     private final PreferencesService preferencesService;
     private final BibDatabaseContext currentDatabase;
     private final AbstractGroup editedGroup;
+    private final GroupDialogHeader groupDialogHeader;
 
-    public GroupDialogViewModel(DialogService dialogService, BibDatabaseContext currentDatabase, PreferencesService preferencesService, AbstractGroup editedGroup) {
+    public GroupDialogViewModel(DialogService dialogService, BibDatabaseContext currentDatabase, PreferencesService preferencesService, AbstractGroup editedGroup, GroupDialogHeader groupDialogHeader) {
         this.dialogService = dialogService;
         this.preferencesService = preferencesService;
         this.currentDatabase = currentDatabase;
         this.editedGroup = editedGroup;
+        this.groupDialogHeader = groupDialogHeader;
 
         setupValidation();
         setValues();
@@ -195,7 +199,7 @@ public class GroupDialogViewModel {
         searchRegexValidator = new FunctionBasedValidator<>(
                 searchGroupSearchTermProperty,
                 input -> {
-                    if (!searchGroupRegexProperty.getValue()) {
+                    if (!searchFlagsProperty.getValue().contains(SearchRules.SearchFlags.CASE_SENSITIVE)) {
                         return true;
                     }
 
@@ -227,12 +231,12 @@ public class GroupDialogViewModel {
                     if (StringUtil.isBlank(input)) {
                         return false;
                     } else {
-                        Path texFilePath = preferencesService.getWorkingDir().resolve(input);
-                        if (!Files.isRegularFile(texFilePath)) {
+                        Path inputPath = getAbsoluteTexGroupPath(input);
+                        if (!inputPath.isAbsolute() || !Files.isRegularFile(inputPath)) {
                             return false;
                         }
                         return FileUtil.getFileExtension(input)
-                                .map(extension -> extension.toLowerCase().equals("aux"))
+                                .map(extension -> extension.equalsIgnoreCase("aux"))
                                 .orElse(false);
                     }
                 },
@@ -261,6 +265,17 @@ public class GroupDialogViewModel {
                 validator.removeValidators(texGroupFilePathValidator);
             }
         });
+    }
+
+    /**
+     * Gets the absolute path relative to the LatexFileDirectory, if given a relative path
+     *
+     * @param input the user input path
+     * @return an absolute path if LatexFileDirectory exists; otherwise, returns input
+     */
+    private Path getAbsoluteTexGroupPath(String input) {
+        Optional<Path> latexFileDirectory = currentDatabase.getMetaData().getLatexFileDirectory(preferencesService.getFilePreferences().getUser());
+        return latexFileDirectory.map(path -> path.resolve(input)).orElse(Path.of(input));
     }
 
     public void validationHandler(Event event) {
@@ -308,8 +323,7 @@ public class GroupDialogViewModel {
                         groupName,
                         groupHierarchySelectedProperty.getValue(),
                         searchGroupSearchTermProperty.getValue().trim(),
-                        searchGroupCaseSensitiveProperty.getValue(),
-                        searchGroupRegexProperty.getValue());
+                        searchFlagsProperty.getValue());
             } else if (typeAutoProperty.getValue()) {
                 if (autoGroupKeywordsOptionProperty.getValue()) {
                     // Set default value for delimiters: ',' for base and '>' for hierarchical
@@ -394,8 +408,7 @@ public class GroupDialogViewModel {
 
                 SearchGroup group = (SearchGroup) editedGroup;
                 searchGroupSearchTermProperty.setValue(group.getSearchExpression());
-                searchGroupCaseSensitiveProperty.setValue(group.isCaseSensitive());
-                searchGroupRegexProperty.setValue(group.isRegularExpression());
+                searchFlagsProperty.setValue(group.getSearchFlags());
             } else if (editedGroup.getClass() == ExplicitGroup.class) {
                 typeExplicitProperty.setValue(true);
             } else if (editedGroup instanceof AutomaticGroup) {
@@ -423,7 +436,9 @@ public class GroupDialogViewModel {
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                 .addExtensionFilter(StandardFileType.AUX)
                 .withDefaultExtension(StandardFileType.AUX)
-                .withInitialDirectory(preferencesService.getWorkingDir()).build();
+                .withInitialDirectory(currentDatabase.getMetaData()
+                                                     .getLatexFileDirectory(preferencesService.getFilePreferences().getUser())
+                                                     .orElse(FileUtil.getInitialDirectory(currentDatabase, preferencesService.getFilePreferences().getWorkingDirectory()))).build();
         dialogService.showFileOpenDialog(fileDialogConfiguration)
                      .ifPresent(file -> texGroupFilePathProperty.setValue(
                              FileUtil.relativize(file.toAbsolutePath(), getFileDirectoriesAsPaths()).toString()
@@ -546,12 +561,8 @@ public class GroupDialogViewModel {
         return searchGroupSearchTermProperty;
     }
 
-    public BooleanProperty searchGroupCaseSensitiveProperty() {
-        return searchGroupCaseSensitiveProperty;
-    }
-
-    public BooleanProperty searchGroupRegexProperty() {
-        return searchGroupRegexProperty;
+    public ObjectProperty<EnumSet<SearchFlags>> searchFlagsProperty() {
+        return searchFlagsProperty;
     }
 
     public BooleanProperty autoGroupKeywordsOptionProperty() {

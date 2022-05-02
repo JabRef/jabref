@@ -3,8 +3,11 @@ package org.jabref.logic.importer.fetcher;
 import java.util.List;
 import java.util.Optional;
 
+import javafx.collections.FXCollections;
+
 import org.jabref.logic.bibtex.FieldContentFormatterPreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.PagedSearchBasedFetcher;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
@@ -35,9 +38,11 @@ public class AstrophysicsDataSystemTest implements PagedSearchFetcherTest {
     @BeforeEach
     public void setUp() throws Exception {
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class);
+        ImporterPreferences importerPreferences = mock(ImporterPreferences.class);
+        when(importerPreferences.getApiKeys()).thenReturn(FXCollections.emptyObservableSet());
         when(importFormatPreferences.getFieldContentFormatterPreferences()).thenReturn(
                 mock(FieldContentFormatterPreferences.class));
-        fetcher = new AstrophysicsDataSystem(importFormatPreferences);
+        fetcher = new AstrophysicsDataSystem(importFormatPreferences, importerPreferences);
 
         diezSliceTheoremEntry = new BibEntry();
         diezSliceTheoremEntry.setType(StandardEntryType.Article);
@@ -134,6 +139,7 @@ public class AstrophysicsDataSystemTest implements PagedSearchFetcherTest {
         luceyPaulEntry.setField(StandardField.URL, "https://ui.adsabs.harvard.edu/abs/2000JGR...10520297L");
         luceyPaulEntry.setField(StandardField.MONTH, "#jan#");
         luceyPaulEntry.setField(StandardField.NUMBER, "E8");
+        luceyPaulEntry.setField(StandardField.ABSTRACT, "The Clementine mission to the Moon returned global imaging data         collected by the ultraviolet visible (UVVIS) camera. This data         set is now in a final state of calibration, and a five-band         multispectral digital image model (DIM) of the lunar surface         will soon be available to the science community. We have used         observations of the lunar sample-return sites and stations         extracted from the final DIM in conjunction with compositional         information for returned lunar soils to revise our previously         published algorithms for the spectral determination of the FeO         and TiO$_{2}$ content of the lunar surface. The algorithms         successfully normalize the effects of space weathering so that         composition may be determined without regard to a surface's         state of maturity. These algorithms permit anyone with access to         the standard archived DIM to construct high spatial resolution         maps of FeO and TiO$_{2}$ abundance. Such maps will be of great         utility in a variety of lunar geologic studies.");
     }
 
     @Test
@@ -144,6 +150,7 @@ public class AstrophysicsDataSystemTest implements PagedSearchFetcherTest {
     @Test
     public void searchByQueryFindsEntry() throws Exception {
         List<BibEntry> fetchedEntries = fetcher.performSearch("Diez slice theorem Lie");
+        assertFalse(fetchedEntries.isEmpty());
         assertTrue(fetchedEntries.contains(diezSliceTheoremEntry));
     }
 
@@ -154,8 +161,10 @@ public class AstrophysicsDataSystemTest implements PagedSearchFetcherTest {
         searchEntry.setField(StandardField.AUTHOR, "Diez");
 
         List<BibEntry> fetchedEntries = fetcher.performSearch(searchEntry);
+
+        // The list contains more than one element, thus we need to check in two steps and cannot use assertEquals(List.of(diezSliceTheoremEntry, fetchedEntries))
         assertFalse(fetchedEntries.isEmpty());
-        assertEquals(diezSliceTheoremEntry, fetchedEntries.get(0));
+        assertTrue(fetchedEntries.contains(diezSliceTheoremEntry));
     }
 
     @Test

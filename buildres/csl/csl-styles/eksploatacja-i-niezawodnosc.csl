@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" demote-non-dropping-particle="sort-only" default-locale="en-US">
   <info>
-    <title>Eksploatacja i Niezawodność (Maintenance and Reliability) (English)</title>
+    <title>Eksploatacja i Niezawodnosc - Maintenance and Reliability</title>
     <id>http://www.zotero.org/styles/eksploatacja-i-niezawodnosc</id>
     <link href="http://www.zotero.org/styles/eksploatacja-i-niezawodnosc" rel="self"/>
     <link href="http://www.zotero.org/styles/annals-of-oncology" rel="template"/>
@@ -128,6 +128,7 @@
           </choose>
         </else>
       </choose>
+      <text variable="DOI" prefix=", https://doi.org/"/>
     </layout>
   </bibliography>
 </style>

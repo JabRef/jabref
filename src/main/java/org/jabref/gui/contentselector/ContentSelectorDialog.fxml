@@ -13,7 +13,7 @@
     <content>
         <VBox>
             <children>
-                <Label prefHeight="27.0" prefWidth="108.0" text="Field names"/>
+                <Label prefHeight="27.0" prefWidth="108.0" text="%Field names"/>
                 <HBox prefHeight="140.0" prefWidth="385.0">
                     <children>
                         <ListView fx:id="fieldsListView" prefHeight="140.0" prefWidth="297.0"/>
@@ -38,7 +38,7 @@
                         <Insets top="20.0"/>
                     </VBox.margin>
                 </Separator>
-                <Label prefHeight="27.0" prefWidth="108.0" text="Keywords"/>
+                <Label prefHeight="27.0" prefWidth="108.0" text="%Keywords"/>
                 <HBox prefHeight="140.0" prefWidth="385.0">
                     <children>
                         <ListView fx:id="keywordsListView" prefHeight="140.0" prefWidth="297.0"/>

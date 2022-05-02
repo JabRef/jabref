@@ -92,19 +92,19 @@ STYLE_FILTER = case ENV['CSL_TEST']
   end
 
 def collect_styles(type = '')
-  Dir[File.join(STYLE_ROOT, type, '*.csl')].select do |filename|
+  dependence = type == '' ? 'independent' : type
+  glob = File.join(STYLE_ROOT, type, '*.csl')
+  print "\nLoading #{dependence} styles matching #{STYLE_FILTER.source} in #{glob}"
+
+  Dir[glob].select do |filename|
     filename =~ STYLE_FILTER
   end
 end
-
-print "\nLoading dependent styles"
 
 Dependents = Hash[collect_styles('dependent').each_with_index.map { |path, i|
   print '.' if i % 120 == 0
   load_style(path)
 }]
-
-print "\nLoading independent styles"
 
 Independents = Hash[collect_styles.each_with_index.map { |path, i|
   print '.'  if i % 120 == 0

@@ -13,7 +13,7 @@
     <category citation-format="note"/>
     <category field="generic-base"/>
     <summary>Chicago format with full notes and bibliography with modifications for MBTS</summary>
-    <updated>2019-10-15T23:12:42+00:00</updated>
+    <updated>2021-04-27T17:00:00+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="en">
@@ -1368,27 +1368,15 @@
   <citation et-al-min="4" et-al-use-first="1" disambiguate-add-names="true">
     <layout suffix="." delimiter="; ">
       <choose>
-        <if position="ibid ibid-with-locator" match="any">
+        <if position="ibid-with-locator">
           <group delimiter=", ">
-            <text macro="contributors-short"/>
-            <group delimiter=" ">
-              <group delimiter=", ">
-                <choose>
-                  <if variable="author editor translator" match="none">
-                    <text macro="title-short"/>
-                  </if>
-                </choose>
-                <text macro="case-locator-subsequent"/>
-              </group>
-              <text macro="case-pinpoint-subsequent"/>
-            </group>
-            <choose>
-              <if match="none" type="legal_case">
-                <text macro="point-locators-subsequent"/>
-              </if>
-            </choose>
+            <text term="ibid"/>
+            <text macro="point-locators-subsequent"/>
           </group>
         </if>
+        <else-if position="ibid">
+          <text term="ibid"/>
+        </else-if>
         <else-if position="subsequent">
           <group delimiter=", ">
             <text macro="contributors-short"/>

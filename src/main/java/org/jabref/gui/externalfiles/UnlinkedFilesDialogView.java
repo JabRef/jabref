@@ -14,6 +14,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBoxTreeItem;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Control;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressIndicator;
@@ -27,8 +28,12 @@ import javafx.scene.layout.VBox;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.actions.ActionFactory;
+import org.jabref.gui.actions.SimpleCommand;
+import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.icon.JabRefIcon;
+import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.FileNodeViewModel;
 import org.jabref.gui.util.IconValidationDecorator;
@@ -50,6 +55,8 @@ public class UnlinkedFilesDialogView extends BaseDialog<Void> {
 
     @FXML private TextField directoryPathField;
     @FXML private ComboBox<FileExtensionViewModel> fileTypeCombo;
+    @FXML private ComboBox<DateRange> fileDateCombo;
+    @FXML private ComboBox<ExternalFileSorter> fileSortCombo;
     @FXML private CheckTreeView<FileNodeViewModel> unlinkedFilesList;
     @FXML private Button scanButton;
     @FXML private Button exportButton;
@@ -73,6 +80,7 @@ public class UnlinkedFilesDialogView extends BaseDialog<Void> {
     @Inject private UndoManager undoManager;
     @Inject private TaskExecutor taskExecutor;
     @Inject private FileUpdateMonitor fileUpdateMonitor;
+    @Inject private ThemeManager themeManager;
 
     private final ControlsFxVisualizer validationVisualizer;
     private UnlinkedFilesDialogViewModel viewModel;
@@ -92,6 +100,8 @@ public class UnlinkedFilesDialogView extends BaseDialog<Void> {
             }
             return null;
         });
+
+        themeManager.updateFontStyle(getDialogPane().getScene());
     }
 
     @FXML
@@ -137,11 +147,23 @@ public class UnlinkedFilesDialogView extends BaseDialog<Void> {
         fileTypeCombo.setItems(viewModel.getFileFilters());
         fileTypeCombo.valueProperty().bindBidirectional(viewModel.selectedExtensionProperty());
         fileTypeCombo.getSelectionModel().selectFirst();
+        new ViewModelListCellFactory<DateRange>()
+            .withText(DateRange::getDateRange)
+            .install(fileDateCombo);
+        fileDateCombo.setItems(viewModel.getDateFilters());
+        fileDateCombo.valueProperty().bindBidirectional(viewModel.selectedDateProperty());
+        fileDateCombo.getSelectionModel().selectFirst();
+        new ViewModelListCellFactory<ExternalFileSorter>()
+                .withText(ExternalFileSorter::getSorter)
+                .install(fileSortCombo);
+        fileSortCombo.setItems(viewModel.getSorters());
+        fileSortCombo.valueProperty().bindBidirectional(viewModel.selectedSortProperty());
+        fileSortCombo.getSelectionModel().selectFirst();
     }
 
     private void initUnlinkedFilesList() {
         new ViewModelTreeCellFactory<FileNodeViewModel>()
-                .withText(FileNodeViewModel::getDisplayText)
+                .withText(FileNodeViewModel::getDisplayTextWithEditDate)
                 .install(unlinkedFilesList);
 
         unlinkedFilesList.maxHeightProperty().bind(((Control) filePane.contentProperty().get()).heightProperty());
@@ -149,6 +171,8 @@ public class UnlinkedFilesDialogView extends BaseDialog<Void> {
         unlinkedFilesList.rootProperty().bind(EasyBind.map(viewModel.treeRootProperty(),
                 fileNode -> fileNode.map(fileNodeViewModel -> new RecursiveTreeItem<>(fileNodeViewModel, FileNodeViewModel::getChildren))
                                     .orElse(null)));
+
+        unlinkedFilesList.setContextMenu(createSearchContextMenu());
 
         EasyBind.subscribe(unlinkedFilesList.rootProperty(), root -> {
             if (root != null) {
@@ -195,16 +219,6 @@ public class UnlinkedFilesDialogView extends BaseDialog<Void> {
     }
 
     @FXML
-    void collapseAll() {
-        expandTree(unlinkedFilesList.getRoot(), false);
-    }
-
-    @FXML
-    void expandAll() {
-        expandTree(unlinkedFilesList.getRoot(), true);
-    }
-
-    @FXML
     void scanFiles() {
         viewModel.startSearch();
     }
@@ -212,16 +226,6 @@ public class UnlinkedFilesDialogView extends BaseDialog<Void> {
     @FXML
     void startImport() {
         viewModel.startImport();
-    }
-
-    @FXML
-    void selectAll() {
-        unlinkedFilesList.getCheckModel().checkAll();
-    }
-
-    @FXML
-    void unselectAll() {
-        unlinkedFilesList.getCheckModel().clearChecks();
     }
 
     @FXML
@@ -237,6 +241,39 @@ public class UnlinkedFilesDialogView extends BaseDialog<Void> {
             item.setExpanded(expand);
             for (TreeItem<?> child : item.getChildren()) {
                 expandTree(child, expand);
+            }
+        }
+    }
+
+    private ContextMenu createSearchContextMenu() {
+        ContextMenu contextMenu = new ContextMenu();
+        ActionFactory factory = new ActionFactory(preferencesService.getKeyBindingRepository());
+
+        contextMenu.getItems().add(factory.createMenuItem(StandardActions.SELECT_ALL, new SearchContextAction(StandardActions.SELECT_ALL)));
+        contextMenu.getItems().add(factory.createMenuItem(StandardActions.UNSELECT_ALL, new SearchContextAction(StandardActions.UNSELECT_ALL)));
+        contextMenu.getItems().add(factory.createMenuItem(StandardActions.EXPAND_ALL, new SearchContextAction(StandardActions.EXPAND_ALL)));
+        contextMenu.getItems().add(factory.createMenuItem(StandardActions.COLLAPSE_ALL, new SearchContextAction(StandardActions.COLLAPSE_ALL)));
+
+        return contextMenu;
+    }
+
+    private class SearchContextAction extends SimpleCommand {
+
+        private final StandardActions command;
+
+        public SearchContextAction(StandardActions command) {
+            this.command = command;
+
+            this.executable.bind(unlinkedFilesList.rootProperty().isNotNull());
+        }
+
+        @Override
+        public void execute() {
+            switch (command) {
+                case SELECT_ALL -> unlinkedFilesList.getCheckModel().checkAll();
+                case UNSELECT_ALL -> unlinkedFilesList.getCheckModel().clearChecks();
+                case EXPAND_ALL -> expandTree(unlinkedFilesList.getRoot(), true);
+                case COLLAPSE_ALL -> expandTree(unlinkedFilesList.getRoot(), false);
             }
         }
     }

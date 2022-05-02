@@ -111,7 +111,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
      */
     public void addNewGroupToRoot() {
         if (currentDatabase.isPresent()) {
-            addNewSubgroup(rootGroup.get());
+            addNewSubgroup(rootGroup.get(), GroupDialogHeader.GROUP);
         } else {
             dialogService.showWarningDialogAndWait(Localization.lang("Cannot create group"), Localization.lang("Cannot create group. Please create a library first."));
         }
@@ -147,13 +147,15 @@ public class GroupTreeViewModel extends AbstractViewModel {
     /**
      * Opens "New Group Dialog" and add the resulting group to the specified group
      */
-    public void addNewSubgroup(GroupNodeViewModel parent) {
+
+    public void addNewSubgroup(GroupNodeViewModel parent, GroupDialogHeader groupDialogHeader) {
         currentDatabase.ifPresent(database -> {
             Optional<AbstractGroup> newGroup = dialogService.showCustomDialogAndWait(new GroupDialogView(
                     dialogService,
                     database,
                     preferences,
-                    null));
+                    null,
+                    groupDialogHeader));
 
             newGroup.ifPresent(group -> {
                 parent.addSubgroup(group);
@@ -184,7 +186,8 @@ public class GroupTreeViewModel extends AbstractViewModel {
                     dialogService,
                     database,
                     preferences,
-                    oldGroup.getGroupNode().getGroup()));
+                    oldGroup.getGroupNode().getGroup(),
+                    GroupDialogHeader.SUBGROUP));
 
             newGroup.ifPresent(group -> {
                 // TODO: Keep assignments

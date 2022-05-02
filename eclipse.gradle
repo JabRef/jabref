@@ -40,7 +40,7 @@ eclipse {
             }
         }
 
-        defaultOutputDir = file('build')
+        defaultOutputDir = file('bin/main')
         downloadSources = true
         downloadJavadoc = true
     }

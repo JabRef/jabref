@@ -13,9 +13,11 @@ import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableInsertEntries;
 import org.jabref.gui.undo.UndoableRemoveEntries;
+import org.jabref.logic.bibtex.comparator.EntryComparator;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.InternalField;
 
 public class MergeEntriesAction extends SimpleCommand {
 
@@ -52,7 +54,19 @@ public class MergeEntriesAction extends SimpleCommand {
         BibEntry one = selectedEntries.get(0);
         BibEntry two = selectedEntries.get(1);
 
-        MergeEntriesDialog dlg = new MergeEntriesDialog(one, two);
+        // compare two entries
+        BibEntry first;
+        BibEntry second;
+        EntryComparator entryComparator = new EntryComparator(false, false, InternalField.KEY_FIELD);
+        if (entryComparator.compare(one, two) <= 0) {
+            first = one;
+            second = two;
+        } else {
+            first = two;
+            second = one;
+        }
+
+        MergeEntriesDialog dlg = new MergeEntriesDialog(first, second);
         dlg.setTitle(Localization.lang("Merge entries"));
         Optional<BibEntry> mergedEntry = dialogService.showCustomDialogAndWait(dlg);
         if (mergedEntry.isPresent()) {

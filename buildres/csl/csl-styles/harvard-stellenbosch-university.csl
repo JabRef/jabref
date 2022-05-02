@@ -2,22 +2,23 @@
 <style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" demote-non-dropping-particle="sort-only" default-locale="en-GB">
   <info>
     <title>Stellenbosch University - Harvard</title>
+    <title-short>SU-Harvard</title-short>
     <id>http://www.zotero.org/styles/harvard-stellenbosch-university</id>
     <link href="http://www.zotero.org/styles/harvard-stellenbosch-university" rel="self"/>
-    <link href="http://www.zotero.org/styles/harvard-cite-them-right" rel="template"/>
-    <link href="http://libguides.sun.ac.za/content.php?pid=344501&amp;sid=2818229" rel="documentation"/>
+    <link href="http://www.zotero.org/styles/harvard-university-of-cape-town" rel="template"/>
+    <link href="https://libguides.sun.ac.za/c.php?g=742962&amp;p=5316902" rel="documentation"/>
+    <!-- Sample data: https://gist.github.com/aurimasv/14da71a5d1def6e6ed86 -->
     <author>
-      <name>Yusuf Ras</name>
-      <email>yr@sun.ac.za</email>
-      <uri>http://www.mendeley.com/profiles/yusuf-ras/</uri>
+      <name>Kirchner van Deventer</name>
     </author>
     <category citation-format="author-date"/>
     <category field="generic-base"/>
-    <updated>2015-09-01T08:01:34+00:00</updated>
+    <updated>2021-06-22T12:00:00+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xmlns="http://purl.org/net/xbiblio/csl" xml:lang="en-GB">
     <terms>
+      <term name="volume" form="short">v.</term>
       <term name="available at">available</term>
       <term name="open-quote">“</term>
       <term name="close-quote">”</term>
@@ -30,7 +31,7 @@
       <if variable="editor">
         <names variable="editor">
           <name and="symbol" initialize-with="." delimiter=", "/>
-          <label form="short" prefix=" (" suffix=")"/>
+          <label form="short" prefix=", " text-case="capitalize-first"/>
         </names>
       </if>
     </choose>
@@ -45,7 +46,7 @@
   </macro>
   <macro name="author">
     <names variable="author">
-      <name name-as-sort-order="all" and="symbol" sort-separator=", " initialize-with="." delimiter=", " delimiter-precedes-last="never"/>
+      <name name-as-sort-order="all" and="symbol" sort-separator=", " initialize-with="." delimiter=", " delimiter-precedes-last="never" et-al-min="9" et-al-use-first="8"/>
       <label form="short" prefix=" " text-case="capitalize-first"/>
       <substitute>
         <names variable="editor"/>
@@ -63,13 +64,13 @@
   </macro>
   <macro name="author-short">
     <names variable="author">
-      <name form="short" and="symbol" delimiter-precedes-last="never" initialize-with="." sort-separator=" "/>
-      <et-al font-style="italic"/>
+      <name form="short" and="symbol" delimiter=", " initialize-with="." delimiter-precedes-last="never" et-al-min="4" et-al-use-first="1"/>
       <substitute>
         <names variable="editor"/>
         <names variable="translator"/>
         <choose>
           <if type="bill book graphic legal_case legislation motion_picture report song" match="any">
+            <!-- Note that webpage title is italicized in bibliography, but quoted in text -->
             <text variable="title" form="short" font-style="italic"/>
           </if>
           <else>
@@ -85,6 +86,10 @@
     </names>
   </macro>
   <macro name="date-issued">
+    <!--
+      Show "in press" for journal articles with non-numeric pages
+      (i.e. "in press" in page field)
+    -->
     <choose>
       <if type="article-journal" match="none">
         <text macro="date-issued-year"/>
@@ -101,6 +106,9 @@
     </choose>
   </macro>
   <macro name="date-issued-no-parentheses">
+    <!--
+      Same as date-issued, but no parentheses around "in press"
+    -->
     <choose>
       <if type="article-journal" match="none">
         <text macro="date-issued-year"/>
@@ -130,14 +138,13 @@
   </macro>
   <macro name="access">
     <choose>
-      <if variable="DOI"/>
+      <if variable="DOI">
+        <text variable="DOI" prefix="DOI: "/>
+      </if>
       <else-if variable="URL">
         <group delimiter=" ">
-          <group delimiter=": ">
-            <group delimiter=", ">
-              <text term="online" prefix="[" suffix="]" text-case="capitalize-first"/>
-              <text term="available at" text-case="capitalize-first"/>
-            </group>
+          <group>
+            <text term="available at" suffix=": " text-case="capitalize-first"/>
             <text variable="URL"/>
           </group>
           <text macro="date-access"/>
@@ -195,10 +202,10 @@
       <text variable="publisher"/>
     </group>
   </macro>
-  <citation disambiguate-add-year-suffix="true" year-suffix-delimiter="," disambiguate-add-names="true" disambiguate-add-givenname="false" collapse="year-suffix" et-al-min="4" et-al-use-first="3" et-al-subsequent-min="3" et-al-subsequent-use-first="1">
+  <citation disambiguate-add-year-suffix="true" year-suffix-delimiter="," disambiguate-add-names="true" disambiguate-add-givenname="false" collapse="year-suffix">
     <sort>
-      <key macro="author"/>
       <key macro="date-issued-no-parentheses"/>
+      <key macro="author"/>
     </sort>
     <layout prefix="(" suffix=")" delimiter="; ">
       <group delimiter=", ">
@@ -218,7 +225,7 @@
       </group>
     </layout>
   </citation>
-  <bibliography hanging-indent="true" et-al-min="9" et-al-use-first="8">
+  <bibliography entry-spacing="0">
     <sort>
       <key macro="author-short" names-min="1" names-use-first="1"/>
       <key macro="author-count" names-min="3" names-use-first="3"/>
@@ -277,11 +284,10 @@
           <else-if type="chapter paper-conference entry-encyclopedia entry-dictionary" match="any">
             <text macro="title"/>
             <group delimiter=" ">
-              <text term="in"/>
+              <text term="in" text-case="capitalize-first"/>
               <text variable="container-title" font-style="italic"/>
-              <text macro="book-details"/>
-              <text macro="editor-translator"/>
             </group>
+            <text macro="book-details"/>
             <text variable="page"/>
           </else-if>
           <else-if type="patent" match="any">

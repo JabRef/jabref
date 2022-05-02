@@ -8,14 +8,12 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
-import org.jabref.gui.DialogService;
 import org.jabref.gui.autocompleter.AutoCompleteFirstNameMode;
 import org.jabref.gui.autocompleter.AutoCompletePreferences;
 import org.jabref.gui.entryeditor.EntryEditorPreferences;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.field.FieldFactory;
-import org.jabref.preferences.PreferencesService;
 
 public class EntryEditorTabViewModel implements PreferenceTabViewModel {
 
@@ -25,6 +23,7 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty acceptRecommendationsProperty = new SimpleBooleanProperty();
     private final BooleanProperty enableLatexCitationsTabProperty = new SimpleBooleanProperty();
     private final BooleanProperty enableValidationProperty = new SimpleBooleanProperty();
+    private final BooleanProperty allowIntegerEditionProperty = new SimpleBooleanProperty();
     private final BooleanProperty enableAutoCompleteProperty = new SimpleBooleanProperty();
     private final StringProperty autoCompleteFieldsProperty = new SimpleStringProperty();
     private final BooleanProperty autoCompleteFirstLastProperty = new SimpleBooleanProperty();
@@ -34,44 +33,41 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty firstNameModeFullProperty = new SimpleBooleanProperty();
     private final BooleanProperty firstNameModeBothProperty = new SimpleBooleanProperty();
 
-    private final DialogService dialogService;
-    private final PreferencesService preferencesService;
-    private final EntryEditorPreferences initialEntryEditorPreferences;
-    private final AutoCompletePreferences initialAutoCompletePreferences;
+    private final EntryEditorPreferences entryEditorPreferences;
+    private final AutoCompletePreferences autoCompletePreferences;
 
     private final List<String> restartWarnings = new ArrayList<>();
 
-    public EntryEditorTabViewModel(DialogService dialogService, PreferencesService preferencesService) {
-        this.dialogService = dialogService;
-        this.preferencesService = preferencesService;
-        this.initialEntryEditorPreferences = preferencesService.getEntryEditorPreferences();
-        this.initialAutoCompletePreferences = preferencesService.getAutoCompletePreferences();
+    public EntryEditorTabViewModel(EntryEditorPreferences entryEditorPreferences, AutoCompletePreferences autoCompletePreferences) {
+        this.entryEditorPreferences = entryEditorPreferences;
+        this.autoCompletePreferences = autoCompletePreferences;
     }
 
     @Override
     public void setValues() {
         // ToDo: Include CustomizeGeneralFieldsDialog in PreferencesDialog
-        // therefore yet unused: initialEntryEditorPreferences.getEntryEditorTabList();
+        // therefore yet unused: entryEditorPreferences.getEntryEditorTabList();
 
-        openOnNewEntryProperty.setValue(initialEntryEditorPreferences.shouldOpenOnNewEntry());
-        defaultSourceProperty.setValue(initialEntryEditorPreferences.showSourceTabByDefault());
-        enableRelatedArticlesTabProperty.setValue(initialEntryEditorPreferences.shouldShowRecommendationsTab());
-        acceptRecommendationsProperty.setValue(initialEntryEditorPreferences.isMrdlibAccepted());
-        enableLatexCitationsTabProperty.setValue(initialEntryEditorPreferences.shouldShowLatexCitationsTab());
-        enableValidationProperty.setValue(initialEntryEditorPreferences.shouldEnableValidation());
+        openOnNewEntryProperty.setValue(entryEditorPreferences.shouldOpenOnNewEntry());
+        defaultSourceProperty.setValue(entryEditorPreferences.showSourceTabByDefault());
+        enableRelatedArticlesTabProperty.setValue(entryEditorPreferences.shouldShowRecommendationsTab());
+        acceptRecommendationsProperty.setValue(entryEditorPreferences.isMrdlibAccepted());
+        enableLatexCitationsTabProperty.setValue(entryEditorPreferences.shouldShowLatexCitationsTab());
+        enableValidationProperty.setValue(entryEditorPreferences.shouldEnableValidation());
+        allowIntegerEditionProperty.setValue(entryEditorPreferences.shouldAllowIntegerEditionBibtex());
 
-        enableAutoCompleteProperty.setValue(initialAutoCompletePreferences.shouldAutoComplete());
-        autoCompleteFieldsProperty.setValue(initialAutoCompletePreferences.getCompleteNamesAsString());
+        enableAutoCompleteProperty.setValue(autoCompletePreferences.shouldAutoComplete());
+        autoCompleteFieldsProperty.setValue(autoCompletePreferences.getCompleteNamesAsString());
 
-        if (initialAutoCompletePreferences.getNameFormat() == AutoCompletePreferences.NameFormat.FIRST_LAST) {
+        if (autoCompletePreferences.getNameFormat() == AutoCompletePreferences.NameFormat.FIRST_LAST) {
             autoCompleteFirstLastProperty.setValue(true);
-        } else if (initialAutoCompletePreferences.getNameFormat() == AutoCompletePreferences.NameFormat.LAST_FIRST) {
+        } else if (autoCompletePreferences.getNameFormat() == AutoCompletePreferences.NameFormat.LAST_FIRST) {
             autoCompleteLastFirstProperty.setValue(true);
         } else {
             autoCompleteBothProperty.setValue(true);
         }
 
-        switch (initialAutoCompletePreferences.getFirstNameMode()) {
+        switch (autoCompletePreferences.getFirstNameMode()) {
             case ONLY_ABBREVIATED -> firstNameModeAbbreviatedProperty.setValue(true);
             case ONLY_FULL -> firstNameModeFullProperty.setValue(true);
             default -> firstNameModeBothProperty.setValue(true);
@@ -80,33 +76,35 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public void storeSettings() {
-        preferencesService.storeEntryEditorPreferences(new EntryEditorPreferences(
-                initialEntryEditorPreferences.getEntryEditorTabList(),
-                openOnNewEntryProperty.getValue(),
-                enableRelatedArticlesTabProperty.getValue(),
-                acceptRecommendationsProperty.getValue(),
-                enableLatexCitationsTabProperty.getValue(),
-                defaultSourceProperty.getValue(),
-                enableValidationProperty.getValue(),
-                initialEntryEditorPreferences.getDividerPosition()));
+        // entryEditorPreferences.setEntryEditorTabList();
+        entryEditorPreferences.setShouldOpenOnNewEntry(openOnNewEntryProperty.getValue());
+        entryEditorPreferences.setShouldShowRecommendationsTab(enableRelatedArticlesTabProperty.getValue());
+        entryEditorPreferences.setIsMrdlibAccepted(acceptRecommendationsProperty.getValue());
+        entryEditorPreferences.setShouldShowLatexCitationsTab(enableLatexCitationsTabProperty.getValue());
+        entryEditorPreferences.setShowSourceTabByDefault(defaultSourceProperty.getValue());
+        entryEditorPreferences.setEnableValidation(enableValidationProperty.getValue());
+        entryEditorPreferences.setAllowIntegerEditionBibtex(allowIntegerEditionProperty.getValue());
+        // entryEditorPreferences.setDividerPosition();
 
-        // default
-        AutoCompletePreferences.NameFormat nameFormat = AutoCompletePreferences.NameFormat.BOTH;
-        if (autoCompleteFirstLastProperty.getValue()) {
-            nameFormat = AutoCompletePreferences.NameFormat.FIRST_LAST;
+        autoCompletePreferences.setAutoComplete(enableAutoCompleteProperty.getValue());
+
+        if (autoCompleteBothProperty.getValue()) {
+            autoCompletePreferences.setNameFormat(AutoCompletePreferences.NameFormat.BOTH);
+        } else if (autoCompleteFirstLastProperty.getValue()) {
+            autoCompletePreferences.setNameFormat(AutoCompletePreferences.NameFormat.FIRST_LAST);
         } else if (autoCompleteLastFirstProperty.getValue()) {
-            nameFormat = AutoCompletePreferences.NameFormat.LAST_FIRST;
+            autoCompletePreferences.setNameFormat(AutoCompletePreferences.NameFormat.LAST_FIRST);
         }
 
-        // default: AutoCompleteFirstNameMode.BOTH
-        AutoCompleteFirstNameMode firstNameMode = AutoCompleteFirstNameMode.BOTH;
-        if (firstNameModeAbbreviatedProperty.getValue()) {
-            firstNameMode = AutoCompleteFirstNameMode.ONLY_ABBREVIATED;
+        if (firstNameModeBothProperty.getValue()) {
+            autoCompletePreferences.setFirstNameMode(AutoCompleteFirstNameMode.BOTH);
+        } else if (firstNameModeAbbreviatedProperty.getValue()) {
+            autoCompletePreferences.setFirstNameMode(AutoCompleteFirstNameMode.ONLY_ABBREVIATED);
         } else if (firstNameModeFullProperty.getValue()) {
-            firstNameMode = AutoCompleteFirstNameMode.ONLY_FULL;
+            autoCompletePreferences.setFirstNameMode(AutoCompleteFirstNameMode.ONLY_FULL);
         }
 
-        if (initialAutoCompletePreferences.shouldAutoComplete() != enableAutoCompleteProperty.getValue()) {
+        if (autoCompletePreferences.shouldAutoComplete() != enableAutoCompleteProperty.getValue()) {
             if (enableAutoCompleteProperty.getValue()) {
                 restartWarnings.add(Localization.lang("Auto complete enabled."));
             } else {
@@ -114,12 +112,8 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
             }
         }
 
-        preferencesService.storeAutoCompletePreferences(new AutoCompletePreferences(
-                enableAutoCompleteProperty.getValue(),
-                firstNameMode,
-                nameFormat,
-                FieldFactory.parseFieldList(autoCompleteFieldsProperty.getValue()),
-                preferencesService.getJournalAbbreviationPreferences()));
+        autoCompletePreferences.getCompleteFields().clear();
+        autoCompletePreferences.getCompleteFields().addAll(FieldFactory.parseFieldList(autoCompleteFieldsProperty.getValue()));
     }
 
     @Override
@@ -149,6 +143,10 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
 
     public BooleanProperty enableValidationProperty() {
         return enableValidationProperty;
+    }
+
+    public BooleanProperty allowIntegerEditionProperty() {
+        return this.allowIntegerEditionProperty;
     }
 
     public BooleanProperty enableAutoCompleteProperty() {

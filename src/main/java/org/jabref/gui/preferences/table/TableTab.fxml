@@ -17,7 +17,6 @@
          xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
          fx:controller="org.jabref.gui.preferences.table.TableTab">
     <fx:define>
-        <ToggleGroup fx:id="specialFieldsStoreMode"/>
         <ToggleGroup fx:id="urlDoiShownFirst"/>
         <ToggleGroup fx:id="displayNamesOrder"/>
         <ToggleGroup fx:id="displayNamesAbbreviation"/>
@@ -88,17 +87,6 @@
                 <CheckBox fx:id="specialFieldsEnable" text="%Enable special fields"/>
                 <Button fx:id="specialFieldsHelp" prefWidth="20.0"/>
             </HBox>
-            <VBox spacing="10.0">
-                <padding>
-                    <Insets left="20.0"/>
-                </padding>
-                <RadioButton fx:id="specialFieldsSyncKeywords"
-                             text="%Synchronize with keywords"
-                             toggleGroup="$specialFieldsStoreMode"/>
-                <RadioButton fx:id="specialFieldsSerialize"
-                             text="%Write values of special fields as separate fields to BibTeX"
-                             toggleGroup="$specialFieldsStoreMode"/>
-            </VBox>
             <CheckBox fx:id="extraFileColumnsEnable" text="%Show extra columns"/>
             <CheckBox fx:id="autoResizeColumns" text="%Fit table horizontally on screen"/>
         </VBox>

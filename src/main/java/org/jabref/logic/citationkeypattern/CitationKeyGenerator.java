@@ -133,7 +133,7 @@ public class CitationKeyGenerator extends BracketedPattern {
     private String appendLettersToKey(String key, String oldKey) {
         long occurrences = database.getNumberOfCitationKeyOccurrences(key);
 
-        if (Objects.equals(oldKey, key)) {
+        if ((occurrences > 0) && Objects.equals(oldKey, key)) {
             occurrences--; // No change, so we can accept one dupe.
         }
 
@@ -213,7 +213,7 @@ public class CitationKeyGenerator extends BracketedPattern {
             // ":lower":
             if (fieldParts.size() > 1) {
                 // apply modifiers:
-                expandedPattern = applyModifiers(expandedPattern, fieldParts, 1);
+                expandedPattern = applyModifiers(expandedPattern, fieldParts, 1, expandBracketContent(entry));
             }
             return cleanKey(expandedPattern, unwantedCharacters);
         };

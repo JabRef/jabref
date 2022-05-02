@@ -1,5 +1,7 @@
 package org.jabref.logic.importer.fetcher.transformers;
 
+import org.jabref.model.strings.StringUtil;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,18 +30,18 @@ public class DBLPQueryTransformer extends YearAndYearRangeByFilteringQueryTransf
     @Override
     protected String handleAuthor(String author) {
         // DBLP does not support explicit author field search
-        return quoteStringIfSpaceIsContained(author);
+        return StringUtil.quoteStringIfSpaceIsContained(author);
     }
 
     @Override
     protected String handleTitle(String title) {
         // DBLP does not support explicit title field search
-        return quoteStringIfSpaceIsContained(title);
+        return StringUtil.quoteStringIfSpaceIsContained(title);
     }
 
     @Override
     protected String handleJournal(String journalTitle) {
         // DBLP does not support explicit journal field search
-        return quoteStringIfSpaceIsContained(journalTitle);
+        return StringUtil.quoteStringIfSpaceIsContained(journalTitle);
     }
 }

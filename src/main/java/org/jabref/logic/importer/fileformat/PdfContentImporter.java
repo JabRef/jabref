@@ -3,7 +3,6 @@ package org.jabref.logic.importer.fileformat;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringWriter;
-import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Locale;
@@ -12,11 +11,9 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
-import org.jabref.logic.importer.fetcher.DoiFetcher;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.OS;
 import org.jabref.logic.util.StandardFileType;
@@ -25,7 +22,6 @@ import org.jabref.logic.xmp.XmpUtilReader;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.strings.StringUtil;
@@ -202,25 +198,15 @@ public class PdfContentImporter extends Importer {
     }
 
     @Override
-    public ParserResult importDatabase(Path filePath, Charset defaultEncoding) {
+    public ParserResult importDatabase(Path filePath) {
         final ArrayList<BibEntry> result = new ArrayList<>(1);
         try (PDDocument document = XmpUtilReader.loadWithAutomaticDecryption(filePath)) {
             String firstPageContents = getFirstPageContents(document);
-
-            Optional<DOI> doi = DOI.findInText(firstPageContents);
-            if (doi.isPresent()) {
-                ParserResult parserResult = new ParserResult(result);
-                Optional<BibEntry> entry = new DoiFetcher(importFormatPreferences).performSearchById(doi.get().getDOI());
-                entry.ifPresent(parserResult.getDatabase()::insertEntry);
-                entry.ifPresent(bibEntry -> bibEntry.addFile(new LinkedFile("", filePath.toAbsolutePath(), "PDF")));
-                return parserResult;
-            }
-
             Optional<BibEntry> entry = getEntryFromPDFContent(firstPageContents, OS.NEWLINE);
             entry.ifPresent(result::add);
         } catch (EncryptedPdfsNotSupportedException e) {
             return ParserResult.fromErrorMessage(Localization.lang("Decryption not supported."));
-        } catch (IOException | FetcherException exception) {
+        } catch (IOException exception) {
             return ParserResult.fromError(exception);
         }
 
@@ -230,7 +216,6 @@ public class PdfContentImporter extends Importer {
 
     // make this method package visible so we can test it
     Optional<BibEntry> getEntryFromPDFContent(String firstpageContents, String lineSeparator) {
-
         // idea: split[] contains the different lines
         // blocks are separated by empty lines
         // treat each block
@@ -619,5 +604,4 @@ public class PdfContentImporter extends Importer {
     public String getDescription() {
         return "PdfContentImporter parses data of the first page of the PDF and creates a BibTeX entry. Currently, Springer and IEEE formats are supported.";
     }
-
 }

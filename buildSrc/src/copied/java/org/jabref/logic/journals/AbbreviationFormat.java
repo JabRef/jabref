@@ -12,11 +12,12 @@ public final class AbbreviationFormat {
     }
 
     public static CSVFormat getCSVFormat() {
-        return CSVFormat.DEFAULT
-                .withIgnoreEmptyLines(true)
-                .withDelimiter(DELIMITER)
-                .withEscape(ESCAPE)
-                .withQuote(QUOTE)
-                .withTrim();
+        return CSVFormat.DEFAULT.builder()
+                .setIgnoreEmptyLines(true)
+                .setDelimiter(DELIMITER)
+                .setEscape(ESCAPE)
+                .setQuote(QUOTE)
+                .setTrim(true)
+                .build();
     }
 }

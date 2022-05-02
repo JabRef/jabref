@@ -6,7 +6,7 @@
     <id>http://www.zotero.org/styles/technische-universitat-dresden-betriebswirtschaftslehre-marketing</id>
     <link href="http://www.zotero.org/styles/technische-universitat-dresden-betriebswirtschaftslehre-marketing" rel="self"/>
     <link href="http://www.zotero.org/styles/technische-universitat-dresden-betriebswirtschaftslehre-logistik-author-date" rel="template"/>
-    <link href="https://tu-dresden.de/bu/wirtschaft/marketing/ressourcen/dateien/lehre/lehre_pdfs/Leitfaden-Abschlussarbeiten-Juni_2017.pdf?lang=de" rel="documentation"/>
+    <link href="https://bildungsportal.sachsen.de/opal/auth/RepositoryEntry/428277778/CourseNode/94280218863497/Leitfaden+Wiss.+Arbeiten+Februar+2021.pdf" rel="documentation"/>
     <author>
       <name>Christina Wenzel</name>
       <email>christina.wenzel@slub-dresden.de</email>
@@ -15,7 +15,7 @@
     <category citation-format="author-date"/>
     <category field="social_science"/>
     <summary>Zitierstil entsprechend den Zitierrichtlinien des Lehrstuhls  Betriebswirtschaftslehre, insbesondere Marketing,der Fakultät Wirtschaftswissenschaften, Technische Universität Dresden.</summary>
-    <updated>2019-11-06T10:34:10+00:00</updated>
+    <updated>2021-05-17T10:08:20+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="de">
@@ -25,11 +25,12 @@
       <term name="presented at">gehalten auf</term>
       <term name="et-al">et al.</term>
       <term name="editor" form="short">Hrsg.</term>
+      <term name="page-range-delimiter">-</term>
     </terms>
   </locale>
   <macro name="editor">
     <names variable="editor" delimiter=", " prefix=" ">
-      <name delimiter="/" initialize-with=". " name-as-sort-order="all"/>
+      <name delimiter="/" initialize-with="." name-as-sort-order="all"/>
       <label form="short" prefix=" (" suffix=")"/>
     </names>
   </macro>
@@ -38,7 +39,7 @@
   </macro>
   <macro name="author">
     <names variable="author" font-variant="normal">
-      <name delimiter="/" delimiter-precedes-last="never" initialize-with=". " name-as-sort-order="all"/>
+      <name delimiter="/" delimiter-precedes-last="never" initialize-with="." name-as-sort-order="all"/>
       <label form="short" prefix=" (" suffix=")"/>
       <substitute>
         <names variable="editor"/>
@@ -48,7 +49,7 @@
   </macro>
   <macro name="author-short">
     <names variable="author">
-      <name form="short" delimiter=" / " delimiter-precedes-last="never" initialize-with=". "/>
+      <name form="short" delimiter="/" delimiter-precedes-last="never" et-al-min="4" et-al-use-first="1" initialize-with=". "/>
       <substitute>
         <names variable="editor"/>
         <names variable="translator"/>
@@ -69,7 +70,7 @@
         <text variable="URL"/>
         <group delimiter=" " prefix=" (" suffix=")">
           <text term="accessed" form="verb"/>
-          <date form="text" variable="accessed"/>
+          <date form="numeric" variable="accessed"/>
         </group>
       </else-if>
     </choose>
@@ -85,9 +86,8 @@
     </choose>
   </macro>
   <macro name="publisher">
-    <group delimiter=" ">
-      <text variable="publisher-place" suffix=":"/>
-      <text variable="publisher"/>
+    <group delimiter=": ">
+      <text variable="publisher-place"/>
     </group>
   </macro>
   <macro name="year-date">
@@ -121,23 +121,42 @@
       <text variable="page"/>
     </group>
   </macro>
-  <citation et-al-min="3" et-al-use-first="1" disambiguate-add-year-suffix="true" disambiguate-add-names="true" disambiguate-add-givenname="true">
+  <citation et-al-min="3" et-al-use-first="1" disambiguate-add-year-suffix="true" disambiguate-add-names="true" disambiguate-add-givenname="true" collapse="year">
+    <sort>
+      <key variable="issued"/>
+      <key macro="author"/>
+    </sort>
     <layout delimiter="; " prefix=" (" suffix=")">
-      <group delimiter=", ">
-        <group delimiter=" ">
-          <text macro="author-short"/>
-          <text macro="year-date"/>
-        </group>
-        <group>
-          <label plural="never" suffix="&#160;" variable="locator" form="short"/>
-          <text variable="locator" form="short"/>
-        </group>
-      </group>
+      <choose>
+        <if position="ibid-with-locator">
+          <text term="ibid" suffix=", "/>
+          <group>
+            <label suffix=" " variable="locator" form="short"/>
+            <text variable="locator"/>
+          </group>
+        </if>
+        <else-if position="ibid">
+          <text term="ibid"/>
+        </else-if>
+        <else>
+          <group delimiter=", ">
+            <group delimiter=" ">
+              <text macro="author-short"/>
+              <text macro="year-date"/>
+            </group>
+            <group>
+              <label suffix=" " variable="locator" form="short"/>
+              <text variable="locator"/>
+            </group>
+          </group>
+        </else>
+      </choose>
     </layout>
   </citation>
   <bibliography hanging-indent="true">
     <sort>
       <key macro="author"/>
+      <key variable="issued"/>
       <key variable="title"/>
     </sort>
     <layout suffix=".">
@@ -149,19 +168,19 @@
       </group>
       <choose>
         <if type="bill book graphic legal_case legislation motion_picture report song" match="any">
-          <group delimiter=". " prefix=" " suffix=". ">
+          <group delimiter=", " prefix=" ">
             <text macro="title"/>
             <text macro="edition"/>
             <text macro="editor"/>
+            <text macro="publisher" prefix=" "/>
           </group>
-          <text macro="publisher" prefix=" "/>
         </if>
         <else-if type="chapter paper-conference entry-dictionary entry-encyclopedia" match="any">
-          <text macro="title" prefix=" " suffix="."/>
+          <text macro="title" prefix=" " suffix=", "/>
           <group prefix=" ">
-            <text term="in" text-case="capitalize-first" suffix=":"/>
-            <text macro="editor"/>
-            <text variable="container-title" font-style="normal" prefix=": " suffix="."/>
+            <text term="in" suffix=": "/>
+            <text macro="editor" suffix=": "/>
+            <text variable="container-title" font-style="normal" suffix=", "/>
             <group delimiter=", " suffix=".">
               <text variable="collection-title" prefix=" "/>
               <number variable="collection-number"/>
@@ -175,16 +194,16 @@
         <else-if type="thesis">
           <group delimiter=", " prefix=" ">
             <text macro="title"/>
-            <text variable="genre"/>
             <text macro="publisher"/>
+            <text variable="genre"/>
           </group>
         </else-if>
         <else>
-          <group suffix=". ">
+          <group>
             <text macro="title" prefix=" "/>
             <text macro="editor" prefix=" "/>
           </group>
-          <group>
+          <group prefix=", ">
             <choose>
               <if type="interview" match="any">
                 <text term="in" text-case="capitalize-first" suffix=": "/>
@@ -201,13 +220,23 @@
               </else-if>
               <else>
                 <group delimiter=": ">
-                  <text term="in" text-case="capitalize-first"/>
+                  <text term="in"/>
                   <text variable="container-title"/>
                 </group>
               </else>
             </choose>
+            <group delimiter=", ">
+              <group delimiter=" " prefix=", ">
+                <text term="volume" form="short"/>
+                <text variable="volume" suffix=","/>
+              </group>
+              <group delimiter=" ">
+                <text term="issue" form="short"/>
+                <text variable="issue"/>
+              </group>
+            </group>
             <group>
-              <label plural="never" suffix=" " variable="page" form="short"/>
+              <label plural="never" prefix=", " suffix=" " variable="page" form="short"/>
               <text variable="page"/>
             </group>
           </group>

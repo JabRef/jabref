@@ -2,10 +2,10 @@ package org.jabref.logic.integrity;
 
 import java.util.Optional;
 
+import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -14,90 +14,99 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class EditionCheckerTest {
-
-    public BibDatabaseContext bibDatabaseContextEdition = new BibDatabaseContext();
-
-    private EditionChecker checker;
-    private EditionChecker checkerb;
-    private BibDatabaseContext bibtex;
-    private BibDatabaseContext biblatex;
-
-    @BeforeEach
-    void setUp() {
-        bibtex = new BibDatabaseContext();
-        bibtex.setMode(BibDatabaseMode.BIBTEX);
-        biblatex = new BibDatabaseContext();
-        biblatex.setMode(BibDatabaseMode.BIBLATEX);
-        checker = new EditionChecker(bibtex, true);
-        checkerb = new EditionChecker(biblatex, true);
-    }
-
     @Test
     void isFirstCharacterANumber() {
-        boolean allowIntegerEdition = false;
-        EditionChecker editionChecker = new EditionChecker(bibDatabaseContextEdition, allowIntegerEdition);
-        assertTrue(editionChecker.isFirstCharDigit("0HelloWorld"));
+        assertTrue(createSimpleEditionChecker(new BibDatabaseContext(), false).isFirstCharDigit("0HelloWorld"));
     }
 
     @Test
     void isFirstCharacterANumberFalseForEmptyString() {
-        boolean allowIntegerEdition = false;
-        var editionChecker = new EditionChecker(bibDatabaseContextEdition, allowIntegerEdition);
-        assertFalse(editionChecker.isFirstCharDigit(""));
+        assertFalse(createSimpleEditionChecker(new BibDatabaseContext(), false).isFirstCharDigit(""));
     }
 
     @Test
     void isFirstCharacterNotANumber() {
-        boolean allowIntegerEdition = false;
-        var editionChecker = new EditionChecker(bibDatabaseContextEdition, allowIntegerEdition);
-        assertFalse(editionChecker.isFirstCharDigit("HelloWorld"));
+        assertFalse(createSimpleEditionChecker(new BibDatabaseContext(), false).isFirstCharDigit("HelloWorld"));
     }
 
     @Test
     void editionCheckerDoesNotComplainIfAllowIntegerEditionIsEnabled() {
-        boolean allowIntegerEdition = true;
-        var editionChecker = new EditionChecker(bibDatabaseContextEdition, allowIntegerEdition);
-        assertEquals(Optional.empty(), editionChecker.checkValue("2"));
+        assertEquals(Optional.empty(), createSimpleEditionChecker(new BibDatabaseContext(), true).checkValue("2"));
     }
 
     @Test
     void bibTexAcceptsOrdinalNumberInWordsWithCapitalFirstLetter() {
-        assertEquals(Optional.empty(), checker.checkValue("Second"));
+        assertEquals(Optional.empty(), createBibtexEditionChecker(true).checkValue("Second"));
     }
 
     @Test
     void bibTexDoesNotAcceptOrdinalNumberInWordsWithNonCapitalFirstLetter() {
-        assertNotEquals(Optional.empty(), checker.checkValue("second"));
+        assertNotEquals(Optional.empty(), createBibtexEditionChecker(true).checkValue("second"));
     }
 
     @Test
     void bibTexAcceptsIntegerInputInEdition() {
-        assertEquals(Optional.empty(), checker.checkValue("2"));
+        assertEquals(Optional.empty(), createBibtexEditionChecker(true).checkValue("2"));
     }
 
     @Test
     void bibTexAcceptsOrdinalNumberInNumbers() {
-        assertEquals(Optional.empty(), checker.checkValue("2nd"));
+        assertEquals(Optional.empty(), createBibtexEditionChecker(true).checkValue("2nd"));
+    }
+
+    @Test
+    void bibTexEmptyValueAsInput() {
+        assertEquals(Optional.empty(), createBibtexEditionChecker(false).checkValue(""));
+    }
+
+    @Test
+    void bibTexNullValueAsInput() {
+        assertEquals(Optional.empty(), createBibtexEditionChecker(false).checkValue(null));
+    }
+
+    @Test
+    void bibTexDoesNotAcceptIntegerOnly() {
+        assertEquals(Optional.of(Localization.lang("no integer as values for edition allowed")), createBibtexEditionChecker(false).checkValue("3"));
+    }
+
+    @Test
+    void bibTexAcceptsFirstEditionAlsoIfIntegerEditionDisallowed() {
+        assertEquals(Optional.of(Localization.lang("edition of book reported as just 1")), createBibtexEditionChecker(false).checkValue("1"));
     }
 
     @Test
     void bibLaTexAcceptsEditionWithCapitalFirstLetter() {
-        assertEquals(Optional.empty(), checkerb.checkValue("Edition 2000"));
+        assertEquals(Optional.empty(), createBiblatexEditionChecker(true).checkValue("Edition 2000"));
     }
 
     @Test
     void bibLaTexAcceptsIntegerInputInEdition() {
-        assertEquals(Optional.empty(), checkerb.checkValue("2"));
+        assertEquals(Optional.empty(), createBiblatexEditionChecker(true).checkValue("2"));
     }
 
     @Test
     void bibLaTexAcceptsEditionAsLiteralString() {
-        assertEquals(Optional.empty(), checkerb.checkValue("Third, revised and expanded edition"));
+        assertEquals(Optional.empty(), createBiblatexEditionChecker(true).checkValue("Third, revised and expanded edition"));
     }
 
     @Test
     void bibLaTexDoesNotAcceptOrdinalNumberInNumbers() {
-        assertNotEquals(Optional.empty(), checkerb.checkValue("2nd"));
+        assertNotEquals(Optional.empty(), createBiblatexEditionChecker(true).checkValue("2nd"));
     }
 
+    private EditionChecker createBibtexEditionChecker(Boolean allowIntegerEdition) {
+        BibDatabaseContext bibtex = new BibDatabaseContext();
+        bibtex.setMode(BibDatabaseMode.BIBTEX);
+        return new EditionChecker(bibtex, allowIntegerEdition);
+    }
+
+    private EditionChecker createBiblatexEditionChecker(Boolean allowIntegerEdition) {
+        BibDatabaseContext biblatex = new BibDatabaseContext();
+        biblatex.setMode(BibDatabaseMode.BIBLATEX);
+        return new EditionChecker(biblatex, allowIntegerEdition);
+    }
+
+    private EditionChecker createSimpleEditionChecker(BibDatabaseContext bibDatabaseContextEdition, boolean allowIntegerEdition) {
+        return new EditionChecker(bibDatabaseContextEdition, allowIntegerEdition);
+    }
 }

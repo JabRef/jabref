@@ -14,6 +14,7 @@ import javafx.scene.control.TextField;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.LibraryTab;
+import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.auxparser.AuxParser;
@@ -42,6 +43,7 @@ public class FromAuxDialog extends BaseDialog<Void> {
 
     @Inject private PreferencesService preferences;
     @Inject private DialogService dialogService;
+    @Inject private ThemeManager themeManager;
 
     public FromAuxDialog(JabRefFrame frame) {
         libraryTab = frame.getCurrentLibraryTab();
@@ -61,6 +63,8 @@ public class FromAuxDialog extends BaseDialog<Void> {
             }
             return null;
         });
+
+        themeManager.updateFontStyle(getDialogPane().getScene());
     }
 
     @FXML
@@ -93,7 +97,7 @@ public class FromAuxDialog extends BaseDialog<Void> {
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                 .addExtensionFilter(StandardFileType.AUX)
                 .withDefaultExtension(StandardFileType.AUX)
-                .withInitialDirectory(preferences.getWorkingDir()).build();
+                .withInitialDirectory(preferences.getFilePreferences().getWorkingDirectory()).build();
         dialogService.showFileOpenDialog(fileDialogConfiguration).ifPresent(file -> auxFileField.setText(file.toAbsolutePath().toString()));
     }
 }

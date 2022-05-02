@@ -1,5 +1,6 @@
 package org.jabref.gui.search.rules.describer;
 
+import java.util.EnumSet;
 import java.util.List;
 
 import javafx.scene.text.Text;
@@ -7,17 +8,17 @@ import javafx.scene.text.TextFlow;
 
 import org.jabref.gui.util.TooltipTextUtil;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.model.search.rules.SearchRules;
+import org.jabref.model.search.rules.SearchRules.SearchFlags;
 import org.jabref.model.search.rules.SentenceAnalyzer;
 
 public class ContainsAndRegexBasedSearchRuleDescriber implements SearchDescriber {
 
-    private final boolean regExp;
-    private final boolean caseSensitive;
+    private final EnumSet<SearchFlags> searchFlags;
     private final String query;
 
-    public ContainsAndRegexBasedSearchRuleDescriber(boolean caseSensitive, boolean regExp, String query) {
-        this.caseSensitive = caseSensitive;
-        this.regExp = regExp;
+    public ContainsAndRegexBasedSearchRuleDescriber(EnumSet<SearchFlags> searchFlags, String query) {
+        this.searchFlags = searchFlags;
         this.query = query;
     }
 
@@ -26,7 +27,7 @@ public class ContainsAndRegexBasedSearchRuleDescriber implements SearchDescriber
         List<String> words = new SentenceAnalyzer(query).getWords();
         String firstWord = words.isEmpty() ? "" : words.get(0);
 
-        String temp = regExp ? Localization.lang(
+        String temp = searchFlags.contains(SearchRules.SearchFlags.REGULAR_EXPRESSION) ? Localization.lang(
                 "This search contains entries in which any field contains the regular expression <b>%0</b>")
                 : Localization.lang("This search contains entries in which any field contains the term <b>%0</b>");
         List<Text> textList = TooltipTextUtil.formatToTexts(temp, new TooltipTextUtil.TextReplacement("<b>%0</b>", firstWord, TooltipTextUtil.TextType.BOLD));
@@ -40,9 +41,6 @@ public class ContainsAndRegexBasedSearchRuleDescriber implements SearchDescriber
         }
 
         textList.add(getCaseSensitiveDescription());
-        textList.add(TooltipTextUtil.createText("\n\n" +
-                Localization.lang("Hint: To search specific fields only, enter for example:")));
-        textList.add(TooltipTextUtil.createText(" author=smith and title=electrical", TooltipTextUtil.TextType.MONOSPACED));
 
         TextFlow searchDescription = new TextFlow();
         searchDescription.getChildren().setAll(textList);
@@ -50,7 +48,7 @@ public class ContainsAndRegexBasedSearchRuleDescriber implements SearchDescriber
     }
 
     private Text getCaseSensitiveDescription() {
-        if (caseSensitive) {
+        if (searchFlags.contains(SearchRules.SearchFlags.CASE_SENSITIVE)) {
             return TooltipTextUtil.createText(String.format(" (%s). ", Localization.lang("case sensitive")), TooltipTextUtil.TextType.NORMAL);
         } else {
             return TooltipTextUtil.createText(String.format(" (%s). ", Localization.lang("case insensitive")), TooltipTextUtil.TextType.NORMAL);

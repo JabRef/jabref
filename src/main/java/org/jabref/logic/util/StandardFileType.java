@@ -42,7 +42,9 @@ public enum StandardFileType implements FileType {
     ZIP("Zip Archive", "zip"),
     CSS("CSS Styleshet", "css"),
     YAML("YAML Markup", "yaml"),
-    ANY_FILE("Any", "*");
+    CFF("CFF", "cff"),
+    ANY_FILE("Any", "*"),
+    CER("SSL Certificate", "cer");
 
     private final List<String> extensions;
     private final String name;

@@ -2,6 +2,7 @@ package org.jabref.model.entry;
 
 import java.util.Optional;
 
+import org.jabref.logic.bibtex.FieldWriter;
 import org.jabref.model.strings.StringUtil;
 
 /**
@@ -165,7 +166,7 @@ public enum Month {
     }
 
     /**
-     * Returns the month in JabRef format. The format is the short 3-digit name surrounded by a '#'.
+     * Returns the month in JabRef format. The format is the short 3-digit name surrounded by a '#' (FieldWriter.BIBTEX_STRING_START_END_SYMBOL).
      * Example: #jan#, #feb#, etc.
      * <p>
      * See <a href="https://github.com/JabRef/jabref/issues/263#issuecomment-151246595">Issue 263</a> for a discussion on that thing.
@@ -175,7 +176,7 @@ public enum Month {
      * @return Month in JabRef format
      */
     public String getJabRefFormat() {
-        return String.format("#%s#", shortName);
+        return String.format(FieldWriter.BIBTEX_STRING_START_END_SYMBOL + "%s" + FieldWriter.BIBTEX_STRING_START_END_SYMBOL, shortName);
     }
 
     /**

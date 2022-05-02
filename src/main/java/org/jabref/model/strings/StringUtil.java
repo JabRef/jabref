@@ -12,6 +12,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.jabref.architecture.ApacheCommonsLang3Allowed;
+import org.jabref.logic.bibtex.FieldWriter;
 
 import com.google.common.base.CharMatcher;
 import org.apache.commons.lang3.StringUtils;
@@ -138,7 +139,7 @@ public class StringUtil {
             return "";
         }
 
-        int updatedFrom = Math.max(from, 0);
+        int updatedFrom = Math.max(0, from);
         int updatedTo = Math.min(strings.length, to);
 
         StringBuilder stringBuilder = new StringBuilder();
@@ -197,7 +198,6 @@ public class StringUtil {
         // remove all whitespace at the end of the string, this especially includes \r created when the field content has \r\n as line separator
         addWrappedLine(result, CharMatcher.whitespace().trimTrailingFrom(lines[0]), wrapAmount, newline);
         for (int i = 1; i < lines.length; i++) {
-
             if (lines[i].trim().isEmpty()) {
                 result.append(newline);
                 result.append('\t');
@@ -257,6 +257,7 @@ public class StringUtil {
      * Decodes an encoded double String array back into array form. The array
      * is assumed to be square, and delimited by the characters ';' (first dim) and
      * ':' (second dim).
+     *
      * @param value The encoded String to be decoded.
      * @return The decoded String array.
      */
@@ -310,7 +311,6 @@ public class StringUtil {
      * @return The resulting string after wrapping capitals.
      */
     public static String putBracesAroundCapitals(String s) {
-
         boolean inString = false;
         boolean isBracing = false;
         boolean escaped = false;
@@ -323,21 +323,19 @@ public class StringUtil {
                 inBrace++;
             } else if (c == '}') {
                 inBrace--;
-            } else if (!escaped && (c == '#')) {
+            } else if (!escaped && (c == FieldWriter.BIBTEX_STRING_START_END_SYMBOL)) {
                 inString = !inString;
             }
 
             // See if we should start bracing:
             if ((inBrace == 0) && !isBracing && !inString && Character.isLetter((char) c)
                     && Character.isUpperCase((char) c)) {
-
                 buf.append('{');
                 isBracing = true;
             }
 
             // See if we should close a brace set:
             if (isBracing && !(Character.isLetter((char) c) && Character.isUpperCase((char) c))) {
-
                 buf.append('}');
                 isBracing = false;
             }
@@ -394,6 +392,7 @@ public class StringUtil {
 
     /**
      * Replaces all platform-dependent line breaks by OS.NEWLINE line breaks.
+     * AKA normalize newlines
      * <p>
      * We do NOT use UNIX line breaks as the user explicitly configures its linebreaks and this method is used in bibtex field writing
      *
@@ -411,6 +410,7 @@ public class StringUtil {
     /**
      * Checks if the given String has exactly one pair of surrounding curly braces <br>
      * Strings with escaped characters in curly braces at the beginning and end are respected, too
+     *
      * @param toCheck The string to check
      * @return True, if the check was succesful. False otherwise.
      */
@@ -599,7 +599,7 @@ public class StringUtil {
      * @return String with n spaces
      */
     public static String repeatSpaces(int n) {
-        return repeat(n, ' ');
+        return repeat(Math.max(0, n), ' ');
     }
 
     /**
@@ -703,7 +703,6 @@ public class StringUtil {
         } else {
             return toCapitalize.toUpperCase(Locale.ROOT);
         }
-
     }
 
     /**
@@ -737,5 +736,18 @@ public class StringUtil {
 
     public static String ignoreCurlyBracket(String title) {
         return isNotBlank(title) ? title.replace("{", "").replace("}", "") : title;
+    }
+
+    /**
+     * Encloses the given string with " if there is a space contained
+     *
+     * @return Returns a string
+     */
+    public static String quoteStringIfSpaceIsContained(String string) {
+        if (string.contains(" ")) {
+            return "\"" + string + "\"";
+        } else {
+            return string;
+        }
     }
 }

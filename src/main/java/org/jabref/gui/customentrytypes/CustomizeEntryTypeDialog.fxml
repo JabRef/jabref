@@ -23,12 +23,12 @@
             <children>
                 <VBox prefHeight="400.0" prefWidth="100.0" spacing="10.0">
                     <children>
-                        <Label text="Entry types"/>
+                        <Label text="%Entry types"/>
                         <TableView fx:id="entryTypes" minWidth="-Infinity"
                                    VBox.vgrow="ALWAYS">
                             <columns>
                                 <TableColumn fx:id="entryTypColumn" minWidth="100.0"
-                                             prefWidth="100.0" text="Entry Type"/>
+                                             prefWidth="100.0" text="%Entry Type"/>
                                 <TableColumn fx:id="entryTypeActionsColumn"
                                              maxWidth="40.0" minWidth="40.0" resizable="false"/>
                             </columns>

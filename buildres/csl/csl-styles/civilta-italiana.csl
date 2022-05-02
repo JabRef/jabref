@@ -10,21 +10,26 @@
       <name>RS</name>
       <email>romansos@gazeta.pl</email>
     </author>
+    <author>
+      <name>Giovanni Ricci</name>
+    </author>
     <category citation-format="note"/>
     <category field="humanities"/>
-    <summary>AIPI Style used in Civiltà Italiana series by Cesati (Italian), based on Ius Ecclesiae style and University of Bologna style</summary>
-    <updated>2017-11-27T12:00:00+00:00</updated>
+    <summary>AIPI Style used in Civiltà Italiana series by Cesati (Italian), based on Ius Ecclesiae style and University of Bologna style, with added support for manuscripts and archive documents.</summary>
+    <updated>2021-06-27T17:00:00+01:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="it">
     <terms>
       <term name="editor" form="verb">
-        <single> a cura di</single>
+        <single>a cura di</single>
         <multiple>a cura di</multiple>
       </term>
       <term name="editor" form="short">a cura di</term>
       <term name="collection-editor" form="verb">a cura di</term>
       <term name="collection-editor" form="short">a cura di</term>
+      <term name="circa" form="long">circa</term>
+      <term name="circa" form="short">ca.</term>
       <term name="translator" form="short">
         <single>trad.</single>
         <multiple>tradd.</multiple>
@@ -33,9 +38,22 @@
         <single>vol.</single>
         <multiple>voll.</multiple>
       </term>
+      <term name="volume" form="long">
+        <single>volume</single>
+        <multiple>volumi</multiple>
+      </term>
       <term name="page" form="short">
         <single>p.</single>
         <multiple>pp.</multiple>
+      </term>
+      <term name="page" form="long">
+        <single>pagina</single>
+        <multiple>pagine</multiple>
+      </term>
+      <!-- aggiunta abbreviazione per la cartulazione 19 gen. 2020-->
+      <term name="folio" form="short">
+        <single>c.</single>
+        <multiple>cc.</multiple>
       </term>
       <term name="paragraph" form="short">
         <single>§</single>
@@ -49,6 +67,9 @@
       <term name="presented at">pubblicato in</term>
     </terms>
   </locale>
+  <!--"========================="-->
+  <!--MACRO-->
+  <!--"========================="-->
   <macro name="author">
     <names variable="author">
       <name delimiter=", " delimiter-precedes-last="always" font-variant="small-caps"/>
@@ -94,6 +115,13 @@
   <macro name="title">
     <text variable="title" font-style="italic"/>
   </macro>
+  <!-- aggiunta macro per l'archivio o la biblioteca conservatori e la collocazione 19 gen. 2021-->
+  <macro name="archive">
+    <text variable="archive" font-variant="small-caps"/>
+  </macro>
+  <macro name="archive_location">
+    <text variable="archive_location"/>
+  </macro>
   <macro name="title-short">
     <text variable="title" form="short" font-style="italic"/>
   </macro>
@@ -104,10 +132,10 @@
     <text term="in" suffix=" "/>
     <choose>
       <if variable="container-author">
-        <text variable="container-title" font-style="italic" suffix=", "/>
         <names variable="container-author">
           <name delimiter=", " delimiter-precedes-last="always" font-variant="small-caps"/>
         </names>
+        <text variable="container-title" font-style="italic" prefix=", "/>
       </if>
       <else-if variable="collection-editor">
         <text variable="container-title" font-style="italic" suffix=", "/>
@@ -116,11 +144,15 @@
           <name delimiter=", " delimiter-precedes-last="always" font-variant="small-caps"/>
         </names>
       </else-if>
+      <else-if variable="container-title">
+        <text variable="container-title" font-style="italic"/>
+        <!-- rimosso il suffisso ", " il 3/1/21 perche confliggeva con la virgola del luogo di edizione-->
+      </else-if>
     </choose>
     <choose>
       <if variable="editor">
-        <text variable="container-title" font-style="italic" suffix=", "/>
-        <names variable="editor">
+        <!-- rimosso il container title il 16/2/21 perche confliggeva quello gia presente nella citazione-->
+        <names variable="editor" prefix=", ">
           <label form="short" suffix=" "/>
           <name delimiter=", " delimiter-precedes-last="always" font-variant="small-caps"/>
         </names>
@@ -128,9 +160,15 @@
     </choose>
   </macro>
   <macro name="date">
+    <!-- aggiunto il supporto per le date approssimate il 26/2/21-->
+    <choose>
+      <if is-uncertain-date="issued">
+        <text term="circa" form="short" suffix=" "/>
+      </if>
+    </choose>
     <date variable="issued">
-      <date-part name="day" form="numeric" suffix="/" range-delimiter="-"/>
-      <date-part name="month" form="numeric" suffix="/"/>
+      <date-part name="day" form="numeric" suffix=" " range-delimiter="-"/>
+      <date-part name="month" form="long" suffix=" "/>
       <date-part name="year" range-delimiter="&#8211;"/>
     </date>
   </macro>
@@ -141,53 +179,64 @@
       <date-part name="year"/>
     </date>
   </macro>
-  <macro name="publisher">
+  <macro name="publisher-place">
     <text variable="publisher-place"/>
   </macro>
-  <macro name="publisher-place-year">
-    <text variable="publisher" suffix=", "/>
-    <text macro="date"/>
+  <macro name="publisher_and_year">
+    <group delimiter=", ">
+      <text variable="publisher"/>
+      <text macro="date"/>
+    </group>
     <number variable="edition" vertical-align="sup"/>
   </macro>
   <macro name="journal">
     <choose>
       <if variable="container-title">
-        <text variable="container-title" prefix="«" suffix="»"/>
+        <text term="in"/>
+        <text variable="container-title" prefix=" «" suffix="»"/>
       </if>
       <else>
         <text variable="container-title" form="short" prefix="«" suffix="»"/>
       </else>
     </choose>
   </macro>
-  <macro name="volref">
-    <choose>
-      <if variable="volume number-of-volumes" match="all">
-        <group delimiter=" ">
-          <text term="volume" form="short" plural="false"/>
-          <text variable="volume"/>
-          <text variable="number-of-volumes" prefix=" ("/>
-          <text term="volume" form="short" plural="true" prefix=" " suffix=")"/>
-        </group>
-      </if>
-      <else>
-        <group delimiter=" ">
-          <text term="volume" form="short" plural="false"/>
-          <text variable="volume"/>
-        </group>
-        <group delimiter=" ">
-          <text variable="number-of-volumes"/>
-          <text term="volume" form="short" plural="true"/>
-        </group>
-      </else>
-    </choose>
+  <macro name="volnumber">
+    <group delimiter=" ">
+      <text variable="number-of-volumes"/>
+      <text term="volume" form="short" plural="true"/>
+    </group>
+  </macro>
+  <!-- aggiunta macro per mettere nelle note il solo volume citato -->
+  <macro name="volume">
+    <group delimiter=" ">
+      <choose>
+        <if type="article-journal article-magazine" match="none">
+          <label variable="volume" form="short" plural="contextual"/>
+        </if>
+      </choose>
+      <!-- per avere i numeri romani in maiuscoletto: 
+      <text variable="volume" font-variant="small-caps" text-case="lowercase"/>
+      -->
+      <text variable="volume"/>
+    </group>
   </macro>
   <macro name="pageref">
-    <label variable="locator" form="short" suffix=" " prefix=", "/>
-    <text variable="locator" suffix="."/>
+    <!-- rimosso prefisso virgola e suffisso punto il 30/1/21 -->
+    <label variable="locator" form="short" suffix=" "/>
+    <text variable="locator"/>
   </macro>
   <macro name="pages">
-    <text term="page" form="short" plural="true" suffix=" " prefix=", "/>
-    <text variable="page" suffix="."/>
+    <!-- inserito label invece di text per poterlo avere declinato sempre correttamente al singolare e al plurale il 27/2/21 -->
+    <label variable="page" form="short" plural="contextual" suffix=" " prefix=", "/>
+    <text variable="page"/>
+  </macro>
+  <!-- aggiunta macro per le segnature il 7/3/21 -->
+  <macro name="call-number">
+    <text variable="call-number"/>
+  </macro>
+  <!-- aggiunta macro per le conferenze il 7/3/21 -->
+  <macro name="event">
+    <text variable="event"/>
   </macro>
   <macro name="urlref">
     <text variable="URL" prefix=" [" suffix="]"/>
@@ -196,23 +245,42 @@
       <text macro="accessed"/>
     </group>
   </macro>
+  <!--"========================="-->
+  <!-- CITAZIONI-->
+  <!--"========================="-->
   <citation>
-    <layout prefix="" suffix="" delimiter="; ">
+    <layout prefix="" suffix="." delimiter="; ">
       <choose>
         <if position="ibid-with-locator">
-          <text term="ibid" form="short" text-case="lowercase"/>
-          <text macro="pageref"/>
+          <text term="ibid" form="short"/>
+          <text macro="pageref" prefix=", "/>
         </if>
         <else-if position="ibid">
-          <text term="ibid" form="long" text-case="lowercase" font-style="italic"/>
+          <text term="ibid" form="long" font-style="italic"/>
         </else-if>
         <else-if position="subsequent">
           <group delimiter=", ">
+            <text macro="archive"/>
             <text macro="author"/>
             <text macro="title-short"/>
-            <text term="cited" form="short"/>
+            <!-- aggiunta precisazione del volume nella citazione breve l'11/2/21-->
+            <choose>
+              <if variable="volume" match="all" type="book">
+                <group delimiter=" ">
+                  <text macro="volume"/>
+                </group>
+              </if>
+            </choose>
+            <choose>
+              <if type="manuscript">
+                <text term="cited" form="short" prefix="ms. "/>
+              </if>
+              <else>
+                <text term="cited" form="short"/>
+              </else>
+            </choose>
+            <text macro="pageref"/>
           </group>
-          <text macro="pageref"/>
         </else-if>
         <else-if type="book">
           <group delimiter=", ">
@@ -220,24 +288,32 @@
             <text macro="editor"/>
             <text macro="title"/>
             <text macro="translator"/>
-            <text macro="volref"/>
-            <text macro="publisher"/>
-            <text macro="publisher-place-year"/>
+            <text macro="volume"/>
+            <text macro="publisher-place"/>
+            <text macro="publisher_and_year"/>
+            <!-- questo consente di scrivere il numero dei volumi dell'opera se non est stato citato nessun volume di preciso e nessun locator e quindi la citazione include tutta l'opera. 2/3/21-->
+            <choose>
+              <if variable="volume locator" match="none">
+                <text macro="volnumber"/>
+              </if>
+            </choose>
+            <text macro="pageref"/>
           </group>
-          <text macro="pageref"/>
         </else-if>
         <else-if type="article-journal">
           <group delimiter=", ">
             <text macro="author"/>
             <text macro="title"/>
             <text macro="journal"/>
+            <text macro="volume"/>
           </group>
-          <text macro="date" prefix=" (" suffix=")"/>
-          <text variable="volume" prefix=", "/>
-          <text variable="issue" prefix=", "/>
+          <group delimiter=", ">
+            <text macro="date" prefix=" (" suffix=")"/>
+            <text variable="issue"/>
+          </group>
           <choose>
             <if variable="locator">
-              <text macro="pageref"/>
+              <text macro="pageref" prefix=", "/>
             </if>
             <else-if variable="page">
               <text macro="pages"/>
@@ -252,32 +328,39 @@
             <text macro="author"/>
             <text macro="title"/>
           </group>
-          <text term="presented at" suffix=" "/>
-          <text variable="container-title" font-style="italic" suffix=", "/>
-          <group delimiter=" " suffix=", ">
-            <text term="section"/>
-            <text variable="section" font-style="italic"/>
-          </group>
+          <text macro="journal" suffix=", "/>
           <choose>
             <if type="article-magazine">
               <text variable="issue" suffix=", "/>
               <text macro="date"/>
+              <choose>
+                <if variable="locator">
+                  <text macro="pageref"/>
+                </if>
+                <else-if variable="page">
+                  <text macro="pages"/>
+                </else-if>
+                <else-if variable="URL">
+                  <text macro="urlref"/>
+                </else-if>
+              </choose>
             </if>
             <else>
               <text macro="date"/>
             </else>
           </choose>
-          <choose>
-            <if variable="locator">
-              <text macro="pageref"/>
-            </if>
-            <else-if variable="page">
-              <text macro="pages"/>
-            </else-if>
-            <else-if variable="URL">
-              <text macro="urlref"/>
-            </else-if>
-          </choose>
+        </else-if>
+        <else-if type="paper-conference">
+          <group delimiter=", ">
+            <text macro="author"/>
+            <text macro="title"/>
+            <text macro="editor-container-title"/>
+            <text macro="event"/>
+            <text macro="volume"/>
+            <text macro="publisher-place"/>
+            <text macro="publisher_and_year"/>
+            <text macro="pageref"/>
+          </group>
         </else-if>
         <else-if type="chapter">
           <group delimiter=", " suffix=", ">
@@ -290,13 +373,13 @@
             <text macro="series-title"/>
           </group>
           <group delimiter=", ">
-            <text macro="volref"/>
-            <text macro="publisher"/>
-            <text macro="publisher-place-year"/>
+            <text macro="volume"/>
+            <text macro="publisher-place"/>
+            <text macro="publisher_and_year"/>
           </group>
           <choose>
             <if variable="locator">
-              <text macro="pageref"/>
+              <text macro="pageref" prefix=", "/>
             </if>
             <else-if variable="page">
               <text macro="pages"/>
@@ -307,16 +390,16 @@
           </choose>
         </else-if>
         <else-if type="thesis">
-          <group delimiter=", ">
+          <group delimiter=", " suffix=", ">
             <text macro="author"/>
             <text macro="title"/>
+            <text variable="genre"/>
+            <text macro="publisher-place"/>
+            <text macro="publisher_and_year"/>
           </group>
-          <text variable="genre" prefix=", " suffix=", "/>
-          <text variable="publisher" suffix=", "/>
-          <text macro="publisher-place-year"/>
           <choose>
             <if variable="locator">
-              <text macro="pageref"/>
+              <text macro="pageref" prefix=", "/>
             </if>
             <else-if variable="page">
               <text macro="pages"/>
@@ -326,25 +409,44 @@
             </else-if>
           </choose>
         </else-if>
+        <else-if type="manuscript">
+          <group delimiter=", ">
+            <text macro="archive"/>
+            <choose>
+              <if variable="call-number" match="all">
+                <text macro="archive_location" font-style="italic"/>
+              </if>
+              <else>
+                <text macro="archive_location"/>
+              </else>
+            </choose>
+            <text macro="call-number"/>
+            <text macro="author"/>
+            <text macro="title"/>
+            <text macro="pageref"/>
+          </group>
+        </else-if>
         <else-if type="entry-encyclopedia entry-dictionary" match="any">
           <group delimiter=", ">
             <text macro="author"/>
             <text macro="title"/>
             <text macro="editor-container-title"/>
-            <text macro="volref"/>
+            <text macro="volume"/>
           </group>
           <choose>
             <if variable="publisher publisher-place issued" match="all">
-              <text variable="publisher" prefix=", " suffix=", "/>
-              <text macro="publisher-place-year"/>
+              <group delimiter=", ">
+                <text macro="publisher-place" prefix=", "/>
+                <text macro="publisher_and_year"/>
+              </group>
             </if>
             <else-if variable="issued">
-              <text macro="date" prefix=", " suffix=", "/>
+              <text macro="date" prefix=", "/>
             </else-if>
           </choose>
           <choose>
             <if variable="locator">
-              <text macro="pageref"/>
+              <text macro="pageref" prefix=", "/>
             </if>
             <else-if variable="page">
               <text macro="pages"/>
@@ -362,7 +464,7 @@
           </group>
           <choose>
             <if variable="locator">
-              <text macro="pageref"/>
+              <text macro="pageref" suffix=", "/>
             </if>
             <else-if variable="page">
               <text macro="pages"/>
@@ -375,10 +477,16 @@
       </choose>
     </layout>
   </citation>
+  <!--"========================="-->
+  <!-- BIBLIOGRAFIA-->
+  <!--"========================="-->
   <bibliography hanging-indent="true" subsequent-author-substitute="&#8212;&#8212;&#8212;" entry-spacing="0">
     <sort>
       <key macro="author-sort"/>
+      <key variable="title"/>
       <key variable="issued"/>
+      <key variable="archive"/>
+      <key variable="archive_location"/>
     </sort>
     <layout suffix=".">
       <text macro="author-sort" suffix=", "/>
@@ -388,25 +496,30 @@
             <text macro="editor-sort"/>
             <text macro="title"/>
             <text macro="translator-sort"/>
-            <text macro="volref"/>
-            <text macro="publisher"/>
-            <text macro="publisher-place-year"/>
+            <text macro="volume"/>
+            <text macro="publisher-place"/>
+            <text macro="publisher_and_year"/>
+            <text macro="volnumber"/>
           </group>
+          <text macro="urlref"/>
+          <!-- aggiunta url del libro -->
         </if>
         <else-if type="thesis">
-          <text macro="title"/>
-          <text variable="genre" prefix=", " suffix=", "/>
-          <text variable="publisher" suffix=", "/>
-          <text macro="publisher-place-year"/>
+          <group delimiter=", ">
+            <text macro="title"/>
+            <text variable="genre"/>
+            <text macro="publisher-place"/>
+            <text macro="publisher_and_year"/>
+          </group>
         </else-if>
         <else-if type="article-journal">
           <group delimiter=", ">
             <text macro="title"/>
             <text macro="journal"/>
           </group>
-          <text variable="volume" prefix=" "/>
-          <text variable="issue" prefix=", "/>
+          <text macro="volume" prefix=", "/>
           <text macro="date" prefix=" (" suffix=")"/>
+          <text variable="issue" prefix=", "/>
           <choose>
             <if variable="page">
               <text macro="pages"/>
@@ -415,28 +528,45 @@
           <text macro="urlref"/>
         </else-if>
         <else-if type="article-newspaper article-magazine" match="any">
-          <text macro="title" suffix=", "/>
-          <text term="presented at" suffix=" "/>
-          <text variable="container-title" font-style="italic" suffix=", "/>
-          <group delimiter=" " suffix=", ">
-            <text term="section"/>
-            <text variable="section" font-style="italic"/>
+          <group delimiter=", ">
+            <text macro="title"/>
+            <text macro="journal"/>
+            <group delimiter=" ">
+              <text term="section"/>
+              <text variable="section" font-style="italic"/>
+            </group>
+            <choose>
+              <if type="article-magazine">
+                <text variable="issue"/>
+                <text macro="date"/>
+              </if>
+              <else>
+                <text macro="date"/>
+              </else>
+            </choose>
           </group>
-          <choose>
-            <if type="article-magazine">
-              <text variable="issue" suffix=", "/>
-              <text macro="date"/>
-            </if>
-            <else>
-              <text macro="date"/>
-            </else>
-          </choose>
           <choose>
             <if variable="page">
               <text macro="pages"/>
             </if>
           </choose>
           <text macro="urlref"/>
+        </else-if>
+        <!-- aggiunta macro conferenze il 1/3/21-->
+        <else-if type="paper-conference">
+          <group delimiter=", ">
+            <text macro="title"/>
+            <text macro="editor-container-title"/>
+            <text macro="event"/>
+            <text macro="volume"/>
+            <text macro="publisher-place"/>
+            <text macro="publisher_and_year"/>
+          </group>
+          <choose>
+            <if variable="page">
+              <text macro="pages"/>
+            </if>
+          </choose>
         </else-if>
         <else-if type="chapter">
           <text macro="title"/>
@@ -445,9 +575,10 @@
             <text macro="series-title"/>
           </group>
           <group delimiter=", " prefix=", ">
-            <text macro="volref"/>
-            <text macro="publisher"/>
-            <text macro="publisher-place-year"/>
+            <text macro="volume"/>
+            <text macro="publisher-place"/>
+            <text macro="publisher_and_year"/>
+            <text macro="volnumber"/>
           </group>
           <choose>
             <if variable="page">
@@ -456,19 +587,46 @@
           </choose>
           <text macro="urlref"/>
         </else-if>
+        <!-- aggiunta macro manoscritti il 19/1/21-->
+        <!-- il blocco if con archive location in corsivo consente di avere il nome del fondo in corsivo e la collocazione in tondo-->
+        <else-if type="manuscript">
+          <group delimiter=", ">
+            <text macro="title"/>
+            <text macro="date"/>
+            <choose>
+              <if variable="page">
+                <text macro="pages"/>
+              </if>
+            </choose>
+            <text macro="archive" prefix="conserv. in "/>
+            <choose>
+              <if variable="call-number" match="all">
+                <text macro="archive_location" font-style="italic"/>
+              </if>
+              <else>
+                <text macro="archive_location"/>
+              </else>
+            </choose>
+            <text macro="call-number"/>
+          </group>
+          <text macro="urlref"/>
+        </else-if>
         <else-if type="entry-encyclopedia entry-dictionary" match="any">
           <group delimiter=", ">
             <text macro="title"/>
             <text macro="editor-container-title"/>
-            <text macro="volref"/>
+            <text macro="volume"/>
           </group>
           <choose>
             <if variable="publisher publisher-place issued" match="all">
-              <text variable="publisher" prefix=", " suffix=", "/>
-              <text macro="publisher-place-year"/>
+              <group delimiter=", ">
+                <text macro="publisher-place" prefix=", "/>
+                <text macro="publisher_and_year"/>
+                <text macro="volnumber"/>
+              </group>
             </if>
             <else-if variable="issued">
-              <text macro="date" prefix=", " suffix=", "/>
+              <text macro="date" prefix=", "/>
             </else-if>
           </choose>
           <choose>

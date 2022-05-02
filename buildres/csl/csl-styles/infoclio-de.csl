@@ -40,7 +40,7 @@
     </terms>
   </locale>
   <citation>
-    <layout suffix="." delimiter="&#160;; ">
+    <layout suffix="." delimiter="; ">
       <choose>
         <if position="ibid-with-locator">
           <group delimiter=", ">
@@ -60,7 +60,7 @@
       </choose>
     </layout>
   </citation>
-  <bibliography>
+  <bibliography hanging-indent="true">
     <sort>
       <key macro="creator" names-min="3" names-use-first="3"/>
       <key variable="issued" sort="descending"/>

@@ -7,7 +7,8 @@
     <id>http://www.zotero.org/styles/hawaii-international-conference-on-system-sciences-proceedings</id>
     <link href="http://www.zotero.org/styles/hawaii-international-conference-on-system-sciences-proceedings" rel="self"/>
     <link href="http://www.zotero.org/styles/acm-sigchi-proceedings" rel="template"/>
-    <link href="http://hicss.hawaii.edu/tracks-and-minitracks/authors/" rel="documentation"/>
+    <link href="https://hicss.hawaii.edu/authors/" rel="documentation"/>
+    <link href="hhttps://docs.google.com/document/d/1OgABmJ6o_YZ4A9WQtYCgIPsD34Ny0lggZScuy4Y6lwQ/edit" rel="documentation"/>
     <author>
       <name>Jeff Hemsley</name>
       <email>jhemsley@uw.edu</email>
@@ -94,10 +95,6 @@
     </layout>
   </citation>
   <bibliography et-al-min="7" et-al-use-first="3" entry-spacing="1">
-    <sort>
-      <key macro="author"/>
-      <key variable="issued"/>
-    </sort>
     <layout>
       <text variable="citation-number" prefix="[" suffix="] "/>
       <text macro="author"/>

@@ -35,13 +35,13 @@ import javafx.stage.Window;
 import javafx.util.Duration;
 
 import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.gui.util.ZipFileChooser;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.preferences.PreferencesService;
 
 import com.jfoenix.controls.JFXSnackbar;
 import com.jfoenix.controls.JFXSnackbar.SnackbarEvent;
@@ -68,20 +68,20 @@ public class JabRefDialogService implements DialogService {
 
     private static final Duration TOAST_MESSAGE_DISPLAY_TIME = Duration.millis(3000);
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefDialogService.class);
-    private static PreferencesService preferences;
 
     private final Window mainWindow;
     private final JFXSnackbar statusLine;
+    private final ThemeManager themeManager;
 
-    public JabRefDialogService(Window mainWindow, Pane mainPane, PreferencesService preferences) {
+    public JabRefDialogService(Window mainWindow, Pane mainPane, ThemeManager themeManager) {
         this.mainWindow = mainWindow;
+        this.themeManager = themeManager;
         this.statusLine = new JFXSnackbar(mainPane);
-        JabRefDialogService.preferences = preferences;
     }
 
     private FXDialog createDialog(AlertType type, String title, String content) {
         FXDialog alert = new FXDialog(type, title, true);
-        preferences.getTheme().installCss(alert.getDialogPane().getScene());
+        themeManager.installCss(alert.getDialogPane().getScene());
         alert.setHeaderText(null);
         alert.setContentText(content);
         alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
@@ -99,7 +99,6 @@ public class JabRefDialogService implements DialogService {
         // Create a new dialog pane that has a checkbox instead of the hide/show details button
         // Use the supplied callback for the action of the checkbox
         alert.setDialogPane(new DialogPane() {
-
             @Override
             protected Node createDetailsButton() {
                 CheckBox optOut = new CheckBox();
@@ -115,7 +114,7 @@ public class JabRefDialogService implements DialogService {
 
         // Reset the dialog graphic using the default style
         alert.getDialogPane().setGraphic(graphic);
-        preferences.getTheme().installCss(alert.getDialogPane().getScene());
+        themeManager.installCss(alert.getDialogPane().getScene());
         alert.setHeaderText(null);
         alert.setContentText(content);
         alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
@@ -140,7 +139,7 @@ public class JabRefDialogService implements DialogService {
         choiceDialog.setTitle(title);
         choiceDialog.setContentText(content);
         choiceDialog.initOwner(mainWindow);
-        preferences.getTheme().installCss(choiceDialog.getDialogPane().getScene());
+        themeManager.installCss(choiceDialog.getDialogPane().getScene());
         return choiceDialog.showAndWait();
     }
 
@@ -150,7 +149,7 @@ public class JabRefDialogService implements DialogService {
         inputDialog.setHeaderText(title);
         inputDialog.setContentText(content);
         inputDialog.initOwner(mainWindow);
-        preferences.getTheme().installCss(inputDialog.getDialogPane().getScene());
+        themeManager.installCss(inputDialog.getDialogPane().getScene());
         return inputDialog.showAndWait();
     }
 
@@ -160,7 +159,7 @@ public class JabRefDialogService implements DialogService {
         inputDialog.setHeaderText(title);
         inputDialog.setContentText(content);
         inputDialog.initOwner(mainWindow);
-        preferences.getTheme().installCss(inputDialog.getDialogPane().getScene());
+        themeManager.installCss(inputDialog.getDialogPane().getScene());
         return inputDialog.showAndWait();
     }
 
@@ -188,7 +187,7 @@ public class JabRefDialogService implements DialogService {
         exceptionDialog.getDialogPane().setMaxWidth(mainWindow.getWidth() / 2);
         exceptionDialog.setHeaderText(message);
         exceptionDialog.initOwner(mainWindow);
-        preferences.getTheme().installCss(exceptionDialog.getDialogPane().getScene());
+        themeManager.installCss(exceptionDialog.getDialogPane().getScene());
         exceptionDialog.showAndWait();
     }
 
@@ -198,7 +197,7 @@ public class JabRefDialogService implements DialogService {
         exceptionDialog.setHeaderText(title);
         exceptionDialog.setContentText(content);
         exceptionDialog.initOwner(mainWindow);
-        preferences.getTheme().installCss(exceptionDialog.getDialogPane().getScene());
+        themeManager.installCss(exceptionDialog.getDialogPane().getScene());
         exceptionDialog.showAndWait();
     }
 
@@ -268,7 +267,7 @@ public class JabRefDialogService implements DialogService {
         alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
         alert.setResizable(true);
         alert.initOwner(mainWindow);
-        preferences.getTheme().installCss(alert.getDialogPane().getScene());
+        themeManager.installCss(alert.getDialogPane().getScene());
         return alert.showAndWait();
     }
 
@@ -296,7 +295,7 @@ public class JabRefDialogService implements DialogService {
             task.cancel();
             progressDialog.close();
         });
-        preferences.getTheme().installCss(progressDialog.getDialogPane().getScene());
+        themeManager.installCss(progressDialog.getDialogPane().getScene());
         progressDialog.initOwner(mainWindow);
         progressDialog.show();
     }
@@ -321,9 +320,9 @@ public class JabRefDialogService implements DialogService {
         alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
         alert.setResizable(true);
         alert.initOwner(mainWindow);
-        preferences.getTheme().installCss(alert.getDialogPane().getScene());
+        themeManager.installCss(alert.getDialogPane().getScene());
 
-        stateManager.getAnyTaskRunning().addListener((observable, oldValue, newValue) -> {
+        stateManager.getAnyTasksThatWillNotBeRecoveredRunning().addListener((observable, oldValue, newValue) -> {
             if (!newValue) {
                 alert.setResult(ButtonType.YES);
                 alert.close();

@@ -32,7 +32,7 @@ public class HowPublishedCheckerTest {
     }
 
     @Test
-    void bibTexDoesNotCareAboutSpecialChracters() {
+    void bibTexDoesNotCareAboutSpecialCharacters() {
         assertEquals(Optional.empty(), checker.checkValue("Lorem ipsum? 10"));
     }
 
@@ -55,5 +55,4 @@ public class HowPublishedCheckerTest {
     void bibLaTexAcceptsStringWithLowercaseFirstLetter() {
         assertEquals(Optional.empty(), checkerBiblatex.checkValue("lorem ipsum"));
     }
-
 }
