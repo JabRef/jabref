@@ -244,7 +244,7 @@ public class BiodiversityLibrary implements SearchBasedParserFetcher {
                 try {
                     entry = getMostDetails(item, entry);
                 } catch (JSONException | IOException | URISyntaxException exception) {
-                    throw new ParseException("Error when parse entry", exception);
+                    throw new ParseException("Error when parsing entry", exception);
                 }
                 entries.add(entry);
             }
