@@ -1,3 +1,7 @@
+---
+parent: Architectural Decisions
+nav_order: 24
+---
 # Use `#` as indicator for BibTeX string constants
 
 Bibtex supports string constants. The entry editor should support that, too.
