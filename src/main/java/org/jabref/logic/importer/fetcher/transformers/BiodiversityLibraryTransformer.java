@@ -10,8 +10,6 @@ public class BiodiversityLibraryTransformer extends YearRangeByFilteringQueryTra
 
     private static final List<String> STOP_WORDS = List.of("a", "and", "for", "or", "with");
 
-    // These have to be integrated into the IEEE query URL as these are just supported as query parameters
-    // Journal is wrapped in quotes by the transformer
     private String journal;
     private String articleNumber;
     private String author;
@@ -35,7 +33,6 @@ public class BiodiversityLibraryTransformer extends YearRangeByFilteringQueryTra
     @Override
     protected String handleAuthor(String author) {
         this.author = author;
-//        return createKeyValuePair("authorname", this.author);
         return StringUtil.quoteStringIfSpaceIsContained(author);
     }
 

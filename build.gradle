@@ -246,7 +246,7 @@ processResources {
                 "astrophysicsDataSystemAPIKey": System.getenv('AstrophysicsDataSystemAPIKey') ? System.getenv('AstrophysicsDataSystemAPIKey') : '',
                 "ieeeAPIKey": System.getenv('IEEEAPIKey') ? System.getenv('IEEEAPIKey') : '',
                 "scienceDirectApiKey": System.getenv('SCIENCEDIRECTAPIKEY') ? System.getenv('SCIENCEDIRECTAPIKEY') : '',
-                "biodiversityHeritageApiKey": System.getenv('BiodiversityHeritageApiKey')?System.getenv('BiodiversityHeritageApiKey'):''
+                "biodiversityHeritageApiKey": System.getenv('BiodiversityHeritageApiKey') ? System.getenv('BiodiversityHeritageApiKey') : ''
         )
         filteringCharset = 'UTF-8'
     }

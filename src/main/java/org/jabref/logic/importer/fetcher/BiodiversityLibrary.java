@@ -33,16 +33,12 @@ import org.slf4j.LoggerFactory;
  *
  * @implNote <a href="https://www.biodiversitylibrary.org/docs/api3.html">API documentation</a>
  */
-
 public class BiodiversityLibrary implements SearchBasedParserFetcher {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BiodiversityLibrary.class);
     private static final String API_KEY = new BuildInfo().biodiversityHeritageApiKey;
     private static final String BASE_URL = "https://www.biodiversitylibrary.org/api3";
     private static final String RESPONSE_FORMAT = "json";
-
-    public BiodiversityLibrary() {
-     }
 
     public URL getBaseURL() throws URISyntaxException, MalformedURLException {
         URIBuilder baseURI = new URIBuilder(BASE_URL);
@@ -66,7 +62,6 @@ public class BiodiversityLibrary implements SearchBasedParserFetcher {
         uriBuilder.addParameter("id", identifier);
 
         return uriBuilder.build().toURL();
-
     }
 
     public URL getPartMetadataURL(String identifier) throws URISyntaxException, MalformedURLException {
@@ -77,76 +72,60 @@ public class BiodiversityLibrary implements SearchBasedParserFetcher {
         uriBuilder.addParameter("id", identifier);
 
         return uriBuilder.build().toURL();
-
     }
 
     public JSONObject getDetails(URL url) throws IOException {
-
         URLDownload download = new URLDownload(url);
         String response = download.asString();
         return new JSONObject(response).getJSONArray("Result").getJSONObject(0);
     }
 
-    public BibEntry getMostDetails(JSONObject item, BibEntry entry) throws IOException, URISyntaxException {
-
+    public BibEntry getMostDetails(JSONObject item, BibEntry entry) throws IOException, URISyntaxException { // FixMe ???? Method name ist unfug
         if (item.has("BHLType")) {
             if (item.getString("BHLType").equals("Part")) {
                 URL url = getPartMetadataURL(item.getString("PartID"));
                 JSONObject itemsDetails = getDetails(url);
-                // Language
                 if (itemsDetails.has("Language")) {
                     entry.setField(StandardField.LANGUAGE, itemsDetails.getString("Language"));
                 }
-                // DOI
                 if (itemsDetails.has("Doi")) {
                     entry.setField(StandardField.DOI, itemsDetails.getString("Doi"));
                 }
-                // Publisher
                 if (itemsDetails.has("PublisherName")) {
                     entry.setField(StandardField.PUBLISHER, itemsDetails.getString("PublisherName"));
                 }
-                // Volume
                 if (itemsDetails.has("Volume") && !entry.hasField(StandardField.VOLUME)) {
                     entry.setField(StandardField.VOLUME, itemsDetails.getString("Volume"));
                 }
-                // Date
                 if (itemsDetails.has("Date") && !entry.hasField(StandardField.DATE) && !entry.hasField(StandardField.YEAR)) {
                     entry.setField(StandardField.DATE, itemsDetails.getString("Date"));
                 }
-                // Link
                 if (itemsDetails.has("PartUrl")) {
                     entry.setField(StandardField.URL, itemsDetails.getString("PartUrl"));
                 }
-
             }
 
             if (item.getString("BHLType").equals("Item")) {
                 URL url = getItemMetadataURL(item.getString("ItemID"));
                 JSONObject itemsDetails = getDetails(url);
-                // Editor
                 if (itemsDetails.has("Sponsor")) {
                     entry.setField(StandardField.EDITOR, itemsDetails.getString("Sponsor"));
                 }
-                // Publisher
                 if (itemsDetails.has("HoldingInstitution")) {
                     entry.setField(StandardField.PUBLISHER, itemsDetails.getString("HoldingInstitution"));
                 }
-                // Language
                 if (itemsDetails.has("Language")) {
                     entry.setField(StandardField.LANGUAGE, itemsDetails.getString("Language"));
                 }
-                // Link
                 if (itemsDetails.has("ItemUrl")) {
                     entry.setField(StandardField.URL, itemsDetails.getString("ItemUrl"));
                 }
-                // Date
                 if (itemsDetails.has("Date") && !entry.hasField(StandardField.DATE) && !entry.hasField(StandardField.YEAR)) {
                     entry.setField(StandardField.DATE, itemsDetails.getString("Date"));
                 }
-
             }
-
         }
+
         return entry;
     }
 
@@ -159,11 +138,10 @@ public class BiodiversityLibrary implements SearchBasedParserFetcher {
             entry.setType(StandardEntryType.Article);
         }
 
-        // Title
         if (item.has("Title")) {
             entry.setField(StandardField.TITLE, item.optString("Title"));
         }
-        // Authors
+
         if (item.has("Authors")) {
             JSONArray authors = item.getJSONArray("Authors");
             List<String> authorList = new ArrayList<>();
@@ -178,27 +156,25 @@ public class BiodiversityLibrary implements SearchBasedParserFetcher {
         } else {
             LOGGER.debug("Empty author name");
         }
-        // Pages
+
         if (item.has("PageRange")) {
             entry.setField(StandardField.PAGES, item.getString("PageRange"));
         } else {
             LOGGER.debug("Empty pages number");
         }
 
-        // Publisher Place
         if (item.has("PublisherPlace")) {
             entry.setField(StandardField.PUBSTATE, item.getString("PublisherPlace"));
         } else {
             LOGGER.debug("Empty Publisher Place");
         }
-        // Publisher Name
+
         if (item.has("PublisherName")) {
             entry.setField(StandardField.PUBLISHER, item.getString("PublisherName"));
         } else {
             LOGGER.debug("Empty Publisher Name");
         }
 
-        // Date
         if (item.has("Date")) {
             entry.setField(StandardField.DATE, item.getString("Date"));
         } else if (item.has("PublicationDate")) {
@@ -207,21 +183,19 @@ public class BiodiversityLibrary implements SearchBasedParserFetcher {
             LOGGER.debug("Empty date");
         }
 
-        // Journal Title
         if (item.has("ContainerTitle")) {
             entry.setField(StandardField.JOURNALTITLE, item.getString("ContainerTitle"));
         } else {
             LOGGER.debug("Empty journal name");
         }
 
-        // Volumes
         if (item.has("Volume")) {
             entry.setField(StandardField.VOLUME, item.getString("Volume"));
         } else {
             LOGGER.debug("Empty volume number");
         }
-        return entry;
 
+        return entry;
     }
 
     @Override
@@ -231,6 +205,7 @@ public class BiodiversityLibrary implements SearchBasedParserFetcher {
             if (response.isEmpty()) {
                 return Collections.emptyList();
             }
+
             String errorMessage = response.getString("ErrorMessage");
             if (!errorMessage.isBlank()) {
                 return Collections.emptyList();
@@ -248,6 +223,7 @@ public class BiodiversityLibrary implements SearchBasedParserFetcher {
                 }
                 entries.add(entry);
             }
+
             return entries;
         };
     }
@@ -256,7 +232,7 @@ public class BiodiversityLibrary implements SearchBasedParserFetcher {
     public URL getURLForQuery(QueryNode luceneQuery) throws URISyntaxException, MalformedURLException, FetcherException {
         URIBuilder uriBuilder = new URIBuilder(getBaseURL().toURI());
         BiodiversityLibraryTransformer transformer = new BiodiversityLibraryTransformer();
-        transformer.transformLuceneQuery(luceneQuery).orElse("");
+        transformer.transformLuceneQuery(luceneQuery).orElse(""); // FixMe: ????? result ignored
         uriBuilder.addParameter("op", "PublicationSearchAdvanced");
 
         if (transformer.getAuthor().isPresent()) {
@@ -267,10 +243,11 @@ public class BiodiversityLibrary implements SearchBasedParserFetcher {
             uriBuilder.addParameter("title", transformer.getTitle().get());
             uriBuilder.addParameter("titleop", "all");
         }
+
         if (transformer.getTitle().isEmpty() && transformer.getAuthor().isEmpty()) {
                 throw new FetcherException("Must add author or title");
         }
-        return uriBuilder.build().toURL();
 
+        return uriBuilder.build().toURL();
     }
 }
