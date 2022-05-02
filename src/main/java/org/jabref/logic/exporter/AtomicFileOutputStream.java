@@ -58,12 +58,17 @@ public class AtomicFileOutputStream extends FilterOutputStream {
      * The file to which writes are redirected to.
      */
     private final Path temporaryFile;
+
     private final FileLock temporaryFileLock;
+
     /**
      * A backup of the target file (if it exists), created when the stream is closed
      */
     private final Path backupFile;
+
     private final boolean keepBackup;
+
+    private boolean errorDuringWrite = false;
 
     /**
      * Creates a new output stream to write to or replace the file at the specified path.
@@ -124,6 +129,7 @@ public class AtomicFileOutputStream extends FilterOutputStream {
             out.write(b, off, len);
         } catch (IOException exception) {
             cleanup();
+            errorDuringWrite = true;
             throw exception;
         }
     }
@@ -174,34 +180,8 @@ public class AtomicFileOutputStream extends FilterOutputStream {
             }
             super.close();
 
-            // We successfully wrote everything to the temporary file, lets copy it to the correct place
-            // First, make backup of original file and try to save file permissions to restore them later (by default: 664)
-            Set<PosixFilePermission> oldFilePermissions = EnumSet.of(PosixFilePermission.OWNER_READ,
-                    PosixFilePermission.OWNER_WRITE,
-                    PosixFilePermission.GROUP_READ,
-                    PosixFilePermission.GROUP_WRITE,
-                    PosixFilePermission.OTHERS_READ);
-            if (Files.exists(targetFile)) {
-                Files.copy(targetFile, backupFile, StandardCopyOption.REPLACE_EXISTING);
-                if (FileUtil.IS_POSIX_COMPILANT) {
-                    try {
-                        oldFilePermissions = Files.getPosixFilePermissions(targetFile);
-                    } catch (IOException exception) {
-                        LOGGER.warn("Error getting file permissions for file {}.", targetFile, exception);
-                    }
-                }
-            }
-
-            // Move temporary file (replace original if it exists)
-            Files.move(temporaryFile, targetFile, StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING);
-
-            // Restore file permissions
-            if (FileUtil.IS_POSIX_COMPILANT) {
-                try {
-                    Files.setPosixFilePermissions(targetFile, oldFilePermissions);
-                } catch (IOException exception) {
-                    LOGGER.warn("Error writing file permissions to file {}.", targetFile, exception);
-                }
+            if (!errorDuringWrite) {
+                replaceOriginalFileByWrittenFile();
             }
 
             if (!keepBackup) {
@@ -211,6 +191,39 @@ public class AtomicFileOutputStream extends FilterOutputStream {
         } finally {
             // Remove temporary file (but not the backup!)
             cleanup();
+        }
+    }
+
+    private void replaceOriginalFileByWrittenFile() throws IOException {
+        // We successfully wrote everything to the temporary file, lets copy it to the correct place
+        // First, make backup of original file and try to save file permissions to restore them later (by default: 664)
+        Set<PosixFilePermission> oldFilePermissions = EnumSet.of(PosixFilePermission.OWNER_READ,
+                PosixFilePermission.OWNER_WRITE,
+                PosixFilePermission.GROUP_READ,
+                PosixFilePermission.GROUP_WRITE,
+                PosixFilePermission.OTHERS_READ);
+        if (Files.exists(targetFile)) {
+            // Make a backup of the original file
+            Files.copy(targetFile, backupFile, StandardCopyOption.REPLACE_EXISTING);
+            if (FileUtil.IS_POSIX_COMPILANT) {
+                try {
+                    oldFilePermissions = Files.getPosixFilePermissions(targetFile);
+                } catch (IOException exception) {
+                    LOGGER.warn("Error getting file permissions for file {}.", targetFile, exception);
+                }
+            }
+        }
+
+        // Move temporary file (replace original if it exists)
+        Files.move(temporaryFile, targetFile, StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING);
+
+        // Restore file permissions
+        if (FileUtil.IS_POSIX_COMPILANT) {
+            try {
+                Files.setPosixFilePermissions(targetFile, oldFilePermissions);
+            } catch (IOException exception) {
+                LOGGER.warn("Error writing file permissions to file {}.", targetFile, exception);
+            }
         }
     }
 
@@ -230,6 +243,7 @@ public class AtomicFileOutputStream extends FilterOutputStream {
             super.write(b);
         } catch (IOException exception) {
             cleanup();
+            errorDuringWrite = true;
             throw exception;
         }
     }
