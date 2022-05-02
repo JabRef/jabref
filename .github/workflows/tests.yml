@@ -38,6 +38,7 @@ jobs:
         with:
           reporter: github-pr-check
           checkstyle_config: 'config/checkstyle/checkstyle_reviewdog.xml'
+          checkstyle_version: '10.1'
       - name: Run checkstyle gradle
         run: ./gradlew checkstyleMain checkstyleTest checkstyleJmh
       - name: Run markdown-lint

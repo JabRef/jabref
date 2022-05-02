@@ -78,7 +78,6 @@ public class XmpUtilReader {
             if (!xmpMetaList.isEmpty()) {
                 // Only support Dublin Core since JabRef 4.2
                 for (XMPMetadata xmpMeta : xmpMetaList) {
-
                     DublinCoreSchema dcSchema = DublinCoreSchemaCustom.copyDublinCoreSchema(xmpMeta.getDublinCoreSchema());
                     if (dcSchema != null) {
                         DublinCoreExtractor dcExtractor = new DublinCoreExtractor(dcSchema, xmpPreferences, new BibEntry());

@@ -68,7 +68,6 @@ public class RisImporter extends Importer {
         List<String> dateTags = Arrays.asList("Y1", "PY", "DA", "Y2");
 
         for (String entry1 : entries) {
-
             String dateTag = "";
             String dateValue = "";
             int datePriority = dateTags.size();
@@ -205,7 +204,6 @@ public class RisImporter extends Importer {
                     } else if ("UR".equals(tag) || "L2".equals(tag) || "LK".equals(tag)) {
                         fields.put(StandardField.URL, value);
                     } else if (((tagPriority = dateTags.indexOf(tag)) != -1) && (value.length() >= 4)) {
-
                         if (tagPriority < datePriority) {
                             String year = value.substring(0, 4);
 

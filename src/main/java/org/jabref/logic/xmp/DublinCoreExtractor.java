@@ -79,7 +79,6 @@ public class DublinCoreExtractor {
     private void extractDate() {
         List<String> dates = dcSchema.getUnqualifiedSequenceValueList("date");
         if ((dates != null) && !dates.isEmpty()) {
-
             String date = dates.get(0).trim();
             Date.parse(date)
                     .ifPresent(dateValue -> {
@@ -98,7 +97,7 @@ public class DublinCoreExtractor {
         try {
             description = dcSchema.getDescription();
         } catch (BadFieldValueException e) {
-            LOGGER.warn("Could not get abstract, e");
+            LOGGER.warn("Could not get abstract", e);
         }
         if (!StringUtil.isNullOrEmpty(description)) {
             bibEntry.setField(StandardField.ABSTRACT, description);

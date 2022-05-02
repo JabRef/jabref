@@ -1,3 +1,7 @@
+---
+nav_order: 4
+parent: The LibreOffice Panel
+---
 # Code reorganization
 
 Why
@@ -11,7 +15,7 @@ Why
 
 ### Layers
 
-![Layers](../.gitbook/assets/layers-v1.svg)
+![Layers](layers-v1.svg)
 
 ### By directories
 

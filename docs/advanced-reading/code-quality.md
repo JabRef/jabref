@@ -1,3 +1,7 @@
+---
+nav_order: 1
+parent: Advanced Reading
+---
 # Code Quality
 
 We monitor the general source code quality at three places:

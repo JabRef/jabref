@@ -30,7 +30,6 @@ public class PageInfo {
      * Optional.empty comes before non-empty.
      */
     public static int comparePageInfo(Optional<OOText> a, Optional<OOText> b) {
-
         Optional<OOText> aa = PageInfo.normalizePageInfo(a);
         Optional<OOText> bb = PageInfo.normalizePageInfo(b);
         if (aa.isEmpty() && bb.isEmpty()) {

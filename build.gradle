@@ -12,7 +12,7 @@ plugins {
 
     id 'org.javamodularity.moduleplugin' version '1.8.10'
 
-    id 'org.openjfx.javafxplugin' version '0.0.12'
+    id 'org.openjfx.javafxplugin' version '0.0.13'
 
     id 'org.beryx.jlink' version '2.25.0'
 
@@ -126,7 +126,7 @@ dependencies {
 
     implementation 'commons-cli:commons-cli:1.5.0'
 
-    implementation 'org.libreoffice:libreoffice:7.3.1'
+    implementation 'org.libreoffice:libreoffice:7.3.2'
     implementation 'org.libreoffice:unoloader:7.3.2'
 
     implementation 'io.github.java-diff-utils:java-diff-utils:4.11'
@@ -145,7 +145,7 @@ dependencies {
 
     implementation group: 'org.mariadb.jdbc', name: 'mariadb-java-client', version: '2.7.5'
 
-    implementation 'org.postgresql:postgresql:42.3.3'
+    implementation 'org.postgresql:postgresql:42.3.4'
 
     implementation ('com.oracle.ojdbc:ojdbc10:19.3.0.0') {
         // causing module issues
@@ -172,7 +172,7 @@ dependencies {
     implementation 'org.controlsfx:controlsfx:11.1.1'
 
     implementation 'org.jsoup:jsoup:1.14.3'
-    implementation 'com.konghq:unirest-java:3.13.7'
+    implementation 'com.konghq:unirest-java:3.13.8'
 
     implementation 'org.slf4j:slf4j-api:2.0.0-alpha7'
     implementation "org.tinylog:tinylog-api:2.4.1"
@@ -181,7 +181,7 @@ dependencies {
 
     implementation 'de.undercouch:citeproc-java:3.0.0-alpha.6'
 
-    // jakarta.activation is already depdency of glassfish
+    // jakarta.activation is already dependency of glassfish
     implementation group: 'jakarta.xml.bind', name: 'jakarta.xml.bind-api', version: '3.0.1'
     implementation group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '3.0.2'
 
@@ -200,13 +200,13 @@ dependencies {
 
     implementation group: 'net.harawata', name: 'appdirs', version: '1.2.1'
 
-    testImplementation 'io.github.classgraph:classgraph:4.8.143'
+    testImplementation 'io.github.classgraph:classgraph:4.8.146'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.8.2'
     testImplementation 'org.junit.platform:junit-platform-launcher:1.8.2'
 
     testRuntimeOnly group: 'org.apache.logging.log4j', name: 'log4j-core', version: '3.0.0-SNAPSHOT'
     testRuntimeOnly group: 'org.apache.logging.log4j', name: 'log4j-jul', version: '3.0.0-SNAPSHOT'
-    testImplementation 'org.mockito:mockito-core:4.4.0'
+    testImplementation 'org.mockito:mockito-core:4.5.1'
     testImplementation 'org.xmlunit:xmlunit-core:2.9.0'
     testImplementation 'org.xmlunit:xmlunit-matchers:2.9.0'
     testRuntimeOnly 'com.tngtech.archunit:archunit-junit5-engine:0.23.1'

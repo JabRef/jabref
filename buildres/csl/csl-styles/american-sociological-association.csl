@@ -130,6 +130,12 @@
           <date variable="issued" form="numeric" date-parts="year"/>
         </group>
       </if>
+      <else-if variable="status">
+        <group>
+          <text variable="status" text-case="lowercase"/>
+          <text variable="year-suffix" prefix="-"/>
+        </group>
+      </else-if>
       <else>
         <text term="no date" form="short"/>
       </else>
@@ -140,6 +146,12 @@
       <if variable="issued">
         <date variable="issued" form="numeric" date-parts="year"/>
       </if>
+      <else-if variable="status">
+        <group>
+          <text variable="status" text-case="lowercase"/>
+          <text variable="year-suffix" prefix="-"/>
+        </group>
+      </else-if>
       <else>
         <text term="no date" form="short"/>
       </else>

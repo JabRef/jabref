@@ -14,7 +14,7 @@
     <category citation-format="author-date"/>
     <category field="medicine"/>
     <summary>Style for dissertations at the Faculty of Medicine at the University of Heidelberg.</summary>
-    <updated>2017-02-19T19:17:48+00:00</updated>
+    <updated>2022-02-28T19:17:48+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="en">
@@ -75,25 +75,21 @@
   </macro>
   <macro name="access">
     <choose>
-      <if variable="URL">
-        <choose>
-          <if variable="DOI">
-            <text variable="DOI" prefix="doi:"/>
-          </if>
-          <else>
-            <group delimiter=" ">
-              <text variable="URL" prefix="URL: "/>
-              <group prefix="[" suffix="]">
-                <text term="accessed" text-case="capitalize-first"/>
-                <date variable="accessed" prefix=" ">
-                  <date-part name="month" suffix=" "/>
-                  <date-part name="year"/>
-                </date>
-              </group>
-            </group>
-          </else>
-        </choose>
+      <if variable="DOI">
+        <text variable="DOI" prefix="doi:"/>
       </if>
+      <else>
+        <group delimiter=" ">
+          <text variable="URL" prefix="URL: "/>
+          <group prefix="[" suffix="]">
+            <text term="accessed" text-case="capitalize-first"/>
+            <date variable="accessed" prefix=" ">
+              <date-part name="month" suffix=" "/>
+              <date-part name="year"/>
+            </date>
+          </group>
+        </group>
+      </else>
     </choose>
   </macro>
   <macro name="title">
