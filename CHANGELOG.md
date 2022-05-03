@@ -10,7 +10,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 ## [Unreleased]
 
 ### Added
-
+- We added support for multiple messages in the snackbar. [#7340](https://github.com/JabRef/jabref/issues/7340)
 ### Changed
 
 ### Fixed
