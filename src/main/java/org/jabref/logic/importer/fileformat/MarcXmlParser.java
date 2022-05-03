@@ -38,6 +38,8 @@ import org.xml.sax.SAXException;
  * See <a href="https://www.dnb.de/DE/Professionell/Metadatendienste/Exportformate/MARC21/marc21_node.html">Feldbeschreibung
  * der Titeldaten bei der Deutschen Nationalbibliothek</a>
  *
+ * https://www.bib-bvb.de/web/kkb-online/rda-felderverzeichnis-des-b3kat-aseq
+ *
  * For further information see
  * https://www.loc.gov/marc/bibliographic/ for detailed documentation
  * for modifications in B3Kat https://www.bib-bvb.de/documents/10792/9f51a033-5ca1-42e2-b2d3-a75e7f1512d4
@@ -69,8 +71,8 @@ public class MarcXmlParser implements Parser {
             return result;
         }
         List<Element> records = getChildren("zs:record", srwrecords);
-        for (Element record : records) {
-            Element e = getChild("zs:recordData", record);
+        for (Element element : records) {
+            Element e = getChild("zs:recordData", element);
             if (e != null) {
                 e = getChild("record", e);
                 if (e != null) {

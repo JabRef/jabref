@@ -51,8 +51,8 @@ public class BVBQueryTransformer extends AbstractQueryTransformer {
     }
 
     @Override
-    protected String handleUnFieldedTerm(String term) {
-        return term;
+    protected Optional<String> handleUnFieldedTerm(String term) {
+        return Optional.of(createKeyValuePair("marcxml.all", term, "="));
     }
 
     @Override
