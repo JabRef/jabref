@@ -8,6 +8,10 @@
     -fx-table-cell-border-color: transparent; /* hide grid lines */
 }
 
+.tree-table-view .scroll-bar:horizontal {
+    -fx-opacity: 0;
+}
+
 .tree-table-cell {
     -fx-padding: 0.35em 0em 0.25em 0em;
 }
