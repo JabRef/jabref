@@ -145,7 +145,7 @@ public class ExportCommand extends SimpleCommand {
                                 }
                                 notificationPane.hide();
                             })),
-                            Duration.seconds(10));
+                            Duration.seconds(5));
                 })
                 .onFailure(this::handleError)
                 .executeWith(Globals.TASK_EXECUTOR);
