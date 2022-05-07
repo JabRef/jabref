@@ -1,15 +1,23 @@
 package org.jabref.gui.maintable;
 
-import javafx.beans.property.*;
+import java.util.EnumSet;
+import java.util.Objects;
+
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.ReadOnlyStringWrapper;
+import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.scene.control.TableColumn;
+
 import org.jabref.gui.util.FieldsUtil;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.field.FieldFactory;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.EnumSet;
-import java.util.Objects;
 
 /**
  * Represents the full internal name of a column in the main table. Consists of two parts: The type of the column and a qualifier, like the
