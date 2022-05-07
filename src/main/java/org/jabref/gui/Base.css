@@ -1108,12 +1108,15 @@ We want to have a look that matches our icons in the tool-bar */
 .notification-bar > .pane > .title,
 .notification-bar > .pane > .label,
 .notification-bar > .pane > .button-bar > .container > .action {
-    -fx-text-fill: -fx-light-text-color;
+    -fx-text-fill: -jr-base;
     -fx-padding: 1ex 1ex 1ex 1ex;
 }
 
 .notification-bar > .pane {
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.3), 9, 0, 0, 2);
     -fx-padding: 6px 7px 6px 32px;
+    -fx-background-radius: 0px;
+    -fx-border-radius: 0px;
 }
 
 .notification-bar > .pane > .button-bar > .container {
@@ -1124,9 +1127,13 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-graphic-text-gap: 8px;
 }
 
+.notification-pane .notification-bar > .pane .close-button > .graphic {
+    -fx-background-color: -jr-base;
+}
+
 .notification-bar > .pane > .label > .ikonli-font-icon {
     -fx-icon-size: 16px;
-    -fx-icon-color: -fx-light-text-color;
+    -fx-icon-color: -jr-base;
 }
 
 .progress-bar > .bar {
