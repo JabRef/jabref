@@ -413,7 +413,7 @@ TextFlow > .tooltip-text-monospaced {
 }
 
 .progress-indicatorToolbar .percentage {
-    -fx-fill:null;
+    -fx-fill: null;
 }
 
 .check-box {
@@ -650,11 +650,11 @@ TextFlow > .tooltip-text-monospaced {
     -fx-background-color: -jr-warn;
 }
 
-.file-row-text{
+.file-row-text {
     -fx-fill: -jr-search-text;
 }
 
-.file-row-text:opacity{
+.file-row-text:opacity {
     -fx-fill: derive(-jr-search-text, 70%);
 }
 
@@ -706,9 +706,9 @@ TextFlow > .tooltip-text-monospaced {
     -fx-padding: 0;
 }
 
-.accordion .titled-pane  {
-   -fx-skin: "org.jabref.gui.util.CustomTitledPaneSkin";
-   -fx-arrow-side: right;
+.accordion .titled-pane {
+    -fx-skin: "org.jabref.gui.util.CustomTitledPaneSkin";
+    -fx-arrow-side: right;
 }
 
 .accordion .titled-pane .title {
@@ -1105,10 +1105,28 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-background-radius: 4px;
 }
 
-.notification-bar > .pane .title, .notification-bar >.pane .label {
+.notification-bar > .pane > .title,
+.notification-bar > .pane > .label,
+.notification-bar > .pane > .button-bar > .container > .action {
     -fx-text-fill: -fx-light-text-color;
     -fx-padding: 1ex 1ex 1ex 1ex;
-    -fx-alignment: center;
+}
+
+.notification-bar > .pane {
+    -fx-padding: 6px 7px 6px 32px;
+}
+
+.notification-bar > .pane > .button-bar > .container {
+    -fx-padding: 0px 24px 0px 0px;
+}
+
+.notification-bar > .pane > .label {
+    -fx-graphic-text-gap: 8px;
+}
+
+.notification-bar > .pane > .label > .ikonli-font-icon {
+    -fx-icon-size: 16px;
+    -fx-icon-color: -fx-light-text-color;
 }
 
 .progress-bar > .bar {
@@ -1270,14 +1288,10 @@ TextFlow * {
     -fx-fill: -fx-mid-text-color;
 }
 
-.fontsizeSpinner{
+.fontsizeSpinner {
     -fx-pref-width: 5em;
 }
 
 .text-field:invalid {
     -fx-background-color: rgba(240, 128, 128, 0.5);
-}
-
-.notification-pane .notification-bar > .pane .label {
-    -fx-text-fill: -fx-mid-text-color;
 }
