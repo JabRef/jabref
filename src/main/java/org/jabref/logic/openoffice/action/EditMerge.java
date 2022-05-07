@@ -57,7 +57,6 @@ public class EditMerge {
             List<JoinableGroupData> joinableGroups = EditMerge.scan(doc, frontend);
 
             for (JoinableGroupData joinableGroupData : joinableGroups) {
-
                 List<CitationGroup> groups = joinableGroupData.group;
 
                 List<Citation> newCitations = (groups.stream()
@@ -154,7 +153,6 @@ public class EditMerge {
      * @return false if cannot add, true if can.  If returned true, then state.cursorBetween and state.currentGroupCursor are expanded to end at the start of currentRange.
      */
     private static boolean checkAddToGroup(ScanState state, CitationGroup group, XTextRange currentRange) {
-
         if (state.currentGroup.isEmpty()) {
             return false;
         }
@@ -170,7 +168,6 @@ public class EditMerge {
         }
 
         if (state.prev != null) {
-
             // Even if we combine AUTHORYEAR_INTEXT citations, we would not mix them with AUTHORYEAR_PAR
             if (group.citationType != state.prev.citationType) {
                 return false;
@@ -301,7 +298,6 @@ public class EditMerge {
         ScanState state = new ScanState();
 
         for (CitationGroup group : groups) {
-
             XTextRange currentRange = (frontend.getMarkRange(doc, group)
                                                .orElseThrow(IllegalStateException::new));
 

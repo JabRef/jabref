@@ -144,7 +144,7 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
                 .build();
 
         List<Path> fileDirectories = databaseContext.getFileDirectories(preferences.getFilePreferences());
-        dialogService.showFileOpenDialog(fileDialogConfiguration).ifPresent(newFile -> {
+        dialogService.showFileOpenDialogAndGetMultipleFiles(fileDialogConfiguration).forEach(newFile -> {
             LinkedFile newLinkedFile = fromFile(newFile, fileDirectories, externalFileTypes);
             files.add(new LinkedFileViewModel(
                     newLinkedFile,
@@ -202,7 +202,9 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
     }
 
     public void fetchFulltext() {
-        FulltextFetchers fetcher = new FulltextFetchers(preferences.getImportFormatPreferences());
+        FulltextFetchers fetcher = new FulltextFetchers(
+                preferences.getImportFormatPreferences(),
+                preferences.getImporterPreferences());
         BackgroundTask
                 .wrap(() -> fetcher.findFullTextPDF(entry))
                 .onRunning(() -> fulltextLookupInProgress.setValue(true))

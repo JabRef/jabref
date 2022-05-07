@@ -337,5 +337,4 @@ class LinkedFileViewModelTest {
         // Assert fail if no PDF type was found
         fail();
     }
-
 }

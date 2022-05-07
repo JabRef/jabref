@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<style xmlns="http://purl.org/net/xbiblio/csl" class="note" version="1.0" initialize-with="." page-range-format="expanded" demote-non-dropping-particle="sort-only" default-locale="en-GB">
+<style xmlns="http://purl.org/net/xbiblio/csl" class="note" version="1.0" initialize-with="." page-range-format="expanded" demote-non-dropping-particle="sort-only">
   <!-- This style was edited with the Visual CSL Editor (https://editor.citationstyles.org/visualEditor/) -->
   <info>
     <title>Institut français d'archéologie orientale - Egyptology (English)</title>
@@ -8,7 +8,7 @@
     <link href="http://www.zotero.org/styles/institut-francais-darcheologie-orientale-en" rel="self"/>
     <link href="http://www.zotero.org/styles/institut-francais-darcheologie-orientale" rel="template"/>
     <link href="https://www.ifao.egnet.net/publications/publier/normes-ed/" rel="documentation"/>
-    <link href="https://www.ifao.egnet.net/uploads/publications/normes/IFAO_publications_normes_bibliographiques_pub_egypto_2021_angl.pdf" rel="documentation"/>
+    <link href="https://www.ifao.egnet.net/uploads/publications/normes/IFAO_publications_normes_bibliographiques_pub_egypto_2022_angl.pdf" rel="documentation"/>
     <author>
       <name>Nicolas Souchon</name>
       <email>souchon.nicolas.ns@gmail.com</email>
@@ -16,7 +16,7 @@
     <category citation-format="note"/>
     <category field="history"/>
     <summary>Style sheet for the archeological and egyptological publications of the Institut français d'archéologie orientale</summary>
-    <updated>2021-07-11T09:27:26+00:00</updated>
+    <updated>2022-03-15T14:37:59+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="en">
@@ -50,10 +50,11 @@
   </macro>
   <macro name="author">
     <names variable="author">
-      <name delimiter=", " initialize-with="." name-as-sort-order="all">
+      <name delimiter-precedes-et-al="never" delimiter-precedes-last="never" et-al-min="5" et-al-use-first="1" initialize-with=".">
         <name-part name="given"/>
         <name-part name="family"/>
       </name>
+      <et-al/>
     </names>
   </macro>
   <macro name="author-short">
@@ -66,19 +67,24 @@
   </macro>
   <macro name="editor">
     <names variable="editor">
-      <name delimiter=", " initialize-with="." name-as-sort-order="all">
+      <name delimiter-precedes-et-al="never" delimiter-precedes-last="never" et-al-min="5" et-al-use-first="1" initialize-with=".">
         <name-part name="given"/>
         <name-part name="family"/>
       </name>
+      <et-al/>
       <label form="short" prefix=" (" suffix=")"/>
+      <substitute>
+        <text macro="container-author"/>
+      </substitute>
     </names>
   </macro>
   <macro name="translator">
     <names variable="translator">
-      <name delimiter=", " initialize-with=".">
+      <name delimiter-precedes-et-al="never" delimiter-precedes-last="never" et-al-min="5" et-al-use-first="1" initialize-with=".">
         <name-part name="given" font-variant="small-caps"/>
         <name-part name="family" font-variant="small-caps"/>
       </name>
+      <et-al/>
       <label form="short" prefix=" (" suffix=")"/>
     </names>
   </macro>
@@ -121,29 +127,19 @@
     <group delimiter="&#160;">
       <choose>
         <if match="any" is-numeric="page">
-          <label variable="page" form="short"/>
+          <text term="page" form="short" plural="true"/>
         </if>
       </choose>
       <text variable="page"/>
-    </group>
-  </macro>
-  <macro name="accessed">
-    <group delimiter="&#160;">
-      <text term="accessed" text-case="lowercase"/>
-      <date delimiter="&#160;" variable="accessed">
-        <date-part name="day"/>
-        <date-part name="month" form="short"/>
-        <date-part name="year"/>
-      </date>
     </group>
   </macro>
   <macro name="issued-year-month-day">
     <choose>
       <if match="any" variable="issued">
         <date delimiter="&#160;" variable="issued">
-          <date-part name="day"/>
-          <date-part name="month" form="short"/>
-          <date-part name="year"/>
+          <date-part name="day" range-delimiter="&#8211;"/>
+          <date-part name="month" range-delimiter="&#8211;"/>
+          <date-part name="year" range-delimiter="&#8211;"/>
         </date>
       </if>
       <else>
@@ -155,7 +151,7 @@
     <choose>
       <if match="any" variable="issued">
         <date date-parts="year" form="text" variable="issued">
-          <date-part name="year"/>
+          <date-part name="year" range-delimiter="&#8211;"/>
         </date>
       </if>
       <else>
@@ -164,10 +160,12 @@
     </choose>
   </macro>
   <macro name="original-date">
-    <date date-parts="year" form="text" variable="original-date"/>
+    <date delimiter="" variable="original-date">
+      <date-part name="year" range-delimiter="&#8211;"/>
+    </date>
   </macro>
   <macro name="URL">
-    <text variable="URL" prefix="&lt;" suffix="&gt;"/>
+    <text variable="URL"/>
   </macro>
   <macro name="edition">
     <group delimiter="&#160;" prefix="(" suffix=")">
@@ -204,18 +202,6 @@
       </name>
       <et-al font-style="normal"/>
       <label form="short" prefix=" (" suffix=")"/>
-    </names>
-  </macro>
-  <macro name="editor-name-first">
-    <names variable="editor">
-      <name initialize-with=".">
-        <name-part name="given"/>
-        <name-part name="family"/>
-      </name>
-      <label form="short" prefix=" (" suffix=")"/>
-      <substitute>
-        <text macro="container-author"/>
-      </substitute>
     </names>
   </macro>
   <macro name="citation">
@@ -302,18 +288,19 @@
     <text variable="event-place"/>
   </macro>
   <macro name="event-date">
-    <date delimiter="" variable="event-date">
-      <date-part name="day"/>
-      <date-part name="month" form="short" prefix=" "/>
-      <date-part name="year" range-delimiter="-" prefix=" "/>
+    <date delimiter=" " variable="event-date">
+      <date-part name="day" range-delimiter="&#8211;"/>
+      <date-part name="month" form="short" range-delimiter="&#8211;"/>
+      <date-part name="year" range-delimiter="&#8211;"/>
     </date>
   </macro>
   <macro name="container-author">
     <names variable="container-author">
-      <name initialize-with=".">
+      <name delimiter-precedes-et-al="never" delimiter-precedes-last="never" et-al-min="5" et-al-use-first="1" initialize-with=".">
         <name-part name="given"/>
         <name-part name="family"/>
       </name>
+      <et-al/>
     </names>
   </macro>
   <macro name="year-suffix">
@@ -321,6 +308,17 @@
   </macro>
   <macro name="note">
     <text variable="note"/>
+  </macro>
+  <macro name="issued-year-month-day-short">
+    <choose>
+      <if match="any" variable="issued">
+        <date delimiter=" " variable="issued">
+          <date-part name="day" range-delimiter="&#8211;"/>
+          <date-part name="month" form="short" range-delimiter="&#8211;"/>
+          <date-part name="year" range-delimiter="&#8211;"/>
+        </date>
+      </if>
+    </choose>
   </macro>
   <citation name-delimiter=", " disambiguate-add-givenname="true" disambiguate-add-year-suffix="true" givenname-disambiguation-rule="all-names">
     <sort>
@@ -340,7 +338,7 @@
       <group display="block">
         <text macro="citation"/>
       </group>
-      <group display="left-margin" delimiter="&#160;" suffix=".">
+      <group display="left-margin" delimiter=", " suffix=".">
         <choose>
           <if type="book" match="any">
             <group delimiter=", ">
@@ -423,7 +421,7 @@
               <text macro="title"/>
               <group delimiter="&#160;">
                 <text term="in" font-style="normal"/>
-                <text macro="editor-name-first" suffix=","/>
+                <text macro="editor" suffix=","/>
                 <text macro="container-title"/>
                 <text macro="volume"/>
                 <text macro="original-date" prefix="(" suffix=")"/>
@@ -527,11 +525,10 @@
                 <if match="any" variable="issued">
                   <group delimiter="&#160;">
                     <text value="version"/>
-                    <text macro="issued-year-month-day"/>
+                    <text macro="issued-year-month-day-short"/>
                   </group>
                 </if>
               </choose>
-              <text macro="accessed"/>
             </group>
           </else-if>
           <else-if type="post-weblog" match="any">
@@ -549,9 +546,8 @@
               <text macro="URL"/>
               <group delimiter="&#160;">
                 <text value="published"/>
-                <text macro="issued-year-month-day"/>
+                <text macro="issued-year-month-day-short"/>
               </group>
-              <text macro="accessed"/>
             </group>
           </else-if>
         </choose>
@@ -561,7 +557,6 @@
               <if type="webpage post-weblog" match="none">
                 <group delimiter=", ">
                   <text macro="URL"/>
-                  <text macro="accessed"/>
                 </group>
               </if>
             </choose>

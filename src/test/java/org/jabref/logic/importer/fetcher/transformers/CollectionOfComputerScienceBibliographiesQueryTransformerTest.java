@@ -49,5 +49,4 @@ class CollectionOfComputerScienceBibliographiesQueryTransformerTest extends Infi
         Optional<String> query = getTransformer().transformLuceneQuery(luceneQuery);
         assertEquals(Optional.of("year:2018 OR year:2019 OR year:2020 OR year:2021"), query);
     }
-
 }

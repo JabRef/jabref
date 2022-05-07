@@ -10,6 +10,7 @@ import org.jabref.architecture.AllowedToUseLogic;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.search.rules.SearchRules.SearchFlags;
+import org.jabref.model.strings.StringUtil;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,7 +41,7 @@ public class RegexBasedSearchRule extends FullTextSearchRule {
     public boolean applyRule(String query, BibEntry bibEntry) {
         Pattern pattern;
         try {
-            pattern = Pattern.compile(query, searchFlags.contains(SearchRules.SearchFlags.CASE_SENSITIVE) ? 0 : Pattern.CASE_INSENSITIVE);
+            pattern = Pattern.compile(StringUtil.stripAccents(query), searchFlags.contains(SearchRules.SearchFlags.CASE_SENSITIVE) ? 0 : Pattern.CASE_INSENSITIVE);
         } catch (PatternSyntaxException ex) {
             LOGGER.debug("Could not compile regex {}", query, ex);
             return false;
@@ -49,7 +50,7 @@ public class RegexBasedSearchRule extends FullTextSearchRule {
         for (Field field : bibEntry.getFields()) {
             Optional<String> fieldOptional = bibEntry.getField(field);
             if (fieldOptional.isPresent()) {
-                String fieldContentNoBrackets = bibEntry.getLatexFreeField(field).get();
+                String fieldContentNoBrackets = StringUtil.stripAccents(bibEntry.getLatexFreeField(field).get());
                 Matcher m = pattern.matcher(fieldContentNoBrackets);
                 if (m.find()) {
                     return true;
@@ -58,5 +59,4 @@ public class RegexBasedSearchRule extends FullTextSearchRule {
         }
         return getFulltextResults(query, bibEntry).numSearchResults() > 0;
     }
-
 }

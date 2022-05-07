@@ -1,3 +1,7 @@
+---
+nav_order: 3
+parent: The LibreOffice Panel
+---
 # Problems
 
 ## pageInfo should belong to citations, not citation groups

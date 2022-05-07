@@ -39,7 +39,6 @@ public class PersonNameStringConverter extends StringConverter<Author> {
 
     @Override
     public String toString(Author author) {
-
         if (autoCompLF) {
             switch (autoCompleteFirstNameMode) {
                 case ONLY_ABBREVIATED:

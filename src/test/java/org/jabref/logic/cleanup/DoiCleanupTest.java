@@ -63,5 +63,4 @@ public class DoiCleanupTest {
                         .withField(unknownField, "https://doi.org/10.1145/2594455"))
         );
     }
-
 }

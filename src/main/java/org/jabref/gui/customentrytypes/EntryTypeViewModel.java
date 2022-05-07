@@ -60,5 +60,4 @@ public class EntryTypeViewModel {
     public String toString() {
         return "CustomEntryTypeViewModel [entryType=" + entryType + ", fields=" + fields + "]";
     }
-
 }

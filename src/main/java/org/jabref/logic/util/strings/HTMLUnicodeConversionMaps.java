@@ -762,7 +762,6 @@ public class HTMLUnicodeConversionMaps {
             {"119978", "Oscr", "$\\mathcal{O}$"}, // script capital O -- possibly use \mathscr
             {"119984", "Uscr", "$\\mathcal{U}$"}, // script capital U -- possibly use \mathscr
             {"120598", "", "$\\epsilon$"}, // mathematical italic epsilon U+1D716 -- requires amsmath
-
     };
 
     // List of combining accents

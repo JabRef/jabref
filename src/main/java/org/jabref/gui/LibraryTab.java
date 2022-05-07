@@ -317,7 +317,6 @@ public class LibraryTab extends Tab {
             // Unique path fragment
             Optional<String> uniquePathPart = FileUtil.getUniquePathFragment(collectAllDatabasePaths(), databasePath);
             uniquePathPart.ifPresent(part -> tabTitle.append(" \u2013 ").append(part));
-
         } else {
             if (databaseLocation == DatabaseLocation.LOCAL) {
                 tabTitle.append(Localization.lang("untitled"));
@@ -611,7 +610,6 @@ public class LibraryTab extends Tab {
      * Closes the entry editor if it is showing any of the given entries.
      */
     private void ensureNotShowingBottomPanel(List<BibEntry> entriesToCheck) {
-
         // This method is not able to close the bottom pane currently
 
         if ((mode == BasePanelMode.SHOWING_EDITOR) && (entriesToCheck.contains(entryEditor.getEntry()))) {
