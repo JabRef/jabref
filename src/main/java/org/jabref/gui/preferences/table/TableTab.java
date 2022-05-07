@@ -94,7 +94,6 @@ public class TableTab extends AbstractPreferenceTabView<TableTabViewModel> imple
                 event.consume();
             }
         });
-
         columnsList.itemsProperty().bind(viewModel.columnsListProperty());
 
         new ViewModelListCellFactory<MainTableColumnModel>()
@@ -146,5 +145,9 @@ public class TableTab extends AbstractPreferenceTabView<TableTabViewModel> imple
 
     public void addColumn() {
         viewModel.insertColumnInList();
+    }
+
+    public TableView<MainTableColumnModel> getList() {
+        return columnsList;
     }
 }
