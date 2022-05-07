@@ -40,7 +40,6 @@ import org.slf4j.LoggerFactory;
  * JabRef's main class to process command line options and to start the UI
  */
 public class JabRefMain extends Application {
-
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefMain.class);
 
     private static String[] arguments;

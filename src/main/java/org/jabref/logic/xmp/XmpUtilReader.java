@@ -78,7 +78,6 @@ public class XmpUtilReader {
             if (!xmpMetaList.isEmpty()) {
                 // Only support Dublin Core since JabRef 4.2
                 for (XMPMetadata xmpMeta : xmpMetaList) {
-
                     DublinCoreSchema dcSchema = DublinCoreSchemaCustom.copyDublinCoreSchema(xmpMeta.getDublinCoreSchema());
                     if (dcSchema != null) {
                         DublinCoreExtractor dcExtractor = new DublinCoreExtractor(dcSchema, xmpPreferences, new BibEntry());
@@ -112,7 +111,7 @@ public class XmpUtilReader {
      *
      * @return empty List if no metadata has been found, or cannot properly find start or end tag in metadata
      */
-    private static List<XMPMetadata> getXmpMetadata(PDDocument document) throws IOException {
+    private static List<XMPMetadata> getXmpMetadata(PDDocument document) {
         PDDocumentCatalog catalog = document.getDocumentCatalog();
         PDMetadata metaRaw = catalog.getMetadata();
         List<XMPMetadata> metaList = new ArrayList<>();

@@ -16,7 +16,7 @@
     <issn>0082-7118</issn>
     <eissn>2752-7042</eissn>
     <summary>Tyndale Bulletin format with full notes and bibliography</summary>
-    <updated>2022-01-11T14:38:09+00:00</updated>
+    <updated>2022-03-04T14:17:21+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
     <!-- Tyndale Bulletin style differs from SBLHS2 only rarely (§4.1). The departures are that Tyndale Bulletin 
       1) insists that DOIs be included where available (§§11.1, 11.3.7) and
@@ -40,6 +40,11 @@
       </term>
       <term name="translator" form="verb-short">trans.</term>
       <term name="translator" form="short">trans.</term>
+      <!-- Use a period after the abbreviation for volume(s) per §12.3. -->
+      <term name="volume" form="short">
+        <single>vol.</single>
+        <multiple>vols.</multiple>
+      </term>
     </terms>
   </locale>
   <macro name="editor-translator-verb-short-comma">

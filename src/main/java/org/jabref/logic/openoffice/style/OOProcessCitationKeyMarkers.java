@@ -18,7 +18,6 @@ class OOProcessCitationKeyMarkers {
      *  markers are the citation keys themselves, separated by commas.
      */
     static void produceCitationMarkers(CitationGroups citationGroups, OOBibStyle style) {
-
         assert style.isCitationKeyCiteMarkers();
 
         citationGroups.createPlainBibliographySortedByComparator(OOProcess.AUTHOR_YEAR_TITLE_COMPARATOR);

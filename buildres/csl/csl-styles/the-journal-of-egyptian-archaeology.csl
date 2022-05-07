@@ -14,7 +14,7 @@
     <category citation-format="note"/>
     <category field="history"/>
     <issn>0307-5133</issn>
-    <updated>2022-03-18T08:56:24+00:00</updated>
+    <updated>2022-04-19T09:32:54+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="en">
@@ -74,7 +74,6 @@
           <names variable="editor"/>
           <names variable="translator"/>
           <names variable="container-author"/>
-          <text macro="title"/>
         </substitute>
       </names>
     </group>
@@ -89,7 +88,6 @@
           <names variable="editor"/>
           <names variable="translator"/>
           <names variable="container-author"/>
-          <text macro="title"/>
         </substitute>
       </names>
     </group>
@@ -206,7 +204,7 @@
         <choose>
           <if variable="URL" match="any">
             <group delimiter=" ">
-              <text variable="URL" prefix="&lt;" suffix=">"/>
+              <text variable="URL" prefix="&lt;" suffix="&gt;"/>
               <text term="accessed" suffix=" "/>
             </group>
             <date variable="accessed">

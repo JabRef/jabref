@@ -63,9 +63,7 @@ public class CopyFilesTask extends Task<List<CopyFilesResultItemViewModel>> {
         String currentDate = currentTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss"));
 
         try (BufferedWriter bw = Files.newBufferedWriter(exportPath.resolve(LOGFILE_PREFIX + currentDate + LOGFILE_EXT), StandardCharsets.UTF_8)) {
-
             for (int i = 0; i < entries.size(); i++) {
-
                 if (isCancelled()) {
                     break;
                 }
@@ -73,7 +71,6 @@ public class CopyFilesTask extends Task<List<CopyFilesResultItemViewModel>> {
                 List<LinkedFile> files = entries.get(i).getFiles();
 
                 for (int j = 0; j < files.size(); j++) {
-
                     if (isCancelled()) {
                         break;
                     }
@@ -87,7 +84,6 @@ public class CopyFilesTask extends Task<List<CopyFilesResultItemViewModel>> {
                     newPath = OptionalUtil.combine(Optional.of(exportPath), fileToExport, resolvePathFilename);
 
                     if (newPath.isPresent()) {
-
                         Path newFile = newPath.get();
                         boolean success = FileUtil.copyFile(fileToExport.get(), newFile, false);
                         updateProgress(totalFilesCounter++, totalFilesCount);
@@ -105,7 +101,6 @@ public class CopyFilesTask extends Task<List<CopyFilesResultItemViewModel>> {
                             writeLogMessage(newFile, bw, localizedSucessMessage);
                             addResultToList(newFile, success, localizedSucessMessage);
                         } else {
-
                             updateMessage(localizedErrorMessage);
                             writeLogMessage(newFile, bw, localizedErrorMessage);
                             addResultToList(newFile, success, localizedErrorMessage);

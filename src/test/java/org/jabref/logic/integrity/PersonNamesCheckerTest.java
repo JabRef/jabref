@@ -93,5 +93,4 @@ public class PersonNamesCheckerTest {
                                       ", and Kurt Cobain and A. Einstein", "Donald E. Knuth and Kurt Cobain and ,",
                          "and Kurt Cobain and A. Einstein", "Donald E. Knuth and Kurt Cobain and");
     }
-
 }

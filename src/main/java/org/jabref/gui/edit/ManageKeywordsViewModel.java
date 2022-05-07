@@ -53,7 +53,6 @@ public class ManageKeywordsViewModel {
                 sortedKeywordsOfAllEntriesBeforeUpdateByUser.addAll(separatedKeywords);
             }
         } else if (type == ManageKeywordsDisplayType.CONTAINED_IN_ANY_ENTRY) {
-
             // all keywords from first entry have to be added
             BibEntry firstEntry = entries.get(0);
             KeywordList separatedKeywords = firstEntry.getKeywords(preferences.getKeywordDelimiter());

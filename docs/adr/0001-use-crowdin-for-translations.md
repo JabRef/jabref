@@ -1,3 +1,7 @@
+---
+parent: Architectural Decisions
+nav_order: 1
+---
 # Use Crowdin for translations
 
 ## Context and Problem Statement

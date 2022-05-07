@@ -1,3 +1,7 @@
+---
+parent: Architectural Decisions
+nav_order: 18
+---
 # Use regular expression to split multiple-sentence titles
 
 ## Context and Problem Statement

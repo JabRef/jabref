@@ -1,3 +1,7 @@
+---
+parent: Architectural Decisions
+nav_order: 14
+---
 # Separate URL creation to enable proper logging
 
 ## Context and Problem Statement

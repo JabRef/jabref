@@ -1,3 +1,7 @@
+---
+parent: Architectural Decisions
+nav_order: 13
+---
 # Add Native Support for BibLatex-Software
 
 * Deciders: Oliver Kopp

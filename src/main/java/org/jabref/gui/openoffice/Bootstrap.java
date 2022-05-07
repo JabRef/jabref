@@ -49,24 +49,24 @@ import com.sun.star.uno.UnoRuntime;
 import com.sun.star.uno.XComponentContext;
 
 /** Bootstrap offers functionality to obtain a context or simply
-    a service manager.
-    The service manager can create a few basic services, whose implementations  are:
-    <ul>
-    <li>com.sun.star.comp.loader.JavaLoader</li>
-    <li>com.sun.star.comp.urlresolver.UrlResolver</li>
-    <li>com.sun.star.comp.bridgefactory.BridgeFactory</li>
-    <li>com.sun.star.comp.connections.Connector</li>
-    <li>com.sun.star.comp.connections.Acceptor</li>
-    <li>com.sun.star.comp.servicemanager.ServiceManager</li>
-    </ul>
-
-    Other services can be inserted into the service manager by
-    using its XSet interface:
-    <pre>
-        XSet xSet = UnoRuntime.queryInterface( XSet.class, aMultiComponentFactory );
-        // insert the service manager
-        xSet.insert( aSingleComponentFactory );
-    </pre>
+  * a service manager.
+  * The service manager can create a few basic services, whose implementations  are:
+  * <ul>
+  * <li>com.sun.star.comp.loader.JavaLoader</li>
+  * <li>com.sun.star.comp.urlresolver.UrlResolver</li>
+  * <li>com.sun.star.comp.bridgefactory.BridgeFactory</li>
+  * <li>com.sun.star.comp.connections.Connector</li>
+  * <li>com.sun.star.comp.connections.Acceptor</li>
+  * <li>com.sun.star.comp.servicemanager.ServiceManager</li>
+  * </ul>
+  *
+  * Other services can be inserted into the service manager by
+  * using its XSet interface:
+  * <pre>
+  *     XSet xSet = UnoRuntime.queryInterface( XSet.class, aMultiComponentFactory );
+  *     // insert the service manager
+  *     xSet.insert( aSingleComponentFactory );
+  * </pre>
 */
 public class Bootstrap {
 
@@ -334,9 +334,7 @@ public class Bootstrap {
     }
 
     private static void pipe(final InputStream in, final PrintStream out, final String prefix) {
-
         new Thread("Pipe: " + prefix) {
-
             @Override
             public void run() {
                 try {

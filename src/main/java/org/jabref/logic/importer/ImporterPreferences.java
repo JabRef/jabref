@@ -1,9 +1,15 @@
 package org.jabref.logic.importer;
 
+import java.util.Set;
+
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableSet;
+
+import org.jabref.logic.preferences.FetcherApiKey;
 
 public class ImporterPreferences {
 
@@ -11,12 +17,18 @@ public class ImporterPreferences {
     private final BooleanProperty grobidEnabled;
     private final BooleanProperty grobidOptOut;
     private final StringProperty grobidURL;
+    private final ObservableSet<FetcherApiKey> apiKeys;
 
-    public ImporterPreferences(boolean generateNewKeyOnImport, boolean grobidEnabled, boolean grobidOptOut, String grobidURL) {
+    public ImporterPreferences(boolean generateNewKeyOnImport,
+                               boolean grobidEnabled,
+                               boolean grobidOptOut,
+                               String grobidURL,
+                               Set<FetcherApiKey> apiKeys) {
         this.generateNewKeyOnImport = new SimpleBooleanProperty(generateNewKeyOnImport);
         this.grobidEnabled = new SimpleBooleanProperty(grobidEnabled);
         this.grobidOptOut = new SimpleBooleanProperty(grobidOptOut);
         this.grobidURL = new SimpleStringProperty(grobidURL);
+        this.apiKeys = FXCollections.observableSet(apiKeys);
     }
 
     public boolean isGenerateNewKeyOnImport() {
@@ -65,5 +77,9 @@ public class ImporterPreferences {
 
     public void setGrobidURL(String grobidURL) {
         this.grobidURL.set(grobidURL);
+    }
+
+    public ObservableSet<FetcherApiKey> getApiKeys() {
+        return apiKeys;
     }
 }
