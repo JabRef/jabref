@@ -400,9 +400,7 @@ public class JabRefFrame extends BorderPane {
             final BibDatabaseContext context = libraryTab.getBibDatabaseContext();
 
             if (context.hasEmptyEntries()) {
-                if (!confirmEmptyEntry(libraryTab, context)) {
-                    return false;
-                }
+                confirmEmptyEntry(libraryTab, context);
             }
 
             if (libraryTab.isModified() && (context.getLocation() == DatabaseLocation.LOCAL)) {
@@ -1167,43 +1165,37 @@ public class JabRefFrame extends BorderPane {
     /**
      * Ask if the user really wants to remove any empty entries
      */
-    private Boolean confirmEmptyEntry(LibraryTab libraryTab, BibDatabaseContext context) {
+    private void confirmEmptyEntry(LibraryTab libraryTab, BibDatabaseContext context) {
         String filename = libraryTab.getBibDatabaseContext()
                                     .getDatabasePath()
                                     .map(Path::toAbsolutePath)
                                     .map(Path::toString)
                                     .orElse(Localization.lang("untitled"));
 
-        ButtonType deleteEmptyEntries = new ButtonType(Localization.lang("Delete empty entries"), ButtonBar.ButtonData.YES);
-        ButtonType keepEmptyEntries = new ButtonType(Localization.lang("Keep empty entries"), ButtonBar.ButtonData.NO);
-        ButtonType cancel = new ButtonType(Localization.lang("Return to JabRef"), ButtonBar.ButtonData.CANCEL_CLOSE);
+        if (prefs.getGeneralPreferences().shouldConfirmDeleteEmptyEntries()) {
+           boolean response = dialogService.showConfirmationDialogWithOptOutAndWait(
+                    Localization.lang("Empty entries"),
+                    Localization.lang("Library '%0' has empty entries. Do you want to delete them?", filename),
+                    Localization.lang("Delete"),
+                    Localization.lang("Cancel"),
+                    Localization.lang("Do not ask again"),
+                    (optOut) -> prefs.getGeneralPreferences().setConfirmDeleteEmptyEntries(!optOut));
+           prefs.getGeneralPreferences().setDeleteEmptyEntries(response);
+        }
 
-        Optional<ButtonType> response = dialogService.showCustomButtonDialogAndWait(Alert.AlertType.CONFIRMATION,
-                Localization.lang("Empty entries"),
-                Localization.lang("Library '%0' has empty entries. Do you want to delete them?", filename),
-                deleteEmptyEntries, keepEmptyEntries, cancel);
-        if (response.isPresent() && response.get().equals(deleteEmptyEntries)) {
-            // The user wants to delete.
+        // The user wants to delete.
+        if (prefs.getGeneralPreferences().shouldDeleteEmptyEntries()) {
             try {
                 for (BibEntry currentEntry : new ArrayList<>(context.getEntries())) {
                     if (currentEntry.getFields().isEmpty()) {
                         context.getDatabase().removeEntries(Collections.singletonList(currentEntry));
                     }
                 }
-                SaveDatabaseAction saveAction = new SaveDatabaseAction(libraryTab, prefs, Globals.entryTypesManager);
-                if (saveAction.save()) {
-                    return true;
-                }
-                // The action was either canceled or unsuccessful.
-                dialogService.notify(Localization.lang("Unable to save library"));
             } catch (Throwable ex) {
                 LOGGER.error("A problem occurred when trying to delete the empty entries", ex);
                 dialogService.showErrorDialogAndWait(Localization.lang("Delete empty entries"), Localization.lang("Could not delete empty entries."), ex);
             }
-            // Save was cancelled or an error occurred.
-            return false;
         }
-        return !response.get().equals(cancel);
     }
 
     private void closeTab(LibraryTab libraryTab) {
@@ -1214,9 +1206,7 @@ public class JabRefFrame extends BorderPane {
 
         final BibDatabaseContext context = libraryTab.getBibDatabaseContext();
         if (context.hasEmptyEntries()) {
-            if (!confirmEmptyEntry(libraryTab, context)) {
-                return;
-            }
+            confirmEmptyEntry(libraryTab, context);
         }
 
         if (libraryTab.isModified() && (context.getLocation() == DatabaseLocation.LOCAL)) {

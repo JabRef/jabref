@@ -33,6 +33,7 @@
     <CheckBox fx:id="inspectionWarningDuplicate"
               text="%Warn about unresolved duplicates when closing inspection window"/>
     <CheckBox fx:id="confirmDelete" text="%Show confirmation dialog when deleting entries"/>
+    <CheckBox fx:id="confirmDeleteEmptyEntries" text="%Show confirmation dialog when deleting empty entries"/>
     <CheckBox fx:id="memoryStickMode"
               text="%Load and Save preferences from/to jabref.xml on start-up (memory stick mode)"/>
     <CheckBox fx:id="collectTelemetry" text="%Collect and share telemetry data to help improve JabRef"/>

@@ -38,6 +38,7 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
 
     private final BooleanProperty inspectionWarningDuplicateProperty = new SimpleBooleanProperty();
     private final BooleanProperty confirmDeleteProperty = new SimpleBooleanProperty();
+    private final BooleanProperty confirmDeleteEmptyEntriesProperty = new SimpleBooleanProperty();
     private final BooleanProperty memoryStickModeProperty = new SimpleBooleanProperty();
     private final BooleanProperty collectTelemetryProperty = new SimpleBooleanProperty();
     private final BooleanProperty showAdvancedHintsProperty = new SimpleBooleanProperty();
@@ -77,6 +78,7 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
 
         inspectionWarningDuplicateProperty.setValue(generalPreferences.warnAboutDuplicatesInInspection());
         confirmDeleteProperty.setValue(generalPreferences.shouldConfirmDelete());
+        confirmDeleteEmptyEntriesProperty.setValue(generalPreferences.shouldConfirmDeleteEmptyEntries());
         memoryStickModeProperty.setValue(generalPreferences.isMemoryStickMode());
         collectTelemetryProperty.setValue(telemetryPreferences.shouldCollectTelemetry());
         showAdvancedHintsProperty.setValue(generalPreferences.shouldShowAdvancedHints());
@@ -106,6 +108,7 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         generalPreferences.setDefaultBibDatabaseMode(selectedBiblatexModeProperty.getValue());
         generalPreferences.setWarnAboutDuplicatesInInspection(inspectionWarningDuplicateProperty.getValue());
         generalPreferences.setConfirmDelete(confirmDeleteProperty.getValue());
+        generalPreferences.setConfirmDeleteEmptyEntries(confirmDeleteEmptyEntriesProperty.getValue());
         generalPreferences.setMemoryStickMode(memoryStickModeProperty.getValue());
         generalPreferences.setShowAdvancedHints(showAdvancedHintsProperty.getValue());
 
@@ -156,6 +159,10 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
 
     public BooleanProperty confirmDeleteProperty() {
         return this.confirmDeleteProperty;
+    }
+
+    public BooleanProperty confirmDeleteEmptyEntriesProperty() {
+        return this.confirmDeleteEmptyEntriesProperty;
     }
 
     public BooleanProperty memoryStickModeProperty() {

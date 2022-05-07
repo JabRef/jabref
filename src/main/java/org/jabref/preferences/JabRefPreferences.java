@@ -263,6 +263,8 @@ public class JabRefPreferences implements PreferencesService {
     public static final String DEFAULT_CITATION_KEY_PATTERN = "defaultBibtexKeyPattern";
     public static final String UNWANTED_CITATION_KEY_CHARACTERS = "defaultUnwantedBibtexKeyCharacters";
     public static final String CONFIRM_DELETE = "confirmDelete";
+    public static final String CONFIRM_DELETE_EMPTY_ENTRIES = "confirmDeleteEmptyEntries";
+    public static final String DELETE_EMPTY_ENTRIES = "deleteEmptyEntries";
     public static final String WARN_BEFORE_OVERWRITING_KEY = "warnBeforeOverwritingKey";
     public static final String AVOID_OVERWRITING_KEY = "avoidOverwritingKey";
     public static final String AUTOLINK_EXACT_KEY_ONLY = "autolinkExactKeyOnly";
@@ -638,6 +640,8 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(AVOID_OVERWRITING_KEY, Boolean.FALSE);
         defaults.put(WARN_BEFORE_OVERWRITING_KEY, Boolean.TRUE);
         defaults.put(CONFIRM_DELETE, Boolean.TRUE);
+        defaults.put(CONFIRM_DELETE_EMPTY_ENTRIES, Boolean.TRUE);
+        defaults.put(DELETE_EMPTY_ENTRIES, Boolean.FALSE);
         defaults.put(DEFAULT_CITATION_KEY_PATTERN, "[auth][year]");
         defaults.put(UNWANTED_CITATION_KEY_CHARACTERS, "-`ʹ:!;?^+");
         defaults.put(RESOLVE_STRINGS_FOR_FIELDS, "author;booktitle;editor;editora;editorb;editorc;institution;issuetitle;journal;journalsubtitle;journaltitle;mainsubtitle;month;publisher;shortauthor;shorteditor;subtitle;titleaddon");
@@ -1311,12 +1315,16 @@ public class JabRefPreferences implements PreferencesService {
                 getBoolean(BIBLATEX_DEFAULT_MODE) ? BibDatabaseMode.BIBLATEX : BibDatabaseMode.BIBTEX,
                 getBoolean(WARN_ABOUT_DUPLICATES_IN_INSPECTION),
                 getBoolean(CONFIRM_DELETE),
+                getBoolean(CONFIRM_DELETE_EMPTY_ENTRIES),
+                getBoolean(DELETE_EMPTY_ENTRIES),
                 getBoolean(MEMORY_STICK_MODE),
                 getBoolean(SHOW_ADVANCED_HINTS));
 
         EasyBind.listen(generalPreferences.defaultBibDatabaseModeProperty(), (obs, oldValue, newValue) -> putBoolean(BIBLATEX_DEFAULT_MODE, (newValue == BibDatabaseMode.BIBLATEX)));
         EasyBind.listen(generalPreferences.isWarnAboutDuplicatesInInspectionProperty(), (obs, oldValue, newValue) -> putBoolean(WARN_ABOUT_DUPLICATES_IN_INSPECTION, newValue));
         EasyBind.listen(generalPreferences.confirmDeleteProperty(), (obs, oldValue, newValue) -> putBoolean(CONFIRM_DELETE, newValue));
+        EasyBind.listen(generalPreferences.confirmDeleteEmptyEntriesProperty(), (obs, oldValue, newValue) -> putBoolean(CONFIRM_DELETE_EMPTY_ENTRIES, newValue));
+        EasyBind.listen(generalPreferences.deleteEmptyEntriesProperty(), (obs, oldValue, newValue) -> putBoolean(DELETE_EMPTY_ENTRIES, newValue));
         EasyBind.listen(generalPreferences.memoryStickModeProperty(), (obs, oldValue, newValue) -> putBoolean(MEMORY_STICK_MODE, newValue));
         EasyBind.listen(generalPreferences.showAdvancedHintsProperty(), (obs, oldValue, newValue) -> putBoolean(SHOW_ADVANCED_HINTS, newValue));
 

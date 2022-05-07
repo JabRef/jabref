@@ -41,7 +41,7 @@ import org.jabref.gui.util.BindingsHelper;
 public class TemporalAccessorPicker extends DatePicker {
     private final ObjectProperty<TemporalAccessor> temporalAccessorValue = new SimpleObjectProperty<>(null);
 
-    private final DateTimeFormatter defaultFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+    private final DateTimeFormatter defaultFormatter = DateTimeFormatter.ofPattern("uuuu-MM-dd'T'HH:mm:ss[xxx][xx][X]");
     private final ObjectProperty<StringConverter<TemporalAccessor>> converter = new SimpleObjectProperty<>(null);
 
     public TemporalAccessorPicker() {
@@ -139,6 +139,7 @@ public class TemporalAccessorPicker extends DatePicker {
 
             TemporalAccessor dateTime = getStringConverter().fromString(value);
             temporalAccessorValue.set(dateTime);
+            System.out.print(temporalAccessorValue);
             return getLocalDate(dateTime);
         }
     }

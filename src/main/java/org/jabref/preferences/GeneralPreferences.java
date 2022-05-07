@@ -11,6 +11,8 @@ public class GeneralPreferences {
     private final ObjectProperty<BibDatabaseMode> defaultBibDatabaseMode;
     private final BooleanProperty warnAboutDuplicatesInInspection;
     private final BooleanProperty confirmDelete;
+    private final BooleanProperty confirmDeleteEmptyEntries;
+    private final BooleanProperty deleteEmptyEntries;
 
     private final BooleanProperty memoryStickMode;
     private final BooleanProperty showAdvancedHints;
@@ -18,12 +20,15 @@ public class GeneralPreferences {
     public GeneralPreferences(BibDatabaseMode defaultBibDatabaseMode,
                               boolean warnAboutDuplicatesInInspection,
                               boolean confirmDelete,
+                              boolean confirmDeleteEmptyEntries,
+                              boolean deleteEmptyEntries,
                               boolean memoryStickMode,
                               boolean showAdvancedHints) {
         this.defaultBibDatabaseMode = new SimpleObjectProperty<>(defaultBibDatabaseMode);
         this.warnAboutDuplicatesInInspection = new SimpleBooleanProperty(warnAboutDuplicatesInInspection);
         this.confirmDelete = new SimpleBooleanProperty(confirmDelete);
-
+        this.confirmDeleteEmptyEntries = new SimpleBooleanProperty(confirmDeleteEmptyEntries);
+        this.deleteEmptyEntries = new SimpleBooleanProperty(deleteEmptyEntries);
         this.memoryStickMode = new SimpleBooleanProperty(memoryStickMode);
         this.showAdvancedHints = new SimpleBooleanProperty(showAdvancedHints);
     }
@@ -62,6 +67,30 @@ public class GeneralPreferences {
 
     public void setConfirmDelete(boolean confirmDelete) {
         this.confirmDelete.set(confirmDelete);
+    }
+
+    public boolean shouldConfirmDeleteEmptyEntries() {
+        return confirmDeleteEmptyEntries.get();
+    }
+
+    public BooleanProperty confirmDeleteEmptyEntriesProperty() {
+        return confirmDeleteEmptyEntries;
+    }
+
+    public void setConfirmDeleteEmptyEntries(boolean confirmDeleteEmptyEntries) {
+        this.confirmDeleteEmptyEntries.set(confirmDeleteEmptyEntries);
+    }
+
+    public boolean shouldDeleteEmptyEntries() {
+        return deleteEmptyEntries.get();
+    }
+
+    public BooleanProperty deleteEmptyEntriesProperty() {
+        return deleteEmptyEntries;
+    }
+
+    public void setDeleteEmptyEntries(boolean deleteEmptyEntries) {
+        this.deleteEmptyEntries.set(deleteEmptyEntries);
     }
 
     public boolean isMemoryStickMode() {
