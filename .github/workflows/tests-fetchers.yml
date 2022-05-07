@@ -31,6 +31,9 @@ concurrency:
   group: fetcher-tests-${{ github.head_ref }}
   cancel-in-progress: true
 
+permissions:
+  contents: read
+
 jobs:
   fetchertests:
     name: Fetcher tests
