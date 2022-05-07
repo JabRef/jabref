@@ -1100,15 +1100,15 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-background-color: -jr-sidepane-background;
 }
 
-.jfx-snackbar-content {
+.notification-bar > .pane {
     -fx-background-color: -jr-gray-3;
     -fx-background-radius: 4px;
-    -fx-padding: 0ex 0ex 0ex 0ex;
 }
 
-.jfx-snackbar-toast {
+.notification-bar > .pane .title, .notification-bar >.pane .label {
     -fx-text-fill: -fx-light-text-color;
-    -fx-padding: -1ex -0.5ex -1ex -0.5ex;
+    -fx-padding: 1ex 1ex 1ex 1ex;
+    -fx-alignment: center;
 }
 
 .progress-bar > .bar {

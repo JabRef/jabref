@@ -155,7 +155,6 @@ public class OOFormatBibliography {
      *   - We do not control the text shown, that is provided by OpenOffice.
      */
     private static OOText formatCitedOnPages(CitationGroups citationGroups, CitedKey citedKey) {
-
         if (!citationGroups.citationGroupsProvideReferenceMarkNameForLinking()) {
             return OOText.fromString("");
         }
@@ -196,5 +195,4 @@ public class OOFormatBibliography {
         stringBuilder.append(suffix);
         return OOText.fromString(stringBuilder.toString());
     }
-
 }

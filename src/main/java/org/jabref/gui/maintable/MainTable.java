@@ -1,34 +1,13 @@
 package org.jabref.gui.maintable;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Path;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
-import javax.swing.undo.UndoManager;
-
+import com.google.common.eventbus.Subscribe;
 import javafx.collections.ListChangeListener;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
-import javafx.scene.input.ClipboardContent;
-import javafx.scene.input.DragEvent;
-import javafx.scene.input.Dragboard;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
-import javafx.scene.input.MouseDragEvent;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.input.TransferMode;
-
-import org.jabref.gui.DialogService;
-import org.jabref.gui.DragAndDropDataFormats;
-import org.jabref.gui.Globals;
-import org.jabref.gui.LibraryTab;
-import org.jabref.gui.StateManager;
+import javafx.scene.input.*;
+import org.jabref.gui.*;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.edit.EditAction;
 import org.jabref.gui.externalfiles.ImportHandler;
@@ -46,10 +25,17 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.event.EntriesAddedEvent;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.PreferencesService;
-
-import com.google.common.eventbus.Subscribe;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.swing.undo.UndoManager;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class MainTable extends TableView<BibEntryTableViewModel> {
 
@@ -134,6 +120,9 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
         this.getSortOrder().clear();
 
+        new MainTableHeaderRightClickMenu().show(this);
+        new MainTableHeaderRightClickMenu().removeColumns(this, dialogService, preferencesService);
+
         /* KEEP for debugging purposes
         for (var colModel : mainTablePreferences.getColumnPreferences().getColumnSortOrder()) {
             for (var col : this.getColumns()) {
@@ -149,10 +138,10 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
         mainTablePreferences.getColumnPreferences().getColumnSortOrder().forEach(columnModel ->
                 this.getColumns().stream()
-                    .map(column -> (MainTableColumn<?>) column)
-                    .filter(column -> column.getModel().equals(columnModel))
-                    .findFirst()
-                    .ifPresent(column -> this.getSortOrder().add(column)));
+                        .map(column -> (MainTableColumn<?>) column)
+                        .filter(column -> column.getModel().equals(columnModel))
+                        .findFirst()
+                        .ifPresent(column -> this.getSortOrder().add(column)));
 
         if (mainTablePreferences.getResizeColumnsToFit()) {
             this.setColumnResizePolicy(new SmartConstrainedResizePolicy());
@@ -203,16 +192,16 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         lastKeyPressTime = System.currentTimeMillis();
 
         this.getItems().stream()
-            .filter(item -> Optional.ofNullable(sortedColumn.getCellObservableValue(item).getValue())
-                                    .map(Object::toString)
-                                    .orElse("")
-                                    .toLowerCase()
-                                    .startsWith(columnSearchTerm))
-            .findFirst()
-            .ifPresent(item -> {
-                this.scrollTo(item);
-                this.clearAndSelect(item.getEntry());
-            });
+                .filter(item -> Optional.ofNullable(sortedColumn.getCellObservableValue(item).getValue())
+                        .map(Object::toString)
+                        .orElse("")
+                        .toLowerCase()
+                        .startsWith(columnSearchTerm))
+                .findFirst()
+                .ifPresent(item -> {
+                    this.scrollTo(item);
+                    this.clearAndSelect(item.getEntry());
+                });
     }
 
     @Subscribe
@@ -221,8 +210,8 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     }
 
     public void clearAndSelect(BibEntry bibEntry) {
+        getSelectionModel().clearSelection();
         findEntry(bibEntry).ifPresent(entry -> {
-            getSelectionModel().clearSelection();
             getSelectionModel().select(entry);
             scrollTo(entry);
         });
@@ -250,8 +239,8 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         this.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
             if (event.getCode() == KeyCode.ENTER) {
                 getSelectedEntries().stream()
-                                    .findFirst()
-                                    .ifPresent(libraryTab::showAndEdit);
+                        .findFirst()
+                        .ifPresent(libraryTab::showAndEdit);
                 event.consume();
                 return;
             }
@@ -436,8 +425,8 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
     private Optional<BibEntryTableViewModel> findEntry(BibEntry entry) {
         return model.getEntriesFilteredAndSorted()
-                    .stream()
-                    .filter(viewModel -> viewModel.getEntry().equals(entry))
-                    .findFirst();
+                .stream()
+                .filter(viewModel -> viewModel.getEntry().equals(entry))
+                .findFirst();
     }
 }

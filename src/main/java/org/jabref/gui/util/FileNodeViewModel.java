@@ -50,7 +50,6 @@ public class FileNodeViewModel {
      * Return a string of a FileTime in a yyyy-MM-dd HH:mm format.
      */
     public static String formatDateTime(FileTime fileTime) {
-
         LocalDateTime localDateTime = fileTime
                 .toInstant()
                 .atZone(ZoneId.systemDefault())

@@ -56,5 +56,4 @@ public class ContainsBasedSearchRule extends FullTextSearchRule {
 
         return getFulltextResults(query, bibEntry).numSearchResults() > 0; // Didn't match all words.
     }
-
 }

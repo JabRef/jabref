@@ -1,3 +1,7 @@
+---
+nav_order: 2
+parent: The LibreOffice Panel
+---
 # Order of appearance of citation groups
 
 The order of appearance of citations is decided on two levels:

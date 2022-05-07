@@ -18,6 +18,7 @@ import org.jabref.logic.crawler.Crawler;
 import org.jabref.logic.exporter.SavePreferences;
 import org.jabref.logic.git.SlrGitHandler;
 import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.io.FileUtil;
@@ -46,6 +47,7 @@ public class ExistingStudySearchAction extends SimpleCommand {
     private final ThemeManager themeManager;
     private final GeneralPreferences generalPreferences;
     private final ImportFormatPreferences importFormatPreferences;
+    private final ImporterPreferences importerPreferences;
     private final SavePreferences savePreferences;
     // This can be either populated before crawl is called or is populated in the call using the directory dialog. This is helpful if the directory is selected in a previous dialog/UI element
 
@@ -64,10 +66,13 @@ public class ExistingStudySearchAction extends SimpleCommand {
         this.generalPreferences = preferencesService.getGeneralPreferences();
         this.themeManager = themeManager;
         this.importFormatPreferences = preferencesService.getImportFormatPreferences();
+        this.importerPreferences = preferencesService.getImporterPreferences();
         this.savePreferences = preferencesService.getSavePreferences();
 
         this.workingDirectory = stateManager.getActiveDatabase()
-                                            .map(database -> FileUtil.getInitialDirectory(database, preferencesService.getFilePreferences().getWorkingDirectory()))
+                                            .map(database -> FileUtil.getInitialDirectory(
+                                                    database,
+                                                    preferencesService.getFilePreferences().getWorkingDirectory()))
                                             .orElse(preferencesService.getFilePreferences().getWorkingDirectory());
     }
 
@@ -101,7 +106,15 @@ public class ExistingStudySearchAction extends SimpleCommand {
         }
         final Crawler crawler;
         try {
-            crawler = new Crawler(studyDirectory, new SlrGitHandler(studyDirectory), generalPreferences, importFormatPreferences, savePreferences, new BibEntryTypesManager(), fileUpdateMonitor);
+            crawler = new Crawler(
+                    studyDirectory,
+                    new SlrGitHandler(studyDirectory),
+                    generalPreferences,
+                    importFormatPreferences,
+                    importerPreferences,
+                    savePreferences,
+                    new BibEntryTypesManager(),
+                    fileUpdateMonitor);
         } catch (IOException | ParseException e) {
             LOGGER.error("Error during reading of study definition file.", e);
             dialogService.showErrorDialogAndWait(Localization.lang("Error during reading of study definition file."), e);

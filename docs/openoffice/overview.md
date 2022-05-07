@@ -1,6 +1,8 @@
+---
+nav_order: 1
+parent: The LibreOffice Panel
+---
 # Overview
-
-## Overview
 
 This is a partial overview of the OpenOffice/LibreOffice panel and the code behind.
 
@@ -9,13 +11,13 @@ This is a partial overview of the OpenOffice/LibreOffice panel and the code behi
 
 I am going to refer to OpenOffice Writer and LibreOffice Writer as LibreOffice or LO: their UNO APIs are still mostly identical, but I only tested with LibreOffice and differences do exist.
 
-### Subject
+## Subject
 
 * What is stored in a document, how.
 * Generating citation markers and bibliography
   * (excluding the bibliography entries, which is delegated to the layout module)
 
-### The purpose of the panel
+## The purpose of the panel
 
 * Allow the user to insert **citations** in a LibreOffice writer document.
 * Automatically format these according to some prescribed style as **citation markers**.
@@ -23,7 +25,7 @@ I am going to refer to OpenOffice Writer and LibreOffice Writer as LibreOffice o
   * The bibliography consists of a title (e.g. "References") and a sorted list of formatted bibliography entries, possibly prefixed with a marker (e.g. "\[1]")
 * It also allows some related activities: connect to a document, select a style, group ("Merge") the citations for nicer output, ungroup ("Separate") them to move or delete them individually, edit ("Manage") their page-info parts, and collect the database entries of cited sources to a new database.
 
-### Citation types
+## Citation types
 
 Citations (actually citation groups, see below) have three types depending on how the citation marker is intended to appear in the text:
 
@@ -36,7 +38,7 @@ Citations (actually citation groups, see below) have three types depending on ho
   * In LibreOffice (`LibreOffice:[Ctrl-F8]` or`LibreOffice:[menu:View]/[Field Shadings]`) shows reference marks with gray background. Invisible citation marks appear as a thin gray rectangle.
 * These citation types correspond to `\citep{Smith2000}`, `\citet{Smith2000}` in [natbib](http://tug.ctan.org/macros/latex/contrib/natbib/natnotes.pdf) and `\nocite{Smith2000}`. I will use `\citep`, `\citet` and `\citen` in "LaTeX pseudocode" below.
 
-### PageInfo
+## PageInfo
 
 The citations can be augmented with a string detailing which part of a document is cited, for example "page 11" or "chapter 2".
 
@@ -48,7 +50,7 @@ Sample citation markers (with LaTeX pseudocode):
 * This string is referred to as **`pageInfo`** in the code.
 * In the GUI the labels "Cite special", "Extra information (e.g. page number)" are used.
 
-### Citation groups
+## Citation groups
 
 Citations can be grouped.
 

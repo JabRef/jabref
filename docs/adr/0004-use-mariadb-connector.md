@@ -1,3 +1,7 @@
+---
+parent: Architectural Decisions
+nav_order: 4
+---
 # Use MariaDB Connector
 
 ## Context and Problem Statement

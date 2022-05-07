@@ -46,7 +46,6 @@ public class UpdateCitationMarkers {
         CitationGroups citationGroups = frontend.citationGroups;
 
         for (CitationGroup group : citationGroups.getCitationGroupsUnordered()) {
-
             boolean withText = (group.citationType != CitationType.INVISIBLE_CIT);
             Optional<OOText> marker = group.getCitationMarker();
 
@@ -57,11 +56,8 @@ public class UpdateCitationMarkers {
             }
 
             if (withText && marker.isPresent()) {
-
                 XTextCursor cursor = frontend.getFillCursorForCitationGroup(doc, group);
-
                 fillCitationMarkInCursor(doc, cursor, marker.get(), withText, style);
-
                 frontend.cleanFillCursorForCitationGroup(doc, group);
             }
         }

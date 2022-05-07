@@ -1,3 +1,7 @@
+---
+parent: Architectural Decisions
+nav_order: 21
+---
 # Keep study as a DTO
 
 ## Context and Problem Statement

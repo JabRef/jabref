@@ -62,7 +62,6 @@ public class CreateModifyExporterDialogViewModel extends AbstractViewModel {
         // Check that there are no empty strings.
         if (layoutFile.get().isEmpty() || name.get().isEmpty() || extension.get().isEmpty()
                 || !layoutFile.get().endsWith(".layout")) {
-
             LOGGER.info("One of the fields is empty or invalid!");
             return null;
         }

@@ -227,5 +227,4 @@ public class ACMPortalParser implements Parser {
 
         return bibEntry;
     }
-
 }

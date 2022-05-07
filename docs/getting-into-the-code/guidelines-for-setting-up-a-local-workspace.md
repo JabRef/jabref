@@ -1,3 +1,7 @@
+---
+parent: Getting into the code
+nav_order: 1
+---
 # Set up a local workspace
 
 This guide explains how to set up your environment for development of JabRef. It includes information about prerequisites, configuring your IDE, and running JabRef locally to verify your setup.
@@ -83,7 +87,7 @@ This section explains how you get the JabRef code onto your machine in a form al
 
 ### Clone your forked repository on your local machine
 
-* In a command line, navigate to the folder where you want to place the source code (parent folder of `jabref/`). To prevent issues along the way, it is strongly recommend to choose a path that does not contain any special (non-ASCII or whitespace) characters.
+* In a command line, navigate to the folder where you want to place the source code (parent folder of `jabref/`). To prevent issues along the way, it is strongly recommend to choose a path that does not contain any special (non-ASCII or whitespace) characters. Note that placing jabref folder directly in the disk root directory may cause an error.  
 * Run `git clone --depth=10 https://github.com/YOUR_USERNAME/jabref.git`. The `--depth--10` is used to limit the download to \~20 MB instead of downloading the complete history (\~800 MB). If you want to dig in our commit history, feel free to download everything.
 * Go to the newly created jabref folder: `cd jabref`
 * Generate additional source code: `./gradlew assemble`
@@ -104,9 +108,9 @@ To configure IntelliJ IDEA for developing JabRef, you should first ensure that y
 
 After that, you can open `jabref/build.gradle` as a project. It is crucial that Java 17 is used consistently for the JabRef project which includes ensuring the right settings for your project structure, Gradle build, and run configurations.
 
-Ensure you have a Java 17 SDK configured by navigating to **File | Project Structure | Platform Settings | SDKs**. If you don't have one, add a new Java JDK and point it to the location of a JDK 17. ![Project Settings](../.gitbook/assets/intellij-choose-jdk-adoptopenjdk-on-windows-project-settings.png)
+Ensure you have a Java 17 SDK configured by navigating to **File | Project Structure | Platform Settings | SDKs**. If you don't have one, add a new Java JDK and point it to the location of a JDK 17. ![Project Settings](../images/intellij-choose-jdk-adoptopenjdk-on-windows-project-settings.png)
 
-Navigate to **File | Project Structure | Project** and ensure that the projects' SDK is Java 17 ![Use JDK 17 as project SDK](../.gitbook/assets/intellij-choose-jdk15-project-default.png)
+Navigate to **File | Project Structure | Project** and ensure that the projects' SDK is Java 17 ![Use JDK 17 as project SDK](../images/intellij-choose-jdk15-project-default.png)
 
 Navigate to **File | Settings | Build, Execution, Deployment | Build Tools | Gradle** and select the "Project SDK" as the Gradle JVM at the bottom.
 
@@ -122,15 +126,15 @@ To prepare IntelliJ's build system two additional steps are required:
     Note that you need to focus another UI element before pressing OK. Otherwise, the setting will be empty.
 *   Enable annotation processors by navigating to **File | Settings | Build, Execution, Deployment | Compiler | Annotation processors** and check "Enable annotation processing"
 
-    ![Enable annotation processing](<../.gitbook/assets/intellij-enable-annotation-processing (1) (1).png>)
+    ![Enable annotation processing](<../images/intellij-enable-annotation-processing.png>)
 
 To have autoformat working properly in the context of line wrapping, "Wrap at right margin" has to be disabled as shown below. Details are found in [IntelliJ issue 240517](https://youtrack.jetbrains.com/issue/IDEA-240517).
 
-![](<../.gitbook/assets/intellij-wrap-at-right-margin (4) (4) (4) (1).png>)
+![](<../images/intellij-wrap-at-right-margin.png>)
 
 To enable "magic" creation and auto cleanup of imports, enable both "Add unambiguous imports on the fly" and "Optimize imports on the fly":
 
-![](../.gitbook/assets/grafik.png)
+![](../images/grafik.png)
 
 Source: [https://www.jetbrains.com/help/idea/creating-and-optimizing-imports.html#automatically-add-import-statements](https://www.jetbrains.com/help/idea/creating-and-optimizing-imports.html#automatically-add-import-statements)
 
@@ -158,7 +162,7 @@ To use IntelliJ IDEA's internal build system when you build JabRef through **Bui
 * In **File | Settings | Build, Execution, Deployment | Build Tools | Gradle** the setting "Build and run using" and "Test using" is set to "IntelliJ IDEA".
 *   Ignore the Gradle project "buildSrc" by clicking the button **Select Project Data To Import** in the Gradle Tool Window and unchecking the folder "buildSrc".
 
-    ![Ignore the Gradle project "buildSrc"](<../.gitbook/assets/intellij-gradle-config-ignore-buildSrc (2) (2) (2) (3) (3) (6) (4).png>)
+    ![Ignore the Gradle project "buildSrc"](<../images/intellij-gradle-config-ignore-buildSrc.png>)
 * Add `src-gen` as root:
   1. Right click on the project "jabref".
   2. Select "Open Module Settings"
@@ -201,7 +205,7 @@ Finally, ensure that the checkstyle configuration file is in place:
 9. Save settings by clicking "OK"
 10. Your configuration should now look like this:
 
-    ![checkstyle settings](<../.gitbook/assets/intellij-checkstyle-settings (1) (1).png>)
+    ![checkstyle settings](<../images/intellij-checkstyle-settings.png>)
 
 ### Setup for Eclipse
 
@@ -218,7 +222,7 @@ Make sure your Eclipse installation us up to date.
 4. Create a run/debug configuration for the main class `org.jabref.gui.JabRefLauncher` and/or for `org.jabref.gui.JabRefMain` (both can be used equivalently)
    *   Remark: The run/debug configuration needs to be added by right clicking the class (e.g. JabRefLauncher or JabRefMain) otherwise it will not work.
 
-       ![Creating the run/debug configuration by right clicking on the class](<../.gitbook/assets/eclipse-create-run-config (1) (3) (3) (4) (4) (3) (1) (1) (1) (13).png>)
+       ![Creating the run/debug configuration by right clicking on the class](<../images/eclipse-create-run-config.png>)
    *   In the tab "Arguments" of the run/debug configuration, enter the following runtime VM arguments:
 
        ```

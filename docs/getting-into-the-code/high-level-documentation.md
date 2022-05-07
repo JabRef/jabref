@@ -1,3 +1,7 @@
+---
+parent: Getting into the code
+nav_order: 2
+---
 # High-level documentation
 
 This page describes relevant information about the code structure of JabRef precisely and succinctly. Closer-to-code documentation is available at [Code HowTos](code-howtos.md).

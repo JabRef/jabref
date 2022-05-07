@@ -1,3 +1,7 @@
+---
+parent: Architectural Decisions
+nav_order: 9
+---
 # Use Plain JUnit5 for advanced test assertions
 
 ## Context and Problem Statement

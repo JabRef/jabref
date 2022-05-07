@@ -100,7 +100,6 @@ public class GroupSerializer {
      * @return a representation of the tree based at this node as a list of strings
      */
     public List<String> serializeTree(GroupTreeNode node) {
-
         List<String> representation = new ArrayList<>();
 
         // Append current node

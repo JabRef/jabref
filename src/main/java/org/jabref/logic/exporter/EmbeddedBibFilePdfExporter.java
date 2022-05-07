@@ -129,7 +129,6 @@ public class EmbeddedBibFilePdfExporter extends Exporter {
             }
             document.save(newFile.toFile());
             FileUtil.copyFile(newFile, path, true);
-
         }
         Files.delete(newFile);
     }
