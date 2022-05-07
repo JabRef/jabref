@@ -11,6 +11,8 @@ import org.jabref.testutils.category.FetcherTest;
 
 import kong.unirest.json.JSONObject;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -49,9 +51,10 @@ public class BiodiversityLibraryTest {
 
     }
 
-    @Test
-    public void getPartMetadaUrl() throws MalformedURLException, URISyntaxException {
-        String id = "1234";
+    @ParameterizedTest
+    @ValueSource(strings = {"1234", "331", "121"})
+    public void getPartMetadaUrl(String id) throws MalformedURLException, URISyntaxException {
+
         String expected_base = (BASE_URL
                 .concat("apikey=")
                 .concat(buildInfo.biodiversityHeritageApiKey)
@@ -59,17 +62,8 @@ public class BiodiversityLibraryTest {
                 .concat("&op=GetPartMetadata&pages=f&names=f")
                 .concat("&id=")
         );
-        String expected = expected_base.concat(id);
 
-        assertEquals(expected, fetcher.getPartMetadataURL(id).toString());
-
-        id = "4321";
-        expected = expected_base.concat(id);
-        assertEquals(expected, fetcher.getPartMetadataURL(id).toString());
-
-        id = "331";
-        expected = expected_base.concat(id);
-        assertEquals(expected, fetcher.getPartMetadataURL(id).toString());
+        assertEquals(expected_base.concat(id), fetcher.getPartMetadataURL(id).toString());
 
     }
 
@@ -102,7 +96,7 @@ public class BiodiversityLibraryTest {
         JSONObject input = new JSONObject("{\n\"BHLType\": \"Part\",\n\"FoundIn\": \"Metadata\",\n\"Volume\": \"3\",\n\"Authors\": [\n{\n\"Name\": \"Dimmock, George,\"\n}\n],\n\"PartUrl\": \"https://www.biodiversitylibrary.org/part/181199\",\n\"PartID\": \"181199\",\n\"Genre\": \"Article\",\n\"Title\": \"The Cocoons of Cionus Scrophulariae\",\n\"ContainerTitle\": \"Psyche.\",\n\"Date\": \"1882\",\n\"PageRange\": \"411--413\"\n}");
         BibEntry expect = new BibEntry(StandardEntryType.Article)
                 .withField(StandardField.TITLE, "The Cocoons of Cionus Scrophulariae")
-                .withField(StandardField.AUTHOR, "Dimmock, George,")
+                .withField(StandardField.AUTHOR, "Dimmock, George, ")
                 .withField(StandardField.PAGES, "411--413")
                 .withField(StandardField.DATE, "1882")
                 .withField(StandardField.JOURNALTITLE, "Psyche.")
@@ -131,7 +125,7 @@ public class BiodiversityLibraryTest {
                  "        }");
          expect = new BibEntry(StandardEntryType.Book)
                 .withField(StandardField.TITLE, "Potatoes : the poor man's own crop : illustrated with plates, showing the decay and disease of the potatoe [sic] : with hints to improve the land and life of the poor man : published to aid the Industrial Marlborough Exhibition")
-                .withField(StandardField.AUTHOR, "George, George")
+                .withField(StandardField.AUTHOR, "George, George ")
                 .withField(StandardField.YEAR, "1861")
                 .withField(StandardField.PUBSTATE, "Salisbury")
                 .withField(StandardField.PUBLISHER, "Frederick A. Blake,");
@@ -158,7 +152,7 @@ public class BiodiversityLibraryTest {
                 "        }");
         expect = new BibEntry(StandardEntryType.Book)
                 .withField(StandardField.TITLE, "The extra cost of producing clean milk.")
-                .withField(StandardField.AUTHOR, "Whitaker, George M. (George Mason)")
+                .withField(StandardField.AUTHOR, "Whitaker, George M. (George Mason) ")
                 .withField(StandardField.YEAR, "1911")
                 .withField(StandardField.PUBSTATE, "Washington")
                 .withField(StandardField.PUBLISHER, "Government Prining Office,");

@@ -7,6 +7,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.IntStream;
 
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ParseException;
@@ -16,6 +17,8 @@ import org.jabref.logic.importer.fetcher.transformers.BiodiversityLibraryTransfo
 import org.jabref.logic.importer.util.JsonReader;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.util.BuildInfo;
+import org.jabref.model.entry.Author;
+import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
@@ -80,46 +83,28 @@ public class BiodiversityLibrary implements SearchBasedParserFetcher {
         return new JSONObject(response).getJSONArray("Result").getJSONObject(0);
     }
 
-    public BibEntry getMostDetails(JSONObject item, BibEntry entry) throws IOException, URISyntaxException { // FixMe ???? Method name ist unfug
+    public BibEntry mountDetails(JSONObject item, BibEntry entry) throws IOException, URISyntaxException { // FixMe ???? Method name ist unfug
         if (item.has("BHLType")) {
             if (item.getString("BHLType").equals("Part")) {
                 URL url = getPartMetadataURL(item.getString("PartID"));
                 JSONObject itemsDetails = getDetails(url);
-                if (itemsDetails.has("Language")) {
-                    entry.setField(StandardField.LANGUAGE, itemsDetails.getString("Language"));
-                }
-                if (itemsDetails.has("Doi")) {
-                    entry.setField(StandardField.DOI, itemsDetails.getString("Doi"));
-                }
-                if (itemsDetails.has("PublisherName")) {
-                    entry.setField(StandardField.PUBLISHER, itemsDetails.getString("PublisherName"));
-                }
-                if (itemsDetails.has("Volume") && !entry.hasField(StandardField.VOLUME)) {
-                    entry.setField(StandardField.VOLUME, itemsDetails.getString("Volume"));
-                }
-                if (itemsDetails.has("Date") && !entry.hasField(StandardField.DATE) && !entry.hasField(StandardField.YEAR)) {
-                    entry.setField(StandardField.DATE, itemsDetails.getString("Date"));
-                }
-                if (itemsDetails.has("PartUrl")) {
-                    entry.setField(StandardField.URL, itemsDetails.getString("PartUrl"));
-                }
+                entry.setField(StandardField.LANGUAGE, itemsDetails.optString("Language", ""));
+
+                entry.setField(StandardField.DOI, itemsDetails.optString("Doi", ""));
+
+                entry.setField(StandardField.PUBLISHER, itemsDetails.optString("PublisherName", ""));
+                entry.setField(StandardField.DATE, itemsDetails.optString("Date", ""));
+                entry.setField(StandardField.VOLUME, itemsDetails.optString("Volume", ""));
+                entry.setField(StandardField.URL, itemsDetails.optString("PartUrl", ""));
             }
 
             if (item.getString("BHLType").equals("Item")) {
                 URL url = getItemMetadataURL(item.getString("ItemID"));
                 JSONObject itemsDetails = getDetails(url);
-                if (itemsDetails.has("Sponsor")) {
-                    entry.setField(StandardField.EDITOR, itemsDetails.getString("Sponsor"));
-                }
-                if (itemsDetails.has("HoldingInstitution")) {
-                    entry.setField(StandardField.PUBLISHER, itemsDetails.getString("HoldingInstitution"));
-                }
-                if (itemsDetails.has("Language")) {
-                    entry.setField(StandardField.LANGUAGE, itemsDetails.getString("Language"));
-                }
-                if (itemsDetails.has("ItemUrl")) {
-                    entry.setField(StandardField.URL, itemsDetails.getString("ItemUrl"));
-                }
+                entry.setField(StandardField.EDITOR, itemsDetails.optString("Sponsor", ""));
+                entry.setField(StandardField.PUBLISHER, itemsDetails.optString("HoldingInstitution", ""));
+                entry.setField(StandardField.LANGUAGE, itemsDetails.optString("Language", ""));
+                entry.setField(StandardField.URL, itemsDetails.optString("ItemUrl", ""));
                 if (itemsDetails.has("Date") && !entry.hasField(StandardField.DATE) && !entry.hasField(StandardField.YEAR)) {
                     entry.setField(StandardField.DATE, itemsDetails.getString("Date"));
                 }
@@ -137,65 +122,34 @@ public class BiodiversityLibrary implements SearchBasedParserFetcher {
         } else {
             entry.setType(StandardEntryType.Article);
         }
+        entry.setField(StandardField.TITLE, item.optString("Title", ""));
 
-        if (item.has("Title")) {
-            entry.setField(StandardField.TITLE, item.optString("Title"));
-        }
+        entry.setField(StandardField.AUTHOR, toAuthors(item.optJSONArray("Authors")));
 
-        if (item.has("Authors")) {
-            JSONArray authors = item.getJSONArray("Authors");
-            List<String> authorList = new ArrayList<>();
-            for (int i = 0; i < authors.length(); i++) {
-                if (authors.getJSONObject(i).has("Name")) {
-                    authorList.add(authors.getJSONObject(i).getString("Name"));
-                } else {
-                    LOGGER.debug("Empty author name.");
-                }
-            }
-            entry.setField(StandardField.AUTHOR, String.join(" and ", authorList));
-        } else {
-            LOGGER.debug("Empty author name");
-        }
+        entry.setField(StandardField.PAGES, item.optString("PageRange", ""));
+        entry.setField(StandardField.PUBSTATE, item.optString("PublisherPlace", ""));
+        entry.setField(StandardField.PUBLISHER, item.optString("PublisherName", ""));
 
-        if (item.has("PageRange")) {
-            entry.setField(StandardField.PAGES, item.getString("PageRange"));
-        } else {
-            LOGGER.debug("Empty pages number");
-        }
-
-        if (item.has("PublisherPlace")) {
-            entry.setField(StandardField.PUBSTATE, item.getString("PublisherPlace"));
-        } else {
-            LOGGER.debug("Empty Publisher Place");
-        }
-
-        if (item.has("PublisherName")) {
-            entry.setField(StandardField.PUBLISHER, item.getString("PublisherName"));
-        } else {
-            LOGGER.debug("Empty Publisher Name");
-        }
-
-        if (item.has("Date")) {
-            entry.setField(StandardField.DATE, item.getString("Date"));
-        } else if (item.has("PublicationDate")) {
-            entry.setField(StandardField.YEAR, item.getString("PublicationDate"));
-        } else {
-            LOGGER.debug("Empty date");
-        }
-
-        if (item.has("ContainerTitle")) {
-            entry.setField(StandardField.JOURNALTITLE, item.getString("ContainerTitle"));
-        } else {
-            LOGGER.debug("Empty journal name");
-        }
-
-        if (item.has("Volume")) {
-            entry.setField(StandardField.VOLUME, item.getString("Volume"));
-        } else {
-            LOGGER.debug("Empty volume number");
-        }
+        entry.setField(StandardField.DATE, item.optString("Date", ""));
+        entry.setField(StandardField.YEAR, item.optString("PublicationDate", ""));
+        entry.setField(StandardField.JOURNALTITLE, item.optString("ContainerTitle", ""));
+        entry.setField(StandardField.VOLUME, item.optString("Volume", ""));
 
         return entry;
+    }
+
+    private String toAuthors(JSONArray authors) {
+        if (authors == null) {
+            return "";
+        }
+
+        // input: list of { "Name": "Author name,"}
+        return IntStream.range(0, authors.length())
+                        .mapToObj(authors::getJSONObject)
+                        .map((author) -> new Author(
+                                author.optString("Name", ""), "", "", "", ""))
+                        .collect(AuthorList.collect())
+                        .getAsFirstLastNamesWithAnd();
     }
 
     @Override
@@ -217,7 +171,7 @@ public class BiodiversityLibrary implements SearchBasedParserFetcher {
                 JSONObject item = items.getJSONObject(i);
                 BibEntry entry = jsonResultToBibEntry(item);
                 try {
-                    entry = getMostDetails(item, entry);
+                    entry = mountDetails(item, entry);
                 } catch (JSONException | IOException | URISyntaxException exception) {
                     throw new ParseException("Error when parsing entry", exception);
                 }
@@ -232,22 +186,8 @@ public class BiodiversityLibrary implements SearchBasedParserFetcher {
     public URL getURLForQuery(QueryNode luceneQuery) throws URISyntaxException, MalformedURLException, FetcherException {
         URIBuilder uriBuilder = new URIBuilder(getBaseURL().toURI());
         BiodiversityLibraryTransformer transformer = new BiodiversityLibraryTransformer();
-        transformer.transformLuceneQuery(luceneQuery).orElse(""); // FixMe: ????? result ignored
         uriBuilder.addParameter("op", "PublicationSearchAdvanced");
-
-        if (transformer.getAuthor().isPresent()) {
-            uriBuilder.addParameter("authorname", transformer.getAuthor().get());
-        }
-
-        if (transformer.getTitle().isPresent()) {
-            uriBuilder.addParameter("title", transformer.getTitle().get());
-            uriBuilder.addParameter("titleop", "all");
-        }
-
-        if (transformer.getTitle().isEmpty() && transformer.getAuthor().isEmpty()) {
-                throw new FetcherException("Must add author or title");
-        }
-
+        uriBuilder.addParameter("authorname", transformer.transformLuceneQuery(luceneQuery).orElse(""));
         return uriBuilder.build().toURL();
     }
 }
