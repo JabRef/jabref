@@ -7,10 +7,13 @@ import java.util.List;
 import javafx.util.Duration;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.Globals;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.exporter.SaveDatabaseAction;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.theme.ThemeManager;
+import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.l10n.Localization;
@@ -36,6 +39,7 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
     private final StateManager stateManager;
     private final ThemeManager themeManager;
 
+    @SuppressWarnings("checkstyle:SingleSpaceSeparator")
     public DatabaseChangeMonitor(BibDatabaseContext database,
                                  FileUpdateMonitor fileMonitor,
                                  TaskExecutor taskExecutor,
@@ -43,7 +47,7 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
                                  PreferencesService preferencesService,
                                  StateManager stateManager,
                                  ThemeManager themeManager,
-                                 LibraryTab.DatabaseNotification notificationPane) {
+                                 LibraryTab libraryTab) {
         this.database = database;
         this.fileMonitor = fileMonitor;
         this.taskExecutor = taskExecutor;
@@ -62,10 +66,31 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
             }
         });
 
+        LibraryTab.DatabaseNotification notificationPane = libraryTab.getNotificationPane();
         addListener(changes -> notificationPane.notify(
                 IconTheme.JabRefIcons.SAVE.getGraphicNode(),
                 Localization.lang("The library has been modified by another program."),
-                List.of(new Action(Localization.lang("Dismiss changes"), event -> notificationPane.hide()),
+                List.of(new Action(Localization.lang("Dismiss changes"), event -> libraryTab.getNotificationPane().hide()),
+                        new Action(Localization.lang("Accept changes"), event -> {
+                            // Perform all accepted changes
+                            NamedCompound ce = new NamedCompound(Localization.lang("Merged external changes"));
+                            for (DatabaseChangeViewModel change : changes) {
+                                if (change instanceof EntryChangeViewModel) {
+                                    // We don't have a checkbox for accept and always get the correct merged entry, the accept property in this special case only controls the radio buttons selection
+                                    change.makeChange(database, ce);
+                                } else if (change.isAccepted()) {
+                                    change.makeChange(database, ce);
+                                }
+                            }
+                            ce.end();
+                            // save modified files
+                            SaveDatabaseAction saveDatabaseAction = new SaveDatabaseAction(
+                                    libraryTab,
+                                    preferencesService,
+                                    Globals.entryTypesManager);
+                            saveDatabaseAction.save();
+                            notificationPane.hide();
+                        }),
                         new Action(Localization.lang("Review changes"), event -> {
                             dialogService.showCustomDialogAndWait(new ChangeDisplayDialog(database, changes));
                             notificationPane.hide();

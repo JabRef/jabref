@@ -12,7 +12,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 ### Added
 
 - We added support for multiple messages in the snackbar. [#7340](https://github.com/JabRef/jabref/issues/7340)
-
+- We added "Accept Changes" button to directly accept external modify when Jabref detects the library has been modified by another program. [#8235](https://github.com/JabRef/jabref/issues/8235)
 ### Changed
 
 - We improved the Latex2Unicode conversion [#8639](https://github.com/JabRef/jabref/pull/8639)
