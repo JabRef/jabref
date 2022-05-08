@@ -88,13 +88,17 @@ This section explains how you get the JabRef code onto your machine in a form al
 * In a command line, navigate to the folder where you want to place the source code (parent folder of `jabref/`). To prevent issues along the way, it is strongly recommend to choose a path that does not contain any special (non-ASCII or whitespace) characters. Note that placing jabref folder directly in the disk root directory may cause an error.  
 * Run `git clone --depth=10 https://github.com/YOUR_USERNAME/jabref.git`. The `--depth--10` is used to limit the download to \~20 MB instead of downloading the complete history (\~800 MB). If you want to dig in our commit history, feel free to download everything.
 * Go to the newly created jabref folder: `cd jabref`
-* Generate additional source code: `./gradlew assemble`
-* Start JabRef: `./gradlew run`
-  * The JabRef's GUI should now start up.
+
+### Create generate source code
+
+1. Generate additional source code: `./gradlew assemble` (on Windows: `gradlew assemble`)
+2. Source code should now reside in `src-gen`.
+3. Start JabRef: `./gradlew run`
+4. JabRef's GUI should now start up.
 
 ## Configure your IDE
 
-These steps are very important. They allow you to focus on the content and ensure that the code formatting always goes well. Did you know that [IntelliJ allows for reformatting selected code](https://www.jetbrains.com/help/idea/reformat-and-rearrange-code.html#reformat\_code) if you press Ctrl + Alt + L?
+These steps are very important. They allow you to focus on the content and ensure that the code formatting always goes well. Did you know that [IntelliJ allows for reformatting selected code](https://www.jetbrains.com/help/idea/reformat-and-rearrange-code.html#reformat\_code) if you press <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>L</kbd>?
 
 ### Configuration of IntelliJ IDEA
 
