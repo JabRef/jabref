@@ -12,7 +12,7 @@ plugins {
 
     id 'org.javamodularity.moduleplugin' version '1.8.10'
 
-    id 'org.openjfx.javafxplugin' version '0.0.12'
+    id 'org.openjfx.javafxplugin' version '0.0.13'
 
     id 'org.beryx.jlink' version '2.25.0'
 
@@ -52,12 +52,6 @@ application {
     mainClass.set('org.jabref.gui.JabRefLauncher')
     mainModule.set('org.jabref')
 }
-
-// TODO: Ugly workaround to temporarily ignore build errors to dependencies of latex2unicode
-// These should be removed, as well as the files in the lib folder, as soon as they have valid module names
-modularity.patchModule("test", "fastparse_2.12-1.0.0.jar")
-modularity.patchModule("test2", "fastparse-utils_2.12-1.0.0.jar")
-modularity.patchModule("test3", "sourcecode_2.12-0.1.4.jar")
 
 // Workaround for https://github.com/openjfx/javafx-gradle-plugin/issues/89
 // See also https://github.com/java9-modularity/gradle-modules-plugin/issues/165
@@ -151,7 +145,7 @@ dependencies {
 
     implementation group: 'org.mariadb.jdbc', name: 'mariadb-java-client', version: '2.7.5'
 
-    implementation 'org.postgresql:postgresql:42.3.3'
+    implementation 'org.postgresql:postgresql:42.3.4'
 
     implementation ('com.oracle.ojdbc:ojdbc10:19.3.0.0') {
         // causing module issues
@@ -191,8 +185,8 @@ dependencies {
     implementation group: 'jakarta.xml.bind', name: 'jakarta.xml.bind-api', version: '3.0.1'
     implementation group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '3.0.2'
 
-    implementation ('com.github.tomtung:latex2unicode_2.12:0.2.6') {
-        exclude module: 'fastparse_2.12'
+    implementation ('com.github.tomtung:latex2unicode_2.13:0.3.2') {
+        exclude module: 'fastparse_2.13'
     }
 
     implementation group: 'com.microsoft.azure', name: 'applicationinsights-core', version: '2.4.1'

@@ -10,7 +10,7 @@ In case you are a end user, please head to the [user documentation](https://docs
 
 On the page [Setting up a local workspace](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace), we wrote about the initial steps to get your IDE running.
 We strongly recommend to continue reading there.
-After you successfully clonded and build JabRef, you are invited to continue reading here.
+After you successfully cloned and build JabRef, you are invited to continue reading here.
 
 ## How tos
 
