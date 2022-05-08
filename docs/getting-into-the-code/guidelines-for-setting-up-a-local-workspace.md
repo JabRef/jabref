@@ -128,24 +128,24 @@ To prepare IntelliJ's build system two additional steps are required:
     Note that you need to focus another UI element before pressing OK. Otherwise, the setting will be empty.
 *   Enable annotation processors by navigating to **File > Settings > Build, Execution, Deployment > Compiler > Annotation processors** and check "Enable annotation processing"
 
-    ![Enable annotation processing](<../images/intellij-enable-annotation-processing.png>)
+    ![Enable annotation processing](../images/intellij-enable-annotation-processing.png)
 
 To have autoformat working properly in the context of line wrapping, "Wrap at right margin" has to be disabled as shown below. Details are found in [IntelliJ issue 240517](https://youtrack.jetbrains.com/issue/IDEA-240517).
 
-![](<../images/intellij-wrap-at-right-margin.png>)
+![](../images/intellij-wrap-at-right-margin.png)
 
 To enable "magic" creation and auto cleanup of imports, enable both "Add unambiguous imports on the fly" and "Optimize imports on the fly":
 
 ![](../images/grafik.png)
 
-Source: [https://www.jetbrains.com/help/idea/creating-and-optimizing-imports.html#automatically-add-import-statements](https://www.jetbrains.com/help/idea/creating-and-optimizing-imports.html#automatically-add-import-statements)
+Source: <https://www.jetbrains.com/help/idea/creating-and-optimizing-imports.html#automatically-add-import-statements>.
 
 #### Using Gradle from within IntelliJ IDEA
 
 Ensuring JabRef builds with Gradle should always the first step because, e.g. it generates additional sources that are required for compiling the code. After adjusting all settings mentioned earlier, your first step should be to
 
 * Open the Gradle Tool Window with the small button that can usually be found on the right side of IDEA or navigate to **View > Tool Windows > Gradle**.
-*   In the Gradle Tool Window, press the "Reload All Gradle Projects" button to ensure that all settings are up-to-date with the setting changes.
+* In the Gradle Tool Window, press the "Reload All Gradle Projects" button to ensure that all settings are up-to-date with the setting changes.
 
 After that, you can use the Gradle Tool Window to build all parts JabRef and run it. To do so, expand the JabRef project in the Gradle Tool Window and navigate to Tasks. From there, you can
 
