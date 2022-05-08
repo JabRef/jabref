@@ -1,10 +1,11 @@
 package org.jabref.gui.fieldeditors;
 
-import java.util.stream.Collectors;
+import java.util.Comparator;
 
 import javafx.beans.binding.Bindings;
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
+import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 
 import org.jabref.gui.autocompleter.SuggestionProvider;
@@ -16,6 +17,7 @@ import org.jabref.model.entry.ParsedEntryLink;
 import org.jabref.model.entry.field.Field;
 
 import com.airhacks.afterburner.views.ViewLoader;
+import com.dlsc.gemsfx.TagsField;
 import com.jfoenix.controls.JFXChip;
 import com.jfoenix.controls.JFXChipView;
 import com.jfoenix.controls.JFXDefaultChip;
@@ -27,8 +29,11 @@ public class LinkedEntriesEditor extends HBox implements FieldEditorFX {
     @FXML
     private JFXChipView<ParsedEntryLink> chipView;
 
+    private SuggestionProvider<BibEntry> suggestionProvider;
+
     public LinkedEntriesEditor(Field field, BibDatabaseContext databaseContext, SuggestionProvider<BibEntry> suggestionProvider, FieldCheckers fieldCheckers) {
         this.viewModel = new LinkedEntriesEditorViewModel(field, suggestionProvider, databaseContext, fieldCheckers);
+        this.suggestionProvider = suggestionProvider;
 
         ViewLoader.view(this)
                   .root(this)
@@ -39,7 +44,7 @@ public class LinkedEntriesEditor extends HBox implements FieldEditorFX {
                 .withText(ParsedEntryLink::getKey);
         chipView.getAutoCompletePopup().setSuggestionsCellFactory(autoCompletionItemFactory);
         chipView.getAutoCompletePopup().setCellLimit(5);
-        chipView.getSuggestions().addAll(suggestionProvider.getPossibleSuggestions().stream().map(ParsedEntryLink::new).collect(Collectors.toList()));
+        chipView.getSuggestions().addAll(suggestionProvider.getPossibleSuggestions().stream().map(ParsedEntryLink::new).toList());
 
         chipView.setChipFactory((view, item) -> {
             JFXChip<ParsedEntryLink> chip = new JFXDefaultChip<>(view, item);
@@ -48,6 +53,10 @@ public class LinkedEntriesEditor extends HBox implements FieldEditorFX {
         });
 
         Bindings.bindContentBidirectional(chipView.getChips(), viewModel.linkedEntriesProperty());
+    }
+
+    public SuggestionProvider<BibEntry> getSuggestionProviderMan() {
+        return suggestionProvider;
     }
 
     public LinkedEntriesEditorViewModel getViewModel() {
@@ -62,5 +71,25 @@ public class LinkedEntriesEditor extends HBox implements FieldEditorFX {
     @Override
     public Parent getNode() {
         return this;
+    }
+
+    public class ParsedEntryLinkField extends TagsField<ParsedEntryLink> {
+        public ParsedEntryLinkField() {
+            setCellFactory(new ViewModelListCellFactory<ParsedEntryLink>().withText(ParsedEntryLink::getKey));
+            setSuggestionProvider(request ->
+                    suggestionProvider.getPossibleSuggestions().stream()
+                                      .filter(suggestion -> suggestion.getCitationKey().orElse("").toLowerCase()
+                                                                      .contains(request.getUserText().toLowerCase()))
+                                      .map(ParsedEntryLink::new).toList());
+            setConverter(viewModel.getStringConverter());
+            setMatcher((entryLink, searchText) -> entryLink.getKey().toLowerCase().startsWith(searchText.toLowerCase()));
+            setComparator(Comparator.comparing(ParsedEntryLink::getKey));
+            setTagViewFactory((entryLink) -> {
+                Label tagLabel = new Label();
+                tagLabel.setText(getConverter().toString(entryLink));
+                tagLabel.setOnMouseClicked(event -> viewModel.jumpToEntry(entryLink));
+                return tagLabel;
+            });
+        }
     }
 }

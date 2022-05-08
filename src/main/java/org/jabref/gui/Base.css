@@ -1148,10 +1148,10 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-background-color: -jr-accent;
 }
 
-.jfx-color-picker:armed,
-.jfx-color-picker:hover,
-.jfx-color-picker:focused,
-.jfx-color-picker {
+.color-picker:armed,
+.color-picker:hover,
+.color-picker:focused,
+.color-picker {
     -fx-background-color: transparent, transparent, transparent, transparent;
     -fx-background-radius: 0px;
     -fx-background-insets: 0px;

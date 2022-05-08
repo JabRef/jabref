@@ -14,6 +14,7 @@ open module org.jabref {
     requires javafx.fxml;
     requires afterburner.fx;
     requires com.jfoenix;
+    requires com.dlsc.gemsfx;
     requires de.saxsys.mvvmfx;
 
     requires org.kordamp.ikonli.core;
