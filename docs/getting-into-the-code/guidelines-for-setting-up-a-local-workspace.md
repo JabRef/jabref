@@ -6,11 +6,9 @@ nav_order: 1
 
 This guide explains how to set up your environment for development of JabRef. It includes information about prerequisites, configuring your IDE, and running JabRef locally to verify your setup.
 
-```
-The most important step is to configure your IDE.
-In case you know how to install JDK 17 with JavaFX support and to fork JabRef's code,
-please scroll down to the IDE setup.
-```
+> **The most important step is to configure your IDE.**\
+> **In case you know how to install JDK 17 with JavaFX support and [to fork JabRef's code](#get-the-code),**\
+> **please scroll down to the [IDE setup](#configure-your-ide).**
 
 For a complete step-by-step guide for Linux using IntelliJ IDEA as the IDE, have a look at the following video instructions:
 
@@ -104,19 +102,19 @@ IntelliJ IDEA fully supports Gradle as a build tool, but also has an internal bu
 
 To configure IntelliJ IDEA for developing JabRef, you should first ensure that you have enabled both bundled plugins _Gradle_ and _Gradle Extension_:
 
-* Navigate to **File | Settings | Plugins | Installed** and check that you have the _Gradle_ and _Gradle Extension_ enabled.
+* Navigate to **File > Settings > Plugins > Installed** and check that you have the _Gradle_ and _Gradle Extension_ enabled.
 
 After that, you can open `jabref/build.gradle` as a project. It is crucial that Java 17 is used consistently for the JabRef project which includes ensuring the right settings for your project structure, Gradle build, and run configurations.
 
-Ensure you have a Java 17 SDK configured by navigating to **File | Project Structure | Platform Settings | SDKs**. If you don't have one, add a new Java JDK and point it to the location of a JDK 17. ![Project Settings](../images/intellij-choose-jdk-adoptopenjdk-on-windows-project-settings.png)
+Ensure you have a Java 17 SDK configured by navigating to **File > Project Structure > Platform Settings > SDKs**. If you don't have one, add a new Java JDK and point it to the location of a JDK 17. ![Project Settings](../images/intellij-choose-jdk-adoptopenjdk-on-windows-project-settings.png)
 
-Navigate to **File | Project Structure | Project** and ensure that the projects' SDK is Java 17 ![Use JDK 17 as project SDK](../images/intellij-choose-jdk15-project-default.png)
+Navigate to **File > Project Structure > Project** and ensure that the projects' SDK is Java 17 ![Use JDK 17 as project SDK](../images/intellij-choose-jdk15-project-default.png)
 
-Navigate to **File | Settings | Build, Execution, Deployment | Build Tools | Gradle** and select the "Project SDK" as the Gradle JVM at the bottom.
+Navigate to **File > Settings > Build, Execution, Deployment > Build Tools > Gradle** and select the "Project SDK" as the Gradle JVM at the bottom. If that does not exist, just select a JDK 17.
 
 To prepare IntelliJ's build system two additional steps are required:
 
-*   Navigate to **File | Settings | Build, Execution, Deployment | Compiler | Java Compiler**, and under "Override compiler parameters per-module" add (\[+]) the following compiler arguments for the `JabRef.main` module. Otherwise, you will get: `java: package com.sun.javafx.scene.control is not visible (package com.sun.javafx.scene.control is declared in module javafx.controls, which does not export it to module org.jabref)`
+*   Navigate to **File > Settings > Build, Execution, Deployment > Compiler > Java Compiler**, and under "Override compiler parameters per-module" add (\[+]) the following compiler arguments for the `JabRef.main` module. Otherwise, you will get: `java: package com.sun.javafx.scene.control is not visible (package com.sun.javafx.scene.control is declared in module javafx.controls, which does not export it to module org.jabref)`
 
     ```
      --add-exports=javafx.controls/com.sun.javafx.scene.control=org.jabref
@@ -124,7 +122,7 @@ To prepare IntelliJ's build system two additional steps are required:
     ```
 
     Note that you need to focus another UI element before pressing OK. Otherwise, the setting will be empty.
-*   Enable annotation processors by navigating to **File | Settings | Build, Execution, Deployment | Compiler | Annotation processors** and check "Enable annotation processing"
+*   Enable annotation processors by navigating to **File > Settings > Build, Execution, Deployment > Compiler > Annotation processors** and check "Enable annotation processing"
 
     ![Enable annotation processing](<../images/intellij-enable-annotation-processing.png>)
 
@@ -142,14 +140,14 @@ Source: [https://www.jetbrains.com/help/idea/creating-and-optimizing-imports.htm
 
 Ensuring JabRef builds with Gradle should always the first step because, e.g. it generates additional sources that are required for compiling the code. After adjusting all settings mentioned earlier, your first step should be to
 
-* Open the Gradle Tool Window with the small button that can usually be found on the right side of IDEA or navigate to **View | Tool Windows | Gradle**.
+* Open the Gradle Tool Window with the small button that can usually be found on the right side of IDEA or navigate to **View > Tool Windows > Gradle**.
 *   In the Gradle Tool Window, press the "Reload All Gradle Projects" button to ensure that all settings are up-to-date
 
     with the setting changes.
 
 After that, you can use the Gradle Tool Window to build all parts JabRef and run it. To do so, expand the JabRef project in the Gradle Tool Window and navigate to Tasks. From there, you can
 
-* Build and run JabRef by double-clicking **JabRef | Tasks | application | run**.
+* Build and run JabRef by double-clicking **JabRef > Tasks > application > run**.
 
 After that a new entry called "jabref \[run]" will appear in the run configurations. Now you can also select "jabref \[run]" and either run or debug the application from within IntelliJ. You can run any other development task in a similar way. Equivalently, this can also be executed from the terminal by running `./gradlew run`.
 
@@ -157,9 +155,9 @@ After that a new entry called "jabref \[run]" will appear in the run configurati
 
 You should use IntelliJ IDEA's internal build system for compiling and running JabRef during development, because it is usually more responsive. Thereby, **it is important** that you understand that JabRef relies on generated sources which are only build through Gradle. Therefore, to build or update these dependencies you need to run the `assemble` Gradle task at least once.
 
-To use IntelliJ IDEA's internal build system when you build JabRef through **Build | Build Project** or use the provided "JabRef Main" run configuration, ensure that
+To use IntelliJ IDEA's internal build system when you build JabRef through **Build > Build Project** or use the provided "JabRef Main" run configuration, ensure that
 
-* In **File | Settings | Build, Execution, Deployment | Build Tools | Gradle** the setting "Build and run using" and "Test using" is set to "IntelliJ IDEA".
+* In **File > Settings > Build, Execution, Deployment > Build Tools > Gradle** the setting "Build and run using" and "Test using" is set to "IntelliJ IDEA".
 *   Ignore the Gradle project "buildSrc" by clicking the button **Select Project Data To Import** in the Gradle Tool Window and unchecking the folder "buildSrc".
 
     ![Ignore the Gradle project "buildSrc"](<../images/intellij-gradle-config-ignore-buildSrc.png>)
@@ -186,15 +184,15 @@ In case all steps are followed, and there are still issues with `SearchBaseVisit
 Contributions to JabRef's source code need to have a code formatting that is consistent with existing source code. For that purpose, JabRef provides code-style and check-style definitions.
 
 * Install the [CheckStyle-IDEA plugin](http://plugins.jetbrains.com/plugin/1065?pr=idea), it can be found via the plug-in repository:
-  1. Navigate to **File | Settings | Plugins | Marketplace** and search for "Checkstyle" and choose "CheckStyle-IDEA"
+  1. Navigate to **File > Settings > Plugins > Marketplace** and search for "Checkstyle" and choose "CheckStyle-IDEA"
   2. Close the settings afterwards and restart IntelliJ
-* Go to **File | Settings | Editor | Code Style**
+* Go to **File > Settings > Editor > Code Style**
 * Click on the settings wheel (next to the scheme chooser), then click "Import Scheme"
 * Select the IntelliJ configuration file `config/IntelliJ Code Style.xml`
 
 Finally, ensure that the checkstyle configuration file is in place:
 
-1. Go to **File | Settings | Tools | Checkstyle | Configuration File**
+1. Go to **File > Settings > Tools > Checkstyle > Configuration File**
 2. Import the CheckStyle configuration file by clicking the \[+] button
 3. For the description provide "JabRef"
 4. Click "Browse" and choose `config/checkstyle/checkstyle.xml`
