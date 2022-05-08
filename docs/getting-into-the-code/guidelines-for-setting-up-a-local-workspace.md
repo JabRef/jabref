@@ -226,9 +226,6 @@ Make sure your Eclipse installation us up to date.
    *   In the tab "Arguments" of the run/debug configuration, enter the following runtime VM arguments:
 
        ```
-          --patch-module test=fastparse_2.12-1.0.0.jar
-          --patch-module test2=fastparse-utils_2.12-1.0.0.jar
-          --patch-module test3=sourcecode_2.12-0.1.4.jar
           --add-exports javafx.controls/com.sun.javafx.scene.control=org.jabref
           --add-exports org.controlsfx.controls/impl.org.controlsfx.skin=org.jabref
           --add-exports javafx.graphics/com.sun.javafx.scene=org.controlsfx.controls
