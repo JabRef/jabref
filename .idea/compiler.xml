@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile default="true" name="Default" enabled="true" />
+    </annotationProcessing>
+    <bytecodeTargetLevel target="17" />
+  </component>
+  <component name="JavacSettings">
+    <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="JabRef.main" options="--add-exports javafx.controls/com.sun.javafx.scene.control=org.jabref --add-exports org.controlsfx.controls/impl.org.controlsfx.skin=org.jabref" />
+    </option>
+  </component>
+</project>

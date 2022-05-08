@@ -42,8 +42,8 @@ gradle.properties
 
 
 # IntelliJ IDEA
-.idea/*
-!.idea/runConfigurations/
+.idea/workspace.xml
+.idea/checkstyleidea-libs
 *.ipr
 *.iml
 
