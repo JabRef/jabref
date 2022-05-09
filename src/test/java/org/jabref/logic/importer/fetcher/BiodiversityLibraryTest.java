@@ -2,7 +2,7 @@ package org.jabref.logic.importer.fetcher;
 
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
-import java.util.Collections;
+import java.util.List;
 
 import javafx.collections.FXCollections;
 
@@ -116,7 +116,7 @@ public class BiodiversityLibraryTest {
             .withField(StandardField.URL, "https://www.biodiversitylibrary.org/item/253874")
             .withField(StandardField.YEAR, "1870");
 
-        assertEquals(Collections.singleton(expected), fetcher.performSearch("dogs"));
+        assertEquals(List.of(expected), fetcher.performSearch("dogs"));
     }
 
     @Test
