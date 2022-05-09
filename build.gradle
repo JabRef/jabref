@@ -100,6 +100,10 @@ javafx {
     modules = [ 'javafx.controls', 'javafx.fxml', 'javafx.web', 'javafx.swing' ]
 }
 
+jacoco {
+    toolVersion = "0.8.8"
+}
+
 dependencies {
     // Include all jar-files in the 'lib' folder as dependencies
     implementation fileTree(dir: 'lib', includes: ['*.jar'])
