@@ -36,9 +36,7 @@ import org.tinylog.Logger;
  * Fetches data from the Biodiversity Heritage Library
  *
  * @implNote
- * <a
- * href="https://www.biodiversitylibrary.org/docs/api3.html">API
- * documentation</a>
+ * <a href="https://www.biodiversitylibrary.org/docs/api3.html">API documentation</a>
  */
 public class BiodiversityLibrary implements SearchBasedParserFetcher, CustomizableKeyFetcher {
 
@@ -67,7 +65,7 @@ public class BiodiversityLibrary implements SearchBasedParserFetcher, Customizab
 
     public URL getBaseURL() throws URISyntaxException, MalformedURLException {
         URIBuilder baseURI = new URIBuilder(BASE_URL);
-        baseURI.addParameter("apikey", API_KEY);
+        baseURI.addParameter("apikey", getApiKey());
         baseURI.addParameter("format", RESPONSE_FORMAT);
 
         return baseURI.build().toURL();
