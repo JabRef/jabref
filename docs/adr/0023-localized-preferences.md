@@ -1,3 +1,7 @@
+---
+parent: Architectural Decisions
+nav_order: 23
+---
 # Localized Preferences
 
 * Status: proposed

@@ -1,3 +1,7 @@
+---
+nav_order: 2
+parent: Readings on Coding
+---
 # Useful development tooling
 
 This page lists some software we consider useful.

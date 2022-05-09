@@ -1,3 +1,7 @@
+---
+nav_order: 4
+parent: The LibreOffice Panel
+---
 # Code reorganization
 
 Why

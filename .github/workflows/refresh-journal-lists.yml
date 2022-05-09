@@ -4,8 +4,14 @@ on:
   workflow_dispatch:
     # Allow to run manually
 
+permissions:
+  contents: read
+
 jobs:
   publish:
+    permissions:
+      contents: write  # for peter-evans/create-pull-request to create branch
+      pull-requests: write  # for peter-evans/create-pull-request to create a PR
     name: Refresh Journal List Files
     runs-on: ubuntu-latest
     steps:
