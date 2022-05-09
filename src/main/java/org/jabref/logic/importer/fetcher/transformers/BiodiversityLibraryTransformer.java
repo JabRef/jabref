@@ -36,5 +36,4 @@ public class BiodiversityLibraryTransformer extends AbstractQueryTransformer {
     protected String handleYear(String year) {
         return null;
     }
-
 }
