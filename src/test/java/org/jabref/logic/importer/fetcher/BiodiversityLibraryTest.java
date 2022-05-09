@@ -111,7 +111,7 @@ public class BiodiversityLibraryTest {
             .withField(StandardField.EDITOR, "Brigham Young University")
             .withField(StandardField.LANGUAGE, "English")
             .withField(StandardField.PUBLISHER, "Harold B. Lee Library (archive.org)")
-            .withField(StandardField.PUBSTATE, "London")
+            .withField(StandardField.LOCATION, "London")
             .withField(StandardField.TITLE, "Lively sallies : after Punch")
             .withField(StandardField.URL, "https://www.biodiversitylibrary.org/item/253874")
             .withField(StandardField.YEAR, "1870");
