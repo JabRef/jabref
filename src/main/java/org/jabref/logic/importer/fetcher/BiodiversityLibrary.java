@@ -205,8 +205,9 @@ public class BiodiversityLibrary implements SearchBasedParserFetcher, Customizab
     public URL getURLForQuery(QueryNode luceneQuery) throws URISyntaxException, MalformedURLException, FetcherException {
         URIBuilder uriBuilder = new URIBuilder(getBaseURL().toURI());
         BiodiversityLibraryTransformer transformer = new BiodiversityLibraryTransformer();
-        uriBuilder.addParameter("op", "PublicationSearchAdvanced");
-        uriBuilder.addParameter("authorname", transformer.transformLuceneQuery(luceneQuery).orElse(""));
+        uriBuilder.addParameter("op", "PublicationSearch");
+        uriBuilder.addParameter("searchtype", "C");
+        uriBuilder.addParameter("searchterm", transformer.transformLuceneQuery(luceneQuery).orElse(""));
         return uriBuilder.build().toURL();
     }
 

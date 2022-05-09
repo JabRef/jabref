@@ -4,17 +4,17 @@ public class BiodiversityLibraryTransformer extends AbstractQueryTransformer {
 
     @Override
     protected String getLogicalAndOperator() {
-        return " AND ";
+        return "+";
     }
 
     @Override
     protected String getLogicalOrOperator() {
-        return " OR ";
+        return "+";
     }
 
     @Override
     protected String getLogicalNotOperator() {
-        return " NOT ";
+        return "+";
     }
 
     @Override
@@ -24,16 +24,16 @@ public class BiodiversityLibraryTransformer extends AbstractQueryTransformer {
 
     @Override
     protected String handleTitle(String title) {
-        return null;
+        return title;
     }
 
     @Override
     protected String handleJournal(String journalTitle) {
-        return null;
+        return journalTitle;
     }
 
     @Override
     protected String handleYear(String year) {
-        return null;
+        return year;
     }
 }
