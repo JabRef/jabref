@@ -93,16 +93,17 @@ public class BiodiversityLibraryTest {
     @Test
     public void testPerformSearch() throws FetcherException {
         BibEntry expected = new BibEntry(StandardEntryType.Book)
-            .withField(StandardField.AUTHOR, "Parkinson, William,  and Temporary Home for Lost and Starving Dogs ")
-            .withField(StandardField.EDITOR, "Brigham Young University")
+            .withField(StandardField.AUTHOR, "Ingersoll, Ernest, ")
+            .withField(StandardField.EDITOR, "University of Illinois Urbana-Champaign Alternates")
             .withField(StandardField.LANGUAGE, "English")
-            .withField(StandardField.PUBLISHER, "Harold B. Lee Library (archive.org)")
-            .withField(StandardField.LOCATION, "London")
-            .withField(StandardField.TITLE, "Lively sallies : after Punch")
-            .withField(StandardField.URL, "https://www.biodiversitylibrary.org/item/253874")
-            .withField(StandardField.YEAR, "1870");
+            .withField(StandardField.PUBLISHER, "University Library, University of Illinois Urbana Champaign")
+            .withField(StandardField.LOCATION, "Chicago")
+            .withField(StandardField.TITLE, "Dogs")
+            .withField(StandardField.URL, "https://www.biodiversitylibrary.org/item/219826")
+            .withField(StandardField.YEAR, "1879");
 
-        assertEquals(List.of(expected), fetcher.performSearch("dogs"));
+        // fetcher returns more than entry, by default up to 200, but we only want to check one here
+        assertEquals(List.of(expected), fetcher.performSearch("dogs").subList(0, 1));
     }
 
     @Test
@@ -142,7 +143,7 @@ public class BiodiversityLibraryTest {
                 .withField(StandardField.TITLE, "Potatoes : the poor man's own crop : illustrated with plates, showing the decay and disease of the potatoe [sic] : with hints to improve the land and life of the poor man : published to aid the Industrial Marlborough Exhibition")
                 .withField(StandardField.AUTHOR, "George, George ")
                 .withField(StandardField.YEAR, "1861")
-                .withField(StandardField.PUBSTATE, "Salisbury")
+                .withField(StandardField.LOCATION, "Salisbury")
                 .withField(StandardField.PUBLISHER, "Frederick A. Blake,");
         assertEquals(expected, fetcher.jsonResultToBibEntry(input));
 
@@ -170,7 +171,7 @@ public class BiodiversityLibraryTest {
                 .withField(StandardField.TITLE, "The extra cost of producing clean milk.")
                 .withField(StandardField.AUTHOR, "Whitaker, George M. (George Mason) ")
                 .withField(StandardField.YEAR, "1911")
-                .withField(StandardField.PUBSTATE, "Washington")
+                .withField(StandardField.LOCATION, "Washington")
                 .withField(StandardField.PUBLISHER, "Government Prining Office,");
         assertEquals(expected, fetcher.jsonResultToBibEntry(input));
     }
