@@ -2,9 +2,11 @@ package org.jabref.logic.importer.fetcher;
 
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
+import java.util.Collections;
 
 import javafx.collections.FXCollections;
 
+import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.model.entry.BibEntry;
@@ -99,6 +101,22 @@ public class BiodiversityLibraryTest {
         id = "331";
         expected = expected_base.concat(id);
         assertEquals(expected, fetcher.getItemMetadataURL(id).toString());
+    }
+
+    @Test
+    public void testPerformSearch() throws FetcherException {
+
+        BibEntry expected = new BibEntry(StandardEntryType.Book)
+            .withField(StandardField.AUTHOR, "Parkinson, William,  and Temporary Home for Lost and Starving Dogs ")
+            .withField(StandardField.EDITOR, "Brigham Young University")
+            .withField(StandardField.LANGUAGE, "English")
+            .withField(StandardField.PUBLISHER, "Harold B. Lee Library (archive.org)")
+            .withField(StandardField.PUBSTATE, "London")
+            .withField(StandardField.TITLE, "Lively sallies : after Punch")
+            .withField(StandardField.URL, "https://www.biodiversitylibrary.org/item/253874")
+            .withField(StandardField.YEAR, "1870");
+
+        assertEquals(Collections.singleton(expected), fetcher.performSearch("dogs"));
     }
 
     @Test
