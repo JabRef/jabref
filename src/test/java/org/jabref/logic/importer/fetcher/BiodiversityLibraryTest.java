@@ -26,7 +26,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@SuppressWarnings("checkstyle:EmptyLineSeparator")
 @FetcherTest
 public class BiodiversityLibraryTest {
     private final String BASE_URL = "https://www.biodiversitylibrary.org/api3?";
