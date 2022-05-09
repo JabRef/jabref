@@ -145,7 +145,7 @@ public class BiodiversityLibrary implements SearchBasedParserFetcher, Customizab
         entry.setField(StandardField.AUTHOR, toAuthors(item.optJSONArray("Authors")));
 
         entry.setField(StandardField.PAGES, item.optString("PageRange", ""));
-        entry.setField(StandardField.PUBSTATE, item.optString("PublisherPlace", ""));
+        entry.setField(StandardField.LOCATION, item.optString("PublisherPlace", ""));
         entry.setField(StandardField.PUBLISHER, item.optString("PublisherName", ""));
 
         entry.setField(StandardField.DATE, item.optString("Date", ""));
