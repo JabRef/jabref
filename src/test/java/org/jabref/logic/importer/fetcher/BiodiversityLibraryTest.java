@@ -57,55 +57,42 @@ public class BiodiversityLibraryTest {
 
     @Test
     public void baseURLConstruction() throws MalformedURLException, URISyntaxException {
+        String expected = fetcher
+                .getTestUrl()
+                .concat(buildInfo.biodiversityHeritageApiKey)
+                .concat(RESPONSE_FORMAT);
 
-        String baseURL = fetcher.getBaseURL().toString();
-        assertEquals(BASE_URL
-                        .concat("apikey=")
-                        .concat(buildInfo.biodiversityHeritageApiKey)
-                        .concat(RESPONSE_FORMAT),
-                baseURL);
+        assertEquals(expected, fetcher.getBaseURL().toString());
     }
 
     @ParameterizedTest
     @ValueSource(strings = {"1234", "331", "121"})
     public void getPartMetadaUrl(String id) throws MalformedURLException, URISyntaxException {
-        String expected_base = (BASE_URL
-                .concat("apikey=")
+        String expected = fetcher
+                .getTestUrl()
                 .concat(buildInfo.biodiversityHeritageApiKey)
                 .concat(RESPONSE_FORMAT)
                 .concat("&op=GetPartMetadata&pages=f&names=f")
-                .concat("&id=")
-        );
+                .concat("&id=");
 
-        assertEquals(expected_base.concat(id), fetcher.getPartMetadataURL(id).toString());
+        assertEquals(expected.concat(id), fetcher.getPartMetadataURL(id).toString());
     }
 
-    @Test
-    public void getItemMetadaUrl() throws MalformedURLException, URISyntaxException {
-        String id = "1234";
-        String expected_base = (BASE_URL
-                .concat("apikey=")
+    @ParameterizedTest
+    @ValueSource(strings = {"1234", "4321", "331"})
+    public void getItemMetadaUrl(String id) throws MalformedURLException, URISyntaxException {
+        String expected = fetcher
+                .getTestUrl()
                 .concat(buildInfo.biodiversityHeritageApiKey)
                 .concat(RESPONSE_FORMAT)
                 .concat("&op=GetItemMetadata&pages=f&ocr=f&ocr=f")
-                .concat("&id=")
-        );
-        String expected = expected_base.concat(id);
+                .concat("&id=");
 
-        assertEquals(expected, fetcher.getItemMetadataURL(id).toString());
-
-        id = "4321";
-        expected = expected_base.concat(id);
-        assertEquals(expected, fetcher.getItemMetadataURL(id).toString());
-
-        id = "331";
-        expected = expected_base.concat(id);
-        assertEquals(expected, fetcher.getItemMetadataURL(id).toString());
+        assertEquals(expected.concat(id), fetcher.getItemMetadataURL(id).toString());
     }
 
     @Test
     public void testPerformSearch() throws FetcherException {
-
         BibEntry expected = new BibEntry(StandardEntryType.Book)
             .withField(StandardField.AUTHOR, "Parkinson, William,  and Temporary Home for Lost and Starving Dogs ")
             .withField(StandardField.EDITOR, "Brigham Young University")
@@ -122,7 +109,7 @@ public class BiodiversityLibraryTest {
     @Test
     public void jsonResultToBibEntry() {
         JSONObject input = new JSONObject("{\n\"BHLType\": \"Part\",\n\"FoundIn\": \"Metadata\",\n\"Volume\": \"3\",\n\"Authors\": [\n{\n\"Name\": \"Dimmock, George,\"\n}\n],\n\"PartUrl\": \"https://www.biodiversitylibrary.org/part/181199\",\n\"PartID\": \"181199\",\n\"Genre\": \"Article\",\n\"Title\": \"The Cocoons of Cionus Scrophulariae\",\n\"ContainerTitle\": \"Psyche.\",\n\"Date\": \"1882\",\n\"PageRange\": \"411--413\"\n}");
-        BibEntry expect = new BibEntry(StandardEntryType.Article)
+        BibEntry expected = new BibEntry(StandardEntryType.Article)
                 .withField(StandardField.TITLE, "The Cocoons of Cionus Scrophulariae")
                 .withField(StandardField.AUTHOR, "Dimmock, George, ")
                 .withField(StandardField.PAGES, "411--413")
@@ -130,7 +117,7 @@ public class BiodiversityLibraryTest {
                 .withField(StandardField.JOURNALTITLE, "Psyche.")
                 .withField(StandardField.VOLUME, "3");
 
-        assertEquals(expect, fetcher.jsonResultToBibEntry(input));
+        assertEquals(expected, fetcher.jsonResultToBibEntry(input));
 
         input = new JSONObject("""
                 {
@@ -152,13 +139,13 @@ public class BiodiversityLibraryTest {
                             "Genre": "Book",
                             "Title": "Potatoes : the poor man's own crop : illustrated with plates, showing the decay and disease of the potatoe [sic] : with hints to improve the land and life of the poor man : published to aid the Industrial Marlborough Exhibition"
                         }""");
-         expect = new BibEntry(StandardEntryType.Book)
+         expected = new BibEntry(StandardEntryType.Book)
                 .withField(StandardField.TITLE, "Potatoes : the poor man's own crop : illustrated with plates, showing the decay and disease of the potatoe [sic] : with hints to improve the land and life of the poor man : published to aid the Industrial Marlborough Exhibition")
                 .withField(StandardField.AUTHOR, "George, George ")
                 .withField(StandardField.YEAR, "1861")
                 .withField(StandardField.PUBSTATE, "Salisbury")
                 .withField(StandardField.PUBLISHER, "Frederick A. Blake,");
-        assertEquals(expect, fetcher.jsonResultToBibEntry(input));
+        assertEquals(expected, fetcher.jsonResultToBibEntry(input));
 
         input = new JSONObject("""
                 {
@@ -180,12 +167,12 @@ public class BiodiversityLibraryTest {
                             "Genre": "Book",
                             "Title": "The extra cost of producing clean milk."
                         }""");
-        expect = new BibEntry(StandardEntryType.Book)
+        expected = new BibEntry(StandardEntryType.Book)
                 .withField(StandardField.TITLE, "The extra cost of producing clean milk.")
                 .withField(StandardField.AUTHOR, "Whitaker, George M. (George Mason) ")
                 .withField(StandardField.YEAR, "1911")
                 .withField(StandardField.PUBSTATE, "Washington")
                 .withField(StandardField.PUBLISHER, "Government Prining Office,");
-        assertEquals(expect, fetcher.jsonResultToBibEntry(input));
+        assertEquals(expected, fetcher.jsonResultToBibEntry(input));
     }
 }
