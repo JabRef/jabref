@@ -65,7 +65,7 @@ Code was first introduced at [PR#3882](https://github.com/JabRef/jabref/pull/388
 
 The keys are placed into the `build.properties` file.
 
-```
+```groovy
 springerNatureAPIKey=${springerNatureAPIKey}
 ```
 
