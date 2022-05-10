@@ -1,6 +1,7 @@
 package org.jabref.gui.entryeditor;
 
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
@@ -53,7 +54,14 @@ public class DeprecatedFieldsTab extends FieldsEditorTab {
     protected Set<Field> determineFieldsToShow(BibEntry entry) {
         Optional<BibEntryType> entryType = entryTypesManager.enrich(entry.getType(), databaseContext.getMode());
         if (entryType.isPresent()) {
-            return entryType.get().getDeprecatedFields();
+            Set<Field> validDeprecatedFields = new HashSet<>();
+            for (Field field : entryType.get().getDeprecatedFields()) {
+                Optional<String> fieldValue = entry.getField(field);
+                if (fieldValue.isPresent()) {
+                    validDeprecatedFields.add(field);
+                }
+            }
+            return validDeprecatedFields;
         } else {
             // Entry type unknown -> treat all fields as required
             return Collections.emptySet();
