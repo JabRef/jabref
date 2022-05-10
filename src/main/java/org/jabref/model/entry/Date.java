@@ -21,6 +21,18 @@ public class Date {
     static {
         List<String> formatStrings = Arrays.asList(
                 "uuuu-MM-dd'T'HH:mm:ss[xxx][xx][X]",    // covers 2018-10-03T07:24:14+03:00
+                /*
+                 start: fix 8754
+                 */
+                "uuuu-MM-dd'T'HH:mm",   // covers 2018-10-03T07:24
+                "uuuu-MM-dd'T'HH:m",   // covers 2018-10-03T17:2
+                "uuuu-MM-dd'T'H:mm",   // covers 2018-10-03T7:24
+                "uuuu-MM-dd'T'H:m",  // covers 2018-10-03T7:7
+                "uuuu-MM-dd'T'HH",   // covers 2018-10-03T07
+                "uuuu-MM-dd'T'H",    // covers 2018-10-03T7
+                /*
+                end
+                 */
                 "uuuu-M-d",                             // covers 2009-1-15
                 "uuuu-M",                               // covers 2009-11
                 "d-M-uuuu",                             // covers 15-1-2012
