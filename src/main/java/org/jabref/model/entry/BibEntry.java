@@ -847,7 +847,6 @@ public class BibEntry implements Cloneable {
         return this;
     }
 
-
     /*
      * Returns user comments (arbitrary text before the entry), if they exist. If not, returns the empty String
      */

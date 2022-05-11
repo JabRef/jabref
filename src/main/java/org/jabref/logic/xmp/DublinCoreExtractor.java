@@ -260,6 +260,7 @@ public class DublinCoreExtractor {
      * <p>
      * The opposite method is {@link DublinCoreExtractor#fillDublinCoreSchema()}
      * </p>
+     *
      * @return The bibEntry extracted from the document information.
      */
     public Optional<BibEntry> extractBibtexEntry() {
@@ -408,6 +409,7 @@ public class DublinCoreExtractor {
             dcSchema.addType(o);
         }
     }
+
     /**
      * Converts the content of the bibEntry to dublin core.
      * <p>
