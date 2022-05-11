@@ -102,7 +102,7 @@ public class UnlinkedFilesCrawler extends BackgroundTask<FileNodeViewModel> {
         // filter files according to last edited date.
         List<Path> filteredFiles = new ArrayList<Path>();
         for (Path path : files) {
-            if (FileFilterUtils.filterByDate(path, dateFilter) && FileFilterUtils.filterByFileExtension(path)) {
+            if (FileFilterUtils.filterByDate(path, dateFilter) && FileFilterUtils.filterByFileExtension(path)&&FileFilterUtils.filterByFileName(path)) {
                 filteredFiles.add(path);
             }
         }

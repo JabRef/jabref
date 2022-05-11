@@ -92,6 +92,11 @@ public class FileFilterUtils {
 
         return true;
     }
+    public static boolean filterByFileName(Path path) {
+        if (FILEIGNORESET.contains(path.getFileName().toString())){
+            return false;}
+        return true;
+        }
 
     /* Sorts a list of Path objects according to the last edited date
      * of their corresponding files, from newest to oldest. */

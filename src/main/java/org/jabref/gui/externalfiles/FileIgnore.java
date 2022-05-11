@@ -26,7 +26,10 @@ public class FileIgnore {
                     IgnoreFileSet.add(line.substring(2));
                 }else if (line != null && line.length() > 1 && line.charAt(0) == '.'){
                     IgnoreFileSet.add(line.substring(1));
+                }else if (line != null && line.length() > 1 &&(!line.contains("/"))){
+                    IgnoreFileSet.add(line);
                 }
+
             }
         } catch (IOException e) {
             LOGGER.error("No such file.");
