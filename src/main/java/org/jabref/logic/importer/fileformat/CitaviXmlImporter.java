@@ -13,6 +13,7 @@ import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -43,7 +44,7 @@ public class CitaviXmlImporter extends Importer implements Parser {
 
     @Override
     public String getName() {
-        return "Citavi";
+        return "Citavi XML";
     }
 
     @Override
@@ -69,25 +70,24 @@ public class CitaviXmlImporter extends Importer implements Parser {
 
     @Override
     public boolean isRecognizedFormat(Path filePath) throws IOException {
-//        String str;
-//        int i = 0;
-//        while (((str = reader.readLine()) != null) && (i < 50)) {
-//            if (str.toLowerCase(Locale.ENGLISH).contains("<records>")) {
-//                return true;
-//            }
-//
-//            i++;
-//        }
-//        return false;
         BufferedReader reader = getReaderFromZip(filePath);
 
-        // todo recognized logic
-        return true;
+        String str;
+        int i = 0;
+        while (((str = reader.readLine()) != null) && (i < 50)) {
+            if (str.toLowerCase(Locale.ENGLISH).contains("<ProjectSettings>")) {
+                return true;
+            }
+
+            i++;
+        }
+        return false;
     }
 
     @Override
     public ParserResult importDatabase(Path filePath) throws IOException {
         BufferedReader reader = getReaderFromZip(filePath);
+        Objects.requireNonNull(reader);
 
         List<BibEntry> bibEntries = new ArrayList<>();
 
