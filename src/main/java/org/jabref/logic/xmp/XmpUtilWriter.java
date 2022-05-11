@@ -35,6 +35,12 @@ import org.apache.xmpbox.xml.XmpSerializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Writes given BibEntries into the XMP part of a PDF file.
+ *
+ * The conversion of a BibEntry to the XMP data (using Dublin Core) is done at
+ * {@link DublinCoreExtractor#fillDublinCoreSchema()}
+ */
 public class XmpUtilWriter {
 
     private static final String XMP_BEGIN_END_TAG = "?xpacket";

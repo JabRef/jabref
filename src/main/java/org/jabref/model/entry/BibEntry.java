@@ -835,6 +835,19 @@ public class BibEntry implements Cloneable {
         return this;
     }
 
+    public BibEntry withDate(Date date) {
+        setDate(date);
+        this.setChanged(false);
+        return this;
+    }
+
+    public BibEntry withMonth(Month parsedMonth) {
+        setMonth(parsedMonth);
+        this.setChanged(false);
+        return this;
+    }
+
+
     /*
      * Returns user comments (arbitrary text before the entry), if they exist. If not, returns the empty String
      */

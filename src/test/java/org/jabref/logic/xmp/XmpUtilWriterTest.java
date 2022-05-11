@@ -2,11 +2,13 @@ package org.jabref.logic.xmp;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.Arrays;
 import java.util.List;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import javax.xml.transform.TransformerException;
 
+import org.jabref.logic.bibtex.comparator.IdComparator;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.Date;
 import org.jabref.model.entry.Month;
@@ -29,70 +31,56 @@ import static org.mockito.Mockito.when;
 
 class XmpUtilWriterTest {
 
-    private static BibEntry olly2018;
-    private static BibEntry toral2006;
-    private static BibEntry vapnik2000;
+    private final BibEntry olly2018 = new BibEntry(StandardEntryType.Article)
+            .withCitationKey("Olly2018")
+            .withField(StandardField.AUTHOR, "Olly and Johannes")
+            .withField(StandardField.TITLE, "Stefan's palace")
+            .withField(StandardField.JOURNAL, "Test Journal")
+            .withField(StandardField.VOLUME, "1")
+            .withField(StandardField.NUMBER, "1")
+            .withField(StandardField.PAGES, "1-2")
+            .withMonth(Month.MARCH)
+            .withField(StandardField.ISSN, "978-123-123")
+            .withField(StandardField.NOTE, "NOTE")
+            .withField(StandardField.ABSTRACT, "ABSTRACT")
+            .withField(StandardField.COMMENT, "COMMENT")
+            .withField(StandardField.DOI, "10/3212.3123")
+            .withField(StandardField.FILE, ":article_dublinCore.pdf:PDF")
+            .withField(StandardField.GROUPS, "NO")
+            .withField(StandardField.HOWPUBLISHED, "online")
+            .withField(StandardField.KEYWORDS, "k1, k2")
+            .withField(StandardField.OWNER, "me")
+            .withField(StandardField.REVIEW, "review")
+            .withField(StandardField.URL, "https://www.olly2018.edu");
+    ;
+    private final BibEntry toral2006 = new BibEntry(StandardEntryType.InProceedings)
+            .withField(StandardField.AUTHOR, "Antonio Toral and Rafael Munoz")
+            .withField(StandardField.TITLE, "A proposal to automatically build and maintain gazetteers for Named Entity Recognition by using Wikipedia")
+            .withField(StandardField.BOOKTITLE, "Proceedings of EACL")
+            .withField(StandardField.PAGES, "56--61")
+            .withField(StandardField.EPRINTTYPE, "asdf")
+            .withField(StandardField.OWNER, "Ich")
+            .withField(StandardField.URL, "www.url.de");
+    private final BibEntry vapnik2000 = new BibEntry(StandardEntryType.Book)
+            .withCitationKey("vapnik2000")
+            .withField(StandardField.TITLE, "The Nature of Statistical Learning Theory")
+            .withField(StandardField.PUBLISHER, "Springer Science + Business Media")
+            .withField(StandardField.AUTHOR, "Vladimir N. Vapnik")
+            .withField(StandardField.DOI, "10.1007/978-1-4757-3264-1")
+            .withField(StandardField.OWNER, "Ich")
+            .withField(StandardField.LANGUAGE, "English, Japanese")
+            .withDate(new Date(2000, 5))
+            .withField(new UnknownField(DC_COVERAGE), "coverageField")
+            .withField(new UnknownField((DC_SOURCE)), "JabRef")
+            .withField(new UnknownField(DC_RIGHTS), "Right To X");
     private XmpPreferences xmpPreferences;
 
-    private void initBibEntries() {
-        olly2018 = new BibEntry(StandardEntryType.Article);
-        olly2018.setCitationKey("Olly2018");
-        olly2018.setField(StandardField.AUTHOR, "Olly and Johannes");
-        olly2018.setField(StandardField.TITLE, "Stefan's palace");
-        olly2018.setField(StandardField.JOURNAL, "Test Journal");
-        olly2018.setField(StandardField.VOLUME, "1");
-        olly2018.setField(StandardField.NUMBER, "1");
-        olly2018.setField(StandardField.PAGES, "1-2");
-        olly2018.setMonth(Month.MARCH);
-        olly2018.setField(StandardField.ISSN, "978-123-123");
-        olly2018.setField(StandardField.NOTE, "NOTE");
-        olly2018.setField(StandardField.ABSTRACT, "ABSTRACT");
-        olly2018.setField(StandardField.COMMENT, "COMMENT");
-        olly2018.setField(StandardField.DOI, "10/3212.3123");
-        olly2018.setField(StandardField.FILE, ":article_dublinCore.pdf:PDF");
-        olly2018.setField(StandardField.GROUPS, "NO");
-        olly2018.setField(StandardField.HOWPUBLISHED, "online");
-        olly2018.setField(StandardField.KEYWORDS, "k1, k2");
-        olly2018.setField(StandardField.OWNER, "me");
-        olly2018.setField(StandardField.REVIEW, "review");
-        olly2018.setField(StandardField.URL, "https://www.olly2018.edu");
-
-        toral2006 = new BibEntry(StandardEntryType.InProceedings);
-        toral2006.setField(StandardField.AUTHOR, "Toral, Antonio and Munoz, Rafael");
-        toral2006.setField(StandardField.TITLE, "A proposal to automatically build and maintain gazetteers for Named Entity Recognition by using Wikipedia");
-        toral2006.setField(StandardField.BOOKTITLE, "Proceedings of EACL");
-        toral2006.setField(StandardField.PAGES, "56--61");
-        toral2006.setField(StandardField.EPRINTTYPE, "asdf");
-        toral2006.setField(StandardField.OWNER, "Ich");
-        toral2006.setField(StandardField.URL, "www.url.de");
-
-        vapnik2000 = new BibEntry(StandardEntryType.Book);
-        vapnik2000.setCitationKey("vapnik2000");
-        vapnik2000.setField(StandardField.TITLE, "The Nature of Statistical Learning Theory");
-        vapnik2000.setField(StandardField.PUBLISHER, "Springer Science + Business Media");
-        vapnik2000.setField(StandardField.AUTHOR, "Vladimir N. Vapnik");
-        vapnik2000.setField(StandardField.DOI, "10.1007/978-1-4757-3264-1");
-        vapnik2000.setField(StandardField.OWNER, "Ich");
-        vapnik2000.setField(StandardField.LANGUAGE, "English, Japanese");
-        vapnik2000.setDate(new Date(2000, 5));
-
-        vapnik2000.setField(new UnknownField(DC_COVERAGE), "coverageField");
-        vapnik2000.setField(new UnknownField((DC_SOURCE)), "JabRef");
-        vapnik2000.setField(new UnknownField(DC_RIGHTS), "Right To X");
-    }
-
-    /**
-     * Create a temporary PDF-file with a single empty page.
-     */
     @BeforeEach
     void setUp() {
         xmpPreferences = mock(XmpPreferences.class);
+        when(xmpPreferences.getKeywordSeparator()).thenReturn(',');
         // The code assumes privacy filters to be off
         when(xmpPreferences.shouldUseXmpPrivacyFilter()).thenReturn(false);
-
-        when(xmpPreferences.getKeywordSeparator()).thenReturn(',');
-
-        this.initBibEntries();
     }
 
     /**
@@ -115,25 +103,42 @@ class XmpUtilWriterTest {
         BibEntry entryWritten = entriesWritten.get(0);
         entryWritten.clearField(StandardField.FILE);
 
-        // compare the two entries
-        assertEquals(entry, entryWritten);
+        assertEquals(List.of(entry), entriesWritten);
+    }
+
+    @Test
+    void testWriteTwoBibEntries(@TempDir Path tempDir) throws IOException, TransformerException {
+        Path pdfFile = this.createDefaultFile("JabRef_writeMultiple.pdf", tempDir);
+        List<BibEntry> entries = List.of(olly2018, toral2006);
+        new XmpUtilWriter().writeXmp(Path.of(pdfFile.toAbsolutePath().toString()), entries, null, xmpPreferences);
+        List<BibEntry> entryList = XmpUtilReader.readXmp(pdfFile.toAbsolutePath(), xmpPreferences);
+
+        // the file field is not written - and the read file field contains the PDF file name
+        // thus, we do not need to compare
+        entries.forEach(entry -> entry.clearField(StandardField.FILE));
+        entryList.forEach(entry -> entry.clearField(StandardField.FILE));
+
+        assertEquals(entries, entryList);
+    }
+
+    @Test
+    void testWriteThreeBibEntries(@TempDir Path tempDir) throws IOException, TransformerException {
+        Path pdfFile = this.createDefaultFile("JabRef_writeMultiple.pdf", tempDir);
+        List<BibEntry> entries = List.of(olly2018, vapnik2000, toral2006);
+        new XmpUtilWriter().writeXmp(Path.of(pdfFile.toAbsolutePath().toString()), entries, null, xmpPreferences);
+        List<BibEntry> entryList = XmpUtilReader.readXmp(pdfFile.toAbsolutePath(), xmpPreferences);
+
+        // the file field is not written - and the read file field contains the PDF file name
+        // thus, we do not need to compare
+        entries.forEach(entry -> entry.clearField(StandardField.FILE));
+        entryList.forEach(entry -> entry.clearField(StandardField.FILE));
+
+        assertEquals(entries, entryList);
     }
 
     /**
-     * Test, which writes multiple metadata entries to a PDF and reads them again to test the size.
+     * Creates a temporary PDF-file with a single empty page.
      */
-    @Test
-    void testWriteMultipleBibEntries(@TempDir Path tempDir) throws IOException, TransformerException {
-        Path pdfFile = this.createDefaultFile("JabRef_writeMultiple.pdf", tempDir);
-
-        List<BibEntry> entries = Arrays.asList(olly2018, vapnik2000, toral2006);
-
-        XmpUtilWriter.writeXmp(Path.of(pdfFile.toAbsolutePath().toString()), entries, null, xmpPreferences);
-
-        List<BibEntry> entryList = XmpUtilReader.readXmp(Path.of(pdfFile.toAbsolutePath().toString()), xmpPreferences);
-        assertEquals(3, entryList.size());
-    }
-
     private Path createDefaultFile(String fileName, Path tempDir) throws IOException {
         // create a default PDF
         Path pdfFile = tempDir.resolve(fileName);
@@ -142,7 +147,6 @@ class XmpUtilWriterTest {
             pdf.addPage(new PDPage());
             pdf.save(pdfFile.toAbsolutePath().toString());
         }
-
         return pdfFile;
     }
 }
