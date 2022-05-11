@@ -63,9 +63,7 @@ public class XmpUtilWriter {
     public void writeXmp(Path file, BibEntry entry,
                                 BibDatabase database, XmpPreferences xmpPreferences)
         throws IOException, TransformerException {
-        List<BibEntry> bibEntryList = new ArrayList<>();
-        bibEntryList.add(entry);
-        writeXmp(file, bibEntryList, database, xmpPreferences);
+        writeXmp(file, List.of(entry), database, xmpPreferences);
     }
 
     /**
@@ -80,9 +78,7 @@ public class XmpUtilWriter {
      */
     private void writeToDCSchema(DublinCoreSchema dcSchema, BibEntry entry, BibDatabase database,
                                         XmpPreferences xmpPreferences) {
-
         BibEntry resolvedEntry = getDefaultOrDatabaseEntry(entry, database);
-
         writeToDCSchema(dcSchema, resolvedEntry, xmpPreferences);
     }
 
