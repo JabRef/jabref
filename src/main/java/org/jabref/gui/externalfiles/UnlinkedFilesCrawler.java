@@ -66,7 +66,7 @@ public class UnlinkedFilesCrawler extends BackgroundTask<FileNodeViewModel> {
      * 'state' must be set to 1, to keep the recursion running. When the states value changes, the method will resolve
      * its recursion and return what it has saved so far.
      * <br>
-     * The files are filtered according to the {@link DateRange} filter value 
+     * The files are filtered according to the {@link DateRange} filter value
      * and then sorted according to the {@link ExternalFileSorter} value.
      *
      * @throws IOException if directory is not a directory or empty
@@ -102,7 +102,7 @@ public class UnlinkedFilesCrawler extends BackgroundTask<FileNodeViewModel> {
         // filter files according to last edited date.
         List<Path> filteredFiles = new ArrayList<Path>();
         for (Path path : files) {
-            if (FileFilterUtils.filterByDate(path, dateFilter)) {
+            if (FileFilterUtils.filterByDate(path, dateFilter) && FileFilterUtils.filterByFileExtension(path)) {
                 filteredFiles.add(path);
             }
         }
