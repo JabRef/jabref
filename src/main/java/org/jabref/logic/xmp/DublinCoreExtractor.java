@@ -49,7 +49,6 @@ public class DublinCoreExtractor {
     public DublinCoreExtractor(DublinCoreSchema dcSchema, XmpPreferences xmpPreferences, BibEntry resolvedEntry) {
         this.dcSchema = dcSchema;
         this.xmpPreferences = xmpPreferences;
-
         this.bibEntry = resolvedEntry;
     }
 
@@ -447,8 +446,12 @@ public class DublinCoreExtractor {
                     case LANGUAGE:
                         this.fillLanguages(field.getValue());
                         break;
+                    case FILE:
+                        // we do not write the "file" field, because the file is the PDF itself
+                        break;
                     case DAY:
                     case MONTH:
+                        // we do not write day and month separately if dc:year can be used
                         if (hasStandardYearField) {
                             break;
                         }
