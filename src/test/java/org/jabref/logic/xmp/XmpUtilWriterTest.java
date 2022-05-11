@@ -99,7 +99,7 @@ class XmpUtilWriterTest {
         new XmpUtilWriter().writeXmp(pdfFile.toAbsolutePath(), entry, null, xmpPreferences);
 
         // read entry again
-        List<BibEntry> entriesWritten = XmpUtilReader.readXmp(pdfFile.toAbsolutePath().toString(), xmpPreferences);
+        List<BibEntry> entriesWritten = new XmpUtilReader().readXmp(pdfFile, xmpPreferences);
         BibEntry entryWritten = entriesWritten.get(0);
         entryWritten.clearField(StandardField.FILE);
 
@@ -111,7 +111,7 @@ class XmpUtilWriterTest {
         Path pdfFile = this.createDefaultFile("JabRef_writeMultiple.pdf", tempDir);
         List<BibEntry> entries = List.of(olly2018, toral2006);
         new XmpUtilWriter().writeXmp(Path.of(pdfFile.toAbsolutePath().toString()), entries, null, xmpPreferences);
-        List<BibEntry> entryList = XmpUtilReader.readXmp(pdfFile.toAbsolutePath(), xmpPreferences);
+        List<BibEntry> entryList = new XmpUtilReader().readXmp(pdfFile.toAbsolutePath(), xmpPreferences);
 
         // the file field is not written - and the read file field contains the PDF file name
         // thus, we do not need to compare
@@ -126,7 +126,7 @@ class XmpUtilWriterTest {
         Path pdfFile = this.createDefaultFile("JabRef_writeMultiple.pdf", tempDir);
         List<BibEntry> entries = List.of(olly2018, vapnik2000, toral2006);
         new XmpUtilWriter().writeXmp(Path.of(pdfFile.toAbsolutePath().toString()), entries, null, xmpPreferences);
-        List<BibEntry> entryList = XmpUtilReader.readXmp(pdfFile.toAbsolutePath(), xmpPreferences);
+        List<BibEntry> entryList = new XmpUtilReader().readXmp(pdfFile.toAbsolutePath(), xmpPreferences);
 
         // the file field is not written - and the read file field contains the PDF file name
         // thus, we do not need to compare
