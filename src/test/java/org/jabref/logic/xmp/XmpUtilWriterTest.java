@@ -108,7 +108,7 @@ class XmpUtilWriterTest {
         entry.setId("ID4711");
 
         // write the changed bib entry to the PDF
-        XmpUtilWriter.writeXmp(pdfFile.toAbsolutePath().toString(), entry, null, xmpPreferences);
+        new XmpUtilWriter().writeXmp(pdfFile.toAbsolutePath(), entry, null, xmpPreferences);
 
         // read entry again
         List<BibEntry> entriesWritten = XmpUtilReader.readXmp(pdfFile.toAbsolutePath().toString(), xmpPreferences);
