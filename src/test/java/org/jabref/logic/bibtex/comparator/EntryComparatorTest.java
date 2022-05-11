@@ -14,7 +14,7 @@ class EntryComparatorTest {
     private BibEntry entry2 = new BibEntry();
 
     @Test
-    void recognizeIdenticObjectsAsEqual() {
+    void recognizeIdenticalObjectsAsEqual() {
         BibEntry e2 = entry1;
         assertEquals(0, new EntryComparator(false, false, StandardField.TITLE).compare(entry1, e2));
     }
