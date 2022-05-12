@@ -32,7 +32,7 @@
     <category citation-format="note"/>
     <category field="theology"/>
     <summary>Society of Biblical Literature format with full notes and bibliography</summary>
-    <updated>2021-05-10T14:27:36+00:00</updated>
+    <updated>2021-05-16T18:39:17+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="en-US">
@@ -81,10 +81,30 @@
       <text macro="editor-translator-verb-short-comma"/>
     </group>
   </macro>
+  <macro name="container-author-reviewed-author-and-editor-translator-short">
+    <group delimiter=", ">
+      <choose>
+        <if variable="container-author reviewed-author" match="any">
+          <names variable="container-author reviewed-author" delimiter=", ">
+            <label form="verb-short" suffix=" "/>
+            <name form="short" and="text" delimiter=", "/>
+          </names>
+        </if>
+      </choose>
+      <text macro="editor-translator-verb-short-comma"/>
+    </group>
+  </macro>
   <macro name="secondary-contributors-note">
     <choose>
       <if type="bill book chapter graphic legal_case legislation motion_picture paper-conference report song" match="none">
         <text macro="container-author-reviewed-author-and-editor-translator"/>
+      </if>
+    </choose>
+  </macro>
+  <macro name="secondary-contributors-short">
+    <choose>
+      <if type="bill book chapter graphic legal_case legislation motion_picture paper-conference report song" match="none">
+        <text macro="container-author-reviewed-author-and-editor-translator-short"/>
       </if>
     </choose>
   </macro>
@@ -275,6 +295,19 @@
       <else-if type="bill book graphic legal_case legislation motion_picture report song" match="any">
         <text variable="title" font-style="italic" text-case="title"/>
       </else-if>
+      <else-if variable="reviewed-author">
+        <choose>
+          <if variable="reviewed-title" match="any">
+            <group delimiter=", review of ">
+              <text variable="title" quotes="true" text-case="title"/>
+              <text variable="reviewed-title" font-style="italic" text-case="title"/>
+            </group>
+          </if>
+          <else>
+            <text variable="title" font-style="italic" prefix="review of " text-case="title"/>
+          </else>
+        </choose>
+      </else-if>
       <else>
         <text variable="title" quotes="true" text-case="title"/>
       </else>
@@ -291,6 +324,25 @@
       </if>
       <else-if type="bill book graphic legal_case legislation motion_picture report song" match="any">
         <text variable="title" font-style="italic" text-case="title"/>
+      </else-if>
+      <else-if variable="reviewed-author">
+        <group delimiter=", ">
+          <choose>
+            <if variable="reviewed-title" match="any">
+              <group delimiter=", review of ">
+                <text variable="title" quotes="true" text-case="title"/>
+                <text variable="reviewed-title" font-style="italic" text-case="title"/>
+              </group>
+            </if>
+            <else>
+              <text variable="title" font-style="italic" prefix="Review of " text-case="title"/>
+            </else>
+          </choose>
+          <names variable="reviewed-author">
+            <label form="verb-short" text-case="lowercase" suffix=" "/>
+            <name and="text" delimiter=", "/>
+          </names>
+        </group>
       </else-if>
       <else>
         <text variable="title" quotes="true" text-case="title"/>
@@ -314,6 +366,19 @@
       </if>
       <else-if type="bill book graphic legal_case legislation motion_picture report song" match="any">
         <text variable="title" form="short" font-style="italic" text-case="title"/>
+      </else-if>
+      <else-if variable="reviewed-author">
+        <choose>
+          <if variable="reviewed-title" match="any">
+            <group delimiter=", review of ">
+              <text variable="title" quotes="true" text-case="title"/>
+              <text variable="reviewed-title" font-style="italic" text-case="title"/>
+            </group>
+          </if>
+          <else>
+            <text variable="title" font-style="italic" prefix="review of " text-case="title"/>
+          </else>
+        </choose>
       </else-if>
       <else>
         <text variable="title" form="short" quotes="true" text-case="title"/>
@@ -608,11 +673,51 @@
       </if>
     </choose>
   </macro>
+  <macro name="event-note">
+    <text variable="event"/>
+  </macro>
   <macro name="event">
     <group>
       <text term="presented at" suffix=" "/>
       <text variable="event"/>
     </group>
+  </macro>
+  <macro name="originally-published">
+    <group delimiter=", ">
+      <group delimiter=": ">
+        <text variable="original-publisher-place"/>
+        <text variable="original-publisher"/>
+      </group>
+      <choose>
+        <if is-uncertain-date="original-date">
+          <date variable="original-date" form="numeric" date-parts="year" prefix="[" suffix="?]"/>
+        </if>
+        <else>
+          <date variable="original-date" form="numeric" date-parts="year"/>
+        </else>
+      </choose>
+    </group>
+  </macro>
+  <macro name="reprint-note">
+    <!--needs localization-->
+    <choose>
+      <if variable="original-date issued" match="all">
+        <choose>
+          <!--for whatever reason in notes, when we have both original and new publishers, reprint doesn't appear-->
+          <if variable="original-publisher original-publisher-place" match="none">
+            <text value="repr."/>
+          </if>
+        </choose>
+      </if>
+    </choose>
+  </macro>
+  <macro name="reprint">
+    <!--needs localization-->
+    <choose>
+      <if variable="original-date issued" match="all">
+        <text value="repr." text-case="capitalize-first"/>
+      </if>
+    </choose>
   </macro>
   <macro name="publisher">
     <choose>
@@ -684,8 +789,8 @@
                   </if>
                   <else>
                     <group delimiter=" ">
-                        <label variable="locator" form="short"/>
-                        <text variable="locator"/>
+                      <label variable="locator" form="short"/>
+                      <text variable="locator"/>
                     </group>
                   </else>
                 </choose>
@@ -812,16 +917,23 @@
         <group prefix=" (" suffix=")">
           <group delimiter=", ">
             <group delimiter=" ">
-              <choose>
-                <if variable="title" match="none"/>
-                <else-if type="thesis speech" match="any">
-                  <text variable="genre"/>
-                </else-if>
-              </choose>
-              <text macro="event"/>
+              <text macro="event-note"/>
+              <group delimiter="">
+                <text macro="originally-published" suffix="; "/>
+                <group delimiter=", ">
+                  <text macro="reprint-note"/>
+                  <text macro="publisher"/>
+                  <choose>
+                    <if variable="title" match="none"/>
+                    <else-if type="thesis speech" match="any">
+                      <text variable="genre"/>
+                    </else-if>
+                  </choose>
+                  <text macro="event"/>
+                </group>
+                <text macro="issued" prefix=", "/>
+              </group>
             </group>
-            <text macro="publisher"/>
-            <text macro="issued"/>
           </group>
         </group>
       </else-if>
@@ -853,7 +965,13 @@
               <text variable="genre" text-case="capitalize-first"/>
             </if>
           </choose>
-          <text macro="publisher"/>
+          <group delimiter=". ">
+            <text macro="originally-published"/>
+            <group delimiter=", ">
+              <text macro="reprint"/>
+              <text macro="publisher"/>
+            </group>
+          </group>
           <text macro="issued"/>
         </group>
       </else-if>
@@ -872,7 +990,14 @@
           <text macro="archive-note"/>
         </else-if>
       </choose>
-      <text variable="URL"/>
+      <choose>
+        <if variable="DOI">
+          <text variable="DOI" prefix="https://doi.org/"/>
+        </if>
+        <else>
+          <text variable="URL"/>
+        </else>
+      </choose>
     </group>
   </macro>
   <macro name="access">
@@ -885,7 +1010,14 @@
           <text macro="archive"/>
         </else-if>
       </choose>
-      <text variable="URL"/>
+      <choose>
+        <if variable="DOI">
+          <text variable="DOI" prefix="https://doi.org/"/>
+        </if>
+        <else>
+          <text variable="URL"/>
+        </else>
+      </choose>
     </group>
   </macro>
   <macro name="unsigned-dictionary-note">
@@ -897,7 +1029,7 @@
         <text variable="collection-number" prefix=" "/>
       </group>
       <group delimiter=" ">
-        <text term="sub verbo" form="short"/>
+        <text term="sub-verbo" form="short"/>
         <text variable="title" text-case="title" quotes="true"/>
       </group>
     </group>
@@ -970,7 +1102,10 @@
         <else-if position="subsequent">
           <group delimiter=", ">
             <text macro="contributors-short"/>
-            <text macro="title-short"/>
+            <group>
+              <text macro="title-short"/>
+              <text macro="secondary-contributors-short" prefix=" (" suffix=")"/>
+            </group>
             <text macro="disambiguate-chapter"/>
             <text macro="point-locators-subsequent"/>
           </group>
@@ -1010,7 +1145,7 @@
   <bibliography hanging-indent="true" et-al-min="10" et-al-use-first="9" subsequent-author-substitute="&#8212;&#8212;&#8212;" entry-spacing="0">
     <sort>
       <key macro="contributors-sort"/>
-      <key variable="title"/>
+      <key macro="title"/>
       <key variable="genre"/>
     </sort>
     <layout suffix=".">

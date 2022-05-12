@@ -1,6 +1,7 @@
 package org.jabref.gui.edit;
 
 import javafx.scene.control.TextInputControl;
+import javafx.scene.web.WebView;
 
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.StateManager;
@@ -56,11 +57,11 @@ public class EditAction extends SimpleCommand {
                     case DELETE_ENTRY -> textInput.deleteNextChar();
                     default -> throw new IllegalStateException("Only cut/copy/paste supported in TextInputControl but got " + action);
                 }
-
-            } else if (!(focusOwner instanceof CodeArea)) {
-
+            } else if ((focusOwner instanceof CodeArea) || (focusOwner instanceof WebView)) {
+                return;
+            } else {
                 LOGGER.debug("Else: {}", focusOwner.getClass().getSimpleName());
-                // Not sure what is selected -> copy/paste/cut selected entries
+                // Not sure what is selected -> copy/paste/cut selected entries except for Preview and CodeArea
 
                 // ToDo: Should be handled by BibDatabaseContext instead of LibraryTab
                 switch (action) {

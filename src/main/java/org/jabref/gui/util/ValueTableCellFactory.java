@@ -3,6 +3,7 @@ package org.jabref.gui.util;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
+import javafx.beans.binding.BooleanExpression;
 import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.control.ContextMenu;
@@ -27,6 +28,8 @@ public class ValueTableCellFactory<S, T> implements Callback<TableColumn<S, T>, 
     private Function<T, String> toText;
     private BiFunction<S, T, Node> toGraphic;
     private BiFunction<S, T, EventHandler<? super MouseEvent>> toOnMouseClickedEvent;
+    private Function<T, BooleanExpression> toDisableExpression;
+    private Function<T, BooleanExpression> toVisibleExpression;
     private BiFunction<S, T, String> toTooltip;
     private Function<T, ContextMenu> contextMenuFactory;
     private BiFunction<S, T, ContextMenu> menuFactory;
@@ -66,6 +69,16 @@ public class ValueTableCellFactory<S, T> implements Callback<TableColumn<S, T>, 
         return this;
     }
 
+    public ValueTableCellFactory<S, T> withDisableExpression(Function<T, BooleanExpression> toDisableBinding) {
+        this.toDisableExpression = toDisableBinding;
+        return this;
+    }
+
+    public ValueTableCellFactory<S, T> withVisibleExpression(Function<T, BooleanExpression> toVisibleBinding) {
+        this.toVisibleExpression = toVisibleBinding;
+        return this;
+    }
+
     public ValueTableCellFactory<S, T> withContextMenu(Function<T, ContextMenu> contextMenuFactory) {
         this.contextMenuFactory = contextMenuFactory;
         return this;
@@ -79,7 +92,6 @@ public class ValueTableCellFactory<S, T> implements Callback<TableColumn<S, T>, 
     @Override
     public TableCell<S, T> call(TableColumn<S, T> param) {
         return new TableCell<>() {
-
             @Override
             protected void updateItem(T item, boolean empty) {
                 super.updateItem(item, empty);
@@ -136,6 +148,14 @@ public class ValueTableCellFactory<S, T> implements Callback<TableColumn<S, T>, 
                             }
                         }
                     });
+
+                    if (toDisableExpression != null) {
+                        disableProperty().bind(toDisableExpression.apply(item));
+                    }
+
+                    if (toVisibleExpression != null) {
+                        visibleProperty().bind(toVisibleExpression.apply(item));
+                    }
                 }
             }
         };

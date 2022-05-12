@@ -1,10 +1,11 @@
 package org.jabref.logic.crawler;
 
 import java.net.URL;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
+
+import javafx.collections.FXCollections;
 
 import org.jabref.logic.bibtex.FieldContentFormatterPreferences;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
@@ -12,11 +13,12 @@ import org.jabref.logic.citationkeypattern.GlobalCitationKeyPattern;
 import org.jabref.logic.exporter.SavePreferences;
 import org.jabref.logic.git.SlrGitHandler;
 import org.jabref.logic.importer.ImportFormatPreferences;
-import org.jabref.logic.preferences.TimestampPreferences;
+import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.metadata.SaveOrderConfig;
 import org.jabref.model.util.DummyFileUpdateMonitor;
+import org.jabref.preferences.GeneralPreferences;
 
 import org.eclipse.jgit.api.Git;
 import org.junit.jupiter.api.Test;
@@ -35,31 +37,38 @@ class CrawlerTest {
     @TempDir
     Path tempRepositoryDirectory;
     ImportFormatPreferences importFormatPreferences;
+    ImporterPreferences importerPreferences;
     SavePreferences savePreferences;
-    TimestampPreferences timestampPreferences;
     BibEntryTypesManager entryTypesManager;
     SlrGitHandler gitHandler = mock(SlrGitHandler.class, Answers.RETURNS_DEFAULTS);
     String hashCodeQuantum = String.valueOf("Quantum".hashCode());
     String hashCodeCloudComputing = String.valueOf("Cloud Computing".hashCode());
 
+    GeneralPreferences generalPreferences = mock(GeneralPreferences.class, Answers.RETURNS_DEEP_STUBS);
+
     @Test
     public void testWhetherAllFilesAreCreated() throws Exception {
         setUp();
-        Crawler testCrawler = new Crawler(getPathToStudyDefinitionFile(), gitHandler, importFormatPreferences, savePreferences, timestampPreferences, entryTypesManager, new DummyFileUpdateMonitor());
+        Crawler testCrawler = new Crawler(getPathToStudyDefinitionFile(),
+                gitHandler,
+                generalPreferences,
+                importFormatPreferences,
+                importerPreferences,
+                savePreferences,
+                entryTypesManager,
+                new DummyFileUpdateMonitor());
 
         testCrawler.performCrawl();
 
         assertTrue(Files.exists(Path.of(tempRepositoryDirectory.toString(), hashCodeQuantum + " - Quantum")));
         assertTrue(Files.exists(Path.of(tempRepositoryDirectory.toString(), hashCodeCloudComputing + " - Cloud Computing")));
 
-        assertTrue(Files.exists(Path.of(tempRepositoryDirectory.toString(), hashCodeQuantum + " - Quantum", "ArXiv.bib")));
-        assertTrue(Files.exists(Path.of(tempRepositoryDirectory.toString(), hashCodeCloudComputing + " - Cloud Computing", "ArXiv.bib")));
-
-        assertTrue(Files.exists(Path.of(tempRepositoryDirectory.toString(), hashCodeQuantum + " - Quantum", "Springer.bib")));
-        assertTrue(Files.exists(Path.of(tempRepositoryDirectory.toString(), hashCodeCloudComputing + " - Cloud Computing", "Springer.bib")));
-
-        assertTrue(Files.exists(Path.of(tempRepositoryDirectory.toString(), hashCodeQuantum + " - Quantum", "result.bib")));
-        assertTrue(Files.exists(Path.of(tempRepositoryDirectory.toString(), hashCodeCloudComputing + " - Cloud Computing", "result.bib")));
+        List<String> filesToAssert = List.of("ArXiv.bib", "Springer.bib", "result.bib", "Medline_PubMed.bib");
+        filesToAssert.forEach(
+                fileName -> {
+                    assertTrue(Files.exists(Path.of(tempRepositoryDirectory.toString(), hashCodeQuantum + " - Quantum", fileName)));
+                    assertTrue(Files.exists(Path.of(tempRepositoryDirectory.toString(), hashCodeCloudComputing + " - Cloud Computing", fileName)));
+                });
         assertTrue(Files.exists(Path.of(tempRepositoryDirectory.toString(), "studyResult.bib")));
     }
 
@@ -85,17 +94,14 @@ class CrawlerTest {
                 ',');
 
         importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        importerPreferences = mock(ImporterPreferences.class);
         savePreferences = mock(SavePreferences.class, Answers.RETURNS_DEEP_STUBS);
-        timestampPreferences = mock(TimestampPreferences.class);
         when(savePreferences.getSaveOrder()).thenReturn(new SaveOrderConfig());
-        when(savePreferences.getEncoding()).thenReturn(null);
         when(savePreferences.takeMetadataSaveOrderInAccount()).thenReturn(true);
         when(savePreferences.getCitationKeyPatternPreferences()).thenReturn(citationKeyPatternPreferences);
-        when(savePreferences.getEncoding()).thenReturn(Charset.defaultCharset());
+        when(importerPreferences.getApiKeys()).thenReturn(FXCollections.emptyObservableSet());
         when(importFormatPreferences.getKeywordSeparator()).thenReturn(',');
         when(importFormatPreferences.getFieldContentFormatterPreferences()).thenReturn(new FieldContentFormatterPreferences());
-        when(importFormatPreferences.isKeywordSyncEnabled()).thenReturn(false);
-        when(importFormatPreferences.getEncoding()).thenReturn(StandardCharsets.UTF_8);
         entryTypesManager = new BibEntryTypesManager();
     }
 

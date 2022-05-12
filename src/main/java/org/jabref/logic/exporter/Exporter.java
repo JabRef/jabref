@@ -1,6 +1,5 @@
 package org.jabref.logic.exporter;
 
-import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
@@ -57,29 +56,28 @@ public abstract class Exporter {
      *
      * @param databaseContext the database to export from
      * @param file            the file to write to
-     * @param encoding        the encoding to use
      * @param entries         a list containing all entries that should be exported
      */
-    public abstract void export(BibDatabaseContext databaseContext, Path file, Charset encoding, List<BibEntry> entries) throws Exception;
+    public abstract void export(BibDatabaseContext databaseContext, Path file, List<BibEntry> entries) throws Exception;
 
     /**
      * Exports to all files linked to a given entry
+     *
      * @param databaseContext   the database to export from
-     * @param encoding          the encoding to use
      * @param filePreferences   the filePreferences to use for resolving paths
      * @param entryToWriteOn    the entry for which we want to write on all linked pdfs
      * @param entriesToWrite    the content that we want to export to the pdfs
      * @return whether any file was written on
      * @throws Exception if the writing fails
      */
-    public boolean exportToAllFilesOfEntry(BibDatabaseContext databaseContext, Charset encoding, FilePreferences filePreferences, BibEntry entryToWriteOn, List<BibEntry> entriesToWrite) throws Exception {
+    public boolean exportToAllFilesOfEntry(BibDatabaseContext databaseContext, FilePreferences filePreferences, BibEntry entryToWriteOn, List<BibEntry> entriesToWrite) throws Exception {
         boolean writtenToAFile = false;
 
         for (LinkedFile file : entryToWriteOn.getFiles()) {
             if (file.getFileType().equals(fileType.getName())) {
                 Optional<Path> filePath = file.findIn(databaseContext, filePreferences);
                 if (filePath.isPresent()) {
-                    export(databaseContext, filePath.get(), encoding, entriesToWrite);
+                    export(databaseContext, filePath.get(), entriesToWrite);
                     writtenToAFile = true;
                 }
             }
@@ -93,15 +91,15 @@ public abstract class Exporter {
      * Behaviour in case the file is linked to different bib-entries depends on the implementation of {@link #export}.
      * If it overwrites any existing information, only the last found bib-entry will be exported (as the previous exports are overwritten).
      * If it extends existing information, all found bib-entries will be exported.
+     *
      * @param databaseContext   the database-context to export from
      * @param dataBase          the database to export from
-     * @param encoding          the encoding to use
      * @param filePreferences   the filePreferences to use for resolving paths
      * @param filePath          the path to the file we want to write on
      * @return whether the file was written on at least once
      * @throws Exception if the writing fails
      */
-    public boolean exportToFileByPath(BibDatabaseContext databaseContext, BibDatabase dataBase, Charset encoding, FilePreferences filePreferences, Path filePath) throws Exception {
+    public boolean exportToFileByPath(BibDatabaseContext databaseContext, BibDatabase dataBase, FilePreferences filePreferences, Path filePath) throws Exception {
         if (!Files.exists(filePath)) {
             return false;
         }
@@ -111,7 +109,7 @@ public abstract class Exporter {
                 if (linkedFile.getFileType().equals(fileType.getName())) {
                     Optional<Path> linkedFilePath = linkedFile.findIn(databaseContext.getFileDirectories(filePreferences));
                     if (!linkedFilePath.isEmpty() && Files.exists(linkedFilePath.get()) && Files.isSameFile(linkedFilePath.get(), filePath)) {
-                        export(databaseContext, filePath, encoding, Arrays.asList((entry)));
+                        export(databaseContext, filePath, Arrays.asList((entry)));
                         writtenABibEntry = true;
                     }
                 }

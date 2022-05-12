@@ -9,13 +9,16 @@
     <author>
       <name>Sebastian Karcher</name>
     </author>
+    <contributor>
+      <name>Frédéric Chevalier</name>
+    </contributor>
     <category citation-format="numeric"/>
     <category field="medicine"/>
     <category field="science"/>
     <issn>1946-6234</issn>
     <eissn>1946-6242</eissn>
     <summary>The style for the Science journal style: Science Translational Medicine</summary>
-    <updated>2012-09-27T22:06:38+00:00</updated>
+    <updated>2021-11-30T22:46:40-06:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <macro name="editor">
@@ -145,7 +148,7 @@
             <text macro="editor" prefix=" "/>
           </group>
           <group prefix=" ">
-            <text macro="title" suffix=", "/>
+            <text macro="title" suffix=". "/>
             <text form="short" variable="container-title" font-style="italic" suffix=" "/>
             <text variable="volume" font-weight="bold"/>
             <text variable="page" prefix=", "/>

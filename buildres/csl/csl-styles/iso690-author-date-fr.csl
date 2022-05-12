@@ -24,7 +24,7 @@
     <category citation-format="author-date"/>
     <category field="generic-base"/>
     <summary>Style based on ISO 690:2010(F), V1.1</summary>
-    <updated>2020-11-19T21:30:00+00:00</updated>
+    <updated>2022-03-21T10:00:00+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale>
@@ -127,7 +127,7 @@
       <if type="book thesis map motion_picture song manuscript" match="any">
         <choose>
           <if variable="author editor translator" match="any">
-            <text variable="title" font-style="italic"/>
+            <text variable="title" font-style="italic" suffix=". "/>
           </if>
           <else>
             <text variable="title" font-style="italic" suffix=", "/>
@@ -162,10 +162,10 @@
         </choose>
         <choose>
           <if variable="container-title">
-            <text variable="container-title" font-style="italic"/>
+            <text variable="container-title" font-style="italic" suffix="."/>
           </if>
           <else>
-            <text variable="event" font-style="italic"/>
+            <text variable="event" font-style="italic" suffix="."/>
           </else>
         </choose>
       </else-if>
@@ -185,7 +185,7 @@
       <else-if type="patent">
         <choose>
           <if variable="author editor translator" match="any">
-            <text variable="title"/>
+            <text variable="title" suffix="."/>
           </if>
           <else>
             <text variable="title" suffix=", "/>
@@ -313,12 +313,16 @@
   </macro>
   <macro name="url">
     <choose>
-      <if variable="URL">
-        <group>
-          <text term="retrieved" suffix=" " text-case="capitalize-first"/>
-          <text term="from" suffix="&#160;: "/>
-          <text variable="URL"/>
-        </group>
+      <if variable="DOI" match="none">
+        <choose>
+          <if variable="URL">
+            <group>
+              <text term="retrieved" suffix=" " text-case="capitalize-first"/>
+              <text term="from" suffix=": "/>
+              <text variable="URL"/>
+            </group>
+          </if>
+        </choose>
       </if>
     </choose>
   </macro>
@@ -462,6 +466,7 @@
             <text macro="accessed" suffix=". "/>
             <text macro="collection" suffix=". "/>
             <text macro="isbn" suffix=". "/>
+            <text macro="doi" suffix=". "/>
             <text macro="url"/>
           </group>
         </else-if>

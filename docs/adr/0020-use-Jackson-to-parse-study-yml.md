@@ -1,3 +1,7 @@
+---
+parent: Architectural Decisions
+nav_order: 20
+---
 # Use Jackson to parse study.yml
 
 ## Context and Problem Statement

@@ -2,34 +2,59 @@ package org.jabref.logic.protectedterms;
 
 import java.util.List;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+
 public class ProtectedTermsPreferences {
 
-    private final List<String> enabledInternalTermLists;
-    private final List<String> enabledExternalTermLists;
-    private final List<String> disabledInternalTermLists;
-    private final List<String> disabledExternalTermLists;
+    private final ObservableList<String> enabledInternalTermLists;
+    private final ObservableList<String> enabledExternalTermLists;
+    private final ObservableList<String> disabledInternalTermLists;
+    private final ObservableList<String> disabledExternalTermLists;
 
-    public ProtectedTermsPreferences(List<String> enabledInternalTermLists, List<String> enabledExternalTermLists,
-                                     List<String> disabledInternalTermLists, List<String> disabledExternalTermLists) {
-        this.enabledInternalTermLists = enabledInternalTermLists;
-        this.disabledInternalTermLists = disabledInternalTermLists;
-        this.enabledExternalTermLists = enabledExternalTermLists;
-        this.disabledExternalTermLists = disabledExternalTermLists;
+    public ProtectedTermsPreferences(List<String> enabledInternalTermLists,
+                                     List<String> enabledExternalTermLists,
+                                     List<String> disabledInternalTermLists,
+                                     List<String> disabledExternalTermLists) {
+        this.enabledInternalTermLists = FXCollections.observableArrayList(enabledInternalTermLists);
+        this.disabledInternalTermLists = FXCollections.observableArrayList(disabledInternalTermLists);
+        this.enabledExternalTermLists = FXCollections.observableArrayList(enabledExternalTermLists);
+        this.disabledExternalTermLists = FXCollections.observableArrayList(disabledExternalTermLists);
     }
 
-    public List<String> getEnabledInternalTermLists() {
+    public ObservableList<String> getEnabledInternalTermLists() {
         return enabledInternalTermLists;
     }
 
-    public List<String> getEnabledExternalTermLists() {
+    public ObservableList<String> getEnabledExternalTermLists() {
         return enabledExternalTermLists;
     }
 
-    public List<String> getDisabledInternalTermLists() {
+    public ObservableList<String> getDisabledInternalTermLists() {
         return disabledInternalTermLists;
     }
 
-    public List<String> getDisabledExternalTermLists() {
+    public ObservableList<String> getDisabledExternalTermLists() {
         return disabledExternalTermLists;
+    }
+
+    public void setEnabledInternalTermLists(List<String> list) {
+        enabledInternalTermLists.clear();
+        enabledInternalTermLists.addAll(list);
+    }
+
+    public void setEnabledExternalTermLists(List<String> list) {
+        enabledExternalTermLists.clear();
+        enabledExternalTermLists.addAll(list);
+    }
+
+    public void setDisabledInternalTermLists(List<String> list) {
+        disabledInternalTermLists.clear();
+        disabledInternalTermLists.addAll(list);
+    }
+
+    public void setDisabledExternalTermLists(List<String> list) {
+        disabledExternalTermLists.clear();
+        disabledExternalTermLists.addAll(list);
     }
 }

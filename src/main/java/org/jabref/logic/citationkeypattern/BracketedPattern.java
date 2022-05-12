@@ -711,13 +711,14 @@ public class BracketedPattern {
      * Gets the last name of the first author/editor
      *
      * @param authorList an {@link AuthorList}
-     * @return the surname of an author/editor or "" if no author was found This method is guaranteed to never return
-     * null.
+     * @return the surname of an author/editor or the von part if no lastname is prsent or ""  if no author was found or both firstname+lastname are empty
+     * This method is guaranteed to never return null.
      */
     private static String firstAuthor(AuthorList authorList) {
         return authorList.getAuthors().stream()
                          .findFirst()
-                         .flatMap(Author::getLast).orElse("");
+                         .flatMap(author -> author.getLast().isPresent() ? author.getLast() : author.getVon())
+                         .orElse("");
     }
 
     /**
@@ -967,7 +968,7 @@ public class BracketedPattern {
         if (numberOfAuthors == 1) {
             author.append(authorList.getAuthor(0).getLast().orElse(""));
         } else if (numberOfAuthors >= 2) {
-            for (int i = 0; i < numberOfAuthors && i < 3; i++) {
+            for (int i = 0; (i < numberOfAuthors) && (i < 3); i++) {
                 author.append(authNofMth(authorList, 1, i + 1));
             }
             if (numberOfAuthors > 3) {
@@ -1004,7 +1005,7 @@ public class BracketedPattern {
      *                   to "" be returned.
      */
     private static String authIniN(AuthorList authorList, int n) {
-        if (n <= 0 || authorList.isEmpty()) {
+        if ((n <= 0) || authorList.isEmpty()) {
             return "";
         }
 
@@ -1233,7 +1234,7 @@ public class BracketedPattern {
                 }
             } else if ((tokenTypes.contains(Institution.SCHOOL)
                     || tokenTypes.contains(Institution.DEPARTMENT))
-                    && institutionNameTokens.length > 1) {
+                    && (institutionNameTokens.length > 1)) {
                 // School is an abbreviation of all the words beginning with a
                 // capital letter excluding: department, school and faculty words.
                 StringBuilder schoolSB = new StringBuilder();

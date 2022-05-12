@@ -25,7 +25,7 @@
       <term name="accessed">consulté le</term>
       <term name="no date">sans date</term>
       <term name="no date" form="short">s.&#160;d.</term>
-      <term name="sub verbo">s.u.</term>
+      <term name="sub-verbo">s.u.</term>
     </terms>
   </locale>
   <macro name="author">
@@ -270,7 +270,7 @@
               </choose>
               <text variable="volume"/>
               <group delimiter=" ">
-                <text term="sub verbo" font-style="italic"/>
+                <text term="sub-verbo" font-style="italic"/>
                 <text macro="title"/>
               </group>
               <text variable="page"/>

@@ -9,7 +9,7 @@ import java.util.Optional;
  */
 public enum Language {
 
-    BAHASA_INDONESIA("Bahasa Indonesia", "in"),
+    BAHASA_INDONESIA("Bahasa Indonesia", "id"),
     BRAZILIAN_PORTUGUESE("Brazilian Portuguese", "pt_BR"),
     DANISH("Dansk", "da"),
     GERMAN("Deutsch", "de"),
@@ -30,7 +30,8 @@ public enum Language {
     VIETNAMESE("Vietnamese", "vi"),
     GREEK("ελληνικά", "el"),
     TAGALOG("Tagalog/Filipino", "tl"),
-    POLISH("Polish", "pl");
+    POLISH("Polish", "pl"),
+    KOREAN("Korean (한국어)", "ko");
 
     private final String displayName;
     private final String id;

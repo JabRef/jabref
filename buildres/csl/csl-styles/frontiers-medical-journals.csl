@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" demote-non-dropping-particle="sort-only" default-locale="en-US">
-  <!-- This style was edited with the Visual CSL Editor (http://editor.citationstyles.org/visualEditor/) -->
   <info>
     <title>Frontiers medical journals</title>
     <id>http://www.zotero.org/styles/frontiers-medical-journals</id>
@@ -16,13 +15,13 @@
     <category citation-format="numeric"/>
     <category field="medicine"/>
     <summary>Style for the Open Access Frontiers in ... Journals</summary>
-    <updated>2014-03-22T17:19:39+00:00</updated>
+    <updated>2021-11-23T11:23:52+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <macro name="editor">
     <names variable="editor" delimiter=", ">
-      <label form="short" prefix=", "/>
-      <name initialize-with=". " delimiter=", " prefix=" "/>
+      <name prefix=" " initialize-with="" name-as-sort-order="all" sort-separator=" "/>
+      <label prefix=", "/>
     </names>
   </macro>
   <macro name="author">
@@ -38,10 +37,9 @@
   <macro name="access">
     <choose>
       <if variable="DOI">
-        <text variable="DOI" prefix="doi:"/>
+        <text variable="DOI" prefix="doi: "/>
       </if>
       <else-if variable="URL">
-        <text value="Available at:" suffix=" "/>
         <text variable="URL"/>
         <group prefix=" [" suffix="]">
           <text term="accessed" text-case="capitalize-first" suffix=" "/>
@@ -99,28 +97,39 @@
       <text variable="citation-number" suffix=". "/>
       <text macro="author" suffix="."/>
       <choose>
-        <if type="bill book graphic legal_case legislation motion_picture report song" match="any">
-          <group delimiter=" " prefix=" ">
+        <if type="bill book graphic legal_case legislation motion_picture report song thesis" match="any">
+          <group delimiter=". " prefix=" " suffix=".">
             <text macro="title"/>
             <text macro="edition"/>
             <text macro="editor"/>
-            <text macro="publisher"/>
-            <date variable="issued" prefix=" (" suffix=").">
-              <date-part name="year"/>
-            </date>
+            <text variable="genre" prefix="[" suffix="]"/>
+            <group delimiter=" ">
+              <text macro="publisher"/>
+              <date variable="issued" prefix="(" suffix=")">
+                <date-part name="year"/>
+              </date>
+            </group>
+            <group delimiter=" ">
+              <text variable="number-of-pages"/>
+              <label plural="never" variable="number-of-pages" form="short"/>
+            </group>
           </group>
         </if>
         <else-if type="chapter paper-conference" match="any">
-          <group delimiter=" " prefix=" ">
+          <group delimiter=". " prefix=" ">
             <text macro="title"/>
-            <text term="in"/>
+            <group delimiter=": ">
+              <text term="in" text-case="capitalize-first"/>
+              <text macro="editor"/>
+            </group>
             <text variable="container-title" font-style="italic"/>
             <text variable="collection-title" suffix="."/>
-          </group>
-          <text macro="editor"/>
-          <group suffix=".">
-            <text macro="publisher" prefix=" (" suffix=")"/>
-            <group prefix=", ">
+            <group delimiter=" ">
+              <text macro="publisher"/>
+              <date date-parts="year" form="text" variable="issued" prefix="(" suffix=")"/>
+            </group>
+            <group delimiter=" ">
+              <label plural="never" variable="page" form="short"/>
               <text variable="page"/>
             </group>
           </group>

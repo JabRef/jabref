@@ -260,8 +260,15 @@
             <text macro="nor-legislation"/>
           </else-if>
           <else-if type="report">
-            <text macro="author-short"/>
-            <text macro="issued"/>
+            <choose>
+              <if variable="author" match="none">
+                <text variable="title"/>
+              </if>
+              <else>
+                <text macro="author-short"/>
+                <text macro="issued"/>
+              </else>
+            </choose>
           </else-if>
           <else>
             <text variable="title"/>
@@ -286,8 +293,10 @@
             <text prefix=", " macro="title"/>
             <text prefix=" " font-style="italic" variable="container-title"/>
             <text prefix=" " macro="issued"/>
-            <text prefix=" " suffix=" " term="page" form="short"/>
-            <text variable="page"/>
+            <group delimiter=" " prefix=" ">
+              <text term="page" form="short"/>
+              <text variable="page"/>
+            </group>
             <text macro="DOI"/>
             <text prefix=" " macro="retrieved-from"/>
           </group>

@@ -68,8 +68,7 @@ public class FileColumn extends MainTableColumn<List<LinkedFile>> {
                                 entry.getEntry(),
                                 database, Globals.TASK_EXECUTOR,
                                 dialogService,
-                                preferencesService.getXmpPreferences(),
-                                preferencesService.getFilePreferences(),
+                                preferencesService,
                                 externalFileTypes);
                         linkedFileViewModel.open();
                     }
@@ -132,8 +131,7 @@ public class FileColumn extends MainTableColumn<List<LinkedFile>> {
                     database,
                     Globals.TASK_EXECUTOR,
                     dialogService,
-                    preferencesService.getXmpPreferences(),
-                    preferencesService.getFilePreferences(),
+                    preferencesService,
                     externalFileTypes);
 
             MenuItem menuItem = new MenuItem(linkedFileViewModel.getTruncatedDescriptionAndLink(),

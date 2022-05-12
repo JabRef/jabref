@@ -9,10 +9,13 @@
       <name>Charles Mercier-Paquin</name>
       <email>charles.mercier.paquin@gmail.com</email>
     </author>
+    <contributor>
+      <name>Brenton M. Wiernik</name>
+    </contributor>
     <category citation-format="note"/>
     <category field="history"/>
     <summary>Le style bibliographique pour citation et références du Département des sciences historiques de l'Université Laval</summary>
-    <updated>2017-10-14T07:50:27+00:00</updated>
+    <updated>2021-11-15T07:50:27+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <macro name="author-bibliography">
@@ -31,7 +34,7 @@
     </names>
   </macro>
   <macro name="editor-bibliography">
-    <names variable="editor">
+    <names variable="editor editorial-director">
       <name and="text" delimiter-precedes-et-al="never" delimiter-precedes-last="never" initialize="false" initialize-with="." name-as-sort-order="first">
         <name-part name="family" text-case="uppercase"/>
         <name-part name="given" text-case="capitalize-first"/>
@@ -40,7 +43,7 @@
     </names>
   </macro>
   <macro name="editor-citation">
-    <names variable="editor">
+    <names variable="editor editorial-director">
       <name and="text" delimiter-precedes-et-al="never" delimiter-precedes-last="never" et-al-min="3" et-al-use-first="1" initialize="false" initialize-with=".">
         <name-part name="given" text-case="capitalize-first"/>
         <name-part name="family" text-case="capitalize-first"/>

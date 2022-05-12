@@ -25,5 +25,4 @@ public class BooktitleCheckerTest {
     void booktitleIsBlank() {
         assertEquals(Optional.empty(), checker.checkValue(" "));
     }
-
 }

@@ -6,13 +6,14 @@ on:
       - gource
   schedule:
     - cron:  '15 3 1 1,4,7,10 *'
+  workflow_dispatch:
 
 jobs:
   action:
     runs-on: ubuntu-latest
     steps:
       - name: 'Checkout'
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0
       - name: Determine dates

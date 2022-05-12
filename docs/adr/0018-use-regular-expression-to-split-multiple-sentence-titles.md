@@ -1,3 +1,7 @@
+---
+parent: Architectural Decisions
+nav_order: 18
+---
 # Use regular expression to split multiple-sentence titles
 
 ## Context and Problem Statement
@@ -8,7 +12,7 @@ Some entry titles are composed of multiple sentences, for example: "Whose Music?
 
 * [Regular expression](https://docs.oracle.com/javase/tutorial/essential/regex/)
 * [OpenNLP](https://opennlp.apache.org/)
-* [ICU4J](http://site.icu-project.org/home)
+* [ICU4J](https://web.archive.org/web/20210413013221/http://site.icu-project.org/home)
 
 ## Decision Outcome
 

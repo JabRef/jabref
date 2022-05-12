@@ -56,15 +56,12 @@ public class CreateModifyExporterDialogViewModel extends AbstractViewModel {
     public ExporterViewModel saveExporter() {
         Path layoutFileDir = Path.of(layoutFile.get()).getParent();
         if (layoutFileDir != null) {
-            String layoutFileDirString = layoutFileDir.toString();
-            preferences.storeImportExportPreferences(
-                    preferences.getImportExportPreferences().withExportWorkingDirectory(Path.of(layoutFileDirString)));
+            preferences.getImportExportPreferences().setExportWorkingDirectory(layoutFileDir);
         }
 
         // Check that there are no empty strings.
         if (layoutFile.get().isEmpty() || name.get().isEmpty() || extension.get().isEmpty()
                 || !layoutFile.get().endsWith(".layout")) {
-
             LOGGER.info("One of the fields is empty or invalid!");
             return null;
         }

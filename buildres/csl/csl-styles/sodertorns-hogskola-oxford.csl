@@ -15,7 +15,7 @@
     <category field="humanities"/>
     <category field="social_science"/>
     <summary>Södertörn University Oxford style without ibid</summary>
-    <updated>2021-02-18T14:14:20+00:00</updated>
+    <updated>2022-01-05T13:45:04+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="sv">
@@ -26,16 +26,6 @@
   <macro name="page-range">
     <label variable="page" form="short" suffix=" "/>
     <text variable="page"/>
-  </macro>
-  <macro name="locator-or-period">
-    <choose>
-      <if variable="locator" match="none">
-        <text value="."/>
-      </if>
-      <else>
-        <text prefix=", " macro="citation-locator" suffix="."/>
-      </else>
-    </choose>
   </macro>
   <macro name="contributors-full">
     <choose>
@@ -51,7 +41,7 @@
           <name name-as-sort-order="all" sort-separator=",&#160;" and="symbol" delimiter=", " delimiter-precedes-last="never">
             <name-part name="family"/>
           </name>
-          <label prefix=" (" form="short" plural="contextual" suffix=")."/>
+          <label prefix=" (" form="short" plural="contextual" suffix=")"/>
         </names>
       </else-if>
       <else-if variable="composer">
@@ -77,7 +67,7 @@
           <name sort-separator=",&#160;" and="symbol" delimiter=", " delimiter-precedes-last="never">
             <name-part name="family"/>
           </name>
-          <label prefix=" (" form="short" plural="contextual" suffix=")."/>
+          <label prefix=" (" form="short" plural="contextual" suffix=")"/>
         </names>
       </else-if>
       <else-if variable="composer">
@@ -103,7 +93,7 @@
           <name sort-separator=",&#160;" and="symbol" delimiter=", " delimiter-precedes-last="never">
             <name-part name="family"/>
           </name>
-          <label prefix=" (" form="short" plural="contextual" suffix=")."/>
+          <label prefix=" (" form="short" plural="contextual" suffix=")"/>
         </names>
       </else-if>
       <else-if variable="composer">
@@ -255,9 +245,11 @@
   <macro name="publisher">
     <choose>
       <if type="book report chapter entry entry-dictionary entry-encyclopedia paper-conference thesis map figure graphic" match="any">
-        <text prefix="(" macro="publisher-place" suffix=": "/>
-        <text macro="printers" suffix=", "/>
-        <text macro="issued-year" suffix=")"/>
+        <group prefix="(" suffix=")">
+          <text macro="publisher-place" suffix=": "/>
+          <text macro="printers" suffix=", "/>
+          <text macro="issued-year"/>
+        </group>
       </if>
       <else>
         <text macro="printers"/>
@@ -327,8 +319,8 @@
       <else-if type="post post-weblog broadcast personal_communication interview manuscript" match="any">
         <date variable="issued">
           <date-part name="day" suffix="/"/>
-          <date-part name="month" suffix=" " form="numeric"/>
-          <date-part name="year"/>
+          <date-part name="month" form="numeric"/>
+          <date-part prefix=" " name="year"/>
         </date>
       </else-if>
       <else>
@@ -339,7 +331,7 @@
     </choose>
   </macro>
   <macro name="citation-locator">
-    <label variable="locator" form="short" suffix="&#160;"/>
+    <label prefix=", " variable="locator" form="short" suffix="&#160;"/>
     <text variable="locator"/>
   </macro>
   <macro name="collection">
@@ -403,13 +395,13 @@
       <text term="accessed" form="short" suffix="&#160;"/>
       <date variable="accessed">
         <date-part name="year" suffix="-"/>
-        <date-part name="month" suffix="-" form="numeric"/>
-        <date-part name="day"/>
+        <date-part name="month" suffix="-" form="numeric-leading-zeros"/>
+        <date-part name="day" form="numeric-leading-zeros"/>
       </date>
     </group>
   </macro>
   <citation et-al-min="20" et-al-use-first="1" disambiguate-add-names="true">
-    <layout delimiter="; ">
+    <layout delimiter="; " suffix=".">
       <choose>
         <if position="subsequent">
           <choose>
@@ -435,7 +427,7 @@
               <text prefix=" " macro="issued-year"/>
             </else>
           </choose>
-          <text macro="locator-or-period"/>
+          <text macro="citation-locator"/>
         </if>
         <else>
           <choose>
@@ -445,7 +437,7 @@
               <text macro="container"/>
               <text prefix=", " variable="volume" text-case="capitalize-first"/>
               <text prefix=" " macro="publisher"/>
-              <text macro="locator-or-period"/>
+              <text macro="citation-locator"/>
             </if>
             <else-if type="book" match="any">
               <text macro="contributors-long" suffix=", "/>
@@ -457,7 +449,7 @@
                 </if>
               </choose>
               <text prefix=" " macro="publisher"/>
-              <text macro="locator-or-period"/>
+              <text macro="citation-locator"/>
             </else-if>
             <else-if type="webpage post post-weblog" match="any">
               <choose>
@@ -475,10 +467,10 @@
                 <if variable="URL" match="any">
                   <text prefix=", " macro="page-range"/>
                   <text prefix=", " macro="identifier"/>
-                  <text prefix=" " macro="quoted" suffix="."/>
+                  <text prefix=" " macro="quoted"/>
                 </if>
                 <else>
-                  <text prefix=", " macro="page-range" suffix="."/>
+                  <text prefix=", " macro="page-range"/>
                 </else>
               </choose>
             </else-if>
@@ -491,10 +483,10 @@
                 <if variable="URL" match="any">
                   <text prefix=", " macro="page-range"/>
                   <text prefix=", " macro="identifier"/>
-                  <text prefix=" " macro="quoted" suffix="."/>
+                  <text prefix=" " macro="quoted"/>
                 </if>
                 <else>
-                  <text prefix=", " macro="page-range" suffix="."/>
+                  <text prefix=", " macro="page-range"/>
                 </else>
               </choose>
             </else-if>
@@ -504,7 +496,7 @@
               <text macro="container"/>
               <text prefix=" " macro="issued"/>
               <text prefix=", doi:" variable="DOI"/>
-              <text macro="locator-or-period"/>
+              <text macro="citation-locator"/>
             </else-if>
             <else-if type="paper-conference speech" match="any">
               <text macro="contributors-long" suffix=", "/>
@@ -518,14 +510,14 @@
                   <text prefix=", doi:" variable="DOI"/>
                 </if>
               </choose>
-              <text macro="locator-or-period"/>
+              <text macro="citation-locator"/>
             </else-if>
             <else-if type="thesis" match="any">
               <text macro="contributors-long" suffix=", "/>
               <text macro="title-long" font-style="italic"/>
               <text prefix=", " macro="genre"/>
               <text prefix=" " macro="publisher"/>
-              <text macro="locator-or-period"/>
+              <text macro="citation-locator"/>
             </else-if>
             <else-if type="report" match="any">
               <text macro="contributors-full" suffix=", "/>
@@ -543,7 +535,7 @@
                   <text prefix=" " macro="quoted"/>
                 </if>
               </choose>
-              <text macro="locator-or-period"/>
+              <text macro="citation-locator"/>
             </else-if>
             <else-if type="map figure graphic" match="any">
               <text macro="contributors-full" suffix=", "/>
@@ -564,11 +556,8 @@
               <choose>
                 <if variable="URL" match="any">
                   <text prefix=", " macro="identifier"/>
-                  <text prefix=" " macro="quoted" suffix="."/>
+                  <text prefix=" " macro="quoted"/>
                 </if>
-                <else>
-                  <text value="."/>
-                </else>
               </choose>
             </else-if>
             <else>
@@ -580,9 +569,9 @@
                 <if variable="URL" match="any">
                   <text prefix=", " macro="issued"/>
                   <text prefix=", " macro="publisher"/>
-                  <text prefix=", " macro="citation-locator"/>
+                  <text macro="citation-locator"/>
                   <text prefix=", " macro="identifier"/>
-                  <text prefix=" " macro="quoted" suffix="."/>
+                  <text prefix=" " macro="quoted"/>
                 </if>
                 <else-if variable="issued" match="none">
                   <choose>
@@ -591,12 +580,9 @@
                     </if>
                   </choose>
                   <choose>
-                    <if variable="locator" match="none">
-                      <text value="."/>
+                    <if variable="locator" match="any">
+                      <text macro="citation-locator"/>
                     </if>
-                    <else>
-                      <text prefix=", " macro="citation-locator" suffix="."/>
-                    </else>
                   </choose>
                 </else-if>
                 <else>
@@ -604,12 +590,9 @@
                   <text prefix=", " macro="issued"/>
                   <text prefix=", " macro="archive"/>
                   <choose>
-                    <if variable="locator" match="none">
-                      <text value="."/>
+                    <if variable="locator" match="any">
+                      <text macro="citation-locator"/>
                     </if>
-                    <else>
-                      <text prefix=", " macro="citation-locator" suffix="."/>
-                    </else>
                   </choose>
                 </else>
               </choose>
@@ -624,7 +607,7 @@
       <key macro="sort-bibliography" names-min="3" names-use-first="3"/>
       <key macro="title-long"/>
     </sort>
-    <layout>
+    <layout suffix=".">
       <choose>
         <if type="chapter entry entry-dictionary entry-encyclopedia" match="any">
           <text macro="contributors-full" suffix=", "/>
@@ -634,7 +617,6 @@
           <text prefix=" " macro="publisher"/>
           <text prefix=", " macro="collection"/>
           <text prefix=", " macro="page-range"/>
-          <text value="."/>
         </if>
         <else-if type="book" match="any">
           <text macro="contributors-full" suffix=", "/>
@@ -645,7 +627,7 @@
               <text prefix=" " term="edition" form="short"/>
             </if>
           </choose>
-          <text prefix=" " macro="publisher" suffix="."/>
+          <text prefix=" " macro="publisher"/>
         </else-if>
         <else-if type="webpage post post-weblog" match="any">
           <choose>
@@ -663,10 +645,10 @@
             <if variable="URL" match="any">
               <text prefix=", " macro="page-range"/>
               <text prefix=", " macro="identifier"/>
-              <text prefix=" " macro="quoted" suffix="."/>
+              <text prefix=" " macro="quoted"/>
             </if>
             <else>
-              <text prefix=", " macro="page-range" suffix="."/>
+              <text prefix=", " macro="page-range"/>
             </else>
           </choose>
         </else-if>
@@ -679,10 +661,10 @@
             <if variable="URL" match="any">
               <text prefix=", " macro="page-range"/>
               <text prefix=", " macro="identifier"/>
-              <text prefix=" " macro="quoted" suffix="."/>
+              <text prefix=" " macro="quoted"/>
             </if>
             <else>
-              <text prefix=", " macro="page-range" suffix="."/>
+              <text prefix=", " macro="page-range"/>
             </else>
           </choose>
         </else-if>
@@ -693,7 +675,6 @@
           <text prefix=" " macro="issued"/>
           <text prefix=", " macro="page-range"/>
           <text prefix=", doi:" variable="DOI"/>
-          <text value="."/>
         </else-if>
         <else-if type="paper-conference speech" match="any">
           <text macro="contributors-full" suffix=", "/>
@@ -705,11 +686,10 @@
           <choose>
             <if variable="DOI" match="any">
               <text prefix=", " macro="page-range"/>
-              <text prefix=", doi:" variable="DOI" suffix="."/>
+              <text prefix=", doi:" variable="DOI"/>
             </if>
             <else>
               <text prefix=", " macro="page-range"/>
-              <text value="."/>
             </else>
           </choose>
         </else-if>
@@ -717,7 +697,7 @@
           <text macro="contributors-full" suffix=", "/>
           <text macro="title-long" font-style="italic"/>
           <text prefix=", " macro="genre"/>
-          <text prefix=" " macro="publisher" suffix="."/>
+          <text prefix=" " macro="publisher"/>
         </else-if>
         <else-if type="report" match="any">
           <text macro="contributors-full" suffix=", "/>
@@ -735,7 +715,6 @@
               <text prefix=" " macro="quoted"/>
             </if>
           </choose>
-          <text value="."/>
         </else-if>
         <else-if type="map figure graphic" match="any">
           <text macro="contributors-full" suffix=", "/>
@@ -756,11 +735,8 @@
           <choose>
             <if variable="URL" match="any">
               <text prefix=", " macro="identifier"/>
-              <text prefix=" " macro="quoted" suffix="."/>
+              <text prefix=" " macro="quoted"/>
             </if>
-            <else>
-              <text value="."/>
-            </else>
           </choose>
         </else-if>
         <else-if type="bill legal_case legislation personal_communication" match="none">
@@ -773,7 +749,7 @@
               <text prefix=", " macro="issued"/>
               <text prefix=", " macro="publisher"/>
               <text prefix=", " macro="identifier"/>
-              <text prefix=" " macro="quoted" suffix="."/>
+              <text prefix=" " macro="quoted"/>
             </if>
             <else-if variable="issued" match="none">
               <choose>
@@ -782,13 +758,11 @@
                 </if>
               </choose>
               <text prefix=", " macro="collection"/>
-              <text value="."/>
             </else-if>
             <else>
               <text prefix=", " macro="publisher"/>
               <text prefix=", " macro="issued"/>
               <text prefix=", " macro="archive"/>
-              <text value="."/>
             </else>
           </choose>
         </else-if>

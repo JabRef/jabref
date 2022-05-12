@@ -1,22 +1,17 @@
 package org.jabref.logic.importer.fileformat;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.CookieHandler;
 import java.net.CookieManager;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.StringJoiner;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.jabref.logic.importer.FetcherException;
@@ -35,13 +30,15 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import org.apache.http.client.utils.URIBuilder;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
 public class ACMPortalParser implements Parser {
 
+    private static final String HOST = "https://dl.acm.org";
     private static final String DOI_URL = "https://dl.acm.org/action/exportCiteProcCitation";
-    private static final Pattern DOI_HTML_PATTERN = Pattern.compile("<input name=\"(.*?)\"");
-    private static final String ITEM_HTML = "<li class=\"search__item issue-item-container\">";
-    private static final int MAX_ITEM_CNT_PER_PAGE = 20;
 
     /**
      * Parse the DOI of the ACM Portal search result page and obtain the corresponding BibEntry
@@ -68,24 +65,20 @@ public class ACMPortalParser implements Parser {
      */
     public List<String> parseDoiSearchPage(InputStream stream) throws ParseException {
         List<String> doiList = new ArrayList<>();
-        String htmlLine;
-        try (BufferedReader in = new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8))) {
-            int cnt = 0;
-            while ((htmlLine = in.readLine()) != null) {
-                if (ITEM_HTML.equals(htmlLine)) {
-                    Matcher matcher = DOI_HTML_PATTERN.matcher(in.readLine());
-                    if (matcher.find()) {
-                        doiList.add(matcher.group(1));
-                        cnt++;
-                        if (cnt >= MAX_ITEM_CNT_PER_PAGE) {
-                            break;
-                        }
-                    }
-                }
+
+        try {
+            Document doc = Jsoup.parse(stream, null, HOST);
+            Elements doiHrefs = doc.select("div.issue-item__content-right > h5 > span > a");
+
+            for (Element elem : doiHrefs) {
+                String fullSegment = elem.attr("href");
+                String doi = fullSegment.substring(fullSegment.indexOf("10"));
+                doiList.add(doi);
             }
-        } catch (IOException e) {
-            throw new ParseException(e);
+        } catch (IOException ex) {
+            throw new ParseException(ex);
         }
+
         return doiList;
     }
 
@@ -234,5 +227,4 @@ public class ACMPortalParser implements Parser {
 
         return bibEntry;
     }
-
 }

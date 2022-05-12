@@ -5,6 +5,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -15,11 +16,15 @@ import java.util.stream.Collectors;
 
 import javax.xml.transform.TransformerException;
 
+import org.jabref.logic.exporter.EmbeddedBibFilePdfExporter;
+import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.schema.DublinCoreSchemaCustom;
 
+import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDDocumentCatalog;
 import org.apache.pdfbox.pdmodel.PDDocumentInformation;
@@ -56,7 +61,8 @@ public class XmpUtilWriter {
      * @throws IOException          If the file could not be written to or could not be found.
      */
     public static void writeXmp(String fileName, BibEntry entry,
-                                BibDatabase database, XmpPreferences xmpPreferences) throws IOException, TransformerException {
+                                BibDatabase database, XmpPreferences xmpPreferences)
+        throws IOException, TransformerException {
         XmpUtilWriter.writeXmp(Path.of(fileName), entry, database, xmpPreferences);
     }
 
@@ -80,7 +86,8 @@ public class XmpUtilWriter {
      * @throws IOException          If the file could not be written to or could not be found.
      */
     public static void writeXmp(Path file, BibEntry entry,
-                                BibDatabase database, XmpPreferences xmpPreferences) throws IOException, TransformerException {
+                                BibDatabase database, XmpPreferences xmpPreferences)
+        throws IOException, TransformerException {
         List<BibEntry> bibEntryList = new ArrayList<>();
         bibEntryList.add(entry);
         XmpUtilWriter.writeXmp(file, bibEntryList, database, xmpPreferences);
@@ -128,8 +135,8 @@ public class XmpUtilWriter {
      *                 resolve strings. If the database is null the strings will not be resolved.
      */
     private static void writeDublinCore(PDDocument document,
-            List<BibEntry> entries, BibDatabase database, XmpPreferences xmpPreferences)
-            throws IOException, TransformerException {
+                                        List<BibEntry> entries, BibDatabase database, XmpPreferences xmpPreferences)
+        throws IOException, TransformerException {
 
         List<BibEntry> resolvedEntries;
         if (database == null) {
@@ -159,7 +166,7 @@ public class XmpUtilWriter {
         meta.removeSchema(meta.getDublinCoreSchema());
 
         for (BibEntry entry : resolvedEntries) {
-            DublinCoreSchema dcSchema = meta.createAndAddDublinCoreSchema();
+            DublinCoreSchema dcSchema = DublinCoreSchemaCustom.copyDublinCoreSchema(meta.createAndAddDublinCoreSchema());
             XmpUtilWriter.writeToDCSchema(dcSchema, entry, null, xmpPreferences);
         }
 
@@ -293,6 +300,8 @@ public class XmpUtilWriter {
      * The method will overwrite existing BibTeX-XMP-data, but keep other
      * existing metadata.
      *
+     * The code for using PDFBox is also used at {@link EmbeddedBibFilePdfExporter#embedBibTex(java.lang.String, java.nio.file.Path)}.
+     *
      * @param path          The file to write the entries to.
      * @param bibtexEntries The entries to write to the file. *
      * @param database      maybenull An optional database which the given bibtex entries belong to, which will be used
@@ -303,8 +312,8 @@ public class XmpUtilWriter {
      */
     public static void writeXmp(Path path,
                                 List<BibEntry> bibtexEntries, BibDatabase database,
-                                XmpPreferences xmpPreferences) throws IOException, TransformerException {
-
+                                XmpPreferences xmpPreferences)
+        throws IOException, TransformerException {
         List<BibEntry> resolvedEntries;
         if (database == null) {
             resolvedEntries = bibtexEntries;
@@ -312,8 +321,11 @@ public class XmpUtilWriter {
             resolvedEntries = database.resolveForStrings(bibtexEntries, false);
         }
 
-        try (PDDocument document = PDDocument.load(path.toFile())) {
-
+        // Read from another file
+        // Reason: Apache PDFBox does not support writing while the file is opened
+        // See https://issues.apache.org/jira/browse/PDFBOX-4028
+        Path newFile = Files.createTempFile("JabRef", "pdf");
+        try (PDDocument document = Loader.loadPDF(path.toFile())) {
             if (document.isEncrypted()) {
                 throw new EncryptedPdfsNotSupportedException();
             }
@@ -324,14 +336,16 @@ public class XmpUtilWriter {
                 XmpUtilWriter.writeDublinCore(document, resolvedEntries, null, xmpPreferences);
             }
 
-            // Save
+            // Save updates to original file
             try {
-                document.save(path.toFile());
+                document.save(newFile.toFile());
+                FileUtil.copyFile(newFile, path, true);
             } catch (IOException e) {
                 LOGGER.debug("Could not write XMP metadata", e);
                 throw new TransformerException("Could not write XMP metadata: " + e.getLocalizedMessage(), e);
             }
         }
+        Files.delete(newFile);
     }
 
     private static BibEntry getDefaultOrDatabaseEntry(BibEntry defaultEntry, BibDatabase database) {

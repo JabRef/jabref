@@ -1,3 +1,7 @@
+---
+parent: Architectural Decisions
+nav_order: 12
+---
 # Handle different bibentry formats of fetchers by adding a layer
 
 ## Context and Problem Statement

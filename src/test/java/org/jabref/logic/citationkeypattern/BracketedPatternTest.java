@@ -386,6 +386,13 @@ class BracketedPatternTest {
                 BracketedPattern.expandBrackets("[author] have published [title] in [journal].", ',', entry, database));
     }
 
+    @Test
+    void expandBracketsWithoutProtectiveBracesUsingUnprotectTermsModifier() {
+        BibEntry bibEntry = new BibEntry()
+                .withField(StandardField.JOURNAL, "{ACS} Medicinal Chemistry Letters");
+        assertEquals("ACS Medicinal Chemistry Letters", BracketedPattern.expandBrackets("[JOURNAL:unprotect_terms]", null, bibEntry, null));
+    }
+
     @ParameterizedTest
     @MethodSource("provideArgumentsForFallback")
     void expandBracketsWithFallback(String expandResult, String pattern) {

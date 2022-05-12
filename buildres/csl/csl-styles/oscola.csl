@@ -255,7 +255,7 @@
   <!--publication info -->
   <macro name="publisher">
     <choose>
-      <if type="book chapter broadcast personal_communication manuscript paper-conference article-newspaper report legislation motion_picture speech interview thesis entry-encyclopedia webpage post-weblog" match="any">
+      <if type="book chapter broadcast personal_communication manuscript paper-conference article-newspaper report legislation motion_picture speech interview thesis entry-encyclopedia webpage post-weblog article" match="any">
         <group delimiter=" ">
           <group prefix="(" suffix=")" delimiter=", ">
             <choose>
@@ -301,6 +301,10 @@
                     <text macro="issued-full"/>
                   </else-if>
                   <else-if type="interview" match="any">
+                    <text macro="issued-full"/>
+                  </else-if>
+                  <else-if type="article" match="any">
+                    <text variable="publisher" strip-periods="true"/>
                     <text macro="issued-full"/>
                   </else-if>
                   <else>

@@ -352,7 +352,7 @@
     <group>
       <choose>
         <if match="any" variable="title">
-          <text term="sub verbo" form="short" prefix=" " suffix=" "/>
+          <text term="sub-verbo" form="short" prefix=" " suffix=" "/>
           <text variable="title"/>
         </if>
       </choose>

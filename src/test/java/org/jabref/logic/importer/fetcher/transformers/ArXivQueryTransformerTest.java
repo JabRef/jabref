@@ -44,5 +44,4 @@ class ArXivQueryTransformerTest extends YearRangeByFilteringQueryTransformerTest
         assertEquals(2018, transformer.getStartYear());
         assertEquals(2018, transformer.getEndYear());
     }
-
 }

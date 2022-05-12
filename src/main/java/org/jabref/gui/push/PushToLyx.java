@@ -15,6 +15,7 @@ import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.push.PushToApplicationConstants;
 import org.jabref.preferences.PreferencesService;
 import org.jabref.preferences.PushToApplicationPreferences;
 
@@ -23,7 +24,7 @@ import org.slf4j.LoggerFactory;
 
 public class PushToLyx extends AbstractPushToApplication implements PushToApplication {
 
-    public static final String NAME = "LyX/Kile";
+    public static final String NAME = PushToApplicationConstants.LYX;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PushToLyx.class);
 
@@ -56,7 +57,7 @@ public class PushToLyx extends AbstractPushToApplication implements PushToApplic
 
     @Override
     public PushToApplicationSettings getSettings(PushToApplication application, ObjectProperty<PushToApplicationPreferences> preferences) {
-        return new PushToLyxSettings(application, dialogService, preferencesService, preferences);
+        return new PushToLyxSettings(application, dialogService, preferencesService.getFilePreferences(), preferences);
     }
 
     @Override

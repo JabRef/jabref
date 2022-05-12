@@ -11,7 +11,9 @@ import java.util.List;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.StandardField;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -35,7 +37,8 @@ public class DocbookExporterTest {
         LayoutFormatterPreferences layoutPreferences = mock(LayoutFormatterPreferences.class, Answers.RETURNS_DEEP_STUBS);
         SavePreferences savePreferences = mock(SavePreferences.class);
         XmpPreferences xmpPreferences = mock(XmpPreferences.class);
-        ExporterFactory exporterFactory = ExporterFactory.create(customFormats, layoutPreferences, savePreferences, xmpPreferences);
+        BibEntryTypesManager entryTypesManager = mock(BibEntryTypesManager.class);
+        ExporterFactory exporterFactory = ExporterFactory.create(customFormats, layoutPreferences, savePreferences, xmpPreferences, BibDatabaseMode.BIBTEX, entryTypesManager);
 
         exportFormat = exporterFactory.getExporterByName("docbook4").get();
     }
@@ -49,7 +52,7 @@ public class DocbookExporterTest {
 
         List<BibEntry> entries = Arrays.asList(entry);
 
-        exportFormat.export(databaseContext, tmpFile, charset, entries);
+        exportFormat.export(databaseContext, tmpFile, entries);
 
         List<String> lines = Files.readAllLines(tmpFile);
         assertEquals(20, lines.size());
@@ -65,11 +68,10 @@ public class DocbookExporterTest {
 
         List<BibEntry> entries = Arrays.asList(entry);
 
-        exportFormat.export(databaseContext, tmpFile, charset, entries);
+        exportFormat.export(databaseContext, tmpFile, entries);
 
         List<String> lines = Files.readAllLines(tmpFile);
         assertEquals(20, lines.size());
         assertEquals("   <citetitle pubwork=\"article\">Insect neuropeptide bursicon homodimers induce innate immune and stress genes during molting by activating the NF&#45;&#954;B transcription factor Relish.</citetitle>", lines.get(9));
     }
-
 }

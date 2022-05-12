@@ -17,6 +17,12 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 class DateTest {
 
     @Test
+    void parseCorrectlyYearRangeDate() throws Exception {
+        Date expectedDataRange = new Date(Year.of(2014), Year.of(2017));
+        assertEquals(Optional.of(expectedDataRange), Date.parse("2014/2017"));
+    }
+
+    @Test
     void parseCorrectlyDayMonthYearDate() throws Exception {
         Date expected = new Date(LocalDate.of(2014, 6, 19));
         assertEquals(Optional.of(expected), Date.parse("19-06-2014"));
@@ -49,7 +55,6 @@ class DateTest {
     @MethodSource("provideInvalidCornerCaseArguments")
     public void nonExistentDates(String invalidDate, String errorMessage) {
         assertEquals(Optional.empty(), Date.parse(invalidDate), errorMessage);
-
     }
 
     private static Stream<Arguments> provideInvalidCornerCaseArguments() {

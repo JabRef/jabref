@@ -19,6 +19,7 @@ public class EntryEditorTab extends AbstractPreferenceTabView<EntryEditorTabView
     @FXML private CheckBox acceptRecommendations;
     @FXML private CheckBox enableLatexCitationsTab;
     @FXML private CheckBox enableValidation;
+    @FXML private CheckBox allowIntegerEdition;
     @FXML private CheckBox enableAutoComplete;
     @FXML private TextField autoCompleteFields;
     @FXML private RadioButton autoCompleteFirstLast;
@@ -40,7 +41,7 @@ public class EntryEditorTab extends AbstractPreferenceTabView<EntryEditorTabView
     }
 
     public void initialize() {
-        this.viewModel = new EntryEditorTabViewModel(dialogService, preferencesService);
+        this.viewModel = new EntryEditorTabViewModel(preferencesService.getEntryEditorPreferences(), preferencesService.getAutoCompletePreferences());
 
         openOnNewEntry.selectedProperty().bindBidirectional(viewModel.openOnNewEntryProperty());
         defaultSource.selectedProperty().bindBidirectional(viewModel.defaultSourceProperty());
@@ -48,6 +49,7 @@ public class EntryEditorTab extends AbstractPreferenceTabView<EntryEditorTabView
         acceptRecommendations.selectedProperty().bindBidirectional(viewModel.acceptRecommendationsProperty());
         enableLatexCitationsTab.selectedProperty().bindBidirectional(viewModel.enableLatexCitationsTabProperty());
         enableValidation.selectedProperty().bindBidirectional(viewModel.enableValidationProperty());
+        allowIntegerEdition.selectedProperty().bindBidirectional(viewModel.allowIntegerEditionProperty());
         enableAutoComplete.selectedProperty().bindBidirectional(viewModel.enableAutoCompleteProperty());
         autoCompleteFields.textProperty().bindBidirectional(viewModel.autoCompleteFieldsProperty());
         autoCompleteFirstLast.selectedProperty().bindBidirectional(viewModel.autoCompleteFirstLastProperty());

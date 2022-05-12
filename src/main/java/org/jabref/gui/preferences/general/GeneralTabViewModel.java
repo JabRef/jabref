@@ -40,7 +40,6 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty confirmDeleteProperty = new SimpleBooleanProperty();
     private final BooleanProperty memoryStickModeProperty = new SimpleBooleanProperty();
     private final BooleanProperty collectTelemetryProperty = new SimpleBooleanProperty();
-    private final BooleanProperty allowIntegerEditionProperty = new SimpleBooleanProperty();
     private final BooleanProperty showAdvancedHintsProperty = new SimpleBooleanProperty();
     private final BooleanProperty markOwnerProperty = new SimpleBooleanProperty();
     private final StringProperty markOwnerNameProperty = new SimpleStringProperty("");
@@ -49,22 +48,22 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty addModificationDateProperty = new SimpleBooleanProperty();
 
     private final DialogService dialogService;
+    private final GeneralPreferences generalPreferences;
     private final PreferencesService preferencesService;
-    private final GeneralPreferences initialGeneralPreferences;
-    private final TelemetryPreferences initialTelemetryPreferences;
-    private final OwnerPreferences initialOwnerPreferences;
-    private final TimestampPreferences initialTimestampPreferences;
+    private final TelemetryPreferences telemetryPreferences;
+    private final OwnerPreferences ownerPreferences;
+    private final TimestampPreferences timestampPreferences;
 
     private List<String> restartWarning = new ArrayList<>();
 
     @SuppressWarnings("ReturnValueIgnored")
-    public GeneralTabViewModel(DialogService dialogService, PreferencesService preferencesService) {
+    public GeneralTabViewModel(DialogService dialogService, PreferencesService preferencesService, GeneralPreferences generalPreferences, TelemetryPreferences telemetryPreferences, OwnerPreferences ownerPreferences, TimestampPreferences timestampPreferences) {
         this.dialogService = dialogService;
+        this.generalPreferences = generalPreferences;
         this.preferencesService = preferencesService;
-        this.initialGeneralPreferences = preferencesService.getGeneralPreferences();
-        this.initialTelemetryPreferences = preferencesService.getTelemetryPreferences();
-        this.initialOwnerPreferences = preferencesService.getOwnerPreferences();
-        this.initialTimestampPreferences = preferencesService.getTimestampPreferences();
+        this.telemetryPreferences = telemetryPreferences;
+        this.ownerPreferences = ownerPreferences;
+        this.timestampPreferences = timestampPreferences;
     }
 
     public void setValues() {
@@ -72,24 +71,22 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         selectedLanguageProperty.setValue(preferencesService.getLanguage());
 
         encodingsListProperty.setValue(FXCollections.observableArrayList(Encodings.getCharsets()));
-        selectedEncodingProperty.setValue(initialGeneralPreferences.getDefaultEncoding());
 
         bibliographyModeListProperty.setValue(FXCollections.observableArrayList(BibDatabaseMode.values()));
-        selectedBiblatexModeProperty.setValue(initialGeneralPreferences.getDefaultBibDatabaseMode());
+        selectedBiblatexModeProperty.setValue(generalPreferences.getDefaultBibDatabaseMode());
 
-        inspectionWarningDuplicateProperty.setValue(initialGeneralPreferences.isWarnAboutDuplicatesInInspection());
-        confirmDeleteProperty.setValue(initialGeneralPreferences.shouldConfirmDelete());
-        allowIntegerEditionProperty.setValue(initialGeneralPreferences.shouldAllowIntegerEditionBibtex());
-        memoryStickModeProperty.setValue(initialGeneralPreferences.isMemoryStickMode());
-        collectTelemetryProperty.setValue(initialTelemetryPreferences.shouldCollectTelemetry());
-        showAdvancedHintsProperty.setValue(initialGeneralPreferences.shouldShowAdvancedHints());
+        inspectionWarningDuplicateProperty.setValue(generalPreferences.warnAboutDuplicatesInInspection());
+        confirmDeleteProperty.setValue(generalPreferences.shouldConfirmDelete());
+        memoryStickModeProperty.setValue(generalPreferences.isMemoryStickMode());
+        collectTelemetryProperty.setValue(telemetryPreferences.shouldCollectTelemetry());
+        showAdvancedHintsProperty.setValue(generalPreferences.shouldShowAdvancedHints());
 
-        markOwnerProperty.setValue(initialOwnerPreferences.isUseOwner());
-        markOwnerNameProperty.setValue(initialOwnerPreferences.getDefaultOwner());
-        markOwnerOverwriteProperty.setValue(initialOwnerPreferences.isOverwriteOwner());
+        markOwnerProperty.setValue(ownerPreferences.isUseOwner());
+        markOwnerNameProperty.setValue(ownerPreferences.getDefaultOwner());
+        markOwnerOverwriteProperty.setValue(ownerPreferences.isOverwriteOwner());
 
-        addCreationDateProperty.setValue(initialTimestampPreferences.shouldAddCreationDate());
-        addModificationDateProperty.setValue(initialTimestampPreferences.shouldAddModificationDate());
+        addCreationDateProperty.setValue(timestampPreferences.shouldAddCreationDate());
+        addModificationDateProperty.setValue(timestampPreferences.shouldAddModificationDate());
     }
 
     public void storeSettings() {
@@ -100,35 +97,26 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
             restartWarning.add(Localization.lang("Changed language") + ": " + newLanguage.getDisplayName());
         }
 
-        if (initialGeneralPreferences.isMemoryStickMode() && !memoryStickModeProperty.getValue()) {
+        if (generalPreferences.isMemoryStickMode() && !memoryStickModeProperty.getValue()) {
             dialogService.showInformationDialogAndWait(Localization.lang("Memory stick mode"),
                     Localization.lang("To disable the memory stick mode"
                             + " rename or remove the jabref.xml file in the same folder as JabRef."));
         }
 
-        preferencesService.storeGeneralPreferences(new GeneralPreferences(
-                selectedEncodingProperty.getValue(),
-                selectedBiblatexModeProperty.getValue(),
-                inspectionWarningDuplicateProperty.getValue(),
-                confirmDeleteProperty.getValue(),
-                allowIntegerEditionProperty.getValue(),
-                memoryStickModeProperty.getValue(),
-                showAdvancedHintsProperty.getValue()));
+        generalPreferences.setDefaultBibDatabaseMode(selectedBiblatexModeProperty.getValue());
+        generalPreferences.setWarnAboutDuplicatesInInspection(inspectionWarningDuplicateProperty.getValue());
+        generalPreferences.setConfirmDelete(confirmDeleteProperty.getValue());
+        generalPreferences.setMemoryStickMode(memoryStickModeProperty.getValue());
+        generalPreferences.setShowAdvancedHints(showAdvancedHintsProperty.getValue());
 
-        preferencesService.storeTelemetryPreferences(
-                initialTelemetryPreferences.withCollectTelemetry(collectTelemetryProperty.getValue()));
+        telemetryPreferences.setCollectTelemetry(collectTelemetryProperty.getValue());
 
-        preferencesService.storeOwnerPreferences(new OwnerPreferences(
-                markOwnerProperty.getValue(),
-                markOwnerNameProperty.getValue().trim(),
-                markOwnerOverwriteProperty.getValue()));
+        ownerPreferences.setUseOwner(markOwnerProperty.getValue());
+        ownerPreferences.setDefaultOwner(markOwnerNameProperty.getValue());
+        ownerPreferences.setOverwriteOwner(markOwnerOverwriteProperty.getValue());
 
-        preferencesService.storeTimestampPreferences(new TimestampPreferences(
-                addCreationDateProperty.getValue(),
-                addModificationDateProperty.getValue(),
-                initialTimestampPreferences.shouldUpdateTimestamp(),
-                initialTimestampPreferences.getTimestampField(),
-                initialTimestampPreferences.getTimestampFormat()));
+        timestampPreferences.setAddCreationDate(addCreationDateProperty.getValue());
+        timestampPreferences.setAddModificationDate(addModificationDateProperty.getValue());
     }
 
     @Override
@@ -176,10 +164,6 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
 
     public BooleanProperty collectTelemetryProperty() {
         return this.collectTelemetryProperty;
-    }
-
-    public BooleanProperty allowIntegerEditionProperty() {
-        return this.allowIntegerEditionProperty;
     }
 
     public BooleanProperty showAdvancedHintsProperty() {

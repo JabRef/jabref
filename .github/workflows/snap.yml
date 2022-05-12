@@ -9,6 +9,10 @@ on:
    # run on each day
   - cron: "33 4 * * *"
 
+concurrency:
+  group: snap-${{ github.head_ref }}
+  cancel-in-progress: true
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -26,7 +30,7 @@ jobs:
         env:
           SNAPCRAFT_LOGIN_FILE: ${{ secrets.SNAPCRAFT_LOGIN_FILE }}
       - name: Checkout source
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       # The image relies on https://builds.jabref.org/master/JabRef-5.0-portable_linux.tar.gz^
       # See snap/snapcraft.yml for details
       - name: Run snapcraft build
