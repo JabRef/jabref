@@ -124,19 +124,20 @@ public class XmpExporterTest {
 
         BibEntry entryTuring = new BibEntry()
                 .withField(StandardField.AUTHOR, "Alan Turing");
-
         BibEntry entryArmbrust = new BibEntry()
                 .withField(StandardField.AUTHOR, "Michael Armbrust")
                 .withCitationKey("Armbrust2010");
 
         exporter.export(databaseContext, file, List.of(entryTuring, entryArmbrust));
 
+        // Nothing written in given file
         List<String> lines = Files.readAllLines(file);
         assertEquals(Collections.emptyList(), lines);
 
+        // turing contains the turing entry only
         Path fileTuring = Path.of(file.getParent().toString(), entryTuring.getId() + "_null.xmp");
-        String actualTuring = String.join("\n", Files.readAllLines(fileTuring)); // we are using \n to join, so we need it in the expected string as well, \r\n would fail
-
+        // we are using \n to join, so we need it in the expected string as well, \r\n would fail
+        String actualTuring = String.join("\n", Files.readAllLines(fileTuring));
         String expectedTuring = """
                 <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
                   <rdf:Description xmlns:dc="http://purl.org/dc/elements/1.1/" rdf:about="">
@@ -156,9 +157,10 @@ public class XmpExporterTest {
               """.stripTrailing();
         assertEquals(expectedTuring, actualTuring);
 
+        // armbrust contains the armbrust entry only
         Path fileArmbrust = Path.of(file.getParent().toString(), entryArmbrust.getId() + "_Armbrust2010.xmp");
-        String actualArmbrust = String.join("\n", Files.readAllLines(fileArmbrust)); // we are using \n to join, so we need it in the expected string as well, \r\n would fail
-
+        // we are using \n to join, so we need it in the expected string as well, \r\n would fail
+        String actualArmbrust = String.join("\n", Files.readAllLines(fileArmbrust));
         String expectedArmbrust = """
                   <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
                     <rdf:Description xmlns:dc="http://purl.org/dc/elements/1.1/" rdf:about="">
