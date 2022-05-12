@@ -22,7 +22,6 @@ import org.jabref.gui.fieldeditors.TextInputControlBehavior;
 import org.jabref.gui.fieldeditors.contextmenu.EditorContextAction;
 import org.jabref.gui.util.BindingsHelper;
 
-
 /**
  * A date picker with configurable datetime format where both date and time can be changed via the text field and the
  * date can additionally be changed via the JavaFX default date picker. Also supports incomplete dates.
