@@ -9,7 +9,7 @@ jobs:
     steps:
       - name: 'Wait for status checks'
         id: waitforstatuschecks
-        uses: "WyriHaximus/github-action-wait-for-status@v1.5"
+        uses: "WyriHaximus/github-action-wait-for-status@v1.6"
         with:
           ignoreActions: Automerge Dependabot,Code coverage,Create snapcraft image,Deploy binaries on builds.jabref.org,codecov/project,markdown-link-check
           checkInterval: 13

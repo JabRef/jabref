@@ -125,3 +125,7 @@
     -fx-text-fill: derive(-fx-light-text-color, 80%);
     -fx-icon-color: derive(-fx-light-text-color, 80%);
 }
+
+.notification-bar > .pane {
+    -fx-background-color: -fx-light-text-color;
+}

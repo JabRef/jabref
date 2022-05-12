@@ -39,6 +39,7 @@ import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.BaseDialog;
+import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.gui.util.ZipFileChooser;
@@ -333,12 +334,14 @@ public class JabRefDialogService implements DialogService {
     public void notify(String message) {
         LOGGER.info(message);
 
-        Notifications.create()
-                .text(message)
-                .position(Pos.BOTTOM_CENTER)
-                .hideAfter(TOAST_MESSAGE_DISPLAY_TIME)
-                .hideCloseButton()
-                .show();
+        DefaultTaskExecutor.runInJavaFXThread(() -> {
+            Notifications.create()
+            .text(message)
+            .position(Pos.BOTTOM_CENTER)
+            .hideAfter(TOAST_MESSAGE_DISPLAY_TIME)
+            .hideCloseButton()
+            .show();
+        });
     }
 
     @Override

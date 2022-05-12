@@ -11,6 +11,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 
 ### Added
 
+- We added a fetcher for [Biodiversity Heritage Library)](https://www.biodiversitylibrary.org/) [8539](https://github.com/JabRef/jabref/issues/8539)
 - We added support for multiple messages in the snackbar. [#7340](https://github.com/JabRef/jabref/issues/7340)
 
 ### Changed
@@ -20,6 +21,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 ### Fixed
 
 - We fixed the unnecessary horizontal scroll bar in group panel [#8467](https://github.com/JabRef/jabref/issues/8467)
+- We fixed an issue where the notification bar message, icon and actions appeared to be invisible. [#8761](https://github.com/JabRef/jabref/issues/8761)
 
 ### Removed
 
