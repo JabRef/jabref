@@ -245,7 +245,7 @@ public class DublinCoreExtractor {
         StringBuilder builder = new StringBuilder();
 
         List<String> languages = dcSchema.getLanguages();
-        if (languages != null && !languages.isEmpty()) {
+        if ((languages != null) && !languages.isEmpty()) {
             languages.forEach(language -> builder.append(",").append(language));
             bibEntry.setField(StandardField.LANGUAGE, builder.substring(1));
         }
@@ -403,9 +403,9 @@ public class DublinCoreExtractor {
     private void fillType() {
         // BibTeX: entry type; DC: 'dc:type'
         TypedBibEntry typedEntry = new TypedBibEntry(bibEntry, BibDatabaseMode.BIBTEX);
-        String o = typedEntry.getTypeForDisplay();
-        if (!o.isEmpty()) {
-            dcSchema.addType(o);
+        String typeForDisplay = typedEntry.getTypeForDisplay();
+        if (!typeForDisplay.isEmpty()) {
+            dcSchema.addType(typeForDisplay);
         }
     }
 
