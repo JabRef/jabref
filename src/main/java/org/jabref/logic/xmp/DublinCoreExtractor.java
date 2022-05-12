@@ -389,12 +389,13 @@ public class DublinCoreExtractor {
     }
 
     /**
-     * All others (+ citation key) get packaged in the relation attribute
-     *
-     * @param field Key of the metadata attribute
-     * @param value Value of the metadata attribute
+     * All others (+ citation key) get packaged in the dc:relation attribute with <code>bibtex/</code> prefix in the content.
+     * The value of the given field is fetched from the class variable {@link DublinCoreExtractor#bibEntry}.
      */
-    private void fillCustomField(Field field, String value) {
+    private void fillCustomField(Field field) {
+        // We write the plain content of the field, because this is a custom DC field content with the semantics that
+        // BibTeX data is stored. Thus, we do not need to get rid of BibTeX, but can keep it.
+        String value = bibEntry.getField(field).get();
         dcSchema.addRelation("bibtex/" + field.getName() + '/' + value);
     }
 
@@ -469,7 +470,7 @@ public class DublinCoreExtractor {
                             break;
                         }
                     default:
-                        this.fillCustomField(field, value);
+                        this.fillCustomField(field);
                 }
             } else {
                 if (DC_COVERAGE.equals(field.getName())) {
@@ -479,7 +480,7 @@ public class DublinCoreExtractor {
                 } else if (DC_SOURCE.equals(field.getName())) {
                     this.fillSource(value);
                 } else {
-                    this.fillCustomField(field, value);
+                    this.fillCustomField(field);
                 }
             }
         }
