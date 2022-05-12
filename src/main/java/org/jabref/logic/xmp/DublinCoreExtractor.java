@@ -9,6 +9,7 @@ import java.util.function.Predicate;
 
 import org.jabref.logic.TypedBibEntry;
 import org.jabref.logic.formatter.casechanger.UnprotectTermsFormatter;
+import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.Author;
 import org.jabref.model.entry.AuthorList;
@@ -22,6 +23,7 @@ import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.EntryTypeFactory;
 import org.jabref.model.strings.StringUtil;
 
+import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.xmpbox.schema.DublinCoreSchema;
 import org.apache.xmpbox.type.BadFieldValueException;
 import org.slf4j.Logger;
@@ -415,6 +417,9 @@ public class DublinCoreExtractor {
      * Converts the content of the bibEntry to dublin core.
      * <p>
      * The opposite method is {@link DublinCoreExtractor#extractBibtexEntry()}.
+     * <p>
+     *     A similar method for writing the DocumentInformationItem (DII) is {@link XmpUtilWriter#writeDocumentInformation(PDDocument, BibEntry, BibDatabase, XmpPreferences)}
+     * </p>
      */
     public void fillDublinCoreSchema() {
         // Query privacy filter settings

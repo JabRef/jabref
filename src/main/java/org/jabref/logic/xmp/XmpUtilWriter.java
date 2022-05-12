@@ -15,7 +15,9 @@ import java.util.stream.Collectors;
 
 import javax.xml.transform.TransformerException;
 
+import org.jabref.logic.bibtex.FieldContentFormatter;
 import org.jabref.logic.exporter.EmbeddedBibFilePdfExporter;
+import org.jabref.logic.formatter.casechanger.UnprotectTermsFormatter;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
@@ -45,6 +47,8 @@ public class XmpUtilWriter {
     private static final String XMP_BEGIN_END_TAG = "?xpacket";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(XmpUtilWriter.class);
+
+    private UnprotectTermsFormatter unprotectTermsFormatter = new UnprotectTermsFormatter();
 
     /**
      * Try to write the given BibTexEntry in the XMP-stream of the given
@@ -211,9 +215,11 @@ public class XmpUtilWriter {
     /**
      * Try to write the given BibTexEntry in the Document Information (the
      * properties of the pdf).
-     *
-     * Existing fields values are overriden if the bibtex entry has the
+     * <p>
+     * Existing fields values are overridden if the bibtex entry has the
      * corresponding value set.
+     * <p>
+     * The method to write DublineCore is {@link DublinCoreExtractor#fillDublinCoreSchema()}
      *
      * @param document The pdf document to write to.
      * @param entry    The Bibtex entry that is written into the PDF properties. *
@@ -221,20 +227,12 @@ public class XmpUtilWriter {
      *                 resolve strings. If the database is null the strings will not be resolved.
      */
     private void writeDocumentInformation(PDDocument document,
-                                                 BibEntry entry, BibDatabase database, XmpPreferences xmpPreferences) {
-
+                                          BibEntry entry, BibDatabase database, XmpPreferences xmpPreferences) {
         PDDocumentInformation di = document.getDocumentInformation();
-
         BibEntry resolvedEntry = getDefaultOrDatabaseEntry(entry, database);
 
-        // Query privacy filter settings
         boolean useXmpPrivacyFilter = xmpPreferences.shouldUseXmpPrivacyFilter();
-
-        // Set all the values including key and entryType
-        for (Entry<Field, String> fieldValuePair : resolvedEntry.getFieldMap().entrySet()) {
-            Field field = fieldValuePair.getKey();
-            String fieldContent = fieldValuePair.getValue();
-
+        for (Field field : resolvedEntry.getFields()) {
             if (useXmpPrivacyFilter && xmpPreferences.getXmpPrivacyFilter().contains(field)) {
                 // erase field instead of adding it
                 if (StandardField.AUTHOR.equals(field)) {
@@ -251,16 +249,20 @@ public class XmpUtilWriter {
                 continue;
             }
 
+            // LaTeX content is removed from the string for "standard" fields in the PDF
+            String value = unprotectTermsFormatter.format(resolvedEntry.getField(field).get());
+
             if (StandardField.AUTHOR.equals(field)) {
-                di.setAuthor(fieldContent);
+                di.setAuthor(value);
             } else if (StandardField.TITLE.equals(field)) {
-                di.setTitle(fieldContent);
+                di.setTitle(value);
             } else if (StandardField.KEYWORDS.equals(field)) {
-                di.setKeywords(fieldContent);
+                di.setKeywords(value);
             } else if (StandardField.ABSTRACT.equals(field)) {
-                di.setSubject(fieldContent);
+                di.setSubject(value);
             } else {
-                di.setCustomMetadataValue("bibtex/" + field, fieldContent);
+                // We hit the case of an PDF-unsupported field --> write it directly
+                di.setCustomMetadataValue("bibtex/" + field, resolvedEntry.getField(field).get());
             }
         }
         di.setCustomMetadataValue("bibtex/entrytype", resolvedEntry.getType().getDisplayName());
