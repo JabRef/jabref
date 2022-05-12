@@ -10,15 +10,15 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class EntryComparatorTest {
 
+    @SuppressWarnings("EqualsWithItself")
     @Test
     void recognizeIdenticalObjectsAsEqual() {
-        BibEntry entry1 = new BibEntry();
-        BibEntry entry2 = entry1;
-        assertEquals(0, new EntryComparator(false, false, StandardField.TITLE).compare(entry1, entry2));
+        BibEntry entry = new BibEntry();
+        assertEquals(0, new EntryComparator(false, false, StandardField.TITLE).compare(entry, entry));
     }
 
     @Test
-    void compareAuthorFieldBiggerAscending() throws Exception {
+    void compareAuthorFieldBiggerAscending() {
         BibEntry entry1 = new BibEntry()
                 .withField(StandardField.AUTHOR, "Stephen King");
         BibEntry entry2 = new BibEntry()
@@ -29,7 +29,7 @@ class EntryComparatorTest {
     }
 
     @Test
-    void bothEntriesHaveNotSetTheFieldToCompareAscending() throws Exception {
+    void bothEntriesHaveNotSetTheFieldToCompareAscending() {
         BibEntry entry1 = new BibEntry()
                 .withField(StandardField.BOOKTITLE, "Stark - The Dark Half (1989)");
         BibEntry entry2 = new BibEntry()
@@ -40,7 +40,7 @@ class EntryComparatorTest {
     }
 
     @Test
-    void secondEntryHasNotSetFieldToCompareAscending() throws Exception {
+    void secondEntryHasNotSetFieldToCompareAscending() {
         BibEntry entry1 = new BibEntry()
                 .withField(StandardField.TITLE, "Stark - The Dark Half (1989)");
         BibEntry entry2 = new BibEntry()
@@ -51,7 +51,7 @@ class EntryComparatorTest {
     }
 
     @Test
-    void firstEntryHasNotSetFieldToCompareAscending() throws Exception {
+    void firstEntryHasNotSetFieldToCompareAscending() {
         BibEntry entry1 = new BibEntry()
                 .withField(StandardField.COMMENTATOR, "Some Commentator");
         BibEntry entry2 = new BibEntry()
@@ -63,7 +63,7 @@ class EntryComparatorTest {
     }
 
     @Test
-    void bothEntriesNumericAscending() throws Exception {
+    void bothEntriesNumericAscending() {
         BibEntry entry1 = new BibEntry()
                 .withField(StandardField.EDITION, "1");
         BibEntry entry2 = new BibEntry()

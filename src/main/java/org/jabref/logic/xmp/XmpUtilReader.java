@@ -72,9 +72,7 @@ public class XmpUtilReader {
                     if (dcSchema != null) {
                         DublinCoreExtractor dcExtractor = new DublinCoreExtractor(dcSchema, xmpPreferences, new BibEntry());
                         Optional<BibEntry> entry = dcExtractor.extractBibtexEntry();
-                        if (entry.isPresent()) {
-                            result.add(entry.get());
-                        }
+                        entry.ifPresent(result::add);
                     }
                 }
             }
@@ -146,7 +144,6 @@ public class XmpUtilReader {
     public PDDocument loadWithAutomaticDecryption(Path path) throws IOException {
         // try to load the document
         // also uses an empty string as default password
-        PDDocument doc = Loader.loadPDF(path.toFile());
-        return doc;
+        return Loader.loadPDF(path.toFile());
     }
 }
