@@ -3,6 +3,7 @@ package org.jabref.logic.xmp;
 import java.nio.file.Path;
 import java.util.List;
 
+import org.jabref.logic.exporter.XmpExporterTest;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.Date;
 import org.jabref.model.entry.Month;
@@ -23,6 +24,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+/**
+ * This tests the writing to a PDF. If the creation of the RDF content should be checked, please head to {@link XmpExporterTest}
+ */
 class XmpUtilWriterTest {
 
     @TempDir

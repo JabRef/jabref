@@ -24,14 +24,12 @@ import static org.mockito.Mockito.when;
 public class XmpExporterTest {
 
     private Exporter exporter;
-    private BibDatabaseContext databaseContext;
+    private BibDatabaseContext databaseContext = new BibDatabaseContext();
     private final XmpPreferences xmpPreferences = mock(XmpPreferences.class);
 
     @BeforeEach
     public void setUp() {
         exporter = new XmpExporter(xmpPreferences);
-
-        databaseContext = new BibDatabaseContext();
     }
 
     @Test
@@ -188,21 +186,25 @@ public class XmpExporterTest {
         Path file = testFolder.resolve("ThisIsARandomlyNamedFile");
         Files.createFile(file);
 
-        BibEntry entry = new BibEntry();
-        entry.setField(StandardField.AUTHOR, "Alan Turing");
+        BibEntry entry = new BibEntry()
+                .withField(StandardField.AUTHOR, "Alan Turing");
 
         exporter.export(databaseContext, file, Collections.singletonList(entry));
+
         String actual = String.join("\n", Files.readAllLines(file));
-        String expected = "  <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n" +
-                "    <rdf:Description xmlns:dc=\"http://purl.org/dc/elements/1.1/\" rdf:about=\"\">\n" +
-                "      <dc:format>application/pdf</dc:format>\n" +
-                "      <dc:type>\n" +
-                "        <rdf:Bag>\n" +
-                "          <rdf:li>Misc</rdf:li>\n" +
-                "        </rdf:Bag>\n" +
-                "      </dc:type>\n" +
-                "    </rdf:Description>\n" +
-                "  </rdf:RDF>";
+        String expected = """
+                  <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+                    <rdf:Description xmlns:dc="http://purl.org/dc/elements/1.1/" rdf:about="">
+                      <dc:format>application/pdf</dc:format>
+                      <dc:type>
+                        <rdf:Bag>
+                          <rdf:li>Misc</rdf:li>
+                        </rdf:Bag>
+                      </dc:type>
+                    </rdf:Description>
+                  </rdf:RDF>
+                """;
+
         assertEquals(expected, actual);
     }
 }
