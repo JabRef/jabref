@@ -13,6 +13,7 @@ env:
   SpringerNatureAPIKey: ${{ secrets.SpringerNatureAPIKey }}
   AstrophysicsDataSystemAPIKey: ${{ secrets.AstrophysicsDataSystemAPIKey }}
   IEEEAPIKey: ${{ secrets.IEEEAPIKey }}
+  BiodiversityHeritageApiKey: ${{ secrets.BiodiversityHeritageApiKey}}
   GRADLE_OPTS: -Xmx4g
   JAVA_OPTS: -Xmx4g
 
@@ -30,7 +31,7 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v3
         with:
-          java-version: 17
+          java-version: 18
           distribution: 'temurin'
           cache: 'gradle'
       - name: Run check style reporter
@@ -55,7 +56,7 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v3
         with:
-          java-version: 17
+          java-version: 18
           distribution: 'temurin'
           cache: 'gradle'
       - name: Run tests
@@ -87,7 +88,7 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v3
         with:
-          java-version: 17
+          java-version: 18
           distribution: 'temurin'
           cache: 'gradle'
       - name: Run tests on PostgreSQL
@@ -121,7 +122,7 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v3
         with:
-          java-version: 17
+          java-version: 18
           distribution: 'temurin'
           cache: 'gradle'
       - name: Run GUI tests
@@ -159,7 +160,7 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v3
         with:
-          java-version: 17
+          java-version: 18
           distribution: 'temurin'
           cache: 'gradle'
       - name: Update test coverage metrics

@@ -7,7 +7,7 @@ nav_order: 1
 This guide explains how to set up your environment for development of JabRef. It includes information about prerequisites, configuring your IDE, and running JabRef locally to verify your setup.
 
 > **The most important step is to configure your IDE.**\
-> **In case you know how to install JDK 17 with JavaFX support and [to fork JabRef's code](#get-the-code),**\
+> **In case you know how to install JDK 18 with JavaFX support and [to fork JabRef's code](#get-the-code),**\
 > **please scroll down to the [IDE setup](#configure-your-ide).**
 
 For a complete step-by-step guide for Linux using IntelliJ IDEA as the IDE, have a look at the following video instructions:
@@ -18,13 +18,13 @@ For a complete step-by-step guide for Linux using IntelliJ IDEA as the IDE, have
 
 This section list the prerequisites you need to get started to develop JabRef. After this section, you are ready to get the code.
 
-### Java Development Kit 17
+### Java Development Kit 18
 
-A working Java (Development Kit) 17 installation with Java FX support is required. In the command line (terminal in Linux, cmd in Windows) run `javac -version` and make sure that the reported version is Java 17 (e.g., `javac 17`). If `javac` is not found or a wrong version is reported, check your `PATH` environment variable, your `JAVA_HOME` environment variable or install the most recent JDK.
+A working Java (Development Kit) 18 installation with Java FX support is required. In the command line (terminal in Linux, cmd in Windows) run `javac -version` and make sure that the reported version is Java 18 (e.g., `javac 18`). If `javac` is not found or a wrong version is reported, check your `PATH` environment variable, your `JAVA_HOME` environment variable or install the most recent JDK.
 
 [JavaFX is not part of the default JDK any more](https://www.reddit.com/r/java/comments/82qm9x/javafx\_will\_be\_removed\_from\_the\_java\_jdk\_in\_jdk\_11/), it needs to be installed separately if not using a special JDK.
 
-Download and install the JDK from [https://jdk.java.net/](https://jdk.java.net). Afterwards, download the "jmods" JavaFX 17 zip archive from [https://gluonhq.com/products/javafx/](https://gluonhq.com/products/javafx/) and put the `.jmod` files into `C:\Program Files\OpenJDK\jdk-17\jmods`.
+Download and install the JDK from [https://jdk.java.net/](https://jdk.java.net). Afterwards, download the "jmods" JavaFX 18 zip archive from [https://gluonhq.com/products/javafx/](https://gluonhq.com/products/javafx/) and put the `.jmod` files into `C:\Program Files\OpenJDK\jdk-18\jmods`.
 
 ### GitHub Account
 
@@ -56,7 +56,7 @@ It is strongly recommend that you have git installed.
 
 ### IDE
 
-We suggest [IntelliJ IDEA](https://www.jetbrains.com/idea/?from=jabref). For advanced users, [Eclipse](https://eclipse.org) (`2020-09` or newer) is also possible.
+We suggest [IntelliJ IDEA](https://www.jetbrains.com/idea/?from=jabref). For advanced users, [Eclipse](https://eclipse.org) (`2022-03` or newer) is also possible.
 
 #### IntelliJ
 
@@ -66,7 +66,7 @@ We recommend to install IntelliJ IDEA using [JetBrains Toolbox App](https://www.
 
 On Ubuntu Linux, you can follow the [documentation from the Ubuntu Community](https://help.ubuntu.com/community/EclipseIDE#Download\_Eclipse) or the [step-by-step guideline from Krizna](https://www.krizna.com/ubuntu/install-eclipse-in-ubuntu-12-04/) to install Eclipse. On Windows, download it from [www.eclipse.org](http://www.eclipse.org/downloads/) and run the installer.
 
-Eclipse JEE 2020-12 or newer is required.
+Eclipse JEE 2022-03 or newer is required.
 
 ### Other Tooling
 
@@ -109,8 +109,8 @@ To configure IntelliJ IDEA for developing JabRef, you should first ensure that y
 
 * Navigate to **File > Settings > Plugins > Installed** and check that you have the _Gradle_ and _Gradle Extension_ enabled.
 
-Ensure you have a Java 17 SDK configured by navigating to **File > Project Structure > Platform Settings > SDKs**.
-If you don't have one, add a new Java JDK and point it to the location of a JDK 17. ![Project Settings](../images/intellij-choose-jdk-adoptopenjdk-on-windows-project-settings.png)
+Ensure you have a Java 18 SDK configured by navigating to **File > Project Structure > Platform Settings > SDKs**.
+If you don't have one, add a new Java JDK and point it to the location of a JDK 18. ![Project Settings](../images/intellij-choose-jdk-adoptopenjdk-on-windows-project-settings.png)
 
 * Enable annotation processors by navigating to **File > Settings > Build, Execution, Deployment > Compiler > Annotation processors** and check "Enable annotation processing"\
   ![Enable annotation processing](../images/intellij-enable-annotation-processing.png)
@@ -251,7 +251,7 @@ Got it running? GREAT! You are ready to lurk the code and contribute to JabRef. 
 
 ### Java installation
 
-An indication that `JAVA_HOME` is not correctly set or no JDK 17 is installed is following error message:
+An indication that `JAVA_HOME` is not correctly set or no JDK 18 is installed is following error message:
 
 ```
 compileJava FAILED
@@ -302,9 +302,9 @@ This can include different modules.
 There might be problems with building if you have openjfx libraries in local maven repository, resulting in errors like this:
 
 ```
- > Could not find javafx-fxml-17-mac.jar (org.openjfx:javafx-fxml:17).
+ > Could not find javafx-fxml-18-mac.jar (org.openjfx:javafx-fxml:18).
      Searched in the following locations:
-         file:<your local maven repository path>/repository/org/openjfx/javafx-fxml/17/javafx-fxml-17-mac.jar
+         file:<your local maven repository path>/repository/org/openjfx/javafx-fxml/18/javafx-fxml-18-mac.jar
 ```
 
 As a workaround, you can remove all local openjfx artifacts by deleting the whole openjfx folder from specified location.
