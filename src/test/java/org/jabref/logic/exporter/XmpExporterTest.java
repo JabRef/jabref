@@ -44,21 +44,21 @@ public class XmpExporterTest {
 
         exporter.export(databaseContext, file, Collections.singletonList(entry));
         String actual = String.join("\n", Files.readAllLines(file)); // we are using \n to join, so we need it in the expected string as well, \r\n would fail
-        String expected = "  <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n" +
-                "    <rdf:Description xmlns:dc=\"http://purl.org/dc/elements/1.1/\" rdf:about=\"\">\n" +
-                "      <dc:creator>\n" +
-                "        <rdf:Seq>\n" +
-                "          <rdf:li>Alan Turing</rdf:li>\n" +
-                "        </rdf:Seq>\n" +
-                "      </dc:creator>\n" +
-                "      <dc:format>application/pdf</dc:format>\n" +
-                "      <dc:type>\n" +
-                "        <rdf:Bag>\n" +
-                "          <rdf:li>Misc</rdf:li>\n" +
-                "        </rdf:Bag>\n" +
-                "      </dc:type>\n" +
-                "    </rdf:Description>\n" +
-                "  </rdf:RDF>";
+        String expected = "  <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n"
+            + "    <rdf:Description xmlns:dc=\"http://purl.org/dc/elements/1.1/\" rdf:about=\"\">\n"
+            + "      <dc:format>application/pdf</dc:format>\n"
+            + "      <dc:type>\n"
+            + "        <rdf:Bag>\n"
+            + "          <rdf:li>Misc</rdf:li>\n"
+            + "        </rdf:Bag>\n"
+            + "      </dc:type>\n"
+            + "      <dc:creator>\n"
+            + "        <rdf:Seq>\n"
+            + "          <rdf:li>Alan Turing</rdf:li>\n"
+            + "        </rdf:Seq>\n"
+            + "      </dc:creator>\n"
+            + "    </rdf:Description>\n"
+            + "  </rdf:RDF>";
         assertEquals(expected, actual);
     }
 
