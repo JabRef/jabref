@@ -54,14 +54,7 @@ public class DeprecatedFieldsTab extends FieldsEditorTab {
     protected Set<Field> determineFieldsToShow(BibEntry entry) {
         Optional<BibEntryType> entryType = entryTypesManager.enrich(entry.getType(), databaseContext.getMode());
         if (entryType.isPresent()) {
-            Set<Field> validDeprecatedFields = new HashSet<>();
-            for (Field field : entryType.get().getDeprecatedFields()) {
-                Optional<String> fieldValue = entry.getField(field);
-                if (fieldValue.isPresent()) {
-                    validDeprecatedFields.add(field);
-                }
-            }
-            return validDeprecatedFields;
+        return entryType.get().getDeprecatedFields().stream().filter(field->! entry.getField(field).isEmpty()).collect(Collectors.toSet());
         } else {
             // Entry type unknown -> treat all fields as required
             return Collections.emptySet();
