@@ -1,9 +1,9 @@
 package org.jabref.gui.entryeditor;
 
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.swing.undo.UndoManager;
 
