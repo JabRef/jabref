@@ -160,7 +160,7 @@ public class AtomicFileOutputStream extends FilterOutputStream {
             Files.deleteIfExists(temporaryFile);
             Files.deleteIfExists(backupFile);
         } catch (IOException exception) {
-            LOGGER.debug("Unable to abort writing to file " + temporaryFile, exception);
+            LOGGER.debug("Unable to abort writing to file {}", temporaryFile, exception);
         }
     }
 
@@ -168,7 +168,7 @@ public class AtomicFileOutputStream extends FilterOutputStream {
         try {
             Files.deleteIfExists(temporaryFile);
         } catch (IOException exception) {
-            LOGGER.debug("Unable to delete file " + temporaryFile, exception);
+            LOGGER.debug("Unable to delete file {}", temporaryFile, exception);
         }
 
         try {
@@ -176,7 +176,7 @@ public class AtomicFileOutputStream extends FilterOutputStream {
                 temporaryFileLock.release();
             }
         } catch (IOException exception) {
-            LOGGER.warn("Unable to release lock on file " + temporaryFile, exception);
+            LOGGER.warn("Unable to release lock on file {}", temporaryFile, exception);
         }
     }
 
