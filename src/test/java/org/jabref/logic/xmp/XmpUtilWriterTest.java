@@ -1,10 +1,7 @@
 package org.jabref.logic.xmp;
 
-import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
-
-import javax.xml.transform.TransformerException;
 
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.Date;
