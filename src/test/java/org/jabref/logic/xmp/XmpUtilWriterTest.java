@@ -18,6 +18,8 @@ import org.apache.pdfbox.pdmodel.PDPage;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.jabref.logic.xmp.DublinCoreExtractor.DC_COVERAGE;
 import static org.jabref.logic.xmp.DublinCoreExtractor.DC_RIGHTS;
@@ -27,6 +29,9 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 class XmpUtilWriterTest {
+
+    @TempDir
+    private Path tempDir;
 
     private final BibEntry olly2018 = new BibEntry(StandardEntryType.Article)
             .withCitationKey("Olly2018")
@@ -49,7 +54,7 @@ class XmpUtilWriterTest {
             .withField(StandardField.OWNER, "me")
             .withField(StandardField.REVIEW, "review")
             .withField(StandardField.URL, "https://www.olly2018.edu");
-    ;
+
     private final BibEntry toral2006 = new BibEntry(StandardEntryType.InProceedings)
             .withField(StandardField.AUTHOR, "Antonio Toral and Rafael Munoz")
             .withField(StandardField.TITLE, "A proposal to automatically build and maintain gazetteers for Named Entity Recognition by using Wikipedia")
@@ -83,29 +88,38 @@ class XmpUtilWriterTest {
     /**
      * Test for writing a PDF file with a single DublinCore metadata entry.
      */
-    @Test
-    void testWriteXmp(@TempDir Path tempDir) throws IOException, TransformerException {
+    void singleEntryWorks(BibEntry entry) throws IOException, TransformerException {
         Path pdfFile = this.createDefaultFile("JabRef_writeSingle.pdf", tempDir);
 
-        // read a bib entry from the tests before
-        BibEntry entry = vapnik2000;
-        entry.setCitationKey("WriteXMPTest");
-        entry.setId("ID4711");
-
-        // write the changed bib entry to the PDF
         new XmpUtilWriter().writeXmp(pdfFile.toAbsolutePath(), entry, null, xmpPreferences);
 
-        // read entry again
         List<BibEntry> entriesWritten = new XmpUtilReader().readXmp(pdfFile, xmpPreferences);
+
         BibEntry entryWritten = entriesWritten.get(0);
         entryWritten.clearField(StandardField.FILE);
+        entry.clearField(StandardField.FILE);
 
         assertEquals(List.of(entry), entriesWritten);
     }
 
     @Test
+    void olly2018Works() throws Exception {
+        singleEntryWorks(olly2018);
+    }
+
+    @Test
+    void toral2006Works() throws Exception {
+        singleEntryWorks(toral2006);
+    }
+
+    @Test
+    void vapnik2000Works() throws Exception {
+        singleEntryWorks(vapnik2000);
+    }
+
+    @Test
     void testWriteTwoBibEntries(@TempDir Path tempDir) throws IOException, TransformerException {
-        Path pdfFile = this.createDefaultFile("JabRef_writeMultiple.pdf", tempDir);
+        Path pdfFile = this.createDefaultFile("JabRef_writeTwo.pdf", tempDir);
         List<BibEntry> entries = List.of(olly2018, toral2006);
         new XmpUtilWriter().writeXmp(pdfFile.toAbsolutePath(), entries, null, xmpPreferences);
         List<BibEntry> entryList = new XmpUtilReader().readXmp(pdfFile.toAbsolutePath(), xmpPreferences);
@@ -120,7 +134,7 @@ class XmpUtilWriterTest {
 
     @Test
     void testWriteThreeBibEntries(@TempDir Path tempDir) throws IOException, TransformerException {
-        Path pdfFile = this.createDefaultFile("JabRef_writeMultiple.pdf", tempDir);
+        Path pdfFile = this.createDefaultFile("JabRef_writeThree.pdf", tempDir);
         List<BibEntry> entries = List.of(olly2018, vapnik2000, toral2006);
         new XmpUtilWriter().writeXmp(pdfFile.toAbsolutePath(), entries, null, xmpPreferences);
         List<BibEntry> entryList = new XmpUtilReader().readXmp(pdfFile.toAbsolutePath(), xmpPreferences);
@@ -131,6 +145,45 @@ class XmpUtilWriterTest {
         entryList.forEach(entry -> entry.clearField(StandardField.FILE));
 
         assertEquals(entries, entryList);
+    }
+
+    @Test
+    void proctingBracesAreRemoved(@TempDir Path tempDir) throws IOException, TransformerException {
+        Path pdfFile = this.createDefaultFile("JabRef_writeBraces.pdf", tempDir);
+        BibEntry original = new BibEntry()
+                .withField(StandardField.NOTE, "Some {P}rotected {T}erm");
+        new XmpUtilWriter().writeXmp(pdfFile.toAbsolutePath(), List.of(original), null, xmpPreferences);
+        List<BibEntry> entryList = new XmpUtilReader().readXmp(pdfFile.toAbsolutePath(), xmpPreferences);
+
+        entryList.forEach(entry -> entry.clearField(StandardField.FILE));
+
+        BibEntry expected = new BibEntry()
+                .withField(StandardField.NOTE, "Some Protected Term");
+        assertEquals(List.of(expected), entryList);
+    }
+
+    @Test
+    void doubleDashAtPageNumberIsKept(@TempDir Path tempDir) throws IOException, TransformerException {
+        Path pdfFile = this.createDefaultFile("JabRef_writeBraces.pdf", tempDir);
+        BibEntry original = new BibEntry()
+                .withField(StandardField.PAGES, "2--33");
+        new XmpUtilWriter().writeXmp(pdfFile.toAbsolutePath(), List.of(original), null, xmpPreferences);
+        List<BibEntry> entryList = new XmpUtilReader().readXmp(pdfFile.toAbsolutePath(), xmpPreferences);
+
+        entryList.forEach(entry -> entry.clearField(StandardField.FILE));
+
+        assertEquals(List.of(original), entryList);
+    }
+
+    @Test
+    void singleEntry(@TempDir Path tempDir) throws IOException, TransformerException {
+        Path pdfFile = this.createDefaultFile("JabRef.pdf", tempDir);
+        new XmpUtilWriter().writeXmp(pdfFile.toAbsolutePath(), List.of(vapnik2000), null, xmpPreferences);
+        List<BibEntry> entryList = new XmpUtilReader().readXmp(pdfFile.toAbsolutePath(), xmpPreferences);
+
+        vapnik2000.clearField(StandardField.FILE);
+        entryList.forEach(entry -> entry.clearField(StandardField.FILE));
+        assertEquals(List.of(vapnik2000), entryList);
     }
 
     /**

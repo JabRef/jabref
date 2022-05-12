@@ -1,16 +1,14 @@
 package org.jabref.logic.xmp;
 
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.List;
-import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
-import java.util.TreeSet;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 import org.jabref.logic.TypedBibEntry;
+import org.jabref.logic.formatter.casechanger.UnprotectTermsFormatter;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.Author;
 import org.jabref.model.entry.AuthorList;
@@ -44,6 +42,8 @@ public class DublinCoreExtractor {
     private final XmpPreferences xmpPreferences;
 
     private final BibEntry bibEntry;
+
+    private UnprotectTermsFormatter unprotectTermsFormatter = new UnprotectTermsFormatter();
 
     /**
      * @param dcSchema      Metadata in DublinCore format.
@@ -429,8 +429,7 @@ public class DublinCoreExtractor {
             dcSchema.setFormat("application/pdf");
             fillType();
 
-            // String value = bibEntry.getLatexFreeField(field).get();
-            String value = bibEntry.getField(field).get();
+            String value = unprotectTermsFormatter.format(bibEntry.getField(field).get());
             if (field instanceof StandardField) {
                 switch ((StandardField) field) {
                     case EDITOR:
