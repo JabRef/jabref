@@ -203,7 +203,7 @@ public class XmpExporterTest {
                       </dc:type>
                     </rdf:Description>
                   </rdf:RDF>
-                """;
+                """.stripTrailing();
 
         assertEquals(expected, actual);
     }

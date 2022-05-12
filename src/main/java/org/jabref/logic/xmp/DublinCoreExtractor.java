@@ -421,14 +421,14 @@ public class DublinCoreExtractor {
         // Query privacy filter settings
         boolean useXmpPrivacyFilter = xmpPreferences.shouldUseXmpPrivacyFilter();
 
+        dcSchema.setFormat("application/pdf");
+        fillType();
+
         Set<Field> fields = bibEntry.getFields();
         for (Field field : fields) {
             if (useXmpPrivacyFilter && xmpPreferences.getXmpPrivacyFilter().contains(field)) {
                 continue;
             }
-
-            dcSchema.setFormat("application/pdf");
-            fillType();
 
             String value = unprotectTermsFormatter.format(bibEntry.getField(field).get());
             if (field instanceof StandardField standardField) {
