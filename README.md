@@ -88,7 +88,7 @@ We will discuss improvements with you and agree to merge them once the [develope
 
 If you want a step-by-step walk-through on how to set-up your workspace, please check [this guideline](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace).
 
-To compile JabRef from source, you need a Java Development Kit 15 and `JAVA_HOME` pointing to this JDK.
+To compile JabRef from source, you need a Java Development Kit 18 and `JAVA_HOME` pointing to this JDK.
 To run it, just execute `gradlew run`.
 When you want to develop, it is necessary to generate additional sources using `gradlew generateSource`
 and then generate the Eclipse `gradlew eclipse`.

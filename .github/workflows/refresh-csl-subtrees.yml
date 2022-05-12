@@ -6,6 +6,9 @@ on:
     - cron: '1 2 1,15 * *'
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   publish:
     name: Refresh Citation Style Language Files
