@@ -3,12 +3,9 @@ package org.jabref.logic.xmp;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.SortedSet;
-import java.util.TreeSet;
 
 import javax.xml.transform.TransformerException;
 
-import org.jabref.logic.bibtex.comparator.IdComparator;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.Date;
 import org.jabref.model.entry.Month;
