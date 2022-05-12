@@ -1,9 +1,12 @@
 package org.jabref.logic.xmp;
 
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
@@ -421,10 +424,8 @@ public class DublinCoreExtractor {
         // Query privacy filter settings
         boolean useXmpPrivacyFilter = xmpPreferences.shouldUseXmpPrivacyFilter();
 
-        dcSchema.setFormat("application/pdf");
-        fillType();
-
-        Set<Field> fields = bibEntry.getFields();
+        SortedSet<Field> fields = new TreeSet<>(Comparator.comparing(field -> field.getName()));
+        fields.addAll(bibEntry.getFields());
         for (Field field : fields) {
             if (useXmpPrivacyFilter && xmpPreferences.getXmpPrivacyFilter().contains(field)) {
                 continue;
@@ -475,5 +476,8 @@ public class DublinCoreExtractor {
                 }
             }
         }
+
+        dcSchema.setFormat("application/pdf");
+        fillType();
     }
 }
