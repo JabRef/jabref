@@ -9,13 +9,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map.Entry;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import javax.xml.transform.TransformerException;
 
-import org.jabref.logic.bibtex.FieldContentFormatter;
 import org.jabref.logic.exporter.EmbeddedBibFilePdfExporter;
 import org.jabref.logic.formatter.casechanger.UnprotectTermsFormatter;
 import org.jabref.logic.util.io.FileUtil;
@@ -48,7 +46,7 @@ public class XmpUtilWriter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(XmpUtilWriter.class);
 
-    private UnprotectTermsFormatter unprotectTermsFormatter = new UnprotectTermsFormatter();
+    private final UnprotectTermsFormatter unprotectTermsFormatter = new UnprotectTermsFormatter();
 
     /**
      * Try to write the given BibTexEntry in the XMP-stream of the given
