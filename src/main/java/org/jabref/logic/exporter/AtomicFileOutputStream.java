@@ -12,8 +12,10 @@ import java.nio.file.attribute.PosixFilePermission;
 import java.util.EnumSet;
 import java.util.Set;
 
+import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.io.FileUtil;
 
+import net.harawata.appdirs.AppDirsFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -106,7 +108,22 @@ public class AtomicFileOutputStream extends FilterOutputStream {
     }
 
     private static Path getPathOfTemporaryFile(Path targetFile) {
-        return FileUtil.addExtension(targetFile, TEMPORARY_EXTENSION);
+        Path result = FileUtil.addExtension(targetFile, TEMPORARY_EXTENSION);
+
+        // We choose the cache dir as it is a local-to-app temporary directory
+        Path directory = Path.of(AppDirsFactory.getInstance().getUserCacheDir(
+                "jabref",
+                new BuildInfo().version.toString(),
+                "org.jabref"))
+                .resolve("bibs");
+        try {
+            Files.createDirectories(directory);
+        } catch (IOException e) {
+            LOGGER.warn("Could not create bib writing directory {}, using {} as file", directory, result, e);
+            return result;
+        }
+        String fileName = FileUtil.getBaseName(targetFile) + "-" + Integer.toHexString(targetFile.hashCode()) + ".bib";
+        return directory.resolve(fileName);
     }
 
     private static Path getPathOfBackupFile(Path targetFile) {
