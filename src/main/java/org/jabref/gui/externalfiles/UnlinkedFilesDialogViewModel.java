@@ -107,9 +107,7 @@ public class UnlinkedFilesDialogViewModel {
                 new FileExtensionViewModel(StandardFileType.BIBTEX_DB, externalFileTypes),
                 new FileExtensionViewModel(StandardFileType.PDF, externalFileTypes));
 
-        this.unlinkedFileFilter = FXCollections.observableArrayList(
-                new FileIgnoreUnlinkedFiles(StandardFileType.DEF),
-                new FileIgnoreUnlinkedFiles(StandardFileType.IUF));
+        this.unlinkedFileFilter = FXCollections.observableArrayList(FileIgnoreUnlinkedFiles.values());
 
         this.dateFilterList = FXCollections.observableArrayList(DateRange.values());
 
@@ -125,12 +123,13 @@ public class UnlinkedFilesDialogViewModel {
     public void startSearch() {
         Path directory = this.getSearchDirectory();
         Filter<Path> selectedFileFilter = selectedExtension.getValue().dirFilter();
+        FileIgnoreUnlinkedFiles selectedUnlinkedFileIgnoreFilter = selectedFileIgnore.getValue();
         DateRange selectedDateFilter = selectedDate.getValue();
         ExternalFileSorter selectedSortFilter = selectedSort.getValue();
         progressValueProperty.unbind();
         progressTextProperty.unbind();
 
-        findUnlinkedFilesTask = new UnlinkedFilesCrawler(directory, selectedFileFilter, selectedDateFilter, selectedSortFilter, bibDatabase, preferences.getFilePreferences())
+        findUnlinkedFilesTask = new UnlinkedFilesCrawler(directory, selectedFileFilter, selectedDateFilter, selectedSortFilter, bibDatabase, preferences.getFilePreferences(), selectedUnlinkedFileIgnoreFilter)
                 .onRunning(() -> {
                     progressValueProperty.set(ProgressIndicator.INDETERMINATE_PROGRESS);
                     progressTextProperty.setValue(Localization.lang("Searching file system..."));

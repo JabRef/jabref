@@ -6,7 +6,9 @@ import java.nio.file.Path;
 import java.nio.file.attribute.FileTime;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.*;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -15,8 +17,7 @@ import org.slf4j.LoggerFactory;
 public class FileFilterUtils {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FileFilterUtils.class);
-    private static final Set<String> FILEIGNORESET = FileIgnore.getInstance().getIgnoreFileSet();
-
+    private static Set<String> FILEIGNORESET = null;
     /* Returns the last edited time of a file as LocalDateTime. */
     public static LocalDateTime getFileTime(Path path) {
         FileTime lastEditedTime = null;
@@ -76,27 +77,25 @@ public class FileFilterUtils {
     }
 
     /* Returns true if a file should be ignored by .gitignore */
-    public static boolean filterByFileExtension(Path path) {
-        try {
-            String fileExtension = "";
-            int i = path.toString().lastIndexOf('.');
-            if (i > 0) {
-                fileExtension = path.toString().substring(i + 1);
+    public static boolean filterForUnlinkedFiles(Path path, FileIgnoreUnlinkedFiles unlinkedFileFilter) {
+        if (unlinkedFileFilter.equals(FileIgnoreUnlinkedFiles.DEFAULT)) {
+            try {
+                FILEIGNORESET = FileIgnoreUnlinkedFiles.getIgnoreFileSet();
+                String fileExtension = "";
+                int i = path.toString().lastIndexOf('.');
+                if (i > 0) {
+                    fileExtension = path.toString().substring(i + 1);
+                }
+                if (!fileExtension.equals("") && FILEIGNORESET.contains(fileExtension)) {
+                    return false;
+                }
+            } catch (Exception e) {
+                LOGGER.info("Not file");
             }
-            if (fileExtension != "" && FILEIGNORESET.contains(fileExtension)) {
-                return false;
-            }
-        } catch (Exception e) {
-            LOGGER.info("Not file");
+            return !FILEIGNORESET.contains(path.getFileName().toString());
         }
-
         return true;
     }
-    public static boolean filterByFileName(Path path) {
-        if (FILEIGNORESET.contains(path.getFileName().toString())){
-            return false;}
-        return true;
-        }
 
     /* Sorts a list of Path objects according to the last edited date
      * of their corresponding files, from newest to oldest. */

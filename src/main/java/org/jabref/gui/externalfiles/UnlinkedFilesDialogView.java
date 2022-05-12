@@ -161,7 +161,7 @@ public class UnlinkedFilesDialogView extends BaseDialog<Void> {
         fileSortCombo.valueProperty().bindBidirectional(viewModel.selectedSortProperty());
         fileSortCombo.getSelectionModel().selectFirst();
         new ViewModelListCellFactory<FileIgnoreUnlinkedFiles>()
-                .withText(FileIgnoreUnlinkedFiles::getDescription)
+                .withText(FileIgnoreUnlinkedFiles::getFileIgnoreOption)
                 .install(unlinkedFileCombo);
         unlinkedFileCombo.setItems(viewModel.unlinkedFileFilter());
         unlinkedFileCombo.valueProperty().bindBidirectional(viewModel.selectedFileIgnoreProperty());

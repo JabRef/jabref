@@ -36,14 +36,16 @@ public class UnlinkedFilesCrawler extends BackgroundTask<FileNodeViewModel> {
     private final ExternalFileSorter sorter;
     private final BibDatabaseContext databaseContext;
     private final FilePreferences filePreferences;
+    private final FileIgnoreUnlinkedFiles unlinkedFileFilter;
 
-    public UnlinkedFilesCrawler(Path directory, Filter<Path> fileFilter, DateRange dateFilter, ExternalFileSorter sorter, BibDatabaseContext databaseContext, FilePreferences filePreferences) {
+    public UnlinkedFilesCrawler(Path directory, Filter<Path> fileFilter, DateRange dateFilter, ExternalFileSorter sorter, BibDatabaseContext databaseContext, FilePreferences filePreferences, FileIgnoreUnlinkedFiles unlinkedFileFilter) {
         this.directory = directory;
         this.fileFilter = fileFilter;
         this.dateFilter = dateFilter;
         this.sorter = sorter;
         this.databaseContext = databaseContext;
         this.filePreferences = filePreferences;
+        this.unlinkedFileFilter = unlinkedFileFilter;
     }
 
     @Override
@@ -66,7 +68,7 @@ public class UnlinkedFilesCrawler extends BackgroundTask<FileNodeViewModel> {
      * 'state' must be set to 1, to keep the recursion running. When the states value changes, the method will resolve
      * its recursion and return what it has saved so far.
      * <br>
-     * The files are filtered according to the {@link DateRange} filter value
+     * The files are filtered according to the {@link DateRange} filter value & the {@link FileIgnoreUnlinkedFiles} filter value
      * and then sorted according to the {@link ExternalFileSorter} value.
      *
      * @throws IOException if directory is not a directory or empty
@@ -102,7 +104,7 @@ public class UnlinkedFilesCrawler extends BackgroundTask<FileNodeViewModel> {
         // filter files according to last edited date.
         List<Path> filteredFiles = new ArrayList<Path>();
         for (Path path : files) {
-            if (FileFilterUtils.filterByDate(path, dateFilter) && FileFilterUtils.filterByFileExtension(path)&&FileFilterUtils.filterByFileName(path)) {
+            if (FileFilterUtils.filterByDate(path, dateFilter) && FileFilterUtils.filterForUnlinkedFiles(path, unlinkedFileFilter)) {
                 filteredFiles.add(path);
             }
         }
