@@ -3,14 +3,13 @@ package org.jabref.logic.exporter;
 import java.io.FileOutputStream;
 import java.io.FilterOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.channels.FileLock;
 import java.nio.channels.OverlappingFileLockException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
-import java.nio.file.attribute.PosixFilePermission;
-import java.util.EnumSet;
-import java.util.Set;
 
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.io.FileUtil;
@@ -86,6 +85,11 @@ public class AtomicFileOutputStream extends FilterOutputStream {
         this.backupFile = getPathOfBackupFile(path);
         this.keepBackup = keepBackup;
 
+        if (Files.exists(targetFile)) {
+            // Make a backup of the original file
+            Files.copy(targetFile, backupFile, StandardCopyOption.REPLACE_EXISTING);
+        }
+
         try {
             // Lock files (so that at least not another JabRef instance writes at the same time to the same tmp file)
             if (out instanceof FileOutputStream) {
@@ -107,27 +111,36 @@ public class AtomicFileOutputStream extends FilterOutputStream {
         this(path, false);
     }
 
-    private static Path getPathOfTemporaryFile(Path targetFile) {
-        Path result = FileUtil.addExtension(targetFile, TEMPORARY_EXTENSION);
-
+    private static Path getBibsPath() {
         // We choose the cache dir as it is a local-to-app temporary directory
         Path directory = Path.of(AppDirsFactory.getInstance().getUserCacheDir(
-                "jabref",
-                new BuildInfo().version.toString(),
-                "org.jabref"))
-                .resolve("bibs");
+                                     "jabref",
+                                     new BuildInfo().version.toString(),
+                                     "org.jabref"))
+                             .resolve("bibs");
+        return directory;
+    }
+
+    private static Path getPathOfSecondFile(Path targetFile, String extension) {
+        Path directory = getBibsPath();
         try {
             Files.createDirectories(directory);
         } catch (IOException e) {
+            Path result = FileUtil.addExtension(targetFile, extension);
             LOGGER.warn("Could not create bib writing directory {}, using {} as file", directory, result, e);
             return result;
         }
-        String fileName = FileUtil.getBaseName(targetFile) + "-" + Integer.toHexString(targetFile.hashCode()) + ".bib";
+        // By using a part of the hex string, we keep some old versions, but not all
+        String fileName = FileUtil.getBaseName(targetFile) + "-" + Integer.toHexString(targetFile.hashCode()).substring(0, 2) + extension + ".bib";
         return directory.resolve(fileName);
     }
 
-    private static Path getPathOfBackupFile(Path targetFile) {
-        return FileUtil.addExtension(targetFile, BACKUP_EXTENSION);
+    static Path getPathOfTemporaryFile(Path targetFile) {
+        return getPathOfSecondFile(targetFile, TEMPORARY_EXTENSION);
+    }
+
+    static Path getPathOfBackupFile(Path targetFile) {
+        return getPathOfSecondFile(targetFile, BACKUP_EXTENSION);
     }
 
     /**
@@ -138,7 +151,7 @@ public class AtomicFileOutputStream extends FilterOutputStream {
     }
 
     /**
-     * Override for performance reasons.
+     * Overridden because of cleanup actions in case of an error
      */
     @Override
     public void write(byte b[], int off, int len) throws IOException {
@@ -166,12 +179,6 @@ public class AtomicFileOutputStream extends FilterOutputStream {
 
     private void cleanup() {
         try {
-            Files.deleteIfExists(temporaryFile);
-        } catch (IOException exception) {
-            LOGGER.debug("Unable to delete file {}", temporaryFile, exception);
-        }
-
-        try {
             if (temporaryFileLock != null) {
                 temporaryFileLock.release();
             }
@@ -198,49 +205,40 @@ public class AtomicFileOutputStream extends FilterOutputStream {
             super.close();
 
             if (!errorDuringWrite) {
+                // We successfully wrote everything to the temporary file, let's copy it to the correct place
                 replaceOriginalFileByWrittenFile();
             }
 
             if (!keepBackup) {
-                // Remove backup file
                 Files.deleteIfExists(backupFile);
             }
         } finally {
-            // Remove temporary file (but not the backup!)
             cleanup();
         }
     }
 
     private void replaceOriginalFileByWrittenFile() throws IOException {
-        // We successfully wrote everything to the temporary file, lets copy it to the correct place
-        // First, make backup of original file and try to save file permissions to restore them later (by default: 664)
-        Set<PosixFilePermission> oldFilePermissions = EnumSet.of(PosixFilePermission.OWNER_READ,
-                PosixFilePermission.OWNER_WRITE,
-                PosixFilePermission.GROUP_READ,
-                PosixFilePermission.GROUP_WRITE,
-                PosixFilePermission.OTHERS_READ);
-        if (Files.exists(targetFile)) {
-            // Make a backup of the original file
-            Files.copy(targetFile, backupFile, StandardCopyOption.REPLACE_EXISTING);
-            if (FileUtil.IS_POSIX_COMPILANT) {
-                try {
-                    oldFilePermissions = Files.getPosixFilePermissions(targetFile);
-                } catch (IOException exception) {
-                    LOGGER.warn("Error getting file permissions for file {}.", targetFile, exception);
-                }
-            }
-        }
-
         // Move temporary file (replace original if it exists)
-        Files.move(temporaryFile, targetFile, StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING);
-
-        // Restore file permissions
-        if (FileUtil.IS_POSIX_COMPILANT) {
-            try {
-                Files.setPosixFilePermissions(targetFile, oldFilePermissions);
-            } catch (IOException exception) {
-                LOGGER.warn("Error writing file permissions to file {}.", targetFile, exception);
+        // We implement the move as write into the original and delete the temporary one to keep file permissions etc.
+        try (InputStream inputStream = Files.newInputStream(temporaryFile);
+             OutputStream outputStream = Files.newOutputStream(targetFile)) {
+            inputStream.transferTo(outputStream);
+        } catch (IOException e) {
+            LOGGER.error("Could not write into final .bib file {}", targetFile, e);
+            if (Files.size(targetFile) != Files.size(backupFile)) {
+                LOGGER.debug("Size of target file and backup file differ. Trying to restore target file from backup.");
+                LOGGER.info("Trying to restore backup from {} to {}", backupFile, targetFile);
+                try (InputStream inputStream = Files.newInputStream(backupFile);
+                     OutputStream outputStream = Files.newOutputStream(targetFile)) {
+                    inputStream.transferTo(outputStream);
+                } catch (IOException ex) {
+                    LOGGER.error("Could not restore backup from {} to {}", backupFile, targetFile, ex);
+                    throw ex;
+                }
+                LOGGER.info("Backup restored");
             }
+            // we rethrow the original error to indicate that writing (somehow) went wrong
+            throw e;
         }
     }
 

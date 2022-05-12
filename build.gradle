@@ -219,6 +219,12 @@ dependencies {
     testImplementation "org.testfx:testfx-junit5:4.0.17-alpha-SNAPSHOT"
     testImplementation "org.hamcrest:hamcrest-library:2.2"
 
+    testImplementation ('com.google.jimfs:jimfs:1.2') {
+        exclude group: "com.google.auto.service"
+        exclude group: "com.google.code.findbugs"
+        exclude group: "org.checkerframework"
+    }
+
     checkstyle 'com.puppycrawl.tools:checkstyle:10.1'
     // xjc needs the runtime as well for the ant task, otherwise it fails
     xjc group: 'org.glassfish.jaxb', name: 'jaxb-xjc', version: '3.0.2'
