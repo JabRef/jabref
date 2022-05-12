@@ -107,7 +107,7 @@ class XmpUtilWriterTest {
     void testWriteTwoBibEntries(@TempDir Path tempDir) throws IOException, TransformerException {
         Path pdfFile = this.createDefaultFile("JabRef_writeMultiple.pdf", tempDir);
         List<BibEntry> entries = List.of(olly2018, toral2006);
-        new XmpUtilWriter().writeXmp(Path.of(pdfFile.toAbsolutePath().toString()), entries, null, xmpPreferences);
+        new XmpUtilWriter().writeXmp(pdfFile.toAbsolutePath(), entries, null, xmpPreferences);
         List<BibEntry> entryList = new XmpUtilReader().readXmp(pdfFile.toAbsolutePath(), xmpPreferences);
 
         // the file field is not written - and the read file field contains the PDF file name
@@ -122,7 +122,7 @@ class XmpUtilWriterTest {
     void testWriteThreeBibEntries(@TempDir Path tempDir) throws IOException, TransformerException {
         Path pdfFile = this.createDefaultFile("JabRef_writeMultiple.pdf", tempDir);
         List<BibEntry> entries = List.of(olly2018, vapnik2000, toral2006);
-        new XmpUtilWriter().writeXmp(Path.of(pdfFile.toAbsolutePath().toString()), entries, null, xmpPreferences);
+        new XmpUtilWriter().writeXmp(pdfFile.toAbsolutePath(), entries, null, xmpPreferences);
         List<BibEntry> entryList = new XmpUtilReader().readXmp(pdfFile.toAbsolutePath(), xmpPreferences);
 
         // the file field is not written - and the read file field contains the PDF file name

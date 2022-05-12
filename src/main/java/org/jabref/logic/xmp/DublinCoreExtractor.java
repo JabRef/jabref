@@ -419,43 +419,46 @@ public class DublinCoreExtractor {
         // Query privacy filter settings
         boolean useXmpPrivacyFilter = xmpPreferences.shouldUseXmpPrivacyFilter();
 
-        Set<Entry<Field, String>> fieldValues = new TreeSet<>(Comparator.comparing(fieldStringEntry -> fieldStringEntry.getKey().getName()));
-        fieldValues.addAll(bibEntry.getFieldMap().entrySet());
-        boolean hasStandardYearField = fieldValues.stream().anyMatch(field -> StandardField.YEAR.equals(field.getKey()));
-        for (Entry<Field, String> field : fieldValues) {
-            if (useXmpPrivacyFilter && xmpPreferences.getXmpPrivacyFilter().contains(field.getKey())) {
+        Set<Field> fields = bibEntry.getFields();
+        boolean hasStandardYearField = bibEntry.hasField(StandardField.YEAR);
+        for (Field field : fields) {
+            if (useXmpPrivacyFilter && xmpPreferences.getXmpPrivacyFilter().contains(field)) {
                 continue;
             }
 
-            Field fieldEntry = field.getKey();
-            if (fieldEntry instanceof StandardField) {
-                switch ((StandardField) fieldEntry) {
+            dcSchema.setFormat("application/pdf");
+            fillType();
+
+            // String value = bibEntry.getLatexFreeField(field).get();
+            String value = bibEntry.getField(field).get();
+            if (field instanceof StandardField) {
+                switch ((StandardField) field) {
                     case EDITOR:
-                        this.fillContributor(field.getValue());
+                        this.fillContributor(value);
                         break;
                     case AUTHOR:
-                        this.fillCreator(field.getValue());
+                        this.fillCreator(value);
                         break;
                     case YEAR:
                         this.fillDate();
                         break;
                     case ABSTRACT:
-                        this.fillDescription(field.getValue());
+                        this.fillDescription(value);
                         break;
                     case DOI:
-                        this.fillIdentifier(field.getValue());
+                        this.fillIdentifier(value);
                         break;
                     case PUBLISHER:
-                        this.fillPublisher(field.getValue());
+                        this.fillPublisher(value);
                         break;
                     case KEYWORDS:
-                        this.fillKeywords(field.getValue());
+                        this.fillKeywords(value);
                         break;
                     case TITLE:
-                        this.fillTitle(field.getValue());
+                        this.fillTitle(value);
                         break;
                     case LANGUAGE:
-                        this.fillLanguages(field.getValue());
+                        this.fillLanguages(value);
                         break;
                     case FILE:
                         // we do not write the "file" field, because the file is the PDF itself
@@ -467,23 +470,19 @@ public class DublinCoreExtractor {
                             break;
                         }
                     default:
-                        this.fillCustomField(field.getKey(), field.getValue());
+                        this.fillCustomField(field, value);
                 }
             } else {
-                if (DC_COVERAGE.equals(fieldEntry.getName())) {
-                    this.fillCoverage(field.getValue());
-                } else if (DC_RIGHTS.equals(fieldEntry.getName())) {
-                    this.fillRights(field.getValue());
-                } else if (DC_SOURCE.equals(fieldEntry.getName())) {
-                    this.fillSource(field.getValue());
+                if (DC_COVERAGE.equals(field.getName())) {
+                    this.fillCoverage(value);
+                } else if (DC_RIGHTS.equals(field.getName())) {
+                    this.fillRights(value);
+                } else if (DC_SOURCE.equals(field.getName())) {
+                    this.fillSource(value);
                 } else {
-                    this.fillCustomField(field.getKey(), field.getValue());
+                    this.fillCustomField(field, value);
                 }
             }
         }
-
-        dcSchema.setFormat("application/pdf");
-
-        fillType();
     }
 }

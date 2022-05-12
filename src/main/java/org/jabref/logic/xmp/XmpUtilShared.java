@@ -25,7 +25,7 @@ public class XmpUtilShared {
     }
 
     protected static XMPMetadata parseXmpMetadata(InputStream is) throws IOException {
-        XMPMetadata meta = null;
+        XMPMetadata meta;
         try {
             DomXmpParser parser = new DomXmpParser();
             meta = parser.parse(is);
