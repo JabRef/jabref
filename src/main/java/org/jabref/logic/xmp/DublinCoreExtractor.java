@@ -45,7 +45,7 @@ public class DublinCoreExtractor {
 
     private final BibEntry bibEntry;
 
-    private UnprotectTermsFormatter unprotectTermsFormatter = new UnprotectTermsFormatter();
+    private final UnprotectTermsFormatter unprotectTermsFormatter = new UnprotectTermsFormatter();
 
     /**
      * @param dcSchema      Metadata in DublinCore format.
@@ -293,8 +293,6 @@ public class DublinCoreExtractor {
 
     /**
      * BibTeX: editor; DC: 'dc:contributor'
-     *
-     * @param authors
      */
     private void fillContributor(String authors) {
         AuthorList list = AuthorList.parse(authors);
@@ -305,8 +303,6 @@ public class DublinCoreExtractor {
 
     /**
      * BibTeX: author; DC: 'dc:creator'
-     *
-     * @param creators
      */
     private void fillCreator(String creators) {
         AuthorList list = AuthorList.parse(creators);
@@ -426,7 +422,6 @@ public class DublinCoreExtractor {
         boolean useXmpPrivacyFilter = xmpPreferences.shouldUseXmpPrivacyFilter();
 
         Set<Field> fields = bibEntry.getFields();
-        boolean hasStandardYearField = bibEntry.hasField(StandardField.YEAR);
         for (Field field : fields) {
             if (useXmpPrivacyFilter && xmpPreferences.getXmpPrivacyFilter().contains(field)) {
                 continue;
@@ -436,46 +431,37 @@ public class DublinCoreExtractor {
             fillType();
 
             String value = unprotectTermsFormatter.format(bibEntry.getField(field).get());
-            if (field instanceof StandardField) {
-                switch ((StandardField) field) {
-                    case EDITOR:
-                        this.fillContributor(value);
-                        break;
-                    case AUTHOR:
-                        this.fillCreator(value);
-                        break;
-                    case YEAR:
-                        this.fillDate();
-                        break;
-                    case ABSTRACT:
-                        this.fillDescription(value);
-                        break;
-                    case DOI:
-                        this.fillIdentifier(value);
-                        break;
-                    case PUBLISHER:
-                        this.fillPublisher(value);
-                        break;
-                    case KEYWORDS:
-                        this.fillKeywords(value);
-                        break;
-                    case TITLE:
-                        this.fillTitle(value);
-                        break;
-                    case LANGUAGE:
-                        this.fillLanguages(value);
-                        break;
-                    case FILE:
+            if (field instanceof StandardField standardField) {
+                switch (standardField) {
+                    case EDITOR ->
+                            this.fillContributor(value);
+                    case AUTHOR ->
+                            this.fillCreator(value);
+                    case YEAR ->
+                            this.fillDate();
+                    case ABSTRACT ->
+                            this.fillDescription(value);
+                    case DOI ->
+                            this.fillIdentifier(value);
+                    case PUBLISHER ->
+                            this.fillPublisher(value);
+                    case KEYWORDS ->
+                            this.fillKeywords(value);
+                    case TITLE ->
+                            this.fillTitle(value);
+                    case LANGUAGE ->
+                            this.fillLanguages(value);
+                    case FILE -> {
                         // we do not write the "file" field, because the file is the PDF itself
-                        break;
-                    case DAY:
-                    case MONTH:
+                    }
+                    case DAY, MONTH -> {
                         // we do not write day and month separately if dc:year can be used
-                        if (hasStandardYearField) {
-                            break;
+                        if (!bibEntry.hasField(StandardField.YEAR)) {
+                            this.fillCustomField(field);
                         }
-                    default:
-                        this.fillCustomField(field);
+                    }
+                    default ->
+                            this.fillCustomField(field);
                 }
             } else {
                 if (DC_COVERAGE.equals(field.getName())) {
