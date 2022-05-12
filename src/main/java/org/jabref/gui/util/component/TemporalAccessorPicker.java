@@ -22,6 +22,7 @@ import org.jabref.gui.fieldeditors.TextInputControlBehavior;
 import org.jabref.gui.fieldeditors.contextmenu.EditorContextAction;
 import org.jabref.gui.util.BindingsHelper;
 
+
 /**
  * A date picker with configurable datetime format where both date and time can be changed via the text field and the
  * date can additionally be changed via the JavaFX default date picker. Also supports incomplete dates.
@@ -41,7 +42,7 @@ import org.jabref.gui.util.BindingsHelper;
 public class TemporalAccessorPicker extends DatePicker {
     private final ObjectProperty<TemporalAccessor> temporalAccessorValue = new SimpleObjectProperty<>(null);
 
-    private final DateTimeFormatter defaultFormatter = DateTimeFormatter.ofPattern("uuuu-MM-dd'T'HH:mm:ss[xxx][xx][X]");
+    private final DateTimeFormatter defaultFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
     private final ObjectProperty<StringConverter<TemporalAccessor>> converter = new SimpleObjectProperty<>(null);
 
     public TemporalAccessorPicker() {
@@ -139,7 +140,6 @@ public class TemporalAccessorPicker extends DatePicker {
 
             TemporalAccessor dateTime = getStringConverter().fromString(value);
             temporalAccessorValue.set(dateTime);
-            System.out.print(temporalAccessorValue);
             return getLocalDate(dateTime);
         }
     }
