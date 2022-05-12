@@ -290,7 +290,7 @@ public class DublinCoreExtractor {
     }
 
     /**
-     * BibTeX-Fields used: editor, Field: 'dc:contributor'
+     * BibTeX: editor; DC: 'dc:contributor'
      *
      * @param authors
      */
@@ -302,7 +302,7 @@ public class DublinCoreExtractor {
     }
 
     /**
-     * BibTeX-Fields used: author, Field: 'dc:creator'
+     * BibTeX: author; DC: 'dc:creator'
      *
      * @param creators
      */
@@ -314,7 +314,7 @@ public class DublinCoreExtractor {
     }
 
     /**
-     * BibTeX-Fields used: year, month, Field: 'dc:date'
+     * BibTeX: year, month; DC: 'dc:date'
      */
     private void fillDate() {
         bibEntry.getFieldOrAlias(StandardField.DATE)
@@ -322,28 +322,28 @@ public class DublinCoreExtractor {
     }
 
     /**
-     * BibTeX-Fields used: abstract, Field: 'dc:description'
+     * BibTeX: abstract; DC: 'dc:description'
      */
     private void fillDescription(String description) {
         dcSchema.setDescription(description);
     }
 
     /**
-     * BibTeX-Fields used: doi, Field: 'dc:identifier'
+     * BibTeX:doi; DC: 'dc:identifier'
      */
     private void fillIdentifier(String identifier) {
         dcSchema.setIdentifier(identifier);
     }
 
     /**
-     * BibTeX-Fields used: publisher, Field: dc:publisher
+     * BibTeX: publisher, DC: dc:publisher
      */
     private void fillPublisher(String publisher) {
         dcSchema.addPublisher(publisher);
     }
 
     /**
-     * BibTeX-Fields used: keywords, Field: 'dc:subject'
+     * BibTeX: keywords; DC: 'dc:subject'
      */
     private void fillKeywords(String value) {
         String[] keywords = value.split(xmpPreferences.getKeywordSeparator().toString());
@@ -353,21 +353,21 @@ public class DublinCoreExtractor {
     }
 
     /**
-     * BibTeX-Fields used: title, Field: 'dc:title'
+     * BibTeX: title; DC: 'dc:title'
      */
     private void fillTitle(String title) {
         dcSchema.setTitle(title);
     }
 
     /**
-     * BibTeX : Coverage (Custom Field); DC Field : Coverage
+     * BibTeX: Coverage (Custom Field); DC Field : Coverage
      */
     private void fillCoverage(String coverage) {
         dcSchema.setCoverage(coverage);
     }
 
     /**
-     * BibTeX Field : language ; DC Field : dc:language
+     * BibTeX: language; DC: dc:language
      */
     private void fillLanguages(String languages) {
         Arrays.stream(languages.split(","))
@@ -375,14 +375,14 @@ public class DublinCoreExtractor {
     }
 
     /**
-     * BibTeX : Rights (Custom Field); DC Field : dc:rights
+     * BibTeX: Rights (Custom Field); DC: dc:rights
      */
     private void fillRights(String rights) {
         dcSchema.addRights(null, rights.split(",")[0]);
     }
 
     /**
-     * BibTeX : Source (Custom Field); DC Field : Source
+     * BibTeX: Source (Custom Field); DC: Source
      */
     private void fillSource(String source) {
         dcSchema.setSource(source);
@@ -402,7 +402,7 @@ public class DublinCoreExtractor {
      * Opposite method: {@link DublinCoreExtractor#extractType()}
      */
     private void fillType() {
-        // Bibtex-Fields used: entrytype, Field: 'dc:type'
+        // BibTeX: entry type; DC: 'dc:type'
         TypedBibEntry typedEntry = new TypedBibEntry(bibEntry, BibDatabaseMode.BIBTEX);
         String o = typedEntry.getTypeForDisplay();
         if (!o.isEmpty()) {
