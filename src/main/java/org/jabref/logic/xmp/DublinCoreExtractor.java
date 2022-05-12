@@ -56,7 +56,7 @@ public class DublinCoreExtractor {
     }
 
     /**
-     * Editor in BibTex - Contributor in DublinCore
+     * Editor in BibTeX - Contributor in DublinCore
      */
     private void extractEditor() {
         List<String> contributors = dcSchema.getContributors();
@@ -66,7 +66,7 @@ public class DublinCoreExtractor {
     }
 
     /**
-     * Author in BibTex - Creator in DublinCore
+     * Author in BibTeX - Creator in DublinCore
      */
     private void extractAuthor() {
         List<String> creators = dcSchema.getCreators();
@@ -76,7 +76,7 @@ public class DublinCoreExtractor {
     }
 
     /**
-     * Bibtex-Fields : year, [month], [day] - 'dc:date' in DublinCore
+     * BibTeX-Fields : year, [month], [day] - 'dc:date' in DublinCore
      */
     private void extractDate() {
         List<String> dates = dcSchema.getUnqualifiedSequenceValueList("date");
@@ -92,7 +92,7 @@ public class DublinCoreExtractor {
     }
 
     /**
-     * Abstract in BibTex - Description in DublinCore
+     * Abstract in BibTeX - Description in DublinCore
      */
     private void extractAbstract() {
         String description = null;
@@ -107,7 +107,7 @@ public class DublinCoreExtractor {
     }
 
     /**
-     * DOI in BibTex - Identifier in DublinCore
+     * DOI in BibTeX - Identifier in DublinCore
      */
     private void extractDOI() {
         String identifier = dcSchema.getIdentifier();
@@ -117,7 +117,7 @@ public class DublinCoreExtractor {
     }
 
     /**
-     * Publisher are equivalent in both formats (BibTex and DublinCore)
+     * Publisher are equivalent in both formats (BibTeX and DublinCore)
      */
     private void extractPublisher() {
         List<String> publishers = dcSchema.getPublishers();
@@ -130,7 +130,7 @@ public class DublinCoreExtractor {
      * This method sets all fields, which are custom in BibTeX and therefore supported by JabRef, but which are not
      * included in the DublinCore format.
      * <p>
-     * The relation attribute of DublinCore is abused to insert these custom fields.
+     * The relation attribute of DublinCore is abused to store these custom fields. The prefix <code>bibtex</code> is used.
      */
     private void extractBibTexFields() {
         Predicate<String> isBibTeXElement = s -> s.startsWith("bibtex/");
@@ -163,7 +163,7 @@ public class DublinCoreExtractor {
     }
 
     /**
-     * Rights are equivalent in both formats (BibTex and DublinCore)
+     * Rights are equivalent in both formats (BibTeX and DublinCore)
      */
     private void extractRights() {
         String rights = null;
@@ -178,7 +178,7 @@ public class DublinCoreExtractor {
     }
 
     /**
-     * Source is equivalent in both formats (BibTex and DublinCore)
+     * Source is equivalent in both formats (BibTeX and DublinCore)
      */
     private void extractSource() {
         String source = dcSchema.getSource();
@@ -188,7 +188,7 @@ public class DublinCoreExtractor {
     }
 
     /**
-     * Keywords in BibTex - Subjects in DublinCore
+     * Keywords in BibTeX - Subjects in DublinCore
      */
     private void extractSubject() {
         List<String> subjects = dcSchema.getSubjects();
@@ -198,7 +198,7 @@ public class DublinCoreExtractor {
     }
 
     /**
-     * Title is equivalent in both formats (BibTex and DublinCore)
+     * Title is equivalent in both formats (BibTeX and DublinCore)
      */
     private void extractTitle() {
         String title = null;
@@ -227,7 +227,7 @@ public class DublinCoreExtractor {
     }
 
     /**
-     * No Equivalent in BibTex. Will create an Unknown "Coverage" Field
+     * No Equivalent in BibTeX. Will create an Unknown "Coverage" Field
      */
     private void extractCoverage() {
         String coverage = dcSchema.getCoverage();
@@ -290,7 +290,7 @@ public class DublinCoreExtractor {
     }
 
     /**
-     * Bibtex-Fields used: editor, Field: 'dc:contributor'
+     * BibTeX-Fields used: editor, Field: 'dc:contributor'
      *
      * @param authors
      */
@@ -302,7 +302,7 @@ public class DublinCoreExtractor {
     }
 
     /**
-     * Bibtex-Fields used: author, Field: 'dc:creator'
+     * BibTeX-Fields used: author, Field: 'dc:creator'
      *
      * @param creators
      */
@@ -314,7 +314,7 @@ public class DublinCoreExtractor {
     }
 
     /**
-     * Bibtex-Fields used: year, month, Field: 'dc:date'
+     * BibTeX-Fields used: year, month, Field: 'dc:date'
      */
     private void fillDate() {
         bibEntry.getFieldOrAlias(StandardField.DATE)
@@ -322,28 +322,28 @@ public class DublinCoreExtractor {
     }
 
     /**
-     * Bibtex-Fields used: abstract, Field: 'dc:description'
+     * BibTeX-Fields used: abstract, Field: 'dc:description'
      */
     private void fillDescription(String description) {
         dcSchema.setDescription(description);
     }
 
     /**
-     * Bibtex-Fields used: doi, Field: 'dc:identifier'
+     * BibTeX-Fields used: doi, Field: 'dc:identifier'
      */
     private void fillIdentifier(String identifier) {
         dcSchema.setIdentifier(identifier);
     }
 
     /**
-     * Bibtex-Fields used: publisher, Field: dc:publisher
+     * BibTeX-Fields used: publisher, Field: dc:publisher
      */
     private void fillPublisher(String publisher) {
         dcSchema.addPublisher(publisher);
     }
 
     /**
-     * Bibtex-Fields used: keywords, Field: 'dc:subject'
+     * BibTeX-Fields used: keywords, Field: 'dc:subject'
      */
     private void fillKeywords(String value) {
         String[] keywords = value.split(",");
@@ -353,21 +353,21 @@ public class DublinCoreExtractor {
     }
 
     /**
-     * Bibtex-Fields used: title, Field: 'dc:title'
+     * BibTeX-Fields used: title, Field: 'dc:title'
      */
     private void fillTitle(String title) {
         dcSchema.setTitle(title);
     }
 
     /**
-     * BibTex : Coverage (Custom Field); DC Field : Coverage
+     * BibTeX : Coverage (Custom Field); DC Field : Coverage
      */
     private void fillCoverage(String coverage) {
         dcSchema.setCoverage(coverage);
     }
 
     /**
-     * BibTex Field : language ; DC Field : dc:language
+     * BibTeX Field : language ; DC Field : dc:language
      */
     private void fillLanguages(String languages) {
         Arrays.stream(languages.split(","))
@@ -375,14 +375,14 @@ public class DublinCoreExtractor {
     }
 
     /**
-     * BibTex : Rights (Custom Field); DC Field : dc:rights
+     * BibTeX : Rights (Custom Field); DC Field : dc:rights
      */
     private void fillRights(String rights) {
         dcSchema.addRights(null, rights.split(",")[0]);
     }
 
     /**
-     * BibTex : Source (Custom Field); DC Field : Source
+     * BibTeX : Source (Custom Field); DC Field : Source
      */
     private void fillSource(String source) {
         dcSchema.setSource(source);
