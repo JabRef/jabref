@@ -27,7 +27,7 @@ public class XmpPdfExporter extends Exporter {
         Objects.requireNonNull(entries);
 
         if (pdfFile.toString().endsWith(".pdf")) {
-            new XmpUtilWriter().writeXmp(pdfFile, entries, databaseContext.getDatabase(), xmpPreferences);
+            new XmpUtilWriter(xmpPreferences).writeXmp(pdfFile, entries, databaseContext.getDatabase());
         }
     }
 }

@@ -57,7 +57,7 @@ public class XmpExporter extends Exporter {
                 if (file.getParent() == null) {
                     entryFile = Path.of(suffix);
                 } else {
-                    entryFile = Path.of(file.getParent().toString() + "/" + suffix);
+                    entryFile = Path.of(file.getParent() + "/" + suffix);
                 }
                 this.writeBibToXmp(entryFile, Collections.singletonList(entry));
             }
@@ -67,7 +67,7 @@ public class XmpExporter extends Exporter {
     }
 
     private void writeBibToXmp(Path file, List<BibEntry> entries) throws IOException {
-        String xmpContent = new XmpUtilWriter().generateXmpStringWithoutXmpDeclaration(entries, this.xmpPreferences);
+        String xmpContent = new XmpUtilWriter(this.xmpPreferences).generateXmpStringWithoutXmpDeclaration(entries);
         try (BufferedWriter writer = Files.newBufferedWriter(file, StandardCharsets.UTF_8)) {
             writer.write(xmpContent);
             writer.flush();

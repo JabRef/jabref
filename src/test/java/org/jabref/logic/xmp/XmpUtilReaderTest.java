@@ -10,7 +10,6 @@ import java.util.Optional;
 
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.fileformat.BibtexImporter;
-import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.schema.DublinCoreSchemaCustom;
@@ -29,16 +28,14 @@ import static org.mockito.Mockito.when;
 class XmpUtilReaderTest {
 
     private XmpPreferences xmpPreferences;
-    private BibtexParser parser;
     private BibtexImporter testImporter;
-    private XmpUtilReader xmpUtilReader = new XmpUtilReader();
+    private final XmpUtilReader xmpUtilReader = new XmpUtilReader();
 
     /**
      * Create a temporary PDF-file with a single empty page.
      */
     @BeforeEach
     void setUp() {
-        ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
         xmpPreferences = mock(XmpPreferences.class);
         // The code assumes privacy filters to be off
         when(xmpPreferences.shouldUseXmpPrivacyFilter()).thenReturn(false);
@@ -91,7 +88,7 @@ class XmpUtilReaderTest {
         Path bibFile = Path.of(XmpUtilShared.class.getResource("article_dublinCore_partial_date.bib").toURI());
         List<BibEntry> expected = testImporter.importDatabase(bibFile).getDatabase().getEntries();
 
-        expected.forEach(bibEntry -> bibEntry.setFiles(Arrays.asList(
+        expected.forEach(bibEntry -> bibEntry.setFiles(List.of(
                 new LinkedFile("", pathPdf.toAbsolutePath(), "PDF"))
         ));
 
@@ -118,7 +115,7 @@ class XmpUtilReaderTest {
         Path bibFile = Path.of(XmpUtilShared.class.getResource("PD_metadata.bib").toURI());
         List<BibEntry> expected = testImporter.importDatabase(bibFile).getDatabase().getEntries();
 
-        expected.forEach(bibEntry -> bibEntry.setFiles(Arrays.asList(
+        expected.forEach(bibEntry -> bibEntry.setFiles(List.of(
                 new LinkedFile("", pathPdf.toAbsolutePath(), "PDF"))
         ));
 

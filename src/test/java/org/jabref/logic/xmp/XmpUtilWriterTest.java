@@ -86,7 +86,7 @@ class XmpUtilWriterTest {
     void singleEntryWorks(BibEntry entry) throws Exception {
         Path pdfFile = this.createDefaultFile("JabRef_writeSingle.pdf", tempDir);
 
-        new XmpUtilWriter().writeXmp(pdfFile.toAbsolutePath(), entry, null, xmpPreferences);
+        new XmpUtilWriter(xmpPreferences).writeXmp(pdfFile.toAbsolutePath(), entry, null);
 
         List<BibEntry> entriesWritten = new XmpUtilReader().readXmp(pdfFile, xmpPreferences);
 
@@ -116,7 +116,7 @@ class XmpUtilWriterTest {
     void testWriteTwoBibEntries(@TempDir Path tempDir) throws Exception {
         Path pdfFile = this.createDefaultFile("JabRef_writeTwo.pdf", tempDir);
         List<BibEntry> entries = List.of(olly2018, toral2006);
-        new XmpUtilWriter().writeXmp(pdfFile.toAbsolutePath(), entries, null, xmpPreferences);
+        new XmpUtilWriter(xmpPreferences).writeXmp(pdfFile.toAbsolutePath(), entries, null);
         List<BibEntry> entryList = new XmpUtilReader().readXmp(pdfFile.toAbsolutePath(), xmpPreferences);
 
         // the file field is not written - and the read file field contains the PDF file name
@@ -131,7 +131,7 @@ class XmpUtilWriterTest {
     void testWriteThreeBibEntries(@TempDir Path tempDir) throws Exception {
         Path pdfFile = this.createDefaultFile("JabRef_writeThree.pdf", tempDir);
         List<BibEntry> entries = List.of(olly2018, vapnik2000, toral2006);
-        new XmpUtilWriter().writeXmp(pdfFile.toAbsolutePath(), entries, null, xmpPreferences);
+        new XmpUtilWriter(xmpPreferences).writeXmp(pdfFile.toAbsolutePath(), entries, null);
         List<BibEntry> entryList = new XmpUtilReader().readXmp(pdfFile.toAbsolutePath(), xmpPreferences);
 
         // the file field is not written - and the read file field contains the PDF file name
@@ -147,7 +147,7 @@ class XmpUtilWriterTest {
         Path pdfFile = this.createDefaultFile("JabRef_writeBraces.pdf", tempDir);
         BibEntry original = new BibEntry()
                 .withField(StandardField.TITLE, "Some {P}rotected {T}erm");
-        new XmpUtilWriter().writeXmp(pdfFile.toAbsolutePath(), List.of(original), null, xmpPreferences);
+        new XmpUtilWriter(xmpPreferences).writeXmp(pdfFile.toAbsolutePath(), List.of(original), null);
         List<BibEntry> entryList = new XmpUtilReader().readXmp(pdfFile.toAbsolutePath(), xmpPreferences);
 
         entryList.forEach(entry -> entry.clearField(StandardField.FILE));
@@ -162,7 +162,7 @@ class XmpUtilWriterTest {
         Path pdfFile = this.createDefaultFile("JabRef_writeBraces.pdf", tempDir);
         BibEntry original = new BibEntry()
                 .withField(StandardField.PAGES, "{55}-{99}");
-        new XmpUtilWriter().writeXmp(pdfFile.toAbsolutePath(), List.of(original), null, xmpPreferences);
+        new XmpUtilWriter(xmpPreferences).writeXmp(pdfFile.toAbsolutePath(), List.of(original), null);
         List<BibEntry> entryList = new XmpUtilReader().readXmp(pdfFile.toAbsolutePath(), xmpPreferences);
 
         entryList.forEach(entry -> entry.clearField(StandardField.FILE));
@@ -175,7 +175,7 @@ class XmpUtilWriterTest {
         Path pdfFile = this.createDefaultFile("JabRef_writeBraces.pdf", tempDir);
         BibEntry original = new BibEntry()
                 .withField(StandardField.PAGES, "2--33");
-        new XmpUtilWriter().writeXmp(pdfFile.toAbsolutePath(), List.of(original), null, xmpPreferences);
+        new XmpUtilWriter(xmpPreferences).writeXmp(pdfFile.toAbsolutePath(), List.of(original), null);
         List<BibEntry> entryList = new XmpUtilReader().readXmp(pdfFile.toAbsolutePath(), xmpPreferences);
 
         entryList.forEach(entry -> entry.clearField(StandardField.FILE));
@@ -186,7 +186,7 @@ class XmpUtilWriterTest {
     @Test
     void singleEntry(@TempDir Path tempDir) throws Exception {
         Path pdfFile = this.createDefaultFile("JabRef.pdf", tempDir);
-        new XmpUtilWriter().writeXmp(pdfFile.toAbsolutePath(), List.of(vapnik2000), null, xmpPreferences);
+        new XmpUtilWriter(xmpPreferences).writeXmp(pdfFile.toAbsolutePath(), List.of(vapnik2000), null);
         List<BibEntry> entryList = new XmpUtilReader().readXmp(pdfFile.toAbsolutePath(), xmpPreferences);
 
         vapnik2000.clearField(StandardField.FILE);
