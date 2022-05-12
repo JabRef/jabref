@@ -346,7 +346,7 @@ public class DublinCoreExtractor {
      * BibTeX-Fields used: keywords, Field: 'dc:subject'
      */
     private void fillKeywords(String value) {
-        String[] keywords = value.split(",");
+        String[] keywords = value.split(xmpPreferences.getKeywordSeparator().toString());
         for (String keyword : keywords) {
             dcSchema.addSubject(keyword.trim());
         }

@@ -19,6 +19,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We improved the Latex2Unicode conversion [#8639](https://github.com/JabRef/jabref/pull/8639)
 - Writing BibTeX data into a PDF (XMP) removes braces. [#8452](https://github.com/JabRef/jabref/issues/8452)
 - Writing BibTeX data into a PDF (XMP) does not write the `file` field.
+- Writing BibTeX data into a PDF (XMP) considers the configured keyboard separator (and does not use "," as default any more)
 
 ### Fixed
 
