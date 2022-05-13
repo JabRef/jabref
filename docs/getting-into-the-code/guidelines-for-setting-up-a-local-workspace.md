@@ -351,10 +351,11 @@ If that does not help:
 4. Execute `./gradlew run`
 5. Start IntelliJ and try again.
 
-### Issue with org/jabref/build/JournalAbbreviationConverter$\_convert\_closure1$\_closure2.class is a duplicate but no duplicate handling strategy has been set
+### Issue with `_closure2.class is a duplicate but no duplicate handling strategy has been set`
 
 After changing the contents of `build.gradle`, on might get following error:
 
-`Entry org/jabref/build/JournalAbbreviationConverter$_convert_closure1$_closure2.class is a duplicate but no duplicate handling strategy has been set.`
+    Entry org/jabref/build/JournalAbbreviationConverter$_convert_closure1$_closure2.class is a duplicate but no duplicate handling strategy has been set.
 
-Currently, no "real" solution is known. One has to start from scratch (`git clean -xdf`, ...).
+Please update to the latest development code.
+We applied the workaround from <https://github.com/gradle/gradle/issues/17236#issuecomment-923074298>.
