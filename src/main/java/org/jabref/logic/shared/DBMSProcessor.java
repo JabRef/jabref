@@ -26,6 +26,7 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.types.EntryTypeFactory;
 
+import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -148,7 +149,6 @@ public abstract class DBMSProcessor {
         if (notYetExistingEntries.isEmpty()) {
             return;
         }
-
         insertIntoEntryTable(notYetExistingEntries);
         insertIntoFieldTable(notYetExistingEntries);
     }
@@ -484,15 +484,12 @@ public abstract class DBMSProcessor {
      * @param sharedIDs the list of Ids to filter. If list is empty, then no filter is applied
      */
     public List<BibEntry> partitionAndGetSharedEntries(List<Integer> sharedIDs) {
+
+        List<List<Integer>> partitions = Lists.partition(sharedIDs, 500);
         List<BibEntry> result = new ArrayList<>();
-        for (int i = 0; i <= sharedIDs.size(); i += 500) {
-            List<Integer> partitionedSharedIDs;
-            if ((i + 500) > sharedIDs.size()) {
-                partitionedSharedIDs = sharedIDs.subList(i, sharedIDs.size());
-            } else {
-                partitionedSharedIDs = sharedIDs.subList(i, i + 500);
-            }
-            result.addAll(getSharedEntries(partitionedSharedIDs));
+
+        for (List<Integer> sublist : partitions) {
+            result.addAll(getSharedEntries(sublist));
         }
         return result;
     }
