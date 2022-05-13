@@ -7,7 +7,6 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Comparator;
-import java.util.Map;
 
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -27,18 +26,15 @@ import org.jabref.logic.net.ssl.TrustStoreManager;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.remote.client.RemoteClient;
-import org.jabref.logic.util.BuildInfo;
 import org.jabref.migrations.PreferencesMigrations;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.preferences.JabRefPreferences;
 import org.jabref.preferences.PreferencesService;
 
-import net.harawata.appdirs.AppDirsFactory;
 import org.apache.commons.cli.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.tinylog.configuration.Configuration;
 
 /**
  * JabRef's main class to process command line options and to start the UI
@@ -49,32 +45,8 @@ public class JabRefMain extends Application {
     private static String[] arguments;
 
     public static void main(String[] args) {
-        addLogToDisk();
         arguments = args;
         launch(arguments);
-    }
-
-    /**
-     * This needs to be called as early as possible. After the first log write, it is not possible to alter
-     * the log configuration programmatically anymore.
-     */
-    private static void addLogToDisk() {
-        Path directory = Path.of(AppDirsFactory.getInstance().getUserLogDir(
-                                     "jabref",
-                                     new BuildInfo().version.toString(),
-                                     "org.jabref"));
-        try {
-            Files.createDirectories(directory);
-        } catch (IOException e) {
-            LOGGER.error("Could not create log directory {}", directory, e);
-            return;
-        }
-        Map<String, String> configuration = Map.of(
-                "writerFile", "rolling file",
-                "writerFile.level", "info",
-                "writerFile.file", directory.resolve("log_{count}.txt").toString(),
-                "writerFile.latest", directory.resolve("latest.txt").toString());
-        Configuration.replace(configuration);
     }
 
     @Override
