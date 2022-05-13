@@ -34,6 +34,7 @@ import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.layout.format.FileLinkPreferences;
 import org.jabref.logic.layout.format.NameFormatterPreferences;
 import org.jabref.logic.net.ProxyPreferences;
+import org.jabref.logic.net.ssl.SSLPreferences;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
 import org.jabref.logic.preferences.DOIPreferences;
 import org.jabref.logic.preferences.OwnerPreferences;
@@ -41,7 +42,6 @@ import org.jabref.logic.preferences.TimestampPreferences;
 import org.jabref.logic.protectedterms.ProtectedTermsPreferences;
 import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.util.io.AutoLinkPreferences;
-import org.jabref.logic.util.io.FileHistory;
 import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntryType;
@@ -64,10 +64,6 @@ public interface PreferencesService {
     FilePreferences getFilePreferences();
 
     FieldWriterPreferences getFieldWriterPreferences();
-
-    FileHistory getFileHistory();
-
-    void storeFileHistory(FileHistory history);
 
     FieldContentFormatterPreferences getFieldContentParserPreferences();
 
@@ -94,10 +90,6 @@ public interface PreferencesService {
     SaveOrderConfig getExportSaveOrder();
 
     void storeExportSaveOrder(SaveOrderConfig config);
-
-    boolean shouldWarnAboutDuplicatesForImport();
-
-    void setShouldWarnAboutDuplicatesForImport(boolean value);
 
     void clear() throws BackingStoreException;
 
@@ -164,6 +156,8 @@ public interface PreferencesService {
 
     ProxyPreferences getProxyPreferences();
 
+    SSLPreferences getSSLPreferences();
+
     //*************************************************************************************************************
     // CitationKeyPatternPreferences
     //*************************************************************************************************************
@@ -224,15 +218,7 @@ public interface PreferencesService {
     // File preferences
     //*************************************************************************************************************
 
-    boolean shouldOpenLastFilesOnStartup();
-
-    void storeOpenLastFilesOnStartup(boolean openLastFilesOnStartup);
-
     AutoLinkPreferences getAutoLinkPreferences();
-
-    boolean shouldAutosave();
-
-    void storeShouldAutosave(boolean shouldAutosave);
 
     FileLinkPreferences getFileLinkPreferences();
 
@@ -296,16 +282,7 @@ public interface PreferencesService {
 
     void storeExternalFileTypes(String externalFileTypes);
 
-    Optional<String> getMergeDiffMode();
-
-    void storeMergeDiffMode(String diffMode);
-
     MrDlibPreferences getMrDlibPreferences();
 
-    String getIdBasedFetcherForEntryGenerator();
-
-    void storeIdBasedFetcherForEntryGenerator(String fetcherName);
-
     ProtectedTermsPreferences getProtectedTermsPreferences();
-
 }

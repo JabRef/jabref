@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+import javafx.animation.PauseTransition;
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -19,12 +20,12 @@ import javafx.scene.control.SplitPane;
 import javafx.scene.control.Tab;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.BorderPane;
+import javafx.util.Duration;
 
 import org.jabref.gui.autocompleter.AutoCompletePreferences;
 import org.jabref.gui.autocompleter.PersonNameSuggestionProvider;
 import org.jabref.gui.autocompleter.SuggestionProviders;
 import org.jabref.gui.collab.DatabaseChangeMonitor;
-import org.jabref.gui.collab.DatabaseChangePane;
 import org.jabref.gui.dialogs.AutosaveUiManager;
 import org.jabref.gui.entryeditor.EntryEditor;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
@@ -71,6 +72,8 @@ import org.jabref.preferences.PreferencesService;
 import com.google.common.eventbus.Subscribe;
 import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.Subscription;
+import org.controlsfx.control.NotificationPane;
+import org.controlsfx.control.action.Action;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -94,7 +97,8 @@ public class LibraryTab extends Tab {
     private MainTable mainTable;
     private BasePanelMode mode = BasePanelMode.SHOWING_NOTHING;
     private SplitPane splitPane;
-    private DatabaseChangePane changePane;
+    private DatabaseNotification databaseNotificationPane;
+
     private boolean saving;
     private PersonNameSuggestionProvider searchAutoCompleter;
     // Used to track whether the base has changed since last save.
@@ -261,10 +265,10 @@ public class LibraryTab extends Tab {
     }
 
     private boolean isDatabaseReadyForAutoSave(BibDatabaseContext context) {
-        return ((context.getLocation() == DatabaseLocation.SHARED) ||
-                ((context.getLocation() == DatabaseLocation.LOCAL) && preferencesService.shouldAutosave()))
-                &&
-                context.getDatabasePath().isPresent();
+        return ((context.getLocation() == DatabaseLocation.SHARED)
+                || ((context.getLocation() == DatabaseLocation.LOCAL)
+                && preferencesService.getImportExportPreferences().shouldAutoSave()))
+                && context.getDatabasePath().isPresent();
     }
 
     /**
@@ -275,7 +279,7 @@ public class LibraryTab extends Tab {
      * Example: *jabref-authors.bib – testbib
      */
     public void updateTabTitle(boolean isChanged) {
-        boolean isAutosaveEnabled = preferencesService.shouldAutosave();
+        boolean isAutosaveEnabled = preferencesService.getImportExportPreferences().shouldAutoSave();
 
         DatabaseLocation databaseLocation = bibDatabaseContext.getLocation();
         Optional<Path> file = bibDatabaseContext.getDatabasePath();
@@ -313,7 +317,6 @@ public class LibraryTab extends Tab {
             // Unique path fragment
             Optional<String> uniquePathPart = FileUtil.getUniquePathFragment(collectAllDatabasePaths(), databasePath);
             uniquePathPart.ifPresent(part -> tabTitle.append(" \u2013 ").append(part));
-
         } else {
             if (databaseLocation == DatabaseLocation.LOCAL) {
                 tabTitle.append(Localization.lang("untitled"));
@@ -338,7 +341,9 @@ public class LibraryTab extends Tab {
             setTooltip(new Tooltip(toolTipText.toString()));
         });
 
-        indexingTaskManager.updateDatabaseName(tabTitle.toString());
+        if (preferencesService.getFilePreferences().shouldFulltextIndexLinkedFiles()) {
+            indexingTaskManager.updateDatabaseName(tabTitle.toString());
+        }
     }
 
     private List<String> collectAllDatabasePaths() {
@@ -494,6 +499,8 @@ public class LibraryTab extends Tab {
         createMainTable();
 
         splitPane.getItems().add(mainTable);
+        databaseNotificationPane = new DatabaseNotification(splitPane);
+        setContent(databaseNotificationPane);
 
         // Saves the divider position as soon as it changes
         // We need to keep a reference to the subscription, otherwise the binding gets garbage collected
@@ -504,8 +511,7 @@ public class LibraryTab extends Tab {
         // Add changePane in case a file is present - otherwise just add the splitPane to the panel
         Optional<Path> file = bibDatabaseContext.getDatabasePath();
         if (file.isPresent()) {
-            // create changeMonitor and changePane so we get notifications about outside changes to the file.
-            resetChangeMonitorAndChangePane();
+            resetChangeMonitor();
         } else {
             if (bibDatabaseContext.getDatabase().hasEntries()) {
                 // if the database is not empty and no file is assigned,
@@ -513,8 +519,6 @@ public class LibraryTab extends Tab {
                 // -> mark as changed
                 this.changedProperty.setValue(true);
             }
-            changePane = null;
-            this.setContent(splitPane);
         }
     }
 
@@ -606,7 +610,6 @@ public class LibraryTab extends Tab {
      * Closes the entry editor if it is showing any of the given entries.
      */
     private void ensureNotShowingBottomPanel(List<BibEntry> entriesToCheck) {
-
         // This method is not able to close the bottom pane currently
 
         if ((mode == BasePanelMode.SHOWING_EDITOR) && (entriesToCheck.contains(entryEditor.getEntry()))) {
@@ -735,7 +738,7 @@ public class LibraryTab extends Tab {
         return annotationCache;
     }
 
-    public void resetChangeMonitorAndChangePane() {
+    public void resetChangeMonitor() {
         changeMonitor.ifPresent(DatabaseChangeMonitor::unregister);
         changeMonitor = Optional.of(new DatabaseChangeMonitor(bibDatabaseContext,
                 Globals.getFileUpdateMonitor(),
@@ -743,11 +746,8 @@ public class LibraryTab extends Tab {
                 dialogService,
                 preferencesService,
                 stateManager,
-                themeManager));
-
-        changePane = new DatabaseChangePane(splitPane, bibDatabaseContext, changeMonitor.get());
-
-        this.setContent(changePane);
+                themeManager,
+                databaseNotificationPane));
     }
 
     public void copy() {
@@ -755,7 +755,7 @@ public class LibraryTab extends Tab {
     }
 
     public void paste() {
-        mainTable.paste(this.bibDatabaseContext.getMode());
+        mainTable.paste();
     }
 
     public void cut() {
@@ -855,53 +855,61 @@ public class LibraryTab extends Tab {
     private class IndexUpdateListener {
 
         public IndexUpdateListener() {
-            try {
-                indexingTaskManager.addToIndex(PdfIndexer.of(bibDatabaseContext, preferencesService.getFilePreferences()), bibDatabaseContext);
-            } catch (IOException e) {
-                LOGGER.error("Cannot access lucene index", e);
+            if (preferencesService.getFilePreferences().shouldFulltextIndexLinkedFiles()) {
+                try {
+                    indexingTaskManager.addToIndex(PdfIndexer.of(bibDatabaseContext, preferencesService.getFilePreferences()), bibDatabaseContext);
+                } catch (IOException e) {
+                    LOGGER.error("Cannot access lucene index", e);
+                }
             }
         }
 
         @Subscribe
         public void listen(EntriesAddedEvent addedEntryEvent) {
-            try {
-                PdfIndexer pdfIndexer = PdfIndexer.of(bibDatabaseContext, preferencesService.getFilePreferences());
-                for (BibEntry addedEntry : addedEntryEvent.getBibEntries()) {
-                    indexingTaskManager.addToIndex(pdfIndexer, addedEntry, bibDatabaseContext);
+            if (preferencesService.getFilePreferences().shouldFulltextIndexLinkedFiles()) {
+                try {
+                    PdfIndexer pdfIndexer = PdfIndexer.of(bibDatabaseContext, preferencesService.getFilePreferences());
+                    for (BibEntry addedEntry : addedEntryEvent.getBibEntries()) {
+                        indexingTaskManager.addToIndex(pdfIndexer, addedEntry, bibDatabaseContext);
+                    }
+                } catch (IOException e) {
+                    LOGGER.error("Cannot access lucene index", e);
                 }
-            } catch (IOException e) {
-                LOGGER.error("Cannot access lucene index", e);
             }
         }
 
         @Subscribe
         public void listen(EntriesRemovedEvent removedEntriesEvent) {
-            try {
-                PdfIndexer pdfIndexer = PdfIndexer.of(bibDatabaseContext, preferencesService.getFilePreferences());
-                for (BibEntry removedEntry : removedEntriesEvent.getBibEntries()) {
-                    indexingTaskManager.removeFromIndex(pdfIndexer, removedEntry);
+            if (preferencesService.getFilePreferences().shouldFulltextIndexLinkedFiles()) {
+                try {
+                    PdfIndexer pdfIndexer = PdfIndexer.of(bibDatabaseContext, preferencesService.getFilePreferences());
+                    for (BibEntry removedEntry : removedEntriesEvent.getBibEntries()) {
+                        indexingTaskManager.removeFromIndex(pdfIndexer, removedEntry);
+                    }
+                } catch (IOException e) {
+                    LOGGER.error("Cannot access lucene index", e);
                 }
-            } catch (IOException e) {
-                LOGGER.error("Cannot access lucene index", e);
             }
         }
 
         @Subscribe
         public void listen(FieldChangedEvent fieldChangedEvent) {
-            if (fieldChangedEvent.getField().equals(StandardField.FILE)) {
-                List<LinkedFile> oldFileList = FileFieldParser.parse(fieldChangedEvent.getOldValue());
-                List<LinkedFile> newFileList = FileFieldParser.parse(fieldChangedEvent.getNewValue());
+            if (preferencesService.getFilePreferences().shouldFulltextIndexLinkedFiles()) {
+                if (fieldChangedEvent.getField().equals(StandardField.FILE)) {
+                    List<LinkedFile> oldFileList = FileFieldParser.parse(fieldChangedEvent.getOldValue());
+                    List<LinkedFile> newFileList = FileFieldParser.parse(fieldChangedEvent.getNewValue());
 
-                List<LinkedFile> addedFiles = new ArrayList<>(newFileList);
-                addedFiles.remove(oldFileList);
-                List<LinkedFile> removedFiles = new ArrayList<>(oldFileList);
-                removedFiles.remove(newFileList);
+                    List<LinkedFile> addedFiles = new ArrayList<>(newFileList);
+                    addedFiles.remove(oldFileList);
+                    List<LinkedFile> removedFiles = new ArrayList<>(oldFileList);
+                    removedFiles.remove(newFileList);
 
-                try {
-                    indexingTaskManager.addToIndex(PdfIndexer.of(bibDatabaseContext, preferencesService.getFilePreferences()), fieldChangedEvent.getBibEntry(), addedFiles, bibDatabaseContext);
-                    indexingTaskManager.removeFromIndex(PdfIndexer.of(bibDatabaseContext, preferencesService.getFilePreferences()), fieldChangedEvent.getBibEntry(), removedFiles);
-                } catch (IOException e) {
-                    LOGGER.warn("I/O error when writing lucene index", e);
+                    try {
+                        indexingTaskManager.addToIndex(PdfIndexer.of(bibDatabaseContext, preferencesService.getFilePreferences()), fieldChangedEvent.getBibEntry(), addedFiles, bibDatabaseContext);
+                        indexingTaskManager.removeFromIndex(PdfIndexer.of(bibDatabaseContext, preferencesService.getFilePreferences()), fieldChangedEvent.getBibEntry(), removedFiles);
+                    } catch (IOException e) {
+                        LOGGER.warn("I/O error when writing lucene index", e);
+                    }
                 }
             }
         }
@@ -909,5 +917,27 @@ public class LibraryTab extends Tab {
 
     public IndexingTaskManager getIndexingTaskManager() {
         return indexingTaskManager;
+    }
+
+    public static class DatabaseNotification extends NotificationPane {
+        public DatabaseNotification(Node content) {
+            super(content);
+        }
+
+        public void notify(Node graphic, String text, List<Action> actions, Duration duration) {
+            this.setGraphic(graphic);
+            this.setText(text);
+            this.getActions().setAll(actions);
+            this.show();
+            if (duration != null && !duration.equals(Duration.ZERO)) {
+                PauseTransition delay = new PauseTransition(duration);
+                delay.setOnFinished(e -> this.hide());
+                delay.play();
+            }
+        }
+    }
+
+    public DatabaseNotification getNotificationPane() {
+        return databaseNotificationPane;
     }
 }

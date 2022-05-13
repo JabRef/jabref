@@ -246,7 +246,7 @@
           </group>
         </group>
         <!-- Available: https://URL.com/ -->
-        <group delimiter=": ">
+        <group delimiter=": " prefix=" ">
           <text term="available at" text-case="capitalize-first"/>
           <text variable="URL"/>
         </group>

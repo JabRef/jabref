@@ -112,7 +112,7 @@ public class ImportEntriesViewModel extends AbstractViewModel {
     public void importEntries(List<BibEntry> entriesToImport, boolean shouldDownloadFiles) {
         // Check if we are supposed to warn about duplicates.
         // If so, then see if there are duplicates, and warn if yes.
-        if (preferences.shouldWarnAboutDuplicatesForImport()) {
+        if (preferences.getImportExportPreferences().shouldWarnAboutDuplicatesOnImport()) {
             BackgroundTask.wrap(() -> entriesToImport.stream()
                                                      .anyMatch(this::hasDuplicate)).onSuccess(duplicateFound -> {
                 if (duplicateFound) {
@@ -121,7 +121,7 @@ public class ImportEntriesViewModel extends AbstractViewModel {
                             Localization.lang("Continue with import"),
                             Localization.lang("Cancel import"),
                             Localization.lang("Do not ask again"),
-                            optOut -> preferences.setShouldWarnAboutDuplicatesForImport(!optOut));
+                            optOut -> preferences.getImportExportPreferences().setWarnAboutDuplicatesOnImport(!optOut));
 
                     if (!continueImport) {
                         dialogService.notify(Localization.lang("Import canceled"));
@@ -169,7 +169,8 @@ public class ImportEntriesViewModel extends AbstractViewModel {
                 preferences,
                 fileUpdateMonitor,
                 undoManager,
-                stateManager);
+                stateManager,
+                dialogService);
         importHandler.importEntries(entriesToImport);
         dialogService.notify(Localization.lang("Number of entries successfully imported") + ": " + entriesToImport.size());
     }

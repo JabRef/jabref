@@ -9,7 +9,7 @@ import java.util.Optional;
  */
 public enum Language {
 
-    BAHASA_INDONESIA("Bahasa Indonesia", "in"),
+    BAHASA_INDONESIA("Bahasa Indonesia", "id"),
     BRAZILIAN_PORTUGUESE("Brazilian Portuguese", "pt_BR"),
     DANISH("Dansk", "da"),
     GERMAN("Deutsch", "de"),

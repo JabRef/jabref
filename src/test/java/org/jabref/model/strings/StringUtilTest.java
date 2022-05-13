@@ -109,7 +109,6 @@ class StringUtilTest {
 
     @Test
     void testShaveString() {
-
         assertEquals("", StringUtil.shaveString(null));
         assertEquals("", StringUtil.shaveString(""));
         assertEquals("aaa", StringUtil.shaveString("   aaa\t\t\n\r"));
@@ -148,7 +147,14 @@ class StringUtilTest {
 
     @Test
     void testGetPart() {
-        // Should be added
+        // Get word between braces
+        assertEquals("{makes}", StringUtil.getPart("Practice {makes} perfect", 8, false));
+        // When the string is empty and start Index equal zero
+        assertEquals("", StringUtil.getPart("", 0, false));
+        // When the word are in between close curly bracket
+        assertEquals("", StringUtil.getPart("A closed mouth catches no }flies}", 25, false));
+        // Get the word from the end of the sentence
+        assertEquals("bite", StringUtil.getPart("Barking dogs seldom bite", 19, true));
     }
 
     @Test
@@ -373,5 +379,11 @@ class StringUtilTest {
     @MethodSource("getQuoteStringIfSpaceIsContainedData")
     void testGuoteStringIfSpaceIsContained(String expected, String source) {
         assertEquals(expected, StringUtil.quoteStringIfSpaceIsContained(source));
+    }
+
+    @Test
+    void testStripAccents() {
+        assertEquals("aAoeee", StringUtil.stripAccents("åÄöéèë"));
+        assertEquals("Muhlbach", StringUtil.stripAccents("Mühlbach"));
     }
 }

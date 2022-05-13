@@ -21,11 +21,12 @@ import org.jabref.logic.exporter.SaveException;
 import org.jabref.logic.exporter.SavePreferences;
 import org.jabref.logic.git.SlrGitHandler;
 import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.OpenDatabase;
-import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.OS;
+import org.jabref.logic.util.io.FileNameCleaner;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntryTypesManager;
@@ -65,6 +66,7 @@ class StudyRepository {
     private final Study study;
     private final GeneralPreferences generalPreferences;
     private final ImportFormatPreferences importFormatPreferences;
+    private final ImporterPreferences importerPreferences;
     private final FileUpdateMonitor fileUpdateMonitor;
     private final SavePreferences savePreferences;
     private final BibEntryTypesManager bibEntryTypesManager;
@@ -78,19 +80,20 @@ class StudyRepository {
      *                                  contain the study definition file.
      * @throws IOException              Thrown if the given repository does not exists, or the study definition file
      *                                  does not exist
-     * @throws ParseException           Problem parsing the study definition file.
      */
     public StudyRepository(Path pathToRepository,
                            SlrGitHandler gitHandler,
                            GeneralPreferences generalPreferences,
                            ImportFormatPreferences importFormatPreferences,
+                           ImporterPreferences importerPreferences,
                            FileUpdateMonitor fileUpdateMonitor,
                            SavePreferences savePreferences,
-                           BibEntryTypesManager bibEntryTypesManager) throws IOException, ParseException {
+                           BibEntryTypesManager bibEntryTypesManager) throws IOException {
         this.repositoryPath = pathToRepository;
         this.gitHandler = gitHandler;
         this.generalPreferences = generalPreferences;
         this.importFormatPreferences = importFormatPreferences;
+        this.importerPreferences = importerPreferences;
         this.fileUpdateMonitor = fileUpdateMonitor;
         this.studyDefinitionFile = Path.of(repositoryPath.toString(), STUDY_DEFINITION_FILE_NAME);
         this.savePreferences = savePreferences;
@@ -137,7 +140,7 @@ class StudyRepository {
      */
     public BibDatabaseContext getFetcherResultEntries(String query, String fetcherName) throws IOException {
         if (Files.exists(getPathToFetcherResultFile(query, fetcherName))) {
-            return OpenDatabase.loadDatabase(getPathToFetcherResultFile(query, fetcherName), generalPreferences, importFormatPreferences, fileUpdateMonitor).getDatabaseContext();
+            return OpenDatabase.loadDatabase(getPathToFetcherResultFile(query, fetcherName), importFormatPreferences, fileUpdateMonitor).getDatabaseContext();
         }
         return new BibDatabaseContext();
     }
@@ -147,7 +150,7 @@ class StudyRepository {
      */
     public BibDatabaseContext getQueryResultEntries(String query) throws IOException {
         if (Files.exists(getPathToQueryResultFile(query))) {
-            return OpenDatabase.loadDatabase(getPathToQueryResultFile(query), generalPreferences, importFormatPreferences, fileUpdateMonitor).getDatabaseContext();
+            return OpenDatabase.loadDatabase(getPathToQueryResultFile(query), importFormatPreferences, fileUpdateMonitor).getDatabaseContext();
         }
         return new BibDatabaseContext();
     }
@@ -157,7 +160,7 @@ class StudyRepository {
      */
     public BibDatabaseContext getStudyResultEntries() throws IOException {
         if (Files.exists(getPathToStudyResultFile())) {
-            return OpenDatabase.loadDatabase(getPathToStudyResultFile(), generalPreferences, importFormatPreferences, fileUpdateMonitor).getDatabaseContext();
+            return OpenDatabase.loadDatabase(getPathToStudyResultFile(), importFormatPreferences, fileUpdateMonitor).getDatabaseContext();
         }
         return new BibDatabaseContext();
     }
@@ -274,7 +277,10 @@ class StudyRepository {
      */
     private void setUpRepositoryStructure() throws IOException {
         // Cannot use stream here since IOException has to be thrown
-        StudyDatabaseToFetcherConverter converter = new StudyDatabaseToFetcherConverter(this.getActiveLibraryEntries(), importFormatPreferences);
+        StudyDatabaseToFetcherConverter converter = new StudyDatabaseToFetcherConverter(
+                this.getActiveLibraryEntries(),
+                importFormatPreferences,
+                importerPreferences);
         for (String query : this.getSearchQueryStrings()) {
             createQueryResultFolder(query);
             converter.getActiveFetchers()
@@ -421,14 +427,14 @@ class StudyRepository {
             BibtexDatabaseWriter databaseWriter = new BibtexDatabaseWriter(bibWriter, generalPreferences, savePreferences, bibEntryTypesManager);
             databaseWriter.saveDatabase(new BibDatabaseContext(entries));
         } catch (UnsupportedCharsetException ex) {
-            throw new SaveException(Localization.lang("Character encoding '%0' is not supported.", generalPreferences.getDefaultEncoding().displayName()), ex);
+            throw new SaveException(Localization.lang("Character encoding UTF-8 is not supported.", ex));
         } catch (IOException ex) {
             throw new SaveException("Problems saving: " + ex, ex);
         }
     }
 
     private Path getPathToFetcherResultFile(String query, String fetcherName) {
-        return Path.of(repositoryPath.toString(), trimNameAndAddID(query), fetcherName + ".bib");
+        return Path.of(repositoryPath.toString(), trimNameAndAddID(query), FileNameCleaner.cleanFileName(fetcherName) + ".bib");
     }
 
     private Path getPathToQueryResultFile(String query) {

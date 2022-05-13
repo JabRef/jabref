@@ -5,8 +5,8 @@
     <title-short>Steel Res. Int.</title-short>
     <id>http://www.zotero.org/styles/steel-research-international</id>
     <link href="http://www.zotero.org/styles/steel-research-international" rel="self"/>
-    <link href="https://onlinelibrary.wiley.com/page/journal/1869344x/homepage/author-guidelines" rel="documentation"/>
     <link href="http://www.zotero.org/styles/taylor-and-francis-national-library-of-medicine" rel="template"/>
+    <link href="https://onlinelibrary.wiley.com/page/journal/1869344x/homepage/author-guidelines" rel="documentation"/>
     <author>
       <name>Christian Schubert</name>
     </author>
@@ -20,31 +20,34 @@
     <issnl>1611-3683</issnl>
     <summary>Citation style for the Steel research international
     
-    There are some difficulties i.e. with patents, preprint  specifications and the variables that the CSL offers (nor preprint type or company variable availably), which probably cannot be fixed right now (perfectly) and need manual correction.
-    Also there is no way to automatically use or define journal or conference abbrevitation in the csl file right now?</summary>
-    <updated>2021-11-10T16:22:30+01:00</updated>
+    Known issues:
+
+    - Patents should have the following form:
+      [2] H.-S. Seo, D.-C. Kim (Samsung Electronics Co., Ltd.), Ger. 2016122271, 2016
+
+      Issue: There is no specific field for patent owner/assignee in CSL (1.0.x) right now. It may come with CSL 1.1.
+      The current idea is to call this variable `assignee`. This is implemented (commented out) in line 53, 
+      which may work with CSL 1.1.
+
+      Journal Abbreviation (for journal titles) are handeled by citation software, experience may therefore vary.</summary>
+    <updated>2022-02-22T10:00:30+01:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="en-US">
     <date form="text" delimiter=" ">
+      <date-part name="day" suffix=" " range-delimiter="-" form="numeric-leading-zeros"/>
       <date-part name="month" form="short" strip-periods="true" suffix=" "/>
       <date-part name="year" font-weight="bold"/>
     </date>
     <terms>
       <term name="chapter" form="short">Ch.</term>
-      <term name="editor" form="short">eds</term>
     </terms>
   </locale>
   <macro name="author">
     <names variable="author">
       <name sort-separator=" " initialize-with="." delimiter=", " delimiter-precedes-last="always"/>
-      <substitute>
-        <names variable="editor">
-            <name/>
-            <label form="short" text-case="capitalize-first" prefix=" (" suffix=")"/>
-        </names>
-      </substitute>
     </names>
+    <!--     <choose><if type="patent"><text variable="assignee" prefix=" (" suffix=")"/></if></choose> -->
   </macro>
   <macro name="title">
     <choose>
@@ -67,7 +70,7 @@
         <text variable="genre" font-style="italic"/>
       </else-if>
       <else-if type="article-journal" match="any">
-        <text variable="container-title" font-style="italic"/>
+        <text variable="container-title" font-style="italic" form="short"/>
       </else-if>
       <else-if type="article-magazine article-newspaper" match="any">
         <text variable="container-title" font-style="italic"/>
@@ -75,6 +78,19 @@
       <else-if type="webpage" match="any">
         <text variable="title"/>
       </else-if>
+      <else-if type="article" match="any">
+        <text value="(Preprint)"/>
+        <text variable="number" prefix=" "/>
+        <text variable="version" prefix=", "/>
+      </else-if>
+    </choose>
+  </macro>
+  <macro name="book-chapter-volume">
+    <choose>
+      <if type="book chapter" match="any">
+        <label variable="volume" form="short" prefix=", "/>
+        <text variable="volume"/>
+      </if>
     </choose>
   </macro>
   <macro name="editor">
@@ -138,6 +154,14 @@
       <if type="speech" match="any">
         <date variable="issued" prefix=", " form="text"/>
       </if>
+      <else-if type="paper-conference" match="any">
+        <group>
+          <date variable="issued" form="text" date-parts="year-month" prefix=", "/>
+        </group>
+      </else-if>
+      <else-if type="article" match="any">
+        <date variable="issued" prefix=", submitted: " form="text" date-parts="year-month"/>
+      </else-if>
       <else-if type="webpage" match="none">
         <group font-weight="bold">
           <date variable="issued" form="text" date-parts="year" prefix=" "/>
@@ -155,14 +179,27 @@
               <text variable="chapter-number"/>
             </group>
           </if>
-          <else>
+          <else-if variable="page">
             <group delimiter=" ">
-              <text term="page" form="short" prefix=", "/>
-              <text variable="page"/>
+              <text variable="page" prefix=", "/>
             </group>
-          </else>
+          </else-if>
         </choose>
       </if>
+      <else-if type="article-journal article-magazine article-newspaper" match="any">
+        <choose>
+          <if variable="page-first">
+            <group delimiter=" ">
+              <text variable="page-first" prefix=", "/>
+            </group>
+          </if>
+          <else-if variable="page">
+            <group delimiter=" ">
+              <text variable="page" prefix=", "/>
+            </group>
+          </else-if>
+        </choose>
+      </else-if>
     </choose>
   </macro>
   <macro name="journal-volume">
@@ -193,7 +230,7 @@
     <sort>
       <key variable="citation-number"/>
     </sort>
-    <layout prefix="[" suffix="]" delimiter=",">
+    <layout vertical-align="sup" delimiter="," prefix="[" suffix="]">
       <group delimiter=",">
         <text variable="citation-number"/>
         <group>
@@ -210,6 +247,7 @@
         <text macro="author"/>
         <text macro="title"/>
       </group>
+      <text macro="book-chapter-volume"/>
       <text macro="editor"/>
       <text macro="publisher"/>
       <text macro="report-patent-numbers"/>

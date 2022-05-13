@@ -15,7 +15,7 @@
     <issn>0002-9114</issn>
     <eissn>1939-828X</eissn>
     <summary>The American Journal of Archaeology style</summary>
-    <updated>2021-11-12T14:22:00+00:00</updated>
+    <updated>2022-02-27T11:00:00+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale>
@@ -262,7 +262,7 @@
         <text macro="container-prefix" suffix=" "/>
       </if>
     </choose>
-    <text variable="container-title" font-style="italic"/>
+    <text variable="container-title" text-case="title" font-style="italic"/>
   </macro>
   <macro name="publisher">
     <group>
@@ -353,7 +353,7 @@
       <key variable="issued"/>
       <key macro="contributors-short"/>
     </sort>
-    <layout delimiter="; ">
+    <layout delimiter="; " suffix=".">
       <group delimiter=", ">
         <group delimiter=" ">
           <text macro="contributors-short"/>

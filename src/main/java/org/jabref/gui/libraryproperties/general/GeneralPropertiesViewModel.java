@@ -1,6 +1,7 @@
 package org.jabref.gui.libraryproperties.general;
 
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 
 import javax.swing.undo.UndoManager;
@@ -62,7 +63,7 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
         boolean isShared = (databaseContext.getLocation() == DatabaseLocation.SHARED);
         encodingDisableProperty.setValue(isShared); // the encoding of shared database is always UTF-8
 
-        selectedEncodingProperty.setValue(metaData.getEncoding().orElse(preferencesService.getGeneralPreferences().getDefaultEncoding()));
+        selectedEncodingProperty.setValue(metaData.getEncoding().orElse(StandardCharsets.UTF_8));
         selectedDatabaseModeProperty.setValue(metaData.getMode().orElse(BibDatabaseMode.BIBLATEX));
         generalFileDirectoryProperty.setValue(metaData.getDefaultFileDirectory().orElse("").trim());
         userSpecificFileDirectoryProperty.setValue(metaData.getUserFileDirectory(preferencesService.getFilePreferences().getUser()).orElse("").trim());

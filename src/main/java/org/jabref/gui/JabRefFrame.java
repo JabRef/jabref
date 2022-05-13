@@ -300,7 +300,6 @@ public class JabRefFrame extends BorderPane {
     private void initShowTrackingNotification() {
         if (prefs.getTelemetryPreferences().shouldAskToCollectTelemetry()) {
             JabRefExecutorService.INSTANCE.submit(new TimerTask() {
-
                 @Override
                 public void run() {
                     DefaultTaskExecutor.runInJavaFXThread(JabRefFrame.this::showTrackingNotification);
@@ -350,7 +349,7 @@ public class JabRefFrame extends BorderPane {
      *                  set to true
      */
     private void tearDownJabRef(List<String> filenames) {
-        if (prefs.getGuiPreferences().shouldOpenLastEdited()) {
+        if (prefs.getImportExportPreferences().shouldOpenLastEdited()) {
             // Here we store the names of all current files. If there is no current file, we remove any
             // previously stored filename.
             if (filenames.isEmpty()) {
@@ -364,7 +363,6 @@ public class JabRefFrame extends BorderPane {
             }
         }
 
-        fileHistory.storeHistory();
         prefs.flush();
     }
 
@@ -385,7 +383,7 @@ public class JabRefFrame extends BorderPane {
         It is important to wait for unfinished background tasks before checking if a save-operation is needed, because
         the background tasks may make changes themselves that need saving.
          */
-        if (stateManager.getAnyTaskRunning().getValue()) {
+        if (stateManager.getAnyTasksThatWillNotBeRecoveredRunning().getValue()) {
             Optional<ButtonType> shouldClose = dialogService.showBackgroundProgressDialogAndWait(
                     Localization.lang("Please wait..."),
                     Localization.lang("Waiting for background tasks to finish. Quit anyway?"),
@@ -446,7 +444,6 @@ public class JabRefFrame extends BorderPane {
 
         // We need to wait with setting the divider since it gets reset a few times during the initial set-up
         mainStage.showingProperty().addListener(new InvalidationListener() {
-
             @Override
             public void invalidated(Observable observable) {
                 if (mainStage.isShowing()) {
@@ -566,7 +563,8 @@ public class JabRefFrame extends BorderPane {
      */
     public List<LibraryTab> getLibraryTabs() {
         return tabbedPane.getTabs().stream()
-                         .map(tab -> (LibraryTab) tab)
+                         .filter(LibraryTab.class::isInstance)
+                         .map(LibraryTab.class::cast)
                          .collect(Collectors.toList());
     }
 
@@ -710,8 +708,8 @@ public class JabRefFrame extends BorderPane {
                         factory.createMenuItem(StandardActions.IMPORT_INTO_NEW_LIBRARY, new ImportCommand(this, true, prefs, stateManager))),
 
                 factory.createSubMenu(StandardActions.EXPORT,
-                        factory.createMenuItem(StandardActions.EXPORT_ALL, new ExportCommand(false, stateManager, dialogService, prefs)),
-                        factory.createMenuItem(StandardActions.EXPORT_SELECTED, new ExportCommand(true, stateManager, dialogService, prefs)),
+                        factory.createMenuItem(StandardActions.EXPORT_ALL, new ExportCommand(ExportCommand.ExportMethod.EXPORT_ALL, this, stateManager, dialogService, prefs)),
+                        factory.createMenuItem(StandardActions.EXPORT_SELECTED, new ExportCommand(ExportCommand.ExportMethod.EXPORT_SELECTED, this, stateManager, dialogService, prefs)),
                         factory.createMenuItem(StandardActions.SAVE_SELECTED_AS_PLAIN_BIBTEX, new SaveAction(SaveAction.SaveMethod.SAVE_SELECTED, this, prefs, stateManager))),
 
                 new SeparatorMenuItem(),
@@ -826,7 +824,7 @@ public class JabRefFrame extends BorderPane {
 
                 new SeparatorMenuItem(),
 
-                factory.createMenuItem(StandardActions.WRITE_METADATA_TO_PDF, new WriteMetadataToPdfAction(stateManager, prefs.getGeneralPreferences().getDefaultBibDatabaseMode(), Globals.entryTypesManager, prefs.getFieldWriterPreferences(), dialogService, taskExecutor, prefs.getFilePreferences(), prefs.getXmpPreferences(), prefs.getGeneralPreferences().getDefaultEncoding())),
+                factory.createMenuItem(StandardActions.WRITE_METADATA_TO_PDF, new WriteMetadataToPdfAction(stateManager, Globals.entryTypesManager, prefs.getFieldWriterPreferences(), dialogService, taskExecutor, prefs.getFilePreferences(), prefs.getXmpPreferences())),
                 factory.createMenuItem(StandardActions.COPY_LINKED_FILES, new CopyFilesAction(dialogService, prefs, stateManager)),
 
                 new SeparatorMenuItem(),
@@ -892,7 +890,7 @@ public class JabRefFrame extends BorderPane {
                         new SeparatorMenuItem(),
 
                         factory.createMenuItem(StandardActions.OPEN_DEV_VERSION_LINK, new OpenBrowserAction("https://builds.jabref.org/master/")),
-                        factory.createMenuItem(StandardActions.OPEN_CHANGELOG, new OpenBrowserAction("https://github.com/JabRef/jabref/blob/master/CHANGELOG.md"))
+                        factory.createMenuItem(StandardActions.OPEN_CHANGELOG, new OpenBrowserAction("https://github.com/JabRef/jabref/blob/main/CHANGELOG.md"))
                 ),
                 factory.createMenuItem(StandardActions.ABOUT, new AboutAction())
         );
@@ -1101,10 +1099,10 @@ public class JabRefFrame extends BorderPane {
     }
 
     private boolean readyForAutosave(BibDatabaseContext context) {
-        return ((context.getLocation() == DatabaseLocation.SHARED) ||
-                ((context.getLocation() == DatabaseLocation.LOCAL) && prefs.shouldAutosave()))
-                &&
-                context.getDatabasePath().isPresent();
+        return ((context.getLocation() == DatabaseLocation.SHARED)
+                || ((context.getLocation() == DatabaseLocation.LOCAL)
+                && prefs.getImportExportPreferences().shouldAutoSave()))
+                && context.getDatabasePath().isPresent();
     }
 
     /**

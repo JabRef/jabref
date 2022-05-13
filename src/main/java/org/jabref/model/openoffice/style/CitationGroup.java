@@ -29,10 +29,6 @@ public class CitationGroup {
     public final List<Citation> citationsInStorageOrder;
 
     /*
-     * Extra data
-     */
-
-    /*
      * A name of a reference mark to link to by formatCitedOnPages.
      * May be initially empty, if backend does not use reference marks.
      *
@@ -86,7 +82,6 @@ public class CitationGroup {
      * Sort citations for presentation within a CitationGroup.
      */
     void imposeLocalOrder(Comparator<BibEntry> entryComparator) {
-
         // For JabRef52 the single pageInfo is always in the last-in-localorder citation.
         // We adjust here accordingly by taking it out and adding it back after sorting.
         final int last = this.numberOfCitations() - 1;
@@ -98,7 +93,7 @@ public class CitationGroup {
         }
 
         this.localOrder = OOListUtil.order(citationsInStorageOrder,
-                                           new CompareCitation(entryComparator, true));
+                new CompareCitation(entryComparator, true));
 
         if (dataModel == OODataModel.JabRef52) {
             getCitationsInLocalOrder().get(last).setPageInfo(lastPageInfo);
@@ -114,7 +109,7 @@ public class CitationGroup {
      */
 
     public List<Citation> getCitationsInLocalOrder() {
-        return OOListUtil.map(localOrder, i -> citationsInStorageOrder.get(i));
+        return OOListUtil.map(localOrder, citationsInStorageOrder::get);
     }
 
     /*
@@ -152,5 +147,4 @@ public class CitationGroup {
     public Optional<OOText> getCitationMarker() {
         return this.citationMarker;
     }
-
 }

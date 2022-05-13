@@ -2,6 +2,7 @@ package org.jabref.gui.entryeditor;
 
 import java.io.File;
 import java.nio.file.Path;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -360,7 +361,7 @@ public class EntryEditor extends BorderPane {
         typeLabel.setText(typedEntry.getTypeForDisplay());
 
         // Add type change menu
-        ContextMenu typeMenu = new ChangeEntryTypeMenu().getChangeEntryTypePopupMenu(entry, databaseContext, undoManager);
+        ContextMenu typeMenu = new ChangeEntryTypeMenu().getChangeEntryTypePopupMenu(Collections.singletonList(entry), databaseContext, undoManager);
         typeLabel.setOnMouseClicked(event -> typeMenu.show(typeLabel, Side.RIGHT, 0, 0));
         typeChangeButton.setOnMouseClicked(event -> typeMenu.show(typeChangeButton, Side.RIGHT, 0, 0));
 
@@ -370,8 +371,7 @@ public class EntryEditor extends BorderPane {
                 preferencesService.getImporterPreferences(),
                 preferencesService.getImportFormatPreferences(),
                 preferencesService.getFilePreferences(),
-                databaseContext,
-                preferencesService.getGeneralPreferences().getDefaultEncoding());
+                databaseContext);
         for (EntryBasedFetcher fetcher : entryBasedFetchers) {
             MenuItem fetcherMenuItem = new MenuItem(fetcher.getName());
             if (fetcher instanceof PdfMergeMetadataImporter.EntryBasedFetcherWrapper) {
@@ -383,8 +383,7 @@ public class EntryEditor extends BorderPane {
                                     preferencesService.getImporterPreferences(),
                                     preferencesService.getImportFormatPreferences(),
                                     preferencesService.getFilePreferences(),
-                                    databaseContext,
-                                    preferencesService.getGeneralPreferences().getDefaultEncoding());
+                                    databaseContext);
                     fetchAndMerge(pdfMergeMetadataImporter);
                 });
             } else {

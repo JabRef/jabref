@@ -31,6 +31,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
+import javafx.stage.Screen;
 
 import org.jabref.gui.Globals;
 import org.jabref.gui.icon.IconTheme.JabRefIcons;
@@ -129,27 +130,21 @@ public class MergeEntries extends BorderPane {
     }
 
     private static String getDisplayText(DiffMode mode) {
-        switch (mode) {
-            case PLAIN:
-                return Localization.lang("Plain text");
-            case WORD:
-                return Localization.lang("Show diff") + " - " + Localization.lang("word");
-            case CHARACTER:
-                return Localization.lang("Show diff") + " - " + Localization.lang("character");
-            case WORD_SYMMETRIC:
-                return Localization.lang("Show symmetric diff") + " - " + Localization.lang("word");
-            case CHARACTER_SYMMETRIC:
-                return Localization.lang("Show symmetric diff") + " - " + Localization.lang("character");
-            default:
-                throw new UnsupportedOperationException("Not implemented: " + mode);
-        }
+        return switch (mode) {
+            case PLAIN -> Localization.lang("Plain text");
+            case WORD -> Localization.lang("Show diff") + " - " + Localization.lang("word");
+            case CHARACTER -> Localization.lang("Show diff") + " - " + Localization.lang("character");
+            case WORD_SYMMETRIC -> Localization.lang("Show symmetric diff") + " - " + Localization.lang("word");
+            case CHARACTER_SYMMETRIC -> Localization.lang("Show symmetric diff") + " - " + Localization.lang("character");
+        };
     }
 
     /**
      * Main function for building the merge entry JPanel
      */
     private void initialize() {
-        setPrefWidth(800);
+        this.setPrefHeight(Screen.getPrimary().getBounds().getHeight() * 0.75);
+        this.setPrefWidth(Screen.getPrimary().getBounds().getWidth() * 0.75);
 
         setupFields();
 
@@ -223,7 +218,7 @@ public class MergeEntries extends BorderPane {
                 if (leftString.isPresent()) {
                     leftRadioButtons.add(list.get(LEFT_RADIOBUTTON_INDEX));
                     list.get(LEFT_RADIOBUTTON_INDEX).setSelected(true);
-                    if (!rightString.isPresent()) {
+                    if (rightString.isEmpty()) {
                         list.get(RIGHT_RADIOBUTTON_INDEX).setDisable(true);
                     } else if (this.defaultRadioButtonSelectionMode == DefaultRadioButtonSelectionMode.RIGHT) {
                         list.get(RIGHT_RADIOBUTTON_INDEX).setSelected(true);
@@ -308,13 +303,11 @@ public class MergeEntries extends BorderPane {
         new ViewModelListCellFactory<DiffMode>()
                 .withText(MergeEntries::getDisplayText)
                 .install(diffMode);
-        DiffMode diffModePref = Globals.prefs.getMergeDiffMode()
-                                             .flatMap(DiffMode::parse)
-                                             .orElse(DiffMode.WORD);
+        DiffMode diffModePref = Globals.prefs.getGuiPreferences().getMergeDiffMode();
         diffMode.setValue(diffModePref);
         EasyBind.subscribe(this.diffMode.valueProperty(), mode -> {
             updateFieldValues(differentFields);
-            Globals.prefs.storeMergeDiffMode(mode.name());
+            Globals.prefs.getGuiPreferences().setMergeDiffMode(mode);
         });
 
         HBox heading = new HBox(10);
@@ -379,16 +372,10 @@ public class MergeEntries extends BorderPane {
         }
     }
 
-    /**
-     * @return Merged BibEntry
-     */
-    public BibEntry getMergeEntry() {
+    public BibEntry getMergedEntry() {
         return mergedEntry;
     }
 
-    /**
-     * Update the merged entry
-     */
     private void updateMergedEntry() {
         // Check if the type has changed
         if (!identicalTypes && !typeRadioButtons.isEmpty() && typeRadioButtons.get(0).isSelected()) {
@@ -421,33 +408,6 @@ public class MergeEntries extends BorderPane {
     public void setRightHeaderText(String rightHeaderText) {
         columnHeadings.set(5, rightHeaderText);
         initialize();
-    }
-
-    public enum DiffMode {
-
-        PLAIN(Localization.lang("None")),
-        WORD(Localization.lang("Word by word")),
-        CHARACTER(Localization.lang("Character by character")),
-        WORD_SYMMETRIC(Localization.lang("Symmetric word by word")),
-        CHARACTER_SYMMETRIC(Localization.lang("Symmetric character by character"));
-
-        private final String text;
-
-        DiffMode(String text) {
-            this.text = text;
-        }
-
-        public static Optional<DiffMode> parse(String name) {
-            try {
-                return Optional.of(DiffMode.valueOf(name));
-            } catch (IllegalArgumentException e) {
-                return Optional.empty();
-            }
-        }
-
-        public String getDisplayText() {
-            return text;
-        }
     }
 
     public enum DefaultRadioButtonSelectionMode {

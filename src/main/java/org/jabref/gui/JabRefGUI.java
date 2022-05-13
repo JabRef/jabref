@@ -28,6 +28,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.shared.DatabaseNotSupportedException;
 import org.jabref.logic.shared.exception.InvalidDBMSConnectionPropertiesException;
 import org.jabref.logic.shared.exception.NotASharedDatabaseException;
+import org.jabref.logic.util.WebViewStore;
 import org.jabref.preferences.GuiPreferences;
 import org.jabref.preferences.PreferencesService;
 
@@ -53,6 +54,8 @@ public class JabRefGUI {
         this.isBlank = isBlank;
         this.preferencesService = preferencesService;
         this.correctedWindowPos = false;
+
+        WebViewStore.init();
 
         mainFrame = new JabRefFrame(mainStage);
 
@@ -128,7 +131,7 @@ public class JabRefGUI {
 
     private void openDatabases() {
         // If the option is enabled, open the last edited libraries, if any.
-        if (!isBlank && preferencesService.getGuiPreferences().shouldOpenLastEdited()) {
+        if (!isBlank && preferencesService.getImportExportPreferences().shouldOpenLastEdited()) {
             openLastEditedDatabases();
         }
 
@@ -279,7 +282,6 @@ public class JabRefGUI {
             try {
                 parsedDatabase = OpenDatabase.loadDatabase(
                         dbFile,
-                        preferencesService.getGeneralPreferences(),
                         preferencesService.getImportFormatPreferences(),
                         Globals.getFileUpdateMonitor());
             } catch (IOException ex) {

@@ -26,6 +26,7 @@ import javafx.scene.input.TransferMode;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.DragAndDropDataFormats;
+import org.jabref.gui.Globals;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.gui.util.BackgroundTask;
@@ -53,6 +54,7 @@ import org.slf4j.LoggerFactory;
  * <p>
  *     {@link PreviewTab} is the controller of Entry Preview tab
  * </p>
+ *
  * @see PreviewTab
  * */
 public class PreviewTabViewModel implements PreferenceTabViewModel {
@@ -121,7 +123,7 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
 
         BackgroundTask.wrap(CitationStyle::discoverCitationStyles)
                       .onSuccess(styles -> styles.stream()
-                                                 .map(CitationStylePreviewLayout::new)
+                                                 .map(style-> new CitationStylePreviewLayout(style, Globals.entryTypesManager))
                                                  .filter(style -> chosenListProperty.getValue().filtered(item ->
                                                          item.getName().equals(style.getName())).isEmpty())
                                                  .sorted(Comparator.comparing(PreviewLayout::getName))
@@ -292,7 +294,6 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
      * @return highlighted span for codeArea
      */
     public StyleSpans<Collection<String>> computeHighlighting(String text) {
-
         final Pattern XML_TAG = Pattern.compile("(?<ELEMENT>(</?\\h*)(\\w+)([^<>]*)(\\h*/?>))"
                 + "|(?<COMMENT><!--[^<>]+-->)");
         final Pattern ATTRIBUTES = Pattern.compile("(\\w+\\h*)(=)(\\h*\"[^\"]+\")");
@@ -309,7 +310,6 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
         int lastKeywordEnd = 0;
         StyleSpansBuilder<Collection<String>> spansBuilder = new StyleSpansBuilder<>();
         while (matcher.find()) {
-
             spansBuilder.add(Collections.emptyList(), matcher.start() - lastKeywordEnd);
             if (matcher.group("COMMENT") != null) {
                 spansBuilder.add(Collections.singleton("comment"), matcher.end() - matcher.start());
@@ -321,7 +321,6 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
                     spansBuilder.add(Collections.singleton("anytag"), matcher.end(GROUP_ELEMENT_NAME) - matcher.end(GROUP_OPEN_BRACKET));
 
                     if (!attributesText.isEmpty()) {
-
                         lastKeywordEnd = 0;
 
                         Matcher attributesMatcher = ATTRIBUTES.matcher(attributesText);

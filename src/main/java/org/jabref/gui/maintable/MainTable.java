@@ -41,11 +41,8 @@ import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.ViewModelTableRowFactory;
-import org.jabref.logic.importer.ImportCleanup;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.OS;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.database.event.EntriesAddedEvent;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.PreferencesService;
@@ -93,7 +90,8 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                 preferencesService,
                 Globals.getFileUpdateMonitor(),
                 undoManager,
-                stateManager);
+                stateManager,
+                dialogService);
 
         localDragboard = stateManager.getLocalDragboard();
 
@@ -223,8 +221,8 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     }
 
     public void clearAndSelect(BibEntry bibEntry) {
+        getSelectionModel().clearSelection();
         findEntry(bibEntry).ifPresent(entry -> {
-            getSelectionModel().clearSelection();
             getSelectionModel().select(entry);
             scrollTo(entry);
         });
@@ -249,7 +247,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     }
 
     private void setupKeyBindings(KeyBindingRepository keyBindings) {
-        this.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
+        this.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
             if (event.getCode() == KeyCode.ENTER) {
                 getSelectedEntries().stream()
                                     .findFirst()
@@ -270,9 +268,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                         event.consume();
                         break;
                     case PASTE:
-                        if (!OS.OS_X) {
-                            new EditAction(StandardActions.PASTE, libraryTab.frame(), stateManager).execute();
-                        }
+                        new EditAction(StandardActions.PASTE, libraryTab.frame(), stateManager).execute();
                         event.consume();
                         break;
                     case COPY:
@@ -306,12 +302,13 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         scrollTo(getItems().size() - 1);
     }
 
-    public void paste(BibDatabaseMode bibDatabaseMode) {
+    public void paste() {
         // Find entries in clipboard
         List<BibEntry> entriesToAdd = Globals.getClipboardManager().extractData();
-        ImportCleanup cleanup = new ImportCleanup(bibDatabaseMode);
-        cleanup.doPostCleanup(entriesToAdd);
-        libraryTab.insertEntries(entriesToAdd);
+
+        for (BibEntry entry : entriesToAdd) {
+            importHandler.importEntryWithDuplicateCheck(database, entry);
+        }
         if (!entriesToAdd.isEmpty()) {
             this.requestFocus();
         }

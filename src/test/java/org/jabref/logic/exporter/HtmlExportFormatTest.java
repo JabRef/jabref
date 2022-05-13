@@ -59,7 +59,7 @@ public class HtmlExportFormatTest {
     @Test
     public void emitWellFormedHtml(@TempDir Path testFolder) throws Exception {
         Path path = testFolder.resolve("ThisIsARandomlyNamedFile");
-        exportFormat.export(databaseContext, path, charset, entries);
+        exportFormat.export(databaseContext, path, entries);
         List<String> lines = Files.readAllLines(path);
         assertEquals("</html>", lines.get(lines.size() - 1));
     }

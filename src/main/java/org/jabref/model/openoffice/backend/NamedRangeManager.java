@@ -17,15 +17,15 @@ public interface NamedRangeManager {
                                 XTextCursor position,
                                 boolean insertSpaceAfter,
                                 boolean withoutBrackets)
-        throws
-        CreationException;
+            throws
+            CreationException;
 
     List<String> getUsedNames(XTextDocument doc)
-        throws
-        NoDocumentException;
+            throws
+            NoDocumentException;
 
     Optional<NamedRange> getNamedRangeFromDocument(XTextDocument doc, String markName)
-        throws
-        NoDocumentException,
-        WrappedTargetException;
+            throws
+            NoDocumentException,
+            WrappedTargetException;
 }

@@ -1,8 +1,12 @@
+---
+nav_order: 1
+parent: Readings on Coding
+---
 # Readings on JavaFX
 
 JabRef's recommendations about JavaFX
 
-## Architecture: Model - View - \(Controller\) - ViewModel  \(MV\(C\)VM\)
+## Architecture: Model - View - (Controller) - ViewModel (MV(C)VM)
 
 The goal of the MVVM architecture is to separate the state/behavior from the appearance of the ui. This is archived by dividing JabRef into different layers, each having a clear responsibility.
 
@@ -26,7 +30,7 @@ public class MyDialogViewModel extends AbstractViewModel {
 }
 ```
 
-* Add a \(readonly\) property as a private field and generate the getters according to the [JavaFX bean conventions](https://docs.oracle.com/javafx/2/binding/jfxpub-binding.htm):
+* Add a (readonly) property as a private field and generate the getters according to the [JavaFX bean conventions](https://docs.oracle.com/javafx/2/binding/jfxpub-binding.htm):
 
 ```java
 private final ReadOnlyStringWrapper heading = new ReadOnlyStringWrapper();
@@ -79,13 +83,13 @@ public class AboutDialogView extends BaseDialog<Void>
 @Inject private DialogService dialogService;
 ```
 
-* It is convenient to load the FXML-view directly from the controller class.
+*   It is convenient to load the FXML-view directly from the controller class.
 
-  The FXML file is loaded using `ViewLoader` based on the name of the class passed to `view`. To make this convention-over-configuration approach work, both the FXML file and the View class should have the same name and should be located in the same package.
+    The FXML file is loaded using `ViewLoader` based on the name of the class passed to `view`. To make this convention-over-configuration approach work, both the FXML file and the View class should have the same name and should be located in the same package.
 
-  Note that fields annotated with `@FXML` or `@Inject` only become accessible after `ViewLoader.load()` is called.
+    Note that fields annotated with `@FXML` or `@Inject` only become accessible after `ViewLoader.load()` is called.
 
-  a `View` class that loads the FXML file.
+    a `View` class that loads the FXML file.
 
 ```java
 private Dependency dependency;
@@ -143,14 +147,14 @@ The view consists a FXML file `MyDialog.fxml` which defines the structure and th
 * [Undo manager](https://github.com/FXMisc/UndoFX)
 * [Docking manager](https://github.com/alexbodogit/AnchorFX) [or](https://github.com/RobertBColton/DockFX)
 * [additional bindings](https://github.com/lestard/advanced-bindings) or [EasyBind](https://github.com/TomasMikula/EasyBind)
-* [Kubed](https://github.com/hudsonb/kubed): data visualization \(inspired by d3\)
+* [Kubed](https://github.com/hudsonb/kubed): data visualization (inspired by d3)
 * [Validation framework](https://github.com/sialcasa/mvvmFX/wiki/Validation)
 * [mvvm framework](https://github.com/sialcasa/mvvmFX/wiki)
 * [CSS Reference](http://docs.oracle.com/javafx/2/api/javafx/scene/doc-files/cssref.html)
 * [JFoenix](https://github.com/jfoenixadmin/JFoenix) Material Designs look & feel
 * [JavaFX Documentation project](https://fxdocs.github.io/docs/html5/index.html): Collected information on JavaFX in a central place
-* [FXExperience](http://fxexperience.com/) JavaFX Links of the week
-* [Foojay](https://foojay.io/) Java and JavaFX tutorials
+* [FXExperience](http://fxexperience.com) JavaFX Links of the week
+* [Foojay](https://foojay.io) Java and JavaFX tutorials
 * [FXTutorials](https://github.com/AlmasB/FXTutorials) A wide range of practical tutorials focusing on Java, JavaFX and FXGL
 
 ## Features missing in JavaFX

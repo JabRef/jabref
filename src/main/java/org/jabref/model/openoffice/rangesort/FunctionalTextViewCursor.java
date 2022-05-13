@@ -44,13 +44,13 @@ import com.sun.star.text.XTextViewCursor;
 public class FunctionalTextViewCursor {
 
     /* The initial position of the cursor or null. */
-    private XTextRange initialPosition;
+    private final XTextRange initialPosition;
 
     /* The initial selection in the document or null. */
-    private XServiceInfo initialSelection;
+    private final XServiceInfo initialSelection;
 
     /* The view cursor, potentially moved from its original location. */
-    private XTextViewCursor viewCursor;
+    private final XTextViewCursor viewCursor;
 
     private FunctionalTextViewCursor(XTextRange initialPosition,
                                      XServiceInfo initialSelection,
@@ -69,7 +69,6 @@ public class FunctionalTextViewCursor {
      * instance.restore() after finished using the cursor.
      */
     public static OOResult<FunctionalTextViewCursor, String> get(XTextDocument doc) {
-
         Objects.requireNonNull(doc);
 
         XTextRange initialPosition = null;
@@ -90,8 +89,8 @@ public class FunctionalTextViewCursor {
         if (initialSelection == null) {
             String errorMessage = ("Selection is not available: cannot provide a functional view cursor");
             return OOResult.error(errorMessage);
-        } else if (!Arrays.stream(initialSelection.getSupportedServiceNames())
-                   .anyMatch("com.sun.star.text.TextRanges"::equals)) {
+        } else if (Arrays.stream(initialSelection.getSupportedServiceNames())
+                         .noneMatch("com.sun.star.text.TextRanges"::equals)) {
             // initialSelection does not support TextRanges.
             // We need to change it (and the viewCursor with it).
             XTextRange newSelection = doc.getText().getStart();

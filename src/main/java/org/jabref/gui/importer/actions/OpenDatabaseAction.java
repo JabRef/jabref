@@ -41,7 +41,8 @@ import org.slf4j.LoggerFactory;
 // The action concerned with opening an existing database.
 public class OpenDatabaseAction extends SimpleCommand {
 
-    public static final Logger LOGGER = LoggerFactory.getLogger(OpenDatabaseAction.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(OpenDatabaseAction.class);
+
     // List of actions that may need to be called after opening the file. Such as
     // upgrade actions etc. that may depend on the JabRef version that wrote the file:
     private static final List<GUIPostOpenAction> POST_OPEN_ACTIONS = Arrays.asList(
@@ -67,7 +68,6 @@ public class OpenDatabaseAction extends SimpleCommand {
         this.dialogService = dialogService;
         this.stateManager = stateManager;
         this.themeManager = themeManager;
-
     }
 
     /**
@@ -198,7 +198,6 @@ public class OpenDatabaseAction extends SimpleCommand {
         ParserResult result;
         try {
             result = OpenDatabase.loadDatabase(fileToLoad,
-                    preferencesService.getGeneralPreferences(),
                     preferencesService.getImportFormatPreferences(),
                     Globals.getFileUpdateMonitor());
         } catch (IOException e) {

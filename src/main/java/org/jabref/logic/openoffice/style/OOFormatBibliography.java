@@ -29,20 +29,20 @@ public class OOFormatBibliography {
     /**
      * @return The formatted bibliography, including its title.
      */
-    public static OOText formatBibliography(CitationGroups cgs,
+    public static OOText formatBibliography(CitationGroups citationGroups,
                                             CitedKeys bibliography,
                                             OOBibStyle style,
                                             boolean alwaysAddCitedOnPages) {
 
         OOText title = style.getFormattedBibliographyTitle();
-        OOText body = formatBibliographyBody(cgs, bibliography, style, alwaysAddCitedOnPages);
+        OOText body = formatBibliographyBody(citationGroups, bibliography, style, alwaysAddCitedOnPages);
         return OOText.fromString(title.toString() + body.toString());
     }
 
     /**
      * @return Formatted body of the bibliography. Excludes the title.
      */
-    public static OOText formatBibliographyBody(CitationGroups cgs,
+    public static OOText formatBibliographyBody(CitationGroups citationGroups,
                                                 CitedKeys bibliography,
                                                 OOBibStyle style,
                                                 boolean alwaysAddCitedOnPages) {
@@ -50,7 +50,7 @@ public class OOFormatBibliography {
         StringBuilder stringBuilder = new StringBuilder();
 
         for (CitedKey citedKey : bibliography.values()) {
-            OOText entryText = formatBibliographyEntry(cgs, citedKey, style, alwaysAddCitedOnPages);
+            OOText entryText = formatBibliographyEntry(citationGroups, citedKey, style, alwaysAddCitedOnPages);
             stringBuilder.append(entryText.toString());
         }
 
@@ -60,7 +60,7 @@ public class OOFormatBibliography {
     /**
      * @return A paragraph. Includes label and "Cited on pages".
      */
-    public static OOText formatBibliographyEntry(CitationGroups cgs,
+    public static OOText formatBibliographyEntry(CitationGroups citationGroups,
                                                  CitedKey citedKey,
                                                  OOBibStyle style,
                                                  boolean alwaysAddCitedOnPages) {
@@ -79,7 +79,7 @@ public class OOFormatBibliography {
 
         // Add "Cited on pages"
         if (citedKey.getLookupResult().isEmpty() || alwaysAddCitedOnPages) {
-            stringBuilder.append(formatCitedOnPages(cgs, citedKey).toString());
+            stringBuilder.append(formatCitedOnPages(citationGroups, citedKey).toString());
         }
 
         // Add paragraph
@@ -154,9 +154,8 @@ public class OOFormatBibliography {
      * - The links are created as references that show page numbers of the reference marks.
      *   - We do not control the text shown, that is provided by OpenOffice.
      */
-    private static OOText formatCitedOnPages(CitationGroups cgs, CitedKey citedKey) {
-
-        if (!cgs.citationGroupsProvideReferenceMarkNameForLinking()) {
+    private static OOText formatCitedOnPages(CitationGroups citationGroups, CitedKey citedKey) {
+        if (!citationGroups.citationGroupsProvideReferenceMarkNameForLinking()) {
             return OOText.fromString("");
         }
 
@@ -166,25 +165,25 @@ public class OOFormatBibliography {
         final String suffix = ")";
         stringBuilder.append(prefix);
 
-        List<CitationGroup> citationGroups = new ArrayList<>();
-        for (CitationPath p : citedKey.getCitationPaths()) {
-            CitationGroupId groupId = p.group;
-            Optional<CitationGroup> group = cgs.getCitationGroup(groupId);
+        List<CitationGroup> filteredList = new ArrayList<>();
+        for (CitationPath path : citedKey.getCitationPaths()) {
+            CitationGroupId groupId = path.group;
+            Optional<CitationGroup> group = citationGroups.getCitationGroup(groupId);
             if (group.isEmpty()) {
                 throw new IllegalStateException();
             }
-            citationGroups.add(group.get());
+            filteredList.add(group.get());
         }
 
         // sort the citationGroups according to their indexInGlobalOrder
-        citationGroups.sort((a, b) -> {
+        filteredList.sort((a, b) -> {
                 Integer aa = a.getIndexInGlobalOrder().orElseThrow(IllegalStateException::new);
                 Integer bb = b.getIndexInGlobalOrder().orElseThrow(IllegalStateException::new);
                 return (aa.compareTo(bb));
             });
 
         int index = 0;
-        for (CitationGroup group : citationGroups) {
+        for (CitationGroup group : filteredList) {
             if (index > 0) {
                 stringBuilder.append(", ");
             }
@@ -196,5 +195,4 @@ public class OOFormatBibliography {
         stringBuilder.append(suffix);
         return OOText.fromString(stringBuilder.toString());
     }
-
 }
