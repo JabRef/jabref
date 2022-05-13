@@ -481,10 +481,10 @@ public abstract class DBMSProcessor {
     /**
      * Queries the database for shared entries in 500 element batches.
      * Optionally, they are filtered by the given list of sharedIds
+     *
      * @param sharedIDs the list of Ids to filter. If list is empty, then no filter is applied
      */
     public List<BibEntry> partitionAndGetSharedEntries(List<Integer> sharedIDs) {
-
         List<List<Integer>> partitions = Lists.partition(sharedIDs, 500);
         List<BibEntry> result = new ArrayList<>();
 
