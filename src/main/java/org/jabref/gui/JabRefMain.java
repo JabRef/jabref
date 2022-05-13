@@ -44,7 +44,7 @@ import org.tinylog.configuration.Configuration;
  * JabRef's main class to process command line options and to start the UI
  */
 public class JabRefMain extends Application {
-    private static final Logger LOGGER = LoggerFactory.getLogger(JabRefMain.class);
+    private static Logger LOGGER;
 
     private static String[] arguments;
 
@@ -52,6 +52,10 @@ public class JabRefMain extends Application {
         addLogToDisk();
         arguments = args;
         launch(arguments);
+    }
+
+    private static void initializeLogger() {
+         LOGGER = LoggerFactory.getLogger(JabRefMain.class);
     }
 
     /**
@@ -66,6 +70,7 @@ public class JabRefMain extends Application {
         try {
             Files.createDirectories(directory);
         } catch (IOException e) {
+            initializeLogger();
             LOGGER.error("Could not create log directory {}", directory, e);
             return;
         }
@@ -75,6 +80,7 @@ public class JabRefMain extends Application {
                 "writerFile.file", directory.resolve("log_{count}.txt").toString(),
                 "writerFile.latest", directory.resolve("latest.txt").toString());
         Configuration.replace(configuration);
+        initializeLogger();
     }
 
     @Override
