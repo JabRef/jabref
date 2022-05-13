@@ -5,7 +5,17 @@ import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.jabref.logic.shared.exception.OfflineLockException;
@@ -16,7 +26,6 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.types.EntryTypeFactory;
 
-import org.jbibtex.BibTeXDatabase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -139,6 +148,7 @@ public abstract class DBMSProcessor {
         if (notYetExistingEntries.isEmpty()) {
             return;
         }
+
         insertIntoEntryTable(notYetExistingEntries);
         insertIntoFieldTable(notYetExistingEntries);
     }
@@ -190,7 +200,6 @@ public abstract class DBMSProcessor {
      * @return <code>true</code> if existent, else <code>false</code>
      */
     private List<BibEntry> getNotYetExistingEntries(List<BibEntry> bibEntries) {
-
         List<Integer> remoteIds = new ArrayList<>();
         List<Integer> localIds = bibEntries.stream()
                                            .map(BibEntry::getSharedBibEntryData)
@@ -296,7 +305,6 @@ public abstract class DBMSProcessor {
             // update only if local version is higher or the entries are equal
             if ((localBibEntry.getSharedBibEntryData().getVersion() >= sharedBibEntry.getSharedBibEntryData()
                                                                                      .getVersion()) || localBibEntry.equals(sharedBibEntry)) {
-
                 insertOrUpdateFields(localBibEntry);
 
                 // updating entry type
@@ -477,12 +485,12 @@ public abstract class DBMSProcessor {
      */
     public List<BibEntry> partitionAndGetSharedEntries(List<Integer> sharedIDs) {
         List<BibEntry> result = new ArrayList<>();
-        for (int i = 0; i <= sharedIDs.size(); i+=500) {
-            List <Integer> partitionedSharedIDs;
-            if (i + 500 > sharedIDs.size()) {
+        for (int i = 0; i <= sharedIDs.size(); i += 500) {
+            List<Integer> partitionedSharedIDs;
+            if ((i + 500) > sharedIDs.size()) {
                 partitionedSharedIDs = sharedIDs.subList(i, sharedIDs.size());
             } else {
-                partitionedSharedIDs = sharedIDs.subList(i, i+500);
+                partitionedSharedIDs = sharedIDs.subList(i, i + 500);
             }
             result.addAll(getSharedEntries(partitionedSharedIDs));
         }
