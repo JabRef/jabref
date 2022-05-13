@@ -5,17 +5,7 @@ import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import org.jabref.logic.shared.exception.OfflineLockException;
@@ -26,6 +16,7 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.types.EntryTypeFactory;
 
+import org.jbibtex.BibTeXDatabase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -477,6 +468,25 @@ public abstract class DBMSProcessor {
         } else {
             return Optional.of(sharedEntries.get(0));
         }
+    }
+
+    /**
+     * Queries the database for shared entries in 500 element batches.
+     * Optionally, they are filtered by the given list of sharedIds
+     * @param sharedIDs the list of Ids to filter. If list is empty, then no filter is applied
+     */
+    public List<BibEntry> partitionAndGetSharedEntries(List<Integer> sharedIDs) {
+        List<BibEntry> result = new ArrayList<>();
+        for (int i = 0; i <= sharedIDs.size(); i+=500) {
+            List <Integer> partitionedSharedIDs;
+            if (i + 500 > sharedIDs.size()) {
+                partitionedSharedIDs = sharedIDs.subList(i, sharedIDs.size());
+            } else {
+                partitionedSharedIDs = sharedIDs.subList(i, i+500);
+            }
+            result.addAll(getSharedEntries(partitionedSharedIDs));
+        }
+        return result;
     }
 
     /**
