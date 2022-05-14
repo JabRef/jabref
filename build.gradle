@@ -40,8 +40,8 @@ group = "org.jabref"
 version = project.findProperty('projVersion') ?: '100.0.0'
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_17
-    targetCompatibility = JavaVersion.VERSION_17
+    sourceCompatibility = JavaVersion.VERSION_18
+    targetCompatibility = JavaVersion.VERSION_18
 
     // Workaround needed for Eclipse, probably because of https://github.com/gradle/gradle/issues/16922
     // Should be removed as soon as Gradle 7.0.1 is released ( https://github.com/gradle/gradle/issues/16922#issuecomment-828217060 )
@@ -100,6 +100,10 @@ javafx {
     modules = [ 'javafx.controls', 'javafx.fxml', 'javafx.web', 'javafx.swing' ]
 }
 
+jacoco {
+    toolVersion = "0.8.8"
+}
+
 dependencies {
     // Include all jar-files in the 'lib' folder as dependencies
     implementation fileTree(dir: 'lib', includes: ['*.jar'])
@@ -118,7 +122,7 @@ dependencies {
     implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.12.0'
     implementation 'com.h2database:h2-mvstore:2.1.212'
 
-    implementation group: 'org.apache.tika', name: 'tika-core', version: '2.3.0'
+    implementation group: 'org.apache.tika', name: 'tika-core', version: '2.4.0'
     implementation 'com.ibm.icu:icu4j-charset:70.1'
 
     // required for reading write-protected PDFs - see https://github.com/JabRef/jabref/pull/942#issuecomment-209252635
@@ -126,7 +130,7 @@ dependencies {
 
     implementation 'commons-cli:commons-cli:1.5.0'
 
-    implementation 'org.libreoffice:libreoffice:7.3.2'
+    implementation 'org.libreoffice:libreoffice:7.3.3'
     implementation 'org.libreoffice:unoloader:7.3.2'
 
     implementation 'io.github.java-diff-utils:java-diff-utils:4.11'
@@ -145,7 +149,7 @@ dependencies {
 
     implementation group: 'org.mariadb.jdbc', name: 'mariadb-java-client', version: '2.7.5'
 
-    implementation 'org.postgresql:postgresql:42.3.4'
+    implementation 'org.postgresql:postgresql:42.3.5'
 
     implementation ('com.oracle.ojdbc:ojdbc10:19.3.0.0') {
         // causing module issues
@@ -245,7 +249,8 @@ processResources {
                 "springerNatureAPIKey": System.getenv('SpringerNatureAPIKey') ? System.getenv('SpringerNatureAPIKey') : '',
                 "astrophysicsDataSystemAPIKey": System.getenv('AstrophysicsDataSystemAPIKey') ? System.getenv('AstrophysicsDataSystemAPIKey') : '',
                 "ieeeAPIKey": System.getenv('IEEEAPIKey') ? System.getenv('IEEEAPIKey') : '',
-                "scienceDirectApiKey": System.getenv('SCIENCEDIRECTAPIKEY') ? System.getenv('SCIENCEDIRECTAPIKEY') : ''
+                "scienceDirectApiKey": System.getenv('SCIENCEDIRECTAPIKEY') ? System.getenv('SCIENCEDIRECTAPIKEY') : '',
+                "biodiversityHeritageApiKey": System.getenv('BiodiversityHeritageApiKey') ? System.getenv('BiodiversityHeritageApiKey') : ''
         )
         filteringCharset = 'UTF-8'
     }
