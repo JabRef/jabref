@@ -15,12 +15,16 @@ import org.jabref.gui.preferences.table.TableTabViewModel;
 import org.jabref.preferences.PreferencesService;
 
 public class MainTableHeaderRightClickMenu extends ContextMenu {
+    static MainTable mT = null;
 
     public void show(MainTable mainTable) {
+        System.out.println("show()");
+        mT = mainTable;
         mainTable.setOnContextMenuRequested(clickEvent -> {
 
             // Click on the tableColumns
             if (!(clickEvent.getTarget() instanceof StackPane)) {
+                System.out.println("Click on the tableColumns");
                 // Create radioMenuItemList from tableColumnList
                 List<RadioMenuItem> radioMenuItems = new ArrayList<>();
                 mainTable.getColumns().forEach(tableColumn -> radioMenuItems.add(createRadioMenuItem(tableColumn)));
@@ -40,14 +44,41 @@ public class MainTableHeaderRightClickMenu extends ContextMenu {
 
     private RadioMenuItem createRadioMenuItem(TableColumn<BibEntryTableViewModel, ?> tableColumn) {
         RadioMenuItem radioMenuItem = new RadioMenuItem(((MainTableColumn<?>) tableColumn).getDisplayName());
-
+        //System.out.println(((MainTableColumn<?>) tableColumn).getDisplayName());
         radioMenuItem.setOnAction(event -> {
-
             // Return the column name when we click an item from context menu
-            System.out.println(((MainTableColumn) tableColumn).getModel().getName());
+            //System.out.println(((MainTableColumn) tableColumn).getModel().getName());
+            update(tableColumn);
         });
 
         return radioMenuItem;
+    }
+
+    private void update(TableColumn<BibEntryTableViewModel, ?> tableColumn) {
+        System.out.println("update()");
+        mT.setOnContextMenuRequested(clickEvent -> {
+
+            // Click on the tableColumns
+            if (!(clickEvent.getTarget() instanceof StackPane)) {
+                System.out.println("Click on the tableColumns");
+                // Create radioMenuItemList from tableColumnList
+                List<RadioMenuItem> radioMenuItems = new ArrayList<>();
+
+                // delete
+                mT.getColumns().removeIf(tableCol -> tableCol == tableColumn);
+
+                mT.getColumns().forEach(tC-> radioMenuItems.add(createRadioMenuItem(tC)));
+
+                // Clean items and add newItems
+                this.getItems().clear();
+
+                this.getItems().addAll(radioMenuItems);
+
+                // Show ContextMenu
+                this.show(mT, clickEvent.getScreenX(), clickEvent.getScreenY());
+            }
+            clickEvent.consume();
+        });
     }
 
     // Need help!!!
