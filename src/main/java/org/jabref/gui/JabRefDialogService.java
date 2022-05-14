@@ -340,7 +340,7 @@ public class JabRefDialogService implements DialogService {
             .position(Pos.BOTTOM_CENTER)
             .hideAfter(TOAST_MESSAGE_DISPLAY_TIME)
             .owner(mainWindow)
-            .threshold(5, Notifications.create().title(Localization.lang("Collapsed Notification")).text(message))
+            .threshold(5, Notifications.create().title(Localization.lang("Collapsed Notification")).text(Localization.lang("See event log for further messages.")))
             .hideCloseButton()
             .show();
         });
