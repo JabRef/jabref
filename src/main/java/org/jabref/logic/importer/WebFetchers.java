@@ -12,6 +12,7 @@ import org.jabref.logic.importer.fetcher.ACS;
 import org.jabref.logic.importer.fetcher.ApsFetcher;
 import org.jabref.logic.importer.fetcher.ArXiv;
 import org.jabref.logic.importer.fetcher.AstrophysicsDataSystem;
+import org.jabref.logic.importer.fetcher.BiodiversityLibrary;
 import org.jabref.logic.importer.fetcher.CiteSeer;
 import org.jabref.logic.importer.fetcher.CollectionOfComputerScienceBibliographiesFetcher;
 import org.jabref.logic.importer.fetcher.CompositeSearchBasedFetcher;
@@ -114,6 +115,7 @@ public class WebFetchers {
         // set.add(new JstorFetcher(importFormatPreferences));
         set.add(new SemanticScholar());
         set.add(new ResearchGate(importFormatPreferences));
+        set.add(new BiodiversityLibrary(importerPreferences));
       return set;
     }
 
@@ -203,6 +205,7 @@ public class WebFetchers {
         fetchers.add(new SpringerFetcher(importerPreferences));
         fetchers.add(new ScienceDirect(importerPreferences));
         fetchers.add(new AstrophysicsDataSystem(importFormatPreferences, importerPreferences));
+        fetchers.add(new BiodiversityLibrary(importerPreferences));
         return fetchers;
     }
 }

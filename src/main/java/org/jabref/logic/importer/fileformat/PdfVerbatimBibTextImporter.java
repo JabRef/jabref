@@ -56,7 +56,7 @@ public class PdfVerbatimBibTextImporter extends Importer {
     @Override
     public ParserResult importDatabase(Path filePath) {
         List<BibEntry> result = new ArrayList<>(1);
-        try (PDDocument document = XmpUtilReader.loadWithAutomaticDecryption(filePath)) {
+        try (PDDocument document = new XmpUtilReader().loadWithAutomaticDecryption(filePath)) {
             String firstPageContents = getFirstPageContents(document);
             BibtexParser parser = new BibtexParser(importFormatPreferences, new DummyFileUpdateMonitor());
             result = parser.parseEntries(firstPageContents);

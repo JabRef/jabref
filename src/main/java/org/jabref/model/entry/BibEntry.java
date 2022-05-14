@@ -597,7 +597,7 @@ public class BibEntry implements Cloneable {
      */
     public Optional<FieldChange> clearField(Field field, EntriesEventSource eventSource) {
         Optional<String> oldValue = getField(field);
-        if (!oldValue.isPresent()) {
+        if (oldValue.isEmpty()) {
             return Optional.empty();
         }
 
@@ -777,7 +777,8 @@ public class BibEntry implements Cloneable {
         return putKeywords(keywordList, keywordDelimiter);
     }
 
-    public Optional<FieldChange> replaceKeywords(KeywordList keywordsToReplace, Keyword newValue,
+    public Optional<FieldChange> replaceKeywords(KeywordList keywordsToReplace,
+                                                 Keyword newValue,
                                                  Character keywordDelimiter) {
         KeywordList keywordList = getKeywords(keywordDelimiter);
         keywordList.replaceAll(keywordsToReplace, newValue);
@@ -831,6 +832,18 @@ public class BibEntry implements Cloneable {
 
     public BibEntry withField(Field field, String value) {
         setField(field, value);
+        this.setChanged(false);
+        return this;
+    }
+
+    public BibEntry withDate(Date date) {
+        setDate(date);
+        this.setChanged(false);
+        return this;
+    }
+
+    public BibEntry withMonth(Month parsedMonth) {
+        setMonth(parsedMonth);
         this.setChanged(false);
         return this;
     }

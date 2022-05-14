@@ -200,7 +200,7 @@ public class PdfContentImporter extends Importer {
     @Override
     public ParserResult importDatabase(Path filePath) {
         final ArrayList<BibEntry> result = new ArrayList<>(1);
-        try (PDDocument document = XmpUtilReader.loadWithAutomaticDecryption(filePath)) {
+        try (PDDocument document = new XmpUtilReader().loadWithAutomaticDecryption(filePath)) {
             String firstPageContents = getFirstPageContents(document);
             Optional<BibEntry> entry = getEntryFromPDFContent(firstPageContents, OS.NEWLINE);
             entry.ifPresent(result::add);

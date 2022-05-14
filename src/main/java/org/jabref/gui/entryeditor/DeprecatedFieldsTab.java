@@ -3,6 +3,7 @@ package org.jabref.gui.entryeditor;
 import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.swing.undo.UndoManager;
 
@@ -53,7 +54,7 @@ public class DeprecatedFieldsTab extends FieldsEditorTab {
     protected Set<Field> determineFieldsToShow(BibEntry entry) {
         Optional<BibEntryType> entryType = entryTypesManager.enrich(entry.getType(), databaseContext.getMode());
         if (entryType.isPresent()) {
-            return entryType.get().getDeprecatedFields();
+            return entryType.get().getDeprecatedFields().stream().filter(field -> !entry.getField(field).isEmpty()).collect(Collectors.toSet());
         } else {
             // Entry type unknown -> treat all fields as required
             return Collections.emptySet();
