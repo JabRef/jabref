@@ -11,12 +11,23 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 
 ### Added
 
+- We added a fetcher for [Biodiversity Heritage Library)](https://www.biodiversitylibrary.org/) [8539](https://github.com/JabRef/jabref/issues/8539)
+- We added support for multiple messages in the snackbar. [#7340](https://github.com/JabRef/jabref/issues/7340)
+
 ### Changed
+
+- We improved the Latex2Unicode conversion [#8639](https://github.com/JabRef/jabref/pull/8639)
+- Writing BibTeX data into a PDF (XMP) removes braces. [#8452](https://github.com/JabRef/jabref/issues/8452)
+- Writing BibTeX data into a PDF (XMP) does not write the `file` field.
+- Writing BibTeX data into a PDF (XMP) considers the configured keyword separator (and does not use "," as default any more)
 
 ### Fixed
 
-### Removed
+- We fixed the unnecessary horizontal scroll bar in group panel [#8467](https://github.com/JabRef/jabref/issues/8467)
+- We fixed an issue where the notification bar message, icon and actions appeared to be invisible. [#8761](https://github.com/JabRef/jabref/issues/8761)
+- We fixed an issue where deprecated fields tab is shown when the fields don't contain any values. [#8396](https://github.com/JabRef/jabref/issues/8396)
 
+### Removed
 
 
 
@@ -113,7 +124,6 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixed a typo in the library properties tab: "String constants". There, one can configure [BibTeX string constants](https://docs.jabref.org/advanced/strings).
 - We fixed an issue when writing a non-UTF-8 encoded file: The header is written again. [#8417](https://github.com/JabRef/jabref/issues/8417)
 - We fixed an issue where folder creation during systemic literature review failed due to an illegal fetcher name. [#8552](https://github.com/JabRef/jabref/pull/8552)
-
 
 ## [5.4] - 2021-12-20
 
@@ -246,7 +256,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - The tooltip of the search field explaining the search is always shown. [#7279](https://github.com/JabRef/jabref/pull/7279)
 - We rewrote the ACM fetcher to adapt to the new interface. [#5804](https://github.com/JabRef/jabref/issues/5804)
 - We moved the select/collapse buttons in the unlinked files dialog into a context menu. [#7383](https://github.com/JabRef/jabref/issues/7383)
-- We fixed an issue where journal abbreviations containing curly braces were not recognized  [#7773](https://github.com/JabRef/jabref/issues/7773)
+- We fixed an issue where journal abbreviations containing curly braces were not recognized [#7773](https://github.com/JabRef/jabref/issues/7773)
 
 ### Fixed
 
@@ -347,7 +357,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We changed the title of the window "Manage field names and content" to have the same title as the corresponding menu item [#6895](https://github.com/JabRef/jabref/pull/6895)
 - We renamed the menus "View -> Previous citation style" and "View -> Next citation style" into "View -> Previous preview style" and "View -> Next preview style" and renamed the "Preview" style to "Customized preview style". [#6899](https://github.com/JabRef/jabref/pull/6899)
 - We changed the default preference option "Search and store files relative to library file location" to on, as this seems to be a more intuitive behaviour. [#6863](https://github.com/JabRef/jabref/issues/6863)
-- We changed the title of the window  "Manage field names and content":  to have the same title as the corresponding menu item  [#6895](https://github.com/JabRef/jabref/pull/6895)
+- We changed the title of the window "Manage field names and content": to have the same title as the corresponding menu item [#6895](https://github.com/JabRef/jabref/pull/6895)
 - We improved the detection of "short" DOIs [6880](https://github.com/JabRef/jabref/issues/6880)
 - We improved the duplicate detection when identifiers like DOI or arxiv are semantiaclly the same, but just syntactically differ (e.g. with or without http(s):// prefix). [#6707](https://github.com/JabRef/jabref/issues/6707)
 - We improved JabRef start up time [6057](https://github.com/JabRef/jabref/issues/6057)
@@ -356,7 +366,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We changed the way JabRef displays the title of a tab and of the window. [4161](https://github.com/JabRef/jabref/issues/4161)
 - We changed connect timeouts for server requests to 30 seconds in general and 5 seconds for GROBID server (special) and improved user notifications on connection issues. [7026](https://github.com/JabRef/jabref/pull/7026)
 - We changed the order of the library tab context menu items. [#7171](https://github.com/JabRef/jabref/issues/7171)
-- We changed the way linked files are opened on Linux to use the native openFile method, compatible with confined  packages. [7037](https://github.com/JabRef/jabref/pull/7037)
+- We changed the way linked files are opened on Linux to use the native openFile method, compatible with confined packages. [7037](https://github.com/JabRef/jabref/pull/7037)
 - We refined the entry preview to show the full names of authors and editors, to list the editor only if no author is present, have the year earlier. [#7083](https://github.com/JabRef/jabref/issues/7083)
 
 ### Fixed
@@ -373,7 +383,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixed an issue where it was impossible to connect to OpenOffice/LibreOffice on Mac OSX. [#6970](https://github.com/JabRef/jabref/pull/6970)
 - We fixed an issue with the python script used by browser plugins that failed to locate JabRef if not installed in its default location. [#6963](https://github.com/JabRef/jabref/pull/6963/files)
 - We fixed an issue where spaces and newlines in an isbn would generate an exception. [#6456](https://github.com/JabRef/jabref/issues/6456)
-- We fixed an issue where identity column header had incorrect foreground color in the  Dark theme. [#6796](https://github.com/JabRef/jabref/issues/6796)
+- We fixed an issue where identity column header had incorrect foreground color in the Dark theme. [#6796](https://github.com/JabRef/jabref/issues/6796)
 - We fixed an issue where the RIS exporter added extra blank lines.[#7007](https://github.com/JabRef/jabref/pull/7007/files)
 - We fixed an issue where clicking on Collapse All button in the Search for Unlinked Local Files expanded the directory structure erroneously [#6848](https://github.com/JabRef/jabref/issues/6848)
 - We fixed an issue, when pulling changes from shared database via shortcut caused creation of a new tech report [6867](https://github.com/JabRef/jabref/issues/6867)
@@ -662,7 +672,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - Use integrated graphics card instead of discrete on macOS [#4070](https://github.com/JabRef/jabref/issues/4070)
 - We added a cleanup operation that detects an arXiv identifier in the note, journal or URL field and moves it to the `eprint` field.
   Because of this change, the last-used cleanup operations were reset.
-- We changed the minimum required version of Java to 1.8.0_171, as this is the latest release for which the automatic Java update works.  [#4093](https://github.com/JabRef/jabref/issues/4093)
+- We changed the minimum required version of Java to 1.8.0_171, as this is the latest release for which the automatic Java update works. [#4093](https://github.com/JabRef/jabref/issues/4093)
 - The special fields like `Printed` and `Read status` now show gray icons when the row is hovered.
 - We added a button in the tab header which allows you to close the database with one click. [#494](https://github.com/JabRef/jabref/issues/494)
 - Sorting in the main table now takes information from cross-referenced entries into account. [#2808](https://github.com/JabRef/jabref/issues/2808)
@@ -689,8 +699,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We optimized the code responsible for connecting to an external database, which should lead to huge improvements in performance.
 - For automatically created groups, added ability to filter groups by entry type. [#4539](https://github.com/JabRef/jabref/issues/4539)
 - We added the ability to add field names from the Preferences Dialog [#4546](https://github.com/JabRef/jabref/issues/4546)
-- We added the ability to change the column widths directly in the main
-. [#4546](https://github.com/JabRef/jabref/issues/4546)
+- We added the ability to change the column widths directly in the main table. [#4546](https://github.com/JabRef/jabref/issues/4546)
 - We added a description of how recommendations were chosen and better error handling to Related Articles tab
 - We added the ability to execute default action in dialog by using with <kbd>Ctrl</kbd> + <kbd>Enter</kbd> combination [#4496](https://github.com/JabRef/jabref/issues/4496)
 - We grouped and reordered the Main Menu (File, Edit, Library, Quality, Tools, and View tabs & icons). [#4666](https://github.com/JabRef/jabref/issues/4666) [#4667](https://github.com/JabRef/jabref/issues/4667) [#4668](https://github.com/JabRef/jabref/issues/4668) [#4669](https://github.com/JabRef/jabref/issues/4669) [#4670](https://github.com/JabRef/jabref/issues/4670) [#4671](https://github.com/JabRef/jabref/issues/4671) [#4672](https://github.com/JabRef/jabref/issues/4672) [#4673](https://github.com/JabRef/jabref/issues/4673)
@@ -780,7 +789,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 
 ### Removed
 
-- The feature to "mark entries" was removed and merged with the groups functionality.  For migration, a group is created for every value of the `__markedentry` field and the entry is added to this group.
+- The feature to "mark entries" was removed and merged with the groups functionality. For migration, a group is created for every value of the `__markedentry` field and the entry is added to this group.
 - The number column was removed.
 - We removed the global search feature.
 - We removed the coloring of cells in the main table according to whether the field is optional/required.

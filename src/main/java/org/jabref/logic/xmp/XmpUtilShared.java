@@ -25,7 +25,7 @@ public class XmpUtilShared {
     }
 
     protected static XMPMetadata parseXmpMetadata(InputStream is) throws IOException {
-        XMPMetadata meta = null;
+        XMPMetadata meta;
         try {
             DomXmpParser parser = new DomXmpParser();
             meta = parser.parse(is);
@@ -47,13 +47,13 @@ public class XmpUtilShared {
      */
     public static boolean hasMetadata(Path path, XmpPreferences xmpPreferences) {
         try {
-            List<BibEntry> bibEntries = XmpUtilReader.readXmp(path, xmpPreferences);
+            List<BibEntry> bibEntries = new XmpUtilReader().readXmp(path, xmpPreferences);
             return !bibEntries.isEmpty();
         } catch (EncryptedPdfsNotSupportedException ex) {
             LOGGER.info("Encryption not supported by XMPUtil");
             return false;
         } catch (IOException e) {
-            XmpUtilShared.LOGGER.debug("No metadata was found. Path: " + path.toString());
+            XmpUtilShared.LOGGER.debug("No metadata was found. Path: {}", path.toString());
             return false;
         }
     }
