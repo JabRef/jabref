@@ -497,6 +497,11 @@ public class JabRefFrame extends BorderPane {
                         factory.createIconButton(StandardActions.OPEN_LIBRARY, new OpenDatabaseAction(this, prefs, dialogService, stateManager, themeManager)),
                         factory.createIconButton(StandardActions.SAVE_LIBRARY, new SaveAction(SaveAction.SaveMethod.SAVE, this, prefs, stateManager))),
 
+                new Separator(Orientation.VERTICAL),
+
+                new HBox(
+                        createTaskIndicator()),
+
                 leftSpacer,
 
                 globalSearchBar,
@@ -531,12 +536,9 @@ public class JabRefFrame extends BorderPane {
                 new HBox(
                         factory.createIconButton(StandardActions.OPEN_GITHUB, new OpenBrowserAction("https://github.com/JabRef/jabref")),
                         factory.createIconButton(StandardActions.OPEN_FACEBOOK, new OpenBrowserAction("https://www.facebook.com/JabRef/")),
-                        factory.createIconButton(StandardActions.OPEN_TWITTER, new OpenBrowserAction("https://twitter.com/jabref_org"))),
+                        factory.createIconButton(StandardActions.OPEN_TWITTER, new OpenBrowserAction("https://twitter.com/jabref_org")))
 
-                new Separator(Orientation.VERTICAL),
-
-                new HBox(
-                        createTaskIndicator()));
+                );
 
         leftSpacer.setPrefWidth(50);
         leftSpacer.setMinWidth(Region.USE_PREF_SIZE);
