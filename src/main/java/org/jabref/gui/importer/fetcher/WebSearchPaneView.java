@@ -61,6 +61,7 @@ public class WebSearchPaneView extends VBox {
         HBox.setHgrow(fetchers, Priority.ALWAYS);
 
         // Create text field for query input
+        HBox hBox = new HBox();
         TextField query = SearchTextField.create();
         query.getStyleClass().add("searchBar");
 
@@ -87,7 +88,11 @@ public class WebSearchPaneView extends VBox {
         Button search = new Button(Localization.lang("Search"));
         search.setDefaultButton(false);
         search.setOnAction(event -> viewModel.search());
-        search.setMaxWidth(Double.MAX_VALUE);
-        getChildren().addAll(fetcherContainer, query, search);
+        search.setMinWidth(70);
+//        query.setMinWidth(50);
+        hBox.getChildren().addAll(query,search);
+        HBox.setHgrow(query,Priority.ALWAYS);
+        getChildren().addAll(fetcherContainer);
+        getChildren().addAll(hBox);
     }
 }
