@@ -18,21 +18,15 @@ public class Date {
 
     private static final DateTimeFormatter NORMALIZED_DATE_FORMATTER = DateTimeFormatter.ofPattern("uuuu[-MM][-dd]");
     private static final DateTimeFormatter SIMPLE_DATE_FORMATS;
+
     static {
         List<String> formatStrings = Arrays.asList(
-                "uuuu-MM-dd'T'HH:mm:ss[xxx][xx][X]",    // covers 2018-10-03T07:24:14+03:00
-                /*
-                 start: fix 8754
-                 */
-                "uuuu-MM-dd'T'HH:mm",   // covers 2018-10-03T07:24
-                "uuuu-MM-dd'T'HH:m",   // covers 2018-10-03T17:2
-                "uuuu-MM-dd'T'H:mm",   // covers 2018-10-03T7:24
-                "uuuu-MM-dd'T'H:m",  // covers 2018-10-03T7:7
-                "uuuu-MM-dd'T'HH",   // covers 2018-10-03T07
-                "uuuu-MM-dd'T'H",    // covers 2018-10-03T7
-                /*
-                end
-                 */
+                "uuuu-MM-dd'T'HH:mm[:ss][Z][z]", // [xxx][xx][X]",    // covers 2018-10-03T07:24:14+03:00
+                "uuuu-MM-dd'T'HH:m[:ss][Z][z]",                    // covers 2018-10-03T17:2
+                "uuuu-MM-dd'T'H:mm[:ss][Z][z]",                    // covers 2018-10-03T7:24
+                "uuuu-MM-dd'T'H:m[:ss][Z][z]",                     // covers 2018-10-03T7:7
+                "uuuu-MM-dd'T'HH[:ss][Z][z]",                      // covers 2018-10-03T07
+                "uuuu-MM-dd'T'H[:ss][Z][z]",                       // covers 2018-10-03T7
                 "uuuu-M-d",                             // covers 2009-1-15
                 "uuuu-M",                               // covers 2009-11
                 "d-M-uuuu",                             // covers 15-1-2012
@@ -119,7 +113,8 @@ public class Date {
         }
     }
 
-    public static Optional<Date> parse(Optional<String> yearValue, Optional<String> monthValue,
+    public static Optional<Date> parse(Optional<String> yearValue,
+                                       Optional<String> monthValue,
                                        Optional<String> dayValue) {
         Optional<Year> year = yearValue.flatMap(Date::convertToInt).map(Year::of);
         Optional<Month> month = monthValue.flatMap(Month::parse);
@@ -188,15 +183,29 @@ public class Date {
             return false;
         }
         Date date1 = (Date) o;
+        // return LocalDateTime.from(date).isEqual(LocalDateTime.from(date1.date));
+
         return Objects.equals(getYear(), date1.getYear()) &&
                 Objects.equals(getMonth(), date1.getMonth()) &&
-                Objects.equals(getDay(), date1.getDay());
+                Objects.equals(getDay(), date1.getDay()) &&
+                Objects.equals(get(ChronoField.HOUR_OF_DAY), date1.get(ChronoField.HOUR_OF_DAY)) &&
+                Objects.equals(get(ChronoField.MINUTE_OF_HOUR), date1.get(ChronoField.MINUTE_OF_HOUR)) &&
+                Objects.equals(get(ChronoField.SECOND_OF_DAY), date1.get(ChronoField.SECOND_OF_DAY)) &&
+                Objects.equals(get(ChronoField.OFFSET_SECONDS), date1.get(ChronoField.OFFSET_SECONDS));
     }
 
     @Override
     public String toString() {
+        String formattedDate;
+        if (date.isSupported(ChronoField.OFFSET_SECONDS)) {
+            formattedDate = DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(date);
+        } else if (date.isSupported(ChronoField.HOUR_OF_DAY)) {
+            formattedDate = DateTimeFormatter.ISO_DATE_TIME.format(date);
+        } else {
+            formattedDate = DateTimeFormatter.ISO_DATE.format(date);
+        }
         return "Date{" +
-                "date=" + date +
+                "date=" + formattedDate +
                 '}';
     }
 
