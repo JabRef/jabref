@@ -336,11 +336,18 @@ public class JabRefDialogService implements DialogService {
 
         DefaultTaskExecutor.runInJavaFXThread(() -> {
             Notifications.create()
-            .text(message)
-            .position(Pos.BOTTOM_CENTER)
-            .hideAfter(TOAST_MESSAGE_DISPLAY_TIME)
-            .hideCloseButton()
-            .show();
+                         .text(message)
+                         .position(Pos.BOTTOM_CENTER)
+                         .hideAfter(TOAST_MESSAGE_DISPLAY_TIME)
+                         .owner(mainWindow)
+                         .threshold(5,
+                                 Notifications.create()
+                                              .title(Localization.lang("Last notification"))
+                                              .text(
+                                                    "(" + Localization.lang("Check the event log to see all notifications") + ")"
+                                                     + "\n\n" + message))
+                         .hideCloseButton()
+                         .show();
         });
     }
 
