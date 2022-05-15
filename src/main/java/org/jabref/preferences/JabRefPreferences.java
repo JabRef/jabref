@@ -528,8 +528,7 @@ public class JabRefPreferences implements PreferencesService {
 
         // SSL
         defaults.put(TRUSTSTORE_PATH, Path.of(AppDirsFactory.getInstance()
-                                                            .getUserDataDir("JabRef", SearchFieldConstants.VERSION, "org.jabref"))
-                                          .resolve("ssl")
+                                                            .getUserDataDir("JabRef", "ssl", "org.jabref"))
                                           .resolve("truststore.jks").toString());
 
         defaults.put(POS_X, 0);
