@@ -1114,7 +1114,6 @@
           <group delimiter=", ">
             <text macro="contributors-note"/>
             <text macro="title-note"/>
-            <text macro="description-note"/>
             <text macro="secondary-contributors-note"/>
             <text macro="container-title-note"/>
             <text macro="container-contributors-note"/>
@@ -1138,6 +1137,7 @@
           <text macro="locators-newspaper" prefix=", "/>
           <text macro="point-locators"/>
           <text macro="access-note" prefix=", "/>
+          <text macro="description-note" prefix=", "/>
         </else>
       </choose>
     </layout>
@@ -1167,7 +1167,6 @@
           <group delimiter=". ">
             <text macro="contributors"/>
             <text macro="title"/>
-            <text macro="description"/>
             <text macro="secondary-contributors"/>
             <text macro="container-title"/>
             <text macro="container-contributors"/>
@@ -1188,6 +1187,7 @@
           <text macro="locators-newspaper" prefix=", "/>
           <text macro="locators-journal"/>
           <text macro="access" prefix=". "/>
+          <text macro="description" prefix=". "/>
         </else>
       </choose>
     </layout>
