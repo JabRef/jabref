@@ -74,11 +74,12 @@ public class JabRefMain extends Application {
             LOGGER.error("Could not create log directory {}", directory, e);
             return;
         }
+        // The "Shared File Writer" is explained at https://tinylog.org/v2/configuration/#shared-file-writer
         Map<String, String> configuration = Map.of(
-                "writerFile", "rolling file",
+                "writerFile", "shared file",
                 "writerFile.level", "info",
-                "writerFile.file", directory.resolve("log_{count}.txt").toString(),
-                "writerFile.latest", directory.resolve("latest.txt").toString());
+                "writerFile.file", directory.resolve("log.txt").toString(),
+                "writerFile.charset", "UTF-8");
         Configuration.replace(configuration);
         initializeLogger();
     }
