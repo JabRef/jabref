@@ -272,7 +272,6 @@ class ArXivTest implements SearchBasedFetcherCapabilityTest, PagedSearchFetcherT
     @Test
     @Override
     public void supportsYearRangeSearch() throws Exception {
-
     }
 
     @Override

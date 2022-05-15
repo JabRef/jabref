@@ -24,7 +24,6 @@ public class MsBibAuthorTest {
 
     @Test
     public void testGetNoMiddleName() {
-
         Author author = new Author("Gustav", null, null, "Bach", null);
         MsBibAuthor msBibAuthor = new MsBibAuthor(author);
         assertEquals(null, msBibAuthor.getMiddleName());
@@ -32,7 +31,6 @@ public class MsBibAuthorTest {
 
     @Test
     public void testGetNoFirstName() {
-
         Author author = new Author(null, null, null, "Bach", null);
         MsBibAuthor msBibAuthor = new MsBibAuthor(author);
         assertEquals(null, msBibAuthor.getMiddleName());

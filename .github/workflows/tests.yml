@@ -13,6 +13,7 @@ env:
   SpringerNatureAPIKey: ${{ secrets.SpringerNatureAPIKey }}
   AstrophysicsDataSystemAPIKey: ${{ secrets.AstrophysicsDataSystemAPIKey }}
   IEEEAPIKey: ${{ secrets.IEEEAPIKey }}
+  BiodiversityHeritageApiKey: ${{ secrets.BiodiversityHeritageApiKey}}
   GRADLE_OPTS: -Xmx4g
   JAVA_OPTS: -Xmx4g
 
@@ -28,9 +29,9 @@ jobs:
       - name: Checkout source
         uses: actions/checkout@v3
       - name: Set up JDK
-        uses: actions/setup-java@v2
+        uses: actions/setup-java@v3
         with:
-          java-version: 17
+          java-version: 18
           distribution: 'temurin'
           cache: 'gradle'
       - name: Run check style reporter
@@ -38,6 +39,7 @@ jobs:
         with:
           reporter: github-pr-check
           checkstyle_config: 'config/checkstyle/checkstyle_reviewdog.xml'
+          checkstyle_version: '10.1'
       - name: Run checkstyle gradle
         run: ./gradlew checkstyleMain checkstyleTest checkstyleJmh
       - name: Run markdown-lint
@@ -52,9 +54,9 @@ jobs:
       - name: Checkout source
         uses: actions/checkout@v3
       - name: Set up JDK
-        uses: actions/setup-java@v2
+        uses: actions/setup-java@v3
         with:
-          java-version: 17
+          java-version: 18
           distribution: 'temurin'
           cache: 'gradle'
       - name: Run tests
@@ -84,9 +86,9 @@ jobs:
       - name: Checkout source
         uses: actions/checkout@v3
       - name: Set up JDK
-        uses: actions/setup-java@v2
+        uses: actions/setup-java@v3
         with:
-          java-version: 17
+          java-version: 18
           distribution: 'temurin'
           cache: 'gradle'
       - name: Run tests on PostgreSQL
@@ -118,9 +120,9 @@ jobs:
       - name: Checkout source
         uses: actions/checkout@v3
       - name: Set up JDK
-        uses: actions/setup-java@v2
+        uses: actions/setup-java@v3
         with:
-          java-version: 17
+          java-version: 18
           distribution: 'temurin'
           cache: 'gradle'
       - name: Run GUI tests
@@ -156,9 +158,9 @@ jobs:
       - name: Checkout source
         uses: actions/checkout@v3
       - name: Set up JDK
-        uses: actions/setup-java@v2
+        uses: actions/setup-java@v3
         with:
-          java-version: 17
+          java-version: 18
           distribution: 'temurin'
           cache: 'gradle'
       - name: Update test coverage metrics

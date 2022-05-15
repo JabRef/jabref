@@ -27,5 +27,4 @@ public abstract class YearRangeByFilteringQueryTransformerTest<T extends YearRan
         assertEquals(2018, transformer.getStartYear());
         assertEquals(2021, transformer.getEndYear());
     }
-
 }

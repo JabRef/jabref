@@ -9,14 +9,14 @@ jobs:
     steps:
       - name: 'Wait for status checks'
         id: waitforstatuschecks
-        uses: "WyriHaximus/github-action-wait-for-status@v1.4"
+        uses: "WyriHaximus/github-action-wait-for-status@v1.6"
         with:
           ignoreActions: Automerge Dependabot,Code coverage,Create snapcraft image,Deploy binaries on builds.jabref.org,codecov/project,markdown-link-check
           checkInterval: 13
         env:
           GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
       - name: Auto approve
-        uses: hmarr/auto-approve-action@v2.2.0
+        uses: hmarr/auto-approve-action@v2.2.1
         if: steps.waitforstatuschecks.outputs.status == 'success'
         with:
           github-token: "${{ secrets.GITHUB_TOKEN }}"

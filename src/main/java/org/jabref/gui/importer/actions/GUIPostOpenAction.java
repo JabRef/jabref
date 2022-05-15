@@ -17,6 +17,7 @@ public interface GUIPostOpenAction {
     /**
      * This method is queried in order to find out whether the action needs to be
      * performed or not.
+     *
      * @param pr The result of the BIB parse operation.
      * @return true if the action should be called, false otherwise.
      */

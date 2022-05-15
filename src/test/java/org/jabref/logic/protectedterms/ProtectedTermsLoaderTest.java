@@ -105,7 +105,6 @@ class ProtectedTermsLoaderTest {
 
     @Test
     void testNewListsAreIncluded() {
-
         ProtectedTermsLoader localLoader = new ProtectedTermsLoader(
                 new ProtectedTermsPreferences(Collections.emptyList(),
                         Collections.emptyList(), Collections.emptyList(), Collections.emptyList()));
@@ -114,7 +113,6 @@ class ProtectedTermsLoaderTest {
 
     @Test
     void testNewListsAreEnabled() {
-
         ProtectedTermsLoader localLoader = new ProtectedTermsLoader(
                 new ProtectedTermsPreferences(Collections.emptyList(),
                         Collections.emptyList(), Collections.emptyList(), Collections.emptyList()));
@@ -125,7 +123,6 @@ class ProtectedTermsLoaderTest {
 
     @Test
     void testInitalizedAllInternalDisabled() {
-
         ProtectedTermsLoader localLoader = new ProtectedTermsLoader(
                 new ProtectedTermsPreferences(Collections.emptyList(), Collections.emptyList(),
                         ProtectedTermsLoader.getInternalLists(), Collections.emptyList()));
@@ -136,7 +133,6 @@ class ProtectedTermsLoaderTest {
 
     @Test
     void testUnknownExternalFileWillNotLoad() {
-
         ProtectedTermsLoader localLoader = new ProtectedTermsLoader(
                 new ProtectedTermsPreferences(ProtectedTermsLoader.getInternalLists(),
                         Collections.singletonList("someUnlikelyNameThatNeverWillExist"), Collections.emptyList(),
@@ -146,7 +142,6 @@ class ProtectedTermsLoaderTest {
 
     @Test
     void testAllDisabledNoWords() {
-
         ProtectedTermsLoader localLoader = new ProtectedTermsLoader(
                 new ProtectedTermsPreferences(Collections.emptyList(), Collections.emptyList(),
                         ProtectedTermsLoader.getInternalLists(), Collections.emptyList()));
@@ -155,7 +150,6 @@ class ProtectedTermsLoaderTest {
 
     @Test
     void testDoNotLoadTheSameInternalListTwice() {
-
         ProtectedTermsLoader localLoader = new ProtectedTermsLoader(
                 new ProtectedTermsPreferences(ProtectedTermsLoader.getInternalLists(), Collections.emptyList(),
                         ProtectedTermsLoader.getInternalLists(), Collections.emptyList()));
@@ -164,7 +158,6 @@ class ProtectedTermsLoaderTest {
 
     @Test
     void testAddNewTermListAddsList(@TempDir Path tempDir) {
-
         ProtectedTermsLoader localLoader = new ProtectedTermsLoader(
                 new ProtectedTermsPreferences(Collections.emptyList(), Collections.emptyList(),
                         ProtectedTermsLoader.getInternalLists(), Collections.emptyList()));
@@ -174,7 +167,6 @@ class ProtectedTermsLoaderTest {
 
     @Test
     void testAddNewTermListNewListInList(@TempDir Path tempDir) {
-
         ProtectedTermsLoader localLoader = new ProtectedTermsLoader(
                 new ProtectedTermsPreferences(Collections.emptyList(), Collections.emptyList(),
                         ProtectedTermsLoader.getInternalLists(), Collections.emptyList()));
@@ -185,7 +177,6 @@ class ProtectedTermsLoaderTest {
 
     @Test
     void testRemoveTermList(@TempDir Path tempDir) {
-
         ProtectedTermsLoader localLoader = new ProtectedTermsLoader(
                 new ProtectedTermsPreferences(Collections.emptyList(), Collections.emptyList(),
                         ProtectedTermsLoader.getInternalLists(), Collections.emptyList()));
@@ -195,7 +186,6 @@ class ProtectedTermsLoaderTest {
 
     @Test
     void testRemoveTermListReduceTheCount(@TempDir Path tempDir) {
-
         ProtectedTermsLoader localLoader = new ProtectedTermsLoader(
                 new ProtectedTermsPreferences(Collections.emptyList(), Collections.emptyList(),
                         ProtectedTermsLoader.getInternalLists(), Collections.emptyList()));
@@ -207,7 +197,6 @@ class ProtectedTermsLoaderTest {
 
     @Test
     void testAddNewTermListSetsCorrectDescription(@TempDir Path tempDir) {
-
         ProtectedTermsLoader localLoader = new ProtectedTermsLoader(
                 new ProtectedTermsPreferences(Collections.emptyList(), Collections.emptyList(),
                         ProtectedTermsLoader.getInternalLists(), Collections.emptyList()));

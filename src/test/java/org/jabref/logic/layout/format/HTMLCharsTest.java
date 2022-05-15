@@ -18,7 +18,6 @@ public class HTMLCharsTest {
 
     @Test
     public void testBasicFormat() {
-
         assertEquals("", layout.format(""));
 
         assertEquals("hallo", layout.format("hallo"));
