@@ -72,6 +72,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We replaced the [OttoBib](https://en.wikipedia.org/wiki/OttoBib) fetcher by a fetcher by [OpenLibrary](https://openlibrary.org/dev/docs/api/books). [#8652](https://github.com/JabRef/jabref/issues/8652)
 - We first fetch ISBN data from OpenLibrary, if nothing found, ebook.de is tried.
 - We now only show a warning when exiting for tasks that will not be recovered automatically upon relaunch of JabRef. [#8468](https://github.com/JabRef/jabref/issues/8468)
+- We changed the position of the search button of web search after the search query. [#8288](https://github.com/JabRef/jabref/issues/8288)
 
 ### Fixed
 

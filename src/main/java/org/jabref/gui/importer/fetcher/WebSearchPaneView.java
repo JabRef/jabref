@@ -90,8 +90,8 @@ public class WebSearchPaneView extends VBox {
         search.setOnAction(event -> viewModel.search());
         search.setMinWidth(70);
 //        query.setMinWidth(50);
-        hBox.getChildren().addAll(query,search);
-        HBox.setHgrow(query,Priority.ALWAYS);
+        hBox.getChildren().addAll(query, search);
+        HBox.setHgrow(query, Priority.ALWAYS);
         getChildren().addAll(fetcherContainer);
         getChildren().addAll(hBox);
     }
