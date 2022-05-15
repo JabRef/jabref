@@ -1,22 +1,9 @@
 package org.jabref.gui.groups;
 
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
-
-import javafx.beans.property.ListProperty;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleListProperty;
-import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
+import com.tobiasdiez.easybind.EasyBind;
+import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
@@ -26,12 +13,15 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.groups.AbstractGroup;
+import org.jabref.model.groups.AutomaticKeywordGroup;
 import org.jabref.model.groups.ExplicitGroup;
 import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.preferences.PreferencesService;
 
-import com.tobiasdiez.easybind.EasyBind;
+import java.util.*;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 public class GroupTreeViewModel extends AbstractViewModel {
 
@@ -59,7 +49,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
         // Register listener
         EasyBind.subscribe(stateManager.activeDatabaseProperty(), this::onActiveDatabaseChanged);
         EasyBind.subscribe(selectedGroups, this::onSelectedGroupChanged);
-
+        EasyBind.subscribe(stateManager.fieldKeywordChangedProperty(), changeEvent -> onFieldKeywordChanged(stateManager.getActiveDatabase()));
         // Set-up bindings
         filterPredicate.bind(EasyBind.map(filterText, text -> group -> group.isMatchedBy(text)));
 
@@ -143,7 +133,28 @@ public class GroupTreeViewModel extends AbstractViewModel {
 
         currentDatabase = newDatabase;
     }
+    /**
+     * Gets invoked when the user is trying to change the value of keywords of any entries.
+     * To ensure the performance for large scale, only group node defined in AutomaticKeywordGroup should be updated.
+     *
+     * @param newDatabase The database after entries changed.
+     */
+    private void onFieldKeywordChanged(Optional<BibDatabaseContext> newDatabase) {
+        if (newDatabase.isPresent()) {
+            if (selectedGroups.size() > 0) {
+                for (GroupNodeViewModel iter:rootGroup.get().getChildren()) {
+                    AbstractGroup keywordGroup = iter.getGroupNode().getGroup();
+                    if (keywordGroup.getClass() == AutomaticKeywordGroup.class && ((AutomaticKeywordGroup) keywordGroup).getField().getName().equals("keywords")) {
+                        iter.setObservableList(newDatabase.get());
+                    }
+                }
+            }
+        } else {
+            rootGroup.setValue(null);
+        }
 
+        currentDatabase = newDatabase;
+    }
     /**
      * Opens "New Group Dialog" and add the resulting group to the specified group
      */
