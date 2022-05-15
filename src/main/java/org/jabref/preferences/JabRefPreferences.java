@@ -527,7 +527,9 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(PROXY_PASSWORD, "");
 
         // SSL
-        defaults.put(TRUSTSTORE_PATH, Path.of(AppDirsFactory.getInstance().getUserDataDir("ssl", SearchFieldConstants.VERSION, "org.jabref")).resolveSibling("truststore.jks").toString());
+        defaults.put(TRUSTSTORE_PATH, Path.of(AppDirsFactory.getInstance()
+                                                            .getUserDataDir("JabRef", "ssl", "org.jabref"))
+                                          .resolve("truststore.jks").toString());
 
         defaults.put(POS_X, 0);
         defaults.put(POS_Y, 0);
