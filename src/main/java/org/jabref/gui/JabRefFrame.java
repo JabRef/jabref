@@ -530,13 +530,6 @@ public class JabRefFrame extends BorderPane {
 
                 new Separator(Orientation.VERTICAL),
 
-//                new HBox(
-//                        factory.createIconButton(StandardActions.OPEN_GITHUB, new OpenBrowserAction("https://github.com/JabRef/jabref")),
-//                        factory.createIconButton(StandardActions.OPEN_FACEBOOK, new OpenBrowserAction("https://www.facebook.com/JabRef/")),
-//                        factory.createIconButton(StandardActions.OPEN_TWITTER, new OpenBrowserAction("https://twitter.com/jabref_org"))),
-//
-//                new Separator(Orientation.VERTICAL),
-
                 new HBox(
                         createTaskIndicator()));
 
