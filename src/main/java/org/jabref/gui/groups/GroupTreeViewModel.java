@@ -299,14 +299,14 @@ public class GroupTreeViewModel extends AbstractViewModel {
             // final UndoableAddOrRemoveGroup undo = new UndoableAddOrRemoveGroup(groupsRoot, node, UndoableAddOrRemoveGroup.REMOVE_NODE_AND_CHILDREN);
             // panel.getUndoManager().addEdit(undo);
 
-            GroupNodeViewModel[] temp = new GroupNodeViewModel[selectedGroups.size()];
-            temp = selectedGroups.toArray(temp);
-            for (GroupNodeViewModel obj : temp) {
-                removeGroupsAndSubGroupsFromEntries(obj);
-                obj.getGroupNode().removeFromParent();
+            GroupNodeViewModel[] selectedGroupNodes = new GroupNodeViewModel[selectedGroups.size()];
+            selectedGroupNodes = selectedGroups.toArray(selectedGroupNodes);
+            for (GroupNodeViewModel eachNode : selectedGroupNodes) {
+                removeGroupsAndSubGroupsFromEntries(eachNode);
+                eachNode.getGroupNode().removeFromParent();
             }
 
-            if (temp.length > 1) {
+            if (selectedGroupNodes.length > 1) {
                 dialogService.notify(Localization.lang("Removed all selected groups and their subgroups."));
             } else {
                 dialogService.notify(Localization.lang("Removed group \"%0\" and its subgroups.", group.getDisplayName()));
