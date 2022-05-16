@@ -35,7 +35,7 @@ class DateTest {
                 Arguments.of(LocalDate.of(2012, Month.JANUARY, 15), "15-1-2012"),
                 Arguments.of(YearMonth.of(2012, Month.JANUARY), "1-2012"),
                 Arguments.of(YearMonth.of(2015, Month.SEPTEMBER), "9/2015"),
-                Arguments.of(YearMonth.of(2015, Month.SEPTEMBER),  "09/2015"),
+                Arguments.of(YearMonth.of(2015, Month.SEPTEMBER), "09/2015"),
                 Arguments.of(YearMonth.of(2015, Month.SEPTEMBER), "9/15"),
                 Arguments.of(LocalDate.of(2015, Month.SEPTEMBER, 1), "September 1, 2015"),
                 Arguments.of(YearMonth.of(2015, Month.SEPTEMBER), "September, 2015"),
@@ -77,13 +77,13 @@ class DateTest {
     void parseZonedTime() {
         Optional<Date> expected = Optional.of(
                 new Date(ZonedDateTime.of(
-                        LocalDateTime.of(2018, Month.OCTOBER, 3, 7, 25, 14),
+                        LocalDateTime.of(2018, Month.OCTOBER, 3, 7, 24, 14),
                         ZoneId.from(ZoneOffset.ofHours(3)))
                 )
         );
 
         assertEquals(expected, Date.parse("2018-10-03T07:24:14+03:00"));
-        assertNotEquals(expected, Date.parse("2018-10-03T07:24:14+03:00"));
+        assertNotEquals(expected, Date.parse("2018-10-03T07:24:14+02:00"));
     }
 
     @Test
