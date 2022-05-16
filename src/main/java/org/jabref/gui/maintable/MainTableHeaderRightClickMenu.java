@@ -44,10 +44,10 @@ public class MainTableHeaderRightClickMenu extends ContextMenu {
 
     private RadioMenuItem createRadioMenuItem(TableColumn<BibEntryTableViewModel, ?> tableColumn) {
         RadioMenuItem radioMenuItem = new RadioMenuItem(((MainTableColumn<?>) tableColumn).getDisplayName());
-        //System.out.println(((MainTableColumn<?>) tableColumn).getDisplayName());
+        // System.out.println(((MainTableColumn<?>) tableColumn).getDisplayName());
         radioMenuItem.setOnAction(event -> {
             // Return the column name when we click an item from context menu
-            //System.out.println(((MainTableColumn) tableColumn).getModel().getName());
+            // System.out.println(((MainTableColumn) tableColumn).getModel().getName());
             update(tableColumn);
         });
 
