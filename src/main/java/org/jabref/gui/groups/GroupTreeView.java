@@ -6,7 +6,6 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -413,12 +412,7 @@ public class GroupTreeView extends BorderPane {
         removeGroupKeepSubgroups.setOnAction(event -> viewModel.removeGroupKeepSubgroups(group));
 
         MenuItem removeGroupAndSubgroups = new MenuItem(Localization.lang("Also remove subgroups"));
-        removeGroupAndSubgroups.setOnAction(event -> {
-            ListIterator<TreeItem<GroupNodeViewModel>> iter = groupTree.getSelectionModel().getSelectedItems().listIterator();
-            while (iter.hasNext()) {
-                viewModel.removeGroupAndSubgroups(iter.next().getValue());
-            }
-        });
+        removeGroupAndSubgroups.setOnAction(event -> viewModel.removeGroupAndSubgroups(group));
 
         MenuItem addSubgroup = new MenuItem(Localization.lang("Add subgroup"));
         addSubgroup.setOnAction(event -> {

@@ -281,20 +281,36 @@ public class GroupTreeViewModel extends AbstractViewModel {
      * Removes the specified group and its subgroups (after asking for confirmation).
      */
     public void removeGroupAndSubgroups(GroupNodeViewModel group) {
-        boolean confirmed = dialogService.showConfirmationDialogAndWait(
-                Localization.lang("Remove group and subgroups"),
-                Localization.lang("Remove group \"%0\" and its subgroups?", group.getDisplayName()),
-                Localization.lang("Remove"));
+        boolean confirmed;
+        if (selectedGroups.size() <= 1) {
+            confirmed = dialogService.showConfirmationDialogAndWait(
+                    Localization.lang("Remove group and subgroups"),
+                    Localization.lang("Remove group \"%0\" and its subgroups?", group.getDisplayName()),
+                    Localization.lang("Remove"));
+        } else {
+            confirmed = dialogService.showConfirmationDialogAndWait(
+                    Localization.lang("Remove groups and subgroups"),
+                    Localization.lang("Remove all selected groups and their subgroups?"),
+                    Localization.lang("Remove all"));
+        }
+
         if (confirmed) {
             // TODO: Add undo
             // final UndoableAddOrRemoveGroup undo = new UndoableAddOrRemoveGroup(groupsRoot, node, UndoableAddOrRemoveGroup.REMOVE_NODE_AND_CHILDREN);
             // panel.getUndoManager().addEdit(undo);
 
-            removeGroupsAndSubGroupsFromEntries(group);
+            GroupNodeViewModel[] temp = new GroupNodeViewModel[selectedGroups.size()];
+            temp = selectedGroups.toArray(temp);
+            for (GroupNodeViewModel obj : temp) {
+                removeGroupsAndSubGroupsFromEntries(obj);
+                obj.getGroupNode().removeFromParent();
+            }
 
-            group.getGroupNode().removeFromParent();
-
-            dialogService.notify(Localization.lang("Removed group \"%0\" and its subgroups.", group.getDisplayName()));
+            if (temp.length > 1) {
+                dialogService.notify(Localization.lang("Removed all selected groups and their subgroups."));
+            } else {
+                dialogService.notify(Localization.lang("Removed group \"%0\" and its subgroups.", group.getDisplayName()));
+            }
             writeGroupChangesToMetaData();
         }
     }
