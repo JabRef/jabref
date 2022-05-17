@@ -1,5 +1,7 @@
 package org.jabref.logic.cleanup;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -14,22 +16,56 @@ import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.identifier.DOI;
 
 /**
- * Formats the DOI (e.g. removes http part) and also moves DOIs from note, url or ee field to the doi field.
+ * Formats
+ * the
+ * DOI
+ * (e.g.
+ * removes
+ * http
+ * part)
+ * and
+ * also
+ * moves
+ * DOIs
+ * from
+ * note,
+ * url
+ * or
+ * ee
+ * field
+ * to
+ * the
+ * doi
+ * field.
  */
 public class DoiCleanup implements CleanupJob {
 
     /**
-     * Fields to check for DOIs.
+     * Fields
+     * to
+     * check
+     * for
+     * DOIs.
      */
     private static final List<Field> FIELDS = Arrays.asList(StandardField.NOTE, StandardField.URL, new UnknownField("ee"));
 
     @Override
     public List<FieldChange> cleanup(BibEntry entry) {
+
         List<FieldChange> changes = new ArrayList<>();
 
         // First check if the Doi Field is empty
         if (entry.hasField(StandardField.DOI)) {
             String doiFieldValue = entry.getField(StandardField.DOI).orElse(null);
+
+            String decodeDoiFieldValue = "";
+            try {
+                decodeDoiFieldValue = URLDecoder.decode(doiFieldValue, "UTF-8");
+            } catch (
+                    UnsupportedEncodingException e) {
+                decodeDoiFieldValue = doiFieldValue;
+            }
+            doiFieldValue = decodeDoiFieldValue;
 
             Optional<DOI> doi = DOI.parse(doiFieldValue);
 
@@ -45,7 +81,7 @@ public class DoiCleanup implements CleanupJob {
                 // Doi field seems to contain Doi -> cleanup note, url, ee field
                 for (Field field : FIELDS) {
                     entry.getField(field).flatMap(DOI::parse)
-                        .ifPresent(unused -> removeFieldValue(entry, field, changes));
+                         .ifPresent(unused -> removeFieldValue(entry, field, changes));
                 }
             }
         } else {
@@ -67,5 +103,12 @@ public class DoiCleanup implements CleanupJob {
     private void removeFieldValue(BibEntry entry, Field field, List<FieldChange> changes) {
         CleanupJob eraser = new FieldFormatterCleanup(field, new ClearFormatter());
         changes.addAll(eraser.cleanup(entry));
+    }
+
+    private String decodeDoi(String doiValue) throws UnsupportedEncodingException {
+        if (doiValue == null) {
+            return null;
+        }
+        return URLDecoder.decode(doiValue, "UTF-8");
     }
 }

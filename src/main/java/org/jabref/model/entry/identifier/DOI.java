@@ -2,12 +2,15 @@ package org.jabref.model.entry.identifier;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.jabref.logic.layout.format.LatexToUnicodeFormatter;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 
@@ -15,7 +18,19 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Class for working with <a href="https://en.wikipedia.org/wiki/Digital_object_identifier">Digital object identifiers (DOIs)</a> and <a href="http://shortdoi.org">Short DOIs</a>
+ * Class
+ * for
+ * working
+ * with
+ * <a
+ * href="https://en.wikipedia.org/wiki/Digital_object_identifier">Digital
+ * object
+ * identifiers
+ * (DOIs)</a>
+ * and
+ * <a
+ * href="http://shortdoi.org">Short
+ * DOIs</a>
  */
 public class DOI implements Identifier {
 
@@ -93,8 +108,8 @@ public class DOI implements Identifier {
     // See https://stackoverflow.com/questions/3203190/regex-any-ascii-character for the regexp that includes ASCII characters only
     // Another reference for regexp for ASCII characters: https://howtodoinjava.com/java/regex/java-clean-ascii-text-non-printable-chars/
     private static final String CHARS_TO_REMOVE = "[\\s+" // remove white space characters, i.e, \t, \n, \x0B, \f, \r . + is a greedy quantifier
-                                                + "[^\\x00-\\x7F]" // strips off all non-ASCII characters
-                                                + "]";
+            + "[^\\x00-\\x7F]" // strips off all non-ASCII characters
+            + "]";
 
     // DOI
     private final String doi;
@@ -102,11 +117,38 @@ public class DOI implements Identifier {
     private boolean isShortDoi = false;
 
     /**
-     * Creates a DOI from various schemes including URL, URN, and plain DOIs/Short DOIs.
+     * Creates
+     * a
+     * DOI
+     * from
+     * various
+     * schemes
+     * including
+     * URL,
+     * URN,
+     * and
+     * plain
+     * DOIs/Short
+     * DOIs.
      *
-     * @param doi the DOI/Short DOI string
-     * @throws NullPointerException     if DOI/Short DOI is null
-     * @throws IllegalArgumentException if doi does not include a valid DOI/Short DOI
+     * @param doi the
+     *            DOI/Short
+     *            DOI
+     *            string
+     * @throws NullPointerException     if
+     *                                  DOI/Short
+     *                                  DOI
+     *                                  is
+     *                                  null
+     * @throws IllegalArgumentException if
+     *                                  doi
+     *                                  does
+     *                                  not
+     *                                  include
+     *                                  a
+     *                                  valid
+     *                                  DOI/Short
+     *                                  DOI
      */
     public DOI(String doi) {
         Objects.requireNonNull(doi);
@@ -120,7 +162,8 @@ public class DOI implements Identifier {
                 // decodes path segment
                 URI url = new URI(trimmedDoi);
                 trimmedDoi = url.getScheme() + "://" + url.getHost() + url.getPath();
-            } catch (URISyntaxException e) {
+            } catch (
+                    URISyntaxException e) {
                 throw new IllegalArgumentException(doi + " is not a valid HTTP DOI/Short DOI.");
             }
         }
@@ -150,39 +193,119 @@ public class DOI implements Identifier {
     }
 
     /**
-     * Creates an Optional&lt;DOI> from various schemes including URL, URN, and plain DOIs.
+     * Creates
+     * an
+     * Optional&lt;DOI>
+     * from
+     * various
+     * schemes
+     * including
+     * URL,
+     * URN,
+     * and
+     * plain
+     * DOIs.
      * <p>
-     * Useful for suppressing the <c>IllegalArgumentException</c> of the Constructor and checking for Optional.isPresent() instead.
+     * Useful
+     * for
+     * suppressing
+     * the
+     * <c>IllegalArgumentException</c>
+     * of
+     * the
+     * Constructor
+     * and
+     * checking
+     * for
+     * Optional.isPresent()
+     * instead.
      *
-     * @param doi the DOI/Short DOI string
-     * @return an Optional containing the DOI or an empty Optional
+     * @param doi the
+     *            DOI/Short
+     *            DOI
+     *            string
+     * @return an
+     * Optional
+     * containing
+     * the
+     * DOI
+     * or
+     * an
+     * empty
+     * Optional
      */
     public static Optional<DOI> parse(String doi) {
         try {
+            LatexToUnicodeFormatter formatter = new LatexToUnicodeFormatter();
             String cleanedDOI = doi;
+            cleanedDOI = URLDecoder.decode(cleanedDOI, StandardCharsets.UTF_8);
+            cleanedDOI = formatter.format(cleanedDOI);
             cleanedDOI = cleanedDOI.replaceAll(CHARS_TO_REMOVE, "");
 
             return Optional.of(new DOI(cleanedDOI));
-        } catch (IllegalArgumentException | NullPointerException e) {
+        } catch (
+                IllegalArgumentException |
+                NullPointerException e) {
             return Optional.empty();
         }
     }
 
     /**
-     * Determines whether a DOI/Short DOI is valid or not
+     * Determines
+     * whether
+     * a
+     * DOI/Short
+     * DOI
+     * is
+     * valid
+     * or
+     * not
      *
-     * @param doi the DOI/Short DOI string
-     * @return true if DOI is valid, false otherwise
+     * @param doi the
+     *            DOI/Short
+     *            DOI
+     *            string
+     * @return true
+     * if
+     * DOI
+     * is
+     * valid,
+     * false
+     * otherwise
      */
     public static boolean isValid(String doi) {
         return parse(doi).isPresent();
     }
 
     /**
-     * Tries to find a DOI/Short DOI inside the given text.
+     * Tries
+     * to
+     * find
+     * a
+     * DOI/Short
+     * DOI
+     * inside
+     * the
+     * given
+     * text.
      *
-     * @param text the Text which might contain a DOI/Short DOI
-     * @return an Optional containing the DOI or an empty Optional
+     * @param text the
+     *             Text
+     *             which
+     *             might
+     *             contain
+     *             a
+     *             DOI/Short
+     *             DOI
+     * @return an
+     * Optional
+     * containing
+     * the
+     * DOI
+     * or
+     * an
+     * empty
+     * Optional
      */
     public static Optional<DOI> findInText(String text) {
         Optional<DOI> result = Optional.empty();
@@ -214,27 +337,63 @@ public class DOI implements Identifier {
     }
 
     /**
-     * Return the plain DOI/Short DOI
+     * Return
+     * the
+     * plain
+     * DOI/Short
+     * DOI
      *
-     * @return the plain DOI/Short DOI value.
+     * @return the
+     * plain
+     * DOI/Short
+     * DOI
+     * value.
      */
     public String getDOI() {
         return doi;
     }
 
     /**
-     * Determines whether DOI is short DOI or not
+     * Determines
+     * whether
+     * DOI
+     * is
+     * short
+     * DOI
+     * or
+     * not
      *
-     * @return true if DOI is short DOI, false otherwise
+     * @return true
+     * if
+     * DOI
+     * is
+     * short
+     * DOI,
+     * false
+     * otherwise
      */
     public boolean isShortDoi() {
         return isShortDoi;
     }
 
     /**
-     * Return a URI presentation for the DOI/Short DOI
+     * Return
+     * a
+     * URI
+     * presentation
+     * for
+     * the
+     * DOI/Short
+     * DOI
      *
-     * @return an encoded URI representation of the DOI/Short DOI
+     * @return an
+     * encoded
+     * URI
+     * representation
+     * of
+     * the
+     * DOI/Short
+     * DOI
      */
     @Override
     public Optional<URI> getExternalURI() {
@@ -251,7 +410,8 @@ public class DOI implements Identifier {
         try {
             URI uri = new URI(base.getScheme(), base.getHost(), "/" + doi, null);
             return Optional.of(uri);
-        } catch (URISyntaxException e) {
+        } catch (
+                URISyntaxException e) {
             // should never happen
             LOGGER.error(doi + " could not be encoded as URI.", e);
             return Optional.empty();
@@ -259,9 +419,24 @@ public class DOI implements Identifier {
     }
 
     /**
-     * Return an ASCII URL presentation for the DOI/Short DOI
+     * Return
+     * an
+     * ASCII
+     * URL
+     * presentation
+     * for
+     * the
+     * DOI/Short
+     * DOI
      *
-     * @return an encoded URL representation of the DOI/Short DOI
+     * @return an
+     * encoded
+     * URL
+     * representation
+     * of
+     * the
+     * DOI/Short
+     * DOI
      */
     public String getURIAsASCIIString() {
         return getExternalURI().map(URI::toASCIIString).orElse("");
@@ -278,7 +453,13 @@ public class DOI implements Identifier {
     }
 
     /**
-     * DOIs are case-insensitive. Thus, 10.1109/cloud.2017.89 equals 10.1109/CLOUD.2017.89
+     * DOIs
+     * are
+     * case-insensitive.
+     * Thus,
+     * 10.1109/cloud.2017.89
+     * equals
+     * 10.1109/CLOUD.2017.89
      */
     @Override
     public boolean equals(Object o) {
