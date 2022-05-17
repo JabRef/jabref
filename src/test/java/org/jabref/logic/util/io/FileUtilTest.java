@@ -392,10 +392,8 @@ class FileUtilTest {
 
     @Test
     void testFindinListofPath() {
-        Path[] pathArr = {existingTestFile, otherExistingTestFile, rootDir};
-        List<Path> paths = List.of(pathArr);
-        Path[] resultArr = {existingTestFile, existingTestFile};
-        List<Path> resultPaths = List.of(resultArr);
+        List<Path> paths = List.of(existingTestFile, otherExistingTestFile, rootDir);
+        List<Path> resultPaths = List.of(existingTestFile, existingTestFile);
         List<Path> result = FileUtil.find("existingTestFile.txt", paths);
         assertEquals(resultPaths, result);
     }
