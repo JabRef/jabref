@@ -47,7 +47,7 @@ class DateTest {
     }
 
     @Test
-    void parseCorrectlyYearMonthDayDate() throws Exception{
+    void parseCorrectlyYearMonthDayDate() throws Exception {
         Date expected = new Date(LocalDate.of(2014, 6, 7));
         assertEquals(Optional.of(expected), Date.parse("2014-6-7"));
     }
