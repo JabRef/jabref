@@ -105,7 +105,7 @@ public class DOI implements Identifier {
     private boolean isShortDoi = false;
 
     /**
-     * Creates a DOI from various schemes including URL, URN, and plain DOIs/Short DOIs
+     * Creates a DOI from various schemes including URL, URN, and plain DOIs/Short DOIs.
      *
      * @param doi the DOI/Short DOI string
      * @throws NullPointerException     if DOI/Short DOI is null
