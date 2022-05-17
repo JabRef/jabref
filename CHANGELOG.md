@@ -28,6 +28,8 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixed the unnecessary horizontal scroll bar in group panel [#8467](https://github.com/JabRef/jabref/issues/8467)
 - We fixed an issue where the notification bar message, icon and actions appeared to be invisible. [#8761](https://github.com/JabRef/jabref/issues/8761)
 - We fixed an issue where deprecated fields tab is shown when the fields don't contain any values. [#8396](https://github.com/JabRef/jabref/issues/8396)
+- We fixed an issue that there are exceptions for DOI search in case DOI contains masked characters. [#8787](https://github.com/JabRef/jabref/issues/8787)
+
 
 ### Removed
 
