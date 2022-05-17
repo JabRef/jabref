@@ -323,7 +323,7 @@ class FileUtilTest {
         // in the @BeforeEach method.
         Path temp = Path.of(otherTemporaryFolder.resolve("123").toString());
 
-        LOGGER.debug(String.valueOf(temp));
+        LOGGER.debug("Temp dir {}", temp);
         FileUtil.renameFile(existingTestFile, temp);
         assertFalse(Files.exists(existingTestFile));
     }
