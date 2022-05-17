@@ -154,7 +154,7 @@ public class MedlineFetcher implements IdBasedParserFetcher, SearchBasedFetcher 
         uriBuilder.addParameter("db", "pubmed");
         uriBuilder.addParameter("sort", "relevance");
         uriBuilder.addParameter("retmax", String.valueOf(NUMBER_TO_FETCH));
-        uriBuilder.addParameter("term", query); //already lucene query
+        uriBuilder.addParameter("term", query); // already lucene query
         return uriBuilder.build().toURL();
     }
 
