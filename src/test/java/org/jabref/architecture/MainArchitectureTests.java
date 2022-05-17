@@ -144,6 +144,7 @@ class MainArchitectureTests {
                    .and().resideOutsideOfPackages("org.jabref.gui.openoffice..") // Uses LibreOffice SDK
                    .and().areNotAnnotatedWith(AllowedToUseStandardStreams.class)
                    .should(GeneralCodingRules.ACCESS_STANDARD_STREAMS)
+                   .because("logging framework should be used instead or the class be marked explicitly as @AllowedToUseStandardStreams")
                    .check(classes);
     }
 }
