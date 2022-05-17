@@ -21,6 +21,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - Writing BibTeX data into a PDF (XMP) removes braces. [#8452](https://github.com/JabRef/jabref/issues/8452)
 - Writing BibTeX data into a PDF (XMP) does not write the `file` field.
 - Writing BibTeX data into a PDF (XMP) considers the configured keyword separator (and does not use "," as default any more)
+- The Medline/Pubmed search now also supports the [default fields and operators for searching](https://docs.jabref.org/collect/import-using-online-bibliographic-database#search-syntax). [forum#3554](https://discourse.jabref.org/t/native-pubmed-search/3354)
 
 ### Fixed
 
