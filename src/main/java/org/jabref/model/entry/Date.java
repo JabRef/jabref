@@ -21,12 +21,12 @@ public class Date {
 
     static {
         List<String> formatStrings = Arrays.asList(
-                "uuuu-MM-dd'T'HH:mm[:ss][xxx][xx][X]",    // covers 2018-10-03T07:24:14+03:00
-                "uuuu-MM-dd'T'HH:m[:ss][xxx][xx][X]",                    // covers 2018-10-03T17:2
-                "uuuu-MM-dd'T'H:mm[:ss][xxx][xx][X]",                    // covers 2018-10-03T7:24
-                "uuuu-MM-dd'T'H:m[:ss][xxx][xx][X]",                     // covers 2018-10-03T7:7
-                "uuuu-MM-dd'T'HH[:ss][xxx][xx][X]",                      // covers 2018-10-03T07
-                "uuuu-MM-dd'T'H[:ss][xxx][xx][X]",                       // covers 2018-10-03T7
+                "uuuu-MM-dd'T'HH:mm[:ss][xxx][xx][X]",  // covers 2018-10-03T07:24:14+03:00
+                "uuuu-MM-dd'T'HH:m[:ss][xxx][xx][X]",   // covers 2018-10-03T17:2
+                "uuuu-MM-dd'T'H:mm[:ss][xxx][xx][X]",   // covers 2018-10-03T7:24
+                "uuuu-MM-dd'T'H:m[:ss][xxx][xx][X]",    // covers 2018-10-03T7:7
+                "uuuu-MM-dd'T'HH[:ss][xxx][xx][X]",     // covers 2018-10-03T07
+                "uuuu-MM-dd'T'H[:ss][xxx][xx][X]",      // covers 2018-10-03T7
                 "uuuu-M-d",                             // covers 2009-1-15
                 "uuuu-M",                               // covers 2009-11
                 "d-M-uuuu",                             // covers 15-1-2012
@@ -182,7 +182,6 @@ public class Date {
             return false;
         }
         Date date1 = (Date) o;
-        // return LocalDateTime.from(date).isEqual(LocalDateTime.from(date1.date));
 
         return Objects.equals(getYear(), date1.getYear()) &&
                 Objects.equals(getMonth(), date1.getMonth()) &&
