@@ -140,8 +140,9 @@ class MainArchitectureTests {
 
     @ArchTest
     public static void restrictStandardStreams(JavaClasses classes) {
-        noClasses().that().areNotAnnotatedWith(AllowedToUseStandardStreams.class)
-                   .and().resideOutsideOfPackages(PACKAGE_ORG_JABREF_CLI)
+        noClasses().that().resideOutsideOfPackages(PACKAGE_ORG_JABREF_CLI)
+                   .and().resideOutsideOfPackages("org.jabref.gui.openoffice..") // Uses LibreOffice SDK
+                   .and().areNotAnnotatedWith(AllowedToUseStandardStreams.class)
                    .should(GeneralCodingRules.ACCESS_STANDARD_STREAMS)
                    .check(classes);
     }
