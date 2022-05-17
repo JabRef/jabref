@@ -45,7 +45,6 @@ public class ModsExportFormatFilesTest {
         LOGGER.debug("Mods export resouce dir {}", resourceDir);
 
         try (Stream<Path> stream = Files.list(resourceDir)) {
-
             return stream.map(n -> n.getFileName().toString()).filter(n -> n.endsWith(".bib"))
                          .filter(n -> n.startsWith("Mods")).toList().stream();
         }
