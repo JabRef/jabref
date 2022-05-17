@@ -42,7 +42,7 @@ public class ModsExportFormatFilesTest {
 
     public static Stream<String> fileNames() throws Exception {
         resourceDir = Path.of(MSBibExportFormatTestFiles.class.getResource("ModsExportFormatTestAllFields.bib").toURI()).getParent();
-        LOGGER.debug(String.valueOf(resourceDir));
+        LOGGER.debug("Mods export resouce dir {}", resourceDir);
 
         try (Stream<Path> stream = Files.list(resourceDir)) {
 
