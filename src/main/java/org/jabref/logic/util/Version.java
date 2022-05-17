@@ -23,7 +23,6 @@ import org.slf4j.LoggerFactory;
 public class Version {
 
     public static final String JABREF_DOWNLOAD_URL = "https://downloads.jabref.org";
-    private static final Logger LOGGER = LoggerFactory.getLogger(Version.class);
 
     private static final Version UNKNOWN_VERSION = new Version();
 
@@ -44,6 +43,14 @@ public class Version {
      * Dummy constructor to create a local object (and  {@link Version#UNKNOWN_VERSION})
      */
     private Version() {
+    }
+
+    /**
+     * Tinylog does not allow for altering existing loging configuraitons after the logger was initialized .
+     * Lazy initialization to enable tinylog writing to a file (and also still enabling loggin in this class)
+     */
+    private static Logger getLogger() {
+        return LoggerFactory.getLogger(Version.class);
     }
 
     /**
@@ -82,14 +89,14 @@ public class Version {
 
                 parsedVersion.isDevelopmentVersion = matcher.group("dev") != null;
             } catch (NumberFormatException e) {
-                LOGGER.warn("Invalid version string used: " + version, e);
+                getLogger().warn("Invalid version string used: {}", version, e);
                 return UNKNOWN_VERSION;
             } catch (IllegalArgumentException e) {
-                LOGGER.warn("Invalid version pattern is used", e);
+                getLogger().warn("Invalid version pattern is used", e);
                 return UNKNOWN_VERSION;
             }
         } else {
-            LOGGER.warn("Version could not be recognized by the pattern");
+            getLogger().warn("Version could not be recognized by the pattern");
             return UNKNOWN_VERSION;
         }
         return parsedVersion;
@@ -288,7 +295,7 @@ public class Version {
 
         public static DevelopmentStage parse(String stage) {
             if (stage == null) {
-                LOGGER.warn("The stage cannot be null");
+                getLogger().warn("The stage cannot be null");
                 return UNKNOWN;
             } else if (stage.equals(STABLE.stage)) {
                 return STABLE;
@@ -297,7 +304,7 @@ public class Version {
             } else if (stage.equals(BETA.stage)) {
                 return BETA;
             }
-            LOGGER.warn("Unknown development stage: {}", stage);
+            getLogger().warn("Unknown development stage: {}", stage);
             return UNKNOWN;
         }
 

@@ -26,6 +26,7 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.types.EntryTypeFactory;
 
+import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -475,6 +476,22 @@ public abstract class DBMSProcessor {
         } else {
             return Optional.of(sharedEntries.get(0));
         }
+    }
+
+    /**
+     * Queries the database for shared entries in 500 element batches.
+     * Optionally, they are filtered by the given list of sharedIds
+     *
+     * @param sharedIDs the list of Ids to filter. If list is empty, then no filter is applied
+     */
+    public List<BibEntry> partitionAndGetSharedEntries(List<Integer> sharedIDs) {
+        List<List<Integer>> partitions = Lists.partition(sharedIDs, 500);
+        List<BibEntry> result = new ArrayList<>();
+
+        for (List<Integer> sublist : partitions) {
+            result.addAll(getSharedEntries(sublist));
+        }
+        return result;
     }
 
     /**
