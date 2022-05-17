@@ -5,7 +5,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.jabref.logic.bibtex.BibEntryAssert;
@@ -22,14 +21,18 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Answers;
 import org.mockito.Mockito;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 
-public class ModsExportFormatTestFiles {
-
+public class ModsExportFormatFilesTest {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ModsExportFormatFilesTest.class);
     private static Path resourceDir;
+
     public Charset charset;
+
     private BibDatabaseContext databaseContext;
     private Path exportedFile;
     private ModsExporter exporter;
@@ -39,12 +42,12 @@ public class ModsExportFormatTestFiles {
 
     public static Stream<String> fileNames() throws Exception {
         resourceDir = Path.of(MSBibExportFormatTestFiles.class.getResource("ModsExportFormatTestAllFields.bib").toURI()).getParent();
-        System.out.println(resourceDir);
+        LOGGER.debug(String.valueOf(resourceDir));
 
         try (Stream<Path> stream = Files.list(resourceDir)) {
-            //            stream.forEach(n -> System.out.println(n));
+
             return stream.map(n -> n.getFileName().toString()).filter(n -> n.endsWith(".bib"))
-                         .filter(n -> n.startsWith("Mods")).collect(Collectors.toList()).stream();
+                         .filter(n -> n.startsWith("Mods")).toList().stream();
         }
     }
 
@@ -65,10 +68,10 @@ public class ModsExportFormatTestFiles {
     @ParameterizedTest
     @MethodSource("fileNames")
     public final void testPerformExport(String filename) throws Exception {
-        importFile = Path.of(ModsExportFormatTestFiles.class.getResource(filename).toURI());
+        importFile = Path.of(ModsExportFormatFilesTest.class.getResource(filename).toURI());
         String xmlFileName = filename.replace(".bib", ".xml");
         List<BibEntry> entries = bibtexImporter.importDatabase(importFile).getDatabase().getEntries();
-        Path expectedFile = Path.of(ModsExportFormatTestFiles.class.getResource(xmlFileName).toURI());
+        Path expectedFile = Path.of(ModsExportFormatFilesTest.class.getResource(xmlFileName).toURI());
 
         exporter.export(databaseContext, exportedFile, entries);
 
@@ -80,7 +83,7 @@ public class ModsExportFormatTestFiles {
     @ParameterizedTest
     @MethodSource("fileNames")
     public final void testExportAsModsAndThenImportAsMods(String filename) throws Exception {
-        importFile = Path.of(ModsExportFormatTestFiles.class.getResource(filename).toURI());
+        importFile = Path.of(ModsExportFormatFilesTest.class.getResource(filename).toURI());
         List<BibEntry> entries = bibtexImporter.importDatabase(importFile).getDatabase().getEntries();
 
         exporter.export(databaseContext, exportedFile, entries);
@@ -90,9 +93,9 @@ public class ModsExportFormatTestFiles {
     @ParameterizedTest
     @MethodSource("fileNames")
     public final void testImportAsModsAndExportAsMods(String filename) throws Exception {
-        importFile = Path.of(ModsExportFormatTestFiles.class.getResource(filename).toURI());
+        importFile = Path.of(ModsExportFormatFilesTest.class.getResource(filename).toURI());
         String xmlFileName = filename.replace(".bib", ".xml");
-        Path xmlFile = Path.of(ModsExportFormatTestFiles.class.getResource(xmlFileName).toURI());
+        Path xmlFile = Path.of(ModsExportFormatFilesTest.class.getResource(xmlFileName).toURI());
 
         List<BibEntry> entries = modsImporter.importDatabase(xmlFile).getDatabase().getEntries();
 
