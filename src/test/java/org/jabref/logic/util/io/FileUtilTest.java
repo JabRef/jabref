@@ -388,8 +388,6 @@ class FileUtilTest {
     void testFindinPath() {
         Optional<Path> resultPath1 = FileUtil.find("existingTestFile.txt", rootDir);
         assertEquals(resultPath1.get().toString(), existingTestFile.toString());
-        Optional<Path> resultPath2 = FileUtil.find("otherExistingTestFile.txt", rootDir);
-        assertEquals(resultPath2.get().toString(), otherExistingTestFile.toString());
     }
 
     @Test
