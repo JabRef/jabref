@@ -23,6 +23,18 @@ class DateTest {
     }
 
     @Test
+    void parseCorrectlyDayMonthYearPeriodSeparatorDate() throws Exception {
+        Date expected = new Date(LocalDate.of(2015, 1, 15));
+        assertEquals(Optional.of(expected), Date.parse("15.1.2015"));
+    }
+
+    @Test
+    void parseCorrectlyMonthWordDayYearDate() throws Exception {
+        Date expected = new Date(LocalDate.of(2015, 9, 1));
+        assertEquals(Optional.of(expected), Date.parse("September 1, 2015"));
+    }
+
+    @Test
     void parseCorrectlyDayMonthYearDate() throws Exception {
         Date expected = new Date(LocalDate.of(2014, 6, 19));
         assertEquals(Optional.of(expected), Date.parse("19-06-2014"));
@@ -32,6 +44,18 @@ class DateTest {
     void parseCorrectlyMonthYearDate() throws Exception {
         Date expected = new Date(YearMonth.of(2014, 6));
         assertEquals(Optional.of(expected), Date.parse("06-2014"));
+    }
+
+    @Test
+    void parseCorrectlyYearMonthDayDate() throws Exception{
+        Date expected = new Date(LocalDate.of(2014, 6, 7));
+        assertEquals(Optional.of(expected), Date.parse("2014-6-7"));
+    }
+
+    @Test
+    void parseCorrectlyMonthWordYearDate() throws Exception {
+        Date expected = new Date(YearMonth.of(2020, 6));
+        assertEquals(Optional.of(expected), Date.parse("Jun, 2020"));
     }
 
     @Test
