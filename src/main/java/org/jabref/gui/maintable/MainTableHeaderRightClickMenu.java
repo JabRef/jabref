@@ -26,7 +26,7 @@ public class MainTableHeaderRightClickMenu extends ContextMenu {
                 mainTable.getColumns().forEach(tableColumn -> radioMenuItems.add(createRadioMenuItem(tableColumn)));
 
                 // Clean items and add newItems
-                // this.getItems().clear();
+                this.getItems().clear();
 
                 this.getItems().addAll(radioMenuItems);
 
