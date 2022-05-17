@@ -16,36 +16,12 @@ import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.identifier.DOI;
 
 /**
- * Formats
- * the
- * DOI
- * (e.g.
- * removes
- * http
- * part)
- * and
- * also
- * moves
- * DOIs
- * from
- * note,
- * url
- * or
- * ee
- * field
- * to
- * the
- * doi
- * field.
+ * Formats the DOI (e.g. removes http part) and also moves DOIs from note, url or ee field to the doi field.
  */
 public class DoiCleanup implements CleanupJob {
 
     /**
-     * Fields
-     * to
-     * check
-     * for
-     * DOIs.
+     * Fields to check for DOIs.
      */
     private static final List<Field> FIELDS = Arrays.asList(StandardField.NOTE, StandardField.URL, new UnknownField("ee"));
 
