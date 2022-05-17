@@ -13,7 +13,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 
 - We added a fetcher for [Biodiversity Heritage Library)](https://www.biodiversitylibrary.org/) [8539](https://github.com/JabRef/jabref/issues/8539)
 - We added support for multiple messages in the snackbar. [#7340](https://github.com/JabRef/jabref/issues/7340)
-- We added an extra option in the 'Find Unlinked Files' dialog view to ignore unnecessary files like Thumbs.db, DS_Store, etc. [#373](https://github.com/koppor/jabref/issues/373)
+- We added an extra option in the 'Find Unlinked Files' dialog view to ignore unnecessary files like Thumbs.db, DS_Store, etc. [koppor#373](https://github.com/koppor/jabref/issues/373)
 - JabRef now writes log files. Linux: `$home/.cache/jabref/logs/version`, Windows: `%APPDATA%\..\Local\harawata\jabref\version\logs`, Mac: `Users/.../Library/Logs/jabref/version`
 
 ### Changed
