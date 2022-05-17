@@ -393,11 +393,10 @@ class FileUtilTest {
     @Test
     void testFindinListofPath() {
         Path[] pathArr = {existingTestFile, otherExistingTestFile, rootDir};
-        List<Path> paths = Arrays.asList(pathArr);
+        List<Path> paths = List.of(pathArr);
         Path[] resultArr = {existingTestFile, existingTestFile};
-        List<Path> resultPaths = Arrays.asList(resultArr);
+        List<Path> resultPaths = List.of(resultArr);
         List<Path> result = FileUtil.find("existingTestFile.txt", paths);
-        System.out.println(result.toString());
         assertEquals(resultPaths, result);
     }
 }
