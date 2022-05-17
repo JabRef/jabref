@@ -11,6 +11,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.jabref.logic.util.io.FileUtil;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,6 +20,7 @@ public class FileFilterUtils {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FileFilterUtils.class);
     private static Set<String> FILEIGNORESET = null;
+
     /* Returns the last edited time of a file as LocalDateTime. */
     public static LocalDateTime getFileTime(Path path) {
         FileTime lastEditedTime = null;
@@ -80,12 +83,8 @@ public class FileFilterUtils {
     public static boolean filterForUnlinkedFiles(Path path, FileIgnoreUnlinkedFiles unlinkedFileFilter) {
         if (unlinkedFileFilter.equals(FileIgnoreUnlinkedFiles.DEFAULT)) {
             try {
-                FILEIGNORESET = FileIgnoreUnlinkedFiles.getIgnoreFileSet();
-                String fileExtension = "";
-                int i = path.toString().lastIndexOf('.');
-                if (i > 0) {
-                    fileExtension = path.toString().substring(i + 1);
-                }
+                FILEIGNORESET = UnlinkedFilesDialogViewModel.getIgnoreFileSet();
+                String fileExtension = FileUtil.getFileExtension(path).orElse("");
                 if (!fileExtension.equals("") && FILEIGNORESET.contains(fileExtension)) {
                     return false;
                 }

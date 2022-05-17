@@ -52,7 +52,7 @@
 
                 <Label text="%File type" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
                 <ComboBox fx:id="fileTypeCombo" maxWidth="Infinity" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
-                <Label text="%Ignore Unlinked Files" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
+                <Label text="%Ignore File Extensions" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
                 <ComboBox fx:id="unlinkedFileCombo" maxWidth="Infinity" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
                 <Label text="%Last edited:" GridPane.columnIndex="0" GridPane.rowIndex="3"/>
                 <ComboBox fx:id="fileDateCombo" maxWidth="Infinity" GridPane.columnIndex="1" GridPane.rowIndex="3"/>

@@ -240,7 +240,7 @@ fabric.properties
 *.zip
 *.tar.gz
 *.rar
-AAGenerator.cpp
+
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
 
@@ -419,7 +419,6 @@ Thumbs.db
 Thumbs.db:encryptable
 ehthumbs.db
 ehthumbs_vista.db
-data.tsv
 # Dump file
 *.stackdump
 

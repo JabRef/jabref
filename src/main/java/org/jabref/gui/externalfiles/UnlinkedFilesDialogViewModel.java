@@ -1,14 +1,20 @@
 package org.jabref.gui.externalfiles;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.DirectoryStream.Filter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -301,5 +307,26 @@ public class UnlinkedFilesDialogViewModel {
 
     public SimpleListProperty<TreeItem<FileNodeViewModel>> checkedFileListProperty() {
         return checkedFileListProperty;
+    }
+
+    public static Set<String> getIgnoreFileSet() {
+        String gitIgnorePath = ".gitignore";
+        Set<String> IgnoreFileSet = new HashSet<>();
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(
+                new FileInputStream(gitIgnorePath)
+        ))) {
+            String line = br.readLine();
+            while (line != null) {
+                line = br.readLine();
+                if (line != null && line.length() > 2 && line.charAt(0) == '*') {
+                    IgnoreFileSet.add(line.substring(2).toLowerCase(Locale.ROOT));
+                } else if (line != null && line.length() > 1 && !line.contains("/")) {
+                    IgnoreFileSet.add(line);
+                }
+            }
+        } catch (IOException e) {
+            LOGGER.error("No such file.");
+        }
+        return IgnoreFileSet;
     }
 }
