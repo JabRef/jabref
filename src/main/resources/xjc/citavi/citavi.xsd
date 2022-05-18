@@ -91,7 +91,7 @@
         <xs:element name="Persons">
           <xs:complexType>
             <xs:sequence>
-              <xs:element name="Person">
+              <xs:element maxOccurs="unbounded" name="Person">
                 <xs:complexType>
                   <xs:sequence>
                     <xs:element name="CreatedBy" type="xs:string" />
@@ -113,7 +113,7 @@
         <xs:element name="References">
           <xs:complexType>
             <xs:sequence>
-              <xs:element name="Reference">
+              <xs:element maxOccurs="unbounded" name="Reference">
                 <xs:complexType>
                   <xs:sequence>
                     <xs:element name="CreatedBy" type="xs:string" />
