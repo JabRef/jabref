@@ -18,13 +18,21 @@ import java.util.Objects;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.ParserResult;
+import org.jabref.logic.importer.fileformat.citavi.CitaviExchangeData;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.BibEntry;
 
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.Unmarshaller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,7 +44,7 @@ public class CitaviXmlImporter extends Importer implements Parser {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CitaviXmlImporter.class);
     private final ImportFormatPreferences preferences;
-    // private Unmarshaller unmarshaller;
+    private Unmarshaller unmarshaller;
 
     public CitaviXmlImporter(ImportFormatPreferences preferences) {
         this.preferences = preferences;
@@ -89,11 +97,52 @@ public class CitaviXmlImporter extends Importer implements Parser {
         BufferedReader reader = getReaderFromZip(filePath);
         Objects.requireNonNull(reader);
 
+        try {
+            Object unmarshalledObject = unmarshallRoot(reader);
+
+            if (unmarshalledObject instanceof CitaviExchangeData) {
+                // Check whether we have an article set, an article, a book article or a book article set
+                CitaviExchangeData data = (CitaviExchangeData) unmarshalledObject;
+                List<BibEntry> bibEntries = parseData(data);
+
+                return new ParserResult(bibEntries);
+            } else {
+                return ParserResult.fromErrorMessage("File does not start with xml tag.");
+            }
+        } catch (JAXBException | XMLStreamException e) {
+            LOGGER.debug("could not parse document", e);
+            return ParserResult.fromError(e);
+        }
+    }
+
+    private List<BibEntry> parseData(CitaviExchangeData data) {
         List<BibEntry> bibEntries = new ArrayList<>();
 
-        // todo add parse logic
+        // todo parse logic
 
-        return new ParserResult(bibEntries);
+        return bibEntries;
+    }
+
+    private void initUnmarshaller() throws JAXBException {
+        if (unmarshaller == null) {
+            // Lazy init because this is expensive
+            JAXBContext context = JAXBContext.newInstance("org.jabref.logic.importer.fileformat.citavi");
+            unmarshaller = context.createUnmarshaller();
+        }
+    }
+
+    private Object unmarshallRoot(BufferedReader reader) throws XMLStreamException, JAXBException {
+        initUnmarshaller();
+
+        XMLInputFactory xmlInputFactory = XMLInputFactory.newFactory();
+        XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(reader);
+
+        // Go to the root element
+        while (!xmlStreamReader.isStartElement()) {
+            xmlStreamReader.next();
+        }
+
+        return unmarshaller.unmarshal(xmlStreamReader);
     }
 
     public ParserResult importDatabase(BufferedReader reader) throws IOException {
@@ -101,31 +150,6 @@ public class CitaviXmlImporter extends Importer implements Parser {
         throw new UnsupportedOperationException("CitaviXmlImporter does not support importDatabase(BufferedReader reader)."
                 + "Instead use importDatabase(Path filePath, Charset defaultEncoding).");
     }
-//    @Override
-//    public ParserResult importDatabase(BufferedReader reader) throws IOException {
-//        Objects.requireNonNull(reader);
-//
-//        try {
-//            Object unmarshalledObject = unmarshallRoot(reader);
-//
-//            if (unmarshalledObject instanceof Xml) {
-//                // Check whether we have an article set, an article, a book article or a book article set
-//                Xml root = (Xml) unmarshalledObject;
-//                List<BibEntry> bibEntries = root
-//                        .getRecords().getRecord()
-//                        .stream()
-//                        .map(this::parseRecord)
-//                        .collect(Collectors.toList());
-//
-//                return new ParserResult(bibEntries);
-//            } else {
-//                return ParserResult.fromErrorMessage("File does not start with xml tag.");
-//            }
-//        } catch (JAXBException | XMLStreamException e) {
-//            LOGGER.debug("could not parse document", e);
-//            return ParserResult.fromError(e);
-//        }
-//    }
 
     @Override
     public List<BibEntry> parseEntries(InputStream inputStream) {
@@ -138,39 +162,11 @@ public class CitaviXmlImporter extends Importer implements Parser {
         return Collections.emptyList();
     }
 
-//    private BibEntry parseRecord(Record record) {
-//        BibEntry entry = new BibEntry();
-//        // add parse logic
-//        return entry;
-//    }
-
-//    private Object unmarshallRoot(BufferedReader reader) throws XMLStreamException, JAXBException {
-//        initUnmarshaller();
-//
-//        XMLInputFactory xmlInputFactory = XMLInputFactory.newFactory();
-//        XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(reader);
-//
-//        // Go to the root element
-//        while (!xmlStreamReader.isStartElement()) {
-//            xmlStreamReader.next();
-//        }
-//
-//        return unmarshaller.unmarshal(xmlStreamReader);
-//    }
-
-//    private void initUnmarshaller() throws JAXBException {
-//        if (unmarshaller == null) {
-//            // Lazy init because this is expensive
-//            JAXBContext context = JAXBContext.newInstance("org.jabref.logic.importer.fileformat.citavi");
-//            unmarshaller = context.createUnmarshaller();
-//        }
-//    }
-
     private BufferedReader getReaderFromZip(Path filePath) throws IOException {
         ZipInputStream zis = new ZipInputStream(new FileInputStream(filePath.toFile()));
         ZipEntry zipEntry = zis.getNextEntry();
 
-        Path newFile = Files.createTempFile("citavicontent", "xml");
+        Path newFile = Files.createTempFile("citavicontent", ".xml");
 
         while (zipEntry != null) {
             Files.copy(zis, newFile, StandardCopyOption.REPLACE_EXISTING);
