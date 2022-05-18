@@ -270,7 +270,7 @@ public class GroupTreeView extends BorderPane {
                     // Prevent right-click to select group
                     event.consume();
                 } else if (event.getTarget() instanceof StackPane pane) {
-                    if (pane.getStyleClass().toString().equals("arrow") || pane.getStyleClass().toString().equals("tree-disclosure-node")) {
+                    if (pane.getStyleClass().contains("arrow") || pane.getStyleClass().contains("tree-disclosure-node")) {
                         event.consume();
                     }
                 }
