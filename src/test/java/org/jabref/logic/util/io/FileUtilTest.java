@@ -383,5 +383,4 @@ class FileUtilTest {
         Path bibFile = Files.createFile(rootDir.resolve("test.pdf"));
         assertFalse(FileUtil.isBibFile(bibFile));
     }
-
 }
