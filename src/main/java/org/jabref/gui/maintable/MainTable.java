@@ -134,7 +134,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
         this.getSortOrder().clear();
 
-        new MainTableHeaderRightClickMenu().show(this);
+        new MainTableHeaderRightClickMenu().show(this, libraryTab, dialogService);
 
         /* KEEP for debugging purposes
         for (var colModel : mainTablePreferences.getColumnPreferences().getColumnSortOrder()) {
