@@ -256,4 +256,45 @@ public class MainTableColumnFactory {
     private TableColumn<BibEntryTableViewModel, String> createLibraryColumn(MainTableColumnModel columnModel) {
         return new LibraryColumn(columnModel);
     }
+
+    /**
+     * Create any single column
+     */
+    public TableColumn<BibEntryTableViewModel, ?> createColumn(MainTableColumnModel columnModel) {
+        switch (columnModel.getType()) {
+            case INDEX:
+                return createIndexColumn(columnModel);
+            case GROUPS:
+                return createGroupColumn(columnModel);
+            case FILES:
+                return createFilesColumn(columnModel);
+            case LINKED_IDENTIFIER:
+                return createIdentifierColumn(columnModel);
+            case LIBRARY_NAME:
+                return createLibraryColumn(columnModel);
+            case EXTRAFILE:
+                if (columnModel.getQualifier().isBlank()) {
+                    return createExtraFileColumn(columnModel);
+                }
+                break;
+            case SPECIALFIELD:
+                if (!columnModel.getQualifier().isBlank()) {
+                    Field field = FieldFactory.parseField(columnModel.getQualifier());
+                    if (field instanceof SpecialField) {
+                        return createSpecialFieldColumn(columnModel);
+                    } else {
+                        LOGGER.warn("Special field type '{}' is unknown. Using normal column type.", columnModel.getQualifier());
+                        return createFieldColumn(columnModel);
+                    }
+                }
+                break;
+            default:
+            case NORMALFIELD:
+                if (!columnModel.getQualifier().isBlank()) {
+                    return createFieldColumn(columnModel);
+                }
+                break;
+        }
+        return null;
+    }
 }

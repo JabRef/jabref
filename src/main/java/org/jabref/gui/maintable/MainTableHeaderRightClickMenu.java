@@ -44,13 +44,18 @@ public class MainTableHeaderRightClickMenu extends ContextMenu {
         radioMenuItem.setOnAction(event -> {
             // Return the column name when we click an item from context menu
             // System.out.println(((MainTableColumn) tableColumn).getModel().getName());
-            removeColumns(tableColumn);
+            removeColumn(tableColumn);
         });
 
         return radioMenuItem;
     }
 
-    public void removeColumns(TableColumn<BibEntryTableViewModel, ?> tableColumn) {
+    public void addColumn(MainTableColumn column, MainTableColumnFactory creator) {
+        MainTableColumnModel columnModel = column.getModel();
+        creator.createColumn(columnModel);
+    }
+
+    public void removeColumn(TableColumn<BibEntryTableViewModel, ?> tableColumn) {
         mT.getColumns().removeIf(tableCol -> tableCol == tableColumn);
     }
 }
