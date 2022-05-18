@@ -56,6 +56,40 @@ class DatabaseMergerTest {
         assertEquals(2, database.getEntries().size());
         assertEquals(List.of(entry1, entry3), database.getEntries());
     }
+    @Test
+    void mergeAddsWithDuplicateEntries() {
+        // Entries 1 and 2 are identical
+        BibEntry entry1 = new BibEntry()
+                .withField(StandardField.AUTHOR, "Joshua Bloch")
+                .withField(StandardField.TITLE, "Effective Java")
+                .withField(StandardField.ISBN, "0-201-31005-8");
+        entry1.setType(StandardEntryType.Book);
+        BibEntry entry2 = new BibEntry()
+                .withField(StandardField.AUTHOR, "Joshua J. Bloch")
+                .withField(StandardField.TITLE, "Effective Java:Programming Language Guide")
+                .withField(StandardField.ISBN, "0-201-31005-8")
+                .withField(StandardField.YEAR, "2001")
+                .withField(StandardField.EDITION, "1");
+        entry2.setType(StandardEntryType.Book);
+        BibEntry entry3 = new BibEntry()
+                .withField(StandardField.AUTHOR, "Joshua J. Bloch")
+                .withField(StandardField.TITLE, "Effective Java")
+                .withField(StandardField.ISBN, "978-0-321-35668-0")
+                .withField(StandardField.YEAR, "2008")
+                .withField(StandardField.EDITION, "2");
+        entry3.setType(StandardEntryType.Book);
+        BibEntry entry4 = new BibEntry()
+                .withField(StandardField.AUTHOR, "Joshua Bloch")
+                .withField(StandardField.TITLE, "Effective Java:Programming Language Guide")
+                .withField(StandardField.ISBN, "978-0-321-35668-0");
+        entry4.setType(StandardEntryType.Book);
+
+        BibDatabase database = new BibDatabase(List.of(entry1, entry4));
+        BibDatabase other = new BibDatabase(List.of(entry2, entry3));
+        new DatabaseMerger(importFormatPreferences.getKeywordSeparator()).merge(database, other);
+        assertEquals(2, database.getEntries().size());
+        assertEquals(List.of(entry1, entry4), database.getEntries());
+    }
 
     @Test
     void mergeBibTexStringsWithSameNameAreImportedWithModifiedName() {
