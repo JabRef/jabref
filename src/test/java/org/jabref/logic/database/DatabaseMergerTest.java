@@ -58,7 +58,7 @@ class DatabaseMergerTest {
     }
     @Test
     void mergeAddsWithDuplicateEntries() {
-        // Entries 1 and 2 are identical
+        // Entries 1 and 2 are identical,  Entries 3 and 4 are identical
         BibEntry entry1 = new BibEntry()
                 .withField(StandardField.AUTHOR, "Joshua Bloch")
                 .withField(StandardField.TITLE, "Effective Java")
