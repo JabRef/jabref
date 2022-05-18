@@ -56,6 +56,7 @@ class DatabaseMergerTest {
         assertEquals(2, database.getEntries().size());
         assertEquals(List.of(entry1, entry3), database.getEntries());
     }
+
     @Test
     void mergeAddsWithDuplicateEntries() {
         // Entries 1 and 2 are identical,  Entries 3 and 4 are identical
@@ -114,10 +115,10 @@ class DatabaseMergerTest {
         new DatabaseMerger(importFormatPreferences.getKeywordSeparator()).mergeStrings(target, source2);
         // Use string representation to compare since the id will not match
         List<String> resultStringsSorted = target.getStringValues()
-                                                 .stream()
-                                                 .map(BibtexString::toString)
-                                                 .sorted()
-                                                 .collect(Collectors.toList());
+                .stream()
+                .map(BibtexString::toString)
+                .sorted()
+                .collect(Collectors.toList());
 
         assertEquals(List.of(targetString.toString(), importedBibTeXString1.toString(),
                 importedBibTeXString2.toString()), resultStringsSorted);
@@ -142,10 +143,10 @@ class DatabaseMergerTest {
         new DatabaseMerger(importFormatPreferences.getKeywordSeparator()).mergeStrings(target, source);
         // Use string representation to compare since the id will not match
         List<String> resultStringsSorted = target.getStringValues()
-                                                 .stream()
-                                                 .map(BibtexString::toString)
-                                                 .sorted()
-                                                 .collect(Collectors.toList());
+                .stream()
+                .map(BibtexString::toString)
+                .sorted()
+                .collect(Collectors.toList());
 
         assertEquals(List.of(targetString1.toString(), targetString2.toString()), resultStringsSorted);
     }
