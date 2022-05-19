@@ -121,7 +121,6 @@ public class UnlinkedFilesCrawler extends BackgroundTask<FileNodeViewModel> {
         return parent;
     }
 
-
     private Set<String> getIgnoreFileSet(Path directory) {
         String gitIgnorePath = ".gitignore";
         Set<String> IgnoreFileSet = new HashSet<>();

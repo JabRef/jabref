@@ -79,7 +79,7 @@ public class FileFilterUtils {
     }
 
     /* Returns true if a file should be ignored by .gitignore */
-    public static boolean filterForUnlinkedFiles(Path path, FileIgnoreUnlinkedFiles unlinkedFileFilter, Set<String> ignoreFileSet ) {
+    public static boolean filterForUnlinkedFiles(Path path, FileIgnoreUnlinkedFiles unlinkedFileFilter, Set<String> ignoreFileSet) {
         if (unlinkedFileFilter.equals(FileIgnoreUnlinkedFiles.DEFAULT)) {
             try {
 

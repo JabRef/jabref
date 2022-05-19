@@ -64,20 +64,20 @@ public class FileFilterUtilsTest {
     @Nested
     class SortingTests {
 
-        private List<Path> files = new ArrayList<Path>();
-        private List<String> expectedSortByDateAscending = new ArrayList<String>();
-        private List<String> expectedSortByDateDescending = new ArrayList<String>();
-        private List<String> wrongOrder = new ArrayList<String>();
+        private final List<Path> files = new ArrayList<>();
+        private final List<String> expectedSortByDateAscending = new ArrayList<>();
+        private final List<String> expectedSortByDateDescending = new ArrayList<>();
+        private final List<String> wrongOrder = new ArrayList<>();
 
         /* Initialize the directory and files used in the sorting tests, and change their last edited dates. */
         @BeforeEach
         public void setUp(@TempDir Path tempDir) throws Exception {
-            
+
             Path firstPath = tempDir.resolve("firstFile.pdf");
             Path secondPath = tempDir.resolve("secondFile.pdf");
             Path thirdPath = tempDir.resolve("thirdFile.pdf");
             Path fourthPath = tempDir.resolve("fourthFile.pdf");
-    
+
             Files.createFile(firstPath);
             Files.createFile(secondPath);
             Files.createFile(thirdPath);
@@ -88,19 +88,19 @@ public class FileFilterUtilsTest {
             Files.setLastModifiedTime(secondPath, FileTime.fromMillis(5));
             Files.setLastModifiedTime(thirdPath, FileTime.fromMillis(1));
             Files.setLastModifiedTime(fourthPath, FileTime.fromMillis(2));
-            
+
             // fill the list to be sorted by the tests.
             files.add(firstPath);
             files.add(secondPath);
             files.add(thirdPath);
             files.add(fourthPath);
-    
+
             // fill the expected values lists.
             expectedSortByDateAscending.add(thirdPath.toString());
             expectedSortByDateAscending.add(fourthPath.toString());
             expectedSortByDateAscending.add(secondPath.toString());
             expectedSortByDateAscending.add(firstPath.toString());
-    
+
             expectedSortByDateDescending.add(firstPath.toString());
             expectedSortByDateDescending.add(secondPath.toString());
             expectedSortByDateDescending.add(fourthPath.toString());
@@ -111,7 +111,7 @@ public class FileFilterUtilsTest {
             wrongOrder.add(thirdPath.toString());
             wrongOrder.add(fourthPath.toString());
         }
-    
+
         @Test
         public void sortByDateAscendingPositiveTest() {
             List<String> sortedPaths = fileFilterUtils
@@ -131,7 +131,7 @@ public class FileFilterUtilsTest {
                 .collect(Collectors.toList());
             assertNotEquals(sortedPaths, wrongOrder);
         }
-    
+
         @Test
         public void sortByDateDescendingPositiveTest() {
             List<String> sortedPaths = fileFilterUtils
