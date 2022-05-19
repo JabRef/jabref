@@ -94,9 +94,13 @@ public class Linux implements NativeDesktop {
         if (desktopSession != null) {
             desktopSession = desktopSession.toLowerCase(Locale.ROOT);
             if (desktopSession.contains("gnome")) {
-                cmd = "nautilus" + filePath.toString().replace(" ", "\\ ");
-            } else if (desktopSession.contains("kde")) {
+                cmd = "nautilus --select " + filePath.toString().replace(" ", "\\ ");
+            } else if (desktopSession.contains("kde") || desktopSession.contains("plasma")) {
                 cmd = "dolphin --select " + filePath.toString().replace(" ", "\\ ");
+            } else if (desktopSession.contains("mate")) {
+                cmd = "caja --select " + filePath.toString().replace(" ", "\\ ");
+            } else if (desktopSession.contains("cinnamon")) {
+                cmd = "nemo --select " + filePath.toString().replace(" ", "\\ ");
             }
         }
         Runtime.getRuntime().exec(cmd);
