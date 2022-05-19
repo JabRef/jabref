@@ -1,13 +1,17 @@
 package org.jabref.gui.externalfiles;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.DirectoryStream.Filter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -102,9 +106,9 @@ public class UnlinkedFilesCrawler extends BackgroundTask<FileNodeViewModel> {
             }
         }
         // filter files according to last edited date.
-        List<Path> filteredFiles = new ArrayList<Path>();
+        List<Path> filteredFiles = new ArrayList<>();
         for (Path path : files) {
-            if (FileFilterUtils.filterByDate(path, dateFilter) && FileFilterUtils.filterForUnlinkedFiles(path, unlinkedFileFilter)) {
+            if (FileFilterUtils.filterByDate(path, dateFilter) && FileFilterUtils.filterForUnlinkedFiles(path, unlinkedFileFilter, getIgnoreFileSet(path))) {
                 filteredFiles.add(path);
             }
         }
@@ -115,5 +119,30 @@ public class UnlinkedFilesCrawler extends BackgroundTask<FileNodeViewModel> {
                 .map(FileNodeViewModel::new)
                 .collect(Collectors.toList()));
         return parent;
+    }
+
+
+    private Set<String> getIgnoreFileSet(Path directory) {
+        String gitIgnorePath = ".gitignore";
+        Set<String> IgnoreFileSet = new HashSet<>();
+
+        Path ignoreFile = directory.resolve(gitIgnorePath);
+
+        if (Files.exists(ignoreFile)) {
+            try (BufferedReader br = Files.newBufferedReader(ignoreFile)) {
+                String line = br.readLine();
+                while (line != null) {
+                    line = br.readLine();
+                    if ((line != null) && (line.length() > 2) && (line.charAt(0) == '*')) {
+                        IgnoreFileSet.add(line.substring(2).toLowerCase(Locale.ROOT));
+                    } else if ((line != null) && (line.length() > 1) && !line.contains("/")) {
+                        IgnoreFileSet.add(line);
+                    }
+                }
+            } catch (IOException e) {
+                LOGGER.error("Error reading file.", e);
+            }
+        }
+        return IgnoreFileSet;
     }
 }

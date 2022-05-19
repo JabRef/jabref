@@ -19,7 +19,6 @@ import org.slf4j.LoggerFactory;
 public class FileFilterUtils {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FileFilterUtils.class);
-    private static Set<String> FILEIGNORESET = null;
 
     /* Returns the last edited time of a file as LocalDateTime. */
     public static LocalDateTime getFileTime(Path path) {
@@ -80,18 +79,18 @@ public class FileFilterUtils {
     }
 
     /* Returns true if a file should be ignored by .gitignore */
-    public static boolean filterForUnlinkedFiles(Path path, FileIgnoreUnlinkedFiles unlinkedFileFilter) {
+    public static boolean filterForUnlinkedFiles(Path path, FileIgnoreUnlinkedFiles unlinkedFileFilter, Set<String> ignoreFileSet ) {
         if (unlinkedFileFilter.equals(FileIgnoreUnlinkedFiles.DEFAULT)) {
             try {
-                FILEIGNORESET = UnlinkedFilesDialogViewModel.getIgnoreFileSet();
+
                 String fileExtension = FileUtil.getFileExtension(path).orElse("");
-                if (!fileExtension.equals("") && FILEIGNORESET.contains(fileExtension)) {
+                if (!fileExtension.equals("") && ignoreFileSet.contains(fileExtension)) {
                     return false;
                 }
             } catch (Exception e) {
                 LOGGER.info("Not file");
             }
-            return !FILEIGNORESET.contains(path.getFileName().toString());
+            return !ignoreFileSet.contains(path.getFileName().toString());
         }
         return true;
     }
