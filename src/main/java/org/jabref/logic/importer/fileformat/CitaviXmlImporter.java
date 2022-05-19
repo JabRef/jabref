@@ -17,6 +17,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -29,8 +31,16 @@ import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.citavi.CitaviExchangeData;
+import org.jabref.logic.importer.fileformat.endnote.Title;
+import org.jabref.logic.importer.fileformat.endnote.Titles;
+import org.jabref.logic.importer.fileformat.endnote.Xml;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.types.EntryType;
+import org.jabref.model.entry.types.IEEETranEntryType;
+import org.jabref.model.entry.types.StandardEntryType;
+import org.jabref.model.strings.StringUtil;
 
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
@@ -106,7 +116,7 @@ public class CitaviXmlImporter extends Importer implements Parser {
             if (unmarshalledObject instanceof CitaviExchangeData) {
                 // Check whether we have an article set, an article, a book article or a book article set
                 CitaviExchangeData data = (CitaviExchangeData) unmarshalledObject;
-                List<BibEntry> bibEntries = parseData(data);
+                List<BibEntry> bibEntries = parseDataList(data);
 
                 return new ParserResult(bibEntries);
             } else {
@@ -118,12 +128,85 @@ public class CitaviXmlImporter extends Importer implements Parser {
         }
     }
 
-    private List<BibEntry> parseData(CitaviExchangeData data) {
+    private List<BibEntry> parseDataList(CitaviExchangeData data) {
         List<BibEntry> bibEntries = new ArrayList<>();
+        BibEntry entry = new BibEntry();
 
-        // todo parse logic
+        bibEntries = data
+                .getReferences().getReference()
+                .stream()
+                .map(this::parseData)
+                .collect(Collectors.toList());
 
         return bibEntries;
+    }
+
+    private BibEntry parseData(CitaviExchangeData.References.Reference data){
+        BibEntry entry = new BibEntry();
+
+        entry.setType(getType(data));
+        Optional.ofNullable(data.getTitle())
+                .ifPresent(value -> entry.setField(StandardField.TITLE, clean(value)));
+        Optional.ofNullable(data.getAbstract())
+                .ifPresent(value -> entry.setField(StandardField.ABSTRACT, clean(value)));
+        Optional.ofNullable(data.getYear())
+                .ifPresent(value -> entry.setField(StandardField.YEAR, clean(value)));
+        Optional.ofNullable(data.getDoi())
+                .ifPresent(value -> entry.setField(StandardField.DOI, clean(value)));
+        Optional.ofNullable(data.getIsbn())
+                .ifPresent(value -> entry.setField(StandardField.ISBN, clean(value)));
+        Optional.ofNullable(getPages(data))
+                .ifPresent(value -> entry.setField(StandardField.PAGES, clean(value)));
+        Optional.ofNullable(data.getVolume())
+                .ifPresent(value -> entry.setField(StandardField.VOLUME, clean(value)));
+
+
+        return entry;
+    }
+
+    private EntryType getType(CitaviExchangeData.References.Reference data) {
+        return Optional.ofNullable(data.getReferenceType())
+                       .map(CitaviXmlImporter::convertRefNameToType)
+                       .orElse(StandardEntryType.Article);
+    }
+
+    private static EntryType convertRefNameToType(String refName) {
+        return switch (refName.toLowerCase().trim()) {
+            case "artwork", "generic", "musicalbum", "audioorvideodocument", "movie" -> StandardEntryType.Misc;
+            case "electronic article" -> IEEETranEntryType.Electronic;
+            case "book section" -> StandardEntryType.InBook;
+            case "book", "bookedited", "audiobook" -> StandardEntryType.Book;
+            case "report" -> StandardEntryType.Report;
+            // case "journal article" -> StandardEntryType.Article;
+            default -> StandardEntryType.Article;
+        };
+    }
+
+    private String getPages(CitaviExchangeData.References.Reference data){
+        String tmpStr = "";
+        if (data.getPageCount() != null && data.getPageRange() == null) {
+            tmpStr = data.getPageCount();
+        }
+        else if (data.getPageCount() == null && data.getPageRange() != null) {
+            tmpStr = data.getPageRange();
+        }
+        else if (data.getPageCount() == null && data.getPageRange() == null) {
+            return null;
+        }
+        int count = 0;
+        String pages = "";
+        for (int i = tmpStr.length()-1; i >= 0; i--) {
+            if (count == 2 ) {
+                pages =  tmpStr.substring(i+1, tmpStr.length()-1-5);
+                break;
+            }
+            else{
+                if (tmpStr.charAt(i) == '>') {
+                    count++;
+                }
+            }
+        }
+        return pages;
     }
 
     private void initUnmarshaller() throws JAXBException {
@@ -196,5 +279,11 @@ public class CitaviXmlImporter extends Importer implements Parser {
             }
         }
         return pushbackInputStream;
+    }
+
+    private String clean(String input) {
+        return StringUtil.unifyLineBreaks(input, " ")
+                         .trim()
+                         .replaceAll(" +", " ");
     }
 }
