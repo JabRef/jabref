@@ -120,6 +120,7 @@
                     <xs:element name="CreatedOn" type="xs:dateTime" />
                     <xs:element name="ModifiedBy" type="xs:string" />
                     <xs:element name="ModifiedOn" type="xs:dateTime" />
+                    <xs:element name="Abstract" type="xs:string" />
                     <xs:element name="AbstractComplexity" type="xs:unsignedByte" />
                     <xs:element name="AbstractSourceTextFormat" type="xs:unsignedByte" />
                     <xs:element name="CitationKeyUpdateType" type="xs:unsignedByte" />
@@ -129,6 +130,7 @@
                     <xs:element name="HasLabel1" type="xs:boolean" />
                     <xs:element name="HasLabel2" type="xs:boolean" />
                     <xs:element name="PageCount" type="xs:string" />
+                    <xs:element name="PageRange" type="xs:string" />
                     <xs:element name="PageRangeNumber" type="xs:byte" />
                     <xs:element name="Rating" type="xs:unsignedByte" />
                     <xs:element name="ReferenceType" type="xs:string" />
@@ -138,6 +140,10 @@
                     <xs:element name="TableOfContentsComplexity" type="xs:unsignedByte" />
                     <xs:element name="TableOfContentsSourceTextFormat" type="xs:unsignedByte" />
                     <xs:element name="Title" type="xs:string" />
+                    <xs:element name="Year" type="xs:string" />
+                    <xs:element name="Doi" type="xs:string" />
+                    <xs:element name="Isbn" type="xs:string" />
+                    <xs:element name="Volume" type="xs:string" />
                   </xs:sequence>
                   <xs:attribute name="id" type="xs:string" use="required" />
                 </xs:complexType>
