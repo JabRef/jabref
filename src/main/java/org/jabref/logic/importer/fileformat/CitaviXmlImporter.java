@@ -1,10 +1,12 @@
 package org.jabref.logic.importer.fileformat;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.PushbackInputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -95,6 +97,7 @@ public class CitaviXmlImporter extends Importer implements Parser {
     @Override
     public ParserResult importDatabase(Path filePath) throws IOException {
         BufferedReader reader = getReaderFromZip(filePath);
+
         Objects.requireNonNull(reader);
 
         try {
@@ -178,6 +181,20 @@ public class CitaviXmlImporter extends Importer implements Parser {
 
         InputStream stream = Files.newInputStream(newFile, StandardOpenOption.READ);
 
-        return new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8));
+        // check and delete the utf-8 BOM bytes
+        InputStream newStream = checkForUtf8BOMAndDiscardIfAny(stream);
+
+        return new BufferedReader(new InputStreamReader(newStream, StandardCharsets.UTF_8));
+    }
+
+    private static InputStream checkForUtf8BOMAndDiscardIfAny(InputStream inputStream) throws IOException {
+        PushbackInputStream pushbackInputStream = new PushbackInputStream(new BufferedInputStream(inputStream), 3);
+        byte[] bom = new byte[3];
+        if (pushbackInputStream.read(bom) != -1) {
+            if (!(bom[0] == (byte) 0xEF && bom[1] == (byte) 0xBB && bom[2] == (byte) 0xBF)) {
+                pushbackInputStream.unread(bom);
+            }
+        }
+        return pushbackInputStream;
     }
 }
