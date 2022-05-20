@@ -38,18 +38,18 @@ public class CitaviXmlImporterTestFiles {
     @ParameterizedTest
     @MethodSource("fileNames")
     void testIsRecognizedFormat(String fileName) throws IOException {
-        ImporterTestEngine.testIsRecognizedFormat(new EndnoteXmlImporter(preferences), fileName);
+        ImporterTestEngine.testIsRecognizedFormat(new CitaviXmlImporter(preferences), fileName);
     }
 
     @ParameterizedTest
     @MethodSource("invalidFileNames")
     void testIsNotRecognizedFormat(String fileName) throws IOException {
-        ImporterTestEngine.testIsNotRecognizedFormat(new EndnoteXmlImporter(preferences), fileName);
+        ImporterTestEngine.testIsNotRecognizedFormat(new CitaviXmlImporter(preferences), fileName);
     }
 
     @ParameterizedTest
     @MethodSource("fileNames")
     void testImportEntries(String fileName) throws Exception {
-        ImporterTestEngine.testImportEntries(new EndnoteXmlImporter(preferences), fileName, FILE_ENDING);
+        ImporterTestEngine.testImportEntries(new CitaviXmlImporter(preferences), fileName, FILE_ENDING);
     }
 }
