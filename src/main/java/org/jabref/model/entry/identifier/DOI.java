@@ -123,8 +123,7 @@ public class DOI implements Identifier {
                 // decodes path segment
                 URI url = new URI(trimmedDoi);
                 trimmedDoi = url.getScheme() + "://" + url.getHost() + url.getPath();
-            } catch (
-                    URISyntaxException e) {
+            } catch (URISyntaxException e) {
                 throw new IllegalArgumentException(doi + " is not a valid HTTP DOI/Short DOI.");
             }
         }
@@ -170,9 +169,7 @@ public class DOI implements Identifier {
             cleanedDOI = cleanedDOI.replaceAll(CHARS_TO_REMOVE, "");
 
             return Optional.of(new DOI(cleanedDOI));
-        } catch (
-                IllegalArgumentException |
-                NullPointerException e) {
+        } catch (IllegalArgumentException | NullPointerException e) {
             return Optional.empty();
         }
     }
