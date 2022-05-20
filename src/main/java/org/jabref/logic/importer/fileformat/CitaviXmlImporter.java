@@ -31,9 +31,6 @@ import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.citavi.CitaviExchangeData;
-import org.jabref.logic.importer.fileformat.endnote.Title;
-import org.jabref.logic.importer.fileformat.endnote.Titles;
-import org.jabref.logic.importer.fileformat.endnote.Xml;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
@@ -141,7 +138,7 @@ public class CitaviXmlImporter extends Importer implements Parser {
         return bibEntries;
     }
 
-    private BibEntry parseData(CitaviExchangeData.References.Reference data){
+    private BibEntry parseData(CitaviExchangeData.References.Reference data) {
         BibEntry entry = new BibEntry();
 
         entry.setType(getType(data));
@@ -159,7 +156,6 @@ public class CitaviXmlImporter extends Importer implements Parser {
                 .ifPresent(value -> entry.setField(StandardField.PAGES, clean(value)));
         Optional.ofNullable(data.getVolume())
                 .ifPresent(value -> entry.setField(StandardField.VOLUME, clean(value)));
-
 
         return entry;
     }
@@ -182,25 +178,22 @@ public class CitaviXmlImporter extends Importer implements Parser {
         };
     }
 
-    private String getPages(CitaviExchangeData.References.Reference data){
+    private String getPages(CitaviExchangeData.References.Reference data) {
         String tmpStr = "";
         if (data.getPageCount() != null && data.getPageRange() == null) {
             tmpStr = data.getPageCount();
-        }
-        else if (data.getPageCount() == null && data.getPageRange() != null) {
+        } else if (data.getPageCount() == null && data.getPageRange() != null) {
             tmpStr = data.getPageRange();
-        }
-        else if (data.getPageCount() == null && data.getPageRange() == null) {
+        } else if (data.getPageCount() == null && data.getPageRange() == null) {
             return null;
         }
         int count = 0;
         String pages = "";
-        for (int i = tmpStr.length()-1; i >= 0; i--) {
-            if (count == 2 ) {
-                pages =  tmpStr.substring(i+1, tmpStr.length()-1-5);
+        for (int i = tmpStr.length() - 1; i >= 0; i--) {
+            if (count == 2) {
+                pages = tmpStr.substring(i + 1, tmpStr.length() - 1 - 5);
                 break;
-            }
-            else{
+            } else {
                 if (tmpStr.charAt(i) == '>') {
                     count++;
                 }
