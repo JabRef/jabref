@@ -306,6 +306,9 @@ public class CitaviXmlImporter extends Importer implements Parser {
         // check and delete the utf-8 BOM bytes
         InputStream newStream = checkForUtf8BOMAndDiscardIfAny(stream);
 
+        // clean up the temp file
+        Files.delete(newFile);
+
         return new BufferedReader(new InputStreamReader(newStream, StandardCharsets.UTF_8));
     }
 
