@@ -98,7 +98,9 @@
                     <xs:element name="CreatedOn" type="xs:dateTime" />
                     <xs:element name="ModifiedBy" type="xs:string" />
                     <xs:element name="ModifiedOn" type="xs:dateTime" />
+                    <xs:element name="FirstName" type="xs:string" />
                     <xs:element name="LastName" type="xs:string" />
+                    <xs:element name="MiddleName" type="xs:string" />
                     <xs:element name="Protected" type="xs:boolean" />
                     <xs:element name="Sex" type="xs:unsignedByte" />
                     <xs:element name="SortFullName" type="xs:string" />
@@ -154,7 +156,7 @@
         <xs:element name="ReferenceAuthors">
           <xs:complexType>
             <xs:sequence>
-              <xs:element name="OnetoN" type="xs:string" />
+              <xs:element maxOccurs="unbounded" name="OnetoN" type="xs:string" />
             </xs:sequence>
           </xs:complexType>
         </xs:element>

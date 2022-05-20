@@ -54,6 +54,8 @@ public class CitaviXmlImporter extends Importer implements Parser {
     private static final Logger LOGGER = LoggerFactory.getLogger(CitaviXmlImporter.class);
     private final ImportFormatPreferences preferences;
     private Unmarshaller unmarshaller;
+    private CitaviExchangeData.ReferenceAuthors authors;
+    private CitaviExchangeData.Persons persons;
 
     public CitaviXmlImporter(ImportFormatPreferences preferences) {
         this.preferences = preferences;
@@ -92,7 +94,7 @@ public class CitaviXmlImporter extends Importer implements Parser {
         String str;
         int i = 0;
         while (((str = reader.readLine()) != null) && (i < 50)) {
-            if (str.toLowerCase(Locale.ENGLISH).contains("<ProjectSettings>")) {
+            if (str.toLowerCase(Locale.ENGLISH).contains("citaviexchangedata")) {
                 return true;
             }
 
@@ -128,7 +130,8 @@ public class CitaviXmlImporter extends Importer implements Parser {
     private List<BibEntry> parseDataList(CitaviExchangeData data) {
         List<BibEntry> bibEntries = new ArrayList<>();
         BibEntry entry = new BibEntry();
-
+        authors = data.getReferenceAuthors();
+        persons = data.getPersons();
         bibEntries = data
                 .getReferences().getReference()
                 .stream()
@@ -156,6 +159,8 @@ public class CitaviXmlImporter extends Importer implements Parser {
                 .ifPresent(value -> entry.setField(StandardField.PAGES, clean(value)));
         Optional.ofNullable(data.getVolume())
                 .ifPresent(value -> entry.setField(StandardField.VOLUME, clean(value)));
+        Optional.ofNullable(getAuthorName(data))
+                .ifPresent(value -> entry.setField(StandardField.AUTHOR, value));
 
         return entry;
     }
@@ -191,7 +196,7 @@ public class CitaviXmlImporter extends Importer implements Parser {
         String pages = "";
         for (int i = tmpStr.length() - 1; i >= 0; i--) {
             if (count == 2) {
-                pages = tmpStr.substring(i + 1, tmpStr.length() - 1 - 5);
+                pages = tmpStr.substring(i + 2, tmpStr.length() - 1 - 5 + 1);
                 break;
             } else {
                 if (tmpStr.charAt(i) == '>') {
@@ -200,6 +205,47 @@ public class CitaviXmlImporter extends Importer implements Parser {
             }
         }
         return pages;
+    }
+
+    private String getAuthorName(CitaviExchangeData.References.Reference data) {
+        int count = 0;
+        int ref = 0;
+        int start = 0;
+        StringBuilder names = new StringBuilder();
+        outerloop:
+        for (int i = 0; i < authors.getOnetoN().size(); i++) {
+            for (int j = 0; j < authors.getOnetoN().get(i).length(); j++) {
+                if (authors.getOnetoN().get(i).charAt(j) == ';') {
+                    count++;
+                    if (count == 1) {
+                        if (authors.getOnetoN().get(i).substring(0, j).equals(data.getId())) {
+                            ref = i;
+                            break outerloop;
+                        }
+                    }
+                }
+            }
+        }
+        for (int i = 0; i < authors.getOnetoN().get(ref).length(); i++) {
+            if (authors.getOnetoN().get(ref).charAt(i) == ';') {
+                count++;
+                if (count == 1) {
+                    start = i + 1;
+                } else if (count > 1) {
+                    for (int j = 0; j < persons.getPerson().size(); j++) {
+                        if (authors.getOnetoN().get(ref).substring(start, i).equals(persons.getPerson().get(j).getId())) {
+                            if (i == authors.getOnetoN().get(ref).length() - 1) {
+                                names.append(persons.getPerson().get(j).getFirstName()).append(" ").append(persons.getPerson().get(j).getLastName());
+                            } else {
+                                names.append(persons.getPerson().get(j).getFirstName()).append(" ").append(persons.getPerson().get(j).getLastName()).append(",");
+                            }
+                        }
+                    }
+                    start = i + 1;
+                }
+            }
+        }
+        return names.toString();
     }
 
     private void initUnmarshaller() throws JAXBException {
