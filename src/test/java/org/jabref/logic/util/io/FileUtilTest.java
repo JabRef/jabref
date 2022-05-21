@@ -20,6 +20,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Answers;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -29,6 +31,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
 class FileUtilTest {
+    private static final Logger LOGGER = LoggerFactory.getLogger(FileUtilTest.class);
+
     private final Path nonExistingTestPath = Path.of("nonExistingTestPath");
     private Path existingTestFile;
     private Path otherExistingTestFile;
@@ -319,7 +323,7 @@ class FileUtilTest {
         // in the @BeforeEach method.
         Path temp = Path.of(otherTemporaryFolder.resolve("123").toString());
 
-        System.out.println(temp);
+        LOGGER.debug("Temp dir {}", temp);
         FileUtil.renameFile(existingTestFile, temp);
         assertFalse(Files.exists(existingTestFile));
     }
@@ -382,5 +386,19 @@ class FileUtilTest {
     void testIsNotBibFile() throws IOException {
         Path bibFile = Files.createFile(rootDir.resolve("test.pdf"));
         assertFalse(FileUtil.isBibFile(bibFile));
+    }
+
+    @Test
+    void testFindinPath() {
+        Optional<Path> resultPath1 = FileUtil.find("existingTestFile.txt", rootDir);
+        assertEquals(resultPath1.get().toString(), existingTestFile.toString());
+    }
+
+    @Test
+    void testFindinListofPath() {
+        List<Path> paths = List.of(existingTestFile, otherExistingTestFile, rootDir);
+        List<Path> resultPaths = List.of(existingTestFile, existingTestFile);
+        List<Path> result = FileUtil.find("existingTestFile.txt", paths);
+        assertEquals(resultPaths, result);
     }
 }

@@ -28,17 +28,17 @@ public class Linux implements NativeDesktop {
             try {
                 File file = new File(filePath);
                 Desktop.getDesktop().open(file);
-                System.out.println("Open file in default application with Desktop integration");
+                LOGGER.debug("Open file in default application with Desktop integration");
             } catch (IllegalArgumentException e) {
-                System.out.println("Fail back to xdg-open");
+                LOGGER.debug("Fail back to xdg-open");
                 try {
                     String[] cmd = {"xdg-open", filePath};
                     Runtime.getRuntime().exec(cmd);
                 } catch (Exception e2) {
-                    System.out.println("Open operation not successful: " + e2);
+                    LOGGER.warn("Open operation not successful: " + e2);
                 }
             } catch (IOException e) {
-                System.out.println("Native open operation not successful: " + e);
+                LOGGER.warn("Native open operation not successful: " + e);
             }
         });
     }
@@ -94,9 +94,13 @@ public class Linux implements NativeDesktop {
         if (desktopSession != null) {
             desktopSession = desktopSession.toLowerCase(Locale.ROOT);
             if (desktopSession.contains("gnome")) {
-                cmd = "nautilus" + filePath.toString().replace(" ", "\\ ");
-            } else if (desktopSession.contains("kde")) {
+                cmd = "nautilus --select " + filePath.toString().replace(" ", "\\ ");
+            } else if (desktopSession.contains("kde") || desktopSession.contains("plasma")) {
                 cmd = "dolphin --select " + filePath.toString().replace(" ", "\\ ");
+            } else if (desktopSession.contains("mate")) {
+                cmd = "caja --select " + filePath.toString().replace(" ", "\\ ");
+            } else if (desktopSession.contains("cinnamon")) {
+                cmd = "nemo --select " + filePath.toString().replace(" ", "\\ ");
             }
         }
         Runtime.getRuntime().exec(cmd);
