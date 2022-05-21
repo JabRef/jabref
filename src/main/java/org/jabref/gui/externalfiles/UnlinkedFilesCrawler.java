@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.nio.file.DirectoryStream.Filter;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -108,7 +109,7 @@ public class UnlinkedFilesCrawler extends BackgroundTask<FileNodeViewModel> {
         // filter files according to last edited date.
         List<Path> filteredFiles = new ArrayList<>();
         for (Path path : files) {
-            if (FileFilterUtils.filterByDate(path, dateFilter) && FileFilterUtils.filterForUnlinkedFiles(path, unlinkedFileFilter, getIgnoreFileSet(path))) {
+            if (FileFilterUtils.filterByDate(path, dateFilter) && FileFilterUtils.filterForUnlinkedFiles(path, unlinkedFileFilter, getIgnoreFileSet(Paths.get("")))) {
                 filteredFiles.add(path);
             }
         }
