@@ -13,8 +13,6 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import javafx.concurrent.Task;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.print.PrinterJob;
 import javafx.scene.Group;
@@ -350,12 +348,10 @@ public class JabRefDialogService implements DialogService {
                                               .text(
                                                     "(" + Localization.lang("Check the event log to see all notifications") + ")"
                                                      + "\n\n" + message)
-                                              .onAction(new EventHandler<ActionEvent>() {
-                                                @Override
-                                                public void handle(ActionEvent a) {
-                                                    ErrorConsoleAction ec = new ErrorConsoleAction();
-                                                    ec.execute();
-                                                }}))
+                                              .onAction((e)-> {
+                                                     ErrorConsoleAction ec = new ErrorConsoleAction();
+                                                     ec.execute();
+                                                 }))
                          .hideCloseButton()
                          .show();
         });
