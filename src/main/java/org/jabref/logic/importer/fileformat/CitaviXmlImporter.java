@@ -159,7 +159,7 @@ public class CitaviXmlImporter extends Importer implements Parser {
                 .ifPresent(value -> entry.setField(StandardField.PAGES, clean(value)));
         Optional.ofNullable(data.getVolume())
                 .ifPresent(value -> entry.setField(StandardField.VOLUME, clean(value)));
-        Optional.ofNullable(getAuthorName(data))
+        Optional.of(getAuthorName(data))
                 .ifPresent(value -> entry.setField(StandardField.AUTHOR, value));
 
         return entry;
@@ -212,20 +212,23 @@ public class CitaviXmlImporter extends Importer implements Parser {
         int ref = 0;
         int start = 0;
         StringBuilder names = new StringBuilder();
-        outerloop:
+        outerLoop1:
         for (int i = 0; i < authors.getOnetoN().size(); i++) {
             for (int j = 0; j < authors.getOnetoN().get(i).length(); j++) {
                 if (authors.getOnetoN().get(i).charAt(j) == ';') {
-                    count++;
-                    if (count == 1) {
-                        if (authors.getOnetoN().get(i).substring(0, j).equals(data.getId())) {
-                            ref = i;
-                            break outerloop;
-                        }
+                    if (authors.getOnetoN().get(i).substring(0, j).equals(data.getId())) {
+                        ref = i;
+                        break outerLoop1;
+                    } else {
+                        break;
                     }
                 }
             }
+            if (i == authors.getOnetoN().size() - 1) {
+                return names.toString();
+            }
         }
+        outerLoop2:
         for (int i = 0; i < authors.getOnetoN().get(ref).length(); i++) {
             if (authors.getOnetoN().get(ref).charAt(i) == ';') {
                 count++;
@@ -234,14 +237,19 @@ public class CitaviXmlImporter extends Importer implements Parser {
                 } else if (count > 1) {
                     for (int j = 0; j < persons.getPerson().size(); j++) {
                         if (authors.getOnetoN().get(ref).substring(start, i).equals(persons.getPerson().get(j).getId())) {
-                            if (i == authors.getOnetoN().get(ref).length() - 1) {
-                                names.append(persons.getPerson().get(j).getFirstName()).append(" ").append(persons.getPerson().get(j).getLastName());
-                            } else {
-                                names.append(persons.getPerson().get(j).getFirstName()).append(" ").append(persons.getPerson().get(j).getLastName()).append(",");
-                            }
+                            names.append(persons.getPerson().get(j).getFirstName()).append(" ").append(persons.getPerson().get(j).getLastName()).append(", ");
+                            start = i + 1;
+                            break;
                         }
                     }
-                    start = i + 1;
+                }
+                if (i == authors.getOnetoN().get(ref).length() - 1 - 36) {
+                    for (int j = 0; j < persons.getPerson().size(); j++) {
+                        if (authors.getOnetoN().get(ref).substring(start).equals(persons.getPerson().get(j).getId())) {
+                            names.append(persons.getPerson().get(j).getFirstName()).append(" ").append(persons.getPerson().get(j).getLastName());
+                            break outerLoop2;
+                        }
+                    }
                 }
             }
         }
