@@ -13,6 +13,8 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import javafx.concurrent.Task;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.print.PrinterJob;
 import javafx.scene.Group;
@@ -35,6 +37,7 @@ import javafx.stage.Stage;
 import javafx.stage.Window;
 import javafx.util.Duration;
 
+import org.jabref.gui.help.ErrorConsoleAction;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.BackgroundTask;
@@ -343,9 +346,16 @@ public class JabRefDialogService implements DialogService {
                          .threshold(5,
                                  Notifications.create()
                                               .title(Localization.lang("Last notification"))
+                                              // TODO: Change to a notification overview instead of event log when that is available. The event log is not that user friendly (different purpose).
                                               .text(
                                                     "(" + Localization.lang("Check the event log to see all notifications") + ")"
-                                                     + "\n\n" + message))
+                                                     + "\n\n" + message)
+                                              .onAction(new EventHandler<ActionEvent>() {
+                                                @Override
+                                                public void handle(ActionEvent a) {
+                                                    ErrorConsoleAction ec = new ErrorConsoleAction();
+                                                    ec.execute();
+                                                }}))
                          .hideCloseButton()
                          .show();
         });
