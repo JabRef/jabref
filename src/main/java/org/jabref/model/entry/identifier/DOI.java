@@ -168,6 +168,10 @@ public class DOI implements Identifier {
             cleanedDOI = formatter.format(cleanedDOI);
             cleanedDOI = cleanedDOI.replaceAll(CHARS_TO_REMOVE, "");
 
+            if (cleanedDOI.startsWith("_") && cleanedDOI.endsWith("_")) {
+                cleanedDOI = cleanedDOI.substring(1, cleanedDOI.length() - 1);
+            }
+
             return Optional.of(new DOI(cleanedDOI));
         } catch (IllegalArgumentException | NullPointerException e) {
             return Optional.empty();
