@@ -79,7 +79,7 @@ public class FetchAndMergeEntry {
                                       String localMessage = exception.getCause().getLocalizedMessage();
                                       // client error
                                       if (localMessage.startsWith("Client")) {
-                                          dialogService.showInformationDialogAndWait(Localization.lang("Lookup DOI"), Localization.lang("No DOI data exists"));
+                                          dialogService.showInformationDialogAndWait(Localization.lang("Lookup DOI"), Localization.lang("No DOI data was found"));
                                       // server error
                                       } else if (localMessage.startsWith("Server")) {
                                           dialogService.showInformationDialogAndWait(Localization.lang("Lookup DOI"), Localization.lang("DOI server not available"));

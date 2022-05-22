@@ -364,11 +364,11 @@ public class URLDownload {
             }
             // status code 4xx
             if (status > HttpURLConnection.HTTP_BAD_REQUEST && status < HttpURLConnection.HTTP_INTERNAL_ERROR) {
-                throw new IOException(Localization.lang("Client Error " + status));
+                throw new IOException(Localization.lang(("Client Error:" + status)));
 
                 // status code 5xx
             } else if (status >= HttpURLConnection.HTTP_INTERNAL_ERROR) {
-                throw new IOException(Localization.lang("Server Error " + status));
+                throw new IOException(Localization.lang(("Server Error:" + status)));
             }
         }
 
