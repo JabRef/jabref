@@ -5,7 +5,9 @@ import java.nio.file.Path;
 import java.nio.file.attribute.FileTime;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -150,6 +152,71 @@ public class FileFilterUtilsTest {
                 .map(Path::toString)
                 .collect(Collectors.toList());
             assertNotEquals(sortedPaths, wrongOrder);
+        }
+    }
+
+    @Nested
+    class filteringTests {
+        private final List<Path> files = new ArrayList<>();
+        private final List<Path> targetFiles = new ArrayList<>();
+        private final Set<String> ignoreFileSet = new HashSet<>();
+
+        @BeforeEach
+        public void setUp(@TempDir Path tempDir) throws Exception {
+
+            ignoreFileSet.add(".DS_Store");
+            ignoreFileSet.add("Thumbs.db");
+
+            Path firstPath = tempDir.resolve("firstFile.pdf");
+            Path secondPath = tempDir.resolve("secondFile.pdf");
+            Path thirdPath = tempDir.resolve("thirdFile.pdf");
+            Path fourthPath = tempDir.resolve("fourthFile.pdf");
+            Path fifthPath = tempDir.resolve(".DS_Store");
+            Path sixthPath = tempDir.resolve("Thumbs.db");
+
+            Files.createFile(firstPath);
+            Files.createFile(secondPath);
+            Files.createFile(thirdPath);
+            Files.createFile(fourthPath);
+            Files.createFile(fifthPath);
+            Files.createFile(sixthPath);
+
+            files.add(firstPath);
+            files.add(secondPath);
+            files.add(thirdPath);
+            files.add(fourthPath);
+            files.add(fifthPath);
+            files.add(sixthPath);
+
+            targetFiles.add(firstPath);
+            targetFiles.add(secondPath);
+            targetFiles.add(thirdPath);
+            targetFiles.add(fourthPath);
+        }
+
+        @Test
+        public void filteringByGitIgnore() {
+            ArrayList<Path> filteredFiles = new ArrayList<>();
+            for (Path path : files) {
+                if (FileFilterUtils.filterForUnlinkedFiles(path, FileIgnoreUnlinkedFiles.DEFAULT,
+                        ignoreFileSet)) {
+                    filteredFiles.add(path);
+                }
+            }
+            assertEquals(true, compareTwoPathList(filteredFiles, targetFiles));
+        }
+
+        public boolean compareTwoPathList(List<Path> list1, List<Path> list2) {
+            if (list1.size() != list2.size()) {
+                return false;
+            }
+            int cnt = 0;
+            for (Path path : list1) {
+                if (list2.contains(path)) {
+                    cnt++;
+                }
+            }
+            return cnt == list2.size();
         }
     }
 }
