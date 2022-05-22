@@ -123,10 +123,10 @@ dependencies {
     implementation 'com.h2database:h2-mvstore:2.1.212'
 
     implementation group: 'org.apache.tika', name: 'tika-core', version: '2.4.0'
-    implementation 'com.ibm.icu:icu4j-charset:70.1'
+    implementation 'com.ibm.icu:icu4j-charset:71.1'
 
     // required for reading write-protected PDFs - see https://github.com/JabRef/jabref/pull/942#issuecomment-209252635
-    implementation 'org.bouncycastle:bcprov-jdk15on:1.70'
+    implementation 'org.bouncycastle:bcprov-jdk18on:1.71'
 
     implementation 'commons-cli:commons-cli:1.5.0'
 
@@ -144,7 +144,7 @@ dependencies {
 
     implementation group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: '6.1.0.202203080745-r'
 
-    implementation group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-yaml', version: '2.13.2'
+    implementation group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-yaml', version: '2.13.3'
     implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.13.2'
 
     implementation group: 'org.mariadb.jdbc', name: 'mariadb-java-client', version: '2.7.5'
