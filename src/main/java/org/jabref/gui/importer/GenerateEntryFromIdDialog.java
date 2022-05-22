@@ -68,5 +68,4 @@ public class GenerateEntryFromIdDialog {
     public DialogPane getDialogPane() {
         return dialogPane;
     }
-
 }

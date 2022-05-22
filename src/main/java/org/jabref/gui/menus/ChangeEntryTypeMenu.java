@@ -32,7 +32,6 @@ import org.jabref.model.strings.StringUtil;
 public class ChangeEntryTypeMenu {
 
     public ChangeEntryTypeMenu() {
-
     }
 
     public static MenuItem createMenuItem(EntryType type, List<BibEntry> entries, UndoManager undoManager) {

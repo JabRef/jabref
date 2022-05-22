@@ -136,8 +136,8 @@ public class ExportCommand extends SimpleCommand {
                     LibraryTab.DatabaseNotification notificationPane = frame.getCurrentLibraryTab().getNotificationPane();
                     notificationPane.notify(
                             IconTheme.JabRefIcons.FOLDER.getGraphicNode(),
-                            Localization.lang("%0 export successful. Open the folder containing the saved file?", format.getName()),
-                            List.of(new Action(Localization.lang("Open"), event -> {
+                            Localization.lang("Export operation finished successfully."),
+                            List.of(new Action(Localization.lang("Reveal in File Explorer"), event -> {
                                 try {
                                     JabRefDesktop.openFolderAndSelectFile(file, preferences);
                                 } catch (IOException e) {

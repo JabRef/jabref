@@ -56,5 +56,4 @@ public class IacrEprintTest {
     public void constructValidIacrEprintUrl() {
         assertEquals("https://ia.cr/2019/001", new IacrEprint("2019/001").getAsciiUrl());
     }
-
 }

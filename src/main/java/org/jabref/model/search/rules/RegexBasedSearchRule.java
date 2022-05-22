@@ -59,5 +59,4 @@ public class RegexBasedSearchRule extends FullTextSearchRule {
         }
         return getFulltextResults(query, bibEntry).numSearchResults() > 0;
     }
-
 }

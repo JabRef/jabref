@@ -61,5 +61,4 @@ public class GroupDiffTest {
         assertEquals(expectedGroupDiff.get().getNewGroupRoot(), groupDiff.get().getNewGroupRoot());
         assertEquals(expectedGroupDiff.get().getOriginalGroupRoot(), groupDiff.get().getOriginalGroupRoot());
     }
-
 }

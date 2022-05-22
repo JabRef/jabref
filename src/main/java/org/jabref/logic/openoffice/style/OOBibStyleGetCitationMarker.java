@@ -156,7 +156,6 @@ class OOBibStyleGetCitationMarker {
         }
 
         if (nAuthors >= 2) {
-
             if (emitAllAuthors) {
                 // Emit last names, except for the last author
                 int j = 1;
@@ -174,7 +173,6 @@ class OOBibStyleGetCitationMarker {
                 stringBuilder.append(andString);
                 String name = getAuthorLastName(authorList, nAuthors - 1);
                 stringBuilder.append(markupAuthorName(style, name));
-
             } else {
                 // Emit last names up to nAuthorsToEmit.
                 //
@@ -293,7 +291,6 @@ class OOBibStyleGetCitationMarker {
     }
 
     private static AuthorList getAuthorList(OOBibStyle style, CitationLookupResult db) {
-
         // The bibtex fields providing author names, e.g. "author" or
         // "editor".
         OrFields authorFieldNames = style.getAuthorFieldNames();
@@ -315,7 +312,6 @@ class OOBibStyleGetCitationMarker {
      * If entry is unresolved, return 0.
      */
     private static int calculateNAuthorsToEmit(OOBibStyle style, CitationMarkerEntry entry) {
-
         if (entry.getLookupResult().isEmpty()) {
             // unresolved
             return 0;
@@ -453,7 +449,6 @@ class OOBibStyleGetCitationMarker {
                     stringBuilder.append(pageInfoPart);
                 }
             } else {
-
                 CitationLookupResult db = entry.getLookupResult().get();
 
                 int maxAuthors = (purpose == AuthorYearMarkerPurpose.NORMALIZED

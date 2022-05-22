@@ -176,5 +176,4 @@ class TimeStampToCreationDateTest {
         migrator.cleanup(input);
         assertEquals(expected, input);
     }
-
 }

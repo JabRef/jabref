@@ -151,7 +151,6 @@ public class OOTextIntoOO {
         int piv = 0;
         Matcher tagMatcher = HTML_TAG.matcher(lText);
         while (tagMatcher.find()) {
-
             String currentSubstring = lText.substring(piv, tagMatcher.start());
             if (!currentSubstring.isEmpty()) {
                 cursor.setString(currentSubstring);
@@ -318,7 +317,6 @@ public class OOTextIntoOO {
      * In particular, when filling the bibliography title and body.
      */
     public static void removeDirectFormatting(XTextCursor cursor) {
-
         XMultiPropertyStates mpss = UnoCast.cast(XMultiPropertyStates.class, cursor).get();
 
         XPropertySet propertySet = UnoCast.cast(XPropertySet.class, cursor).get();
@@ -443,7 +441,6 @@ public class OOTextIntoOO {
         final Stack<ArrayList<Optional<Object>>> layers;
 
         MyPropertyStack(XTextCursor cursor) {
-
             XPropertySet propertySet = UnoCast.cast(XPropertySet.class, cursor).get();
             XPropertySetInfo propertySetInfo = propertySet.getPropertySetInfo();
 

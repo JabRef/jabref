@@ -37,7 +37,6 @@ public final class PdfSearcher {
     private PdfSearcher(Directory indexDirectory) {
         this.indexDirectory = indexDirectory;
         Codec.forName("Lucene91");
-
     }
 
     public static PdfSearcher of(BibDatabaseContext databaseContext) throws IOException {
@@ -75,7 +74,6 @@ public final class PdfSearcher {
                 resultDocs.add(new SearchResult(searcher, query, scoreDoc));
             }
             return new PdfSearchResults(resultDocs);
-
         } catch (ParseException e) {
             LOGGER.warn("Could not parse query: '{}'!\n{}", searchString, e.getMessage());
             return new PdfSearchResults();

@@ -108,7 +108,6 @@ public class FileUtil {
     }
 
     public static Optional<String> getUniquePathFragment(List<String> paths, Path databasePath) {
-
         String fileName = databasePath.getFileName().toString();
 
         List<String> uniquePathParts = uniquePathSubstrings(paths);

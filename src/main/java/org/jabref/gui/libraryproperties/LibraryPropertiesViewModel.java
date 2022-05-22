@@ -15,7 +15,6 @@ public class LibraryPropertiesViewModel {
     private final ObservableList<PropertiesTab> propertiesTabs;
 
     public LibraryPropertiesViewModel(BibDatabaseContext databaseContext) {
-
         propertiesTabs = FXCollections.observableArrayList(
                 new GeneralPropertiesView(databaseContext),
                 new SavingPropertiesView(databaseContext),

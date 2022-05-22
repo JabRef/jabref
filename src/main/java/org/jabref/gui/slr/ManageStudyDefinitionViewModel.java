@@ -14,6 +14,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.logic.importer.WebFetchers;
 import org.jabref.model.study.Study;
@@ -40,33 +41,35 @@ public class ManageStudyDefinitionViewModel {
     private final SimpleStringProperty directory = new SimpleStringProperty();
     private Study study;
 
-    public ManageStudyDefinitionViewModel(Study study, Path studyDirectory, ImportFormatPreferences importFormatPreferences) {
+    public ManageStudyDefinitionViewModel(Study study,
+                                          Path studyDirectory,
+                                          ImportFormatPreferences importFormatPreferences,
+                                          ImporterPreferences importerPreferences) {
         if (Objects.isNull(study)) {
-            computeNonSelectedDatabases(importFormatPreferences);
+            computeNonSelectedDatabases(importFormatPreferences, importerPreferences);
             return;
         }
         this.study = study;
         title.setValue(study.getTitle());
         authors.addAll(study.getAuthors());
         researchQuestions.addAll(study.getResearchQuestions());
-        queries.addAll(study.getQueries().stream().map(StudyQuery::getQuery).collect(Collectors.toList()));
+        queries.addAll(study.getQueries().stream().map(StudyQuery::getQuery).toList());
         databases.addAll(study.getDatabases()
                               .stream()
                               .map(studyDatabase -> new StudyDatabaseItem(studyDatabase.getName(), studyDatabase.isEnabled()))
-                              .collect(Collectors.toList()));
-        computeNonSelectedDatabases(importFormatPreferences);
+                              .toList());
+        computeNonSelectedDatabases(importFormatPreferences, importerPreferences);
         if (!Objects.isNull(studyDirectory)) {
             this.directory.set(studyDirectory.toString());
         }
     }
 
-    private void computeNonSelectedDatabases(ImportFormatPreferences importFormatPreferences) {
-        nonSelectedDatabases.addAll(WebFetchers.getSearchBasedFetchers(importFormatPreferences)
+    private void computeNonSelectedDatabases(ImportFormatPreferences importFormatPreferences, ImporterPreferences importerPreferences) {
+        nonSelectedDatabases.addAll(WebFetchers.getSearchBasedFetchers(importFormatPreferences, importerPreferences)
                                                .stream()
                                                .map(SearchBasedFetcher::getName)
                                                .map(s -> new StudyDatabaseItem(s, true))
-                                               .filter(studyDatabase -> !databases.contains(studyDatabase))
-                                               .collect(Collectors.toList()));
+                                               .filter(studyDatabase -> !databases.contains(studyDatabase)).toList());
     }
 
     public StringProperty getTitle() {
@@ -165,7 +168,7 @@ public class ManageStudyDefinitionViewModel {
     }
 
     public void setStudyDirectory(Optional<Path> studyRepositoryRoot) {
-        getDirectory().setValue(studyRepositoryRoot.isPresent() ? studyRepositoryRoot.get().toString() : getDirectory().getValueSafe());
+        getDirectory().setValue(studyRepositoryRoot.map(Path::toString).orElseGet(() -> getDirectory().getValueSafe()));
     }
 
     public void deleteAuthor(String item) {

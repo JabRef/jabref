@@ -80,7 +80,6 @@ public class MedlinePlainImporter extends Importer {
                                         .split("\\n\\n");
 
         for (String entry1 : entries) {
-
             if (entry1.trim().isEmpty() || !entry1.contains("-")) {
                 continue;
             }
@@ -94,7 +93,6 @@ public class MedlinePlainImporter extends Importer {
             String[] lines = entry1.split("\n");
 
             for (int j = 0; j < lines.length; j++) {
-
                 StringBuilder current = new StringBuilder(lines[j]);
                 boolean done = false;
 

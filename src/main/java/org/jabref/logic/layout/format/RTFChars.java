@@ -36,7 +36,6 @@ public class RTFChars implements LayoutFormatter {
         boolean escaped = false;
         boolean incommand = false;
         for (int i = 0; i < field.length(); i++) {
-
             char c = field.charAt(i);
 
             if (escaped && (c == '\\')) {

@@ -50,7 +50,6 @@ public class CrossrefFetcherEvaluator {
 
             for (BibEntry entry : entries) {
                 executorService.execute(new Runnable() {
-
                     @Override
                     public void run() {
                         Optional<DOI> origDOI = entry.getField(StandardField.DOI).flatMap(DOI::parse);
