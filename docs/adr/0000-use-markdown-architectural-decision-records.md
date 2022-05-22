@@ -1,3 +1,7 @@
+---
+parent: Architectural Decisions
+nav_order: 0
+---
 # Use Markdown Architectural Decision Records
 
 ## Context and Problem Statement

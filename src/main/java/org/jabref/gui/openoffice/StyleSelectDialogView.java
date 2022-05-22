@@ -55,7 +55,6 @@ public class StyleSelectDialogView extends BaseDialog<OOBibStyle> {
     private PreviewViewer previewBook;
 
     public StyleSelectDialogView(StyleLoader loader) {
-
         this.loader = loader;
 
         ViewLoader.view(this)

@@ -12,7 +12,7 @@ plugins {
 
     id 'org.javamodularity.moduleplugin' version '1.8.10'
 
-    id 'org.openjfx.javafxplugin' version '0.0.12'
+    id 'org.openjfx.javafxplugin' version '0.0.13'
 
     id 'org.beryx.jlink' version '2.25.0'
 
@@ -40,8 +40,8 @@ group = "org.jabref"
 version = project.findProperty('projVersion') ?: '100.0.0'
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_17
-    targetCompatibility = JavaVersion.VERSION_17
+    sourceCompatibility = JavaVersion.VERSION_18
+    targetCompatibility = JavaVersion.VERSION_18
 
     // Workaround needed for Eclipse, probably because of https://github.com/gradle/gradle/issues/16922
     // Should be removed as soon as Gradle 7.0.1 is released ( https://github.com/gradle/gradle/issues/16922#issuecomment-828217060 )
@@ -52,12 +52,6 @@ application {
     mainClass.set('org.jabref.gui.JabRefLauncher')
     mainModule.set('org.jabref')
 }
-
-// TODO: Ugly workaround to temporarily ignore build errors to dependencies of latex2unicode
-// These should be removed, as well as the files in the lib folder, as soon as they have valid module names
-modularity.patchModule("test", "fastparse_2.12-1.0.0.jar")
-modularity.patchModule("test2", "fastparse-utils_2.12-1.0.0.jar")
-modularity.patchModule("test3", "sourcecode_2.12-0.1.4.jar")
 
 // Workaround for https://github.com/openjfx/javafx-gradle-plugin/issues/89
 // See also https://github.com/java9-modularity/gradle-modules-plugin/issues/165
@@ -106,6 +100,10 @@ javafx {
     modules = [ 'javafx.controls', 'javafx.fxml', 'javafx.web', 'javafx.swing' ]
 }
 
+jacoco {
+    toolVersion = "0.8.8"
+}
+
 dependencies {
     // Include all jar-files in the 'lib' folder as dependencies
     implementation fileTree(dir: 'lib', includes: ['*.jar'])
@@ -119,21 +117,20 @@ dependencies {
     implementation 'org.apache.lucene:lucene-queries:9.1.0'
     implementation 'org.apache.lucene:lucene-analysis-common:9.1.0'
     implementation 'org.apache.lucene:lucene-highlighter:9.1.0'
-    implementation 'org.apache.lucene:lucene-backward-codecs:9.1.0'
 
     implementation group: 'org.apache.commons', name: 'commons-csv', version: '1.9.0'
     implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.12.0'
     implementation 'com.h2database:h2-mvstore:2.1.212'
 
-    implementation group: 'org.apache.tika', name: 'tika-core', version: '2.3.0'
-    implementation 'com.ibm.icu:icu4j-charset:70.1'
+    implementation group: 'org.apache.tika', name: 'tika-core', version: '2.4.0'
+    implementation 'com.ibm.icu:icu4j-charset:71.1'
 
     // required for reading write-protected PDFs - see https://github.com/JabRef/jabref/pull/942#issuecomment-209252635
-    implementation 'org.bouncycastle:bcprov-jdk15on:1.70'
+    implementation 'org.bouncycastle:bcprov-jdk18on:1.71'
 
     implementation 'commons-cli:commons-cli:1.5.0'
 
-    implementation 'org.libreoffice:libreoffice:7.3.1'
+    implementation 'org.libreoffice:libreoffice:7.3.3'
     implementation 'org.libreoffice:unoloader:7.3.2'
 
     implementation 'io.github.java-diff-utils:java-diff-utils:4.11'
@@ -147,12 +144,12 @@ dependencies {
 
     implementation group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: '6.1.0.202203080745-r'
 
-    implementation group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-yaml', version: '2.13.2'
+    implementation group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-yaml', version: '2.13.3'
     implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.13.2'
 
     implementation group: 'org.mariadb.jdbc', name: 'mariadb-java-client', version: '2.7.5'
 
-    implementation 'org.postgresql:postgresql:42.3.3'
+    implementation 'org.postgresql:postgresql:42.3.5'
 
     implementation ('com.oracle.ojdbc:ojdbc10:19.3.0.0') {
         // causing module issues
@@ -179,7 +176,7 @@ dependencies {
     implementation 'org.controlsfx:controlsfx:11.1.1'
 
     implementation 'org.jsoup:jsoup:1.14.3'
-    implementation 'com.konghq:unirest-java:3.13.7'
+    implementation 'com.konghq:unirest-java:3.13.8'
 
     implementation 'org.slf4j:slf4j-api:2.0.0-alpha7'
     implementation "org.tinylog:tinylog-api:2.4.1"
@@ -192,8 +189,8 @@ dependencies {
     implementation group: 'jakarta.xml.bind', name: 'jakarta.xml.bind-api', version: '3.0.1'
     implementation group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '3.0.2'
 
-    implementation ('com.github.tomtung:latex2unicode_2.12:0.2.6') {
-        exclude module: 'fastparse_2.12'
+    implementation ('com.github.tomtung:latex2unicode_2.13:0.3.2') {
+        exclude module: 'fastparse_2.13'
     }
 
     implementation group: 'com.microsoft.azure', name: 'applicationinsights-core', version: '2.4.1'
@@ -207,13 +204,13 @@ dependencies {
 
     implementation group: 'net.harawata', name: 'appdirs', version: '1.2.1'
 
-    testImplementation 'io.github.classgraph:classgraph:4.8.143'
+    testImplementation 'io.github.classgraph:classgraph:4.8.146'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.8.2'
     testImplementation 'org.junit.platform:junit-platform-launcher:1.8.2'
 
     testRuntimeOnly group: 'org.apache.logging.log4j', name: 'log4j-core', version: '3.0.0-SNAPSHOT'
     testRuntimeOnly group: 'org.apache.logging.log4j', name: 'log4j-jul', version: '3.0.0-SNAPSHOT'
-    testImplementation 'org.mockito:mockito-core:4.4.0'
+    testImplementation 'org.mockito:mockito-core:4.5.1'
     testImplementation 'org.xmlunit:xmlunit-core:2.9.0'
     testImplementation 'org.xmlunit:xmlunit-matchers:2.9.0'
     testRuntimeOnly 'com.tngtech.archunit:archunit-junit5-engine:0.23.1'
@@ -252,7 +249,8 @@ processResources {
                 "springerNatureAPIKey": System.getenv('SpringerNatureAPIKey') ? System.getenv('SpringerNatureAPIKey') : '',
                 "astrophysicsDataSystemAPIKey": System.getenv('AstrophysicsDataSystemAPIKey') ? System.getenv('AstrophysicsDataSystemAPIKey') : '',
                 "ieeeAPIKey": System.getenv('IEEEAPIKey') ? System.getenv('IEEEAPIKey') : '',
-                "scienceDirectApiKey": System.getenv('SCIENCEDIRECTAPIKEY') ? System.getenv('SCIENCEDIRECTAPIKEY') : ''
+                "scienceDirectApiKey": System.getenv('SCIENCEDIRECTAPIKEY') ? System.getenv('SCIENCEDIRECTAPIKEY') : '',
+                "biodiversityHeritageApiKey": System.getenv('BiodiversityHeritageApiKey') ? System.getenv('BiodiversityHeritageApiKey') : ''
         )
         filteringCharset = 'UTF-8'
     }

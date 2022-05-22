@@ -3,8 +3,10 @@ package org.jabref.logic.importer.fetcher;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
+import javafx.collections.FXCollections;
+
+import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.PagedSearchBasedFetcher;
 import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.model.entry.BibEntry;
@@ -20,15 +22,19 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 @FetcherTest
 class SpringerFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSearchFetcherTest {
 
+    ImporterPreferences importerPreferences = mock(ImporterPreferences.class);
     SpringerFetcher fetcher;
 
     @BeforeEach
     void setUp() {
-        fetcher = new SpringerFetcher();
+        when(importerPreferences.getApiKeys()).thenReturn(FXCollections.emptyObservableSet());
+        fetcher = new SpringerFetcher(importerPreferences);
     }
 
     @Test
@@ -129,13 +135,13 @@ class SpringerFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSear
     @Test
     @Disabled("Year search is currently broken, because the API returns mutliple years.")
     @Override
-    public void supportsYearSearch() throws Exception {
+    public void supportsYearSearch() {
     }
 
     @Test
     @Disabled("Year range search is not natively supported by the API, but can be emulated by multiple single year searches.")
     @Override
-    public void supportsYearRangeSearch() throws Exception {
+    public void supportsYearRangeSearch() {
     }
 
     @Test
@@ -170,8 +176,10 @@ class SpringerFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSear
 
         Assertions.assertTrue(resultJustByAuthor.containsAll(result));
         List<BibEntry> allEntriesFromCSCW = result.stream()
-                                                  .filter(bibEntry -> bibEntry.getField(StandardField.JOURNAL).orElse("").equals("Computer Supported Cooperative Work (CSCW)"))
-                                                  .collect(Collectors.toList());
+                                                  .filter(bibEntry -> bibEntry.getField(StandardField.JOURNAL)
+                                                                              .orElse("")
+                                                                              .equals("Computer Supported Cooperative Work (CSCW)"))
+                                                  .toList();
         allEntriesFromCSCW.stream()
                           .map(bibEntry -> bibEntry.getField(StandardField.AUTHOR))
                           .filter(Optional::isPresent)

@@ -1,3 +1,7 @@
+---
+parent: Architectural Decisions
+nav_order: 11
+---
 # Test external links in documentation
 
 ## Context and Problem Statement

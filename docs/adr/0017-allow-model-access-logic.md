@@ -1,3 +1,7 @@
+---
+parent: Architectural Decisions
+nav_order: 17
+---
 # Allow org.jabref.model to access org.jabref.logic
 
 ## Context and Problem Statement

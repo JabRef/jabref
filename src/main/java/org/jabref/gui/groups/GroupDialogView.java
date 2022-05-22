@@ -247,7 +247,6 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
         popOver.setCornerRadius(0);
         popOver.setTitle("Icon picker");
         popOver.show(iconPickerButton);
-
     }
 
     public class IkonliCell extends GridCell<Ikon> {

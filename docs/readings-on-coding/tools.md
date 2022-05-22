@@ -1,3 +1,7 @@
+---
+nav_order: 2
+parent: Readings on Coding
+---
 # Useful development tooling
 
 This page lists some software we consider useful.
@@ -37,7 +41,7 @@ See also: [https://help.github.com/articles/syncing-a-fork/](https://help.github
 2. `choco install git`
 3. `choco install conemu clink`
 4. `choco install notepadplusplus`
-5. If you want to have your jdk also managed via chocolatey: `choco install jdk8`
+5. If you want to have your jdk also managed via chocolatey: `choco install temurin`
 
 Then, each weak do `choco upgrade all` to ensure all tooling is uptodate.
 

@@ -21,8 +21,8 @@ import org.jabref.logic.exporter.SaveException;
 import org.jabref.logic.exporter.SavePreferences;
 import org.jabref.logic.git.SlrGitHandler;
 import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.OpenDatabase;
-import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.OS;
@@ -66,6 +66,7 @@ class StudyRepository {
     private final Study study;
     private final GeneralPreferences generalPreferences;
     private final ImportFormatPreferences importFormatPreferences;
+    private final ImporterPreferences importerPreferences;
     private final FileUpdateMonitor fileUpdateMonitor;
     private final SavePreferences savePreferences;
     private final BibEntryTypesManager bibEntryTypesManager;
@@ -79,19 +80,20 @@ class StudyRepository {
      *                                  contain the study definition file.
      * @throws IOException              Thrown if the given repository does not exists, or the study definition file
      *                                  does not exist
-     * @throws ParseException           Problem parsing the study definition file.
      */
     public StudyRepository(Path pathToRepository,
                            SlrGitHandler gitHandler,
                            GeneralPreferences generalPreferences,
                            ImportFormatPreferences importFormatPreferences,
+                           ImporterPreferences importerPreferences,
                            FileUpdateMonitor fileUpdateMonitor,
                            SavePreferences savePreferences,
-                           BibEntryTypesManager bibEntryTypesManager) throws IOException, ParseException {
+                           BibEntryTypesManager bibEntryTypesManager) throws IOException {
         this.repositoryPath = pathToRepository;
         this.gitHandler = gitHandler;
         this.generalPreferences = generalPreferences;
         this.importFormatPreferences = importFormatPreferences;
+        this.importerPreferences = importerPreferences;
         this.fileUpdateMonitor = fileUpdateMonitor;
         this.studyDefinitionFile = Path.of(repositoryPath.toString(), STUDY_DEFINITION_FILE_NAME);
         this.savePreferences = savePreferences;
@@ -275,7 +277,10 @@ class StudyRepository {
      */
     private void setUpRepositoryStructure() throws IOException {
         // Cannot use stream here since IOException has to be thrown
-        StudyDatabaseToFetcherConverter converter = new StudyDatabaseToFetcherConverter(this.getActiveLibraryEntries(), importFormatPreferences);
+        StudyDatabaseToFetcherConverter converter = new StudyDatabaseToFetcherConverter(
+                this.getActiveLibraryEntries(),
+                importFormatPreferences,
+                importerPreferences);
         for (String query : this.getSearchQueryStrings()) {
             createQueryResultFolder(query);
             converter.getActiveFetchers()

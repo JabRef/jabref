@@ -191,7 +191,6 @@ public class CustomEntryTypeDialogViewModel {
     }
 
     public void apply() {
-
         for (var typeWithField : entryTypesWithFields) {
             BibEntryType type = typeWithField.entryType().getValue();
             List<FieldViewModel> allFields = typeWithField.fields();

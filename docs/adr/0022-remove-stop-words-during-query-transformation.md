@@ -1,3 +1,7 @@
+---
+parent: Architectural Decisions
+nav_order: 22
+---
 # Remove stop words during query transformation
 
 ## Context and Problem Statement

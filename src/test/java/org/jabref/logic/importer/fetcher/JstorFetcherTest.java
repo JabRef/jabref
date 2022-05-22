@@ -93,18 +93,15 @@ public class JstorFetcherTest implements SearchBasedFetcherCapabilityTest {
     @Disabled("jstor does not support search only based on year")
     @Override
     public void supportsYearRangeSearch() throws Exception {
-
     }
 
     @Disabled("jstor does not provide articles with journals")
     @Override
     public void supportsJournalSearch() throws Exception {
-
     }
 
     @Disabled("jstor does not support search only based on year")
     @Override
     public void supportsYearSearch() throws Exception {
-
     }
 }

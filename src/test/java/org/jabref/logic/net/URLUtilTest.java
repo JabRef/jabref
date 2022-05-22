@@ -73,5 +73,4 @@ class URLUtilTest {
         assertFalse(URLUtil.isURL("www.google.com"));
         assertFalse(URLUtil.isURL("google.com"));
     }
-
 }
