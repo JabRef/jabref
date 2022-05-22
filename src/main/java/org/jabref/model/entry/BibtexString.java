@@ -189,6 +189,6 @@ public class BibtexString implements Cloneable {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, hasChanged, name, content, type, parsedSerialization );
+        return Objects.hash(id, hasChanged, name, content, type, parsedSerialization);
     }
 }
