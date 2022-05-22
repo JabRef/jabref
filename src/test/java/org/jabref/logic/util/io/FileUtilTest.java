@@ -387,4 +387,18 @@ class FileUtilTest {
         Path bibFile = Files.createFile(rootDir.resolve("test.pdf"));
         assertFalse(FileUtil.isBibFile(bibFile));
     }
+
+    @Test
+    void testFindinPath() {
+        Optional<Path> resultPath1 = FileUtil.find("existingTestFile.txt", rootDir);
+        assertEquals(resultPath1.get().toString(), existingTestFile.toString());
+    }
+
+    @Test
+    void testFindinListofPath() {
+        List<Path> paths = List.of(existingTestFile, otherExistingTestFile, rootDir);
+        List<Path> resultPaths = List.of(existingTestFile, existingTestFile);
+        List<Path> result = FileUtil.find("existingTestFile.txt", paths);
+        assertEquals(resultPaths, result);
+    }
 }
