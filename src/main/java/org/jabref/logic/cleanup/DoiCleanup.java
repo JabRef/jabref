@@ -78,11 +78,4 @@ public class DoiCleanup implements CleanupJob {
         CleanupJob eraser = new FieldFormatterCleanup(field, new ClearFormatter());
         changes.addAll(eraser.cleanup(entry));
     }
-
-    private String decodeDoi(String doiValue) throws UnsupportedEncodingException {
-        if (doiValue == null) {
-            return null;
-        }
-        return URLDecoder.decode(doiValue, "UTF-8");
-    }
 }
