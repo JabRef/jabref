@@ -126,7 +126,7 @@ dependencies {
     implementation 'com.ibm.icu:icu4j-charset:71.1'
 
     // required for reading write-protected PDFs - see https://github.com/JabRef/jabref/pull/942#issuecomment-209252635
-    implementation 'org.bouncycastle:bcprov-jdk15on:1.70'
+    implementation 'org.bouncycastle:bcprov-jdk18on:1.71'
 
     implementation 'commons-cli:commons-cli:1.5.0'
 
