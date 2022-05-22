@@ -22,6 +22,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - Writing BibTeX data into a PDF (XMP) does not write the `file` field.
 - Writing BibTeX data into a PDF (XMP) considers the configured keyword separator (and does not use "," as default any more)
 - The Medline/Pubmed search now also supports the [default fields and operators for searching](https://docs.jabref.org/collect/import-using-online-bibliographic-database#search-syntax). [forum#3554](https://discourse.jabref.org/t/native-pubmed-search/3354)
+- We improved group expansion arrow that prevent it from activating group when expanding or collapsing. [#7982](https://github.com/JabRef/jabref/issues/7982), [#3176](https://github.com/JabRef/jabref/issues/3176)
 
 ### Fixed
 
@@ -31,6 +32,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixed an issue where deprecated fields tab is shown when the fields don't contain any values. [#8396](https://github.com/JabRef/jabref/issues/8396)
 - We fixed an issue which allow us to select and open identifiers from a popup list in the maintable [#8758](https://github.com/JabRef/jabref/issues/8758), [8802](https://github.com/JabRef/jabref/issues/8802)
 - We fixed an issue where the escape button had no functionality within the "Filter groups" textfield. [koppor#562](https://github.com/koppor/jabref/issues/562)
+- We fixed an issue where right clicking a group and choose "remove selected entries from this group" leads to error when Bibtex source tab is selected. [#8012](https://github.com/JabRef/jabref/issues/8012)
 
 ### Removed
 
