@@ -76,7 +76,17 @@ public class FetchAndMergeEntry {
                                   })
                                   .onFailure(exception -> {
                                       LOGGER.error("Error while fetching bibliographic information", exception);
-                                      dialogService.showErrorDialogAndWait(exception);
+                                      String localMessage = exception.getCause().getLocalizedMessage();
+                                      // client error
+                                      if (localMessage.startsWith("Client")) {
+                                          dialogService.showInformationDialogAndWait(Localization.lang("Lookup DOI"), Localization.lang("No DOI data exists"));
+                                      // server error
+                                      } else if (localMessage.startsWith("Server")) {
+                                          dialogService.showInformationDialogAndWait(Localization.lang("Lookup DOI"), Localization.lang("DOI server not available"));
+                                      // default error
+                                      } else {
+                                          dialogService.showErrorDialogAndWait(exception);
+                                      }
                                   })
                                   .executeWith(Globals.TASK_EXECUTOR);
                 }

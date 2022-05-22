@@ -25,6 +25,22 @@ public class URLDownloadTest {
         assertTrue(dl.asString().contains("Google"), "google.com should contain google");
     }
 
+    // test client error 404
+    @Test
+    public void testStringDownloadThrowClientError() throws IOException {
+        URLDownload dl = new URLDownload(new URL("http://httpstat.us/404"));
+        IOException exception = assertThrows(IOException.class, dl::asString);
+        assertTrue(exception.getLocalizedMessage().contentEquals("Client Error 404"), "Should be Client Error.");
+    }
+
+    // test server error 503
+    @Test
+    public void testStringDownloadThrowServerError() throws IOException {
+        URLDownload dl = new URLDownload(new URL("http://httpstat.us/503"));
+        IOException exception = assertThrows(IOException.class, dl::asString);
+        assertTrue(exception.getLocalizedMessage().contentEquals("Server Error 503"), "Should be Server Error.");
+    }
+
     @Test
     public void testStringDownload() throws IOException {
         URLDownload dl = new URLDownload(new URL("http://www.google.com"));

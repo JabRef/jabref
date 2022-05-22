@@ -40,6 +40,7 @@ import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
+import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.util.FileHelper;
 
@@ -360,6 +361,14 @@ public class URLDownload {
                     // open the new connnection again
                     connection = new URLDownload(newUrl).openConnection();
                 }
+            }
+            // status code 4xx
+            if (status > HttpURLConnection.HTTP_BAD_REQUEST && status < HttpURLConnection.HTTP_INTERNAL_ERROR) {
+                throw new IOException(Localization.lang("Client Error " + status));
+
+                // status code 5xx
+            } else if (status >= HttpURLConnection.HTTP_INTERNAL_ERROR) {
+                throw new IOException(Localization.lang("Server Error " + status));
             }
         }
 
