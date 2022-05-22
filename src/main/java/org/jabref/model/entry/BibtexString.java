@@ -178,7 +178,9 @@ public class BibtexString implements Cloneable {
             return false;
         }
         BibtexString that = (BibtexString) o;
-        return (Objects.equals(hasChanged, that.hasChanged) &&
+        return (
+                Objects.equals(id, that.id) &&
+                Objects.equals(hasChanged, that.hasChanged) &&
                 Objects.equals(name, that.name) &&
                 Objects.equals(content, that.content) &&
                 Objects.equals(type, that.type) &&
@@ -187,6 +189,6 @@ public class BibtexString implements Cloneable {
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, content, id, type, parsedSerialization, hasChanged);
+        return Objects.hash(id, hasChanged, name, content, type, parsedSerialization );
     }
 }
