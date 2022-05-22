@@ -376,7 +376,6 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
     private void handleStructureLine(String line) {
         int index = line.indexOf('=');
         if ((index > 0) && (index < (line.length() - 1))) {
-
             try {
                 final String typeName = line.substring(0, index);
                 final String formatString = line.substring(index + 1);
@@ -923,5 +922,4 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
                 ? OOFormat.paragraph(title)
                 : OOFormat.paragraph(title, parStyle));
     }
-
 }

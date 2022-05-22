@@ -42,7 +42,6 @@ public class CitationGroups {
      * Constructor
      */
     public CitationGroups(Map<CitationGroupId, CitationGroup> citationGroups) {
-
         this.citationGroupsUnordered = citationGroups;
 
         this.globalOrder = Optional.empty();
@@ -200,7 +199,6 @@ public class CitationGroups {
      * @return Citation keys where lookupCitations() failed.
      */
     public List<String> getUnresolvedKeys() {
-
         CitedKeys bib = getBibliography().orElse(getCitedKeysUnordered());
 
         List<String> unresolvedKeys = new ArrayList<>();

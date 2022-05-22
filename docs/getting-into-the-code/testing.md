@@ -1,3 +1,7 @@
+---
+parent: Getting into the code
+nav_order: 3
+---
 # How to test
 
 For details on unit testing see [https://devdocs.jabref.org/getting-into-the-code/code-howtos#test-cases](https://devdocs.jabref.org/getting-into-the-code/code-howtos#test-cases).

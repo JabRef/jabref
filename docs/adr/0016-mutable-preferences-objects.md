@@ -1,3 +1,7 @@
+---
+parent: Architectural Decisions
+nav_order: 16
+---
 # Mutable preferences objects
 
 ## Context and Problem Statement

@@ -79,7 +79,6 @@ public class NameFormatter implements LayoutFormatter {
     private String parameter = NameFormatter.DEFAULT_FORMAT;
 
     private static String format(String toFormat, AuthorList al, String[] formats) {
-
         StringBuilder sb = new StringBuilder();
 
         int n = al.getNumberOfAuthors();

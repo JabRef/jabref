@@ -96,7 +96,6 @@ public class GenerateCitationKeyAction extends SimpleCommand {
 
     private BackgroundTask generateKeysInBackground() {
         return new BackgroundTask<Void>() {
-
             private NamedCompound compound;
 
             @Override
@@ -141,7 +140,6 @@ public class GenerateCitationKeyAction extends SimpleCommand {
                 return super.onSuccess(onSuccess);
             }
         };
-
     }
 
     private String formatOutputMessage(String start, int count) {

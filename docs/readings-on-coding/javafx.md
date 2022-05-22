@@ -1,3 +1,7 @@
+---
+nav_order: 1
+parent: Readings on Coding
+---
 # Readings on JavaFX
 
 JabRef's recommendations about JavaFX

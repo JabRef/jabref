@@ -1,3 +1,7 @@
+---
+nav_order: 4
+parent: Advanced Reading
+---
 # Recommendations for UI design
 
 * [Designing More Efficient Forms: Structure, Inputs, Labels and Actions](https://uxplanet.org/designing-more-efficient-forms-structure-inputs-labels-and-actions-e3a47007114f)

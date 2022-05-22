@@ -8,6 +8,7 @@ import org.jabref.logic.exporter.SaveException;
 import org.jabref.logic.exporter.SavePreferences;
 import org.jabref.logic.git.SlrGitHandler;
 import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.study.QueryResult;
@@ -32,10 +33,30 @@ public class Crawler {
      *
      * @param studyRepositoryRoot The path to the study repository
      */
-    public Crawler(Path studyRepositoryRoot, SlrGitHandler gitHandler, GeneralPreferences generalPreferences, ImportFormatPreferences importFormatPreferences, SavePreferences savePreferences, BibEntryTypesManager bibEntryTypesManager, FileUpdateMonitor fileUpdateMonitor) throws IllegalArgumentException, IOException, ParseException {
-        studyRepository = new StudyRepository(studyRepositoryRoot, gitHandler, generalPreferences, importFormatPreferences, fileUpdateMonitor, savePreferences, bibEntryTypesManager);
-        StudyDatabaseToFetcherConverter studyDatabaseToFetcherConverter = new StudyDatabaseToFetcherConverter(studyRepository.getActiveLibraryEntries(), importFormatPreferences);
-        this.studyFetcher = new StudyFetcher(studyDatabaseToFetcherConverter.getActiveFetchers(), studyRepository.getSearchQueryStrings());
+    public Crawler(Path studyRepositoryRoot,
+                   SlrGitHandler gitHandler,
+                   GeneralPreferences generalPreferences,
+                   ImportFormatPreferences importFormatPreferences,
+                   ImporterPreferences importerPreferences,
+                   SavePreferences savePreferences,
+                   BibEntryTypesManager bibEntryTypesManager,
+                   FileUpdateMonitor fileUpdateMonitor) throws IllegalArgumentException, IOException, ParseException {
+        this.studyRepository = new StudyRepository(
+                studyRepositoryRoot,
+                gitHandler,
+                generalPreferences,
+                importFormatPreferences,
+                importerPreferences,
+                fileUpdateMonitor,
+                savePreferences,
+                bibEntryTypesManager);
+        StudyDatabaseToFetcherConverter studyDatabaseToFetcherConverter = new StudyDatabaseToFetcherConverter(
+                studyRepository.getActiveLibraryEntries(),
+                importFormatPreferences,
+                importerPreferences);
+        this.studyFetcher = new StudyFetcher(
+                studyDatabaseToFetcherConverter.getActiveFetchers(),
+                studyRepository.getSearchQueryStrings());
     }
 
     /**

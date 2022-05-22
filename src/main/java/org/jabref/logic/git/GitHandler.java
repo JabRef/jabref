@@ -110,6 +110,7 @@ public class GitHandler {
 
     /**
      * Creates a commit on the currently checked out branch
+     *
      * @param amend Whether to amend to the last commit (true), or not (false)
      * @return Returns true if a new commit was created. This is the case if the repository was not clean on method invocation
      */

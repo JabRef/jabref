@@ -250,7 +250,6 @@ public class RepecNepImporter extends Importer {
         List<String> authors = new ArrayList<>();
         StringBuilder institutions = new StringBuilder();
         while ((this.lastLine != null) && !"".equals(this.lastLine) && !startsWithKeyword(RepecNepImporter.RECOGNIZED_FIELDS)) {
-
             // read single author
             String author;
             StringBuilder institution = new StringBuilder();
@@ -323,7 +322,6 @@ public class RepecNepImporter extends Importer {
 
         // read other fields
         while ((this.lastLine != null) && !isStartOfWorkingPaper() && (startsWithKeyword(RepecNepImporter.RECOGNIZED_FIELDS) || "".equals(this.lastLine))) {
-
             // if multiple lines for a field are allowed and field consists of multiple lines, join them
             String keyword = "".equals(this.lastLine) ? "" : this.lastLine.substring(0, this.lastLine.indexOf(':')).trim();
             // skip keyword
@@ -379,7 +377,6 @@ public class RepecNepImporter extends Importer {
         try {
             readLine(reader); // skip header and editor information
             while (this.lastLine != null) {
-
                 if (this.lastLine.startsWith("-----------------------------")) {
                     this.inOverviewSection = this.preLine.startsWith("In this issue we have");
                 }

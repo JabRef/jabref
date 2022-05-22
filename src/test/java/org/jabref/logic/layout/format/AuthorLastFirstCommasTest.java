@@ -13,7 +13,6 @@ public class AuthorLastFirstCommasTest {
      */
     @Test
     public void testFormat() {
-
         LayoutFormatter a = new AuthorLastFirstCommas();
 
         // Empty case

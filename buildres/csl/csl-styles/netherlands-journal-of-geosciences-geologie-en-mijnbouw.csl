@@ -16,7 +16,7 @@
     <category field="engineering"/>
     <issn>0016-7746</issn>
     <eissn>1573-9708</eissn>
-    <updated>2021-09-07T11:15:14+00:00</updated>
+    <updated>2022-05-03T09:47:13+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="en">
@@ -203,12 +203,12 @@
     <choose>
       <if type="song">
         <names variable="composer" delimiter=", ">
-          <name and="symbol" delimiter-precedes-last="always" initialize-with="." name-as-sort-order="all"/>
+          <name and="symbol" delimiter-precedes-last="never" initialize-with="." name-as-sort-order="all"/>
           <substitute>
             <names variable="original-author"/>
             <names variable="author"/>
             <names variable="translator">
-              <name name-as-sort-order="all" and="symbol" sort-separator=", " initialize-with=". " delimiter=", " delimiter-precedes-last="always"/>
+              <name name-as-sort-order="all" and="symbol" sort-separator=", " initialize-with=". " delimiter=", " delimiter-precedes-last="never"/>
               <label form="short" prefix=" (" suffix=")"/>
             </names>
             <group delimiter=" ">
@@ -222,12 +222,12 @@
       <else-if type="treaty"/>
       <else>
         <names variable="author" delimiter=", ">
-          <name and="symbol" delimiter-precedes-last="always" initialize-with="." name-as-sort-order="all"/>
+          <name and="symbol" delimiter-precedes-last="never" initialize-with="." name-as-sort-order="all"/>
           <substitute>
             <names variable="illustrator"/>
             <names variable="composer"/>
             <names variable="director">
-              <name name-as-sort-order="all" and="symbol" sort-separator=", " initialize-with=". " delimiter=", " delimiter-precedes-last="always"/>
+              <name name-as-sort-order="all" and="symbol" sort-separator=", " initialize-with=". " delimiter=", " delimiter-precedes-last="never"/>
               <label form="long" prefix=" (" suffix=")"/>
             </names>
             <choose>
@@ -241,21 +241,21 @@
                   </else>
                 </choose>
                 <names variable="translator">
-                  <name name-as-sort-order="all" and="symbol" sort-separator=", " initialize-with=". " delimiter=", " delimiter-precedes-last="always"/>
+                  <name name-as-sort-order="all" and="symbol" sort-separator=", " initialize-with=". " delimiter=", " delimiter-precedes-last="never"/>
                   <label form="short" prefix=" (" suffix=")"/>
                 </names>
               </if>
             </choose>
             <names variable="editor translator" delimiter=", ">
-              <name name-as-sort-order="all" and="symbol" sort-separator=", " initialize-with=". " delimiter=", " delimiter-precedes-last="always"/>
+              <name name-as-sort-order="all" and="symbol" sort-separator=", " initialize-with=". " delimiter=", " delimiter-precedes-last="never"/>
               <label form="short" prefix=" (" suffix=")"/>
             </names>
             <names variable="editorial-director">
-              <name name-as-sort-order="all" and="symbol" sort-separator=", " initialize-with=". " delimiter=", " delimiter-precedes-last="always"/>
+              <name name-as-sort-order="all" and="symbol" sort-separator=", " initialize-with=". " delimiter=", " delimiter-precedes-last="never"/>
               <label form="short" prefix=" (" suffix=")"/>
             </names>
             <names variable="collection-editor">
-              <name name-as-sort-order="all" and="symbol" sort-separator=", " initialize-with=". " delimiter=", " delimiter-precedes-last="always"/>
+              <name name-as-sort-order="all" and="symbol" sort-separator=", " initialize-with=". " delimiter=", " delimiter-precedes-last="never"/>
               <label form="short" prefix=" (" suffix=")"/>
             </names>
             <choose>
@@ -482,7 +482,7 @@
             <text variable="title"/>
           </else-if>
           <else>
-            <text variable="title" font-style="italic"/>
+            <text variable="title" font-style="normal"/>
           </else>
         </choose>
       </else-if>
@@ -524,7 +524,7 @@
             <text macro="secondary-contributors"/>
           </group>
         </else-if>
-        <else-if type="book interview manuscript motion_picture musical_score pamphlet post-weblog speech webpage" match="any">
+        <else-if type="interview manuscript motion_picture musical_score pamphlet post-weblog speech webpage" match="any">
           <group delimiter="; ">
             <text macro="locators"/>
             <text macro="secondary-contributors"/>
@@ -692,9 +692,6 @@
           <text macro="locators"/>
         </group>
       </if>
-      <else>
-        <text macro="locators"/>
-      </else>
     </choose>
   </macro>
   <macro name="format-report">
@@ -806,8 +803,8 @@
             <else>
               <group delimiter=": ">
                 <group delimiter=" ">
-                  <text variable="publisher-place"/>
-                  <text variable="publisher" prefix="(" suffix=")"/>
+                  <text variable="publisher"/>
+                  <text variable="publisher-place" prefix="(" suffix=")"/>
                 </group>
                 <text macro="locators"/>
               </group>
@@ -1102,6 +1099,10 @@
       <group>
         <label variable="page" form="short" suffix=" "/>
         <text variable="page"/>
+      </group>
+      <group delimiter=" ">
+        <text variable="number-of-pages"/>
+        <label plural="always" variable="number-of-pages" form="short"/>
       </group>
     </group>
   </macro>
@@ -1424,8 +1425,8 @@
   </macro>
   <citation et-al-min="3" et-al-use-first="1" disambiguate-add-year-suffix="true" disambiguate-add-names="true" disambiguate-add-givenname="true" collapse="year" givenname-disambiguation-rule="primary-name">
     <sort>
-      <key macro="author" names-min="8" names-use-first="6"/>
       <key macro="issued-sort"/>
+      <key macro="author" names-min="8" names-use-first="6"/>
     </sort>
     <layout prefix="(" suffix=")" delimiter="; ">
       <group delimiter=", ">
@@ -1445,7 +1446,7 @@
       <group delimiter=" ">
         <group delimiter=". " suffix=".">
           <group delimiter=", ">
-            <text macro="author" font-weight="bold"/>
+            <text macro="author" font-style="italic" font-weight="bold"/>
             <text macro="issued"/>
           </group>
           <text macro="title-and-descriptions"/>

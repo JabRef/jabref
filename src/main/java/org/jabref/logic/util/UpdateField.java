@@ -99,7 +99,6 @@ public class UpdateField {
     }
 
     private static void setAutomaticFields(BibEntry entry, boolean setOwner, String owner, boolean setTimeStamp, String timeStamp) {
-
         // Set owner field if this option is enabled:
         if (setOwner) {
             // Set owner field to default value

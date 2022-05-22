@@ -34,5 +34,4 @@ public class JabRefIkonHandler extends AbstractIkonHandler {
     public String getFontFamily() {
         return "JabRefMaterialDesign";
     }
-
 }

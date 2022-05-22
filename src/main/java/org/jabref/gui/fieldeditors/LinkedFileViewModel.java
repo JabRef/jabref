@@ -421,23 +421,26 @@ public class LinkedFileViewModel extends AbstractViewModel {
         BackgroundTask<Void> writeTask = BackgroundTask.wrap(() -> {
             Optional<Path> file = linkedFile.findIn(databaseContext, preferences.getFilePreferences());
             if (file.isEmpty()) {
-                // TODO: Print error message
-                // Localization.lang("PDF does not exist");
+                dialogService.notify(Localization.lang("Failed to write metadata, file %1 not found.", file.map(Path::toString).orElse("")));
             } else {
-                try {
-                    XmpUtilWriter.writeXmp(file.get(), entry, databaseContext.getDatabase(), preferences.getXmpPreferences());
+                synchronized (linkedFile) {
+                    try {
+                        // Similar code can be found at {@link org.jabref.gui.exporter.WriteMetadataToPdfAction.writeMetadataToFile}
+                        new XmpUtilWriter(preferences.getXmpPreferences()).writeXmp(file.get(), entry, databaseContext.getDatabase());
 
-                    EmbeddedBibFilePdfExporter embeddedBibExporter = new EmbeddedBibFilePdfExporter(preferences.getGeneralPreferences().getDefaultBibDatabaseMode(), Globals.entryTypesManager, preferences.getFieldWriterPreferences());
-                    embeddedBibExporter.exportToFileByPath(databaseContext, databaseContext.getDatabase(), preferences.getFilePreferences(), file.get());
-                } catch (IOException | TransformerException ex) {
-                    // TODO: Print error message
-                    // Localization.lang("Error while writing") + " '" + file.toString() + "': " + ex;
+                        EmbeddedBibFilePdfExporter embeddedBibExporter = new EmbeddedBibFilePdfExporter(databaseContext.getMode(), Globals.entryTypesManager, preferences.getFieldWriterPreferences());
+                        embeddedBibExporter.exportToFileByPath(databaseContext, databaseContext.getDatabase(), preferences.getFilePreferences(), file.get());
+
+                        dialogService.notify(Localization.lang("Success! Finished writing metadata."));
+                    } catch (IOException | TransformerException ex) {
+                        dialogService.notify(Localization.lang("Error while writing metadata. See the error log for details."));
+                        LOGGER.error("Error while writing metadata to {}", file.map(Path::toString).orElse(""), ex);
+                    }
                 }
             }
             return null;
         });
 
-        // TODO: Show progress
         taskExecutor.execute(writeTask);
     }
 
@@ -459,7 +462,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
 
             BackgroundTask<Path> downloadTask = prepareDownloadTask(targetDirectory.get(), urlDownload);
             downloadTask.onSuccess(destination -> {
-                boolean isDuplicate = false;
+                boolean isDuplicate;
                 try {
                     isDuplicate = FileNameUniqueness.isDuplicatedFile(targetDirectory.get(), destination.getFileName(), dialogService);
                 } catch (IOException e) {

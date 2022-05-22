@@ -25,6 +25,7 @@
   <locale>
     <terms>
       <term name="editor" form="verb-short">ed.</term>
+      <term name="ibid">id.</term>
       <term name="translator" form="verb-short">trans.</term>
     </terms>
   </locale>
@@ -229,10 +230,15 @@
   <citation et-al-min="4" et-al-use-first="1">
     <layout suffix="." delimiter="; ">
       <choose>
-        <if position="ibid">
-          <text value="id." text-case="capitalize-first" font-style="italic"/>
-          <text macro="at_page"/>
+        <if position="ibid-with-locator">
+          <group delimiter=" ">
+            <text term="ibid" text-case="capitalize-first" font-style="italic"/>
+            <text macro="at_page"/>
+          </group>
         </if>
+        <else-if position="ibid">
+          <text term="ibid" text-case="capitalize-first" font-style="italic"/>
+        </else-if>
         <else-if position="subsequent">
           <group delimiter=", ">
             <group delimiter=" ">

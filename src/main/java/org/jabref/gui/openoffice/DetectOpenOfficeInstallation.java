@@ -36,7 +36,6 @@ public class DetectOpenOfficeInstallation {
     }
 
     public Optional<Path> selectInstallationPath() {
-
         final NativeDesktop nativeDesktop = JabRefDesktop.getNativeDesktop();
 
         dialogService.showInformationDialogAndWait(Localization.lang("Could not find OpenOffice/LibreOffice installation"),
