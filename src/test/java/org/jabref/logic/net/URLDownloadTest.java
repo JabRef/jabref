@@ -33,7 +33,7 @@ public class URLDownloadTest {
     public void testStringDownloadThrowClientError() throws IOException {
         URLDownload dl = new URLDownload(new URL("http://httpstat.us/404"));
         IOException exception = assertThrows(IOException.class, dl::asString);
-        assertTrue(exception.getLocalizedMessage().contentEquals("Client Error"), "Should be Client Error.");
+        assertTrue(exception.getLocalizedMessage().contentEquals("Client Error 404"), "Should be Client Error.");
     }
 
     // test server error 503
@@ -41,7 +41,7 @@ public class URLDownloadTest {
     public void testStringDownloadThrowServerError() throws IOException {
         URLDownload dl = new URLDownload(new URL("http://httpstat.us/503"));
         IOException exception = assertThrows(IOException.class, dl::asString);
-        assertTrue(exception.getLocalizedMessage().contentEquals("Server Error"), "Should be Server Error.");
+        assertTrue(exception.getLocalizedMessage().contentEquals("Server Error 503"), "Should be Server Error.");
     }
 
     @Test
