@@ -76,7 +76,7 @@ public class FetchAndMergeEntry {
                                   })
                                   .onFailure(exception -> {
                                       LOGGER.error("Error while fetching bibliographic information", exception);
-                                      String localMessage = exception.getCause().getLocalizedMessage();
+                                      String localMessage = exception.getLocalizedMessage();
                                       // client error
                                       if (localMessage.startsWith("Client")) {
                                           dialogService.showInformationDialogAndWait(Localization.lang("Lookup DOI"), Localization.lang("No DOI data was found"));

@@ -1,5 +1,6 @@
 package org.jabref.logic.importer.fetcher;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Collections;
@@ -72,7 +73,6 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
                     return new Medra().performSearchById(identifier);
                 }
                 URL doiURL = new URL(doi.get().getURIAsASCIIString());
-
                 // BibTeX data
                 URLDownload download = getUrlDownload(doiURL);
                 download.addHeader("Accept", MediaTypes.APPLICATION_BIBTEX);
@@ -81,7 +81,12 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
                     bibtexString = download.asString();
                 } catch (IOException e) {
                     // an IOException will be thrown if download is unable to download from the doiURL
-                    throw new FetcherException(Localization.lang("No DOI data exists"), e);
+                    // dispatch the IOException
+                    if (e instanceof FileNotFoundException) {
+                        throw new FetcherException(Localization.lang("Client Error"), e);
+                    } else {
+                        throw new FetcherException(Localization.lang("Server Error"), e);
+                    }
                 }
 
                 // BibTeX entry
@@ -107,6 +112,17 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
         } catch (JSONException e) {
             throw new FetcherException("Could not retrieve Registration Agency", e);
         }
+    }
+
+    /**
+     * Returns client error or server error according to the message
+     *
+     * @param exception the IOException
+     */
+    private String dispatchIOException(IOException exception) {
+        String classification = "Client Error";
+
+        return classification;
     }
 
     private void doPostCleanup(BibEntry entry) {
