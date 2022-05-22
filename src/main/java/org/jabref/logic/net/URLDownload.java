@@ -363,13 +363,11 @@ public class URLDownload {
             }
             // status code 4xx
             if (status > HttpURLConnection.HTTP_BAD_REQUEST && status < HttpURLConnection.HTTP_INTERNAL_ERROR) {
-                String message = String.format("Client Error %d", status);
-                throw new IOException(Localization.lang(message));
+                throw new IOException(Localization.lang("Client Error"));
 
                 // status code 5xx
             } else if (status >= HttpURLConnection.HTTP_INTERNAL_ERROR) {
-                String message = String.format("Server Error %d", status);
-                throw new IOException(Localization.lang(message));
+                throw new IOException(Localization.lang("Server Error"));
             }
         }
 
