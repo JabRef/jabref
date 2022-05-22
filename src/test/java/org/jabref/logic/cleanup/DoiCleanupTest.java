@@ -66,7 +66,6 @@ public class DoiCleanupTest {
                 Arguments.of(new BibEntry()
                          .withField(StandardField.DOI, "10.18726/2018_3"),
                           new BibEntry()
-                         .withField(unknownField, "https://doi.org/10.18726/2018%7B%5Ctextunderscore%7D3"))
-        );
-    }
+                         .withField(unknownField, "https://doi.org/10.18726/2018%7B%5Ctextunderscore%7D3")));
+            }
 }
