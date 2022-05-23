@@ -1276,10 +1276,25 @@ TextFlow * {
     -fx-fill: -fx-text-background-color;
 }
 
-.chips-pane > .editor {
+.tags-field {
     -fx-pref-height: 30px;
-    -fx-padding: 0px 0px 0px -8px;
     -fx-margin: 0em;
+    -fx-border-style: none;
+}
+
+.tags-field > .flow-pane > .text-input {
+    /* -fx-background-color: darkred; */
+
+}
+
+.tags-field > .flow-pane > .tag-view {
+    -fx-background-color: -fx-default-button;
+    -fx-text-fill: -fx-focused-text-base-color;
+}
+
+.tags-field > .flow-pane > .tag-view:selected {
+    -fx-background-color: derive(-fx-default-button, -20%);
+    -fx-text-fill: -fx-focused-text-base-color;
 }
 
 .searchBar:invalid {

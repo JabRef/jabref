@@ -39,6 +39,8 @@ public class LinkedEntriesEditor extends HBox implements FieldEditorFX {
         HBox.setHgrow(entryLinkField, Priority.ALWAYS);
         Bindings.bindContentBidirectional(entryLinkField.getTags(), viewModel.linkedEntriesProperty());
 
+        getStyleClass().add("linked-entries-editor");
+
         getChildren().add(entryLinkField);
     }
 
@@ -70,10 +72,15 @@ public class LinkedEntriesEditor extends HBox implements FieldEditorFX {
             setConverter(viewModel.getStringConverter());
             setMatcher((entryLink, searchText) -> entryLink.getKey().toLowerCase().startsWith(searchText.toLowerCase()));
             setComparator(Comparator.comparing(ParsedEntryLink::getKey));
+
             setTagViewFactory((entryLink) -> {
                 Label tagLabel = new Label();
                 tagLabel.setText(getConverter().toString(entryLink));
-                tagLabel.setOnMouseClicked(event -> viewModel.jumpToEntry(entryLink));
+                tagLabel.setOnMouseClicked(event -> {
+                    if (event.getClickCount() == 2) {
+                        viewModel.jumpToEntry(entryLink);
+                    }
+                });
                 return tagLabel;
             });
         }
