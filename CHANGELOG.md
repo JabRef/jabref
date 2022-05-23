@@ -34,6 +34,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixed an issue which allow us to select and open identifiers from a popup list in the maintable [#8758](https://github.com/JabRef/jabref/issues/8758), [8802](https://github.com/JabRef/jabref/issues/8802)
 - We fixed an issue where the escape button had no functionality within the "Filter groups" textfield. [koppor#562](https://github.com/koppor/jabref/issues/562)
 - We fixed an issue where right clicking a group and choose "remove selected entries from this group" leads to error when Bibtex source tab is selected. [#8012](https://github.com/JabRef/jabref/issues/8012)
+- We fixed an issue where removing several groups deletes only one of them. [#8390](https://github.com/JabRef/jabref/issues/8390)
 
 ### Removed
 
