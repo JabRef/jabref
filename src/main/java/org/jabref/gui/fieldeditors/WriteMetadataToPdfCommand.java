@@ -48,7 +48,6 @@ public class WriteMetadataToPdfCommand extends SimpleCommand {
             } else {
                 synchronized (linkedFile) {
                     try {
-                        Thread.sleep(3000);
                         // Similar code can be found at {@link org.jabref.gui.exporter.WriteMetadataToPdfAction.writeMetadataToFile}
                         XmpUtilWriter.writeXmp(file.get(), entry, databaseContext.getDatabase(), preferences.getXmpPreferences());
 
