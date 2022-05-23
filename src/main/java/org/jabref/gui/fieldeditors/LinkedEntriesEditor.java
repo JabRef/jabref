@@ -1,12 +1,14 @@
 package org.jabref.gui.fieldeditors;
 
 import java.util.Comparator;
+import java.util.stream.Collectors;
 
 import javafx.beans.binding.Bindings;
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 
 import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.gui.util.ViewModelListCellFactory;
@@ -18,45 +20,26 @@ import org.jabref.model.entry.field.Field;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.dlsc.gemsfx.TagsField;
-import com.jfoenix.controls.JFXChip;
-import com.jfoenix.controls.JFXChipView;
-import com.jfoenix.controls.JFXDefaultChip;
 
 public class LinkedEntriesEditor extends HBox implements FieldEditorFX {
 
-    @FXML
-    private final LinkedEntriesEditorViewModel viewModel;
-    @FXML
-    private JFXChipView<ParsedEntryLink> chipView;
+    @FXML private final LinkedEntriesEditorViewModel viewModel;
 
-    private SuggestionProvider<BibEntry> suggestionProvider;
+    private final SuggestionProvider<BibEntry> suggestionProvider;
 
     public LinkedEntriesEditor(Field field, BibDatabaseContext databaseContext, SuggestionProvider<BibEntry> suggestionProvider, FieldCheckers fieldCheckers) {
-        this.viewModel = new LinkedEntriesEditorViewModel(field, suggestionProvider, databaseContext, fieldCheckers);
-        this.suggestionProvider = suggestionProvider;
-
         ViewLoader.view(this)
                   .root(this)
                   .load();
 
-        chipView.setConverter(viewModel.getStringConverter());
-        var autoCompletionItemFactory = new ViewModelListCellFactory<ParsedEntryLink>()
-                .withText(ParsedEntryLink::getKey);
-        chipView.getAutoCompletePopup().setSuggestionsCellFactory(autoCompletionItemFactory);
-        chipView.getAutoCompletePopup().setCellLimit(5);
-        chipView.getSuggestions().addAll(suggestionProvider.getPossibleSuggestions().stream().map(ParsedEntryLink::new).toList());
+        this.viewModel = new LinkedEntriesEditorViewModel(field, suggestionProvider, databaseContext, fieldCheckers);
+        this.suggestionProvider = suggestionProvider;
 
-        chipView.setChipFactory((view, item) -> {
-            JFXChip<ParsedEntryLink> chip = new JFXDefaultChip<>(view, item);
-            chip.setOnMouseClicked(event -> viewModel.jumpToEntry(item));
-            return chip;
-        });
+        ParsedEntryLinkField entryLinkField = new ParsedEntryLinkField();
+        HBox.setHgrow(entryLinkField, Priority.ALWAYS);
+        Bindings.bindContentBidirectional(entryLinkField.getTags(), viewModel.linkedEntriesProperty());
 
-        Bindings.bindContentBidirectional(chipView.getChips(), viewModel.linkedEntriesProperty());
-    }
-
-    public SuggestionProvider<BibEntry> getSuggestionProviderMan() {
-        return suggestionProvider;
+        getChildren().add(entryLinkField);
     }
 
     public LinkedEntriesEditorViewModel getViewModel() {
@@ -75,12 +58,15 @@ public class LinkedEntriesEditor extends HBox implements FieldEditorFX {
 
     public class ParsedEntryLinkField extends TagsField<ParsedEntryLink> {
         public ParsedEntryLinkField() {
+            super();
+
             setCellFactory(new ViewModelListCellFactory<ParsedEntryLink>().withText(ParsedEntryLink::getKey));
+            // Mind the .collect(Collectors.toList()) as the list needs to be mutable
             setSuggestionProvider(request ->
                     suggestionProvider.getPossibleSuggestions().stream()
                                       .filter(suggestion -> suggestion.getCitationKey().orElse("").toLowerCase()
                                                                       .contains(request.getUserText().toLowerCase()))
-                                      .map(ParsedEntryLink::new).toList());
+                                      .map(ParsedEntryLink::new).collect(Collectors.toList()));
             setConverter(viewModel.getStringConverter());
             setMatcher((entryLink, searchText) -> entryLink.getKey().toLowerCase().startsWith(searchText.toLowerCase()));
             setComparator(Comparator.comparing(ParsedEntryLink::getKey));
