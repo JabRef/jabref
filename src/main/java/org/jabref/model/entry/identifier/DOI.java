@@ -10,6 +10,7 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.jabref.architecture.AllowedToUseLogic;
 import org.jabref.logic.layout.format.LatexToUnicodeFormatter;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
@@ -20,6 +21,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Class for working with <a href="https://en.wikipedia.org/wiki/Digital_object_identifier">Digital object identifiers (DOIs)</a> and <a href="http://shortdoi.org">Short DOIs</a>
  */
+@AllowedToUseLogic("because we want to have this class 'smart' an be able to parse obscure DOIs, too. For this, we need the LatexToUnicodeformatter.")
 public class DOI implements Identifier {
 
     public static final URI AGENCY_RESOLVER = URI.create("https://doi.org/doiRA");
