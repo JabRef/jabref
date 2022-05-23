@@ -13,7 +13,6 @@ open module org.jabref {
     requires javafx.web;
     requires javafx.fxml;
     requires afterburner.fx;
-    requires com.jfoenix;
     requires com.dlsc.gemsfx;
     requires de.saxsys.mvvmfx;
 

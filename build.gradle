@@ -172,9 +172,8 @@ dependencies {
     implementation 'org.fxmisc.flowless:flowless:0.6.9'
     implementation 'org.fxmisc.richtext:richtextfx:0.10.9'
     implementation group: 'org.glassfish.hk2.external', name: 'jakarta.inject', version: '2.6.1'
-    implementation 'com.jfoenix:jfoenix:9.0.10'
     implementation (group: 'com.dlsc.gemsfx', name: 'gemsfx', version: '1.45.2') {
-        exclude module: 'javax.inject'
+        exclude module: 'javax.inject' // Split package, use only jakarta.inject
     }
 
     implementation 'org.controlsfx:controlsfx:11.1.1'
