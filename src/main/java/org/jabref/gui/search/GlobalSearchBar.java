@@ -14,6 +14,7 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.collections.ObservableList;
 import javafx.css.PseudoClass;
 import javafx.event.Event;
 import javafx.geometry.Insets;
@@ -38,6 +39,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 
+import javafx.util.StringConverter;
 import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.Globals;
 import org.jabref.gui.JabRefFrame;
@@ -387,11 +389,13 @@ public class GlobalSearchBar extends HBox {
         DefaultTaskExecutor.runInJavaFXThread(() -> searchField.setText(searchTerm));
     }
 
-    private static class SearchPopupSkin<T> implements Skin<AutoCompletePopup<T>> {
+    private class SearchPopupSkin<T> implements Skin<AutoCompletePopup<T>> {
 
         private final AutoCompletePopup<T> control;
         private final ListView<T> suggestionList;
         private final BorderPane container;
+
+        private final String[] headings = {"Entrytype","Author/Editor","Title","Year","Journal/Booktitle"};
 
         public SearchPopupSkin(AutoCompletePopup<T> control) {
             this.control = control;
@@ -435,7 +439,13 @@ public class GlobalSearchBar extends HBox {
 
         private void onSuggestionChosen(T suggestion) {
             if (suggestion != null) {
-                Event.fireEvent(this.control, new AutoCompletePopup.SuggestionEvent<>(suggestion));
+                //Check what class the suggestion is, then add to the search bar
+                if(suggestion.getClass() == Author.class){
+                    //Update the search bar to contain the text author=suggestion
+                    String searchTerm = this.control.getConverter().toString(suggestion);
+                    searchField.setText("author="+searchTerm);
+                }
+                //Event.fireEvent(this.control, new AutoCompletePopup.SuggestionEvent<>(suggestion));
             }
         }
 
