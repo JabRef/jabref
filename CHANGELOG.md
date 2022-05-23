@@ -30,7 +30,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 
 ### Removed
 
-
+- We removed the social media buttons for our Twitter and Facebook pages. [#8774](https://github.com/JabRef/jabref/issues/8774)
 
 
 
