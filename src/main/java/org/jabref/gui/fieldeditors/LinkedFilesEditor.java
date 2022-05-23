@@ -184,7 +184,7 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
 
         WriteMetadataToPdfCommand writeMetadataToPdfCommand = linkedFile.createWriteMetadataToPdfCommand();
         writeMetadataToPdf.disableProperty().bind(writeMetadataToPdfCommand.executableProperty().not());
-        writeMetadataToPdf.setOnAction(event ->  writeMetadataToPdfCommand.execute());
+        writeMetadataToPdf.setOnAction(event -> writeMetadataToPdfCommand.execute());
 
         Button parsePdfMetadata = IconTheme.JabRefIcons.FILE_SEARCH.asButton();
         parsePdfMetadata.setTooltip(new Tooltip(Localization.lang("Parse Metadata from PDF.")));
