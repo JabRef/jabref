@@ -1,5 +1,11 @@
 package org.jabref.gui.fieldeditors;
 
+import java.io.IOException;
+import java.nio.file.Path;
+import java.util.Optional;
+
+import javax.xml.transform.TransformerException;
+
 import org.jabref.gui.DialogService;
 import org.jabref.gui.Globals;
 import org.jabref.gui.actions.SimpleCommand;
@@ -12,12 +18,8 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.preferences.PreferencesService;
-import org.slf4j.Logger;
 
-import javax.xml.transform.TransformerException;
-import java.io.IOException;
-import java.nio.file.Path;
-import java.util.Optional;
+import org.slf4j.Logger;
 
 public class WriteMetadataToPdfCommand extends SimpleCommand {
     private final LinkedFile linkedFile;
@@ -29,7 +31,6 @@ public class WriteMetadataToPdfCommand extends SimpleCommand {
     private final TaskExecutor taskExecutor;
 
     public WriteMetadataToPdfCommand(LinkedFile linkedFile, BibDatabaseContext databaseContext, PreferencesService preferences, DialogService dialogService, BibEntry entry, Logger logger, TaskExecutor taskExecutor) {
-
         this.linkedFile = linkedFile;
         this.databaseContext = databaseContext;
         this.preferences = preferences;
