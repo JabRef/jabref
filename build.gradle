@@ -10,7 +10,7 @@ plugins {
 
     id 'me.champeau.gradle.jmh' version '0.5.3'
 
-    id 'org.javamodularity.moduleplugin' version '1.8.10'
+    id 'org.javamodularity.moduleplugin' version '1.8.11'
 
     id 'org.openjfx.javafxplugin' version '0.0.13'
 
