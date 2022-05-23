@@ -125,9 +125,12 @@
   <macro name="year-date">
     <choose>
       <if variable="issued">
-        <group delimiter=" ">
-          <date variable="original-date" form="numeric" date-parts="year" prefix="[" suffix="]"/>
-          <date variable="issued" form="numeric" date-parts="year"/>
+        <group>
+          <group delimiter=" ">
+            <date variable="original-date" form="numeric" date-parts="year" prefix="[" suffix="]"/>
+            <date variable="issued" form="numeric" date-parts="year"/>
+          </group>
+          <text variable="year-suffix"/>
         </group>
       </if>
       <else-if variable="status">
@@ -137,7 +140,10 @@
         </group>
       </else-if>
       <else>
-        <text term="no date" form="short"/>
+        <group>
+          <text term="no date" form="short"/>
+          <text variable="year-suffix" prefix="-"/>
+        </group>
       </else>
     </choose>
   </macro>
