@@ -1,3 +1,7 @@
+---
+parent: Architectural Decisions
+nav_order: 2
+---
 # Use slf4j together with log4j2 for logging
 
 ## Context and Problem Statement

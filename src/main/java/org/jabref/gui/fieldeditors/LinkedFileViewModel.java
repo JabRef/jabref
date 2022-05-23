@@ -435,7 +435,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
 
             BackgroundTask<Path> downloadTask = prepareDownloadTask(targetDirectory.get(), urlDownload);
             downloadTask.onSuccess(destination -> {
-                boolean isDuplicate = false;
+                boolean isDuplicate;
                 try {
                     isDuplicate = FileNameUniqueness.isDuplicatedFile(targetDirectory.get(), destination.getFileName(), dialogService);
                 } catch (IOException e) {

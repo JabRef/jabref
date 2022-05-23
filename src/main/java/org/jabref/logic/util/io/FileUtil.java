@@ -33,7 +33,7 @@ import org.slf4j.LoggerFactory;
 
 public class FileUtil {
 
-    public static final boolean IS_POSIX_COMPILANT = FileSystems.getDefault().supportedFileAttributeViews().contains("posix");
+    public static final boolean IS_POSIX_COMPLIANT = FileSystems.getDefault().supportedFileAttributeViews().contains("posix");
     public static final int MAXIMUM_FILE_NAME_LENGTH = 255;
     private static final Logger LOGGER = LoggerFactory.getLogger(FileUtil.class);
 
