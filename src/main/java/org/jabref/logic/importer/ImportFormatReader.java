@@ -193,7 +193,7 @@ public class ImportFormatReader {
                     parserResult.setPath(filePath);
                     return new UnknownFormatImport(ImportFormatReader.BIBTEX_FORMAT, parserResult);
                 } else {
-                    throw new ImportException(Localization.lang("Could not find a suitable import format."));
+                    throw new ImportException(Localization.lang("%0", parserResult.getErrorMessage()));
                 }
             } catch (IOException ignore) {
                 // Ignored

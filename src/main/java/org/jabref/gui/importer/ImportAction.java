@@ -77,6 +77,8 @@ public class ImportAction {
                 if (importError == null) {
                     // TODO: No control flow using exceptions
                     throw new JabRefException(Localization.lang("No entries found. Please make sure you are using the correct import filter."));
+                } else if (importError instanceof ImportException) {
+                    DefaultTaskExecutor.runAndWaitInJavaFXThread(() -> dialogService.showWarningDialogAndWait(Localization.lang("Import error"), importError.getLocalizedMessage()));
                 } else {
                     throw importError;
                 }
