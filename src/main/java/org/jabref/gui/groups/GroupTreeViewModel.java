@@ -1,5 +1,6 @@
 package org.jabref.gui.groups;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -299,14 +300,13 @@ public class GroupTreeViewModel extends AbstractViewModel {
             // final UndoableAddOrRemoveGroup undo = new UndoableAddOrRemoveGroup(groupsRoot, node, UndoableAddOrRemoveGroup.REMOVE_NODE_AND_CHILDREN);
             // panel.getUndoManager().addEdit(undo);
 
-            GroupNodeViewModel[] selectedGroupNodes = new GroupNodeViewModel[selectedGroups.size()];
-            selectedGroupNodes = selectedGroups.toArray(selectedGroupNodes);
-            for (GroupNodeViewModel eachNode : selectedGroupNodes) {
+            ArrayList<GroupNodeViewModel> selectedGroupNodes = new ArrayList<>(selectedGroups);
+            selectedGroupNodes.forEach(eachNode -> {
                 removeGroupsAndSubGroupsFromEntries(eachNode);
                 eachNode.getGroupNode().removeFromParent();
-            }
+            });
 
-            if (selectedGroupNodes.length > 1) {
+            if (selectedGroupNodes.size() > 1) {
                 dialogService.notify(Localization.lang("Removed all selected groups and their subgroups."));
             } else {
                 dialogService.notify(Localization.lang("Removed group \"%0\" and its subgroups.", group.getDisplayName()));
