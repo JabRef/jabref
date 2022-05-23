@@ -80,7 +80,8 @@ public class JabRefMain extends Application {
                 "writerFile.level", "info",
                 "writerFile.file", directory.resolve("log.txt").toString(),
                 "writerFile.charset", "UTF-8");
-        Configuration.replace(configuration);
+
+        configuration.entrySet().forEach(config -> Configuration.set(config.getKey(), config.getValue()));
         initializeLogger();
     }
 
