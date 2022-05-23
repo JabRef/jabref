@@ -1,3 +1,7 @@
+---
+parent: Architectural Decisions
+nav_order: 5
+---
 # Fully Support UTF-8 Only For LaTeX Files
 
 ## Context and Problem Statement

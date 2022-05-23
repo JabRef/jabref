@@ -34,4 +34,10 @@ class CitationStyleTest {
 
         assertEquals(expected, citation);
     }
+
+    @Test
+    void testDiscoverCitationStylesNotNull() throws Exception {
+        List<CitationStyle> styleList = CitationStyle.discoverCitationStyles();
+        assertNotNull(styleList);
+    }
 }
