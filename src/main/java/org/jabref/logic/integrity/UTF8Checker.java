@@ -52,6 +52,7 @@ public class UTF8Checker implements EntryChecker {
      * Check whether a byte array is encoded in UTF-8 charset
      *
      * Use java api decoder and try&catch block to check the charset.
+     *
      * @param data the byte array used to check the encoding charset
      * @return true if is encoded in UTF-8 & false is not encoded in UTF-8
      */

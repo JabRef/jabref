@@ -49,7 +49,6 @@ public class OpenDocumentSpreadsheetCreator extends Exporter {
     private static void storeOpenDocumentSpreadsheetFile(Path file, InputStream source) throws IOException {
 
         try (ZipOutputStream out = new ZipOutputStream(new BufferedOutputStream(Files.newOutputStream(file)))) {
-
             // addResourceFile("mimetype", "/resource/ods/mimetype", out);
             ZipEntry ze = new ZipEntry("mimetype");
             String mime = "application/vnd.oasis.opendocument.spreadsheet";
@@ -112,7 +111,6 @@ public class OpenDocumentSpreadsheetCreator extends Exporter {
         OpenDocumentRepresentation od = new OpenDocumentRepresentation(database, entries);
 
         try (Writer ps = new OutputStreamWriter(new FileOutputStream(tmpFile), StandardCharsets.UTF_8)) {
-
             DOMSource source = new DOMSource(od.getDOMrepresentation());
             StreamResult result = new StreamResult(ps);
             Transformer trans = TransformerFactory.newInstance().newTransformer();

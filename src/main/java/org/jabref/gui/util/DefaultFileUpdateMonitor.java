@@ -113,6 +113,5 @@ public class DefaultFileUpdateMonitor implements Runnable, FileUpdateMonitor {
         } catch (IOException e) {
             LOGGER.error("error closing watcher", e);
         }
-
     }
 }

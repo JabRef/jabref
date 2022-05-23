@@ -42,7 +42,6 @@ public class OpenOfficeFileSearch {
     }
 
     private static List<Path> findOpenOfficeDirectories(List<Path> programDirectories) {
-
         BiPredicate<Path, BasicFileAttributes> filePredicate = (path, attr) ->
                 attr.isDirectory() && (path.toString().toLowerCase(Locale.ROOT).contains("openoffice")
                         || path.toString().toLowerCase(Locale.ROOT).contains("libreoffice"));

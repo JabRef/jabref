@@ -109,7 +109,6 @@ class StringUtilTest {
 
     @Test
     void testShaveString() {
-
         assertEquals("", StringUtil.shaveString(null));
         assertEquals("", StringUtil.shaveString(""));
         assertEquals("aaa", StringUtil.shaveString("   aaa\t\t\n\r"));

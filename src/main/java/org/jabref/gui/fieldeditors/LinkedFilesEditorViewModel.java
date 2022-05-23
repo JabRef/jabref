@@ -202,7 +202,9 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
     }
 
     public void fetchFulltext() {
-        FulltextFetchers fetcher = new FulltextFetchers(preferences.getImportFormatPreferences());
+        FulltextFetchers fetcher = new FulltextFetchers(
+                preferences.getImportFormatPreferences(),
+                preferences.getImporterPreferences());
         BackgroundTask
                 .wrap(() -> fetcher.findFullTextPDF(entry))
                 .onRunning(() -> fulltextLookupInProgress.setValue(true))

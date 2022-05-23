@@ -58,6 +58,7 @@ open module org.jabref {
 
     // Microsoft application insights
     requires applicationinsights.core;
+    requires applicationinsights.logging.log4j2;
 
     // Libre Office
     requires org.libreoffice.uno;
@@ -71,7 +72,6 @@ open module org.jabref {
     requires fastparse;
     requires jbibtex;
     requires citeproc.java;
-    requires antlr.runtime;
     requires de.saxsys.mvvmfx.validation;
     requires com.google.gson;
     requires unirest.java;
@@ -85,9 +85,11 @@ open module org.jabref {
     requires org.mariadb.jdbc;
     uses org.mariadb.jdbc.credential.CredentialPlugin;
     requires org.apache.commons.lang3;
+    requires antlr.runtime;
     requires org.antlr.antlr4.runtime;
     requires org.fxmisc.flowless;
     requires org.apache.tika.core;
+    uses org.apache.tika.detect.AutoDetectReader;
     requires pdfbox;
     requires xmpbox;
     requires com.ibm.icu;
@@ -101,19 +103,20 @@ open module org.jabref {
 
     // fulltext search
     requires org.apache.lucene.core;
+    // In case the version is updated, please also adapt SearchFieldConstants#VERSION to the newly used version
     uses org.apache.lucene.codecs.lucene91.Lucene91Codec;
-    requires org.apache.lucene.backward_codecs;
-    uses org.apache.lucene.backward_codecs.lucene87.Lucene87Codec;
 
     requires org.apache.lucene.queryparser;
     uses org.apache.lucene.queryparser.classic.MultiFieldQueryParser;
     requires org.apache.lucene.analysis.common;
     requires org.apache.lucene.highlighter;
 
-
     requires com.fasterxml.jackson.databind;
     requires com.fasterxml.jackson.dataformat.yaml;
     requires com.fasterxml.jackson.datatype.jsr310;
     requires net.harawata.appdirs;
 
+    requires org.eclipse.jgit;
+    uses org.eclipse.jgit.transport.SshSessionFactory;
+    uses org.eclipse.jgit.lib.GpgSigner;
 }

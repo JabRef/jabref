@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <style xmlns="http://purl.org/net/xbiblio/csl" class="note" version="1.0" page-range-format="expanded" default-locale="fr-FR">
   <info>
-    <title>Centre de recherche sur les civilisations de l'Asie orientale (Français)</title>
-    <title-short>CRCAO</title-short>
+    <title>Centre de recherche sur les civilisations de l'Asie orientale (Français - note)</title>
+    <title-short>CRCAO (note)</title-short>
     <id>http://www.zotero.org/styles/centre-de-recherche-sur-les-civilisations-de-l-asie-orientale</id>
     <link href="http://www.zotero.org/styles/centre-de-recherche-sur-les-civilisations-de-l-asie-orientale" rel="self"/>
     <link href="https://github.com/citation-style-language/styles/pull/1385#issuecomment-73234582" rel="documentation"/>

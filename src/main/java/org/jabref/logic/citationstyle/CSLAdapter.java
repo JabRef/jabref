@@ -54,6 +54,7 @@ public class CSLAdapter {
     /**
      * Creates the bibliography of the provided items. This method needs to run synchronized because the underlying
      * CSL engine is not thread-safe.
+     *
      * @param databaseContext {@link BibDatabaseContext} is used to be able to resolve fields and their aliases
      */
     public synchronized List<String> makeBibliography(List<BibEntry> bibEntries, String style, CitationStyleOutputFormat outputFormat, BibDatabaseContext databaseContext, BibEntryTypesManager entryTypesManager) throws IOException, IllegalArgumentException {
@@ -99,7 +100,6 @@ public class CSLAdapter {
          * Converts the {@link BibEntry} into {@link CSLItemData}.
          */
         private static CSLItemData bibEntryToCSLItemData(BibEntry bibEntry, BibDatabaseContext bibDatabaseContext, BibEntryTypesManager entryTypesManager) {
-
             String citeKey = bibEntry.getCitationKey().orElse("");
             BibTeXEntry bibTeXEntry = new BibTeXEntry(new Key(bibEntry.getType().getName()), new Key(citeKey));
 
@@ -120,7 +120,6 @@ public class CSLAdapter {
                                 value = bibEntry.getMonth().map(Month::getShortName).orElse(value);
                             }
                             bibTeXEntry.addField(new Key(key.getName()), new DigitStringValue(value));
-
                         });
             }
             return BIBTEX_CONVERTER.toItemData(bibTeXEntry);
