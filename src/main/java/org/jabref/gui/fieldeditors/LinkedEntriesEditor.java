@@ -39,8 +39,6 @@ public class LinkedEntriesEditor extends HBox implements FieldEditorFX {
         HBox.setHgrow(entryLinkField, Priority.ALWAYS);
         Bindings.bindContentBidirectional(entryLinkField.getTags(), viewModel.linkedEntriesProperty());
 
-        getStyleClass().add("linked-entries-editor");
-
         getChildren().add(entryLinkField);
     }
 

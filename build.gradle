@@ -370,8 +370,6 @@ run {
                 'javafx.controls/com.sun.javafx.scene.control' : 'org.jabref',
                 'org.controlsfx.controls/impl.org.controlsfx.skin' : 'org.jabref',
 
-                'javafx.controls/com.sun.javafx.scene.control.behavior' : 'com.jfoenix',
-
                 // Not sure why we need to restate the controlfx exports
                 // Taken from here: https://github.com/controlsfx/controlsfx/blob/9.0.0/build.gradle#L1
                 'javafx.graphics/com.sun.javafx.scene' : 'org.controlsfx.controls',
@@ -392,12 +390,7 @@ run {
                 'javafx.controls/com.sun.javafx.scene.control' : 'org.jabref',
 
                 'javafx.controls/javafx.scene.control.skin' : 'org.controlsfx.controls',
-                'javafx.graphics/javafx.scene' : 'org.controlsfx.controls',
-
-                'javafx.controls/com.sun.javafx.scene.control.behavior' : 'com.jfoenix',
-                'javafx.base/com.sun.javafx.binding' : 'com.jfoenix',
-                'javafx.graphics/com.sun.javafx.stage' : 'com.jfoenix',
-                'javafx.base/com.sun.javafx.event' : 'com.jfoenix'
+                'javafx.graphics/javafx.scene' : 'org.controlsfx.controls'
         ]
     }
 }

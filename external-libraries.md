@@ -93,13 +93,6 @@ License: Apache-2.0
 ```
 
 ```yaml
-Id:      com.jfoenix:jfoenix
-Project: JavaFX MAterial Design Library
-URL:     https://github.com/jfoenixadmin/JFoenix
-License: Apache-2.0
-```
-
-```yaml
 Id:      com.konghq.unirest
 Project: Unirest for Java
 URL:     https://github.com/Kong/unirest-java
@@ -536,7 +529,6 @@ com.googlecode.javaewah:JavaEWAH:1.1.13
 com.h2database:h2-mvstore:2.1.212
 com.ibm.icu:icu4j-charset:70.1
 com.ibm.icu:icu4j:70.1
-com.jfoenix:jfoenix:9.0.10
 com.konghq:unirest-java:3.13.8
 com.microsoft.azure:applicationinsights-core:2.4.1
 com.microsoft.azure:applicationinsights-logging-log4j2:2.4.1

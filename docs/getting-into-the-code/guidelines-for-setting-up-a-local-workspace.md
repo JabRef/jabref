@@ -239,8 +239,6 @@ Make sure your Eclipse installation us up to date.
           --add-exports javafx.base/com.sun.javafx.runtime=org.controlsfx.controls
           --add-exports javafx.web/com.sun.webkit=org.controlsfx.controls
           --add-exports javafx.graphics/com.sun.javafx.css=org.controlsfx.controls
-          --add-exports javafx.controls/com.sun.javafx.scene.control.behavior=com.jfoenix
-          --add-exports javafx.graphics/com.sun.javafx.stage=com.jfoenix
           --add-exports com.oracle.truffle.regex/com.oracle.truffle.regex=org.graalvm.truffle
           --patch-module org.jabref=build/resources/main
        ```
@@ -258,7 +256,6 @@ In the run configuration, there is a "Build and run" section. At the "VM options
 --add-exports=org.controlsfx.controls/impl.org.controlsfx.skin=org.jabref  
 --add-exports javafx.graphics/com.sun.javafx.application=ALL-UNNAMED  
 --add-exports javafx.graphics/com.sun.javafx.stage=ALL-UNNAMED  
---add-exports javafx.graphics/com.sun.javafx.stage=com.jfoenix
 ```
 
 Now the test will run.
@@ -270,7 +267,6 @@ To run the `LocalizationConsistencyTest` you need to add some extra module infor
 ```
 --add-exports javafx.graphics/com.sun.javafx.application=ALL-UNNAMED
 --add-exports javafx.graphics/com.sun.javafx.stage=ALL-UNNAMED
---add-exports javafx.graphics/com.sun.javafx.stage=com.jfoenix
 ```
 
 ## Final comments
