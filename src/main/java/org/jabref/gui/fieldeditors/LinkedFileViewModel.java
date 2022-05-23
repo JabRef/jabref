@@ -14,7 +14,6 @@ import java.util.function.Supplier;
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLSocketFactory;
-import javax.xml.transform.TransformerException;
 
 import javafx.beans.Observable;
 import javafx.beans.property.BooleanProperty;
@@ -28,7 +27,6 @@ import javafx.scene.control.ButtonType;
 
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
-import org.jabref.gui.Globals;
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.externalfiles.FileDownloadTask;
 import org.jabref.gui.externalfiletype.ExternalFileType;
@@ -41,7 +39,6 @@ import org.jabref.gui.mergeentries.MultiMergeEntriesView;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.TaskExecutor;
-import org.jabref.logic.exporter.EmbeddedBibFilePdfExporter;
 import org.jabref.logic.externalfiles.LinkedFileHandler;
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
@@ -54,7 +51,6 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.util.io.FileNameUniqueness;
 import org.jabref.logic.util.io.FileUtil;
-import org.jabref.logic.xmp.XmpUtilWriter;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
@@ -417,33 +413,8 @@ public class LinkedFileViewModel extends AbstractViewModel {
         });
     }
 
-    public void writeMetadataToPdf(Runnable preWrite, Runnable postWrite) {
-        BackgroundTask<Void> writeTask = BackgroundTask.wrap(() -> {
-            Optional<Path> file = linkedFile.findIn(databaseContext, preferences.getFilePreferences());
-            if (file.isEmpty()) {
-                dialogService.notify(Localization.lang("Failed to write metadata, file %1 not found.", file.map(Path::toString).orElse("")));
-            } else {
-                synchronized (linkedFile) {
-                    try {
-                        // Similar code can be found at {@link org.jabref.gui.exporter.WriteMetadataToPdfAction.writeMetadataToFile}
-                        XmpUtilWriter.writeXmp(file.get(), entry, databaseContext.getDatabase(), preferences.getXmpPreferences());
-
-                        EmbeddedBibFilePdfExporter embeddedBibExporter = new EmbeddedBibFilePdfExporter(databaseContext.getMode(), Globals.entryTypesManager, preferences.getFieldWriterPreferences());
-                        embeddedBibExporter.exportToFileByPath(databaseContext, databaseContext.getDatabase(), preferences.getFilePreferences(), file.get());
-
-                        dialogService.notify(Localization.lang("Success! Finished writing metadata."));
-                    } catch (IOException | TransformerException ex) {
-                        dialogService.notify(Localization.lang("Error while writing metadata. See the error log for details."));
-                        LOGGER.error("Error while writing metadata to {}", file.map(Path::toString).orElse(""), ex);
-                    }
-                }
-            }
-            return null;
-        });
-        writeTask
-                .onRunning(preWrite)
-                .onFinished(postWrite);
-        taskExecutor.execute(writeTask);
+    public WriteMetadataToPdfCommand createWriteMetadataToPdfCommand() {
+        return new WriteMetadataToPdfCommand(linkedFile, databaseContext, preferences, dialogService, entry, LOGGER, taskExecutor);
     }
 
     public void download() {
