@@ -2,6 +2,7 @@ package org.jabref.logic.importer.fetcher;
 
 import java.util.Optional;
 
+import org.jabref.logic.importer.DOIDataNotFoundException;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.entry.BibEntry;
@@ -15,7 +16,6 @@ import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
 @FetcherTest
@@ -121,15 +121,13 @@ public class DoiFetcherTest {
     // test invalid DOI client error message "Client Error"
     @Test
     public void testPerformSearchInvalidDOIClientErrorMessage1() {
-        FetcherException exception = assertThrows(FetcherException.class, () -> fetcher.performSearchById("10.1002/9781118257517F"));
-        assertTrue(exception.getLocalizedMessage().contentEquals("Client Error"));
+        assertThrows(DOIDataNotFoundException.class, () -> fetcher.performSearchById("10.1002/9781118257517F"));
     }
 
     // test invalid DOI client error message "Client Error"
     @Test
     public void testPerformSearchInvalidDOIClientErrorMessage2() {
-        FetcherException exception = assertThrows(FetcherException.class, () -> fetcher.performSearchById("10.1002/9781517F"));
-        assertTrue(exception.getLocalizedMessage().contentEquals("Client Error"));
+        assertThrows(DOIDataNotFoundException.class, () -> fetcher.performSearchById("10.1002/9781517F"));
     }
 
     @Test

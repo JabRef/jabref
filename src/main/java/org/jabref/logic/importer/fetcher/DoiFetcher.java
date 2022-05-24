@@ -12,6 +12,8 @@ import org.jabref.logic.cleanup.FieldFormatterCleanup;
 import org.jabref.logic.formatter.bibtexfields.ClearFormatter;
 import org.jabref.logic.formatter.bibtexfields.NormalizePagesFormatter;
 import org.jabref.logic.help.HelpFile;
+import org.jabref.logic.importer.DOIDataNotFoundException;
+import org.jabref.logic.importer.DOIServerNotAvailableException;
 import org.jabref.logic.importer.EntryBasedFetcher;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.IdBasedFetcher;
@@ -83,9 +85,9 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
                     // an IOException will be thrown if download is unable to download from the doiURL
                     // dispatch the IOException
                     if (e instanceof FileNotFoundException) {
-                        throw new FetcherException(Localization.lang("Client Error"), e);
+                        throw new DOIDataNotFoundException(Localization.lang("Client Error"), e);
                     } else {
-                        throw new FetcherException(Localization.lang("Server Error"), e);
+                        throw new DOIServerNotAvailableException(Localization.lang("Server Error"), e);
                     }
                 }
 

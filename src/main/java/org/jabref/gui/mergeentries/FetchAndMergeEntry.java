@@ -16,6 +16,8 @@ import org.jabref.gui.undo.UndoableChangeType;
 import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.TaskExecutor;
+import org.jabref.logic.importer.DOIDataNotFoundException;
+import org.jabref.logic.importer.DOIServerNotAvailableException;
 import org.jabref.logic.importer.EntryBasedFetcher;
 import org.jabref.logic.importer.IdBasedFetcher;
 import org.jabref.logic.importer.ImportCleanup;
@@ -76,12 +78,11 @@ public class FetchAndMergeEntry {
                                   })
                                   .onFailure(exception -> {
                                       LOGGER.error("Error while fetching bibliographic information", exception);
-                                      String localMessage = exception.getLocalizedMessage();
                                       // client error
-                                      if (localMessage.startsWith("Client")) {
+                                      if (exception instanceof DOIDataNotFoundException) {
                                           dialogService.showInformationDialogAndWait(Localization.lang("Lookup DOI"), Localization.lang("No DOI data was found"));
                                       // server error
-                                      } else if (localMessage.startsWith("Server")) {
+                                      } else if (exception instanceof DOIServerNotAvailableException) {
                                           dialogService.showInformationDialogAndWait(Localization.lang("Lookup DOI"), Localization.lang("DOI server not available"));
                                       // default error
                                       } else {
