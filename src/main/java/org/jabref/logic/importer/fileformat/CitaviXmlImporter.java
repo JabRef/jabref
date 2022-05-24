@@ -225,6 +225,10 @@ public class CitaviXmlImporter extends Importer implements Parser {
     }
 
     private String getAuthorName(CitaviExchangeData.References.Reference data) {
+        if (authors == null) {
+            return null;
+        }
+
         int count = 0;
         int ref = 0;
         int start = 0;
@@ -274,6 +278,10 @@ public class CitaviXmlImporter extends Importer implements Parser {
     }
 
     private String getEditorName(CitaviExchangeData.References.Reference data) {
+        if (editors == null) {
+            return null;
+        }
+
         int count = 0;
         int ref = 0;
         int start = 0;
@@ -323,6 +331,10 @@ public class CitaviXmlImporter extends Importer implements Parser {
     }
 
     private String getKeywords(CitaviExchangeData.References.Reference data) {
+        if (keyword == null) {
+            return null;
+        }
+
         int count = 0;
         int ref = 0;
         int start = 0;
@@ -372,6 +384,10 @@ public class CitaviXmlImporter extends Importer implements Parser {
     }
 
     private String getPublisher(CitaviExchangeData.References.Reference data) {
+        if (publisher == null) {
+            return null;
+        }
+
         int ref = 0;
         StringBuilder words = new StringBuilder();
         outerLoop1:
