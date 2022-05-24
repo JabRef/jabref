@@ -249,6 +249,9 @@ public class EntryEditor extends BorderPane {
         entryEditorTabs.add(new OptionalFields2Tab(databaseContext, libraryTab.getSuggestionProviders(), undoManager, dialogService, preferencesService, stateManager, themeManager, libraryTab.getIndexingTaskManager(), bibEntryTypesManager, ExternalFileTypes.getInstance(), taskExecutor, Globals.journalAbbreviationRepository));
         entryEditorTabs.add(new DeprecatedFieldsTab(databaseContext, libraryTab.getSuggestionProviders(), undoManager, dialogService, preferencesService, stateManager, themeManager, libraryTab.getIndexingTaskManager(), bibEntryTypesManager, ExternalFileTypes.getInstance(), taskExecutor, Globals.journalAbbreviationRepository));
 
+        // new field
+        entryEditorTabs.add(new newField(databaseContext, libraryTab.getSuggestionProviders(), undoManager, dialogService, preferencesService, stateManager, themeManager, libraryTab.getIndexingTaskManager(), bibEntryTypesManager, ExternalFileTypes.getInstance(), taskExecutor, Globals.journalAbbreviationRepository));
+
         // Other fields
         entryEditorTabs.add(new OtherFieldsTab(databaseContext, libraryTab.getSuggestionProviders(), undoManager, dialogService, preferencesService, stateManager, themeManager, libraryTab.getIndexingTaskManager(), bibEntryTypesManager, ExternalFileTypes.getInstance(), taskExecutor, Globals.journalAbbreviationRepository));
 

@@ -17,6 +17,7 @@ import org.jabref.gui.autocompleter.SuggestionProviders;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.theme.ThemeManager;
+import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
@@ -30,12 +31,11 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.preferences.PreferencesService;
 
-public class OtherFieldsTab extends FieldsEditorTab {
-
+public class newField extends FieldsEditorTab {
     private final List<Field> customTabFieldNames;
     private final BibEntryTypesManager entryTypesManager;
 
-    public OtherFieldsTab(BibDatabaseContext databaseContext,
+    public newField(BibDatabaseContext databaseContext,
                           SuggestionProviders suggestionProviders,
                           UndoManager undoManager,
                           DialogService dialogService,
@@ -63,7 +63,7 @@ public class OtherFieldsTab extends FieldsEditorTab {
         this.entryTypesManager = entryTypesManager;
         this.customTabFieldNames = preferences.getAllDefaultTabFieldNames();
 
-        setText(Localization.lang("Other fields"));
+        setText(Localization.lang("Merged Fields"));
         setTooltip(new Tooltip(Localization.lang("Show remaining fields")));
         setGraphic(IconTheme.JabRefIcons.OPTIONAL.getGraphicNode());
     }
@@ -75,7 +75,7 @@ public class OtherFieldsTab extends FieldsEditorTab {
             Set<Field> allKnownFields = entryType.get().getAllFields();
             Set<Field> otherFields = entry.getFields().stream().filter(field -> !allKnownFields.contains(field)).collect(Collectors.toCollection(LinkedHashSet::new));
 
-           otherFields.removeAll(entryType.get().getDeprecatedFields());
+            otherFields.removeAll(entryType.get().getDeprecatedFields());
 //            otherFields.removeAll(entryType.get().getOptionalFields().stream().map(BibField::getField).collect(Collectors.toSet()));
 //            otherFields.remove(InternalField.KEY_FIELD);
 //            otherFields.removeAll(customTabFieldNames);

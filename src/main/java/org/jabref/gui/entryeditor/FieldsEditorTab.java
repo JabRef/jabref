@@ -136,7 +136,7 @@ abstract class FieldsEditorTab extends EntryEditorTab {
         columnDoNotContract.setMinWidth(Region.USE_PREF_SIZE);
         int rows;
         if (compressed) {
-            rows = (int) Math.ceil((double) fields.size() / 2);
+            rows = (int) Math.ceil((double) fields.size() / 1);
 
             addColumn(gridPane, 0, labels.subList(0, rows));
             addColumn(gridPane, 3, labels.subList(rows, labels.size()));
@@ -144,7 +144,7 @@ abstract class FieldsEditorTab extends EntryEditorTab {
             addColumn(gridPane, 4, editors.values().stream().map(FieldEditorFX::getNode).skip(rows));
 
             columnExpand.setPercentWidth(40);
-            gridPane.getColumnConstraints().addAll(columnDoNotContract, columnExpand, new ColumnConstraints(10),
+            gridPane.getColumnConstraints().addAll(columnDoNotContract, columnExpand, new ColumnConstraints(5),
                     columnDoNotContract, columnExpand);
 
             setCompressedRowLayout(gridPane, rows);
