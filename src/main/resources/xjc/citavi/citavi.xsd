@@ -88,6 +88,28 @@
             </xs:sequence>
           </xs:complexType>
         </xs:element>
+        <xs:element name="Publishers">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element maxOccurs="unbounded" name="Publisher">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="CreatedBy" type="xs:string" />
+                    <xs:element name="CreatedOn" type="xs:dateTime" />
+                    <xs:element name="ModifiedBy" type="xs:string" />
+                    <xs:element name="ModifiedOn" type="xs:dateTime" />
+                    <xs:element name="Name" type="xs:string" />
+                    <xs:element name="Notes" type="xs:string" />
+                    <xs:element name="Protected" type="xs:boolean" />
+                    <xs:element name="SortFullName" type="xs:string" />
+                    <xs:element name="UniqueFullName" type="xs:string" />
+                  </xs:sequence>
+                  <xs:attribute name="id" type="xs:string" use="required" />
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
         <xs:element name="Persons">
           <xs:complexType>
             <xs:sequence>
@@ -154,6 +176,41 @@
           </xs:complexType>
         </xs:element>
         <xs:element name="ReferenceAuthors">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element maxOccurs="unbounded" name="OnetoN" type="xs:string" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="ReferenceEditors">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element maxOccurs="unbounded" name="OnetoN" type="xs:string" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="ReferenceGroups">
+          <xs:complexType>
+            <xs:sequence>
+               <xs:element maxOccurs="unbounded" name="OnetoN" type="xs:string" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="ReferenceKeywords">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element maxOccurs="unbounded" name="OnetoN" type="xs:string" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="ReferenceOrganizations">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element maxOccurs="unbounded" name="OnetoN" type="xs:string" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="ReferencePublishers">
           <xs:complexType>
             <xs:sequence>
               <xs:element maxOccurs="unbounded" name="OnetoN" type="xs:string" />

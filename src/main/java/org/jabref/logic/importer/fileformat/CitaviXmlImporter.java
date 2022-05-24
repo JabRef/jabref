@@ -54,8 +54,13 @@ public class CitaviXmlImporter extends Importer implements Parser {
     private static final Logger LOGGER = LoggerFactory.getLogger(CitaviXmlImporter.class);
     private final ImportFormatPreferences preferences;
     private Unmarshaller unmarshaller;
-    private CitaviExchangeData.ReferenceAuthors authors;
     private CitaviExchangeData.Persons persons;
+    private CitaviExchangeData.Keywords keywords;
+    private CitaviExchangeData.Publishers publishers;
+    private CitaviExchangeData.ReferenceAuthors authors;
+    private CitaviExchangeData.ReferenceEditors editors;
+    private CitaviExchangeData.ReferenceKeywords keyword;
+    private CitaviExchangeData.ReferencePublishers publisher;
 
     public CitaviXmlImporter(ImportFormatPreferences preferences) {
         this.preferences = preferences;
@@ -132,6 +137,12 @@ public class CitaviXmlImporter extends Importer implements Parser {
         BibEntry entry = new BibEntry();
         authors = data.getReferenceAuthors();
         persons = data.getPersons();
+        editors = data.getReferenceEditors();
+        keywords = data.getKeywords();
+        keyword = data.getReferenceKeywords();
+        publishers = data.getPublishers();
+        publisher = data.getReferencePublishers();
+
         bibEntries = data
                 .getReferences().getReference()
                 .stream()
@@ -161,6 +172,12 @@ public class CitaviXmlImporter extends Importer implements Parser {
                 .ifPresent(value -> entry.setField(StandardField.VOLUME, clean(value)));
         Optional.of(getAuthorName(data))
                 .ifPresent(value -> entry.setField(StandardField.AUTHOR, value));
+        Optional.of(getEditorName(data))
+                .ifPresent(value -> entry.setField(StandardField.EDITOR, value));
+        Optional.of(getKeywords(data))
+                .ifPresent(value -> entry.setField(StandardField.KEYWORDS, value));
+        Optional.of(getPublisher(data))
+                .ifPresent(value -> entry.setField(StandardField.PUBLISHER, value));
 
         return entry;
     }
@@ -254,6 +271,137 @@ public class CitaviXmlImporter extends Importer implements Parser {
             }
         }
         return names.toString();
+    }
+
+    private String getEditorName(CitaviExchangeData.References.Reference data) {
+        int count = 0;
+        int ref = 0;
+        int start = 0;
+        StringBuilder names = new StringBuilder();
+        outerLoop1:
+        for (int i = 0; i < editors.getOnetoN().size(); i++) {
+            for (int j = 0; j < editors.getOnetoN().get(i).length(); j++) {
+                if (editors.getOnetoN().get(i).charAt(j) == ';') {
+                    if (editors.getOnetoN().get(i).substring(0, j).equals(data.getId())) {
+                        ref = i;
+                        break outerLoop1;
+                    } else {
+                        break;
+                    }
+                }
+            }
+            if (i == editors.getOnetoN().size() - 1) {
+                return names.toString();
+            }
+        }
+        outerLoop2:
+        for (int i = 0; i < editors.getOnetoN().get(ref).length(); i++) {
+            if (editors.getOnetoN().get(ref).charAt(i) == ';') {
+                count++;
+                if (count == 1) {
+                    start = i + 1;
+                } else if (count > 1) {
+                    for (int j = 0; j < persons.getPerson().size(); j++) {
+                        if (editors.getOnetoN().get(ref).substring(start, i).equals(persons.getPerson().get(j).getId())) {
+                            names.append(persons.getPerson().get(j).getFirstName()).append(" ").append(persons.getPerson().get(j).getLastName()).append(", ");
+                            start = i + 1;
+                            break;
+                        }
+                    }
+                }
+                if (i == editors.getOnetoN().get(ref).length() - 1 - 36) {
+                    for (int j = 0; j < persons.getPerson().size(); j++) {
+                        if (editors.getOnetoN().get(ref).substring(start).equals(persons.getPerson().get(j).getId())) {
+                            names.append(persons.getPerson().get(j).getFirstName()).append(" ").append(persons.getPerson().get(j).getLastName());
+                            break outerLoop2;
+                        }
+                    }
+                }
+            }
+        }
+        return names.toString();
+    }
+
+    private String getKeywords(CitaviExchangeData.References.Reference data) {
+        int count = 0;
+        int ref = 0;
+        int start = 0;
+        StringBuilder words = new StringBuilder();
+        outerLoop1:
+        for (int i = 0; i < keyword.getOnetoN().size(); i++) {
+            for (int j = 0; j < keyword.getOnetoN().get(i).length(); j++) {
+                if (keyword.getOnetoN().get(i).charAt(j) == ';') {
+                    if (keyword.getOnetoN().get(i).substring(0, j).equals(data.getId())) {
+                        ref = i;
+                        break outerLoop1;
+                    } else {
+                        break;
+                    }
+                }
+            }
+            if (i == keyword.getOnetoN().size() - 1) {
+                return words.toString();
+            }
+        }
+        outerLoop2:
+        for (int i = 0; i < keyword.getOnetoN().get(ref).length(); i++) {
+            if (keyword.getOnetoN().get(ref).charAt(i) == ';') {
+                count++;
+                if (count == 1) {
+                    start = i + 1;
+                } else if (count > 1) {
+                    for (int j = 0; j < keywords.getKeyword().size(); j++) {
+                        if (keyword.getOnetoN().get(ref).substring(start, i).equals(keywords.getKeyword().get(j).getId())) {
+                            words.append(keywords.getKeyword().get(j).getName()).append(", ");
+                            start = i + 1;
+                            break;
+                        }
+                    }
+                }
+                if (i == keyword.getOnetoN().get(ref).length() - 1 - 36) {
+                    for (int j = 0; j < keywords.getKeyword().size(); j++) {
+                        if (keyword.getOnetoN().get(ref).substring(start).equals(keywords.getKeyword().get(j).getId())) {
+                            words.append(keywords.getKeyword().get(j).getName());
+                            break outerLoop2;
+                        }
+                    }
+                }
+            }
+        }
+        return words.toString();
+    }
+
+    private String getPublisher(CitaviExchangeData.References.Reference data) {
+        int ref = 0;
+        StringBuilder words = new StringBuilder();
+        outerLoop1:
+        for (int i = 0; i < publisher.getOnetoN().size(); i++) {
+            for (int j = 0; j < publisher.getOnetoN().get(i).length(); j++) {
+                if (publisher.getOnetoN().get(i).charAt(j) == ';') {
+                    if (publisher.getOnetoN().get(i).substring(0, j).equals(data.getId())) {
+                        ref = i;
+                        break outerLoop1;
+                    } else {
+                        break;
+                    }
+                }
+            }
+            if (i == publisher.getOnetoN().size() - 1) {
+                return words.toString();
+            }
+        }
+        outerLoop2:
+        for (int i = 0; i < publisher.getOnetoN().get(ref).length(); i++) {
+            if (publisher.getOnetoN().get(ref).charAt(i) == ';') {
+                for (int j = 0; j < publishers.getPublisher().size(); j++) {
+                    if (publisher.getOnetoN().get(ref).substring(i + 1).equals(publishers.getPublisher().get(j).getId())) {
+                        words.append(publishers.getPublisher().get(j).getName());
+                        break outerLoop2;
+                    }
+                }
+            }
+        }
+        return words.toString();
     }
 
     private void initUnmarshaller() throws JAXBException {
