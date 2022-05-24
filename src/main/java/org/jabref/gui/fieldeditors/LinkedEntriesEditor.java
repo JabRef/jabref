@@ -68,8 +68,10 @@ public class LinkedEntriesEditor extends HBox implements FieldEditorFX {
                                                                       .contains(request.getUserText().toLowerCase()))
                                       .map(ParsedEntryLink::new).collect(Collectors.toList()));
             setConverter(viewModel.getStringConverter());
+            setNewItemProducer(searchText -> viewModel.getStringConverter().fromString(searchText));
             setMatcher((entryLink, searchText) -> entryLink.getKey().toLowerCase().startsWith(searchText.toLowerCase()));
             setComparator(Comparator.comparing(ParsedEntryLink::getKey));
+            setShowSearchIcon(false);
 
             setTagViewFactory((entryLink) -> {
                 Label tagLabel = new Label();
