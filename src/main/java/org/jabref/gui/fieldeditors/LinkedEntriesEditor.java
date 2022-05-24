@@ -5,6 +5,7 @@ import java.util.stream.Collectors;
 
 import javafx.beans.binding.Bindings;
 import javafx.fxml.FXML;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
@@ -67,22 +68,23 @@ public class LinkedEntriesEditor extends HBox implements FieldEditorFX {
                                       .filter(suggestion -> suggestion.getCitationKey().orElse("").toLowerCase()
                                                                       .contains(request.getUserText().toLowerCase()))
                                       .map(ParsedEntryLink::new).collect(Collectors.toList()));
+            setTagViewFactory(this::createTag);
             setConverter(viewModel.getStringConverter());
             setNewItemProducer(searchText -> viewModel.getStringConverter().fromString(searchText));
             setMatcher((entryLink, searchText) -> entryLink.getKey().toLowerCase().startsWith(searchText.toLowerCase()));
             setComparator(Comparator.comparing(ParsedEntryLink::getKey));
             setShowSearchIcon(false);
+        }
 
-            setTagViewFactory((entryLink) -> {
-                Label tagLabel = new Label();
-                tagLabel.setText(getConverter().toString(entryLink));
-                tagLabel.setOnMouseClicked(event -> {
-                    if (event.getClickCount() == 2) {
-                        viewModel.jumpToEntry(entryLink);
-                    }
-                });
-                return tagLabel;
+        private Node createTag(ParsedEntryLink entryLink) {
+            Label tagLabel = new Label();
+            tagLabel.setText(getConverter().toString(entryLink));
+            tagLabel.setOnMouseClicked(event -> {
+                if (event.getClickCount() == 2) {
+                    viewModel.jumpToEntry(entryLink);
+                }
             });
+            return tagLabel;
         }
     }
 }
