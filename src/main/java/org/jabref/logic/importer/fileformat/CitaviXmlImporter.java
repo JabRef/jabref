@@ -170,13 +170,13 @@ public class CitaviXmlImporter extends Importer implements Parser {
                 .ifPresent(value -> entry.setField(StandardField.PAGES, clean(value)));
         Optional.ofNullable(data.getVolume())
                 .ifPresent(value -> entry.setField(StandardField.VOLUME, clean(value)));
-        Optional.of(getAuthorName(data))
+        Optional.ofNullable(getAuthorName(data))
                 .ifPresent(value -> entry.setField(StandardField.AUTHOR, value));
-        Optional.of(getEditorName(data))
+        Optional.ofNullable(getEditorName(data))
                 .ifPresent(value -> entry.setField(StandardField.EDITOR, value));
-        Optional.of(getKeywords(data))
+        Optional.ofNullable(getKeywords(data))
                 .ifPresent(value -> entry.setField(StandardField.KEYWORDS, value));
-        Optional.of(getPublisher(data))
+        Optional.ofNullable(getPublisher(data))
                 .ifPresent(value -> entry.setField(StandardField.PUBLISHER, value));
 
         return entry;
