@@ -254,7 +254,7 @@ public class CitaviXmlImporter extends Importer implements Parser {
                 } else if (count > 1) {
                     for (int j = 0; j < persons.getPerson().size(); j++) {
                         if (authors.getOnetoN().get(ref).substring(start, i).equals(persons.getPerson().get(j).getId())) {
-                            names.append(persons.getPerson().get(j).getFirstName()).append(" ").append(persons.getPerson().get(j).getLastName()).append(", ");
+                            names.append(persons.getPerson().get(j).getFirstName()).append(" ").append(persons.getPerson().get(j).getLastName()).append(" and ");
                             start = i + 1;
                             break;
                         }
@@ -303,7 +303,7 @@ public class CitaviXmlImporter extends Importer implements Parser {
                 } else if (count > 1) {
                     for (int j = 0; j < persons.getPerson().size(); j++) {
                         if (editors.getOnetoN().get(ref).substring(start, i).equals(persons.getPerson().get(j).getId())) {
-                            names.append(persons.getPerson().get(j).getFirstName()).append(" ").append(persons.getPerson().get(j).getLastName()).append(", ");
+                            names.append(persons.getPerson().get(j).getFirstName()).append(" ").append(persons.getPerson().get(j).getLastName()).append(" and ");
                             start = i + 1;
                             break;
                         }
