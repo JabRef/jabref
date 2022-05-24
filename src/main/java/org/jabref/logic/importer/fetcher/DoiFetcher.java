@@ -116,17 +116,6 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
         }
     }
 
-    /**
-     * Returns client error or server error according to the message
-     *
-     * @param exception the IOException
-     */
-    private String dispatchIOException(IOException exception) {
-        String classification = "Client Error";
-
-        return classification;
-    }
-
     private void doPostCleanup(BibEntry entry) {
         new FieldFormatterCleanup(StandardField.PAGES, new NormalizePagesFormatter()).cleanup(entry);
         new FieldFormatterCleanup(StandardField.URL, new ClearFormatter()).cleanup(entry);
