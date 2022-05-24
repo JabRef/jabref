@@ -8,7 +8,6 @@ open module org.jabref {
     // JavaFX
     requires javafx.base;
     requires javafx.graphics;
-    requires javafx.swing;
     requires javafx.controls;
     requires javafx.web;
     requires javafx.fxml;

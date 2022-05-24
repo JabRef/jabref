@@ -97,7 +97,7 @@ configurations {
 
 javafx {
     version = "18"
-    modules = [ 'javafx.controls', 'javafx.fxml', 'javafx.web', 'javafx.swing' ]
+    modules = [ 'javafx.controls', 'javafx.fxml', 'javafx.web' ]
 }
 
 jacoco {
