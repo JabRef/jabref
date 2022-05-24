@@ -131,7 +131,7 @@ dependencies {
     implementation 'commons-cli:commons-cli:1.5.0'
 
     implementation 'org.libreoffice:libreoffice:7.3.3'
-    implementation 'org.libreoffice:unoloader:7.3.2'
+    implementation 'org.libreoffice:unoloader:7.3.3'
 
     implementation 'io.github.java-diff-utils:java-diff-utils:4.11'
     implementation 'info.debatty:java-string-similarity:2.0.0'
@@ -172,8 +172,9 @@ dependencies {
     implementation 'org.fxmisc.flowless:flowless:0.6.9'
     implementation 'org.fxmisc.richtext:richtextfx:0.10.9'
     implementation group: 'org.glassfish.hk2.external', name: 'jakarta.inject', version: '2.6.1'
-    implementation (group: 'com.dlsc.gemsfx', name: 'gemsfx', version: '1.45.2') {
+    implementation ('com.dlsc.gemsfx:gemsfx:1.47.0') {
         exclude module: 'javax.inject' // Split package, use only jakarta.inject
+        exclude group: 'com.dlsc.unitfx'
     }
 
     implementation 'org.controlsfx:controlsfx:11.1.1'
