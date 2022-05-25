@@ -439,9 +439,14 @@ public class GlobalSearchBar extends HBox {
             if (suggestion != null) {
                 // Check what class the suggestion is, then add to the search bar
                 if (suggestion.getClass() == BibEntry.class){
-                    // Update the search bar to contain the text author=suggestion
+                    // Update the search bar to contain the text title=suggestion
                     String searchTerm = this.control.getConverter().toString(suggestion);
                     searchField.setText("title=" + searchTerm);
+                }
+                if (suggestion.getClass() == Author.class){
+                    // Update the search bar to contain the text author=suggestion
+                    String searchTerm = this.control.getConverter().toString(suggestion);
+                    searchField.setText("author="+searchTerm);
                 }
                 // Event.fireEvent(this.control, new AutoCompletePopup.SuggestionEvent<>(suggestion));
             }
