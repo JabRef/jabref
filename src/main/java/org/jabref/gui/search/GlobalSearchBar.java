@@ -18,7 +18,6 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.css.PseudoClass;
-import javafx.event.Event;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
@@ -34,15 +33,13 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 
-import javafx.util.StringConverter;
 import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.Globals;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.StateManager;
-import org.jabref.gui.autocompleter.AppendPersonNamesStrategy;
-import org.jabref.gui.autocompleter.AutoCompleteFirstNameMode;
+import org.jabref.gui.autocompleter.AppendWordsStrategy;
 import org.jabref.gui.autocompleter.AutoCompletionTextInputBinding;
-import org.jabref.gui.autocompleter.PersonNameStringConverter;
+import org.jabref.gui.autocompleter.TitleStringConverter;
 import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.icon.IconTheme;
@@ -57,6 +54,7 @@ import org.jabref.gui.util.TooltipTextUtil;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.search.SearchQuery;
 import org.jabref.model.entry.Author;
+import org.jabref.model.entry.BibEntry;
 import org.jabref.model.search.rules.SearchRules;
 import org.jabref.preferences.PreferencesService;
 import org.jabref.preferences.SearchPreferences;
@@ -309,13 +307,13 @@ public class GlobalSearchBar extends HBox {
         currentResults.setText(illegalSearch);
     }
 
-    public void setAutoCompleter(SuggestionProvider<Author> searchCompleter) {
+    public void setAutoCompleter(SuggestionProvider<BibEntry> searchCompleter) {
         if (preferencesService.getAutoCompletePreferences().shouldAutoComplete()) {
-            AutoCompletionTextInputBinding<Author> autoComplete = AutoCompletionTextInputBinding.autoComplete(searchField,
+            AutoCompletionTextInputBinding<BibEntry> autoComplete = AutoCompletionTextInputBinding.autoComplete(searchField,
                     searchCompleter::provideSuggestions,
-                    new PersonNameStringConverter(false, false, AutoCompleteFirstNameMode.BOTH),
-                    new AppendPersonNamesStrategy());
-            AutoCompletePopup<Author> popup = getPopup(autoComplete);
+                    new TitleStringConverter(),
+                    new AppendWordsStrategy());
+            AutoCompletePopup<BibEntry> popup = getPopup(autoComplete);
             popup.setSkin(new SearchPopupSkin<>(popup));
         }
     }
@@ -442,15 +440,21 @@ public class GlobalSearchBar extends HBox {
             });
         }
 
+        @SuppressWarnings("checkstyle:WhitespaceAround")
         private void onSuggestionChosen(T suggestion) {
             if (suggestion != null) {
-                //Check what class the suggestion is, then add to the search bar
-                if(suggestion.getClass() == Author.class){
-                    //Update the search bar to contain the text author=suggestion
+                // Check what class the suggestion is, then add to the search bar
+                if (suggestion.getClass() == BibEntry.class){
+                    // Update the search bar to contain the text title=suggestion
+                    String searchTerm = this.control.getConverter().toString(suggestion);
+                    searchField.setText("title=" + searchTerm);
+                }
+                if (suggestion.getClass() == Author.class){
+                    // Update the search bar to contain the text author=suggestion
                     String searchTerm = this.control.getConverter().toString(suggestion);
                     searchField.setText("author="+searchTerm);
                 }
-                //Event.fireEvent(this.control, new AutoCompletePopup.SuggestionEvent<>(suggestion));
+                // Event.fireEvent(this.control, new AutoCompletePopup.SuggestionEvent<>(suggestion));
             }
         }
 

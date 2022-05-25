@@ -23,8 +23,8 @@ import javafx.scene.layout.BorderPane;
 import javafx.util.Duration;
 
 import org.jabref.gui.autocompleter.AutoCompletePreferences;
-import org.jabref.gui.autocompleter.PersonNameSuggestionProvider;
 import org.jabref.gui.autocompleter.SuggestionProviders;
+import org.jabref.gui.autocompleter.TitleSuggestionProvider;
 import org.jabref.gui.collab.DatabaseChangeMonitor;
 import org.jabref.gui.dialogs.AutosaveUiManager;
 import org.jabref.gui.entryeditor.EntryEditor;
@@ -100,7 +100,7 @@ public class LibraryTab extends Tab {
     private DatabaseNotification databaseNotificationPane;
 
     private boolean saving;
-    private PersonNameSuggestionProvider searchAutoCompleter;
+    private TitleSuggestionProvider searchAutoCompleter;
     // Used to track whether the base has changed since last save.
     private BibEntry showing;
     private SuggestionProviders suggestionProviders;
@@ -533,7 +533,7 @@ public class LibraryTab extends Tab {
             // Create empty suggestion providers if auto completion is deactivated
             suggestionProviders = new SuggestionProviders();
         }
-        searchAutoCompleter = new PersonNameSuggestionProvider(FieldFactory.getPersonNameFields(), getDatabase());
+        searchAutoCompleter = new TitleSuggestionProvider(getDatabase());
     }
 
     public void updateSearchManager() {
