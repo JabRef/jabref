@@ -126,7 +126,7 @@ public class ImporterTest {
                 new RepecNepImporter(importFormatPreferences),
                 new RisImporter(),
                 new SilverPlatterImporter(),
-                new CitaviXmlImporter(importFormatPreferences)
+                new CitaviXmlImporter()
         );
         // @formatter:on
     }

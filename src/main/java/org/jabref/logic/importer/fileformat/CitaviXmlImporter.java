@@ -26,12 +26,13 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
-import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.citavi.CitaviExchangeData;
 import org.jabref.logic.util.StandardFileType;
+import org.jabref.model.entry.Author;
+import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.EntryType;
@@ -52,7 +53,6 @@ import org.slf4j.LoggerFactory;
 public class CitaviXmlImporter extends Importer implements Parser {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CitaviXmlImporter.class);
-    private final ImportFormatPreferences preferences;
     private Unmarshaller unmarshaller;
     private CitaviExchangeData.Persons persons;
     private CitaviExchangeData.Keywords keywords;
@@ -62,9 +62,6 @@ public class CitaviXmlImporter extends Importer implements Parser {
     private CitaviExchangeData.ReferenceKeywords keyword;
     private CitaviExchangeData.ReferencePublishers publisher;
 
-    public CitaviXmlImporter(ImportFormatPreferences preferences) {
-        this.preferences = preferences;
-    }
 
     @Override
     public String getName() {
@@ -94,27 +91,25 @@ public class CitaviXmlImporter extends Importer implements Parser {
 
     @Override
     public boolean isRecognizedFormat(Path filePath) throws IOException {
-        BufferedReader reader = getReaderFromZip(filePath);
+        try (BufferedReader reader = getReaderFromZip(filePath)) {
 
-        String str;
-        int i = 0;
-        while (((str = reader.readLine()) != null) && (i < 50)) {
-            if (str.toLowerCase(Locale.ENGLISH).contains("citaviexchangedata")) {
-                return true;
+            String str;
+            int i = 0;
+            while (((str = reader.readLine()) != null) && (i < 50)) {
+                if (str.toLowerCase(Locale.ENGLISH).contains("citaviexchangedata")) {
+                    return true;
+                }
+
+                i++;
             }
-
-            i++;
         }
         return false;
     }
 
     @Override
     public ParserResult importDatabase(Path filePath) throws IOException {
-        BufferedReader reader = getReaderFromZip(filePath);
 
-        Objects.requireNonNull(reader);
-
-        try {
+        try (BufferedReader reader = getReaderFromZip(filePath)) {
             Object unmarshalledObject = unmarshallRoot(reader);
 
             if (unmarshalledObject instanceof CitaviExchangeData) {
@@ -134,7 +129,7 @@ public class CitaviXmlImporter extends Importer implements Parser {
 
     private List<BibEntry> parseDataList(CitaviExchangeData data) {
         List<BibEntry> bibEntries = new ArrayList<>();
-        BibEntry entry = new BibEntry();
+
         authors = data.getReferenceAuthors();
         persons = data.getPersons();
         editors = data.getReferenceEditors();
@@ -202,18 +197,18 @@ public class CitaviXmlImporter extends Importer implements Parser {
 
     private String getPages(CitaviExchangeData.References.Reference data) {
         String tmpStr = "";
-        if (data.getPageCount() != null && data.getPageRange() == null) {
+        if ((data.getPageCount() != null) && (data.getPageRange() == null)) {
             tmpStr = data.getPageCount();
-        } else if (data.getPageCount() == null && data.getPageRange() != null) {
+        } else if ((data.getPageCount() == null) && (data.getPageRange() != null)) {
             tmpStr = data.getPageRange();
-        } else if (data.getPageCount() == null && data.getPageRange() == null) {
+        } else if ((data.getPageCount() == null) && (data.getPageRange() == null)) {
             return null;
         }
         int count = 0;
         String pages = "";
         for (int i = tmpStr.length() - 1; i >= 0; i--) {
             if (count == 2) {
-                pages = tmpStr.substring(i + 2, tmpStr.length() - 1 - 5 + 1);
+                pages = tmpStr.substring(i + 2, (tmpStr.length() - 1 - 5) + 1);
                 break;
             } else {
                 if (tmpStr.charAt(i) == '>') {
@@ -229,6 +224,8 @@ public class CitaviXmlImporter extends Importer implements Parser {
             return null;
         }
 
+        List<Author> jabrefAuthors = new ArrayList<>();
+
         int count = 0;
         int ref = 0;
         int start = 0;
@@ -236,6 +233,7 @@ public class CitaviXmlImporter extends Importer implements Parser {
         outerLoop1:
         for (int i = 0; i < authors.getOnetoN().size(); i++) {
             for (int j = 0; j < authors.getOnetoN().get(i).length(); j++) {
+
                 if (authors.getOnetoN().get(i).charAt(j) == ';') {
                     if (authors.getOnetoN().get(i).substring(0, j).equals(data.getId())) {
                         ref = i;
@@ -245,7 +243,7 @@ public class CitaviXmlImporter extends Importer implements Parser {
                     }
                 }
             }
-            if (i == authors.getOnetoN().size() - 1) {
+            if (i == (authors.getOnetoN().size() - 1)) {
                 return names.toString();
             }
         }
@@ -258,24 +256,26 @@ public class CitaviXmlImporter extends Importer implements Parser {
                 } else if (count > 1) {
                     for (int j = 0; j < persons.getPerson().size(); j++) {
                         if (authors.getOnetoN().get(ref).substring(start, i).equals(persons.getPerson().get(j).getId())) {
-                            names.append(persons.getPerson().get(j).getFirstName()).append(" ").append(persons.getPerson().get(j).getLastName()).append(" and ");
+                            jabrefAuthors.add(new Author(persons.getPerson().get(j).getFirstName(), "", "" , persons.getPerson().get(j).getLastName(), ""));
                             start = i + 1;
                             break;
                         }
                     }
                 }
-                if (i == authors.getOnetoN().get(ref).length() - 1 - 36) {
+                if (i == (authors.getOnetoN().get(ref).length() - 1 - 36)) {
                     for (int j = 0; j < persons.getPerson().size(); j++) {
                         if (authors.getOnetoN().get(ref).substring(start).equals(persons.getPerson().get(j).getId())) {
-                            names.append(persons.getPerson().get(j).getFirstName()).append(" ").append(persons.getPerson().get(j).getLastName());
+                            jabrefAuthors.add(new Author(persons.getPerson().get(j).getFirstName(), "", "" , persons.getPerson().get(j).getLastName(), ""));
                             break outerLoop2;
                         }
                     }
                 }
             }
         }
-        return names.toString();
+        return AuthorList.of(jabrefAuthors).getAsLastFirstFirstLastNamesWithAnd(false);
+
     }
+
 
     private String getEditorName(CitaviExchangeData.References.Reference data) {
         if (editors == null) {
@@ -298,7 +298,7 @@ public class CitaviXmlImporter extends Importer implements Parser {
                     }
                 }
             }
-            if (i == editors.getOnetoN().size() - 1) {
+            if (i == (editors.getOnetoN().size() - 1)) {
                 return names.toString();
             }
         }
@@ -317,7 +317,7 @@ public class CitaviXmlImporter extends Importer implements Parser {
                         }
                     }
                 }
-                if (i == editors.getOnetoN().get(ref).length() - 1 - 36) {
+                if (i == (editors.getOnetoN().get(ref).length() - 1 - 36)) {
                     for (int j = 0; j < persons.getPerson().size(); j++) {
                         if (editors.getOnetoN().get(ref).substring(start).equals(persons.getPerson().get(j).getId())) {
                             names.append(persons.getPerson().get(j).getFirstName()).append(" ").append(persons.getPerson().get(j).getLastName());
@@ -351,7 +351,7 @@ public class CitaviXmlImporter extends Importer implements Parser {
                     }
                 }
             }
-            if (i == keyword.getOnetoN().size() - 1) {
+            if (i == (keyword.getOnetoN().size() - 1)) {
                 return words.toString();
             }
         }
@@ -370,7 +370,7 @@ public class CitaviXmlImporter extends Importer implements Parser {
                         }
                     }
                 }
-                if (i == keyword.getOnetoN().get(ref).length() - 1 - 36) {
+                if (i == (keyword.getOnetoN().get(ref).length() - 1 - 36)) {
                     for (int j = 0; j < keywords.getKeyword().size(); j++) {
                         if (keyword.getOnetoN().get(ref).substring(start).equals(keywords.getKeyword().get(j).getId())) {
                             words.append(keywords.getKeyword().get(j).getName());
@@ -402,7 +402,7 @@ public class CitaviXmlImporter extends Importer implements Parser {
                     }
                 }
             }
-            if (i == publisher.getOnetoN().size() - 1) {
+            if (i == (publisher.getOnetoN().size() - 1)) {
                 return words.toString();
             }
         }
@@ -442,6 +442,7 @@ public class CitaviXmlImporter extends Importer implements Parser {
         return unmarshaller.unmarshal(xmlStreamReader);
     }
 
+    @Override
     public ParserResult importDatabase(BufferedReader reader) throws IOException {
         Objects.requireNonNull(reader);
         throw new UnsupportedOperationException("CitaviXmlImporter does not support importDatabase(BufferedReader reader)."
@@ -488,7 +489,7 @@ public class CitaviXmlImporter extends Importer implements Parser {
         PushbackInputStream pushbackInputStream = new PushbackInputStream(new BufferedInputStream(inputStream), 3);
         byte[] bom = new byte[3];
         if (pushbackInputStream.read(bom) != -1) {
-            if (!(bom[0] == (byte) 0xEF && bom[1] == (byte) 0xBB && bom[2] == (byte) 0xBF)) {
+            if (!((bom[0] == (byte) 0xEF) && (bom[1] == (byte) 0xBB) && (bom[2] == (byte) 0xBF))) {
                 pushbackInputStream.unread(bom);
             }
         }
