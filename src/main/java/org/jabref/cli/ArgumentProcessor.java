@@ -157,7 +157,8 @@ public class ArgumentProcessor {
                 // * means "guess the format":
                 System.out.println(Localization.lang("Importing in unknown format") + ": " + file);
 
-                ImportFormatReader.UnknownFormatImport importResult = Globals.IMPORT_FORMAT_READER.importUnknownFormat(file, new DummyFileUpdateMonitor());
+                ImportFormatReader.UnknownFormatImport importResult =
+                        Globals.IMPORT_FORMAT_READER.importUnknownFormat(file, new DummyFileUpdateMonitor());
 
                 System.out.println(Localization.lang("Format used") + ": " + importResult.format);
                 return Optional.of(importResult.parserResult);
@@ -178,7 +179,6 @@ public class ArgumentProcessor {
     }
 
     private List<ParserResult> processArguments() {
-
         if (!cli.isBlank() && cli.isDebugLogging()) {
             System.err.println("use java property -Dtinylog.level=debug");
         }
@@ -301,7 +301,6 @@ public class ArgumentProcessor {
 
         writeMetadatatoPdfByCitekey(databaseContext, dataBase, citeKeys, filePreferences, xmpPdfExporter, embeddedBibFilePdfExporter, writeXMP, embeddBibfile);
         writeMetadatatoPdfByFileNames(databaseContext, dataBase, pdfs, filePreferences, xmpPdfExporter, embeddedBibFilePdfExporter, writeXMP, embeddBibfile);
-
     }
 
     private void writeMetadatatoPDFsOfEntry(BibDatabaseContext databaseContext, String citeKey, BibEntry entry, FilePreferences filePreferences, XmpPdfExporter xmpPdfExporter, EmbeddedBibFilePdfExporter embeddedBibFilePdfExporter, boolean writeXMP, boolean embeddBibfile) {
@@ -528,7 +527,11 @@ public class ArgumentProcessor {
             SavePreferences savePreferences = preferencesService.getSavePreferences();
             AtomicFileWriter fileWriter = new AtomicFileWriter(Path.of(subName), StandardCharsets.UTF_8);
             BibWriter bibWriter = new BibWriter(fileWriter, OS.NEWLINE);
-            BibDatabaseWriter databaseWriter = new BibtexDatabaseWriter(bibWriter, generalPreferences, savePreferences, Globals.entryTypesManager);
+            BibDatabaseWriter databaseWriter = new BibtexDatabaseWriter(
+                    bibWriter,
+                    generalPreferences,
+                    savePreferences,
+                    Globals.entryTypesManager);
             databaseWriter.saveDatabase(new BibDatabaseContext(newBase));
 
             // Show just a warning message if encoding did not work for all characters:
@@ -588,13 +591,20 @@ public class ArgumentProcessor {
             preferencesService.importPreferences(Path.of(cli.getPreferencesImport()));
             Globals.entryTypesManager.addCustomOrModifiedTypes(preferencesService.getBibEntryTypes(BibDatabaseMode.BIBTEX),
                     preferencesService.getBibEntryTypes(BibDatabaseMode.BIBLATEX));
-            List<TemplateExporter> customExporters = preferencesService.getCustomExportFormats(Globals.journalAbbreviationRepository);
+            List<TemplateExporter> customExporters =
+                    preferencesService.getCustomExportFormats(Globals.journalAbbreviationRepository);
             LayoutFormatterPreferences layoutPreferences =
                     preferencesService.getLayoutFormatterPreferences(Globals.journalAbbreviationRepository);
             SavePreferences savePreferences = preferencesService.getSavePreferencesForExport();
             XmpPreferences xmpPreferences = preferencesService.getXmpPreferences();
             BibDatabaseMode bibDatabaseMode = preferencesService.getGeneralPreferences().getDefaultBibDatabaseMode();
-            Globals.exportFactory = ExporterFactory.create(customExporters, layoutPreferences, savePreferences, xmpPreferences, bibDatabaseMode, Globals.entryTypesManager);
+            Globals.exportFactory = ExporterFactory.create(
+                    customExporters,
+                    layoutPreferences,
+                    savePreferences,
+                    xmpPreferences,
+                    bibDatabaseMode,
+                    Globals.entryTypesManager);
         } catch (JabRefException ex) {
             LOGGER.error("Cannot import preferences", ex);
         }
@@ -668,7 +678,9 @@ public class ArgumentProcessor {
         String engine = split[0];
         String query = split[1];
 
-        Set<SearchBasedFetcher> fetchers = WebFetchers.getSearchBasedFetchers(preferencesService.getImportFormatPreferences());
+        Set<SearchBasedFetcher> fetchers = WebFetchers.getSearchBasedFetchers(
+                preferencesService.getImportFormatPreferences(),
+                preferencesService.getImporterPreferences());
         Optional<SearchBasedFetcher> selectedFetcher = fetchers.stream()
                                                                .filter(fetcher -> fetcher.getName().equalsIgnoreCase(engine))
                                                                .findFirst();

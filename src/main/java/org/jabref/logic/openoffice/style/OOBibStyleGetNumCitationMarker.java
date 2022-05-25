@@ -112,7 +112,6 @@ class OOBibStyleGetNumCitationMarker {
         }
 
         if (blockSize >= 2) {
-
             /*
              * Check assumptions
              */
@@ -147,7 +146,6 @@ class OOBibStyleGetNumCitationMarker {
                 stringBuilder.append(style.getGroupedNumbersSeparator());
                 stringBuilder.append(last);
             } else {
-
                 // Emit: first, first+1,..., last
                 for (int j = 0; j < blockSize; j++) {
                     if (j > 0) {
@@ -217,7 +215,6 @@ class OOBibStyleGetNumCitationMarker {
         List<CitationMarkerNumericEntry> nextBlock = new ArrayList<>();
 
         for (int i = 0; i < nCitations; i++) {
-
             final CitationMarkerNumericEntry current = sorted.get(i);
             if (current.getNumber().isPresent() && current.getNumber().get() < 0) {
                 throw new IllegalArgumentException("getNumCitationMarker2: found negative number");
@@ -254,7 +251,6 @@ class OOBibStyleGetNumCitationMarker {
                 currentBlock = nextBlock;
                 nextBlock = new ArrayList<>();
             }
-
         }
 
         if (!nextBlock.isEmpty()) {
@@ -273,5 +269,4 @@ class OOBibStyleGetNumCitationMarker {
         stringBuilder.append(bracketAfter);
         return OOText.fromString(stringBuilder.toString());
     }
-
 }

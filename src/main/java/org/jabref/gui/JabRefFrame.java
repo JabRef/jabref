@@ -300,7 +300,6 @@ public class JabRefFrame extends BorderPane {
     private void initShowTrackingNotification() {
         if (prefs.getTelemetryPreferences().shouldAskToCollectTelemetry()) {
             JabRefExecutorService.INSTANCE.submit(new TimerTask() {
-
                 @Override
                 public void run() {
                     DefaultTaskExecutor.runInJavaFXThread(JabRefFrame.this::showTrackingNotification);
@@ -445,7 +444,6 @@ public class JabRefFrame extends BorderPane {
 
         // We need to wait with setting the divider since it gets reset a few times during the initial set-up
         mainStage.showingProperty().addListener(new InvalidationListener() {
-
             @Override
             public void invalidated(Observable observable) {
                 if (mainStage.isShowing()) {
@@ -531,14 +529,12 @@ public class JabRefFrame extends BorderPane {
                 new Separator(Orientation.VERTICAL),
 
                 new HBox(
-                        factory.createIconButton(StandardActions.OPEN_GITHUB, new OpenBrowserAction("https://github.com/JabRef/jabref")),
-                        factory.createIconButton(StandardActions.OPEN_FACEBOOK, new OpenBrowserAction("https://www.facebook.com/JabRef/")),
-                        factory.createIconButton(StandardActions.OPEN_TWITTER, new OpenBrowserAction("https://twitter.com/jabref_org"))),
+                        createTaskIndicator()),
 
                 new Separator(Orientation.VERTICAL),
 
                 new HBox(
-                        createTaskIndicator()));
+                        factory.createIconButton(StandardActions.OPEN_GITHUB, new OpenBrowserAction("https://github.com/JabRef/jabref"))));
 
         leftSpacer.setPrefWidth(50);
         leftSpacer.setMinWidth(Region.USE_PREF_SIZE);

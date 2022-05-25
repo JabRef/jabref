@@ -1,3 +1,7 @@
+---
+parent: Architectural Decisions
+nav_order: 6
+---
 # Only translated strings in language file
 
 ## Context and Problem Statement

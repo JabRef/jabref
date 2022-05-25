@@ -137,7 +137,6 @@ public class OOFrontend {
         // build final list
         List<RangeSortEntry<CitationGroup>> result = new ArrayList<>();
         for (List<RangeSortEntry<CitationGroup>> partition : partitions.getPartitions()) {
-
             int indexInPartition = 0;
             for (RangeSortEntry<CitationGroup> sortable : partition) {
                 sortable.setIndexInPosition(indexInPartition++);
@@ -327,7 +326,6 @@ public class OOFrontend {
     }
 
     public List<RangeForOverlapCheck<CitationGroupId>> viewCursorRanges(XTextDocument doc) {
-
         List<RangeForOverlapCheck<CitationGroupId>> result = new ArrayList<>();
 
         Optional<XTextRange> range = UnoCursor.getViewCursor(doc).map(e -> e);
@@ -348,7 +346,6 @@ public class OOFrontend {
      */
     public List<RangeForOverlapCheck<CitationGroupId>>
     footnoteMarkRanges(XTextDocument doc, List<RangeForOverlapCheck<CitationGroupId>> citationRanges) {
-
         // We partition by XText and use a single range from
         // each partition to get at the corresponding footnotemark range.
 
@@ -381,7 +378,6 @@ public class OOFrontend {
     }
 
     static String rangeOverlapsToMessage(List<RangeOverlap<RangeForOverlapCheck<CitationGroupId>>> overlaps) {
-
         if (overlaps.isEmpty()) {
             return "(*no overlaps*)";
         }

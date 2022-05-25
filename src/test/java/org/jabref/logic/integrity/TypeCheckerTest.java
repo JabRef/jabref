@@ -29,5 +29,4 @@ public class TypeCheckerTest {
         entry.setField(StandardField.PAGES, "11--15");
         assertEquals(List.of(new IntegrityMessage("wrong entry type as proceedings has page numbers", entry, StandardField.PAGES)), checker.check(entry));
     }
-
 }

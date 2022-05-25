@@ -64,7 +64,7 @@ public class PdfEmbeddedBibFileImporter extends Importer {
 
     @Override
     public ParserResult importDatabase(Path filePath) {
-        try (PDDocument document = XmpUtilReader.loadWithAutomaticDecryption(filePath)) {
+        try (PDDocument document = new XmpUtilReader().loadWithAutomaticDecryption(filePath)) {
             return new ParserResult(getEmbeddedBibFileEntries(document));
         } catch (EncryptedPdfsNotSupportedException e) {
             return ParserResult.fromErrorMessage(Localization.lang("Decryption not supported."));
@@ -163,5 +163,4 @@ public class PdfEmbeddedBibFileImporter extends Importer {
     public String getDescription() {
         return "PdfEmbeddedBibFileImporter imports an embedded Bib-File from the PDF.";
     }
-
 }

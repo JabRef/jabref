@@ -57,8 +57,8 @@ public class GvkParser implements Parser {
             return result;
         }
         List<Element> records = getChildren("zs:record", srwrecords);
-        for (Element record : records) {
-            Element e = getChild("zs:recordData", record);
+        for (Element gvkRecord : records) {
+            Element e = getChild("zs:recordData", gvkRecord);
             if (e != null) {
                 e = getChild("record", e);
                 if (e != null) {

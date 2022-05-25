@@ -59,9 +59,14 @@ public class EntryTypeViewModel {
         this.preferencesService = preferences;
         this.dialogService = dialogService;
         this.stateManager = stateManager;
-        fetchers.addAll(WebFetchers.getIdBasedFetchers(preferences.getImportFormatPreferences()));
+        fetchers.addAll(WebFetchers.getIdBasedFetchers(
+                preferences.getImportFormatPreferences(),
+                preferences.getImporterPreferences()));
         selectedItemProperty.setValue(getLastSelectedFetcher());
-        idFieldValidator = new FunctionBasedValidator<>(idText, StringUtil::isNotBlank, ValidationMessage.error(Localization.lang("Required field \"%0\" is empty.", Localization.lang("ID"))));
+        idFieldValidator = new FunctionBasedValidator<>(
+                idText,
+                StringUtil::isNotBlank,
+                ValidationMessage.error(Localization.lang("Required field \"%0\" is empty.", Localization.lang("ID"))));
     }
 
     public BooleanProperty searchSuccesfulProperty() {
@@ -152,7 +157,14 @@ public class EntryTypeViewModel {
             if (result.isPresent()) {
                 final BibEntry entry = result.get();
 
-                ImportHandler handler = new ImportHandler(libraryTab.getBibDatabaseContext(), ExternalFileTypes.getInstance(), preferencesService, Globals.getFileUpdateMonitor(), libraryTab.getUndoManager(), stateManager, dialogService);
+                ImportHandler handler = new ImportHandler(
+                        libraryTab.getBibDatabaseContext(),
+                        ExternalFileTypes.getInstance(),
+                        preferencesService,
+                        Globals.getFileUpdateMonitor(),
+                        libraryTab.getUndoManager(),
+                        stateManager,
+                        dialogService);
                 handler.importEntryWithDuplicateCheck(libraryTab.getBibDatabaseContext(), entry);
 
                 searchSuccesfulProperty.set(true);
@@ -170,7 +182,12 @@ public class EntryTypeViewModel {
                         Localization.lang("Add entry manually"),
                         Localization.lang("Return to dialog"));
                 if (addEntryFlag) {
-                    new NewEntryAction(libraryTab.frame(), StandardEntryType.Article, dialogService, preferencesService, stateManager).execute();
+                    new NewEntryAction(
+                            libraryTab.frame(),
+                            StandardEntryType.Article,
+                            dialogService,
+                            preferencesService,
+                            stateManager).execute();
                     searchSuccesfulProperty.set(true);
                 }
             }

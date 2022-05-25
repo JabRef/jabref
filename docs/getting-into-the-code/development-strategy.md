@@ -1,3 +1,7 @@
+---
+parent: Getting into the code
+nav_order: 5
+---
 # JabRef's development strategy
 
 We aim to keep up to high-quality code standards and use code quality tools wherever possible.

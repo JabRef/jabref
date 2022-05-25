@@ -293,6 +293,7 @@ public class BibDatabase {
     /**
      * Replaces the existing lists of BibTexString with the given one
      * Duplicates throw KeyCollisionException
+     *
      * @param stringsToAdd The collection of strings to set
      */
     public void setStrings(List<BibtexString> stringsToAdd) {
@@ -437,7 +438,6 @@ public class BibDatabase {
      * given BibtexEntries is modified.
      */
     public BibEntry resolveForStrings(BibEntry entry, boolean inPlace) {
-
         BibEntry resultingEntry;
         if (inPlace) {
             resultingEntry = entry;
@@ -504,7 +504,6 @@ public class BibDatabase {
             int piv = 0;
             int next;
             while ((next = res.indexOf(FieldWriter.BIBTEX_STRING_START_END_SYMBOL, piv)) >= 0) {
-
                 // We found the next string ref. Append the text
                 // up to it.
                 if (next > 0) {
@@ -634,6 +633,7 @@ public class BibDatabase {
 
     /**
      * Set the newline separator.
+     *
      * @param newLineSeparator
      */
     public void setNewLineSeparator(String newLineSeparator) {
@@ -646,5 +646,4 @@ public class BibDatabase {
     public String getNewLineSeparator() {
         return newLineSeparator;
     }
-
 }
