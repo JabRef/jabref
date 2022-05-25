@@ -1,6 +1,7 @@
 package org.jabref.gui.search;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -14,6 +15,7 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.css.PseudoClass;
 import javafx.event.Event;
@@ -21,14 +23,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
-import javafx.scene.control.Button;
-import javafx.scene.control.ButtonBase;
-import javafx.scene.control.ContentDisplay;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
-import javafx.scene.control.Skin;
-import javafx.scene.control.ToggleButton;
-import javafx.scene.control.Tooltip;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.TextFieldListCell;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
@@ -149,12 +144,12 @@ public class GlobalSearchBar extends HBox {
         initSearchModifierButtons();
 
         BooleanBinding focusedOrActive = searchField.focusedProperty()
-                                                    .or(regularExpressionButton.focusedProperty())
-                                                    .or(caseSensitiveButton.focusedProperty())
-                                                    .or(fulltextButton.focusedProperty())
-                                                    .or(keepSearchString.focusedProperty())
-                                                    .or(searchField.textProperty()
-                                                                   .isNotEmpty());
+                .or(regularExpressionButton.focusedProperty())
+                .or(caseSensitiveButton.focusedProperty())
+                .or(fulltextButton.focusedProperty())
+                .or(keepSearchString.focusedProperty())
+                .or(searchField.textProperty()
+                        .isNotEmpty());
 
         regularExpressionButton.visibleProperty().unbind();
         regularExpressionButton.visibleProperty().bind(focusedOrActive);
@@ -392,14 +387,28 @@ public class GlobalSearchBar extends HBox {
     private class SearchPopupSkin<T> implements Skin<AutoCompletePopup<T>> {
 
         private final AutoCompletePopup<T> control;
+
         private final ListView<T> suggestionList;
+        //private final ListView<T> suggestionList;
         private final BorderPane container;
 
         private final String[] headings = {"Entrytype","Author/Editor","Title","Year","Journal/Booktitle"};
 
         public SearchPopupSkin(AutoCompletePopup<T> control) {
             this.control = control;
-            this.suggestionList = new ListView<>(control.getSuggestions());
+            StringConverter<T> converter = control.getConverter();
+            //this.suggestionList = new ListView<>(control.getSuggestions());
+            //this.suggestionList = new ListView<>();
+            ObservableList<T> tHeadings = FXCollections.observableArrayList(converter.fromString(headings[1]));
+            ObservableList<T> items = control.getSuggestions();
+            ObservableList<T> resultingList = FXCollections.observableArrayList();
+
+            merge(resultingList,tHeadings,items);
+
+            this.suggestionList = new ListView<>(resultingList);
+            //this.suggestionList.setItems(items);
+            //this.suggestionList.getItems().addAll(control.getSuggestions());
+
             this.suggestionList.getStyleClass().add("auto-complete-popup");
             this.suggestionList.getStylesheets().add(Objects.requireNonNull(AutoCompletionBinding.class.getResource("autocompletion.css")).toExternalForm());
             this.suggestionList.prefHeightProperty().bind(Bindings.min(control.visibleRowCountProperty(), Bindings.size(this.suggestionList.getItems())).multiply(24).add(18));
@@ -447,6 +456,43 @@ public class GlobalSearchBar extends HBox {
                 }
                 //Event.fireEvent(this.control, new AutoCompletePopup.SuggestionEvent<>(suggestion));
             }
+        }
+
+        private ObservableList<T> merge(ObservableList<T> res, ObservableList<T>... lists){
+            final ObservableList<T> list = res;
+            for(ObservableList<T> l : lists) {
+                list.addAll(l);
+                l.addListener((javafx.collections.ListChangeListener.Change<? extends T> c) -> {
+                    while (c.next()) {
+                        List<String> objectsAdded = new ArrayList<>();
+                        if (c.wasRemoved()) {
+                            //System.out.println("\nRemoved " + c.getRemoved().size() + " Objects");
+                            //for(int i = 0; i < c.getRemoved().size();i++){
+                            //System.out.println("Item " + i + ":" + control.getConverter().toString(c.getRemoved().get(i)));
+                            //if(!objectsAdded.contains(control.getConverter().toString(c.getRemoved().get(i)))){
+                            //System.out.println(control.getConverter().toString(c.getRemoved().get(i)) + " should not have been removed");
+                            //    list.remove(c.getRemoved().get(i));
+                            //}
+                            //else{
+                            //    System.out.println(control.getConverter().toString(c.getRemoved().get(i)) + " was correctly removed");
+                            //}
+                            //}
+                            list.removeAll(c.getRemoved());
+                        }
+                        if (c.wasAdded()) {
+                            System.out.println("\nAdded " + c.getAddedSize() + " Objects");
+
+                            for(int i = 0; i < c.getAddedSubList().size();i++){
+                                System.out.println("Item " + i + ":" + control.getConverter().toString(c.getAddedSubList().get(i)));
+                                objectsAdded.add(control.getConverter().toString(c.getAddedSubList().get(i)));
+                            }
+                            list.addAll(c.getAddedSubList());
+                        }
+
+                    }
+                });
+            }
+            return list;
         }
 
         @Override
