@@ -1,7 +1,7 @@
 package org.jabref.logic.bst;
 
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
@@ -26,13 +26,17 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.StandardField;
 
-import org.antlr.runtime.ANTLRFileStream;
-import org.antlr.runtime.ANTLRStringStream;
-import org.antlr.runtime.CharStream;
-import org.antlr.runtime.CommonTokenStream;
-import org.antlr.runtime.RecognitionException;
-import org.antlr.runtime.tree.CommonTree;
-import org.antlr.runtime.tree.Tree;
+import org.antlr.v4.runtime.BailErrorStrategy;
+import org.antlr.v4.runtime.BaseErrorListener;
+import org.antlr.v4.runtime.CharStream;
+import org.antlr.v4.runtime.CharStreams;
+import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.RecognitionException;
+import org.antlr.v4.runtime.Recognizer;
+import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.misc.ParseCancellationException;
+import org.antlr.v4.runtime.tree.ParseTree;
+import org.antlr.v4.runtime.tree.Tree;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,7 +45,7 @@ import org.slf4j.LoggerFactory;
  * <p>
  * Documentation can be found in the original bibtex distribution:
  * <p>
- * https://www.ctan.org/pkg/bibtex
+ * <a href="https://www.ctan.org/pkg/bibtex">https://www.ctan.org/pkg/bibtex</a>
  */
 public class VM implements Warn {
 
@@ -65,13 +69,25 @@ public class VM implements Warn {
 
     private final Map<String, BstFunction> buildInFunctions;
 
-    private File file;
+    private Path path;
 
-    private final CommonTree tree;
+    private final ParseTree tree;
 
     private StringBuilder bbl;
 
     private String preamble = "";
+
+    public static class ThrowingErrorListener extends BaseErrorListener {
+
+        public static final ThrowingErrorListener INSTANCE = new ThrowingErrorListener();
+
+        @Override
+        public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol,
+                                int line, int charPositionInLine, String msg, RecognitionException e)
+                throws ParseCancellationException {
+            throw new ParseCancellationException("line " + line + ":" + charPositionInLine + " " + msg);
+        }
+    }
 
     public static class Identifier {
 
@@ -104,20 +120,20 @@ public class VM implements Warn {
         void execute(BstEntry context);
     }
 
-    public VM(File f) throws RecognitionException, IOException {
-        this(new ANTLRFileStream(f.getPath()));
-        this.file = f;
+    public VM(Path path) throws RecognitionException, IOException {
+        this(CharStreams.fromPath(path));
+        this.path = path;
     }
 
     public VM(String s) throws RecognitionException {
-        this(new ANTLRStringStream(s));
+        this(CharStreams.fromString(s));
     }
 
     private VM(CharStream bst) throws RecognitionException {
         this(VM.charStream2CommonTree(bst));
     }
 
-    private VM(CommonTree tree) {
+    private VM(ParseTree tree) {
         this.tree = tree;
 
         this.buildInFunctions = new HashMap<>(37);
@@ -794,12 +810,15 @@ public class VM implements Warn {
         }
     }
 
-    private static CommonTree charStream2CommonTree(CharStream bst) throws RecognitionException {
-        BstLexer lex = new BstLexer(bst);
-        CommonTokenStream tokens = new CommonTokenStream(lex);
-        BstParser parser = new BstParser(tokens);
-        BstParser.program_return r = parser.program();
-        return (CommonTree) r.getTree();
+    private static ParseTree charStream2CommonTree(CharStream query) throws RecognitionException {
+        BstLexer lexer = new BstLexer(query);
+        lexer.removeErrorListeners(); // no infos on file system
+        lexer.addErrorListener(ThrowingErrorListener.INSTANCE);
+        BstParser parser = new BstParser(new CommonTokenStream(lexer));
+        parser.removeErrorListeners(); // no infos on file system
+        parser.addErrorListener(ThrowingErrorListener.INSTANCE);
+        parser.setErrorHandler(new BailErrorStrategy()); // ParseCancelationException on parse errors
+        return parser.start();
     }
 
     private boolean assign(BstEntry context, Object o1, Object o2) {
@@ -1106,10 +1125,10 @@ public class VM implements Warn {
                             break;
                     }
                 } catch (VMException e) {
-                    if (file == null) {
+                    if (path == null) {
                         LOGGER.error("ERROR " + e.getMessage() + " (" + c.getLine() + ")");
                     } else {
-                        LOGGER.error("ERROR " + e.getMessage() + " (" + file.getPath() + ":"
+                        LOGGER.error("ERROR " + e.getMessage() + " (" + path + ":"
                                 + c.getLine() + ")");
                     }
                     throw e;
@@ -1156,7 +1175,7 @@ public class VM implements Warn {
     }
 
     private void function(Tree child) {
-        String name = child.getChild(0).getText();
+        String name = ((Token) child.getChild(0).getPayload()).getText();
         Tree localStack = child.getChild(1);
         functions.put(name, new StackFunction(localStack));
     }
@@ -1170,7 +1189,7 @@ public class VM implements Warn {
         Tree t = child.getChild(0);
 
         for (int i = 0; i < t.getChildCount(); i++) {
-            String name = t.getChild(i).getText();
+            String name = ((Token) t.getChild(i).getPayload()).getText();
             integers.put(name, 0);
         }
     }
@@ -1185,7 +1204,7 @@ public class VM implements Warn {
         Tree t = child.getChild(0);
 
         for (int i = 0; i < t.getChildCount(); i++) {
-            String name = t.getChild(i).getText();
+            String name = ((Token) t.getChild(i).getPayload()).getText();
             strings.put(name, null);
         }
     }

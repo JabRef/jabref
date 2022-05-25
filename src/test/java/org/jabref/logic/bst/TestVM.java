@@ -1,8 +1,8 @@
 package org.jabref.logic.bst;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
+import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -16,7 +16,7 @@ import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
-import org.antlr.runtime.RecognitionException;
+import org.antlr.v4.runtime.RecognitionException;
 import org.junit.jupiter.api.Test;
 import org.mockito.Answers;
 
@@ -29,7 +29,7 @@ public class TestVM {
 
     @Test
     public void testAbbrv() throws RecognitionException, IOException {
-        VM vm = new VM(new File("src/test/resources/org/jabref/logic/bst/abbrv.bst"));
+        VM vm = new VM(Path.of("src/test/resources/org/jabref/logic/bst/abbrv.bst"));
         List<BibEntry> v = List.of(t1BibtexEntry());
 
         String expected = "\\begin{thebibliography}{1}\\bibitem{canh05}K.~Crowston, H.~Annabi, J.~Howison, and C.~Masango.\\newblock Effective work practices for floss development: A model and  propositions.\\newblock In {\\em Hawaii International Conference On System Sciences (HICSS)}, 2005.\\end{thebibliography}";
@@ -607,7 +607,7 @@ public class TestVM {
 
     @Test
     public void testHypthenatedName() throws RecognitionException, IOException {
-        VM vm = new VM(new File("src/test/resources/org/jabref/logic/bst/abbrv.bst"));
+        VM vm = new VM(Path.of("src/test/resources/org/jabref/logic/bst/abbrv.bst"));
         List<BibEntry> v = List.of(TestVM.bibtexString2BibtexEntry("@article{canh05, author = \"Jean-Paul Sartre\" }"));
         assertTrue(vm.run(v).contains("J.-P. Sartre"));
     }
