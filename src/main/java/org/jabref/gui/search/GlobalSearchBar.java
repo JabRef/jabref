@@ -33,14 +33,12 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 
+import javafx.util.StringConverter;
 import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.Globals;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.StateManager;
-import org.jabref.gui.autocompleter.AppendWordsStrategy;
-import org.jabref.gui.autocompleter.AutoCompletionTextInputBinding;
-import org.jabref.gui.autocompleter.TitleStringConverter;
-import org.jabref.gui.autocompleter.SuggestionProvider;
+import org.jabref.gui.autocompleter.*;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.keyboard.KeyBinding;
@@ -307,13 +305,16 @@ public class GlobalSearchBar extends HBox {
         currentResults.setText(illegalSearch);
     }
 
-    public void setAutoCompleter(SuggestionProvider<BibEntry> searchCompleter) {
+    public void setAutoCompleter(SuggestionProvider<Author> searchCompleter) {
         if (preferencesService.getAutoCompletePreferences().shouldAutoComplete()) {
-            AutoCompletionTextInputBinding<BibEntry> autoComplete = AutoCompletionTextInputBinding.autoComplete(searchField,
+            AutoCompletionTextInputBinding<Author> autoComplete = AutoCompletionTextInputBinding.autoComplete(searchField,
                     searchCompleter::provideSuggestions,
-                    new TitleStringConverter(),
-                    new AppendWordsStrategy());
-            AutoCompletePopup<BibEntry> popup = getPopup(autoComplete);
+                    new PersonNameStringConverter(false, false, AutoCompleteFirstNameMode.BOTH),
+                    new AppendPersonNamesStrategy());
+                    //new TitleStringConverter(),
+                    //new AppendWordsStrategy());
+            //AutoCompletePopup<BibEntry> popup = getPopup(autoComplete);
+            AutoCompletePopup<Author> popup = getPopup(autoComplete);
             popup.setSkin(new SearchPopupSkin<>(popup));
         }
     }

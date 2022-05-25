@@ -10,11 +10,17 @@ public class TitleStringConverter extends StringConverter<BibEntry> {
 
     @Override
     public String toString(BibEntry entry) {
-        return entry.getTitle().get();
+        if(entry != null) {
+            return entry.getTitle().get();
+        }
+        else{
+            return null;
+        }
     }
 
     @Override
     public BibEntry fromString(String string) {
+        //TODO: need to properly implement fromString for titles
         return null;
     }
 }
