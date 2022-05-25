@@ -307,11 +307,9 @@ public class VM implements Warn {
             }
             Object o1 = stack.pop();
 
-            if (!((o1 instanceof String) && (((String) o1).length() == 1))) {
+            if (!((o1 instanceof String s) && (((String) o1).length() == 1))) {
                 throw new VMException("Can only perform chr.to.int$ on string with length 1");
             }
-
-            String s = (String) o1;
 
             stack.push((int) s.charAt(0));
         });
@@ -356,11 +354,9 @@ public class VM implements Warn {
                 return;
             }
 
-            if (!(o1 instanceof String)) {
+            if (!(o1 instanceof String s)) {
                 throw new VMException("Operand does not match function empty$");
             }
-
-            String s = (String) o1;
 
             stack.push("".equals(s.trim()) ? VM.TRUE : VM.FALSE);
         });
@@ -404,11 +400,9 @@ public class VM implements Warn {
             }
             Object o1 = stack.pop();
 
-            if (!(o1 instanceof Integer)) {
+            if (!(o1 instanceof Integer i)) {
                 throw new VMException("Can only perform operation int.to.chr$ on an Integer");
             }
-
-            Integer i = (Integer) o1;
 
             stack.push(String.valueOf((char) i.intValue()));
         });
@@ -475,10 +469,9 @@ public class VM implements Warn {
             }
             Object o1 = stack.pop();
 
-            if (!(o1 instanceof String)) {
+            if (!(o1 instanceof String s)) {
                 throw new VMException("Need a string at the top of the stack for num.names$");
             }
-            String s = (String) o1;
 
             stack.push(AuthorList.parse(s).getNumberOfAuthors());
         });
@@ -496,9 +489,7 @@ public class VM implements Warn {
          *
          * @PREAMBLE strings read from the database files.
          */
-        buildInFunctions.put("preamble$", context -> {
-            stack.push(preamble);
-        });
+        buildInFunctions.put("preamble$", context -> stack.push(preamble));
 
         /*
          * Pops the top (string) literal, removes nonalphanumeric characters
@@ -644,11 +635,10 @@ public class VM implements Warn {
         }
         Object o1 = stack.pop();
 
-        if (!(o1 instanceof String)) {
+        if (!(o1 instanceof String s)) {
             throw new VMException("Can only perform operation on a string text.length$");
         }
 
-        String s = (String) o1;
         char[] c = s.toCharArray();
         int result = 0;
 
@@ -752,12 +742,9 @@ public class VM implements Warn {
         Object o2 = stack.pop();
         Object o3 = stack.pop();
 
-        if (!((o1 instanceof Integer) && (o2 instanceof Integer) && (o3 instanceof String))) {
+        if (!((o1 instanceof Integer len) && (o2 instanceof Integer start) && (o3 instanceof String s))) {
             throw new VMException("Expecting two integers and a string for substring$");
         }
-
-        Integer len = (Integer) o1;
-        Integer start = (Integer) o2;
 
         int lenI = len;
         int startI = start;
@@ -774,8 +761,6 @@ public class VM implements Warn {
             startI = -Integer.MIN_VALUE / 2;
         }
 
-        String s = (String) o3;
-
         if (startI < 0) {
             startI += s.length() + 1;
             startI = Math.max(1, (startI + 1) - lenI);
@@ -789,11 +774,10 @@ public class VM implements Warn {
         }
         Object o1 = stack.pop();
 
-        if (!(o1 instanceof String)) {
+        if (!(o1 instanceof String s)) {
             throw new VMException("Can only add a period to a string for add.period$");
         }
 
-        String s = (String) o1;
         Matcher m = ADD_PERIOD_PATTERN.matcher(s);
 
         if (m.find()) {
@@ -896,39 +880,28 @@ public class VM implements Warn {
         for (int i = 0; i < tree.getChildCount(); i++) {
             Tree child = tree.getChild(i);
             switch (child.getType()) {
-                case BstParser.STRINGS:
-                    strings(child);
-                    break;
-                case BstParser.INTEGERS:
-                    integers(child);
-                    break;
-                case BstParser.FUNCTION:
-                    function(child);
-                    break;
-                case BstParser.EXECUTE:
-                    execute(child);
-                    break;
-                case BstParser.SORT:
-                    sort();
-                    break;
-                case BstParser.ITERATE:
-                    iterate(child);
-                    break;
-                case BstParser.REVERSE:
-                    reverse(child);
-                    break;
-                case BstParser.ENTRY:
-                    entry(child);
-                    break;
-                case BstParser.READ:
-                    read(bibDatabase);
-                    break;
-                case BstParser.MACRO:
-                    macro(child);
-                    break;
-                default:
-                    LOGGER.info("Unknown type: {}", child.getType());
-                    break;
+                case BstParser.STRINGS ->
+                        strings(child);
+                case BstParser.INTEGERS ->
+                        integers(child);
+                case BstParser.FUNCTION ->
+                        function(child);
+                case BstParser.EXECUTE ->
+                        execute(child);
+                case BstParser.SORT ->
+                        sort();
+                case BstParser.ITERATE ->
+                        iterate(child);
+                case BstParser.REVERSE ->
+                        reverse(child);
+                case BstParser.ENTRY ->
+                        entry(child);
+                case BstParser.READ ->
+                        read(bibDatabase);
+                case BstParser.MACRO ->
+                        macro(child);
+                default ->
+                        LOGGER.info("Unknown type: {}", child.getType());
             }
         }
 
@@ -960,7 +933,7 @@ public class VM implements Warn {
                                                        // We nevertheless want to have the full month name.
                                                        // Thus, we lookup the full month name here.
                                                        return Month.parse(result)
-                                                                   .map(month -> month.getFullName())
+                                                                   .map(Month::getFullName)
                                                                    .orElse(result);
                                                    }
                                                    return result;
@@ -1076,8 +1049,7 @@ public class VM implements Warn {
     }
 
     private void executeInContext(Object o, BstEntry context) {
-        if (o instanceof Tree) {
-            Tree t = (Tree) o;
+        if (o instanceof Tree t) {
             new StackFunction(t).execute(context);
         } else if (o instanceof Identifier) {
             execute(((Identifier) o).getName(), context);
@@ -1107,22 +1079,18 @@ public class VM implements Warn {
                 try {
 
                     switch (c.getType()) {
-                        case BstParser.STRING:
+                        case BstParser.STRING -> {
                             String s = c.getText();
                             push(s.substring(1, s.length() - 1));
-                            break;
-                        case BstParser.INTEGER:
-                            push(Integer.parseInt(c.getText().substring(1)));
-                            break;
-                        case BstParser.QUOTED:
-                            push(new Identifier(c.getText().substring(1)));
-                            break;
-                        case BstParser.STACK:
-                            push(c);
-                            break;
-                        default:
-                            VM.this.execute(c.getText(), context);
-                            break;
+                        }
+                        case BstParser.INTEGER ->
+                                push(Integer.parseInt(c.getText().substring(1)));
+                        case BstParser.QUOTED ->
+                                push(new Identifier(c.getText().substring(1)));
+                        case BstParser.STACK ->
+                                push(c);
+                        default ->
+                                VM.this.execute(c.getText(), context);
                     }
                 } catch (VMException e) {
                     if (path == null) {
@@ -1197,8 +1165,6 @@ public class VM implements Warn {
     /**
      * Declares global string variables. It has one argument, a list of variable names. You may have any number of these
      * commands, but a variable's declaration must precede its use.
-     *
-     * @param child
      */
     private void strings(Tree child) {
         Tree t = child.getChild(0);

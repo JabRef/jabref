@@ -620,12 +620,16 @@ public class TestVM {
     }
 
     private static String t1BibtexString() {
-        return "@inproceedings{canh05,\n"
-                + "  author = {Crowston, K. and Annabi, H. and Howison, J. and Masango, C.},\n"
-                + "  title = {Effective work practices for floss development: A model and propositions},\n"
-                + "  booktitle = {Hawaii International Conference On System Sciences (HICSS)},\n"
-                + "  year = {2005},\n" + "  owner = {oezbek},\n" + "  timestamp = {2006.05.29},\n"
-                + "  url = {http://james.howison.name/publications.html}}\n";
+        return """
+                @inproceedings{canh05,
+                  author = {Crowston, K. and Annabi, H. and Howison, J. and Masango, C.},
+                  title = {Effective work practices for floss development: A model and propositions},
+                  booktitle = {Hawaii International Conference On System Sciences (HICSS)},
+                  year = {2005},
+                  owner = {oezbek},
+                  timestamp = {2006.05.29},
+                  url = {http://james.howison.name/publications.html}}
+                """;
     }
 
     private static BibEntry t1BibtexEntry() throws IOException {
