@@ -233,7 +233,6 @@ public class CitaviXmlImporter extends Importer implements Parser {
         outerLoop1:
         for (int i = 0; i < authors.getOnetoN().size(); i++) {
             for (int j = 0; j < authors.getOnetoN().get(i).length(); j++) {
-
                 if (authors.getOnetoN().get(i).charAt(j) == ';') {
                     if (authors.getOnetoN().get(i).substring(0, j).equals(data.getId())) {
                         ref = i;
@@ -256,7 +255,7 @@ public class CitaviXmlImporter extends Importer implements Parser {
                 } else if (count > 1) {
                     for (int j = 0; j < persons.getPerson().size(); j++) {
                         if (authors.getOnetoN().get(ref).substring(start, i).equals(persons.getPerson().get(j).getId())) {
-                            jabrefAuthors.add(new Author(persons.getPerson().get(j).getFirstName(), "", "" , persons.getPerson().get(j).getLastName(), ""));
+                            jabrefAuthors.add(new Author(persons.getPerson().get(j).getFirstName(), "", "", persons.getPerson().get(j).getLastName(), ""));
                             start = i + 1;
                             break;
                         }
@@ -265,7 +264,7 @@ public class CitaviXmlImporter extends Importer implements Parser {
                 if (i == (authors.getOnetoN().get(ref).length() - 1 - 36)) {
                     for (int j = 0; j < persons.getPerson().size(); j++) {
                         if (authors.getOnetoN().get(ref).substring(start).equals(persons.getPerson().get(j).getId())) {
-                            jabrefAuthors.add(new Author(persons.getPerson().get(j).getFirstName(), "", "" , persons.getPerson().get(j).getLastName(), ""));
+                            jabrefAuthors.add(new Author(persons.getPerson().get(j).getFirstName(), "", "", persons.getPerson().get(j).getLastName(), ""));
                             break outerLoop2;
                         }
                     }
@@ -273,9 +272,7 @@ public class CitaviXmlImporter extends Importer implements Parser {
             }
         }
         return AuthorList.of(jabrefAuthors).getAsLastFirstFirstLastNamesWithAnd(false);
-
     }
-
 
     private String getEditorName(CitaviExchangeData.References.Reference data) {
         if (editors == null) {
