@@ -4,9 +4,9 @@ import javafx.util.StringConverter;
 
 import org.jabref.model.entry.BibEntry;
 
-public class BibEntryStringConverter extends StringConverter<BibEntry> {
+public class TitleStringConverter extends StringConverter<BibEntry> {
 
-    public BibEntryStringConverter() { }
+    public TitleStringConverter() { }
 
     @Override
     public String toString(BibEntry entry) {
