@@ -397,17 +397,13 @@ public class GlobalSearchBar extends HBox {
         public SearchPopupSkin(AutoCompletePopup<T> control) {
             this.control = control;
             StringConverter<T> converter = control.getConverter();
-            //this.suggestionList = new ListView<>(control.getSuggestions());
-            //this.suggestionList = new ListView<>();
+
             ObservableList<T> tHeadings = FXCollections.observableArrayList(converter.fromString(headings[1]));
             ObservableList<T> items = control.getSuggestions();
             ObservableList<T> resultingList = FXCollections.observableArrayList();
-
             merge(resultingList,tHeadings,items);
 
             this.suggestionList = new ListView<>(resultingList);
-            //this.suggestionList.setItems(items);
-            //this.suggestionList.getItems().addAll(control.getSuggestions());
 
             this.suggestionList.getStyleClass().add("auto-complete-popup");
             this.suggestionList.getStylesheets().add(Objects.requireNonNull(AutoCompletionBinding.class.getResource("autocompletion.css")).toExternalForm());
@@ -458,6 +454,7 @@ public class GlobalSearchBar extends HBox {
             }
         }
 
+        //Merge multiple Observable Lists together
         private ObservableList<T> merge(ObservableList<T> res, ObservableList<T>... lists){
             final ObservableList<T> list = res;
             for(ObservableList<T> l : lists) {
@@ -466,29 +463,11 @@ public class GlobalSearchBar extends HBox {
                     while (c.next()) {
                         List<String> objectsAdded = new ArrayList<>();
                         if (c.wasRemoved()) {
-                            //System.out.println("\nRemoved " + c.getRemoved().size() + " Objects");
-                            //for(int i = 0; i < c.getRemoved().size();i++){
-                            //System.out.println("Item " + i + ":" + control.getConverter().toString(c.getRemoved().get(i)));
-                            //if(!objectsAdded.contains(control.getConverter().toString(c.getRemoved().get(i)))){
-                            //System.out.println(control.getConverter().toString(c.getRemoved().get(i)) + " should not have been removed");
-                            //    list.remove(c.getRemoved().get(i));
-                            //}
-                            //else{
-                            //    System.out.println(control.getConverter().toString(c.getRemoved().get(i)) + " was correctly removed");
-                            //}
-                            //}
                             list.removeAll(c.getRemoved());
                         }
                         if (c.wasAdded()) {
-                            System.out.println("\nAdded " + c.getAddedSize() + " Objects");
-
-                            for(int i = 0; i < c.getAddedSubList().size();i++){
-                                System.out.println("Item " + i + ":" + control.getConverter().toString(c.getAddedSubList().get(i)));
-                                objectsAdded.add(control.getConverter().toString(c.getAddedSubList().get(i)));
-                            }
                             list.addAll(c.getAddedSubList());
                         }
-
                     }
                 });
             }
