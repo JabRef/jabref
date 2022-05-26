@@ -89,41 +89,58 @@ public class Linux implements NativeDesktop {
     public void openFolderAndSelectFile(Path filePath) throws IOException {
         String desktopSession = System.getenv("DESKTOP_SESSION");
 
-        String cmd = "xdg-open " + filePath.toAbsolutePath().getParent().toString(); // default command
+        String cmd = "xdg-open";// default command
 
         if (desktopSession != null) {
             desktopSession = desktopSession.toLowerCase(Locale.ROOT);
             if (desktopSession.contains("gnome")) {
-                cmd = "nautilus --select " + filePath.toString().replace(" ", "\\ ");
+                cmd = "nautilus --select";
             } else if (desktopSession.contains("kde") || desktopSession.contains("plasma")) {
-                cmd = "dolphin --select " + filePath.toString().replace(" ", "\\ ");
+                cmd = "dolphin --select";
             } else if (desktopSession.contains("mate")) {
-                cmd = "caja --select " + filePath.toString().replace(" ", "\\ ");
+                cmd = "caja --select";
             } else if (desktopSession.contains("cinnamon")) {
-                cmd = "nemo --select " + filePath.toString().replace(" ", "\\ ");
-            }
+                cmd = "nemo";
+           }
         }
-        Runtime.getRuntime().exec(cmd);
+        ProcessBuilder processBuilder =  new ProcessBuilder(cmd, filePath.toAbsolutePath().toString());
+        Process process = processBuilder.start();
+
+        StreamGobbler streamGobblerInput = new StreamGobbler(process.getInputStream(), LOGGER::debug);
+        StreamGobbler streamGobblerError = new StreamGobbler(process.getErrorStream(), LOGGER::debug);
+
+        JabRefExecutorService.INSTANCE.execute(streamGobblerInput);
+        JabRefExecutorService.INSTANCE.execute(streamGobblerError);
     }
 
     @Override
     public void openConsole(String absolutePath) throws IOException {
-        Runtime runtime = Runtime.getRuntime();
-        Process p = runtime.exec("readlink /etc/alternatives/x-terminal-emulator");
-        BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
 
-        String emulatorName = reader.readLine();
-        if (emulatorName != null) {
-            emulatorName = emulatorName.substring(emulatorName.lastIndexOf(File.separator) + 1);
+        ProcessBuilder processBuilder = new ProcessBuilder("readlink /etc/alternatives/x-terminal-emulator");
+        Process process = processBuilder.start();
 
-            if (emulatorName.contains("gnome")) {
-                runtime.exec("gnome-terminal --working-directory=" + absolutePath);
-            } else if (emulatorName.contains("xfce4")) {
-                runtime.exec("xfce4-terminal --working-directory=" + absolutePath);
-            } else if (emulatorName.contains("konsole")) {
-                runtime.exec("konsole --workdir=" + absolutePath);
-            } else {
-                runtime.exec(emulatorName, null, new File(absolutePath));
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+            String emulatorName = reader.readLine();
+            if (emulatorName != null) {
+                emulatorName = emulatorName.substring(emulatorName.lastIndexOf(File.separator) + 1);
+
+                String cmd = "";
+                if (emulatorName.contains("gnome")) {
+                    cmd = "gnome-terminal --working-directory=";
+                } else if (emulatorName.contains("xfce4")) {
+                    cmd = ("xfce4-terminal --working-directory=");
+                } else if (emulatorName.contains("konsole")) {
+                    cmd = ("konsole --workdir=");
+                } else {
+                    cmd = emulatorName;
+                }
+                process = new ProcessBuilder(cmd, absolutePath).start();
+
+                StreamGobbler streamGobblerInput = new StreamGobbler(process.getInputStream(), LOGGER::debug);
+                StreamGobbler streamGobblerError = new StreamGobbler(process.getErrorStream(), LOGGER::debug);
+
+                JabRefExecutorService.INSTANCE.execute(streamGobblerInput);
+                JabRefExecutorService.INSTANCE.execute(streamGobblerError);
             }
         }
     }
