@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.Locale;
 import java.util.Optional;
 
@@ -116,7 +117,7 @@ public class Linux implements NativeDesktop {
     @Override
     public void openConsole(String absolutePath) throws IOException {
 
-        ProcessBuilder processBuilder = new ProcessBuilder("readlink /etc/alternatives/x-terminal-emulator");
+        ProcessBuilder processBuilder = new ProcessBuilder("readlink", "/etc/alternatives/x-terminal-emulator");
         Process process = processBuilder.start();
 
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
@@ -124,17 +125,20 @@ public class Linux implements NativeDesktop {
             if (emulatorName != null) {
                 emulatorName = emulatorName.substring(emulatorName.lastIndexOf(File.separator) + 1);
 
-                String cmd = "";
+                absolutePath = "\"" + absolutePath + "\"";
+
+                String[] cmd = {};
                 if (emulatorName.contains("gnome")) {
-                    cmd = "gnome-terminal --working-directory=";
+                    cmd = new String[] {"gnome-terminal", "--working-directory=" + absolutePath};
                 } else if (emulatorName.contains("xfce4")) {
-                    cmd = ("xfce4-terminal --working-directory=");
+                    cmd = new String[] {"xfce4-terminal", "--working-directory=" + absolutePath};
                 } else if (emulatorName.contains("konsole")) {
-                    cmd = ("konsole --workdir=");
+                    cmd = new String[] {"konsole --workdir=" + absolutePath};
                 } else {
-                    cmd = emulatorName;
+                    cmd = new String[] {emulatorName, absolutePath};
                 }
-                process = new ProcessBuilder(cmd, absolutePath).start();
+                LOGGER.debug("Terminal cmd {}", Arrays.toString(cmd));
+                process = new ProcessBuilder(cmd).start();
 
                 StreamGobbler streamGobblerInput = new StreamGobbler(process.getInputStream(), LOGGER::debug);
                 StreamGobbler streamGobblerError = new StreamGobbler(process.getErrorStream(), LOGGER::debug);
