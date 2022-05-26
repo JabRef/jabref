@@ -747,7 +747,7 @@ public class LibraryTab extends Tab {
                 preferencesService,
                 stateManager,
                 themeManager,
-                databaseNotificationPane));
+                this));
     }
 
     public void copy() {
