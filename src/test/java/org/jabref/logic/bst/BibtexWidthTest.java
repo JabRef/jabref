@@ -2,6 +2,8 @@ package org.jabref.logic.bst;
 
 import java.util.stream.Stream;
 
+import org.jabref.logic.bst.util.BibtexWidth;
+
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;

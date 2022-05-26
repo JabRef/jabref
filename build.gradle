@@ -274,7 +274,7 @@ tasks.register("generateBstGrammarSource", JavaExec) {
 
     inputs.dir('src/main/antlr4/org/jabref/bst/')
     outputs.dir("src-gen/main/java/org/jabref/logic/bst/")
-    args  = ["-o", "src-gen/main/java/org/jabref/logic/bst/", "-listener", "-package", "org.jabref.logic.bst", "$projectDir/src/main/antlr4/org/jabref/bst/Bst.g4"]
+    args  = ["-o", "src-gen/main/java/org/jabref/logic/bst/", "-visitor", "-no-listener", "-package", "org.jabref.logic.bst", "$projectDir/src/main/antlr4/org/jabref/bst/Bst.g4"]
 }
 
 tasks.register("generateSearchGrammarSource", JavaExec) {

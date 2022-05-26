@@ -2,7 +2,8 @@ package org.jabref.logic.bst;
 
 import java.util.stream.Stream;
 
-import org.jabref.logic.bst.BibtexCaseChanger.FORMAT_MODE;
+import org.jabref.logic.bst.util.BibtexCaseChanger;
+import org.jabref.logic.bst.util.BibtexCaseChanger.FORMAT_MODE;
 
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;

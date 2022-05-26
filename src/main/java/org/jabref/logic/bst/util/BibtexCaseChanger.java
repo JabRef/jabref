@@ -1,4 +1,4 @@
-package org.jabref.logic.bst;
+package org.jabref.logic.bst.util;
 
 import java.util.Locale;
 import java.util.Optional;
@@ -136,10 +136,7 @@ public final class BibtexCaseChanger {
      * is other stuff, too, between braces, but it doesn't try to do anything
      * special with |colon|s.
      *
-     * @param c
      * @param start  the current position. It points to the opening brace
-     * @param format
-     * @return
      */
     private int convertSpecialChar(StringBuilder sb, char[] c, int start, FORMAT_MODE format) {
         int i = start;
@@ -174,11 +171,6 @@ public final class BibtexCaseChanger {
      * up) and append the result to the stringBuffer, return the updated
      * position.
      *
-     * @param c
-     * @param start
-     * @param s
-     * @param sb
-     * @param format
      * @return the new position
      */
     private int convertAccented(char[] c, int start, String s, StringBuilder sb, FORMAT_MODE format) {
@@ -217,18 +209,16 @@ public final class BibtexCaseChanger {
     private int convertNonControl(char[] c, int start, StringBuilder sb, FORMAT_MODE format) {
         int pos = start;
         switch (format) {
-            case TITLE_LOWERS:
-            case ALL_LOWERS:
+            case TITLE_LOWERS, ALL_LOWERS -> {
                 sb.append(Character.toLowerCase(c[pos]));
                 pos++;
-                break;
-            case ALL_UPPERS:
+            }
+            case ALL_UPPERS -> {
                 sb.append(Character.toUpperCase(c[pos]));
                 pos++;
-                break;
-            default:
-                LOGGER.info("convertNonControl - Unknown format: " + format);
-                break;
+            }
+            default ->
+                    LOGGER.info("convertNonControl - Unknown format: " + format);
         }
         return pos;
     }
@@ -236,7 +226,7 @@ public final class BibtexCaseChanger {
     private int convertCharIfBraceLevelIsZero(char[] c, int start, StringBuilder sb, FORMAT_MODE format) {
         int i = start;
         switch (format) {
-            case TITLE_LOWERS:
+            case TITLE_LOWERS -> {
                 if ((i == 0) || (prevColon && Character.isWhitespace(c[i - 1]))) {
                     sb.append(c[i]);
                 } else {
@@ -247,16 +237,13 @@ public final class BibtexCaseChanger {
                 } else if (!Character.isWhitespace(c[i])) {
                     prevColon = false;
                 }
-                break;
-            case ALL_LOWERS:
-                sb.append(Character.toLowerCase(c[i]));
-                break;
-            case ALL_UPPERS:
-                sb.append(Character.toUpperCase(c[i]));
-                break;
-            default:
-                LOGGER.info("convertCharIfBraceLevelIsZero - Unknown format: " + format);
-                break;
+            }
+            case ALL_LOWERS ->
+                    sb.append(Character.toLowerCase(c[i]));
+            case ALL_UPPERS ->
+                    sb.append(Character.toUpperCase(c[i]));
+            default ->
+                    LOGGER.info("convertCharIfBraceLevelIsZero - Unknown format: " + format);
         }
         i++;
         return i;

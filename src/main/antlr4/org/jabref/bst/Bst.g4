@@ -21,7 +21,7 @@ EQUAL : '=';
 ASSIGN : ':=';
 ADD : '+';
 SUB : '-';
-MUL : '*';
+CONCAT : '*';
 
 fragment LETTER : ('a'..'z'|'A'..'Z'|'.'|'$');
 fragment DIGIT : [0-9];
@@ -41,37 +41,35 @@ start
     ;
 
 commands
-    : STRINGS idList
-    | INTEGERS idList
-    | FUNCTION id stack
-    | MACRO id
-    | READ
-    | EXECUTE LBRACE function RBRACE
-    | ITERATE LBRACE function RBRACE
-    | REVERSE LBRACE function RBRACE
-    | ENTRY idList0 idList0 idList0
-    | SORT
+    : list=(STRINGS|INTEGERS) id=idListObl                            #variablesCommand
+    | FUNCTION LBRACE id=identifier RBRACE exp=stack                  #functionCommand
+    | list=MACRO LBRACE id=identifier RBRACE LBRACE exp=STRING RBRACE #variablesCommand
+    | READ                                                            #readCommand
+    | EXECUTE LBRACE id=function RBRACE                               #executeCommand
+    | ITERATE LBRACE id=function RBRACE                               #iterateCommand
+    | REVERSE LBRACE id=function RBRACE                               #reverseCommand
+    | ENTRY first=idListOpt second=idListOpt third=idListOpt          #entryCommand
+    | SORT                                                            #sortCommand
     ;
-
 
 identifier
-    : IDENTIFIER
+	: IDENTIFIER
+	;
+
+idListObl
+    : LBRACE identifier+ RBRACE
     ;
 
-id  : LBRACE identifier RBRACE
-    ;
-
-idList
-    : LBRACE IDENTIFIER+ RBRACE
-    ;
-
-idList0
-    : LBRACE IDENTIFIER* RBRACE
+idListOpt
+    : LBRACE identifier* RBRACE
     ;
 
 function
-	: LT | GT | EQUAL | ADD | SUB | ASSIGN | MUL
-	| identifier
+	: operator=(LT | GT | EQUAL) #comparisonFunction
+	| operator=(ADD | SUB)       #arithmeticFunction
+	| ASSIGN                     #assignmentFunction
+	| CONCAT                     #concatFunction
+	| identifier                 #userFunction
 	;
 
 stack

@@ -1,9 +1,10 @@
 package org.jabref.logic.bst;
 
+import org.jabref.logic.bst.util.BibtexTextPrefix;
+
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
 
 public class TextPrefixFunctionTest {
 
@@ -21,6 +22,6 @@ public class TextPrefixFunctionTest {
     }
 
     private static void assertPrefix(final String string, final String string2) {
-        assertEquals(string, BibtexTextPrefix.textPrefix(5, string2, s -> fail("Should not Warn! text.prefix$ should be " + string + " for (5) " + string2)));
+        assertEquals(string, BibtexTextPrefix.textPrefix(5, string2));
     }
 }

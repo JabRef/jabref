@@ -1,4 +1,7 @@
-package org.jabref.logic.bst;
+package org.jabref.logic.bst.util;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The |built_in| function {\.{text.prefix\$}} pops the top two literals (the
@@ -15,14 +18,12 @@ package org.jabref.logic.bst;
  *
  */
 public class BibtexTextPrefix {
+    private static final Logger LOGGER = LoggerFactory.getLogger(BibtexTextPrefix.class);
 
     private BibtexTextPrefix() {
     }
 
-    /**
-     * @param warn may-be-null
-     */
-    public static String textPrefix(int inNumOfChars, String toPrefix, Warn warn) {
+    public static String textPrefix(int inNumOfChars, String toPrefix) {
         int numOfChars = inNumOfChars;
         StringBuilder sb = new StringBuilder();
 
@@ -53,15 +54,13 @@ public class BibtexTextPrefix {
                 if (braceLevel > 0) {
                     braceLevel--;
                 } else {
-                    if (warn != null) {
-                        warn.warn("Unbalanced brace in string for purify$: " + toPrefix);
-                    }
+                    LOGGER.warn("Unbalanced brace in string for purify$: {}", toPrefix);
                 }
             } else {
                 numOfChars--;
             }
         }
-        sb.append(toPrefix.substring(0, i));
+        sb.append(toPrefix, 0, i);
         while (braceLevel > 0) {
             sb.append('}');
             braceLevel--;

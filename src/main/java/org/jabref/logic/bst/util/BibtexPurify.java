@@ -1,4 +1,7 @@
-package org.jabref.logic.bst;
+package org.jabref.logic.bst.util;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -11,16 +14,12 @@ package org.jabref.logic.bst;
  *
  */
 public class BibtexPurify {
+    private static final Logger LOGGER = LoggerFactory.getLogger(BibtexPurify.class);
 
     private BibtexPurify() {
     }
 
-    /**
-     * @param toPurify
-     * @param warn     may-be-null
-     * @return
-     */
-    public static String purify(String toPurify, Warn warn) {
+    public static String purify(String toPurify) {
         StringBuilder sb = new StringBuilder();
 
         char[] cs = toPurify.toCharArray();
@@ -63,15 +62,13 @@ public class BibtexPurify {
                 if (braceLevel > 0) {
                     braceLevel--;
                 } else {
-                    if (warn != null) {
-                        warn.warn("Unbalanced brace in string for purify$: " + toPurify);
-                    }
+                    LOGGER.warn("Unbalanced brace in string for purify$: {}", toPurify);
                 }
             }
             i++;
         }
-        if ((braceLevel != 0) && (warn != null)) {
-            warn.warn("Unbalanced brace in string for purify$: " + toPurify);
+        if ((braceLevel != 0)) {
+            LOGGER.warn("Unbalanced brace in string for purify$: {}", toPurify);
         }
 
         return sb.toString();
