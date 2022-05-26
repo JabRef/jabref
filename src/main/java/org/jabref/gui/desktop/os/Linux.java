@@ -100,7 +100,7 @@ public class Linux implements NativeDesktop {
             } else if (desktopSession.contains("mate")) {
                 cmd = "caja --select";
             } else if (desktopSession.contains("cinnamon")) {
-                cmd = "nemo";
+                cmd = "nemo"; // Although nemo is based on nautilus it does not support --select, it directly highlights the file
             }
         }
         ProcessBuilder processBuilder = new ProcessBuilder(cmd, filePath.toAbsolutePath().toString());
