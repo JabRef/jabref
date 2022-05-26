@@ -25,4 +25,22 @@ class FileHelperTest {
       Path path = Path.of("/");
       assertEquals(Optional.of(path), FileHelper.find("", path));
     }
+
+    @Test
+    public void testFileNameIllegal1() {
+        Path path = Path.of("/");
+        assertEquals(Optional.empty(), FileHelper.find(">", path));
+    }
+
+    @Test
+    public void testFileNameIllegal2() {
+        Path path = Path.of("/");
+        assertEquals(Optional.empty(), FileHelper.find("*", path));
+    }
+
+    @Test
+    public void testFileNameIllegal3() {
+        Path path = Path.of("/");
+        assertEquals(Optional.empty(), FileHelper.find("?", path));
+    }
 }
