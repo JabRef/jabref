@@ -89,7 +89,7 @@ public class Linux implements NativeDesktop {
     public void openFolderAndSelectFile(Path filePath) throws IOException {
         String desktopSession = System.getenv("DESKTOP_SESSION");
 
-        String cmd = "xdg-open";// default command
+        String cmd = "xdg-open"; // default command
 
         if (desktopSession != null) {
             desktopSession = desktopSession.toLowerCase(Locale.ROOT);
@@ -101,9 +101,9 @@ public class Linux implements NativeDesktop {
                 cmd = "caja --select";
             } else if (desktopSession.contains("cinnamon")) {
                 cmd = "nemo";
-           }
+            }
         }
-        ProcessBuilder processBuilder =  new ProcessBuilder(cmd, filePath.toAbsolutePath().toString());
+        ProcessBuilder processBuilder = new ProcessBuilder(cmd, filePath.toAbsolutePath().toString());
         Process process = processBuilder.start();
 
         StreamGobbler streamGobblerInput = new StreamGobbler(process.getInputStream(), LOGGER::debug);
