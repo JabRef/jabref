@@ -1,160 +1,57 @@
 package org.jabref.logic.bst;
 
-import java.io.IOException;
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
 import java.util.HashMap;
-import java.util.List;
-import java.util.ListIterator;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.jabref.logic.bibtex.FieldContentFormatterPreferences;
-import org.jabref.logic.bibtex.FieldWriter;
-import org.jabref.logic.bibtex.FieldWriterPreferences;
-import org.jabref.logic.bibtex.InvalidFieldValueException;
 import org.jabref.logic.bst.util.BibtexCaseChanger;
 import org.jabref.logic.bst.util.BibtexNameFormatter;
 import org.jabref.logic.bst.util.BibtexPurify;
 import org.jabref.logic.bst.util.BibtexTextPrefix;
 import org.jabref.logic.bst.util.BibtexWidth;
-import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.Author;
 import org.jabref.model.entry.AuthorList;
-import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.Month;
-import org.jabref.model.entry.field.Field;
-import org.jabref.model.entry.field.FieldFactory;
-import org.jabref.model.entry.field.StandardField;
 
-import org.antlr.v4.runtime.BailErrorStrategy;
-import org.antlr.v4.runtime.BaseErrorListener;
-import org.antlr.v4.runtime.CharStream;
-import org.antlr.v4.runtime.CharStreams;
-import org.antlr.v4.runtime.CommonTokenStream;
-import org.antlr.v4.runtime.RecognitionException;
-import org.antlr.v4.runtime.Recognizer;
-import org.antlr.v4.runtime.misc.ParseCancellationException;
-import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.Tree;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * A BibTeX Virtual machine that can execute .bst files.
- * <p>
- * Documentation can be found in the original bibtex distribution:
- * <p>
- * <a href="https://www.ctan.org/pkg/bibtex">https://www.ctan.org/pkg/bibtex</a>
- */
-public class VM {
-
-    public static final Integer FALSE = 0;
-
-    public static final Integer TRUE = 1;
-
+public class BstFunctions {
+    private static final Logger LOGGER = LoggerFactory.getLogger(BstFunctions.class);
     private static final Pattern ADD_PERIOD_PATTERN = Pattern.compile("([^\\.\\?\\!\\}\\s])(\\}|\\s)*$");
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(VM.class);
-
-    private List<BstEntry> entries;
-
-    private Map<String, String> strings = new HashMap<>();
-
-    private Map<String, Integer> integers = new HashMap<>();
-
-    private Map<String, BstFunction> functions = new HashMap<>();
-
-    private Stack<Object> stack = new Stack<>();
-
+    private final Map<String, String> strings;
+    private final Map<String, Integer> integers;
+    private final Map<String, BstFunction> functions;
     private final Map<String, BstFunction> buildInFunctions = new HashMap<>(37);
 
-    private Path path;
+    private final Stack<Object> stack;
 
-    private final ParseTree tree;
-
-    private StringBuilder bbl;
+    private final StringBuilder bbl;
+    private int bstWarning = 0;
 
     private String preamble = "";
-
-    private int bstWarning = 1;
-
-    public static class ThrowingErrorListener extends BaseErrorListener {
-
-        public static final ThrowingErrorListener INSTANCE = new ThrowingErrorListener();
-
-        @Override
-        public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol,
-                                int line, int charPositionInLine, String msg, RecognitionException e)
-                throws ParseCancellationException {
-            throw new ParseCancellationException("line " + line + ":" + charPositionInLine + " " + msg);
-        }
-    }
-
-    public static class Identifier {
-
-        public final String name;
-
-        public Identifier(String name) {
-            this.name = name;
-        }
-
-        public String getName() {
-            return name;
-        }
-    }
-
-    public static class Variable {
-
-        public final String name;
-
-        public Variable(String name) {
-            this.name = name;
-        }
-
-        public String getName() {
-            return name;
-        }
-    }
 
     @FunctionalInterface
     public interface BstFunction {
         void execute(BstEntry context);
     }
 
-    public VM(Path path) throws RecognitionException, IOException {
-        this(CharStreams.fromPath(path));
-        this.path = path;
-    }
+    public BstFunctions(Map<String, String> strings,
+                        Map<String, Integer> integers,
+                        Map<String, BstFunction> functions,
+                        Stack<Object> stack,
+                        StringBuilder bbl) {
+        this.strings = strings;
+        this.integers = integers;
+        this.functions = functions;
+        this.stack = stack;
+        this.bbl = bbl;
 
-    public VM(String s) throws RecognitionException {
-        this(CharStreams.fromString(s));
-    }
-
-    private VM(CharStream bst) throws RecognitionException {
-        this(VM.charStream2CommonTree(bst));
-    }
-
-    private VM(ParseTree tree) {
-        this.tree = tree;
         initBuildInFunctions();
-    }
-
-    private static ParseTree charStream2CommonTree(CharStream query) throws RecognitionException {
-        BstLexer lexer = new BstLexer(query);
-        lexer.removeErrorListeners(); // no infos on file system
-        lexer.addErrorListener(ThrowingErrorListener.INSTANCE);
-        BstParser parser = new BstParser(new CommonTokenStream(lexer));
-        parser.removeErrorListeners(); // no infos on file system
-        parser.addErrorListener(ThrowingErrorListener.INSTANCE);
-        parser.setErrorHandler(new BailErrorStrategy()); // ParseCancelationException on parse errors
-        return parser.start();
     }
 
     private void initBuildInFunctions() {
@@ -202,7 +99,7 @@ public class VM {
      * the integer 1 if the second is greater than the first, 0
      * otherwise.
      */
-    private void bstIsGreaterThan(Object context) {
+    private void bstIsGreaterThan(BstEntry context) {
         if (stack.size() < 2) {
             throw new VMException("Not enough operands on stack for operation >");
         }
@@ -213,7 +110,7 @@ public class VM {
             throw new VMException("Can only compare two integers with >");
         }
 
-        stack.push(((Integer) o1).compareTo((Integer) o2) > 0 ? VM.TRUE : VM.FALSE);
+        stack.push(((Integer) o1).compareTo((Integer) o2) > 0 ? BstVM.TRUE : BstVM.FALSE);
     }
 
     /**
@@ -232,7 +129,7 @@ public class VM {
             throw new VMException("Can only compare two integers with <");
         }
 
-        stack.push(((Integer) o1).compareTo((Integer) o2) < 0 ? VM.TRUE : VM.FALSE);
+        stack.push(((Integer) o1).compareTo((Integer) o2) < 0 ? BstVM.TRUE : BstVM.FALSE);
     }
 
     /**
@@ -256,7 +153,7 @@ public class VM {
             return;
         }
 
-        stack.push(o1.equals(o2) ? VM.TRUE : VM.FALSE);
+        stack.push(o1.equals(o2) ? BstVM.TRUE : BstVM.FALSE);
     }
 
     /**
@@ -336,7 +233,7 @@ public class VM {
     }
 
     private boolean doBstAssign(BstEntry context, Object o1, Object o2) {
-        if (!(o1 instanceof VM.Identifier) || !((o2 instanceof String) || (o2 instanceof Integer))) {
+        if (!(o1 instanceof BstVM.Identifier) || !((o2 instanceof String) || (o2 instanceof Integer))) {
             throw new VMException("Invalid parameters");
         }
 
@@ -412,7 +309,7 @@ public class VM {
         if (context == null) {
             throw new VMException("Call.type$ can only be called from within a context (ITERATE or REVERSE).");
         }
-        VM.this.execute(context.entry.getType().getName(), context);
+        // BstVM.this.execute(context.entry.getType().getName(), context); // FIXME
     }
 
     /**
@@ -445,11 +342,12 @@ public class VM {
         }
 
         Object o2 = stack.pop();
-        if (!(o2 instanceof String s)) {
+        if (!(o2 instanceof String)) {
             throw new VMException("A string is needed as second parameter for change.case$");
         }
 
         char format = ((String) o1).toLowerCase(Locale.ROOT).charAt(0);
+        String s = (String) o2;
 
         stack.push(BibtexCaseChanger.changeCase(s, BibtexCaseChanger.FORMAT_MODE.getFormatModeForBSTFormat(format)));
     }
@@ -516,7 +414,7 @@ public class VM {
             throw new VMException("Operand does not match function empty$");
         }
 
-        stack.push("".equals(s.trim()) ? VM.TRUE : VM.FALSE);
+        stack.push("".equals(s.trim()) ? BstVM.TRUE : BstVM.FALSE);
     }
 
     /**
@@ -575,15 +473,15 @@ public class VM {
         Object f2 = stack.pop();
         Object i = stack.pop();
 
-        if (!((f1 instanceof VM.Identifier) || (f1 instanceof Tree))
-                && ((f2 instanceof VM.Identifier) || (f2 instanceof Tree)) && (i instanceof Integer)) {
+        if (!((f1 instanceof BstVM.Identifier) || (f1 instanceof Tree))
+                && ((f2 instanceof BstVM.Identifier) || (f2 instanceof Tree)) && (i instanceof Integer)) {
             throw new VMException("Expecting two functions and an integer for if$.");
         }
 
         if ((Integer) i > 0) {
-            VM.this.executeInContext(f2, context);
+            // BstVM.this.executeInContext(f2, context); // FIXME
         } else {
-            VM.this.executeInContext(f1, context);
+            // BstVM.this.executeInContext(f1, context); // FIXME
         }
     }
 
@@ -654,7 +552,7 @@ public class VM {
      * break.
      */
     private void bstNewLine(BstEntry context) {
-        VM.this.bbl.append('\n');
+        this.bbl.append('\n');
     }
 
     /**
@@ -916,7 +814,7 @@ public class VM {
      * messages issued.
      */
     private void bstWarning(BstEntry context) {
-        LOGGER.warn("Warning (#" + (bstWarning++) + "): " + stack.pop());
+        LOGGER.warn("Warning (#{}): {}", bstWarning++, stack.pop());
     }
 
     /**
@@ -931,13 +829,13 @@ public class VM {
         Object f2 = stack.pop();
         Object f1 = stack.pop();
 
-        if (!((f1 instanceof VM.Identifier) || (f1 instanceof Tree))
-                && ((f2 instanceof VM.Identifier) || (f2 instanceof Tree))) {
+        if (!((f1 instanceof BstVM.Identifier) || (f1 instanceof Tree))
+                && ((f2 instanceof BstVM.Identifier) || (f2 instanceof Tree))) {
             throw new VMException("Expecting two functions for while$.");
         }
 
         do {
-            executeInContext(f1, context);
+            // executeInContext(f1, context); // FIXME
 
             Object i = stack.pop();
             if (!(i instanceof Integer)) {
@@ -946,7 +844,7 @@ public class VM {
             if ((Integer) i <= 0) {
                 break;
             }
-            executeInContext(f2, context);
+            // executeInContext(f2, context); // FIXME
         } while (true);
     }
 
@@ -982,375 +880,5 @@ public class VM {
     private void bstWrite(BstEntry context) {
         String s = (String) stack.pop();
         bbl.append(s);
-    }
-
-    public String run(BibDatabase db) {
-        preamble = db.getPreamble().orElse("");
-        return run(db.getEntries());
-    }
-
-    public String run(Collection<BibEntry> bibtex) {
-        return this.run(bibtex, null);
-    }
-
-    /**
-     * Transforms the given list of BibEntries to a rendered list of references using the underlying bst file
-     *
-     * @param bibEntries  list of entries to convert
-     * @param bibDatabase (may be null) the bibDatabase used for resolving strings / crossref
-     * @return list of references in plain text form
-     */
-    public String run(Collection<BibEntry> bibEntries, BibDatabase bibDatabase) {
-        Objects.requireNonNull(bibEntries);
-
-        // Reset
-        bbl = new StringBuilder();
-
-        strings = new HashMap<>();
-
-        integers = new HashMap<>();
-        integers.put("entry.max$", Integer.MAX_VALUE);
-        integers.put("global.max$", Integer.MAX_VALUE);
-
-        functions = new HashMap<>();
-        functions.putAll(buildInFunctions);
-
-        stack = new Stack<>();
-
-        // Create entries
-        entries = new ArrayList<>(bibEntries.size());
-        for (BibEntry entry : bibEntries) {
-            entries.add(new BstEntry(entry));
-        }
-
-        // Go
-        for (int i = 0; i < tree.getChildCount(); i++) {
-            Tree child = tree.getChild(i);
-            switch (child) {
-                case BstParser.StringsCommandContext ctx ->
-                        strings(ctx);
-                case BstParser.IntegersCommandContext ctx ->
-                        integers(ctx);
-                case BstParser.FunctionCommandContext ctx ->
-                        function(ctx);
-                case BstParser.ExecuteCommandContext ctx ->
-                        execute(ctx);
-                case BstParser.SortCommandContext ctx ->
-                        sort(ctx);
-                case BstParser.IterateCommandContext ctx ->
-                        iterate(ctx);
-                case BstParser.ReverseCommandContext ctx ->
-                        reverse(ctx);
-                case BstParser.EntryCommandContext ctx ->
-                        entry(ctx);
-                case BstParser.ReadCommandContext ctx ->
-                        read(bibDatabase, ctx);
-                case BstParser.MacroCommandContext ctx ->
-                        macro(ctx);
-                default ->
-                        LOGGER.info("Unknown type: {}", ((BstParser.CommandsContext) child).getText());
-            }
-        }
-
-        return bbl.toString();
-    }
-
-    /**
-     * Dredges up from the database file the field values for each entry in the list. It has no arguments. If a database
-     * entry doesn't have a value for a field (and probably no database entry will have a value for every field), that
-     * field variable is marked as missing for the entry.
-     * <p>
-     * We use null for the missing entry designator.
-     */
-    private void read(BibDatabase bibDatabase, Tree child) {
-        FieldWriter fieldWriter = new FieldWriter(new FieldWriterPreferences(true, List.of(StandardField.MONTH), new FieldContentFormatterPreferences()));
-        for (BstEntry e : entries) {
-            for (Map.Entry<String, String> mEntry : e.fields.entrySet()) {
-                Field field = FieldFactory.parseField(mEntry.getKey());
-                String fieldValue = e.entry.getResolvedFieldOrAlias(field, bibDatabase)
-                                           .map(content -> {
-                                               try {
-                                                   String result = fieldWriter.write(field, content);
-                                                   if (result.startsWith("{")) {
-                                                       // Strip enclosing {} from the output
-                                                       return result.substring(1, result.length() - 1);
-                                                   }
-                                                   if (field == StandardField.MONTH) {
-                                                       // We don't have the internal BibTeX strings at hand.
-                                                       // We nevertheless want to have the full month name.
-                                                       // Thus, we lookup the full month name here.
-                                                       return Month.parse(result)
-                                                                   .map(Month::getFullName)
-                                                                   .orElse(result);
-                                                   }
-                                                   return result;
-                                               } catch (InvalidFieldValueException invalidFieldValueException) {
-                                                   // in case there is something wrong with the content, just return the content itself
-                                                   return content;
-                                               }
-                                           })
-                                           .orElse(null);
-                mEntry.setValue(fieldValue);
-            }
-        }
-
-        for (BstEntry e : entries) {
-            if (!e.fields.containsKey(StandardField.CROSSREF.getName())) {
-                e.fields.put(StandardField.CROSSREF.getName(), null);
-            }
-        }
-    }
-
-    /**
-     * Defines a string macro. It has two arguments; the first is the macro's name, which is treated like any other
-     * variable or function name, and the second is its definition, which must be double-quote-delimited. You must have
-     * one for each three-letter month abbreviation; in addition, you should have one for common journal names. The
-     * user's database may override any definition you define using this command. If you want to define a string the
-     * user can't touch, use the FUNCTION command, which has a compatible syntax.
-     */
-    private void macro(Tree child) {
-        String name = child.getChild(0).getText();
-        String replacement = child.getChild(1).getText();
-        functions.put(name, new MacroFunction(replacement));
-    }
-
-    public class MacroFunction implements BstFunction {
-
-        private final String replacement;
-
-        public MacroFunction(String replacement) {
-            this.replacement = replacement;
-        }
-
-        @Override
-        public void execute(BstEntry context) {
-            VM.this.push(replacement);
-        }
-    }
-
-    /**
-     * Declares the fields and entry variables. It has three arguments, each a (possibly empty) list of variable names.
-     * The three lists are of: fields, integer entry variables, and string entry variables. There is an additional field
-     * that BibTEX automatically declares, crossref, used for cross referencing. And there is an additional string entry
-     * variable automatically declared, sort.key$, used by the SORT command. Each of these variables has a value for
-     * each entry on the list.
-     */
-    private void entry(Tree child) {
-        // Fields first
-        Tree t = child.getChild(0);
-
-        for (int i = 0; i < t.getChildCount(); i++) {
-            String name = t.getChild(i).getText();
-
-            for (BstEntry entry : entries) {
-                entry.fields.put(name, null);
-            }
-        }
-
-        // Integers
-        t = child.getChild(1);
-
-        for (int i = 0; i < t.getChildCount(); i++) {
-            String name = t.getChild(i).getText();
-
-            for (BstEntry entry : entries) {
-                entry.localIntegers.put(name, 0);
-            }
-        }
-        // Strings
-        t = child.getChild(2);
-
-        for (int i = 0; i < t.getChildCount(); i++) {
-            String name = t.getChild(i).getText();
-            for (BstEntry entry : entries) {
-                entry.localStrings.put(name, null);
-            }
-        }
-        for (BstEntry entry : entries) {
-            entry.localStrings.put("sort.key$", null);
-        }
-    }
-
-    private void reverse(Tree child) {
-        BstFunction f = functions.get(child.getChild(0).getText());
-
-        ListIterator<BstEntry> i = entries.listIterator(entries.size());
-        while (i.hasPrevious()) {
-            f.execute(i.previous());
-        }
-    }
-
-    private void iterate(Tree child) {
-        BstFunction f = functions.get(child.getChild(0).getText());
-
-        for (BstEntry entry : entries) {
-            f.execute(entry);
-        }
-    }
-
-    /**
-     * Sorts the entry list using the values of the string entry variable sort.key$. It has no arguments.
-     */
-    private void sort(Tree child) {
-        entries.sort(Comparator.comparing(o -> (o.localStrings.get("sort.key$"))));
-    }
-
-    private void executeInContext(Object o, BstEntry context) {
-        if (o instanceof Tree t) {
-            new StackFunction(t).execute(context);
-        } else if (o instanceof Identifier) {
-            execute(((Identifier) o).getName(), context);
-        }
-    }
-
-    private void execute(Tree child) {
-        execute(child.getChild(0).getText(), null);
-    }
-
-    public class StackFunction implements BstFunction {
-
-        private final Tree localTree;
-
-        public StackFunction(Tree stack) {
-            localTree = stack;
-        }
-
-        public Tree getTree() {
-            return localTree;
-        }
-
-        @Override
-        public void execute(BstEntry context) {
-            for (int i = 0; i < localTree.getChildCount(); i++) {
-                Tree c = localTree.getChild(i);
-                try {
-
-                    switch (c.getType()) {
-                        case BstParser.STRING -> {
-                            String s = c.getText();
-                            push(s.substring(1, s.length() - 1));
-                        }
-                        case BstParser.INTEGER ->
-                                push(Integer.parseInt(c.getText().substring(1)));
-                        case BstParser.QUOTED ->
-                                push(new Identifier(c.getText().substring(1)));
-                        case BstParser.STACK ->
-                                push(c);
-                        default ->
-                                VM.this.execute(c.getText(), context);
-                    }
-                } catch (VMException e) {
-                    if (path == null) {
-                        LOGGER.error("ERROR " + e.getMessage() + " (" + c.getLine() + ")");
-                    } else {
-                        LOGGER.error("ERROR " + e.getMessage() + " (" + path + ":"
-                                + c.getLine() + ")");
-                    }
-                    throw e;
-                }
-            }
-        }
-    }
-
-    private void push(Tree t) {
-        stack.push(t);
-    }
-
-    private void execute(String name, BstEntry context) {
-        if (context != null) {
-            if (context.fields.containsKey(name)) {
-                stack.push(context.fields.get(name));
-                return;
-            }
-            if (context.localStrings.containsKey(name)) {
-                stack.push(context.localStrings.get(name));
-                return;
-            }
-            if (context.localIntegers.containsKey(name)) {
-                stack.push(context.localIntegers.get(name));
-                return;
-            }
-        }
-        if (strings.containsKey(name)) {
-            stack.push(strings.get(name));
-            return;
-        }
-        if (integers.containsKey(name)) {
-            stack.push(integers.get(name));
-            return;
-        }
-
-        if (functions.containsKey(name)) {
-            // OK to have a null context
-            functions.get(name).execute(context);
-            return;
-        }
-
-        throw new VMException("No matching identifier found: " + name);
-    }
-
-    private void function(Tree child) {
-        String name = child.getChild(0).getText();
-        Tree localStack = child.getChild(1);
-        functions.put(name, new StackFunction(localStack));
-    }
-
-    /**
-     * Declares global integer variables. It has one argument, a list of variable names. There are two such
-     * automatically-declared variables, entry.max$ and global.max$, used for limiting the lengths of string vari-
-     * ables. You may have any number of these commands, but a variable's declaration must precede its use.
-     */
-    private void integers(Tree child) {
-        Tree t = child.getChild(0);
-
-        for (int i = 0; i < t.getChildCount(); i++) {
-            String name = t.getChild(i).getText();
-            integers.put(name, 0);
-        }
-    }
-
-    /**
-     * Declares global string variables. It has one argument, a list of variable names. You may have any number of these
-     * commands, but a variable's declaration must precede its use.
-     */
-    private void strings(Tree child) {
-        Tree t = child.getChild(0);
-
-        for (int i = 0; i < t.getChildCount(); i++) {
-            String name = t.getChild(i).getText();
-            strings.put(name, null);
-        }
-    }
-
-    private void push(Integer integer) {
-        stack.push(integer);
-    }
-
-    private void push(String string) {
-        stack.push(string);
-    }
-
-    private void push(Identifier identifier) {
-        stack.push(identifier);
-    }
-
-    public Map<String, String> getStrings() {
-        return strings;
-    }
-
-    public Map<String, Integer> getIntegers() {
-        return integers;
-    }
-
-    public List<BstEntry> getEntries() {
-        return entries;
-    }
-
-    public Map<String, BstFunction> getFunctions() {
-        return functions;
-    }
-
-    public Stack<Object> getStack() {
-        return stack;
     }
 }

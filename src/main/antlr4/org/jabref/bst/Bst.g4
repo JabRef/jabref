@@ -41,14 +41,15 @@ start
     ;
 
 commands
-    : list=(STRINGS|INTEGERS) id=idListObl                            #variablesCommand
+    : STRINGS ids=idListObl                                           #stringsCommand
+    | INTEGERS ids=idListObl                                          #integersCommand
     | FUNCTION LBRACE id=identifier RBRACE exp=stack                  #functionCommand
-    | list=MACRO LBRACE id=identifier RBRACE LBRACE exp=STRING RBRACE #variablesCommand
+    | MACRO LBRACE id=identifier RBRACE LBRACE repl=STRING RBRACE     #macroCommand
     | READ                                                            #readCommand
-    | EXECUTE LBRACE id=function RBRACE                               #executeCommand
-    | ITERATE LBRACE id=function RBRACE                               #iterateCommand
-    | REVERSE LBRACE id=function RBRACE                               #reverseCommand
-    | ENTRY first=idListOpt second=idListOpt third=idListOpt          #entryCommand
+    | EXECUTE LBRACE exp=function RBRACE                              #executeCommand
+    | ITERATE LBRACE exp=function RBRACE                              #iterateCommand
+    | REVERSE LBRACE exp=function RBRACE                              #reverseCommand
+    | ENTRY idListOpt idListOpt idListOpt                             #entryCommand
     | SORT                                                            #sortCommand
     ;
 
