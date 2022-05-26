@@ -6,8 +6,11 @@ import java.io.InputStream;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.*;
-
+import java.util.Arrays;
+import java.util.List;
+import java.util.Locale;
+import java.util.Objects;
+import java.util.Optional;
 
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.preferences.FilePreferences;
@@ -108,8 +111,10 @@ public class FileHelper {
      * Detect illegal characters in given filename.
      *
      * @param fileName the fileName to detect
-     * @return Boolean whether there is a illegal name
+     * @return Boolean whether there is a illegal name.
+     *
      */
+
     public static Boolean detectBadFileName(String fileName) {
         for (int i = 0; i < fileName.length(); i++) {
             char c = fileName.charAt(i);
@@ -136,7 +141,9 @@ public class FileHelper {
     /**
      * Converts a relative filename to an absolute one, if necessary. Returns
      * an empty optional if the file does not exist.
+     *
      */
+
     public static Optional<Path> find(String fileName, Path directory) {
         Objects.requireNonNull(fileName);
         Objects.requireNonNull(directory);
