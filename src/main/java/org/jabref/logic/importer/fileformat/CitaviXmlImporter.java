@@ -59,6 +59,11 @@ public class CitaviXmlImporter extends Importer implements Parser {
     private static final byte UUID_LENGTH = 36;
     private static final byte UUID_SEMICOLON_OFFSET_INDEX = 37;
 
+    private final Map<String, Author> knownPersons = new HashMap<>();
+
+    private Map<String, String> refIdwithAuthors = new HashMap<>();
+    private Map<String, String> refIdWithEditors = new HashMap<>();
+
     private Unmarshaller unmarshaller;
     private CitaviExchangeData.Persons persons;
     private CitaviExchangeData.Keywords keywords;
@@ -67,10 +72,6 @@ public class CitaviXmlImporter extends Importer implements Parser {
     private CitaviExchangeData.ReferenceEditors editors;
     private CitaviExchangeData.ReferenceKeywords keyword;
     private CitaviExchangeData.ReferencePublishers publisher;
-
-    Map<String, String> refIdwithAuthors = new HashMap<>();
-    Map<String,String> refIdWithEditors = new HashMap<>();
-    Map<String, Author> knownPersons = new HashMap<>();
 
     @Override
     public String getName() {
@@ -101,7 +102,6 @@ public class CitaviXmlImporter extends Importer implements Parser {
     @Override
     public boolean isRecognizedFormat(Path filePath) throws IOException {
         try (BufferedReader reader = getReaderFromZip(filePath)) {
-
             String str;
             int i = 0;
             while (((str = reader.readLine()) != null) && (i < 50)) {
@@ -147,8 +147,8 @@ public class CitaviXmlImporter extends Importer implements Parser {
         publishers = data.getPublishers();
         publisher = data.getReferencePublishers();
 
-       this.refIdwithAuthors =   buildPersonList(authors.getOnetoN());
-       this.refIdWithEditors = buildPersonList(editors.getOnetoN());
+        this.refIdwithAuthors = buildPersonList(authors.getOnetoN());
+        this.refIdWithEditors = buildPersonList(editors.getOnetoN());
 
         bibEntries = data
                          .getReferences().getReference()
@@ -239,11 +239,10 @@ public class CitaviXmlImporter extends Importer implements Parser {
         return this.refIdwithAuthors.get(data.getId());
     }
 
-    private Map<String,String> buildPersonList(List<String> authorsOrEditors) {
-        Map<String,String> refToPerson = new HashMap<>();
+    private Map<String, String> buildPersonList(List<String> authorsOrEditors) {
+        Map<String, String> refToPerson = new HashMap<>();
 
-        for (var idStringsWithSemicolon : authorsOrEditors) {
-
+        for (String idStringsWithSemicolon : authorsOrEditors) {
             String refId = idStringsWithSemicolon.substring(0, UUID_LENGTH);
             String rest = idStringsWithSemicolon.substring(UUID_SEMICOLON_OFFSET_INDEX, idStringsWithSemicolon.length());
 
@@ -261,10 +260,8 @@ public class CitaviXmlImporter extends Importer implements Parser {
                 jabrefAuthors.add(knownPersons.get(personId));
 
             }
-
             String stringifiedAuthors = AuthorList.of(jabrefAuthors).getAsLastFirstNamesWithAnd(false);
             refToPerson.put(refId, stringifiedAuthors);
-
         }
         return refToPerson;
 
