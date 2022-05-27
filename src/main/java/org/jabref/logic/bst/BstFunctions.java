@@ -26,7 +26,7 @@ public class BstFunctions {
     private final Map<String, String> strings;
     private final Map<String, Integer> integers;
     private final Map<String, BstFunction> functions;
-    private final Map<String, BstFunction> buildInFunctions = new HashMap<>(37);
+    private final Map<String, BstFunction> builtInFunctions = new HashMap<>(37);
 
     private final Stack<Object> stack;
 
@@ -51,47 +51,51 @@ public class BstFunctions {
         this.stack = stack;
         this.bbl = bbl;
 
-        initBuildInFunctions();
+        inititalize();
     }
 
-    private void initBuildInFunctions() {
-        buildInFunctions.put(">", this::bstIsGreaterThan);
-        buildInFunctions.put("<", this::bstIsLowerThan);
-        buildInFunctions.put("=", this::bstEquals);
-        buildInFunctions.put("+", this::bstAdd);
-        buildInFunctions.put("-", this::bstSubtract);
-        buildInFunctions.put("*", this::bstConcat);
-        buildInFunctions.put(":=", this::bstAssign);
-        buildInFunctions.put("add.period$", this::bstAddPeriod);
-        buildInFunctions.put("call.type$", this::bstCallType);
-        buildInFunctions.put("change.case$", this::bstChangeCase);
-        buildInFunctions.put("chr.to.int$", this::bstChrToInt);
-        buildInFunctions.put("cite$", this::bstCite);
-        buildInFunctions.put("duplicate$", this::bstDuplicate);
-        buildInFunctions.put("empty$", this::bstEmpty);
-        buildInFunctions.put("format.name$", this::bstFormatName);
-        buildInFunctions.put("if$", this::bstIf);
-        buildInFunctions.put("int.to.chr$", this::bstIntToChr);
-        buildInFunctions.put("int.to.str$", this::bstIntToStr);
-        buildInFunctions.put("missing$", this::bstMissing);
-        buildInFunctions.put("newline$", this::bstNewLine);
-        buildInFunctions.put("num.names$", this::bstNumNames);
-        buildInFunctions.put("pop$", this::bstPop);
-        buildInFunctions.put("preamble$", this::bstPreamble);
-        buildInFunctions.put("purify$", this::bstPurify);
-        buildInFunctions.put("quote$", this::bstQuote);
-        buildInFunctions.put("skip$", this::bstSkip);
-        buildInFunctions.put("stack$", this::bstStack);
-        buildInFunctions.put("substring$", this::bstSubstring);
-        buildInFunctions.put("swap$", this::bstSwap);
-        buildInFunctions.put("text.length$", this::bstTextLength);
-        buildInFunctions.put("text.prefix$", this::bstTextPrefix);
-        buildInFunctions.put("top$", this::bstTop);
-        buildInFunctions.put("type$", this::bstType);
-        buildInFunctions.put("warning$", this::bstWarning);
-        buildInFunctions.put("while$", this::bstWhile);
-        buildInFunctions.put("width$", this::bstWidth);
-        buildInFunctions.put("write$", this::bstWrite);
+    private void inititalize() {
+        builtInFunctions.put(">", this::bstIsGreaterThan);
+        builtInFunctions.put("<", this::bstIsLowerThan);
+        builtInFunctions.put("=", this::bstEquals);
+        builtInFunctions.put("+", this::bstAdd);
+        builtInFunctions.put("-", this::bstSubtract);
+        builtInFunctions.put("*", this::bstConcat);
+        builtInFunctions.put(":=", this::bstAssign);
+        builtInFunctions.put("add.period$", this::bstAddPeriod);
+        builtInFunctions.put("call.type$", this::bstCallType);
+        builtInFunctions.put("change.case$", this::bstChangeCase);
+        builtInFunctions.put("chr.to.int$", this::bstChrToInt);
+        builtInFunctions.put("cite$", this::bstCite);
+        builtInFunctions.put("duplicate$", this::bstDuplicate);
+        builtInFunctions.put("empty$", this::bstEmpty);
+        builtInFunctions.put("format.name$", this::bstFormatName);
+        builtInFunctions.put("if$", this::bstIf);
+        builtInFunctions.put("int.to.chr$", this::bstIntToChr);
+        builtInFunctions.put("int.to.str$", this::bstIntToStr);
+        builtInFunctions.put("missing$", this::bstMissing);
+        builtInFunctions.put("newline$", this::bstNewLine);
+        builtInFunctions.put("num.names$", this::bstNumNames);
+        builtInFunctions.put("pop$", this::bstPop);
+        builtInFunctions.put("preamble$", this::bstPreamble);
+        builtInFunctions.put("purify$", this::bstPurify);
+        builtInFunctions.put("quote$", this::bstQuote);
+        builtInFunctions.put("skip$", this::bstSkip);
+        builtInFunctions.put("stack$", this::bstStack);
+        builtInFunctions.put("substring$", this::bstSubstring);
+        builtInFunctions.put("swap$", this::bstSwap);
+        builtInFunctions.put("text.length$", this::bstTextLength);
+        builtInFunctions.put("text.prefix$", this::bstTextPrefix);
+        builtInFunctions.put("top$", this::bstTop);
+        builtInFunctions.put("type$", this::bstType);
+        builtInFunctions.put("warning$", this::bstWarning);
+        builtInFunctions.put("while$", this::bstWhile);
+        builtInFunctions.put("width$", this::bstWidth);
+        builtInFunctions.put("write$", this::bstWrite);
+    }
+
+    public Map<String, BstFunction> getBuiltInFunction() {
+        return builtInFunctions;
     }
 
     /**
