@@ -253,18 +253,15 @@ public class CitaviXmlImporter extends Importer implements Parser {
             for (String personId : personIds) {
                 // Store persons we already encountered, we can have the same author multiple times in the whole database
                 knownPersons.computeIfAbsent(personId, k -> {
-
                     Optional<Person> person = persons.getPerson().stream().filter(p -> p.getId().equals(k)).findFirst();
                     return person.map(p -> new Author(p.getFirstName(), "", "", p.getLastName(), "")).orElse(null);
                 });
                 jabrefAuthors.add(knownPersons.get(personId));
-
             }
             String stringifiedAuthors = AuthorList.of(jabrefAuthors).getAsLastFirstNamesWithAnd(false);
             refToPerson.put(refId, stringifiedAuthors);
         }
         return refToPerson;
-
     }
 
     private String getEditorName(CitaviExchangeData.References.Reference data) {
