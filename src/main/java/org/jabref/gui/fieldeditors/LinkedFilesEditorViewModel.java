@@ -135,7 +135,7 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
         return files;
     }
 
-    public void addNewFile() {
+    public int addNewFile() {
         Path workingDirectory = databaseContext.getFirstExistingFileDir(preferences.getFilePreferences())
                                                .orElse(preferences.getFilePreferences().getWorkingDirectory());
 
@@ -155,6 +155,7 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
                     preferences,
                     externalFileTypes));
         });
+        return files.size();
     }
 
     @Override

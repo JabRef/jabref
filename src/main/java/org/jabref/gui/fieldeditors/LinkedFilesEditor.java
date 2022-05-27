@@ -236,7 +236,16 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
 
     @FXML
     private void addNewFile() {
-        viewModel.addNewFile();
+//        System.out.println(listView.getPrefHeight());
+        int number = viewModel.addNewFile();
+        if(number < 3)
+            return;
+        else{
+            listView.setMinHeight(number*20);
+//            listView.setPrefHeight(number*5);
+            System.out.println(listView.getPrefHeight());
+        }
+//
     }
 
     @FXML
