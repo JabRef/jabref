@@ -305,16 +305,16 @@ public class GlobalSearchBar extends HBox {
         currentResults.setText(illegalSearch);
     }
 
-    public void setAutoCompleter(SuggestionProvider<Author> searchCompleter) {
+    public void setAutoCompleter(OmnisearchSuggestionProvider searchCompleter) {
         if (preferencesService.getAutoCompletePreferences().shouldAutoComplete()) {
-            AutoCompletionTextInputBinding<Author> autoComplete = AutoCompletionTextInputBinding.autoComplete(searchField,
+            AutoCompletionTextInputBinding<String> autoComplete = AutoCompletionTextInputBinding.autoComplete(searchField,
                     searchCompleter::provideSuggestions,
-                    new PersonNameStringConverter(false, false, AutoCompleteFirstNameMode.BOTH),
+                    new StringStringConverter(),
                     new AppendPersonNamesStrategy());
-                    //new TitleStringConverter(),
-                    //new AppendWordsStrategy());
-            //AutoCompletePopup<BibEntry> popup = getPopup(autoComplete);
-            AutoCompletePopup<Author> popup = getPopup(autoComplete);
+                    // new TitleStringConverter(),
+                    // new AppendWordsStrategy());
+            // AutoCompletePopup<BibEntry> popup = getPopup(autoComplete);
+            AutoCompletePopup<String> popup = getPopup(autoComplete);
             popup.setSkin(new SearchPopupSkin<>(popup));
         }
     }
@@ -454,6 +454,10 @@ public class GlobalSearchBar extends HBox {
                     // Update the search bar to contain the text author=suggestion
                     String searchTerm = this.control.getConverter().toString(suggestion);
                     searchField.setText("author="+searchTerm);
+                }
+                if (suggestion.getClass() == String.class) {
+                    String searchTerm = this.control.getConverter().toString(suggestion);
+                    searchField.setText("string=" + searchTerm);
                 }
                 // Event.fireEvent(this.control, new AutoCompletePopup.SuggestionEvent<>(suggestion));
             }
