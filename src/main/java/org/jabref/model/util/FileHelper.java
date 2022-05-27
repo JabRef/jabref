@@ -27,6 +27,22 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class FileHelper {
+    /**
+     * MUST ALWAYS BE A SORTED ARRAY because it is used in a binary search
+     */
+    // @formatter:off
+    private static final int[] ILLEGAL_CHARS = {
+            0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
+            10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
+            20, 21, 22, 23, 24, 25, 26, 27, 28, 29,
+            30, 31, 34,
+            42,
+            58,
+            60, 62, 63,
+            123, 124, 125
+    };
+    // @formatter:on
+
     private static final Logger LOGGER = LoggerFactory.getLogger(FileHelper.class);
     /**
      * Returns the extension of a file or Optional.empty() if the file does not have one (no . in name).
@@ -115,7 +131,7 @@ public class FileHelper {
      *
      */
 
-    public static Boolean detectBadFileName(String fileName) {
+    public static boolean detectBadFileName(String fileName) {
         for (int i = 0; i < fileName.length(); i++) {
             char c = fileName.charAt(i);
             if (!isCharLegal(c)) {
@@ -125,19 +141,11 @@ public class FileHelper {
         return false;
     }
 
-    private static boolean isCharLegal(char c) {
-         int[] ILLEGAL_CHARS = {
-                 0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
-                 10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
-                 20, 21, 22, 23, 24, 25, 26, 27, 28, 29,
-                 30, 31, 34,
-                 42,
-                 58,
-                 60, 62, 63,
-                 123, 124, 125
-        };
+
+    public static boolean isCharLegal(char c) {
         return Arrays.binarySearch(ILLEGAL_CHARS, c) < 0;
     }
+
     /**
      * Converts a relative filename to an absolute one, if necessary. Returns
      * an empty optional if the file does not exist.

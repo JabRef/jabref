@@ -1,6 +1,6 @@
 package org.jabref.logic.util.io;
 
-import java.util.Arrays;
+import org.jabref.model.util.FileHelper;
 
 /**
  * This class is based on http://stackoverflow.com/a/5626340/873282
@@ -9,21 +9,6 @@ import java.util.Arrays;
  */
 public class FileNameCleaner {
 
-    /**
-     * MUST ALWAYS BE A SORTED ARRAY because it is used in a binary search
-     */
-    // @formatter:off
-    private static final int[] ILLEGAL_CHARS = {
-            0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
-            10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
-            20, 21, 22, 23, 24, 25, 26, 27, 28, 29,
-            30, 31, 34,
-            42,
-            58,
-            60, 62, 63,
-            123, 124, 125
-    };
-    // @formatter:on
 
     private FileNameCleaner() {
     }
@@ -38,7 +23,7 @@ public class FileNameCleaner {
         StringBuilder cleanName = new StringBuilder(badFileName.length());
         for (int i = 0; i < badFileName.length(); i++) {
             char c = badFileName.charAt(i);
-            if (FileNameCleaner.isCharLegal(c) && (c != '/') && (c != '\\')) {
+            if (FileHelper.isCharLegal(c) && (c != '/') && (c != '\\')) {
                 cleanName.append(c);
             } else {
                 cleanName.append('_');
@@ -58,16 +43,12 @@ public class FileNameCleaner {
         StringBuilder cleanName = new StringBuilder(badFileName.length());
         for (int i = 0; i < badFileName.length(); i++) {
             char c = badFileName.charAt(i);
-            if (FileNameCleaner.isCharLegal(c)) {
+            if (FileHelper.isCharLegal(c)) {
                 cleanName.append(c);
             } else {
                 cleanName.append('_');
             }
         }
         return cleanName.toString().trim();
-    }
-
-    private static boolean isCharLegal(char c) {
-        return Arrays.binarySearch(FileNameCleaner.ILLEGAL_CHARS, c) < 0;
     }
 }
