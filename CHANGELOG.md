@@ -33,7 +33,8 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixed an issue where an exxception for DOI search occured when the DOI contained urlencoded characters. [#8787](https://github.com/JabRef/jabref/issues/8787)
 - We fixed an issue which allow us to select and open identifiers from a popup list in the maintable [#8758](https://github.com/JabRef/jabref/issues/8758), [8802](https://github.com/JabRef/jabref/issues/8802)
 - We fixed an issue where the escape button had no functionality within the "Filter groups" textfield. [koppor#562](https://github.com/koppor/jabref/issues/562)
-- We fixed an issue where right clicking a group and choose "remove selected entries from this group" leads to error when Bibtex source tab is selected. [#8012](https://github.com/JabRef/jabref/issues/8012)
+- We fixed an issue where right clicking a group and choose "remove selected entries  from this group" leads to error when Bibtex source tab is selected. [#8012](https://github.com/JabRef/jabref/issues/8012)
+- We fixed an issue of 4688 which was about merging the optionals,optional2 and otherFields.[#4688](https://github.com/JabRef/jabref/issues/4688)
 
 ### Removed
 
