@@ -26,7 +26,7 @@ Architectural decisions for JabRef:
 * [ADR-0016](./adr/0016-mutable-preferences-objects.md) - Mutable preferences objects
 * [ADR-0017](./adr/0017-allow-model-access-logic.md) - Allow org.jabref.model to access org.jabref.logic
 * [ADR-0018](./adr/0018-use-regular-expression-to-split-multiple-sentence-titles.md) - Use regular expression to split multiple-sentence titles
-* [ADR-0019](./adr/0019-implement-special-fields-as-seperate-fields.md) - Implement special fields as separate fields
+* [ADR-0019](./adr/0019-implement-special-fields-as-separate-fields.md) - Implement special fields as separate fields
 * [ADR-0020](./adr/0020-use-Jackson-to-parse-study-yml.md) - Use Jackson to parse study.yml
 * [ADR-0021](./adr/0021-keep-study-as-a-dto.md) - Keep study as a DTO
 * [ADR-0022](./adr/0022-remove-stop-words-during-query-transformation.md) - Remove stop words during query transformation
