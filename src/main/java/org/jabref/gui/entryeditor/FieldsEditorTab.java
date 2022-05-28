@@ -134,28 +134,12 @@ abstract class FieldsEditorTab extends EntryEditorTab {
 
         ColumnConstraints columnDoNotContract = new ColumnConstraints();
         columnDoNotContract.setMinWidth(Region.USE_PREF_SIZE);
-        int rows;
-        if (compressed) {
-            rows = (int) Math.ceil((double) fields.size() / 1);
-
-            addColumn(gridPane, 0, labels.subList(0, rows));
-            addColumn(gridPane, 3, labels.subList(rows, labels.size()));
-            addColumn(gridPane, 1, editors.values().stream().map(FieldEditorFX::getNode).limit(rows));
-            addColumn(gridPane, 4, editors.values().stream().map(FieldEditorFX::getNode).skip(rows));
-
-            columnExpand.setPercentWidth(40);
-            gridPane.getColumnConstraints().addAll(columnDoNotContract, columnExpand, new ColumnConstraints(5),
-                    columnDoNotContract, columnExpand);
-
-            setCompressedRowLayout(gridPane, rows);
-        } else {
             addColumn(gridPane, 0, labels);
             addColumn(gridPane, 1, editors.values().stream().map(FieldEditorFX::getNode));
 
             gridPane.getColumnConstraints().addAll(columnDoNotContract, columnExpand);
 
             setRegularRowLayout(gridPane);
-        }
     }
 
     private void setRegularRowLayout(GridPane gridPane) {

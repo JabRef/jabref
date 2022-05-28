@@ -25,15 +25,14 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.BibEntryTypesManager;
-import org.jabref.model.entry.field.BibField;
 import org.jabref.model.entry.field.Field;
-import org.jabref.model.entry.field.InternalField;
 import org.jabref.preferences.PreferencesService;
 
 public class OptionalFieldsTabBase extends FieldsEditorTab {
     private final BibEntryTypesManager entryTypesManager;
     private final boolean isPrimaryOptionalFields;
     private final List<Field> customTabFieldNames;
+
     public OptionalFieldsTabBase(String title,
                                  boolean isPrimaryOptionalFields,
                                  BibDatabaseContext databaseContext,
@@ -72,14 +71,10 @@ public class OptionalFieldsTabBase extends FieldsEditorTab {
     protected Set<Field> determineFieldsToShow(BibEntry entry) {
         Optional<BibEntryType> entryType = entryTypesManager.enrich(entry.getType(), databaseContext.getMode());
         if (entryType.isPresent()) {
-                Set<Field> allKnownFields = entryType.get().getAllFields();
-                Set<Field> otherFields = entry.getFields().stream().filter(field -> !allKnownFields.contains(field)).collect(Collectors.toCollection(LinkedHashSet::new));
-
-               // otherFields.removeAll(entryType.get().getDeprecatedFields());
-//                otherFields.removeAll(entryType.get().getOptionalFields().stream().map(BibField::getField).collect(Collectors.toSet()));
-//                otherFields.remove(InternalField.KEY_FIELD);
-//                otherFields.removeAll(customTabFieldNames);
-                return otherFields;
+            Set<Field> allKnownFields = entryType.get().getAllFields();
+            Set<Field> otherFields = entry.getFields().stream().filter(field -> !allKnownFields.contains(field)).collect(Collectors.toCollection(LinkedHashSet::new));
+            otherFields.removeAll(entryType.get().getDeprecatedFields());
+            return otherFields;
         } else {
             // Entry type unknown -> treat all fields as required
             return Collections.emptySet();
