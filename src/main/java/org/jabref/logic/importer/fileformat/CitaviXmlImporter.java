@@ -37,6 +37,8 @@ import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.Author;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.Keyword;
+import org.jabref.model.entry.KeywordList;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.IEEETranEntryType;
@@ -60,19 +62,24 @@ public class CitaviXmlImporter extends Importer implements Parser {
     private static final byte UUID_SEMICOLON_OFFSET_INDEX = 37;
 
     private final Map<String, Author> knownPersons = new HashMap<>();
+    private final Map<String, Keyword> knownKeywords = new HashMap<>();
+    private final Map<String, String> knownPublishers = new HashMap<>();
 
-    private Map<String, String> refIdwithAuthors = new HashMap<>();
+    private Map<String, String> refIdWithAuthors = new HashMap<>();
     private Map<String, String> refIdWithEditors = new HashMap<>();
+    private Map<String, String> refIdWithKeywords = new HashMap<>();
+    private Map<String, String> refIdWithPublishers = new HashMap<>();
 
-    private Unmarshaller unmarshaller;
     private CitaviExchangeData.Persons persons;
     private CitaviExchangeData.Keywords keywords;
     private CitaviExchangeData.Publishers publishers;
-    private CitaviExchangeData.ReferenceAuthors authors;
-    private CitaviExchangeData.ReferenceEditors editors;
-    private CitaviExchangeData.ReferenceKeywords keyword;
-    private CitaviExchangeData.ReferencePublishers publisher;
 
+    private CitaviExchangeData.ReferenceAuthors refAuthors;
+    private CitaviExchangeData.ReferenceEditors refEditors;
+    private CitaviExchangeData.ReferenceKeywords refKeywords;
+    private CitaviExchangeData.ReferencePublishers refPublishers;
+
+    private Unmarshaller unmarshaller;
     @Override
     public String getName() {
         return "Citavi XML";
@@ -139,16 +146,27 @@ public class CitaviXmlImporter extends Importer implements Parser {
     private List<BibEntry> parseDataList(CitaviExchangeData data) {
         List<BibEntry> bibEntries = new ArrayList<>();
 
-        authors = data.getReferenceAuthors();
         persons = data.getPersons();
-        editors = data.getReferenceEditors();
         keywords = data.getKeywords();
-        keyword = data.getReferenceKeywords();
         publishers = data.getPublishers();
-        publisher = data.getReferencePublishers();
 
-        this.refIdwithAuthors = buildPersonList(authors.getOnetoN());
-        this.refIdWithEditors = buildPersonList(editors.getOnetoN());
+        refAuthors = data.getReferenceAuthors();
+        refEditors = data.getReferenceEditors();
+        refKeywords = data.getReferenceKeywords();
+        refPublishers = data.getReferencePublishers();
+
+        if (refAuthors != null) {
+            this.refIdWithAuthors = buildPersonList(refAuthors.getOnetoN());
+        }
+        if (refEditors != null) {
+            this.refIdWithEditors = buildPersonList(refEditors.getOnetoN());
+        }
+        if (refKeywords != null) {
+            this.refIdWithKeywords = buildKeywordList(refKeywords.getOnetoN());
+        }
+        if (refPublishers != null) {
+            this.refIdWithPublishers = buildPublisherList(refPublishers.getOnetoN());
+        }
 
         bibEntries = data
                          .getReferences().getReference()
@@ -232,11 +250,11 @@ public class CitaviXmlImporter extends Importer implements Parser {
     }
 
     private String getAuthorName(CitaviExchangeData.References.Reference data) {
-        if (authors == null) {
+        if (refAuthors == null) {
             return null;
         }
 
-        return this.refIdwithAuthors.get(data.getId());
+        return this.refIdWithAuthors.get(data.getId());
     }
 
     private Map<String, String> buildPersonList(List<String> authorsOrEditors) {
@@ -264,94 +282,78 @@ public class CitaviXmlImporter extends Importer implements Parser {
         return refToPerson;
     }
 
+    private Map<String, String> buildKeywordList(List<String> keywordsList) {
+        Map<String, String> refToKeywords = new HashMap<>();
+
+        for (String idStringsWithSemicolon : keywordsList) {
+            String refId = idStringsWithSemicolon.substring(0, UUID_LENGTH);
+            String rest = idStringsWithSemicolon.substring(UUID_SEMICOLON_OFFSET_INDEX, idStringsWithSemicolon.length());
+
+            String[] keywordIds = rest.split(";");
+
+            List<Keyword> jabrefKeywords = new ArrayList<>();
+
+            for (String keywordId : keywordIds) {
+                // store keywords already encountered
+                knownKeywords.computeIfAbsent(keywordId, k -> {
+                    Optional<CitaviExchangeData.Keywords.Keyword> keyword = keywords.getKeyword().stream().filter(p -> p.getId().equals(k)).findFirst();
+                    return keyword.map(p -> new Keyword(p.getName())).orElse(null);
+                });
+                jabrefKeywords.add(knownKeywords.get(keywordId));
+            }
+
+            KeywordList list = new KeywordList(List.copyOf(jabrefKeywords));
+            String stringifiedKeywords = list.toString();
+            refToKeywords.put(refId, stringifiedKeywords);
+        }
+        return refToKeywords;
+    }
+
+    private Map<String, String> buildPublisherList(List<String> publishersList) {
+        Map<String, String> refToPublishers = new HashMap<>();
+
+        for (String idStringsWithSemicolon : publishersList) {
+            String refId = idStringsWithSemicolon.substring(0, UUID_LENGTH);
+            String rest = idStringsWithSemicolon.substring(UUID_SEMICOLON_OFFSET_INDEX, idStringsWithSemicolon.length());
+
+            String[] publisherIds = rest.split(";");
+
+            List<String> jabrefPublishers = new ArrayList<>();
+
+            for (String pubId : publisherIds) {
+                // store publishers already encountered
+                knownPublishers.computeIfAbsent(pubId, k -> {
+                    Optional<CitaviExchangeData.Publishers.Publisher> publisher = publishers.getPublisher().stream().filter(p -> p.getId().equals(k)).findFirst();
+                    return publisher.map(p -> new String(p.getName())).orElse(null);
+                });
+                jabrefPublishers.add(knownPublishers.get(pubId));
+            }
+
+            String stringifiedKeywords = String.join(",", jabrefPublishers);
+            refToPublishers.put(refId, stringifiedKeywords);
+        }
+        return refToPublishers;
+    }
+
     private String getEditorName(CitaviExchangeData.References.Reference data) {
+        if (refEditors == null) {
+            return null;
+        }
         return this.refIdWithEditors.get(data.getId());
     }
 
     private String getKeywords(CitaviExchangeData.References.Reference data) {
-        if (keyword == null) {
+        if (refKeywords == null) {
             return null;
         }
-
-        int count = 0;
-        int ref = 0;
-        int start = 0;
-        StringBuilder words = new StringBuilder();
-        outerLoop1: for (int i = 0; i < keyword.getOnetoN().size(); i++) {
-            for (int j = 0; j < keyword.getOnetoN().get(i).length(); j++) {
-                if (keyword.getOnetoN().get(i).charAt(j) == ';') {
-                    if (keyword.getOnetoN().get(i).substring(0, j).equals(data.getId())) {
-                        ref = i;
-                        break outerLoop1;
-                    } else {
-                        break;
-                    }
-                }
-            }
-            if (i == (keyword.getOnetoN().size() - 1)) {
-                return words.toString();
-            }
-        }
-        outerLoop2: for (int i = 0; i < keyword.getOnetoN().get(ref).length(); i++) {
-            if (keyword.getOnetoN().get(ref).charAt(i) == ';') {
-                count++;
-                if (count == 1) {
-                    start = i + 1;
-                } else if (count > 1) {
-                    for (int j = 0; j < keywords.getKeyword().size(); j++) {
-                        if (keyword.getOnetoN().get(ref).substring(start, i).equals(keywords.getKeyword().get(j).getId())) {
-                            words.append(keywords.getKeyword().get(j).getName()).append(", ");
-                            start = i + 1;
-                            break;
-                        }
-                    }
-                }
-                if (i == (keyword.getOnetoN().get(ref).length() - 1 - 36)) {
-                    for (int j = 0; j < keywords.getKeyword().size(); j++) {
-                        if (keyword.getOnetoN().get(ref).substring(start).equals(keywords.getKeyword().get(j).getId())) {
-                            words.append(keywords.getKeyword().get(j).getName());
-                            break outerLoop2;
-                        }
-                    }
-                }
-            }
-        }
-        return words.toString();
+        return this.refIdWithKeywords.get(data.getId());
     }
 
     private String getPublisher(CitaviExchangeData.References.Reference data) {
-        if (publisher == null) {
+        if (refPublishers == null) {
             return null;
         }
-
-        int ref = 0;
-        StringBuilder words = new StringBuilder();
-        outerLoop1: for (int i = 0; i < publisher.getOnetoN().size(); i++) {
-            for (int j = 0; j < publisher.getOnetoN().get(i).length(); j++) {
-                if (publisher.getOnetoN().get(i).charAt(j) == ';') {
-                    if (publisher.getOnetoN().get(i).substring(0, j).equals(data.getId())) {
-                        ref = i;
-                        break outerLoop1;
-                    } else {
-                        break;
-                    }
-                }
-            }
-            if (i == (publisher.getOnetoN().size() - 1)) {
-                return words.toString();
-            }
-        }
-        outerLoop2: for (int i = 0; i < publisher.getOnetoN().get(ref).length(); i++) {
-            if (publisher.getOnetoN().get(ref).charAt(i) == ';') {
-                for (int j = 0; j < publishers.getPublisher().size(); j++) {
-                    if (publisher.getOnetoN().get(ref).substring(i + 1).equals(publishers.getPublisher().get(j).getId())) {
-                        words.append(publishers.getPublisher().get(j).getName());
-                        break outerLoop2;
-                    }
-                }
-            }
-        }
-        return words.toString();
+        return this.refIdWithPublishers.get(data.getId());
     }
 
     private void initUnmarshaller() throws JAXBException {
