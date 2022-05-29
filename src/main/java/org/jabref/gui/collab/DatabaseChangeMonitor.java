@@ -72,7 +72,7 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
                             // Perform all accepted changes
                             NamedCompound ce = new NamedCompound(Localization.lang("Merged external changes"));
                             for (DatabaseChangeViewModel change : changes) {
-                                if(change instanceof EntryChangeViewModel || change.isAccepted()){
+                                if (change instanceof EntryChangeViewModel || change.isAccepted()) {
                                     change.makeChange(database, ce);
                                 }
                             }
