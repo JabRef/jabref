@@ -398,9 +398,11 @@ public class GlobalSearchBar extends HBox {
             ObservableList<T> tHeadings = FXCollections.observableArrayList(converter.fromString(headings[1]));
             ObservableList<T> items = control.getSuggestions();
             ObservableList<T> resultingList = FXCollections.observableArrayList();
-            merge(resultingList,tHeadings,items);
+            //merge(resultingList,tHeadings,items);
 
-            this.suggestionList = new ListView<>(resultingList);
+            //this.suggestionList = new ListView<>(resultingList);
+
+            this.suggestionList = new ListView<>(control.getSuggestions());
 
             this.suggestionList.getStyleClass().add("auto-complete-popup");
             this.suggestionList.getStylesheets().add(Objects.requireNonNull(AutoCompletionBinding.class.getResource("autocompletion.css")).toExternalForm());
@@ -455,7 +457,7 @@ public class GlobalSearchBar extends HBox {
                 }
                 if (((Suggestion) suggestion).getType() == String.class) {
                     String searchTerm = this.control.getConverter().toString(suggestion);
-                    searchField.setText("string=" + searchTerm);
+                    searchField.setText(searchTerm + "=");
                 }
                 // Event.fireEvent(this.control, new AutoCompletePopup.SuggestionEvent<>(suggestion));
             }
