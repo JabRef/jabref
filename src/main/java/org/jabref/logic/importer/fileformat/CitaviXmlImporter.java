@@ -191,8 +191,7 @@ public class CitaviXmlImporter extends Importer implements Parser {
                 .ifPresent(value -> entry.setField(StandardField.DOI, clean(value)));
         Optional.ofNullable(data.getIsbn())
                 .ifPresent(value -> entry.setField(StandardField.ISBN, clean(value)));
-        Optional.ofNullable(getPages(data))
-                .ifPresent(value -> entry.setField(StandardField.PAGES, clean(value)));
+        entry.setField(StandardField.PAGES, clean(getPages(data)));
         Optional.ofNullable(data.getVolume())
                 .ifPresent(value -> entry.setField(StandardField.VOLUME, clean(value)));
         Optional.ofNullable(getAuthorName(data))
@@ -232,7 +231,7 @@ public class CitaviXmlImporter extends Importer implements Parser {
         } else if ((data.getPageCount() == null) && (data.getPageRange() != null)) {
             tmpStr = data.getPageRange();
         } else if ((data.getPageCount() == null) && (data.getPageRange() == null)) {
-            return null;
+            return tmpStr;
         }
         int count = 0;
         String pages = "";
