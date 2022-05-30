@@ -112,7 +112,7 @@ public class CitaviXmlImporter extends Importer implements Parser {
             String str;
             int i = 0;
             while (((str = reader.readLine()) != null) && (i < 50)) {
-                if (str.toLowerCase(Locale.ENGLISH).contains("citaviexchangedata")) {
+                if (str.toLowerCase(Locale.ROOT).contains("citaviexchangedata")) {
                     return true;
                 }
 
@@ -297,7 +297,7 @@ public class CitaviXmlImporter extends Importer implements Parser {
                 // store keywords already encountered
                 knownKeywords.computeIfAbsent(keywordId, k -> {
                     Optional<CitaviExchangeData.Keywords.Keyword> keyword = keywords.getKeyword().stream().filter(p -> p.getId().equals(k)).findFirst();
-                    return keyword.map(p -> new Keyword(p.getName())).orElse(null);
+                    return keyword.map(kword -> new Keyword(kword.getName())).orElse(null);
                 });
                 jabrefKeywords.add(knownKeywords.get(keywordId));
             }
