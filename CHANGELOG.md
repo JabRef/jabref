@@ -34,6 +34,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixed an issue which allow us to select and open identifiers from a popup list in the maintable [#8758](https://github.com/JabRef/jabref/issues/8758), [8802](https://github.com/JabRef/jabref/issues/8802)
 - We fixed an issue where the escape button had no functionality within the "Filter groups" textfield. [koppor#562](https://github.com/koppor/jabref/issues/562)
 - We fixed an issue where right clicking a group and choose "remove selected entries from this group" leads to error when Bibtex source tab is selected. [#8012](https://github.com/JabRef/jabref/issues/8012)
+- We fixed an issue where removing several groups deletes only one of them. [#8390](https://github.com/JabRef/jabref/issues/8390)
 
 ### Removed
 
@@ -101,6 +102,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixed an issue where no citationkey was generated on import, pasting a doi or an entry on the main table. [8406](https://github.com/JabRef/jabref/issues/8406), [koppor#553](https://github.com/koppor/jabref/issues/553)
 - We fixed an issue where accent search does not perform consistently. [#6815](https://github.com/JabRef/jabref/issues/6815)
 - We fixed an issue where the incorrect entry was selected when "New Article" is pressed while search filters are active. [#8674](https://github.com/JabRef/jabref/issues/8674)
+- We fixed an issue where "Write BibTeXEntry metadata to PDF" button remains enabled while writing to PDF is in-progress. [#8691](https://github.com/JabRef/jabref/issues/8691)
 
 ### Removed
 
