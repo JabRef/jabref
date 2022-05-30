@@ -441,19 +441,19 @@ public class GlobalSearchBar extends HBox {
 
         @SuppressWarnings("checkstyle:WhitespaceAround")
         private void onSuggestionChosen(T suggestion) {
-            if (suggestion != null) {
+            if (suggestion != null && suggestion.getClass() == Suggestion.class) {
                 // Check what class the suggestion is, then add to the search bar
-                if (suggestion.getClass() == BibEntry.class){
+                if (((Suggestion) suggestion).getType() == BibEntry.class) {
                     // Update the search bar to contain the text title=suggestion
                     String searchTerm = this.control.getConverter().toString(suggestion);
                     searchField.setText("title=" + searchTerm);
                 }
-                if (suggestion.getClass() == Author.class){
+                if (((Suggestion) suggestion).getType() == Author.class) {
                     // Update the search bar to contain the text author=suggestion
                     String searchTerm = this.control.getConverter().toString(suggestion);
-                    searchField.setText("author="+searchTerm);
+                    searchField.setText("author=" + searchTerm);
                 }
-                if (suggestion.getClass() == String.class) {
+                if (((Suggestion) suggestion).getType() == String.class) {
                     String searchTerm = this.control.getConverter().toString(suggestion);
                     searchField.setText("string=" + searchTerm);
                 }
