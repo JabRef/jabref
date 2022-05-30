@@ -17,6 +17,11 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 
 ### Changed
 
+- We upgraded to Lucene 9.2 for the fulltext search.
+  Thus, the now created search index cannot be read from older versions of JabRef anylonger.
+  ⚠️ JabRef will recreate the index in a new folder for new files and this will take a long time for a huge library.
+  Moreover, switching back and forth JabRef versions and meanwhile adding PDFs also requires rebuilding the index now and then.
+  [#8868](https://github.com/JabRef/jabref/pull/8868)
 - We improved the Latex2Unicode conversion [#8639](https://github.com/JabRef/jabref/pull/8639)
 - Writing BibTeX data into a PDF (XMP) removes braces. [#8452](https://github.com/JabRef/jabref/issues/8452)
 - Writing BibTeX data into a PDF (XMP) does not write the `file` field.
@@ -36,6 +41,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixed an issue where the escape button had no functionality within the "Filter groups" textfield. [koppor#562](https://github.com/koppor/jabref/issues/562)
 - We fixed an issue where right clicking a group and choose "remove selected entries from this group" leads to error when Bibtex source tab is selected. [#8012](https://github.com/JabRef/jabref/issues/8012)
 - When the proxy configuration removed the proxy user/password, this change is applied immediately.
+- We fixed an issue where removing several groups deletes only one of them. [#8390](https://github.com/JabRef/jabref/issues/8390)
 
 ### Removed
 
@@ -103,6 +109,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixed an issue where no citationkey was generated on import, pasting a doi or an entry on the main table. [8406](https://github.com/JabRef/jabref/issues/8406), [koppor#553](https://github.com/koppor/jabref/issues/553)
 - We fixed an issue where accent search does not perform consistently. [#6815](https://github.com/JabRef/jabref/issues/6815)
 - We fixed an issue where the incorrect entry was selected when "New Article" is pressed while search filters are active. [#8674](https://github.com/JabRef/jabref/issues/8674)
+- We fixed an issue where "Write BibTeXEntry metadata to PDF" button remains enabled while writing to PDF is in-progress. [#8691](https://github.com/JabRef/jabref/issues/8691)
 
 ### Removed
 
