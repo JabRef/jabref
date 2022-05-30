@@ -23,6 +23,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.util.Duration;
 
 import org.jabref.gui.autocompleter.AutoCompletePreferences;
+import org.jabref.gui.autocompleter.OmnisearchSuggestionProvider;
 import org.jabref.gui.autocompleter.PersonNameSuggestionProvider;
 import org.jabref.gui.autocompleter.SuggestionProviders;
 import org.jabref.gui.autocompleter.TitleSuggestionProvider;
@@ -102,7 +103,7 @@ public class LibraryTab extends Tab {
 
     private boolean saving;
     //private TitleSuggestionProvider searchAutoCompleter;
-    private PersonNameSuggestionProvider searchAutoCompleter;
+    private OmnisearchSuggestionProvider searchAutoCompleter;
     // Used to track whether the base has changed since last save.
     private BibEntry showing;
     private SuggestionProviders suggestionProviders;
@@ -535,8 +536,7 @@ public class LibraryTab extends Tab {
             // Create empty suggestion providers if auto completion is deactivated
             suggestionProviders = new SuggestionProviders();
         }
-        //searchAutoCompleter = new TitleSuggestionProvider(getDatabase());
-        searchAutoCompleter = new PersonNameSuggestionProvider(FieldFactory.getPersonNameFields(), getDatabase());
+        searchAutoCompleter = new OmnisearchSuggestionProvider(FieldFactory.getPersonNameFields(), getDatabase());
     }
 
     public void updateSearchManager() {

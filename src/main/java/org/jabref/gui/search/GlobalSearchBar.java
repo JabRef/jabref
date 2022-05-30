@@ -53,6 +53,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.search.SearchQuery;
 import org.jabref.model.entry.Author;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.Suggestion;
 import org.jabref.model.search.rules.SearchRules;
 import org.jabref.preferences.PreferencesService;
 import org.jabref.preferences.SearchPreferences;
@@ -305,16 +306,13 @@ public class GlobalSearchBar extends HBox {
         currentResults.setText(illegalSearch);
     }
 
-    public void setAutoCompleter(SuggestionProvider<Author> searchCompleter) {
+    public void setAutoCompleter(OmnisearchSuggestionProvider searchCompleter) {
         if (preferencesService.getAutoCompletePreferences().shouldAutoComplete()) {
-            AutoCompletionTextInputBinding<Author> autoComplete = AutoCompletionTextInputBinding.autoComplete(searchField,
+            AutoCompletionTextInputBinding<Suggestion> autoComplete = AutoCompletionTextInputBinding.autoComplete(searchField,
                     searchCompleter::provideSuggestions,
-                    new PersonNameStringConverter(false, false, AutoCompleteFirstNameMode.BOTH),
+                    new SuggestionStringConverter(),
                     new AppendPersonNamesStrategy());
-                    //new TitleStringConverter(),
-                    //new AppendWordsStrategy());
-            //AutoCompletePopup<BibEntry> popup = getPopup(autoComplete);
-            AutoCompletePopup<Author> popup = getPopup(autoComplete);
+            AutoCompletePopup<Suggestion> popup = getPopup(autoComplete);
             popup.setSkin(new SearchPopupSkin<>(popup));
         }
     }
@@ -443,17 +441,21 @@ public class GlobalSearchBar extends HBox {
 
         @SuppressWarnings("checkstyle:WhitespaceAround")
         private void onSuggestionChosen(T suggestion) {
-            if (suggestion != null) {
+            if (suggestion != null && suggestion.getClass() == Suggestion.class) {
                 // Check what class the suggestion is, then add to the search bar
-                if (suggestion.getClass() == BibEntry.class){
+                if (((Suggestion) suggestion).getType() == BibEntry.class) {
                     // Update the search bar to contain the text title=suggestion
                     String searchTerm = this.control.getConverter().toString(suggestion);
                     searchField.setText("title=" + searchTerm);
                 }
-                if (suggestion.getClass() == Author.class){
+                if (((Suggestion) suggestion).getType() == Author.class) {
                     // Update the search bar to contain the text author=suggestion
                     String searchTerm = this.control.getConverter().toString(suggestion);
-                    searchField.setText("author="+searchTerm);
+                    searchField.setText("author=" + searchTerm);
+                }
+                if (((Suggestion) suggestion).getType() == String.class) {
+                    String searchTerm = this.control.getConverter().toString(suggestion);
+                    searchField.setText("string=" + searchTerm);
                 }
                 // Event.fireEvent(this.control, new AutoCompletePopup.SuggestionEvent<>(suggestion));
             }
