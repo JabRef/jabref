@@ -23,12 +23,8 @@ public class OmnisearchSuggestionProvider {
     }
 
     public final Collection<Suggestion> provideSuggestions(ISuggestionRequest request) {
-        Stream<Suggestion> titlesHeading = Stream.of(new Suggestion("Title",String.class));
-        Stream<Suggestion> titles = Stream.concat(titlesHeading,titleSuggestionProvider.provideSuggestions(request).stream().map(t -> new Suggestion(t.getTitle().get(), BibEntry.class)));
-        //Stream<Suggestion> titles = titleSuggestionProvider.provideSuggestions(request).stream().map(t -> new Suggestion(t.getTitle().get(), BibEntry.class));
-        Stream<Suggestion> authorsHeading = Stream.of(new Suggestion("Author/Editor",String.class));
-        Stream<Suggestion> authors = Stream.concat(authorsHeading,authorSuggestionProvider.provideSuggestions(request).stream().map(a -> new Suggestion(a.getLastFirst(false), Author.class)));
-        //Stream<Suggestion> authors = authorSuggestionProvider.provideSuggestions(request).stream().map(a -> new Suggestion(a.getLastFirst(false), Author.class));
+        Stream<Suggestion> authors = Stream.concat(Stream.of(new Suggestion("Author/Editor",String.class)),authorSuggestionProvider.provideSuggestions(request).stream().map(a -> new Suggestion(a.getLastFirst(false), Author.class)));
+        Stream<Suggestion> titles = Stream.concat(Stream.of(new Suggestion("Title",String.class)),titleSuggestionProvider.provideSuggestions(request).stream().map(t -> new Suggestion(t.getTitle().get(), BibEntry.class)));
         return Stream.concat(titles, authors).collect(Collectors.toList());
     }
 }
