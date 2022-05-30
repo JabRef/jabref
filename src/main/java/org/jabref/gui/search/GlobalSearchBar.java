@@ -382,26 +382,13 @@ public class GlobalSearchBar extends HBox {
     }
 
     private class SearchPopupSkin<T> implements Skin<AutoCompletePopup<T>> {
-
         private final AutoCompletePopup<T> control;
-
         private final ListView<T> suggestionList;
-        //private final ListView<T> suggestionList;
         private final BorderPane container;
-
-        private final String[] headings = {"Entrytype","Author/Editor","Title","Year","Journal/Booktitle"};
 
         public SearchPopupSkin(AutoCompletePopup<T> control) {
             this.control = control;
-            StringConverter<T> converter = control.getConverter();
-
-            ObservableList<T> tHeadings = FXCollections.observableArrayList(converter.fromString(headings[1]));
-            ObservableList<T> items = control.getSuggestions();
-            ObservableList<T> resultingList = FXCollections.observableArrayList();
-            merge(resultingList,tHeadings,items);
-
-            this.suggestionList = new ListView<>(resultingList);
-
+            this.suggestionList = new ListView<>(control.getSuggestions());
             this.suggestionList.getStyleClass().add("auto-complete-popup");
             this.suggestionList.getStylesheets().add(Objects.requireNonNull(AutoCompletionBinding.class.getResource("autocompletion.css")).toExternalForm());
             this.suggestionList.prefHeightProperty().bind(Bindings.min(control.visibleRowCountProperty(), Bindings.size(this.suggestionList.getItems())).multiply(24).add(18));
@@ -444,43 +431,15 @@ public class GlobalSearchBar extends HBox {
             if (suggestion != null && suggestion.getClass() == Suggestion.class) {
                 // Check what class the suggestion is, then add to the search bar
                 if (((Suggestion) suggestion).getType() == BibEntry.class) {
-                    // Update the search bar to contain the text title=suggestion
                     String searchTerm = this.control.getConverter().toString(suggestion);
                     searchField.setText("title=" + searchTerm);
                 }
                 if (((Suggestion) suggestion).getType() == Author.class) {
-                    // Update the search bar to contain the text author=suggestion
                     String searchTerm = this.control.getConverter().toString(suggestion);
                     searchField.setText("author=" + searchTerm);
                 }
-                if (((Suggestion) suggestion).getType() == String.class) {
-                    String searchTerm = this.control.getConverter().toString(suggestion);
-                    searchField.setText("string=" + searchTerm);
-                }
-                // Event.fireEvent(this.control, new AutoCompletePopup.SuggestionEvent<>(suggestion));
             }
         }
-
-        //Merge multiple Observable Lists together
-        private ObservableList<T> merge(ObservableList<T> res, ObservableList<T>... lists){
-            final ObservableList<T> list = res;
-            for(ObservableList<T> l : lists) {
-                list.addAll(l);
-                l.addListener((javafx.collections.ListChangeListener.Change<? extends T> c) -> {
-                    while (c.next()) {
-                        List<String> objectsAdded = new ArrayList<>();
-                        if (c.wasRemoved()) {
-                            list.removeAll(c.getRemoved());
-                        }
-                        if (c.wasAdded()) {
-                            list.addAll(c.getAddedSubList());
-                        }
-                    }
-                });
-            }
-            return list;
-        }
-
         @Override
         public Node getNode() {
             return this.container;
