@@ -112,7 +112,7 @@ public class CitaviXmlImporter extends Importer implements Parser {
             String str;
             int i = 0;
             while (((str = reader.readLine()) != null) && (i < 50)) {
-                if (str.toLowerCase(Locale.ENGLISH).contains("citaviexchangedata")) {
+                if (str.toLowerCase(Locale.ROOT).contains("citaviexchangedata")) {
                     return true;
                 }
 
