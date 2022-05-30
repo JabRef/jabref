@@ -18,3 +18,10 @@ sourceSets{
         }
     }
 }
+
+/**
+ * This is a workaround for Entry org/jabref/build/JournalAbbreviationConverter$_convert_closure1$_closure2.class is a duplicate but no duplicate handling strategy has been set.
+ *
+ * Source: https://github.com/gradle/gradle/issues/17236#issuecomment-923074298
+ */
+tasks.getByName("jar").setProperty("duplicatesStrategy", DuplicatesStrategy.EXCLUDE);

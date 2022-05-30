@@ -16,7 +16,7 @@
     <category field="engineering"/>
     <issn>0016-7746</issn>
     <eissn>1573-9708</eissn>
-    <updated>2022-04-19T09:47:13+00:00</updated>
+    <updated>2022-05-03T09:47:13+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="en">
@@ -203,12 +203,12 @@
     <choose>
       <if type="song">
         <names variable="composer" delimiter=", ">
-          <name and="symbol" delimiter-precedes-last="always" initialize-with="." name-as-sort-order="all"/>
+          <name and="symbol" delimiter-precedes-last="never" initialize-with="." name-as-sort-order="all"/>
           <substitute>
             <names variable="original-author"/>
             <names variable="author"/>
             <names variable="translator">
-              <name name-as-sort-order="all" and="symbol" sort-separator=", " initialize-with=". " delimiter=", " delimiter-precedes-last="always"/>
+              <name name-as-sort-order="all" and="symbol" sort-separator=", " initialize-with=". " delimiter=", " delimiter-precedes-last="never"/>
               <label form="short" prefix=" (" suffix=")"/>
             </names>
             <group delimiter=" ">
@@ -222,12 +222,12 @@
       <else-if type="treaty"/>
       <else>
         <names variable="author" delimiter=", ">
-          <name and="symbol" delimiter-precedes-last="always" initialize-with="." name-as-sort-order="all"/>
+          <name and="symbol" delimiter-precedes-last="never" initialize-with="." name-as-sort-order="all"/>
           <substitute>
             <names variable="illustrator"/>
             <names variable="composer"/>
             <names variable="director">
-              <name name-as-sort-order="all" and="symbol" sort-separator=", " initialize-with=". " delimiter=", " delimiter-precedes-last="always"/>
+              <name name-as-sort-order="all" and="symbol" sort-separator=", " initialize-with=". " delimiter=", " delimiter-precedes-last="never"/>
               <label form="long" prefix=" (" suffix=")"/>
             </names>
             <choose>
@@ -241,21 +241,21 @@
                   </else>
                 </choose>
                 <names variable="translator">
-                  <name name-as-sort-order="all" and="symbol" sort-separator=", " initialize-with=". " delimiter=", " delimiter-precedes-last="always"/>
+                  <name name-as-sort-order="all" and="symbol" sort-separator=", " initialize-with=". " delimiter=", " delimiter-precedes-last="never"/>
                   <label form="short" prefix=" (" suffix=")"/>
                 </names>
               </if>
             </choose>
             <names variable="editor translator" delimiter=", ">
-              <name name-as-sort-order="all" and="symbol" sort-separator=", " initialize-with=". " delimiter=", " delimiter-precedes-last="always"/>
+              <name name-as-sort-order="all" and="symbol" sort-separator=", " initialize-with=". " delimiter=", " delimiter-precedes-last="never"/>
               <label form="short" prefix=" (" suffix=")"/>
             </names>
             <names variable="editorial-director">
-              <name name-as-sort-order="all" and="symbol" sort-separator=", " initialize-with=". " delimiter=", " delimiter-precedes-last="always"/>
+              <name name-as-sort-order="all" and="symbol" sort-separator=", " initialize-with=". " delimiter=", " delimiter-precedes-last="never"/>
               <label form="short" prefix=" (" suffix=")"/>
             </names>
             <names variable="collection-editor">
-              <name name-as-sort-order="all" and="symbol" sort-separator=", " initialize-with=". " delimiter=", " delimiter-precedes-last="always"/>
+              <name name-as-sort-order="all" and="symbol" sort-separator=", " initialize-with=". " delimiter=", " delimiter-precedes-last="never"/>
               <label form="short" prefix=" (" suffix=")"/>
             </names>
             <choose>

@@ -1,8 +1,6 @@
 package org.jabref.logic.exporter;
 
-import java.io.BufferedWriter;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
@@ -57,7 +55,7 @@ public class XmpExporter extends Exporter {
                 if (file.getParent() == null) {
                     entryFile = Path.of(suffix);
                 } else {
-                    entryFile = Path.of(file.getParent().toString() + "/" + suffix);
+                    entryFile = Path.of(file.getParent() + "/" + suffix);
                 }
                 this.writeBibToXmp(entryFile, Collections.singletonList(entry));
             }
@@ -67,10 +65,7 @@ public class XmpExporter extends Exporter {
     }
 
     private void writeBibToXmp(Path file, List<BibEntry> entries) throws IOException {
-        String xmpContent = XmpUtilWriter.generateXmpStringWithoutXmpDeclaration(entries, this.xmpPreferences);
-        try (BufferedWriter writer = Files.newBufferedWriter(file, StandardCharsets.UTF_8)) {
-            writer.write(xmpContent);
-            writer.flush();
-        }
+        String xmpContent = new XmpUtilWriter(this.xmpPreferences).generateXmpStringWithoutXmpDeclaration(entries);
+        Files.writeString(file, xmpContent);
     }
 }

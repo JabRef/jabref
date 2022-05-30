@@ -35,6 +35,7 @@ import javafx.stage.Stage;
 import javafx.stage.Window;
 import javafx.util.Duration;
 
+import org.jabref.gui.help.ErrorConsoleAction;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.BackgroundTask;
@@ -336,11 +337,23 @@ public class JabRefDialogService implements DialogService {
 
         DefaultTaskExecutor.runInJavaFXThread(() -> {
             Notifications.create()
-            .text(message)
-            .position(Pos.BOTTOM_CENTER)
-            .hideAfter(TOAST_MESSAGE_DISPLAY_TIME)
-            .hideCloseButton()
-            .show();
+                         .text(message)
+                         .position(Pos.BOTTOM_CENTER)
+                         .hideAfter(TOAST_MESSAGE_DISPLAY_TIME)
+                         .owner(mainWindow)
+                         .threshold(5,
+                                 Notifications.create()
+                                              .title(Localization.lang("Last notification"))
+                                              // TODO: Change to a notification overview instead of event log when that is available. The event log is not that user friendly (different purpose).
+                                              .text(
+                                                    "(" + Localization.lang("Check the event log to see all notifications") + ")"
+                                                     + "\n\n" + message)
+                                              .onAction((e)-> {
+                                                     ErrorConsoleAction ec = new ErrorConsoleAction();
+                                                     ec.execute();
+                                                 }))
+                         .hideCloseButton()
+                         .show();
         });
     }
 
