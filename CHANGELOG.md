@@ -23,6 +23,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - Writing BibTeX data into a PDF (XMP) considers the configured keyword separator (and does not use "," as default any more)
 - The Medline/Pubmed search now also supports the [default fields and operators for searching](https://docs.jabref.org/collect/import-using-online-bibliographic-database#search-syntax). [forum#3554](https://discourse.jabref.org/t/native-pubmed-search/3354)
 - We improved group expansion arrow that prevent it from activating group when expanding or collapsing. [#7982](https://github.com/JabRef/jabref/issues/7982), [#3176](https://github.com/JabRef/jabref/issues/3176)
+- When configured SSL certificates changed, JabRef warns the user to restart to apply the configuration.
 
 ### Fixed
 
@@ -30,11 +31,11 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixed the unnecessary horizontal scroll bar in group panel [#8467](https://github.com/JabRef/jabref/issues/8467)
 - We fixed an issue where the notification bar message, icon and actions appeared to be invisible. [#8761](https://github.com/JabRef/jabref/issues/8761)
 - We fixed an issue where deprecated fields tab is shown when the fields don't contain any values. [#8396](https://github.com/JabRef/jabref/issues/8396)
-- We fixed an issue where an exception for DOI search occured when the DOI contained urlencoded characters. [#8787](https://github.com/JabRef/jabref/issues/8787)
+- We fixed an issue where an exception for DOI search occurred when the DOI contained urlencoded characters. [#8787](https://github.com/JabRef/jabref/issues/8787)
 - We fixed an issue which allow us to select and open identifiers from a popup list in the maintable [#8758](https://github.com/JabRef/jabref/issues/8758), [8802](https://github.com/JabRef/jabref/issues/8802)
 - We fixed an issue where the escape button had no functionality within the "Filter groups" textfield. [koppor#562](https://github.com/koppor/jabref/issues/562)
 - We fixed an issue where right clicking a group and choose "remove selected entries from this group" leads to error when Bibtex source tab is selected. [#8012](https://github.com/JabRef/jabref/issues/8012)
-- When the proxy configuration removed the proxy user/password, this change is applied immediatly.
+- When the proxy configuration removed the proxy user/password, this change is applied immediately.
 
 ### Removed
 
@@ -66,7 +67,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 ### Changed
 
 - We upgraded to Lucene 9.1 for the fulltext search.
-  Thus, the now created search index cannot be read from older versions of JabRef anylonger.
+  Thus, the now created search index cannot be read from older versions of JabRef any longer.
   ⚠️ JabRef will recreate the index in a new folder for new files and this will take a long time for a huge library.
   Moreover, switching back and forth JabRef versions and meanwhile adding PDFs also requires rebuilding the index now and then.
   [#8362](https://github.com/JabRef/jabref/pull/8362)
@@ -93,7 +94,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixed an issue where "Copy DOI url" in the right-click menu of the Entry List would just copy the DOI and not the DOI url. [#8389](https://github.com/JabRef/jabref/issues/8389)
 - We fixed an issue where opening the console from the drop-down menu would cause an exception. [#8466](https://github.com/JabRef/jabref/issues/8466)
 - We fixed an issue when reading non-UTF-8 encoded. When no encoding header is present, the encoding is now detected from the file content (and the preference option is disregarded). [#8417](https://github.com/JabRef/jabref/issues/8417)
-- We fixed an issue where pasting a URL was replacing + signs by spaces making the URL unreachable. [#8448](https://github.com/JabRef/jabref/issues/8448)
+- We fixed an issue where pasting a URL was replacing `+` signs by spaces making the URL unreachable. [#8448](https://github.com/JabRef/jabref/issues/8448)
 - We fixed an issue where creating subsidiary files from aux files created with some versions of biblatex would produce incorrect results. [#8513](https://github.com/JabRef/jabref/issues/8513)
 - We fixed an issue where opening the changelog from withing JabRef led to a 404 error. [#8563](https://github.com/JabRef/jabref/issues/8563)
 - We fixed an issue where not all found unlinked local files were imported correctly due to some race condition. [#8444](https://github.com/JabRef/jabref/issues/8444)
