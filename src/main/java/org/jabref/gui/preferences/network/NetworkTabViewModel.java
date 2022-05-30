@@ -4,6 +4,7 @@ import java.net.MalformedURLException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import javafx.beans.property.BooleanProperty;
@@ -69,7 +70,7 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
     private final ProxyPreferences backupProxyPreferences;
     private final SSLPreferences sslPreferences;
 
-    private final List<String> restartWarning = new ArrayList<>();
+    private final List<String> restartWarnings = new ArrayList<>();
 
     private final TrustStoreManager trustStoreManager;
 
@@ -208,9 +209,12 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
     }
 
     private void storeProxySettings(ProxyPreferences newProxyPreferences) {
-        if (!newProxyPreferences.equals(proxyPreferences)) {
-            ProxyRegisterer.register(newProxyPreferences);
+        if (Objects.equals(newProxyPreferences, proxyPreferences)) {
+            // nothing changed; thus, nothing to store
+            return;
         }
+
+        ProxyRegisterer.register(newProxyPreferences);
 
         proxyPreferences.setUseProxy(newProxyPreferences.shouldUseProxy());
         proxyPreferences.setHostname(newProxyPreferences.getHostname());
@@ -318,7 +322,7 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public List<String> getRestartWarnings() {
-        return restartWarning;
+        return restartWarnings;
     }
 
     public BooleanProperty remoteServerProperty() {
