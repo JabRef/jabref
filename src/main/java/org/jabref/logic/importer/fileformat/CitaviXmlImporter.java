@@ -297,7 +297,7 @@ public class CitaviXmlImporter extends Importer implements Parser {
                 // store keywords already encountered
                 knownKeywords.computeIfAbsent(keywordId, k -> {
                     Optional<CitaviExchangeData.Keywords.Keyword> keyword = keywords.getKeyword().stream().filter(p -> p.getId().equals(k)).findFirst();
-                    return keyword.map(p -> new Keyword(p.getName())).orElse(null);
+                    return keyword.map(kword -> new Keyword(kword.getName())).orElse(null);
                 });
                 jabrefKeywords.add(knownKeywords.get(keywordId));
             }
