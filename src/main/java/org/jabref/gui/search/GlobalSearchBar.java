@@ -53,6 +53,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.search.SearchQuery;
 import org.jabref.model.entry.Author;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.Suggestion;
 import org.jabref.model.search.rules.SearchRules;
 import org.jabref.preferences.PreferencesService;
 import org.jabref.preferences.SearchPreferences;
@@ -307,14 +308,11 @@ public class GlobalSearchBar extends HBox {
 
     public void setAutoCompleter(OmnisearchSuggestionProvider searchCompleter) {
         if (preferencesService.getAutoCompletePreferences().shouldAutoComplete()) {
-            AutoCompletionTextInputBinding<String> autoComplete = AutoCompletionTextInputBinding.autoComplete(searchField,
+            AutoCompletionTextInputBinding<Suggestion> autoComplete = AutoCompletionTextInputBinding.autoComplete(searchField,
                     searchCompleter::provideSuggestions,
-                    new StringStringConverter(),
+                    new SuggestionStringConverter(),
                     new AppendPersonNamesStrategy());
-                    // new TitleStringConverter(),
-                    // new AppendWordsStrategy());
-            // AutoCompletePopup<BibEntry> popup = getPopup(autoComplete);
-            AutoCompletePopup<String> popup = getPopup(autoComplete);
+            AutoCompletePopup<Suggestion> popup = getPopup(autoComplete);
             popup.setSkin(new SearchPopupSkin<>(popup));
         }
     }

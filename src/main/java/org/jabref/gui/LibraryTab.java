@@ -536,8 +536,6 @@ public class LibraryTab extends Tab {
             // Create empty suggestion providers if auto completion is deactivated
             suggestionProviders = new SuggestionProviders();
         }
-        // searchAutoCompleter = new TitleSuggestionProvider(getDatabase());
-        // searchAutoCompleter = new PersonNameSuggestionProvider(FieldFactory.getPersonNameFields(), getDatabase());
         searchAutoCompleter = new OmnisearchSuggestionProvider(FieldFactory.getPersonNameFields(), getDatabase());
     }
 

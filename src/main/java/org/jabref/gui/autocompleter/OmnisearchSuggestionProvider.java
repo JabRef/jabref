@@ -5,6 +5,9 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.jabref.model.database.BibDatabase;
+import org.jabref.model.entry.Author;
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.Suggestion;
 import org.jabref.model.entry.field.Field;
 
 import org.controlsfx.control.textfield.AutoCompletionBinding.ISuggestionRequest;
@@ -19,9 +22,9 @@ public class OmnisearchSuggestionProvider {
         this.authorSuggestionProvider = new PersonNameSuggestionProvider(fields, database);
     }
 
-    public final Collection<String> provideSuggestions(ISuggestionRequest request) {
-        Stream<String> titles = titleSuggestionProvider.provideSuggestions(request).stream().map(t -> t.getTitle().get());
-        Stream<String> authors = authorSuggestionProvider.provideSuggestions(request).stream().map(a -> a.getLastFirst(false));
+    public final Collection<Suggestion> provideSuggestions(ISuggestionRequest request) {
+        Stream<Suggestion> titles = titleSuggestionProvider.provideSuggestions(request).stream().map(t -> new Suggestion(t.getTitle().get(), BibEntry.class));
+        Stream<Suggestion> authors = authorSuggestionProvider.provideSuggestions(request).stream().map(a -> new Suggestion(a.getLastFirst(false), Author.class));
         return Stream.concat(titles, authors).collect(Collectors.toList());
     }
 }
