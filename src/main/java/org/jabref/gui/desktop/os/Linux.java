@@ -90,21 +90,22 @@ public class Linux implements NativeDesktop {
     public void openFolderAndSelectFile(Path filePath) throws IOException {
         String desktopSession = System.getenv("DESKTOP_SESSION");
 
-        String cmd = "xdg-open"; // default command
+        String absoluteFilePath = filePath.toAbsolutePath().toString();
+        String[] cmd = {"xdg-open", absoluteFilePath}; // default command
 
         if (desktopSession != null) {
             desktopSession = desktopSession.toLowerCase(Locale.ROOT);
             if (desktopSession.contains("gnome")) {
-                cmd = "nautilus --select";
+                cmd = new String[] {"nautilus", "--select", absoluteFilePath};
             } else if (desktopSession.contains("kde") || desktopSession.contains("plasma")) {
-                cmd = "dolphin --select";
+                cmd = new String[] {"dolphin", "--select", absoluteFilePath};
             } else if (desktopSession.contains("mate")) {
-                cmd = "caja --select";
+                cmd = new String[] {"caja", "--select", absoluteFilePath};
             } else if (desktopSession.contains("cinnamon")) {
-                cmd = "nemo"; // Although nemo is based on nautilus it does not support --select, it directly highlights the file
+                cmd = new String[] {"nemo", absoluteFilePath}; // Although nemo is based on nautilus it does not support --select, it directly highlights the file
             }
         }
-        ProcessBuilder processBuilder = new ProcessBuilder(cmd, filePath.toAbsolutePath().toString());
+        ProcessBuilder processBuilder = new ProcessBuilder((cmd));
         Process process = processBuilder.start();
 
         StreamGobbler streamGobblerInput = new StreamGobbler(process.getInputStream(), LOGGER::debug);
