@@ -355,13 +355,16 @@ class BibEntryWriterTest {
     @Test
     void testEntryTypeChange() throws IOException {
         // @formatter:off
-        String expected = OS.NEWLINE + "@Article{test," + OS.NEWLINE +
-                "  author       = {BlaBla}," + OS.NEWLINE +
-                "  journal      = {International Journal of Something}," + OS.NEWLINE +
-                "  number       = {1}," + OS.NEWLINE +
-                "  note         = {some note}," + OS.NEWLINE +
-                "  howpublished = {asdf}," + OS.NEWLINE +
-                "}" + OS.NEWLINE;
+        String expected = """
+
+                @Article{test,
+                  author       = {BlaBla},
+                  journal      = {International Journal of Something},
+                  number       = {1},
+                  note         = {some note},
+                  howpublished = {asdf},
+                }
+                """.replaceAll("\n", OS.NEWLINE);
         // @formatter:on
 
         // read in bibtex string
@@ -376,13 +379,15 @@ class BibEntryWriterTest {
         bibEntryWriter.write(entry, bibWriter, BibDatabaseMode.BIBTEX);
 
         // @formatter:off
-        String expectedNewEntry = "@InProceedings{test," + OS.NEWLINE +
-                "  author       = {BlaBla}," + OS.NEWLINE +
-                "  note         = {some note}," + OS.NEWLINE +
-                "  number       = {1}," + OS.NEWLINE +
-                "  howpublished = {asdf}," + OS.NEWLINE +
-                "  journal      = {International Journal of Something}," + OS.NEWLINE +
-                "}" + OS.NEWLINE;
+        String expectedNewEntry = """
+                @InProceedings{test,
+                  author       = {BlaBla},
+                  note         = {some note},
+                  number       = {1},
+                  howpublished = {asdf},
+                  journal      = {International Journal of Something},
+                }
+                """.replaceAll("\n", OS.NEWLINE);
         // @formatter:on
         assertEquals(expectedNewEntry, stringWriter.toString());
     }
@@ -444,12 +449,14 @@ class BibEntryWriterTest {
     @Test
     void multipleWritesWithoutModification() throws IOException {
         // @formatter:off
-        String bibtexEntry = "@Article{test," + OS.NEWLINE +
-                "  Author                   = {Foo Bar}," + OS.NEWLINE +
-                "  Journal                  = {International Journal of Something}," + OS.NEWLINE +
-                "  Note                     = {some note}," + OS.NEWLINE +
-                "  Number                   = {1}" + OS.NEWLINE +
-                "}" + OS.NEWLINE;
+        String bibtexEntry = """
+                @Article{test,
+                  Author                   = {Foo Bar},
+                  Journal                  = {International Journal of Something},
+                  Note                     = {some note},
+                  Number                   = {1}
+                }
+                """.replaceAll("\n", OS.NEWLINE);
         // @formatter:on
 
         String result = testSingleWrite(bibtexEntry);
@@ -478,11 +485,13 @@ class BibEntryWriterTest {
     @Test
     void monthFieldSpecialSyntax() throws IOException {
         // @formatter:off
-        String bibtexEntry = "@Article{test," + OS.NEWLINE +
-                "  Author                   = {Foo Bar}," + OS.NEWLINE +
-                "  Month                    = mar," + OS.NEWLINE +
-                "  Number                   = {1}" + OS.NEWLINE +
-                "}" + OS.NEWLINE;
+        String bibtexEntry = """
+                @Article{test,
+                  Author                   = {Foo Bar},
+                  Month                    = mar,
+                  Number                   = {1}
+                }
+                """.replaceAll("\n", OS.NEWLINE);
         // @formatter:on
 
         // read in bibtex string
@@ -559,9 +568,11 @@ class BibEntryWriterTest {
 
         bibEntryWriter.write(entry, bibWriter, BibDatabaseMode.BIBTEX);
 
-        assertEquals("@Misc{," + OS.NEWLINE +
-                        "  month = apr," + OS.NEWLINE +
-                        "}" + OS.NEWLINE,
+        assertEquals("""
+                        @Misc{,
+                          month = apr,
+                        }
+                        """.replaceAll("\n", OS.NEWLINE),
                 stringWriter.toString());
     }
 
@@ -574,9 +585,11 @@ class BibEntryWriterTest {
 
         bibEntryWriter.write(entry, bibWriter, BibDatabaseMode.BIBTEX);
 
-        assertEquals("@Misc{," + OS.NEWLINE +
-                        "  month = {apr}," + OS.NEWLINE +
-                        "}" + OS.NEWLINE,
+        assertEquals("""
+                        @Misc{,
+                          month = {apr},
+                        }
+                        """.replaceAll("\n", OS.NEWLINE),
                 stringWriter.toString());
     }
 
