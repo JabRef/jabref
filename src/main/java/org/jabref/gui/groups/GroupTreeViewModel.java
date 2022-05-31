@@ -278,7 +278,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
             // final UndoableAddOrRemoveGroup undo = new UndoableAddOrRemoveGroup(groupsRoot, node, UndoableAddOrRemoveGroup.REMOVE_NODE_KEEP_CHILDREN);
             // panel.getUndoManager().addEdit(undo);
 
-            ArrayList<GroupNodeViewModel> selectedGroupNodes = new ArrayList<>(selectedGroups);
+            List<GroupNodeViewModel> selectedGroupNodes = new ArrayList<>(selectedGroups);
             selectedGroupNodes.forEach(eachNode -> {
                 GroupTreeNode groupNode = eachNode.getGroupNode();
 
