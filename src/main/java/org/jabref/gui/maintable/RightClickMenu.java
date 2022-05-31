@@ -132,8 +132,8 @@ public class RightClickMenu {
             BibEntry entry = entries.get(0);
             String authors = entry.getField(StandardField.AUTHOR).orElse("");
             if(!authors.equals("")){
-                String[] arthurNames = authors.split("and");
-                for( String name : arthurNames ) {
+                String[] authorNames = authors.split("and");
+                for( String name : authorNames ) {
                     LookUpSpecialMenu.getItems().addAll(
                             factory.createMenuItem(new CustomizedAction(name, name),new LookupAuthorAction(name, dialogService,stateManager, preferencesService)));
                 }
