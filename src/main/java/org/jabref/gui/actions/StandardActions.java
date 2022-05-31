@@ -133,6 +133,7 @@ public enum StandardActions implements Action {
     AUTO_LINK_FILES(Localization.lang("Automatically set file links"), IconTheme.JabRefIcons.AUTO_FILE_LINK, KeyBinding.AUTOMATICALLY_LINK_FILES),
     LOOKUP_DOC_IDENTIFIER(Localization.lang("Search document identifier online")),
     LOOKUP_FULLTEXT(Localization.lang("Search full text documents online"), IconTheme.JabRefIcons.FILE_SEARCH, KeyBinding.DOWNLOAD_FULL_TEXT),
+    LOOKUP_AUTHORS(Localization.lang("Search Authors by GoogleScholar")),
     GENERATE_CITE_KEY(Localization.lang("Generate citation key"), IconTheme.JabRefIcons.MAKE_KEY, KeyBinding.AUTOGENERATE_CITATION_KEYS),
     GENERATE_CITE_KEYS(Localization.lang("Generate citation keys"), IconTheme.JabRefIcons.MAKE_KEY, KeyBinding.AUTOGENERATE_CITATION_KEYS),
     DOWNLOAD_FULL_TEXT(Localization.lang("Search full text documents online"), IconTheme.JabRefIcons.FILE_SEARCH, KeyBinding.DOWNLOAD_FULL_TEXT),
