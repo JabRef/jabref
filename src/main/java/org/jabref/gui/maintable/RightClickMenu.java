@@ -1,20 +1,12 @@
 package org.jabref.gui.maintable;
 
-import javax.swing.undo.UndoManager;
-
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Menu;
 import javafx.scene.control.SeparatorMenuItem;
-
-import org.jabref.gui.ClipBoardManager;
-import org.jabref.gui.DialogService;
-import org.jabref.gui.Globals;
-import org.jabref.gui.LibraryTab;
-import org.jabref.gui.SendAsEMailAction;
-import org.jabref.gui.StateManager;
+import org.jabref.gui.*;
 import org.jabref.gui.actions.ActionFactory;
-import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.actions.CustomizedAction;
+import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.edit.CopyMoreAction;
 import org.jabref.gui.edit.EditAction;
 import org.jabref.gui.exporter.ExportToClipboardAction;
@@ -28,13 +20,15 @@ import org.jabref.gui.specialfields.SpecialFieldMenuItemFactory;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.citationstyle.CitationStyleOutputFormat;
 import org.jabref.logic.citationstyle.CitationStylePreviewLayout;
+import org.jabref.logic.l10n.Localization;
+import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.SpecialField;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.preferences.PreferencesService;
 import org.jabref.preferences.PreviewPreferences;
-import org.jabref.model.entry.BibEntry;
+
+import javax.swing.undo.UndoManager;
 import java.util.List;
-import org.jabref.logic.l10n.Localization;
-import org.jabref.model.entry.field.StandardField;
 public class RightClickMenu {
 
     public static ContextMenu create(BibEntryTableViewModel entry,
@@ -77,7 +71,7 @@ public class RightClickMenu {
                 factory.createMenuItem(StandardActions.OPEN_EXTERNAL_FILE, new OpenExternalFileAction(dialogService, stateManager, preferencesService)),
                 factory.createMenuItem(StandardActions.OPEN_URL, new OpenUrlAction(dialogService, stateManager, preferencesService)),
                 factory.createMenuItem(StandardActions.SEARCH_SHORTSCIENCE, new SearchShortScienceAction(dialogService, stateManager, preferencesService)),
-                LookArthurMenu(factory, dialogService, stateManager, preferencesService),
+                LookAuthorMenu(factory, dialogService, stateManager, preferencesService),
                 new SeparatorMenuItem(),
 
                 new ChangeEntryTypeMenu().getChangeEntryTypeMenu(entry.getEntry(), libraryTab.getBibDatabaseContext(), libraryTab.getUndoManager()),
@@ -122,7 +116,7 @@ public class RightClickMenu {
 
         return copySpecialMenu;
     }
-    private static Menu LookArthurMenu(ActionFactory factory,
+    private static Menu LookAuthorMenu(ActionFactory factory,
                                        DialogService dialogService,
                                        StateManager stateManager,
                                        PreferencesService preferencesService
@@ -136,9 +130,9 @@ public class RightClickMenu {
                 return;
             }
             BibEntry entry = entries.get(0);
-            String arthurs = entry.getField(StandardField.AUTHOR).orElse("");
-            if(!arthurs.equals("")){
-                String[] arthurNames = arthurs.split("and");
+            String authors = entry.getField(StandardField.AUTHOR).orElse("");
+            if(!authors.equals("")){
+                String[] arthurNames = authors.split("and");
                 for( String name : arthurNames ) {
                     LookUpSpecialMenu.getItems().addAll(
                             factory.createMenuItem(new CustomizedAction(name, name),new LookupAuthorAction(name, dialogService,stateManager, preferencesService)));

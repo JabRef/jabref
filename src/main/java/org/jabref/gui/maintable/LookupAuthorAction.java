@@ -21,14 +21,14 @@ public class LookupAuthorAction extends SimpleCommand {
     protected final StateManager stateManager;
     protected final PreferencesService preferencesService;
     public final String baseUrl;
-    public final String arthurName;
+    public final String author;
 
     public LookupAuthorAction( String name, DialogService dialogService, StateManager stateManager, PreferencesService preferencesService) {
         this.dialogService = dialogService;
         this.stateManager = stateManager;
         this.preferencesService = preferencesService;
         this.baseUrl = "https://scholar.google.com/citations?view_op=search_authors&";
-        this.arthurName = name;
+        this.author = name;
         BooleanExpression fieldIsSet = isFieldSetForSelectedEntry(StandardField.TITLE, stateManager);
         this.executable.bind(needsEntriesSelected(1, stateManager).and(fieldIsSet));
     }
@@ -41,7 +41,7 @@ public class LookupAuthorAction extends SimpleCommand {
                 dialogService.notify(Localization.lang("This operation requires exactly one item to be selected."));
                 return;
             }
-            query = "mauthors=" + arthurName.replace(" ","+");
+            query = "mauthors=" + author.replace(" ","+");
             String url = baseUrl + query ;
             System.out.println(url);
             JabRefDesktop.openBrowserShowPopup(url);
