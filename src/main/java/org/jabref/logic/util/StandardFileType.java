@@ -44,7 +44,10 @@ public enum StandardFileType implements FileType {
     YAML("YAML Markup", "yaml"),
     CFF("CFF", "cff"),
     ANY_FILE("Any", "*"),
-    CER("SSL Certificate", "cer");
+    CER("SSL Certificate", "cer"),
+    CITAVI("Citavi", "ctv6bak", "ctv5bak");
+
+
 
     private final List<String> extensions;
     private final String name;

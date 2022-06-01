@@ -227,7 +227,7 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
     }
 
     /**
-     * Inserts the preference values into the the Properties of the ViewModel
+     * Inserts the preference values into the Properties of the ViewModel
      */
     public void setValues() {
         for (PreferencesTab preferencesTab : preferenceTabs) {
