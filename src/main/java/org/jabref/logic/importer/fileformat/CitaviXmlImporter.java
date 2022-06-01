@@ -28,6 +28,7 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
+import org.jabref.logic.formatter.bibtexfields.NormalizePagesFormatter;
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.ParserResult;
@@ -188,7 +189,12 @@ public class CitaviXmlImporter extends Importer implements Parser {
                 .ifPresent(value -> entry.setField(StandardField.DOI, clean(value)));
         Optional.ofNullable(data.getIsbn())
                 .ifPresent(value -> entry.setField(StandardField.ISBN, clean(value)));
-        entry.setField(StandardField.PAGES, clean(getPages(data)));
+
+        String pages = clean(getPages(data));
+        // Cleans also unicode minus signs
+        pages = new NormalizePagesFormatter().format(pages);
+        entry.setField(StandardField.PAGES, pages);
+
         Optional.ofNullable(data.getVolume())
                 .ifPresent(value -> entry.setField(StandardField.VOLUME, clean(value)));
         Optional.ofNullable(getAuthorName(data))
