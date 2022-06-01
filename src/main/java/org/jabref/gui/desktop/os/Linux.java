@@ -146,7 +146,7 @@ public class Linux implements NativeDesktop {
                     cmd = new String[] {emulatorName, absolutePath};
                 }
 
-                ProcessBuilder builder  = new ProcessBuilder(cmd);
+                ProcessBuilder builder = new ProcessBuilder(cmd);
                 builder.directory(new File(absolutePath));
                 builder.start();
 

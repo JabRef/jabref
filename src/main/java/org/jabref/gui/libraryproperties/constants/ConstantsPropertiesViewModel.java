@@ -36,7 +36,7 @@ public class ConstantsPropertiesViewModel implements PropertiesTabViewModel {
 
     public ConstantsPropertiesViewModel(BibDatabaseContext databaseContext, DialogService dialogService) {
         this.databaseContext = databaseContext;
-        this.dialogService  = dialogService;
+        this.dialogService = dialogService;
 
         ObservableList<ObservableValue<Boolean>> allValidProperty =
                 EasyBind.map(stringsListProperty, ConstantsItemModel::combinedValidationValidProperty);
