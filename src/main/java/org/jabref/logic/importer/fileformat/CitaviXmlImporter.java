@@ -76,6 +76,7 @@ public class CitaviXmlImporter extends Importer implements Parser {
     private CitaviExchangeData.ReferencePublishers refPublishers;
 
     private Unmarshaller unmarshaller;
+
     @Override
     public String getName() {
         return "Citavi XML";
