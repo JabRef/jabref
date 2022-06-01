@@ -5,16 +5,18 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Arrays;
 import java.util.Locale;
 import java.util.Optional;
 
 import org.jabref.architecture.AllowedToUseAwt;
+import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefExecutorService;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.util.StreamGobbler;
+import org.jabref.logic.l10n.Localization;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -116,7 +118,12 @@ public class Linux implements NativeDesktop {
     }
 
     @Override
-    public void openConsole(String absolutePath) throws IOException {
+    public void openConsole(String absolutePath, DialogService dialogService) throws IOException {
+
+        if (!Files.exists(Path.of("/etc/alternatives/x-terminal-emulator"))) {
+            dialogService.showErrorDialogAndWait(Localization.lang("Could not detect terminal automatically. Please define a custom terminal in the preferences."));
+            return;
+        }
 
         ProcessBuilder processBuilder = new ProcessBuilder("readlink", "/etc/alternatives/x-terminal-emulator");
         Process process = processBuilder.start();
@@ -130,16 +137,18 @@ public class Linux implements NativeDesktop {
 
                 String[] cmd = {};
                 if (emulatorName.contains("gnome")) {
-                    cmd = new String[] {"gnome-terminal", "--working-directory=" + absolutePath};
+                    cmd = new String[] {"gnome-terminal", "--working-directory=", absolutePath};
                 } else if (emulatorName.contains("xfce4")) {
-                    cmd = new String[] {"xfce4-terminal", "--working-directory=" + absolutePath};
+                    cmd = new String[] {"xfce4-terminal", "--working-directory=", absolutePath};
                 } else if (emulatorName.contains("konsole")) {
-                    cmd = new String[] {"konsole --workdir=" + absolutePath};
+                    cmd = new String[] {"konsole", "--workdir=", absolutePath};
                 } else {
                     cmd = new String[] {emulatorName, absolutePath};
                 }
-                LOGGER.debug("Terminal cmd {}", Arrays.toString(cmd));
-                process = new ProcessBuilder(cmd).start();
+
+                ProcessBuilder builder  = new ProcessBuilder(cmd);
+                builder.directory(new File(absolutePath));
+                builder.start();
 
                 StreamGobbler streamGobblerInput = new StreamGobbler(process.getInputStream(), LOGGER::debug);
                 StreamGobbler streamGobblerError = new StreamGobbler(process.getErrorStream(), LOGGER::debug);

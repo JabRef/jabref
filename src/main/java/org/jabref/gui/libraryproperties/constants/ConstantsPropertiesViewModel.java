@@ -11,6 +11,7 @@ import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
+import org.jabref.gui.DialogService;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.libraryproperties.PropertiesTabViewModel;
 import org.jabref.logic.bibtex.comparator.BibtexStringComparator;
@@ -31,8 +32,11 @@ public class ConstantsPropertiesViewModel implements PropertiesTabViewModel {
 
     private final BibDatabaseContext databaseContext;
 
-    public ConstantsPropertiesViewModel(BibDatabaseContext databaseContext) {
+    private final DialogService dialogService;
+
+    public ConstantsPropertiesViewModel(BibDatabaseContext databaseContext, DialogService dialogService) {
         this.databaseContext = databaseContext;
+        this.dialogService  = dialogService;
 
         ObservableList<ObservableValue<Boolean>> allValidProperty =
                 EasyBind.map(stringsListProperty, ConstantsItemModel::combinedValidationValidProperty);
@@ -90,7 +94,7 @@ public class ConstantsPropertiesViewModel implements PropertiesTabViewModel {
     }
 
     public void openHelpPage() {
-        HelpAction.openHelpPage(HelpFile.STRING_EDITOR);
+        new HelpAction(HelpFile.STRING_EDITOR, dialogService).execute();
     }
 
     public ListProperty<ConstantsItemModel> stringsListProperty() {

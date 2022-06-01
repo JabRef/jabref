@@ -6,6 +6,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
 
+import org.jabref.gui.DialogService;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 
@@ -79,7 +80,7 @@ public class Windows implements NativeDesktop {
     }
 
     @Override
-    public void openConsole(String absolutePath) throws IOException {
+    public void openConsole(String absolutePath, DialogService dialogService) throws IOException {
         ProcessBuilder process = new ProcessBuilder("cmd.exe", "/c", "start");
         process.directory(new File(absolutePath));
         process.start();
