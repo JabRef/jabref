@@ -10,7 +10,7 @@ plugins {
 
     id 'me.champeau.gradle.jmh' version '0.5.3'
 
-    id 'org.javamodularity.moduleplugin' version '1.8.10'
+    id 'org.javamodularity.moduleplugin' version '1.8.11'
 
     id 'org.openjfx.javafxplugin' version '0.0.13'
 
@@ -112,11 +112,11 @@ dependencies {
     implementation 'org.apache.pdfbox:fontbox:3.0.0-RC1'
     implementation 'org.apache.pdfbox:xmpbox:3.0.0-RC1'
 
-    implementation 'org.apache.lucene:lucene-core:9.1.0'
-    implementation 'org.apache.lucene:lucene-queryparser:9.1.0'
-    implementation 'org.apache.lucene:lucene-queries:9.1.0'
-    implementation 'org.apache.lucene:lucene-analysis-common:9.1.0'
-    implementation 'org.apache.lucene:lucene-highlighter:9.1.0'
+    implementation 'org.apache.lucene:lucene-core:9.2.0'
+    implementation 'org.apache.lucene:lucene-queryparser:9.2.0'
+    implementation 'org.apache.lucene:lucene-queries:9.2.0'
+    implementation 'org.apache.lucene:lucene-analysis-common:9.2.0'
+    implementation 'org.apache.lucene:lucene-highlighter:9.2.0'
 
     implementation group: 'org.apache.commons', name: 'commons-csv', version: '1.9.0'
     implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.12.0'
@@ -131,7 +131,7 @@ dependencies {
     implementation 'commons-cli:commons-cli:1.5.0'
 
     implementation 'org.libreoffice:libreoffice:7.3.3'
-    implementation 'org.libreoffice:unoloader:7.3.2'
+    implementation 'org.libreoffice:unoloader:7.3.3'
 
     implementation 'io.github.java-diff-utils:java-diff-utils:4.11'
     implementation 'info.debatty:java-string-similarity:2.0.0'
@@ -145,7 +145,7 @@ dependencies {
     implementation group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: '6.1.0.202203080745-r'
 
     implementation group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-yaml', version: '2.13.3'
-    implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.13.2'
+    implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.13.3'
 
     implementation group: 'org.mariadb.jdbc', name: 'mariadb-java-client', version: '2.7.5'
 
@@ -178,8 +178,8 @@ dependencies {
 
     implementation 'org.controlsfx:controlsfx:11.1.1'
 
-    implementation 'org.jsoup:jsoup:1.14.3'
-    implementation 'com.konghq:unirest-java:3.13.8'
+    implementation 'org.jsoup:jsoup:1.15.1'
+    implementation 'com.konghq:unirest-java:3.13.10'
 
     implementation 'org.slf4j:slf4j-api:2.0.0-alpha7'
     implementation "org.tinylog:tinylog-api:2.4.1"
@@ -207,7 +207,7 @@ dependencies {
 
     implementation group: 'net.harawata', name: 'appdirs', version: '1.2.1'
 
-    testImplementation 'io.github.classgraph:classgraph:4.8.146'
+    testImplementation 'io.github.classgraph:classgraph:4.8.147'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.8.2'
     testImplementation 'org.junit.platform:junit-platform-launcher:1.8.2'
 

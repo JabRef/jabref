@@ -43,44 +43,41 @@ public class IacrEprintFetcherTest {
     public void setUp() {
         fetcher = new IacrEprintFetcher(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS));
 
-        abram2017 = new BibEntry();
-        abram2017.setType(StandardEntryType.Misc);
-        abram2017.setCitationKey("cryptoeprint:2017:1118");
-        abram2017.setField(StandardField.ABSTRACT, "dummy");
-        abram2017.setField(StandardField.AUTHOR, "Ittai Abraham and Dahlia Malkhi and Kartik Nayak and Ling Ren and Alexander Spiegelman");
-        abram2017.setField(StandardField.DATE, "2017-11-18");
-        abram2017.setField(StandardField.HOWPUBLISHED, "Cryptology ePrint Archive, Report 2017/1118");
-        abram2017.setField(StandardField.NOTE, "\\url{https://ia.cr/2017/1118}");
-        abram2017.setField(StandardField.TITLE, "Solida: A Blockchain Protocol Based on Reconfigurable Byzantine Consensus");
-        abram2017.setField(StandardField.URL, "https://eprint.iacr.org/2017/1118/20171124:064527");
-        abram2017.setField(StandardField.VERSION, "20171124:064527");
-        abram2017.setField(StandardField.YEAR, "2017");
+        abram2017 = new BibEntry(StandardEntryType.Misc)
+                .withCitationKey("cryptoeprint:2017:1118")
+                .withField(StandardField.ABSTRACT, "dummy")
+                .withField(StandardField.AUTHOR, "Ittai Abraham and Dahlia Malkhi and Kartik Nayak and Ling Ren and Alexander Spiegelman")
+                .withField(StandardField.DATE, "2017-11-18")
+                .withField(StandardField.HOWPUBLISHED, "Cryptology ePrint Archive, Report 2017/1118")
+                .withField(StandardField.NOTE, "\\url{https://ia.cr/2017/1118}")
+                .withField(StandardField.TITLE, "Solida: A Blockchain Protocol Based on Reconfigurable Byzantine Consensus")
+                .withField(StandardField.URL, "https://eprint.iacr.org/2017/1118/20171124:064527")
+                .withField(StandardField.VERSION, "20171124:064527")
+                .withField(StandardField.YEAR, "2017");
 
-        beierle2016 = new BibEntry();
-        beierle2016.setType(StandardEntryType.Misc);
-        beierle2016.setCitationKey("cryptoeprint:2016:119");
-        beierle2016.setField(StandardField.ABSTRACT, "dummy");
-        beierle2016.setField(StandardField.AUTHOR, "Christof Beierle and Thorsten Kranz and Gregor Leander");
-        beierle2016.setField(StandardField.DATE, "2017-02-17");
-        beierle2016.setField(StandardField.HOWPUBLISHED, "Cryptology ePrint Archive, Report 2016/119");
-        beierle2016.setField(StandardField.NOTE, "\\url{https://ia.cr/2016/119}");
-        beierle2016.setField(StandardField.TITLE, "Lightweight Multiplication in GF(2^n) with Applications to MDS Matrices");
-        beierle2016.setField(StandardField.URL, "https://eprint.iacr.org/2016/119/20170217:150415");
-        beierle2016.setField(StandardField.VERSION, "20170217:150415");
-        beierle2016.setField(StandardField.YEAR, "2016");
+        beierle2016 = new BibEntry(StandardEntryType.Misc)
+                .withCitationKey("cryptoeprint:2016:119")
+                .withField(StandardField.ABSTRACT, "dummy")
+                .withField(StandardField.AUTHOR, "Christof Beierle and Thorsten Kranz and Gregor Leander")
+                .withField(StandardField.DATE, "2017-02-17")
+                .withField(StandardField.HOWPUBLISHED, "Cryptology ePrint Archive, Report 2016/119")
+                .withField(StandardField.NOTE, "\\url{https://ia.cr/2016/119}")
+                .withField(StandardField.TITLE, "Lightweight Multiplication in GF(2^n) with Applications to MDS Matrices")
+                .withField(StandardField.URL, "https://eprint.iacr.org/2016/119/20170217:150415")
+                .withField(StandardField.VERSION, "20170217:150415")
+                .withField(StandardField.YEAR, "2016");
 
-        delgado2017 = new BibEntry();
-        delgado2017.setType(StandardEntryType.Misc);
-        delgado2017.setCitationKey("cryptoeprint:2017:1095");
-        delgado2017.setField(StandardField.ABSTRACT, "dummy");
-        delgado2017.setField(StandardField.AUTHOR, "Sergi Delgado-Segura and Cristina Pérez-Solà and Guillermo Navarro-Arribas and Jordi Herrera-Joancomartí");
-        delgado2017.setField(StandardField.DATE, "2018-01-19");
-        delgado2017.setField(StandardField.HOWPUBLISHED, "Cryptology ePrint Archive, Report 2017/1095");
-        delgado2017.setField(StandardField.NOTE, "\\url{https://ia.cr/2017/1095}");
-        delgado2017.setField(StandardField.TITLE, "Analysis of the Bitcoin UTXO set");
-        delgado2017.setField(StandardField.URL, "https://eprint.iacr.org/2017/1095/20180119:113352");
-        delgado2017.setField(StandardField.VERSION, "20180119:113352");
-        delgado2017.setField(StandardField.YEAR, "2017");
+        delgado2017 = new BibEntry(StandardEntryType.Misc)
+                .withCitationKey("cryptoeprint:2017:1095")
+                .withField(StandardField.ABSTRACT, "dummy")
+                .withField(StandardField.AUTHOR, "Sergi Delgado-Segura and Cristina Pérez-Solà and Guillermo Navarro-Arribas and Jordi Herrera-Joancomartí")
+                .withField(StandardField.DATE, "2018-01-19")
+                .withField(StandardField.HOWPUBLISHED, "Cryptology ePrint Archive, Report 2017/1095")
+                .withField(StandardField.NOTE, "\\url{https://ia.cr/2017/1095}")
+                .withField(StandardField.TITLE, "Analysis of the Bitcoin UTXO set")
+                .withField(StandardField.URL, "https://eprint.iacr.org/2017/1095/20180119:113352")
+                .withField(StandardField.VERSION, "20180119:113352")
+                .withField(StandardField.YEAR, "2017");
     }
 
     @Test

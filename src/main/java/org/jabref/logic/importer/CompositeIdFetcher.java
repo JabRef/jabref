@@ -4,13 +4,11 @@ import java.util.Optional;
 
 import org.jabref.logic.importer.fetcher.ArXiv;
 import org.jabref.logic.importer.fetcher.DoiFetcher;
-import org.jabref.logic.importer.fetcher.IacrEprintFetcher;
 import org.jabref.logic.importer.fetcher.IsbnFetcher;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.identifier.ArXivIdentifier;
 import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.entry.identifier.ISBN;
-import org.jabref.model.entry.identifier.IacrEprint;
 
 public class CompositeIdFetcher {
 
@@ -33,10 +31,11 @@ public class CompositeIdFetcher {
         if (isbn.isPresent()) {
             return new IsbnFetcher(importFormatPreferences).performSearchById(isbn.get().getNormalized());
         }
+        /* TODO: IACR is currently disabled, because it needs to be reworked: https://github.com/JabRef/jabref/issues/8876
         Optional<IacrEprint> iacrEprint = IacrEprint.parse(identifier);
         if (iacrEprint.isPresent()) {
             return new IacrEprintFetcher(importFormatPreferences).performSearchById(iacrEprint.get().getNormalized());
-        }
+        }*/
 
         return Optional.empty();
     }
