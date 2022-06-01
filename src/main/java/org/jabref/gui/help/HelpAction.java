@@ -19,12 +19,11 @@ public class HelpAction extends SimpleCommand {
         this.dialogService = dialogService;
     }
 
-     void openHelpPage(HelpFile helpPage) {
+    void openHelpPage(HelpFile helpPage) {
         StringBuilder sb = new StringBuilder("https://docs.jabref.org/");
         sb.append(helpPage.getPageName());
         JabRefDesktop.openBrowserShowPopup(sb.toString(), dialogService);
     }
-
 
     @Override
     public void execute() {

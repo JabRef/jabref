@@ -6,6 +6,7 @@ import java.nio.file.Path;
 import org.jabref.gui.DialogService;
 
 public interface NativeDesktop {
+
     void openFile(String filePath, String fileType) throws IOException;
 
     /**
