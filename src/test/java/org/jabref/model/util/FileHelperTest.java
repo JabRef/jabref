@@ -29,10 +29,9 @@ class FileHelperTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = { "*","?",">","\"" })
+    @ValueSource(strings = { "*", "?", ">", "\"" })
     public void testFileNameIllegal(String fileName) {
         Path path = Path.of("/");
         assertEquals(Optional.empty(), FileHelper.find(fileName, path));
     }
-
 }
