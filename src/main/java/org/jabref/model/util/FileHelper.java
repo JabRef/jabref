@@ -141,7 +141,6 @@ public class FileHelper {
         return false;
     }
 
-
     public static boolean isCharLegal(char c) {
         return Arrays.binarySearch(ILLEGAL_CHARS, c) < 0;
     }

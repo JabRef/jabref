@@ -9,7 +9,6 @@ import org.jabref.model.util.FileHelper;
  */
 public class FileNameCleaner {
 
-
     private FileNameCleaner() {
     }
 

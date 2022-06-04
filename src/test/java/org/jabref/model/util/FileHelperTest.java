@@ -4,6 +4,8 @@ import java.nio.file.Path;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -26,21 +28,11 @@ class FileHelperTest {
       assertEquals(Optional.of(path), FileHelper.find("", path));
     }
 
-    @Test
-    public void testFileNameIllegal1() {
+    @ParameterizedTest
+    @ValueSource(strings = { "*","?",">","\"" })
+    public void testFileNameIllegal(String fileName) {
         Path path = Path.of("/");
-        assertEquals(Optional.empty(), FileHelper.find(">", path));
+        assertEquals(Optional.empty(), FileHelper.find(fileName, path));
     }
 
-    @Test
-    public void testFileNameIllegal2() {
-        Path path = Path.of("/");
-        assertEquals(Optional.empty(), FileHelper.find("*", path));
-    }
-
-    @Test
-    public void testFileNameIllegal3() {
-        Path path = Path.of("/");
-        assertEquals(Optional.empty(), FileHelper.find("?", path));
-    }
 }
