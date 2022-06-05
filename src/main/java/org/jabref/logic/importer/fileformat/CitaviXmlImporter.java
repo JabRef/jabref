@@ -57,6 +57,7 @@ public class CitaviXmlImporter extends Importer implements Parser {
     private static final Logger LOGGER = LoggerFactory.getLogger(CitaviXmlImporter.class);
     private static final byte UUID_LENGTH = 36;
     private static final byte UUID_SEMICOLON_OFFSET_INDEX = 37;
+    private final NormalizePagesFormatter pagesFormatter = new NormalizePagesFormatter();
 
     private final Map<String, Author> knownPersons = new HashMap<>();
     private final Map<String, Keyword> knownKeywords = new HashMap<>();
@@ -192,7 +193,7 @@ public class CitaviXmlImporter extends Importer implements Parser {
 
         String pages = clean(getPages(data));
         // Cleans also unicode minus signs
-        pages = new NormalizePagesFormatter().format(pages);
+        pages = pagesFormatter.format(pages);
         entry.setField(StandardField.PAGES, pages);
 
         Optional.ofNullable(data.getVolume())
