@@ -44,6 +44,7 @@ public class FileHelper {
     // @formatter:on
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FileHelper.class);
+
     /**
      * Returns the extension of a file or Optional.empty() if the file does not have one (no . in name).
      *
@@ -123,14 +124,13 @@ public class FileHelper {
                           .flatMap(directory -> find(fileName, directory).stream())
                           .findFirst();
     }
+
     /**
      * Detect illegal characters in given filename.
      *
      * @param fileName the fileName to detect
      * @return Boolean whether there is a illegal name.
-     *
      */
-
     public static boolean detectBadFileName(String fileName) {
         for (int i = 0; i < fileName.length(); i++) {
             char c = fileName.charAt(i);
@@ -148,9 +148,7 @@ public class FileHelper {
     /**
      * Converts a relative filename to an absolute one, if necessary. Returns
      * an empty optional if the file does not exist.
-     *
      */
-
     public static Optional<Path> find(String fileName, Path directory) {
         Objects.requireNonNull(fileName);
         Objects.requireNonNull(directory);
