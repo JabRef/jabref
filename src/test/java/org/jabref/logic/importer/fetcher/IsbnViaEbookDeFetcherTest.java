@@ -28,7 +28,7 @@ public class IsbnViaEbookDeFetcherTest extends AbstractIsbnFetcherTest {
                 .withField(StandardField.PUBLISHER, "Addison Wesley")
                 .withField(StandardField.YEAR, "2018")
                 .withField(StandardField.AUTHOR, "Bloch, Joshua")
-                .withField(StandardField.DATE, "2018-01-31")
+                .withField(StandardField.DATE, "2018-01-15")
                 .withField(new UnknownField("ean"), "9780134685991")
                 .withField(StandardField.ISBN, "0134685997")
                 .withField(StandardField.URL, "https://www.ebook.de/de/product/28983211/joshua_bloch_effective_java.html");

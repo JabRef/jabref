@@ -40,7 +40,7 @@ class DoiResolutionTest {
         );
     }
 
-    @Disabled("Cannot fetch due to Cloudfare protection")
+    @Disabled("Cannot fetch due to Cloudflare protection")
     @Test
     void linkWithPdfStringLeadsToFulltext() throws IOException {
         entry.setField(StandardField.DOI, "10.1002/acr2.11101");
@@ -61,7 +61,7 @@ class DoiResolutionTest {
 
     @Test
     void returnAnythingWhenBehindSpringerPayWall() throws IOException {
-        // Springer returns a HTML page instead of an empty page,
+        // Springer returns an HTML page instead of an empty page,
         // even if the user does not have access
         // We cannot easily handle this case, because other publisher return the wrong media type.
         entry.setField(StandardField.DOI, "10.1007/978-3-319-62594-2_12");

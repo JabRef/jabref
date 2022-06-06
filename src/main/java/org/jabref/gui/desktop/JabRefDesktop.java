@@ -12,7 +12,6 @@ import java.util.regex.Pattern;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.Globals;
-import org.jabref.gui.JabRefGUI;
 import org.jabref.gui.desktop.os.DefaultDesktop;
 import org.jabref.gui.desktop.os.Linux;
 import org.jabref.gui.desktop.os.NativeDesktop;
@@ -184,7 +183,7 @@ public class JabRefDesktop {
      * @param fileLink the location of the file
      * @throws IOException if the default file browser cannot be opened
      */
-    public static void openFolderAndSelectFile(Path fileLink, PreferencesService preferencesService) throws IOException {
+    public static void openFolderAndSelectFile(Path fileLink, PreferencesService preferencesService, DialogService dialogService) throws IOException {
         if (fileLink == null) {
             return;
         }
@@ -208,7 +207,7 @@ public class JabRefDesktop {
                     new ProcessBuilder(subcommands).start();
                 } catch (IOException exception) {
                     LOGGER.error("Open File Browser", exception);
-                    JabRefGUI.getMainFrame().getDialogService().notify(Localization.lang("Error occured while executing the command \"%0\".", command));
+                    dialogService.notify(Localization.lang("Error occured while executing the command \"%0\".", command));
                 }
             }
         }
@@ -233,7 +232,7 @@ public class JabRefDesktop {
      *
      * @param url the URL to open
      */
-    public static void openBrowserShowPopup(String url) {
+    public static void openBrowserShowPopup(String url, DialogService dialogService) {
         try {
             openBrowser(url);
         } catch (IOException exception) {
@@ -242,8 +241,8 @@ public class JabRefDesktop {
             String couldNotOpenBrowser = Localization.lang("Could not open browser.");
             String openManually = Localization.lang("Please open %0 manually.", url);
             String copiedToClipboard = Localization.lang("The link has been copied to the clipboard.");
-            JabRefGUI.getMainFrame().getDialogService().notify(couldNotOpenBrowser);
-            JabRefGUI.getMainFrame().getDialogService().showErrorDialogAndWait(couldNotOpenBrowser, couldNotOpenBrowser + "\n" + openManually + "\n" + copiedToClipboard);
+            dialogService.notify(couldNotOpenBrowser);
+            dialogService.showErrorDialogAndWait(couldNotOpenBrowser, couldNotOpenBrowser + "\n" + openManually + "\n" + copiedToClipboard);
         }
     }
 
@@ -253,8 +252,9 @@ public class JabRefDesktop {
      * If no command is specified in {@link Globals}, the default system console will be executed.
      *
      * @param file Location the console should be opened at.
+     * @param dialogService
      */
-    public static void openConsole(File file, PreferencesService preferencesService) throws IOException {
+    public static void openConsole(File file, PreferencesService preferencesService, DialogService dialogService) throws IOException {
         if (file == null) {
             return;
         }
@@ -263,7 +263,7 @@ public class JabRefDesktop {
 
         boolean useCustomTerminal = preferencesService.getExternalApplicationsPreferences().useCustomTerminal();
         if (!useCustomTerminal) {
-            NATIVE_DESKTOP.openConsole(absolutePath);
+            NATIVE_DESKTOP.openConsole(absolutePath, dialogService);
         } else {
             String command = preferencesService.getExternalApplicationsPreferences().getCustomTerminalCommand();
             command = command.trim();
@@ -275,14 +275,14 @@ public class JabRefDesktop {
                 String[] subcommands = command.split(" ");
 
                 LOGGER.info("Executing command \"" + command + "\"...");
-                JabRefGUI.getMainFrame().getDialogService().notify(Localization.lang("Executing command \"%0\"...", command));
+                dialogService.notify(Localization.lang("Executing command \"%0\"...", command));
 
                 try {
                     new ProcessBuilder(subcommands).start();
                 } catch (IOException exception) {
                     LOGGER.error("Open console", exception);
 
-                    JabRefGUI.getMainFrame().getDialogService().notify(Localization.lang("Error occured while executing the command \"%0\".", command));
+                   dialogService.notify(Localization.lang("Error occured while executing the command \"%0\".", command));
                 }
             }
         }
