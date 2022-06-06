@@ -146,10 +146,10 @@ public class Linux implements NativeDesktop {
 
                 ProcessBuilder builder = new ProcessBuilder(cmd);
                 builder.directory(new File(absolutePath));
-                builder.start();
+                Process processTerminal = builder.start();
 
-                StreamGobbler streamGobblerInput = new StreamGobbler(process.getInputStream(), LOGGER::debug);
-                StreamGobbler streamGobblerError = new StreamGobbler(process.getErrorStream(), LOGGER::debug);
+                StreamGobbler streamGobblerInput = new StreamGobbler(processTerminal.getInputStream(), LOGGER::debug);
+                StreamGobbler streamGobblerError = new StreamGobbler(processTerminal.getErrorStream(), LOGGER::debug);
 
                 JabRefExecutorService.INSTANCE.execute(streamGobblerInput);
                 JabRefExecutorService.INSTANCE.execute(streamGobblerError);
