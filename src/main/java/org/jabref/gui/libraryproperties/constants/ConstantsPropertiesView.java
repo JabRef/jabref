@@ -12,6 +12,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.Tooltip;
 import javafx.util.converter.DefaultStringConverter;
 
+import org.jabref.gui.DialogService;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.libraryproperties.AbstractPropertiesTabView;
 import org.jabref.gui.libraryproperties.PropertiesTab;
@@ -33,6 +34,7 @@ public class ConstantsPropertiesView extends AbstractPropertiesTabView<Constants
     @FXML private ButtonType saveButton;
 
     @Inject private PreferencesService preferencesService;
+    @Inject private DialogService dialogService;
 
     public ConstantsPropertiesView(BibDatabaseContext databaseContext) {
         this.databaseContext = databaseContext;
@@ -48,7 +50,7 @@ public class ConstantsPropertiesView extends AbstractPropertiesTabView<Constants
     }
 
     public void initialize() {
-        this.viewModel = new ConstantsPropertiesViewModel(databaseContext);
+        this.viewModel = new ConstantsPropertiesViewModel(databaseContext, dialogService);
 
         addStringButton.setTooltip(new Tooltip(Localization.lang("New string")));
 
