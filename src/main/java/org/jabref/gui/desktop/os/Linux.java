@@ -133,8 +133,6 @@ public class Linux implements NativeDesktop {
             if (emulatorName != null) {
                 emulatorName = emulatorName.substring(emulatorName.lastIndexOf(File.separator) + 1);
 
-                absolutePath = "\"" + absolutePath + "\"";
-
                 String[] cmd = {};
                 if (emulatorName.contains("gnome")) {
                     cmd = new String[] {"gnome-terminal", "--working-directory=", absolutePath};
