@@ -265,7 +265,8 @@ task generateSource(dependsOn: ["generateBstGrammarSource",
                                 "generateMedlineSource",
                                 "generateBibtexmlSource",
                                 "generateEndnoteSource",
-                                "generateModsSource"]) {
+                                "generateModsSource",
+                                "generateCitaviSource"]) {
     group = 'JabRef'
     description 'Generates all necessary (Java) source files.'
 }
@@ -317,6 +318,15 @@ task generateEndnoteSource(type: XjcTask) {
     schemaFile = "src/main/resources/xjc/endnote/endnote.xsd"
     outputDirectory = "src-gen/main/java/"
     javaPackage = "org.jabref.logic.importer.fileformat.endnote"
+}
+
+task generateCitaviSource(type: XjcTask) {
+    group = 'JabRef'
+    description = "Generates java files for the citavi importer."
+
+    schemaFile = "src/main/resources/xjc/citavi/citavi.xsd"
+    outputDirectory = "src-gen/main/java/"
+    javaPackage = "org.jabref.logic.importer.fileformat.citavi"
 }
 
 task generateModsSource(type: XjcTask) {

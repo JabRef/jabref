@@ -2,6 +2,7 @@
 <style xmlns="http://purl.org/net/xbiblio/csl" class="note" version="1.0" demote-non-dropping-particle="sort-only" page-range-format="chicago" default-locale="en-US">
   <info>
     <title>Society of Biblical Literature 2nd edition (full note)</title>
+    <title-short>SBL (2nd edition)</title-short>
     <id>http://www.zotero.org/styles/society-of-biblical-literature-fullnote-bibliography</id>
     <link href="http://www.zotero.org/styles/society-of-biblical-literature-fullnote-bibliography" rel="self"/>
     <link href="http://www.zotero.org/styles/chicago-fullnote-bibliography" rel="template"/>
@@ -32,7 +33,7 @@
     <category citation-format="note"/>
     <category field="theology"/>
     <summary>Society of Biblical Literature format with full notes and bibliography</summary>
-    <updated>2021-05-16T18:39:17+00:00</updated>
+    <updated>2022-05-27T18:39:17+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="en-US">
