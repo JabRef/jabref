@@ -13,8 +13,6 @@ ENTRY : 'ENTRY';
 READ : 'READ';
 MACRO : 'MACRO';
 
-LBRACE : '{';
-RBRACE : '}';
 GT : '>';
 LT : '<';
 EQUAL : '=';
@@ -22,6 +20,10 @@ ASSIGN : ':=';
 ADD : '+';
 SUB : '-';
 CONCAT : '*';
+IF : 'if$';
+WHILE : 'while$';
+LBRACE : '{';
+RBRACE : '}';
 
 fragment LETTER : ('a'..'z'|'A'..'Z'|'.'|'$');
 fragment DIGIT : [0-9];
@@ -36,19 +38,19 @@ LINE_COMMENT : '%' ~('\n'|'\r')* '\r'? '\n' -> skip;
 
 // Parser
 
-start
+bstFile
     : commands+ EOF
     ;
 
 commands
     : STRINGS ids=idListObl                                           #stringsCommand
     | INTEGERS ids=idListObl                                          #integersCommand
-    | FUNCTION LBRACE id=identifier RBRACE exp=stack                  #functionCommand
+    | FUNCTION LBRACE id=identifier RBRACE function=stack             #functionCommand
     | MACRO LBRACE id=identifier RBRACE LBRACE repl=STRING RBRACE     #macroCommand
     | READ                                                            #readCommand
-    | EXECUTE LBRACE exp=function RBRACE                              #executeCommand
-    | ITERATE LBRACE exp=function RBRACE                              #iterateCommand
-    | REVERSE LBRACE exp=function RBRACE                              #reverseCommand
+    | EXECUTE LBRACE bstFunction RBRACE                               #executeCommand
+    | ITERATE LBRACE bstFunction RBRACE                               #iterateCommand
+    | REVERSE LBRACE bstFunction RBRACE                               #reverseCommand
     | ENTRY idListOpt idListOpt idListOpt                             #entryCommand
     | SORT                                                            #sortCommand
     ;
@@ -57,20 +59,19 @@ identifier
 	: IDENTIFIER
 	;
 
+// Obligatory identifier list
 idListObl
     : LBRACE identifier+ RBRACE
     ;
 
+// Optional identifier list
 idListOpt
     : LBRACE identifier* RBRACE
     ;
 
-function
-	: operator=(LT | GT | EQUAL) #comparisonFunction
-	| operator=(ADD | SUB)       #arithmeticFunction
-	| ASSIGN                     #assignmentFunction
-	| CONCAT                     #concatFunction
-	| identifier                 #userFunction
+bstFunction
+	: LT | GT | EQUAL | ADD | SUB | ASSIGN | CONCAT
+	| identifier
 	;
 
 stack
@@ -78,7 +79,7 @@ stack
 	;
 
 stackitem
-	: function
+	: bstFunction
 	| STRING
 	| INTEGER
 	| QUOTED

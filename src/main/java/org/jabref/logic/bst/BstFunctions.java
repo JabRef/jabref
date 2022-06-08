@@ -15,6 +15,8 @@ import org.jabref.logic.bst.util.BibtexWidth;
 import org.jabref.model.entry.Author;
 import org.jabref.model.entry.AuthorList;
 
+import org.antlr.v4.runtime.misc.ParseCancellationException;
+import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.Tree;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,44 +28,48 @@ public class BstFunctions {
     private final Map<String, String> strings;
     private final Map<String, Integer> integers;
     private final Map<String, BstFunction> functions;
-    private final Map<String, BstFunction> builtInFunctions = new HashMap<>(37);
+    private final String preamble;
 
     private final Stack<Object> stack;
-
     private final StringBuilder bbl;
-    private int bstWarning = 0;
 
-    private String preamble = "";
+    private int bstWarning = 0;
 
     @FunctionalInterface
     public interface BstFunction {
-        void execute(BstEntry context);
+
+        void execute(BstVMVisitor visitor, BstParser.BstFunctionContext functionContext);
+
+        default void execute(BstVMVisitor visitor, BstParser.BstFunctionContext functionContext, BstEntry bstEntry) {
+            this.execute(visitor, functionContext);
+        }
     }
 
-    public BstFunctions(Map<String, String> strings,
-                        Map<String, Integer> integers,
-                        Map<String, BstFunction> functions,
+    public BstFunctions(BstVMContext bstVMContext,
                         Stack<Object> stack,
                         StringBuilder bbl) {
-        this.strings = strings;
-        this.integers = integers;
-        this.functions = functions;
+        this.strings = bstVMContext.strings();
+        this.integers = bstVMContext.integers();
+        this.functions = bstVMContext.functions();
+        this.bstWarning = bstVMContext.warnings();
+        this.preamble = bstVMContext.bibDatabase().getPreamble().orElse("");
+
         this.stack = stack;
         this.bbl = bbl;
-
-        inititalize();
     }
 
-    private void inititalize() {
+    protected Map<String, BstFunction> getBuiltInFunctions() {
+        Map<String, BstFunction> builtInFunctions = new HashMap<>();
+
         builtInFunctions.put(">", this::bstIsGreaterThan);
         builtInFunctions.put("<", this::bstIsLowerThan);
         builtInFunctions.put("=", this::bstEquals);
         builtInFunctions.put("+", this::bstAdd);
         builtInFunctions.put("-", this::bstSubtract);
         builtInFunctions.put("*", this::bstConcat);
-        builtInFunctions.put(":=", this::bstAssign);
+        builtInFunctions.put(":=", new BstAssignFunction());
         builtInFunctions.put("add.period$", this::bstAddPeriod);
-        builtInFunctions.put("call.type$", this::bstCallType);
+        builtInFunctions.put("call.type$", new BstCallTypeFunction());
         builtInFunctions.put("change.case$", this::bstChangeCase);
         builtInFunctions.put("chr.to.int$", this::bstChrToInt);
         builtInFunctions.put("cite$", this::bstCite);
@@ -92,9 +98,7 @@ public class BstFunctions {
         builtInFunctions.put("while$", this::bstWhile);
         builtInFunctions.put("width$", this::bstWidth);
         builtInFunctions.put("write$", this::bstWrite);
-    }
 
-    public Map<String, BstFunction> getBuiltInFunction() {
         return builtInFunctions;
     }
 
@@ -103,7 +107,7 @@ public class BstFunctions {
      * the integer 1 if the second is greater than the first, 0
      * otherwise.
      */
-    private void bstIsGreaterThan(BstEntry context) {
+    private void bstIsGreaterThan(BstVMVisitor visitor, BstParser.BstFunctionContext functionContext) {
         if (stack.size() < 2) {
             throw new VMException("Not enough operands on stack for operation >");
         }
@@ -122,7 +126,7 @@ public class BstFunctions {
      * the integer 1 if the second is lower than the first, 0
      * otherwise.
      */
-    private void bstIsLowerThan(BstEntry context) {
+    private void bstIsLowerThan(BstVMVisitor visitor, BstParser.BstFunctionContext functionContext) {
         if (stack.size() < 2) {
             throw new VMException("Not enough operands on stack for operation <");
         }
@@ -140,7 +144,7 @@ public class BstFunctions {
      * Pops the top two (both integer or both string) literals, compares
      * them, and pushes the integer 1 if they're equal, 0 otherwise.
      */
-    private void bstEquals(BstEntry context) {
+    private void bstEquals(BstVMVisitor visitor, BstParser.BstFunctionContext functionContext) {
         if (stack.size() < 2) {
             throw new VMException("Not enough operands on stack for operation =");
         }
@@ -148,12 +152,12 @@ public class BstFunctions {
         Object o2 = stack.pop();
 
         if ((o1 == null) ^ (o2 == null)) {
-            stack.push(VM.FALSE);
+            stack.push(BstVM.FALSE);
             return;
         }
 
         if ((o1 == null) && (o2 == null)) {
-            stack.push(VM.TRUE);
+            stack.push(BstVM.TRUE);
             return;
         }
 
@@ -163,7 +167,7 @@ public class BstFunctions {
     /**
      *  Pops the top two (integer) literals and pushes their sum.
      */
-    private void bstAdd(BstEntry context) {
+    private void bstAdd(BstVMVisitor visitor, BstParser.BstFunctionContext functionContext) {
         if (stack.size() < 2) {
             throw new VMException("Not enough operands on stack for operation +");
         }
@@ -181,7 +185,7 @@ public class BstFunctions {
      * Pops the top two (integer) literals and pushes their difference
      * (the first subtracted from the second).
      */
-    private void bstSubtract(BstEntry context) {
+    private void bstSubtract(BstVMVisitor visitor, BstParser.BstFunctionContext functionContext) {
         if (stack.size() < 2) {
             throw new VMException("Not enough operands on stack for operation -");
         }
@@ -200,7 +204,7 @@ public class BstFunctions {
      * order, that is, the order in which pushed), and pushes the
      * resulting string.
      */
-    private void bstConcat(BstEntry context) {
+    private void bstConcat(BstVMVisitor visitor, BstParser.BstFunctionContext functionContext) {
         if (stack.size() < 2) {
             throw new VMException("Not enough operands on stack for operation *");
         }
@@ -227,45 +231,54 @@ public class BstFunctions {
      * Pops the top two literals and assigns to the first (which must be
      * a global or entry variable) the value of the second.
      */
-    private void bstAssign(BstEntry context) {
-        if (stack.size() < 2) {
-            throw new VMException("Invalid call to operation :=");
-        }
-        Object o1 = stack.pop();
-        Object o2 = stack.pop();
-        doBstAssign(context, o1, o2);
-    }
+    public class BstAssignFunction implements BstFunction {
 
-    private boolean doBstAssign(BstEntry context, Object o1, Object o2) {
-        if (!(o1 instanceof BstVM.Identifier) || !((o2 instanceof String) || (o2 instanceof Integer))) {
-            throw new VMException("Invalid parameters");
+        @Override
+        public void execute(BstVMVisitor visitor, BstParser.BstFunctionContext functionContext) {
+            this.execute(visitor, functionContext, null);
         }
 
-        String name = ((VM.Identifier) o1).getName();
+        @Override
+        public void execute(BstVMVisitor visitor, BstParser.BstFunctionContext functionContext, BstEntry bstEntry) {
+            if (stack.size() < 2) {
+                throw new VMException("Invalid call to operation :=");
+            }
+            Object o1 = stack.pop();
+            Object o2 = stack.pop();
+            doAssign(bstEntry, o1, o2);
+        }
 
-        if (o2 instanceof String) {
-            if ((context != null) && context.localStrings.containsKey(name)) {
-                context.localStrings.put(name, (String) o2);
+        private boolean doAssign(BstEntry context, Object o1, Object o2) {
+            if (!(o1 instanceof BstVMVisitor.Identifier) || !((o2 instanceof String) || (o2 instanceof Integer))) {
+                throw new VMException("Invalid parameters");
+            }
+
+            String name = ((BstVMVisitor.Identifier) o1).name();
+
+            if (o2 instanceof String) {
+                if ((context != null) && context.localStrings.containsKey(name)) {
+                    context.localStrings.put(name, (String) o2);
+                    return true;
+                }
+
+                if (strings.containsKey(name)) {
+                    strings.put(name, (String) o2);
+                    return true;
+                }
+                return false;
+            }
+
+            if ((context != null) && context.localIntegers.containsKey(name)) {
+                context.localIntegers.put(name, (Integer) o2);
                 return true;
             }
 
-            if (strings.containsKey(name)) {
-                strings.put(name, (String) o2);
+            if (integers.containsKey(name)) {
+                integers.put(name, (Integer) o2);
                 return true;
             }
             return false;
         }
-
-        if ((context != null) && context.localIntegers.containsKey(name)) {
-            context.localIntegers.put(name, (Integer) o2);
-            return true;
-        }
-
-        if (integers.containsKey(name)) {
-            integers.put(name, (Integer) o2);
-            return true;
-        }
-        return false;
     }
 
     /**
@@ -273,7 +286,7 @@ public class BstFunctions {
      * '}' character isn't a `.', `?', or `!', and pushes this resulting
      * string.
      */
-    private void bstAddPeriod(BstEntry context) {
+    private void bstAddPeriod(BstVMVisitor visitor, BstParser.BstFunctionContext functionContext) {
         if (stack.isEmpty()) {
             throw new VMException("Not enough operands on stack for operation add.period$");
         }
@@ -309,11 +322,19 @@ public class BstFunctions {
      * one function for each standard entry type as well as a
      * default.type function.
      */
-    private void bstCallType(BstEntry context) {
-        if (context == null) {
-            throw new VMException("Call.type$ can only be called from within a context (ITERATE or REVERSE).");
+    public class BstCallTypeFunction implements BstFunction {
+        @Override
+        public void execute(BstVMVisitor visitor, BstParser.BstFunctionContext functionContext) {
+            throw new ParseCancellationException("Call.type$ can only be called from within a context (ITERATE or REVERSE).");
         }
-        // BstVM.this.execute(context.entry.getType().getName(), context); // FIXME
+
+        public void execute(BstVMVisitor visitor, BstParser.BstFunctionContext functionContext, BstEntry bstEntry) {
+            if (bstEntry == null) {
+                this.execute(visitor, functionContext); // Throw error
+            }
+
+            // functions.get(functionContext.getText()).execute(functionContext, bstEntry);
+        }
     }
 
     /**
@@ -335,7 +356,7 @@ public class BstFunctions {
      * the strings t and T are equivalent for the purposes of this built-in
      * function.)
      */
-    private void bstChangeCase(BstEntry value) {
+    private void bstChangeCase(BstVMVisitor visitor, BstParser.BstFunctionContext functionContext) {
         if (stack.size() < 2) {
             throw new VMException("Not enough operands on stack for operation change.case$");
         }
@@ -361,7 +382,7 @@ public class BstFunctions {
      * character, converts it to the corresponding ASCII integer, and
      * pushes this integer.
      */
-    private void bstChrToInt(BstEntry context) {
+    private void bstChrToInt(BstVMVisitor visitor, BstParser.BstFunctionContext functionContext) {
         if (stack.isEmpty()) {
             throw new VMException("Not enough operands on stack for operation chr.to.int$");
         }
@@ -378,7 +399,7 @@ public class BstFunctions {
      * Pushes the string that was the \cite-command argument for this
      * entry.
      */
-    private void bstCite(BstEntry context) {
+    private void bstCite(BstVMVisitor visitor, BstParser.BstFunctionContext functionContext) {
         if (context == null) {
             throw new VMException("Must have an entry to cite$");
         }
@@ -388,7 +409,7 @@ public class BstFunctions {
     /**
      * Pops the top literal from the stack and pushes two copies of it.
      */
-    private void bstDuplicate(BstEntry context) {
+    private void bstDuplicate(BstVMVisitor visitor, BstParser.BstFunctionContext functionContext) {
         if (stack.isEmpty()) {
             throw new VMException("Not enough operands on stack for operation duplicate$");
         }
@@ -403,14 +424,14 @@ public class BstFunctions {
      * field or a string having no non-white-space characters, 0
      * otherwise.
      */
-    private void bstEmpty(BstEntry context) {
+    private void bstEmpty(BstVMVisitor visitor, BstParser.BstFunctionContext functionContext) {
         if (stack.isEmpty()) {
             throw new VMException("Not enough operands on stack for operation empty$");
         }
         Object o1 = stack.pop();
 
         if (o1 == null) {
-            stack.push(VM.TRUE);
+            stack.push(BstVM.TRUE);
             return;
         }
 
@@ -432,7 +453,7 @@ public class BstFunctions {
      * pushes the formatted name. If any of the types is incorrect, it
      * complains and pushes the null string.
      */
-    private void bstFormatName(BstEntry context) {
+    private void bstFormatName(BstVMVisitor visitor, BstParser.BstFunctionContext functionContext) {
         if (stack.size() < 3) {
             throw new VMException("Not enough operands on stack for operation format.name$");
         }
@@ -469,23 +490,24 @@ public class BstFunctions {
      * than 0, it executes the second literal, else it executes the
      * first.
      */
-    private void bstIf(BstEntry context) {
+    private void bstIf(BstVMVisitor visitor, BstParser.BstFunctionContext functionContext) {
         if (stack.size() < 3) {
             throw new VMException("Not enough operands on stack for operation =");
         }
+
         Object f1 = stack.pop();
         Object f2 = stack.pop();
         Object i = stack.pop();
 
-        if (!((f1 instanceof BstVM.Identifier) || (f1 instanceof Tree))
-                && ((f2 instanceof BstVM.Identifier) || (f2 instanceof Tree)) && (i instanceof Integer)) {
+        if (!((f1 instanceof BstVMVisitor.Identifier) || (f1 instanceof Tree))
+                && ((f2 instanceof BstVMVisitor.Identifier) || (f2 instanceof Tree)) && (i instanceof Integer)) {
             throw new VMException("Expecting two functions and an integer for if$.");
         }
 
-        if ((Integer) i > 0) {
-            // BstVM.this.executeInContext(f2, context); // FIXME
+        if (((Integer) i) > 0) {
+            visitor.visit((ParseTree) f2);
         } else {
-            // BstVM.this.executeInContext(f1, context); // FIXME
+            visitor.visit((ParseTree) f1);
         }
     }
 
@@ -494,7 +516,7 @@ public class BstFunctions {
      * value of a single character, converts it to the corresponding
      * single-character string, and pushes this string.
      */
-    private void bstIntToChr(BstEntry context) {
+    private void bstIntToChr(BstVMVisitor visitor, BstParser.BstFunctionContext functionContext) {
         if (stack.isEmpty()) {
             throw new VMException("Not enough operands on stack for operation int.to.chr$");
         }
@@ -511,7 +533,7 @@ public class BstFunctions {
      * Pops the top (integer) literal, converts it to its (unique)
      * string equivalent, and pushes this string.
      */
-    private void bstIntToStr(BstEntry context) {
+    private void bstIntToStr(BstVMVisitor visitor, BstParser.BstFunctionContext functionContext) {
         if (stack.isEmpty()) {
             throw new VMException("Not enough operands on stack for operation int.to.str$");
         }
@@ -528,24 +550,24 @@ public class BstFunctions {
      * Pops the top literal and pushes the integer 1 if it's a missing
      * field, 0 otherwise.
      */
-    private void bstMissing(BstEntry context) {
+    private void bstMissing(BstVMVisitor visitor, BstParser.BstFunctionContext functionContext) {
         if (stack.isEmpty()) {
             throw new VMException("Not enough operands on stack for operation missing$");
         }
         Object o1 = stack.pop();
 
         if (o1 == null) {
-            stack.push(VM.TRUE);
+            stack.push(BstVM.TRUE);
             return;
         }
 
         if (!(o1 instanceof String)) {
             LOGGER.warn("Not a string or missing field in operation missing$");
-            stack.push(VM.TRUE);
+            stack.push(BstVM.TRUE);
             return;
         }
 
-        stack.push(VM.FALSE);
+        stack.push(BstVM.FALSE);
     }
 
     /**
@@ -555,7 +577,7 @@ public class BstFunctions {
      * function only when you want a blank line or an explicit line
      * break.
      */
-    private void bstNewLine(BstEntry context) {
+    private void bstNewLine(BstVMVisitor visitor, BstParser.BstFunctionContext functionContext) {
         this.bbl.append('\n');
     }
 
@@ -565,7 +587,7 @@ public class BstFunctions {
      * substring "and" (ignoring case differences) surrounded by
      * non-null white-space at the top brace level.
      */
-    private void bstNumNames(BstEntry context) {
+    private void bstNumNames(BstVMVisitor visitor, BstParser.BstFunctionContext functionContext) {
         if (stack.isEmpty()) {
             throw new VMException("Not enough operands on stack for operation num.names$");
         }
@@ -582,7 +604,7 @@ public class BstFunctions {
      * Pops the top of the stack but doesn't print it; this gets rid of
      * an unwanted stack literal.
      */
-    private void bstPop(BstEntry context) {
+    private void bstPop(BstVMVisitor visitor, BstParser.BstFunctionContext functionContext) {
         stack.pop();
     }
 
@@ -592,7 +614,7 @@ public class BstFunctions {
      * database files. (or the empty string if there were none)
      * '@PREAMBLE' strings are read from the database files.
      */
-    private void bstPreamble(BstEntry context) {
+    private void bstPreamble(BstVMVisitor visitor, BstParser.BstFunctionContext functionContext) {
         stack.push(preamble);
     }
 
@@ -603,7 +625,7 @@ public class BstFunctions {
      * contained in the control sequences associated with a \special
      * character", and pushes the resulting string.
      */
-    private void bstPurify(BstEntry context) {
+    private void bstPurify(BstVMVisitor visitor, BstParser.BstFunctionContext functionContext) {
         if (stack.isEmpty()) {
             throw new VMException("Not enough operands on stack for operation purify$");
         }
@@ -621,14 +643,14 @@ public class BstFunctions {
     /**
      * Pushes the string consisting of the double-quote character.
      */
-    private void bstQuote(BstEntry context) {
+    private void bstQuote(BstVMVisitor visitor, BstParser.BstFunctionContext functionContext) {
         stack.push("\"");
     }
 
     /**
      * Does nothing.
      */
-    private void bstSkip(BstEntry context) {
+    private void bstSkip(BstVMVisitor visitor, BstParser.BstFunctionContext functionContext) {
         // no-op
     }
 
@@ -636,7 +658,7 @@ public class BstFunctions {
      * Pops and prints the whole stack; it's meant to be used for style
      * designers while debugging.
      */
-    private void bstStack(BstEntry context) {
+    private void bstStack(BstVMVisitor visitor, BstParser.BstFunctionContext functionContext) {
         while (!stack.empty()) {
             LOGGER.debug("Stack entry {}", stack.pop());
         }
@@ -651,7 +673,7 @@ public class BstFunctions {
      * (including) from the end if start is negative (where the first
      * character from the end is the last character).
      */
-    private void bstSubstring(BstEntry context) {
+    private void bstSubstring(BstVMVisitor visitor, BstParser.BstFunctionContext functionContext) {
         if (stack.size() < 3) {
             throw new VMException("Not enough operands on stack for operation substring$");
         }
@@ -693,7 +715,7 @@ public class BstFunctions {
      * text character, even if it's missing its matching right brace,
      * and where braces don't count as text characters.
      */
-    private void bstSwap(BstEntry context) {
+    private void bstSwap(BstVMVisitor visitor, BstParser.BstFunctionContext functionContext) {
         if (stack.size() < 2) {
             throw new VMException("Not enough operands on stack for operation swap$");
         }
@@ -715,7 +737,7 @@ public class BstFunctions {
      * BibTEX considers everything contained inside the braces as a
      * single letter.
      */
-    private void bstTextLength(BstEntry context) {
+    private void bstTextLength(BstVMVisitor visitor, BstParser.BstFunctionContext functionContext) {
         if (stack.isEmpty()) {
             throw new VMException("Not enough operands on stack for operation text.length$");
         }
@@ -771,7 +793,7 @@ public class BstFunctions {
      * consider braces to be text characters; furthermore, this function
      * appends any needed matching right braces.
      */
-    private void bstTextPrefix(BstEntry context) {
+    private void bstTextPrefix(BstVMVisitor visitor, BstParser.BstFunctionContext functionContext) {
         if (stack.size() < 2) {
             throw new VMException("Not enough operands on stack for operation text.prefix$");
         }
@@ -796,7 +818,7 @@ public class BstFunctions {
     /**
      * Pops and prints the top of the stack to the log file. It's useful for debugging.
      */
-    private void bstTop(BstEntry context) {
+    private void bstTop(BstVMVisitor visitor, BstParser.BstFunctionContext functionContext) {
         LOGGER.debug("Stack entry {}", stack.pop());
     }
 
@@ -804,7 +826,7 @@ public class BstFunctions {
      * Pushes the current entry's type (book, article, etc.), but pushes
      * the null string if the type is either unknown or undefined.
      */
-    private void bstType(BstEntry context) {
+    private void bstType(BstVMVisitor visitor, BstParser.BstFunctionContext functionContext) {
         if (context == null) {
             throw new VMException("type$ need a context.");
         }
@@ -817,7 +839,7 @@ public class BstFunctions {
      * message. This also increments a count of the number of warning
      * messages issued.
      */
-    private void bstWarning(BstEntry context) {
+    private void bstWarning(BstVMVisitor visitor, BstParser.BstFunctionContext functionContext) {
         LOGGER.warn("Warning (#{}): {}", bstWarning++, stack.pop());
     }
 
@@ -826,20 +848,20 @@ public class BstFunctions {
      * second as long as the (integer) literal left on the stack by
      * executing the first is greater than 0.
      */
-    private void bstWhile(BstEntry context) {
+    private void bstWhile(BstVMVisitor visitor, BstParser.BstFunctionContext functionContext) {
         if (stack.size() < 2) {
             throw new VMException("Not enough operands on stack for operation while$");
         }
         Object f2 = stack.pop();
         Object f1 = stack.pop();
 
-        if (!((f1 instanceof BstVM.Identifier) || (f1 instanceof Tree))
-                && ((f2 instanceof BstVM.Identifier) || (f2 instanceof Tree))) {
+        if (!((f1 instanceof BstVMVisitor.Identifier) || (f1 instanceof ParseTree))
+                && ((f2 instanceof BstVMVisitor.Identifier) || (f2 instanceof ParseTree))) {
             throw new VMException("Expecting two functions for while$.");
         }
 
         do {
-            // executeInContext(f1, context); // FIXME
+            visitor.visit((ParseTree) f1);
 
             Object i = stack.pop();
             if (!(i instanceof Integer)) {
@@ -848,7 +870,7 @@ public class BstFunctions {
             if ((Integer) i <= 0) {
                 break;
             }
-            // executeInContext(f2, context); // FIXME
+            visitor.visit((ParseTree) f2);
         } while (true);
     }
 
@@ -861,7 +883,7 @@ public class BstFunctions {
      * characters (even without their |right_brace|s) are handled specially. If the
      * literal isn't a string, it complains and pushes~0.
      */
-    private void bstWidth(BstEntry context) {
+    private void bstWidth(BstVMVisitor visitor, BstParser.BstFunctionContext functionContext) {
         if (stack.isEmpty()) {
             throw new VMException("Not enough operands on stack for operation width$");
         }
@@ -881,7 +903,7 @@ public class BstFunctions {
      * (which will result in stuff being written onto the bbl file when
      * the buffer fills up).
      */
-    private void bstWrite(BstEntry context) {
+    private void bstWrite(BstVMVisitor visitor, BstParser.BstFunctionContext functionContext) {
         String s = (String) stack.pop();
         bbl.append(s);
     }
