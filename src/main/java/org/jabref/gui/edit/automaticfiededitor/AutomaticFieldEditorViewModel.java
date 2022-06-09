@@ -2,8 +2,6 @@ package org.jabref.gui.edit.automaticfiededitor;
 
 import java.util.List;
 
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
@@ -16,7 +14,7 @@ import org.jabref.model.entry.BibEntry;
 
 public class AutomaticFieldEditorViewModel extends AbstractViewModel {
     private final ObservableList<AutomaticFieldEditorTab> fieldEditorTabs = FXCollections.observableArrayList();
-    private final StringProperty textValueProperty = new SimpleStringProperty();
+
     public AutomaticFieldEditorViewModel(List<BibEntry> selectedEntries, BibDatabaseContext databaseContext) {
         fieldEditorTabs.addAll(
                 new EditFieldValueTabView(selectedEntries, databaseContext),

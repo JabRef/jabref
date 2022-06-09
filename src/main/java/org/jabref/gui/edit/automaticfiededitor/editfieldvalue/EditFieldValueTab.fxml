@@ -31,19 +31,23 @@
             <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
         </rowConstraints>
          <children>
-            <CheckBox mnemonicParsing="false" prefHeight="19.0" prefWidth="300.0" text="Ovewrite Non empty fields" GridPane.columnSpan="2147483647" GridPane.rowIndex="3" />
+            <CheckBox fx:id="overwriteNonEmptyFieldsCheckBox" mnemonicParsing="false" text="Ovewrite Non empty fields" GridPane.columnSpan="2147483647" GridPane.rowIndex="3">
+               <GridPane.margin>
+                  <Insets left="2.0" />
+               </GridPane.margin>
+            </CheckBox>
             <HBox prefHeight="100.0" prefWidth="200.0" spacing="8.0" GridPane.columnSpan="2147483647" GridPane.rowIndex="4">
                <children>
-                  <Button mnemonicParsing="false" text="Set" />
-                  <Button mnemonicParsing="false" text="Append" />
+                  <Button fx:id="setValueButton" mnemonicParsing="false" onAction="#setFieldValue" text="Set" />
+                  <Button fx:id="appendValueButton" mnemonicParsing="false" onAction="#appendToFieldValue" text="Append" />
                   <Separator maxHeight="1.7976931348623157E308" minWidth="10.0" orientation="VERTICAL" prefWidth="11.0" />
-                  <Button mnemonicParsing="false" text="Clear field" />
+                  <Button fx:id="clearFieldButton" mnemonicParsing="false" onAction="#clearField" text="Clear field" />
                </children>
             </HBox>
-            <HBox prefHeight="100.0" prefWidth="200.0" spacing="8.0" GridPane.columnSpan="3" GridPane.hgrow="ALWAYS" GridPane.rowIndex="2" GridPane.vgrow="NEVER">
+            <HBox spacing="8.0" GridPane.columnSpan="3" GridPane.hgrow="ALWAYS" GridPane.rowIndex="2" GridPane.vgrow="NEVER">
                <children>
-                  <ComboBox maxHeight="1.7976931348623157E308" prefHeight="34.0" prefWidth="184.0" promptText="Author" />
-                  <TextField prefHeight="76.0" prefWidth="184.0" promptText="field value" />
+                  <ComboBox fx:id="fieldComboBox" maxHeight="1.7976931348623157E308" minHeight="36.0" prefHeight="36.0" prefWidth="184.0" promptText="Author" HBox.hgrow="ALWAYS" />
+                  <TextField fx:id="fieldValueTextField" minHeight="32.0" minWidth="-Infinity" prefHeight="36.0" prefWidth="184.0" promptText="field value" HBox.hgrow="ALWAYS" />
                </children>
             </HBox>
             <HBox alignment="BOTTOM_LEFT" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" GridPane.hgrow="ALWAYS" GridPane.rowSpan="2" GridPane.vgrow="ALWAYS">
