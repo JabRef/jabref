@@ -4,9 +4,8 @@
 <fx:root
         xmlns="http://javafx.com/javafx"
         xmlns:fx="http://javafx.com/fxml"
-        fx:controller="org.jabref.gui.edit.automaticfiededitor.twofields.TwoFieldsTabView"
+        fx:controller="org.jabref.gui.edit.automaticfiededitor.renamefield.RenameFieldTabView"
         prefHeight="400.0"
-        prefWidth="600.0"
-        type="Pane">
+        prefWidth="600.0" type="Pane">
 
 </fx:root>

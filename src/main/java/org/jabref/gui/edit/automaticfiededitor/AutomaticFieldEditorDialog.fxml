@@ -1,93 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.CheckBox?>
-<?import javafx.scene.control.ComboBox?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.TextField?>
-<?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.ColumnConstraints?>
-<?import javafx.scene.layout.GridPane?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.RowConstraints?>
-<?import javafx.scene.layout.VBox?>
-<?import javafx.scene.text.Font?>
-
-<AnchorPane maxWidth="800.0" prefHeight="511.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jabref.gui.edit.automaticfiededitor.AutomaticFieldEditorDialog">
-   <children>
-      <VBox layoutX="16.0" layoutY="24.0" prefHeight="131.0" prefWidth="767.0" spacing="24.0" AnchorPane.leftAnchor="16.0" AnchorPane.rightAnchor="16.0" AnchorPane.topAnchor="24.0">
-         <children>
-            <Label text="Edit field value of selected references">
-               <font>
-                  <Font size="16.0" />
-               </font>
-            </Label>
-            <VBox fillWidth="false" spacing="8.0">
-               <children>
-                  <HBox spacing="16.0" VBox.vgrow="NEVER">
-                     <children>
-                        <ComboBox fx:id="fieldComboBox" prefHeight="34.0" prefWidth="150.0" promptText="Author" />
-                        <Button mnemonicParsing="false" prefHeight="34.0" text="Clear field" />
-                     </children>
-                  </HBox>
-                  <VBox spacing="8.0">
-                     <children>
-                        <TextField prefHeight="31.0" prefWidth="190.0" promptText="value">
-                           <font>
-                              <Font size="14.0" />
-                           </font>
-                        </TextField>
-                        <CheckBox mnemonicParsing="false" text="Overwrite Non empty fields" />
-                     </children>
-                  </VBox>
-               </children>
-            </VBox>
-         </children>
-      </VBox>
-      <VBox layoutX="17.0" layoutY="186.0" spacing="12.0" AnchorPane.leftAnchor="16.0" AnchorPane.rightAnchor="16.0">
-         <children>
-            <HBox spacing="8.0">
-               <children>
-                  <Button mnemonicParsing="false" text="Set value" />
-                  <Button mnemonicParsing="false" text="Append value" />
-               </children>
-            </HBox>
-         </children>
-      </VBox>
-      <VBox layoutX="16.0" layoutY="246.0" prefHeight="131.0" prefWidth="767.0" spacing="24.0" AnchorPane.leftAnchor="16.0" AnchorPane.rightAnchor="16.0">
-         <children>
-            <Label text="Copy or move the value of one field to another">
-               <font>
-                  <Font size="16.0" />
-               </font>
-            </Label>
-            <GridPane minHeight="160.0" prefHeight="160.0" vgap="8.0" VBox.vgrow="NEVER">
-              <columnConstraints>
-                <ColumnConstraints hgrow="SOMETIMES" maxWidth="379.20001220703125" minWidth="10.0" prefWidth="59.20001220703125" />
-                <ColumnConstraints hgrow="SOMETIMES" maxWidth="726.3999938964844" minWidth="10.0" prefWidth="708.7999877929688" />
-              </columnConstraints>
-              <rowConstraints>
-                <RowConstraints maxHeight="33.000008010864256" minHeight="10.0" prefHeight="26.60001220703125" vgrow="SOMETIMES" />
-                <RowConstraints maxHeight="28.19998779296875" minHeight="10.0" prefHeight="28.19998779296875" vgrow="SOMETIMES" />
-                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-              </rowConstraints>
-               <children>
-                  <Label text="From" />
-                  <Label text="To" GridPane.rowIndex="1" />
-                  <ComboBox prefWidth="150.0" promptText="Author" GridPane.columnIndex="1" GridPane.hgrow="NEVER" GridPane.vgrow="NEVER" />
-                  <ComboBox prefWidth="150.0" promptText="Title" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                  <CheckBox mnemonicParsing="false" prefHeight="19.0" prefWidth="210.0" text="Overwrite Non empty fields" GridPane.columnSpan="2147483647" GridPane.rowIndex="2" />
-                  <HBox prefHeight="100.0" prefWidth="200.0" spacing="8.0" GridPane.columnSpan="2147483647" GridPane.rowIndex="3">
-                     <children>
-                        <Button mnemonicParsing="false" text="Move value" />
-                        <Button mnemonicParsing="false" text="Copy value" />
-                        <Button mnemonicParsing="false" text="Swap values" />
-                     </children>
-                  </HBox>
-               </children>
-            </GridPane>
-         </children>
-      </VBox>
-   </children>
-</AnchorPane>
+<?import javafx.scene.control.ButtonType?>
+<?import javafx.scene.control.DialogPane?>
+<?import javafx.scene.control.TabPane?>
+<DialogPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+            fx:controller="org.jabref.gui.edit.automaticfiededitor.AutomaticFieldEditorDialog"
+            prefHeight="400.0" prefWidth="600.0">
+    <content>
+        <TabPane fx:id="tabPane" tabClosingPolicy="UNAVAILABLE"/>
+    </content>
+    <ButtonType fx:constant="CANCEL"/>
+</DialogPane>

@@ -1,11 +1,11 @@
 package org.jabref.gui.edit.automaticfiededitor;
 
-import javafx.scene.layout.Region;
+import javafx.scene.layout.Pane;
 
-public abstract class AbstractAutomaticFieldEditorTabView extends Region implements AutomaticFieldEditorTab {
+public abstract class AbstractAutomaticFieldEditorTabView extends Pane implements AutomaticFieldEditorTab {
 
     @Override
-    public Region getContent() {
+    public Pane getContent() {
         return this;
     }
 }
