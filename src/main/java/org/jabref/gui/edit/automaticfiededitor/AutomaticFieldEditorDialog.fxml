@@ -13,7 +13,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane maxWidth="800.0" prefHeight="511.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jabref.gui.edit.AutomaticFieldEditorDialog">
+<AnchorPane maxWidth="800.0" prefHeight="511.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jabref.gui.edit.automaticfiededitor.AutomaticFieldEditorDialog">
    <children>
       <VBox layoutX="16.0" layoutY="24.0" prefHeight="131.0" prefWidth="767.0" spacing="24.0" AnchorPane.leftAnchor="16.0" AnchorPane.rightAnchor="16.0" AnchorPane.topAnchor="24.0">
          <children>
@@ -82,6 +82,7 @@
                      <children>
                         <Button mnemonicParsing="false" text="Move value" />
                         <Button mnemonicParsing="false" text="Copy value" />
+                        <Button mnemonicParsing="false" text="Swap values" />
                      </children>
                   </HBox>
                </children>
