@@ -2,6 +2,7 @@ package org.jabref.logic.bst;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.Stack;
 
@@ -20,10 +21,9 @@ import org.antlr.v4.runtime.tree.TerminalNode;
 
 class BstVMVisitor extends BstBaseVisitor<Integer> {
     private final BstVMContext bstVMContext;
-
-    private final Stack<Object> stack = new Stack<>();
     private final StringBuilder bbl;
 
+    private final Stack<Object> stack = new Stack<>();
     private BstEntry selectedBstEntry = null;
 
     public record Identifier(String name) {
@@ -103,6 +103,35 @@ class BstVMVisitor extends BstBaseVisitor<Integer> {
             if (!e.fields.containsKey(StandardField.CROSSREF.getName())) {
                 e.fields.put(StandardField.CROSSREF.getName(), null);
             }
+        }
+
+        return BstVM.TRUE;
+    }
+
+    @Override
+    public Integer visitExecuteCommand(BstParser.ExecuteCommandContext ctx) {
+        this.selectedBstEntry = null;
+        visit(ctx.bstFunction());
+
+        return BstVM.TRUE;
+    }
+
+    @Override
+    public Integer visitIterateCommand(BstParser.IterateCommandContext ctx) {
+        for (BstEntry entry : bstVMContext.entries()) {
+            this.selectedBstEntry = entry;
+            visit(ctx.bstFunction());
+        }
+
+        return BstVM.TRUE;
+    }
+
+    @Override
+    public Integer visitReverseCommand(BstParser.ReverseCommandContext ctx) {
+        ListIterator<BstEntry> i = bstVMContext.entries().listIterator(bstVMContext.entries().size());
+        while (i.hasPrevious()) {
+            this.selectedBstEntry = i.previous();
+            visit(ctx.bstFunction());
         }
 
         return BstVM.TRUE;
@@ -220,7 +249,7 @@ class BstVMVisitor extends BstBaseVisitor<Integer> {
         @Override
         public void execute(BstVMVisitor visitor, ParserRuleContext parserRuleContext) {
             if (parserRuleContext instanceof BstParser.IdentifierContext) {
-                stack.push(expression);
+                stack.push(expression); // Macro
             } else {
                 visitor.visit(parserRuleContext);
             }

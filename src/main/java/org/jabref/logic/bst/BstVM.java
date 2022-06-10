@@ -27,7 +27,7 @@ import org.antlr.v4.runtime.tree.ParseTree;
  *  [x] migrate runner/visitor
  *  [x] migrate functions
  *  [x] context / entry needs to be set as a field for the visitor to iterate forwards or backwards through all the entries
- *  [ ] migrate execute / forward / backward / stack / quote / etc.
+ *  [x] migrate execute / forward / backward / stack / quote / etc.
  *  [ ] remove old VM
  *  [ ] fix tests
  *  [ ] create new tests
