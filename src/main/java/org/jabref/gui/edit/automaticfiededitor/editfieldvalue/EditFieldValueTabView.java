@@ -38,12 +38,12 @@ public class EditFieldValueTabView extends AbstractAutomaticFieldEditorTabView {
 
     private EditFieldValueViewModel viewModel;
 
-    private NamedCompound edits;
+    private final NamedCompound dialogEdits;
 
-    public EditFieldValueTabView(List<BibEntry> selectedEntries, BibDatabaseContext databaseContext, NamedCompound edits) {
+    public EditFieldValueTabView(List<BibEntry> selectedEntries, BibDatabaseContext databaseContext, NamedCompound dialogEdits) {
         this.selectedEntries = selectedEntries;
         this.databaseContext = databaseContext;
-        this.edits = edits;
+        this.dialogEdits = dialogEdits;
 
         ViewLoader.view(this)
                   .root(this)
@@ -52,7 +52,7 @@ public class EditFieldValueTabView extends AbstractAutomaticFieldEditorTabView {
 
     @FXML
     public void initialize() {
-        viewModel = new EditFieldValueViewModel(databaseContext, selectedEntries, edits);
+        viewModel = new EditFieldValueViewModel(databaseContext, selectedEntries, dialogEdits);
         fieldComboBox.setConverter(new StringConverter<>() {
             @Override
             public String toString(Field field) {
@@ -67,7 +67,10 @@ public class EditFieldValueTabView extends AbstractAutomaticFieldEditorTabView {
         fieldComboBox.getItems().addAll(viewModel.getAllFields());
         fieldComboBox.getSelectionModel().selectFirst();
         viewModel.selectedFieldProperty().bindBidirectional(fieldComboBox.valueProperty());
+
         viewModel.fieldValueProperty().bindBidirectional(fieldValueTextField.textProperty());
+
+        viewModel.overwriteNonEmptyFieldsProperty().bindBidirectional(overwriteNonEmptyFieldsCheckBox.selectedProperty());
     }
 
     @Override

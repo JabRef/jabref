@@ -3,7 +3,9 @@ package org.jabref.gui.edit.automaticfiededitor.editfieldvalue;
 import java.util.List;
 import java.util.Optional;
 
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
@@ -16,7 +18,6 @@ import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
-import org.jabref.model.entry.field.FieldFactory;
 
 public class EditFieldValueViewModel extends AbstractViewModel {
     private final BibDatabaseContext databaseContext;
@@ -26,14 +27,16 @@ public class EditFieldValueViewModel extends AbstractViewModel {
 
     private final ObjectProperty<Field> selectedField = new SimpleObjectProperty<>();
 
+    private final BooleanProperty overwriteNonEmptyFields = new SimpleBooleanProperty();
+
     private final ObservableList<Field> allFields = FXCollections.observableArrayList();
 
-    private final NamedCompound edits;
+    private final NamedCompound dialogEdits;
 
-    public EditFieldValueViewModel(BibDatabaseContext databaseContext, List<BibEntry> selectedEntries, NamedCompound edits) {
+    public EditFieldValueViewModel(BibDatabaseContext databaseContext, List<BibEntry> selectedEntries, NamedCompound dialogEdits) {
         this.databaseContext = databaseContext;
         this.selectedEntries = selectedEntries;
-        this.edits = edits;
+        this.dialogEdits = dialogEdits;
 
         allFields.addAll(databaseContext.getDatabase().getAllVisibleFields().stream().toList());
     }
@@ -55,11 +58,30 @@ public class EditFieldValueViewModel extends AbstractViewModel {
 
         if (clearFieldEdit.hasEdits()) {
             clearFieldEdit.end();
-            edits.addEdit(clearFieldEdit);
+            dialogEdits.addEdit(clearFieldEdit);
         }
     }
 
     public void setFieldValue() {
+        NamedCompound setFieldEdit = new NamedCompound("CHANGE_SELECTED_FIELD");
+
+        for (BibEntry entry : selectedEntries) {
+            Optional<String> oldFieldValue = entry.getField(selectedField.get());
+            if (oldFieldValue.isEmpty() || overwriteNonEmptyFields.get()) {
+                entry.setField(selectedField.get(), fieldValue.get());
+
+                setFieldEdit.addEdit(new UndoableFieldChange(entry,
+                        selectedField.get(),
+                        null,
+                        fieldValue.get()));
+                fieldValue.set("");
+            }
+        }
+
+        if (setFieldEdit.hasEdits()) {
+            setFieldEdit.end();
+            dialogEdits.addEdit(setFieldEdit);
+        }
     }
 
     public void appendToFieldValue() {
@@ -81,7 +103,7 @@ public class EditFieldValueViewModel extends AbstractViewModel {
         return fieldValue;
     }
 
-    Field parseField(String name) {
-        return FieldFactory.parseField(name);
+    public BooleanProperty overwriteNonEmptyFieldsProperty() {
+        return overwriteNonEmptyFields;
     }
 }
