@@ -65,6 +65,7 @@ public class EditFieldValueTabView extends AbstractAutomaticFieldEditorTabView {
             }
         });
         fieldComboBox.getItems().addAll(viewModel.getAllFields());
+        fieldComboBox.getSelectionModel().selectFirst();
         viewModel.selectedFieldProperty().bindBidirectional(fieldComboBox.valueProperty());
         viewModel.fieldValueProperty().bindBidirectional(fieldValueTextField.textProperty());
     }
