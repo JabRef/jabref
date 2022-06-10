@@ -15,7 +15,6 @@ import org.jabref.logic.bst.util.BibtexWidth;
 import org.jabref.model.entry.Author;
 import org.jabref.model.entry.AuthorList;
 
-import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.Tree;
 import org.slf4j.Logger;
@@ -40,7 +39,7 @@ public class BstFunctions {
 
         void execute(BstVMVisitor visitor, BstParser.BstFunctionContext functionContext);
 
-        default void execute(BstVMVisitor visitor, BstParser.BstFunctionContext functionContext, BstEntry bstEntry) {
+        default void execute(BstVMVisitor visitor, BstParser.BstFunctionContext functionContext, BstEntry bstEntryContext) {
             this.execute(visitor, functionContext);
         }
     }
@@ -51,7 +50,6 @@ public class BstFunctions {
         this.strings = bstVMContext.strings();
         this.integers = bstVMContext.integers();
         this.functions = bstVMContext.functions();
-        this.bstWarning = bstVMContext.warnings();
         this.preamble = bstVMContext.bibDatabase().getPreamble().orElse("");
 
         this.stack = stack;
@@ -72,7 +70,7 @@ public class BstFunctions {
         builtInFunctions.put("call.type$", new BstCallTypeFunction());
         builtInFunctions.put("change.case$", this::bstChangeCase);
         builtInFunctions.put("chr.to.int$", this::bstChrToInt);
-        builtInFunctions.put("cite$", this::bstCite);
+        builtInFunctions.put("cite$", new BstCiteFunction());
         builtInFunctions.put("duplicate$", this::bstDuplicate);
         builtInFunctions.put("empty$", this::bstEmpty);
         builtInFunctions.put("format.name$", this::bstFormatName);
@@ -93,7 +91,7 @@ public class BstFunctions {
         builtInFunctions.put("text.length$", this::bstTextLength);
         builtInFunctions.put("text.prefix$", this::bstTextPrefix);
         builtInFunctions.put("top$", this::bstTop);
-        builtInFunctions.put("type$", this::bstType);
+        builtInFunctions.put("type$", new BstTypeFunction());
         builtInFunctions.put("warning$", this::bstWarning);
         builtInFunctions.put("while$", this::bstWhile);
         builtInFunctions.put("width$", this::bstWidth);
@@ -255,6 +253,7 @@ public class BstFunctions {
 
             String name = ((BstVMVisitor.Identifier) o1).name();
 
+            // ToDo: use switch statement pattern matching instead (Java 19)
             if (o2 instanceof String) {
                 if ((context != null) && context.localStrings.containsKey(name)) {
                     context.localStrings.put(name, (String) o2);
@@ -266,17 +265,18 @@ public class BstFunctions {
                     return true;
                 }
                 return false;
+            } else {
+                if ((context != null) && context.localIntegers.containsKey(name)) {
+                    context.localIntegers.put(name, (Integer) o2);
+                    return true;
+                }
+
+                if (integers.containsKey(name)) {
+                    integers.put(name, (Integer) o2);
+                    return true;
+                }
             }
 
-            if ((context != null) && context.localIntegers.containsKey(name)) {
-                context.localIntegers.put(name, (Integer) o2);
-                return true;
-            }
-
-            if (integers.containsKey(name)) {
-                integers.put(name, (Integer) o2);
-                return true;
-            }
             return false;
         }
     }
@@ -325,15 +325,16 @@ public class BstFunctions {
     public class BstCallTypeFunction implements BstFunction {
         @Override
         public void execute(BstVMVisitor visitor, BstParser.BstFunctionContext functionContext) {
-            throw new ParseCancellationException("Call.type$ can only be called from within a context (ITERATE or REVERSE).");
+            throw new VMException("Call.type$ can only be called from within a context (ITERATE or REVERSE).");
         }
 
+        @Override
         public void execute(BstVMVisitor visitor, BstParser.BstFunctionContext functionContext, BstEntry bstEntry) {
             if (bstEntry == null) {
                 this.execute(visitor, functionContext); // Throw error
             }
 
-            // functions.get(functionContext.getText()).execute(functionContext, bstEntry);
+            functions.get(functionContext.getText()).execute(visitor, functionContext, bstEntry);
         }
     }
 
@@ -399,11 +400,21 @@ public class BstFunctions {
      * Pushes the string that was the \cite-command argument for this
      * entry.
      */
-    private void bstCite(BstVMVisitor visitor, BstParser.BstFunctionContext functionContext) {
-        if (context == null) {
+    public class BstCiteFunction implements BstFunction {
+        @Override
+        public void execute(BstVMVisitor visitor, BstParser.BstFunctionContext functionContext) {
             throw new VMException("Must have an entry to cite$");
         }
-        stack.push(context.entry.getCitationKey().orElse(null));
+
+        @Override
+        public void execute(BstVMVisitor visitor, BstParser.BstFunctionContext functionContext, BstEntry bstEntryContext) {
+            if (bstEntryContext == null) {
+                execute(visitor, functionContext);
+                return;
+            }
+
+            stack.push(bstEntryContext.entry.getCitationKey().orElse(null));
+        }
     }
 
     /**
@@ -826,12 +837,21 @@ public class BstFunctions {
      * Pushes the current entry's type (book, article, etc.), but pushes
      * the null string if the type is either unknown or undefined.
      */
-    private void bstType(BstVMVisitor visitor, BstParser.BstFunctionContext functionContext) {
-        if (context == null) {
+    public class BstTypeFunction implements BstFunction {
+        @Override
+        public void execute(BstVMVisitor visitor, BstParser.BstFunctionContext functionContext) {
             throw new VMException("type$ need a context.");
         }
 
-        stack.push(context.entry.getType().getName());
+        @Override
+        public void execute(BstVMVisitor visitor, BstParser.BstFunctionContext functionContext, BstEntry bstEntryContext) {
+            if (bstEntryContext == null) {
+                this.execute(visitor, functionContext);
+                return;
+            }
+
+            stack.push(bstEntryContext.entry.getType().getName());
+        }
     }
 
     /**

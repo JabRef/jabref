@@ -19,9 +19,11 @@ import org.antlr.v4.runtime.tree.ParseTree;
 
 class BstVMVisitor extends BstBaseVisitor<Integer> {
     private final BstVMContext bstVMContext;
-    private final Stack<Object> stack = new Stack<>();
 
+    private final Stack<Object> stack = new Stack<>();
     private final StringBuilder bbl;
+
+    private BstEntry currentBstEntry;
 
     public record Identifier(String name) {
     }
@@ -140,7 +142,7 @@ class BstVMVisitor extends BstBaseVisitor<Integer> {
 
     @Override
     public Integer visitBstFunction(BstParser.BstFunctionContext ctx) {
-        bstVMContext.functions().get(ctx.getChild(0).getText()).execute(this, ctx);
+        bstVMContext.functions().get(ctx.getChild(0).getText()).execute(this, ctx, currentBstEntry);
         return BstVM.TRUE;
     }
 

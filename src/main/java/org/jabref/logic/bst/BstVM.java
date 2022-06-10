@@ -26,16 +26,12 @@ import org.antlr.v4.runtime.tree.ParseTree;
  *  [x] migrate grammar
  *  [x] migrate runner/visitor
  *  [x] migrate functions
- *  [ ] context / entry needs to be set as a private final for the visitor can iteratate forward or backward on
- *      corresponding command.
+ *  [x] context / entry needs to be set as a field for the visitor to iterate forwards or backwards through all the entries
  *  [ ] migrate execute / forward / backward / stack / quote / etc.
  *  [ ] remove old VM
  *  [ ] fix tests
  *  [ ] create new tests
- *  [ ] debug
- *  [ ] more debug
  *  [ ] clean up bstFunctions
- *  [ ] still more debug
  */
 
 public class BstVM {
