@@ -6,6 +6,7 @@ import javax.inject.Inject;
 import javax.swing.undo.UndoManager;
 
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
@@ -22,6 +23,7 @@ import org.jabref.model.entry.field.FieldFactory;
 import com.airhacks.afterburner.views.ViewLoader;
 
 public class EditFieldValueTabView extends AbstractAutomaticFieldEditorTabView {
+    public Button appendValueButton;
     @FXML
     private ComboBox<Field> fieldComboBox;
 
@@ -71,6 +73,8 @@ public class EditFieldValueTabView extends AbstractAutomaticFieldEditorTabView {
         viewModel.fieldValueProperty().bindBidirectional(fieldValueTextField.textProperty());
 
         viewModel.overwriteNonEmptyFieldsProperty().bindBidirectional(overwriteNonEmptyFieldsCheckBox.selectedProperty());
+
+        appendValueButton.disableProperty().bind(overwriteNonEmptyFieldsCheckBox.selectedProperty().not());
     }
 
     @Override

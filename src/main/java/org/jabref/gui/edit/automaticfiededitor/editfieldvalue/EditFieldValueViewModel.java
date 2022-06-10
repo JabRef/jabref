@@ -72,7 +72,7 @@ public class EditFieldValueViewModel extends AbstractViewModel {
 
                 setFieldEdit.addEdit(new UndoableFieldChange(entry,
                         selectedField.get(),
-                        null,
+                        oldFieldValue.orElse(null),
                         fieldValue.get()));
                 fieldValue.set("");
             }
@@ -85,6 +85,29 @@ public class EditFieldValueViewModel extends AbstractViewModel {
     }
 
     public void appendToFieldValue() {
+        NamedCompound appendToFieldEdit = new NamedCompound("APPEND_TO_SELECTED_FIELD");
+
+        for (BibEntry entry : selectedEntries) {
+            Optional<String> oldFieldValue = entry.getField(selectedField.get());
+            // Append button should be disabled if 'overwriteNonEmptyFields' is false
+            if (overwriteNonEmptyFields.get()) {
+                String newFieldValue = oldFieldValue.orElse("").concat(fieldValue.get());
+
+                entry.setField(selectedField.get(), newFieldValue);
+                appendToFieldEdit.addEdit(new UndoableFieldChange(entry,
+                        selectedField.get(),
+                        oldFieldValue.orElse(null),
+                        newFieldValue)
+                );
+
+                fieldValue.set("");
+            }
+        }
+
+        if (appendToFieldEdit.hasEdits()) {
+            appendToFieldEdit.end();
+            dialogEdits.addEdit(appendToFieldEdit);
+        }
     }
 
     public ObservableList<Field> getAllFields() {
