@@ -2,6 +2,8 @@ package org.jabref.gui.edit.automaticfiededitor;
 
 import java.util.List;
 
+import javax.swing.undo.UndoManager;
+
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
@@ -16,17 +18,33 @@ import org.jabref.model.entry.BibEntry;
 public class AutomaticFieldEditorViewModel extends AbstractViewModel {
     public static final String NAMED_COMPOUND_EDITS = "EDIT_FIELDS";
     private final ObservableList<AutomaticFieldEditorTab> fieldEditorTabs = FXCollections.observableArrayList();
-    private NamedCompound edits = new NamedCompound(NAMED_COMPOUND_EDITS);
+    private final NamedCompound dialogEdits = new NamedCompound(NAMED_COMPOUND_EDITS);
 
-    public AutomaticFieldEditorViewModel(List<BibEntry> selectedEntries, BibDatabaseContext databaseContext) {
+    private final BibDatabaseContext databaseContext;
+    private final UndoManager undoManager;
+
+    public AutomaticFieldEditorViewModel(List<BibEntry> selectedEntries, BibDatabaseContext databaseContext, UndoManager undoManager) {
         fieldEditorTabs.addAll(
-                new EditFieldValueTabView(selectedEntries, databaseContext, edits),
+                new EditFieldValueTabView(selectedEntries, databaseContext, dialogEdits),
                 new TwoFieldsTabView(),
                 new RenameFieldTabView()
         );
+        this.databaseContext = databaseContext;
+        this.undoManager = undoManager;
     }
 
     public ObservableList<AutomaticFieldEditorTab> getFieldEditorTabs() {
         return fieldEditorTabs;
+    }
+
+    public void saveChanges() {
+        System.out.println("savee");
+        dialogEdits.end();
+        undoManager.addEdit(dialogEdits);
+    }
+
+    public void cancelChanges() {
+        dialogEdits.end();
+        dialogEdits.undo();
     }
 }
