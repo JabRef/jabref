@@ -9,18 +9,21 @@ import javafx.fxml.FXML;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
+import javafx.util.StringConverter;
 
 import org.jabref.gui.edit.automaticfiededitor.AbstractAutomaticFieldEditorTabView;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.FieldFactory;
 
 import com.airhacks.afterburner.views.ViewLoader;
 
 public class EditFieldValueTabView extends AbstractAutomaticFieldEditorTabView {
     @FXML
-    private ComboBox<String> fieldComboBox;
+    private ComboBox<Field> fieldComboBox;
 
     @FXML
     private TextField fieldValueTextField;
@@ -50,10 +53,20 @@ public class EditFieldValueTabView extends AbstractAutomaticFieldEditorTabView {
     @FXML
     public void initialize() {
         viewModel = new EditFieldValueViewModel(databaseContext, selectedEntries, edits);
-        fieldComboBox.getItems().addAll(viewModel.getAllFieldNames());
+        fieldComboBox.setConverter(new StringConverter<>() {
+            @Override
+            public String toString(Field field) {
+                return field.getName();
+            }
 
-        fieldComboBox.valueProperty().bindBidirectional(viewModel.selectedFieldNameProperty());
-        fieldValueTextField.textProperty().bindBidirectional(viewModel.fieldValueProperty());
+            @Override
+            public Field fromString(String name) {
+                return FieldFactory.parseField(name);
+            }
+        });
+        fieldComboBox.getItems().addAll(viewModel.getAllFields());
+        viewModel.selectedFieldProperty().bindBidirectional(fieldComboBox.valueProperty());
+        viewModel.fieldValueProperty().bindBidirectional(fieldValueTextField.textProperty());
     }
 
     @Override

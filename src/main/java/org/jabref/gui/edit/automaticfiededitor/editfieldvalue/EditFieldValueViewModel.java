@@ -3,6 +3,8 @@ package org.jabref.gui.edit.automaticfiededitor.editfieldvalue;
 import java.util.List;
 import java.util.Optional;
 
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
@@ -22,9 +24,9 @@ public class EditFieldValueViewModel extends AbstractViewModel {
 
     private final StringProperty fieldValue = new SimpleStringProperty();
 
-    private final StringProperty selectedFieldName = new SimpleStringProperty();
+    private final ObjectProperty<Field> selectedField = new SimpleObjectProperty<>();
 
-    private final ObservableList<String> allFieldNames = FXCollections.observableArrayList();
+    private final ObservableList<Field> allFields = FXCollections.observableArrayList();
 
     private final NamedCompound edits;
 
@@ -33,21 +35,19 @@ public class EditFieldValueViewModel extends AbstractViewModel {
         this.selectedEntries = selectedEntries;
         this.edits = edits;
 
-        allFieldNames.addAll(databaseContext.getDatabase().getAllVisibleFields().stream().map(Field::getName).toList());
-        selectedFieldName.setValue(allFieldNames.get(0));
+        allFields.addAll(databaseContext.getDatabase().getAllVisibleFields().stream().toList());
     }
 
     public void clearSelectedField() {
-        NamedCompound clearFieldEdit = new NamedCompound("");
-        Field selectedField = parseField(selectedFieldName.get());
+        NamedCompound clearFieldEdit = new NamedCompound("CLEAR_SELECTED_FIELD");
 
         for (BibEntry entry : selectedEntries) {
-            Optional<String> oldFieldValue = entry.getField(selectedField);
+            Optional<String> oldFieldValue = entry.getField(selectedField.get());
             if (oldFieldValue.isPresent()) {
-                entry.setField(selectedField, "");
+                entry.setField(selectedField.get(), "");
 
                 clearFieldEdit.addEdit(new UndoableFieldChange(entry,
-                        selectedField,
+                        selectedField.get(),
                         oldFieldValue.orElse(null),
                         fieldValue.get()));
             }
@@ -65,12 +65,12 @@ public class EditFieldValueViewModel extends AbstractViewModel {
     public void appendToFieldValue() {
     }
 
-    public ObservableList<String> getAllFieldNames() {
-        return allFieldNames;
+    public ObservableList<Field> getAllFields() {
+        return allFields;
     }
 
-    public StringProperty selectedFieldNameProperty() {
-        return selectedFieldName;
+    public ObjectProperty<Field> selectedFieldProperty() {
+        return selectedField;
     }
 
     public String getFieldValue() {
