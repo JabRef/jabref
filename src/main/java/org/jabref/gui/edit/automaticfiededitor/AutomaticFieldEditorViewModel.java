@@ -38,7 +38,6 @@ public class AutomaticFieldEditorViewModel extends AbstractViewModel {
     }
 
     public void saveChanges() {
-        System.out.println("savee");
         dialogEdits.end();
         undoManager.addEdit(dialogEdits);
     }
