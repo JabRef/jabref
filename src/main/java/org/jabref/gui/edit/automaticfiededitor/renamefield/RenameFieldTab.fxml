@@ -28,7 +28,7 @@
          <children>
              <HBox alignment="BOTTOM_LEFT" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" GridPane.hgrow="ALWAYS" GridPane.rowSpan="2" GridPane.vgrow="ALWAYS">
                  <children>
-                     <Label alignment="BOTTOM_LEFT" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" styleClass="sectionHeader" text="Rename field">
+                     <Label alignment="BOTTOM_LEFT" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" styleClass="sectionHeader" text="%Rename field">
                          <HBox.margin>
                              <Insets bottom="10.0" />
                          </HBox.margin>
@@ -37,7 +37,7 @@
              </HBox>
             <HBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" GridPane.columnSpan="2" GridPane.rowIndex="3" GridPane.rowSpan="2">
                <children>
-                  <Button fx:id="renameButton" alignment="TOP_LEFT" mnemonicParsing="false" onAction="#renameField" text="Rename">
+                  <Button fx:id="renameButton" alignment="TOP_LEFT" mnemonicParsing="false" onAction="#renameField" text="%Rename">
                      <HBox.margin>
                         <Insets top="4.0" />
                      </HBox.margin>
@@ -47,7 +47,7 @@
             <HBox prefHeight="100.0" prefWidth="200.0" spacing="8.0" GridPane.columnSpan="2" GridPane.rowIndex="2">
                <children>
                   <ComboBox fx:id="fieldComboBox" minWidth="-Infinity" prefHeight="36.0" prefWidth="150.0" promptText="Author" HBox.hgrow="ALWAYS" />
-                  <TextField fx:id="newFieldNameTextField" minHeight="-Infinity" prefHeight="36.0" promptText="new field name" HBox.hgrow="ALWAYS" />
+                  <TextField fx:id="newFieldNameTextField" minHeight="-Infinity" prefHeight="36.0" promptText="%new field name" HBox.hgrow="ALWAYS" />
                </children>
             </HBox>
          </children>
