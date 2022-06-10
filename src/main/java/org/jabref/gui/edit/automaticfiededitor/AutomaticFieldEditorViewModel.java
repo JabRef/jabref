@@ -26,7 +26,7 @@ public class AutomaticFieldEditorViewModel extends AbstractViewModel {
     public AutomaticFieldEditorViewModel(List<BibEntry> selectedEntries, BibDatabaseContext databaseContext, UndoManager undoManager) {
         fieldEditorTabs.addAll(
                 new EditFieldValueTabView(selectedEntries, databaseContext, dialogEdits),
-                new TwoFieldsTabView(),
+                new TwoFieldsTabView(selectedEntries, databaseContext, dialogEdits),
                 new RenameFieldTabView(selectedEntries, databaseContext, dialogEdits)
         );
         this.databaseContext = databaseContext;
