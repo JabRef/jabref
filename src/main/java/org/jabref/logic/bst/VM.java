@@ -204,13 +204,13 @@ public class VM {
      */
     private void bstIsGreaterThan(Object context) {
         if (stack.size() < 2) {
-            throw new VMException("Not enough operands on stack for operation >");
+            throw new BstVMException("Not enough operands on stack for operation >");
         }
         Object o2 = stack.pop();
         Object o1 = stack.pop();
 
         if (!((o1 instanceof Integer) && (o2 instanceof Integer))) {
-            throw new VMException("Can only compare two integers with >");
+            throw new BstVMException("Can only compare two integers with >");
         }
 
         stack.push(((Integer) o1).compareTo((Integer) o2) > 0 ? VM.TRUE : VM.FALSE);
@@ -223,13 +223,13 @@ public class VM {
      */
     private void bstIsLowerThan(BstEntry context) {
         if (stack.size() < 2) {
-            throw new VMException("Not enough operands on stack for operation <");
+            throw new BstVMException("Not enough operands on stack for operation <");
         }
         Object o2 = stack.pop();
         Object o1 = stack.pop();
 
         if (!((o1 instanceof Integer) && (o2 instanceof Integer))) {
-            throw new VMException("Can only compare two integers with <");
+            throw new BstVMException("Can only compare two integers with <");
         }
 
         stack.push(((Integer) o1).compareTo((Integer) o2) < 0 ? VM.TRUE : VM.FALSE);
@@ -241,7 +241,7 @@ public class VM {
      */
     private void bstEquals(BstEntry context) {
         if (stack.size() < 2) {
-            throw new VMException("Not enough operands on stack for operation =");
+            throw new BstVMException("Not enough operands on stack for operation =");
         }
         Object o1 = stack.pop();
         Object o2 = stack.pop();
@@ -264,13 +264,13 @@ public class VM {
      */
     private void bstAdd(BstEntry context) {
         if (stack.size() < 2) {
-            throw new VMException("Not enough operands on stack for operation +");
+            throw new BstVMException("Not enough operands on stack for operation +");
         }
         Object o2 = stack.pop();
         Object o1 = stack.pop();
 
         if (!((o1 instanceof Integer) && (o2 instanceof Integer))) {
-            throw new VMException("Can only compare two integers with +");
+            throw new BstVMException("Can only compare two integers with +");
         }
 
         stack.push((Integer) o1 + (Integer) o2);
@@ -282,13 +282,13 @@ public class VM {
      */
     private void bstSubtract(BstEntry context) {
         if (stack.size() < 2) {
-            throw new VMException("Not enough operands on stack for operation -");
+            throw new BstVMException("Not enough operands on stack for operation -");
         }
         Object o2 = stack.pop();
         Object o1 = stack.pop();
 
         if (!((o1 instanceof Integer) && (o2 instanceof Integer))) {
-            throw new VMException("Can only subtract two integers with -");
+            throw new BstVMException("Can only subtract two integers with -");
         }
 
         stack.push((Integer) o1 - (Integer) o2);
@@ -301,7 +301,7 @@ public class VM {
      */
     private void bstConcat(BstEntry context) {
         if (stack.size() < 2) {
-            throw new VMException("Not enough operands on stack for operation *");
+            throw new BstVMException("Not enough operands on stack for operation *");
         }
         Object o2 = stack.pop();
         Object o1 = stack.pop();
@@ -316,7 +316,7 @@ public class VM {
         if (!((o1 instanceof String) && (o2 instanceof String))) {
             LOGGER.error("o1: {} ({})", o1, o1.getClass());
             LOGGER.error("o2: {} ({})", o2, o2.getClass());
-            throw new VMException("Can only concatenate two String with *");
+            throw new BstVMException("Can only concatenate two String with *");
         }
 
         stack.push(o1.toString() + o2);
@@ -328,7 +328,7 @@ public class VM {
      */
     private void bstAssign(BstEntry context) {
         if (stack.size() < 2) {
-            throw new VMException("Invalid call to operation :=");
+            throw new BstVMException("Invalid call to operation :=");
         }
         Object o1 = stack.pop();
         Object o2 = stack.pop();
@@ -337,7 +337,7 @@ public class VM {
 
     private boolean doBstAssign(BstEntry context, Object o1, Object o2) {
         if (!(o1 instanceof VM.Identifier) || !((o2 instanceof String) || (o2 instanceof Integer))) {
-            throw new VMException("Invalid parameters");
+            throw new BstVMException("Invalid parameters");
         }
 
         String name = ((VM.Identifier) o1).getName();
@@ -374,12 +374,12 @@ public class VM {
      */
     private void bstAddPeriod(BstEntry context) {
         if (stack.isEmpty()) {
-            throw new VMException("Not enough operands on stack for operation add.period$");
+            throw new BstVMException("Not enough operands on stack for operation add.period$");
         }
         Object o1 = stack.pop();
 
         if (!(o1 instanceof String s)) {
-            throw new VMException("Can only add a period to a string for add.period$");
+            throw new BstVMException("Can only add a period to a string for add.period$");
         }
 
         Matcher m = ADD_PERIOD_PATTERN.matcher(s);
@@ -410,7 +410,7 @@ public class VM {
      */
     private void bstCallType(BstEntry context) {
         if (context == null) {
-            throw new VMException("Call.type$ can only be called from within a context (ITERATE or REVERSE).");
+            throw new BstVMException("Call.type$ can only be called from within a context (ITERATE or REVERSE).");
         }
         VM.this.execute(context.entry.getType().getName(), context);
     }
@@ -436,17 +436,17 @@ public class VM {
      */
     private void bstChangeCase(BstEntry value) {
         if (stack.size() < 2) {
-            throw new VMException("Not enough operands on stack for operation change.case$");
+            throw new BstVMException("Not enough operands on stack for operation change.case$");
         }
 
         Object o1 = stack.pop();
         if (!((o1 instanceof String) && (((String) o1).length() == 1))) {
-            throw new VMException("A format string of length 1 is needed for change.case$");
+            throw new BstVMException("A format string of length 1 is needed for change.case$");
         }
 
         Object o2 = stack.pop();
         if (!(o2 instanceof String s)) {
-            throw new VMException("A string is needed as second parameter for change.case$");
+            throw new BstVMException("A string is needed as second parameter for change.case$");
         }
 
         char format = ((String) o1).toLowerCase(Locale.ROOT).charAt(0);
@@ -461,12 +461,12 @@ public class VM {
      */
     private void bstChrToInt(BstEntry context) {
         if (stack.isEmpty()) {
-            throw new VMException("Not enough operands on stack for operation chr.to.int$");
+            throw new BstVMException("Not enough operands on stack for operation chr.to.int$");
         }
         Object o1 = stack.pop();
 
         if (!((o1 instanceof String s) && (((String) o1).length() == 1))) {
-            throw new VMException("Can only perform chr.to.int$ on string with length 1");
+            throw new BstVMException("Can only perform chr.to.int$ on string with length 1");
         }
 
         stack.push((int) s.charAt(0));
@@ -478,7 +478,7 @@ public class VM {
      */
     private void bstCite(BstEntry context) {
         if (context == null) {
-            throw new VMException("Must have an entry to cite$");
+            throw new BstVMException("Must have an entry to cite$");
         }
         stack.push(context.entry.getCitationKey().orElse(null));
     }
@@ -488,7 +488,7 @@ public class VM {
      */
     private void bstDuplicate(BstEntry context) {
         if (stack.isEmpty()) {
-            throw new VMException("Not enough operands on stack for operation duplicate$");
+            throw new BstVMException("Not enough operands on stack for operation duplicate$");
         }
         Object o1 = stack.pop();
 
@@ -503,7 +503,7 @@ public class VM {
      */
     private void bstEmpty(BstEntry context) {
         if (stack.isEmpty()) {
-            throw new VMException("Not enough operands on stack for operation empty$");
+            throw new BstVMException("Not enough operands on stack for operation empty$");
         }
         Object o1 = stack.pop();
 
@@ -513,7 +513,7 @@ public class VM {
         }
 
         if (!(o1 instanceof String s)) {
-            throw new VMException("Operand does not match function empty$");
+            throw new BstVMException("Operand does not match function empty$");
         }
 
         stack.push("".equals(s.trim()) ? VM.TRUE : VM.FALSE);
@@ -532,7 +532,7 @@ public class VM {
      */
     private void bstFormatName(BstEntry context) {
         if (stack.size() < 3) {
-            throw new VMException("Not enough operands on stack for operation format.name$");
+            throw new BstVMException("Not enough operands on stack for operation format.name$");
         }
         Object o1 = stack.pop();
         Object o2 = stack.pop();
@@ -553,7 +553,7 @@ public class VM {
         } else {
             AuthorList a = AuthorList.parse(names);
             if (name > a.getNumberOfAuthors()) {
-                throw new VMException("Author Out of Bounds. Number " + name + " invalid for " + names);
+                throw new BstVMException("Author Out of Bounds. Number " + name + " invalid for " + names);
             }
             Author author = a.getAuthor(name - 1);
 
@@ -569,7 +569,7 @@ public class VM {
      */
     private void bstIf(BstEntry context) {
         if (stack.size() < 3) {
-            throw new VMException("Not enough operands on stack for operation =");
+            throw new BstVMException("Not enough operands on stack for operation =");
         }
         Object f1 = stack.pop();
         Object f2 = stack.pop();
@@ -577,7 +577,7 @@ public class VM {
 
         if (!((f1 instanceof VM.Identifier) || (f1 instanceof Tree))
                 && ((f2 instanceof VM.Identifier) || (f2 instanceof Tree)) && (i instanceof Integer)) {
-            throw new VMException("Expecting two functions and an integer for if$.");
+            throw new BstVMException("Expecting two functions and an integer for if$.");
         }
 
         if ((Integer) i > 0) {
@@ -594,12 +594,12 @@ public class VM {
      */
     private void bstIntToChr(BstEntry context) {
         if (stack.isEmpty()) {
-            throw new VMException("Not enough operands on stack for operation int.to.chr$");
+            throw new BstVMException("Not enough operands on stack for operation int.to.chr$");
         }
         Object o1 = stack.pop();
 
         if (!(o1 instanceof Integer i)) {
-            throw new VMException("Can only perform operation int.to.chr$ on an Integer");
+            throw new BstVMException("Can only perform operation int.to.chr$ on an Integer");
         }
 
         stack.push(String.valueOf((char) i.intValue()));
@@ -611,12 +611,12 @@ public class VM {
      */
     private void bstIntToStr(BstEntry context) {
         if (stack.isEmpty()) {
-            throw new VMException("Not enough operands on stack for operation int.to.str$");
+            throw new BstVMException("Not enough operands on stack for operation int.to.str$");
         }
         Object o1 = stack.pop();
 
         if (!(o1 instanceof Integer)) {
-            throw new VMException("Can only transform an integer to an string using int.to.str$");
+            throw new BstVMException("Can only transform an integer to an string using int.to.str$");
         }
 
         stack.push(o1.toString());
@@ -628,7 +628,7 @@ public class VM {
      */
     private void bstMissing(BstEntry context) {
         if (stack.isEmpty()) {
-            throw new VMException("Not enough operands on stack for operation missing$");
+            throw new BstVMException("Not enough operands on stack for operation missing$");
         }
         Object o1 = stack.pop();
 
@@ -665,12 +665,12 @@ public class VM {
      */
     private void bstNumNames(BstEntry context) {
         if (stack.isEmpty()) {
-            throw new VMException("Not enough operands on stack for operation num.names$");
+            throw new BstVMException("Not enough operands on stack for operation num.names$");
         }
         Object o1 = stack.pop();
 
         if (!(o1 instanceof String s)) {
-            throw new VMException("Need a string at the top of the stack for num.names$");
+            throw new BstVMException("Need a string at the top of the stack for num.names$");
         }
 
         stack.push(AuthorList.parse(s).getNumberOfAuthors());
@@ -703,7 +703,7 @@ public class VM {
      */
     private void bstPurify(BstEntry context) {
         if (stack.isEmpty()) {
-            throw new VMException("Not enough operands on stack for operation purify$");
+            throw new BstVMException("Not enough operands on stack for operation purify$");
         }
         Object o1 = stack.pop();
 
@@ -751,14 +751,14 @@ public class VM {
      */
     private void bstSubstring(BstEntry context) {
         if (stack.size() < 3) {
-            throw new VMException("Not enough operands on stack for operation substring$");
+            throw new BstVMException("Not enough operands on stack for operation substring$");
         }
         Object o1 = stack.pop();
         Object o2 = stack.pop();
         Object o3 = stack.pop();
 
         if (!((o1 instanceof Integer len) && (o2 instanceof Integer start) && (o3 instanceof String s))) {
-            throw new VMException("Expecting two integers and a string for substring$");
+            throw new BstVMException("Expecting two integers and a string for substring$");
         }
 
         int lenI = len;
@@ -793,7 +793,7 @@ public class VM {
      */
     private void bstSwap(BstEntry context) {
         if (stack.size() < 2) {
-            throw new VMException("Not enough operands on stack for operation swap$");
+            throw new BstVMException("Not enough operands on stack for operation swap$");
         }
         Object f1 = stack.pop();
         Object f2 = stack.pop();
@@ -815,12 +815,12 @@ public class VM {
      */
     private void bstTextLength(BstEntry context) {
         if (stack.isEmpty()) {
-            throw new VMException("Not enough operands on stack for operation text.length$");
+            throw new BstVMException("Not enough operands on stack for operation text.length$");
         }
         Object o1 = stack.pop();
 
         if (!(o1 instanceof String s)) {
-            throw new VMException("Can only perform operation on a string text.length$");
+            throw new BstVMException("Can only perform operation on a string text.length$");
         }
 
         char[] c = s.toCharArray();
@@ -871,7 +871,7 @@ public class VM {
      */
     private void bstTextPrefix(BstEntry context) {
         if (stack.size() < 2) {
-            throw new VMException("Not enough operands on stack for operation text.prefix$");
+            throw new BstVMException("Not enough operands on stack for operation text.prefix$");
         }
 
         Object o1 = stack.pop();
@@ -904,7 +904,7 @@ public class VM {
      */
     private void bstType(BstEntry context) {
         if (context == null) {
-            throw new VMException("type$ need a context.");
+            throw new BstVMException("type$ need a context.");
         }
 
         stack.push(context.entry.getType().getName());
@@ -926,14 +926,14 @@ public class VM {
      */
     private void bstWhile(BstEntry context) {
         if (stack.size() < 2) {
-            throw new VMException("Not enough operands on stack for operation while$");
+            throw new BstVMException("Not enough operands on stack for operation while$");
         }
         Object f2 = stack.pop();
         Object f1 = stack.pop();
 
         if (!((f1 instanceof VM.Identifier) || (f1 instanceof Tree))
                 && ((f2 instanceof VM.Identifier) || (f2 instanceof Tree))) {
-            throw new VMException("Expecting two functions for while$.");
+            throw new BstVMException("Expecting two functions for while$.");
         }
 
         do {
@@ -941,7 +941,7 @@ public class VM {
 
             Object i = stack.pop();
             if (!(i instanceof Integer)) {
-                throw new VMException("First parameter to while has to return an integer but was " + i);
+                throw new BstVMException("First parameter to while has to return an integer but was " + i);
             }
             if ((Integer) i <= 0) {
                 break;
@@ -961,7 +961,7 @@ public class VM {
      */
     private void bstWidth(BstEntry context) {
         if (stack.isEmpty()) {
-            throw new VMException("Not enough operands on stack for operation width$");
+            throw new BstVMException("Not enough operands on stack for operation width$");
         }
         Object o1 = stack.pop();
 
@@ -1239,7 +1239,8 @@ public class VM {
                         default ->
                                 VM.this.execute(c.getText(), context);
                     }
-                } catch (VMException e) {
+                } catch (
+                        BstVMException e) {
                     if (path == null) {
                         LOGGER.error("ERROR " + e.getMessage() + " (" + c.getLine() + ")");
                     } else {
@@ -1286,7 +1287,7 @@ public class VM {
             return;
         }
 
-        throw new VMException("No matching identifier found: " + name);
+        throw new BstVMException("No matching identifier found: " + name);
     }
 
     private void function(Tree child) {

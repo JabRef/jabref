@@ -162,7 +162,7 @@ public class TestVM {
     @Test
     public void testVMArithmetic2() throws RecognitionException {
         VM vm = new VM("FUNCTION {test} { " + "#1 \"HELLO\" + #5 #2 - }" + "EXECUTE {test}");
-        assertThrows(VMException.class, () -> vm.run(Collections.emptyList()));
+        assertThrows(BstVMException.class, () -> vm.run(Collections.emptyList()));
     }
 
     @Test

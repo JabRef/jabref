@@ -5,7 +5,7 @@ import java.util.Locale;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.jabref.logic.bst.VMException;
+import org.jabref.logic.bst.BstVMException;
 import org.jabref.model.entry.Author;
 import org.jabref.model.entry.AuthorList;
 
@@ -111,7 +111,7 @@ public class BibtexNameFormatter {
                     case 'j' ->
                             author.getJr();
                     default ->
-                            throw new VMException("Internal error");
+                            throw new BstVMException("Internal error");
                 };
 
                 if (tokenS.isEmpty()) {
