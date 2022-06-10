@@ -27,7 +27,7 @@ public class AutomaticFieldEditorViewModel extends AbstractViewModel {
         fieldEditorTabs.addAll(
                 new EditFieldValueTabView(selectedEntries, databaseContext, dialogEdits),
                 new TwoFieldsTabView(),
-                new RenameFieldTabView()
+                new RenameFieldTabView(selectedEntries, databaseContext, dialogEdits)
         );
         this.databaseContext = databaseContext;
         this.undoManager = undoManager;
