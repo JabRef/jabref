@@ -24,7 +24,9 @@ public class AutomaticFieldEditorDialog extends BaseDialog<Void> {
     public AutomaticFieldEditorDialog(List<BibEntry> selectedEntries, BibDatabaseContext databaseContext) {
         this.selectedEntries = selectedEntries;
         this.databaseContext = databaseContext;
+
         this.setTitle(Localization.lang("Automatic Field Editor"));
+
         ViewLoader.view(this)
                   .load()
                   .setAsDialogPane(this);

@@ -1,5 +1,6 @@
 package org.jabref.gui.edit.automaticfiededitor.editfieldvalue;
 
+import java.util.Comparator;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -66,7 +67,7 @@ public class EditFieldValueTabView extends AbstractAutomaticFieldEditorTabView {
                 return FieldFactory.parseField(name);
             }
         });
-        fieldComboBox.getItems().addAll(viewModel.getAllFields());
+        fieldComboBox.getItems().addAll(viewModel.getAllFields().sorted(Comparator.comparing(Field::getName)));
         fieldComboBox.getSelectionModel().selectFirst();
         viewModel.selectedFieldProperty().bindBidirectional(fieldComboBox.valueProperty());
 
