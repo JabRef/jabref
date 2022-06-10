@@ -24,7 +24,7 @@ class BstVMVisitor extends BstBaseVisitor<Integer> {
     private final Stack<Object> stack = new Stack<>();
     private final StringBuilder bbl;
 
-    private BstEntry selectedBstEntry;
+    private BstEntry selectedBstEntry = null;
 
     public record Identifier(String name) {
     }
@@ -55,14 +55,14 @@ class BstVMVisitor extends BstBaseVisitor<Integer> {
     }
 
     @Override
-    public Integer visitMacroCommand(BstParser.MacroCommandContext ctx) {
-        bstVMContext.functions().put(ctx.id.getText(), new BstVMFunction<>(ctx.repl.getText()));
+    public Integer visitFunctionCommand(BstParser.FunctionCommandContext ctx) {
+        bstVMContext.functions().put(ctx.id.getText(), new BstVMFunction<>(ctx.function));
         return BstVM.TRUE;
     }
 
     @Override
-    public Integer visitFunctionCommand(BstParser.FunctionCommandContext ctx) {
-        bstVMContext.functions().put(ctx.id.getText(), new BstVMFunction<>(ctx.function));
+    public Integer visitMacroCommand(BstParser.MacroCommandContext ctx) {
+        bstVMContext.functions().put(ctx.id.getText(), new BstVMFunction<>(ctx.repl.getText()));
         return BstVM.TRUE;
     }
 
@@ -109,27 +109,6 @@ class BstVMVisitor extends BstBaseVisitor<Integer> {
     }
 
     @Override
-    public Integer visitStackitem(BstParser.StackitemContext ctx) {
-        for (ParseTree childNode : ctx.children) {
-            if (childNode instanceof TerminalNode token) {
-                switch (token.getSymbol().getType()) {
-                    case BstParser.STRING -> {
-                        String s = token.getText();
-                        stack.push(s.substring(1, s.length() - 1));
-                    }
-                    case BstParser.INTEGER ->
-                            stack.push(Integer.parseInt(token.getText().substring(1)));
-                    case BstParser.QUOTED ->
-                            stack.push(new Identifier(token.getText().substring(1)));
-                }
-            } else {
-                visit(childNode);
-            }
-        }
-        return BstVM.TRUE;
-    }
-
-    @Override
     public Integer visitEntryCommand(BstParser.EntryCommandContext ctx) {
         // ENTRY command contains 3 optionally filled identifier lists:
         // Fields, Integers and Strings
@@ -169,12 +148,6 @@ class BstVMVisitor extends BstBaseVisitor<Integer> {
     }
 
     @Override
-    public Integer visitBstFunction(BstParser.BstFunctionContext ctx) {
-        bstVMContext.functions().get(ctx.getChild(0).getText()).execute(this, ctx, selectedBstEntry);
-        return BstVM.TRUE;
-    }
-
-    @Override
     public Integer visitIdentifier(BstParser.IdentifierContext ctx) {
         String name = ctx.IDENTIFIER().getText();
 
@@ -208,6 +181,33 @@ class BstVMVisitor extends BstBaseVisitor<Integer> {
         }
 
         throw new BstVMException("No matching identifier found: " + name);
+    }
+
+    @Override
+    public Integer visitBstFunction(BstParser.BstFunctionContext ctx) {
+        bstVMContext.functions().get(ctx.getChild(0).getText()).execute(this, ctx, selectedBstEntry);
+        return BstVM.TRUE;
+    }
+
+    @Override
+    public Integer visitStackitem(BstParser.StackitemContext ctx) {
+        for (ParseTree childNode : ctx.children) {
+            if (childNode instanceof TerminalNode token) {
+                switch (token.getSymbol().getType()) {
+                    case BstParser.STRING -> {
+                        String s = token.getText();
+                        stack.push(s.substring(1, s.length() - 1));
+                    }
+                    case BstParser.INTEGER ->
+                            stack.push(Integer.parseInt(token.getText().substring(1)));
+                    case BstParser.QUOTED ->
+                            stack.push(new Identifier(token.getText().substring(1)));
+                }
+            } else {
+                visit(childNode);
+            }
+        }
+        return BstVM.TRUE;
     }
 
     private class BstVMFunction<T> implements BstFunctions.BstFunction {
