@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
-import java.util.Stack;
 
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
@@ -28,7 +27,7 @@ import org.antlr.v4.runtime.tree.ParseTree;
  *  [x] migrate functions
  *  [x] context / entry needs to be set as a field for the visitor to iterate forwards or backwards through all the entries
  *  [x] migrate execute / forward / backward / stack / quote / etc.
- *  [ ] remove old VM
+ *  [x] remove old VM
  *  [ ] fix tests
  *  [ ] create new tests
  *  [ ] clean up bstFunctions
@@ -39,7 +38,9 @@ public class BstVM {
     protected static final Integer FALSE = 0;
     protected static final Integer TRUE = 1;
 
-    private final ParseTree tree;
+    protected final ParseTree tree;
+
+    protected BstVMContext latestContext; // for testing
 
     public BstVM(Path path) throws RecognitionException, IOException {
         this(CharStreams.fromPath(path));
@@ -49,7 +50,7 @@ public class BstVM {
         this(CharStreams.fromString(s));
     }
 
-    private BstVM(CharStream bst) throws RecognitionException {
+    protected BstVM(CharStream bst) throws RecognitionException {
         this(charStream2CommonTree(bst));
     }
 
@@ -60,7 +61,7 @@ public class BstVM {
     private static ParseTree charStream2CommonTree(CharStream query) {
         BstLexer lexer = new BstLexer(query);
         lexer.removeErrorListeners();
-        lexer.addErrorListener(VM.ThrowingErrorListener.INSTANCE);
+        lexer.addErrorListener(ThrowingErrorListener.INSTANCE);
         BstParser parser = new BstParser(new CommonTokenStream(lexer));
         parser.removeErrorListeners();
         parser.addErrorListener(ThrowingErrorListener.INSTANCE);
@@ -84,15 +85,20 @@ public class BstVM {
         }
 
         StringBuilder bbl = new StringBuilder();
-        Stack<Object> stack = new Stack<>();
 
         BstVMContext bstVMContext = new BstVMContext(entries, bibDatabase);
-        bstVMContext.functions().putAll(new BstFunctions(bstVMContext, stack, bbl).getBuiltInFunctions());
+        bstVMContext.functions().putAll(new BstFunctions(bstVMContext, bbl).getBuiltInFunctions());
 
         BstVMVisitor bstVMVisitor = new BstVMVisitor(bstVMContext, bbl);
         bstVMVisitor.visit(tree);
 
+        latestContext = bstVMContext;
+
         return bbl.toString();
+    }
+
+    public String render(Collection<BibEntry> bibEntries) {
+        return render(bibEntries, null);
     }
 
     private static class ThrowingErrorListener extends BaseErrorListener {

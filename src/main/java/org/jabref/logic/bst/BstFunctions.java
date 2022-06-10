@@ -46,14 +46,13 @@ public class BstFunctions {
     }
 
     public BstFunctions(BstVMContext bstVMContext,
-                        Stack<Object> stack,
                         StringBuilder bbl) {
         this.strings = bstVMContext.strings();
         this.integers = bstVMContext.integers();
         this.functions = bstVMContext.functions();
         this.preamble = bstVMContext.bibDatabase().getPreamble().orElse("");
+        this.stack = bstVMContext.stack();
 
-        this.stack = stack;
         this.bbl = bbl;
     }
 

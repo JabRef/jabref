@@ -4,7 +4,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
-import java.util.Stack;
 
 import org.jabref.logic.bibtex.FieldContentFormatterPreferences;
 import org.jabref.logic.bibtex.FieldWriter;
@@ -23,7 +22,6 @@ class BstVMVisitor extends BstBaseVisitor<Integer> {
     private final BstVMContext bstVMContext;
     private final StringBuilder bbl;
 
-    private final Stack<Object> stack = new Stack<>();
     private BstEntry selectedBstEntry = null;
 
     public record Identifier(String name) {
@@ -182,24 +180,24 @@ class BstVMVisitor extends BstBaseVisitor<Integer> {
 
         if (selectedBstEntry != null) {
             if (selectedBstEntry.fields.containsKey(name)) {
-                stack.push(selectedBstEntry.fields.get(name));
+                bstVMContext.stack().push(selectedBstEntry.fields.get(name));
                 return BstVM.TRUE;
             }
             if (selectedBstEntry.localStrings.containsKey(name)) {
-                stack.push(selectedBstEntry.localStrings.get(name));
+                bstVMContext.stack().push(selectedBstEntry.localStrings.get(name));
                 return BstVM.TRUE;
             }
             if (selectedBstEntry.localIntegers.containsKey(name)) {
-                stack.push(selectedBstEntry.localIntegers.get(name));
+                bstVMContext.stack().push(selectedBstEntry.localIntegers.get(name));
                 return BstVM.TRUE;
             }
         }
         if (bstVMContext.strings().containsKey(name)) {
-            stack.push(bstVMContext.strings().get(name));
+            bstVMContext.stack().push(bstVMContext.strings().get(name));
             return BstVM.TRUE;
         }
         if (bstVMContext.integers().containsKey(name)) {
-            stack.push(bstVMContext.integers().get(name));
+            bstVMContext.stack().push(bstVMContext.integers().get(name));
             return BstVM.TRUE;
         }
 
@@ -225,12 +223,12 @@ class BstVMVisitor extends BstBaseVisitor<Integer> {
                 switch (token.getSymbol().getType()) {
                     case BstParser.STRING -> {
                         String s = token.getText();
-                        stack.push(s.substring(1, s.length() - 1));
+                        bstVMContext.stack().push(s.substring(1, s.length() - 1));
                     }
                     case BstParser.INTEGER ->
-                            stack.push(Integer.parseInt(token.getText().substring(1)));
+                            bstVMContext.stack().push(Integer.parseInt(token.getText().substring(1)));
                     case BstParser.QUOTED ->
-                            stack.push(new Identifier(token.getText().substring(1)));
+                            bstVMContext.stack().push(new Identifier(token.getText().substring(1)));
                 }
             } else {
                 visit(childNode);
@@ -249,7 +247,7 @@ class BstVMVisitor extends BstBaseVisitor<Integer> {
         @Override
         public void execute(BstVMVisitor visitor, ParserRuleContext parserRuleContext) {
             if (parserRuleContext instanceof BstParser.IdentifierContext) {
-                stack.push(expression); // Macro
+                bstVMContext.stack().push(expression); // Macro
             } else {
                 visitor.visit(parserRuleContext);
             }
