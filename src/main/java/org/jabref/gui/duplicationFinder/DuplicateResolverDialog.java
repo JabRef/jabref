@@ -6,6 +6,7 @@ import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
 import javafx.scene.layout.BorderPane;
 
+import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.duplicationFinder.DuplicateResolverDialog.DuplicateResolverResult;
 import org.jabref.gui.help.HelpAction;
@@ -39,16 +40,18 @@ public class DuplicateResolverDialog extends BaseDialog<DuplicateResolverResult>
     }
 
     private MergeEntries mergeEntries;
+    private final DialogService dialogService;
 
-    public DuplicateResolverDialog(BibEntry one, BibEntry two, DuplicateResolverType type, BibDatabaseContext database, StateManager stateManager) {
+    public DuplicateResolverDialog(BibEntry one, BibEntry two, DuplicateResolverType type, BibDatabaseContext database, StateManager stateManager, DialogService dialogService) {
         this.setTitle(Localization.lang("Possible duplicate entries"));
         this.database = database;
         this.stateManager = stateManager;
+        this.dialogService = dialogService;
         init(one, two, type);
     }
 
     private void init(BibEntry one, BibEntry two, DuplicateResolverType type) {
-        HelpAction helpCommand = new HelpAction(HelpFile.FIND_DUPLICATES);
+        HelpAction helpCommand = new HelpAction(HelpFile.FIND_DUPLICATES, dialogService);
         ButtonType help = new ButtonType(Localization.lang("Help"), ButtonData.HELP);
 
         ButtonType cancel = ButtonType.CANCEL;

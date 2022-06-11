@@ -81,7 +81,7 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> i
         addModificationDate.selectedProperty().bindBidirectional(viewModel.addModificationDateProperty());
 
         ActionFactory actionFactory = new ActionFactory(Globals.getKeyPrefs());
-        actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.OWNER), markOwnerHelp);
+        actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.OWNER, dialogService), markOwnerHelp);
 
         validationVisualizer.setDecoration(new IconValidationDecorator());
     }

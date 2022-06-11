@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<style xmlns="http://purl.org/net/xbiblio/csl" class="note" version="1.0" demote-non-dropping-particle="sort-only" default-locale="en-US" page-range-format="chicago">
+<style xmlns="http://purl.org/net/xbiblio/csl" class="note" version="1.0" demote-non-dropping-particle="sort-only" page-range-format="chicago" default-locale="en-US">
   <info>
     <title>Society of Biblical Literature 1st edition (full note)</title>
+    <title-short>SBL (1st edition)</title-short>
     <id>http://www.zotero.org/styles/society-of-biblical-literature-1st-edition-fullnote-bibliography</id>
     <link href="http://www.zotero.org/styles/society-of-biblical-literature-1st-edition-fullnote-bibliography" rel="self"/>
     <link href="http://www.zotero.org/styles/chicago-fullnote-bibliography" rel="template"/>
@@ -24,7 +25,7 @@
     <category citation-format="note"/>
     <category field="theology"/>
     <summary>Society of Biblical Literature, 1st edition, format with full notes and bibliography</summary>
-    <updated>2012-10-26T01:15:26+00:00</updated>
+    <updated>2022-05-27T01:15:26+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="en-US">
