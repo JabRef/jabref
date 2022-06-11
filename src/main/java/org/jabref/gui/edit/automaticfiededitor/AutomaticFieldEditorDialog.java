@@ -35,7 +35,7 @@ public class AutomaticFieldEditorDialog extends BaseDialog<Void> {
         this.databaseContext = databaseContext;
         this.undoManager = Globals.undoManager;
 
-        this.setTitle(Localization.lang("Automatic Field Editor"));
+        this.setTitle(Localization.lang("Automatic field editor"));
 
         ViewLoader.view(this)
                   .load()
