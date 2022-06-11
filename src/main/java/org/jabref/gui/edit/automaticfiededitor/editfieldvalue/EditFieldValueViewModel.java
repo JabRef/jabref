@@ -1,5 +1,6 @@
 package org.jabref.gui.edit.automaticfiededitor.editfieldvalue;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -35,7 +36,7 @@ public class EditFieldValueViewModel extends AbstractViewModel {
 
     public EditFieldValueViewModel(BibDatabaseContext databaseContext, List<BibEntry> selectedEntries, NamedCompound dialogEdits) {
         this.databaseContext = databaseContext;
-        this.selectedEntries = selectedEntries;
+        this.selectedEntries = new ArrayList<>(selectedEntries);
         this.dialogEdits = dialogEdits;
 
         allFields.addAll(databaseContext.getDatabase().getAllVisibleFields().stream().toList());
@@ -64,16 +65,18 @@ public class EditFieldValueViewModel extends AbstractViewModel {
 
     public void setFieldValue() {
         NamedCompound setFieldEdit = new NamedCompound("CHANGE_SELECTED_FIELD");
+        String toSetFieldValue = fieldValue.getValue();
 
         for (BibEntry entry : selectedEntries) {
             Optional<String> oldFieldValue = entry.getField(selectedField.get());
             if (oldFieldValue.isEmpty() || overwriteNonEmptyFields.get()) {
-                entry.setField(selectedField.get(), fieldValue.get());
+                System.out.printf("Setting field %s for entry %s%n", selectedField.get().getName(), entry.getId());
+                entry.setField(selectedField.get(), toSetFieldValue);
 
                 setFieldEdit.addEdit(new UndoableFieldChange(entry,
                         selectedField.get(),
                         oldFieldValue.orElse(null),
-                        fieldValue.get()));
+                        toSetFieldValue));
                 fieldValue.set("");
             }
         }
@@ -86,12 +89,13 @@ public class EditFieldValueViewModel extends AbstractViewModel {
 
     public void appendToFieldValue() {
         NamedCompound appendToFieldEdit = new NamedCompound("APPEND_TO_SELECTED_FIELD");
+        String toAppendFieldValue = fieldValue.getValue();
 
         for (BibEntry entry : selectedEntries) {
             Optional<String> oldFieldValue = entry.getField(selectedField.get());
             // Append button should be disabled if 'overwriteNonEmptyFields' is false
             if (overwriteNonEmptyFields.get()) {
-                String newFieldValue = oldFieldValue.orElse("").concat(fieldValue.get());
+                String newFieldValue = oldFieldValue.orElse("").concat(toAppendFieldValue);
 
                 entry.setField(selectedField.get(), newFieldValue);
                 appendToFieldEdit.addEdit(new UndoableFieldChange(entry,
