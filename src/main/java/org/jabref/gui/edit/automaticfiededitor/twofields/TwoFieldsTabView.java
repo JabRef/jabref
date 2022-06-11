@@ -1,5 +1,6 @@
 package org.jabref.gui.edit.automaticfiededitor.twofields;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
@@ -41,7 +42,7 @@ public class TwoFieldsTabView extends AbstractAutomaticFieldEditorTabView implem
     private final NamedCompound dialogEdits;
 
     public TwoFieldsTabView(List<BibEntry> selectedEntries, BibDatabaseContext databaseContext, NamedCompound dialogEdits) {
-        this.selectedEntries = selectedEntries;
+        this.selectedEntries = new ArrayList<>(selectedEntries);
         this.databaseContext = databaseContext;
         this.dialogEdits = dialogEdits;
 
