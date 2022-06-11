@@ -6,7 +6,7 @@
     <title-short>FAO</title-short>
     <id>http://www.zotero.org/styles/food-and-agriculture-organization-of-the-united-nations</id>
     <link href="http://www.zotero.org/styles/food-and-agriculture-organization-of-the-united-nations" rel="self"/>
-    <link href="http://www.fao.org/3/a-ac339e.pdf" rel="documentation"/>
+    <link href="https://www.fao.org/3/cb8081en/cb8081en.pdf" rel="documentation"/>
     <author>
       <name>Bin Liu</name>
       <email>lieubean@gmail.com</email>
@@ -15,12 +15,23 @@
     <contributor>
       <name>Julian Plummer</name>
       <email>julian.plummer@gmail.com</email>
+      <uri>https://www.linkedin.com/in/julian-plummer/</uri>
+    </contributor>
+    <contributor>
+      <name>Amy Knauff</name>
+      <email/>
+      <uri>https://www.linkedin.com/in/amy-knauff-92655442/</uri>
+    </contributor>
+    <contributor>
+      <name>Stephanie Wright</name>
+      <email/>
+      <uri>https://www.linkedin.com/in/piriet/</uri>
     </contributor>
     <category citation-format="author-date"/>
     <category field="science"/>
     <category field="social_science"/>
-    <summary>This style is created to meet the citation and bibliographical requirements of FAOSTYLE, and has been tested with Zotero and Mendeley. Last update: March 2017.</summary>
-    <updated>2021-06-07T23:29:39+02:00</updated>
+    <summary>This style is created to meet the citation and bibliographical requirements of FAOSTYLE, and has been tested with Zotero and Mendeley. Last update: February 2022.</summary>
+    <updated>2022-02-02T16:03:38+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <!-- Locale settings for English. Settings for other languages could be added later to this section. -->
@@ -28,8 +39,8 @@
     <style-options punctuation-in-quote="false"/>
     <terms>
       <term name="no date">undated</term>
-      <term name="available at">also available at</term>
-      <term name="presented at">Paper presented at</term>
+      <term name="presented at">Presentation at</term>
+      <term name="by">Adopted</term>
     </terms>
     <date delimiter=" " form="text">
       <date-part name="day"/>
@@ -42,7 +53,7 @@
     <text term="anonymous" text-case="capitalize-first"/>
   </macro>
   <macro name="editor">
-    <!-- XX ed. / XX & XX eds. -->
+    <!-- Outputs "XX ed. / XX & XX eds." -->
     <names variable="editor">
       <name and="symbol" delimiter-precedes-last="never" initialize-with="."/>
       <label form="short" strip-periods="true" prefix=", "/>
@@ -80,7 +91,7 @@
     </names>
   </macro>
   <macro name="date">
-    <!-- date format: year / undated / put "forthcoming" or else in "Date" field when needed.-->
+    <!-- date format: year / undated / put "forthcoming" or else in "Date" field when needed. -->
     <choose>
       <if match="none" variable="issued">
         <text term="no date"/>
@@ -90,60 +101,90 @@
       </else>
     </choose>
   </macro>
+  <macro name="title-and-genre">
+    <!-- For book, song, audio recording, etc.: Outputs "Title (italic) [Medium/Genre]". -->
+    <group delimiter=" ">
+      <text variable="title" font-style="italic"/>
+      <text variable="medium" prefix="[" suffix="]"/>
+      <text variable="genre" prefix="[" suffix="]"/>
+    </group>
+  </macro>
+  <macro name="periodical">
+    <!-- For journal and magazine: Outputs "Journal/Magazine title (italic), Vol(Issue): Page." Suffix is added because this can appear at the end of a reference. -->
+    <group suffix=".">
+      <text variable="container-title" form="long" font-style="italic"/>
+      <text variable="volume" prefix=", "/>
+      <text variable="issue" prefix="(" suffix=")"/>
+      <text variable="page" prefix=": "/>
+    </group>
+  </macro>
+  <macro name="edition">
+    <!-- Outputs edition info like "Second edition". -->
+    <number text-case="capitalize-first" variable="edition" form="long-ordinal"/>
+    <text term="edition" prefix=" "/>
+  </macro>
+  <macro name="vol">
+    <!-- Vol. xx -->
+    <group delimiter=" ">
+      <text term="volume" form="short" text-case="capitalize-first"/>
+      <text variable="volume"/>
+    </group>
+  </macro>
+  <macro name="in-and-container">
+    <!-- Outputs "In: XX ed. Container-title (italic)" if container-title exists. "XX ed. " will be omited if there's no editor. -->
+    <choose>
+      <if variable="container-title">
+        <group delimiter=" ">
+          <text term="in" text-case="capitalize-first" suffix=":"/>
+          <text macro="editor" suffix="."/>
+          <text variable="container-title" font-style="italic"/>
+        </group>
+      </if>
+    </choose>
+  </macro>
+  <macro name="series-and-number">
+    <!-- Outputs "Series-Title No. xxx" for various types.-->
+    <group delimiter=" ">
+      <text variable="collection-title"/>
+      <text variable="collection-number"/>
+      <!-- "Series Number" field for book section in Zotero. -->
+      <text variable="number"/>
+      <!-- "Report Number" field for report in Zotero. -->
+      <!-- "No. " must be entered in "Series Number" and "Report Number" in Zotero. -->
+      <!-- Mendeley doesn't offer a "Series Number / Report Number" field. "No. xxx" must be put in "Series" field. -->
+    </group>
+  </macro>
   <macro name="publisher-and-place">
-    <!-- place, publisher -->
-    <group delimiter=", ">
+    <!-- Outputs "place, publisher." Suffix is added because this can appear at the end of a reference. -->
+    <group delimiter=", " suffix=".">
       <text variable="publisher-place"/>
       <text variable="publisher"/>
     </group>
   </macro>
-  <macro name="edition">
-    <!-- Second edition -->
-    <number text-case="capitalize-first" variable="edition" form="long-ordinal"/>
-    <text term="edition" prefix=" "/>
-  </macro>
   <macro name="Cite-and-URL">
-    <!-- [Cited day month year]. URL -->
-    <group delimiter=" " prefix="[" suffix="]. ">
+    <!-- Output "Cited day month year. URL" -->
+    <group delimiter=" " suffix=". ">
       <text term="cited" text-case="capitalize-first"/>
       <date form="text" variable="accessed"/>
     </group>
     <text variable="URL"/>
   </macro>
-  <macro name="Available-at">
-    <!-- (also available at URL). -->
-    <group delimiter=" " prefix="(" suffix=").">
-      <text term="available at"/>
-      <text variable="URL"/>
-    </group>
-  </macro>
-  <macro name="DOI-or-available-at">
-    <!-- If DOI exists, then DOI is shown as: https://doi.org/DOI. If DOI doesn't exist, then "also available at URL" is shown. -->
+  <macro name="DOI-or-URL">
+    <!-- If DOI exists, outputs "https://doi.org/DOI". If DOI doesn't exist, then outputs URL. -->
     <choose>
       <if variable="DOI">
         <text variable="DOI" prefix="https://doi.org/"/>
       </if>
       <else>
-        <group delimiter=" " prefix="(" suffix=").">
-          <text term="available at"/>
-          <text variable="URL"/>
-        </group>
+        <text variable="URL"/>
       </else>
     </choose>
-  </macro>
-  <macro name="number_of_pages-label">
-    <!-- 1 p. / x pp. -->
-    <group delimiter=" ">
-      <text variable="number-of-pages"/>
-      <label variable="number-of-pages" form="short"/>
-    </group>
   </macro>
   <!-- in-line citation: (author, date) -->
   <citation disambiguate-add-year-suffix="true" collapse="year" et-al-min="4" et-al-use-first="1">
     <sort>
       <key variable="author"/>
       <key variable="issued"/>
-      <key variable="accessed"/>
     </sort>
     <layout prefix="(" suffix=")" delimiter="; ">
       <text macro="author-short" suffix=", "/>
@@ -151,220 +192,195 @@
     </layout>
   </citation>
   <!-- bibliography -->
-  <bibliography entry-spacing="0" et-al-min="8" et-al-use-first="7">
+  <bibliography entry-spacing="0" hanging-indent="true" line-spacing="1" et-al-min="10" et-al-use-first="7">
     <sort>
       <key macro="author"/>
       <key variable="issued"/>
-      <key variable="accessed"/>
     </sort>
     <layout>
       <choose>
-        <if match="none" type="legal_case">
-          <!-- Every item type except legal case uses "Anonymous" as author if there's no author. So legal case is singled out here. -->
+        <if type="legal_case bill legislation" match="none">
+          <!-- Every item type except legal ones (case, bill and statute) uses "Anonymous" as author if there's no author. -->
           <group delimiter=". ">
             <text macro="author" font-weight="bold"/>
             <text macro="date"/>
             <choose>
               <if type="book">
-                <!-- book and computer program in Zotero; book in Mendeley.  -->
-                <group>
-                  <text variable="title" font-style="italic"/>
-                  <text variable="medium" prefix=" [" suffix="]"/>
-                  <!-- For computer program in Zotero. Can put "CD&#8211;ROM / DVD&#8211;ROM" in "System" field. -->
-                  <text variable="genre" prefix=" [" suffix="]"/>
-                  <!-- For eBook in Mendeley, put "Kindle edition" in "Genre" field. For eBook in Zotero, put "genre:Kindle edition" in "Extra" field. -->
-                  <text macro="edition" prefix=". "/>
-                </group>
+                <!-- book and computer program in Zotero; book in Mendeley. -->
+                <text macro="title-and-genre"/>
+                <!-- For Computer Program in Zotero, put "CD-ROM"/ "DVD-ROM" etc. in "System" field. -->
+                <!-- For eBook in Mendeley, put "CD-ROM", "Kindle edition" etc. in "Genre" field. -->
+                <!-- For eBook in Zotero, put "Medium: CD-ROM", "Genre: Kindle edition" etc. in "Extra" field. -->
+                <text macro="edition"/>
                 <text macro="editor"/>
-                <group>
-                  <text variable="collection-title"/>
-                  <text variable="collection-number" prefix=" "/>
-                  <!-- Mendeley doesn't offer a "Series Number / Report Number" field. "No. xxx" must be put in "Series" field. -->
-                </group>
-                <text macro="publisher-and-place" suffix="."/>
-                <text macro="number_of_pages-label"/>
-                <text macro="DOI-or-available-at"/>
+                <text macro="vol"/>
+                <text macro="series-and-number"/>
+                <text macro="publisher-and-place"/>
+                <text macro="DOI-or-URL"/>
               </if>
-              <else-if type="chapter report" match="any">
-                <!-- book section and report -->
+              <else-if type="chapter">
+                <!-- book section -->
                 <text variable="title"/>
+                <text macro="in-and-container"/>
                 <group delimiter=" ">
-                  <text term="in" text-case="capitalize-first" font-style="italic"/>
-                  <text macro="editor"/>
+                  <text macro="edition" suffix=","/>
+                  <label variable="page" form="short"/>
+                  <text variable="page"/>
                 </group>
-                <group>
-                  <text variable="container-title" font-style="italic"/>
-                  <text macro="edition" prefix=". "/>
-                  <label variable="page" prefix=", " form="short"/>
-                  <!-- pp. xx&#8211;xx -->
-                  <text variable="page" prefix=" "/>
-                </group>
-                <group>
-                  <text variable="collection-title"/>
-                  <text variable="collection-number" prefix=" "/>
-                  <!-- "Series Number" field for book section in Zotero. -->
-                  <text variable="number" prefix=" "/>
-                  <!-- "Report Number" field for report in Zotero. -->
-                  <!-- Mendeley doesn't offer a "Series Number / Report Number" field. "No. xxx" must be put in "Series" field. -->
-                </group>
-                <group suffix=".">
-                  <text macro="publisher-and-place"/>
-                  <text macro="number_of_pages-label"/>
-                </group>
-                <text macro="DOI-or-available-at"/>
+                <text macro="vol"/>
+                <text macro="series-and-number"/>
+                <text macro="publisher-and-place"/>
+                <text macro="DOI-or-URL"/>
               </else-if>
               <else-if type="article-journal">
-                <!-- paper journal article -->
+                <!-- journal article -->
                 <text variable="title"/>
-                <group suffix=".">
-                  <text variable="container-title" form="long" font-style="italic"/>
-                  <text variable="volume" prefix=", "/>
-                  <text variable="issue" prefix="(" suffix=")"/>
-                  <text variable="page" prefix=": "/>
-                </group>
-                <text macro="DOI-or-available-at"/>
+                <text macro="periodical"/>
+                <text macro="DOI-or-URL"/>
               </else-if>
               <else-if type="article-magazine">
-                <!-- magazine and online-only journal article -->
+                <!-- magazine article -->
                 <text variable="title"/>
-                <group suffix=".">
-                  <text variable="container-title" form="long" font-style="italic"/>
-                  <text variable="volume" prefix=", "/>
-                  <text variable="issue" prefix="(" suffix=")"/>
-                  <text variable="page" prefix=": "/>
-                  <choose>
-                    <if variable="URL">
-                      <!-- If URL exists, use "[online]" and Cite-and-URL macro.  -->
-                      <text term="online" prefix=" [" suffix="]"/>
-                    </if>
-                  </choose>
-                </group>
+                <text macro="periodical"/>
                 <text macro="Cite-and-URL"/>
               </else-if>
               <else-if type="article-newspaper">
                 <!-- newspaper article -->
                 <text variable="title"/>
-                <group>
+                <group delimiter=", " suffix=".">
                   <text variable="container-title" font-style="italic"/>
-                  <date form="text" variable="issued" prefix=", "/>
+                  <date form="text" variable="issued"/>
                 </group>
-                <text macro="Available-at"/>
+                <text macro="Cite-and-URL"/>
               </else-if>
               <else-if type="webpage post-weblog" match="any">
-                <!-- web page, online monographs, and blog post -->
-                <choose>
-                  <if variable="container-title">
-                    <group>
-                      <text variable="title"/>
-                      <text term="in" text-case="capitalize-first" prefix=". "/>
-                      <text variable="container-title" font-style="italic" prefix=": "/>
-                      <text term="online" prefix=" [" suffix="]"/>
-                    </group>
-                  </if>
-                  <else>
-                    <group>
-                      <text variable="title" font-style="italic"/>
-                      <text term="online" prefix=" [" suffix="]"/>
-                    </group>
-                  </else>
-                </choose>
-                <text variable="note"/>
-                <!-- Put place and other information in "Extra" field in Zotero and in Notes in Mendeley. -->
+                <!-- web page and blog post -->
+                <text variable="title"/>
+                <text macro="in-and-container"/>
+                <text variable="publisher-place"/>
+                <!-- Put place in "Extra" field in Zotero, e.g. "Place: Rome". -->
                 <text macro="Cite-and-URL"/>
               </else-if>
               <else-if type="thesis">
                 <!-- thesis -->
                 <text variable="title" font-style="italic"/>
                 <text macro="publisher-and-place"/>
-                <text variable="genre" prefix=" (" suffix=")"/>
-                <text macro="DOI-or-available-at"/>
+                <text variable="genre" suffix="."/>
+                <!-- Suffix is added because this can appear at the end of a reference, i.e. when the thesis doesn't have DOI/URL. -->
+                <text macro="DOI-or-URL"/>
               </else-if>
-              <else-if type="song motion_picture article" match="any">
-                <!-- audio recording, film, and video recording in Zotero; film and computer program in Mendeley -->
-                <choose>
-                  <if match="any" variable="medium genre">
-                    <group>
-                      <text variable="title" font-style="italic"/>
-                      <text variable="medium" prefix=" [" suffix="]"/>
-                      <!-- Can put "audio / video" in "Format" field in Zotero. -->
-                      <text variable="genre" prefix=" [" suffix="]"/>
-                      <!-- Can put "audio / video / CD&#8211;ROM" in "Genre" field in Mendeley. -->
-                    </group>
-                  </if>
-                  <else>
-                    <text variable="title"/>
-                  </else>
-                </choose>
-                <text macro="publisher-and-place" suffix="."/>
+              <else-if type="song motion_picture" match="any">
+                <!-- audio recording, film and video recording in Zotero; film and computer program in Mendeley -->
+                <text macro="title-and-genre"/>
+                <!-- Can put "audio recording", "video" etc. in "Format" field in Zotero. -->
+                <!-- Can put "audio recording", "video" etc. in "Genre" field in Mendeley. -->
+                <text macro="publisher-and-place"/>
                 <text macro="Cite-and-URL"/>
               </else-if>
-              <else-if type="manuscript">
-                <!-- manuscript -->
-                <text variable="title"/>
-                <text variable="genre" suffix="."/>
-                <text variable="publisher-place" suffix="."/>
-                <text macro="number_of_pages-label"/>
-                <text macro="Available-at"/>
+              <else-if type="manuscript report" match="any">
+                <!-- manuscript and report -->
+                <text variable="title" font-style="italic"/>
+                <text variable="genre"/>
+                <text macro="series-and-number"/>
+                <text macro="publisher-and-place"/>
+                <text macro="DOI-or-URL"/>
               </else-if>
-              <else-if type="speech" match="any">
+              <else-if type="article">
+                <!-- document, can be used for e.g. monograph -->
+                <text variable="title" font-style="italic"/>
+                <text variable="genre"/>
+                <text macro="series-and-number"/>
+                <text macro="publisher-and-place"/>
+                <text macro="Cite-and-URL"/>
+              </else-if>
+              <else-if type="speech">
                 <!-- presentation -->
                 <text variable="title"/>
-                <group suffix=".">
+                <group delimiter=" ">
                   <text term="presented at"/>
-                  <text variable="event" prefix=" "/>
-                  <date form="text" variable="issued" prefix=", "/>
-                  <text variable="publisher-place" prefix=", "/>
+                  <text variable="event" suffix=","/>
+                  <date form="text" variable="issued" suffix=","/>
+                  <text macro="publisher-and-place"/>
                 </group>
                 <text macro="Cite-and-URL"/>
               </else-if>
               <else-if type="paper-conference">
                 <!-- conference paper -->
-                <text variable="title"/>
-                <group>
-                  <text term="in" text-case="capitalize-first" font-style="italic"/>
-                  <text macro="editor" prefix=" "/>
-                </group>
-                <text variable="container-title" font-style="italic"/>
-                <group suffix=".">
-                  <label suffix=" " variable="page" form="short"/>
-                  <text variable="page"/>
-                </group>
+                <text variable="title" font-style="italic"/>
+                <text macro="in-and-container"/>
                 <text variable="collection-title"/>
-                <group suffix=".">
-                  <text term="presented at"/>
-                  <text variable="event" prefix=" "/>
-                  <date form="text" variable="issued" prefix=", "/>
-                  <text variable="publisher-place" prefix=", "/>
+                <group delimiter=", " suffix=".">
+                  <text variable="event"/>
+                  <text variable="publisher-place"/>
+                  <text variable="publisher"/>
+                  <!-- Not using macro "publisher-and-place" here because event date needs to be appended and the suffix "." of the macro would appear. -->
+                  <date form="text" variable="issued"/>
                 </group>
-                <text macro="DOI-or-available-at"/>
+                <text macro="DOI-or-URL"/>
               </else-if>
               <else>
                 <!-- other item types -->
-                <text variable="title" suffix="."/>
-                <text macro="publisher-and-place" suffix="."/>
+                <text variable="title"/>
+                <text variable="genre"/>
+                <text macro="publisher-and-place"/>
                 <text macro="Cite-and-URL"/>
               </else>
             </choose>
           </group>
         </if>
-        <else>
+        <else-if type="legal_case">
           <!-- case -->
           <group delimiter=" ">
-            <group>
-              <text variable="title"/>
-              <text variable="volume" prefix=", "/>
-            </group>
-            <text variable="container-title"/>
-            <text variable="page"/>
-            <group delimiter=" " prefix="(" suffix=")">
-              <text variable="authority"/>
-              <!-- "Court" field in Zotero -->
-              <text variable="publisher"/>
-              <!-- "Publisher" field in Mendeley -->
-              <text macro="date"/>
+            <text variable="title" font-style="italic" suffix="."/>
+            <text variable="authority" suffix=","/>
+            <!-- "Court" field in Zotero -->
+            <text variable="number" suffix="."/>
+            <!-- "Docket Number" field in Zotero -->
+            <date form="text" variable="issued" suffix="."/>
+            <text variable="note" suffix="."/>
+            <!-- "Extra" field in Zotero. Can be used to put any additional information. -->
+          </group>
+        </else-if>
+        <else-if type="bill">
+          <!-- legal instruments -->
+          <choose>
+            <if variable="title-short">
+              <text variable="title" form="short" font-style="italic" suffix=" "/>
+              <text variable="title" font-style="italic" prefix="(" suffix="). "/>
+            </if>
+            <else>
+              <text variable="title" font-style="italic" suffix=". "/>
+            </else>
+          </choose>
+          <group delimiter=" ">
+            <text term="by" suffix=":"/>
+            <text variable="publisher-place" suffix=","/>
+            <!-- Put "Place: xxxxx" in "Extra" field in Zotero -->
+            <date form="text" variable="issued" suffix="."/>
+            <group delimiter=", " suffix=".">
+              <text variable="number"/>
+              <!-- "Bill Number" field in Zotero -->
+              <group delimiter=" ">
+                <text variable="volume"/>
+                <!-- "Code Volume" field in Zotero -->
+                <text variable="container-title"/>
+                <!-- "Code" field in Zotero -->
+                <text variable="page"/>
+                <!-- "Code Pages" field in Zotero -->
+              </group>
             </group>
           </group>
-        </else>
+        </else-if>
+        <else-if type="legislation">
+          <!-- Type "statute" in Zotero, used for legislation -->
+          <group delimiter=" ">
+            <text macro="author" font-weight="bold" suffix="."/>
+            <text variable="title" font-style="italic" suffix=","/>
+            <text variable="number" suffix=","/>
+            <!-- "Public Law Number" field in Zotero -->
+            <text macro="date" suffix="."/>
+          </group>
+        </else-if>
       </choose>
     </layout>
   </bibliography>

@@ -195,7 +195,7 @@ public class EntryEditor extends BorderPane {
                         event.consume();
                         break;
                     case HELP:
-                        HelpAction.openHelpPage(HelpFile.ENTRY_EDITOR);
+                        new HelpAction(HelpFile.ENTRY_EDITOR, dialogService).execute();
                         event.consume();
                         break;
                     case CLOSE:

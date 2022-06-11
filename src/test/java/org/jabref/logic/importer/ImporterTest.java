@@ -7,6 +7,7 @@ import java.util.stream.Stream;
 import org.jabref.logic.importer.fileformat.BibTeXMLImporter;
 import org.jabref.logic.importer.fileformat.BiblioscapeImporter;
 import org.jabref.logic.importer.fileformat.BibtexImporter;
+import org.jabref.logic.importer.fileformat.CitaviXmlImporter;
 import org.jabref.logic.importer.fileformat.CopacImporter;
 import org.jabref.logic.importer.fileformat.EndnoteImporter;
 import org.jabref.logic.importer.fileformat.InspecImporter;
@@ -124,7 +125,8 @@ public class ImporterTest {
                 new PdfXmpImporter(xmpPreferences),
                 new RepecNepImporter(importFormatPreferences),
                 new RisImporter(),
-                new SilverPlatterImporter()
+                new SilverPlatterImporter(),
+                new CitaviXmlImporter()
         );
         // @formatter:on
     }
