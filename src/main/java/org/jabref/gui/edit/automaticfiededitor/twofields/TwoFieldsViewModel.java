@@ -13,9 +13,11 @@ import javafx.collections.ObservableList;
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.edit.automaticfiededitor.MoveFieldValueAction;
 import org.jabref.gui.undo.NamedCompound;
+import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.strings.StringUtil;
 
 public class TwoFieldsViewModel extends AbstractViewModel {
     private final ObjectProperty<Field> fromField = new SimpleObjectProperty<>();
@@ -67,6 +69,26 @@ public class TwoFieldsViewModel extends AbstractViewModel {
     }
 
     public void copyValue() {
+        NamedCompound copyFieldValueEdit = new NamedCompound("COPY_FIELD_VALUE");
+
+        for (BibEntry entry : selectedEntries) {
+            String fromFieldValue = entry.getField(fromField.get()).orElse("");
+            String toFieldValue = entry.getField(toField.get()).orElse("");
+
+            if (overwriteNonEmptyFields.get() || StringUtil.isBlank(toFieldValue)) {
+                entry.setField(toField.get(), fromFieldValue);
+
+                copyFieldValueEdit.addEdit(new UndoableFieldChange(entry,
+                        toField.get(),
+                        toFieldValue,
+                        fromFieldValue));
+            }
+        }
+
+        if (copyFieldValueEdit.hasEdits()) {
+            copyFieldValueEdit.end();
+            dialogEdits.addEdit(copyFieldValueEdit);
+        }
     }
 
     public void moveValue() {
