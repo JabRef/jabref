@@ -20,8 +20,6 @@ ASSIGN : ':=';
 ADD : '+';
 SUB : '-';
 CONCAT : '*';
-IF : 'if$';
-WHILE : 'while$';
 LBRACE : '{';
 RBRACE : '}';
 

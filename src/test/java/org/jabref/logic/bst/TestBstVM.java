@@ -42,12 +42,11 @@ public class TestBstVM {
     @Test
     public void testSimple() throws RecognitionException, IOException {
 
-        TestVM vm = new TestVM("ENTRY  { " + "  address " + "  author " + "  title " + "  type "
-                + "}  {}  { label }" + "INTEGERS { output.state before.all"
-                + " mid.sentence after.sentence after.block }"
-                + "FUNCTION {init.state.consts}{ #0 'before.all := "
-                + " #1 'mid.sentence :=  #2 'after.sentence :=  #3 'after.block := } "
-                + "STRINGS { s t } " + "READ");
+        TestVM vm = new TestVM("ENTRY  { address author title type } {} { label } "
+                + "INTEGERS { output.state before.all mid.sentence after.sentence after.block } "
+                + "FUNCTION {init.state.consts}{ #0 'before.all := #1 'mid.sentence :=  #2 'after.sentence :=  #3 'after.block := } "
+                + "STRINGS { s t } "
+                + "READ");
 
         List<BibEntry> v = List.of(t1BibtexEntry());
 
@@ -271,8 +270,7 @@ public class TestBstVM {
 
     @Test
     public void testChangeCase() throws RecognitionException {
-        TestVM vm = new TestVM(
-                "STRINGS { title } "
+        TestVM vm = new TestVM("STRINGS { title } "
                         + "READ "
                         + "FUNCTION {format.title}"
                         + " { duplicate$ empty$ "
