@@ -28,6 +28,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - Writing BibTeX data into a PDF (XMP) considers the configured keyword separator (and does not use "," as default any more)
 - The Medline/Pubmed search now also supports the [default fields and operators for searching](https://docs.jabref.org/collect/import-using-online-bibliographic-database#search-syntax). [forum#3554](https://discourse.jabref.org/t/native-pubmed-search/3354)
 - We improved group expansion arrow that prevent it from activating group when expanding or collapsing. [#7982](https://github.com/JabRef/jabref/issues/7982), [#3176](https://github.com/JabRef/jabref/issues/3176)
+- We improved the appearances and logic of the "Manage field names & content" dialog, and renamed it to "Automatic field editor". [#6536](https://github.com/JabRef/jabref/issues/6536)
 
 ### Fixed
 
