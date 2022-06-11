@@ -70,7 +70,6 @@ public class EditFieldValueViewModel extends AbstractViewModel {
         for (BibEntry entry : selectedEntries) {
             Optional<String> oldFieldValue = entry.getField(selectedField.get());
             if (oldFieldValue.isEmpty() || overwriteNonEmptyFields.get()) {
-                System.out.printf("Setting field %s for entry %s%n", selectedField.get().getName(), entry.getId());
                 entry.setField(selectedField.get(), toSetFieldValue);
 
                 setFieldEdit.addEdit(new UndoableFieldChange(entry,
