@@ -1,5 +1,6 @@
 package org.jabref.gui.edit.automaticfiededitor.twofields;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javafx.beans.property.BooleanProperty;
@@ -10,6 +11,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 import org.jabref.gui.AbstractViewModel;
+import org.jabref.gui.edit.automaticfiededitor.MoveFieldValueAction;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -29,7 +31,7 @@ public class TwoFieldsViewModel extends AbstractViewModel {
     private final NamedCompound dialogEdits;
 
     public TwoFieldsViewModel(List<BibEntry> selectedEntries, BibDatabaseContext databaseContext, NamedCompound dialogEdits) {
-        this.selectedEntries = selectedEntries;
+        this.selectedEntries = new ArrayList<>(selectedEntries);
         this.databaseContext = databaseContext;
         this.dialogEdits = dialogEdits;
 
@@ -68,6 +70,17 @@ public class TwoFieldsViewModel extends AbstractViewModel {
     }
 
     public void moveValue() {
+        NamedCompound moveEdit = new NamedCompound("MOVE_EDIT");
+
+        new MoveFieldValueAction(fromField.get(),
+                toField.get(),
+                selectedEntries,
+                moveEdit).execute();
+
+        if (moveEdit.hasEdits()) {
+            moveEdit.end();
+            dialogEdits.addEdit(moveEdit);
+        }
     }
 
     public void swapValues() {
