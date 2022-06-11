@@ -13,7 +13,7 @@
 
 <fx:root prefHeight="400.0" prefWidth="600.0" type="AnchorPane" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jabref.gui.edit.automaticfiededitor.twofields.TwoFieldsTabView">
     <children>
-          <GridPane hgap="8.0" layoutX="16.0" layoutY="246.0" minHeight="160.0" prefHeight="230.0" prefWidth="568.0" vgap="8.0" AnchorPane.leftAnchor="16.0" AnchorPane.rightAnchor="16.0" AnchorPane.topAnchor="10.0">
+          <GridPane hgap="8.0" layoutX="16.0" layoutY="246.0" minHeight="160.0" prefHeight="230.0" prefWidth="568.0" vgap="8.0" AnchorPane.leftAnchor="16.0" AnchorPane.rightAnchor="16.0" AnchorPane.topAnchor="8.0">
               <columnConstraints>
                   <ColumnConstraints hgrow="SOMETIMES" maxWidth="379.20001220703125" minWidth="40.0" prefWidth="65.00001220703125" />
                   <ColumnConstraints hgrow="SOMETIMES" maxWidth="726.3999938964844" minWidth="10.0" prefWidth="324.1999877929687" />

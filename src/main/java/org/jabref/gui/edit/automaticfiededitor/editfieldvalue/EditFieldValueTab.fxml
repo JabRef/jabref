@@ -47,7 +47,7 @@
             <HBox spacing="8.0" GridPane.columnSpan="3" GridPane.hgrow="ALWAYS" GridPane.rowIndex="2" GridPane.vgrow="NEVER">
                <children>
                   <ComboBox fx:id="fieldComboBox" maxHeight="1.7976931348623157E308" minHeight="36.0" prefHeight="36.0" prefWidth="184.0" promptText="Author" HBox.hgrow="ALWAYS" />
-                  <TextField fx:id="fieldValueTextField" minHeight="32.0" minWidth="-Infinity" prefHeight="36.0" prefWidth="184.0" promptText="%field value" HBox.hgrow="ALWAYS" />
+                  <TextField fx:id="fieldValueTextField" minHeight="32.0" minWidth="-Infinity" prefHeight="36.0" prefWidth="184.0" promptText="%Field value" HBox.hgrow="ALWAYS" />
                </children>
             </HBox>
             <HBox alignment="BOTTOM_LEFT" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" GridPane.hgrow="ALWAYS" GridPane.rowSpan="2" GridPane.vgrow="ALWAYS">
