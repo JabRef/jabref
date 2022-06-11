@@ -93,18 +93,49 @@ public class TwoFieldsViewModel extends AbstractViewModel {
 
     public void moveValue() {
         NamedCompound moveEdit = new NamedCompound("MOVE_EDIT");
+        if (overwriteNonEmptyFields.get()) {
+            new MoveFieldValueAction(fromField.get(),
+                    toField.get(),
+                    selectedEntries,
+                    moveEdit).execute();
 
-        new MoveFieldValueAction(fromField.get(),
-                toField.get(),
-                selectedEntries,
-                moveEdit).execute();
-
-        if (moveEdit.hasEdits()) {
-            moveEdit.end();
-            dialogEdits.addEdit(moveEdit);
+            if (moveEdit.hasEdits()) {
+                moveEdit.end();
+                dialogEdits.addEdit(moveEdit);
+            }
         }
     }
 
     public void swapValues() {
+        NamedCompound swapFieldValuesEdit = new NamedCompound("SWAP_FIELD_VALUES");
+
+        for (BibEntry entry : selectedEntries) {
+            String fromFieldValue = entry.getField(fromField.get()).orElse("");
+            String toFieldValue = entry.getField(toField.get()).orElse("");
+
+            if (overwriteNonEmptyFields.get() && StringUtil.isNotBlank(fromFieldValue) && StringUtil.isNotBlank(toFieldValue)) {
+                entry.setField(toField.get(), fromFieldValue);
+                entry.setField(fromField.get(), toFieldValue);
+
+                swapFieldValuesEdit.addEdit(new UndoableFieldChange(
+                        entry,
+                        toField.get(),
+                        toFieldValue,
+                        fromFieldValue
+                ));
+
+                swapFieldValuesEdit.addEdit(new UndoableFieldChange(
+                        entry,
+                        fromField.get(),
+                        fromFieldValue,
+                        toFieldValue
+                ));
+            }
+        }
+
+        if (swapFieldValuesEdit.hasEdits()) {
+            swapFieldValuesEdit.end();
+            dialogEdits.addEdit(swapFieldValuesEdit);
+        }
     }
 }
