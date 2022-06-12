@@ -1,5 +1,5 @@
 ---
-parent: Architectural Decisions
+parent: Decision Records
 nav_order: 9
 ---
 # Use Plain JUnit5 for advanced test assertions

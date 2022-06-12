@@ -1,5 +1,5 @@
 ---
-parent: Architectural Decisions
+parent: Decision Records
 nav_order: 12
 ---
 # Handle different bibentry formats of fetchers by adding a layer

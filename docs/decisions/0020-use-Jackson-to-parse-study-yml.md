@@ -1,5 +1,5 @@
 ---
-parent: Architectural Decisions
+parent: Decision Records
 nav_order: 20
 ---
 # Use Jackson to parse study.yml
@@ -7,7 +7,7 @@ nav_order: 20
 ## Context and Problem Statement
 
 The study definition file is formulated as a YAML document.
-To accessed the definition within JabRef this document has to be parsed.
+To access the definition within JabRef this document has to be parsed.
 What parser should be used to parse YAML files?
 
 ## Considered Options
@@ -20,7 +20,7 @@ What parser should be used to parse YAML files?
 
 ## Decision Outcome
 
-Chosen option: Jackson, because as it is a dedicated library for parsing YAML. yamlbeans also seem to be viable. They all offer similar functionality
+Chosen option: Jackson, because as it is a dedicated library for parsing YAML. `yamlbeans` also seem to be viable. They all offer similar functionality.
 
 ## Pros and Cons of the Options
 
