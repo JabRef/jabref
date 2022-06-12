@@ -1,5 +1,5 @@
 ---
-parent: Architectural Decisions
+parent: Decision Records
 nav_order: 7
 ---
 # Provide a human-readable changelog

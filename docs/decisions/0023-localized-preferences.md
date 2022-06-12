@@ -1,5 +1,5 @@
 ---
-parent: Architectural Decisions
+parent: Decision Records
 nav_order: 23
 ---
 # Localized Preferences
@@ -9,7 +9,7 @@ nav_order: 23
 
 ## Context and Problem Statement
 
-Currently, JabRef uses some localized preferences. We want to remove the Localization-dependency from the JabRefPreferences and move the Localization to where the String is used.
+Currently, JabRef uses some localized preferences. We want to remove the Localization-dependency from the `JabRefPreferences` and move the Localization to where the String is used.
 The problem is how to store the default values.
 
 ## Considered Options

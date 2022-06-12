@@ -1,5 +1,5 @@
 ---
-parent: Architectural Decisions
+parent: Decision Records
 nav_order: 5
 ---
 # Fully Support UTF-8 Only For LaTeX Files

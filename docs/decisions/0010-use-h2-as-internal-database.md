@@ -1,5 +1,5 @@
 ---
-parent: Architectural Decisions
+parent: Decision Records
 nav_order: 10
 ---
 # Use H2 as Internal SQL Database

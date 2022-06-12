@@ -1,5 +1,5 @@
 ---
-parent: Architectural Decisions
+parent: Decision Records
 nav_order: 14
 ---
 # Separate URL creation to enable proper logging

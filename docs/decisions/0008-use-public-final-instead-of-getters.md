@@ -1,5 +1,5 @@
 ---
-parent: Architectural Decisions
+parent: Decision Records
 nav_order: 8
 ---
 # Use `public final` instead of getters to offer access to immutable variables

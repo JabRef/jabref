@@ -1,5 +1,5 @@
 ---
-parent: Architectural Decisions
+parent: Decision Records
 nav_order: 18
 ---
 # Use regular expression to split multiple-sentence titles

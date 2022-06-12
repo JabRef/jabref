@@ -1,5 +1,5 @@
 ---
-parent: Architectural Decisions
+parent: Decision Records
 nav_order: 2
 ---
 # Use slf4j together with log4j2 for logging

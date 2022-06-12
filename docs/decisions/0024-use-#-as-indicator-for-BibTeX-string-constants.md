@@ -1,5 +1,5 @@
 ---
-parent: Architectural Decisions
+parent: Decision Records
 nav_order: 24
 ---
 # Use `#` as indicator for BibTeX string constants
@@ -25,7 +25,7 @@ Affected code is (at least) `org.jabref.logic.importer.fileformat.BibtexParser#p
 
 ## Decision Outcome
 
-Chosen option: "Wrap string constants in #", because already existing behavior
+Chosen option: "Wrap string constants in #", because already existing behavior.
 
 ## Pros and Cons of the Options
 
@@ -66,10 +66,10 @@ field2 = {value}   -> value
 field1 = value # value --> §value§ # §value§
 ```
 
-* Good, because Easy to implement
-* Good, because No conflict with BibTeX's `#` sign
-* Bad, because Documentation needs to be updated
-* Bad, because `§` is not available on an US keyboard
+* Good, because easy to implement
+* Good, because no conflict with BibTeX's `#` sign
+* Bad, because documentation needs to be updated
+* Bad, because `§` is not available on a US keyboard
 
 ### Replace the internal `#` in JabRef by the non-used character `%`
 
@@ -86,7 +86,7 @@ field2 = {value}   -> value
 field1 = value # value --> %value% # %value%
 ```
 
-* Good, because A user does not write LaTeX comments inside a string
+* Good, because a user does not write LaTeX comments inside a string
 * Bad, because `%` could be used in Markdown, too
 * Bad, because `%` is used for comments in LaTeX and thus migtht cause confusion
 * Bad, because `%` could appear in URLs: There is [url percent encoding](https://www.w3schools.com/tags/ref_urlencode.asp)
@@ -124,7 +124,7 @@ field2 = {value}   -> value
 field1 = value # value --> &value # &value
 ```
 
-* Good, because Near to C syntax
+* Good, because near to C syntax
 * Bad, because `&` is a LaTeX command for tables
 * Bad, because `&` could appear in URLs
 
@@ -132,6 +132,6 @@ field1 = value # value --> &value # &value
 
 `org.jabref.model.entry.BibEntry#setField(org.jabref.model.entry.field.Field, java.lang.String)` changes to `org.jabref.model.entry.BibEntry#setField(org.jabref.model.entry.field.Field, org.jabref.model.entry.field.Value)` (org.jabref.model.entry.BibEntry#setField(org.jabref.model.entry.field.Field, java.lang.String)). This would bring JabRef's internal data model even more close to BibTeX
 
-* Good, because More object-orientated design of BibTeX field storage
-* Good, because Easies implementation of an advanced field editor
-* Bad, because High effort to implement
+* Good, because more object-orientated design of BibTeX field storage
+* Good, because eases implementation of an advanced field editor
+* Bad, because high effort to implement
