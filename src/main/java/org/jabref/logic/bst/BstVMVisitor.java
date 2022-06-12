@@ -245,11 +245,11 @@ class BstVMVisitor extends BstBaseVisitor<Integer> {
         }
 
         @Override
-        public void execute(BstVMVisitor visitor, ParserRuleContext parserRuleContext) {
+        public void execute(BstVMVisitor visitor, ParserRuleContext bstFunctionContext) {
             if (expression instanceof String str) {
                 bstVMContext.stack().push(str.substring(1, str.length() - 1)); // Macro
-            } else {
-                visitor.visit(parserRuleContext);
+            } else if (expression instanceof ParserRuleContext ctx) {
+                visitor.visit(ctx);
             }
         }
     }

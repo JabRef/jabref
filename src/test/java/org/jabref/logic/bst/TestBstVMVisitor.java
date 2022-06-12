@@ -59,13 +59,29 @@ class TestBstVMVisitor {
 
     @Test
     void testVisitFunctionCommand() {
-        TestBstVM.TestVM vm = new TestBstVM.TestVM("FUNCTION {init.state.consts} { #0 'before.all := } ");
+        TestBstVM.TestVM vm = new TestBstVM.TestVM("FUNCTION {test.func} { #1 'test.var := } EXECUTE { test.func }");
         vm.render(Collections.emptyList());
 
         Map<String, BstFunctions.BstFunction> functions = vm.latestContext.functions();
 
-        assertTrue(functions.containsKey("init.state.consts"));
-        assertNotNull(functions.get("init.state.consts"));
+        assertTrue(functions.containsKey("test.func"));
+        assertNotNull(functions.get("test.func"));
+    }
+
+    // ToDo: Belongs in testBstFunction
+    @Test
+    void testAssignFunction() {
+        TestBstVM.TestVM vm = new TestBstVM.TestVM("INTEGERS { test.var }" +
+                "FUNCTION {test.func} { #1 'test.var := }" +
+                "EXECUTE { test.func }");
+        vm.render(Collections.emptyList());
+
+        Map<String, BstFunctions.BstFunction> functions = vm.latestContext.functions();
+
+        assertTrue(functions.containsKey("test.func"));
+        assertNotNull(functions.get("test.func"));
+
+        assertEquals(1, vm.latestContext.integers().get("test.var"));
     }
 
     @Test
