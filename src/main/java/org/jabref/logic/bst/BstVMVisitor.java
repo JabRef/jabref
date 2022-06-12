@@ -212,7 +212,12 @@ class BstVMVisitor extends BstBaseVisitor<Integer> {
 
     @Override
     public Integer visitBstFunction(BstParser.BstFunctionContext ctx) {
-        bstVMContext.functions().get(ctx.getChild(0).getText()).execute(this, ctx, selectedBstEntry);
+        String name = ctx.getChild(0).getText();
+        if (!bstVMContext.functions().containsKey(name)) {
+            throw new BstVMException("Function does not exist: " + name);
+        }
+
+        bstVMContext.functions().get(name).execute(this, ctx, selectedBstEntry);
         return BstVM.TRUE;
     }
 
