@@ -629,17 +629,17 @@ public class TestBstVM {
                 """;
     }
 
-    private static BibEntry t1BibtexEntry() throws IOException {
+    public static BibEntry t1BibtexEntry() throws IOException {
         return TestBstVM.bibtexString2BibtexEntry(t1BibtexString());
     }
 
-    private static class TestVM extends BstVM {
+    public static class TestVM extends BstVM {
 
         private TestVM(Path path) throws RecognitionException, IOException {
             super(CharStreams.fromPath(path));
         }
 
-        private TestVM(String s) throws RecognitionException {
+        protected TestVM(String s) throws RecognitionException {
             super(s);
         }
 

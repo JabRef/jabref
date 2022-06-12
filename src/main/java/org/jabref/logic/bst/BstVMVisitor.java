@@ -39,7 +39,7 @@ class BstVMVisitor extends BstBaseVisitor<Integer> {
         }
 
         for (BstParser.IdentifierContext identifierContext : ctx.ids.identifier()) {
-            bstVMContext.integers().put(identifierContext.getText(), null);
+            bstVMContext.strings().put(identifierContext.getText(), null);
         }
         return BstVM.TRUE;
     }

@@ -24,10 +24,10 @@ LBRACE : '{';
 RBRACE : '}';
 
 fragment LETTER : ('a'..'z'|'A'..'Z'|'.'|'$');
-fragment DIGIT : [0-9];
+fragment NUMERAL : ('0'..'9');
 
-IDENTIFIER : LETTER (LETTER|DIGIT|'_')*;
-INTEGER : '#' ('+'|'-')? DIGIT+;
+IDENTIFIER : LETTER (LETTER|NUMERAL|'_')*;
+INTEGER : '#' ('+'|'-')? NUMERAL+;
 QUOTED : '\'' IDENTIFIER;
 STRING : '"' (~('"'))* '"';
 
