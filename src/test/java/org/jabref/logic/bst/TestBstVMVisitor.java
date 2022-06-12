@@ -77,6 +77,6 @@ class TestBstVMVisitor {
         assertTrue(functions.containsKey("jan"));
         assertNotNull(functions.get("jan"));
 
-
+        assertEquals("January", vm.latestContext.stack().pop());
     }
 }
