@@ -96,20 +96,41 @@ class TestBstVMVisitor {
         List<BibEntry> testEntries = List.of(TestBstVM.t1BibtexEntry());
 
         vm.render(testEntries);
+        BstEntry bstEntry = vm.latestContext.entries().get(0);
 
-        assertTrue(vm.latestContext.entries().get(0).fields.containsKey("address"));
-        assertTrue(vm.latestContext.entries().get(0).fields.containsKey("author"));
-        assertTrue(vm.latestContext.entries().get(0).fields.containsKey("title"));
-        assertTrue(vm.latestContext.entries().get(0).fields.containsKey("type"));
+        assertTrue(bstEntry.fields.containsKey("address"));
+        assertTrue(bstEntry.fields.containsKey("author"));
+        assertTrue(bstEntry.fields.containsKey("title"));
+        assertTrue(bstEntry.fields.containsKey("type"));
 
-        assertTrue(vm.latestContext.entries().get(0).localIntegers.containsKey("variable"));
+        assertTrue(bstEntry.localIntegers.containsKey("variable"));
 
-        assertTrue(vm.latestContext.entries().get(0).localStrings.containsKey("label"));
-        assertTrue(vm.latestContext.entries().get(0).localStrings.containsKey("sort.key$"));
+        assertTrue(bstEntry.localStrings.containsKey("label"));
+        assertTrue(bstEntry.localStrings.containsKey("sort.key$"));
     }
 
     @Test
-    void testVisitReadCommand() {
-        TestBstVM.TestVM vm = new TestBstVM.TestVM(""); // ENTRY {type author title booktitle year owner timestamp url}{}{}
+    void testVisitReadCommand() throws IOException {
+        TestBstVM.TestVM vm = new TestBstVM.TestVM("ENTRY {author title booktitle year owner timestamp url}{}{} READ");
+        List<BibEntry> testEntries = List.of(TestBstVM.t1BibtexEntry());
+
+        vm.render(testEntries);
+
+        Map<String, String> fields = vm.latestContext.entries().get(0).fields;
+
+        assertTrue(fields.containsKey("author"));
+        assertEquals("Crowston, K. and Annabi, H. and Howison, J. and Masango, C.", fields.get("author"));
+        assertTrue(fields.containsKey("title"));
+        assertEquals("Effective work practices for floss development: A model and propositions", fields.get("title"));
+        assertTrue(fields.containsKey("booktitle"));
+        assertEquals("Hawaii International Conference On System Sciences (HICSS)", fields.get("booktitle"));
+        assertTrue(fields.containsKey("year"));
+        assertEquals("2005", fields.get("year"));
+        assertTrue(fields.containsKey("owner"));
+        assertEquals("oezbek", fields.get("owner"));
+        assertTrue(fields.containsKey("timestamp"));
+        assertEquals("2006.05.29", fields.get("timestamp"));
+        assertTrue(fields.containsKey("url"));
+        assertEquals("http://james.howison.name/publications.html", fields.get("url"));
     }
 }
