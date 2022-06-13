@@ -7,7 +7,6 @@ import java.util.Map;
 
 import org.jabref.model.entry.BibEntry;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -16,12 +15,6 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class TestBstVMVisitor {
-    private List<BibEntry> testEntry;
-
-    @BeforeEach
-    void beforeAll() throws IOException {
-        // this.testEntry = List.of(TestBstVM.t1BibtexEntry());
-    }
 
     @Test
     public void testVisitStringsCommand() {
@@ -94,5 +87,29 @@ class TestBstVMVisitor {
         assertNotNull(functions.get("jan"));
 
         assertEquals("January", vm.latestContext.stack().pop());
+        assertTrue(vm.latestContext.stack().isEmpty());
+    }
+
+    @Test
+    void testVisitEntryCommand() throws IOException {
+        TestBstVM.TestVM vm = new TestBstVM.TestVM("ENTRY {address author title type}{variable}{label}");
+        List<BibEntry> testEntries = List.of(TestBstVM.t1BibtexEntry());
+
+        vm.render(testEntries);
+
+        assertTrue(vm.latestContext.entries().get(0).fields.containsKey("address"));
+        assertTrue(vm.latestContext.entries().get(0).fields.containsKey("author"));
+        assertTrue(vm.latestContext.entries().get(0).fields.containsKey("title"));
+        assertTrue(vm.latestContext.entries().get(0).fields.containsKey("type"));
+
+        assertTrue(vm.latestContext.entries().get(0).localIntegers.containsKey("variable"));
+
+        assertTrue(vm.latestContext.entries().get(0).localStrings.containsKey("label"));
+        assertTrue(vm.latestContext.entries().get(0).localStrings.containsKey("sort.key$"));
+    }
+
+    @Test
+    void testVisitReadCommand() {
+        TestBstVM.TestVM vm = new TestBstVM.TestVM(""); // ENTRY {type author title booktitle year owner timestamp url}{}{}
     }
 }
