@@ -41,13 +41,18 @@ public class TestBstVM {
 
     @Test
     public void testSimple() throws RecognitionException, IOException {
-
-        TestVM vm = new TestVM("ENTRY  { address author title type } {} { label } "
-                + "INTEGERS { output.state before.all mid.sentence after.sentence after.block } "
-                + "FUNCTION {init.state.consts}{ #0 'before.all := #1 'mid.sentence :=  #2 'after.sentence :=  #3 'after.block := } "
-                + "STRINGS { s t } "
-                + "READ");
-
+        TestVM vm = new TestVM("""
+               ENTRY { address author title type } { } { label }
+               INTEGERS { output.state before.all mid.sentence after.sentence after.block }
+               FUNCTION { init.state.consts }{
+                  #0 'before.all :=
+                  #1 'mid.sentence :=
+                  #2 'after.sentence :=
+                  #3 'after.block :=
+               }
+               STRINGS { s t }
+               READ
+               """);
         List<BibEntry> v = List.of(t1BibtexEntry());
 
         vm.render(v);
@@ -61,10 +66,12 @@ public class TestBstVM {
 
     @Test
     public void testLabel() throws RecognitionException, IOException {
-        TestVM vm = new TestVM("ENTRY  { title }  {}  { label } "
-                + "FUNCTION { test } { label #0 = title 'label := #5 label #6 pop$ } " + "READ "
-                + "ITERATE { test }");
-
+        TestVM vm = new TestVM("""
+                ENTRY { title } {} { label }
+                FUNCTION { test } { label #0 = title 'label := #5 label #6 pop$ }
+                READ
+                ITERATE { test }
+                """);
         List<BibEntry> v = List.of(t1BibtexEntry());
 
         vm.render(v);
@@ -76,7 +83,7 @@ public class TestBstVM {
 
     @Test
     public void testQuote() throws RecognitionException {
-        TestVM vm = new TestVM("FUNCTION {a}{ quote$ quote$ * } EXECUTE {a}");
+        TestVM vm = new TestVM("FUNCTION { a }{ quote$ quote$ * } EXECUTE { a }");
 
         vm.render(Collections.emptyList());
         assertEquals("\"\"", vm.getStack().pop());
@@ -84,19 +91,21 @@ public class TestBstVM {
 
     @Test
     public void testFunction1() throws RecognitionException {
-        TestVM vm = new TestVM("FUNCTION {init.state.consts}{ #0 'before.all := } ");
+        TestVM vm = new TestVM("FUNCTION { init.state.consts }{ #0 'before.all := } ");
 
         vm.render(Collections.emptyList());
 
         assertEquals(38, vm.getFunctions().size());
-
         assertNotNull(vm.getFunctions().get("init.state.consts"));
     }
 
     @Test
     public void testExecuteSimple() throws RecognitionException {
-        TestVM vm = new TestVM("INTEGERS { variable.a } " + "FUNCTION {init.state.consts}{ #5 'variable.a := } "
-                + "EXECUTE {init.state.consts}");
+        TestVM vm = new TestVM("""
+                INTEGERS { variable.a }
+                FUNCTION { init.state.consts }{ #5 'variable.a := }
+                EXECUTE { init.state.consts }
+                """);
 
         vm.render(Collections.emptyList());
 
@@ -105,9 +114,21 @@ public class TestBstVM {
 
     @Test
     public void testExecuteSimple2() throws RecognitionException {
-        TestVM vm = new TestVM("FUNCTION {a}{ #5 #5 = " + "#1 #2 = " + "#3 #4 < " + "#4 #3 < "
-                + "#4 #4 < " + "#3 #4 > " + "#4 #3 > " + "#4 #4 > " + "\"H\" \"H\" = "
-                + "\"H\" \"Ha\" = } " + "EXECUTE {a}");
+        TestVM vm = new TestVM("""
+                FUNCTION {a}{
+                    #5 #5 =
+                    #1 #2 =
+                    #3 #4 <
+                    #4 #3 <
+                    #4 #4 <
+                    #3 #4 >
+                    #4 #3 >
+                    #4 #4 >
+                    "H" "H" =
+                    "H" "Ha" =
+                }
+                EXECUTE { a }
+                """);
 
         vm.render(Collections.emptyList());
 
@@ -126,11 +147,24 @@ public class TestBstVM {
 
     @Test
     public void testIfSkipPop() throws RecognitionException {
-        TestVM vm = new TestVM("FUNCTION {not}    {   { #0 }        { #1 }  if$    }"
-                + "FUNCTION {and}    {   'skip$        { pop$ #0 }      if$    }"
-                + "FUNCTION {or}    {   { pop$ #1 }        'skip$      if$    }" + "FUNCTION {test} { "
-                + "#1 #1 and #0 #1 and #1 #0 and #0 #0 and " + "#0 not #1 not "
-                + "#1 #1 or #0 #1 or #1 #0 or #0 #0 or }" + "EXECUTE {test}");
+        TestVM vm = new TestVM("""
+                FUNCTION { not } { { #0 } { #1 } if$ }
+                FUNCTION { and } { 'skip$ { pop$ #0 } if$ }"
+                FUNCTION { or } { { pop$ #1 } 'skip$ if$ }
+                FUNCTION { test } {
+                    #1 #1 and
+                    #0 #1 and
+                    #1 #0 and
+                    #0 #0 and
+                    #0 not
+                    #1 not
+                    #1 #1 or
+                    #0 #1 or
+                    #1 #0 or
+                    #0 #0 or
+                }
+                EXECUTE { test }
+                """);
 
         vm.render(Collections.emptyList());
 
@@ -149,7 +183,13 @@ public class TestBstVM {
 
     @Test
     public void testArithmetic() throws RecognitionException {
-        TestVM vm = new TestVM("FUNCTION {test} { " + "#1 #1 + #5 #2 - }" + "EXECUTE {test}");
+        TestVM vm = new TestVM("""
+                FUNCTION { test } {
+                    #1 #1 +
+                    #5 #2 -
+                }
+                EXECUTE { test }
+                """);
 
         vm.render(Collections.emptyList());
 
@@ -160,13 +200,23 @@ public class TestBstVM {
 
     @Test
     public void testArithmetic2() throws RecognitionException {
-        TestVM vm = new TestVM("FUNCTION {test} { " + "#1 \"HELLO\" + #5 #2 - }" + "EXECUTE {test}");
+        TestVM vm = new TestVM("""
+                FUNCTION { test } {
+                    #1 "HELLO" +      % Throws exception
+                    #5 #2 -
+                }
+                EXECUTE { test }
+                """);
+
         assertThrows(BstVMException.class, () -> vm.render(Collections.emptyList()));
     }
 
     @Test
     public void testNumNames() throws RecognitionException {
-        TestVM vm = new TestVM("FUNCTION {test} { \"Johnny Foo and Mary Bar\" num.names$ }" + "EXECUTE {test}");
+        TestVM vm = new TestVM("""
+                FUNCTION { test } { "Johnny Foo and Mary Bar" num.names$ }
+                EXECUTE { test }
+                """);
 
         vm.render(Collections.emptyList());
 
@@ -176,8 +226,10 @@ public class TestBstVM {
 
     @Test
     public void testNumNames2() throws RecognitionException {
-        TestVM vm = new TestVM("FUNCTION {test} { \"Johnny Foo { and } Mary Bar\" num.names$ }"
-                + "EXECUTE {test}");
+        TestVM vm = new TestVM("""
+                FUNCTION { test } { "Johnny Foo { and } Mary Bar" num.names$ }
+                EXECUTE { test }
+                """);
 
         vm.render(Collections.emptyList());
 
@@ -187,11 +239,14 @@ public class TestBstVM {
 
     @Test
     public void testStringOps1() throws RecognitionException {
-        TestVM vm = new TestVM(
-                "FUNCTION {test} { \"H\" \"allo\" * \"Johnny\" add.period$ \"Johnny.\" add.period$"
-                        + "\"Johnny!\" add.period$ \"Johnny?\" add.period$ \"Johnny} }}}\" add.period$"
-                        + "\"Johnny!}\" add.period$ \"Johnny?}\" add.period$ \"Johnny.}\" add.period$ }"
-                        + "EXECUTE {test}");
+        TestVM vm = new TestVM("""
+                FUNCTION { test } {
+                    "H" "allo" * "Johnny" add.period$ "Johnny." add.period$
+                    "Johnny!" add.period$ "Johnny?" add.period$ "Johnny} }}}" add.period$
+                    "Johnny!}" add.period$ "Johnny?}" add.period$ "Johnny.}" add.period$
+                }
+                EXECUTE { test }
+                """);
 
         vm.render(Collections.emptyList());
 
@@ -209,18 +264,19 @@ public class TestBstVM {
 
     @Test
     public void testSubstring() throws RecognitionException {
-        TestVM vm = new TestVM("FUNCTION {test} " + "{ \"123456789\" #2  #1  substring$ " + // 2
-                "  \"123456789\" #4 global.max$ substring$ " + // 456789
-                "  \"123456789\" #1  #9  substring$ " + // 123456789
-                "  \"123456789\" #1  #10 substring$ " + // 123456789
-                "  \"123456789\" #1  #99 substring$ " + // 123456789
-
-                "  \"123456789\" #-7 #3  substring$ " + // 123
-                "  \"123456789\" #-1 #1  substring$ " + // 9
-                "  \"123456789\" #-1 #3  substring$ " + // 789
-                "  \"123456789\" #-2 #2  substring$ " + // 78
-
-                "} EXECUTE {test} ");
+        TestVM vm = new TestVM("""
+                FUNCTION { test } {
+                    "123456789" #2  #1          substring$  % 2
+                    "123456789" #4  global.max$ substring$  % 456789
+                    "123456789" #1  #9          substring$  % 123456789
+                    "123456789" #1  #10         substring$  % 123456789
+                    "123456789" #1  #99         substring$  % 123456789
+                    "123456789" #-7 #3          substring$  % 123
+                    "123456789" #-1 #1          substring$  % 9
+                    "123456789" #-1 #3          substring$  % 789
+                    "123456789" #-2 #2          substring$  % 78
+                } EXECUTE { test }
+                """);
 
         vm.render(Collections.emptyList());
 
@@ -228,7 +284,6 @@ public class TestBstVM {
         assertEquals("789", vm.getStack().pop());
         assertEquals("9", vm.getStack().pop());
         assertEquals("123", vm.getStack().pop());
-
         assertEquals("123456789", vm.getStack().pop());
         assertEquals("123456789", vm.getStack().pop());
         assertEquals("123456789", vm.getStack().pop());
@@ -239,14 +294,23 @@ public class TestBstVM {
 
     @Test
     public void testEmpty() throws RecognitionException, IOException {
-        TestVM vm = new TestVM("ENTRY {title}{}{} READ STRINGS { s } FUNCTION {test} " + "{ s empty$ " + // FALSE
-                "\"\" empty$ " + // FALSE
-                "\"   \" empty$ " + // FALSE
-                " title empty$ " + // FALSE
-                " \" HALLO \" empty$ } ITERATE {test} ");
-
+        TestVM vm = new TestVM("""
+                ENTRY { title } { } { }
+                READ
+                STRINGS { s }
+                FUNCTION { test } {
+                    s empty$          % TRUE
+                    "" empty$         % TRUE
+                    "   " empty$      % TRUE
+                    title empty$      % TRUE
+                    " HALLO " empty$  % FALSE
+                }
+                ITERATE { test }
+                """);
         List<BibEntry> v = List.of(TestBstVM.bibtexString2BibtexEntry("@article{a, author=\"AAA\"}"));
+
         vm.render(v);
+
         assertEquals(BstVM.FALSE, vm.getStack().pop());
         assertEquals(BstVM.TRUE, vm.getStack().pop());
         assertEquals(BstVM.TRUE, vm.getStack().pop());
@@ -257,9 +321,19 @@ public class TestBstVM {
 
     @Test
     public void testDuplicateEmptyPopSwapIf() throws RecognitionException {
-        TestVM vm = new TestVM("FUNCTION {emphasize} " + "{ duplicate$ empty$ " + "  { pop$ \"\" } "
-                + "  { \"{\\em \" swap$ * \"}\" * } " + "  if$ " + "} " + "FUNCTION {test} {"
-                + "  \"\" emphasize " + "  \"Hello\" emphasize " + "}" + "EXECUTE {test} ");
+        TestVM vm = new TestVM("""
+                FUNCTION { emphasize } {
+                    duplicate$ empty$
+                        { pop$ "" }
+                        { "{\\em " swap$ * "}" * }
+                    if$
+                }
+                FUNCTION { test } {
+                    "" emphasize
+                    "Hello" emphasize
+                }
+                EXECUTE { test }
+                """);
 
         vm.render(Collections.emptyList());
 
@@ -270,25 +344,27 @@ public class TestBstVM {
 
     @Test
     public void testChangeCase() throws RecognitionException {
-        TestVM vm = new TestVM("STRINGS { title } "
-                        + "READ "
-                        + "FUNCTION {format.title}"
-                        + " { duplicate$ empty$ "
-                        + "    { pop$ \"\" } "
-                        + "    { \"t\" change.case$ } "
-                        + "  if$ "
-                        + "} "
-                        + "FUNCTION {test} {"
-                        + "  \"hello world\" \"u\" change.case$ format.title "
-                        + "  \"Hello World\" format.title "
-                        + "  \"\" format.title "
-                        + "  \"{A}{D}/{C}ycle: {I}{B}{M}'s {F}ramework for {A}pplication {D}evelopment and {C}ase\" \"u\" change.case$ format.title "
-                        + "}" + "EXECUTE {test} ");
+        TestVM vm = new TestVM("""
+                STRINGS { title }
+                READ
+                FUNCTION { format.title } {
+                    duplicate$ empty$
+                        { pop$ "" }
+                        { "t" change.case$ }
+                    if$
+                }
+                FUNCTION { test } {
+                    "hello world" "u" change.case$ format.title
+                    "Hello World" format.title
+                    "" format.title
+                    "{A}{D}/{C}ycle: {I}{B}{M}'s {F}ramework for {A}pplication {D}evelopment and {C}ase" "u" change.case$ format.title
+                }
+                EXECUTE { test }
+                """);
 
         vm.render(Collections.emptyList());
 
-        assertEquals(
-                "{A}{D}/{C}ycle: {I}{B}{M}'s {F}ramework for {A}pplication {D}evelopment and {C}ase",
+        assertEquals("{A}{D}/{C}ycle: {I}{B}{M}'s {F}ramework for {A}pplication {D}evelopment and {C}ase",
                 vm.getStack().pop());
         assertEquals("", vm.getStack().pop());
         assertEquals("Hello world", vm.getStack().pop());
@@ -298,13 +374,19 @@ public class TestBstVM {
 
     @Test
     public void testTextLength() throws RecognitionException {
-        TestVM vm = new TestVM("FUNCTION {test} {" + "  \"hello world\" text.length$ "
-                + "  \"Hello {W}orld\" text.length$ " + "  \"\" text.length$ "
-                + "  \"{A}{D}/{Cycle}\" text.length$ "
-                + "  \"{\\This is one character}\" text.length$ "
-                + "  \"{\\This {is} {one} {c{h}}aracter as well}\" text.length$ "
-                + "  \"{\\And this too\" text.length$ " + "  \"These are {\\11}\" text.length$ " + "} "
-                + "EXECUTE {test} ");
+        TestVM vm = new TestVM("""
+                FUNCTION { test } {
+                    "hello world" text.length$
+                    "Hello {W}orld" text.length$
+                    "" text.length$
+                    "{A}{D}/{Cycle}" text.length$
+                    "{\\This is one character}" text.length$
+                    "{\\This {is} {one} {c{h}}aracter as well}" text.length$
+                    "{\\And this too" text.length$
+                    "These are {\\11}" text.length$
+                }
+                EXECUTE { test }
+                """);
 
         vm.render(Collections.emptyList());
 
@@ -321,7 +403,10 @@ public class TestBstVM {
 
     @Test
     public void testIntToStr() throws RecognitionException {
-        TestVM vm = new TestVM("FUNCTION {test} { #3 int.to.str$ #9999 int.to.str$}" + "EXECUTE {test}");
+        TestVM vm = new TestVM("""
+                FUNCTION { test } { #3 int.to.str$ #9999 int.to.str$ }
+                EXECUTE { test }
+                """);
 
         vm.render(Collections.emptyList());
 
@@ -332,7 +417,10 @@ public class TestBstVM {
 
     @Test
     public void testChrToInt() throws RecognitionException {
-        TestVM vm = new TestVM("FUNCTION {test} { \"H\" chr.to.int$ }" + "EXECUTE {test}");
+        TestVM vm = new TestVM("""
+                FUNCTION { test } { "H" chr.to.int$ }
+                EXECUTE { test }
+                """);
 
         vm.render(Collections.emptyList());
 
@@ -342,7 +430,10 @@ public class TestBstVM {
 
     @Test
     public void testChrToIntIntToChr() throws RecognitionException {
-        TestVM vm = new TestVM("FUNCTION {test} { \"H\" chr.to.int$ int.to.chr$ }" + "EXECUTE {test}");
+        TestVM vm = new TestVM("""
+                FUNCTION { test } { "H" chr.to.int$ int.to.chr$ }
+                EXECUTE {test}
+                """);
 
         vm.render(Collections.emptyList());
 
@@ -352,14 +443,18 @@ public class TestBstVM {
 
     @Test
     public void testSort() throws RecognitionException, IOException {
-        TestVM vm = new TestVM("ENTRY  { title }  { }  { label }"
-                + "FUNCTION {presort} { cite$ 'sort.key$ := } ITERATE { presort } SORT");
-
+        TestVM vm = new TestVM("""
+                ENTRY { title } { } { label }
+                FUNCTION { presort } { cite$ 'sort.key$ := }
+                ITERATE { presort }
+                SORT
+                """);
         List<BibEntry> v = List.of(
                 TestBstVM.bibtexString2BibtexEntry("@article{a, author=\"AAA\"}"),
                 TestBstVM.bibtexString2BibtexEntry("@article{b, author=\"BBB\"}"),
                 TestBstVM.bibtexString2BibtexEntry("@article{d, author=\"DDD\"}"),
                 TestBstVM.bibtexString2BibtexEntry("@article{c, author=\"CCC\"}"));
+
         vm.render(v);
 
         List<BstEntry> v2 = vm.getEntries();
@@ -371,7 +466,7 @@ public class TestBstVM {
 
     @Test
     public void testBuildIn() throws RecognitionException {
-        TestVM vm = new TestVM("EXECUTE {global.max$}");
+        TestVM vm = new TestVM("EXECUTE { global.max$ }");
 
         vm.render(Collections.emptyList());
 
@@ -381,10 +476,17 @@ public class TestBstVM {
 
     @Test
     public void testVariables() throws RecognitionException {
-        TestVM vm = new TestVM(" STRINGS { t }                          "
-                + " FUNCTION {not}    { { #0 } { #1 }  if$ } "
-                + " FUNCTION {n.dashify} { \"HELLO-WORLD\" 't := t empty$ not } "
-                + " EXECUTE {n.dashify}                    ");
+        TestVM vm = new TestVM("""
+                STRINGS { t }
+                FUNCTION { not } {
+                    { #0 } { #1 } if$
+                }
+                FUNCTION { n.dashify } {
+                    "HELLO-WORLD" 't :=
+                    t empty$ not
+                }
+                EXECUTE { n.dashify }
+                """);
 
         vm.render(Collections.emptyList());
 
@@ -393,38 +495,43 @@ public class TestBstVM {
 
     @Test
     public void testWhile() throws RecognitionException {
-        TestVM vm = new TestVM(
-                "STRINGS { t }            "
-                        + "FUNCTION {not}    {   "
-                        + " { #0 } { #1 }  if$ } "
-                        + "FUNCTION {n.dashify}              "
-                        + "{ \"HELLO-WORLD\"                 "
-                        + "  't :=                           "
-                        + " \"\"                                                 "
-                        + "       { t empty$ not }                 "
-                        + "       { t #1 #1 substring$ \"-\" =                      "
-                        + "         { t #1 #2 substring$ \"--\" = not "
-                        + "              { \"--\" *                                       "
-                        + "                t #2 global.max$ substring$ 't :=                 "
-                        + "              }                                                    "
-                        + "              {   { t #1 #1 substring$ \"-\" = }                "
-                        + "                  { \"-\" *                                         "
-                        + "                    t #2 global.max$ substring$ 't :=               "
-                        + "                  }                                                  "
-                        + "                while$                                                                  "
-                        + "              }                                                                  "
-                        + "            if$                                                                  "
-                        + "          }                                                                  "
-                        + "          { t #1 #1 substring$ *                                       "
-                        + "            t #2 global.max$ substring$ 't :=                          "
-                        + "          }                                                                  "
-                        + "          if$                                                                  "
-                        + "        }                                                                  "
-                        + "      while$                                                                  "
-                        + "    }                                                                  "
-                        + " EXECUTE {n.dashify} ");
-
+        TestVM vm = new TestVM("""
+                        STRINGS { t }
+                        FUNCTION {not} { { #0 } { #1 } if$ }
+                        FUNCTION {n.dashify} {
+                            "HELLO-WORLD" 't :=
+                            ""
+                            { t empty$ not }                                    % while
+                            {
+                                t #1 #1 substring$ "-" =                        % if
+                                {
+                                    t #1 #2 substring$ "--" = not               % if
+                                    {
+                                        "--" *
+                                        t #2 global.max$ substring$ 't :=
+                                    }
+                                    {
+                                        { t #1 #1 substring$ "-" = }            % while
+                                        {
+                                            "-" *
+                                            t #2 global.max$ substring$ 't :=
+                                        }
+                                        while$
+                                    }
+                                   if$
+                                }
+                                {
+                                    t #1 #1 substring$ *
+                                    t #2 global.max$ substring$ 't :=
+                                }
+                                if$
+                            }
+                            while$
+                        }
+                        EXECUTE {n.dashify}
+                        """);
         List<BibEntry> v = Collections.emptyList();
+
         vm.render(v);
 
         assertEquals(1, vm.getStack().size());
@@ -433,14 +540,20 @@ public class TestBstVM {
 
     @Test
     public void testType() throws RecognitionException, IOException {
-        TestVM vm = new TestVM("ENTRY  { title }  { }  { label }"
-                + "FUNCTION {presort} { cite$ 'sort.key$ := } ITERATE { presort } SORT FUNCTION {test} { type$ } ITERATE { test }");
-
+        TestVM vm = new TestVM("""
+                ENTRY { title }  { }  { label }
+                FUNCTION { presort } { cite$ 'sort.key$ := }
+                ITERATE { presort }
+                SORT
+                FUNCTION { test } { type$ }
+                ITERATE { test }
+                """);
         List<BibEntry> v = List.of(
                 TestBstVM.bibtexString2BibtexEntry("@article{a, author=\"AAA\"}"),
                 TestBstVM.bibtexString2BibtexEntry("@book{b, author=\"BBB\"}"),
                 TestBstVM.bibtexString2BibtexEntry("@misc{c, author=\"CCC\"}"),
                 TestBstVM.bibtexString2BibtexEntry("@inproceedings{d, author=\"DDD\"}"));
+
         vm.render(v);
 
         assertEquals(4, vm.getStack().size());
@@ -452,21 +565,22 @@ public class TestBstVM {
 
     @Test
     public void testMissing() throws RecognitionException, IOException {
-        TestVM vm = new TestVM(
-                "ENTRY    { title }  { }  { label } " +
-                        "FUNCTION {presort} { cite$ 'sort.key$ := } " +
-                        "ITERATE  {presort} " +
-                        "READ SORT " +
-                        "FUNCTION {test}{ title missing$ cite$ } " +
-                        "ITERATE  { test }");
-
+        TestVM vm = new TestVM("""
+                ENTRY { title }  { }  { label }
+                FUNCTION { presort } { cite$ 'sort.key$ := }
+                ITERATE { presort }
+                READ
+                SORT
+                FUNCTION { test } { title missing$ cite$ }
+                ITERATE { test }
+                """);
         List<BibEntry> v = List.of(
                 t1BibtexEntry(),
                 TestBstVM.bibtexString2BibtexEntry("@article{test, author=\"No title\"}"));
+
         vm.render(v);
 
         assertEquals(4, vm.getStack().size());
-
         assertEquals("test", vm.getStack().pop());
         assertEquals(1, vm.getStack().pop());
         assertEquals("canh05", vm.getStack().pop());
@@ -475,21 +589,29 @@ public class TestBstVM {
 
     @Test
     public void testFormatName() throws RecognitionException {
-        TestVM vm = new TestVM(
-                "FUNCTION {format}{ \"Charles Louis Xavier Joseph de la Vall{\\'e}e Poussin\" #1 \"{vv~}{ll}{, jj}{, f}?\" format.name$ }"
-                        + "EXECUTE {format}");
-
+        TestVM vm = new TestVM("""
+                FUNCTION { format }{ "Charles Louis Xavier Joseph de la Vall{\\'e}e Poussin" #1 "{vv~}{ll}{, jj}{, f}?" format.name$ }
+                EXECUTE { format }
+                """);
         List<BibEntry> v = Collections.emptyList();
+
         vm.render(v);
+
         assertEquals("de~la Vall{\\'e}e~Poussin, C.~L. X.~J?", vm.getStack().pop());
         assertEquals(0, vm.getStack().size());
     }
 
     @Test
     public void testFormatName2() throws RecognitionException, IOException {
-        TestVM vm = new TestVM("ENTRY  { author }  { }  { label } " + "FUNCTION {presort} { cite$ 'sort.key$ := } "
-                + "ITERATE { presort } " + "READ " + "SORT "
-                + "FUNCTION {format}{ author #2 \"{vv~}{ll}{, jj}{, f}?\" format.name$ }" + "ITERATE {format}");
+        TestVM vm = new TestVM("""
+                ENTRY { author } { } { label }
+                FUNCTION { presort } { cite$ 'sort.key$ := }
+                ITERATE { presort }
+                READ
+                SORT
+                FUNCTION { format }{ author #2 "{vv~}{ll}{, jj}{, f}?" format.name$ }
+                ITERATE { format }
+                """);
 
         List<BibEntry> v = List.of(
                 t1BibtexEntry(),
@@ -503,11 +625,16 @@ public class TestBstVM {
 
     @Test
     public void testCallType() throws RecognitionException, IOException {
-        TestVM vm = new TestVM(
-                "ENTRY  { title }  { }  { label } FUNCTION {presort} { cite$ 'sort.key$ := } ITERATE { presort } READ SORT "
-                        + "FUNCTION {inproceedings}{ \"InProceedings called on \" title * } "
-                        + "FUNCTION {book}{ \"Book called on \" title * } " + " ITERATE { call.type$ }");
-
+        TestVM vm = new TestVM("""
+                ENTRY { title }  { }  { label }
+                FUNCTION { presort } { cite$ 'sort.key$ := }
+                ITERATE { presort }
+                READ
+                SORT
+                FUNCTION { inproceedings }{ "InProceedings called on " title * }
+                FUNCTION { book }{ "Book called on " title * }
+                ITERATE { call.type$ }
+                """);
         List<BibEntry> v = List.of(
                 t1BibtexEntry(),
                 TestBstVM.bibtexString2BibtexEntry("@book{test, title=\"Test\"}"));
@@ -515,7 +642,6 @@ public class TestBstVM {
         vm.render(v);
 
         assertEquals(2, vm.getStack().size());
-
         assertEquals("Book called on Test", vm.getStack().pop());
         assertEquals(
                 "InProceedings called on Effective work practices for floss development: A model and propositions",
@@ -525,9 +651,12 @@ public class TestBstVM {
 
     @Test
     public void testIterate() throws RecognitionException, IOException {
-        TestVM vm = new TestVM("ENTRY  { " + "  address " + "  author " + "  title " + "  type "
-                + "}  {}  { label } " + "FUNCTION {test}{ cite$ } " + "READ " + "ITERATE { test }");
-
+        TestVM vm = new TestVM("""
+                ENTRY { address author title type } {} { label }
+                FUNCTION { test }{ cite$ }
+                READ
+                ITERATE { test }
+                """);
         List<BibEntry> v = List.of(
                 t1BibtexEntry(),
                 TestBstVM.bibtexString2BibtexEntry("@article{test, title=\"BLA\"}"));
@@ -535,7 +664,6 @@ public class TestBstVM {
         vm.render(v);
 
         assertEquals(2, vm.getStack().size());
-
         String s1 = (String) vm.getStack().pop();
         String s2 = (String) vm.getStack().pop();
 
@@ -549,38 +677,37 @@ public class TestBstVM {
 
     @Test
     public void testWidth() throws RecognitionException, IOException {
-        TestVM vm = new TestVM("ENTRY  { " + "  address " + "  author " + "  title " + "  type "
-                + "}  {}  { label } " +
-                "STRINGS { longest.label } " +
-                "INTEGERS { number.label longest.label.width } " +
-                "FUNCTION {initialize.longest.label} " +
-                "{ \"\" 'longest.label := " +
-                "  #1 'number.label := " +
-                "  #0 'longest.label.width := " +
-                "} " +
-                " " +
-                "        FUNCTION {longest.label.pass} " +
-                "        { number.label int.to.str$ 'label := " +
-                "          number.label #1 + 'number.label := " +
-                "          label width$ longest.label.width > " +
-                "            { label 'longest.label := " +
-                "              label width$ 'longest.label.width := " +
-                "            } " +
-                "            'skip$ " +
-                "          if$ " +
-                "        } " +
-                " " +
-                "        EXECUTE {initialize.longest.label} " +
-                " " +
-                "        ITERATE {longest.label.pass} " +
-                "FUNCTION {begin.bib} " +
-                "{ preamble$ empty$" +
-                "    'skip$" +
-                "    { preamble$ write$ newline$ }" +
-                "  if$" +
-                "  \"\\begin{thebibliography}{\"  longest.label  * \"}\" *" +
-                "}" +
-                "EXECUTE {begin.bib}");
+        TestVM vm = new TestVM("""
+                ENTRY { address author title type } {} { label }
+                STRINGS { longest.label }
+                INTEGERS { number.label longest.label.width }
+                FUNCTION { initialize.longest.label } {
+                    "" 'longest.label :=
+                    #1 'number.label :=
+                    #0 'longest.label.width :=
+                }
+                FUNCTION {longest.label.pass} {
+                    number.label int.to.str$ 'label :=
+                    number.label #1 + 'number.label :=
+                    label width$ longest.label.width >
+                        {
+                            label 'longest.label :=
+                            label width$ 'longest.label.width :=
+                        }
+                        'skip$
+                    if$
+                }
+                EXECUTE { initialize.longest.label }
+                ITERATE { longest.label.pass }
+                FUNCTION { begin.bib } {
+                    preamble$ empty$
+                        'skip$
+                        { preamble$ write$ newline$ }
+                    if$
+                    "\\begin{thebibliography}{"  longest.label  * "}" *
+                }
+                EXECUTE {begin.bib}
+                """);
 
         List<BibEntry> v = List.of(t1BibtexEntry());
 
@@ -592,7 +719,10 @@ public class TestBstVM {
 
     @Test
     public void testSwap() throws RecognitionException {
-        TestVM vm = new TestVM("FUNCTION {a}{ #3 \"Hallo\" swap$ } EXECUTE { a }");
+        TestVM vm = new TestVM("""
+                FUNCTION { a } { #3 "Hallo" swap$ }
+                EXECUTE { a }
+                """);
 
         List<BibEntry> v = Collections.emptyList();
         vm.render(v);

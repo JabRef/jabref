@@ -123,7 +123,15 @@ class TestBstVMVisitor {
 
     // sort
 
-    // identifier
+    @Test
+    void testVisitIdentifier() throws IOException {
+        TestBstVM.TestVM vm = new TestBstVM.TestVM(
+                "ENTRY {author title booktitle year owner timestamp url}{}{} READ"
+                + "FUNCTION { test } {  }");
+        List<BibEntry> testEntries = List.of(TestBstVM.t1BibtexEntry());
+
+        vm.render(testEntries);
+    }
 
     // bstFunction
 
