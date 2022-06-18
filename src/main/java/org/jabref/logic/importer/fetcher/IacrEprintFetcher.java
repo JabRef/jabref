@@ -1,8 +1,6 @@
 package org.jabref.logic.importer.fetcher;
 
 import java.io.IOException;
-import java.time.format.DateTimeFormatter;
-import java.util.Locale;
 import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
@@ -19,22 +17,12 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 public class IacrEprintFetcher implements IdBasedFetcher {
 
     public static final String NAME = "IACR eprints";
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(IacrEprintFetcher.class);
-    private static final Pattern DATE_FROM_WEBSITE_AFTER_2000_PATTERN = Pattern.compile("[a-z ]+(\\d{1,2} [A-Za-z][a-z]{2} \\d{4})");
-    private static final Pattern DATE_FROM_WEBSITE_BEFORE_2000_PATTERN = Pattern.compile("[A-Za-z ]+? ([A-Za-z][a-z]{2,10} \\d{1,2}(th|st|nd|rd)?, \\d{4})\\.?");
     private static final Pattern WITHOUT_LETTERS_SPACE = Pattern.compile("[^0-9/]");
 
-    private static final DateTimeFormatter DATE_FORMAT_WEBSITE_AFTER_2000 = DateTimeFormatter.ofPattern("d MMM yyyy", Locale.US);
-    private static final DateTimeFormatter DATE_FORMAT_WEBSITE_BEFORE_2000_LONG_MONTHS = DateTimeFormatter.ofPattern("MMMM d['th']['st']['nd']['rd'] yyyy", Locale.US);
-    private static final DateTimeFormatter DATE_FORMAT_WEBSITE_BEFORE_2000_SHORT_MONTHS = DateTimeFormatter.ofPattern("MMM d['th']['st']['nd']['rd'] yyyy", Locale.US);
-    private static final DateTimeFormatter DATE_FORMAT_BIBTEX = DateTimeFormatter.ISO_LOCAL_DATE;
     private static final Predicate<String> IDENTIFIER_PREDICATE = Pattern.compile("\\d{4}/\\d{3,5}").asPredicate();
     private static final String CITATION_URL_PREFIX = "https://eprint.iacr.org/";
     private static final String DESCRIPTION_URL_PREFIX = "https://eprint.iacr.org/";
@@ -82,8 +70,7 @@ public class IacrEprintFetcher implements IdBasedFetcher {
         String descriptiveHtml = getHtml(entryUrl);
 
         entry.setField(StandardField.ABSTRACT, getAbstract(descriptiveHtml));
-        String dateStringAsInHtml = getRequiredValueBetween("<dt>History</dt>" + "\n      \n      \n      " + "<dd>", ":", descriptiveHtml);
-        entry.setField(StandardField.DATE, dateStringAsInHtml);
+        entry.setField(StandardField.DATE, getDate(descriptiveHtml));
 
         // Version information for entries after year 2000
         if (isFromOrAfterYear2000(entry)) {
@@ -102,10 +89,17 @@ public class IacrEprintFetcher implements IdBasedFetcher {
     }
 
     private String getAbstract(String descriptiveHtml) throws FetcherException {
-        String abstractText = getRequiredValueBetween("<h5 class=\"mt-3\">Abstract</h5>" + "\n    " + "<p style=\"white-space: pre-wrap;\">", "</p>", descriptiveHtml);
+        String startOfAbstractString = "<h5 class=\"mt-3\">Abstract</h5>\n    <p style=\"white-space: pre-wrap;\">";
+        String abstractText = getRequiredValueBetween(startOfAbstractString, "</p>", descriptiveHtml);
         return abstractText;
     }
-    
+
+    private String getDate(String descriptiveHtml) throws FetcherException {
+        String startOfHistoryString = "<dt>History</dt>\n      \n      \n      <dd>";
+        String dateStringAsInHtml = getRequiredValueBetween(startOfHistoryString, ":", descriptiveHtml);
+        return dateStringAsInHtml;
+    }
+
     private String getHtml(String url) throws FetcherException {
         try {
             URLDownload download = new URLDownload(url);
