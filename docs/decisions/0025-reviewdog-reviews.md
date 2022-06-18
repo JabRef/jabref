@@ -1,5 +1,5 @@
 ---
-parent: Architectural Decisions
+parent: Decision Records
 nav_order: 25
 ---
 # Reviewdog findings are code reviews
@@ -20,7 +20,6 @@ How to quickly provide feedback to contributors that checkstyle was not matched?
 * Keep maintainers focused on the "real" challanges of the code changes
 
 ## Considered Options
-
 
 * Use [Reviewdog's PullRequest review reporter](https://github.com/reviewdog/reviewdog#reporter-github-pullrequest-review-comment--reportergithub-pr-review)
 * Use [Reviewdog's check reporter](https://github.com/reviewdog/reviewdog#reporter-github-checks--reportergithub-check)

@@ -1,12 +1,12 @@
 ---
-parent: Architectural Decisions
+parent: Decision Records
 nav_order: 19
 ---
 # Implement special fields as separate fields
 
 ## Context and Problem Statement
 
-How to implement special fields in bibtex databases?
+How to implement special fields in BibTeX databases?
 
 ## Considered Options
 
@@ -52,7 +52,7 @@ keywords = {prio1, printed, read}
 ```
 
 * Good, because does not bloat the BibTeX file. Typically, 50% of the lines are special fields
-* Good, because the user can easily assign a special field. E.g, typing “, prio1” into keywords instead of “\n  priority = {prio1},”
+* Good, because the user can easily assign a special field. E.g, typing “, prio1” into keywords instead of “`\n  priority = {prio1},`”
 * Bad, because they need to be synchronized to fields (because otherwise, the maintable cannot render it)
 * Bad, because keywords are related to the actual content
 * Bad, because some users want to keep publisher keywords
@@ -70,7 +70,7 @@ jabrefspecial = {prio1, printed, red}
 
 ### Special fields as sub-feature of groups
 
-* Good, because one concept rulez them all
+* Good, because one concept rules them all
 * Good, because groups already provide [explicit handling of certain cases](https://docs.jabref.org/finding-sorting-and-cleaning-entries/groups#types-of-groups): groups based on keywords and groups based on author's last names
 * Bad, because main table implementation changes: Currently, each column in the main table represents a field. The main may [mark entries belonging to certain groups](https://docs.jabref.org/finding-sorting-and-cleaning-entries/groups#group-color-bars-in-the-entry-table), but does offer an explicit rendering of groups
 * Bad, because groups are more a query on data of the entries instead of explicitly assigning entries to a group

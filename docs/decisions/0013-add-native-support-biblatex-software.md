@@ -1,5 +1,5 @@
 ---
-parent: Architectural Decisions
+parent: Decision Records
 nav_order: 13
 ---
 # Add Native Support for BibLatex-Software

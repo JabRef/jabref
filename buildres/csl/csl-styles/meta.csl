@@ -1,58 +1,60 @@
 <?xml version="1.0" encoding="utf-8"?>
-<style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" et-al-min="3" et-al-use-first="1" demote-non-dropping-particle="never" default-locale="fr-CA">
+<style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" and="text" et-al-min="3" et-al-use-first="2" initialize="false" demote-non-dropping-particle="never">
+  <!-- Polyglot; journal publishes in English, French, and Spanish. -->
   <info>
-    <title>Université du Québec à Montréal - APA (Français - Canada)</title>
-    <title-short>UQAM</title-short>
-    <id>http://www.zotero.org/styles/universite-du-quebec-a-montreal</id>
-    <link href="http://www.zotero.org/styles/universite-du-quebec-a-montreal" rel="self"/>
-    <link href="http://www.zotero.org/styles/apa" rel="template"/>
-    <link href="http://guides.bibliotheques.uqam.ca/themes/105-Logiciels-de-gestion-bibliographique?tab=563" rel="documentation"/>
-    <link href="http://www.guidemt.uqam.ca/citer/style-uqam" rel="documentation"/>
+    <title>Meta</title>
+    <id>http://www.zotero.org/styles/meta</id>
+    <link href="http://www.zotero.org/styles/meta" rel="self"/>
+    <link href="http://www.zotero.org/styles/universite-de-montreal-apa" rel="template"/>
+    <link href="https://www.erudit.org/fr/revues/meta/#journal-info-editorial_policy" rel="documentation"/>
     <author>
-      <name>Jean-Jacques Rondeau</name>
-      <email>rondeau.jean-jacques@uqam.ca</email>
+      <name>Maya de Wit</name>
+      <email>mail@tolkngt.nl</email>
     </author>
+    <contributor>
+      <name>Patrick O'Brien</name>
+    </contributor>
     <category citation-format="author-date"/>
-    <category field="psychology"/>
-    <category field="generic-base"/>
-    <summary>Le style UQAM APA est une adaptation française canadienne de la 7e édition de la norme APA conforme au Guide de présentation des mémoires et des thèses de l'Université du Québec à Montréal. Il remplace l'ancienne version qui portait le nom de style UQAM qui était basée sur la 6e édition du style APA.</summary>
-    <updated>2019-11-13T20:36:26+00:00</updated>
+    <category field="humanities"/>
+    <issn>0026-0452</issn>
+    <eissn>1492-1421</eissn>
+    <updated>2022-06-13T09:02:50+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
-  <locale xml:lang="fr">
+  <locale xml:lang="en">
     <terms>
-      <term name="editor" form="short">dir.</term>
-      <term name="editortranslator" form="short">éd. &amp; trad.</term>
-      <term name="translator" form="short">trad.</term>
-      <term name="no date" form="short">s. d.</term>
-      <term name="in">dans</term>
-      <term name="retrieved">récupéré</term>
-      <term name="from">de</term>
-      <term name="presented at">communication présentée au</term>
-      <term name="page" form="short">p.</term>
+      <term name="editor" form="verb-short">ed.</term>
+      <term name="editortranslator" form="short">ed. &amp; Trans.</term>
+      <term name="translator" form="short">trans.</term>
+      <term name="no date" form="short">n.d.</term>
+      <term name="in">in</term>
+      <term name="retrieved">retrieved</term>
+      <term name="accessed">consulted on</term>
+      <term name="presented at">presented at</term>
       <term name="chapter-number" form="short">chap.</term>
       <term name="section">section</term>
       <term name="number-of-volumes" form="short">vol.</term>
-      <term name="number">numéro</term>
-      <term name="scale">échelle</term>
+      <term name="number">number</term>
+      <term name="scale">scale</term>
       <term name="circa" form="short">v. </term>
-      <term name="interview" form="verb">interviewé par</term>
-      <term name="author" form="verb">enregistré par</term>
+      <term name="interview" form="verb">interview</term>
+      <term name="author" form="verb">registered by</term>
       <term name="number" form="short">n&amp;#7506;</term>
     </terms>
   </locale>
   <macro name="container-contributors">
     <choose>
       <if type="chapter paper-conference entry-encyclopedia entry-dictionary map" match="any">
-        <names variable="editor container-author" delimiter=", " suffix=", ">
-          <name and="text" delimiter-precedes-last="never" initialize-with=". "/>
-          <label form="short" prefix=" (" suffix=")"/>
+        <names variable="editor">
+          <name and="text" initialize-with=".">
+            <name-part name="family" font-variant="small-caps"/>
+          </name>
         </names>
       </if>
       <else-if type="interview broadcast" match="any">
         <choose>
           <if match="any" variable="container-title">
-            <text variable="publisher" suffix=", "/>
+            <text variable="publisher" suffix=","/>
           </if>
         </choose>
       </else-if>
@@ -60,9 +62,9 @@
   </macro>
   <macro name="secondary-contributors">
     <choose>
-      <if type="article-journal book chapter paper-conference entry-encyclopedia entry-dictionary" match="none">
-        <names variable="editor" delimiter=", " prefix=" (" suffix=")">
-          <name and="symbol" initialize-with=". " delimiter=", "/>
+      <if type="article-journal book chapter paper-conference entry-encyclopedia entry-dictionary" match="any">
+        <names variable="editor" prefix=" " suffix=" ">
+          <name and="text"/>
           <label form="short" prefix=", "/>
         </names>
       </if>
@@ -72,13 +74,15 @@
     <choose>
       <if match="any" variable="composer">
         <names variable="composer">
-          <name and="text" delimiter-precedes-last="never" et-al-use-last="true" initialize-with=". " name-as-sort-order="all"/>
+          <name and="text" delimiter-precedes-last="never" et-al-use-last="true" initialize-with="." name-as-sort-order="all"/>
         </names>
       </if>
       <else>
         <names variable="author">
-          <name and="text" delimiter-precedes-last="never" et-al-use-last="true" initialize-with=". " name-as-sort-order="all"/>
-          <label form="short" prefix=" (" suffix=")"/>
+          <name and="text" delimiter-precedes-last="never" et-al-use-last="true" initialize="false" initialize-with=". " name-as-sort-order="all">
+            <name-part name="family" font-variant="small-caps"/>
+          </name>
+          <label form="short" prefix=", "/>
           <substitute>
             <choose>
               <if type="entry-dictionary entry-encyclopedia webpage manuscript legislation legal_case bill treaty article map article-magazine article-newspaper" match="any">
@@ -108,12 +112,12 @@
     <choose>
       <if match="any" variable="composer">
         <names variable="composer">
-          <name form="short" and="text" name-as-sort-order="all"/>
+          <name form="short" and="text" et-al-min="3" et-al-use-first="2" name-as-sort-order="all"/>
         </names>
       </if>
       <else>
         <names variable="author">
-          <name form="short" and="text" name-as-sort-order="all"/>
+          <name form="short" and="text" et-al-min="3" et-al-use-first="2" et-al-subsequent-min="3" et-al-subsequent-use-first="2" initialize="false" name-as-sort-order="all"/>
           <et-al font-style="italic"/>
           <substitute>
             <choose>
@@ -153,7 +157,7 @@
       <if type="thesis dataset" match="any">
         <choose>
           <if variable="DOI">
-            <text variable="DOI" prefix="https://doi.org/"/>
+            <text variable="DOI"/>
           </if>
           <else-if variable="archive" match="any">
             <group delimiter=". ">
@@ -181,7 +185,7 @@
       <else>
         <choose>
           <if variable="DOI">
-            <text variable="DOI" prefix="https://doi.org/"/>
+            <text variable="DOI"/>
           </if>
           <else>
             <choose>
@@ -201,7 +205,13 @@
                 </choose>
               </if>
               <else>
-                <text variable="URL"/>
+                <group delimiter=", ">
+                  <group delimiter=" ">
+                    <text term="accessed" text-case="capitalize-first"/>
+                    <date form="text" variable="accessed"/>
+                  </group>
+                  <text variable="URL"/>
+                </group>
               </else>
             </choose>
           </else>
@@ -268,14 +278,20 @@
   </macro>
   <macro name="publisher">
     <choose>
-      <if type="speech" match="any">
-        <text variable="publisher-place"/>
+      <if type="book thesis" match="any">
+        <group delimiter=": ">
+          <text variable="publisher-place"/>
+          <text variable="publisher"/>
+        </group>
       </if>
       <else-if type="post thesis" match="none">
         <group delimiter=", ">
           <choose>
             <if type="book chapter report" match="any">
-              <text variable="publisher"/>
+              <group delimiter=": ">
+                <text variable="publisher-place"/>
+                <text variable="publisher" suffix=","/>
+              </group>
             </if>
             <else-if type="patent">
               <group delimiter=", ">
@@ -291,8 +307,11 @@
               </group>
               <text variable="publisher-place"/>
             </else-if>
-            <else-if type="article-journal article-magazine article-newspaper post-weblog" match="none">
-              <text variable="publisher"/>
+            <else-if type="article-journal article-magazine" match="any">
+              <group delimiter=": ">
+                <text variable="publisher-place"/>
+                <text variable="publisher"/>
+              </group>
             </else-if>
           </choose>
         </group>
@@ -353,7 +372,7 @@
     <choose>
       <if match="any" variable="original-date">
         <choose>
-          <if type="musical_score book song chapter" match="any">
+          <if type="musical_score book song" match="any">
             <group prefix="(" suffix=")">
               <date date-parts="year" form="text" variable="issued"/>
               <text variable="year-suffix"/>
@@ -422,7 +441,7 @@
             </group>
           </else-if>
           <else>
-            <group prefix="(" suffix=").">
+            <group prefix="(" suffix="):">
               <date variable="issued">
                 <date-part name="year"/>
               </date>
@@ -570,9 +589,9 @@
   <macro name="locators">
     <choose>
       <if type="article-journal article-magazine review-book interview article" match="any">
-        <group prefix=", " delimiter=", ">
+        <group delimiter=":" prefix=". ">
           <group>
-            <text variable="volume" font-style="italic"/>
+            <text variable="volume" font-style="normal"/>
             <text variable="issue" prefix="(" suffix=")"/>
           </group>
           <text variable="page"/>
@@ -587,7 +606,7 @@
         </group>
       </else-if>
       <else-if type="book paper-conference entry-encyclopedia chapter entry-dictionary musical_score map figure" match="any">
-        <group prefix=" (" suffix=")" delimiter=", ">
+        <group delimiter=", " prefix=" ">
           <group delimiter=", ">
             <text macro="edition"/>
             <text macro="translation-illustration"/>
@@ -604,10 +623,7 @@
             <text term="version"/>
             <text variable="version"/>
           </group>
-          <group delimiter=" ">
-            <label variable="page" form="short"/>
-            <text variable="page"/>
-          </group>
+          <text variable="page"/>
         </group>
         <choose>
           <if type="book" match="any">
@@ -674,7 +690,7 @@
         <if type="chapter paper-conference entry-encyclopedia entry-dictionary song musical_score figure broadcast interview" match="any">
           <choose>
             <if match="any" variable="container-title">
-              <text term="in" text-case="capitalize-first" suffix=" "/>
+              <text term="in" text-case="capitalize-first" font-style="italic" suffix=": "/>
             </if>
           </choose>
         </if>
@@ -721,7 +737,7 @@
   </macro>
   <macro name="original-date">
     <choose>
-      <if type="song musical_score book chapter" match="any">
+      <if type="song musical_score book" match="any">
         <group prefix="(" suffix=")">
           <text value="Publication originale en "/>
           <date variable="original-date">
@@ -746,15 +762,7 @@
   <macro name="title-extra">
     <choose>
       <if type="thesis" match="any">
-        <text variable="archive_location" prefix="(Publication n&amp;#7506;  " suffix=") "/>
-        <group delimiter=", " prefix="[" suffix="]">
-          <group delimiter=" ">
-            <text term="version"/>
-            <text variable="version"/>
-          </group>
-          <text variable="genre"/>
-          <text variable="publisher"/>
-        </group>
+        <text variable="genre"/>
       </if>
       <else-if type="article-journal" match="any">
         <choose>
@@ -875,7 +883,7 @@
         <text variable="number" prefix=", "/>
       </if>
       <else-if type="article" match="any">
-        <text variable="number" prefix=" (" suffix=")"/>
+        <text variable="number" prefix="(" suffix=")"/>
         <choose>
           <if match="none" variable="author editor">
             <text variable="genre" prefix=". [" suffix="]"/>
@@ -892,15 +900,15 @@
       <key macro="author-short"/>
       <key macro="issued-sort"/>
     </sort>
-    <layout prefix="(" suffix=")" delimiter="&#160;; ">
-      <group delimiter=", ">
-        <text macro="author-short"/>
+    <layout delimiter="; " prefix="(" suffix=")">
+      <group delimiter=" ">
+        <text macro="author-short" font-variant="normal"/>
         <text macro="issued-year"/>
         <text macro="citation-locator"/>
       </group>
     </layout>
   </citation>
-  <bibliography delimiter-precedes-last="never" et-al-min="21" et-al-use-first="19" et-al-use-last="true" hanging-indent="true">
+  <bibliography et-al-min="7" et-al-use-first="3" et-al-use-last="true" hanging-indent="true">
     <sort>
       <key macro="author"/>
       <key macro="issued-sort" sort="ascending"/>
@@ -908,7 +916,7 @@
     </sort>
     <layout>
       <group suffix=".">
-        <group delimiter=". ">
+        <group delimiter=" ">
           <text macro="author"/>
           <text macro="issued"/>
           <text macro="title" prefix=" "/>
@@ -916,11 +924,11 @@
         <text macro="title-extra" prefix=" "/>
         <text macro="container" prefix=". "/>
         <text macro="container-title-extra"/>
-        <text macro="locators"/>
         <group delimiter=", " prefix=". ">
           <text macro="event"/>
           <text macro="publisher"/>
         </group>
+        <text macro="locators"/>
       </group>
       <text macro="extra" prefix=" " suffix="."/>
       <text macro="access" prefix=" "/>

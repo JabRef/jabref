@@ -1,5 +1,5 @@
 ---
-parent: Architectural Decisions
+parent: Decision Records
 nav_order: 21
 ---
 # Keep study as a DTO
@@ -7,7 +7,7 @@ nav_order: 21
 ## Context and Problem Statement
 
 The study holds query and library entries that could be replaced respectively with complex query and fetcher instances.
-This poses the question: should the study remain a pure DTO object or should it contain direct object instances?
+This poses the question: should the study remain a pure DTO object, or should it contain direct object instances?
 
 ## Considered Options
 
@@ -16,7 +16,7 @@ This poses the question: should the study remain a pure DTO object or should it 
 
 ## Decision Outcome
 
-Chosen option: "Keep study as DTO and use transformators", because comes out best (see below).
+Chosen option: "Keep study as DTO and use transformers", because comes out best (see below).
 
 ## Pros and Cons of the Options
 
@@ -30,5 +30,5 @@ Chosen option: "Keep study as DTO and use transformators", because comes out bes
 
 * Good, because no need for database and query entries
 * Bad, because custom de-/serializers for fetchers and complex queries needed
-* Bad, because harder to maintain than using "vanilla" jackson de-/serialization
+* Bad, because harder to maintain than using "vanilla" Jackson de-/serialization
 * … <!-- numbers of pros and cons can vary -->
