@@ -192,9 +192,12 @@ public class GroupTreeViewModel extends AbstractViewModel {
 
             newGroup.ifPresent(group -> {
                 // TODO: Keep assignments
-                boolean keepPreviousAssignments = dialogService.showConfirmationDialogAndWait(
-                        Localization.lang("Change of Grouping Method"),
-                        Localization.lang("Assign the original group's entries to this group?"));
+                boolean keepPreviousAssignments = true;
+                if (newGroup.get().getClass() != ExplicitGroup.class) {
+                    keepPreviousAssignments = dialogService.showConfirmationDialogAndWait(
+                    Localization.lang("Change of Grouping Method"),
+                    Localization.lang("Assign the original group's entries to this group?"));
+                }
                 //        WarnAssignmentSideEffects.warnAssignmentSideEffects(newGroup, panel.frame());
                 boolean removePreviousAssignments = (oldGroup.getGroupNode().getGroup() instanceof ExplicitGroup)
                         && (group instanceof ExplicitGroup);
