@@ -6,7 +6,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.h2database:h2-mvstore:2.1.212'
+    implementation 'com.h2database:h2-mvstore:2.1.214'
     implementation 'org.apache.commons:commons-csv:1.9.0'
     implementation 'org.slf4j:slf4j-api:2.0.0-alpha7'
 }
