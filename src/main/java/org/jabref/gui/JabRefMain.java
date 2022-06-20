@@ -80,7 +80,8 @@ public class JabRefMain extends Application {
                 "writerFile.level", "info",
                 "writerFile.file", directory.resolve("log.txt").toString(),
                 "writerFile.charset", "UTF-8");
-        Configuration.replace(configuration);
+
+        configuration.entrySet().forEach(config -> Configuration.set(config.getKey(), config.getValue()));
         initializeLogger();
     }
 
@@ -203,7 +204,7 @@ public class JabRefMain extends Application {
 
         try (DirectoryStream<Path> stream = Files.newDirectoryStream(appData)) {
             for (Path path : stream) {
-                if (Files.isDirectory(path) && !path.equals(currentIndexPath)) {
+                if (Files.isDirectory(path) && !path.toString().endsWith("ssl") && path.toString().contains("lucene") && !path.equals(currentIndexPath)) {
                     LOGGER.info("Deleting out-of-date fulltext search index at {}.", path);
                     Files.walk(path)
                          .sorted(Comparator.reverseOrder())

@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 
 import org.jabref.architecture.AllowedToUseAwt;
+import org.jabref.gui.DialogService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,7 +32,7 @@ public class DefaultDesktop implements NativeDesktop {
     }
 
     @Override
-    public void openConsole(String absolutePath) throws IOException {
+    public void openConsole(String absolutePath, DialogService dialogService) throws IOException {
         LOGGER.error("This feature is not supported by your Operating System.");
     }
 

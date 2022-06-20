@@ -5,15 +5,18 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Locale;
 import java.util.Optional;
 
 import org.jabref.architecture.AllowedToUseAwt;
+import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefExecutorService;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.util.StreamGobbler;
+import org.jabref.logic.l10n.Localization;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,17 +31,17 @@ public class Linux implements NativeDesktop {
             try {
                 File file = new File(filePath);
                 Desktop.getDesktop().open(file);
-                System.out.println("Open file in default application with Desktop integration");
+                LOGGER.debug("Open file in default application with Desktop integration");
             } catch (IllegalArgumentException e) {
-                System.out.println("Fail back to xdg-open");
+                LOGGER.debug("Fail back to xdg-open");
                 try {
                     String[] cmd = {"xdg-open", filePath};
                     Runtime.getRuntime().exec(cmd);
                 } catch (Exception e2) {
-                    System.out.println("Open operation not successful: " + e2);
+                    LOGGER.warn("Open operation not successful: " + e2);
                 }
             } catch (IOException e) {
-                System.out.println("Native open operation not successful: " + e);
+                LOGGER.warn("Native open operation not successful: " + e);
             }
         });
     }
@@ -89,37 +92,67 @@ public class Linux implements NativeDesktop {
     public void openFolderAndSelectFile(Path filePath) throws IOException {
         String desktopSession = System.getenv("DESKTOP_SESSION");
 
-        String cmd = "xdg-open " + filePath.toAbsolutePath().getParent().toString(); // default command
+        String absoluteFilePath = filePath.toAbsolutePath().toString();
+        String[] cmd = {"xdg-open", absoluteFilePath}; // default command
 
         if (desktopSession != null) {
             desktopSession = desktopSession.toLowerCase(Locale.ROOT);
             if (desktopSession.contains("gnome")) {
-                cmd = "nautilus" + filePath.toString().replace(" ", "\\ ");
-            } else if (desktopSession.contains("kde")) {
-                cmd = "dolphin --select " + filePath.toString().replace(" ", "\\ ");
+                cmd = new String[] {"nautilus", "--select", absoluteFilePath};
+            } else if (desktopSession.contains("kde") || desktopSession.contains("plasma")) {
+                cmd = new String[] {"dolphin", "--select", absoluteFilePath};
+            } else if (desktopSession.contains("mate")) {
+                cmd = new String[] {"caja", "--select", absoluteFilePath};
+            } else if (desktopSession.contains("cinnamon")) {
+                cmd = new String[] {"nemo", absoluteFilePath}; // Although nemo is based on nautilus it does not support --select, it directly highlights the file
             }
         }
-        Runtime.getRuntime().exec(cmd);
+        ProcessBuilder processBuilder = new ProcessBuilder((cmd));
+        Process process = processBuilder.start();
+
+        StreamGobbler streamGobblerInput = new StreamGobbler(process.getInputStream(), LOGGER::debug);
+        StreamGobbler streamGobblerError = new StreamGobbler(process.getErrorStream(), LOGGER::debug);
+
+        JabRefExecutorService.INSTANCE.execute(streamGobblerInput);
+        JabRefExecutorService.INSTANCE.execute(streamGobblerError);
     }
 
     @Override
-    public void openConsole(String absolutePath) throws IOException {
-        Runtime runtime = Runtime.getRuntime();
-        Process p = runtime.exec("readlink /etc/alternatives/x-terminal-emulator");
-        BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
+    public void openConsole(String absolutePath, DialogService dialogService) throws IOException {
 
-        String emulatorName = reader.readLine();
-        if (emulatorName != null) {
-            emulatorName = emulatorName.substring(emulatorName.lastIndexOf(File.separator) + 1);
+        if (!Files.exists(Path.of("/etc/alternatives/x-terminal-emulator"))) {
+            dialogService.showErrorDialogAndWait(Localization.lang("Could not detect terminal automatically. Please define a custom terminal in the preferences."));
+            return;
+        }
 
-            if (emulatorName.contains("gnome")) {
-                runtime.exec("gnome-terminal --working-directory=" + absolutePath);
-            } else if (emulatorName.contains("xfce4")) {
-                runtime.exec("xfce4-terminal --working-directory=" + absolutePath);
-            } else if (emulatorName.contains("konsole")) {
-                runtime.exec("konsole --workdir=" + absolutePath);
-            } else {
-                runtime.exec(emulatorName, null, new File(absolutePath));
+        ProcessBuilder processBuilder = new ProcessBuilder("readlink", "/etc/alternatives/x-terminal-emulator");
+        Process process = processBuilder.start();
+
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+            String emulatorName = reader.readLine();
+            if (emulatorName != null) {
+                emulatorName = emulatorName.substring(emulatorName.lastIndexOf(File.separator) + 1);
+
+                String[] cmd = {};
+                if (emulatorName.contains("gnome")) {
+                    cmd = new String[] {"gnome-terminal", "--working-directory=", absolutePath};
+                } else if (emulatorName.contains("xfce4")) {
+                    cmd = new String[] {"xfce4-terminal", "--working-directory=", absolutePath};
+                } else if (emulatorName.contains("konsole")) {
+                    cmd = new String[] {"konsole", "--workdir=", absolutePath};
+                } else {
+                    cmd = new String[] {emulatorName, absolutePath};
+                }
+
+                ProcessBuilder builder = new ProcessBuilder(cmd);
+                builder.directory(new File(absolutePath));
+                Process processTerminal = builder.start();
+
+                StreamGobbler streamGobblerInput = new StreamGobbler(processTerminal.getInputStream(), LOGGER::debug);
+                StreamGobbler streamGobblerError = new StreamGobbler(processTerminal.getErrorStream(), LOGGER::debug);
+
+                JabRefExecutorService.INSTANCE.execute(streamGobblerInput);
+                JabRefExecutorService.INSTANCE.execute(streamGobblerError);
             }
         }
     }

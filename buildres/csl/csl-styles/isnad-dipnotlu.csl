@@ -17,7 +17,7 @@
     <category field="humanities"/>
     <category field="social_science"/>
     <summary>ISNAD Citation Style full notes and bibliography format.</summary>
-    <updated>2020-04-08T12:59:16+00:00</updated>
+    <updated>2022-05-31T12:59:16+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <!--
@@ -763,11 +763,9 @@
   <macro name="locators-note">
     <choose>
       <if type="article-journal article-magazine article-newspaper" match="any">
-        <group delimiter=", ">
-          <group>
-            <number suffix="/" variable="volume"/>
-            <number variable="issue"/>
-          </group>
+        <group delimiter="/">
+          <number variable="volume"/>
+          <number variable="issue"/>
         </group>
       </if>
       <else-if type="bill legislation legal_case" match="any">
@@ -869,11 +867,9 @@
   <macro name="locators">
     <choose>
       <if type="article-journal article-magazine article-newspaper" match="any">
-        <group delimiter=", ">
-          <group>
-            <number suffix="/" variable="volume"/>
-            <number variable="issue"/>
-          </group>
+        <group delimiter="/">
+          <number variable="volume"/>
+          <number variable="issue"/>
         </group>
       </if>
       <else-if type="bill legislation legal_case" match="any">
