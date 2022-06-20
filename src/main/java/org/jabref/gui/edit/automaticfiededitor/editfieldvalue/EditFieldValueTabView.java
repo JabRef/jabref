@@ -3,9 +3,6 @@ package org.jabref.gui.edit.automaticfiededitor.editfieldvalue;
 import java.util.Comparator;
 import java.util.List;
 
-import javax.inject.Inject;
-import javax.swing.undo.UndoManager;
-
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
