@@ -31,6 +31,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We improved group expansion arrow that prevent it from activating group when expanding or collapsing. [#7982](https://github.com/JabRef/jabref/issues/7982), [#3176](https://github.com/JabRef/jabref/issues/3176)
 - When configured SSL certificates changed, JabRef warns the user to restart to apply the configuration.
 - We improved the appearances and logic of the "Manage field names & content" dialog, and renamed it to "Automatic field editor". [#6536](https://github.com/JabRef/jabref/issues/6536)
+- We fixed an issue that caused JabRef to sometimes open multiple instances when "Remote Operation" is enabled. [#8653](https://github.com/JabRef/jabref/issues/8653)
 
 ### Fixed
 
