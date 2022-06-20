@@ -55,7 +55,6 @@ public class UnlinkedFilesDialogView extends BaseDialog<Void> {
 
     @FXML private TextField directoryPathField;
     @FXML private ComboBox<FileExtensionViewModel> fileTypeCombo;
-    @FXML private ComboBox<FileIgnoreUnlinkedFiles> unlinkedFileCombo;
     @FXML private ComboBox<DateRange> fileDateCombo;
     @FXML private ComboBox<ExternalFileSorter> fileSortCombo;
     @FXML private CheckTreeView<FileNodeViewModel> unlinkedFilesList;
@@ -160,12 +159,6 @@ public class UnlinkedFilesDialogView extends BaseDialog<Void> {
         fileSortCombo.setItems(viewModel.getSorters());
         fileSortCombo.valueProperty().bindBidirectional(viewModel.selectedSortProperty());
         fileSortCombo.getSelectionModel().selectFirst();
-        new ViewModelListCellFactory<FileIgnoreUnlinkedFiles>()
-                .withText(FileIgnoreUnlinkedFiles::getFileIgnoreOption)
-                .install(unlinkedFileCombo);
-        unlinkedFileCombo.setItems(viewModel.unlinkedFileFilter());
-        unlinkedFileCombo.valueProperty().bindBidirectional(viewModel.selectedFileIgnoreProperty());
-        unlinkedFileCombo.getSelectionModel().selectFirst();
     }
 
     private void initUnlinkedFilesList() {

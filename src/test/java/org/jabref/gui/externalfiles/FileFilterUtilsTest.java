@@ -163,7 +163,6 @@ public class FileFilterUtilsTest {
 
         @BeforeEach
         public void setUp(@TempDir Path tempDir) throws Exception {
-
             ignoreFileSet.add(".DS_Store");
             ignoreFileSet.add("Thumbs.db");
 
@@ -192,31 +191,6 @@ public class FileFilterUtilsTest {
             targetFiles.add(secondPath);
             targetFiles.add(thirdPath);
             targetFiles.add(fourthPath);
-        }
-
-        @Test
-        public void filteringByGitIgnore() {
-            ArrayList<Path> filteredFiles = new ArrayList<>();
-            for (Path path : files) {
-                if (FileFilterUtils.filterForUnlinkedFiles(path, FileIgnoreUnlinkedFiles.DEFAULT,
-                        ignoreFileSet)) {
-                    filteredFiles.add(path);
-                }
-            }
-            assertEquals(true, compareTwoPathList(filteredFiles, targetFiles));
-        }
-
-        public boolean compareTwoPathList(List<Path> list1, List<Path> list2) {
-            if (list1.size() != list2.size()) {
-                return false;
-            }
-            int cnt = 0;
-            for (Path path : list1) {
-                if (list2.contains(path)) {
-                    cnt++;
-                }
-            }
-            return cnt == list2.size();
         }
     }
 }

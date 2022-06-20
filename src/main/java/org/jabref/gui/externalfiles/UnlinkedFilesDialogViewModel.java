@@ -55,7 +55,6 @@ public class UnlinkedFilesDialogViewModel {
     private final ImportHandler importHandler;
     private final StringProperty directoryPath = new SimpleStringProperty("");
     private final ObjectProperty<FileExtensionViewModel> selectedExtension = new SimpleObjectProperty<>();
-    private final ObjectProperty<FileIgnoreUnlinkedFiles> selectedFileIgnore = new SimpleObjectProperty<>();
     private final ObjectProperty<DateRange> selectedDate = new SimpleObjectProperty<>();
     private final ObjectProperty<ExternalFileSorter> selectedSort = new SimpleObjectProperty<>();
 
@@ -70,7 +69,6 @@ public class UnlinkedFilesDialogViewModel {
     private final ObservableList<FileExtensionViewModel> fileFilterList;
     private final ObservableList<DateRange> dateFilterList;
     private final ObservableList<ExternalFileSorter> fileSortList;
-    private final ObservableList<FileIgnoreUnlinkedFiles> unlinkedFileFilter;
 
     private final DialogService dialogService;
     private final PreferencesService preferences;
@@ -107,8 +105,6 @@ public class UnlinkedFilesDialogViewModel {
                 new FileExtensionViewModel(StandardFileType.BIBTEX_DB, externalFileTypes),
                 new FileExtensionViewModel(StandardFileType.PDF, externalFileTypes));
 
-        this.unlinkedFileFilter = FXCollections.observableArrayList(FileIgnoreUnlinkedFiles.values());
-
         this.dateFilterList = FXCollections.observableArrayList(DateRange.values());
 
         this.fileSortList = FXCollections.observableArrayList(ExternalFileSorter.values());
@@ -123,13 +119,12 @@ public class UnlinkedFilesDialogViewModel {
     public void startSearch() {
         Path directory = this.getSearchDirectory();
         Filter<Path> selectedFileFilter = selectedExtension.getValue().dirFilter();
-        FileIgnoreUnlinkedFiles selectedUnlinkedFileIgnoreFilter = selectedFileIgnore.getValue();
         DateRange selectedDateFilter = selectedDate.getValue();
         ExternalFileSorter selectedSortFilter = selectedSort.getValue();
         progressValueProperty.unbind();
         progressTextProperty.unbind();
 
-        findUnlinkedFilesTask = new UnlinkedFilesCrawler(directory, selectedFileFilter, selectedDateFilter, selectedSortFilter, bibDatabase, preferences.getFilePreferences(), selectedUnlinkedFileIgnoreFilter)
+        findUnlinkedFilesTask = new UnlinkedFilesCrawler(directory, selectedFileFilter, selectedDateFilter, selectedSortFilter, bibDatabase, preferences.getFilePreferences())
                 .onRunning(() -> {
                     progressValueProperty.set(ProgressIndicator.INDETERMINATE_PROGRESS);
                     progressTextProperty.setValue(Localization.lang("Searching file system..."));
@@ -210,10 +205,6 @@ public class UnlinkedFilesDialogViewModel {
         return this.fileFilterList;
     }
 
-    public ObservableList<FileIgnoreUnlinkedFiles> unlinkedFileFilter() {
-        return this.unlinkedFileFilter;
-    }
-
     public ObservableList<DateRange> getDateFilters() {
         return this.dateFilterList;
     }
@@ -273,10 +264,6 @@ public class UnlinkedFilesDialogViewModel {
 
     public ObjectProperty<ExternalFileSorter> selectedSortProperty() {
         return this.selectedSort;
-    }
-
-    public ObjectProperty<FileIgnoreUnlinkedFiles> selectedFileIgnoreProperty() {
-        return this.selectedFileIgnore;
     }
 
     public StringProperty directoryPathProperty() {

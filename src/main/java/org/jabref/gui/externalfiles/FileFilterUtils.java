@@ -22,7 +22,7 @@ public class FileFilterUtils {
 
     /* Returns the last edited time of a file as LocalDateTime. */
     public static LocalDateTime getFileTime(Path path) {
-        FileTime lastEditedTime = null;
+        FileTime lastEditedTime;
         try {
             lastEditedTime = Files.getLastModifiedTime(path);
         } catch (IOException e) {
@@ -78,25 +78,10 @@ public class FileFilterUtils {
         return isInDateRange;
     }
 
-    /* Returns true if a file should be ignored by .gitignore */
-    public static boolean filterForUnlinkedFiles(Path path, FileIgnoreUnlinkedFiles unlinkedFileFilter, Set<String> ignoreFileSet) {
-        if (unlinkedFileFilter.equals(FileIgnoreUnlinkedFiles.DEFAULT)) {
-            try {
-
-                String fileExtension = FileUtil.getFileExtension(path).orElse("");
-                if (!fileExtension.equals("") && ignoreFileSet.contains(fileExtension)) {
-                    return false;
-                }
-            } catch (Exception e) {
-                LOGGER.info("Not file");
-            }
-            return !ignoreFileSet.contains(path.getFileName().toString());
-        }
-        return true;
-    }
-
-    /* Sorts a list of Path objects according to the last edited date
-     * of their corresponding files, from newest to oldest. */
+    /**
+     * Sorts a list of Path objects according to the last edited date
+     * of their corresponding files, from newest to oldest.
+     */
     public List<Path> sortByDateAscending(List<Path> files) {
         return files.stream()
                 .sorted(Comparator.comparingLong(file -> FileFilterUtils.getFileTime(file)
@@ -106,8 +91,10 @@ public class FileFilterUtils {
                 .collect(Collectors.toList());
     }
 
-    /* Sorts a list of Path objects according to the last edited date
-     * of their corresponding files, from oldest to newest. */
+    /**
+     * Sorts a list of Path objects according to the last edited date
+     * of their corresponding files, from oldest to newest.
+     */
     public List<Path> sortByDateDescending(List<Path> files) {
         return files.stream()
                 .sorted(Comparator.comparingLong(file -> -FileFilterUtils.getFileTime(file)
@@ -117,8 +104,10 @@ public class FileFilterUtils {
                 .collect(Collectors.toList());
     }
 
-    /* Sorts a list of Path objects according to the last edited date
-     * the order depends on the specified sorter type. */
+    /**
+     * Sorts a list of Path objects according to the last edited date
+     * the order depends on the specified sorter type.
+     */
     public static List<Path> sortByDate(List<Path> files, ExternalFileSorter sortType) {
         FileFilterUtils fileFilter = new FileFilterUtils();
         List<Path> sortedFiles = switch (sortType) {
