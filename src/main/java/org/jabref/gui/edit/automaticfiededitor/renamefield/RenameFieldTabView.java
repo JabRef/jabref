@@ -22,13 +22,10 @@ import com.airhacks.afterburner.views.ViewLoader;
 public class RenameFieldTabView extends AbstractAutomaticFieldEditorTabView implements AutomaticFieldEditorTab {
     @FXML
     private ComboBox<Field> fieldComboBox;
-
     @FXML
     private TextField newFieldNameTextField;
-
     private final List<BibEntry> selectedEntries;
     private final BibDatabaseContext databaseContext;
-
     private final NamedCompound dialogEdits;
     private RenameFieldViewModel viewModel;
 

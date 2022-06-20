@@ -34,8 +34,6 @@ public class EditFieldValueTabView extends AbstractAutomaticFieldEditorTabView {
     @FXML
     private CheckBox overwriteNonEmptyFieldsCheckBox;
 
-    @Inject private UndoManager undoManager;
-
     private final List<BibEntry> selectedEntries;
     private final BibDatabaseContext databaseContext;
 

@@ -25,7 +25,7 @@ public class AutomaticFieldEditorDialog extends BaseDialog<Void> {
     @FXML
     private TabPane tabPane;
 
-    private UndoManager undoManager;
+    private final UndoManager undoManager;
 
     private final BibDatabaseContext databaseContext;
     private final List<BibEntry> selectedEntries;
