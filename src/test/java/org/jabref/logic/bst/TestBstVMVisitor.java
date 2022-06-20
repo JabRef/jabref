@@ -60,9 +60,11 @@ class TestBstVMVisitor {
     // ToDo: Belongs in testBstFunction
     @Test
     void testAssignFunction() {
-        TestBstVM.TestVM vm = new TestBstVM.TestVM("INTEGERS { test.var }" +
-                "FUNCTION {test.func} { #1 'test.var := }" +
-                "EXECUTE { test.func }");
+        TestBstVM.TestVM vm = new TestBstVM.TestVM("""
+                INTEGERS { test.var }
+                FUNCTION { test.func } { #1 'test.var := }
+                EXECUTE { test.func }
+                """);
 
         vm.render(Collections.emptyList());
 
@@ -125,12 +127,30 @@ class TestBstVMVisitor {
 
     @Test
     void testVisitIdentifier() throws IOException {
-        TestBstVM.TestVM vm = new TestBstVM.TestVM(
-                "ENTRY {author title booktitle year owner timestamp url}{}{} READ"
-                + "FUNCTION { test } {  }");
+        TestBstVM.TestVM vm = new TestBstVM.TestVM("""
+                ENTRY { } { local.variable } { local.label }
+                READ
+                STRINGS { label }
+                INTEGERS { variable }
+                FUNCTION { test } {
+                    #1 'local.variable :=
+                    #2 'variable :=
+                    "TEST" 'local.label :=
+                    "TEST-GLOBAL" 'label :=
+                    local.label local.variable
+                    label variable
+                }
+                ITERATE { test }
+                """);
         List<BibEntry> testEntries = List.of(TestBstVM.t1BibtexEntry());
 
         vm.render(testEntries);
+
+        assertEquals(2, vm.getStack().pop());
+        assertEquals("TEST-GLOBAL", vm.getStack().pop());
+        assertEquals(1, vm.getStack().pop());
+        assertEquals("TEST", vm.getStack().pop());
+        assertEquals(0, vm.getStack().size());
     }
 
     // bstFunction

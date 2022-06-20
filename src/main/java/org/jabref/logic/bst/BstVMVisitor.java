@@ -201,23 +201,18 @@ class BstVMVisitor extends BstBaseVisitor<Integer> {
             return BstVM.TRUE;
         }
 
-        if (bstVMContext.functions().containsKey(name)) {
-            // OK to have a null context
-            bstVMContext.functions().get(name).execute(this, ctx, selectedBstEntry);
-            return BstVM.TRUE;
-        }
-
         throw new BstVMException("No matching identifier found: " + name);
     }
 
     @Override
     public Integer visitBstFunction(BstParser.BstFunctionContext ctx) {
         String name = ctx.getChild(0).getText();
-        if (!bstVMContext.functions().containsKey(name)) {
-            throw new BstVMException("Function does not exist: " + name);
+        if (bstVMContext.functions().containsKey(name)) {
+            bstVMContext.functions().get(name).execute(this, ctx, selectedBstEntry);
+        } else {
+            visit(ctx.getChild(0));
         }
 
-        bstVMContext.functions().get(name).execute(this, ctx, selectedBstEntry);
         return BstVM.TRUE;
     }
 

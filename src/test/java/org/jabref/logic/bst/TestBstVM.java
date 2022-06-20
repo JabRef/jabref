@@ -115,7 +115,7 @@ public class TestBstVM {
     @Test
     public void testExecuteSimple2() throws RecognitionException {
         TestVM vm = new TestVM("""
-                FUNCTION {a}{
+                FUNCTION { a } {
                     #5 #5 =
                     #1 #2 =
                     #3 #4 <
@@ -149,7 +149,7 @@ public class TestBstVM {
     public void testIfSkipPop() throws RecognitionException {
         TestVM vm = new TestVM("""
                 FUNCTION { not } { { #0 } { #1 } if$ }
-                FUNCTION { and } { 'skip$ { pop$ #0 } if$ }"
+                FUNCTION { and } { 'skip$ { pop$ #0 } if$ }
                 FUNCTION { or } { { pop$ #1 } 'skip$ if$ }
                 FUNCTION { test } {
                     #1 #1 and
@@ -678,7 +678,7 @@ public class TestBstVM {
     @Test
     public void testWidth() throws RecognitionException, IOException {
         TestVM vm = new TestVM("""
-                ENTRY { address author title type } {} { label }
+                ENTRY { address author title type } { } { label }
                 STRINGS { longest.label }
                 INTEGERS { number.label longest.label.width }
                 FUNCTION { initialize.longest.label } {

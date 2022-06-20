@@ -19,7 +19,6 @@ import org.jabref.model.entry.AuthorList;
 
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ParseTree;
-import org.antlr.v4.runtime.tree.Tree;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -257,24 +256,25 @@ public class BstFunctions {
 
             // ToDo: use switch statement pattern matching instead (Java 19)
             if (o2 instanceof String) {
+                String value = (String) o2;
                 if ((context != null) && context.localStrings.containsKey(name)) {
-                    context.localStrings.put(name, (String) o2);
+                    context.localStrings.put(name, value);
                     return true;
                 }
 
                 if (strings.containsKey(name)) {
-                    strings.put(name, (String) o2);
+                    strings.put(name, value);
                     return true;
                 }
-                return false;
             } else {
+                Integer value = (Integer) o2;
                 if ((context != null) && context.localIntegers.containsKey(name)) {
-                    context.localIntegers.put(name, (Integer) o2);
+                    context.localIntegers.put(name, value);
                     return true;
                 }
 
                 if (integers.containsKey(name)) {
-                    integers.put(name, (Integer) o2);
+                    integers.put(name, value);
                     return true;
                 }
             }
@@ -505,15 +505,15 @@ public class BstFunctions {
      */
     private void bstIf(BstVMVisitor visitor, ParserRuleContext parserRuleContext) {
         if (stack.size() < 3) {
-            throw new BstVMException("Not enough operands on stack for operation =");
+            throw new BstVMException("Not enough operands on stack for if$");
         }
 
         Object f1 = stack.pop();
         Object f2 = stack.pop();
         Object i = stack.pop();
 
-        if (!((f1 instanceof BstVMVisitor.Identifier) || (f1 instanceof Tree))
-                && ((f2 instanceof BstVMVisitor.Identifier) || (f2 instanceof Tree)) && (i instanceof Integer)) {
+        if (!((f1 instanceof BstVMVisitor.Identifier) || (f1 instanceof ParseTree))
+                && ((f2 instanceof BstVMVisitor.Identifier) || (f2 instanceof ParseTree)) && (i instanceof Integer)) {
             throw new BstVMException("Expecting two functions and an integer for if$.");
         }
 
