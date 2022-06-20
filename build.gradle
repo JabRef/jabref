@@ -120,7 +120,7 @@ dependencies {
 
     implementation group: 'org.apache.commons', name: 'commons-csv', version: '1.9.0'
     implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.12.0'
-    implementation 'com.h2database:h2-mvstore:2.1.212'
+    implementation 'com.h2database:h2-mvstore:2.1.214'
 
     implementation group: 'org.apache.tika', name: 'tika-core', version: '2.4.1'
     implementation 'com.ibm.icu:icu4j-charset:71.1'
