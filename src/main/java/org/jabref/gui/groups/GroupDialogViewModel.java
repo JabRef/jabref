@@ -38,6 +38,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.Keyword;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.groups.AbstractGroup;
+import org.jabref.model.groups.AutomaticGroup;
 import org.jabref.model.groups.AutomaticKeywordGroup;
 import org.jabref.model.groups.AutomaticPersonsGroup;
 import org.jabref.model.groups.ExplicitGroup;
@@ -385,9 +386,7 @@ public class GroupDialogViewModel {
             descriptionProperty.setValue(editedGroup.getDescription().orElse(""));
             iconProperty.setValue(editedGroup.getIconName().orElse(""));
             groupHierarchySelectedProperty.setValue(editedGroup.getHierarchicalContext());
-            typeExplicitProperty.setValue(true);
 
-            /*
             if (editedGroup.getClass() == WordKeywordGroup.class) {
                 typeKeywordsProperty.setValue(true);
 
@@ -430,7 +429,6 @@ public class GroupDialogViewModel {
                 TexGroup group = (TexGroup) editedGroup;
                 texGroupFilePathProperty.setValue(group.getFilePath().toString());
             }
-             */
         }
     }
 

@@ -27,8 +27,15 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.groups.AbstractGroup;
+import org.jabref.model.groups.AutomaticGroup;
+import org.jabref.model.groups.AutomaticKeywordGroup;
+import org.jabref.model.groups.AutomaticPersonsGroup;
 import org.jabref.model.groups.ExplicitGroup;
 import org.jabref.model.groups.GroupTreeNode;
+import org.jabref.model.groups.RegexKeywordGroup;
+import org.jabref.model.groups.SearchGroup;
+import org.jabref.model.groups.TexGroup;
+import org.jabref.model.groups.WordKeywordGroup;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.preferences.PreferencesService;
 
@@ -178,6 +185,75 @@ public class GroupTreeViewModel extends AbstractViewModel {
         currentDatabase.ifPresent(database -> database.getMetaData().setGroups(rootGroup.get().getGroupNode()));
     }
 
+    private boolean compareGroupType(AbstractGroup oldGroup, AbstractGroup newGroup) {
+        if (!oldGroup.getClass().equals(newGroup.getClass())) {
+            return false;
+        }
+
+        if (oldGroup.getClass() == WordKeywordGroup.class) {
+            WordKeywordGroup oldWordKeywordGroup = (WordKeywordGroup) oldGroup;
+            WordKeywordGroup newWordKeywordGroup = (WordKeywordGroup) newGroup;
+
+            if (!oldWordKeywordGroup.getSearchField().getName().equals(newWordKeywordGroup.getSearchField().getName())) {
+                return false;
+            } else if (!oldWordKeywordGroup.getSearchExpression().equals(newWordKeywordGroup.getSearchExpression())) {
+                return false;
+            } else if (oldWordKeywordGroup.isCaseSensitive() != newWordKeywordGroup.isCaseSensitive()) {
+                return false;
+            }
+        } else if (oldGroup.getClass() == RegexKeywordGroup.class) {
+            RegexKeywordGroup oldRegexKeywordGroup = (RegexKeywordGroup) oldGroup;
+            RegexKeywordGroup newRegexKeywordGroup = (RegexKeywordGroup) newGroup;
+
+            if (!oldRegexKeywordGroup.getSearchField().getName().equals(newRegexKeywordGroup.getSearchField().getName())) {
+                return false;
+            } else if (!oldRegexKeywordGroup.getSearchExpression().equals(newRegexKeywordGroup.getSearchExpression())) {
+                return false;
+            } else if (oldRegexKeywordGroup.isCaseSensitive() != newRegexKeywordGroup.isCaseSensitive()) {
+                return false;
+            }
+        } else if (oldGroup.getClass() == SearchGroup.class) {
+            SearchGroup oldSearchGroup = (SearchGroup) oldGroup;
+            SearchGroup newSearchGroup = (SearchGroup) newGroup;
+
+            if (!oldSearchGroup.getSearchExpression().equals(newSearchGroup.getSearchExpression())) {
+                return false;
+            } else if (!oldSearchGroup.getSearchFlags().equals(newSearchGroup.getSearchFlags())) {
+                return false;
+            }
+        } else if (oldGroup.getClass() == ExplicitGroup.class) {
+            return true;
+        } else if (oldGroup instanceof AutomaticGroup) {
+            if (oldGroup.getClass() == AutomaticKeywordGroup.class) {
+                AutomaticKeywordGroup oldAutomaticKeywordGroup = (AutomaticKeywordGroup) oldGroup;
+                AutomaticKeywordGroup newAutomaticKeywordGroup = (AutomaticKeywordGroup) newGroup;
+
+                if (!oldAutomaticKeywordGroup.getKeywordDelimiter().toString().equals(newAutomaticKeywordGroup.getKeywordDelimiter().toString())) {
+                    return false;
+                } else if (!oldAutomaticKeywordGroup.getKeywordHierarchicalDelimiter().toString().equals(newAutomaticKeywordGroup.getKeywordHierarchicalDelimiter().toString())) {
+                    return false;
+                } else if (!oldAutomaticKeywordGroup.getField().getName().equals(newAutomaticKeywordGroup.getField().getName())) {
+                    return false;
+                }
+            } else if (oldGroup.getClass() == AutomaticPersonsGroup.class) {
+                AutomaticPersonsGroup oldAutomaticPersonsGroup = (AutomaticPersonsGroup) oldGroup;
+                AutomaticPersonsGroup newAutomaticPersonsGroup = (AutomaticPersonsGroup) newGroup;
+
+                if (!oldAutomaticPersonsGroup.getField().getName().equals(newAutomaticPersonsGroup.getField().getName())) {
+                    return false;
+                }
+            }
+        } else if (oldGroup.getClass() == TexGroup.class) {
+            TexGroup oldTexGroup = (TexGroup) oldGroup;
+            TexGroup newTexGroup = (TexGroup) newGroup;
+
+            if (!oldTexGroup.getFilePath().toString().equals(newTexGroup.getFilePath().toString())) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     /**
      * Opens "Edit Group Dialog" and changes the given group to the edited one.
      */
@@ -193,7 +269,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
             newGroup.ifPresent(group -> {
                 // TODO: Keep assignments
                 boolean keepPreviousAssignments = true;
-                if (newGroup.get().getClass() != ExplicitGroup.class) {
+                if (!compareGroupType(oldGroup.getGroupNode().getGroup(), newGroup.get())) {
                     keepPreviousAssignments = dialogService.showConfirmationDialogAndWait(
                     Localization.lang("Change of Grouping Method"),
                     Localization.lang("Assign the original group's entries to this group?"));
