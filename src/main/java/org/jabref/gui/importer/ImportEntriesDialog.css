@@ -16,5 +16,5 @@
 }
 
 .list-cell:entry-selected {
-    -fx-background-color: derive(-jr-selected, 60%);
+    -fx-background-color: derive(-jr-selected, 35%);
 }
