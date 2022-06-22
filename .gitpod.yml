@@ -5,4 +5,4 @@ tasks:
 vscode:
   extensions:
     - redhat.java
-    - vscjava
+    - vscjava.vscode-java-pack
