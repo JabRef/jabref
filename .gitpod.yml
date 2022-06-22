@@ -1,0 +1,8 @@
+image:
+  file: .gitpod.Dockerfile
+tasks:
+  - init: ./gradlew assemble
+vscode:
+  extensions:
+    - redhat.java
+    - vscjava
