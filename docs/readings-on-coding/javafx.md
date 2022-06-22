@@ -1,15 +1,19 @@
+---
+nav_order: 1
+parent: Readings on Coding
+---
 # Readings on JavaFX
 
 JabRef's recommendations about JavaFX
 
-## Architecture: Model - View - \(Controller\) - ViewModel  \(MV\(C\)VM\)
+## Architecture: Model - View - (Controller) - ViewModel (MV(C)VM)
 
 The goal of the MVVM architecture is to separate the state/behavior from the appearance of the ui. This is archived by dividing JabRef into different layers, each having a clear responsibility.
 
 * The _Model_ contains the business logic and data structures. These aspects are again encapsulated in the _logic_ and _model_ package, respectively.
 * The _View_ controls the appearance and structure of the UI. It is usually defined in a _FXML_ file.
 * _View model_ converts the data from logic and model in a form that is easily usable in the gui. Thus it controls the state of the View. Moreover, the ViewModel contains all the logic needed to change the current state of the UI or perform an action. These actions are usually passed down to the _logic_ package, after some data validation. The important aspect is that the ViewModel contains all the ui-related logic but does _not_ have direct access to the controls defined in the View. Hence, the ViewModel can easily be tested by unit tests.
-* The _Controller_ initializes the view model and binds it to the view. In an ideal world all the binding would already be done directly in the FXML. But JavaFX's binding expressions are not yet powerful enough to accomplish this. It is important to keep in mind that the Controller should be as minimalistic as possible. Especially one should resist the temptation to validate inputs in the controller. The ViewModel should handle data validation! It is often convenient to load the FXML file directly from the controller.  
+* The _Controller_ initializes the view model and binds it to the view. In an ideal world all the binding would already be done directly in the FXML. But JavaFX's binding expressions are not yet powerful enough to accomplish this. It is important to keep in mind that the Controller should be as minimalistic as possible. Especially one should resist the temptation to validate inputs in the controller. The ViewModel should handle data validation! It is often convenient to load the FXML file directly from the controller.
 
 The only class which access model and logic classes is the ViewModel. Controller and View have only access the ViewModel and never the backend. The ViewModel does not know the Controller or View.
 
@@ -26,7 +30,7 @@ public class MyDialogViewModel extends AbstractViewModel {
 }
 ```
 
-* Add a \(readonly\) property as a private field and generate the getters according to the [JavaFX bean conventions](https://docs.oracle.com/javafx/2/binding/jfxpub-binding.htm):
+* Add a (readonly) property as a private field and generate the getters according to the [JavaFX bean conventions](https://docs.oracle.com/javafx/2/binding/jfxpub-binding.htm):
 
 ```java
 private final ReadOnlyStringWrapper heading = new ReadOnlyStringWrapper();
@@ -79,13 +83,13 @@ public class AboutDialogView extends BaseDialog<Void>
 @Inject private DialogService dialogService;
 ```
 
-* It is convenient to load the FXML-view directly from the controller class.
+*   It is convenient to load the FXML-view directly from the controller class.
 
-  The FXML file is loaded using `ViewLoader` based on the name of the class passed to `view`. To make this convention-over-configuration approach work, both the FXML file and the View class should have the same name and should be located in the same package.
+    The FXML file is loaded using `ViewLoader` based on the name of the class passed to `view`. To make this convention-over-configuration approach work, both the FXML file and the View class should have the same name and should be located in the same package.
 
-  Note that fields annotated with `@FXML` or `@Inject` only become accessible after `ViewLoader.load()` is called.
+    Note that fields annotated with `@FXML` or `@Inject` only become accessible after `ViewLoader.load()` is called.
 
-  a `View` class that loads the FXML file.
+    a `View` class that loads the FXML file.
 
 ```java
 private Dependency dependency;
@@ -140,20 +144,19 @@ The view consists a FXML file `MyDialog.fxml` which defines the structure and th
 
 * [curated list of awesome JavaFX frameworks, libraries, books and etc...](https://github.com/mhrimaz/AwesomeJavaFX)
 * [ControlsFX](http://fxexperience.com/controlsfx/features/) amazing collection of controls
-* [jIconFont](http://jiconfont.github.io/googlematerialdesignicons) or [fontawesomefx](https://bitbucket.org/Jerady/fontawesomefx/)
 * [Undo manager](https://github.com/FXMisc/UndoFX)
 * [Docking manager](https://github.com/alexbodogit/AnchorFX) [or](https://github.com/RobertBColton/DockFX)
 * [additional bindings](https://github.com/lestard/advanced-bindings) or [EasyBind](https://github.com/TomasMikula/EasyBind)
-* [Kubed](https://github.com/hudsonb/kubed): data visualization \(inspired by d3\)
+* [Kubed](https://github.com/hudsonb/kubed): data visualization (inspired by d3)
 * [Validation framework](https://github.com/sialcasa/mvvmFX/wiki/Validation)
 * [mvvm framework](https://github.com/sialcasa/mvvmFX/wiki)
 * [CSS Reference](http://docs.oracle.com/javafx/2/api/javafx/scene/doc-files/cssref.html)
 * [JFoenix](https://github.com/jfoenixadmin/JFoenix) Material Designs look & feel
-* [FontAwesomeFX](https://bitbucket.org/Jerady/fontawesomefx/overview): supports different icon fonts
 * [JavaFX Documentation project](https://fxdocs.github.io/docs/html5/index.html): Collected information on JavaFX in a central place
-* [FXExperience](http://fxexperience.com/) JavaFX Links of the week
+* [FXExperience](http://fxexperience.com) JavaFX Links of the week
+* [Foojay](https://foojay.io) Java and JavaFX tutorials
+* [FXTutorials](https://github.com/AlmasB/FXTutorials) A wide range of practical tutorials focusing on Java, JavaFX and FXGL
 
 ## Features missing in JavaFX
 
 * bidirectional binding in FXML, see [official feature request](https://bugs.openjdk.java.net/browse/JDK-8090665)
-

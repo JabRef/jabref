@@ -6,6 +6,7 @@ import com.tngtech.archunit.core.domain.JavaClasses;
 import com.tngtech.archunit.junit.AnalyzeClasses;
 import com.tngtech.archunit.junit.ArchIgnore;
 import com.tngtech.archunit.junit.ArchTest;
+import com.tngtech.archunit.library.GeneralCodingRules;
 
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
 import static com.tngtech.archunit.library.Architectures.layeredArchitecture;
@@ -20,6 +21,7 @@ class MainArchitectureTests {
     private static final String PACKAGE_ORG_JABREF_GUI = "org.jabref.gui..";
     private static final String PACKAGE_ORG_JABREF_LOGIC = "org.jabref.logic..";
     private static final String PACKAGE_ORG_JABREF_MODEL = "org.jabref.model..";
+    private static final String PACKAGE_ORG_JABREF_CLI = "org.jabref.cli..";
 
     @ArchTest
     public static void doNotUseApacheCommonsLang3(JavaClasses classes) {
@@ -92,7 +94,7 @@ class MainArchitectureTests {
                 .layer("Gui").definedBy(PACKAGE_ORG_JABREF_GUI)
                 .layer("Logic").definedBy(PACKAGE_ORG_JABREF_LOGIC)
                 .layer("Model").definedBy(PACKAGE_ORG_JABREF_MODEL)
-                .layer("Cli").definedBy("org.jabref.cli..")
+                .layer("Cli").definedBy(PACKAGE_ORG_JABREF_CLI)
                 .layer("Migrations").definedBy("org.jabref.migrations..") // TODO: Move to logic
                 .layer("Preferences").definedBy("org.jabref.preferences..")
                 .layer("Styletester").definedBy("org.jabref.styletester..")
@@ -117,7 +119,12 @@ class MainArchitectureTests {
 
     @ArchTest
     public static void restrictUsagesInModel(JavaClasses classes) {
-        noClasses().that().resideInAPackage(PACKAGE_ORG_JABREF_MODEL)
+        // Until we switch to Lucene, we need to access Globals.stateManager().getActiveDatabase() from the search classes,
+        // because the PDFSearch needs to access the index of the corresponding database
+        noClasses().that().areNotAssignableFrom("org.jabref.model.search.rules.ContainBasedSearchRule")
+                   .and().areNotAssignableFrom("org.jabref.model.search.rules.RegexBasedSearchRule")
+                   .and().areNotAssignableFrom("org.jabref.model.search.rules.GrammarBasedSearchRule")
+                   .and().resideInAPackage(PACKAGE_ORG_JABREF_MODEL)
                    .should().dependOnClassesThat().resideInAPackage(PACKAGE_JAVAX_SWING)
                    .orShould().dependOnClassesThat().haveFullyQualifiedName(CLASS_ORG_JABREF_GLOBALS)
                    .check(classes);
@@ -128,6 +135,16 @@ class MainArchitectureTests {
         noClasses().that().resideInAPackage(PACKAGE_ORG_JABREF_LOGIC)
                    .should().dependOnClassesThat().resideInAPackage(PACKAGE_JAVAX_SWING)
                    .orShould().dependOnClassesThat().haveFullyQualifiedName(CLASS_ORG_JABREF_GLOBALS)
+                   .check(classes);
+    }
+
+    @ArchTest
+    public static void restrictStandardStreams(JavaClasses classes) {
+        noClasses().that().resideOutsideOfPackages(PACKAGE_ORG_JABREF_CLI)
+                   .and().resideOutsideOfPackages("org.jabref.gui.openoffice..") // Uses LibreOffice SDK
+                   .and().areNotAnnotatedWith(AllowedToUseStandardStreams.class)
+                   .should(GeneralCodingRules.ACCESS_STANDARD_STREAMS)
+                   .because("logging framework should be used instead or the class be marked explicitly as @AllowedToUseStandardStreams")
                    .check(classes);
     }
 }

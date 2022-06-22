@@ -38,7 +38,11 @@ public class UnicodeToLatexFormatter extends Formatter implements LayoutFormatte
                 Integer cpNext = result.codePointAt(i + 1);
                 String code = HTMLUnicodeConversionMaps.ESCAPED_ACCENTS.get(cpNext);
                 if (code == null) {
-                    sb.append((char) cpCurrent);
+                    // skip next index to avoid reading surrogate as a separate char
+                    if (!Character.isBmpCodePoint(cpCurrent)) {
+                        i++;
+                    }
+                    sb.appendCodePoint(cpCurrent);
                 } else {
                     sb.append("{\\").append(code).append('{').append((char) cpCurrent).append("}}");
                     consumed = true;

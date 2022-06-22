@@ -2,11 +2,16 @@ package org.jabref.logic.integrity;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Stream;
 
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -15,22 +20,19 @@ public class BibStringCheckerTest {
     private final BibStringChecker checker = new BibStringChecker();
     private final BibEntry entry = new BibEntry();
 
-    @Test
-    void fieldAcceptsNoHashMarks() {
-        entry.setField(StandardField.TITLE, "Not a single hash mark");
-        assertEquals(Collections.emptyList(), checker.check(entry));
+    @ParameterizedTest
+    @MethodSource("provideAcceptedInputs")
+    void acceptsAllowedInputs(List<IntegrityMessage> expected, Field field, String value) {
+        entry.setField(field, value);
+        assertEquals(expected, checker.check(entry));
     }
 
-    @Test
-    void monthAcceptsEvenNumberOfHashMarks() {
-        entry.setField(StandardField.MONTH, "#jan#");
-        assertEquals(Collections.emptyList(), checker.check(entry));
-    }
-
-    @Test
-    void authorAcceptsEvenNumberOfHashMarks() {
-        entry.setField(StandardField.AUTHOR, "#einstein# and #newton#");
-        assertEquals(Collections.emptyList(), checker.check(entry));
+    private static Stream<Arguments> provideAcceptedInputs() {
+        return Stream.of(
+                Arguments.of(Collections.emptyList(), StandardField.TITLE, "Not a single hash mark"),
+                Arguments.of(Collections.emptyList(), StandardField.MONTH, "#jan#"),
+                Arguments.of(Collections.emptyList(), StandardField.AUTHOR, "#einstein# and #newton#")
+        );
     }
 
     @Test

@@ -17,7 +17,7 @@
             fx:controller="org.jabref.gui.preferences.PreferencesDialogView">
     <content>
         <SplitPane dividerPositions="0.2">
-            <VBox id="sidepane" prefWidth="160.0">
+            <VBox id="sidepane">
                 <CustomTextField fx:id="searchBox" promptText="%Search" VBox.vgrow="NEVER">
                     <VBox.margin>
                         <Insets bottom="3.0" left="3.0" right="3.0" top="3.0"/>
@@ -63,7 +63,7 @@
                     </Button>
                 </HBox>
             </VBox>
-            <ScrollPane fx:id="preferencesContainer" maxHeight="Infinity" maxWidth="Infinity"/>
+            <ScrollPane fx:id="preferencesContainer"/>
         </SplitPane>
     </content>
     <ButtonType fx:id="saveButton" text="%Save" buttonData="OK_DONE"/>

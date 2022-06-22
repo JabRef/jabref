@@ -19,7 +19,7 @@ public class JabRefCLI {
     private static final int WIDTH = 100; // Number of characters per line
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefCLI.class);
     private final CommandLine cl;
-    private List<String> leftOver;
+    private final List<String> leftOver;
 
     public JabRefCLI(String[] args) throws ParseException {
         Options options = getOptions();
@@ -147,6 +147,24 @@ public class JabRefCLI {
         return cl.hasOption("automaticallySetFileLinks");
     }
 
+    public boolean isWriteXMPtoPdf() {
+        return cl.hasOption("writeXMPtoPdf");
+    }
+
+    public boolean isEmbeddBibfileInPdf() {
+        return cl.hasOption("embeddBibfileInPdf");
+    }
+
+    public boolean isWriteMetadatatoPdf() {
+        return cl.hasOption("writeMetadatatoPdf");
+    }
+
+    public String getWriteMetadatatoPdf() {
+        return cl.hasOption("writeMetadatatoPdf") ? cl.getOptionValue("writeMetadatatoPdf") :
+                cl.hasOption("writeXMPtoPdf") ? cl.getOptionValue("writeXMPtoPdf") :
+                cl.hasOption("embeddBibfileInPdf") ? cl.getOptionValue("embeddBibfileInPdf") : null;
+    }
+
     private static Options getOptions() {
         Options options = new Options();
 
@@ -240,6 +258,30 @@ public class JabRefCLI {
                 .desc(String.format("%s: '%s'", Localization.lang("Reset preferences"), "-d mainFontSize,newline' or '-d all"))
                 .hasArg()
                 .argName("KEY1[,KEY2][,KEYn] | all")
+                .build());
+
+        options.addOption(Option
+                .builder()
+                .longOpt("writeXMPtoPdf")
+                .desc(String.format("%s: '%s'", Localization.lang("Write BibTeXEntry as XMP metadata to PDF."), "-w pathToMyOwnPaper.pdf"))
+                .hasArg()
+                .argName("CITEKEY1[,CITEKEY2][,CITEKEYn] | PDF1[,PDF2][,PDFn] | all")
+                .build());
+
+        options.addOption(Option
+                .builder()
+                .longOpt("embeddBibfileInPdf")
+                .desc(String.format("%s: '%s'", Localization.lang("Embed BibTeXEntry in PDF."), "-w pathToMyOwnPaper.pdf"))
+                .hasArg()
+                .argName("CITEKEY1[,CITEKEY2][,CITEKEYn] | PDF1[,PDF2][,PDFn] | all")
+                .build());
+
+        options.addOption(Option
+                .builder("w")
+                .longOpt("writeMetadatatoPdf")
+                .desc(String.format("%s: '%s'", Localization.lang("Write BibTeXEntry as metadata to PDF."), "-w pathToMyOwnPaper.pdf"))
+                .hasArg()
+                .argName("CITEKEY1[,CITEKEY2][,CITEKEYn] | PDF1[,PDF2][,PDFn] | all")
                 .build());
 
         return options;

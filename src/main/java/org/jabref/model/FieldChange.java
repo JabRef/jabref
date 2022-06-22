@@ -16,8 +16,8 @@ public class FieldChange {
     private final String newValue;
 
     public FieldChange(BibEntry entry, Field field, String oldValue, String newValue) {
-        this.entry = entry;
-        this.field = field;
+        this.entry = Objects.requireNonNull(entry);
+        this.field = Objects.requireNonNull(field);
         this.oldValue = oldValue;
         this.newValue = newValue;
     }

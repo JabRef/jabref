@@ -36,6 +36,7 @@ import java.util.Map.Entry;
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
@@ -97,13 +98,15 @@ public class URLDownload {
      * security-relevant information this is kind of OK (no, actually it is not...).
      * <p>
      * Taken from http://stackoverflow.com/a/6055903/873661 and https://stackoverflow.com/a/19542614/873661
+     *
+     * @deprecated
      */
+    @Deprecated
     public static void bypassSSLVerification() {
         LOGGER.warn("Fix SSL exceptions by accepting ALL certificates");
 
         // Create a trust manager that does not validate certificate chains
         TrustManager[] trustAllCerts = {new X509TrustManager() {
-
             @Override
             public void checkClientTrusted(X509Certificate[] chain, String authType) {
             }
@@ -129,6 +132,20 @@ public class URLDownload {
             HttpsURLConnection.setDefaultHostnameVerifier(allHostsValid);
         } catch (Exception e) {
             LOGGER.error("A problem occurred when bypassing SSL verification", e);
+        }
+    }
+
+    /**
+     *
+     * @param socketFactory trust manager
+     * @param verifier host verifier
+     */
+    public static void setSSLVerification(SSLSocketFactory socketFactory, HostnameVerifier verifier) {
+        try {
+            HttpsURLConnection.setDefaultSSLSocketFactory(socketFactory);
+            HttpsURLConnection.setDefaultHostnameVerifier(verifier);
+        } catch (Exception e) {
+            LOGGER.error("A problem occurred when reset SSL verification", e);
         }
     }
 
@@ -185,7 +202,7 @@ public class URLDownload {
         Unirest.config().setDefaultHeader("User-Agent", "Mozilla/5.0 (Windows; U; WindowsNT 5.1; en-US; rv1.8.1.6) Gecko/20070725 Firefox/2.0.0.6");
 
         int statusCode = Unirest.head(source.toString()).asString().getStatus();
-        return statusCode >= 200 && statusCode < 300;
+        return (statusCode >= 200) && (statusCode < 300);
     }
 
     public boolean isMimeType(String type) {
@@ -290,11 +307,12 @@ public class URLDownload {
 
         // Take everything after the last '/' as name + extension
         String fileNameWithExtension = sourcePath.substring(sourcePath.lastIndexOf('/') + 1);
-        String fileName = FileUtil.getBaseName(fileNameWithExtension);
+        String fileName = "jabref-" + FileUtil.getBaseName(fileNameWithExtension);
         String extension = "." + FileHelper.getFileExtension(fileNameWithExtension).orElse("tmp");
 
         // Create temporary file and download to it
         Path file = Files.createTempFile(fileName, extension);
+        file.toFile().deleteOnExit();
         toFile(file);
 
         return file;
@@ -308,7 +326,6 @@ public class URLDownload {
     private void copy(InputStream in, Writer out, Charset encoding) throws IOException {
         Reader r = new InputStreamReader(in, encoding);
         try (BufferedReader read = new BufferedReader(r)) {
-
             String line;
             while ((line = read.readLine()) != null) {
                 out.write(line);

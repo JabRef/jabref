@@ -1,6 +1,6 @@
 %0 \endnotereftype
 %0 Thesis
-%A \format[AuthorLastFirst,RemoveBracketsAddComma,AuthorAndsReplacer]{\author}
+%A \format[Authors(LastFirst,FullName,Semicolon,Amp)]{\author}
 %D \year
 %T \format[RemoveLatexCommands]{\title}
 %E

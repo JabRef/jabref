@@ -1,9 +1,9 @@
 %0 \endnotereftype
 %0 Book
-%A \format[AuthorLastFirst,RemoveBracketsAddComma,AuthorAndsReplacer]{\author}
+%A \format[Authors(LastFirst,FullName,Semicolon,Amp)]{\author}
 %D \year
 %T \format[RemoveLatexCommands]{\title}
-%E \format[AuthorLastFirst,RemoveBracketsAddComma,AuthorAndsReplacer]{\editor}
+%E \format[Authors(LastFirst,FullName,Semicolon,Amp)]{\editor}
 %B \series
 %C \address
 %I \publisher

@@ -25,8 +25,7 @@ import com.tobiasdiez.easybind.PreboundBinding;
 import com.tobiasdiez.easybind.Subscription;
 
 /**
- * Helper methods for javafx binding.
- * Some methods are taken from https://bugs.openjdk.java.net/browse/JDK-8134679
+ * Helper methods for javafx binding. Some methods are taken from https://bugs.openjdk.java.net/browse/JDK-8134679
  */
 public class BindingsHelper {
 
@@ -43,8 +42,7 @@ public class BindingsHelper {
     }
 
     public static <T, U> ObservableList<U> map(ObservableValue<T> source, Function<T, List<U>> mapper) {
-        PreboundBinding<List<U>> binding = new PreboundBinding<List<U>>(source) {
-
+        PreboundBinding<List<U>> binding = new PreboundBinding<>(source) {
             @Override
             protected List<U> computeValue() {
                 return mapper.apply(source.getValue());
@@ -57,7 +55,7 @@ public class BindingsHelper {
     }
 
     /**
-     * Binds propertA bidirectional to propertyB using the provided map functions to convert between them.
+     * Binds propertyA bidirectional to propertyB using the provided map functions to convert between them.
      */
     public static <A, B> void bindBidirectional(Property<A> propertyA, Property<B> propertyB, Function<A, B> mapAtoB, Function<B, A> mapBtoA) {
         Consumer<B> updateA = newValueB -> propertyA.setValue(mapBtoA.apply(newValueB));
@@ -66,15 +64,14 @@ public class BindingsHelper {
     }
 
     /**
-     * Binds propertA bidirectional to propertyB while using updateB to update propertyB when propertyA changed.
+     * Binds propertyA bidirectional to propertyB while using updateB to update propertyB when propertyA changed.
      */
     public static <A> void bindBidirectional(Property<A> propertyA, ObservableValue<A> propertyB, Consumer<A> updateB) {
         bindBidirectional(propertyA, propertyB, propertyA::setValue, updateB);
     }
 
     /**
-     * Binds propertA bidirectional to propertyB using updateB to update propertyB when propertyA changed and similar
-     * for updateA.
+     * Binds propertyA bidirectional to propertyB using updateB to update propertyB when propertyA changed and similar for updateA.
      */
     public static <A, B> void bindBidirectional(ObservableValue<A> propertyA, ObservableValue<B> propertyB, Consumer<B> updateA, Consumer<A> updateB) {
         final BidirectionalBinding<A, B> binding = new BidirectionalBinding<>(propertyA, propertyB, updateA, updateB);
@@ -135,8 +132,7 @@ public class BindingsHelper {
     }
 
     public static <T> ObservableValue<T> constantOf(T value) {
-        return new ObjectBinding<T>() {
-
+        return new ObjectBinding<>() {
             @Override
             protected T computeValue() {
                 return value;
@@ -146,7 +142,6 @@ public class BindingsHelper {
 
     public static ObservableValue<Boolean> constantOf(boolean value) {
         return new BooleanBinding() {
-
             @Override
             protected boolean computeValue() {
                 return value;
@@ -156,7 +151,6 @@ public class BindingsHelper {
 
     public static ObservableValue<? extends String> emptyString() {
         return new StringBinding() {
-
             @Override
             protected String computeValue() {
                 return "";

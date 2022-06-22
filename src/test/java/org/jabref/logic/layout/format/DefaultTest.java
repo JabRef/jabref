@@ -1,49 +1,36 @@
 package org.jabref.logic.layout.format;
 
+import java.util.stream.Stream;
+
 import org.jabref.logic.layout.ParamLayoutFormatter;
 
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class DefaultTest {
 
-    @Test
-    public void testSimpleText() {
-        ParamLayoutFormatter a = new Default();
-        a.setArgument("DEFAULT TEXT");
-        assertEquals("Bob Bruce", a.format("Bob Bruce"));
+    ParamLayoutFormatter paramLayoutFormatter = new Default();
+
+    @ParameterizedTest
+    @MethodSource("formatTests")
+    void paramLayoutFormatTest(String expectedString, String inputString, String formatterArgument) {
+        if (!formatterArgument.isEmpty()) {
+            paramLayoutFormatter.setArgument(formatterArgument);
+        }
+        assertEquals(expectedString, paramLayoutFormatter.format(inputString));
     }
 
-    @Test
-    public void testFormatNullExpectReplace() {
-        ParamLayoutFormatter a = new Default();
-        a.setArgument("DEFAULT TEXT");
-        assertEquals("DEFAULT TEXT", a.format(null));
-    }
-
-    @Test
-    public void testFormatEmpty() {
-        ParamLayoutFormatter a = new Default();
-        a.setArgument("DEFAULT TEXT");
-        assertEquals("DEFAULT TEXT", a.format(""));
-    }
-
-    @Test
-    public void testNoArgumentSet() {
-        ParamLayoutFormatter a = new Default();
-        assertEquals("Bob Bruce and Jolly Jumper", a.format("Bob Bruce and Jolly Jumper"));
-    }
-
-    @Test
-    public void testNoArgumentSetNullInput() {
-        ParamLayoutFormatter a = new Default();
-        assertEquals("", a.format(null));
-    }
-
-    @Test
-    public void testNoArgumentSetEmptyInput() {
-        ParamLayoutFormatter a = new Default();
-        assertEquals("", a.format(""));
+    private static Stream<Arguments> formatTests() {
+        return Stream.of(
+                Arguments.of("Bob Bruce", "Bob Bruce", "DEFAULT TEXT"),
+                Arguments.of("DEFAULT TEXT", null, "DEFAULT TEXT"),
+                Arguments.of("DEFAULT TEXT", "", "DEFAULT TEXT"),
+                Arguments.of("Bob Bruce and Jolly Jumper", "Bob Bruce and Jolly Jumper", ""),
+                Arguments.of("", null, ""),
+                Arguments.of("", "", "")
+        );
     }
 }

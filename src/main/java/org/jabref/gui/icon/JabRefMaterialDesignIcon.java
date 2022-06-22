@@ -1,6 +1,6 @@
 package org.jabref.gui.icon;
 
-import de.jensd.fx.glyphs.GlyphIcons;
+import org.kordamp.ikonli.Ikon;
 
 /**
  * Provides the same true-type font interface as MaterialDesignIcon itself, but uses a font we created ourselves that
@@ -12,37 +12,48 @@ import de.jensd.fx.glyphs.GlyphIcons;
  * @see <a href="https://github.com/JabRef/jabref/wiki/Custom-SVG-Icons-for-JabRef">Tutorial on our Wiki</a>
  * @see <a href="https://materialdesignicons.com/custom">Material Design Icon custom page</a>
  */
-public enum JabRefMaterialDesignIcon implements GlyphIcons {
+public enum JabRefMaterialDesignIcon implements Ikon {
 
-    TEX_STUDIO("\ue900"),
-    TEX_MAKER("\ue901"),
-    EMACS("\ue902"),
-    OPEN_OFFICE("\ue903"),
-    VIM("\ue904"),
-    VIM2("\ue905"),
-    LYX("\ue906"),
-    WINEDT("\ue907"),
-    ARXIV("\ue908"),
-    COPY("\ue909"),
-    PASTE("\ue90a"),
-    SET_CENTER("\ue90b"),
-    SET_ALL("\ue90c"),
-    VSCODE("\ue90d"),
-    CANCEL("\ue90e");
+    TEX_STUDIO("jab-texstudio", '\ue900'),
+    TEX_MAKER("jab-textmaker", '\ue901'),
+    EMACS("jab-emacs", '\ue902'),
+    OPEN_OFFICE("jab-oo", '\ue903'),
+    VIM("jab-vim", '\ue904'),
+    VIM2("jab-vim2", '\ue905'),
+    LYX("jab-lyx", '\ue906'),
+    WINEDT("jab-winedt", '\ue907'),
+    ARXIV("jab-arxiv", '\ue908'),
+    COPY("jab-copy", '\ue909'),
+    PASTE("jab-paste", '\ue90a'),
+    SET_CENTER("jab-setcenter", '\ue90b'),
+    SET_ALL("jab-setall", '\ue90c'),
+    VSCODE("jab-vsvode", '\ue90d'),
+    CANCEL("jab-cancel", '\ue90e');
 
-    private final String unicode;
+    private String description;
+    private int code;
 
-    JabRefMaterialDesignIcon(String unicode) {
-        this.unicode = unicode;
+    JabRefMaterialDesignIcon(String description, int code) {
+        this.description = description;
+        this.code = code;
+    }
+
+    public static JabRefMaterialDesignIcon findByDescription(String description) {
+        for (JabRefMaterialDesignIcon font : values()) {
+            if (font.getDescription().equals(description)) {
+                return font;
+            }
+        }
+        throw new IllegalArgumentException("Icon description '" + description + "' is invalid!");
     }
 
     @Override
-    public String unicode() {
-        return unicode;
+    public String getDescription() {
+        return description;
     }
 
     @Override
-    public String fontFamily() {
-        return "\'JabRefMaterialDesign\'";
+    public int getCode() {
+        return code;
     }
 }

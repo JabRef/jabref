@@ -12,9 +12,9 @@ import javafx.scene.control.ScrollPane;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ControlHelper;
-import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.preferences.PreferencesService;
@@ -37,7 +37,7 @@ public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel
 
     @Inject private DialogService dialogService;
     @Inject private PreferencesService preferencesService;
-    @Inject private TaskExecutor taskExecutor;
+    @Inject private ThemeManager themeManager;
 
     private final JabRefFrame frame;
     private PreferencesDialogViewModel viewModel;
@@ -52,9 +52,7 @@ public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel
 
         ControlHelper.setAction(saveButton, getDialogPane(), event -> savePreferencesAndCloseDialog());
 
-        // ToDo: After conversion of all tabs to mvvm, rework interface and make validSettings bindable
-        // Button btnSave = (Button) this.getDialogPane().lookupButton(saveButton);
-        // btnSave.disableProperty().bind(viewModel.validSettings().validProperty().not());
+        themeManager.updateFontStyle(getDialogPane().getScene());
     }
 
     public PreferencesDialogViewModel getViewModel() {
@@ -78,10 +76,12 @@ public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel
         searchBox.setLeft(IconTheme.JabRefIcons.SEARCH.getGraphicNode());
 
         EasyBind.subscribe(preferenceTabList.getSelectionModel().selectedItemProperty(), tab -> {
-            if (tab == null) {
-                preferencesContainer.setContent(null);
+            if (tab instanceof AbstractPreferenceTabView<?> preferencesTab) {
+                preferencesContainer.setContent(preferencesTab.getBuilder());
+                preferencesTab.prefWidthProperty().bind(preferencesContainer.widthProperty());
+                preferencesTab.getStyleClass().add("preferencesTab");
             } else {
-                preferencesContainer.setContent(tab.getBuilder());
+                preferencesContainer.setContent(null);
             }
         });
 

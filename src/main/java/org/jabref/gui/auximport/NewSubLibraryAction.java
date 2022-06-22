@@ -1,8 +1,11 @@
 package org.jabref.gui.auximport;
 
+import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
+
+import com.airhacks.afterburner.injection.Injector;
 
 import static org.jabref.gui.actions.ActionHelper.needsDatabase;
 
@@ -21,7 +24,7 @@ public class NewSubLibraryAction extends SimpleCommand {
 
     @Override
     public void execute() {
-        FromAuxDialog dialog = new FromAuxDialog(jabRefFrame);
-        dialog.showAndWait();
+        DialogService dialogService = Injector.instantiateModelOrService(DialogService.class);
+        dialogService.showCustomDialogAndWait(new FromAuxDialog(jabRefFrame));
     }
 }

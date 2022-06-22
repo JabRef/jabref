@@ -2,6 +2,8 @@ package org.jabref.gui.commonfxcontrols;
 
 import java.util.Collection;
 
+import javax.inject.Inject;
+
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.fxml.FXML;
@@ -27,15 +29,15 @@ public class CitationKeyPatternPanel extends TableView<CitationKeyPatternPanelIt
     @FXML public TableColumn<CitationKeyPatternPanelItemModel, String> patternColumn;
     @FXML public TableColumn<CitationKeyPatternPanelItemModel, EntryType> actionsColumn;
 
+    @Inject private PreferencesService preferences;
+
     private CitationKeyPatternPanelViewModel viewModel;
 
     private long lastKeyPressTime;
     private String tableSearchTerm;
 
-    public CitationKeyPatternPanel(PreferencesService preferences, Collection<BibEntryType> entryTypeList, AbstractCitationKeyPattern keyPattern) {
+    public CitationKeyPatternPanel() {
         super();
-
-        viewModel = new CitationKeyPatternPanelViewModel(preferences, entryTypeList, keyPattern);
 
         ViewLoader.view(this)
                   .root(this)
@@ -44,6 +46,8 @@ public class CitationKeyPatternPanel extends TableView<CitationKeyPatternPanelIt
 
     @FXML
     private void initialize() {
+        viewModel = new CitationKeyPatternPanelViewModel(preferences);
+
         this.setEditable(true);
 
         entryTypeColumn.setSortable(true);
@@ -80,8 +84,8 @@ public class CitationKeyPatternPanel extends TableView<CitationKeyPatternPanelIt
         this.itemsProperty().bindBidirectional(viewModel.patternListProperty());
     }
 
-    public void setValues() {
-        viewModel.setValues();
+    public void setValues(Collection<BibEntryType> entryTypeList, AbstractCitationKeyPattern keyPattern) {
+        viewModel.setValues(entryTypeList, keyPattern);
     }
 
     public void resetAll() {

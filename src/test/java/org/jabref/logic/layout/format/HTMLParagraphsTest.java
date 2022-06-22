@@ -1,22 +1,32 @@
 package org.jabref.logic.layout.format;
 
+import java.util.stream.Stream;
+
 import org.jabref.logic.layout.LayoutFormatter;
 
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class HTMLParagraphsTest {
 
-    @Test
-    public void testFormat() {
+    LayoutFormatter htmlFormatter = new HTMLParagraphs();
 
-        LayoutFormatter f = new HTMLParagraphs();
+    @ParameterizedTest
+    @MethodSource("htmlFormatTests")
+    void testCorrectFormat(String expectedString, String inputString) {
+        assertEquals(expectedString, htmlFormatter.format(inputString));
+    }
 
-        assertEquals("", f.format(""));
-        assertEquals("<p>\nHello\n</p>", f.format("Hello"));
-        assertEquals("<p>\nHello\nWorld\n</p>", f.format("Hello\nWorld"));
-        assertEquals("<p>\nHello World\n</p>\n<p>\nWhat a lovely day\n</p>", f.format("Hello World\n   \nWhat a lovely day\n"));
-        assertEquals("<p>\nHello World\n</p>\n<p>\nCould not be any better\n</p>\n<p>\nWhat a lovely day\n</p>", f.format("Hello World\n \n\nCould not be any better\n\nWhat a lovely day\n"));
+    private static Stream<Arguments> htmlFormatTests() {
+        return Stream.of(
+                Arguments.of("", ""),
+                Arguments.of("<p>\nHello\n</p>", "Hello"),
+                Arguments.of("<p>\nHello\nWorld\n</p>", "Hello\nWorld"),
+                Arguments.of("<p>\nHello World\n</p>\n<p>\nWhat a lovely day\n</p>", "Hello World\n   \nWhat a lovely day\n"),
+                Arguments.of("<p>\nHello World\n</p>\n<p>\nCould not be any better\n</p>\n<p>\nWhat a lovely day\n</p>", "Hello World\n \n\nCould not be any better\n\nWhat a lovely day\n")
+        );
     }
 }

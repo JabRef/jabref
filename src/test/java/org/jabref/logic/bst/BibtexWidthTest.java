@@ -1,6 +1,10 @@
 package org.jabref.logic.bst;
 
-import org.junit.jupiter.api.Test;
+import java.util.stream.Stream;
+
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -33,39 +37,39 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class BibtexWidthTest {
 
-    private void assertBibtexWidth(final int i, final String string) {
-        assertEquals(i, BibtexWidth.width(string));
+    @ParameterizedTest
+    @MethodSource("provideTestWidth")
+    public void testWidth(int i, String str) {
+        assertEquals(i, BibtexWidth.width(str));
     }
 
-    @Test
-    public void testWidth() {
-
-        assertBibtexWidth(278, "i");
-
-        assertBibtexWidth(1639, "0I~ ");
-
-        assertBibtexWidth(2612, "Hi Hi ");
-
-        assertBibtexWidth(778, "{\\oe}");
-
-        assertBibtexWidth(3390, "Hi {\\oe   }Hi ");
-
-        assertBibtexWidth(444, "{\\'e}");
-
-        assertBibtexWidth(19762, "Ulrich {\\\"{U}}nderwood and Ned {\\~N}et and Paul {\\={P}}ot");
-
-        assertBibtexWidth(7861, "{\\'{E}}douard Masterly");
-
-        assertBibtexWidth(30514, "Jonathan Meyer and Charles Louis Xavier Joseph de la Vall{\\'e}e Poussin");
-
+    private static Stream<Arguments> provideTestWidth() {
+        return Stream.of(
+                Arguments.of(278, "i"),
+                Arguments.of(1639, "0I~ "),
+                Arguments.of(2612, "Hi Hi "),
+                Arguments.of(778, "{\\oe}"),
+                Arguments.of(3390, "Hi {\\oe   }Hi "),
+                Arguments.of(444, "{\\'e}"),
+                Arguments.of(19762, "Ulrich {\\\"{U}}nderwood and Ned {\\~N}et and Paul {\\={P}}ot"),
+                Arguments.of(7861, "{\\'{E}}douard Masterly"),
+                Arguments.of(30514, "Jonathan Meyer and Charles Louis Xavier Joseph de la Vall{\\'e}e Poussin")
+        );
     }
 
-    @Test
-    public void testGetCharWidth() {
-        assertEquals(500, BibtexWidth.getCharWidth('0'));
-        assertEquals(361, BibtexWidth.getCharWidth('I'));
-        assertEquals(500, BibtexWidth.getCharWidth('~'));
-        assertEquals(500, BibtexWidth.getCharWidth('}'));
-        assertEquals(278, BibtexWidth.getCharWidth(' '));
+    @ParameterizedTest
+    @MethodSource("provideTestGetCharWidth")
+    public void testGetCharWidth(int i, Character c) {
+        assertEquals(i, BibtexWidth.getCharWidth(c));
+    }
+
+    private static Stream<Arguments> provideTestGetCharWidth() {
+        return Stream.of(
+                Arguments.of(500, '0'),
+                Arguments.of(361, 'I'),
+                Arguments.of(500, '~'),
+                Arguments.of(500, '}'),
+                Arguments.of(278, ' ')
+        );
     }
 }

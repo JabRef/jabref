@@ -21,7 +21,10 @@ import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.entry.identifier.Identifier;
+import org.jabref.preferences.PreferencesService;
 
 import com.tobiasdiez.easybind.EasyBind;
 
@@ -32,12 +35,16 @@ public class IdentifierEditorViewModel extends AbstractEditorViewModel {
     private final ObjectProperty<Optional<? extends Identifier>> identifier = new SimpleObjectProperty<>();
     private final TaskExecutor taskExecutor;
     private final DialogService dialogService;
+    private final Field field;
+    private final PreferencesService preferences;
 
-    public IdentifierEditorViewModel(Field field, SuggestionProvider<?> suggestionProvider, TaskExecutor taskExecutor, DialogService dialogService, FieldCheckers fieldCheckers) {
+    public IdentifierEditorViewModel(Field field, SuggestionProvider<?> suggestionProvider, TaskExecutor taskExecutor, DialogService dialogService, FieldCheckers fieldCheckers, PreferencesService preferences) {
         super(field, suggestionProvider, fieldCheckers);
 
         this.taskExecutor = taskExecutor;
         this.dialogService = dialogService;
+        this.preferences = preferences;
+        this.field = field;
 
         identifier.bind(
                 EasyBind.map(text, input -> IdentifierParser.parse(field, input))
@@ -67,6 +74,15 @@ public class IdentifierEditorViewModel extends AbstractEditorViewModel {
     }
 
     public void openExternalLink() {
+        if (field.equals(StandardField.DOI) && preferences.getDOIPreferences().isUseCustom()) {
+            identifier.get().map(identifier -> (DOI) identifier).map(DOI::getDOI)
+                      .ifPresent(s -> JabRefDesktop.openCustomDoi(s, preferences, dialogService));
+        } else {
+            openExternalLinkDefault();
+        }
+    }
+
+    public void openExternalLinkDefault() {
         identifier.get().flatMap(Identifier::getExternalURI).ifPresent(
                 url -> {
                     try {

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.ButtonType?>
+<?import javafx.scene.control.DialogPane?>
+<?import javafx.scene.control.TabPane?>
+<DialogPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+            fx:controller="org.jabref.gui.libraryproperties.LibraryPropertiesView"
+            prefHeight="400.0" prefWidth="600.0">
+    <content>
+        <TabPane fx:id="tabPane" tabClosingPolicy="UNAVAILABLE"/>
+    </content>
+    <ButtonType fx:id="saveButton" text="%Apply" buttonData="OK_DONE"/>
+    <ButtonType fx:constant="CANCEL"/>
+</DialogPane>

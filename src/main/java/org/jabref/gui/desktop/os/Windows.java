@@ -2,9 +2,11 @@ package org.jabref.gui.desktop.os;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
 
+import org.jabref.gui.DialogService;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 
@@ -27,13 +29,34 @@ public class Windows implements NativeDesktop {
     @Override
     public String detectProgramPath(String programName, String directoryName) {
         String progFiles = System.getenv("ProgramFiles(x86)");
-        if (progFiles == null) {
-            progFiles = System.getenv("ProgramFiles");
+        String programPath;
+        if (progFiles != null) {
+            programPath = getProgramPath(programName, directoryName, progFiles);
+            if (programPath != null) {
+                return programPath;
+            }
         }
+
+        progFiles = System.getenv("ProgramFiles");
+        programPath = getProgramPath(programName, directoryName, progFiles);
+        if (programPath != null) {
+            return programPath;
+        }
+
+        return "";
+    }
+
+    private String getProgramPath(String programName, String directoryName, String progFiles) {
+        Path programPath;
         if ((directoryName != null) && !directoryName.isEmpty()) {
-            return Path.of(progFiles, directoryName, programName + DEFAULT_EXECUTABLE_EXTENSION).toString();
+            programPath = Path.of(progFiles, directoryName, programName + DEFAULT_EXECUTABLE_EXTENSION);
+        } else {
+            programPath = Path.of(progFiles, programName + DEFAULT_EXECUTABLE_EXTENSION);
         }
-        return Path.of(progFiles, programName + DEFAULT_EXECUTABLE_EXTENSION).toString();
+        if (Files.exists(programPath)) {
+            return programPath.toString();
+        }
+        return null;
     }
 
     @Override
@@ -57,7 +80,7 @@ public class Windows implements NativeDesktop {
     }
 
     @Override
-    public void openConsole(String absolutePath) throws IOException {
+    public void openConsole(String absolutePath, DialogService dialogService) throws IOException {
         ProcessBuilder process = new ProcessBuilder("cmd.exe", "/c", "start");
         process.directory(new File(absolutePath));
         process.start();

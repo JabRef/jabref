@@ -12,6 +12,7 @@ import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
+import org.jabref.support.DisabledOnCIServer;
 import org.jabref.testutils.category.FetcherTest;
 
 import org.junit.jupiter.api.Disabled;
@@ -22,6 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 
 @FetcherTest
+@DisabledOnCIServer("CI server is blocked by JSTOR")
 public class JstorFetcherTest implements SearchBasedFetcherCapabilityTest {
 
     private final JstorFetcher fetcher = new JstorFetcher(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS));
@@ -91,18 +93,15 @@ public class JstorFetcherTest implements SearchBasedFetcherCapabilityTest {
     @Disabled("jstor does not support search only based on year")
     @Override
     public void supportsYearRangeSearch() throws Exception {
-
     }
 
     @Disabled("jstor does not provide articles with journals")
     @Override
     public void supportsJournalSearch() throws Exception {
-
     }
 
     @Disabled("jstor does not support search only based on year")
     @Override
     public void supportsYearSearch() throws Exception {
-
     }
 }

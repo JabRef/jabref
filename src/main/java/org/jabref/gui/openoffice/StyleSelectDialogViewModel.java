@@ -22,9 +22,9 @@ import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.openoffice.OOBibStyle;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
-import org.jabref.logic.openoffice.StyleLoader;
+import org.jabref.logic.openoffice.style.OOBibStyle;
+import org.jabref.logic.openoffice.style.StyleLoader;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.preferences.PreferencesService;
@@ -62,7 +62,7 @@ public class StyleSelectDialogViewModel {
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                 .addExtensionFilter(Localization.lang("Style file"), StandardFileType.JSTYLE)
                 .withDefaultExtension(Localization.lang("Style file"), StandardFileType.JSTYLE)
-                .withInitialDirectory(preferencesService.getWorkingDir())
+                .withInitialDirectory(preferencesService.getFilePreferences().getWorkingDirectory())
                 .build();
         Optional<Path> path = dialogService.showFileOpenDialog(fileDialogConfiguration);
         path.map(Path::toAbsolutePath).map(Path::toString).ifPresent(stylePath -> {
@@ -85,7 +85,6 @@ public class StyleSelectDialogViewModel {
     }
 
     public void deleteStyle() {
-
         OOBibStyle style = selectedItem.getValue().getStyle();
         if (loader.removeStyle(style)) {
             styles.remove(selectedItem.get());
@@ -96,7 +95,7 @@ public class StyleSelectDialogViewModel {
         OOBibStyle style = selectedItem.getValue().getStyle();
         Optional<ExternalFileType> type = ExternalFileTypes.getInstance().getExternalFileTypeByExt("jstyle");
         try {
-            JabRefDesktop.openExternalFileAnyFormat(new BibDatabaseContext(), style.getPath(), type);
+            JabRefDesktop.openExternalFileAnyFormat(new BibDatabaseContext(), preferencesService, style.getPath(), type);
         } catch (IOException e) {
             dialogService.showErrorDialogAndWait(e);
         }

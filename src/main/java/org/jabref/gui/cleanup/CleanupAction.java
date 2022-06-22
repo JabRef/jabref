@@ -56,10 +56,13 @@ public class CleanupAction extends SimpleCommand {
         isCanceled = false;
         modifiedEntriesCount = 0;
 
-        Optional<CleanupPreset> chosenPreset = new CleanupDialog(
+        CleanupDialog cleanupDialog = new CleanupDialog(
                 stateManager.getActiveDatabase().get(),
                 preferences.getCleanupPreset(),
-                preferences.getFilePreferences()).showAndWait();
+                preferences.getFilePreferences()
+        );
+
+        Optional<CleanupPreset> chosenPreset = dialogService.showCustomDialogAndWait(cleanupDialog);
 
         chosenPreset.ifPresent(preset -> {
             if (preset.isRenamePDFActive() && preferences.getAutoLinkPreferences().shouldAskAutoNamingPdfs()) {
@@ -67,9 +70,8 @@ public class CleanupAction extends SimpleCommand {
                         Localization.lang("Auto-generating PDF-Names does not support undo. Continue?"),
                         Localization.lang("Autogenerate PDF Names"),
                         Localization.lang("Cancel"),
-                        Localization.lang("Disable this confirmation dialog"),
-                        optOut -> preferences.storeAutoLinkPreferences(preferences.getAutoLinkPreferences()
-                                                                                  .withAskAutoNamingPdfs(!optOut)));
+                        Localization.lang("Do not ask again"),
+                        optOut -> preferences.getAutoLinkPreferences().setAskAutoNamingPdfs(!optOut));
                 if (!confirmed) {
                     isCanceled = true;
                     return;
@@ -91,7 +93,8 @@ public class CleanupAction extends SimpleCommand {
         // Create and run cleaner
         CleanupWorker cleaner = new CleanupWorker(
                 databaseContext,
-                preferences.getCleanupPreferences(Globals.journalAbbreviationRepository));
+                preferences.getCleanupPreferences(Globals.journalAbbreviationRepository),
+                preferences.getTimestampPreferences());
 
         List<FieldChange> changes = cleaner.cleanup(preset, entry);
 

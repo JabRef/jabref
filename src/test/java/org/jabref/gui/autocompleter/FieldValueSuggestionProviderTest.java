@@ -3,7 +3,12 @@ package org.jabref.gui.autocompleter;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
+import java.util.Set;
 
+import javafx.collections.FXCollections;
+
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
@@ -14,6 +19,8 @@ import org.junit.jupiter.api.Test;
 import static org.jabref.gui.autocompleter.AutoCompleterUtil.getRequest;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 class FieldValueSuggestionProviderTest {
 
@@ -21,7 +28,7 @@ class FieldValueSuggestionProviderTest {
     private BibDatabase database;
 
     @BeforeEach
-    void setUp() throws Exception {
+    void setUp() {
         database = new BibDatabase();
         autoCompleter = new FieldValueSuggestionProvider(StandardField.TITLE, database);
     }
@@ -57,13 +64,30 @@ class FieldValueSuggestionProviderTest {
     }
 
     @Test
+    void completeOnIgnoredFieldReturnsNothing() {
+        AutoCompletePreferences autoCompletePreferences = mock(AutoCompletePreferences.class);
+        JournalAbbreviationRepository journalAbbreviationRepository = mock(JournalAbbreviationRepository.class);
+        when(autoCompletePreferences.getCompleteFields()).thenReturn(FXCollections.observableSet(Set.of(StandardField.AUTHOR)));
+        SuggestionProviders suggestionProviders = new SuggestionProviders(database, journalAbbreviationRepository, autoCompletePreferences);
+
+        SuggestionProvider<String> autoCompleter = (SuggestionProvider<String>) suggestionProviders.getForField(StandardField.TITLE);
+
+        BibEntry entry = new BibEntry();
+        entry.setField(StandardField.TITLE, "testValue");
+        database.insertEntry(entry);
+
+        Collection<String> result = autoCompleter.provideSuggestions(getRequest(("testValue")));
+        assertEquals(Collections.emptyList(), result);
+    }
+
+    @Test
     void completeValueReturnsValue() {
         BibEntry entry = new BibEntry();
         entry.setField(StandardField.TITLE, "testValue");
         database.insertEntry(entry);
 
         Collection<String> result = autoCompleter.provideSuggestions(getRequest(("testValue")));
-        assertEquals(Arrays.asList("testValue"), result);
+        assertEquals(List.of("testValue"), result);
     }
 
     @Test
@@ -73,7 +97,7 @@ class FieldValueSuggestionProviderTest {
         database.insertEntry(entry);
 
         Collection<String> result = autoCompleter.provideSuggestions(getRequest(("test")));
-        assertEquals(Arrays.asList("testValue"), result);
+        assertEquals(List.of("testValue"), result);
     }
 
     @Test
@@ -83,7 +107,7 @@ class FieldValueSuggestionProviderTest {
         database.insertEntry(entry);
 
         Collection<String> result = autoCompleter.provideSuggestions(getRequest(("testvalue")));
-        assertEquals(Arrays.asList("testValue"), result);
+        assertEquals(List.of("testValue"), result);
     }
 
     @Test

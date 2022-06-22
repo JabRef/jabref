@@ -6,7 +6,6 @@ import java.util.List;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 
-import org.jabref.gui.Dialog;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.Globals;
 import org.jabref.gui.JabRefFrame;
@@ -44,7 +43,7 @@ public class IntegrityCheckAction extends SimpleCommand {
                 Globals.prefs.getFilePreferences(),
                 Globals.prefs.getCitationKeyPatternPreferences(),
                 Globals.journalAbbreviationRepository,
-                Globals.prefs.getGeneralPreferences().shouldAllowIntegerEditionBibtex());
+                Globals.prefs.getEntryEditorPreferences().shouldAllowIntegerEditionBibtex());
 
         Task<List<IntegrityMessage>> task = new Task<>() {
             @Override
@@ -71,8 +70,7 @@ public class IntegrityCheckAction extends SimpleCommand {
             if (messages.isEmpty()) {
                 dialogService.notify(Localization.lang("No problems found."));
             } else {
-                Dialog<Void> dialog = new IntegrityCheckDialog(messages, frame.getCurrentLibraryTab());
-                dialog.showAndWait();
+                dialogService.showCustomDialogAndWait(new IntegrityCheckDialog(messages, frame.getCurrentLibraryTab()));
             }
         });
         task.setOnFailed(event -> dialogService.showErrorDialogAndWait("Integrity check failed.", task.getException()));

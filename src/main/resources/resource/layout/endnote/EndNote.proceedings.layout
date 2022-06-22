@@ -1,9 +1,9 @@
 %0 \endnotereftype
 %0 Conference Proceedings
-%A \format[AuthorLastFirst,RemoveBracketsAddComma,AuthorAndsReplacer]{\author}
+%A \format[Authors(LastFirst,FullName,Semicolon,Amp)]{\author}
 %D \year
 %T \format[RemoveLatexCommands]{\title}
-%E \format[AuthorLastFirst,RemoveBracketsAddComma,AuthorAndsReplacer]{\editor}
+%E \format[Authors(LastFirst,FullName,Semicolon,Amp)]{\editor}
 %B \booktitle
 %C \address
 %I \publisher

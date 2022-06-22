@@ -15,10 +15,9 @@ public abstract class AbstractPreferenceTabView<T extends PreferenceTabViewModel
 
     @Inject protected TaskExecutor taskExecutor;
     @Inject protected DialogService dialogService;
+    @Inject protected PreferencesService preferencesService;
 
     protected T viewModel;
-
-    protected PreferencesService preferences;
 
     @Override
     public Node getBuilder() {

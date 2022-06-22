@@ -5,7 +5,6 @@ import java.util.Optional;
 import org.jabref.logic.preferences.TimestampPreferences;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
 import org.jabref.preferences.PreferencesService;
@@ -25,6 +24,9 @@ class UpdateTimestampListenerTest {
     private PreferencesService preferencesMock;
     private TimestampPreferences timestampPreferencesMock;
 
+    private final String baseDate = "2000-1-1";
+    private final String newDate = "2000-1-2";
+
     @BeforeEach
     void setUp() {
         database = new BibDatabase();
@@ -40,47 +42,37 @@ class UpdateTimestampListenerTest {
 
     @Test
     void updateTimestampEnabled() {
-        final Field timestampField = StandardField.TIMESTAMP;
-        final String baseDate = "2000-1-1";
-        final String newDate = "2000-1-2";
-
         final boolean includeTimestamp = true;
 
-        when(timestampPreferencesMock.getTimestampField()).thenReturn(timestampField);
         when(timestampPreferencesMock.now()).thenReturn(newDate);
-        when(timestampPreferencesMock.shouldIncludeTimestamps()).thenReturn(includeTimestamp);
+        when(timestampPreferencesMock.shouldAddModificationDate()).thenReturn(includeTimestamp);
 
-        bibEntry.setField(timestampField, baseDate);
+        bibEntry.setField(StandardField.MODIFICATIONDATE, baseDate);
 
-        assertEquals(Optional.of(baseDate), bibEntry.getField(timestampField), "Initial timestamp not set correctly");
+        assertEquals(Optional.of(baseDate), bibEntry.getField(StandardField.MODIFICATIONDATE), "Initial timestamp not set correctly");
 
         database.registerListener(new UpdateTimestampListener(preferencesMock));
 
         bibEntry.setField(new UnknownField("test"), "some value");
 
-        assertEquals(Optional.of(newDate), bibEntry.getField(timestampField), "Timestamp not set correctly after entry changed");
+        assertEquals(Optional.of(newDate), bibEntry.getField(StandardField.MODIFICATIONDATE), "Timestamp not set correctly after entry changed");
     }
 
     @Test
     void updateTimestampDisabled() {
-        final Field timestampField = StandardField.TIMESTAMP;
-        final String baseDate = "2000-1-1";
-        final String newDate = "2000-1-2";
-
         final boolean includeTimestamp = false;
 
-        when(timestampPreferencesMock.getTimestampField()).thenReturn(timestampField);
         when(timestampPreferencesMock.now()).thenReturn(newDate);
-        when(timestampPreferencesMock.shouldIncludeTimestamps()).thenReturn(includeTimestamp);
+        when(timestampPreferencesMock.shouldAddModificationDate()).thenReturn(includeTimestamp);
 
-        bibEntry.setField(timestampField, baseDate);
+        bibEntry.setField(StandardField.MODIFICATIONDATE, baseDate);
 
-        assertEquals(Optional.of(baseDate), bibEntry.getField(timestampField), "Initial timestamp not set correctly");
+        assertEquals(Optional.of(baseDate), bibEntry.getField(StandardField.MODIFICATIONDATE), "Initial timestamp not set correctly");
 
         database.registerListener(new UpdateTimestampListener(preferencesMock));
 
         bibEntry.setField(new UnknownField("test"), "some value");
 
-        assertEquals(Optional.of(baseDate), bibEntry.getField(timestampField), "New timestamp set after entry changed even though updates were disabled");
+        assertEquals(Optional.of(baseDate), bibEntry.getField(StandardField.MODIFICATIONDATE), "New timestamp set after entry changed even though updates were disabled");
     }
 }

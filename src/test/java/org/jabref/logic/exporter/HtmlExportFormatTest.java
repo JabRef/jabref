@@ -11,7 +11,9 @@ import java.util.List;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.StandardField;
 
 import org.junit.jupiter.api.AfterEach;
@@ -35,7 +37,8 @@ public class HtmlExportFormatTest {
         LayoutFormatterPreferences layoutPreferences = mock(LayoutFormatterPreferences.class, Answers.RETURNS_DEEP_STUBS);
         SavePreferences savePreferences = mock(SavePreferences.class);
         XmpPreferences xmpPreferences = mock(XmpPreferences.class);
-        ExporterFactory exporterFactory = ExporterFactory.create(customFormats, layoutPreferences, savePreferences, xmpPreferences);
+        BibEntryTypesManager entryTypesManager = mock(BibEntryTypesManager.class);
+        ExporterFactory exporterFactory = ExporterFactory.create(customFormats, layoutPreferences, savePreferences, xmpPreferences, BibDatabaseMode.BIBTEX, entryTypesManager);
 
         exportFormat = exporterFactory.getExporterByName("html").get();
 
@@ -56,7 +59,7 @@ public class HtmlExportFormatTest {
     @Test
     public void emitWellFormedHtml(@TempDir Path testFolder) throws Exception {
         Path path = testFolder.resolve("ThisIsARandomlyNamedFile");
-        exportFormat.export(databaseContext, path, charset, entries);
+        exportFormat.export(databaseContext, path, entries);
         List<String> lines = Files.readAllLines(path);
         assertEquals("</html>", lines.get(lines.size() - 1));
     }

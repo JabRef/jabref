@@ -7,47 +7,49 @@ import java.util.stream.Collectors;
 
 import javafx.scene.Node;
 import javafx.scene.paint.Color;
-import javafx.scene.text.Text;
 
 import org.jabref.gui.util.ColorUtil;
 
-import de.jensd.fx.glyphs.GlyphIcons;
+import org.kordamp.ikonli.Ikon;
+import org.kordamp.ikonli.javafx.FontIcon;
 
 public class InternalMaterialDesignIcon implements JabRefIcon {
 
-    private final List<GlyphIcons> icons;
+    private final List<Ikon> icons;
     private Optional<Color> color;
     private final String unicode;
 
-    public InternalMaterialDesignIcon(Color color, GlyphIcons... icons) {
+    public InternalMaterialDesignIcon(Color color, Ikon... icons) {
         this(color, Arrays.asList(icons));
     }
 
-    InternalMaterialDesignIcon(Color color, List<GlyphIcons> icons) {
+    InternalMaterialDesignIcon(Color color, List<Ikon> icons) {
         this(icons);
         this.color = Optional.of(color);
     }
 
-    public InternalMaterialDesignIcon(GlyphIcons... icons) {
+    public InternalMaterialDesignIcon(Ikon... icons) {
         this(Arrays.asList(icons));
     }
 
-    public InternalMaterialDesignIcon(List<GlyphIcons> icons) {
+    public InternalMaterialDesignIcon(List<Ikon> icons) {
         this.icons = icons;
-        this.unicode = icons.stream().map(GlyphIcons::unicode).collect(Collectors.joining());
+        this.unicode = icons.stream().map(Ikon::getCode).map(String::valueOf).collect(Collectors.joining());
         this.color = Optional.empty();
     }
 
     @Override
     public Node getGraphicNode() {
-        GlyphIcons icon = icons.get(0);
+        Ikon icon = icons.get(0);
+        FontIcon fontIcon = FontIcon.of(icon);
+        fontIcon.getStyleClass().add("glyph-icon");
 
-        Text text = new Text(unicode);
-        text.getStyleClass().add("glyph-icon");
-        text.setStyle(String.format("-fx-font-family: %s;", icon.fontFamily()));
+//      Override the default color from the css files
+        color.ifPresent(color -> fontIcon.setStyle(fontIcon.getStyle() +
+                String.format("-fx-fill: %s;", ColorUtil.toRGBCode(color)) +
+                String.format("-fx-icon-color: %s;", ColorUtil.toRGBCode(color))));
 
-        color.ifPresent(color -> text.setStyle(text.getStyle() + String.format("-fx-fill: %s;", ColorUtil.toRGBCode(color))));
-        return text;
+        return fontIcon;
     }
 
     @Override
@@ -62,7 +64,7 @@ public class InternalMaterialDesignIcon implements JabRefIcon {
 
     @Override
     public String name() {
-        return unicode;
+        return icons.get(0).toString();
     }
 
     public String getCode() {
@@ -70,12 +72,7 @@ public class InternalMaterialDesignIcon implements JabRefIcon {
     }
 
     @Override
-    public String unicode() {
-        return icons.get(0).unicode();
-    }
-
-    @Override
-    public String fontFamily() {
-        return icons.get(0).fontFamily();
+    public Ikon getIkon() {
+        return icons.get(0);
     }
 }

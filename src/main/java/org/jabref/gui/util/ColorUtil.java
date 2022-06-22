@@ -11,6 +11,14 @@ public class ColorUtil {
                 (int) (color.getBlue() * 255));
     }
 
+    public static String toRGBACode(Color color) {
+        return String.format("rgba(%d,%d,%d,%f)",
+                (int) (color.getRed() * 255),
+                (int) (color.getGreen() * 255),
+                (int) (color.getBlue() * 255),
+                color.getOpacity());
+    }
+
     public static String toHex(Color validFieldBackgroundColor) {
         return String.format("#%02x%02x%02x", (int) validFieldBackgroundColor.getRed(), (int) validFieldBackgroundColor.getGreen(), (int) validFieldBackgroundColor.getBlue());
     }

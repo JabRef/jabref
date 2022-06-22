@@ -40,7 +40,7 @@
 
 		\begin{author}
 		<div class="bibtex_author">
-			\format[AuthorLastFirst,AuthorAbbreviator,AuthorAndsReplacer,HTMLChars]{\author}
+			\format[Authors(LastFirst,Semicolon,Amp),HTMLChars]{\author}
 		</div>
 		\end{author}
 

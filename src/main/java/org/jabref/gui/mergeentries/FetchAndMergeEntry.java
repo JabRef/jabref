@@ -66,9 +66,9 @@ public class FetchAndMergeEntry {
                     BackgroundTask.wrap(() -> fetcher.get().performSearchById(fieldContent.get()))
                                   .onSuccess(fetchedEntry -> {
                                       ImportCleanup cleanup = new ImportCleanup(libraryTab.getBibDatabaseContext().getMode());
-                                      cleanup.doPostCleanup(entry);
                                       String type = field.getDisplayName();
                                       if (fetchedEntry.isPresent()) {
+                                          cleanup.doPostCleanup(fetchedEntry.get());
                                           showMergeDialog(entry, fetchedEntry.get(), fetcher.get());
                                       } else {
                                           dialogService.notify(Localization.lang("Cannot get info based on given %0: %1", type, fieldContent.get()));
@@ -91,7 +91,7 @@ public class FetchAndMergeEntry {
         dialog.setTitle(Localization.lang("Merge entry with %0 information", fetcher.getName()));
         dialog.setLeftHeaderText(Localization.lang("Original entry"));
         dialog.setRightHeaderText(Localization.lang("Entry from %0", fetcher.getName()));
-        Optional<BibEntry> mergedEntry = dialog.showAndWait();
+        Optional<BibEntry> mergedEntry = dialogService.showCustomDialogAndWait(dialog);
         if (mergedEntry.isPresent()) {
             NamedCompound ce = new NamedCompound(Localization.lang("Merge entry with %0 information", fetcher.getName()));
 

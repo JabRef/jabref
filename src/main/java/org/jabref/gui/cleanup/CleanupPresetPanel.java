@@ -36,6 +36,8 @@ public class CleanupPresetPanel extends VBox {
     @FXML private CheckBox cleanUpUpgradeExternalLinks;
     @FXML private CheckBox cleanUpBiblatex;
     @FXML private CheckBox cleanUpBibtex;
+    @FXML private CheckBox cleanUpTimestampToCreationDate;
+    @FXML private CheckBox cleanUpTimestampToModificationDate;
     @FXML private FieldFormatterCleanupsPanel formatterCleanupsPanel;
 
     public CleanupPresetPanel(BibDatabaseContext databaseContext, CleanupPreset cleanupPreset, FilePreferences filePreferences) {
@@ -69,7 +71,30 @@ public class CleanupPresetPanel extends VBox {
                                             .concat(": ")
                                             .concat(filePreferences.getFileNamePattern());
         cleanupRenamePDFLabel.setText(currentPattern);
-
+        cleanUpBibtex.selectedProperty().addListener(
+                (observable, oldValue, newValue) -> {
+                    if (newValue) {
+                        cleanUpBiblatex.selectedProperty().setValue(false);
+                    }
+                });
+        cleanUpBiblatex.selectedProperty().addListener(
+                (observable, oldValue, newValue) -> {
+                    if (newValue) {
+                        cleanUpBibtex.selectedProperty().setValue(false);
+                    }
+                });
+        cleanUpTimestampToCreationDate.selectedProperty().addListener(
+                (observable, oldValue, newValue) -> {
+                    if (newValue) {
+                        cleanUpTimestampToModificationDate.selectedProperty().setValue(false);
+                    }
+                });
+        cleanUpTimestampToModificationDate.selectedProperty().addListener(
+                (observable, oldValue, newValue) -> {
+                    if (newValue) {
+                        cleanUpTimestampToCreationDate.selectedProperty().setValue(false);
+                    }
+                });
         updateDisplay(cleanupPreset);
     }
 
@@ -85,6 +110,9 @@ public class CleanupPresetPanel extends VBox {
         cleanUpUpgradeExternalLinks.setSelected(preset.isActive(CleanupPreset.CleanupStep.CLEAN_UP_UPGRADE_EXTERNAL_LINKS));
         cleanUpBiblatex.setSelected(preset.isActive(CleanupPreset.CleanupStep.CONVERT_TO_BIBLATEX));
         cleanUpBibtex.setSelected(preset.isActive(CleanupPreset.CleanupStep.CONVERT_TO_BIBTEX));
+        cleanUpTimestampToCreationDate.setSelected(preset.isActive(CleanupPreset.CleanupStep.CONVERT_TIMESTAMP_TO_CREATIONDATE));
+        cleanUpTimestampToModificationDate.setSelected(preset.isActive(CleanupPreset.CleanupStep.CONVERT_TIMESTAMP_TO_MODIFICATIONDATE));
+        cleanUpTimestampToModificationDate.setSelected(preset.isActive(CleanupPreset.CleanupStep.DO_NOT_CONVERT_TIMESTAMP));
         cleanUpISSN.setSelected(preset.isActive(CleanupPreset.CleanupStep.CLEAN_UP_ISSN));
         formatterCleanupsPanel.cleanupsDisableProperty().setValue(!preset.getFormatterCleanups().isEnabled());
         formatterCleanupsPanel.cleanupsProperty().setValue(FXCollections.observableArrayList(preset.getFormatterCleanups().getConfiguredActions()));
@@ -123,6 +151,12 @@ public class CleanupPresetPanel extends VBox {
         }
         if (cleanUpBibtex.isSelected()) {
             activeJobs.add(CleanupPreset.CleanupStep.CONVERT_TO_BIBTEX);
+        }
+        if (cleanUpTimestampToCreationDate.isSelected()) {
+            activeJobs.add(CleanupPreset.CleanupStep.CONVERT_TIMESTAMP_TO_CREATIONDATE);
+        }
+        if (cleanUpTimestampToModificationDate.isSelected()) {
+            activeJobs.add(CleanupPreset.CleanupStep.CONVERT_TIMESTAMP_TO_MODIFICATIONDATE);
         }
 
         activeJobs.add(CleanupPreset.CleanupStep.FIX_FILE_LINKS);

@@ -26,7 +26,7 @@
     -fx-background-color: transparent;
 }
 
-#preferencesContainer {
+.preferencesTab {
     -fx-padding: 0.5em;
 }
 

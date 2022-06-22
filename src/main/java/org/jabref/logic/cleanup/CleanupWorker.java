@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import org.jabref.logic.preferences.TimestampPreferences;
 import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -13,10 +14,12 @@ public class CleanupWorker {
 
     private final BibDatabaseContext databaseContext;
     private final FilePreferences filePreferences;
+    private final TimestampPreferences timestampPreferences;
 
-    public CleanupWorker(BibDatabaseContext databaseContext, CleanupPreferences cleanupPreferences) {
+    public CleanupWorker(BibDatabaseContext databaseContext, CleanupPreferences cleanupPreferences, TimestampPreferences timestampPreferences) {
         this.databaseContext = databaseContext;
         this.filePreferences = cleanupPreferences.getFilePreferences();
+        this.timestampPreferences = timestampPreferences;
     }
 
     public List<FieldChange> cleanup(CleanupPreset preset, BibEntry entry) {
@@ -65,6 +68,10 @@ public class CleanupWorker {
                 return new ConvertToBiblatexCleanup();
             case CONVERT_TO_BIBTEX:
                 return new ConvertToBibtexCleanup();
+            case CONVERT_TIMESTAMP_TO_CREATIONDATE:
+                return new TimeStampToCreationDate(timestampPreferences);
+            case CONVERT_TIMESTAMP_TO_MODIFICATIONDATE:
+                return new TimeStampToModificationDate(timestampPreferences);
             case MOVE_PDF:
                 return new MoveFilesCleanup(databaseContext, filePreferences);
             case FIX_FILE_LINKS:

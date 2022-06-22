@@ -22,10 +22,12 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.StateManager;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.maintable.columns.FieldColumn;
 import org.jabref.gui.maintable.columns.FileColumn;
+import org.jabref.gui.maintable.columns.LibraryColumn;
 import org.jabref.gui.maintable.columns.LinkedIdentifierColumn;
 import org.jabref.gui.maintable.columns.MainTableColumn;
 import org.jabref.gui.maintable.columns.SpecialFieldColumn;
@@ -57,19 +59,23 @@ public class MainTableColumnFactory {
     private final CellFactory cellFactory;
     private final UndoManager undoManager;
     private final DialogService dialogService;
+    private final StateManager stateManager;
 
     public MainTableColumnFactory(BibDatabaseContext database,
                                   PreferencesService preferencesService,
+                                  ColumnPreferences abstractColumnPrefs,
                                   ExternalFileTypes externalFileTypes,
                                   UndoManager undoManager,
-                                  DialogService dialogService) {
+                                  DialogService dialogService,
+                                  StateManager stateManager) {
         this.database = Objects.requireNonNull(database);
         this.preferencesService = Objects.requireNonNull(preferencesService);
-        this.columnPreferences = preferencesService.getColumnPreferences();
+        this.columnPreferences = abstractColumnPrefs;
         this.externalFileTypes = Objects.requireNonNull(externalFileTypes);
         this.dialogService = dialogService;
         this.cellFactory = new CellFactory(externalFileTypes, preferencesService, undoManager);
         this.undoManager = undoManager;
+        this.stateManager = stateManager;
     }
 
     public List<TableColumn<BibEntryTableViewModel, ?>> createColumns() {
@@ -90,6 +96,9 @@ public class MainTableColumnFactory {
                 case LINKED_IDENTIFIER:
                     columns.add(createIdentifierColumn(column));
                     break;
+                case LIBRARY_NAME:
+                    columns.add(createLibraryColumn(column));
+                    break;
                 case EXTRAFILE:
                     if (!column.getQualifier().isBlank()) {
                         columns.add(createExtraFileColumn(column));
@@ -101,7 +110,7 @@ public class MainTableColumnFactory {
                         if (field instanceof SpecialField) {
                             columns.add(createSpecialFieldColumn(column));
                         } else {
-                            LOGGER.warn(Localization.lang("Special field type %0 is unknown. Using normal column type.", column.getQualifier()));
+                            LOGGER.warn("Special field type '{}' is unknown. Using normal column type.", column.getQualifier());
                             columns.add(createFieldColumn(column));
                         }
                     }
@@ -207,7 +216,7 @@ public class MainTableColumnFactory {
      * Creates a clickable icons column for DOIs, URLs, URIs and EPrints.
      */
     private TableColumn<BibEntryTableViewModel, Map<Field, String>> createIdentifierColumn(MainTableColumnModel columnModel) {
-        return new LinkedIdentifierColumn(columnModel, cellFactory, database, dialogService);
+        return new LinkedIdentifierColumn(columnModel, cellFactory, database, dialogService, preferencesService, stateManager);
     }
 
     /**
@@ -239,5 +248,12 @@ public class MainTableColumnFactory {
                 dialogService,
                 preferencesService,
                 columnModel.getQualifier());
+    }
+
+    /**
+     * Create library column containing the Filename of the library's bib file
+     */
+    private TableColumn<BibEntryTableViewModel, String> createLibraryColumn(MainTableColumnModel columnModel) {
+        return new LibraryColumn(columnModel);
     }
 }

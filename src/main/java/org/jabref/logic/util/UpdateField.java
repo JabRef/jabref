@@ -1,7 +1,5 @@
 package org.jabref.logic.util;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Collection;
 import java.util.Optional;
 
@@ -93,26 +91,14 @@ public class UpdateField {
     public static void setAutomaticFields(BibEntry entry, boolean overwriteOwner, boolean overwriteTimestamp,
                                           OwnerPreferences ownerPreferences, TimestampPreferences timestampPreferences) {
         String defaultOwner = ownerPreferences.getDefaultOwner();
-        String timestamp = DateTimeFormatter.ofPattern(timestampPreferences.getTimestampFormat()).format(LocalDateTime.now());
-        Field timeStampField = timestampPreferences.getTimestampField();
+        String timestamp = timestampPreferences.now();
         boolean setOwner = ownerPreferences.isUseOwner() && (overwriteOwner || (!entry.hasField(StandardField.OWNER)));
-        boolean setTimeStamp = timestampPreferences.shouldUseTimestamps() && (overwriteTimestamp || (!entry.hasField(timeStampField)));
+        boolean setTimeStamp = timestampPreferences.shouldAddCreationDate();
 
-        setAutomaticFields(entry, setOwner, defaultOwner, setTimeStamp, timeStampField, timestamp);
+        setAutomaticFields(entry, setOwner, defaultOwner, setTimeStamp, timestamp);
     }
 
-    public static void setAutomaticFields(BibEntry entry,
-                                          OwnerPreferences ownerPreferences, TimestampPreferences timestampPreferences) {
-        UpdateField.setAutomaticFields(entry,
-                ownerPreferences.isOverwriteOwner(),
-                timestampPreferences.shouldOverwriteTimestamp(),
-                ownerPreferences,
-                timestampPreferences);
-    }
-
-    private static void setAutomaticFields(BibEntry entry, boolean setOwner, String owner, boolean setTimeStamp,
-                                           Field timeStampField, String timeStamp) {
-
+    private static void setAutomaticFields(BibEntry entry, boolean setOwner, String owner, boolean setTimeStamp, String timeStamp) {
         // Set owner field if this option is enabled:
         if (setOwner) {
             // Set owner field to default value
@@ -120,7 +106,7 @@ public class UpdateField {
         }
 
         if (setTimeStamp) {
-            entry.setField(timeStampField, timeStamp);
+            entry.setField(StandardField.CREATIONDATE, timeStamp);
         }
     }
 
@@ -130,26 +116,24 @@ public class UpdateField {
      *
      * @param bibs List of bibtex entries
      */
-    public static void setAutomaticFields(Collection<BibEntry> bibs, boolean overwriteOwner, boolean overwriteTimestamp,
+    public static void setAutomaticFields(Collection<BibEntry> bibs, boolean overwriteOwner,
                                           OwnerPreferences ownerPreferences, TimestampPreferences timestampPreferences) {
 
         boolean globalSetOwner = ownerPreferences.isUseOwner();
-        boolean globalSetTimeStamp = timestampPreferences.shouldUseTimestamps();
+        boolean setTimeStamp = timestampPreferences.shouldAddCreationDate();
 
         // Do not need to do anything if all options are disabled
-        if (!(globalSetOwner || globalSetTimeStamp)) {
+        if (!(globalSetOwner || setTimeStamp)) {
             return;
         }
 
-        Field timeStampField = timestampPreferences.getTimestampField();
         String defaultOwner = ownerPreferences.getDefaultOwner();
-        String timestamp = DateTimeFormatter.ofPattern(timestampPreferences.getTimestampFormat()).format(LocalDateTime.now());
+        String timestamp = timestampPreferences.now();
 
         // Iterate through all entries
         for (BibEntry curEntry : bibs) {
             boolean setOwner = globalSetOwner && (overwriteOwner || (!curEntry.hasField(StandardField.OWNER)));
-            boolean setTimeStamp = globalSetTimeStamp && (overwriteTimestamp || (!curEntry.hasField(timeStampField)));
-            setAutomaticFields(curEntry, setOwner, defaultOwner, setTimeStamp, timeStampField, timestamp);
+            setAutomaticFields(curEntry, setOwner, defaultOwner, setTimeStamp, timestamp);
         }
     }
 
@@ -157,7 +141,6 @@ public class UpdateField {
                                           OwnerPreferences ownerPreferences, TimestampPreferences timestampPreferences) {
         UpdateField.setAutomaticFields(bibs,
                 ownerPreferences.isOverwriteOwner(),
-                timestampPreferences.shouldOverwriteTimestamp(),
                 ownerPreferences,
                 timestampPreferences);
     }

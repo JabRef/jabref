@@ -8,21 +8,21 @@ package org.jabref.logic.help;
 public enum HelpFile {
     // empty string denotes that it refers to the TOC/index
     CONTENTS(""), // this is always the index
-    ENTRY_EDITOR("general/entryeditor"),
+    ENTRY_EDITOR("advanced/entryeditor"),
     STRING_EDITOR("setup/stringeditor"),
     GROUPS("finding-sorting-and-cleaning-entries/groups#groups-structure-creating-and-removing-groups"),
-    SPECIAL_FIELDS("fields/specialfields"),
+    SPECIAL_FIELDS("finding-sorting-and-cleaning-entries/specialfields"),
     CITATION_KEY_PATTERN("setup/citationkeypatterns"),
-    OWNER("fields/owner"),
-    TIMESTAMP("fields/timestamp"),
-    CUSTOM_EXPORTS_NAME_FORMATTER("import-export/customexports#using-custom-name-formatters"),
+    OWNER("advanced/entryeditor/owner"),
+    TIMESTAMP("advanced/entryeditor/timestamp"),
+    CUSTOM_EXPORTS_NAME_FORMATTER("collaborative-work/export/customexports#using-custom-name-formatters"),
     GENERAL_FIELDS("setup/generalfields"),
-    REMOTE("general/remote"),
-    REGEX_SEARCH("fields/filelinks#RegularExpressionSearch"),
+    REMOTE("advanced/remote"),
+    REGEX_SEARCH("finding-sorting-and-cleaning-entries/filelinks#using-regular-expression-search-for-auto-linking"),
     PREVIEW("setup/preview"),
-    AUTOSAVE("general/autosave"),
+    AUTOSAVE("advanced/autosave"),
     // The help page covers both OO and LO.
-    OPENOFFICE_LIBREOFFICE("import-export/openofficeintegration"),
+    OPENOFFICE_LIBREOFFICE("cite/openofficeintegration"),
     FETCHER_ACM("collect/import-using-online-bibliographic-database#acmportal"),
     FETCHER_ADS("collect/import-using-online-bibliographic-database#ads"),
     FETCHER_BIBSONOMY_SCRAPER(""),
@@ -44,7 +44,7 @@ public enum HelpFile {
     FETCHER_SCIENCEDIRECT(""),
     DATABASE_PROPERTIES("setup/databaseproperties"),
     FIND_DUPLICATES("finding-sorting-and-cleaning-entries/findduplicates"),
-    SQL_DATABASE_MIGRATION("collaborative-work/sqldatabasemigration");
+    SQL_DATABASE_MIGRATION("collaborative-work/sqldatabase/sqldatabasemigration");
 
     private final String pageName;
 

@@ -19,6 +19,9 @@ public class BibDatabaseContextChangedEvent {
         this.filteredOut = filteredOut;
     }
 
+    /**
+     * Check if this event can be filtered out to be synchronized with a database at a later time.
+     */
     public boolean isFilteredOut() {
         return filteredOut;
     }

@@ -21,6 +21,7 @@ import java.util.stream.Collectors;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
+import org.jabref.logic.bibtex.FieldWriter;
 import org.jabref.model.database.event.EntriesAddedEvent;
 import org.jabref.model.database.event.EntriesRemovedEvent;
 import org.jabref.model.entry.BibEntry;
@@ -59,7 +60,15 @@ public class BibDatabase {
 
     // All file contents below the last entry in the file
     private String epilog = "";
+
     private String sharedDatabaseID;
+
+    private String newLineSeparator = System.lineSeparator();
+
+    public BibDatabase(List<BibEntry> entries, String newLineSeparator) {
+        this(entries);
+        this.newLineSeparator = newLineSeparator;
+    }
 
     public BibDatabase(List<BibEntry> entries) {
         this();
@@ -284,6 +293,7 @@ public class BibDatabase {
     /**
      * Replaces the existing lists of BibTexString with the given one
      * Duplicates throw KeyCollisionException
+     *
      * @param stringsToAdd The collection of strings to set
      */
     public void setStrings(List<BibtexString> stringsToAdd) {
@@ -428,7 +438,6 @@ public class BibDatabase {
      * given BibtexEntries is modified.
      */
     public BibEntry resolveForStrings(BibEntry entry, boolean inPlace) {
-
         BibEntry resultingEntry;
         if (inPlace) {
             resultingEntry = entry;
@@ -494,14 +503,13 @@ public class BibDatabase {
             StringBuilder newRes = new StringBuilder();
             int piv = 0;
             int next;
-            while ((next = res.indexOf('#', piv)) >= 0) {
-
+            while ((next = res.indexOf(FieldWriter.BIBTEX_STRING_START_END_SYMBOL, piv)) >= 0) {
                 // We found the next string ref. Append the text
                 // up to it.
                 if (next > 0) {
                     newRes.append(res, piv, next);
                 }
-                int stringEnd = res.indexOf('#', next + 1);
+                int stringEnd = res.indexOf(FieldWriter.BIBTEX_STRING_START_END_SYMBOL, next + 1);
                 if (stringEnd >= 0) {
                     // We found the boundaries of the string ref,
                     // now resolve that one.
@@ -621,5 +629,21 @@ public class BibDatabase {
      */
     public boolean isDuplicateCitationKeyExisting(String key) {
         return getNumberOfCitationKeyOccurrences(key) > 1;
+    }
+
+    /**
+     * Set the newline separator.
+     *
+     * @param newLineSeparator
+     */
+    public void setNewLineSeparator(String newLineSeparator) {
+        this.newLineSeparator = newLineSeparator;
+    }
+
+    /**
+     * Returns the string used to indicate a linebreak
+     */
+    public String getNewLineSeparator() {
+        return newLineSeparator;
     }
 }

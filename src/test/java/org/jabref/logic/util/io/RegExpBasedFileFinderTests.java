@@ -5,26 +5,33 @@ import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
 
-import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class RegExpBasedFileFinderTests {
-
-    private static final String FILES_DIRECTORY = "src/test/resources/org/jabref/logic/importer/unlinkedFilesTestFolder";
-    private BibDatabase database;
+    private static final List<String> PDF_EXTENSION = Collections.singletonList("pdf");
+    private static final List<String> FILE_NAMES = List.of(
+            "ACM_IEEE-CS.pdf",
+            "pdfInDatabase.pdf",
+            "Regexp from [A-Z].pdf",
+            "directory/subdirectory/2003_Hippel_209.pdf",
+            "directory/subdirectory/2017_Gražulis_726.pdf",
+            "directory/subdirectory/pdfInSubdirectory.pdf",
+            "directory/subdirectory/GUO ea - INORG CHEM COMMUN 2010 - Ferroelectric Metal Organic Framework (MOF).pdf"
+            );
+    private Path directory;
     private BibEntry entry;
 
     @BeforeEach
-    void setUp() {
-
+    void setUp(@TempDir Path tempDir) throws Exception {
         entry = new BibEntry();
         entry.setType(StandardEntryType.Article);
         entry.setCitationKey("HipKro03");
@@ -40,69 +47,98 @@ class RegExpBasedFileFinderTests {
         entry.setField(StandardField.ISSN, "1526-5455");
         entry.setField(StandardField.PUBLISHER, "INFORMS");
 
-        database = new BibDatabase();
-        database.insertEntry(entry);
+        // Create default directories and files
+        directory = tempDir;
+        Files.createDirectories(directory.resolve("directory/subdirectory"));
+        for (String fileName : FILE_NAMES) {
+            Files.createFile(directory.resolve(fileName));
+        }
     }
 
     @Test
     void testFindFiles() throws Exception {
         // given
-        BibEntry localEntry = new BibEntry(StandardEntryType.Article);
-        localEntry.setCitationKey("pdfInDatabase");
-        localEntry.setField(StandardField.YEAR, "2001");
+        BibEntry localEntry = new BibEntry(StandardEntryType.Article).withCitationKey("pdfInDatabase");
 
-        List<String> extensions = Collections.singletonList("pdf");
-
-        List<Path> dirs = Collections.singletonList(Path.of(FILES_DIRECTORY));
         RegExpBasedFileFinder fileFinder = new RegExpBasedFileFinder("**/[citationkey].*\\\\.[extension]", ',');
 
         // when
-        List<Path> result = fileFinder.findAssociatedFiles(localEntry, dirs, extensions);
+        List<Path> result = fileFinder.findAssociatedFiles(localEntry, List.of(directory), PDF_EXTENSION);
+        List<Path> expected = List.of(directory.resolve("pdfInDatabase.pdf"));
 
         // then
-        assertEquals(Collections.singletonList(Path.of("src/test/resources/org/jabref/logic/importer/unlinkedFilesTestFolder/pdfInDatabase.pdf")),
-                result);
+        assertEquals(expected, result);
     }
 
     @Test
     void testYearAuthFirstPageFindFiles() throws Exception {
         // given
-        List<String> extensions = Collections.singletonList("pdf");
-
-        List<Path> dirs = Collections.singletonList(Path.of(FILES_DIRECTORY));
         RegExpBasedFileFinder fileFinder = new RegExpBasedFileFinder("**/[year]_[auth]_[firstpage].*\\\\.[extension]", ',');
 
         // when
-        List<Path> result = fileFinder.findAssociatedFiles(entry, dirs, extensions);
+        List<Path> result = fileFinder.findAssociatedFiles(entry, List.of(directory), PDF_EXTENSION);
+        List<Path> expected = List.of(directory.resolve("directory/subdirectory/2003_Hippel_209.pdf"));
 
         // then
-        assertEquals(Collections.singletonList(Path.of("src/test/resources/org/jabref/logic/importer/unlinkedFilesTestFolder/directory/subdirectory/2003_Hippel_209.pdf")),
-                result);
+        assertEquals(expected, result);
+    }
+
+    @Test
+    void findAssociatedFilesFindFileContainingBracketsFromBracketedExpression() throws Exception {
+        var bibEntry = new BibEntry().withField(StandardField.TITLE, "Regexp from [A-Z]");
+
+        RegExpBasedFileFinder fileFinder = new RegExpBasedFileFinder("[TITLE]\\\\.[extension]", ',');
+
+        List<Path> result = fileFinder.findAssociatedFiles(bibEntry, List.of(directory), PDF_EXTENSION);
+        List<Path> pdfFile = List.of(directory.resolve("Regexp from [A-Z].pdf"));
+
+        assertEquals(pdfFile, result);
+    }
+
+    @Test
+    void findAssociatedFilesFindCleanedFileFromBracketedExpression() throws Exception {
+        var bibEntry = new BibEntry().withField(StandardField.JOURNAL, "ACM/IEEE-CS");
+
+        RegExpBasedFileFinder fileFinder = new RegExpBasedFileFinder("[JOURNAL]\\\\.[extension]", ',');
+
+        List<Path> result = fileFinder.findAssociatedFiles(bibEntry, List.of(directory), PDF_EXTENSION);
+        List<Path> pdfFile = List.of(directory.resolve("ACM_IEEE-CS.pdf"));
+
+        assertEquals(pdfFile, result);
+    }
+
+    @Test
+    void findAssociatedFilesFindFileContainingParenthesizesFromBracketedExpression() throws Exception {
+        var bibEntry = new BibEntry().withCitationKey("Guo_ICC_2010")
+                                     .withField(StandardField.TITLE, "Ferroelectric Metal Organic Framework (MOF)")
+                                     .withField(StandardField.AUTHOR, "Guo, M. and Cai, H.-L. and Xiong, R.-G.")
+                                     .withField(StandardField.JOURNAL, "Inorganic Chemistry Communications")
+                                     .withField(StandardField.YEAR, "2010");
+
+        RegExpBasedFileFinder fileFinder = new RegExpBasedFileFinder("**/.*[TITLE].*\\\\.[extension]", ',');
+
+        List<Path> result = fileFinder.findAssociatedFiles(bibEntry, List.of(directory), PDF_EXTENSION);
+        List<Path> pdfFile = List.of(directory.resolve("directory/subdirectory/GUO ea - INORG CHEM COMMUN 2010 - Ferroelectric Metal Organic Framework (MOF).pdf"));
+
+        assertEquals(pdfFile, result);
     }
 
     @Test
     void testAuthorWithDiacritics() throws Exception {
         // given
-        BibEntry localEntry = new BibEntry(StandardEntryType.Article);
-        localEntry.setCitationKey("Grazulis2017");
+        BibEntry localEntry = new BibEntry(StandardEntryType.Article).withCitationKey("Grazulis2017");
         localEntry.setField(StandardField.YEAR, "2017");
         localEntry.setField(StandardField.AUTHOR, "Gražulis, Saulius and O. Kitsune");
         localEntry.setField(StandardField.PAGES, "726--729");
 
-        List<String> extensions = Collections.singletonList("pdf");
-
-        List<Path> dirs = Collections.singletonList(Path.of(FILES_DIRECTORY));
         RegExpBasedFileFinder fileFinder = new RegExpBasedFileFinder("**/[year]_[auth]_[firstpage]\\\\.[extension]", ',');
 
         // when
-        List<Path> result = fileFinder.findAssociatedFiles(localEntry, dirs, extensions);
-        List<Path> expected = Collections.singletonList(Path.of("src/test/resources/org/jabref/logic/importer/unlinkedFilesTestFolder/directory/subdirectory/2017_Gražulis_726.pdf"));
+        List<Path> result = fileFinder.findAssociatedFiles(localEntry, List.of(directory), PDF_EXTENSION);
+        List<Path> expected = List.of(directory.resolve("directory/subdirectory/2017_Gražulis_726.pdf"));
 
         // then
-        assertEquals(expected.size(), result.size());
-        for (int i = 0; i < expected.size(); i++) {
-            assertTrue(Files.isSameFile(expected.get(i), result.get(i)));
-        }
+        assertEquals(expected, result);
     }
 
     @Test
@@ -112,17 +148,14 @@ class RegExpBasedFileFinderTests {
         localEntry.setCitationKey("pdfInSubdirectory");
         localEntry.setField(StandardField.YEAR, "2017");
 
-        List<String> extensions = Collections.singletonList("pdf");
-
-        List<Path> dirs = Collections.singletonList(Path.of(FILES_DIRECTORY));
         RegExpBasedFileFinder fileFinder = new RegExpBasedFileFinder("**/[citationkey].*\\\\.[extension]", ',');
 
         // when
-        List<Path> result = fileFinder.findAssociatedFiles(localEntry, dirs, extensions);
+        List<Path> result = fileFinder.findAssociatedFiles(localEntry, List.of(directory), PDF_EXTENSION);
+        List<Path> expected = List.of(directory.resolve("directory/subdirectory/pdfInSubdirectory.pdf"));
 
         // then
-        assertEquals(Collections.singletonList(Path.of("src/test/resources/org/jabref/logic/importer/unlinkedFilesTestFolder/directory/subdirectory/pdfInSubdirectory.pdf")),
-                result);
+        assertEquals(expected, result);
     }
 
     @Test
@@ -132,45 +165,12 @@ class RegExpBasedFileFinderTests {
         localEntry.setCitationKey("pdfInSubdirectory");
         localEntry.setField(StandardField.YEAR, "2017");
 
-        List<String> extensions = Collections.singletonList("pdf");
-
-        List<Path> dirs = Collections.singletonList(Path.of(FILES_DIRECTORY));
         RegExpBasedFileFinder fileFinder = new RegExpBasedFileFinder("*/[citationkey].*\\\\.[extension]", ',');
 
         // when
-        List<Path> result = fileFinder.findAssociatedFiles(localEntry, dirs, extensions);
+        List<Path> result = fileFinder.findAssociatedFiles(localEntry, List.of(directory), PDF_EXTENSION);
 
         // then
         assertTrue(result.isEmpty());
-    }
-
-    @Test
-    void testExpandBrackets() {
-
-        assertEquals("", RegExpBasedFileFinder.expandBrackets("", entry, database, ','));
-
-        assertEquals("dropped", RegExpBasedFileFinder.expandBrackets("drop[unknownkey]ped", entry, database,
-                ','));
-
-        assertEquals("Eric von Hippel and Georg von Krogh",
-                RegExpBasedFileFinder.expandBrackets("[author]", entry, database, ','));
-
-        assertEquals("Eric von Hippel and Georg von Krogh are two famous authors.",
-                RegExpBasedFileFinder.expandBrackets("[author] are two famous authors.", entry, database,
-                        ','));
-
-        assertEquals("Eric von Hippel and Georg von Krogh are two famous authors.",
-                RegExpBasedFileFinder.expandBrackets("[author] are two famous authors.", entry, database,
-                        ','));
-
-        assertEquals(
-                "Eric von Hippel and Georg von Krogh have published Open Source Software and the \"Private-Collective\" Innovation Model: Issues for Organization Science in Organization Science.",
-                RegExpBasedFileFinder.expandBrackets("[author] have published [fulltitle] in [journal].", entry, database,
-                        ','));
-
-        assertEquals(
-                "Eric von Hippel and Georg von Krogh have published Open Source Software and the \"Private Collective\" Innovation Model: Issues for Organization Science in Organization Science.",
-                RegExpBasedFileFinder.expandBrackets("[author] have published [title] in [journal].", entry, database,
-                        ','));
     }
 }

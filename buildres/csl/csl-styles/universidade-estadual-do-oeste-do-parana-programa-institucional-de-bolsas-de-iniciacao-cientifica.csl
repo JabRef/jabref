@@ -1,0 +1,270 @@
+<?xml version="1.0" encoding="utf-8"?>
+<style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" demote-non-dropping-particle="never" default-locale="pt-BR">
+  <info>
+    <title>Universidade Estadual do Oeste do Paraná - Programa Institucional de Bolsas de Iniciação Científica (Português - Brasil)</title>
+    <title-short>PIBIC</title-short>
+    <id>http://www.zotero.org/styles/universidade-estadual-do-oeste-do-parana-programa-institucional-de-bolsas-de-iniciacao-cientifica</id>
+    <link href="http://www.zotero.org/styles/universidade-estadual-do-oeste-do-parana-programa-institucional-de-bolsas-de-iniciacao-cientifica" rel="self"/>
+    <link href="http://www.zotero.org/styles/the-holocene" rel="template"/>
+    <link href="labceuunioeste.wix.com/unioeste" rel="documentation"/>
+    <author>
+      <name>Fernando de Farias Martins</name>
+      <email>fernandof_martins@hotmail.com</email>
+      <uri>https://orthoptera.wixsite.com/unioeste</uri>
+    </author>
+    <author>
+      <name>Neucir Szinwelski</name>
+      <email>neucirufv@gmail.com</email>
+      <uri>https://orthoptera.wixsite.com/unioeste</uri>
+    </author>
+    <category citation-format="author-date"/>
+    <summary>Modified from The Holocene citation style.</summary>
+    <updated>2018-09-19T12:27:17+00:00</updated>
+    <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
+  </info>
+  <locale xml:lang="pt-BR">
+    <terms>
+      <term name="and">e</term>
+      <term name="retrieved">obtido</term>
+      <term name="from">de</term>
+      <term name="in">in</term>
+      <term name="accessed">acessado em</term>
+      <term name="presented at">apresentado em</term>
+      <term name="and others">et al.</term>
+      <term name="month-01" form="short">jan.</term>
+      <term name="month-02" form="short">fev.</term>
+      <term name="month-03" form="short">mar.</term>
+      <term name="month-04" form="short">abr.</term>
+      <term name="month-05" form="short">maio</term>
+      <term name="month-06" form="short">jun.</term>
+      <term name="month-07" form="short">jul.</term>
+      <term name="month-08" form="short">ago.</term>
+      <term name="month-09" form="short">set.</term>
+      <term name="month-10" form="short">out.</term>
+      <term name="month-11" form="short">nov.</term>
+      <term name="month-12" form="short">dez.</term>
+      <term name="editor" form="short">
+        <single>ed</single>
+        <multiple>eds</multiple>
+      </term>
+      <term name="container-author" form="short">
+        <single>ed</single>
+        <multiple>eds</multiple>
+      </term>
+      <term name="collection-editor" form="short">
+        <single>ed</single>
+        <multiple>eds</multiple>
+      </term>
+    </terms>
+  </locale>
+  <macro name="author">
+    <names variable="author">
+      <name suffix="." and="symbol" delimiter-precedes-last="never" et-al-min="10" et-al-use-first="8" initialize-with="." name-as-sort-order="all"/>
+      <et-al font-style="italic"/>
+      <label form="short" strip-periods="true" prefix=" (" suffix=")"/>
+      <substitute>
+        <names variable="editor"/>
+        <names variable="translator"/>
+        <text macro="title"/>
+      </substitute>
+    </names>
+  </macro>
+  <macro name="author-short">
+    <names variable="author">
+      <name form="short" delimiter=",  " and="symbol" initialize-with=". "/>
+      <et-al font-style="italic"/>
+      <substitute>
+        <names variable="editor"/>
+        <names variable="translator"/>
+        <text variable="container-title" font-style="italic" font-weight="normal"/>
+        <choose>
+          <if type="bill book graphic legal_case legislation motion_picture report song" match="any">
+            <text variable="title" form="short" font-style="italic"/>
+          </if>
+          <else>
+            <text variable="title" form="short" quotes="true"/>
+          </else>
+        </choose>
+      </substitute>
+    </names>
+  </macro>
+  <macro name="container-contributors">
+    <choose>
+      <if type="chapter" match="any">
+        <text term="in" text-case="capitalize-first" prefix=" " suffix=" "/>
+        <names variable="editor translator" delimiter=", " suffix=" ">
+          <name and="symbol" et-al-min="4" et-al-use-first="3" initialize-with="." name-as-sort-order="all"/>
+          <label form="symbol" plural="always" text-case="capitalize-first" strip-periods="true" prefix=" (" suffix=".),"/>
+        </names>
+      </if>
+      <else-if type="legal_case legislation" match="any">
+        <text variable="number" prefix=" " suffix="."/>
+      </else-if>
+    </choose>
+    <choose>
+      <if type="paper-conference" match="any">
+        <text term="in" text-case="capitalize-first" prefix=" " suffix=" Anais do "/>
+      </if>
+    </choose>
+  </macro>
+  <macro name="access">
+    <choose>
+      <if variable="URL">
+        <group>
+          <text value=""/>
+          <text variable="URL"/>
+          <date form="text" variable="accessed" prefix=". Acesso em ">
+            <date-part name="day"/>
+            <date-part name="month" text-case="capitalize-first"/>
+            <date-part name="year"/>
+          </date>
+        </group>
+      </if>
+    </choose>
+  </macro>
+  <macro name="title">
+    <choose>
+      <if type="bill book graphic motion_picture report song thesis" match="any">
+        <text variable="title" font-style="italic"/>
+      </if>
+      <else-if type="legal_case legislation" match="any">
+        <text variable="title" font-weight="bold"/>
+      </else-if>
+      <else>
+        <text variable="title" font-style="normal" suffix="."/>
+      </else>
+    </choose>
+  </macro>
+  <macro name="publisher">
+    <choose>
+      <if type="thesis">
+        <group delimiter=", ">
+          <text variable="genre"/>
+          <text variable="publisher"/>
+          <text variable="abstract"/>
+        </group>
+      </if>
+      <else-if type="patent" match="any">
+        <text variable="publisher" font-style="italic" suffix=" "/>
+        <text variable="number" font-style="italic" font-weight="normal" suffix=", "/>
+        <text variable="page"/>
+      </else-if>
+      <else-if type="paper-conference" match="any">
+        <text variable="publisher-place"/>
+      </else-if>
+      <else-if type="legal_case legislation" match="any">
+        <text variable="publisher" suffix=", "/>
+        <text variable="publisher-place" suffix=", "/>
+        <text variable="page"/>
+      </else-if>
+      <else-if type="broadcast interview" match="any">
+        <group delimiter=". " prefix="Entrevistadores: ">
+          <text variable="genre"/>
+          <text variable="publisher-place"/>
+          <text variable="publisher"/>
+        </group>
+      </else-if>
+      <else>
+        <text variable="genre" suffix=". "/>
+        <group delimiter=": ">
+          <text variable="publisher-place" prefix=" "/>
+          <text variable="publisher"/>
+        </group>
+        <choose>
+          <if type="broadcast interview" match="any">
+            <group>
+              <text value=""/>
+            </group>
+          </if>
+        </choose>
+      </else>
+    </choose>
+  </macro>
+  <macro name="event">
+    <choose>
+      <if variable="event">
+        <text term="presented at" prefix="paper " suffix=" "/>
+        <text variable="event"/>
+      </if>
+      <else-if type="chapter" match="any">
+        <text variable="page" prefix=" (pp. " suffix=")."/>
+      </else-if>
+    </choose>
+  </macro>
+  <macro name="year-date">
+    <choose>
+      <if variable="issued">
+        <group>
+          <date date-parts="year" form="numeric" variable="issued">
+            <date-part name="year"/>
+          </date>
+        </group>
+      </if>
+    </choose>
+  </macro>
+  <macro name="locators">
+    <choose>
+      <if type="article-journal article-magazine" match="any">
+        <group delimiter=" " prefix=" ">
+          <group>
+            <text variable="volume" font-weight="bold" suffix=","/>
+          </group>
+          <text variable="page"/>
+        </group>
+      </if>
+      <else-if type="article-newspaper">
+        <group delimiter=", " prefix=", ">
+          <date variable="issued">
+            <date-part name="day"/>
+            <date-part name="month" form="long" prefix=" "/>
+          </date>
+          <group delimiter=" ">
+            <label variable="page"/>
+            <text variable="page"/>
+          </group>
+        </group>
+      </else-if>
+    </choose>
+  </macro>
+  <citation et-al-min="3" et-al-use-first="1" disambiguate-add-year-suffix="true" collapse="year">
+    <sort>
+      <key macro="year-date"/>
+      <key macro="author"/>
+    </sort>
+    <layout delimiter="; " prefix="(" suffix=")">
+      <group delimiter=", ">
+        <text macro="author-short"/>
+        <text macro="year-date"/>
+      </group>
+      <text variable="locator" prefix=": "/>
+    </layout>
+  </citation>
+  <bibliography et-al-min="10" et-al-use-first="8">
+    <sort>
+      <key macro="author"/>
+      <key macro="year-date"/>
+    </sort>
+    <layout suffix=".">
+      <group delimiter=" " suffix=".">
+        <text macro="author"/>
+        <text macro="year-date" prefix="(" suffix=")."/>
+        <text macro="title"/>
+      </group>
+      <text macro="container-contributors"/>
+      <choose>
+        <if type="paper-conference" match="any">
+          <text variable="container-title" font-weight="normal" text-decoration="none" suffix="."/>
+        </if>
+        <else>
+          <text variable="container-title" font-style="italic" font-weight="normal" prefix=" "/>
+        </else>
+      </choose>
+      <text macro="event"/>
+      <group delimiter=" ">
+        <text macro="publisher" prefix=" "/>
+      </group>
+      <text macro="locators"/>
+      <text macro="access" prefix=". "/>
+    </layout>
+  </bibliography>
+</style>

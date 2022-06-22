@@ -111,6 +111,10 @@ public class ExternalFileTypes {
      *         guaranteed to be returned.
      */
     public Optional<ExternalFileType> getExternalFileTypeByMimeType(String mimeType) {
+        // Ignores parameters according to link: (https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types)
+        if (mimeType.indexOf(';') != -1) {
+            mimeType = mimeType.substring(0, mimeType.indexOf(';')).trim();
+        }
         for (ExternalFileType type : externalFileTypes) {
             if (type.getMimeType().equalsIgnoreCase(mimeType)) {
                 return Optional.of(type);
@@ -129,7 +133,6 @@ public class ExternalFileTypes {
      * @param types The new List of external file types. This is the complete list, not just new entries.
      */
     public void setExternalFileTypes(List<ExternalFileType> types) {
-
         // First find a list of the default types:
         List<ExternalFileType> defTypes = new ArrayList<>(getDefaultExternalFileTypes());
         // Make a list of types that are unchanged:

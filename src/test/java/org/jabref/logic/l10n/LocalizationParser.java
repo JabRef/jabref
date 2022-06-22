@@ -18,24 +18,22 @@ import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javafx.fxml.FXMLLoader;
 
+import com.airhacks.afterburner.views.ViewLoader;
+import org.mockito.Answers;
+import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 
 public class LocalizationParser {
 
-    public static SortedSet<LocalizationEntry> find(LocalizationBundleForTest type) throws IOException {
+    public static SortedSet<LocalizationEntry> findMissingKeys(LocalizationBundleForTest type) throws IOException {
         Set<LocalizationEntry> entries = findLocalizationEntriesInFiles(type);
-
         Set<String> keysInJavaFiles = entries.stream()
                                              .map(LocalizationEntry::getKey)
-                                             .distinct()
-                                             .sorted()
                                              .collect(Collectors.toSet());
 
         Set<String> englishKeys;
@@ -47,23 +45,21 @@ public class LocalizationParser {
         List<String> missingKeys = new ArrayList<>(keysInJavaFiles);
         missingKeys.removeAll(englishKeys);
 
-        return entries.stream().filter(e -> missingKeys.contains(e.getKey())).collect(
-                Collectors.toCollection(TreeSet::new));
+        return entries.stream()
+                      .filter(e -> missingKeys.contains(e.getKey()))
+                      .collect(Collectors.toCollection(TreeSet::new));
     }
 
     public static SortedSet<String> findObsolete(LocalizationBundleForTest type) throws IOException {
-        Set<LocalizationEntry> entries = findLocalizationEntriesInFiles(type);
-
-        Set<String> keysInFiles = entries.stream().map(LocalizationEntry::getKey).collect(Collectors.toSet());
-
         Set<String> englishKeys;
         if (type == LocalizationBundleForTest.LANG) {
             englishKeys = getKeysInPropertiesFile("/l10n/JabRef_en.properties");
         } else {
             englishKeys = getKeysInPropertiesFile("/l10n/Menu_en.properties");
         }
-        englishKeys.removeAll(keysInFiles);
-
+        Set<String> keysInSourceFiles = findLocalizationEntriesInFiles(type)
+                .stream().map(LocalizationEntry::getKey).collect(Collectors.toSet());
+        englishKeys.removeAll(keysInSourceFiles);
         return new TreeSet<>(englishKeys);
     }
 
@@ -114,14 +110,19 @@ public class LocalizationParser {
         }
     }
 
+    /**
+     * Returns the trimmed key set of the given property file. Each key is already unescaped.
+     */
     public static SortedSet<String> getKeysInPropertiesFile(String path) {
         Properties properties = getProperties(path);
-
         return properties.keySet().stream()
-                         .sorted()
                          .map(Object::toString)
                          .map(String::trim)
-                         .map(e -> new LocalizationKey(e).getPropertiesKey())
+                         .map(key -> key
+                                 // escape keys to make them comparable
+                                 .replace("\\", "\\\\")
+                                 .replace("\n", "\\n")
+                         )
                          .collect(Collectors.toCollection(TreeSet::new));
     }
 
@@ -145,41 +146,29 @@ public class LocalizationParser {
     }
 
     private static List<LocalizationEntry> getLanguageKeysInJavaFile(Path path, LocalizationBundleForTest type) {
-        List<LocalizationEntry> result = new ArrayList<>();
-
+        List<String> lines;
         try {
-            List<String> lines = Files.readAllLines(path, StandardCharsets.UTF_8);
-            String content = String.join("\n", lines);
-
-            List<String> keys = JavaLocalizationEntryParser.getLanguageKeysInString(content, type);
-
-            for (String key : keys) {
-                result.add(new LocalizationEntry(path, key, type));
-            }
+            lines = Files.readAllLines(path, StandardCharsets.UTF_8);
         } catch (IOException exception) {
             throw new RuntimeException(exception);
         }
-
-        return result;
+        String content = String.join("\n", lines);
+        return JavaLocalizationEntryParser.getLanguageKeysInString(content, type).stream()
+                                          .map(key -> new LocalizationEntry(path, key, type))
+                                          .collect(Collectors.toList());
     }
 
     private static List<LocalizationEntry> getLocalizationParametersInJavaFile(Path path, LocalizationBundleForTest type) {
-        List<LocalizationEntry> result = new ArrayList<>();
-
+        List<String> lines;
         try {
-            List<String> lines = Files.readAllLines(path, StandardCharsets.UTF_8);
-            String content = String.join("\n", lines);
-
-            List<String> keys = JavaLocalizationEntryParser.getLocalizationParameter(content, type);
-
-            for (String key : keys) {
-                result.add(new LocalizationEntry(path, key, type));
-            }
+            lines = Files.readAllLines(path, StandardCharsets.UTF_8);
         } catch (IOException exception) {
             throw new RuntimeException(exception);
         }
-
-        return result;
+        String content = String.join("\n", lines);
+        return JavaLocalizationEntryParser.getLocalizationParameter(content, type).stream()
+                                          .map(key -> new LocalizationEntry(path, key, type))
+                                          .collect(Collectors.toList());
     }
 
     /**
@@ -188,9 +177,11 @@ public class LocalizationParser {
     private static List<LocalizationEntry> getLanguageKeysInFxmlFile(Path path, LocalizationBundleForTest type) {
         List<String> result = new ArrayList<>();
 
+        // Afterburner ViewLoader forces a controller factory, but we do not need any controller
+        MockedStatic<ViewLoader> viewLoader = Mockito.mockStatic(ViewLoader.class, Answers.RETURNS_DEEP_STUBS);
+
         // Record which keys are requested; we pretend that we have all keys
         ResourceBundle registerUsageResourceBundle = new ResourceBundle() {
-
             @Override
             protected Object handleGetObject(String key) {
                 result.add(key);
@@ -212,121 +203,33 @@ public class LocalizationParser {
             FXMLLoader loader = new FXMLLoader(path.toUri().toURL(), registerUsageResourceBundle);
             // We don't want to initialize controller
             loader.setControllerFactory(Mockito::mock);
+
             // We need to load in "static mode" because otherwise fxml files with fx:root doesn't work
             setStaticLoad(loader);
             loader.load();
         } catch (IOException exception) {
             throw new RuntimeException(exception);
+        } finally {
+            viewLoader.close();
         }
 
         return result.stream()
-                     .map(key -> new LocalizationEntry(path, new LocalizationKey(key).getPropertiesKey(), type))
+                     .map(key -> new LocalizationEntry(path, key, type))
                      .collect(Collectors.toList());
     }
 
     private static void setStaticLoad(FXMLLoader loader) {
         // Somebody decided to make "setStaticLoad" package-private, so let's use reflection
+        //
+        // Issues in JFX:
+        //   - https://bugs.openjdk.java.net/browse/JDK-8159005 "SceneBuilder needs public access to FXMLLoader setStaticLoad" --> call for "request from community users with use cases"
+        //   - https://bugs.openjdk.java.net/browse/JDK-8127532 "FXMLLoader#setStaticLoad is deprecated"
         try {
             Method method = FXMLLoader.class.getDeclaredMethod("setStaticLoad", boolean.class);
             method.setAccessible(true);
             method.invoke(loader, true);
         } catch (SecurityException | NoSuchMethodException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
             throw new RuntimeException(e);
-        }
-    }
-
-    static class JavaLocalizationEntryParser {
-
-        private static final String INFINITE_WHITESPACE = "\\s*";
-        private static final String DOT = "\\.";
-        private static final Pattern LOCALIZATION_START_PATTERN = Pattern.compile("Localization" + INFINITE_WHITESPACE + DOT + INFINITE_WHITESPACE + "lang" + INFINITE_WHITESPACE + "\\(");
-
-        private static final Pattern LOCALIZATION_MENU_START_PATTERN = Pattern.compile("Localization" + INFINITE_WHITESPACE + DOT + INFINITE_WHITESPACE + "menuTitle" + INFINITE_WHITESPACE + "\\(");
-        private static final Pattern ESCAPED_QUOTATION_SYMBOL = Pattern.compile("\\\\\"");
-
-        private static final Pattern QUOTATION_SYMBOL = Pattern.compile("QUOTATIONPLACEHOLDER");
-
-        public static List<String> getLanguageKeysInString(String content, LocalizationBundleForTest type) {
-            List<String> parameters = getLocalizationParameter(content, type);
-
-            List<String> result = new ArrayList<>();
-
-            for (String param : parameters) {
-
-                String parsedContentsOfLangMethod = ESCAPED_QUOTATION_SYMBOL.matcher(param).replaceAll("QUOTATIONPLACEHOLDER");
-
-                // only retain what is within quotation
-                StringBuilder b = new StringBuilder();
-                int quotations = 0;
-                for (char c : parsedContentsOfLangMethod.toCharArray()) {
-                    if ((c == '"') && (quotations > 0)) {
-                        quotations--;
-                    } else if (c == '"') {
-                        quotations++;
-                    } else {
-                        if (quotations != 0) {
-                            b.append(c);
-                        } else {
-                            if (c == ',') {
-                                break;
-                            }
-                        }
-                    }
-                }
-
-                String languageKey = QUOTATION_SYMBOL.matcher(b.toString()).replaceAll("\\\"");
-
-                // escape chars which are not allowed in property file keys
-                String languagePropertyKey = new LocalizationKey(languageKey).getPropertiesKey();
-
-                if (languagePropertyKey.endsWith(" ")) {
-                    throw new RuntimeException(languageKey + " ends with a space. As this is a localization key, this is illegal!");
-                }
-
-                if (languagePropertyKey.contains("\\n")) {
-                    throw new RuntimeException(languageKey + " contains a new line character. As this is a localization key, this is illegal!");
-                }
-
-                if (!languagePropertyKey.trim().isEmpty()) {
-                    result.add(languagePropertyKey);
-                }
-            }
-
-            return result;
-        }
-
-        public static List<String> getLocalizationParameter(String content, LocalizationBundleForTest type) {
-            List<String> result = new ArrayList<>();
-
-            Matcher matcher;
-            if (type == LocalizationBundleForTest.LANG) {
-                matcher = LOCALIZATION_START_PATTERN.matcher(content);
-            } else {
-                matcher = LOCALIZATION_MENU_START_PATTERN.matcher(content);
-            }
-            while (matcher.find()) {
-                // find contents between the brackets, covering multi-line strings as well
-                int index = matcher.end();
-                int brackets = 1;
-                StringBuilder buffer = new StringBuilder();
-                while (brackets != 0) {
-                    char c = content.charAt(index);
-                    if (c == '(') {
-                        brackets++;
-                    } else if (c == ')') {
-                        brackets--;
-                    }
-                    // skip closing brackets
-                    if (brackets != 0) {
-                        buffer.append(c);
-                    }
-                    index++;
-                }
-                // trim newlines and whitespace
-                result.add(buffer.toString().trim());
-            }
-
-            return result;
         }
     }
 }

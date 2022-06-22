@@ -4,12 +4,14 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - master
-      - master-release
+      - main
+      - main-release
     paths-ignore:
       - 'docs/**'
       - 'src/test/**'
       - 'README.md'
+    tags:
+       - '*'
   pull_request:
     paths-ignore:
       - 'docs/**'
@@ -20,7 +22,15 @@ env:
   SpringerNatureAPIKey: ${{ secrets.SpringerNatureAPIKey }}
   AstrophysicsDataSystemAPIKey: ${{ secrets.AstrophysicsDataSystemAPIKey }}
   IEEEAPIKey: ${{ secrets.IEEEAPIKey }}
+  BiodiversityHeritageApiKey: ${{ secrets.BiodiversityHeritageApiKey}}
   OSXCERT: ${{ secrets.OSX_SIGNING_CERT }}
+  GRADLE_OPTS: -Xmx4g -Dorg.gradle.daemon=false -Dorg.gradle.vfs.watch=false
+  JAVA_OPTS: -Xmx4g
+
+concurrency:
+  group: ${{ github.ref }}
+  cancel-in-progress: true
+
 
 jobs:
   build:
@@ -41,38 +51,23 @@ jobs:
     runs-on: ${{ matrix.os }}
     name: Create installer and portable version for ${{ matrix.displayName }}
     steps:
-      - name: Cancel Previous Runs
-        uses: styfle/cancel-workflow-action@0.6.0
-        with:
-          access_token: ${{ github.token }}
       - name: Fetch all history for all tags and branches
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0
       - name: Install GitVersion
-        uses: gittools/actions/gitversion/setup@v0.9.7
+        uses: gittools/actions/gitversion/setup@v0.9.13
         with:
           versionSpec: "5.x"
       - name: Run GitVersion
         id: gitversion
-        uses: gittools/actions/gitversion/execute@v0.9.7
-      - name: Set up JDK 15 for linux and mac
-        uses: actions/setup-java@v1
+        uses: gittools/actions/gitversion/execute@v0.9.13
+      - name: Set up JDK
+        uses: actions/setup-java@v3
         with:
-          java-version: 15
-        if: matrix.os != 'windows-latest'
-      - name: Set up JDK 14 for windows
-        uses: actions/setup-java@v1
-        with:
-          java-version: 14
-        if: matrix.os == 'windows-latest'
-      - name: Restore gradle cache
-        uses: actions/cache@master
-        with:
-          path: ~/.gradle/caches
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle-
+          java-version: 18
+          distribution: 'temurin'
+          cache: 'gradle'
       - name: Setup OSX key chain on OSX
         if: matrix.os == 'macos-latest'
         uses: apple-actions/import-codesign-certs@v1
@@ -97,18 +92,18 @@ jobs:
         if: matrix.os == 'macos-latest'
         shell: bash
         run: |
-          codesign --entitlements buildres/mac/myapp.entitlements --options runtime -vvv -f --sign "Developer ID Application: Tobias Diez (W2PU6LW5U5)" build/distribution/JabRef.app/Contents/runtime/Contents/MacOS/libjli.dylib
-          codesign --entitlements buildres/mac/myapp.entitlements --options runtime -vvv -f --sign "Developer ID Application: Tobias Diez (W2PU6LW5U5)" build/distribution/JabRef.app/Contents/MacOS/JabRef
-          codesign --entitlements buildres/mac/myapp.entitlements --options runtime -vvv -f --sign "Developer ID Application: Tobias Diez (W2PU6LW5U5)" build/distribution/JabRef.app
+          codesign --entitlements buildres/mac/jabref.entitlements --options runtime -vvv -f --sign "Developer ID Application: JabRef e.V. (6792V39SK3)" build/distribution/JabRef.app/Contents/runtime/Contents/MacOS/libjli.dylib
+          codesign --entitlements buildres/mac/jabref.entitlements --options runtime -vvv -f --sign "Developer ID Application: JabRef e.V. (6792V39SK3)" build/distribution/JabRef.app/Contents/MacOS/JabRef
+          codesign --entitlements buildres/mac/jabref.entitlements --options runtime -vvv -f --sign "Developer ID Application: JabRef e.V. (6792V39SK3)" build/distribution/JabRef.app
           jpackage --type pkg --dest build/distribution --name JabRef --app-version "${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}" --app-image build/distribution/JabRef.app --verbose --type dmg --vendor JabRef --app-version "${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}" --file-associations buildres/mac/bibtexAssociations.properties --resource-dir buildres/mac
-          codesign -s "Developer ID Application: Tobias Diez (W2PU6LW5U5)" --options runtime --entitlements buildres/mac/myapp.entitlements -vvvv --deep "build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}.dmg"
+          codesign -s "Developer ID Application: JabRef e.V. (6792V39SK3)" --options runtime --entitlements buildres/mac/jabref.entitlements -vvvv --deep "build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}.dmg"
           jpackage --type pkg --dest build/distribution --name JabRef --mac-package-identifier JabRef --app-version "${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}" --app-image build/distribution/JabRef.app --verbose --type pkg --vendor JabRef --app-version "${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}" --file-associations buildres/mac/bibtexAssociations.properties --resource-dir buildres/mac
-          productsign --sign "Developer ID Installer: Tobias Diez (W2PU6LW5U5)" "build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}.pkg" "build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}-signed.pkg"
+          productsign --sign "Developer ID Installer: JabRef e.V. (6792V39SK3)" "build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}.pkg" "build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}-signed.pkg"
       - name: Notarize dmg and pkg installer
-        if: matrix.os == 'macos-latest' && github.ref == 'refs/heads/master'
+        if: matrix.os == 'macos-latest' && startsWith(github.ref, 'refs/tags/')
         shell: bash
         run: |
-          REQUEST_UUID_DMG=$(xcrun altool --verbose --notarize-app --primary-bundle-id "org.jabref" --username ${{ secrets.OSX_NOTARIZATION_APP_USERNAME }} --password ${{ secrets.OSX_NOTARIZATION_APP_PWD }} --asc-provider "W2PU6LW5U5" --file "build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}.dmg" | grep RequestUUID | awk '{print $3}')
+          REQUEST_UUID_DMG=$(xcrun altool --verbose --notarize-app --primary-bundle-id "org.jabref" --username ${{ secrets.OSX_NOTARIZATION_APP_USERNAME }} --password ${{ secrets.OSX_NOTARIZATION_APP_PWD }} --asc-provider "6792V39SK3" --file "build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}.dmg" | grep RequestUUID | awk '{print $3}')
           while xcrun altool --notarization-info "$REQUEST_UUID_DMG" -u ${{ secrets.OSX_NOTARIZATION_APP_USERNAME }} -p  ${{ secrets.OSX_NOTARIZATION_APP_PWD }} | grep "Status: in progress" > /dev/null; do
             echo "Verification in progress..."
             sleep 30
@@ -117,7 +112,7 @@ jobs:
           spctl -vvv --assess --type exec build/distribution/JabRef.app
           codesign -vvv --deep --strict "build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}.dmg"
           codesign -dvv "build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}.dmg"
-          REQUEST_UUID_PKG=$(xcrun altool --verbose --notarize-app --primary-bundle-id "org.jabref" --username ${{ secrets.OSX_NOTARIZATION_APP_USERNAME }} --password ${{ secrets.OSX_NOTARIZATION_APP_PWD }} --asc-provider "W2PU6LW5U5" --file "build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}-signed.pkg" | grep RequestUUID | awk '{print $3}')
+          REQUEST_UUID_PKG=$(xcrun altool --verbose --notarize-app --primary-bundle-id "org.jabref" --username ${{ secrets.OSX_NOTARIZATION_APP_USERNAME }} --password ${{ secrets.OSX_NOTARIZATION_APP_PWD }} --asc-provider "6792V39SK3" --file "build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}-signed.pkg" | grep RequestUUID | awk '{print $3}')
           while xcrun altool --notarization-info "$REQUEST_UUID_PKG" -u ${{ secrets.OSX_NOTARIZATION_APP_USERNAME }} -p  ${{ secrets.OSX_NOTARIZATION_APP_PWD }} | grep "Status: in progress" > /dev/null; do
             echo "Verification in progress..."
             sleep 30
@@ -158,16 +153,16 @@ jobs:
         env:
           BUILDJABREFPRIVATEKEY: ${{ secrets.buildJabRefPrivateKey }}
       - name: Checkout source
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Fetch all history for all tags and branches
         run: git fetch --prune --unshallow
       - name: Install GitVersion
-        uses: gittools/actions/gitversion/setup@v0.9.7
+        uses: gittools/actions/gitversion/setup@v0.9.13
         with:
           versionSpec: '5.x'
       - name: Run GitVersion
         id: gitversion
-        uses: gittools/actions/gitversion/execute@v0.9.7
+        uses: gittools/actions/gitversion/execute@v0.9.13
       - name: Get linux binaries
         uses: actions/download-artifact@master
         with:

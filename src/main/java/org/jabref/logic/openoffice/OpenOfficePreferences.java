@@ -1,7 +1,5 @@
 package org.jabref.logic.openoffice;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class OpenOfficePreferences {
@@ -16,42 +14,32 @@ public class OpenOfficePreferences {
 
     public static final String DEFAULT_LINUX_PATH = "/usr/lib/libreoffice";
     public static final String DEFAULT_LINUX_EXEC_PATH = "/usr/lib/libreoffice/program/soffice";
+    public static final String DEFAULT_LINUX_FLATPAK_EXEC_PATH = "/app/bin/soffice";
     public static final String LINUX_EXECUTABLE = "soffice";
 
-    public static final List<String> OO_JARS = Arrays.asList("unoil.jar", "jurt.jar", "juh.jar", "ridl.jar");
-
-    private String executablePath = "";
-    private String installationPath = "";
+    private String executablePath;
+    private String installationPath;
     private boolean useAllDatabases;
     private boolean syncWhenCiting;
-    private boolean showPanel;
-    private List<String> externalStyles = new ArrayList<>();
-    private String currentStyle = "";
-    private String jarsPath = "";
+    private List<String> externalStyles;
+    private String currentStyle;
 
-    public OpenOfficePreferences(
-            String jarsPath,
-            String executablePath,
-            String installationPath,
-            boolean useAllDatabases,
-            boolean syncWhenCiting,
-            boolean showPanel,
-            List<String> externalStyles,
-            String currentStyle
-    ) {
-        this.jarsPath = jarsPath;
+    public OpenOfficePreferences(String executablePath,
+                                 String installationPath,
+                                 boolean useAllDatabases,
+                                 boolean syncWhenCiting,
+                                 List<String> externalStyles,
+                                 String currentStyle) {
         this.executablePath = executablePath;
         this.installationPath = installationPath;
         this.useAllDatabases = useAllDatabases;
         this.syncWhenCiting = syncWhenCiting;
-        this.showPanel = showPanel;
         this.externalStyles = externalStyles;
         this.currentStyle = currentStyle;
     }
 
     public void clearCurrentStyle() {
         this.currentStyle = null;
-        // TODO: sync to prefs
     }
 
     /**
@@ -70,10 +58,6 @@ public class OpenOfficePreferences {
      */
     public String getInstallationPath() {
         return installationPath;
-    }
-
-    public void setInstallationPath(String installationPath) {
-        this.installationPath = installationPath;
     }
 
     /**
@@ -99,17 +83,6 @@ public class OpenOfficePreferences {
     }
 
     /**
-     * true if the OO panel is shown on startup
-     */
-    public boolean getShowPanel() {
-        return showPanel;
-    }
-
-    public void setShowPanel(boolean showPanel) {
-        this.showPanel = showPanel;
-    }
-
-    /**
      * list with paths to external style files
      */
     public List<String> getExternalStyles() {
@@ -131,26 +104,8 @@ public class OpenOfficePreferences {
         this.currentStyle = currentStyle;
     }
 
-    /**
-     * directory that contains juh.jar, jurt.jar, ridl.jar, unoil.jar
-     */
-    public String getJarsPath() {
-        return jarsPath;
-    }
-
-    public void setJarsPath(String jarsPath) {
-        this.jarsPath = jarsPath;
-    }
-
-    public void updateConnectionParams(String ooPath, String execPath, String jarsPath) {
-        setInstallationPath(ooPath);
-        setExecutablePath(execPath);
-        setJarsPath(jarsPath);
-    }
-
     public void clearConnectionSettings() {
         this.installationPath = "";
         this.executablePath = "";
-        this.jarsPath = "";
     }
 }

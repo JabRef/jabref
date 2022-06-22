@@ -2,6 +2,8 @@ package org.jabref.build.xjc
 
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.InputFile
+import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.TaskAction
 
@@ -30,7 +32,7 @@ class XjcTask extends DefaultTask {
         }
     }
 
-    @Input
+    @InputFile
     File getSchemaFile() {
         if (schemaFile == null) {
             return null
@@ -42,6 +44,7 @@ class XjcTask extends DefaultTask {
         this.schemaFile = schemaFile
     }
 
+    @OutputDirectory
     File getOutputDirectory() {
         if (outputDirectory == null) {
             return null
@@ -54,6 +57,7 @@ class XjcTask extends DefaultTask {
         updateOutput()
     }
 
+    @Input
     String getJavaPackage() {
         return javaPackage
     }
@@ -63,6 +67,7 @@ class XjcTask extends DefaultTask {
         updateOutput()
     }
 
+    @Input
     String getEncoding() {
         if(encoding == null ) {
             // use UTF-8 as default encoding
@@ -76,6 +81,7 @@ class XjcTask extends DefaultTask {
         this.encoding = encoding
     }
 
+    @Input
     String getArguments() {
         return arguments
     }
@@ -84,7 +90,7 @@ class XjcTask extends DefaultTask {
         this.arguments = args
     }
 
-    @Input
+    @InputFile
     File getBindingFile() {
         if (bindingFile == null) {
             return null

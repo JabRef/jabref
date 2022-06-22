@@ -1,5 +1,7 @@
 package org.jabref.gui.linkedfile;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
@@ -23,7 +25,7 @@ import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.util.FileHelper;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.FilePreferences;
 
 import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.optional.ObservableOptionalValue;
@@ -38,13 +40,13 @@ public class LinkedFilesEditDialogViewModel extends AbstractViewModel {
     private final ObservableOptionalValue<ExternalFileType> monadicSelectedExternalFileType;
     private final BibDatabaseContext database;
     private final DialogService dialogService;
-    private final PreferencesService preferences;
+    private final FilePreferences filePreferences;
     private final ExternalFileTypes externalFileTypes;
 
-    public LinkedFilesEditDialogViewModel(LinkedFile linkedFile, BibDatabaseContext database, DialogService dialogService, PreferencesService preferences, ExternalFileTypes externalFileTypes) {
+    public LinkedFilesEditDialogViewModel(LinkedFile linkedFile, BibDatabaseContext database, DialogService dialogService, FilePreferences filePreferences, ExternalFileTypes externalFileTypes) {
         this.database = database;
         this.dialogService = dialogService;
-        this.preferences = preferences;
+        this.filePreferences = filePreferences;
         this.externalFileTypes = externalFileTypes;
         allExternalFileTypes.set(FXCollections.observableArrayList(externalFileTypes.getExternalFileTypeSelection()));
 
@@ -54,7 +56,6 @@ public class LinkedFilesEditDialogViewModel extends AbstractViewModel {
 
     private void setExternalFileTypeByExtension(String link) {
         if (!link.isEmpty()) {
-
             // Check if this looks like a remote link:
             if (REMOTE_LINK_PATTERN.matcher(link).matches()) {
                 externalFileTypes.getExternalFileTypeByExt("html").ifPresent(selectedExternalFileType::setValue);
@@ -69,9 +70,9 @@ public class LinkedFilesEditDialogViewModel extends AbstractViewModel {
     public void openBrowseDialog() {
         String fileText = link.get();
 
-        Optional<Path> file = FileHelper.find(database, fileText, preferences.getFilePreferences());
+        Optional<Path> file = FileHelper.find(database, fileText, filePreferences);
 
-        Path workingDir = file.orElse(preferences.getWorkingDir());
+        Path workingDir = file.orElse(filePreferences.getWorkingDirectory());
         String fileName = Path.of(fileText).getFileName().toString();
 
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
@@ -81,7 +82,7 @@ public class LinkedFilesEditDialogViewModel extends AbstractViewModel {
 
         dialogService.showFileOpenDialog(fileDialogConfiguration).ifPresent(path -> {
             // Store the directory for next time:
-            preferences.setWorkingDirectory(path);
+            filePreferences.setWorkingDirectory(path);
             link.set(relativize(path));
 
             setExternalFileTypeByExtension(link.getValueSafe());
@@ -125,11 +126,20 @@ public class LinkedFilesEditDialogViewModel extends AbstractViewModel {
     }
 
     public LinkedFile getNewLinkedFile() {
-        return new LinkedFile(description.getValue(), Path.of(link.getValue()), monadicSelectedExternalFileType.getValue().map(ExternalFileType::toString).orElse(""));
+        String fileType = monadicSelectedExternalFileType.getValue().map(ExternalFileType::toString).orElse("");
+
+        if (LinkedFile.isOnlineLink(link.getValue())) {
+            try {
+                return new LinkedFile(description.getValue(), new URL(link.getValue()), fileType);
+            } catch (MalformedURLException e) {
+                return new LinkedFile(description.getValue(), link.getValue(), fileType);
+            }
+        }
+        return new LinkedFile(description.getValue(), Path.of(link.getValue()), fileType);
     }
 
     private String relativize(Path filePath) {
-        List<Path> fileDirectories = database.getFileDirectories(preferences.getFilePreferences());
+        List<Path> fileDirectories = database.getFileDirectories(filePreferences);
         return FileUtil.relativize(filePath, fileDirectories).toString();
     }
 }

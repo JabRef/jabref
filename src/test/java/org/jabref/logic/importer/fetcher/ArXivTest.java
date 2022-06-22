@@ -6,7 +6,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.PagedSearchBasedFetcher;
 import org.jabref.logic.importer.SearchBasedFetcher;
@@ -96,11 +95,42 @@ class ArXivTest implements SearchBasedFetcherCapabilityTest, PagedSearchFetcherT
     }
 
     @Test
+    void findFullTextByTitleWithCurlyBracket() throws IOException {
+        entry.setField(StandardField.TITLE, "Machine versus {Human} {Attention} in {Deep} {Reinforcement} {Learning} {Tasks}");
+
+        assertEquals(Optional.of(new URL("http://arxiv.org/pdf/2010.15942v3")), fetcher.findFullText(entry));
+    }
+
+    @Test
+    void findFullTextByTitleWithColonAndJournalWithoutEprint() throws IOException {
+        entry.setField(StandardField.TITLE, "Bayes-TrEx: a Bayesian Sampling Approach to Model Transparency by Example");
+        entry.setField(StandardField.JOURNAL, "arXiv:2002.10248v4 [cs]");
+
+        assertEquals(Optional.of(new URL("http://arxiv.org/pdf/2002.10248v4")), fetcher.findFullText(entry));
+    }
+
+    @Test
+    void findFullTextByTitleWithColonAndUrlWithoutEprint() throws IOException {
+        entry.setField(StandardField.TITLE, "Bayes-TrEx: a Bayesian Sampling Approach to Model Transparency by Example");
+        entry.setField(StandardField.URL, "http://arxiv.org/abs/2002.10248v4");
+
+        assertEquals(Optional.of(new URL("http://arxiv.org/pdf/2002.10248v4")), fetcher.findFullText(entry));
+    }
+
+    @Test
     void findFullTextByTitleAndPartOfAuthor() throws IOException {
         entry.setField(StandardField.TITLE, "Pause Point Spectra in DNA Constant-Force Unzipping");
         entry.setField(StandardField.AUTHOR, "Weeks and Lucks");
 
         assertEquals(Optional.of(new URL("http://arxiv.org/pdf/cond-mat/0406246v1")), fetcher.findFullText(entry));
+    }
+
+    @Test
+    void findFullTextByTitleWithCurlyBracketAndPartOfAuthor() throws IOException {
+        entry.setField(StandardField.TITLE, "Machine versus {Human} {Attention} in {Deep} {Reinforcement} {Learning} {Tasks}");
+        entry.setField(StandardField.AUTHOR, "Zhang, Ruohan and Guo");
+
+        assertEquals(Optional.of(new URL("http://arxiv.org/pdf/2010.15942v3")), fetcher.findFullText(entry));
     }
 
     @Test
@@ -192,7 +222,7 @@ class ArXivTest implements SearchBasedFetcherCapabilityTest, PagedSearchFetcherT
 
     @Test
     void searchWithMalformedIdThrowsException() throws Exception {
-        assertThrows(FetcherException.class, () -> fetcher.performSearchById("123412345"));
+        assertEquals(Optional.empty(), fetcher.performSearchById("123412345"));
     }
 
     @Test
@@ -229,7 +259,7 @@ class ArXivTest implements SearchBasedFetcherCapabilityTest, PagedSearchFetcherT
 
     @Override
     public List<String> getTestAuthors() {
-        return List.of("\"Tobias Diez\"");
+        return List.of("Tobias Diez");
     }
 
     @Disabled("Is not supported by the current API")
@@ -242,12 +272,11 @@ class ArXivTest implements SearchBasedFetcherCapabilityTest, PagedSearchFetcherT
     @Test
     @Override
     public void supportsYearRangeSearch() throws Exception {
-
     }
 
     @Override
     public String getTestJournal() {
-        return "\"Journal of Geometry and Physics (2013)\"";
+        return "Journal of Geometry and Physics (2013)";
     }
 
     /**

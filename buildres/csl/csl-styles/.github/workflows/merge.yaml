@@ -1,0 +1,118 @@
+name: Merge to release
+
+on:
+  push:
+    branches:
+      - master
+    tags-ignore:
+      - '**'
+  workflow_dispatch:
+    inputs:
+      commit_message:
+        description: Commit message
+        required: true
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+      DISTRIBUTION_UPDATER_TOKEN: "${{ secrets.DISTRIBUTION_UPDATER_TOKEN }}"
+    steps:
+    - uses: actions/checkout@v2
+      if: github.event_name == 'push'
+    - uses: actions/checkout@v2
+      if: github.event_name == 'workflow_dispatch'
+      with:
+        fetch-depth: 0
+
+    - name: Release branch version
+      id: release
+      run: echo ::set-output name=branch::v1.0.2
+    - name: Checkout release branch
+      uses: actions/checkout@v2
+      with:
+        ref: ${{ steps.release.outputs.branch }}
+        path: './release'
+
+    - name: Check for relevant changes
+      if: github.event_name == 'push'
+      uses: dorny/paths-filter@v2
+      id: update
+      with:
+        list-files: shell
+        filters: |
+          updated:
+            - added|modified: [ '*.csl', 'dependent/*.csl', '*.xml', 'README.md' ]
+          deleted:
+            - deleted: [ '*.csl', 'dependent/*.csl', '*.xml' ]
+          workflows:
+            - added|modified: .github/workflows/*.yaml
+
+    - name: Changed files
+      if: github.event_name == 'push'
+      run: |
+        echo updated: ${{ steps.update.outputs.updated_files }}
+        echo deleted: ${{ steps.update.outputs.deleted_files }}
+        echo workflows: ${{ steps.update.outputs.workflows_files }}
+
+    - name: Set up Ruby
+      if: github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && (steps.update.outputs.updated == 'true' || steps.update.outputs.deleted == 'true'))
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: 3.0.2
+    - name: but use cache to speed that up
+      if: github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && (steps.update.outputs.updated == 'true' || steps.update.outputs.deleted == 'true'))
+      uses: actions/cache@v2
+      with:
+        path: vendor/bundle
+        key: ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-gems-
+    - name: Bundle install
+      if: github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && (steps.update.outputs.updated == 'true' || steps.update.outputs.deleted == 'true'))
+      run: |
+        bundle config path vendor/bundle
+        bundle update sheldon --jobs 4 --retry 3
+
+    - name: Populate new branch
+      run: bundle exec sheldon --token=$GITHUB_TOKEN --verbose --populate release
+      if: github.event_name == 'workflow_dispatch'
+
+    - name: update the timestamps and add the changes
+      run: bundle exec sheldon --token=$GITHUB_TOKEN --verbose --release release ${{ steps.update.outputs.updated_files }}
+      if: github.event_name == 'push' && steps.update.outputs.updated == 'true'
+
+    - name: delete deleted files
+      run: cd release && git rm ${{ steps.update.outputs.deleted_files }}
+      if: github.event_name == 'push' && steps.update.outputs.deleted == 'true'
+
+    - uses: stefanzweifel/git-auto-commit-action@v4
+      with:
+        repository: 'release'
+        commit_message: Releasing ${{ steps.update.outputs.updated_files }} ${{ steps.update.outputs.deleted_files }}
+      if: github.event_name == 'push' && (steps.update.outputs.updated == 'true' || steps.update.outputs.deleted == 'true')
+
+    - uses: stefanzweifel/git-auto-commit-action@v4
+      with:
+        repository: 'release'
+        commit_message: ${{ github.event.inputs.commit_message }}
+      if: github.event_name == 'workflow_dispatch'
+
+    # https://styles-update.zotero.org:8826/ is for Zotero (styles page, API's citation server, client style updates, etc.)
+    - name: ping Zotero servers
+      if: github.repository == 'citation-style-language/styles'
+      run: |
+        curl -H 'Content-Length:' -H "Authorization: $ZOTERO_UPDATE_TOKEN" -F 'payload={"type":"push","branch":"${{ steps.release.outputs.branch }}","status":0,"commit":"'$GITHUB_SHA'"}' https://styles-update.zotero.org:8826/
+
+    - name: Copy workflows to locales repository
+      if: github.repository == 'citation-style-language/styles' && steps.update.outputs.workflows == 'true'
+      uses: drud/action-cross-commit@master
+      with:
+        source-folder: .github/workflows
+        destination-repository: https://csl-bot:${{ secrets.CSLBOT_TOKEN }}@github.com/citation-style-language/locales
+        destination-folder: .github/workflows
+        destination-branch: master
+        git-user: "csl-bot"
+        git-user-email: github@citationstyles.org
+        git-commit-message: copied ${{ steps.update.outputs.workflows_files }} from styles

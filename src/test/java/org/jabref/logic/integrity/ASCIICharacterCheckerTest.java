@@ -33,4 +33,20 @@ public class ASCIICharacterCheckerTest {
         assertEquals(List.of(new IntegrityMessage("Non-ASCII encoded character found", entry, StandardField.AUTHOR)), checker.check(entry));
     }
 
+    @Test
+    void fieldAcceptsOnlyAsciiCharacters() {
+        String field = "";
+        for (int i = 32; i <= 127; i++) {
+            field += Character.toString(i);
+        }
+        entry.setField(StandardField.TITLE, field);
+        assertEquals(Collections.emptyList(), checker.check(entry));
+    }
+
+    @Test
+    void fieldDoesNotAcceptNonAsciiCharacters() {
+        String field = Character.toString(31) + Character.toString(128);
+        entry.setField(StandardField.TITLE, field);
+        assertEquals(List.of(new IntegrityMessage("Non-ASCII encoded character found", entry, StandardField.TITLE)), checker.check(entry));
+    }
 }

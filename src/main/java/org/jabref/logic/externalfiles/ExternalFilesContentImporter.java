@@ -1,35 +1,37 @@
 package org.jabref.logic.externalfiles;
 
-import java.nio.charset.StandardCharsets;
+import java.io.IOException;
 import java.nio.file.Path;
-import java.util.List;
 
 import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.OpenDatabase;
 import org.jabref.logic.importer.ParserResult;
-import org.jabref.logic.importer.fileformat.PdfContentImporter;
-import org.jabref.logic.importer.fileformat.PdfXmpImporter;
-import org.jabref.model.entry.BibEntry;
+import org.jabref.logic.importer.fileformat.PdfMergeMetadataImporter;
 import org.jabref.model.util.FileUpdateMonitor;
+import org.jabref.preferences.GeneralPreferences;
 
 public class ExternalFilesContentImporter {
 
+    private final GeneralPreferences generalPreferences;
+    private final ImporterPreferences importerPreferences;
     private final ImportFormatPreferences importFormatPreferences;
 
-    public ExternalFilesContentImporter(ImportFormatPreferences importFormatPreferences) {
+    public ExternalFilesContentImporter(GeneralPreferences generalPreferences, ImporterPreferences importerPreferences, ImportFormatPreferences importFormatPreferences) {
+        this.generalPreferences = generalPreferences;
+        this.importerPreferences = importerPreferences;
         this.importFormatPreferences = importFormatPreferences;
     }
 
-    public List<BibEntry> importPDFContent(Path file) {
-        return new PdfContentImporter(importFormatPreferences).importDatabase(file, StandardCharsets.UTF_8).getDatabase().getEntries();
+    public ParserResult importPDFContent(Path file) {
+        try {
+            return new PdfMergeMetadataImporter(importerPreferences, importFormatPreferences).importDatabase(file);
+        } catch (IOException e) {
+           return ParserResult.fromError(e);
+        }
     }
 
-    public List<BibEntry> importXMPContent(Path file) {
-        return new PdfXmpImporter(importFormatPreferences.getXmpPreferences()).importDatabase(file, StandardCharsets.UTF_8).getDatabase().getEntries();
-    }
-
-    public List<BibEntry> importFromBibFile(Path bibFile, FileUpdateMonitor fileUpdateMonitor) {
-        ParserResult parserResult = OpenDatabase.loadDatabase(bibFile.toString(), importFormatPreferences, fileUpdateMonitor);
-        return parserResult.getDatabaseContext().getEntries();
+    public ParserResult importFromBibFile(Path bibFile, FileUpdateMonitor fileUpdateMonitor) throws IOException {
+        return OpenDatabase.loadDatabase(bibFile, importFormatPreferences, fileUpdateMonitor);
     }
 }

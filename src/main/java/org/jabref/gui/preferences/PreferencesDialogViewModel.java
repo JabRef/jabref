@@ -12,6 +12,27 @@ import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.Globals;
 import org.jabref.gui.JabRefFrame;
+import org.jabref.gui.preferences.appearance.AppearanceTab;
+import org.jabref.gui.preferences.citationkeypattern.CitationKeyPatternTab;
+import org.jabref.gui.preferences.customexporter.CustomExporterTab;
+import org.jabref.gui.preferences.customimporter.CustomImporterTab;
+import org.jabref.gui.preferences.entryeditor.EntryEditorTab;
+import org.jabref.gui.preferences.entryeditortabs.CustomEditorFieldsTab;
+import org.jabref.gui.preferences.external.ExternalTab;
+import org.jabref.gui.preferences.externalfiletypes.ExternalFileTypesTab;
+import org.jabref.gui.preferences.file.FileTab;
+import org.jabref.gui.preferences.general.GeneralTab;
+import org.jabref.gui.preferences.groups.GroupsTab;
+import org.jabref.gui.preferences.importexport.ImportExportTab;
+import org.jabref.gui.preferences.journals.JournalAbbreviationsTab;
+import org.jabref.gui.preferences.keybindings.KeyBindingsTab;
+import org.jabref.gui.preferences.linkedfiles.LinkedFilesTab;
+import org.jabref.gui.preferences.nameformatter.NameFormatterTab;
+import org.jabref.gui.preferences.network.NetworkTab;
+import org.jabref.gui.preferences.preview.PreviewTab;
+import org.jabref.gui.preferences.protectedterms.ProtectedTermsTab;
+import org.jabref.gui.preferences.table.TableTab;
+import org.jabref.gui.preferences.xmp.XmpPrivacyTab;
 import org.jabref.gui.push.PushToApplicationsManager;
 import org.jabref.gui.push.PushToEmacs;
 import org.jabref.gui.util.FileDialogConfiguration;
@@ -45,19 +66,27 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
         this.frame = frame;
 
         preferenceTabs = FXCollections.observableArrayList(
-                new GeneralTabView(preferences),
-                new FileTabView(preferences),
-                new TableTabView(preferences),
-                new PreviewTabView(preferences),
-                new ExternalTabView(preferences, frame.getPushToApplicationsManager()),
-                new GroupsTabView(preferences),
-                new EntryEditorTabView(preferences),
-                new CitationKeyPatternTabView(preferences),
-                new LinkedFilesTabView(preferences),
-                new NameFormatterTabView(preferences),
-                new XmpPrivacyTabView(preferences),
-                new NetworkTabView(preferences),
-                new AppearanceTabView(preferences)
+                new GeneralTab(),
+                new KeyBindingsTab(),
+                new FileTab(),
+                new TableTab(),
+                new PreviewTab(),
+                new ProtectedTermsTab(),
+                new ExternalTab(frame.getPushToApplicationsManager()),
+                new ExternalFileTypesTab(),
+                new JournalAbbreviationsTab(),
+                new GroupsTab(),
+                new EntryEditorTab(),
+                new ImportExportTab(),
+                new CustomEditorFieldsTab(),
+                new CitationKeyPatternTab(),
+                new LinkedFilesTab(),
+                new NameFormatterTab(),
+                new CustomImporterTab(),
+                new CustomExporterTab(),
+                new XmpPrivacyTab(),
+                new NetworkTab(),
+                new AppearanceTab()
         );
     }
 
@@ -107,7 +136,7 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
     }
 
     public void showPreferences() {
-        new PreferencesFilterDialog(new PreferencesFilter(preferences)).showAndWait();
+        dialogService.showCustomDialogAndWait(new PreferencesFilterDialog(new PreferencesFilter(preferences)));
     }
 
     public void resetPreferences() {
@@ -136,7 +165,6 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
      */
     private void updateAfterPreferenceChanges() {
         // Reload internal preferences cache
-        preferences.updateEntryEditorTabList();
         preferences.updateGlobalCitationKeyPattern();
         preferences.updateMainTableColumns();
 
@@ -146,7 +174,8 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
         LayoutFormatterPreferences layoutPreferences = preferences.getLayoutFormatterPreferences(Globals.journalAbbreviationRepository);
         SavePreferences savePreferences = preferences.getSavePreferencesForExport();
         XmpPreferences xmpPreferences = preferences.getXmpPreferences();
-        Globals.exportFactory = ExporterFactory.create(customExporters, layoutPreferences, savePreferences, xmpPreferences);
+        Globals.exportFactory = ExporterFactory.create(customExporters, layoutPreferences, savePreferences,
+                xmpPreferences, preferences.getGeneralPreferences().getDefaultBibDatabaseMode(), Globals.entryTypesManager);
 
         ExternalApplicationsPreferences externalApplicationsPreferences = preferences.getExternalApplicationsPreferences();
         PushToApplicationsManager manager = frame.getPushToApplicationsManager();
@@ -198,7 +227,7 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
     }
 
     /**
-     * Inserts the preference values into the the Properties of the ViewModel
+     * Inserts the preference values into the Properties of the ViewModel
      */
     public void setValues() {
         for (PreferencesTab preferencesTab : preferenceTabs) {

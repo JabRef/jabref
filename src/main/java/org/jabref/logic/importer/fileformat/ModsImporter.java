@@ -15,11 +15,6 @@ import java.util.Optional;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
-
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParseException;
@@ -63,6 +58,10 @@ import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.EntryTypeFactory;
 
 import com.google.common.base.Joiner;
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBElement;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.Unmarshaller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -149,7 +148,6 @@ public class ModsImporter extends Importer implements Parser {
         List<String> notes = new ArrayList<>();
 
         for (Object groupElement : modsGroup) {
-
             // Get the element. Only one of the elements should be not an empty optional.
             Optional<AbstractDefinition> abstractDefinition = getElement(groupElement, AbstractDefinition.class);
             Optional<GenreDefinition> genreDefinition = getElement(groupElement, GenreDefinition.class);
@@ -196,7 +194,6 @@ public class ModsImporter extends Importer implements Parser {
             identifierDefinition.ifPresent(identifier -> parseIdentifier(fields, identifier, entry));
 
             titleInfoDefinition.ifPresent(titleInfo -> parseTitle(fields, titleInfo.getTitleOrSubTitleOrPartNumber()));
-
         }
 
         // The element subject can appear more than one time, that's why the keywords has to be put out of the for loop
@@ -204,7 +201,6 @@ public class ModsImporter extends Importer implements Parser {
         // same goes for authors and notes
         putIfListIsNotEmpty(fields, authors, StandardField.AUTHOR, " and ");
         putIfListIsNotEmpty(fields, notes, StandardField.NOTE, ", ");
-
     }
 
     private void parseTitle(Map<Field, String> fields, List<Object> titleOrSubTitleOrPartNumber) {
@@ -395,7 +391,6 @@ public class ModsImporter extends Importer implements Parser {
     private void putDate(Map<Field, String> fields, String elementName, DateDefinition date) {
         if (date.getValue() != null) {
             switch (elementName) {
-
                 case "dateIssued":
                     // The first 4 digits of dateIssued should be the year
                     fields.put(StandardField.YEAR, date.getValue().replaceAll("[^0-9]*", "").replaceAll("\\(\\d?\\d?\\d?\\d?.*\\)", "\1"));

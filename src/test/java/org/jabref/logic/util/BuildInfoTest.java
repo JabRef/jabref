@@ -3,7 +3,6 @@ package org.jabref.logic.util;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class BuildInfoTest {
@@ -24,6 +23,5 @@ public class BuildInfoTest {
     public void azureInstrumentationKeyIsNotEmpty() {
         BuildInfo buildInfo = new BuildInfo();
         assertNotNull(buildInfo.azureInstrumentationKey);
-        assertNotEquals("", buildInfo.azureInstrumentationKey);
     }
 }

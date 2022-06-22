@@ -1,6 +1,5 @@
 package org.jabref.gui;
 
-import java.awt.GraphicsEnvironment;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -8,6 +7,7 @@ import javafx.stage.Screen;
 
 import org.jabref.architecture.AllowedToUseAwt;
 import org.jabref.gui.keyboard.KeyBindingRepository;
+import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.util.DefaultFileUpdateMonitor;
 import org.jabref.gui.util.DefaultTaskExecutor;
@@ -19,6 +19,7 @@ import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.logic.remote.server.RemoteListenerServerLifecycle;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.model.entry.BibEntryTypesManager;
+import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.JabRefPreferences;
 
@@ -75,9 +76,8 @@ public class Globals {
     public static BibEntryTypesManager entryTypesManager = new BibEntryTypesManager();
 
     private static ClipBoardManager clipBoardManager = null;
-
-    // Key binding preferences
     private static KeyBindingRepository keyBindingRepository;
+    private static ThemeManager themeManager;
 
     private static DefaultFileUpdateMonitor fileUpdateMonitor;
     private static TelemetryClient telemetryClient;
@@ -100,14 +100,24 @@ public class Globals {
         return clipBoardManager;
     }
 
+    public static synchronized ThemeManager getThemeManager() {
+        if (themeManager == null) {
+            themeManager = new ThemeManager(
+                    prefs.getAppearancePreferences(),
+                    getFileUpdateMonitor(),
+                    Runnable::run);
+        }
+        return themeManager;
+    }
+
     // Background tasks
     public static void startBackgroundTasks() {
         Globals.fileUpdateMonitor = new DefaultFileUpdateMonitor();
         JabRefExecutorService.INSTANCE.executeInterruptableTask(Globals.fileUpdateMonitor, "FileUpdateMonitor");
-
-        if (Globals.prefs.getTelemetryPreferences().shouldCollectTelemetry() && !GraphicsEnvironment.isHeadless()) {
+        // TODO Currently deactivated due to incompatibilities in XML
+      /*  if (Globals.prefs.getTelemetryPreferences().shouldCollectTelemetry() && !GraphicsEnvironment.isHeadless()) {
             startTelemetryClient();
-        }
+        } */
     }
 
     private static void stopTelemetryClient() {
@@ -119,12 +129,14 @@ public class Globals {
 
     private static void startTelemetryClient() {
         TelemetryConfiguration telemetryConfiguration = TelemetryConfiguration.getActive();
-        telemetryConfiguration.setInstrumentationKey(Globals.BUILD_INFO.azureInstrumentationKey);
+        if (!StringUtil.isNullOrEmpty(Globals.BUILD_INFO.azureInstrumentationKey)) {
+            telemetryConfiguration.setInstrumentationKey(Globals.BUILD_INFO.azureInstrumentationKey);
+        }
         telemetryConfiguration.setTrackingIsDisabled(!Globals.prefs.getTelemetryPreferences().shouldCollectTelemetry());
         telemetryClient = new TelemetryClient(telemetryConfiguration);
         telemetryClient.getContext().getProperties().put("JabRef version", Globals.BUILD_INFO.version.toString());
         telemetryClient.getContext().getProperties().put("Java version", StandardSystemProperty.JAVA_VERSION.value());
-        telemetryClient.getContext().getUser().setId(Globals.prefs.getOrCreateUserId());
+        telemetryClient.getContext().getUser().setId(Globals.prefs.getTelemetryPreferences().getUserId());
         telemetryClient.getContext().getSession().setId(UUID.randomUUID().toString());
         telemetryClient.getContext().getDevice().setOperatingSystem(StandardSystemProperty.OS_NAME.value());
         telemetryClient.getContext().getDevice().setOperatingSystemVersion(StandardSystemProperty.OS_VERSION.value());
@@ -139,7 +151,9 @@ public class Globals {
 
     public static void shutdownThreadPools() {
         TASK_EXECUTOR.shutdown();
-        fileUpdateMonitor.shutdown();
+        if (fileUpdateMonitor != null) {
+            fileUpdateMonitor.shutdown();
+        }
         JabRefExecutorService.INSTANCE.shutdownEverything();
     }
 

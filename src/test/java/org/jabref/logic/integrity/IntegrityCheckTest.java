@@ -87,9 +87,9 @@ class IntegrityCheckTest {
 
     private static Stream<String> provideIncorrectFormat() {
         return Stream.of("   Knuth, Donald E. ",
-                         "Knuth, Donald E. and Kurt Cobain and A. Einstein",
-                         ", and Kurt Cobain and A. Einstein", "Donald E. Knuth and Kurt Cobain and ,",
-                         "and Kurt Cobain and A. Einstein", "Donald E. Knuth and Kurt Cobain and");
+                "Knuth, Donald E. and Kurt Cobain and A. Einstein",
+                ", and Kurt Cobain and A. Einstein", "Donald E. Knuth and Kurt Cobain and ,",
+                "and Kurt Cobain and A. Einstein", "Donald E. Knuth and Kurt Cobain and");
     }
 
     @Test
@@ -179,21 +179,12 @@ class IntegrityCheckTest {
 
     private void assertCorrect(BibDatabaseContext context) {
         FilePreferences filePreferencesMock = mock(FilePreferences.class);
-        when(filePreferencesMock.shouldStoreFilesRelativeToBib()).thenReturn(true);
+        when(filePreferencesMock.shouldStoreFilesRelativeToBibFile()).thenReturn(true);
         List<IntegrityMessage> messages = new IntegrityCheck(context,
                 filePreferencesMock,
                 createCitationKeyPatternPreferences(),
                 JournalAbbreviationLoader.loadBuiltInRepository(), false
         ).check();
-        assertEquals(Collections.emptyList(), messages);
-    }
-
-    private void assertCorrect(BibDatabaseContext context, boolean allowIntegerEdition) {
-        List<IntegrityMessage> messages = new IntegrityCheck(context,
-                                                             mock(FilePreferences.class),
-                                                             createCitationKeyPatternPreferences(),
-                                                             JournalAbbreviationLoader.loadBuiltInRepository(),
-                                                             allowIntegerEdition).check();
         assertEquals(Collections.emptyList(), messages);
     }
 

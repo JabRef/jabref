@@ -3,11 +3,17 @@ package org.jabref.logic.citationstyle;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
 
 import org.jabref.logic.formatter.bibtexfields.RemoveNewlinesFormatter;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntryType;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.Month;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
@@ -48,9 +54,11 @@ public class CSLAdapter {
     /**
      * Creates the bibliography of the provided items. This method needs to run synchronized because the underlying
      * CSL engine is not thread-safe.
+     *
+     * @param databaseContext {@link BibDatabaseContext} is used to be able to resolve fields and their aliases
      */
-    public synchronized List<String> makeBibliography(List<BibEntry> bibEntries, String style, CitationStyleOutputFormat outputFormat) throws IOException, IllegalArgumentException {
-        dataProvider.setData(bibEntries);
+    public synchronized List<String> makeBibliography(List<BibEntry> bibEntries, String style, CitationStyleOutputFormat outputFormat, BibDatabaseContext databaseContext, BibEntryTypesManager entryTypesManager) throws IOException, IllegalArgumentException {
+        dataProvider.setData(bibEntries, databaseContext, entryTypesManager);
         initialize(style, outputFormat);
         cslInstance.registerCitationItems(dataProvider.getIds());
         final Bibliography bibliography = cslInstance.makeBibliography();
@@ -68,7 +76,7 @@ public class CSLAdapter {
         if ((cslInstance == null) || !Objects.equals(newStyle, style)) {
             // lang and forceLang are set to the default values of other CSL constructors
             cslInstance = new CSL(dataProvider, new JabRefLocaleProvider(),
-                    new DefaultAbbreviationProvider(), null, newStyle, "en-US", false, true);
+                    new DefaultAbbreviationProvider(), newStyle, "en-US");
             style = newStyle;
         }
 
@@ -85,18 +93,25 @@ public class CSLAdapter {
     private static class JabRefItemDataProvider implements ItemDataProvider {
 
         private final List<BibEntry> data = new ArrayList<>();
+        private BibDatabaseContext bibDatabaseContext;
+        private BibEntryTypesManager entryTypesManager;
 
         /**
          * Converts the {@link BibEntry} into {@link CSLItemData}.
          */
-        private static CSLItemData bibEntryToCSLItemData(BibEntry bibEntry) {
+        private static CSLItemData bibEntryToCSLItemData(BibEntry bibEntry, BibDatabaseContext bibDatabaseContext, BibEntryTypesManager entryTypesManager) {
             String citeKey = bibEntry.getCitationKey().orElse("");
             BibTeXEntry bibTeXEntry = new BibTeXEntry(new Key(bibEntry.getType().getName()), new Key(citeKey));
 
             // Not every field is already generated into latex free fields
             RemoveNewlinesFormatter removeNewlinesFormatter = new RemoveNewlinesFormatter();
-            for (Field key : bibEntry.getFieldMap().keySet()) {
-                bibEntry.getField(key)
+
+            Optional<BibEntryType> entryType = entryTypesManager.enrich(bibEntry.getType(), bibDatabaseContext.getMode());
+
+            Set<Field> fields = entryType.map(BibEntryType::getAllFields).orElse(bibEntry.getFields());
+
+            for (Field key : fields) {
+                bibEntry.getResolvedFieldOrAlias(key, bibDatabaseContext.getDatabase())
                         .map(removeNewlinesFormatter::format)
                         .map(LatexToUnicodeAdapter::format)
                         .ifPresent(value -> {
@@ -110,24 +125,26 @@ public class CSLAdapter {
             return BIBTEX_CONVERTER.toItemData(bibTeXEntry);
         }
 
-        public void setData(List<BibEntry> data) {
+        public void setData(List<BibEntry> data, BibDatabaseContext bibDatabaseContext, BibEntryTypesManager entryTypesManager) {
             this.data.clear();
             this.data.addAll(data);
+            this.bibDatabaseContext = bibDatabaseContext;
+            this.entryTypesManager = entryTypesManager;
         }
 
         @Override
         public CSLItemData retrieveItem(String id) {
             return data.stream()
                        .filter(entry -> entry.getCitationKey().orElse("").equals(id))
-                       .map(JabRefItemDataProvider::bibEntryToCSLItemData)
+                       .map(entry -> JabRefItemDataProvider.bibEntryToCSLItemData(entry, bibDatabaseContext, entryTypesManager))
                        .findFirst().orElse(null);
         }
 
         @Override
-        public String[] getIds() {
+        public Collection<String> getIds() {
             return data.stream()
                        .map(entry -> entry.getCitationKey().orElse(""))
-                       .toArray(String[]::new);
+                       .toList();
         }
     }
 }

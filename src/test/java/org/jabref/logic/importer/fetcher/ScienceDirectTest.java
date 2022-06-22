@@ -4,6 +4,9 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.Optional;
 
+import javafx.collections.FXCollections;
+
+import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.support.DisabledOnCIServer;
@@ -13,22 +16,26 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 @FetcherTest
 class ScienceDirectTest {
 
+    private final ImporterPreferences importerPreferences = mock(ImporterPreferences.class);
     private ScienceDirect finder;
     private BibEntry entry;
 
     @BeforeEach
     void setUp() {
-        finder = new ScienceDirect();
+        when(importerPreferences.getApiKeys()).thenReturn(FXCollections.emptyObservableSet());
+        finder = new ScienceDirect(importerPreferences);
         entry = new BibEntry();
     }
 
     @Test
     @DisabledOnCIServer("CI server is blocked")
-    void findByDOIOldPage() throws IOException {
+    void findByDoiOldPage() throws IOException {
         entry.setField(StandardField.DOI, "10.1016/j.jrmge.2015.08.004");
 
         assertEquals(
@@ -39,7 +46,7 @@ class ScienceDirectTest {
 
     @Test
     @DisabledOnCIServer("CI server is blocked")
-    void findByDOINewPage() throws IOException {
+    void findByDoiNewPage() throws IOException {
         entry.setField(StandardField.DOI, "10.1016/j.aasri.2014.09.002");
 
         assertEquals(
@@ -62,7 +69,7 @@ class ScienceDirectTest {
 
     @Test
     @DisabledOnCIServer("CI server is blocked")
-    void notFoundByDOI() throws IOException {
+    void notFoundByDoi() throws IOException {
         entry.setField(StandardField.DOI, "10.1016/j.aasri.2014.0559.002");
 
         assertEquals(Optional.empty(), finder.findFullText(entry));

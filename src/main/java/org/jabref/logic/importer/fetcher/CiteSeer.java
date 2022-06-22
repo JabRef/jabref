@@ -20,6 +20,7 @@ import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.SearchBasedParserFetcher;
+import org.jabref.logic.importer.fetcher.transformers.DefaultQueryTransformer;
 import org.jabref.logic.importer.fileformat.CoinsParser;
 import org.jabref.logic.util.OS;
 import org.jabref.model.entry.BibEntry;
@@ -27,6 +28,7 @@ import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.StandardField;
 
 import org.apache.http.client.utils.URIBuilder;
+import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 
 public class CiteSeer implements SearchBasedParserFetcher {
 
@@ -44,10 +46,10 @@ public class CiteSeer implements SearchBasedParserFetcher {
     }
 
     @Override
-    public URL getURLForQuery(String query) throws URISyntaxException, MalformedURLException, FetcherException {
+    public URL getURLForQuery(QueryNode luceneQuery) throws URISyntaxException, MalformedURLException, FetcherException {
         URIBuilder uriBuilder = new URIBuilder("https://citeseer.ist.psu.edu/search");
         uriBuilder.addParameter("sort", "rlv"); // Sort by relevance
-        uriBuilder.addParameter("q", query); // Query
+        uriBuilder.addParameter("q", new DefaultQueryTransformer().transformLuceneQuery(luceneQuery).orElse("")); // Query
         uriBuilder.addParameter("t", "doc"); // Type: documents
         // uriBuilder.addParameter("start", "0"); // Start index (not supported at the moment)
         return uriBuilder.build().toURL();

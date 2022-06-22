@@ -1,12 +1,17 @@
 name: Snap
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - snapcraft
   schedule:
    # run on each day
   - cron: "33 4 * * *"
+
+concurrency:
+  group: snap-${{ github.head_ref }}
+  cancel-in-progress: true
 
 jobs:
   build:
@@ -25,15 +30,15 @@ jobs:
         env:
           SNAPCRAFT_LOGIN_FILE: ${{ secrets.SNAPCRAFT_LOGIN_FILE }}
       - name: Checkout source
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       # The image relies on https://builds.jabref.org/master/JabRef-5.0-portable_linux.tar.gz^
       # See snap/snapcraft.yml for details
-      - name: Build snap (1) Run build
+      - name: Run snapcraft build
         uses: snapcore/action-build@v1
         id: snapcraft
         with:
           snapcraft-args: "--debug"
-      - name: Build snap (2) Upload snap
+      - name: Upload snap
         if: ${{ steps.checksecrets.outputs.secretspresent }}
         uses: snapcore/action-publish@v1
         with:

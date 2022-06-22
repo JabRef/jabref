@@ -80,7 +80,7 @@ import org.jabref.logic.layout.format.ToUpperCase;
 import org.jabref.logic.layout.format.WrapContent;
 import org.jabref.logic.layout.format.WrapFileLinks;
 import org.jabref.logic.layout.format.XMLChars;
-import org.jabref.logic.openoffice.OOPreFormatter;
+import org.jabref.logic.openoffice.style.OOPreFormatter;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -304,7 +304,6 @@ class LayoutEntry {
                         }
                     }
                 } else {
-
                     // if previous was skipped --> remove leading line
                     // breaks
                     if (previousSkipped) {
@@ -528,14 +527,12 @@ class LayoutEntry {
     }
 
     public static List<List<String>> parseMethodsCalls(String calls) {
-
         List<List<String>> result = new ArrayList<>();
 
         char[] c = calls.toCharArray();
 
         int i = 0;
         while (i < c.length) {
-
             int start = i;
             if (Character.isJavaIdentifierStart(c[i])) {
                 i++;
@@ -543,7 +540,6 @@ class LayoutEntry {
                     i++;
                 }
                 if ((i < c.length) && (c[i] == '(')) {
-
                     String method = calls.substring(start, i);
 
                     // Skip the brace

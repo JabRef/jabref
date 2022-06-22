@@ -13,6 +13,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
+import org.jabref.preferences.GeneralPreferences;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -20,11 +21,11 @@ import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 class OpenDatabaseTest {
 
     private final Charset defaultEncoding = StandardCharsets.UTF_8;
+    private GeneralPreferences generalPreferences;
     private ImportFormatPreferences importFormatPreferences;
     private final Path bibNoHeader;
     private final Path bibWrongHeader;
@@ -43,8 +44,8 @@ class OpenDatabaseTest {
 
     @BeforeEach
     void setUp() {
+        generalPreferences = mock(GeneralPreferences.class, Answers.RETURNS_DEEP_STUBS);
         importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
-        when(importFormatPreferences.getEncoding()).thenReturn(StandardCharsets.UTF_8);
     }
 
     @Test
@@ -61,15 +62,13 @@ class OpenDatabaseTest {
 
     @Test
     void useSpecifiedEncoding() throws IOException {
-        ParserResult result = OpenDatabase.loadDatabase(bibHeader,
-                importFormatPreferences.withEncoding(StandardCharsets.US_ASCII), fileMonitor);
+        ParserResult result = OpenDatabase.loadDatabase(bibHeader, importFormatPreferences, fileMonitor);
         assertEquals(defaultEncoding, result.getMetaData().getEncoding().get());
     }
 
     @Test
     void useSpecifiedEncodingWithSignature() throws IOException {
-        ParserResult result = OpenDatabase.loadDatabase(bibHeaderAndSignature,
-                importFormatPreferences.withEncoding(StandardCharsets.US_ASCII), fileMonitor);
+        ParserResult result = OpenDatabase.loadDatabase(bibHeaderAndSignature, importFormatPreferences, fileMonitor);
         assertEquals(defaultEncoding, result.getMetaData().getEncoding().get());
     }
 

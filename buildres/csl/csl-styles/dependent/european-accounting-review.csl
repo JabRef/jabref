@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<style xmlns="http://purl.org/net/xbiblio/csl" version="1.0" default-locale="en-US">
+  <info>
+    <title>European Accounting Review</title>
+    <title-short>EAR</title-short>
+    <id>http://www.zotero.org/styles/european-accounting-review</id>
+    <link href="http://www.zotero.org/styles/european-accounting-review" rel="self"/>
+    <link href="http://www.zotero.org/styles/apa" rel="independent-parent"/>
+    <link href="https://www.tandfonline.com/action/authorSubmission?show=instructions&amp;journalCode=rear20#refs" rel="documentation"/>
+    <author>
+      <name>Nicola Maria Fiore</name>
+      <email>ninnofiore@outlook.com</email>
+    </author>
+    <contributor>
+      <name>Xuanheng Huang</name>
+      <email>huangxuanheng@gmail.com</email>
+    </contributor>
+    <contributor>
+      <name>Vito Ferrulli</name>
+      <email>vitof97@gmail.com</email>
+    </contributor>
+    <category citation-format="author-date"/>
+    <category field="generic-base"/>
+    <issn>0963-8180</issn>
+    <eissn>1468-4497</eissn>
+    <summary>European Accounting Review (variant of the APA style)</summary>
+    <updated>2021-03-11T20:18:08+00:00</updated>
+    <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
+  </info>
+</style>

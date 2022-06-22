@@ -47,13 +47,14 @@ public abstract class BackgroundTask<V> {
     private final StringProperty title = new SimpleStringProperty(this.getClass().getSimpleName());
     private final DoubleProperty workDonePercentage = new SimpleDoubleProperty(0);
     private final BooleanProperty showToUser = new SimpleBooleanProperty(false);
+    private final BooleanProperty willBeRecoveredAutomatically = new SimpleBooleanProperty(false);
 
     public BackgroundTask() {
         workDonePercentage.bind(EasyBind.map(progress, BackgroundTask.BackgroundProgress::getWorkDonePercentage));
     }
 
     public static <V> BackgroundTask<V> wrap(Callable<V> callable) {
-        return new BackgroundTask<V>() {
+        return new BackgroundTask<>() {
             @Override
             protected V call() throws Exception {
                 return callable.call();
@@ -62,9 +63,9 @@ public abstract class BackgroundTask<V> {
     }
 
     public static BackgroundTask<Void> wrap(Runnable runnable) {
-        return new BackgroundTask<Void>() {
+        return new BackgroundTask<>() {
             @Override
-            protected Void call() throws Exception {
+            protected Void call() {
                 runnable.run();
                 return null;
             }
@@ -128,6 +129,14 @@ public abstract class BackgroundTask<V> {
 
     public void showToUser(boolean show) {
         showToUser.set(show);
+    }
+
+    public boolean willBeRecoveredAutomatically() {
+        return willBeRecoveredAutomatically.get();
+    }
+
+    public void willBeRecoveredAutomatically(boolean willBeRecoveredAutomatically) {
+        this.willBeRecoveredAutomatically.set(willBeRecoveredAutomatically);
     }
 
     /**
@@ -194,7 +203,7 @@ public abstract class BackgroundTask<V> {
      * @param <T>             type of the return value of the second task
      */
     public <T> BackgroundTask<T> then(Function<V, BackgroundTask<T>> nextTaskFactory) {
-        return new BackgroundTask<T>() {
+        return new BackgroundTask<>() {
             @Override
             protected T call() throws Exception {
                 V result = BackgroundTask.this.call();
@@ -212,7 +221,7 @@ public abstract class BackgroundTask<V> {
      * @param <T>           type of the return value of the second task
      */
     public <T> BackgroundTask<T> thenRun(Function<V, T> nextOperation) {
-        return new BackgroundTask<T>() {
+        return new BackgroundTask<>() {
             @Override
             protected T call() throws Exception {
                 V result = BackgroundTask.this.call();
@@ -229,7 +238,7 @@ public abstract class BackgroundTask<V> {
      * @param nextOperation the function that performs the next operation
      */
     public BackgroundTask<Void> thenRun(Consumer<V> nextOperation) {
-        return new BackgroundTask<Void>() {
+        return new BackgroundTask<>() {
             @Override
             protected Void call() throws Exception {
                 V result = BackgroundTask.this.call();

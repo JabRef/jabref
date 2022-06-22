@@ -25,17 +25,18 @@ eclipse {
                 }
 
                 def javafxcontrols = entries.find { isJavafxControls(it) };
-                javafxcontrols.entryAttributes['add-exports'] = 'javafx.controls/com.sun.javafx.scene.control=org.jabref:javafx.controls/com.sun.javafx.scene.control.behavior=org.jabref:javafx.controls/javafx.scene.control=org.jabref';
+                javafxcontrols.entryAttributes['add-exports'] = 'javafx.controls/com.sun.javafx.scene.control=org.jabref:javafx.controls/com.sun.javafx.scene.control.behavior=org.jabref:javafx.controls/javafx.scene.control=org.jabref:javafx.controls/com.sun.javafx.scene.control.behavior=com.jfoenix';
                 javafxcontrols.entryAttributes['add-opens'] = 'javafx.controls/com.sun.javafx.scene.control=org.jabref:javafx.controls/com.sun.javafx.scene.control.behavior=org.jabref:javafx.controls/javafx.scene.control=org.jabref:javafx.controls/javafx.scene.control.skin=org.controlsfx.controls';
 
                 def javafxgraphics = entries.find { isJavafxGraphics(it) };
                 javafxgraphics.entryAttributes['add-opens'] = 'javafx.graphics/javafx.scene=org.controlsfx.controls';
+                javafxgraphics.entryAttributes['add-exports'] = 'javafx.graphics/com.sun.javafx.stage=com.jfoenix';
+
+                def javafxbase = entries.find { isJavafxBase(it) };
+                javafxbase.entryAttributes['add-exports'] = 'javafx.base/com.sun.javafx.event=org.controlsfx.controls:';
 
                 def javafxfxml = entries.find { isJavafxFXML(it) };
                 javafxfxml.entryAttributes['add-opens'] = 'javafx.fxml/javafx.fxml=org.jabref';
-
-                def graaltruffle = entries.find{ isTruffleGraal(it) } ;
-                graaltruffle.entryAttributes['add-exports'] = 'com.oracle.truffle.regex/com.oracle.truffle.regex=org.graalvm.truffle';
 
                 entries.findAll { isLibrary(it) && isTestScope(it) }.each { //mark test source files
                     it.entryAttributes['test'] = 'true'
@@ -43,7 +44,7 @@ eclipse {
             }
         }
 
-        defaultOutputDir = file('build')
+        defaultOutputDir = file('bin/main')
         downloadSources = true
         downloadJavadoc = true
     }
@@ -64,9 +65,9 @@ boolean isJavafxControls(entry) { return entry.properties.path.contains('javafx-
 
 boolean isJavafxGraphics(entry) { return entry.properties.path.contains('javafx-graphics'); }
 
-boolean isJavafxFXML(entry) { return entry.properties.path.contains('javafx-fxml'); }
+boolean isJavafxBase(entry) { return entry.properties.path.contains('javafx-base'); }
 
-boolean isTruffleGraal(entry)  {return entry.properties.path.contains('org.graalvm.regex'); }
+boolean isJavafxFXML(entry) { return entry.properties.path.contains('javafx-fxml'); }
 
 // add formatter and cleanup settings to Eclipse settings
 // see http://stackoverflow.com/a/27461890/873282

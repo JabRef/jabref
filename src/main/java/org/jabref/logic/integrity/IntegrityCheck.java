@@ -1,5 +1,6 @@
 package org.jabref.logic.integrity;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,9 +39,11 @@ public class IntegrityCheck {
                 new CitationKeyDeviationChecker(bibDatabaseContext, citationKeyPatternPreferences),
                 new CitationKeyDuplicationChecker(bibDatabaseContext.getDatabase())
         ));
-
         if (bibDatabaseContext.isBiblatexMode()) {
-            entryCheckers.add(new JournalInAbbreviationListChecker(StandardField.JOURNALTITLE, journalAbbreviationRepository));
+            entryCheckers.addAll(List.of(
+                    new JournalInAbbreviationListChecker(StandardField.JOURNALTITLE, journalAbbreviationRepository),
+                    new UTF8Checker(bibDatabaseContext.getMetaData().getEncoding().orElse(StandardCharsets.UTF_8))
+            ));
         } else {
             entryCheckers.addAll(List.of(
                     new JournalInAbbreviationListChecker(StandardField.JOURNAL, journalAbbreviationRepository),
@@ -59,7 +62,6 @@ public class IntegrityCheck {
         for (BibEntry entry : database.getEntries()) {
             result.addAll(checkEntry(entry));
         }
-
         result.addAll(checkDatabase(database));
 
         return result;

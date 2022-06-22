@@ -22,17 +22,16 @@ public class ImportDataTest {
      */
     @Test
     void testTestingEnvironment() {
+        assertTrue(Files.exists(ImportDataTest.EXISTING_FOLDER), "EXISTING_FOLDER does not exist");
+        assertTrue(Files.isDirectory(ImportDataTest.EXISTING_FOLDER), "EXISTING_FOLDER is not a directory");
 
-        assertTrue(Files.exists(ImportDataTest.EXISTING_FOLDER));
-        assertTrue(Files.isDirectory(ImportDataTest.EXISTING_FOLDER));
+        assertTrue(Files.exists(ImportDataTest.FILE_IN_DATABASE), "FILE_IN_DATABASE does not exist");
+        assertTrue(Files.isRegularFile(ImportDataTest.FILE_IN_DATABASE), "FILE_IN_DATABASE is not a regular file");
 
-        assertTrue(Files.exists(ImportDataTest.FILE_IN_DATABASE));
-        assertTrue(Files.isRegularFile(ImportDataTest.FILE_IN_DATABASE));
+        assertTrue(Files.exists(ImportDataTest.FILE_NOT_IN_DATABASE), "FILE_NOT_IN_DATABASE does not exist");
+        assertTrue(Files.isRegularFile(ImportDataTest.FILE_NOT_IN_DATABASE), "FILE_NOT_IN_DATABASE is not a regular file");
 
-        assertTrue(Files.exists(ImportDataTest.FILE_NOT_IN_DATABASE));
-        assertTrue(Files.isRegularFile(ImportDataTest.FILE_NOT_IN_DATABASE));
-
-        assertFalse(Files.exists(ImportDataTest.NOT_EXISTING_FOLDER));
-        assertFalse(Files.exists(ImportDataTest.NOT_EXISTING_PDF));
+        assertFalse(Files.exists(ImportDataTest.NOT_EXISTING_FOLDER), "NOT_EXISTING_FOLDER exists");
+        assertFalse(Files.exists(ImportDataTest.NOT_EXISTING_PDF), "NOT_EXISTING_PDF exists");
     }
 }

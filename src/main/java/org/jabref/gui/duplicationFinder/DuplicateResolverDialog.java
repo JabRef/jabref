@@ -6,6 +6,7 @@ import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
 import javafx.scene.layout.BorderPane;
 
+import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.duplicationFinder.DuplicateResolverDialog.DuplicateResolverResult;
 import org.jabref.gui.help.HelpAction;
@@ -38,18 +39,19 @@ public class DuplicateResolverDialog extends BaseDialog<DuplicateResolverResult>
         BREAK
     }
 
-    private MergeEntries me;
+    private MergeEntries mergeEntries;
+    private final DialogService dialogService;
 
-    public DuplicateResolverDialog(BibEntry one, BibEntry two, DuplicateResolverType type, BibDatabaseContext database, StateManager stateManager) {
+    public DuplicateResolverDialog(BibEntry one, BibEntry two, DuplicateResolverType type, BibDatabaseContext database, StateManager stateManager, DialogService dialogService) {
         this.setTitle(Localization.lang("Possible duplicate entries"));
         this.database = database;
         this.stateManager = stateManager;
+        this.dialogService = dialogService;
         init(one, two, type);
     }
 
     private void init(BibEntry one, BibEntry two, DuplicateResolverType type) {
-
-        HelpAction helpCommand = new HelpAction(HelpFile.FIND_DUPLICATES);
+        HelpAction helpCommand = new HelpAction(HelpFile.FIND_DUPLICATES, dialogService);
         ButtonType help = new ButtonType(Localization.lang("Help"), ButtonData.HELP);
 
         ButtonType cancel = ButtonType.CANCEL;
@@ -67,13 +69,13 @@ public class DuplicateResolverDialog extends BaseDialog<DuplicateResolverResult>
                 first = new ButtonType(Localization.lang("Keep left"), ButtonData.APPLY);
                 second = new ButtonType(Localization.lang("Keep right"), ButtonData.APPLY);
                 both = new ButtonType(Localization.lang("Keep both"), ButtonData.APPLY);
-                me = new MergeEntries(one, two);
+                mergeEntries = new MergeEntries(one, two);
                 break;
             case INSPECTION:
                 first = new ButtonType(Localization.lang("Remove old entry"), ButtonData.APPLY);
                 second = new ButtonType(Localization.lang("Remove entry from import"), ButtonData.APPLY);
                 both = new ButtonType(Localization.lang("Keep both"), ButtonData.APPLY);
-                me = new MergeEntries(one, two, Localization.lang("Old entry"),
+                mergeEntries = new MergeEntries(one, two, Localization.lang("Old entry"),
                         Localization.lang("From import"));
                 break;
             case DUPLICATE_SEARCH_WITH_EXACT:
@@ -83,13 +85,13 @@ public class DuplicateResolverDialog extends BaseDialog<DuplicateResolverResult>
 
                 removeExactVisible = true;
 
-                me = new MergeEntries(one, two);
+                mergeEntries = new MergeEntries(one, two);
                 break;
             default:
                 first = new ButtonType(Localization.lang("Import and remove old entry"), ButtonData.APPLY);
                 second = new ButtonType(Localization.lang("Do not import entry"), ButtonData.APPLY);
                 both = new ButtonType(Localization.lang("Import and keep old entry"), ButtonData.APPLY);
-                me = new MergeEntries(one, two, Localization.lang("Old entry"),
+                mergeEntries = new MergeEntries(one, two, Localization.lang("Old entry"),
                         Localization.lang("From import"));
                 break;
         }
@@ -107,7 +109,7 @@ public class DuplicateResolverDialog extends BaseDialog<DuplicateResolverResult>
             this.setY(state.getY());
         }
 
-        BorderPane borderPane = new BorderPane(me);
+        BorderPane borderPane = new BorderPane(mergeEntries);
         borderPane.setBottom(options);
 
         this.setResultConverter(button -> {
@@ -134,6 +136,6 @@ public class DuplicateResolverDialog extends BaseDialog<DuplicateResolverResult>
     }
 
     public BibEntry getMergedEntry() {
-        return me.getMergeEntry();
+        return mergeEntries.getMergedEntry();
     }
 }

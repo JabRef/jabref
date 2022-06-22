@@ -88,5 +88,4 @@ public class MedraTest {
         Optional<BibEntry> fetchedEntry = fetcher.performSearchById(identifier);
         assertEquals(expected, fetchedEntry);
     }
-
 }

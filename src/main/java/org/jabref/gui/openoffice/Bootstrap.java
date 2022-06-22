@@ -21,13 +21,12 @@
 package org.jabref.gui.openoffice;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
-import java.net.URLClassLoader;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
@@ -50,24 +49,24 @@ import com.sun.star.uno.UnoRuntime;
 import com.sun.star.uno.XComponentContext;
 
 /** Bootstrap offers functionality to obtain a context or simply
-    a service manager.
-    The service manager can create a few basic services, whose implementations  are:
-    <ul>
-    <li>com.sun.star.comp.loader.JavaLoader</li>
-    <li>com.sun.star.comp.urlresolver.UrlResolver</li>
-    <li>com.sun.star.comp.bridgefactory.BridgeFactory</li>
-    <li>com.sun.star.comp.connections.Connector</li>
-    <li>com.sun.star.comp.connections.Acceptor</li>
-    <li>com.sun.star.comp.servicemanager.ServiceManager</li>
-    </ul>
-
-    Other services can be inserted into the service manager by
-    using its XSet interface:
-    <pre>
-        XSet xSet = UnoRuntime.queryInterface( XSet.class, aMultiComponentFactory );
-        // insert the service manager
-        xSet.insert( aSingleComponentFactory );
-    </pre>
+  * a service manager.
+  * The service manager can create a few basic services, whose implementations  are:
+  * <ul>
+  * <li>com.sun.star.comp.loader.JavaLoader</li>
+  * <li>com.sun.star.comp.urlresolver.UrlResolver</li>
+  * <li>com.sun.star.comp.bridgefactory.BridgeFactory</li>
+  * <li>com.sun.star.comp.connections.Connector</li>
+  * <li>com.sun.star.comp.connections.Acceptor</li>
+  * <li>com.sun.star.comp.servicemanager.ServiceManager</li>
+  * </ul>
+  *
+  * Other services can be inserted into the service manager by
+  * using its XSet interface:
+  * <pre>
+  *     XSet xSet = UnoRuntime.queryInterface( XSet.class, aMultiComponentFactory );
+  *     // insert the service manager
+  *     xSet.insert( aSingleComponentFactory );
+  * </pre>
 */
 public class Bootstrap {
 
@@ -254,10 +253,9 @@ public class Bootstrap {
      * @throws BootstrapException if things go awry.
      * @since UDK 3.1.0
      */
-    public static final XComponentContext bootstrap(URLClassLoader loader) throws BootstrapException {
-
+    public static final XComponentContext bootstrap(Path ooPath) throws BootstrapException {
         String[] defaultArgArray = getDefaultOptions();
-        return bootstrap(defaultArgArray, loader);
+        return bootstrap(defaultArgArray, ooPath);
     }
 
     /**
@@ -269,7 +267,7 @@ public class Bootstrap {
      * @see #getDefaultOptions()
      * @since LibreOffice 5.1
      */
-    public static final XComponentContext bootstrap(String[] argArray, URLClassLoader loader) throws BootstrapException {
+    public static final XComponentContext bootstrap(String[] argArray, Path path) throws BootstrapException {
 
         XComponentContext xContext = null;
 
@@ -280,18 +278,10 @@ public class Bootstrap {
                 throw new BootstrapException("no local component context!");
             }
 
-            // find office executable relative to this class's class loader
-            String sOffice = System.getProperty("os.name").startsWith("Windows") ? "soffice.exe" : "soffice";
-
-            File fOffice = NativeLibraryLoader.getResource(loader, sOffice);
-            if (fOffice == null) {
-                throw new BootstrapException("no office executable found!");
-            }
-
             // create call with arguments
             // We need a socket, pipe does not work. https://api.libreoffice.org/examples/examples.html
             String[] cmdArray = new String[argArray.length + 2];
-            cmdArray[0] = fOffice.getPath();
+            cmdArray[0] = path.toAbsolutePath().toString();
             cmdArray[1] = ("--accept=socket,host=localhost,port=2083" + ";urp;");
 
             System.arraycopy(argArray, 0, cmdArray, 2, argArray.length);
@@ -344,9 +334,7 @@ public class Bootstrap {
     }
 
     private static void pipe(final InputStream in, final PrintStream out, final String prefix) {
-
         new Thread("Pipe: " + prefix) {
-
             @Override
             public void run() {
                 try {

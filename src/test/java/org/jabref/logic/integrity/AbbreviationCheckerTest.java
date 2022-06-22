@@ -44,5 +44,4 @@ class AbbreviationCheckerTest {
     void checkValueDoesNotComplainAboutJournalNameThatHasΝοInput() {
         assertEquals(Optional.empty(), checker.checkValue(""));
     }
-
 }

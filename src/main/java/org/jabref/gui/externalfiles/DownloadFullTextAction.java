@@ -85,7 +85,9 @@ public class DownloadFullTextAction extends SimpleCommand {
                 Map<BibEntry, Optional<URL>> downloads = new ConcurrentHashMap<>();
                 int count = 0;
                 for (BibEntry entry : entries) {
-                    FulltextFetchers fetchers = new FulltextFetchers(preferences.getImportFormatPreferences());
+                    FulltextFetchers fetchers = new FulltextFetchers(
+                            preferences.getImportFormatPreferences(),
+                            preferences.getImporterPreferences());
                     downloads.put(entry, fetchers.findFullTextPDF(entry));
                     updateProgress(++count, entries.size());
                 }
@@ -109,12 +111,10 @@ public class DownloadFullTextAction extends SimpleCommand {
             BibEntry entry = download.getKey();
             Optional<URL> result = download.getValue();
             if (result.isPresent()) {
-                Optional<Path> dir = databaseContext.getFirstExistingFileDir(Globals.prefs.getFilePreferences());
+                Optional<Path> dir = databaseContext.getFirstExistingFileDir(preferences.getFilePreferences());
                 if (dir.isEmpty()) {
                     dialogService.showErrorDialogAndWait(Localization.lang("Directory not found"),
-                            Localization.lang("Main file directory not set!") + " "
-                                    + Localization.lang("Preferences")
-                                    + " -> " + Localization.lang("File"));
+                            Localization.lang("Main file directory not set. Check the preferences (linked files) or the library properties."));
                     return;
                 }
 
@@ -146,8 +146,7 @@ public class DownloadFullTextAction extends SimpleCommand {
                     databaseContext,
                     Globals.TASK_EXECUTOR,
                     dialogService,
-                    preferences.getXmpPreferences(),
-                    preferences.getFilePreferences(),
+                    preferences,
                     ExternalFileTypes.getInstance());
 
             onlineFile.download();

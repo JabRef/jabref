@@ -6,11 +6,17 @@ import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.gui.keyboard.KeyBinding;
 
 public interface Action {
-    Optional<JabRefIcon> getIcon();
+    default Optional<JabRefIcon> getIcon() {
+        return Optional.empty();
+    }
 
-    Optional<KeyBinding> getKeyBinding();
+    default Optional<KeyBinding> getKeyBinding() {
+        return Optional.empty();
+    }
 
     String getText();
 
-    String getDescription();
+    default String getDescription() {
+        return "";
+    }
 }

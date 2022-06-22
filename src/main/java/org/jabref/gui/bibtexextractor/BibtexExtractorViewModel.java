@@ -1,6 +1,7 @@
 package org.jabref.gui.bibtexextractor;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.swing.undo.UndoManager;
@@ -31,10 +32,10 @@ public class BibtexExtractorViewModel {
     private static final Logger LOGGER = LoggerFactory.getLogger(BibtexExtractorViewModel.class);
 
     private final StringProperty inputTextProperty = new SimpleStringProperty("");
-    private DialogService dialogService;
-    private GrobidCitationFetcher currentCitationfetcher;
-    private TaskExecutor taskExecutor;
-    private ImportHandler importHandler;
+    private final DialogService dialogService;
+    private final PreferencesService preferencesService;
+    private final TaskExecutor taskExecutor;
+    private final ImportHandler importHandler;
 
     public BibtexExtractorViewModel(BibDatabaseContext bibdatabaseContext,
                                     DialogService dialogService,
@@ -45,16 +46,16 @@ public class BibtexExtractorViewModel {
                                     StateManager stateManager) {
 
         this.dialogService = dialogService;
-        currentCitationfetcher = new GrobidCitationFetcher(preferencesService.getImportFormatPreferences());
+        this.preferencesService = preferencesService;
         this.taskExecutor = taskExecutor;
         this.importHandler = new ImportHandler(
-                dialogService,
                 bibdatabaseContext,
                 ExternalFileTypes.getInstance(),
                 preferencesService,
                 fileUpdateMonitor,
                 undoManager,
-                stateManager);
+                stateManager,
+                dialogService);
     }
 
     public StringProperty inputTextProperty() {
@@ -62,7 +63,22 @@ public class BibtexExtractorViewModel {
     }
 
     public void startParsing() {
-        BackgroundTask.wrap(() -> currentCitationfetcher.performSearch(inputTextProperty.getValue()))
+        if (preferencesService.getImporterPreferences().isGrobidEnabled()) {
+            parseUsingGrobid();
+        } else {
+            parseUsingBibtexExtractor();
+        }
+    }
+
+    private void parseUsingBibtexExtractor() {
+        BibEntry parsedEntry = new BibtexExtractor().extract(inputTextProperty.getValue());
+        importHandler.importEntries(List.of(parsedEntry));
+        trackNewEntry(parsedEntry, "ParseWithBibTeXExtractor");
+    }
+
+    private void parseUsingGrobid() {
+        GrobidCitationFetcher grobidCitationFetcher = new GrobidCitationFetcher(preferencesService.getImporterPreferences(), preferencesService.getImportFormatPreferences());
+        BackgroundTask.wrap(() -> grobidCitationFetcher.performSearch(inputTextProperty.getValue()))
                       .onRunning(() -> dialogService.notify(Localization.lang("Your text is being parsed...")))
                       .onFailure((e) -> {
                           if (e instanceof FetcherException) {
@@ -77,14 +93,14 @@ public class BibtexExtractorViewModel {
                           dialogService.notify(Localization.lang("%0 entries were parsed from your query.", String.valueOf(parsedEntries.size())));
                           importHandler.importEntries(parsedEntries);
                           for (BibEntry bibEntry : parsedEntries) {
-                              trackNewEntry(bibEntry);
+                              trackNewEntry(bibEntry, "ParseWithGrobid");
                           }
                       }).executeWith(taskExecutor);
     }
 
-    private void trackNewEntry(BibEntry bibEntry) {
+    private void trackNewEntry(BibEntry bibEntry, String eventMessage) {
         Map<String, String> properties = new HashMap<>();
         properties.put("EntryType", bibEntry.typeProperty().getValue().getName());
-        Globals.getTelemetryClient().ifPresent(client -> client.trackEvent("ParseWithGrobid", properties, new HashMap<>()));
+        Globals.getTelemetryClient().ifPresent(client -> client.trackEvent(eventMessage, properties, new HashMap<>()));
     }
 }

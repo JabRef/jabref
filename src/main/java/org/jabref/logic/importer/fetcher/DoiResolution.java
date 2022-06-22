@@ -1,9 +1,11 @@
 package org.jabref.logic.importer.fetcher;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -12,7 +14,7 @@ import java.util.stream.Collectors;
 
 import org.jabref.logic.importer.FulltextFetcher;
 import org.jabref.logic.net.URLDownload;
-import org.jabref.logic.util.strings.StringSimilarity;
+import org.jabref.logic.preferences.DOIPreferences;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
@@ -28,14 +30,19 @@ import org.slf4j.LoggerFactory;
 
 /**
  * FulltextFetcher implementation that follows the DOI resolution redirects and scans for a full-text PDF URL.
+ *
+ * Note that we also have custom fetchers in place.
+ * See {@link org.jabref.logic.importer.WebFetchers#getFullTextFetchers(org.jabref.logic.importer.ImportFormatPreferences)}.
  */
 public class DoiResolution implements FulltextFetcher {
-    private static final Logger LOGGER = LoggerFactory.getLogger(DoiResolution.class);
 
-    /**
-     * Hosts for which tailored fetchers exist, so this fetcher is not needed.
-     */
-    private final List<String> excludedHosts = Arrays.asList("link.springer.com", "ieeexplore.ieee.org");
+    private static final Logger LOGGER = LoggerFactory.getLogger(DoiResolution.class);
+    private DOIPreferences doiPreferences;
+
+    public DoiResolution(DOIPreferences doiPreferences) {
+        super();
+        this.doiPreferences = doiPreferences;
+    }
 
     @Override
     public Optional<URL> findFullText(BibEntry entry) throws IOException {
@@ -43,11 +50,23 @@ public class DoiResolution implements FulltextFetcher {
 
         Optional<DOI> doi = entry.getField(StandardField.DOI).flatMap(DOI::parse);
 
-        if (!doi.isPresent()) {
+        if (doi.isEmpty()) {
             return Optional.empty();
         }
 
-        String doiLink = doi.get().getURIAsASCIIString();
+        URL base;
+
+        String doiLink;
+        if (doiPreferences.isUseCustom()) {
+            base = new URL(doiPreferences.getDefaultBaseURI());
+            doiLink = doi.get()
+                         .getExternalURIWithCustomBase(base.toString())
+                         .map(URI::toASCIIString)
+                         .orElse("");
+        } else {
+            base = DOI.RESOLVER.toURL();
+            doiLink = doi.get().getURIAsASCIIString();
+        }
         if (doiLink.isEmpty()) {
             return Optional.empty();
         }
@@ -57,18 +76,25 @@ public class DoiResolution implements FulltextFetcher {
             Connection connection = Jsoup.connect(doiLink);
             // pretend to be a browser (agent & referrer)
             connection.userAgent(URLDownload.USER_AGENT);
-            connection.referrer("http://www.google.com");
+            connection.referrer("https://www.google.com");
             connection.followRedirects(true);
             connection.ignoreHttpErrors(true);
             // some publishers are quite slow (default is 3s)
-            connection.timeout(10000);
+            connection.timeout(30_000);
 
             Connection.Response response = connection.execute();
-            if (excludedHosts.contains(response.url().getHost())) {
-                return Optional.empty();
-            }
 
             Document html = response.parse();
+            // citation pdf meta tag
+            Optional<URL> citationMetaTag = citationMetaTag(html);
+            if (citationMetaTag.isPresent()) {
+                return citationMetaTag;
+            }
+            Optional<URL> embeddedLink = findEmbeddedLink(html, base);
+            if (embeddedLink.isPresent()) {
+                return embeddedLink;
+            }
+
             // scan for PDF
             Elements hrefElements = html.body().select("a[href]");
 
@@ -91,11 +117,11 @@ public class DoiResolution implements FulltextFetcher {
 
             // return if only one link was found (high accuracy)
             if (links.size() == 1) {
-                LOGGER.info("Fulltext PDF found @ " + doiLink);
+                LOGGER.info("Fulltext PDF found @ {}", doiLink);
                 return Optional.of(links.get(0));
             }
-            // return if links are similar or multiple links are similar
-            return findSimilarLinks(links);
+            // return if links are equal
+            return findDistinctLinks(links);
         } catch (UnsupportedMimeTypeException type) {
             // this might be the PDF already as we follow redirects
             if (type.getMimeType().startsWith("application/pdf")) {
@@ -109,7 +135,42 @@ public class DoiResolution implements FulltextFetcher {
         return Optional.empty();
     }
 
-    private Optional<URL> findSimilarLinks(List<URL> urls) {
+    /**
+     * Scan for <meta name="citation_pdf_url">
+     * See https://scholar.google.com/intl/de/scholar/inclusion.html#indexing
+     */
+    private Optional<URL> citationMetaTag(Document html) {
+        Elements citationPdfUrlElement = html.head().select("meta[name='citation_pdf_url']");
+        Optional<String> citationPdfUrl = citationPdfUrlElement.stream().map(e -> e.attr("content")).findFirst();
+
+        if (citationPdfUrl.isPresent()) {
+            try {
+                return Optional.of(new URL(citationPdfUrl.get()));
+            } catch (MalformedURLException e) {
+                return Optional.empty();
+            }
+        }
+        return Optional.empty();
+    }
+
+    private Optional<URL> findEmbeddedLink(Document html, URL base) {
+        Elements embedElement = html.body().select("embed[id='pdf']");
+        Optional<String> pdfUrl = embedElement
+                .stream()
+                .map(e -> e.attr("src")).findFirst();
+
+        if (pdfUrl.isPresent()) {
+            try {
+                URL url = base.toURI().resolve(pdfUrl.get()).toURL();
+                return Optional.of(url);
+            } catch (MalformedURLException | URISyntaxException e) {
+                return Optional.empty();
+            }
+        }
+        return Optional.empty();
+    }
+
+    private Optional<URL> findDistinctLinks(List<URL> urls) {
         List<URL> distinctLinks = urls.stream().distinct().collect(Collectors.toList());
 
         if (distinctLinks.isEmpty()) {
@@ -118,13 +179,6 @@ public class DoiResolution implements FulltextFetcher {
         // equal
         if (distinctLinks.size() == 1) {
             return Optional.of(distinctLinks.get(0));
-        }
-        // similar
-        final String firstElement = distinctLinks.get(0).toString();
-        StringSimilarity similarity = new StringSimilarity();
-        List<URL> similarLinks = distinctLinks.stream().filter(elem -> similarity.isSimilar(firstElement, elem.toString())).collect(Collectors.toList());
-        if (similarLinks.size() == distinctLinks.size()) {
-            return Optional.of(similarLinks.get(0));
         }
 
         return Optional.empty();

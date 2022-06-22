@@ -4,7 +4,6 @@
 <?import javafx.scene.control.DialogPane?>
 <?import javafx.scene.control.Hyperlink?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.Cursor?>
@@ -15,7 +14,7 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.shape.SVGPath?>
-<DialogPane prefHeight="600.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jabref.gui.help.AboutDialogView">
+<DialogPane prefWidth="530.0" prefHeight="510.0" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jabref.gui.help.AboutDialogView">
     <content>
         <VBox alignment="CENTER_LEFT" BorderPane.alignment="CENTER">
             <HBox alignment="CENTER_LEFT">
@@ -83,13 +82,11 @@
                     </bottom>
                 </BorderPane>
             </HBox>
-            <Label styleClass="sub-heading" text="%Developers"/>
-            <Label alignment="CENTER" styleClass="info-sections" text="${controller.viewModel.developers}" textAlignment="JUSTIFY" wrapText="true"/>
-            <Label styleClass="sub-heading" text="%Authors"/>
-            <HBox alignment="CENTER" VBox.vgrow="ALWAYS" prefHeight="100">
-                <ScrollPane fitToWidth="true">
-                    <Label styleClass="info-sections" text="${controller.viewModel.authors}" textAlignment="JUSTIFY" wrapText="true" BorderPane.alignment="CENTER"/>
-                </ScrollPane>
+            <Label styleClass="sub-heading" text="%Maintainers"/>
+            <Label alignment="CENTER" styleClass="info-sections" text="${controller.viewModel.maintainers}" textAlignment="JUSTIFY" wrapText="true"/>
+            <Label styleClass="sub-heading" text="%Contributors"/>
+            <HBox alignment="CENTER_LEFT">
+                <Hyperlink styleClass="contrib-section" onAction="#openContributors" text="%JabRef would not have been possible without the help of our contributors." wrapText="true"/>
             </HBox>
             <TextArea fx:id="textAreaVersions" editable="false" prefHeight="100.0" prefWidth="200.0" styleClass="info-sections"/>
         </VBox>

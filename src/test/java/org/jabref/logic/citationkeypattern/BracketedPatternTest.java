@@ -1,5 +1,7 @@
 package org.jabref.logic.citationkeypattern;
 
+import java.util.stream.Stream;
+
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibtexString;
@@ -8,6 +10,9 @@ import org.jabref.model.entry.types.StandardEntryType;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -280,7 +285,7 @@ class BracketedPatternTest {
     }
 
     @Test
-    void expandBracketsWithModifierContainingRegexCharacterCkass() {
+    void expandBracketsWithModifierContainingRegexCharacterClass() {
         BibEntry bibEntry = new BibEntry().withField(StandardField.TITLE, "Wickedness:Managing");
 
         assertEquals("Wickedness.Managing", BracketedPattern.expandBrackets("[title:regex(\"[:]+\",\".\")]", null, bibEntry, null));
@@ -323,5 +328,90 @@ class BracketedPatternTest {
                 .withField(StandardField.AUTHOR, "杨秀群");
 
         assertEquals("杨秀群", BracketedPattern.expandBrackets("[auth]", null, bibEntry, null));
+    }
+
+    @Test
+    void expandBracketsUnmodifiedStringFromLongFirstPageNumber() {
+        BibEntry bibEntry = new BibEntry()
+                .withField(StandardField.PAGES, "2325967120921344");
+
+        assertEquals("2325967120921344", BracketedPattern.expandBrackets("[firstpage]", null, bibEntry, null));
+    }
+
+    @Test
+    void expandBracketsUnmodifiedStringFromLongLastPageNumber() {
+        BibEntry bibEntry = new BibEntry()
+                .withField(StandardField.PAGES, "2325967120921344");
+
+        assertEquals("2325967120921344", BracketedPattern.expandBrackets("[lastpage]", null, bibEntry, null));
+    }
+
+    @Test
+    void expandBracketsWithTestCasesFromRegExpBasedFileFinder() {
+        BibEntry entry = new BibEntry(StandardEntryType.Article).withCitationKey("HipKro03");
+        entry.setField(StandardField.AUTHOR, "Eric von Hippel and Georg von Krogh");
+        entry.setField(StandardField.TITLE, "Open Source Software and the \"Private-Collective\" Innovation Model: Issues for Organization Science");
+        entry.setField(StandardField.JOURNAL, "Organization Science");
+        entry.setField(StandardField.YEAR, "2003");
+        entry.setField(StandardField.VOLUME, "14");
+        entry.setField(StandardField.PAGES, "209--223");
+        entry.setField(StandardField.NUMBER, "2");
+        entry.setField(StandardField.ADDRESS, "Institute for Operations Research and the Management Sciences (INFORMS), Linthicum, Maryland, USA");
+        entry.setField(StandardField.DOI, "http://dx.doi.org/10.1287/orsc.14.2.209.14992");
+        entry.setField(StandardField.ISSN, "1526-5455");
+        entry.setField(StandardField.PUBLISHER, "INFORMS");
+
+        BibDatabase database = new BibDatabase();
+        database.insertEntry(entry);
+
+        assertEquals("", BracketedPattern.expandBrackets("", ',', entry, database));
+
+        assertEquals("dropped", BracketedPattern.expandBrackets("drop[unknownkey]ped", ',', entry, database));
+
+        assertEquals("Eric von Hippel and Georg von Krogh",
+                BracketedPattern.expandBrackets("[author]", ',', entry, database));
+
+        assertEquals("Eric von Hippel and Georg von Krogh are two famous authors.",
+                BracketedPattern.expandBrackets("[author] are two famous authors.", ',', entry, database));
+
+        assertEquals("Eric von Hippel and Georg von Krogh are two famous authors.",
+                BracketedPattern.expandBrackets("[author] are two famous authors.", ',', entry, database));
+
+        assertEquals(
+                "Eric von Hippel and Georg von Krogh have published Open Source Software and the \"Private-Collective\" Innovation Model: Issues for Organization Science in Organization Science.",
+                BracketedPattern.expandBrackets("[author] have published [fulltitle] in [journal].", ',', entry, database));
+
+        assertEquals(
+                "Eric von Hippel and Georg von Krogh have published Open Source Software and the \"Private Collective\" Innovation Model: Issues for Organization Science in Organization Science.",
+                BracketedPattern.expandBrackets("[author] have published [title] in [journal].", ',', entry, database));
+    }
+
+    @Test
+    void expandBracketsWithoutProtectiveBracesUsingUnprotectTermsModifier() {
+        BibEntry bibEntry = new BibEntry()
+                .withField(StandardField.JOURNAL, "{ACS} Medicinal Chemistry Letters");
+        assertEquals("ACS Medicinal Chemistry Letters", BracketedPattern.expandBrackets("[JOURNAL:unprotect_terms]", null, bibEntry, null));
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideArgumentsForFallback")
+    void expandBracketsWithFallback(String expandResult, String pattern) {
+        BibEntry bibEntry = new BibEntry()
+                .withField(StandardField.YEAR, "2021").withField(StandardField.EPRINT, "2105.02891");
+        BracketedPattern bracketedPattern = new BracketedPattern(pattern);
+
+        assertEquals(expandResult, bracketedPattern.expand(bibEntry));
+    }
+
+    private static Stream<Arguments> provideArgumentsForFallback() {
+        return Stream.of(
+                Arguments.of("auth", "[title:(auth)]"),
+                Arguments.of("auth2021", "[title:(auth[YEAR])]"),
+                Arguments.of("not2021", "[title:(not[YEAR])]"),
+                Arguments.of("", "[title:([YEAR)]"),
+                Arguments.of(")]", "[title:(YEAR])]"),
+                Arguments.of("2105.02891", "[title:([EPRINT:([YEAR])])]"),
+                Arguments.of("2021", "[title:([auth:([YEAR])])]")
+        );
     }
 }

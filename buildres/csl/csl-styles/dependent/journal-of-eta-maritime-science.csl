@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<style xmlns="http://purl.org/net/xbiblio/csl" version="1.0" default-locale="en-US">
+  <info>
+    <title>Journal of ETA Maritime Science</title>
+    <title-short>JEMS</title-short>
+    <id>http://www.zotero.org/styles/journal-of-eta-maritime-science</id>
+    <link href="http://www.zotero.org/styles/journal-of-eta-maritime-science" rel="self"/>
+    <link href="http://www.zotero.org/styles/ieee" rel="independent-parent"/>
+    <link href="https://jemsjournal.org/guide-for-authors" rel="documentation"/>
+    <category citation-format="numeric"/>
+    <category field="engineering"/>
+    <issn>2147-2955</issn>
+    <eissn>2148-9386</eissn>
+    <updated>2021-03-26T12:00:00+00:00</updated>
+    <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
+  </info>
+</style>

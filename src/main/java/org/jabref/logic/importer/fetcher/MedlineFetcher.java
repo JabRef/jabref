@@ -28,6 +28,7 @@ import org.jabref.logic.importer.IdBasedParserFetcher;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.SearchBasedFetcher;
+import org.jabref.logic.importer.fetcher.transformers.MedlineQueryTransformer;
 import org.jabref.logic.importer.fileformat.MedlineImporter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
@@ -35,6 +36,7 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
 
 import org.apache.http.client.utils.URIBuilder;
+import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,16 +53,6 @@ public class MedlineFetcher implements IdBasedParserFetcher, SearchBasedFetcher 
     private static final String SEARCH_URL = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi";
 
     private int numberOfResultsFound;
-
-    /**
-     * Replaces all commas in a given string with " AND "
-     *
-     * @param query input to remove commas
-     * @return input without commas
-     */
-    private static String replaceCommaWithAND(String query) {
-        return query.replaceAll(", ", " AND ").replaceAll(",", " AND ");
-    }
 
     /**
      * When using 'esearch.fcgi?db=&lt;database>&term=&lt;query>' we will get a list of IDs matching the query.
@@ -157,39 +149,12 @@ public class MedlineFetcher implements IdBasedParserFetcher, SearchBasedFetcher 
         new FieldFormatterCleanup(StandardField.AUTHOR, new NormalizeNamesFormatter()).cleanup(entry);
     }
 
-    @Override
-    public List<BibEntry> performSearch(ComplexSearchQuery complexSearchQuery) throws FetcherException {
-        List<BibEntry> entryList;
-        String query = complexSearchQuery.toString();
-
-        if (query.isBlank()) {
-            return Collections.emptyList();
-        } else {
-            // searching for pubmed ids matching the query
-            List<String> idList = getPubMedIdsFromQuery(query);
-
-            if (idList.isEmpty()) {
-                LOGGER.info("No results found.");
-                return Collections.emptyList();
-            }
-            if (numberOfResultsFound > NUMBER_TO_FETCH) {
-                LOGGER.info(
-                        numberOfResultsFound + " results found. Only 50 relevant results will be fetched by default.");
-            }
-
-            // pass the list of ids to fetchMedline to download them. like a id fetcher for mutliple ids
-            entryList = fetchMedline(idList);
-
-            return entryList;
-        }
-    }
-
     private URL createSearchUrl(String query) throws URISyntaxException, MalformedURLException {
         URIBuilder uriBuilder = new URIBuilder(SEARCH_URL);
         uriBuilder.addParameter("db", "pubmed");
         uriBuilder.addParameter("sort", "relevance");
         uriBuilder.addParameter("retmax", String.valueOf(NUMBER_TO_FETCH));
-        uriBuilder.addParameter("term", replaceCommaWithAND(query));
+        uriBuilder.addParameter("term", query); // already lucene query
         return uriBuilder.build().toURL();
     }
 
@@ -219,6 +184,34 @@ public class MedlineFetcher implements IdBasedParserFetcher, SearchBasedFetcher 
         } catch (IOException e) {
             throw new FetcherException("Error while fetching from Medline",
                     Localization.lang("Error while fetching from %0", "Medline"), e);
+        }
+    }
+
+    @Override
+    public List<BibEntry> performSearch(QueryNode luceneQuery) throws FetcherException {
+        List<BibEntry> entryList;
+        MedlineQueryTransformer transformer = new MedlineQueryTransformer();
+        Optional<String> transformedQuery = transformer.transformLuceneQuery(luceneQuery);
+
+        if (transformedQuery.isEmpty() || transformedQuery.get().isBlank()) {
+            return Collections.emptyList();
+        } else {
+            // searching for pubmed ids matching the query
+            List<String> idList = getPubMedIdsFromQuery(transformedQuery.get());
+
+            if (idList.isEmpty()) {
+                LOGGER.info("No results found.");
+                return Collections.emptyList();
+            }
+            if (numberOfResultsFound > NUMBER_TO_FETCH) {
+                LOGGER.info(
+                        numberOfResultsFound + " results found. Only 50 relevant results will be fetched by default.");
+            }
+
+            // pass the list of ids to fetchMedline to download them. like a id fetcher for mutliple ids
+            entryList = fetchMedline(idList);
+
+            return entryList;
         }
     }
 }

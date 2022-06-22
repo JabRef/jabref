@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<style xmlns="http://purl.org/net/xbiblio/csl" version="1.0" default-locale="en-US">
+  <info>
+    <title>Qualitative Health Research</title>
+    <title-short>QHR</title-short>
+    <id>http://www.zotero.org/styles/qualitative-health-research</id>
+    <link href="http://www.zotero.org/styles/qualitative-health-research" rel="self"/>
+    <link href="http://www.zotero.org/styles/apa" rel="independent-parent"/>
+    <link href="https://journals.sagepub.com/author-instructions/QHR" rel="documentation"/>
+    <category citation-format="author-date"/>
+    <category field="medicine"/>
+    <issn>1049-7323</issn>
+    <eissn>1552-7557</eissn>
+    <updated>2020-12-01T12:00:00+00:00</updated>
+    <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
+  </info>
+</style>

@@ -1,34 +1,30 @@
 package org.jabref.logic.layout.format;
 
-import org.junit.jupiter.api.Test;
+import java.util.stream.Stream;
+
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class ToUpperCaseTest {
 
-    @Test
-    public void testEmpty() {
-        assertEquals("", new ToUpperCase().format(""));
+    ToUpperCase upperCase = new ToUpperCase();
+
+    @ParameterizedTest
+    @MethodSource("toUpperCaseTests")
+    void toUpperCaseTests(String expectedString, String inputString) {
+        assertEquals(expectedString, upperCase.format(inputString));
     }
 
-    @Test
-    public void testNull() {
-        assertNull(new ToUpperCase().format(null));
-    }
-
-    @Test
-    public void testLowerCase() {
-        assertEquals("ABCD EFG", new ToUpperCase().format("abcd efg"));
-    }
-
-    @Test
-    public void testUpperCase() {
-        assertEquals("ABCD EFG", new ToUpperCase().format("ABCD EFG"));
-    }
-
-    @Test
-    public void testMixedCase() {
-        assertEquals("ABCD EFG", new ToUpperCase().format("abCD eFg"));
+    private static Stream<Arguments> toUpperCaseTests() {
+        return Stream.of(
+                Arguments.of("", ""),
+                Arguments.of(null, null),
+                Arguments.of("ABCD EFG", "abcd efg"),
+                Arguments.of("ABCD EFG", "ABCD EFG"),
+                Arguments.of("ABCD EFG", "abCD eFg")
+        );
     }
 }

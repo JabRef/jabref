@@ -3,80 +3,63 @@ name: Tests
 on:
   push:
     branches:
-      - master
+      - main
+      - main-release
   pull_request:
     # always run on pull requests
+  workflow_dispatch:
 
 env:
   SpringerNatureAPIKey: ${{ secrets.SpringerNatureAPIKey }}
   AstrophysicsDataSystemAPIKey: ${{ secrets.AstrophysicsDataSystemAPIKey }}
   IEEEAPIKey: ${{ secrets.IEEEAPIKey }}
+  BiodiversityHeritageApiKey: ${{ secrets.BiodiversityHeritageApiKey}}
+  GRADLE_OPTS: -Xmx4g
+  JAVA_OPTS: -Xmx4g
+
+concurrency:
+  group: tests-${{ github.head_ref }}
+  cancel-in-progress: true
 
 jobs:
   checkstyle:
     name: Checkstyle
     runs-on: ubuntu-latest
     steps:
-      - name: Cancel Previous Runs
-        uses: styfle/cancel-workflow-action@0.6.0
-        with:
-          access_token: ${{ github.token }}
       - name: Checkout source
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Set up JDK
-        uses: actions/setup-java@v1
+        uses: actions/setup-java@v3
         with:
-          java-version: 14
-      - uses: actions/cache@v1
-        name: Restore gradle cache
-        with:
-          path: ~/.gradle/caches
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
-          restore-keys: |
-            ${{ runner.OS }}-gradle-${{ env.cache-name }}-
-            ${{ runner.OS }}-gradle-
-            ${{ runner.OS }}-
-      - uses: actions/cache@v1
-        name: Restore gradle wrapper
-        with:
-          path: ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-${{ hashFiles('gradle/wrapper/gradle-wrapper.properties') }}
+          java-version: 18
+          distribution: 'temurin'
+          cache: 'gradle'
       - name: Run check style reporter
         uses: nikitasavinov/checkstyle-action@master
         with:
-          reporter: github-pr-check
+          reporter: github-pr-review
+          github_token: ${{ secrets.GITHUB_TOKEN }}
           checkstyle_config: 'config/checkstyle/checkstyle_reviewdog.xml'
+          checkstyle_version: '10.3'
       - name: Run checkstyle gradle
         run: ./gradlew checkstyleMain checkstyleTest checkstyleJmh
       - name: Run markdown-lint
         uses: avto-dev/markdown-lint@v1
         with:
-          args: CHANGELOG.md CONTRIBUTING.md README.md docs/
+          args: CHANGELOG.md CONTRIBUTING.md README.md
           config: '.markdownlint.yml'
   tests:
     name: Unit tests
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Set up JDK
-        uses: actions/setup-java@v1
+        uses: actions/setup-java@v3
         with:
-          java-version: 14
-      - uses: actions/cache@v1
-        name: Restore gradle chache
-        with:
-          path: ~/.gradle/caches
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
-          restore-keys: |
-            ${{ runner.OS }}-gradle-${{ env.cache-name }}-
-            ${{ runner.OS }}-gradle-
-            ${{ runner.OS }}-
-      - uses: actions/cache@v1
-        name: Restore gradle wrapper
-        with:
-          path: ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-${{ hashFiles('gradle/wrapper/gradle-wrapper.properties') }}
+          java-version: 18
+          distribution: 'temurin'
+          cache: 'gradle'
       - name: Run tests
         run: xvfb-run --auto-servernum ./gradlew check -x checkstyleJmh -x checkstyleMain -x checkstyleTest
         env:
@@ -102,25 +85,13 @@ jobs:
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
     steps:
       - name: Checkout source
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Set up JDK
-        uses: actions/setup-java@v1
+        uses: actions/setup-java@v3
         with:
-          java-version: 14
-      - uses: actions/cache@v1
-        name: Restore gradle chache
-        with:
-          path: ~/.gradle/caches
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
-          restore-keys: |
-            ${{ runner.OS }}-gradle-${{ env.cache-name }}-
-            ${{ runner.OS }}-gradle-
-            ${{ runner.OS }}-
-      - uses: actions/cache@v1
-        name: Restore gradle wrapper
-        with:
-          path: ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-${{ hashFiles('gradle/wrapper/gradle-wrapper.properties') }}
+          java-version: 18
+          distribution: 'temurin'
+          cache: 'gradle'
       - name: Run tests on PostgreSQL
         run: ./gradlew databaseTest --rerun-tasks
         env:
@@ -148,25 +119,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Set up JDK
-        uses: actions/setup-java@v1
+        uses: actions/setup-java@v3
         with:
-          java-version: 14
-      - uses: actions/cache@v1
-        name: Restore gradle chache
-        with:
-          path: ~/.gradle/caches
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
-          restore-keys: |
-            ${{ runner.OS }}-gradle-${{ env.cache-name }}-
-            ${{ runner.OS }}-gradle-
-            ${{ runner.OS }}-
-      - uses: actions/cache@v1
-        name: Restore gradle wrapper
-        with:
-          path: ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-${{ hashFiles('gradle/wrapper/gradle-wrapper.properties') }}
+          java-version: 18
+          distribution: 'temurin'
+          cache: 'gradle'
       - name: Run GUI tests
         run: xvfb-run --auto-servernum ./gradlew guiTest
         env:
@@ -198,25 +157,13 @@ jobs:
         env:
           SNAPCRAFT_LOGIN_FILE: ${{ secrets.CODECOV_TOKEN }}
       - name: Checkout source
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Set up JDK
-        uses: actions/setup-java@v1
+        uses: actions/setup-java@v3
         with:
-          java-version: 14
-      - uses: actions/cache@v1
-        name: Restore gradle chache
-        with:
-          path: ~/.gradle/caches
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
-          restore-keys: |
-            ${{ runner.OS }}-gradle-${{ env.cache-name }}-
-            ${{ runner.OS }}-gradle-
-            ${{ runner.OS }}-
-      - uses: actions/cache@v1
-        name: Restore gradle wrapper
-        with:
-          path: ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-${{ hashFiles('gradle/wrapper/gradle-wrapper.properties') }}
+          java-version: 18
+          distribution: 'temurin'
+          cache: 'gradle'
       - name: Update test coverage metrics
         if: ${{ steps.checksecrets.outputs.secretspresent }}
         run: xvfb-run --auto-servernum ./gradlew jacocoTestReport && bash <(curl -s https://codecov.io/bash);
@@ -230,37 +177,5 @@ jobs:
     name: "Validate Gradle Wrapper"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: gradle/wrapper-validation-action@v1
-  checkauthors:
-    name: "Validate AUTHORS"
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          # full checkout needed for authors generation
-          fetch-depth: 0
-      - name: "All authors of this PR listed in AUTHORS"
-        id: authors_check
-        shell: bash
-        run: |
-          git config user.name "JabRef Author Checker [bot]"
-          git config user.email "noreply@jabref.org"
-          ./scripts/generate-authors.sh
-          set +o pipefail
-          added=$(git diff HEAD --no-ext-diff --unified=0 -a --no-prefix | egrep "^\+[^+]" | sed "s/^\+//")
-          if [ -z "$added" ]; then
-            echo "No authors added"
-            exit 0
-          fi
-          echo "Authors found in this PR not listed in the AUTHORS file."
-          echo
-          echo "The JabRef maintainers will add the following name to the AUTHORS file"
-          echo
-          echo -e "$added"
-          echo
-          echo "In case you want to use a different one, please comment here and adjust your name in your git configuration for future commits"
-          echo
-          echo "Just adding yourself into the AUTHORS file does not help as it is overwritten by our script ./scripts/generate-authors."
-          echo "Read more on the AUTHORS file at found at https://github.com/JabRef/jabref/blob/master/CONTRIBUTING.md#author-credits"
-          exit 1

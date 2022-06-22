@@ -6,8 +6,12 @@ import org.jabref.gui.maintable.BibEntryTableViewModel;
 import org.jabref.gui.maintable.MainTableColumnModel;
 import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.gui.util.comparator.NumericFieldComparator;
+import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.OrFields;
+import org.jabref.model.entry.field.UnknownField;
+
+import com.google.common.collect.Iterables;
 
 /**
  * A column that displays the text-value of the field
@@ -26,7 +30,16 @@ public class FieldColumn extends MainTableColumn<String> {
         new ValueTableCellFactory<BibEntryTableViewModel, String>()
                 .withText(text -> text)
                 .install(this);
-        this.setComparator(new NumericFieldComparator());
+
+        if (fields.size() == 1) {
+            // comparator can't parse more than one value
+            Field field = Iterables.getOnlyElement(fields);
+
+            if (field instanceof UnknownField || field.isNumeric()) {
+                this.setComparator(new NumericFieldComparator());
+            }
+        }
+
         this.setSortable(true);
     }
 

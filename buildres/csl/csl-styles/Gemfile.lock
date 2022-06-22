@@ -1,0 +1,118 @@
+GIT
+  remote: https://github.com/citation-style-language/Sheldon.git
+  revision: 2f22073efcbfe1d0a2599f8a8a68791a81da2022
+  specs:
+    sheldon (1.0.31)
+      citeproc-ruby (~> 2.0)
+      csl-styles (~> 2.0)
+      diffy
+      dotenv
+      erubis (~> 2.7)
+      faraday
+      faraday_middleware
+      git_diff
+      hashdiff (= 0.3.7)
+      nokogiri
+      octokit (~> 4.0)
+      ostruct
+      reverse_markdown
+
+GEM
+  remote: https://rubygems.org/
+  specs:
+    addressable (2.8.0)
+      public_suffix (>= 2.0.2, < 5.0)
+    citeproc (1.0.10)
+      namae (~> 1.0)
+    citeproc-ruby (2.0.0)
+      citeproc (~> 1.0, >= 1.0.9)
+      csl (~> 2.0)
+    csl (2.0.0)
+      namae (~> 1.0)
+      rexml
+    csl-styles (2.0.0)
+      csl (~> 2.0)
+    diff-lcs (1.5.0)
+    diffy (3.4.0)
+    dotenv (2.7.6)
+    erubis (2.7.0)
+    faraday (1.8.0)
+      faraday-em_http (~> 1.0)
+      faraday-em_synchrony (~> 1.0)
+      faraday-excon (~> 1.1)
+      faraday-httpclient (~> 1.0.1)
+      faraday-net_http (~> 1.0)
+      faraday-net_http_persistent (~> 1.1)
+      faraday-patron (~> 1.0)
+      faraday-rack (~> 1.0)
+      multipart-post (>= 1.2, < 3)
+      ruby2_keywords (>= 0.0.4)
+    faraday-em_http (1.0.0)
+    faraday-em_synchrony (1.0.0)
+    faraday-excon (1.1.0)
+    faraday-httpclient (1.0.1)
+    faraday-net_http (1.0.1)
+    faraday-net_http_persistent (1.2.0)
+    faraday-patron (1.0.0)
+    faraday-rack (1.0.0)
+    faraday_middleware (1.2.0)
+      faraday (~> 1.0)
+    fuubar (2.5.1)
+      rspec-core (~> 3.0)
+      ruby-progressbar (~> 1.4)
+    git_diff (0.4.3)
+    hashdiff (0.3.7)
+    mini_portile2 (2.8.0)
+    multipart-post (2.1.1)
+    namae (1.1.1)
+    nokogiri (1.13.6)
+      mini_portile2 (~> 2.8.0)
+      racc (~> 1.4)
+    nokogiri (1.13.6-x64-mingw32)
+      racc (~> 1.4)
+    octokit (4.21.0)
+      faraday (>= 0.9)
+      sawyer (~> 0.8.0, >= 0.5.3)
+    ostruct (0.5.2)
+    public_suffix (4.0.6)
+    racc (1.6.0)
+    rake (13.0.6)
+    reverse_markdown (2.1.1)
+      nokogiri
+    rexml (3.2.5)
+    rspec (3.10.0)
+      rspec-core (~> 3.10.0)
+      rspec-expectations (~> 3.10.0)
+      rspec-mocks (~> 3.10.0)
+    rspec-core (3.10.1)
+      rspec-support (~> 3.10.0)
+    rspec-expectations (3.10.1)
+      diff-lcs (>= 1.2.0, < 2.0)
+      rspec-support (~> 3.10.0)
+    rspec-mocks (3.10.2)
+      diff-lcs (>= 1.2.0, < 2.0)
+      rspec-support (~> 3.10.0)
+    rspec-support (3.10.3)
+    ruby-progressbar (1.11.0)
+    ruby2_keywords (0.0.5)
+    sawyer (0.8.2)
+      addressable (>= 2.3.5)
+      faraday (> 0.8, < 2.0)
+
+PLATFORMS
+  ruby
+  x64-mingw32
+
+DEPENDENCIES
+  csl (~> 2.0)
+  fuubar
+  nokogiri
+  rake
+  rspec
+  sheldon!
+
+RUBY VERSION
+   ruby 3.0.2p107
+
+BUNDLED WITH
+   2.2.32

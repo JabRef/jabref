@@ -36,12 +36,13 @@ public class MainTableColumnModel {
         GROUPS("groups", Localization.lang("Groups")),
         LINKED_IDENTIFIER("linked_id", Localization.lang("Linked identifiers")),
         NORMALFIELD("field"),
-        SPECIALFIELD("special", Localization.lang("Special"));
+        SPECIALFIELD("special", Localization.lang("Special")),
+        LIBRARY_NAME("library", Localization.lang("Library"));
 
         public static final EnumSet<Type> ICON_COLUMNS = EnumSet.of(EXTRAFILE, FILES, GROUPS, LINKED_IDENTIFIER);
 
-        private String name;
-        private String displayName;
+        private final String name;
+        private final String displayName;
 
         Type(String name) {
             this.name = name;
@@ -67,7 +68,7 @@ public class MainTableColumnModel {
                     return type;
                 }
             }
-            LOGGER.warn(Localization.lang("Column type %0 is unknown.", text));
+            LOGGER.warn("Column type '{}' is unknown.", text);
             return NORMALFIELD;
         }
     }

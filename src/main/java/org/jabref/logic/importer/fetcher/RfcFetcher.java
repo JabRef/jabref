@@ -22,6 +22,7 @@ import org.apache.http.client.utils.URIBuilder;
  */
 public class RfcFetcher implements IdBasedParserFetcher {
 
+    private final static String DRAFT_PREFIX = "draft";
     private final ImportFormatPreferences importFormatPreferences;
 
     public RfcFetcher(ImportFormatPreferences importFormatPreferences) {
@@ -38,11 +39,21 @@ public class RfcFetcher implements IdBasedParserFetcher {
         return Optional.of(HelpFile.FETCHER_RFC);
     }
 
+    /**
+     * Get the URL of the RFC resource according to the given identifier
+     *
+     * @param identifier the ID
+     * @return the URL of the RFC resource
+     */
     @Override
     public URL getUrlForIdentifier(String identifier) throws URISyntaxException, MalformedURLException, FetcherException {
-        // Add "rfc" prefix if user's search entry was numerical
+
         String prefixedIdentifier = identifier;
-        prefixedIdentifier = (!identifier.toLowerCase().startsWith("rfc")) ? "rfc" + prefixedIdentifier : prefixedIdentifier;
+        // if not a "draft" version
+        if (!identifier.toLowerCase().startsWith(DRAFT_PREFIX)) {
+            // Add "rfc" prefix if user's search entry was numerical
+            prefixedIdentifier = (!identifier.toLowerCase().startsWith("rfc")) ? "rfc" + prefixedIdentifier : prefixedIdentifier;
+        }
 
         URIBuilder uriBuilder = new URIBuilder("https://datatracker.ietf.org/doc/" + prefixedIdentifier + "/bibtex/");
 

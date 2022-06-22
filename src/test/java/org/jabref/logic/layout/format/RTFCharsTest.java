@@ -5,6 +5,8 @@ import org.jabref.logic.layout.LayoutFormatter;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -128,6 +130,59 @@ class RTFCharsTest {
         assertEquals("\\u182P", formatter.format("{\\P}")); // ¶
         assertEquals("\\u169?", formatter.format("{\\copyright}")); // ©
         assertEquals("\\u163?", formatter.format("{\\pounds}")); // £
+    }
+
+    @ParameterizedTest(name = "specialChar={0}, formattedStr={1}")
+    @CsvSource({
+            "ÀÁÂÃÄĀĂĄ, \\u192A\\u193A\\u194A\\u195A\\u196A\\u256A\\u258A\\u260A", // A
+            "àáâãäåāăą, \\u224a\\u225a\\u226a\\u227a\\u228a\\u229a\\u257a\\u259a\\u261a", // a
+            "ÇĆĈĊČ, \\u199C\\u262C\\u264C\\u266C\\u268C", // C
+            "çćĉċč, \\u231c\\u263c\\u265c\\u267c\\u269c", // c
+            "ÐĐ, \\u208D\\u272D", // D
+            "ðđ, \\u240d\\u273d", // d
+            "ÈÉÊËĒĔĖĘĚ, \\u200E\\u201E\\u202E\\u203E\\u274E\\u276E\\u278E\\u280E\\u282E", // E
+            "èéêëēĕėęě, \\u232e\\u233e\\u234e\\u235e\\u275e\\u277e\\u279e\\u281e\\u283e", // e
+            "ĜĞĠĢŊ, \\u284G\\u286G\\u288G\\u290G\\u330G", // G
+            "ĝğġģŋ, \\u285g\\u287g\\u289g\\u291g\\u331g", // g
+            "ĤĦ, \\u292H\\u294H", // H
+            "ĥħ, \\u293h\\u295h", // h
+            "ÌÍÎÏĨĪĬĮİ, \\u204I\\u205I\\u206I\\u207I\\u296I\\u298I\\u300I\\u302I\\u304I", // I
+            "ìíîïĩīĭį, \\u236i\\u237i\\u238i\\u239i\\u297i\\u299i\\u301i\\u303i", // i
+            "Ĵ, \\u308J", // J
+            "ĵ, \\u309j", // j
+            "Ķ, \\u310K", // K
+            "ķ, \\u311k", // k
+            "ĹĻĿ, \\u313L\\u315L\\u319L", // L
+            "ĺļŀł, \\u314l\\u316l\\u320l\\u322l", // l
+            "ÑŃŅŇ, \\u209N\\u323N\\u325N\\u327N", // N
+            "ñńņň, \\u241n\\u324n\\u326n\\u328n", // n
+            "ÒÓÔÕÖØŌŎ, \\u210O\\u211O\\u212O\\u213O\\u214O\\u216O\\u332O\\u334O", // O
+            "òóôõöøōŏ, \\u242o\\u243o\\u244o\\u245o\\u246o\\u248o\\u333o\\u335o", // o
+            "ŔŖŘ, \\u340R\\u342R\\u344R", // R
+            "ŕŗř, \\u341r\\u343r\\u345r", // r
+            "ŚŜŞŠ, \\u346S\\u348S\\u350S\\u352S", // S
+            "śŝşš, \\u347s\\u349s\\u351s\\u353s", // s
+            "ŢŤŦ, \\u354T\\u356T\\u358T", // T
+            "ţŧ, \\u355t\\u359t", // t
+            "ÙÚÛÜŨŪŬŮŲ, \\u217U\\u218U\\u219U\\u220U\\u360U\\u362U\\u364U\\u366U\\u370U", // U
+            "ùúûũūŭůų, \\u249u\\u250u\\u251u\\u361u\\u363u\\u365u\\u367u\\u371u", // u
+            "Ŵ, \\u372W", // W
+            "ŵ, \\u373w", // w
+            "ŶŸÝ, \\u374Y\\u376Y\\u221Y", // Y
+            "ŷÿ, \\u375y\\u255y", // y
+            "ŹŻŽ, \\u377Z\\u379Z\\u381Z", // Z
+            "źżž, \\u378z\\u380z\\u382z", // z
+            "Æ, \\u198AE", // AE
+            "æ, \\u230ae", // ae
+            "Œ, \\u338OE", // OE
+            "œ, \\u339oe", // oe
+            "Þ, \\u222TH", // TH
+            "ß, \\u223ss", // ss
+            "¡, \\u161!" // !
+    })
+    public void testMoreSpecialCharacters(String specialChar, String expectedResult) {
+        String formattedStr = formatter.format(specialChar);
+        assertEquals(expectedResult, formattedStr);
     }
 
     @Test

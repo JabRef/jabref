@@ -270,7 +270,7 @@ public class HTMLUnicodeConversionMaps {
             {"957", "nu", "$\\nu$"}, // greek small letter nu, U+03BD ISOgrk3
             {"958", "xi", "$\\xi$"}, // greek small letter xi, U+03BE ISOgrk3
             {"959", "omicron", "$\\omicron$"}, // greek small letter omicron, U+03BF NEW
-            {"960", "pi", "$\\phi$"}, // greek small letter pi, U+03C0 ISOgrk3
+            {"960", "pi", "$\\pi$"}, // greek small letter pi, U+03C0 ISOgrk3
             {"961", "rho", "$\\rho$"}, // greek small letter rho, U+03C1 ISOgrk3
             {"962", "sigmaf", "$\\varsigma$"}, // greek small letter final sigma,
             //                                   U+03C2 ISOgrk3
@@ -760,8 +760,8 @@ public class HTMLUnicodeConversionMaps {
             {"64259", "", "ffi"}, // ffi ligature (which LaTeX solves by itself)
             {"64260", "", "ffl"}, // ffl ligature (which LaTeX solves by itself)
             {"119978", "Oscr", "$\\mathcal{O}$"}, // script capital O -- possibly use \mathscr
-            {"119984", "Uscr", "$\\mathcal{U}$"} // script capital U -- possibly use \mathscr
-
+            {"119984", "Uscr", "$\\mathcal{U}$"}, // script capital U -- possibly use \mathscr
+            {"120598", "", "$\\epsilon$"}, // mathematical italic epsilon U+1D716 -- requires amsmath
     };
 
     // List of combining accents

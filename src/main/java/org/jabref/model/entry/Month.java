@@ -2,6 +2,7 @@ package org.jabref.model.entry;
 
 import java.util.Optional;
 
+import org.jabref.logic.bibtex.FieldWriter;
 import org.jabref.model.strings.StringUtil;
 
 /**
@@ -108,9 +109,9 @@ public enum Month {
      *
      * @param value a String that represents a month in German form
      * @return the corresponding month instance, empty if input is not in German
-     *         form
+     * form
      */
-    private static Optional<Month> parseGermanShortMonth(String value) {
+    static Optional<Month> parseGermanShortMonth(String value) {
         value = value.toLowerCase();
         switch (value) {
             case "jan":
@@ -165,9 +166,9 @@ public enum Month {
     }
 
     /**
-     * Returns the month in JabRef format. The format is the short 3-digit name surrounded by a '#'.
+     * Returns the month in JabRef format. The format is the short 3-digit name surrounded by a '#' (FieldWriter.BIBTEX_STRING_START_END_SYMBOL).
      * Example: #jan#, #feb#, etc.
-     *
+     * <p>
      * See <a href="https://github.com/JabRef/jabref/issues/263#issuecomment-151246595">Issue 263</a> for a discussion on that thing.
      * This seems to be an <em>invalid</em> format in terms of plain BiBTeX, but a <em>valid</em> format in the case of JabRef.
      * The documentation is available at the <a href="https://docs.jabref.org/fields/strings">Strings help</a> of JabRef.
@@ -175,7 +176,7 @@ public enum Month {
      * @return Month in JabRef format
      */
     public String getJabRefFormat() {
-        return String.format("#%s#", shortName);
+        return String.format(FieldWriter.BIBTEX_STRING_START_END_SYMBOL + "%s" + FieldWriter.BIBTEX_STRING_START_END_SYMBOL, shortName);
     }
 
     /**

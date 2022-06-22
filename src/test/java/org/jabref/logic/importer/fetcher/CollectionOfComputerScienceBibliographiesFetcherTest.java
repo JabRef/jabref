@@ -10,12 +10,15 @@ import java.util.stream.Collectors;
 
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.logic.importer.fetcher.transformers.AbstractQueryTransformer;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.testutils.category.FetcherTest;
 
+import org.apache.lucene.queryparser.flexible.core.QueryNodeParseException;
+import org.apache.lucene.queryparser.flexible.standard.parser.StandardSyntaxParser;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Answers;
@@ -41,29 +44,15 @@ class CollectionOfComputerScienceBibliographiesFetcherTest {
     }
 
     @Test
-    public void getUrlForQueryReturnsCorrectUrl() throws MalformedURLException, URISyntaxException, FetcherException {
+    public void getUrlForQueryReturnsCorrectUrl() throws MalformedURLException, URISyntaxException, FetcherException, QueryNodeParseException {
         String query = "java jdk";
-        URL url = fetcher.getURLForQuery(query);
+        URL url = fetcher.getURLForQuery(new StandardSyntaxParser().parse(query, AbstractQueryTransformer.NO_EXPLICIT_FIELD));
         assertEquals("http://liinwww.ira.uka.de/bibliography/rss?query=java+jdk&sort=score", url.toString());
     }
 
     @Test
     public void performSearchReturnsMatchingMultipleEntries() throws FetcherException {
         List<BibEntry> searchResult = fetcher.performSearch("jabref");
-
-        BibEntry firstBibEntry = new BibEntry(StandardEntryType.InProceedings)
-                .withCitationKey("conf/ecsa/OlssonEW17")
-                .withField(StandardField.AUTHOR, "Tobias Olsson and Morgan Ericsson and Anna Wingkvist")
-                .withField(StandardField.EDITOR, "Rog{\\'e}rio de Lemos")
-                .withField(StandardField.ISBN, "978-1-4503-5217-8")
-                .withField(StandardField.PAGES, "152--158")
-                .withField(StandardField.PUBLISHER, "ACM")
-                .withField(StandardField.TITLE, "The relationship of code churn and architectural violations in the open source software JabRef")
-                .withField(StandardField.URL, "http://dl.acm.org/citation.cfm?id=3129790")
-                .withField(StandardField.YEAR, "2017")
-                .withField(StandardField.BOOKTITLE, "11th European Conference on Software Architecture, ECSA 2017, Companion Proceedings, Canterbury, United Kingdom, September 11-15, 2017")
-                .withField(new UnknownField("bibsource"), "DBLP, http://dblp.uni-trier.de/https://doi.org/10.1145/3129790.3129810; DBLP, http://dblp.uni-trier.de/db/conf/ecsa/ecsa2017c.html#OlssonEW17")
-                .withField(new UnknownField("bibdate"), "2018-11-06");
 
         BibEntry secondBibEntry = new BibEntry(StandardEntryType.Article)
                 .withCitationKey("oai:DiVA.org:lnu-68408")
@@ -109,9 +98,9 @@ class CollectionOfComputerScienceBibliographiesFetcherTest {
                 .withField(StandardField.YEAR, "2017");
 
         // Checking a subset, because the query "jabref" is generic and returns a changing result set
-        assertEquals(Set.of(firstBibEntry, secondBibEntry), searchResult.stream().filter(bibEntry -> {
+        assertEquals(Set.of(secondBibEntry), searchResult.stream().filter(bibEntry -> {
             String citeKey = bibEntry.getCitationKey().get();
-            return (citeKey.equals(firstBibEntry.getCitationKey().get()) || citeKey.equals(secondBibEntry.getCitationKey().get()));
+            return citeKey.equals(secondBibEntry.getCitationKey().get());
         }).collect(Collectors.toSet()));
     }
 

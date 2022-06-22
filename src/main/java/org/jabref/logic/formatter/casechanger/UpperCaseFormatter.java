@@ -3,6 +3,9 @@ package org.jabref.logic.formatter.casechanger;
 import org.jabref.logic.cleanup.Formatter;
 import org.jabref.logic.l10n.Localization;
 
+/**
+ * Converts all characters of the given string to upper case, but does not change words starting with "{"
+ */
 public class UpperCaseFormatter extends Formatter {
 
     @Override
@@ -15,9 +18,6 @@ public class UpperCaseFormatter extends Formatter {
         return "upper_case";
     }
 
-    /**
-     * Converts all characters of the given string to upper case, but does not change words starting with "{"
-     */
     @Override
     public String format(String input) {
         Title title = new Title(input);

@@ -3,6 +3,7 @@ package org.jabref.logic.importer.fetcher;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.StringJoiner;
 import java.util.stream.Collectors;
 
 import org.jabref.logic.importer.ImportCleanup;
@@ -31,10 +32,10 @@ interface SearchBasedFetcherCapabilityTest {
      */
     @Test
     default void supportsAuthorSearch() throws Exception {
-        ComplexSearchQuery.ComplexSearchQueryBuilder builder = ComplexSearchQuery.builder();
-        getTestAuthors().forEach(builder::author);
+        StringJoiner queryBuilder = new StringJoiner("\" AND author:\"", "author:\"", "\"");
+        getTestAuthors().forEach(queryBuilder::add);
 
-        List<BibEntry> result = getFetcher().performSearch(builder.build());
+        List<BibEntry> result = getFetcher().performSearch(queryBuilder.toString());
         new ImportCleanup(BibDatabaseMode.BIBTEX).doPostCleanup(result);
 
         assertFalse(result.isEmpty());
@@ -51,12 +52,7 @@ interface SearchBasedFetcherCapabilityTest {
      */
     @Test
     default void supportsYearSearch() throws Exception {
-        ComplexSearchQuery complexSearchQuery = ComplexSearchQuery
-                .builder()
-                .singleYear(getTestYear())
-                .build();
-
-        List<BibEntry> result = getFetcher().performSearch(complexSearchQuery);
+        List<BibEntry> result = getFetcher().performSearch("year:" + getTestYear());
         new ImportCleanup(BibDatabaseMode.BIBTEX).doPostCleanup(result);
         List<String> differentYearsInResult = result.stream()
                                                     .map(bibEntry -> bibEntry.getField(StandardField.YEAR))
@@ -73,11 +69,9 @@ interface SearchBasedFetcherCapabilityTest {
      */
     @Test
     default void supportsYearRangeSearch() throws Exception {
-        ComplexSearchQuery.ComplexSearchQueryBuilder builder = ComplexSearchQuery.builder();
         List<String> yearsInYearRange = List.of("2018", "2019", "2020");
-        builder.fromYearAndToYear(2018, 2020);
 
-        List<BibEntry> result = getFetcher().performSearch(builder.build());
+        List<BibEntry> result = getFetcher().performSearch("year-range:2018-2020");
         new ImportCleanup(BibDatabaseMode.BIBTEX).doPostCleanup(result);
         List<String> differentYearsInResult = result.stream()
                                                     .map(bibEntry -> bibEntry.getField(StandardField.YEAR))
@@ -94,13 +88,12 @@ interface SearchBasedFetcherCapabilityTest {
      */
     @Test
     default void supportsJournalSearch() throws Exception {
-        ComplexSearchQuery.ComplexSearchQueryBuilder builder = ComplexSearchQuery.builder();
-        builder.journal(getTestJournal());
-        List<BibEntry> result = getFetcher().performSearch(builder.build());
+        List<BibEntry> result = getFetcher().performSearch("journal:\"" + getTestJournal() + "\"");
         new ImportCleanup(BibDatabaseMode.BIBTEX).doPostCleanup(result);
 
         assertFalse(result.isEmpty());
         result.forEach(bibEntry -> {
+            assertTrue(bibEntry.hasField(StandardField.JOURNAL));
             String journal = bibEntry.getField(StandardField.JOURNAL).orElse("");
             assertTrue(journal.contains(getTestJournal().replace("\"", "")));
         });

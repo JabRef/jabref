@@ -10,6 +10,7 @@ import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.jabref.logic.JabRefException;
 import org.jabref.logic.WatchServiceUnavailableException;
@@ -25,22 +26,22 @@ import org.slf4j.LoggerFactory;
  * This class monitors a set of files for changes. Upon detecting a change it notifies the registered {@link
  * FileUpdateListener}s.
  * <p>
- * Implementation based on https://stackoverflow.com/questions/16251273/can-i-watch-for-single-file-change-with-watchservice-not-the-whole-directory
+ * Implementation based on <a href="https://stackoverflow.com/questions/16251273/can-i-watch-for-single-file-change-with-watchservice-not-the-whole-directory">https://stackoverflow.com/questions/16251273/can-i-watch-for-single-file-change-with-watchservice-not-the-whole-directory</a>.
  */
 public class DefaultFileUpdateMonitor implements Runnable, FileUpdateMonitor {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultFileUpdateMonitor.class);
 
     private final Multimap<Path, FileUpdateListener> listeners = ArrayListMultimap.create(20, 4);
-    private WatchService watcher;
+    private volatile WatchService watcher;
     private final AtomicBoolean notShutdown = new AtomicBoolean(true);
-    private Optional<JabRefException> filesystemMonitorFailure;
+    private final AtomicReference<Optional<JabRefException>> filesystemMonitorFailure = new AtomicReference<>(Optional.empty());
 
     @Override
     public void run() {
         try (WatchService watcher = FileSystems.getDefault().newWatchService()) {
             this.watcher = watcher;
-            filesystemMonitorFailure = Optional.empty();
+            filesystemMonitorFailure.set(Optional.empty());
 
             while (notShutdown.get()) {
                 WatchKey key;
@@ -56,8 +57,8 @@ public class DefaultFileUpdateMonitor implements Runnable, FileUpdateMonitor {
                     if (kind == StandardWatchEventKinds.OVERFLOW) {
                         Thread.yield();
                         continue;
-                    } else if (kind == StandardWatchEventKinds.ENTRY_MODIFY) {
-                        // We only handle "ENTRY_MODIFY" here, so the context is always a Path
+                    } else if (kind == StandardWatchEventKinds.ENTRY_CREATE || kind == StandardWatchEventKinds.ENTRY_MODIFY) {
+                        // We only handle "ENTRY_CREATE" and "ENTRY_MODIFY" here, so the context is always a Path
                         @SuppressWarnings("unchecked")
                         WatchEvent<Path> ev = (WatchEvent<Path>) event;
                         Path path = ((Path) key.watchable()).resolve(ev.context());
@@ -68,15 +69,16 @@ public class DefaultFileUpdateMonitor implements Runnable, FileUpdateMonitor {
                 Thread.yield();
             }
         } catch (IOException e) {
-            filesystemMonitorFailure = Optional.of(new WatchServiceUnavailableException(e.getMessage(),
-                                                                                        e.getLocalizedMessage(), e.getCause()));
-            LOGGER.warn(filesystemMonitorFailure.get().getLocalizedMessage(), e);
+            JabRefException exception = new WatchServiceUnavailableException(
+                    e.getMessage(), e.getLocalizedMessage(), e.getCause());
+            filesystemMonitorFailure.set(Optional.of(exception));
+            LOGGER.warn(exception.getLocalizedMessage(), e);
         }
     }
 
     @Override
     public boolean isActive() {
-        return filesystemMonitorFailure.isEmpty();
+        return filesystemMonitorFailure.get().isEmpty();
     }
 
     private void notifyAboutChange(Path path) {
@@ -88,8 +90,10 @@ public class DefaultFileUpdateMonitor implements Runnable, FileUpdateMonitor {
         if (isActive()) {
             // We can't watch files directly, so monitor their parent directory for updates
             Path directory = file.toAbsolutePath().getParent();
-            directory.register(watcher, StandardWatchEventKinds.ENTRY_MODIFY);
+            directory.register(watcher, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_MODIFY);
             listeners.put(file, listener);
+        } else {
+            LOGGER.warn("Not adding listener {} to file {} because the file update monitor isn't active", listener, file);
         }
     }
 
@@ -102,10 +106,12 @@ public class DefaultFileUpdateMonitor implements Runnable, FileUpdateMonitor {
     public void shutdown() {
         try {
             notShutdown.set(false);
-            watcher.close();
+            WatchService watcher = this.watcher;
+            if (watcher != null) {
+                watcher.close();
+            }
         } catch (IOException e) {
             LOGGER.error("error closing watcher", e);
         }
-
     }
 }

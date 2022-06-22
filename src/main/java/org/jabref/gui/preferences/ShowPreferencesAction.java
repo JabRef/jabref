@@ -1,8 +1,11 @@
 package org.jabref.gui.preferences;
 
+import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.util.TaskExecutor;
+
+import com.airhacks.afterburner.injection.Injector;
 
 public class ShowPreferencesAction extends SimpleCommand {
 
@@ -16,6 +19,7 @@ public class ShowPreferencesAction extends SimpleCommand {
 
     @Override
     public void execute() {
-        new PreferencesDialogView(jabRefFrame).show();
+        DialogService dialogService = Injector.instantiateModelOrService(DialogService.class);
+        dialogService.showCustomDialog(new PreferencesDialogView(jabRefFrame));
     }
 }

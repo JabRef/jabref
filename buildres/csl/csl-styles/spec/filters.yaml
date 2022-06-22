@@ -1,0 +1,88 @@
+# These ISSNs are ignored when checking for duplicate ISSNs
+ISSN:
+- 1662-453X
+- 1663-9812
+- 1664-042X
+- 1664-0640
+- 1664-1078
+- 1664-2295
+- 1664-2392
+- 1664-302X
+- 1664-3224
+- 1664-462X
+- 1664-8021
+- 2234-943X
+- 0036-8075
+- 1095-9203
+- 1359-4184
+- 1476-5578
+- 1097-6256
+- 1047-7594
+- 1546-1726
+- 2108-6419
+- 0035-2969
+- 1958-5691
+- 0943-8610
+- 2194-508X
+- 0223-5099
+- 0322-8916
+- 1805-6555
+- 1899-0665
+- 0305-1048
+- 1362-4962
+- 0042-7306
+- 1783-1830
+- 1438-5627
+- 0353-6483
+- 1855-8399
+- 0001-4966
+- 1520-8524
+- 1161-9473
+- 2496-7114
+
+# These titles are ignored when checking for duplicate titles
+TITLES: []
+# - example title 1
+# - example title 2
+
+# These styles are ignored when checking for valid citation-formats
+CITATION_FORMAT:
+- bibtex
+- blank
+- national-archives-of-australia
+
+# These styles are ignored when checking for unused macros
+UNUSED_MACROS:
+- apa-annotated-bibliography
+- apa-cv
+- apa-numeric-superscript
+- apa-numeric-superscript-brackets
+- apa-with-abstract
+- chicago-annotated-bibliography
+- chicago-author-date
+- chicago-author-date-16th-edition
+- chicago-library-list
+- chicago-note-bibliography-16th-edition
+- chicago-note-bibliography-with-ibid
+- chicago-note-bibliography
+- taylor-and-francis-chicago-author-date
+- turabian-author-date
+
+# These files and directories are ignored when checking for extra files
+EXTRA_FILES:
+- CONTRIBUTING.md
+- Gemfile
+- Gemfile.lock
+- README.md
+- dependent
+- Rakefile
+- renamed-styles.json
+- REQUESTING.md
+- STYLE_DEVELOPMENT.md
+- STYLE_REQUIREMENTS.md
+- QUALITY_CONTROL.md
+
+# These directories and their contents are ignored when checking for extra files
+EXTRA_FILES_DIRECTORY:
+- spec
+- vendor

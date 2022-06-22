@@ -10,8 +10,8 @@ import java.util.Locale;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
+import org.jabref.gui.DialogService;
 import org.jabref.gui.Globals;
-import org.jabref.gui.JabRefGUI;
 import org.jabref.gui.desktop.os.DefaultDesktop;
 import org.jabref.gui.desktop.os.Linux;
 import org.jabref.gui.desktop.os.NativeDesktop;
@@ -19,14 +19,16 @@ import org.jabref.gui.desktop.os.OSX;
 import org.jabref.gui.desktop.os.Windows;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
+import org.jabref.logic.importer.util.IdentifierParser;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.OS;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.identifier.ArXivIdentifier;
 import org.jabref.model.entry.identifier.DOI;
-import org.jabref.model.entry.identifier.Eprint;
 import org.jabref.model.util.FileHelper;
+import org.jabref.preferences.PreferencesService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,13 +50,16 @@ public class JabRefDesktop {
     /**
      * Open a http/pdf/ps viewer for the given link string.
      */
-    public static void openExternalViewer(BibDatabaseContext databaseContext, String initialLink, Field initialField)
+    public static void openExternalViewer(BibDatabaseContext databaseContext,
+                                          PreferencesService preferencesService,
+                                          String initialLink,
+                                          Field initialField)
             throws IOException {
         String link = initialLink;
         Field field = initialField;
         if (StandardField.PS.equals(field) || StandardField.PDF.equals(field)) {
             // Find the default directory for this field type:
-            List<Path> directories = databaseContext.getFileDirectories(Globals.prefs.getFilePreferences());
+            List<Path> directories = databaseContext.getFileDirectories(preferencesService.getFilePreferences());
 
             Optional<Path> file = FileHelper.find(link, directories);
 
@@ -78,7 +83,12 @@ public class JabRefDesktop {
             openDoi(link);
             return;
         } else if (StandardField.EPRINT.equals(field)) {
-            link = Eprint.build(link).map(Eprint::getURIAsASCIIString).orElse(link);
+            link = ArXivIdentifier.parse(link)
+                                  .map(ArXivIdentifier::getExternalURI)
+                                  .filter(Optional::isPresent)
+                                  .map(Optional::get)
+                                  .map(URI::toASCIIString)
+                                  .orElse(link);
             // should be opened in browser
             field = StandardField.URL;
         }
@@ -107,6 +117,19 @@ public class JabRefDesktop {
         openBrowser(link);
     }
 
+    public static void openCustomDoi(String link, PreferencesService preferences, DialogService dialogService) {
+        IdentifierParser.parse(StandardField.DOI, link)
+                        .map(identifier -> (DOI) identifier)
+                        .flatMap(doi -> doi.getExternalURIWithCustomBase(preferences.getDOIPreferences().getDefaultBaseURI()))
+                        .ifPresent(uri -> {
+                            try {
+                                JabRefDesktop.openBrowser(uri);
+                            } catch (IOException e) {
+                                dialogService.showErrorDialogAndWait(Localization.lang("Unable to open link."), e);
+                            }
+                        });
+    }
+
     /**
      * Open an external file, attempting to use the correct viewer for it.
      *
@@ -114,7 +137,9 @@ public class JabRefDesktop {
      * @param link            The filename.
      * @return false if the link couldn't be resolved, true otherwise.
      */
-    public static boolean openExternalFileAnyFormat(final BibDatabaseContext databaseContext, String link,
+    public static boolean openExternalFileAnyFormat(final BibDatabaseContext databaseContext,
+                                                    PreferencesService preferencesService,
+                                                    String link,
                                                     final Optional<ExternalFileType> type)
             throws IOException {
 
@@ -123,7 +148,7 @@ public class JabRefDesktop {
             return true;
         }
 
-        Optional<Path> file = FileHelper.find(databaseContext, link, Globals.prefs.getFilePreferences());
+        Optional<Path> file = FileHelper.find(databaseContext, link, preferencesService.getFilePreferences());
         if (file.isPresent() && Files.exists(file.get())) {
             // Open the file:
             String filePath = file.get().toString();
@@ -158,17 +183,17 @@ public class JabRefDesktop {
      * @param fileLink the location of the file
      * @throws IOException if the default file browser cannot be opened
      */
-    public static void openFolderAndSelectFile(Path fileLink) throws IOException {
+    public static void openFolderAndSelectFile(Path fileLink, PreferencesService preferencesService, DialogService dialogService) throws IOException {
         if (fileLink == null) {
             return;
         }
 
-        boolean useCustomFileBrowser = Globals.prefs.getExternalApplicationsPreferences().useCustomFileBrowser();
+        boolean useCustomFileBrowser = preferencesService.getExternalApplicationsPreferences().useCustomFileBrowser();
         if (!useCustomFileBrowser) {
             NATIVE_DESKTOP.openFolderAndSelectFile(fileLink);
         } else {
             String absolutePath = fileLink.toAbsolutePath().getParent().toString();
-            String command = Globals.prefs.getExternalApplicationsPreferences().getCustomFileBrowserCommand();
+            String command = preferencesService.getExternalApplicationsPreferences().getCustomFileBrowserCommand();
             if (!command.isEmpty()) {
                 command = command.replaceAll("\\s+", " "); // normalize white spaces
 
@@ -182,7 +207,7 @@ public class JabRefDesktop {
                     new ProcessBuilder(subcommands).start();
                 } catch (IOException exception) {
                     LOGGER.error("Open File Browser", exception);
-                    JabRefGUI.getMainFrame().getDialogService().notify(Localization.lang("Error occured while executing the command \"%0\".", command));
+                    dialogService.notify(Localization.lang("Error occured while executing the command \"%0\".", command));
                 }
             }
         }
@@ -203,12 +228,11 @@ public class JabRefDesktop {
     }
 
     /**
-     * Opens the url with the users standard Browser.
-     * If that fails a popup will be shown to instruct the user to open the link manually
-     * and the link gets copied to the clipboard
+     * Opens the url with the users standard Browser. If that fails a popup will be shown to instruct the user to open the link manually and the link gets copied to the clipboard
+     *
      * @param url the URL to open
      */
-    public static void openBrowserShowPopup(String url) {
+    public static void openBrowserShowPopup(String url, DialogService dialogService) {
         try {
             openBrowser(url);
         } catch (IOException exception) {
@@ -217,8 +241,8 @@ public class JabRefDesktop {
             String couldNotOpenBrowser = Localization.lang("Could not open browser.");
             String openManually = Localization.lang("Please open %0 manually.", url);
             String copiedToClipboard = Localization.lang("The link has been copied to the clipboard.");
-            JabRefGUI.getMainFrame().getDialogService().notify(couldNotOpenBrowser);
-            JabRefGUI.getMainFrame().getDialogService().showErrorDialogAndWait(couldNotOpenBrowser, couldNotOpenBrowser + "\n" + openManually + "\n" + copiedToClipboard);
+            dialogService.notify(couldNotOpenBrowser);
+            dialogService.showErrorDialogAndWait(couldNotOpenBrowser, couldNotOpenBrowser + "\n" + openManually + "\n" + copiedToClipboard);
         }
     }
 
@@ -228,19 +252,20 @@ public class JabRefDesktop {
      * If no command is specified in {@link Globals}, the default system console will be executed.
      *
      * @param file Location the console should be opened at.
+     * @param dialogService
      */
-    public static void openConsole(File file) throws IOException {
+    public static void openConsole(File file, PreferencesService preferencesService, DialogService dialogService) throws IOException {
         if (file == null) {
             return;
         }
 
         String absolutePath = file.toPath().toAbsolutePath().getParent().toString();
 
-        boolean useCustomTerminal = Globals.prefs.getExternalApplicationsPreferences().useCustomTerminal();
+        boolean useCustomTerminal = preferencesService.getExternalApplicationsPreferences().useCustomTerminal();
         if (!useCustomTerminal) {
-            NATIVE_DESKTOP.openConsole(absolutePath);
+            NATIVE_DESKTOP.openConsole(absolutePath, dialogService);
         } else {
-            String command = Globals.prefs.getExternalApplicationsPreferences().getCustomTerminalCommand();
+            String command = preferencesService.getExternalApplicationsPreferences().getCustomTerminalCommand();
             command = command.trim();
 
             if (!command.isEmpty()) {
@@ -250,14 +275,14 @@ public class JabRefDesktop {
                 String[] subcommands = command.split(" ");
 
                 LOGGER.info("Executing command \"" + command + "\"...");
-                JabRefGUI.getMainFrame().getDialogService().notify(Localization.lang("Executing command \"%0\"...", command));
+                dialogService.notify(Localization.lang("Executing command \"%0\"...", command));
 
                 try {
                     new ProcessBuilder(subcommands).start();
                 } catch (IOException exception) {
                     LOGGER.error("Open console", exception);
 
-                    JabRefGUI.getMainFrame().getDialogService().notify(Localization.lang("Error occured while executing the command \"%0\".", command));
+                   dialogService.notify(Localization.lang("Error occured while executing the command \"%0\".", command));
                 }
             }
         }

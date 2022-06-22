@@ -11,6 +11,10 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import javafx.beans.binding.Bindings;
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleStringProperty;
+
 import org.jabref.gui.DialogService;
 import org.jabref.gui.Globals;
 import org.jabref.gui.JabRefExecutorService;
@@ -41,6 +45,9 @@ public class DuplicateSearch extends SimpleCommand {
     private final AtomicBoolean libraryAnalyzed = new AtomicBoolean();
     private final AtomicBoolean autoRemoveExactDuplicates = new AtomicBoolean();
     private final AtomicInteger duplicateCount = new AtomicInteger();
+    private final SimpleStringProperty duplicateCountObservable = new SimpleStringProperty();
+    private final SimpleStringProperty duplicateTotal = new SimpleStringProperty();
+    private final SimpleIntegerProperty duplicateProgress = new SimpleIntegerProperty(0);
     private final DialogService dialogService;
     private final StateManager stateManager;
 
@@ -67,6 +74,8 @@ public class DuplicateSearch extends SimpleCommand {
             return;
         }
 
+        duplicateCountObservable.addListener((obj, oldValue, newValue) -> DefaultTaskExecutor.runAndWaitInJavaFXThread(() -> duplicateTotal.set(newValue)));
+
         JabRefExecutorService.INSTANCE.executeInterruptableTask(() -> searchPossibleDuplicates(entries, database.getMode()), "DuplicateSearcher");
         BackgroundTask.wrap(this::verifyDuplicates)
                       .onSuccess(this::handleDuplicates)
@@ -85,7 +94,7 @@ public class DuplicateSearch extends SimpleCommand {
 
                 if (new DuplicateCheck(Globals.entryTypesManager).isDuplicate(first, second, databaseMode)) {
                     duplicates.add(Arrays.asList(first, second));
-                    duplicateCount.getAndIncrement();
+                    duplicateCountObservable.set(String.valueOf(duplicateCount.incrementAndGet()));
                 }
             }
         }
@@ -96,6 +105,8 @@ public class DuplicateSearch extends SimpleCommand {
         DuplicateSearchResult result = new DuplicateSearchResult();
 
         while (!libraryAnalyzed.get() || !duplicates.isEmpty()) {
+            duplicateProgress.set(duplicateProgress.getValue() + 1);
+
             List<BibEntry> dups;
             try {
                 // poll with timeout in case the library is not analyzed completely, but contains no more duplicates
@@ -131,9 +142,12 @@ public class DuplicateSearch extends SimpleCommand {
     }
 
     private void askResolveStrategy(DuplicateSearchResult result, BibEntry first, BibEntry second, DuplicateResolverType resolverType) {
-        DuplicateResolverDialog dialog = new DuplicateResolverDialog(first, second, resolverType, frame.getCurrentLibraryTab().getBibDatabaseContext(), stateManager);
+        DuplicateResolverDialog dialog = new DuplicateResolverDialog(first, second, resolverType, frame.getCurrentLibraryTab().getBibDatabaseContext(), stateManager, dialogService);
 
-        DuplicateResolverResult resolverResult = dialog.showAndWait().orElse(DuplicateResolverResult.BREAK);
+        dialog.titleProperty().bind(Bindings.concat(dialog.getTitle()).concat(" (").concat(duplicateProgress.getValue()).concat("/").concat(duplicateTotal).concat(")"));
+
+        DuplicateResolverResult resolverResult = dialogService.showCustomDialogAndWait(dialog)
+                                                              .orElse(DuplicateResolverResult.BREAK);
 
         if ((resolverResult == DuplicateResolverResult.KEEP_LEFT)
                 || (resolverResult == DuplicateResolverResult.AUTOREMOVE_EXACT)) {
@@ -170,6 +184,8 @@ public class DuplicateSearch extends SimpleCommand {
             libraryTab.getDatabase().insertEntries(result.getToAdd());
             libraryTab.markBaseChanged();
         }
+
+        duplicateProgress.set(0);
 
         dialogService.notify(Localization.lang("Duplicates found") + ": " + duplicateCount.get() + ' '
                 + Localization.lang("pairs processed") + ": " + result.getDuplicateCount());

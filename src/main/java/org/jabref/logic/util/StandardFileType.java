@@ -10,49 +10,61 @@ import org.jabref.model.util.OptionalUtil;
  */
 public enum StandardFileType implements FileType {
 
-    BIBTEXML("bibx", "xml"),
-    ENDNOTE("ref", "enw"),
-    ISI("isi", "txt"),
-    MEDLINE("nbib", "xml"),
-    MEDLINE_PLAIN("nbib", "txt"),
-    PUBMED("fcgi"),
-    SILVER_PLATTER("dat", "txt"),
+    BIBTEXML("BibTeXML", "bibx", "xml"),
+    ENDNOTE("Endnote", "ref", "enw"),
+    ISI("Isi", "isi", "txt"),
+    MEDLINE("Medline", "nbib", "xml"),
+    MEDLINE_PLAIN("Medline Plain", "nbib", "txt"),
+    PUBMED("Pubmed", "fcgi"),
+    SILVER_PLATTER("SilverPlatter", "dat", "txt"),
+    AUX("Aux file", "aux"),
+    BIBTEX_DB("Bibtex library", "bib"),
+    CITATION_STYLE("Citation Style", "csl"),
+    CLASS("Class file", "class"),
+    CSV("CSV", "csv"),
+    HTML("HTML", "html", "htm"),
+    JAR("JAR", "jar"),
+    JAVA_KEYSTORE("Java Keystore", "jks"),
+    JSTYLE("LibreOffice layout style", "jstyle"),
+    LAYOUT("Custom Exporter format", "layout"),
+    ODS("OpenOffice Calc", "ods"),
+    PDF("PDF", "pdf"),
+    RIS("RIS", "ris"),
+    TERMS("Protected terms", "terms"),
+    TXT("Plain Text", "txt"),
+    RDF("RDF", "rdf"),
+    RTF("RTF", "rtf"),
+    SXC("Open Office Calc 1.x", "sxc"),
+    TEX("LaTeX", "tex"),
+    XML("XML", "xml"),
+    JSON("JSON", "json"),
+    XMP("XMP", "xmp"),
+    ZIP("Zip Archive", "zip"),
+    CSS("CSS Styleshet", "css"),
+    YAML("YAML Markup", "yaml"),
+    CFF("CFF", "cff"),
+    ANY_FILE("Any", "*"),
+    CER("SSL Certificate", "cer"),
+    CITAVI("Citavi", "ctv6bak", "ctv5bak");
 
-    AUX("aux"),
-    BIBTEX_DB("bib"),
-    CITATION_STYLE("csl"),
-    CLASS("class"),
-    CSV("csv"),
-    HTML("html", "htm"),
-    JAR("jar"),
-    JAVA_KEYSTORE("jks"),
-    JSTYLE("jstyle"),
-    LAYOUT("layout"),
-    ODS("ods"),
-    PDF("pdf"),
-    RIS("ris"),
-    TERMS("terms"),
-    TXT("txt"),
-    RDF("rdf"),
-    RTF("rtf"),
-    SXC("sxc"),
-    TEX("tex"),
-    XML("xml"),
-    JSON("json"),
-    XMP("xmp"),
-    ZIP("zip"),
-    CSS("css"),
-    YAML("yaml");
+
 
     private final List<String> extensions;
+    private final String name;
 
-    StandardFileType(String... extensions) {
+    StandardFileType(String name, String... extensions) {
         this.extensions = Arrays.asList(extensions);
+        this.name = name;
     }
 
     @Override
     public List<String> getExtensions() {
         return extensions;
+    }
+
+    @Override
+    public String getName() {
+        return this.name;
     }
 
     public static FileType fromExtensions(String... extensions) {
@@ -61,6 +73,6 @@ public enum StandardFileType implements FileType {
         return OptionalUtil.orElse(Arrays.stream(StandardFileType.values())
                                          .filter(field -> field.getExtensions().stream().anyMatch(elem -> exts.contains(elem)))
                                          .findAny(),
-                new UnknownFileType(extensions));
+                                   new UnknownFileType(extensions));
     }
 }

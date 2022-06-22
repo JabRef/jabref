@@ -1,5 +1,9 @@
 package org.jabref.model.search.rules;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.EnumSet;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -8,10 +12,18 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import org.jabref.architecture.AllowedToUseLogic;
+import org.jabref.gui.Globals;
+import org.jabref.logic.pdf.search.retrieval.PdfSearcher;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.Keyword;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.InternalField;
+import org.jabref.model.pdf.search.PdfSearchResults;
+import org.jabref.model.pdf.search.SearchResult;
+import org.jabref.model.search.rules.SearchRules.SearchFlags;
+import org.jabref.model.strings.StringUtil;
 import org.jabref.search.SearchBaseVisitor;
 import org.jabref.search.SearchLexer;
 import org.jabref.search.SearchParser;
@@ -32,15 +44,18 @@ import org.slf4j.LoggerFactory;
  * <p>
  * This class implements the "Advanced Search Mode" described in the help
  */
+@AllowedToUseLogic("Because access to the lucene index is needed")
 public class GrammarBasedSearchRule implements SearchRule {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GrammarBasedSearchRule.class);
 
-    private final boolean caseSensitiveSearch;
-    private final boolean regExpSearch;
+    private final EnumSet<SearchFlags> searchFlags;
 
     private ParseTree tree;
     private String query;
+    private List<SearchResult> searchResults = new ArrayList<>();
+
+    private final BibDatabaseContext databaseContext;
 
     public static class ThrowingErrorListener extends BaseErrorListener {
 
@@ -54,21 +69,13 @@ public class GrammarBasedSearchRule implements SearchRule {
         }
     }
 
-    public GrammarBasedSearchRule(boolean caseSensitiveSearch, boolean regExpSearch) throws RecognitionException {
-        this.caseSensitiveSearch = caseSensitiveSearch;
-        this.regExpSearch = regExpSearch;
+    public GrammarBasedSearchRule(EnumSet<SearchFlags> searchFlags) throws RecognitionException {
+        this.searchFlags = searchFlags;
+        databaseContext = Globals.stateManager.getActiveDatabase().orElse(null);
     }
 
-    public static boolean isValid(boolean caseSensitive, boolean regExp, String query) {
-        return new GrammarBasedSearchRule(caseSensitive, regExp).validateSearchStrings(query);
-    }
-
-    public boolean isCaseSensitiveSearch() {
-        return this.caseSensitiveSearch;
-    }
-
-    public boolean isRegExpSearch() {
-        return this.regExpSearch;
+    public static boolean isValid(EnumSet<SearchFlags> searchFlags, String query) {
+        return new GrammarBasedSearchRule(searchFlags).validateSearchStrings(query);
     }
 
     public ParseTree getTree() {
@@ -93,16 +100,32 @@ public class GrammarBasedSearchRule implements SearchRule {
         parser.setErrorHandler(new BailErrorStrategy()); // ParseCancelationException on parse errors
         tree = parser.start();
         this.query = query;
+
+        if (!searchFlags.contains(SearchRules.SearchFlags.FULLTEXT) || (databaseContext == null)) {
+            return;
+        }
+        try {
+            PdfSearcher searcher = PdfSearcher.of(databaseContext);
+            PdfSearchResults results = searcher.search(query, 5);
+            searchResults = results.getSortedByScore();
+        } catch (IOException e) {
+            LOGGER.error("Could not retrieve search results!", e);
+        }
     }
 
     @Override
     public boolean applyRule(String query, BibEntry bibEntry) {
         try {
-            return new BibtexSearchVisitor(caseSensitiveSearch, regExpSearch, bibEntry).visit(tree);
+            return new BibtexSearchVisitor(searchFlags, bibEntry).visit(tree);
         } catch (Exception e) {
             LOGGER.debug("Search failed", e);
-            return false;
+            return getFulltextResults(query, bibEntry).numSearchResults() > 0;
         }
+    }
+
+    @Override
+    public PdfSearchResults getFulltextResults(String query, BibEntry bibEntry) {
+        return new PdfSearchResults(searchResults.stream().filter(searchResult -> searchResult.isResultFor(bibEntry)).collect(Collectors.toList()));
     }
 
     @Override
@@ -114,6 +137,10 @@ public class GrammarBasedSearchRule implements SearchRule {
             LOGGER.debug("Search query invalid", e);
             return false;
         }
+    }
+
+    public EnumSet<SearchFlags> getSearchFlags() {
+        return searchFlags;
     }
 
     public enum ComparisonOperator {
@@ -136,12 +163,12 @@ public class GrammarBasedSearchRule implements SearchRule {
         private final Pattern fieldPattern;
         private final Pattern valuePattern;
 
-        public Comparator(String field, String value, ComparisonOperator operator, boolean caseSensitive, boolean regex) {
+        public Comparator(String field, String value, ComparisonOperator operator, EnumSet<SearchFlags> searchFlags) {
             this.operator = operator;
 
-            int option = caseSensitive ? 0 : Pattern.CASE_INSENSITIVE;
-            this.fieldPattern = Pattern.compile(regex ? field : "\\Q" + field + "\\E", option);
-            this.valuePattern = Pattern.compile(regex ? value : "\\Q" + value + "\\E", option);
+            int option = searchFlags.contains(SearchRules.SearchFlags.CASE_SENSITIVE) ? 0 : Pattern.CASE_INSENSITIVE;
+            this.fieldPattern = Pattern.compile(searchFlags.contains(SearchRules.SearchFlags.REGULAR_EXPRESSION) ? StringUtil.stripAccents(field) : "\\Q" + StringUtil.stripAccents(field) + "\\E", option);
+            this.valuePattern = Pattern.compile(searchFlags.contains(SearchRules.SearchFlags.REGULAR_EXPRESSION) ? StringUtil.stripAccents(value) : "\\Q" + StringUtil.stripAccents(value) + "\\E", option);
         }
 
         public boolean compare(BibEntry entry) {
@@ -167,7 +194,7 @@ public class GrammarBasedSearchRule implements SearchRule {
             for (Field field : fieldsKeys) {
                 Optional<String> fieldValue = entry.getLatexFreeField(field);
                 if (fieldValue.isPresent()) {
-                    if (matchFieldValue(fieldValue.get())) {
+                    if (matchFieldValue(StringUtil.stripAccents(fieldValue.get()))) {
                         return true;
                     }
                 }
@@ -200,19 +227,17 @@ public class GrammarBasedSearchRule implements SearchRule {
      */
     static class BibtexSearchVisitor extends SearchBaseVisitor<Boolean> {
 
-        private final boolean caseSensitive;
-        private final boolean regex;
+        private final EnumSet<SearchFlags> searchFlags;
 
         private final BibEntry entry;
 
-        public BibtexSearchVisitor(boolean caseSensitive, boolean regex, BibEntry bibEntry) {
-            this.caseSensitive = caseSensitive;
-            this.regex = regex;
+        public BibtexSearchVisitor(EnumSet<SearchFlags> searchFlags, BibEntry bibEntry) {
+            this.searchFlags = searchFlags;
             this.entry = bibEntry;
         }
 
         public boolean comparison(String field, ComparisonOperator operator, String value) {
-            return new Comparator(field, value, operator, caseSensitive, regex).compare(entry);
+            return new Comparator(field, value, operator, searchFlags).compare(entry);
         }
 
         @Override
@@ -232,7 +257,7 @@ public class GrammarBasedSearchRule implements SearchRule {
             if (fieldDescriptor.isPresent()) {
                 return comparison(fieldDescriptor.get().getText(), ComparisonOperator.build(context.operator.getText()), right);
             } else {
-                return SearchRules.getSearchRule(caseSensitive, regex).applyRule(right, entry);
+                return SearchRules.getSearchRule(searchFlags).applyRule(right, entry);
             }
         }
 

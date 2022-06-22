@@ -1,7 +1,10 @@
 package org.jabref.gui.help;
 
+import org.jabref.gui.DialogService;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.errorconsole.ErrorConsoleView;
+
+import com.airhacks.afterburner.injection.Injector;
 
 /**
  * Such an error console can be
@@ -14,7 +17,7 @@ public class ErrorConsoleAction extends SimpleCommand {
 
     @Override
     public void execute() {
-        new ErrorConsoleView().show();
+        DialogService dialogService = Injector.instantiateModelOrService(DialogService.class);
+        dialogService.showCustomDialog(new ErrorConsoleView());
     }
-
 }

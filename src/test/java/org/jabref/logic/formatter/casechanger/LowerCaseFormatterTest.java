@@ -1,7 +1,12 @@
 package org.jabref.logic.formatter.casechanger;
 
+import java.util.stream.Stream;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -17,11 +22,19 @@ public class LowerCaseFormatterTest {
         formatter = new LowerCaseFormatter();
     }
 
-    @Test
-    public void test() {
-        assertEquals("lower", formatter.format("LOWER"));
-        assertEquals("lower {UPPER}", formatter.format("LOWER {UPPER}"));
-        assertEquals("lower {U}pper", formatter.format("LOWER {U}PPER"));
+    @ParameterizedTest
+    @MethodSource("provideStringsForFormat")
+    public void test(String expected, String input) {
+        assertEquals(expected, formatter.format(input));
+    }
+
+    private static Stream<Arguments> provideStringsForFormat() {
+        return Stream.of(
+                Arguments.of("lower", "lower"),
+                Arguments.of("lower", "LOWER"),
+                Arguments.of("lower {UPPER}", "LOWER {UPPER}"),
+                Arguments.of("lower {U}pper", "LOWER {U}PPER")
+        );
     }
 
     @Test

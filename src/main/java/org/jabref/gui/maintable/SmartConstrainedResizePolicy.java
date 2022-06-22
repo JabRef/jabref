@@ -38,13 +38,18 @@ public class SmartConstrainedResizePolicy implements Callback<TableView.ResizeFe
 
         if (Math.abs(totalWidth - tableWidth) > 1) {
             double totalPrefWidth = visibleLeafColumns.stream().mapToDouble(TableColumnBase::getPrefWidth).sum();
+            double currPrefWidth = 0;
             if (totalPrefWidth > 0) {
                 for (TableColumnBase col : visibleLeafColumns) {
                     double share = col.getPrefWidth() / totalPrefWidth;
                     double newSize = tableWidth * share;
 
                     // Just to make sure that we are staying under the total table width (due to rounding errors)
-                    newSize -= 2;
+                    currPrefWidth += newSize;
+                    if (currPrefWidth > tableWidth) {
+                        newSize -= currPrefWidth - tableWidth;
+                        currPrefWidth -= tableWidth;
+                    }
 
                     resize(col, newSize - col.getWidth());
                 }

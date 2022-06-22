@@ -33,12 +33,12 @@ class AuthorListParserTest {
     @MethodSource("data")
     void parseCorrectly(String authorsString, Author authorsParsed) {
         AuthorListParser parser = new AuthorListParser();
-        Assertions.assertEquals(new AuthorList(authorsParsed), parser.parse(authorsString));
+        Assertions.assertEquals(AuthorList.of(authorsParsed), parser.parse(authorsString));
     }
 
     @Test
     public void parseAuthorWithFirstNameAbbreviationContainingUmlaut() {
-        assertEquals(new AuthorList(
+        assertEquals(AuthorList.of(
                 new Author("{\\OE}rjan", "{\\OE}.", null, "Umlauts", null)),
                 new AuthorListParser().parse("{\\OE}rjan Umlauts"));
     }

@@ -3,6 +3,7 @@ package org.jabref.gui;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
@@ -50,16 +51,12 @@ public class EntryTypeView extends BaseDialog<EntryType> {
     @FXML private ButtonType generateButton;
     @FXML private TextField idTextField;
     @FXML private ComboBox<IdBasedFetcher> idBasedFetchers;
-    @FXML private FlowPane biblatexPane;
-    @FXML private FlowPane bibTexPane;
-    @FXML private FlowPane ieeetranPane;
+    @FXML private FlowPane recommendedEntriesPane;
+    @FXML private FlowPane otherEntriesPane;
     @FXML private FlowPane customPane;
-    @FXML private FlowPane biblatexSoftwarePane;
-    @FXML private TitledPane biblatexTitlePane;
-    @FXML private TitledPane bibTexTitlePane;
-    @FXML private TitledPane ieeeTranTitlePane;
+    @FXML private TitledPane recommendedEntriesTitlePane;
+    @FXML private TitledPane otherEntriesTitlePane;
     @FXML private TitledPane customTitlePane;
-    @FXML private TitledPane biblatexSoftwareTitlePane;
 
     private final LibraryTab libraryTab;
     private final DialogService dialogService;
@@ -82,7 +79,7 @@ public class EntryTypeView extends BaseDialog<EntryType> {
         ControlHelper.setAction(generateButton, this.getDialogPane(), event -> viewModel.runFetcherWorker());
 
         setResultConverter(button -> {
-            // The buttonType will always be cancel, even if we pressed one of the entry type buttons
+            // The buttonType will always be "cancel", even if we pressed one of the entry type buttons
             return type;
         });
 
@@ -138,43 +135,51 @@ public class EntryTypeView extends BaseDialog<EntryType> {
 
         // we set the managed property so that they will only be rendered when they are visble so that the Nodes only take the space when visible
         // avoids removing and adding from the scence graph
-        bibTexTitlePane.managedProperty().bind(bibTexTitlePane.visibleProperty());
-        ieeeTranTitlePane.managedProperty().bind(ieeeTranTitlePane.visibleProperty());
-        biblatexTitlePane.managedProperty().bind(biblatexTitlePane.visibleProperty());
+        recommendedEntriesTitlePane.managedProperty().bind(recommendedEntriesTitlePane.visibleProperty());
+        otherEntriesTitlePane.managedProperty().bind(otherEntriesTitlePane.visibleProperty());
         customTitlePane.managedProperty().bind(customTitlePane.visibleProperty());
-        biblatexSoftwareTitlePane.managedProperty().bind(biblatexSoftwareTitlePane.visibleProperty());
 
-        if (libraryTab.getBibDatabaseContext().isBiblatexMode()) {
-            addEntriesToPane(biblatexPane, BiblatexEntryTypeDefinitions.ALL);
-            addEntriesToPane(biblatexSoftwarePane, BiblatexSoftwareEntryTypeDefinitions.ALL);
-
-            bibTexTitlePane.setVisible(false);
-            ieeeTranTitlePane.setVisible(false);
-
-            List<BibEntryType> customTypes = Globals.entryTypesManager.getAllCustomTypes(BibDatabaseMode.BIBLATEX);
-            if (customTypes.isEmpty()) {
-                customTitlePane.setVisible(false);
+        otherEntriesTitlePane.expandedProperty().addListener((obs, wasExpanded, isNowExpanded) -> {
+            if (isNowExpanded) {
+                this.setHeight(this.getHeight() + otherEntriesPane.getHeight());
             } else {
-                addEntriesToPane(customPane, customTypes);
+                this.setHeight(this.getHeight() - otherEntriesPane.getHeight());
             }
+        });
+
+        boolean isBiblatexMode = libraryTab.getBibDatabaseContext().isBiblatexMode();
+        List<BibEntryType> recommendedEntries;
+        List<BibEntryType> otherEntries;
+        if (isBiblatexMode) {
+            recommendedEntries = BiblatexEntryTypeDefinitions.RECOMMENDED;
+            otherEntries = BiblatexEntryTypeDefinitions.ALL
+                .stream()
+                .filter(e -> !recommendedEntries.contains(e))
+                .collect(Collectors.toList());
+            otherEntries.addAll(BiblatexSoftwareEntryTypeDefinitions.ALL);
         } else {
-            biblatexTitlePane.setVisible(false);
-            biblatexSoftwareTitlePane.setVisible(false);
-            addEntriesToPane(bibTexPane, BibtexEntryTypeDefinitions.ALL);
-            addEntriesToPane(ieeetranPane, IEEETranEntryTypeDefinitions.ALL);
+            recommendedEntries = BibtexEntryTypeDefinitions.RECOMMENDED;
+            otherEntries = BibtexEntryTypeDefinitions.ALL
+                .stream()
+                .filter(e -> !recommendedEntries.contains(e))
+                .collect(Collectors.toList());
+            otherEntries.addAll(IEEETranEntryTypeDefinitions.ALL);
+        }
+        addEntriesToPane(recommendedEntriesPane, recommendedEntries);
+        addEntriesToPane(otherEntriesPane, otherEntries);
 
-            List<BibEntryType> customTypes = Globals.entryTypesManager.getAllCustomTypes(BibDatabaseMode.BIBTEX);
-            if (customTypes.isEmpty()) {
-                customTitlePane.setVisible(false);
-            } else {
-                addEntriesToPane(customPane, customTypes);
-            }
+        BibDatabaseMode customTypeDatabaseMode = isBiblatexMode ? BibDatabaseMode.BIBLATEX : BibDatabaseMode.BIBTEX;
+        List<BibEntryType> customTypes = Globals.entryTypesManager.getAllCustomTypes(customTypeDatabaseMode);
+        if (customTypes.isEmpty()) {
+            customTitlePane.setVisible(false);
+        } else {
+            addEntriesToPane(customPane, customTypes);
         }
 
-        Platform.runLater(() -> {
-            idTextField.requestFocus();
-            visualizer.initVisualization(viewModel.idFieldValidationStatus(), idTextField, true);
-        });
+        viewModel.idTextProperty().addListener((obs, oldValue, newValue) ->
+                visualizer.initVisualization(viewModel.idFieldValidationStatus(), idTextField, true));
+
+        Platform.runLater(() -> idTextField.requestFocus());
     }
 
     public EntryType getChoice() {
@@ -200,9 +205,7 @@ public class EntryTypeView extends BaseDialog<EntryType> {
     }
 
     /**
-     * The description is originating from biblatex manual chapter 2
-     * Biblatex documentation is favored over the bibtex,
-     * since bibtex is a subset of biblatex and biblatex is better documented.
+     * The description is originating from biblatex manual chapter 2 Biblatex documentation is favored over the bibtex, since bibtex is a subset of biblatex and biblatex is better documented.
      */
     public static String getDescription(EntryType selectedType) {
         if (selectedType instanceof StandardEntryType) {

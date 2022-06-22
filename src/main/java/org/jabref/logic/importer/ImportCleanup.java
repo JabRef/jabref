@@ -33,6 +33,6 @@ public class ImportCleanup {
      * Performs a format conversion of the given entry collection into the targeted format.
      */
     public void doPostCleanup(Collection<BibEntry> entries) {
-        entries.parallelStream().forEach(entry -> doPostCleanup(entry));
+        entries.forEach(this::doPostCleanup);
     }
 }

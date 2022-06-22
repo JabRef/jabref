@@ -1,12 +1,14 @@
 package org.jabref.model.metadata;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Stores the save order config from MetaData
@@ -15,22 +17,46 @@ import org.jabref.model.entry.field.FieldFactory;
  */
 public class SaveOrderConfig {
 
-    private static final String ORIGINAL = "original";
-    private static final String SPECIFIED = "specified";
-    private final LinkedList<SortCriterion> sortCriteria = new LinkedList<>();
-    private boolean saveInOriginalOrder;
-    private boolean saveInSpecifiedOrder;
+    public enum OrderType {
+        SPECIFIED("specified"),
+        ORIGINAL("original"),
+        TABLE("table");
 
-    public SaveOrderConfig() {
-        setSaveInOriginalOrder();
+        private final String name;
+
+        OrderType(String name) {
+            this.name = name;
+        }
+
+        @Override
+        public String toString() {
+            return name;
+        }
+
+        public static SaveOrderConfig.OrderType fromBooleans(boolean saveInSpecifiedOrder, boolean saveInOriginalOrder) {
+            SaveOrderConfig.OrderType orderType = SaveOrderConfig.OrderType.TABLE;
+            if (saveInSpecifiedOrder) {
+                orderType = SaveOrderConfig.OrderType.SPECIFIED;
+            } else if (saveInOriginalOrder) {
+                orderType = SaveOrderConfig.OrderType.ORIGINAL;
+            }
+
+            return orderType;
+        }
     }
 
-    public SaveOrderConfig(boolean saveInOriginalOrder, boolean saveInSpecifiedOrder, SortCriterion first, SortCriterion second, SortCriterion third) {
-        this.saveInOriginalOrder = saveInOriginalOrder;
-        this.saveInSpecifiedOrder = saveInSpecifiedOrder;
-        sortCriteria.add(first);
-        sortCriteria.add(second);
-        sortCriteria.add(third);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SaveOrderConfig.class);
+
+    private final List<SortCriterion> sortCriteria = new ArrayList<>();
+    private OrderType orderType;
+
+    public SaveOrderConfig() {
+        this.orderType = OrderType.ORIGINAL;
+    }
+
+    public SaveOrderConfig(OrderType orderType, List<SortCriterion> sortCriteria) {
+        this.orderType = orderType;
+        this.sortCriteria.addAll(sortCriteria);
     }
 
     private SaveOrderConfig(List<String> data) {
@@ -40,15 +66,21 @@ public class SaveOrderConfig {
             throw new IllegalArgumentException();
         }
 
-        String choice = data.get(0);
-        if (ORIGINAL.equals(choice)) {
-            setSaveInOriginalOrder();
-        } else {
-            setSaveInSpecifiedOrder();
+        try {
+            this.orderType = OrderType.valueOf(data.get(0).toUpperCase());
+        } catch (IllegalArgumentException ex) {
+            if (data.size() > 1 && data.size() % 2 == 1) {
+                LOGGER.warn("Could not parse sort order: {} - trying to parse the sort criteria", data.get(0));
+                this.orderType = OrderType.SPECIFIED;
+            } else {
+                LOGGER.warn("Could not parse sort order: {}", data.get(0));
+                this.orderType = OrderType.ORIGINAL;
+                return;
+            }
         }
 
         for (int index = 1; index < data.size(); index = index + 2) {
-            sortCriteria.addLast(new SortCriterion(FieldFactory.parseField(data.get(index)), data.get(index + 1)));
+            sortCriteria.add(new SortCriterion(FieldFactory.parseField(data.get(index)), data.get(index + 1)));
         }
     }
 
@@ -58,19 +90,15 @@ public class SaveOrderConfig {
 
     public static SaveOrderConfig getDefaultSaveOrder() {
         SaveOrderConfig standard = new SaveOrderConfig();
-        standard.setSaveInOriginalOrder();
+        standard.orderType = OrderType.ORIGINAL;
         return standard;
     }
 
-    public boolean saveInOriginalOrder() {
-        return saveInOriginalOrder;
+    public OrderType getOrderType() {
+        return orderType;
     }
 
-    public boolean saveInSpecifiedOrder() {
-        return saveInSpecifiedOrder;
-    }
-
-    public LinkedList<SortCriterion> getSortCriteria() {
+    public List<SortCriterion> getSortCriteria() {
         return sortCriteria;
     }
 
@@ -79,35 +107,23 @@ public class SaveOrderConfig {
         if (this == o) {
             return true;
         }
-        if (o instanceof SaveOrderConfig) {
-            SaveOrderConfig that = (SaveOrderConfig) o;
+        if (o instanceof SaveOrderConfig that) {
             return Objects.equals(sortCriteria, that.sortCriteria) &&
-                    Objects.equals(saveInOriginalOrder, that.saveInOriginalOrder) &&
-                    Objects.equals(saveInSpecifiedOrder, that.saveInSpecifiedOrder);
+                    Objects.equals(orderType, that.orderType);
         }
         return false;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(saveInOriginalOrder, saveInSpecifiedOrder, sortCriteria);
+        return Objects.hash(orderType, sortCriteria);
     }
 
     @Override
     public String toString() {
-        return "SaveOrderConfig{" + "saveInOriginalOrder=" + saveInOriginalOrder
-                + "saveInSpecifiedOrder =" + saveInSpecifiedOrder
-                + ", sortCriteria=" + sortCriteria +
+        return "SaveOrderConfig{" + "orderType=" + orderType.toString() +
+                ", sortCriteria=" + sortCriteria +
                 '}';
-    }
-
-    public void setSaveInOriginalOrder() {
-        this.saveInOriginalOrder = true;
-    }
-
-    public void setSaveInSpecifiedOrder() {
-        this.saveInOriginalOrder = false;
-        this.saveInSpecifiedOrder = true;
     }
 
     /**
@@ -115,10 +131,10 @@ public class SaveOrderConfig {
      */
     public List<String> getAsStringList() {
         List<String> res = new ArrayList<>(7);
-        if (saveInOriginalOrder) {
-            res.add(ORIGINAL);
+        if (orderType == OrderType.ORIGINAL) {
+            res.add(OrderType.ORIGINAL.toString());
         } else {
-            res.add(SPECIFIED);
+            res.add(OrderType.SPECIFIED.toString());
         }
 
         for (SortCriterion sortCriterion : sortCriteria) {
@@ -135,6 +151,11 @@ public class SaveOrderConfig {
 
         public boolean descending;
 
+        /**
+         *
+         * @param field The field
+         * @param descending Must be a boolean value as string, e.g. "true", "false"
+         */
         public SortCriterion(Field field, String descending) {
             this.field = field;
             this.descending = Boolean.parseBoolean(descending);
@@ -146,7 +167,6 @@ public class SaveOrderConfig {
         }
 
         public SortCriterion() {
-
         }
 
         @Override

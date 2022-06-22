@@ -11,6 +11,7 @@ import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.Version;
+import org.jabref.preferences.InternalPreferences;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,19 +33,19 @@ public class VersionWorker {
      */
     private final Version installedVersion;
 
-    /**
-     * The version which was previously ignored by the user
-     */
-    private final Version toBeIgnored;
-
     private final DialogService dialogService;
     private final TaskExecutor taskExecutor;
+    private final InternalPreferences internalPreferences;
 
-    public VersionWorker(Version installedVersion, Version toBeIgnored, DialogService dialogService, TaskExecutor taskExecutor) {
+    public VersionWorker(Version installedVersion,
+
+                         DialogService dialogService,
+                         TaskExecutor taskExecutor,
+                         InternalPreferences internalPreferences) {
         this.installedVersion = Objects.requireNonNull(installedVersion);
-        this.toBeIgnored = Objects.requireNonNull(toBeIgnored);
         this.dialogService = Objects.requireNonNull(dialogService);
         this.taskExecutor = Objects.requireNonNull(taskExecutor);
+        this.internalPreferences = internalPreferences;
     }
 
     /**
@@ -88,13 +89,15 @@ public class VersionWorker {
      */
     private void showUpdateInfo(Optional<Version> newerVersion, boolean manualExecution) {
         // no new version could be found, only respect the ignored version on automated version checks
-        if (!newerVersion.isPresent() || (newerVersion.get().equals(toBeIgnored) && !manualExecution)) {
+        if (newerVersion.isEmpty() || (newerVersion.get().equals(internalPreferences.getIgnoredVersion()) && !manualExecution)) {
             if (manualExecution) {
                 dialogService.notify(Localization.lang("JabRef is up-to-date."));
             }
         } else {
             // notify the user about a newer version
-            new NewVersionDialog(installedVersion, newerVersion.get()).showAndWait();
+            if (dialogService.showCustomDialogAndWait(new NewVersionDialog(installedVersion, newerVersion.get(), dialogService)).orElse(true)) {
+                internalPreferences.setIgnoredVersion(newerVersion.get());
+            }
         }
     }
 }

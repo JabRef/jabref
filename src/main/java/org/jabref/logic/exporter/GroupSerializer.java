@@ -18,6 +18,7 @@ import org.jabref.model.groups.KeywordGroup;
 import org.jabref.model.groups.RegexKeywordGroup;
 import org.jabref.model.groups.SearchGroup;
 import org.jabref.model.groups.TexGroup;
+import org.jabref.model.search.rules.SearchRules;
 import org.jabref.model.strings.StringUtil;
 
 public class GroupSerializer {
@@ -69,9 +70,9 @@ public class GroupSerializer {
         sb.append(MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR);
         sb.append(StringUtil.quote(group.getSearchExpression(), MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR, MetadataSerializationConfiguration.GROUP_QUOTE_CHAR));
         sb.append(MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR);
-        sb.append(StringUtil.booleanToBinaryString(group.isCaseSensitive()));
+        sb.append(StringUtil.booleanToBinaryString(group.getSearchFlags().contains(SearchRules.SearchFlags.CASE_SENSITIVE)));
         sb.append(MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR);
-        sb.append(StringUtil.booleanToBinaryString(group.isRegularExpression()));
+        sb.append(StringUtil.booleanToBinaryString(group.getSearchFlags().contains(SearchRules.SearchFlags.REGULAR_EXPRESSION)));
         sb.append(MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR);
 
         appendGroupDetails(sb, group);
@@ -99,7 +100,6 @@ public class GroupSerializer {
      * @return a representation of the tree based at this node as a list of strings
      */
     public List<String> serializeTree(GroupTreeNode node) {
-
         List<String> representation = new ArrayList<>();
 
         // Append current node

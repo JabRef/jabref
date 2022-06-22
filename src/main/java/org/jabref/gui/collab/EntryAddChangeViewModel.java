@@ -2,21 +2,35 @@ package org.jabref.gui.collab;
 
 import javafx.scene.Node;
 
-import org.jabref.gui.Globals;
-import org.jabref.gui.JabRefGUI;
+import org.jabref.gui.DialogService;
+import org.jabref.gui.StateManager;
 import org.jabref.gui.preview.PreviewViewer;
+import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableInsertEntries;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.preferences.PreferencesService;
 
 class EntryAddChangeViewModel extends DatabaseChangeViewModel {
 
     private final BibEntry entry;
+    private final PreferencesService preferencesService;
+    private final DialogService dialogService;
+    private final StateManager stateManager;
+    private final ThemeManager themeManager;
 
-    public EntryAddChangeViewModel(BibEntry entry) {
+    public EntryAddChangeViewModel(BibEntry entry,
+                                   PreferencesService preferencesService,
+                                   DialogService dialogService,
+                                   StateManager stateManager,
+                                   ThemeManager themeManager) {
         super();
+        this.dialogService = dialogService;
+        this.preferencesService = preferencesService;
+        this.themeManager = themeManager;
+        this.stateManager = stateManager;
         this.name = entry.getCitationKey()
                          .map(key -> Localization.lang("Added entry") + ": '" + key + '\'')
                          .orElse(Localization.lang("Added entry"));
@@ -31,8 +45,8 @@ class EntryAddChangeViewModel extends DatabaseChangeViewModel {
 
     @Override
     public Node description() {
-        PreviewViewer previewViewer = new PreviewViewer(new BibDatabaseContext(), JabRefGUI.getMainFrame().getDialogService(), Globals.stateManager);
-        previewViewer.setLayout(Globals.prefs.getPreviewPreferences().getCurrentPreviewStyle());
+        PreviewViewer previewViewer = new PreviewViewer(new BibDatabaseContext(), dialogService, stateManager, themeManager);
+        previewViewer.setLayout(preferencesService.getPreviewPreferences().getSelectedPreviewLayout());
         previewViewer.setEntry(entry);
         return previewViewer;
     }

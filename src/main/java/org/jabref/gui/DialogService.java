@@ -15,6 +15,7 @@ import javafx.scene.control.ChoiceDialog;
 import javafx.scene.control.DialogPane;
 import javafx.scene.control.TextInputDialog;
 
+import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.l10n.Localization;
@@ -161,6 +162,13 @@ public interface DialogService {
                                                     String optOutMessage, Consumer<Boolean> optOutAction);
 
     /**
+     * Shows a custom dialog without returning any results.
+     *
+     * @param dialog dialog to show
+     */
+    void showCustomDialog(BaseDialog<?> dialog);
+
+    /**
      * This will create and display a new dialog of the specified
      * {@link Alert.AlertType} but with user defined buttons as optional
      * {@link ButtonType}s.
@@ -184,7 +192,7 @@ public interface DialogService {
      * @param dialog dialog to show
      * @param <R>    type of result
      */
-    <R> Optional<R> showCustomDialogAndWait(Dialog<R> dialog);
+    <R> Optional<R> showCustomDialogAndWait(javafx.scene.control.Dialog<R> dialog);
 
     /**
      * Constructs and shows a canceable {@link ProgressDialog}. Clicking cancel will cancel the underlying service and close the dialog
@@ -207,7 +215,7 @@ public interface DialogService {
     <V> Optional<ButtonType> showBackgroundProgressDialogAndWait(String title, String content, StateManager stateManager);
 
     /**
-     * Notify the user in an non-blocking way (i.e., in form of toast in a snackbar).
+     * Notify the user in a non-blocking way (i.e., in form of toast in a snackbar).
      *
      * @param message the message to show.
      */

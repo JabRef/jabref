@@ -15,15 +15,18 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.preferences.PreferencesService;
 
 public class OpenUrlAction extends SimpleCommand {
 
     private final DialogService dialogService;
     private final StateManager stateManager;
+    private final PreferencesService preferences;
 
-    public OpenUrlAction(DialogService dialogService, StateManager stateManager) {
+    public OpenUrlAction(DialogService dialogService, StateManager stateManager, PreferencesService preferences) {
         this.dialogService = dialogService;
         this.stateManager = stateManager;
+        this.preferences = preferences;
 
         BooleanExpression fieldIsSet = ActionHelper.isAnyFieldSetForSelectedEntry(
                 List.of(StandardField.URL, StandardField.DOI, StandardField.URI, StandardField.EPRINT),
@@ -62,7 +65,11 @@ public class OpenUrlAction extends SimpleCommand {
 
             if (link.isPresent()) {
                 try {
-                    JabRefDesktop.openExternalViewer(databaseContext, link.get(), field);
+                    if (field.equals(StandardField.DOI) && preferences.getDOIPreferences().isUseCustom()) {
+                        JabRefDesktop.openCustomDoi(link.get(), preferences, dialogService);
+                    } else {
+                        JabRefDesktop.openExternalViewer(databaseContext, preferences, link.get(), field);
+                    }
                 } catch (IOException e) {
                     dialogService.showErrorDialogAndWait(Localization.lang("Unable to open link."), e);
                 }

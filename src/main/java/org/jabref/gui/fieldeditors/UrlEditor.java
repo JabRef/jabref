@@ -39,7 +39,7 @@ public class UrlEditor extends HBox implements FieldEditorFX {
 
         textArea.textProperty().bindBidirectional(viewModel.textProperty());
         Supplier<List<MenuItem>> contextMenuSupplier = EditorMenus.getCleanupUrlMenu(textArea);
-        textArea.addToContextMenu(contextMenuSupplier);
+        textArea.initContextMenu(contextMenuSupplier);
 
         // init paste handler for UrlEditor to format pasted url link in textArea
         textArea.setPasteActionHandler(() -> textArea.setText(new CleanupUrlFormatter().format(new TrimWhitespaceFormatter().format(textArea.getText()))));

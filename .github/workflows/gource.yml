@@ -1,0 +1,56 @@
+name: Gource
+
+on:
+  push:
+    branches:
+      - gource
+  schedule:
+    - cron:  '15 3 1 1,4,7,10 *'
+  workflow_dispatch:
+
+jobs:
+  action:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 'Checkout'
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Determine dates
+        id: dates
+        run: |
+          echo ::set-output name=start_date::`date -d "$(date +%Y-%m-01) -3 months" +%Y-%m-%d`
+          echo ::set-output name=stop_date::`date -d "$(date +%Y-%m-01) -1 day" +%Y-%m-%d`
+          echo ::set-output name=quarter::`date -d "$(date +%Y-%m-01) -1 day" +%Y`-Q$(( ((`date -d "$(date +%Y-%m-01) -1 day" +%m`)-1)/3+1 ))
+      - name: 'Development history of last quarter'
+        uses: nbprojekt/gource-action@v1
+        with:
+          gource_title: 'JabRef | more information at contribute.jabref.org'
+          logo_url: 'https://www.jabref.org/img/JabRef-icon-256.png'
+          # 5s * 365 / 4 = 7.5min
+          gource_seconds_per_day: 5
+          gource_start_date: ${{ steps.dates.outputs.start_date }}
+          gource_stop_date: ${{ steps.dates.outputs.stop_date }}
+          gource_file_filter: csl$
+      - name: 'Store video'
+        run: |
+          mkdir gource-videos
+          mv ./gource/gource.mp4 ./gource-videos/jabref-${{ steps.dates.outputs.quarter }}.mp4
+      - name: 'Complete development history'
+        uses: nbprojekt/gource-action@v1
+        with:
+          gource_title: 'JabRef | more information at contribute.jabref.org'
+          logo_url: 'https://www.jabref.org/img/JabRef-icon-256.png'
+          # 0.01 leads to a 45 second video for the complete history until end of 2020
+          # 0.1 leads to a 8 minute video
+          gource_seconds_per_day: 0.1
+          gource_file_filter: csl$
+      - name: 'Store video'
+        run: |
+          mv gource/gource.mp4 gource-videos/jabref-complete.mp4
+      - name: 'Upload gource video'
+        uses: actions/upload-artifact@v2
+        with:
+          name: Gource
+          path: ./gource-videos/
+          retention-days: 80

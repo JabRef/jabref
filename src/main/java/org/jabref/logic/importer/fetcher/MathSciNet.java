@@ -23,6 +23,7 @@ import org.jabref.logic.importer.IdBasedParserFetcher;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.SearchBasedParserFetcher;
+import org.jabref.logic.importer.fetcher.transformers.DefaultQueryTransformer;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.util.OS;
 import org.jabref.model.entry.BibEntry;
@@ -31,6 +32,7 @@ import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.apache.http.client.utils.URIBuilder;
+import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 
 /**
  * Fetches data from the MathSciNet (http://www.ams.org/mathscinet)
@@ -72,10 +74,10 @@ public class MathSciNet implements SearchBasedParserFetcher, EntryBasedParserFet
     }
 
     @Override
-    public URL getURLForQuery(String query) throws URISyntaxException, MalformedURLException, FetcherException {
+    public URL getURLForQuery(QueryNode luceneQuery) throws URISyntaxException, MalformedURLException, FetcherException {
         URIBuilder uriBuilder = new URIBuilder("https://mathscinet.ams.org/mathscinet/search/publications.html");
         uriBuilder.addParameter("pg7", "ALLF"); // search all fields
-        uriBuilder.addParameter("s7", query); // query
+        uriBuilder.addParameter("s7", new DefaultQueryTransformer().transformLuceneQuery(luceneQuery).orElse("")); // query
         uriBuilder.addParameter("r", "1"); // start index
         uriBuilder.addParameter("extend", "1"); // should return up to 100 items (instead of default 10)
         uriBuilder.addParameter("fmt", "bibtex"); // BibTeX format

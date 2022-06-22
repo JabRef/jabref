@@ -7,12 +7,13 @@ The title of the PR must not reference an issue, because GitHub does not support
 
 
 <!-- 
-- Go through the list below. If a task has been completed, mark it done by using `[x]`.
-- Please don't remove any items, just leave them unchecked if they are not applicable.
+- Go through the list below. Please don't remove any items.
+- [x] done; [ ] not done / not applicable
 -->
 
-- [ ] Change in CHANGELOG.md described (if applicable)
+- [ ] Change in `CHANGELOG.md` described in a way that is understandable for the average user (if applicable)
 - [ ] Tests created for changes (if applicable)
 - [ ] Manually tested changed features in running JabRef (always required)
 - [ ] Screenshots added in PR description (for UI changes)
-- [ ] [Checked documentation](https://docs.jabref.org/): Is the information available and up to date? If not created an issue at <https://github.com/JabRef/user-documentation/issues> or, even better, submitted a pull request to the documentation repository.
+- [ ] [Checked developer's documentation](https://devdocs.jabref.org/): Is the information available and up to date? If not, I outlined it in this pull request.
+- [ ] [Checked documentation](https://docs.jabref.org/): Is the information available and up to date? If not, I created an issue at <https://github.com/JabRef/user-documentation/issues> or, even better, I submitted a pull request to the documentation repository.

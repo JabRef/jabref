@@ -24,16 +24,16 @@ public class AboutDialogViewModel extends AbstractViewModel {
 
     private static final String HOMEPAGE_URL = "https://www.jabref.org";
     private static final String DONATION_URL = "https://donations.jabref.org";
-    private static final String LIBRARIES_URL = "https://github.com/JabRef/jabref/blob/master/external-libraries.md";
+    private static final String LIBRARIES_URL = "https://github.com/JabRef/jabref/blob/main/external-libraries.md";
     private static final String GITHUB_URL = "https://github.com/JabRef/jabref";
-    private static final String LICENSE_URL = "https://github.com/JabRef/jabref/blob/master/LICENSE.md";
+    private static final String LICENSE_URL = "https://github.com/JabRef/jabref/blob/main/LICENSE.md";
+    private static final String CONTRIBUTORS_URL = "https://github.com/JabRef/jabref/graphs/contributors";
     private final String changelogUrl;
     private final String versionInfo;
     private final ReadOnlyStringWrapper environmentInfo = new ReadOnlyStringWrapper();
     private final Logger logger = LoggerFactory.getLogger(AboutDialogViewModel.class);
     private final ReadOnlyStringWrapper heading = new ReadOnlyStringWrapper();
-    private final ReadOnlyStringWrapper authors = new ReadOnlyStringWrapper();
-    private final ReadOnlyStringWrapper developers = new ReadOnlyStringWrapper();
+    private final ReadOnlyStringWrapper maintainers = new ReadOnlyStringWrapper();
     private final ReadOnlyStringWrapper license = new ReadOnlyStringWrapper();
     private final ReadOnlyBooleanWrapper isDevelopmentVersion = new ReadOnlyBooleanWrapper();
     private final DialogService dialogService;
@@ -54,12 +54,11 @@ public class AboutDialogViewModel extends AbstractViewModel {
                     Collectors.joining("--"));
             developmentVersion.set(dev);
         }
-        developers.set(buildInfo.developers);
-        authors.set(buildInfo.authors);
+        maintainers.set(buildInfo.maintainers);
         license.set(Localization.lang("License") + ":");
         changelogUrl = buildInfo.version.getChangelogUrl();
-        versionInfo = String.format("JabRef %s%n%s %s %s %nJava %s", buildInfo.version, BuildInfo.OS,
-                BuildInfo.OS_VERSION, BuildInfo.OS_ARCH, BuildInfo.JAVA_VERSION);
+        versionInfo = String.format("JabRef %s%n%s %s %s %nJava %s %nJavaFX %s", buildInfo.version, BuildInfo.OS,
+                BuildInfo.OS_VERSION, BuildInfo.OS_ARCH, BuildInfo.JAVA_VERSION, BuildInfo.JAVAFX_VERSION);
     }
 
     public String getDevelopmentVersion() {
@@ -78,24 +77,16 @@ public class AboutDialogViewModel extends AbstractViewModel {
         return isDevelopmentVersion.getReadOnlyProperty();
     }
 
-    public ReadOnlyStringProperty authorsProperty() {
-        return authors.getReadOnlyProperty();
-    }
-
-    public String getAuthors() {
-        return authors.get();
-    }
-
     public String getVersionInfo() {
         return versionInfo;
     }
 
-    public ReadOnlyStringProperty developersProperty() {
-        return developers.getReadOnlyProperty();
+    public ReadOnlyStringProperty maintainersProperty() {
+        return maintainers.getReadOnlyProperty();
     }
 
-    public String getDevelopers() {
-        return developers.get();
+    public String getMaintainers() {
+        return maintainers.get();
     }
 
     public ReadOnlyStringProperty headingProperty() {
@@ -141,6 +132,10 @@ public class AboutDialogViewModel extends AbstractViewModel {
 
     public void openLicense() {
         openWebsite(LICENSE_URL);
+    }
+
+    public void openContributors() {
+        openWebsite(CONTRIBUTORS_URL);
     }
 
     public void openDonation() {

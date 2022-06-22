@@ -34,7 +34,11 @@ public class CopyMoreAction extends SimpleCommand {
     private final ClipBoardManager clipBoardManager;
     private final PreferencesService preferencesService;
 
-    public CopyMoreAction(StandardActions action, DialogService dialogService, StateManager stateManager, ClipBoardManager clipBoardManager, PreferencesService preferencesService) {
+    public CopyMoreAction(StandardActions action,
+                          DialogService dialogService,
+                          StateManager stateManager,
+                          ClipBoardManager clipBoardManager,
+                          PreferencesService preferencesService) {
         this.action = action;
         this.dialogService = dialogService;
         this.stateManager = stateManager;
@@ -56,6 +60,7 @@ public class CopyMoreAction extends SimpleCommand {
             case COPY_CITE_KEY -> copyCiteKey();
             case COPY_KEY_AND_TITLE -> copyKeyAndTitle();
             case COPY_KEY_AND_LINK -> copyKeyAndLink();
+            case COPY_DOI, COPY_DOI_URL -> copyDoi();
             default -> LOGGER.info("Unknown copy command.");
         }
     }
@@ -113,6 +118,42 @@ public class CopyMoreAction extends SimpleCommand {
         }
     }
 
+    private void copyDoi() {
+        List<BibEntry> entries = stateManager.getSelectedEntries();
+
+        // Collect all non-null DOI or DOI urls
+        if (action == StandardActions.COPY_DOI_URL) {
+            copyDoiList(entries.stream()
+                    .filter(entry -> entry.getDOI().isPresent())
+                    .map(entry -> entry.getDOI().get().getURIAsASCIIString())
+                    .collect(Collectors.toList()), entries.size());
+        } else {
+            copyDoiList(entries.stream()
+                    .filter(entry -> entry.getDOI().isPresent())
+                    .map(entry -> entry.getDOI().get().getDOI())
+                    .collect(Collectors.toList()), entries.size());
+        }
+    }
+
+    private void copyDoiList(List<String> dois, int size) {
+        if (dois.isEmpty()) {
+            dialogService.notify(Localization.lang("None of the selected entries have DOIs."));
+            return;
+        }
+
+        final String copiedDois = String.join(",", dois);
+        clipBoardManager.setContent(copiedDois);
+
+        if (dois.size() == size) {
+            // All entries had DOIs.
+            dialogService.notify(Localization.lang("Copied '%0' to clipboard.",
+                    JabRefDialogService.shortenDialogMessage(copiedDois)));
+        } else {
+            dialogService.notify(Localization.lang("Warning: %0 out of %1 entries have undefined DOIs.",
+                    Integer.toString(size - dois.size()), Integer.toString(size)));
+        }
+    }
+
     private void copyCiteKey() {
         List<BibEntry> entries = stateManager.getSelectedEntries();
 
@@ -127,7 +168,7 @@ public class CopyMoreAction extends SimpleCommand {
             return;
         }
 
-        String citeCommand = Optional.ofNullable(Globals.prefs.getExternalApplicationsPreferences().getCiteCommand())
+        String citeCommand = Optional.ofNullable(preferencesService.getExternalApplicationsPreferences().getCiteCommand())
                                      .filter(cite -> cite.contains("\\")) // must contain \
                                      .orElse("\\cite");
 

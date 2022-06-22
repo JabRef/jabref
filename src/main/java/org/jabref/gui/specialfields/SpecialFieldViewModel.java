@@ -2,6 +2,7 @@ package org.jabref.gui.specialfields;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.swing.undo.UndoManager;
@@ -13,7 +14,7 @@ import org.jabref.gui.actions.Action;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.gui.undo.UndoableFieldChange;
-import org.jabref.logic.specialfields.SpecialFieldsUtils;
+import org.jabref.logic.util.UpdateField;
 import org.jabref.model.FieldChange;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.SpecialField;
@@ -83,17 +84,9 @@ public class SpecialFieldViewModel {
     }
 
     public void setSpecialFieldValue(BibEntry bibEntry, SpecialFieldValue value) {
-        List<FieldChange> changes = SpecialFieldsUtils.updateField(
-                getField(),
-                value.getFieldValue().orElse(null),
-                bibEntry,
-                getField().isSingleValueField(),
-                preferencesService.getSpecialFieldsPreferences().isKeywordSyncEnabled(),
-                preferencesService.getKeywordDelimiter());
+        Optional<FieldChange> change = UpdateField.updateField(bibEntry, getField(), value.getFieldValue().orElse(null), getField().isSingleValueField());
 
-        for (FieldChange change : changes) {
-            undoManager.addEdit(new UndoableFieldChange(change));
-        }
+        change.ifPresent(fieldChange -> undoManager.addEdit(new UndoableFieldChange(fieldChange)));
     }
 
     public void toggle(BibEntry entry) {

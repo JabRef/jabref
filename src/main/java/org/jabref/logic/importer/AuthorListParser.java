@@ -150,7 +150,7 @@ public class AuthorListParser {
         while (tokenStart < original.length()) {
             getAuthor().ifPresent(authors::add);
         }
-        return new AuthorList(authors);
+        return AuthorList.of(authors);
     }
 
     /**

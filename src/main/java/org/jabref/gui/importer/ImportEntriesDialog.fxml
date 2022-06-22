@@ -19,6 +19,7 @@
             <CheckListView fx:id="entriesListView" VBox.vgrow="ALWAYS"/>
             <HBox spacing="4">
                 <Button onAction="#selectAllNewEntries" styleClass="text-button" text="%Select all new entries"/>
+                <Button onAction="#selectAllEntries" styleClass="text-button" text="%Select all entries"/>
                 <Button onAction="#unselectAll" styleClass="text-button" text="%Unselect all"/>
                 <HBox HBox.hgrow="ALWAYS"/>
                 <GridPane hgap="4.0" vgap="4.0">

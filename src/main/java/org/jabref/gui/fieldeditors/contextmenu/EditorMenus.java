@@ -24,28 +24,9 @@ import org.jabref.logic.l10n.Localization;
  * Provides context menus for the text fields of the entry editor. Note that we use {@link Supplier} to prevent an early
  * instantiation of the menus. Therefore, they are attached to each text field but instantiation happens on the first
  * right-click of the user in that field. The late instantiation is done by {@link
- * org.jabref.gui.fieldeditors.EditorTextArea#addToContextMenu(java.util.function.Supplier)}.
+ * org.jabref.gui.fieldeditors.EditorTextArea#initContextMenu(java.util.function.Supplier)}.
  */
 public class EditorMenus {
-
-    /**
-     * The default menu that contains functions for changing the case of text and doing several conversions.
-     *
-     * @param textInput text-input-control that this menu will be connected to
-     * @return default context menu available for most text fields
-     */
-    public static Supplier<List<MenuItem>> getDefaultMenu(final TextInputControl textInput) {
-        return () -> {
-            List<MenuItem> menuItems = new ArrayList<>(6);
-            menuItems.add(new CaseChangeMenu(textInput.textProperty()));
-            menuItems.add(new ConversionMenu(textInput.textProperty()));
-            menuItems.add(new SeparatorMenuItem());
-            menuItems.add(new ProtectedTermsMenu(textInput));
-            menuItems.add(new SeparatorMenuItem());
-            menuItems.add(new ClearField(textInput));
-            return menuItems;
-        };
-    }
 
     /**
      * The default context menu with a specific menu for normalizing person names regarding to BibTex rules.
@@ -61,26 +42,27 @@ public class EditorMenus {
             Tooltip.install(normalizeNames.getContent(), toolTip);
             List<MenuItem> menuItems = new ArrayList<>(6);
             menuItems.add(normalizeNames);
-            menuItems.addAll(getDefaultMenu(textInput).get());
+            menuItems.addAll(new DefaultMenu(textInput).get());
             return menuItems;
         };
     }
 
     /**
-     * The default context menu with a specific menu copying a DOI URL.
+     * The default context menu with a specific menu copying a DOI/ DOI URL.
      *
      * @param textArea text-area that this menu will be connected to
-     * @return menu containing items of the default menu and an item for copying a DOI URL
+     * @return menu containing items of the default menu and an item for copying a DOI/DOI URL
      */
     public static Supplier<List<MenuItem>> getDOIMenu(TextArea textArea) {
         return () -> {
             ActionFactory factory = new ActionFactory(Globals.getKeyPrefs());
-            MenuItem copyDoiUrlMenuItem = factory.createMenuItem(StandardActions.COPY_DOI, new CopyDoiUrlAction(textArea));
-
+            MenuItem copyDoiMenuItem = factory.createMenuItem(StandardActions.COPY_DOI, new CopyDoiUrlAction(textArea, StandardActions.COPY_DOI));
+            MenuItem copyDoiUrlMenuItem = factory.createMenuItem(StandardActions.COPY_DOI_URL, new CopyDoiUrlAction(textArea, StandardActions.COPY_DOI_URL));
             List<MenuItem> menuItems = new ArrayList<>();
+            menuItems.add(copyDoiMenuItem);
             menuItems.add(copyDoiUrlMenuItem);
             menuItems.add(new SeparatorMenuItem());
-            menuItems.addAll(getDefaultMenu(textArea).get());
+            menuItems.addAll(new DefaultMenu(textArea).get());
             return menuItems;
         };
     }
@@ -96,7 +78,6 @@ public class EditorMenus {
             CustomMenuItem cleanupURL = new CustomMenuItem(new Label(Localization.lang("Cleanup URL link")));
             cleanupURL.setDisable(textArea.textProperty().isEmpty().get());
             cleanupURL.setOnAction(event -> textArea.setText(new CleanupUrlFormatter().format(textArea.getText())));
-
             List<MenuItem> menuItems = new ArrayList<>();
             menuItems.add(cleanupURL);
             return menuItems;

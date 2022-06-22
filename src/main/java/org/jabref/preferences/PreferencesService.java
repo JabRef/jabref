@@ -1,6 +1,5 @@
 package org.jabref.preferences;
 
-import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
@@ -10,14 +9,12 @@ import java.util.prefs.BackingStoreException;
 
 import org.jabref.gui.autocompleter.AutoCompletePreferences;
 import org.jabref.gui.entryeditor.EntryEditorPreferences;
-import org.jabref.gui.groups.GroupViewMode;
 import org.jabref.gui.groups.GroupsPreferences;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.maintable.ColumnPreferences;
 import org.jabref.gui.maintable.MainTableNameFormatPreferences;
 import org.jabref.gui.maintable.MainTablePreferences;
 import org.jabref.gui.specialfields.SpecialFieldsPreferences;
-import org.jabref.gui.util.Theme;
 import org.jabref.logic.JabRefException;
 import org.jabref.logic.bibtex.FieldContentFormatterPreferences;
 import org.jabref.logic.bibtex.FieldWriterPreferences;
@@ -28,20 +25,23 @@ import org.jabref.logic.cleanup.CleanupPreset;
 import org.jabref.logic.exporter.SavePreferences;
 import org.jabref.logic.exporter.TemplateExporter;
 import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.fileformat.CustomImporter;
 import org.jabref.logic.journals.JournalAbbreviationPreferences;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Language;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
+import org.jabref.logic.layout.format.FileLinkPreferences;
 import org.jabref.logic.layout.format.NameFormatterPreferences;
 import org.jabref.logic.net.ProxyPreferences;
+import org.jabref.logic.net.ssl.SSLPreferences;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
+import org.jabref.logic.preferences.DOIPreferences;
 import org.jabref.logic.preferences.OwnerPreferences;
 import org.jabref.logic.preferences.TimestampPreferences;
 import org.jabref.logic.protectedterms.ProtectedTermsPreferences;
 import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.util.io.AutoLinkPreferences;
-import org.jabref.logic.util.io.FileHistory;
 import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntryType;
@@ -51,9 +51,7 @@ import org.jabref.model.metadata.SaveOrderConfig;
 
 public interface PreferencesService {
 
-    VersionPreferences getVersionPreferences();
-
-    void storeVersionPreferences(VersionPreferences versionPreferences);
+    InternalPreferences getInternalPreferences();
 
     JournalAbbreviationPreferences getJournalAbbreviationPreferences();
 
@@ -65,13 +63,7 @@ public interface PreferencesService {
 
     FilePreferences getFilePreferences();
 
-    void storeFilePreferences(FilePreferences filePreferences);
-
     FieldWriterPreferences getFieldWriterPreferences();
-
-    FileHistory getFileHistory();
-
-    void storeFileHistory(FileHistory history);
 
     FieldContentFormatterPreferences getFieldContentParserPreferences();
 
@@ -95,19 +87,13 @@ public interface PreferencesService {
 
     SavePreferences getSavePreferences();
 
-    Charset getDefaultEncoding();
-
-    String getUser();
-
-    SaveOrderConfig loadExportSaveOrder();
+    SaveOrderConfig getExportSaveOrder();
 
     void storeExportSaveOrder(SaveOrderConfig config);
 
-    boolean shouldWarnAboutDuplicatesForImport();
-
-    void setShouldWarnAboutDuplicatesForImport(boolean value);
-
     void clear() throws BackingStoreException;
+
+    void deleteKey(String key) throws IllegalArgumentException;
 
     void flush();
 
@@ -134,23 +120,15 @@ public interface PreferencesService {
 
     void setLanguage(Language language);
 
-    BibDatabaseMode getDefaultBibDatabaseMode();
-
     GeneralPreferences getGeneralPreferences();
-
-    void storeGeneralPreferences(GeneralPreferences preferences);
 
     TelemetryPreferences getTelemetryPreferences();
 
-    void storeTelemetryPreferences(TelemetryPreferences preferences);
+    DOIPreferences getDOIPreferences();
 
     OwnerPreferences getOwnerPreferences();
 
-    void storeOwnerPreferences(OwnerPreferences preferences);
-
     TimestampPreferences getTimestampPreferences();
-
-    void storeTimestampPreferences(TimestampPreferences preferences);
 
     //*************************************************************************************************************
     // GroupsPreferences
@@ -160,31 +138,15 @@ public interface PreferencesService {
 
     GroupsPreferences getGroupsPreferences();
 
-    void storeGroupsPreferences(GroupsPreferences preferences);
-
-    GroupViewMode getGroupViewMode();
-
-    void setGroupViewMode(GroupViewMode mode);
-
-    boolean getDisplayGroupCount();
-
     //*************************************************************************************************************
     // EntryEditorPreferences
     //*************************************************************************************************************
-
-    Map<String, Set<Field>> getEntryEditorTabList();
-
-    void updateEntryEditorTabList();
 
     Map<String, Set<Field>> getDefaultTabNamesAndFields();
 
     List<Field> getAllDefaultTabFieldNames();
 
-    void storeEntryEditorTabList(Map<String, Set<Field>> customTabsMap);
-
     EntryEditorPreferences getEntryEditorPreferences();
-
-    void storeEntryEditorPreferences(EntryEditorPreferences preferences);
 
     //*************************************************************************************************************
     // Network preferences
@@ -192,11 +154,9 @@ public interface PreferencesService {
 
     RemotePreferences getRemotePreferences();
 
-    void storeRemotePreferences(RemotePreferences remotePreferences);
-
     ProxyPreferences getProxyPreferences();
 
-    void storeProxyPreferences(ProxyPreferences proxyPreferences);
+    SSLPreferences getSSLPreferences();
 
     //*************************************************************************************************************
     // CitationKeyPatternPreferences
@@ -230,7 +190,7 @@ public interface PreferencesService {
 
     ColumnPreferences getColumnPreferences();
 
-    void storeColumnPreferences(ColumnPreferences columnPreferences);
+    void storeMainTableColumnPreferences(ColumnPreferences columnPreferences);
 
     MainTablePreferences getMainTablePreferences();
 
@@ -241,44 +201,34 @@ public interface PreferencesService {
     void storeMainTableNameFormatPreferences(MainTableNameFormatPreferences preferences);
 
     //*************************************************************************************************************
+    // SearchDialogColumnPreferences
+    //*************************************************************************************************************
+
+    ColumnPreferences getSearchDialogColumnPreferences();
+
+    void storeSearchDialogColumnPreferences(ColumnPreferences columnPreferences);
+
+    //*************************************************************************************************************
     // AppearancePreferences
     //*************************************************************************************************************
 
-    Theme getTheme();
-
-    void updateTheme();
-
     AppearancePreferences getAppearancePreferences();
-
-    void storeAppearancePreference(AppearancePreferences preferences);
 
     //*************************************************************************************************************
     // File preferences
     //*************************************************************************************************************
 
-    boolean shouldOpenLastFilesOnStartup();
-
-    void storeOpenLastFilesOnStartup(boolean openLastFilesOnStartup);
-
-    NewLineSeparator getNewLineSeparator();
-
-    void storeNewLineSeparator(NewLineSeparator newLineSeparator);
-
     AutoLinkPreferences getAutoLinkPreferences();
 
-    void storeAutoLinkPreferences(AutoLinkPreferences autoLinkPreferences);
+    FileLinkPreferences getFileLinkPreferences();
 
-    boolean shouldAutosave();
-
-    void storeShouldAutosave(boolean shouldAutosave);
+    void storeFileDirforDatabase(List<Path> dirs);
 
     //*************************************************************************************************************
     // Import/Export preferences
     //*************************************************************************************************************
 
     ImportExportPreferences getImportExportPreferences();
-
-    void storeImportExportPreferences(ImportExportPreferences preferences);
 
     List<TemplateExporter> getCustomExportFormats(JournalAbbreviationRepository repository);
 
@@ -288,15 +238,13 @@ public interface PreferencesService {
 
     void storeCustomImportFormats(Set<CustomImporter> customImporters);
 
+    ImporterPreferences getImporterPreferences();
+
     //*************************************************************************************************************
     // Preview preferences
     //*************************************************************************************************************
 
     PreviewPreferences getPreviewPreferences();
-
-    void updatePreviewPreferences();
-
-    void storePreviewPreferences(PreviewPreferences previewPreferences);
 
     //*************************************************************************************************************
     // SidePanePreferences
@@ -304,21 +252,13 @@ public interface PreferencesService {
 
     SidePanePreferences getSidePanePreferences();
 
-    void storeSidePanePreferences(SidePanePreferences sidePanePreferences);
-
     //*************************************************************************************************************
     // GuiPreferences
     //*************************************************************************************************************
 
     GuiPreferences getGuiPreferences();
 
-    void storeGuiPreferences(GuiPreferences guiPreferences);
-
     void clearEditedFiles();
-
-    Path getWorkingDir();
-
-    void setWorkingDirectory(Path dir);
 
     //*************************************************************************************************************
     // Misc preferences
@@ -326,23 +266,13 @@ public interface PreferencesService {
 
     XmpPreferences getXmpPreferences();
 
-    void storeXmpPreferences(XmpPreferences preferences);
-
     NameFormatterPreferences getNameFormatterPreferences();
-
-    void storeNameFormatterPreferences(NameFormatterPreferences preferences);
 
     AutoCompletePreferences getAutoCompletePreferences();
 
-    void storeAutoCompletePreferences(AutoCompletePreferences autoCompletePreferences);
-
     SpecialFieldsPreferences getSpecialFieldsPreferences();
 
-    void storeSpecialFieldsPreferences(SpecialFieldsPreferences specialFieldsPreferences);
-
     SearchPreferences getSearchPreferences();
-
-    void storeSearchPreferences(SearchPreferences preferences);
 
     String getLastPreferencesExportPath();
 
@@ -352,19 +282,7 @@ public interface PreferencesService {
 
     void storeExternalFileTypes(String externalFileTypes);
 
-    Optional<String> getMergeDiffMode();
-
-    void storeMergeDiffMode(String diffMode);
-
     MrDlibPreferences getMrDlibPreferences();
 
-    void storeMrDlibPreferences(MrDlibPreferences preferences);
-
-    String getIdBasedFetcherForEntryGenerator();
-
-    void storeIdBasedFetcherForEntryGenerator(String fetcherName);
-
     ProtectedTermsPreferences getProtectedTermsPreferences();
-
-    void storeProtectedTermsPreferences(ProtectedTermsPreferences preferences);
 }

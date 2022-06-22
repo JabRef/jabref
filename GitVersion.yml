@@ -3,7 +3,7 @@ assembly-informational-format: '{major}.{minor}{PreReleaseTagWithDash}--{CommitD
 mode: ContinuousDeployment
 
 branches:
-  master:
-    regex: ^master
+  main:
+    regex: ^main
     tag: ''
-    pre-release-weight: 0 # 0 after stable release, 15000 before alpha release, 30000 before beta release, 50000 before stable release
+    pre-release-weight: 0  # 0 after stable release, 15000 before alpha release, 30000 before beta release, 50000 before stable release

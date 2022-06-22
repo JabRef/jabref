@@ -37,6 +37,10 @@
     -fx-padding: 5px;
 }
 
+.contrib-section {
+    -fx-padding: 5 5 10 5;
+}
+
 .logo-pane {
     fx-fill: transparent;
 }

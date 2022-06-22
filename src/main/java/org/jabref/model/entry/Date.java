@@ -4,17 +4,52 @@ import java.time.LocalDate;
 import java.time.Year;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoField;
 import java.time.temporal.TemporalAccessor;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 
 public class Date {
 
+    private static final DateTimeFormatter NORMALIZED_DATE_FORMATTER = DateTimeFormatter.ofPattern("uuuu[-MM][-dd]");
+    private static final DateTimeFormatter SIMPLE_DATE_FORMATS;
+
+    static {
+        List<String> formatStrings = Arrays.asList(
+                "uuuu-MM-dd'T'HH:mm[:ss][xxx][xx][X]",  // covers 2018-10-03T07:24:14+03:00
+                "uuuu-MM-dd'T'HH:m[:ss][xxx][xx][X]",   // covers 2018-10-03T17:2
+                "uuuu-MM-dd'T'H:mm[:ss][xxx][xx][X]",   // covers 2018-10-03T7:24
+                "uuuu-MM-dd'T'H:m[:ss][xxx][xx][X]",    // covers 2018-10-03T7:7
+                "uuuu-MM-dd'T'HH[:ss][xxx][xx][X]",     // covers 2018-10-03T07
+                "uuuu-MM-dd'T'H[:ss][xxx][xx][X]",      // covers 2018-10-03T7
+                "uuuu-M-d",                             // covers 2009-1-15
+                "uuuu-M",                               // covers 2009-11
+                "d-M-uuuu",                             // covers 15-1-2012
+                "M-uuuu",                               // covers 1-2012
+                "M/uuuu",                               // covers 9/2015 and 09/2015
+                "M/uu",                                 // covers 9/15
+                "MMMM d, uuuu",                         // covers September 1, 2015
+                "MMMM, uuuu",                           // covers September, 2015
+                "d.M.uuuu",                             // covers 15.1.2015
+                "uuuu.M.d",                             // covers 2015.1.15
+                "uuuu",                                 // covers 2015
+                "MMM, uuuu");                           // covers Jan, 2020
+
+        SIMPLE_DATE_FORMATS = formatStrings.stream()
+                                           .map(DateTimeFormatter::ofPattern)
+                                           .reduce(new DateTimeFormatterBuilder(),
+                                                   DateTimeFormatterBuilder::appendOptional,
+                                                   (builder, formatterBuilder) -> builder.append(formatterBuilder.toFormatter()))
+                                           .toFormatter(Locale.US);
+    }
+
     private final TemporalAccessor date;
+    private final TemporalAccessor endDate;
 
     public Date(int year, int month, int dayOfMonth) {
         this(LocalDate.of(year, month, dayOfMonth));
@@ -30,47 +65,55 @@ public class Date {
 
     public Date(TemporalAccessor date) {
         this.date = date;
+        endDate = null;
     }
 
     /**
-     * Try to parse the following formats
-     *  - "M/y" (covers 9/15, 9/2015, and 09/2015)
-     *  - "MMMM (dd), yyyy" (covers September 1, 2015 and September, 2015)
-     *  - "yyyy-MM-dd" (covers 2009-1-15)
-     *  - "dd-MM-yyyy" (covers 15-1-2009)
-     *  - "d.M.uuuu" (covers 15.1.2015)
-     *  - "uuuu.M.d" (covers 2015.1.15)
-     *  - "MMM, uuuu" (covers Jan, 2020)
-     * The code is essentially taken from http://stackoverflow.com/questions/4024544/how-to-parse-dates-in-multiple-formats-using-simpledateformat.
+     * Creates a Date from date and endDate.
+     *
+     * @param date the start date
+     * @param endDate the start date
+     */
+    public Date(TemporalAccessor date, TemporalAccessor endDate) {
+        this.date = date;
+        this.endDate = endDate;
+    }
+
+    /**
+     * Creates a Date from date and endDate.
+     *
+     * @param dateString the string to extract the date information
+     * @throws DateTimeParseException if dataString is mal-formatted
      */
     public static Optional<Date> parse(String dateString) {
         Objects.requireNonNull(dateString);
-        List<String> formatStrings = Arrays.asList(
-                "uuuu-M-d",
-                "uuuu-M",
-                "d-M-uuuu",
-                "M-uuuu",
-                "M/uu",
-                "M/uuuu",
-                "MMMM d, uuuu",
-                "MMMM, uuuu",
-                "d.M.uuuu",
-                "uuuu.M.d", "uuuu",
-                "MMM, uuuu");
 
-        for (String formatString : formatStrings) {
+        if (dateString.isEmpty()) {
+            return Optional.empty();
+        }
+
+        // if dateString has format of uuuu/uuuu, treat as date range
+        if (dateString.matches("[0-9]{4}/[0-9]{4}")) {
             try {
-                TemporalAccessor parsedDate = DateTimeFormatter.ofPattern(formatString).parse(dateString);
-                return Optional.of(new Date(parsedDate));
+                String[] strDates = dateString.split("/");
+                TemporalAccessor parsedDate = SIMPLE_DATE_FORMATS.parse(strDates[0]);
+                TemporalAccessor parsedEndDate = SIMPLE_DATE_FORMATS.parse(strDates[1]);
+                return Optional.of(new Date(parsedDate, parsedEndDate));
             } catch (DateTimeParseException ignored) {
-                // Ignored
+                return Optional.empty();
             }
         }
 
-        return Optional.empty();
+        try {
+            TemporalAccessor parsedDate = SIMPLE_DATE_FORMATS.parse(dateString);
+            return Optional.of(new Date(parsedDate));
+        } catch (DateTimeParseException ignored) {
+            return Optional.empty();
+        }
     }
 
-    public static Optional<Date> parse(Optional<String> yearValue, Optional<String> monthValue,
+    public static Optional<Date> parse(Optional<String> yearValue,
+                                       Optional<String> monthValue,
                                        Optional<String> dayValue) {
         Optional<Year> year = yearValue.flatMap(Date::convertToInt).map(Year::of);
         Optional<Month> month = monthValue.flatMap(Month::parse);
@@ -103,8 +146,7 @@ public class Date {
     }
 
     public String getNormalized() {
-        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("uuuu[-MM][-dd]");
-        return dateFormatter.format(date);
+        return NORMALIZED_DATE_FORMATTER.format(date);
     }
 
     public Optional<Integer> getYear() {
@@ -140,15 +182,28 @@ public class Date {
             return false;
         }
         Date date1 = (Date) o;
+
         return Objects.equals(getYear(), date1.getYear()) &&
                 Objects.equals(getMonth(), date1.getMonth()) &&
-                Objects.equals(getDay(), date1.getDay());
+                Objects.equals(getDay(), date1.getDay()) &&
+                Objects.equals(get(ChronoField.HOUR_OF_DAY), date1.get(ChronoField.HOUR_OF_DAY)) &&
+                Objects.equals(get(ChronoField.MINUTE_OF_HOUR), date1.get(ChronoField.MINUTE_OF_HOUR)) &&
+                Objects.equals(get(ChronoField.SECOND_OF_DAY), date1.get(ChronoField.SECOND_OF_DAY)) &&
+                Objects.equals(get(ChronoField.OFFSET_SECONDS), date1.get(ChronoField.OFFSET_SECONDS));
     }
 
     @Override
     public String toString() {
+        String formattedDate;
+        if (date.isSupported(ChronoField.OFFSET_SECONDS)) {
+            formattedDate = DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(date);
+        } else if (date.isSupported(ChronoField.HOUR_OF_DAY)) {
+            formattedDate = DateTimeFormatter.ISO_DATE_TIME.format(date);
+        } else {
+            formattedDate = DateTimeFormatter.ISO_DATE.format(date);
+        }
         return "Date{" +
-                "date=" + date +
+                "date=" + formattedDate +
                 '}';
     }
 

@@ -21,4 +21,8 @@ public class BooktitleCheckerTest {
         assertNotEquals(Optional.empty(), checker.checkValue("Digital Information and Communication Technology and it's Applications (DICTAP), 2014 Fourth International Conference on"));
     }
 
+    @Test
+    void booktitleIsBlank() {
+        assertEquals(Optional.empty(), checker.checkValue(" "));
+    }
 }

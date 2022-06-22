@@ -1,0 +1,87 @@
+name: Pull request feedback
+
+on:
+  pull_request_target:
+    types: [ opened, synchronize, workflow_dispatch]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+    steps:
+    # owner-test just checks out the PR -- this has an exfiltration risk, make SURE that
+    # this can only be triggered by people with repo write access -- such as people that can add
+    # labels to a PR
+    # https://securitylab.github.com/research/github-actions-preventing-pwn-requests
+    - name: Checkout repo for OWNER TEST
+      uses: actions/checkout@v2
+      if: contains(github.event.pull_request.labels.*.name, 'safe to test')
+      with:
+        ref: ${{ github.event.pull_request.head.ref }}
+
+    # otherwise, checkout the current master, and the pr to the subdirectory 'pull-request'
+    - name: Checkout base repo for pull-request test
+      uses: actions/checkout@v2
+      if: "! contains(github.event.pull_request.labels.*.name, 'safe to test')"
+    - name: Checkout pull-request
+      uses: actions/checkout@v2
+      if: "! contains(github.event.pull_request.labels.*.name, 'safe to test')"
+      with:
+        repository: ${{ github.event.pull_request.head.repo.full_name }}
+        path: pull-request
+        ref: ${{ github.event.pull_request.head.ref }}
+        token: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Check for relevant changes
+      uses: dorny/paths-filter@v2
+      id: changed
+      with:
+        list-files: shell
+        filters: |
+          style:
+            - '*.csl'
+            - 'dependent/*.csl'
+          locale:
+            - '*.xml'
+
+    - name: Changed files
+      run: |
+        echo changed: ${{ steps.changed.outputs.style_files }} ${{ steps.changed.outputs.locale_files }}
+
+    - name: Set up Ruby
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: 3.0.2
+    - name: but use cache to speed that up
+      uses: actions/cache@v2
+      with:
+        path: vendor/bundle
+        key: ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-gems-
+    - name: Bundle install
+      run: |
+        bundle config path vendor/bundle
+        bundle update sheldon --jobs 4 --retry 3
+
+    - name: Welcome to a new PR
+      if: github.event.action == 'opened' && steps.changed.outputs.style == 'true'
+      run: bundle exec sheldon --token=$GITHUB_TOKEN --welcome
+
+    - name: See if the styles/locales work
+      run: bundle exec rake
+
+    - name: report
+      if: (failure() || success()) && steps.changed.outputs.style == 'true'
+      run: bundle exec sheldon --token=$GITHUB_TOKEN --${{ job.status }} --verbose
+
+    - name: commit reindented styles
+      if: github.repository == 'citation-style-language/styles' && steps.changed.outputs.style == 'true'
+      continue-on-error: true
+      uses: stefanzweifel/git-auto-commit-action@v4
+      with:
+        commit_message: Re-indent CSL styles
+        file_pattern: ${{ steps.changed.outputs.style_files }}
+        repository: pull-request
+        skip_dirty_check: false
