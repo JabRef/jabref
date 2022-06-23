@@ -74,7 +74,7 @@ def send_message(message):
 
 def add_jabref_entry(data):
     """Send string via cli as literal to preserve special characters"""
-    cmd = str(JABREF_PATH).split() + ["--importBibtex", r"{}".format(data)]
+    cmd = str(JABREF_PATH).split() + ["--importBibtex", r"'{}'".format(data)]
     logging.info("Try to execute command {}".format(cmd))
     response = subprocess.check_output(cmd, stderr=subprocess.STDOUT)
     logging.info("Called JabRef and got: {}".format(response))
