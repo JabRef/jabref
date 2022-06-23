@@ -5,4 +5,7 @@ tasks:
 vscode:
   extensions:
     - redhat.java
-    - vscjava.vscode-java-pack
+    - richardwillis.vscode-gradle
+    - vscjava.vscode-java-debug
+    - kiteco.kite
+    - DavidAnson.vscode-markdownlint
