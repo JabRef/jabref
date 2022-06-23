@@ -3,7 +3,10 @@ package org.jabref.gui.desktop.os;
 import java.io.IOException;
 import java.nio.file.Path;
 
+import org.jabref.gui.DialogService;
+
 public interface NativeDesktop {
+
     void openFile(String filePath, String fileType) throws IOException;
 
     /**
@@ -17,7 +20,7 @@ public interface NativeDesktop {
 
     void openFolderAndSelectFile(Path file) throws IOException;
 
-    void openConsole(String absolutePath) throws IOException;
+    void openConsole(String absolutePath, DialogService dialogService) throws IOException;
 
     String detectProgramPath(String programName, String directoryName);
 

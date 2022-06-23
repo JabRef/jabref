@@ -120,9 +120,9 @@ dependencies {
 
     implementation group: 'org.apache.commons', name: 'commons-csv', version: '1.9.0'
     implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.12.0'
-    implementation 'com.h2database:h2-mvstore:2.1.212'
+    implementation 'com.h2database:h2-mvstore:2.1.214'
 
-    implementation group: 'org.apache.tika', name: 'tika-core', version: '2.4.0'
+    implementation group: 'org.apache.tika', name: 'tika-core', version: '2.4.1'
     implementation 'com.ibm.icu:icu4j-charset:71.1'
 
     // required for reading write-protected PDFs - see https://github.com/JabRef/jabref/pull/942#issuecomment-209252635
@@ -130,26 +130,26 @@ dependencies {
 
     implementation 'commons-cli:commons-cli:1.5.0'
 
-    implementation 'org.libreoffice:libreoffice:7.3.3'
-    implementation 'org.libreoffice:unoloader:7.3.3'
+    implementation 'org.libreoffice:libreoffice:7.3.4'
+    implementation 'org.libreoffice:unoloader:7.3.4'
 
     implementation 'io.github.java-diff-utils:java-diff-utils:4.11'
     implementation 'info.debatty:java-string-similarity:2.0.0'
 
     antlr3 'org.antlr:antlr:3.5.3'
-    implementation 'org.antlr:antlr-runtime:3.5.2'
+    implementation 'org.antlr:antlr-runtime:3.5.3'
 
     antlr4 'org.antlr:antlr4:4.9.3'
     implementation 'org.antlr:antlr4-runtime:4.9.3'
 
-    implementation group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: '6.1.0.202203080745-r'
+    implementation group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: '6.2.0.202206071550-r'
 
     implementation group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-yaml', version: '2.13.3'
     implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.13.3'
 
     implementation group: 'org.mariadb.jdbc', name: 'mariadb-java-client', version: '2.7.5'
 
-    implementation 'org.postgresql:postgresql:42.3.5'
+    implementation 'org.postgresql:postgresql:42.4.0'
 
     implementation ('com.oracle.ojdbc:ojdbc10:19.3.0.0') {
         // causing module issues
@@ -169,7 +169,7 @@ dependencies {
     implementation 'de.saxsys:mvvmfx-validation:1.9.0-SNAPSHOT'
     implementation 'de.saxsys:mvvmfx:1.8.0'
     implementation 'com.tobiasdiez:easybind:2.2'
-    implementation 'org.fxmisc.flowless:flowless:0.6.9'
+    implementation 'org.fxmisc.flowless:flowless:0.6.10'
     implementation 'org.fxmisc.richtext:richtextfx:0.10.9'
     implementation group: 'org.glassfish.hk2.external', name: 'jakarta.inject', version: '2.6.1'
     implementation (group: 'com.dlsc.gemsfx', name: 'gemsfx', version: '1.45.2') {
@@ -211,7 +211,9 @@ dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter:5.8.2'
     testImplementation 'org.junit.platform:junit-platform-launcher:1.8.2'
 
-    testImplementation 'org.mockito:mockito-core:4.5.1'
+    testRuntimeOnly group: 'org.apache.logging.log4j', name: 'log4j-core', version: '3.0.0-SNAPSHOT'
+    testRuntimeOnly group: 'org.apache.logging.log4j', name: 'log4j-jul', version: '3.0.0-SNAPSHOT'
+    testImplementation 'org.mockito:mockito-core:4.6.1'
     testImplementation 'org.xmlunit:xmlunit-core:2.9.0'
     testImplementation 'org.xmlunit:xmlunit-matchers:2.9.0'
     testRuntimeOnly 'com.tngtech.archunit:archunit-junit5-engine:0.23.1'
@@ -266,7 +268,8 @@ task generateSource(dependsOn: ["generateBstGrammarSource",
                                 "generateMedlineSource",
                                 "generateBibtexmlSource",
                                 "generateEndnoteSource",
-                                "generateModsSource"]) {
+                                "generateModsSource",
+                                "generateCitaviSource"]) {
     group = 'JabRef'
     description 'Generates all necessary (Java) source files.'
 }
@@ -318,6 +321,15 @@ task generateEndnoteSource(type: XjcTask) {
     schemaFile = "src/main/resources/xjc/endnote/endnote.xsd"
     outputDirectory = "src-gen/main/java/"
     javaPackage = "org.jabref.logic.importer.fileformat.endnote"
+}
+
+task generateCitaviSource(type: XjcTask) {
+    group = 'JabRef'
+    description = "Generates java files for the citavi importer."
+
+    schemaFile = "src/main/resources/xjc/citavi/citavi.xsd"
+    outputDirectory = "src-gen/main/java/"
+    javaPackage = "org.jabref.logic.importer.fileformat.citavi"
 }
 
 task generateModsSource(type: XjcTask) {
