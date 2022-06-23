@@ -1,5 +1,6 @@
 package org.jabref.gui.copyfiles;
 
+import javafx.event.EventType;
 import javafx.fxml.FXML;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.TableColumn;
@@ -13,6 +14,7 @@ import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.logic.l10n.Localization;
 
 import com.airhacks.afterburner.views.ViewLoader;
+import org.fxmisc.wellbehaved.event.InputMap;
 
 public class CopyFilesDialogView extends BaseDialog<Void> {
 
@@ -40,6 +42,8 @@ public class CopyFilesDialogView extends BaseDialog<Void> {
     }
 
     private void setupTable() {
+        InputMap.ignore(EventType.ROOT);
+
         colFile.setCellValueFactory(cellData -> cellData.getValue().getFile());
         colMessage.setCellValueFactory(cellData -> cellData.getValue().getMessage());
         colStatus.setCellValueFactory(cellData -> cellData.getValue().getIcon());
