@@ -283,7 +283,7 @@ public class BibtexParser implements Parser {
 
             LOGGER.debug("Could not parse entry", ex);
             parserResult.addWarning(Localization.lang("Error occurred when parsing entry") + ": '" + ex.getMessage()
-                    + "'. " + Localization.lang("Skipped entry."));
+                    + "'. " + "\n\n" + Localization.lang("JabRef skipped the entry."));
         }
     }
 
