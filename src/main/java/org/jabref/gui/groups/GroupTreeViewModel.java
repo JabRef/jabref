@@ -186,10 +186,10 @@ public class GroupTreeViewModel extends AbstractViewModel {
     }
 
     private boolean compareGroupType(AbstractGroup oldGroup, AbstractGroup newGroup) {
-        if (!oldGroup.getClass().equals(newGroup.getClass())) {
-            return false;
-        }
+        return oldGroup.getClass().equals(newGroup.getClass());
+    }
 
+    private boolean compareGroupFields(AbstractGroup oldGroup, AbstractGroup newGroup) {
         if (oldGroup.getClass() == WordKeywordGroup.class) {
             WordKeywordGroup oldWordKeywordGroup = (WordKeywordGroup) oldGroup;
             WordKeywordGroup newWordKeywordGroup = (WordKeywordGroup) newGroup;
@@ -198,8 +198,8 @@ public class GroupTreeViewModel extends AbstractViewModel {
                 return false;
             } else if (!oldWordKeywordGroup.getSearchExpression().equals(newWordKeywordGroup.getSearchExpression())) {
                 return false;
-            } else if (oldWordKeywordGroup.isCaseSensitive() != newWordKeywordGroup.isCaseSensitive()) {
-                return false;
+            } else {
+                return oldWordKeywordGroup.isCaseSensitive() == newWordKeywordGroup.isCaseSensitive();
             }
         } else if (oldGroup.getClass() == RegexKeywordGroup.class) {
             RegexKeywordGroup oldRegexKeywordGroup = (RegexKeywordGroup) oldGroup;
@@ -209,8 +209,8 @@ public class GroupTreeViewModel extends AbstractViewModel {
                 return false;
             } else if (!oldRegexKeywordGroup.getSearchExpression().equals(newRegexKeywordGroup.getSearchExpression())) {
                 return false;
-            } else if (oldRegexKeywordGroup.isCaseSensitive() != newRegexKeywordGroup.isCaseSensitive()) {
-                return false;
+            } else {
+                return oldRegexKeywordGroup.isCaseSensitive() == newRegexKeywordGroup.isCaseSensitive();
             }
         } else if (oldGroup.getClass() == SearchGroup.class) {
             SearchGroup oldSearchGroup = (SearchGroup) oldGroup;
@@ -218,8 +218,8 @@ public class GroupTreeViewModel extends AbstractViewModel {
 
             if (!oldSearchGroup.getSearchExpression().equals(newSearchGroup.getSearchExpression())) {
                 return false;
-            } else if (!oldSearchGroup.getSearchFlags().equals(newSearchGroup.getSearchFlags())) {
-                return false;
+            } else {
+                return oldSearchGroup.getSearchFlags().equals(newSearchGroup.getSearchFlags());
             }
         } else if (oldGroup.getClass() == ExplicitGroup.class) {
             return true;
@@ -232,24 +232,20 @@ public class GroupTreeViewModel extends AbstractViewModel {
                     return false;
                 } else if (!oldAutomaticKeywordGroup.getKeywordHierarchicalDelimiter().toString().equals(newAutomaticKeywordGroup.getKeywordHierarchicalDelimiter().toString())) {
                     return false;
-                } else if (!oldAutomaticKeywordGroup.getField().getName().equals(newAutomaticKeywordGroup.getField().getName())) {
-                    return false;
+                } else {
+                    return oldAutomaticKeywordGroup.getField().getName().equals(newAutomaticKeywordGroup.getField().getName());
                 }
             } else if (oldGroup.getClass() == AutomaticPersonsGroup.class) {
                 AutomaticPersonsGroup oldAutomaticPersonsGroup = (AutomaticPersonsGroup) oldGroup;
                 AutomaticPersonsGroup newAutomaticPersonsGroup = (AutomaticPersonsGroup) newGroup;
 
-                if (!oldAutomaticPersonsGroup.getField().getName().equals(newAutomaticPersonsGroup.getField().getName())) {
-                    return false;
-                }
+                return oldAutomaticPersonsGroup.getField().getName().equals(newAutomaticPersonsGroup.getField().getName());
             }
         } else if (oldGroup.getClass() == TexGroup.class) {
             TexGroup oldTexGroup = (TexGroup) oldGroup;
             TexGroup newTexGroup = (TexGroup) newGroup;
 
-            if (!oldTexGroup.getFilePath().toString().equals(newTexGroup.getFilePath().toString())) {
-                return false;
-            }
+            return oldTexGroup.getFilePath().toString().equals(newTexGroup.getFilePath().toString());
         }
         return true;
     }
@@ -269,7 +265,8 @@ public class GroupTreeViewModel extends AbstractViewModel {
             newGroup.ifPresent(group -> {
                 // TODO: Keep assignments
                 boolean keepPreviousAssignments = true;
-                if (!compareGroupType(oldGroup.getGroupNode().getGroup(), newGroup.get())) {
+                if (!compareGroupType(oldGroup.getGroupNode().getGroup(), newGroup.get())
+                        || !compareGroupFields(oldGroup.getGroupNode().getGroup(), newGroup.get())) {
                     keepPreviousAssignments = dialogService.showConfirmationDialogAndWait(
                     Localization.lang("Change of Grouping Method"),
                     Localization.lang("Assign the original group's entries to this group?"));
