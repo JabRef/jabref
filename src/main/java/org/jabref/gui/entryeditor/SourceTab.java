@@ -310,9 +310,7 @@ public class SourceTab extends EntryEditorTab {
                     new FieldWriter(fieldWriterPreferences).write(fieldName, newValue);
 
                     compound.addEdit(new UndoableFieldChange(outOfFocusEntry, fieldName, oldValue, newValue));
-                    if (outOfFocusEntry.getField(fieldName).isPresent()) {
-                        outOfFocusEntry.setField(fieldName, newValue);
-                    }
+                    outOfFocusEntry.setField(fieldName, newValue);
                 }
             }
 

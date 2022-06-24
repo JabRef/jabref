@@ -37,9 +37,10 @@ jobs:
       - name: Run check style reporter
         uses: nikitasavinov/checkstyle-action@master
         with:
-          reporter: github-pr-check
+          reporter: github-pr-review
+          github_token: ${{ secrets.GITHUB_TOKEN }}
           checkstyle_config: 'config/checkstyle/checkstyle_reviewdog.xml'
-          checkstyle_version: '10.1'
+          checkstyle_version: '10.3'
       - name: Run checkstyle gradle
         run: ./gradlew checkstyleMain checkstyleTest checkstyleJmh
       - name: Run markdown-lint

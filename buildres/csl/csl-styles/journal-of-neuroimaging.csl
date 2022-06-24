@@ -14,7 +14,7 @@
     <category field="medicine"/>
     <issn>1051-2284</issn>
     <eissn>1552-6569</eissn>
-    <updated>2022-05-01T19:04:20+00:00</updated>
+    <updated>2022-06-02T19:04:20+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <macro name="editor">
@@ -76,7 +76,7 @@
       </group>
     </layout>
   </citation>
-  <bibliography hanging-indent="false" et-al-min="99" et-al-use-first="98" second-field-align="flush">
+  <bibliography hanging-indent="false" et-al-min="7" et-al-use-first="3" second-field-align="flush">
     <layout>
       <text variable="citation-number" suffix=". "/>
       <group delimiter=". ">
