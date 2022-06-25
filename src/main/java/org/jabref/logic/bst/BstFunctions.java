@@ -334,9 +334,9 @@ public class BstFunctions {
         public void execute(BstVMVisitor visitor, ParserRuleContext parserRuleContext, BstEntry bstEntry) {
             if (bstEntry == null) {
                 this.execute(visitor, parserRuleContext); // Throw error
+            } else {
+                functions.get(bstEntry.entry.getType().getName()).execute(visitor, parserRuleContext, bstEntry);
             }
-
-            functions.get(parserRuleContext.getText()).execute(visitor, parserRuleContext, bstEntry);
         }
     }
 
@@ -508,8 +508,8 @@ public class BstFunctions {
             throw new BstVMException("Not enough operands on stack for if$");
         }
 
-        Object f1 = stack.pop();
         Object f2 = stack.pop();
+        Object f1 = stack.pop();
         Object i = stack.pop();
 
         if (!((f1 instanceof BstVMVisitor.Identifier) || (f1 instanceof ParseTree))
@@ -518,9 +518,9 @@ public class BstFunctions {
         }
 
         if (((Integer) i) > 0) {
-            visitor.visit((ParseTree) f2);
+            new BstVMVisitor.BstVMFunction<>(f1).execute(visitor, parserRuleContext);
         } else {
-            visitor.visit((ParseTree) f1);
+            new BstVMVisitor.BstVMFunction<>(f2).execute(visitor, parserRuleContext);
         }
     }
 

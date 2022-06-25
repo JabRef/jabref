@@ -153,6 +153,25 @@ class TestBstVMVisitor {
         assertEquals(0, vm.getStack().size());
     }
 
+    @Test
+    void testIf() {
+        TestBstVM.TestVM vm = new TestBstVM.TestVM("""
+                FUNCTION { path1 } { #1 }
+                FUNCTION { path0 } { #0 }
+                FUNCTION { test } {
+                    #1 path1 path0 if$
+                    #0 path1 path0 if$
+                }
+                EXECUTE { test }
+                """);
+
+        vm.render(Collections.emptyList());
+
+        assertEquals(0, vm.getStack().pop());
+        assertEquals(1, vm.getStack().pop());
+        assertEquals(0, vm.getStack().size());
+    }
+
     // bstFunction
 
     // stackitem

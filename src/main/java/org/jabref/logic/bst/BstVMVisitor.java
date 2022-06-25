@@ -237,17 +237,14 @@ class BstVMVisitor extends BstBaseVisitor<Integer> {
         return BstVM.TRUE;
     }
 
-    private class BstVMFunction<T> implements BstFunctions.BstFunction {
-        private final T expression;
-
-        BstVMFunction(T expression) {
-            this.expression = expression;
-        }
+    public record BstVMFunction<T>(T expression) implements BstFunctions.BstFunction {
 
         @Override
         public void execute(BstVMVisitor visitor, ParserRuleContext bstFunctionContext) {
             if (expression instanceof String str) {
-                bstVMContext.stack().push(str.substring(1, str.length() - 1)); // Macro
+                visitor.bstVMContext.stack().push(str.substring(1, str.length() - 1));
+            } else if (expression instanceof Integer integer) {
+                visitor.bstVMContext.stack().push(integer);
             } else if (expression instanceof ParserRuleContext ctx) {
                 visitor.visit(ctx);
             }
