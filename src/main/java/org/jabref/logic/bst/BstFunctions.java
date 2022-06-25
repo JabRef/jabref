@@ -508,19 +508,20 @@ public class BstFunctions {
             throw new BstVMException("Not enough operands on stack for if$");
         }
 
-        Object f2 = stack.pop();
         Object f1 = stack.pop();
+        Object f2 = stack.pop();
         Object i = stack.pop();
 
         if (!((f1 instanceof BstVMVisitor.Identifier) || (f1 instanceof ParseTree))
-                && ((f2 instanceof BstVMVisitor.Identifier) || (f2 instanceof ParseTree)) && (i instanceof Integer)) {
+                && ((f2 instanceof BstVMVisitor.Identifier) || (f2 instanceof ParseTree))
+                && (i instanceof Integer)) {
             throw new BstVMException("Expecting two functions and an integer for if$.");
         }
 
         if (((Integer) i) > 0) {
-            new BstVMVisitor.BstVMFunction<>(f1).execute(visitor, parserRuleContext);
-        } else {
             new BstVMVisitor.BstVMFunction<>(f2).execute(visitor, parserRuleContext);
+        } else {
+            new BstVMVisitor.BstVMFunction<>(f1).execute(visitor, parserRuleContext);
         }
     }
 
