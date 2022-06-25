@@ -204,7 +204,7 @@ public class JabRefMain extends Application {
 
         try (DirectoryStream<Path> stream = Files.newDirectoryStream(appData)) {
             for (Path path : stream) {
-                if (Files.isDirectory(path) && !path.equals(currentIndexPath)) {
+                if (Files.isDirectory(path) && !path.toString().endsWith("ssl") && path.toString().contains("lucene") && !path.equals(currentIndexPath)) {
                     LOGGER.info("Deleting out-of-date fulltext search index at {}.", path);
                     Files.walk(path)
                          .sorted(Comparator.reverseOrder())

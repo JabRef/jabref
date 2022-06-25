@@ -47,6 +47,7 @@ class CompositeIdFetcherTest {
                                 .withField(StandardField.KEYWORDS, "astro-ph.GA"),
                         "arXiv:2110.02957"
                 ),
+                /* disabled, because Iacr does not work
                 Arguments.arguments(
                         "performSearchByIdReturnsCorrectEntryForIacrEprintId",
                         new BibEntry(StandardEntryType.Misc)
@@ -61,7 +62,7 @@ class CompositeIdFetcherTest {
                                 .withField(StandardField.YEAR, "2017")
                                 .withCitationKey("cryptoeprint:2017:1118"),
                         "2017/1118"
-                ),
+                ), */
                 Arguments.arguments(
                         "performSearchByIdReturnsCorrectEntryForIsbnId",
                         new BibEntry(StandardEntryType.Book)

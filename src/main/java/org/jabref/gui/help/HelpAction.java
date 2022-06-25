@@ -1,5 +1,6 @@
 package org.jabref.gui.help;
 
+import org.jabref.gui.DialogService;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.logic.help.HelpFile;
@@ -10,25 +11,18 @@ import org.jabref.logic.help.HelpFile;
  */
 public class HelpAction extends SimpleCommand {
 
-    private HelpFile helpPage;
+    private final HelpFile helpPage;
+    private final DialogService dialogService;
 
-    public HelpAction(HelpFile helpPage) {
+    public HelpAction(HelpFile helpPage, DialogService dialogService) {
         this.helpPage = helpPage;
+        this.dialogService = dialogService;
     }
 
-    public static void openHelpPage(HelpFile helpPage) {
+    void openHelpPage(HelpFile helpPage) {
         StringBuilder sb = new StringBuilder("https://docs.jabref.org/");
         sb.append(helpPage.getPageName());
-        JabRefDesktop.openBrowserShowPopup(sb.toString());
-    }
-
-    public static SimpleCommand getMainHelpPageCommand() {
-        return new SimpleCommand() {
-            @Override
-            public void execute() {
-                openHelpPage(HelpFile.CONTENTS);
-            }
-        };
+        JabRefDesktop.openBrowserShowPopup(sb.toString(), dialogService);
     }
 
     @Override
