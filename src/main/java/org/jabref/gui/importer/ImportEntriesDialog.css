@@ -1,5 +1,5 @@
 .addEntryButton {
-    -fx-font-size: 35;
+    -fx-font-size: 2em;
 }
 
 .addEntryButton:selected {
@@ -16,10 +16,10 @@
     -fx-fill: -js-summary-text-color;
 }
 
-.list-cell:entry-selected{
+.list-cell:entry-selected {
     -fx-background-color: derive(-jr-selected, 35%);
 }
 
-.list-cell:entry-selected .summary > Text{
+.list-cell:entry-selected .summary > Text {
     -fx-fill: js-summary-text-color-selected;
 }

@@ -98,7 +98,6 @@
     -jr-drag-target: -jr-purple;
     -jr-drag-target-hover: derive(-jr-purple, 80%);
 
-    /* For summary text color */
     -js-summary-text-color: #000000;
     -js-summary-text-color-selected: #000000;
 
