@@ -1,5 +1,5 @@
 .addEntryButton {
-    -fx-font-size: 2em;
+    -fx-font-size: 35;
 }
 
 .addEntryButton:selected {
@@ -11,10 +11,15 @@
     /*-fx-padding: 0.5em 0em 0.5em 0em;*/
 }
 
-.list-cell {
+.list-cell .summary > Text {
     -fx-padding: 0.5em 0 1em 0.5em;
+    -fx-fill: -js-summary-text-color;
 }
 
-.list-cell:entry-selected {
+.list-cell:entry-selected{
     -fx-background-color: derive(-jr-selected, 35%);
+}
+
+.list-cell:entry-selected .summary > Text{
+    -fx-fill: js-summary-text-color-selected;
 }
