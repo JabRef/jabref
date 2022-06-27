@@ -172,6 +172,70 @@ class TestBstVMVisitor {
         assertEquals(0, vm.getStack().size());
     }
 
+    @Test
+    void testOrTrueTrue() {
+        TestBstVM.TestVM vm = new TestBstVM.TestVM("""
+                FUNCTION { or } { { pop$ #1 } 'skip$ if$ }
+                FUNCTION { test } {
+                    #1 #1 or
+                }
+                EXECUTE { test }
+                """);
+
+        vm.render(Collections.emptyList());
+
+        assertEquals(BstVM.TRUE, vm.getStack().pop());
+        assertEquals(0, vm.getStack().size());
+    }
+
+    @Test
+    void testOrFalseTrue() {
+        TestBstVM.TestVM vm = new TestBstVM.TestVM("""
+                FUNCTION { or } { { pop$ #1 } 'skip$ if$ }
+                FUNCTION { test } {
+                    #0 #1 or
+                }
+                EXECUTE { test }
+                """);
+
+        vm.render(Collections.emptyList());
+
+        assertEquals(BstVM.TRUE, vm.getStack().pop());
+        assertEquals(0, vm.getStack().size());
+    }
+
+    @Test
+    void testOrTrueFalse() {
+        TestBstVM.TestVM vm = new TestBstVM.TestVM("""
+                FUNCTION { or } { { pop$ #1 } 'skip$ if$ }
+                FUNCTION { test } {
+                    #1 #0 or
+                }
+                EXECUTE { test }
+                """);
+
+        vm.render(Collections.emptyList());
+
+        assertEquals(BstVM.TRUE, vm.getStack().pop());
+        assertEquals(0, vm.getStack().size());
+    }
+
+    @Test
+    void testOrFalseFalse() {
+        TestBstVM.TestVM vm = new TestBstVM.TestVM("""
+                FUNCTION { or } { { pop$ #1 } 'skip$ if$ }
+                FUNCTION { test } {
+                    #0 #0 or
+                }
+                EXECUTE { test }
+                """);
+
+        vm.render(Collections.emptyList());
+
+        assertEquals(BstVM.FALSE, vm.getStack().pop());
+        assertEquals(0, vm.getStack().size());
+    }
+
     // bstFunction
 
     // stackitem
