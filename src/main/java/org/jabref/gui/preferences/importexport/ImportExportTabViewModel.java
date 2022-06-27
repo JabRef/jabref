@@ -34,6 +34,7 @@ import org.jabref.logic.preferences.FetcherApiKey;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.metadata.SaveOrderConfig;
+import org.jabref.preferences.ImportExportPreferences;
 import org.jabref.preferences.PreferencesService;
 
 public class ImportExportTabViewModel implements PreferenceTabViewModel {
@@ -55,19 +56,22 @@ public class ImportExportTabViewModel implements PreferenceTabViewModel {
 
     private final BooleanProperty grobidEnabledProperty = new SimpleBooleanProperty();
     private final StringProperty grobidURLProperty = new SimpleStringProperty("");
+    private final BooleanProperty warnAboutDuplicatesOnImportProperty = new SimpleBooleanProperty();
 
     private final DialogService dialogService;
     private final PreferencesService preferencesService;
     private final DOIPreferences doiPreferences;
     private final ImporterPreferences importerPreferences;
     private final SaveOrderConfig initialExportOrder;
+    private final ImportExportPreferences importExportPreferences;
 
-    public ImportExportTabViewModel(PreferencesService preferencesService, DOIPreferences doiPreferences, DialogService dialogService) {
+    public ImportExportTabViewModel(PreferencesService preferencesService, DOIPreferences doiPreferences, DialogService dialogService, ImportExportPreferences importExportPreferences) {
         this.dialogService = dialogService;
         this.preferencesService = preferencesService;
         this.importerPreferences = preferencesService.getImporterPreferences();
         this.doiPreferences = doiPreferences;
         this.initialExportOrder = preferencesService.getExportSaveOrder();
+        this.importExportPreferences = importExportPreferences;
     }
 
     @Override
@@ -75,6 +79,7 @@ public class ImportExportTabViewModel implements PreferenceTabViewModel {
         generateKeyOnImportProperty.setValue(importerPreferences.isGenerateNewKeyOnImport());
         useCustomDOIProperty.setValue(doiPreferences.isUseCustom());
         useCustomDOINameProperty.setValue(doiPreferences.getDefaultBaseURI());
+        warnAboutDuplicatesOnImportProperty.setValue(importExportPreferences.shouldWarnAboutDuplicatesOnImport());
 
         switch (initialExportOrder.getOrderType()) {
             case SPECIFIED -> exportInSpecifiedOrderProperty.setValue(true);
@@ -111,6 +116,7 @@ public class ImportExportTabViewModel implements PreferenceTabViewModel {
                 sortCriteriaProperty.stream().map(SortCriterionViewModel::getCriterion).toList());
         preferencesService.storeExportSaveOrder(newSaveOrderConfig);
 
+        importExportPreferences.setWarnAboutDuplicatesOnImport(warnAboutDuplicatesOnImportProperty.getValue());
         // API keys
         preferencesService.getImporterPreferences().getApiKeys().clear();
         preferencesService.getImporterPreferences().getApiKeys().addAll(apiKeys);
@@ -165,7 +171,9 @@ public class ImportExportTabViewModel implements PreferenceTabViewModel {
     public ObjectProperty<FetcherApiKey> selectedApiKeyProperty() {
         return selectedApiKeyProperty;
     }
-
+    public BooleanProperty warnAboutDuplicatesOnImportProperty() {
+        return warnAboutDuplicatesOnImportProperty;
+    }
     public void checkCustomApiKey() {
         final String apiKeyName = selectedApiKeyProperty.get().getName();
 
