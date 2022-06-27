@@ -55,6 +55,9 @@
 
     -jr-drag-target: -jr-accent;
     -jr-drag-target-hover: -jr-accent;
+
+    -js-summary-text-color: derive(-fx-light-text-color, 70%);
+    -js-summary-text-color-selected: derive( -fx-dark-text-color, 70%);
 }
 
 #previewBody {
