@@ -201,6 +201,10 @@ class BstVMVisitor extends BstBaseVisitor<Integer> {
             return BstVM.TRUE;
         }
 
+        if (bstVMContext.functions().containsKey(name)) {
+            bstVMContext.functions().get(name).execute(this, ctx);
+        }
+
         throw new BstVMException("No matching identifier found: " + name);
     }
 
@@ -242,11 +246,13 @@ class BstVMVisitor extends BstBaseVisitor<Integer> {
         @Override
         public void execute(BstVMVisitor visitor, ParserRuleContext bstFunctionContext) {
             if (expression instanceof String str) {
-                visitor.bstVMContext.stack().push(str.substring(1, str.length() - 1));
+                visitor.bstVMContext.stack().push(str.substring(1, str.length() - 1)); // Macro
+            } else if (expression instanceof ParserRuleContext ctx) {
+                visitor.visit(ctx); // Function
             } else if (expression instanceof Integer integer) {
                 visitor.bstVMContext.stack().push(integer);
-            } else if (expression instanceof ParserRuleContext ctx) {
-                visitor.visit(ctx);
+            } else if (expression instanceof Identifier identifier) {
+                // Fixme: should push parsed identifier
             }
         }
     }
