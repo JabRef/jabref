@@ -112,5 +112,4 @@ public class FileNodeViewModel {
         FileNodeViewModel other = (FileNodeViewModel) obj;
         return Objects.equals(children, other.children) && (fileCount == other.fileCount) && Objects.equals(path, other.path);
     }
-
 }
