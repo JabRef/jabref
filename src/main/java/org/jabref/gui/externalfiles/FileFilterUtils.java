@@ -8,10 +8,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
-
-import org.jabref.logic.util.io.FileUtil;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

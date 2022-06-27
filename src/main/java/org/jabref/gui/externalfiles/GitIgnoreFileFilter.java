@@ -8,7 +8,6 @@ import java.nio.file.Path;
 import java.nio.file.PathMatcher;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -59,9 +58,9 @@ public class GitIgnoreFileFilter implements DirectoryStream.Filter<Path> {
     public boolean accept(Path path) throws IOException {
         // We assume that git does not stop at a patern, but tries all. We implement that behavior
         return gitIgnorePatterns.stream().noneMatch(filter ->
-                // we need this one for "*.png"
-                filter.matches(path.getFileName()) ||
-                // we need this one for "**/*.png"
-                filter.matches(path));
+        // we need this one for "*.png"
+        filter.matches(path.getFileName()) ||
+        // we need this one for "**/*.png"
+                                                              filter.matches(path));
     }
 }

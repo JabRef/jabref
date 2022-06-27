@@ -7,6 +7,7 @@ import java.nio.file.attribute.FileTime;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.Objects;
 
 import javafx.beans.property.ReadOnlyListWrapper;
 import javafx.collections.FXCollections;
@@ -94,4 +95,22 @@ public class FileNodeViewModel {
                 this.children,
                 this.fileCount);
     }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(children, fileCount, path);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (!(obj instanceof FileNodeViewModel)) {
+            return false;
+        }
+        FileNodeViewModel other = (FileNodeViewModel) obj;
+        return Objects.equals(children, other.children) && (fileCount == other.fileCount) && Objects.equals(path, other.path);
+    }
+
 }
