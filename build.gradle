@@ -81,7 +81,7 @@ repositories {
     mavenLocal()
     mavenCentral()
     maven { url 'https://oss.sonatype.org/content/groups/public' }
-    maven { url 'https://repository.apache.org/snapshots' }
+    maven { url 'https://jitpack.io' }
 }
 
 configurations {
@@ -93,6 +93,10 @@ configurations {
         extendsFrom implementation
         exclude group: "javax.activation"
     }
+}
+
+dependencyLocking {
+    lockAllConfigurations()
 }
 
 javafx {
@@ -120,9 +124,9 @@ dependencies {
 
     implementation group: 'org.apache.commons', name: 'commons-csv', version: '1.9.0'
     implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.12.0'
-    implementation 'com.h2database:h2-mvstore:2.1.212'
+    implementation 'com.h2database:h2-mvstore:2.1.214'
 
-    implementation group: 'org.apache.tika', name: 'tika-core', version: '2.4.0'
+    implementation group: 'org.apache.tika', name: 'tika-core', version: '2.4.1'
     implementation 'com.ibm.icu:icu4j-charset:71.1'
 
     // required for reading write-protected PDFs - see https://github.com/JabRef/jabref/pull/942#issuecomment-209252635
@@ -130,8 +134,8 @@ dependencies {
 
     implementation 'commons-cli:commons-cli:1.5.0'
 
-    implementation 'org.libreoffice:libreoffice:7.3.3'
-    implementation 'org.libreoffice:unoloader:7.3.3'
+    implementation 'org.libreoffice:libreoffice:7.3.4'
+    implementation 'org.libreoffice:unoloader:7.3.4'
 
     implementation 'io.github.java-diff-utils:java-diff-utils:4.11'
     implementation 'info.debatty:java-string-similarity:2.0.0'
@@ -142,7 +146,7 @@ dependencies {
     antlr4 'org.antlr:antlr4:4.9.3'
     implementation 'org.antlr:antlr4-runtime:4.9.3'
 
-    implementation group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: '6.1.0.202203080745-r'
+    implementation group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: '6.2.0.202206071550-r'
 
     implementation group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-yaml', version: '2.13.3'
     implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.13.3'
@@ -166,7 +170,7 @@ dependencies {
     // JavaFX stuff
     implementation 'org.kordamp.ikonli:ikonli-javafx:12.3.1'
     implementation 'org.kordamp.ikonli:ikonli-materialdesign2-pack:12.3.1'
-    implementation 'de.saxsys:mvvmfx-validation:1.9.0-SNAPSHOT'
+    implementation 'com.github.sialcasa.mvvmFX:mvvmfx-validation:f195849ca9' //jitpack
     implementation 'de.saxsys:mvvmfx:1.8.0'
     implementation 'com.tobiasdiez:easybind:2.2'
     implementation 'org.fxmisc.flowless:flowless:0.6.10'
@@ -208,15 +212,13 @@ dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter:5.8.2'
     testImplementation 'org.junit.platform:junit-platform-launcher:1.8.2'
 
-    testRuntimeOnly group: 'org.apache.logging.log4j', name: 'log4j-core', version: '3.0.0-SNAPSHOT'
-    testRuntimeOnly group: 'org.apache.logging.log4j', name: 'log4j-jul', version: '3.0.0-SNAPSHOT'
     testImplementation 'org.mockito:mockito-core:4.6.1'
     testImplementation 'org.xmlunit:xmlunit-core:2.9.0'
     testImplementation 'org.xmlunit:xmlunit-matchers:2.9.0'
     testRuntimeOnly 'com.tngtech.archunit:archunit-junit5-engine:0.23.1'
     testImplementation 'com.tngtech.archunit:archunit-junit5-api:0.23.1'
-    testImplementation "org.testfx:testfx-core:4.0.17-alpha-SNAPSHOT"
-    testImplementation "org.testfx:testfx-junit5:4.0.17-alpha-SNAPSHOT"
+    testImplementation "org.testfx:testfx-core:4.0.16-alpha"
+    testImplementation "org.testfx:testfx-junit5:4.0.16-alpha"
     testImplementation "org.hamcrest:hamcrest-library:2.2"
 
     checkstyle 'com.puppycrawl.tools:checkstyle:10.1'
