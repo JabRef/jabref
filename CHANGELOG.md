@@ -18,6 +18,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 
 ### Changed
 
+- Change in the color of the selection entries and the color of the summary in the Import Entries Dialog. [#7927](https://github.com/JabRef/jabref/issues/7927)
 - We upgraded to Lucene 9.2 for the fulltext search.
   Thus, the now created search index cannot be read from older versions of JabRef anylonger.
   ⚠️ JabRef will recreate the index in a new folder for new files and this will take a long time for a huge library.
