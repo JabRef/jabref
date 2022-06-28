@@ -234,6 +234,8 @@ class BstVMVisitor extends BstBaseVisitor<Integer> {
                     case BstParser.QUOTED ->
                             bstVMContext.stack().push(new Identifier(token.getText().substring(1)));
                 }
+            } else if (childNode instanceof BstParser.StackContext) {
+                bstVMContext.stack().push(childNode);
             } else {
                 visit(childNode);
             }
@@ -247,12 +249,14 @@ class BstVMVisitor extends BstBaseVisitor<Integer> {
         public void execute(BstVMVisitor visitor, ParserRuleContext bstFunctionContext) {
             if (expression instanceof String str) {
                 visitor.bstVMContext.stack().push(str.substring(1, str.length() - 1)); // Macro
-            } else if (expression instanceof ParserRuleContext ctx) {
-                visitor.visit(ctx); // Function
             } else if (expression instanceof Integer integer) {
                 visitor.bstVMContext.stack().push(integer);
             } else if (expression instanceof Identifier identifier) {
-                // Fixme: should push parsed identifier
+                if (visitor.bstVMContext.functions().containsKey(identifier.name)) {
+                    visitor.bstVMContext.functions().get(identifier.name).execute(visitor, bstFunctionContext);
+                }
+            } else if (expression instanceof ParserRuleContext ctx) {
+                visitor.visit(ctx); // Function
             }
         }
     }

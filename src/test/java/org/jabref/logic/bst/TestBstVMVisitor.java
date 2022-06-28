@@ -236,6 +236,38 @@ class TestBstVMVisitor {
         assertEquals(0, vm.getStack().size());
     }
 
+    @Test
+    void testOrFiveSix() {
+        TestBstVM.TestVM vm = new TestBstVM.TestVM("""
+                FUNCTION { or } { { pop$ #1 } 'skip$ if$ }
+                FUNCTION { test } {
+                    #5 #6 or
+                }
+                EXECUTE { test }
+                """);
+
+        vm.render(Collections.emptyList());
+
+        assertEquals(BstVM.TRUE, vm.getStack().pop());
+        assertEquals(0, vm.getStack().size());
+    }
+
+    @Test
+    void testOrFalseFive() {
+        TestBstVM.TestVM vm = new TestBstVM.TestVM("""
+                FUNCTION { or } { { pop$ #1 } 'skip$ if$ }
+                FUNCTION { test } {
+                    #0 #5 or
+                }
+                EXECUTE { test }
+                """);
+
+        vm.render(Collections.emptyList());
+
+        assertEquals(BstVM.TRUE, vm.getStack().pop());
+        assertEquals(0, vm.getStack().size());
+    }
+
     // bstFunction
 
     // stackitem
