@@ -5,7 +5,6 @@ import javafx.beans.property.BooleanPropertyBase;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.css.PseudoClass;
-import javafx.event.Event;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
@@ -29,14 +28,8 @@ import org.jabref.logic.l10n.Localization;
 
 import org.fxmisc.flowless.VirtualizedScrollPane;
 import org.fxmisc.richtext.StyleClassedTextArea;
-import org.fxmisc.wellbehaved.event.InputMap;
-import org.fxmisc.wellbehaved.event.Nodes;
 import org.kordamp.ikonli.javafx.FontIcon;
 import org.kordamp.ikonli.materialdesign2.MaterialDesignC;
-
-import static org.fxmisc.wellbehaved.event.EventPattern.anyOf;
-import static org.fxmisc.wellbehaved.event.EventPattern.eventType;
-import static org.fxmisc.wellbehaved.event.EventPattern.mousePressed;
 
 /**
  * A readonly, selectable field cell that contains the value of some field
@@ -143,14 +136,17 @@ public class FieldValueCell extends AbstractCell implements Toggle {
     }
 
     private void preventTextSelectionViaMouseEvents() {
-        InputMap<Event> preventSelection = InputMap.consume(
-                anyOf(eventType(MouseEvent.MOUSE_DRAGGED),
-                      eventType(MouseEvent.DRAG_DETECTED),
-                      eventType(MouseEvent.MOUSE_ENTERED),
-                      mousePressed().unless(e -> e.getClickCount() == 1)
-                )
-        );
-        Nodes.addInputMap(label, preventSelection);
+        label.addEventFilter(MouseEvent.ANY, e -> {
+            if (e.getEventType() == MouseEvent.MOUSE_DRAGGED ||
+                    e.getEventType() == MouseEvent.DRAG_DETECTED ||
+                    e.getEventType() == MouseEvent.MOUSE_ENTERED) {
+                e.consume();
+            } else if (e.getEventType() == MouseEvent.MOUSE_PRESSED) {
+                if (e.getClickCount() > 1) {
+                    e.consume();
+                }
+            }
+        });
     }
 
     @Override
