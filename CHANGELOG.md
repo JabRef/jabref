@@ -13,11 +13,13 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 
 - We added a fetcher for [Biodiversity Heritage Library](https://www.biodiversitylibrary.org/). [8539](https://github.com/JabRef/jabref/issues/8539)
 - We added support for multiple messages in the snackbar. [#7340](https://github.com/JabRef/jabref/issues/7340)
+- We added an extra option in the 'Find Unlinked Files' dialog view to ignore unnecessary files like Thumbs.db, DS_Store, etc. [koppor#373](https://github.com/koppor/jabref/issues/373)
 - JabRef now writes log files. Linux: `$home/.cache/jabref/logs/version`, Windows: `%APPDATA%\..\Local\harawata\jabref\version\logs`, Mac: `Users/.../Library/Logs/jabref/version`
 - We added an importer for Citavi backup files, support ".ctv5bak" and ".ctv6bak" file formats. [#8322](https://github.com/JabRef/jabref/issues/8322)
 
 ### Changed
 
+- Change in the color of the selection entries and the color of the summary in the Import Entries Dialog. [#7927](https://github.com/JabRef/jabref/issues/7927)
 - We upgraded to Lucene 9.2 for the fulltext search.
   Thus, the now created search index cannot be read from older versions of JabRef anylonger.
   ⚠️ JabRef will recreate the index in a new folder for new files and this will take a long time for a huge library.
@@ -30,6 +32,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - The Medline/Pubmed search now also supports the [default fields and operators for searching](https://docs.jabref.org/collect/import-using-online-bibliographic-database#search-syntax). [forum#3554](https://discourse.jabref.org/t/native-pubmed-search/3354)
 - We improved group expansion arrow that prevent it from activating group when expanding or collapsing. [#7982](https://github.com/JabRef/jabref/issues/7982), [#3176](https://github.com/JabRef/jabref/issues/3176)
 - When configured SSL certificates changed, JabRef warns the user to restart to apply the configuration.
+- We improved the appearances and logic of the "Manage field names & content" dialog, and renamed it to "Automatic field editor". [#6536](https://github.com/JabRef/jabref/issues/6536)
 - We fixed an issue that caused JabRef to sometimes open multiple instances when "Remote Operation" is enabled. [#8653](https://github.com/JabRef/jabref/issues/8653)
 
 ### Fixed
