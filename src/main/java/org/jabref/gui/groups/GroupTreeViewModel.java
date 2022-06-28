@@ -197,8 +197,8 @@ public class GroupTreeViewModel extends AbstractViewModel {
             newGroup.ifPresent(group -> {
                 // TODO: Keep assignments
                 String content = Localization.lang("Assign the original group's entries to this group?");
-                ButtonType keepAssignments = new ButtonType(Localization.lang("Yes"), ButtonBar.ButtonData.YES);
-                ButtonType removeAssignments = new ButtonType(Localization.lang("No"), ButtonBar.ButtonData.NO);
+                ButtonType keepAssignments = new ButtonType(Localization.lang("Assign"), ButtonBar.ButtonData.YES);
+                ButtonType removeAssignments = new ButtonType(Localization.lang("Do not assign"), ButtonBar.ButtonData.NO);
                 ButtonType cancel = new ButtonType(Localization.lang("Cancel"), ButtonBar.ButtonData.CANCEL_CLOSE);
 
                 if (newGroup.get().getClass() == WordKeywordGroup.class) {
@@ -225,19 +225,19 @@ public class GroupTreeViewModel extends AbstractViewModel {
                     removePreviousAssignments = false;
                 }
 
-                if (previousAssignments.isPresent() && previousAssignments.get().getButtonData() == ButtonBar.ButtonData.YES) {
+                if (previousAssignments.isPresent() && (previousAssignments.get().getButtonData() == ButtonBar.ButtonData.YES)) {
                     oldGroup.getGroupNode().setGroup(
                             group,
                             true,
                             removePreviousAssignments,
                             database.getEntries());
-                } else if (previousAssignments.isPresent() && previousAssignments.get().getButtonData() == ButtonBar.ButtonData.NO) {
+                } else if (previousAssignments.isPresent() && (previousAssignments.get().getButtonData() == ButtonBar.ButtonData.NO)) {
                     oldGroup.getGroupNode().setGroup(
                             group,
                             false,
                             removePreviousAssignments,
                             database.getEntries());
-                } else if (previousAssignments.isPresent() && previousAssignments.get().getButtonData() == ButtonBar.ButtonData.CANCEL_CLOSE) {
+                } else if (previousAssignments.isPresent() && (previousAssignments.get().getButtonData() == ButtonBar.ButtonData.CANCEL_CLOSE)) {
                     return;
                 }
 
