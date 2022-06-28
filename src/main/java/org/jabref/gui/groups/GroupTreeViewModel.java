@@ -202,7 +202,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
                 ButtonType cancel = new ButtonType(Localization.lang("Cancel"), ButtonBar.ButtonData.CANCEL_CLOSE);
 
                 if (newGroup.get().getClass() == WordKeywordGroup.class) {
-                    content = content + "\n" +
+                    content = content + "\n\n" +
                             Localization.lang("(Note: If original entries lack keywords to qualify for the new group configuration, confirming here will add them)");
                 }
                 Optional<ButtonType> previousAssignments = dialogService.showCustomButtonDialogAndWait(Alert.AlertType.WARNING,
