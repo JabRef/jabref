@@ -117,6 +117,7 @@ public class ImportExportTabViewModel implements PreferenceTabViewModel {
         preferencesService.storeExportSaveOrder(newSaveOrderConfig);
 
         importExportPreferences.setWarnAboutDuplicatesOnImport(warnAboutDuplicatesOnImportProperty.getValue());
+
         // API keys
         preferencesService.getImporterPreferences().getApiKeys().clear();
         preferencesService.getImporterPreferences().getApiKeys().addAll(apiKeys);
@@ -171,9 +172,11 @@ public class ImportExportTabViewModel implements PreferenceTabViewModel {
     public ObjectProperty<FetcherApiKey> selectedApiKeyProperty() {
         return selectedApiKeyProperty;
     }
+
     public BooleanProperty warnAboutDuplicatesOnImportProperty() {
         return warnAboutDuplicatesOnImportProperty;
     }
+
     public void checkCustomApiKey() {
         final String apiKeyName = selectedApiKeyProperty.get().getName();
 
