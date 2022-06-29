@@ -33,8 +33,6 @@ public class GuiPreferences {
 
     private final ObjectProperty<DiffMode> mergeDiffMode;
 
-    private final DoubleProperty sidePaneWidth;
-
     public GuiPreferences(double positionX,
                           double positionY,
                           double sizeX,
@@ -44,8 +42,7 @@ public class GuiPreferences {
                           Path lastFocusedFile,
                           FileHistory fileHistory,
                           String lastSelectedIdBasedFetcher,
-                          DiffMode mergeDiffMode,
-                          double sidePaneWidth) {
+                          DiffMode mergeDiffMode) {
         this.positionX = new SimpleDoubleProperty(positionX);
         this.positionY = new SimpleDoubleProperty(positionY);
         this.sizeX = new SimpleDoubleProperty(sizeX);
@@ -55,7 +52,6 @@ public class GuiPreferences {
         this.lastFocusedFile = new SimpleObjectProperty<>(lastFocusedFile);
         this.lastSelectedIdBasedFetcher = new SimpleStringProperty(lastSelectedIdBasedFetcher);
         this.mergeDiffMode = new SimpleObjectProperty<>(mergeDiffMode);
-        this.sidePaneWidth = new SimpleDoubleProperty(sidePaneWidth);
         this.fileHistory = fileHistory;
     }
 
@@ -165,17 +161,5 @@ public class GuiPreferences {
 
     public void setMergeDiffMode(DiffMode mergeDiffMode) {
         this.mergeDiffMode.set(mergeDiffMode);
-    }
-
-    public double getSidePaneWidth() {
-        return sidePaneWidth.get();
-    }
-
-    public DoubleProperty sidePaneWidthProperty() {
-        return sidePaneWidth;
-    }
-
-    public void setSidePaneWidth(double sidePaneWidth) {
-        this.sidePaneWidth.set(sidePaneWidth);
     }
 }

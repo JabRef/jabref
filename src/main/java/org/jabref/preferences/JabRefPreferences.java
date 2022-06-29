@@ -662,7 +662,7 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(CITE_COMMAND, "\\cite"); // obsoleted by the app-specific ones (not any more?)
 
         defaults.put(LAST_USED_EXPORT, "");
-        defaults.put(SIDE_PANE_WIDTH, 0.15);
+        defaults.put(SIDE_PANE_WIDTH, 300);
 
         defaults.put(MAIN_FONT_SIZE, 9);
         defaults.put(OVERRIDE_DEFAULT_FONT_SIZE, false);
@@ -2481,14 +2481,15 @@ public class JabRefPreferences implements PreferencesService {
         sidePanePreferences = new SidePanePreferences(
                 getVisibleSidePanes(),
                 getSidePanePreferredPositions(),
-                getInt(SELECTED_FETCHER_INDEX));
+                getInt(SELECTED_FETCHER_INDEX),
+                getDouble(SIDE_PANE_WIDTH));
 
         sidePanePreferences.visiblePanes().addListener((InvalidationListener) listener ->
                 storeVisibleSidePanes(sidePanePreferences.visiblePanes()));
         sidePanePreferences.getPreferredPositions().addListener((InvalidationListener) listener ->
                 storeSidePanePreferredPositions(sidePanePreferences.getPreferredPositions()));
         EasyBind.listen(sidePanePreferences.webSearchFetcherSelectedProperty(), (obs, oldValue, newValue) -> putInt(SELECTED_FETCHER_INDEX, newValue));
-
+        EasyBind.subscribe(sidePanePreferences.sidePaneWidthProperty(), width -> putDouble(SIDE_PANE_WIDTH, width.doubleValue()));
         return sidePanePreferences;
     }
 
@@ -2567,8 +2568,7 @@ public class JabRefPreferences implements PreferencesService {
                 Path.of(get(LAST_FOCUSED)),
                 getFileHistory(),
                 get(ID_ENTRY_GENERATOR),
-                DiffMode.parse(get(MERGE_ENTRIES_DIFF_MODE)),
-                getDouble(SIDE_PANE_WIDTH));
+                DiffMode.parse(get(MERGE_ENTRIES_DIFF_MODE)));
 
         EasyBind.listen(guiPreferences.positionXProperty(), (obs, oldValue, newValue) -> putDouble(POS_X, newValue.doubleValue()));
         EasyBind.listen(guiPreferences.positionYProperty(), (obs, oldValue, newValue) -> putDouble(POS_Y, newValue.doubleValue()));
@@ -2587,7 +2587,6 @@ public class JabRefPreferences implements PreferencesService {
         guiPreferences.getFileHistory().getHistory().addListener((InvalidationListener) change -> storeFileHistory(guiPreferences.getFileHistory()));
         EasyBind.listen(guiPreferences.lastSelectedIdBasedFetcherProperty(), (obs, oldValue, newValue) -> put(ID_ENTRY_GENERATOR, newValue));
         EasyBind.listen(guiPreferences.mergeDiffModeProperty(), (obs, oldValue, newValue) -> put(MERGE_ENTRIES_DIFF_MODE, newValue.name()));
-        EasyBind.listen(guiPreferences.sidePaneWidthProperty(), (obs, oldValue, newValue) -> putDouble(SIDE_PANE_WIDTH, newValue.doubleValue()));
 
         return guiPreferences;
     }
