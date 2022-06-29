@@ -36,7 +36,7 @@ class SidePaneViewModelTest {
     DialogService dialogService = mock(DialogService.class);
     UndoManager undoManager = mock(UndoManager.class);
 
-    SidePanePreferences sidePanePreferences = new SidePanePreferences(new HashSet<>(), new HashMap<>(), 0);
+    SidePanePreferences sidePanePreferences = new SidePanePreferences(new HashSet<>(), new HashMap<>(), 0, 300);
     ObservableList<SidePaneType> sidePaneComponents = FXCollections.observableArrayList();
     SidePaneViewModel sidePaneViewModel;
 
