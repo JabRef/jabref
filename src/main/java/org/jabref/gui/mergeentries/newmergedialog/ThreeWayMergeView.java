@@ -50,8 +50,8 @@ public class ThreeWayMergeView extends VBox {
         initializeHeaderView();
         initializeToolbar();
 
-        this.setPrefHeight(Screen.getPrimary().getBounds().getHeight() * 0.75);
-        this.setPrefWidth(Screen.getPrimary().getBounds().getWidth() * 0.95);
+        this.setPrefHeight(Screen.getPrimary().getBounds().getHeight() * 0.80);
+        this.setPrefWidth(Screen.getPrimary().getBounds().getWidth() * 0.97);
 
         getChildren().addAll(toolbar, headerView, scrollPane);
     }
