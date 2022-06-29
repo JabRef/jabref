@@ -98,6 +98,6 @@ For IntelliJ IDEA, just import the project via a Gradle Import by pointing at th
 
 ## Sponsoring
 
-JabRef development is by powered YourKit Java Profiler [![YourKit Java Profiler](https://www.yourkit.com/images/yk_logo.png)](https://www.yourkit.com/java/profiler/)
+JabRef development is powered by YourKit Java Profiler [![YourKit Java Profiler](https://www.yourkit.com/images/yk_logo.png)](https://www.yourkit.com/java/profiler/)
 
 [JabRef]: https://www.jabref.org
