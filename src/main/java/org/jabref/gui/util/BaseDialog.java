@@ -39,10 +39,6 @@ public class BaseDialog<T> extends Dialog<T> implements org.jabref.gui.Dialog<T>
 
         setDialogIcon(IconTheme.getJabRefImage());
         setResizable(true);
-
-        EasyBind.wrapNullable(dialogPaneProperty())
-                .mapObservable(Node::sceneProperty)
-                .subscribeToValues(scene -> Globals.getThemeManager().installCss(scene));
     }
 
     private Optional<Button> getDefaultButton() {
