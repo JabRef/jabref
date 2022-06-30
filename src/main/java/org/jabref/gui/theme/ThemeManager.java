@@ -6,6 +6,7 @@ import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.WeakHashMap;
 import java.util.function.Consumer;
@@ -46,7 +47,7 @@ public class ThemeManager {
     private final StyleSheet baseStyleSheet;
     private Theme theme;
 
-    private final Set<Scene> scenes = Collections.newSetFromMap(new WeakHashMap<>());
+    private Scene mainWindowScene;
     private final Set<WebEngine> webEngines = Collections.newSetFromMap(new WeakHashMap<>());
 
     public ThemeManager(AppearancePreferences appearancePreferences,
@@ -88,8 +89,7 @@ public class ThemeManager {
     }
 
     private void updateFontSettings() {
-        DefaultTaskExecutor.runInJavaFXThread(() ->
-                updateRunner.accept(() -> scenes.forEach(this::updateFontStyle)));
+        DefaultTaskExecutor.runInJavaFXThread(() -> updateRunner.accept(() -> getMainWindowScene().ifPresent(this::updateFontStyle)));
     }
 
     private void removeStylesheetFromWatchList(StyleSheet styleSheet) {
@@ -117,12 +117,10 @@ public class ThemeManager {
         if (baseStyleSheet.getSceneStylesheet() == null) {
             LOGGER.error("Base stylesheet does not exist.");
         } else {
-            LOGGER.debug("Updating base CSS for {} scenes", scenes.size());
+            LOGGER.debug("Updating base CSS for main window scene");
         }
 
-        DefaultTaskExecutor.runInJavaFXThread(() ->
-                updateRunner.accept(() -> scenes.forEach(this::updateBaseCss))
-        );
+        DefaultTaskExecutor.runInJavaFXThread(() -> updateRunner.accept(() -> getMainWindowScene().ifPresent(this::updateBaseCss)));
     }
 
     private void additionalCssLiveUpdate() {
@@ -131,11 +129,11 @@ public class ThemeManager {
             return styleSheet.getWebEngineStylesheet();
         }).orElse("");
 
-        LOGGER.debug("Updating additional CSS for {} scenes and {} web engines", scenes.size(), webEngines.size());
+        LOGGER.debug("Updating additional CSS for main window scene and {} web engines", webEngines.size());
 
         DefaultTaskExecutor.runInJavaFXThread(() ->
                 updateRunner.accept(() -> {
-                    scenes.forEach(this::updateAdditionalCss);
+                    getMainWindowScene().ifPresent(this::updateAdditionalCss);
 
                     webEngines.forEach(webEngine -> {
                         // force refresh by unloading style sheet, if the location hasn't changed
@@ -149,6 +147,7 @@ public class ThemeManager {
     }
 
     private void updateBaseCss(Scene scene) {
+        Objects.requireNonNull(scene, "install css for main window scene before updating base css");
         List<String> stylesheets = scene.getStylesheets();
         if (!stylesheets.isEmpty()) {
             stylesheets.remove(0);
@@ -158,6 +157,7 @@ public class ThemeManager {
     }
 
     private void updateAdditionalCss(Scene scene) {
+        Objects.requireNonNull(scene, "install css for main window scene before updating additional css");
         scene.getStylesheets().setAll(List.of(
                 baseStyleSheet.getSceneStylesheet().toExternalForm(),
                 appearancePreferences.getTheme()
@@ -177,14 +177,14 @@ public class ThemeManager {
      * Installs the base css file as a stylesheet in the given scene. Changes in the css file lead to a redraw of the
      * scene using the new css file.
      *
-     * @param scene the scene to install the css into
+     * @param mainWindowScene the scene to install the css into
      */
-    public void installCss(Scene scene) {
+    public void installCss(Scene mainWindowScene) {
+        Objects.requireNonNull(mainWindowScene, "scene is required");
         updateRunner.accept(() -> {
-            if (this.scenes.add(scene)) {
-                updateBaseCss(scene);
-                updateAdditionalCss(scene);
-            }
+            this.mainWindowScene = mainWindowScene;
+            updateBaseCss(mainWindowScene);
+            updateAdditionalCss(mainWindowScene);
         });
     }
 
@@ -222,5 +222,9 @@ public class ThemeManager {
      */
     public Theme getActiveTheme() {
         return this.theme;
+    }
+
+    public Optional<Scene> getMainWindowScene() {
+        return mainWindowScene == null ? Optional.empty() : Optional.of(mainWindowScene);
     }
 }
