@@ -120,7 +120,7 @@ public class ThemeManager {
             LOGGER.debug("Updating base CSS for main window scene");
         }
 
-        DefaultTaskExecutor.runInJavaFXThread(() -> updateRunner.accept(() -> getMainWindowScene().ifPresent(this::updateBaseCss)));
+        DefaultTaskExecutor.runInJavaFXThread(() -> updateRunner.accept(this::updateBaseCss));
     }
 
     private void additionalCssLiveUpdate() {
@@ -133,7 +133,7 @@ public class ThemeManager {
 
         DefaultTaskExecutor.runInJavaFXThread(() ->
                 updateRunner.accept(() -> {
-                    getMainWindowScene().ifPresent(this::updateAdditionalCss);
+                    updateAdditionalCss();
 
                     webEngines.forEach(webEngine -> {
                         // force refresh by unloading style sheet, if the location hasn't changed
@@ -146,19 +146,19 @@ public class ThemeManager {
         );
     }
 
-    private void updateBaseCss(Scene scene) {
-        Objects.requireNonNull(scene, "install css for main window scene before updating base css");
-        List<String> stylesheets = scene.getStylesheets();
-        if (!stylesheets.isEmpty()) {
-            stylesheets.remove(0);
-        }
+    private void updateBaseCss() {
+        getMainWindowScene().ifPresent(scene -> {
+            List<String> stylesheets = scene.getStylesheets();
+            if (!stylesheets.isEmpty()) {
+                stylesheets.remove(0);
+            }
 
-        stylesheets.add(0, baseStyleSheet.getSceneStylesheet().toExternalForm());
+            stylesheets.add(0, baseStyleSheet.getSceneStylesheet().toExternalForm());
+        });
     }
 
-    private void updateAdditionalCss(Scene scene) {
-        Objects.requireNonNull(scene, "install css for main window scene before updating additional css");
-        scene.getStylesheets().setAll(List.of(
+    private void updateAdditionalCss() {
+        getMainWindowScene().ifPresent(scene -> scene.getStylesheets().setAll(List.of(
                 baseStyleSheet.getSceneStylesheet().toExternalForm(),
                 appearancePreferences.getTheme()
                                      .getAdditionalStylesheet().map(styleSheet -> {
@@ -170,7 +170,7 @@ public class ThemeManager {
                                          }
                                      })
                                      .orElse("")
-        ));
+        )));
     }
 
     /**
@@ -183,8 +183,8 @@ public class ThemeManager {
         Objects.requireNonNull(mainWindowScene, "scene is required");
         updateRunner.accept(() -> {
             this.mainWindowScene = mainWindowScene;
-            updateBaseCss(mainWindowScene);
-            updateAdditionalCss(mainWindowScene);
+            updateBaseCss();
+            updateAdditionalCss();
         });
     }
 
