@@ -475,8 +475,8 @@ public class JabRefFrame extends BorderPane {
 
     private void setDividerPosition() {
         if (mainStage.isShowing() && !sidePane.getChildren().isEmpty()) {
-            splitPane.setDividerPositions(prefs.getSidePanePreferences().getSidePaneWidth() / splitPane.getWidth());
-            dividerSubscription = EasyBind.subscribe(sidePane.widthProperty(), width -> prefs.getSidePanePreferences().setSidePaneWidth(width.doubleValue()));
+            splitPane.setDividerPositions(prefs.getGuiPreferences().getSidePaneWidth() / splitPane.getWidth());
+            dividerSubscription = EasyBind.subscribe(sidePane.widthProperty(), width -> prefs.getGuiPreferences().setSidePaneWidth(width.doubleValue()));
         }
     }
 
