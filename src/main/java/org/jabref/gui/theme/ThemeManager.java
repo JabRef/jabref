@@ -225,6 +225,6 @@ public class ThemeManager {
     }
 
     public Optional<Scene> getMainWindowScene() {
-        return mainWindowScene == null ? Optional.empty() : Optional.of(mainWindowScene);
+        return Optional.ofNullable(mainWindowScene);
     }
 }
