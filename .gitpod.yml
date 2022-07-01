@@ -2,7 +2,15 @@ image:
   file: .gitpod.Dockerfile
 tasks:
   - init: ./gradlew assemble
+jetbrains:
+  intellij:
+    plugins:
+      - CheckStyle-IDEA
+      - zielu.gittoolbox
 vscode:
   extensions:
     - redhat.java
-    - vscjava
+    - richardwillis.vscode-gradle
+    - vscjava.vscode-java-debug
+    - kiteco.kite
+    - DavidAnson.vscode-markdownlint
