@@ -58,7 +58,7 @@
 	Databese			webpage
 	Software			book (with version number)
 	Patent				patent
-	Socail media		webpage (social media title as container-title)	
+	Socail media		webpage (social media title as container-title)
 	Movie				motion_picture (with genre)
 	TV broadcast		broadcast
 	Video record		motion_picture (without genre)
@@ -762,11 +762,6 @@
   <macro name="locators-note">
     <choose>
       <if type="article-journal article-magazine article-newspaper" match="any">
-<<<<<<< HEAD
-        <group delimiter="/">
-          <number variable="volume"/>
-          <number variable="issue"/>
-=======
         <group delimiter=", ">
           <group>
             <choose>
@@ -779,7 +774,6 @@
             </choose>
             <number variable="issue"/>
           </group>
->>>>>>> ffe166348a625e7ee36f94dc8123d6f7b9fca46b
         </group>
       </if>
       <else-if type="bill legislation legal_case" match="any">
@@ -881,11 +875,6 @@
   <macro name="locators">
     <choose>
       <if type="article-journal article-magazine article-newspaper" match="any">
-<<<<<<< HEAD
-        <group delimiter="/">
-          <number variable="volume"/>
-          <number variable="issue"/>
-=======
         <group delimiter=", ">
           <group>
             <choose>
@@ -898,7 +887,6 @@
             </choose>
             <number variable="issue"/>
           </group>
->>>>>>> ffe166348a625e7ee36f94dc8123d6f7b9fca46b
         </group>
       </if>
       <else-if type="bill legislation legal_case" match="any">
