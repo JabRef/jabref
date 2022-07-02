@@ -65,12 +65,11 @@
 }
 
 .addition {
-    -rtfx-background-color: #0B1935;
+    -rtfx-background-color: -jr-green;
 }
 
 .deletion {
-    -rtfx-background-color: #4E0A0D;
-
+    -rtfx-background-color: -jr-red;
 }
 
 #previewBody {
