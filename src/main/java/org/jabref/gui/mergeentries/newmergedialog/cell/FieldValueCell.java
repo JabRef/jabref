@@ -80,6 +80,11 @@ public class FieldValueCell extends AbstractCell implements Toggle {
         initializeLabel();
         initializeSelectionBox();
         textProperty().addListener(invalidated -> setUserData(getText()));
+        setOnMouseClicked(e -> {
+            if (!isDisabled()) {
+                setSelected(true);
+            }
+        });
 
         selectionBox.getChildren().addAll(label, checkmarkLayout);
         getChildren().setAll(selectionBox);
@@ -91,12 +96,13 @@ public class FieldValueCell extends AbstractCell implements Toggle {
         label.appendText(textProperty().get());
         label.setAutoHeight(true);
         label.setWrapText(true);
-        // TODO: Set cursor to Cursor.HAND
 
+        // Workarounds
         preventTextSelectionViaMouseEvents();
 
         label.prefHeightProperty().bind(label.totalHeightEstimateProperty().orElseConst(-1d));
 
+        // Fix text area consuming scroll events before they rich the outer scrollable
         label.addEventFilter(ScrollEvent.SCROLL, e -> {
             e.consume();
             FieldValueCell.this.fireEvent(e.copyFor(e.getSource(), FieldValueCell.this));
