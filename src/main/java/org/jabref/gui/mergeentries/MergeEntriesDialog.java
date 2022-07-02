@@ -2,6 +2,7 @@ package org.jabref.gui.mergeentries;
 
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
+import javafx.stage.StageStyle;
 
 import org.jabref.gui.mergeentries.newmergedialog.ThreeWayMergeView;
 import org.jabref.gui.util.BaseDialog;
@@ -22,6 +23,7 @@ public class MergeEntriesDialog extends BaseDialog<BibEntry> {
      */
     private void init() {
         this.getDialogPane().setContent(threeWayMergeView);
+        this.initStyle(StageStyle.UTILITY);
 
         // Create buttons
         ButtonType replaceEntries = new ButtonType(Localization.lang("Merge entries"), ButtonBar.ButtonData.OK_DONE);
