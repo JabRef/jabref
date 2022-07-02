@@ -11,6 +11,8 @@ import org.jabref.gui.mergeentries.newmergedialog.diffhighlighter.UnifiedDiffHig
 import org.jabref.gui.mergeentries.newmergedialog.toolbar.ThreeWayMergeToolbar;
 import org.jabref.model.strings.StringUtil;
 
+import org.fxmisc.richtext.StyleClassedTextArea;
+
 public class FieldRowController {
     private final FieldNameCell fieldNameCell;
     private final FieldValueCell leftValueCell;
@@ -41,58 +43,31 @@ public class FieldRowController {
         });
 
         mergedValueCell.textProperty().addListener((observable, old, mergedValue) -> {
-            if (!StringUtil.isNullOrEmpty(mergedValue)) {
-                if (mergedValue.equals(leftValue)) {
-                    toggleGroup.selectToggle(leftValueCell);
-                } else if (mergedValue.equals(rightValue)) {
-                    toggleGroup.selectToggle(rightValueCell);
-                } else {
-                    // deselect all toggles because left and right values don't equal the merged value
-                    toggleGroup.selectToggle(null);
-                }
+            if (mergedValue.equals(leftValue)) {
+                toggleGroup.selectToggle(leftValueCell);
+            } else if (mergedValue.equals(rightValue)) {
+                toggleGroup.selectToggle(rightValueCell);
             } else {
-                // deselect all toggles because empty toggles cannot be selected
+                // deselect all toggles because left and right values don't equal the merged value
                 toggleGroup.selectToggle(null);
             }
         });
 
-        // empty toggles are disabled and cannot be selected
-        if (StringUtil.isNullOrEmpty(leftValue)) {
-            leftValueCell.setDisable(true);
-        } else if (StringUtil.isNullOrEmpty(rightValue)) {
+        // Because when both left and right have the same values, then only left value will be shown
+        if (hasEqualLeftAndRightValues()) {
             rightValueCell.setDisable(true);
         }
     }
 
-    /**
-     * @return True if left value was selected, False otherwise
-     */
-    public boolean selectLeftValue() {
-        if (StringUtil.isNullOrEmpty(leftValue)) {
-            toggleGroup.selectToggle(null);
-            mergedValueCell.setText("");
-            return false;
-        } else {
-            toggleGroup.selectToggle(leftValueCell);
-            return true;
-        }
+    public void selectLeftValue() {
+        toggleGroup.selectToggle(leftValueCell);
     }
 
-    /**
-     * @return True if left value was selected, False otherwise
-     */
-    public boolean selectRightValue() {
-        if (StringUtil.isNullOrEmpty(rightValue)) {
-            toggleGroup.selectToggle(null);
-            mergedValueCell.setText("");
-            return false;
+    public void selectRightValue() {
+        if (rightValueCell.isDisabled()) {
+            selectLeftValue();
         } else {
-            if (hasEqualLeftAndRightValues()) {
-                toggleGroup.selectToggle(leftValueCell);
-            } else {
-                toggleGroup.selectToggle(rightValueCell);
-            }
-            return true;
+            toggleGroup.selectToggle(rightValueCell);
         }
     }
 
@@ -130,30 +105,25 @@ public class FieldRowController {
         if (leftValueCell.isDisabled() || rightValueCell.isDisabled()) {
             return;
         }
-        // Clearing old diff styles
+
+        StyleClassedTextArea leftLabel = leftValueCell.getStyleClassedLabel();
+        StyleClassedTextArea rightLabel = rightValueCell.getStyleClassedLabel();
+        // Clearing old diff styles based on previous diffConfig
         hideDiff();
         if (diffConfig.diffView() == ThreeWayMergeToolbar.DiffView.UNIFIED) {
-            new UnifiedDiffHighlighter(leftValueCell.getStyleClassedLabel(),
-                                       rightValueCell.getStyleClassedLabel(),
-                                       diffConfig.diffMethod()).highlight();
+            new UnifiedDiffHighlighter(leftLabel, rightLabel, diffConfig.diffMethod()).highlight();
         } else {
-            new SplitDiffHighlighter(leftValueCell.getStyleClassedLabel(),
-                                     rightValueCell.getStyleClassedLabel(),
-                                     diffConfig.diffMethod()).highlight();
+            new SplitDiffHighlighter(leftLabel, rightLabel, diffConfig.diffMethod()).highlight();
         }
     }
 
     public void hideDiff() {
-        if (!StringUtil.isNullOrEmpty(leftValue)) {
-            int leftValueLength = getLeftValueCell().getStyleClassedLabel().getLength();
-            getLeftValueCell().getStyleClassedLabel().clearStyle(0, leftValueLength);
-            getLeftValueCell().getStyleClassedLabel().replaceText(leftValue);
-        }
+        int leftValueLength = getLeftValueCell().getStyleClassedLabel().getLength();
+        getLeftValueCell().getStyleClassedLabel().clearStyle(0, leftValueLength);
+        getLeftValueCell().getStyleClassedLabel().replaceText(leftValue);
 
-        if (!StringUtil.isNullOrEmpty(rightValue)) {
-            int rightValueLength = getRightValueCell().getStyleClassedLabel().getLength();
-            getRightValueCell().getStyleClassedLabel().clearStyle(0, rightValueLength);
-            getRightValueCell().getStyleClassedLabel().replaceText(rightValue);
-        }
+        int rightValueLength = getRightValueCell().getStyleClassedLabel().getLength();
+        getRightValueCell().getStyleClassedLabel().clearStyle(0, rightValueLength);
+        getRightValueCell().getStyleClassedLabel().replaceText(rightValue);
     }
 }

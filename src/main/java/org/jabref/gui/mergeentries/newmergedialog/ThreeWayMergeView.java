@@ -50,7 +50,7 @@ public class ThreeWayMergeView extends VBox {
         initializeHeaderView();
         initializeToolbar();
 
-        this.setPrefHeight(Screen.getPrimary().getBounds().getHeight() * 0.80);
+        this.setPrefHeight(Screen.getPrimary().getBounds().getHeight() * 0.76);
         this.setPrefWidth(Screen.getPrimary().getBounds().getWidth() * 0.97);
 
         getChildren().addAll(toolbar, headerView, scrollPane);
@@ -139,7 +139,6 @@ public class ThreeWayMergeView extends VBox {
             mergeGridPane.add(fieldRow.getFieldNameCell(), 0, index, 1, 1);
             mergeGridPane.add(fieldRow.getLeftValueCell(), 1, index, 2, 1);
             mergeGridPane.add(fieldRow.getMergedValueCell(), 3, index, 1, 1);
-            fieldRow.getRightValueCell().setDisable(true);
         } else {
             mergeGridPane.addRow(index, fieldRow.getFieldNameCell(), fieldRow.getLeftValueCell(), fieldRow.getRightValueCell(), fieldRow.getMergedValueCell());
         }
