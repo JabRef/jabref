@@ -20,10 +20,9 @@ public final class UnifiedDiffHighlighter extends DiffHighlighter {
     }
 
     public UnifiedDiffHighlighter(StyleClassedTextArea sourceTextview, StyleClassedTextArea targetTextview) {
-        this(sourceTextview, targetTextview, DiffMethod.WORDS);
+        this(sourceTextview, targetTextview, DiffMethod.CHARS);
     }
 
-    @SuppressWarnings({"checkstyle:RegexpMultiline", "checkstyle:EmptyBlock"})
     @Override
     public void highlight() {
         String sourceContent = sourceTextview.getText();
@@ -97,6 +96,10 @@ public final class UnifiedDiffHighlighter extends DiffHighlighter {
                 position = position + changeWords.size() - 1;
             }
         }
+        if (targetTextview.getLength() >= getSeparator().length()) {
+            // There always going to be an extra separator at the start
+            targetTextview.deleteText(0, getSeparator().length());
+        }
     }
 
     private void appendToTextArea(StyleClassedTextArea textArea, String text, String styleClass) {
@@ -105,10 +108,11 @@ public final class UnifiedDiffHighlighter extends DiffHighlighter {
         }
         // Append separator without styling it
         if (text.startsWith(getSeparator())) {
-            textArea.appendText(getSeparator());
+            textArea.append(getSeparator(), "unchanged");
+            textArea.append(text.substring(getSeparator().length()), styleClass);
+        } else {
+            textArea.append(text, styleClass);
         }
-        int separatorIndex = text.indexOf(getSeparator());
-        textArea.append(text.substring(separatorIndex != -1 ? separatorIndex + 1 : 0), styleClass);
     }
 
     private Optional<Change> findChange(int position, List<Change> changeList) {
