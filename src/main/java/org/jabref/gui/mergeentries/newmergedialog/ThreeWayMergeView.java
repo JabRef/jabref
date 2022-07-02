@@ -10,8 +10,8 @@ import javafx.stage.Screen;
 import org.jabref.gui.mergeentries.newmergedialog.toolbox.ThreeWayMergeToolbox;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
-
-import static org.jabref.gui.mergeentries.newmergedialog.cell.AbstractCell.BackgroundTone;
+import org.jabref.model.entry.field.InternalField;
+import org.jabref.model.entry.types.EntryTypeFactory;
 
 public class ThreeWayMergeView extends VBox {
     public static final int GRID_COLUMN_MIN_WIDTH = 100;
@@ -68,11 +68,30 @@ public class ThreeWayMergeView extends VBox {
 
     private void addFieldRow(int index) {
         Field field = viewModel.allFields().get(index);
-        String leftEntryValue = viewModel.getLeftEntry().getField(field).orElse("");
-        String rightEntryValue = viewModel.getRightEntry().getField(field).orElse("");
-        BackgroundTone backgroundTone = index % 2 == 0 ? BackgroundTone.DARK : BackgroundTone.LIGHT;
 
-        FieldRowController fieldRow = new FieldRowController(field.getDisplayName(), leftEntryValue, rightEntryValue, backgroundTone);
+        String leftEntryValue;
+        String rightEntryValue;
+        if (field.equals(InternalField.TYPE_HEADER)) {
+            leftEntryValue = viewModel.getLeftEntry().getType().getDisplayName();
+            rightEntryValue = viewModel.getRightEntry().getType().getDisplayName();
+        } else {
+            leftEntryValue = viewModel.getLeftEntry().getField(field).orElse("");
+            rightEntryValue = viewModel.getRightEntry().getField(field).orElse("");
+        }
+
+        FieldRowController fieldRow = new FieldRowController(field.getDisplayName(), leftEntryValue, rightEntryValue, index);
+        fieldRow.mergedValueProperty().addListener((observable, old, mergedValue) -> {
+            if (field.equals(InternalField.TYPE_HEADER)) {
+                getMergedEntry().setType(EntryTypeFactory.parse(mergedValue));
+            } else {
+                getMergedEntry().setField(field, mergedValue);
+            }
+        });
+        if (field.equals(InternalField.TYPE_HEADER)) {
+            getMergedEntry().setType(EntryTypeFactory.parse(fieldRow.getMergedValue()));
+        } else {
+            getMergedEntry().setField(field, fieldRow.getMergedValue());
+        }
 
         if (fieldRow.hasEqualLeftAndRightValues()) {
             mergeGridPane.add(fieldRow.getFieldNameCell(), 0, index, 1, 1);
@@ -81,5 +100,9 @@ public class ThreeWayMergeView extends VBox {
         } else {
             mergeGridPane.addRow(index, fieldRow.getFieldNameCell(), fieldRow.getLeftValueCell(), fieldRow.getRightValueCell(), fieldRow.getMergedValueCell());
         }
+    }
+
+    public BibEntry getMergedEntry() {
+        return viewModel.getMergedEntry();
     }
 }
