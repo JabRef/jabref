@@ -1,5 +1,6 @@
 package org.jabref.gui.mergeentries.newmergedialog.cell;
 
+import javafx.geometry.Insets;
 import javafx.scene.control.Label;
 
 public class HeaderCell extends AbstractCell {
@@ -19,5 +20,6 @@ public class HeaderCell extends AbstractCell {
 
     private void initializeLabel() {
         label.textProperty().bind(textProperty());
+        label.setPadding(new Insets(getPadding().getTop(), getPadding().getRight(), getPadding().getBottom(), 16));
     }
 }
