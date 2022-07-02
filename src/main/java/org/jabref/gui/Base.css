@@ -256,6 +256,19 @@
     -jr-header-height: 3em;
 }
 
+.unchanged {
+    -rtfx-background-color:#0000;
+}
+
+.addition {
+    -rtfx-background-color: rgba(29, 209, 161, 0.5);
+}
+
+.deletion {
+    -rtfx-background-color: rgba(255, 107, 107, 0.55);
+}
+
+
 #frame {
     -fx-background-color: -jr-background-alt;
 }
