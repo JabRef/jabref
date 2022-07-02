@@ -39,7 +39,7 @@ public abstract sealed class DiffHighlighter permits SplitDiffHighlighter, Unifi
         return diffMethod.separator();
     }
 
-    enum DiffMethod {
+    public enum DiffMethod {
         WORDS(" "), CHARS("");
 
         private final String separator;
@@ -54,7 +54,7 @@ public abstract sealed class DiffHighlighter permits SplitDiffHighlighter, Unifi
     }
 
     protected String join(List<String> stringList) {
-        return String.join(" ", stringList);
+        return String.join(getSeparator(), stringList);
     }
 
     enum ChangeType {
