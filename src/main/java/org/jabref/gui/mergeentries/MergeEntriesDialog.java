@@ -9,12 +9,9 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 
 public class MergeEntriesDialog extends BaseDialog<BibEntry> {
-
-    private final MergeEntries mergeEntries;
     private final ThreeWayMergeView threeWayMergeView;
 
     public MergeEntriesDialog(BibEntry one, BibEntry two) {
-        mergeEntries = new MergeEntries(one, two);
         threeWayMergeView = new ThreeWayMergeView(one, two);
 
         init();
@@ -31,7 +28,7 @@ public class MergeEntriesDialog extends BaseDialog<BibEntry> {
         this.getDialogPane().getButtonTypes().setAll(ButtonType.CANCEL, replaceEntries);
         this.setResultConverter(buttonType -> {
             if (buttonType.equals(replaceEntries)) {
-                return null;
+                return threeWayMergeView.getMergedEntry();
             } else {
                 return null;
             }
@@ -39,10 +36,10 @@ public class MergeEntriesDialog extends BaseDialog<BibEntry> {
     }
 
     public void setLeftHeaderText(String leftHeaderText) {
-        mergeEntries.setLeftHeaderText(leftHeaderText);
+        // mergeEntries.setLeftHeaderText(leftHeaderText);
     }
 
     public void setRightHeaderText(String rightHeaderText) {
-        mergeEntries.setRightHeaderText(rightHeaderText);
+        // mergeEntries.setRightHeaderText(rightHeaderText);
     }
 }
