@@ -6,7 +6,9 @@ import javafx.scene.control.ToggleGroup;
 import org.jabref.gui.mergeentries.newmergedialog.cell.FieldNameCell;
 import org.jabref.gui.mergeentries.newmergedialog.cell.FieldValueCell;
 import org.jabref.gui.mergeentries.newmergedialog.cell.MergedFieldCell;
+import org.jabref.gui.mergeentries.newmergedialog.diffhighlighter.DiffHighlighter;
 import org.jabref.gui.mergeentries.newmergedialog.diffhighlighter.UnifiedDiffHighlighter;
+import org.jabref.gui.mergeentries.newmergedialog.toolbar.ThreeWayMergeToolbar;
 import org.jabref.model.strings.StringUtil;
 
 public class FieldRowController {
@@ -15,6 +17,10 @@ public class FieldRowController {
     private final FieldValueCell rightValueCell;
     private final MergedFieldCell mergedValueCell;
 
+    private final String leftValue;
+
+    private final String rightValue;
+
     private final ToggleGroup toggleGroup = new ToggleGroup();
 
     public FieldRowController(String fieldName, String leftValue, String rightValue, int rowIndex) {
@@ -22,6 +28,9 @@ public class FieldRowController {
         leftValueCell = new FieldValueCell(leftValue, rowIndex);
         rightValueCell = new FieldValueCell(rightValue, rowIndex);
         mergedValueCell = new MergedFieldCell(StringUtil.isNullOrEmpty(leftValue) ? rightValue : leftValue, rowIndex);
+
+        this.leftValue = leftValue;
+        this.rightValue = rightValue;
 
         toggleGroup.getToggles().addAll(leftValueCell, rightValueCell);
         toggleGroup.selectToggle(StringUtil.isNullOrEmpty(leftValue) ? rightValueCell : leftValueCell);
@@ -52,11 +61,6 @@ public class FieldRowController {
             leftValueCell.setDisable(true);
         } else if (StringUtil.isNullOrEmpty(rightValue)) {
             rightValueCell.setDisable(true);
-        }
-
-        // Debugging
-        if (!leftValueCell.isDisabled() && !rightValueCell.isDisabled()) {
-            new UnifiedDiffHighlighter(leftValueCell.getStyleClassedLabel(), rightValueCell.getStyleClassedLabel()).highlight();
         }
     }
 
@@ -110,5 +114,33 @@ public class FieldRowController {
         return !StringUtil.isNullOrEmpty(leftValueCell.getText()) &&
                 !StringUtil.isNullOrEmpty(rightValueCell.getText()) &&
                 leftValueCell.getText().equals(rightValueCell.getText());
+    }
+
+    public void showDiffs(ShowDiffConfig diffConfig) {
+        // TODO: read this from diffConfig
+        if (diffConfig.diffView() == ThreeWayMergeToolbar.DiffView.UNIFIED) {
+            if (!leftValueCell.isDisabled() && !rightValueCell.isDisabled()) {
+                hideDiffs();
+                if (diffConfig.diffMode() == ThreeWayMergeToolbar.DiffHighlightMode.WORDS) {
+                    new UnifiedDiffHighlighter(leftValueCell.getStyleClassedLabel(), rightValueCell.getStyleClassedLabel(), DiffHighlighter.DiffMethod.WORDS).highlight();
+                } else {
+                    new UnifiedDiffHighlighter(leftValueCell.getStyleClassedLabel(), rightValueCell.getStyleClassedLabel(), DiffHighlighter.DiffMethod.CHARS).highlight();
+                }
+            }
+        }
+    }
+
+    public void hideDiffs() {
+        if (!StringUtil.isNullOrEmpty(leftValue)) {
+            int leftValueLength = getLeftValueCell().getStyleClassedLabel().getLength();
+            getLeftValueCell().getStyleClassedLabel().clearStyle(0, leftValueLength);
+            getLeftValueCell().getStyleClassedLabel().replaceText(leftValue);
+        }
+
+        if (!StringUtil.isNullOrEmpty(rightValue)) {
+            int rightValueLength = getRightValueCell().getStyleClassedLabel().getLength();
+            getRightValueCell().getStyleClassedLabel().clearStyle(0, rightValueLength);
+            getRightValueCell().getStyleClassedLabel().replaceText(rightValue);
+        }
     }
 }

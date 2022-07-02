@@ -62,6 +62,20 @@ public class ThreeWayMergeView extends VBox {
     private void initializeToolbar() {
         toolbar.setOnSelectLeftEntryValuesButtonClicked(e -> fieldRowControllerList.forEach(FieldRowController::selectLeftValue));
         toolbar.setOnSelectRightEntryValuesButtonClicked(e -> fieldRowControllerList.forEach(FieldRowController::selectRightValue));
+
+        toolbar.showDiffProperty().addListener(e -> updateDiff());
+        toolbar.diffViewProperty().addListener(e -> updateDiff());
+        toolbar.diffHighlightModeProperty().addListener(e -> updateDiff());
+    }
+
+    private void updateDiff() {
+        if (toolbar.isShowDiffEnabled()) {
+            fieldRowControllerList.forEach(fieldRow -> fieldRow.showDiffs(
+                    new ShowDiffConfig(toolbar.getDiffView(), toolbar.getDiffHighlightMode())
+            ));
+        } else {
+            fieldRowControllerList.forEach(FieldRowController::hideDiffs);
+        }
     }
 
     private void initializeHeaderView() {
