@@ -97,6 +97,7 @@ public class ThreeWayMergeView extends VBox {
             mergeGridPane.add(fieldRow.getFieldNameCell(), 0, index, 1, 1);
             mergeGridPane.add(fieldRow.getLeftValueCell(), 1, index, 2, 1);
             mergeGridPane.add(fieldRow.getMergedValueCell(), 3, index, 1, 1);
+            fieldRow.getRightValueCell().setDisable(true);
         } else {
             mergeGridPane.addRow(index, fieldRow.getFieldNameCell(), fieldRow.getLeftValueCell(), fieldRow.getRightValueCell(), fieldRow.getMergedValueCell());
         }
