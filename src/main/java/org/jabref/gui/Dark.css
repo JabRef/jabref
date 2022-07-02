@@ -63,6 +63,19 @@
     -js-summary-text-color-selected: derive( -fx-dark-text-color, 70%);
 }
 
+.unchanged {
+
+}
+
+.addition {
+    -rtfx-background-color: #0B1935;
+}
+
+.deletion {
+    -rtfx-background-color: #4E0A0D;
+
+}
+
 #previewBody {
     background-color: #272b38; /* -fx-control-inner-background*/
     color: #7d8591; /* -fx-mid-text-color*/

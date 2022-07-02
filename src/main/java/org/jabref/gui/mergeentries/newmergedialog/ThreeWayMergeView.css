@@ -48,16 +48,3 @@
     -fx-font-weight: bold;
     -fx-padding: 1, 0, 1, 0;
 }
-
-/* Diff Highlighting */
-.unchanged {
-
-}
-
-.addition {
-    -rtfx-background-color: rgba(35, 225, 96, 0.26);
-}
-
-.deletion {
-    -rtfx-background-color: rgba(248, 62, 68, 0.26);
-}
