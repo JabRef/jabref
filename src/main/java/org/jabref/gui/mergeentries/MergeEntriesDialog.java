@@ -1,5 +1,6 @@
 package org.jabref.gui.mergeentries;
 
+import javafx.geometry.Insets;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.stage.StageStyle;
@@ -23,7 +24,7 @@ public class MergeEntriesDialog extends BaseDialog<BibEntry> {
      */
     private void init() {
         this.getDialogPane().setContent(threeWayMergeView);
-        this.initStyle(StageStyle.UTILITY);
+        this.getDialogPane().setPadding(new Insets(0));
 
         // Create buttons
         ButtonType replaceEntries = new ButtonType(Localization.lang("Merge entries"), ButtonBar.ButtonData.OK_DONE);
@@ -38,10 +39,10 @@ public class MergeEntriesDialog extends BaseDialog<BibEntry> {
     }
 
     public void setLeftHeaderText(String leftHeaderText) {
-        // mergeEntries.setLeftHeaderText(leftHeaderText);
+        threeWayMergeView.setLeftHeader(leftHeaderText);
     }
 
     public void setRightHeaderText(String rightHeaderText) {
-        // mergeEntries.setRightHeaderText(rightHeaderText);
+        threeWayMergeView.setRightHeader(rightHeaderText);
     }
 }
