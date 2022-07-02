@@ -15,6 +15,8 @@ import javafx.collections.ObservableList;
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.FieldFactory;
+import org.jabref.model.entry.field.InternalField;
 
 class ThreeWayMergeViewModel extends AbstractViewModel {
 
@@ -102,6 +104,12 @@ class ThreeWayMergeViewModel extends AbstractViewModel {
     private void setAllFields(Set<Field> fields) {
         allFields.clear();
         allFields.addAll(fields);
+        // Don't show internal fields. See org.jabref.model.entry.field.InternalField
+        allFields.removeIf(FieldFactory::isInternalField);
+
         allFields.sort(Comparator.comparing(Field::getName));
+
+        // Add the entry type field as the first field to display
+        allFields.add(0, InternalField.TYPE_HEADER);
     }
 }
