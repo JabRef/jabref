@@ -1,4 +1,4 @@
-package org.jabref.gui.mergeentries.newmergedialog.cell;
+package org.jabref.gui.mergeentries.newmergedialog;
 
 import java.util.Objects;
 
