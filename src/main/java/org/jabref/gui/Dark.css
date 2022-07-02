@@ -4,6 +4,9 @@
     -jr-selected: -jr-accent;
     -jr-hover: #fff1;
 
+    -jr-row-odd-background: #272b38;
+    -jr-row-even-background: #212330;
+    -jr-accent-alt: -jr-accent;
 
     -jr-red: #b71c1f;
     -jr-light-red: #db1d2b;

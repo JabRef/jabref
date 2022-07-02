@@ -2,6 +2,14 @@
 
 .root {
     -jr-transparent-green: rgba(16, 172, 132, 0.12);
+    -jr-row-odd-background: -fx-control-inner-background;
+    -jr-row-even-background: -fx-control-inner-background-alt;
+    /*
+    On light theme, the text is hard to see when it's on top of the accent color. This is an alternative lighter accent color
+    for better text visibility.
+    */
+    -jr-accent-alt: derive(-jr-accent, 10%);
+
     /*
     The theme color and some derived colors from it are used for icons, tab-headers, marking of selected inputs and
     hover colors for the main menu. It generally defines the look of JabRef. The highlighting colors below should
