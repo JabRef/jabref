@@ -28,6 +28,12 @@ public class FieldRowController {
         toggleGroup.selectedToggleProperty().addListener(invalidated -> {
             mergedValueCell.setText((String) toggleGroup.getSelectedToggle().getUserData());
         });
+
+        if (StringUtil.isNullOrEmpty(leftValue)) {
+            leftValueCell.setDisable(true);
+        } else if (StringUtil.isNullOrEmpty(rightValue)) {
+            rightValueCell.setDisable(true);
+        }
     }
 
     public String getMergedValue() {
@@ -36,5 +42,21 @@ public class FieldRowController {
 
     public ReadOnlyStringProperty mergedValueProperty() {
         return mergedValueCell.textProperty();
+    }
+
+    public FieldNameCell getFieldNameCell() {
+        return fieldNameCell;
+    }
+
+    public FieldValueCell getLeftValueCell() {
+        return leftValueCell;
+    }
+
+    public FieldValueCell getRightValueCell() {
+        return rightValueCell;
+    }
+
+    public MergedFieldCell getMergedValueCell() {
+        return mergedValueCell;
     }
 }
