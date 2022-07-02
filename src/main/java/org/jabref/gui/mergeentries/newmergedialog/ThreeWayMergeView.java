@@ -14,7 +14,7 @@ import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.types.EntryTypeFactory;
 
 public class ThreeWayMergeView extends VBox {
-    public static final int GRID_COLUMN_MIN_WIDTH = 100;
+    public static final int GRID_COLUMN_MIN_WIDTH = 250;
     public static final String LEFT_DEFAULT_HEADER = "Left Entry";
     public static final String RIGHT_DEFAULT_HEADER = "Right Entry";
     private ThreeWayMergeToolbox mergeToolbox;
@@ -39,7 +39,7 @@ public class ThreeWayMergeView extends VBox {
         scrollPane.setContent(mergeGridPane);
         getChildren().addAll(mergeToolbox, headerView, scrollPane);
 
-        this.setPrefHeight(Screen.getPrimary().getBounds().getHeight() * 0.78);
+        this.setPrefHeight(Screen.getPrimary().getBounds().getHeight() * 0.80);
         this.setPrefWidth(Screen.getPrimary().getBounds().getWidth() * 0.95);
     }
 
