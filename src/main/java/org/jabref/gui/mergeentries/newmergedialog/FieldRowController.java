@@ -6,6 +6,7 @@ import javafx.scene.control.ToggleGroup;
 import org.jabref.gui.mergeentries.newmergedialog.cell.FieldNameCell;
 import org.jabref.gui.mergeentries.newmergedialog.cell.FieldValueCell;
 import org.jabref.gui.mergeentries.newmergedialog.cell.MergedFieldCell;
+import org.jabref.gui.mergeentries.newmergedialog.diffhighlighter.UnifiedDiffHighlighter;
 import org.jabref.model.strings.StringUtil;
 
 public class FieldRowController {
@@ -51,6 +52,11 @@ public class FieldRowController {
             leftValueCell.setDisable(true);
         } else if (StringUtil.isNullOrEmpty(rightValue)) {
             rightValueCell.setDisable(true);
+        }
+
+        // Debugging
+        if (!leftValueCell.isDisabled() && !rightValueCell.isDisabled()) {
+            new UnifiedDiffHighlighter(leftValueCell.getStyleClassedLabel(), rightValueCell.getStyleClassedLabel()).highlight();
         }
     }
 
