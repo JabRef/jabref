@@ -29,7 +29,7 @@ public class ThreeWayMergeView extends VBox {
         viewModel = new ThreeWayMergeViewModel(leftEntry, rightEntry, leftHeader, rightHeader);
 
         mergeToolbox = new ThreeWayMergeToolbox();
-        headerView = new HeaderView();
+        headerView = new HeaderView(leftHeader, rightHeader);
         scrollPane = new ScrollPane();
         scrollPane.setFitToWidth(true);
         scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
