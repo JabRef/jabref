@@ -19,10 +19,6 @@ public final class UnifiedDiffHighlighter extends DiffHighlighter {
         super(sourceTextview, targetTextview, diffMethod);
     }
 
-    public UnifiedDiffHighlighter(StyleClassedTextArea sourceTextview, StyleClassedTextArea targetTextview) {
-        this(sourceTextview, targetTextview, DiffMethod.CHARS);
-    }
-
     @Override
     public void highlight() {
         String sourceContent = sourceTextview.getText();
