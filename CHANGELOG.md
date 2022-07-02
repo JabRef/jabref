@@ -51,6 +51,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - When the proxy configuration removed the proxy user/password, this change is applied immediately.
 - We fixed an issue where removing several groups deletes only one of them. [#8390](https://github.com/JabRef/jabref/issues/8390)
 - We fixed an issue where "Warn about duplicates on import" option now under Perferences -> Import and Export. [kopper#570](https://github.com/koppor/jabref/issues/570)
+
 ### Removed
 
 - We removed the social media buttons for our Twitter and Facebook pages. [#8774](https://github.com/JabRef/jabref/issues/8774)
