@@ -8,6 +8,9 @@ import javafx.css.PseudoClass;
 import javafx.event.Event;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Cursor;
+import javafx.scene.control.Button;
+import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Toggle;
 import javafx.scene.control.ToggleGroup;
@@ -92,6 +95,7 @@ public class FieldValueCell extends AbstractCell implements Toggle {
         label.appendText(textProperty().get());
         label.setAutoHeight(true);
         label.setWrapText(true);
+        label.setStyle("-fx-cursor: hand");
 
         // Workarounds
         preventTextSelectionViaMouseEvents();
