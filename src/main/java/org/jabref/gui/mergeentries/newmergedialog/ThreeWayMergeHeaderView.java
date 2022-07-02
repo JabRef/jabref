@@ -36,7 +36,10 @@ public class ThreeWayMergeHeaderView extends GridPane {
         setMaxHeight(Control.USE_PREF_SIZE);
         setMinHeight(Control.USE_PREF_SIZE);
 
-        bindHeaderWidthToFieldGridWidth();
+        // The fields grid pane is contained within a scroll pane, thus it doesn't allocate the full available width. In
+        // fact, it uses the available width minus the size of the scrollbar which is 8. This leads to header columns being
+        // always wider than fields columns. This hack should fix it.
+        setPadding(new Insets(0, 8, 0, 0));
     }
 
     public void setLeftHeader(String leftHeader) {
@@ -45,14 +48,5 @@ public class ThreeWayMergeHeaderView extends GridPane {
 
     public void setRightHeader(String rightHeader) {
         rightHeaderCell.setText(rightHeader);
-    }
-
-    /**
-     * The fields grid pane is contained within a scroll pane, thus it doesn't allocate the full available width. In
-     * fact, it uses the available width minus the size of the scrollbar which is 8. This leads to header columns being
-     * always larger than fields columns. This hack should fix it.
-     */
-    private void bindHeaderWidthToFieldGridWidth() {
-        setPadding(new Insets(0, 8, 0, 0));
     }
 }
