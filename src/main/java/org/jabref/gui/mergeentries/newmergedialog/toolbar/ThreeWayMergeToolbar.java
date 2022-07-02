@@ -1,7 +1,7 @@
 package org.jabref.gui.mergeentries.newmergedialog.toolbar;
 
 import java.util.Arrays;
-import java.util.function.Consumer;
+import java.util.Objects;
 
 import javafx.beans.binding.BooleanExpression;
 import javafx.beans.property.ObjectProperty;
@@ -12,13 +12,17 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.ToggleGroup;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.util.StringConverter;
+
+import org.jabref.gui.mergeentries.DiffHighlighting;
+import org.jabref.gui.mergeentries.DiffMode;
+import org.jabref.gui.mergeentries.newmergedialog.diffhighlighter.DiffHighlighter;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.EasyBinding;
+import org.apache.commons.lang3.builder.Diff;
 
 public class ThreeWayMergeToolbar extends AnchorPane {
     @FXML
@@ -98,7 +102,7 @@ public class ThreeWayMergeToolbar extends AnchorPane {
         diffHighlightModeToggleGroup.selectToggle(highlightWordsRadioButton);
     }
 
-    public ReadOnlyObjectProperty<DiffView> diffViewProperty() {
+    public ObjectProperty<DiffView> diffViewProperty() {
         return diffViewComboBox.valueProperty();
     }
 
@@ -106,18 +110,26 @@ public class ThreeWayMergeToolbar extends AnchorPane {
         return diffViewProperty().get();
     }
 
+    public void setDiffView(DiffView diffView) {
+        diffViewProperty().set(diffView);
+    }
+
     public EasyBinding<Boolean> showDiffProperty() {
         return showDiff;
     }
 
+    public void setShowDiff(boolean showDiff) {
+        plainTextOrDiffComboBox.valueProperty().set(showDiff ? PlainTextOrDiff.Diff : PlainTextOrDiff.PLAIN_TEXT);
+    }
+
     /**
-     * Convince method used to disable diff related views when diff is not selected.
+     * Convenience method used to disable diff related views when diff is not selected.
      *
      * <p>
      * This method is required because {@link EasyBinding} class doesn't have a method to invert a boolean property,
      * like {@link BooleanExpression#not()}
      * </p>
-     * */
+     */
     public EasyBinding<Boolean> notShowDiffProperty() {
         return showDiffProperty().map(showDiff -> !showDiff);
     }
@@ -134,12 +146,16 @@ public class ThreeWayMergeToolbar extends AnchorPane {
         return diffHighlightModeProperty().get();
     }
 
-    public void setOnSelectLeftEntryValuesButtonClicked(Consumer<MouseEvent> onClick) {
-        selectLeftEntryValuesButton.setOnMouseClicked(onClick::accept);
+    public void setDiffHighlightMode(DiffHighlightMode diffHighlightMode) {
+        diffHighlightModeProperty().set(diffHighlightMode);
     }
 
-    public void setOnSelectRightEntryValuesButtonClicked(Consumer<MouseEvent> onClick) {
-        selectRightEntryValuesButton.setOnMouseClicked(onClick::accept);
+    public void setOnSelectLeftEntryValuesButtonClicked(Runnable onClick) {
+        selectLeftEntryValuesButton.setOnMouseClicked(e -> onClick.run());
+    }
+
+    public void setOnSelectRightEntryValuesButtonClicked(Runnable onClick) {
+        selectRightEntryValuesButton.setOnMouseClicked(e -> onClick.run());
     }
 
     public enum PlainTextOrDiff {
@@ -184,7 +200,13 @@ public class ThreeWayMergeToolbar extends AnchorPane {
         }
     }
 
+    // TODO: remove this and use DiffMethod
     public enum DiffHighlightMode {
-        WORDS, CHARS
+        WORDS, CHARS;
+
+        public static DiffHighlightMode from(DiffHighlighter.DiffMethod diffMethod) {
+            Objects.requireNonNull(diffMethod, "Diff method is required");
+            return diffMethod == DiffHighlighter.DiffMethod.WORDS ? WORDS : CHARS;
+        }
     }
 }
