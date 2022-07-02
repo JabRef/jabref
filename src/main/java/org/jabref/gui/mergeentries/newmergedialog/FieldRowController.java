@@ -54,6 +54,28 @@ public class FieldRowController {
         }
     }
 
+    /**
+     * @return True if left value was selected, False otherwise
+     */
+    public boolean selectLeftValue() {
+        if (!leftValueCell.isDisabled()) {
+            toggleGroup.selectToggle(leftValueCell);
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * @return True if left value was selected, False otherwise
+     */
+    public boolean selectRightValue() {
+        if (!rightValueCell.isDisabled()) {
+            toggleGroup.selectToggle(rightValueCell);
+            return true;
+        }
+        return false;
+    }
+
     public String getMergedValue() {
         return mergedValueProperty().getValue();
     }
