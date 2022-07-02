@@ -148,4 +148,12 @@ public class ThreeWayMergeView extends VBox {
     public BibEntry getMergedEntry() {
         return viewModel.getMergedEntry();
     }
+
+    public void setLeftHeader(String leftHeader) {
+        headerView.setLeftHeader(leftHeader);
+    }
+
+    public void setRightHeader(String rightHeader) {
+        headerView.setRightHeader(rightHeader);
+    }
 }
