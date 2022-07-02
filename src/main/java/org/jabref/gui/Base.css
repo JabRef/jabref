@@ -257,6 +257,10 @@
     -rtfx-background-color:#0000;
 }
 
+.updated {
+    -rtfx-background-color: rgba(41, 166, 236, 0.66);
+}
+
 .addition {
     -rtfx-background-color: rgba(29, 209, 161, 0.5);
 }

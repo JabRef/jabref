@@ -10,18 +10,13 @@ import com.github.difflib.patch.DeltaType;
 import org.fxmisc.richtext.StyleClassedTextArea;
 
 /**
- * A diff highlighter in which changes of type {@link DeltaType#CHANGE} are split between source and target
- * text view. They are represented by an addition in the target text view and deletion in the source text view.
- * Normal addition and deletion are kept as they are.
+ * A diff highlighter in which changes are split between source and target text view.
+ * They are represented by an addition in the target text view and deletion in the source text view.
  */
 public final class SplitDiffHighlighter extends DiffHighlighter {
 
     public SplitDiffHighlighter(StyleClassedTextArea sourceTextview, StyleClassedTextArea targetTextview, DiffMethod diffMethod) {
         super(sourceTextview, targetTextview, diffMethod);
-    }
-
-    public SplitDiffHighlighter(StyleClassedTextArea sourceTextview, StyleClassedTextArea targetTextview) {
-        this(sourceTextview, targetTextview, DiffMethod.WORDS);
     }
 
     @Override
@@ -32,92 +27,51 @@ public final class SplitDiffHighlighter extends DiffHighlighter {
             return;
         }
 
-        List<String> sourceWords = splitString(sourceContent);
-        List<String> targetWords = splitString(targetContent);
-        List<String> unifiedWords = new ArrayList<>(targetWords);
+        List<String> sourceTokens = splitString(sourceContent);
+        List<String> targetTokens = splitString(targetContent);
 
-        List<AbstractDelta<String>> deltaList = DiffUtils.diff(sourceWords, targetWords).getDeltas();
+        List<AbstractDelta<String>> deltaList = DiffUtils.diff(sourceTokens, targetTokens).getDeltas();
 
-        List<Change> changeList = new ArrayList<>();
-
-        int deletionCount = 0;
         for (AbstractDelta<String> delta : deltaList) {
+            int affectedSourceTokensPosition = delta.getSource().getPosition();
+            int affectedTargetTokensPosition = delta.getTarget().getPosition();
+
+            List<String> affectedTokensInSource = delta.getSource().getLines();
+            List<String> affectedTokensInTarget = delta.getTarget().getLines();
+            int joinedSourceTokensLength = affectedTokensInSource.stream()
+                    .map(String::length)
+                    .reduce(Integer::sum)
+                    .map(value -> value + (getSeparator().length() * (affectedTokensInSource.size() - 1)))
+                    .orElse(0);
+
+            int joinedTargetTokensLength = affectedTokensInTarget.stream()
+                    .map(String::length)
+                    .reduce(Integer::sum)
+                    .map(value -> value + (getSeparator().length() * (affectedTokensInTarget.size() - 1)))
+                    .orElse(0);
+            int affectedSourceTokensPositionInText = getPositionInText(affectedSourceTokensPosition, sourceTokens);
+            int affectedTargetTokensPositionInText = getPositionInText(affectedTargetTokensPosition, targetTokens);
             switch (delta.getType()) {
                 case CHANGE -> {
-                    int changePosition = delta.getTarget().getPosition();
-                    int deletionPoint = changePosition + deletionCount;
-                    int insertionPoint = deletionPoint + 1;
-                    List<String> deltaSourceWords = delta.getSource().getLines();
-                    List<String> deltaTargetWords = delta.getTarget().getLines();
-
-                    unifiedWords.add(deletionPoint, join(deltaSourceWords));
-
-                    changeList.add(new Change(deletionPoint, 1, ChangeType.CHANGE_DELETION));
-                    changeList.add(new Change(insertionPoint, deltaTargetWords.size(), ChangeType.ADDITION));
-                    deletionCount++;
+                    sourceTextview.setStyleClass(affectedSourceTokensPositionInText, affectedSourceTokensPositionInText + joinedSourceTokensLength, "deletion");
+                    targetTextview.setStyleClass(affectedTargetTokensPositionInText, affectedTargetTokensPositionInText + joinedTargetTokensLength, "updated");
                 }
-                case DELETE -> {
-                    int deletionPoint = delta.getTarget().getPosition() + deletionCount;
-                    unifiedWords.add(deletionPoint, join(delta.getSource().getLines()));
-
-                    changeList.add(new Change(deletionPoint, 1, ChangeType.DELETION));
-                    deletionCount++;
-                }
-                case INSERT -> {
-                    int insertionPoint = delta.getTarget().getPosition() + deletionCount;
-                    changeList.add(new Change(insertionPoint, delta.getTarget().getLines().size(), ChangeType.ADDITION));
-                }
+                case DELETE ->
+                        sourceTextview.setStyleClass(affectedSourceTokensPositionInText, affectedSourceTokensPositionInText + joinedSourceTokensLength, "deletion");
+                case INSERT ->
+                        targetTextview.setStyleClass(affectedTargetTokensPositionInText, affectedTargetTokensPositionInText + joinedTargetTokensLength, "addition");
             }
-        }
-        sourceTextview.clear();
-        targetTextview.clear();
-
-        boolean changeInProgress = false;
-        for (int position = 0; position < unifiedWords.size(); position++) {
-            String word = unifiedWords.get(position);
-            Optional<Change> changeAtPosition = findChange(position, changeList);
-            if (changeAtPosition.isEmpty()) {
-                appendToTextArea(targetTextview, getSeparator() + word, "unchanged");
-            } else {
-                Change change = changeAtPosition.get();
-                List<String> changeWords = unifiedWords.subList(change.position(), change.position() + change.spanSize());
-
-                if (change.type() == ChangeType.DELETION) {
-                    appendToTextArea(targetTextview, getSeparator() + join(changeWords), "deletion");
-                } else if (change.type() == ChangeType.ADDITION) {
-                    if (changeInProgress) {
-                        appendToTextArea(targetTextview, join(changeWords), "addition");
-                        changeInProgress = false;
-                    } else {
-                        appendToTextArea(targetTextview, getSeparator() + join(changeWords), "addition");
-                    }
-                } else if (change.type() == ChangeType.CHANGE_DELETION) {
-                    appendToTextArea(targetTextview, getSeparator() + join(changeWords), "deletion");
-                    changeInProgress = true;
-                }
-                position = position + changeWords.size() - 1;
-            }
-        }
-        if (targetTextview.getLength() >= getSeparator().length()) {
-            // There always going to be an extra separator at the start
-            targetTextview.deleteText(0, getSeparator().length());
         }
     }
 
-    private void appendToTextArea(StyleClassedTextArea textArea, String text, String styleClass) {
-        if (text.isEmpty()) {
-            return;
-        }
-        // Append separator without styling it
-        if (text.startsWith(getSeparator())) {
-            textArea.append(getSeparator(), "unchanged");
-            textArea.append(text.substring(getSeparator().length()), styleClass);
+    public int getPositionInText(int positionInTokenList, List<String> tokenList) {
+        if (positionInTokenList == 0) {
+            return 0;
         } else {
-            textArea.append(text, styleClass);
+            return tokenList.stream().limit(positionInTokenList).map(String::length)
+                    .reduce(Integer::sum)
+                    .map(value -> value + (getSeparator().length() * positionInTokenList))
+                    .orElse(0);
         }
-    }
-
-    private Optional<Change> findChange(int position, List<Change> changeList) {
-        return changeList.stream().filter(change -> change.position() == position).findAny();
     }
 }
