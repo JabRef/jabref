@@ -11,10 +11,12 @@ public class FieldNameCell extends AbstractCell {
 
     public FieldNameCell(String text, BackgroundTone backgroundTone) {
         super(text, backgroundTone);
+        initialize();
     }
 
     public FieldNameCell(String text) {
         super(text);
+        initialize();
     }
 
     private void initialize() {
