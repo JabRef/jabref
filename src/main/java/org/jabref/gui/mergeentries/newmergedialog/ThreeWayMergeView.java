@@ -50,7 +50,7 @@ public class ThreeWayMergeView extends VBox {
         initializeHeaderView();
         initializeToolbar();
 
-        this.setPrefHeight(Screen.getPrimary().getBounds().getHeight() * 0.80);
+        this.setPrefHeight(Screen.getPrimary().getBounds().getHeight() * 0.75);
         this.setPrefWidth(Screen.getPrimary().getBounds().getWidth() * 0.95);
 
         getChildren().addAll(toolbar, headerView, scrollPane);
@@ -61,8 +61,8 @@ public class ThreeWayMergeView extends VBox {
     }
 
     private void initializeToolbar() {
-        toolbar.setOnSelectLeftEntryValuesButtonClicked(e -> fieldRowControllerList.forEach(FieldRowController::selectLeftValue));
-        toolbar.setOnSelectRightEntryValuesButtonClicked(e -> fieldRowControllerList.forEach(FieldRowController::selectRightValue));
+        toolbar.setOnSelectLeftEntryValuesButtonClicked(this::selectLeftEntryValues);
+        toolbar.setOnSelectRightEntryValuesButtonClicked(this::selectRightEntryValues);
 
         toolbar.showDiffProperty().addListener(e -> updateDiff());
         toolbar.diffViewProperty().addListener(e -> updateDiff());
@@ -155,5 +155,19 @@ public class ThreeWayMergeView extends VBox {
 
     public void setRightHeader(String rightHeader) {
         headerView.setRightHeader(rightHeader);
+    }
+
+    public void selectLeftEntryValues() {
+        fieldRowControllerList.forEach(FieldRowController::selectLeftValue);
+    }
+
+    public void selectRightEntryValues() {
+        fieldRowControllerList.forEach(FieldRowController::selectRightValue);
+    }
+
+    public void showDiff(ShowDiffConfig diffConfig) {
+        toolbar.setDiffView(diffConfig.diffView());
+        toolbar.setDiffHighlightMode(ThreeWayMergeToolbar.DiffHighlightMode.from(diffConfig.diffMethod()));
+        toolbar.setShowDiff(true);
     }
 }
