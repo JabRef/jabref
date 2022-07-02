@@ -25,7 +25,7 @@ public class ThreeWayMergeView extends VBox {
     private final ThreeWayMergeViewModel viewModel;
 
     public ThreeWayMergeView(BibEntry leftEntry, BibEntry rightEntry, String leftHeader, String rightHeader) {
-        // getStylesheets().add("newmergedialog.css");
+        getStylesheets().add(ThreeWayMergeView.class.getResource("ThreeWayMergeView.css").toExternalForm());
         viewModel = new ThreeWayMergeViewModel(leftEntry, rightEntry, leftHeader, rightHeader);
 
         mergeToolbox = new ThreeWayMergeToolbox();
