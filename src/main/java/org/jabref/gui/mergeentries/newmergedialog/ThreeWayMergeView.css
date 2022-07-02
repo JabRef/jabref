@@ -4,22 +4,21 @@
 }
 
 .merged-field .styled-text-area {
-    -fx-background-radius: 5;
-    -fx-border-radius: 5;
-    -fx-border-color: #dfdfdf
+    -fx-background-radius: 3;
+    -fx-border-radius: 3;
+    -fx-border-color: #dfdfdf;
+    -fx-background-color: white;
 }
 
 .field-value:selected .selection-box {
-    -fx-background-color: -jr-transparent-green;
-    -fx-border-color: -jr-green;
+    -fx-background-color: derive(-jr-accent, 20%);
+    -fx-border-color: -jr-accent;
 }
 
 .field-value .selection-box {
     -fx-background-color: #0000;
-    -fx-padding: 8;
     -fx-border-width: 1;
-    -fx-border-color: #219b3800;
-    -fx-border-style: SOLID;
+    -fx-border-color: #0000;
     -fx-border-radius: 8;
     -fx-background-radius: 8;
 }
@@ -32,15 +31,19 @@
     -fx-font-size: 13;
 }
 
-.field-value .checkmark {
-    -fx-icon-size: 13;
-    -fx-icon-color: #25b060;
+
+.field-value .checkmark-icon {
+    -fx-icon-size: 16;
+    -fx-icon-color: -jr-gray-2;
+    -fx-opacity: 100%;
+}
+.field-value:disabled .checkmark-icon {
     -fx-opacity: 0%;
 }
 
-.field-value:selected .checkmark {
-    -fx-icon-size: 14;
-    -fx-icon-color: -jr-green;
+.field-value:selected .checkmark-icon {
+    -fx-icon-size: 16;
+    -fx-icon-color: derive(-jr-accent, -30%);;
     -fx-opacity: 100%;
 }
 
@@ -54,9 +57,4 @@
 
 .deletion {
     -rtfx-background-color: rgba(248, 62, 68, 0.26);
-}
-
-
-* {
-    -jr-transparent-green: rgba(16, 172, 132, 0.15);
 }
