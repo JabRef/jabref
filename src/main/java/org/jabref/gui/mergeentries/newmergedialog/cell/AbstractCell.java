@@ -7,7 +7,6 @@ import javafx.beans.property.StringProperty;
 import javafx.css.PseudoClass;
 import javafx.geometry.Insets;
 import javafx.scene.layout.HBox;
-import javafx.scene.paint.Color;
 
 /**
  *
@@ -79,18 +78,5 @@ public abstract class AbstractCell extends HBox {
 
     public void setText(String text) {
         textProperty().set(text);
-    }
-
-    public enum BackgroundTone {
-        LIGHT(Color.web("#FEFEFE")), DARK(Color.web("#EFEFEF"));
-        private final Color color;
-
-        BackgroundTone(Color color) {
-            this.color = color;
-        }
-
-        public Color color() {
-            return color;
-        }
     }
 }
