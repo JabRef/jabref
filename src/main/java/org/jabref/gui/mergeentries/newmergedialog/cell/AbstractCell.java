@@ -6,8 +6,6 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.geometry.Insets;
 import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
-import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 
@@ -24,6 +22,8 @@ public abstract class AbstractCell extends HBox {
 
         setText(text);
         setBackgroundTone(backgroundTone);
+        // TODO: Remove this when cells are added to the grid pane, and add the stylesheet to the root layout instead.
+        getStylesheets().add("../newmergedialog.css");
     }
 
     public AbstractCell(String text) {
