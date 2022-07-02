@@ -2,13 +2,13 @@
 
 .root {
     -jr-transparent-green: rgba(16, 172, 132, 0.12);
-    -jr-row-odd-background: -fx-control-inner-background;
-    -jr-row-even-background: -fx-control-inner-background-alt;
+    -jr-row-odd-background: -fx-control-inner-background-alt;
+    -jr-row-even-background: -fx-control-inner-background;
     /*
     On light theme, the text is hard to see when it's on top of the accent color. This is an alternative lighter accent color
     for better text visibility.
     */
-    -jr-accent-alt: derive(-jr-accent, 10%);
+    -jr-accent-alt: derive(-jr-accent, 15%);
 
     /*
     The theme color and some derived colors from it are used for icons, tab-headers, marking of selected inputs and
@@ -616,6 +616,31 @@ TextFlow > .tooltip-text-monospaced {
 .tree-table-view > .virtual-flow > .clipped-container > .sheet > .tree-table-row-cell .tree-table-cell:selected {
     -fx-border-color: transparent;
     -fx-background-insets: 0;
+}
+
+.field-value .copy-icon {
+    -fx-icon-size: 15;
+    -fx-icon-color: -fx-text-background-color;
+    -fx-blend-mode: multiply ;
+    -fx-opacity: 69%;
+}
+
+.field-value:disabled .copy-icon {
+    -fx-opacity: 0%;
+}
+
+.field-value:selected .copy-icon {
+
+}
+
+.header-cell {
+    -fx-border-width: 0 0 1 0;
+    -fx-border-color: -jr-gray-1;
+    -fx-background-color: -jr-row-even-background;
+}
+
+.merge-header {
+    -fx-background-color: -jr-row-even-background;
 }
 
 .table-view .groupColumnBackground {
