@@ -42,6 +42,7 @@ public class FieldValueCell extends AbstractCell implements Toggle {
     private final StyleClassedTextArea label = new StyleClassedTextArea();
 
     private final VirtualizedScrollPane<StyleClassedTextArea> scrollPane = new VirtualizedScrollPane<>(label);
+    HBox labelBox = new HBox(scrollPane);
     private final BooleanProperty selected = new BooleanPropertyBase() {
         @Override
         public Object getBean() {
@@ -69,11 +70,6 @@ public class FieldValueCell extends AbstractCell implements Toggle {
         initialize();
     }
 
-    public FieldValueCell(String text) {
-        super(text);
-        initialize();
-    }
-
     private void initialize() {
         getStyleClass().add(DEFAULT_STYLE_CLASS);
         initializeScrollPane();
@@ -86,7 +82,7 @@ public class FieldValueCell extends AbstractCell implements Toggle {
             }
         });
 
-        selectionBox.getChildren().addAll(scrollPane, checkmarkLayout);
+        selectionBox.getChildren().addAll(labelBox, checkmarkLayout);
         getChildren().setAll(selectionBox);
     }
 
@@ -113,11 +109,23 @@ public class FieldValueCell extends AbstractCell implements Toggle {
         selectionBox.getStyleClass().add(SELECTION_BOX_STYLE_CLASS);
         HBox.setHgrow(selectionBox, Priority.ALWAYS);
 
-        FontIcon checkmarkCircleIcon = FontIcon.of(MaterialDesignC.CONTENT_COPY);
-        checkmarkCircleIcon.getStyleClass().add("checkmark-icon");
-        checkmarkLayout.getChildren().setAll(checkmarkCircleIcon);
-        checkmarkLayout.setPadding(new Insets(1, 0, 0, 0));
-        checkmarkLayout.setAlignment(Pos.TOP_RIGHT);
+        HBox.setHgrow(labelBox, Priority.ALWAYS);
+        labelBox.setPadding(new Insets(8));
+        labelBox.setCursor(Cursor.HAND);
+
+        FontIcon copyIcon = FontIcon.of(MaterialDesignC.CONTENT_COPY);
+        Button copyButton = new Button();
+        copyButton.setGraphic(copyIcon);
+        copyButton.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+        copyButton.setStyle("-fx-border-width: 0");
+
+        copyIcon.getStyleClass().add("checkmark-icon");
+        checkmarkLayout.getChildren().setAll(copyButton);
+        checkmarkLayout.setAlignment(Pos.TOP_CENTER);
+        checkmarkLayout.setPrefWidth(28);
+
+        copyButton.setMaxHeight(Double.MAX_VALUE);
+        VBox.setVgrow(copyButton, Priority.ALWAYS);
     }
 
     private void initializeScrollPane() {
