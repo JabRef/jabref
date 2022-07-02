@@ -27,7 +27,10 @@ public class MergedFieldCell extends AbstractCell {
     }
 
     private void initializeTextArea() {
-        bindTextAreaValue();
+        BindingsHelper.bindBidirectional(textArea.textProperty(),
+                                         textProperty(),
+                                         textArea::replaceText,
+                                         textProperty()::setValue);
 
         setAlignment(Pos.CENTER);
         textArea.setWrapText(true);
@@ -39,10 +42,5 @@ public class MergedFieldCell extends AbstractCell {
             e.consume();
             MergedFieldCell.this.fireEvent(e.copyFor(e.getSource(), MergedFieldCell.this));
         });
-    }
-
-    private void bindTextAreaValue() {
-        textArea.replaceText(textProperty().get());
-        textProperty().addListener(((observable, oldValue, newValue) -> textArea.replaceText(newValue)));
     }
 }
