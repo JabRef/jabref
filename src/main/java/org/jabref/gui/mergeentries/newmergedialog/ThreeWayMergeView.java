@@ -73,6 +73,13 @@ public class ThreeWayMergeView extends VBox {
         BackgroundTone backgroundTone = index % 2 == 0 ? BackgroundTone.DARK : BackgroundTone.LIGHT;
 
         FieldRowController fieldRow = new FieldRowController(field.getDisplayName(), leftEntryValue, rightEntryValue, backgroundTone);
-        mergeGridPane.addRow(index, fieldRow.getFieldNameCell(), fieldRow.getLeftValueCell(), fieldRow.getRightValueCell(), fieldRow.getMergedValueCell());
+
+        if (fieldRow.hasEqualLeftAndRightValues()) {
+            mergeGridPane.add(fieldRow.getFieldNameCell(), 0, index, 1, 1);
+            mergeGridPane.add(fieldRow.getLeftValueCell(), 1, index, 2, 1);
+            mergeGridPane.add(fieldRow.getMergedValueCell(), 3, index, 1, 1);
+        } else {
+            mergeGridPane.addRow(index, fieldRow.getFieldNameCell(), fieldRow.getLeftValueCell(), fieldRow.getRightValueCell(), fieldRow.getMergedValueCell());
+        }
     }
 }
