@@ -116,18 +116,23 @@ public class FieldValueCell extends AbstractCell implements Toggle {
         labelBox.setPadding(new Insets(8));
         labelBox.setCursor(Cursor.HAND);
 
-        FontIcon copyIcon = FontIcon.of(MaterialDesignC.CONTENT_COPY);
-        Button copyButton = factory.createIconButton(() -> Localization.lang("Copy"), new CopyFieldValueCommand(Globals.prefs, getText()));
-        copyButton.setGraphic(copyIcon);
-        copyButton.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
-
-        copyIcon.getStyleClass().add("copy-icon");
-        checkmarkLayout.getChildren().setAll(copyButton);
+        checkmarkLayout.getChildren().setAll(createCopyButton());
         checkmarkLayout.setAlignment(Pos.TOP_CENTER);
         checkmarkLayout.setPrefWidth(28);
 
+    }
+
+    private Button createCopyButton() {
+        FontIcon copyIcon = FontIcon.of(MaterialDesignC.CONTENT_COPY);
+        copyIcon.getStyleClass().add("copy-icon");
+
+        Button copyButton = factory.createIconButton(() -> Localization.lang("Copy"), new CopyFieldValueCommand(Globals.prefs, getText()));
+        copyButton.setGraphic(copyIcon);
+        copyButton.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
         copyButton.setMaxHeight(Double.MAX_VALUE);
         VBox.setVgrow(copyButton, Priority.ALWAYS);
+
+        return copyButton;
     }
 
     private void initializeScrollPane() {
