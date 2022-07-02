@@ -59,4 +59,14 @@ public class FieldRowController {
     public MergedFieldCell getMergedValueCell() {
         return mergedValueCell;
     }
+
+    public boolean hasEqualLeftAndRightValues() {
+        return !StringUtil.isNullOrEmpty(leftValueCell.getText()) &&
+                !StringUtil.isNullOrEmpty(rightValueCell.getText()) &&
+                leftValueCell.getText().equals(rightValueCell.getText());
+    }
+
+    public void deselectLeft() {
+        toggleGroup.getSelectedToggle().setSelected(false);
+    }
 }
