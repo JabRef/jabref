@@ -10,6 +10,7 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.Screen;
 
+import org.jabref.gui.mergeentries.newmergedialog.diffhighlighter.DiffHighlighter;
 import org.jabref.gui.mergeentries.newmergedialog.toolbar.ThreeWayMergeToolbar;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
@@ -70,11 +71,10 @@ public class ThreeWayMergeView extends VBox {
 
     private void updateDiff() {
         if (toolbar.isShowDiffEnabled()) {
-            fieldRowControllerList.forEach(fieldRow -> fieldRow.showDiffs(
-                    new ShowDiffConfig(toolbar.getDiffView(), toolbar.getDiffHighlightMode())
-            ));
+            DiffHighlighter.DiffMethod diffMethod = toolbar.getDiffHighlightMode() == ThreeWayMergeToolbar.DiffHighlightMode.WORDS ? DiffHighlighter.DiffMethod.WORDS : DiffHighlighter.DiffMethod.CHARS;
+            fieldRowControllerList.forEach(fieldRow -> fieldRow.showDiff(new ShowDiffConfig(toolbar.getDiffView(), diffMethod)));
         } else {
-            fieldRowControllerList.forEach(FieldRowController::hideDiffs);
+            fieldRowControllerList.forEach(FieldRowController::hideDiff);
         }
     }
 
