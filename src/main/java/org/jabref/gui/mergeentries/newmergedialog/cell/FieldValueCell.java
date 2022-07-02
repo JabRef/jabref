@@ -22,6 +22,10 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 
+import org.jabref.gui.Globals;
+import org.jabref.gui.actions.ActionFactory;
+import org.jabref.logic.l10n.Localization;
+
 import org.fxmisc.flowless.VirtualizedScrollPane;
 import org.fxmisc.richtext.StyleClassedTextArea;
 import org.fxmisc.wellbehaved.event.InputMap;
@@ -68,8 +72,8 @@ public class FieldValueCell extends AbstractCell implements Toggle {
     private final HBox selectionBox = new HBox();
     private final VBox checkmarkLayout = new VBox();
 
-    public FieldValueCell(String text, BackgroundTone backgroundTone) {
-        super(text, backgroundTone);
+    public FieldValueCell(String text, int rowIndex) {
+        super(text, rowIndex);
         initialize();
     }
 

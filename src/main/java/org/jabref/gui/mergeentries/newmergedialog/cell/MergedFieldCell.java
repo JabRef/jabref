@@ -6,6 +6,8 @@ import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 
+import org.jabref.gui.util.BindingsHelper;
+
 import org.fxmisc.richtext.StyleClassedTextArea;
 
 public class MergedFieldCell extends AbstractCell {
@@ -13,13 +15,8 @@ public class MergedFieldCell extends AbstractCell {
 
     private final StyleClassedTextArea textArea = new StyleClassedTextArea();
 
-    public MergedFieldCell(String text, BackgroundTone backgroundTone) {
-        super(text, backgroundTone);
-        initialize();
-    }
-
-    public MergedFieldCell(String text) {
-        super(text);
+    public MergedFieldCell(String text, int rowIndex) {
+        super(text, rowIndex);
         initialize();
     }
 
