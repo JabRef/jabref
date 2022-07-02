@@ -24,6 +24,7 @@ import javafx.scene.paint.Color;
 
 import org.jabref.gui.Globals;
 import org.jabref.gui.actions.ActionFactory;
+import org.jabref.gui.mergeentries.newmergedialog.CopyFieldValueCommand;
 import org.jabref.logic.l10n.Localization;
 
 import org.fxmisc.flowless.VirtualizedScrollPane;
@@ -107,7 +108,7 @@ public class FieldValueCell extends AbstractCell implements Toggle {
 
         label.prefHeightProperty().bind(label.totalHeightEstimateProperty().orElseConst(-1d));
 
-        // Fix text area consuming scroll events before they rich the outer scrollable
+        // Fix text area consuming scroll events before they reach the outer scrollable
         label.addEventFilter(ScrollEvent.SCROLL, e -> {
             e.consume();
             FieldValueCell.this.fireEvent(e.copyFor(e.getSource(), FieldValueCell.this));
