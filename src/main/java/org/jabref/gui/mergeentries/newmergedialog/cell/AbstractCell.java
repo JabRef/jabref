@@ -23,7 +23,7 @@ public abstract class AbstractCell extends HBox {
         setText(text);
         setBackgroundTone(backgroundTone);
         // TODO: Remove this when cells are added to the grid pane, and add the stylesheet to the root layout instead.
-        getStylesheets().add("../newmergedialog.css");
+        getStylesheets().add("../ThreeWayMergeView.css");
     }
 
     public AbstractCell(String text) {
@@ -55,7 +55,7 @@ public abstract class AbstractCell extends HBox {
     }
 
     public enum BackgroundTone {
-        LIGHT(Color.web("#F7F7F7")), DARK(Color.web("#FAFAFA"));
+        LIGHT(Color.web("#FEFEFE")), DARK(Color.web("#EFEFEF"));
         private final Color color;
 
         BackgroundTone(Color color) {
