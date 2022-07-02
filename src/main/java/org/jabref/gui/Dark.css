@@ -81,6 +81,31 @@
 .tree-table-row-cell:hover {
     -fx-background-color: -jr-hover;
 }
+.field-value .copy-icon {
+    -fx-icon-size: 15;
+    -fx-icon-color: -fx-text-background-color;
+    -fx-blend-mode: inherit;
+    -fx-opacity: 100%;
+}
+
+.field-value:disabled .copy-icon {
+    -fx-opacity: 0%;
+}
+
+.field-value:selected .copy-icon {
+    -fx-icon-color: -fx-text-background-color;
+    -fx-opacity: 100%;
+}
+
+.header-cell {
+    -fx-border-width: 0 0 1 0;
+    -fx-border-color: -fx-outer-border;
+    -fx-background-color: -jr-row-odd-background;
+}
+
+.merge-header {
+    -fx-background-color: -jr-row-odd-background;
+}
 
 .table-view .groupColumnBackground {
     -fx-stroke: -jr-gray-3;

@@ -1,13 +1,18 @@
 .merged-field {
-    -fx-border-color: #dfdfdf;
-    -fx-border-width: 0 0 0 1.5;
+/*    -fx-border-color: #dfdfdf;
+    -fx-border-width: 0 0 0 1.5;*/
 }
 
 .merged-field .styled-text-area {
-    -fx-background-radius: 3;
-    -fx-border-radius: 3;
-    -fx-border-color: #dfdfdf;
-    -fx-background-color: white;
+    -fx-background-color: -fx-outer-border, -fx-control-inner-background;
+    -fx-background-insets: 0, 1;
+    -fx-prompt-text-fill: -fx-mid-text-color;
+}
+.merged-field .styled-text-area:focused {
+    -fx-highlight-fill: derive(-jr-accent, 20%);
+    -fx-background-color: -jr-accent, -fx-control-inner-background;
+    -fx-background-insets: 0, 2;
+    -fx-highlight-text-fill: -fx-text-inner-color;
 }
 
 .field-value:selected .selection-box {
@@ -23,28 +28,8 @@
     -fx-background-radius: 8;
 }
 
-.field-value .styled-text-area .text{
+.styled-text-area .text{
     -fx-fill: -fx-text-background-color;
-}
-
-.field-value .text-area {
-    -fx-font-size: 13;
-}
-
-
-.field-value .copy-icon {
-    -fx-icon-size: 15;
-    -fx-icon-color: -fx-text-background-color;
-    -fx-opacity: 100%;
-}
-
-.field-value:disabled .copy-icon {
-    -fx-opacity: 0%;
-}
-
-.field-value:selected .copy-icon {
-    -fx-icon-color: -fx-text-background-color;
-    -fx-opacity: 100%;
 }
 
 .field-cell:odd {
@@ -57,6 +42,11 @@
 
 .merge-toolbox {
     -fx-background-color: -jr-menu-background;
+}
+
+.header-cell .label{
+    -fx-font-weight: bold;
+    -fx-padding: 1, 0, 1, 0;
 }
 
 /* Diff Highlighting */
