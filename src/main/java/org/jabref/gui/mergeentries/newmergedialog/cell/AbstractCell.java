@@ -1,11 +1,11 @@
 package org.jabref.gui.mergeentries.newmergedialog.cell;
 
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.BooleanPropertyBase;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.css.PseudoClass;
 import javafx.geometry.Insets;
-import javafx.scene.layout.Background;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 
@@ -13,21 +13,60 @@ import javafx.scene.paint.Color;
  *
  */
 public abstract class AbstractCell extends HBox {
+    public static final String ODD_PSEUDO_CLASS = "odd";
+    public static final String EVEN_PSEUDO_CLASS = "even";
+    public static final int NO_ROW_NUMBER = -1;
+    private static final String DEFAULT_STYLE_CLASS = "field-cell";
     private final StringProperty text = new SimpleStringProperty();
-    private final ObjectProperty<BackgroundTone> backgroundTone = new SimpleObjectProperty<>();
+    private final BooleanProperty odd = new BooleanPropertyBase() {
+        @Override
+        public Object getBean() {
+            return AbstractCell.this;
+        }
 
-    public AbstractCell(String text, BackgroundTone backgroundTone) {
-        backgroundToneProperty().addListener(invalidated -> setBackground(Background.fill(getBackgroundTone().color())));
+        @Override
+        public String getName() {
+            return "odd";
+        }
+
+        @Override
+        protected void invalidated() {
+            pseudoClassStateChanged(PseudoClass.getPseudoClass(ODD_PSEUDO_CLASS), get());
+            pseudoClassStateChanged(PseudoClass.getPseudoClass(EVEN_PSEUDO_CLASS), !get());
+        }
+    };
+
+    private final BooleanProperty even = new BooleanPropertyBase() {
+        @Override
+        public Object getBean() {
+            return AbstractCell.this;
+        }
+
+        @Override
+        public String getName() {
+            return "even";
+        }
+
+        @Override
+        protected void invalidated() {
+            pseudoClassStateChanged(PseudoClass.getPseudoClass(EVEN_PSEUDO_CLASS), get());
+            pseudoClassStateChanged(PseudoClass.getPseudoClass(ODD_PSEUDO_CLASS), !get());
+        }
+    };
+
+    public AbstractCell(String text, int rowIndex) {
+        getStyleClass().add(DEFAULT_STYLE_CLASS);
+        if (rowIndex != NO_ROW_NUMBER) {
+            if (rowIndex % 2 == 1) {
+                odd.setValue(true);
+            } else {
+                even.setValue(true);
+            }
+        }
+
         setPadding(new Insets(8));
 
         setText(text);
-        setBackgroundTone(backgroundTone);
-        // TODO: Remove this when cells are added to the grid pane, and add the stylesheet to the root layout instead.
-        getStylesheets().add("../ThreeWayMergeView.css");
-    }
-
-    public AbstractCell(String text) {
-        this(text, BackgroundTone.DARK);
     }
 
     public String getText() {
@@ -40,18 +79,6 @@ public abstract class AbstractCell extends HBox {
 
     public void setText(String text) {
         textProperty().set(text);
-    }
-
-    public void setBackgroundTone(BackgroundTone backgroundTone) {
-        backgroundToneProperty().set(backgroundTone);
-    }
-
-    public BackgroundTone getBackgroundTone() {
-        return backgroundToneProperty().get();
-    }
-
-    public ObjectProperty<BackgroundTone> backgroundToneProperty() {
-        return backgroundTone;
     }
 
     public enum BackgroundTone {
