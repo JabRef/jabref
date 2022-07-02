@@ -86,7 +86,7 @@ public class FieldValueCell extends AbstractCell implements Toggle {
             }
         });
 
-        selectionBox.getChildren().addAll(label, checkmarkLayout);
+        selectionBox.getChildren().addAll(scrollPane, checkmarkLayout);
         getChildren().setAll(selectionBox);
     }
 
@@ -113,7 +113,9 @@ public class FieldValueCell extends AbstractCell implements Toggle {
         selectionBox.getStyleClass().add(SELECTION_BOX_STYLE_CLASS);
         HBox.setHgrow(selectionBox, Priority.ALWAYS);
 
-        checkmarkLayout.getChildren().setAll(new FontIcon(MaterialDesignC.CHECK));
+        FontIcon checkmarkCircleIcon = FontIcon.of(MaterialDesignC.CONTENT_COPY);
+        checkmarkCircleIcon.getStyleClass().add("checkmark-icon");
+        checkmarkLayout.getChildren().setAll(checkmarkCircleIcon);
         checkmarkLayout.setPadding(new Insets(1, 0, 0, 0));
         checkmarkLayout.setAlignment(Pos.TOP_RIGHT);
     }
