@@ -9,13 +9,8 @@ public class FieldNameCell extends AbstractCell {
     public static final String DEFAULT_STYLE_CLASS = "field-name";
     private final Label label = new Label();
 
-    public FieldNameCell(String text, BackgroundTone backgroundTone) {
-        super(text, backgroundTone);
-        initialize();
-    }
-
-    public FieldNameCell(String text) {
-        super(text);
+    public FieldNameCell(String text, int rowIndex) {
+        super(text, rowIndex);
         initialize();
     }
 
