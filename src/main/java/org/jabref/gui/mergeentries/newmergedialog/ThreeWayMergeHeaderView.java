@@ -4,7 +4,6 @@ import javafx.geometry.Insets;
 import javafx.scene.control.Control;
 import javafx.scene.layout.GridPane;
 
-import org.jabref.gui.mergeentries.newmergedialog.cell.EmptyCell;
 import org.jabref.gui.mergeentries.newmergedialog.cell.HeaderCell;
 
 /**
@@ -26,7 +25,7 @@ public class ThreeWayMergeHeaderView extends GridPane {
         this.mergedHeaderCell = new HeaderCell("Merged Entry");
 
         addRow(0,
-               new EmptyCell(HeaderCell.DEFAULT_STYLE_CLASS),
+               new HeaderCell(""),
                leftHeaderCell,
                rightHeaderCell,
                mergedHeaderCell
