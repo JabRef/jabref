@@ -5,7 +5,6 @@ import java.util.Objects;
 
 import javafx.beans.binding.BooleanExpression;
 import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -15,14 +14,11 @@ import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.AnchorPane;
 import javafx.util.StringConverter;
 
-import org.jabref.gui.mergeentries.DiffHighlighting;
-import org.jabref.gui.mergeentries.DiffMode;
 import org.jabref.gui.mergeentries.newmergedialog.diffhighlighter.DiffHighlighter;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.EasyBinding;
-import org.apache.commons.lang3.builder.Diff;
 
 public class ThreeWayMergeToolbar extends AnchorPane {
     @FXML
