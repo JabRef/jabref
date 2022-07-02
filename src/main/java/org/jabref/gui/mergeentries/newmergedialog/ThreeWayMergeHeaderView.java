@@ -8,7 +8,7 @@ import org.jabref.gui.mergeentries.newmergedialog.cell.EmptyCell;
 import org.jabref.gui.mergeentries.newmergedialog.cell.HeaderCell;
 
 /**
- * I used a GridPane instead of a Hbox because Hbox allocates more space for cells
+ * GridPane was used instead of a Hbox because Hbox allocates more space for cells
  * with longer text, but I wanted all cells to have the same width
  */
 public class ThreeWayMergeHeaderView extends GridPane {
