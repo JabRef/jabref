@@ -191,4 +191,8 @@ public class FieldValueCell extends AbstractCell implements Toggle {
     public Object getUserData() {
         return super.getText();
     }
+
+    public StyleClassedTextArea getStyleClassedLabel() {
+        return label;
+    }
 }
