@@ -48,6 +48,8 @@ public class FieldValueCell extends AbstractCell implements Toggle {
     private final ObjectProperty<ToggleGroup> toggleGroup = new SimpleObjectProperty<>();
     private final StyleClassedTextArea label = new StyleClassedTextArea();
 
+    private final ActionFactory factory = new ActionFactory(Globals.getKeyPrefs());
+
     private final VirtualizedScrollPane<StyleClassedTextArea> scrollPane = new VirtualizedScrollPane<>(label);
     HBox labelBox = new HBox(scrollPane);
     private final BooleanProperty selected = new BooleanPropertyBase() {
@@ -65,8 +67,7 @@ public class FieldValueCell extends AbstractCell implements Toggle {
         protected void invalidated() {
             pseudoClassStateChanged(SELECTED_PSEUDO_CLASS, get());
 
-            ToggleGroup group = getToggleGroup();
-            group.selectToggle(FieldValueCell.this);
+            getToggleGroup().selectToggle(FieldValueCell.this);
         }
     };
     private final HBox selectionBox = new HBox();
@@ -122,12 +123,11 @@ public class FieldValueCell extends AbstractCell implements Toggle {
         labelBox.setCursor(Cursor.HAND);
 
         FontIcon copyIcon = FontIcon.of(MaterialDesignC.CONTENT_COPY);
-        Button copyButton = new Button();
+        Button copyButton = factory.createIconButton(() -> Localization.lang("Copy"), new CopyFieldValueCommand(Globals.prefs, getText()));
         copyButton.setGraphic(copyIcon);
         copyButton.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
-        copyButton.setStyle("-fx-border-width: 0");
 
-        copyIcon.getStyleClass().add("checkmark-icon");
+        copyIcon.getStyleClass().add("copy-icon");
         checkmarkLayout.getChildren().setAll(copyButton);
         checkmarkLayout.setAlignment(Pos.TOP_CENTER);
         checkmarkLayout.setPrefWidth(28);
