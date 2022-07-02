@@ -119,7 +119,6 @@ public class FieldValueCell extends AbstractCell implements Toggle {
         checkmarkLayout.getChildren().setAll(createCopyButton());
         checkmarkLayout.setAlignment(Pos.TOP_CENTER);
         checkmarkLayout.setPrefWidth(28);
-
     }
 
     private Button createCopyButton() {
