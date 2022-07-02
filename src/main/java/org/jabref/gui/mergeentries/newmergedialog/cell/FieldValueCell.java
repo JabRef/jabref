@@ -34,7 +34,9 @@ import static org.fxmisc.wellbehaved.event.EventPattern.mousePressed;
  * A readonly, selectable field cell that contains the value of some field
  */
 public class FieldValueCell extends AbstractCell implements Toggle {
+    public static final String DEFAULT_STYLE_CLASS = "field-value";
     public static final String SELECTION_BOX_STYLE_CLASS = "selection-box";
+
     private static final PseudoClass SELECTED_PSEUDO_CLASS = PseudoClass.getPseudoClass("selected");
     private final ObjectProperty<ToggleGroup> toggleGroup = new SimpleObjectProperty<>();
     private final StyleClassedTextArea label = new StyleClassedTextArea();
@@ -54,6 +56,9 @@ public class FieldValueCell extends AbstractCell implements Toggle {
         @Override
         protected void invalidated() {
             pseudoClassStateChanged(SELECTED_PSEUDO_CLASS, get());
+
+            ToggleGroup group = getToggleGroup();
+            group.selectToggle(FieldValueCell.this);
         }
     };
     private final HBox selectionBox = new HBox();
@@ -70,6 +75,7 @@ public class FieldValueCell extends AbstractCell implements Toggle {
     }
 
     private void initialize() {
+        getStyleClass().add(DEFAULT_STYLE_CLASS);
         initializeScrollPane();
         initializeLabel();
         initializeSelectionBox();
