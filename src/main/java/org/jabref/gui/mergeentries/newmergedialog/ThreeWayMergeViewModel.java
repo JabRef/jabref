@@ -37,6 +37,8 @@ class ThreeWayMergeViewModel extends AbstractViewModel {
         setLeftHeader(leftHeader);
         setRightHeader(rightHeader);
 
+        mergedEntry.set(new BibEntry());
+
         Set<Field> leftAndRightFieldsUnion = new HashSet<>(leftEntry.getFields());
         leftAndRightFieldsUnion.addAll(rightEntry.getFields());
         setAllFields(leftAndRightFieldsUnion);
