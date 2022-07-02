@@ -1,5 +1,68 @@
-.root {
+.merged-field {
+    -fx-border-color: #dfdfdf;
+    -fx-border-width: 0 0 0 1.5;
+}
 
+.merged-field .styled-text-area {
+    -fx-background-radius: 3;
+    -fx-border-radius: 3;
+    -fx-border-color: #dfdfdf;
+    -fx-background-color: white;
+}
+
+.field-value:selected .selection-box {
+    -fx-background-color: derive(-jr-accent, 20%);
+    -fx-border-color: -jr-accent;
+}
+
+.field-value .selection-box {
+    -fx-background-color: #0000;
+    -fx-padding: 8;
+    -fx-border-width: 1;
+    -fx-border-color: #0000;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+}
+
+.field-value .label {
+    -fx-font-size: 13;
+}
+
+.field-value .text-area {
+    -fx-font-size: 13;
+}
+
+
+.field-value .checkmark-icon {
+    -fx-icon-size: 16;
+    -fx-icon-color: -jr-gray-2;
+    -fx-opacity: 100%;
+}
+.field-value:disabled .checkmark-icon {
+    -fx-opacity: 0%;
+}
+
+.field-value:selected .checkmark-icon {
+    -fx-icon-size: 16;
+    -fx-icon-color: derive(-jr-accent, -30%);;
+    -fx-opacity: 100%;
+}
+
+.unchanged {
+
+}
+
+.addition {
+    -rtfx-background-color: rgba(35, 225, 96, 0.26);
+}
+
+.deletion {
+    -rtfx-background-color: rgba(248, 62, 68, 0.26);
+}
+
+
+.root {
+    -jr-transparent-green: rgba(16, 172, 132, 0.12);
     /*
     The theme color and some derived colors from it are used for icons, tab-headers, marking of selected inputs and
     hover colors for the main menu. It generally defines the look of JabRef. The highlighting colors below should
@@ -9,6 +72,7 @@
     /* This theme is the original JabRef dark blue color */
     -jr-theme: #50618F;
     -jr-accent: #a3b7e6;
+    -jr-transparent-accent: rgba(163, 183, 230, 0.16);
     -jr-selected: -jr-accent;
     -jr-checked: -jr-theme;
     -jr-hover: #0002;
