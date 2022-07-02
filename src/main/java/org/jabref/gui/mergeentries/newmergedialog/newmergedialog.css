@@ -1,0 +1,10 @@
+.merged-field {
+    -fx-border-color: #dfdfdf;
+    -fx-border-width: 0 0 0 1.5;
+}
+
+.merged-field .styled-text-area {
+    -fx-background-radius: 5;
+    -fx-border-radius: 5;
+    -fx-border-color: #dfdfdf
+}
