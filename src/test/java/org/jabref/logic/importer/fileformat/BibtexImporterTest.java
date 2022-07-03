@@ -165,7 +165,7 @@ public class BibtexImporterTest {
 
     @ParameterizedTest
     @CsvSource({"encoding-utf-8-with-header.bib", "encoding-utf-8-without-header.bib"})
-    public void testParsingOfUtf8EncodedFileReadsUmlatCharacterCorrectly(String filename) throws Exception {
+    public void testParsingOfUtf8EncodedFileReadsUmlautCharacterCorrectly(String filename) throws Exception {
         ParserResult parserResult = importer.importDatabase(
                 Path.of(BibtexImporterTest.class.getResource(filename).toURI()));
         assertEquals(
@@ -175,7 +175,7 @@ public class BibtexImporterTest {
 
     @ParameterizedTest
     @CsvSource({"encoding-utf-16BE-with-header.bib", "encoding-utf-16BE-without-header.bib"})
-    public void testParsingOfUtf816EncodedFileReadsUmlatCharacterCorrectly(String filename) throws Exception {
+    public void testParsingOfUtf16EncodedFileReadsUmlautCharacterCorrectly(String filename) throws Exception {
         ParserResult parserResult = importer.importDatabase(
                 Path.of(BibtexImporterTest.class.getResource(filename).toURI()));
 
