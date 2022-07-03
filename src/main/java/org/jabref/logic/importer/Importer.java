@@ -11,7 +11,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
-import java.util.Arrays;
 import java.util.Objects;
 
 import org.jabref.logic.util.FileType;
@@ -123,16 +122,11 @@ public abstract class Importer implements Comparable<Importer> {
             if ((matches == null) || (matches.length == 0)) {
                 return defaultCharSet;
             }
-            if (Arrays.stream(matches).anyMatch(singleCharset -> singleCharset.getName().equals(defaultCharSet.toString()))) {
-                return defaultCharSet;
-            }
-            if (Arrays.stream(matches).anyMatch(singleCharset -> singleCharset.getName().equals(StandardCharsets.UTF_16.toString()))) {
-                return StandardCharsets.UTF_16;
-            }
 
             if (matches[0] != null) {
                 return Charset.forName(matches[0].getName());
             }
+
         } catch (IOException e) {
             LOGGER.error("Could not determine charset. Using default one.", e);
         }

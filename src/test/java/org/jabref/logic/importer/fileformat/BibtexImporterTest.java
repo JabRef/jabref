@@ -12,10 +12,14 @@ import java.util.stream.Stream;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.util.StandardFileType;
+import org.jabref.model.database.BibDatabase;
+import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.StandardEntryType;
+import org.jabref.model.metadata.MetaData;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -167,5 +171,23 @@ public class BibtexImporterTest {
         assertEquals(
                 List.of(new BibEntry(StandardEntryType.Article).withField(StandardField.TITLE, "Ü ist ein Umlaut")),
                 parserResult.getDatabase().getEntries());
+    }
+
+    @ParameterizedTest
+    @CsvSource({"encoding-utf-16BE-with-header.bib", "encoding-utf-16BE-without-header.bib"})
+    public void testParsingOfUtf816EncodedFileReadsUmlatCharacterCorrectly(String filename) throws Exception {
+        ParserResult parserResult = importer.importDatabase(
+                Path.of(BibtexImporterTest.class.getResource(filename).toURI()));
+
+        BibDatabaseContext parsedContext = new BibDatabaseContext(parserResult.getDatabase(), parserResult.getMetaData());
+
+        MetaData metaData = new MetaData();
+        metaData.setMode(BibDatabaseMode.BIBTEX);
+        metaData.setEncoding(StandardCharsets.UTF_16BE);
+        BibDatabaseContext bibDatabaseContext = new BibDatabaseContext(new BibDatabase(List.of(new BibEntry(StandardEntryType.Article).withField(StandardField.TITLE, "Ü ist ein Umlaut"))), metaData);
+
+        assertEquals(
+                     bibDatabaseContext.getDatabase().getEntries(),
+                     parsedContext.getDatabase().getEntries());
     }
 }
