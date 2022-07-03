@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" demote-non-dropping-particle="never" default-locale="de-DE">
+  <!-- This style was edited with the Visual CSL Editor (https://editor.citationstyles.org/visualEditor/) -->
   <info>
-    <title>Technische Universität Dresden - Linguistik (Deutsch)</title>
-    <title-short>TUD Linguistik (Deutsch)</title-short>
-    <id>http://www.zotero.org/styles/technische-universitat-dresden-linguistik</id>
-    <link href="http://www.zotero.org/styles/technische-universitat-dresden-linguistik" rel="self"/>
-    <link href="http://www.zotero.org/styles/deutsche-sprache" rel="template"/>
-    <link href="https://tu-dresden.de/gsw/slk/germanistik/al/ressourcen/dateien/studium/200424_Stylesheet_ALI.pdf" rel="documentation"/>
+    <title>Journal für Medienlinguistik (Deutsch)</title>
+    <title-short>jfml (Deutsch)</title-short>
+    <id>http://www.zotero.org/styles/journal-fur-medienlinguistik</id>
+    <link href="http://www.zotero.org/styles/journal-fur-medienlinguistik" rel="self"/>
+    <link href="http://www.zotero.org/styles/technische-universitat-dresden-linguistik" rel="template"/>
+    <link xml:lang="de" href="https://jfml.org/libraryFiles/downloadPublic/5" rel="documentation"/>
     <author>
       <name>Simon Meier-Vieracker</name>
       <uri>https://tu-dresden.de/gsw/slk/germanistik/al</uri>
@@ -14,12 +15,12 @@
     </author>
     <category citation-format="author-date"/>
     <category field="linguistics"/>
-    <category field="literature"/>
-    <summary>Zitierstil entsprechend den Vorgaben der linguistischen Professuren am Institut für Germanistik der Technischen Universität Dresden. Der Stil orientiert sich an den Richtlinien von 'Deutsche Sprache: Zeitschrift für Theorie Praxis Dokumentation', hg. vom IDS Mannheim</summary>
-    <updated>2022-06-23T08:36:06+00:00</updated>
+    <issn>2569-6491</issn>
+    <summary>Stylesheet des Journals für Medienlinguistik (jfml)</summary>
+    <updated>2022-06-22T06:36:28+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
-  <locale xml:lang="de">
+  <locale xml:lang="de-DE">
     <terms>
       <term name="et-al">et al.</term>
       <term name="editor" form="short">Hg.</term>
@@ -44,7 +45,7 @@
     </group>
   </macro>
   <macro name="editor-container-title">
-    <group delimiter=": ">
+    <group delimiter=": " suffix=" ">
       <text term="in" text-case="capitalize-first"/>
       <group delimiter=": " suffix=".">
         <names variable="editor">
@@ -56,9 +57,12 @@
     </group>
   </macro>
   <macro name="publication-place-publisher">
-    <group delimiter=": ">
-      <text variable="publisher-place"/>
-      <text variable="publisher" quotes="false" font-variant="normal" font-weight="normal" vertical-align="baseline"/>
+    <group delimiter=" ">
+      <group delimiter=": ">
+        <text variable="publisher-place" suffix=":"/>
+        <text variable="publisher"/>
+      </group>
+      <text macro="collection-title-number"/>
     </group>
   </macro>
   <macro name="creator-year-short">
@@ -72,7 +76,7 @@
       <if match="any" is-numeric="edition">
         <group delimiter=" ">
           <number variable="edition" form="ordinal"/>
-          <text term="edition" form="short"/>
+          <text term="edition"/>
         </group>
       </if>
       <else>
@@ -81,26 +85,24 @@
     </choose>
   </macro>
   <macro name="collection-title-number">
-    <group delimiter=" " prefix=" (= " suffix=")">
-      <text variable="collection-title"/>
+    <group delimiter=" " prefix=" (" suffix=")">
+      <text variable="collection-title" suffix=","/>
       <text variable="collection-number"/>
     </group>
   </macro>
   <macro name="page-range">
-    <group delimiter=" " suffix=".">
-      <text term="page" form="short"/>
+    <group>
       <text variable="page"/>
     </group>
   </macro>
   <macro name="online-url">
     <group delimiter=" ">
       <text variable="URL"/>
-      <date form="numeric" variable="accessed" prefix="(letzter Zugriff " suffix=")"/>
     </group>
   </macro>
   <macro name="container-title-volume">
     <group delimiter=" " suffix=",">
-      <text variable="container-title"/>
+      <text variable="container-title" font-style="italic"/>
       <text variable="volume"/>
       <text variable="issue" prefix="(" suffix=")"/>
     </group>
@@ -113,14 +115,10 @@
       </substitute>
     </names>
   </macro>
-  <macro name="doi">
-    <text variable="DOI" prefix="https://doi.org/"/>
-  </macro>
   <macro name="title">
     <choose>
       <if type="book" match="any">
-        <text variable="title"/>
-        <text macro="collection-title-number" prefix=" "/>
+        <text variable="title" font-style="italic"/>
       </if>
       <else>
         <text variable="title"/>
@@ -130,8 +128,7 @@
   <macro name="container-title">
     <choose>
       <if type="chapter" match="any">
-        <text variable="container-title"/>
-        <text macro="collection-title-number"/>
+        <text variable="container-title" font-style="italic"/>
       </if>
     </choose>
   </macro>
@@ -151,8 +148,8 @@
       <key macro="creator-short"/>
       <key macro="creator-year-short"/>
     </sort>
-    <layout>
-      <group delimiter=". " suffix=".">
+    <layout suffix=".">
+      <group delimiter=". ">
         <group delimiter=" ">
           <text macro="creator-year-long" suffix=":"/>
           <text macro="title"/>
@@ -170,17 +167,22 @@
                 <text term="in" text-case="capitalize-first"/>
                 <text macro="container-title-volume"/>
               </group>
-              <text macro="page-range"/>
-              <text macro="doi" strip-periods="false"/>
+              <text macro="page-range" suffix="."/>
+              <text variable="DOI" prefix="DOI: "/>
+              <choose>
+                <if match="none" variable="DOI">
+                  <text variable="URL" prefix="URL: "/>
+                </if>
+              </choose>
             </group>
           </else-if>
           <else-if type="chapter" match="any">
-            <group delimiter=". ">
+            <group>
               <text macro="editor-container-title"/>
               <text macro="edition"/>
               <text macro="publication-place-publisher"/>
-              <text macro="page-range"/>
-              <text macro="doi"/>
+              <text macro="page-range" prefix=", "/>
+              <text variable="DOI" prefix=". DOI: "/>
             </group>
           </else-if>
           <else-if type="dataset" match="any"/>
