@@ -19,9 +19,9 @@ jobs:
       GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
       DISTRIBUTION_UPDATER_TOKEN: "${{ secrets.DISTRIBUTION_UPDATER_TOKEN }}"
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       if: github.event_name == 'push'
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       if: github.event_name == 'workflow_dispatch'
       with:
         fetch-depth: 0
@@ -30,7 +30,7 @@ jobs:
       id: release
       run: echo ::set-output name=branch::v1.0.2
     - name: Checkout release branch
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       with:
         ref: ${{ steps.release.outputs.branch }}
         path: './release'
@@ -63,7 +63,7 @@ jobs:
         ruby-version: 3.0.2
     - name: but use cache to speed that up
       if: github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && (steps.update.outputs.updated == 'true' || steps.update.outputs.deleted == 'true'))
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       with:
         path: vendor/bundle
         key: ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}
