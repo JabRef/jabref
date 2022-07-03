@@ -93,18 +93,18 @@
 .tree-table-row-cell:hover {
     -fx-background-color: -jr-hover;
 }
-.field-value .copy-icon {
-    -fx-icon-size: 15;
+.field-value .action-icon {
+    -fx-icon-size: 14;
     -fx-icon-color: -fx-text-background-color;
     -fx-blend-mode: inherit;
     -fx-opacity: 100%;
 }
 
-.field-value:disabled .copy-icon {
+.field-value:disabled .action-icon {
     -fx-opacity: 0%;
 }
 
-.field-value:selected .copy-icon {
+.field-value:selected .action-icon {
     -fx-icon-color: -fx-text-background-color;
     -fx-opacity: 100%;
 }
