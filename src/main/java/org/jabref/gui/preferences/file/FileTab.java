@@ -25,7 +25,6 @@ public class FileTab extends AbstractPreferenceTabView<FileTabViewModel> impleme
     @FXML private RadioButton resolveStrings;
     @FXML private TextField resolveStringsForFields;
     @FXML private CheckBox alwaysReformatBib;
-    @FXML private CheckBox warnAboutDuplicatesOnImport;
 
     @FXML private CheckBox autosaveLocalLibraries;
     @FXML private Button autosaveLocalLibrariesHelp;
@@ -48,7 +47,6 @@ public class FileTab extends AbstractPreferenceTabView<FileTabViewModel> impleme
         resolveStringsForFields.disableProperty().bind(doNotResolveStrings.selectedProperty());
 
         alwaysReformatBib.selectedProperty().bindBidirectional(viewModel.alwaysReformatBibProperty());
-        warnAboutDuplicatesOnImport.selectedProperty().bindBidirectional(viewModel.warnAboutDuplicatesOnImportProperty());
         autosaveLocalLibraries.selectedProperty().bindBidirectional(viewModel.autosaveLocalLibrariesProperty());
 
         ActionFactory actionFactory = new ActionFactory(Globals.getKeyPrefs());

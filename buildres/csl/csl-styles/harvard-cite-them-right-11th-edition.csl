@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" demote-non-dropping-particle="sort-only" default-locale="en-GB">
   <info>
-    <title>Cite Them Right 12th edition - Harvard</title>
-    <id>http://www.zotero.org/styles/harvard-cite-them-right</id>
-    <link href="http://www.zotero.org/styles/harvard-cite-them-right" rel="self"/>
-    <link href="http://www.zotero.org/styles/harvard-cite-them-right-11th-edition" rel="template"/>
+    <title>Cite Them Right 11th edition - Harvard</title>
+    <id>http://www.zotero.org/styles/harvard-cite-them-right-11th-edition</id>
+    <link href="http://www.zotero.org/styles/harvard-cite-them-right-11th-edition" rel="self"/>
+    <link href="http://www.zotero.org/styles/harvard-cite-them-right-10th-edition" rel="template"/>
     <link href="http://www.citethemrightonline.com/" rel="documentation"/>
     <author>
       <name>Patrick O'Brien</name>
@@ -12,7 +12,7 @@
     <category citation-format="author-date"/>
     <category field="generic-base"/>
     <summary>Harvard according to Cite Them Right, 11th edition.</summary>
-    <updated>2022-06-27T11:10:37+00:00</updated>
+    <updated>2022-06-27T07:43:59+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="en-GB">
@@ -34,7 +34,7 @@
         <choose>
           <if variable="container-author" match="none">
             <names variable="editor translator" delimiter=", ">
-              <name and="text" initialize-with="."/>
+              <name and="text" initialize-with="." name-as-sort-order="all"/>
               <label form="short" prefix=" (" suffix=")"/>
             </names>
           </if>
@@ -98,10 +98,7 @@
   <macro name="access">
     <choose>
       <if variable="DOI">
-        <group delimiter=": ">
-          <text term="available at" text-case="capitalize-first"/>
-          <text variable="DOI" prefix="https://doi.org/"/>
-        </group>
+        <text variable="DOI" prefix="doi:"/>
       </if>
       <else-if variable="URL">
         <text term="available at" suffix=": " text-case="capitalize-first"/>
