@@ -1,12 +1,9 @@
 package org.jabref.gui.mergeentries.newmergedialog.diffhighlighter;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import com.github.difflib.DiffUtils;
 import com.github.difflib.patch.AbstractDelta;
-import com.github.difflib.patch.DeltaType;
 import org.fxmisc.richtext.StyleClassedTextArea;
 
 /**
