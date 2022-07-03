@@ -122,11 +122,9 @@ public abstract class Importer implements Comparable<Importer> {
             if ((matches == null) || (matches.length == 0)) {
                 return defaultCharSet;
             }
-
             if (matches[0] != null) {
                 return Charset.forName(matches[0].getName());
             }
-
         } catch (IOException e) {
             LOGGER.error("Could not determine charset. Using default one.", e);
         }
