@@ -27,6 +27,7 @@ import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.fieldeditors.URLUtil;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.strings.StringUtil;
 
 import com.tobiasdiez.easybind.EasyBind;
@@ -156,7 +157,7 @@ public class FieldValueCell extends AbstractCell implements Toggle {
         openLinkButton.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
         openLinkButton.setMaxHeight(Double.MAX_VALUE);
 
-        isUrl.bind(EasyBind.map(textProperty(), input -> StringUtil.isNotBlank(input) && URLUtil.isURL(input)));
+        isUrl.bind(EasyBind.map(textProperty(), input -> StringUtil.isNotBlank(input) && (URLUtil.isURL(input) || DOI.isValid(input))));
         openLinkButton.visibleProperty().bind(isUrl);
 
         return openLinkButton;
