@@ -3,7 +3,6 @@ package org.jabref.gui.mergeentries.newmergedialog.cell;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.BooleanPropertyBase;
 import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.css.PseudoClass;
 import javafx.geometry.Insets;
@@ -75,8 +74,6 @@ public class FieldValueCell extends AbstractCell implements Toggle {
     };
     private final HBox selectionBox = new HBox();
     private final HBox actionsContainer = new HBox();
-
-    private final BooleanProperty isUrl = new SimpleBooleanProperty();
 
     public FieldValueCell(String text, int rowIndex) {
         super(text, rowIndex);
@@ -157,8 +154,7 @@ public class FieldValueCell extends AbstractCell implements Toggle {
         openLinkButton.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
         openLinkButton.setMaxHeight(Double.MAX_VALUE);
 
-        isUrl.bind(EasyBind.map(textProperty(), input -> StringUtil.isNotBlank(input) && (URLUtil.isURL(input) || DOI.isValid(input))));
-        openLinkButton.visibleProperty().bind(isUrl);
+        openLinkButton.visibleProperty().bind(EasyBind.map(textProperty(), input -> StringUtil.isNotBlank(input) && (URLUtil.isURL(input) || DOI.isValid(input))));
 
         return openLinkButton;
     }
