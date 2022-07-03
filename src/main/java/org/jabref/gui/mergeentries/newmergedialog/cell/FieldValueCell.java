@@ -65,7 +65,7 @@ public class FieldValueCell extends AbstractCell implements Toggle {
         }
     };
     private final HBox selectionBox = new HBox();
-    private final VBox checkmarkLayout = new VBox();
+    private final HBox actionsContainer = new HBox();
 
     public FieldValueCell(String text, int rowIndex) {
         super(text, rowIndex);
@@ -84,7 +84,7 @@ public class FieldValueCell extends AbstractCell implements Toggle {
             }
         });
 
-        selectionBox.getChildren().addAll(labelBox, checkmarkLayout);
+        selectionBox.getChildren().addAll(labelBox, actionsContainer);
         getChildren().setAll(selectionBox);
     }
 
@@ -116,9 +116,9 @@ public class FieldValueCell extends AbstractCell implements Toggle {
         labelBox.setPadding(new Insets(8));
         labelBox.setCursor(Cursor.HAND);
 
-        checkmarkLayout.getChildren().setAll(createCopyButton());
-        checkmarkLayout.setAlignment(Pos.TOP_CENTER);
-        checkmarkLayout.setPrefWidth(28);
+        actionsContainer.getChildren().setAll(createCopyButton());
+        actionsContainer.setAlignment(Pos.TOP_CENTER);
+        actionsContainer.setPrefWidth(28);
     }
 
     private Button createCopyButton() {
@@ -129,7 +129,6 @@ public class FieldValueCell extends AbstractCell implements Toggle {
         copyButton.setGraphic(copyIcon);
         copyButton.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
         copyButton.setMaxHeight(Double.MAX_VALUE);
-        VBox.setVgrow(copyButton, Priority.ALWAYS);
 
         return copyButton;
     }
