@@ -635,18 +635,18 @@ TextFlow > .tooltip-text-monospaced {
     -fx-background-insets: 0;
 }
 
-.field-value .copy-icon {
-    -fx-icon-size: 15;
+.field-value .action-icon {
+    -fx-icon-size: 14;
     -fx-icon-color: -fx-text-background-color;
     -fx-blend-mode: multiply ;
     -fx-opacity: 69%;
 }
 
-.field-value:disabled .copy-icon {
+.field-value:disabled .action-icon {
     -fx-opacity: 0%;
 }
 
-.field-value:selected .copy-icon {
+.field-value:selected .action-icon {
 
 }
 

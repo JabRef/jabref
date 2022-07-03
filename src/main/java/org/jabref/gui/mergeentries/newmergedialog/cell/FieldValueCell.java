@@ -3,11 +3,13 @@ package org.jabref.gui.mergeentries.newmergedialog.cell;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.BooleanPropertyBase;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.css.PseudoClass;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.ScrollPane;
@@ -18,23 +20,29 @@ import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
-import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 
 import org.jabref.gui.Globals;
 import org.jabref.gui.actions.ActionFactory;
-import org.jabref.gui.mergeentries.newmergedialog.CopyFieldValueCommand;
+import org.jabref.gui.fieldeditors.URLUtil;
+import org.jabref.gui.icon.IconTheme;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.model.strings.StringUtil;
 
+import com.tobiasdiez.easybind.EasyBind;
 import org.fxmisc.flowless.VirtualizedScrollPane;
 import org.fxmisc.richtext.StyleClassedTextArea;
 import org.kordamp.ikonli.javafx.FontIcon;
 import org.kordamp.ikonli.materialdesign2.MaterialDesignC;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A readonly, selectable field cell that contains the value of some field
  */
 public class FieldValueCell extends AbstractCell implements Toggle {
+    public static final Logger LOGGER = LoggerFactory.getLogger(FieldValueCell.class);
+
     public static final String DEFAULT_STYLE_CLASS = "field-value";
     public static final String SELECTION_BOX_STYLE_CLASS = "selection-box";
 
@@ -67,6 +75,8 @@ public class FieldValueCell extends AbstractCell implements Toggle {
     private final HBox selectionBox = new HBox();
     private final HBox actionsContainer = new HBox();
 
+    private final BooleanProperty isUrl = new SimpleBooleanProperty();
+
     public FieldValueCell(String text, int rowIndex) {
         super(text, rowIndex);
         initialize();
@@ -77,6 +87,7 @@ public class FieldValueCell extends AbstractCell implements Toggle {
         initializeScrollPane();
         initializeLabel();
         initializeSelectionBox();
+        initializeActions();
         textProperty().addListener(invalidated -> setUserData(getText()));
         setOnMouseClicked(e -> {
             if (!isDisabled()) {
@@ -108,6 +119,12 @@ public class FieldValueCell extends AbstractCell implements Toggle {
         });
     }
 
+    private void initializeActions() {
+        actionsContainer.getChildren().setAll(createOpenLinkButton(), createCopyButton());
+        actionsContainer.setAlignment(Pos.TOP_CENTER);
+        actionsContainer.setPrefWidth(28);
+    }
+
     private void initializeSelectionBox() {
         selectionBox.getStyleClass().add(SELECTION_BOX_STYLE_CLASS);
         HBox.setHgrow(selectionBox, Priority.ALWAYS);
@@ -115,22 +132,34 @@ public class FieldValueCell extends AbstractCell implements Toggle {
         HBox.setHgrow(labelBox, Priority.ALWAYS);
         labelBox.setPadding(new Insets(8));
         labelBox.setCursor(Cursor.HAND);
-
-        actionsContainer.getChildren().setAll(createCopyButton());
-        actionsContainer.setAlignment(Pos.TOP_CENTER);
-        actionsContainer.setPrefWidth(28);
     }
 
     private Button createCopyButton() {
         FontIcon copyIcon = FontIcon.of(MaterialDesignC.CONTENT_COPY);
-        copyIcon.getStyleClass().add("copy-icon");
+        copyIcon.getStyleClass().add("action-icon");
 
         Button copyButton = factory.createIconButton(() -> Localization.lang("Copy"), new CopyFieldValueCommand(Globals.prefs, getText()));
         copyButton.setGraphic(copyIcon);
         copyButton.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
         copyButton.setMaxHeight(Double.MAX_VALUE);
+        copyButton.visibleProperty().bind(textProperty().isEmpty().not());
 
         return copyButton;
+    }
+
+    public Button createOpenLinkButton() {
+        Node openLinkIcon = IconTheme.JabRefIcons.OPEN_LINK.getGraphicNode();
+        openLinkIcon.getStyleClass().add("action-icon");
+
+        Button openLinkButton = factory.createIconButton(() -> Localization.lang("Open Link"), new OpenExternalLinkAction(getText()));
+        openLinkButton.setGraphic(openLinkIcon);
+        openLinkButton.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+        openLinkButton.setMaxHeight(Double.MAX_VALUE);
+
+        isUrl.bind(EasyBind.map(textProperty(), input -> StringUtil.isNotBlank(input) && URLUtil.isURL(input)));
+        openLinkButton.visibleProperty().bind(isUrl);
+
+        return openLinkButton;
     }
 
     private void initializeScrollPane() {
