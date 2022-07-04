@@ -53,7 +53,7 @@ public class FieldRowController {
             }
         });
 
-        // Because when both left and right have the same values, then only left value will be shown
+        //  When left and right have the same value, only the left value will be shown
         if (hasEqualLeftAndRightValues()) {
             rightValueCell.setDisable(true);
         }
@@ -111,9 +111,9 @@ public class FieldRowController {
         // Clearing old diff styles based on previous diffConfig
         hideDiff();
         if (diffConfig.diffView() == ThreeWayMergeToolbar.DiffView.UNIFIED) {
-            new UnifiedDiffHighlighter(leftLabel, rightLabel, diffConfig.diffMethod()).highlight();
+            new UnifiedDiffHighlighter(leftLabel, rightLabel, diffConfig.diffHighlightingMethod()).highlight();
         } else {
-            new SplitDiffHighlighter(leftLabel, rightLabel, diffConfig.diffMethod()).highlight();
+            new SplitDiffHighlighter(leftLabel, rightLabel, diffConfig.diffHighlightingMethod()).highlight();
         }
     }
 

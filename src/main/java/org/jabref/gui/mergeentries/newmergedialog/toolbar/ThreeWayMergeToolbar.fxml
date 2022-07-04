@@ -38,10 +38,10 @@
             </Separator>
             <RadioButton fx:id="highlightWordsRadioButton" disable="true" mnemonicParsing="false" text="Highlight words">
                <toggleGroup>
-                  <ToggleGroup fx:id="diffHighlightModeToggleGroup" />
+                  <ToggleGroup fx:id="diffHighlightingMethodToggleGroup" />
                </toggleGroup>
             </RadioButton>
-            <RadioButton fx:id="highlightCharactersRadioButtons" disable="true" mnemonicParsing="false" text="Highlight characters" toggleGroup="$diffHighlightModeToggleGroup" />
+            <RadioButton fx:id="highlightCharactersRadioButtons" disable="true" mnemonicParsing="false" text="Highlight characters" toggleGroup="$diffHighlightingMethodToggleGroup" />
          </items>
       </ToolBar>
    </children>
