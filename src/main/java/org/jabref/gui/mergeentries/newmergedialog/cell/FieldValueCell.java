@@ -43,7 +43,7 @@ import org.slf4j.LoggerFactory;
 public class FieldValueCell extends AbstractCell implements Toggle {
     public static final Logger LOGGER = LoggerFactory.getLogger(FieldValueCell.class);
 
-    public static final String DEFAULT_STYLE_CLASS = "field-value";
+    public static final String DEFAULT_STYLE_CLASS = "merge-field-value";
     public static final String SELECTION_BOX_STYLE_CLASS = "selection-box";
 
     private static final PseudoClass SELECTED_PSEUDO_CLASS = PseudoClass.getPseudoClass("selected");

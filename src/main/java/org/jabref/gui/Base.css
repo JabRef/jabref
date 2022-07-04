@@ -634,14 +634,14 @@ TextFlow > .tooltip-text-monospaced {
     -fx-background-insets: 0;
 }
 
-.field-value .action-icon {
+.merge-field-value .action-icon {
     -fx-blend-mode: multiply;
     -fx-opacity: 69%;
     -fx-icon-size: 14;
     -fx-icon-color: -fx-text-background-color;
 }
 
-.field-value:disabled .action-icon {
+.merge-field-value:disabled .action-icon {
     -fx-opacity: 0%;
 }
 

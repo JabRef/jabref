@@ -10,12 +10,12 @@
     -fx-highlight-text-fill: -fx-text-inner-color;
 }
 
-.field-value:selected .selection-box {
+.merge-field-value:selected .selection-box {
     -fx-background-color: -jr-accent-alt;
     -fx-border-color: -jr-accent;
 }
 
-.field-value .selection-box {
+.merge-field-value .selection-box {
     -fx-background-color: #0000;
     -fx-border-color: #0000;
     -fx-border-radius: 8;
