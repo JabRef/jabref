@@ -39,7 +39,7 @@
     -fx-background-color: -jr-menu-background;
 }
 
-.header-cell .label{
+.merge-header-cell .label{
     -fx-font-weight: bold;
     -fx-padding: 1, 0, 1, 0;
 }
