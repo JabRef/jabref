@@ -112,7 +112,7 @@
     -fx-opacity: 100%;
 }
 
-.header-cell {
+.merge-header-cell {
     -fx-border-width: 0 0 1 0;
     -fx-border-color: -fx-outer-border;
     -fx-background-color: -jr-row-odd-background;
