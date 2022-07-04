@@ -4,7 +4,7 @@ import javafx.geometry.Insets;
 import javafx.scene.control.Label;
 
 public class HeaderCell extends AbstractCell {
-    public static final String DEFAULT_STYLE_CLASS = "header-cell";
+    public static final String DEFAULT_STYLE_CLASS = "merge-header-cell";
     private final Label label = new Label();
 
     public HeaderCell(String text) {

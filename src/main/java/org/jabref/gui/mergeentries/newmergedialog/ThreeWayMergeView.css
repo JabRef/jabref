@@ -1,8 +1,3 @@
-.merged-field {
-/*    -fx-border-color: #dfdfdf;
-    -fx-border-width: 0 0 0 1.5;*/
-}
-
 .merged-field .styled-text-area {
     -fx-background-color: -fx-outer-border, -fx-control-inner-background;
     -fx-background-insets: 0, 1;
@@ -16,8 +11,6 @@
 }
 
 .field-value:selected .selection-box {
-  /*  -fx-background-color: -jr-accent-alt;
-    -fx-border-color: -jr-accent-alt;*/
     -fx-background-color: -jr-accent-alt;
     -fx-border-color: -jr-accent;
 }

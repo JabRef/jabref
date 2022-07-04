@@ -1,7 +1,6 @@
 
 
 .root {
-    -jr-transparent-green: rgba(16, 172, 132, 0.12);
     -jr-row-odd-background: -fx-control-inner-background-alt;
     -jr-row-even-background: -fx-control-inner-background;
     /*
@@ -647,7 +646,7 @@ TextFlow > .tooltip-text-monospaced {
 
 }
 
-.header-cell {
+.merge-header-cell {
     -fx-border-width: 0 0 1 0;
     -fx-border-color: -jr-gray-1;
     -fx-background-color: -jr-row-even-background;
