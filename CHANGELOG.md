@@ -34,10 +34,12 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We improved group expansion arrow that prevent it from activating group when expanding or collapsing. [#7982](https://github.com/JabRef/jabref/issues/7982), [#3176](https://github.com/JabRef/jabref/issues/3176)
 - When configured SSL certificates changed, JabRef warns the user to restart to apply the configuration.
 - We improved the appearances and logic of the "Manage field names & content" dialog, and renamed it to "Automatic field editor". [#6536](https://github.com/JabRef/jabref/issues/6536)
-- We fixed an issue that caused JabRef to sometimes open multiple instances when "Remote Operation" is enabled. [#8653](https://github.com/JabRef/jabref/issues/8653)
+- We improved the message explaining the options when modifying an automatic keyword group [#8911](https://github.com/JabRef/jabref/issues/8911)
+- We moved the preferences option "Warn about duplicates on import" option from the tab "File" to the tab "Import and Export". [kopper#570](https://github.com/koppor/jabref/issues/570)
 
 ### Fixed
 
+- We fixed an issue that caused JabRef to sometimes open multiple instances when "Remote Operation" is enabled. [#8653](https://github.com/JabRef/jabref/issues/8653)
 - We fixed an issue where linked files with the filetype "application/pdf" in an entry were not shown with the correct PDF-Icon in the main table [8930](https://github.com/JabRef/jabref/issues/8930)
 - We fixed an issue where "open folder" for linked files did not open the folder and did not select the file unter certain Linux desktop environments [#8679](https://github.com/JabRef/jabref/issues/8679), [#8849](https://github.com/JabRef/jabref/issues/8849)
 - We fixed an issue where the content of a big shared database library is not shown [#8788](https://github.com/JabRef/jabref/issues/8788)
@@ -50,6 +52,8 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixed an issue where the exception that there are invalid characters in filename. [#8786](https://github.com/JabRef/jabref/issues/8786)
 - When the proxy configuration removed the proxy user/password, this change is applied immediately.
 - We fixed an issue where removing several groups deletes only one of them. [#8390](https://github.com/JabRef/jabref/issues/8390)
+- We fixed an issue where the Sidepane (groups, web search and open office) width is not remembered after restarting JabRef. [#8907](https://github.com/JabRef/jabref/issues/8907)
+- We fixed a bug where switching between themes will cause an error/exception. [#8939](https://github.com/JabRef/jabref/pull/8939)
 
 ### Removed
 
