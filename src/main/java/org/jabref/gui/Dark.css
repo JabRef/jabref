@@ -96,20 +96,10 @@
 .tree-table-row-cell:hover {
     -fx-background-color: -jr-hover;
 }
+
 .field-value .action-icon {
-    -fx-icon-size: 14;
-    -fx-icon-color: -fx-text-background-color;
-    -fx-blend-mode: inherit;
-    -fx-opacity: 100%;
-}
-
-.field-value:disabled .action-icon {
-    -fx-opacity: 0%;
-}
-
-.field-value:selected .action-icon {
-    -fx-icon-color: -fx-text-background-color;
-    -fx-opacity: 100%;
+    -fx-blend-mode: none;
+    -fx-opacity: 90%;
 }
 
 .merge-header-cell {
