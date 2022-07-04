@@ -448,8 +448,10 @@ public class JabRefFrame extends BorderPane {
             @Override
             public void invalidated(Observable observable) {
                 if (mainStage.isShowing()) {
-                    setDividerPosition();
-                    observable.removeListener(this);
+                    Platform.runLater(() -> {
+                        setDividerPosition();
+                        observable.removeListener(this);
+                    });
                 }
             }
         });
@@ -472,10 +474,9 @@ public class JabRefFrame extends BorderPane {
     }
 
     private void setDividerPosition() {
-        splitPane.setDividerPositions(prefs.getGuiPreferences().getSidePaneWidth());
         if (mainStage.isShowing() && !sidePane.getChildren().isEmpty()) {
-            dividerSubscription = EasyBind.subscribe(splitPane.getDividers().get(0).positionProperty(),
-                    position -> prefs.getGuiPreferences().setSidePaneWidth(position.doubleValue()));
+            splitPane.setDividerPositions(prefs.getGuiPreferences().getSidePaneWidth() / splitPane.getWidth());
+            dividerSubscription = EasyBind.subscribe(sidePane.widthProperty(), width -> prefs.getGuiPreferences().setSidePaneWidth(width.doubleValue()));
         }
     }
 
