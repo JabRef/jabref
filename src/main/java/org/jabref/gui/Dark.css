@@ -94,7 +94,7 @@
     -fx-background-color: -jr-hover;
 }
 
-.field-value .action-icon {
+.merge-field-value .action-icon {
     -fx-blend-mode: none;
     -fx-opacity: 90%;
 }
