@@ -1,7 +1,9 @@
 package org.jabref.gui.mergeentries.newmergedialog;
 
-import org.jabref.gui.mergeentries.newmergedialog.diffhighlighter.DiffHighlighter;
-import org.jabref.gui.mergeentries.newmergedialog.toolbar.ThreeWayMergeToolbar;
+import static org.jabref.gui.mergeentries.newmergedialog.diffhighlighter.DiffHighlighter.DiffMethod;
+import static org.jabref.gui.mergeentries.newmergedialog.toolbar.ThreeWayMergeToolbar.DiffView;
 
-public record ShowDiffConfig(ThreeWayMergeToolbar.DiffView diffView, DiffHighlighter.DiffMethod diffMethod) {
+public record ShowDiffConfig(
+        DiffView diffView,
+        DiffMethod diffHighlightingMethod) {
 }

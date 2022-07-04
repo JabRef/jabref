@@ -1,7 +1,6 @@
 package org.jabref.gui.mergeentries.newmergedialog.toolbar;
 
 import java.util.Arrays;
-import java.util.Objects;
 
 import javafx.beans.binding.BooleanExpression;
 import javafx.beans.property.ObjectProperty;
@@ -20,6 +19,8 @@ import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.EasyBinding;
 
+import static org.jabref.gui.mergeentries.newmergedialog.diffhighlighter.DiffHighlighter.DiffMethod;
+
 public class ThreeWayMergeToolbar extends AnchorPane {
     @FXML
     private RadioButton highlightCharactersRadioButtons;
@@ -28,7 +29,7 @@ public class ThreeWayMergeToolbar extends AnchorPane {
     private RadioButton highlightWordsRadioButton;
 
     @FXML
-    private ToggleGroup diffHighlightModeToggleGroup;
+    private ToggleGroup diffHighlightingMethodToggleGroup;
 
     @FXML
     private ComboBox<DiffView> diffViewComboBox;
@@ -42,7 +43,7 @@ public class ThreeWayMergeToolbar extends AnchorPane {
     @FXML
     private Button selectRightEntryValuesButton;
 
-    private final ObjectProperty<DiffHighlightMode> diffHighlightMode = new SimpleObjectProperty<>();
+    private final ObjectProperty<DiffHighlighter.DiffMethod> diffHighlightingMethod = new SimpleObjectProperty<>();
     private EasyBinding<Boolean> showDiff;
 
     public ThreeWayMergeToolbar() {
@@ -87,15 +88,15 @@ public class ThreeWayMergeToolbar extends AnchorPane {
         highlightWordsRadioButton.disableProperty().bind(notShowDiffProperty());
         highlightCharactersRadioButtons.disableProperty().bind(notShowDiffProperty());
 
-        diffHighlightModeToggleGroup.selectedToggleProperty().addListener((observable -> {
-            if (diffHighlightModeToggleGroup.getSelectedToggle().equals(highlightCharactersRadioButtons)) {
-                diffHighlightMode.set(DiffHighlightMode.CHARS);
+        diffHighlightingMethodToggleGroup.selectedToggleProperty().addListener((observable -> {
+            if (diffHighlightingMethodToggleGroup.getSelectedToggle().equals(highlightCharactersRadioButtons)) {
+                diffHighlightingMethod.set(DiffMethod.CHARS);
             } else {
-                diffHighlightMode.set(DiffHighlightMode.WORDS);
+                diffHighlightingMethod.set(DiffMethod.WORDS);
             }
         }));
 
-        diffHighlightModeToggleGroup.selectToggle(highlightWordsRadioButton);
+        diffHighlightingMethodToggleGroup.selectToggle(highlightWordsRadioButton);
     }
 
     public ObjectProperty<DiffView> diffViewProperty() {
@@ -134,16 +135,16 @@ public class ThreeWayMergeToolbar extends AnchorPane {
         return showDiffProperty().get();
     }
 
-    public ObjectProperty<DiffHighlightMode> diffHighlightModeProperty() {
-        return diffHighlightMode;
+    public ObjectProperty<DiffMethod> diffHighlightingMethodProperty() {
+        return diffHighlightingMethod;
     }
 
-    public DiffHighlightMode getDiffHighlightMode() {
-        return diffHighlightModeProperty().get();
+    public DiffMethod getDiffHighlightingMethod() {
+        return diffHighlightingMethodProperty().get();
     }
 
-    public void setDiffHighlightMode(DiffHighlightMode diffHighlightMode) {
-        diffHighlightModeProperty().set(diffHighlightMode);
+    public void setDiffHighlightingMethod(DiffMethod diffHighlightingMethod) {
+        diffHighlightingMethodProperty().set(diffHighlightingMethod);
     }
 
     public void setOnSelectLeftEntryValuesButtonClicked(Runnable onClick) {
@@ -193,16 +194,6 @@ public class ThreeWayMergeToolbar extends AnchorPane {
                     .filter(diffView -> diffView.getValue().equals(str))
                     .findAny()
                     .orElseThrow(IllegalArgumentException::new);
-        }
-    }
-
-    // TODO: remove this and use DiffMethod
-    public enum DiffHighlightMode {
-        WORDS, CHARS;
-
-        public static DiffHighlightMode from(DiffHighlighter.DiffMethod diffMethod) {
-            Objects.requireNonNull(diffMethod, "Diff method is required");
-            return diffMethod == DiffHighlighter.DiffMethod.WORDS ? WORDS : CHARS;
         }
     }
 }
