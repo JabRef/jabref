@@ -11,6 +11,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Screen;
 
 import org.jabref.gui.mergeentries.newmergedialog.toolbar.ThreeWayMergeToolbar;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.InternalField;
@@ -19,8 +20,8 @@ import org.jabref.model.entry.types.EntryTypeFactory;
 public class ThreeWayMergeView extends VBox {
 
     public static final int GRID_COLUMN_MIN_WIDTH = 250;
-    public static final String LEFT_DEFAULT_HEADER = "Left Entry";
-    public static final String RIGHT_DEFAULT_HEADER = "Right Entry";
+    public static final String LEFT_DEFAULT_HEADER = Localization.lang("Left Entry");
+    public static final String RIGHT_DEFAULT_HEADER = Localization.lang("Right Entry");
 
     private final ColumnConstraints fieldNameColumnConstraints = new ColumnConstraints(150);
     private final ColumnConstraints leftEntryColumnConstraints = new ColumnConstraints(GRID_COLUMN_MIN_WIDTH, 256, Double.MAX_VALUE);

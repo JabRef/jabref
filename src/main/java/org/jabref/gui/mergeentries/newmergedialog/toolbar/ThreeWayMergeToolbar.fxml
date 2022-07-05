@@ -30,18 +30,18 @@
                </children></HBox>
             <Separator maxHeight="-Infinity" minHeight="-Infinity" orientation="VERTICAL" prefHeight="40.0" />
             <ComboBox fx:id="plainTextOrDiffComboBox" prefHeight="30.0" prefWidth="150.0" promptText="Plain text" />
-            <ComboBox fx:id="diffViewComboBox" disable="true" prefHeight="30.0" prefWidth="150.0" promptText="Unified view" />
+            <ComboBox fx:id="diffViewComboBox" disable="true" prefHeight="30.0" prefWidth="150.0" />
             <Separator maxHeight="-Infinity" minHeight="-Infinity" orientation="VERTICAL" prefHeight="40.0">
                <opaqueInsets>
                   <Insets />
                </opaqueInsets>
             </Separator>
-            <RadioButton fx:id="highlightWordsRadioButton" disable="true" mnemonicParsing="false" text="Highlight words">
+            <RadioButton fx:id="highlightWordsRadioButton" disable="true" mnemonicParsing="false" text="%Highlight words">
                <toggleGroup>
                   <ToggleGroup fx:id="diffHighlightingMethodToggleGroup" />
                </toggleGroup>
             </RadioButton>
-            <RadioButton fx:id="highlightCharactersRadioButtons" disable="true" mnemonicParsing="false" text="Highlight characters" toggleGroup="$diffHighlightingMethodToggleGroup" />
+            <RadioButton fx:id="highlightCharactersRadioButtons" disable="true" mnemonicParsing="false" text="%Highlight characters" toggleGroup="$diffHighlightingMethodToggleGroup" />
          </items>
       </ToolBar>
    </children>
