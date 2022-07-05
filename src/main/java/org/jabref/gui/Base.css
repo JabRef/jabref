@@ -108,6 +108,9 @@
     -jr-drag-target: -jr-purple;
     -jr-drag-target-hover: derive(-jr-purple, 80%);
 
+    -js-summary-text-color: #000000;
+    -js-summary-text-color-selected: #000000;
+
     /*
      Here are redefinitions of the default properties of modena. They should in principle all be derived from the
      above colors. Goal should be to make as few as possible direct color-changes to elements and only do this for
