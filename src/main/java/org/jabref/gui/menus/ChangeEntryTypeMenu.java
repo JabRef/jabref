@@ -13,7 +13,6 @@ import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SeparatorMenuItem;
 
-import org.jabref.gui.Globals;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.logic.l10n.Localization;
@@ -21,6 +20,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryType;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.types.BibtexEntryTypeDefinitions;
 import org.jabref.model.entry.types.IEEETranEntryTypeDefinitions;
 
@@ -30,14 +30,17 @@ public class ChangeEntryTypeMenu {
     private final BibDatabaseContext bibDatabaseContext;
     private final UndoManager undoManager;
     private final ActionFactory factory;
+    private final BibEntryTypesManager entryTypesManager;
 
     public ChangeEntryTypeMenu(List<BibEntry> entries,
                                BibDatabaseContext bibDatabaseContext,
                                UndoManager undoManager,
-                               KeyBindingRepository keyBindingRepository) {
+                               KeyBindingRepository keyBindingRepository,
+                               BibEntryTypesManager entryTypesManager ) {
         this.entries = entries;
         this.bibDatabaseContext = bibDatabaseContext;
         this.undoManager = undoManager;
+        this.entryTypesManager = entryTypesManager;
         this.factory = new ActionFactory(keyBindingRepository);
     }
 
@@ -58,10 +61,10 @@ public class ChangeEntryTypeMenu {
 
         if (bibDatabaseContext.isBiblatexMode()) {
             // Default BibLaTeX
-            items.addAll(fromEntryTypes(Globals.entryTypesManager.getAllTypes(BibDatabaseMode.BIBLATEX), entries, undoManager));
+            items.addAll(fromEntryTypes(entryTypesManager.getAllTypes(BibDatabaseMode.BIBLATEX), entries, undoManager));
 
             // Custom types
-            createSubMenu(Localization.lang("Custom"), Globals.entryTypesManager.getAllCustomTypes(BibDatabaseMode.BIBLATEX), entries, undoManager)
+            createSubMenu(Localization.lang("Custom"), entryTypesManager.getAllCustomTypes(BibDatabaseMode.BIBLATEX), entries, undoManager)
                     .ifPresent(subMenu ->
                             items.addAll(new SeparatorMenuItem(),
                             subMenu
@@ -79,7 +82,7 @@ public class ChangeEntryTypeMenu {
                     ));
 
             // Custom types
-            createSubMenu(Localization.lang("Custom"), Globals.entryTypesManager.getAllCustomTypes(BibDatabaseMode.BIBTEX), entries, undoManager)
+            createSubMenu(Localization.lang("Custom"), entryTypesManager.getAllCustomTypes(BibDatabaseMode.BIBTEX), entries, undoManager)
                     .ifPresent(subMenu -> items.addAll(
                             new SeparatorMenuItem(),
                             subMenu
