@@ -16,7 +16,7 @@ import org.fxmisc.richtext.StyleClassedTextArea;
 public class FieldRowController {
     private final FieldNameCell fieldNameCell;
     private final FieldValueCell leftValueCell;
-    private final FieldValueCell rightValueCell;
+    private FieldValueCell rightValueCell;
     private final MergedFieldCell mergedValueCell;
 
     private final String leftValue;
@@ -53,9 +53,11 @@ public class FieldRowController {
             }
         });
 
-        //  When left and right have the same value, only the left value will be shown
+        //  When both the left and right cells have the same value, only the left value is displayed,
+        //  making it unnecessary to keep allocating memory for the right cell.
         if (hasEqualLeftAndRightValues()) {
-            rightValueCell.setDisable(true);
+            // Setting this to null so the GC release the memory allocated to the right cell.
+            this.rightValueCell = null;
         }
     }
 
@@ -64,7 +66,7 @@ public class FieldRowController {
     }
 
     public void selectRightValue() {
-        if (rightValueCell.isDisabled()) {
+        if (rightValueCell == null) {
             selectLeftValue();
         } else {
             toggleGroup.selectToggle(rightValueCell);
@@ -96,13 +98,13 @@ public class FieldRowController {
     }
 
     public boolean hasEqualLeftAndRightValues() {
-        return !StringUtil.isNullOrEmpty(leftValueCell.getText()) &&
+        return isRightValueCellHidden() || (!StringUtil.isNullOrEmpty(leftValueCell.getText()) &&
                 !StringUtil.isNullOrEmpty(rightValueCell.getText()) &&
-                leftValueCell.getText().equals(rightValueCell.getText());
+                leftValueCell.getText().equals(rightValueCell.getText()));
     }
 
     public void showDiff(ShowDiffConfig diffConfig) {
-        if (leftValueCell.isDisabled() || rightValueCell.isDisabled()) {
+        if (isRightValueCellHidden()) {
             return;
         }
 
@@ -118,6 +120,10 @@ public class FieldRowController {
     }
 
     public void hideDiff() {
+        if (isRightValueCellHidden()) {
+            return;
+        }
+
         int leftValueLength = getLeftValueCell().getStyleClassedLabel().getLength();
         getLeftValueCell().getStyleClassedLabel().clearStyle(0, leftValueLength);
         getLeftValueCell().getStyleClassedLabel().replaceText(leftValue);
@@ -125,5 +131,9 @@ public class FieldRowController {
         int rightValueLength = getRightValueCell().getStyleClassedLabel().getLength();
         getRightValueCell().getStyleClassedLabel().clearStyle(0, rightValueLength);
         getRightValueCell().getStyleClassedLabel().replaceText(rightValue);
+    }
+
+    private boolean isRightValueCellHidden() {
+        return rightValueCell == null;
     }
 }
