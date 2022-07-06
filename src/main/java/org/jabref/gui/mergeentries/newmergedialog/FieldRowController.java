@@ -66,7 +66,7 @@ public class FieldRowController {
     }
 
     public void selectRightValue() {
-        if (rightValueCell == null) {
+        if (isRightValueCellHidden()) {
             selectLeftValue();
         } else {
             toggleGroup.selectToggle(rightValueCell);
