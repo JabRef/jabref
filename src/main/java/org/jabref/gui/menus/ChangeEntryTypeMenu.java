@@ -36,7 +36,7 @@ public class ChangeEntryTypeMenu {
                                BibDatabaseContext bibDatabaseContext,
                                UndoManager undoManager,
                                KeyBindingRepository keyBindingRepository,
-                               BibEntryTypesManager entryTypesManager ) {
+                               BibEntryTypesManager entryTypesManager) {
         this.entries = entries;
         this.bibDatabaseContext = bibDatabaseContext;
         this.undoManager = undoManager;
