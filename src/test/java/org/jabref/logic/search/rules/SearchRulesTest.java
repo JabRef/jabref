@@ -25,5 +25,4 @@ class SearchRulesTest {
         SearchRule searchRule = SearchRules.getSearchRuleByQuery("title:test", EnumSet.noneOf(SearchRules.SearchFlags.class));
         assertInstanceOf(LuceneBasedSearchRule.class, searchRule);
     }
-
 }

@@ -73,4 +73,3 @@ public class SearchResultsTable extends TableView<BibEntryTableViewModel> {
         database.getDatabase().registerListener(this);
     }
 }
-

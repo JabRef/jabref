@@ -107,5 +107,4 @@ class LuceneBasedSearchRuleTest {
         assertTrue(luceneBasedSearchRuleCaseInsensitive.validateSearchStrings(query));
         assertTrue(luceneBasedSearchRuleCaseInsensitive.applyRule(query, bibEntry));
     }
-
 }
