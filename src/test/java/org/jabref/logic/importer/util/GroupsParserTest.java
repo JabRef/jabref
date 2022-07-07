@@ -139,6 +139,5 @@ class GroupsParserTest {
         SearchGroup expected = new SearchGroup("Data", GroupHierarchyType.INCLUDING, "project=data|number|quant*", EnumSet.of(SearchRules.SearchFlags.REGULAR_EXPRESSION));
         AbstractGroup parsed = GroupsParser.fromString("SearchGroup:Data;2;project=data|number|quant*;0;1;1;;;;;", ',', fileMonitor, metaData);
         assertEquals(expected, parsed);
-
     }
 }

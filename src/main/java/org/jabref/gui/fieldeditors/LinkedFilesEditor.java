@@ -1,5 +1,6 @@
 package org.jabref.gui.fieldeditors;
 
+import java.util.List;
 import java.util.Optional;
 
 import javafx.beans.binding.Bindings;
@@ -13,6 +14,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.ListView;
 import javafx.scene.control.ProgressBar;
+import javafx.scene.control.SelectionMode;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.ClipboardContent;
@@ -92,6 +94,7 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
                 .withValidation(LinkedFileViewModel::fileExistsValidationStatus);
 
         listView.setCellFactory(cellFactory);
+        listView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
         decoratedModelList = new UiThreadObservableList<>(viewModel.filesProperty());
         Bindings.bindContentBidirectional(listView.itemsProperty().get(), decoratedModelList);
@@ -123,20 +126,19 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
         ObservableList<LinkedFileViewModel> items = listView.itemsProperty().get();
 
         if (dragboard.hasContent(DragAndDropDataFormats.LINKED_FILE)) {
-
             LinkedFile linkedFile = (LinkedFile) dragboard.getContent(DragAndDropDataFormats.LINKED_FILE);
-            LinkedFileViewModel transferedItem = null;
+            LinkedFileViewModel transferredItem = null;
             int draggedIdx = 0;
             for (int i = 0; i < items.size(); i++) {
                 if (items.get(i).getFile().equals(linkedFile)) {
                     draggedIdx = i;
-                    transferedItem = items.get(i);
+                    transferredItem = items.get(i);
                     break;
                 }
             }
             int thisIdx = items.indexOf(originalItem);
             items.set(draggedIdx, originalItem);
-            items.set(thisIdx, transferedItem);
+            items.set(thisIdx, transferredItem);
             success = true;
         }
 
@@ -178,8 +180,11 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
         Button writeMetadataToPdf = IconTheme.JabRefIcons.IMPORT.asButton();
         writeMetadataToPdf.setTooltip(new Tooltip(Localization.lang("Write BibTeXEntry metadata to PDF.")));
         writeMetadataToPdf.visibleProperty().bind(linkedFile.isOfflinePdfProperty());
-        writeMetadataToPdf.setOnAction(event -> linkedFile.writeMetadataToPdf());
         writeMetadataToPdf.getStyleClass().setAll("icon-button");
+
+        WriteMetadataToPdfCommand writeMetadataToPdfCommand = linkedFile.createWriteMetadataToPdfCommand();
+        writeMetadataToPdf.disableProperty().bind(writeMetadataToPdfCommand.executableProperty().not());
+        writeMetadataToPdf.setOnAction(event -> writeMetadataToPdfCommand.execute());
 
         Button parsePdfMetadata = IconTheme.JabRefIcons.FILE_SEARCH.asButton();
         parsePdfMetadata.setTooltip(new Tooltip(Localization.lang("Parse Metadata from PDF.")));
@@ -204,8 +209,8 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
             if (keyBinding.isPresent()) {
                 switch (keyBinding.get()) {
                     case DELETE_ENTRY:
-                        LinkedFileViewModel selectedItem = listView.getSelectionModel().getSelectedItem();
-                        if (selectedItem != null) {
+                        List<LinkedFileViewModel> toBeDeleted = List.copyOf(listView.getSelectionModel().getSelectedItems());
+                        for (LinkedFileViewModel selectedItem : toBeDeleted) {
                             viewModel.deleteFile(selectedItem);
                         }
                         event.consume();
@@ -248,7 +253,6 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
     }
 
     private void handleItemMouseClick(LinkedFileViewModel linkedFile, MouseEvent event) {
-
         if (event.getButton().equals(MouseButton.PRIMARY) && (event.getClickCount() == 2)) {
             // Double click -> open
             linkedFile.open();

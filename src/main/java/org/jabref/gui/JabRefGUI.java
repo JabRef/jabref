@@ -28,6 +28,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.shared.DatabaseNotSupportedException;
 import org.jabref.logic.shared.exception.InvalidDBMSConnectionPropertiesException;
 import org.jabref.logic.shared.exception.NotASharedDatabaseException;
+import org.jabref.logic.util.WebViewStore;
 import org.jabref.preferences.GuiPreferences;
 import org.jabref.preferences.PreferencesService;
 
@@ -53,6 +54,8 @@ public class JabRefGUI {
         this.isBlank = isBlank;
         this.preferencesService = preferencesService;
         this.correctedWindowPos = false;
+
+        WebViewStore.init();
 
         mainFrame = new JabRefFrame(mainStage);
 

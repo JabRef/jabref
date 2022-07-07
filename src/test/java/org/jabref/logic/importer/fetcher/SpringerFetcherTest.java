@@ -3,8 +3,10 @@ package org.jabref.logic.importer.fetcher;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
+import javafx.collections.FXCollections;
+
+import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.PagedSearchBasedFetcher;
 import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.model.entry.BibEntry;
@@ -20,15 +22,19 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 @FetcherTest
 class SpringerFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSearchFetcherTest {
 
+    ImporterPreferences importerPreferences = mock(ImporterPreferences.class);
     SpringerFetcher fetcher;
 
     @BeforeEach
     void setUp() {
-        fetcher = new SpringerFetcher();
+        when(importerPreferences.getApiKeys()).thenReturn(FXCollections.emptyObservableSet());
+        fetcher = new SpringerFetcher(importerPreferences);
     }
 
     @Test
@@ -100,15 +106,21 @@ class SpringerFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSear
 
     @Test
     void testSpringerJSONToBibtex() {
-        String jsonString = "{\r\n" + "            \"identifier\":\"doi:10.1007/BF01201962\",\r\n"
-                + "            \"title\":\"Book reviews\",\r\n"
-                + "            \"publicationName\":\"World Journal of Microbiology & Biotechnology\",\r\n"
-                + "            \"issn\":\"1573-0972\",\r\n" + "            \"isbn\":\"\",\r\n"
-                + "            \"doi\":\"10.1007/BF01201962\",\r\n" + "            \"publisher\":\"Springer\",\r\n"
-                + "            \"publicationDate\":\"1992-09-01\",\r\n" + "            \"volume\":\"8\",\r\n"
-                + "            \"number\":\"5\",\r\n" + "            \"startingPage\":\"550\",\r\n"
-                + "            \"url\":\"http://dx.doi.org/10.1007/BF01201962\",\"copyright\":\"©1992 Rapid Communications of Oxford Ltd.\"\r\n"
-                + "        }";
+        String jsonString = """
+                {\r
+                            "identifier":"doi:10.1007/BF01201962",\r
+                            "title":"Book reviews",\r
+                            "publicationName":"World Journal of Microbiology & Biotechnology",\r
+                            "issn":"1573-0972",\r
+                            "isbn":"",\r
+                            "doi":"10.1007/BF01201962",\r
+                            "publisher":"Springer",\r
+                            "publicationDate":"1992-09-01",\r
+                            "volume":"8",\r
+                            "number":"5",\r
+                            "startingPage":"550",\r
+                            "url":"http://dx.doi.org/10.1007/BF01201962","copyright":"©1992 Rapid Communications of Oxford Ltd."\r
+                        }""";
 
         JSONObject jsonObject = new JSONObject(jsonString);
         BibEntry bibEntry = SpringerFetcher.parseSpringerJSONtoBibtex(jsonObject);
@@ -129,13 +141,13 @@ class SpringerFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSear
     @Test
     @Disabled("Year search is currently broken, because the API returns mutliple years.")
     @Override
-    public void supportsYearSearch() throws Exception {
+    public void supportsYearSearch() {
     }
 
     @Test
     @Disabled("Year range search is not natively supported by the API, but can be emulated by multiple single year searches.")
     @Override
-    public void supportsYearRangeSearch() throws Exception {
+    public void supportsYearRangeSearch() {
     }
 
     @Test
@@ -170,8 +182,10 @@ class SpringerFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSear
 
         Assertions.assertTrue(resultJustByAuthor.containsAll(result));
         List<BibEntry> allEntriesFromCSCW = result.stream()
-                                                  .filter(bibEntry -> bibEntry.getField(StandardField.JOURNAL).orElse("").equals("Computer Supported Cooperative Work (CSCW)"))
-                                                  .collect(Collectors.toList());
+                                                  .filter(bibEntry -> bibEntry.getField(StandardField.JOURNAL)
+                                                                              .orElse("")
+                                                                              .equals("Computer Supported Cooperative Work (CSCW)"))
+                                                  .toList();
         allEntriesFromCSCW.stream()
                           .map(bibEntry -> bibEntry.getField(StandardField.AUTHOR))
                           .filter(Optional::isPresent)

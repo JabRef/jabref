@@ -31,7 +31,7 @@ public class OpenConsoleActionTest {
 
     @Test
     public void newActionGetsCurrentDatabase() {
-        OpenConsoleAction action = new OpenConsoleAction(stateManager, preferences);
+        OpenConsoleAction action = new OpenConsoleAction(stateManager, preferences, null);
         action.execute();
         verify(stateManager, times(1)).getActiveDatabase();
         verify(current, times(1)).getDatabasePath();
@@ -39,7 +39,7 @@ public class OpenConsoleActionTest {
 
     @Test
     public void newActionGetsSuppliedDatabase() {
-        OpenConsoleAction action = new OpenConsoleAction(() -> other, stateManager, preferences);
+        OpenConsoleAction action = new OpenConsoleAction(() -> other, stateManager, preferences, null);
         action.execute();
         verify(stateManager, never()).getActiveDatabase();
         verify(other, times(1)).getDatabasePath();
@@ -47,10 +47,9 @@ public class OpenConsoleActionTest {
 
     @Test
     public void actionDefaultsToCurrentDatabase() {
-        OpenConsoleAction action = new OpenConsoleAction(() -> null, stateManager, preferences);
+        OpenConsoleAction action = new OpenConsoleAction(() -> null, stateManager, preferences, null);
         action.execute();
         verify(stateManager, times(1)).getActiveDatabase();
         verify(current, times(1)).getDatabasePath();
     }
-
 }

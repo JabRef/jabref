@@ -32,7 +32,6 @@ public class UnlinkedPDFFileFilter implements DirectoryStream.Filter<Path> {
 
     @Override
     public boolean accept(Path pathname) throws IOException {
-
         if (Files.isDirectory(pathname)) {
             return true;
         } else {

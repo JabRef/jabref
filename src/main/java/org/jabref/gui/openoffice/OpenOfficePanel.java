@@ -119,7 +119,7 @@ public class OpenOfficePanel {
         manualConnect.setTooltip(new Tooltip(Localization.lang("Manual connect")));
         manualConnect.setMaxWidth(Double.MAX_VALUE);
 
-        help = factory.createIconButton(StandardActions.HELP, new HelpAction(HelpFile.OPENOFFICE_LIBREOFFICE));
+        help = factory.createIconButton(StandardActions.HELP, new HelpAction(HelpFile.OPENOFFICE_LIBREOFFICE, dialogService));
         help.setMaxWidth(Double.MAX_VALUE);
 
         selectDocument = new Button();
@@ -168,7 +168,6 @@ public class OpenOfficePanel {
     }
 
     private void initPanel() {
-
         connect.setOnAction(e -> connectAutomatically());
         manualConnect.setOnAction(e -> connectManually());
 
@@ -285,9 +284,7 @@ public class OpenOfficePanel {
         if (officeInstallation.isExecutablePathDefined()) {
             connect();
         } else {
-
             Task<List<Path>> taskConnectIfInstalled = new Task<>() {
-
                 @Override
                 protected List<Path> call() {
                     return OpenOfficeFileSearch.detectInstallations();
@@ -319,7 +316,6 @@ public class OpenOfficePanel {
         DetectOpenOfficeInstallation officeInstallation = new DetectOpenOfficeInstallation(preferencesService, dialogService);
 
         if (selectedPath.isPresent()) {
-
             BackgroundTask.wrap(() -> officeInstallation.setOpenOfficePreferences(selectedPath.get()))
                           .withInitialMessage("Searching for executable")
                           .onFailure(dialogService::showErrorDialogAndWait).onSuccess(value -> {
@@ -365,7 +361,6 @@ public class OpenOfficePanel {
         openOfficePreferences = preferencesService.getOpenOfficePreferences();
 
         Task<OOBibBase> connectTask = new Task<>() {
-
             @Override
             protected OOBibBase call() throws Exception {
                 updateProgress(ProgressBar.INDETERMINATE_PROGRESS, ProgressBar.INDETERMINATE_PROGRESS);
@@ -465,7 +460,6 @@ public class OpenOfficePanel {
 
             Optional<AdvancedCiteDialogViewModel> citeDialogViewModel = dialogService.showCustomDialogAndWait(new AdvancedCiteDialogView());
             if (citeDialogViewModel.isPresent()) {
-
                 AdvancedCiteDialogViewModel model = citeDialogViewModel.get();
                 if (!model.pageInfoProperty().getValue().isEmpty()) {
                     pageInfo = model.pageInfoProperty().getValue();
@@ -548,7 +542,6 @@ public class OpenOfficePanel {
     }
 
     private ContextMenu createSettingsPopup() {
-
         ContextMenu contextMenu = new ContextMenu();
 
         CheckMenuItem autoSync = new CheckMenuItem(Localization.lang("Automatically sync bibliography when inserting citations"));

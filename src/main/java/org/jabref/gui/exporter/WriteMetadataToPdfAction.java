@@ -5,7 +5,6 @@ import java.nio.file.Path;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import javafx.application.Platform;
 import javafx.geometry.Insets;
@@ -34,7 +33,6 @@ import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.logic.xmp.XmpUtilWriter;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.preferences.FilePreferences;
@@ -44,11 +42,12 @@ import static org.jabref.gui.actions.ActionHelper.needsDatabase;
 public class WriteMetadataToPdfAction extends SimpleCommand {
 
     private final StateManager stateManager;
+    private final BibEntryTypesManager entryTypesManager;
+    private final FieldWriterPreferences fieldWriterPreferences;
     private final DialogService dialogService;
     private final TaskExecutor taskExecutor;
     private final FilePreferences filePreferences;
     private final XmpPreferences xmpPreferences;
-    private final EmbeddedBibFilePdfExporter embeddedBibExporter;
 
     private OptionsDialog optionsDialog;
 
@@ -60,13 +59,14 @@ public class WriteMetadataToPdfAction extends SimpleCommand {
     private int entriesChanged;
     private int errors;
 
-    public WriteMetadataToPdfAction(StateManager stateManager, BibDatabaseMode databaseMode, BibEntryTypesManager entryTypesManager, FieldWriterPreferences fieldWriterPreferences, DialogService dialogService, TaskExecutor taskExecutor, FilePreferences filePreferences, XmpPreferences xmpPreferences) {
+    public WriteMetadataToPdfAction(StateManager stateManager, BibEntryTypesManager entryTypesManager, FieldWriterPreferences fieldWriterPreferences, DialogService dialogService, TaskExecutor taskExecutor, FilePreferences filePreferences, XmpPreferences xmpPreferences) {
         this.stateManager = stateManager;
+        this.entryTypesManager = entryTypesManager;
+        this.fieldWriterPreferences = fieldWriterPreferences;
         this.dialogService = dialogService;
         this.taskExecutor = taskExecutor;
         this.filePreferences = filePreferences;
         this.xmpPreferences = xmpPreferences;
-        this.embeddedBibExporter = new EmbeddedBibFilePdfExporter(databaseMode, entryTypesManager, fieldWriterPreferences);
 
         this.executable.bind(needsDatabase(stateManager));
     }
@@ -88,7 +88,6 @@ public class WriteMetadataToPdfAction extends SimpleCommand {
         entries = stateManager.getSelectedEntries();
 
         if (entries.isEmpty()) {
-
             entries = database.getEntries();
 
             if (entries.isEmpty()) {
@@ -129,8 +128,8 @@ public class WriteMetadataToPdfAction extends SimpleCommand {
                                     .map(file -> file.findIn(stateManager.getActiveDatabase().get(), filePreferences))
                                     .filter(Optional::isPresent)
                                     .map(Optional::get)
-                                    .filter(path -> FileUtil.isPDFFile(path))
-                                    .collect(Collectors.toList());
+                                    .filter(FileUtil::isPDFFile)
+                                    .toList();
 
             Platform.runLater(() -> optionsDialog.getProgressArea()
                                                  .appendText(entry.getCitationKey().orElse(Localization.lang("undefined")) + "\n"));
@@ -144,13 +143,14 @@ public class WriteMetadataToPdfAction extends SimpleCommand {
                     if (Files.exists(file)) {
                         try {
                             writeMetadataToFile(file, entry, stateManager.getActiveDatabase().get(), database);
-                            Platform.runLater(
-                                    () -> optionsDialog.getProgressArea().appendText("  " + Localization.lang("OK") + ".\n"));
+                            Platform.runLater(() ->
+                                    optionsDialog.getProgressArea()
+                                                 .appendText("  " + Localization.lang("OK") + ".\n"));
                             entriesChanged++;
                         } catch (Exception e) {
                             Platform.runLater(() -> {
-                                optionsDialog.getProgressArea().appendText("  " + Localization.lang("Error while writing") + " '"
-                                        + file.toString() + "':\n");
+                                optionsDialog.getProgressArea()
+                                             .appendText("  " + Localization.lang("Error while writing") + " '" + file + "':\n");
                                 optionsDialog.getProgressArea().appendText("    " + e.getLocalizedMessage() + "\n");
                             });
                             errors++;
@@ -160,23 +160,24 @@ public class WriteMetadataToPdfAction extends SimpleCommand {
                         Platform.runLater(() -> {
                             optionsDialog.getProgressArea()
                                          .appendText("  " + Localization.lang("Skipped - PDF does not exist") + ":\n");
-                            optionsDialog.getProgressArea().appendText("    " + file.toString() + "\n");
+                            optionsDialog.getProgressArea()
+                                         .appendText("    " + file + "\n");
                         });
                     }
                 }
             }
 
             if (optionsDialog.isCanceled()) {
-                Platform.runLater(
-                        () -> optionsDialog.getProgressArea().appendText("\n" + Localization.lang("Operation canceled.") + "\n"));
+                Platform.runLater(() ->
+                        optionsDialog.getProgressArea().appendText("\n" + Localization.lang("Operation canceled.") + "\n"));
                 break;
             }
         }
         Platform.runLater(() -> {
             optionsDialog.getProgressArea()
                          .appendText("\n"
-                                 + Localization.lang("Finished writing metadata for %0 file (%1 skipped, %2 errors).", String
-                                 .valueOf(entriesChanged), String.valueOf(skipped), String.valueOf(errors)));
+                                 + Localization.lang("Finished writing metadata for %0 file (%1 skipped, %2 errors).",
+                                 String.valueOf(entriesChanged), String.valueOf(skipped), String.valueOf(errors)));
             optionsDialog.done();
         });
 
@@ -189,10 +190,12 @@ public class WriteMetadataToPdfAction extends SimpleCommand {
     }
 
     /**
-     * This writes both XMP data and embeddeds the .bib file
+     * This writes both XMP data and embeds a corresponding .bib file
      */
-    private void writeMetadataToFile(Path file, BibEntry entry, BibDatabaseContext databaseContext, BibDatabase database) throws Exception {
-        XmpUtilWriter.writeXmp(file, entry, database, xmpPreferences);
+    synchronized private void writeMetadataToFile(Path file, BibEntry entry, BibDatabaseContext databaseContext, BibDatabase database) throws Exception {
+        new XmpUtilWriter(xmpPreferences).writeXmp(file, entry, database);
+
+        EmbeddedBibFilePdfExporter embeddedBibExporter = new EmbeddedBibFilePdfExporter(databaseContext.getMode(), entryTypesManager, fieldWriterPreferences);
         embeddedBibExporter.exportToFileByPath(databaseContext, database, filePreferences, file);
     }
 

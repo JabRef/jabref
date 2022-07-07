@@ -49,14 +49,14 @@ public class IsbnFetcher implements EntryBasedFetcher, IdBasedFetcher {
         // remove any newlines and spaces.
         identifier = NEWLINE_SPACE_PATTERN.matcher(identifier).replaceAll("");
 
-        IsbnViaEbookDeFetcher isbnViaEbookDeFetcher = new IsbnViaEbookDeFetcher(importFormatPreferences);
-        Optional<BibEntry> bibEntry = isbnViaEbookDeFetcher.performSearchById(identifier);
+        OpenLibraryFetcher openLibraryFetcher = new OpenLibraryFetcher(importFormatPreferences);
+        Optional<BibEntry> bibEntry = openLibraryFetcher.performSearchById(identifier);
 
-        // nothing found at ebook.de: try ottobib
+        // nothing found at OpenLibrary: try ebook.de
         if (!bibEntry.isPresent()) {
-            LOGGER.debug("No entry found at ebook.de; trying ottobib");
-            IsbnViaOttoBibFetcher isbnViaOttoBibFetcher = new IsbnViaOttoBibFetcher(importFormatPreferences);
-            bibEntry = isbnViaOttoBibFetcher.performSearchById(identifier);
+            LOGGER.debug("No entry found at OpenLibrary; trying ebook.de");
+            IsbnViaEbookDeFetcher isbnViaEbookDeFetcher = new IsbnViaEbookDeFetcher(importFormatPreferences);
+            bibEntry = isbnViaEbookDeFetcher.performSearchById(identifier);
         }
 
         return bibEntry;

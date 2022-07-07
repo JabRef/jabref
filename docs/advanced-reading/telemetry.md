@@ -1,3 +1,7 @@
+---
+nav_order: 6
+parent: Advanced Reading
+---
 # Telemetry
 
 JabRef aims for improving user experience. For that, it employs telemetry and, for instance, checks for used features.

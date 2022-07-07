@@ -70,5 +70,4 @@ public class LuceneBasedSearchRule extends FullTextSearchRule {
 
         return getFulltextResults(queryString, bibEntry).numSearchResults() > 0; // Didn't match all words.
     }
-
 }

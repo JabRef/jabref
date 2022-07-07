@@ -16,8 +16,10 @@ import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
 import javafx.concurrent.Task;
 import javafx.scene.Node;
+import javafx.util.Pair;
 
 import org.jabref.gui.sidepane.SidePaneType;
+import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.gui.util.DialogWindowState;
 import org.jabref.gui.util.OptionalObjectProperty;
@@ -53,9 +55,10 @@ public class StateManager {
     private final OptionalObjectProperty<SearchQuery> activeSearchQuery = OptionalObjectProperty.empty();
     private final ObservableMap<BibDatabaseContext, IntegerProperty> searchResultMap = FXCollections.observableHashMap();
     private final OptionalObjectProperty<Node> focusOwner = OptionalObjectProperty.empty();
-    private final ObservableList<Task<?>> backgroundTasks = FXCollections.observableArrayList(task -> new Observable[] {task.progressProperty(), task.runningProperty()});
-    private final EasyBinding<Boolean> anyTaskRunning = EasyBind.reduce(backgroundTasks, tasks -> tasks.anyMatch(Task::isRunning));
-    private final EasyBinding<Double> tasksProgress = EasyBind.reduce(backgroundTasks, tasks -> tasks.filter(Task::isRunning).mapToDouble(Task::getProgress).average().orElse(1));
+    private final ObservableList<Pair<BackgroundTask, Task<?>>> backgroundTasks = FXCollections.observableArrayList(task -> new Observable[] {task.getValue().progressProperty(), task.getValue().runningProperty()});
+    private final EasyBinding<Boolean> anyTaskRunning = EasyBind.reduce(backgroundTasks, tasks -> tasks.map(Pair::getValue).anyMatch(Task::isRunning));
+    private final EasyBinding<Boolean> anyTasksThatWillNotBeRecoveredRunning = EasyBind.reduce(backgroundTasks, tasks -> tasks.anyMatch(task -> !task.getKey().willBeRecoveredAutomatically() && task.getValue().isRunning()));
+    private final EasyBinding<Double> tasksProgress = EasyBind.reduce(backgroundTasks, tasks -> tasks.map(Pair::getValue).filter(Task::isRunning).mapToDouble(Task::getProgress).average().orElse(1));
     private final ObservableMap<String, DialogWindowState> dialogWindowStates = FXCollections.observableHashMap();
     private final ObservableList<SidePaneType> visibleSidePanes = FXCollections.observableArrayList();
 
@@ -143,15 +146,19 @@ public class StateManager {
     }
 
     public ObservableList<Task<?>> getBackgroundTasks() {
-        return backgroundTasks;
+        return EasyBind.map(backgroundTasks, Pair::getValue);
     }
 
-    public void addBackgroundTask(Task<?> backgroundTask) {
-        this.backgroundTasks.add(0, backgroundTask);
+    public void addBackgroundTask(BackgroundTask backgroundTask, Task<?> task) {
+        this.backgroundTasks.add(0, new Pair<>(backgroundTask, task));
     }
 
     public EasyBinding<Boolean> getAnyTaskRunning() {
         return anyTaskRunning;
+    }
+
+    public EasyBinding<Boolean> getAnyTasksThatWillNotBeRecoveredRunning() {
+        return anyTasksThatWillNotBeRecoveredRunning;
     }
 
     public EasyBinding<Double> getTasksProgress() {

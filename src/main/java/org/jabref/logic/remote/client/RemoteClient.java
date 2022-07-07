@@ -18,7 +18,7 @@ public class RemoteClient {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RemoteClient.class);
 
-    private static final int TIMEOUT = 200;
+    private static final int TIMEOUT = 1000;
     private final int port;
 
     public RemoteClient(int port) {

@@ -1,3 +1,7 @@
+---
+nav_order: 5
+parent: Advanced Reading
+---
 # Remote Storage
 
 ## Using a shared PostgreSQL database

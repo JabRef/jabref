@@ -1,5 +1,6 @@
 package org.jabref.gui.groups;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -16,6 +17,9 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonBar;
+import javafx.scene.control.ButtonType;
 
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
@@ -28,6 +32,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.groups.AbstractGroup;
 import org.jabref.model.groups.ExplicitGroup;
 import org.jabref.model.groups.GroupTreeNode;
+import org.jabref.model.groups.WordKeywordGroup;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.preferences.PreferencesService;
 
@@ -191,9 +196,21 @@ public class GroupTreeViewModel extends AbstractViewModel {
 
             newGroup.ifPresent(group -> {
                 // TODO: Keep assignments
-                boolean keepPreviousAssignments = dialogService.showConfirmationDialogAndWait(
+                String content = Localization.lang("Assign the original group's entries to this group?");
+                ButtonType keepAssignments = new ButtonType(Localization.lang("Assign"), ButtonBar.ButtonData.YES);
+                ButtonType removeAssignments = new ButtonType(Localization.lang("Do not assign"), ButtonBar.ButtonData.NO);
+                ButtonType cancel = new ButtonType(Localization.lang("Cancel"), ButtonBar.ButtonData.CANCEL_CLOSE);
+
+                if (newGroup.get().getClass() == WordKeywordGroup.class) {
+                    content = content + "\n\n" +
+                            Localization.lang("(Note: If original entries lack keywords to qualify for the new group configuration, confirming here will add them)");
+                }
+                Optional<ButtonType> previousAssignments = dialogService.showCustomButtonDialogAndWait(Alert.AlertType.WARNING,
                         Localization.lang("Change of Grouping Method"),
-                        Localization.lang("Assign the original group's entries to this group?"));
+                        content,
+                        keepAssignments,
+                        removeAssignments,
+                        cancel);
                 //        WarnAssignmentSideEffects.warnAssignmentSideEffects(newGroup, panel.frame());
                 boolean removePreviousAssignments = (oldGroup.getGroupNode().getGroup() instanceof ExplicitGroup)
                         && (group instanceof ExplicitGroup);
@@ -208,11 +225,22 @@ public class GroupTreeViewModel extends AbstractViewModel {
                     removePreviousAssignments = false;
                 }
 
-                oldGroup.getGroupNode().setGroup(
-                        group,
-                        keepPreviousAssignments,
-                        removePreviousAssignments,
-                        database.getEntries());
+                if (previousAssignments.isPresent() && (previousAssignments.get().getButtonData() == ButtonBar.ButtonData.YES)) {
+                    oldGroup.getGroupNode().setGroup(
+                            group,
+                            true,
+                            removePreviousAssignments,
+                            database.getEntries());
+                } else if (previousAssignments.isPresent() && (previousAssignments.get().getButtonData() == ButtonBar.ButtonData.NO)) {
+                    oldGroup.getGroupNode().setGroup(
+                            group,
+                            false,
+                            removePreviousAssignments,
+                            database.getEntries());
+                } else if (previousAssignments.isPresent() && (previousAssignments.get().getButtonData() == ButtonBar.ButtonData.CANCEL_CLOSE)) {
+                    return;
+                }
+
                 // stateManager.getEntriesInCurrentDatabase());
 
                 // TODO: Add undo
@@ -259,20 +287,38 @@ public class GroupTreeViewModel extends AbstractViewModel {
     }
 
     public void removeGroupKeepSubgroups(GroupNodeViewModel group) {
-        boolean confirmation = dialogService.showConfirmationDialogAndWait(
-                Localization.lang("Remove group"),
-                Localization.lang("Remove group \"%0\"?", group.getDisplayName()));
+        boolean confirmed;
+        if (selectedGroups.size() <= 1) {
+            confirmed = dialogService.showConfirmationDialogAndWait(
+                    Localization.lang("Remove group"),
+                    Localization.lang("Remove group \"%0\" and keep its subgroups?", group.getDisplayName()),
+                    Localization.lang("Remove"));
+        } else {
+            confirmed = dialogService.showConfirmationDialogAndWait(
+                    Localization.lang("Remove groups"),
+                    Localization.lang("Remove all selected groups and keep their subgroups?"),
+                    Localization.lang("Remove all"));
+        }
 
-        if (confirmation) {
+        if (confirmed) {
             // TODO: Add undo
             // final UndoableAddOrRemoveGroup undo = new UndoableAddOrRemoveGroup(groupsRoot, node, UndoableAddOrRemoveGroup.REMOVE_NODE_KEEP_CHILDREN);
             // panel.getUndoManager().addEdit(undo);
-            GroupTreeNode groupNode = group.getGroupNode();
-            groupNode.getParent()
-                     .ifPresent(parent -> groupNode.moveAllChildrenTo(parent, parent.getIndexOfChild(groupNode).get()));
-            groupNode.removeFromParent();
 
-            dialogService.notify(Localization.lang("Removed group \"%0\".", group.getDisplayName()));
+            List<GroupNodeViewModel> selectedGroupNodes = new ArrayList<>(selectedGroups);
+            selectedGroupNodes.forEach(eachNode -> {
+                GroupTreeNode groupNode = eachNode.getGroupNode();
+
+                groupNode.getParent()
+                         .ifPresent(parent -> groupNode.moveAllChildrenTo(parent, parent.getIndexOfChild(groupNode).get()));
+                groupNode.removeFromParent();
+            });
+
+            if (selectedGroupNodes.size() > 1) {
+                dialogService.notify(Localization.lang("Removed all selected groups."));
+            } else {
+                dialogService.notify(Localization.lang("Removed group \"%0\".", group.getDisplayName()));
+            }
             writeGroupChangesToMetaData();
         }
     }
@@ -281,20 +327,35 @@ public class GroupTreeViewModel extends AbstractViewModel {
      * Removes the specified group and its subgroups (after asking for confirmation).
      */
     public void removeGroupAndSubgroups(GroupNodeViewModel group) {
-        boolean confirmed = dialogService.showConfirmationDialogAndWait(
-                Localization.lang("Remove group and subgroups"),
-                Localization.lang("Remove group \"%0\" and its subgroups?", group.getDisplayName()),
-                Localization.lang("Remove"));
+        boolean confirmed;
+        if (selectedGroups.size() <= 1) {
+            confirmed = dialogService.showConfirmationDialogAndWait(
+                    Localization.lang("Remove group and subgroups"),
+                    Localization.lang("Remove group \"%0\" and its subgroups?", group.getDisplayName()),
+                    Localization.lang("Remove"));
+        } else {
+            confirmed = dialogService.showConfirmationDialogAndWait(
+                    Localization.lang("Remove groups and subgroups"),
+                    Localization.lang("Remove all selected groups and their subgroups?"),
+                    Localization.lang("Remove all"));
+        }
+
         if (confirmed) {
             // TODO: Add undo
             // final UndoableAddOrRemoveGroup undo = new UndoableAddOrRemoveGroup(groupsRoot, node, UndoableAddOrRemoveGroup.REMOVE_NODE_AND_CHILDREN);
             // panel.getUndoManager().addEdit(undo);
 
-            removeGroupsAndSubGroupsFromEntries(group);
+            ArrayList<GroupNodeViewModel> selectedGroupNodes = new ArrayList<>(selectedGroups);
+            selectedGroupNodes.forEach(eachNode -> {
+                removeGroupsAndSubGroupsFromEntries(eachNode);
+                eachNode.getGroupNode().removeFromParent();
+            });
 
-            group.getGroupNode().removeFromParent();
-
-            dialogService.notify(Localization.lang("Removed group \"%0\" and its subgroups.", group.getDisplayName()));
+            if (selectedGroupNodes.size() > 1) {
+                dialogService.notify(Localization.lang("Removed all selected groups and their subgroups."));
+            } else {
+                dialogService.notify(Localization.lang("Removed group \"%0\" and its subgroups.", group.getDisplayName()));
+            }
             writeGroupChangesToMetaData();
         }
     }

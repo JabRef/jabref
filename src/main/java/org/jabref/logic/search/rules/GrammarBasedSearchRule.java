@@ -22,6 +22,7 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.pdf.search.PdfSearchResults;
 import org.jabref.model.pdf.search.SearchResult;
+import org.jabref.model.strings.StringUtil;
 import org.jabref.search.SearchBaseVisitor;
 import org.jabref.search.SearchLexer;
 import org.jabref.search.SearchParser;
@@ -164,8 +165,8 @@ public class GrammarBasedSearchRule implements SearchRule {
             this.operator = operator;
 
             int option = searchFlags.contains(SearchRules.SearchFlags.CASE_SENSITIVE) ? 0 : Pattern.CASE_INSENSITIVE;
-            this.fieldPattern = Pattern.compile(searchFlags.contains(SearchRules.SearchFlags.REGULAR_EXPRESSION) ? field : "\\Q" + field + "\\E", option);
-            this.valuePattern = Pattern.compile(searchFlags.contains(SearchRules.SearchFlags.REGULAR_EXPRESSION) ? value : "\\Q" + value + "\\E", option);
+            this.fieldPattern = Pattern.compile(searchFlags.contains(SearchRules.SearchFlags.REGULAR_EXPRESSION) ? StringUtil.stripAccents(field) : "\\Q" + StringUtil.stripAccents(field) + "\\E", option);
+            this.valuePattern = Pattern.compile(searchFlags.contains(SearchRules.SearchFlags.REGULAR_EXPRESSION) ? StringUtil.stripAccents(value) : "\\Q" + StringUtil.stripAccents(value) + "\\E", option);
         }
 
         public boolean compare(BibEntry entry) {
@@ -191,7 +192,7 @@ public class GrammarBasedSearchRule implements SearchRule {
             for (Field field : fieldsKeys) {
                 Optional<String> fieldValue = entry.getLatexFreeField(field);
                 if (fieldValue.isPresent()) {
-                    if (matchFieldValue(fieldValue.get())) {
+                    if (matchFieldValue(StringUtil.stripAccents(fieldValue.get()))) {
                         return true;
                     }
                 }

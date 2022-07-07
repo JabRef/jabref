@@ -269,6 +269,7 @@ public class GroupDialogViewModel {
 
     /**
      * Gets the absolute path relative to the LatexFileDirectory, if given a relative path
+     *
      * @param input the user input path
      * @return an absolute path if LatexFileDirectory exists; otherwise, returns input
      */
@@ -445,7 +446,7 @@ public class GroupDialogViewModel {
     }
 
     public void openHelpPage() {
-        HelpAction.openHelpPage(HelpFile.GROUPS);
+        new HelpAction(HelpFile.GROUPS, dialogService).execute();
     }
 
     private List<Path> getFileDirectoriesAsPaths() {

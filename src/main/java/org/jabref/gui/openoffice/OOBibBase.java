@@ -180,7 +180,6 @@ class OOBibBase {
      * Get the cursor positioned by the user for inserting text.
      */
     OOResult<XTextCursor, OOError> getUserCursorForTextInsertion(XTextDocument doc, String errorTitle) {
-
         // Get the cursor positioned by the user.
         XTextCursor cursor = UnoCursor.getViewCursor(doc).orElse(null);
 
@@ -265,7 +264,6 @@ class OOBibBase {
      * ******************************************************/
 
     private static OOVoidResult<OOError> checkIfOpenOfficeIsRecordingChanges(XTextDocument doc) {
-
         String errorTitle = Localization.lang("Recording and/or Recorded changes");
         try {
             boolean recordingChanges = UnoRedlines.getRecordChanges(doc);
@@ -393,7 +391,6 @@ class OOBibBase {
     }
 
     public OOVoidResult<OOError> checkStylesExistInTheDocument(OOBibStyle style, XTextDocument doc) {
-
         String pathToStyleFile = style.getPath();
 
         List<OOVoidResult<OOError>> results = new ArrayList<>();
@@ -430,7 +427,6 @@ class OOBibBase {
      *
      * ******************************************************/
     public Optional<List<CitationEntry>> guiActionGetCitationEntries() {
-
         final Optional<List<CitationEntry>> FAIL = Optional.empty();
         final String errorTitle = Localization.lang("Problem collecting citations");
 
@@ -481,7 +477,6 @@ class OOBibBase {
      * </ul>
      */
     public void guiActionApplyCitationEntries(List<CitationEntry> citationEntries) {
-
         final String errorTitle = Localization.lang("Problem modifying citation");
 
         OOResult<XTextDocument, OOError> odoc = getXTextDocument();
@@ -617,7 +612,6 @@ class OOBibBase {
      * GUI action "Merge citations"
      */
     public void guiActionMergeCitationGroups(List<BibDatabase> databases, OOBibStyle style) {
-
         final String errorTitle = Localization.lang("Problem combining cite markers");
 
         OOResult<XTextDocument, OOError> odoc = getXTextDocument();
@@ -672,7 +666,6 @@ class OOBibBase {
      * Do the opposite of MergeCitationGroups. Combined markers are split, with a space inserted between.
      */
     public void guiActionSeparateCitations(List<BibDatabase> databases, OOBibStyle style) {
-
         final String errorTitle = Localization.lang("Problem during separating cite markers");
 
         OOResult<XTextDocument, OOError> odoc = getXTextDocument();
@@ -729,7 +722,6 @@ class OOBibBase {
      * @param returnPartialResult If there are some unresolved keys, shall we return an otherwise nonempty result, or Optional.empty()?
      */
     public Optional<BibDatabase> exportCitedHelper(List<BibDatabase> databases, boolean returnPartialResult) {
-
         final Optional<BibDatabase> FAIL = Optional.empty();
         final String errorTitle = Localization.lang("Unable to generate new library");
 
@@ -798,7 +790,6 @@ class OOBibBase {
      * @param style     Style.
      */
     public void guiActionUpdateDocument(List<BibDatabase> databases, OOBibStyle style) {
-
         final String errorTitle = Localization.lang("Unable to synchronize bibliography");
 
         try {

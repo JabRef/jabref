@@ -65,7 +65,6 @@ public final class ApplicationInsightsLogEvent extends ApplicationInsightsEvent 
 
     @Override
     public Map<String, String> getCustomParameters() {
-
         Map<String, String> metaData = new HashMap<>();
 
         metaData.put("SourceType", "slf4j");
@@ -78,13 +77,11 @@ public final class ApplicationInsightsLogEvent extends ApplicationInsightsEvent 
             addLogEventProperty("Logger Message", getMessage(), metaData);
 
             for (StackTraceElement stackTraceElement : logEvent.getException().getStackTrace()) {
-
                 addLogEventProperty("ClassName", stackTraceElement.getClassName(), metaData);
                 addLogEventProperty("FileName", stackTraceElement.getFileName(), metaData);
                 addLogEventProperty("MethodName", stackTraceElement.getMethodName(), metaData);
                 addLogEventProperty("LineNumber", String.valueOf(stackTraceElement.getLineNumber()), metaData);
             }
-
         }
 
         for (Entry<String, String> entry : logEvent.getContext().entrySet()) {
@@ -102,7 +99,6 @@ public final class ApplicationInsightsLogEvent extends ApplicationInsightsEvent 
         org.tinylog.Level logEventLevel = logEvent.getLevel();
 
         switch (logEventLevel) {
-
             case ERROR:
                 return SeverityLevel.Error;
             case WARN:

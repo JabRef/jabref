@@ -22,7 +22,6 @@ class CitationStyleTest {
 
     @Test
     void testDefaultCitation() {
-
         BibDatabaseContext context = new BibDatabaseContext(new BibDatabase(List.of(TestEntry.getTestEntry())));
         context.setMode(BibDatabaseMode.BIBLATEX);
         String citation = CitationStyleGenerator.generateCitation(TestEntry.getTestEntry(), CitationStyle.getDefault().getSource(), CitationStyleOutputFormat.HTML, context, new BibEntryTypesManager());
@@ -34,5 +33,11 @@ class CitationStyleTest {
                           + "";
 
         assertEquals(expected, citation);
+    }
+
+    @Test
+    void testDiscoverCitationStylesNotNull() throws Exception {
+        List<CitationStyle> styleList = CitationStyle.discoverCitationStyles();
+        assertNotNull(styleList);
     }
 }

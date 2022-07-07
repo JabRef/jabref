@@ -183,7 +183,7 @@ public class AtomicFileOutputStream extends FilterOutputStream {
                     PosixFilePermission.OTHERS_READ);
             if (Files.exists(targetFile)) {
                 Files.copy(targetFile, backupFile, StandardCopyOption.REPLACE_EXISTING);
-                if (FileUtil.IS_POSIX_COMPILANT) {
+                if (FileUtil.IS_POSIX_COMPLIANT) {
                     try {
                         oldFilePermissions = Files.getPosixFilePermissions(targetFile);
                     } catch (IOException exception) {
@@ -196,7 +196,7 @@ public class AtomicFileOutputStream extends FilterOutputStream {
             Files.move(temporaryFile, targetFile, StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING);
 
             // Restore file permissions
-            if (FileUtil.IS_POSIX_COMPILANT) {
+            if (FileUtil.IS_POSIX_COMPLIANT) {
                 try {
                     Files.setPosixFilePermissions(targetFile, oldFilePermissions);
                 } catch (IOException exception) {

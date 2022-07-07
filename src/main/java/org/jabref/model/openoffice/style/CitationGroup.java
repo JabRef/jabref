@@ -82,7 +82,6 @@ public class CitationGroup {
      * Sort citations for presentation within a CitationGroup.
      */
     void imposeLocalOrder(Comparator<BibEntry> entryComparator) {
-
         // For JabRef52 the single pageInfo is always in the last-in-localorder citation.
         // We adjust here accordingly by taking it out and adding it back after sorting.
         final int last = this.numberOfCitations() - 1;

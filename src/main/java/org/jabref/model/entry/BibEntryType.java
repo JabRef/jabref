@@ -124,7 +124,6 @@ public class BibEntryType implements Comparable<BibEntryType> {
         return type.equals(that.type) &&
                Objects.equals(requiredFields, that.requiredFields) &&
                Objects.equals(fields, that.fields);
-
     }
 
     @Override

@@ -268,7 +268,6 @@ public class GlobalSearchBar extends HBox {
     }
 
     public void performSearch() {
-
         LOGGER.debug("Flags: {}", searchPreferences.getSearchFlags());
         LOGGER.debug("Run search " + searchField.getText());
 

@@ -10,5 +10,5 @@ public class SearchFieldConstants {
 
     public static final String[] PDF_FIELDS = new String[]{PATH, CONTENT, PAGE_NUMBER, MODIFIED, ANNOTATIONS};
 
-    public static final String VERSION = "0.5a";
+    public static final String VERSION = "lucene92";
 }

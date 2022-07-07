@@ -66,7 +66,7 @@ public class EntryComparator implements Comparator<BibEntry> {
             }
         }
 
-        // If the field is author or editor, we rearrange names so they are
+        // If the field is author or editor, we rearrange names to achieve that they are
         // sorted according to last name.
         if (sortField.getProperties().contains(FieldProperty.PERSON_NAMES)) {
             if (f1 != null) {
