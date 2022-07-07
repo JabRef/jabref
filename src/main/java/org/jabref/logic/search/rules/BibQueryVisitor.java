@@ -23,6 +23,9 @@ import org.apache.lucene.queryparser.flexible.standard.nodes.RegexpQueryNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Implements a Lucene-syntax based search on BibEntries
+ */
 public class BibQueryVisitor {
     public static final String NO_EXPLICIT_FIELD = "default";
     private static final Logger LOGGER = LoggerFactory.getLogger(BibQueryVisitor.class);

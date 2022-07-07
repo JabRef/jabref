@@ -24,8 +24,10 @@ public class LuceneBasedSearchRule extends FullTextSearchRule {
     private static final Logger LOGGER = LoggerFactory.getLogger(LuceneBasedSearchRule.class);
 
     // We use SyntaxParser to be consistent with org.jabref.logic.importer
-    // We do not use "PrecedenceQueryParser", because this parser keeps the term "AND"
+    // We do not use "PrecedenceQueryParser", because StandardSyntaxParser parser keeps the term "AND"
     private SyntaxParser parser = new StandardSyntaxParser();
+
+    // We cache the mapping from the plain query string to the parsed Lucene query to avoid parsing
     private LoadingCache<String, QueryNode> cache = CacheBuilder.newBuilder()
                                                             .maximumSize(100)
                                                             .build(
