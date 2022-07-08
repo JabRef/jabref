@@ -135,7 +135,7 @@ public class ThreeWayMergeView extends VBox {
         String leftEntryGroups = viewModel.getLeftEntry().getField(StandardField.GROUPS).orElse("");
         String rightEntryGroups = viewModel.getRightEntry().getField(StandardField.GROUPS).orElse("");
 
-        String mergedGroups = mergeLeftAndRightEntryGroups();
+        String mergedGroups = mergeLeftAndRightEntryGroups(leftEntryGroups, rightEntryGroups);
         viewModel.getLeftEntry().setField(StandardField.GROUPS, mergedGroups);
         viewModel.getRightEntry().setField(StandardField.GROUPS, mergedGroups);
 
@@ -206,9 +206,9 @@ public class ThreeWayMergeView extends VBox {
         mergeGridPane.getChildren().removeIf(node -> GridPane.getRowIndex(node) == index && GridPane.getColumnIndex(node) > FIELD_NAME_COLUMN);
     }
 
-    private String mergeLeftAndRightEntryGroups() {
-        List<String> leftGroups = new ArrayList<>(Arrays.stream(viewModel.getLeftEntry().getField(StandardField.GROUPS).orElse("").split(", ")).toList());
-        List<String> rightGroups = Arrays.stream(viewModel.getRightEntry().getField(StandardField.GROUPS).orElse("").split(", ")).toList();
+    private String mergeLeftAndRightEntryGroups(String left, String right) {
+        List<String> leftGroups = new ArrayList<>(Arrays.stream(left.split(", ")).toList());
+        List<String> rightGroups = Arrays.stream(right.split(", ")).toList();
         leftGroups.addAll(rightGroups);
 
         return String.join(", ", leftGroups);
