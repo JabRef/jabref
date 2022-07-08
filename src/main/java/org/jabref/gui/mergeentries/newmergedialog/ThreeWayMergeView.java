@@ -118,7 +118,7 @@ public class ThreeWayMergeView extends VBox {
 
             // Removing this will cause UI to lag when updating field values
             if (getFieldAtIndex(fieldIndex).equals(StandardField.GROUPS)) {
-                mergeGridPane.getRowConstraints().add(fieldIndex, new RowConstraints(56, 56, 56));
+                mergeGridPane.getRowConstraints().add(fieldIndex, new RowConstraints(56, 56, Double.MAX_VALUE));
             } else {
                 mergeGridPane.getRowConstraints().add(new RowConstraints());
             }
