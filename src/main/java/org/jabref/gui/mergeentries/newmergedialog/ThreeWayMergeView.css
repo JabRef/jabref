@@ -43,3 +43,9 @@
     -fx-font-weight: bold;
     -fx-padding: 1, 0, 1, 0;
 }
+
+.field-name .glyph-icon,
+.field-name .ikonli-font-icon {
+    -fx-icon-size: 17;
+    -fx-icon-color:  -jr-theme-text;
+}
