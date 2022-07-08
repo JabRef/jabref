@@ -2,7 +2,9 @@ package org.jabref.gui.mergeentries.newmergedialog;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.ColumnConstraints;
@@ -41,7 +43,7 @@ public class ThreeWayMergeView extends VBox {
     private final GridPane mergeGridPane;
 
     private final ThreeWayMergeViewModel viewModel;
-    private final List<ThreeFieldValues> threeFieldValuesList = new ArrayList<>();
+    private final List<ThreeFieldValues> fieldValuesList = new ArrayList<>();
 
     private MergedGroups mergedGroupsRecord;
 
@@ -81,9 +83,9 @@ public class ThreeWayMergeView extends VBox {
 
     private void updateDiff() {
         if (toolbar.isShowDiffEnabled()) {
-            threeFieldValuesList.forEach(fieldRow -> fieldRow.showDiff(new ShowDiffConfig(toolbar.getDiffView(), toolbar.getDiffHighlightingMethod())));
+            fieldValuesList.forEach(fieldValues -> fieldValues.showDiff(new ShowDiffConfig(toolbar.getDiffView(), toolbar.getDiffHighlightingMethod())));
         } else {
-            threeFieldValuesList.forEach(ThreeFieldValues::hideDiff);
+            fieldValuesList.forEach(ThreeFieldValues::hideDiff);
         }
     }
 
@@ -114,7 +116,7 @@ public class ThreeWayMergeView extends VBox {
             addFieldName(getFieldAtIndex(fieldIndex), fieldIndex);
             addFieldValues(fieldIndex);
 
-            // Removing this will cause a UI lag when updating field values
+            // Removing this will cause UI to lag when updating field values
             if (getFieldAtIndex(fieldIndex).equals(StandardField.GROUPS)) {
                 mergeGridPane.getRowConstraints().add(fieldIndex, new RowConstraints(56, 56, 56));
             } else {
@@ -181,7 +183,7 @@ public class ThreeWayMergeView extends VBox {
         }
 
         ThreeFieldValues fieldRow = new ThreeFieldValues(leftEntryValue, rightEntryValue, fieldIndex);
-        threeFieldValuesList.add(fieldRow);
+        fieldValuesList.add(fieldRow);
 
         fieldRow.mergedValueProperty().addListener((observable, old, mergedValue) -> {
             if (field.equals(InternalField.TYPE_HEADER)) {
@@ -212,12 +214,12 @@ public class ThreeWayMergeView extends VBox {
     }
 
     private void removeFieldValues(int index) {
-        threeFieldValuesList.remove(index);
+        fieldValuesList.remove(index);
         mergeGridPane.getChildren().removeIf(node -> GridPane.getRowIndex(node) == index && GridPane.getColumnIndex(node) > FIELD_NAME_COLUMN);
     }
 
     private String mergeLeftAndRightEntryGroups(String left, String right) {
-        List<String> leftGroups = new ArrayList<>(Arrays.stream(left.split(", ")).toList());
+        Set<String> leftGroups = new HashSet<>(Arrays.stream(left.split(", ")).toList());
         List<String> rightGroups = Arrays.stream(right.split(", ")).toList();
         leftGroups.addAll(rightGroups);
 
@@ -237,11 +239,11 @@ public class ThreeWayMergeView extends VBox {
     }
 
     public void selectLeftEntryValues() {
-        threeFieldValuesList.forEach(ThreeFieldValues::selectLeftValue);
+        fieldValuesList.forEach(ThreeFieldValues::selectLeftValue);
     }
 
     public void selectRightEntryValues() {
-        threeFieldValuesList.forEach(ThreeFieldValues::selectRightValue);
+        fieldValuesList.forEach(ThreeFieldValues::selectRightValue);
     }
 
     public void showDiff(ShowDiffConfig diffConfig) {
