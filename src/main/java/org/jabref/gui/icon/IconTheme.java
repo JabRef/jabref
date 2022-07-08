@@ -343,7 +343,9 @@ public class IconTheme {
 
         ACCEPT_LEFT(MaterialDesignS.SUBDIRECTORY_ARROW_LEFT),
 
-        ACCEPT_RIGHT(MaterialDesignS.SUBDIRECTORY_ARROW_RIGHT);
+        ACCEPT_RIGHT(MaterialDesignS.SUBDIRECTORY_ARROW_RIGHT),
+
+        MERGE_GROUPS(MaterialDesignS.SOURCE_MERGE);
 
         private final JabRefIcon icon;
 
