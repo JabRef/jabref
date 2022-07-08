@@ -121,29 +121,37 @@ public class ThreeWayMergeView extends VBox {
 
         if (field.equals(StandardField.GROUPS)) {
             GroupsFieldNameCell groupsField = (GroupsFieldNameCell) fieldNameCell;
-            groupsField.setOnMergeGroups(() -> {
-                if (mergedGroupsRecord == null) {
-                    String leftEntryValue = viewModel.getLeftEntry().getField(field).orElse("");
-                    String rightEntryValue = viewModel.getRightEntry().getField(field).orElse("");
-
-                    String mergedGroups = mergeLeftAndRightEntryGroups();
-                    viewModel.getLeftEntry().setField(field, mergedGroups);
-                    viewModel.getRightEntry().setField(field, mergedGroups);
-                    System.out.println("Groups merged: " + mergedGroups);
-                    mergedGroupsRecord = new MergedGroups(leftEntryValue, rightEntryValue, mergedGroups);
-                    updateFieldValues(fieldIndex);
-                }
-            });
-
-            groupsField.setOnUnmergeGroups(() -> {
-                if (mergedGroupsRecord != null) {
-                    viewModel.getLeftEntry().setField(field, mergedGroupsRecord.leftEntryGroups());
-                    viewModel.getRightEntry().setField(field, mergedGroupsRecord.rightEntryGroups());
-                    updateFieldValues(fieldIndex);
-                    mergedGroupsRecord = null;
+            groupsField.setOnAction(() -> {
+                if (areGroupsMerged()) {
+                    unmergeGroups();
+                } else {
+                    mergeGroups();
                 }
             });
         }
+    }
+
+    public void mergeGroups() {
+        String leftEntryGroups = viewModel.getLeftEntry().getField(StandardField.GROUPS).orElse("");
+        String rightEntryGroups = viewModel.getRightEntry().getField(StandardField.GROUPS).orElse("");
+
+        String mergedGroups = mergeLeftAndRightEntryGroups();
+        viewModel.getLeftEntry().setField(StandardField.GROUPS, mergedGroups);
+        viewModel.getRightEntry().setField(StandardField.GROUPS, mergedGroups);
+
+        mergedGroupsRecord = new MergedGroups(leftEntryGroups, rightEntryGroups, mergedGroups);
+        updateFieldValues(viewModel.allFields().indexOf(StandardField.GROUPS));
+    }
+
+    public void unmergeGroups() {
+        viewModel.getLeftEntry().setField(StandardField.GROUPS, mergedGroupsRecord.leftEntryGroups());
+        viewModel.getRightEntry().setField(StandardField.GROUPS, mergedGroupsRecord.rightEntryGroups());
+        updateFieldValues(viewModel.allFields().indexOf(StandardField.GROUPS));
+        mergedGroupsRecord = null;
+    }
+
+    private boolean areGroupsMerged() {
+        return mergedGroupsRecord != null;
     }
 
     private Field getFieldAtIndex(int index) {
