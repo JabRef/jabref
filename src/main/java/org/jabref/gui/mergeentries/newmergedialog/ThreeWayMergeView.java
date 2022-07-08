@@ -135,12 +135,14 @@ public class ThreeWayMergeView extends VBox {
         String leftEntryGroups = viewModel.getLeftEntry().getField(StandardField.GROUPS).orElse("");
         String rightEntryGroups = viewModel.getRightEntry().getField(StandardField.GROUPS).orElse("");
 
-        String mergedGroups = mergeLeftAndRightEntryGroups(leftEntryGroups, rightEntryGroups);
-        viewModel.getLeftEntry().setField(StandardField.GROUPS, mergedGroups);
-        viewModel.getRightEntry().setField(StandardField.GROUPS, mergedGroups);
+        if (!leftEntryGroups.equals(rightEntryGroups)) {
+            String mergedGroups = mergeLeftAndRightEntryGroups(leftEntryGroups, rightEntryGroups);
+            viewModel.getLeftEntry().setField(StandardField.GROUPS, mergedGroups);
+            viewModel.getRightEntry().setField(StandardField.GROUPS, mergedGroups);
 
-        mergedGroupsRecord = new MergedGroups(leftEntryGroups, rightEntryGroups, mergedGroups);
-        updateFieldValues(viewModel.allFields().indexOf(StandardField.GROUPS));
+            mergedGroupsRecord = new MergedGroups(leftEntryGroups, rightEntryGroups, mergedGroups);
+            updateFieldValues(viewModel.allFields().indexOf(StandardField.GROUPS));
+        }
     }
 
     public void unmergeGroups() {
