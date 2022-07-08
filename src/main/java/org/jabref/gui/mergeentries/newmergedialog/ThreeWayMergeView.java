@@ -14,6 +14,7 @@ import javafx.scene.layout.RowConstraints;
 import javafx.scene.layout.VBox;
 import javafx.stage.Screen;
 
+import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.mergeentries.newmergedialog.cell.FieldNameCell;
 import org.jabref.gui.mergeentries.newmergedialog.cell.FieldNameCellFactory;
 import org.jabref.gui.mergeentries.newmergedialog.cell.GroupsFieldNameCell;
@@ -131,35 +132,9 @@ public class ThreeWayMergeView extends VBox {
 
         if (field.equals(StandardField.GROUPS)) {
             GroupsFieldNameCell groupsField = (GroupsFieldNameCell) fieldNameCell;
-            groupsField.setOnAction(() -> {
-                if (areGroupsMerged()) {
-                    unmergeGroups();
-                } else {
-                    mergeGroups();
-                }
-            });
+            groupsField.setMergeGroupsCommand(new MergeGroupsCommand());
+            groupsField.setUnmergeGroupsCommand(new UnmergeGroupsCommand());
         }
-    }
-
-    public void mergeGroups() {
-        String leftEntryGroups = viewModel.getLeftEntry().getField(StandardField.GROUPS).orElse("");
-        String rightEntryGroups = viewModel.getRightEntry().getField(StandardField.GROUPS).orElse("");
-
-        if (!leftEntryGroups.equals(rightEntryGroups)) {
-            String mergedGroups = mergeLeftAndRightEntryGroups(leftEntryGroups, rightEntryGroups);
-            viewModel.getLeftEntry().setField(StandardField.GROUPS, mergedGroups);
-            viewModel.getRightEntry().setField(StandardField.GROUPS, mergedGroups);
-
-            mergedGroupsRecord = new MergedGroups(leftEntryGroups, rightEntryGroups, mergedGroups);
-            updateFieldValues(viewModel.allFields().indexOf(StandardField.GROUPS));
-        }
-    }
-
-    public void unmergeGroups() {
-        viewModel.getLeftEntry().setField(StandardField.GROUPS, mergedGroupsRecord.leftEntryGroups());
-        viewModel.getRightEntry().setField(StandardField.GROUPS, mergedGroupsRecord.rightEntryGroups());
-        updateFieldValues(viewModel.allFields().indexOf(StandardField.GROUPS));
-        mergedGroupsRecord = null;
     }
 
     private boolean areGroupsMerged() {
@@ -251,5 +226,37 @@ public class ThreeWayMergeView extends VBox {
         toolbar.setDiffView(diffConfig.diffView());
         toolbar.setDiffHighlightingMethod(diffConfig.diffHighlightingMethod());
         toolbar.setShowDiff(true);
+    }
+
+    public class MergeGroupsCommand extends SimpleCommand {
+        @Override
+        public void execute() {
+            if (!areGroupsMerged()) {
+                String leftEntryGroups = viewModel.getLeftEntry().getField(StandardField.GROUPS).orElse("");
+                String rightEntryGroups = viewModel.getRightEntry().getField(StandardField.GROUPS).orElse("");
+
+                if (!leftEntryGroups.equals(rightEntryGroups)) {
+                    String mergedGroups = mergeLeftAndRightEntryGroups(leftEntryGroups, rightEntryGroups);
+                    viewModel.getLeftEntry().setField(StandardField.GROUPS, mergedGroups);
+                    viewModel.getRightEntry().setField(StandardField.GROUPS, mergedGroups);
+
+                    mergedGroupsRecord = new MergedGroups(leftEntryGroups, rightEntryGroups, mergedGroups);
+                    updateFieldValues(viewModel.allFields().indexOf(StandardField.GROUPS));
+                }
+            }
+        }
+    }
+
+    public class UnmergeGroupsCommand extends SimpleCommand {
+
+        @Override
+        public void execute() {
+            if (areGroupsMerged()) {
+                viewModel.getLeftEntry().setField(StandardField.GROUPS, mergedGroupsRecord.leftEntryGroups());
+                viewModel.getRightEntry().setField(StandardField.GROUPS, mergedGroupsRecord.rightEntryGroups());
+                updateFieldValues(viewModel.allFields().indexOf(StandardField.GROUPS));
+                mergedGroupsRecord = null;
+            }
+        }
     }
 }
