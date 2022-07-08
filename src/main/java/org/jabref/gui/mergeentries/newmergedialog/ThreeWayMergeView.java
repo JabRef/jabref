@@ -8,6 +8,7 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.RowConstraints;
 import javafx.scene.layout.VBox;
 import javafx.stage.Screen;
 
@@ -112,6 +113,12 @@ public class ThreeWayMergeView extends VBox {
         for (int fieldIndex = 0; fieldIndex < viewModel.allFieldsSize(); fieldIndex++) {
             addFieldName(getFieldAtIndex(fieldIndex), fieldIndex);
             addFieldValues(fieldIndex);
+
+            if (getFieldAtIndex(fieldIndex).equals(StandardField.GROUPS)) {
+                mergeGridPane.getRowConstraints().add(fieldIndex, new RowConstraints(56, 56, 56));
+            } else {
+                mergeGridPane.getRowConstraints().add(new RowConstraints());
+            }
         }
     }
 
