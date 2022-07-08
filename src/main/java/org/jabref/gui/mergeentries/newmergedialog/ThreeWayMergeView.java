@@ -183,7 +183,7 @@ public class ThreeWayMergeView extends VBox {
         }
 
         ThreeFieldValues fieldRow = new ThreeFieldValues(leftEntryValue, rightEntryValue, fieldIndex);
-        fieldValuesList.add(fieldRow);
+        fieldValuesList.add(fieldIndex, fieldRow);
 
         fieldRow.mergedValueProperty().addListener((observable, old, mergedValue) -> {
             if (field.equals(InternalField.TYPE_HEADER)) {
