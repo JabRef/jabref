@@ -3,7 +3,6 @@ package org.jabref.gui.mergeentries.newmergedialog;
 import javafx.beans.property.ReadOnlyStringProperty;
 import javafx.scene.control.ToggleGroup;
 
-import org.jabref.gui.mergeentries.newmergedialog.cell.FieldNameCell;
 import org.jabref.gui.mergeentries.newmergedialog.cell.FieldValueCell;
 import org.jabref.gui.mergeentries.newmergedialog.cell.MergedFieldCell;
 import org.jabref.gui.mergeentries.newmergedialog.diffhighlighter.SplitDiffHighlighter;
@@ -13,6 +12,9 @@ import org.jabref.model.strings.StringUtil;
 
 import org.fxmisc.richtext.StyleClassedTextArea;
 
+/**
+ * A controller class to control left, right and merged field values
+ */
 public class ThreeFieldValues {
     private final FieldValueCell leftValueCell;
     private FieldValueCell rightValueCell;
