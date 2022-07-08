@@ -182,10 +182,10 @@ public class ThreeWayMergeView extends VBox {
             rightEntryValue = viewModel.getRightEntry().getField(field).orElse("");
         }
 
-        ThreeFieldValues fieldRow = new ThreeFieldValues(leftEntryValue, rightEntryValue, fieldIndex);
-        fieldValuesList.add(fieldIndex, fieldRow);
+        ThreeFieldValues fieldValues = new ThreeFieldValues(leftEntryValue, rightEntryValue, fieldIndex);
+        fieldValuesList.add(fieldIndex, fieldValues);
 
-        fieldRow.mergedValueProperty().addListener((observable, old, mergedValue) -> {
+        fieldValues.mergedValueProperty().addListener((observable, old, mergedValue) -> {
             if (field.equals(InternalField.TYPE_HEADER)) {
                 getMergedEntry().setType(EntryTypeFactory.parse(mergedValue));
             } else {
@@ -193,24 +193,25 @@ public class ThreeWayMergeView extends VBox {
             }
         });
         if (field.equals(InternalField.TYPE_HEADER)) {
-            getMergedEntry().setType(EntryTypeFactory.parse(fieldRow.getMergedValue()));
+            getMergedEntry().setType(EntryTypeFactory.parse(fieldValues.getMergedValue()));
         } else {
-            getMergedEntry().setField(field, fieldRow.getMergedValue());
+            getMergedEntry().setField(field, fieldValues.getMergedValue());
         }
 
-        if (fieldRow.hasEqualLeftAndRightValues()) {
-            mergeGridPane.add(fieldRow.getLeftValueCell(), 1, fieldIndex, 2, 1);
-            mergeGridPane.add(fieldRow.getMergedValueCell(), 3, fieldIndex);
+        if (fieldValues.hasEqualLeftAndRightValues()) {
+            mergeGridPane.add(fieldValues.getLeftValueCell(), 1, fieldIndex, 2, 1);
+            mergeGridPane.add(fieldValues.getMergedValueCell(), 3, fieldIndex);
         } else {
-            mergeGridPane.add(fieldRow.getLeftValueCell(), 1, fieldIndex);
-            mergeGridPane.add(fieldRow.getRightValueCell(), 2, fieldIndex);
-            mergeGridPane.add(fieldRow.getMergedValueCell(), 3, fieldIndex);
+            mergeGridPane.add(fieldValues.getLeftValueCell(), 1, fieldIndex);
+            mergeGridPane.add(fieldValues.getRightValueCell(), 2, fieldIndex);
+            mergeGridPane.add(fieldValues.getMergedValueCell(), 3, fieldIndex);
         }
     }
 
     private void updateFieldValues(int fieldIndex) {
         removeFieldValues(fieldIndex);
         addFieldValues(fieldIndex);
+        updateDiff();
     }
 
     private void removeFieldValues(int index) {
