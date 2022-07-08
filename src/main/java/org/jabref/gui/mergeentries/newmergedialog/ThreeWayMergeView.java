@@ -114,6 +114,7 @@ public class ThreeWayMergeView extends VBox {
             addFieldName(getFieldAtIndex(fieldIndex), fieldIndex);
             addFieldValues(fieldIndex);
 
+            // Removing this will cause a UI lag when updating field values
             if (getFieldAtIndex(fieldIndex).equals(StandardField.GROUPS)) {
                 mergeGridPane.getRowConstraints().add(fieldIndex, new RowConstraints(56, 56, 56));
             } else {
@@ -205,12 +206,12 @@ public class ThreeWayMergeView extends VBox {
         }
     }
 
-    public void updateFieldValues(int fieldIndex) {
+    private void updateFieldValues(int fieldIndex) {
         removeFieldValues(fieldIndex);
         addFieldValues(fieldIndex);
     }
 
-    public void removeFieldValues(int index) {
+    private void removeFieldValues(int index) {
         threeFieldValuesList.remove(index);
         mergeGridPane.getChildren().removeIf(node -> GridPane.getRowIndex(node) == index && GridPane.getColumnIndex(node) > FIELD_NAME_COLUMN);
     }
