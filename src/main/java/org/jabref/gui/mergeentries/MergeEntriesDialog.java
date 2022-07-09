@@ -33,6 +33,7 @@ public class MergeEntriesDialog extends BaseDialog<BibEntry> {
             if (buttonType.equals(replaceEntries)) {
                 return threeWayMergeView.getMergedEntry();
             } else {
+                threeWayMergeView.cancelGroupsMerge();
                 return null;
             }
         });
