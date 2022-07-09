@@ -41,7 +41,8 @@ public class FieldNameCell extends AbstractCell {
         HBox.setHgrow(labelBox, Priority.ALWAYS);
     }
 
-    protected void addAction(String actionName, IconTheme.JabRefIcons icon, Command command) {
+    protected void setAction(String actionName, IconTheme.JabRefIcons icon, Command command) {
+        actionLayout.getChildren().clear();
         Node iconNode = icon.getGraphicNode();
         Button actionButton = factory.createIconButton(() -> Localization.lang(actionName), command);
         actionButton.setGraphic(iconNode);
