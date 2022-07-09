@@ -6,6 +6,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javafx.beans.binding.Bindings;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
@@ -47,6 +50,9 @@ public class ThreeWayMergeView extends VBox {
     private final List<ThreeFieldValues> fieldValuesList = new ArrayList<>();
 
     private MergedGroups mergedGroupsRecord;
+
+    private final BooleanProperty areGroupsMerged = new SimpleBooleanProperty();
+
 
     public ThreeWayMergeView(BibEntry leftEntry, BibEntry rightEntry, String leftHeader, String rightHeader) {
         getStylesheets().add(ThreeWayMergeView.class.getResource("ThreeWayMergeView.css").toExternalForm());
@@ -132,8 +138,8 @@ public class ThreeWayMergeView extends VBox {
 
         if (field.equals(StandardField.GROUPS)) {
             GroupsFieldNameCell groupsField = (GroupsFieldNameCell) fieldNameCell;
-            groupsField.setMergeGroupsCommand(new MergeGroupsCommand());
-            groupsField.setUnmergeGroupsCommand(new UnmergeGroupsCommand());
+            groupsField.setMergeGroupsCommand(new MergeGroupsCommand(groupsField));
+            groupsField.setUnmergeGroupsCommand(new UnmergeGroupsCommand(groupsField));
         }
     }
 
@@ -229,34 +235,61 @@ public class ThreeWayMergeView extends VBox {
     }
 
     public class MergeGroupsCommand extends SimpleCommand {
-        @Override
-        public void execute() {
-            if (!areGroupsMerged()) {
+        private final GroupsFieldNameCell groupsFieldNameCell;
+
+        public MergeGroupsCommand(GroupsFieldNameCell groupsFieldCell) {
+            this.groupsFieldNameCell = groupsFieldCell;
+
+            this.executable.bind(Bindings.and(areGroupsMerged.not(), Bindings.createBooleanBinding(() -> {
                 String leftEntryGroups = viewModel.getLeftEntry().getField(StandardField.GROUPS).orElse("");
                 String rightEntryGroups = viewModel.getRightEntry().getField(StandardField.GROUPS).orElse("");
 
-                if (!leftEntryGroups.equals(rightEntryGroups)) {
-                    String mergedGroups = mergeLeftAndRightEntryGroups(leftEntryGroups, rightEntryGroups);
-                    viewModel.getLeftEntry().setField(StandardField.GROUPS, mergedGroups);
-                    viewModel.getRightEntry().setField(StandardField.GROUPS, mergedGroups);
+                return !leftEntryGroups.equals(rightEntryGroups);
+            })));
+        }
 
-                    mergedGroupsRecord = new MergedGroups(leftEntryGroups, rightEntryGroups, mergedGroups);
-                    updateFieldValues(viewModel.allFields().indexOf(StandardField.GROUPS));
-                }
-            }
+        @Override
+        public void execute() {
+                assert !areGroupsMerged();
+
+                String leftEntryGroups = viewModel.getLeftEntry().getField(StandardField.GROUPS).orElse("");
+                String rightEntryGroups = viewModel.getRightEntry().getField(StandardField.GROUPS).orElse("");
+
+                assert !leftEntryGroups.equals(rightEntryGroups);
+
+                String mergedGroups = mergeLeftAndRightEntryGroups(leftEntryGroups, rightEntryGroups);
+                viewModel.getLeftEntry().setField(StandardField.GROUPS, mergedGroups);
+                viewModel.getRightEntry().setField(StandardField.GROUPS, mergedGroups);
+
+                mergedGroupsRecord = new MergedGroups(leftEntryGroups, rightEntryGroups, mergedGroups);
+                updateFieldValues(viewModel.allFields().indexOf(StandardField.GROUPS));
+                groupsFieldNameCell.toggleMergeProperty().set(GroupsFieldNameCell.ToggleMerge.UNMERGE);
         }
     }
 
     public class UnmergeGroupsCommand extends SimpleCommand {
+        private final GroupsFieldNameCell groupsFieldCell;
+
+        public UnmergeGroupsCommand(GroupsFieldNameCell groupsFieldCell) {
+            this.groupsFieldCell = groupsFieldCell;
+        }
 
         @Override
         public void execute() {
-            if (areGroupsMerged()) {
+                assert areGroupsMerged();
                 viewModel.getLeftEntry().setField(StandardField.GROUPS, mergedGroupsRecord.leftEntryGroups());
                 viewModel.getRightEntry().setField(StandardField.GROUPS, mergedGroupsRecord.rightEntryGroups());
                 updateFieldValues(viewModel.allFields().indexOf(StandardField.GROUPS));
                 mergedGroupsRecord = null;
-            }
+                groupsFieldCell.toggleMergeProperty().set(GroupsFieldNameCell.ToggleMerge.MERGE);
         }
     }
+
+    /*
+     * Notes
+     * 1. Left and Right could have the same value
+     *
+     * Merge Button Clicked:
+     * 1.
+     * */
 }
