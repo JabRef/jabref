@@ -1,9 +1,8 @@
 package org.jabref.logic.pdf.search.indexing;
 
 import java.util.List;
-import java.util.Queue;
 import java.util.Set;
-import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.stream.Collectors;
 
 import org.jabref.gui.util.BackgroundTask;
@@ -18,7 +17,7 @@ import org.jabref.model.entry.LinkedFile;
  */
 public class IndexingTaskManager extends BackgroundTask<Void> {
 
-    private final Queue<Runnable> taskQueue = new ConcurrentLinkedQueue<>();
+    private final ConcurrentLinkedDeque<Runnable> taskQueue = new ConcurrentLinkedDeque<>();
     private TaskExecutor taskExecutor;
     private int numOfIndexedFiles = 0;
 
@@ -43,7 +42,7 @@ public class IndexingTaskManager extends BackgroundTask<Void> {
         }
         updateProgress();
         while (!taskQueue.isEmpty() && !isCanceled()) {
-            taskQueue.poll().run();
+            taskQueue.pollFirst().run();
             numOfIndexedFiles++;
             updateProgress();
         }
@@ -60,9 +59,13 @@ public class IndexingTaskManager extends BackgroundTask<Void> {
         });
     }
 
-    private void enqueueTask(Runnable indexingTask) {
+    private void enqueueTask(Runnable indexingTask, boolean skipToFront) {
         if (!isBlockingNewTasks) {
-            taskQueue.add(indexingTask);
+            if (skipToFront) {
+                taskQueue.addFirst(indexingTask);
+            } else {
+                taskQueue.addLast(indexingTask);
+            }
             // What if already running?
             synchronized (lock) {
                 if (!isRunning) {
@@ -86,17 +89,17 @@ public class IndexingTaskManager extends BackgroundTask<Void> {
     }
 
     public void createIndex(LuceneIndexer indexer) {
-        enqueueTask(() -> indexer.createIndex());
+        enqueueTask(() -> indexer.createIndex(), true);
     }
 
     public void manageFulltextIndexAccordingToPrefs(LuceneIndexer indexer) {
         indexer.getFilePreferences().fulltextIndexLinkedFilesProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue.booleanValue()) {
                 for (BibEntry bibEntry : indexer.getDatabaseContext().getEntries()) {
-                    enqueueTask(() -> indexer.updateIndex(bibEntry, List.of()));
+                    enqueueTask(() -> indexer.updateLinkedFilesInIndex(bibEntry, List.of()), false);
                 }
             } else {
-                enqueueTask(() -> indexer.deleteLinkedFilesIndex());
+                enqueueTask(() -> indexer.deleteLinkedFilesIndex(), true);
             }
         });
     }
@@ -105,30 +108,33 @@ public class IndexingTaskManager extends BackgroundTask<Void> {
         Set<String> pathsToRemove = indexer.getListOfFilePaths();
         Set<Integer> hashesOfEntriesToRemove = indexer.getDatabaseContext().getEntries().stream().map(BibEntry::updateAndGetIndexHash).collect(Collectors.toSet());
         for (BibEntry entry : indexer.getDatabaseContext().getEntries()) {
-            enqueueTask(() -> indexer.addToIndex(entry));
+            enqueueTask(() -> indexer.addBibFieldsToIndex(entry), true);
+            enqueueTask(() -> indexer.addLinkedFilesToIndex(entry), false);
             hashesOfEntriesToRemove.removeIf(hash -> Integer.valueOf(entry.getLastIndexHash()).equals(hash));
             for (LinkedFile file : entry.getFiles()) {
                 pathsToRemove.remove(file.getLink());
             }
         }
         for (String pathToRemove : pathsToRemove) {
-            enqueueTask(() -> indexer.removeFromIndex(pathToRemove));
+            enqueueTask(() -> indexer.removeFromIndex(pathToRemove), true);
         }
         for (int hashToRemove : hashesOfEntriesToRemove) {
-            enqueueTask(() -> indexer.removeFromIndex(hashToRemove));
+            enqueueTask(() -> indexer.removeFromIndex(hashToRemove), true);
         }
     }
 
     public void addToIndex(LuceneIndexer indexer, BibEntry entry) {
-        enqueueTask(() -> indexer.addToIndex(entry));
+        enqueueTask(() -> indexer.addBibFieldsToIndex(entry), true);
+        enqueueTask(() -> indexer.addLinkedFilesToIndex(entry), false);
     }
 
     public void removeFromIndex(LuceneIndexer indexer, BibEntry entry) {
-        enqueueTask(() -> indexer.removeFromIndex(entry));
+        enqueueTask(() -> indexer.removeFromIndex(entry), false);
     }
 
     public void updateIndex(LuceneIndexer indexer, BibEntry entry, List<LinkedFile> removedFiles) {
-        enqueueTask(() -> indexer.updateIndex(entry, removedFiles));
+        enqueueTask(() -> indexer.updateBibFieldsInIndex(entry), true);
+        enqueueTask(() -> indexer.updateLinkedFilesInIndex(entry, removedFiles), false);
     }
 
     public void updateDatabaseName(String name) {

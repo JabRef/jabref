@@ -86,8 +86,7 @@ public class LuceneIndexer {
      *
      * @param entry a bibtex entry to link the pdf files to
      */
-    public void addToIndex(BibEntry entry) {
-        writeBibFieldsToIndex(entry);
+    public void addLinkedFilesToIndex(BibEntry entry) {
         for (LinkedFile file : entry.getFiles()) {
             writeFileToIndex(entry, file);
         }
@@ -151,7 +150,7 @@ public class LuceneIndexer {
         }
     }
 
-    private void writeBibFieldsToIndex(BibEntry bibEntry) {
+    public void addBibFieldsToIndex(BibEntry bibEntry) {
         try {
             try (IndexWriter indexWriter = new IndexWriter(directoryToIndex,
                     new IndexWriterConfig(
@@ -224,20 +223,21 @@ public class LuceneIndexer {
         }
     }
 
-    public void updateIndex(BibEntry entry, List<LinkedFile> removedFiles) {
+    public void updateBibFieldsInIndex(BibEntry entry) {
         int oldHash = entry.getLastIndexHash();
         int newHash = entry.updateAndGetIndexHash();
         if (oldHash != newHash) {
-            addToIndex(entry);
+            addBibFieldsToIndex(entry);
             removeFromIndex(oldHash);
-            for (LinkedFile removedFile : removedFiles) {
-                removeFromIndex(removedFile.getLink());
-            }
-        } else {
-            // This only happens when fulltext-indexing was turned off and is now turned back on again
-            for (LinkedFile linkedFile : entry.getFiles()) {
-                writeFileToIndex(entry, linkedFile);
-            }
+        }
+    }
+
+    public void updateLinkedFilesInIndex(BibEntry entry, List<LinkedFile> removedFiles) {
+        for (LinkedFile removedFile : removedFiles) {
+            removeFromIndex(removedFile.getLink());
+        }
+        for (LinkedFile linkedFile : entry.getFiles()) {
+            writeFileToIndex(entry, linkedFile);
         }
     }
 
