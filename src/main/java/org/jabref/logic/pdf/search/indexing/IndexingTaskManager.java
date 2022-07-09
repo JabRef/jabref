@@ -1,8 +1,10 @@
 package org.jabref.logic.pdf.search.indexing;
 
+import java.util.List;
 import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.stream.Collectors;
 
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.DefaultTaskExecutor;
@@ -89,14 +91,19 @@ public class IndexingTaskManager extends BackgroundTask<Void> {
 
     public void updateIndex(LuceneIndexer indexer) {
         Set<String> pathsToRemove = indexer.getListOfFilePaths();
+        Set<Integer> hashesOfEntriesToRemove = indexer.getDatabaseContext().getEntries().stream().map(BibEntry::updateAndGetIndexHash).collect(Collectors.toSet());
         for (BibEntry entry : indexer.getDatabaseContext().getEntries()) {
             enqueueTask(() -> indexer.addToIndex(entry));
+            hashesOfEntriesToRemove.removeIf(hash -> Integer.valueOf(entry.getLastIndexHash()).equals(hash));
             for (LinkedFile file : entry.getFiles()) {
                 pathsToRemove.remove(file.getLink());
             }
         }
         for (String pathToRemove : pathsToRemove) {
             enqueueTask(() -> indexer.removeFromIndex(pathToRemove));
+        }
+        for (int hashToRemove : hashesOfEntriesToRemove) {
+            enqueueTask(() -> indexer.removeFromIndex(hashToRemove));
         }
     }
 
@@ -108,8 +115,8 @@ public class IndexingTaskManager extends BackgroundTask<Void> {
         enqueueTask(() -> indexer.removeFromIndex(entry));
     }
 
-    public void updateIndex(LuceneIndexer indexer, BibEntry entry) {
-        enqueueTask(() -> indexer.updateIndex(entry));
+    public void updateIndex(LuceneIndexer indexer, BibEntry entry, List<LinkedFile> removedFiles) {
+        enqueueTask(() -> indexer.updateIndex(entry, removedFiles));
     }
 
     public void updateDatabaseName(String name) {

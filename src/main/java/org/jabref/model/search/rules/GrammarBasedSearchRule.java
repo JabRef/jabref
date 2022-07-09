@@ -14,13 +14,13 @@ import java.util.stream.Collectors;
 
 import org.jabref.architecture.AllowedToUseLogic;
 import org.jabref.gui.Globals;
-import org.jabref.logic.pdf.search.retrieval.PdfSearcher;
+import org.jabref.logic.pdf.search.retrieval.LuceneSearcher;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.Keyword;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.InternalField;
-import org.jabref.model.pdf.search.PdfSearchResults;
+import org.jabref.model.pdf.search.LuceneSearchResults;
 import org.jabref.model.pdf.search.SearchResult;
 import org.jabref.model.search.rules.SearchRules.SearchFlags;
 import org.jabref.model.strings.StringUtil;
@@ -105,8 +105,8 @@ public class GrammarBasedSearchRule implements SearchRule {
             return;
         }
         try {
-            PdfSearcher searcher = PdfSearcher.of(databaseContext);
-            PdfSearchResults results = searcher.search(query, 5);
+            LuceneSearcher searcher = LuceneSearcher.of(databaseContext);
+            LuceneSearchResults results = searcher.search(query, 5);
             searchResults = results.getSortedByScore();
         } catch (IOException e) {
             LOGGER.error("Could not retrieve search results!", e);
@@ -119,13 +119,13 @@ public class GrammarBasedSearchRule implements SearchRule {
             return new BibtexSearchVisitor(searchFlags, bibEntry).visit(tree);
         } catch (Exception e) {
             LOGGER.debug("Search failed", e);
-            return getFulltextResults(query, bibEntry).numSearchResults() > 0;
+            return getLuceneResults(query, bibEntry).numSearchResults() > 0;
         }
     }
 
     @Override
-    public PdfSearchResults getFulltextResults(String query, BibEntry bibEntry) {
-        return new PdfSearchResults(searchResults.stream().filter(searchResult -> searchResult.isResultFor(bibEntry)).collect(Collectors.toList()));
+    public LuceneSearchResults getLuceneResults(String query, BibEntry bibEntry) {
+        return new LuceneSearchResults(searchResults.stream().filter(searchResult -> searchResult.getSearchScoreFor(bibEntry) > 0).collect(Collectors.toList()));
     }
 
     @Override

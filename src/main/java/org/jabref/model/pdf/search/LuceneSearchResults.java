@@ -5,15 +5,15 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
-public final class PdfSearchResults {
+public final class LuceneSearchResults {
 
     private final List<SearchResult> searchResults;
 
-    public PdfSearchResults(List<SearchResult> search) {
+    public LuceneSearchResults(List<SearchResult> search) {
         this.searchResults = Collections.unmodifiableList(search);
     }
 
-    public PdfSearchResults() {
+    public LuceneSearchResults() {
         this.searchResults = Collections.emptyList();
     }
 

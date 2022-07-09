@@ -8,7 +8,8 @@ import java.util.Objects;
 import org.jabref.gui.LibraryTab;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.pdf.search.EnglishStemAnalyzer;
-import org.jabref.model.pdf.search.PdfSearchResults;
+import org.jabref.model.pdf.search.LuceneSearchResults;
+import org.jabref.model.pdf.search.SearchFieldConstants;
 import org.jabref.model.pdf.search.SearchResult;
 import org.jabref.model.strings.StringUtil;
 
@@ -25,20 +26,18 @@ import org.apache.lucene.store.NIOFSDirectory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.jabref.model.pdf.search.SearchFieldConstants.PDF_FIELDS;
-
-public final class PdfSearcher {
+public final class LuceneSearcher {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LibraryTab.class);
 
     private final Directory indexDirectory;
 
-    private PdfSearcher(Directory indexDirectory) {
+    private LuceneSearcher(Directory indexDirectory) {
         this.indexDirectory = indexDirectory;
     }
 
-    public static PdfSearcher of(BibDatabaseContext databaseContext) throws IOException {
-        return new PdfSearcher(new NIOFSDirectory(databaseContext.getFulltextIndexPath()));
+    public static LuceneSearcher of(BibDatabaseContext databaseContext) throws IOException {
+        return new LuceneSearcher(new NIOFSDirectory(databaseContext.getFulltextIndexPath()));
     }
 
     /**
@@ -48,10 +47,10 @@ public final class PdfSearcher {
      * @param maxHits      number of maximum search results, must be positive
      * @return a result set of all documents that have matches in any fields
      */
-    public PdfSearchResults search(final String searchString, final int maxHits)
+    public LuceneSearchResults search(final String searchString, final int maxHits)
         throws IOException {
         if (StringUtil.isBlank(Objects.requireNonNull(searchString, "The search string was null!"))) {
-            return new PdfSearchResults();
+            return new LuceneSearchResults();
         }
         if (maxHits <= 0) {
             throw new IllegalArgumentException("Must be called with at least 1 maxHits, was" + maxHits);
@@ -61,20 +60,22 @@ public final class PdfSearcher {
 
         if (!DirectoryReader.indexExists(indexDirectory)) {
             LOGGER.debug("Index directory {} does not yet exist", indexDirectory);
-            return new PdfSearchResults();
+            return new LuceneSearchResults();
         }
 
         try (IndexReader reader = DirectoryReader.open(indexDirectory)) {
             IndexSearcher searcher = new IndexSearcher(reader);
-            Query query = new MultiFieldQueryParser(PDF_FIELDS, new EnglishStemAnalyzer()).parse(searchString);
+            String[] searchable_fields = new String[SearchFieldConstants.all_searchable_fields.size()];
+            SearchFieldConstants.all_searchable_fields.toArray(searchable_fields);
+            Query query = new MultiFieldQueryParser(searchable_fields, new EnglishStemAnalyzer()).parse(searchString);
             TopDocs results = searcher.search(query, maxHits);
             for (ScoreDoc scoreDoc : results.scoreDocs) {
                 resultDocs.add(new SearchResult(searcher, query, scoreDoc));
             }
-            return new PdfSearchResults(resultDocs);
+            return new LuceneSearchResults(resultDocs);
         } catch (ParseException e) {
             LOGGER.warn("Could not parse query: '{}'!\n{}", searchString, e.getMessage());
-            return new PdfSearchResults();
+            return new LuceneSearchResults();
         }
     }
 }

@@ -230,8 +230,9 @@ public class BibDatabaseContext {
         Path appData = getFulltextIndexBasePath();
 
         if (getDatabasePath().isPresent()) {
-            LOGGER.info("Index path for {} is {}", getDatabasePath().get(), appData);
-            return appData.resolve(String.valueOf(this.getDatabasePath().get().hashCode()));
+            Path databasePath = appData.resolve(String.valueOf(this.getDatabasePath().get().hashCode()));
+            LOGGER.info("Index path for {} is {}", getDatabasePath().get(), databasePath);
+            return databasePath;
         }
 
         return appData.resolve("unsaved");

@@ -11,7 +11,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.types.StandardEntryType;
-import org.jabref.model.pdf.search.PdfSearchResults;
+import org.jabref.model.pdf.search.LuceneSearchResults;
 import org.jabref.preferences.FilePreferences;
 
 import org.apache.lucene.queryparser.classic.ParseException;
@@ -25,9 +25,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class PdfSearcherTest {
+public class LuceneSearcherTest {
 
-    private PdfSearcher search;
+    private LuceneSearcher search;
 
     @BeforeEach
     public void setUp(@TempDir Path indexDir) throws IOException {
@@ -54,7 +54,7 @@ public class PdfSearcherTest {
         database.insertEntry(exampleThesis);
 
         LuceneIndexer indexer = LuceneIndexer.of(context, filePreferences);
-        search = PdfSearcher.of(context);
+        search = LuceneSearcher.of(context);
 
         indexer.createIndex();
         for (BibEntry bibEntry : context.getEntries()) {
@@ -64,37 +64,37 @@ public class PdfSearcherTest {
 
     @Test
     public void searchForTest() throws IOException, ParseException {
-        PdfSearchResults result = search.search("test", 10);
+        LuceneSearchResults result = search.search("test", 10);
         assertEquals(8, result.numSearchResults());
     }
 
     @Test
     public void searchForUniversity() throws IOException, ParseException {
-        PdfSearchResults result = search.search("University", 10);
+        LuceneSearchResults result = search.search("University", 10);
         assertEquals(1, result.numSearchResults());
     }
 
     @Test
     public void searchForStopWord() throws IOException, ParseException {
-        PdfSearchResults result = search.search("and", 10);
+        LuceneSearchResults result = search.search("and", 10);
         assertEquals(0, result.numSearchResults());
     }
 
     @Test
     public void searchForSecond() throws IOException, ParseException {
-        PdfSearchResults result = search.search("second", 10);
+        LuceneSearchResults result = search.search("second", 10);
         assertEquals(4, result.numSearchResults());
     }
 
     @Test
     public void searchForAnnotation() throws IOException, ParseException {
-        PdfSearchResults result = search.search("annotation", 10);
+        LuceneSearchResults result = search.search("annotation", 10);
         assertEquals(2, result.numSearchResults());
     }
 
     @Test
     public void searchForEmptyString() throws IOException {
-        PdfSearchResults result = search.search("", 10);
+        LuceneSearchResults result = search.search("", 10);
         assertEquals(0, result.numSearchResults());
     }
 

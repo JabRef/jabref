@@ -44,6 +44,7 @@ import org.jabref.logic.autosaveandbackup.AutosaveManager;
 import org.jabref.logic.autosaveandbackup.BackupManager;
 import org.jabref.logic.citationstyle.CitationStyleCache;
 import org.jabref.logic.importer.ParserResult;
+import org.jabref.logic.importer.util.FileFieldParser;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.pdf.FileAnnotationCache;
 import org.jabref.logic.pdf.search.indexing.IndexingTaskManager;
@@ -59,11 +60,13 @@ import org.jabref.model.database.event.BibDatabaseContextChangedEvent;
 import org.jabref.model.database.event.EntriesAddedEvent;
 import org.jabref.model.database.event.EntriesRemovedEvent;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.event.EntriesEventSource;
 import org.jabref.model.entry.event.EntryChangedEvent;
 import org.jabref.model.entry.event.FieldChangedEvent;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.preferences.PreferencesService;
 
 import com.google.common.eventbus.Subscribe;
@@ -894,7 +897,13 @@ public class LibraryTab extends Tab {
             if (preferencesService.getFilePreferences().shouldFulltextIndexLinkedFiles()) {
                 for (BibEntry bibEntry : fieldChangedEvent.getBibEntries()) {
                     try {
-                        indexingTaskManager.updateIndex(LuceneIndexer.of(bibDatabaseContext, preferencesService.getFilePreferences()), bibEntry);
+                        List<LinkedFile> removedFiles = new ArrayList<>();
+                        if (fieldChangedEvent.getField().equals(StandardField.FILE)) {
+                            List<LinkedFile> oldFileList = FileFieldParser.parse(fieldChangedEvent.getOldValue());
+                            List<LinkedFile> newFileList = FileFieldParser.parse(fieldChangedEvent.getNewValue());
+                            removedFiles.remove(newFileList);
+                        }
+                        indexingTaskManager.updateIndex(LuceneIndexer.of(bibDatabaseContext, preferencesService.getFilePreferences()), bibEntry, removedFiles);
                     } catch (IOException e) {
                         LOGGER.warn("I/O error when writing lucene index", e);
                     }

@@ -8,10 +8,10 @@ import java.util.stream.Collectors;
 
 import org.jabref.architecture.AllowedToUseLogic;
 import org.jabref.gui.Globals;
-import org.jabref.logic.pdf.search.retrieval.PdfSearcher;
+import org.jabref.logic.pdf.search.retrieval.LuceneSearcher;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.pdf.search.PdfSearchResults;
+import org.jabref.model.pdf.search.LuceneSearchResults;
 import org.jabref.model.pdf.search.SearchResult;
 
 import org.slf4j.Logger;
@@ -39,7 +39,7 @@ public abstract class FullTextSearchRule implements SearchRule {
         this.lastQuery = "";
         lastSearchResults = Collections.emptyList();
 
-        databaseContext = Globals.stateManager.getActiveDatabase().orElse(null);
+         databaseContext = Globals.stateManager.getActiveDatabase().orElse(null);
     }
 
     public EnumSet<SearchRules.SearchFlags> getSearchFlags() {
@@ -47,25 +47,25 @@ public abstract class FullTextSearchRule implements SearchRule {
     }
 
     @Override
-    public PdfSearchResults getFulltextResults(String query, BibEntry bibEntry) {
+    public LuceneSearchResults getLuceneResults(String query, BibEntry bibEntry) {
         if (!searchFlags.contains(SearchRules.SearchFlags.FULLTEXT) || databaseContext == null) {
-            return new PdfSearchResults();
+            return new LuceneSearchResults();
         }
 
         if (!query.equals(this.lastQuery)) {
             this.lastQuery = query;
             lastSearchResults = Collections.emptyList();
             try {
-                PdfSearcher searcher = PdfSearcher.of(databaseContext);
-                PdfSearchResults results = searcher.search(query, 5);
+                LuceneSearcher searcher = LuceneSearcher.of(databaseContext);
+                LuceneSearchResults results = searcher.search(query, 5);
                 lastSearchResults = results.getSortedByScore();
             } catch (IOException e) {
                 LOGGER.error("Could not retrieve search results!", e);
             }
         }
 
-        return new PdfSearchResults(lastSearchResults.stream()
-                                                     .filter(searchResult -> searchResult.isResultFor(bibEntry))
-                                                     .collect(Collectors.toList()));
+        return new LuceneSearchResults(lastSearchResults.stream()
+                                                        .filter(searchResult -> searchResult.getSearchScoreFor(bibEntry) > 0)
+                                                        .collect(Collectors.toList()));
     }
 }

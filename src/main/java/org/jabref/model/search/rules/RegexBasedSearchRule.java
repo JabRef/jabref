@@ -57,6 +57,6 @@ public class RegexBasedSearchRule extends FullTextSearchRule {
                 }
             }
         }
-        return getFulltextResults(query, bibEntry).numSearchResults() > 0;
+        return getLuceneResults(query, bibEntry).numSearchResults() > 0;
     }
 }
