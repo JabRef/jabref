@@ -224,12 +224,6 @@ public class LuceneIndexer {
         }
     }
 
-    public void updateIndex() {
-        for (BibEntry bibEntry : databaseContext.getEntries()) {
-            updateIndex(bibEntry, List.of());
-        }
-    }
-
     public void updateIndex(BibEntry entry, List<LinkedFile> removedFiles) {
         int oldHash = entry.getLastIndexHash();
         int newHash = entry.updateAndGetIndexHash();

@@ -92,7 +92,9 @@ public class IndexingTaskManager extends BackgroundTask<Void> {
     public void manageFulltextIndexAccordingToPrefs(LuceneIndexer indexer) {
         indexer.getFilePreferences().fulltextIndexLinkedFilesProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue.booleanValue()) {
-                enqueueTask(() -> indexer.updateIndex());
+                for (BibEntry bibEntry : indexer.getDatabaseContext().getEntries()) {
+                    enqueueTask(() -> indexer.updateIndex(bibEntry, List.of()));
+                }
             } else {
                 enqueueTask(() -> indexer.deleteLinkedFilesIndex());
             }
