@@ -5,9 +5,8 @@ public class GroupsFieldNameCell extends FieldNameCell {
     private Runnable onUnmergeGroups;
     private boolean isMerged = false;
 
-    public GroupsFieldNameCell(String text, int rowIndex, boolean groupsMerged) {
+    public GroupsFieldNameCell(String text, int rowIndex) {
         super(text, rowIndex);
-        isMerged = groupsMerged;
         setOnMouseClicked(e -> {
             if (isMerged) {
                 if (onUnmergeGroups != null) {

@@ -4,19 +4,16 @@ import javafx.beans.property.ReadOnlyStringProperty;
 import javafx.scene.control.ToggleGroup;
 
 import org.jabref.gui.mergeentries.newmergedialog.cell.FieldNameCell;
-import org.jabref.gui.mergeentries.newmergedialog.cell.FieldNameCellFactory;
 import org.jabref.gui.mergeentries.newmergedialog.cell.FieldValueCell;
 import org.jabref.gui.mergeentries.newmergedialog.cell.MergedFieldCell;
 import org.jabref.gui.mergeentries.newmergedialog.diffhighlighter.SplitDiffHighlighter;
 import org.jabref.gui.mergeentries.newmergedialog.diffhighlighter.UnifiedDiffHighlighter;
 import org.jabref.gui.mergeentries.newmergedialog.toolbar.ThreeWayMergeToolbar;
-import org.jabref.model.entry.field.Field;
 import org.jabref.model.strings.StringUtil;
 
 import org.fxmisc.richtext.StyleClassedTextArea;
 
 public class ThreeFieldValues {
-    private final FieldNameCell fieldNameCell;
     private final FieldValueCell leftValueCell;
     private FieldValueCell rightValueCell;
     private final MergedFieldCell mergedValueCell;
@@ -25,19 +22,15 @@ public class ThreeFieldValues {
 
     private final String rightValue;
 
-    private final String fieldName;
-
     private final ToggleGroup toggleGroup = new ToggleGroup();
 
-    public ThreeFieldValues(Field field, String leftValue, String rightValue, int rowIndex, boolean groupsMerged) {
-        fieldNameCell = FieldNameCellFactory.create(field, rowIndex, groupsMerged);
+    public ThreeFieldValues(String leftValue, String rightValue, int rowIndex) {
         leftValueCell = new FieldValueCell(leftValue, rowIndex);
         rightValueCell = new FieldValueCell(rightValue, rowIndex);
         mergedValueCell = new MergedFieldCell(StringUtil.isNullOrEmpty(leftValue) ? rightValue : leftValue, rowIndex);
 
         this.leftValue = leftValue;
         this.rightValue = rightValue;
-        this.fieldName = field.getDisplayName();
 
         toggleGroup.getToggles().addAll(leftValueCell, rightValueCell);
         toggleGroup.selectToggle(StringUtil.isNullOrEmpty(leftValue) ? rightValueCell : leftValueCell);
@@ -84,10 +77,6 @@ public class ThreeFieldValues {
 
     public ReadOnlyStringProperty mergedValueProperty() {
         return mergedValueCell.textProperty();
-    }
-
-    public FieldNameCell getFieldNameCell() {
-        return fieldNameCell;
     }
 
     public FieldValueCell getLeftValueCell() {
