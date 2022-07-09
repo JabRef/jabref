@@ -39,7 +39,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Indexes the text of PDF files and adds it into the lucene search index.
  */
-public class PdfIndexer {
+public class LuceneIndexer {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LibraryTab.class);
 
@@ -48,13 +48,18 @@ public class PdfIndexer {
 
     private final FilePreferences filePreferences;
 
-    public PdfIndexer(Directory indexDirectory, FilePreferences filePreferences) {
-        this.directoryToIndex = indexDirectory;
+    public LuceneIndexer(BibDatabaseContext databaseContext, FilePreferences filePreferences) throws IOException {
+        this.databaseContext = databaseContext;
+        this.directoryToIndex = new NIOFSDirectory(databaseContext.getFulltextIndexPath());
         this.filePreferences = filePreferences;
     }
 
-    public static PdfIndexer of(BibDatabaseContext databaseContext, FilePreferences filePreferences) throws IOException {
-        return new PdfIndexer(new NIOFSDirectory(databaseContext.getFulltextIndexPath()), filePreferences);
+    public static LuceneIndexer of(BibDatabaseContext databaseContext, FilePreferences filePreferences) throws IOException {
+        return new LuceneIndexer(databaseContext, filePreferences);
+    }
+
+    public BibDatabaseContext getDatabaseContext() {
+        return databaseContext;
     }
 
     /**
@@ -70,45 +75,14 @@ public class PdfIndexer {
         }
     }
 
-    public void addToIndex(BibDatabaseContext databaseContext) {
-        for (BibEntry entry : databaseContext.getEntries()) {
-            addToIndex(entry, databaseContext);
-        }
-    }
-
     /**
      * Adds all the pdf files linked to one entry in the database to an existing (or new) Lucene search index
      *
      * @param entry a bibtex entry to link the pdf files to
-     * @param databaseContext the associated BibDatabaseContext
      */
-    public void addToIndex(BibEntry entry, BibDatabaseContext databaseContext) {
-        addToIndex(entry, entry.getFiles(), databaseContext);
-    }
-
-    /**
-     * Adds a list of pdf files linked to one entry in the database to an existing (or new) Lucene search index
-     *
-     * @param entry a bibtex entry to link the pdf files to
-     * @param databaseContext the associated BibDatabaseContext
-     */
-    public void addToIndex(BibEntry entry, List<LinkedFile> linkedFiles, BibDatabaseContext databaseContext) {
-        for (LinkedFile linkedFile : linkedFiles) {
-            addToIndex(entry, linkedFile, databaseContext);
-        }
-    }
-
-    /**
-     * Adds a pdf file linked to one entry in the database to an existing (or new) Lucene search index
-     *
-     * @param entry a bibtex entry
-     * @param linkedFile the link to the pdf files
-     */
-    public void addToIndex(BibEntry entry, LinkedFile linkedFile, BibDatabaseContext databaseContext) {
-        if (databaseContext != null) {
-            this.databaseContext = databaseContext;
-        }
-        if (!entry.getFiles().isEmpty()) {
+    public void addToIndex(BibEntry entry) {
+        // write bib fields
+        for (LinkedFile linkedFile : entry.getFiles()) {
             writeToIndex(entry, linkedFile);
         }
     }
@@ -131,21 +105,12 @@ public class PdfIndexer {
     }
 
     /**
-     * Removes  all files linked to a bib-entry from the index
-     *
-     * @param entry the entry documents are linked to
-     */
-    public void removeFromIndex(BibEntry entry) {
-        removeFromIndex(entry, entry.getFiles());
-    }
-
-    /**
      * Removes a list of files linked to a bib-entry from the index
      *
      * @param entry the entry documents are linked to
      */
-    public void removeFromIndex(BibEntry entry, List<LinkedFile> linkedFiles) {
-        for (LinkedFile linkedFile : linkedFiles) {
+    public void removeFromIndex(BibEntry entry) {
+        for (LinkedFile linkedFile : entry.getFiles()) {
             removeFromIndex(linkedFile.getLink());
         }
     }
@@ -160,18 +125,6 @@ public class PdfIndexer {
             // Do nothing. Index is deleted.
         } catch (IOException e) {
             LOGGER.warn("The IndexWriter could not be initialized", e);
-        }
-    }
-
-    /**
-     * Writes all files linked to an entry to the index if the files are not yet in the index or the files on the fs are
-     * newer than the one in the index.
-     *
-     * @param entry the entry associated with the file
-     */
-    private void writeToIndex(BibEntry entry) {
-        for (LinkedFile linkedFile : entry.getFiles()) {
-            writeToIndex(entry, linkedFile);
         }
     }
 
@@ -224,6 +177,11 @@ public class PdfIndexer {
         } catch (IOException e) {
             LOGGER.warn("Could not add the document {} to the index!", linkedFile.getLink(), e);
         }
+    }
+
+    public void updateIndex(BibEntry entry) {
+        // For fields: if hash matches, do nothing. If not, re-index
+        // For files: check for missing files to index and indexed files to delete
     }
 
     /**

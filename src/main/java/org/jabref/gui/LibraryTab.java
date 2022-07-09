@@ -44,11 +44,10 @@ import org.jabref.logic.autosaveandbackup.AutosaveManager;
 import org.jabref.logic.autosaveandbackup.BackupManager;
 import org.jabref.logic.citationstyle.CitationStyleCache;
 import org.jabref.logic.importer.ParserResult;
-import org.jabref.logic.importer.util.FileFieldParser;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.pdf.FileAnnotationCache;
 import org.jabref.logic.pdf.search.indexing.IndexingTaskManager;
-import org.jabref.logic.pdf.search.indexing.PdfIndexer;
+import org.jabref.logic.pdf.search.indexing.LuceneIndexer;
 import org.jabref.logic.search.SearchQuery;
 import org.jabref.logic.shared.DatabaseLocation;
 import org.jabref.logic.util.UpdateField;
@@ -60,13 +59,11 @@ import org.jabref.model.database.event.BibDatabaseContextChangedEvent;
 import org.jabref.model.database.event.EntriesAddedEvent;
 import org.jabref.model.database.event.EntriesRemovedEvent;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.event.EntriesEventSource;
 import org.jabref.model.entry.event.EntryChangedEvent;
 import org.jabref.model.entry.event.FieldChangedEvent;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
-import org.jabref.model.entry.field.StandardField;
 import org.jabref.preferences.PreferencesService;
 
 import com.google.common.eventbus.Subscribe;
@@ -857,7 +854,7 @@ public class LibraryTab extends Tab {
         public IndexUpdateListener() {
             if (preferencesService.getFilePreferences().shouldFulltextIndexLinkedFiles()) {
                 try {
-                    indexingTaskManager.updateIndex(PdfIndexer.of(bibDatabaseContext, preferencesService.getFilePreferences()), bibDatabaseContext);
+                    indexingTaskManager.updateIndex(LuceneIndexer.of(bibDatabaseContext, preferencesService.getFilePreferences()));
                 } catch (IOException e) {
                     LOGGER.error("Cannot access lucene index", e);
                 }
@@ -868,9 +865,9 @@ public class LibraryTab extends Tab {
         public void listen(EntriesAddedEvent addedEntryEvent) {
             if (preferencesService.getFilePreferences().shouldFulltextIndexLinkedFiles()) {
                 try {
-                    PdfIndexer pdfIndexer = PdfIndexer.of(bibDatabaseContext, preferencesService.getFilePreferences());
+                    LuceneIndexer luceneIndexer = LuceneIndexer.of(bibDatabaseContext, preferencesService.getFilePreferences());
                     for (BibEntry addedEntry : addedEntryEvent.getBibEntries()) {
-                        indexingTaskManager.addToIndex(pdfIndexer, addedEntry, bibDatabaseContext);
+                        indexingTaskManager.addToIndex(luceneIndexer, addedEntry);
                     }
                 } catch (IOException e) {
                     LOGGER.error("Cannot access lucene index", e);
@@ -882,9 +879,9 @@ public class LibraryTab extends Tab {
         public void listen(EntriesRemovedEvent removedEntriesEvent) {
             if (preferencesService.getFilePreferences().shouldFulltextIndexLinkedFiles()) {
                 try {
-                    PdfIndexer pdfIndexer = PdfIndexer.of(bibDatabaseContext, preferencesService.getFilePreferences());
+                    LuceneIndexer luceneIndexer = LuceneIndexer.of(bibDatabaseContext, preferencesService.getFilePreferences());
                     for (BibEntry removedEntry : removedEntriesEvent.getBibEntries()) {
-                        indexingTaskManager.removeFromIndex(pdfIndexer, removedEntry);
+                        indexingTaskManager.removeFromIndex(luceneIndexer, removedEntry);
                     }
                 } catch (IOException e) {
                     LOGGER.error("Cannot access lucene index", e);
@@ -895,18 +892,9 @@ public class LibraryTab extends Tab {
         @Subscribe
         public void listen(FieldChangedEvent fieldChangedEvent) {
             if (preferencesService.getFilePreferences().shouldFulltextIndexLinkedFiles()) {
-                if (fieldChangedEvent.getField().equals(StandardField.FILE)) {
-                    List<LinkedFile> oldFileList = FileFieldParser.parse(fieldChangedEvent.getOldValue());
-                    List<LinkedFile> newFileList = FileFieldParser.parse(fieldChangedEvent.getNewValue());
-
-                    List<LinkedFile> addedFiles = new ArrayList<>(newFileList);
-                    addedFiles.remove(oldFileList);
-                    List<LinkedFile> removedFiles = new ArrayList<>(oldFileList);
-                    removedFiles.remove(newFileList);
-
+                for (BibEntry bibEntry : fieldChangedEvent.getBibEntries()) {
                     try {
-                        indexingTaskManager.addToIndex(PdfIndexer.of(bibDatabaseContext, preferencesService.getFilePreferences()), fieldChangedEvent.getBibEntry(), addedFiles, bibDatabaseContext);
-                        indexingTaskManager.removeFromIndex(PdfIndexer.of(bibDatabaseContext, preferencesService.getFilePreferences()), fieldChangedEvent.getBibEntry(), removedFiles);
+                        indexingTaskManager.updateIndex(LuceneIndexer.of(bibDatabaseContext, preferencesService.getFilePreferences()), bibEntry);
                     } catch (IOException e) {
                         LOGGER.warn("I/O error when writing lucene index", e);
                     }

@@ -9,7 +9,7 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.pdf.search.indexing.PdfIndexer;
+import org.jabref.logic.pdf.search.indexing.LuceneIndexer;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.preferences.FilePreferences;
 
@@ -68,8 +68,8 @@ public class RebuildFulltextSearchIndexAction extends SimpleCommand {
             return;
         }
         try {
-            currentLibraryTab.get().getIndexingTaskManager().createIndex(PdfIndexer.of(databaseContext, filePreferences));
-            currentLibraryTab.get().getIndexingTaskManager().updateIndex(PdfIndexer.of(databaseContext, filePreferences), databaseContext);
+            currentLibraryTab.get().getIndexingTaskManager().createIndex(LuceneIndexer.of(databaseContext, filePreferences));
+            currentLibraryTab.get().getIndexingTaskManager().updateIndex(LuceneIndexer.of(databaseContext, filePreferences));
         } catch (IOException e) {
             dialogService.notify(Localization.lang("Failed to access fulltext search index"));
             LOGGER.error("Failed to access fulltext search index", e);

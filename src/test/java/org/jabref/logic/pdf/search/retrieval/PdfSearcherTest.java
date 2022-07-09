@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Collections;
 
-import org.jabref.logic.pdf.search.indexing.PdfIndexer;
+import org.jabref.logic.pdf.search.indexing.LuceneIndexer;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
@@ -53,11 +53,13 @@ public class PdfSearcherTest {
         exampleThesis.setCitationKey("ExampleThesis");
         database.insertEntry(exampleThesis);
 
-        PdfIndexer indexer = PdfIndexer.of(context, filePreferences);
+        LuceneIndexer indexer = LuceneIndexer.of(context, filePreferences);
         search = PdfSearcher.of(context);
 
         indexer.createIndex();
-        indexer.addToIndex(context);
+        for (BibEntry bibEntry : context.getEntries()) {
+            indexer.addToIndex(bibEntry);
+        }
     }
 
     @Test

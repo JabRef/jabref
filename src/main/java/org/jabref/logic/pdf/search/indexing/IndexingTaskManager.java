@@ -9,12 +9,11 @@ import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 
 /**
- * Wrapper around {@link PdfIndexer} to execute all operations in the background.
+ * Wrapper around {@link LuceneIndexer} to execute all operations in the background.
  */
 public class IndexingTaskManager extends BackgroundTask<Void> {
 
@@ -55,7 +54,7 @@ public class IndexingTaskManager extends BackgroundTask<Void> {
 
     private void updateProgress() {
         DefaultTaskExecutor.runInJavaFXThread(() -> {
-            updateMessage(Localization.lang("%0 of %1 linked files added to the index", numOfIndexedFiles, numOfIndexedFiles + taskQueue.size()));
+            updateMessage(Localization.lang("%0 of %1 entries added to the index", numOfIndexedFiles, numOfIndexedFiles + taskQueue.size()));
             updateProgress(numOfIndexedFiles, numOfIndexedFiles + taskQueue.size());
         });
     }
@@ -85,15 +84,15 @@ public class IndexingTaskManager extends BackgroundTask<Void> {
         };
     }
 
-    public void createIndex(PdfIndexer indexer) {
+    public void createIndex(LuceneIndexer indexer) {
         enqueueTask(() -> indexer.createIndex());
     }
 
-    public void updateIndex(PdfIndexer indexer, BibDatabaseContext databaseContext) {
+    public void updateIndex(LuceneIndexer indexer) {
         Set<String> pathsToRemove = indexer.getListOfFilePaths();
-        for (BibEntry entry : databaseContext.getEntries()) {
+        for (BibEntry entry : indexer.getDatabaseContext().getEntries()) {
+            enqueueTask(() -> indexer.addToIndex(entry));
             for (LinkedFile file : entry.getFiles()) {
-                enqueueTask(() -> indexer.addToIndex(entry, file, databaseContext));
                 pathsToRemove.remove(file.getLink());
             }
         }
@@ -102,24 +101,22 @@ public class IndexingTaskManager extends BackgroundTask<Void> {
         }
     }
 
-    public void addToIndex(PdfIndexer indexer, BibEntry entry, BibDatabaseContext databaseContext) {
-        enqueueTask(() -> addToIndex(indexer, entry, entry.getFiles(), databaseContext));
+    public void addToIndex(LuceneIndexer indexer, BibEntry entry) {
+        enqueueTask(() -> addToIndex(indexer, entry));
     }
 
-    public void addToIndex(PdfIndexer indexer, BibEntry entry, List<LinkedFile> linkedFiles, BibDatabaseContext databaseContext) {
-        for (LinkedFile file : linkedFiles) {
-            enqueueTask(() -> indexer.addToIndex(entry, file, databaseContext));
-        }
-    }
-
-    public void removeFromIndex(PdfIndexer indexer, BibEntry entry, List<LinkedFile> linkedFiles) {
+    public void removeFromIndex(LuceneIndexer indexer, List<LinkedFile> linkedFiles) {
         for (LinkedFile file : linkedFiles) {
             enqueueTask(() -> indexer.removeFromIndex(file.getLink()));
         }
     }
 
-    public void removeFromIndex(PdfIndexer indexer, BibEntry entry) {
-        enqueueTask(() -> removeFromIndex(indexer, entry, entry.getFiles()));
+    public void removeFromIndex(LuceneIndexer indexer, BibEntry entry) {
+        enqueueTask(() -> removeFromIndex(indexer, entry));
+    }
+
+    public void updateIndex(LuceneIndexer indexer, BibEntry entry) {
+        enqueueTask(() -> updateIndex(indexer, entry));
     }
 
     public void updateDatabaseName(String name) {

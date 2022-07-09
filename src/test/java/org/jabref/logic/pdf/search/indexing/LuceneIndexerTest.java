@@ -25,9 +25,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class PdfIndexerTest {
+public class LuceneIndexerTest {
 
-    private PdfIndexer indexer;
+    private LuceneIndexer indexer;
     private BibDatabase database;
     private BibDatabaseContext context = mock(BibDatabaseContext.class);
 
@@ -42,7 +42,7 @@ public class PdfIndexerTest {
         when(context.getFulltextIndexPath()).thenReturn(indexDir);
         when(context.getDatabase()).thenReturn(database);
         when(context.getEntries()).thenReturn(database.getEntries());
-        this.indexer = PdfIndexer.of(context, filePreferences);
+        this.indexer = LuceneIndexer.of(context, filePreferences);
     }
 
     @Test
@@ -54,7 +54,9 @@ public class PdfIndexerTest {
 
         // when
         indexer.createIndex();
-        indexer.addToIndex(context);
+        for (BibEntry bibEntry : context.getEntries()) {
+            indexer.addToIndex(bibEntry);
+        }
 
         // then
         try (IndexReader reader = DirectoryReader.open(new NIOFSDirectory(context.getFulltextIndexPath()))) {
@@ -71,7 +73,9 @@ public class PdfIndexerTest {
 
         // when
         indexer.createIndex();
-        indexer.addToIndex(context);
+        for (BibEntry bibEntry : context.getEntries()) {
+            indexer.addToIndex(bibEntry);
+        }
 
         // then
         try (IndexReader reader = DirectoryReader.open(new NIOFSDirectory(context.getFulltextIndexPath()))) {
@@ -88,7 +92,9 @@ public class PdfIndexerTest {
 
         // when
         indexer.createIndex();
-        indexer.addToIndex(context);
+        for (BibEntry bibEntry : context.getEntries()) {
+            indexer.addToIndex(bibEntry);
+        }
 
         // then
         try (IndexReader reader = DirectoryReader.open(new NIOFSDirectory(context.getFulltextIndexPath()))) {
@@ -106,7 +112,9 @@ public class PdfIndexerTest {
 
         // when
         indexer.createIndex();
-        indexer.addToIndex(context);
+        for (BibEntry bibEntry : context.getEntries()) {
+            indexer.addToIndex(bibEntry);
+        }
 
         // then
         try (IndexReader reader = DirectoryReader.open(new NIOFSDirectory(context.getFulltextIndexPath()))) {
@@ -124,7 +132,9 @@ public class PdfIndexerTest {
 
         // when
         indexer.createIndex();
-        indexer.addToIndex(context);
+        for (BibEntry bibEntry : context.getEntries()) {
+            indexer.addToIndex(bibEntry);
+        }
 
         // then
         try (IndexReader reader = DirectoryReader.open(new NIOFSDirectory(context.getFulltextIndexPath()))) {
@@ -141,7 +151,9 @@ public class PdfIndexerTest {
         database.insertEntry(entry);
 
         indexer.createIndex();
-        indexer.addToIndex(context);
+        for (BibEntry bibEntry : context.getEntries()) {
+            indexer.addToIndex(bibEntry);
+        }
         // index actually exists
         try (IndexReader reader = DirectoryReader.open(new NIOFSDirectory(context.getFulltextIndexPath()))) {
             assertEquals(33, reader.numDocs());
@@ -164,7 +176,9 @@ public class PdfIndexerTest {
         exampleThesis.setFiles(Collections.singletonList(new LinkedFile("Example Thesis", "thesis-example.pdf", StandardFileType.PDF.getName())));
         database.insertEntry(exampleThesis);
         indexer.createIndex();
-        indexer.addToIndex(context);
+        for (BibEntry bibEntry : context.getEntries()) {
+            indexer.addToIndex(bibEntry);
+        }
 
         // index with first entry
         try (IndexReader reader = DirectoryReader.open(new NIOFSDirectory(context.getFulltextIndexPath()))) {
@@ -176,7 +190,7 @@ public class PdfIndexerTest {
         metadata.setFiles(Collections.singletonList(new LinkedFile("Metadata file", "metaData.pdf", StandardFileType.PDF.getName())));
 
         // when
-        indexer.addToIndex(metadata, null);
+        indexer.addToIndex(metadata);
 
         // then
         try (IndexReader reader = DirectoryReader.open(new NIOFSDirectory(context.getFulltextIndexPath()))) {
