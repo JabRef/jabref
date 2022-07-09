@@ -93,13 +93,11 @@ public class IndexingTaskManager extends BackgroundTask<Void> {
         Set<String> pathsToRemove = indexer.getListOfFilePaths();
         for (BibEntry entry : databaseContext.getEntries()) {
             for (LinkedFile file : entry.getFiles()) {
-                System.out.println("Adding file " + file.getLink());
                 enqueueTask(() -> indexer.addToIndex(entry, file, databaseContext));
                 pathsToRemove.remove(file.getLink());
             }
         }
         for (String pathToRemove : pathsToRemove) {
-            System.out.println("Removing file " + pathToRemove);
             enqueueTask(() -> indexer.removeFromIndex(pathToRemove));
         }
     }
