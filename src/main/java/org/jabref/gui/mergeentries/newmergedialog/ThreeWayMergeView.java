@@ -111,13 +111,39 @@ public class ThreeWayMergeView extends VBox {
 
         for (int fieldIndex = 0; fieldIndex < viewModel.allFieldsSize(); fieldIndex++) {
             addFieldName(getFieldAtIndex(fieldIndex), fieldIndex);
-            addFieldValues(getFieldAtIndex(fieldIndex), fieldIndex);
+            addFieldValues(fieldIndex);
         }
     }
 
-    private void addFieldName(Field field, int rowIndex) {
-        FieldNameCell fieldNameCell = FieldNameCellFactory.create(field, rowIndex);
-        mergeGridPane.add(fieldNameCell, 0, rowIndex);
+    private void addFieldName(Field field, int fieldIndex) {
+        FieldNameCell fieldNameCell = FieldNameCellFactory.create(field, fieldIndex);
+        mergeGridPane.add(fieldNameCell, FIELD_NAME_COLUMN, fieldIndex);
+
+        if (field.equals(StandardField.GROUPS)) {
+            GroupsFieldNameCell groupsField = (GroupsFieldNameCell) fieldNameCell;
+            groupsField.setOnMergeGroups(() -> {
+                if (mergedGroupsRecord == null) {
+                    String leftEntryValue = viewModel.getLeftEntry().getField(field).orElse("");
+                    String rightEntryValue = viewModel.getRightEntry().getField(field).orElse("");
+
+                    String mergedGroups = mergeLeftAndRightEntryGroups();
+                    viewModel.getLeftEntry().setField(field, mergedGroups);
+                    viewModel.getRightEntry().setField(field, mergedGroups);
+                    System.out.println("Groups merged: " + mergedGroups);
+                    mergedGroupsRecord = new MergedGroups(leftEntryValue, rightEntryValue, mergedGroups);
+                    updateFieldValues(fieldIndex);
+                }
+            });
+
+            groupsField.setOnUnmergeGroups(() -> {
+                if (mergedGroupsRecord != null) {
+                    viewModel.getLeftEntry().setField(field, mergedGroupsRecord.leftEntryGroups());
+                    viewModel.getRightEntry().setField(field, mergedGroupsRecord.rightEntryGroups());
+                    updateFieldValues(fieldIndex);
+                    mergedGroupsRecord = null;
+                }
+            });
+        }
     }
 
     private Field getFieldAtIndex(int index) {
@@ -136,38 +162,8 @@ public class ThreeWayMergeView extends VBox {
             rightEntryValue = viewModel.getRightEntry().getField(field).orElse("");
         }
 
-        ThreeFieldValues fieldRow = new ThreeFieldValues(leftEntryValue, rightEntryValue, index);
+        ThreeFieldValues fieldRow = new ThreeFieldValues(leftEntryValue, rightEntryValue, fieldIndex);
         threeFieldValuesList.add(fieldRow);
-
-/*        if (field.equals(StandardField.GROUPS)) {
-            // attach listener
-            GroupsFieldNameCell groupsField = (GroupsFieldNameCell) fieldRow.getFieldNameCell();
-            groupsField.setOnMergeGroups(() -> {
-                if (!fieldRow.hasEqualLeftAndRightValues()) {
-                    removeRow(index);
-                    String mergedGroups = mergeEntryGroups();
-                    viewModel.getLeftEntry().setField(field, mergedGroups);
-                    viewModel.getRightEntry().setField(field, mergedGroups);
-                    addFieldValues(field, index);
-                    System.out.println("Groups merged: " + mergedGroups);
-                    mergedGroupsRecord = new MergedGroups(leftEntryValue, rightEntryValue, mergedGroups);
-                } else {
-                    System.out.println("Groups already have the same value");
-                }
-            });
-
-            groupsField.setOnUnmergeGroups(() -> {
-                if (fieldRow.hasEqualLeftAndRightValues()) {
-                    if (mergedGroupsRecord != null) {
-                        viewModel.getLeftEntry().setField(field, mergedGroupsRecord.leftEntryGroups());
-                        viewModel.getRightEntry().setField(field, mergedGroupsRecord.rightEntryGroups());
-                        removeRow(index);
-                        addFieldValues(field, index);
-                        mergedGroupsRecord = null;
-                    }
-                }
-            });
-        }*/
 
         fieldRow.mergedValueProperty().addListener((observable, old, mergedValue) -> {
             if (field.equals(InternalField.TYPE_HEADER)) {
