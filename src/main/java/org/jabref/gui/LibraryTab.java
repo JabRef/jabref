@@ -855,12 +855,13 @@ public class LibraryTab extends Tab {
     private class IndexUpdateListener {
 
         public IndexUpdateListener() {
-            if (preferencesService.getFilePreferences().shouldFulltextIndexLinkedFiles()) {
-                try {
-                    indexingTaskManager.updateIndex(LuceneIndexer.of(bibDatabaseContext, preferencesService.getFilePreferences()));
-                } catch (IOException e) {
-                    LOGGER.error("Cannot access lucene index", e);
+            try {
+                indexingTaskManager.manageFulltextIndexAccordingToPrefs(LuceneIndexer.of(bibDatabaseContext, preferencesService.getFilePreferences()));
+                if (preferencesService.getFilePreferences().shouldFulltextIndexLinkedFiles()) {
+                        indexingTaskManager.updateIndex(LuceneIndexer.of(bibDatabaseContext, preferencesService.getFilePreferences()));
                 }
+            } catch (IOException e) {
+                LOGGER.error("Cannot access lucene index", e);
             }
         }
 

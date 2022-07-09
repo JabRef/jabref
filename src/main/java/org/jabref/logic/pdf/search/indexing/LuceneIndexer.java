@@ -30,6 +30,8 @@ import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.index.Term;
+import org.apache.lucene.queryparser.classic.ParseException;
+import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.search.ScoreDoc;
@@ -176,6 +178,9 @@ public class LuceneIndexer {
      * @param linkedFile the file to write to the index
      */
     private void writeFileToIndex(BibEntry entry, LinkedFile linkedFile) {
+        if (!filePreferences.shouldFulltextIndexLinkedFiles()) {
+            return;
+        }
         if (linkedFile.isOnlineLink() || !StandardFileType.PDF.getName().equals(linkedFile.getFileType())) {
             return;
         }
@@ -219,16 +224,26 @@ public class LuceneIndexer {
         }
     }
 
+    public void updateIndex() {
+        for (BibEntry bibEntry : databaseContext.getEntries()) {
+            updateIndex(bibEntry, List.of());
+        }
+    }
+
     public void updateIndex(BibEntry entry, List<LinkedFile> removedFiles) {
         int oldHash = entry.getLastIndexHash();
         int newHash = entry.updateAndGetIndexHash();
-        if (oldHash == newHash) {
-            return;
-        }
-        addToIndex(entry);
-        removeFromIndex(oldHash);
-        for (LinkedFile removedFile : removedFiles) {
-            removeFromIndex(removedFile.getLink());
+        if (oldHash != newHash) {
+            addToIndex(entry);
+            removeFromIndex(oldHash);
+            for (LinkedFile removedFile : removedFiles) {
+                removeFromIndex(removedFile.getLink());
+            }
+        } else {
+            // This only happens when fulltext-indexing was turned off and is now turned back on again
+            for (LinkedFile linkedFile : entry.getFiles()) {
+                writeFileToIndex(entry, linkedFile);
+            }
         }
     }
 
@@ -253,5 +268,25 @@ public class LuceneIndexer {
             return paths;
         }
         return paths;
+    }
+
+    public void deleteLinkedFilesIndex() {
+        try (IndexWriter indexWriter = new IndexWriter(
+                directoryToIndex,
+                new IndexWriterConfig(
+                        new EnglishStemAnalyzer()).setOpenMode(IndexWriterConfig.OpenMode.CREATE_OR_APPEND))) {
+            QueryParser queryParser = new QueryParser(SearchFieldConstants.PATH, new EnglishStemAnalyzer());
+            queryParser.setAllowLeadingWildcard(true);
+            indexWriter.deleteDocuments(queryParser.parse("*"));
+            indexWriter.commit();
+        } catch (IOException e) {
+            LOGGER.warn("Could not initialize the IndexWriter!", e);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public FilePreferences getFilePreferences() {
+        return filePreferences;
     }
 }

@@ -89,6 +89,16 @@ public class IndexingTaskManager extends BackgroundTask<Void> {
         enqueueTask(() -> indexer.createIndex());
     }
 
+    public void manageFulltextIndexAccordingToPrefs(LuceneIndexer indexer) {
+        indexer.getFilePreferences().fulltextIndexLinkedFilesProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue.booleanValue()) {
+                enqueueTask(() -> indexer.updateIndex());
+            } else {
+                enqueueTask(() -> indexer.deleteLinkedFilesIndex());
+            }
+        });
+    }
+
     public void updateIndex(LuceneIndexer indexer) {
         Set<String> pathsToRemove = indexer.getListOfFilePaths();
         Set<Integer> hashesOfEntriesToRemove = indexer.getDatabaseContext().getEntries().stream().map(BibEntry::updateAndGetIndexHash).collect(Collectors.toSet());
