@@ -142,6 +142,7 @@ public class ThreeWayMergeView extends VBox {
             GroupsFieldNameCell groupsField = (GroupsFieldNameCell) fieldNameCell;
             groupsField.setMergeGroupsCommand(new MergeGroupsCommand(groupsField));
             groupsField.setUnmergeGroupsCommand(new UnmergeGroupsCommand(groupsField));
+            groupsField.setMergeAction(GroupsFieldNameCell.MergeAction.MERGE);
         }
     }
 
