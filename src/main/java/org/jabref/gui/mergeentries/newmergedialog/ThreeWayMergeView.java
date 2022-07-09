@@ -1,6 +1,7 @@
 package org.jabref.gui.mergeentries.newmergedialog;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javafx.scene.control.ScrollPane;
@@ -12,6 +13,7 @@ import javafx.stage.Screen;
 
 import org.jabref.gui.mergeentries.newmergedialog.cell.FieldNameCell;
 import org.jabref.gui.mergeentries.newmergedialog.cell.FieldNameCellFactory;
+import org.jabref.gui.mergeentries.newmergedialog.cell.GroupsFieldNameCell;
 import org.jabref.gui.mergeentries.newmergedialog.toolbar.ThreeWayMergeToolbar;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
@@ -23,9 +25,11 @@ import org.jabref.model.entry.types.EntryTypeFactory;
 public class ThreeWayMergeView extends VBox {
 
     public static final int GRID_COLUMN_MIN_WIDTH = 250;
+
     public static final String LEFT_DEFAULT_HEADER = Localization.lang("Left Entry");
     public static final String RIGHT_DEFAULT_HEADER = Localization.lang("Right Entry");
 
+    private static final int FIELD_NAME_COLUMN = 0;
     private final ColumnConstraints fieldNameColumnConstraints = new ColumnConstraints(150);
     private final ColumnConstraints leftEntryColumnConstraints = new ColumnConstraints(GRID_COLUMN_MIN_WIDTH, 256, Double.MAX_VALUE);
     private final ColumnConstraints rightEntryColumnConstraints = new ColumnConstraints(GRID_COLUMN_MIN_WIDTH, 256, Double.MAX_VALUE);
@@ -120,7 +124,8 @@ public class ThreeWayMergeView extends VBox {
         return viewModel.allFields().get(index);
     }
 
-    private void addFieldValues(Field field, int index) {
+    private void addFieldValues(int fieldIndex) {
+        Field field = getFieldAtIndex(fieldIndex);
         String leftEntryValue;
         String rightEntryValue;
         if (field.equals(InternalField.TYPE_HEADER)) {
@@ -178,24 +183,23 @@ public class ThreeWayMergeView extends VBox {
         }
 
         if (fieldRow.hasEqualLeftAndRightValues()) {
-            mergeGridPane.add(fieldRow.getLeftValueCell(), 1, index, 2, 1);
-            mergeGridPane.add(fieldRow.getMergedValueCell(), 3, index);
+            mergeGridPane.add(fieldRow.getLeftValueCell(), 1, fieldIndex, 2, 1);
+            mergeGridPane.add(fieldRow.getMergedValueCell(), 3, fieldIndex);
         } else {
-            mergeGridPane.add(fieldRow.getLeftValueCell(), 1, index);
-            mergeGridPane.add(fieldRow.getRightValueCell(), 1, index);
-            mergeGridPane.add(fieldRow.getMergedValueCell(), 3, index);
+            mergeGridPane.add(fieldRow.getLeftValueCell(), 1, fieldIndex);
+            mergeGridPane.add(fieldRow.getRightValueCell(), 2, fieldIndex);
+            mergeGridPane.add(fieldRow.getMergedValueCell(), 3, fieldIndex);
         }
     }
 
-    public void removeRow(int index) {
-        threeFieldValuesList.remove(index);
-        mergeGridPane.getChildren().removeIf(node -> GridPane.getRowIndex(node) == index);
+    public void updateFieldValues(int fieldIndex) {
+        removeFieldValues(fieldIndex);
+        addFieldValues(fieldIndex);
     }
 
-    private String mergeEntryGroups() {
-        // TODO: Update the merging logic
-        return viewModel.getLeftEntry().getField(StandardField.GROUPS).orElse("") +
-                viewModel.getRightEntry().getField(StandardField.GROUPS).orElse("");
+    public void removeFieldValues(int index) {
+        threeFieldValuesList.remove(index);
+        mergeGridPane.getChildren().removeIf(node -> GridPane.getRowIndex(node) == index && GridPane.getColumnIndex(node) > FIELD_NAME_COLUMN);
     }
 
     private String mergeLeftAndRightEntryGroups() {
