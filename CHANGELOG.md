@@ -35,7 +35,8 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - When configured SSL certificates changed, JabRef warns the user to restart to apply the configuration.
 - We improved the appearances and logic of the "Manage field names & content" dialog, and renamed it to "Automatic field editor". [#6536](https://github.com/JabRef/jabref/issues/6536)
 - We improved the message explaining the options when modifying an automatic keyword group [#8911](https://github.com/JabRef/jabref/issues/8911)
-- We moved the preferences option "Warn about duplicates on import" option from the tab "File" to the tab "Import and Export". [kopper#570](https://github.com/koppor/jabref/issues/570)
+- We moved the preferences option "Warn about duplicates on import" option from the tab "File" to the tab "Import and Export". [koppor#570](https://github.com/koppor/jabref/issues/570)
+- When JabRef encounters `% Encoding: UTF-8` header, it is kept during writing (and not removed). [#8964](https://github.com/JabRef/jabref/pull/8964)
 
 ### Fixed
 
