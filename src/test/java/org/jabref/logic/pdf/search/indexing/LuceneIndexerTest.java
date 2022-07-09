@@ -34,6 +34,7 @@ public class LuceneIndexerTest {
     @BeforeEach
     public void setUp(@TempDir Path indexDir) throws IOException {
         FilePreferences filePreferences = mock(FilePreferences.class);
+        when(filePreferences.shouldFulltextIndexLinkedFiles()).thenReturn(true);
         this.database = new BibDatabase();
 
         this.context = mock(BibDatabaseContext.class);
@@ -55,12 +56,13 @@ public class LuceneIndexerTest {
         // when
         indexer.createIndex();
         for (BibEntry bibEntry : context.getEntries()) {
-            indexer.addToIndex(bibEntry);
+            indexer.addBibFieldsToIndex(bibEntry);
+            indexer.addLinkedFilesToIndex(bibEntry);
         }
 
         // then
         try (IndexReader reader = DirectoryReader.open(new NIOFSDirectory(context.getFulltextIndexPath()))) {
-            assertEquals(33, reader.numDocs());
+            assertEquals(34, reader.numDocs());
         }
     }
 
@@ -74,12 +76,13 @@ public class LuceneIndexerTest {
         // when
         indexer.createIndex();
         for (BibEntry bibEntry : context.getEntries()) {
-            indexer.addToIndex(bibEntry);
+            indexer.addBibFieldsToIndex(bibEntry);
+            indexer.addLinkedFilesToIndex(bibEntry);
         }
 
         // then
         try (IndexReader reader = DirectoryReader.open(new NIOFSDirectory(context.getFulltextIndexPath()))) {
-            assertEquals(0, reader.numDocs());
+            assertEquals(1, reader.numDocs());
         }
     }
 
@@ -93,12 +96,13 @@ public class LuceneIndexerTest {
         // when
         indexer.createIndex();
         for (BibEntry bibEntry : context.getEntries()) {
-            indexer.addToIndex(bibEntry);
+            indexer.addBibFieldsToIndex(bibEntry);
+            indexer.addLinkedFilesToIndex(bibEntry);
         }
 
         // then
         try (IndexReader reader = DirectoryReader.open(new NIOFSDirectory(context.getFulltextIndexPath()))) {
-            assertEquals(0, reader.numDocs());
+            assertEquals(1, reader.numDocs());
         }
     }
 
@@ -113,12 +117,13 @@ public class LuceneIndexerTest {
         // when
         indexer.createIndex();
         for (BibEntry bibEntry : context.getEntries()) {
-            indexer.addToIndex(bibEntry);
+            indexer.addBibFieldsToIndex(bibEntry);
+            indexer.addLinkedFilesToIndex(bibEntry);
         }
 
         // then
         try (IndexReader reader = DirectoryReader.open(new NIOFSDirectory(context.getFulltextIndexPath()))) {
-            assertEquals(33, reader.numDocs());
+            assertEquals(34, reader.numDocs());
         }
     }
 
@@ -133,12 +138,13 @@ public class LuceneIndexerTest {
         // when
         indexer.createIndex();
         for (BibEntry bibEntry : context.getEntries()) {
-            indexer.addToIndex(bibEntry);
+            indexer.addBibFieldsToIndex(bibEntry);
+            indexer.addLinkedFilesToIndex(bibEntry);
         }
 
         // then
         try (IndexReader reader = DirectoryReader.open(new NIOFSDirectory(context.getFulltextIndexPath()))) {
-            assertEquals(1, reader.numDocs());
+            assertEquals(2, reader.numDocs());
         }
     }
 
@@ -152,11 +158,12 @@ public class LuceneIndexerTest {
 
         indexer.createIndex();
         for (BibEntry bibEntry : context.getEntries()) {
-            indexer.addToIndex(bibEntry);
+            indexer.addBibFieldsToIndex(bibEntry);
+            indexer.addLinkedFilesToIndex(bibEntry);
         }
         // index actually exists
         try (IndexReader reader = DirectoryReader.open(new NIOFSDirectory(context.getFulltextIndexPath()))) {
-            assertEquals(33, reader.numDocs());
+            assertEquals(34, reader.numDocs());
         }
 
         // when
@@ -177,12 +184,13 @@ public class LuceneIndexerTest {
         database.insertEntry(exampleThesis);
         indexer.createIndex();
         for (BibEntry bibEntry : context.getEntries()) {
-            indexer.addToIndex(bibEntry);
+            indexer.addBibFieldsToIndex(bibEntry);
+            indexer.addLinkedFilesToIndex(bibEntry);
         }
 
         // index with first entry
         try (IndexReader reader = DirectoryReader.open(new NIOFSDirectory(context.getFulltextIndexPath()))) {
-            assertEquals(33, reader.numDocs());
+            assertEquals(34, reader.numDocs());
         }
 
         BibEntry metadata = new BibEntry(StandardEntryType.Article);
@@ -190,11 +198,12 @@ public class LuceneIndexerTest {
         metadata.setFiles(Collections.singletonList(new LinkedFile("Metadata file", "metaData.pdf", StandardFileType.PDF.getName())));
 
         // when
-        indexer.addToIndex(metadata);
+        indexer.addBibFieldsToIndex(metadata);
+        indexer.addLinkedFilesToIndex(metadata);
 
         // then
         try (IndexReader reader = DirectoryReader.open(new NIOFSDirectory(context.getFulltextIndexPath()))) {
-            assertEquals(34, reader.numDocs());
+            assertEquals(36, reader.numDocs());
         }
     }
 }

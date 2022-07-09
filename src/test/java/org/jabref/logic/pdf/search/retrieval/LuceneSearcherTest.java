@@ -32,6 +32,7 @@ public class LuceneSearcherTest {
     @BeforeEach
     public void setUp(@TempDir Path indexDir) throws IOException {
         FilePreferences filePreferences = mock(FilePreferences.class);
+        when(filePreferences.shouldFulltextIndexLinkedFiles()).thenReturn(true);
         // given
         BibDatabase database = new BibDatabase();
         BibDatabaseContext context = mock(BibDatabaseContext.class);
@@ -58,7 +59,8 @@ public class LuceneSearcherTest {
 
         indexer.createIndex();
         for (BibEntry bibEntry : context.getEntries()) {
-            indexer.addToIndex(bibEntry);
+            indexer.addBibFieldsToIndex(bibEntry);
+            indexer.addLinkedFilesToIndex(bibEntry);
         }
     }
 
