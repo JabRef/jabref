@@ -68,9 +68,11 @@ public class BibtexImporter extends Importer {
         }
 
         Charset encoding;
+        boolean encodingExplicitlySupplied;
         try (BufferedReader reader = Files.newBufferedReader(filePath, detectedCharset)) {
             Optional<Charset> suppliedEncoding = getSuppliedEncoding(reader);
             LOGGER.debug("Supplied encoding: {}", suppliedEncoding);
+            encodingExplicitlySupplied = suppliedEncoding.isPresent();
 
             // in case no encoding information is present, use the detected one
             encoding = suppliedEncoding.orElse(detectedCharset);
@@ -80,6 +82,7 @@ public class BibtexImporter extends Importer {
         try (BufferedReader reader = Files.newBufferedReader(filePath, encoding)) {
             ParserResult parserResult = this.importDatabase(reader);
             parserResult.getMetaData().setEncoding(encoding);
+            parserResult.getMetaData().setEncodingExplicitlySupplied(encodingExplicitlySupplied);
             parserResult.setPath(filePath);
             if (parserResult.getMetaData().getMode().isEmpty()) {
                 parserResult.getMetaData().setMode(BibDatabaseModeDetection.inferMode(parserResult.getDatabase()));
