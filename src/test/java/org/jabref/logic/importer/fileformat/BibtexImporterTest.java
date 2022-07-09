@@ -27,6 +27,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
@@ -161,11 +162,25 @@ public class BibtexImporterTest {
 
     @ParameterizedTest
     @CsvSource({"encoding-utf-8-with-header.bib", "encoding-utf-8-without-header.bib"})
-    public void testParsingOfUtf8EncodedFileReadsUmlatCharacterCorrectly(String filename) throws Exception {
+    public void testParsingOfUtf8EncodedFileReadsUmlautCharacterCorrectly(String filename) throws Exception {
         ParserResult parserResult = importer.importDatabase(
                 Path.of(BibtexImporterTest.class.getResource(filename).toURI()));
         assertEquals(
                 List.of(new BibEntry(StandardEntryType.Article).withField(StandardField.TITLE, "Ü ist ein Umlaut")),
                 parserResult.getDatabase().getEntries());
+    }
+
+    @Test
+    public void encodingSupplied() throws Exception {
+        ParserResult parserResult = importer.importDatabase(
+                Path.of(BibtexImporterTest.class.getResource("encoding-utf-8-with-header.bib").toURI()));
+        assertTrue(parserResult.getMetaData().getEncodingExplicitlySupplied());
+    }
+
+    @Test
+    public void encodingNotSupplied() throws Exception {
+        ParserResult parserResult = importer.importDatabase(
+                Path.of(BibtexImporterTest.class.getResource("encoding-utf-8-without-header.bib").toURI()));
+        assertFalse(parserResult.getMetaData().getEncodingExplicitlySupplied());
     }
 }
