@@ -198,6 +198,14 @@ public class ThreeWayMergeView extends VBox {
                 viewModel.getRightEntry().getField(StandardField.GROUPS).orElse("");
     }
 
+    private String mergeLeftAndRightEntryGroups() {
+        List<String> leftGroups = new ArrayList<>(Arrays.stream(viewModel.getLeftEntry().getField(StandardField.GROUPS).orElse("").split(", ")).toList());
+        List<String> rightGroups = Arrays.stream(viewModel.getRightEntry().getField(StandardField.GROUPS).orElse("").split(", ")).toList();
+        leftGroups.addAll(rightGroups);
+
+        return String.join(", ", leftGroups);
+    }
+
     public BibEntry getMergedEntry() {
         return viewModel.getMergedEntry();
     }
