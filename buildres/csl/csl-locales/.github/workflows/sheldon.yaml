@@ -15,17 +15,17 @@ jobs:
     # labels to a PR
     # https://securitylab.github.com/research/github-actions-preventing-pwn-requests
     - name: Checkout repo for OWNER TEST
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       if: contains(github.event.pull_request.labels.*.name, 'safe to test')
       with:
         ref: ${{ github.event.pull_request.head.ref }}
 
     # otherwise, checkout the current master, and the pr to the subdirectory 'pull-request'
     - name: Checkout base repo for pull-request test
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       if: "! contains(github.event.pull_request.labels.*.name, 'safe to test')"
     - name: Checkout pull-request
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       if: "! contains(github.event.pull_request.labels.*.name, 'safe to test')"
       with:
         repository: ${{ github.event.pull_request.head.repo.full_name }}
@@ -54,7 +54,7 @@ jobs:
       with:
         ruby-version: 3.0.2
     - name: but use cache to speed that up
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       with:
         path: vendor/bundle
         key: ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}

@@ -80,7 +80,6 @@ public class JabRefDialogService implements DialogService {
 
     private FXDialog createDialog(AlertType type, String title, String content) {
         FXDialog alert = new FXDialog(type, title, true);
-        themeManager.installCss(alert.getDialogPane().getScene());
         alert.setHeaderText(null);
         alert.setContentText(content);
         alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
@@ -113,7 +112,6 @@ public class JabRefDialogService implements DialogService {
 
         // Reset the dialog graphic using the default style
         alert.getDialogPane().setGraphic(graphic);
-        themeManager.installCss(alert.getDialogPane().getScene());
         alert.setHeaderText(null);
         alert.setContentText(content);
         alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
@@ -138,7 +136,6 @@ public class JabRefDialogService implements DialogService {
         choiceDialog.setTitle(title);
         choiceDialog.setContentText(content);
         choiceDialog.initOwner(mainWindow);
-        themeManager.installCss(choiceDialog.getDialogPane().getScene());
         return choiceDialog.showAndWait();
     }
 
@@ -148,7 +145,6 @@ public class JabRefDialogService implements DialogService {
         inputDialog.setHeaderText(title);
         inputDialog.setContentText(content);
         inputDialog.initOwner(mainWindow);
-        themeManager.installCss(inputDialog.getDialogPane().getScene());
         return inputDialog.showAndWait();
     }
 
@@ -158,7 +154,6 @@ public class JabRefDialogService implements DialogService {
         inputDialog.setHeaderText(title);
         inputDialog.setContentText(content);
         inputDialog.initOwner(mainWindow);
-        themeManager.installCss(inputDialog.getDialogPane().getScene());
         return inputDialog.showAndWait();
     }
 
@@ -186,7 +181,6 @@ public class JabRefDialogService implements DialogService {
         exceptionDialog.getDialogPane().setMaxWidth(mainWindow.getWidth() / 2);
         exceptionDialog.setHeaderText(message);
         exceptionDialog.initOwner(mainWindow);
-        themeManager.installCss(exceptionDialog.getDialogPane().getScene());
         exceptionDialog.showAndWait();
     }
 
@@ -196,7 +190,6 @@ public class JabRefDialogService implements DialogService {
         exceptionDialog.setHeaderText(title);
         exceptionDialog.setContentText(content);
         exceptionDialog.initOwner(mainWindow);
-        themeManager.installCss(exceptionDialog.getDialogPane().getScene());
         exceptionDialog.showAndWait();
     }
 
@@ -266,7 +259,6 @@ public class JabRefDialogService implements DialogService {
         alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
         alert.setResizable(true);
         alert.initOwner(mainWindow);
-        themeManager.installCss(alert.getDialogPane().getScene());
         return alert.showAndWait();
     }
 
@@ -294,7 +286,6 @@ public class JabRefDialogService implements DialogService {
             task.cancel();
             progressDialog.close();
         });
-        themeManager.installCss(progressDialog.getDialogPane().getScene());
         progressDialog.initOwner(mainWindow);
         progressDialog.show();
     }
@@ -319,7 +310,6 @@ public class JabRefDialogService implements DialogService {
         alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
         alert.setResizable(true);
         alert.initOwner(mainWindow);
-        themeManager.installCss(alert.getDialogPane().getScene());
 
         stateManager.getAnyTasksThatWillNotBeRecoveredRunning().addListener((observable, oldValue, newValue) -> {
             if (!newValue) {
