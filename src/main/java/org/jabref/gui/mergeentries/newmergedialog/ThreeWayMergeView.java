@@ -6,6 +6,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.swing.undo.CompoundEdit;
+
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -22,6 +24,7 @@ import org.jabref.gui.mergeentries.newmergedialog.cell.FieldNameCell;
 import org.jabref.gui.mergeentries.newmergedialog.cell.FieldNameCellFactory;
 import org.jabref.gui.mergeentries.newmergedialog.cell.GroupsFieldNameCell;
 import org.jabref.gui.mergeentries.newmergedialog.toolbar.ThreeWayMergeToolbar;
+import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
@@ -49,10 +52,9 @@ public class ThreeWayMergeView extends VBox {
     private final ThreeWayMergeViewModel viewModel;
     private final List<ThreeFieldValues> fieldValuesList = new ArrayList<>();
 
-    private MergedGroups mergedGroupsRecord;
-
     private final BooleanProperty areGroupsMerged = new SimpleBooleanProperty();
 
+    private final CompoundEdit mergeGroupsEdit = new CompoundEdit();
 
     public ThreeWayMergeView(BibEntry leftEntry, BibEntry rightEntry, String leftHeader, String rightHeader) {
         getStylesheets().add(ThreeWayMergeView.class.getResource("ThreeWayMergeView.css").toExternalForm());
@@ -143,10 +145,6 @@ public class ThreeWayMergeView extends VBox {
         }
     }
 
-    private boolean areGroupsMerged() {
-        return mergedGroupsRecord != null;
-    }
-
     private Field getFieldAtIndex(int index) {
         return viewModel.allFields().get(index);
     }
@@ -234,6 +232,12 @@ public class ThreeWayMergeView extends VBox {
         toolbar.setShowDiff(true);
     }
 
+    public void cancelGroupsMerge() {
+        if (mergeGroupsEdit.canUndo()) {
+            mergeGroupsEdit.undo();
+        }
+    }
+
     public class MergeGroupsCommand extends SimpleCommand {
         private final GroupsFieldNameCell groupsFieldNameCell;
 
@@ -250,20 +254,28 @@ public class ThreeWayMergeView extends VBox {
 
         @Override
         public void execute() {
-                assert !areGroupsMerged();
+            BibEntry leftEntry = viewModel.getLeftEntry();
+            BibEntry rightEntry = viewModel.getRightEntry();
 
-                String leftEntryGroups = viewModel.getLeftEntry().getField(StandardField.GROUPS).orElse("");
-                String rightEntryGroups = viewModel.getRightEntry().getField(StandardField.GROUPS).orElse("");
+            String leftEntryGroups = leftEntry.getField(StandardField.GROUPS).orElse("");
+            String rightEntryGroups = rightEntry.getField(StandardField.GROUPS).orElse("");
 
-                assert !leftEntryGroups.equals(rightEntryGroups);
+            assert !leftEntryGroups.equals(rightEntryGroups);
 
-                String mergedGroups = mergeLeftAndRightEntryGroups(leftEntryGroups, rightEntryGroups);
-                viewModel.getLeftEntry().setField(StandardField.GROUPS, mergedGroups);
-                viewModel.getRightEntry().setField(StandardField.GROUPS, mergedGroups);
+            String mergedGroups = mergeLeftAndRightEntryGroups(leftEntryGroups, rightEntryGroups);
+            viewModel.getLeftEntry().setField(StandardField.GROUPS, mergedGroups);
+            viewModel.getRightEntry().setField(StandardField.GROUPS, mergedGroups);
 
-                mergedGroupsRecord = new MergedGroups(leftEntryGroups, rightEntryGroups, mergedGroups);
-                updateFieldValues(viewModel.allFields().indexOf(StandardField.GROUPS));
-                groupsFieldNameCell.toggleMergeProperty().set(GroupsFieldNameCell.ToggleMerge.UNMERGE);
+            if (mergeGroupsEdit.canRedo()) {
+                mergeGroupsEdit.redo();
+            } else {
+                mergeGroupsEdit.addEdit(new UndoableFieldChange(leftEntry, StandardField.GROUPS, leftEntryGroups, mergedGroups));
+                mergeGroupsEdit.addEdit(new UndoableFieldChange(rightEntry, StandardField.GROUPS, rightEntryGroups, mergedGroups));
+                mergeGroupsEdit.end();
+            }
+
+            updateFieldValues(viewModel.allFields().indexOf(StandardField.GROUPS));
+            groupsFieldNameCell.mergeActionProperty().set(GroupsFieldNameCell.MergeAction.UNMERGE);
         }
     }
 
@@ -272,24 +284,16 @@ public class ThreeWayMergeView extends VBox {
 
         public UnmergeGroupsCommand(GroupsFieldNameCell groupsFieldCell) {
             this.groupsFieldCell = groupsFieldCell;
+            this.executable.bind(Bindings.createBooleanBinding(mergeGroupsEdit::canUndo));
         }
 
         @Override
         public void execute() {
-                assert areGroupsMerged();
-                viewModel.getLeftEntry().setField(StandardField.GROUPS, mergedGroupsRecord.leftEntryGroups());
-                viewModel.getRightEntry().setField(StandardField.GROUPS, mergedGroupsRecord.rightEntryGroups());
+            if (mergeGroupsEdit.canUndo()) {
+                mergeGroupsEdit.undo();
                 updateFieldValues(viewModel.allFields().indexOf(StandardField.GROUPS));
-                mergedGroupsRecord = null;
-                groupsFieldCell.toggleMergeProperty().set(GroupsFieldNameCell.ToggleMerge.MERGE);
+                groupsFieldCell.mergeActionProperty().set(GroupsFieldNameCell.MergeAction.MERGE);
+            }
         }
     }
-
-    /*
-     * Notes
-     * 1. Left and Right could have the same value
-     *
-     * Merge Button Clicked:
-     * 1.
-     * */
 }
