@@ -285,7 +285,6 @@ public class ThreeWayMergeView extends VBox {
 
         public UnmergeGroupsCommand(GroupsFieldNameCell groupsFieldCell) {
             this.groupsFieldCell = groupsFieldCell;
-            this.executable.bind(Bindings.createBooleanBinding(mergeGroupsEdit::canUndo));
         }
 
         @Override
