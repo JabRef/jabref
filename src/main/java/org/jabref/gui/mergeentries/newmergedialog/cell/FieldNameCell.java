@@ -2,6 +2,8 @@ package org.jabref.gui.mergeentries.newmergedialog.cell;
 
 import javafx.scene.control.Label;
 
+import org.jabref.gui.actions.Action;
+
 /**
  * A non-editable cell that contains the name of some field
  */
