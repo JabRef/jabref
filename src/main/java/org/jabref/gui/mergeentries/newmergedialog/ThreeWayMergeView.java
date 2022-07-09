@@ -10,11 +10,13 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.Screen;
 
+import org.jabref.gui.mergeentries.newmergedialog.cell.GroupsFieldNameCell;
 import org.jabref.gui.mergeentries.newmergedialog.toolbar.ThreeWayMergeToolbar;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.InternalField;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.EntryTypeFactory;
 
 public class ThreeWayMergeView extends VBox {
@@ -33,7 +35,9 @@ public class ThreeWayMergeView extends VBox {
     private final GridPane mergeGridPane;
 
     private final ThreeWayMergeViewModel viewModel;
-    private final List<FieldRowController> fieldRowControllerList = new ArrayList<>();
+    private final List<ThreeFieldValues> threeFieldValuesList = new ArrayList<>();
+
+    private MergedGroups mergedGroupsRecord;
 
     public ThreeWayMergeView(BibEntry leftEntry, BibEntry rightEntry, String leftHeader, String rightHeader) {
         getStylesheets().add(ThreeWayMergeView.class.getResource("ThreeWayMergeView.css").toExternalForm());
@@ -71,9 +75,9 @@ public class ThreeWayMergeView extends VBox {
 
     private void updateDiff() {
         if (toolbar.isShowDiffEnabled()) {
-            fieldRowControllerList.forEach(fieldRow -> fieldRow.showDiff(new ShowDiffConfig(toolbar.getDiffView(), toolbar.getDiffHighlightingMethod())));
+            threeFieldValuesList.forEach(fieldRow -> fieldRow.showDiff(new ShowDiffConfig(toolbar.getDiffView(), toolbar.getDiffHighlightingMethod())));
         } else {
-            fieldRowControllerList.forEach(FieldRowController::hideDiff);
+            threeFieldValuesList.forEach(ThreeFieldValues::hideDiff);
         }
     }
 
@@ -101,13 +105,19 @@ public class ThreeWayMergeView extends VBox {
         mergeGridPane.getColumnConstraints().addAll(fieldNameColumnConstraints, leftEntryColumnConstraints, rightEntryColumnConstraints, mergedEntryColumnConstraints);
 
         for (int fieldIndex = 0; fieldIndex < viewModel.allFieldsSize(); fieldIndex++) {
-            addFieldRow(fieldIndex);
+            addFieldValues(viewModel.allFields().get(fieldIndex), fieldIndex);
         }
     }
 
-    private void addFieldRow(int index) {
-        Field field = viewModel.allFields().get(index);
+    private void addFieldName(Field field, int rowIndex) {
 
+    }
+
+    private Field getFieldAtIndex(int index) {
+        return viewModel.allFields().get(index);
+    }
+
+    private void addFieldValues(Field field, int index) {
         String leftEntryValue;
         String rightEntryValue;
         if (field.equals(InternalField.TYPE_HEADER)) {
@@ -118,8 +128,38 @@ public class ThreeWayMergeView extends VBox {
             rightEntryValue = viewModel.getRightEntry().getField(field).orElse("");
         }
 
-        FieldRowController fieldRow = new FieldRowController(field.getDisplayName(), leftEntryValue, rightEntryValue, index);
-        fieldRowControllerList.add(fieldRow);
+        ThreeFieldValues fieldRow = new ThreeFieldValues(field, leftEntryValue, rightEntryValue, index, mergedGroupsRecord != null);
+        threeFieldValuesList.add(fieldRow);
+
+        if (field.equals(StandardField.GROUPS)) {
+            // attach listener
+            GroupsFieldNameCell groupsField = (GroupsFieldNameCell) fieldRow.getFieldNameCell();
+            groupsField.setOnMergeGroups(() -> {
+                if (!fieldRow.hasEqualLeftAndRightValues()) {
+                    removeRow(index);
+                    String mergedGroups = mergeEntryGroups();
+                    viewModel.getLeftEntry().setField(field, mergedGroups);
+                    viewModel.getRightEntry().setField(field, mergedGroups);
+                    addFieldValues(field, index);
+                    System.out.println("Groups merged: " + mergedGroups);
+                    mergedGroupsRecord = new MergedGroups(leftEntryValue, rightEntryValue, mergedGroups);
+                } else {
+                    System.out.println("Groups already have the same value");
+                }
+            });
+
+            groupsField.setOnUnmergeGroups(() -> {
+                if (fieldRow.hasEqualLeftAndRightValues()) {
+                    if (mergedGroupsRecord != null) {
+                        viewModel.getLeftEntry().setField(field, mergedGroupsRecord.leftEntryGroups());
+                        viewModel.getRightEntry().setField(field, mergedGroupsRecord.rightEntryGroups());
+                        removeRow(index);
+                        addFieldValues(field, index);
+                        mergedGroupsRecord = null;
+                    }
+                }
+            });
+        }
 
         fieldRow.mergedValueProperty().addListener((observable, old, mergedValue) -> {
             if (field.equals(InternalField.TYPE_HEADER)) {
@@ -143,6 +183,17 @@ public class ThreeWayMergeView extends VBox {
         }
     }
 
+    public void removeRow(int index) {
+        threeFieldValuesList.remove(index);
+        mergeGridPane.getChildren().removeIf(node -> GridPane.getRowIndex(node) == index);
+    }
+
+    private String mergeEntryGroups() {
+        // TODO: Update the merging logic
+        return viewModel.getLeftEntry().getField(StandardField.GROUPS).orElse("") +
+                viewModel.getRightEntry().getField(StandardField.GROUPS).orElse("");
+    }
+
     public BibEntry getMergedEntry() {
         return viewModel.getMergedEntry();
     }
@@ -156,11 +207,11 @@ public class ThreeWayMergeView extends VBox {
     }
 
     public void selectLeftEntryValues() {
-        fieldRowControllerList.forEach(FieldRowController::selectLeftValue);
+        threeFieldValuesList.forEach(ThreeFieldValues::selectLeftValue);
     }
 
     public void selectRightEntryValues() {
-        fieldRowControllerList.forEach(FieldRowController::selectRightValue);
+        threeFieldValuesList.forEach(ThreeFieldValues::selectRightValue);
     }
 
     public void showDiff(ShowDiffConfig diffConfig) {
