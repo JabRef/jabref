@@ -10,7 +10,6 @@ import javafx.scene.layout.Priority;
 import org.jabref.gui.Globals;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.icon.IconTheme;
-import org.jabref.logic.l10n.Localization;
 
 import de.saxsys.mvvmfx.utils.commands.Command;
 
