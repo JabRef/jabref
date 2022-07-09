@@ -4,16 +4,18 @@ import javafx.beans.property.ReadOnlyStringProperty;
 import javafx.scene.control.ToggleGroup;
 
 import org.jabref.gui.mergeentries.newmergedialog.cell.FieldNameCell;
+import org.jabref.gui.mergeentries.newmergedialog.cell.FieldNameCellFactory;
 import org.jabref.gui.mergeentries.newmergedialog.cell.FieldValueCell;
 import org.jabref.gui.mergeentries.newmergedialog.cell.MergedFieldCell;
 import org.jabref.gui.mergeentries.newmergedialog.diffhighlighter.SplitDiffHighlighter;
 import org.jabref.gui.mergeentries.newmergedialog.diffhighlighter.UnifiedDiffHighlighter;
 import org.jabref.gui.mergeentries.newmergedialog.toolbar.ThreeWayMergeToolbar;
+import org.jabref.model.entry.field.Field;
 import org.jabref.model.strings.StringUtil;
 
 import org.fxmisc.richtext.StyleClassedTextArea;
 
-public class FieldRowController {
+public class ThreeFieldValues {
     private final FieldNameCell fieldNameCell;
     private final FieldValueCell leftValueCell;
     private FieldValueCell rightValueCell;
@@ -23,16 +25,19 @@ public class FieldRowController {
 
     private final String rightValue;
 
+    private final String fieldName;
+
     private final ToggleGroup toggleGroup = new ToggleGroup();
 
-    public FieldRowController(String fieldName, String leftValue, String rightValue, int rowIndex) {
-        fieldNameCell = new FieldNameCell(fieldName, rowIndex);
+    public ThreeFieldValues(Field field, String leftValue, String rightValue, int rowIndex, boolean groupsMerged) {
+        fieldNameCell = FieldNameCellFactory.create(field, rowIndex, groupsMerged);
         leftValueCell = new FieldValueCell(leftValue, rowIndex);
         rightValueCell = new FieldValueCell(rightValue, rowIndex);
         mergedValueCell = new MergedFieldCell(StringUtil.isNullOrEmpty(leftValue) ? rightValue : leftValue, rowIndex);
 
         this.leftValue = leftValue;
         this.rightValue = rightValue;
+        this.fieldName = field.getDisplayName();
 
         toggleGroup.getToggles().addAll(leftValueCell, rightValueCell);
         toggleGroup.selectToggle(StringUtil.isNullOrEmpty(leftValue) ? rightValueCell : leftValueCell);
