@@ -1,6 +1,5 @@
 package org.jabref.logic.pdf.search.indexing;
 
-import java.util.List;
 import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -102,21 +101,15 @@ public class IndexingTaskManager extends BackgroundTask<Void> {
     }
 
     public void addToIndex(LuceneIndexer indexer, BibEntry entry) {
-        enqueueTask(() -> addToIndex(indexer, entry));
-    }
-
-    public void removeFromIndex(LuceneIndexer indexer, List<LinkedFile> linkedFiles) {
-        for (LinkedFile file : linkedFiles) {
-            enqueueTask(() -> indexer.removeFromIndex(file.getLink()));
-        }
+        enqueueTask(() -> indexer.addToIndex(entry));
     }
 
     public void removeFromIndex(LuceneIndexer indexer, BibEntry entry) {
-        enqueueTask(() -> removeFromIndex(indexer, entry));
+        enqueueTask(() -> indexer.removeFromIndex(entry));
     }
 
     public void updateIndex(LuceneIndexer indexer, BibEntry entry) {
-        enqueueTask(() -> updateIndex(indexer, entry));
+        enqueueTask(() -> indexer.updateIndex(entry));
     }
 
     public void updateDatabaseName(String name) {
