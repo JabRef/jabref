@@ -10,7 +10,8 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.Screen;
 
-import org.jabref.gui.mergeentries.newmergedialog.cell.GroupsFieldNameCell;
+import org.jabref.gui.mergeentries.newmergedialog.cell.FieldNameCell;
+import org.jabref.gui.mergeentries.newmergedialog.cell.FieldNameCellFactory;
 import org.jabref.gui.mergeentries.newmergedialog.toolbar.ThreeWayMergeToolbar;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
@@ -105,12 +106,14 @@ public class ThreeWayMergeView extends VBox {
         mergeGridPane.getColumnConstraints().addAll(fieldNameColumnConstraints, leftEntryColumnConstraints, rightEntryColumnConstraints, mergedEntryColumnConstraints);
 
         for (int fieldIndex = 0; fieldIndex < viewModel.allFieldsSize(); fieldIndex++) {
-            addFieldValues(viewModel.allFields().get(fieldIndex), fieldIndex);
+            addFieldName(getFieldAtIndex(fieldIndex), fieldIndex);
+            addFieldValues(getFieldAtIndex(fieldIndex), fieldIndex);
         }
     }
 
     private void addFieldName(Field field, int rowIndex) {
-
+        FieldNameCell fieldNameCell = FieldNameCellFactory.create(field, rowIndex);
+        mergeGridPane.add(fieldNameCell, 0, rowIndex);
     }
 
     private Field getFieldAtIndex(int index) {
@@ -128,10 +131,10 @@ public class ThreeWayMergeView extends VBox {
             rightEntryValue = viewModel.getRightEntry().getField(field).orElse("");
         }
 
-        ThreeFieldValues fieldRow = new ThreeFieldValues(field, leftEntryValue, rightEntryValue, index, mergedGroupsRecord != null);
+        ThreeFieldValues fieldRow = new ThreeFieldValues(leftEntryValue, rightEntryValue, index);
         threeFieldValuesList.add(fieldRow);
 
-        if (field.equals(StandardField.GROUPS)) {
+/*        if (field.equals(StandardField.GROUPS)) {
             // attach listener
             GroupsFieldNameCell groupsField = (GroupsFieldNameCell) fieldRow.getFieldNameCell();
             groupsField.setOnMergeGroups(() -> {
@@ -159,7 +162,7 @@ public class ThreeWayMergeView extends VBox {
                     }
                 }
             });
-        }
+        }*/
 
         fieldRow.mergedValueProperty().addListener((observable, old, mergedValue) -> {
             if (field.equals(InternalField.TYPE_HEADER)) {
@@ -175,11 +178,12 @@ public class ThreeWayMergeView extends VBox {
         }
 
         if (fieldRow.hasEqualLeftAndRightValues()) {
-            mergeGridPane.add(fieldRow.getFieldNameCell(), 0, index, 1, 1);
             mergeGridPane.add(fieldRow.getLeftValueCell(), 1, index, 2, 1);
-            mergeGridPane.add(fieldRow.getMergedValueCell(), 3, index, 1, 1);
+            mergeGridPane.add(fieldRow.getMergedValueCell(), 3, index);
         } else {
-            mergeGridPane.addRow(index, fieldRow.getFieldNameCell(), fieldRow.getLeftValueCell(), fieldRow.getRightValueCell(), fieldRow.getMergedValueCell());
+            mergeGridPane.add(fieldRow.getLeftValueCell(), 1, index);
+            mergeGridPane.add(fieldRow.getRightValueCell(), 1, index);
+            mergeGridPane.add(fieldRow.getMergedValueCell(), 3, index);
         }
     }
 

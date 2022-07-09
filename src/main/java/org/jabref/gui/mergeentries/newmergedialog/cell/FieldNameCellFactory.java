@@ -5,9 +5,9 @@ import org.jabref.model.entry.field.StandardField;
 
 public class FieldNameCellFactory {
 
-    public static FieldNameCell create(Field field, int rowIndex, boolean groupsMerged) {
+    public static FieldNameCell create(Field field, int rowIndex) {
         if (field.equals(StandardField.GROUPS)) {
-            return new GroupsFieldNameCell("Groups", rowIndex, groupsMerged);
+            return new GroupsFieldNameCell("Groups", rowIndex);
         } else {
             return new FieldNameCell(field.getDisplayName(), rowIndex);
         }
