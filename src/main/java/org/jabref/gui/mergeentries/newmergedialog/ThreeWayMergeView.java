@@ -199,14 +199,6 @@ public class ThreeWayMergeView extends VBox {
         mergeGridPane.getChildren().removeIf(node -> GridPane.getRowIndex(node) == index && GridPane.getColumnIndex(node) > FIELD_NAME_COLUMN);
     }
 
-    private String mergeLeftAndRightEntryGroups(String left, String right) {
-        Set<String> leftGroups = new HashSet<>(Arrays.stream(left.split(", ")).toList());
-        List<String> rightGroups = Arrays.stream(right.split(", ")).toList();
-        leftGroups.addAll(rightGroups);
-
-        return String.join(", ", leftGroups);
-    }
-
     public BibEntry getMergedEntry() {
         return viewModel.getMergedEntry();
     }
@@ -276,7 +268,15 @@ public class ThreeWayMergeView extends VBox {
             }
 
             updateFieldValues(viewModel.allFields().indexOf(StandardField.GROUPS));
-            groupsFieldNameCell.mergeActionProperty().set(GroupsFieldNameCell.MergeAction.UNMERGE);
+            groupsFieldNameCell.setMergeAction(GroupsFieldNameCell.MergeAction.UNMERGE);
+        }
+
+        private String mergeLeftAndRightEntryGroups(String left, String right) {
+            Set<String> leftGroups = new HashSet<>(Arrays.stream(left.split(", ")).toList());
+            List<String> rightGroups = Arrays.stream(right.split(", ")).toList();
+            leftGroups.addAll(rightGroups);
+
+            return String.join(", ", leftGroups);
         }
     }
 
@@ -292,7 +292,7 @@ public class ThreeWayMergeView extends VBox {
             if (mergeGroupsEdit.canUndo()) {
                 mergeGroupsEdit.undo();
                 updateFieldValues(viewModel.allFields().indexOf(StandardField.GROUPS));
-                groupsFieldCell.mergeActionProperty().set(GroupsFieldNameCell.MergeAction.MERGE);
+                groupsFieldCell.setMergeAction(GroupsFieldNameCell.MergeAction.MERGE);
             }
         }
     }
