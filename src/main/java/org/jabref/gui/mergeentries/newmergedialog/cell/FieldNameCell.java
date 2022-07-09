@@ -44,7 +44,7 @@ public class FieldNameCell extends AbstractCell {
     protected void setAction(String actionName, IconTheme.JabRefIcons icon, Command command) {
         actionLayout.getChildren().clear();
         Node iconNode = icon.getGraphicNode();
-        Button actionButton = factory.createIconButton(() -> Localization.lang(actionName), command);
+        Button actionButton = factory.createIconButton(() -> actionName, command);
         actionButton.setGraphic(iconNode);
         actionButton.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
         actionButton.setMaxHeight(Double.MAX_VALUE);
