@@ -857,7 +857,7 @@ public class LibraryTab extends Tab {
         public IndexUpdateListener() {
             if (preferencesService.getFilePreferences().shouldFulltextIndexLinkedFiles()) {
                 try {
-                    indexingTaskManager.addToIndex(PdfIndexer.of(bibDatabaseContext, preferencesService.getFilePreferences()), bibDatabaseContext);
+                    indexingTaskManager.updateIndex(PdfIndexer.of(bibDatabaseContext, preferencesService.getFilePreferences()), bibDatabaseContext);
                 } catch (IOException e) {
                     LOGGER.error("Cannot access lucene index", e);
                 }
