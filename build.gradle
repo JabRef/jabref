@@ -127,7 +127,6 @@ dependencies {
     implementation 'com.h2database:h2-mvstore:2.1.214'
 
     implementation group: 'org.apache.tika', name: 'tika-core', version: '2.4.1'
-    //implementation 'com.github.Jabref:icu:addASciiTest-SNAPSHOT' // local build from https://github.com/unicode-org/icu/pull/2127
 
     // required for reading write-protected PDFs - see https://github.com/JabRef/jabref/pull/942#issuecomment-209252635
     implementation 'org.bouncycastle:bcprov-jdk18on:1.71'
