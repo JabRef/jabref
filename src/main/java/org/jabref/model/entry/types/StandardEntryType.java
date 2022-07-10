@@ -22,6 +22,7 @@ public enum StandardEntryType implements EntryType {
     // Biblatex
     BookInBook("BookInBook"),
     InReference("InReference"),
+    JURISDICTION_APA("Jurisdiction_apa"),
     MvBook("MvBook"),
     MvCollection("MvCollection"),
     MvProceedings("MvProceedings"),

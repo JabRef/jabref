@@ -99,6 +99,18 @@ public class BibtexEntryTypeDefinitions {
             .build();
 
     /**
+     * A jurisdiction from court case.
+     * <p>
+     * Required fields: title, citation, CITATION+an:citeorg, CITATION+an:citedate, CITATION+an:citeinfo, url, date, origdate
+     * Optional fields: none
+     */
+    private static final BibEntryType JURISDICTION_APA = new BibEntryTypeBuilder()
+            .withType(StandardEntryType.JURISDICTION_APA)
+            .withRequiredFields(StandardField.TITLE, StandardField.CITATION, StandardField.CITATION_CITEINFO, StandardField.URL, StandardField.DATE)
+            .withDetailFields(StandardField.ORGANIZATION, StandardField.CITATION_CITEORG, StandardField.CITATION_CITEDATE, StandardField.CITATION_CITEDATE, StandardField.ORIGDATE)
+            .build();
+
+    /**
      * Technical documentation.
      * Required field: title.
      * Optional fields: author, organization, address, edition, month, year, note.
@@ -178,7 +190,7 @@ public class BibtexEntryTypeDefinitions {
             .build();
 
     public static final List<BibEntryType> ALL = Arrays.asList(ARTICLE, INBOOK, BOOK, BOOKLET, INCOLLECTION, CONFERENCE,
-            INPROCEEDINGS, PROCEEDINGS, MANUAL, MASTERSTHESIS, PHDTHESIS, TECHREPORT, UNPUBLISHED, MISC);
+            INPROCEEDINGS, PROCEEDINGS, MANUAL, MASTERSTHESIS, PHDTHESIS, TECHREPORT, UNPUBLISHED, MISC, JURISDICTION_APA);
 
     public static final List<BibEntryType> RECOMMENDED = Arrays.asList(ARTICLE, BOOK, INPROCEEDINGS, TECHREPORT, MISC);
 
