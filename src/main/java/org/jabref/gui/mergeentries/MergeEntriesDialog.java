@@ -1,5 +1,7 @@
 package org.jabref.gui.mergeentries;
 
+import javax.swing.undo.CompoundEdit;
+
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 
@@ -45,5 +47,9 @@ public class MergeEntriesDialog extends BaseDialog<BibEntry> {
 
     public void setRightHeaderText(String rightHeaderText) {
         threeWayMergeView.setRightHeader(rightHeaderText);
+    }
+
+    public CompoundEdit getMergeGroupsEdit() {
+        return threeWayMergeView.getMergeGroupsEdit();
     }
 }

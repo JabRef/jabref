@@ -5,11 +5,14 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import javax.swing.undo.CompoundEdit;
 
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleIntegerProperty;
@@ -163,6 +166,10 @@ public class DuplicateSearch extends SimpleCommand {
         } else if (resolverResult == DuplicateResolverResult.KEEP_MERGE) {
             result.replace(first, second, dialog.getMergedEntry());
         }
+
+        if (dialog.getMergeGroupsEdit().canUndo()) {
+            result.setMergeGroupsEdit(dialog.getMergeGroupsEdit());
+        }
     }
 
     private void handleDuplicates(DuplicateSearchResult result) {
@@ -184,6 +191,7 @@ public class DuplicateSearch extends SimpleCommand {
             libraryTab.getDatabase().insertEntries(result.getToAdd());
             libraryTab.markBaseChanged();
         }
+        result.getMergedGroupsEdit().ifPresent(compoundEdit::addEdit);
 
         duplicateProgress.set(0);
 
@@ -202,6 +210,8 @@ public class DuplicateSearch extends SimpleCommand {
 
         private final Map<Integer, BibEntry> toRemove = new HashMap<>();
         private final List<BibEntry> toAdd = new ArrayList<>();
+
+        private CompoundEdit mergeGroupsEdit;
 
         private int duplicates = 0;
 
@@ -231,6 +241,14 @@ public class DuplicateSearch extends SimpleCommand {
 
         public synchronized int getDuplicateCount() {
             return duplicates;
+        }
+
+        public synchronized void setMergeGroupsEdit(CompoundEdit mergeGroupsEdit) {
+            this.mergeGroupsEdit = mergeGroupsEdit;
+        }
+
+        public Optional<CompoundEdit> getMergedGroupsEdit() {
+            return Optional.ofNullable(mergeGroupsEdit);
         }
     }
 }
