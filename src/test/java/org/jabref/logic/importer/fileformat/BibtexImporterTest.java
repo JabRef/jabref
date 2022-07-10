@@ -180,18 +180,16 @@ public class BibtexImporterTest {
         ParserResult parserResult = importer.importDatabase(
                 Path.of(BibtexImporterTest.class.getResource(filename).toURI()));
 
-        BibDatabaseContext parsedContext = new BibDatabaseContext(parserResult.getDatabase(), parserResult.getMetaData());
+        BibDatabase database = new BibDatabase(List.of(new BibEntry(StandardEntryType.Article).withField(StandardField.TITLE, "Ü ist ein Umlaut")));
+        database.setNewLineSeparator("\n");
+        assertEquals(
+                database.getEntries(),
+                parserResult.getDatabase().getEntries());
 
         MetaData metaData = new MetaData();
         metaData.setMode(BibDatabaseMode.BIBTEX);
         metaData.setEncoding(StandardCharsets.UTF_16BE);
-        BibDatabase database = new BibDatabase(List.of(new BibEntry(StandardEntryType.Article).withField(StandardField.TITLE, "Ü ist ein Umlaut")));
-        database.setNewLineSeparator("\n");
-        BibDatabaseContext bibDatabaseContext = new BibDatabaseContext(database, metaData);
-
-        assertEquals(
-                     bibDatabaseContext.getDatabase().getEntries(),
-                     parsedContext.getDatabase().getEntries());
+        assertEquals(metaData, parserResult.getMetaData());
     }
 
     @Test
