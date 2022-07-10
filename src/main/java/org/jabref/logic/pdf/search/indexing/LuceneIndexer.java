@@ -159,7 +159,7 @@ public class LuceneIndexer {
                 document.add(new StringField(SearchFieldConstants.BIB_ENTRY_ID_HASH, String.valueOf(bibEntry.getLastIndexHash()), org.apache.lucene.document.Field.Store.YES));
                 for (Map.Entry<Field, String> field : bibEntry.getFieldMap().entrySet()) {
                     document.add(new TextField(SearchFieldConstants.BIB_FIELDS_PREFIX + field.getKey().getName(), field.getValue(), org.apache.lucene.document.Field.Store.YES));
-                    SearchFieldConstants.all_searchable_fields.add(SearchFieldConstants.BIB_FIELDS_PREFIX + field.getKey().getName());
+                    SearchFieldConstants.searchableBibFields.add(SearchFieldConstants.BIB_FIELDS_PREFIX + field.getKey().getName());
                 }
                 indexWriter.addDocument(document);
                 indexWriter.commit();

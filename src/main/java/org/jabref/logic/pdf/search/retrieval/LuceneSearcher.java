@@ -1,16 +1,22 @@
 package org.jabref.logic.pdf.search.retrieval;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 import org.jabref.gui.LibraryTab;
+import org.jabref.logic.search.SearchQuery;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.entry.BibEntry;
 import org.jabref.model.pdf.search.EnglishStemAnalyzer;
 import org.jabref.model.pdf.search.LuceneSearchResults;
 import org.jabref.model.pdf.search.SearchFieldConstants;
 import org.jabref.model.pdf.search.SearchResult;
+import org.jabref.model.search.rules.SearchRules;
 import org.jabref.model.strings.StringUtil;
 
 import org.apache.lucene.index.DirectoryReader;
@@ -30,14 +36,16 @@ public final class LuceneSearcher {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LibraryTab.class);
 
+    private final BibDatabaseContext databaseContext;
     private final Directory indexDirectory;
 
-    private LuceneSearcher(Directory indexDirectory) {
+    private LuceneSearcher(BibDatabaseContext databaseContext, Directory indexDirectory) {
+        this.databaseContext = databaseContext;
         this.indexDirectory = indexDirectory;
     }
 
     public static LuceneSearcher of(BibDatabaseContext databaseContext) throws IOException {
-        return new LuceneSearcher(new NIOFSDirectory(databaseContext.getFulltextIndexPath()));
+        return new LuceneSearcher(databaseContext, new NIOFSDirectory(databaseContext.getFulltextIndexPath()));
     }
 
     /**
@@ -49,6 +57,7 @@ public final class LuceneSearcher {
      */
     public LuceneSearchResults search(final String searchString, final int maxHits)
         throws IOException {
+        Thread.dumpStack();
         if (StringUtil.isBlank(Objects.requireNonNull(searchString, "The search string was null!"))) {
             return new LuceneSearchResults();
         }
@@ -65,8 +74,8 @@ public final class LuceneSearcher {
 
         try (IndexReader reader = DirectoryReader.open(indexDirectory)) {
             IndexSearcher searcher = new IndexSearcher(reader);
-            String[] searchable_fields = new String[SearchFieldConstants.all_searchable_fields.size()];
-            SearchFieldConstants.all_searchable_fields.toArray(searchable_fields);
+            String[] searchable_fields = new String[SearchFieldConstants.searchableBibFields.size()];
+            SearchFieldConstants.searchableBibFields.toArray(searchable_fields);
             Query query = new MultiFieldQueryParser(searchable_fields, new EnglishStemAnalyzer()).parse(searchString);
             TopDocs results = searcher.search(query, maxHits);
             for (ScoreDoc scoreDoc : results.scoreDocs) {
@@ -77,5 +86,34 @@ public final class LuceneSearcher {
             LOGGER.warn("Could not parse query: '{}'!\n{}", searchString, e.getMessage());
             return new LuceneSearchResults();
         }
+    }
+
+    public HashMap<BibEntry, List<SearchResult>> search(SearchQuery query) {
+        HashMap<BibEntry, List<SearchResult>> results = new HashMap<>();
+        Set<String> fieldsToSearchIn = new HashSet<>(SearchFieldConstants.searchableBibFields);
+        if (query.getSearchFlags().contains(SearchRules.SearchFlags.FULLTEXT)) {
+            fieldsToSearchIn.addAll(List.of(SearchFieldConstants.PDF_FIELDS));
+        }
+        try (IndexReader reader = DirectoryReader.open(indexDirectory)) {
+            IndexSearcher searcher = new IndexSearcher(reader);
+            String[] fieldsToSearchArray = new String[fieldsToSearchIn.size()];
+            fieldsToSearchIn.toArray(fieldsToSearchArray);
+            Query luceneQuery = new MultiFieldQueryParser(fieldsToSearchArray, new EnglishStemAnalyzer()).parse(query.getQuery());
+            TopDocs docs = searcher.search(luceneQuery, Integer.MAX_VALUE);
+            for (ScoreDoc scoreDoc : docs.scoreDocs) {
+                SearchResult searchResult = new SearchResult(searcher, luceneQuery, scoreDoc);
+                for (BibEntry match : searchResult.getMatchingEntries(databaseContext)) {
+                    if (!results.containsKey(match)) {
+                        results.put(match, new LinkedList<>());
+                    }
+                    results.get(match).add(searchResult);
+                }
+            }
+        } catch (ParseException e) {
+            LOGGER.warn("Could not parse query: '{}'!\n{}", query.getQuery(), e.getMessage());
+        } catch (IOException e) {
+            LOGGER.warn("Could not open Index at: '{}'!\n{}", indexDirectory, e.getMessage());
+        }
+        return results;
     }
 }

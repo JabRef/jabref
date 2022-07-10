@@ -41,6 +41,7 @@ public class SearchResultsTableDataModel {
         }
 
         entriesFiltered = new FilteredList<>(entriesViewModel);
+        // don't need this if ranking is in place?
         entriesFiltered.predicateProperty().bind(EasyBind.map(stateManager.activeSearchQueryProperty(), (query) -> entry -> isMatchedBySearch(query, entry)));
 
         // We need to wrap the list since otherwise sorting in the table does not work

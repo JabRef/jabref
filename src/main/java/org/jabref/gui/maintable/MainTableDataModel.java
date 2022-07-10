@@ -1,9 +1,13 @@
 package org.jabref.gui.maintable;
 
+import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.function.Predicate;
 
 import javafx.beans.binding.Bindings;
+import javafx.beans.binding.ObjectBinding;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleIntegerProperty;
@@ -16,10 +20,12 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.groups.GroupViewMode;
 import org.jabref.gui.groups.GroupsPreferences;
 import org.jabref.gui.util.BindingsHelper;
+import org.jabref.logic.pdf.search.retrieval.LuceneSearcher;
 import org.jabref.logic.search.SearchQuery;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.groups.GroupTreeNode;
+import org.jabref.model.pdf.search.SearchResult;
 import org.jabref.model.search.matchers.MatcherSet;
 import org.jabref.model.search.matchers.MatcherSets;
 import org.jabref.preferences.PreferencesService;
@@ -46,9 +52,11 @@ public class MainTableDataModel {
                 new BibEntryTableViewModel(entry, bibDatabaseContext, fieldValueFormatter));
 
         entriesFiltered = new FilteredList<>(entriesViewModel);
-        entriesFiltered.predicateProperty().bind(
-                EasyBind.combine(stateManager.activeGroupProperty(), stateManager.activeSearchQueryProperty(), (groups, query) -> entry -> isMatched(groups, query, entry))
-        );
+        ObjectBinding<Predicate<BibEntryTableViewModel>> filter = Bindings.createObjectBinding(
+                () -> entry -> isMatchedByGroup(stateManager.activeGroupProperty(), entry), stateManager.activeGroupProperty());
+        entriesFiltered.predicateProperty().bind(filter);
+
+        stateManager.activeSearchQueryProperty().addListener((observable, oldValue, newValue) -> doSearch(newValue));
 
         IntegerProperty resultSize = new SimpleIntegerProperty();
         resultSize.bind(Bindings.size(entriesFiltered));
@@ -57,13 +65,26 @@ public class MainTableDataModel {
         entriesSorted = new SortedList<>(entriesFiltered);
     }
 
-    private boolean isMatched(ObservableList<GroupTreeNode> groups, Optional<SearchQuery> query, BibEntryTableViewModel entry) {
-        return isMatchedByGroup(groups, entry) && isMatchedBySearch(query, entry);
+    private void doSearch(Optional<SearchQuery> query) {
+        for (BibEntryTableViewModel entry : entriesFiltered) {
+            entry.resetSearchResults();
+        }
+        if (query.isPresent()) {
+            String searchString = query.get().getQuery();
+            try {
+                LuceneSearcher searcher = LuceneSearcher.of(bibDatabaseContext);
+                Map<BibEntry, List<SearchResult>> results = searcher.search(query.get());
+                for (Map.Entry<BibEntry, List<SearchResult>> result : results.entrySet()) {
+                    getTableViewModelForEntry(result.getKey()).ifPresent(bibEntryTableViewModel -> bibEntryTableViewModel.addSearchResults(result.getValue()));
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
-    private boolean isMatchedBySearch(Optional<SearchQuery> query, BibEntryTableViewModel entry) {
-        return query.map(matcher -> matcher.isMatch(entry.getEntry()))
-                    .orElse(true);
+    private Optional<BibEntryTableViewModel> getTableViewModelForEntry(BibEntry entry) {
+        return entriesSorted.stream().filter(viewModel -> viewModel.getEntry().equals(entry)).findFirst();
     }
 
     private boolean isMatchedByGroup(ObservableList<GroupTreeNode> groups, BibEntryTableViewModel entry) {

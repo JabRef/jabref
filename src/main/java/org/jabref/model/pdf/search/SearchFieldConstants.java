@@ -1,8 +1,7 @@
 package org.jabref.model.pdf.search;
 
-import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 public class SearchFieldConstants {
 
@@ -17,7 +16,7 @@ public class SearchFieldConstants {
     public static final String MODIFIED = FILE_FIELDS_PREFIX + "modified";
 
     public static final String[] PDF_FIELDS = new String[]{PATH, CONTENT, ANNOTATIONS};
-    public static Set<String> all_searchable_fields = Arrays.stream(PDF_FIELDS).collect(Collectors.toSet());
+    public static Set<String> searchableBibFields = new HashSet<>();
 
     public static final String VERSION = "lucene92_jabref0";
 }

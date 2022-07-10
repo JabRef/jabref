@@ -147,12 +147,30 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         }
         */
 
+        // always sort by score first. If no search is ongoing, it will be equal for all columns.
+        ListChangeListener<? super TableColumn<BibEntryTableViewModel, ?>> scoreSortOderPrioritizer = new ListChangeListener<TableColumn<BibEntryTableViewModel, ?>>() {
+            @Override
+            public void onChanged(Change<? extends TableColumn<BibEntryTableViewModel, ?>> c) {
+                getSortOrder().removeListener(this);
+                getSortOrder().removeAll(getColumns().get(0));
+                getSortOrder().add(0, getColumns().get(0));
+                getSortOrder().addListener(this);
+            }
+        };
+
+        // insert score sort order
+        this.getSortOrder().add(0, this.getColumns().get(0));
         mainTablePreferences.getColumnPreferences().getColumnSortOrder().forEach(columnModel ->
                 this.getColumns().stream()
                     .map(column -> (MainTableColumn<?>) column)
                     .filter(column -> column.getModel().equals(columnModel))
+                    .filter(column -> !column.getModel().getType().equals(MainTableColumnModel.Type.SCORE))
                     .findFirst()
                     .ifPresent(column -> this.getSortOrder().add(column)));
+        this.getSortOrder().addListener(scoreSortOderPrioritizer);
+
+        // Is this always called after the search is done?
+        stateManager.activeSearchQueryProperty().addListener((observable, oldValue, newValue) -> sort());
 
         if (mainTablePreferences.getResizeColumnsToFit()) {
             this.setColumnResizePolicy(new SmartConstrainedResizePolicy());

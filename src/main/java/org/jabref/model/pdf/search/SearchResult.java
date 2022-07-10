@@ -5,7 +5,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.LinkedFile;
 
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.index.IndexableField;
@@ -70,6 +72,17 @@ public final class SearchResult {
             this.pageNumber = -1;
             this.modified = -1;
         }
+    }
+
+    public List<BibEntry> getMatchingEntries(BibDatabaseContext databaseContext) {
+        if (this.path.length() > 0) {
+            return getEntriesWithFile(path, databaseContext);
+        }
+        return databaseContext.getEntries().stream().filter(bibEntry -> bibEntry.getLastIndexHash() == this.hash).collect(Collectors.toList());
+    }
+
+    private List<BibEntry> getEntriesWithFile(String path, BibDatabaseContext databaseContext) {
+        return databaseContext.getEntries().stream().filter(entry -> entry.getFiles().stream().map(LinkedFile::getLink).anyMatch(link -> link.equals(path))).collect(Collectors.toList());
     }
 
     private String getFieldContents(IndexSearcher searcher, ScoreDoc scoreDoc, String field) throws IOException {
