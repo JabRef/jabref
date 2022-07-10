@@ -194,6 +194,27 @@ public class BibtexDatabaseWriterTest {
     }
 
     @Test
+    void utf8EncodingWrittenIfExplicitlyDefined() throws Exception {
+        metaData.setEncoding(StandardCharsets.UTF_8);
+        metaData.setEncodingExplicitlySupplied(true);
+
+        databaseWriter.savePartOfDatabase(bibtexContext, Collections.emptyList());
+
+        assertEquals("% Encoding: UTF-8" + OS.NEWLINE,
+                stringWriter.toString());
+    }
+
+    @Test
+    void utf8EncodingNotWrittenIfNotExplicitlyDefined() throws Exception {
+        metaData.setEncoding(StandardCharsets.UTF_8);
+        metaData.setEncodingExplicitlySupplied(false);
+
+        databaseWriter.savePartOfDatabase(bibtexContext, Collections.emptyList());
+
+        assertEquals("", stringWriter.toString());
+    }
+
+    @Test
     void writeMetadata() throws Exception {
         DatabaseCitationKeyPattern bibtexKeyPattern = new DatabaseCitationKeyPattern(mock(GlobalCitationKeyPattern.class));
         bibtexKeyPattern.setDefaultValue("test");
@@ -394,6 +415,44 @@ public class BibtexDatabaseWriterTest {
         Path pathToFile = bibFolder.resolve("JabRef.bib");
         Path file = Files.createFile(pathToFile);
         Charset charset = Charset.forName("windows-1252");
+
+        try (BufferedWriter fileWriter = Files.newBufferedWriter(file, charset)) {
+            BibWriter bibWriter = new BibWriter(fileWriter, context.getDatabase().getNewLineSeparator());
+            BibtexDatabaseWriter databaseWriter = new BibtexDatabaseWriter(bibWriter, generalPreferences, savePreferences, entryTypesManager);
+            databaseWriter.saveDatabase(context);
+        }
+
+        assertEquals(Files.readString(testFile, charset), Files.readString(file, charset));
+    }
+
+    @Test
+    void roundtripUtf8HeaderKept(@TempDir Path bibFolder) throws Exception {
+        Path testFile = Path.of(BibtexImporterTest.class.getResource("encoding-utf-8-with-header-with-databasetypecomment.bib").toURI());
+        ParserResult result = new BibtexImporter(importFormatPreferences, fileMonitor).importDatabase(testFile);
+        BibDatabaseContext context = new BibDatabaseContext(result.getDatabase(), result.getMetaData());
+
+        Path pathToFile = bibFolder.resolve("JabRef.bib");
+        Path file = Files.createFile(pathToFile);
+        Charset charset = StandardCharsets.UTF_8;
+
+        try (BufferedWriter fileWriter = Files.newBufferedWriter(file, charset)) {
+            BibWriter bibWriter = new BibWriter(fileWriter, context.getDatabase().getNewLineSeparator());
+            BibtexDatabaseWriter databaseWriter = new BibtexDatabaseWriter(bibWriter, generalPreferences, savePreferences, entryTypesManager);
+            databaseWriter.saveDatabase(context);
+        }
+
+        assertEquals(Files.readString(testFile, charset), Files.readString(file, charset));
+    }
+
+    @Test
+    void roundtripNotExplicitUtf8HeaderNotInsertedDuringWrite(@TempDir Path bibFolder) throws Exception {
+        Path testFile = Path.of(BibtexImporterTest.class.getResource("encoding-utf-8-without-header-with-databasetypecomment.bib").toURI());
+        ParserResult result = new BibtexImporter(importFormatPreferences, fileMonitor).importDatabase(testFile);
+        BibDatabaseContext context = new BibDatabaseContext(result.getDatabase(), result.getMetaData());
+
+        Path pathToFile = bibFolder.resolve("JabRef.bib");
+        Path file = Files.createFile(pathToFile);
+        Charset charset = StandardCharsets.UTF_8;
 
         try (BufferedWriter fileWriter = Files.newBufferedWriter(file, charset)) {
             BibWriter bibWriter = new BibWriter(fileWriter, context.getDatabase().getNewLineSeparator());
