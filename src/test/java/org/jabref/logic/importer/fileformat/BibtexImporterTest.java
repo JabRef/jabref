@@ -12,7 +12,6 @@ import java.util.stream.Stream;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.util.StandardFileType;
-import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
@@ -179,10 +178,8 @@ public class BibtexImporterTest {
         ParserResult parserResult = importer.importDatabase(
                 Path.of(BibtexImporterTest.class.getResource(filename).toURI()));
 
-        BibDatabase database = new BibDatabase(List.of(new BibEntry(StandardEntryType.Article).withField(StandardField.TITLE, "Ü ist ein Umlaut")));
-        database.setNewLineSeparator("\n");
         assertEquals(
-                database.getEntries(),
+                List.of(new BibEntry(StandardEntryType.Article).withField(StandardField.TITLE, "Ü ist ein Umlaut")),
                 parserResult.getDatabase().getEntries());
 
         MetaData metaData = new MetaData();
@@ -196,6 +193,17 @@ public class BibtexImporterTest {
         ParserResult parserResult = importer.importDatabase(
                 Path.of(BibtexImporterTest.class.getResource("encoding-utf-8-with-header.bib").toURI()));
         assertTrue(parserResult.getMetaData().getEncodingExplicitlySupplied());
+    }
+
+    @Test
+    public void wrongEncodingSupplied() throws Exception {
+        ParserResult parserResult = importer.importDatabase(
+                Path.of(BibtexImporterTest.class.getResource("encoding-windows-1252-but-utf-8-declared--decoding-fails.bib").toURI()));
+
+        // The test file contains "Test{NBSP}I. Last" where the character "{NBSP}" is encoded using Windows-1252 instead of UTF-8
+        assertEquals(
+                List.of(new BibEntry(StandardEntryType.Article).withField(StandardField.AUTHOR, "Test�I. Last")),
+                parserResult.getDatabase().getEntries());
     }
 
     @Test

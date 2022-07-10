@@ -37,7 +37,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We improved the message explaining the options when modifying an automatic keyword group [#8911](https://github.com/JabRef/jabref/issues/8911)
 - We moved the preferences option "Warn about duplicates on import" option from the tab "File" to the tab "Import and Export". [koppor#570](https://github.com/koppor/jabref/issues/570)
 - When JabRef encounters `% Encoding: UTF-8` header, it is kept during writing (and not removed). [#8964](https://github.com/JabRef/jabref/pull/8964)
-- We ignore characters, which cannot be decoded using the specified encoding. This happens if the user inputs something strange and JabRef writes the file.
+- We replace characters which cannot be decoded using the specified encoding by a (probably another) valid character. This happens if JabRef detects the wrong charset (e.g., UTF-8 instead of Windows 1252).
 
 ### Fixed
 

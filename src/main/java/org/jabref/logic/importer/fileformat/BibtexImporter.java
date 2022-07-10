@@ -82,11 +82,11 @@ public class BibtexImporter extends Importer {
             LOGGER.debug("Encoding used to read the file: {}", encoding);
         }
 
-        // We "just" ignore unreadable characters
+        // We replace unreadable characters
         // Unfortunately, no warning will be issued to the user
         // As this is a very seldom case, we accept that
         CharsetDecoder decoder = encoding.newDecoder();
-        decoder.onMalformedInput(CodingErrorAction.IGNORE);
+        decoder.onMalformedInput(CodingErrorAction.REPLACE);
 
         try (InputStreamReader inputStreamReader = new InputStreamReader(Files.newInputStream(filePath), decoder);
              BufferedReader reader = new BufferedReader(inputStreamReader)) {
