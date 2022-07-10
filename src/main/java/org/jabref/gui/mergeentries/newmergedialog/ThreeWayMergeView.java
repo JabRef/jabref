@@ -33,7 +33,7 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.EntryTypeFactory;
 
 public class ThreeWayMergeView extends VBox {
-
+    public static final String GROUPS_SEPARATOR = ", ";
     public static final int GRID_COLUMN_MIN_WIDTH = 250;
 
     public static final String LEFT_DEFAULT_HEADER = Localization.lang("Left Entry");
@@ -280,7 +280,7 @@ public class ThreeWayMergeView extends VBox {
             List<String> rightGroups = Arrays.stream(right.split(", ")).toList();
             leftGroups.addAll(rightGroups);
 
-            return String.join(", ", leftGroups);
+            return String.join(GROUPS_SEPARATOR, leftGroups);
         }
     }
 
