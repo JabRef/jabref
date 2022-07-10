@@ -13,7 +13,6 @@ import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabase;
-import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
