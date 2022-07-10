@@ -133,6 +133,10 @@ public class FetchAndMergeEntry {
                     edited = true;
                 }
             }
+            if (dialog.getMergeGroupsEdit().canUndo()) {
+                ce.addEdit(dialog.getMergeGroupsEdit());
+                edited = true;
+            }
 
             if (edited) {
                 ce.end();

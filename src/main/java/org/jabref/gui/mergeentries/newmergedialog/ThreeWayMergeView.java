@@ -231,6 +231,10 @@ public class ThreeWayMergeView extends VBox {
         }
     }
 
+    public CompoundEdit getMergeGroupsEdit() {
+        return mergeGroupsEdit;
+    }
+
     public class MergeGroupsCommand extends SimpleCommand {
         private final GroupsFieldNameCell groupsFieldNameCell;
 

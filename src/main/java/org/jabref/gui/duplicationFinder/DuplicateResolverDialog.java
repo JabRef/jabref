@@ -1,5 +1,7 @@
 package org.jabref.gui.duplicationFinder;
 
+import javax.swing.undo.CompoundEdit;
+
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonBar.ButtonData;
@@ -137,5 +139,9 @@ public class DuplicateResolverDialog extends BaseDialog<DuplicateResolverResult>
 
     public BibEntry getMergedEntry() {
         return threeWayMerge.getMergedEntry();
+    }
+
+    public CompoundEdit getMergeGroupsEdit() {
+        return threeWayMerge.getMergeGroupsEdit();
     }
 }

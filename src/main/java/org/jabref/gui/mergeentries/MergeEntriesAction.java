@@ -81,6 +81,7 @@ public class MergeEntriesAction extends SimpleCommand {
             ce.addEdit(new UndoableInsertEntries(databaseContext.getDatabase(), mergedEntry.get()));
             List<BibEntry> entriesToRemove = Arrays.asList(one, two);
             ce.addEdit(new UndoableRemoveEntries(databaseContext.getDatabase(), entriesToRemove));
+            ce.addEdit(dlg.getMergeGroupsEdit());
             databaseContext.getDatabase().removeEntries(entriesToRemove);
             ce.end();
             Globals.undoManager.addEdit(ce); // ToDo: Rework UndoManager and extract Globals
