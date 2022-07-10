@@ -7,7 +7,17 @@ In case, there is no issue present, the pull request implementing the feature is
 
 Note that this project **does not** adhere to [Semantic Versioning](http://semver.org/).
 
-## [Unreleased]
+## [version6] - Big changes
+
+The branch `version6` is intended to collect improvements, where multiple pull requests build on each other.
+From the user perspective, the combination of the pull request needs to be tested.
+(We created the branch to support lowering the amount of open pull requests)
+
+
+
+
+
+## [Unreleased] - version 5.7 - not yet released
 
 ### Added
 
@@ -35,7 +45,8 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - When configured SSL certificates changed, JabRef warns the user to restart to apply the configuration.
 - We improved the appearances and logic of the "Manage field names & content" dialog, and renamed it to "Automatic field editor". [#6536](https://github.com/JabRef/jabref/issues/6536)
 - We improved the message explaining the options when modifying an automatic keyword group [#8911](https://github.com/JabRef/jabref/issues/8911)
-- We moved the preferences option "Warn about duplicates on import" option from the tab "File" to the tab "Import and Export". [kopper#570](https://github.com/koppor/jabref/issues/570)
+- We moved the preferences option "Warn about duplicates on import" option from the tab "File" to the tab "Import and Export". [koppor#570](https://github.com/koppor/jabref/issues/570)
+- When JabRef encounters `% Encoding: UTF-8` header, it is kept during writing (and not removed). [#8964](https://github.com/JabRef/jabref/pull/8964)
 
 ### Fixed
 
@@ -839,6 +850,7 @@ The changelog of JabRef 4.x is available at the [v4.3.1 tag](https://github.com/
 The changelog of JabRef 3.x is available at the [v3.8.2 tag](https://github.com/JabRef/jabref/blob/v3.8.2/CHANGELOG.md).
 The changelog of JabRef 2.11 and all previous versions is available as [text file in the v2.11.1 tag](https://github.com/JabRef/jabref/blob/v2.11.1/CHANGELOG).
 
+[version6]: https://github.com/JabRef/jabref/compare/main...version6
 [Unreleased]: https://github.com/JabRef/jabref/compare/v5.6...HEAD
 [5.6]: https://github.com/JabRef/jabref/compare/v5.5...v5.6
 [5.5]: https://github.com/JabRef/jabref/compare/v5.4...v5.5
