@@ -11,6 +11,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+import java.util.Arrays;
 import java.util.Objects;
 
 import org.jabref.logic.util.FileType;
@@ -122,6 +123,11 @@ public abstract class Importer implements Comparable<Importer> {
             if ((matches == null) || (matches.length == 0)) {
                 return defaultCharSet;
             }
+
+            if (Arrays.stream(matches).anyMatch(charset -> "ASCII".equals(charset.getName()))) {
+                return defaultCharSet;
+            }
+
             if (matches[0] != null) {
                 return Charset.forName(matches[0].getName());
             }
@@ -158,7 +164,7 @@ public abstract class Importer implements Comparable<Importer> {
         return new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8));
     }
 
-    public static BufferedReader getReader(InputStream stream) throws IOException {
+    public static BufferedReader getReader(InputStream stream) {
         BufferedInputStream bufferedInputStream = new BufferedInputStream(stream);
         Charset charset = getCharset(bufferedInputStream);
         InputStreamReader reader = new InputStreamReader(bufferedInputStream, charset);

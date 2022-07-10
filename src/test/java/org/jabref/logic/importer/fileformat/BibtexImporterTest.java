@@ -174,7 +174,6 @@ public class BibtexImporterTest {
                 parserResult.getDatabase().getEntries());
     }
 
-
     @ParameterizedTest
     @CsvSource({"encoding-utf-16BE-with-header.bib", "encoding-utf-16BE-without-header.bib"})
     public void testParsingOfUtf16EncodedFileReadsUmlautCharacterCorrectly(String filename) throws Exception {
@@ -194,7 +193,7 @@ public class BibtexImporterTest {
                      bibDatabaseContext.getDatabase().getEntries(),
                      parsedContext.getDatabase().getEntries());
     }
-	
+
     @Test
     public void encodingSupplied() throws Exception {
         ParserResult parserResult = importer.importDatabase(
