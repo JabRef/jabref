@@ -5,8 +5,9 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.Objects;
 
-import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.Image;
+import javafx.scene.image.PixelWriter;
+import javafx.scene.image.WritableImage;
 
 import org.jabref.architecture.AllowedToUseAwt;
 
@@ -51,7 +52,7 @@ public class PdfDocumentPageViewModel extends DocumentPageViewModel {
         try {
             int resolution = 96;
             BufferedImage image = renderer.renderImageWithDPI(pageNumber, 2 * resolution, ImageType.RGB);
-            return SwingFXUtils.toFXImage(resize(image, width, height), null);
+            return convertToFxImage(resize(image, width, height));
         } catch (IOException e) {
             // TODO: LOG
             return null;
@@ -67,5 +68,20 @@ public class PdfDocumentPageViewModel extends DocumentPageViewModel {
     public double getAspectRatio() {
         PDRectangle mediaBox = page.getMediaBox();
         return mediaBox.getWidth() / mediaBox.getHeight();
+    }
+
+    // Taken from https://stackoverflow.com/a/57552025/3450689
+    private static Image convertToFxImage(BufferedImage image) {
+        WritableImage wr = null;
+        if (image != null) {
+            wr = new WritableImage(image.getWidth(), image.getHeight());
+            PixelWriter pw = wr.getPixelWriter();
+            for (int x = 0; x < image.getWidth(); x++) {
+                for (int y = 0; y < image.getHeight(); y++) {
+                    pw.setArgb(x, y, image.getRGB(x, y));
+                }
+            }
+        }
+        return wr;
     }
 }

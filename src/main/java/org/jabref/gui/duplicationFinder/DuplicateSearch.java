@@ -142,7 +142,7 @@ public class DuplicateSearch extends SimpleCommand {
     }
 
     private void askResolveStrategy(DuplicateSearchResult result, BibEntry first, BibEntry second, DuplicateResolverType resolverType) {
-        DuplicateResolverDialog dialog = new DuplicateResolverDialog(first, second, resolverType, frame.getCurrentLibraryTab().getBibDatabaseContext(), stateManager);
+        DuplicateResolverDialog dialog = new DuplicateResolverDialog(first, second, resolverType, frame.getCurrentLibraryTab().getBibDatabaseContext(), stateManager, dialogService);
 
         dialog.titleProperty().bind(Bindings.concat(dialog.getTitle()).concat(" (").concat(duplicateProgress.getValue()).concat("/").concat(duplicateTotal).concat(")"));
 

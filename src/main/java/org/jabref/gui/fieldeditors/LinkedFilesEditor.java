@@ -180,8 +180,11 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
         Button writeMetadataToPdf = IconTheme.JabRefIcons.IMPORT.asButton();
         writeMetadataToPdf.setTooltip(new Tooltip(Localization.lang("Write BibTeXEntry metadata to PDF.")));
         writeMetadataToPdf.visibleProperty().bind(linkedFile.isOfflinePdfProperty());
-        writeMetadataToPdf.setOnAction(event -> linkedFile.writeMetadataToPdf());
         writeMetadataToPdf.getStyleClass().setAll("icon-button");
+
+        WriteMetadataToPdfCommand writeMetadataToPdfCommand = linkedFile.createWriteMetadataToPdfCommand();
+        writeMetadataToPdf.disableProperty().bind(writeMetadataToPdfCommand.executableProperty().not());
+        writeMetadataToPdf.setOnAction(event -> writeMetadataToPdfCommand.execute());
 
         Button parsePdfMetadata = IconTheme.JabRefIcons.FILE_SEARCH.asButton();
         parsePdfMetadata.setTooltip(new Tooltip(Localization.lang("Parse Metadata from PDF.")));

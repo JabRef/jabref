@@ -80,7 +80,7 @@ public class DoiResolution implements FulltextFetcher {
             connection.followRedirects(true);
             connection.ignoreHttpErrors(true);
             // some publishers are quite slow (default is 3s)
-            connection.timeout(10000);
+            connection.timeout(30_000);
 
             Connection.Response response = connection.execute();
 

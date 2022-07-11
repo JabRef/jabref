@@ -8,7 +8,6 @@ open module org.jabref {
     // JavaFX
     requires javafx.base;
     requires javafx.graphics;
-    requires javafx.swing;
     requires javafx.controls;
     requires javafx.web;
     requires javafx.fxml;
@@ -105,7 +104,7 @@ open module org.jabref {
     // fulltext search
     requires org.apache.lucene.core;
     // In case the version is updated, please also adapt SearchFieldConstants#VERSION to the newly used version
-    uses org.apache.lucene.codecs.lucene91.Lucene91Codec;
+    uses org.apache.lucene.codecs.lucene92.Lucene92Codec;
 
     requires org.apache.lucene.queryparser;
     uses org.apache.lucene.queryparser.classic.MultiFieldQueryParser;

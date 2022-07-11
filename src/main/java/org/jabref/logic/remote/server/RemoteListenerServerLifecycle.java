@@ -43,7 +43,8 @@ public class RemoteListenerServerLifecycle implements AutoCloseable {
         try {
             result = new RemoteListenerServerThread(messageHandler, port, preferencesService);
         } catch (BindException e) {
-            LOGGER.warn("Port is blocked", e);
+            LOGGER.warn("There was an error opening the configured network port {}. Please ensure there isn't another" +
+                    " application already using that port.", port);
             result = null;
         } catch (IOException e) {
             result = null;

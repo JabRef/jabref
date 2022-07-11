@@ -1,5 +1,7 @@
 package org.jabref.logic.cleanup;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -31,6 +33,14 @@ public class DoiCleanup implements CleanupJob {
         if (entry.hasField(StandardField.DOI)) {
             String doiFieldValue = entry.getField(StandardField.DOI).orElse(null);
 
+            String decodeDoiFieldValue = "";
+            try {
+                decodeDoiFieldValue = URLDecoder.decode(doiFieldValue, "UTF-8");
+            } catch (UnsupportedEncodingException e) {
+                decodeDoiFieldValue = doiFieldValue;
+            }
+            doiFieldValue = decodeDoiFieldValue;
+
             Optional<DOI> doi = DOI.parse(doiFieldValue);
 
             if (doi.isPresent()) {
@@ -45,7 +55,7 @@ public class DoiCleanup implements CleanupJob {
                 // Doi field seems to contain Doi -> cleanup note, url, ee field
                 for (Field field : FIELDS) {
                     entry.getField(field).flatMap(DOI::parse)
-                        .ifPresent(unused -> removeFieldValue(entry, field, changes));
+                         .ifPresent(unused -> removeFieldValue(entry, field, changes));
                 }
             }
         } else {
