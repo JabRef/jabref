@@ -52,7 +52,7 @@ public class TwoFieldsTabView extends AbstractAutomaticFieldEditorTabView implem
     }
 
     public void initialize() {
-        viewModel = new TwoFieldsViewModel(selectedEntries, databaseContext, dialogEdits);
+        viewModel = new TwoFieldsViewModel(selectedEntries, databaseContext.getDatabase().getAllVisibleFields(), dialogEdits);
         initializeFromAndToComboBox();
 
         viewModel.overwriteNonEmptyFieldsProperty().bindBidirectional(overwriteNonEmptyFields.selectedProperty());

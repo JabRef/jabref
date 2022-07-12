@@ -2,6 +2,7 @@ package org.jabref.gui.edit.automaticfiededitor.twofields;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
@@ -14,7 +15,6 @@ import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.edit.automaticfiededitor.MoveFieldValueAction;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableFieldChange;
-import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.strings.StringUtil;
@@ -29,15 +29,13 @@ public class TwoFieldsViewModel extends AbstractViewModel {
     // TODO: Create an abstraction where selectedEntries, databaseContext and dialogEdits dependencies are shared across
     //  all automatic field editors tab view models
     private final List<BibEntry> selectedEntries;
-    private final BibDatabaseContext databaseContext;
     private final NamedCompound dialogEdits;
 
-    public TwoFieldsViewModel(List<BibEntry> selectedEntries, BibDatabaseContext databaseContext, NamedCompound dialogEdits) {
+    public TwoFieldsViewModel(List<BibEntry> selectedEntries, Set<Field> visibleFields, NamedCompound dialogEdits) {
         this.selectedEntries = new ArrayList<>(selectedEntries);
-        this.databaseContext = databaseContext;
         this.dialogEdits = dialogEdits;
 
-        allFields.addAll(databaseContext.getDatabase().getAllVisibleFields());
+        allFields.addAll(visibleFields);
     }
 
     public ObservableList<Field> getAllFields() {
@@ -139,5 +137,9 @@ public class TwoFieldsViewModel extends AbstractViewModel {
             swapFieldValuesEdit.end();
             dialogEdits.addEdit(swapFieldValuesEdit);
         }
+    }
+
+    public List<BibEntry> getSelectedEntries() {
+        return selectedEntries;
     }
 }
