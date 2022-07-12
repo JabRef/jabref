@@ -11,5 +11,5 @@
     </content>
     <ButtonType fx:id="saveButton" text="Keep Modifications" buttonData="OK_DONE"/>
     <ButtonType fx:id="cancelButton"
-                text="Revert" buttonData="CANCEL_CLOSE"/>
+                text="%Cancel" buttonData="CANCEL_CLOSE"/>
 </DialogPane>
