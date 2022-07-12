@@ -70,7 +70,7 @@ public class BstVM {
     }
 
     /**
-     * Transforms the given list of BibEntries to a rendered list of references using the underlying bst file
+     * Transforms the given list of BibEntries to a rendered list of references using the parsed bst program
      *
      * @param bibEntries  list of entries to convert
      * @param bibDatabase (may be null) the bibDatabase used for resolving strings / crossref
@@ -84,17 +84,19 @@ public class BstVM {
             entries.add(new BstEntry(entry));
         }
 
-        StringBuilder bbl = new StringBuilder();
+        StringBuilder resultBuffer = new StringBuilder();
 
         BstVMContext bstVMContext = new BstVMContext(entries, bibDatabase);
-        bstVMContext.functions().putAll(new BstFunctions(bstVMContext, bbl).getBuiltInFunctions());
+        bstVMContext.functions().putAll(new BstFunctions(bstVMContext, resultBuffer).getBuiltInFunctions());
+        bstVMContext.integers().put("entry.max$", Integer.MAX_VALUE);
+        bstVMContext.integers().put("global.max$", Integer.MAX_VALUE);
 
-        BstVMVisitor bstVMVisitor = new BstVMVisitor(bstVMContext, bbl);
+        BstVMVisitor bstVMVisitor = new BstVMVisitor(bstVMContext, resultBuffer);
         bstVMVisitor.visit(tree);
 
         latestContext = bstVMContext;
 
-        return bbl.toString();
+        return resultBuffer.toString();
     }
 
     public String render(Collection<BibEntry> bibEntries) {

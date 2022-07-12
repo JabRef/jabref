@@ -16,8 +16,5 @@ public record BstVMContext(List<BstEntry> entries,
 
     public BstVMContext(List<BstEntry> entries, BibDatabase bibDatabase) {
         this(entries, new HashMap<>(), new HashMap<>(), new HashMap<>(), new Stack<>(), bibDatabase);
-
-        this.integers.put("entry.max$", Integer.MAX_VALUE);
-        this.integers.put("global.max$", Integer.MAX_VALUE);
     }
 }
