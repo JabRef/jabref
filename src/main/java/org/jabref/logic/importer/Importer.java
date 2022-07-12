@@ -123,11 +123,9 @@ public abstract class Importer implements Comparable<Importer> {
             if ((matches == null) || (matches.length == 0)) {
                 return defaultCharSet;
             }
-            if (Arrays.stream(matches).anyMatch(singleCharset -> singleCharset.getName().equals(defaultCharSet.toString()))) {
+
+            if (Arrays.stream(matches).anyMatch(charset -> "ASCII".equals(charset.getName()))) {
                 return defaultCharSet;
-            }
-            if (Arrays.stream(matches).anyMatch(singleCharset -> singleCharset.getName().equals(StandardCharsets.UTF_16.toString()))) {
-                return StandardCharsets.UTF_16;
             }
 
             if (matches[0] != null) {
@@ -166,7 +164,7 @@ public abstract class Importer implements Comparable<Importer> {
         return new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8));
     }
 
-    public static BufferedReader getReader(InputStream stream) throws IOException {
+    public static BufferedReader getReader(InputStream stream) {
         BufferedInputStream bufferedInputStream = new BufferedInputStream(stream);
         Charset charset = getCharset(bufferedInputStream);
         InputStreamReader reader = new InputStreamReader(bufferedInputStream, charset);
