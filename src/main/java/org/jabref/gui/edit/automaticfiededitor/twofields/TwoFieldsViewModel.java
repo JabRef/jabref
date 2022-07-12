@@ -76,12 +76,14 @@ public class TwoFieldsViewModel extends AbstractViewModel {
             String toFieldValue = entry.getField(toField.get()).orElse("");
 
             if (overwriteNonEmptyFields.get() || StringUtil.isBlank(toFieldValue)) {
-                entry.setField(toField.get(), fromFieldValue);
+                if (StringUtil.isNotBlank(fromFieldValue)) {
+                    entry.setField(toField.get(), fromFieldValue);
+                }
 
                 copyFieldValueEdit.addEdit(new UndoableFieldChange(entry,
-                        toField.get(),
-                        toFieldValue,
-                        fromFieldValue));
+                                                                   toField.get(),
+                                                                   toFieldValue,
+                                                                   fromFieldValue));
             }
         }
 
@@ -95,9 +97,9 @@ public class TwoFieldsViewModel extends AbstractViewModel {
         NamedCompound moveEdit = new NamedCompound("MOVE_EDIT");
         if (overwriteNonEmptyFields.get()) {
             new MoveFieldValueAction(fromField.get(),
-                    toField.get(),
-                    selectedEntries,
-                    moveEdit).execute();
+                                     toField.get(),
+                                     selectedEntries,
+                                     moveEdit).execute();
 
             if (moveEdit.hasEdits()) {
                 moveEdit.end();
