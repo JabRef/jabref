@@ -1,12 +1,11 @@
 package org.jabref.logic.pdf.search.retrieval;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 
 import org.jabref.gui.LibraryTab;
 import org.jabref.logic.search.SearchQuery;
@@ -90,15 +89,17 @@ public final class LuceneSearcher {
 
     public HashMap<BibEntry, List<SearchResult>> search(SearchQuery query) {
         HashMap<BibEntry, List<SearchResult>> results = new HashMap<>();
-        Set<String> fieldsToSearchIn = new HashSet<>(SearchFieldConstants.searchableBibFields);
+        HashMap<String, Float> boosts = new HashMap<String, Float>();
+        SearchFieldConstants.searchableBibFields.stream().forEach(field -> boosts.put(field, Float.valueOf(4)));
+
         if (query.getSearchFlags().contains(SearchRules.SearchFlags.FULLTEXT)) {
-            fieldsToSearchIn.addAll(List.of(SearchFieldConstants.PDF_FIELDS));
+            Arrays.stream(SearchFieldConstants.PDF_FIELDS).forEach(field -> boosts.put(field, Float.valueOf(1)));
         }
         try (IndexReader reader = DirectoryReader.open(indexDirectory)) {
             IndexSearcher searcher = new IndexSearcher(reader);
-            String[] fieldsToSearchArray = new String[fieldsToSearchIn.size()];
-            fieldsToSearchIn.toArray(fieldsToSearchArray);
-            Query luceneQuery = new MultiFieldQueryParser(fieldsToSearchArray, new EnglishStemAnalyzer()).parse(query.getQuery());
+            String[] fieldsToSearchArray = new String[boosts.size()];
+            boosts.keySet().toArray(fieldsToSearchArray);
+            Query luceneQuery = new MultiFieldQueryParser(fieldsToSearchArray, new EnglishStemAnalyzer(), boosts).parse(query.getQuery());
             TopDocs docs = searcher.search(luceneQuery, Integer.MAX_VALUE);
             for (ScoreDoc scoreDoc : docs.scoreDocs) {
                 SearchResult searchResult = new SearchResult(searcher, luceneQuery, scoreDoc);
