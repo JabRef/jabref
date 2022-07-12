@@ -17,6 +17,9 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonBar;
+import javafx.scene.control.ButtonType;
 
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
@@ -29,6 +32,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.groups.AbstractGroup;
 import org.jabref.model.groups.ExplicitGroup;
 import org.jabref.model.groups.GroupTreeNode;
+import org.jabref.model.groups.WordKeywordGroup;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.preferences.PreferencesService;
 
@@ -192,9 +196,21 @@ public class GroupTreeViewModel extends AbstractViewModel {
 
             newGroup.ifPresent(group -> {
                 // TODO: Keep assignments
-                boolean keepPreviousAssignments = dialogService.showConfirmationDialogAndWait(
+                String content = Localization.lang("Assign the original group's entries to this group?");
+                ButtonType keepAssignments = new ButtonType(Localization.lang("Assign"), ButtonBar.ButtonData.YES);
+                ButtonType removeAssignments = new ButtonType(Localization.lang("Do not assign"), ButtonBar.ButtonData.NO);
+                ButtonType cancel = new ButtonType(Localization.lang("Cancel"), ButtonBar.ButtonData.CANCEL_CLOSE);
+
+                if (newGroup.get().getClass() == WordKeywordGroup.class) {
+                    content = content + "\n\n" +
+                            Localization.lang("(Note: If original entries lack keywords to qualify for the new group configuration, confirming here will add them)");
+                }
+                Optional<ButtonType> previousAssignments = dialogService.showCustomButtonDialogAndWait(Alert.AlertType.WARNING,
                         Localization.lang("Change of Grouping Method"),
-                        Localization.lang("Assign the original group's entries to this group?"));
+                        content,
+                        keepAssignments,
+                        removeAssignments,
+                        cancel);
                 //        WarnAssignmentSideEffects.warnAssignmentSideEffects(newGroup, panel.frame());
                 boolean removePreviousAssignments = (oldGroup.getGroupNode().getGroup() instanceof ExplicitGroup)
                         && (group instanceof ExplicitGroup);
@@ -209,11 +225,22 @@ public class GroupTreeViewModel extends AbstractViewModel {
                     removePreviousAssignments = false;
                 }
 
-                oldGroup.getGroupNode().setGroup(
-                        group,
-                        keepPreviousAssignments,
-                        removePreviousAssignments,
-                        database.getEntries());
+                if (previousAssignments.isPresent() && (previousAssignments.get().getButtonData() == ButtonBar.ButtonData.YES)) {
+                    oldGroup.getGroupNode().setGroup(
+                            group,
+                            true,
+                            removePreviousAssignments,
+                            database.getEntries());
+                } else if (previousAssignments.isPresent() && (previousAssignments.get().getButtonData() == ButtonBar.ButtonData.NO)) {
+                    oldGroup.getGroupNode().setGroup(
+                            group,
+                            false,
+                            removePreviousAssignments,
+                            database.getEntries());
+                } else if (previousAssignments.isPresent() && (previousAssignments.get().getButtonData() == ButtonBar.ButtonData.CANCEL_CLOSE)) {
+                    return;
+                }
+
                 // stateManager.getEntriesInCurrentDatabase());
 
                 // TODO: Add undo

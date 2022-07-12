@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<style xmlns="http://purl.org/net/xbiblio/csl" version="1.0" default-locale="en-US">
+  <info>
+    <title>Advanced Theory and Simulations</title>
+    <id>http://www.zotero.org/styles/advanced-theory-and-simulations</id>
+    <link href="http://www.zotero.org/styles/advanced-theory-and-simulations" rel="self"/>
+    <link href="http://www.zotero.org/styles/advanced-materials" rel="independent-parent"/>
+    <link href="https://onlinelibrary.wiley.com/page/journal/25130390/homepage/author-guidelines" rel="documentation"/>
+    <category citation-format="numeric"/>
+    <category field="physics"/>
+    <issn>2513-0390</issn>
+    <updated>2022-06-22T12:00:00+00:00</updated>
+    <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
+  </info>
+</style>
