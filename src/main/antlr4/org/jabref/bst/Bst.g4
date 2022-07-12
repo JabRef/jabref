@@ -54,8 +54,8 @@ commands
     ;
 
 identifier
-	: IDENTIFIER
-	;
+    : IDENTIFIER
+    ;
 
 // Obligatory identifier list
 idListObl
@@ -68,18 +68,18 @@ idListOpt
     ;
 
 bstFunction
-	: LT | GT | EQUAL | ADD | SUB | ASSIGN | CONCAT
-	| identifier
-	;
+    : LT | GT | EQUAL | ADD | SUB | ASSIGN | CONCAT
+    | identifier
+    ;
 
 stack
-	: LBRACE stackitem+ RBRACE
-	;
+    : LBRACE stackitem+ RBRACE
+    ;
 
 stackitem
-	: bstFunction
-	| STRING
-	| INTEGER
-	| QUOTED
-	| stack
-	;
+    : bstFunction
+    | STRING
+    | INTEGER
+    | QUOTED
+    | stack
+    ;

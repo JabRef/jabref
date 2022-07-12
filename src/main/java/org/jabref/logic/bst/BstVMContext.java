@@ -13,7 +13,6 @@ public record BstVMContext(List<BstEntry> entries,
                            Map<String, BstFunctions.BstFunction> functions,
                            Stack<Object> stack,
                            BibDatabase bibDatabase) {
-
     public BstVMContext(List<BstEntry> entries, BibDatabase bibDatabase) {
         this(entries, new HashMap<>(), new HashMap<>(), new HashMap<>(), new Stack<>(), bibDatabase);
     }
