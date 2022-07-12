@@ -23,10 +23,10 @@ import com.airhacks.afterburner.views.ViewLoader;
 
 public class TwoFieldsTabView extends AbstractAutomaticFieldEditorTabView implements AutomaticFieldEditorTab {
     @FXML
-    private Button moveValueButton;
+    private Button moveContentButton;
 
     @FXML
-    private Button swapValuesButton;
+    private Button swapContentButton;
 
     @FXML
     private ComboBox<Field> fromFieldComboBox;
@@ -57,8 +57,8 @@ public class TwoFieldsTabView extends AbstractAutomaticFieldEditorTabView implem
 
         viewModel.overwriteNonEmptyFieldsProperty().bindBidirectional(overwriteNonEmptyFields.selectedProperty());
 
-        moveValueButton.disableProperty().bind(viewModel.overwriteNonEmptyFieldsProperty().not());
-        swapValuesButton.disableProperty().bind(viewModel.overwriteNonEmptyFieldsProperty().not());
+        moveContentButton.disableProperty().bind(viewModel.overwriteNonEmptyFieldsProperty().not());
+        swapContentButton.disableProperty().bind(viewModel.overwriteNonEmptyFieldsProperty().not());
     }
 
     private void initializeFromAndToComboBox() {
@@ -102,17 +102,17 @@ public class TwoFieldsTabView extends AbstractAutomaticFieldEditorTabView implem
     }
 
     @FXML
-    void copyValue() {
+    void copyContent() {
         viewModel.copyValue();
     }
 
     @FXML
-    void moveValue() {
+    void moveContent() {
         viewModel.moveValue();
     }
 
     @FXML
-    void swapValues() {
+    void swapContent() {
         viewModel.swapValues();
     }
 }

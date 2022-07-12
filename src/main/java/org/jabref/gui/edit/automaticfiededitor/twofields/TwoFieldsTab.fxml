@@ -35,14 +35,17 @@
                   <CheckBox fx:id="overwriteNonEmptyFields" mnemonicParsing="false" prefHeight="19.0" prefWidth="210.0" text="%Overwrite Non empty fields" GridPane.columnSpan="2147483647" GridPane.rowIndex="4" />
                   <HBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" spacing="8.0" GridPane.columnSpan="2147483647" GridPane.rowIndex="5">
                       <children>
-                          <Button fx:id="copyValueButton" mnemonicParsing="false" onAction="#copyValue" text="%Copy value" />
-                          <Button fx:id="moveValueButton" mnemonicParsing="false" onAction="#moveValue" text="%Move value" />
-                          <Button fx:id="swapValuesButton" mnemonicParsing="false" onAction="#swapValues" text="%Swap values" />
+                          <Button fx:id="copyContentButton"
+                                  mnemonicParsing="false" onAction="#copyContent" text="%Copy content" />
+                          <Button fx:id="moveContentButton"
+                                  mnemonicParsing="false" onAction="#moveContent" text="%Move content" />
+                          <Button fx:id="swapContentButton"
+                                  mnemonicParsing="false" onAction="#swapContent" text="%Swap content" />
                       </children>
                   </HBox>
             <HBox alignment="CENTER_LEFT" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" GridPane.columnSpan="3" GridPane.rowSpan="2">
                <children>
-                      <Label alignment="BOTTOM_LEFT" minHeight="-Infinity" minWidth="-Infinity" styleClass="sectionHeader" text="%Copy or move the value of one field to another">
+                      <Label alignment="BOTTOM_LEFT" minHeight="-Infinity" minWidth="-Infinity" styleClass="sectionHeader" text="%Copy or move the content of one field to another">
                      <HBox.margin>
                         <Insets bottom="10.0" />
                      </HBox.margin>

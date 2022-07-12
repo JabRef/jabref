@@ -1,4 +1,4 @@
-package org.jabref.gui.edit.automaticfiededitor.editfieldvalue;
+package org.jabref.gui.edit.automaticfiededitor.editfieldcontent;
 
 import java.util.Comparator;
 import java.util.List;
@@ -20,7 +20,7 @@ import org.jabref.model.entry.field.FieldFactory;
 
 import com.airhacks.afterburner.views.ViewLoader;
 
-public class EditFieldValueTabView extends AbstractAutomaticFieldEditorTabView {
+public class EditFieldContentTabView extends AbstractAutomaticFieldEditorTabView {
     public Button appendValueButton;
     @FXML
     private ComboBox<Field> fieldComboBox;
@@ -34,11 +34,11 @@ public class EditFieldValueTabView extends AbstractAutomaticFieldEditorTabView {
     private final List<BibEntry> selectedEntries;
     private final BibDatabaseContext databaseContext;
 
-    private EditFieldValueViewModel viewModel;
+    private EditFieldContentViewModel viewModel;
 
     private final NamedCompound dialogEdits;
 
-    public EditFieldValueTabView(List<BibEntry> selectedEntries, BibDatabaseContext databaseContext, NamedCompound dialogEdits) {
+    public EditFieldContentTabView(List<BibEntry> selectedEntries, BibDatabaseContext databaseContext, NamedCompound dialogEdits) {
         this.selectedEntries = selectedEntries;
         this.databaseContext = databaseContext;
         this.dialogEdits = dialogEdits;
@@ -50,7 +50,7 @@ public class EditFieldValueTabView extends AbstractAutomaticFieldEditorTabView {
 
     @FXML
     public void initialize() {
-        viewModel = new EditFieldValueViewModel(databaseContext, selectedEntries, dialogEdits);
+        viewModel = new EditFieldContentViewModel(databaseContext, selectedEntries, dialogEdits);
         fieldComboBox.setConverter(new StringConverter<>() {
             @Override
             public String toString(Field field) {
@@ -75,7 +75,7 @@ public class EditFieldValueTabView extends AbstractAutomaticFieldEditorTabView {
 
     @Override
     public String getTabName() {
-        return Localization.lang("Edit field value");
+        return Localization.lang("Edit field content");
     }
 
     @FXML

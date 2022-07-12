@@ -1,4 +1,4 @@
-package org.jabref.gui.edit.automaticfiededitor.editfieldvalue;
+package org.jabref.gui.edit.automaticfiededitor.editfieldcontent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,7 +20,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 
-public class EditFieldValueViewModel extends AbstractViewModel {
+public class EditFieldContentViewModel extends AbstractViewModel {
     private final BibDatabaseContext databaseContext;
     private final List<BibEntry> selectedEntries;
 
@@ -34,7 +34,7 @@ public class EditFieldValueViewModel extends AbstractViewModel {
 
     private final NamedCompound dialogEdits;
 
-    public EditFieldValueViewModel(BibDatabaseContext databaseContext, List<BibEntry> selectedEntries, NamedCompound dialogEdits) {
+    public EditFieldContentViewModel(BibDatabaseContext databaseContext, List<BibEntry> selectedEntries, NamedCompound dialogEdits) {
         this.databaseContext = databaseContext;
         this.selectedEntries = new ArrayList<>(selectedEntries);
         this.dialogEdits = dialogEdits;

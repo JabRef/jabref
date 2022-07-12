@@ -8,7 +8,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 import org.jabref.gui.AbstractViewModel;
-import org.jabref.gui.edit.automaticfiededitor.editfieldvalue.EditFieldValueTabView;
+import org.jabref.gui.edit.automaticfiededitor.editfieldcontent.EditFieldContentTabView;
 import org.jabref.gui.edit.automaticfiededitor.renamefield.RenameFieldTabView;
 import org.jabref.gui.edit.automaticfiededitor.twofields.TwoFieldsTabView;
 import org.jabref.gui.undo.NamedCompound;
@@ -25,7 +25,7 @@ public class AutomaticFieldEditorViewModel extends AbstractViewModel {
 
     public AutomaticFieldEditorViewModel(List<BibEntry> selectedEntries, BibDatabaseContext databaseContext, UndoManager undoManager) {
         fieldEditorTabs.addAll(
-                new EditFieldValueTabView(selectedEntries, databaseContext, dialogEdits),
+                new EditFieldContentTabView(selectedEntries, databaseContext, dialogEdits),
                 new TwoFieldsTabView(selectedEntries, databaseContext, dialogEdits),
                 new RenameFieldTabView(selectedEntries, databaseContext, dialogEdits)
         );

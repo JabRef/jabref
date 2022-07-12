@@ -15,7 +15,7 @@
 
 
 <?import org.jabref.gui.icon.JabRefIconView?>
-<fx:root prefHeight="400.0" prefWidth="600.0" type="AnchorPane" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jabref.gui.edit.automaticfiededitor.editfieldvalue.EditFieldValueTabView">
+<fx:root prefHeight="400.0" prefWidth="600.0" type="AnchorPane" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jabref.gui.edit.automaticfiededitor.editfieldcontent.EditFieldContentTabView">
    <children>
       <GridPane hgap="8.0" prefWidth="568.0" vgap="8.0" AnchorPane.leftAnchor="16.0" AnchorPane.rightAnchor="16.0" AnchorPane.topAnchor="0.0">
         <columnConstraints>
@@ -42,7 +42,7 @@
                   <Button fx:id="setValueButton" mnemonicParsing="false" onAction="#setFieldValue" text="%Set" />
                   <Button fx:id="appendValueButton" mnemonicParsing="false" onAction="#appendToFieldValue" text="%Append" />
                   <Separator maxHeight="1.7976931348623157E308" minWidth="10.0" orientation="VERTICAL" prefWidth="11.0" />
-                  <Button fx:id="clearFieldButton" mnemonicParsing="false" onAction="#clearField" text="%Clear field" >
+                  <Button fx:id="clearFieldButton" mnemonicParsing="false" onAction="#clearField" text="%Clear field content" >
                       <graphic>
                           <JabRefIconView glyph="DELETE_ENTRY"/>
                       </graphic>
@@ -52,12 +52,12 @@
             <HBox spacing="8.0" GridPane.columnSpan="3" GridPane.hgrow="ALWAYS" GridPane.rowIndex="2" GridPane.vgrow="NEVER">
                <children>
                   <ComboBox fx:id="fieldComboBox" maxHeight="1.7976931348623157E308" minHeight="36.0" prefHeight="36.0" prefWidth="184.0" promptText="Author" HBox.hgrow="ALWAYS" />
-                  <TextField fx:id="fieldValueTextField" minHeight="32.0" minWidth="-Infinity" prefHeight="36.0" prefWidth="184.0" promptText="%Field value" HBox.hgrow="ALWAYS"/>
+                  <TextField fx:id="fieldValueTextField" minHeight="32.0" minWidth="-Infinity" prefHeight="36.0" prefWidth="184.0" promptText="%Set or Append content" HBox.hgrow="ALWAYS"/>
                </children>
             </HBox>
             <HBox alignment="BOTTOM_LEFT" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" GridPane.hgrow="ALWAYS" GridPane.rowSpan="2" GridPane.vgrow="ALWAYS">
                <children>
-                  <Label alignment="BOTTOM_LEFT" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" styleClass="sectionHeader" text="%Edit field value of selected entries">
+                  <Label alignment="BOTTOM_LEFT" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" styleClass="sectionHeader" text="%Edit field content for selected entries">
                      <HBox.margin>
                         <Insets bottom="10.0" />
                      </HBox.margin>
