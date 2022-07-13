@@ -1,6 +1,5 @@
 package org.jabref.gui.edit.automaticfiededitor.editfieldcontent;
 
-import java.util.Comparator;
 import java.util.List;
 
 import javafx.fxml.FXML;
@@ -19,6 +18,7 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 
 import com.airhacks.afterburner.views.ViewLoader;
+import com.tobiasdiez.easybind.EasyBind;
 
 public class EditFieldContentTabView extends AbstractAutomaticFieldEditorTabView {
     public Button appendValueButton;
@@ -62,7 +62,7 @@ public class EditFieldContentTabView extends AbstractAutomaticFieldEditorTabView
                 return FieldFactory.parseField(name);
             }
         });
-        fieldComboBox.getItems().addAll(viewModel.getAllFields().sorted(Comparator.comparing(Field::getName)));
+        EasyBind.bindContent(fieldComboBox.getItems(), viewModel.getAllFields());
         fieldComboBox.getSelectionModel().selectFirst();
         viewModel.selectedFieldProperty().bindBidirectional(fieldComboBox.valueProperty());
 

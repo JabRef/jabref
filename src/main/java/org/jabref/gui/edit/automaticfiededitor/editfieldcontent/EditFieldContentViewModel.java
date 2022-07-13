@@ -1,6 +1,7 @@
 package org.jabref.gui.edit.automaticfiededitor.editfieldcontent;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -39,7 +40,11 @@ public class EditFieldContentViewModel extends AbstractViewModel {
         this.selectedEntries = new ArrayList<>(selectedEntries);
         this.dialogEdits = dialogEdits;
 
-        allFields.addAll(databaseContext.getDatabase().getAllVisibleFields().stream().toList());
+        updateFields();
+    }
+
+    private void updateFields() {
+        allFields.addAll(databaseContext.getDatabase().getAllVisibleFields().stream().sorted(Comparator.comparing(Field::getName)).toList());
     }
 
     public void clearSelectedField() {
@@ -71,6 +76,7 @@ public class EditFieldContentViewModel extends AbstractViewModel {
             Optional<String> oldFieldValue = entry.getField(selectedField.get());
             if (oldFieldValue.isEmpty() || overwriteNonEmptyFields.get()) {
                 entry.setField(selectedField.get(), toSetFieldValue);
+                updateFields();
 
                 setFieldEdit.addEdit(new UndoableFieldChange(entry,
                         selectedField.get(),
@@ -97,6 +103,7 @@ public class EditFieldContentViewModel extends AbstractViewModel {
                 String newFieldValue = oldFieldValue.orElse("").concat(toAppendFieldValue);
 
                 entry.setField(selectedField.get(), newFieldValue);
+                updateFields();
                 appendToFieldEdit.addEdit(new UndoableFieldChange(entry,
                         selectedField.get(),
                         oldFieldValue.orElse(null),
