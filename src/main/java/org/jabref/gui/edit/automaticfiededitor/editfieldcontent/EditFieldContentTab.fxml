@@ -51,7 +51,7 @@
             </HBox>
             <HBox spacing="8.0" GridPane.columnSpan="3" GridPane.hgrow="ALWAYS" GridPane.rowIndex="2" GridPane.vgrow="NEVER">
                <children>
-                  <ComboBox fx:id="fieldComboBox" maxHeight="1.7976931348623157E308" minHeight="36.0" prefHeight="36.0" prefWidth="184.0" promptText="Author" HBox.hgrow="ALWAYS" />
+                  <ComboBox fx:id="fieldComboBox" editable="true" maxHeight="1.7976931348623157E308" minHeight="36.0" prefHeight="36.0" prefWidth="184.0" promptText="Author" HBox.hgrow="ALWAYS" />
                   <TextField fx:id="fieldValueTextField" minHeight="32.0" minWidth="-Infinity" prefHeight="36.0" prefWidth="184.0" promptText="%Set or Append content" HBox.hgrow="ALWAYS"/>
                </children>
             </HBox>
