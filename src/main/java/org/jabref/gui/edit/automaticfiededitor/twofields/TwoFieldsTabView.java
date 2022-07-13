@@ -34,7 +34,7 @@ public class TwoFieldsTabView extends AbstractAutomaticFieldEditorTabView implem
     private ComboBox<Field> toFieldComboBox;
 
     @FXML
-    private CheckBox overwriteNonEmptyFields;
+    private CheckBox overwriteFieldContentCheckBox;
 
     private TwoFieldsViewModel viewModel;
     private final List<BibEntry> selectedEntries;
@@ -55,10 +55,10 @@ public class TwoFieldsTabView extends AbstractAutomaticFieldEditorTabView implem
         viewModel = new TwoFieldsViewModel(selectedEntries, databaseContext.getDatabase().getAllVisibleFields(), dialogEdits);
         initializeFromAndToComboBox();
 
-        viewModel.overwriteNonEmptyFieldsProperty().bindBidirectional(overwriteNonEmptyFields.selectedProperty());
+        viewModel.overwriteFieldContentProperty().bindBidirectional(overwriteFieldContentCheckBox.selectedProperty());
 
-        moveContentButton.disableProperty().bind(viewModel.overwriteNonEmptyFieldsProperty().not());
-        swapContentButton.disableProperty().bind(viewModel.overwriteNonEmptyFieldsProperty().not());
+        moveContentButton.disableProperty().bind(viewModel.overwriteFieldContentProperty().not());
+        swapContentButton.disableProperty().bind(viewModel.overwriteFieldContentProperty().not());
     }
 
     private void initializeFromAndToComboBox() {

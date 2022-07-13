@@ -24,7 +24,7 @@ public class TwoFieldsViewModel extends AbstractViewModel {
 
     private final ObjectProperty<Field> toField = new SimpleObjectProperty<>();
 
-    private final BooleanProperty overwriteNonEmptyFields = new SimpleBooleanProperty();
+    private final BooleanProperty overwriteFieldContent = new SimpleBooleanProperty();
     private final ObservableList<Field> allFields = FXCollections.observableArrayList();
     // TODO: Create an abstraction where selectedEntries, databaseContext and dialogEdits dependencies are shared across
     //  all automatic field editors tab view models
@@ -58,12 +58,12 @@ public class TwoFieldsViewModel extends AbstractViewModel {
         return toField;
     }
 
-    public boolean getOverwriteNonEmptyFields() {
-        return overwriteNonEmptyFields.get();
+    public boolean isOverwriteFieldContent() {
+        return overwriteFieldContent.get();
     }
 
-    public BooleanProperty overwriteNonEmptyFieldsProperty() {
-        return overwriteNonEmptyFields;
+    public BooleanProperty overwriteFieldContentProperty() {
+        return overwriteFieldContent;
     }
 
     public void copyValue() {
@@ -73,7 +73,7 @@ public class TwoFieldsViewModel extends AbstractViewModel {
             String fromFieldValue = entry.getField(fromField.get()).orElse("");
             String toFieldValue = entry.getField(toField.get()).orElse("");
 
-            if (overwriteNonEmptyFields.get() || StringUtil.isBlank(toFieldValue)) {
+            if (overwriteFieldContent.get() || StringUtil.isBlank(toFieldValue)) {
                 if (StringUtil.isNotBlank(fromFieldValue)) {
                     entry.setField(toField.get(), fromFieldValue);
                 }
@@ -93,7 +93,7 @@ public class TwoFieldsViewModel extends AbstractViewModel {
 
     public void moveValue() {
         NamedCompound moveEdit = new NamedCompound("MOVE_EDIT");
-        if (overwriteNonEmptyFields.get()) {
+        if (overwriteFieldContent.get()) {
             new MoveFieldValueAction(fromField.get(),
                                      toField.get(),
                                      selectedEntries,
@@ -113,7 +113,7 @@ public class TwoFieldsViewModel extends AbstractViewModel {
             String fromFieldValue = entry.getField(fromField.get()).orElse("");
             String toFieldValue = entry.getField(toField.get()).orElse("");
 
-            if (overwriteNonEmptyFields.get() && StringUtil.isNotBlank(fromFieldValue) && StringUtil.isNotBlank(toFieldValue)) {
+            if (overwriteFieldContent.get() && StringUtil.isNotBlank(fromFieldValue) && StringUtil.isNotBlank(toFieldValue)) {
                 entry.setField(toField.get(), fromFieldValue);
                 entry.setField(fromField.get(), toFieldValue);
 

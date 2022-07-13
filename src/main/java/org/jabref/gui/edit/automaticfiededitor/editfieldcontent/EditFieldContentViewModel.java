@@ -29,7 +29,7 @@ public class EditFieldContentViewModel extends AbstractViewModel {
 
     private final ObjectProperty<Field> selectedField = new SimpleObjectProperty<>();
 
-    private final BooleanProperty overwriteNonEmptyFields = new SimpleBooleanProperty();
+    private final BooleanProperty overwriteFieldContent = new SimpleBooleanProperty();
 
     private final ObservableList<Field> allFields = FXCollections.observableArrayList();
 
@@ -74,7 +74,7 @@ public class EditFieldContentViewModel extends AbstractViewModel {
 
         for (BibEntry entry : selectedEntries) {
             Optional<String> oldFieldValue = entry.getField(selectedField.get());
-            if (oldFieldValue.isEmpty() || overwriteNonEmptyFields.get()) {
+            if (oldFieldValue.isEmpty() || overwriteFieldContent.get()) {
                 entry.setField(selectedField.get(), toSetFieldValue);
                 updateFields();
 
@@ -99,7 +99,7 @@ public class EditFieldContentViewModel extends AbstractViewModel {
         for (BibEntry entry : selectedEntries) {
             Optional<String> oldFieldValue = entry.getField(selectedField.get());
             // Append button should be disabled if 'overwriteNonEmptyFields' is false
-            if (overwriteNonEmptyFields.get()) {
+            if (overwriteFieldContent.get()) {
                 String newFieldValue = oldFieldValue.orElse("").concat(toAppendFieldValue);
 
                 entry.setField(selectedField.get(), newFieldValue);
@@ -136,7 +136,7 @@ public class EditFieldContentViewModel extends AbstractViewModel {
         return fieldValue;
     }
 
-    public BooleanProperty overwriteNonEmptyFieldsProperty() {
-        return overwriteNonEmptyFields;
+    public BooleanProperty overwriteFieldContentProperty() {
+        return overwriteFieldContent;
     }
 }

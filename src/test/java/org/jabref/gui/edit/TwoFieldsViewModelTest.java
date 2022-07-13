@@ -37,7 +37,7 @@ public class TwoFieldsViewModelTest {
 
         twoFieldsViewModel.fromFieldProperty().set(StandardField.YEAR);
         twoFieldsViewModel.toFieldProperty().set(StandardField.DATE);
-        twoFieldsViewModel.overwriteNonEmptyFieldsProperty().set(true);
+        twoFieldsViewModel.overwriteFieldContentProperty().set(true);
         twoFieldsViewModel.copyValue();
 
         assertEquals(Optional.of("2015"), entryA.getField(StandardField.DATE), "YEAR field is not copied correctly to the DATE field");
@@ -49,7 +49,7 @@ public class TwoFieldsViewModelTest {
     void swapValuesShouldNotSwapFieldValuesIfOneOfTheValuesIsBlank() {
         twoFieldsViewModel.fromFieldProperty().set(StandardField.YEAR);
         twoFieldsViewModel.toFieldProperty().set(StandardField.DATE);
-        twoFieldsViewModel.overwriteNonEmptyFieldsProperty().set(true);
+        twoFieldsViewModel.overwriteFieldContentProperty().set(true);
 
         twoFieldsViewModel.swapValues();
 
@@ -61,7 +61,7 @@ public class TwoFieldsViewModelTest {
     void swapValuesShouldSwapFieldValuesIfBothValuesAreNotBlank() {
         twoFieldsViewModel.fromFieldProperty().set(StandardField.YEAR);
         twoFieldsViewModel.toFieldProperty().set(StandardField.DATE);
-        twoFieldsViewModel.overwriteNonEmptyFieldsProperty().set(true);
+        twoFieldsViewModel.overwriteFieldContentProperty().set(true);
 
         twoFieldsViewModel.swapValues();
 
@@ -74,7 +74,7 @@ public class TwoFieldsViewModelTest {
     void moveValueShouldNotMoveValueIfToFieldIsNotBlankAndOverwriteIsNotEnabled() {
         twoFieldsViewModel.fromFieldProperty().set(StandardField.YEAR);
         twoFieldsViewModel.toFieldProperty().set(StandardField.DATE);
-        twoFieldsViewModel.overwriteNonEmptyFieldsProperty().set(false);
+        twoFieldsViewModel.overwriteFieldContentProperty().set(false);
 
         twoFieldsViewModel.moveValue();
 
@@ -86,7 +86,7 @@ public class TwoFieldsViewModelTest {
     void moveValueShouldMoveValueIfOverwriteIsEnabled() {
         twoFieldsViewModel.fromFieldProperty().set(StandardField.DATE);
         twoFieldsViewModel.toFieldProperty().set(StandardField.YEAR);
-        twoFieldsViewModel.overwriteNonEmptyFieldsProperty().set(true);
+        twoFieldsViewModel.overwriteFieldContentProperty().set(true);
 
         twoFieldsViewModel.moveValue();
 

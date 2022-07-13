@@ -32,7 +32,8 @@
             <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
         </rowConstraints>
          <children>
-            <CheckBox fx:id="overwriteNonEmptyFieldsCheckBox" mnemonicParsing="false" text="%Overwrite Non empty fields" GridPane.columnSpan="2147483647" GridPane.rowIndex="3">
+            <CheckBox fx:id="overwriteFieldContentCheckBox"
+                      mnemonicParsing="false" text="%Overwrite field content" GridPane.columnSpan="2147483647" GridPane.rowIndex="3">
                <GridPane.margin>
                   <Insets left="2.0" />
                </GridPane.margin>

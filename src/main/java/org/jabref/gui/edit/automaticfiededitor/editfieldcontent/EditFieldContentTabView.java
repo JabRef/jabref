@@ -29,7 +29,7 @@ public class EditFieldContentTabView extends AbstractAutomaticFieldEditorTabView
     private TextField fieldValueTextField;
 
     @FXML
-    private CheckBox overwriteNonEmptyFieldsCheckBox;
+    private CheckBox overwriteFieldContentCheckBox;
 
     private final List<BibEntry> selectedEntries;
     private final BibDatabaseContext databaseContext;
@@ -68,9 +68,9 @@ public class EditFieldContentTabView extends AbstractAutomaticFieldEditorTabView
 
         viewModel.fieldValueProperty().bindBidirectional(fieldValueTextField.textProperty());
 
-        viewModel.overwriteNonEmptyFieldsProperty().bindBidirectional(overwriteNonEmptyFieldsCheckBox.selectedProperty());
+        viewModel.overwriteFieldContentProperty().bindBidirectional(overwriteFieldContentCheckBox.selectedProperty());
 
-        appendValueButton.disableProperty().bind(overwriteNonEmptyFieldsCheckBox.selectedProperty().not());
+        appendValueButton.disableProperty().bind(overwriteFieldContentCheckBox.selectedProperty().not());
     }
 
     @Override
