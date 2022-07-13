@@ -44,7 +44,7 @@ public class EditFieldContentViewModel extends AbstractViewModel {
     }
 
     private void updateFields() {
-        allFields.addAll(databaseContext.getDatabase().getAllVisibleFields().stream().sorted(Comparator.comparing(Field::getName)).toList());
+        allFields.addAll(databaseContext.getDatabase().getAllVisibleFields().stream().sorted(Comparator.comparing(Field::getDisplayName)).toList());
     }
 
     public void clearSelectedField() {

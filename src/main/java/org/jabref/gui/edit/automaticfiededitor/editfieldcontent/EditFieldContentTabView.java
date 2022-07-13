@@ -54,7 +54,7 @@ public class EditFieldContentTabView extends AbstractAutomaticFieldEditorTabView
         fieldComboBox.setConverter(new StringConverter<>() {
             @Override
             public String toString(Field field) {
-                return field.getName();
+                return field.getDisplayName();
             }
 
             @Override

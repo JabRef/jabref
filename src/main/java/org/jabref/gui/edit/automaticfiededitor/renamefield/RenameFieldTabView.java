@@ -43,11 +43,11 @@ public class RenameFieldTabView extends AbstractAutomaticFieldEditorTabView impl
     public void initialize() {
         viewModel = new RenameFieldViewModel(selectedEntries, databaseContext, dialogEdits);
 
-        fieldComboBox.getItems().addAll(viewModel.getAllFields().sorted(Comparator.comparing(Field::getName)));
+        fieldComboBox.getItems().addAll(viewModel.getAllFields().sorted(Comparator.comparing(Field::getDisplayName)));
         fieldComboBox.setConverter(new StringConverter<>() {
             @Override
             public String toString(Field field) {
-                return field.getName();
+                return field.getDisplayName();
             }
 
             @Override

@@ -62,13 +62,13 @@ public class TwoFieldsTabView extends AbstractAutomaticFieldEditorTabView implem
     }
 
     private void initializeFromAndToComboBox() {
-        fromFieldComboBox.getItems().addAll(viewModel.getAllFields().sorted(Comparator.comparing(Field::getName)));
-        toFieldComboBox.getItems().addAll(viewModel.getAllFields().sorted(Comparator.comparing(Field::getName)));
+        fromFieldComboBox.getItems().addAll(viewModel.getAllFields().sorted(Comparator.comparing(Field::getDisplayName)));
+        toFieldComboBox.getItems().addAll(viewModel.getAllFields().sorted(Comparator.comparing(Field::getDisplayName)));
 
         fromFieldComboBox.setConverter(new StringConverter<>() {
             @Override
             public String toString(Field field) {
-                return field.getName();
+                return field.getDisplayName();
             }
 
             @Override
@@ -80,7 +80,7 @@ public class TwoFieldsTabView extends AbstractAutomaticFieldEditorTabView implem
         toFieldComboBox.setConverter(new StringConverter<>() {
             @Override
             public String toString(Field field) {
-                return field.getName();
+                return field.getDisplayName();
             }
 
             @Override
