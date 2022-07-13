@@ -6,22 +6,18 @@ import javax.swing.undo.UndoManager;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.ButtonBar;
-import javafx.scene.control.ButtonType;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 
 import org.jabref.gui.Globals;
 import org.jabref.gui.util.BaseDialog;
-import org.jabref.gui.util.ControlHelper;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
 import com.airhacks.afterburner.views.ViewLoader;
 
-public class AutomaticFieldEditorDialog extends BaseDialog<Void> {
-    @FXML public ButtonType saveButton;
-    @FXML public ButtonType cancelButton;
+public class AutomaticFieldEditorDialog extends BaseDialog<String> {
     @FXML
     private TabPane tabPane;
 
@@ -42,8 +38,14 @@ public class AutomaticFieldEditorDialog extends BaseDialog<Void> {
                   .load()
                   .setAsDialogPane(this);
 
-        ControlHelper.setAction(saveButton, getDialogPane(), event -> saveChangesAndCloseDialog());
-        ControlHelper.setAction(cancelButton, getDialogPane(), event -> cancelChangesAndCloseDialog());
+        setResultConverter(buttonType -> {
+            if (buttonType != null && buttonType.getButtonData() == ButtonBar.ButtonData.OK_DONE) {
+                saveChanges();
+            } else {
+                cancelChanges();
+            }
+            return "";
+        });
 
         // This will prevent all dialog buttons from having the same size
         // Read more: https://stackoverflow.com/questions/45866249/javafx-8-alert-different-button-sizes
@@ -61,13 +63,11 @@ public class AutomaticFieldEditorDialog extends BaseDialog<Void> {
         }
     }
 
-    private void saveChangesAndCloseDialog() {
+    private void saveChanges() {
         viewModel.saveChanges();
-        close();
     }
 
-    private void cancelChangesAndCloseDialog() {
+    private void cancelChanges() {
         viewModel.cancelChanges();
-        close();
     }
 }
