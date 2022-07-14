@@ -62,7 +62,7 @@ public class GenerateEntryFromIdAction extends SimpleCommand {
             Optional<BibEntry> result = bibEntry;
             if (result.isPresent()) {
                 final BibEntry entry = result.get();
-                ImportHandler handler = new ImportHandler(libraryTab.getBibDatabaseContext(), ExternalFileTypes.getInstance(), preferencesService, Globals.getFileUpdateMonitor(), libraryTab.getUndoManager(), stateManager, dialogService);
+                ImportHandler handler = new ImportHandler(libraryTab.getBibDatabaseContext(), ExternalFileTypes.getInstance(), preferencesService, Globals.getFileUpdateMonitor(), libraryTab.getUndoManager(), stateManager, dialogService, null);
                 handler.importEntryWithDuplicateCheck(libraryTab.getBibDatabaseContext(), entry);
             } else {
                 dialogService.notify("No entry found or import canceled");

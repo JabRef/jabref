@@ -78,13 +78,10 @@ public class FetchAndMergeEntry {
                                   })
                                   .onFailure(exception -> {
                                       LOGGER.error("Error while fetching bibliographic information", exception);
-                                      // client error
                                       if (exception instanceof FetcherClientException) {
                                           dialogService.showInformationDialogAndWait(Localization.lang("Lookup {0}", fetcher.get().getName()), Localization.lang("No data was found for the identifier"));
-                                      // server error
                                       } else if (exception instanceof FetcherServerException) {
                                           dialogService.showInformationDialogAndWait(Localization.lang("Lookup {0}", fetcher.get().getName()), Localization.lang("Server not available"));
-                                      // default error
                                       } else {
                                           dialogService.showErrorDialogAndWait(exception);
                                       }

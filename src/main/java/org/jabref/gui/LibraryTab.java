@@ -480,7 +480,9 @@ public class LibraryTab extends Tab {
                 dialogService,
                 stateManager,
                 externalFileTypes,
-                Globals.getKeyPrefs());
+                Globals.getKeyPrefs(),
+                Globals.getClipboardManager(),
+                Globals.IMPORT_FORMAT_READER);
 
         // Add the listener that binds selection to state manager (TODO: should be replaced by proper JavaFX binding as soon as table is implemented in JavaFX)
         mainTable.addSelectionListener(listEvent -> stateManager.setSelectedEntries(mainTable.getSelectedEntries()));
@@ -929,7 +931,7 @@ public class LibraryTab extends Tab {
             this.setText(text);
             this.getActions().setAll(actions);
             this.show();
-            if (duration != null && !duration.equals(Duration.ZERO)) {
+            if ((duration != null) && !duration.equals(Duration.ZERO)) {
                 PauseTransition delay = new PauseTransition(duration);
                 delay.setOnFinished(e -> this.hide());
                 delay.play();

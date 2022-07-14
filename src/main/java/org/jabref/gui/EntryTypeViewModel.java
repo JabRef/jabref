@@ -19,6 +19,7 @@ import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.importer.NewEntryAction;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.IdBasedFetcher;
+import org.jabref.logic.importer.ImportFormatReader;
 import org.jabref.logic.importer.WebFetchers;
 import org.jabref.logic.importer.fetcher.DoiFetcher;
 import org.jabref.logic.l10n.Localization;
@@ -50,15 +51,19 @@ public class EntryTypeViewModel {
     private final DialogService dialogService;
     private final Validator idFieldValidator;
     private final StateManager stateManager;
+    private final ImportFormatReader importFormatReader;
 
     public EntryTypeViewModel(PreferencesService preferences,
                               LibraryTab libraryTab,
                               DialogService dialogService,
-                              StateManager stateManager) {
+                              StateManager stateManager,
+                              ImportFormatReader importFormatReader) {
         this.libraryTab = libraryTab;
         this.preferencesService = preferences;
         this.dialogService = dialogService;
         this.stateManager = stateManager;
+        this.importFormatReader = importFormatReader;
+
         fetchers.addAll(WebFetchers.getIdBasedFetchers(
                 preferences.getImportFormatPreferences(),
                 preferences.getImporterPreferences()));
@@ -164,7 +169,8 @@ public class EntryTypeViewModel {
                         Globals.getFileUpdateMonitor(),
                         libraryTab.getUndoManager(),
                         stateManager,
-                        dialogService);
+                        dialogService,
+                        importFormatReader);
                 handler.importEntryWithDuplicateCheck(libraryTab.getBibDatabaseContext(), entry);
 
                 searchSuccesfulProperty.set(true);

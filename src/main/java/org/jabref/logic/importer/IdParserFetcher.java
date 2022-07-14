@@ -88,6 +88,8 @@ public interface IdParserFetcher<T extends Identifier> extends IdFetcher<T> {
             LOGGER.debug("Id not found");
             return Optional.empty();
         } catch (IOException e) {
+
+
             // TODO: Catch HTTP Response 401 errors and report that user has no rights to access resource
             // TODO catch 503 service unavailable and alert user
             throw new FetcherException("An I/O exception occurred", e);

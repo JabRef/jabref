@@ -24,6 +24,7 @@ import javafx.scene.input.MouseDragEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
 
+import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.DragAndDropDataFormats;
 import org.jabref.gui.Globals;
@@ -41,6 +42,7 @@ import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.ViewModelTableRowFactory;
+import org.jabref.logic.importer.ImportFormatReader;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.event.EntriesAddedEvent;
@@ -60,6 +62,8 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     private final StateManager stateManager;
     private final BibDatabaseContext database;
     private final MainTableDataModel model;
+    private final ClipBoardManager clipBoardManager;
+    private final ImportFormatReader importFormatReader;
 
     private final ImportHandler importHandler;
     private final CustomLocalDragboard localDragboard;
@@ -74,7 +78,9 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                      DialogService dialogService,
                      StateManager stateManager,
                      ExternalFileTypes externalFileTypes,
-                     KeyBindingRepository keyBindingRepository) {
+                     KeyBindingRepository keyBindingRepository,
+                     ClipBoardManager clipBoardManager,
+                     ImportFormatReader importFormatReader) {
         super();
 
         this.libraryTab = libraryTab;
@@ -82,6 +88,8 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         this.stateManager = stateManager;
         this.database = Objects.requireNonNull(database);
         this.model = model;
+        this.clipBoardManager = clipBoardManager;
+        this.importFormatReader = importFormatReader;
         UndoManager undoManager = libraryTab.getUndoManager();
         MainTablePreferences mainTablePreferences = preferencesService.getMainTablePreferences();
 
@@ -91,7 +99,8 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                 Globals.getFileUpdateMonitor(),
                 undoManager,
                 stateManager,
-                dialogService);
+                dialogService,
+                importFormatReader);
 
         localDragboard = stateManager.getLocalDragboard();
 
@@ -304,16 +313,19 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     }
 
     public void paste() {
-        // Find entries in clipboard
-        List<BibEntry> entriesToAdd = Globals.getClipboardManager().extractData();
+
+        String data = this.clipBoardManager.getContents();
+        //TODO call import handler
+        /*// Find entries in clipboard
 
         for (BibEntry entry : entriesToAdd) {
             importHandler.importEntryWithDuplicateCheck(database, entry);
         }
         if (!entriesToAdd.isEmpty()) {
             this.requestFocus();
-        }
+        }*/
     }
+
 
     private void handleOnDragOver(TableRow<BibEntryTableViewModel> row, BibEntryTableViewModel item, DragEvent event) {
         if (event.getDragboard().hasFiles()) {
@@ -441,4 +453,6 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                     .filter(viewModel -> viewModel.getEntry().equals(entry))
                     .findFirst();
     }
+
+
 }

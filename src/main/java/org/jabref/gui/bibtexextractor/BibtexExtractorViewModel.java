@@ -17,6 +17,7 @@ import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.importer.FetcherException;
+import org.jabref.logic.importer.ImportFormatReader;
 import org.jabref.logic.importer.fetcher.GrobidCitationFetcher;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
@@ -43,7 +44,8 @@ public class BibtexExtractorViewModel {
                                     FileUpdateMonitor fileUpdateMonitor,
                                     TaskExecutor taskExecutor,
                                     UndoManager undoManager,
-                                    StateManager stateManager) {
+                                    StateManager stateManager,
+                                    ImportFormatReader importFormatReader) {
 
         this.dialogService = dialogService;
         this.preferencesService = preferencesService;
@@ -55,7 +57,8 @@ public class BibtexExtractorViewModel {
                 fileUpdateMonitor,
                 undoManager,
                 stateManager,
-                dialogService);
+                dialogService,
+                importFormatReader);
     }
 
     public StringProperty inputTextProperty() {

@@ -42,6 +42,7 @@ import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.gui.util.ViewModelTreeCellFactory;
+import org.jabref.logic.importer.ImportFormatReader;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.PreferencesService;
@@ -81,6 +82,7 @@ public class UnlinkedFilesDialogView extends BaseDialog<Void> {
     @Inject private TaskExecutor taskExecutor;
     @Inject private FileUpdateMonitor fileUpdateMonitor;
     @Inject private ThemeManager themeManager;
+    @Inject private ImportFormatReader importFormatReader;
 
     private final ControlsFxVisualizer validationVisualizer;
     private UnlinkedFilesDialogViewModel viewModel;
@@ -106,7 +108,7 @@ public class UnlinkedFilesDialogView extends BaseDialog<Void> {
 
     @FXML
     private void initialize() {
-        viewModel = new UnlinkedFilesDialogViewModel(dialogService, ExternalFileTypes.getInstance(), undoManager, fileUpdateMonitor, preferencesService, stateManager, taskExecutor);
+        viewModel = new UnlinkedFilesDialogViewModel(dialogService, ExternalFileTypes.getInstance(), undoManager, fileUpdateMonitor, preferencesService, stateManager, taskExecutor, importFormatReader);
 
         progressDisplay.progressProperty().bind(viewModel.progressValueProperty());
         progressText.textProperty().bind(viewModel.progressTextProperty());

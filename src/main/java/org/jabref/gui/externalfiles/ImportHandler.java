@@ -1,6 +1,8 @@
 package org.jabref.gui.externalfiles;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -22,7 +24,15 @@ import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.database.DuplicateCheck;
 import org.jabref.logic.externalfiles.ExternalFilesContentImporter;
+import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportCleanup;
+import org.jabref.logic.importer.ImportException;
+import org.jabref.logic.importer.ImportFormatReader;
+import org.jabref.logic.importer.ParseException;
+import org.jabref.logic.importer.ImportFormatReader.UnknownFormatImport;
+import org.jabref.logic.importer.fetcher.ArXiv;
+import org.jabref.logic.importer.fetcher.DoiFetcher;
+import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.UpdateField;
 import org.jabref.logic.util.io.FileUtil;
@@ -30,9 +40,12 @@ import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.identifier.ArXivIdentifier;
+import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.groups.GroupEntryChanger;
 import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.util.FileUpdateMonitor;
+import org.jabref.model.util.OptionalUtil;
 import org.jabref.preferences.PreferencesService;
 
 import org.slf4j.Logger;
@@ -49,6 +62,7 @@ public class ImportHandler {
     private final UndoManager undoManager;
     private final StateManager stateManager;
     private final DialogService dialogService;
+    private final ImportFormatReader importFormatReader;
 
     public ImportHandler(BibDatabaseContext database,
                          ExternalFileTypes externalFileTypes,
@@ -56,13 +70,15 @@ public class ImportHandler {
                          FileUpdateMonitor fileupdateMonitor,
                          UndoManager undoManager,
                          StateManager stateManager,
-                         DialogService dialogService) {
+                         DialogService dialogService,
+                         ImportFormatReader importFormatReader) {
 
         this.bibDatabaseContext = database;
         this.preferencesService = preferencesService;
         this.fileUpdateMonitor = fileupdateMonitor;
         this.stateManager = stateManager;
         this.dialogService = dialogService;
+        this.importFormatReader = importFormatReader;
 
         this.linker = new ExternalFilesEntryLinker(externalFileTypes, preferencesService.getFilePreferences(), database);
         this.contentImporter = new ExternalFilesContentImporter(
@@ -243,6 +259,75 @@ public class ImportHandler {
 
         for (BibEntry entry : entries) {
             keyGenerator.generateAndSetKey(entry);
+        }
+    }
+
+    public List<BibEntry> extractData(String data) {
+       /* Object entries = clipboard.getContent(DragAndDropDataFormats.ENTRIES);
+
+        if (entries == null) {
+            return handleStringData(clipboard.getString());
+        }
+        return handleBibTeXData((String) entries);
+        */
+        return null;
+    }
+
+    private List<BibEntry> handleBibTeXData(String entries) {
+        BibtexParser parser = new BibtexParser(preferencesService.getImportFormatPreferences(), Globals.getFileUpdateMonitor());
+        try {
+            return parser.parseEntries(new ByteArrayInputStream(entries.getBytes(StandardCharsets.UTF_8)));
+        } catch (ParseException ex) {
+            LOGGER.error("Could not paste", ex);
+            return Collections.emptyList();
+        }
+    }
+
+    private List<BibEntry> handleStringData(String data) {
+        if ((data == null) || data.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        Optional<DOI> doi = DOI.parse(data);
+        if (doi.isPresent()) {
+            return fetchByDOI(doi.get());
+        }
+        Optional<ArXivIdentifier> arXiv = ArXivIdentifier.parse(data);
+        if (arXiv.isPresent()) {
+            return fetchByArXiv(arXiv.get());
+        }
+
+        return tryImportFormats(data);
+    }
+
+    private List<BibEntry> tryImportFormats(String data) {
+        try {
+            UnknownFormatImport unknownFormatImport = importFormatReader.importUnknownFormat(data);
+            return unknownFormatImport.parserResult.getDatabase().getEntries();
+        } catch (ImportException ignored) {
+            return Collections.emptyList();
+        }
+    }
+
+    private List<BibEntry> fetchByDOI(DOI doi) {
+        LOGGER.info("Found DOI in clipboard");
+        try {
+            Optional<BibEntry> entry = new DoiFetcher(preferencesService.getImportFormatPreferences()).performSearchById(doi.getDOI());
+            return OptionalUtil.toList(entry);
+        } catch (FetcherException ex) {
+            LOGGER.error("Error while fetching", ex);
+            return Collections.emptyList();
+        }
+    }
+
+    private List<BibEntry> fetchByArXiv(ArXivIdentifier arXivIdentifier) {
+        LOGGER.info("Found arxiv identifier in clipboard");
+        try {
+            Optional<BibEntry> entry = new ArXiv(preferencesService.getImportFormatPreferences()).performSearchById(arXivIdentifier.getNormalizedWithoutVersion());
+            return OptionalUtil.toList(entry);
+        } catch (FetcherException ex) {
+            LOGGER.error("Error while fetching", ex);
+            return Collections.emptyList();
         }
     }
 }
