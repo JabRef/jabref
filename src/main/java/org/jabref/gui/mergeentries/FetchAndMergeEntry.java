@@ -16,9 +16,9 @@ import org.jabref.gui.undo.UndoableChangeType;
 import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.TaskExecutor;
-import org.jabref.logic.importer.DOIDataNotFoundException;
-import org.jabref.logic.importer.DOIServerNotAvailableException;
 import org.jabref.logic.importer.EntryBasedFetcher;
+import org.jabref.logic.importer.FetcherClientException;
+import org.jabref.logic.importer.FetcherServerException;
 import org.jabref.logic.importer.IdBasedFetcher;
 import org.jabref.logic.importer.ImportCleanup;
 import org.jabref.logic.importer.WebFetcher;
@@ -79,11 +79,11 @@ public class FetchAndMergeEntry {
                                   .onFailure(exception -> {
                                       LOGGER.error("Error while fetching bibliographic information", exception);
                                       // client error
-                                      if (exception instanceof DOIDataNotFoundException) {
-                                          dialogService.showInformationDialogAndWait(Localization.lang("Lookup DOI"), Localization.lang("No DOI data was found"));
+                                      if (exception instanceof FetcherClientException) {
+                                          dialogService.showInformationDialogAndWait(Localization.lang("Lookup {0}", fetcher.get().getName()), Localization.lang("No data was found for the identifier"));
                                       // server error
-                                      } else if (exception instanceof DOIServerNotAvailableException) {
-                                          dialogService.showInformationDialogAndWait(Localization.lang("Lookup DOI"), Localization.lang("DOI server not available"));
+                                      } else if (exception instanceof FetcherServerException) {
+                                          dialogService.showInformationDialogAndWait(Localization.lang("Lookup {0}", fetcher.get().getName()), Localization.lang("Server not available"));
                                       // default error
                                       } else {
                                           dialogService.showErrorDialogAndWait(exception);

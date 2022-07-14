@@ -40,6 +40,8 @@ import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
+import org.jabref.logic.importer.FetcherClientException;
+import org.jabref.logic.importer.FetcherServerException;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.util.FileHelper;
 
@@ -350,16 +352,22 @@ public class URLDownload {
         if (connection instanceof HttpURLConnection) {
             // normally, 3xx is redirect
             int status = ((HttpURLConnection) connection).getResponseCode();
-            if (status != HttpURLConnection.HTTP_OK) {
-                if ((status == HttpURLConnection.HTTP_MOVED_TEMP)
-                        || (status == HttpURLConnection.HTTP_MOVED_PERM)
-                        || (status == HttpURLConnection.HTTP_SEE_OTHER)) {
-                    // get redirect url from "location" header field
-                    String newUrl = connection.getHeaderField("location");
-                    // open the new connnection again
-                    connection = new URLDownload(newUrl).openConnection();
-                }
+
+            if ((status == HttpURLConnection.HTTP_MOVED_TEMP)
+                    || (status == HttpURLConnection.HTTP_MOVED_PERM)
+                    || (status == HttpURLConnection.HTTP_SEE_OTHER)) {
+                // get redirect url from "location" header field
+                String newUrl = connection.getHeaderField("location");
+                // open the new connnection again
+                connection = new URLDownload(newUrl).openConnection();
             }
+            if ((status >= 400) && (status < 500)) {
+                throw new IOException(new FetcherClientException("Client error. Status code " + status));
+            }
+            if (status >= 500) {
+                throw new IOException(new FetcherServerException("Server error. Status Code " + status));
+            }
+
         }
 
         // this does network i/o: GET + read returned headers

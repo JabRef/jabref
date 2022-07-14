@@ -1,6 +1,5 @@
 package org.jabref.logic.importer.fetcher;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Collections;
@@ -12,8 +11,6 @@ import org.jabref.logic.cleanup.FieldFormatterCleanup;
 import org.jabref.logic.formatter.bibtexfields.ClearFormatter;
 import org.jabref.logic.formatter.bibtexfields.NormalizePagesFormatter;
 import org.jabref.logic.help.HelpFile;
-import org.jabref.logic.importer.DOIDataNotFoundException;
-import org.jabref.logic.importer.DOIServerNotAvailableException;
 import org.jabref.logic.importer.EntryBasedFetcher;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.IdBasedFetcher;
@@ -82,13 +79,11 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
                 try {
                     bibtexString = download.asString();
                 } catch (IOException e) {
-                    // an IOException will be thrown if download is unable to download from the doiURL
-                    // dispatch the IOException
-                    if (e instanceof FileNotFoundException) {
-                        throw new DOIDataNotFoundException(Localization.lang("Client Error"), e);
-                    } else {
-                        throw new DOIServerNotAvailableException(Localization.lang("Server Error"), e);
+                    // an IOException with a nested FetcherException will be thrown when you encounter a 400x or 500x http status code
+                    if (e.getCause() instanceof FetcherException fe) {
+                        throw fe;
                     }
+                    throw e;
                 }
 
                 // BibTeX entry
