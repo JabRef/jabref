@@ -21,8 +21,11 @@ public enum StandardEntryType implements EntryType {
     Unpublished("Unpublished"),
     // Biblatex
     BookInBook("BookInBook"),
+    CONSTITUTION("Constitution"),
     InReference("InReference"),
-    JURISDICTION_APA("Jurisdiction_apa"),
+    LEGISLATION("Legislation"),
+    LEGADMINMATERIAL("Legadminmaterial"),
+    JURISDICTION("Jurisdiction"),
     MvBook("MvBook"),
     MvCollection("MvCollection"),
     MvProceedings("MvProceedings"),
