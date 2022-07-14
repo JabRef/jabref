@@ -194,8 +194,12 @@ public class SourceTab extends EntryEditorTab {
         sourceValidator.getValidationStatus().getMessages().addListener((InvalidationListener) c -> {
             ValidationStatus sourceValidationStatus = sourceValidator.getValidationStatus();
             if (!sourceValidationStatus.isValid()) {
-                sourceValidationStatus.getHighestMessage().ifPresent(message ->
-                        dialogService.showErrorDialogAndWait(message.getMessage()));
+                sourceValidationStatus.getHighestMessage().ifPresent(message -> {
+                    String content = Localization.lang("User input via entry-editor in `{}bibtex source` tab led to failure.")
+                            + "\n" + Localization.lang("Please check your library file for wrong syntax.")
+                            + "\n\n" + message.getMessage();
+                    dialogService.showWarningDialogAndWait(Localization.lang("SourceTab error"), content);
+                });
             }
         });
 
@@ -306,9 +310,7 @@ public class SourceTab extends EntryEditorTab {
                     new FieldWriter(fieldWriterPreferences).write(fieldName, newValue);
 
                     compound.addEdit(new UndoableFieldChange(outOfFocusEntry, fieldName, oldValue, newValue));
-                    if (outOfFocusEntry.getField(fieldName).isPresent()) {
-                        outOfFocusEntry.setField(fieldName, newValue);
-                    }
+                    outOfFocusEntry.setField(fieldName, newValue);
                 }
             }
 

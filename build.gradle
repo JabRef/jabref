@@ -81,7 +81,7 @@ repositories {
     mavenLocal()
     mavenCentral()
     maven { url 'https://oss.sonatype.org/content/groups/public' }
-    maven { url 'https://repository.apache.org/snapshots' }
+    maven { url 'https://jitpack.io' }
 }
 
 configurations {
@@ -95,8 +95,12 @@ configurations {
     }
 }
 
+dependencyLocking {
+    lockAllConfigurations()
+}
+
 javafx {
-    version = "18"
+    version = "18.0.1"
     modules = [ 'javafx.controls', 'javafx.fxml', 'javafx.web', 'javafx.swing' ]
 }
 
@@ -112,44 +116,43 @@ dependencies {
     implementation 'org.apache.pdfbox:fontbox:3.0.0-RC1'
     implementation 'org.apache.pdfbox:xmpbox:3.0.0-RC1'
 
-    implementation 'org.apache.lucene:lucene-core:9.1.0'
-    implementation 'org.apache.lucene:lucene-queryparser:9.1.0'
-    implementation 'org.apache.lucene:lucene-queries:9.1.0'
-    implementation 'org.apache.lucene:lucene-analysis-common:9.1.0'
-    implementation 'org.apache.lucene:lucene-highlighter:9.1.0'
+    implementation 'org.apache.lucene:lucene-core:9.2.0'
+    implementation 'org.apache.lucene:lucene-queryparser:9.2.0'
+    implementation 'org.apache.lucene:lucene-queries:9.2.0'
+    implementation 'org.apache.lucene:lucene-analysis-common:9.2.0'
+    implementation 'org.apache.lucene:lucene-highlighter:9.2.0'
 
     implementation group: 'org.apache.commons', name: 'commons-csv', version: '1.9.0'
     implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.12.0'
-    implementation 'com.h2database:h2-mvstore:2.1.212'
+    implementation 'com.h2database:h2-mvstore:2.1.214'
 
-    implementation group: 'org.apache.tika', name: 'tika-core', version: '2.4.0'
-    implementation 'com.ibm.icu:icu4j-charset:71.1'
+    implementation group: 'org.apache.tika', name: 'tika-core', version: '2.4.1'
 
     // required for reading write-protected PDFs - see https://github.com/JabRef/jabref/pull/942#issuecomment-209252635
     implementation 'org.bouncycastle:bcprov-jdk18on:1.71'
 
     implementation 'commons-cli:commons-cli:1.5.0'
 
-    implementation 'org.libreoffice:libreoffice:7.3.3'
-    implementation 'org.libreoffice:unoloader:7.3.2'
+    implementation 'org.libreoffice:libreoffice:7.3.4'
+    implementation 'org.libreoffice:unoloader:7.3.4'
 
     implementation 'io.github.java-diff-utils:java-diff-utils:4.11'
     implementation 'info.debatty:java-string-similarity:2.0.0'
 
     antlr3 'org.antlr:antlr:3.5.3'
-    implementation 'org.antlr:antlr-runtime:3.5.2'
+    implementation 'org.antlr:antlr-runtime:3.5.3'
 
     antlr4 'org.antlr:antlr4:4.9.3'
     implementation 'org.antlr:antlr4-runtime:4.9.3'
 
-    implementation group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: '6.1.0.202203080745-r'
+    implementation group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: '6.2.0.202206071550-r'
 
     implementation group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-yaml', version: '2.13.3'
     implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.13.3'
 
-    implementation group: 'org.mariadb.jdbc', name: 'mariadb-java-client', version: '2.7.5'
+    implementation group: 'org.mariadb.jdbc', name: 'mariadb-java-client', version: '2.7.6'
 
-    implementation 'org.postgresql:postgresql:42.3.5'
+    implementation 'org.postgresql:postgresql:42.4.0'
 
     implementation ('com.oracle.ojdbc:ojdbc10:19.3.0.0') {
         // causing module issues
@@ -166,17 +169,17 @@ dependencies {
     // JavaFX stuff
     implementation 'org.kordamp.ikonli:ikonli-javafx:12.3.1'
     implementation 'org.kordamp.ikonli:ikonli-materialdesign2-pack:12.3.1'
-    implementation 'de.saxsys:mvvmfx-validation:1.9.0-SNAPSHOT'
+    implementation 'com.github.sialcasa.mvvmFX:mvvmfx-validation:f195849ca9' //jitpack
     implementation 'de.saxsys:mvvmfx:1.8.0'
     implementation 'com.tobiasdiez:easybind:2.2'
-    implementation 'org.fxmisc.flowless:flowless:0.6.9'
+    implementation 'org.fxmisc.flowless:flowless:0.6.10'
     implementation 'org.fxmisc.richtext:richtextfx:0.10.9'
     implementation group: 'org.glassfish.hk2.external', name: 'jakarta.inject', version: '2.6.1'
     implementation 'com.jfoenix:jfoenix:9.0.10'
     implementation 'org.controlsfx:controlsfx:11.1.1'
 
-    implementation 'org.jsoup:jsoup:1.14.3'
-    implementation 'com.konghq:unirest-java:3.13.8'
+    implementation 'org.jsoup:jsoup:1.15.1'
+    implementation 'com.konghq:unirest-java:3.13.10'
 
     implementation 'org.slf4j:slf4j-api:2.0.0-alpha7'
     implementation "org.tinylog:tinylog-api:2.4.1"
@@ -204,22 +207,20 @@ dependencies {
 
     implementation group: 'net.harawata', name: 'appdirs', version: '1.2.1'
 
-    testImplementation 'io.github.classgraph:classgraph:4.8.146'
+    testImplementation 'io.github.classgraph:classgraph:4.8.149'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.8.2'
     testImplementation 'org.junit.platform:junit-platform-launcher:1.8.2'
 
-    testRuntimeOnly group: 'org.apache.logging.log4j', name: 'log4j-core', version: '3.0.0-SNAPSHOT'
-    testRuntimeOnly group: 'org.apache.logging.log4j', name: 'log4j-jul', version: '3.0.0-SNAPSHOT'
-    testImplementation 'org.mockito:mockito-core:4.5.1'
+    testImplementation 'org.mockito:mockito-core:4.6.1'
     testImplementation 'org.xmlunit:xmlunit-core:2.9.0'
     testImplementation 'org.xmlunit:xmlunit-matchers:2.9.0'
     testRuntimeOnly 'com.tngtech.archunit:archunit-junit5-engine:0.23.1'
     testImplementation 'com.tngtech.archunit:archunit-junit5-api:0.23.1'
-    testImplementation "org.testfx:testfx-core:4.0.17-alpha-SNAPSHOT"
-    testImplementation "org.testfx:testfx-junit5:4.0.17-alpha-SNAPSHOT"
+    testImplementation "org.testfx:testfx-core:4.0.16-alpha"
+    testImplementation "org.testfx:testfx-junit5:4.0.16-alpha"
     testImplementation "org.hamcrest:hamcrest-library:2.2"
 
-    checkstyle 'com.puppycrawl.tools:checkstyle:10.1'
+    checkstyle 'com.puppycrawl.tools:checkstyle:10.3.1'
     // xjc needs the runtime as well for the ant task, otherwise it fails
     xjc group: 'org.glassfish.jaxb', name: 'jaxb-xjc', version: '3.0.2'
     xjc group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '3.0.2'
@@ -265,7 +266,8 @@ task generateSource(dependsOn: ["generateBstGrammarSource",
                                 "generateMedlineSource",
                                 "generateBibtexmlSource",
                                 "generateEndnoteSource",
-                                "generateModsSource"]) {
+                                "generateModsSource",
+                                "generateCitaviSource"]) {
     group = 'JabRef'
     description 'Generates all necessary (Java) source files.'
 }
@@ -317,6 +319,15 @@ task generateEndnoteSource(type: XjcTask) {
     schemaFile = "src/main/resources/xjc/endnote/endnote.xsd"
     outputDirectory = "src-gen/main/java/"
     javaPackage = "org.jabref.logic.importer.fileformat.endnote"
+}
+
+task generateCitaviSource(type: XjcTask) {
+    group = 'JabRef'
+    description = "Generates java files for the citavi importer."
+
+    schemaFile = "src/main/resources/xjc/citavi/citavi.xsd"
+    outputDirectory = "src-gen/main/java/"
+    javaPackage = "org.jabref.logic.importer.fileformat.citavi"
 }
 
 task generateModsSource(type: XjcTask) {
