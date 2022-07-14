@@ -103,12 +103,12 @@ public class DoiFetcherTest {
     }
 
     @Test
-    public void testPerformSearchInvalidDOIClientErrorMessage1() {
+    public void testPerformSearchInvalidDOIClientResultsinFetcherClientException() {
         assertThrows(FetcherClientException.class, () -> fetcher.performSearchById("10.1002/9781118257517F"));
     }
 
     @Test
-    public void testPerformSearchInvalidDOIClientErrorMessage2() {
+    public void testPerformSearchInvalidDOIClientResultsinFetcherClientException2() {
         assertThrows(FetcherClientException.class, () -> fetcher.performSearchById("10.1002/9781517F"));
     }
 
