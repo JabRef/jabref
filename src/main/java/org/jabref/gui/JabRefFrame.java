@@ -233,8 +233,7 @@ public class JabRefFrame extends BorderPane {
                 // It is necessary to setOnDragOver for newly opened tabs
                 tabbedPane.lookupAll(".tab").forEach(t -> {
                     t.setOnDragOver(tabDragEvent -> {
-                        if(tabDragEvent.getDragboard().hasContent(DragAndDropDataFormats.ENTRIES))
-                        {
+                        if(tabDragEvent.getDragboard().hasContent(DragAndDropDataFormats.ENTRIES)) {
                             tabDragEvent.acceptTransferModes(TransferMode.COPY);
                             tabDragEvent.consume();
                         }

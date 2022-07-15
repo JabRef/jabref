@@ -763,8 +763,7 @@ public class LibraryTab extends Tab {
         mainTable.paste();
     }
 
-    public void dropEntry(List<BibEntry> entriesToAdd)
-    {
+    public void dropEntry(List<BibEntry> entriesToAdd) {
         mainTable.dropEntry(entriesToAdd);
     }
 
