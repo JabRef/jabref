@@ -141,7 +141,7 @@ public class BibDatabase {
      * @return set of fieldnames, that are visible
      */
     public ObservableSet<Field> getAllVisibleFields() {
-        return FXCollections.unmodifiableObservableSet(visibleFields);
+        return visibleFields;
     }
 
     /**
