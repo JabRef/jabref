@@ -67,7 +67,6 @@ public class EditFieldContentTabView extends AbstractAutomaticFieldEditorTabView
         populateFieldsComboBox();
         viewModel.getAllFields().addListener((InvalidationListener) observable -> populateFieldsComboBox());
 
-        fieldComboBox.getSelectionModel().selectFirst();
         viewModel.selectedFieldProperty().bindBidirectional(fieldComboBox.valueProperty());
 
         viewModel.fieldValueProperty().bindBidirectional(fieldValueTextField.textProperty());
@@ -79,6 +78,7 @@ public class EditFieldContentTabView extends AbstractAutomaticFieldEditorTabView
 
     private void populateFieldsComboBox() {
         fieldComboBox.getItems().setAll(viewModel.getAllFields().stream().sorted(Comparator.comparing(Field::getDisplayName)).toList());
+        fieldComboBox.getSelectionModel().selectFirst();
     }
 
     @Override
