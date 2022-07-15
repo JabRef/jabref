@@ -10,7 +10,7 @@ import javafx.collections.ObservableList;
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.edit.automaticfiededitor.editfieldcontent.EditFieldContentTabView;
 import org.jabref.gui.edit.automaticfiededitor.renamefield.RenameFieldTabView;
-import org.jabref.gui.edit.automaticfiededitor.twofields.CopyOrMoveFieldContentTabView;
+import org.jabref.gui.edit.automaticfiededitor.copyormovecontent.CopyOrMoveFieldContentTabView;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;

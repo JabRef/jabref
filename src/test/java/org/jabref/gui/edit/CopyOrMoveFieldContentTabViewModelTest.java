@@ -4,7 +4,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import org.jabref.gui.edit.automaticfiededitor.twofields.CopyOrMoveFieldContentTabViewModel;
+import org.jabref.gui.edit.automaticfiededitor.copyormovecontent.CopyOrMoveFieldContentTabViewModel;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;

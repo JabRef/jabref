@@ -1,4 +1,4 @@
-package org.jabref.gui.edit.automaticfiededitor.twofields;
+package org.jabref.gui.edit.automaticfiededitor.copyormovecontent;
 
 import java.util.ArrayList;
 import java.util.Comparator;
