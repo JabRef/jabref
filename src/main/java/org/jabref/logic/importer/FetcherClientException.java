@@ -16,5 +16,4 @@ public class FetcherClientException extends FetcherException {
     public FetcherClientException(String errorMessage, String localizedMessage, Throwable cause) {
         super(errorMessage, localizedMessage, cause);
     }
-
 }

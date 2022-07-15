@@ -28,8 +28,8 @@ import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportCleanup;
 import org.jabref.logic.importer.ImportException;
 import org.jabref.logic.importer.ImportFormatReader;
-import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.ImportFormatReader.UnknownFormatImport;
+import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.fetcher.ArXiv;
 import org.jabref.logic.importer.fetcher.DoiFetcher;
 import org.jabref.logic.importer.fileformat.BibtexParser;
@@ -82,9 +82,9 @@ public class ImportHandler {
 
         this.linker = new ExternalFilesEntryLinker(externalFileTypes, preferencesService.getFilePreferences(), database);
         this.contentImporter = new ExternalFilesContentImporter(
-                preferencesService.getGeneralPreferences(),
-                preferencesService.getImporterPreferences(),
-                preferencesService.getImportFormatPreferences());
+                                                                preferencesService.getGeneralPreferences(),
+                                                                preferencesService.getImporterPreferences(),
+                                                                preferencesService.getImportFormatPreferences());
         this.undoManager = undoManager;
     }
 
@@ -94,6 +94,7 @@ public class ImportHandler {
 
     public BackgroundTask<List<ImportFilesResultItemViewModel>> importFilesInBackground(final List<Path> files) {
         return new BackgroundTask<>() {
+
             private int counter;
             private final List<ImportFilesResultItemViewModel> results = new ArrayList<>();
 
@@ -181,8 +182,8 @@ public class ImportHandler {
 
         // Set owner/timestamp
         UpdateField.setAutomaticFields(entries,
-                preferencesService.getOwnerPreferences(),
-                preferencesService.getTimestampPreferences());
+                                       preferencesService.getOwnerPreferences(),
+                                       preferencesService.getTimestampPreferences());
 
         // Generate citation keys
         if (preferencesService.getImporterPreferences().isGenerateNewKeyOnImport()) {
@@ -215,7 +216,7 @@ public class ImportHandler {
                 case AUTOREMOVE_EXACT:
                 case BREAK:
                 default:
-                   return;
+                    return;
             }
         }
         // Regenerate CiteKey of imported BibEntry
@@ -252,28 +253,17 @@ public class ImportHandler {
      */
     private void generateKeys(List<BibEntry> entries) {
         CitationKeyGenerator keyGenerator = new CitationKeyGenerator(
-                bibDatabaseContext.getMetaData().getCiteKeyPattern(preferencesService.getCitationKeyPatternPreferences()
-                                                                                     .getKeyPattern()),
-                bibDatabaseContext.getDatabase(),
-                preferencesService.getCitationKeyPatternPreferences());
+                                                                     bibDatabaseContext.getMetaData().getCiteKeyPattern(preferencesService.getCitationKeyPatternPreferences()
+                                                                                                                                          .getKeyPattern()),
+                                                                     bibDatabaseContext.getDatabase(),
+                                                                     preferencesService.getCitationKeyPatternPreferences());
 
         for (BibEntry entry : entries) {
             keyGenerator.generateAndSetKey(entry);
         }
     }
 
-    public List<BibEntry> extractData(String data) {
-       /* Object entries = clipboard.getContent(DragAndDropDataFormats.ENTRIES);
-
-        if (entries == null) {
-            return handleStringData(clipboard.getString());
-        }
-        return handleBibTeXData((String) entries);
-        */
-        return null;
-    }
-
-    private List<BibEntry> handleBibTeXData(String entries) {
+    public List<BibEntry> handleBibTeXData(String entries) {
         BibtexParser parser = new BibtexParser(preferencesService.getImportFormatPreferences(), Globals.getFileUpdateMonitor());
         try {
             return parser.parseEntries(new ByteArrayInputStream(entries.getBytes(StandardCharsets.UTF_8)));
@@ -283,7 +273,7 @@ public class ImportHandler {
         }
     }
 
-    private List<BibEntry> handleStringData(String data) {
+    public List<BibEntry> handleStringData(String data) {
         if ((data == null) || data.isEmpty()) {
             return Collections.emptyList();
         }

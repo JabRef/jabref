@@ -313,19 +313,22 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     }
 
     public void paste() {
-
-        String data = this.clipBoardManager.getContents();
-        //TODO call import handler
-        /*// Find entries in clipboard
+        List<BibEntry> entriesToAdd = this.clipBoardManager.getBibTeXEntriesFromClipbaord()
+            .map(importHandler::handleBibTeXData)
+            .orElseGet(this::handleNonBibteXStringData);
 
         for (BibEntry entry : entriesToAdd) {
             importHandler.importEntryWithDuplicateCheck(database, entry);
         }
         if (!entriesToAdd.isEmpty()) {
             this.requestFocus();
-        }*/
+        }
     }
 
+    private List<BibEntry> handleNonBibteXStringData() {
+        String data = this.clipBoardManager.getContents();
+        return this.importHandler.handleStringData(data);
+    }
 
     private void handleOnDragOver(TableRow<BibEntryTableViewModel> row, BibEntryTableViewModel item, DragEvent event) {
         if (event.getDragboard().hasFiles()) {

@@ -15,5 +15,4 @@ public class FetcherServerException extends FetcherException {
     public FetcherServerException(String errorMessage, String localizedMessage, Throwable cause) {
         super(errorMessage, localizedMessage, cause);
     }
-
 }

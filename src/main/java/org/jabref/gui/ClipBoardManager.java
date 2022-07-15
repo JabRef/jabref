@@ -7,6 +7,7 @@ import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 
 import javafx.application.Platform;
 import javafx.scene.control.TextInputControl;
@@ -85,6 +86,10 @@ public class ClipBoardManager {
             return "";
         }
         return result;
+    }
+
+    public Optional<String> getBibTeXEntriesFromClipbaord(){
+        return Optional.ofNullable(clipboard.getContent(DragAndDropDataFormats.ENTRIES)).map(String.class::cast);
     }
 
     /**

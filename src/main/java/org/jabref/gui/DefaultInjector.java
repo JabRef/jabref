@@ -55,8 +55,7 @@ public class DefaultInjector implements PresenterFactory {
             return Globals.entryTypesManager;
         } else if (clazz == ImportFormatReader.class) {
             return Globals.IMPORT_FORMAT_READER;
-        }
-        else {
+        } else {
             try {
                 return clazz.newInstance();
             } catch (InstantiationException | IllegalAccessException ex) {

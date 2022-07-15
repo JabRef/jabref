@@ -367,12 +367,8 @@ public class URLDownload {
             if (status >= 500) {
                 throw new IOException(new FetcherServerException("Server error. Status Code " + status));
             }
-
         }
-
         // this does network i/o: GET + read returned headers
-        connection.connect();
-
         return connection;
     }
 
