@@ -81,6 +81,7 @@ EXTRA_FILES:
 - STYLE_DEVELOPMENT.md
 - STYLE_REQUIREMENTS.md
 - QUALITY_CONTROL.md
+- composer.json
 
 # These directories and their contents are ignored when checking for extra files
 EXTRA_FILES_DIRECTORY:

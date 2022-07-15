@@ -27,6 +27,7 @@ import org.jabref.gui.specialfields.SpecialFieldMenuItemFactory;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.citationstyle.CitationStyleOutputFormat;
 import org.jabref.logic.citationstyle.CitationStylePreviewLayout;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.SpecialField;
 import org.jabref.preferences.PreferencesService;
 import org.jabref.preferences.PreviewPreferences;
@@ -41,7 +42,8 @@ public class RightClickMenu {
                                      PreferencesService preferencesService,
                                      UndoManager undoManager,
                                      ClipBoardManager clipBoardManager,
-                                     TaskExecutor taskExecutor) {
+                                     TaskExecutor taskExecutor,
+                                     BibEntryTypesManager entryTypesManager) {
         ActionFactory factory = new ActionFactory(keyBindingRepository);
         ContextMenu contextMenu = new ContextMenu();
 
@@ -76,7 +78,7 @@ public class RightClickMenu {
 
                 new SeparatorMenuItem(),
 
-                new ChangeEntryTypeMenu().getChangeEntryTypeMenu(libraryTab.getSelectedEntries(), libraryTab.getBibDatabaseContext(), libraryTab.getUndoManager()),
+                new ChangeEntryTypeMenu(libraryTab.getSelectedEntries(), libraryTab.getBibDatabaseContext(), libraryTab.getUndoManager(), keyBindingRepository, entryTypesManager).asSubMenu(),
                 factory.createMenuItem(StandardActions.MERGE_WITH_FETCHED_ENTRY, new MergeWithFetchedEntryAction(libraryTab, dialogService, stateManager))
         );
 
