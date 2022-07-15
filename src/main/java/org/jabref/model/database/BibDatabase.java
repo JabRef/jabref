@@ -20,6 +20,7 @@ import java.util.stream.Collectors;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.ObservableSet;
 
 import org.jabref.logic.bibtex.FieldWriter;
 import org.jabref.model.database.event.EntriesAddedEvent;
@@ -29,6 +30,7 @@ import org.jabref.model.entry.BibtexString;
 import org.jabref.model.entry.Month;
 import org.jabref.model.entry.event.EntriesEventSource;
 import org.jabref.model.entry.event.EntryChangedEvent;
+import org.jabref.model.entry.event.FieldAddedOrRemovedEvent;
 import org.jabref.model.entry.event.FieldChangedEvent;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
@@ -52,6 +54,8 @@ public class BibDatabase {
      * State attributes
      */
     private final ObservableList<BibEntry> entries = FXCollections.synchronizedObservableList(FXCollections.observableArrayList(BibEntry::getObservables));
+
+    private final ObservableSet<Field> visibleFields = FXCollections.observableSet();
     private Map<String, BibtexString> bibtexStrings = new ConcurrentHashMap<>();
 
     private final EventBus eventBus = new EventBus();
@@ -136,13 +140,8 @@ public class BibDatabase {
      *
      * @return set of fieldnames, that are visible
      */
-    public Set<Field> getAllVisibleFields() {
-        Set<Field> allFields = new TreeSet<>(Comparator.comparing(Field::getName));
-        for (BibEntry e : getEntries()) {
-            allFields.addAll(e.getFields());
-        }
-        return allFields.stream().filter(field -> !FieldFactory.isInternalField(field))
-                        .collect(Collectors.toSet());
+    public ObservableSet<Field> getAllVisibleFields() {
+        return FXCollections.unmodifiableObservableSet(visibleFields);
     }
 
     /**
@@ -214,6 +213,8 @@ public class BibDatabase {
             eventBus.post(new EntriesAddedEvent(newEntries, newEntries.get(0), eventSource));
         }
         entries.addAll(newEntries);
+
+        updateVisibleFields();
     }
 
     public synchronized void removeEntry(BibEntry bibEntry) {
@@ -251,6 +252,7 @@ public class BibDatabase {
         boolean anyRemoved = entries.removeIf(entry -> ids.contains(entry.getId()));
         if (anyRemoved) {
             eventBus.post(new EntriesRemovedEvent(toBeDeleted, eventSource));
+            updateVisibleFields();
         }
     }
 
@@ -582,6 +584,30 @@ public class BibDatabase {
     @Subscribe
     private void relayEntryChangeEvent(FieldChangedEvent event) {
         eventBus.post(event);
+    }
+
+    @Subscribe
+    private void listen(FieldAddedOrRemovedEvent event) {
+        System.out.println(event);
+        // When a field is removed from an entry we can't tell if it's
+        // still present in other entries, and thus we can't remove it
+        // from the set of visible fields. However, when a new field is added
+        // to any entry, we can simply add it to the set because we're
+        // going to add it whether other entries have it or not
+        boolean isAdded = visibleFields.add(event.getField());
+        if (!isAdded) {
+            updateVisibleFields();
+        }
+    }
+
+    private void updateVisibleFields() {
+        visibleFields.clear();
+        Set<Field> allFields = new TreeSet<>(Comparator.comparing(Field::getName));
+        for (BibEntry e : getEntries()) {
+            allFields.addAll(e.getFields());
+        }
+        visibleFields.addAll(allFields.stream().filter(field -> !FieldFactory.isInternalField(field))
+                                     .collect(Collectors.toSet()));
     }
 
     public Optional<BibEntry> getReferencedEntry(BibEntry entry) {
