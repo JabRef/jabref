@@ -82,9 +82,9 @@ public class ImportHandler {
 
         this.linker = new ExternalFilesEntryLinker(externalFileTypes, preferencesService.getFilePreferences(), database);
         this.contentImporter = new ExternalFilesContentImporter(
-                                                                preferencesService.getGeneralPreferences(),
-                                                                preferencesService.getImporterPreferences(),
-                                                                preferencesService.getImportFormatPreferences());
+                preferencesService.getGeneralPreferences(),
+                preferencesService.getImporterPreferences(),
+                preferencesService.getImportFormatPreferences());
         this.undoManager = undoManager;
     }
 
@@ -94,7 +94,6 @@ public class ImportHandler {
 
     public BackgroundTask<List<ImportFilesResultItemViewModel>> importFilesInBackground(final List<Path> files) {
         return new BackgroundTask<>() {
-
             private int counter;
             private final List<ImportFilesResultItemViewModel> results = new ArrayList<>();
 
@@ -182,8 +181,8 @@ public class ImportHandler {
 
         // Set owner/timestamp
         UpdateField.setAutomaticFields(entries,
-                                       preferencesService.getOwnerPreferences(),
-                                       preferencesService.getTimestampPreferences());
+                preferencesService.getOwnerPreferences(),
+                preferencesService.getTimestampPreferences());
 
         // Generate citation keys
         if (preferencesService.getImporterPreferences().isGenerateNewKeyOnImport()) {
@@ -216,7 +215,7 @@ public class ImportHandler {
                 case AUTOREMOVE_EXACT:
                 case BREAK:
                 default:
-                    return;
+                   return;
             }
         }
         // Regenerate CiteKey of imported BibEntry
@@ -253,10 +252,10 @@ public class ImportHandler {
      */
     private void generateKeys(List<BibEntry> entries) {
         CitationKeyGenerator keyGenerator = new CitationKeyGenerator(
-                                                                     bibDatabaseContext.getMetaData().getCiteKeyPattern(preferencesService.getCitationKeyPatternPreferences()
-                                                                                                                                          .getKeyPattern()),
-                                                                     bibDatabaseContext.getDatabase(),
-                                                                     preferencesService.getCitationKeyPatternPreferences());
+                bibDatabaseContext.getMetaData().getCiteKeyPattern(preferencesService.getCitationKeyPatternPreferences()
+                                                                                     .getKeyPattern()),
+                bibDatabaseContext.getDatabase(),
+                preferencesService.getCitationKeyPatternPreferences());
 
         for (BibEntry entry : entries) {
             keyGenerator.generateAndSetKey(entry);
