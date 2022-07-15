@@ -46,9 +46,10 @@ import com.tobiasdiez.easybind.EasyBind;
 
 public class MergeEntries extends BorderPane {
 
-    private static final int NUMBER_OF_COLUMNS = 6;
+    private static final int NUMBER_OF_COLUMNS = 7; // 1
     private static final int LEFT_RADIOBUTTON_INDEX = 0;
     private static final int RIGHT_RADIOBUTTON_INDEX = 2;
+    private static final int MERGE_RADIOBUTTON_INDEX = 3; // 1
     private final ComboBox<DiffMode> diffMode = new ComboBox<>();
 
     // Headings
@@ -58,6 +59,7 @@ public class MergeEntries extends BorderPane {
             "left icon",
             Localization.lang("None"),
             "right icon",
+            Localization.lang("Merge entry"), // 1
             Localization.lang("Right entry"));
     private final Set<Field> identicalFields = new HashSet<>();
     private final Set<Field> differentFields = new HashSet<>();
@@ -128,6 +130,9 @@ public class MergeEntries extends BorderPane {
     public MergeEntries(BibEntry entryLeft, BibEntry entryRight) {
         this(entryLeft, entryRight, DefaultRadioButtonSelectionMode.LEFT);
     }
+    /*
+    show the text of the button
+     */
 
     private static String getDisplayText(DiffMode mode) {
         return switch (mode) {
@@ -147,24 +152,33 @@ public class MergeEntries extends BorderPane {
         this.setPrefWidth(Screen.getPrimary().getBounds().getWidth() * 0.75);
 
         setupFields();
-
+        /*
+        i can't understand below function
+         */
         fillDiffModes();
-
+        /*
+        set up the pane
+         */
         GridPane mergePanel = new GridPane();
         mergePanel.setVgap(10);
         mergePanel.setHgap(15);
+        /*
+        set up the column pattern
+         */
         ColumnConstraints columnLabel = new ColumnConstraints();
         columnLabel.setHgrow(Priority.ALWAYS);
+
         ColumnConstraints columnValues = new ColumnConstraints();
         columnValues.setHgrow(Priority.NEVER);
         columnValues.setPercentWidth(40);
+
         ColumnConstraints columnSelect = new ColumnConstraints();
         columnSelect.setHgrow(Priority.NEVER);
         columnSelect.setHalignment(HPos.CENTER);
         // See columnHeadings variable for the headings: 1) field, 2) left content, 3) left arrow, 4) "none", 5) right arrow, 6) right content
-        mergePanel.getColumnConstraints().setAll(columnLabel, columnValues, columnSelect, columnSelect, columnSelect, columnValues);
+        mergePanel.getColumnConstraints().setAll(columnLabel, columnValues, columnSelect, columnSelect, columnSelect, columnSelect, columnValues); // 1
 
-        setupHeadingRows(mergePanel);
+        setupHeadingRows(mergePanel); // set up the heading
         setupEntryTypeRow(mergePanel);
         setupFieldRows(mergePanel);
 
@@ -178,6 +192,9 @@ public class MergeEntries extends BorderPane {
 
         getStylesheets().add(0, MergeEntries.class.getResource("MergeEntries.css").toExternalForm());
     }
+    /*
+    set up all field except type and heading
+     */
 
     private void setupFieldRows(GridPane mergePanel) {
         // For all fields in joint add a row and possibly radio buttons
@@ -204,6 +221,33 @@ public class MergeEntries extends BorderPane {
             // Add radio buttons if the two entries do not have identical fields
             if (identicalFields.contains(field)) {
                 mergedEntry.setField(field, leftString.get()); // Will only happen if both entries have the field and the content is identical
+            } else if (field.getDisplayName().equals("Citationkey")) {
+                ToggleGroup group = new ToggleGroup();
+                List<RadioButton> list = new ArrayList<>(4);
+                for (int k = 0; k < 4; k++) {
+                    RadioButton button = new RadioButton();
+                    EasyBind.subscribe(button.selectedProperty(), selected -> updateMergedEntry());
+                    group.getToggles().add(button);
+                    mergePanel.add(button, 2 + k, row);
+                    list.add(button);
+                }
+                radioButtons.put(field, list);             // maybe there is bug
+                if (leftString.isPresent()) {
+                    leftRadioButtons.add(list.get(LEFT_RADIOBUTTON_INDEX));
+                    list.get(LEFT_RADIOBUTTON_INDEX).setSelected(true);
+                    if (rightString.isEmpty()) {
+                        list.get(RIGHT_RADIOBUTTON_INDEX).setDisable(true);
+                    } else if (this.defaultRadioButtonSelectionMode == DefaultRadioButtonSelectionMode.RIGHT) {
+                        list.get(RIGHT_RADIOBUTTON_INDEX).setSelected(true);
+                        rightRadioButtons.add(list.get(RIGHT_RADIOBUTTON_INDEX));
+                    } else {
+                        rightRadioButtons.add(list.get(RIGHT_RADIOBUTTON_INDEX));
+                    }
+                } else {
+                    list.get(LEFT_RADIOBUTTON_INDEX).setDisable(true);
+                    list.get(RIGHT_RADIOBUTTON_INDEX).setSelected(true);
+                    rightRadioButtons.add(list.get(RIGHT_RADIOBUTTON_INDEX));
+                }
             } else {
                 ToggleGroup group = new ToggleGroup();
                 List<RadioButton> list = new ArrayList<>(3);
@@ -236,7 +280,7 @@ public class MergeEntries extends BorderPane {
             // Right text pane
             if (rightString.isPresent()) {
                 TextFlow tf = new DiffHighlightingTextPane();
-                mergePanel.add(tf, 5, row);
+                mergePanel.add(tf, 6, row);
                 rightTextPanes.put(field, tf);
             }
             row++;
@@ -249,11 +293,11 @@ public class MergeEntries extends BorderPane {
         mergePanel.add(new Label(Localization.lang("Entry type")), 0, rowIndex);
         if (leftEntry.getType().equals(rightEntry.getType())) {
             mergePanel.add(DiffHighlighting.forUnchanged(leftEntry.getType().getDisplayName()), 1, rowIndex);
-            mergePanel.add(DiffHighlighting.forUnchanged(rightEntry.getType().getDisplayName()), 5, rowIndex);
+            mergePanel.add(DiffHighlighting.forUnchanged(rightEntry.getType().getDisplayName()), 6, rowIndex); // 1
             identicalTypes = true;
         } else {
             mergePanel.add(DiffHighlighting.forChanged(leftEntry.getType().getDisplayName()), 1, rowIndex);
-            mergePanel.add(DiffHighlighting.forChanged(rightEntry.getType().getDisplayName()), 5, rowIndex);
+            mergePanel.add(DiffHighlighting.forChanged(rightEntry.getType().getDisplayName()), 6, rowIndex);
             identicalTypes = false;
             ToggleGroup group = new ToggleGroup();
             typeRadioButtons = new ArrayList<>(2);
@@ -315,6 +359,9 @@ public class MergeEntries extends BorderPane {
         setTop(heading);
         BorderPane.setMargin(heading, new Insets(0, 0, 10, 0));
     }
+    /*
+    record all fields,including identical and non-identical
+     */
 
     private void setupFields() {
         allFields.addAll(leftEntry.getFields());
@@ -394,8 +441,10 @@ public class MergeEntries extends BorderPane {
                 mergedEntry.setField(field, leftEntry.getField(field).get()); // Will only happen if field exists
             } else if (radioButtons.get(field).get(RIGHT_RADIOBUTTON_INDEX).isSelected()) {
                 mergedEntry.setField(field, rightEntry.getField(field).get()); // Will only happen if field exists
-            } else {
+            } else if (radioButtons.get(field).get(1).isSelected()) {
                 mergedEntry.clearField(field);
+            } else {
+                mergedEntry.setField(field, leftEntry.getField(field).get() + ", " + rightEntry.getField(field).get());
             }
         }
     }
@@ -415,3 +464,4 @@ public class MergeEntries extends BorderPane {
         RIGHT
     }
 }
+
