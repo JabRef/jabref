@@ -16,11 +16,11 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class TestBstVMVisitor {
+class BstVMVisitorTest {
 
     @Test
     public void testVisitStringsCommand() {
-        TestBstVM.TestVM vm = new TestBstVM.TestVM("STRINGS { test.string1 test.string2 test.string3 }");
+        BstVMTest.TestVM vm = new BstVMTest.TestVM("STRINGS { test.string1 test.string2 test.string3 }");
 
         vm.render(Collections.emptyList());
 
@@ -35,7 +35,7 @@ class TestBstVMVisitor {
 
     @Test
     public void testVisitIntegersCommand() {
-        TestBstVM.TestVM vm = new TestBstVM.TestVM("INTEGERS { variable.a variable.b variable.c }");
+        BstVMTest.TestVM vm = new BstVMTest.TestVM("INTEGERS { variable.a variable.b variable.c }");
 
         vm.render(Collections.emptyList());
 
@@ -50,7 +50,7 @@ class TestBstVMVisitor {
 
     @Test
     void testVisitFunctionCommand() {
-        TestBstVM.TestVM vm = new TestBstVM.TestVM("""
+        BstVMTest.TestVM vm = new BstVMTest.TestVM("""
                 FUNCTION { test.func } { #1 'test.var := }
                 EXECUTE { test.func }
                 """);
@@ -64,7 +64,7 @@ class TestBstVMVisitor {
 
     @Test
     void testVisitMacroCommand() {
-        TestBstVM.TestVM vm = new TestBstVM.TestVM("""
+        BstVMTest.TestVM vm = new BstVMTest.TestVM("""
                 MACRO { jan } { "January" }
                 EXECUTE { jan }
                 """);
@@ -80,8 +80,8 @@ class TestBstVMVisitor {
 
     @Test
     void testVisitEntryCommand() {
-        TestBstVM.TestVM vm = new TestBstVM.TestVM("ENTRY { address author title type } { variable } { label }");
-        List<BibEntry> testEntries = List.of(TestBstVM.defaultTestEntry());
+        BstVMTest.TestVM vm = new BstVMTest.TestVM("ENTRY { address author title type } { variable } { label }");
+        List<BibEntry> testEntries = List.of(BstVMTest.defaultTestEntry());
 
         vm.render(testEntries);
 
@@ -97,11 +97,11 @@ class TestBstVMVisitor {
 
     @Test
     void testVisitReadCommand() {
-        TestBstVM.TestVM vm = new TestBstVM.TestVM("""
+        BstVMTest.TestVM vm = new BstVMTest.TestVM("""
                 ENTRY { author title booktitle year owner timestamp url } { } { }
                 READ
                 """);
-        List<BibEntry> testEntries = List.of(TestBstVM.defaultTestEntry());
+        List<BibEntry> testEntries = List.of(BstVMTest.defaultTestEntry());
 
         vm.render(testEntries);
 
@@ -117,7 +117,7 @@ class TestBstVMVisitor {
 
     @Test
     public void testVisitExecuteCommand() throws RecognitionException {
-        TestBstVM.TestVM vm = new TestBstVM.TestVM("""
+        BstVMTest.TestVM vm = new BstVMTest.TestVM("""
                 INTEGERS { variable.a }
                 FUNCTION { init.state.consts } { #5 'variable.a := }
                 EXECUTE { init.state.consts }
@@ -132,14 +132,14 @@ class TestBstVMVisitor {
 
     @Test
     public void testVisitIterateCommand() throws RecognitionException {
-        TestBstVM.TestVM vm = new TestBstVM.TestVM("""
+        BstVMTest.TestVM vm = new BstVMTest.TestVM("""
                 ENTRY { } { } { }
                 FUNCTION { test } { cite$ }
                 READ
                 ITERATE { test }
                 """);
         List<BibEntry> testEntries = List.of(
-                TestBstVM.defaultTestEntry(),
+                BstVMTest.defaultTestEntry(),
                 new BibEntry(StandardEntryType.Article)
                         .withCitationKey("test"));
 
@@ -152,7 +152,7 @@ class TestBstVMVisitor {
 
     @Test
     public void testVisitSortCommand() throws RecognitionException {
-        TestBstVM.TestVM vm = new TestBstVM.TestVM("""
+        BstVMTest.TestVM vm = new BstVMTest.TestVM("""
                 ENTRY { } { } { }
                 FUNCTION { presort } { cite$ 'sort.key$ := }
                 ITERATE { presort }
@@ -175,7 +175,7 @@ class TestBstVMVisitor {
 
     @Test
     void testVisitIdentifier() {
-        TestBstVM.TestVM vm = new TestBstVM.TestVM("""
+        BstVMTest.TestVM vm = new BstVMTest.TestVM("""
                 ENTRY { } { local.variable } { local.label }
                 READ
                 STRINGS { label }
@@ -190,7 +190,7 @@ class TestBstVMVisitor {
                 }
                 ITERATE { test }
                 """);
-        List<BibEntry> testEntries = List.of(TestBstVM.defaultTestEntry());
+        List<BibEntry> testEntries = List.of(BstVMTest.defaultTestEntry());
 
         vm.render(testEntries);
 

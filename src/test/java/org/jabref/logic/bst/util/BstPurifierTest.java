@@ -1,8 +1,6 @@
-package org.jabref.logic.bst;
+package org.jabref.logic.bst.util;
 
 import java.util.stream.Stream;
-
-import org.jabref.logic.bst.util.BibtexPurify;
 
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -10,12 +8,12 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class BibtexPurifyTest {
+public class BstPurifierTest {
 
     @ParameterizedTest
     @MethodSource("provideTestStrings")
     public void testPurify(String expected, String toBePurified) {
-        assertEquals(expected, BibtexPurify.purify(toBePurified));
+        assertEquals(expected, BstPurifier.purify(toBePurified));
     }
 
     private static Stream<Arguments> provideTestStrings() {

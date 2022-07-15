@@ -28,10 +28,10 @@ import org.slf4j.LoggerFactory;
  * Sounds easy - is a nightmare... X-(
  *
  */
-public class BibtexNameFormatter {
-    private static final Logger LOGGER = LoggerFactory.getLogger(BibtexNameFormatter.class);
+public class BstNameFormatter {
+    private static final Logger LOGGER = LoggerFactory.getLogger(BstNameFormatter.class);
 
-    private BibtexNameFormatter() {
+    private BstNameFormatter() {
     }
 
     /**
@@ -48,7 +48,7 @@ public class BibtexNameFormatter {
             LOGGER.warn("AuthorList {} does not contain an author with number {}", authorsNameList, whichName);
             return "";
         }
-        return BibtexNameFormatter.formatName(al.getAuthor(whichName - 1), formatString);
+        return BstNameFormatter.formatName(al.getAuthor(whichName - 1), formatString);
     }
 
     public static String formatName(Author author, String format) {
@@ -151,7 +151,7 @@ public class BibtexNameFormatter {
                         }
                         if (((j + 1) < d.length) && (d[j + 1] == '{')) {
                             StringBuilder interTokenSb = new StringBuilder();
-                            j = BibtexNameFormatter.consumeToMatchingBrace(interTokenSb, d, j + 1);
+                            j = BstNameFormatter.consumeToMatchingBrace(interTokenSb, d, j + 1);
                             interToken = interTokenSb.substring(1, interTokenSb.length() - 1);
                         }
 
@@ -160,7 +160,7 @@ public class BibtexNameFormatter {
                             if (abbreviateThatIsSingleLetter) {
                                 String[] dashes = token.split("-");
 
-                                token = Arrays.stream(dashes).map(BibtexNameFormatter::getFirstCharOfString)
+                                token = Arrays.stream(dashes).map(BstNameFormatter::getFirstCharOfString)
                                               .collect(Collectors.joining(".-"));
                             }
 
@@ -176,7 +176,7 @@ public class BibtexNameFormatter {
                                     // No clue what this means (What the hell are tokens anyway???
                                     // if (lex_class[name_sep_char[cur_token]] = sep_char) then
                                     //    append_ex_buf_char_and_check (name_sep_char[cur_token])
-                                    if ((k == (tokens.length - 2)) || (BibtexNameFormatter.numberOfChars(sb.substring(groupStart, sb.length()), 3) < 3)) {
+                                    if ((k == (tokens.length - 2)) || (BstNameFormatter.numberOfChars(sb.substring(groupStart, sb.length()), 3) < 3)) {
                                         sb.append('~');
                                     } else {
                                         sb.append(' ');
@@ -201,7 +201,7 @@ public class BibtexNameFormatter {
                 if (sb.length() > 0) {
                     boolean noDisTie = false;
                     if ((sb.charAt(sb.length() - 1) == '~') &&
-                            ((BibtexNameFormatter.numberOfChars(sb.substring(groupStart, sb.length()), 4) >= 4) ||
+                            ((BstNameFormatter.numberOfChars(sb.substring(groupStart, sb.length()), 4) >= 4) ||
                                     ((sb.length() > 1) && (noDisTie = sb.charAt(sb.length() - 2) == '~')))) {
                         sb.deleteCharAt(sb.length() - 1);
                         if (!noDisTie) {
@@ -255,7 +255,7 @@ public class BibtexNameFormatter {
             }
             if ((c[i] == '{') && ((i + 1) < c.length) && (c[i + 1] == '\\')) {
                 StringBuilder sb = new StringBuilder();
-                BibtexNameFormatter.consumeToMatchingBrace(sb, c, i);
+                BstNameFormatter.consumeToMatchingBrace(sb, c, i);
                 return sb.toString();
             }
         }

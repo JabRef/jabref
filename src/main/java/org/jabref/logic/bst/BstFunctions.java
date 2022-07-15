@@ -8,11 +8,11 @@ import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.jabref.logic.bst.util.BibtexCaseChanger;
-import org.jabref.logic.bst.util.BibtexNameFormatter;
-import org.jabref.logic.bst.util.BibtexPurify;
-import org.jabref.logic.bst.util.BibtexTextPrefix;
-import org.jabref.logic.bst.util.BibtexWidth;
+import org.jabref.logic.bst.util.BstCaseChanger;
+import org.jabref.logic.bst.util.BstNameFormatter;
+import org.jabref.logic.bst.util.BstPurifier;
+import org.jabref.logic.bst.util.BstTextPrefixer;
+import org.jabref.logic.bst.util.BstWidthCalculator;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.Author;
 import org.jabref.model.entry.AuthorList;
@@ -377,7 +377,7 @@ public class BstFunctions {
         char format = ((String) o1).toLowerCase(Locale.ROOT).charAt(0);
         String s = (String) o2;
 
-        stack.push(BibtexCaseChanger.changeCase(s, BibtexCaseChanger.FORMAT_MODE.getFormatModeForBSTFormat(format)));
+        stack.push(BstCaseChanger.changeCase(s, BstCaseChanger.FORMAT_MODE.getFormatModeForBSTFormat(format)));
     }
 
     /**
@@ -493,7 +493,7 @@ public class BstFunctions {
             }
             Author author = a.getAuthor(name - 1);
 
-            stack.push(BibtexNameFormatter.formatName(author, format));
+            stack.push(BstNameFormatter.formatName(author, format));
         }
     }
 
@@ -651,7 +651,7 @@ public class BstFunctions {
             return;
         }
 
-        stack.push(BibtexPurify.purify((String) o1));
+        stack.push(BstPurifier.purify((String) o1));
     }
 
     /**
@@ -826,7 +826,7 @@ public class BstFunctions {
             return;
         }
 
-        stack.push(BibtexTextPrefix.textPrefix((Integer) o1, (String) o2));
+        stack.push(BstTextPrefixer.textPrefix((Integer) o1, (String) o2));
     }
 
     /**
@@ -918,7 +918,7 @@ public class BstFunctions {
             return;
         }
 
-        stack.push(BibtexWidth.width((String) o1));
+        stack.push(BstWidthCalculator.width((String) o1));
     }
 
     /**

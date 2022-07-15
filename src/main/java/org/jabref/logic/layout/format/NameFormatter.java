@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import org.jabref.logic.bst.util.BibtexNameFormatter;
+import org.jabref.logic.bst.util.BstNameFormatter;
 import org.jabref.logic.layout.LayoutFormatter;
 import org.jabref.model.entry.AuthorList;
 
@@ -86,7 +86,7 @@ public class NameFormatter implements LayoutFormatter {
         for (int i = 1; i <= al.getNumberOfAuthors(); i++) {
             for (int j = 1; j < formats.length; j += 2) {
                 if ("*".equals(formats[j])) {
-                    sb.append(BibtexNameFormatter.formatName(toFormat, i, formats[j + 1]));
+                    sb.append(BstNameFormatter.formatName(toFormat, i, formats[j + 1]));
                     break;
                 } else {
                     String[] range = formats[j].split("\\.\\.");
@@ -112,7 +112,7 @@ public class NameFormatter implements LayoutFormatter {
                     }
 
                     if ((s <= i) && (i <= e)) {
-                        sb.append(BibtexNameFormatter.formatName(toFormat, i, formats[j + 1]));
+                        sb.append(BstNameFormatter.formatName(toFormat, i, formats[j + 1]));
                         break;
                     }
                 }

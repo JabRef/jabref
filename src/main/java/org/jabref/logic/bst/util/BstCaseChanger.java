@@ -6,9 +6,9 @@ import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public final class BibtexCaseChanger {
+public final class BstCaseChanger {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(BibtexCaseChanger.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(BstCaseChanger.class);
 
     // stores whether the char before the current char was a colon
     private boolean prevColon = true;
@@ -63,7 +63,7 @@ public final class BibtexCaseChanger {
         }
     }
 
-    private BibtexCaseChanger() {
+    private BstCaseChanger() {
     }
 
     /**
@@ -73,7 +73,7 @@ public final class BibtexCaseChanger {
      * @param format the format
      */
     public static String changeCase(String s, FORMAT_MODE format) {
-        return (new BibtexCaseChanger()).doChangeCase(s, format);
+        return (new BstCaseChanger()).doChangeCase(s, format);
     }
 
     private String doChangeCase(String s, FORMAT_MODE format) {
@@ -149,7 +149,7 @@ public final class BibtexCaseChanger {
             i++;
             // skip over the |backslash|
 
-            Optional<String> s = BibtexCaseChanger.findSpecialChar(c, i);
+            Optional<String> s = BstCaseChanger.findSpecialChar(c, i);
             if (s.isPresent()) {
                 i = convertAccented(c, i, s.get(), sb, format);
             }

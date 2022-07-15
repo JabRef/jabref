@@ -17,10 +17,10 @@ import org.slf4j.LoggerFactory;
  * complains and pushes the null string.
  *
  */
-public class BibtexTextPrefix {
-    private static final Logger LOGGER = LoggerFactory.getLogger(BibtexTextPrefix.class);
+public class BstTextPrefixer {
+    private static final Logger LOGGER = LoggerFactory.getLogger(BstTextPrefixer.class);
 
-    private BibtexTextPrefix() {
+    private BstTextPrefixer() {
     }
 
     public static String textPrefix(int inNumOfChars, String toPrefix) {

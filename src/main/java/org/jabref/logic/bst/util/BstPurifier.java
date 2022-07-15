@@ -13,10 +13,10 @@ import org.slf4j.LoggerFactory;
  * pushes the null string.
  *
  */
-public class BibtexPurify {
-    private static final Logger LOGGER = LoggerFactory.getLogger(BibtexPurify.class);
+public class BstPurifier {
+    private static final Logger LOGGER = LoggerFactory.getLogger(BstPurifier.class);
 
-    private BibtexPurify() {
+    private BstPurifier() {
     }
 
     public static String purify(String toPurify) {
@@ -40,7 +40,7 @@ public class BibtexPurify {
                     i++; // skip brace
                     while ((i < n) && (braceLevel > 0)) {
                         i++; // skip backslash
-                        BibtexCaseChanger.findSpecialChar(cs, i).ifPresent(sb::append);
+                        BstCaseChanger.findSpecialChar(cs, i).ifPresent(sb::append);
 
                         while ((i < n) && Character.isLetter(cs[i])) {
                             i++;
