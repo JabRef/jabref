@@ -317,7 +317,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     public void dropEntry(List<BibEntry> entriesToAdd)
     {
         for (BibEntry entry : entriesToAdd) {
-            importHandler.importEntryWithDuplicateCheck(database, entry);
+            importHandler.importEntryWithDuplicateCheck(database, (BibEntry) entry.clone());
         }
     }
 
