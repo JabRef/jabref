@@ -4,24 +4,21 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableSet;
 
-import org.jabref.gui.AbstractViewModel;
+import org.jabref.gui.edit.automaticfiededitor.AbstractAutomaticFieldEditorTabViewModel;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 
-public class EditFieldContentViewModel extends AbstractViewModel {
+public class EditFieldContentViewModel extends AbstractAutomaticFieldEditorTabViewModel {
     private final BibDatabaseContext databaseContext;
     private final List<BibEntry> selectedEntries;
 
@@ -31,16 +28,13 @@ public class EditFieldContentViewModel extends AbstractViewModel {
 
     private final BooleanProperty overwriteFieldContent = new SimpleBooleanProperty();
 
-    private final ObservableSet<Field> allFields = FXCollections.observableSet();
-
     private final NamedCompound dialogEdits;
 
     public EditFieldContentViewModel(BibDatabaseContext databaseContext, List<BibEntry> selectedEntries, NamedCompound dialogEdits) {
+        super(databaseContext.getDatabase());
         this.databaseContext = databaseContext;
         this.selectedEntries = new ArrayList<>(selectedEntries);
         this.dialogEdits = dialogEdits;
-
-        Bindings.bindContent(allFields, databaseContext.getDatabase().getAllVisibleFields());
     }
 
     public void clearSelectedField() {
@@ -100,10 +94,6 @@ public class EditFieldContentViewModel extends AbstractViewModel {
             appendToFieldEdit.end();
             dialogEdits.addEdit(appendToFieldEdit);
         }
-    }
-
-    public ObservableSet<Field> getAllFields() {
-        return allFields;
     }
 
     public ObjectProperty<Field> selectedFieldProperty() {
