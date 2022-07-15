@@ -293,7 +293,8 @@ public class OpenOfficePanel {
 
             taskConnectIfInstalled.setOnSucceeded(evt -> {
                 var installations = new ArrayList<>(taskConnectIfInstalled.getValue());
-                if (installations.isEmpty()) {
+                boolean flag = installations.isEmpty();
+                if (flag) {
                     officeInstallation.selectInstallationPath().ifPresent(installations::add);
                 }
                 Optional<Path> actualFile = officeInstallation.chooseAmongInstallations(installations);
@@ -341,20 +342,18 @@ public class OpenOfficePanel {
         boolean hasSelectedBibEntry = true;
 
         selectDocument.setDisable(!(isConnected));
-        pushEntries.setDisable(!(isConnectedToDocument && hasStyle && hasDatabase));
+        pushEntries.setDisable(!(isConnectedToDocument));
 
-        boolean canCite = isConnectedToDocument && hasStyle && hasSelectedBibEntry;
-        pushEntriesInt.setDisable(!canCite);
-        pushEntriesEmpty.setDisable(!canCite);
-        pushEntriesAdvanced.setDisable(!canCite);
+        pushEntriesInt.setDisable(!isConnectedToDocument);
+        pushEntriesEmpty.setDisable(!isConnectedToDocument);
+        pushEntriesAdvanced.setDisable(!isConnectedToDocument);
 
-        boolean canRefreshDocument = isConnectedToDocument && hasStyle;
-        update.setDisable(!canRefreshDocument);
-        merge.setDisable(!canRefreshDocument);
-        unmerge.setDisable(!canRefreshDocument);
-        manageCitations.setDisable(!canRefreshDocument);
+        update.setDisable(!isConnectedToDocument);
+        merge.setDisable(!isConnectedToDocument);
+        unmerge.setDisable(!isConnectedToDocument);
+        manageCitations.setDisable(!isConnectedToDocument);
 
-        exportCitations.setDisable(!(isConnectedToDocument && hasDatabase));
+        exportCitations.setDisable(!(isConnectedToDocument));
     }
 
     private void connect() {
@@ -366,17 +365,21 @@ public class OpenOfficePanel {
                 updateProgress(ProgressBar.INDETERMINATE_PROGRESS, ProgressBar.INDETERMINATE_PROGRESS);
 
                 var path = Path.of(openOfficePreferences.getExecutablePath());
+
                 return createBibBase(path);
             }
         };
 
         connectTask.setOnSucceeded(value -> {
-            ooBase = connectTask.getValue();
+            if (value.isConsumed()){
+                ooBase = connectTask.getValue();
 
-            ooBase.guiActionSelectDocument(true);
+                ooBase.guiActionSelectDocument(true);
 
-            // Enable actions that depend on Connect:
-            updateButtonAvailability();
+                // Enable actions that depend on Connect:
+                updateButtonAvailability();
+            }
+
         });
 
         connectTask.setOnFailed(value -> {
@@ -396,11 +399,11 @@ public class OpenOfficePanel {
                                 + Localization.lang("If connecting manually, please verify program and library paths.") + "\n" + "\n" + Localization.lang("Error message:"),
                         ex);
             } else {
-                dialogService.showErrorDialogAndWait(Localization.lang("Autodetection failed"), Localization.lang("Autodetection failed"), ex);
+                dialogService.showErrorDialogAndWait(Localization.lang("Auto-detection failed"), Localization.lang("Auto-detection failed"), ex);
             }
         });
 
-        dialogService.showProgressDialog(Localization.lang("Autodetecting paths..."), Localization.lang("Autodetecting paths..."), connectTask);
+        dialogService.showProgressDialog(Localization.lang("Auto-detecting paths..."), Localization.lang("Auto-detecting paths..."), connectTask);
         taskExecutor.execute(connectTask);
     }
 
