@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" default-locale="fr-FR" version="1.0" page-range-format="expanded" demote-non-dropping-particle="sort-only">
+<style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" page-range-format="expanded" demote-non-dropping-particle="sort-only" default-locale="fr-FR">
   <info>
-    <title>Sciences Po - Ecole doctorale (author-date, Français)</title>
+    <title>Sciences Po - Ecole de la recherche (author-date, Français)</title>
     <id>http://www.zotero.org/styles/sciences-po-ecole-doctorale-author-date</id>
     <link href="http://www.zotero.org/styles/sciences-po-ecole-doctorale-author-date" rel="self"/>
     <link href="https://sciencespo.libguides.com/zotero/styles" rel="documentation"/>
