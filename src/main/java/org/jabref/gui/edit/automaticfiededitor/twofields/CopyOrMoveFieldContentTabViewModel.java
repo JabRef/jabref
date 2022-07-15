@@ -19,7 +19,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.strings.StringUtil;
 
-public class TwoFieldsViewModel extends AbstractViewModel {
+public class CopyOrMoveFieldContentTabViewModel extends AbstractViewModel {
     private final ObjectProperty<Field> fromField = new SimpleObjectProperty<>();
 
     private final ObjectProperty<Field> toField = new SimpleObjectProperty<>();
@@ -31,7 +31,7 @@ public class TwoFieldsViewModel extends AbstractViewModel {
     private final List<BibEntry> selectedEntries;
     private final NamedCompound dialogEdits;
 
-    public TwoFieldsViewModel(List<BibEntry> selectedEntries, Set<Field> visibleFields, NamedCompound dialogEdits) {
+    public CopyOrMoveFieldContentTabViewModel(List<BibEntry> selectedEntries, Set<Field> visibleFields, NamedCompound dialogEdits) {
         this.selectedEntries = new ArrayList<>(selectedEntries);
         this.dialogEdits = dialogEdits;
 

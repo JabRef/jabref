@@ -10,7 +10,7 @@ import javafx.collections.ObservableList;
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.edit.automaticfiededitor.editfieldcontent.EditFieldContentTabView;
 import org.jabref.gui.edit.automaticfiededitor.renamefield.RenameFieldTabView;
-import org.jabref.gui.edit.automaticfiededitor.twofields.TwoFieldsTabView;
+import org.jabref.gui.edit.automaticfiededitor.twofields.CopyOrMoveFieldContentTabView;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -26,7 +26,7 @@ public class AutomaticFieldEditorViewModel extends AbstractViewModel {
     public AutomaticFieldEditorViewModel(List<BibEntry> selectedEntries, BibDatabaseContext databaseContext, UndoManager undoManager) {
         fieldEditorTabs.addAll(
                 new EditFieldContentTabView(selectedEntries, databaseContext, dialogEdits),
-                new TwoFieldsTabView(selectedEntries, databaseContext, dialogEdits),
+                new CopyOrMoveFieldContentTabView(selectedEntries, databaseContext, dialogEdits),
                 new RenameFieldTabView(selectedEntries, databaseContext, dialogEdits)
         );
         this.databaseContext = databaseContext;

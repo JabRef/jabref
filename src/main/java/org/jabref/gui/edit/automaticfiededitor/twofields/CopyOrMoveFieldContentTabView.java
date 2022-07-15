@@ -21,7 +21,7 @@ import org.jabref.model.entry.field.FieldFactory;
 
 import com.airhacks.afterburner.views.ViewLoader;
 
-public class TwoFieldsTabView extends AbstractAutomaticFieldEditorTabView implements AutomaticFieldEditorTab {
+public class CopyOrMoveFieldContentTabView extends AbstractAutomaticFieldEditorTabView implements AutomaticFieldEditorTab {
     @FXML
     private Button moveContentButton;
 
@@ -36,12 +36,12 @@ public class TwoFieldsTabView extends AbstractAutomaticFieldEditorTabView implem
     @FXML
     private CheckBox overwriteFieldContentCheckBox;
 
-    private TwoFieldsViewModel viewModel;
+    private CopyOrMoveFieldContentTabViewModel viewModel;
     private final List<BibEntry> selectedEntries;
     private final BibDatabaseContext databaseContext;
     private final NamedCompound dialogEdits;
 
-    public TwoFieldsTabView(List<BibEntry> selectedEntries, BibDatabaseContext databaseContext, NamedCompound dialogEdits) {
+    public CopyOrMoveFieldContentTabView(List<BibEntry> selectedEntries, BibDatabaseContext databaseContext, NamedCompound dialogEdits) {
         this.selectedEntries = new ArrayList<>(selectedEntries);
         this.databaseContext = databaseContext;
         this.dialogEdits = dialogEdits;
@@ -52,7 +52,7 @@ public class TwoFieldsTabView extends AbstractAutomaticFieldEditorTabView implem
     }
 
     public void initialize() {
-        viewModel = new TwoFieldsViewModel(selectedEntries, databaseContext.getDatabase().getAllVisibleFields(), dialogEdits);
+        viewModel = new CopyOrMoveFieldContentTabViewModel(selectedEntries, databaseContext.getDatabase().getAllVisibleFields(), dialogEdits);
         initializeFromAndToComboBox();
 
         viewModel.overwriteFieldContentProperty().bindBidirectional(overwriteFieldContentCheckBox.selectedProperty());
@@ -98,7 +98,7 @@ public class TwoFieldsTabView extends AbstractAutomaticFieldEditorTabView implem
 
     @Override
     public String getTabName() {
-        return Localization.lang("Two fields");
+        return Localization.lang("Copy or Move content");
     }
 
     @FXML

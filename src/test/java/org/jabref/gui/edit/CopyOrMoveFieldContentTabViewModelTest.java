@@ -4,7 +4,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import org.jabref.gui.edit.automaticfiededitor.twofields.TwoFieldsViewModel;
+import org.jabref.gui.edit.automaticfiededitor.twofields.CopyOrMoveFieldContentTabViewModel;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
@@ -14,8 +14,8 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class TwoFieldsViewModelTest {
-    TwoFieldsViewModel twoFieldsViewModel;
+public class CopyOrMoveFieldContentTabViewModelTest {
+    CopyOrMoveFieldContentTabViewModel copyOrMoveFieldContentTabViewModel;
     BibEntry entryA;
     BibEntry entryB;
 
@@ -28,17 +28,17 @@ public class TwoFieldsViewModelTest {
         entryB = new BibEntry(BibEntry.DEFAULT_TYPE)
                 .withField(StandardField.DATE, "1998");
 
-        twoFieldsViewModel = newTwoFieldsViewModel(entryA, entryB);
+        copyOrMoveFieldContentTabViewModel = newTwoFieldsViewModel(entryA, entryB);
     }
 
     @Test
     void copyValueDoesNotCopyBlankValues() {
-        TwoFieldsViewModel twoFieldsViewModel = newTwoFieldsViewModel(entryA, entryB);
+        CopyOrMoveFieldContentTabViewModel copyOrMoveFieldContentTabViewModel = newTwoFieldsViewModel(entryA, entryB);
 
-        twoFieldsViewModel.fromFieldProperty().set(StandardField.YEAR);
-        twoFieldsViewModel.toFieldProperty().set(StandardField.DATE);
-        twoFieldsViewModel.overwriteFieldContentProperty().set(true);
-        twoFieldsViewModel.copyValue();
+        copyOrMoveFieldContentTabViewModel.fromFieldProperty().set(StandardField.YEAR);
+        copyOrMoveFieldContentTabViewModel.toFieldProperty().set(StandardField.DATE);
+        copyOrMoveFieldContentTabViewModel.overwriteFieldContentProperty().set(true);
+        copyOrMoveFieldContentTabViewModel.copyValue();
 
         assertEquals(Optional.of("2015"), entryA.getField(StandardField.DATE), "YEAR field is not copied correctly to the DATE field");
         assertEquals(Optional.of("2015"), entryA.getField(StandardField.YEAR), "YEAR field should not have changed");
@@ -47,11 +47,11 @@ public class TwoFieldsViewModelTest {
 
     @Test
     void swapValuesShouldNotSwapFieldValuesIfOneOfTheValuesIsBlank() {
-        twoFieldsViewModel.fromFieldProperty().set(StandardField.YEAR);
-        twoFieldsViewModel.toFieldProperty().set(StandardField.DATE);
-        twoFieldsViewModel.overwriteFieldContentProperty().set(true);
+        copyOrMoveFieldContentTabViewModel.fromFieldProperty().set(StandardField.YEAR);
+        copyOrMoveFieldContentTabViewModel.toFieldProperty().set(StandardField.DATE);
+        copyOrMoveFieldContentTabViewModel.overwriteFieldContentProperty().set(true);
 
-        twoFieldsViewModel.swapValues();
+        copyOrMoveFieldContentTabViewModel.swapValues();
 
         assertEquals(Optional.of("1998"), entryB.getField(StandardField.DATE));
         assertEquals(Optional.empty(), entryB.getField(StandardField.YEAR));
@@ -59,11 +59,11 @@ public class TwoFieldsViewModelTest {
 
     @Test
     void swapValuesShouldSwapFieldValuesIfBothValuesAreNotBlank() {
-        twoFieldsViewModel.fromFieldProperty().set(StandardField.YEAR);
-        twoFieldsViewModel.toFieldProperty().set(StandardField.DATE);
-        twoFieldsViewModel.overwriteFieldContentProperty().set(true);
+        copyOrMoveFieldContentTabViewModel.fromFieldProperty().set(StandardField.YEAR);
+        copyOrMoveFieldContentTabViewModel.toFieldProperty().set(StandardField.DATE);
+        copyOrMoveFieldContentTabViewModel.overwriteFieldContentProperty().set(true);
 
-        twoFieldsViewModel.swapValues();
+        copyOrMoveFieldContentTabViewModel.swapValues();
 
         assertEquals(List.of(Optional.of("2014"), Optional.of("2015")),
                      List.of(entryA.getField(StandardField.YEAR), entryA.getField(StandardField.DATE)),
@@ -72,11 +72,11 @@ public class TwoFieldsViewModelTest {
 
     @Test
     void moveValueShouldNotMoveValueIfToFieldIsNotBlankAndOverwriteIsNotEnabled() {
-        twoFieldsViewModel.fromFieldProperty().set(StandardField.YEAR);
-        twoFieldsViewModel.toFieldProperty().set(StandardField.DATE);
-        twoFieldsViewModel.overwriteFieldContentProperty().set(false);
+        copyOrMoveFieldContentTabViewModel.fromFieldProperty().set(StandardField.YEAR);
+        copyOrMoveFieldContentTabViewModel.toFieldProperty().set(StandardField.DATE);
+        copyOrMoveFieldContentTabViewModel.overwriteFieldContentProperty().set(false);
 
-        twoFieldsViewModel.moveValue();
+        copyOrMoveFieldContentTabViewModel.moveValue();
 
         assertEquals(Optional.of("2015"), entryA.getField(StandardField.YEAR));
         assertEquals(Optional.of("2014"), entryA.getField(StandardField.DATE));
@@ -84,17 +84,17 @@ public class TwoFieldsViewModelTest {
 
     @Test
     void moveValueShouldMoveValueIfOverwriteIsEnabled() {
-        twoFieldsViewModel.fromFieldProperty().set(StandardField.DATE);
-        twoFieldsViewModel.toFieldProperty().set(StandardField.YEAR);
-        twoFieldsViewModel.overwriteFieldContentProperty().set(true);
+        copyOrMoveFieldContentTabViewModel.fromFieldProperty().set(StandardField.DATE);
+        copyOrMoveFieldContentTabViewModel.toFieldProperty().set(StandardField.YEAR);
+        copyOrMoveFieldContentTabViewModel.overwriteFieldContentProperty().set(true);
 
-        twoFieldsViewModel.moveValue();
+        copyOrMoveFieldContentTabViewModel.moveValue();
 
         assertEquals(Optional.of("1998"), entryB.getField(StandardField.YEAR));
         assertEquals(Optional.empty(), entryB.getField(StandardField.DATE));
     }
 
-    private TwoFieldsViewModel newTwoFieldsViewModel(BibEntry... selectedEntries) {
-        return new TwoFieldsViewModel(List.of(selectedEntries), Collections.emptySet(), new NamedCompound(""));
+    private CopyOrMoveFieldContentTabViewModel newTwoFieldsViewModel(BibEntry... selectedEntries) {
+        return new CopyOrMoveFieldContentTabViewModel(List.of(selectedEntries), Collections.emptySet(), new NamedCompound(""));
     }
 }
