@@ -2,44 +2,34 @@ package org.jabref.gui.edit.automaticfiededitor.copyormovecontent;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 
-import org.jabref.gui.AbstractViewModel;
+import org.jabref.gui.edit.automaticfiededitor.AbstractAutomaticFieldEditorTabViewModel;
 import org.jabref.gui.edit.automaticfiededitor.MoveFieldValueAction;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableFieldChange;
+import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.strings.StringUtil;
 
-public class CopyOrMoveFieldContentTabViewModel extends AbstractViewModel {
+public class CopyOrMoveFieldContentTabViewModel extends AbstractAutomaticFieldEditorTabViewModel {
     private final ObjectProperty<Field> fromField = new SimpleObjectProperty<>();
 
     private final ObjectProperty<Field> toField = new SimpleObjectProperty<>();
 
     private final BooleanProperty overwriteFieldContent = new SimpleBooleanProperty();
-    private final ObservableList<Field> allFields = FXCollections.observableArrayList();
-    // TODO: Create an abstraction where selectedEntries, databaseContext and dialogEdits dependencies are shared across
-    //  all automatic field editors tab view models
     private final List<BibEntry> selectedEntries;
     private final NamedCompound dialogEdits;
 
-    public CopyOrMoveFieldContentTabViewModel(List<BibEntry> selectedEntries, Set<Field> visibleFields, NamedCompound dialogEdits) {
+    public CopyOrMoveFieldContentTabViewModel(List<BibEntry> selectedEntries, BibDatabase bibDatabase, NamedCompound dialogEdits) {
+        super(bibDatabase);
         this.selectedEntries = new ArrayList<>(selectedEntries);
         this.dialogEdits = dialogEdits;
-
-        allFields.addAll(visibleFields);
-    }
-
-    public ObservableList<Field> getAllFields() {
-        return allFields;
     }
 
     public Field getFromField() {

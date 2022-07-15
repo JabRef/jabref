@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
+import javafx.beans.InvalidationListener;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
@@ -52,7 +53,7 @@ public class CopyOrMoveFieldContentTabView extends AbstractAutomaticFieldEditorT
     }
 
     public void initialize() {
-        viewModel = new CopyOrMoveFieldContentTabViewModel(selectedEntries, databaseContext.getDatabase().getAllVisibleFields(), dialogEdits);
+        viewModel = new CopyOrMoveFieldContentTabViewModel(selectedEntries, databaseContext.getDatabase(), dialogEdits);
         initializeFromAndToComboBox();
 
         viewModel.overwriteFieldContentProperty().bindBidirectional(overwriteFieldContentCheckBox.selectedProperty());
@@ -62,8 +63,8 @@ public class CopyOrMoveFieldContentTabView extends AbstractAutomaticFieldEditorT
     }
 
     private void initializeFromAndToComboBox() {
-        fromFieldComboBox.getItems().addAll(viewModel.getAllFields().sorted(Comparator.comparing(Field::getDisplayName)));
-        toFieldComboBox.getItems().addAll(viewModel.getAllFields().sorted(Comparator.comparing(Field::getDisplayName)));
+        populateFieldsComboBox();
+        viewModel.getAllFields().addListener((InvalidationListener) observable -> populateFieldsComboBox());
 
         fromFieldComboBox.setConverter(new StringConverter<>() {
             @Override
@@ -80,7 +81,7 @@ public class CopyOrMoveFieldContentTabView extends AbstractAutomaticFieldEditorT
         toFieldComboBox.setConverter(new StringConverter<>() {
             @Override
             public String toString(Field field) {
-                return field.getDisplayName();
+                return field == null ? "" : field.getDisplayName();
             }
 
             @Override
@@ -89,11 +90,15 @@ public class CopyOrMoveFieldContentTabView extends AbstractAutomaticFieldEditorT
             }
         });
 
-        fromFieldComboBox.getSelectionModel().selectFirst();
-        toFieldComboBox.getSelectionModel().selectLast();
-
         viewModel.fromFieldProperty().bindBidirectional(fromFieldComboBox.valueProperty());
         viewModel.toFieldProperty().bindBidirectional(toFieldComboBox.valueProperty());
+    }
+
+    private void populateFieldsComboBox() {
+        fromFieldComboBox.getItems().setAll(viewModel.getAllFields().stream().sorted(Comparator.comparing(Field::getDisplayName)).toList());
+        fromFieldComboBox.getSelectionModel().selectFirst();
+        toFieldComboBox.getItems().setAll(viewModel.getAllFields().stream().sorted(Comparator.comparing(Field::getDisplayName)).toList());
+        toFieldComboBox.getSelectionModel().selectFirst();
     }
 
     @Override

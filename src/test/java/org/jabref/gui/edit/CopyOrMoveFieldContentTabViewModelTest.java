@@ -1,11 +1,11 @@
 package org.jabref.gui.edit;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
 import org.jabref.gui.edit.automaticfiededitor.copyormovecontent.CopyOrMoveFieldContentTabViewModel;
 import org.jabref.gui.undo.NamedCompound;
+import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 
@@ -19,6 +19,8 @@ public class CopyOrMoveFieldContentTabViewModelTest {
     BibEntry entryA;
     BibEntry entryB;
 
+    BibDatabase bibDatabase;
+
     @BeforeEach
     void setup() {
         entryA = new BibEntry(BibEntry.DEFAULT_TYPE)
@@ -27,7 +29,7 @@ public class CopyOrMoveFieldContentTabViewModelTest {
 
         entryB = new BibEntry(BibEntry.DEFAULT_TYPE)
                 .withField(StandardField.DATE, "1998");
-
+        bibDatabase = new BibDatabase();
         copyOrMoveFieldContentTabViewModel = newTwoFieldsViewModel(entryA, entryB);
     }
 
@@ -95,6 +97,6 @@ public class CopyOrMoveFieldContentTabViewModelTest {
     }
 
     private CopyOrMoveFieldContentTabViewModel newTwoFieldsViewModel(BibEntry... selectedEntries) {
-        return new CopyOrMoveFieldContentTabViewModel(List.of(selectedEntries), Collections.emptySet(), new NamedCompound(""));
+        return new CopyOrMoveFieldContentTabViewModel(List.of(selectedEntries), bibDatabase, new NamedCompound(""));
     }
 }
