@@ -41,6 +41,14 @@ public class CitationKeyCheckerTest {
     }
 
     @Test
+    void emptyCitationKeyFromAuthorAndTitle() {
+        BibEntry entry = new BibEntry().withField(StandardField.AUTHOR, "Brown")
+                                       .withField(StandardField.TITLE, "The Title");
+        List<IntegrityMessage> expected = Collections.singletonList(new IntegrityMessage(Localization.lang("empty citation key") + ": " + entry.getAuthorTitleYear(100), entry, InternalField.KEY_FIELD));
+        assertEquals(expected, checker.check(entry));
+    }
+
+    @Test
     void emptyCitationKey() {
         BibEntry entry = new BibEntry().withField(StandardField.AUTHOR, "Brown")
                                        .withField(StandardField.TITLE, "The Title")

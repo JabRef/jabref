@@ -653,7 +653,7 @@ public class JabRefPreferences implements PreferencesService {
         // default time stamp follows ISO-8601. Reason: https://xkcd.com/1179/
         defaults.put(TIME_STAMP_FORMAT, "yyyy-MM-dd");
 
-        defaults.put(GENERATE_KEYS_BEFORE_SAVING, Boolean.FALSE);
+        defaults.put(GENERATE_KEYS_BEFORE_SAVING, Boolean.TRUE);
 
         defaults.put(USE_REMOTE_SERVER, Boolean.TRUE);
         defaults.put(REMOTE_SERVER_PORT, 6050);

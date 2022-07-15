@@ -11,7 +11,8 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.strings.StringUtil;
 
 /**
- * Currently only checks the key if there is an author, year, and title present.
+ * In the past only checks the key if there is an author, year, and title present.
+ * Currently checks the key all the time.
  */
 public class CitationKeyChecker implements EntryChecker {
 
@@ -20,12 +21,10 @@ public class CitationKeyChecker implements EntryChecker {
         Optional<String> author = entry.getField(StandardField.AUTHOR);
         Optional<String> title = entry.getField(StandardField.TITLE);
         Optional<String> year = entry.getField(StandardField.YEAR);
-        if (author.isEmpty() || title.isEmpty() || year.isEmpty()) {
-            return Collections.emptyList();
-        }
 
         if (StringUtil.isBlank(entry.getCitationKey())) {
             String authorTitleYear = entry.getAuthorTitleYear(100);
+
             return Collections.singletonList(new IntegrityMessage(
                     Localization.lang("empty citation key") + ": " + authorTitleYear, entry, InternalField.KEY_FIELD));
         }
