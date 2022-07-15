@@ -2,11 +2,7 @@ package org.jabref.gui;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 import javafx.animation.PauseTransition;
 import javafx.application.Platform;
@@ -152,6 +148,10 @@ public class LibraryTab extends Tab {
         this.getDatabase().registerListener(new UpdateTimestampListener(preferencesService));
 
         this.entryEditor = new EntryEditor(this, externalFileTypes);
+
+        // set LibraryTab ID for drag'n'drop
+        // ID content doesn't matter, we only need different tabs to have different ID
+        this.setId(Long.valueOf(new Random().nextLong()).toString());
 
         Platform.runLater(() -> {
             EasyBind.subscribe(changedProperty, this::updateTabTitle);
@@ -756,6 +756,11 @@ public class LibraryTab extends Tab {
 
     public void paste() {
         mainTable.paste();
+    }
+
+    public void dropEntry(List<BibEntry> entriesToAdd)
+    {
+        mainTable.dropEntry(entriesToAdd);
     }
 
     public void cut() {
