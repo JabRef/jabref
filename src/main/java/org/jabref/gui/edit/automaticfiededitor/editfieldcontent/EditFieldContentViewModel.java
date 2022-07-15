@@ -13,7 +13,6 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableSet;
-import javafx.collections.SetChangeListener;
 
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.undo.NamedCompound;
@@ -21,8 +20,6 @@ import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
-
-import org.tinylog.Logger;
 
 public class EditFieldContentViewModel extends AbstractViewModel {
     private final BibDatabaseContext databaseContext;
