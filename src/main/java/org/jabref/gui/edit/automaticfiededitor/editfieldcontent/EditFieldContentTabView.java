@@ -75,7 +75,7 @@ public class EditFieldContentTabView extends AbstractAutomaticFieldEditorTabView
 
     @Override
     public String getTabName() {
-        return Localization.lang("Edit field content");
+        return Localization.lang("Edit content");
     }
 
     @FXML
