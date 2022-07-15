@@ -38,7 +38,6 @@ public class ClipBoardManager {
 
     private final PreferencesService preferencesService;
 
-
     public ClipBoardManager(PreferencesService preferencesService) {
         this(Clipboard.getSystemClipboard(), Toolkit.getDefaultToolkit().getSystemSelection(), preferencesService);
     }
@@ -88,7 +87,7 @@ public class ClipBoardManager {
         return result;
     }
 
-    public Optional<String> getBibTeXEntriesFromClipbaord(){
+    public Optional<String> getBibTeXEntriesFromClipbaord() {
         return Optional.ofNullable(clipboard.getContent(DragAndDropDataFormats.ENTRIES)).map(String.class::cast);
     }
 

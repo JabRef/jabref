@@ -456,6 +456,4 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                     .filter(viewModel -> viewModel.getEntry().equals(entry))
                     .findFirst();
     }
-
-
 }
