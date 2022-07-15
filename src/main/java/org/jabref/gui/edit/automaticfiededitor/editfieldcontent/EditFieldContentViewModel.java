@@ -1,10 +1,10 @@
 package org.jabref.gui.edit.automaticfiededitor.editfieldcontent;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -12,7 +12,8 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
+import javafx.collections.ObservableSet;
+import javafx.collections.SetChangeListener;
 
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.undo.NamedCompound;
@@ -20,6 +21,8 @@ import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
+
+import org.tinylog.Logger;
 
 public class EditFieldContentViewModel extends AbstractViewModel {
     private final BibDatabaseContext databaseContext;
@@ -31,7 +34,7 @@ public class EditFieldContentViewModel extends AbstractViewModel {
 
     private final BooleanProperty overwriteFieldContent = new SimpleBooleanProperty();
 
-    private final ObservableList<Field> allFields = FXCollections.observableArrayList();
+    private final ObservableSet<Field> allFields = FXCollections.observableSet();
 
     private final NamedCompound dialogEdits;
 
@@ -40,11 +43,7 @@ public class EditFieldContentViewModel extends AbstractViewModel {
         this.selectedEntries = new ArrayList<>(selectedEntries);
         this.dialogEdits = dialogEdits;
 
-        updateFields();
-    }
-
-    private void updateFields() {
-        allFields.setAll(databaseContext.getDatabase().getAllVisibleFields().stream().sorted(Comparator.comparing(Field::getDisplayName)).toList());
+        Bindings.bindContent(allFields, databaseContext.getDatabase().getAllVisibleFields());
     }
 
     public void clearSelectedField() {
@@ -53,12 +52,8 @@ public class EditFieldContentViewModel extends AbstractViewModel {
         for (BibEntry entry : selectedEntries) {
             Optional<String> oldFieldValue = entry.getField(selectedField.get());
             if (oldFieldValue.isPresent()) {
-                entry.setField(selectedField.get(), "");
-
-                clearFieldEdit.addEdit(new UndoableFieldChange(entry,
-                        selectedField.get(),
-                        oldFieldValue.orElse(null),
-                        fieldValue.get()));
+                entry.clearField(selectedField.get())
+                        .ifPresent(fieldChange -> clearFieldEdit.addEdit(new UndoableFieldChange(fieldChange)));
             }
         }
 
@@ -75,13 +70,8 @@ public class EditFieldContentViewModel extends AbstractViewModel {
         for (BibEntry entry : selectedEntries) {
             Optional<String> oldFieldValue = entry.getField(selectedField.get());
             if (oldFieldValue.isEmpty() || overwriteFieldContent.get()) {
-                entry.setField(selectedField.get(), toSetFieldValue);
-                updateFields();
-
-                setFieldEdit.addEdit(new UndoableFieldChange(entry,
-                        selectedField.get(),
-                        oldFieldValue.orElse(null),
-                        toSetFieldValue));
+                entry.setField(selectedField.get(), toSetFieldValue)
+                        .ifPresent(fieldChange -> setFieldEdit.addEdit(new UndoableFieldChange(fieldChange)));
                 fieldValue.set("");
             }
         }
@@ -102,13 +92,8 @@ public class EditFieldContentViewModel extends AbstractViewModel {
             if (overwriteFieldContent.get()) {
                 String newFieldValue = oldFieldValue.orElse("").concat(toAppendFieldValue);
 
-                entry.setField(selectedField.get(), newFieldValue);
-                updateFields();
-                appendToFieldEdit.addEdit(new UndoableFieldChange(entry,
-                        selectedField.get(),
-                        oldFieldValue.orElse(null),
-                        newFieldValue)
-                );
+                entry.setField(selectedField.get(), newFieldValue)
+                        .ifPresent(fieldChange -> appendToFieldEdit.addEdit(new UndoableFieldChange(fieldChange)));
 
                 fieldValue.set("");
             }
@@ -120,7 +105,7 @@ public class EditFieldContentViewModel extends AbstractViewModel {
         }
     }
 
-    public ObservableList<Field> getAllFields() {
+    public ObservableSet<Field> getAllFields() {
         return allFields;
     }
 
