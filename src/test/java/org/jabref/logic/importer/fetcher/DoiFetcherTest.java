@@ -2,7 +2,6 @@ package org.jabref.logic.importer.fetcher;
 
 import java.util.Optional;
 
-import org.jabref.logic.importer.FetcherClientException;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.entry.BibEntry;
@@ -104,12 +103,12 @@ public class DoiFetcherTest {
 
     @Test
     public void testPerformSearchInvalidDOIClientResultsinFetcherClientException() {
-        assertThrows(FetcherClientException.class, () -> fetcher.performSearchById("10.1002/9781118257517F"));
+        assertThrows(FetcherException.class, () -> fetcher.performSearchById("10.1002/9781118257517F"));
     }
 
     @Test
     public void testPerformSearchInvalidDOIClientResultsinFetcherClientException2() {
-        assertThrows(FetcherClientException.class, () -> fetcher.performSearchById("10.1002/9781517F"));
+        assertThrows(FetcherException.class, () -> fetcher.performSearchById("10.1002/9781517F"));
     }
 
     @Test

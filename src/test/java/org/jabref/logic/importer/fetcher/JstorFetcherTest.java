@@ -40,7 +40,8 @@ public class JstorFetcherTest implements SearchBasedFetcherCapabilityTest {
             .withField(StandardField.PAGES, "63--73")
             .withField(StandardField.VOLUME, "20")
             .withField(StandardField.URL, "http://www.jstor.org/stable/90002164")
-            .withField(StandardField.YEAR, "2017");
+            .withField(StandardField.YEAR, "2017")
+            .withField(StandardField.URLDATE, "2022-07-16");
 
     private final BibEntry doiEntry = new BibEntry(StandardEntryType.Article)
             .withCitationKey("10.1086/501484")
@@ -69,7 +70,7 @@ public class JstorFetcherTest implements SearchBasedFetcherCapabilityTest {
     }
 
     @Test
-    void fetchPDF() throws IOException, FetcherException {
+    void fetchPDF() throws IOException {
         Optional<URL> url = fetcher.findFullText(bibEntry);
         assertEquals(Optional.of(new URL("https://www.jstor.org/stable/pdf/90002164.pdf")), url);
     }
