@@ -91,7 +91,7 @@ public class FetchAndMergeEntry {
         dialog.setTitle(Localization.lang("Merge entry with %0 information", fetcher.getName()));
         dialog.setLeftHeaderText(Localization.lang("Original entry"));
         dialog.setRightHeaderText(Localization.lang("Entry from %0", fetcher.getName()));
-        Optional<BibEntry> mergedEntry = dialogService.showCustomDialogAndWait(dialog);
+        Optional<BibEntry> mergedEntry = dialogService.showCustomDialogAndWait(dialog).map(MergeResult::mergedEntry);
         if (mergedEntry.isPresent()) {
             NamedCompound ce = new NamedCompound(Localization.lang("Merge entry with %0 information", fetcher.getName()));
 
@@ -132,10 +132,6 @@ public class FetchAndMergeEntry {
                     ce.addEdit(new UndoableFieldChange(originalEntry, field, originalString.get(), null)); // originalString always present
                     edited = true;
                 }
-            }
-            if (dialog.getMergeGroupsEdit().canUndo()) {
-                ce.addEdit(dialog.getMergeGroupsEdit());
-                edited = true;
             }
 
             if (edited) {
