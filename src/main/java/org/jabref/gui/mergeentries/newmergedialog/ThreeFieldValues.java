@@ -1,8 +1,6 @@
 package org.jabref.gui.mergeentries.newmergedialog;
 
-import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyStringProperty;
-import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.control.ToggleGroup;
 
 import org.jabref.gui.mergeentries.newmergedialog.cell.FieldValueCell;
