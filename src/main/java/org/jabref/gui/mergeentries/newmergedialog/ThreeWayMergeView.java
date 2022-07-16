@@ -231,10 +231,6 @@ public class ThreeWayMergeView extends VBox {
         }
     }
 
-    public CompoundEdit getMergeGroupsEdit() {
-        return mergeGroupsEdit;
-    }
-
     public BibEntry getLeftEntry() {
         return viewModel.getLeftEntry();
     }
