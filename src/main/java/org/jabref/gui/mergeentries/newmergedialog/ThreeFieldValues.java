@@ -1,6 +1,8 @@
 package org.jabref.gui.mergeentries.newmergedialog;
 
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyStringProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.control.ToggleGroup;
 
 import org.jabref.gui.mergeentries.newmergedialog.cell.FieldValueCell;
@@ -26,10 +28,14 @@ public class ThreeFieldValues {
 
     private final ToggleGroup toggleGroup = new ToggleGroup();
 
+    private final ThreeFieldValuesViewModel viewModel;
+
     public ThreeFieldValues(String leftValue, String rightValue, int rowIndex) {
         leftValueCell = new FieldValueCell(leftValue, rowIndex);
         rightValueCell = new FieldValueCell(rightValue, rowIndex);
         mergedValueCell = new MergedFieldCell(StringUtil.isNullOrEmpty(leftValue) ? rightValue : leftValue, rowIndex);
+
+        viewModel = new ThreeFieldValuesViewModel();
 
         this.leftValue = leftValue;
         this.rightValue = rightValue;
