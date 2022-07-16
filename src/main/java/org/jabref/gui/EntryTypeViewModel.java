@@ -153,11 +153,8 @@ public class EntryTypeViewModel {
             LOGGER.error(String.format("Exception during fetching when using fetcher '%s' with entry id '%s'.", searchId, fetcher), exception);
 
             searchingProperty.set(false);
-
             fetcherWorker = new FetcherWorker();
         });
-
-
 
         fetcherWorker.setOnSucceeded(evt -> {
             Optional<BibEntry> result = fetcherWorker.getValue();

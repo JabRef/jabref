@@ -308,6 +308,5 @@ public class ImportHandler {
         LOGGER.info("Found arxiv identifier in clipboard");
         Optional<BibEntry> entry = new ArXiv(preferencesService.getImportFormatPreferences()).performSearchById(arXivIdentifier.getNormalizedWithoutVersion());
         return OptionalUtil.toList(entry);
-
     }
 }
