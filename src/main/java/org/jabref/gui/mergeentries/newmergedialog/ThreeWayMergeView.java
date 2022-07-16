@@ -31,6 +31,7 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.EntryTypeFactory;
+import org.jabref.model.strings.StringUtil;
 
 public class ThreeWayMergeView extends VBox {
     public static final String GROUPS_SEPARATOR = ", ";
@@ -280,11 +281,17 @@ public class ThreeWayMergeView extends VBox {
         }
 
         private String mergeLeftAndRightEntryGroups(String left, String right) {
-            Set<String> leftGroups = new HashSet<>(Arrays.stream(left.split(", ")).toList());
-            List<String> rightGroups = Arrays.stream(right.split(", ")).toList();
-            leftGroups.addAll(rightGroups);
+            if (StringUtil.isBlank(left)) {
+                return right;
+            } else if (StringUtil.isBlank(right)) {
+                return left;
+            } else {
+                Set<String> leftGroups = new HashSet<>(Arrays.stream(left.split(", ")).toList());
+                List<String> rightGroups = Arrays.stream(right.split(", ")).toList();
+                leftGroups.addAll(rightGroups);
 
-            return String.join(GROUPS_SEPARATOR, leftGroups);
+                return String.join(GROUPS_SEPARATOR, leftGroups);
+            }
         }
     }
 
