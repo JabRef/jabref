@@ -272,7 +272,7 @@ public class ImportHandler {
         }
     }
 
-    public List<BibEntry> handleStringData(String data) {
+    public List<BibEntry> handleStringData(String data) throws FetcherException {
         if ((data == null) || data.isEmpty()) {
             return Collections.emptyList();
         }
@@ -298,25 +298,16 @@ public class ImportHandler {
         }
     }
 
-    private List<BibEntry> fetchByDOI(DOI doi) {
+    private List<BibEntry> fetchByDOI(DOI doi) throws FetcherException {
         LOGGER.info("Found DOI in clipboard");
-        try {
-            Optional<BibEntry> entry = new DoiFetcher(preferencesService.getImportFormatPreferences()).performSearchById(doi.getDOI());
-            return OptionalUtil.toList(entry);
-        } catch (FetcherException ex) {
-            LOGGER.error("Error while fetching", ex);
-            return Collections.emptyList();
-        }
+        Optional<BibEntry> entry = new DoiFetcher(preferencesService.getImportFormatPreferences()).performSearchById(doi.getDOI());
+        return OptionalUtil.toList(entry);
     }
 
-    private List<BibEntry> fetchByArXiv(ArXivIdentifier arXivIdentifier) {
+    private List<BibEntry> fetchByArXiv(ArXivIdentifier arXivIdentifier) throws FetcherException {
         LOGGER.info("Found arxiv identifier in clipboard");
-        try {
-            Optional<BibEntry> entry = new ArXiv(preferencesService.getImportFormatPreferences()).performSearchById(arXivIdentifier.getNormalizedWithoutVersion());
-            return OptionalUtil.toList(entry);
-        } catch (FetcherException ex) {
-            LOGGER.error("Error while fetching", ex);
-            return Collections.emptyList();
-        }
+        Optional<BibEntry> entry = new ArXiv(preferencesService.getImportFormatPreferences()).performSearchById(arXivIdentifier.getNormalizedWithoutVersion());
+        return OptionalUtil.toList(entry);
+
     }
 }

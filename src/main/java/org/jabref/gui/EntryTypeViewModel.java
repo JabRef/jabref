@@ -146,9 +146,9 @@ public class EntryTypeViewModel {
             String fetcher = selectedItemProperty().getValue().getName();
             String searchId = idText.getValue();
             if (exception instanceof FetcherException) {
-                dialogService.showErrorDialogAndWait(Localization.lang("Error"), Localization.lang("Error while fetching from %0", fetcher + "." + "\n" + fetcherExceptionMessage));
+                dialogService.showInformationDialogAndWait(Localization.lang("Error"), Localization.lang("Error while fetching from %0", fetcher + "." + "\n" + fetcherExceptionMessage));
             } else {
-                dialogService.showErrorDialogAndWait(Localization.lang("No files found.", Localization.lang("Fetcher '%0' did not find an entry for id '%1'.", fetcher, searchId) + "\n" + fetcherExceptionMessage));
+                dialogService.showInformationDialogAndWait(Localization.lang("No files found."), Localization.lang("Fetcher '%0' did not find an entry for id '%1'.", fetcher, searchId) + "\n" + fetcherExceptionMessage);
             }
             LOGGER.error(String.format("Exception during fetching when using fetcher '%s' with entry id '%s'.", searchId, fetcher), exception);
 
@@ -156,6 +156,8 @@ public class EntryTypeViewModel {
 
             fetcherWorker = new FetcherWorker();
         });
+
+
 
         fetcherWorker.setOnSucceeded(evt -> {
             Optional<BibEntry> result = fetcherWorker.getValue();

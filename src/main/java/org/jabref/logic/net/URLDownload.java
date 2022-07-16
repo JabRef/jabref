@@ -361,10 +361,6 @@ public class URLDownload {
                 // open the new connection again
                 connection = new URLDownload(newUrl).openConnection();
             }
-            if (status == HttpURLConnection.HTTP_NOT_FOUND) {
-                LOGGER.debug("Encountered 404 error for {}", connection.getURL());
-                return connection;
-            }
             if ((status >= 400) && (status < 500)) {
                 throw new IOException(new FetcherClientException("Client error. Status code " + status));
             }

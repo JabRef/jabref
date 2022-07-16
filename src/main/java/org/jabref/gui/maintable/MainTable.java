@@ -3,6 +3,7 @@ package org.jabref.gui.maintable;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -42,6 +43,9 @@ import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.ViewModelTableRowFactory;
+import org.jabref.logic.importer.FetcherClientException;
+import org.jabref.logic.importer.FetcherException;
+import org.jabref.logic.importer.FetcherServerException;
 import org.jabref.logic.importer.ImportFormatReader;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
@@ -313,7 +317,8 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     }
 
     public void paste() {
-        List<BibEntry> entriesToAdd = this.clipBoardManager.getBibTeXEntriesFromClipbaord()
+        List<BibEntry> entriesToAdd = new ArrayList<>();
+            entriesToAdd = this.clipBoardManager.getBibTeXEntriesFromClipbaord()
             .map(importHandler::handleBibTeXData)
             .orElseGet(this::handleNonBibteXStringData);
 
@@ -327,7 +332,19 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
     private List<BibEntry> handleNonBibteXStringData() {
         String data = this.clipBoardManager.getContents();
-        return this.importHandler.handleStringData(data);
+        List<BibEntry> entries = new ArrayList<>();
+        try {
+            entries = this.importHandler.handleStringData(data);
+        } catch (FetcherException exception) {
+            if (exception instanceof FetcherClientException) {
+                dialogService.showInformationDialogAndWait(Localization.lang("Lookup identifier"), Localization.lang("No data was found for the identifier"));
+            } else if (exception instanceof FetcherServerException) {
+                dialogService.showInformationDialogAndWait(Localization.lang("Lookup identifier"), Localization.lang("Server not available"));
+            } else {
+                dialogService.showErrorDialogAndWait(exception);
+            }
+        }
+        return entries;
     }
 
     private void handleOnDragOver(TableRow<BibEntryTableViewModel> row, BibEntryTableViewModel item, DragEvent event) {
