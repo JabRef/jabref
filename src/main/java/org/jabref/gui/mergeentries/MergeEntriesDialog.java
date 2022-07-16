@@ -1,7 +1,5 @@
 package org.jabref.gui.mergeentries;
 
-import javax.swing.undo.CompoundEdit;
-
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 
@@ -10,7 +8,7 @@ import org.jabref.gui.util.BaseDialog;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 
-public class MergeEntriesDialog extends BaseDialog<BibEntry> {
+public class MergeEntriesDialog extends BaseDialog<MergeResult> {
     private final ThreeWayMergeView threeWayMergeView;
 
     public MergeEntriesDialog(BibEntry one, BibEntry two) {
@@ -33,7 +31,7 @@ public class MergeEntriesDialog extends BaseDialog<BibEntry> {
         this.getDialogPane().getButtonTypes().setAll(ButtonType.CANCEL, replaceEntries);
         this.setResultConverter(buttonType -> {
             if (buttonType.equals(replaceEntries)) {
-                return threeWayMergeView.getMergedEntry();
+                return new MergeResult(threeWayMergeView.getLeftEntry(), threeWayMergeView.getRightEntry(), threeWayMergeView.getMergedEntry());
             } else {
                 threeWayMergeView.cancelGroupsMerge();
                 return null;
@@ -47,9 +45,5 @@ public class MergeEntriesDialog extends BaseDialog<BibEntry> {
 
     public void setRightHeaderText(String rightHeaderText) {
         threeWayMergeView.setRightHeader(rightHeaderText);
-    }
-
-    public CompoundEdit getMergeGroupsEdit() {
-        return threeWayMergeView.getMergeGroupsEdit();
     }
 }

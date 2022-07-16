@@ -58,7 +58,7 @@ public class ThreeWayMergeView extends VBox {
 
     public ThreeWayMergeView(BibEntry leftEntry, BibEntry rightEntry, String leftHeader, String rightHeader) {
         getStylesheets().add(ThreeWayMergeView.class.getResource("ThreeWayMergeView.css").toExternalForm());
-        viewModel = new ThreeWayMergeViewModel(leftEntry, rightEntry, leftHeader, rightHeader);
+        viewModel = new ThreeWayMergeViewModel((BibEntry) leftEntry.clone(), (BibEntry) rightEntry.clone(), leftHeader, rightHeader);
 
         mergeGridPane = new GridPane();
         scrollPane = new ScrollPane();
@@ -233,6 +233,14 @@ public class ThreeWayMergeView extends VBox {
 
     public CompoundEdit getMergeGroupsEdit() {
         return mergeGroupsEdit;
+    }
+
+    public BibEntry getLeftEntry() {
+        return viewModel.getLeftEntry();
+    }
+
+    public BibEntry getRightEntry() {
+        return viewModel.getRightEntry();
     }
 
     public class MergeGroupsCommand extends SimpleCommand {
