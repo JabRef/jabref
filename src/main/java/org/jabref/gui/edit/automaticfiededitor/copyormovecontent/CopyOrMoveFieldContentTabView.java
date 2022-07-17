@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-import javafx.beans.InvalidationListener;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
@@ -63,8 +62,11 @@ public class CopyOrMoveFieldContentTabView extends AbstractAutomaticFieldEditorT
     }
 
     private void initializeFromAndToComboBox() {
-        populateFieldsComboBox();
-        viewModel.getAllFields().addListener((InvalidationListener) observable -> populateFieldsComboBox());
+        fromFieldComboBox.getItems().setAll(viewModel.getAllFields());
+        fromFieldComboBox.getSelectionModel().selectFirst();
+
+        toFieldComboBox.getItems().setAll(viewModel.getAllFields());
+        toFieldComboBox.getSelectionModel().selectFirst();
 
         fromFieldComboBox.setConverter(new StringConverter<>() {
             @Override

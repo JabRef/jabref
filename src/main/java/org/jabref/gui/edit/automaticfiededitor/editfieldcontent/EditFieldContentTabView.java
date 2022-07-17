@@ -1,9 +1,7 @@
 package org.jabref.gui.edit.automaticfiededitor.editfieldcontent;
 
-import java.util.Comparator;
 import java.util.List;
 
-import javafx.beans.InvalidationListener;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
@@ -64,8 +62,9 @@ public class EditFieldContentTabView extends AbstractAutomaticFieldEditorTabView
             }
         });
 
-        populateFieldsComboBox();
-        viewModel.getAllFields().addListener((InvalidationListener) observable -> populateFieldsComboBox());
+        fieldComboBox.getItems().setAll(viewModel.getAllFields());
+
+        fieldComboBox.getSelectionModel().selectFirst();
 
         viewModel.selectedFieldProperty().bindBidirectional(fieldComboBox.valueProperty());
 
@@ -74,11 +73,6 @@ public class EditFieldContentTabView extends AbstractAutomaticFieldEditorTabView
         viewModel.overwriteFieldContentProperty().bindBidirectional(overwriteFieldContentCheckBox.selectedProperty());
 
         appendValueButton.disableProperty().bind(overwriteFieldContentCheckBox.selectedProperty().not());
-    }
-
-    private void populateFieldsComboBox() {
-        fieldComboBox.getItems().setAll(viewModel.getAllFields().stream().sorted(Comparator.comparing(Field::getDisplayName)).toList());
-        fieldComboBox.getSelectionModel().selectFirst();
     }
 
     @Override

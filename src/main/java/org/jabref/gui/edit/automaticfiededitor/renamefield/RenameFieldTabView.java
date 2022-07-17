@@ -1,9 +1,7 @@
 package org.jabref.gui.edit.automaticfiededitor.renamefield;
 
-import java.util.Comparator;
 import java.util.List;
 
-import javafx.beans.InvalidationListener;
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
@@ -44,8 +42,8 @@ public class RenameFieldTabView extends AbstractAutomaticFieldEditorTabView impl
     public void initialize() {
         viewModel = new RenameFieldViewModel(selectedEntries, databaseContext, dialogEdits);
 
-        populateFieldsComboBox();
-        viewModel.getAllFields().addListener((InvalidationListener) observable -> populateFieldsComboBox());
+        fieldComboBox.getItems().setAll(viewModel.getAllFields());
+        fieldComboBox.getSelectionModel().selectFirst();
 
         fieldComboBox.setConverter(new StringConverter<>() {
             @Override
@@ -59,15 +57,9 @@ public class RenameFieldTabView extends AbstractAutomaticFieldEditorTabView impl
             }
         });
 
-        fieldComboBox.getSelectionModel().selectFirst();
         viewModel.selectedFieldProperty().bindBidirectional(fieldComboBox.valueProperty());
 
         viewModel.newFieldNameProperty().bindBidirectional(newFieldNameTextField.textProperty());
-    }
-
-    private void populateFieldsComboBox() {
-        fieldComboBox.getItems().setAll(viewModel.getAllFields().stream().sorted(Comparator.comparing(Field::getDisplayName)).toList());
-        fieldComboBox.getSelectionModel().selectFirst();
     }
 
     @Override
