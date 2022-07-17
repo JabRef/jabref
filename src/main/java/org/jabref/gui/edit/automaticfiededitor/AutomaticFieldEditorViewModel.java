@@ -8,28 +8,25 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 import org.jabref.gui.AbstractViewModel;
+import org.jabref.gui.edit.automaticfiededitor.copyormovecontent.CopyOrMoveFieldContentTabView;
 import org.jabref.gui.edit.automaticfiededitor.editfieldcontent.EditFieldContentTabView;
 import org.jabref.gui.edit.automaticfiededitor.renamefield.RenameFieldTabView;
-import org.jabref.gui.edit.automaticfiededitor.copyormovecontent.CopyOrMoveFieldContentTabView;
 import org.jabref.gui.undo.NamedCompound;
-import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 
 public class AutomaticFieldEditorViewModel extends AbstractViewModel {
     public static final String NAMED_COMPOUND_EDITS = "EDIT_FIELDS";
     private final ObservableList<AutomaticFieldEditorTab> fieldEditorTabs = FXCollections.observableArrayList();
     private final NamedCompound dialogEdits = new NamedCompound(NAMED_COMPOUND_EDITS);
-
-    private final BibDatabaseContext databaseContext;
     private final UndoManager undoManager;
 
-    public AutomaticFieldEditorViewModel(List<BibEntry> selectedEntries, BibDatabaseContext databaseContext, UndoManager undoManager) {
+    public AutomaticFieldEditorViewModel(List<BibEntry> selectedEntries, BibDatabase database, UndoManager undoManager) {
         fieldEditorTabs.addAll(
-                new EditFieldContentTabView(selectedEntries, databaseContext, dialogEdits),
-                new CopyOrMoveFieldContentTabView(selectedEntries, databaseContext, dialogEdits),
-                new RenameFieldTabView(selectedEntries, databaseContext, dialogEdits)
+                new EditFieldContentTabView(selectedEntries, database, dialogEdits),
+                new CopyOrMoveFieldContentTabView(selectedEntries, database, dialogEdits),
+                new RenameFieldTabView(selectedEntries, database, dialogEdits)
         );
-        this.databaseContext = databaseContext;
         this.undoManager = undoManager;
     }
 

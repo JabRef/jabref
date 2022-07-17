@@ -14,12 +14,11 @@ import javafx.beans.property.StringProperty;
 import org.jabref.gui.edit.automaticfiededitor.AbstractAutomaticFieldEditorTabViewModel;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableFieldChange;
-import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 
 public class EditFieldContentViewModel extends AbstractAutomaticFieldEditorTabViewModel {
-    private final BibDatabaseContext databaseContext;
     private final List<BibEntry> selectedEntries;
 
     private final StringProperty fieldValue = new SimpleStringProperty();
@@ -30,9 +29,8 @@ public class EditFieldContentViewModel extends AbstractAutomaticFieldEditorTabVi
 
     private final NamedCompound dialogEdits;
 
-    public EditFieldContentViewModel(BibDatabaseContext databaseContext, List<BibEntry> selectedEntries, NamedCompound dialogEdits) {
-        super(databaseContext.getDatabase());
-        this.databaseContext = databaseContext;
+    public EditFieldContentViewModel(BibDatabase database, List<BibEntry> selectedEntries, NamedCompound dialogEdits) {
+        super(database);
         this.selectedEntries = new ArrayList<>(selectedEntries);
         this.dialogEdits = dialogEdits;
     }

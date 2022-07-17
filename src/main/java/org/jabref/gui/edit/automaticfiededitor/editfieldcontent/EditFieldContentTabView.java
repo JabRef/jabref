@@ -12,7 +12,7 @@ import javafx.util.StringConverter;
 import org.jabref.gui.edit.automaticfiededitor.AbstractAutomaticFieldEditorTabView;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
@@ -31,15 +31,15 @@ public class EditFieldContentTabView extends AbstractAutomaticFieldEditorTabView
     private CheckBox overwriteFieldContentCheckBox;
 
     private final List<BibEntry> selectedEntries;
-    private final BibDatabaseContext databaseContext;
+    private final BibDatabase database;
 
     private EditFieldContentViewModel viewModel;
 
     private final NamedCompound dialogEdits;
 
-    public EditFieldContentTabView(List<BibEntry> selectedEntries, BibDatabaseContext databaseContext, NamedCompound dialogEdits) {
+    public EditFieldContentTabView(List<BibEntry> selectedEntries, BibDatabase database, NamedCompound dialogEdits) {
         this.selectedEntries = selectedEntries;
-        this.databaseContext = databaseContext;
+        this.database = database;
         this.dialogEdits = dialogEdits;
 
         ViewLoader.view(this)
@@ -49,7 +49,7 @@ public class EditFieldContentTabView extends AbstractAutomaticFieldEditorTabView
 
     @FXML
     public void initialize() {
-        viewModel = new EditFieldContentViewModel(databaseContext, selectedEntries, dialogEdits);
+        viewModel = new EditFieldContentViewModel(database, selectedEntries, dialogEdits);
         fieldComboBox.setConverter(new StringConverter<>() {
             @Override
             public String toString(Field field) {

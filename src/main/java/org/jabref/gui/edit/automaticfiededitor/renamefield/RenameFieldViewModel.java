@@ -10,7 +10,7 @@ import javafx.beans.property.StringProperty;
 import org.jabref.gui.edit.automaticfiededitor.AbstractAutomaticFieldEditorTabViewModel;
 import org.jabref.gui.edit.automaticfiededitor.MoveFieldValueAction;
 import org.jabref.gui.undo.NamedCompound;
-import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
@@ -20,13 +20,11 @@ public class RenameFieldViewModel extends AbstractAutomaticFieldEditorTabViewMod
     private final StringProperty newFieldName = new SimpleStringProperty();
     private final ObjectProperty<Field> selectedField = new SimpleObjectProperty<>();
     private final List<BibEntry> selectedEntries;
-    private final BibDatabaseContext databaseContext;
     private final NamedCompound dialogEdits;
 
-    public RenameFieldViewModel(List<BibEntry> selectedEntries, BibDatabaseContext databaseContext, NamedCompound dialogEdits) {
-        super(databaseContext.getDatabase());
+    public RenameFieldViewModel(List<BibEntry> selectedEntries, BibDatabase database, NamedCompound dialogEdits) {
+        super(database);
         this.selectedEntries = selectedEntries;
-        this.databaseContext = databaseContext;
         this.dialogEdits = dialogEdits;
     }
 

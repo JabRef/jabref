@@ -11,6 +11,7 @@ import org.jabref.gui.edit.automaticfiededitor.AbstractAutomaticFieldEditorTabVi
 import org.jabref.gui.edit.automaticfiededitor.AutomaticFieldEditorTab;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
@@ -24,13 +25,13 @@ public class RenameFieldTabView extends AbstractAutomaticFieldEditorTabView impl
     @FXML
     private TextField newFieldNameTextField;
     private final List<BibEntry> selectedEntries;
-    private final BibDatabaseContext databaseContext;
+    private final BibDatabase database;
     private final NamedCompound dialogEdits;
     private RenameFieldViewModel viewModel;
 
-    public RenameFieldTabView(List<BibEntry> selectedEntries, BibDatabaseContext databaseContext, NamedCompound dialogEdits) {
+    public RenameFieldTabView(List<BibEntry> selectedEntries, BibDatabase database, NamedCompound dialogEdits) {
         this.selectedEntries = selectedEntries;
-        this.databaseContext = databaseContext;
+        this.database = database;
         this.dialogEdits = dialogEdits;
 
         ViewLoader.view(this)
@@ -40,7 +41,7 @@ public class RenameFieldTabView extends AbstractAutomaticFieldEditorTabView impl
 
     @FXML
     public void initialize() {
-        viewModel = new RenameFieldViewModel(selectedEntries, databaseContext, dialogEdits);
+        viewModel = new RenameFieldViewModel(selectedEntries, database, dialogEdits);
 
         fieldComboBox.getItems().setAll(viewModel.getAllFields());
         fieldComboBox.getSelectionModel().selectFirst();

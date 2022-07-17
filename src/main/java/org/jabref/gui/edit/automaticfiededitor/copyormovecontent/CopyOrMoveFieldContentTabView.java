@@ -14,7 +14,7 @@ import org.jabref.gui.edit.automaticfiededitor.AbstractAutomaticFieldEditorTabVi
 import org.jabref.gui.edit.automaticfiededitor.AutomaticFieldEditorTab;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
@@ -38,12 +38,12 @@ public class CopyOrMoveFieldContentTabView extends AbstractAutomaticFieldEditorT
 
     private CopyOrMoveFieldContentTabViewModel viewModel;
     private final List<BibEntry> selectedEntries;
-    private final BibDatabaseContext databaseContext;
+    private final BibDatabase database;
     private final NamedCompound dialogEdits;
 
-    public CopyOrMoveFieldContentTabView(List<BibEntry> selectedEntries, BibDatabaseContext databaseContext, NamedCompound dialogEdits) {
+    public CopyOrMoveFieldContentTabView(List<BibEntry> selectedEntries, BibDatabase database, NamedCompound dialogEdits) {
         this.selectedEntries = new ArrayList<>(selectedEntries);
-        this.databaseContext = databaseContext;
+        this.database = database;
         this.dialogEdits = dialogEdits;
 
         ViewLoader.view(this)
@@ -52,7 +52,7 @@ public class CopyOrMoveFieldContentTabView extends AbstractAutomaticFieldEditorT
     }
 
     public void initialize() {
-        viewModel = new CopyOrMoveFieldContentTabViewModel(selectedEntries, databaseContext.getDatabase(), dialogEdits);
+        viewModel = new CopyOrMoveFieldContentTabViewModel(selectedEntries, database, dialogEdits);
         initializeFromAndToComboBox();
 
         viewModel.overwriteFieldContentProperty().bindBidirectional(overwriteFieldContentCheckBox.selectedProperty());

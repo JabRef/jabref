@@ -12,7 +12,7 @@ import javafx.scene.control.TabPane;
 import org.jabref.gui.Globals;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 
 import com.airhacks.afterburner.views.ViewLoader;
@@ -23,13 +23,13 @@ public class AutomaticFieldEditorDialog extends BaseDialog<String> {
 
     private final UndoManager undoManager;
 
-    private final BibDatabaseContext databaseContext;
+    private final BibDatabase database;
     private final List<BibEntry> selectedEntries;
     private AutomaticFieldEditorViewModel viewModel;
 
-    public AutomaticFieldEditorDialog(List<BibEntry> selectedEntries, BibDatabaseContext databaseContext) {
+    public AutomaticFieldEditorDialog(List<BibEntry> selectedEntries, BibDatabase database) {
         this.selectedEntries = selectedEntries;
-        this.databaseContext = databaseContext;
+        this.database = database;
         this.undoManager = Globals.undoManager;
 
         this.setTitle(Localization.lang("Automatic field editor"));
@@ -56,7 +56,7 @@ public class AutomaticFieldEditorDialog extends BaseDialog<String> {
 
     @FXML
     public void initialize() {
-        viewModel = new AutomaticFieldEditorViewModel(selectedEntries, databaseContext, undoManager);
+        viewModel = new AutomaticFieldEditorViewModel(selectedEntries, database, undoManager);
 
         for (AutomaticFieldEditorTab tabModel : viewModel.getFieldEditorTabs()) {
             tabPane.getTabs().add(new Tab(tabModel.getTabName(), tabModel.getContent()));
