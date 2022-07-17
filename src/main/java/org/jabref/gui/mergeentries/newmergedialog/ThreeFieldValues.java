@@ -1,5 +1,6 @@
 package org.jabref.gui.mergeentries.newmergedialog;
 
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyStringProperty;
 import javafx.scene.control.ToggleGroup;
 
@@ -11,6 +12,8 @@ import org.jabref.gui.mergeentries.newmergedialog.toolbar.ThreeWayMergeToolbar;
 import org.jabref.model.strings.StringUtil;
 
 import org.fxmisc.richtext.StyleClassedTextArea;
+
+import static org.jabref.gui.mergeentries.newmergedialog.ThreeFieldValuesViewModel.Selection;
 
 /**
  * A controller class to control left, right and merged field values
@@ -57,6 +60,19 @@ public class ThreeFieldValues {
             }
         });
 
+        mergedValueCell.textProperty().bindBidirectional(viewModel.mergedFieldValueProperty());
+
+        viewModel.selectionProperty().addListener(obs -> {
+            Selection selection = viewModel.getSelection();
+            if (selection == Selection.LEFT) {
+                toggleGroup.selectToggle(leftValueCell);
+            } else if (selection == Selection.RIGHT) {
+                toggleGroup.selectToggle(rightValueCell);
+            } else if (selection == Selection.NONE) {
+                toggleGroup.selectToggle(null);
+            }
+        });
+
         //  When both the left and right cells have the same value, only the left value is displayed,
         //  making it unnecessary to keep allocating memory for the right cell.
         if (hasEqualLeftAndRightValues()) {
@@ -66,15 +82,11 @@ public class ThreeFieldValues {
     }
 
     public void selectLeftValue() {
-        toggleGroup.selectToggle(leftValueCell);
+        viewModel.selectLeftValue();
     }
 
     public void selectRightValue() {
-        if (isRightValueCellHidden()) {
-            selectLeftValue();
-        } else {
-            toggleGroup.selectToggle(rightValueCell);
-        }
+        viewModel.selectRightValue();
     }
 
     public String getMergedValue() {
@@ -135,5 +147,9 @@ public class ThreeFieldValues {
 
     private boolean isRightValueCellHidden() {
         return rightValueCell == null;
+    }
+
+    private ObjectProperty<ThreeFieldValuesViewModel.Selection> selectionProperty() {
+        return viewModel.selectionProperty();
     }
 }
