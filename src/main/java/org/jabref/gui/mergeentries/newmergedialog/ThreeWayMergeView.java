@@ -9,8 +9,6 @@ import java.util.Set;
 import javax.swing.undo.CompoundEdit;
 
 import javafx.beans.binding.Bindings;
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.SimpleBooleanProperty;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
@@ -52,8 +50,6 @@ public class ThreeWayMergeView extends VBox {
 
     private final ThreeWayMergeViewModel viewModel;
     private final List<ThreeFieldValues> fieldValuesList = new ArrayList<>();
-
-    private final BooleanProperty areGroupsMerged = new SimpleBooleanProperty();
 
     private final CompoundEdit mergeGroupsEdit = new CompoundEdit();
 
@@ -246,12 +242,12 @@ public class ThreeWayMergeView extends VBox {
         public MergeGroupsCommand(GroupsFieldNameCell groupsFieldCell) {
             this.groupsFieldNameCell = groupsFieldCell;
 
-            this.executable.bind(Bindings.and(areGroupsMerged.not(), Bindings.createBooleanBinding(() -> {
+            this.executable.bind(Bindings.createBooleanBinding(() -> {
                 String leftEntryGroups = viewModel.getLeftEntry().getField(StandardField.GROUPS).orElse("");
                 String rightEntryGroups = viewModel.getRightEntry().getField(StandardField.GROUPS).orElse("");
 
                 return !leftEntryGroups.equals(rightEntryGroups);
-            })));
+            }));
         }
 
         @Override
