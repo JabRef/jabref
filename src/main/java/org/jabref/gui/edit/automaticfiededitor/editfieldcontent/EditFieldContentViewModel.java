@@ -99,6 +99,10 @@ public class EditFieldContentViewModel extends AbstractAutomaticFieldEditorTabVi
         return selectedField;
     }
 
+    public Field getSelectedField() {
+        return selectedFieldProperty().get();
+    }
+
     public String getFieldValue() {
         return fieldValue.get();
     }
