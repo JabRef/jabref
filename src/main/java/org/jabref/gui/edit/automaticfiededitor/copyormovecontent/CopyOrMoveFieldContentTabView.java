@@ -1,7 +1,6 @@
 package org.jabref.gui.edit.automaticfiededitor.copyormovecontent;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
 import javafx.fxml.FXML;
@@ -63,10 +62,7 @@ public class CopyOrMoveFieldContentTabView extends AbstractAutomaticFieldEditorT
 
     private void initializeFromAndToComboBox() {
         fromFieldComboBox.getItems().setAll(viewModel.getAllFields());
-        fromFieldComboBox.getSelectionModel().selectFirst();
-
         toFieldComboBox.getItems().setAll(viewModel.getAllFields());
-        toFieldComboBox.getSelectionModel().selectFirst();
 
         fromFieldComboBox.setConverter(new StringConverter<>() {
             @Override
@@ -92,15 +88,8 @@ public class CopyOrMoveFieldContentTabView extends AbstractAutomaticFieldEditorT
             }
         });
 
-        viewModel.fromFieldProperty().bindBidirectional(fromFieldComboBox.valueProperty());
-        viewModel.toFieldProperty().bindBidirectional(toFieldComboBox.valueProperty());
-    }
-
-    private void populateFieldsComboBox() {
-        fromFieldComboBox.getItems().setAll(viewModel.getAllFields().stream().sorted(Comparator.comparing(Field::getDisplayName)).toList());
-        fromFieldComboBox.getSelectionModel().selectFirst();
-        toFieldComboBox.getItems().setAll(viewModel.getAllFields().stream().sorted(Comparator.comparing(Field::getDisplayName)).toList());
-        toFieldComboBox.getSelectionModel().selectFirst();
+        fromFieldComboBox.valueProperty().bindBidirectional(viewModel.fromFieldProperty());
+        toFieldComboBox.valueProperty().bindBidirectional(viewModel.toFieldProperty());
     }
 
     @Override

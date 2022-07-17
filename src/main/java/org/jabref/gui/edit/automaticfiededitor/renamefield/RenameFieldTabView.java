@@ -12,7 +12,6 @@ import org.jabref.gui.edit.automaticfiededitor.AutomaticFieldEditorTab;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabase;
-import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
@@ -58,9 +57,8 @@ public class RenameFieldTabView extends AbstractAutomaticFieldEditorTabView impl
             }
         });
 
-        viewModel.selectedFieldProperty().bindBidirectional(fieldComboBox.valueProperty());
-
-        viewModel.newFieldNameProperty().bindBidirectional(newFieldNameTextField.textProperty());
+        fieldComboBox.valueProperty().bindBidirectional(viewModel.selectedFieldProperty());
+        newFieldNameTextField.textProperty().bindBidirectional(viewModel.newFieldNameProperty());
     }
 
     @Override

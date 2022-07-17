@@ -15,14 +15,15 @@ import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.strings.StringUtil;
 
 public class CopyOrMoveFieldContentTabViewModel extends AbstractAutomaticFieldEditorTabViewModel {
-    private final ObjectProperty<Field> fromField = new SimpleObjectProperty<>();
+    private final ObjectProperty<Field> fromField = new SimpleObjectProperty<>(StandardField.ABSTRACT);
 
-    private final ObjectProperty<Field> toField = new SimpleObjectProperty<>();
+    private final ObjectProperty<Field> toField = new SimpleObjectProperty<>(StandardField.AUTHOR);
 
-    private final BooleanProperty overwriteFieldContent = new SimpleBooleanProperty();
+    private final BooleanProperty overwriteFieldContent = new SimpleBooleanProperty(Boolean.FALSE);
     private final List<BibEntry> selectedEntries;
     private final NamedCompound dialogEdits;
 

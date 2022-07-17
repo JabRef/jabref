@@ -66,11 +66,11 @@ public class EditFieldContentTabView extends AbstractAutomaticFieldEditorTabView
 
         fieldComboBox.getSelectionModel().selectFirst();
 
-        viewModel.selectedFieldProperty().bindBidirectional(fieldComboBox.valueProperty());
+        fieldComboBox.valueProperty().bindBidirectional(viewModel.selectedFieldProperty());
 
-        viewModel.fieldValueProperty().bindBidirectional(fieldValueTextField.textProperty());
+        fieldValueTextField.textProperty().bindBidirectional(viewModel.fieldValueProperty());
 
-        viewModel.overwriteFieldContentProperty().bindBidirectional(overwriteFieldContentCheckBox.selectedProperty());
+        overwriteFieldContentCheckBox.selectedProperty().bindBidirectional(viewModel.overwriteFieldContentProperty());
 
         appendValueButton.disableProperty().bind(overwriteFieldContentCheckBox.selectedProperty().not());
     }

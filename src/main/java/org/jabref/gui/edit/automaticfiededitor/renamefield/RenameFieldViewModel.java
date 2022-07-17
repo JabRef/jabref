@@ -14,11 +14,12 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
+import org.jabref.model.entry.field.StandardField;
 
 public class RenameFieldViewModel extends AbstractAutomaticFieldEditorTabViewModel {
 
-    private final StringProperty newFieldName = new SimpleStringProperty();
-    private final ObjectProperty<Field> selectedField = new SimpleObjectProperty<>();
+    private final StringProperty newFieldName = new SimpleStringProperty("");
+    private final ObjectProperty<Field> selectedField = new SimpleObjectProperty<>(StandardField.AUTHOR);
     private final List<BibEntry> selectedEntries;
     private final NamedCompound dialogEdits;
 

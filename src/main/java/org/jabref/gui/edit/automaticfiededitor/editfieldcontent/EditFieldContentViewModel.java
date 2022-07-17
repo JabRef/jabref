@@ -17,15 +17,16 @@ import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.StandardField;
 
 public class EditFieldContentViewModel extends AbstractAutomaticFieldEditorTabViewModel {
     private final List<BibEntry> selectedEntries;
 
-    private final StringProperty fieldValue = new SimpleStringProperty();
+    private final StringProperty fieldValue = new SimpleStringProperty("");
 
-    private final ObjectProperty<Field> selectedField = new SimpleObjectProperty<>();
+    private final ObjectProperty<Field> selectedField = new SimpleObjectProperty<>(StandardField.AUTHOR);
 
-    private final BooleanProperty overwriteFieldContent = new SimpleBooleanProperty();
+    private final BooleanProperty overwriteFieldContent = new SimpleBooleanProperty(Boolean.FALSE);
 
     private final NamedCompound dialogEdits;
 
