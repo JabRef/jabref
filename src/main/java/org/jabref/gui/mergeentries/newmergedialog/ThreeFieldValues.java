@@ -12,6 +12,7 @@ import org.jabref.gui.mergeentries.newmergedialog.diffhighlighter.UnifiedDiffHig
 import org.jabref.gui.mergeentries.newmergedialog.toolbar.ThreeWayMergeToolbar;
 import org.jabref.model.strings.StringUtil;
 
+import com.tobiasdiez.easybind.EasyBind;
 import org.fxmisc.richtext.StyleClassedTextArea;
 
 import static org.jabref.gui.mergeentries.newmergedialog.ThreeFieldValuesViewModel.Selection;
@@ -48,8 +49,7 @@ public class ThreeFieldValues {
         leftValueCell.textProperty().bindBidirectional(viewModel.leftFieldValueProperty());
         rightValueCell.textProperty().bindBidirectional(viewModel.rightFieldValueProperty());
 
-        viewModel.selectionProperty().addListener(obs -> {
-            Selection selection = viewModel.getSelection();
+        EasyBind.subscribe(viewModel.selectionProperty(), selection -> {
             if (selection == Selection.LEFT) {
                 toggleGroup.selectToggle(leftValueCell);
             } else if (selection == Selection.RIGHT) {
@@ -59,29 +59,15 @@ public class ThreeFieldValues {
             }
         });
 
-        toggleGroup.selectedToggleProperty().addListener(obs -> {
-            Toggle selectedToggle = toggleGroup.getSelectedToggle();
-            if (selectedToggle == leftValueCell) {
+        EasyBind.subscribe(toggleGroup.selectedToggleProperty(), val -> {
+            if (val == leftValueCell) {
                 selectLeftValue();
-            } else if (selectedToggle == rightValueCell) {
+            } else if (val == rightValueCell) {
                 selectRightValue();
             } else {
                 selectNone();
             }
         });
-
-        if (StringUtil.isNullOrEmpty(leftValue)) {
-            selectRightValue();
-        } else {
-            selectLeftValue();
-        }
-
-        //  When both the left and right cells have the same value, only the left value is displayed,
-        //  making it unnecessary to keep allocating memory for the right cell.
-        if (hasEqualLeftAndRightValues()) {
-            // Setting this to null so the GC release the memory allocated to the right cell.
-            this.rightValueCell = null;
-        }
     }
 
     public void selectLeftValue() {

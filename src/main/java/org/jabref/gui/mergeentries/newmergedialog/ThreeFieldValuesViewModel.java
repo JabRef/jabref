@@ -11,6 +11,8 @@ import javafx.beans.property.StringProperty;
 
 import org.jabref.model.strings.StringUtil;
 
+import com.tobiasdiez.easybind.EasyBind;
+
 public class ThreeFieldValuesViewModel {
     public enum Selection {
         LEFT,
@@ -38,15 +40,21 @@ public class ThreeFieldValuesViewModel {
         rightFieldValueProperty().set(rightValue);
         hasEqualLeftAndRight = Bindings.createBooleanBinding(this::hasEqualLeftAndRightValues, leftFieldValue, rightFieldValue);
 
-        selectionProperty().addListener((obs, old, newVal) -> {
-            switch (newVal) {
+        if (StringUtil.isNullOrEmpty(leftValue)) {
+            selectRightValue();
+        } else {
+            selectLeftValue();
+        }
+
+        EasyBind.subscribe(selectionProperty(), selection -> {
+            switch (selection) {
                 case LEFT -> setMergedFieldValue(getLeftFieldValue());
                 case RIGHT -> setMergedFieldValue(getRightFieldValue());
             }
         });
 
-        mergedFieldValueProperty().addListener(obs -> {
-            if (getMergedFieldValue().equals(getLeftFieldValue())) {
+        EasyBind.subscribe(mergedFieldValueProperty(), mergedValue -> {
+            if (mergedValue.equals(getLeftFieldValue())) {
                 selectLeftValue();
             } else if (getMergedFieldValue().equals(getRightFieldValue())) {
                 selectRightValue();
@@ -55,19 +63,7 @@ public class ThreeFieldValuesViewModel {
             }
         });
 
-        if (StringUtil.isNullOrEmpty(leftValue)) {
-            selectRightValue();
-        } else {
-            selectLeftValue();
-        }
-
-        if (hasEqualLeftAndRight.get()) {
-            setIsFieldsMerged(true);
-        }
-
-        hasEqualLeftAndRight.addListener(obs -> {
-            setIsFieldsMerged(true);
-        });
+        EasyBind.subscribe(hasEqualLeftAndRightBinding(), this::setIsFieldsMerged);
     }
 
     public boolean hasEqualLeftAndRightValues() {
