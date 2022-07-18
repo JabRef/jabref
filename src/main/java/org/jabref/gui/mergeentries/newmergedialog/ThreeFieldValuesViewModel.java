@@ -37,12 +37,14 @@ public class ThreeFieldValuesViewModel {
         leftFieldValueProperty().set(leftValue);
         rightFieldValueProperty().set(rightValue);
         hasEqualLeftAndRight = Bindings.createBooleanBinding(this::hasEqualLeftAndRightValues, leftFieldValue, rightFieldValue);
+
         selectionProperty().addListener((obs, old, newVal) -> {
             switch (newVal) {
-                case LEFT -> onLeftSelected();
-                case RIGHT -> onRightSelected();
+                case LEFT -> setMergedFieldValue(getLeftFieldValue());
+                case RIGHT -> setMergedFieldValue(getRightFieldValue());
             }
         });
+
         mergedFieldValueProperty().addListener(obs -> {
             if (getMergedFieldValue().equals(getLeftFieldValue())) {
                 selectLeftValue();
@@ -52,24 +54,26 @@ public class ThreeFieldValuesViewModel {
                 selectNone();
             }
         });
+
+        if (StringUtil.isNullOrEmpty(leftValue)) {
+            selectRightValue();
+        } else {
+            selectLeftValue();
+        }
+
+        if (hasEqualLeftAndRight.get()) {
+            setIsFieldsMerged(true);
+        }
+
+        hasEqualLeftAndRight.addListener(obs -> {
+            setIsFieldsMerged(true);
+        });
     }
 
     public boolean hasEqualLeftAndRightValues() {
         return (!StringUtil.isNullOrEmpty(leftFieldValue.get()) &&
                 !StringUtil.isNullOrEmpty(rightFieldValue.get()) &&
                 leftFieldValue.get().equals(rightFieldValue.get()));
-    }
-
-    private void onLeftSelected() {
-        setMergedFieldValue(getLeftFieldValue());
-    }
-
-    private void onRightSelected() {
-        if (isIsFieldsMerged()) {
-            onLeftSelected();
-        } else {
-            setMergedFieldValue(getRightFieldValue());
-        }
     }
 
     public void selectLeftValue() {
