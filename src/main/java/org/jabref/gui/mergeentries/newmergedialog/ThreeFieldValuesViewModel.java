@@ -57,6 +57,9 @@ public class ThreeFieldValuesViewModel {
             setRightFieldValue(rightEntry.getField(field).orElse(""));
         }
 
+        EasyBind.listen(leftFieldValueProperty(), (obs, old, leftValue) -> leftEntry.setField(field, leftValue));
+        EasyBind.listen(rightFieldValueProperty(), (obs, old, rightValue) -> rightEntry.setField(field, rightValue));
+
         hasEqualLeftAndRight = Bindings.createBooleanBinding(this::hasEqualLeftAndRightValues, leftFieldValueProperty(), rightFieldValueProperty());
 
         if (StringUtil.isNullOrEmpty(leftFieldValue.get())) {
@@ -67,8 +70,8 @@ public class ThreeFieldValuesViewModel {
 
         EasyBind.subscribe(selectionProperty(), selection -> {
             switch (selection) {
-                case LEFT -> setMergedFieldValue(getLeftFieldValue());
-                case RIGHT -> setMergedFieldValue(getRightFieldValue());
+                case LEFT -> mergedFieldValueProperty().bind(leftFieldValueProperty());
+                case RIGHT -> mergedFieldValueProperty().bind(rightFieldValueProperty());
             }
         });
 
@@ -159,7 +162,7 @@ public class ThreeFieldValuesViewModel {
         return leftFieldValue;
     }
 
-    private void setLeftFieldValue(String leftFieldValue) {
+    public void setLeftFieldValue(String leftFieldValue) {
         this.leftFieldValue.set(leftFieldValue);
     }
 
@@ -171,7 +174,7 @@ public class ThreeFieldValuesViewModel {
         return rightFieldValue;
     }
 
-    private void setRightFieldValue(String rightFieldValue) {
+    public void setRightFieldValue(String rightFieldValue) {
         this.rightFieldValue.set(rightFieldValue);
     }
 
