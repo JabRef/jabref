@@ -155,7 +155,7 @@ public class BstVMTest {
     public static class TestVM extends BstVM {
 
         private TestVM(Path path) throws RecognitionException, IOException {
-            super(CharStreams.fromPath(path));
+            super(path);
         }
 
         protected TestVM(String s) throws RecognitionException {

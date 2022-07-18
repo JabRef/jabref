@@ -17,8 +17,12 @@ import org.jabref.model.entry.field.StandardField;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 class BstVMVisitor extends BstBaseVisitor<Integer> {
+    private static final Logger LOGGER = LoggerFactory.getLogger(BstVMVisitor.class);
+
     private final BstVMContext bstVMContext;
     private final StringBuilder bbl;
 
@@ -223,21 +227,27 @@ class BstVMVisitor extends BstBaseVisitor<Integer> {
     @Override
     public Integer visitStackitem(BstParser.StackitemContext ctx) {
         for (ParseTree childNode : ctx.children) {
-            if (childNode instanceof TerminalNode token) {
-                switch (token.getSymbol().getType()) {
-                    case BstParser.STRING -> {
-                        String s = token.getText();
-                        bstVMContext.stack().push(s.substring(1, s.length() - 1));
+            try {
+                if (childNode instanceof TerminalNode token) {
+                    switch (token.getSymbol().getType()) {
+                        case BstParser.STRING -> {
+                            String s = token.getText();
+                            bstVMContext.stack().push(s.substring(1, s.length() - 1));
+                        }
+                        case BstParser.INTEGER ->
+                                bstVMContext.stack().push(Integer.parseInt(token.getText().substring(1)));
+                        case BstParser.QUOTED ->
+                                bstVMContext.stack().push(new Identifier(token.getText().substring(1)));
                     }
-                    case BstParser.INTEGER ->
-                            bstVMContext.stack().push(Integer.parseInt(token.getText().substring(1)));
-                    case BstParser.QUOTED ->
-                            bstVMContext.stack().push(new Identifier(token.getText().substring(1)));
+                } else if (childNode instanceof BstParser.StackContext) {
+                    bstVMContext.stack().push(childNode);
+                } else {
+                    new BstVMVisitor.BstVMFunction<>(childNode).execute(this, ctx);
                 }
-            } else if (childNode instanceof BstParser.StackContext) {
-                bstVMContext.stack().push(childNode);
-            } else {
-                visit(childNode);
+            } catch (BstVMException e) {
+                bstVMContext.path().ifPresentOrElse(
+                        (path) -> LOGGER.error("{} ({})", e.getMessage(), path),
+                        () -> LOGGER.error(e.getMessage()));
             }
         }
         return BstVM.TRUE;

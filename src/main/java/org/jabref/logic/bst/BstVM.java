@@ -39,11 +39,13 @@ public class BstVM {
     protected static final Integer TRUE = 1;
 
     protected final ParseTree tree;
-
     protected BstVMContext latestContext; // for testing
+
+    private Path path = null;
 
     public BstVM(Path path) throws RecognitionException, IOException {
         this(CharStreams.fromPath(path));
+        this.path = path;
     }
 
     public BstVM(String s) throws RecognitionException {
@@ -86,7 +88,7 @@ public class BstVM {
 
         StringBuilder resultBuffer = new StringBuilder();
 
-        BstVMContext bstVMContext = new BstVMContext(entries, bibDatabase);
+        BstVMContext bstVMContext = new BstVMContext(entries, bibDatabase, path);
         bstVMContext.functions().putAll(new BstFunctions(bstVMContext, resultBuffer).getBuiltInFunctions());
         bstVMContext.integers().put("entry.max$", Integer.MAX_VALUE);
         bstVMContext.integers().put("global.max$", Integer.MAX_VALUE);
