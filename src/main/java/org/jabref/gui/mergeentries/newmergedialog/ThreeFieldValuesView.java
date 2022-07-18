@@ -20,7 +20,7 @@ import static org.jabref.gui.mergeentries.newmergedialog.ThreeFieldValuesViewMod
 /**
  * A controller class to control left, right and merged field values
  */
-public class ThreeFieldValues {
+public class ThreeFieldValuesView {
     private final FieldValueCell leftValueCell;
     private FieldValueCell rightValueCell;
     private final MergedFieldCell mergedValueCell;
@@ -33,7 +33,7 @@ public class ThreeFieldValues {
 
     private final ThreeFieldValuesViewModel viewModel;
 
-    public ThreeFieldValues(String leftValue, String rightValue, int rowIndex) {
+    public ThreeFieldValuesView(String leftValue, String rightValue, int rowIndex) {
         leftValueCell = new FieldValueCell(leftValue, rowIndex);
         rightValueCell = new FieldValueCell(rightValue, rowIndex);
         mergedValueCell = new MergedFieldCell(StringUtil.isNullOrEmpty(leftValue) ? rightValue : leftValue, rowIndex);
