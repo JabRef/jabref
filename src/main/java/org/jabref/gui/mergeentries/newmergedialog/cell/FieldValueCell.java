@@ -100,7 +100,7 @@ public class FieldValueCell extends AbstractCell implements Toggle {
     private void initializeLabel() {
         label.setEditable(false);
         label.setBackground(Background.fill(Color.TRANSPARENT));
-        label.appendText(textProperty().get());
+        EasyBind.subscribe(textProperty(), label::replaceText);
         label.setAutoHeight(true);
         label.setWrapText(true);
         label.setStyle("-fx-cursor: hand");
