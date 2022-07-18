@@ -119,7 +119,7 @@ public class ThreeWayMergeView extends VBox {
         mergeGridPane.getColumnConstraints().addAll(fieldNameColumnConstraints, leftEntryColumnConstraints, rightEntryColumnConstraints, mergedEntryColumnConstraints);
 
         for (int fieldIndex = 0; fieldIndex < viewModel.allFieldsSize(); fieldIndex++) {
-            addFieldName(getFieldAtIndex(fieldIndex), fieldIndex);
+            // addFieldName(getFieldAtIndex(fieldIndex), fieldIndex);
             addFieldValues(fieldIndex);
 
             // Removing this will cause UI to lag when updating field values
@@ -159,7 +159,7 @@ public class ThreeWayMergeView extends VBox {
             rightEntryValue = viewModel.getRightEntry().getField(field).orElse("");
         }
 
-        ThreeFieldValuesView fieldValues = new ThreeFieldValuesView(leftEntryValue, rightEntryValue, fieldIndex);
+        ThreeFieldValuesView fieldValues = new ThreeFieldValuesView(field, leftEntryValue, rightEntryValue, fieldIndex);
         fieldValuesList.add(fieldIndex, fieldValues);
 
         fieldValues.mergedValueProperty().addListener((observable, old, mergedValue) -> {
@@ -175,6 +175,7 @@ public class ThreeWayMergeView extends VBox {
             getMergedEntry().setField(field, fieldValues.getMergedValue());
         }
 
+        mergeGridPane.add(fieldValues.getFieldNameCell(), 0, fieldIndex);
         mergeGridPane.add(fieldValues.getLeftValueCell(), 1, fieldIndex);
         mergeGridPane.add(fieldValues.getRightValueCell(), 2, fieldIndex);
         mergeGridPane.add(fieldValues.getMergedValueCell(), 3, fieldIndex);

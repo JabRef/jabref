@@ -5,11 +5,14 @@ import javafx.beans.property.ReadOnlyStringProperty;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.GridPane;
 
+import org.jabref.gui.mergeentries.newmergedialog.cell.FieldNameCell;
+import org.jabref.gui.mergeentries.newmergedialog.cell.FieldNameCellFactory;
 import org.jabref.gui.mergeentries.newmergedialog.cell.FieldValueCell;
 import org.jabref.gui.mergeentries.newmergedialog.cell.MergedFieldCell;
 import org.jabref.gui.mergeentries.newmergedialog.diffhighlighter.SplitDiffHighlighter;
 import org.jabref.gui.mergeentries.newmergedialog.diffhighlighter.UnifiedDiffHighlighter;
 import org.jabref.gui.mergeentries.newmergedialog.toolbar.ThreeWayMergeToolbar;
+import org.jabref.model.entry.field.Field;
 import org.jabref.model.strings.StringUtil;
 
 import com.tobiasdiez.easybind.EasyBind;
@@ -21,6 +24,7 @@ import static org.jabref.gui.mergeentries.newmergedialog.ThreeFieldValuesViewMod
  * A controller class to control left, right and merged field values
  */
 public class ThreeFieldValuesView {
+    private final FieldNameCell fieldNameCell;
     private final FieldValueCell leftValueCell;
     private FieldValueCell rightValueCell;
     private final MergedFieldCell mergedValueCell;
@@ -33,7 +37,8 @@ public class ThreeFieldValuesView {
 
     private final ThreeFieldValuesViewModel viewModel;
 
-    public ThreeFieldValuesView(String leftValue, String rightValue, int rowIndex) {
+    public ThreeFieldValuesView(Field field, String leftValue, String rightValue, int rowIndex) {
+        fieldNameCell = FieldNameCellFactory.create(field, rowIndex);
         leftValueCell = new FieldValueCell(leftValue, rowIndex);
         rightValueCell = new FieldValueCell(rightValue, rowIndex);
         mergedValueCell = new MergedFieldCell(StringUtil.isNullOrEmpty(leftValue) ? rightValue : leftValue, rowIndex);
@@ -99,6 +104,10 @@ public class ThreeFieldValuesView {
 
     public ReadOnlyStringProperty mergedValueProperty() {
         return viewModel.mergedFieldValueProperty();
+    }
+
+    public FieldNameCell getFieldNameCell() {
+        return fieldNameCell;
     }
 
     public FieldValueCell getLeftValueCell() {
