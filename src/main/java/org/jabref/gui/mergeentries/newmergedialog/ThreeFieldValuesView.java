@@ -48,8 +48,8 @@ public class ThreeFieldValuesView {
 
     private final CompoundEdit fieldsMergedEdit = new CompoundEdit();
 
-    public ThreeFieldValuesView(Field field, BibEntry leftEntry, BibEntry rightEntry, int rowIndex) {
-        viewModel = new ThreeFieldValuesViewModel(field, leftEntry, rightEntry);
+    public ThreeFieldValuesView(Field field, BibEntry leftEntry, BibEntry rightEntry, BibEntry mergedEntry, int rowIndex) {
+        viewModel = new ThreeFieldValuesViewModel(field, leftEntry, rightEntry, mergedEntry);
 
         fieldNameCell = FieldNameCellFactory.create(field, rowIndex);
         leftValueCell = new FieldValueCell(viewModel.getLeftFieldValue(), rowIndex);
