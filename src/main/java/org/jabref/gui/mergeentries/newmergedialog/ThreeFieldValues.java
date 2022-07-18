@@ -3,6 +3,7 @@ package org.jabref.gui.mergeentries.newmergedialog;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyStringProperty;
 import javafx.scene.control.ToggleGroup;
+import javafx.scene.layout.GridPane;
 
 import org.jabref.gui.mergeentries.newmergedialog.cell.FieldValueCell;
 import org.jabref.gui.mergeentries.newmergedialog.cell.MergedFieldCell;
@@ -65,6 +66,17 @@ public class ThreeFieldValues {
                 selectRightValue();
             } else {
                 selectNone();
+            }
+        });
+
+        // Hide rightValueCell and extend leftValueCell to 2 columns when fields are merged
+        EasyBind.subscribe(viewModel.isFieldsMergedProperty(), isFieldsMerged -> {
+            if (isFieldsMerged) {
+                rightValueCell.setVisible(false);
+                GridPane.setColumnSpan(leftValueCell, 2);
+            } else {
+                rightValueCell.setVisible(true);
+                GridPane.setColumnSpan(leftValueCell, 1);
             }
         });
     }

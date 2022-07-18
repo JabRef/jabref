@@ -175,14 +175,9 @@ public class ThreeWayMergeView extends VBox {
             getMergedEntry().setField(field, fieldValues.getMergedValue());
         }
 
-        if (fieldValues.hasEqualLeftAndRightValues()) {
-            mergeGridPane.add(fieldValues.getLeftValueCell(), 1, fieldIndex, 2, 1);
-            mergeGridPane.add(fieldValues.getMergedValueCell(), 3, fieldIndex);
-        } else {
-            mergeGridPane.add(fieldValues.getLeftValueCell(), 1, fieldIndex);
-            mergeGridPane.add(fieldValues.getRightValueCell(), 2, fieldIndex);
-            mergeGridPane.add(fieldValues.getMergedValueCell(), 3, fieldIndex);
-        }
+        mergeGridPane.add(fieldValues.getLeftValueCell(), 1, fieldIndex);
+        mergeGridPane.add(fieldValues.getRightValueCell(), 2, fieldIndex);
+        mergeGridPane.add(fieldValues.getMergedValueCell(), 3, fieldIndex);
     }
 
     private void updateFieldValues(int fieldIndex) {
