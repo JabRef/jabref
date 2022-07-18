@@ -25,7 +25,6 @@ import org.jabref.gui.mergeentries.newmergedialog.cell.MergedFieldCell;
 import org.jabref.gui.mergeentries.newmergedialog.diffhighlighter.SplitDiffHighlighter;
 import org.jabref.gui.mergeentries.newmergedialog.diffhighlighter.UnifiedDiffHighlighter;
 import org.jabref.gui.mergeentries.newmergedialog.toolbar.ThreeWayMergeToolbar;
-import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.strings.StringUtil;
@@ -197,23 +196,19 @@ public class ThreeFieldValuesView {
 
         @Override
         public void execute() {
-            BibEntry leftEntry = viewModel.getLeftEntry();
-            BibEntry rightEntry = viewModel.getRightEntry();
+            assert !viewModel.getLeftFieldValue().equals(viewModel.getRightFieldValue());
 
-            String leftEntryGroups = leftEntry.getField(viewModel.getField()).orElse("");
-            String rightEntryGroups = rightEntry.getField(viewModel.getField()).orElse("");
+            String oldLeftFieldValue = viewModel.getLeftFieldValue();
+            String oldRightFieldValue = viewModel.getRightFieldValue();
 
-            assert !leftEntryGroups.equals(rightEntryGroups);
-
-            String mergedGroups = mergeLeftAndRightEntryGroups(leftEntryGroups, rightEntryGroups);
-            viewModel.getLeftEntry().setField(viewModel.getField(), mergedGroups);
-            viewModel.getRightEntry().setField(viewModel.getField(), mergedGroups);
+            String mergedGroups = mergeLeftAndRightEntryGroups(viewModel.getLeftFieldValue(), viewModel.getRightFieldValue());
+            viewModel.setLeftFieldValue(mergedGroups);
+            viewModel.setRightFieldValue(mergedGroups);
 
             if (fieldsMergedEdit.canRedo()) {
                 fieldsMergedEdit.redo();
             } else {
-                fieldsMergedEdit.addEdit(new UndoableFieldChange(leftEntry, viewModel.getField(), leftEntryGroups, mergedGroups));
-                fieldsMergedEdit.addEdit(new UndoableFieldChange(rightEntry, viewModel.getField(), rightEntryGroups, mergedGroups));
+                fieldsMergedEdit.addEdit(new MergeFieldsUndo(oldLeftFieldValue, oldRightFieldValue, mergedGroups));
                 fieldsMergedEdit.end();
             }
 
