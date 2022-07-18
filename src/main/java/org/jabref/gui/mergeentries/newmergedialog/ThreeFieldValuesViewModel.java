@@ -12,6 +12,7 @@ import javafx.beans.property.StringProperty;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.InternalField;
+import org.jabref.model.entry.types.EntryTypeFactory;
 import org.jabref.model.strings.StringUtil;
 
 import com.tobiasdiez.easybind.EasyBind;
@@ -42,12 +43,15 @@ public class ThreeFieldValuesViewModel {
 
     private final BibEntry rightEntry;
 
+    private final BibEntry mergedEntry;
+
     private final BooleanBinding hasEqualLeftAndRight;
 
-    public ThreeFieldValuesViewModel(Field field, BibEntry leftEntry, BibEntry rightEntry) {
+    public ThreeFieldValuesViewModel(Field field, BibEntry leftEntry, BibEntry rightEntry, BibEntry mergedEntry) {
         this.field = field;
         this.leftEntry = leftEntry;
         this.rightEntry = rightEntry;
+        this.mergedEntry = mergedEntry;
 
         if (field.equals(InternalField.TYPE_HEADER)) {
             setLeftFieldValue(leftEntry.getType().getDisplayName());
@@ -59,6 +63,13 @@ public class ThreeFieldValuesViewModel {
 
         EasyBind.listen(leftFieldValueProperty(), (obs, old, leftValue) -> leftEntry.setField(field, leftValue));
         EasyBind.listen(rightFieldValueProperty(), (obs, old, rightValue) -> rightEntry.setField(field, rightValue));
+        EasyBind.listen(mergedFieldValueProperty(), (obs, old, mergedFieldValue) -> {
+            if (field.equals(InternalField.TYPE_HEADER)) {
+                getMergedEntry().setType(EntryTypeFactory.parse(mergedFieldValue));
+            } else {
+                getMergedEntry().setField(field, mergedFieldValue);
+            }
+        });
 
         hasEqualLeftAndRight = Bindings.createBooleanBinding(this::hasEqualLeftAndRightValues, leftFieldValueProperty(), rightFieldValueProperty());
 
@@ -188,5 +199,9 @@ public class ThreeFieldValuesViewModel {
 
     public BibEntry getRightEntry() {
         return rightEntry;
+    }
+
+    public BibEntry getMergedEntry() {
+        return mergedEntry;
     }
 }

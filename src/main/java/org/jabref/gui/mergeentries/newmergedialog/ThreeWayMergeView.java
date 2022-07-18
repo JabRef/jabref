@@ -17,9 +17,7 @@ import org.jabref.gui.mergeentries.newmergedialog.toolbar.ThreeWayMergeToolbar;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
-import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.model.entry.types.EntryTypeFactory;
 
 public class ThreeWayMergeView extends VBox {
     public static final int GRID_COLUMN_MIN_WIDTH = 250;
@@ -126,21 +124,9 @@ public class ThreeWayMergeView extends VBox {
     private void addFieldValues(int fieldIndex) {
         Field field = getFieldAtIndex(fieldIndex);
 
-        ThreeFieldValuesView fieldValues = new ThreeFieldValuesView(field, getLeftEntry(), getRightEntry(), fieldIndex);
-        fieldValuesList.add(fieldIndex, fieldValues);
+        ThreeFieldValuesView fieldValues = new ThreeFieldValuesView(field, getLeftEntry(), getRightEntry(), getMergedEntry(), fieldIndex);
 
-        fieldValues.mergedValueProperty().addListener((observable, old, mergedValue) -> {
-            if (field.equals(InternalField.TYPE_HEADER)) {
-                getMergedEntry().setType(EntryTypeFactory.parse(mergedValue));
-            } else {
-                getMergedEntry().setField(field, mergedValue);
-            }
-        });
-        if (field.equals(InternalField.TYPE_HEADER)) {
-            getMergedEntry().setType(EntryTypeFactory.parse(fieldValues.getMergedValue()));
-        } else {
-            getMergedEntry().setField(field, fieldValues.getMergedValue());
-        }
+        fieldValuesList.add(fieldIndex, fieldValues);
 
         mergeGridPane.add(fieldValues.getFieldNameCell(), 0, fieldIndex);
         mergeGridPane.add(fieldValues.getLeftValueCell(), 1, fieldIndex);
