@@ -12,8 +12,8 @@ import org.jabref.gui.mergeentries.newmergedialog.cell.MergedFieldCell;
 import org.jabref.gui.mergeentries.newmergedialog.diffhighlighter.SplitDiffHighlighter;
 import org.jabref.gui.mergeentries.newmergedialog.diffhighlighter.UnifiedDiffHighlighter;
 import org.jabref.gui.mergeentries.newmergedialog.toolbar.ThreeWayMergeToolbar;
+import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
-import org.jabref.model.strings.StringUtil;
 
 import com.tobiasdiez.easybind.EasyBind;
 import org.fxmisc.richtext.StyleClassedTextArea;
@@ -29,24 +29,17 @@ public class ThreeFieldValuesView {
     private FieldValueCell rightValueCell;
     private final MergedFieldCell mergedValueCell;
 
-    private final String leftValue;
-
-    private final String rightValue;
-
     private final ToggleGroup toggleGroup = new ToggleGroup();
 
     private final ThreeFieldValuesViewModel viewModel;
 
-    public ThreeFieldValuesView(Field field, String leftValue, String rightValue, int rowIndex) {
+    public ThreeFieldValuesView(Field field, BibEntry leftEntry, BibEntry rightEntry, int rowIndex) {
+        viewModel = new ThreeFieldValuesViewModel(field, leftEntry, rightEntry);
+
         fieldNameCell = FieldNameCellFactory.create(field, rowIndex);
-        leftValueCell = new FieldValueCell(leftValue, rowIndex);
-        rightValueCell = new FieldValueCell(rightValue, rowIndex);
-        mergedValueCell = new MergedFieldCell(StringUtil.isNullOrEmpty(leftValue) ? rightValue : leftValue, rowIndex);
-
-        viewModel = new ThreeFieldValuesViewModel(leftValue, rightValue);
-
-        this.leftValue = leftValue;
-        this.rightValue = rightValue;
+        leftValueCell = new FieldValueCell(viewModel.getLeftFieldValue(), rowIndex);
+        rightValueCell = new FieldValueCell(viewModel.getRightFieldValue(), rowIndex);
+        mergedValueCell = new MergedFieldCell(viewModel.getMergedFieldValue(), rowIndex);
 
         toggleGroup.getToggles().addAll(leftValueCell, rightValueCell);
 
@@ -149,11 +142,11 @@ public class ThreeFieldValuesView {
 
         int leftValueLength = getLeftValueCell().getStyleClassedLabel().getLength();
         getLeftValueCell().getStyleClassedLabel().clearStyle(0, leftValueLength);
-        getLeftValueCell().getStyleClassedLabel().replaceText(leftValue);
+        getLeftValueCell().getStyleClassedLabel().replaceText(viewModel.getLeftFieldValue());
 
         int rightValueLength = getRightValueCell().getStyleClassedLabel().getLength();
         getRightValueCell().getStyleClassedLabel().clearStyle(0, rightValueLength);
-        getRightValueCell().getStyleClassedLabel().replaceText(rightValue);
+        getRightValueCell().getStyleClassedLabel().replaceText(viewModel.getRightFieldValue());
     }
 
     private boolean isRightValueCellHidden() {

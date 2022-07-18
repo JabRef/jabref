@@ -149,17 +149,8 @@ public class ThreeWayMergeView extends VBox {
 
     private void addFieldValues(int fieldIndex) {
         Field field = getFieldAtIndex(fieldIndex);
-        String leftEntryValue;
-        String rightEntryValue;
-        if (field.equals(InternalField.TYPE_HEADER)) {
-            leftEntryValue = viewModel.getLeftEntry().getType().getDisplayName();
-            rightEntryValue = viewModel.getRightEntry().getType().getDisplayName();
-        } else {
-            leftEntryValue = viewModel.getLeftEntry().getField(field).orElse("");
-            rightEntryValue = viewModel.getRightEntry().getField(field).orElse("");
-        }
 
-        ThreeFieldValuesView fieldValues = new ThreeFieldValuesView(field, leftEntryValue, rightEntryValue, fieldIndex);
+        ThreeFieldValuesView fieldValues = new ThreeFieldValuesView(field, getLeftEntry(), getRightEntry(), fieldIndex);
         fieldValuesList.add(fieldIndex, fieldValues);
 
         fieldValues.mergedValueProperty().addListener((observable, old, mergedValue) -> {

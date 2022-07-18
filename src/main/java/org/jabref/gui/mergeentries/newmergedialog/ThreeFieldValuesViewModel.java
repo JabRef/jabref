@@ -9,6 +9,9 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.strings.StringUtil;
 
 import com.tobiasdiez.easybind.EasyBind;
@@ -33,14 +36,30 @@ public class ThreeFieldValuesViewModel {
     private final StringProperty rightFieldValue = new SimpleStringProperty("");
     private final StringProperty mergedFieldValue = new SimpleStringProperty("");
 
+    private final Field field;
+
+    private final BibEntry leftEntry;
+
+    private final BibEntry rightEntry;
+
     private final BooleanBinding hasEqualLeftAndRight;
 
-    public ThreeFieldValuesViewModel(String leftValue, String rightValue) {
-        leftFieldValueProperty().set(leftValue);
-        rightFieldValueProperty().set(rightValue);
-        hasEqualLeftAndRight = Bindings.createBooleanBinding(this::hasEqualLeftAndRightValues, leftFieldValue, rightFieldValue);
+    public ThreeFieldValuesViewModel(Field field, BibEntry leftEntry, BibEntry rightEntry) {
+        this.field = field;
+        this.leftEntry = leftEntry;
+        this.rightEntry = rightEntry;
 
-        if (StringUtil.isNullOrEmpty(leftValue)) {
+        if (field.equals(InternalField.TYPE_HEADER)) {
+            setLeftFieldValue(leftEntry.getType().getDisplayName());
+            setRightFieldValue(rightEntry.getType().getDisplayName());
+        } else {
+            setLeftFieldValue(leftEntry.getField(field).orElse(""));
+            setRightFieldValue(rightEntry.getField(field).orElse(""));
+        }
+
+        hasEqualLeftAndRight = Bindings.createBooleanBinding(this::hasEqualLeftAndRightValues, leftFieldValueProperty(), rightFieldValueProperty());
+
+        if (StringUtil.isNullOrEmpty(leftFieldValue.get())) {
             selectRightValue();
         } else {
             selectLeftValue();
@@ -140,7 +159,7 @@ public class ThreeFieldValuesViewModel {
         return leftFieldValue;
     }
 
-    public void setLeftFieldValue(String leftFieldValue) {
+    private void setLeftFieldValue(String leftFieldValue) {
         this.leftFieldValue.set(leftFieldValue);
     }
 
@@ -152,7 +171,15 @@ public class ThreeFieldValuesViewModel {
         return rightFieldValue;
     }
 
-    public void setRightFieldValue(String rightFieldValue) {
+    private void setRightFieldValue(String rightFieldValue) {
         this.rightFieldValue.set(rightFieldValue);
+    }
+
+    public BibEntry getLeftEntry() {
+        return leftEntry;
+    }
+
+    public BibEntry getRightEntry() {
+        return rightEntry;
     }
 }
