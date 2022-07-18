@@ -49,7 +49,7 @@ public class ThreeWayMergeView extends VBox {
     private final GridPane mergeGridPane;
 
     private final ThreeWayMergeViewModel viewModel;
-    private final List<ThreeFieldValues> fieldValuesList = new ArrayList<>();
+    private final List<ThreeFieldValuesView> fieldValuesList = new ArrayList<>();
 
     private final CompoundEdit mergeGroupsEdit = new CompoundEdit();
 
@@ -91,7 +91,7 @@ public class ThreeWayMergeView extends VBox {
         if (toolbar.isShowDiffEnabled()) {
             fieldValuesList.forEach(fieldValues -> fieldValues.showDiff(new ShowDiffConfig(toolbar.getDiffView(), toolbar.getDiffHighlightingMethod())));
         } else {
-            fieldValuesList.forEach(ThreeFieldValues::hideDiff);
+            fieldValuesList.forEach(ThreeFieldValuesView::hideDiff);
         }
     }
 
@@ -159,7 +159,7 @@ public class ThreeWayMergeView extends VBox {
             rightEntryValue = viewModel.getRightEntry().getField(field).orElse("");
         }
 
-        ThreeFieldValues fieldValues = new ThreeFieldValues(leftEntryValue, rightEntryValue, fieldIndex);
+        ThreeFieldValuesView fieldValues = new ThreeFieldValuesView(leftEntryValue, rightEntryValue, fieldIndex);
         fieldValuesList.add(fieldIndex, fieldValues);
 
         fieldValues.mergedValueProperty().addListener((observable, old, mergedValue) -> {
@@ -204,11 +204,11 @@ public class ThreeWayMergeView extends VBox {
     }
 
     public void selectLeftEntryValues() {
-        fieldValuesList.forEach(ThreeFieldValues::selectLeftValue);
+        fieldValuesList.forEach(ThreeFieldValuesView::selectLeftValue);
     }
 
     public void selectRightEntryValues() {
-        fieldValuesList.forEach(ThreeFieldValues::selectRightValue);
+        fieldValuesList.forEach(ThreeFieldValuesView::selectRightValue);
     }
 
     public void showDiff(ShowDiffConfig diffConfig) {
