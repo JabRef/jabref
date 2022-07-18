@@ -5,6 +5,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.swing.undo.AbstractUndoableEdit;
+import javax.swing.undo.CannotRedoException;
+import javax.swing.undo.CannotUndoException;
 import javax.swing.undo.CompoundEdit;
 
 import javafx.beans.binding.Bindings;
@@ -247,6 +250,32 @@ public class ThreeFieldValuesView {
                 groupsFieldCell.setMergeAction(MergeableFieldCell.MergeAction.MERGE);
                 viewModel.setIsFieldsMerged(false);
             }
+        }
+    }
+
+    class MergeFieldsUndo extends AbstractUndoableEdit {
+        private final String oldLeft;
+        private final String oldRight;
+        private final String mergedFields;
+
+        MergeFieldsUndo(String oldLeft, String oldRight, String mergedFields) {
+            this.oldLeft = oldLeft;
+            this.oldRight = oldRight;
+            this.mergedFields = mergedFields;
+        }
+
+        @Override
+        public void undo() throws CannotUndoException {
+            super.undo();
+            viewModel.setLeftFieldValue(oldLeft);
+            viewModel.setRightFieldValue(oldRight);
+        }
+
+        @Override
+        public void redo() throws CannotRedoException {
+            super.redo();
+            viewModel.setLeftFieldValue(mergedFields);
+            viewModel.setRightFieldValue(mergedFields);
         }
     }
 }
