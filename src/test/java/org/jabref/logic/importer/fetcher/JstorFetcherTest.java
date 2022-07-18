@@ -2,6 +2,8 @@ package org.jabref.logic.importer.fetcher;
 
 import java.io.IOException;
 import java.net.URL;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -63,13 +65,19 @@ public class JstorFetcherTest implements SearchBasedFetcherCapabilityTest {
     }
 
     @Test
-    void searchById() throws FetcherException {
+    void searchById() throws Exception {
+        bibEntry.setField(StandardField.URLDATE, LocalDate.now().format(DateTimeFormatter.ISO_DATE));
         assertEquals(Optional.of(bibEntry), fetcher.performSearchById("90002164"));
+    }
+
+    @Test
+    void searchByUrlUsingId() throws Exception {
+        doiEntry.setField(StandardField.URLDATE, LocalDate.now().format(DateTimeFormatter.ISO_DATE));
         assertEquals(Optional.of(doiEntry), fetcher.performSearchById("https://www.jstor.org/stable/10.1086/501484?seq=1"));
     }
 
     @Test
-    void fetchPDF() throws IOException, FetcherException {
+    void fetchPDF() throws Exception {
         Optional<URL> url = fetcher.findFullText(bibEntry);
         assertEquals(Optional.of(new URL("https://www.jstor.org/stable/pdf/90002164.pdf")), url);
     }
