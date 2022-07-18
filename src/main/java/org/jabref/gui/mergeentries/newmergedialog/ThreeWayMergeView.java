@@ -1,14 +1,10 @@
 package org.jabref.gui.mergeentries.newmergedialog;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import javax.swing.undo.CompoundEdit;
 
-import javafx.beans.binding.Bindings;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
@@ -17,28 +13,20 @@ import javafx.scene.layout.RowConstraints;
 import javafx.scene.layout.VBox;
 import javafx.stage.Screen;
 
-import org.jabref.gui.actions.SimpleCommand;
-import org.jabref.gui.mergeentries.newmergedialog.cell.FieldNameCell;
-import org.jabref.gui.mergeentries.newmergedialog.cell.FieldNameCellFactory;
-import org.jabref.gui.mergeentries.newmergedialog.cell.MergeableFieldCell;
 import org.jabref.gui.mergeentries.newmergedialog.toolbar.ThreeWayMergeToolbar;
-import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.EntryTypeFactory;
-import org.jabref.model.strings.StringUtil;
 
 public class ThreeWayMergeView extends VBox {
-    public static final String GROUPS_SEPARATOR = ", ";
     public static final int GRID_COLUMN_MIN_WIDTH = 250;
 
     public static final String LEFT_DEFAULT_HEADER = Localization.lang("Left Entry");
     public static final String RIGHT_DEFAULT_HEADER = Localization.lang("Right Entry");
 
-    private static final int FIELD_NAME_COLUMN = 0;
     private final ColumnConstraints fieldNameColumnConstraints = new ColumnConstraints(150);
     private final ColumnConstraints leftEntryColumnConstraints = new ColumnConstraints(GRID_COLUMN_MIN_WIDTH, 256, Double.MAX_VALUE);
     private final ColumnConstraints rightEntryColumnConstraints = new ColumnConstraints(GRID_COLUMN_MIN_WIDTH, 256, Double.MAX_VALUE);
@@ -131,18 +119,6 @@ public class ThreeWayMergeView extends VBox {
         }
     }
 
-    private void addFieldName(Field field, int fieldIndex) {
-        FieldNameCell fieldNameCell = FieldNameCellFactory.create(field, fieldIndex);
-        mergeGridPane.add(fieldNameCell, FIELD_NAME_COLUMN, fieldIndex);
-
-        if (FieldNameCellFactory.isMergeableField(field)) {
-            MergeableFieldCell mergeableFieldCell = (MergeableFieldCell) fieldNameCell;
-            mergeableFieldCell.setMergeCommand(new MergeGroupsCommand(mergeableFieldCell));
-            mergeableFieldCell.setUnmergeCommand(new UnmergeGroupsCommand(mergeableFieldCell));
-            mergeableFieldCell.setMergeAction(MergeableFieldCell.MergeAction.MERGE);
-        }
-    }
-
     private Field getFieldAtIndex(int index) {
         return viewModel.allFields().get(index);
     }
@@ -170,17 +146,6 @@ public class ThreeWayMergeView extends VBox {
         mergeGridPane.add(fieldValues.getLeftValueCell(), 1, fieldIndex);
         mergeGridPane.add(fieldValues.getRightValueCell(), 2, fieldIndex);
         mergeGridPane.add(fieldValues.getMergedValueCell(), 3, fieldIndex);
-    }
-
-    private void updateFieldValues(int fieldIndex) {
-        removeFieldValues(fieldIndex);
-        addFieldValues(fieldIndex);
-        updateDiff();
-    }
-
-    private void removeFieldValues(int index) {
-        fieldValuesList.remove(index);
-        mergeGridPane.getChildren().removeIf(node -> GridPane.getRowIndex(node) == index && GridPane.getColumnIndex(node) > FIELD_NAME_COLUMN);
     }
 
     public BibEntry getMergedEntry() {
@@ -221,77 +186,5 @@ public class ThreeWayMergeView extends VBox {
 
     public BibEntry getRightEntry() {
         return viewModel.getRightEntry();
-    }
-
-    public class MergeGroupsCommand extends SimpleCommand {
-        private final MergeableFieldCell groupsFieldNameCell;
-
-        public MergeGroupsCommand(MergeableFieldCell groupsFieldCell) {
-            this.groupsFieldNameCell = groupsFieldCell;
-
-            this.executable.bind(Bindings.createBooleanBinding(() -> {
-                String leftEntryGroups = viewModel.getLeftEntry().getField(StandardField.GROUPS).orElse("");
-                String rightEntryGroups = viewModel.getRightEntry().getField(StandardField.GROUPS).orElse("");
-
-                return !leftEntryGroups.equals(rightEntryGroups);
-            }));
-        }
-
-        @Override
-        public void execute() {
-            BibEntry leftEntry = viewModel.getLeftEntry();
-            BibEntry rightEntry = viewModel.getRightEntry();
-
-            String leftEntryGroups = leftEntry.getField(StandardField.GROUPS).orElse("");
-            String rightEntryGroups = rightEntry.getField(StandardField.GROUPS).orElse("");
-
-            assert !leftEntryGroups.equals(rightEntryGroups);
-
-            String mergedGroups = mergeLeftAndRightEntryGroups(leftEntryGroups, rightEntryGroups);
-            viewModel.getLeftEntry().setField(StandardField.GROUPS, mergedGroups);
-            viewModel.getRightEntry().setField(StandardField.GROUPS, mergedGroups);
-
-            if (mergeGroupsEdit.canRedo()) {
-                mergeGroupsEdit.redo();
-            } else {
-                mergeGroupsEdit.addEdit(new UndoableFieldChange(leftEntry, StandardField.GROUPS, leftEntryGroups, mergedGroups));
-                mergeGroupsEdit.addEdit(new UndoableFieldChange(rightEntry, StandardField.GROUPS, rightEntryGroups, mergedGroups));
-                mergeGroupsEdit.end();
-            }
-
-            updateFieldValues(viewModel.allFields().indexOf(StandardField.GROUPS));
-            groupsFieldNameCell.setMergeAction(MergeableFieldCell.MergeAction.UNMERGE);
-        }
-
-        private String mergeLeftAndRightEntryGroups(String left, String right) {
-            if (StringUtil.isBlank(left)) {
-                return right;
-            } else if (StringUtil.isBlank(right)) {
-                return left;
-            } else {
-                Set<String> leftGroups = new HashSet<>(Arrays.stream(left.split(", ")).toList());
-                List<String> rightGroups = Arrays.stream(right.split(", ")).toList();
-                leftGroups.addAll(rightGroups);
-
-                return String.join(GROUPS_SEPARATOR, leftGroups);
-            }
-        }
-    }
-
-    public class UnmergeGroupsCommand extends SimpleCommand {
-        private final MergeableFieldCell groupsFieldCell;
-
-        public UnmergeGroupsCommand(MergeableFieldCell groupsFieldCell) {
-            this.groupsFieldCell = groupsFieldCell;
-        }
-
-        @Override
-        public void execute() {
-            if (mergeGroupsEdit.canUndo()) {
-                mergeGroupsEdit.undo();
-                updateFieldValues(viewModel.allFields().indexOf(StandardField.GROUPS));
-                groupsFieldCell.setMergeAction(MergeableFieldCell.MergeAction.MERGE);
-            }
-        }
     }
 }
