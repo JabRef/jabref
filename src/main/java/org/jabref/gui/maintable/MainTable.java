@@ -337,9 +337,9 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
             entries = this.importHandler.handleStringData(data);
         } catch (FetcherException exception) {
             if (exception instanceof FetcherClientException) {
-                dialogService.showInformationDialogAndWait(Localization.lang("Lookup identifier"), Localization.lang("No data was found for the identifier"));
+                dialogService.showInformationDialogAndWait(Localization.lang("Look up identifier"), Localization.lang("No data was found for the identifier"));
             } else if (exception instanceof FetcherServerException) {
-                dialogService.showInformationDialogAndWait(Localization.lang("Lookup identifier"), Localization.lang("Server not available"));
+                dialogService.showInformationDialogAndWait(Localization.lang("Look up identifier"), Localization.lang("Server not available"));
             } else {
                 dialogService.showErrorDialogAndWait(exception);
             }
