@@ -175,6 +175,10 @@ public class ThreeFieldValuesViewModel {
         this.rightFieldValue.set(rightFieldValue);
     }
 
+    public Field getField() {
+        return field;
+    }
+
     public BibEntry getLeftEntry() {
         return leftEntry;
     }
