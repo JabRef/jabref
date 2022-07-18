@@ -11,7 +11,6 @@ import javax.swing.undo.CannotUndoException;
 import javax.swing.undo.CompoundEdit;
 
 import javafx.beans.binding.Bindings;
-import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyStringProperty;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.GridPane;
@@ -40,7 +39,7 @@ import static org.jabref.gui.mergeentries.newmergedialog.ThreeFieldValuesViewMod
 public class ThreeFieldValuesView {
     private final FieldNameCell fieldNameCell;
     private final FieldValueCell leftValueCell;
-    private FieldValueCell rightValueCell;
+    private final FieldValueCell rightValueCell;
     private final MergedFieldCell mergedValueCell;
 
     private final ToggleGroup toggleGroup = new ToggleGroup();
@@ -138,12 +137,8 @@ public class ThreeFieldValuesView {
         return mergedValueCell;
     }
 
-    public boolean hasEqualLeftAndRightValues() {
-        return viewModel.hasEqualLeftAndRightValues();
-    }
-
     public void showDiff(ShowDiffConfig diffConfig) {
-        if (isRightValueCellHidden()) {
+        if (!rightValueCell.isVisible()) {
             return;
         }
 
@@ -159,7 +154,7 @@ public class ThreeFieldValuesView {
     }
 
     public void hideDiff() {
-        if (isRightValueCellHidden()) {
+        if (!rightValueCell.isVisible()) {
             return;
         }
 
@@ -170,14 +165,6 @@ public class ThreeFieldValuesView {
         int rightValueLength = getRightValueCell().getStyleClassedLabel().getLength();
         getRightValueCell().getStyleClassedLabel().clearStyle(0, rightValueLength);
         getRightValueCell().getStyleClassedLabel().replaceText(viewModel.getRightFieldValue());
-    }
-
-    private boolean isRightValueCellHidden() {
-        return rightValueCell == null;
-    }
-
-    private ObjectProperty<ThreeFieldValuesViewModel.Selection> selectionProperty() {
-        return viewModel.selectionProperty();
     }
 
     public class MergeCommand extends SimpleCommand {
@@ -201,19 +188,18 @@ public class ThreeFieldValuesView {
             String oldLeftFieldValue = viewModel.getLeftFieldValue();
             String oldRightFieldValue = viewModel.getRightFieldValue();
 
-            String mergedGroups = mergeLeftAndRightEntryGroups(viewModel.getLeftFieldValue(), viewModel.getRightFieldValue());
-            viewModel.setLeftFieldValue(mergedGroups);
-            viewModel.setRightFieldValue(mergedGroups);
+            String mergedFields = mergeLeftAndRightEntryGroups(viewModel.getLeftFieldValue(), viewModel.getRightFieldValue());
+            viewModel.setLeftFieldValue(mergedFields);
+            viewModel.setRightFieldValue(mergedFields);
 
             if (fieldsMergedEdit.canRedo()) {
                 fieldsMergedEdit.redo();
             } else {
-                fieldsMergedEdit.addEdit(new MergeFieldsUndo(oldLeftFieldValue, oldRightFieldValue, mergedGroups));
+                fieldsMergedEdit.addEdit(new MergeFieldsUndo(oldLeftFieldValue, oldRightFieldValue, mergedFields));
                 fieldsMergedEdit.end();
             }
 
             groupsFieldNameCell.setMergeAction(MergeableFieldCell.MergeAction.UNMERGE);
-            viewModel.setIsFieldsMerged(true);
         }
 
         private String mergeLeftAndRightEntryGroups(String left, String right) {
@@ -243,7 +229,6 @@ public class ThreeFieldValuesView {
             if (fieldsMergedEdit.canUndo()) {
                 fieldsMergedEdit.undo();
                 groupsFieldCell.setMergeAction(MergeableFieldCell.MergeAction.MERGE);
-                viewModel.setIsFieldsMerged(false);
             }
         }
     }
