@@ -32,6 +32,8 @@ public class ImportExportTab extends AbstractPreferenceTabView<ImportExportTabVi
     @FXML private CheckBox grobidEnabled;
     @FXML private TextField grobidURL;
 
+    @FXML private CheckBox warnAboutDuplicatesOnImport;
+
     public ImportExportTab() {
         ViewLoader.view(this)
                   .root(this)
@@ -44,7 +46,7 @@ public class ImportExportTab extends AbstractPreferenceTabView<ImportExportTabVi
     }
 
     public void initialize() {
-        this.viewModel = new ImportExportTabViewModel(preferencesService, preferencesService.getDOIPreferences(), dialogService);
+        this.viewModel = new ImportExportTabViewModel(preferencesService, preferencesService.getDOIPreferences(), dialogService, preferencesService.getImportExportPreferences());
 
         useCustomDOI.selectedProperty().bindBidirectional(viewModel.useCustomDOIProperty());
         useCustomDOIName.textProperty().bindBidirectional(viewModel.useCustomDOINameProperty());
@@ -85,6 +87,8 @@ public class ImportExportTab extends AbstractPreferenceTabView<ImportExportTabVi
 
         // Content is set later
         viewModel.fetcherApiKeys().addListener((InvalidationListener) change -> apiKeySelector.getSelectionModel().selectFirst());
+
+        warnAboutDuplicatesOnImport.selectedProperty().bindBidirectional(viewModel.warnAboutDuplicatesOnImportProperty());
     }
 
     private void updateFetcherApiKey(FetcherApiKey apiKey) {

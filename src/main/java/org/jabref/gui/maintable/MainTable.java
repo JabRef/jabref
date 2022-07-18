@@ -124,7 +124,8 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                         preferencesService,
                         undoManager,
                         Globals.getClipboardManager(),
-                        Globals.TASK_EXECUTOR))
+                        Globals.TASK_EXECUTOR,
+                        Globals.entryTypesManager))
                 .setOnDragDetected(this::handleOnDragDetected)
                 .setOnDragDropped(this::handleOnDragDropped)
                 .setOnDragOver(this::handleOnDragOver)
