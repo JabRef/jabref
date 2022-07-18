@@ -2,6 +2,7 @@ package org.jabref.gui.mergeentries.newmergedialog;
 
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyStringProperty;
+import javafx.scene.control.Toggle;
 import javafx.scene.control.ToggleGroup;
 
 import org.jabref.gui.mergeentries.newmergedialog.cell.FieldValueCell;
@@ -36,31 +37,16 @@ public class ThreeFieldValues {
         rightValueCell = new FieldValueCell(rightValue, rowIndex);
         mergedValueCell = new MergedFieldCell(StringUtil.isNullOrEmpty(leftValue) ? rightValue : leftValue, rowIndex);
 
-        viewModel = new ThreeFieldValuesViewModel();
+        viewModel = new ThreeFieldValuesViewModel(leftValue, rightValue);
 
         this.leftValue = leftValue;
         this.rightValue = rightValue;
 
         toggleGroup.getToggles().addAll(leftValueCell, rightValueCell);
-        toggleGroup.selectToggle(StringUtil.isNullOrEmpty(leftValue) ? rightValueCell : leftValueCell);
-        toggleGroup.selectedToggleProperty().addListener(invalidated -> {
-            if (toggleGroup.getSelectedToggle() != null) {
-                mergedValueCell.setText((String) toggleGroup.getSelectedToggle().getUserData());
-            }
-        });
-
-        mergedValueCell.textProperty().addListener((observable, old, mergedValue) -> {
-            if (mergedValue.equals(leftValue)) {
-                toggleGroup.selectToggle(leftValueCell);
-            } else if (mergedValue.equals(rightValue)) {
-                toggleGroup.selectToggle(rightValueCell);
-            } else {
-                // deselect all toggles because left and right values don't equal the merged value
-                toggleGroup.selectToggle(null);
-            }
-        });
 
         mergedValueCell.textProperty().bindBidirectional(viewModel.mergedFieldValueProperty());
+        leftValueCell.textProperty().bindBidirectional(viewModel.leftFieldValueProperty());
+        rightValueCell.textProperty().bindBidirectional(viewModel.rightFieldValueProperty());
 
         viewModel.selectionProperty().addListener(obs -> {
             Selection selection = viewModel.getSelection();
@@ -72,6 +58,23 @@ public class ThreeFieldValues {
                 toggleGroup.selectToggle(null);
             }
         });
+
+        toggleGroup.selectedToggleProperty().addListener(obs -> {
+            Toggle selectedToggle = toggleGroup.getSelectedToggle();
+            if (selectedToggle == leftValueCell) {
+                selectLeftValue();
+            } else if (selectedToggle == rightValueCell) {
+                selectRightValue();
+            } else {
+                selectNone();
+            }
+        });
+
+        if (StringUtil.isNullOrEmpty(leftValue)) {
+            selectRightValue();
+        } else {
+            selectLeftValue();
+        }
 
         //  When both the left and right cells have the same value, only the left value is displayed,
         //  making it unnecessary to keep allocating memory for the right cell.
@@ -89,12 +92,16 @@ public class ThreeFieldValues {
         viewModel.selectRightValue();
     }
 
+    public void selectNone() {
+        viewModel.selectNone();
+    }
+
     public String getMergedValue() {
         return mergedValueProperty().getValue();
     }
 
     public ReadOnlyStringProperty mergedValueProperty() {
-        return mergedValueCell.textProperty();
+        return viewModel.mergedFieldValueProperty();
     }
 
     public FieldValueCell getLeftValueCell() {
@@ -110,9 +117,7 @@ public class ThreeFieldValues {
     }
 
     public boolean hasEqualLeftAndRightValues() {
-        return isRightValueCellHidden() || (!StringUtil.isNullOrEmpty(leftValueCell.getText()) &&
-                !StringUtil.isNullOrEmpty(rightValueCell.getText()) &&
-                leftValueCell.getText().equals(rightValueCell.getText()));
+        return isRightValueCellHidden() || (!StringUtil.isNullOrEmpty(leftValueCell.getText()) && !StringUtil.isNullOrEmpty(rightValueCell.getText()) && leftValueCell.getText().equals(rightValueCell.getText()));
     }
 
     public void showDiff(ShowDiffConfig diffConfig) {

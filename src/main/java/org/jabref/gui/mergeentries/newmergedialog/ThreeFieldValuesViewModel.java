@@ -27,14 +27,31 @@ public class ThreeFieldValuesViewModel {
 
     private final ObjectProperty<Selection> selection = new SimpleObjectProperty<>();
 
-    private final StringProperty leftFieldValue = new SimpleStringProperty();
-    private final StringProperty rightFieldValue = new SimpleStringProperty();
-    private final StringProperty mergedFieldValue = new SimpleStringProperty();
+    private final StringProperty leftFieldValue = new SimpleStringProperty("");
+    private final StringProperty rightFieldValue = new SimpleStringProperty("");
+    private final StringProperty mergedFieldValue = new SimpleStringProperty("");
 
     private final BooleanBinding hasEqualLeftAndRight;
 
-    public ThreeFieldValuesViewModel() {
+    public ThreeFieldValuesViewModel(String leftValue, String rightValue) {
+        leftFieldValueProperty().set(leftValue);
+        rightFieldValueProperty().set(rightValue);
         hasEqualLeftAndRight = Bindings.createBooleanBinding(this::hasEqualLeftAndRightValues, leftFieldValue, rightFieldValue);
+        selectionProperty().addListener((obs, old, newVal) -> {
+            switch (newVal) {
+                case LEFT -> onLeftSelected();
+                case RIGHT -> onRightSelected();
+            }
+        });
+        mergedFieldValueProperty().addListener(obs -> {
+            if (getMergedFieldValue().equals(getLeftFieldValue())) {
+                selectLeftValue();
+            } else if (getMergedFieldValue().equals(getRightFieldValue())) {
+                selectRightValue();
+            } else {
+                selectNone();
+            }
+        });
     }
 
     public boolean hasEqualLeftAndRightValues() {
@@ -43,9 +60,20 @@ public class ThreeFieldValuesViewModel {
                 leftFieldValue.get().equals(rightFieldValue.get()));
     }
 
+    private void onLeftSelected() {
+        setMergedFieldValue(getLeftFieldValue());
+    }
+
+    private void onRightSelected() {
+        if (isIsFieldsMerged()) {
+            onLeftSelected();
+        } else {
+            setMergedFieldValue(getRightFieldValue());
+        }
+    }
+
     public void selectLeftValue() {
         setSelection(Selection.LEFT);
-        setMergedFieldValue(getLeftFieldValue());
     }
 
     public void selectRightValue() {
@@ -53,8 +81,11 @@ public class ThreeFieldValuesViewModel {
             selectLeftValue();
         } else {
             setSelection(Selection.RIGHT);
-            setMergedFieldValue(getRightFieldValue());
         }
+    }
+
+    public void selectNone() {
+        setSelection(Selection.NONE);
     }
 
     public void setMergedFieldValue(String mergedFieldValue) {
@@ -63,6 +94,10 @@ public class ThreeFieldValuesViewModel {
 
     public StringProperty mergedFieldValueProperty() {
         return mergedFieldValue;
+    }
+
+    public String getMergedFieldValue() {
+        return mergedFieldValue.get();
     }
 
     public void merge() {
