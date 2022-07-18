@@ -20,7 +20,7 @@ import javafx.stage.Screen;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.mergeentries.newmergedialog.cell.FieldNameCell;
 import org.jabref.gui.mergeentries.newmergedialog.cell.FieldNameCellFactory;
-import org.jabref.gui.mergeentries.newmergedialog.cell.GroupsFieldNameCell;
+import org.jabref.gui.mergeentries.newmergedialog.cell.MergeableFieldCell;
 import org.jabref.gui.mergeentries.newmergedialog.toolbar.ThreeWayMergeToolbar;
 import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.logic.l10n.Localization;
@@ -135,11 +135,11 @@ public class ThreeWayMergeView extends VBox {
         FieldNameCell fieldNameCell = FieldNameCellFactory.create(field, fieldIndex);
         mergeGridPane.add(fieldNameCell, FIELD_NAME_COLUMN, fieldIndex);
 
-        if (field.equals(StandardField.GROUPS)) {
-            GroupsFieldNameCell groupsField = (GroupsFieldNameCell) fieldNameCell;
-            groupsField.setMergeGroupsCommand(new MergeGroupsCommand(groupsField));
-            groupsField.setUnmergeGroupsCommand(new UnmergeGroupsCommand(groupsField));
-            groupsField.setMergeAction(GroupsFieldNameCell.MergeAction.MERGE);
+        if (FieldNameCellFactory.isMergeableField(field)) {
+            MergeableFieldCell mergeableFieldCell = (MergeableFieldCell) fieldNameCell;
+            mergeableFieldCell.setMergeCommand(new MergeGroupsCommand(mergeableFieldCell));
+            mergeableFieldCell.setUnmergeCommand(new UnmergeGroupsCommand(mergeableFieldCell));
+            mergeableFieldCell.setMergeAction(MergeableFieldCell.MergeAction.MERGE);
         }
     }
 
@@ -232,9 +232,9 @@ public class ThreeWayMergeView extends VBox {
     }
 
     public class MergeGroupsCommand extends SimpleCommand {
-        private final GroupsFieldNameCell groupsFieldNameCell;
+        private final MergeableFieldCell groupsFieldNameCell;
 
-        public MergeGroupsCommand(GroupsFieldNameCell groupsFieldCell) {
+        public MergeGroupsCommand(MergeableFieldCell groupsFieldCell) {
             this.groupsFieldNameCell = groupsFieldCell;
 
             this.executable.bind(Bindings.createBooleanBinding(() -> {
@@ -268,7 +268,7 @@ public class ThreeWayMergeView extends VBox {
             }
 
             updateFieldValues(viewModel.allFields().indexOf(StandardField.GROUPS));
-            groupsFieldNameCell.setMergeAction(GroupsFieldNameCell.MergeAction.UNMERGE);
+            groupsFieldNameCell.setMergeAction(MergeableFieldCell.MergeAction.UNMERGE);
         }
 
         private String mergeLeftAndRightEntryGroups(String left, String right) {
@@ -287,9 +287,9 @@ public class ThreeWayMergeView extends VBox {
     }
 
     public class UnmergeGroupsCommand extends SimpleCommand {
-        private final GroupsFieldNameCell groupsFieldCell;
+        private final MergeableFieldCell groupsFieldCell;
 
-        public UnmergeGroupsCommand(GroupsFieldNameCell groupsFieldCell) {
+        public UnmergeGroupsCommand(MergeableFieldCell groupsFieldCell) {
             this.groupsFieldCell = groupsFieldCell;
         }
 
@@ -298,7 +298,7 @@ public class ThreeWayMergeView extends VBox {
             if (mergeGroupsEdit.canUndo()) {
                 mergeGroupsEdit.undo();
                 updateFieldValues(viewModel.allFields().indexOf(StandardField.GROUPS));
-                groupsFieldCell.setMergeAction(GroupsFieldNameCell.MergeAction.MERGE);
+                groupsFieldCell.setMergeAction(MergeableFieldCell.MergeAction.MERGE);
             }
         }
     }

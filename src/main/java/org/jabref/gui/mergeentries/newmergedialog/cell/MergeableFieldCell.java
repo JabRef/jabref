@@ -5,33 +5,33 @@ import javafx.beans.property.SimpleObjectProperty;
 
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.field.Field;
 
 import de.saxsys.mvvmfx.utils.commands.Command;
 
-public class GroupsFieldNameCell extends FieldNameCell {
-    private Command mergeGroupsCommand;
-    private Command unmergeGroupsCommand;
+public class MergeableFieldCell extends FieldNameCell {
+    private Command mergeCommand;
+    private Command unmergeCommand;
 
     private final ObjectProperty<MergeAction> mergeAction = new SimpleObjectProperty<>();
 
-    public GroupsFieldNameCell(int rowIndex) {
-        super(StandardField.GROUPS.getDisplayName(), rowIndex);
+    public MergeableFieldCell(Field field, int rowIndex) {
+        super(field.getDisplayName(), rowIndex);
         mergeActionProperty().addListener((obs, old, newValue) -> {
             if (newValue == MergeAction.MERGE) {
-                setAction(Localization.lang("Merge Groups"), IconTheme.JabRefIcons.MERGE_GROUPS, mergeGroupsCommand);
+                setAction(Localization.lang("Merge Groups"), IconTheme.JabRefIcons.MERGE_GROUPS, mergeCommand);
             } else {
-                setAction(Localization.lang("Unmerge Groups"), IconTheme.JabRefIcons.UNDO, unmergeGroupsCommand);
+                setAction(Localization.lang("Unmerge Groups"), IconTheme.JabRefIcons.UNDO, unmergeCommand);
             }
         });
     }
 
-    public void setMergeGroupsCommand(Command mergeGroupsCommand) {
-        this.mergeGroupsCommand = mergeGroupsCommand;
+    public void setMergeCommand(Command mergeCommand) {
+        this.mergeCommand = mergeCommand;
     }
 
-    public void setUnmergeGroupsCommand(Command unmergeGroupsCommand) {
-        this.unmergeGroupsCommand = unmergeGroupsCommand;
+    public void setUnmergeCommand(Command unmergeCommand) {
+        this.unmergeCommand = unmergeCommand;
     }
 
     public ObjectProperty<MergeAction> mergeActionProperty() {
