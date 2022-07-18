@@ -2,7 +2,6 @@ package org.jabref.gui.mergeentries.newmergedialog;
 
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyStringProperty;
-import javafx.scene.control.Toggle;
 import javafx.scene.control.ToggleGroup;
 
 import org.jabref.gui.mergeentries.newmergedialog.cell.FieldValueCell;
@@ -59,10 +58,10 @@ public class ThreeFieldValues {
             }
         });
 
-        EasyBind.subscribe(toggleGroup.selectedToggleProperty(), val -> {
-            if (val == leftValueCell) {
+        EasyBind.subscribe(toggleGroup.selectedToggleProperty(), selectedToggle -> {
+            if (selectedToggle == leftValueCell) {
                 selectLeftValue();
-            } else if (val == rightValueCell) {
+            } else if (selectedToggle == rightValueCell) {
                 selectRightValue();
             } else {
                 selectNone();
@@ -103,7 +102,7 @@ public class ThreeFieldValues {
     }
 
     public boolean hasEqualLeftAndRightValues() {
-        return isRightValueCellHidden() || (!StringUtil.isNullOrEmpty(leftValueCell.getText()) && !StringUtil.isNullOrEmpty(rightValueCell.getText()) && leftValueCell.getText().equals(rightValueCell.getText()));
+        return viewModel.hasEqualLeftAndRightValues();
     }
 
     public void showDiff(ShowDiffConfig diffConfig) {
