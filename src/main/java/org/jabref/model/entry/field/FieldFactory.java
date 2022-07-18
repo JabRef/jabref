@@ -74,11 +74,17 @@ public class FieldFactory {
     }
 
     public static Field parseField(String fieldName) {
-        return OptionalUtil.<Field>orElse(OptionalUtil.<Field>orElse(OptionalUtil.<Field>orElse(
+        return OptionalUtil.<Field>orElse(
+                OptionalUtil.<Field>orElse(
+                 OptionalUtil.<Field>orElse(
+                  OptionalUtil.<Field>orElse(
+                   OptionalUtil.<Field>orElse(
                 InternalField.fromName(fieldName),
                 StandardField.fromName(fieldName)),
                 SpecialField.fromName(fieldName)),
-                IEEEField.fromName(fieldName))
+                IEEEField.fromName(fieldName)),
+                BiblatexSoftwareField.fromName(fieldName)),
+                BiblatexApaField.fromName(fieldName))
                 .orElse(new UnknownField(fieldName));
     }
 
@@ -138,6 +144,8 @@ public class FieldFactory {
 
     private static Set<Field> getAllFields() {
         Set<Field> fields = new HashSet<>();
+        fields.addAll(EnumSet.allOf(BiblatexApaField.class));
+        fields.addAll(EnumSet.allOf(BiblatexSoftwareField.class));
         fields.addAll(EnumSet.allOf(IEEEField.class));
         fields.addAll(EnumSet.allOf(InternalField.class));
         fields.addAll(EnumSet.allOf(SpecialField.class));
