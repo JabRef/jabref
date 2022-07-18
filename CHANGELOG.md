@@ -16,6 +16,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We added an extra option in the 'Find Unlinked Files' dialog view to ignore unnecessary files like Thumbs.db, DS_Store, etc. [koppor#373](https://github.com/koppor/jabref/issues/373)
 - JabRef now writes log files. Linux: `$home/.cache/jabref/logs/version`, Windows: `%APPDATA%\..\Local\harawata\jabref\version\logs`, Mac: `Users/.../Library/Logs/jabref/version`
 - We added an importer for Citavi backup files, support ".ctv5bak" and ".ctv6bak" file formats. [#8322](https://github.com/JabRef/jabref/issues/8322)
+- We added a feature to drag selected entries and drop them to other opened inactive library tabs [koppor521](https://github.com/koppor/jabref/issues/521).
 
 ### Changed
 

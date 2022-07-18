@@ -222,6 +222,54 @@ public class JabRefFrame extends BorderPane {
                 } else {
                     tabbedPane.getTabs().remove(dndIndicator);
                 }
+                // Accept drag entries from MainTable
+                if (event.getDragboard().hasContent(DragAndDropDataFormats.ENTRIES)) {
+                    event.acceptTransferModes(TransferMode.COPY);
+                    event.consume();
+                }
+            });
+
+            this.getScene().setOnDragEntered(event -> {
+                // It is necessary to setOnDragOver for newly opened tabs
+                // drag'n'drop on tabs covered dnd on tabbedPane, so dnd on tabs should contain all dnds on tabbedPane
+                tabbedPane.lookupAll(".tab").forEach(t -> {
+                    t.setOnDragOver(tabDragEvent -> {
+                        if (DragAndDropHelper.hasBibFiles(tabDragEvent.getDragboard())) {
+                            tabDragEvent.acceptTransferModes(TransferMode.ANY);
+                            if (!tabbedPane.getTabs().contains(dndIndicator)) {
+                                tabbedPane.getTabs().add(dndIndicator);
+                            }
+                            event.consume();
+                        } else {
+                            tabbedPane.getTabs().remove(dndIndicator);
+                        }
+
+                        if (tabDragEvent.getDragboard().hasContent(DragAndDropDataFormats.ENTRIES)) {
+                            tabDragEvent.acceptTransferModes(TransferMode.COPY);
+                            tabDragEvent.consume();
+                        }
+                    });
+                    t.setOnDragExited(event1 -> tabbedPane.getTabs().remove(dndIndicator));
+                    t.setOnDragDropped(tabDragEvent -> {
+                        if (DragAndDropHelper.hasBibFiles(tabDragEvent.getDragboard())) {
+                            tabbedPane.getTabs().remove(dndIndicator);
+                            List<Path> bibFiles = DragAndDropHelper.getBibFiles(tabDragEvent.getDragboard());
+                            OpenDatabaseAction openDatabaseAction = this.getOpenDatabaseAction();
+                            openDatabaseAction.openFiles(bibFiles, true);
+                            tabDragEvent.setDropCompleted(true);
+                            tabDragEvent.consume();
+                        } else {
+                            for (Tab libraryTab : tabbedPane.getTabs()) {
+                                if (libraryTab.getId().equals(t.getId()) &&
+                                        !tabbedPane.getSelectionModel().getSelectedItem().equals(libraryTab)) {
+                                    ((LibraryTab) libraryTab).dropEntry(stateManager.getLocalDragboard().getBibEntries());
+                                }
+                            }
+                            tabDragEvent.consume();
+                        }
+                    });
+                });
+                event.consume();
             });
 
             this.getScene().setOnDragExited(event -> tabbedPane.getTabs().remove(dndIndicator));
