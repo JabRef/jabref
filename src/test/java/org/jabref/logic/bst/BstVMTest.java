@@ -11,7 +11,6 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 
-import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.RecognitionException;
 import org.junit.jupiter.api.Test;
 
@@ -59,17 +58,17 @@ public class BstVMTest {
     @Test
     public void testSimple() throws RecognitionException {
         TestVM vm = new TestVM("""
-               ENTRY { address author title type } { } { label }
-               INTEGERS { output.state before.all mid.sentence after.sentence after.block }
-               FUNCTION { init.state.consts }{
-                  #0 'before.all :=
-                  #1 'mid.sentence :=
-                  #2 'after.sentence :=
-                  #3 'after.block :=
-               }
-               STRINGS { s t }
-               READ
-               """);
+                ENTRY { address author title type } { } { label }
+                INTEGERS { output.state before.all mid.sentence after.sentence after.block }
+                FUNCTION { init.state.consts }{
+                   #0 'before.all :=
+                   #1 'mid.sentence :=
+                   #2 'after.sentence :=
+                   #3 'after.block :=
+                }
+                STRINGS { s t }
+                READ
+                """);
         List<BibEntry> testEntries = List.of(defaultTestEntry());
 
         vm.render(testEntries);
@@ -150,6 +149,80 @@ public class BstVMTest {
         String result = vm.render(testEntries);
 
         assertTrue(result.contains("J.-P. Sartre"));
+    }
+
+    @Test
+    void testChopWord() {
+        TestVM vm = new TestVM("""
+                STRINGS { s }
+                INTEGERS { len }
+
+                FUNCTION { chop.word }
+                {
+                    's :=
+                        'len :=
+                        s #1 len substring$ =
+                            { s len #1 + global.max$ substring$ }
+                        's
+                        if$
+                }
+
+                FUNCTION { test } {
+                    "A " #2
+                    "A Colorful Morning"
+                    chop.word
+                }
+
+                EXECUTE { test }
+                """);
+
+        vm.render(Collections.emptyList());
+
+        assertTrue(vm.latestContext.stack().get(0).equals("Colorful Morning"));
+    }
+
+    @Test
+    void testSortFormatTitle() {
+        TestVM vm = new TestVM("""
+                STRINGS { s t }
+                INTEGERS { len }
+                FUNCTION { sortify } {
+                    purify$
+                    "l" change.case$
+                }
+
+                FUNCTION { chop.word }
+                {
+                    's :=
+                        'len :=
+                        s #1 len substring$ =
+                            { s len #1 + global.max$ substring$ }
+                        's
+                        if$
+                }
+
+                FUNCTION {sort.format.title}
+                { 't :=
+                  % "A " #2
+                  %  "An " #3
+                      "The " #4 t chop.word
+                  %  chop.word
+                  % chop.word
+                  sortify
+                  #1 global.max$ substring$
+                }
+
+                FUNCTION { test } {
+                    "A Colorful Morning"
+                    sort.format.title
+                }
+
+                EXECUTE {test}
+                """);
+
+        vm.render(Collections.emptyList());
+
+        assertTrue(vm.latestContext.stack().get(0).equals("Colorful Morning"));
     }
 
     public static class TestVM extends BstVM {

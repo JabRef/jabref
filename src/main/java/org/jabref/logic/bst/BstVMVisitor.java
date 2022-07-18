@@ -196,6 +196,7 @@ class BstVMVisitor extends BstBaseVisitor<Integer> {
                 return BstVM.TRUE;
             }
         }
+
         if (bstVMContext.strings().containsKey(name)) {
             bstVMContext.stack().push(bstVMContext.strings().get(name));
             return BstVM.TRUE;
@@ -204,7 +205,6 @@ class BstVMVisitor extends BstBaseVisitor<Integer> {
             bstVMContext.stack().push(bstVMContext.integers().get(name));
             return BstVM.TRUE;
         }
-
         if (bstVMContext.functions().containsKey(name)) {
             bstVMContext.functions().get(name).execute(this, ctx);
             return BstVM.TRUE;
@@ -260,15 +260,16 @@ class BstVMVisitor extends BstBaseVisitor<Integer> {
         public void execute(BstVMVisitor visitor, ParserRuleContext bstFunctionContext) {
             if (expression instanceof String str) {
                 visitor.bstVMContext.stack().push(str.substring(1, str.length() - 1)); // Macro
-            } else if (expression instanceof Integer integer) {
-                visitor.bstVMContext.stack().push(integer);
-            } else if (expression instanceof Identifier identifier) {
-                if (visitor.bstVMContext.functions().containsKey(identifier.name)) {
-                    visitor.bstVMContext.functions().get(identifier.name).execute(visitor, bstFunctionContext);
-                }
             } else if (expression instanceof ParserRuleContext ctx) {
                 visitor.visit(ctx); // Function
             }
+//            else if (expression instanceof Integer integer) {
+//                visitor.bstVMContext.stack().push(integer);
+//            } else if (expression instanceof Identifier identifier) {
+//                if (visitor.bstVMContext.functions().containsKey(identifier.name)) {
+//                    visitor.bstVMContext.functions().get(identifier.name).execute(visitor, bstFunctionContext);
+//                }
+//            }
         }
     }
 }

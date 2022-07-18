@@ -519,9 +519,11 @@ public class BstFunctions {
         }
 
         if (((Integer) i) > 0) {
-            new BstVMVisitor.BstVMFunction<>(f2).execute(visitor, ctx);
+            visitor.visit((ParseTree) f2);
+            // new BstVMVisitor.BstVMFunction<>(f2).execute(visitor, ctx);
         } else {
-            new BstVMVisitor.BstVMFunction<>(f1).execute(visitor, ctx);
+            // new BstVMVisitor.BstVMFunction<>(f1).execute(visitor, ctx);
+            visitor.visit((ParseTree) f1);
         }
     }
 
