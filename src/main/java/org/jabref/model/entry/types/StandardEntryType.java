@@ -21,11 +21,7 @@ public enum StandardEntryType implements EntryType {
     Unpublished("Unpublished"),
     // Biblatex
     BookInBook("BookInBook"),
-    CONSTITUTION("Constitution"),
     InReference("InReference"),
-    LEGISLATION("Legislation"),
-    LEGADMINMATERIAL("Legadminmaterial"),
-    JURISDICTION("Jurisdiction"),
     MvBook("MvBook"),
     MvCollection("MvCollection"),
     MvProceedings("MvProceedings"),
@@ -40,10 +36,7 @@ public enum StandardEntryType implements EntryType {
     Thesis("Thesis"),
     WWW("WWW"),
     Software("Software"),
-    Dataset("Dataset"),
-    SoftwareVersion("SoftwareVersion"),
-    SoftwareModule("SoftwareModule"),
-    CodeFragment("CodeFragment");
+    Dataset("Dataset");
 
     private final String displayName;
 
