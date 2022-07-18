@@ -70,8 +70,8 @@ public class ThreeFieldValuesViewModel {
 
         EasyBind.subscribe(selectionProperty(), selection -> {
             switch (selection) {
-                case LEFT -> mergedFieldValueProperty().bind(leftFieldValueProperty());
-                case RIGHT -> mergedFieldValueProperty().bind(rightFieldValueProperty());
+                case LEFT -> EasyBind.subscribe(leftFieldValueProperty(), this::setMergedFieldValue);
+                case RIGHT -> EasyBind.subscribe(rightFieldValueProperty(), this::setMergedFieldValue);
             }
         });
 
