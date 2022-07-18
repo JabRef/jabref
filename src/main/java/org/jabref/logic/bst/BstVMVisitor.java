@@ -207,6 +207,7 @@ class BstVMVisitor extends BstBaseVisitor<Integer> {
 
         if (bstVMContext.functions().containsKey(name)) {
             bstVMContext.functions().get(name).execute(this, ctx);
+            return BstVM.TRUE;
         }
 
         throw new BstVMException("No matching identifier found: " + name);
