@@ -52,7 +52,7 @@ public class ThreeFieldValuesView {
         rightValueCell = new FieldValueCell(viewModel.getRightFieldValue(), rowIndex);
         mergedValueCell = new MergedFieldCell(viewModel.getMergedFieldValue(), rowIndex);
 
-        if (FieldNameCellFactory.isMergeableField(field)) {
+        if (FieldMergerFactory.canMerge(field)) {
             MergeableFieldCell mergeableFieldCell = (MergeableFieldCell) fieldNameCell;
             mergeableFieldCell.setMergeCommand(new MergeCommand(mergeableFieldCell, fieldMergerFactory.create(field)));
             mergeableFieldCell.setUnmergeCommand(new UnmergeCommand(mergeableFieldCell));

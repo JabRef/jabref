@@ -20,4 +20,8 @@ public class FieldMergerFactory {
             throw new IllegalArgumentException("No implementation found for merging the given field: " + field.getDisplayName());
         }
     }
+
+    public static boolean canMerge(Field field) {
+        return field == StandardField.GROUPS || field == StandardField.KEYWORDS;
+    }
 }
