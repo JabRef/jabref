@@ -1,12 +1,12 @@
 package org.jabref.logic.importer.fetcher;
 
-import java.io.IOException;
 import java.net.URL;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.model.entry.BibEntry;
@@ -40,8 +40,7 @@ public class JstorFetcherTest implements SearchBasedFetcherCapabilityTest {
             .withField(StandardField.PAGES, "63--73")
             .withField(StandardField.VOLUME, "20")
             .withField(StandardField.URL, "http://www.jstor.org/stable/90002164")
-            .withField(StandardField.YEAR, "2017")
-            .withField(StandardField.URLDATE, "2022-07-16");
+            .withField(StandardField.YEAR, "2017");
 
     private final BibEntry doiEntry = new BibEntry(StandardEntryType.Article)
             .withCitationKey("10.1086/501484")
@@ -64,13 +63,19 @@ public class JstorFetcherTest implements SearchBasedFetcherCapabilityTest {
     }
 
     @Test
-    void searchById() throws FetcherException {
+    void searchById() throws Exception {
+        bibEntry.setField(StandardField.URLDATE, LocalDate.now().format(DateTimeFormatter.ISO_DATE));
         assertEquals(Optional.of(bibEntry), fetcher.performSearchById("90002164"));
+    }
+
+    @Test
+    void searchByUrlUsingId() throws Exception {
+        doiEntry.setField(StandardField.URLDATE, LocalDate.now().format(DateTimeFormatter.ISO_DATE));
         assertEquals(Optional.of(doiEntry), fetcher.performSearchById("https://www.jstor.org/stable/10.1086/501484?seq=1"));
     }
 
     @Test
-    void fetchPDF() throws IOException {
+    void fetchPDF() throws Exception {
         Optional<URL> url = fetcher.findFullText(bibEntry);
         assertEquals(Optional.of(new URL("https://www.jstor.org/stable/pdf/90002164.pdf")), url);
     }

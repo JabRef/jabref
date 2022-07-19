@@ -345,6 +345,11 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
             }
         }
         return entries;
+
+    public void dropEntry(List<BibEntry> entriesToAdd) {
+        for (BibEntry entry : entriesToAdd) {
+            importHandler.importEntryWithDuplicateCheck(database, (BibEntry) entry.clone());
+        }
     }
 
     private void handleOnDragOver(TableRow<BibEntryTableViewModel> row, BibEntryTableViewModel item, DragEvent event) {
@@ -383,8 +388,9 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
         // The following is necesary to initiate the drag and drop in javafx, although we don't need the contents
         // It doesn't work without
+        // Drag'n'drop to other tabs use COPY TransferMode, drop to group sidepane use MOVE
         ClipboardContent content = new ClipboardContent();
-        Dragboard dragboard = startDragAndDrop(TransferMode.MOVE);
+        Dragboard dragboard = startDragAndDrop(TransferMode.COPY_OR_MOVE);
         content.put(DragAndDropDataFormats.ENTRIES, "");
         dragboard.setContent(content);
 
