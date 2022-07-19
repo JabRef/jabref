@@ -17,7 +17,7 @@ import org.jabref.model.strings.StringUtil;
 
 import com.tobiasdiez.easybind.EasyBind;
 
-public class ThreeFieldValuesViewModel {
+public class FieldRowViewModel {
     public enum Selection {
         LEFT,
         RIGHT,
@@ -47,7 +47,7 @@ public class ThreeFieldValuesViewModel {
 
     private final BooleanBinding hasEqualLeftAndRight;
 
-    public ThreeFieldValuesViewModel(Field field, BibEntry leftEntry, BibEntry rightEntry, BibEntry mergedEntry) {
+    public FieldRowViewModel(Field field, BibEntry leftEntry, BibEntry rightEntry, BibEntry mergedEntry) {
         this.field = field;
         this.leftEntry = leftEntry;
         this.rightEntry = rightEntry;

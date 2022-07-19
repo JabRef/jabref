@@ -27,12 +27,12 @@ import org.jabref.model.entry.field.Field;
 import com.tobiasdiez.easybind.EasyBind;
 import org.fxmisc.richtext.StyleClassedTextArea;
 
-import static org.jabref.gui.mergeentries.newmergedialog.ThreeFieldValuesViewModel.Selection;
+import static org.jabref.gui.mergeentries.newmergedialog.FieldRowViewModel.Selection;
 
 /**
  * A controller class to control left, right and merged field values
  */
-public class ThreeFieldValuesView {
+public class FieldRowView {
     private final FieldNameCell fieldNameCell;
     private final FieldValueCell leftValueCell;
     private final FieldValueCell rightValueCell;
@@ -40,12 +40,12 @@ public class ThreeFieldValuesView {
 
     private final ToggleGroup toggleGroup = new ToggleGroup();
 
-    private final ThreeFieldValuesViewModel viewModel;
+    private final FieldRowViewModel viewModel;
 
     private final CompoundEdit fieldsMergedEdit = new CompoundEdit();
 
-    public ThreeFieldValuesView(Field field, BibEntry leftEntry, BibEntry rightEntry, BibEntry mergedEntry, FieldMergerFactory fieldMergerFactory, int rowIndex) {
-        viewModel = new ThreeFieldValuesViewModel(field, leftEntry, rightEntry, mergedEntry);
+    public FieldRowView(Field field, BibEntry leftEntry, BibEntry rightEntry, BibEntry mergedEntry, FieldMergerFactory fieldMergerFactory, int rowIndex) {
+        viewModel = new FieldRowViewModel(field, leftEntry, rightEntry, mergedEntry);
 
         fieldNameCell = FieldNameCellFactory.create(field, rowIndex);
         leftValueCell = new FieldValueCell(viewModel.getLeftFieldValue(), rowIndex);
