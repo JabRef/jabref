@@ -19,7 +19,7 @@ public class KeywordMerger implements FieldMerger {
 
     @Override
     public String merge(String keywordsA, String keywordsB) {
-        String keywordSeparator = " " + preferencesService.getGroupsPreferences().getKeywordSeparator();
+        String keywordSeparator = preferencesService.getGroupsPreferences().getKeywordSeparator() + " ";
 
         if (StringUtil.isBlank(keywordsA) && StringUtil.isBlank(keywordsB)) {
             return "";
@@ -28,11 +28,11 @@ public class KeywordMerger implements FieldMerger {
         } else if (StringUtil.isBlank(keywordsB)) {
             return keywordsA;
         } else {
-            Set<String> leftGroups = new HashSet<>(Arrays.stream(keywordsA.split(keywordSeparator)).toList());
-            List<String> rightGroups = Arrays.stream(keywordsB.split(keywordSeparator)).toList();
-            leftGroups.addAll(rightGroups);
+            Set<String> keywordsASet = new HashSet<>(Arrays.stream(keywordsA.split(keywordSeparator)).toList());
+            List<String> keywordsBList = Arrays.stream(keywordsB.split(keywordSeparator)).toList();
+            keywordsASet.addAll(keywordsBList);
 
-            return String.join(keywordSeparator, leftGroups);
+            return String.join(keywordSeparator, keywordsASet);
         }
     }
 }
