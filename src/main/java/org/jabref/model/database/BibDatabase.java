@@ -588,7 +588,6 @@ public class BibDatabase {
 
     @Subscribe
     private void listen(FieldAddedOrRemovedEvent event) {
-        System.out.println(event);
         // When a field is removed from an entry we can't tell if it's
         // still present in other entries, and thus we can't remove it
         // from the set of visible fields. However, when a new field is added
