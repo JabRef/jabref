@@ -17,7 +17,6 @@ import org.jabref.gui.mergeentries.newmergedialog.toolbar.ThreeWayMergeToolbar;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
-import org.jabref.model.entry.field.StandardField;
 
 public class ThreeWayMergeView extends VBox {
     public static final int GRID_COLUMN_MIN_WIDTH = 250;
@@ -107,15 +106,9 @@ public class ThreeWayMergeView extends VBox {
         mergeGridPane.getColumnConstraints().addAll(fieldNameColumnConstraints, leftEntryColumnConstraints, rightEntryColumnConstraints, mergedEntryColumnConstraints);
 
         for (int fieldIndex = 0; fieldIndex < viewModel.allFieldsSize(); fieldIndex++) {
-            // addFieldName(getFieldAtIndex(fieldIndex), fieldIndex);
             addRow(fieldIndex);
 
-            // Removing this will cause UI to lag when updating field values
-            if (getFieldAtIndex(fieldIndex).equals(StandardField.GROUPS)) {
-                mergeGridPane.getRowConstraints().add(fieldIndex, new RowConstraints(56, 56, Double.MAX_VALUE));
-            } else {
-                mergeGridPane.getRowConstraints().add(new RowConstraints());
-            }
+            mergeGridPane.getRowConstraints().add(new RowConstraints());
         }
     }
 
