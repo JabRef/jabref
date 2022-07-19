@@ -35,7 +35,7 @@ public class ThreeWayMergeView extends VBox {
     private final GridPane mergeGridPane;
 
     private final ThreeWayMergeViewModel viewModel;
-    private final List<ThreeFieldValuesView> fieldValuesList = new ArrayList<>();
+    private final List<FieldRowView> fieldRows = new ArrayList<>();
 
     private final FieldMergerFactory fieldMergerFactory;
 
@@ -77,9 +77,9 @@ public class ThreeWayMergeView extends VBox {
 
     private void updateDiff() {
         if (toolbar.isShowDiffEnabled()) {
-            fieldValuesList.forEach(fieldValues -> fieldValues.showDiff(new ShowDiffConfig(toolbar.getDiffView(), toolbar.getDiffHighlightingMethod())));
+            fieldRows.forEach(row -> row.showDiff(new ShowDiffConfig(toolbar.getDiffView(), toolbar.getDiffHighlightingMethod())));
         } else {
-            fieldValuesList.forEach(ThreeFieldValuesView::hideDiff);
+            fieldRows.forEach(FieldRowView::hideDiff);
         }
     }
 
@@ -108,7 +108,7 @@ public class ThreeWayMergeView extends VBox {
 
         for (int fieldIndex = 0; fieldIndex < viewModel.allFieldsSize(); fieldIndex++) {
             // addFieldName(getFieldAtIndex(fieldIndex), fieldIndex);
-            addFieldValues(fieldIndex);
+            addRow(fieldIndex);
 
             // Removing this will cause UI to lag when updating field values
             if (getFieldAtIndex(fieldIndex).equals(StandardField.GROUPS)) {
@@ -123,17 +123,17 @@ public class ThreeWayMergeView extends VBox {
         return viewModel.allFields().get(index);
     }
 
-    private void addFieldValues(int fieldIndex) {
+    private void addRow(int fieldIndex) {
         Field field = getFieldAtIndex(fieldIndex);
 
-        ThreeFieldValuesView fieldValues = new ThreeFieldValuesView(field, getLeftEntry(), getRightEntry(), getMergedEntry(), fieldMergerFactory, fieldIndex);
+        FieldRowView fieldRow = new FieldRowView(field, getLeftEntry(), getRightEntry(), getMergedEntry(), fieldMergerFactory, fieldIndex);
 
-        fieldValuesList.add(fieldIndex, fieldValues);
+        fieldRows.add(fieldIndex, fieldRow);
 
-        mergeGridPane.add(fieldValues.getFieldNameCell(), 0, fieldIndex);
-        mergeGridPane.add(fieldValues.getLeftValueCell(), 1, fieldIndex);
-        mergeGridPane.add(fieldValues.getRightValueCell(), 2, fieldIndex);
-        mergeGridPane.add(fieldValues.getMergedValueCell(), 3, fieldIndex);
+        mergeGridPane.add(fieldRow.getFieldNameCell(), 0, fieldIndex);
+        mergeGridPane.add(fieldRow.getLeftValueCell(), 1, fieldIndex);
+        mergeGridPane.add(fieldRow.getRightValueCell(), 2, fieldIndex);
+        mergeGridPane.add(fieldRow.getMergedValueCell(), 3, fieldIndex);
     }
 
     public BibEntry getMergedEntry() {
@@ -149,11 +149,11 @@ public class ThreeWayMergeView extends VBox {
     }
 
     public void selectLeftEntryValues() {
-        fieldValuesList.forEach(ThreeFieldValuesView::selectLeftValue);
+        fieldRows.forEach(FieldRowView::selectLeftValue);
     }
 
     public void selectRightEntryValues() {
-        fieldValuesList.forEach(ThreeFieldValuesView::selectRightValue);
+        fieldRows.forEach(FieldRowView::selectRightValue);
     }
 
     public void showDiff(ShowDiffConfig diffConfig) {
