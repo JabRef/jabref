@@ -95,6 +95,12 @@ public class FieldRowView {
                 GridPane.setColumnSpan(leftValueCell, 1);
             }
         });
+
+        EasyBind.listen(viewModel.hasEqualLeftAndRightBinding(), (obs, old, isEqual) -> {
+            if (isEqual) {
+                hideDiff();
+            }
+        });
     }
 
     public void selectLeftValue() {
