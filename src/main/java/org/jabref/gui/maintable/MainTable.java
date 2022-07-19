@@ -11,8 +11,8 @@ import java.util.stream.Collectors;
 
 import javax.swing.undo.UndoManager;
 
-import javafx.collections.ListChangeListener;
 import javafx.scene.control.SelectionMode;
+import javafx.collections.ListChangeListener;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
@@ -35,17 +35,17 @@ import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.edit.EditAction;
 import org.jabref.gui.externalfiles.ImportHandler;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
-import org.jabref.gui.keyboard.KeyBinding;
-import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.maintable.columns.LibraryColumn;
 import org.jabref.gui.maintable.columns.MainTableColumn;
-import org.jabref.gui.util.ControlHelper;
-import org.jabref.gui.util.CustomLocalDragboard;
-import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.ViewModelTableRowFactory;
 import org.jabref.logic.importer.FetcherClientException;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.FetcherServerException;
+import org.jabref.gui.keyboard.KeyBinding;
+import org.jabref.gui.keyboard.KeyBindingRepository;
+import org.jabref.gui.util.ControlHelper;
+import org.jabref.gui.util.CustomLocalDragboard;
+import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.importer.ImportFormatReader;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
@@ -66,12 +66,10 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     private final StateManager stateManager;
     private final BibDatabaseContext database;
     private final MainTableDataModel model;
-    private final ClipBoardManager clipBoardManager;
-    private final ImportFormatReader importFormatReader;
 
     private final ImportHandler importHandler;
     private final CustomLocalDragboard localDragboard;
-
+    private final ClipBoardManager clipBoardManager;
     private long lastKeyPressTime;
     private String columnSearchTerm;
 
@@ -93,7 +91,6 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         this.database = Objects.requireNonNull(database);
         this.model = model;
         this.clipBoardManager = clipBoardManager;
-        this.importFormatReader = importFormatReader;
         UndoManager undoManager = libraryTab.getUndoManager();
         MainTablePreferences mainTablePreferences = preferencesService.getMainTablePreferences();
 
@@ -345,6 +342,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
             }
         }
         return entries;
+    }
 
     public void dropEntry(List<BibEntry> entriesToAdd) {
         for (BibEntry entry : entriesToAdd) {
