@@ -53,9 +53,9 @@ public class GenerateEntryFromIdAction extends SimpleCommand {
 
             boolean addEntryFlag;
             if (exception instanceof FetcherClientException) {
-                addEntryFlag = dialogService.showConfirmationDialogAndWait(Localization.lang("Failed to import by ID"), Localization.lang("Bibliographic data not found. Cause is likely the client side. Please check connection and identifier for correctness." + "\n" + fetcherExceptionMessage), Localization.lang("Add entry manually"));
+                addEntryFlag = dialogService.showConfirmationDialogAndWait(Localization.lang("Failed to import by ID"), Localization.lang("Bibliographic data not found. Cause is likely the client side. Please check connection and identifier for correctness.") + "\n" + fetcherExceptionMessage, Localization.lang("Add entry manually"));
             } else if (exception instanceof FetcherServerException) {
-                addEntryFlag = dialogService.showConfirmationDialogAndWait(Localization.lang("Failed to import by ID"), Localization.lang("Bibliographic data not found. Cause is likely the server side. Please try agan later." + "\n" + fetcherExceptionMessage), Localization.lang("Add entry manually"));
+                addEntryFlag = dialogService.showConfirmationDialogAndWait(Localization.lang("Failed to import by ID"), Localization.lang("Bibliographic data not found. Cause is likely the server side. Please try agan later.") + "\n" + fetcherExceptionMessage, Localization.lang("Add entry manually"));
             } else {
                 addEntryFlag = dialogService.showConfirmationDialogAndWait(Localization.lang("Failed to import by ID"), Localization.lang("Error message %0", fetcherExceptionMessage), Localization.lang("Add entry manually"));
             }
