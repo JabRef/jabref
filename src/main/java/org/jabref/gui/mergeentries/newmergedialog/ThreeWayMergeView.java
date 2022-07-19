@@ -3,8 +3,6 @@ package org.jabref.gui.mergeentries.newmergedialog;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.undo.CompoundEdit;
-
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
@@ -38,8 +36,6 @@ public class ThreeWayMergeView extends VBox {
 
     private final ThreeWayMergeViewModel viewModel;
     private final List<ThreeFieldValuesView> fieldValuesList = new ArrayList<>();
-
-    private final CompoundEdit mergeGroupsEdit = new CompoundEdit();
 
     private final FieldMergerFactory fieldMergerFactory;
 
@@ -164,12 +160,6 @@ public class ThreeWayMergeView extends VBox {
         toolbar.setDiffView(diffConfig.diffView());
         toolbar.setDiffHighlightingMethod(diffConfig.diffHighlightingMethod());
         toolbar.setShowDiff(true);
-    }
-
-    public void cancelGroupsMerge() {
-        if (mergeGroupsEdit.canUndo()) {
-            mergeGroupsEdit.undo();
-        }
     }
 
     public BibEntry getLeftEntry() {
