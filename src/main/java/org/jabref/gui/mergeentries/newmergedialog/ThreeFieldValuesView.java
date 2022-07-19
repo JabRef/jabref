@@ -1,10 +1,5 @@
 package org.jabref.gui.mergeentries.newmergedialog;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
@@ -23,10 +18,11 @@ import org.jabref.gui.mergeentries.newmergedialog.cell.MergeableFieldCell;
 import org.jabref.gui.mergeentries.newmergedialog.cell.MergedFieldCell;
 import org.jabref.gui.mergeentries.newmergedialog.diffhighlighter.SplitDiffHighlighter;
 import org.jabref.gui.mergeentries.newmergedialog.diffhighlighter.UnifiedDiffHighlighter;
+import org.jabref.gui.mergeentries.newmergedialog.fieldsmerger.FieldMerger;
+import org.jabref.gui.mergeentries.newmergedialog.fieldsmerger.FieldMergerFactory;
 import org.jabref.gui.mergeentries.newmergedialog.toolbar.ThreeWayMergeToolbar;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
-import org.jabref.model.strings.StringUtil;
 
 import com.tobiasdiez.easybind.EasyBind;
 import org.fxmisc.richtext.StyleClassedTextArea;
@@ -48,7 +44,7 @@ public class ThreeFieldValuesView {
 
     private final CompoundEdit fieldsMergedEdit = new CompoundEdit();
 
-    public ThreeFieldValuesView(Field field, BibEntry leftEntry, BibEntry rightEntry, BibEntry mergedEntry, int rowIndex) {
+    public ThreeFieldValuesView(Field field, BibEntry leftEntry, BibEntry rightEntry, BibEntry mergedEntry, FieldMergerFactory fieldMergerFactory, int rowIndex) {
         viewModel = new ThreeFieldValuesViewModel(field, leftEntry, rightEntry, mergedEntry);
 
         fieldNameCell = FieldNameCellFactory.create(field, rowIndex);
@@ -58,7 +54,7 @@ public class ThreeFieldValuesView {
 
         if (FieldNameCellFactory.isMergeableField(field)) {
             MergeableFieldCell mergeableFieldCell = (MergeableFieldCell) fieldNameCell;
-            mergeableFieldCell.setMergeCommand(new MergeCommand(mergeableFieldCell));
+            mergeableFieldCell.setMergeCommand(new MergeCommand(mergeableFieldCell, fieldMergerFactory.create(field)));
             mergeableFieldCell.setUnmergeCommand(new UnmergeCommand(mergeableFieldCell));
             mergeableFieldCell.setMergeAction(MergeableFieldCell.MergeAction.MERGE);
         }
@@ -169,9 +165,11 @@ public class ThreeFieldValuesView {
 
     public class MergeCommand extends SimpleCommand {
         private final MergeableFieldCell groupsFieldNameCell;
+        private final FieldMerger fieldMerger;
 
-        public MergeCommand(MergeableFieldCell groupsFieldCell) {
+        public MergeCommand(MergeableFieldCell groupsFieldCell, FieldMerger fieldMerger) {
             this.groupsFieldNameCell = groupsFieldCell;
+            this.fieldMerger = fieldMerger;
 
             this.executable.bind(Bindings.createBooleanBinding(() -> {
                 String leftEntryGroups = viewModel.getLeftEntry().getField(viewModel.getField()).orElse("");
@@ -188,7 +186,7 @@ public class ThreeFieldValuesView {
             String oldLeftFieldValue = viewModel.getLeftFieldValue();
             String oldRightFieldValue = viewModel.getRightFieldValue();
 
-            String mergedFields = mergeLeftAndRightEntryGroups(viewModel.getLeftFieldValue(), viewModel.getRightFieldValue());
+            String mergedFields = fieldMerger.merge(viewModel.getLeftFieldValue(), viewModel.getRightFieldValue());
             viewModel.setLeftFieldValue(mergedFields);
             viewModel.setRightFieldValue(mergedFields);
 
@@ -200,20 +198,6 @@ public class ThreeFieldValuesView {
             }
 
             groupsFieldNameCell.setMergeAction(MergeableFieldCell.MergeAction.UNMERGE);
-        }
-
-        private String mergeLeftAndRightEntryGroups(String left, String right) {
-            if (StringUtil.isBlank(left)) {
-                return right;
-            } else if (StringUtil.isBlank(right)) {
-                return left;
-            } else {
-                Set<String> leftGroups = new HashSet<>(Arrays.stream(left.split(", ")).toList());
-                List<String> rightGroups = Arrays.stream(right.split(", ")).toList();
-                leftGroups.addAll(rightGroups);
-
-                return String.join(", ", leftGroups);
-            }
         }
     }
 

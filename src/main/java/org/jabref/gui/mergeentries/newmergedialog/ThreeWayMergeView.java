@@ -13,6 +13,8 @@ import javafx.scene.layout.RowConstraints;
 import javafx.scene.layout.VBox;
 import javafx.stage.Screen;
 
+import org.jabref.gui.Globals;
+import org.jabref.gui.mergeentries.newmergedialog.fieldsmerger.FieldMergerFactory;
 import org.jabref.gui.mergeentries.newmergedialog.toolbar.ThreeWayMergeToolbar;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
@@ -39,9 +41,13 @@ public class ThreeWayMergeView extends VBox {
 
     private final CompoundEdit mergeGroupsEdit = new CompoundEdit();
 
+    private final FieldMergerFactory fieldMergerFactory;
+
     public ThreeWayMergeView(BibEntry leftEntry, BibEntry rightEntry, String leftHeader, String rightHeader) {
         getStylesheets().add(ThreeWayMergeView.class.getResource("ThreeWayMergeView.css").toExternalForm());
         viewModel = new ThreeWayMergeViewModel((BibEntry) leftEntry.clone(), (BibEntry) rightEntry.clone(), leftHeader, rightHeader);
+        // TODO: Inject 'preferenceService' into the constructor
+        this.fieldMergerFactory = new FieldMergerFactory(Globals.prefs);
 
         mergeGridPane = new GridPane();
         scrollPane = new ScrollPane();
@@ -124,7 +130,7 @@ public class ThreeWayMergeView extends VBox {
     private void addFieldValues(int fieldIndex) {
         Field field = getFieldAtIndex(fieldIndex);
 
-        ThreeFieldValuesView fieldValues = new ThreeFieldValuesView(field, getLeftEntry(), getRightEntry(), getMergedEntry(), fieldIndex);
+        ThreeFieldValuesView fieldValues = new ThreeFieldValuesView(field, getLeftEntry(), getRightEntry(), getMergedEntry(), fieldMergerFactory, fieldIndex);
 
         fieldValuesList.add(fieldIndex, fieldValues);
 
