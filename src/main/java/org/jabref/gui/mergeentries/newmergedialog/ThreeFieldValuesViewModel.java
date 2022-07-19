@@ -100,9 +100,7 @@ public class ThreeFieldValuesViewModel {
     }
 
     public boolean hasEqualLeftAndRightValues() {
-        return (!StringUtil.isNullOrEmpty(leftFieldValue.get()) &&
-                !StringUtil.isNullOrEmpty(rightFieldValue.get()) &&
-                leftFieldValue.get().equals(rightFieldValue.get()));
+        return leftFieldValue.get().equals(rightFieldValue.get());
     }
 
     public void selectLeftValue() {
