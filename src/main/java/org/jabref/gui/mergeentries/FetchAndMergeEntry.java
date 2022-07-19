@@ -166,7 +166,7 @@ public class FetchAndMergeEntry {
                           }
                       })
                       .onFailure(exception -> {
-                          LOGGER.error("Error while fetching entry with " + fetcher.getName(), exception);
+                          LOGGER.error("Error while fetching entry with {} ", fetcher.getName(), exception);
                           dialogService.showErrorDialogAndWait(Localization.lang("Error while fetching from %0", fetcher.getName()), exception);
                       })
                       .executeWith(taskExecutor);

@@ -11,9 +11,10 @@ import org.jabref.gui.externalfiles.ImportHandler;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.TaskExecutor;
-import org.jabref.logic.JabRefException;
 import org.jabref.logic.importer.CompositeIdFetcher;
+import org.jabref.logic.importer.FetcherClientException;
 import org.jabref.logic.importer.FetcherException;
+import org.jabref.logic.importer.FetcherServerException;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.types.StandardEntryType;
@@ -47,11 +48,17 @@ public class GenerateEntryFromIdAction extends SimpleCommand {
         backgroundTask.titleProperty().set(Localization.lang("Import by ID"));
         backgroundTask.showToUser(true);
         backgroundTask.onRunning(() -> dialogService.notify("%s".formatted(backgroundTask.messageProperty().get())));
-        backgroundTask.onFailure((e) -> {
-            // When unable to import by ID, present the user options to cancel or add entry manually
-            boolean addEntryFlag = dialogService.showConfirmationDialogAndWait(Localization.lang("Failed to import by ID"),
-                                                                               e.getMessage(),
-                                                                               Localization.lang("Add entry manually"));
+        backgroundTask.onFailure((exception) -> {
+            String fetcherExceptionMessage = exception.getMessage();
+
+            boolean addEntryFlag;
+            if (exception instanceof FetcherClientException) {
+                addEntryFlag = dialogService.showConfirmationDialogAndWait(Localization.lang("Failed to import by ID"), Localization.lang("Bibliographic data not found. Cause is likely the client side. Please check connection and identifier for correctness." + "\n" + fetcherExceptionMessage), Localization.lang("Add entry manually"));
+            } else if (exception instanceof FetcherServerException) {
+                addEntryFlag = dialogService.showConfirmationDialogAndWait(Localization.lang("Failed to import by ID"), Localization.lang("Bibliographic data not found. Cause is likely the server side. Please try agan later." + "\n" + fetcherExceptionMessage), Localization.lang("Add entry manually"));
+            } else {
+                addEntryFlag = dialogService.showConfirmationDialogAndWait(Localization.lang("Failed to import by ID"), Localization.lang("Error message %0", fetcherExceptionMessage), Localization.lang("Add entry manually"));
+            }
             if (addEntryFlag) {
                 // add entry manually
                 new NewEntryAction(libraryTab.frame(), StandardEntryType.Article, dialogService,
@@ -76,17 +83,12 @@ public class GenerateEntryFromIdAction extends SimpleCommand {
     private BackgroundTask<Optional<BibEntry>> searchAndImportEntryInBackground() {
         return new BackgroundTask<>() {
             @Override
-            protected Optional<BibEntry> call() throws JabRefException {
+            protected Optional<BibEntry> call() throws FetcherException {
                 if (isCanceled()) {
                     return Optional.empty();
                 }
-
                 updateMessage(Localization.lang("Searching..."));
-                try {
-                    return new CompositeIdFetcher(preferencesService.getImportFormatPreferences()).performSearchById(identifier);
-                } catch (FetcherException fetcherException) {
-                    throw new JabRefException("Fetcher error: %s".formatted(fetcherException.getMessage()));
-                }
+                return new CompositeIdFetcher(preferencesService.getImportFormatPreferences()).performSearchById(identifier);
             }
         };
     }

@@ -362,10 +362,10 @@ public class URLDownload {
                 connection = new URLDownload(newUrl).openConnection();
             }
             if ((status >= 400) && (status < 500)) {
-                throw new IOException(new FetcherClientException("Client error. Status code " + status));
+                throw new IOException(new FetcherClientException("Encountered HTTP Status code " + status));
             }
             if (status >= 500) {
-                throw new IOException(new FetcherServerException("Server error. Status Code " + status));
+                throw new IOException(new FetcherServerException("Encountered HTTP Status Code " + status));
             }
         }
         // this does network i/o: GET + read returned headers
