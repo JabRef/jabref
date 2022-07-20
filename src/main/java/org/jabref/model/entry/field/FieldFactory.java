@@ -83,14 +83,13 @@ public class FieldFactory {
               StandardField.fromName(fieldName)),
               SpecialField.fromName(fieldName)),
               IEEEField.fromName(fieldName)),
-              BiblatexSoftwareField.fromName(type,fieldName)),
+              BiblatexSoftwareField.fromName(type, fieldName)),
               BiblatexApaField.fromName(type, fieldName))
               .orElse(new UnknownField(fieldName));
     }
 
     public static Field parseField(String fieldName) {
         return parseField(null, fieldName);
-
     }
 
     public static Set<Field> getKeyFields() {

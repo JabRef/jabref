@@ -48,13 +48,14 @@ public enum BiblatexApaField implements Field {
     }
 
     public static <T> Optional<BiblatexApaField> fromName(T type, String name) {
-        if(!(type instanceof BiblatexApaEntryType)) {
+        if (!(type instanceof BiblatexApaEntryType)) {
             return Optional.empty();
         }
         return Arrays.stream(BiblatexApaField.values())
                      .filter(field -> field.getName().equalsIgnoreCase(name))
                      .findAny();
     }
+
     @Override
     public Set<FieldProperty> getProperties() {
         return Collections.unmodifiableSet(properties);

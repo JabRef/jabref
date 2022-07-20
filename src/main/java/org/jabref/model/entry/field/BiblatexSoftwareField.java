@@ -47,14 +47,15 @@ public enum BiblatexSoftwareField implements Field {
         this.properties = EnumSet.of(first, rest);
     }
 
-    public static<T> Optional<BiblatexSoftwareField> fromName(T type, String name) {
-        if(!(type instanceof BiblatexSoftwareEntryType)) {
+    public static <T> Optional<BiblatexSoftwareField> fromName(T type, String name) {
+        if (!(type instanceof BiblatexSoftwareEntryType)) {
             return Optional.empty();
         }
         return Arrays.stream(BiblatexSoftwareField.values())
                      .filter(field -> field.getName().equalsIgnoreCase(name))
                      .findAny();
     }
+
     @Override
     public Set<FieldProperty> getProperties() {
         return Collections.unmodifiableSet(properties);
