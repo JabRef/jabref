@@ -73,11 +73,15 @@ public class FieldRowViewModel {
 
         hasEqualLeftAndRight = Bindings.createBooleanBinding(this::hasEqualLeftAndRightValues, leftFieldValueProperty(), rightFieldValueProperty());
 
-        if (StringUtil.isNullOrEmpty(leftFieldValue.get())) {
-            selectRightValue();
-        } else {
-            selectLeftValue();
-        }
+        selectNonEmptyValue();
+
+        EasyBind.listen(isFieldsMergedProperty(), (obs, old, areFieldsMerged) -> {
+            if (areFieldsMerged) {
+                selectLeftValue();
+            } else {
+                selectNonEmptyValue();
+            }
+        });
 
         EasyBind.subscribe(selectionProperty(), selection -> {
             switch (selection) {
@@ -97,6 +101,14 @@ public class FieldRowViewModel {
         });
 
         EasyBind.subscribe(hasEqualLeftAndRightBinding(), this::setIsFieldsMerged);
+    }
+
+    public void selectNonEmptyValue() {
+        if (StringUtil.isNullOrEmpty(leftFieldValue.get())) {
+            selectRightValue();
+        } else {
+            selectLeftValue();
+        }
     }
 
     public boolean hasEqualLeftAndRightValues() {
