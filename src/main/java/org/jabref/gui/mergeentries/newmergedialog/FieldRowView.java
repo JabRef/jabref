@@ -5,7 +5,6 @@ import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 import javax.swing.undo.CompoundEdit;
 
-import javafx.beans.binding.Bindings;
 import javafx.beans.property.ReadOnlyStringProperty;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.GridPane;
@@ -170,19 +169,14 @@ public class FieldRowView {
     }
 
     public class MergeCommand extends SimpleCommand {
-        private final MergeableFieldCell groupsFieldNameCell;
+        private final MergeableFieldCell mergeableFieldCell;
         private final FieldMerger fieldMerger;
 
-        public MergeCommand(MergeableFieldCell groupsFieldCell, FieldMerger fieldMerger) {
-            this.groupsFieldNameCell = groupsFieldCell;
+        public MergeCommand(MergeableFieldCell mergeableFieldCell, FieldMerger fieldMerger) {
+            this.mergeableFieldCell = mergeableFieldCell;
             this.fieldMerger = fieldMerger;
 
-            this.executable.bind(Bindings.createBooleanBinding(() -> {
-                String leftEntryGroups = viewModel.getLeftEntry().getField(viewModel.getField()).orElse("");
-                String rightEntryGroups = viewModel.getRightEntry().getField(viewModel.getField()).orElse("");
-
-                return !leftEntryGroups.equals(rightEntryGroups);
-            }));
+            this.executable.bind(viewModel.hasEqualLeftAndRightBinding().not());
         }
 
         @Override
@@ -203,22 +197,22 @@ public class FieldRowView {
                 fieldsMergedEdit.end();
             }
 
-            groupsFieldNameCell.setMergeAction(MergeableFieldCell.MergeAction.UNMERGE);
+            mergeableFieldCell.setMergeAction(MergeableFieldCell.MergeAction.UNMERGE);
         }
     }
 
     public class UnmergeCommand extends SimpleCommand {
-        private final MergeableFieldCell groupsFieldCell;
+        private final MergeableFieldCell mergeableFieldCell;
 
-        public UnmergeCommand(MergeableFieldCell groupsFieldCell) {
-            this.groupsFieldCell = groupsFieldCell;
+        public UnmergeCommand(MergeableFieldCell mergeableFieldCell) {
+            this.mergeableFieldCell = mergeableFieldCell;
         }
 
         @Override
         public void execute() {
             if (fieldsMergedEdit.canUndo()) {
                 fieldsMergedEdit.undo();
-                groupsFieldCell.setMergeAction(MergeableFieldCell.MergeAction.MERGE);
+                mergeableFieldCell.setMergeAction(MergeableFieldCell.MergeAction.MERGE);
             }
         }
     }
