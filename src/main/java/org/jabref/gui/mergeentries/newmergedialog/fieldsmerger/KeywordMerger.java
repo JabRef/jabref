@@ -1,10 +1,8 @@
 package org.jabref.gui.mergeentries.newmergedialog.fieldsmerger;
 
 import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Objects;
-import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.jabref.model.strings.StringUtil;
 import org.jabref.preferences.PreferencesService;
@@ -28,11 +26,9 @@ public class KeywordMerger implements FieldMerger {
         } else if (StringUtil.isBlank(keywordsB)) {
             return keywordsA;
         } else {
-            Set<String> keywordsASet = new HashSet<>(Arrays.stream(keywordsA.split(keywordSeparator)).toList());
-            List<String> keywordsBList = Arrays.stream(keywordsB.split(keywordSeparator)).toList();
-            keywordsASet.addAll(keywordsBList);
-
-            return String.join(keywordSeparator, keywordsASet);
+            return Arrays.stream((keywordsA + keywordSeparator + keywordsB).split(keywordSeparator))
+                         .distinct()
+                         .collect(Collectors.joining(keywordSeparator));
         }
     }
 }
