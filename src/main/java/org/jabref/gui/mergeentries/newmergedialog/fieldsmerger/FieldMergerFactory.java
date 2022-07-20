@@ -16,12 +16,14 @@ public class FieldMergerFactory {
             return new GroupMerger();
         } else if (field.equals(StandardField.KEYWORDS)) {
             return new KeywordMerger(preferencesService);
+        } else if (field == StandardField.COMMENT) {
+            return new CommentMerger();
         } else {
             throw new IllegalArgumentException("No implementation found for merging the given field: " + field.getDisplayName());
         }
     }
 
     public static boolean canMerge(Field field) {
-        return field == StandardField.GROUPS || field == StandardField.KEYWORDS;
+        return field == StandardField.GROUPS || field == StandardField.KEYWORDS || field == StandardField.COMMENT;
     }
 }
