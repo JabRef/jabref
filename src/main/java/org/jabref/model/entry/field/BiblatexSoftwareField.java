@@ -6,6 +6,8 @@ import java.util.EnumSet;
 import java.util.Optional;
 import java.util.Set;
 
+import org.jabref.model.entry.types.BiblatexSoftwareEntryType;
+
 public enum BiblatexSoftwareField implements Field {
 
     HALID("hal_id"),
@@ -45,7 +47,10 @@ public enum BiblatexSoftwareField implements Field {
         this.properties = EnumSet.of(first, rest);
     }
 
-    public static Optional<BiblatexSoftwareField> fromName(String name) {
+    public static<T> Optional<BiblatexSoftwareField> fromName(T type, String name) {
+        if(!(type instanceof BiblatexSoftwareEntryType)) {
+            return Optional.empty();
+        }
         return Arrays.stream(BiblatexSoftwareField.values())
                      .filter(field -> field.getName().equalsIgnoreCase(name))
                      .findAny();

@@ -6,6 +6,8 @@ import java.util.EnumSet;
 import java.util.Optional;
 import java.util.Set;
 
+import org.jabref.model.entry.types.BiblatexApaEntryType;
+
 public enum BiblatexApaField implements Field {
 
     AMENDMENT("amendment"),
@@ -45,7 +47,10 @@ public enum BiblatexApaField implements Field {
         this.properties = EnumSet.of(first, rest);
     }
 
-    public static Optional<BiblatexApaField> fromName(String name) {
+    public static <T> Optional<BiblatexApaField> fromName(T type, String name) {
+        if(!(type instanceof BiblatexApaEntryType)) {
+            return Optional.empty();
+        }
         return Arrays.stream(BiblatexApaField.values())
                      .filter(field -> field.getName().equalsIgnoreCase(name))
                      .findAny();
@@ -73,4 +78,5 @@ public enum BiblatexApaField implements Field {
             return displayName;
         }
     }
+
 }

@@ -65,6 +65,7 @@ public class MetaDataParser {
                 String user = entry.getKey().substring(MetaData.FILE_DIRECTORY.length() + 1);
                 metaData.setUserFileDirectory(user, getSingleItem(value));
             } else if (entry.getKey().startsWith(MetaData.SELECTOR_META_PREFIX)) {
+                // edge case, it might be one special field e.g. article from biblatex-apa, but we can't distinguish this from any other field and rather prefer to handle it as UnknownField
                 metaData.addContentSelector(ContentSelectors.parse(FieldFactory.parseField(entry.getKey().substring(MetaData.SELECTOR_META_PREFIX.length())), StringUtil.unquote(entry.getValue(), MetaData.ESCAPE_CHARACTER)));
             } else if (entry.getKey().startsWith(MetaData.FILE_DIRECTORY + "Latex-")) {
                 // The user name comes directly after "FILE_DIRECTORYLatex-"
