@@ -16,6 +16,8 @@ import org.jabref.model.entry.types.EntryTypeFactory;
 import org.jabref.model.strings.StringUtil;
 
 import com.tobiasdiez.easybind.EasyBind;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class FieldRowViewModel {
     public enum Selection {
@@ -28,7 +30,7 @@ public class FieldRowViewModel {
         NONE
     }
 
-
+    private final Logger LOGGER = LoggerFactory.getLogger(FieldRowViewModel.class);
     private final BooleanProperty isFieldsMerged = new SimpleBooleanProperty(Boolean.FALSE);
 
     private final ObjectProperty<Selection> selection = new SimpleObjectProperty<>();
@@ -76,6 +78,7 @@ public class FieldRowViewModel {
         selectNonEmptyValue();
 
         EasyBind.listen(isFieldsMergedProperty(), (obs, old, areFieldsMerged) -> {
+            LOGGER.debug("Field are merged: {}", areFieldsMerged);
             if (areFieldsMerged) {
                 selectLeftValue();
             } else {
@@ -84,6 +87,7 @@ public class FieldRowViewModel {
         });
 
         EasyBind.subscribe(selectionProperty(), selection -> {
+            LOGGER.debug("Selecting {}' value for field {}", selection, field.getDisplayName());
             switch (selection) {
                 case LEFT -> EasyBind.subscribe(leftFieldValueProperty(), this::setMergedFieldValue);
                 case RIGHT -> EasyBind.subscribe(rightFieldValueProperty(), this::setMergedFieldValue);
@@ -91,6 +95,7 @@ public class FieldRowViewModel {
         });
 
         EasyBind.subscribe(mergedFieldValueProperty(), mergedValue -> {
+            LOGGER.debug("Merged value is {} for field {}", mergedValue, field.getDisplayName());
             if (mergedValue.equals(getLeftFieldValue())) {
                 selectLeftValue();
             } else if (getMergedFieldValue().equals(getRightFieldValue())) {
