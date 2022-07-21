@@ -606,6 +606,7 @@ public class BibDatabase {
             allFields.addAll(e.getFields());
         }
         visibleFields.addAll(allFields.stream().filter(field -> !FieldFactory.isInternalField(field))
+                             .filter(field -> StringUtil.isNotBlank(field.getName()))
                                      .collect(Collectors.toSet()));
     }
 
