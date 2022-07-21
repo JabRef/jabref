@@ -10,11 +10,8 @@ import org.jabref.gui.icon.IconTheme;
 
 public class NotificationPaneAdapter extends LibraryTab.DatabaseNotification {
 
-    public static final String STYLE_CLASS = "trans-notification-pane";
-
     public NotificationPaneAdapter(Node content) {
         super(content);
-        getStyleClass().add(STYLE_CLASS);
     }
 
     public void notify(int affectedEntries, int totalEntries) {
