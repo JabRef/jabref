@@ -2,6 +2,8 @@ package org.jabref.gui.edit.automaticfiededitor.renamefield;
 
 import java.util.List;
 
+import javafx.beans.binding.Bindings;
+import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -16,6 +18,12 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.strings.StringUtil;
+
+import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
+import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
+import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
+import de.saxsys.mvvmfx.utils.validation.Validator;
 
 public class RenameFieldViewModel extends AbstractAutomaticFieldEditorTabViewModel {
     public static final int TAB_INDEX = 2;
@@ -24,10 +32,34 @@ public class RenameFieldViewModel extends AbstractAutomaticFieldEditorTabViewMod
     private final List<BibEntry> selectedEntries;
     private final NamedCompound dialogEdits;
 
+    private final Validator fieldValidator;
+
+    private final Validator fieldNameValidator;
+
+    private final BooleanBinding canRename;
+
     public RenameFieldViewModel(List<BibEntry> selectedEntries, BibDatabase database, NamedCompound dialogEdits) {
         super(database);
         this.selectedEntries = selectedEntries;
         this.dialogEdits = dialogEdits;
+
+        fieldValidator = new FunctionBasedValidator<>(selectedField, field -> StringUtil.isNotBlank(field.getName()),
+                ValidationMessage.error("Field cannot be empty"));
+        fieldNameValidator = new FunctionBasedValidator<>(newFieldName, StringUtil::isNotBlank, ValidationMessage.error("Field name cannot be blank"));
+
+        canRename = Bindings.and(fieldValidationStatus().validProperty(), fieldNameValidationStatus().validProperty());
+    }
+
+    public ValidationStatus fieldValidationStatus() {
+        return fieldValidator.getValidationStatus();
+    }
+
+    public ValidationStatus fieldNameValidationStatus() {
+        return fieldNameValidator.getValidationStatus();
+    }
+
+    public BooleanBinding canRenameProperty() {
+        return canRename;
     }
 
     public String getNewFieldName() {

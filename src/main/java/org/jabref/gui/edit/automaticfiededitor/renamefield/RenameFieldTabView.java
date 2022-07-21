@@ -3,6 +3,7 @@ package org.jabref.gui.edit.automaticfiededitor.renamefield;
 import java.util.List;
 
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 
@@ -15,10 +16,13 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 
 import com.airhacks.afterburner.views.ViewLoader;
+import com.tobiasdiez.easybind.EasyBind;
 
 import static org.jabref.gui.customentrytypes.CustomEntryTypeDialogViewModel.FIELD_STRING_CONVERTER;
 
 public class RenameFieldTabView extends AbstractAutomaticFieldEditorTabView implements AutomaticFieldEditorTab {
+    @FXML
+    private Button renameButton;
     @FXML
     private ComboBox<Field> fieldComboBox;
     @FXML
@@ -48,6 +52,10 @@ public class RenameFieldTabView extends AbstractAutomaticFieldEditorTabView impl
         fieldComboBox.setConverter(FIELD_STRING_CONVERTER);
 
         fieldComboBox.valueProperty().bindBidirectional(viewModel.selectedFieldProperty());
+        EasyBind.listen(fieldComboBox.getEditor().textProperty(), observable -> fieldComboBox.commitValue());
+
+        renameButton.disableProperty().bind(viewModel.canRenameProperty().not());
+
         newFieldNameTextField.textProperty().bindBidirectional(viewModel.newFieldNameProperty());
     }
 
