@@ -97,6 +97,16 @@ public class CopyOrMoveFieldContentTabView extends AbstractAutomaticFieldEditorT
         return Localization.lang("Copy or Move content");
     }
 
+    @Override
+    public void registerListener(Object object) {
+        viewModel.registerListener(object);
+    }
+
+    @Override
+    public void unregisterListener(Object object) {
+        viewModel.registerListener(object);
+    }
+
     @FXML
     void copyContent() {
         viewModel.copyValue();

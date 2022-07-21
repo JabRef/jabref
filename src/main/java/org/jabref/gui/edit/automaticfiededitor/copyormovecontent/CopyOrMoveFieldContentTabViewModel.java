@@ -9,6 +9,7 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 
 import org.jabref.gui.edit.automaticfiededitor.AbstractAutomaticFieldEditorTabViewModel;
+import org.jabref.gui.edit.automaticfiededitor.AutomaticFieldEditorEvent;
 import org.jabref.gui.edit.automaticfiededitor.MoveFieldValueAction;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableFieldChange;
@@ -19,6 +20,7 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.strings.StringUtil;
 
 public class CopyOrMoveFieldContentTabViewModel extends AbstractAutomaticFieldEditorTabViewModel {
+    public static final int TAB_INDEX = 1;
     private final ObjectProperty<Field> fromField = new SimpleObjectProperty<>(StandardField.ABSTRACT);
 
     private final ObjectProperty<Field> toField = new SimpleObjectProperty<>(StandardField.AUTHOR);
@@ -59,7 +61,7 @@ public class CopyOrMoveFieldContentTabViewModel extends AbstractAutomaticFieldEd
 
     public void copyValue() {
         NamedCompound copyFieldValueEdit = new NamedCompound("COPY_FIELD_VALUE");
-
+        int affectedEntriesCount = 0;
         for (BibEntry entry : selectedEntries) {
             String fromFieldValue = entry.getField(fromField.get()).orElse("");
             String toFieldValue = entry.getField(toField.get()).orElse("");
@@ -68,18 +70,19 @@ public class CopyOrMoveFieldContentTabViewModel extends AbstractAutomaticFieldEd
                 if (StringUtil.isNotBlank(fromFieldValue)) {
                     entry.setField(toField.get(), fromFieldValue);
                 }
-
+                // TODO: Wrap this in the above if statement
                 copyFieldValueEdit.addEdit(new UndoableFieldChange(entry,
                                                                    toField.get(),
                                                                    toFieldValue,
                                                                    fromFieldValue));
+                affectedEntriesCount++;
             }
         }
-
         if (copyFieldValueEdit.hasEdits()) {
             copyFieldValueEdit.end();
             dialogEdits.addEdit(copyFieldValueEdit);
         }
+        eventBus.post(new AutomaticFieldEditorEvent(TAB_INDEX, affectedEntriesCount));
     }
 
     public void moveValue() {

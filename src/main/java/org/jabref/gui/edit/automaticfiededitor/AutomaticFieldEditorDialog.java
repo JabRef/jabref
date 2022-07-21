@@ -1,5 +1,6 @@
 package org.jabref.gui.edit.automaticfiededitor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.undo.UndoManager;
@@ -16,6 +17,7 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 
 import com.airhacks.afterburner.views.ViewLoader;
+import com.google.common.eventbus.Subscribe;
 
 public class AutomaticFieldEditorDialog extends BaseDialog<String> {
     @FXML
@@ -26,6 +28,8 @@ public class AutomaticFieldEditorDialog extends BaseDialog<String> {
     private final BibDatabase database;
     private final List<BibEntry> selectedEntries;
     private AutomaticFieldEditorViewModel viewModel;
+
+    private List<NotificationPaneAdapter> notificationPanes = new ArrayList<>();
 
     public AutomaticFieldEditorDialog(List<BibEntry> selectedEntries, BibDatabase database) {
         this.selectedEntries = selectedEntries;
@@ -59,8 +63,20 @@ public class AutomaticFieldEditorDialog extends BaseDialog<String> {
         viewModel = new AutomaticFieldEditorViewModel(selectedEntries, database, undoManager);
 
         for (AutomaticFieldEditorTab tabModel : viewModel.getFieldEditorTabs()) {
-            tabPane.getTabs().add(new Tab(tabModel.getTabName(), tabModel.getContent()));
+            NotificationPaneAdapter notificationPane = new NotificationPaneAdapter(tabModel.getContent());
+            notificationPanes.add(notificationPane);
+            tabModel.registerListener(this);
+            tabPane.getTabs().add(new Tab(tabModel.getTabName(), notificationPane));
         }
+    }
+
+    @Subscribe
+    private void onEntriesUpdated(AutomaticFieldEditorEvent event) {
+        assert event.getTabIndex() < notificationPanes.size() : "The tab index is not associated with any of the automatic field editor tabs.";
+        assert event.getNumberOfAffectedEntries() <= selectedEntries.size() : "The number of affected entries cannot exceed the number of selected entries.";
+
+        notificationPanes.get(event.getTabIndex())
+                         .notify(event.getNumberOfAffectedEntries(), selectedEntries.size());
     }
 
     private void saveChanges() {

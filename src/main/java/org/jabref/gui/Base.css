@@ -1151,6 +1151,10 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-background-color: -jr-accent;
 }
 
+.trans-notification-pane .notification-bar > .pane{
+    -fx-background-color: rgba(64, 64, 64, 0.85);
+}
+
 .jfx-color-picker:armed,
 .jfx-color-picker:hover,
 .jfx-color-picker:focused,

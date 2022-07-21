@@ -15,8 +15,14 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 
-public abstract class AbstractAutomaticFieldEditorTabViewModel extends AbstractViewModel {
+import com.google.common.eventbus.EventBus;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+public abstract class AbstractAutomaticFieldEditorTabViewModel extends AbstractViewModel {
+    public static final Logger LOGGER = LoggerFactory.getLogger(AbstractAutomaticFieldEditorTabViewModel.class);
+
+    protected final EventBus eventBus = new EventBus();
     private final ObservableList<Field> allFields = FXCollections.observableArrayList();
 
     public AbstractAutomaticFieldEditorTabViewModel(BibDatabase bibDatabase) {
@@ -34,5 +40,19 @@ public abstract class AbstractAutomaticFieldEditorTabViewModel extends AbstractV
         Set<Field> fieldsSet = new HashSet<>(allFields);
         fieldsSet.addAll(fields);
         allFields.setAll(fieldsSet);
+    }
+
+    public void registerListener(Object object) {
+        eventBus.register(object);
+    }
+
+    public void unregisterListener(Object listener) {
+        try {
+            eventBus.unregister(listener);
+        } catch (
+                IllegalArgumentException e) {
+            // occurs if the event source has not been registered, should not prevent shutdown
+            LOGGER.debug("Problem unregistering", e);
+        }
     }
 }
