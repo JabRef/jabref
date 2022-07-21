@@ -7,7 +7,6 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
-import javafx.util.StringConverter;
 
 import org.jabref.gui.edit.automaticfiededitor.AbstractAutomaticFieldEditorTabView;
 import org.jabref.gui.edit.automaticfiededitor.AutomaticFieldEditorTab;
@@ -16,9 +15,10 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
-import org.jabref.model.entry.field.FieldFactory;
 
 import com.airhacks.afterburner.views.ViewLoader;
+
+import static org.jabref.gui.customentrytypes.CustomEntryTypeDialogViewModel.FIELD_STRING_CONVERTER;
 
 public class CopyOrMoveFieldContentTabView extends AbstractAutomaticFieldEditorTabView implements AutomaticFieldEditorTab {
     @FXML
@@ -64,29 +64,9 @@ public class CopyOrMoveFieldContentTabView extends AbstractAutomaticFieldEditorT
         fromFieldComboBox.getItems().setAll(viewModel.getAllFields());
         toFieldComboBox.getItems().setAll(viewModel.getAllFields());
 
-        fromFieldComboBox.setConverter(new StringConverter<>() {
-            @Override
-            public String toString(Field field) {
-                return field.getDisplayName();
-            }
+        fromFieldComboBox.setConverter(FIELD_STRING_CONVERTER);
 
-            @Override
-            public Field fromString(String name) {
-                return FieldFactory.parseField(name);
-            }
-        });
-
-        toFieldComboBox.setConverter(new StringConverter<>() {
-            @Override
-            public String toString(Field field) {
-                return field == null ? "" : field.getDisplayName();
-            }
-
-            @Override
-            public Field fromString(String name) {
-                return FieldFactory.parseField(name);
-            }
-        });
+        toFieldComboBox.setConverter(FIELD_STRING_CONVERTER);
 
         fromFieldComboBox.valueProperty().bindBidirectional(viewModel.fromFieldProperty());
         toFieldComboBox.valueProperty().bindBidirectional(viewModel.toFieldProperty());

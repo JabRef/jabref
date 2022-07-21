@@ -7,7 +7,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
-import javafx.util.StringConverter;
 
 import org.jabref.gui.edit.automaticfiededitor.AbstractAutomaticFieldEditorTabView;
 import org.jabref.gui.undo.NamedCompound;
@@ -15,9 +14,10 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
-import org.jabref.model.entry.field.FieldFactory;
 
 import com.airhacks.afterburner.views.ViewLoader;
+
+import static org.jabref.gui.customentrytypes.CustomEntryTypeDialogViewModel.FIELD_STRING_CONVERTER;
 
 public class EditFieldContentTabView extends AbstractAutomaticFieldEditorTabView {
     public Button appendValueButton;
@@ -50,17 +50,7 @@ public class EditFieldContentTabView extends AbstractAutomaticFieldEditorTabView
     @FXML
     public void initialize() {
         viewModel = new EditFieldContentViewModel(database, selectedEntries, dialogEdits);
-        fieldComboBox.setConverter(new StringConverter<>() {
-            @Override
-            public String toString(Field field) {
-                return field == null ? "" : field.getDisplayName();
-            }
-
-            @Override
-            public Field fromString(String name) {
-                return FieldFactory.parseField(name);
-            }
-        });
+        fieldComboBox.setConverter(FIELD_STRING_CONVERTER);
 
         fieldComboBox.getItems().setAll(viewModel.getAllFields());
 

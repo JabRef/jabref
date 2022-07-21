@@ -5,7 +5,6 @@ import java.util.List;
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
-import javafx.util.StringConverter;
 
 import org.jabref.gui.edit.automaticfiededitor.AbstractAutomaticFieldEditorTabView;
 import org.jabref.gui.edit.automaticfiededitor.AutomaticFieldEditorTab;
@@ -14,9 +13,10 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
-import org.jabref.model.entry.field.FieldFactory;
 
 import com.airhacks.afterburner.views.ViewLoader;
+
+import static org.jabref.gui.customentrytypes.CustomEntryTypeDialogViewModel.FIELD_STRING_CONVERTER;
 
 public class RenameFieldTabView extends AbstractAutomaticFieldEditorTabView implements AutomaticFieldEditorTab {
     @FXML
@@ -45,17 +45,7 @@ public class RenameFieldTabView extends AbstractAutomaticFieldEditorTabView impl
         fieldComboBox.getItems().setAll(viewModel.getAllFields());
         fieldComboBox.getSelectionModel().selectFirst();
 
-        fieldComboBox.setConverter(new StringConverter<>() {
-            @Override
-            public String toString(Field field) {
-                return field.getDisplayName();
-            }
-
-            @Override
-            public Field fromString(String name) {
-                return FieldFactory.parseField(name);
-            }
-        });
+        fieldComboBox.setConverter(FIELD_STRING_CONVERTER);
 
         fieldComboBox.valueProperty().bindBidirectional(viewModel.selectedFieldProperty());
         newFieldNameTextField.textProperty().bindBidirectional(viewModel.newFieldNameProperty());
