@@ -80,6 +80,16 @@ public class EditFieldContentTabView extends AbstractAutomaticFieldEditorTabView
         return Localization.lang("Edit content");
     }
 
+    @Override
+    public void registerListener(Object object) {
+        viewModel.registerListener(object);
+    }
+
+    @Override
+    public void unregisterListener(Object object) {
+        viewModel.registerListener(object);
+    }
+
     @FXML
     void appendToFieldValue() {
         viewModel.appendToFieldValue();
