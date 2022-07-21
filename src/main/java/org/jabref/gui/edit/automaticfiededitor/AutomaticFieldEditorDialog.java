@@ -72,11 +72,11 @@ public class AutomaticFieldEditorDialog extends BaseDialog<String> {
 
     @Subscribe
     private void onEntriesUpdated(AutomaticFieldEditorEvent event) {
-        assert event.getTabIndex() < notificationPanes.size() : "The tab index is not associated with any of the automatic field editor tabs.";
-        assert event.getNumberOfAffectedEntries() <= selectedEntries.size() : "The number of affected entries cannot exceed the number of selected entries.";
+        assert event.tabIndex() < notificationPanes.size() : "The tab index is not associated with any of the automatic field editor tabs.";
+        assert event.numberOfAffectedEntries() <= selectedEntries.size() : "The number of affected entries cannot exceed the number of selected entries.";
 
-        notificationPanes.get(event.getTabIndex())
-                         .notify(event.getNumberOfAffectedEntries(), selectedEntries.size());
+        notificationPanes.get(event.tabIndex())
+                         .notify(event.numberOfAffectedEntries(), selectedEntries.size());
     }
 
     private void saveChanges() {
