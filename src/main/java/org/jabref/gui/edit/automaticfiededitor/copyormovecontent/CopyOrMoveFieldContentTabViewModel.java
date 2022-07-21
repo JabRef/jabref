@@ -69,13 +69,12 @@ public class CopyOrMoveFieldContentTabViewModel extends AbstractAutomaticFieldEd
             if (overwriteFieldContent.get() || StringUtil.isBlank(toFieldValue)) {
                 if (StringUtil.isNotBlank(fromFieldValue)) {
                     entry.setField(toField.get(), fromFieldValue);
+                    copyFieldValueEdit.addEdit(new UndoableFieldChange(entry,
+                            toField.get(),
+                            toFieldValue,
+                            fromFieldValue));
+                    affectedEntriesCount++;
                 }
-                // TODO: Wrap this in the above if statement
-                copyFieldValueEdit.addEdit(new UndoableFieldChange(entry,
-                                                                   toField.get(),
-                                                                   toFieldValue,
-                                                                   fromFieldValue));
-                affectedEntriesCount++;
             }
         }
         if (copyFieldValueEdit.hasEdits()) {
