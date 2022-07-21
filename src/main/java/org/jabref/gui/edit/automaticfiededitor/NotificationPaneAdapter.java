@@ -18,6 +18,6 @@ public class NotificationPaneAdapter extends LibraryTab.DatabaseNotification {
         String notificationMessage = String.format("%d/%d affected entries", affectedEntries, totalEntries);
         Node notificationGraphic = IconTheme.JabRefIcons.INTEGRITY_INFO.getGraphicNode();
 
-        notify(notificationGraphic, notificationMessage, Collections.emptyList(), Duration.millis(1750));
+        notify(notificationGraphic, notificationMessage, Collections.emptyList(), Duration.seconds(2));
     }
 }
