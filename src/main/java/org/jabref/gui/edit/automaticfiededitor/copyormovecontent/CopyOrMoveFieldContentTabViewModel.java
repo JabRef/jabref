@@ -101,7 +101,7 @@ public class CopyOrMoveFieldContentTabViewModel extends AbstractAutomaticFieldEd
 
     public void swapValues() {
         NamedCompound swapFieldValuesEdit = new NamedCompound("SWAP_FIELD_VALUES");
-
+        int affectedEntriesCount = 0;
         for (BibEntry entry : selectedEntries) {
             String fromFieldValue = entry.getField(fromField.get()).orElse("");
             String toFieldValue = entry.getField(toField.get()).orElse("");
@@ -123,6 +123,7 @@ public class CopyOrMoveFieldContentTabViewModel extends AbstractAutomaticFieldEd
                         fromFieldValue,
                         toFieldValue
                 ));
+                affectedEntriesCount++;
             }
         }
 
@@ -130,6 +131,8 @@ public class CopyOrMoveFieldContentTabViewModel extends AbstractAutomaticFieldEd
             swapFieldValuesEdit.end();
             dialogEdits.addEdit(swapFieldValuesEdit);
         }
+        // TODO: Maybe pass the edits to the event bus and let the dialog register them?
+        eventBus.post(new AutomaticFieldEditorEvent(TAB_INDEX, affectedEntriesCount));
     }
 
     public List<BibEntry> getSelectedEntries() {
