@@ -86,17 +86,19 @@ public class CopyOrMoveFieldContentTabViewModel extends AbstractAutomaticFieldEd
 
     public void moveValue() {
         NamedCompound moveEdit = new NamedCompound("MOVE_EDIT");
+        int affectedEntriesCount = 0;
         if (overwriteFieldContent.get()) {
-            new MoveFieldValueAction(fromField.get(),
+            affectedEntriesCount = new MoveFieldValueAction(fromField.get(),
                                      toField.get(),
                                      selectedEntries,
-                                     moveEdit).execute();
+                                     moveEdit).executeAndGetAffectedEntriesCount();
 
             if (moveEdit.hasEdits()) {
                 moveEdit.end();
                 dialogEdits.addEdit(moveEdit);
             }
         }
+        eventBus.post(new AutomaticFieldEditorEvent(TAB_INDEX, affectedEntriesCount));
     }
 
     public void swapValues() {

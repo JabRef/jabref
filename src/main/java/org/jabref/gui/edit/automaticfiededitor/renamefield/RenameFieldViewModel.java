@@ -8,6 +8,7 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
 import org.jabref.gui.edit.automaticfiededitor.AbstractAutomaticFieldEditorTabViewModel;
+import org.jabref.gui.edit.automaticfiededitor.AutomaticFieldEditorEvent;
 import org.jabref.gui.edit.automaticfiededitor.MoveFieldValueAction;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.model.database.BibDatabase;
@@ -17,7 +18,7 @@ import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.StandardField;
 
 public class RenameFieldViewModel extends AbstractAutomaticFieldEditorTabViewModel {
-
+    public static final int TAB_INDEX = 2;
     private final StringProperty newFieldName = new SimpleStringProperty("");
     private final ObjectProperty<Field> selectedField = new SimpleObjectProperty<>(StandardField.AUTHOR);
     private final List<BibEntry> selectedEntries;
@@ -47,15 +48,15 @@ public class RenameFieldViewModel extends AbstractAutomaticFieldEditorTabViewMod
 
     public void renameField() {
         NamedCompound renameEdit = new NamedCompound("RENAME_EDIT");
-        // TODO: find a way to access the affected entries count or fire the event bus
-       new MoveFieldValueAction(selectedField.get(),
+       int affectedEntriesCount = new MoveFieldValueAction(selectedField.get(),
                FieldFactory.parseField(newFieldName.get()),
                selectedEntries,
-               renameEdit).execute();
+               renameEdit).executeAndGetAffectedEntriesCount();
 
         if (renameEdit.hasEdits()) {
             renameEdit.end();
             dialogEdits.addEdit(renameEdit);
         }
+        eventBus.post(new AutomaticFieldEditorEvent(TAB_INDEX, affectedEntriesCount));
     }
 }
