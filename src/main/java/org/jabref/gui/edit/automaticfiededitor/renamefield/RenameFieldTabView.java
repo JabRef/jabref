@@ -2,6 +2,7 @@ package org.jabref.gui.edit.automaticfiededitor.renamefield;
 
 import java.util.List;
 
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
@@ -17,6 +18,7 @@ import org.jabref.model.entry.field.Field;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
+import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 
 import static org.jabref.gui.customentrytypes.CustomEntryTypeDialogViewModel.FIELD_STRING_CONVERTER;
 
@@ -31,6 +33,8 @@ public class RenameFieldTabView extends AbstractAutomaticFieldEditorTabView impl
     private final BibDatabase database;
     private final NamedCompound dialogEdits;
     private RenameFieldViewModel viewModel;
+
+    private final ControlsFxVisualizer visualizer = new ControlsFxVisualizer();
 
     public RenameFieldTabView(List<BibEntry> selectedEntries, BibDatabase database, NamedCompound dialogEdits) {
         this.selectedEntries = selectedEntries;
@@ -57,6 +61,10 @@ public class RenameFieldTabView extends AbstractAutomaticFieldEditorTabView impl
         renameButton.disableProperty().bind(viewModel.canRenameProperty().not());
 
         newFieldNameTextField.textProperty().bindBidirectional(viewModel.newFieldNameProperty());
+
+        Platform.runLater(() -> {
+            visualizer.initVisualization(viewModel.fieldNameValidationStatus(), newFieldNameTextField, true);
+        });
     }
 
     @Override

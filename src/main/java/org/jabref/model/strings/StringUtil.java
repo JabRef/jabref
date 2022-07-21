@@ -750,4 +750,15 @@ public class StringUtil {
             return string;
         }
     }
+
+    /**
+     * Checks if the given string contains any whitespace characters. The supported whitespace characters
+     * are the set of characters matched by {@code \s} in regular expressions, which are {@code [ \t\n\x0B\f\r]}.
+     *
+     * @param s The string to check
+     * @return {@code True} if the given string does contain at least one whitespace character, {@code False} otherwise
+     * */
+    public static boolean containsAnyWhitespaceCharacters(String s) {
+        return s.matches(".*\s.*");
+    }
 }

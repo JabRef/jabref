@@ -45,7 +45,14 @@ public class RenameFieldViewModel extends AbstractAutomaticFieldEditorTabViewMod
 
         fieldValidator = new FunctionBasedValidator<>(selectedField, field -> StringUtil.isNotBlank(field.getName()),
                 ValidationMessage.error("Field cannot be empty"));
-        fieldNameValidator = new FunctionBasedValidator<>(newFieldName, StringUtil::isNotBlank, ValidationMessage.error("Field name cannot be blank"));
+        fieldNameValidator = new FunctionBasedValidator<>(newFieldName, fieldName -> {
+            if (StringUtil.isBlank(fieldName)) {
+                return ValidationMessage.error("Field name cannot be empty");
+            } else if (StringUtil.containsAnyWhitespaceCharacters(fieldName)) {
+                return ValidationMessage.error("Field name cannot have whitespace characters");
+            }
+            return null;
+        });
 
         canRename = Bindings.and(fieldValidationStatus().validProperty(), fieldNameValidationStatus().validProperty());
     }
