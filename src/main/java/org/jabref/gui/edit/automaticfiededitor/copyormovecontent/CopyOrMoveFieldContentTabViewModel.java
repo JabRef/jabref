@@ -3,6 +3,7 @@ package org.jabref.gui.edit.automaticfiededitor.copyormovecontent;
 import java.util.ArrayList;
 import java.util.List;
 
+import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -19,6 +20,11 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.strings.StringUtil;
 
+import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
+import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
+import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
+import de.saxsys.mvvmfx.utils.validation.Validator;
+
 public class CopyOrMoveFieldContentTabViewModel extends AbstractAutomaticFieldEditorTabViewModel {
     public static final int TAB_INDEX = 1;
     private final ObjectProperty<Field> fromField = new SimpleObjectProperty<>(StandardField.ABSTRACT);
@@ -29,10 +35,43 @@ public class CopyOrMoveFieldContentTabViewModel extends AbstractAutomaticFieldEd
     private final List<BibEntry> selectedEntries;
     private final NamedCompound dialogEdits;
 
+    private final Validator toFieldValidator;
+
+    private final BooleanBinding canMove;
+
+    private final BooleanBinding canSwap;
+
     public CopyOrMoveFieldContentTabViewModel(List<BibEntry> selectedEntries, BibDatabase bibDatabase, NamedCompound dialogEdits) {
         super(bibDatabase);
         this.selectedEntries = new ArrayList<>(selectedEntries);
         this.dialogEdits = dialogEdits;
+
+        toFieldValidator = new FunctionBasedValidator<>(toField, field -> {
+            if (StringUtil.isBlank(field.getName())) {
+                return ValidationMessage.error("Field name cannot be empty");
+            } else if (StringUtil.containsAnyWhitespaceCharacters(field.getName())) {
+                return ValidationMessage.error("Field name cannot have whitespace characters");
+            }
+            return null;
+        });
+
+        canMove = BooleanBinding.booleanExpression(toFieldValidationStatus().validProperty())
+                                .and(overwriteFieldContentProperty());
+
+        canSwap = BooleanBinding.booleanExpression(toFieldValidationStatus().validProperty())
+                                .and(overwriteFieldContentProperty());
+    }
+
+    public ValidationStatus toFieldValidationStatus() {
+        return toFieldValidator.getValidationStatus();
+    }
+
+    public BooleanBinding canMoveProperty() {
+        return canMove;
+    }
+
+    public BooleanBinding canSwapProperty() {
+        return canSwap;
     }
 
     public Field getFromField() {
@@ -89,9 +128,9 @@ public class CopyOrMoveFieldContentTabViewModel extends AbstractAutomaticFieldEd
         int affectedEntriesCount = 0;
         if (overwriteFieldContent.get()) {
             affectedEntriesCount = new MoveFieldValueAction(fromField.get(),
-                                     toField.get(),
-                                     selectedEntries,
-                                     moveEdit).executeAndGetAffectedEntriesCount();
+                    toField.get(),
+                    selectedEntries,
+                    moveEdit).executeAndGetAffectedEntriesCount();
 
             if (moveEdit.hasEdits()) {
                 moveEdit.end();

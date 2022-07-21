@@ -30,8 +30,8 @@
               <children>
                   <Label prefHeight="19.0" prefWidth="48.0" text="From" GridPane.rowIndex="2" />
                   <Label text="To" GridPane.rowIndex="3" />
-                  <ComboBox fx:id="fromFieldComboBox" editable="true" minWidth="-Infinity" prefHeight="32.0" prefWidth="150.0" promptText="Author" GridPane.columnIndex="1" GridPane.hgrow="NEVER" GridPane.rowIndex="2" GridPane.vgrow="NEVER" />
-                  <ComboBox fx:id="toFieldComboBox" editable="true" minWidth="-Infinity" prefHeight="32.0" prefWidth="150.0" promptText="Title" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                  <ComboBox fx:id="fromFieldComboBox" editable="true" minWidth="-Infinity" prefHeight="32.0" prefWidth="150.0" GridPane.columnIndex="1" GridPane.hgrow="NEVER" GridPane.rowIndex="2" GridPane.vgrow="NEVER" />
+                  <ComboBox fx:id="toFieldComboBox" editable="true" minWidth="-Infinity" prefHeight="32.0" prefWidth="150.0" GridPane.columnIndex="1" GridPane.rowIndex="3" />
                   <CheckBox fx:id="overwriteFieldContentCheckBox"
                             mnemonicParsing="false" prefHeight="19.0" prefWidth="210.0" text="%Overwrite field content" GridPane.columnSpan="2147483647" GridPane.rowIndex="4" />
                   <HBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" spacing="8.0" GridPane.columnSpan="2147483647" GridPane.rowIndex="5">
