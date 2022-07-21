@@ -47,7 +47,7 @@ public class RenameFieldViewModel extends AbstractAutomaticFieldEditorTabViewMod
 
     public void renameField() {
         NamedCompound renameEdit = new NamedCompound("RENAME_EDIT");
-
+        // TODO: find a way to access the affected entries count or fire the event bus
        new MoveFieldValueAction(selectedField.get(),
                FieldFactory.parseField(newFieldName.get()),
                selectedEntries,

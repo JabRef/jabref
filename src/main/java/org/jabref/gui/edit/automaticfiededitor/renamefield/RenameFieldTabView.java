@@ -66,6 +66,16 @@ public class RenameFieldTabView extends AbstractAutomaticFieldEditorTabView impl
         return Localization.lang("Rename field");
     }
 
+    @Override
+    public void registerListener(Object object) {
+        viewModel.registerListener(object);
+    }
+
+    @Override
+    public void unregisterListener(Object object) {
+        viewModel.registerListener(object);
+    }
+
     @FXML
     void renameField() {
         viewModel.renameField();
