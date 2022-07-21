@@ -42,11 +42,7 @@ public class EditFieldContentViewModel extends AbstractAutomaticFieldEditorTabVi
     private final NamedCompound dialogEdits;
 
     private final Validator fieldValidator;
-
-    private final BooleanProperty canSet = new SimpleBooleanProperty();
     private final BooleanBinding canAppend;
-
-    private final BooleanProperty canClear = new SimpleBooleanProperty();
 
     public EditFieldContentViewModel(BibDatabase database, List<BibEntry> selectedEntries, NamedCompound dialogEdits) {
         super(database);
@@ -63,20 +59,10 @@ public class EditFieldContentViewModel extends AbstractAutomaticFieldEditorTabVi
         });
 
         canAppend = Bindings.and(overwriteFieldContentProperty(), fieldValidationStatus().validProperty());
-        canSet.bind(fieldValidationStatus().validProperty());
-        canClear.bind(fieldValidationStatus().validProperty());
     }
 
     public ValidationStatus fieldValidationStatus() {
         return fieldValidator.getValidationStatus();
-    }
-
-    public BooleanProperty canSetProperty() {
-        return canSet;
-    }
-
-    public BooleanProperty canClearProperty() {
-        return canClear;
     }
 
     public BooleanBinding canAppendProperty() {

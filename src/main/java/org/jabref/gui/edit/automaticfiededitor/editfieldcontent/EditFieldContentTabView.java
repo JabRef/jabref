@@ -71,9 +71,9 @@ public class EditFieldContentTabView extends AbstractAutomaticFieldEditorTabView
         overwriteFieldContentCheckBox.selectedProperty().bindBidirectional(viewModel.overwriteFieldContentProperty());
 
         appendValueButton.disableProperty().bind(viewModel.canAppendProperty().not());
-        setValueButton.disableProperty().bind(viewModel.canSetProperty().not());
-        clearFieldButton.disableProperty().bind(viewModel.canClearProperty().not());
-        overwriteFieldContentCheckBox.disableProperty().bind(viewModel.canSetProperty().not());
+        setValueButton.disableProperty().bind(viewModel.fieldValidationStatus().validProperty().not());
+        clearFieldButton.disableProperty().bind(viewModel.fieldValidationStatus().validProperty().not());
+        overwriteFieldContentCheckBox.disableProperty().bind(viewModel.fieldValidationStatus().validProperty().not());
 
         Platform.runLater(() -> visualizer.initVisualization(viewModel.fieldValidationStatus(), fieldComboBox, true));
     }
