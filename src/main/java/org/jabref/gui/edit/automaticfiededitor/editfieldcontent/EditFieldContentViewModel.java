@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import javafx.beans.binding.Bindings;
+import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -19,6 +21,12 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.strings.StringUtil;
+
+import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
+import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
+import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
+import de.saxsys.mvvmfx.utils.validation.Validator;
 
 public class EditFieldContentViewModel extends AbstractAutomaticFieldEditorTabViewModel {
     public static final int TAB_INDEX = 0;
@@ -33,10 +41,46 @@ public class EditFieldContentViewModel extends AbstractAutomaticFieldEditorTabVi
 
     private final NamedCompound dialogEdits;
 
+    private final Validator fieldValidator;
+
+    private final BooleanProperty canSet = new SimpleBooleanProperty();
+    private final BooleanBinding canAppend;
+
+    private final BooleanProperty canClear = new SimpleBooleanProperty();
+
     public EditFieldContentViewModel(BibDatabase database, List<BibEntry> selectedEntries, NamedCompound dialogEdits) {
         super(database);
         this.selectedEntries = new ArrayList<>(selectedEntries);
         this.dialogEdits = dialogEdits;
+
+        fieldValidator = new FunctionBasedValidator<>(selectedField, field -> {
+            if (StringUtil.isBlank(field.getName())) {
+                return ValidationMessage.error("Field name cannot be empty");
+            } else if (StringUtil.containsAnyWhitespaceCharacters(field.getName())) {
+                return ValidationMessage.error("Field name cannot have whitespace characters");
+            }
+            return null;
+        });
+
+        canAppend = Bindings.and(overwriteFieldContentProperty(), fieldValidationStatus().validProperty());
+        canSet.bind(fieldValidationStatus().validProperty());
+        canClear.bind(fieldValidationStatus().validProperty());
+    }
+
+    public ValidationStatus fieldValidationStatus() {
+        return fieldValidator.getValidationStatus();
+    }
+
+    public BooleanProperty canSetProperty() {
+        return canSet;
+    }
+
+    public BooleanProperty canClearProperty() {
+        return canClear;
+    }
+
+    public BooleanBinding canAppendProperty() {
+        return canAppend;
     }
 
     public void clearSelectedField() {

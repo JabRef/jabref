@@ -2,6 +2,7 @@ package org.jabref.gui.edit.automaticfiededitor.editfieldcontent;
 
 import java.util.List;
 
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
@@ -16,11 +17,15 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 
 import com.airhacks.afterburner.views.ViewLoader;
+import com.tobiasdiez.easybind.EasyBind;
+import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 
 import static org.jabref.gui.customentrytypes.CustomEntryTypeDialogViewModel.FIELD_STRING_CONVERTER;
 
 public class EditFieldContentTabView extends AbstractAutomaticFieldEditorTabView {
     public Button appendValueButton;
+    public Button clearFieldButton;
+    public Button setValueButton;
     @FXML
     private ComboBox<Field> fieldComboBox;
 
@@ -36,6 +41,8 @@ public class EditFieldContentTabView extends AbstractAutomaticFieldEditorTabView
     private EditFieldContentViewModel viewModel;
 
     private final NamedCompound dialogEdits;
+
+    private final ControlsFxVisualizer visualizer = new ControlsFxVisualizer();
 
     public EditFieldContentTabView(List<BibEntry> selectedEntries, BibDatabase database, NamedCompound dialogEdits) {
         this.selectedEntries = selectedEntries;
@@ -57,12 +64,18 @@ public class EditFieldContentTabView extends AbstractAutomaticFieldEditorTabView
         fieldComboBox.getSelectionModel().selectFirst();
 
         fieldComboBox.valueProperty().bindBidirectional(viewModel.selectedFieldProperty());
+        EasyBind.listen(fieldComboBox.getEditor().textProperty(), observable -> fieldComboBox.commitValue());
 
         fieldValueTextField.textProperty().bindBidirectional(viewModel.fieldValueProperty());
 
         overwriteFieldContentCheckBox.selectedProperty().bindBidirectional(viewModel.overwriteFieldContentProperty());
 
-        appendValueButton.disableProperty().bind(overwriteFieldContentCheckBox.selectedProperty().not());
+        appendValueButton.disableProperty().bind(viewModel.canAppendProperty().not());
+        setValueButton.disableProperty().bind(viewModel.canSetProperty().not());
+        clearFieldButton.disableProperty().bind(viewModel.canClearProperty().not());
+        overwriteFieldContentCheckBox.disableProperty().bind(viewModel.canSetProperty().not());
+
+        Platform.runLater(() -> visualizer.initVisualization(viewModel.fieldValidationStatus(), fieldComboBox, true));
     }
 
     @Override
