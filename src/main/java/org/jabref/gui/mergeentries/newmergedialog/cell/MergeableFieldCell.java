@@ -19,9 +19,9 @@ public class MergeableFieldCell extends FieldNameCell {
         super(field.getDisplayName(), rowIndex);
         mergeActionProperty().addListener((obs, old, newValue) -> {
             if (newValue == MergeAction.MERGE) {
-                setAction(Localization.lang("Merge Groups"), IconTheme.JabRefIcons.MERGE_GROUPS, mergeCommand);
+                setAction(Localization.lang("Merge %0", field.getDisplayName()), IconTheme.JabRefIcons.MERGE_GROUPS, mergeCommand);
             } else {
-                setAction(Localization.lang("Unmerge Groups"), IconTheme.JabRefIcons.UNDO, unmergeCommand);
+                setAction(Localization.lang("Unmerge %0", field.getDisplayName()), IconTheme.JabRefIcons.UNDO, unmergeCommand);
             }
         });
     }
