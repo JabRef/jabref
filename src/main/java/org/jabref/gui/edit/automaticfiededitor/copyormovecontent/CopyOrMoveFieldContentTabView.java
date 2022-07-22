@@ -82,6 +82,8 @@ public class CopyOrMoveFieldContentTabView extends AbstractAutomaticFieldEditorT
 
         fromFieldComboBox.valueProperty().bindBidirectional(viewModel.fromFieldProperty());
         toFieldComboBox.valueProperty().bindBidirectional(viewModel.toFieldProperty());
+
+        EasyBind.listen(fromFieldComboBox.getEditor().textProperty(), observable -> fromFieldComboBox.commitValue());
         EasyBind.listen(toFieldComboBox.getEditor().textProperty(), observable -> toFieldComboBox.commitValue());
     }
 

@@ -48,7 +48,7 @@ public class RenameFieldViewModelTest {
 
         assertEquals(Optional.of("2014"), entryA.getField(FieldFactory.parseField("ETAD")));
         assertEquals(Optional.empty(), entryA.getField(StandardField.DATE));
-        
+
         assertEquals(Optional.of("1998"), entryB.getField(FieldFactory.parseField("ETAD")));
         assertEquals(Optional.empty(), entryB.getField(StandardField.DATE));
     }
