@@ -10,7 +10,7 @@
     <link href="https://www.eriesjournal.com/index.php/eries/about/submissions" rel="documentation"/>
     <author>
       <name>Dominik Bláha</name>
-      <email>blahad@sic.czu.cz</email>
+      <email>blahad@lib.czu.cz</email>
     </author>
     <contributor>
       <name>Igor Krejčí</name>
@@ -20,7 +20,7 @@
     <category field="humanities"/>
     <issn>2336-2375</issn>
     <eissn>1803-1617</eissn>
-    <updated>2019-04-20T15:03:39+00:00</updated>
+    <updated>2022-07-10T17:58:51+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="en">
@@ -618,8 +618,8 @@
       <key macro="issued-sort" sort="ascending"/>
       <key macro="title"/>
     </sort>
-    <layout suffix=".">
-      <group>
+    <layout>
+      <group suffix=".">
         <group>
           <text macro="author"/>
           <text macro="issued"/>

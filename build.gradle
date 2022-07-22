@@ -99,7 +99,7 @@ dependencyLocking {
 }
 
 javafx {
-    version = "18"
+    version = "18.0.1"
     modules = [ 'javafx.controls', 'javafx.fxml', 'javafx.web', 'javafx.swing' ]
 }
 
@@ -126,7 +126,6 @@ dependencies {
     implementation 'com.h2database:h2-mvstore:2.1.214'
 
     implementation group: 'org.apache.tika', name: 'tika-core', version: '2.4.1'
-    implementation 'com.ibm.icu:icu4j-charset:71.1'
 
     // required for reading write-protected PDFs - see https://github.com/JabRef/jabref/pull/942#issuecomment-209252635
     implementation 'org.bouncycastle:bcprov-jdk18on:1.71'
@@ -204,7 +203,7 @@ dependencies {
 
     implementation group: 'net.harawata', name: 'appdirs', version: '1.2.1'
 
-    testImplementation 'io.github.classgraph:classgraph:4.8.147'
+    testImplementation 'io.github.classgraph:classgraph:4.8.149'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.8.2'
     testImplementation 'org.junit.platform:junit-platform-launcher:1.8.2'
 
