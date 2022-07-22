@@ -18,11 +18,18 @@ public class MoveFieldValueAction extends SimpleCommand {
 
     private int affectedEntriesCount;
 
-    public MoveFieldValueAction(Field fromField, Field toField, List<BibEntry> entries, NamedCompound edits) {
+    private final boolean overwriteToFieldContent;
+
+    public MoveFieldValueAction(Field fromField, Field toField, List<BibEntry> entries, NamedCompound edits, boolean overwriteToFieldContent) {
         this.fromField = fromField;
         this.toField = toField;
         this.entries = entries;
         this.edits = edits;
+        this.overwriteToFieldContent = overwriteToFieldContent;
+    }
+
+    public MoveFieldValueAction(Field fromField, Field toField, List<BibEntry> entries, NamedCompound edits) {
+        this(fromField, toField, entries, edits, true);
     }
 
     @Override
@@ -32,12 +39,14 @@ public class MoveFieldValueAction extends SimpleCommand {
             String fromFieldValue = entry.getField(fromField).orElse("");
             String toFieldValue = entry.getField(toField).orElse("");
             if (StringUtil.isNotBlank(fromFieldValue)) {
-                entry.setField(toField, fromFieldValue);
-                entry.setField(fromField, "");
+                if (overwriteToFieldContent || toFieldValue.isEmpty()) {
+                    entry.setField(toField, fromFieldValue);
+                    entry.setField(fromField, "");
 
-                edits.addEdit(new UndoableFieldChange(entry, fromField, fromFieldValue, null));
-                edits.addEdit(new UndoableFieldChange(entry, toField, toFieldValue, fromFieldValue));
-                affectedEntriesCount++;
+                    edits.addEdit(new UndoableFieldChange(entry, fromField, fromFieldValue, null));
+                    edits.addEdit(new UndoableFieldChange(entry, toField, toFieldValue, fromFieldValue));
+                    affectedEntriesCount++;
+                }
             }
         }
 

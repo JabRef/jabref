@@ -77,6 +77,10 @@ public class RenameFieldViewModel extends AbstractAutomaticFieldEditorTabViewMod
         return newFieldName;
     }
 
+    public void setNewFieldName(String newName) {
+        newFieldNameProperty().set(newName);
+    }
+
     public Field getSelectedField() {
         return selectedField.get();
     }
@@ -85,17 +89,26 @@ public class RenameFieldViewModel extends AbstractAutomaticFieldEditorTabViewMod
         return selectedField;
     }
 
+    public void selectField(Field field) {
+        selectedFieldProperty().set(field);
+    }
+
     public void renameField() {
         NamedCompound renameEdit = new NamedCompound("RENAME_EDIT");
-       int affectedEntriesCount = new MoveFieldValueAction(selectedField.get(),
-               FieldFactory.parseField(newFieldName.get()),
-               selectedEntries,
-               renameEdit).executeAndGetAffectedEntriesCount();
+        int affectedEntriesCount = 0;
+        if (fieldNameValidationStatus().isValid()) {
+            affectedEntriesCount = new MoveFieldValueAction(selectedField.get(),
+                    FieldFactory.parseField(newFieldName.get()),
+                    selectedEntries,
+                    renameEdit,
+                    false).executeAndGetAffectedEntriesCount();
 
-        if (renameEdit.hasEdits()) {
-            renameEdit.end();
-            dialogEdits.addEdit(renameEdit);
+            if (renameEdit.hasEdits()) {
+                renameEdit.end();
+                dialogEdits.addEdit(renameEdit);
+            }
         }
+
         eventBus.post(new AutomaticFieldEditorEvent(TAB_INDEX, affectedEntriesCount));
     }
 }
