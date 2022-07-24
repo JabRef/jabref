@@ -386,4 +386,20 @@ class StringUtilTest {
         assertEquals("aAoeee", StringUtil.stripAccents("åÄöéèë"));
         assertEquals("Muhlbach", StringUtil.stripAccents("Mühlbach"));
     }
+
+    @Test
+    void testContainsWhitespace() {
+        assertTrue(StringUtil.containsWhitespace("file url"));
+        assertTrue(StringUtil.containsWhitespace("file\nurl"));
+        assertTrue(StringUtil.containsWhitespace("file\r\nurl"));
+        assertTrue(StringUtil.containsWhitespace("file\rurl"));
+        assertTrue(StringUtil.containsWhitespace("file\furl"));
+        assertTrue(StringUtil.containsWhitespace("file_url "));
+        assertTrue(StringUtil.containsWhitespace("file url\n"));
+        assertTrue(StringUtil.containsWhitespace(" "));
+
+        assertFalse(StringUtil.containsWhitespace("file_url"));
+        assertFalse(StringUtil.containsWhitespace("PascalCase"));
+        assertFalse(StringUtil.containsWhitespace(""));
+    }
 }
