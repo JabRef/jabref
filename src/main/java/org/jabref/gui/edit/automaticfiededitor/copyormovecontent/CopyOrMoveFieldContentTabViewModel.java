@@ -49,7 +49,7 @@ public class CopyOrMoveFieldContentTabViewModel extends AbstractAutomaticFieldEd
         toFieldValidator = new FunctionBasedValidator<>(toField, field -> {
             if (StringUtil.isBlank(field.getName())) {
                 return ValidationMessage.error("Field name cannot be empty");
-            } else if (StringUtil.containsAnyWhitespaceCharacters(field.getName())) {
+            } else if (StringUtil.containsWhitespace(field.getName())) {
                 return ValidationMessage.error("Field name cannot have whitespace characters");
             }
             return null;

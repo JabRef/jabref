@@ -52,7 +52,7 @@ public class EditFieldContentViewModel extends AbstractAutomaticFieldEditorTabVi
         fieldValidator = new FunctionBasedValidator<>(selectedField, field -> {
             if (StringUtil.isBlank(field.getName())) {
                 return ValidationMessage.error("Field name cannot be empty");
-            } else if (StringUtil.containsAnyWhitespaceCharacters(field.getName())) {
+            } else if (StringUtil.containsWhitespace(field.getName())) {
                 return ValidationMessage.error("Field name cannot have whitespace characters");
             }
             return null;
