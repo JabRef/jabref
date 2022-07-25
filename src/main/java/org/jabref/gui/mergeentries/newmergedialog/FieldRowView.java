@@ -55,9 +55,9 @@ public class FieldRowView {
             MergeableFieldCell mergeableFieldCell = (MergeableFieldCell) fieldNameCell;
             EasyBind.listen(mergeableFieldCell.fieldStateProperty(), ((observableValue, old, fieldState) -> {
                 if (fieldState == MergeableFieldCell.FieldState.MERGED) {
-                    new MergeCommand(mergeableFieldCell, fieldMergerFactory.create(field)).execute();
+                    new MergeCommand(fieldMergerFactory.create(field)).execute();
                 } else {
-                    new UnmergeCommand(mergeableFieldCell).execute();
+                    new UnmergeCommand().execute();
                 }
             }));
         }
@@ -173,11 +173,9 @@ public class FieldRowView {
     }
 
     public class MergeCommand extends SimpleCommand {
-        private final MergeableFieldCell mergeableFieldCell;
         private final FieldMerger fieldMerger;
 
-        public MergeCommand(MergeableFieldCell mergeableFieldCell, FieldMerger fieldMerger) {
-            this.mergeableFieldCell = mergeableFieldCell;
+        public MergeCommand(FieldMerger fieldMerger) {
             this.fieldMerger = fieldMerger;
 
             this.executable.bind(viewModel.hasEqualLeftAndRightBinding().not());
@@ -204,10 +202,8 @@ public class FieldRowView {
     }
 
     public class UnmergeCommand extends SimpleCommand {
-        private final MergeableFieldCell mergeableFieldCell;
 
-        public UnmergeCommand(MergeableFieldCell mergeableFieldCell) {
-            this.mergeableFieldCell = mergeableFieldCell;
+        public UnmergeCommand() {
         }
 
         @Override
