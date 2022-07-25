@@ -1,17 +1,12 @@
 package org.jabref.gui.mergeentries.newmergedialog.cell;
 
-import javafx.scene.Node;
 import javafx.scene.control.Button;
-import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 
 import org.jabref.gui.Globals;
 import org.jabref.gui.actions.ActionFactory;
-import org.jabref.gui.icon.IconTheme;
-
-import de.saxsys.mvvmfx.utils.commands.Command;
 
 /**
  * A non-editable cell that contains the name of some field
@@ -40,14 +35,9 @@ public class FieldNameCell extends AbstractCell {
         HBox.setHgrow(labelBox, Priority.ALWAYS);
     }
 
-    protected void setAction(String actionName, IconTheme.JabRefIcons icon, Command command) {
+    protected void addSideButton(Button sideButton) {
+        // TODO: Allow adding more than one side button
         actionLayout.getChildren().clear();
-        Node iconNode = icon.getGraphicNode();
-        Button actionButton = factory.createIconButton(() -> actionName, command);
-        actionButton.setGraphic(iconNode);
-        actionButton.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
-        actionButton.setMaxHeight(Double.MAX_VALUE);
-
-        actionLayout.getChildren().add(actionButton);
+        actionLayout.getChildren().setAll(sideButton);
     }
 }

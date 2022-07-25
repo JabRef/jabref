@@ -53,9 +53,13 @@ public class FieldRowView {
 
         if (FieldMergerFactory.canMerge(field)) {
             MergeableFieldCell mergeableFieldCell = (MergeableFieldCell) fieldNameCell;
-            mergeableFieldCell.setMergeCommand(new MergeCommand(mergeableFieldCell, fieldMergerFactory.create(field)));
-            mergeableFieldCell.setUnmergeCommand(new UnmergeCommand(mergeableFieldCell));
-            mergeableFieldCell.setMergeAction(MergeableFieldCell.MergeAction.MERGE);
+            EasyBind.listen(mergeableFieldCell.fieldStateProperty(), ((observableValue, old, fieldState) -> {
+                if (fieldState == MergeableFieldCell.FieldState.MERGED) {
+                    new MergeCommand(mergeableFieldCell, fieldMergerFactory.create(field)).execute();
+                } else {
+                    new UnmergeCommand(mergeableFieldCell).execute();
+                }
+            }));
         }
 
         toggleGroup.getToggles().addAll(leftValueCell, rightValueCell);
@@ -196,8 +200,6 @@ public class FieldRowView {
                 fieldsMergedEdit.addEdit(new MergeFieldsUndo(oldLeftFieldValue, oldRightFieldValue, mergedFields));
                 fieldsMergedEdit.end();
             }
-
-            mergeableFieldCell.setMergeAction(MergeableFieldCell.MergeAction.UNMERGE);
         }
     }
 
@@ -212,7 +214,6 @@ public class FieldRowView {
         public void execute() {
             if (fieldsMergedEdit.canUndo()) {
                 fieldsMergedEdit.undo();
-                mergeableFieldCell.setMergeAction(MergeableFieldCell.MergeAction.MERGE);
             }
         }
     }
