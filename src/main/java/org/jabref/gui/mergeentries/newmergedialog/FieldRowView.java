@@ -56,6 +56,8 @@ public class FieldRowView {
 
         if (FieldMergerFactory.canMerge(field)) {
             MergeableFieldCell mergeableFieldCell = (MergeableFieldCell) fieldNameCell;
+            mergeableFieldCell.setCanMerge(!viewModel.hasEqualLeftAndRightValues());
+
             EasyBind.listen(mergeableFieldCell.fieldStateProperty(), ((observableValue, old, fieldState) -> {
                 LOGGER.debug("Field merge state is {} for field {}", fieldState, field);
                 if (fieldState == MergeableFieldCell.FieldState.MERGED) {
@@ -104,7 +106,6 @@ public class FieldRowView {
         });
 
         EasyBind.listen(viewModel.hasEqualLeftAndRightBinding(), (obs, old, isEqual) -> {
-
             if (isEqual) {
                 LOGGER.debug("Left and right values are equal, LEFT==RIGHT=={}", viewModel.getLeftFieldValue());
                 hideDiff();
