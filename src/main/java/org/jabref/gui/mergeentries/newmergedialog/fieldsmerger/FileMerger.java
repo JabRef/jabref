@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.jabref.logic.bibtex.FileFieldWriter;
 import org.jabref.logic.importer.util.FileFieldParser;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.strings.StringUtil;
@@ -22,8 +23,8 @@ public class FileMerger implements FieldMerger {
             List<LinkedFile> linkedFilesB = FileFieldParser.parse(filesB);
             // TODO: If one of the linked files list is empty then the its string value is malformed.
             return Stream.concat(linkedFilesA.stream(), linkedFilesB.stream())
-                         .map(LinkedFile::getLink)
-                         .collect(Collectors.joining(";"));
+                         .map(FileFieldWriter::getStringRepresentation)
+                         .collect(Collectors.joining());
         }
     }
 }
