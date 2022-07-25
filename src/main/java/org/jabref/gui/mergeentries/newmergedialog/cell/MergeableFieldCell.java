@@ -1,6 +1,8 @@
 package org.jabref.gui.mergeentries.newmergedialog.cell;
 
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.control.Button;
 
@@ -14,6 +16,7 @@ import org.jabref.model.entry.field.Field;
 
 public class MergeableFieldCell extends FieldNameCell {
     private final ObjectProperty<FieldState> fieldState = new SimpleObjectProperty<>(FieldState.UNMERGED);
+    private final BooleanProperty canMerge = new SimpleBooleanProperty(Boolean.TRUE);
 
     private Button toggleMergeUnmergeButton;
 
@@ -26,7 +29,8 @@ public class MergeableFieldCell extends FieldNameCell {
         this.field = field;
 
         configureMergeButton();
-        addSideButton(toggleMergeUnmergeButton);
+        super.addSideButton(toggleMergeUnmergeButton);
+        toggleMergeUnmergeButton.disableProperty().bind(canMergeProperty().not());
     }
 
     private void configureMergeButton() {
@@ -57,6 +61,25 @@ public class MergeableFieldCell extends FieldNameCell {
 
     private void setFieldState(FieldState fieldState) {
         fieldStateProperty().set(fieldState);
+    }
+
+    public FieldState getFieldState() {
+        return fieldState.get();
+    }
+
+    public BooleanProperty canMergeProperty() {
+        return canMerge;
+    }
+
+    public boolean canMerge() {
+        return canMerge.get();
+    }
+
+    /**
+     * Setting {@code canMerge} to {@code false} will disable the merge/unmerge button
+     * */
+    public void setCanMerge(boolean value) {
+        canMergeProperty().set(value);
     }
 
     private class ToggleMergeUnmergeAction extends SimpleCommand {
