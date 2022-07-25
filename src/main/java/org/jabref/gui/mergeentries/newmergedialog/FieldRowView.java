@@ -25,6 +25,8 @@ import org.jabref.model.entry.field.Field;
 
 import com.tobiasdiez.easybind.EasyBind;
 import org.fxmisc.richtext.StyleClassedTextArea;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static org.jabref.gui.mergeentries.newmergedialog.FieldRowViewModel.Selection;
 
@@ -32,6 +34,7 @@ import static org.jabref.gui.mergeentries.newmergedialog.FieldRowViewModel.Selec
  * A controller class to control left, right and merged field values
  */
 public class FieldRowView {
+    private static final Logger LOGGER = LoggerFactory.getLogger(FieldRowView.class);
     private final FieldNameCell fieldNameCell;
     private final FieldValueCell leftValueCell;
     private final FieldValueCell rightValueCell;
@@ -54,6 +57,7 @@ public class FieldRowView {
         if (FieldMergerFactory.canMerge(field)) {
             MergeableFieldCell mergeableFieldCell = (MergeableFieldCell) fieldNameCell;
             EasyBind.listen(mergeableFieldCell.fieldStateProperty(), ((observableValue, old, fieldState) -> {
+                LOGGER.debug("Field merge state is {} for field {}", fieldState, field);
                 if (fieldState == MergeableFieldCell.FieldState.MERGED) {
                     new MergeCommand(fieldMergerFactory.create(field)).execute();
                 } else {
@@ -100,7 +104,9 @@ public class FieldRowView {
         });
 
         EasyBind.listen(viewModel.hasEqualLeftAndRightBinding(), (obs, old, isEqual) -> {
+
             if (isEqual) {
+                LOGGER.debug("Left and right values are equal, LEFT==RIGHT=={}", viewModel.getLeftFieldValue());
                 hideDiff();
             }
         });
@@ -146,6 +152,7 @@ public class FieldRowView {
         if (!rightValueCell.isVisible()) {
             return;
         }
+        LOGGER.debug("Showing diffs...");
 
         StyleClassedTextArea leftLabel = leftValueCell.getStyleClassedLabel();
         StyleClassedTextArea rightLabel = rightValueCell.getStyleClassedLabel();
@@ -162,6 +169,8 @@ public class FieldRowView {
         if (!rightValueCell.isVisible()) {
             return;
         }
+
+        LOGGER.debug("Hiding diffs...");
 
         int leftValueLength = getLeftValueCell().getStyleClassedLabel().getLength();
         getLeftValueCell().getStyleClassedLabel().clearStyle(0, leftValueLength);
