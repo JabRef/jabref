@@ -3,8 +3,12 @@ package org.jabref.gui.mergeentries.newmergedialog.fieldsmerger;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.strings.StringUtil;
 
+/**
+ * A merger for the {@link StandardField#GROUPS} field
+ * */
 public class GroupMerger implements FieldMerger {
     public static final String GROUPS_SEPARATOR = ", ";
 
