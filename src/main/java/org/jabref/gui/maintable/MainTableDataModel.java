@@ -49,7 +49,7 @@ public class MainTableDataModel {
         entriesFiltered.predicateProperty().bind(
                 EasyBind.combine(stateManager.activeGroupProperty(),
                         stateManager.activeSearchQueryProperty(),
-                        groupsPreferences.groupViewModeProperty(), // So that the filtered list updates when group view mode changes
+                        groupsPreferences.groupViewModeProperty(),
                         (groups, query, groupViewMode) -> entry -> isMatched(groups, query, entry))
         );
 
