@@ -6,12 +6,12 @@ import javafx.scene.control.Label;
 /**
  * A readonly cell used to display the header of the ThreeWayMerge UI at the top of the layout.
  * */
-public class HeaderCell extends AbstractCell {
+public class HeaderCell extends ThreeWayMergeCell {
     public static final String DEFAULT_STYLE_CLASS = "merge-header-cell";
     private final Label label = new Label();
 
     public HeaderCell(String text) {
-        super(text, AbstractCell.NO_ROW_NUMBER);
+        super(text, ThreeWayMergeCell.NO_ROW_NUMBER);
         initialize();
     }
 

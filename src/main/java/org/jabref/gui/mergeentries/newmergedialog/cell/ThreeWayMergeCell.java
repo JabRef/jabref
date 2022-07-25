@@ -11,7 +11,7 @@ import javafx.scene.layout.HBox;
 /**
  *
  */
-public abstract class AbstractCell extends HBox {
+public abstract class ThreeWayMergeCell extends HBox {
     public static final String ODD_PSEUDO_CLASS = "odd";
     public static final String EVEN_PSEUDO_CLASS = "even";
     public static final int NO_ROW_NUMBER = -1;
@@ -20,7 +20,7 @@ public abstract class AbstractCell extends HBox {
     private final BooleanProperty odd = new BooleanPropertyBase() {
         @Override
         public Object getBean() {
-            return AbstractCell.this;
+            return ThreeWayMergeCell.this;
         }
 
         @Override
@@ -38,7 +38,7 @@ public abstract class AbstractCell extends HBox {
     private final BooleanProperty even = new BooleanPropertyBase() {
         @Override
         public Object getBean() {
-            return AbstractCell.this;
+            return ThreeWayMergeCell.this;
         }
 
         @Override
@@ -53,7 +53,7 @@ public abstract class AbstractCell extends HBox {
         }
     };
 
-    public AbstractCell(String text, int rowIndex) {
+    public ThreeWayMergeCell(String text, int rowIndex) {
         getStyleClass().add(DEFAULT_STYLE_CLASS);
         if (rowIndex != NO_ROW_NUMBER) {
             if (rowIndex % 2 == 1) {
