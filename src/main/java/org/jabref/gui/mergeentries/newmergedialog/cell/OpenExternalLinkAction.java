@@ -9,7 +9,7 @@ import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.strings.StringUtil;
 
 /**
- * This action can open an Url and DOI
+ * A command for opening DOIs and URLs. This was created primarily for simplifying {@link FieldValueCell}.
  * */
 public class OpenExternalLinkAction extends SimpleCommand {
     private final String urlOrDoi;

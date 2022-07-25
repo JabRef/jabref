@@ -4,9 +4,13 @@ import java.util.Arrays;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.preferences.PreferencesService;
 
+/**
+ * A merger for the {@link StandardField#KEYWORDS} field
+ * */
 public class KeywordMerger implements FieldMerger {
     private final PreferencesService preferencesService;
 
