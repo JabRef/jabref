@@ -34,7 +34,7 @@ public class MergeableFieldCell extends FieldNameCell {
     }
 
     private void configureMergeButton() {
-        Action mergeAction = new Action.Builder(Localization.lang("Merge %", field.getDisplayName()))
+        Action mergeAction = new Action.Builder(Localization.lang("Merge %0", field.getDisplayName()))
                 .setIcon(IconTheme.JabRefIcons.MERGE_GROUPS);
 
         if (toggleMergeUnmergeButton == null) {
@@ -45,7 +45,7 @@ public class MergeableFieldCell extends FieldNameCell {
     }
 
     private void configureUnmergeButton() {
-        Action unmergeAction = new Action.Builder(Localization.lang("Unmerge %", field.getDisplayName()))
+        Action unmergeAction = new Action.Builder(Localization.lang("Unmerge %0", field.getDisplayName()))
                 .setIcon(IconTheme.JabRefIcons.UNDO);
 
         if (toggleMergeUnmergeButton == null) {
