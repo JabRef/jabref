@@ -31,7 +31,7 @@ public class FieldNameCell extends ThreeWayMergeCell {
         HBox.setHgrow(labelBox, Priority.ALWAYS);
     }
 
-    protected void addSideButton(Button sideButton) {
+    public void addSideButton(Button sideButton) {
         // TODO: Allow adding more than one side button
         actionLayout.getChildren().clear();
         actionLayout.getChildren().setAll(sideButton);
