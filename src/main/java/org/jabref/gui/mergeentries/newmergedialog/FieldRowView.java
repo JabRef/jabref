@@ -11,10 +11,9 @@ import javafx.scene.layout.GridPane;
 
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.mergeentries.newmergedialog.cell.FieldNameCell;
-import org.jabref.gui.mergeentries.newmergedialog.cell.FieldNameCellFactory;
 import org.jabref.gui.mergeentries.newmergedialog.cell.FieldValueCell;
-import org.jabref.gui.mergeentries.newmergedialog.cell.MergeableFieldCell;
 import org.jabref.gui.mergeentries.newmergedialog.cell.MergedFieldCell;
+import org.jabref.gui.mergeentries.newmergedialog.cell.sidebuttons.ToggleMergeUnmergeButton;
 import org.jabref.gui.mergeentries.newmergedialog.diffhighlighter.SplitDiffHighlighter;
 import org.jabref.gui.mergeentries.newmergedialog.diffhighlighter.UnifiedDiffHighlighter;
 import org.jabref.gui.mergeentries.newmergedialog.fieldsmerger.FieldMerger;
@@ -49,18 +48,19 @@ public class FieldRowView {
     public FieldRowView(Field field, BibEntry leftEntry, BibEntry rightEntry, BibEntry mergedEntry, FieldMergerFactory fieldMergerFactory, int rowIndex) {
         viewModel = new FieldRowViewModel(field, leftEntry, rightEntry, mergedEntry);
 
-        fieldNameCell = FieldNameCellFactory.create(field, rowIndex);
+        fieldNameCell = new FieldNameCell(field.getDisplayName(), rowIndex);
         leftValueCell = new FieldValueCell(viewModel.getLeftFieldValue(), rowIndex);
         rightValueCell = new FieldValueCell(viewModel.getRightFieldValue(), rowIndex);
         mergedValueCell = new MergedFieldCell(viewModel.getMergedFieldValue(), rowIndex);
 
         if (FieldMergerFactory.canMerge(field)) {
-            MergeableFieldCell mergeableFieldCell = (MergeableFieldCell) fieldNameCell;
-            mergeableFieldCell.setCanMerge(!viewModel.hasEqualLeftAndRightValues());
+            ToggleMergeUnmergeButton toggleMergeUnmergeButton = new ToggleMergeUnmergeButton(field);
+            toggleMergeUnmergeButton.setCanMerge(!viewModel.hasEqualLeftAndRightValues());
+            fieldNameCell.addSideButton(toggleMergeUnmergeButton);
 
-            EasyBind.listen(mergeableFieldCell.fieldStateProperty(), ((observableValue, old, fieldState) -> {
+            EasyBind.listen(toggleMergeUnmergeButton.fieldStateProperty(), ((observableValue, old, fieldState) -> {
                 LOGGER.debug("Field merge state is {} for field {}", fieldState, field);
-                if (fieldState == MergeableFieldCell.FieldState.MERGED) {
+                if (fieldState == ToggleMergeUnmergeButton.FieldState.MERGED) {
                     new MergeCommand(fieldMergerFactory.create(field)).execute();
                 } else {
                     new UnmergeCommand().execute();

@@ -1,4 +1,4 @@
-package org.jabref.gui.mergeentries.newmergedialog.cell;
+package org.jabref.gui.mergeentries.newmergedialog.cell.sidebuttons;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
@@ -14,45 +14,34 @@ import org.jabref.gui.icon.IconTheme;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.field.Field;
 
-public class MergeableFieldCell extends FieldNameCell {
+public class ToggleMergeUnmergeButton extends Button {
     private final ObjectProperty<FieldState> fieldState = new SimpleObjectProperty<>(FieldState.UNMERGED);
     private final BooleanProperty canMerge = new SimpleBooleanProperty(Boolean.TRUE);
-
-    private Button toggleMergeUnmergeButton;
 
     private final ActionFactory actionFactory = new ActionFactory(Globals.getKeyPrefs());
 
     private final Field field;
 
-    public MergeableFieldCell(Field field, int rowIndex) {
-        super(field.getDisplayName(), rowIndex);
+    public ToggleMergeUnmergeButton(Field field) {
         this.field = field;
+        setMaxHeight(Double.MAX_VALUE);
+        setFocusTraversable(false);
 
         configureMergeButton();
-        super.addSideButton(toggleMergeUnmergeButton);
-        toggleMergeUnmergeButton.disableProperty().bind(canMergeProperty().not());
+        this.disableProperty().bind(canMergeProperty().not());
     }
 
     private void configureMergeButton() {
         Action mergeAction = new Action.Builder(Localization.lang("Merge %0", field.getDisplayName()))
                 .setIcon(IconTheme.JabRefIcons.MERGE_GROUPS);
 
-        if (toggleMergeUnmergeButton == null) {
-            toggleMergeUnmergeButton = actionFactory.createIconButton(mergeAction, new ToggleMergeUnmergeAction());
-            toggleMergeUnmergeButton.setMaxHeight(Double.MAX_VALUE);
-        }
-        actionFactory.configureIconButton(mergeAction, new ToggleMergeUnmergeAction(), toggleMergeUnmergeButton);
+        actionFactory.configureIconButton(mergeAction, new ToggleMergeUnmergeAction(), this);
     }
 
     private void configureUnmergeButton() {
         Action unmergeAction = new Action.Builder(Localization.lang("Unmerge %0", field.getDisplayName()))
                 .setIcon(IconTheme.JabRefIcons.UNDO);
-
-        if (toggleMergeUnmergeButton == null) {
-            toggleMergeUnmergeButton = actionFactory.createIconButton(unmergeAction, new ToggleMergeUnmergeAction());
-            toggleMergeUnmergeButton.setMaxHeight(Double.MAX_VALUE);
-        }
-        actionFactory.configureIconButton(unmergeAction, new ToggleMergeUnmergeAction(), toggleMergeUnmergeButton);
+        actionFactory.configureIconButton(unmergeAction, new ToggleMergeUnmergeAction(), this);
     }
 
     public ObjectProperty<FieldState> fieldStateProperty() {
