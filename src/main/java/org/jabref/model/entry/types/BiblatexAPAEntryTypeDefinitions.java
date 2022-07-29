@@ -12,7 +12,7 @@ public class BiblatexAPAEntryTypeDefinitions {
 
     private static final BibEntryType JURISDICTION = new BibEntryTypeBuilder()
             .withType(BiblatexApaEntryType.Jurisdiction)
-            .withDetailFields(StandardField.ORGANIZATION, BiblatexApaField.CITATION_CITEORG, BiblatexApaField.CITATION_CITEDATE, BiblatexApaField.CITATION_CITEDATE, StandardField.ORIGDATE)
+            .withImportantFields(StandardField.ORGANIZATION, BiblatexApaField.CITATION_CITEORG, BiblatexApaField.CITATION_CITEDATE, BiblatexApaField.CITATION_CITEDATE, StandardField.ORIGDATE)
             .withRequiredFields(StandardField.TITLE, BiblatexApaField.CITATION, BiblatexApaField.CITATION_CITEINFO, StandardField.URL, StandardField.DATE)
             .build();
 
