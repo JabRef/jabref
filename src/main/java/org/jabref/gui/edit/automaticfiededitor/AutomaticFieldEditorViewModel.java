@@ -8,6 +8,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 import org.jabref.gui.AbstractViewModel;
+import org.jabref.gui.StateManager;
 import org.jabref.gui.edit.automaticfiededitor.copyormovecontent.CopyOrMoveFieldContentTabView;
 import org.jabref.gui.edit.automaticfiededitor.editfieldcontent.EditFieldContentTabView;
 import org.jabref.gui.edit.automaticfiededitor.renamefield.RenameFieldTabView;
@@ -19,15 +20,22 @@ public class AutomaticFieldEditorViewModel extends AbstractViewModel {
     public static final String NAMED_COMPOUND_EDITS = "EDIT_FIELDS";
     private final ObservableList<AutomaticFieldEditorTab> fieldEditorTabs = FXCollections.observableArrayList();
     private final NamedCompound dialogEdits = new NamedCompound(NAMED_COMPOUND_EDITS);
+
+    private final StateManager stateManager;
     private final UndoManager undoManager;
 
-    public AutomaticFieldEditorViewModel(List<BibEntry> selectedEntries, BibDatabase database, UndoManager undoManager) {
+    public AutomaticFieldEditorViewModel(List<BibEntry> selectedEntries, BibDatabase database, UndoManager undoManager, StateManager stateManager) {
+        this.undoManager = undoManager;
+        this.stateManager = stateManager;
         fieldEditorTabs.addAll(
-                new EditFieldContentTabView(selectedEntries, database, dialogEdits),
+                new EditFieldContentTabView(selectedEntries, database, stateManager),
                 new CopyOrMoveFieldContentTabView(selectedEntries, database, dialogEdits),
                 new RenameFieldTabView(selectedEntries, database, dialogEdits)
         );
-        this.undoManager = undoManager;
+    }
+
+    public NamedCompound getDialogEdits() {
+        return dialogEdits;
     }
 
     public ObservableList<AutomaticFieldEditorTab> getFieldEditorTabs() {

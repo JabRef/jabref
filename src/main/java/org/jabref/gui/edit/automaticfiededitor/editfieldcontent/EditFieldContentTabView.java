@@ -9,8 +9,8 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 
+import org.jabref.gui.StateManager;
 import org.jabref.gui.edit.automaticfiededitor.AbstractAutomaticFieldEditorTabView;
-import org.jabref.gui.undo.NamedCompound;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
@@ -40,14 +40,14 @@ public class EditFieldContentTabView extends AbstractAutomaticFieldEditorTabView
 
     private EditFieldContentViewModel viewModel;
 
-    private final NamedCompound dialogEdits;
+    private final StateManager stateManager;
 
     private final ControlsFxVisualizer visualizer = new ControlsFxVisualizer();
 
-    public EditFieldContentTabView(List<BibEntry> selectedEntries, BibDatabase database, NamedCompound dialogEdits) {
+    public EditFieldContentTabView(List<BibEntry> selectedEntries, BibDatabase database, StateManager stateManager) {
         this.selectedEntries = selectedEntries;
         this.database = database;
-        this.dialogEdits = dialogEdits;
+        this.stateManager = stateManager;
 
         ViewLoader.view(this)
                   .root(this)
@@ -56,7 +56,7 @@ public class EditFieldContentTabView extends AbstractAutomaticFieldEditorTabView
 
     @FXML
     public void initialize() {
-        viewModel = new EditFieldContentViewModel(database, selectedEntries, dialogEdits);
+        viewModel = new EditFieldContentViewModel(database, selectedEntries, stateManager);
         fieldComboBox.setConverter(FIELD_STRING_CONVERTER);
 
         fieldComboBox.getItems().setAll(viewModel.getAllFields());

@@ -22,6 +22,6 @@ public class AutomaticFieldEditorAction extends SimpleCommand {
     @Override
     public void execute() {
         dialogService.showCustomDialogAndWait(new AutomaticFieldEditorDialog(stateManager.getSelectedEntries(),
-                stateManager.getActiveDatabase().map(BibDatabaseContext::getDatabase).orElseThrow()));
+                stateManager.getActiveDatabase().map(BibDatabaseContext::getDatabase).orElseThrow(), stateManager));
     }
 }

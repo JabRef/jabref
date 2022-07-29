@@ -11,6 +11,7 @@ import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 
 import org.jabref.gui.Globals;
+import org.jabref.gui.StateManager;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabase;
@@ -18,6 +19,7 @@ import org.jabref.model.entry.BibEntry;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.google.common.eventbus.Subscribe;
+import com.tobiasdiez.easybind.EasyBind;
 
 public class AutomaticFieldEditorDialog extends BaseDialog<String> {
     @FXML
@@ -27,13 +29,17 @@ public class AutomaticFieldEditorDialog extends BaseDialog<String> {
 
     private final BibDatabase database;
     private final List<BibEntry> selectedEntries;
+
+    private final StateManager stateManager;
+
     private AutomaticFieldEditorViewModel viewModel;
 
     private List<NotificationPaneAdapter> notificationPanes = new ArrayList<>();
 
-    public AutomaticFieldEditorDialog(List<BibEntry> selectedEntries, BibDatabase database) {
+    public AutomaticFieldEditorDialog(List<BibEntry> selectedEntries, BibDatabase database, StateManager stateManager) {
         this.selectedEntries = selectedEntries;
         this.database = database;
+        this.stateManager = stateManager;
         this.undoManager = Globals.undoManager;
 
         this.setTitle(Localization.lang("Automatic field editor"));
@@ -60,7 +66,7 @@ public class AutomaticFieldEditorDialog extends BaseDialog<String> {
 
     @FXML
     public void initialize() {
-        viewModel = new AutomaticFieldEditorViewModel(selectedEntries, database, undoManager);
+        viewModel = new AutomaticFieldEditorViewModel(selectedEntries, database, undoManager, stateManager);
 
         for (AutomaticFieldEditorTab tabModel : viewModel.getFieldEditorTabs()) {
             NotificationPaneAdapter notificationPane = new NotificationPaneAdapter(tabModel.getContent());
@@ -68,6 +74,12 @@ public class AutomaticFieldEditorDialog extends BaseDialog<String> {
             tabModel.registerListener(this);
             tabPane.getTabs().add(new Tab(tabModel.getTabName(), notificationPane));
         }
+
+        EasyBind.listen(stateManager.lastAutomaticFieldEditorEditProperty(), (obs, old, lastEdit) -> {
+            viewModel.getDialogEdits().addEdit(lastEdit.getEdit());
+            notificationPanes.get(lastEdit.getTabIndex())
+                             .notify(lastEdit.getAffectedEntries(), selectedEntries.size());
+        });
     }
 
     @Subscribe
