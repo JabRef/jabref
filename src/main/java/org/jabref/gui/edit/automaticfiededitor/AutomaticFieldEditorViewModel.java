@@ -21,16 +21,14 @@ public class AutomaticFieldEditorViewModel extends AbstractViewModel {
     private final ObservableList<AutomaticFieldEditorTab> fieldEditorTabs = FXCollections.observableArrayList();
     private final NamedCompound dialogEdits = new NamedCompound(NAMED_COMPOUND_EDITS);
 
-    private final StateManager stateManager;
     private final UndoManager undoManager;
 
     public AutomaticFieldEditorViewModel(List<BibEntry> selectedEntries, BibDatabase database, UndoManager undoManager, StateManager stateManager) {
         this.undoManager = undoManager;
-        this.stateManager = stateManager;
         fieldEditorTabs.addAll(
-                new EditFieldContentTabView(selectedEntries, database, stateManager),
-                new CopyOrMoveFieldContentTabView(selectedEntries, database, stateManager),
-                new RenameFieldTabView(selectedEntries, database, stateManager)
+                new EditFieldContentTabView(database, stateManager),
+                new CopyOrMoveFieldContentTabView(database, stateManager),
+                new RenameFieldTabView(database, stateManager)
         );
     }
 

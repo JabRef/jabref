@@ -36,8 +36,8 @@ public class RenameFieldTabView extends AbstractAutomaticFieldEditorTabView impl
 
     private final ControlsFxVisualizer visualizer = new ControlsFxVisualizer();
 
-    public RenameFieldTabView(List<BibEntry> selectedEntries, BibDatabase database, StateManager stateManager) {
-        this.selectedEntries = selectedEntries;
+    public RenameFieldTabView(BibDatabase database, StateManager stateManager) {
+        this.selectedEntries = stateManager.getSelectedEntries();
         this.database = database;
         this.stateManager = stateManager;
 

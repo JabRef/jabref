@@ -46,8 +46,8 @@ public class CopyOrMoveFieldContentTabView extends AbstractAutomaticFieldEditorT
 
     private final ControlsFxVisualizer visualizer = new ControlsFxVisualizer();
 
-    public CopyOrMoveFieldContentTabView(List<BibEntry> selectedEntries, BibDatabase database, StateManager stateManager) {
-        this.selectedEntries = new ArrayList<>(selectedEntries);
+    public CopyOrMoveFieldContentTabView(BibDatabase database, StateManager stateManager) {
+        this.selectedEntries = new ArrayList<>(stateManager.getSelectedEntries());
         this.database = database;
         this.stateManager = stateManager;
 

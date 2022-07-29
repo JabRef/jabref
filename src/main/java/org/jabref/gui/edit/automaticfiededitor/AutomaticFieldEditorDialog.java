@@ -35,9 +35,9 @@ public class AutomaticFieldEditorDialog extends BaseDialog<String> {
 
     private List<NotificationPaneAdapter> notificationPanes = new ArrayList<>();
 
-    public AutomaticFieldEditorDialog(List<BibEntry> selectedEntries, BibDatabase database, StateManager stateManager) {
-        this.selectedEntries = selectedEntries;
-        this.database = database;
+    public AutomaticFieldEditorDialog(StateManager stateManager) {
+        this.selectedEntries = stateManager.getSelectedEntries();
+        this.database = stateManager.getActiveDatabase().orElseThrow().getDatabase();
         this.stateManager = stateManager;
         this.undoManager = Globals.undoManager;
 

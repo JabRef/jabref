@@ -44,8 +44,8 @@ public class EditFieldContentTabView extends AbstractAutomaticFieldEditorTabView
 
     private final ControlsFxVisualizer visualizer = new ControlsFxVisualizer();
 
-    public EditFieldContentTabView(List<BibEntry> selectedEntries, BibDatabase database, StateManager stateManager) {
-        this.selectedEntries = selectedEntries;
+    public EditFieldContentTabView(BibDatabase database, StateManager stateManager) {
+        this.selectedEntries = stateManager.getSelectedEntries();
         this.database = database;
         this.stateManager = stateManager;
 
