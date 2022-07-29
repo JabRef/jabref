@@ -3,8 +3,8 @@ package org.jabref.gui.edit;
 import java.util.List;
 import java.util.Optional;
 
+import org.jabref.gui.StateManager;
 import org.jabref.gui.edit.automaticfiededitor.renamefield.RenameFieldViewModel;
-import org.jabref.gui.undo.NamedCompound;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
@@ -16,6 +16,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mock;
 
 public class RenameFieldViewModelTest {
     RenameFieldViewModel renameFieldViewModel;
@@ -23,6 +24,8 @@ public class RenameFieldViewModelTest {
     BibEntry entryB;
 
     BibDatabase bibDatabase;
+
+    StateManager stateManager = mock(StateManager.class);
 
     @BeforeEach
     void setup() {
@@ -37,7 +40,7 @@ public class RenameFieldViewModelTest {
                 .withField(StandardField.AUTHOR, "Eddie");
 
         bibDatabase = new BibDatabase();
-        renameFieldViewModel = new RenameFieldViewModel(List.of(entryA, entryB), bibDatabase, new NamedCompound(""));
+        renameFieldViewModel = new RenameFieldViewModel(List.of(entryA, entryB), bibDatabase, stateManager);
     }
 
     @Test

@@ -3,8 +3,8 @@ package org.jabref.gui.edit;
 import java.util.List;
 import java.util.Optional;
 
+import org.jabref.gui.StateManager;
 import org.jabref.gui.edit.automaticfiededitor.editfieldcontent.EditFieldContentViewModel;
-import org.jabref.gui.undo.NamedCompound;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.mockito.Mockito.mock;
 
 public class EditFieldContentTabViewModelTest {
     EditFieldContentViewModel editFieldContentViewModel;
@@ -21,6 +22,8 @@ public class EditFieldContentTabViewModelTest {
     BibEntry entryB;
 
     BibDatabase bibDatabase;
+
+    StateManager stateManager = mock(StateManager.class);
 
     @BeforeEach
     void setup() {
@@ -33,7 +36,7 @@ public class EditFieldContentTabViewModelTest {
                 .withField(StandardField.YEAR, "");
 
         bibDatabase = new BibDatabase();
-        editFieldContentViewModel = new EditFieldContentViewModel(bibDatabase, List.of(entryA, entryB), new NamedCompound(""));
+        editFieldContentViewModel = new EditFieldContentViewModel(bibDatabase, List.of(entryA, entryB), stateManager);
     }
 
     @Test

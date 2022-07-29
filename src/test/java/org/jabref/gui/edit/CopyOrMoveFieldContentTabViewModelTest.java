@@ -3,8 +3,8 @@ package org.jabref.gui.edit;
 import java.util.List;
 import java.util.Optional;
 
+import org.jabref.gui.StateManager;
 import org.jabref.gui.edit.automaticfiededitor.copyormovecontent.CopyOrMoveFieldContentTabViewModel;
-import org.jabref.gui.undo.NamedCompound;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
@@ -13,6 +13,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mock;
 
 public class CopyOrMoveFieldContentTabViewModelTest {
     CopyOrMoveFieldContentTabViewModel copyOrMoveFieldContentTabViewModel;
@@ -20,6 +21,8 @@ public class CopyOrMoveFieldContentTabViewModelTest {
     BibEntry entryB;
 
     BibDatabase bibDatabase;
+
+    StateManager stateManager = mock(StateManager.class);
 
     @BeforeEach
     void setup() {
@@ -97,6 +100,6 @@ public class CopyOrMoveFieldContentTabViewModelTest {
     }
 
     private CopyOrMoveFieldContentTabViewModel newTwoFieldsViewModel(BibEntry... selectedEntries) {
-        return new CopyOrMoveFieldContentTabViewModel(List.of(selectedEntries), bibDatabase, new NamedCompound(""));
+        return new CopyOrMoveFieldContentTabViewModel(List.of(selectedEntries), bibDatabase, stateManager);
     }
 }
