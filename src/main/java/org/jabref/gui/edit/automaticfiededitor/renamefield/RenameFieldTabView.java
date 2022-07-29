@@ -8,9 +8,9 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 
+import org.jabref.gui.StateManager;
 import org.jabref.gui.edit.automaticfiededitor.AbstractAutomaticFieldEditorTabView;
 import org.jabref.gui.edit.automaticfiededitor.AutomaticFieldEditorTab;
-import org.jabref.gui.undo.NamedCompound;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
@@ -31,15 +31,15 @@ public class RenameFieldTabView extends AbstractAutomaticFieldEditorTabView impl
     private TextField newFieldNameTextField;
     private final List<BibEntry> selectedEntries;
     private final BibDatabase database;
-    private final NamedCompound dialogEdits;
+    private final StateManager stateManager;
     private RenameFieldViewModel viewModel;
 
     private final ControlsFxVisualizer visualizer = new ControlsFxVisualizer();
 
-    public RenameFieldTabView(List<BibEntry> selectedEntries, BibDatabase database, NamedCompound dialogEdits) {
+    public RenameFieldTabView(List<BibEntry> selectedEntries, BibDatabase database, StateManager stateManager) {
         this.selectedEntries = selectedEntries;
         this.database = database;
-        this.dialogEdits = dialogEdits;
+        this.stateManager = stateManager;
 
         ViewLoader.view(this)
                   .root(this)
@@ -48,7 +48,7 @@ public class RenameFieldTabView extends AbstractAutomaticFieldEditorTabView impl
 
     @FXML
     public void initialize() {
-        viewModel = new RenameFieldViewModel(selectedEntries, database, dialogEdits);
+        viewModel = new RenameFieldViewModel(selectedEntries, database, stateManager);
 
         fieldComboBox.getItems().setAll(viewModel.getAllFields());
         fieldComboBox.getSelectionModel().selectFirst();
@@ -70,16 +70,6 @@ public class RenameFieldTabView extends AbstractAutomaticFieldEditorTabView impl
     @Override
     public String getTabName() {
         return Localization.lang("Rename field");
-    }
-
-    @Override
-    public void registerListener(Object object) {
-        viewModel.registerListener(object);
-    }
-
-    @Override
-    public void unregisterListener(Object object) {
-        viewModel.registerListener(object);
     }
 
     @FXML

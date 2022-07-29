@@ -9,9 +9,9 @@ import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 
+import org.jabref.gui.StateManager;
 import org.jabref.gui.edit.automaticfiededitor.AbstractAutomaticFieldEditorTabView;
 import org.jabref.gui.edit.automaticfiededitor.AutomaticFieldEditorTab;
-import org.jabref.gui.undo.NamedCompound;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
@@ -42,14 +42,14 @@ public class CopyOrMoveFieldContentTabView extends AbstractAutomaticFieldEditorT
     private CopyOrMoveFieldContentTabViewModel viewModel;
     private final List<BibEntry> selectedEntries;
     private final BibDatabase database;
-    private final NamedCompound dialogEdits;
+    private final StateManager stateManager;
 
     private final ControlsFxVisualizer visualizer = new ControlsFxVisualizer();
 
-    public CopyOrMoveFieldContentTabView(List<BibEntry> selectedEntries, BibDatabase database, NamedCompound dialogEdits) {
+    public CopyOrMoveFieldContentTabView(List<BibEntry> selectedEntries, BibDatabase database, StateManager stateManager) {
         this.selectedEntries = new ArrayList<>(selectedEntries);
         this.database = database;
-        this.dialogEdits = dialogEdits;
+        this.stateManager = stateManager;
 
         ViewLoader.view(this)
                   .root(this)
@@ -57,7 +57,7 @@ public class CopyOrMoveFieldContentTabView extends AbstractAutomaticFieldEditorT
     }
 
     public void initialize() {
-        viewModel = new CopyOrMoveFieldContentTabViewModel(selectedEntries, database, dialogEdits);
+        viewModel = new CopyOrMoveFieldContentTabViewModel(selectedEntries, database, stateManager);
         initializeFromAndToComboBox();
 
         viewModel.overwriteFieldContentProperty().bindBidirectional(overwriteFieldContentCheckBox.selectedProperty());
@@ -90,16 +90,6 @@ public class CopyOrMoveFieldContentTabView extends AbstractAutomaticFieldEditorT
     @Override
     public String getTabName() {
         return Localization.lang("Copy or Move content");
-    }
-
-    @Override
-    public void registerListener(Object object) {
-        viewModel.registerListener(object);
-    }
-
-    @Override
-    public void unregisterListener(Object object) {
-        viewModel.registerListener(object);
     }
 
     @FXML

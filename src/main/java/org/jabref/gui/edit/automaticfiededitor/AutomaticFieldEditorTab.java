@@ -6,8 +6,4 @@ public interface AutomaticFieldEditorTab {
     Pane getContent();
 
     String getTabName();
-
-    void registerListener(Object object);
-
-    void unregisterListener(Object object);
 }

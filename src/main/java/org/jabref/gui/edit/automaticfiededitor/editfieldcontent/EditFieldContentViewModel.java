@@ -40,15 +40,12 @@ public class EditFieldContentViewModel extends AbstractAutomaticFieldEditorTabVi
 
     private final BooleanProperty overwriteFieldContent = new SimpleBooleanProperty(Boolean.FALSE);
 
-    private final StateManager stateManager;
-
     private final Validator fieldValidator;
     private final BooleanBinding canAppend;
 
     public EditFieldContentViewModel(BibDatabase database, List<BibEntry> selectedEntries, StateManager stateManager) {
-        super(database);
+        super(database, stateManager);
         this.selectedEntries = new ArrayList<>(selectedEntries);
-        this.stateManager = stateManager;
 
         fieldValidator = new FunctionBasedValidator<>(selectedField, field -> {
             if (StringUtil.isBlank(field.getName())) {

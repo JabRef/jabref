@@ -29,8 +29,8 @@ public class AutomaticFieldEditorViewModel extends AbstractViewModel {
         this.stateManager = stateManager;
         fieldEditorTabs.addAll(
                 new EditFieldContentTabView(selectedEntries, database, stateManager),
-                new CopyOrMoveFieldContentTabView(selectedEntries, database, dialogEdits),
-                new RenameFieldTabView(selectedEntries, database, dialogEdits)
+                new CopyOrMoveFieldContentTabView(selectedEntries, database, stateManager),
+                new RenameFieldTabView(selectedEntries, database, stateManager)
         );
     }
 

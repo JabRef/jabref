@@ -9,8 +9,9 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
+import org.jabref.gui.StateManager;
 import org.jabref.gui.edit.automaticfiededitor.AbstractAutomaticFieldEditorTabViewModel;
-import org.jabref.gui.edit.automaticfiededitor.AutomaticFieldEditorEvent;
+import org.jabref.gui.edit.automaticfiededitor.LastAutomaticFieldEditorEdit;
 import org.jabref.gui.edit.automaticfiededitor.MoveFieldValueAction;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.model.database.BibDatabase;
@@ -30,7 +31,6 @@ public class RenameFieldViewModel extends AbstractAutomaticFieldEditorTabViewMod
     private final StringProperty newFieldName = new SimpleStringProperty("");
     private final ObjectProperty<Field> selectedField = new SimpleObjectProperty<>(StandardField.AUTHOR);
     private final List<BibEntry> selectedEntries;
-    private final NamedCompound dialogEdits;
 
     private final Validator fieldValidator;
 
@@ -38,10 +38,9 @@ public class RenameFieldViewModel extends AbstractAutomaticFieldEditorTabViewMod
 
     private final BooleanBinding canRename;
 
-    public RenameFieldViewModel(List<BibEntry> selectedEntries, BibDatabase database, NamedCompound dialogEdits) {
-        super(database);
+    public RenameFieldViewModel(List<BibEntry> selectedEntries, BibDatabase database, StateManager stateManager) {
+        super(database, stateManager);
         this.selectedEntries = selectedEntries;
-        this.dialogEdits = dialogEdits;
 
         fieldValidator = new FunctionBasedValidator<>(selectedField, field -> StringUtil.isNotBlank(field.getName()),
                 ValidationMessage.error("Field cannot be empty"));
@@ -105,10 +104,11 @@ public class RenameFieldViewModel extends AbstractAutomaticFieldEditorTabViewMod
 
             if (renameEdit.hasEdits()) {
                 renameEdit.end();
-                dialogEdits.addEdit(renameEdit);
             }
         }
 
-        eventBus.post(new AutomaticFieldEditorEvent(TAB_INDEX, affectedEntriesCount));
+        stateManager.setLastAutomaticFieldEditorEdit(new LastAutomaticFieldEditorEdit(
+                affectedEntriesCount, TAB_INDEX, renameEdit
+        ));
     }
 }

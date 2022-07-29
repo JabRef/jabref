@@ -18,7 +18,6 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 
 import com.airhacks.afterburner.views.ViewLoader;
-import com.google.common.eventbus.Subscribe;
 import com.tobiasdiez.easybind.EasyBind;
 
 public class AutomaticFieldEditorDialog extends BaseDialog<String> {
@@ -71,7 +70,6 @@ public class AutomaticFieldEditorDialog extends BaseDialog<String> {
         for (AutomaticFieldEditorTab tabModel : viewModel.getFieldEditorTabs()) {
             NotificationPaneAdapter notificationPane = new NotificationPaneAdapter(tabModel.getContent());
             notificationPanes.add(notificationPane);
-            tabModel.registerListener(this);
             tabPane.getTabs().add(new Tab(tabModel.getTabName(), notificationPane));
         }
 
@@ -80,15 +78,6 @@ public class AutomaticFieldEditorDialog extends BaseDialog<String> {
             notificationPanes.get(lastEdit.getTabIndex())
                              .notify(lastEdit.getAffectedEntries(), selectedEntries.size());
         });
-    }
-
-    @Subscribe
-    private void onEntriesUpdated(AutomaticFieldEditorEvent event) {
-        assert event.tabIndex() < notificationPanes.size() : "The tab index is not associated with any of the automatic field editor tabs.";
-        assert event.numberOfAffectedEntries() <= selectedEntries.size() : "The number of affected entries cannot exceed the number of selected entries.";
-
-        notificationPanes.get(event.tabIndex())
-                         .notify(event.numberOfAffectedEntries(), selectedEntries.size());
     }
 
     private void saveChanges() {

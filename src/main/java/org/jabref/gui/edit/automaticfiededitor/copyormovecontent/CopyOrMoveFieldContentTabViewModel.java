@@ -9,8 +9,9 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 
+import org.jabref.gui.StateManager;
 import org.jabref.gui.edit.automaticfiededitor.AbstractAutomaticFieldEditorTabViewModel;
-import org.jabref.gui.edit.automaticfiededitor.AutomaticFieldEditorEvent;
+import org.jabref.gui.edit.automaticfiededitor.LastAutomaticFieldEditorEdit;
 import org.jabref.gui.edit.automaticfiededitor.MoveFieldValueAction;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableFieldChange;
@@ -33,7 +34,6 @@ public class CopyOrMoveFieldContentTabViewModel extends AbstractAutomaticFieldEd
 
     private final BooleanProperty overwriteFieldContent = new SimpleBooleanProperty(Boolean.FALSE);
     private final List<BibEntry> selectedEntries;
-    private final NamedCompound dialogEdits;
 
     private final Validator toFieldValidator;
 
@@ -41,10 +41,9 @@ public class CopyOrMoveFieldContentTabViewModel extends AbstractAutomaticFieldEd
 
     private final BooleanBinding canSwap;
 
-    public CopyOrMoveFieldContentTabViewModel(List<BibEntry> selectedEntries, BibDatabase bibDatabase, NamedCompound dialogEdits) {
-        super(bibDatabase);
+    public CopyOrMoveFieldContentTabViewModel(List<BibEntry> selectedEntries, BibDatabase bibDatabase, StateManager stateManager) {
+        super(bibDatabase, stateManager);
         this.selectedEntries = new ArrayList<>(selectedEntries);
-        this.dialogEdits = dialogEdits;
 
         toFieldValidator = new FunctionBasedValidator<>(toField, field -> {
             if (StringUtil.isBlank(field.getName())) {
@@ -118,9 +117,10 @@ public class CopyOrMoveFieldContentTabViewModel extends AbstractAutomaticFieldEd
         }
         if (copyFieldValueEdit.hasEdits()) {
             copyFieldValueEdit.end();
-            dialogEdits.addEdit(copyFieldValueEdit);
         }
-        eventBus.post(new AutomaticFieldEditorEvent(TAB_INDEX, affectedEntriesCount));
+        stateManager.setLastAutomaticFieldEditorEdit(new LastAutomaticFieldEditorEdit(
+                affectedEntriesCount, TAB_INDEX, copyFieldValueEdit
+        ));
     }
 
     public void moveValue() {
@@ -134,10 +134,11 @@ public class CopyOrMoveFieldContentTabViewModel extends AbstractAutomaticFieldEd
 
             if (moveEdit.hasEdits()) {
                 moveEdit.end();
-                dialogEdits.addEdit(moveEdit);
             }
         }
-        eventBus.post(new AutomaticFieldEditorEvent(TAB_INDEX, affectedEntriesCount));
+        stateManager.setLastAutomaticFieldEditorEdit(new LastAutomaticFieldEditorEdit(
+                affectedEntriesCount, TAB_INDEX, moveEdit
+        ));
     }
 
     public void swapValues() {
@@ -170,10 +171,10 @@ public class CopyOrMoveFieldContentTabViewModel extends AbstractAutomaticFieldEd
 
         if (swapFieldValuesEdit.hasEdits()) {
             swapFieldValuesEdit.end();
-            dialogEdits.addEdit(swapFieldValuesEdit);
         }
-        // TODO: Maybe pass the edits to the event bus and let the dialog register them?
-        eventBus.post(new AutomaticFieldEditorEvent(TAB_INDEX, affectedEntriesCount));
+        stateManager.setLastAutomaticFieldEditorEdit(new LastAutomaticFieldEditorEdit(
+                affectedEntriesCount, TAB_INDEX, swapFieldValuesEdit
+        ));
     }
 
     public List<BibEntry> getSelectedEntries() {
