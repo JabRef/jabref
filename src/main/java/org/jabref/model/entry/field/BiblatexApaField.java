@@ -79,5 +79,4 @@ public enum BiblatexApaField implements Field {
             return displayName;
         }
     }
-
 }
