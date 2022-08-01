@@ -3,6 +3,7 @@ package org.jabref.gui.edit.automaticfiededitor;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.undo.CannotUndoException;
 import javax.swing.undo.UndoManager;
 
 import javafx.fxml.FXML;
@@ -19,8 +20,13 @@ import org.jabref.model.entry.BibEntry;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class AutomaticFieldEditorDialog extends BaseDialog<String> {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(AutomaticFieldEditorDialog.class);
+
     @FXML
     private TabPane tabPane;
 
@@ -85,6 +91,10 @@ public class AutomaticFieldEditorDialog extends BaseDialog<String> {
     }
 
     private void cancelChanges() {
-        viewModel.cancelChanges();
+        try {
+            viewModel.cancelChanges();
+        } catch (CannotUndoException e) {
+            LOGGER.info("Could not undo", e);
+        }
     }
 }
