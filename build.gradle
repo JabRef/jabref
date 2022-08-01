@@ -120,7 +120,7 @@ dependencies {
     implementation 'org.apache.lucene:lucene-queryparser:9.2.0'
     implementation 'org.apache.lucene:lucene-queries:9.2.0'
     implementation 'org.apache.lucene:lucene-analysis-common:9.2.0'
-    implementation 'org.apache.lucene:lucene-highlighter:9.2.0'
+    implementation 'org.apache.lucene:lucene-highlighter:9.3.0'
 
     implementation group: 'org.apache.commons', name: 'commons-csv', version: '1.9.0'
     implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.12.0'
@@ -220,7 +220,7 @@ dependencies {
     testImplementation "org.testfx:testfx-junit5:4.0.16-alpha"
     testImplementation "org.hamcrest:hamcrest-library:2.2"
 
-    checkstyle 'com.puppycrawl.tools:checkstyle:10.3.1'
+    checkstyle 'com.puppycrawl.tools:checkstyle:10.3.2'
     // xjc needs the runtime as well for the ant task, otherwise it fails
     xjc group: 'org.glassfish.jaxb', name: 'jaxb-xjc', version: '3.0.2'
     xjc group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '3.0.2'
