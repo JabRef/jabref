@@ -39,5 +39,8 @@ class MetaDataChangeViewModel extends DatabaseChangeViewModel {
     @Override
     public void makeChange(BibDatabaseContext database, NamedCompound undoEdit) {
         database.setMetaData(metaDataDiff.getNewMetaData());
+        // group change is handled by GroupChangeViewModel, so we set the groups root to the original value
+        // to prevent any inconsistency
+        metaDataDiff.getGroupDifferences().ifPresent(groupDiff -> database.getMetaData().setGroups(groupDiff.getOriginalGroupRoot()));
     }
 }

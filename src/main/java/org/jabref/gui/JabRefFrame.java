@@ -222,6 +222,54 @@ public class JabRefFrame extends BorderPane {
                 } else {
                     tabbedPane.getTabs().remove(dndIndicator);
                 }
+                // Accept drag entries from MainTable
+                if (event.getDragboard().hasContent(DragAndDropDataFormats.ENTRIES)) {
+                    event.acceptTransferModes(TransferMode.COPY);
+                    event.consume();
+                }
+            });
+
+            this.getScene().setOnDragEntered(event -> {
+                // It is necessary to setOnDragOver for newly opened tabs
+                // drag'n'drop on tabs covered dnd on tabbedPane, so dnd on tabs should contain all dnds on tabbedPane
+                tabbedPane.lookupAll(".tab").forEach(tab -> {
+                    tab.setOnDragOver(tabDragEvent -> {
+                        if (DragAndDropHelper.hasBibFiles(tabDragEvent.getDragboard())) {
+                            tabDragEvent.acceptTransferModes(TransferMode.ANY);
+                            if (!tabbedPane.getTabs().contains(dndIndicator)) {
+                                tabbedPane.getTabs().add(dndIndicator);
+                            }
+                            event.consume();
+                        } else {
+                            tabbedPane.getTabs().remove(dndIndicator);
+                        }
+
+                        if (tabDragEvent.getDragboard().hasContent(DragAndDropDataFormats.ENTRIES)) {
+                            tabDragEvent.acceptTransferModes(TransferMode.COPY);
+                            tabDragEvent.consume();
+                        }
+                    });
+                    tab.setOnDragExited(event1 -> tabbedPane.getTabs().remove(dndIndicator));
+                    tab.setOnDragDropped(tabDragEvent -> {
+                        if (DragAndDropHelper.hasBibFiles(tabDragEvent.getDragboard())) {
+                            tabbedPane.getTabs().remove(dndIndicator);
+                            List<Path> bibFiles = DragAndDropHelper.getBibFiles(tabDragEvent.getDragboard());
+                            OpenDatabaseAction openDatabaseAction = this.getOpenDatabaseAction();
+                            openDatabaseAction.openFiles(bibFiles, true);
+                            tabDragEvent.setDropCompleted(true);
+                            tabDragEvent.consume();
+                        } else {
+                            for (Tab libraryTab : tabbedPane.getTabs()) {
+                                if (libraryTab.getId().equals(tab.getId()) &&
+                                        !tabbedPane.getSelectionModel().getSelectedItem().equals(libraryTab)) {
+                                    ((LibraryTab) libraryTab).dropEntry(stateManager.getLocalDragboard().getBibEntries());
+                                }
+                            }
+                            tabDragEvent.consume();
+                        }
+                    });
+                });
+                event.consume();
             });
 
             this.getScene().setOnDragExited(event -> tabbedPane.getTabs().remove(dndIndicator));
@@ -448,8 +496,10 @@ public class JabRefFrame extends BorderPane {
             @Override
             public void invalidated(Observable observable) {
                 if (mainStage.isShowing()) {
-                    setDividerPosition();
-                    observable.removeListener(this);
+                    Platform.runLater(() -> {
+                        setDividerPosition();
+                        observable.removeListener(this);
+                    });
                 }
             }
         });
@@ -472,10 +522,9 @@ public class JabRefFrame extends BorderPane {
     }
 
     private void setDividerPosition() {
-        splitPane.setDividerPositions(prefs.getGuiPreferences().getSidePaneWidth());
         if (mainStage.isShowing() && !sidePane.getChildren().isEmpty()) {
-            dividerSubscription = EasyBind.subscribe(splitPane.getDividers().get(0).positionProperty(),
-                    position -> prefs.getGuiPreferences().setSidePaneWidth(position.doubleValue()));
+            splitPane.setDividerPositions(prefs.getGuiPreferences().getSidePaneWidth() / splitPane.getWidth());
+            dividerSubscription = EasyBind.subscribe(sidePane.widthProperty(), width -> prefs.getGuiPreferences().setSidePaneWidth(width.doubleValue()));
         }
     }
 
