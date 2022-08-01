@@ -387,19 +387,25 @@ class StringUtilTest {
         assertEquals("Muhlbach", StringUtil.stripAccents("Mühlbach"));
     }
 
-    @Test
-    void testContainsWhitespace() {
-        assertTrue(StringUtil.containsWhitespace("file url"));
-        assertTrue(StringUtil.containsWhitespace("file\nurl"));
-        assertTrue(StringUtil.containsWhitespace("file\r\nurl"));
-        assertTrue(StringUtil.containsWhitespace("file\rurl"));
-        assertTrue(StringUtil.containsWhitespace("file\furl"));
-        assertTrue(StringUtil.containsWhitespace("file_url "));
-        assertTrue(StringUtil.containsWhitespace("file url\n"));
-        assertTrue(StringUtil.containsWhitespace(" "));
+    static Stream<Arguments> testContainsWhitespace() {
+        return Stream.of(
+                Arguments.of(true, "file url"),
+                Arguments.of(true, "file\nurl"),
+                Arguments.of(true, "file\r\nurl"),
+                Arguments.of(true, "file\rurl"),
+                Arguments.of(true, "file\furl"),
+                Arguments.of(true, "file_url "),
+                Arguments.of(true, "file url\n"),
+                Arguments.of(true, " "),
 
-        assertFalse(StringUtil.containsWhitespace("file_url"));
-        assertFalse(StringUtil.containsWhitespace("PascalCase"));
-        assertFalse(StringUtil.containsWhitespace(""));
+                Arguments.of(false, "file_url"),
+                Arguments.of(false, "PascalCase"),
+                Arguments.of(false, ""));
+    }
+
+    @ParameterizedTest
+    @MethodSource
+    void testContainsWhitespace(Boolean expected, String input) {
+        assertEquals(expected, StringUtil.containsWhitespace(input));
     }
 }
