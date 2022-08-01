@@ -16,7 +16,7 @@ public final class BstCaseChanger {
     // global variable to store the current brace level
     private int braceLevel;
 
-    public enum FORMAT_MODE {
+    public enum FormatMode {
         // First character and character after a ":" as upper case - everything else in lower case. Obey {}.
         TITLE_LOWERS('t'),
 
@@ -40,7 +40,7 @@ public final class BstCaseChanger {
 
         private final char asChar;
 
-        FORMAT_MODE(char asChar) {
+        FormatMode(char asChar) {
             this.asChar = asChar;
         }
 
@@ -53,13 +53,17 @@ public final class BstCaseChanger {
          *
          * @throws IllegalArgumentException if char is not 't', 'l', 'u'
          */
-        public static FORMAT_MODE getFormatModeForBSTFormat(final char bstFormat) {
-            for (FORMAT_MODE mode : FORMAT_MODE.values()) {
+        public static FormatMode of(final char bstFormat) {
+            for (FormatMode mode : FormatMode.values()) {
                 if (mode.asChar == bstFormat) {
                     return mode;
                 }
             }
             throw new IllegalArgumentException();
+        }
+
+        public static FormatMode of(final String bstFormat) {
+            return of(bstFormat.toLowerCase(Locale.ROOT).charAt(0));
         }
     }
 
@@ -72,11 +76,11 @@ public final class BstCaseChanger {
      * @param s      the string to handle
      * @param format the format
      */
-    public static String changeCase(String s, FORMAT_MODE format) {
+    public static String changeCase(String s, FormatMode format) {
         return (new BstCaseChanger()).doChangeCase(s, format);
     }
 
-    private String doChangeCase(String s, FORMAT_MODE format) {
+    private String doChangeCase(String s, FormatMode format) {
         char[] c = s.toCharArray();
 
         StringBuilder sb = new StringBuilder();
@@ -93,7 +97,7 @@ public final class BstCaseChanger {
                     i++;
                     continue;
                 }
-                if ((format == FORMAT_MODE.TITLE_LOWERS) && ((i == 0) || (prevColon && Character.isWhitespace(c[i - 1])))) {
+                if ((format == FormatMode.TITLE_LOWERS) && ((i == 0) || (prevColon && Character.isWhitespace(c[i - 1])))) {
                     sb.append('{');
                     i++;
                     prevColon = false;
@@ -138,7 +142,7 @@ public final class BstCaseChanger {
      *
      * @param start  the current position. It points to the opening brace
      */
-    private int convertSpecialChar(StringBuilder sb, char[] c, int start, FORMAT_MODE format) {
+    private int convertSpecialChar(StringBuilder sb, char[] c, int start, FormatMode format) {
         int i = start;
 
         sb.append(c[i]);
@@ -173,7 +177,7 @@ public final class BstCaseChanger {
      *
      * @return the new position
      */
-    private int convertAccented(char[] c, int start, String s, StringBuilder sb, FORMAT_MODE format) {
+    private int convertAccented(char[] c, int start, String s, StringBuilder sb, FormatMode format) {
         int pos = start;
         pos += s.length();
 
@@ -206,7 +210,7 @@ public final class BstCaseChanger {
         return pos;
     }
 
-    private int convertNonControl(char[] c, int start, StringBuilder sb, FORMAT_MODE format) {
+    private int convertNonControl(char[] c, int start, StringBuilder sb, FormatMode format) {
         int pos = start;
         switch (format) {
             case TITLE_LOWERS, ALL_LOWERS -> {
@@ -223,7 +227,7 @@ public final class BstCaseChanger {
         return pos;
     }
 
-    private int convertCharIfBraceLevelIsZero(char[] c, int start, StringBuilder sb, FORMAT_MODE format) {
+    private int convertCharIfBraceLevelIsZero(char[] c, int start, StringBuilder sb, FormatMode format) {
         int i = start;
         switch (format) {
             case TITLE_LOWERS -> {

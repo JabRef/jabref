@@ -1,7 +1,6 @@
 package org.jabref.logic.bst;
 
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Stack;
@@ -24,7 +23,7 @@ import org.slf4j.LoggerFactory;
 
 public class BstFunctions {
     private static final Logger LOGGER = LoggerFactory.getLogger(BstFunctions.class);
-    private static final Pattern ADD_PERIOD_PATTERN = Pattern.compile("([^\\.\\?\\!\\}\\s])(\\}|\\s)*$");
+    private static final Pattern ADD_PERIOD_PATTERN = Pattern.compile("([^.?!}\\s])(}|\\s)*$");
 
     private final Map<String, String> strings;
     private final Map<String, Integer> integers;
@@ -240,46 +239,37 @@ public class BstFunctions {
         @Override
         public void execute(BstVMVisitor visitor, ParserRuleContext ctx, BstEntry bstEntry) {
             if (stack.size() < 2) {
-                throw new BstVMException("Invalid call to operation := (line %d)".formatted(ctx.start.getLine()));
+                throw new BstVMException("Not enough operands on stack for operation := (line %d)".formatted(ctx.start.getLine()));
             }
             Object o1 = stack.pop();
             Object o2 = stack.pop();
-            doAssign(bstEntry, o1, o2, ctx);
-        }
 
-        private boolean doAssign(BstEntry context, Object o1, Object o2, ParserRuleContext ctx) {
-            if (!(o1 instanceof BstVMVisitor.Identifier) || !((o2 instanceof String) || (o2 instanceof Integer))) {
+            if (!(o1 instanceof BstVMVisitor.Identifier identifier)) {
                 throw new BstVMException("Invalid parameters (line %d)".formatted(ctx.start.getLine()));
             }
+            String name = identifier.name();
 
-            String name = ((BstVMVisitor.Identifier) o1).name();
-
-            // ToDo: use switch statement pattern matching instead (Java 19)
-            if (o2 instanceof String) {
-                String value = (String) o2;
-                if ((context != null) && context.localStrings.containsKey(name)) {
-                    context.localStrings.put(name, value);
-                    return true;
+            if (o2 instanceof String value) {
+                if ((bstEntry != null) && bstEntry.localStrings.containsKey(name)) {
+                    bstEntry.localStrings.put(name, value);
+                    return;
                 }
 
                 if (strings.containsKey(name)) {
                     strings.put(name, value);
-                    return true;
                 }
-            } else {
-                Integer value = (Integer) o2;
-                if ((context != null) && context.localIntegers.containsKey(name)) {
-                    context.localIntegers.put(name, value);
-                    return true;
+            } else if (o2 instanceof Integer value) {
+                if ((bstEntry != null) && bstEntry.localIntegers.containsKey(name)) {
+                    bstEntry.localIntegers.put(name, value);
+                    return;
                 }
 
                 if (integers.containsKey(name)) {
                     integers.put(name, value);
-                    return true;
                 }
+            } else {
+                throw new BstVMException("Invalid parameters (line %d)".formatted(ctx.start.getLine()));
             }
-
-            return false;
         }
     }
 
@@ -365,19 +355,16 @@ public class BstFunctions {
         }
 
         Object o1 = stack.pop();
-        if (!((o1 instanceof String) && (((String) o1).length() == 1))) {
+        if (!((o1 instanceof String format) && (format.length() == 1))) {
             throw new BstVMException("A format string of length 1 is needed for change.case$ (line %d)".formatted(ctx.start.getLine()));
         }
 
         Object o2 = stack.pop();
-        if (!(o2 instanceof String)) {
+        if (!(o2 instanceof String toChange)) {
             throw new BstVMException("A string is needed as second parameter for change.case$ (line %d)".formatted(ctx.start.getLine()));
         }
 
-        char format = ((String) o1).toLowerCase(Locale.ROOT).charAt(0);
-        String s = (String) o2;
-
-        stack.push(BstCaseChanger.changeCase(s, BstCaseChanger.FORMAT_MODE.getFormatModeForBSTFormat(format)));
+        stack.push(BstCaseChanger.changeCase(toChange, BstCaseChanger.FormatMode.of(format)));
     }
 
     /**

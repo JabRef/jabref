@@ -2,7 +2,7 @@ package org.jabref.logic.bst.util;
 
 import java.util.stream.Stream;
 
-import org.jabref.logic.bst.util.BstCaseChanger.FORMAT_MODE;
+import org.jabref.logic.bst.util.BstCaseChanger.FormatMode;
 
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -17,7 +17,7 @@ public class BstCaseChangersTest {
     @ParameterizedTest
     @MethodSource("provideStringsForTitleLowers")
     public void testChangeCaseTitleLowers(String expected, String toBeFormatted) {
-        assertEquals(expected, BstCaseChanger.changeCase(toBeFormatted, FORMAT_MODE.TITLE_LOWERS));
+        assertEquals(expected, BstCaseChanger.changeCase(toBeFormatted, FormatMode.TITLE_LOWERS));
     }
 
     private static Stream<Arguments> provideStringsForTitleLowers() {
@@ -59,7 +59,7 @@ public class BstCaseChangersTest {
     @ParameterizedTest
     @MethodSource("provideStringsForAllLowers")
     public void testChangeCaseAllLowers(String expected, String toBeFormatted) {
-        assertEquals(expected, BstCaseChanger.changeCase(toBeFormatted, FORMAT_MODE.ALL_LOWERS));
+        assertEquals(expected, BstCaseChanger.changeCase(toBeFormatted, FormatMode.ALL_LOWERS));
     }
 
     private static Stream<Arguments> provideStringsForAllLowers() {
@@ -90,7 +90,7 @@ public class BstCaseChangersTest {
     @ParameterizedTest
     @MethodSource("provideStringsForAllUppers")
     public void testChangeCaseAllUppers(String expected, String toBeFormatted) {
-        assertEquals(expected, BstCaseChanger.changeCase(toBeFormatted, FORMAT_MODE.ALL_UPPERS));
+        assertEquals(expected, BstCaseChanger.changeCase(toBeFormatted, FormatMode.ALL_UPPERS));
     }
 
     private static Stream<Arguments> provideStringsForAllUppers() {
@@ -121,7 +121,7 @@ public class BstCaseChangersTest {
     @ParameterizedTest
     @MethodSource("provideTitleCaseAllLowers")
     public void testTitleCaseAllLowers(String expected, String toBeFormatted) {
-        assertEquals(expected, BstCaseChanger.changeCase(toBeFormatted, FORMAT_MODE.ALL_LOWERS));
+        assertEquals(expected, BstCaseChanger.changeCase(toBeFormatted, FormatMode.ALL_LOWERS));
     }
 
     private static Stream<Arguments> provideTitleCaseAllLowers() {
