@@ -3,7 +3,7 @@
   <!-- This style was edited with the Visual CSL Editor (https://editor.citationstyles.org/visualEditor/) -->
   <info>
     <title>Beilstein Journal of Organic Chemistry</title>
-    <title-short>Beilstein</title-short>
+    <title-short>BJOC</title-short>
     <id>http://www.zotero.org/styles/beilstein-journal-of-organic-chemistry</id>
     <link href="http://www.zotero.org/styles/beilstein-journal-of-organic-chemistry" rel="self"/>
     <link href="http://www.zotero.org/styles/american-chemical-society" rel="template"/>
@@ -154,7 +154,6 @@
                 <if variable="volume">
                   <group delimiter=" ">
                     <text variable="volume" font-style="italic"/>
-                    <text variable="issue" prefix="(" suffix=")"/>
                   </group>
                 </if>
                 <else>
