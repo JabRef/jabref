@@ -20,11 +20,11 @@ class BstVMVisitorTest {
 
     @Test
     public void testVisitStringsCommand() {
-        BstVMTest.TestVM vm = new BstVMTest.TestVM("STRINGS { test.string1 test.string2 test.string3 }");
+        BstVM vm = new BstVM("STRINGS { test.string1 test.string2 test.string3 }");
 
         vm.render(Collections.emptyList());
 
-        Map<String, String> strList = vm.getStrings();
+        Map<String, String> strList = vm.latestContext.strings();
         assertTrue(strList.containsKey("test.string1"));
         assertNull(strList.get("test.string1"));
         assertTrue(strList.containsKey("test.string2"));
@@ -35,11 +35,11 @@ class BstVMVisitorTest {
 
     @Test
     public void testVisitIntegersCommand() {
-        BstVMTest.TestVM vm = new BstVMTest.TestVM("INTEGERS { variable.a variable.b variable.c }");
+        BstVM vm = new BstVM("INTEGERS { variable.a variable.b variable.c }");
 
         vm.render(Collections.emptyList());
 
-        Map<String, Integer> integersList = vm.getIntegers();
+        Map<String, Integer> integersList = vm.latestContext.integers();
         assertTrue(integersList.containsKey("variable.a"));
         assertEquals(0, integersList.get("variable.a"));
         assertTrue(integersList.containsKey("variable.b"));
@@ -50,28 +50,28 @@ class BstVMVisitorTest {
 
     @Test
     void testVisitFunctionCommand() {
-        BstVMTest.TestVM vm = new BstVMTest.TestVM("""
+        BstVM vm = new BstVM("""
                 FUNCTION { test.func } { #1 'test.var := }
                 EXECUTE { test.func }
                 """);
 
         vm.render(Collections.emptyList());
 
-        Map<String, BstFunctions.BstFunction> functions = vm.getFunctions();
+        Map<String, BstFunctions.BstFunction> functions = vm.latestContext.functions();
         assertTrue(functions.containsKey("test.func"));
         assertNotNull(functions.get("test.func"));
     }
 
     @Test
     void testVisitMacroCommand() {
-        BstVMTest.TestVM vm = new BstVMTest.TestVM("""
+        BstVM vm = new BstVM("""
                 MACRO { jan } { "January" }
                 EXECUTE { jan }
                 """);
 
         vm.render(Collections.emptyList());
 
-        Map<String, BstFunctions.BstFunction> functions = vm.getFunctions();
+        Map<String, BstFunctions.BstFunction> functions = vm.latestContext.functions();
         assertTrue(functions.containsKey("jan"));
         assertNotNull(functions.get("jan"));
         assertEquals("January", vm.latestContext.stack().pop());
@@ -80,12 +80,12 @@ class BstVMVisitorTest {
 
     @Test
     void testVisitEntryCommand() {
-        BstVMTest.TestVM vm = new BstVMTest.TestVM("ENTRY { address author title type } { variable } { label }");
+        BstVM vm = new BstVM("ENTRY { address author title type } { variable } { label }");
         List<BibEntry> testEntries = List.of(BstVMTest.defaultTestEntry());
 
         vm.render(testEntries);
 
-        BstEntry bstEntry = vm.getEntries().get(0);
+        BstEntry bstEntry = vm.latestContext.entries().get(0);
         assertTrue(bstEntry.fields.containsKey("address"));
         assertTrue(bstEntry.fields.containsKey("author"));
         assertTrue(bstEntry.fields.containsKey("title"));
@@ -97,7 +97,7 @@ class BstVMVisitorTest {
 
     @Test
     void testVisitReadCommand() {
-        BstVMTest.TestVM vm = new BstVMTest.TestVM("""
+        BstVM vm = new BstVM("""
                 ENTRY { author title booktitle year owner timestamp url } { } { }
                 READ
                 """);
@@ -105,7 +105,7 @@ class BstVMVisitorTest {
 
         vm.render(testEntries);
 
-        Map<String, String> fields = vm.getEntries().get(0).fields;
+        Map<String, String> fields = vm.latestContext.entries().get(0).fields;
         assertEquals("Crowston, K. and Annabi, H. and Howison, J. and Masango, C.", fields.get("author"));
         assertEquals("Effective work practices for floss development: A model and propositions", fields.get("title"));
         assertEquals("Hawaii International Conference On System Sciences (HICSS)", fields.get("booktitle"));
@@ -117,7 +117,7 @@ class BstVMVisitorTest {
 
     @Test
     public void testVisitExecuteCommand() throws RecognitionException {
-        BstVMTest.TestVM vm = new BstVMTest.TestVM("""
+        BstVM vm = new BstVM("""
                 INTEGERS { variable.a }
                 FUNCTION { init.state.consts } { #5 'variable.a := }
                 EXECUTE { init.state.consts }
@@ -125,14 +125,14 @@ class BstVMVisitorTest {
 
         vm.render(Collections.emptyList());
 
-        assertEquals(5, vm.getIntegers().get("variable.a"));
+        assertEquals(5, vm.latestContext.integers().get("variable.a"));
     }
 
     // ToDo: testVisitReverseCommand
 
     @Test
     public void testVisitIterateCommand() throws RecognitionException {
-        BstVMTest.TestVM vm = new BstVMTest.TestVM("""
+        BstVM vm = new BstVM("""
                 ENTRY { } { } { }
                 FUNCTION { test } { cite$ }
                 READ
@@ -152,7 +152,7 @@ class BstVMVisitorTest {
 
     @Test
     public void testVisitSortCommand() throws RecognitionException {
-        BstVMTest.TestVM vm = new BstVMTest.TestVM("""
+        BstVM vm = new BstVM("""
                 ENTRY { } { } { }
                 FUNCTION { presort } { cite$ 'sort.key$ := }
                 ITERATE { presort }
@@ -166,7 +166,7 @@ class BstVMVisitorTest {
 
         vm.render(testEntries);
 
-        List<BstEntry> sortedEntries = vm.getEntries();
+        List<BstEntry> sortedEntries = vm.latestContext.entries();
         assertEquals(Optional.of("a"), sortedEntries.get(0).entry.getCitationKey());
         assertEquals(Optional.of("b"), sortedEntries.get(1).entry.getCitationKey());
         assertEquals(Optional.of("c"), sortedEntries.get(2).entry.getCitationKey());
@@ -175,7 +175,7 @@ class BstVMVisitorTest {
 
     @Test
     void testVisitIdentifier() {
-        BstVMTest.TestVM vm = new BstVMTest.TestVM("""
+        BstVM vm = new BstVM("""
                 ENTRY { } { local.variable } { local.label }
                 READ
                 STRINGS { label }

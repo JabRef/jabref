@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
+import java.util.Stack;
 
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
@@ -19,19 +20,6 @@ import org.antlr.v4.runtime.RecognitionException;
 import org.antlr.v4.runtime.Recognizer;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.antlr.v4.runtime.tree.ParseTree;
-
-/* ToDo:
- *  [x] clean up bst functions and fix javadoc
- *  [x] migrate grammar
- *  [x] migrate runner/visitor
- *  [x] migrate functions
- *  [x] context / entry needs to be set as a field for the visitor to iterate forwards or backwards through all the entries
- *  [x] migrate execute / forward / backward / stack / quote / etc.
- *  [x] remove old VM
- *  [ ] fix tests
- *  [ ] create new tests
- *  [ ] clean up bstFunctions
- */
 
 public class BstVM {
 
@@ -103,6 +91,14 @@ public class BstVM {
 
     public String render(Collection<BibEntry> bibEntries) {
         return render(bibEntries, null);
+    }
+
+    protected Stack<Object> getStack() {
+        if (latestContext != null) {
+            return latestContext.stack();
+        } else {
+            throw new BstVMException("BstVM must have rendered at least once to provide the latest stack");
+        }
     }
 
     private static class ThrowingErrorListener extends BaseErrorListener {

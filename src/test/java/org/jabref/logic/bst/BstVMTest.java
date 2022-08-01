@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
-import java.util.Stack;
 
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
@@ -20,17 +18,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class BstVMTest {
 
     public static BibEntry defaultTestEntry() {
-        /*
-            @inproceedings{canh05,
-            author = {Crowston, K. and Annabi, H. and Howison, J. and Masango, C.},
-            title = {Effective work practices for floss development: A model and propositions},
-            booktitle = {Hawaii International Conference On System Sciences (HICSS)},
-            year = {2005},
-            owner = {oezbek},
-            timestamp = {2006.05.29},
-            url = {http://james.howison.name/publications.html}}
-        */
-
         return new BibEntry(StandardEntryType.InProceedings)
                 .withCitationKey("canh05")
                 .withField(StandardField.AUTHOR, "Crowston, K. and Annabi, H. and Howison, J. and Masango, C.")
@@ -44,7 +31,7 @@ public class BstVMTest {
 
     @Test
     public void testAbbrv() throws RecognitionException, IOException {
-        TestVM vm = new TestVM(Path.of("src/test/resources/org/jabref/logic/bst/abbrv.bst"));
+        BstVM vm = new BstVM(Path.of("src/test/resources/org/jabref/logic/bst/abbrv.bst"));
         List<BibEntry> testEntries = List.of(defaultTestEntry());
 
         String expected = "\\begin{thebibliography}{1}\\bibitem{canh05}K.~Crowston, H.~Annabi, J.~Howison, and C.~Masango.\\newblock Effective work practices for floss development: A model and  propositions.\\newblock In {\\em Hawaii International Conference On System Sciences (HICSS)}, 2005.\\end{thebibliography}";
@@ -57,7 +44,7 @@ public class BstVMTest {
 
     @Test
     public void testSimple() throws RecognitionException {
-        TestVM vm = new TestVM("""
+        BstVM vm = new BstVM("""
                 ENTRY { address author title type } { } { label }
                 INTEGERS { output.state before.all mid.sentence after.sentence after.block }
                 FUNCTION { init.state.consts }{
@@ -73,16 +60,16 @@ public class BstVMTest {
 
         vm.render(testEntries);
 
-        assertEquals(2, vm.getStrings().size());
-        assertEquals(7, vm.getIntegers().size());
-        assertEquals(1, vm.getEntries().size());
-        assertEquals(5, vm.getEntries().get(0).fields.size());
-        assertEquals(38, vm.getFunctions().size());
+        assertEquals(2, vm.latestContext.strings().size());
+        assertEquals(7, vm.latestContext.integers().size());
+        assertEquals(1, vm.latestContext.entries().size());
+        assertEquals(5, vm.latestContext.entries().get(0).fields.size());
+        assertEquals(38, vm.latestContext.functions().size());
     }
 
     @Test
     public void testLabel() throws RecognitionException {
-        TestVM vm = new TestVM("""
+        BstVM vm = new BstVM("""
                 ENTRY { title } {} { label }
                 FUNCTION { test } {
                     label #0 =
@@ -97,30 +84,30 @@ public class BstVMTest {
 
         assertEquals(
                 "Effective work practices for floss development: A model and propositions",
-                vm.getStack().pop());
+                vm.latestContext.stack().pop());
     }
 
     @Test
     public void testQuote() throws RecognitionException {
-        TestVM vm = new TestVM("FUNCTION { a }{ quote$ quote$ * } EXECUTE { a }");
+        BstVM vm = new BstVM("FUNCTION { a }{ quote$ quote$ * } EXECUTE { a }");
 
         vm.render(Collections.emptyList());
-        assertEquals("\"\"", vm.getStack().pop());
+        assertEquals("\"\"", vm.latestContext.stack().pop());
     }
 
     @Test
     public void testBuildIn() throws RecognitionException {
-        TestVM vm = new TestVM("EXECUTE { global.max$ }");
+        BstVM vm = new BstVM("EXECUTE { global.max$ }");
 
         vm.render(Collections.emptyList());
 
-        assertEquals(Integer.MAX_VALUE, vm.getStack().pop());
-        assertTrue(vm.getStack().empty());
+        assertEquals(Integer.MAX_VALUE, vm.latestContext.stack().pop());
+        assertTrue(vm.latestContext.stack().empty());
     }
 
     @Test
     public void testVariables() throws RecognitionException {
-        TestVM vm = new TestVM("""
+        BstVM vm = new BstVM("""
                 STRINGS { t }
                 FUNCTION { not } {
                     { #0 } { #1 } if$
@@ -134,12 +121,12 @@ public class BstVMTest {
 
         vm.render(Collections.emptyList());
 
-        assertEquals(BstVM.TRUE, vm.getStack().pop());
+        assertEquals(BstVM.TRUE, vm.latestContext.stack().pop());
     }
 
     @Test
     public void testHypthenatedName() throws RecognitionException, IOException {
-        TestVM vm = new TestVM(Path.of("src/test/resources/org/jabref/logic/bst/abbrv.bst"));
+        BstVM vm = new BstVM(Path.of("src/test/resources/org/jabref/logic/bst/abbrv.bst"));
         List<BibEntry> testEntries = List.of(
                 new BibEntry(StandardEntryType.Article)
                         .withCitationKey("canh05")
@@ -153,7 +140,7 @@ public class BstVMTest {
 
     @Test
     void testAbbrevStyleChopWord() {
-        TestVM vm = new TestVM("""
+        BstVM vm = new BstVM("""
                 STRINGS { s }
                 INTEGERS { len }
 
@@ -189,7 +176,7 @@ public class BstVMTest {
 
     @Test
     void testAbbrevStyleSortFormatTitle() {
-        TestVM vm = new TestVM("""
+        BstVM vm = new BstVM("""
                 STRINGS { s t }
                 INTEGERS { len }
                 FUNCTION { sortify } {
@@ -229,36 +216,5 @@ public class BstVMTest {
         vm.render(Collections.emptyList());
 
         assertEquals("colorful morning", vm.latestContext.stack().pop());
-    }
-
-    public static class TestVM extends BstVM {
-
-        private TestVM(Path path) throws RecognitionException, IOException {
-            super(path);
-        }
-
-        protected TestVM(String s) throws RecognitionException {
-            super(s);
-        }
-
-        protected Map<String, String> getStrings() {
-            return latestContext.strings();
-        }
-
-        protected Map<String, Integer> getIntegers() {
-            return latestContext.integers();
-        }
-
-        protected List<BstEntry> getEntries() {
-            return latestContext.entries();
-        }
-
-        protected Map<String, BstFunctions.BstFunction> getFunctions() {
-            return latestContext.functions();
-        }
-
-        protected Stack<Object> getStack() {
-            return latestContext.stack();
-        }
     }
 }
