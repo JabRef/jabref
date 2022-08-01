@@ -381,7 +381,7 @@ public class OpenOfficePanel {
 
         connectTask.setOnFailed(value -> {
             Throwable ex = connectTask.getException();
-            LOGGER.error("autodetect failed" , ex);
+            LOGGER.error("autodetect failed", ex);
             if (ex instanceof UnsatisfiedLinkError) {
                 LOGGER.warn("Could not connect to running OpenOffice/LibreOffice", ex);
 
@@ -396,10 +396,9 @@ public class OpenOfficePanel {
                                 + Localization.lang("Make sure you have installed OpenOffice/LibreOffice with Java support.") + "\n"
                                 + Localization.lang("If connecting manually, please verify program and library paths.") + "\n" + "\n" + Localization.lang("Error message:"),
                         ex);
-            }  else if (ex instanceof BootstrapException bootstrapEx) {
+            } else if (ex instanceof BootstrapException bootstrapEx) {
                LOGGER.error("Exception boostrap cause", bootstrapEx.getTargetException());
                dialogService.showErrorDialogAndWait("Bootstrap error", bootstrapEx.getTargetException());
-
             } else {
                 dialogService.showErrorDialogAndWait(Localization.lang("Autodetection failed"), Localization.lang("Autodetection failed"), ex);
             }
