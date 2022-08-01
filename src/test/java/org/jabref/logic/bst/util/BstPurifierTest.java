@@ -1,4 +1,4 @@
-package org.jabref.logic.bst;
+package org.jabref.logic.bst.util;
 
 import java.util.stream.Stream;
 
@@ -7,14 +7,13 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
 
-public class BibtexPurifyTest {
+public class BstPurifierTest {
 
     @ParameterizedTest
     @MethodSource("provideTestStrings")
     public void testPurify(String expected, String toBePurified) {
-        assertEquals(expected, BibtexPurify.purify(toBePurified, s -> fail("Should not Warn (" + s + ")! purify should be " + expected + " for " + toBePurified)));
+        assertEquals(expected, BstPurifier.purify(toBePurified));
     }
 
     private static Stream<Arguments> provideTestStrings() {

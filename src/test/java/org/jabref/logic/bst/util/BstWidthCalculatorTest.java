@@ -1,4 +1,4 @@
-package org.jabref.logic.bst;
+package org.jabref.logic.bst.util;
 
 import java.util.stream.Stream;
 
@@ -35,12 +35,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * \bibcite{canh05}{CMM{$^{+}$}05}
  * </code>
  */
-public class BibtexWidthTest {
+public class BstWidthCalculatorTest {
 
     @ParameterizedTest
     @MethodSource("provideTestWidth")
     public void testWidth(int i, String str) {
-        assertEquals(i, BibtexWidth.width(str));
+        assertEquals(i, BstWidthCalculator.width(str));
     }
 
     private static Stream<Arguments> provideTestWidth() {
@@ -60,7 +60,7 @@ public class BibtexWidthTest {
     @ParameterizedTest
     @MethodSource("provideTestGetCharWidth")
     public void testGetCharWidth(int i, Character c) {
-        assertEquals(i, BibtexWidth.getCharWidth(c));
+        assertEquals(i, BstWidthCalculator.getCharWidth(c));
     }
 
     private static Stream<Arguments> provideTestGetCharWidth() {

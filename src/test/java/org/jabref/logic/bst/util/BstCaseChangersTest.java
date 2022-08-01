@@ -1,8 +1,8 @@
-package org.jabref.logic.bst;
+package org.jabref.logic.bst.util;
 
 import java.util.stream.Stream;
 
-import org.jabref.logic.bst.BibtexCaseChanger.FORMAT_MODE;
+import org.jabref.logic.bst.util.BstCaseChanger.FormatMode;
 
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -12,12 +12,12 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class BibtexCaseChangersTest {
+public class BstCaseChangersTest {
 
     @ParameterizedTest
     @MethodSource("provideStringsForTitleLowers")
     public void testChangeCaseTitleLowers(String expected, String toBeFormatted) {
-        assertEquals(expected, BibtexCaseChanger.changeCase(toBeFormatted, FORMAT_MODE.TITLE_LOWERS));
+        assertEquals(expected, BstCaseChanger.changeCase(toBeFormatted, FormatMode.TITLE_LOWERS));
     }
 
     private static Stream<Arguments> provideStringsForTitleLowers() {
@@ -59,7 +59,7 @@ public class BibtexCaseChangersTest {
     @ParameterizedTest
     @MethodSource("provideStringsForAllLowers")
     public void testChangeCaseAllLowers(String expected, String toBeFormatted) {
-        assertEquals(expected, BibtexCaseChanger.changeCase(toBeFormatted, FORMAT_MODE.ALL_LOWERS));
+        assertEquals(expected, BstCaseChanger.changeCase(toBeFormatted, FormatMode.ALL_LOWERS));
     }
 
     private static Stream<Arguments> provideStringsForAllLowers() {
@@ -90,7 +90,7 @@ public class BibtexCaseChangersTest {
     @ParameterizedTest
     @MethodSource("provideStringsForAllUppers")
     public void testChangeCaseAllUppers(String expected, String toBeFormatted) {
-        assertEquals(expected, BibtexCaseChanger.changeCase(toBeFormatted, FORMAT_MODE.ALL_UPPERS));
+        assertEquals(expected, BstCaseChanger.changeCase(toBeFormatted, FormatMode.ALL_UPPERS));
     }
 
     private static Stream<Arguments> provideStringsForAllUppers() {
@@ -121,7 +121,7 @@ public class BibtexCaseChangersTest {
     @ParameterizedTest
     @MethodSource("provideTitleCaseAllLowers")
     public void testTitleCaseAllLowers(String expected, String toBeFormatted) {
-        assertEquals(expected, BibtexCaseChanger.changeCase(toBeFormatted, FORMAT_MODE.ALL_LOWERS));
+        assertEquals(expected, BstCaseChanger.changeCase(toBeFormatted, FormatMode.ALL_LOWERS));
     }
 
     private static Stream<Arguments> provideTitleCaseAllLowers() {

@@ -1,48 +1,42 @@
-package org.jabref.logic.bst;
+package org.jabref.logic.bst.util;
 
 import org.jabref.model.entry.AuthorList;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class BibtexNameFormatterTest {
+public class BstNameFormatterTest {
 
     @Test
     public void testUmlautsFullNames() {
-        AuthorList al = AuthorList
-                .parse("Charles Louis Xavier Joseph de la Vall{\\'e}e Poussin");
+        AuthorList list = AuthorList.parse("Charles Louis Xavier Joseph de la Vall{\\'e}e Poussin");
 
-        assertEquals("de~laVall{\\'e}e~PoussinCharles Louis Xavier~Joseph", BibtexNameFormatter.formatName(al
-                .getAuthor(0), "{vv}{ll}{jj}{ff}", Assertions::fail));
+        assertEquals("de~laVall{\\'e}e~PoussinCharles Louis Xavier~Joseph",
+                BstNameFormatter.formatName(list.getAuthor(0), "{vv}{ll}{jj}{ff}"));
     }
 
     @Test
     public void testUmlautsAbbreviations() {
-        AuthorList al = AuthorList
-                .parse("Charles Louis Xavier Joseph de la Vall{\\'e}e Poussin");
+        AuthorList list = AuthorList.parse("Charles Louis Xavier Joseph de la Vall{\\'e}e Poussin");
 
-        assertEquals("de~la Vall{\\'e}e~Poussin, C.~L. X.~J.", BibtexNameFormatter.formatName(al
-                .getAuthor(0), "{vv~}{ll}{, jj}{, f.}", Assertions::fail));
+        assertEquals("de~la Vall{\\'e}e~Poussin, C.~L. X.~J.",
+                BstNameFormatter.formatName(list.getAuthor(0), "{vv~}{ll}{, jj}{, f.}"));
     }
 
     @Test
     public void testUmlautsAbbreviationsWithQuestionMark() {
-        AuthorList al = AuthorList
-                .parse("Charles Louis Xavier Joseph de la Vall{\\'e}e Poussin");
+        AuthorList list = AuthorList.parse("Charles Louis Xavier Joseph de la Vall{\\'e}e Poussin");
 
-        assertEquals("de~la Vall{\\'e}e~Poussin, C.~L. X.~J?", BibtexNameFormatter.formatName(al
-                .getAuthor(0), "{vv~}{ll}{, jj}{, f}?", Assertions::fail));
+        assertEquals("de~la Vall{\\'e}e~Poussin, C.~L. X.~J?",
+                BstNameFormatter.formatName(list.getAuthor(0), "{vv~}{ll}{, jj}{, f}?"));
     }
 
     @Test
     public void testFormatName() {
-        AuthorList al = AuthorList
-                .parse("Charles Louis Xavier Joseph de la Vall{\\'e}e Poussin");
+        AuthorList list = AuthorList.parse("Charles Louis Xavier Joseph de la Vall{\\'e}e Poussin");
 
-        assertEquals("dlVP", BibtexNameFormatter.formatName(al.getAuthor(0), "{v{}}{l{}}",
-                Assertions::fail));
+        assertEquals("dlVP", BstNameFormatter.formatName(list.getAuthor(0), "{v{}}{l{}}"));
 
         assertNameFormatA("Meyer, J?", "Jonathan Meyer and Charles Louis Xavier Joseph de la Vall{\\'e}e Poussin");
         assertNameFormatB("J.~Meyer", "Jonathan Meyer and Charles Louis Xavier Joseph de la Vall{\\'e}e Poussin");
@@ -60,8 +54,7 @@ public class BibtexNameFormatterTest {
     }
 
     private void assertNameFormat(String string, String string2, int which, String format) {
-        assertEquals(string, BibtexNameFormatter.formatName(string2, which, format,
-                Assertions::fail));
+        assertEquals(string, BstNameFormatter.formatName(string2, which, format));
     }
 
     private void assertNameFormatC(String string, String string2) {
@@ -79,44 +72,41 @@ public class BibtexNameFormatterTest {
     @Test
     public void matchingBraceConsumedForCompleteWords() {
         StringBuilder sb = new StringBuilder();
-        assertEquals(6, BibtexNameFormatter.consumeToMatchingBrace(sb, "{HELLO} {WORLD}"
-                .toCharArray(), 0));
+        assertEquals(6, BstNameFormatter.consumeToMatchingBrace(sb, "{HELLO} {WORLD}".toCharArray(), 0));
         assertEquals("{HELLO}", sb.toString());
     }
 
     @Test
     public void matchingBraceConsumedForBracesInWords() {
         StringBuilder sb = new StringBuilder();
-        assertEquals(18, BibtexNameFormatter.consumeToMatchingBrace(sb, "{HE{L{}L}O} {WORLD}"
-                .toCharArray(), 12));
+        assertEquals(18, BstNameFormatter.consumeToMatchingBrace(sb, "{HE{L{}L}O} {WORLD}".toCharArray(), 12));
         assertEquals("{WORLD}", sb.toString());
     }
 
     @Test
     public void testConsumeToMatchingBrace() {
         StringBuilder sb = new StringBuilder();
-        assertEquals(10, BibtexNameFormatter.consumeToMatchingBrace(sb, "{HE{L{}L}O} {WORLD}"
-                .toCharArray(), 0));
+        assertEquals(10, BstNameFormatter.consumeToMatchingBrace(sb, "{HE{L{}L}O} {WORLD}".toCharArray(), 0));
         assertEquals("{HE{L{}L}O}", sb.toString());
     }
 
     @Test
     public void testGetFirstCharOfString() {
-        assertEquals("C", BibtexNameFormatter.getFirstCharOfString("Charles"));
-        assertEquals("V", BibtexNameFormatter.getFirstCharOfString("Vall{\\'e}e"));
-        assertEquals("{\\'e}", BibtexNameFormatter.getFirstCharOfString("{\\'e}"));
-        assertEquals("{\\'e", BibtexNameFormatter.getFirstCharOfString("{\\'e"));
-        assertEquals("E", BibtexNameFormatter.getFirstCharOfString("{E"));
+        assertEquals("C", BstNameFormatter.getFirstCharOfString("Charles"));
+        assertEquals("V", BstNameFormatter.getFirstCharOfString("Vall{\\'e}e"));
+        assertEquals("{\\'e}", BstNameFormatter.getFirstCharOfString("{\\'e}"));
+        assertEquals("{\\'e", BstNameFormatter.getFirstCharOfString("{\\'e"));
+        assertEquals("E", BstNameFormatter.getFirstCharOfString("{E"));
     }
 
     @Test
     public void testNumberOfChars() {
-        assertEquals(6, BibtexNameFormatter.numberOfChars("Vall{\\'e}e", -1));
-        assertEquals(2, BibtexNameFormatter.numberOfChars("Vall{\\'e}e", 2));
-        assertEquals(1, BibtexNameFormatter.numberOfChars("Vall{\\'e}e", 1));
-        assertEquals(6, BibtexNameFormatter.numberOfChars("Vall{\\'e}e", 6));
-        assertEquals(6, BibtexNameFormatter.numberOfChars("Vall{\\'e}e", 7));
-        assertEquals(8, BibtexNameFormatter.numberOfChars("Vall{e}e", -1));
-        assertEquals(6, BibtexNameFormatter.numberOfChars("Vall{\\'e this will be skipped}e", -1));
+        assertEquals(6, BstNameFormatter.numberOfChars("Vall{\\'e}e", -1));
+        assertEquals(2, BstNameFormatter.numberOfChars("Vall{\\'e}e", 2));
+        assertEquals(1, BstNameFormatter.numberOfChars("Vall{\\'e}e", 1));
+        assertEquals(6, BstNameFormatter.numberOfChars("Vall{\\'e}e", 6));
+        assertEquals(6, BstNameFormatter.numberOfChars("Vall{\\'e}e", 7));
+        assertEquals(8, BstNameFormatter.numberOfChars("Vall{e}e", -1));
+        assertEquals(6, BstNameFormatter.numberOfChars("Vall{\\'e this will be skipped}e", -1));
     }
 }
