@@ -10,6 +10,5 @@
         <TabPane fx:id="tabPane" tabClosingPolicy="UNAVAILABLE"/>
     </content>
     <ButtonType fx:id="saveButton" text="Keep Modifications" buttonData="OK_DONE"/>
-    <ButtonType fx:id="cancelButton"
-                text="Revert" buttonData="CANCEL_CLOSE"/>
+    <ButtonType fx:constant="CANCEL"/>
 </DialogPane>
