@@ -152,7 +152,7 @@ public class BstVMTest {
     }
 
     @Test
-    void testChopWord() {
+    void testAbbrevStyleChopWord() {
         TestVM vm = new TestVM("""
                 STRINGS { s }
                 INTEGERS { len }
@@ -171,6 +171,10 @@ public class BstVMTest {
                     "A " #2
                     "A Colorful Morning"
                     chop.word
+
+                    "An " #3
+                    "A Colorful Morning"
+                    chop.word
                 }
 
                 EXECUTE { test }
@@ -178,11 +182,13 @@ public class BstVMTest {
 
         vm.render(Collections.emptyList());
 
-        assertTrue(vm.latestContext.stack().get(0).equals("Colorful Morning"));
+        assertEquals("A Colorful Morning", vm.latestContext.stack().pop());
+        assertEquals("Colorful Morning", vm.latestContext.stack().pop());
+        assertEquals(0, vm.latestContext.stack().size());
     }
 
     @Test
-    void testSortFormatTitle() {
+    void testAbbrevStyleSortFormatTitle() {
         TestVM vm = new TestVM("""
                 STRINGS { s t }
                 INTEGERS { len }
@@ -201,13 +207,13 @@ public class BstVMTest {
                         if$
                 }
 
-                FUNCTION {sort.format.title}
+                FUNCTION { sort.format.title }
                 { 't :=
-                  % "A " #2
-                  %  "An " #3
+                   "A " #2
+                    "An " #3
                       "The " #4 t chop.word
-                  %  chop.word
-                  % chop.word
+                    chop.word
+                   chop.word
                   sortify
                   #1 global.max$ substring$
                 }
@@ -222,7 +228,7 @@ public class BstVMTest {
 
         vm.render(Collections.emptyList());
 
-        assertTrue(vm.latestContext.stack().get(0).equals("Colorful Morning"));
+        assertEquals("colorful morning", vm.latestContext.stack().pop());
     }
 
     public static class TestVM extends BstVM {

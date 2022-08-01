@@ -58,13 +58,16 @@ class BstVMVisitor extends BstBaseVisitor<Integer> {
 
     @Override
     public Integer visitFunctionCommand(BstParser.FunctionCommandContext ctx) {
-        bstVMContext.functions().put(ctx.id.getText(), new BstVMFunction<>(ctx.function));
+        bstVMContext.functions().put(ctx.id.getText(),
+                (visitor, functionContext) -> visitor.visit(ctx.function));
         return BstVM.TRUE;
     }
 
     @Override
     public Integer visitMacroCommand(BstParser.MacroCommandContext ctx) {
-        bstVMContext.functions().put(ctx.id.getText(), new BstVMFunction<>(ctx.repl.getText()));
+        String replacement = ctx.repl.getText().substring(1, ctx.repl.getText().length() - 1);
+        bstVMContext.functions().put(ctx.id.getText(),
+                (visitor, functionContext) -> bstVMContext.stack().push(replacement));
         return BstVM.TRUE;
     }
 
@@ -180,34 +183,37 @@ class BstVMVisitor extends BstBaseVisitor<Integer> {
 
     @Override
     public Integer visitIdentifier(BstParser.IdentifierContext ctx) {
-        String name = ctx.IDENTIFIER().getText();
+        resolveIdentifier(ctx.IDENTIFIER().getText(), ctx);
+        return BstVM.TRUE;
+    }
 
+    protected void resolveIdentifier(String name, ParserRuleContext ctx) {
         if (selectedBstEntry != null) {
             if (selectedBstEntry.fields.containsKey(name)) {
                 bstVMContext.stack().push(selectedBstEntry.fields.get(name));
-                return BstVM.TRUE;
+                return;
             }
             if (selectedBstEntry.localStrings.containsKey(name)) {
                 bstVMContext.stack().push(selectedBstEntry.localStrings.get(name));
-                return BstVM.TRUE;
+                return;
             }
             if (selectedBstEntry.localIntegers.containsKey(name)) {
                 bstVMContext.stack().push(selectedBstEntry.localIntegers.get(name));
-                return BstVM.TRUE;
+                return;
             }
         }
 
         if (bstVMContext.strings().containsKey(name)) {
             bstVMContext.stack().push(bstVMContext.strings().get(name));
-            return BstVM.TRUE;
+            return;
         }
         if (bstVMContext.integers().containsKey(name)) {
             bstVMContext.stack().push(bstVMContext.integers().get(name));
-            return BstVM.TRUE;
+            return;
         }
         if (bstVMContext.functions().containsKey(name)) {
             bstVMContext.functions().get(name).execute(this, ctx);
-            return BstVM.TRUE;
+            return;
         }
 
         throw new BstVMException("No matching identifier found: " + name);
@@ -243,7 +249,7 @@ class BstVMVisitor extends BstBaseVisitor<Integer> {
                 } else if (childNode instanceof BstParser.StackContext) {
                     bstVMContext.stack().push(childNode);
                 } else {
-                    new BstVMVisitor.BstVMFunction<>(childNode).execute(this, ctx);
+                    this.visit(childNode);
                 }
             } catch (BstVMException e) {
                 bstVMContext.path().ifPresentOrElse(
@@ -252,24 +258,5 @@ class BstVMVisitor extends BstBaseVisitor<Integer> {
             }
         }
         return BstVM.TRUE;
-    }
-
-    public record BstVMFunction<T>(T expression) implements BstFunctions.BstFunction {
-
-        @Override
-        public void execute(BstVMVisitor visitor, ParserRuleContext bstFunctionContext) {
-            if (expression instanceof String str) {
-                visitor.bstVMContext.stack().push(str.substring(1, str.length() - 1)); // Macro
-            } else if (expression instanceof ParserRuleContext ctx) {
-                visitor.visit(ctx); // Function
-            }
-//            else if (expression instanceof Integer integer) {
-//                visitor.bstVMContext.stack().push(integer);
-//            } else if (expression instanceof Identifier identifier) {
-//                if (visitor.bstVMContext.functions().containsKey(identifier.name)) {
-//                    visitor.bstVMContext.functions().get(identifier.name).execute(visitor, bstFunctionContext);
-//                }
-//            }
-        }
     }
 }

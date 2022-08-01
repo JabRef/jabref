@@ -519,11 +519,17 @@ public class BstFunctions {
         }
 
         if (((Integer) i) > 0) {
-            visitor.visit((ParseTree) f2);
-            // new BstVMVisitor.BstVMFunction<>(f2).execute(visitor, ctx);
+            callIdentifierOrTree(f2, visitor, ctx);
         } else {
-            // new BstVMVisitor.BstVMFunction<>(f1).execute(visitor, ctx);
-            visitor.visit((ParseTree) f1);
+            callIdentifierOrTree(f1, visitor, ctx);
+        }
+    }
+
+    private void callIdentifierOrTree(Object f, BstVMVisitor visitor, ParserRuleContext ctx) {
+        if (f instanceof ParseTree tree) {
+            visitor.visit(tree);
+        } else if (f instanceof BstVMVisitor.Identifier identifier) {
+            visitor.resolveIdentifier(identifier.name(), ctx);
         }
     }
 
