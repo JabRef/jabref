@@ -9,6 +9,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.types.StandardEntryType;
 
 import org.antlr.v4.runtime.RecognitionException;
+import org.antlr.v4.runtime.tree.ParseTree;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -216,6 +217,31 @@ class BstVMVisitorTest {
         assertEquals("TEST-GLOBAL", vm.getStack().pop());
         assertEquals(1, vm.getStack().pop());
         assertEquals("TEST", vm.getStack().pop());
+        assertEquals(0, vm.getStack().size());
+    }
+
+    @Test
+    void testVisitStackitem() {
+        BstVM vm = new BstVM("""
+                STRINGS { t }
+                FUNCTION { test2 } { #3 }
+                FUNCTION { test } {
+                    "HELLO"
+                    #1
+                    't
+                    { #2 }
+                    test2
+                }
+                EXECUTE { test }
+                """);
+
+        vm.render(Collections.emptyList());
+
+        assertEquals(3, vm.getStack().pop());
+        assertTrue(vm.getStack().pop() instanceof ParseTree);
+        assertEquals(new BstVMVisitor.Identifier("t"), vm.getStack().pop());
+        assertEquals(1, vm.getStack().pop());
+        assertEquals("HELLO", vm.getStack().pop());
         assertEquals(0, vm.getStack().size());
     }
 
