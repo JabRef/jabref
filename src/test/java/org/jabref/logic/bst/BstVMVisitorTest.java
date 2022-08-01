@@ -128,8 +128,6 @@ class BstVMVisitorTest {
         assertEquals(5, vm.latestContext.integers().get("variable.a"));
     }
 
-    // ToDo: testVisitReverseCommand
-
     @Test
     public void testVisitIterateCommand() throws RecognitionException {
         BstVM vm = new BstVM("""
@@ -148,6 +146,26 @@ class BstVMVisitorTest {
         assertEquals(2, vm.getStack().size());
         assertEquals("test", vm.getStack().pop());
         assertEquals("canh05", vm.getStack().pop());
+    }
+
+    @Test
+    public void testVisitReverseCommand() throws RecognitionException {
+        BstVM vm = new BstVM("""
+                ENTRY { } { } { }
+                FUNCTION { test } { cite$ }
+                READ
+                REVERSE { test }
+                """);
+        List<BibEntry> testEntries = List.of(
+                BstVMTest.defaultTestEntry(),
+                new BibEntry(StandardEntryType.Article)
+                        .withCitationKey("test"));
+
+        vm.render(testEntries);
+
+        assertEquals(2, vm.getStack().size());
+        assertEquals("canh05", vm.getStack().pop());
+        assertEquals("test", vm.getStack().pop());
     }
 
     @Test
