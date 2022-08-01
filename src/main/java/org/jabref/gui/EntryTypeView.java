@@ -28,6 +28,7 @@ import org.jabref.logic.importer.WebFetcher;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntryType;
+import org.jabref.model.entry.types.BiblatexAPAEntryTypeDefinitions;
 import org.jabref.model.entry.types.BiblatexEntryTypeDefinitions;
 import org.jabref.model.entry.types.BiblatexSoftwareEntryTypeDefinitions;
 import org.jabref.model.entry.types.BibtexEntryTypeDefinitions;
@@ -157,6 +158,7 @@ public class EntryTypeView extends BaseDialog<EntryType> {
                 .filter(e -> !recommendedEntries.contains(e))
                 .collect(Collectors.toList());
             otherEntries.addAll(BiblatexSoftwareEntryTypeDefinitions.ALL);
+            otherEntries.addAll(BiblatexAPAEntryTypeDefinitions.ALL);
         } else {
             recommendedEntries = BibtexEntryTypeDefinitions.RECOMMENDED;
             otherEntries = BibtexEntryTypeDefinitions.ALL
