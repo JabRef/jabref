@@ -9,6 +9,7 @@ import org.jabref.logic.bst.util.BstNameFormatterTest;
 import org.jabref.logic.bst.util.BstPurifierTest;
 import org.jabref.logic.bst.util.BstTextPrefixerTest;
 import org.jabref.logic.bst.util.BstWidthCalculatorTest;
+import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
@@ -617,23 +618,8 @@ class BstFunctionsTest {
         assertEquals("\\begin{thebibliography}{1}", vm.getStack().pop());
     }
 
-    /*
-    ToDo:
-     - duplicate
-     - newline
-     - preamble
-     - quote
-     - stack
-     - top
-     - warning
-     - write
-     - skip
-     - pop
-     */
-
     @Test
     public void testDuplicateEmptyPopSwapIf() throws RecognitionException {
-        // ToDo: Make better tests for this
         BstVM vm = new BstVM("""
                 FUNCTION { emphasize } {
                     duplicate$ empty$
@@ -653,5 +639,28 @@ class BstFunctionsTest {
         assertEquals("{\\em Hello}", vm.getStack().pop());
         assertEquals("", vm.getStack().pop());
         assertEquals(0, vm.getStack().size());
+    }
+
+    @Test
+    public void testPreambleWriteNewlineQuote() {
+        BstVM vm = new BstVM("""
+                FUNCTION { test } {
+                    preamble$
+                    write$
+                    newline$
+                    "hello"
+                    write$
+                    quote$ "quoted" * quote$ *
+                    write$
+                }
+                EXECUTE { test }
+                """);
+
+        BibDatabase testDatabase = new BibDatabase();
+        testDatabase.setPreamble("A Preamble");
+
+        String result = vm.render(Collections.emptyList(), testDatabase);
+
+        assertEquals("A Preamble\nhello\"quoted\"", result);
     }
 }
