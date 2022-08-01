@@ -530,6 +530,8 @@ public class BstFunctions {
             visitor.visit(tree);
         } else if (f instanceof BstVMVisitor.Identifier identifier) {
             visitor.resolveIdentifier(identifier.name(), ctx);
+        } else {
+            stack.push(f);
         }
     }
 

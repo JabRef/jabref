@@ -255,6 +255,7 @@ class BstVMVisitor extends BstBaseVisitor<Integer> {
                 bstVMContext.path().ifPresentOrElse(
                         (path) -> LOGGER.error("{} ({})", e.getMessage(), path),
                         () -> LOGGER.error(e.getMessage()));
+                throw e;
             }
         }
         return BstVM.TRUE;
