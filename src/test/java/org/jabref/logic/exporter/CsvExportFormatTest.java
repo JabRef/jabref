@@ -1,8 +1,6 @@
 package org.jabref.logic.exporter;
 
 import java.io.File;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -12,7 +10,9 @@ import java.util.List;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.StandardField;
 
 import org.junit.jupiter.api.AfterEach;
@@ -27,7 +27,6 @@ import static org.mockito.Mockito.mock;
 public class CsvExportFormatTest {
 
     public BibDatabaseContext databaseContext;
-    public Charset charset;
     private Exporter exportFormat;
 
     @BeforeEach
@@ -36,12 +35,12 @@ public class CsvExportFormatTest {
         LayoutFormatterPreferences layoutPreferences = mock(LayoutFormatterPreferences.class, Answers.RETURNS_DEEP_STUBS);
         SavePreferences savePreferences = mock(SavePreferences.class);
         XmpPreferences xmpPreferences = mock(XmpPreferences.class);
-        ExporterFactory exporterFactory = ExporterFactory.create(customFormats, layoutPreferences, savePreferences, xmpPreferences);
+        BibEntryTypesManager entryTypesManager = mock(BibEntryTypesManager.class);
+        ExporterFactory exporterFactory = ExporterFactory.create(customFormats, layoutPreferences, savePreferences, xmpPreferences, BibDatabaseMode.BIBTEX, entryTypesManager);
 
         exportFormat = exporterFactory.getExporterByName("oocsv").get();
 
         databaseContext = new BibDatabaseContext();
-        charset = StandardCharsets.UTF_8;
     }
 
     @AfterEach
@@ -57,7 +56,7 @@ public class CsvExportFormatTest {
         entry.setField(StandardField.AUTHOR, "Someone, Van Something");
         List<BibEntry> entries = Arrays.asList(entry);
 
-        exportFormat.export(databaseContext, path, charset, entries);
+        exportFormat.export(databaseContext, path, entries);
 
         List<String> lines = Files.readAllLines(path);
         assertEquals(2, lines.size());
@@ -74,7 +73,7 @@ public class CsvExportFormatTest {
         entry.setField(StandardField.AUTHOR, "von Neumann, John and Smith, John and Black Brown, Peter");
         List<BibEntry> entries = Arrays.asList(entry);
 
-        exportFormat.export(databaseContext, path, charset, entries);
+        exportFormat.export(databaseContext, path, entries);
 
         List<String> lines = Files.readAllLines(path);
         assertEquals(2, lines.size());
@@ -91,7 +90,7 @@ public class CsvExportFormatTest {
         entry.setField(StandardField.EDITOR, "Someone, Van Something");
         List<BibEntry> entries = Arrays.asList(entry);
 
-        exportFormat.export(databaseContext, tmpFile.toPath(), charset, entries);
+        exportFormat.export(databaseContext, tmpFile.toPath(), entries);
 
         List<String> lines = Files.readAllLines(tmpFile.toPath());
         assertEquals(2, lines.size());
@@ -108,7 +107,7 @@ public class CsvExportFormatTest {
         entry.setField(StandardField.EDITOR, "von Neumann, John and Smith, John and Black Brown, Peter");
         List<BibEntry> entries = Arrays.asList(entry);
 
-        exportFormat.export(databaseContext, tmpFile.toPath(), charset, entries);
+        exportFormat.export(databaseContext, tmpFile.toPath(), entries);
 
         List<String> lines = Files.readAllLines(tmpFile.toPath());
         assertEquals(2, lines.size());

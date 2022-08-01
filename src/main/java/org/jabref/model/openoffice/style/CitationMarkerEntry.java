@@ -15,14 +15,12 @@ public interface CitationMarkerEntry extends CitationMarkerNormEntry {
     Optional<String> getUniqueLetter();
 
     /**
-     * pageInfo for this citation, provided by the user.
-     *          May be empty, for none.
+     * pageInfo for this citation, provided by the user. May be empty, for none.
      */
     Optional<OOText> getPageInfo();
 
     /**
-     *  @return true if this citation is the first appearance of the source cited. Some styles use
-     *               different limit on the number of authors shown in this case.
+     * @return true if this citation is the first appearance of the source cited. Some styles use different limit on the number of authors shown in this case.
      */
     boolean getIsFirstAppearanceOfSource();
 }

@@ -2,7 +2,6 @@ package org.jabref.logic.importer.fileformat;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collections;
@@ -37,7 +36,7 @@ public class MsBibImporterTest {
                 "IsiImporterTestInspec.isi", "emptyFile.xml", "IsiImporterTestWOS.isi");
         for (String s : notAccepted) {
             Path file = Path.of(MsBibImporter.class.getResource(s).toURI());
-            assertFalse(testImporter.isRecognizedFormat(file, Charset.defaultCharset()));
+            assertFalse(testImporter.isRecognizedFormat(file));
         }
     }
 
@@ -45,7 +44,7 @@ public class MsBibImporterTest {
     public final void testImportEntriesEmpty() throws IOException, URISyntaxException {
         MsBibImporter testImporter = new MsBibImporter();
         Path file = Path.of(MsBibImporter.class.getResource("EmptyMsBib_Test.xml").toURI());
-        List<BibEntry> entries = testImporter.importDatabase(file, Charset.defaultCharset()).getDatabase().getEntries();
+        List<BibEntry> entries = testImporter.importDatabase(file).getDatabase().getEntries();
         assertEquals(Collections.emptyList(), entries);
     }
 
@@ -53,7 +52,7 @@ public class MsBibImporterTest {
     public final void testImportEntriesNotRecognizedFormat() throws IOException, URISyntaxException {
         MsBibImporter testImporter = new MsBibImporter();
         Path file = Path.of(MsBibImporter.class.getResource("CopacImporterTest1.txt").toURI());
-        List<BibEntry> entries = testImporter.importDatabase(file, Charset.defaultCharset()).getDatabase().getEntries();
+        List<BibEntry> entries = testImporter.importDatabase(file).getDatabase().getEntries();
         assertEquals(0, entries.size());
     }
 

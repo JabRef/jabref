@@ -1,10 +1,14 @@
+---
+nav_order: 3
+parent: Advanced Reading
+---
 # Custom SVG icons
 
-JabRef uses [Material Design Icons](https://materialdesignicons.com/) for most buttons on toolbars and panels. While most required icons are available, some specific ones cannot be found in the standard set, like Vim, Emacs, etc. Although custom icons might not fit the existing icons perfectly in style and level of detail, they will fit much better into JabRef than having a color pixel icon between all Material Design Icons.
+JabRef uses [Material Design Icons](https://materialdesignicons.com) for most buttons on toolbars and panels. While most required icons are available, some specific ones cannot be found in the standard set, like Vim, Emacs, etc. Although custom icons might not fit the existing icons perfectly in style and level of detail, they will fit much better into JabRef than having a color pixel icon between all Material Design Icons.
 
 ![toolbar](http://i.imgur.com/KlyYrNn.png)
 
-This tutorial aims to describe the process of adding missing icons created in a vector drawing tool like Adobe Illustrator and packing them into a _true type font_ \(TTF\) to fit seamlessly into the JabRef framework. Already existing custom icons will be published \(link is coming soon\) as they need to be repacked as well.
+This tutorial aims to describe the process of adding missing icons created in a vector drawing tool like Adobe Illustrator and packing them into a _true type font_ (TTF) to fit seamlessly into the JabRef framework. Already existing custom icons will be published (link is coming soon) as they need to be repacked as well.
 
 The process consists of 5 steps:
 
@@ -28,7 +32,7 @@ Unpack the downloaded font-package and copy the `.ttf` file under `fonts` to `sr
 
 ## Step 4. Adapt the class `org.jabref.gui.JabRefMaterialDesignIcon`
 
-Inside the font-package will be a CSS file that specifies which icon \(glyph\) is at which code point. If you have ordered them correctly, you newly designed icon\(s\) will be at the end and you can simply append them to `org.jabref.gui.JabRefMaterialDesignIcon`:
+Inside the font-package will be a CSS file that specifies which icon (glyph) is at which code point. If you have ordered them correctly, you newly designed icon(s) will be at the end and you can simply append them to `org.jabref.gui.JabRefMaterialDesignIcon`:
 
 ```java
     TEX_STUDIO("\ue900"),
@@ -43,9 +47,8 @@ Inside the font-package will be a CSS file that specifies which icon \(glyph\) i
 
 ## Step 5. Adapt the class `org.jabref.gui.IconTheme`
 
-If you added an icon that already existed \(but not as flat Material Design Icon\), then you need to change the appropriate line in `org.jabref.gui.IconTheme`, where the icon is assigned. If you created a new one, then you need to add a line. You can specify the icon like this:
+If you added an icon that already existed (but not as flat Material Design Icon), then you need to change the appropriate line in `org.jabref.gui.IconTheme`, where the icon is assigned. If you created a new one, then you need to add a line. You can specify the icon like this:
 
 ```java
 APPLICATION_EMACS(JabRefMaterialDesignIcon.EMACS)
 ```
-

@@ -21,14 +21,14 @@
     <names variable="editor">
       <name and="text" initialize-with="" name-as-sort-order="all" sort-separator=""/>
       <label form="short" prefix=" (" suffix=")" strip-periods="true"/>
-      <et-al suffix="." font-style="italic"/>
+      <et-al font-style="italic"/>
     </names>
   </macro>
   <macro name="author">
     <names variable="author">
       <name and="text" et-al-min="6" et-al-use-first="5" name-as-sort-order="all" sort-separator=" "/>
       <label form="short" prefix=" "/>
-      <et-al suffix="." font-style="italic"/>
+      <et-al font-style="italic"/>
       <substitute>
         <names variable="editor"/>
         <text variable="title"/>

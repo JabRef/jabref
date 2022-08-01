@@ -10,6 +10,7 @@ import org.jabref.logic.remote.client.RemoteClient;
 import org.jabref.logic.remote.server.MessageHandler;
 import org.jabref.logic.remote.server.RemoteListenerServerLifecycle;
 import org.jabref.logic.util.OS;
+import org.jabref.preferences.PreferencesService;
 import org.jabref.support.DisabledOnCIServer;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -19,6 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assumptions.assumeFalse;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -30,10 +32,12 @@ import static org.mockito.Mockito.verify;
 class RemoteSetupTest {
 
     private MessageHandler messageHandler;
+    private PreferencesService preferencesService;
 
     @BeforeEach
     void setUp() {
         messageHandler = mock(MessageHandler.class);
+        preferencesService = mock(PreferencesService.class);
     }
 
     @Test
@@ -43,10 +47,10 @@ class RemoteSetupTest {
 
         try (RemoteListenerServerLifecycle server = new RemoteListenerServerLifecycle()) {
             assertFalse(server.isOpen());
-            server.openAndStart(messageHandler, port);
+            server.openAndStart(messageHandler, port, preferencesService);
             assertTrue(server.isOpen());
             assertTrue(new RemoteClient(port).sendCommandLineArguments(message));
-            verify(messageHandler).handleCommandLineArguments(message);
+            verify(messageHandler).handleCommandLineArguments(message, preferencesService);
             server.stop();
             assertFalse(server.isOpen());
         }
@@ -63,7 +67,7 @@ class RemoteSetupTest {
             server.stop();
             assertFalse(server.isOpen());
             assertTrue(server.isNotStartedBefore());
-            server.open(messageHandler, port);
+            server.open(messageHandler, port, preferencesService);
             assertTrue(server.isOpen());
             assertTrue(server.isNotStartedBefore());
             server.start();
@@ -71,7 +75,7 @@ class RemoteSetupTest {
             assertFalse(server.isNotStartedBefore());
 
             assertTrue(new RemoteClient(port).sendCommandLineArguments(message));
-            verify(messageHandler).handleCommandLineArguments(message);
+            verify(messageHandler).handleCommandLineArguments(message, preferencesService);
             server.stop();
             assertFalse(server.isOpen());
             assertTrue(server.isNotStartedBefore());
@@ -89,9 +93,9 @@ class RemoteSetupTest {
 
             try (RemoteListenerServerLifecycle server = new RemoteListenerServerLifecycle()) {
                 assertFalse(server.isOpen());
-                server.openAndStart(messageHandler, port);
+                server.openAndStart(messageHandler, port, preferencesService);
                 assertFalse(server.isOpen());
-                verify(messageHandler, never()).handleCommandLineArguments(any());
+                verify(messageHandler, never()).handleCommandLineArguments(any(), eq(preferencesService));
             }
         }
     }
@@ -135,7 +139,7 @@ class RemoteSetupTest {
         final int port = 34567;
 
         try (RemoteListenerServerLifecycle server = new RemoteListenerServerLifecycle()) {
-            server.openAndStart(messageHandler, port);
+            server.openAndStart(messageHandler, port, preferencesService);
 
             assertTrue(new RemoteClient(port).ping());
         }

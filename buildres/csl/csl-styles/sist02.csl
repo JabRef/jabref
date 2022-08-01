@@ -67,6 +67,12 @@
       <label form="short" plural="never"/>
     </names>
   </macro>
+  <macro name="translator">
+    <names variable="translator">
+      <name initialize="false" initialize-with=". " name-as-sort-order="all"/>
+      <label form="short" plural="never"/>
+    </names>
+  </macro>
   <macro name="locators">
     <group delimiter=", ">
       <group>
@@ -167,6 +173,7 @@
         <else-if type="book" match="any">
           <group delimiter=". ">
             <text macro="title"/>
+            <text macro="translator"/>
             <group delimiter=", ">
               <text variable="edition"/>
               <text macro="publisher"/>

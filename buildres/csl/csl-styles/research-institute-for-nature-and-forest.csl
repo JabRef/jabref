@@ -18,11 +18,15 @@
       <name>Thierry Onkelinx</name>
       <uri>https://www.mendeley.com/profiles/thierry-onkelinx/</uri>
     </contributor>
+    <contributor>
+      <name>Els Lommelen</name>
+      <uri>https://github.com/elslommelen</uri>
+    </contributor>
     <category citation-format="author-date"/>
     <category field="biology"/>
     <category field="botany"/>
     <category field="zoology"/>
-    <updated>2020-12-18T17:09:06+01:00</updated>
+    <updated>2021-12-21T18:20:00+01:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="en">
@@ -39,6 +43,11 @@
         <multiple>eds.</multiple>
       </term>
       <term name="edition" form="short">ed.</term>
+      <term name="no date" form="short">s.d.</term>
+    </terms>
+  </locale>
+  <locale xml:lang="fr">
+    <terms>
       <term name="no date" form="short">s.d.</term>
     </terms>
   </locale>

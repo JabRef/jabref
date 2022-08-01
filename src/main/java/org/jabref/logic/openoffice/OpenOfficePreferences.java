@@ -1,6 +1,5 @@
 package org.jabref.logic.openoffice;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class OpenOfficePreferences {
@@ -18,28 +17,23 @@ public class OpenOfficePreferences {
     public static final String DEFAULT_LINUX_FLATPAK_EXEC_PATH = "/app/bin/soffice";
     public static final String LINUX_EXECUTABLE = "soffice";
 
-    private String executablePath = "";
-    private String installationPath = "";
+    private String executablePath;
+    private String installationPath;
     private boolean useAllDatabases;
     private boolean syncWhenCiting;
-    private boolean showPanel;
-    private List<String> externalStyles = new ArrayList<>();
-    private String currentStyle = "";
+    private List<String> externalStyles;
+    private String currentStyle;
 
-    public OpenOfficePreferences(
-            String executablePath,
-            String installationPath,
-            boolean useAllDatabases,
-            boolean syncWhenCiting,
-            boolean showPanel,
-            List<String> externalStyles,
-            String currentStyle
-    ) {
+    public OpenOfficePreferences(String executablePath,
+                                 String installationPath,
+                                 boolean useAllDatabases,
+                                 boolean syncWhenCiting,
+                                 List<String> externalStyles,
+                                 String currentStyle) {
         this.executablePath = executablePath;
         this.installationPath = installationPath;
         this.useAllDatabases = useAllDatabases;
         this.syncWhenCiting = syncWhenCiting;
-        this.showPanel = showPanel;
         this.externalStyles = externalStyles;
         this.currentStyle = currentStyle;
     }
@@ -66,10 +60,6 @@ public class OpenOfficePreferences {
         return installationPath;
     }
 
-    public void setInstallationPath(String installationPath) {
-        this.installationPath = installationPath;
-    }
-
     /**
      * true if all databases should be used when citing
      */
@@ -93,17 +83,6 @@ public class OpenOfficePreferences {
     }
 
     /**
-     * true if the OO panel is shown on startup
-     */
-    public boolean getShowPanel() {
-        return showPanel;
-    }
-
-    public void setShowPanel(boolean showPanel) {
-        this.showPanel = showPanel;
-    }
-
-    /**
      * list with paths to external style files
      */
     public List<String> getExternalStyles() {
@@ -123,11 +102,6 @@ public class OpenOfficePreferences {
 
     public void setCurrentStyle(String currentStyle) {
         this.currentStyle = currentStyle;
-    }
-
-    public void updateConnectionParams(String ooPath, String execPath, String jarsPath) {
-        setInstallationPath(ooPath);
-        setExecutablePath(execPath);
     }
 
     public void clearConnectionSettings() {

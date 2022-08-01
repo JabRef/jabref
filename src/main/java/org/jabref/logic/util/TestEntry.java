@@ -12,7 +12,6 @@ public class TestEntry {
     }
 
     public static BibEntry getTestEntry() {
-
         BibEntry entry = new BibEntry(StandardEntryType.Article);
         entry.setCitationKey("Smith2016");
         entry.setField(StandardField.AUTHOR, "Smith, Bill and Jones, Bob and Williams, Jeff");
@@ -20,7 +19,7 @@ public class TestEntry {
         entry.setField(StandardField.TITLE, "Title of the test entry");
         entry.setField(StandardField.NUMBER, "3");
         entry.setField(StandardField.VOLUME, "34");
-        entry.setField(StandardField.ISSUE, "3");
+        entry.setField(StandardField.ISSUE, "7");
         entry.setField(StandardField.YEAR, "2016");
         entry.setField(StandardField.PAGES, "45--67");
         entry.setField(StandardField.MONTH, "July");

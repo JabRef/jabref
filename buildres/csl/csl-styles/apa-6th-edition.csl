@@ -896,30 +896,50 @@
   </macro>
   <macro name="event">
     <choose>
-      <if variable="event" type="speech paper-conference" match="any">
+      <if variable="event">
+        <!-- To prevent Zotero from printing event-place due to its double-mapping of all 'place' to
+             both publisher-place and event-place. Remove this 'choose' when that is changed. -->
         <choose>
-          <!-- Don't print event info if published in a proceedings -->
-          <if variable="collection-editor editor issue page volume" match="none">
-            <group delimiter=" ">
-              <text variable="genre" text-case="capitalize-first"/>
-              <group delimiter=" ">
-                <choose>
-                  <if variable="genre">
-                    <text term="presented at"/>
-                  </if>
-                  <else>
-                    <text term="presented at" text-case="capitalize-first"/>
-                  </else>
-                </choose>
-                <group delimiter=", ">
-                  <text variable="event"/>
-                  <text variable="event-place"/>
+          <if variable="event" type="speech paper-conference" match="any">
+            <choose>
+              <!-- Don't print event info if published in a proceedings -->
+              <if variable="collection-editor editor issue page volume" match="none">
+                <group delimiter=" ">
+                  <text variable="genre" text-case="capitalize-first"/>
+                  <group delimiter=" ">
+                    <choose>
+                      <if variable="genre">
+                        <text term="presented at"/>
+                      </if>
+                      <else>
+                        <text term="presented at" text-case="capitalize-first"/>
+                      </else>
+                    </choose>
+                    <group delimiter=", ">
+                      <text macro="event-title"/>
+                      <text variable="event-place"/>
+                    </group>
+                  </group>
                 </group>
-              </group>
-            </group>
+              </if>
+            </choose>
           </if>
         </choose>
       </if>
+    </choose>
+  </macro>
+  <macro name="event-title">
+    <choose>
+      <!-- TODO: We expect "event-title" to be used,
+           but processors and applications may not be updated yet.
+           This macro ensures that either "event" or "event-title" can be accpeted.
+           Remove if procesor logic and application adoption can handle this. -->
+      <if variable="event-title">
+        <text variable="event-title"/>
+      </if>
+      <else>
+        <text variable="event"/>
+      </else>
     </choose>
   </macro>
   <macro name="issued">
@@ -964,10 +984,8 @@
         </group>
       </else-if>
       <else>
-        <group>
-          <text term="no date" form="short"/>
-          <text variable="year-suffix" prefix="-"/>
-        </group>
+        <text term="no date" form="short"/>
+        <text variable="year-suffix" prefix="-"/>
       </else>
     </choose>
   </macro>
@@ -1402,7 +1420,7 @@
         <group prefix="(" suffix=")">
           <choose>
             <if variable="references">
-              <!-- This provides the option for more elaborate description 
+              <!-- This provides the option for more elaborate description
                    of publication history, such as full "reprinted" references
                    (example 26) or retracted references -->
               <text variable="references"/>

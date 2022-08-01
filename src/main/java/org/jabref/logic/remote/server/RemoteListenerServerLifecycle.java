@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.BindException;
 
 import org.jabref.gui.JabRefExecutorService;
+import org.jabref.preferences.PreferencesService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,16 +34,17 @@ public class RemoteListenerServerLifecycle implements AutoCloseable {
     /**
      * Acquire any resources needed for the server.
      */
-    public void open(MessageHandler messageHandler, int port) {
+    public void open(MessageHandler messageHandler, int port, PreferencesService preferencesService) {
         if (isOpen()) {
             return;
         }
 
         RemoteListenerServerThread result;
         try {
-            result = new RemoteListenerServerThread(messageHandler, port);
+            result = new RemoteListenerServerThread(messageHandler, port, preferencesService);
         } catch (BindException e) {
-            LOGGER.warn("Port is blocked", e);
+            LOGGER.warn("There was an error opening the configured network port {}. Please ensure there isn't another" +
+                    " application already using that port.", port);
             result = null;
         } catch (IOException e) {
             result = null;
@@ -66,8 +68,8 @@ public class RemoteListenerServerLifecycle implements AutoCloseable {
         return (remoteListenerServerThread == null) || (remoteListenerServerThread.getState() == Thread.State.NEW);
     }
 
-    public void openAndStart(MessageHandler messageHandler, int port) {
-        open(messageHandler, port);
+    public void openAndStart(MessageHandler messageHandler, int port, PreferencesService preferencesService) {
+        open(messageHandler, port, preferencesService);
         start();
     }
 

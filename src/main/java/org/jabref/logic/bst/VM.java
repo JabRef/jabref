@@ -14,6 +14,7 @@ import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.jabref.logic.bibtex.FieldContentFormatterPreferences;
 import org.jabref.logic.bibtex.FieldWriter;
 import org.jabref.logic.bibtex.FieldWriterPreferences;
 import org.jabref.logic.bibtex.InvalidFieldValueException;
@@ -593,7 +594,6 @@ public class VM implements Warn {
          * messages issued.
          */
         buildInFunctions.put("warning$", new BstFunction() {
-
             int warning = 1;
 
             @Override
@@ -803,7 +803,6 @@ public class VM implements Warn {
     }
 
     private boolean assign(BstEntry context, Object o1, Object o2) {
-
         if (!(o1 instanceof Identifier) || !((o2 instanceof String) || (o2 instanceof Integer))) {
             throw new VMException("Invalid parameters");
         }
@@ -811,7 +810,6 @@ public class VM implements Warn {
         String name = ((Identifier) o1).getName();
 
         if (o2 instanceof String) {
-
             if ((context != null) && context.localStrings.containsKey(name)) {
                 context.localStrings.put(name, (String) o2);
                 return true;
@@ -924,10 +922,9 @@ public class VM implements Warn {
      * field variable is marked as missing for the entry.
      * <p>
      * We use null for the missing entry designator.
-     * @param bibDatabase
      */
     private void read(BibDatabase bibDatabase) {
-        FieldWriter fieldWriter = new FieldWriter(new FieldWriterPreferences());
+        FieldWriter fieldWriter = new FieldWriter(new FieldWriterPreferences(true, List.of(StandardField.MONTH), new FieldContentFormatterPreferences()));
         for (BstEntry e : entries) {
             for (Map.Entry<String, String> mEntry : e.fields.entrySet()) {
                 Field field = FieldFactory.parseField(mEntry.getKey());
@@ -1036,7 +1033,6 @@ public class VM implements Warn {
     }
 
     private void reverse(Tree child) {
-
         BstFunction f = functions.get(child.getChild(0).getText());
 
         ListIterator<BstEntry> i = entries.listIterator(entries.size());
@@ -1087,9 +1083,7 @@ public class VM implements Warn {
 
         @Override
         public void execute(BstEntry context) {
-
             for (int i = 0; i < localTree.getChildCount(); i++) {
-
                 Tree c = localTree.getChild(i);
                 try {
 
@@ -1129,9 +1123,7 @@ public class VM implements Warn {
     }
 
     private void execute(String name, BstEntry context) {
-
         if (context != null) {
-
             if (context.fields.containsKey(name)) {
                 stack.push(context.fields.get(name));
                 return;

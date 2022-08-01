@@ -9,8 +9,10 @@
 <?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 <?import org.jabref.gui.icon.JabRefIconView?>
+<?import org.controlsfx.control.textfield.CustomTextField?>
 <?import org.fxmisc.flowless.VirtualizedScrollPane?>
 <?import org.fxmisc.richtext.CodeArea?>
 <fx:root spacing="10.0" type="VBox"
@@ -21,10 +23,12 @@
     <HBox spacing="4.0">
         <VBox spacing="4.0" HBox.hgrow="ALWAYS">
             <Label text="%Available" styleClass="sectionHeader"/>
-            <ListView fx:id="availableListView" maxHeight="250.0" minHeight="250.0"/>
+            <CustomTextField fx:id="searchBox" promptText="%Filter" VBox.vgrow="NEVER" prefHeight="20.0"/>
+            <ListView fx:id="availableListView" minHeight="150.0" prefHeight="250.0"/>
         </VBox>
         <VBox alignment="CENTER" spacing="4.0">
             <Label styleClass="sectionHeader"/>
+            <Region prefHeight="24.0"/>
             <Button fx:id="toRightButton" onAction="#toRightButtonAction"
                     prefHeight="20.0" prefWidth="20.0" styleClass="icon-button,narrow">
                 <graphic>
@@ -40,10 +44,12 @@
         </VBox>
         <VBox spacing="4.0" HBox.hgrow="ALWAYS">
             <Label text="%Selected" styleClass="sectionHeader"/>
-            <ListView fx:id="chosenListView" maxHeight="250.0" minHeight="250.0"/>
+            <Region prefHeight="24.0"/>
+            <ListView fx:id="chosenListView" minHeight="150.0" prefHeight="250.0"/>
         </VBox>
         <VBox alignment="CENTER" spacing="4.0">
             <Label styleClass="sectionHeader"/>
+            <Region prefHeight="24.0"/>
             <Button fx:id="sortUpButton" onAction="#sortUpButtonAction"
                     prefHeight="20.0" prefWidth="20.0" styleClass="icon-button,narrow">
                 <graphic>
@@ -60,7 +66,9 @@
     </HBox>
 
     <AnchorPane>
-        <TabPane prefHeight="250.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" tabClosingPolicy="UNAVAILABLE">
+        <TabPane prefHeight="250.0" tabClosingPolicy="UNAVAILABLE"
+                 AnchorPane.topAnchor="0.0" AnchorPane.leftAnchor="0.0"
+                 AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0">
             <Tab text="%Preview" fx:id="previewTab"/>
             <Tab text="%Edit">
                 <VirtualizedScrollPane>
@@ -70,7 +78,8 @@
                 </VirtualizedScrollPane>
             </Tab>
         </TabPane>
-        <HBox alignment="CENTER_RIGHT" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="2.0" spacing="5.0">
+        <HBox alignment="CENTER_RIGHT" spacing="5.0"
+              AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="2.0">
             <Label fx:id="readOnlyLabel" text="%Read only"/>
             <Button fx:id="resetDefaultButton" onAction="#resetDefaultButtonAction"
                     prefHeight="20.0" prefWidth="20.0" styleClass="icon-button,narrow">

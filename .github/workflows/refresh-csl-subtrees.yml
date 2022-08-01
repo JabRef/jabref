@@ -6,6 +6,9 @@ on:
     - cron: '1 2 1,15 * *'
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   publish:
     name: Refresh Citation Style Language Files
@@ -13,7 +16,7 @@ jobs:
     if: github.repository == 'JabRef/jabref'
     steps:
       - name: Checkout source
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           ref: main
           fetch-depth: 0
@@ -42,7 +45,7 @@ jobs:
           cp buildres/csl/csl-locales/locales-en-US.xml src/main/resources/csl-locales/
           git add .
           git commit -m"Refresh example styles" || true
-      - uses: peter-evans/create-pull-request@v3
+      - uses: peter-evans/create-pull-request@v4
         with:
           token: ${{ secrets.GH_TOKEN_UPDATE_GRADLE_WRAPPER }}
           branch: refresh-csl

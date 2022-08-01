@@ -1,5 +1,6 @@
 package org.jabref.gui.fieldeditors;
 
+import java.io.IOException;
 import java.net.CookieHandler;
 import java.net.CookieManager;
 import java.net.CookiePolicy;
@@ -22,12 +23,15 @@ import org.jabref.gui.externalfiletype.StandardExternalFileType;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.CurrentThreadTaskExecutor;
 import org.jabref.gui.util.TaskExecutor;
+import org.jabref.logic.externalfiles.LinkedFileHandler;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.preferences.FilePreferences;
+import org.jabref.preferences.PreferencesService;
+import org.jabref.testutils.category.FetcherTest;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
@@ -60,7 +64,7 @@ class LinkedFileViewModelTest {
     private DialogService dialogService;
     private final ExternalFileTypes externalFileType = mock(ExternalFileTypes.class);
     private final FilePreferences filePreferences = mock(FilePreferences.class);
-    private final XmpPreferences xmpPreferences = mock(XmpPreferences.class);
+    private final PreferencesService preferences = mock(PreferencesService.class);
     private CookieManager cookieManager;
 
     @BeforeEach
@@ -76,6 +80,8 @@ class LinkedFileViewModelTest {
         when(externalFileType.getExternalFileTypeByMimeType(contains("text/html"))).thenReturn(Optional.of(StandardExternalFileType.URL));
         when(externalFileType.getExternalFileTypeByExt("pdf")).thenReturn(Optional.of(StandardExternalFileType.PDF));
         when(externalFileType.getExternalFileTypeByExt("html")).thenReturn(Optional.of(StandardExternalFileType.URL));
+        when(preferences.getFilePreferences()).thenReturn(filePreferences);
+        when(preferences.getXmpPreferences()).thenReturn(mock(XmpPreferences.class));
         tempFile = tempFolder.resolve("temporaryFile");
         Files.createFile(tempFile);
 
@@ -100,7 +106,7 @@ class LinkedFileViewModelTest {
         linkedFile = spy(new LinkedFile("", Path.of("nonexistent file"), ""));
         doReturn(Optional.empty()).when(linkedFile).findIn(any(BibDatabaseContext.class), any(FilePreferences.class));
 
-        LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, taskExecutor, dialogService, xmpPreferences, filePreferences, externalFileType);
+        LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, taskExecutor, dialogService, preferences, externalFileType);
         boolean removed = viewModel.delete();
 
         assertTrue(removed);
@@ -118,7 +124,7 @@ class LinkedFileViewModelTest {
                 any(ButtonType.class),
                 any(ButtonType.class))).thenAnswer(invocation -> Optional.of(invocation.getArgument(3))); // first vararg - remove button
 
-        LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, taskExecutor, dialogService, xmpPreferences, filePreferences, externalFileType);
+        LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, taskExecutor, dialogService, preferences, externalFileType);
         boolean removed = viewModel.delete();
 
         assertTrue(removed);
@@ -136,7 +142,7 @@ class LinkedFileViewModelTest {
                 any(ButtonType.class),
                 any(ButtonType.class))).thenAnswer(invocation -> Optional.of(invocation.getArgument(4))); // second vararg - delete button
 
-        LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, taskExecutor, dialogService, xmpPreferences, filePreferences, externalFileType);
+        LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, taskExecutor, dialogService, preferences, externalFileType);
         boolean removed = viewModel.delete();
 
         assertTrue(removed);
@@ -154,7 +160,7 @@ class LinkedFileViewModelTest {
                 any(ButtonType.class),
                 any(ButtonType.class))).thenAnswer(invocation -> Optional.of(invocation.getArgument(4))); // second vararg - delete button
 
-        LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, taskExecutor, dialogService, xmpPreferences, filePreferences, externalFileType);
+        LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, taskExecutor, dialogService, preferences, externalFileType);
         boolean removed = viewModel.delete();
 
         assertTrue(removed);
@@ -171,7 +177,7 @@ class LinkedFileViewModelTest {
                 any(ButtonType.class),
                 any(ButtonType.class))).thenAnswer(invocation -> Optional.of(invocation.getArgument(5))); // third vararg - cancel button
 
-        LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, taskExecutor, dialogService, xmpPreferences, filePreferences, externalFileType);
+        LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, taskExecutor, dialogService, preferences, externalFileType);
         boolean removed = viewModel.delete();
 
         assertFalse(removed);
@@ -180,7 +186,7 @@ class LinkedFileViewModelTest {
 
     @Test
     void downloadHtmlFileCausesWarningDisplay() throws MalformedURLException {
-        when(filePreferences.shouldStoreFilesRelativeToBib()).thenReturn(true);
+        when(filePreferences.shouldStoreFilesRelativeToBibFile()).thenReturn(true);
         when(filePreferences.getFileNamePattern()).thenReturn("[citationkey]");
         when(filePreferences.getFileDirectoryPattern()).thenReturn("[entrytype]");
         databaseContext.setDatabasePath(tempFile);
@@ -189,7 +195,7 @@ class LinkedFileViewModelTest {
         String fileType = StandardExternalFileType.URL.getName();
         linkedFile = new LinkedFile(url, fileType);
 
-        LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, new CurrentThreadTaskExecutor(), dialogService, xmpPreferences, filePreferences, externalFileType);
+        LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, new CurrentThreadTaskExecutor(), dialogService, preferences, externalFileType);
 
         viewModel.download();
 
@@ -204,7 +210,7 @@ class LinkedFileViewModelTest {
         when(filePreferences.getFileNamePattern()).thenReturn("[citationkey]");
         when(filePreferences.getFileDirectoryPattern()).thenReturn("");
 
-        LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, new CurrentThreadTaskExecutor(), dialogService, xmpPreferences, filePreferences, externalFileType);
+        LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, new CurrentThreadTaskExecutor(), dialogService, preferences, externalFileType);
 
         BackgroundTask<Path> task = viewModel.prepareDownloadTask(tempFile.getParent(), new URLDownload("http://arxiv.org/pdf/1207.0408v1"));
         task.onSuccess(destination -> {
@@ -216,20 +222,21 @@ class LinkedFileViewModelTest {
         new CurrentThreadTaskExecutor().execute(task);
     }
 
+    @FetcherTest
     @Test
     void downloadHtmlWhenLinkedFilePointsToHtml() throws MalformedURLException {
-        // the link mentioned in issue #7452
-        String url = "https://onlinelibrary.wiley.com/doi/abs/10.1002/0470862106.ia615";
+        // use google as test url, wiley is protected by clooudfare
+        String url = "https://google.com";
         String fileType = StandardExternalFileType.URL.getName();
         linkedFile = new LinkedFile(new URL(url), fileType);
 
-        when(filePreferences.shouldStoreFilesRelativeToBib()).thenReturn(true);
+        when(filePreferences.shouldStoreFilesRelativeToBibFile()).thenReturn(true);
         when(filePreferences.getFileNamePattern()).thenReturn("[citationkey]");
         when(filePreferences.getFileDirectoryPattern()).thenReturn("[entrytype]");
 
         databaseContext.setDatabasePath(tempFile);
 
-        LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, new CurrentThreadTaskExecutor(), dialogService, xmpPreferences, filePreferences, externalFileType);
+        LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, new CurrentThreadTaskExecutor(), dialogService, preferences, externalFileType);
 
         viewModel.download();
 
@@ -250,9 +257,10 @@ class LinkedFileViewModelTest {
         linkedFile = new LinkedFile("desc", tempFile, "pdf");
         databaseContext = mock(BibDatabaseContext.class);
         when(filePreferences.getFileNamePattern()).thenReturn("[citationkey]");
+        when(filePreferences.getFileDirectoryPattern()).thenReturn("");
         when(databaseContext.getFirstExistingFileDir(filePreferences)).thenReturn(Optional.of(Path.of("/home")));
 
-        LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, taskExecutor, dialogService, xmpPreferences, filePreferences, externalFileType);
+        LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, taskExecutor, dialogService, preferences, externalFileType);
         assertFalse(viewModel.isGeneratedPathSameAsOriginal());
     }
 
@@ -261,12 +269,41 @@ class LinkedFileViewModelTest {
         linkedFile = new LinkedFile("desc", tempFile, "pdf");
         databaseContext = mock(BibDatabaseContext.class);
         when(filePreferences.getFileNamePattern()).thenReturn("[citationkey]");
+        when(filePreferences.getFileDirectoryPattern()).thenReturn("");
         when(databaseContext.getFirstExistingFileDir(filePreferences)).thenReturn(Optional.of(tempFile.getParent()));
 
-        LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, taskExecutor, dialogService, xmpPreferences, filePreferences, externalFileType);
+        LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, taskExecutor, dialogService, preferences, externalFileType);
         assertTrue(viewModel.isGeneratedPathSameAsOriginal());
     }
 
+    // Tests if isGeneratedPathSameAsOriginal takes into consideration File directory pattern
+    @Test
+    void isNotSamePathWithPattern() {
+        linkedFile = new LinkedFile("desc", tempFile, "pdf");
+        databaseContext = mock(BibDatabaseContext.class);
+        when(filePreferences.getFileNamePattern()).thenReturn("[citationkey]");
+        when(filePreferences.getFileDirectoryPattern()).thenReturn("[entrytype]");
+        when(databaseContext.getFirstExistingFileDir(filePreferences)).thenReturn(Optional.of(tempFile.getParent()));
+
+        LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, taskExecutor, dialogService, preferences, externalFileType);
+        assertFalse(viewModel.isGeneratedPathSameAsOriginal());
+    }
+
+    // Tests if isGeneratedPathSameAsOriginal takes into consideration File directory pattern
+    @Test
+    void isSamePathWithPattern() throws IOException {
+        linkedFile = new LinkedFile("desc", tempFile, "pdf");
+        databaseContext = mock(BibDatabaseContext.class);
+        when(filePreferences.getFileNamePattern()).thenReturn("[citationkey]");
+        when(filePreferences.getFileDirectoryPattern()).thenReturn("[entrytype]");
+        when(databaseContext.getFirstExistingFileDir(filePreferences)).thenReturn(Optional.of(tempFile.getParent()));
+
+        LinkedFileHandler fileHandler = new LinkedFileHandler(linkedFile, entry, databaseContext, filePreferences);
+        fileHandler.moveToDefaultDirectory();
+
+        LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, taskExecutor, dialogService, preferences, externalFileType);
+        assertTrue(viewModel.isGeneratedPathSameAsOriginal());
+    }
 
     // Tests if added parameters to mimeType gets parsed to correct format.
     @Test
@@ -280,13 +317,13 @@ class LinkedFileViewModelTest {
     void downloadPdfFileWhenLinkedFilePointsToPdfUrl() throws MalformedURLException {
         linkedFile = new LinkedFile(new URL("http://arxiv.org/pdf/1207.0408v1"), "pdf");
         // Needed Mockito stubbing methods to run test
-        when(filePreferences.shouldStoreFilesRelativeToBib()).thenReturn(true);
+        when(filePreferences.shouldStoreFilesRelativeToBibFile()).thenReturn(true);
         when(filePreferences.getFileNamePattern()).thenReturn("[citationkey]");
         when(filePreferences.getFileDirectoryPattern()).thenReturn("[entrytype]");
 
         databaseContext.setDatabasePath(tempFile);
 
-        LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, new CurrentThreadTaskExecutor(), dialogService, xmpPreferences, filePreferences, externalFileType);
+        LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, new CurrentThreadTaskExecutor(), dialogService, preferences, externalFileType);
         viewModel.download();
 
         // Loop through downloaded files to check for filetype='pdf'
@@ -300,5 +337,4 @@ class LinkedFileViewModelTest {
         // Assert fail if no PDF type was found
         fail();
     }
-
 }

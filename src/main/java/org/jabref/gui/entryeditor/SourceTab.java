@@ -38,11 +38,13 @@ import org.jabref.logic.bibtex.BibEntryWriter;
 import org.jabref.logic.bibtex.FieldWriter;
 import org.jabref.logic.bibtex.FieldWriterPreferences;
 import org.jabref.logic.bibtex.InvalidFieldValueException;
+import org.jabref.logic.exporter.BibWriter;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.search.SearchQuery;
+import org.jabref.logic.util.OS;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
@@ -128,11 +130,11 @@ public class SourceTab extends EntryEditorTab {
     }
 
     private String getSourceString(BibEntry entry, BibDatabaseMode type, FieldWriterPreferences fieldWriterPreferences) throws IOException {
-        StringWriter stringWriter = new StringWriter(200);
+        StringWriter writer = new StringWriter();
+        BibWriter bibWriter = new BibWriter(writer, OS.NEWLINE);
         FieldWriter fieldWriter = FieldWriter.buildIgnoreHashes(fieldWriterPreferences);
-        new BibEntryWriter(fieldWriter, Globals.entryTypesManager).writeWithoutPrependedNewlines(entry, stringWriter, type);
-
-        return stringWriter.getBuffer().toString();
+        new BibEntryWriter(fieldWriter, Globals.entryTypesManager).write(entry, bibWriter, type);
+        return writer.toString();
     }
 
     /* Work around for different input methods.
@@ -192,8 +194,12 @@ public class SourceTab extends EntryEditorTab {
         sourceValidator.getValidationStatus().getMessages().addListener((InvalidationListener) c -> {
             ValidationStatus sourceValidationStatus = sourceValidator.getValidationStatus();
             if (!sourceValidationStatus.isValid()) {
-                sourceValidationStatus.getHighestMessage().ifPresent(message ->
-                        dialogService.showErrorDialogAndWait(message.getMessage()));
+                sourceValidationStatus.getHighestMessage().ifPresent(message -> {
+                    String content = Localization.lang("User input via entry-editor in `{}bibtex source` tab led to failure.")
+                            + "\n" + Localization.lang("Please check your library file for wrong syntax.")
+                            + "\n\n" + message.getMessage();
+                    dialogService.showWarningDialogAndWait(Localization.lang("SourceTab error"), content);
+                });
             }
         });
 
@@ -333,5 +339,4 @@ public class SourceTab extends EntryEditorTab {
             }
         });
     }
-
 }

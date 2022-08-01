@@ -28,7 +28,7 @@ public class MergeEntriesDialog extends BaseDialog<BibEntry> {
         this.getDialogPane().getButtonTypes().setAll(ButtonType.CANCEL, replaceEntries);
         this.setResultConverter(buttonType -> {
             if (buttonType.equals(replaceEntries)) {
-                return mergeEntries.getMergeEntry();
+                return mergeEntries.getMergedEntry();
             } else {
                 return null;
             }

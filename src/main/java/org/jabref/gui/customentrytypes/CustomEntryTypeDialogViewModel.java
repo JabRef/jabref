@@ -16,6 +16,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.util.StringConverter;
 
+import org.jabref.gui.DialogService;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntryType;
@@ -25,7 +26,6 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.FieldPriority;
 import org.jabref.model.entry.field.OrFields;
-import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.UnknownEntryType;
 import org.jabref.preferences.PreferencesService;
@@ -38,7 +38,6 @@ import de.saxsys.mvvmfx.utils.validation.Validator;
 public class CustomEntryTypeDialogViewModel {
 
     public static final StringConverter<Field> FIELD_STRING_CONVERTER = new StringConverter<>() {
-
         @Override
         public String toString(Field object) {
             return object != null ? object.getDisplayName() : "";
@@ -46,7 +45,7 @@ public class CustomEntryTypeDialogViewModel {
 
         @Override
         public Field fromString(String string) {
-            return new UnknownField(string);
+            return FieldFactory.parseField(string);
         }
     };
 
@@ -61,14 +60,16 @@ public class CustomEntryTypeDialogViewModel {
 
     private final PreferencesService preferencesService;
     private final BibEntryTypesManager entryTypesManager;
+    private final DialogService dialogService;
 
     private final Validator entryTypeValidator;
     private final Validator fieldValidator;
 
-    public CustomEntryTypeDialogViewModel(BibDatabaseMode mode, PreferencesService preferencesService, BibEntryTypesManager entryTypesManager) {
+    public CustomEntryTypeDialogViewModel(BibDatabaseMode mode, PreferencesService preferencesService, BibEntryTypesManager entryTypesManager, DialogService dialogService) {
         this.mode = mode;
         this.preferencesService = preferencesService;
         this.entryTypesManager = entryTypesManager;
+        this.dialogService = dialogService;
 
         addAllTypes();
 
@@ -128,7 +129,14 @@ public class CustomEntryTypeDialogViewModel {
     public void addNewField() {
         Field field = newFieldToAdd.getValue();
         FieldViewModel model = new FieldViewModel(field, true, FieldPriority.IMPORTANT);
-        this.selectedEntryType.getValue().addField(model);
+        ObservableList<FieldViewModel> entryFields = this.selectedEntryType.getValue().fields();
+        boolean fieldExists = entryFields.stream().anyMatch(fieldViewModel -> fieldViewModel.fieldName().getValue().equals(field.getDisplayName()));
+
+        if (!fieldExists) {
+            this.selectedEntryType.getValue().addField(model);
+        } else {
+            dialogService.showWarningDialogAndWait(Localization.lang("Duplicate fields"), Localization.lang("Warning: You added field \"%0\" twice. Only one will be kept.", field.getDisplayName()));
+        }
         newFieldToAddProperty().setValue(null);
     }
 
@@ -183,7 +191,6 @@ public class CustomEntryTypeDialogViewModel {
     }
 
     public void apply() {
-
         for (var typeWithField : entryTypesWithFields) {
             BibEntryType type = typeWithField.entryType().getValue();
             List<FieldViewModel> allFields = typeWithField.fields();

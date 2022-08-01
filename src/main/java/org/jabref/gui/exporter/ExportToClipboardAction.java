@@ -1,6 +1,5 @@
 package org.jabref.gui.exporter;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -15,8 +14,8 @@ import javafx.scene.input.ClipboardContent;
 
 import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
-import org.jabref.gui.JabRefFrame;
-import org.jabref.gui.LibraryTab;
+import org.jabref.gui.StateManager;
+import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.TaskExecutor;
@@ -24,7 +23,6 @@ import org.jabref.logic.exporter.Exporter;
 import org.jabref.logic.exporter.ExporterFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.FileType;
-import org.jabref.logic.util.OS;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.PreferencesService;
@@ -37,43 +35,42 @@ public class ExportToClipboardAction extends SimpleCommand {
     private static final Logger LOGGER = LoggerFactory.getLogger(ExportToClipboardAction.class);
 
     // Only text based exporters can be used
-    private static final Set<FileType> SUPPORTED_FILETYPES = Set.of(StandardFileType.TXT, StandardFileType.RTF, StandardFileType.RDF, StandardFileType.XML, StandardFileType.HTML, StandardFileType.CSV, StandardFileType.RIS);
+    private static final Set<FileType> SUPPORTED_FILETYPES = Set.of(
+            StandardFileType.TXT,
+            StandardFileType.RTF,
+            StandardFileType.RDF,
+            StandardFileType.XML,
+            StandardFileType.HTML,
+            StandardFileType.CSV,
+            StandardFileType.RIS);
 
-    private JabRefFrame frame;
     private final DialogService dialogService;
-    private LibraryTab panel;
     private final List<BibEntry> entries = new ArrayList<>();
     private final ExporterFactory exporterFactory;
     private final ClipBoardManager clipBoardManager;
     private final TaskExecutor taskExecutor;
     private final PreferencesService preferences;
+    private final StateManager stateManager;
 
-    public ExportToClipboardAction(JabRefFrame frame, DialogService dialogService, ExporterFactory exporterFactory, ClipBoardManager clipBoardManager, TaskExecutor taskExecutor, PreferencesService prefs) {
-        this.frame = frame;
+    public ExportToClipboardAction(DialogService dialogService,
+                                   ExporterFactory exporterFactory,
+                                   StateManager stateManager,
+                                   ClipBoardManager clipBoardManager,
+                                   TaskExecutor taskExecutor,
+                                   PreferencesService prefs) {
         this.dialogService = dialogService;
         this.exporterFactory = exporterFactory;
         this.clipBoardManager = clipBoardManager;
         this.taskExecutor = taskExecutor;
         this.preferences = prefs;
-    }
+        this.stateManager = stateManager;
 
-    public ExportToClipboardAction(LibraryTab panel, DialogService dialogService, ExporterFactory exporterFactory, ClipBoardManager clipBoardManager, TaskExecutor taskExecutor, PreferencesService prefs) {
-        this.panel = panel;
-        this.dialogService = dialogService;
-        this.exporterFactory = exporterFactory;
-        this.clipBoardManager = clipBoardManager;
-        this.taskExecutor = taskExecutor;
-        this.preferences = prefs;
-
+        this.executable.bind(ActionHelper.needsEntriesSelected(stateManager));
     }
 
     @Override
     public void execute() {
-        if (panel == null) {
-            panel = frame.getCurrentLibraryTab();
-        }
-
-        if (panel.getSelectedEntries().isEmpty()) {
+        if (stateManager.getSelectedEntries().isEmpty()) {
             dialogService.notify(Localization.lang("This operation requires one or more entries to be selected."));
             return;
         }
@@ -106,12 +103,12 @@ public class ExportToClipboardAction extends SimpleCommand {
         // Set the global variable for this database's file directory before exporting,
         // so formatters can resolve linked files correctly.
         // (This is an ugly hack!)
-        preferences.storeFileDirforDatabase(panel.getBibDatabaseContext()
-                                                .getFileDirectories(preferences.getFilePreferences()));
+        preferences.storeFileDirforDatabase(stateManager.getActiveDatabase()
+                                                        .map(db -> db.getFileDirectories(preferences.getFilePreferences()))
+                                                        .orElse(List.of(preferences.getFilePreferences().getWorkingDirectory())));
 
         // Add chosen export type to last used preference, to become default
-        preferences.storeImportExportPreferences(
-               preferences.getImportExportPreferences().withLastExportExtension(exporter.getName()));
+        preferences.getImportExportPreferences().setLastExportExtension(exporter.getName());
 
         Path tmp = null;
         try {
@@ -119,18 +116,14 @@ public class ExportToClipboardAction extends SimpleCommand {
             // file, and read the contents afterwards:
             tmp = Files.createTempFile("jabrefCb", ".tmp");
 
-            entries.addAll(panel.getSelectedEntries());
+            entries.addAll(stateManager.getSelectedEntries());
 
             // Write to file:
-            exporter.export(panel.getBibDatabaseContext(), tmp,
-                    panel.getBibDatabaseContext()
-                         .getMetaData()
-                         .getEncoding()
-                         .orElse(preferences.getDefaultEncoding()),
+            exporter.export(stateManager.getActiveDatabase().get(), tmp,
                     entries);
             // Read the file and put the contents on the clipboard:
 
-            return new ExportResult(readFileToString(tmp), exporter.getFileType());
+            return new ExportResult(Files.readString(tmp), exporter.getFileType());
         } finally {
             // Clean up:
             if ((tmp != null) && Files.exists(tmp)) {
@@ -159,23 +152,6 @@ public class ExportToClipboardAction extends SimpleCommand {
         dialogService.notify(Localization.lang("Entries exported to clipboard") + ": " + entries.size());
     }
 
-    private String readFileToString(Path tmp) throws IOException {
-        try (BufferedReader reader = Files.newBufferedReader(tmp, panel.getBibDatabaseContext()
-                                                                       .getMetaData()
-                                                                       .getEncoding()
-                                                                       .orElse(preferences.getDefaultEncoding()))) {
-            return reader.lines().collect(Collectors.joining(OS.NEWLINE));
-        }
-    }
-
-    private static class ExportResult {
-
-        final String content;
-        final FileType fileType;
-
-        ExportResult(String content, FileType fileType) {
-            this.content = content;
-            this.fileType = fileType;
-        }
+    private record ExportResult(String content, FileType fileType) {
     }
 }

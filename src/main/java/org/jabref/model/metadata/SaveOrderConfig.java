@@ -33,12 +33,12 @@ public class SaveOrderConfig {
             return name;
         }
 
-        public static SaveOrderConfig.OrderType fromBooleans(boolean saveInSpecifiedOrder, boolean saveInTableOrder) {
-            SaveOrderConfig.OrderType orderType = SaveOrderConfig.OrderType.ORIGINAL;
+        public static SaveOrderConfig.OrderType fromBooleans(boolean saveInSpecifiedOrder, boolean saveInOriginalOrder) {
+            SaveOrderConfig.OrderType orderType = SaveOrderConfig.OrderType.TABLE;
             if (saveInSpecifiedOrder) {
                 orderType = SaveOrderConfig.OrderType.SPECIFIED;
-            } else if (saveInTableOrder) {
-                orderType = SaveOrderConfig.OrderType.TABLE;
+            } else if (saveInOriginalOrder) {
+                orderType = SaveOrderConfig.OrderType.ORIGINAL;
             }
 
             return orderType;
@@ -67,7 +67,7 @@ public class SaveOrderConfig {
         }
 
         try {
-            this.orderType = OrderType.valueOf(data.get(0));
+            this.orderType = OrderType.valueOf(data.get(0).toUpperCase());
         } catch (IllegalArgumentException ex) {
             if (data.size() > 1 && data.size() % 2 == 1) {
                 LOGGER.warn("Could not parse sort order: {} - trying to parse the sort criteria", data.get(0));
@@ -167,7 +167,6 @@ public class SaveOrderConfig {
         }
 
         public SortCriterion() {
-
         }
 
         @Override

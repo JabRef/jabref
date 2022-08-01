@@ -9,11 +9,11 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.BiPredicate;
+import java.util.function.Supplier;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLSocketFactory;
-import javax.xml.transform.TransformerException;
 
 import javafx.beans.Observable;
 import javafx.beans.property.BooleanProperty;
@@ -35,16 +35,22 @@ import org.jabref.gui.externalfiletype.StandardExternalFileType;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.gui.linkedfile.LinkedFileEditDialogView;
+import org.jabref.gui.mergeentries.MultiMergeEntriesView;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.externalfiles.LinkedFileHandler;
+import org.jabref.logic.importer.Importer;
+import org.jabref.logic.importer.ParserResult;
+import org.jabref.logic.importer.fileformat.PdfContentImporter;
+import org.jabref.logic.importer.fileformat.PdfEmbeddedBibFileImporter;
+import org.jabref.logic.importer.fileformat.PdfGrobidImporter;
+import org.jabref.logic.importer.fileformat.PdfVerbatimBibTextImporter;
+import org.jabref.logic.importer.fileformat.PdfXmpImporter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.util.io.FileNameUniqueness;
 import org.jabref.logic.util.io.FileUtil;
-import org.jabref.logic.xmp.XmpPreferences;
-import org.jabref.logic.xmp.XmpUtilWriter;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
@@ -52,6 +58,7 @@ import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.FileHelper;
 import org.jabref.model.util.OptionalUtil;
 import org.jabref.preferences.FilePreferences;
+import org.jabref.preferences.PreferencesService;
 
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
@@ -69,12 +76,11 @@ public class LinkedFileViewModel extends AbstractViewModel {
     private final DoubleProperty downloadProgress = new SimpleDoubleProperty(-1);
     private final BooleanProperty downloadOngoing = new SimpleBooleanProperty(false);
     private final BooleanProperty isAutomaticallyFound = new SimpleBooleanProperty(false);
-    private final BooleanProperty canWriteXMPMetadata = new SimpleBooleanProperty(false);
+    private final BooleanProperty isOfflinePdf = new SimpleBooleanProperty(false);
     private final DialogService dialogService;
     private final BibEntry entry;
     private final TaskExecutor taskExecutor;
-    private final FilePreferences filePreferences;
-    private final XmpPreferences xmpPreferences;
+    private final PreferencesService preferences;
     private final LinkedFileHandler linkedFileHandler;
     private final ExternalFileTypes externalFileTypes;
 
@@ -85,19 +91,17 @@ public class LinkedFileViewModel extends AbstractViewModel {
                                BibDatabaseContext databaseContext,
                                TaskExecutor taskExecutor,
                                DialogService dialogService,
-                               XmpPreferences xmpPreferences,
-                               FilePreferences filePreferences,
+                               PreferencesService preferences,
                                ExternalFileTypes externalFileTypes) {
 
         this.linkedFile = linkedFile;
-        this.filePreferences = filePreferences;
-        this.linkedFileHandler = new LinkedFileHandler(linkedFile, entry, databaseContext, filePreferences);
+        this.preferences = preferences;
+        this.linkedFileHandler = new LinkedFileHandler(linkedFile, entry, databaseContext, preferences.getFilePreferences());
         this.databaseContext = databaseContext;
         this.entry = entry;
         this.dialogService = dialogService;
         this.taskExecutor = taskExecutor;
         this.externalFileTypes = externalFileTypes;
-        this.xmpPreferences = xmpPreferences;
 
         fileExistsValidator = new FunctionBasedValidator<>(
                 linkedFile.linkProperty(),
@@ -105,18 +109,18 @@ public class LinkedFileViewModel extends AbstractViewModel {
                     if (linkedFile.isOnlineLink()) {
                         return true;
                     } else {
-                        Optional<Path> path = FileHelper.find(databaseContext, link, filePreferences);
+                        Optional<Path> path = FileHelper.find(databaseContext, link, preferences.getFilePreferences());
                         return path.isPresent() && Files.exists(path.get());
                     }
                 },
                 ValidationMessage.warning(Localization.lang("Could not find file '%0'.", linkedFile.getLink())));
 
         downloadOngoing.bind(downloadProgress.greaterThanOrEqualTo(0).and(downloadProgress.lessThan(1)));
-        canWriteXMPMetadata.setValue(!linkedFile.isOnlineLink() && linkedFile.getFileType().equalsIgnoreCase("pdf"));
+        isOfflinePdf.setValue(!linkedFile.isOnlineLink() && linkedFile.getFileType().equalsIgnoreCase("pdf"));
     }
 
-    public BooleanProperty canWriteXMPMetadataProperty() {
-        return canWriteXMPMetadata;
+    public BooleanProperty isOfflinePdfProperty() {
+        return isOfflinePdf;
     }
 
     public boolean isAutomaticallyFound() {
@@ -196,7 +200,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
     public void open() {
         try {
             Optional<ExternalFileType> type = ExternalFileTypes.getInstance().fromLinkedFile(linkedFile, true);
-            boolean successful = JabRefDesktop.openExternalFileAnyFormat(databaseContext, linkedFile.getLink(), type);
+            boolean successful = JabRefDesktop.openExternalFileAnyFormat(databaseContext, preferences, linkedFile.getLink(), type);
             if (!successful) {
                 dialogService.showErrorDialogAndWait(Localization.lang("File not found"), Localization.lang("Could not find file '%0'.", linkedFile.getLink()));
             }
@@ -211,10 +215,10 @@ public class LinkedFileViewModel extends AbstractViewModel {
                 Optional<Path> resolvedPath = FileHelper.find(
                         databaseContext,
                         linkedFile.getLink(),
-                        filePreferences);
+                        preferences.getFilePreferences());
 
                 if (resolvedPath.isPresent()) {
-                    JabRefDesktop.openFolderAndSelectFile(resolvedPath.get());
+                    JabRefDesktop.openFolderAndSelectFile(resolvedPath.get(), preferences, dialogService);
                 } else {
                     dialogService.showErrorDialogAndWait(Localization.lang("File not found"));
                 }
@@ -246,7 +250,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
             return;
         }
 
-        Optional<Path> file = linkedFile.findIn(databaseContext, filePreferences);
+        Optional<Path> file = linkedFile.findIn(databaseContext, preferences.getFilePreferences());
         if (file.isPresent()) {
             performRenameWithConflictCheck(targetFileName);
         } else {
@@ -283,13 +287,13 @@ public class LinkedFileViewModel extends AbstractViewModel {
         }
 
         // Get target folder
-        Optional<Path> fileDir = databaseContext.getFirstExistingFileDir(filePreferences);
+        Optional<Path> fileDir = databaseContext.getFirstExistingFileDir(preferences.getFilePreferences());
         if (fileDir.isEmpty()) {
             dialogService.showErrorDialogAndWait(Localization.lang("Move file"), Localization.lang("File directory is not set or does not exist!"));
             return;
         }
 
-        Optional<Path> file = linkedFile.findIn(databaseContext, filePreferences);
+        Optional<Path> file = linkedFile.findIn(databaseContext, preferences.getFilePreferences());
         if ((file.isPresent())) {
             // Found the linked file, so move it
             try {
@@ -325,9 +329,26 @@ public class LinkedFileViewModel extends AbstractViewModel {
      * @return true if suggested filepath is same as existing filepath.
      */
     public boolean isGeneratedPathSameAsOriginal() {
-        Optional<Path> newDir = databaseContext.getFirstExistingFileDir(filePreferences);
+        FilePreferences filePreferences = preferences.getFilePreferences();
+        Optional<Path> baseDir = databaseContext.getFirstExistingFileDir(filePreferences);
+        if (baseDir.isEmpty()) {
+            // could not find default path
+            return false;
+        }
 
-        Optional<Path> currentDir = linkedFile.findIn(databaseContext, filePreferences).map(Path::getParent);
+        // append File directory pattern if exits
+        String targetDirectoryName = FileUtil.createDirNameFromPattern(
+                databaseContext.getDatabase(),
+                entry,
+                filePreferences.getFileDirectoryPattern());
+
+        Optional<Path> targetDir = baseDir.map(dir -> dir.resolve(targetDirectoryName));
+
+        Optional<Path> currentDir = linkedFile.findIn(databaseContext, preferences.getFilePreferences()).map(Path::getParent);
+        if (currentDir.isEmpty()) {
+            // Could not find file
+            return false;
+        }
 
         BiPredicate<Path, Path> equality = (fileA, fileB) -> {
             try {
@@ -336,7 +357,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
                 return false;
             }
         };
-        return OptionalUtil.equals(newDir, currentDir, equality);
+        return OptionalUtil.equals(targetDir, currentDir, equality);
     }
 
     public void moveToDefaultDirectoryAndRename() {
@@ -351,7 +372,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
      * successfully, does not exist in the first place or the user choose to remove it)
      */
     public boolean delete() {
-        Optional<Path> file = linkedFile.findIn(databaseContext, filePreferences);
+        Optional<Path> file = linkedFile.findIn(databaseContext, preferences.getFilePreferences());
 
         if (file.isEmpty()) {
             LOGGER.warn("Could not find file " + linkedFile.getLink());
@@ -392,28 +413,8 @@ public class LinkedFileViewModel extends AbstractViewModel {
         });
     }
 
-    public void writeXMPMetadata() {
-        // Localization.lang("Writing XMP metadata...")
-        BackgroundTask<Void> writeTask = BackgroundTask.wrap(() -> {
-            Optional<Path> file = linkedFile.findIn(databaseContext, filePreferences);
-            if (file.isEmpty()) {
-                // TODO: Print error message
-                // Localization.lang("PDF does not exist");
-            } else {
-                try {
-                    XmpUtilWriter.writeXmp(file.get(), entry, databaseContext.getDatabase(), xmpPreferences);
-                } catch (IOException | TransformerException ex) {
-                    // TODO: Print error message
-                    // Localization.lang("Error while writing") + " '" + file.toString() + "': " + ex;
-                }
-            }
-            return null;
-        });
-
-        // Localization.lang("Finished writing XMP metadata.")
-
-        // TODO: Show progress
-        taskExecutor.execute(writeTask);
+    public WriteMetadataToPdfCommand createWriteMetadataToPdfCommand() {
+        return new WriteMetadataToPdfCommand(linkedFile, databaseContext, preferences, dialogService, entry, LOGGER, taskExecutor);
     }
 
     public void download() {
@@ -421,7 +422,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
             throw new UnsupportedOperationException("In order to download the file it has to be an online link");
         }
         try {
-            Optional<Path> targetDirectory = databaseContext.getFirstExistingFileDir(filePreferences);
+            Optional<Path> targetDirectory = databaseContext.getFirstExistingFileDir(preferences.getFilePreferences());
             if (targetDirectory.isEmpty()) {
                 dialogService.showErrorDialogAndWait(Localization.lang("Download file"), Localization.lang("File directory is not set or does not exist!"));
                 return;
@@ -434,7 +435,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
 
             BackgroundTask<Path> downloadTask = prepareDownloadTask(targetDirectory.get(), urlDownload);
             downloadTask.onSuccess(destination -> {
-                boolean isDuplicate = false;
+                boolean isDuplicate;
                 try {
                     isDuplicate = FileNameUniqueness.isDuplicatedFile(targetDirectory.get(), destination.getFileName(), dialogService);
                 } catch (IOException e) {
@@ -443,7 +444,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
                 }
 
                 if (!isDuplicate) {
-                    LinkedFile newLinkedFile = LinkedFilesEditorViewModel.fromFile(destination, databaseContext.getFileDirectories(filePreferences), externalFileTypes);
+                    LinkedFile newLinkedFile = LinkedFilesEditorViewModel.fromFile(destination, databaseContext.getFileDirectories(preferences.getFilePreferences()), externalFileTypes);
                     List<LinkedFile> linkedFiles = entry.getFiles();
 
                     entry.addLinkedFile(entry, linkedFile, newLinkedFile, linkedFiles);
@@ -460,6 +461,10 @@ public class LinkedFileViewModel extends AbstractViewModel {
             downloadTask.messageProperty().set(
                     Localization.lang("Fulltext for") + ": " + entry.getCitationKey().orElse(Localization.lang("New entry")));
             downloadTask.showToUser(true);
+            downloadTask.onFailure(ex -> {
+                LOGGER.error("Error downloading", ex);
+                dialogService.showErrorDialogAndWait(Localization.lang("Error downloading"), ex);
+            });
             taskExecutor.execute(downloadTask);
         } catch (MalformedURLException exception) {
             dialogService.showErrorDialogAndWait(Localization.lang("Invalid URL"), exception);
@@ -474,7 +479,6 @@ public class LinkedFileViewModel extends AbstractViewModel {
                 if (dialogService.showConfirmationDialogAndWait(Localization.lang("Download file"),
                         Localization.lang("Unable to find valid certification path to requested target(%0), download anyway?",
                                 urlDownload.getSource().toString()))) {
-                    URLDownload.bypassSSLVerification();
                     return true;
                 } else {
                     dialogService.notify(Localization.lang("Download operation canceled."));
@@ -495,13 +499,12 @@ public class LinkedFileViewModel extends AbstractViewModel {
                     String suggestedTypeName = externalFileType.getName();
                     linkedFile.setFileType(suggestedTypeName);
                     String suggestedName = linkedFileHandler.getSuggestedFileName(externalFileType.getExtension());
-                    String fulltextDir = FileUtil.createDirNameFromPattern(databaseContext.getDatabase(), entry, filePreferences.getFileDirectoryPattern());
+                    String fulltextDir = FileUtil.createDirNameFromPattern(databaseContext.getDatabase(), entry, preferences.getFilePreferences().getFileDirectoryPattern());
                     suggestedName = FileNameUniqueness.getNonOverWritingFileName(targetDirectory.resolve(fulltextDir), suggestedName);
                     return targetDirectory.resolve(fulltextDir).resolve(suggestedName);
                 })
                 .then(destination -> new FileDownloadTask(urlDownload.getSource(), destination))
-                .onFinished(() -> URLDownload.setSSLVerification(defaultSSLSocketFactory, defaultHostnameVerifier))
-                .onFailure(exception -> dialogService.showErrorDialogAndWait("Download failed", exception));
+                .onFinished(() -> URLDownload.setSSLVerification(defaultSSLSocketFactory, defaultHostnameVerifier));
         return downloadTask;
     }
 
@@ -537,5 +540,37 @@ public class LinkedFileViewModel extends AbstractViewModel {
 
     public ValidationStatus fileExistsValidationStatus() {
         return fileExistsValidator.getValidationStatus();
+    }
+
+    public void parsePdfMetadataAndShowMergeDialog() {
+        linkedFile.findIn(databaseContext, preferences.getFilePreferences()).ifPresent(filePath -> {
+            MultiMergeEntriesView dialog = new MultiMergeEntriesView(preferences, taskExecutor);
+            dialog.addSource(Localization.lang("Entry"), entry);
+            dialog.addSource(Localization.lang("Verbatim"), wrapImporterToSupplier(new PdfVerbatimBibTextImporter(preferences.getImportFormatPreferences()), filePath));
+            dialog.addSource(Localization.lang("Embedded"), wrapImporterToSupplier(new PdfEmbeddedBibFileImporter(preferences.getImportFormatPreferences()), filePath));
+            if (preferences.getImporterPreferences().isGrobidEnabled()) {
+                dialog.addSource("Grobid", wrapImporterToSupplier(new PdfGrobidImporter(preferences.getImporterPreferences(), preferences.getImportFormatPreferences()), filePath));
+            }
+            dialog.addSource(Localization.lang("XMP metadata"), wrapImporterToSupplier(new PdfXmpImporter(preferences.getXmpPreferences()), filePath));
+            dialog.addSource(Localization.lang("Content"), wrapImporterToSupplier(new PdfContentImporter(preferences.getImportFormatPreferences()), filePath));
+            dialog.showAndWait().ifPresent(newEntry -> {
+                databaseContext.getDatabase().removeEntry(entry);
+                databaseContext.getDatabase().insertEntry(newEntry);
+            });
+        });
+    }
+
+    private Supplier<BibEntry> wrapImporterToSupplier(Importer importer, Path filePath) {
+        return () -> {
+            try {
+                ParserResult parserResult = importer.importDatabase(filePath);
+                if (parserResult.isInvalid() || parserResult.isEmpty() || !parserResult.getDatabase().hasEntries()) {
+                    return null;
+                }
+                return parserResult.getDatabase().getEntries().get(0);
+            } catch (IOException e) {
+                return null;
+            }
+        };
     }
 }

@@ -12,7 +12,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiFunction;
-import java.util.regex.Pattern;
 
 import javafx.beans.Observable;
 import javafx.beans.property.ObjectProperty;
@@ -57,7 +56,6 @@ public class BibEntry implements Cloneable {
 
     public static final EntryType DEFAULT_TYPE = StandardEntryType.Misc;
     private static final Logger LOGGER = LoggerFactory.getLogger(BibEntry.class);
-    private static final Pattern REMOVE_TRAILING_WHITESPACE = Pattern.compile("\\s+$");
     private final SharedBibEntryData sharedBibEntryData;
 
     /**
@@ -397,7 +395,7 @@ public class BibEntry implements Cloneable {
     }
 
     /**
-     * Returns an set containing the names of all fields that are set for this particular entry.
+     * Returns a set containing the names of all fields that are set for this particular entry.
      *
      * @return a set of existing field names
      */
@@ -471,7 +469,7 @@ public class BibEntry implements Cloneable {
                 }
             } else {
                 // Date field not in valid format
-                LOGGER.debug("Could not parse date " + date.get());
+                LOGGER.debug("Could not parse date {}", date.get());
                 return Optional.empty();
             }
         }
@@ -599,7 +597,7 @@ public class BibEntry implements Cloneable {
      */
     public Optional<FieldChange> clearField(Field field, EntriesEventSource eventSource) {
         Optional<String> oldValue = getField(field);
-        if (!oldValue.isPresent()) {
+        if (oldValue.isEmpty()) {
             return Optional.empty();
         }
 
@@ -699,8 +697,7 @@ public class BibEntry implements Cloneable {
     }
 
     public void setCommentsBeforeEntry(String parsedComments) {
-        // delete trailing whitespaces (between entry and text)
-        this.commentsBeforeEntry = REMOVE_TRAILING_WHITESPACE.matcher(parsedComments).replaceFirst("");
+        this.commentsBeforeEntry = parsedComments;
     }
 
     public boolean hasChanged() {
@@ -780,7 +777,8 @@ public class BibEntry implements Cloneable {
         return putKeywords(keywordList, keywordDelimiter);
     }
 
-    public Optional<FieldChange> replaceKeywords(KeywordList keywordsToReplace, Keyword newValue,
+    public Optional<FieldChange> replaceKeywords(KeywordList keywordsToReplace,
+                                                 Keyword newValue,
                                                  Character keywordDelimiter) {
         KeywordList keywordList = getKeywords(keywordDelimiter);
         keywordList.replaceAll(keywordsToReplace, newValue);
@@ -834,6 +832,18 @@ public class BibEntry implements Cloneable {
 
     public BibEntry withField(Field field, String value) {
         setField(field, value);
+        this.setChanged(false);
+        return this;
+    }
+
+    public BibEntry withDate(Date date) {
+        setDate(date);
+        this.setChanged(false);
+        return this;
+    }
+
+    public BibEntry withMonth(Month parsedMonth) {
+        setMonth(parsedMonth);
         this.setChanged(false);
         return this;
     }
@@ -1010,5 +1020,4 @@ public class BibEntry implements Cloneable {
         }
         entry.setFiles(linkedFiles);
     }
-
 }

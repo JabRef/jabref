@@ -2,7 +2,7 @@ name: Pull request feedback
 
 on:
   pull_request_target:
-    types: [ opened, synchronize, labeled ]
+    types: [ opened, synchronize, workflow_dispatch]
 
 jobs:
   test:
@@ -15,21 +15,23 @@ jobs:
     # labels to a PR
     # https://securitylab.github.com/research/github-actions-preventing-pwn-requests
     - name: Checkout repo for OWNER TEST
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       if: contains(github.event.pull_request.labels.*.name, 'safe to test')
       with:
-        ref: ${{ github.event.pull_request.head.sha }}
+        ref: ${{ github.event.pull_request.head.ref }}
 
-    # otherwise, checkout the current master, and the pr to the subdirectory 'pr'
+    # otherwise, checkout the current master, and the pr to the subdirectory 'pull-request'
     - name: Checkout base repo for pull-request test
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       if: "! contains(github.event.pull_request.labels.*.name, 'safe to test')"
     - name: Checkout pull-request
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       if: "! contains(github.event.pull_request.labels.*.name, 'safe to test')"
       with:
+        repository: ${{ github.event.pull_request.head.repo.full_name }}
         path: pull-request
-        ref: ${{ github.event.pull_request.head.sha }}
+        ref: ${{ github.event.pull_request.head.ref }}
+        token: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Check for relevant changes
       uses: dorny/paths-filter@v2
@@ -50,9 +52,9 @@ jobs:
     - name: Set up Ruby
       uses: ruby/setup-ruby@v1
       with:
-        ruby-version: 3.0.0
+        ruby-version: 3.0.2
     - name: but use cache to speed that up
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       with:
         path: vendor/bundle
         key: ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}
@@ -73,3 +75,13 @@ jobs:
     - name: report
       if: (failure() || success()) && steps.changed.outputs.style == 'true'
       run: bundle exec sheldon --token=$GITHUB_TOKEN --${{ job.status }} --verbose
+
+    - name: commit reindented styles
+      if: github.repository == 'citation-style-language/styles' && steps.changed.outputs.style == 'true'
+      continue-on-error: true
+      uses: stefanzweifel/git-auto-commit-action@v4
+      with:
+        commit_message: Re-indent CSL styles
+        file_pattern: ${{ steps.changed.outputs.style_files }}
+        repository: pull-request
+        skip_dirty_check: false

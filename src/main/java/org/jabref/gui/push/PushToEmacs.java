@@ -14,6 +14,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.OS;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.push.PushToApplicationConstants;
 import org.jabref.preferences.PreferencesService;
 import org.jabref.preferences.PushToApplicationPreferences;
 
@@ -22,7 +23,7 @@ import org.slf4j.LoggerFactory;
 
 public class PushToEmacs extends AbstractPushToApplication implements PushToApplication {
 
-    public static final String NAME = "Emacs";
+    public static final String NAME = PushToApplicationConstants.EMACS;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PushToEmacs.class);
 
@@ -130,6 +131,6 @@ public class PushToEmacs extends AbstractPushToApplication implements PushToAppl
 
     @Override
     public PushToApplicationSettings getSettings(PushToApplication application, ObjectProperty<PushToApplicationPreferences> preferences) {
-        return new PushToEmacsSettings(application, dialogService, preferencesService, preferences);
+        return new PushToEmacsSettings(application, dialogService, preferencesService.getFilePreferences(), preferences);
     }
 }

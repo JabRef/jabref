@@ -57,8 +57,8 @@ Please see our [Installation Guide](https://docs.jabref.org/installation).
 [![Paypal Donate](https://img.shields.io/badge/donate-paypal-00457c.svg?logo=paypal&style=flat-square)](https://paypal.me/JabRef)
 
 We are thankful for any bug reports or other feedback.
-If you have ideas for new features you want to be included in JabRef, [tell us in our forum](http://discourse.jabref.org/c/features)!
-If you need support in using JabRef, please read [the documentation](https://docs.jabref.org/) first, the [frequently asked questions (FAQ)](https://docs.jabref.org/faq) and also have a look at our [community forum](https://discourse.jabref.org/c/help).
+If you have ideas for new features you want to be included in JabRef, tell us in [the feature section](http://discourse.jabref.org/c/features) of our forum!
+If you need support in using JabRef, please read [the documentation](https://docs.jabref.org/) first, the [frequently asked questions (FAQ)](https://docs.jabref.org/faq) and also have a look at our [community forum](https://discourse.jabref.org/c/help/7).
 You can use our [GitHub issue tracker](https://github.com/JabRef/jabref/issues) to file bug reports.
 
 An explanation of donation possibilities and usage of donations is available at our [donations page](https://donations.jabref.org).
@@ -71,7 +71,7 @@ An explanation of donation possibilities and usage of donations is available at 
 [![OpenHub](https://www.openhub.net/p/jabref/widgets/project_thin_badge.gif)](https://www.openhub.net/p/jabref)
 [![Deployment Status](https://github.com/JabRef/jabref/workflows/Deployment/badge.svg)](https://github.com/JabRef/jabref/actions?query=workflow%3ADeployment)
 [![Test Status](https://github.com/JabRef/jabref/workflows/Tests/badge.svg)](https://github.com/JabRef/jabref/actions?query=workflow%3ATests)
-[![codecov.io](https://codecov.io/github/JabRef/jabref/coverage.svg?branch=master)](https://codecov.io/github/JabRef/jabref?branch=master)
+[![codecov.io](https://codecov.io/github/JabRef/jabref/coverage.svg?branch=master)](https://codecov.io/github/JabRef/jabref?branch=main)
 
 Want to be part of a free and open-source project that tens of thousands of scientists use every day?
 Check out the ways you can contribute, below:
@@ -84,16 +84,20 @@ Check out the ways you can contribute, below:
 
 We view pull requests as a collaborative process.
 Submit a pull request early to get feedback from the team on work in progress.
-We will discuss improvements with you and agree to merge them once the [developers](https://github.com/JabRef/jabref/blob/master/DEVELOPERS) approve.
+We will discuss improvements with you and agree to merge them once the [developers](https://github.com/JabRef/jabref/blob/main/MAINTAINERS) approve. Please also remember to discuss bigger changes early with the core developers to avoid a waste of time and work. Some fundamental design decisions can be found within our list of [Architectural Decision Records](https://devdocs.jabref.org/adr.html).
 
 If you want a step-by-step walk-through on how to set-up your workspace, please check [this guideline](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace).
 
-To compile JabRef from source, you need a Java Development Kit 15 and `JAVA_HOME` pointing to this JDK.
+To compile JabRef from source, you need a Java Development Kit 18 and `JAVA_HOME` pointing to this JDK.
 To run it, just execute `gradlew run`.
 When you want to develop, it is necessary to generate additional sources using `gradlew generateSource`
 and then generate the Eclipse `gradlew eclipse`.
 For IntelliJ IDEA, just import the project via a Gradle Import by pointing at the `build.gradle`.
 
 `gradlew test` executes all tests. We use [Github Actions](https://github.com/JabRef/jabref/actions) for executing the tests after each commit. For developing, it is sufficient to locally only run the associated test for the classes you changed. Github will report any other failure.
+
+## Sponsoring
+
+JabRef development is powered by YourKit Java Profiler [![YourKit Java Profiler](https://www.yourkit.com/images/yk_logo.png)](https://www.yourkit.com/java/profiler/)
 
 [JabRef]: https://www.jabref.org

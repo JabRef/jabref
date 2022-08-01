@@ -1,24 +1,8 @@
 default: true
 
-# Using h2 has side effects in GitBook's toc. Thus, we sometimes switch from h1 to h3
-MD001: false
-
-MD012:
-  # 2 are required, because GitBook adss two blank lines at the end of a file
-  maximum: 2
-
+# allow arbitrary line length
 MD013: false
-
-# The FAQs state questions - we allow them
-MD026:
-  punctuation: ".,;:!"
-
-# not supported by gitbook
-MD031: false
 
 MD033:
   # we have <a> tags with ids and superscript
   allowed_elements: ['a', 'kbd', 'sup']
-
-# seems to be unsupported by gitbook anymore
-MD045: false

@@ -7,6 +7,7 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Comparator;
+import java.util.Map;
 
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -21,32 +22,67 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.ProxyAuthenticator;
 import org.jabref.logic.net.ProxyPreferences;
 import org.jabref.logic.net.ProxyRegisterer;
+import org.jabref.logic.net.ssl.SSLPreferences;
+import org.jabref.logic.net.ssl.TrustStoreManager;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.remote.client.RemoteClient;
-import org.jabref.logic.util.OS;
+import org.jabref.logic.util.BuildInfo;
 import org.jabref.migrations.PreferencesMigrations;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.preferences.JabRefPreferences;
 import org.jabref.preferences.PreferencesService;
 
+import net.harawata.appdirs.AppDirsFactory;
 import org.apache.commons.cli.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.tinylog.configuration.Configuration;
 
 /**
  * JabRef's main class to process command line options and to start the UI
  */
 public class JabRefMain extends Application {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(JabRefMain.class);
+    private static Logger LOGGER;
 
     private static String[] arguments;
 
     public static void main(String[] args) {
+        addLogToDisk();
         arguments = args;
         launch(arguments);
+    }
+
+    private static void initializeLogger() {
+         LOGGER = LoggerFactory.getLogger(JabRefMain.class);
+    }
+
+    /**
+     * This needs to be called as early as possible. After the first log write, it is not possible to alter
+     * the log configuration programmatically anymore.
+     */
+    private static void addLogToDisk() {
+        Path directory = Path.of(AppDirsFactory.getInstance().getUserLogDir(
+                                     "jabref",
+                                     new BuildInfo().version.toString(),
+                                     "org.jabref"));
+        try {
+            Files.createDirectories(directory);
+        } catch (IOException e) {
+            initializeLogger();
+            LOGGER.error("Could not create log directory {}", directory, e);
+            return;
+        }
+        // The "Shared File Writer" is explained at https://tinylog.org/v2/configuration/#shared-file-writer
+        Map<String, String> configuration = Map.of(
+                "writerFile", "shared file",
+                "writerFile.level", "info",
+                "writerFile.file", directory.resolve("log.txt").toString(),
+                "writerFile.charset", "UTF-8");
+
+        configuration.entrySet().forEach(config -> Configuration.set(config.getKey(), config.getValue()));
+        initializeLogger();
     }
 
     @Override
@@ -62,6 +98,8 @@ public class JabRefMain extends Application {
 
             configureProxy(preferences.getProxyPreferences());
 
+            configureSSL(preferences.getSSLPreferences());
+
             Globals.startBackgroundTasks();
 
             applyPreferences(preferences);
@@ -70,15 +108,15 @@ public class JabRefMain extends Application {
 
             try {
                 // Process arguments
-                ArgumentProcessor argumentProcessor = new ArgumentProcessor(arguments, ArgumentProcessor.Mode.INITIAL_START);
+                ArgumentProcessor argumentProcessor = new ArgumentProcessor(arguments, ArgumentProcessor.Mode.INITIAL_START, preferences);
                 // Check for running JabRef
-                if (!handleMultipleAppInstances(arguments) || argumentProcessor.shouldShutDown()) {
+                if (!handleMultipleAppInstances(arguments, preferences) || argumentProcessor.shouldShutDown()) {
                     Platform.exit();
                     return;
                 }
 
                 // If not, start GUI
-                new JabRefGUI(mainStage, argumentProcessor.getParserResults(), argumentProcessor.isBlank());
+                new JabRefGUI(mainStage, argumentProcessor.getParserResults(), argumentProcessor.isBlank(), preferences);
             } catch (ParseException e) {
                 LOGGER.error("Problem parsing arguments", e);
 
@@ -97,8 +135,8 @@ public class JabRefMain extends Application {
         Globals.shutdownThreadPools();
     }
 
-    private static boolean handleMultipleAppInstances(String[] args) {
-        RemotePreferences remotePreferences = Globals.prefs.getRemotePreferences();
+    private static boolean handleMultipleAppInstances(String[] args, PreferencesService preferences) {
+        RemotePreferences remotePreferences = preferences.getRemotePreferences();
         if (remotePreferences.useRemoteServer()) {
             // Try to contact already running JabRef
             RemoteClient remoteClient = new RemoteClient(remotePreferences.getPort());
@@ -113,7 +151,7 @@ public class JabRefMain extends Application {
                 }
             } else {
                 // We are alone, so we start the server
-                Globals.REMOTE_LISTENER.openAndStart(new JabRefMessageHandler(), remotePreferences.getPort());
+                Globals.REMOTE_LISTENER.openAndStart(new JabRefMessageHandler(), remotePreferences.getPort(), preferences);
             }
         }
         return true;
@@ -124,7 +162,8 @@ public class JabRefMain extends Application {
         Globals.journalAbbreviationRepository = JournalAbbreviationLoader.loadRepository(preferences.getJournalAbbreviationPreferences());
 
         // Build list of Import and Export formats
-        Globals.IMPORT_FORMAT_READER.resetImportFormats(preferences.getImportFormatPreferences(),
+        Globals.IMPORT_FORMAT_READER.resetImportFormats(preferences.getImporterPreferences(),
+                preferences.getGeneralPreferences(), preferences.getImportFormatPreferences(),
                 preferences.getXmpPreferences(), Globals.getFileUpdateMonitor());
         Globals.entryTypesManager.addCustomOrModifiedTypes(preferences.getBibEntryTypes(BibDatabaseMode.BIBTEX),
                 preferences.getBibEntryTypes(BibDatabaseMode.BIBLATEX));
@@ -132,36 +171,45 @@ public class JabRefMain extends Application {
                 preferences.getCustomExportFormats(Globals.journalAbbreviationRepository),
                 preferences.getLayoutFormatterPreferences(Globals.journalAbbreviationRepository),
                 preferences.getSavePreferencesForExport(),
-                preferences.getXmpPreferences());
+                preferences.getXmpPreferences(),
+                preferences.getGeneralPreferences().getDefaultBibDatabaseMode(),
+                Globals.entryTypesManager);
 
         // Initialize protected terms loader
         Globals.protectedTermsLoader = new ProtectedTermsLoader(preferences.getProtectedTermsPreferences());
-
-        // Override used newline character with the one stored in the preferences
-        // The preferences return the system newline character sequence as default
-        OS.NEWLINE = preferences.getNewLineSeparator().toString();
     }
 
     private static void configureProxy(ProxyPreferences proxyPreferences) {
         ProxyRegisterer.register(proxyPreferences);
-        if (proxyPreferences.isUseProxy() && proxyPreferences.isUseAuthentication()) {
+        if (proxyPreferences.shouldUseProxy() && proxyPreferences.shouldUseAuthentication()) {
             Authenticator.setDefault(new ProxyAuthenticator());
         }
+    }
+
+    private static void configureSSL(SSLPreferences sslPreferences) {
+        TrustStoreManager.createTruststoreFileIfNotExist(Path.of(sslPreferences.getTruststorePath()));
+        System.setProperty("javax.net.ssl.trustStore", sslPreferences.getTruststorePath());
+        System.setProperty("javax.net.ssl.trustStorePassword", "changeit");
     }
 
     private static void clearOldSearchIndices() {
         Path currentIndexPath = BibDatabaseContext.getFulltextIndexBasePath();
         Path appData = currentIndexPath.getParent();
 
+        try {
+            Files.createDirectories(currentIndexPath);
+        } catch (IOException e) {
+            LOGGER.error("Could not create index directory {}", appData, e);
+        }
+
         try (DirectoryStream<Path> stream = Files.newDirectoryStream(appData)) {
             for (Path path : stream) {
-                if (Files.isDirectory(path) && !path.equals(currentIndexPath)) {
+                if (Files.isDirectory(path) && !path.toString().endsWith("ssl") && path.toString().contains("lucene") && !path.equals(currentIndexPath)) {
                     LOGGER.info("Deleting out-of-date fulltext search index at {}.", path);
                     Files.walk(path)
                          .sorted(Comparator.reverseOrder())
                          .map(Path::toFile)
                          .forEach(File::delete);
-
                 }
             }
         } catch (IOException e) {

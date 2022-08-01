@@ -22,14 +22,12 @@ import org.jabref.model.openoffice.util.OOListUtil;
 class OOProcessAuthorYearMarkers {
 
     private OOProcessAuthorYearMarkers() {
-        /**/
     }
 
     /**
      *  Fills {@code sortedCitedKeys//normCitMarker}
      */
     private static void createNormalizedCitationMarkers(CitedKeys sortedCitedKeys, OOBibStyle style) {
-
         for (CitedKey ck : sortedCitedKeys.values()) {
             ck.setNormalizedCitationMarker(Optional.of(style.getNormalizedCitationMarker(ck)));
         }
@@ -46,12 +44,11 @@ class OOProcessAuthorYearMarkers {
      * Clears uniqueLetters before filling.
      *
      * On return: Each citedKey in sortedCitedKeys has uniqueLetter set as needed.
-     *            The same values are copied to the corresponding citations in cgs.
+     *            The same values are copied to the corresponding citations in citationGroups.
      *
      *  Depends on: style, citations and their order.
      */
-    private static void createUniqueLetters(CitedKeys sortedCitedKeys, CitationGroups cgs) {
-
+    private static void createUniqueLetters(CitedKeys sortedCitedKeys, CitationGroups citationGroups) {
         // The entries in the clashingKeys lists preserve
         // firstAppearance order from sortedCitedKeys.values().
         //
@@ -64,6 +61,9 @@ class OOProcessAuthorYearMarkers {
             String citationKey = citedKey.citationKey;
 
             List<String> clashingKeys = normCitMarkerToClachingKeys.putIfAbsent(normCitMarker, new ArrayList<>(1));
+            if (clashingKeys == null) {
+                clashingKeys = normCitMarkerToClachingKeys.get(normCitMarker);
+            }
             if (!clashingKeys.contains(citationKey)) {
                 // First appearance of citationKey, add to list.
                 clashingKeys.add(citationKey);
@@ -85,12 +85,12 @@ class OOProcessAuthorYearMarkers {
             // according to their order in clashingKeys.
             int nextUniqueLetter = 'a';
             for (String citationKey : clashingKeys) {
-                String ul = String.valueOf((char) nextUniqueLetter);
-                sortedCitedKeys.get(citationKey).setUniqueLetter(Optional.of(ul));
+                String uniqueLetter = String.valueOf((char) nextUniqueLetter);
+                sortedCitedKeys.get(citationKey).setUniqueLetter(Optional.of(uniqueLetter));
                 nextUniqueLetter++;
             }
         }
-        sortedCitedKeys.distributeUniqueLetters(cgs);
+        sortedCitedKeys.distributeUniqueLetters(citationGroups);
     }
 
     /* ***************************************
@@ -105,10 +105,10 @@ class OOProcessAuthorYearMarkers {
      *
      * Preconditions: globalOrder, localOrder
      */
-    private static void setIsFirstAppearanceOfSourceInCitations(CitationGroups cgs) {
+    private static void setIsFirstAppearanceOfSourceInCitations(CitationGroups citationGroups) {
         Set<String> seenBefore = new HashSet<>();
-        for (CitationGroup cg : cgs.getCitationGroupsInGlobalOrder()) {
-            for (Citation cit : cg.getCitationsInLocalOrder()) {
+        for (CitationGroup group : citationGroups.getCitationGroupsInGlobalOrder()) {
+            for (Citation cit : group.getCitationsInLocalOrder()) {
                 String currentKey = cit.citationKey;
                 if (!seenBefore.contains(currentKey)) {
                     cit.setIsFirstAppearanceOfSource(true);
@@ -124,36 +124,33 @@ class OOProcessAuthorYearMarkers {
      * Produce citMarkers for normal
      * (!isCitationKeyCiteMarkers &amp;&amp; !isNumberEntries) styles.
      *
-     * @param cgs
+     * @param citationGroups
      * @param style              Bibliography style.
      */
-    static void produceCitationMarkers(CitationGroups cgs, OOBibStyle style) {
-
+    static void produceCitationMarkers(CitationGroups citationGroups, OOBibStyle style) {
         assert !style.isCitationKeyCiteMarkers();
         assert !style.isNumberEntries();
         // Citations in (Au1, Au2 2000) form
 
-        CitedKeys citedKeys = cgs.getCitedKeysSortedInOrderOfAppearance();
+        CitedKeys citedKeys = citationGroups.getCitedKeysSortedInOrderOfAppearance();
 
         createNormalizedCitationMarkers(citedKeys, style);
-        createUniqueLetters(citedKeys, cgs);
-        cgs.createPlainBibliographySortedByComparator(OOProcess.AUTHOR_YEAR_TITLE_COMPARATOR);
+        createUniqueLetters(citedKeys, citationGroups);
+        citationGroups.createPlainBibliographySortedByComparator(OOProcess.AUTHOR_YEAR_TITLE_COMPARATOR);
 
         // Mark first appearance of each citationKey
-        setIsFirstAppearanceOfSourceInCitations(cgs);
+        setIsFirstAppearanceOfSourceInCitations(citationGroups);
 
-        for (CitationGroup cg : cgs.getCitationGroupsInGlobalOrder()) {
-
-            final boolean inParenthesis = (cg.citationType == CitationType.AUTHORYEAR_PAR);
+        for (CitationGroup group : citationGroups.getCitationGroupsInGlobalOrder()) {
+            final boolean inParenthesis = (group.citationType == CitationType.AUTHORYEAR_PAR);
             final NonUniqueCitationMarker strictlyUnique = NonUniqueCitationMarker.THROWS;
 
-            List<Citation> cits = cg.getCitationsInLocalOrder();
+            List<Citation> cits = group.getCitationsInLocalOrder();
             List<CitationMarkerEntry> citationMarkerEntries = OOListUtil.map(cits, e -> e);
             OOText citMarker = style.createCitationMarker(citationMarkerEntries,
                                                           inParenthesis,
                                                           strictlyUnique);
-            cg.setCitationMarker(Optional.of(citMarker));
+            group.setCitationMarker(Optional.of(citMarker));
         }
     }
-
 }

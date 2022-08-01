@@ -1,0 +1,13 @@
+{
+    "name": "citation-style-language/styles",
+    "description": "Citation Style Language (CSL) Styless",
+    "type": "library",
+    "license": "CC-BY-SA-3.0",
+    "homepage": "http://citationstyles.org/",
+    "authors": [
+        {
+            "name": "Citation Style Language (CSL) Team",
+            "homepage": "http://citationstyles.org/about/#Credits"
+        }
+    ]
+}

@@ -3,6 +3,7 @@ package org.jabref.gui.entryeditor;
 import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.swing.undo.UndoManager;
 
@@ -13,9 +14,11 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.autocompleter.SuggestionProviders;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.pdf.search.indexing.IndexingTaskManager;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryType;
@@ -33,11 +36,13 @@ public class DeprecatedFieldsTab extends FieldsEditorTab {
                                DialogService dialogService,
                                PreferencesService preferences,
                                StateManager stateManager,
+                               ThemeManager themeManager,
+                               IndexingTaskManager indexingTaskManager,
                                BibEntryTypesManager entryTypesManager,
                                ExternalFileTypes externalFileTypes,
                                TaskExecutor taskExecutor,
                                JournalAbbreviationRepository journalAbbreviationRepository) {
-        super(false, databaseContext, suggestionProviders, undoManager, dialogService, preferences, stateManager, externalFileTypes, taskExecutor, journalAbbreviationRepository);
+        super(false, databaseContext, suggestionProviders, undoManager, dialogService, preferences, stateManager, themeManager, externalFileTypes, taskExecutor, journalAbbreviationRepository, indexingTaskManager);
         this.entryTypesManager = entryTypesManager;
 
         setText(Localization.lang("Deprecated fields"));
@@ -49,8 +54,7 @@ public class DeprecatedFieldsTab extends FieldsEditorTab {
     protected Set<Field> determineFieldsToShow(BibEntry entry) {
         Optional<BibEntryType> entryType = entryTypesManager.enrich(entry.getType(), databaseContext.getMode());
         if (entryType.isPresent()) {
-            return entryType.get().getDeprecatedFields();
-
+            return entryType.get().getDeprecatedFields().stream().filter(field -> !entry.getField(field).isEmpty()).collect(Collectors.toSet());
         } else {
             // Entry type unknown -> treat all fields as required
             return Collections.emptySet();

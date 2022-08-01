@@ -37,34 +37,32 @@ public class ArXivIdentifier implements Identifier {
 
     public static Optional<ArXivIdentifier> parse(String value) {
         String identifier = value.replaceAll(" ", "");
-        Pattern identifierPattern = Pattern.compile("(" + ARXIV_PREFIX + ")?\\s?:?\\s?(?<id>\\d{4}.\\d{4,5})(v(?<version>\\d+))?\\s?(\\[(?<classification>\\S+)\\])?");
+        Pattern identifierPattern = Pattern.compile("(" + ARXIV_PREFIX + ")?\\s?:?\\s?(?<id>\\d{4}\\.\\d{4,5})(v(?<version>\\d+))?\\s?(\\[(?<classification>\\S+)\\])?");
         Matcher identifierMatcher = identifierPattern.matcher(identifier);
         if (identifierMatcher.matches()) {
-            String id = identifierMatcher.group("id");
-            String classification = identifierMatcher.group("classification");
-            if (classification == null) {
-                classification = "";
-            }
-            String version = identifierMatcher.group("version");
-            if (version == null) {
-                version = "";
-            }
-            return Optional.of(new ArXivIdentifier(id, version, classification));
+            return getArXivIdentifier(identifierMatcher);
         }
 
         Pattern oldIdentifierPattern = Pattern.compile("(" + ARXIV_PREFIX + ")?\\s?:?\\s?(?<id>(?<classification>[a-z\\-]+(\\.[A-Z]{2})?)/\\d{7})(v(?<version>\\d+))?");
         Matcher oldIdentifierMatcher = oldIdentifierPattern.matcher(identifier);
         if (oldIdentifierMatcher.matches()) {
-            String id = oldIdentifierMatcher.group("id");
-            String classification = oldIdentifierMatcher.group("classification");
-            String version = oldIdentifierMatcher.group("version");
-            if (version == null) {
-                version = "";
-            }
-            return Optional.of(new ArXivIdentifier(id, version, classification));
+            return getArXivIdentifier(oldIdentifierMatcher);
         }
 
         return Optional.empty();
+    }
+
+    private static Optional<ArXivIdentifier> getArXivIdentifier(Matcher matcher) {
+        String id = matcher.group("id");
+        String classification = matcher.group("classification");
+        if (classification == null) {
+            classification = "";
+        }
+        String version = matcher.group("version");
+        if (version == null) {
+            version = "";
+        }
+        return Optional.of(new ArXivIdentifier(id, version, classification));
     }
 
     public Optional<String> getClassification() {
@@ -123,7 +121,7 @@ public class ArXivIdentifier implements Identifier {
     @Override
     public Optional<URI> getExternalURI() {
         try {
-            return Optional.of(new URI("https://arxiv.org/abs/" + identifier));
+            return Optional.of(new URI("https://arxiv.org/abs/" + getNormalized()));
         } catch (URISyntaxException e) {
             return Optional.empty();
         }

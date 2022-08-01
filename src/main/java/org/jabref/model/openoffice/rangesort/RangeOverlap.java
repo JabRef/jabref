@@ -3,7 +3,7 @@ package org.jabref.model.openoffice.rangesort;
 import java.util.List;
 
 /**
- *  Used in reporting range overlaps.
+ * Used in reporting range overlaps.
  */
 public class RangeOverlap<V> {
     public final RangeOverlapKind kind;

@@ -11,7 +11,7 @@ import org.jabref.logic.layout.format.LatexToUnicodeFormatter;
 import org.jabref.logic.layout.format.RemoveLatexCommandsFormatter;
 import org.jabref.logic.layout.format.RemoveTilde;
 import org.jabref.logic.preview.PreviewLayout;
-import org.jabref.model.database.BibDatabase;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
 import org.slf4j.Logger;
@@ -42,7 +42,7 @@ public class BstPreviewLayout implements PreviewLayout {
     }
 
     @Override
-    public String generatePreview(BibEntry originalEntry, BibDatabase database) {
+    public String generatePreview(BibEntry originalEntry, BibDatabaseContext databaseContext) {
         if (error != null) {
             return error;
         }

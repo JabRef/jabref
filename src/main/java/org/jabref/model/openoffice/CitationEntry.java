@@ -37,12 +37,12 @@ public class CitationEntry implements Comparable<CitationEntry> {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) {
+    public boolean equals(Object object) {
+        if (this == object) {
             return true;
         }
-        if (o instanceof CitationEntry) {
-            CitationEntry other = (CitationEntry) o;
+        if (object instanceof CitationEntry) {
+            CitationEntry other = (CitationEntry) object;
             return Objects.equals(this.refMarkName, other.refMarkName);
         }
         return false;

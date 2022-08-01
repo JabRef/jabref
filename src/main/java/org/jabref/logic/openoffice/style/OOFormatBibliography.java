@@ -29,28 +29,28 @@ public class OOFormatBibliography {
     /**
      * @return The formatted bibliography, including its title.
      */
-    public static OOText formatBibliography(CitationGroups cgs,
+    public static OOText formatBibliography(CitationGroups citationGroups,
                                             CitedKeys bibliography,
                                             OOBibStyle style,
                                             boolean alwaysAddCitedOnPages) {
 
         OOText title = style.getFormattedBibliographyTitle();
-        OOText body = formatBibliographyBody(cgs, bibliography, style, alwaysAddCitedOnPages);
+        OOText body = formatBibliographyBody(citationGroups, bibliography, style, alwaysAddCitedOnPages);
         return OOText.fromString(title.toString() + body.toString());
     }
 
     /**
      * @return Formatted body of the bibliography. Excludes the title.
      */
-    public static OOText formatBibliographyBody(CitationGroups cgs,
+    public static OOText formatBibliographyBody(CitationGroups citationGroups,
                                                 CitedKeys bibliography,
                                                 OOBibStyle style,
                                                 boolean alwaysAddCitedOnPages) {
 
         StringBuilder stringBuilder = new StringBuilder();
 
-        for (CitedKey ck : bibliography.values()) {
-            OOText entryText = formatBibliographyEntry(cgs, ck, style, alwaysAddCitedOnPages);
+        for (CitedKey citedKey : bibliography.values()) {
+            OOText entryText = formatBibliographyEntry(citationGroups, citedKey, style, alwaysAddCitedOnPages);
             stringBuilder.append(entryText.toString());
         }
 
@@ -60,30 +60,30 @@ public class OOFormatBibliography {
     /**
      * @return A paragraph. Includes label and "Cited on pages".
      */
-    public static OOText formatBibliographyEntry(CitationGroups cgs,
-                                                 CitedKey ck,
+    public static OOText formatBibliographyEntry(CitationGroups citationGroups,
+                                                 CitedKey citedKey,
                                                  OOBibStyle style,
                                                  boolean alwaysAddCitedOnPages) {
-        StringBuilder sb = new StringBuilder();
+        StringBuilder stringBuilder = new StringBuilder();
 
         // insert marker "[1]"
         if (style.isNumberEntries()) {
-            sb.append(style.getNumCitationMarkerForBibliography(ck).toString());
+            stringBuilder.append(style.getNumCitationMarkerForBibliography(citedKey).toString());
         } else {
             // !style.isNumberEntries() : emit no prefix
             // Note: We might want [citationKey] prefix for style.isCitationKeyCiteMarkers();
         }
 
         // Add entry body
-        sb.append(formatBibliographyEntryBody(ck, style).toString());
+        stringBuilder.append(formatBibliographyEntryBody(citedKey, style).toString());
 
         // Add "Cited on pages"
-        if (ck.getLookupResult().isEmpty() || alwaysAddCitedOnPages) {
-            sb.append(formatCitedOnPages(cgs, ck).toString());
+        if (citedKey.getLookupResult().isEmpty() || alwaysAddCitedOnPages) {
+            stringBuilder.append(formatCitedOnPages(citationGroups, citedKey).toString());
         }
 
         // Add paragraph
-        OOText entryText = OOText.fromString(sb.toString());
+        OOText entryText = OOText.fromString(stringBuilder.toString());
         String parStyle = style.getReferenceParagraphFormat();
         return OOFormat.paragraph(entryText, parStyle);
     }
@@ -91,20 +91,20 @@ public class OOFormatBibliography {
     /**
      * @return just the body of a bibliography entry. No label, "Cited on pages" or paragraph.
      */
-    public static OOText formatBibliographyEntryBody(CitedKey ck, OOBibStyle style) {
-        if (ck.getLookupResult().isEmpty()) {
+    public static OOText formatBibliographyEntryBody(CitedKey citedKey, OOBibStyle style) {
+        if (citedKey.getLookupResult().isEmpty()) {
             // Unresolved entry
-            return OOText.fromString(String.format("Unresolved(%s)", ck.citationKey));
+            return OOText.fromString(String.format("Unresolved(%s)", citedKey.citationKey));
         } else {
             // Resolved entry, use the layout engine
-            BibEntry bibentry = ck.getLookupResult().get().entry;
+            BibEntry bibentry = citedKey.getLookupResult().get().entry;
             Layout layout = style.getReferenceFormat(bibentry.getType());
             layout.setPostFormatter(POSTFORMATTER);
 
             return formatFullReferenceOfBibEntry(layout,
                                                  bibentry,
-                                                 ck.getLookupResult().get().database,
-                                                 ck.getUniqueLetter().orElse(null));
+                                                 citedKey.getLookupResult().get().database,
+                                                 citedKey.getUniqueLetter().orElse(null));
         }
     }
 
@@ -147,54 +147,52 @@ public class OOFormatBibliography {
     }
 
     /**
-     * Format links to citations of the source (ck).
+     * Format links to citations of the source (citedKey).
      *
      * Requires reference marks for the citation groups.
      *
      * - The links are created as references that show page numbers of the reference marks.
      *   - We do not control the text shown, that is provided by OpenOffice.
      */
-    private static OOText formatCitedOnPages(CitationGroups cgs, CitedKey ck) {
-
-        if (!cgs.citationGroupsProvideReferenceMarkNameForLinking()) {
+    private static OOText formatCitedOnPages(CitationGroups citationGroups, CitedKey citedKey) {
+        if (!citationGroups.citationGroupsProvideReferenceMarkNameForLinking()) {
             return OOText.fromString("");
         }
 
-        StringBuilder sb = new StringBuilder();
+        StringBuilder stringBuilder = new StringBuilder();
 
-        String prefix = String.format(" (%s: ", Localization.lang("Cited on pages"));
-        String suffix = ")";
-        sb.append(prefix);
+        final String prefix = String.format(" (%s: ", Localization.lang("Cited on pages"));
+        final String suffix = ")";
+        stringBuilder.append(prefix);
 
-        List<CitationGroup> citationGroups = new ArrayList<>();
-        for (CitationPath p : ck.getCitationPaths()) {
-            CitationGroupId cgid = p.group;
-            Optional<CitationGroup> cg = cgs.getCitationGroup(cgid);
-            if (cg.isEmpty()) {
+        List<CitationGroup> filteredList = new ArrayList<>();
+        for (CitationPath path : citedKey.getCitationPaths()) {
+            CitationGroupId groupId = path.group;
+            Optional<CitationGroup> group = citationGroups.getCitationGroup(groupId);
+            if (group.isEmpty()) {
                 throw new IllegalStateException();
             }
-            citationGroups.add(cg.get());
+            filteredList.add(group.get());
         }
 
         // sort the citationGroups according to their indexInGlobalOrder
-        citationGroups.sort((a, b) -> {
+        filteredList.sort((a, b) -> {
                 Integer aa = a.getIndexInGlobalOrder().orElseThrow(IllegalStateException::new);
                 Integer bb = b.getIndexInGlobalOrder().orElseThrow(IllegalStateException::new);
                 return (aa.compareTo(bb));
             });
 
-        int i = 0;
-        for (CitationGroup cg : citationGroups) {
-            if (i > 0) {
-                sb.append(", ");
+        int index = 0;
+        for (CitationGroup group : filteredList) {
+            if (index > 0) {
+                stringBuilder.append(", ");
             }
-            String markName = cg.getReferenceMarkNameForLinking().orElseThrow(IllegalStateException::new);
+            String markName = group.getReferenceMarkNameForLinking().orElseThrow(IllegalStateException::new);
             OOText xref = OOFormat.formatReferenceToPageNumberOfReferenceMark(markName);
-            sb.append(xref.toString());
-            i++;
+            stringBuilder.append(xref.toString());
+            index++;
         }
-        sb.append(suffix);
-        return OOText.fromString(sb.toString());
+        stringBuilder.append(suffix);
+        return OOText.fromString(stringBuilder.toString());
     }
-
 }

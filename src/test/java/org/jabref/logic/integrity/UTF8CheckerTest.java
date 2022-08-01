@@ -1,6 +1,7 @@
 package org.jabref.logic.integrity;
 
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.List;
@@ -24,28 +25,26 @@ public class UTF8CheckerTest {
      */
     @Test
     void fieldAcceptsUTF8() {
-        UTF8Checker checker = new UTF8Checker();
+        UTF8Checker checker = new UTF8Checker(StandardCharsets.UTF_8);
         entry.setField(StandardField.TITLE, "Only ascii characters!'@12");
         assertEquals(Collections.emptyList(), checker.check(entry));
     }
 
     /**
      * fieldDoesNotAcceptUmlauts to check UTF8Checker's result set
-     * when the entry is encoded in Non-Utf-8 charset and the System
+     * when the entry is encoded in Non-Utf-8 charset and the Library
      * environment is Non UTF-8.
-     * Finally we need to reset the environment charset.
+     * Finally, we need to reset the environment charset.
+     *
      * @throws UnsupportedEncodingException initial a String in charset GBK
      * Demo: new String(StringDemo.getBytes(), "GBK");
      */
     @Test
     void fieldDoesNotAcceptUmlauts() throws UnsupportedEncodingException {
-        String defaultCharset = System.getProperty("file.encoding");
-        System.getProperties().put("file.encoding", "GBK");
-        UTF8Checker checker = new UTF8Checker();
+        UTF8Checker checker = new UTF8Checker(Charset.forName("GBK"));
         String NonUTF8 = new String("你好，这条语句使用GBK字符集".getBytes(), "GBK");
         entry.setField(StandardField.MONTH, NonUTF8);
         assertEquals(List.of(new IntegrityMessage("Non-UTF-8 encoded field found", entry, StandardField.MONTH)), checker.check(entry));
-        System.getProperties().put("file.encoding", defaultCharset);
     }
 
     /**
@@ -59,7 +58,6 @@ public class UTF8CheckerTest {
     void NonUTF8EncodingCheckerTest() throws UnsupportedEncodingException {
         String NonUTF8 = new String("你好，这条语句使用GBK字符集".getBytes(), "GBK");
             assertFalse(UTF8Checker.UTF8EncodingChecker(NonUTF8.getBytes("GBK")));
-
     }
 
     /**

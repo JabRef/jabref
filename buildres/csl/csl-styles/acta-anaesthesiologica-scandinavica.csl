@@ -155,8 +155,6 @@
   </citation>
   <bibliography second-field-align="flush">
     <layout>
-      <group delimiter=". " suffix=". ">
-        <text variable="citation-number"/>
       <text variable="citation-number" suffix=". "/>
       <group delimiter=". " suffix=". ">
         <text macro="author"/>

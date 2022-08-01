@@ -35,16 +35,14 @@ import org.jabref.gui.externalfiles.ImportHandler;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.keyboard.KeyBindingRepository;
+import org.jabref.gui.maintable.columns.LibraryColumn;
 import org.jabref.gui.maintable.columns.MainTableColumn;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.ViewModelTableRowFactory;
-import org.jabref.logic.importer.ImportCleanup;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.OS;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.database.event.EntriesAddedEvent;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.PreferencesService;
@@ -59,6 +57,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
     private final LibraryTab libraryTab;
     private final DialogService dialogService;
+    private final StateManager stateManager;
     private final BibDatabaseContext database;
     private final MainTableDataModel model;
 
@@ -80,6 +79,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
         this.libraryTab = libraryTab;
         this.dialogService = dialogService;
+        this.stateManager = stateManager;
         this.database = Objects.requireNonNull(database);
         this.model = model;
         UndoManager undoManager = libraryTab.getUndoManager();
@@ -90,7 +90,8 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                 preferencesService,
                 Globals.getFileUpdateMonitor(),
                 undoManager,
-                stateManager);
+                stateManager,
+                dialogService);
 
         localDragboard = stateManager.getLocalDragboard();
 
@@ -101,10 +102,13 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                 new MainTableColumnFactory(
                         database,
                         preferencesService,
+                        preferencesService.getColumnPreferences(),
                         externalFileTypes,
                         libraryTab.getUndoManager(),
                         dialogService,
                         stateManager).createColumns());
+
+        this.getColumns().removeIf(col -> col instanceof LibraryColumn);
 
         new ViewModelTableRowFactory<BibEntryTableViewModel>()
                 .withOnMouseClickedEvent((entry, event) -> {
@@ -119,7 +123,9 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                         stateManager,
                         preferencesService,
                         undoManager,
-                        Globals.getClipboardManager()))
+                        Globals.getClipboardManager(),
+                        Globals.TASK_EXECUTOR,
+                        Globals.entryTypesManager))
                 .setOnDragDetected(this::handleOnDragDetected)
                 .setOnDragDropped(this::handleOnDragDropped)
                 .setOnDragOver(this::handleOnDragOver)
@@ -216,8 +222,8 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     }
 
     public void clearAndSelect(BibEntry bibEntry) {
+        getSelectionModel().clearSelection();
         findEntry(bibEntry).ifPresent(entry -> {
-            getSelectionModel().clearSelection();
             getSelectionModel().select(entry);
             scrollTo(entry);
         });
@@ -242,7 +248,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     }
 
     private void setupKeyBindings(KeyBindingRepository keyBindings) {
-        this.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
+        this.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
             if (event.getCode() == KeyCode.ENTER) {
                 getSelectedEntries().stream()
                                     .findFirst()
@@ -263,21 +269,19 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                         event.consume();
                         break;
                     case PASTE:
-                        if (!OS.OS_X) {
-                            new EditAction(StandardActions.PASTE, libraryTab.frame(), Globals.stateManager).execute();
-                        }
+                        new EditAction(StandardActions.PASTE, libraryTab.frame(), stateManager).execute();
                         event.consume();
                         break;
                     case COPY:
-                        new EditAction(StandardActions.COPY, libraryTab.frame(), Globals.stateManager).execute();
+                        new EditAction(StandardActions.COPY, libraryTab.frame(), stateManager).execute();
                         event.consume();
                         break;
                     case CUT:
-                        new EditAction(StandardActions.CUT, libraryTab.frame(), Globals.stateManager).execute();
+                        new EditAction(StandardActions.CUT, libraryTab.frame(), stateManager).execute();
                         event.consume();
                         break;
                     case DELETE_ENTRY:
-                        new EditAction(StandardActions.DELETE_ENTRY, libraryTab.frame(), Globals.stateManager).execute();
+                        new EditAction(StandardActions.DELETE_ENTRY, libraryTab.frame(), stateManager).execute();
                         event.consume();
                         break;
                     default:
@@ -299,14 +303,21 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         scrollTo(getItems().size() - 1);
     }
 
-    public void paste(BibDatabaseMode bibDatabaseMode) {
+    public void paste() {
         // Find entries in clipboard
         List<BibEntry> entriesToAdd = Globals.getClipboardManager().extractData();
-        ImportCleanup cleanup = new ImportCleanup(bibDatabaseMode);
-        cleanup.doPostCleanup(entriesToAdd);
-        libraryTab.insertEntries(entriesToAdd);
+
+        for (BibEntry entry : entriesToAdd) {
+            importHandler.importEntryWithDuplicateCheck(database, entry);
+        }
         if (!entriesToAdd.isEmpty()) {
             this.requestFocus();
+        }
+    }
+
+    public void dropEntry(List<BibEntry> entriesToAdd) {
+        for (BibEntry entry : entriesToAdd) {
+            importHandler.importEntryWithDuplicateCheck(database, (BibEntry) entry.clone());
         }
     }
 
@@ -346,8 +357,9 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
         // The following is necesary to initiate the drag and drop in javafx, although we don't need the contents
         // It doesn't work without
+        // Drag'n'drop to other tabs use COPY TransferMode, drop to group sidepane use MOVE
         ClipboardContent content = new ClipboardContent();
-        Dragboard dragboard = startDragAndDrop(TransferMode.MOVE);
+        Dragboard dragboard = startDragAndDrop(TransferMode.COPY_OR_MOVE);
         content.put(DragAndDropDataFormats.ENTRIES, "");
         dragboard.setContent(content);
 
@@ -379,11 +391,11 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                         }
                         case MOVE -> {
                             LOGGER.debug("Mode MOVE"); // alt on win
-                            importHandler.getLinker().moveFilesToFileDirAndAddToEntry(entry, files);
+                            importHandler.getLinker().moveFilesToFileDirAndAddToEntry(entry, files, libraryTab.getIndexingTaskManager());
                         }
                         case COPY -> {
                             LOGGER.debug("Mode Copy"); // ctrl on win
-                            importHandler.getLinker().copyFilesToFileDirAndAddToEntry(entry, files);
+                            importHandler.getLinker().copyFilesToFileDirAndAddToEntry(entry, files, libraryTab.getIndexingTaskManager());
                         }
                     }
                 }

@@ -2,30 +2,41 @@ package org.jabref.logic.importer.fileformat;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.util.StandardFileType;
+import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
+import org.jabref.model.entry.types.StandardEntryType;
+import org.jabref.model.metadata.MetaData;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
 /**
- * This class tests the BibtexImporter. That importer is only used for --importToOpen, which is currently untested
+ * This class tests the BibtexImporter.
  * <p>
- * TODO: 1. Add test for --importToOpen 2. Move these tests to the code opening a bibtex file
+ * The tests for writing can be found at {@link org.jabref.logic.exporter.BibtexDatabaseWriterTest}
  */
 public class BibtexImporterTest {
 
@@ -39,18 +50,17 @@ public class BibtexImporterTest {
     @Test
     public void testIsRecognizedFormat() throws IOException, URISyntaxException {
         Path file = Path.of(BibtexImporterTest.class.getResource("BibtexImporter.examples.bib").toURI());
-        assertTrue(importer.isRecognizedFormat(file, StandardCharsets.UTF_8));
+        assertTrue(importer.isRecognizedFormat(file));
     }
 
     @Test
     public void testImportEntries() throws IOException, URISyntaxException {
         Path file = Path.of(BibtexImporterTest.class.getResource("BibtexImporter.examples.bib").toURI());
-        List<BibEntry> bibEntries = importer.importDatabase(file, StandardCharsets.UTF_8).getDatabase().getEntries();
+        List<BibEntry> bibEntries = importer.importDatabase(file).getDatabase().getEntries();
 
         assertEquals(4, bibEntries.size());
 
         for (BibEntry entry : bibEntries) {
-
             if (entry.getCitationKey().get().equals("aksin")) {
                 assertEquals(
                         Optional.of(
@@ -115,16 +125,91 @@ public class BibtexImporterTest {
     @Test
     public void testGetDescription() {
         assertEquals(
-                "This importer exists only to enable `--importToOpen someEntry.bib`\n"
-                        + "It is NOT intended to import a BIB file. This is done via the option action, which treats the metadata fields.\n"
-                        + "The metadata is not required to be read here, as this class is NOT called at --import.",
+                "This importer enables `--importToOpen someEntry.bib`",
                 importer.getDescription());
     }
 
     @Test
     public void testRecognizesDatabaseID() throws Exception {
         Path file = Path.of(BibtexImporterTest.class.getResource("AutosavedSharedDatabase.bib").toURI());
-        String sharedDatabaseID = importer.importDatabase(file, StandardCharsets.UTF_8).getDatabase().getSharedDatabaseID().get();
+        String sharedDatabaseID = importer.importDatabase(file).getDatabase().getSharedDatabaseID().get();
         assertEquals("13ceoc8dm42f5g1iitao3dj2ap", sharedDatabaseID);
+    }
+
+    static Stream<Arguments> testParsingOfEncodedFileWithHeader() {
+        return Stream.of(
+                Arguments.of(StandardCharsets.US_ASCII, "encoding-us-ascii-with-header.bib"),
+                Arguments.of(StandardCharsets.UTF_8, "encoding-utf-8-with-header.bib"),
+                Arguments.of(Charset.forName("Windows-1252"), "encoding-windows-1252-with-header.bib")
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource
+    public void testParsingOfEncodedFileWithHeader(Charset charset, String fileName) throws Exception {
+        ParserResult parserResult = importer.importDatabase(
+                Path.of(BibtexImporterTest.class.getResource(fileName).toURI()));
+        assertEquals(Optional.of(charset), parserResult.getMetaData().getEncoding());
+    }
+
+    @ParameterizedTest
+    @CsvSource({"encoding-windows-1252-with-header.bib", "encoding-windows-1252-without-header.bib"})
+    public void testParsingOfWindows1252EncodedFileReadsDegreeCharacterCorrectly(String filename) throws Exception {
+        ParserResult parserResult = importer.importDatabase(
+                Path.of(BibtexImporterTest.class.getResource(filename).toURI()));
+        assertEquals(
+                List.of(new BibEntry(StandardEntryType.Article).withField(StandardField.ABSTRACT, "25° C")),
+                parserResult.getDatabase().getEntries());
+    }
+
+    @ParameterizedTest
+    @CsvSource({"encoding-utf-8-with-header.bib", "encoding-utf-8-without-header.bib"})
+    public void testParsingOfUtf8EncodedFileReadsUmlautCharacterCorrectly(String filename) throws Exception {
+        ParserResult parserResult = importer.importDatabase(
+                Path.of(BibtexImporterTest.class.getResource(filename).toURI()));
+        assertEquals(
+                List.of(new BibEntry(StandardEntryType.Article).withField(StandardField.TITLE, "Ü ist ein Umlaut")),
+                parserResult.getDatabase().getEntries());
+    }
+
+    @ParameterizedTest
+    @CsvSource({"encoding-utf-16BE-with-header.bib", "encoding-utf-16BE-without-header.bib"})
+    public void testParsingOfUtf16EncodedFileReadsUmlautCharacterCorrectly(String filename) throws Exception {
+        ParserResult parserResult = importer.importDatabase(
+                Path.of(BibtexImporterTest.class.getResource(filename).toURI()));
+
+        assertEquals(
+                List.of(new BibEntry(StandardEntryType.Article).withField(StandardField.TITLE, "Ü ist ein Umlaut")),
+                parserResult.getDatabase().getEntries());
+
+        MetaData metaData = new MetaData();
+        metaData.setMode(BibDatabaseMode.BIBTEX);
+        metaData.setEncoding(StandardCharsets.UTF_16BE);
+        assertEquals(metaData, parserResult.getMetaData());
+    }
+
+    @Test
+    public void encodingSupplied() throws Exception {
+        ParserResult parserResult = importer.importDatabase(
+                Path.of(BibtexImporterTest.class.getResource("encoding-utf-8-with-header.bib").toURI()));
+        assertTrue(parserResult.getMetaData().getEncodingExplicitlySupplied());
+    }
+
+    @Test
+    public void wrongEncodingSupplied() throws Exception {
+        ParserResult parserResult = importer.importDatabase(
+                Path.of(BibtexImporterTest.class.getResource("encoding-windows-1252-but-utf-8-declared--decoding-fails.bib").toURI()));
+
+        // The test file contains "Test{NBSP}I. Last" where the character "{NBSP}" is encoded using Windows-1252 instead of UTF-8
+        assertEquals(
+                List.of(new BibEntry(StandardEntryType.Article).withField(StandardField.AUTHOR, "Test�I. Last")),
+                parserResult.getDatabase().getEntries());
+    }
+
+    @Test
+    public void encodingNotSupplied() throws Exception {
+        ParserResult parserResult = importer.importDatabase(
+                Path.of(BibtexImporterTest.class.getResource("encoding-utf-8-without-header.bib").toURI()));
+        assertFalse(parserResult.getMetaData().getEncodingExplicitlySupplied());
     }
 }

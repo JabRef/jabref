@@ -11,12 +11,15 @@ import org.jabref.support.DisabledOnCIServer;
 
 import kong.unirest.UnirestException;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class URLDownloadTest {
+    private static final Logger LOGGER = LoggerFactory.getLogger(URLDownloadTest.class);
 
     @Test
     public void testStringDownloadWithSetEncoding() throws IOException {
@@ -42,7 +45,7 @@ public class URLDownloadTest {
         } finally {
             // cleanup
             if (!destination.delete()) {
-                System.err.println("Cannot delete downloaded file");
+                LOGGER.error("Cannot delete downloaded file");
             }
         }
     }
@@ -64,7 +67,7 @@ public class URLDownloadTest {
 
     @Test
     public void downloadToTemporaryFileKeepsName() throws IOException {
-        URLDownload google = new URLDownload(new URL("https://github.com/JabRef/jabref/blob/master/LICENSE.md"));
+        URLDownload google = new URLDownload(new URL("https://github.com/JabRef/jabref/blob/main/LICENSE.md"));
 
         String path = google.toTemporaryFile().toString();
         assertTrue(path.contains("LICENSE") && path.endsWith(".md"), path);

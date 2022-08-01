@@ -2,7 +2,7 @@ package org.jabref.gui.maintable;
 
 import java.util.stream.Collectors;
 
-import javafx.beans.InvalidationListener;
+import javafx.scene.control.TableView;
 
 import org.jabref.gui.maintable.columns.MainTableColumn;
 import org.jabref.preferences.PreferencesService;
@@ -10,32 +10,20 @@ import org.jabref.preferences.PreferencesService;
 /**
  * Keep track of changes made to the columns (reordering, resorting, resizing).
  */
-public class PersistenceVisualStateTable {
+public class PersistenceVisualStateTable extends AbstractPersistenceVisualStateTable {
 
-    private final MainTable mainTable;
-    private final PreferencesService preferences;
-
-    public PersistenceVisualStateTable(final MainTable mainTable, PreferencesService preferences) {
-        this.mainTable = mainTable;
-        this.preferences = preferences;
-
-        mainTable.getColumns().addListener((InvalidationListener) obs -> updateColumns());
-        mainTable.getSortOrder().addListener((InvalidationListener) obs -> updateSortOrder());
-
-        // As we store the ColumnModels of the MainTable, we need to add the listener to the ColumnModel properties,
-        // since the value is bound to the model after the listener to the column itself is called.
-        mainTable.getColumns().forEach(col ->
-                ((MainTableColumn<?>) col).getModel().widthProperty().addListener(obs -> updateColumns()));
-        mainTable.getColumns().forEach(col ->
-                ((MainTableColumn<?>) col).getModel().sortTypeProperty().addListener(obs -> updateColumns()));
+    public PersistenceVisualStateTable(final TableView<BibEntryTableViewModel> mainTable, PreferencesService preferences) {
+        super(mainTable, preferences);
     }
 
     /**
      * Stores shown columns, their width and their sortType in preferences.
      */
-    private void updateColumns() {
-        preferences.storeColumnPreferences(new ColumnPreferences(
+    @Override
+    protected void updateColumns() {
+        preferences.storeMainTableColumnPreferences(new ColumnPreferences(
                 mainTable.getColumns().stream()
+                         .filter(col -> col instanceof MainTableColumn<?>)
                          .map(column -> ((MainTableColumn<?>) column).getModel())
                          .collect(Collectors.toList()),
                 preferences.getColumnPreferences().getColumnSortOrder()));
@@ -45,10 +33,12 @@ public class PersistenceVisualStateTable {
      * Stores the SortOrder of the the Table in the preferences. Cannot be combined with updateColumns, because JavaFX
      * would provide just an empty list for the sort order on other changes.
      */
-    private void updateSortOrder() {
-        preferences.storeColumnPreferences(new ColumnPreferences(
+    @Override
+    protected void updateSortOrder() {
+        preferences.storeMainTableColumnPreferences(new ColumnPreferences(
                 preferences.getColumnPreferences().getColumns(),
                 mainTable.getSortOrder().stream()
+                         .filter(col -> col instanceof MainTableColumn<?>)
                          .map(column -> ((MainTableColumn<?>) column).getModel())
                          .collect(Collectors.toList())));
     }

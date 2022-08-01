@@ -3,7 +3,6 @@ package org.jabref.gui.preferences.file;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
-import javafx.scene.control.ComboBox;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
 
@@ -13,10 +12,8 @@ import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.preferences.PreferencesTab;
-import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.preferences.NewLineSeparator;
 
 import com.airhacks.afterburner.views.ViewLoader;
 
@@ -24,10 +21,9 @@ public class FileTab extends AbstractPreferenceTabView<FileTabViewModel> impleme
 
     @FXML private CheckBox openLastStartup;
     @FXML private TextField noWrapFiles;
-    @FXML private RadioButton resolveStringsBibTex;
-    @FXML private RadioButton resolveStringsAll;
-    @FXML private TextField resolveStringsExcept;
-    @FXML private ComboBox<NewLineSeparator> newLineSeparator;
+    @FXML private RadioButton doNotResolveStrings;
+    @FXML private RadioButton resolveStrings;
+    @FXML private TextField resolveStringsForFields;
     @FXML private CheckBox alwaysReformatBib;
 
     @FXML private CheckBox autosaveLocalLibraries;
@@ -40,24 +36,21 @@ public class FileTab extends AbstractPreferenceTabView<FileTabViewModel> impleme
     }
 
     public void initialize() {
-        this.viewModel = new FileTabViewModel(preferencesService);
+        this.viewModel = new FileTabViewModel(preferencesService.getImportExportPreferences());
+
         openLastStartup.selectedProperty().bindBidirectional(viewModel.openLastStartupProperty());
         noWrapFiles.textProperty().bindBidirectional(viewModel.noWrapFilesProperty());
-        resolveStringsBibTex.selectedProperty().bindBidirectional(viewModel.resolveStringsBibTexProperty());
-        resolveStringsAll.selectedProperty().bindBidirectional(viewModel.resolveStringsAllProperty());
-        resolveStringsExcept.textProperty().bindBidirectional(viewModel.resolveStringsExceptProperty());
-        resolveStringsExcept.disableProperty().bind(resolveStringsAll.selectedProperty().not());
-        new ViewModelListCellFactory<NewLineSeparator>()
-                .withText(NewLineSeparator::getDisplayName)
-                .install(newLineSeparator);
-        newLineSeparator.itemsProperty().bind(viewModel.newLineSeparatorListProperty());
-        newLineSeparator.valueProperty().bindBidirectional(viewModel.selectedNewLineSeparatorProperty());
-        alwaysReformatBib.selectedProperty().bindBidirectional(viewModel.alwaysReformatBibProperty());
 
+        doNotResolveStrings.selectedProperty().bindBidirectional(viewModel.doNotResolveStringsProperty());
+        resolveStrings.selectedProperty().bindBidirectional(viewModel.resolveStringsProperty());
+        resolveStringsForFields.textProperty().bindBidirectional(viewModel.resolveStringsForFieldsProperty());
+        resolveStringsForFields.disableProperty().bind(doNotResolveStrings.selectedProperty());
+
+        alwaysReformatBib.selectedProperty().bindBidirectional(viewModel.alwaysReformatBibProperty());
         autosaveLocalLibraries.selectedProperty().bindBidirectional(viewModel.autosaveLocalLibrariesProperty());
 
         ActionFactory actionFactory = new ActionFactory(Globals.getKeyPrefs());
-        actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.AUTOSAVE), autosaveLocalLibrariesHelp);
+        actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.AUTOSAVE, dialogService), autosaveLocalLibrariesHelp);
     }
 
     @Override

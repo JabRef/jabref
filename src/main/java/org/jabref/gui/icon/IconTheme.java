@@ -193,7 +193,8 @@ public class IconTheme {
         SEARCH(MaterialDesignM.MAGNIFY),
         FILE_SEARCH(MaterialDesignF.FILE_FIND),
         ADVANCED_SEARCH(Color.CYAN, MaterialDesignM.MAGNIFY),
-        PREFERENCES(MaterialDesignS.STAR_SETTINGS),
+        PREFERENCES(MaterialDesignC.COG),
+        SELECTORS(MaterialDesignS.STAR_SETTINGS),
         HELP(MaterialDesignH.HELP_CIRCLE),
         UP(MaterialDesignA.ARROW_UP),
         DOWN(MaterialDesignA.ARROW_DOWN),
@@ -234,6 +235,7 @@ public class IconTheme {
         QUALITY_ASSURED(MaterialDesignC.CERTIFICATE),
         QUALITY(MaterialDesignC.CERTIFICATE),
         OPEN(MaterialDesignF.FOLDER_OUTLINE),
+        OPEN_LIST(MaterialDesignF.FOLDER_OPEN_OUTLINE),
         ADD_ROW(MaterialDesignS.SERVER_PLUS),
         REMOVE_ROW(MaterialDesignS.SERVER_MINUS),
         PICTURE(MaterialDesignF.FILE_IMAGE),
@@ -332,7 +334,12 @@ public class IconTheme {
         HOME(MaterialDesignH.HOME),
         LINK(MaterialDesignL.LINK),
         LINK_VARIANT(MaterialDesignL.LINK_VARIANT),
-        PROTECT_STRING(MaterialDesignC.CODE_BRACES);
+        PROTECT_STRING(MaterialDesignC.CODE_BRACES),
+        SELECT_ICONS(MaterialDesignA.APPS),
+        KEEP_SEARCH_STRING(MaterialDesignE.EARTH),
+        KEEP_ON_TOP(MaterialDesignP.PIN),
+        KEEP_ON_TOP_OFF(MaterialDesignP.PIN_OFF_OUTLINE),
+        OPEN_GLOBAL_SEARCH(MaterialDesignO.OPEN_IN_NEW);
 
         private final JabRefIcon icon;
 

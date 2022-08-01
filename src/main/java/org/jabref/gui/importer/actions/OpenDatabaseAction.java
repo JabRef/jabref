@@ -1,5 +1,6 @@
 package org.jabref.gui.importer.actions;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.sql.SQLException;
@@ -17,10 +18,13 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.Globals;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.LibraryTab;
+import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.dialogs.BackupUIManager;
 import org.jabref.gui.shared.SharedDatabaseUIManager;
+import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.BackgroundTask;
+import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.autosaveandbackup.BackupManager;
 import org.jabref.logic.importer.OpenDatabase;
@@ -38,7 +42,8 @@ import org.slf4j.LoggerFactory;
 // The action concerned with opening an existing database.
 public class OpenDatabaseAction extends SimpleCommand {
 
-    public static final Logger LOGGER = LoggerFactory.getLogger(OpenDatabaseAction.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(OpenDatabaseAction.class);
+
     // List of actions that may need to be called after opening the file. Such as
     // upgrade actions etc. that may depend on the JabRef version that wrote the file:
     private static final List<GUIPostOpenAction> POST_OPEN_ACTIONS = Arrays.asList(
@@ -50,12 +55,20 @@ public class OpenDatabaseAction extends SimpleCommand {
 
     private final JabRefFrame frame;
     private final PreferencesService preferencesService;
+    private final StateManager stateManager;
+    private final ThemeManager themeManager;
     private final DialogService dialogService;
 
-    public OpenDatabaseAction(JabRefFrame frame, PreferencesService preferencesService, DialogService dialogService) {
+    public OpenDatabaseAction(JabRefFrame frame,
+                              PreferencesService preferencesService,
+                              DialogService dialogService,
+                              StateManager stateManager,
+                              ThemeManager themeManager) {
         this.frame = frame;
         this.preferencesService = preferencesService;
         this.dialogService = dialogService;
+        this.stateManager = stateManager;
+        this.themeManager = themeManager;
     }
 
     /**
@@ -90,10 +103,10 @@ public class OpenDatabaseAction extends SimpleCommand {
      */
     private Path getInitialDirectory() {
         if (frame.getBasePanelCount() == 0) {
-            return Globals.prefs.getWorkingDir();
+            return preferencesService.getFilePreferences().getWorkingDirectory();
         } else {
             Optional<Path> databasePath = frame.getCurrentLibraryTab().getBibDatabaseContext().getDatabasePath();
-            return databasePath.map(Path::getParent).orElse(Globals.prefs.getWorkingDir());
+            return databasePath.map(Path::getParent).orElse(preferencesService.getFilePreferences().getWorkingDirectory());
         }
     }
 
@@ -167,7 +180,7 @@ public class OpenDatabaseAction extends SimpleCommand {
 
         BackgroundTask<ParserResult> backgroundTask = BackgroundTask.wrap(() -> loadDatabase(file));
         LibraryTab.Factory libraryTabFactory = new LibraryTab.Factory();
-        LibraryTab newTab = libraryTabFactory.createLibraryTab(frame, preferencesService, file, backgroundTask);
+        LibraryTab newTab = libraryTabFactory.createLibraryTab(frame, preferencesService, stateManager, themeManager, file, backgroundTask);
 
         backgroundTask.onFinished(() -> trackOpenNewDatabase(newTab));
     }
@@ -177,14 +190,27 @@ public class OpenDatabaseAction extends SimpleCommand {
 
         dialogService.notify(Localization.lang("Opening") + ": '" + file + "'");
 
-        Globals.prefs.setWorkingDirectory(fileToLoad.getParent());
+        preferencesService.getFilePreferences().setWorkingDirectory(fileToLoad.getParent());
 
         if (BackupManager.backupFileDiffers(fileToLoad)) {
             BackupUIManager.showRestoreBackupDialog(dialogService, fileToLoad);
         }
 
-        ParserResult result = OpenDatabase.loadDatabase(fileToLoad.toString(),
-                Globals.prefs.getImportFormatPreferences(), Globals.prefs.getTimestampPreferences(), Globals.getFileUpdateMonitor());
+        ParserResult result;
+        try {
+            result = OpenDatabase.loadDatabase(fileToLoad,
+                    preferencesService.getImportFormatPreferences(),
+                    Globals.getFileUpdateMonitor());
+            if (result.hasWarnings()) {
+                String content = Localization.lang("Please check your library file for wrong syntax.")
+                        + "\n\n" + result.getErrorMessage();
+                DefaultTaskExecutor.runInJavaFXThread(() ->
+                        dialogService.showWarningDialogAndWait(Localization.lang("Open library error"), content));
+            }
+        } catch (IOException e) {
+            result = ParserResult.fromError(e);
+            LOGGER.error("Error opening file '{}'", fileToLoad, e);
+        }
 
         if (result.getDatabase().isShared()) {
             try {

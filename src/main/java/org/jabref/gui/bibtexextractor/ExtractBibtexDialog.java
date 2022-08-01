@@ -46,7 +46,7 @@ public class ExtractBibtexDialog extends BaseDialog<Void> {
 
         buttonParse = (Button) getDialogPane().lookupButton(parseButtonType);
         buttonParse.setTooltip(new Tooltip((Localization.lang("Starts the extraction and adds the resulting entries to the currently opened database"))));
-        buttonParse.setOnAction(event -> viewModel.startParsing());
+        buttonParse.setOnAction((event) -> viewModel.startParsing());
         buttonParse.disableProperty().bind(viewModel.inputTextProperty().isEmpty());
     }
 

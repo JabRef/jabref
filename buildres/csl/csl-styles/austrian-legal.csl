@@ -34,7 +34,7 @@
           </else>
         </choose>
       </if>
-      <else-if type="bill">
+      <else-if type="bill legislation" match="any">
         <!-- move statutes to the bottom -->
         <text value="ZZZZ"/>
       </else-if>
@@ -99,7 +99,7 @@
             </else>
           </choose>
         </if>
-        <else-if type="bill">
+        <else-if type="bill legislation" match="any">
           <choose>
             <if variable="container-title section" match="all">
               <text variable="section" suffix=" "/>
@@ -307,7 +307,7 @@
             </else>
           </choose>
         </if>
-        <else-if type="bill">
+        <else-if type="bill legislation" match="any">
           <text value=" "/>
         </else-if>
         <else-if type="article-journal">

@@ -7,7 +7,6 @@ import org.jabref.model.openoffice.ootext.OOText;
 public class PageInfo {
 
     private PageInfo() {
-        // hide public constructor
     }
 
     /*
@@ -19,7 +18,7 @@ public class PageInfo {
         }
         String str = OOText.toString(optionalText.get());
         String trimmed = str.trim();
-        if (trimmed.equals("")) {
+        if ("".equals(trimmed)) {
             return Optional.empty();
         }
         return Optional.of(OOText.fromString(trimmed));
@@ -27,11 +26,10 @@ public class PageInfo {
 
     /**
      * Defines sort order for pageInfo strings.
-     *
+     * <p>
      * Optional.empty comes before non-empty.
      */
     public static int comparePageInfo(Optional<OOText> a, Optional<OOText> b) {
-
         Optional<OOText> aa = PageInfo.normalizePageInfo(a);
         Optional<OOText> bb = PageInfo.normalizePageInfo(b);
         if (aa.isEmpty() && bb.isEmpty()) {

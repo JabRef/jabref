@@ -98,6 +98,9 @@
     -jr-drag-target: -jr-purple;
     -jr-drag-target-hover: derive(-jr-purple, 80%);
 
+    -js-summary-text-color: #000000;
+    -js-summary-text-color-selected: #000000;
+
     /*
      Here are redefinitions of the default properties of modena. They should in principle all be derived from the
      above colors. Goal should be to make as few as possible direct color-changes to elements and only do this for
@@ -272,6 +275,10 @@
     -fx-fill: -fx-text-base-color;
 }
 
+.ikonli-font-icon {
+    -fx-icon-color: -fx-text-base-color;
+}
+
 .tooltip {
     -fx-background-color: -jr-tooltip-bg;
     -fx-opacity: 95%;
@@ -283,15 +290,15 @@
     -fx-font-size: 1em;
 }
 
-.tooltip > TextFlow > .tooltip-text-bold {
+TextFlow > .tooltip-text-bold {
     -fx-font-weight: bold;
 }
 
-.tooltip > TextFlow > .tooltip-text-italic {
+TextFlow > .tooltip-text-italic {
     -fx-font-style: italic;
 }
 
-.tooltip > TextFlow > .tooltip-text-monospaced {
+TextFlow > .tooltip-text-monospaced {
     -fx-font-family: monospace;
 }
 
@@ -409,7 +416,7 @@
 }
 
 .progress-indicatorToolbar .percentage {
-    -fx-fill:null;
+    -fx-fill: null;
 }
 
 .check-box {
@@ -646,11 +653,11 @@
     -fx-background-color: -jr-warn;
 }
 
-.file-row-text{
+.file-row-text {
     -fx-fill: -jr-search-text;
 }
 
-.file-row-text:opacity{
+.file-row-text:opacity {
     -fx-fill: derive(-jr-search-text, 70%);
 }
 
@@ -702,9 +709,9 @@
     -fx-padding: 0;
 }
 
-.accordion .titled-pane  {
-   -fx-skin: "org.jabref.gui.util.CustomTitledPaneSkin";
-   -fx-arrow-side: right;
+.accordion .titled-pane {
+    -fx-skin: "org.jabref.gui.util.CustomTitledPaneSkin";
+    -fx-arrow-side: right;
 }
 
 .accordion .titled-pane .title {
@@ -859,10 +866,12 @@
     -fx-padding: 0.3em 0.9em 0.3em 0.9em;
 }
 
-.sidePaneComponentHeader .glyph-icon {
+.sidePaneComponentHeader .glyph-icon,
+.sidePaneComponentHeader .ikonli-font-icon {
     -fx-fill: -jr-sidepane-header-color;
     -fx-text-fill: -jr-sidepane-header-color;
     -fx-font-size: 16px;
+    -fx-icon-color: -jr-theme-text;
 }
 
 .mainMenu {
@@ -938,10 +947,12 @@
     -fx-border-width: 0;
 }
 
-.mainToolbar .glyph-icon {
+.mainToolbar .glyph-icon,
+.mainToolbar .ikonli-font-icon {
     -fx-font-size: 1.7em;
     -fx-fill: -jr-theme-text;
     -fx-text-fill: -jr-theme-text;
+    -fx-icon-color: -jr-theme-text;
 }
 
 .mainToolbar .search-field {
@@ -950,6 +961,12 @@
     -fx-border-color: -jr-separator;
     -fx-border-radius: 2;
     -fx-fill: -jr-search-text;
+}
+
+.mainToolbar .search-field .button .glyph-icon {
+    -fx-fill: -jr-search-text;
+    -fx-text-fill: -jr-search-text;
+    -fx-icon-color: -jr-search-text;
 }
 
 /* magnifier glass */
@@ -971,11 +988,13 @@
 .mainToolbar .search-field .toggle-button .glyph-icon {
     -fx-fill: derive(-jr-search-text, 80%);
     -fx-text-fill: derive(-jr-search-text, 80%);
+    -fx-icon-color: derive(-jr-search-text, 80%);
 }
 
 .mainToolbar .search-field .toggle-button:selected .glyph-icon {
     -fx-fill: -jr-search-text;
     -fx-text-fill: -jr-search-text;
+    -fx-icon-color: -jr-search-text;
 }
 
 /* search text */
@@ -1039,6 +1058,27 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-fill: -fx-text-background-color;
 }
 
+/* Drag and drop colored indicator */
+
+.table-row-cell:dragOver-bottom {
+    -fx-border-color: -jr-drag-target;
+    -fx-border-width: 0 0 2 0;
+    -fx-padding: 0 0 -2 0;
+}
+
+.table-row-cell:dragOver-center {
+    -fx-border-color: -jr-drag-target;
+    -fx-border-width: 1 1 1 1;
+    -fx-padding: -1 -1 -1 -1;
+    -fx-background-color: -jr-drag-target-hover;
+}
+
+.table-row-cell:dragOver-top {
+    -fx-border-color: -jr-drag-target;
+    -fx-border-width: 2 0 0 0;
+    -fx-padding: -2 0 0 0;
+}
+
 /* Improve the context menu of the main toolbar, when icons don't fit and you have to press the little arrow to see them */
 .mainToolbar .context-menu .glyph-icon {
     -fx-fill: -jr-theme-text;
@@ -1063,15 +1103,40 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-background-color: -jr-sidepane-background;
 }
 
-.jfx-snackbar-content {
+.notification-bar > .pane {
     -fx-background-color: -jr-gray-3;
     -fx-background-radius: 4px;
-    -fx-padding: 0ex 0ex 0ex 0ex;
 }
 
-.jfx-snackbar-toast {
-    -fx-text-fill: -fx-light-text-color;
-    -fx-padding: -1ex -0.5ex -1ex -0.5ex;
+.notification-bar > .pane > .title,
+.notification-bar > .pane > .label,
+.notification-bar > .pane > .button-bar > .container > .action {
+    -fx-text-fill: -jr-base;
+    -fx-padding: 1ex 1ex 1ex 1ex;
+}
+
+.notification-bar > .pane {
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.3), 9, 0, 0, 2);
+    -fx-padding: 6px 7px 6px 32px;
+    -fx-background-radius: 0px;
+    -fx-border-radius: 0px;
+}
+
+.notification-bar > .pane > .button-bar > .container {
+    -fx-padding: 0px 24px 0px 0px;
+}
+
+.notification-bar > .pane > .label {
+    -fx-graphic-text-gap: 8px;
+}
+
+.notification-pane .notification-bar > .pane .close-button > .graphic {
+    -fx-background-color: -jr-base;
+}
+
+.notification-bar > .pane > .label > .ikonli-font-icon {
+    -fx-icon-size: 16px;
+    -fx-icon-color: -jr-base;
 }
 
 .progress-bar > .bar {
@@ -1233,7 +1298,7 @@ TextFlow * {
     -fx-fill: -fx-mid-text-color;
 }
 
-.fontsizeSpinner{
+.fontsizeSpinner {
     -fx-pref-width: 5em;
 }
 

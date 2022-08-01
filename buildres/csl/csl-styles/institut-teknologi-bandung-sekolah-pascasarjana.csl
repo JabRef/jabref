@@ -50,11 +50,6 @@
     <updated>2018-07-17T06:47:52+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
-  <locale xml:lang="en">
-    <terms>
-      <term name="communications">Personal communication</term>
-    </terms>
-  </locale>
   <locale xml:lang="id">
     <terms>
       <term name="editortranslator" form="short">
@@ -69,7 +64,7 @@
       <term name="edition">edisi</term>
       <term name="director">sutradara</term>
       <term name="in">dalam</term>
-      <term name="communications">Komunikasi pribadi</term>
+      <term name="personal-communication">komunikasi pribadi</term>
     </terms>
   </locale>
   <macro name="container-contributors">
@@ -232,7 +227,7 @@
         </choose>
       </if>
       <else-if type="personal_communication" match="any">
-        <text term="communications"/>
+        <text term="personal-communication" text-case="capitalize-first"/>
       </else-if>
       <else-if variable="reviewed-author">
         <choose>

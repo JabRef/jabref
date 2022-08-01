@@ -68,8 +68,7 @@ public class FileColumn extends MainTableColumn<List<LinkedFile>> {
                                 entry.getEntry(),
                                 database, Globals.TASK_EXECUTOR,
                                 dialogService,
-                                preferencesService.getXmpPreferences(),
-                                preferencesService.getFilePreferences(),
+                                preferencesService,
                                 externalFileTypes);
                         linkedFileViewModel.open();
                     }
@@ -132,8 +131,7 @@ public class FileColumn extends MainTableColumn<List<LinkedFile>> {
                     database,
                     Globals.TASK_EXECUTOR,
                     dialogService,
-                    preferencesService.getXmpPreferences(),
-                    preferencesService.getFilePreferences(),
+                    preferencesService,
                     externalFileTypes);
 
             MenuItem menuItem = new MenuItem(linkedFileViewModel.getTruncatedDescriptionAndLink(),
@@ -149,7 +147,7 @@ public class FileColumn extends MainTableColumn<List<LinkedFile>> {
         if (linkedFiles.size() > 1) {
             return IconTheme.JabRefIcons.FILE_MULTIPLE.getGraphicNode();
         } else if (linkedFiles.size() == 1) {
-            return externalFileTypes.fromLinkedFile(linkedFiles.get(0), false)
+            return externalFileTypes.fromLinkedFile(linkedFiles.get(0), true)
                                     .map(ExternalFileType::getIcon)
                                     .orElse(IconTheme.JabRefIcons.FILE)
                                     .getGraphicNode();

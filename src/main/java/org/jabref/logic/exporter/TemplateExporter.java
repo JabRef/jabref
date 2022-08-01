@@ -8,6 +8,7 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -46,7 +47,6 @@ public class TemplateExporter extends Exporter {
     private final String directory;
     private final LayoutFormatterPreferences layoutPreferences;
     private final SavePreferences savePreferences;
-    private Charset encoding; // If this value is set, it will be used to override the default encoding for the getCurrentBasePanel.
     private boolean customExport;
     private BlankLineBehaviour blankLineBehaviour;
 
@@ -140,16 +140,6 @@ public class TemplateExporter extends Exporter {
     }
 
     /**
-     * Set an encoding which will be used in preference to the default value obtained from the basepanel.
-     *
-     * @param encoding The name of the encoding to use.
-     */
-    public TemplateExporter withEncoding(Charset encoding) {
-        this.encoding = encoding;
-        return this;
-    }
-
-    /**
      * This method should return a reader from which the given layout file can be read.
      * <p>
      * Subclasses of TemplateExporter are free to override and provide their own implementation.
@@ -192,14 +182,17 @@ public class TemplateExporter extends Exporter {
 
     @Override
     public void export(final BibDatabaseContext databaseContext, final Path file,
-                       final Charset encoding, List<BibEntry> entries) throws Exception {
+                       List<BibEntry> entries) throws Exception {
         Objects.requireNonNull(databaseContext);
         Objects.requireNonNull(entries);
+
+        Charset encodingToUse = StandardCharsets.UTF_8;
+
         if (entries.isEmpty()) { // Do not export if no entries to export -- avoids exports with only template text
             return;
         }
 
-        try (AtomicFileWriter ps = new AtomicFileWriter(file, encoding)) {
+        try (AtomicFileWriter ps = new AtomicFileWriter(file, encodingToUse)) {
             Layout beginLayout = null;
 
             // Check if this export filter has bundled name formatters:
@@ -218,7 +211,7 @@ public class TemplateExporter extends Exporter {
             }
             // Write the header
             if (beginLayout != null) {
-                ps.write(beginLayout.doLayout(databaseContext, encoding));
+                ps.write(beginLayout.doLayout(databaseContext, encodingToUse));
                 missingFormatters.addAll(beginLayout.getMissingFormatters());
             }
 
@@ -300,7 +293,7 @@ public class TemplateExporter extends Exporter {
 
             // Write footer
             if (endLayout != null) {
-                ps.write(endLayout.doLayout(databaseContext, this.encoding));
+                ps.write(endLayout.doLayout(databaseContext, encodingToUse));
                 missingFormatters.addAll(endLayout.getMissingFormatters());
             }
 

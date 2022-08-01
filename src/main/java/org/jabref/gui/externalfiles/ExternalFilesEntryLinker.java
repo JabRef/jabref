@@ -1,5 +1,6 @@
 package org.jabref.gui.externalfiles;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
@@ -10,13 +11,20 @@ import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.externalfiletype.UnknownExternalFileType;
 import org.jabref.logic.cleanup.MoveFilesCleanup;
 import org.jabref.logic.cleanup.RenamePdfCleanup;
+import org.jabref.logic.pdf.search.indexing.IndexingTaskManager;
+import org.jabref.logic.pdf.search.indexing.PdfIndexer;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.preferences.FilePreferences;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class ExternalFilesEntryLinker {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ExternalFilesEntryLinker.class);
 
     private final ExternalFileTypes externalFileTypes;
     private final FilePreferences filePreferences;
@@ -63,17 +71,37 @@ public class ExternalFilesEntryLinker {
         }
     }
 
-    public void moveFilesToFileDirAndAddToEntry(BibEntry entry, List<Path> files) {
-        addFilesToEntry(entry, files);
-        moveLinkedFilesToFileDir(entry);
-        renameLinkedFilesToPattern(entry);
+    public void moveFilesToFileDirAndAddToEntry(BibEntry entry, List<Path> files, IndexingTaskManager indexingTaskManager) {
+        try (AutoCloseable blocker = indexingTaskManager.blockNewTasks()) {
+            addFilesToEntry(entry, files);
+            moveLinkedFilesToFileDir(entry);
+            renameLinkedFilesToPattern(entry);
+        } catch (Exception e) {
+            LOGGER.error("Could not block IndexingTaskManager", e);
+        }
+
+        try {
+            indexingTaskManager.addToIndex(PdfIndexer.of(bibDatabaseContext, filePreferences), entry, bibDatabaseContext);
+        } catch (IOException e) {
+            LOGGER.error("Could not access Fulltext-Index", e);
+        }
     }
 
-    public void copyFilesToFileDirAndAddToEntry(BibEntry entry, List<Path> files) {
-        for (Path file : files) {
-            copyFileToFileDir(file)
-                    .ifPresent(copiedFile -> addFilesToEntry(entry, Collections.singletonList(copiedFile)));
+    public void copyFilesToFileDirAndAddToEntry(BibEntry entry, List<Path> files, IndexingTaskManager indexingTaskManager) {
+        try (AutoCloseable blocker = indexingTaskManager.blockNewTasks()) {
+            for (Path file : files) {
+                copyFileToFileDir(file)
+                        .ifPresent(copiedFile -> addFilesToEntry(entry, Collections.singletonList(copiedFile)));
+            }
+            renameLinkedFilesToPattern(entry);
+        } catch (Exception e) {
+            LOGGER.error("Could not block IndexingTaskManager", e);
         }
-        renameLinkedFilesToPattern(entry);
+
+        try {
+            indexingTaskManager.addToIndex(PdfIndexer.of(bibDatabaseContext, filePreferences), entry, bibDatabaseContext);
+        } catch (IOException e) {
+            LOGGER.error("Could not access Fulltext-Index", e);
+        }
     }
 }

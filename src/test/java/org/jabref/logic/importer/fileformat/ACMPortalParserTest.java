@@ -22,6 +22,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 @FetcherTest
 public class ACMPortalParserTest {
@@ -77,10 +78,11 @@ public class ACMPortalParserTest {
 
     @Test
     void testParseDoiSearchPage() throws ParseException, IOException {
-        List<String> testDoiList = List.of("10.1145/3129790.3129810");
+        String testDoi = "10.1145/3129790.3129810";
         CookieHandler.setDefault(new CookieManager());
         List<String> doiList = parser.parseDoiSearchPage(new URLDownload(searchUrl).asInputStream());
-        assertEquals(testDoiList, doiList);
+        assertFalse(doiList.isEmpty());
+        assertEquals(testDoi, doiList.get(0));
     }
 
     @Test
