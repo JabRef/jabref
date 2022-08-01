@@ -85,7 +85,6 @@ repositories {
 }
 
 configurations {
-    antlr3
     antlr4
     // TODO: Remove the following workaround for split error messages such as
     // error: module java.xml.bind reads package javax.annotation from both jsr305 and java.annotation
@@ -138,9 +137,6 @@ dependencies {
 
     implementation 'io.github.java-diff-utils:java-diff-utils:4.12'
     implementation 'info.debatty:java-string-similarity:2.0.0'
-
-    antlr3 'org.antlr:antlr:3.5.3'
-    implementation 'org.antlr:antlr-runtime:3.5.3'
 
     antlr4 'org.antlr:antlr4:4.9.3'
     implementation 'org.antlr:antlr4-runtime:4.9.3'
@@ -212,8 +208,8 @@ dependencies {
     implementation group: 'net.harawata', name: 'appdirs', version: '1.2.1'
 
     testImplementation 'io.github.classgraph:classgraph:4.8.149'
-    testImplementation 'org.junit.jupiter:junit-jupiter:5.8.2'
-    testImplementation 'org.junit.platform:junit-platform-launcher:1.8.2'
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.9.0'
+    testImplementation 'org.junit.platform:junit-platform-launcher:1.9.0'
 
     testImplementation 'org.mockito:mockito-core:4.6.1'
     testImplementation 'org.xmlunit:xmlunit-core:2.9.0'
@@ -277,14 +273,14 @@ task generateSource(dependsOn: ["generateBstGrammarSource",
 }
 
 tasks.register("generateBstGrammarSource", JavaExec) {
-    main = "org.antlr.Tool"
-    classpath = configurations.antlr3
+    main = "org.antlr.v4.Tool"
+    classpath = configurations.antlr4
     group = "JabRef"
-    description = 'Generates BstLexer.java and BstParser.java from the Bst.g grammar file using antlr3.'
+    description = 'Generates BstLexer.java and BstParser.java from the Bst.g grammar file using antlr4.'
 
-    inputs.dir('src/main/antlr3/org/jabref/bst/')
+    inputs.dir('src/main/antlr4/org/jabref/bst/')
     outputs.dir("src-gen/main/java/org/jabref/logic/bst/")
-    args = ["-o", "src-gen/main/java/org/jabref/logic/bst/" , "$projectDir/src/main/antlr3/org/jabref/bst/Bst.g" ]
+    args = ["-o", "src-gen/main/java/org/jabref/logic/bst/", "-visitor", "-no-listener", "-package", "org.jabref.logic.bst", "$projectDir/src/main/antlr4/org/jabref/bst/Bst.g4"]
 }
 
 tasks.register("generateSearchGrammarSource", JavaExec) {
