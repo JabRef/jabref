@@ -23,9 +23,9 @@
                             </columns>
                         </TableView>
                         <VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" spacing="8.0" HBox.hgrow="NEVER">
-                            <Button fx:id="acceptYoursButton" onAction="#denyChanges" text="Deny" />
-                            <Button fx:id="acceptTheirsButton" onAction="#acceptChanges" text="Accept" />
-                            <Button fx:id="openAdvancedMergeDialogButton" maxWidth="1.7976931348623157E308" onAction="#openAdvancedMergeDialog" text="Merge.." />
+                            <Button onAction="#acceptChanges" text="Accept" maxWidth="1.7976931348623157E308"/>
+                            <Button onAction="#denyChanges" text="Deny" maxWidth="1.7976931348623157E308"/>
+                            <Button maxWidth="1.7976931348623157E308" onAction="#openAdvancedMergeDialog" text="Merge.." />
                             <HBox.margin>
                                 <Insets left="8.0" right="8.0" top="8.0" />
                             </HBox.margin>
