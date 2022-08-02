@@ -23,13 +23,13 @@ import org.jabref.model.database.BibDatabaseContext;
 
 import com.tobiasdiez.easybind.EasyBind;
 
-class ChangeDisplayDialog extends BaseDialog<Boolean> {
+class ExternalChangesResolverDialog extends BaseDialog<Boolean> {
 
     private final ListView<DatabaseChangeViewModel> changesList;
     private final BorderPane infoPanel = new BorderPane();
     private final CheckBox cb = new CheckBox(Localization.lang("Accept change"));
 
-    public ChangeDisplayDialog(BibDatabaseContext database, List<DatabaseChangeViewModel> changes) {
+    public ExternalChangesResolverDialog(BibDatabaseContext database, List<DatabaseChangeViewModel> changes) {
         this.setTitle(Localization.lang("External changes"));
         this.getDialogPane().setPrefSize(800, 600);
 
