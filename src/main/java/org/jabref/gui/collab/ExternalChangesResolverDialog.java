@@ -13,6 +13,8 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.SplitPane;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
@@ -26,7 +28,10 @@ import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
 
 public class ExternalChangesResolverDialog extends BaseDialog<Boolean> {
-
+    @FXML
+    public TableView<DatabaseChangeViewModel> changesTableView;
+    @FXML
+    private TableColumn<DatabaseChangeViewModel, String> changeName;
     private final ListView<DatabaseChangeViewModel> changesList;
     private final BorderPane infoPanel = new BorderPane();
     private final CheckBox cb = new CheckBox(Localization.lang("Accept change"));
@@ -37,6 +42,7 @@ public class ExternalChangesResolverDialog extends BaseDialog<Boolean> {
 
         ViewLoader.view(this)
                 .load().setAsDialogPane(this);
+        changesTableView.itemsProperty().set(FXCollections.observableList(changes));
 
         changesList = new ListView<>(FXCollections.observableArrayList(changes));
         changesList.setPrefWidth(200);
@@ -70,7 +76,7 @@ public class ExternalChangesResolverDialog extends BaseDialog<Boolean> {
         pane.getItems().addAll(leftScroll, infoPanel);
         SplitPane.setResizableWithParent(leftScroll, false);
 
-        getDialogPane().setContent(pane);
+        // getDialogPane().setContent(pane);
 
         Label rootInfo = new Label(Localization.lang("Select the tree nodes to view and accept or reject changes") + '.');
         infoPanel.setCenter(rootInfo);
@@ -105,6 +111,7 @@ public class ExternalChangesResolverDialog extends BaseDialog<Boolean> {
 
     @FXML
     private void initialize() {
+        changeName.setCellValueFactory(data -> data.getValue().nameProperty());
     }
 
     private void selectedChangeChanged(DatabaseChangeViewModel currentChange) {
@@ -119,5 +126,17 @@ public class ExternalChangesResolverDialog extends BaseDialog<Boolean> {
                 cb.setManaged(false);
             }
         }
+    }
+
+    @FXML
+    public void acceptYours() {
+    }
+
+    @FXML
+    public void acceptTheirs() {
+    }
+
+    @FXML
+    public void openAdvancedMergeDialog() {
     }
 }
