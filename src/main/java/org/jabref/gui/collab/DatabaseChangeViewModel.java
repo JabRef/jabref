@@ -3,7 +3,10 @@ package org.jabref.gui.collab;
 import java.util.Optional;
 
 import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.ReadOnlyStringProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.scene.Node;
 
 import org.jabref.gui.actions.SimpleCommand;
@@ -11,21 +14,16 @@ import org.jabref.gui.undo.NamedCompound;
 import org.jabref.model.database.BibDatabaseContext;
 
 abstract class DatabaseChangeViewModel {
-
-    protected String name;
+    private final StringProperty name = new SimpleStringProperty("");
     private BooleanProperty acceptedProperty = new SimpleBooleanProperty(true);
 
-    DatabaseChangeViewModel() {
-        name = "";
-    }
-
     DatabaseChangeViewModel(String name) {
-        this.name = name;
+        setName(name);
     }
 
     @Override
     public String toString() {
-        return name;
+        return getName();
     }
 
     public boolean isAccepted() {
@@ -38,6 +36,18 @@ abstract class DatabaseChangeViewModel {
 
     public void setAccepted(boolean accepted) {
         this.acceptedProperty.setValue(accepted);
+    }
+
+    public ReadOnlyStringProperty nameProperty() {
+        return name;
+    }
+
+    public String getName() {
+        return nameProperty().get();
+    }
+
+    private void setName(String str) {
+        name.set(str);
     }
 
     /**
