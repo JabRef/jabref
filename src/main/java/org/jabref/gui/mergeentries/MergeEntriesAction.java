@@ -68,16 +68,16 @@ public class MergeEntriesAction extends SimpleCommand {
 
         MergeEntriesDialog dialog = new MergeEntriesDialog(first, second);
         dialog.setTitle(Localization.lang("Merge entries"));
-        Optional<MergeResult> mergeResultOpt = dialogService.showCustomDialogAndWait(dialog);
-        mergeResultOpt.ifPresentOrElse(mergeResult -> {
+        Optional<EntriesMergeResult> mergeResultOpt = dialogService.showCustomDialogAndWait(dialog);
+        mergeResultOpt.ifPresentOrElse(entriesMergeResult -> {
             // TODO: BibDatabase::insertEntry does not contain logic to mark the BasePanel as changed and to mark
             //  entries with a timestamp, only BasePanel::insertEntry does. Workaround for the moment is to get the
             //  BasePanel from the constructor injected JabRefFrame. Should be refactored and extracted!
-            frame.getCurrentLibraryTab().insertEntry(mergeResult.mergedEntry());
+            frame.getCurrentLibraryTab().insertEntry(entriesMergeResult.mergedEntry());
 
             NamedCompound ce = new NamedCompound(Localization.lang("Merge entries"));
-            ce.addEdit(new UndoableInsertEntries(databaseContext.getDatabase(), mergeResult.mergedEntry()));
-            List<BibEntry> entriesToRemove = Arrays.asList(one, two);
+            ce.addEdit(new UndoableInsertEntries(databaseContext.getDatabase(), entriesMergeResult.mergedEntry()));
+            List<BibEntry> entriesToRemove = Arrays.asList(entriesMergeResult.originalLeftEntry(), entriesMergeResult.originalRightEntry());
             ce.addEdit(new UndoableRemoveEntries(databaseContext.getDatabase(), entriesToRemove));
             databaseContext.getDatabase().removeEntries(entriesToRemove);
             ce.end();
