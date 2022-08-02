@@ -3,6 +3,7 @@ package org.jabref.gui.collab;
 import java.util.List;
 
 import javafx.collections.FXCollections;
+import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonBar.ButtonData;
@@ -21,6 +22,7 @@ import org.jabref.gui.util.BaseDialog;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 
+import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
 
 public class ExternalChangesResolverDialog extends BaseDialog<Boolean> {
@@ -32,6 +34,9 @@ public class ExternalChangesResolverDialog extends BaseDialog<Boolean> {
     public ExternalChangesResolverDialog(BibDatabaseContext database, List<DatabaseChangeViewModel> changes) {
         this.setTitle(Localization.lang("External changes"));
         this.getDialogPane().setPrefSize(800, 600);
+
+        ViewLoader.view(this)
+                .load().setAsDialogPane(this);
 
         changesList = new ListView<>(FXCollections.observableArrayList(changes));
         changesList.setPrefWidth(200);
@@ -96,6 +101,10 @@ public class ExternalChangesResolverDialog extends BaseDialog<Boolean> {
                 return true;
             }
         });
+    }
+
+    @FXML
+    private void initialize() {
     }
 
     private void selectedChangeChanged(DatabaseChangeViewModel currentChange) {
