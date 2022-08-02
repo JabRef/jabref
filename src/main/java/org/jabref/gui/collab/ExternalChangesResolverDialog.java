@@ -5,13 +5,13 @@ import java.util.List;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
-import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.control.SelectionMode;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -43,6 +43,7 @@ public class ExternalChangesResolverDialog extends BaseDialog<Boolean> {
         ViewLoader.view(this)
                 .load().setAsDialogPane(this);
         changesTableView.itemsProperty().set(FXCollections.observableList(changes));
+        changesTableView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
         changesList = new ListView<>(FXCollections.observableArrayList(changes));
         changesList.setPrefWidth(200);
