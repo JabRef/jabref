@@ -30,14 +30,11 @@ class EntryChangeViewModel extends DatabaseChangeViewModel {
     private DialogService dialogService;
 
     public EntryChangeViewModel(BibEntry entry, BibEntry newEntry) {
-        super();
+        super(entry.getCitationKey().map(key -> Localization.lang("Modified entry") + ": '" + key + '\'')
+                   .orElse(Localization.lang("Modified entry")));
 
         this.oldEntry = entry;
         this.newEntry = newEntry;
-
-        name = entry.getCitationKey()
-                    .map(key -> Localization.lang("Modified entry") + ": '" + key + '\'')
-                    .orElse(Localization.lang("Modified entry"));
     }
 
     /**
@@ -70,7 +67,7 @@ class EntryChangeViewModel extends DatabaseChangeViewModel {
         threeWayMergeView.selectLeftEntryValues();
         threeWayMergeView.showDiff(new ShowDiffConfig(ThreeWayMergeToolbar.DiffView.SPLIT, DiffHighlighter.DiffMethod.WORDS));
         VBox container = new VBox(10);
-        Label header = new Label(name);
+        Label header = new Label(getName());
         header.getStyleClass().add("sectionHeader");
         container.getChildren().add(header);
         container.getChildren().add(threeWayMergeView);
