@@ -3,6 +3,9 @@ package org.jabref.gui.collab;
 import java.util.ArrayList;
 import java.util.List;
 
+import javafx.application.Platform;
+import javafx.beans.binding.Bindings;
+import javafx.beans.binding.BooleanBinding;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.SelectionMode;
@@ -15,6 +18,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 
 import com.airhacks.afterburner.views.ViewLoader;
+import com.tobiasdiez.easybind.EasyBind;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,6 +35,8 @@ public class ExternalChangesResolverDialog extends BaseDialog<Boolean> {
 
     private final List<DatabaseChangeViewModel> acceptedChanges = new ArrayList<>();
 
+    private final BooleanBinding areChangesResolved;
+
     public ExternalChangesResolverDialog(BibDatabaseContext database, List<DatabaseChangeViewModel> changes) {
         this.database = database;
 
@@ -42,15 +48,23 @@ public class ExternalChangesResolverDialog extends BaseDialog<Boolean> {
         changesTableView.itemsProperty().set(FXCollections.observableList(changes));
         changesTableView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
+        areChangesResolved = Bindings.createBooleanBinding(() -> changesTableView.getItems().isEmpty(), changesTableView.itemsProperty().getValue());
+        EasyBind.subscribe(areChangesResolved, isResolved -> {
+            if (isResolved) {
+                LOGGER.info("Closing ExternalChangesResolverDialog");
+                close();
+            }
+        });
+
         setResultConverter(button -> {
-            if (!changesTableView.getItems().isEmpty()) {
-                LOGGER.info("External changes ARE NOT resolved");
-                return false;
-            } else {
+            if (areChangesResolved.get()) {
                 LOGGER.info("External changes are resolved successfully");
-                applyChanges();
+                Platform.runLater(this::applyChanges);
                 // TODO: panel.getUndoManager().addEdit(ce);
                 return true;
+            } else {
+                LOGGER.info("External changes ARE NOT resolved");
+                return false;
             }
         });
     }
