@@ -1,5 +1,6 @@
 package org.jabref.gui.collab;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javafx.collections.FXCollections;
@@ -26,8 +27,12 @@ import org.jabref.model.database.BibDatabaseContext;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ExternalChangesResolverDialog extends BaseDialog<Boolean> {
+    private final static Logger LOGGER = LoggerFactory.getLogger(ExternalChangesResolverDialog.class);
+
     @FXML
     public TableView<DatabaseChangeViewModel> changesTableView;
     @FXML
@@ -36,7 +41,14 @@ public class ExternalChangesResolverDialog extends BaseDialog<Boolean> {
     private final BorderPane infoPanel = new BorderPane();
     private final CheckBox cb = new CheckBox(Localization.lang("Accept change"));
 
+    private final BibDatabaseContext database;
+    private final NamedCompound ce = new NamedCompound(Localization.lang("Merged external changes"));
+
+    private final List<DatabaseChangeViewModel> acceptedChanges = new ArrayList<>();
+
     public ExternalChangesResolverDialog(BibDatabaseContext database, List<DatabaseChangeViewModel> changes) {
+        this.database = database;
+
         this.setTitle(Localization.lang("External changes"));
         this.getDialogPane().setPrefSize(800, 600);
 
@@ -86,22 +98,13 @@ public class ExternalChangesResolverDialog extends BaseDialog<Boolean> {
         ButtonType dismissChanges = new ButtonType(Localization.lang("Dismiss"), ButtonData.CANCEL_CLOSE);
 
         setResultConverter(button -> {
-            if (button == dismissChanges) {
+            if (!changesTableView.getItems().isEmpty()) {
+                LOGGER.info("External changes ARE NOT resolved");
                 return false;
             } else {
-                // Perform all accepted changes
-                NamedCompound ce = new NamedCompound(Localization.lang("Merged external changes"));
-                for (DatabaseChangeViewModel change : changes) {
-                    if (change instanceof EntryChangeViewModel) {
-                        // We don't have a checkbox for accept and always get the correct merged entry, the accept property in this special case only controls the radio buttons selection
-                        change.makeChange(database, ce);
-                    } else if (change.isAccepted()) {
-                        change.makeChange(database, ce);
-                    }
-                }
-                ce.end();
+                LOGGER.info("External changes are resolved successfully");
+                applyChanges();
                 // TODO: panel.getUndoManager().addEdit(ce);
-
                 return true;
             }
         });
@@ -127,14 +130,23 @@ public class ExternalChangesResolverDialog extends BaseDialog<Boolean> {
     }
 
     @FXML
-    public void acceptYours() {
+    public void denyChanges() {
+        changesTableView.getItems().removeAll(changesTableView.getSelectionModel().getSelectedItems());
     }
 
     @FXML
-    public void acceptTheirs() {
+    public void acceptChanges() {
+        // Changes will be applied when closing the dialog as a transaction
+        acceptedChanges.addAll(changesTableView.getSelectionModel().getSelectedItems());
+        changesTableView.getItems().removeAll(changesTableView.getSelectionModel().getSelectedItems());
     }
 
     @FXML
     public void openAdvancedMergeDialog() {
+    }
+
+    private void applyChanges() {
+        acceptedChanges.forEach(change -> change.makeChange(database, ce));
+        ce.end();
     }
 }
