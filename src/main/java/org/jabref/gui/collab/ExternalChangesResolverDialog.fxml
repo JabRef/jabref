@@ -10,16 +10,15 @@
 <?import javafx.scene.layout.VBox?>
 <?import org.controlsfx.control.MasterDetailPane?>
 
-<DialogPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jabref.gui.collab.ExternalChangesResolverDialog">
+<DialogPane prefHeight="400.0" prefWidth="700.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jabref.gui.collab.ExternalChangesResolverDialog">
     <content>
         <AnchorPane>
             <MasterDetailPane detailSide="BOTTOM" dividerPosition="0.6" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                 <masterNode>
                     <HBox>
-                        <TableView layoutX="34.0" layoutY="46.0" maxWidth="Infinity" prefHeight="236.0" HBox.hgrow="ALWAYS">
+                        <TableView fx:id="changesTableView" layoutX="34.0" layoutY="46.0" maxWidth="Infinity" prefHeight="236.0" HBox.hgrow="ALWAYS">
                             <columns>
-                                <TableColumn prefWidth="75.0" text="C1" />
-                                <TableColumn prefWidth="75.0" text="C2" />
+                                <TableColumn fx:id="changeName" prefWidth="400.0" text="Name" />
                             </columns>
                         </TableView>
                         <VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" spacing="8.0" HBox.hgrow="NEVER">
