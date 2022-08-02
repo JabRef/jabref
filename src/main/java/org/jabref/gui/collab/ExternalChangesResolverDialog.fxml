@@ -10,6 +10,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import org.controlsfx.control.MasterDetailPane?>
 
+<?import javafx.scene.control.ButtonType?>
 <DialogPane prefHeight="400.0" prefWidth="700.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jabref.gui.collab.ExternalChangesResolverDialog">
     <content>
         <AnchorPane>
@@ -39,4 +40,5 @@
         </AnchorPane>
 
     </content>
+    <ButtonType fx:id="close" text="%Close" buttonData="CANCEL_CLOSE"/>
 </DialogPane>
