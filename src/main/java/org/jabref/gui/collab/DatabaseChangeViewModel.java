@@ -1,9 +1,12 @@
 package org.jabref.gui.collab;
 
+import java.util.Optional;
+
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.scene.Node;
 
+import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.model.database.BibDatabaseContext;
 
@@ -51,4 +54,12 @@ abstract class DatabaseChangeViewModel {
      * @param undoEdit NamedCompound The compound to hold the undo edits.
      */
     public abstract void makeChange(BibDatabaseContext database, NamedCompound undoEdit);
+
+    public boolean hasAdvancedMergeDialog() {
+        return false;
+    }
+
+    public Optional<SimpleCommand> openAdvancedMergeDialog() {
+        return Optional.empty();
+    }
 }
