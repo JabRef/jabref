@@ -1,10 +1,16 @@
 package org.jabref.gui.collab;
 
+import java.util.Optional;
+
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 
+import org.jabref.gui.DialogService;
+import org.jabref.gui.actions.SimpleCommand;
+import org.jabref.gui.mergeentries.MergeEntriesDialog;
+import org.jabref.gui.mergeentries.MergeTwoEntriesAction;
 import org.jabref.gui.mergeentries.newmergedialog.ShowDiffConfig;
 import org.jabref.gui.mergeentries.newmergedialog.ThreeWayMergeView;
 import org.jabref.gui.mergeentries.newmergedialog.diffhighlighter.DiffHighlighter;
@@ -20,6 +26,8 @@ class EntryChangeViewModel extends DatabaseChangeViewModel {
     private final BibEntry oldEntry;
     private final BibEntry newEntry;
     private ThreeWayMergeView threeWayMergeView;
+
+    private DialogService dialogService;
 
     public EntryChangeViewModel(BibEntry entry, BibEntry newEntry) {
         super();
@@ -68,5 +76,17 @@ class EntryChangeViewModel extends DatabaseChangeViewModel {
         container.getChildren().add(threeWayMergeView);
         VBox.setMargin(threeWayMergeView, new Insets(5, 5, 5, 5));
         return container;
+    }
+
+    @Override
+    public boolean hasAdvancedMergeDialog() {
+        return true;
+    }
+
+    @Override
+    public Optional<SimpleCommand> openAdvancedMergeDialog() {
+        MergeEntriesDialog mergeEntriesDialog = new MergeEntriesDialog(oldEntry, newEntry);
+        return dialogService.showCustomDialogAndWait(mergeEntriesDialog)
+                            .map(res -> new MergeTwoEntriesAction(res, null, null));
     }
 }

@@ -23,7 +23,7 @@ import org.jabref.model.database.BibDatabaseContext;
 
 import com.tobiasdiez.easybind.EasyBind;
 
-class ExternalChangesResolverDialog extends BaseDialog<Boolean> {
+public class ExternalChangesResolverDialog extends BaseDialog<Boolean> {
 
     private final ListView<DatabaseChangeViewModel> changesList;
     private final BorderPane infoPanel = new BorderPane();
