@@ -84,9 +84,6 @@ public class ExternalChangesResolverDialog extends BaseDialog<Boolean> {
 
         ButtonType dismissChanges = new ButtonType(Localization.lang("Dismiss"), ButtonData.CANCEL_CLOSE);
 
-        getDialogPane().getButtonTypes().setAll(new ButtonType(Localization.lang("Accept changes"), ButtonBar.ButtonData.APPLY),
-                dismissChanges);
-
         setResultConverter(button -> {
             if (button == dismissChanges) {
                 return false;
