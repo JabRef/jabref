@@ -5,6 +5,7 @@ import javafx.scene.control.Control;
 import javafx.scene.layout.GridPane;
 
 import org.jabref.gui.mergeentries.newmergedialog.cell.HeaderCell;
+import org.jabref.logic.l10n.Localization;
 
 /**
  * GridPane was used instead of a Hbox because Hbox allocates more space for cells
@@ -22,7 +23,7 @@ public class ThreeWayMergeHeaderView extends GridPane {
 
         this.leftHeaderCell = new HeaderCell(leftHeader);
         this.rightHeaderCell = new HeaderCell(rightHeader);
-        this.mergedHeaderCell = new HeaderCell("Merged Entry");
+        this.mergedHeaderCell = new HeaderCell(Localization.lang("Merged Entry"));
 
         addRow(0,
                new HeaderCell(""),

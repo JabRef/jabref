@@ -14,6 +14,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.util.StringConverter;
 
 import org.jabref.gui.mergeentries.newmergedialog.diffhighlighter.DiffHighlighter;
+import org.jabref.logic.l10n.Localization;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
@@ -156,7 +157,7 @@ public class ThreeWayMergeToolbar extends AnchorPane {
     }
 
     public enum PlainTextOrDiff {
-        PLAIN_TEXT("Plain Text"), Diff("Show Diff");
+        PLAIN_TEXT(Localization.lang("Plain Text")), Diff(Localization.lang("Show Diff"));
 
         private final String value;
 
@@ -177,8 +178,8 @@ public class ThreeWayMergeToolbar extends AnchorPane {
     }
 
     public enum DiffView {
-        UNIFIED("Unified View"),
-        SPLIT("Split View");
+        UNIFIED(Localization.lang("Unified View")),
+        SPLIT(Localization.lang("Split View"));
         private final String value;
 
         DiffView(String value) {
