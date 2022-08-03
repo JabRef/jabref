@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <style xmlns="http://purl.org/net/xbiblio/csl" class="note" version="1.0" page-range-format="expanded" demote-non-dropping-particle="sort-only" default-locale="fr-FR">
   <info>
-    <title>Sciences Po - École doctorale (note, Français)</title>
+    <title>Sciences Po - École de la recherche (note, Français)</title>
     <id>http://www.zotero.org/styles/sciences-po-ecole-doctorale-note-french</id>
     <link href="http://www.zotero.org/styles/sciences-po-ecole-doctorale-note-french" rel="self"/>
     <link href="https://sciencespo.libguides.com/zotero/styles" rel="documentation"/>
@@ -349,11 +349,9 @@
     <layout delimiter="&#160;; ">
       <choose>
         <if position="ibid-with-locator">
-          <group delimiter=". ">
-            <text term="ibid" text-case="capitalize-first" font-style="italic"/>
-            <label variable="locator" form="short" suffix="&#160;"/>
-            <text variable="locator"/>
-          </group>
+          <text term="ibid" text-case="capitalize-first" font-style="italic"/>
+          <label variable="locator" form="short" suffix="&#160;"/>
+          <text variable="locator"/>
         </if>
         <else-if position="ibid">
           <text term="ibid" text-case="capitalize-first" font-style="italic"/>
