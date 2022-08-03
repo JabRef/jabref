@@ -12,6 +12,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.layout.BorderPane;
 
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.util.BaseDialog;
@@ -21,6 +22,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
 import de.saxsys.mvvmfx.utils.commands.CommandBase;
+import org.controlsfx.control.MasterDetailPane;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,6 +33,10 @@ public class ExternalChangesResolverDialog extends BaseDialog<Boolean> {
     public TableView<DatabaseChangeViewModel> changesTableView;
     @FXML
     public Button openAdvancedMergeDialogButton;
+    @FXML
+    public MasterDetailPane materDetailPane;
+    @FXML
+    public BorderPane changeInfoPane;
     @FXML
     private TableColumn<DatabaseChangeViewModel, String> changeName;
 
@@ -77,6 +83,11 @@ public class ExternalChangesResolverDialog extends BaseDialog<Boolean> {
             } else {
                 LOGGER.info("External changes ARE NOT resolved");
                 return false;
+            }
+        });
+        EasyBind.subscribe(changesTableView.getSelectionModel().selectedItemProperty(), selectedChange -> {
+            if (selectedChange != null) {
+                changeInfoPane.setCenter(selectedChange.description());
             }
         });
     }
