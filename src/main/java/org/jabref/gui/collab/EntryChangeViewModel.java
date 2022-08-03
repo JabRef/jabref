@@ -27,14 +27,15 @@ class EntryChangeViewModel extends DatabaseChangeViewModel {
     private final BibEntry newEntry;
     private ThreeWayMergeView threeWayMergeView;
 
-    private DialogService dialogService;
+    private final DialogService dialogService;
 
-    public EntryChangeViewModel(BibEntry entry, BibEntry newEntry) {
+    public EntryChangeViewModel(BibEntry entry, BibEntry newEntry, DialogService dialogService) {
         super(entry.getCitationKey().map(key -> Localization.lang("Modified entry") + ": '" + key + '\'')
                    .orElse(Localization.lang("Modified entry")));
 
         this.oldEntry = entry;
         this.newEntry = newEntry;
+        this.dialogService = dialogService;
     }
 
     /**
@@ -52,13 +53,10 @@ class EntryChangeViewModel extends DatabaseChangeViewModel {
 
     @Override
     public void makeChange(BibDatabaseContext database, NamedCompound undoEdit) {
-        this.description(); // Init dialog to prevent NPE
         database.getDatabase().removeEntry(oldEntry);
-        BibEntry mergedEntry = threeWayMergeView.getMergedEntry();
-        mergedEntry.setId(oldEntry.getId()); // Keep ID
-        database.getDatabase().insertEntry(mergedEntry);
+        database.getDatabase().insertEntry(newEntry);
         undoEdit.addEdit(new UndoableInsertEntries(database.getDatabase(), oldEntry));
-        undoEdit.addEdit(new UndoableInsertEntries(database.getDatabase(), mergedEntry));
+        undoEdit.addEdit(new UndoableInsertEntries(database.getDatabase(), newEntry));
     }
 
     @Override

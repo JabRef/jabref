@@ -99,6 +99,6 @@ public class ChangeScanner {
             return new EntryDeleteChangeViewModel(diff.getOriginalEntry());
         }
 
-        return new EntryChangeViewModel(diff.getOriginalEntry(), diff.getNewEntry());
+        return new EntryChangeViewModel(diff.getOriginalEntry(), diff.getNewEntry(), dialogService);
     }
 }
