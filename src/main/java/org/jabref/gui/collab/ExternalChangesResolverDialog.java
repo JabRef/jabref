@@ -52,6 +52,7 @@ public class ExternalChangesResolverDialog extends BaseDialog<Boolean> {
                 .load().setAsDialogPane(this);
         changesTableView.itemsProperty().set(FXCollections.observableList(changes));
         changesTableView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+        changesTableView.getSelectionModel().selectFirst();
 
         areChangesResolved = Bindings.createBooleanBinding(() -> changesTableView.getItems().isEmpty(), changesTableView.itemsProperty().getValue());
         EasyBind.subscribe(areChangesResolved, isResolved -> {
