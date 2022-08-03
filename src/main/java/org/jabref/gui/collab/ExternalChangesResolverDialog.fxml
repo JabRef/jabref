@@ -11,10 +11,11 @@
 <?import org.controlsfx.control.MasterDetailPane?>
 
 <?import javafx.scene.control.ButtonType?>
+<?import javafx.scene.layout.BorderPane?>
 <DialogPane prefHeight="400.0" prefWidth="700.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jabref.gui.collab.ExternalChangesResolverDialog">
     <content>
         <AnchorPane>
-            <MasterDetailPane detailSide="BOTTOM" dividerPosition="0.6" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <MasterDetailPane fx:id="materDetailPane" detailSide="BOTTOM" dividerPosition="0.6" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                 <masterNode>
                     <HBox>
                         <TableView fx:id="changesTableView" layoutX="34.0" layoutY="46.0" maxWidth="Infinity" prefHeight="236.0" HBox.hgrow="ALWAYS">
@@ -33,7 +34,8 @@
                     </HBox>
                 </masterNode>
                 <detailNode>
-
+                    <BorderPane fx:id = "changeInfoPane" prefHeight="100">
+                    </BorderPane>
                 </detailNode>
             </MasterDetailPane>
 
