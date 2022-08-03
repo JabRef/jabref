@@ -90,6 +90,10 @@ public class OpenOfficeDocumentCreatorTest {
         Input.Builder control = Input.from(Files.newInputStream(xmlFile));
         Input.Builder test = Input.from(Files.newInputStream(contentXmlPath));
 
+        // for debugging purposes
+       // Path testPath = xmlFile.resolveSibling("test.xml");
+       // Files.copy(Files.newInputStream(contentXmlPath), testPath, StandardCopyOption.REPLACE_EXISTING);
+
         assertThat(test, CompareMatcher.isSimilarTo(control)
                                        .normalizeWhitespace()
                                        .withNodeMatcher(new DefaultNodeMatcher(ElementSelectors.byNameAndText)).throwComparisonFailure());
