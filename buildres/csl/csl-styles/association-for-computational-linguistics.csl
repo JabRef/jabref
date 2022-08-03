@@ -67,11 +67,6 @@
       </else>
     </choose>
   </macro>
-  <macro name="month">
-    <date variable="issued">
-      <date-part name="month"/>
-    </date>
-  </macro>
   <macro name="edition">
     <number variable="edition" form="ordinal"/>
     <text term="edition" prefix=" "/>
@@ -199,7 +194,6 @@
             <text variable="volume" prefix=", "/>
             <text variable="issue" prefix="(" suffix=")"/>
             <text variable="page" prefix=":"/>
-            <text macro="month" prefix=", "/>
           </group>
         </if>
         <!-- corresponds to "proceedings", "manual", "book", and "periodical" in bibtex -->
@@ -212,7 +206,6 @@
             <text variable="publisher"/>
             <text variable="publisher-place"/>
             <text macro="edition"/>
-            <text macro="month"/>
           </group>
         </else-if>
         <!-- corresponds to "inbook" and "incollection" in bibtex -->
@@ -236,7 +229,6 @@
             <text variable="publisher"/>
             <text variable="publisher-place"/>
             <text macro="edition"/>
-            <text macro="month"/>
           </group>
         </else-if>
         <!-- corresponds to "booklet" in bibtex -->
@@ -244,7 +236,6 @@
           <text variable="title" prefix=" " suffix="."/>
           <group delimiter=", " prefix=" " suffix=".">
             <text variable="publisher-place"/>
-            <text macro="month"/>
           </group>
         </else-if>
         <!-- corresponds to "inproceedings" and "conference" in bibtex -->
@@ -262,18 +253,10 @@
             <choose>
               <if variable="event-place publisher-place" match="any">
                 <text macro="event-or-publisher-place"/>
-                <text macro="month"/>
               </if>
             </choose>
           </group>
-          <group prefix=" " suffix="." delimiter=", ">
-            <text variable="publisher"/>
-            <choose>
-              <if variable="event-place publisher-place" match="none">
-                <text macro="month"/>
-              </if>
-            </choose>
-          </group>
+          <text variable="publisher" prefix=" " suffix="."/>
         </else-if>
         <!-- corresponds to "techreport" in bibtex -->
         <else-if type="report">
@@ -282,7 +265,6 @@
             <text macro="technical-report"/>
             <text variable="publisher"/>
             <text variable="publisher-place"/>
-            <text macro="month"/>
           </group>
         </else-if>
         <!-- corresponds to "phdthesis" and "masterthesis" in bibtex -->
@@ -293,13 +275,11 @@
             <text macro="thesis-type"/>
             <text variable="publisher"/>
             <text variable="publisher-place"/>
-            <text macro="month"/>
           </group>
         </else-if>
         <!-- misc. -->
         <else>
           <text variable="title" prefix=" " suffix="."/>
-          <text macro="month" prefix=" " suffix="."/>
         </else>
       </choose>
       <!-- note -->

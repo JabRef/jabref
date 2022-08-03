@@ -17,6 +17,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - JabRef now writes log files. Linux: `$home/.cache/jabref/logs/version`, Windows: `%APPDATA%\..\Local\harawata\jabref\version\logs`, Mac: `Users/.../Library/Logs/jabref/version`
 - We added an importer for Citavi backup files, support ".ctv5bak" and ".ctv6bak" file formats. [#8322](https://github.com/JabRef/jabref/issues/8322)
 - We added a feature to drag selected entries and drop them to other opened inactive library tabs [koppor521](https://github.com/koppor/jabref/issues/521).
+- We added support for the [biblatex-apa](https://github.com/plk/biblatex-apa) legal entry types `Legislation`, `Legadminmaterial`, `Jurisdiction`, `Constitution` and `Legal` [#8931](https://github.com/JabRef/jabref/issues/8931)
 
 ### Changed
 
@@ -59,6 +60,9 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixed a bug where switching between themes will cause an error/exception. [#8939](https://github.com/JabRef/jabref/pull/8939)
 - We fixed a bug where files that were deleted in the source bibtex file were kept in the index. [#8962](https://github.com/JabRef/jabref/pull/8962)
 - We fixed "Error while sending to JabRef" when the browser extension interacts with JabRef. [JabRef-Browser-Extension#479](https://github.com/JabRef/JabRef-Browser-Extension/issues/479)
+- We fixed a bug where updating group view mode (intersection or union) requires re-selecting groups to take effect. [#6998](https://github.com/JabRef/jabref/issues/6998)
+- We fixed a bug that prevented external group metadata changes from being merged. [#8873](https://github.com/JabRef/jabref/issues/8873)
+- We fixed the shared database opening dialog to remember autosave folder and tick. [#7516](https://github.com/JabRef/jabref/issues/7516)
 
 ### Removed
 

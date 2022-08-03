@@ -387,8 +387,8 @@ public class BibtexParser implements Parser {
         }
         // strip empty lines
         while ((runningIndex < indexOfAt) &&
-                (context.charAt(runningIndex) == '\r' ||
-                        context.charAt(runningIndex) == '\n')) {
+                ((context.charAt(runningIndex) == '\r') ||
+                        (context.charAt(runningIndex) == '\n'))) {
             runningIndex++;
         }
         return context.substring(runningIndex);
