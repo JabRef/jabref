@@ -1,10 +1,16 @@
 package org.jabref.gui.collab;
 
+import java.util.Optional;
+
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 
+import org.jabref.gui.DialogService;
+import org.jabref.gui.actions.SimpleCommand;
+import org.jabref.gui.mergeentries.MergeEntriesDialog;
+import org.jabref.gui.mergeentries.MergeTwoEntriesAction;
 import org.jabref.gui.mergeentries.newmergedialog.ShowDiffConfig;
 import org.jabref.gui.mergeentries.newmergedialog.ThreeWayMergeView;
 import org.jabref.gui.mergeentries.newmergedialog.diffhighlighter.DiffHighlighter;
@@ -21,15 +27,15 @@ class EntryChangeViewModel extends DatabaseChangeViewModel {
     private final BibEntry newEntry;
     private ThreeWayMergeView threeWayMergeView;
 
-    public EntryChangeViewModel(BibEntry entry, BibEntry newEntry) {
-        super();
+    private final DialogService dialogService;
+
+    public EntryChangeViewModel(BibEntry entry, BibEntry newEntry, DialogService dialogService) {
+        super(entry.getCitationKey().map(key -> Localization.lang("Modified entry") + ": '" + key + '\'')
+                   .orElse(Localization.lang("Modified entry")));
 
         this.oldEntry = entry;
         this.newEntry = newEntry;
-
-        name = entry.getCitationKey()
-                    .map(key -> Localization.lang("Modified entry") + ": '" + key + '\'')
-                    .orElse(Localization.lang("Modified entry"));
+        this.dialogService = dialogService;
     }
 
     /**
@@ -47,13 +53,10 @@ class EntryChangeViewModel extends DatabaseChangeViewModel {
 
     @Override
     public void makeChange(BibDatabaseContext database, NamedCompound undoEdit) {
-        this.description(); // Init dialog to prevent NPE
         database.getDatabase().removeEntry(oldEntry);
-        BibEntry mergedEntry = threeWayMergeView.getMergedEntry();
-        mergedEntry.setId(oldEntry.getId()); // Keep ID
-        database.getDatabase().insertEntry(mergedEntry);
+        database.getDatabase().insertEntry(newEntry);
         undoEdit.addEdit(new UndoableInsertEntries(database.getDatabase(), oldEntry));
-        undoEdit.addEdit(new UndoableInsertEntries(database.getDatabase(), mergedEntry));
+        undoEdit.addEdit(new UndoableInsertEntries(database.getDatabase(), newEntry));
     }
 
     @Override
@@ -62,11 +65,23 @@ class EntryChangeViewModel extends DatabaseChangeViewModel {
         threeWayMergeView.selectLeftEntryValues();
         threeWayMergeView.showDiff(new ShowDiffConfig(ThreeWayMergeToolbar.DiffView.SPLIT, DiffHighlighter.DiffMethod.WORDS));
         VBox container = new VBox(10);
-        Label header = new Label(name);
+        Label header = new Label(getName());
         header.getStyleClass().add("sectionHeader");
         container.getChildren().add(header);
         container.getChildren().add(threeWayMergeView);
         VBox.setMargin(threeWayMergeView, new Insets(5, 5, 5, 5));
         return container;
+    }
+
+    @Override
+    public boolean hasAdvancedMergeDialog() {
+        return true;
+    }
+
+    @Override
+    public Optional<SimpleCommand> openAdvancedMergeDialog() {
+        MergeEntriesDialog mergeEntriesDialog = new MergeEntriesDialog(oldEntry, newEntry);
+        return dialogService.showCustomDialogAndWait(mergeEntriesDialog)
+                            .map(res -> new MergeTwoEntriesAction(res, null, null));
     }
 }
