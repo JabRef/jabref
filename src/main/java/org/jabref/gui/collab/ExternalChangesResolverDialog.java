@@ -8,6 +8,7 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -28,6 +29,8 @@ public class ExternalChangesResolverDialog extends BaseDialog<Boolean> {
     @FXML
     public TableView<DatabaseChangeViewModel> changesTableView;
     @FXML
+    public Button openAdvancedMergeDialogButton;
+    @FXML
     private TableColumn<DatabaseChangeViewModel, String> changeName;
 
     private final BibDatabaseContext database;
@@ -36,6 +39,8 @@ public class ExternalChangesResolverDialog extends BaseDialog<Boolean> {
     private final List<DatabaseChangeViewModel> acceptedChanges = new ArrayList<>();
 
     private final BooleanBinding areChangesResolved;
+
+    private final BooleanBinding canOpenAdvancedMergeDialog;
 
     public ExternalChangesResolverDialog(BibDatabaseContext database, List<DatabaseChangeViewModel> changes) {
         this.database = database;
@@ -55,6 +60,11 @@ public class ExternalChangesResolverDialog extends BaseDialog<Boolean> {
                 close();
             }
         });
+
+        canOpenAdvancedMergeDialog = Bindings.createBooleanBinding(() -> changesTableView.getSelectionModel().getSelectedItems().size() == 1 &&
+                changesTableView.getSelectionModel().getSelectedItems().get(0).hasAdvancedMergeDialog(), changesTableView.getSelectionModel().getSelectedItems());
+
+        openAdvancedMergeDialogButton.disableProperty().bind(canOpenAdvancedMergeDialog.not());
 
         setResultConverter(button -> {
             if (areChangesResolved.get()) {
