@@ -26,13 +26,14 @@ class EntryAddChangeViewModel extends DatabaseChangeViewModel {
                                    DialogService dialogService,
                                    StateManager stateManager,
                                    ThemeManager themeManager) {
-        super(entry.getCitationKey()
-                   .map(key -> Localization.lang("Added entry") + ": '" + key + '\'')
-                   .orElse(Localization.lang("Added entry")));
+        super();
         this.dialogService = dialogService;
         this.preferencesService = preferencesService;
         this.themeManager = themeManager;
         this.stateManager = stateManager;
+        this.name = entry.getCitationKey()
+                         .map(key -> Localization.lang("Added entry") + ": '" + key + '\'')
+                         .orElse(Localization.lang("Added entry"));
         this.entry = entry;
     }
 

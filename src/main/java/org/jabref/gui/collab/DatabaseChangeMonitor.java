@@ -67,7 +67,7 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
                 Localization.lang("The library has been modified by another program."),
                 List.of(new Action(Localization.lang("Dismiss changes"), event -> notificationPane.hide()),
                         new Action(Localization.lang("Review changes"), event -> {
-                            dialogService.showCustomDialogAndWait(new ExternalChangesResolverDialog(database, changes));
+                            dialogService.showCustomDialogAndWait(new ChangeDisplayDialog(database, changes));
                             notificationPane.hide();
                         })),
                 Duration.ZERO));

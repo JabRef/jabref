@@ -20,9 +20,11 @@ class EntryDeleteChangeViewModel extends DatabaseChangeViewModel {
     private final BibEntry entry;
 
     public EntryDeleteChangeViewModel(BibEntry entry) {
-        super(entry.getCitationKey()
-                   .map(key -> Localization.lang("Deleted entry") + ": '" + key + '\'')
-                   .orElse(Localization.lang("Deleted entry")));
+        super(Localization.lang("Deleted entry"));
+
+        this.name = entry.getCitationKey()
+                         .map(key -> Localization.lang("Deleted entry") + ": '" + key + '\'')
+                         .orElse(Localization.lang("Deleted entry"));
         this.entry = entry;
     }
 
@@ -35,7 +37,6 @@ class EntryDeleteChangeViewModel extends DatabaseChangeViewModel {
     @Override
     public Node description() {
         PreviewViewer previewViewer = new PreviewViewer(new BibDatabaseContext(), JabRefGUI.getMainFrame().getDialogService(), Globals.stateManager, Globals.getThemeManager());
-        previewViewer.setLayout(Globals.prefs.getPreviewPreferences().getSelectedPreviewLayout());
         previewViewer.setEntry(entry);
         return previewViewer;
     }
