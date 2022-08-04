@@ -10,6 +10,8 @@ import org.controlsfx.control.Rating;
 public class CustomRatingSkin extends RatingSkin {
     public CustomRatingSkin(Rating control) {
         super(control);
+
+        consumeMouseEvents(false);
     }
 
     @Override

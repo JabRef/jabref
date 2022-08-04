@@ -103,6 +103,8 @@ public class SpecialFieldColumn extends MainTableColumn<Optional<SpecialFieldVal
             if (event.getButton().equals(MouseButton.PRIMARY) && event.getClickCount() == 2) {
                 ranking.setRating(0);
                 event.consume();
+            } else if (event.getButton().equals(MouseButton.SECONDARY)) {
+                event.consume();
             }
         });
 
