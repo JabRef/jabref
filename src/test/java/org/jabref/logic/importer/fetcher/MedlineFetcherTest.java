@@ -190,7 +190,7 @@ public class MedlineFetcherTest {
 
     @Test
     public void testInvalidSearchTerm() throws Exception {
-        assertThrows(FetcherClientException.class, () ->fetcher.performSearchById("this.is.a.invalid.search.term.for.the.medline.fetcher"));
+        assertThrows(FetcherClientException.class, () -> fetcher.performSearchById("this.is.a.invalid.search.term.for.the.medline.fetcher"));
     }
 
     @Test

@@ -126,17 +126,20 @@ public class IdentifierEditorViewModel extends AbstractEditorViewModel {
                             dialogService.notify(Localization.lang("No %0 found", field.getDisplayName()));
                         }
                     })
-                    .onFailure(exception -> {
-                        LOGGER.error("Error while fetching bibliographic information", exception);
-                        if (exception instanceof FetcherClientException) {
-                            dialogService.showInformationDialogAndWait(Localization.lang("Look up %0", idFetcher.getName()), Localization.lang("No data was found for the identifier"));
-                        } else if (exception instanceof FetcherServerException) {
-                            dialogService.showInformationDialogAndWait(Localization.lang("Look up %0", idFetcher.getName()), Localization.lang("Server not available"));
-                        } else {
-                            dialogService.showErrorDialogAndWait(exception);
-                        }
-                    })
-                    .executeWith(taskExecutor);
+                      .onFailure(exception -> {
+                          LOGGER.error("Error while fetching bibliographic information", exception);
+                          if (exception instanceof FetcherClientException) {
+                              dialogService.showInformationDialogAndWait(Localization.lang("Look up %0", idFetcher.getName()), Localization.lang("No data was found for the identifier"));
+                          } else if (exception instanceof FetcherServerException) {
+                              dialogService.showInformationDialogAndWait(Localization.lang("Look up %0", idFetcher.getName()), Localization.lang("Server not available"));
+                          } else if (exception.getCause() != null) {
+                              dialogService.showWarningDialogAndWait(Localization.lang("Look up %0", idFetcher.getName()), Localization.lang("Error occured %0", exception.getCause().getMessage()));
+
+                          } else {
+                              dialogService.showWarningDialogAndWait(Localization.lang("Look up %0", idFetcher.getName()), Localization.lang("Error occured %0", exception.getCause().getMessage()));
+                          }
+                      })
+                      .executeWith(taskExecutor);
         });
     }
 }

@@ -83,7 +83,7 @@ public class FetchAndMergeEntry {
                                       } else if (exception instanceof FetcherServerException) {
                                           dialogService.showInformationDialogAndWait(Localization.lang("Fetching information using %0", fetcher.get().getName()), Localization.lang("Server not available"));
                                       } else {
-                                          dialogService.showErrorDialogAndWait(exception);
+                                          dialogService.showInformationDialogAndWait(Localization.lang("Fetching information using %0", fetcher.get().getName()), Localization.lang("Error occured %0", exception.getMessage()));
                                       }
                                   })
                                   .executeWith(Globals.TASK_EXECUTOR);
