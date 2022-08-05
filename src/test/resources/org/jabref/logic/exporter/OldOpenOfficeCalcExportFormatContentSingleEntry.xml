@@ -151,12 +151,6 @@
                     <text:p>Gender</text:p>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p>Hal_id</text:p>
-                </table:table-cell>
-                <table:table-cell>
-                    <text:p>Hal_version</text:p>
-                </table:table-cell>
-                <table:table-cell>
                     <text:p>Holder</text:p>
                 </table:table-cell>
                 <table:table-cell>
@@ -170,9 +164,6 @@
                 </table:table-cell>
                 <table:table-cell>
                     <text:p>Introduction</text:p>
-                </table:table-cell>
-                <table:table-cell>
-                    <text:p>Introducedin</text:p>
                 </table:table-cell>
                 <table:table-cell>
                     <text:p>ISBN</text:p>
@@ -215,9 +206,6 @@
                 </table:table-cell>
                 <table:table-cell>
                     <text:p>Library</text:p>
-                </table:table-cell>
-                <table:table-cell>
-                    <text:p>License</text:p>
                 </table:table-cell>
                 <table:table-cell>
                     <text:p>Location</text:p>
@@ -292,16 +280,7 @@
                     <text:p>Related</text:p>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p>Relatedtype</text:p>
-                </table:table-cell>
-                <table:table-cell>
-                    <text:p>Relatedstring</text:p>
-                </table:table-cell>
-                <table:table-cell>
                     <text:p>Reportno</text:p>
-                </table:table-cell>
-                <table:table-cell>
-                    <text:p>Repository</text:p>
                 </table:table-cell>
                 <table:table-cell>
                     <text:p>Review</text:p>
@@ -332,9 +311,6 @@
                 </table:table-cell>
                 <table:table-cell>
                     <text:p>Subtitle</text:p>
-                </table:table-cell>
-                <table:table-cell>
-                    <text:p>Swhid</text:p>
                 </table:table-cell>
                 <table:table-cell>
                     <text:p>Title</text:p>
@@ -567,15 +543,6 @@
                     <text:p/>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p/>
-                </table:table-cell>
-                <table:table-cell>
-                    <text:p/>
-                </table:table-cell>
-                <table:table-cell>
-                    <text:p/>
-                </table:table-cell>
-                <table:table-cell>
                     <text:p>0097-8418</text:p>
                 </table:table-cell>
                 <table:table-cell>
@@ -589,9 +556,6 @@
                 </table:table-cell>
                 <table:table-cell>
                     <text:p>SIGCSE Bull.</text:p>
-                </table:table-cell>
-                <table:table-cell>
-                    <text:p/>
                 </table:table-cell>
                 <table:table-cell>
                     <text:p/>
@@ -676,18 +640,6 @@
                 </table:table-cell>
                 <table:table-cell>
                     <text:p>ACM</text:p>
-                </table:table-cell>
-                <table:table-cell>
-                    <text:p/>
-                </table:table-cell>
-                <table:table-cell>
-                    <text:p/>
-                </table:table-cell>
-                <table:table-cell>
-                    <text:p/>
-                </table:table-cell>
-                <table:table-cell>
-                    <text:p/>
                 </table:table-cell>
                 <table:table-cell>
                     <text:p/>

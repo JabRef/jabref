@@ -31,7 +31,7 @@ public enum IEEEField implements Field {
         this.properties = EnumSet.of(first, rest);
     }
 
-    public static Optional<IEEEField> fromName(String name) {
+    public static <T> Optional<IEEEField> fromName(String name) {
         return Arrays.stream(IEEEField.values())
                      .filter(field -> field.getName().equalsIgnoreCase(name))
                      .findAny();
