@@ -134,7 +134,6 @@ public class IdentifierEditorViewModel extends AbstractEditorViewModel {
                               dialogService.showInformationDialogAndWait(Localization.lang("Look up %0", idFetcher.getName()), Localization.lang("Server not available"));
                           } else if (exception.getCause() != null) {
                               dialogService.showWarningDialogAndWait(Localization.lang("Look up %0", idFetcher.getName()), Localization.lang("Error occured %0", exception.getCause().getMessage()));
-
                           } else {
                               dialogService.showWarningDialogAndWait(Localization.lang("Look up %0", idFetcher.getName()), Localization.lang("Error occured %0", exception.getCause().getMessage()));
                           }
