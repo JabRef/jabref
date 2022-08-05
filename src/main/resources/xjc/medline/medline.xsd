@@ -1,314 +1,1830 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!-- Source: https://github.com/lstern/psilibrary/blob/master/doc/medline/medline.xsd-->
-<!--
-     This is the Current DTD which NLM has written for 
-  External  Use.  If you are a NCBI User, use the information
-  from the PubmedArticleSet.
-  
-  Comments and suggestions are welcome.
-  (May 9, 2000)
-  
-  Corrections:
-  ~~~~~~~~~~~
-  Oct. 09 2002 
-  - "PubMedArticle" has been renamed to "PubmedArticle"
-  - All referencies to "PubMedArticle" has been removed
-  - "ProviderId" has been removed from PubmedData
-  - "URL" has been removed from PubmdeData
-  
-  	$Id: pubmed_160101.dtd 480858 2015-10-05 15:12:19Z korobtch $
-  
--->
-<!-- ================================================================= -->
-<!-- ================================================================= -->
-<!-- Reference to Where the MEDLINECITATION DTD is located -->
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
-  <xs:include schemaLocation="nlmmedlinecitationset_160101.xsd"/>
-  <xs:include schemaLocation="bookdoc_160101.xsd"/>
-  <!-- ================================================================= -->
-  <xs:simpleType name="iso.language.codes">
-    <xs:restriction base="xs:token">
-      <xs:enumeration value="AF"/>
-      <xs:enumeration value="AR"/>
-      <xs:enumeration value="AZ"/>
-      <xs:enumeration value="BG"/>
-      <xs:enumeration value="CS"/>
-      <xs:enumeration value="DA"/>
-      <xs:enumeration value="DE"/>
-      <xs:enumeration value="EN"/>
-      <xs:enumeration value="EL"/>
-      <xs:enumeration value="ES"/>
-      <xs:enumeration value="FA"/>
-      <xs:enumeration value="FI"/>
-      <xs:enumeration value="FR"/>
-      <xs:enumeration value="HE"/>
-      <xs:enumeration value="HU"/>
-      <xs:enumeration value="HY"/>
-      <xs:enumeration value="IN"/>
-      <xs:enumeration value="IS"/>
-      <xs:enumeration value="IT"/>
-      <xs:enumeration value="IW"/>
-      <xs:enumeration value="JA"/>
-      <xs:enumeration value="KA"/>
-      <xs:enumeration value="KO"/>
-      <xs:enumeration value="LT"/>
-      <xs:enumeration value="MK"/>
-      <xs:enumeration value="ML"/>
-      <xs:enumeration value="NL"/>
-      <xs:enumeration value="NO"/>
-      <xs:enumeration value="PL"/>
-      <xs:enumeration value="PT"/>
-      <xs:enumeration value="PS"/>
-      <xs:enumeration value="RO"/>
-      <xs:enumeration value="RU"/>
-      <xs:enumeration value="SL"/>
-      <xs:enumeration value="SK"/>
-      <xs:enumeration value="SQ"/>
-      <xs:enumeration value="SR"/>
-      <xs:enumeration value="SV"/>
-      <xs:enumeration value="SW"/>
-      <xs:enumeration value="TH"/>
-      <xs:enumeration value="TR"/>
-      <xs:enumeration value="UK"/>
-      <xs:enumeration value="VI"/>
-      <xs:enumeration value="ZH"/>
-    </xs:restriction>
-  </xs:simpleType>
-  <xs:simpleType name="pub.status.int">
-    <xs:restriction base="xs:token">
-      <xs:enumeration value="pmc"/>
-      <xs:enumeration value="pmcr"/>
-      <xs:enumeration value="pubmed"/>
-      <xs:enumeration value="pubmedr"/>
-      <xs:enumeration value="premedline"/>
-      <xs:enumeration value="medline"/>
-      <xs:enumeration value="medliner"/>
-      <xs:enumeration value="entrez"/>
-      <xs:enumeration value="pmc-release"/>
-    </xs:restriction>
-  </xs:simpleType>
-  <xs:simpleType name="pub.status">
-    <xs:union memberTypes="pub.status.int">
-      <xs:simpleType>
-        <xs:restriction base="xs:token">
-          <xs:enumeration value="received"/>
-        </xs:restriction>
-      </xs:simpleType>
-      <xs:simpleType>
-        <xs:restriction base="xs:token">
-          <xs:enumeration value="accepted"/>
-        </xs:restriction>
-      </xs:simpleType>
-      <xs:simpleType>
-        <xs:restriction base="xs:token">
-          <xs:enumeration value="epublish"/>
-        </xs:restriction>
-      </xs:simpleType>
-      <xs:simpleType>
-        <xs:restriction base="xs:token">
-          <xs:enumeration value="ppublish"/>
-        </xs:restriction>
-      </xs:simpleType>
-      <xs:simpleType>
-        <xs:restriction base="xs:token">
-          <xs:enumeration value="revised"/>
-        </xs:restriction>
-      </xs:simpleType>
-      <xs:simpleType>
-        <xs:restriction base="xs:token">
-          <xs:enumeration value="aheadofprint"/>
-        </xs:restriction>
-      </xs:simpleType>
-      <xs:simpleType>
-        <xs:restriction base="xs:token">
-          <xs:enumeration value="retracted"/>
-        </xs:restriction>
-      </xs:simpleType>
-      <xs:simpleType>
-        <xs:restriction base="xs:token">
-          <xs:enumeration value="ecollection"/>
-        </xs:restriction>
-      </xs:simpleType>
-    </xs:union>
-  </xs:simpleType>
-  <xs:simpleType name="art.id.type.int">
-    <xs:restriction base="xs:token">
-      <xs:enumeration value="pubmed"/>
-      <xs:enumeration value="medline"/>
-      <xs:enumeration value="pmcid"/>
-      <xs:enumeration value="pmcbook"/>
-      <xs:enumeration value="bookaccession"/>
-    </xs:restriction>
-  </xs:simpleType>
-  <xs:simpleType name="art.id.type">
-    <xs:union memberTypes="art.id.type.int">
-      <xs:simpleType>
-        <xs:restriction base="xs:token">
-          <xs:enumeration value="doi"/>
-        </xs:restriction>
-      </xs:simpleType>
-      <xs:simpleType>
-        <xs:restriction base="xs:token">
-          <xs:enumeration value="pii"/>
-        </xs:restriction>
-      </xs:simpleType>
-      <xs:simpleType>
-        <xs:restriction base="xs:token">
-          <xs:enumeration value="pmcpid"/>
-        </xs:restriction>
-      </xs:simpleType>
-      <xs:simpleType>
-        <xs:restriction base="xs:token">
-          <xs:enumeration value="pmpid"/>
-        </xs:restriction>
-      </xs:simpleType>
-      <xs:simpleType>
-        <xs:restriction base="xs:token">
-          <xs:enumeration value="pmc"/>
-        </xs:restriction>
-      </xs:simpleType>
-      <xs:simpleType>
-        <xs:restriction base="xs:token">
-          <xs:enumeration value="mid"/>
-        </xs:restriction>
-      </xs:simpleType>
-      <xs:simpleType>
-        <xs:restriction base="xs:token">
-          <xs:enumeration value="sici"/>
-        </xs:restriction>
-      </xs:simpleType>
-    </xs:union>
-  </xs:simpleType>
-  <!-- ================================================================= -->
+<?xml version="1.0" encoding="Windows-1252"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:mml="http://www.w3.org/1998/Math/MathML"   elementFormDefault="qualified">
+  <xs:import namespace="http://www.w3.org/1998/Math/MathML" schemaLocation="mathml3.xsd"></xs:import>
+  <xs:attribute name="id" type="xs:ID" />
+  <xs:attribute name="xref" type="xs:string" />
+  <xs:attribute name="class" type="xs:string" />
+  <xs:attribute name="style" type="xs:string" />
+  <xs:attribute name="href" type="xs:string" />
+  <xs:attribute name="other" type="xs:string" />
+  <xs:attribute name="encoding" type="xs:string" />
+  <xs:attribute name="definitionURL" type="xs:string" />
+  <xs:attribute name="type" type="xs:string" />
+  <xs:attribute name="base" type="xs:string" />
+  <xs:attribute name="cd" type="xs:string" />
+  <xs:attribute name="src" type="xs:string" />
+  <xs:attribute name="scope" type="xs:string" />
+  <xs:attribute name="nargs" type="xs:string" />
+  <xs:attribute name="occurrence">
+    <xs:simpleType>
+      <xs:restriction base="xs:NMTOKEN">
+        <xs:enumeration value="prefix" />
+        <xs:enumeration value="infix" />
+        <xs:enumeration value="function-model" />
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:attribute>
+  <xs:attribute name="closure" type="xs:string" />
+  <xs:attribute name="order">
+    <xs:simpleType>
+      <xs:restriction base="xs:NMTOKEN">
+        <xs:enumeration value="numeric" />
+        <xs:enumeration value="lexicographic" />
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:attribute>
+  <xs:attribute name="mathcolor" type="xs:string" />
+  <xs:attribute name="mathbackground" type="xs:string" />
+  <xs:attribute name="mathvariant">
+    <xs:simpleType>
+      <xs:restriction base="xs:NMTOKEN">
+        <xs:enumeration value="normal" />
+        <xs:enumeration value="bold" />
+        <xs:enumeration value="italic" />
+        <xs:enumeration value="bold-italic" />
+        <xs:enumeration value="double-struck" />
+        <xs:enumeration value="bold-fraktur" />
+        <xs:enumeration value="script" />
+        <xs:enumeration value="bold-script" />
+        <xs:enumeration value="fraktur" />
+        <xs:enumeration value="sans-serif" />
+        <xs:enumeration value="bold-sans-serif" />
+        <xs:enumeration value="sans-serif-italic" />
+        <xs:enumeration value="sans-serif-bold-italic" />
+        <xs:enumeration value="monospace" />
+        <xs:enumeration value="initial" />
+        <xs:enumeration value="tailed" />
+        <xs:enumeration value="looped" />
+        <xs:enumeration value="stretched" />
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:attribute>
+  <xs:attribute name="mathsize" type="xs:string" />
+  <xs:attribute name="dir">
+    <xs:simpleType>
+      <xs:restriction base="xs:NMTOKEN">
+        <xs:enumeration value="ltr" />
+        <xs:enumeration value="rtl" />
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:attribute>
+  <xs:attribute name="fontfamily" type="xs:string" />
+  <xs:attribute name="fontweight">
+    <xs:simpleType>
+      <xs:restriction base="xs:NMTOKEN">
+        <xs:enumeration value="normal" />
+        <xs:enumeration value="bold" />
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:attribute>
+  <xs:attribute name="fontstyle">
+    <xs:simpleType>
+      <xs:restriction base="xs:NMTOKEN">
+        <xs:enumeration value="normal" />
+        <xs:enumeration value="italic" />
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:attribute>
+  <xs:attribute name="fontsize" type="xs:string" />
+  <xs:attribute name="color" type="xs:string" />
+  <xs:attribute name="background" type="xs:string" />
+  <xs:attribute name="form">
+    <xs:simpleType>
+      <xs:restriction base="xs:NMTOKEN">
+        <xs:enumeration value="prefix" />
+        <xs:enumeration value="infix" />
+        <xs:enumeration value="postfix" />
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:attribute>
+  <xs:attribute name="fence">
+    <xs:simpleType>
+      <xs:restriction base="xs:NMTOKEN">
+        <xs:enumeration value="true" />
+        <xs:enumeration value="false" />
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:attribute>
+  <xs:attribute name="separator">
+    <xs:simpleType>
+      <xs:restriction base="xs:NMTOKEN">
+        <xs:enumeration value="true" />
+        <xs:enumeration value="false" />
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:attribute>
+  <xs:attribute name="lspace" type="xs:string" />
+  <xs:attribute name="rspace" type="xs:string" />
+  <xs:attribute name="stretchy">
+    <xs:simpleType>
+      <xs:restriction base="xs:NMTOKEN">
+        <xs:enumeration value="true" />
+        <xs:enumeration value="false" />
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:attribute>
+  <xs:attribute name="symmetric">
+    <xs:simpleType>
+      <xs:restriction base="xs:NMTOKEN">
+        <xs:enumeration value="true" />
+        <xs:enumeration value="false" />
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:attribute>
+  <xs:attribute name="maxsize" type="xs:string" />
+  <xs:attribute name="minsize" type="xs:string" />
+  <xs:attribute name="largeop">
+    <xs:simpleType>
+      <xs:restriction base="xs:NMTOKEN">
+        <xs:enumeration value="true" />
+        <xs:enumeration value="false" />
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:attribute>
+  <xs:attribute name="movablelimits">
+    <xs:simpleType>
+      <xs:restriction base="xs:NMTOKEN">
+        <xs:enumeration value="true" />
+        <xs:enumeration value="false" />
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:attribute>
+  <xs:attribute name="accent">
+    <xs:simpleType>
+      <xs:restriction base="xs:NMTOKEN">
+        <xs:enumeration value="true" />
+        <xs:enumeration value="false" />
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:attribute>
+  <xs:attribute name="linebreak">
+    <xs:simpleType>
+      <xs:restriction base="xs:NMTOKEN">
+        <xs:enumeration value="auto" />
+        <xs:enumeration value="newline" />
+        <xs:enumeration value="nobreak" />
+        <xs:enumeration value="goodbreak" />
+        <xs:enumeration value="badbreak" />
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:attribute>
+  <xs:attribute name="lineleading" type="xs:string" />
+  <xs:attribute name="linebreakstyle">
+    <xs:simpleType>
+      <xs:restriction base="xs:NMTOKEN">
+        <xs:enumeration value="before" />
+        <xs:enumeration value="after" />
+        <xs:enumeration value="duplicate" />
+        <xs:enumeration value="infixlinebreakstyle" />
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:attribute>
+  <xs:attribute name="linebreakmultchar" type="xs:string" />
+  <xs:attribute name="indentalign">
+    <xs:simpleType>
+      <xs:restriction base="xs:NMTOKEN">
+        <xs:enumeration value="left" />
+        <xs:enumeration value="center" />
+        <xs:enumeration value="right" />
+        <xs:enumeration value="auto" />
+        <xs:enumeration value="id" />
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:attribute>
+  <xs:attribute name="indentshift" type="xs:string" />
+  <xs:attribute name="indenttarget" type="xs:string" />
+  <xs:attribute name="indentalignfirst">
+    <xs:simpleType>
+      <xs:restriction base="xs:NMTOKEN">
+        <xs:enumeration value="left" />
+        <xs:enumeration value="center" />
+        <xs:enumeration value="right" />
+        <xs:enumeration value="auto" />
+        <xs:enumeration value="id" />
+        <xs:enumeration value="indentalign" />
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:attribute>
+  <xs:attribute name="indentshiftfirst" type="xs:string" />
+  <xs:attribute name="indentalignlast">
+    <xs:simpleType>
+      <xs:restriction base="xs:NMTOKEN">
+        <xs:enumeration value="left" />
+        <xs:enumeration value="center" />
+        <xs:enumeration value="right" />
+        <xs:enumeration value="auto" />
+        <xs:enumeration value="id" />
+        <xs:enumeration value="indentalign" />
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:attribute>
+  <xs:attribute name="indentshiftlast" type="xs:string" />
+  <xs:attribute name="width" type="xs:string" />
+  <xs:attribute name="height" type="xs:string" />
+  <xs:attribute name="depth" type="xs:string" />
+  <xs:attribute name="lquote" type="xs:string" />
+  <xs:attribute name="rquote" type="xs:string" />
+  <xs:attribute name="valign" type="xs:string" />
+  <xs:attribute name="alt" type="xs:string" />
+  <xs:attribute name="index" type="xs:string" />
+  <xs:attribute name="position" type="xs:string" />
+  <xs:attribute name="length" type="xs:string" />
+  <xs:attribute name="leftoverhang" type="xs:string" />
+  <xs:attribute name="rightoverhang" type="xs:string" />
+  <xs:attribute name="mslinethickness" type="xs:string" />
+  <xs:attribute name="edge">
+    <xs:simpleType>
+      <xs:restriction base="xs:NMTOKEN">
+        <xs:enumeration value="left" />
+        <xs:enumeration value="right" />
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:attribute>
+  <xs:attribute name="groupalign">
+    <xs:simpleType>
+      <xs:restriction base="xs:NMTOKEN">
+        <xs:enumeration value="left" />
+        <xs:enumeration value="center" />
+        <xs:enumeration value="right" />
+        <xs:enumeration value="decimalpoint" />
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:attribute>
+  <xs:attribute name="linethickness" type="xs:string" />
+  <xs:attribute name="numalign">
+    <xs:simpleType>
+      <xs:restriction base="xs:NMTOKEN">
+        <xs:enumeration value="left" />
+        <xs:enumeration value="center" />
+        <xs:enumeration value="right" />
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:attribute>
+  <xs:attribute name="denomalign">
+    <xs:simpleType>
+      <xs:restriction base="xs:NMTOKEN">
+        <xs:enumeration value="left" />
+        <xs:enumeration value="center" />
+        <xs:enumeration value="right" />
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:attribute>
+  <xs:attribute name="bevelled">
+    <xs:simpleType>
+      <xs:restriction base="xs:NMTOKEN">
+        <xs:enumeration value="true" />
+        <xs:enumeration value="false" />
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:attribute>
+  <xs:attribute name="scriptlevel" type="xs:string" />
+  <xs:attribute name="displaystyle">
+    <xs:simpleType>
+      <xs:restriction base="xs:NMTOKEN">
+        <xs:enumeration value="true" />
+        <xs:enumeration value="false" />
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:attribute>
+  <xs:attribute name="scriptsizemultiplier" type="xs:string" />
+  <xs:attribute name="scriptminsize" type="xs:string" />
+  <xs:attribute name="infixlinebreakstyle">
+    <xs:simpleType>
+      <xs:restriction base="xs:NMTOKEN">
+        <xs:enumeration value="before" />
+        <xs:enumeration value="after" />
+        <xs:enumeration value="duplicate" />
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:attribute>
+  <xs:attribute name="decimalpoint" type="xs:string" />
+  <xs:attribute name="accentunder">
+    <xs:simpleType>
+      <xs:restriction base="xs:NMTOKEN">
+        <xs:enumeration value="true" />
+        <xs:enumeration value="false" />
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:attribute>
+  <xs:attribute name="align">
+    <xs:simpleType>
+      <xs:restriction base="xs:NMTOKEN">
+        <xs:enumeration value="left" />
+        <xs:enumeration value="right" />
+        <xs:enumeration value="center" />
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:attribute>
+  <xs:attribute name="alignmentscope" type="xs:string" />
+  <xs:attribute name="charalign">
+    <xs:simpleType>
+      <xs:restriction base="xs:NMTOKEN">
+        <xs:enumeration value="left" />
+        <xs:enumeration value="center" />
+        <xs:enumeration value="right" />
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:attribute>
+  <xs:attribute name="charspacing" type="xs:string" />
+  <xs:attribute name="close" type="xs:string" />
+  <xs:attribute name="columnalign" type="xs:string" />
+  <xs:attribute name="columnlines" type="xs:string" />
+  <xs:attribute name="columnspacing" type="xs:string" />
+  <xs:attribute name="columnspan" type="xs:string" />
+  <xs:attribute name="columnwidth" type="xs:string" />
+  <xs:attribute name="crossout" type="xs:string" />
+  <xs:attribute name="equalcolumns">
+    <xs:simpleType>
+      <xs:restriction base="xs:NMTOKEN">
+        <xs:enumeration value="true" />
+        <xs:enumeration value="false" />
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:attribute>
+  <xs:attribute name="equalrows">
+    <xs:simpleType>
+      <xs:restriction base="xs:NMTOKEN">
+        <xs:enumeration value="true" />
+        <xs:enumeration value="false" />
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:attribute>
+  <xs:attribute name="frame">
+    <xs:simpleType>
+      <xs:restriction base="xs:NMTOKEN">
+        <xs:enumeration value="none" />
+        <xs:enumeration value="solid" />
+        <xs:enumeration value="dashed" />
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:attribute>
+  <xs:attribute name="framespacing" type="xs:string" />
+  <xs:attribute name="location">
+    <xs:simpleType>
+      <xs:restriction base="xs:NMTOKEN">
+        <xs:enumeration value="w" />
+        <xs:enumeration value="nw" />
+        <xs:enumeration value="n" />
+        <xs:enumeration value="ne" />
+        <xs:enumeration value="e" />
+        <xs:enumeration value="se" />
+        <xs:enumeration value="s" />
+        <xs:enumeration value="sw" />
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:attribute>
+  <xs:attribute name="longdivstyle" type="xs:string" />
+  <xs:attribute name="minlabelspacing" type="xs:string" />
+  <xs:attribute name="notation" type="xs:string" />
+  <xs:attribute name="open" type="xs:string" />
+  <xs:attribute name="rowalign" type="xs:string" />
+  <xs:attribute name="rowlines" type="xs:string" />
+  <xs:attribute name="rowspacing" type="xs:string" />
+  <xs:attribute name="rowspan" type="xs:string" />
+  <xs:attribute name="selection" type="xs:string" />
+  <xs:attribute name="separators" type="xs:string" />
+  <xs:attribute name="shift" type="xs:string" />
+  <xs:attribute name="side">
+    <xs:simpleType>
+      <xs:restriction base="xs:NMTOKEN">
+        <xs:enumeration value="left" />
+        <xs:enumeration value="right" />
+        <xs:enumeration value="leftoverlap" />
+        <xs:enumeration value="rightoverlap" />
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:attribute>
+  <xs:attribute name="stackalign">
+    <xs:simpleType>
+      <xs:restriction base="xs:NMTOKEN">
+        <xs:enumeration value="left" />
+        <xs:enumeration value="center" />
+        <xs:enumeration value="right" />
+        <xs:enumeration value="decimalpoint" />
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:attribute>
+  <xs:attribute name="subscriptshift" type="xs:string" />
+  <xs:attribute name="superscriptshift" type="xs:string" />
+  <xs:attribute name="veryverythinmathspace" type="xs:string" />
+  <xs:attribute name="verythinmathspace" type="xs:string" />
+  <xs:attribute name="thinmathspace" type="xs:string" />
+  <xs:attribute name="mediummathspace" type="xs:string" />
+  <xs:attribute name="thickmathspace" type="xs:string" />
+  <xs:attribute name="verythickmathspace" type="xs:string" />
+  <xs:attribute name="veryverythickmathspace" type="xs:string" />
+  <xs:attribute name="voffset" type="xs:string" />
+  <xs:attribute name="actiontype" type="xs:string" />
+  <xs:attribute name="display">
+    <xs:simpleType>
+      <xs:restriction base="xs:NMTOKEN">
+        <xs:enumeration value="block" />
+        <xs:enumeration value="inline" />
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:attribute>
+  <xs:attribute name="maxwidth" type="xs:string" />
+  <xs:attribute name="overflow">
+    <xs:simpleType>
+      <xs:restriction base="xs:NMTOKEN">
+        <xs:enumeration value="linebreak" />
+        <xs:enumeration value="scroll" />
+        <xs:enumeration value="elide" />
+        <xs:enumeration value="truncate" />
+        <xs:enumeration value="scale" />
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:attribute>
+  <xs:attribute name="altimg" type="xs:string" />
+  <xs:attribute name="altimg-width" type="xs:string" />
+  <xs:attribute name="altimg-height" type="xs:string" />
+  <xs:attribute name="altimg-valign" type="xs:string" />
+  <xs:attribute name="alttext" type="xs:string" />
+  <xs:attribute name="cdgroup" type="xs:string" />
+  <xs:attribute name="mode" type="xs:string" />
+  <xs:attribute name="macros" type="xs:string" />
+  <xs:attribute name="name" type="xs:string" />
   <xs:element name="PubmedArticleSet">
     <xs:complexType>
-      <xs:choice maxOccurs="unbounded">
-        <xs:element ref="PubmedArticle"/>
-        <xs:element ref="PubmedBookArticle"/>
-      </xs:choice>
+      <xs:sequence>
+        <xs:choice minOccurs="1" maxOccurs="unbounded">
+          <xs:element ref="PubmedArticle" />
+          <xs:element ref="PubmedBookArticle" />
+        </xs:choice>
+        <xs:element minOccurs="0" maxOccurs="1" ref="DeleteCitation" />
+      </xs:sequence>
     </xs:complexType>
   </xs:element>
-  <!-- ================================================================= -->
-  <!-- This is the top level element for PubMedArticle -->
+  <xs:element name="BookDocumentSet">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="BookDocument" />
+        <xs:element minOccurs="0" maxOccurs="1" ref="DeleteDocument" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="PubmedBookArticleSet">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="PubmedBookArticle" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
   <xs:element name="PubmedArticle">
     <xs:complexType>
       <xs:sequence>
-        <xs:element ref="MedlineCitation"/>
-        <xs:element minOccurs="0" ref="PubmedData"/>
+        <xs:element ref="MedlineCitation" />
+        <xs:element minOccurs="0" maxOccurs="1" ref="PubmedData" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
-  <!-- ================================================================= -->
-  <xs:complexType name="normal.date">
-    <xs:sequence>
-      <xs:element ref="Year"/>
-      <xs:element ref="Month"/>
-      <xs:element ref="Day"/>
-      <xs:sequence minOccurs="0">
-        <xs:element ref="Hour"/>
-        <xs:sequence minOccurs="0">
-          <xs:element ref="Minute"/>
-          <xs:element minOccurs="0" ref="Second"/>
-        </xs:sequence>
+  <xs:element name="PubmedBookArticle">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="BookDocument" />
+        <xs:element minOccurs="0" maxOccurs="1" ref="PubmedBookData" />
       </xs:sequence>
-    </xs:sequence>
-  </xs:complexType>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="BookDocument">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="PMID" />
+        <xs:element ref="ArticleIdList" />
+        <xs:element ref="Book" />
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="LocationLabel" />
+        <xs:element minOccurs="0" maxOccurs="1" ref="ArticleTitle" />
+        <xs:element minOccurs="0" maxOccurs="1" ref="VernacularTitle" />
+        <xs:element minOccurs="0" maxOccurs="1" ref="Pagination" />
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="Language" />
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="AuthorList" />
+        <xs:element minOccurs="0" maxOccurs="1" ref="InvestigatorList" />
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="PublicationType" />
+        <xs:element minOccurs="0" maxOccurs="1" ref="Abstract" />
+        <xs:element minOccurs="0" maxOccurs="1" ref="Sections" />
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="KeywordList" />
+        <xs:element minOccurs="0" maxOccurs="1" ref="ContributionDate" />
+        <xs:element minOccurs="0" maxOccurs="1" ref="DateRevised" />
+        <xs:element minOccurs="0" maxOccurs="1" ref="GrantList" />
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="ItemList" />
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="ReferenceList" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="DeleteCitation">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="1" maxOccurs="unbounded" ref="PMID" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="DeleteDocument">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="PMID" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="MedlineCitation">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="PMID" />
+        <xs:element minOccurs="0" maxOccurs="1" ref="DateCompleted" />
+        <xs:element minOccurs="0" maxOccurs="1" ref="DateRevised" />
+        <xs:element ref="Article" />
+        <xs:element ref="MedlineJournalInfo" />
+        <xs:element minOccurs="0" maxOccurs="1" ref="ChemicalList" />
+        <xs:element minOccurs="0" maxOccurs="1" ref="SupplMeshList" />
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="CitationSubset" />
+        <xs:element minOccurs="0" maxOccurs="1" ref="CommentsCorrectionsList" />
+        <xs:element minOccurs="0" maxOccurs="1" ref="GeneSymbolList" />
+        <xs:element minOccurs="0" maxOccurs="1" ref="MeshHeadingList" />
+        <xs:element minOccurs="0" maxOccurs="1" ref="NumberOfReferences" />
+        <xs:element minOccurs="0" maxOccurs="1" ref="PersonalNameSubjectList" />
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="OtherID" />
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="OtherAbstract" />
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="KeywordList" />
+        <xs:element minOccurs="0" maxOccurs="1" ref="CoiStatement" />
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="SpaceFlightMission" />
+        <xs:element minOccurs="0" maxOccurs="1" ref="InvestigatorList" />
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="GeneralNote" />
+      </xs:sequence>
+      <xs:attribute default="NLM" name="Owner">
+        <xs:simpleType>
+          <xs:restriction base="xs:NMTOKEN">
+            <xs:enumeration value="NLM" />
+            <xs:enumeration value="NASA" />
+            <xs:enumeration value="PIP" />
+            <xs:enumeration value="KIE" />
+            <xs:enumeration value="HSR" />
+            <xs:enumeration value="HMD" />
+            <xs:enumeration value="NOTNLM" />
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="Status" use="required">
+        <xs:simpleType>
+          <xs:restriction base="xs:NMTOKEN">
+            <xs:enumeration value="Completed" />
+            <xs:enumeration value="In-Process" />
+            <xs:enumeration value="PubMed-not-MEDLINE" />
+            <xs:enumeration value="In-Data-Review" />
+            <xs:enumeration value="Publisher" />
+            <xs:enumeration value="MEDLINE" />
+            <xs:enumeration value="OLDMEDLINE" />
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="VersionID" type="xs:string" />
+      <xs:attribute name="VersionDate" type="xs:string" />
+      <xs:attribute name="IndexingMethod" type="xs:string" />
+    </xs:complexType>
+  </xs:element>
   <xs:element name="PubmedData">
     <xs:complexType>
       <xs:sequence>
-        <xs:element minOccurs="0" ref="History"/>
-        <xs:element ref="PublicationStatus"/>
-        <xs:element ref="ArticleIdList"/>
-        <xs:element minOccurs="0" ref="ObjectList"/>
+        <xs:element minOccurs="0" maxOccurs="1" ref="History" />
+        <xs:element ref="PublicationStatus" />
+        <xs:element ref="ArticleIdList" />
+        <xs:element minOccurs="0" maxOccurs="1" ref="ObjectList" />
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="ReferenceList" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="PubmedBookData">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="1" ref="History" />
+        <xs:element ref="PublicationStatus" />
+        <xs:element ref="ArticleIdList" />
+        <xs:element minOccurs="0" maxOccurs="1" ref="ObjectList" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="Article">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="Journal" />
+        <xs:element ref="ArticleTitle" />
+        <xs:choice>
+          <xs:sequence>
+            <xs:element ref="Pagination" />
+            <xs:element minOccurs="0" maxOccurs="unbounded" ref="ELocationID" />
+          </xs:sequence>
+          <xs:element minOccurs="1" maxOccurs="unbounded" ref="ELocationID" />
+        </xs:choice>
+        <xs:element minOccurs="0" maxOccurs="1" ref="Abstract" />
+        <xs:element minOccurs="0" maxOccurs="1" ref="AuthorList" />
+        <xs:element minOccurs="1" maxOccurs="unbounded" ref="Language" />
+        <xs:element minOccurs="0" maxOccurs="1" ref="DataBankList" />
+        <xs:element minOccurs="0" maxOccurs="1" ref="GrantList" />
+        <xs:element ref="PublicationTypeList" />
+        <xs:element minOccurs="0" maxOccurs="1" ref="VernacularTitle" />
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="ArticleDate" />
+      </xs:sequence>
+      <xs:attribute name="PubModel" use="required">
+        <xs:simpleType>
+          <xs:restriction base="xs:NMTOKEN">
+            <xs:enumeration value="Print" />
+            <xs:enumeration value="Print-Electronic" />
+            <xs:enumeration value="Electronic" />
+            <xs:enumeration value="Electronic-Print" />
+            <xs:enumeration value="Electronic-eCollection" />
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="Abstract">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="1" maxOccurs="unbounded" ref="AbstractText" />
+        <xs:element minOccurs="0" maxOccurs="1" ref="CopyrightInformation" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="AbstractText">
+    <xs:complexType mixed="true">
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="b" />
+        <xs:element ref="i" />
+        <xs:element ref="sup" />
+        <xs:element ref="sub" />
+        <xs:element ref="u" />
+        <xs:element ref="mml:math" />
+        <xs:element ref="DispFormula" />
+      </xs:choice>
+      <xs:attribute name="Label" type="xs:string" />
+      <xs:attribute name="NlmCategory">
+        <xs:simpleType>
+          <xs:restriction base="xs:NMTOKEN">
+            <xs:enumeration value="BACKGROUND" />
+            <xs:enumeration value="OBJECTIVE" />
+            <xs:enumeration value="METHODS" />
+            <xs:enumeration value="RESULTS" />
+            <xs:enumeration value="CONCLUSIONS" />
+            <xs:enumeration value="UNASSIGNED" />
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="AccessionNumber" type="xs:string" />
+  <xs:element name="AccessionNumberList">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="1" maxOccurs="unbounded" ref="AccessionNumber" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="Acronym" type="xs:string" />
+  <xs:element name="Affiliation">
+    <xs:complexType mixed="true">
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="b" />
+        <xs:element ref="i" />
+        <xs:element ref="sup" />
+        <xs:element ref="sub" />
+        <xs:element ref="u" />
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="AffiliationInfo">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="Affiliation" />
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="Identifier" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="Agency" type="xs:string" />
+  <xs:element name="ArticleDate">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="Year" />
+        <xs:element ref="Month" />
+        <xs:element ref="Day" />
+      </xs:sequence>
+      <xs:attribute fixed="Electronic" name="DateType" type="xs:string" />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="ArticleId">
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="xs:string">
+          <xs:attribute default="pubmed" name="IdType">
+            <xs:simpleType>
+              <xs:restriction base="xs:NMTOKEN">
+                <xs:enumeration value="doi" />
+                <xs:enumeration value="pii" />
+                <xs:enumeration value="pmcpid" />
+                <xs:enumeration value="pmpid" />
+                <xs:enumeration value="pmc" />
+                <xs:enumeration value="mid" />
+                <xs:enumeration value="sici" />
+                <xs:enumeration value="pubmed" />
+                <xs:enumeration value="medline" />
+                <xs:enumeration value="pmcid" />
+                <xs:enumeration value="pmcbook" />
+                <xs:enumeration value="bookaccession" />
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:attribute>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="ArticleIdList">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="1" maxOccurs="unbounded" ref="ArticleId" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="ArticleTitle">
+    <xs:complexType mixed="true">
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="b" />
+        <xs:element ref="i" />
+        <xs:element ref="sup" />
+        <xs:element ref="sub" />
+        <xs:element ref="u" />
+        <xs:element ref="mml:math" />
+      </xs:choice>
+      <xs:attribute name="book" type="xs:string" />
+      <xs:attribute name="part" type="xs:string" />
+      <xs:attribute name="sec" type="xs:string" />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="Author">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:choice>
+          <xs:sequence>
+            <xs:element ref="LastName" />
+            <xs:element minOccurs="0" maxOccurs="1" ref="ForeName" />
+            <xs:element minOccurs="0" maxOccurs="1" ref="Initials" />
+            <xs:element minOccurs="0" maxOccurs="1" ref="Suffix" />
+          </xs:sequence>
+          <xs:element ref="CollectiveName" />
+        </xs:choice>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="Identifier" />
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="AffiliationInfo" />
+      </xs:sequence>
+      <xs:attribute default="Y" name="ValidYN">
+        <xs:simpleType>
+          <xs:restriction base="xs:NMTOKEN">
+            <xs:enumeration value="Y" />
+            <xs:enumeration value="N" />
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="EqualContrib">
+        <xs:simpleType>
+          <xs:restriction base="xs:NMTOKEN">
+            <xs:enumeration value="Y" />
+            <xs:enumeration value="N" />
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="AuthorList">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="1" maxOccurs="unbounded" ref="Author" />
+      </xs:sequence>
+      <xs:attribute default="Y" name="CompleteYN">
+        <xs:simpleType>
+          <xs:restriction base="xs:NMTOKEN">
+            <xs:enumeration value="Y" />
+            <xs:enumeration value="N" />
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="Type">
+        <xs:simpleType>
+          <xs:restriction base="xs:NMTOKEN">
+            <xs:enumeration value="authors" />
+            <xs:enumeration value="editors" />
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="b">
+    <xs:complexType mixed="true">
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="b" />
+        <xs:element ref="i" />
+        <xs:element ref="sup" />
+        <xs:element ref="sub" />
+        <xs:element ref="u" />
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="BeginningDate">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="Year" />
+        <xs:choice minOccurs="0" maxOccurs="1">
+          <xs:sequence>
+            <xs:element ref="Month" />
+            <xs:element minOccurs="0" maxOccurs="1" ref="Day" />
+          </xs:sequence>
+          <xs:element ref="Season" />
+        </xs:choice>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="Book">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="Publisher" />
+        <xs:element ref="BookTitle" />
+        <xs:element ref="PubDate" />
+        <xs:element minOccurs="0" maxOccurs="1" ref="BeginningDate" />
+        <xs:element minOccurs="0" maxOccurs="1" ref="EndingDate" />
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="AuthorList" />
+        <xs:element minOccurs="0" maxOccurs="1" ref="InvestigatorList" />
+        <xs:element minOccurs="0" maxOccurs="1" ref="Volume" />
+        <xs:element minOccurs="0" maxOccurs="1" ref="VolumeTitle" />
+        <xs:element minOccurs="0" maxOccurs="1" ref="Edition" />
+        <xs:element minOccurs="0" maxOccurs="1" ref="CollectionTitle" />
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="Isbn" />
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="ELocationID" />
+        <xs:element minOccurs="0" maxOccurs="1" ref="Medium" />
+        <xs:element minOccurs="0" maxOccurs="1" ref="ReportNumber" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="BookTitle">
+    <xs:complexType mixed="true">
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="b" />
+        <xs:element ref="i" />
+        <xs:element ref="sup" />
+        <xs:element ref="sub" />
+        <xs:element ref="u" />
+        <xs:element ref="mml:math" />
+      </xs:choice>
+      <xs:attribute name="book" type="xs:string" />
+      <xs:attribute name="part" type="xs:string" />
+      <xs:attribute name="sec" type="xs:string" />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="Chemical">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="RegistryNumber" />
+        <xs:element ref="NameOfSubstance" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="ChemicalList">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="1" maxOccurs="unbounded" ref="Chemical" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="Citation">
+    <xs:complexType mixed="true">
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="b" />
+        <xs:element ref="i" />
+        <xs:element ref="sup" />
+        <xs:element ref="sub" />
+        <xs:element ref="u" />
+        <xs:element ref="mml:math" />
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="CitationSubset" type="xs:string" />
+  <xs:element name="CoiStatement">
+    <xs:complexType mixed="true">
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="b" />
+        <xs:element ref="i" />
+        <xs:element ref="sup" />
+        <xs:element ref="sub" />
+        <xs:element ref="u" />
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="CollectionTitle">
+    <xs:complexType mixed="true">
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="b" />
+        <xs:element ref="i" />
+        <xs:element ref="sup" />
+        <xs:element ref="sub" />
+        <xs:element ref="u" />
+        <xs:element ref="mml:math" />
+      </xs:choice>
+      <xs:attribute name="book" type="xs:string" />
+      <xs:attribute name="part" type="xs:string" />
+      <xs:attribute name="sec" type="xs:string" />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="CollectiveName">
+    <xs:complexType mixed="true">
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="b" />
+        <xs:element ref="i" />
+        <xs:element ref="sup" />
+        <xs:element ref="sub" />
+        <xs:element ref="u" />
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="CommentsCorrections">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="RefSource" />
+        <xs:element minOccurs="0" maxOccurs="1" ref="PMID" />
+        <xs:element minOccurs="0" maxOccurs="1" ref="Note" />
+      </xs:sequence>
+      <xs:attribute name="RefType" use="required">
+        <xs:simpleType>
+          <xs:restriction base="xs:NMTOKEN">
+            <xs:enumeration value="AssociatedDataset" />
+            <xs:enumeration value="AssociatedPublication" />
+            <xs:enumeration value="CommentIn" />
+            <xs:enumeration value="CommentOn" />
+            <xs:enumeration value="CorrectedandRepublishedIn" />
+            <xs:enumeration value="CorrectedandRepublishedFrom" />
+            <xs:enumeration value="ErratumIn" />
+            <xs:enumeration value="ErratumFor" />
+            <xs:enumeration value="ExpressionOfConcernIn" />
+            <xs:enumeration value="ExpressionOfConcernFor" />
+            <xs:enumeration value="RepublishedIn" />
+            <xs:enumeration value="RepublishedFrom" />
+            <xs:enumeration value="RetractedandRepublishedIn" />
+            <xs:enumeration value="RetractedandRepublishedFrom" />
+            <xs:enumeration value="RetractionIn" />
+            <xs:enumeration value="RetractionOf" />
+            <xs:enumeration value="UpdateIn" />
+            <xs:enumeration value="UpdateOf" />
+            <xs:enumeration value="SummaryForPatientsIn" />
+            <xs:enumeration value="OriginalReportIn" />
+            <xs:enumeration value="ReprintIn" />
+            <xs:enumeration value="ReprintOf" />
+            <xs:enumeration value="Cites" />
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="CommentsCorrectionsList">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="1" maxOccurs="unbounded" ref="CommentsCorrections" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="ContractNumber" type="xs:string" />
+  <xs:element name="ContributionDate">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="Year" />
+        <xs:choice minOccurs="0" maxOccurs="1">
+          <xs:sequence>
+            <xs:element ref="Month" />
+            <xs:element minOccurs="0" maxOccurs="1" ref="Day" />
+          </xs:sequence>
+          <xs:element ref="Season" />
+        </xs:choice>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="CopyrightInformation" type="xs:string" />
+  <xs:element name="Country" type="xs:string" />
+  <xs:element name="DataBank">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="DataBankName" />
+        <xs:element minOccurs="0" maxOccurs="1" ref="AccessionNumberList" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="DataBankList">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="1" maxOccurs="unbounded" ref="DataBank" />
+      </xs:sequence>
+      <xs:attribute default="Y" name="CompleteYN">
+        <xs:simpleType>
+          <xs:restriction base="xs:NMTOKEN">
+            <xs:enumeration value="Y" />
+            <xs:enumeration value="N" />
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="DataBankName" type="xs:string" />
+  <xs:element name="DateCompleted">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="Year" />
+        <xs:element ref="Month" />
+        <xs:element ref="Day" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="DateRevised">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="Year" />
+        <xs:element ref="Month" />
+        <xs:element ref="Day" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="Day" type="xs:string" />
+  <xs:element name="DescriptorName">
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="xs:string">
+          <xs:attribute default="N" name="MajorTopicYN">
+            <xs:simpleType>
+              <xs:restriction base="xs:NMTOKEN">
+                <xs:enumeration value="Y" />
+                <xs:enumeration value="N" />
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:attribute>
+          <xs:attribute name="Type">
+            <xs:simpleType>
+              <xs:restriction base="xs:NMTOKEN">
+                <xs:enumeration value="Geographic" />
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:attribute>
+          <xs:attribute name="UI" type="xs:string" use="required" />
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="DispFormula">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="mml:math" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="Edition" type="xs:string" />
+  <xs:element name="ELocationID">
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="xs:string">
+          <xs:attribute name="EIdType" use="required">
+            <xs:simpleType>
+              <xs:restriction base="xs:NMTOKEN">
+                <xs:enumeration value="doi" />
+                <xs:enumeration value="pii" />
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:attribute>
+          <xs:attribute default="Y" name="ValidYN">
+            <xs:simpleType>
+              <xs:restriction base="xs:NMTOKEN">
+                <xs:enumeration value="Y" />
+                <xs:enumeration value="N" />
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:attribute>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="EndingDate">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="Year" />
+        <xs:choice minOccurs="0" maxOccurs="1">
+          <xs:sequence>
+            <xs:element ref="Month" />
+            <xs:element minOccurs="0" maxOccurs="1" ref="Day" />
+          </xs:sequence>
+          <xs:element ref="Season" />
+        </xs:choice>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="EndPage" type="xs:string" />
+  <xs:element name="ForeName" type="xs:string" />
+  <xs:element name="GeneSymbol" type="xs:string" />
+  <xs:element name="GeneSymbolList">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="1" maxOccurs="unbounded" ref="GeneSymbol" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GeneralNote">
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="xs:string">
+          <xs:attribute default="NLM" name="Owner">
+            <xs:simpleType>
+              <xs:restriction base="xs:NMTOKEN">
+                <xs:enumeration value="NLM" />
+                <xs:enumeration value="NASA" />
+                <xs:enumeration value="PIP" />
+                <xs:enumeration value="KIE" />
+                <xs:enumeration value="HSR" />
+                <xs:enumeration value="HMD" />
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:attribute>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="Grant">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="1" ref="GrantID" />
+        <xs:element minOccurs="0" maxOccurs="1" ref="Acronym" />
+        <xs:element ref="Agency" />
+        <xs:element ref="Country" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GrantID" type="xs:string" />
+  <xs:element name="GrantList">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="1" maxOccurs="unbounded" ref="Grant" />
+      </xs:sequence>
+      <xs:attribute default="Y" name="CompleteYN">
+        <xs:simpleType>
+          <xs:restriction base="xs:NMTOKEN">
+            <xs:enumeration value="Y" />
+            <xs:enumeration value="N" />
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="History">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="1" maxOccurs="unbounded" ref="PubMedPubDate" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="Hour" type="xs:string" />
+  <xs:element name="i">
+    <xs:complexType mixed="true">
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="b" />
+        <xs:element ref="i" />
+        <xs:element ref="sup" />
+        <xs:element ref="sub" />
+        <xs:element ref="u" />
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="Identifier">
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="xs:string">
+          <xs:attribute name="Source" type="xs:string" use="required" />
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="Initials" type="xs:string" />
+  <xs:element name="Investigator">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="LastName" />
+        <xs:element minOccurs="0" maxOccurs="1" ref="ForeName" />
+        <xs:element minOccurs="0" maxOccurs="1" ref="Initials" />
+        <xs:element minOccurs="0" maxOccurs="1" ref="Suffix" />
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="Identifier" />
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="AffiliationInfo" />
+      </xs:sequence>
+      <xs:attribute default="Y" name="ValidYN">
+        <xs:simpleType>
+          <xs:restriction base="xs:NMTOKEN">
+            <xs:enumeration value="Y" />
+            <xs:enumeration value="N" />
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="InvestigatorList">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="1" maxOccurs="unbounded" ref="Investigator" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="Isbn" type="xs:string" />
+  <xs:element name="ISOAbbreviation" type="xs:string" />
+  <xs:element name="ISSN">
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="xs:string">
+          <xs:attribute name="IssnType" use="required">
+            <xs:simpleType>
+              <xs:restriction base="xs:NMTOKEN">
+                <xs:enumeration value="Electronic" />
+                <xs:enumeration value="Print" />
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:attribute>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="ISSNLinking" type="xs:string" />
+  <xs:element name="Issue" type="xs:string" />
+  <xs:element name="Item" type="xs:string" />
+  <xs:element name="ItemList">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="1" maxOccurs="unbounded" ref="Item" />
+      </xs:sequence>
+      <xs:attribute name="ListType" type="xs:string" use="required" />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="Journal">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="1" ref="ISSN" />
+        <xs:element ref="JournalIssue" />
+        <xs:element minOccurs="0" maxOccurs="1" ref="Title" />
+        <xs:element minOccurs="0" maxOccurs="1" ref="ISOAbbreviation" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="JournalIssue">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="1" ref="Volume" />
+        <xs:element minOccurs="0" maxOccurs="1" ref="Issue" />
+        <xs:element ref="PubDate" />
+      </xs:sequence>
+      <xs:attribute name="CitedMedium" use="required">
+        <xs:simpleType>
+          <xs:restriction base="xs:NMTOKEN">
+            <xs:enumeration value="Internet" />
+            <xs:enumeration value="Print" />
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="Keyword">
+    <xs:complexType mixed="true">
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="b" />
+        <xs:element ref="i" />
+        <xs:element ref="sup" />
+        <xs:element ref="sub" />
+        <xs:element ref="u" />
+        <xs:element ref="mml:math" />
+      </xs:choice>
+      <xs:attribute default="N" name="MajorTopicYN">
+        <xs:simpleType>
+          <xs:restriction base="xs:NMTOKEN">
+            <xs:enumeration value="Y" />
+            <xs:enumeration value="N" />
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="KeywordList">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="1" maxOccurs="unbounded" ref="Keyword" />
+      </xs:sequence>
+      <xs:attribute default="NLM" name="Owner">
+        <xs:simpleType>
+          <xs:restriction base="xs:NMTOKEN">
+            <xs:enumeration value="NLM" />
+            <xs:enumeration value="NLM-AUTO" />
+            <xs:enumeration value="NASA" />
+            <xs:enumeration value="PIP" />
+            <xs:enumeration value="KIE" />
+            <xs:enumeration value="NOTNLM" />
+            <xs:enumeration value="HHS" />
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="Language" type="xs:string" />
+  <xs:element name="LastName" type="xs:string" />
+  <xs:element name="LocationLabel">
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="xs:string">
+          <xs:attribute name="Type">
+            <xs:simpleType>
+              <xs:restriction base="xs:NMTOKEN">
+                <xs:enumeration value="part" />
+                <xs:enumeration value="chapter" />
+                <xs:enumeration value="section" />
+                <xs:enumeration value="appendix" />
+                <xs:enumeration value="figure" />
+                <xs:enumeration value="table" />
+                <xs:enumeration value="box" />
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:attribute>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="Medium" type="xs:string" />
+  <xs:element name="MedlineDate" type="xs:string" />
+  <xs:element name="MedlineJournalInfo">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="1" ref="Country" />
+        <xs:element ref="MedlineTA" />
+        <xs:element minOccurs="0" maxOccurs="1" ref="NlmUniqueID" />
+        <xs:element minOccurs="0" maxOccurs="1" ref="ISSNLinking" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="MedlinePgn" type="xs:string" />
+  <xs:element name="MedlineTA" type="xs:string" />
+  <xs:element name="MeshHeading">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="DescriptorName" />
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="QualifierName" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="MeshHeadingList">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="1" maxOccurs="unbounded" ref="MeshHeading" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="Minute" type="xs:string" />
+  <xs:element name="Month" type="xs:string" />
+  <xs:element name="NameOfSubstance">
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="xs:string">
+          <xs:attribute name="UI" type="xs:string" use="required" />
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="NlmUniqueID" type="xs:string" />
+  <xs:element name="Note" type="xs:string" />
+  <xs:element name="NumberOfReferences" type="xs:string" />
+  <xs:element name="Object">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="Param" />
+      </xs:sequence>
+      <xs:attribute name="Type" type="xs:string" use="required" />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="ObjectList">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="1" maxOccurs="unbounded" ref="Object" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="OtherAbstract">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="1" maxOccurs="unbounded" ref="AbstractText" />
+        <xs:element minOccurs="0" maxOccurs="1" ref="CopyrightInformation" />
+      </xs:sequence>
+      <xs:attribute name="Type" use="required">
+        <xs:simpleType>
+          <xs:restriction base="xs:NMTOKEN">
+            <xs:enumeration value="AAMC" />
+            <xs:enumeration value="AIDS" />
+            <xs:enumeration value="KIE" />
+            <xs:enumeration value="PIP" />
+            <xs:enumeration value="NASA" />
+            <xs:enumeration value="Publisher" />
+            <xs:enumeration value="plain-language-summary" />
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute default="eng" name="Language" type="xs:string" />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="OtherID">
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="xs:string">
+          <xs:attribute name="Source" use="required">
+            <xs:simpleType>
+              <xs:restriction base="xs:NMTOKEN">
+                <xs:enumeration value="NASA" />
+                <xs:enumeration value="KIE" />
+                <xs:enumeration value="PIP" />
+                <xs:enumeration value="POP" />
+                <xs:enumeration value="ARPL" />
+                <xs:enumeration value="CPC" />
+                <xs:enumeration value="IND" />
+                <xs:enumeration value="CPFH" />
+                <xs:enumeration value="CLML" />
+                <xs:enumeration value="NRCBL" />
+                <xs:enumeration value="NLM" />
+                <xs:enumeration value="QCIM" />
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:attribute>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="PMID">
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="xs:string">
+          <xs:attribute name="Version" type="xs:string" use="required" />
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="Pagination">
+    <xs:complexType>
+      <xs:choice>
+        <xs:sequence>
+          <xs:element ref="StartPage" />
+          <xs:element minOccurs="0" maxOccurs="1" ref="EndPage" />
+          <xs:element minOccurs="0" maxOccurs="1" ref="MedlinePgn" />
+        </xs:sequence>
+        <xs:element ref="MedlinePgn" />
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="Param">
+    <xs:complexType mixed="true">
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="b" />
+        <xs:element ref="i" />
+        <xs:element ref="sup" />
+        <xs:element ref="sub" />
+        <xs:element ref="u" />
+      </xs:choice>
+      <xs:attribute name="Name" type="xs:string" use="required" />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="PersonalNameSubject">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="LastName" />
+        <xs:element minOccurs="0" maxOccurs="1" ref="ForeName" />
+        <xs:element minOccurs="0" maxOccurs="1" ref="Initials" />
+        <xs:element minOccurs="0" maxOccurs="1" ref="Suffix" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="PersonalNameSubjectList">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="1" maxOccurs="unbounded" ref="PersonalNameSubject" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="PubDate">
+    <xs:complexType>
+      <xs:choice>
+        <xs:sequence>
+          <xs:element ref="Year" />
+          <xs:choice minOccurs="0" maxOccurs="1">
+            <xs:sequence>
+              <xs:element ref="Month" />
+              <xs:element minOccurs="0" maxOccurs="1" ref="Day" />
+            </xs:sequence>
+            <xs:element ref="Season" />
+          </xs:choice>
+        </xs:sequence>
+        <xs:element ref="MedlineDate" />
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="PublicationStatus" type="xs:string" />
+  <xs:element name="PublicationType">
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="xs:string">
+          <xs:attribute name="UI" type="xs:string" use="required" />
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="PublicationTypeList">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="1" maxOccurs="unbounded" ref="PublicationType" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
   <xs:element name="PubMedPubDate">
     <xs:complexType>
-      <xs:complexContent>
-        <xs:extension base="normal.date">
-          <xs:attributeGroup ref="attlist.PubMedPubDate"/>
-        </xs:extension>
-      </xs:complexContent>
+      <xs:sequence>
+        <xs:element ref="Year" />
+        <xs:element ref="Month" />
+        <xs:element ref="Day" />
+        <xs:sequence minOccurs="0" maxOccurs="1">
+          <xs:element ref="Hour" />
+          <xs:sequence minOccurs="0" maxOccurs="1">
+            <xs:element ref="Minute" />
+            <xs:element minOccurs="0" maxOccurs="1" ref="Second" />
+          </xs:sequence>
+        </xs:sequence>
+      </xs:sequence>
+      <xs:attribute name="PubStatus" use="required">
+        <xs:simpleType>
+          <xs:restriction base="xs:NMTOKEN">
+            <xs:enumeration value="received" />
+            <xs:enumeration value="accepted" />
+            <xs:enumeration value="epublish" />
+            <xs:enumeration value="ppublish" />
+            <xs:enumeration value="revised" />
+            <xs:enumeration value="aheadofprint" />
+            <xs:enumeration value="retracted" />
+            <xs:enumeration value="ecollection" />
+            <xs:enumeration value="pmc" />
+            <xs:enumeration value="pmcr" />
+            <xs:enumeration value="pubmed" />
+            <xs:enumeration value="pubmedr" />
+            <xs:enumeration value="premedline" />
+            <xs:enumeration value="medline" />
+            <xs:enumeration value="medliner" />
+            <xs:enumeration value="entrez" />
+            <xs:enumeration value="pmc-release" />
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
     </xs:complexType>
   </xs:element>
-  <xs:attributeGroup name="attlist.PubMedPubDate">
-    <xs:attribute name="PubStatus" use="required" type="pub.status"/>
-  </xs:attributeGroup>
-  <xs:element name="PublicationStatus" type="xs:string"/>
-  <xs:element name="ArticleIdList">
+  <xs:element name="Publisher">
     <xs:complexType>
       <xs:sequence>
-        <xs:element maxOccurs="unbounded" ref="ArticleId"/>
+        <xs:element ref="PublisherName" />
+        <xs:element minOccurs="0" maxOccurs="1" ref="PublisherLocation" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
-  <xs:element name="ArticleId">
+  <xs:element name="PublisherLocation" type="xs:string" />
+  <xs:element name="PublisherName">
     <xs:complexType mixed="true">
-      <xs:attributeGroup ref="attlist.ArticleId"/>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="b" />
+        <xs:element ref="i" />
+        <xs:element ref="sup" />
+        <xs:element ref="sub" />
+        <xs:element ref="u" />
+      </xs:choice>
     </xs:complexType>
   </xs:element>
-  <xs:attributeGroup name="attlist.ArticleId">
-    <xs:attribute name="IdType" default="pubmed" type="art.id.type"/>
-  </xs:attributeGroup>
-  <xs:element name="History">
+  <xs:element name="QualifierName">
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="xs:string">
+          <xs:attribute default="N" name="MajorTopicYN">
+            <xs:simpleType>
+              <xs:restriction base="xs:NMTOKEN">
+                <xs:enumeration value="Y" />
+                <xs:enumeration value="N" />
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:attribute>
+          <xs:attribute name="UI" type="xs:string" use="required" />
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="Reference">
     <xs:complexType>
       <xs:sequence>
-        <xs:element maxOccurs="unbounded" ref="PubMedPubDate"/>
+        <xs:element ref="Citation" />
+        <xs:element minOccurs="0" maxOccurs="1" ref="ArticleIdList" />
       </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="ReferenceList">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="1" ref="Title" />
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="Reference" />
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="ReferenceList" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="RefSource" type="xs:string" />
+  <xs:element name="RegistryNumber" type="xs:string" />
+  <xs:element name="ReportNumber" type="xs:string" />
+  <xs:element name="Season" type="xs:string" />
+  <xs:element name="Second" type="xs:string" />
+  <xs:element name="Section">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="1" ref="LocationLabel" />
+        <xs:element ref="SectionTitle" />
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="Section" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="Sections">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="1" maxOccurs="unbounded" ref="Section" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="SectionTitle">
+    <xs:complexType mixed="true">
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="b" />
+        <xs:element ref="i" />
+        <xs:element ref="sup" />
+        <xs:element ref="sub" />
+        <xs:element ref="u" />
+      </xs:choice>
+      <xs:attribute name="book" type="xs:string" />
+      <xs:attribute name="part" type="xs:string" />
+      <xs:attribute name="sec" type="xs:string" />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="SpaceFlightMission" type="xs:string" />
+  <xs:element name="StartPage" type="xs:string" />
+  <xs:element name="sub">
+    <xs:complexType mixed="true">
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="b" />
+        <xs:element ref="i" />
+        <xs:element ref="sup" />
+        <xs:element ref="sub" />
+        <xs:element ref="u" />
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="Suffix">
+    <xs:complexType mixed="true">
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="b" />
+        <xs:element ref="i" />
+        <xs:element ref="sup" />
+        <xs:element ref="sub" />
+        <xs:element ref="u" />
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="sup">
+    <xs:complexType mixed="true">
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="b" />
+        <xs:element ref="i" />
+        <xs:element ref="sup" />
+        <xs:element ref="sub" />
+        <xs:element ref="u" />
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="SupplMeshList">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="1" maxOccurs="unbounded" ref="SupplMeshName" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="SupplMeshName">
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="xs:string">
+          <xs:attribute name="Type" use="required">
+            <xs:simpleType>
+              <xs:restriction base="xs:NMTOKEN">
+                <xs:enumeration value="Disease" />
+                <xs:enumeration value="Protocol" />
+                <xs:enumeration value="Organism" />
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:attribute>
+          <xs:attribute name="UI" type="xs:string" use="required" />
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="Title" type="xs:string" />
+  <xs:element name="u">
+    <xs:complexType mixed="true">
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="b" />
+        <xs:element ref="i" />
+        <xs:element ref="sup" />
+        <xs:element ref="sub" />
+        <xs:element ref="u" />
+      </xs:choice>
     </xs:complexType>
   </xs:element>
   <xs:element name="URL">
-    <xs:complexType mixed="true">
-      <xs:attributeGroup ref="attlist.URL"/>
-    </xs:complexType>
-  </xs:element>
-  <xs:attributeGroup name="attlist.URL">
-    <xs:attribute name="lang" type="iso.language.codes"/>
-    <xs:attribute name="Type">
-      <xs:simpleType>
-        <xs:restriction base="xs:token">
-          <xs:enumeration value="FullText"/>
-          <xs:enumeration value="Summary"/>
-          <xs:enumeration value="fulltext"/>
-          <xs:enumeration value="summary"/>
-        </xs:restriction>
-      </xs:simpleType>
-    </xs:attribute>
-  </xs:attributeGroup>
-  <xs:element name="ObjectList">
     <xs:complexType>
-      <xs:sequence>
-        <xs:element maxOccurs="unbounded" ref="Object"/>
-      </xs:sequence>
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="Object">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element minOccurs="0" maxOccurs="unbounded" ref="Param"/>
-      </xs:sequence>
-      <xs:attributeGroup ref="attlist.Object"/>
-    </xs:complexType>
-  </xs:element>
-  <xs:attributeGroup name="attlist.Object">
-    <xs:attribute name="Type" use="required"/>
-  </xs:attributeGroup>
-  <xs:element name="Param">
-    <xs:complexType>
-      <xs:complexContent>
-        <xs:extension base="text">
-          <xs:attributeGroup ref="attlist.Param"/>
+      <xs:simpleContent>
+        <xs:extension base="xs:string">
+          <xs:attribute name="lang">
+            <xs:simpleType>
+              <xs:restriction base="xs:NMTOKEN">
+                <xs:enumeration value="AF" />
+                <xs:enumeration value="AR" />
+                <xs:enumeration value="AZ" />
+                <xs:enumeration value="BG" />
+                <xs:enumeration value="CS" />
+                <xs:enumeration value="DA" />
+                <xs:enumeration value="DE" />
+                <xs:enumeration value="EN" />
+                <xs:enumeration value="EL" />
+                <xs:enumeration value="ES" />
+                <xs:enumeration value="FA" />
+                <xs:enumeration value="FI" />
+                <xs:enumeration value="FR" />
+                <xs:enumeration value="HE" />
+                <xs:enumeration value="HU" />
+                <xs:enumeration value="HY" />
+                <xs:enumeration value="IN" />
+                <xs:enumeration value="IS" />
+                <xs:enumeration value="IT" />
+                <xs:enumeration value="IW" />
+                <xs:enumeration value="JA" />
+                <xs:enumeration value="KA" />
+                <xs:enumeration value="KO" />
+                <xs:enumeration value="LT" />
+                <xs:enumeration value="MK" />
+                <xs:enumeration value="ML" />
+                <xs:enumeration value="NL" />
+                <xs:enumeration value="NO" />
+                <xs:enumeration value="PL" />
+                <xs:enumeration value="PT" />
+                <xs:enumeration value="PS" />
+                <xs:enumeration value="RO" />
+                <xs:enumeration value="RU" />
+                <xs:enumeration value="SL" />
+                <xs:enumeration value="SK" />
+                <xs:enumeration value="SQ" />
+                <xs:enumeration value="SR" />
+                <xs:enumeration value="SV" />
+                <xs:enumeration value="SW" />
+                <xs:enumeration value="TH" />
+                <xs:enumeration value="TR" />
+                <xs:enumeration value="UK" />
+                <xs:enumeration value="VI" />
+                <xs:enumeration value="ZH" />
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:attribute>
+          <xs:attribute name="Type">
+            <xs:simpleType>
+              <xs:restriction base="xs:NMTOKEN">
+                <xs:enumeration value="FullText" />
+                <xs:enumeration value="Summary" />
+                <xs:enumeration value="fulltext" />
+                <xs:enumeration value="summary" />
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:attribute>
         </xs:extension>
-      </xs:complexContent>
+      </xs:simpleContent>
     </xs:complexType>
   </xs:element>
-  <xs:attributeGroup name="attlist.Param">
-    <xs:attribute name="Name" use="required"/>
-  </xs:attributeGroup>
-  <xs:element name="Hour" type="xs:string"/>
-  <xs:element name="Minute" type="xs:string"/>
-  <xs:element name="Second" type="xs:string"/>
-  <!-- ================================================================= -->
+  <xs:element name="VernacularTitle">
+    <xs:complexType mixed="true">
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="b" />
+        <xs:element ref="i" />
+        <xs:element ref="sup" />
+        <xs:element ref="sub" />
+        <xs:element ref="u" />
+      <!--  <xs:element ref="mml:math" /> -->
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="Volume" type="xs:string" />
+  <xs:element name="VolumeTitle">
+    <xs:complexType mixed="true">
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="b" />
+        <xs:element ref="i" />
+        <xs:element ref="sup" />
+        <xs:element ref="sub" />
+        <xs:element ref="u" />
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="Year" type="xs:string" />
 </xs:schema>
-<!-- ================================================================= -->
