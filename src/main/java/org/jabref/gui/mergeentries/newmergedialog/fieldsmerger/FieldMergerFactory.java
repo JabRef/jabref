@@ -12,9 +12,9 @@ public class FieldMergerFactory {
     }
 
     public FieldMerger create(Field field) {
-        if (field.equals(StandardField.GROUPS)) {
+        if (field == StandardField.GROUPS) {
             return new GroupMerger();
-        } else if (field.equals(StandardField.KEYWORDS)) {
+        } else if (field == StandardField.KEYWORDS) {
             return new KeywordMerger(preferencesService);
         } else if (field == StandardField.COMMENT) {
             return new CommentMerger();
