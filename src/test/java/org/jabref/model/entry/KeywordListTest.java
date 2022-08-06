@@ -88,4 +88,25 @@ public class KeywordListTest {
         assertEquals(new KeywordList(expectedOne, expectedTwo),
                 KeywordList.parse("Parent1 > Node1 > Child1, Parent2 > Node2 > Child2", ',', '>'));
     }
+
+    @Test
+    public void mergeTwoIdenticalKeywordsShouldReturnOnKeyword() {
+        assertEquals(new KeywordList("JabRef"), KeywordList.merge("JabRef", "JabRef", ','));
+    }
+
+    @Test
+    public void mergeOneEmptyKeywordAnAnotherNonEmptyShouldReturnTheNonEmptyKeyword() {
+        assertEquals(new KeywordList("JabRef"), KeywordList.merge("", "JabRef", ','));
+    }
+
+    @Test
+    public void mergeTwoDistinctKeywordsShouldReturnTheTwoKeywordsMerged() {
+        assertEquals(new KeywordList("Figma", "JabRef"), KeywordList.merge("Figma", "JabRef", ','));
+        assertEquals(new KeywordList("JabRef", "Figma"), KeywordList.merge("Figma", "JabRef", ','));
+    }
+
+    @Test
+    public void mergeTwoListsOfKeywordsShouldReturnTheKeywordsMerged() {
+        assertEquals(new KeywordList("Figma", "Adobe", "JabRef", "Eclipse", "JetBrains"), KeywordList.merge("Figma, Adobe, JetBrains, Eclipse", "Adobe, JabRef", ','));
+    }
 }
