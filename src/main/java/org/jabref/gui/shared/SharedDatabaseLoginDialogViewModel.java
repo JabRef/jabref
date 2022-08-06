@@ -212,6 +212,9 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
         }
 
         sharedDatabasePreferences.setRememberPassword(rememberPassword.get());
+
+        sharedDatabasePreferences.setFolder(folder.getValue());
+        sharedDatabasePreferences.setAutosave(autosave.get());
     }
 
     /**
@@ -225,6 +228,8 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
         Optional<String> sharedDatabaseUser = sharedDatabasePreferences.getUser();
         Optional<String> sharedDatabasePassword = sharedDatabasePreferences.getPassword();
         boolean sharedDatabaseRememberPassword = sharedDatabasePreferences.getRememberPassword();
+        Optional<String> sharedDatabaseFolder = sharedDatabasePreferences.getFolder();
+        boolean sharedDatabaseAutosave = sharedDatabasePreferences.getAutosave();
         Optional<String> sharedDatabaseKeystoreFile = sharedDatabasePreferences.getKeyStoreFile();
 
         if (sharedDatabaseType.isPresent()) {
@@ -248,6 +253,9 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
         }
 
         rememberPassword.set(sharedDatabaseRememberPassword);
+        
+        sharedDatabaseFolder.ifPresent(folder::set);
+        autosave.set(sharedDatabaseAutosave);
     }
 
     private boolean isSharedDatabaseAlreadyPresent(DBMSConnectionProperties connectionProperties) {

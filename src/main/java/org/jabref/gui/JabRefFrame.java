@@ -127,6 +127,7 @@ import org.jabref.logic.citationstyle.CitationStyleOutputFormat;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.IdFetcher;
 import org.jabref.logic.importer.ImportCleanup;
+import org.jabref.logic.importer.ImportFormatReader;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.WebFetchers;
 import org.jabref.logic.l10n.Localization;
@@ -183,6 +184,7 @@ public class JabRefFrame extends BorderPane {
     private Subscription dividerSubscription;
 
     private final TaskExecutor taskExecutor;
+    private final ImportFormatReader importFormatReader;
 
     public JabRefFrame(Stage mainStage) {
         this.mainStage = mainStage;
@@ -194,6 +196,7 @@ public class JabRefFrame extends BorderPane {
         this.globalSearchBar = new GlobalSearchBar(this, stateManager, prefs, undoManager);
         this.fileHistory = new FileHistoryMenu(prefs, dialogService, getOpenDatabaseAction());
         this.taskExecutor = Globals.TASK_EXECUTOR;
+        this.importFormatReader = Globals.IMPORT_FORMAT_READER;
         this.setOnKeyTyped(key -> {
             if (this.fileHistory.isShowing()) {
                 if (this.fileHistory.openFileByKey(key)) {
@@ -232,8 +235,8 @@ public class JabRefFrame extends BorderPane {
             this.getScene().setOnDragEntered(event -> {
                 // It is necessary to setOnDragOver for newly opened tabs
                 // drag'n'drop on tabs covered dnd on tabbedPane, so dnd on tabs should contain all dnds on tabbedPane
-                tabbedPane.lookupAll(".tab").forEach(t -> {
-                    t.setOnDragOver(tabDragEvent -> {
+                tabbedPane.lookupAll(".tab").forEach(tab -> {
+                    tab.setOnDragOver(tabDragEvent -> {
                         if (DragAndDropHelper.hasBibFiles(tabDragEvent.getDragboard())) {
                             tabDragEvent.acceptTransferModes(TransferMode.ANY);
                             if (!tabbedPane.getTabs().contains(dndIndicator)) {
@@ -249,8 +252,8 @@ public class JabRefFrame extends BorderPane {
                             tabDragEvent.consume();
                         }
                     });
-                    t.setOnDragExited(event1 -> tabbedPane.getTabs().remove(dndIndicator));
-                    t.setOnDragDropped(tabDragEvent -> {
+                    tab.setOnDragExited(event1 -> tabbedPane.getTabs().remove(dndIndicator));
+                    tab.setOnDragDropped(tabDragEvent -> {
                         if (DragAndDropHelper.hasBibFiles(tabDragEvent.getDragboard())) {
                             tabbedPane.getTabs().remove(dndIndicator);
                             List<Path> bibFiles = DragAndDropHelper.getBibFiles(tabDragEvent.getDragboard());
@@ -260,7 +263,7 @@ public class JabRefFrame extends BorderPane {
                             tabDragEvent.consume();
                         } else {
                             for (Tab libraryTab : tabbedPane.getTabs()) {
-                                if (libraryTab.getId().equals(t.getId()) &&
+                                if (libraryTab.getId().equals(tab.getId()) &&
                                         !tabbedPane.getSelectionModel().getSelectedItem().equals(libraryTab)) {
                                     ((LibraryTab) libraryTab).dropEntry(stateManager.getLocalDragboard().getBibEntries());
                                 }
@@ -1140,7 +1143,7 @@ public class JabRefFrame extends BorderPane {
     public LibraryTab addTab(BibDatabaseContext databaseContext, boolean raisePanel) {
         Objects.requireNonNull(databaseContext);
 
-        LibraryTab libraryTab = new LibraryTab(this, prefs, stateManager, themeManager, databaseContext, ExternalFileTypes.getInstance());
+        LibraryTab libraryTab = new LibraryTab(this, prefs, stateManager, themeManager, databaseContext, ExternalFileTypes.getInstance(), importFormatReader);
         addTab(libraryTab, raisePanel);
         return libraryTab;
     }

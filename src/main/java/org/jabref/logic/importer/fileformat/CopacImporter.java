@@ -137,7 +137,7 @@ public class CopacImporter extends Importer {
                 } else if ("DT- ".equals(code)) {
                     setOrAppend(b, new UnknownField("documenttype"), line.substring(4).trim(), ", ");
                 } else {
-                    setOrAppend(b, FieldFactory.parseField(code.substring(0, 2)), line.substring(4).trim(), ", ");
+                    setOrAppend(b, FieldFactory.parseField(StandardEntryType.Book, line.substring(0, 2)), line.substring(4).trim(), ", ");
                 }
             }
             results.add(b);

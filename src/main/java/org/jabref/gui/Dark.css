@@ -132,3 +132,11 @@
 .notification-bar > .pane {
     -fx-background-color: -fx-light-text-color;
 }
+
+.rating > .container > .button {
+    -fx-icon-color: derive(-fx-light-text-color, -50%);
+}
+
+.rating > .container > .button.strong {
+    -fx-icon-color: -fx-light-text-color;
+}
