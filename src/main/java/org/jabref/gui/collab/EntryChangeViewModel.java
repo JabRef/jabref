@@ -30,7 +30,7 @@ class EntryChangeViewModel extends DatabaseChangeViewModel {
     private final DialogService dialogService;
 
     public EntryChangeViewModel(BibEntry entry, BibEntry newEntry, DialogService dialogService) {
-        super(entry.getCitationKey().map(key -> Localization.lang("Modified entry") + ": '" + key + '\'')
+        super(entry.getCitationKey().map(key -> Localization.lang("Modified entry '%0'", key))
                    .orElse(Localization.lang("Modified entry")));
 
         this.oldEntry = entry;
