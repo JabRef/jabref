@@ -43,7 +43,7 @@ public class ExternalFileTypesTab extends AbstractPreferenceTabView<ExternalFile
 
     @FXML
     public void initialize() {
-        viewModel = new ExternalFileTypesTabViewModel(ExternalFileTypes.getInstance());
+        viewModel = new ExternalFileTypesTabViewModel(ExternalFileTypes.getInstance(), preferencesService);
 
         fileTypesTable.setItems(viewModel.getFileTypes());
 

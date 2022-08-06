@@ -2760,8 +2760,8 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     @Override
-    public Optional<String> getExternalFileTypes() {
-        return Optional.ofNullable(get(EXTERNAL_FILE_TYPES, null));
+    public String getExternalFileTypes() {
+        return get(EXTERNAL_FILE_TYPES);
     }
 
     @Override

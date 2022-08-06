@@ -3,7 +3,9 @@ package org.jabref.gui.externalfiletype;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -30,7 +32,7 @@ public enum ExternalFileTypes {
     private final ExternalFileType HTML_FALLBACK_TYPE = StandardExternalFileType.URL;
 
     ExternalFileTypes() {
-        updateExternalFileTypes();
+        externalFileTypes.addAll(fromString(Globals.prefs.getExternalFileTypes()));
     }
 
     public static ExternalFileTypes getInstance() {
@@ -43,6 +45,11 @@ public enum ExternalFileTypes {
 
     public Set<ExternalFileType> getExternalFileTypeSelection() {
         return externalFileTypes;
+    }
+
+    public void setExternalFileTypes(Collection<ExternalFileType> types) {
+        externalFileTypes.clear();
+        externalFileTypes.addAll(types);
     }
 
     /**
@@ -124,21 +131,44 @@ public enum ExternalFileTypes {
         }
     }
 
+    public Optional<ExternalFileType> getExternalFileTypeByFile(Path file) {
+        final String filePath = file.toString();
+        final Optional<String> extension = FileHelper.getFileExtension(filePath);
+        return extension.flatMap(this::getExternalFileTypeByExt);
+    }
+
+    public Optional<ExternalFileType> fromLinkedFile(LinkedFile linkedFile, boolean deduceUnknownType) {
+        Optional<ExternalFileType> type = getExternalFileTypeByName(linkedFile.getFileType());
+        boolean isUnknownType = type.isEmpty() || (type.get() instanceof UnknownExternalFileType);
+
+        if (isUnknownType && deduceUnknownType) {
+            // No file type was recognized. Try to find a usable file type based on mime type:
+            Optional<ExternalFileType> mimeType = getExternalFileTypeByMimeType(linkedFile.getFileType());
+            if (mimeType.isPresent()) {
+                return mimeType;
+            }
+
+            // No type could be found from mime type. Try based on the extension:
+            return FileHelper.getFileExtension(linkedFile.getLink())
+                             .flatMap(this::getExternalFileTypeByExt);
+        } else {
+            return type;
+        }
+    }
+
     /**
-     * Reset the List of external file types after user customization.
-     *
-     * @param types The new List of external file types. This is the complete list, not just new entries.
+     * @return A StringList of customized and removed file types compared to the default list of external file types for storing
      */
-    public void setExternalFileTypes(List<ExternalFileType> types) {
+    public String toString() {
         // First find a list of the default types:
         List<ExternalFileType> defTypes = new ArrayList<>(getDefaultExternalFileTypes());
         // Make a list of types that are unchanged:
         List<ExternalFileType> unchanged = new ArrayList<>();
+        // Create a result list
+        List<ExternalFileType> results = new ArrayList<>();
 
-        externalFileTypes.clear();
-        for (ExternalFileType type : types) {
-            externalFileTypes.add(type);
-
+        for (ExternalFileType type : externalFileTypes) {
+            results.add(type);
             // See if we can find a type with matching name in the default type list:
             ExternalFileType found = null;
             for (ExternalFileType defType : defTypes) {
@@ -163,52 +193,38 @@ public enum ExternalFileTypes {
         // and from the list of defaults, since we don't need to mention these in prefs:
         for (ExternalFileType type : unchanged) {
             defTypes.remove(type);
-            types.remove(type);
+            results.remove(type);
         }
 
         // Now set up the array to write to prefs, containing all new types, all modified
         // types, and a flag denoting each default type that has been removed:
-        String[][] array = new String[types.size() + defTypes.size()][];
+        String[][] array = new String[results.size() + defTypes.size()][];
         int i = 0;
-        for (ExternalFileType type : types) {
-            array[i] = getStringArrayRepresentation(type);
+        for (ExternalFileType type : results) {
+            array[i] = type.toStringArray();
             i++;
         }
         for (ExternalFileType type : defTypes) {
             array[i] = new String[] {type.getName(), FILE_TYPE_REMOVED_FLAG};
             i++;
         }
-        Globals.prefs.storeExternalFileTypes(FileFieldWriter.encodeStringArray(array));
+        return FileFieldWriter.encodeStringArray(array);
     }
 
     /**
-     * Return a String array representing this file type. This is used for storage into
-     * Preferences, and the same array can be used to construct the file type later,
-     * using the String[] constructor.
-     *
-     * @return A String[] containing all information about this file type.
+     * Set up the list of external file types, either from default values, or from values recorded in PreferencesService.
      */
-    private String[] getStringArrayRepresentation(ExternalFileType type) {
-        return new String[] {type.getName(), type.getExtension(), type.getMimeType(), type.getOpenWithApplication(), type.getIcon().name()};
-    }
-
-    /**
-     * Set up the list of external file types, either from default values, or from values recorded in Preferences.
-     */
-    private void updateExternalFileTypes() {
+    public static Set<ExternalFileType> fromString(String storedFileTypes) {
         // First get a list of the default file types as a starting point:
-        List<ExternalFileType> types = new ArrayList<>(getDefaultExternalFileTypes());
+        Set<ExternalFileType> types = new HashSet<>(getDefaultExternalFileTypes());
+
         // If no changes have been stored, simply use the defaults:
-        Optional<String> storedFileTypes = Globals.prefs.getExternalFileTypes();
-        if (storedFileTypes.isEmpty()) {
-            externalFileTypes.clear();
-            externalFileTypes.addAll(types);
-            return;
+        if (StringUtil.isBlank(storedFileTypes)) {
+            return types;
         }
 
         // Read the prefs information for file types:
-        String[][] vals = StringUtil
-                .decodeStringDoubleArray(storedFileTypes.orElse(""));
+        String[][] vals = StringUtil.decodeStringDoubleArray(storedFileTypes);
         for (String[] val : vals) {
             if ((val.length == 2) && val[1].equals(FILE_TYPE_REMOVED_FLAG)) {
                 // This entry indicates that a default entry type should be removed:
@@ -246,31 +262,6 @@ public enum ExternalFileTypes {
         }
 
         // Finally, build the list of types based on the modified defaults list:
-        externalFileTypes.addAll(types);
-    }
-
-    public Optional<ExternalFileType> getExternalFileTypeByFile(Path file) {
-        final String filePath = file.toString();
-        final Optional<String> extension = FileHelper.getFileExtension(filePath);
-        return extension.flatMap(this::getExternalFileTypeByExt);
-    }
-
-    public Optional<ExternalFileType> fromLinkedFile(LinkedFile linkedFile, boolean deduceUnknownType) {
-        Optional<ExternalFileType> type = getExternalFileTypeByName(linkedFile.getFileType());
-        boolean isUnknownType = type.isEmpty() || (type.get() instanceof UnknownExternalFileType);
-
-        if (isUnknownType && deduceUnknownType) {
-            // No file type was recognized. Try to find a usable file type based on mime type:
-            Optional<ExternalFileType> mimeType = getExternalFileTypeByMimeType(linkedFile.getFileType());
-            if (mimeType.isPresent()) {
-                return mimeType;
-            }
-
-            // No type could be found from mime type. Try based on the extension:
-            return FileHelper.getFileExtension(linkedFile.getLink())
-                             .flatMap(this::getExternalFileTypeByExt);
-        } else {
-            return type;
-        }
+        return types;
     }
 }

@@ -3,7 +3,6 @@ package org.jabref.preferences;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.prefs.BackingStoreException;
 
@@ -278,7 +277,7 @@ public interface PreferencesService {
 
     void storeLastPreferencesExportPath(Path exportFile);
 
-    Optional<String> getExternalFileTypes();
+    String getExternalFileTypes();
 
     void storeExternalFileTypes(String externalFileTypes);
 
