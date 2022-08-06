@@ -212,10 +212,6 @@ public class FieldRowView {
     }
 
     public class UnmergeCommand extends SimpleCommand {
-
-        public UnmergeCommand() {
-        }
-
         @Override
         public void execute() {
             if (fieldsMergedEdit.canUndo()) {
