@@ -96,7 +96,7 @@ public class ChangeScanner {
         }
 
         if (diff.getNewEntry() == null) {
-            return new EntryDeleteChangeViewModel(diff.getOriginalEntry());
+            return new EntryDeleteChangeViewModel(diff.getOriginalEntry(), preferencesService);
         }
 
         return new EntryChangeViewModel(diff.getOriginalEntry(), diff.getNewEntry(), dialogService);
