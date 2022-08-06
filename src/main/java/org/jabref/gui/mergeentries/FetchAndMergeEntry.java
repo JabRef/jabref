@@ -17,6 +17,8 @@ import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.importer.EntryBasedFetcher;
+import org.jabref.logic.importer.FetcherClientException;
+import org.jabref.logic.importer.FetcherServerException;
 import org.jabref.logic.importer.IdBasedFetcher;
 import org.jabref.logic.importer.ImportCleanup;
 import org.jabref.logic.importer.WebFetcher;
@@ -76,7 +78,13 @@ public class FetchAndMergeEntry {
                                   })
                                   .onFailure(exception -> {
                                       LOGGER.error("Error while fetching bibliographic information", exception);
-                                      dialogService.showErrorDialogAndWait(exception);
+                                      if (exception instanceof FetcherClientException) {
+                                          dialogService.showInformationDialogAndWait(Localization.lang("Fetching information using %0", fetcher.get().getName()), Localization.lang("No data was found for the identifier"));
+                                      } else if (exception instanceof FetcherServerException) {
+                                          dialogService.showInformationDialogAndWait(Localization.lang("Fetching information using %0", fetcher.get().getName()), Localization.lang("Server not available"));
+                                      } else {
+                                          dialogService.showInformationDialogAndWait(Localization.lang("Fetching information using %0", fetcher.get().getName()), Localization.lang("Error occured %0", exception.getMessage()));
+                                      }
                                   })
                                   .executeWith(Globals.TASK_EXECUTOR);
                 }
@@ -158,7 +166,7 @@ public class FetchAndMergeEntry {
                           }
                       })
                       .onFailure(exception -> {
-                          LOGGER.error("Error while fetching entry with " + fetcher.getName(), exception);
+                          LOGGER.error("Error while fetching entry with {} ", fetcher.getName(), exception);
                           dialogService.showErrorDialogAndWait(Localization.lang("Error while fetching from %0", fetcher.getName()), exception);
                       })
                       .executeWith(taskExecutor);
