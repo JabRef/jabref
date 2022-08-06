@@ -17,27 +17,24 @@ import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.FileHelper;
 
 // Do not make this class final, as it otherwise can't be mocked for tests
-public class ExternalFileTypes {
+public enum ExternalFileTypes {
+    INSTANCE;
 
     // This String is used in the encoded list in prefs of external file type
     // modifications, in order to indicate a removed default file type:
     private static final String FILE_TYPE_REMOVED_FLAG = "REMOVED";
-    // The only instance of this class:
-    private static ExternalFileTypes singleton;
+
     // Map containing all registered external file types:
     private final Set<ExternalFileType> externalFileTypes = new TreeSet<>(Comparator.comparing(ExternalFileType::getName));
 
     private final ExternalFileType HTML_FALLBACK_TYPE = StandardExternalFileType.URL;
 
-    private ExternalFileTypes() {
+    ExternalFileTypes() {
         updateExternalFileTypes();
     }
 
     public static ExternalFileTypes getInstance() {
-        if (ExternalFileTypes.singleton == null) {
-            ExternalFileTypes.singleton = new ExternalFileTypes();
-        }
-        return ExternalFileTypes.singleton;
+        return INSTANCE;
     }
 
     public static List<ExternalFileType> getDefaultExternalFileTypes() {
