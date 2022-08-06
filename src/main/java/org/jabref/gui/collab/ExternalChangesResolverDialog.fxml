@@ -23,10 +23,10 @@
                                 <TableColumn fx:id="changeName" prefWidth="400.0" text="Name" />
                             </columns>
                         </TableView>
-                        <VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" spacing="8.0" HBox.hgrow="NEVER">
-                            <Button onAction="#acceptChanges" text="Accept" maxWidth="1.7976931348623157E308"/>
-                            <Button onAction="#denyChanges" text="Deny" maxWidth="1.7976931348623157E308"/>
-                            <Button fx:id="openAdvancedMergeDialogButton" maxWidth="1.7976931348623157E308" onAction="#openAdvancedMergeDialog" text="Merge.." />
+                        <VBox maxHeight="1.7976931348623157E308" maxWidth="Infinity" minHeight="-Infinity" minWidth="-Infinity" spacing="8.0" HBox.hgrow="NEVER">
+                            <Button onAction="#acceptChanges" text="Accept" maxWidth="Infinity"/>
+                            <Button onAction="#denyChanges" text="Deny" maxWidth="Infinity"/>
+                            <Button fx:id="openAdvancedMergeDialogButton" maxWidth="Infinity" onAction="#openAdvancedMergeDialog" text="Merge.." />
                             <HBox.margin>
                                 <Insets left="8.0" right="8.0" top="8.0" />
                             </HBox.margin>
