@@ -180,7 +180,7 @@ public class TableTabViewModel implements PreferenceTabViewModel {
     }
 
     private void insertExtraFileColumns() {
-        ExternalFileTypes.getInstance().getExternalFileTypeSelection().stream()
+        ExternalFileTypes.getInstance().getExternalFileTypes().stream()
                          .map(ExternalFileType::getName)
                          .map(name -> new MainTableColumnModel(MainTableColumnModel.Type.EXTRAFILE, name))
                          .forEach(item -> availableColumnsProperty.getValue().add(item));

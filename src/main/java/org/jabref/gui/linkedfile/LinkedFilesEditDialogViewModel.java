@@ -48,7 +48,7 @@ public class LinkedFilesEditDialogViewModel extends AbstractViewModel {
         this.dialogService = dialogService;
         this.filePreferences = filePreferences;
         this.externalFileTypes = externalFileTypes;
-        allExternalFileTypes.set(FXCollections.observableArrayList(externalFileTypes.getExternalFileTypeSelection()));
+        allExternalFileTypes.set(FXCollections.observableArrayList(externalFileTypes.getExternalFileTypes()));
 
         monadicSelectedExternalFileType = EasyBind.wrapNullable(selectedExternalFileType);
         setValues(linkedFile);
@@ -101,7 +101,7 @@ public class LinkedFilesEditDialogViewModel extends AbstractViewModel {
         selectedExternalFileType.setValue(null);
 
         // See what is a reasonable selection for the type combobox:
-        Optional<ExternalFileType> fileType = externalFileTypes.fromLinkedFile(linkedFile, false);
+        Optional<ExternalFileType> fileType = externalFileTypes.getExternalFileTypeByLinkedFile(linkedFile, false);
         if (fileType.isPresent() && !(fileType.get() instanceof UnknownExternalFileType)) {
             selectedExternalFileType.setValue(fileType.get());
         } else if ((linkedFile.getLink() != null) && (!linkedFile.getLink().isEmpty())) {

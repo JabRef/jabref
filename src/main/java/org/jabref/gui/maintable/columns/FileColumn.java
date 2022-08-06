@@ -147,7 +147,7 @@ public class FileColumn extends MainTableColumn<List<LinkedFile>> {
         if (linkedFiles.size() > 1) {
             return IconTheme.JabRefIcons.FILE_MULTIPLE.getGraphicNode();
         } else if (linkedFiles.size() == 1) {
-            return externalFileTypes.fromLinkedFile(linkedFiles.get(0), true)
+            return externalFileTypes.getExternalFileTypeByLinkedFile(linkedFiles.get(0), true)
                                     .map(ExternalFileType::getIcon)
                                     .orElse(IconTheme.JabRefIcons.FILE)
                                     .getGraphicNode();

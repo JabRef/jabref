@@ -56,7 +56,7 @@ public class CellFactory {
         // icon.setToolTipText(Localization.lang("Open file"));
         TABLE_ICONS.put(StandardField.FILE, icon);
 
-        for (ExternalFileType fileType : externalFileTypes.getExternalFileTypeSelection()) {
+        for (ExternalFileType fileType : externalFileTypes.getExternalFileTypes()) {
             icon = fileType.getIcon();
             // icon.setToolTipText(Localization.lang("Open %0 file", fileType.getName()));
             TABLE_ICONS.put(fileType.getField(), icon);

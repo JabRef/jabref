@@ -43,7 +43,7 @@ public enum ExternalFileTypes {
         return Arrays.asList(StandardExternalFileType.values());
     }
 
-    public Set<ExternalFileType> getExternalFileTypeSelection() {
+    public Set<ExternalFileType> getExternalFileTypes() {
         return externalFileTypes;
     }
 
@@ -137,7 +137,7 @@ public enum ExternalFileTypes {
         return extension.flatMap(this::getExternalFileTypeByExt);
     }
 
-    public Optional<ExternalFileType> fromLinkedFile(LinkedFile linkedFile, boolean deduceUnknownType) {
+    public Optional<ExternalFileType> getExternalFileTypeByLinkedFile(LinkedFile linkedFile, boolean deduceUnknownType) {
         Optional<ExternalFileType> type = getExternalFileTypeByName(linkedFile.getFileType());
         boolean isUnknownType = type.isEmpty() || (type.get() instanceof UnknownExternalFileType);
 
@@ -261,7 +261,6 @@ public enum ExternalFileTypes {
             }
         }
 
-        // Finally, build the list of types based on the modified defaults list:
         return types;
     }
 }

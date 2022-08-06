@@ -31,7 +31,7 @@ public class ExternalFileTypesTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public void setValues() {
-        fileTypes.setAll(externalFileTypes.getExternalFileTypeSelection());
+        fileTypes.setAll(externalFileTypes.getExternalFileTypes());
         fileTypes.sort(Comparator.comparing(ExternalFileType::getName));
     }
 
