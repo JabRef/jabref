@@ -72,6 +72,13 @@ public class KeywordList implements Iterable<Keyword> {
         return parse(keywordString, delimiter, Keyword.DEFAULT_HIERARCHICAL_DELIMITER);
     }
 
+    public static KeywordList merge(String keywordStringA, String keywordStringB, Character delimiter) {
+        KeywordList keywordListA = parse(keywordStringA, delimiter);
+        KeywordList keywordListB = parse(keywordStringB, delimiter);
+        List<Keyword> distinctKeywords = Stream.concat(keywordListA.stream(), keywordListB.stream()).distinct().toList();
+        return new KeywordList(distinctKeywords);
+    }
+
     public KeywordList createClone() {
         return new KeywordList(this.keywordChains);
     }
