@@ -10,10 +10,14 @@ import org.eclipse.jgit.api.errors.GitAPIException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class SlrGitHandlerTest {
+    private static final Logger LOGGER = LoggerFactory.getLogger(SlrGitHandlerTest.class);
+
     @TempDir
     Path repositoryPath;
     private SlrGitHandler gitHandler;
@@ -44,7 +48,7 @@ class SlrGitHandlerTest {
         Files.writeString(Path.of(repositoryPath.toString(), "TestFolder", "Test1.txt"), "This is a new line of text 2\n" + Files.readString(Path.of(repositoryPath.toString(), "TestFolder", "Test1.txt")));
         gitHandler.createCommitOnCurrentBranch("Commit 2 on branch1", false);
 
-        System.out.println(gitHandler.calculatePatchOfNewSearchResults("branch1"));
+        LOGGER.debug(gitHandler.calculatePatchOfNewSearchResults("branch1"));
         assertEquals(expectedPatch, gitHandler.calculatePatchOfNewSearchResults("branch1"));
     }
 

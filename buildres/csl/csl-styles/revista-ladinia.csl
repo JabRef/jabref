@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="utf-8"?>
+<style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" page-range-format="expanded">
+  <info>
+    <title>Revista Ladinia</title>
+    <title-short>LADINIA</title-short>
+    <id>http://www.zotero.org/styles/revista-ladinia</id>
+    <link href="http://www.zotero.org/styles/revista-ladinia" rel="self"/>
+    <link href="http://www.zotero.org/styles/apa" rel="template"/>
+    <link href="https://micura.it/la/ativites/ladinia/style-sheet" rel="documentation"/>
+    <author>
+      <name>Samuel Frontull</name>
+      <email>samuel.frontull@uibk.ac.at</email>
+    </author>
+    <author>
+      <name>Paolo Anvidalfarei</name>
+      <email>paolo@micura.it</email>
+    </author>
+    <category citation-format="author-date"/>
+    <category field="linguistics"/>
+    <issn>1124-1004</issn>
+    <updated>2022-05-11T09:51:15+01:00</updated>
+    <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
+  </info>
+  <locale xml:lang="it">
+    <terms>
+      <term name="open-quote">“</term>
+      <term name="close-quote">”</term>
+      <term name="and others"/>
+      <term name="no date">s.a.</term>
+      <term name="no-place">s.l.</term>
+      <term name="anonymous">N.N.</term>
+      <term name="editor">
+        <single>ed.</single>
+        <multiple>eds.</multiple>
+      </term>
+    </terms>
+  </locale>
+  <locale xml:lang="de">
+    <terms>
+      <term name="open-quote">“</term>
+      <term name="close-quote">”</term>
+      <term name="and others"/>
+      <term name="no date">s.a.</term>
+      <term name="no-place">s.l.</term>
+      <term name="anonymous">N.N.</term>
+      <term name="editor">
+        <single>ed.</single>
+        <multiple>eds.</multiple>
+      </term>
+    </terms>
+  </locale>
+  <locale xml:lang="en">
+    <terms>
+      <term name="open-quote">“</term>
+      <term name="close-quote">”</term>
+      <term name="and others"/>
+      <term name="no date">s.a.</term>
+      <term name="no-place">s.l.</term>
+      <term name="anonymous">N.N.</term>
+      <term name="editor">
+        <single>ed.</single>
+        <multiple>eds.</multiple>
+      </term>
+    </terms>
+  </locale>
+  <macro name="author">
+    <names variable="author">
+      <name name-as-sort-order="all" delimiter="/" form="short">
+        <name-part name="family" font-variant="small-caps"/>
+      </name>
+      <et-al term="and others"/>
+      <substitute>
+        <names variable="editor"/>
+        <text macro="anonymous"/>
+      </substitute>
+    </names>
+  </macro>
+  <macro name="anonymous">
+    <text term="anonymous"/>
+  </macro>
+  <macro name="author-bibliography">
+    <names variable="author">
+      <name name-as-sort-order="all" delimiter="/">
+        <name-part name="family" font-variant="small-caps"/>
+      </name>
+      <label prefix=" (" suffix=")"/>
+      <et-al/>
+      <substitute>
+        <names variable="editor translator"/>
+        <text macro="anonymous"/>
+      </substitute>
+    </names>
+  </macro>
+  <macro name="editor">
+    <names variable="editor translator" delimiter=", ">
+      <name name-as-sort-order="all" delimiter="/">
+        <name-part name="family" font-variant="small-caps"/>
+      </name>
+      <label prefix=" (" suffix=")"/>
+    </names>
+  </macro>
+  <macro name="issued-year">
+    <choose>
+      <if variable="issued">
+        <date variable="issued">
+          <date-part name="year"/>
+        </date>
+      </if>
+      <else>
+        <text term="no date"/>
+      </else>
+    </choose>
+  </macro>
+  <macro name="publisher-place">
+    <choose>
+      <if variable="publisher-place">
+        <text variable="publisher-place"/>
+      </if>
+      <else-if type="book" match="any">
+        <text term="no-place"/>
+      </else-if>
+    </choose>
+  </macro>
+  <macro name="place-year">
+    <group delimiter=" ">
+      <text macro="publisher-place"/>
+      <text macro="issued-year"/>
+    </group>
+  </macro>
+  <macro name="container">
+    <choose>
+      <if type="book">
+        <group delimiter=", ">
+          <text macro="editor"/>
+          <text variable="container-title"/>
+        </group>
+      </if>
+      <else>
+        <group delimiter=": ">
+          <text term="in"/>
+          <group delimiter=", ">
+            <text macro="editor"/>
+            <choose>
+              <if type="chapter">
+                <text variable="container-title"/>
+              </if>
+              <else>
+                <text variable="container-title" quotes="true"/>
+              </else>
+            </choose>
+          </group>
+        </group>
+      </else>
+    </choose>
+  </macro>
+  <macro name="volume">
+    <text variable="volume"/>
+  </macro>
+  <macro name="page">
+    <text variable="page"/>
+  </macro>
+  <citation et-al-min="4" et-al-use-first="1" initialize-with="." disambiguate-add-givenname="true" disambiguate-add-year-suffix="true" collapse="year">
+    <sort>
+      <key macro="author"/>
+      <key macro="issued-year"/>
+    </sort>
+    <layout prefix="(" suffix=")" delimiter=", ">
+      <group delimiter=" ">
+        <text macro="author"/>
+        <text macro="issued-year"/>
+      </group>
+    </layout>
+  </citation>
+  <bibliography et-al-min="4" et-al-use-first="1">
+    <sort>
+      <key macro="author-bibliography"/>
+      <key macro="issued-year"/>
+      <key variable="title"/>
+    </sort>
+    <layout suffix=".">
+      <text macro="author-bibliography" suffix=": "/>
+      <group delimiter=", ">
+        <text variable="title" font-style="italic"/>
+        <text macro="container"/>
+        <text macro="volume"/>
+        <text macro="place-year"/>
+        <text macro="page"/>
+      </group>
+    </layout>
+  </bibliography>
+</style>

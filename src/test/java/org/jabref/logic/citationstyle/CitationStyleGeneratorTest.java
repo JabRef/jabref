@@ -26,6 +26,40 @@ class CitationStyleGeneratorTest {
     private BibEntryTypesManager bibEntryTypesManager = new BibEntryTypesManager();
 
     @Test
+    void testACMCitation() {
+        BibDatabaseContext context = new BibDatabaseContext(new BibDatabase(List.of(TestEntry.getTestEntry())));
+        context.setMode(BibDatabaseMode.BIBLATEX);
+        List<CitationStyle> styleList = CitationStyle.discoverCitationStyles();
+        CitationStyle style = styleList.stream().filter(e -> "ACM SIGGRAPH".equals(e.getTitle())).findAny().orElse(null);
+        String citation = CitationStyleGenerator.generateCitation(TestEntry.getTestEntry(), style.getSource(), CitationStyleOutputFormat.HTML, context, new BibEntryTypesManager());
+
+        // if the acm-siggraph.csl citation style changes this has to be modified
+        String expected = "  <div class=\"csl-entry\">"
+                + "<span style=\"font-variant: small-caps\">Smith, B., Jones, B., and Williams, J.</span> 2016-07. Title of the test entry. <span style=\"font-style: italic\">BibTeX Journal</span> <span style=\"font-style: italic\">34</span>, 7, 45&ndash;67."
+                + "</div>\n"
+                + "";
+
+        assertEquals(expected, citation);
+    }
+
+    @Test
+    void testAPACitation() {
+        BibDatabaseContext context = new BibDatabaseContext(new BibDatabase(List.of(TestEntry.getTestEntry())));
+        context.setMode(BibDatabaseMode.BIBLATEX);
+        List<CitationStyle> styleList = CitationStyle.discoverCitationStyles();
+        CitationStyle style = styleList.stream().filter(e -> "American Psychological Association 6th edition".equals(e.getTitle())).findAny().orElse(null);
+        String citation = CitationStyleGenerator.generateCitation(TestEntry.getTestEntry(), style.getSource(), CitationStyleOutputFormat.HTML, context, new BibEntryTypesManager());
+
+        // if the apa-6th-citation.csl citation style changes this has to be modified
+        String expected = "  <div class=\"csl-entry\">"
+                + "Smith, B., Jones, B., &amp; Williams, J. (2016-07). Title of the test entry. <span style=\"font-style: italic\">BibTeX Journal</span>, <span style=\"font-style: italic\">34</span>(7), 45&ndash;67. https://doi.org/10.1001/bla.blubb"
+                + "</div>\n"
+                + "";
+
+        assertEquals(expected, citation);
+    }
+
+    @Test
     void testIgnoreNewLine() {
         BibEntry entry = new BibEntry();
         entry.setField(StandardField.AUTHOR, "Last, First and\nDoe, Jane");

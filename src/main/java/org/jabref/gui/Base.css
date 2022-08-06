@@ -98,6 +98,9 @@
     -jr-drag-target: -jr-purple;
     -jr-drag-target-hover: derive(-jr-purple, 80%);
 
+    -js-summary-text-color: #000000;
+    -js-summary-text-color-selected: #000000;
+
     /*
      Here are redefinitions of the default properties of modena. They should in principle all be derived from the
      above colors. Goal should be to make as few as possible direct color-changes to elements and only do this for
@@ -413,7 +416,7 @@ TextFlow > .tooltip-text-monospaced {
 }
 
 .progress-indicatorToolbar .percentage {
-    -fx-fill:null;
+    -fx-fill: null;
 }
 
 .check-box {
@@ -650,11 +653,11 @@ TextFlow > .tooltip-text-monospaced {
     -fx-background-color: -jr-warn;
 }
 
-.file-row-text{
+.file-row-text {
     -fx-fill: -jr-search-text;
 }
 
-.file-row-text:opacity{
+.file-row-text:opacity {
     -fx-fill: derive(-jr-search-text, 70%);
 }
 
@@ -706,9 +709,9 @@ TextFlow > .tooltip-text-monospaced {
     -fx-padding: 0;
 }
 
-.accordion .titled-pane  {
-   -fx-skin: "org.jabref.gui.util.CustomTitledPaneSkin";
-   -fx-arrow-side: right;
+.accordion .titled-pane {
+    -fx-skin: "org.jabref.gui.util.CustomTitledPaneSkin";
+    -fx-arrow-side: right;
 }
 
 .accordion .titled-pane .title {
@@ -1100,15 +1103,40 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-background-color: -jr-sidepane-background;
 }
 
-.jfx-snackbar-content {
+.notification-bar > .pane {
     -fx-background-color: -jr-gray-3;
     -fx-background-radius: 4px;
-    -fx-padding: 0ex 0ex 0ex 0ex;
 }
 
-.jfx-snackbar-toast {
-    -fx-text-fill: -fx-light-text-color;
-    -fx-padding: -1ex -0.5ex -1ex -0.5ex;
+.notification-bar > .pane > .title,
+.notification-bar > .pane > .label,
+.notification-bar > .pane > .button-bar > .container > .action {
+    -fx-text-fill: -jr-base;
+    -fx-padding: 1ex 1ex 1ex 1ex;
+}
+
+.notification-bar > .pane {
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.3), 9, 0, 0, 2);
+    -fx-padding: 6px 7px 6px 32px;
+    -fx-background-radius: 0px;
+    -fx-border-radius: 0px;
+}
+
+.notification-bar > .pane > .button-bar > .container {
+    -fx-padding: 0px 24px 0px 0px;
+}
+
+.notification-bar > .pane > .label {
+    -fx-graphic-text-gap: 8px;
+}
+
+.notification-pane .notification-bar > .pane .close-button > .graphic {
+    -fx-background-color: -jr-base;
+}
+
+.notification-bar > .pane > .label > .ikonli-font-icon {
+    -fx-icon-size: 16px;
+    -fx-icon-color: -jr-base;
 }
 
 .progress-bar > .bar {
@@ -1270,7 +1298,7 @@ TextFlow * {
     -fx-fill: -fx-mid-text-color;
 }
 
-.fontsizeSpinner{
+.fontsizeSpinner {
     -fx-pref-width: 5em;
 }
 
@@ -1278,6 +1306,15 @@ TextFlow * {
     -fx-background-color: rgba(240, 128, 128, 0.5);
 }
 
-.notification-pane .notification-bar > .pane .label {
-    -fx-text-fill: -fx-mid-text-color;
+.rating {
+    -fx-skin: "org.jabref.gui.util.CustomRatingSkin";
+    -fx-padding: 0.5em 0px 0px 0px;
+}
+
+.rating > .container > .button {
+    -fx-icon-color: derive(-fx-text-base-color, 85%);
+}
+
+.rating > .container > .button.strong {
+    -fx-icon-color: -fx-text-base-color;
 }

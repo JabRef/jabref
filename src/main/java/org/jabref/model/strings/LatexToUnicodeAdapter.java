@@ -6,7 +6,7 @@ import java.util.Optional;
 import java.util.regex.Pattern;
 
 import com.github.tomtung.latex2unicode.LaTeX2Unicode;
-import fastparse.core.Parsed;
+import fastparse.Parsed;
 
 /**
  * Adapter class for the latex2unicode lib. This is an alternative to our LatexToUnicode class

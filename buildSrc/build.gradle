@@ -6,7 +6,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.h2database:h2-mvstore:2.1.212'
+    implementation 'com.h2database:h2-mvstore:2.1.214'
     implementation 'org.apache.commons:commons-csv:1.9.0'
     implementation 'org.slf4j:slf4j-api:2.0.0-alpha7'
 }
@@ -18,3 +18,10 @@ sourceSets{
         }
     }
 }
+
+/**
+ * This is a workaround for Entry org/jabref/build/JournalAbbreviationConverter$_convert_closure1$_closure2.class is a duplicate but no duplicate handling strategy has been set.
+ *
+ * Source: https://github.com/gradle/gradle/issues/17236#issuecomment-923074298
+ */
+tasks.getByName("jar").setProperty("duplicatesStrategy", DuplicatesStrategy.EXCLUDE);

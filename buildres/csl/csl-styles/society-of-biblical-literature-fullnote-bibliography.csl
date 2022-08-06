@@ -2,6 +2,7 @@
 <style xmlns="http://purl.org/net/xbiblio/csl" class="note" version="1.0" demote-non-dropping-particle="sort-only" page-range-format="chicago" default-locale="en-US">
   <info>
     <title>Society of Biblical Literature 2nd edition (full note)</title>
+    <title-short>SBL (2nd edition)</title-short>
     <id>http://www.zotero.org/styles/society-of-biblical-literature-fullnote-bibliography</id>
     <link href="http://www.zotero.org/styles/society-of-biblical-literature-fullnote-bibliography" rel="self"/>
     <link href="http://www.zotero.org/styles/chicago-fullnote-bibliography" rel="template"/>
@@ -32,7 +33,7 @@
     <category citation-format="note"/>
     <category field="theology"/>
     <summary>Society of Biblical Literature format with full notes and bibliography</summary>
-    <updated>2021-05-16T18:39:17+00:00</updated>
+    <updated>2022-06-29T13:58:51+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="en-US">
@@ -112,11 +113,11 @@
     <choose>
       <if type="bill book chapter graphic legal_case legislation motion_picture paper-conference report song" match="any">
         <group delimiter=", ">
-          <text macro="editor-translator-verb-short-comma"/>
           <names variable="container-author">
             <label form="verb-short" suffix=" "/>
             <name and="text" delimiter=", "/>
           </names>
+          <text macro="editor-translator-verb-short-comma"/>
         </group>
       </if>
     </choose>
@@ -381,7 +382,7 @@
         </choose>
       </else-if>
       <else>
-        <text variable="title" form="short" quotes="true" text-case="title"/>
+        <text variable="title" quotes="true" form="short" text-case="title"/>
       </else>
     </choose>
   </macro>
@@ -674,7 +675,16 @@
     </choose>
   </macro>
   <macro name="event-note">
-    <text variable="event"/>
+    <!-- Support citation of unpublished conference presentations per SBLHS2 §6.3.8. -->
+    <choose>
+      <if type="speech" match="any">
+        <group delimiter=" ">
+          <text variable="genre"/>
+          <text term="presented at" suffix=" "/>
+        </group>
+      </if>
+    </choose>
+    <text variable="event" suffix=","/>
   </macro>
   <macro name="event">
     <group>
@@ -790,7 +800,15 @@
                   <else>
                     <group delimiter=" ">
                       <label variable="locator" form="short"/>
-                      <text variable="locator"/>
+                      <!-- Adds quotes around the locator when the type is sub-verbo per https://sblhs2.com/2017/03/30/citing-reference-works-2-lexica/ -->
+                      <choose>
+                        <if locator="sub-verbo">
+                          <text variable="locator" quotes="true"/>
+                        </if>
+                        <else>
+                          <text variable="locator"/>
+                        </else>
+                      </choose>
                     </group>
                   </else>
                 </choose>
@@ -840,9 +858,9 @@
       </else-if>
       <else-if type="entry-dictionary entry-encyclopedia" match="any">
         <choose>
-          <if position="first" variable="volume" match="all">
+          <if position="first" match="all">
             <text macro="point-locators-subsequent" prefix=" "/>
-            <!--SBL 6.3.6 prefers space in first entry before vol info.-->
+            <!-- Per SBLHS2 §6.3.6, the first reference will, by definition have the dictionary title or abbreviation preceding the locators, volume number included. No comma should appear after the title or abbreviation and before the locators. -->
           </if>
           <else>
             <text macro="point-locators-subsequent" prefix=", "/>
@@ -925,11 +943,10 @@
                   <text macro="publisher"/>
                   <choose>
                     <if variable="title" match="none"/>
-                    <else-if type="thesis speech" match="any">
+                    <else-if type="thesis" match="any">
                       <text variable="genre"/>
                     </else-if>
                   </choose>
-                  <text macro="event"/>
                 </group>
                 <text macro="issued" prefix=", "/>
               </group>
@@ -990,12 +1007,15 @@
           <text macro="archive-note"/>
         </else-if>
       </choose>
+      <!-- SBL style uses DOIs and URLs when the resource is electronic. SBLHS2 §§ 6.1.6, 6.2.25, 6.3.10, 6.4.13&#8211;14. If a resource has physical dimensions, however, it is not electronic. So, DOI or URL output should be bypassed. -->
       <choose>
-        <if variable="DOI">
-          <text variable="DOI" prefix="https://doi.org/"/>
-        </if>
+        <if variable="dimensions"/>
         <else>
-          <text variable="URL"/>
+          <!-- Per SBLHS2 §6.3.10, allows either DOI or URL or both to be included. -->
+          <group delimiter=", ">
+            <text variable="DOI" prefix="https://doi.org/"/>
+            <text variable="URL"/>
+          </group>
         </else>
       </choose>
     </group>
@@ -1010,12 +1030,15 @@
           <text macro="archive"/>
         </else-if>
       </choose>
+      <!-- SBL style uses DOIs and URLs when the resource is electronic. SBLHS2 §§6.1.6, 6.2.25, 6.3.10, 6.4.13&#8211;14. If a resource has physical dimensions, however, it is not electronic. So, DOI or URL output should be bypassed. -->
       <choose>
-        <if variable="DOI">
-          <text variable="DOI" prefix="https://doi.org/"/>
-        </if>
+        <if variable="dimensions"/>
         <else>
-          <text variable="URL"/>
+          <!-- Per SBLHS2 §6.3.10, allows either DOI or URL or both to be included. -->
+          <group delimiter=", ">
+            <text variable="DOI" prefix="https://doi.org/"/>
+            <text variable="URL"/>
+          </group>
         </else>
       </choose>
     </group>
@@ -1071,14 +1094,16 @@
         <!-- Support custom citations via the annote variable. For discussion, see https://forums.zotero.org/discussion/comment/317370 -->
         <if variable="annote">
           <choose>
-            <if locator="section">
-              <group delimiter=" ">
+            <!-- For situations like citation of lexica per https://sblhs2.com/2017/03/30/citing-reference-works-2-lexica/. -->
+            <if locator="sub-verbo">
+              <group delimiter=", ">
                 <text variable="annote"/>
                 <text macro="point-locators-subsequent"/>
               </group>
             </if>
+            <!-- For situations like citation of collections like (M)OTP per https://sblhs2.com/2017/06/08/citing-text-collections-3-otp/ and https://sblhs2.com/2017/06/22/citing-text-collections-3-motp/. -->
             <else>
-              <group delimiter=", ">
+              <group delimiter=" ">
                 <text variable="annote"/>
                 <text macro="point-locators-subsequent"/>
               </group>
