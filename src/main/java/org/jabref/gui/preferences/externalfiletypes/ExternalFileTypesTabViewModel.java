@@ -36,8 +36,7 @@ public class ExternalFileTypesTabViewModel implements PreferenceTabViewModel {
     }
 
     public void storeSettings() {
-        externalFileTypes.setExternalFileTypes(fileTypes);
-        preferencesService.storeExternalFileTypes(externalFileTypes.toString());
+        preferencesService.storeExternalFileTypes(fileTypes);
     }
 
     public void resetToDefaults() {

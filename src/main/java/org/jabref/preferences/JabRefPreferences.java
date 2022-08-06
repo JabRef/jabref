@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -42,6 +43,8 @@ import org.jabref.gui.autocompleter.AutoCompleteFirstNameMode;
 import org.jabref.gui.autocompleter.AutoCompletePreferences;
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.entryeditor.EntryEditorPreferences;
+import org.jabref.gui.externalfiletype.ExternalFileType;
+import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.groups.GroupViewMode;
 import org.jabref.gui.groups.GroupsPreferences;
 import org.jabref.gui.keyboard.KeyBindingRepository;
@@ -429,6 +432,8 @@ public class JabRefPreferences implements PreferencesService {
 
     private Set<CustomImporter> customImporters;
     private String userName;
+
+    private Set<ExternalFileType> externalFileTypes;
 
     private PreviewPreferences previewPreferences;
     private SidePanePreferences sidePanePreferences;
@@ -2760,13 +2765,23 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     @Override
-    public String getExternalFileTypes() {
-        return get(EXTERNAL_FILE_TYPES);
+    public Set<ExternalFileType> getExternalFileTypes() {
+        if (externalFileTypes == null) {
+            externalFileTypes = new TreeSet<>(Comparator.comparing(ExternalFileType::getName));
+            updateExternalFileTypes();
+        }
+        return externalFileTypes;
     }
 
     @Override
-    public void storeExternalFileTypes(String externalFileTypes) {
-        put(EXTERNAL_FILE_TYPES, externalFileTypes);
+    public void storeExternalFileTypes(Collection<ExternalFileType> externalFileTypes) {
+        put(EXTERNAL_FILE_TYPES, ExternalFileTypes.toStringList(externalFileTypes));
+        updateExternalFileTypes();
+    }
+
+    private void updateExternalFileTypes() {
+        externalFileTypes.clear();
+        externalFileTypes = ExternalFileTypes.fromString(get(EXTERNAL_FILE_TYPES));
     }
 
     @Override

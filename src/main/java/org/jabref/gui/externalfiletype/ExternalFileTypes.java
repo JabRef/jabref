@@ -4,13 +4,11 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
-import java.util.TreeSet;
 
 import org.jabref.gui.Globals;
 import org.jabref.logic.bibtex.FileFieldWriter;
@@ -26,14 +24,7 @@ public enum ExternalFileTypes {
     // modifications, in order to indicate a removed default file type:
     private static final String FILE_TYPE_REMOVED_FLAG = "REMOVED";
 
-    // Map containing all registered external file types:
-    private final Set<ExternalFileType> externalFileTypes = new TreeSet<>(Comparator.comparing(ExternalFileType::getName));
-
     private final ExternalFileType HTML_FALLBACK_TYPE = StandardExternalFileType.URL;
-
-    ExternalFileTypes() {
-        externalFileTypes.addAll(fromString(Globals.prefs.getExternalFileTypes()));
-    }
 
     public static ExternalFileTypes getInstance() {
         return INSTANCE;
@@ -44,12 +35,7 @@ public enum ExternalFileTypes {
     }
 
     public Set<ExternalFileType> getExternalFileTypes() {
-        return externalFileTypes;
-    }
-
-    public void setExternalFileTypes(Collection<ExternalFileType> types) {
-        externalFileTypes.clear();
-        externalFileTypes.addAll(types);
+        return Globals.prefs.getExternalFileTypes();
     }
 
     /**
@@ -59,7 +45,7 @@ public enum ExternalFileTypes {
      * @return The ExternalFileType registered, or null if none.
      */
     public Optional<ExternalFileType> getExternalFileTypeByName(String name) {
-        Optional<ExternalFileType> externalFileType = externalFileTypes.stream().filter(type -> type.getName().equals(name)).findFirst();
+        Optional<ExternalFileType> externalFileType = getExternalFileTypes().stream().filter(type -> type.getName().equals(name)).findFirst();
         if (externalFileType.isPresent()) {
             return externalFileType;
         }
@@ -75,7 +61,7 @@ public enum ExternalFileTypes {
      */
     public Optional<ExternalFileType> getExternalFileTypeByExt(String extension) {
         String extensionCleaned = extension.replace(".", "").replace("*", "");
-        return externalFileTypes.stream().filter(type -> type.getExtension().equalsIgnoreCase(extensionCleaned)).findFirst();
+        return getExternalFileTypes().stream().filter(type -> type.getExtension().equalsIgnoreCase(extensionCleaned)).findFirst();
     }
 
     /**
@@ -85,7 +71,7 @@ public enum ExternalFileTypes {
      * @return true if an ExternalFileType with the extension exists, false otherwise
      */
     public boolean isExternalFileTypeByExt(String extension) {
-        return externalFileTypes.stream().anyMatch(type -> type.getExtension().equalsIgnoreCase(extension));
+        return getExternalFileTypes().stream().anyMatch(type -> type.getExtension().equalsIgnoreCase(extension));
     }
 
     /**
@@ -97,7 +83,7 @@ public enum ExternalFileTypes {
     public Optional<ExternalFileType> getExternalFileTypeForName(String filename) {
         int longestFound = -1;
         ExternalFileType foundType = null;
-        for (ExternalFileType type : externalFileTypes) {
+        for (ExternalFileType type : getExternalFileTypes()) {
             if (!type.getExtension().isEmpty() && filename.toLowerCase(Locale.ROOT).endsWith(type.getExtension().toLowerCase(Locale.ROOT))
                     && (type.getExtension().length() > longestFound)) {
                 longestFound = type.getExtension().length();
@@ -119,7 +105,7 @@ public enum ExternalFileTypes {
         if (mimeType.indexOf(';') != -1) {
             mimeType = mimeType.substring(0, mimeType.indexOf(';')).trim();
         }
-        for (ExternalFileType type : externalFileTypes) {
+        for (ExternalFileType type : getExternalFileTypes()) {
             if (type.getMimeType().equalsIgnoreCase(mimeType)) {
                 return Optional.of(type);
             }
@@ -159,7 +145,7 @@ public enum ExternalFileTypes {
     /**
      * @return A StringList of customized and removed file types compared to the default list of external file types for storing
      */
-    public String toString() {
+    public static String toStringList(Collection<ExternalFileType> fileTypes) {
         // First find a list of the default types:
         List<ExternalFileType> defTypes = new ArrayList<>(getDefaultExternalFileTypes());
         // Make a list of types that are unchanged:
@@ -167,7 +153,7 @@ public enum ExternalFileTypes {
         // Create a result list
         List<ExternalFileType> results = new ArrayList<>();
 
-        for (ExternalFileType type : externalFileTypes) {
+        for (ExternalFileType type : fileTypes) {
             results.add(type);
             // See if we can find a type with matching name in the default type list:
             ExternalFileType found = null;
