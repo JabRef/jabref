@@ -30,7 +30,7 @@ class ImportFormatReaderIntegrationTest {
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(importFormatPreferences.getCustomImportList()).thenReturn(Set.of());
         GeneralPreferences generalPreferences = mock(GeneralPreferences.class, Answers.RETURNS_DEEP_STUBS);
-        reader.resetImportFormats(mock(ImporterPreferences.class), generalPreferences, importFormatPreferences, mock(XmpPreferences.class), new DummyFileUpdateMonitor());
+        reader.resetImportFormats(mock(ImporterPreferences.class), importFormatPreferences, mock(XmpPreferences.class), new DummyFileUpdateMonitor());
     }
 
     @ParameterizedTest

@@ -2,6 +2,7 @@ package org.jabref.logic.importer.fetcher;
 
 import java.util.Optional;
 
+import org.jabref.logic.importer.FetcherClientException;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.entry.BibEntry;
@@ -13,6 +14,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 
 public class OpenLibraryFetcherTest extends AbstractIsbnFetcherTest {
@@ -71,7 +73,6 @@ public class OpenLibraryFetcherTest extends AbstractIsbnFetcherTest {
     public void testIsbnNeitherAvailableOnEbookDeNorOrViaOpenLibrary() throws Exception {
         // In this test, the ISBN needs to be a valid (syntax+checksum) ISBN number
         // However, the ISBN number must not be assigned to a real book
-        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("9785646216541");
-        assertEquals(Optional.empty(), fetchedEntry);
+        assertThrows(FetcherClientException.class, () -> fetcher.performSearchById("9785646216541"));
     }
 }
