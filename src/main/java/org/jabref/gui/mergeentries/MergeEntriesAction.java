@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Optional;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
@@ -14,13 +13,10 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.InternalField;
 
 public class MergeEntriesAction extends SimpleCommand {
-
-    private final JabRefFrame frame;
     private final DialogService dialogService;
     private final StateManager stateManager;
 
-    public MergeEntriesAction(JabRefFrame frame, DialogService dialogService, StateManager stateManager) {
-        this.frame = frame;
+    public MergeEntriesAction(DialogService dialogService, StateManager stateManager) {
         this.dialogService = dialogService;
         this.stateManager = stateManager;
 
@@ -63,7 +59,7 @@ public class MergeEntriesAction extends SimpleCommand {
         dialog.setTitle(Localization.lang("Merge entries"));
         Optional<EntriesMergeResult> mergeResultOpt = dialogService.showCustomDialogAndWait(dialog);
         mergeResultOpt.ifPresentOrElse(entriesMergeResult -> {
-            new MergeTwoEntriesAction(entriesMergeResult, frame, stateManager).execute();
+            new MergeTwoEntriesAction(entriesMergeResult, stateManager).execute();
 
             dialogService.notify(Localization.lang("Merged entries"));
         }, () -> dialogService.notify(Localization.lang("Canceled merging entries")));

@@ -4,7 +4,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.jabref.gui.Globals;
-import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.undo.NamedCompound;
@@ -16,12 +15,10 @@ import org.jabref.model.entry.BibEntry;
 
 public class MergeTwoEntriesAction extends SimpleCommand {
     private final EntriesMergeResult entriesMergeResult;
-    private final JabRefFrame frame;
     private final StateManager stateManager;
 
-    public MergeTwoEntriesAction(EntriesMergeResult entriesMergeResult, JabRefFrame frame, StateManager stateManager) {
+    public MergeTwoEntriesAction(EntriesMergeResult entriesMergeResult, StateManager stateManager) {
         this.entriesMergeResult = entriesMergeResult;
-        this.frame = frame;
         this.stateManager = stateManager;
     }
 
@@ -32,15 +29,16 @@ public class MergeTwoEntriesAction extends SimpleCommand {
         }
 
         BibDatabase database = stateManager.getActiveDatabase().get().getDatabase();
+        List<BibEntry> entriesToRemove = Arrays.asList(entriesMergeResult.originalLeftEntry(), entriesMergeResult.originalRightEntry());
 
-        frame.getCurrentLibraryTab().insertEntry(entriesMergeResult.mergedEntry());
+        database.insertEntry(entriesMergeResult.mergedEntry());
+        database.removeEntries(entriesToRemove);
 
         NamedCompound ce = new NamedCompound(Localization.lang("Merge entries"));
         ce.addEdit(new UndoableInsertEntries(stateManager.getActiveDatabase().get().getDatabase(), entriesMergeResult.mergedEntry()));
-        List<BibEntry> entriesToRemove = Arrays.asList(entriesMergeResult.originalLeftEntry(), entriesMergeResult.originalRightEntry());
         ce.addEdit(new UndoableRemoveEntries(database, entriesToRemove));
-        database.removeEntries(entriesToRemove);
         ce.end();
+
         Globals.undoManager.addEdit(ce);
     }
 }
