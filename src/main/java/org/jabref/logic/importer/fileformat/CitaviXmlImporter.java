@@ -33,6 +33,8 @@ import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.citavi.CitaviExchangeData;
+import org.jabref.logic.importer.fileformat.citavi.CitaviExchangeData.KnowledgeItems;
+import org.jabref.logic.importer.fileformat.citavi.CitaviExchangeData.KnowledgeItems.KnowledgeItem;
 import org.jabref.logic.importer.fileformat.citavi.CitaviExchangeData.Persons.Person;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.Author;
@@ -71,6 +73,7 @@ public class CitaviXmlImporter extends Importer implements Parser {
     private CitaviExchangeData.Persons persons;
     private CitaviExchangeData.Keywords keywords;
     private CitaviExchangeData.Publishers publishers;
+    private KnowledgeItems knowledgeItems;
 
     private CitaviExchangeData.ReferenceAuthors refAuthors;
     private CitaviExchangeData.ReferenceEditors refEditors;
@@ -78,6 +81,7 @@ public class CitaviXmlImporter extends Importer implements Parser {
     private CitaviExchangeData.ReferencePublishers refPublishers;
 
     private Unmarshaller unmarshaller;
+
 
     @Override
     public String getName() {
@@ -148,6 +152,8 @@ public class CitaviXmlImporter extends Importer implements Parser {
         persons = data.getPersons();
         keywords = data.getKeywords();
         publishers = data.getPublishers();
+        knowledgeItems = data.getKnowledgeItems();
+
 
         refAuthors = data.getReferenceAuthors();
         refEditors = data.getReferenceEditors();
@@ -206,7 +212,8 @@ public class CitaviXmlImporter extends Importer implements Parser {
                 .ifPresent(value -> entry.setField(StandardField.KEYWORDS, value));
         Optional.ofNullable(getPublisher(data))
                 .ifPresent(value -> entry.setField(StandardField.PUBLISHER, value));
-
+        Optional.ofNullable(getKnowledgeItem(data))
+                .ifPresent(value -> entry.setField(StandardField.COMMENT, value));
         return entry;
     }
 
@@ -357,6 +364,21 @@ public class CitaviXmlImporter extends Importer implements Parser {
             return null;
         }
         return this.refIdWithPublishers.get(data.getId());
+    }
+
+    private String getKnowledgeItem(CitaviExchangeData.References.Reference data) {
+
+        Optional<KnowledgeItem> knowledgeItem = knowledgeItems.getKnowledgeItem().stream().filter(p->data.getId().equals(p.getReferenceID())).findFirst();
+
+        StringBuilder comment = new StringBuilder();
+        Optional<String> title = knowledgeItem.map(item -> item.getCoreStatement());
+        title.ifPresent(t -> comment.append("#").append(t).append("\n\n"));
+        Optional<String> text = knowledgeItem.map(item -> item.getText());
+        text.ifPresent(t -> comment.append(t).append("\n"));
+        Optional<String> pages = knowledgeItem.map(item -> item.getPageRange());
+        pages.ifPresent(p -> comment.append(p));
+
+        return comment.toString();
     }
 
     private void initUnmarshaller() throws JAXBException {
