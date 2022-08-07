@@ -21,7 +21,6 @@ import org.jabref.model.database.BibDatabaseContext;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
-import de.saxsys.mvvmfx.utils.commands.CommandBase;
 import org.controlsfx.control.MasterDetailPane;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -115,7 +114,10 @@ public class ExternalChangesResolverDialog extends BaseDialog<Boolean> {
         assert changesTableView.getSelectionModel().getSelectedItems().get(0).hasAdvancedMergeDialog();
 
         DatabaseChangeViewModel changeViewModel = changesTableView.getSelectionModel().getSelectedItems().get(0);
-        changeViewModel.openAdvancedMergeDialog().ifPresent(CommandBase::execute);
+        changeViewModel.openAdvancedMergeDialog().ifPresent(change -> {
+            acceptedChanges.add(change);
+            changesTableView.getItems().removeAll(changeViewModel);
+        });
     }
 
     private void applyChanges() {

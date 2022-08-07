@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.logic.bibtex.comparator.BibDatabaseDiff;
@@ -31,16 +32,20 @@ public class ChangeScanner {
     private final StateManager stateManager;
     private final ThemeManager themeManager;
 
+    private final JabRefFrame frame;
+
     public ChangeScanner(BibDatabaseContext database,
                          DialogService dialogService,
                          PreferencesService preferencesService,
                          StateManager stateManager,
-                         ThemeManager themeManager) {
+                         ThemeManager themeManager,
+                         JabRefFrame frame) {
         this.database = database;
         this.dialogService = dialogService;
         this.preferencesService = preferencesService;
         this.stateManager = stateManager;
         this.themeManager = themeManager;
+        this.frame = frame;
     }
 
     public List<DatabaseChangeViewModel> scanForChanges() {
@@ -99,6 +104,6 @@ public class ChangeScanner {
             return new EntryDeleteChangeViewModel(diff.getOriginalEntry(), preferencesService);
         }
 
-        return new EntryChangeViewModel(diff.getOriginalEntry(), diff.getNewEntry(), dialogService, preferencesService, stateManager, themeManager);
+        return new EntryChangeViewModel(diff.getOriginalEntry(), diff.getNewEntry(), dialogService, preferencesService, stateManager, themeManager, frame);
     }
 }

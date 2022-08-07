@@ -9,7 +9,6 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.scene.Node;
 
-import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.model.database.BibDatabaseContext;
 
@@ -69,7 +68,7 @@ abstract class DatabaseChangeViewModel {
         return false;
     }
 
-    public Optional<SimpleCommand> openAdvancedMergeDialog() {
+    public Optional<DatabaseChangeViewModel> openAdvancedMergeDialog() {
         return Optional.empty();
     }
 }

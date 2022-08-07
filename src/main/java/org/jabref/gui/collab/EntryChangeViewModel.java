@@ -5,10 +5,9 @@ import java.util.Optional;
 import javafx.scene.Node;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.StateManager;
-import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.mergeentries.MergeEntriesDialog;
-import org.jabref.gui.mergeentries.MergeTwoEntriesAction;
 import org.jabref.gui.preview.PreviewViewer;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.undo.NamedCompound;
@@ -27,8 +26,10 @@ class EntryChangeViewModel extends DatabaseChangeViewModel {
     private final StateManager stateManager;
     private final ThemeManager themeManager;
 
+    private final JabRefFrame jabRefFrame;
+
     public EntryChangeViewModel(BibEntry entry, BibEntry newEntry, DialogService dialogService, PreferencesService preferencesService,
-                                StateManager stateManager, ThemeManager themeManager) {
+                                StateManager stateManager, ThemeManager themeManager, JabRefFrame jabRefFrame) {
         super(entry.getCitationKey().map(key -> Localization.lang("Modified entry '%0'", key))
                    .orElse(Localization.lang("Modified entry")));
 
@@ -38,6 +39,7 @@ class EntryChangeViewModel extends DatabaseChangeViewModel {
         this.preferencesService = preferencesService;
         this.stateManager = stateManager;
         this.themeManager = themeManager;
+        this.jabRefFrame = jabRefFrame;
     }
 
     /**
@@ -70,9 +72,10 @@ class EntryChangeViewModel extends DatabaseChangeViewModel {
     }
 
     @Override
-    public Optional<SimpleCommand> openAdvancedMergeDialog() {
+    public Optional<DatabaseChangeViewModel> openAdvancedMergeDialog() {
         MergeEntriesDialog mergeEntriesDialog = new MergeEntriesDialog(oldEntry, newEntry);
         return dialogService.showCustomDialogAndWait(mergeEntriesDialog)
-                            .map(res -> new MergeTwoEntriesAction(res, null, null));
+                            .map(result -> new EntryChangeViewModel(oldEntry, result.mergedEntry(),
+                                    dialogService, preferencesService, stateManager, themeManager, jabRefFrame));
     }
 }
