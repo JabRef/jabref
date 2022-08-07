@@ -42,14 +42,6 @@ class EntryChangeViewModel extends DatabaseChangeViewModel {
         this.jabRefFrame = jabRefFrame;
     }
 
-    /**
-     * We override this here to select the radio buttons accordingly
-     */
-    @Override
-    public void setAccepted(boolean accepted) {
-        super.setAccepted(accepted);
-    }
-
     @Override
     public void makeChange(BibDatabaseContext database, NamedCompound undoEdit) {
         database.getDatabase().removeEntry(oldEntry);
