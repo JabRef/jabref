@@ -2,40 +2,42 @@ package org.jabref.gui.collab;
 
 import java.util.Optional;
 
-import javafx.geometry.Insets;
 import javafx.scene.Node;
-import javafx.scene.control.Label;
-import javafx.scene.layout.VBox;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.mergeentries.MergeEntriesDialog;
 import org.jabref.gui.mergeentries.MergeTwoEntriesAction;
-import org.jabref.gui.mergeentries.newmergedialog.ShowDiffConfig;
-import org.jabref.gui.mergeentries.newmergedialog.ThreeWayMergeView;
-import org.jabref.gui.mergeentries.newmergedialog.diffhighlighter.DiffHighlighter;
-import org.jabref.gui.mergeentries.newmergedialog.toolbar.ThreeWayMergeToolbar;
+import org.jabref.gui.preview.PreviewViewer;
+import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableInsertEntries;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.preferences.PreferencesService;
 
 class EntryChangeViewModel extends DatabaseChangeViewModel {
 
     private final BibEntry oldEntry;
     private final BibEntry newEntry;
-    private ThreeWayMergeView threeWayMergeView;
-
     private final DialogService dialogService;
+    private final PreferencesService preferencesService;
+    private final StateManager stateManager;
+    private final ThemeManager themeManager;
 
-    public EntryChangeViewModel(BibEntry entry, BibEntry newEntry, DialogService dialogService) {
+    public EntryChangeViewModel(BibEntry entry, BibEntry newEntry, DialogService dialogService, PreferencesService preferencesService,
+                                StateManager stateManager, ThemeManager themeManager) {
         super(entry.getCitationKey().map(key -> Localization.lang("Modified entry '%0'", key))
                    .orElse(Localization.lang("Modified entry")));
 
         this.oldEntry = entry;
         this.newEntry = newEntry;
         this.dialogService = dialogService;
+        this.preferencesService = preferencesService;
+        this.stateManager = stateManager;
+        this.themeManager = themeManager;
     }
 
     /**
@@ -44,11 +46,6 @@ class EntryChangeViewModel extends DatabaseChangeViewModel {
     @Override
     public void setAccepted(boolean accepted) {
         super.setAccepted(accepted);
-        if (accepted) {
-            threeWayMergeView.selectRightEntryValues();
-        } else {
-            threeWayMergeView.selectLeftEntryValues();
-        }
     }
 
     @Override
@@ -61,16 +58,10 @@ class EntryChangeViewModel extends DatabaseChangeViewModel {
 
     @Override
     public Node description() {
-        threeWayMergeView = new ThreeWayMergeView(oldEntry, newEntry, Localization.lang("In JabRef"), Localization.lang("On disk"));
-        threeWayMergeView.selectLeftEntryValues();
-        threeWayMergeView.showDiff(new ShowDiffConfig(ThreeWayMergeToolbar.DiffView.SPLIT, DiffHighlighter.DiffMethod.WORDS));
-        VBox container = new VBox(10);
-        Label header = new Label(getName());
-        header.getStyleClass().add("sectionHeader");
-        container.getChildren().add(header);
-        container.getChildren().add(threeWayMergeView);
-        VBox.setMargin(threeWayMergeView, new Insets(5, 5, 5, 5));
-        return container;
+        PreviewViewer previewViewer = new PreviewViewer(new BibDatabaseContext(), dialogService, stateManager, themeManager);
+        previewViewer.setLayout(preferencesService.getPreviewPreferences().getSelectedPreviewLayout());
+        previewViewer.setEntry(newEntry);
+        return previewViewer;
     }
 
     @Override
