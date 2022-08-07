@@ -7,7 +7,6 @@ import java.util.List;
 import javafx.util.Duration;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.icon.IconTheme;
@@ -37,8 +36,6 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
     private final StateManager stateManager;
     private final ThemeManager themeManager;
 
-    private final JabRefFrame frame;
-
     public DatabaseChangeMonitor(BibDatabaseContext database,
                                  FileUpdateMonitor fileMonitor,
                                  TaskExecutor taskExecutor,
@@ -46,7 +43,7 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
                                  PreferencesService preferencesService,
                                  StateManager stateManager,
                                  ThemeManager themeManager,
-                                 LibraryTab.DatabaseNotification notificationPane, JabRefFrame frame) {
+                                 LibraryTab.DatabaseNotification notificationPane) {
         this.database = database;
         this.fileMonitor = fileMonitor;
         this.taskExecutor = taskExecutor;
@@ -54,7 +51,6 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
         this.preferencesService = preferencesService;
         this.stateManager = stateManager;
         this.themeManager = themeManager;
-        this.frame = frame;
 
         this.listeners = new ArrayList<>();
 
@@ -80,7 +76,7 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
     @Override
     public void fileUpdated() {
         // File on disk has changed, thus look for notable changes and notify listeners in case there are such changes
-        ChangeScanner scanner = new ChangeScanner(database, dialogService, preferencesService, stateManager, themeManager, frame);
+        ChangeScanner scanner = new ChangeScanner(database, dialogService, preferencesService, stateManager, themeManager);
         BackgroundTask.wrap(scanner::scanForChanges)
                       .onSuccess(changes -> {
                           if (!changes.isEmpty()) {
