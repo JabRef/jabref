@@ -14,7 +14,7 @@ import org.jabref.model.database.BibDatabaseContext;
 
 abstract class DatabaseChangeViewModel {
     private final StringProperty name = new SimpleStringProperty("");
-    private BooleanProperty acceptedProperty = new SimpleBooleanProperty(true);
+    private final BooleanProperty acceptedProperty = new SimpleBooleanProperty();
 
     DatabaseChangeViewModel(String name) {
         setName(name);
@@ -35,6 +35,13 @@ abstract class DatabaseChangeViewModel {
 
     public void setAccepted(boolean accepted) {
         this.acceptedProperty.setValue(accepted);
+    }
+
+    /**
+     * Convince method for accepting changes
+     * */
+    public void accept() {
+        setAccepted(true);
     }
 
     public ReadOnlyStringProperty nameProperty() {

@@ -42,14 +42,15 @@ public class ExternalChangesResolverDialog extends BaseDialog<Boolean> {
     private final BibDatabaseContext database;
     private final NamedCompound ce = new NamedCompound(Localization.lang("Merged external changes"));
 
-    private final List<DatabaseChangeViewModel> acceptedChanges = new ArrayList<>();
-
     private final BooleanBinding areChangesResolved;
 
     private final BooleanBinding canOpenAdvancedMergeDialog;
 
+    private final List<DatabaseChangeViewModel> changes;
+
     public ExternalChangesResolverDialog(BibDatabaseContext database, List<DatabaseChangeViewModel> changes) {
         this.database = database;
+        this.changes = new ArrayList<>(changes);
 
         this.setTitle(Localization.lang("External changes"));
         this.getDialogPane().setPrefSize(800, 600);
@@ -104,7 +105,7 @@ public class ExternalChangesResolverDialog extends BaseDialog<Boolean> {
     @FXML
     public void acceptChanges() {
         // Changes will be applied when closing the dialog as a transaction
-        acceptedChanges.addAll(changesTableView.getSelectionModel().getSelectedItems());
+        changesTableView.getSelectionModel().getSelectedItems().forEach(DatabaseChangeViewModel::accept);
         changesTableView.getItems().removeAll(changesTableView.getSelectionModel().getSelectedItems());
     }
 
@@ -115,13 +116,13 @@ public class ExternalChangesResolverDialog extends BaseDialog<Boolean> {
 
         DatabaseChangeViewModel changeViewModel = changesTableView.getSelectionModel().getSelectedItems().get(0);
         changeViewModel.openAdvancedMergeDialog().ifPresent(change -> {
-            acceptedChanges.add(change);
+            change.accept();
             changesTableView.getItems().removeAll(changeViewModel);
         });
     }
 
     private void applyChanges() {
-        acceptedChanges.forEach(change -> change.makeChange(database, ce));
+        changes.stream().filter(DatabaseChangeViewModel::isAccepted).forEach(change -> change.makeChange(database, ce));
         ce.end();
     }
 }
