@@ -20,7 +20,7 @@
                     <HBox>
                         <TableView fx:id="changesTableView" layoutX="34.0" layoutY="46.0" maxWidth="Infinity" prefHeight="236.0" HBox.hgrow="ALWAYS">
                             <columns>
-                                <TableColumn fx:id="changeName" prefWidth="400.0" text="Name" />
+                                <TableColumn fx:id="changeName" prefWidth="400.0" text="Change" />
                             </columns>
                         </TableView>
                         <VBox maxHeight="1.7976931348623157E308" maxWidth="Infinity" minHeight="-Infinity" minWidth="-Infinity" spacing="8.0" HBox.hgrow="NEVER">
