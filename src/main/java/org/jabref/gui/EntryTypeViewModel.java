@@ -17,8 +17,11 @@ import javafx.concurrent.Worker;
 import org.jabref.gui.externalfiles.ImportHandler;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.importer.NewEntryAction;
+import org.jabref.logic.importer.FetcherClientException;
 import org.jabref.logic.importer.FetcherException;
+import org.jabref.logic.importer.FetcherServerException;
 import org.jabref.logic.importer.IdBasedFetcher;
+import org.jabref.logic.importer.ImportFormatReader;
 import org.jabref.logic.importer.WebFetchers;
 import org.jabref.logic.importer.fetcher.DoiFetcher;
 import org.jabref.logic.l10n.Localization;
@@ -50,15 +53,19 @@ public class EntryTypeViewModel {
     private final DialogService dialogService;
     private final Validator idFieldValidator;
     private final StateManager stateManager;
+    private final ImportFormatReader importFormatReader;
 
     public EntryTypeViewModel(PreferencesService preferences,
                               LibraryTab libraryTab,
                               DialogService dialogService,
-                              StateManager stateManager) {
+                              StateManager stateManager,
+                              ImportFormatReader importFormatReader) {
         this.libraryTab = libraryTab;
         this.preferencesService = preferences;
         this.dialogService = dialogService;
         this.stateManager = stateManager;
+        this.importFormatReader = importFormatReader;
+
         fetchers.addAll(WebFetchers.getIdBasedFetchers(
                 preferences.getImportFormatPreferences(),
                 preferences.getImporterPreferences()));
@@ -140,15 +147,18 @@ public class EntryTypeViewModel {
             String fetcherExceptionMessage = exception.getMessage();
             String fetcher = selectedItemProperty().getValue().getName();
             String searchId = idText.getValue();
-            if (exception instanceof FetcherException) {
-                dialogService.showErrorDialogAndWait(Localization.lang("Error"), Localization.lang("Error while fetching from %0", fetcher + "." + "\n" + fetcherExceptionMessage));
+
+            if (exception instanceof FetcherClientException) {
+                dialogService.showInformationDialogAndWait(Localization.lang("Failed to import by ID"), Localization.lang("Bibliographic data not found. Cause is likely the client side. Please check connection and identifier for correctness.") + "\n" + fetcherExceptionMessage);
+            } else if (exception instanceof FetcherServerException) {
+                dialogService.showInformationDialogAndWait(Localization.lang("Failed to import by ID"), Localization.lang("Bibliographic data not found. Cause is likely the server side. Please try agan later.") + "\n" + fetcherExceptionMessage);
             } else {
-                dialogService.showErrorDialogAndWait(Localization.lang("No files found.", Localization.lang("Fetcher '%0' did not find an entry for id '%1'.", fetcher, searchId) + "\n" + fetcherExceptionMessage));
+                dialogService.showInformationDialogAndWait(Localization.lang("Failed to import by ID"), Localization.lang("Error message %0", fetcherExceptionMessage));
             }
+
             LOGGER.error(String.format("Exception during fetching when using fetcher '%s' with entry id '%s'.", searchId, fetcher), exception);
 
             searchingProperty.set(false);
-
             fetcherWorker = new FetcherWorker();
         });
 
@@ -164,7 +174,8 @@ public class EntryTypeViewModel {
                         Globals.getFileUpdateMonitor(),
                         libraryTab.getUndoManager(),
                         stateManager,
-                        dialogService);
+                        dialogService,
+                        importFormatReader);
                 handler.importEntryWithDuplicateCheck(libraryTab.getBibDatabaseContext(), entry);
 
                 searchSuccesfulProperty.set(true);
@@ -177,7 +188,7 @@ public class EntryTypeViewModel {
                 String searchId = idText.getValue();
 
                 // When DOI ID is not found, allow the user to either return to the dialog or add entry manually
-                boolean addEntryFlag = dialogService.showConfirmationDialogAndWait(Localization.lang("DOI not found"),
+                boolean addEntryFlag = dialogService.showConfirmationDialogAndWait(Localization.lang("Identifier not found"),
                         Localization.lang("Fetcher '%0' did not find an entry for id '%1'.", fetcher, searchId),
                         Localization.lang("Add entry manually"),
                         Localization.lang("Return to dialog"));

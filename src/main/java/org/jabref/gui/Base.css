@@ -1353,3 +1353,16 @@ TextFlow * {
 .text-field:invalid {
     -fx-background-color: rgba(240, 128, 128, 0.5);
 }
+
+.rating {
+    -fx-skin: "org.jabref.gui.util.CustomRatingSkin";
+    -fx-padding: 0.5em 0px 0px 0px;
+}
+
+.rating > .container > .button {
+    -fx-icon-color: derive(-fx-text-base-color, 85%);
+}
+
+.rating > .container > .button.strong {
+    -fx-icon-color: -fx-text-base-color;
+}

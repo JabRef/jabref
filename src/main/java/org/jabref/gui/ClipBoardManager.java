@@ -5,10 +5,7 @@ import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -22,19 +19,8 @@ import javafx.scene.input.MouseButton;
 import org.jabref.architecture.AllowedToUseAwt;
 import org.jabref.logic.bibtex.BibEntryWriter;
 import org.jabref.logic.bibtex.FieldWriter;
-import org.jabref.logic.importer.FetcherException;
-import org.jabref.logic.importer.ImportException;
-import org.jabref.logic.importer.ImportFormatReader;
-import org.jabref.logic.importer.ImportFormatReader.UnknownFormatImport;
-import org.jabref.logic.importer.ParseException;
-import org.jabref.logic.importer.fetcher.ArXiv;
-import org.jabref.logic.importer.fetcher.DoiFetcher;
-import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.identifier.ArXivIdentifier;
-import org.jabref.model.entry.identifier.DOI;
-import org.jabref.model.util.OptionalUtil;
 import org.jabref.preferences.PreferencesService;
 
 import org.slf4j.Logger;
@@ -49,18 +35,16 @@ public class ClipBoardManager {
 
     private static Clipboard clipboard;
     private static java.awt.datatransfer.Clipboard primary;
-    private static ImportFormatReader importFormatReader;
+
     private final PreferencesService preferencesService;
 
     public ClipBoardManager(PreferencesService preferencesService) {
-        this(Clipboard.getSystemClipboard(), Toolkit.getDefaultToolkit().getSystemSelection(), Globals.IMPORT_FORMAT_READER, preferencesService);
+        this(Clipboard.getSystemClipboard(), Toolkit.getDefaultToolkit().getSystemSelection(), preferencesService);
     }
 
-    public ClipBoardManager(Clipboard clipboard, java.awt.datatransfer.Clipboard primary, ImportFormatReader importFormatReader, PreferencesService preferencesService) {
+    public ClipBoardManager(Clipboard clipboard, java.awt.datatransfer.Clipboard primary, PreferencesService preferencesService) {
         ClipBoardManager.clipboard = clipboard;
         ClipBoardManager.primary = primary;
-        ClipBoardManager.importFormatReader = importFormatReader;
-
         this.preferencesService = preferencesService;
     }
 
@@ -101,6 +85,10 @@ public class ClipBoardManager {
             return "";
         }
         return result;
+    }
+
+    public Optional<String> getBibTeXEntriesFromClipbaord() {
+        return Optional.ofNullable(clipboard.getContent(DragAndDropDataFormats.ENTRIES)).map(String.class::cast);
     }
 
     /**
@@ -166,72 +154,5 @@ public class ClipBoardManager {
         content.putString(serializedEntries);
         clipboard.setContent(content);
         setPrimaryClipboardContent(content);
-    }
-
-    public List<BibEntry> extractData() {
-        Object entries = clipboard.getContent(DragAndDropDataFormats.ENTRIES);
-
-        if (entries == null) {
-            return handleStringData(clipboard.getString());
-        }
-        return handleBibTeXData((String) entries);
-    }
-
-    private List<BibEntry> handleBibTeXData(String entries) {
-        BibtexParser parser = new BibtexParser(preferencesService.getImportFormatPreferences(), Globals.getFileUpdateMonitor());
-        try {
-            return parser.parseEntries(new ByteArrayInputStream(entries.getBytes(StandardCharsets.UTF_8)));
-        } catch (ParseException ex) {
-            LOGGER.error("Could not paste", ex);
-            return Collections.emptyList();
-        }
-    }
-
-    private List<BibEntry> handleStringData(String data) {
-        if ((data == null) || data.isEmpty()) {
-            return Collections.emptyList();
-        }
-
-        Optional<DOI> doi = DOI.parse(data);
-        if (doi.isPresent()) {
-            return fetchByDOI(doi.get());
-        }
-        Optional<ArXivIdentifier> arXiv = ArXivIdentifier.parse(data);
-        if (arXiv.isPresent()) {
-            return fetchByArXiv(arXiv.get());
-        }
-
-        return tryImportFormats(data);
-    }
-
-    private List<BibEntry> tryImportFormats(String data) {
-        try {
-            UnknownFormatImport unknownFormatImport = importFormatReader.importUnknownFormat(data);
-            return unknownFormatImport.parserResult.getDatabase().getEntries();
-        } catch (ImportException ignored) {
-            return Collections.emptyList();
-        }
-    }
-
-    private List<BibEntry> fetchByDOI(DOI doi) {
-        LOGGER.info("Found DOI in clipboard");
-        try {
-            Optional<BibEntry> entry = new DoiFetcher(preferencesService.getImportFormatPreferences()).performSearchById(doi.getDOI());
-            return OptionalUtil.toList(entry);
-        } catch (FetcherException ex) {
-            LOGGER.error("Error while fetching", ex);
-            return Collections.emptyList();
-        }
-    }
-
-    private List<BibEntry> fetchByArXiv(ArXivIdentifier arXivIdentifier) {
-        LOGGER.info("Found arxiv identifier in clipboard");
-        try {
-            Optional<BibEntry> entry = new ArXiv(preferencesService.getImportFormatPreferences()).performSearchById(arXivIdentifier.getNormalizedWithoutVersion());
-            return OptionalUtil.toList(entry);
-        } catch (FetcherException ex) {
-            LOGGER.error("Error while fetching", ex);
-            return Collections.emptyList();
-        }
     }
 }

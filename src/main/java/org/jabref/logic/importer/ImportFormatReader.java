@@ -39,7 +39,6 @@ import org.jabref.model.database.BibDatabases;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.FileUpdateMonitor;
-import org.jabref.preferences.GeneralPreferences;
 
 public class ImportFormatReader {
 
@@ -51,11 +50,9 @@ public class ImportFormatReader {
      */
     private final List<Importer> formats = new ArrayList<>();
 
-    private GeneralPreferences generalPreferences;
     private ImportFormatPreferences importFormatPreferences;
 
-    public void resetImportFormats(ImporterPreferences importerPreferences, GeneralPreferences generalPreferences, ImportFormatPreferences newImportFormatPreferences, XmpPreferences xmpPreferences, FileUpdateMonitor fileMonitor) {
-        this.generalPreferences = generalPreferences;
+    public void resetImportFormats(ImporterPreferences importerPreferences, ImportFormatPreferences newImportFormatPreferences, XmpPreferences xmpPreferences, FileUpdateMonitor fileMonitor) {
         this.importFormatPreferences = newImportFormatPreferences;
 
         formats.clear();
