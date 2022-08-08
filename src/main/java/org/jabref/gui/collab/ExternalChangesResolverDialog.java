@@ -3,8 +3,6 @@ package org.jabref.gui.collab;
 import java.util.ArrayList;
 import java.util.List;
 
-import javafx.beans.InvalidationListener;
-import javafx.beans.binding.Bindings;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.SelectionMode;
@@ -69,6 +67,7 @@ public class ExternalChangesResolverDialog extends BaseDialog<Boolean> {
 
         changeName.setCellValueFactory(data -> data.getValue().nameProperty());
 
+        EasyBind.bindContent(changesTableView.getItems(), viewModel.getChanges());
         changesTableView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         changesTableView.getSelectionModel().selectFirst();
 
