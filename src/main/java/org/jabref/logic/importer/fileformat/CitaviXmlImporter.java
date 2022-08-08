@@ -82,7 +82,6 @@ public class CitaviXmlImporter extends Importer implements Parser {
 
     private Unmarshaller unmarshaller;
 
-
     @Override
     public String getName() {
         return "Citavi XML";
@@ -153,7 +152,6 @@ public class CitaviXmlImporter extends Importer implements Parser {
         keywords = data.getKeywords();
         publishers = data.getPublishers();
         knowledgeItems = data.getKnowledgeItems();
-
 
         refAuthors = data.getReferenceAuthors();
         refEditors = data.getReferenceEditors();
@@ -367,8 +365,7 @@ public class CitaviXmlImporter extends Importer implements Parser {
     }
 
     private String getKnowledgeItem(CitaviExchangeData.References.Reference data) {
-
-        Optional<KnowledgeItem> knowledgeItem = knowledgeItems.getKnowledgeItem().stream().filter(p->data.getId().equals(p.getReferenceID())).findFirst();
+        Optional<KnowledgeItem> knowledgeItem = knowledgeItems.getKnowledgeItem().stream().filter(p -> data.getId().equals(p.getReferenceID())).findFirst();
 
         StringBuilder comment = new StringBuilder();
         Optional<String> title = knowledgeItem.map(item -> item.getCoreStatement());
