@@ -24,6 +24,7 @@ import org.jabref.gui.dialogs.BackupUIManager;
 import org.jabref.gui.shared.SharedDatabaseUIManager;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.BackgroundTask;
+import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.autosaveandbackup.BackupManager;
 import org.jabref.logic.importer.OpenDatabase;
@@ -179,7 +180,7 @@ public class OpenDatabaseAction extends SimpleCommand {
 
         BackgroundTask<ParserResult> backgroundTask = BackgroundTask.wrap(() -> loadDatabase(file));
         LibraryTab.Factory libraryTabFactory = new LibraryTab.Factory();
-        LibraryTab newTab = libraryTabFactory.createLibraryTab(frame, preferencesService, stateManager, themeManager, file, backgroundTask);
+        LibraryTab newTab = libraryTabFactory.createLibraryTab(frame, preferencesService, stateManager, themeManager, file, backgroundTask, Globals.IMPORT_FORMAT_READER);
 
         backgroundTask.onFinished(() -> trackOpenNewDatabase(newTab));
     }
@@ -200,6 +201,12 @@ public class OpenDatabaseAction extends SimpleCommand {
             result = OpenDatabase.loadDatabase(fileToLoad,
                     preferencesService.getImportFormatPreferences(),
                     Globals.getFileUpdateMonitor());
+            if (result.hasWarnings()) {
+                String content = Localization.lang("Please check your library file for wrong syntax.")
+                        + "\n\n" + result.getErrorMessage();
+                DefaultTaskExecutor.runInJavaFXThread(() ->
+                        dialogService.showWarningDialogAndWait(Localization.lang("Open library error"), content));
+            }
         } catch (IOException e) {
             result = ParserResult.fromError(e);
             LOGGER.error("Error opening file '{}'", fileToLoad, e);

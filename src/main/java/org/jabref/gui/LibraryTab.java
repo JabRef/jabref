@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Random;
 
 import javafx.animation.PauseTransition;
 import javafx.application.Platform;
@@ -43,6 +44,7 @@ import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.autosaveandbackup.AutosaveManager;
 import org.jabref.logic.autosaveandbackup.BackupManager;
 import org.jabref.logic.citationstyle.CitationStyleCache;
+import org.jabref.logic.importer.ImportFormatReader;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.util.FileFieldParser;
 import org.jabref.logic.l10n.Localization;
@@ -113,13 +115,15 @@ public class LibraryTab extends Tab {
     private BackgroundTask<ParserResult> dataLoadingTask = BackgroundTask.wrap(() -> null);
 
     private final IndexingTaskManager indexingTaskManager = new IndexingTaskManager(Globals.TASK_EXECUTOR);
+    private final ImportFormatReader importFormatReader;
 
     public LibraryTab(JabRefFrame frame,
                       PreferencesService preferencesService,
                       StateManager stateManager,
                       ThemeManager themeManager,
                       BibDatabaseContext bibDatabaseContext,
-                      ExternalFileTypes externalFileTypes) {
+                      ExternalFileTypes externalFileTypes,
+                      ImportFormatReader importFormatReader) {
         this.frame = Objects.requireNonNull(frame);
         this.bibDatabaseContext = Objects.requireNonNull(bibDatabaseContext);
         this.externalFileTypes = Objects.requireNonNull(externalFileTypes);
@@ -128,6 +132,7 @@ public class LibraryTab extends Tab {
         this.preferencesService = Objects.requireNonNull(preferencesService);
         this.stateManager = Objects.requireNonNull(stateManager);
         this.themeManager = Objects.requireNonNull(themeManager);
+        this.importFormatReader = importFormatReader;
 
         bibDatabaseContext.getDatabase().registerListener(this);
         bibDatabaseContext.getMetaData().registerListener(this);
@@ -152,6 +157,10 @@ public class LibraryTab extends Tab {
         this.getDatabase().registerListener(new UpdateTimestampListener(preferencesService));
 
         this.entryEditor = new EntryEditor(this, externalFileTypes);
+
+        // set LibraryTab ID for drag'n'drop
+        // ID content doesn't matter, we only need different tabs to have different ID
+        this.setId(Long.valueOf(new Random().nextLong()).toString());
 
         Platform.runLater(() -> {
             EasyBind.subscribe(changedProperty, this::updateTabTitle);
@@ -480,7 +489,9 @@ public class LibraryTab extends Tab {
                 dialogService,
                 stateManager,
                 externalFileTypes,
-                Globals.getKeyPrefs());
+                Globals.getKeyPrefs(),
+                Globals.getClipboardManager(),
+                Globals.IMPORT_FORMAT_READER);
 
         // Add the listener that binds selection to state manager (TODO: should be replaced by proper JavaFX binding as soon as table is implemented in JavaFX)
         mainTable.addSelectionListener(listEvent -> stateManager.setSelectedEntries(mainTable.getSelectedEntries()));
@@ -758,6 +769,10 @@ public class LibraryTab extends Tab {
         mainTable.paste();
     }
 
+    public void dropEntry(List<BibEntry> entriesToAdd) {
+        mainTable.dropEntry(entriesToAdd);
+    }
+
     public void cut() {
         mainTable.cut();
     }
@@ -789,11 +804,11 @@ public class LibraryTab extends Tab {
     }
 
     public static class Factory {
-        public LibraryTab createLibraryTab(JabRefFrame frame, PreferencesService preferencesService, StateManager stateManager, ThemeManager themeManager, Path file, BackgroundTask<ParserResult> dataLoadingTask) {
+        public LibraryTab createLibraryTab(JabRefFrame frame, PreferencesService preferencesService, StateManager stateManager, ThemeManager themeManager, Path file, BackgroundTask<ParserResult> dataLoadingTask, ImportFormatReader importFormatReader) {
             BibDatabaseContext context = new BibDatabaseContext();
             context.setDatabasePath(file);
 
-            LibraryTab newTab = new LibraryTab(frame, preferencesService, stateManager, themeManager, context, ExternalFileTypes.getInstance());
+            LibraryTab newTab = new LibraryTab(frame, preferencesService, stateManager, themeManager, context, ExternalFileTypes.getInstance(), importFormatReader);
             newTab.setDataLoadingTask(dataLoadingTask);
 
             dataLoadingTask.onRunning(newTab::onDatabaseLoadingStarted)
@@ -857,7 +872,7 @@ public class LibraryTab extends Tab {
         public IndexUpdateListener() {
             if (preferencesService.getFilePreferences().shouldFulltextIndexLinkedFiles()) {
                 try {
-                    indexingTaskManager.addToIndex(PdfIndexer.of(bibDatabaseContext, preferencesService.getFilePreferences()), bibDatabaseContext);
+                    indexingTaskManager.updateIndex(PdfIndexer.of(bibDatabaseContext, preferencesService.getFilePreferences()), bibDatabaseContext);
                 } catch (IOException e) {
                     LOGGER.error("Cannot access lucene index", e);
                 }
@@ -929,7 +944,7 @@ public class LibraryTab extends Tab {
             this.setText(text);
             this.getActions().setAll(actions);
             this.show();
-            if (duration != null && !duration.equals(Duration.ZERO)) {
+            if ((duration != null) && !duration.equals(Duration.ZERO)) {
                 PauseTransition delay = new PauseTransition(duration);
                 delay.setOnFinished(e -> this.hide());
                 delay.play();

@@ -2,6 +2,7 @@ package org.jabref.logic.importer.fetcher;
 
 import java.util.Optional;
 
+import org.jabref.logic.importer.FetcherClientException;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.InternalField;
@@ -14,6 +15,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 
 @FetcherTest
@@ -63,7 +65,7 @@ public class RfcFetcherTest {
         bibDraftEntry.setField(StandardField.PUBLISHER, "Internet Engineering Task Force");
         bibDraftEntry.setField(StandardField.TITLE, "{Hypertext Transfer Protocol -- HTTP/1.0}");
         bibDraftEntry.setField(StandardField.TYPE, "Internet-Draft");
-        bibDraftEntry.setField(StandardField.URL, "https://datatracker.ietf.org/doc/html/draft-fielding-http-spec-01");
+        bibDraftEntry.setField(StandardField.URL, "https://datatracker.ietf.org/doc/draft-fielding-http-spec/01/");
         bibDraftEntry.setField(StandardField.YEAR, "1994");
         bibDraftEntry.setField(StandardField.ABSTRACT, "The Hypertext Transfer Protocol (HTTP) is an application-level protocol with the lightness and speed necessary for distributed, collaborative, hypermedia information systems. It is a generic, stateless, object-oriented protocol which can be used for many tasks, such as name servers and distributed object management systems, through extension of its request methods (commands). A feature of HTTP is the typing and negotiation of data representation, allowing systems to be built independently of the data being transferred. HTTP has been in use by the World-Wide Web global information initiative since 1990. This specification reflects preferred usage of the protocol referred to as 'HTTP/1.0', and is compatible with the most commonly used HTTP server and client programs implemented prior to November 1994.");
         bibDraftEntry.setCommentsBeforeEntry("%% You should probably cite draft-ietf-http-v10-spec instead of this I-D.\n");
@@ -88,16 +90,16 @@ public class RfcFetcherTest {
 
     @Test
     public void performSearchByIdFindsNothingWithValidDraftIdentifier() throws Exception {
-        assertEquals(Optional.empty(), fetcher.performSearchById("draft-test-draft-spec"));
+        assertThrows(FetcherClientException.class, () -> fetcher.performSearchById("draft-test-draft-spec"));
     }
 
     @Test
     public void performSearchByIdFindsNothingWithValidIdentifier() throws Exception {
-        assertEquals(Optional.empty(), fetcher.performSearchById("RFC9999"));
+        assertThrows(FetcherClientException.class, () -> fetcher.performSearchById("RFC9999"));
     }
 
     @Test
     public void performSearchByIdFindsNothingWithInvalidIdentifier() throws Exception {
-        assertEquals(Optional.empty(), fetcher.performSearchById("banana"));
+        assertThrows(FetcherClientException.class, () -> fetcher.performSearchById("banana"));
     }
 }

@@ -17,11 +17,11 @@
     <category field="humanities"/>
     <category field="social_science"/>
     <summary>ISNAD Citation Style full notes and bibliography format.</summary>
-    <updated>2020-04-08T12:59:16+00:00</updated>
+    <updated>2022-05-31T12:59:16+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <!--
-	ISNAD FULL NOTES v.1.1
+	ISNAD FULL NOTES v.1.2
 
 	Document Type Mappings
 	ISNAD				CSL
@@ -51,14 +51,14 @@
 	Interview			interview
 	Interview			article-journal, article-magazine, article-newspaper, book (as collection-title with interviewer extra)
 	Legislation			legislation (with code number for official journal)
-	Legislation			legislation (without code number other legal sources) 
-	Standart			book
+	Legislation			legislation (without code number other legal sources)
+	Standard			standard (For backward compability book with issued, collection-number, authority)
 	Case				legal_case
 	Website				webpage
 	Databese			webpage
 	Software			book (with version number)
 	Patent				patent
-	Socail media		webpage (social media title as container-title)	
+	Socail media		webpage (social media title as container-title)
 	Movie				motion_picture (with genre)
 	TV broadcast		broadcast
 	Video record		motion_picture (without genre)
@@ -303,8 +303,7 @@
               <choose>
                 <if type="entry-encyclopedia" match="none">
                   <names variable="editor">
-                    <name/>
-                    <label form="short" prefix=" (" suffix=")"/>
+                    <name form="short"/>
                   </names>
                 </if>
               </choose>
@@ -765,7 +764,14 @@
       <if type="article-journal article-magazine article-newspaper" match="any">
         <group delimiter=", ">
           <group>
-            <number suffix="/" variable="volume"/>
+            <choose>
+              <if match="all" variable="volume issue">
+                <number suffix="/" variable="volume"/>
+              </if>
+              <else>
+                <number variable="volume"/>
+              </else>
+            </choose>
             <number variable="issue"/>
           </group>
         </group>
@@ -871,7 +877,14 @@
       <if type="article-journal article-magazine article-newspaper" match="any">
         <group delimiter=", ">
           <group>
-            <number suffix="/" variable="volume"/>
+            <choose>
+              <if match="all" variable="volume issue">
+                <number suffix="/" variable="volume"/>
+              </if>
+              <else>
+                <number variable="volume"/>
+              </else>
+            </choose>
             <number variable="issue"/>
           </group>
         </group>
@@ -1038,7 +1051,17 @@
               <if is-uncertain-date="issued">
                 <date variable="issued" form="numeric" date-parts="year" prefix="[" suffix="?]"/>
               </if>
-              <else-if type="book" variable="issued collection-number">
+              <else-if type="standard">
+                <choose>
+                  <if variable="collection-title" match="none">
+                    <group delimiter=", ">
+                      <date date-parts="year" form="numeric" variable="issued"/>
+                      <text variable="collection-number"/>
+                    </group>
+                  </if>
+                </choose>
+              </else-if>
+              <else-if type="book" variable="issued collection-number authority">
                 <choose>
                   <if variable="collection-title" match="none">
                     <group delimiter=", ">

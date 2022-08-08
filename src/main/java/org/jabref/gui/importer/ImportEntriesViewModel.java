@@ -12,6 +12,7 @@ import javafx.collections.ObservableList;
 
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
+import org.jabref.gui.Globals;
 import org.jabref.gui.JabRefGUI;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.duplicationFinder.DuplicateResolverDialog;
@@ -170,7 +171,8 @@ public class ImportEntriesViewModel extends AbstractViewModel {
                 fileUpdateMonitor,
                 undoManager,
                 stateManager,
-                dialogService);
+                dialogService,
+                Globals.IMPORT_FORMAT_READER);
         importHandler.importEntries(entriesToImport);
         dialogService.notify(Localization.lang("Number of entries successfully imported") + ": " + entriesToImport.size());
     }
@@ -198,7 +200,7 @@ public class ImportEntriesViewModel extends AbstractViewModel {
         Optional<BibEntry> other = new DuplicateCheck(entryTypesManager).containsDuplicate(databaseContext.getDatabase(), entry, databaseContext.getMode());
         if (other.isPresent()) {
             DuplicateResolverDialog dialog = new DuplicateResolverDialog(other.get(),
-                    entry, DuplicateResolverDialog.DuplicateResolverType.INSPECTION, databaseContext, stateManager);
+                    entry, DuplicateResolverDialog.DuplicateResolverType.INSPECTION, databaseContext, stateManager, dialogService);
 
             DuplicateResolverDialog.DuplicateResolverResult result = dialogService.showCustomDialogAndWait(dialog)
                                                                                   .orElse(DuplicateResolverDialog.DuplicateResolverResult.BREAK);
@@ -229,7 +231,7 @@ public class ImportEntriesViewModel extends AbstractViewModel {
         other = findInternalDuplicate(entry);
         if (other.isPresent()) {
             DuplicateResolverDialog diag = new DuplicateResolverDialog(entry,
-                    other.get(), DuplicateResolverDialog.DuplicateResolverType.DUPLICATE_SEARCH, databaseContext, stateManager);
+                    other.get(), DuplicateResolverDialog.DuplicateResolverType.DUPLICATE_SEARCH, databaseContext, stateManager, dialogService);
 
             DuplicateResolverDialog.DuplicateResolverResult answer = dialogService.showCustomDialogAndWait(diag)
                                                                                   .orElse(DuplicateResolverDialog.DuplicateResolverResult.BREAK);

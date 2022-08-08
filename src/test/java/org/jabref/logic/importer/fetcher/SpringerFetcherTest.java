@@ -106,15 +106,21 @@ class SpringerFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSear
 
     @Test
     void testSpringerJSONToBibtex() {
-        String jsonString = "{\r\n" + "            \"identifier\":\"doi:10.1007/BF01201962\",\r\n"
-                + "            \"title\":\"Book reviews\",\r\n"
-                + "            \"publicationName\":\"World Journal of Microbiology & Biotechnology\",\r\n"
-                + "            \"issn\":\"1573-0972\",\r\n" + "            \"isbn\":\"\",\r\n"
-                + "            \"doi\":\"10.1007/BF01201962\",\r\n" + "            \"publisher\":\"Springer\",\r\n"
-                + "            \"publicationDate\":\"1992-09-01\",\r\n" + "            \"volume\":\"8\",\r\n"
-                + "            \"number\":\"5\",\r\n" + "            \"startingPage\":\"550\",\r\n"
-                + "            \"url\":\"http://dx.doi.org/10.1007/BF01201962\",\"copyright\":\"©1992 Rapid Communications of Oxford Ltd.\"\r\n"
-                + "        }";
+        String jsonString = """
+                {\r
+                            "identifier":"doi:10.1007/BF01201962",\r
+                            "title":"Book reviews",\r
+                            "publicationName":"World Journal of Microbiology & Biotechnology",\r
+                            "issn":"1573-0972",\r
+                            "isbn":"",\r
+                            "doi":"10.1007/BF01201962",\r
+                            "publisher":"Springer",\r
+                            "publicationDate":"1992-09-01",\r
+                            "volume":"8",\r
+                            "number":"5",\r
+                            "startingPage":"550",\r
+                            "url":"http://dx.doi.org/10.1007/BF01201962","copyright":"©1992 Rapid Communications of Oxford Ltd."\r
+                        }""";
 
         JSONObject jsonObject = new JSONObject(jsonString);
         BibEntry bibEntry = SpringerFetcher.parseSpringerJSONtoBibtex(jsonObject);

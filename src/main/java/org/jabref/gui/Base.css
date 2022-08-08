@@ -98,6 +98,9 @@
     -jr-drag-target: -jr-purple;
     -jr-drag-target-hover: derive(-jr-purple, 80%);
 
+    -js-summary-text-color: #000000;
+    -js-summary-text-color-selected: #000000;
+
     /*
      Here are redefinitions of the default properties of modena. They should in principle all be derived from the
      above colors. Goal should be to make as few as possible direct color-changes to elements and only do this for
@@ -1301,4 +1304,17 @@ TextFlow * {
 
 .text-field:invalid {
     -fx-background-color: rgba(240, 128, 128, 0.5);
+}
+
+.rating {
+    -fx-skin: "org.jabref.gui.util.CustomRatingSkin";
+    -fx-padding: 0.5em 0px 0px 0px;
+}
+
+.rating > .container > .button {
+    -fx-icon-color: derive(-fx-text-base-color, 85%);
+}
+
+.rating > .container > .button.strong {
+    -fx-icon-color: -fx-text-base-color;
 }
