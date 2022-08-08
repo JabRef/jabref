@@ -3,6 +3,7 @@ package org.jabref.gui.mergeentries;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 
+import org.jabref.gui.mergeentries.newmergedialog.ShowDiffConfig;
 import org.jabref.gui.mergeentries.newmergedialog.ThreeWayMergeView;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.logic.l10n.Localization;
@@ -48,5 +49,9 @@ public class MergeEntriesDialog extends BaseDialog<EntriesMergeResult> {
 
     public void setRightHeaderText(String rightHeaderText) {
         threeWayMergeView.setRightHeader(rightHeaderText);
+    }
+
+    public void configureDiff(ShowDiffConfig diffConfig) {
+        threeWayMergeView.showDiff(diffConfig);
     }
 }

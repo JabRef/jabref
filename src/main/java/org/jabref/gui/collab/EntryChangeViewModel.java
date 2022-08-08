@@ -7,6 +7,9 @@ import javafx.scene.Node;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.mergeentries.MergeEntriesDialog;
+import org.jabref.gui.mergeentries.newmergedialog.ShowDiffConfig;
+import org.jabref.gui.mergeentries.newmergedialog.diffhighlighter.DiffHighlighter;
+import org.jabref.gui.mergeentries.newmergedialog.toolbar.ThreeWayMergeToolbar;
 import org.jabref.gui.preview.PreviewViewer;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.undo.NamedCompound;
@@ -62,6 +65,10 @@ class EntryChangeViewModel extends DatabaseChangeViewModel {
     @Override
     public Optional<DatabaseChangeViewModel> openAdvancedMergeDialog() {
         MergeEntriesDialog mergeEntriesDialog = new MergeEntriesDialog(oldEntry, newEntry);
+        mergeEntriesDialog.setLeftHeaderText(Localization.lang("On JabRef"));
+        mergeEntriesDialog.setRightHeaderText(Localization.lang("On disk"));
+        mergeEntriesDialog.configureDiff(new ShowDiffConfig(ThreeWayMergeToolbar.DiffView.SPLIT, DiffHighlighter.DiffMethod.WORDS));
+
         return dialogService.showCustomDialogAndWait(mergeEntriesDialog)
                             .map(result -> new EntryChangeViewModel(oldEntry, result.mergedEntry(),
                                     dialogService, preferencesService, stateManager, themeManager));
