@@ -371,9 +371,9 @@ public class CitaviXmlImporter extends Importer implements Parser {
         Optional<String> title = knowledgeItem.map(item -> item.getCoreStatement());
         title.ifPresent(t -> comment.append("#").append(t).append("\n\n"));
         Optional<String> text = knowledgeItem.map(item -> item.getText());
-        text.ifPresent(t -> comment.append(t).append("\n"));
-        Optional<String> pages = knowledgeItem.map(item -> item.getPageRange());
-        pages.ifPresent(p -> comment.append(p));
+        text.ifPresent(t -> comment.append(t).append("\n\n"));
+        Optional<Integer> pages = knowledgeItem.map(item -> item.getPageRangeNumber()).filter(range -> range != -1);
+        pages.ifPresent(p -> comment.append("page range: ").append(p));
 
         return comment.toString();
     }
