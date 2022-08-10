@@ -66,28 +66,24 @@ public class MergeEntriesAction extends SimpleCommand {
             second = one;
         }
 
-        MergeEntriesDialog dlg = new MergeEntriesDialog(first, second);
-        dlg.setTitle(Localization.lang("Merge entries"));
-        Optional<BibEntry> mergedEntry = dialogService.showCustomDialogAndWait(dlg);
-        if (mergedEntry.isPresent()) {
-            // ToDo: BibDatabase::insertEntry does not contain logic to mark the BasePanel as changed and to mark
+        MergeEntriesDialog dialog = new MergeEntriesDialog(first, second);
+        dialog.setTitle(Localization.lang("Merge entries"));
+        Optional<MergeResult> mergeResultOpt = dialogService.showCustomDialogAndWait(dialog);
+        mergeResultOpt.ifPresentOrElse(mergeResult -> {
+            // TODO: BibDatabase::insertEntry does not contain logic to mark the BasePanel as changed and to mark
             //  entries with a timestamp, only BasePanel::insertEntry does. Workaround for the moment is to get the
             //  BasePanel from the constructor injected JabRefFrame. Should be refactored and extracted!
-            frame.getCurrentLibraryTab().insertEntry(mergedEntry.get());
+            frame.getCurrentLibraryTab().insertEntry(mergeResult.mergedEntry());
 
-            // Create a new entry and add it to the undo stack
-            // Remove the other two entries and add them to the undo stack (which is not working...)
             NamedCompound ce = new NamedCompound(Localization.lang("Merge entries"));
-            ce.addEdit(new UndoableInsertEntries(databaseContext.getDatabase(), mergedEntry.get()));
+            ce.addEdit(new UndoableInsertEntries(databaseContext.getDatabase(), mergeResult.mergedEntry()));
             List<BibEntry> entriesToRemove = Arrays.asList(one, two);
             ce.addEdit(new UndoableRemoveEntries(databaseContext.getDatabase(), entriesToRemove));
             databaseContext.getDatabase().removeEntries(entriesToRemove);
             ce.end();
-            Globals.undoManager.addEdit(ce); // ToDo: Rework UndoManager and extract Globals
+            Globals.undoManager.addEdit(ce);
 
             dialogService.notify(Localization.lang("Merged entries"));
-        } else {
-            dialogService.notify(Localization.lang("Canceled merging entries"));
-        }
+        }, () -> dialogService.notify(Localization.lang("Canceled merging entries")));
     }
 }

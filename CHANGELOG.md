@@ -13,13 +13,10 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 
 ### Changed
 
-- We improved the Latex2Unicode conversion [#8639](https://github.com/JabRef/jabref/pull/8639)
 - When JabRef writes a `.bib` file, it makes first a backup (`.bak`) of the `.bib`
 - When JabRef writes a `.bib` file, it first attempts to write into a separate local directory
 - We changed the writing method of a `.bib` file: Existing files should have been modified instead of being replaced.
-- Writing BibTeX data into a PDF (XMP) removes braces. [#8452](https://github.com/JabRef/jabref/issues/8452)
-- Writing BibTeX data into a PDF (XMP) does not write the `file` field.
-- Writing BibTeX data into a PDF (XMP) considers the configured keyword separator (and does not use "," as default any more)
+- We changed the button label from "Return to JabRef" to "Return to library" to better indicate the purpose of the action.
 
 ### Fixed
 

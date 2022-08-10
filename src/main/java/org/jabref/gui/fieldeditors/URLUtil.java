@@ -74,7 +74,12 @@ public class URLUtil {
      * @return true if <c>url</c> contains a valid URL
      */
     public static boolean isURL(String url) {
-        return url.contains("://");
+        try {
+            new URL(url);
+            return true;
+        } catch (MalformedURLException e) {
+            return false;
+        }
     }
 
     /**
