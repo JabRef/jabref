@@ -28,6 +28,7 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
+import org.jabref.logic.cleanup.NormalizeNewlinesFormatter;
 import org.jabref.logic.formatter.bibtexfields.NormalizePagesFormatter;
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.Parser;
@@ -59,6 +60,7 @@ public class CitaviXmlImporter extends Importer implements Parser {
     private static final Logger LOGGER = LoggerFactory.getLogger(CitaviXmlImporter.class);
     private static final byte UUID_LENGTH = 36;
     private static final byte UUID_SEMICOLON_OFFSET_INDEX = 37;
+    private final NormalizeNewlinesFormatter normalizeNewlinesFormatter = new NormalizeNewlinesFormatter();
     private final NormalizePagesFormatter pagesFormatter = new NormalizePagesFormatter();
 
     private final Map<String, Author> knownPersons = new HashMap<>();
@@ -117,7 +119,6 @@ public class CitaviXmlImporter extends Importer implements Parser {
                 if (str.toLowerCase(Locale.ROOT).contains("citaviexchangedata")) {
                     return true;
                 }
-
                 i++;
             }
         }
@@ -131,7 +132,7 @@ public class CitaviXmlImporter extends Importer implements Parser {
             Object unmarshalledObject = unmarshallRoot(reader);
 
             if (unmarshalledObject instanceof CitaviExchangeData) {
-                // Check whether we have an article set, an article, a book article or a book article set
+                // Check whether we have an article set, an article, a book article, or a book article set
                 CitaviExchangeData data = (CitaviExchangeData) unmarshalledObject;
                 List<BibEntry> bibEntries = parseDataList(data);
 
@@ -203,15 +204,15 @@ public class CitaviXmlImporter extends Importer implements Parser {
         Optional.ofNullable(data.getVolume())
                 .ifPresent(value -> entry.setField(StandardField.VOLUME, clean(value)));
         Optional.ofNullable(getAuthorName(data))
-                .ifPresent(value -> entry.setField(StandardField.AUTHOR, value));
+                .ifPresent(value -> entry.setField(StandardField.AUTHOR, clean(value)));
         Optional.ofNullable(getEditorName(data))
-                .ifPresent(value -> entry.setField(StandardField.EDITOR, value));
+                .ifPresent(value -> entry.setField(StandardField.EDITOR, clean(value)));
         Optional.ofNullable(getKeywords(data))
-                .ifPresent(value -> entry.setField(StandardField.KEYWORDS, value));
+                .ifPresent(value -> entry.setField(StandardField.KEYWORDS, clean(value)));
         Optional.ofNullable(getPublisher(data))
-                .ifPresent(value -> entry.setField(StandardField.PUBLISHER, value));
+                .ifPresent(value -> entry.setField(StandardField.PUBLISHER, clean(value)));
         Optional.ofNullable(getKnowledgeItem(data))
-                .ifPresent(value -> entry.setField(StandardField.COMMENT, value));
+                .ifPresent(value -> entry.setField(StandardField.COMMENT, normalizeNewlinesFormatter.format(value)));
         return entry;
     }
 
