@@ -2,7 +2,6 @@ package org.jabref.logic.bibtex;
 
 import java.util.Collections;
 
-import org.jabref.logic.util.OS;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
 
