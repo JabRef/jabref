@@ -152,8 +152,8 @@ public class CSLAdapter {
                         if (!bibEntry.hasField(StandardField.PAGES)) {
                             bibEntry.setField(StandardField.PAGES, eid);
                             bibEntry.clearField(StandardField.EID);
-                        }}
-                    );
+                        }
+                    });
                 } else {
                     // BibTeX mode
                     bibEntry.getField(StandardField.NUMBER).ifPresent(number -> {
