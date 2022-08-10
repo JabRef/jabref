@@ -22,24 +22,23 @@ class FieldContentFormatterTest {
     }
 
     @Test
-    void unifiesLineBreaks() {
+    void doesNotUnifyLineBreaks() {
         String original = "I\r\nunify\nline\rbreaks.";
-        String expected = "I\nunify\nline\nbreaks.".replace("\n", OS.NEWLINE);
         String processed = parser.format(new StringBuilder(original), StandardField.ABSTRACT);
 
-        assertEquals(expected, processed);
+        // Normalization is done at org.jabref.logic.exporter.BibWriter, so no need to normalize here
+        assertEquals(original, processed);
     }
 
     @Test
     void retainsWhitespaceForMultiLineFields() {
         String original = "I\nkeep\nline\nbreaks\nand\n\ttabs.";
-        String formatted = original.replace("\n", OS.NEWLINE);
 
         String abstrakt = parser.format(new StringBuilder(original), StandardField.ABSTRACT);
         String review = parser.format(new StringBuilder(original), StandardField.REVIEW);
 
-        assertEquals(formatted, abstrakt);
-        assertEquals(formatted, review);
+        assertEquals(original, abstrakt);
+        assertEquals(original, review);
     }
 
     @Test
