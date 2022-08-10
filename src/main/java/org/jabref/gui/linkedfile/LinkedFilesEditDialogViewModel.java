@@ -58,12 +58,12 @@ public class LinkedFilesEditDialogViewModel extends AbstractViewModel {
         if (!link.isEmpty()) {
             // Check if this looks like a remote link:
             if (REMOTE_LINK_PATTERN.matcher(link).matches()) {
-                externalFileTypes.getExternalFileTypeByExt("html").ifPresent(selectedExternalFileType::setValue);
+                externalFileTypes.getExternalFileTypeByExt("html", filePreferences).ifPresent(selectedExternalFileType::setValue);
             }
 
             // Try to guess the file type:
             String theLink = link.trim();
-            externalFileTypes.getExternalFileTypeForName(theLink).ifPresent(selectedExternalFileType::setValue);
+            externalFileTypes.getExternalFileTypeForName(theLink, filePreferences).ifPresent(selectedExternalFileType::setValue);
         }
     }
 
@@ -101,7 +101,7 @@ public class LinkedFilesEditDialogViewModel extends AbstractViewModel {
         selectedExternalFileType.setValue(null);
 
         // See what is a reasonable selection for the type combobox:
-        Optional<ExternalFileType> fileType = externalFileTypes.getExternalFileTypeByLinkedFile(linkedFile, false);
+        Optional<ExternalFileType> fileType = externalFileTypes.getExternalFileTypeByLinkedFile(linkedFile, false, filePreferences);
         if (fileType.isPresent() && !(fileType.get() instanceof UnknownExternalFileType)) {
             selectedExternalFileType.setValue(fileType.get());
         } else if ((linkedFile.getLink() != null) && (!linkedFile.getLink().isEmpty())) {

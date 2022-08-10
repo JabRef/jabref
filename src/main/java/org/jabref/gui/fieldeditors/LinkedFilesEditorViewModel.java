@@ -38,6 +38,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.util.FileHelper;
+import org.jabref.preferences.FilePreferences;
 import org.jabref.preferences.PreferencesService;
 
 public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
@@ -87,19 +88,19 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
      *
      * TODO: Move this method to {@link LinkedFile} as soon as {@link CustomExternalFileType} lives in model.
      */
-    public static LinkedFile fromFile(Path file, List<Path> fileDirectories, ExternalFileTypes externalFileTypesFile) {
+    public static LinkedFile fromFile(Path file, List<Path> fileDirectories, ExternalFileTypes externalFileTypesFile, FilePreferences filePreferences) {
         String fileExtension = FileHelper.getFileExtension(file).orElse("");
         ExternalFileType suggestedFileType = externalFileTypesFile
-                .getExternalFileTypeByExt(fileExtension)
+                .getExternalFileTypeByExt(fileExtension, filePreferences)
                 .orElse(new UnknownExternalFileType(fileExtension));
         Path relativePath = FileUtil.relativize(file, fileDirectories);
         return new LinkedFile("", relativePath, suggestedFileType.getName());
     }
 
-    public LinkedFileViewModel fromFile(Path file) {
+    public LinkedFileViewModel fromFile(Path file, FilePreferences filePreferences) {
         List<Path> fileDirectories = databaseContext.getFileDirectories(preferences.getFilePreferences());
 
-        LinkedFile linkedFile = fromFile(file, fileDirectories, externalFileTypes);
+        LinkedFile linkedFile = fromFile(file, fileDirectories, externalFileTypes, filePreferences);
         return new LinkedFileViewModel(
                 linkedFile,
                 entry,
@@ -145,7 +146,7 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
 
         List<Path> fileDirectories = databaseContext.getFileDirectories(preferences.getFilePreferences());
         dialogService.showFileOpenDialogAndGetMultipleFiles(fileDialogConfiguration).forEach(newFile -> {
-            LinkedFile newLinkedFile = fromFile(newFile, fileDirectories, externalFileTypes);
+            LinkedFile newLinkedFile = fromFile(newFile, fileDirectories, externalFileTypes, preferences.getFilePreferences());
             files.add(new LinkedFileViewModel(
                     newLinkedFile,
                     entry,

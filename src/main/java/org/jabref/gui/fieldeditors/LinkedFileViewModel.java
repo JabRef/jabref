@@ -176,7 +176,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
     }
 
     public JabRefIcon getTypeIcon() {
-        return externalFileTypes.getExternalFileTypeByLinkedFile(linkedFile, false)
+        return externalFileTypes.getExternalFileTypeByLinkedFile(linkedFile, false, preferences.getFilePreferences())
                                 .map(ExternalFileType::getIcon)
                                 .orElse(IconTheme.JabRefIcons.FILE);
     }
@@ -199,7 +199,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
 
     public void open() {
         try {
-            Optional<ExternalFileType> type = ExternalFileTypes.getInstance().getExternalFileTypeByLinkedFile(linkedFile, true);
+            Optional<ExternalFileType> type = ExternalFileTypes.getInstance().getExternalFileTypeByLinkedFile(linkedFile, true, preferences.getFilePreferences());
             boolean successful = JabRefDesktop.openExternalFileAnyFormat(databaseContext, preferences, linkedFile.getLink(), type);
             if (!successful) {
                 dialogService.showErrorDialogAndWait(Localization.lang("File not found"), Localization.lang("Could not find file '%0'.", linkedFile.getLink()));
@@ -444,7 +444,11 @@ public class LinkedFileViewModel extends AbstractViewModel {
                 }
 
                 if (!isDuplicate) {
-                    LinkedFile newLinkedFile = LinkedFilesEditorViewModel.fromFile(destination, databaseContext.getFileDirectories(preferences.getFilePreferences()), externalFileTypes);
+                    LinkedFile newLinkedFile = LinkedFilesEditorViewModel.fromFile(
+                            destination,
+                            databaseContext.getFileDirectories(preferences.getFilePreferences()),
+                            externalFileTypes,
+                            preferences.getFilePreferences());
                     List<LinkedFile> linkedFiles = entry.getFiles();
 
                     entry.addLinkedFile(entry, linkedFile, newLinkedFile, linkedFiles);
@@ -523,15 +527,15 @@ public class LinkedFileViewModel extends AbstractViewModel {
 
         if (mimeType != null) {
             LOGGER.debug("MIME Type suggested: " + mimeType);
-            return externalFileTypes.getExternalFileTypeByMimeType(mimeType);
+            return externalFileTypes.getExternalFileTypeByMimeType(mimeType, preferences.getFilePreferences());
         } else {
             return Optional.empty();
         }
     }
 
     private Optional<ExternalFileType> inferFileTypeFromURL(String url) {
-        return URLUtil.getSuffix(url)
-                      .flatMap(externalFileTypes::getExternalFileTypeByExt);
+        return URLUtil.getSuffix(url, preferences.getFilePreferences())
+                      .flatMap(extension -> externalFileTypes.getExternalFileTypeByExt(extension, preferences.getFilePreferences()));
     }
 
     public LinkedFile getFile() {

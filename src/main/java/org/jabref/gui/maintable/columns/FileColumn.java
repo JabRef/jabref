@@ -94,7 +94,7 @@ public class FileColumn extends MainTableColumn<List<LinkedFile>> {
         setCommonSettings();
 
         this.setGraphic(externalFileTypes
-                .getExternalFileTypeByName(fileType)
+                .getExternalFileTypeByName(fileType, preferencesService.getFilePreferences())
                 .map(ExternalFileType::getIcon).orElse(IconTheme.JabRefIcons.FILE)
                 .getGraphicNode());
 
@@ -147,7 +147,7 @@ public class FileColumn extends MainTableColumn<List<LinkedFile>> {
         if (linkedFiles.size() > 1) {
             return IconTheme.JabRefIcons.FILE_MULTIPLE.getGraphicNode();
         } else if (linkedFiles.size() == 1) {
-            return externalFileTypes.getExternalFileTypeByLinkedFile(linkedFiles.get(0), true)
+            return externalFileTypes.getExternalFileTypeByLinkedFile(linkedFiles.get(0), true, preferencesService.getFilePreferences())
                                     .map(ExternalFileType::getIcon)
                                     .orElse(IconTheme.JabRefIcons.FILE)
                                     .getGraphicNode();

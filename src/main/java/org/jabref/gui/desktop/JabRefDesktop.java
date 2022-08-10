@@ -219,7 +219,7 @@ public class JabRefDesktop {
      * @param url the URL to open
      */
     public static void openBrowser(String url) throws IOException {
-        Optional<ExternalFileType> fileType = ExternalFileTypes.getInstance().getExternalFileTypeByExt("html");
+        Optional<ExternalFileType> fileType = ExternalFileTypes.getInstance().getExternalFileTypeByExt("html", Globals.prefs.getFilePreferences());
         openExternalFilePlatformIndependent(fileType, url);
     }
 

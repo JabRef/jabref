@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.TreeSet;
 
+import javafx.collections.FXCollections;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
 
@@ -46,6 +47,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.contains;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
@@ -75,11 +77,11 @@ class LinkedFileViewModelTest {
         taskExecutor = mock(TaskExecutor.class);
         dialogService = mock(DialogService.class);
 
-        when(externalFileType.getExternalFileTypes()).thenReturn(new TreeSet<>(ExternalFileTypes.getDefaultExternalFileTypes()));
-        when(externalFileType.getExternalFileTypeByMimeType("application/pdf")).thenReturn(Optional.of(StandardExternalFileType.PDF));
-        when(externalFileType.getExternalFileTypeByMimeType(contains("text/html"))).thenReturn(Optional.of(StandardExternalFileType.URL));
-        when(externalFileType.getExternalFileTypeByExt("pdf")).thenReturn(Optional.of(StandardExternalFileType.PDF));
-        when(externalFileType.getExternalFileTypeByExt("html")).thenReturn(Optional.of(StandardExternalFileType.URL));
+        when(filePreferences.getExternalFileTypes()).thenReturn(FXCollections.observableSet(new TreeSet<>(ExternalFileTypes.getDefaultExternalFileTypes())));
+        when(externalFileType.getExternalFileTypeByMimeType("application/pdf", filePreferences)).thenReturn(Optional.of(StandardExternalFileType.PDF));
+        when(externalFileType.getExternalFileTypeByMimeType(contains("text/html"), eq(filePreferences))).thenReturn(Optional.of(StandardExternalFileType.URL));
+        when(externalFileType.getExternalFileTypeByExt("pdf", filePreferences)).thenReturn(Optional.of(StandardExternalFileType.PDF));
+        when(externalFileType.getExternalFileTypeByExt("html", filePreferences)).thenReturn(Optional.of(StandardExternalFileType.URL));
         when(preferences.getFilePreferences()).thenReturn(filePreferences);
         when(preferences.getXmpPreferences()).thenReturn(mock(XmpPreferences.class));
         tempFile = tempFolder.resolve("temporaryFile");
@@ -214,7 +216,7 @@ class LinkedFileViewModelTest {
 
         BackgroundTask<Path> task = viewModel.prepareDownloadTask(tempFile.getParent(), new URLDownload("http://arxiv.org/pdf/1207.0408v1"));
         task.onSuccess(destination -> {
-            LinkedFile newLinkedFile = LinkedFilesEditorViewModel.fromFile(destination, Collections.singletonList(tempFile.getParent()), externalFileType);
+            LinkedFile newLinkedFile = LinkedFilesEditorViewModel.fromFile(destination, Collections.singletonList(tempFile.getParent()), externalFileType, filePreferences);
             assertEquals("asdf.pdf", newLinkedFile.getLink());
             assertEquals("PDF", newLinkedFile.getFileType());
         });
@@ -308,7 +310,7 @@ class LinkedFileViewModelTest {
     // Tests if added parameters to mimeType gets parsed to correct format.
     @Test
     void mimeTypeStringWithParameterIsReturnedAsWithoutParameter() {
-        Optional<ExternalFileType> test = externalFileType.getExternalFileTypeByMimeType("text/html; charset=UTF-8");
+        Optional<ExternalFileType> test = externalFileType.getExternalFileTypeByMimeType("text/html; charset=UTF-8", filePreferences);
         String actual = test.get().toString();
         assertEquals("URL", actual);
     }

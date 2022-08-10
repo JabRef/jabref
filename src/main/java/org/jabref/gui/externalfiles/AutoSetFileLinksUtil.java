@@ -55,15 +55,17 @@ public class AutoSetFileLinksUtil {
     private static final Logger LOGGER = LoggerFactory.getLogger(AutoSetFileLinksUtil.class);
     private final List<Path> directories;
     private final AutoLinkPreferences autoLinkPreferences;
+    private final FilePreferences filePreferences;
     private final ExternalFileTypes externalFileTypes;
 
     public AutoSetFileLinksUtil(BibDatabaseContext databaseContext, FilePreferences filePreferences, AutoLinkPreferences autoLinkPreferences, ExternalFileTypes externalFileTypes) {
-        this(databaseContext.getFileDirectories(filePreferences), autoLinkPreferences, externalFileTypes);
+        this(databaseContext.getFileDirectories(filePreferences), filePreferences, autoLinkPreferences, externalFileTypes);
     }
 
-    private AutoSetFileLinksUtil(List<Path> directories, AutoLinkPreferences autoLinkPreferences, ExternalFileTypes externalFileTypes) {
+    private AutoSetFileLinksUtil(List<Path> directories, FilePreferences filePreferences, AutoLinkPreferences autoLinkPreferences, ExternalFileTypes externalFileTypes) {
         this.directories = directories;
         this.autoLinkPreferences = autoLinkPreferences;
+        this.filePreferences = filePreferences;
         this.externalFileTypes = externalFileTypes;
     }
 
@@ -128,7 +130,7 @@ public class AutoSetFileLinksUtil {
 
             if (!fileAlreadyLinked) {
                 Optional<ExternalFileType> type = FileHelper.getFileExtension(foundFile)
-                                                            .map(externalFileTypes::getExternalFileTypeByExt)
+                                                            .map(extension -> externalFileTypes.getExternalFileTypeByExt(extension, filePreferences))
                                                             .orElse(Optional.of(new UnknownExternalFileType("")));
 
                 String strType = type.isPresent() ? type.get().getName() : "";

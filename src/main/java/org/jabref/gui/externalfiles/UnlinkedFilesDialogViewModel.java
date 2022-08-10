@@ -101,9 +101,9 @@ public class UnlinkedFilesDialogViewModel {
                 dialogService);
 
         this.fileFilterList = FXCollections.observableArrayList(
-                new FileExtensionViewModel(StandardFileType.ANY_FILE, externalFileTypes),
-                new FileExtensionViewModel(StandardFileType.BIBTEX_DB, externalFileTypes),
-                new FileExtensionViewModel(StandardFileType.PDF, externalFileTypes));
+                new FileExtensionViewModel(StandardFileType.ANY_FILE, externalFileTypes, preferences.getFilePreferences()),
+                new FileExtensionViewModel(StandardFileType.BIBTEX_DB, externalFileTypes, preferences.getFilePreferences()),
+                new FileExtensionViewModel(StandardFileType.PDF, externalFileTypes, preferences.getFilePreferences()));
 
         this.dateFilterList = FXCollections.observableArrayList(DateRange.values());
 

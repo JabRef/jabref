@@ -12,6 +12,7 @@ import java.util.Optional;
 
 import org.jabref.architecture.AllowedToUseAwt;
 import org.jabref.gui.DialogService;
+import org.jabref.gui.Globals;
 import org.jabref.gui.JabRefExecutorService;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
@@ -48,7 +49,7 @@ public class Linux implements NativeDesktop {
 
     @Override
     public void openFile(String filePath, String fileType) throws IOException {
-        Optional<ExternalFileType> type = ExternalFileTypes.getInstance().getExternalFileTypeByExt(fileType);
+        Optional<ExternalFileType> type = ExternalFileTypes.getInstance().getExternalFileTypeByExt(fileType, Globals.prefs.getFilePreferences());
         String viewer;
 
         if (type.isPresent() && !type.get().getOpenWithApplication().isEmpty()) {

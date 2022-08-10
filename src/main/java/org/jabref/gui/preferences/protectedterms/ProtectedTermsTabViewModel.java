@@ -125,8 +125,8 @@ public class ProtectedTermsTabViewModel implements PreferenceTabViewModel {
 
     public void edit(ProtectedTermsListItemModel file) {
         Optional<ExternalFileType> termsFileType = OptionalUtil.<ExternalFileType>orElse(
-                ExternalFileTypes.getInstance().getExternalFileTypeByExt("terms"),
-                ExternalFileTypes.getInstance().getExternalFileTypeByExt("txt")
+                ExternalFileTypes.getInstance().getExternalFileTypeByExt("terms", preferences.getFilePreferences()),
+                ExternalFileTypes.getInstance().getExternalFileTypeByExt("txt", preferences.getFilePreferences())
         );
 
         String fileName = file.getTermsList().getLocation();
