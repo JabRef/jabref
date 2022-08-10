@@ -2,6 +2,7 @@ package org.jabref.logic.importer.fetcher;
 
 import java.util.Optional;
 
+import org.jabref.logic.importer.FetcherClientException;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.entry.BibEntry;
@@ -15,6 +16,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 
 @FetcherTest
@@ -77,11 +79,10 @@ public class IsbnViaEbookDeFetcherTest extends AbstractIsbnFetcherTest {
 
     /**
      * This test searches for a valid ISBN. See https://www.amazon.de/dp/3728128155/?tag=jabref-21 However, this ISBN is
-     * not available on ebook.de. The fetcher should return nothing rather than throwing an exception.
+     * not available on ebook.de.
      */
     @Test
     public void searchForValidButNotFoundISBN() throws Exception {
-        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("3728128155");
-        assertEquals(Optional.empty(), fetchedEntry);
+        assertThrows(FetcherClientException.class, ()-> fetcher.performSearchById("3728128155"));
     }
 }
