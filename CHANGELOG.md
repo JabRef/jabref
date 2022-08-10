@@ -13,6 +13,8 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 
 ### Changed
 
+- We changed the button label from "Return to JabRef" to "Return to library" to better indicate the purpose of the action.
+
 ### Fixed
 
 ### Removed
