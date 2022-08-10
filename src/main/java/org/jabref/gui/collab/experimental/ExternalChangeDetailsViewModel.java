@@ -1,4 +1,4 @@
-package org.jabref.gui.collab;
+package org.jabref.gui.collab.experimental;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ReadOnlyStringProperty;

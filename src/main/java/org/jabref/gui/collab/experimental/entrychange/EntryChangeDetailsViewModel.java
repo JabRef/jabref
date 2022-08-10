@@ -1,6 +1,6 @@
-package org.jabref.gui.collab.entrychange;
+package org.jabref.gui.collab.experimental.entrychange;
 
-import org.jabref.gui.collab.ExternalChangeDetailsViewModel;
+import org.jabref.gui.collab.experimental.ExternalChangeDetailsViewModel;
 import org.jabref.model.database.BibDatabaseContext;
 
 public class EntryChangeDetailsViewModel extends ExternalChangeDetailsViewModel {

@@ -1,11 +1,12 @@
-package org.jabref.gui.collab;
+package org.jabref.gui.collab.experimental;
 
 import javafx.scene.layout.AnchorPane;
 
+import org.jabref.gui.collab.experimental.entrychange.EntryChangeDetailsView;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.model.database.BibDatabaseContext;
 
-public abstract class ExternalChangeDetailsView extends AnchorPane {
+public sealed abstract class ExternalChangeDetailsView extends AnchorPane permits EntryChangeDetailsView {
 
     protected final String name;
     protected NamedCompound undoEdit;
@@ -15,15 +16,5 @@ public abstract class ExternalChangeDetailsView extends AnchorPane {
         this.name = name;
         this.undoEdit = undoEdit;
         this.bibDatabaseContext = bibDatabaseContext;
-    }
-
-    public abstract ExternalChangeResolver getExternalChangeResolver();
-
-    public boolean hasAnAdvancedChangeResolverDialog() {
-        return false;
-    }
-
-    public ExternalChangeResolver openAdvancedChangeResolverDialog() {
-        throw new IllegalStateException(String.format("This change '%s' cannot be resolved with an advanced change resolver dialog", name));
     }
 }
