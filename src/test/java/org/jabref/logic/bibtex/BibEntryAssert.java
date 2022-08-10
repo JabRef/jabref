@@ -86,7 +86,6 @@ public class BibEntryAssert {
         assertNotNull(actualEntries);
         // explicit reference of Assertions is needed here to disambiguate from the methods defined by this class
         List<BibEntry> expectedEntries = getListFromInputStream(expectedInputStream);
-        Assertions.assertEquals(expectedEntries.get(0), actualEntries.get(0));
         Assertions.assertEquals(expectedEntries, actualEntries);
     }
 
