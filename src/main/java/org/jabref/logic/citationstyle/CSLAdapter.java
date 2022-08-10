@@ -122,18 +122,38 @@ public class CSLAdapter {
                 // Note that we do not need to convert from "pages" to "page", because CiteProc already handles it
                 // See BibTeXConverter
                 if (bibDatabaseContext.isBiblatexMode()) {
-                    // Move "number" to "issue" if "issue" does not exist
+                    // Map "number" to CSL "issue", unless no number exists
                     Optional<String> numberField = bibEntry.getField(StandardField.NUMBER);
                     numberField.ifPresent(number -> {
-                        if (!bibEntry.hasField(StandardField.ISSUE)) {
                             bibEntry.setField(StandardField.ISSUE, number);
                             bibEntry.clearField(StandardField.NUMBER);
                         }
-                    });
+                    // TODO: Map eid to CSL number, once APA recognizes a "number" field
+                    // www.zotero.org/styles/apa-6th-edition
+                    // https://docs.citationstyles.org/en/stable/specification.html#number-variables
+                    // https://apastyle.apa.org/style-grammar-guidelines/references/examples/journal-article-references#2
+                    // e.g. like this:
+                    //
+                    //                  bibEntry.getField(StandardField.EID).ifPresent(eid -> {
+                    //                   if (!bibEntry.hasField(StandardField.NUMBER)) {
+                    //                       bibEntry.setField(StandardField.NUMBER, eid);
+                    //                       bibEntry.clearField(StandardField.EID);
+                    //                   }
+                    //                   else {
+                    //                       if (!bibEntry.hasField(StandardField.PAGES)) {
+                    //                       bibEntry.setField(StandardField.PAGES, eid);
+                    //                       bibEntry.clearField(StandardField.EID);
+                    //                   }
+                    //               }});
+                    //
+                    // TODO: Remove mapping of eid to pages once eid is mapped to number.
+                    );
                     bibEntry.getField(StandardField.EID).ifPresent(eid -> {
-                        bibEntry.setField(StandardField.NUMBER, eid);
-                        bibEntry.clearField(StandardField.EID);
-                    });
+                        if (!bibEntry.hasField(StandardField.PAGES)) {
+                            bibEntry.setField(StandardField.PAGES, eid);
+                            bibEntry.clearField(StandardField.EID);
+                        }}
+                    );
                 } else {
                     // BibTeX mode
                     bibEntry.getField(StandardField.NUMBER).ifPresent(number -> {

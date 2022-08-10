@@ -13,7 +13,6 @@ import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -23,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class CitationStyleGeneratorTest {
 
-    private BibEntryTypesManager bibEntryTypesManager = new BibEntryTypesManager();
+    private final BibEntryTypesManager bibEntryTypesManager = new BibEntryTypesManager();
 
     @Test
     void testIgnoreNewLine() {
@@ -61,7 +60,7 @@ class CitationStyleGeneratorTest {
     @Test
     void testHtmlFormat() {
         String expectedCitation = "  <div class=\"csl-entry\">\n" +
-                "    <div class=\"csl-left-margin\">[1]</div><div class=\"csl-right-inline\">B. Smith, B. Jones, and J. Williams, &ldquo;Title of the test entry,&rdquo; <span style=\"font-style: italic\">BibTeX Journal</span>, vol. 34, no. 7, Art. no. 3, 2016-07, doi: 10.1001/bla.blubb.</div>\n" +
+                "    <div class=\"csl-left-margin\">[1]</div><div class=\"csl-right-inline\">B. Smith, B. Jones, and J. Williams, &ldquo;Title of the test entry,&rdquo; <span style=\"font-style: italic\">BibTeX Journal</span>, vol. 34, no. 3, pp. 45&ndash;67, 2016-07, doi: 10.1001/bla.blubb.</div>\n" +
                 "  </div>\n";
 
         BibEntry entry = TestEntry.getTestEntry();
@@ -74,7 +73,7 @@ class CitationStyleGeneratorTest {
 
     @Test
     void testTextFormat() {
-        String expectedCitation = "[1]B. Smith, B. Jones, and J. Williams, “Title of the test entry,” BibTeX Journal, vol. 34, no. 7, Art. no. 3, 2016-07, doi: 10.1001/bla.blubb.\n";
+        String expectedCitation = "[1]B. Smith, B. Jones, and J. Williams, “Title of the test entry,” BibTeX Journal, vol. 34, no. 3, pp. 45–67, 2016-07, doi: 10.1001/bla.blubb.\n";
 
         BibEntry entry = TestEntry.getTestEntry();
         String style = CitationStyle.getDefault().getSource();
@@ -99,11 +98,10 @@ class CitationStyleGeneratorTest {
     }
 
     @Test
-    @Disabled("Currently citeproc does not handler number field correctly")
     void testHandleAmpersand() {
-        String expectedCitation = "[1]B. Smith, B. Jones, and J. Williams, “&TitleTest&” BibTeX Journal, vol. 34, no. 3, pp. 45–67, Jul. 2016.\n";
+        String expectedCitation = "[1]B. Smith, B. Jones, and J. Williams, “Famous quote: “&TitleTest&” - that is it,” BibTeX Journal, vol. 34, no. 3, pp. 45–67, 2016-07, doi: 10.1001/bla.blubb.\n";
         BibEntry entry = TestEntry.getTestEntry();
-        entry.setField(StandardField.TITLE, "“&TitleTest&”");
+        entry.setField(StandardField.TITLE, "Famous quote: “&TitleTest&” - that is it");
         String style = CitationStyle.getDefault().getSource();
         CitationStyleOutputFormat format = CitationStyleOutputFormat.TEXT;
 
@@ -161,7 +159,7 @@ class CitationStyleGeneratorTest {
                                 .withField(StandardField.NUMBER, "28"),
                         "ieee.csl"),
                 Arguments.of(
-                        "[1]F. Last and J. Doe, no. 7, Art. no. 28.\n",
+                        "[1]F. Last and J. Doe, no. 28.\n",
                         BibDatabaseMode.BIBLATEX,
                         new BibEntry(StandardEntryType.Article)
                                 .withField(StandardField.AUTHOR, "Last, First and\nDoe, Jane")
@@ -169,6 +167,25 @@ class CitationStyleGeneratorTest {
                                 .withField(StandardField.NUMBER, "28"),
                         "ieee.csl"),
                 Arguments.of(
+                        // TODO:
+                        // This test only;
+                        // Replace
+                        // "[1]F. Last and J. Doe, no. 7, p. e0270533.\n",
+                        // with
+                        // "[1]F. Last and J. Doe, no. 7, Art. no. e0270533.\n",
+                        // once Biblatex "eid" is mapped to CSL "number" instead of CSL "pages"
+                        //
+                        // Alternative non-optimal hack: Rework the pages checker to get rid of "p."
+                        // when detecting an article-number in the pages field
+                        //
+                        "[1]F. Last and J. Doe, no. 7, p. e0270533.\n",
+                        BibDatabaseMode.BIBLATEX,
+                        new BibEntry(StandardEntryType.Article)
+                                .withField(StandardField.AUTHOR, "Last, First and\nDoe, Jane")
+                                .withField(StandardField.ISSUE, "7")
+                                .withField(StandardField.EID, "e0270533"),
+                        "ieee.csl"),
+                         Arguments.of(
                         "[1]F. Last and J. Doe, no. 33, pp. 7–8.\n",
                         BibDatabaseMode.BIBLATEX,
                         new BibEntry(StandardEntryType.Article)
