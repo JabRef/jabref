@@ -4,9 +4,10 @@ import java.util.Objects;
 
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.OS;
+import org.jabref.model.strings.StringUtil;
 
 /**
- * Trim all whitespace characters (defined in java) in the string.
+ * Replace all newline characters to the OS default
  */
 public class NormalizeNewlinesFormatter extends Formatter {
 
@@ -28,7 +29,7 @@ public class NormalizeNewlinesFormatter extends Formatter {
         if (shouldNormalizeNewlines) {
             // if we don't have real new lines, but pseudo newlines, we replace them
             // On Win 8.1, this is always true for multiline fields
-            return value.replace("\n", OS.NEWLINE);
+            return StringUtil.unifyLineBreaks("\n", OS.NEWLINE);
         } else {
             return value;
         }
