@@ -13,5 +13,5 @@ gradlew text eol=lf
 # .bib files have to be written using OS specific line endings to enable our tests working
 *.bib text !eol
 
-# disable after a release
-CHANGELOG.md merge=union
+# disable after a release (otherwise, duplicate CHANGELOG.md entries will be generated)
+# CHANGELOG.md merge=union
