@@ -15,7 +15,7 @@ import org.jabref.logic.bibtex.FileFieldWriter;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.FileHelper;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.FilePreferences;
 
 // Do not make this class final, as it otherwise can't be mocked for tests
 public enum ExternalFileTypes {
@@ -28,7 +28,7 @@ public enum ExternalFileTypes {
     private final ExternalFileType HTML_FALLBACK_TYPE = StandardExternalFileType.URL;
 
     /**
-     * @deprecated use {@link PreferencesService#getExternalFileTypes()} instead.
+     * @deprecated use {@link FilePreferences#getExternalFileTypes()} instead.
      */
     @Deprecated
     public static ExternalFileTypes getInstance() {
@@ -40,11 +40,11 @@ public enum ExternalFileTypes {
     }
 
     /**
-     * @deprecated use {@link PreferencesService#getExternalFileTypes()} instead.
+     * @deprecated use {@link FilePreferences#getExternalFileTypes()} instead.
      */
     @Deprecated
     public Set<ExternalFileType> getExternalFileTypes() {
-        return Globals.prefs.getExternalFileTypes();
+        return Globals.prefs.getFilePreferences().getExternalFileTypes();
     }
 
     /**

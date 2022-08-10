@@ -15,7 +15,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -432,8 +431,6 @@ public class JabRefPreferences implements PreferencesService {
 
     private Set<CustomImporter> customImporters;
     private String userName;
-
-    private Set<ExternalFileType> externalFileTypes;
 
     private PreviewPreferences previewPreferences;
     private SidePanePreferences sidePanePreferences;
@@ -2213,7 +2210,8 @@ public class JabRefPreferences implements PreferencesService {
                 get(IMPORT_FILEDIRPATTERN),
                 getBoolean(DOWNLOAD_LINKED_FILES),
                 getBoolean(FULLTEXT_INDEX_LINKED_FILES),
-                Path.of(get(WORKING_DIRECTORY))
+                Path.of(get(WORKING_DIRECTORY)),
+                ExternalFileTypes.fromString(get(EXTERNAL_FILE_TYPES))
         );
 
         EasyBind.listen(filePreferences.mainFileDirectoryProperty(), (obs, oldValue, newValue) -> put(MAIN_FILE_DIRECTORY, newValue));
@@ -2223,6 +2221,8 @@ public class JabRefPreferences implements PreferencesService {
         EasyBind.listen(filePreferences.downloadLinkedFilesProperty(), (obs, oldValue, newValue) -> putBoolean(DOWNLOAD_LINKED_FILES, newValue));
         EasyBind.listen(filePreferences.fulltextIndexLinkedFilesProperty(), (obs, oldValue, newValue) -> putBoolean(FULLTEXT_INDEX_LINKED_FILES, newValue));
         EasyBind.listen(filePreferences.workingDirectoryProperty(), (obs, oldValue, newValue) -> put(WORKING_DIRECTORY, newValue.toString()));
+        filePreferences.getExternalFileTypes().addListener((SetChangeListener<ExternalFileType>) c ->
+                put(EXTERNAL_FILE_TYPES, ExternalFileTypes.toStringList(filePreferences.getExternalFileTypes())));
 
         return filePreferences;
     }
@@ -2762,26 +2762,6 @@ public class JabRefPreferences implements PreferencesService {
     @Override
     public void storeLastPreferencesExportPath(Path exportFile) {
         put(PREFS_EXPORT_PATH, exportFile.toString());
-    }
-
-    @Override
-    public Set<ExternalFileType> getExternalFileTypes() {
-        if (externalFileTypes == null) {
-            externalFileTypes = new TreeSet<>(Comparator.comparing(ExternalFileType::getName));
-            updateExternalFileTypes();
-        }
-        return externalFileTypes;
-    }
-
-    @Override
-    public void storeExternalFileTypes(Collection<ExternalFileType> externalFileTypes) {
-        put(EXTERNAL_FILE_TYPES, ExternalFileTypes.toStringList(externalFileTypes));
-        updateExternalFileTypes();
-    }
-
-    private void updateExternalFileTypes() {
-        externalFileTypes.clear();
-        externalFileTypes = ExternalFileTypes.fromString(get(EXTERNAL_FILE_TYPES));
     }
 
     @Override

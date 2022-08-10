@@ -14,29 +14,28 @@ import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.FilePreferences;
 
 import com.airhacks.afterburner.injection.Injector;
 
 public class ExternalFileTypesTabViewModel implements PreferenceTabViewModel {
 
-    private final ExternalFileTypes externalFileTypes;
-    private final PreferencesService preferencesService;
+    private final FilePreferences filePreferences;
     private final ObservableList<ExternalFileType> fileTypes = FXCollections.observableArrayList();
 
-    public ExternalFileTypesTabViewModel(ExternalFileTypes externalFileTypes, PreferencesService preferencesService) {
-        this.externalFileTypes = externalFileTypes;
-        this.preferencesService = preferencesService;
+    public ExternalFileTypesTabViewModel(FilePreferences filePreferences) {
+        this.filePreferences = filePreferences;
     }
 
     @Override
     public void setValues() {
-        fileTypes.setAll(externalFileTypes.getExternalFileTypes());
+        fileTypes.setAll(filePreferences.getExternalFileTypes());
         fileTypes.sort(Comparator.comparing(ExternalFileType::getName));
     }
 
     public void storeSettings() {
-        preferencesService.storeExternalFileTypes(fileTypes);
+        filePreferences.getExternalFileTypes().clear();
+        filePreferences.getExternalFileTypes().addAll(fileTypes);
     }
 
     public void resetToDefaults() {

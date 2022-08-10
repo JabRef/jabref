@@ -5,7 +5,6 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 
 import org.jabref.gui.externalfiletype.ExternalFileType;
-import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
@@ -43,7 +42,7 @@ public class ExternalFileTypesTab extends AbstractPreferenceTabView<ExternalFile
 
     @FXML
     public void initialize() {
-        viewModel = new ExternalFileTypesTabViewModel(ExternalFileTypes.getInstance(), preferencesService);
+        viewModel = new ExternalFileTypesTabViewModel(preferencesService.getFilePreferences());
 
         fileTypesTable.setItems(viewModel.getFileTypes());
 
