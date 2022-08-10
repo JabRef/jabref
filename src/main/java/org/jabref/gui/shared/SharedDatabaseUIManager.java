@@ -17,7 +17,6 @@ import org.jabref.gui.entryeditor.EntryEditor;
 import org.jabref.gui.exporter.SaveDatabaseAction;
 import org.jabref.gui.mergeentries.EntriesMergeResult;
 import org.jabref.gui.mergeentries.MergeEntriesDialog;
-import org.jabref.gui.mergeentries.MergeResult;
 import org.jabref.gui.undo.UndoableRemoveEntries;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
