@@ -1,11 +1,9 @@
 package org.jabref.gui.mergeentries.newmergedialog.fieldsmerger;
 
-import java.util.Arrays;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
+import org.jabref.model.entry.KeywordList;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.model.strings.StringUtil;
 import org.jabref.preferences.PreferencesService;
 
 /**
@@ -21,18 +19,7 @@ public class KeywordMerger implements FieldMerger {
 
     @Override
     public String merge(String keywordsA, String keywordsB) {
-        String keywordSeparator = preferencesService.getGroupsPreferences().getKeywordSeparator() + " ";
-
-        if (StringUtil.isBlank(keywordsA) && StringUtil.isBlank(keywordsB)) {
-            return "";
-        } else if (StringUtil.isBlank(keywordsA)) {
-            return keywordsB;
-        } else if (StringUtil.isBlank(keywordsB)) {
-            return keywordsA;
-        } else {
-            return Arrays.stream((keywordsA + keywordSeparator + keywordsB).split(keywordSeparator))
-                         .distinct()
-                         .collect(Collectors.joining(keywordSeparator));
-        }
+        Character delimiter = preferencesService.getGroupsPreferences().getKeywordSeparator();
+        return KeywordList.merge(keywordsA, keywordsB, delimiter).getAsString(delimiter);
     }
 }

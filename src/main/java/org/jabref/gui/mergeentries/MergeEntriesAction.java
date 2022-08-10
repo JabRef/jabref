@@ -57,6 +57,7 @@ public class MergeEntriesAction extends SimpleCommand {
 
         MergeEntriesDialog dialog = new MergeEntriesDialog(first, second);
         dialog.setTitle(Localization.lang("Merge entries"));
+        
         Optional<EntriesMergeResult> mergeResultOpt = dialogService.showCustomDialogAndWait(dialog);
         mergeResultOpt.ifPresentOrElse(entriesMergeResult -> {
             new MergeTwoEntriesAction(entriesMergeResult, stateManager).execute();
