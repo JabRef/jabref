@@ -8,9 +8,11 @@ import java.util.stream.Collectors;
 import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyListProperty;
 import javafx.beans.property.ReadOnlyListWrapper;
 import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
@@ -18,6 +20,7 @@ import javafx.concurrent.Task;
 import javafx.scene.Node;
 import javafx.util.Pair;
 
+import org.jabref.gui.edit.automaticfiededitor.LastAutomaticFieldEditorEdit;
 import org.jabref.gui.sidepane.SidePaneType;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.CustomLocalDragboard;
@@ -61,6 +64,8 @@ public class StateManager {
     private final EasyBinding<Double> tasksProgress = EasyBind.reduce(backgroundTasks, tasks -> tasks.map(Pair::getValue).filter(Task::isRunning).mapToDouble(Task::getProgress).average().orElse(1));
     private final ObservableMap<String, DialogWindowState> dialogWindowStates = FXCollections.observableHashMap();
     private final ObservableList<SidePaneType> visibleSidePanes = FXCollections.observableArrayList();
+
+    private final ObjectProperty<LastAutomaticFieldEditorEdit> lastAutomaticFieldEditorEdit = new SimpleObjectProperty<>();
 
     public StateManager() {
         activeGroups.bind(Bindings.valueAt(selectedGroups, activeDatabase.orElse(null)));
@@ -171,5 +176,17 @@ public class StateManager {
 
     public void setDialogWindowState(String className, DialogWindowState state) {
         dialogWindowStates.put(className, state);
+    }
+
+    public ObjectProperty<LastAutomaticFieldEditorEdit> lastAutomaticFieldEditorEditProperty() {
+        return lastAutomaticFieldEditorEdit;
+    }
+
+    public LastAutomaticFieldEditorEdit getLastAutomaticFieldEditorEdit() {
+        return lastAutomaticFieldEditorEditProperty().get();
+    }
+
+    public void setLastAutomaticFieldEditorEdit(LastAutomaticFieldEditorEdit automaticFieldEditorEdit) {
+        lastAutomaticFieldEditorEditProperty().set(automaticFieldEditorEdit);
     }
 }

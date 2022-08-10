@@ -55,6 +55,9 @@
 
     -jr-drag-target: -jr-accent;
     -jr-drag-target-hover: -jr-accent;
+
+    -js-summary-text-color: derive(-fx-light-text-color, 70%);
+    -js-summary-text-color-selected: derive( -fx-dark-text-color, 70%);
 }
 
 #previewBody {
@@ -124,4 +127,16 @@
     -fx-fill: derive(-fx-light-text-color, 80%);
     -fx-text-fill: derive(-fx-light-text-color, 80%);
     -fx-icon-color: derive(-fx-light-text-color, 80%);
+}
+
+.notification-bar > .pane {
+    -fx-background-color: -fx-light-text-color;
+}
+
+.rating > .container > .button {
+    -fx-icon-color: derive(-fx-light-text-color, -50%);
+}
+
+.rating > .container > .button.strong {
+    -fx-icon-color: -fx-light-text-color;
 }

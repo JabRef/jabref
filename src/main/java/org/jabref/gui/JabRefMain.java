@@ -7,6 +7,7 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Comparator;
+import java.util.Map;
 
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -26,27 +27,62 @@ import org.jabref.logic.net.ssl.TrustStoreManager;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.remote.client.RemoteClient;
+import org.jabref.logic.util.BuildInfo;
 import org.jabref.migrations.PreferencesMigrations;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.preferences.JabRefPreferences;
 import org.jabref.preferences.PreferencesService;
 
+import net.harawata.appdirs.AppDirsFactory;
 import org.apache.commons.cli.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.tinylog.configuration.Configuration;
 
 /**
  * JabRef's main class to process command line options and to start the UI
  */
 public class JabRefMain extends Application {
-    private static final Logger LOGGER = LoggerFactory.getLogger(JabRefMain.class);
+    private static Logger LOGGER;
 
     private static String[] arguments;
 
     public static void main(String[] args) {
+        addLogToDisk();
         arguments = args;
         launch(arguments);
+    }
+
+    private static void initializeLogger() {
+         LOGGER = LoggerFactory.getLogger(JabRefMain.class);
+    }
+
+    /**
+     * This needs to be called as early as possible. After the first log write, it is not possible to alter
+     * the log configuration programmatically anymore.
+     */
+    private static void addLogToDisk() {
+        Path directory = Path.of(AppDirsFactory.getInstance().getUserLogDir(
+                                     "jabref",
+                                     new BuildInfo().version.toString(),
+                                     "org.jabref"));
+        try {
+            Files.createDirectories(directory);
+        } catch (IOException e) {
+            initializeLogger();
+            LOGGER.error("Could not create log directory {}", directory, e);
+            return;
+        }
+        // The "Shared File Writer" is explained at https://tinylog.org/v2/configuration/#shared-file-writer
+        Map<String, String> configuration = Map.of(
+                "writerFile", "shared file",
+                "writerFile.level", "info",
+                "writerFile.file", directory.resolve("log.txt").toString(),
+                "writerFile.charset", "UTF-8");
+
+        configuration.entrySet().forEach(config -> Configuration.set(config.getKey(), config.getValue()));
+        initializeLogger();
     }
 
     @Override
@@ -168,7 +204,7 @@ public class JabRefMain extends Application {
 
         try (DirectoryStream<Path> stream = Files.newDirectoryStream(appData)) {
             for (Path path : stream) {
-                if (Files.isDirectory(path) && !path.equals(currentIndexPath)) {
+                if (Files.isDirectory(path) && !path.toString().endsWith("ssl") && path.toString().contains("lucene") && !path.equals(currentIndexPath)) {
                     LOGGER.info("Deleting out-of-date fulltext search index at {}.", path);
                     Files.walk(path)
                          .sorted(Comparator.reverseOrder())

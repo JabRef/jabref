@@ -110,7 +110,6 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.EntryTypeFactory;
 import org.jabref.model.metadata.SaveOrderConfig;
-import org.jabref.model.pdf.search.SearchFieldConstants;
 import org.jabref.model.push.PushToApplicationConstants;
 import org.jabref.model.search.rules.SearchRules;
 import org.jabref.model.strings.StringUtil;
@@ -527,7 +526,9 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(PROXY_PASSWORD, "");
 
         // SSL
-        defaults.put(TRUSTSTORE_PATH, Path.of(AppDirsFactory.getInstance().getUserDataDir("ssl", SearchFieldConstants.VERSION, "org.jabref")).resolveSibling("truststore.jks").toString());
+        defaults.put(TRUSTSTORE_PATH, Path.of(AppDirsFactory.getInstance()
+                                                            .getUserDataDir("JabRef", "ssl", "org.jabref"))
+                                          .resolve("truststore.jks").toString());
 
         defaults.put(POS_X, 0);
         defaults.put(POS_Y, 0);
@@ -629,8 +630,8 @@ public class JabRefPreferences implements PreferencesService {
 
         defaults.put(SPECIALFIELDSENABLED, Boolean.TRUE);
 
-        defaults.put(FETCHER_CUSTOM_KEY_NAMES, "Springer;IEEEXplore;SAO/NASA ADS;ScienceDirect");
-        defaults.put(FETCHER_CUSTOM_KEY_USES, "FALSE;FALSE;FALSE;FALSE");
+        defaults.put(FETCHER_CUSTOM_KEY_NAMES, "Springer;IEEEXplore;SAO/NASA ADS;ScienceDirect;Biodiversity Heritage");
+        defaults.put(FETCHER_CUSTOM_KEY_USES, "FALSE;FALSE;FALSE;FALSE;FALSE");
         defaults.put(FETCHER_CUSTOM_KEYS, "");
 
         defaults.put(USE_OWNER, Boolean.FALSE);
@@ -2851,7 +2852,7 @@ public class JabRefPreferences implements PreferencesService {
             fetcherApiKeys.add(new FetcherApiKey(
                     names.get(i),
                     // i < uses.size() ? Boolean.parseBoolean(uses.get(i)) : false
-                    i < uses.size() && Boolean.parseBoolean(uses.get(i)),
+                    (i < uses.size()) && Boolean.parseBoolean(uses.get(i)),
                     i < keys.size() ? keys.get(i) : ""));
         }
 

@@ -33,7 +33,7 @@ GEM
     csl-styles (2.0.0)
       csl (~> 2.0)
     diff-lcs (1.5.0)
-    diffy (3.4.0)
+    diffy (3.4.2)
     dotenv (2.7.6)
     erubis (2.7.0)
     faraday (1.8.0)
