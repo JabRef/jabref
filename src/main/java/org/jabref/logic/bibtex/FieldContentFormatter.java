@@ -43,7 +43,10 @@ public class FieldContentFormatter {
      */
     public String format(String fieldContent, Field field) {
         if (multiLineFields.contains(field)) {
-            return StringUtil.unifyLineBreaks(fieldContent, OS.NEWLINE);
+            // Keep the field as is.
+            // Newlines are normalized at org.jabref.logic.exporter.BibWriter
+            // Alternative: StringUtil.unifyLineBreaks(fieldContent, OS.NEWLINE)
+            return fieldContent;
         }
 
         return WHITESPACE.matcher(fieldContent).replaceAll(" ");
