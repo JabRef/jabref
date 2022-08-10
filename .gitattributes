@@ -17,5 +17,5 @@ gradlew text eol=lf
 # This overwrites the setting of "*.bib"
 Citavi*.bib eol=lf
 
-# disable after a release
-CHANGELOG.md merge=union
+# disable after a release (otherwise, duplicate CHANGELOG.md entries will be generated)
+# CHANGELOG.md merge=union
