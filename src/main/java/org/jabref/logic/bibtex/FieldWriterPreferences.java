@@ -8,7 +8,6 @@ public class FieldWriterPreferences {
 
     private final boolean resolveStrings;
     private final List<Field> resolveStringsForFields;
-    private final int lineLength = 65; // Constant
     private final FieldContentFormatterPreferences fieldContentFormatterPreferences;
 
     /**
@@ -27,10 +26,6 @@ public class FieldWriterPreferences {
 
     public List<Field> getResolveStringsForFields() {
         return resolveStringsForFields;
-    }
-
-    public int getLineLength() {
-        return lineLength;
     }
 
     public FieldContentFormatterPreferences getFieldContentFormatterPreferences() {
