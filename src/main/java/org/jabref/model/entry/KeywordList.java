@@ -3,6 +3,7 @@ package org.jabref.model.entry;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
@@ -70,6 +71,13 @@ public class KeywordList implements Iterable<Keyword> {
      */
     public static KeywordList parse(String keywordString, Character delimiter) {
         return parse(keywordString, delimiter, Keyword.DEFAULT_HIERARCHICAL_DELIMITER);
+    }
+
+    public static KeywordList merge(String keywordStringA, String keywordStringB, Character delimiter) {
+        KeywordList keywordListA = parse(keywordStringA, delimiter);
+        KeywordList keywordListB = parse(keywordStringB, delimiter);
+        List<Keyword> distinctKeywords = Stream.concat(keywordListA.stream(), keywordListB.stream()).distinct().toList();
+        return new KeywordList(distinctKeywords);
     }
 
     public KeywordList createClone() {
@@ -186,7 +194,7 @@ public class KeywordList implements Iterable<Keyword> {
             return false;
         }
         KeywordList keywords1 = (KeywordList) o;
-        return Objects.equals(keywordChains, keywords1.keywordChains);
+        return Objects.equals(new HashSet<>(keywordChains), new HashSet<>(keywords1.keywordChains));
     }
 
     @Override

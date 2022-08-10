@@ -7,19 +7,20 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.RowConstraints;
 import javafx.scene.layout.VBox;
 import javafx.stage.Screen;
 
+import org.jabref.gui.Globals;
+import org.jabref.gui.mergeentries.newmergedialog.fieldsmerger.FieldMergerFactory;
 import org.jabref.gui.mergeentries.newmergedialog.toolbar.ThreeWayMergeToolbar;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
-import org.jabref.model.entry.field.InternalField;
-import org.jabref.model.entry.types.EntryTypeFactory;
 
 public class ThreeWayMergeView extends VBox {
-
     public static final int GRID_COLUMN_MIN_WIDTH = 250;
+
     public static final String LEFT_DEFAULT_HEADER = Localization.lang("Left Entry");
     public static final String RIGHT_DEFAULT_HEADER = Localization.lang("Right Entry");
 
@@ -33,11 +34,15 @@ public class ThreeWayMergeView extends VBox {
     private final GridPane mergeGridPane;
 
     private final ThreeWayMergeViewModel viewModel;
-    private final List<FieldRowController> fieldRowControllerList = new ArrayList<>();
+    private final List<FieldRowView> fieldRows = new ArrayList<>();
+
+    private final FieldMergerFactory fieldMergerFactory;
 
     public ThreeWayMergeView(BibEntry leftEntry, BibEntry rightEntry, String leftHeader, String rightHeader) {
         getStylesheets().add(ThreeWayMergeView.class.getResource("ThreeWayMergeView.css").toExternalForm());
-        viewModel = new ThreeWayMergeViewModel(leftEntry, rightEntry, leftHeader, rightHeader);
+        viewModel = new ThreeWayMergeViewModel((BibEntry) leftEntry.clone(), (BibEntry) rightEntry.clone(), leftHeader, rightHeader);
+        // TODO: Inject 'preferenceService' into the constructor
+        this.fieldMergerFactory = new FieldMergerFactory(Globals.prefs);
 
         mergeGridPane = new GridPane();
         scrollPane = new ScrollPane();
@@ -71,9 +76,9 @@ public class ThreeWayMergeView extends VBox {
 
     private void updateDiff() {
         if (toolbar.isShowDiffEnabled()) {
-            fieldRowControllerList.forEach(fieldRow -> fieldRow.showDiff(new ShowDiffConfig(toolbar.getDiffView(), toolbar.getDiffHighlightingMethod())));
+            fieldRows.forEach(row -> row.showDiff(new ShowDiffConfig(toolbar.getDiffView(), toolbar.getDiffHighlightingMethod())));
         } else {
-            fieldRowControllerList.forEach(FieldRowController::hideDiff);
+            fieldRows.forEach(FieldRowView::hideDiff);
         }
     }
 
@@ -101,46 +106,27 @@ public class ThreeWayMergeView extends VBox {
         mergeGridPane.getColumnConstraints().addAll(fieldNameColumnConstraints, leftEntryColumnConstraints, rightEntryColumnConstraints, mergedEntryColumnConstraints);
 
         for (int fieldIndex = 0; fieldIndex < viewModel.allFieldsSize(); fieldIndex++) {
-            addFieldRow(fieldIndex);
+            addRow(fieldIndex);
+
+            mergeGridPane.getRowConstraints().add(new RowConstraints());
         }
     }
 
-    private void addFieldRow(int index) {
-        Field field = viewModel.allFields().get(index);
+    private Field getFieldAtIndex(int index) {
+        return viewModel.allFields().get(index);
+    }
 
-        String leftEntryValue;
-        String rightEntryValue;
-        if (field.equals(InternalField.TYPE_HEADER)) {
-            leftEntryValue = viewModel.getLeftEntry().getType().getDisplayName();
-            rightEntryValue = viewModel.getRightEntry().getType().getDisplayName();
-        } else {
-            leftEntryValue = viewModel.getLeftEntry().getField(field).orElse("");
-            rightEntryValue = viewModel.getRightEntry().getField(field).orElse("");
-        }
+    private void addRow(int fieldIndex) {
+        Field field = getFieldAtIndex(fieldIndex);
 
-        FieldRowController fieldRow = new FieldRowController(field.getDisplayName(), leftEntryValue, rightEntryValue, index);
-        fieldRowControllerList.add(fieldRow);
+        FieldRowView fieldRow = new FieldRowView(field, getLeftEntry(), getRightEntry(), getMergedEntry(), fieldMergerFactory, fieldIndex);
 
-        fieldRow.mergedValueProperty().addListener((observable, old, mergedValue) -> {
-            if (field.equals(InternalField.TYPE_HEADER)) {
-                getMergedEntry().setType(EntryTypeFactory.parse(mergedValue));
-            } else {
-                getMergedEntry().setField(field, mergedValue);
-            }
-        });
-        if (field.equals(InternalField.TYPE_HEADER)) {
-            getMergedEntry().setType(EntryTypeFactory.parse(fieldRow.getMergedValue()));
-        } else {
-            getMergedEntry().setField(field, fieldRow.getMergedValue());
-        }
+        fieldRows.add(fieldIndex, fieldRow);
 
-        if (fieldRow.hasEqualLeftAndRightValues()) {
-            mergeGridPane.add(fieldRow.getFieldNameCell(), 0, index, 1, 1);
-            mergeGridPane.add(fieldRow.getLeftValueCell(), 1, index, 2, 1);
-            mergeGridPane.add(fieldRow.getMergedValueCell(), 3, index, 1, 1);
-        } else {
-            mergeGridPane.addRow(index, fieldRow.getFieldNameCell(), fieldRow.getLeftValueCell(), fieldRow.getRightValueCell(), fieldRow.getMergedValueCell());
-        }
+        mergeGridPane.add(fieldRow.getFieldNameCell(), 0, fieldIndex);
+        mergeGridPane.add(fieldRow.getLeftValueCell(), 1, fieldIndex);
+        mergeGridPane.add(fieldRow.getRightValueCell(), 2, fieldIndex);
+        mergeGridPane.add(fieldRow.getMergedValueCell(), 3, fieldIndex);
     }
 
     public BibEntry getMergedEntry() {
@@ -156,16 +142,24 @@ public class ThreeWayMergeView extends VBox {
     }
 
     public void selectLeftEntryValues() {
-        fieldRowControllerList.forEach(FieldRowController::selectLeftValue);
+        fieldRows.forEach(FieldRowView::selectLeftValue);
     }
 
     public void selectRightEntryValues() {
-        fieldRowControllerList.forEach(FieldRowController::selectRightValue);
+        fieldRows.forEach(FieldRowView::selectRightValue);
     }
 
     public void showDiff(ShowDiffConfig diffConfig) {
         toolbar.setDiffView(diffConfig.diffView());
         toolbar.setDiffHighlightingMethod(diffConfig.diffHighlightingMethod());
         toolbar.setShowDiff(true);
+    }
+
+    public BibEntry getLeftEntry() {
+        return viewModel.getLeftEntry();
+    }
+
+    public BibEntry getRightEntry() {
+        return viewModel.getRightEntry();
     }
 }

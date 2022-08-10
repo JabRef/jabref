@@ -138,4 +138,12 @@ public class DuplicateResolverDialog extends BaseDialog<DuplicateResolverResult>
     public BibEntry getMergedEntry() {
         return threeWayMerge.getMergedEntry();
     }
+
+    public BibEntry getNewLeftEntry() {
+        return threeWayMerge.getLeftEntry();
+    }
+
+    public BibEntry getNewRightEntry() {
+        return threeWayMerge.getRightEntry();
+    }
 }

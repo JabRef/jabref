@@ -40,7 +40,7 @@ import org.slf4j.LoggerFactory;
 /**
  * A readonly, selectable field cell that contains the value of some field
  */
-public class FieldValueCell extends AbstractCell implements Toggle {
+public class FieldValueCell extends ThreeWayMergeCell implements Toggle {
     public static final Logger LOGGER = LoggerFactory.getLogger(FieldValueCell.class);
 
     public static final String DEFAULT_STYLE_CLASS = "merge-field-value";
@@ -100,7 +100,7 @@ public class FieldValueCell extends AbstractCell implements Toggle {
     private void initializeLabel() {
         label.setEditable(false);
         label.setBackground(Background.fill(Color.TRANSPARENT));
-        label.appendText(textProperty().get());
+        EasyBind.subscribe(textProperty(), label::replaceText);
         label.setAutoHeight(true);
         label.setWrapText(true);
         label.setStyle("-fx-cursor: hand");
