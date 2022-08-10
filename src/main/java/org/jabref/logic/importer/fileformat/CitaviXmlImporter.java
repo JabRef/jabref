@@ -33,6 +33,8 @@ import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.citavi.CitaviExchangeData;
+import org.jabref.logic.importer.fileformat.citavi.CitaviExchangeData.KnowledgeItems;
+import org.jabref.logic.importer.fileformat.citavi.CitaviExchangeData.KnowledgeItems.KnowledgeItem;
 import org.jabref.logic.importer.fileformat.citavi.CitaviExchangeData.Persons.Person;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.Author;
@@ -71,6 +73,7 @@ public class CitaviXmlImporter extends Importer implements Parser {
     private CitaviExchangeData.Persons persons;
     private CitaviExchangeData.Keywords keywords;
     private CitaviExchangeData.Publishers publishers;
+    private KnowledgeItems knowledgeItems;
 
     private CitaviExchangeData.ReferenceAuthors refAuthors;
     private CitaviExchangeData.ReferenceEditors refEditors;
@@ -114,7 +117,6 @@ public class CitaviXmlImporter extends Importer implements Parser {
                 if (str.toLowerCase(Locale.ROOT).contains("citaviexchangedata")) {
                     return true;
                 }
-
                 i++;
             }
         }
@@ -123,12 +125,11 @@ public class CitaviXmlImporter extends Importer implements Parser {
 
     @Override
     public ParserResult importDatabase(Path filePath) throws IOException {
-
         try (BufferedReader reader = getReaderFromZip(filePath)) {
             Object unmarshalledObject = unmarshallRoot(reader);
 
             if (unmarshalledObject instanceof CitaviExchangeData) {
-                // Check whether we have an article set, an article, a book article or a book article set
+                // Check whether we have an article set, an article, a book article, or a book article set
                 CitaviExchangeData data = (CitaviExchangeData) unmarshalledObject;
                 List<BibEntry> bibEntries = parseDataList(data);
 
@@ -148,6 +149,7 @@ public class CitaviXmlImporter extends Importer implements Parser {
         persons = data.getPersons();
         keywords = data.getKeywords();
         publishers = data.getPublishers();
+        knowledgeItems = data.getKnowledgeItems();
 
         refAuthors = data.getReferenceAuthors();
         refEditors = data.getReferenceEditors();
@@ -199,14 +201,15 @@ public class CitaviXmlImporter extends Importer implements Parser {
         Optional.ofNullable(data.getVolume())
                 .ifPresent(value -> entry.setField(StandardField.VOLUME, clean(value)));
         Optional.ofNullable(getAuthorName(data))
-                .ifPresent(value -> entry.setField(StandardField.AUTHOR, value));
+                .ifPresent(value -> entry.setField(StandardField.AUTHOR, clean(value)));
         Optional.ofNullable(getEditorName(data))
-                .ifPresent(value -> entry.setField(StandardField.EDITOR, value));
+                .ifPresent(value -> entry.setField(StandardField.EDITOR, clean(value)));
         Optional.ofNullable(getKeywords(data))
-                .ifPresent(value -> entry.setField(StandardField.KEYWORDS, value));
+                .ifPresent(value -> entry.setField(StandardField.KEYWORDS, clean(value)));
         Optional.ofNullable(getPublisher(data))
-                .ifPresent(value -> entry.setField(StandardField.PUBLISHER, value));
-
+                .ifPresent(value -> entry.setField(StandardField.PUBLISHER, clean(value)));
+        Optional.ofNullable(getKnowledgeItem(data))
+                .ifPresent(value -> entry.setField(StandardField.COMMENT, StringUtil.unifyLineBreaks(value, "\n")));
         return entry;
     }
 
@@ -357,6 +360,20 @@ public class CitaviXmlImporter extends Importer implements Parser {
             return null;
         }
         return this.refIdWithPublishers.get(data.getId());
+    }
+
+    private String getKnowledgeItem(CitaviExchangeData.References.Reference data) {
+        Optional<KnowledgeItem> knowledgeItem = knowledgeItems.getKnowledgeItem().stream().filter(p -> data.getId().equals(p.getReferenceID())).findFirst();
+
+        StringBuilder comment = new StringBuilder();
+        Optional<String> title = knowledgeItem.map(item -> item.getCoreStatement());
+        title.ifPresent(t -> comment.append("# ").append(t).append("\n\n"));
+        Optional<String> text = knowledgeItem.map(item -> item.getText());
+        text.ifPresent(t -> comment.append(t).append("\n\n"));
+        Optional<Integer> pages = knowledgeItem.map(item -> item.getPageRangeNumber()).filter(range -> range != -1);
+        pages.ifPresent(p -> comment.append("page range: ").append(p));
+
+        return comment.toString();
     }
 
     private void initUnmarshaller() throws JAXBException {

@@ -16,6 +16,8 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - When JabRef writes a `.bib` file, it makes first a backup (`.bak`) of the `.bib`
 - When JabRef writes a `.bib` file, it first attempts to write into a separate local directory
 - We changed the writing method of a `.bib` file: Existing files should have been modified instead of being replaced.
+- We improved the Citavi Importer to also import so called Knowledge-items into the field `comment` of the corresponding entry [#9025](https://github.com/JabRef/jabref/issues/9025)
+- We removed wrapping of string constants when writing to a `.bib` file.
 - We changed the button label from "Return to JabRef" to "Return to library" to better indicate the purpose of the action.
 
 ### Fixed

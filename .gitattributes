@@ -13,5 +13,9 @@ gradlew text eol=lf
 # .bib files have to be written using OS specific line endings to enable our tests working
 *.bib text !eol
 
+# Citavi needs to be LF line ending
+# This overwrites the setting of "*.bib"
+Citavi*.bib eol=lf
+
 # disable after a release (otherwise, duplicate CHANGELOG.md entries will be generated)
 # CHANGELOG.md merge=union
