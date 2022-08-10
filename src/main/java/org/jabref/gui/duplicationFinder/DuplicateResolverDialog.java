@@ -10,7 +10,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.duplicationFinder.DuplicateResolverDialog.DuplicateResolverResult;
 import org.jabref.gui.help.HelpAction;
-import org.jabref.gui.mergeentries.MergeEntries;
+import org.jabref.gui.mergeentries.newmergedialog.ThreeWayMergeView;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.DialogWindowState;
 import org.jabref.logic.help.HelpFile;
@@ -39,7 +39,7 @@ public class DuplicateResolverDialog extends BaseDialog<DuplicateResolverResult>
         BREAK
     }
 
-    private MergeEntries mergeEntries;
+    private ThreeWayMergeView threeWayMerge;
     private final DialogService dialogService;
 
     public DuplicateResolverDialog(BibEntry one, BibEntry two, DuplicateResolverType type, BibDatabaseContext database, StateManager stateManager, DialogService dialogService) {
@@ -69,14 +69,14 @@ public class DuplicateResolverDialog extends BaseDialog<DuplicateResolverResult>
                 first = new ButtonType(Localization.lang("Keep left"), ButtonData.APPLY);
                 second = new ButtonType(Localization.lang("Keep right"), ButtonData.APPLY);
                 both = new ButtonType(Localization.lang("Keep both"), ButtonData.APPLY);
-                mergeEntries = new MergeEntries(one, two);
+                threeWayMerge = new ThreeWayMergeView(one, two);
                 break;
             case INSPECTION:
                 first = new ButtonType(Localization.lang("Remove old entry"), ButtonData.APPLY);
                 second = new ButtonType(Localization.lang("Remove entry from import"), ButtonData.APPLY);
                 both = new ButtonType(Localization.lang("Keep both"), ButtonData.APPLY);
-                mergeEntries = new MergeEntries(one, two, Localization.lang("Old entry"),
-                        Localization.lang("From import"));
+                threeWayMerge = new ThreeWayMergeView(one, two, Localization.lang("Old entry"),
+                                                      Localization.lang("From import"));
                 break;
             case DUPLICATE_SEARCH_WITH_EXACT:
                 first = new ButtonType(Localization.lang("Keep left"), ButtonData.APPLY);
@@ -85,14 +85,14 @@ public class DuplicateResolverDialog extends BaseDialog<DuplicateResolverResult>
 
                 removeExactVisible = true;
 
-                mergeEntries = new MergeEntries(one, two);
+                threeWayMerge = new ThreeWayMergeView(one, two);
                 break;
             default:
                 first = new ButtonType(Localization.lang("Import and remove old entry"), ButtonData.APPLY);
                 second = new ButtonType(Localization.lang("Do not import entry"), ButtonData.APPLY);
                 both = new ButtonType(Localization.lang("Import and keep old entry"), ButtonData.APPLY);
-                mergeEntries = new MergeEntries(one, two, Localization.lang("Old entry"),
-                        Localization.lang("From import"));
+                threeWayMerge = new ThreeWayMergeView(one, two, Localization.lang("Old entry"),
+                                                      Localization.lang("From import"));
                 break;
         }
         if (removeExactVisible) {
@@ -109,7 +109,7 @@ public class DuplicateResolverDialog extends BaseDialog<DuplicateResolverResult>
             this.setY(state.getY());
         }
 
-        BorderPane borderPane = new BorderPane(mergeEntries);
+        BorderPane borderPane = new BorderPane(threeWayMerge);
         borderPane.setBottom(options);
 
         this.setResultConverter(button -> {
@@ -136,6 +136,6 @@ public class DuplicateResolverDialog extends BaseDialog<DuplicateResolverResult>
     }
 
     public BibEntry getMergedEntry() {
-        return mergeEntries.getMergedEntry();
+        return threeWayMerge.getMergedEntry();
     }
 }
