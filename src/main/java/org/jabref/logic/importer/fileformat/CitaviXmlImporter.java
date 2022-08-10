@@ -28,7 +28,6 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
-import org.jabref.logic.cleanup.NormalizeNewlinesFormatter;
 import org.jabref.logic.formatter.bibtexfields.NormalizePagesFormatter;
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.Parser;
@@ -60,7 +59,6 @@ public class CitaviXmlImporter extends Importer implements Parser {
     private static final Logger LOGGER = LoggerFactory.getLogger(CitaviXmlImporter.class);
     private static final byte UUID_LENGTH = 36;
     private static final byte UUID_SEMICOLON_OFFSET_INDEX = 37;
-    private final NormalizeNewlinesFormatter normalizeNewlinesFormatter = new NormalizeNewlinesFormatter();
     private final NormalizePagesFormatter pagesFormatter = new NormalizePagesFormatter();
 
     private final Map<String, Author> knownPersons = new HashMap<>();
@@ -127,7 +125,6 @@ public class CitaviXmlImporter extends Importer implements Parser {
 
     @Override
     public ParserResult importDatabase(Path filePath) throws IOException {
-
         try (BufferedReader reader = getReaderFromZip(filePath)) {
             Object unmarshalledObject = unmarshallRoot(reader);
 
@@ -212,7 +209,7 @@ public class CitaviXmlImporter extends Importer implements Parser {
         Optional.ofNullable(getPublisher(data))
                 .ifPresent(value -> entry.setField(StandardField.PUBLISHER, clean(value)));
         Optional.ofNullable(getKnowledgeItem(data))
-                .ifPresent(value -> entry.setField(StandardField.COMMENT, normalizeNewlinesFormatter.format(value)));
+                .ifPresent(value -> entry.setField(StandardField.COMMENT, StringUtil.unifyLineBreaks(value, "\n")));
         return entry;
     }
 
