@@ -4,12 +4,14 @@ import java.nio.file.Path;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class FileHelperTest {
+
     @Test
     public void extractFileExtension() {
         final String filePath = FileHelperTest.class.getResource("pdffile.pdf").getPath();
@@ -24,14 +26,19 @@ class FileHelperTest {
 
     @Test
     public void testFileNameEmpty() {
-      Path path = Path.of("/");
-      assertEquals(Optional.of(path), FileHelper.find("", path));
+        Path path = Path.of("/");
+        assertEquals(Optional.of(path), FileHelper.find("", path));
     }
 
     @ParameterizedTest
-    @ValueSource(strings = { "*", "?", ">", "\"" })
+    @ValueSource(strings = {"*", "?", ">", "\""})
     public void testFileNameIllegal(String fileName) {
         Path path = Path.of("/");
         assertEquals(Optional.empty(), FileHelper.find(fileName, path));
+    }
+
+    @Test
+    public void testPathWithSubDirectories(@TempDir Path temp) throws Exception {
+        // TODO
     }
 }
