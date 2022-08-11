@@ -22,6 +22,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.StringJoiner;
 import java.util.function.Predicate;
+import java.util.regex.Matcher;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -371,15 +372,22 @@ public class CitaviXmlImporter extends Importer implements Parser {
         List<KnowledgeItem> foundItems = knowledgeItems.getKnowledgeItem().stream().filter(p -> data.getId().equals(p.getReferenceID())).toList();
         for (KnowledgeItem knowledgeItem : foundItems) {
             Optional<String> title = Optional.ofNullable(knowledgeItem.getCoreStatement()).filter(Predicate.not(String::isEmpty));
-            title.ifPresent(t -> comment.add("# " + removeSpacesBeforeLineBreak(t)));
+            title.ifPresent(t -> comment.add("# " + cleanUpText(t)));
 
             Optional<String> text = Optional.ofNullable(knowledgeItem.getText()).filter(Predicate.not(String::isEmpty));
-            text.ifPresent(t -> comment.add(removeSpacesBeforeLineBreak(t)));
+            text.ifPresent(t -> comment.add(cleanUpText(t)));
 
             Optional<Integer> pages = Optional.ofNullable(knowledgeItem.getPageRangeNumber()).filter(range -> range != -1);
             pages.ifPresent(p -> comment.add("page range: " + p));
         }
         return comment.toString();
+    }
+
+    String cleanUpText(String text) {
+        String result = removeSpacesBeforeLineBreak(text);
+        result = result.replaceAll("(?<!\\\\)\\{", "\\\\{");
+        result = result.replaceAll("(?<!\\\\)}", "\\\\}");
+        return result;
     }
 
     private String removeSpacesBeforeLineBreak(String string) {
