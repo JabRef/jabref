@@ -157,7 +157,7 @@ public class BackupManager {
 
         // do not print errors in field values into the log during autosave
         if (!isErrorInField) {
-            LOGGER.error("Error while saving to file" + backupPath, e);
+            LOGGER.error("Error while saving to file {}", backupPath, e);
         }
     }
 
