@@ -20,6 +20,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.StringJoiner;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
@@ -366,21 +367,15 @@ public class CitaviXmlImporter extends Importer implements Parser {
     }
 
     private String getKnowledgeItem(CitaviExchangeData.References.Reference data) {
-        StringBuilder comment = new StringBuilder();
+        StringJoiner comment = new StringJoiner("\n\n");
         List<KnowledgeItem> foundItems = knowledgeItems.getKnowledgeItem().stream().filter(p -> data.getId().equals(p.getReferenceID())).toList();
-
-        int i = 0;
         for (KnowledgeItem knowledgeItem : foundItems) {
-            i++;
             Optional<String> title = Optional.ofNullable(knowledgeItem.getCoreStatement()).filter(Predicate.not(String::isEmpty));
-            title.ifPresent(t -> comment.append("# ").append(t).append("\n\n"));
+            title.ifPresent(t -> comment.add("# " + t));
             Optional<String> text = Optional.ofNullable(knowledgeItem.getText()).filter(Predicate.not(String::isEmpty));
-            text.ifPresent(t -> comment.append(t).append("\n\n"));
+            text.ifPresent(t -> comment.add(t));
             Optional<Integer> pages = Optional.ofNullable(knowledgeItem.getPageRangeNumber()).filter(range -> range != -1);
-            pages.ifPresent(p -> comment.append("page range: ").append(p));
-            if (i < foundItems.size()) {
-                comment.append("\n\n");
-            }
+            pages.ifPresent(p -> comment.add("page range: " + (p)));
         }
         return comment.toString();
     }
