@@ -161,8 +161,15 @@ public class FileHelper {
         if (fileName.isEmpty()) {
             return Optional.of(directory);
         }
-
+        // get the furthest path element from root and check if our filename starts with the same name
+        // workaround for old JabRef behavior
+        String furthestDirFromRoot = directory.getFileName().toString();
         Path resolvedFile = directory.resolve(fileName);
+
+        if (fileName.startsWith(furthestDirFromRoot)) {
+            resolvedFile = directory.resolveSibling(fileName);
+        }
+
         if (Files.exists(resolvedFile)) {
             return Optional.of(resolvedFile);
         } else {
