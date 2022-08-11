@@ -27,5 +27,8 @@ Chosen option: "Create a temporary file in a local folder and copy after success
 
 ### Create temporary file next to bib file and atomically move it to the original file
 
+This implementation is available at [Marty Lamb's AtomicFileOutputStream](https://github.com/martylamb/atomicfileoutputstream/blob/master/src/main/java/com/martiansoftware/io/AtomicFileOutputStream.java)
+and [Apache Zookeepr's AtomicFileOutputStream](https://github.com/apache/zookeeper/blob/master/zookeeper-server/src/main/java/org/apache/zookeeper/common/AtomicFileOutputStream.java).
+
 * Good, because Atomic move is an all-or-nothing move
 * Bad, because Makes issues with Dropbox, OneDrive, ...
