@@ -228,11 +228,13 @@ public class SaveDatabaseAction {
     }
 
     private boolean saveDatabase(Path file, boolean selectedOnly, Charset encoding, SavePreferences.DatabaseSaveType saveType) throws SaveException {
+        // if this code is adapted, please also adapt org.jabref.logic.autosaveandbackup.BackupManager.performBackup
+
         GeneralPreferences generalPreferences = this.preferences.getGeneralPreferences();
         SavePreferences savePreferences = this.preferences.getSavePreferences()
                                                       .withSaveType(saveType);
+        BibDatabaseContext bibDatabaseContext = libraryTab.getBibDatabaseContext();
         try (AtomicFileWriter fileWriter = new AtomicFileWriter(file, encoding)) {
-            BibDatabaseContext bibDatabaseContext = libraryTab.getBibDatabaseContext();
             BibWriter bibWriter = new BibWriter(fileWriter, bibDatabaseContext.getDatabase().getNewLineSeparator());
             BibtexDatabaseWriter databaseWriter = new BibtexDatabaseWriter(bibWriter, generalPreferences, savePreferences, entryTypesManager);
 
