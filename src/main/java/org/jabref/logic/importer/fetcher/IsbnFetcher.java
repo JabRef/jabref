@@ -50,13 +50,19 @@ public class IsbnFetcher implements EntryBasedFetcher, IdBasedFetcher {
         identifier = NEWLINE_SPACE_PATTERN.matcher(identifier).replaceAll("");
 
         OpenLibraryFetcher openLibraryFetcher = new OpenLibraryFetcher(importFormatPreferences);
-        Optional<BibEntry> bibEntry = openLibraryFetcher.performSearchById(identifier);
 
-        // nothing found at OpenLibrary: try ebook.de
-        if (!bibEntry.isPresent()) {
-            LOGGER.debug("No entry found at OpenLibrary; trying ebook.de");
-            IsbnViaEbookDeFetcher isbnViaEbookDeFetcher = new IsbnViaEbookDeFetcher(importFormatPreferences);
-            bibEntry = isbnViaEbookDeFetcher.performSearchById(identifier);
+        Optional<BibEntry> bibEntry = Optional.empty();
+        try {
+            bibEntry = openLibraryFetcher.performSearchById(identifier);
+        } catch (FetcherException ex) {
+            LOGGER.debug("Got a fetcher exception for IBSN search", ex);
+        } finally {
+            // nothing found at OpenLibrary: try ebook.de
+            if (!bibEntry.isPresent()) {
+                LOGGER.debug("No entry found at OpenLibrary; trying ebook.de");
+                IsbnViaEbookDeFetcher isbnViaEbookDeFetcher = new IsbnViaEbookDeFetcher(importFormatPreferences);
+                bibEntry = isbnViaEbookDeFetcher.performSearchById(identifier);
+            }
         }
 
         return bibEntry;

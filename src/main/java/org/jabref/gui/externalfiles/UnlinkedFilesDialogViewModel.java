@@ -35,6 +35,7 @@ import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.gui.util.FileNodeViewModel;
 import org.jabref.gui.util.TaskExecutor;
+import org.jabref.logic.importer.ImportFormatReader;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabaseContext;
@@ -84,7 +85,8 @@ public class UnlinkedFilesDialogViewModel {
                                         FileUpdateMonitor fileUpdateMonitor,
                                         PreferencesService preferences,
                                         StateManager stateManager,
-                                        TaskExecutor taskExecutor) {
+                                        TaskExecutor taskExecutor,
+                                        ImportFormatReader importFormatReader) {
         this.preferences = preferences;
         this.dialogService = dialogService;
         this.taskExecutor = taskExecutor;
@@ -95,7 +97,8 @@ public class UnlinkedFilesDialogViewModel {
                 fileUpdateMonitor,
                 undoManager,
                 stateManager,
-                dialogService);
+                dialogService,
+                importFormatReader);
 
         this.fileFilterList = FXCollections.observableArrayList(
                 new FileExtensionViewModel(StandardFileType.ANY_FILE, preferences.getFilePreferences()),

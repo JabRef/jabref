@@ -180,7 +180,7 @@ public class OpenDatabaseAction extends SimpleCommand {
 
         BackgroundTask<ParserResult> backgroundTask = BackgroundTask.wrap(() -> loadDatabase(file));
         LibraryTab.Factory libraryTabFactory = new LibraryTab.Factory();
-        LibraryTab newTab = libraryTabFactory.createLibraryTab(frame, preferencesService, stateManager, themeManager, file, backgroundTask);
+        LibraryTab newTab = libraryTabFactory.createLibraryTab(frame, preferencesService, stateManager, themeManager, file, backgroundTask, Globals.IMPORT_FORMAT_READER);
 
         backgroundTask.onFinished(() -> trackOpenNewDatabase(newTab));
     }

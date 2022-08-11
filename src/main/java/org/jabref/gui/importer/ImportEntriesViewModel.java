@@ -12,6 +12,7 @@ import javafx.collections.ObservableList;
 
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
+import org.jabref.gui.Globals;
 import org.jabref.gui.JabRefGUI;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.duplicationFinder.DuplicateResolverDialog;
@@ -167,7 +168,8 @@ public class ImportEntriesViewModel extends AbstractViewModel {
                 fileUpdateMonitor,
                 undoManager,
                 stateManager,
-                dialogService);
+                dialogService,
+                Globals.IMPORT_FORMAT_READER);
         importHandler.importEntries(entriesToImport);
         dialogService.notify(Localization.lang("Number of entries successfully imported") + ": " + entriesToImport.size());
     }
