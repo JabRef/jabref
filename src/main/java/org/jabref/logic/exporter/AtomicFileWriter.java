@@ -22,11 +22,7 @@ public class AtomicFileWriter extends OutputStreamWriter {
     private final Set<Character> problemCharacters = new TreeSet<>();
 
     public AtomicFileWriter(Path file, Charset encoding) throws IOException {
-        this(file, encoding, false);
-    }
-
-    public AtomicFileWriter(Path file, Charset encoding, boolean keepBackup) throws IOException {
-        super(new AtomicFileOutputStream(file, keepBackup), encoding);
+        super(new AtomicFileOutputStream(file), encoding);
         encoder = encoding.newEncoder();
     }
 

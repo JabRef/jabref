@@ -10,6 +10,7 @@ import java.nio.channels.OverlappingFileLockException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.nio.file.StandardOpenOption;
 
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.io.FileUtil;
@@ -25,10 +26,11 @@ import org.slf4j.LoggerFactory;
  * <p>
  * In detail, the strategy is to:
  * <ol>
- * <li>Write to a temporary file (with .tmp suffix) in the same directory as the destination file.</li>
- * <li>Create a backup (with .bak suffix) of the original file (if it exists) in the same directory.</li>
- * <li>Move the temporary file to the correct place, overwriting any file that already exists at that location.</li>
- * <li>Delete the backup file (if configured to do so).</li>
+ * <li>Create a backup (with .bak suffix) of the original file (if it exists) in the <a href="https://github.com/harawata/appdirs#supported-directories">UserDataDir</a>.</li>
+ * <li>Write to a temporary file (with .tmp suffix) in the system-wide temporary directory.</li>
+ * <li>Copy the content of the temporary file to the .bib file, overwriting any content that already exists in that file.</li>
+ * <li>Delete the temporary file.</li>
+ * <li>Rename the .bak to .old.</li>
  * </ol>
  * If all goes well, no temporary or backup files will remain on disk after closing the stream.
  * <p>
@@ -36,12 +38,9 @@ import org.slf4j.LoggerFactory;
  * <ol>
  * <li>If anything goes wrong while writing to the temporary file, the temporary file will be deleted (leaving the
  * original file untouched).</li>
- * <li>If anything goes wrong while copying the temporary file to the target file, the backup of the original file is
- * kept.</li>
+ * <li>If anything goes wrong while copying the temporary file to the target file, the backup of the original file is written into the original file.</li>
+ * <li>If that rescue goes wrong, JabRef knows at the start that there is a .bak file and will prompt the user.</li>
  * </ol>
- * <p>
- * Implementation inspired by code from <a href="https://github.com/martylamb/atomicfileoutputstream/blob/master/src/main/java/com/martiansoftware/io/AtomicFileOutputStream.java">Marty
- * Lamb</a> and <a href="https://github.com/apache/zookeeper/blob/master/src/java/main/org/apache/zookeeper/common/AtomicFileOutputStream.java">Apache</a>.
  */
 public class AtomicFileOutputStream extends FilterOutputStream {
 
@@ -49,6 +48,7 @@ public class AtomicFileOutputStream extends FilterOutputStream {
 
     private static final String TEMPORARY_EXTENSION = ".tmp";
     private static final String BACKUP_EXTENSION = ".bak";
+    private static final String OLD_EXTENSION = ".old";
 
     /**
      * The file we want to create/replace.
@@ -60,6 +60,7 @@ public class AtomicFileOutputStream extends FilterOutputStream {
      */
     private final Path temporaryFile;
 
+    // The lock can be a local variable, because the locking is done by the operating system (and not a Java-based lock)
     private final FileLock temporaryFileLock;
 
     /**
@@ -67,23 +68,19 @@ public class AtomicFileOutputStream extends FilterOutputStream {
      */
     private final Path backupFile;
 
-    private final boolean keepBackup;
-
     private boolean errorDuringWrite = false;
 
     /**
      * Creates a new output stream to write to or replace the file at the specified path.
      *
      * @param path       the path of the file to write to or replace
-     * @param keepBackup whether to keep the backup file after a successful write process
      */
-    public AtomicFileOutputStream(Path path, boolean keepBackup) throws IOException {
+    public AtomicFileOutputStream(Path path) throws IOException {
         super(Files.newOutputStream(getPathOfTemporaryFile(path)));
 
         this.targetFile = path;
         this.temporaryFile = getPathOfTemporaryFile(path);
         this.backupFile = getPathOfBackupFile(path);
-        this.keepBackup = keepBackup;
 
         if (Files.exists(targetFile)) {
             // Make a backup of the original file
@@ -103,17 +100,22 @@ public class AtomicFileOutputStream extends FilterOutputStream {
     }
 
     /**
-     * Creates a new output stream to write to or replace the file at the specified path. The backup file is deleted when the write was successful.
-     *
-     * @param path the path of the file to write to or replace
+     * Determines the path of the temporary file.
      */
-    public AtomicFileOutputStream(Path path) throws IOException {
-        this(path, false);
+    static Path getPathOfTemporaryFile(Path targetFile) {
+        Path tempFile;
+        try {
+            tempFile = Files.createTempFile(targetFile.getFileName().toString(), TEMPORARY_EXTENSION);
+        } catch (IOException e) {
+            Path result = FileUtil.addExtension(targetFile, TEMPORARY_EXTENSION);
+            LOGGER.warn("Could not create bib writing temporary file, using {} as file", result, e);
+            return result;
+        }
+        return tempFile;
     }
 
-    private static Path getBibsPath() {
-        // We choose the cache dir as it is a local-to-app temporary directory
-        Path directory = Path.of(AppDirsFactory.getInstance().getUserCacheDir(
+    private static Path getDataDir() {
+        Path directory = Path.of(AppDirsFactory.getInstance().getUserDataDir(
                                      "jabref",
                                      new BuildInfo().version.toString(),
                                      "org.jabref"))
@@ -121,26 +123,33 @@ public class AtomicFileOutputStream extends FilterOutputStream {
         return directory;
     }
 
-    private static Path getPathOfSecondFile(Path targetFile, String extension) {
-        Path directory = getBibsPath();
+    /**
+     * Determines the path of the backup file
+     *
+     * <p>
+     *     As default, a directory inside the user temporary dir is used
+     * </p>
+     * <p>
+     *     SIDE EFFECT: Creates the directory and backups an existing bak file to the temporary directory.
+     *     In case that fails, the return path of the .bak file is set to be next to the .bib file
+     * </p>
+     * <p>
+     *     Note that this backup is different from the <code>.sav</code> file generated by {@link org.jabref.logic.autosaveandbackup.BackupManager}
+     *     (and configured in the preferences as "make backups")
+     * </p>
+     */
+    static Path getPathOfBackupFile(Path targetFile) {
+        // We choose the data directory, because a ".bak" file should survive cache cleanups
+        Path directory = getDataDir();
         try {
             Files.createDirectories(directory);
         } catch (IOException e) {
-            Path result = FileUtil.addExtension(targetFile, extension);
+            Path result = FileUtil.addExtension(targetFile, BACKUP_EXTENSION);
             LOGGER.warn("Could not create bib writing directory {}, using {} as file", directory, result, e);
             return result;
         }
-        // By using a part of the hex string, we keep some old versions, but not all
-        String fileName = FileUtil.getBaseName(targetFile) + "-" + Integer.toHexString(targetFile.hashCode()).substring(0, 2) + extension + ".bib";
+        String fileName = targetFile + BACKUP_EXTENSION;
         return directory.resolve(fileName);
-    }
-
-    static Path getPathOfTemporaryFile(Path targetFile) {
-        return getPathOfSecondFile(targetFile, TEMPORARY_EXTENSION);
-    }
-
-    static Path getPathOfBackupFile(Path targetFile) {
-        return getPathOfSecondFile(targetFile, BACKUP_EXTENSION);
     }
 
     /**
@@ -208,10 +217,6 @@ public class AtomicFileOutputStream extends FilterOutputStream {
                 // We successfully wrote everything to the temporary file, let's copy it to the correct place
                 replaceOriginalFileByWrittenFile();
             }
-
-            if (!keepBackup) {
-                Files.deleteIfExists(backupFile);
-            }
         } finally {
             cleanup();
         }
@@ -220,7 +225,7 @@ public class AtomicFileOutputStream extends FilterOutputStream {
     private void replaceOriginalFileByWrittenFile() throws IOException {
         // Move temporary file (replace original if it exists)
         // We implement the move as write into the original and delete the temporary one to keep file permissions etc.
-        try (InputStream inputStream = Files.newInputStream(temporaryFile);
+        try (InputStream inputStream = Files.newInputStream(temporaryFile, StandardOpenOption.DELETE_ON_CLOSE);
              OutputStream outputStream = Files.newOutputStream(targetFile)) {
             inputStream.transferTo(outputStream);
         } catch (IOException e) {
@@ -239,6 +244,12 @@ public class AtomicFileOutputStream extends FilterOutputStream {
             }
             // we rethrow the original error to indicate that writing (somehow) went wrong
             throw e;
+        }
+        String filenameOld = FileUtil.getBaseName(backupFile) + OLD_EXTENSION;
+        try {
+            Files.move(backupFile, backupFile.resolveSibling(filenameOld), StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.COPY_ATTRIBUTES);
+        } catch (IOException e) {
+            LOGGER.warn("Could not rename {} to {}", backupFile, filenameOld, e);
         }
     }
 

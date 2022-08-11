@@ -231,7 +231,7 @@ public class SaveDatabaseAction {
         GeneralPreferences generalPreferences = this.preferences.getGeneralPreferences();
         SavePreferences savePreferences = this.preferences.getSavePreferences()
                                                       .withSaveType(saveType);
-        try (AtomicFileWriter fileWriter = new AtomicFileWriter(file, encoding, savePreferences.shouldMakeBackup())) {
+        try (AtomicFileWriter fileWriter = new AtomicFileWriter(file, encoding)) {
             BibDatabaseContext bibDatabaseContext = libraryTab.getBibDatabaseContext();
             BibWriter bibWriter = new BibWriter(fileWriter, bibDatabaseContext.getDatabase().getNewLineSeparator());
             BibtexDatabaseWriter databaseWriter = new BibtexDatabaseWriter(bibWriter, generalPreferences, savePreferences, entryTypesManager);

@@ -36,7 +36,7 @@ class AtomicFileOutputStreamTest {
 
         // Running out of disk space should occur
         assertThrows(IOException.class, () -> {
-            AtomicFileOutputStream atomicFileOutputStream = new AtomicFileOutputStream(out, false);
+            AtomicFileOutputStream atomicFileOutputStream = new AtomicFileOutputStream(out);
             InputStream inputStream = new ByteArrayInputStream(fiveThousandChars.getBytes());
             inputStream.transferTo(atomicFileOutputStream);
             atomicFileOutputStream.close();
