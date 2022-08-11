@@ -29,6 +29,7 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
+import org.jabref.logic.formatter.bibtexfields.HtmlToLatexFormatter;
 import org.jabref.logic.formatter.bibtexfields.NormalizePagesFormatter;
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.Parser;
@@ -60,6 +61,7 @@ public class CitaviXmlImporter extends Importer implements Parser {
     private static final Logger LOGGER = LoggerFactory.getLogger(CitaviXmlImporter.class);
     private static final byte UUID_LENGTH = 36;
     private static final byte UUID_SEMICOLON_OFFSET_INDEX = 37;
+    private final HtmlToLatexFormatter htmlToLatexFormatter = new HtmlToLatexFormatter();
     private final NormalizePagesFormatter pagesFormatter = new NormalizePagesFormatter();
 
     private final Map<String, Author> knownPersons = new HashMap<>();
@@ -460,9 +462,9 @@ public class CitaviXmlImporter extends Importer implements Parser {
     }
 
     private String clean(String input) {
-        return StringUtil.unifyLineBreaks(input, " ")
+        String result = StringUtil.unifyLineBreaks(input, " ")
                          .trim()
-                         .replaceAll(" +", " ")
-                         .replaceAll("&quot;", "\"");
+                         .replaceAll(" +", " ");
+        return htmlToLatexFormatter.format(result);
     }
 }
