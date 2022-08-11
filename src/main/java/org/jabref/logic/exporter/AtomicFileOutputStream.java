@@ -5,12 +5,15 @@ import java.io.FilterOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.math.BigInteger;
+import java.nio.ByteBuffer;
 import java.nio.channels.FileLock;
 import java.nio.channels.OverlappingFileLockException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
+import java.util.HexFormat;
 
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.io.FileUtil;
@@ -138,7 +141,7 @@ public class AtomicFileOutputStream extends FilterOutputStream {
      *     (and configured in the preferences as "make backups")
      * </p>
      */
-    static Path getPathOfBackupFile(Path targetFile) {
+    public static Path getPathOfBackupFile(Path targetFile) {
         // We choose the data directory, because a ".bak" file should survive cache cleanups
         Path directory = getDataDir();
         try {
@@ -148,8 +151,27 @@ public class AtomicFileOutputStream extends FilterOutputStream {
             LOGGER.warn("Could not create bib writing directory {}, using {} as file", directory, result, e);
             return result;
         }
-        String fileName = targetFile + BACKUP_EXTENSION;
+        String fileName = getUniqueFilePrefix(targetFile) + "-" + targetFile + BACKUP_EXTENSION;
         return directory.resolve(fileName);
+    }
+
+    /**
+     * <p>
+     * Determines a unique file prefix.
+     * </p>
+     * <p>
+     *     When creating a backup file, the backup file should belong to the original file.
+     *     Just adding ".bak" suffix to the filename, does not work in all cases:
+     *     It may be possible that the user has opened "paper.bib" twice.
+     *     Thus, we need to create a unique prefix to distinguish these files.
+     * </p>
+     */
+    private static String getUniqueFilePrefix(Path targetFile) {
+        // Idea: use the hash code and convert it to hex
+        // Thereby, use positive values only and use length 4
+        int positiveCode = Math.abs(targetFile.hashCode());
+        byte[] array = ByteBuffer.allocate(4).putInt(positiveCode).array();
+        return HexFormat.of().formatHex(array);
     }
 
     /**
