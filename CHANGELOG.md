@@ -22,6 +22,8 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 
 ### Fixed
 
+- We fixed a performance regression when opening large libraries [#9041](https://github.com/JabRef/jabref/issues/9041)
+
 ### Removed
 
 
