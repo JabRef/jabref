@@ -10,7 +10,6 @@ import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
 
-import org.jabref.gui.Globals;
 import org.jabref.logic.bibtex.FileFieldWriter;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.strings.StringUtil;
@@ -37,14 +36,6 @@ public enum ExternalFileTypes {
 
     public static List<ExternalFileType> getDefaultExternalFileTypes() {
         return Arrays.asList(StandardExternalFileType.values());
-    }
-
-    /**
-     * @deprecated use {@link FilePreferences#getExternalFileTypes()} instead.
-     */
-    @Deprecated
-    public Set<ExternalFileType> getExternalFileTypes() {
-        return Globals.prefs.getFilePreferences().getExternalFileTypes();
     }
 
     /**

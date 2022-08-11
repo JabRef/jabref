@@ -8,7 +8,6 @@ import javax.swing.undo.UndoManager;
 import javafx.scene.Node;
 
 import org.jabref.gui.externalfiletype.ExternalFileType;
-import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.gui.specialfields.SpecialFieldViewModel;
@@ -22,7 +21,7 @@ public class CellFactory {
 
     private final Map<Field, JabRefIcon> TABLE_ICONS = new HashMap<>();
 
-    public CellFactory(ExternalFileTypes externalFileTypes, PreferencesService preferencesService, UndoManager undoManager) {
+    public CellFactory(PreferencesService preferencesService, UndoManager undoManager) {
         JabRefIcon icon;
         icon = IconTheme.JabRefIcons.PDF_FILE;
         // icon.setToo(Localization.lang("Open") + " PDF");
@@ -56,7 +55,7 @@ public class CellFactory {
         // icon.setToolTipText(Localization.lang("Open file"));
         TABLE_ICONS.put(StandardField.FILE, icon);
 
-        for (ExternalFileType fileType : externalFileTypes.getExternalFileTypes()) {
+        for (ExternalFileType fileType : preferencesService.getFilePreferences().getExternalFileTypes()) {
             icon = fileType.getIcon();
             // icon.setToolTipText(Localization.lang("Open %0 file", fileType.getName()));
             TABLE_ICONS.put(fileType.getField(), icon);

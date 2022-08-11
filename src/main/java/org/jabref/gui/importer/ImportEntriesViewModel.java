@@ -16,7 +16,6 @@ import org.jabref.gui.JabRefGUI;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.duplicationFinder.DuplicateResolverDialog;
 import org.jabref.gui.externalfiles.ImportHandler;
-import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.fieldeditors.LinkedFileViewModel;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.TaskExecutor;
@@ -148,8 +147,7 @@ public class ImportEntriesViewModel extends AbstractViewModel {
                                 databaseContext,
                                 taskExecutor,
                                 dialogService,
-                                preferences,
-                                ExternalFileTypes.getInstance()).download());
+                                preferences).download());
             }
         }
 
@@ -165,7 +163,6 @@ public class ImportEntriesViewModel extends AbstractViewModel {
     private void buildImportHandlerThenImportEntries(List<BibEntry> entriesToImport) {
         ImportHandler importHandler = new ImportHandler(
                 databaseContext,
-                ExternalFileTypes.getInstance(),
                 preferences,
                 fileUpdateMonitor,
                 undoManager,

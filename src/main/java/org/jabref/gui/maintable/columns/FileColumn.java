@@ -32,7 +32,6 @@ import org.jabref.preferences.PreferencesService;
  */
 public class FileColumn extends MainTableColumn<List<LinkedFile>> {
 
-    private final ExternalFileTypes externalFileTypes;
     private final DialogService dialogService;
     private final BibDatabaseContext database;
     private final PreferencesService preferencesService;
@@ -42,11 +41,9 @@ public class FileColumn extends MainTableColumn<List<LinkedFile>> {
      */
     public FileColumn(MainTableColumnModel model,
                       BibDatabaseContext database,
-                      ExternalFileTypes externalFileTypes,
                       DialogService dialogService,
                       PreferencesService preferencesService) {
         super(model);
-        this.externalFileTypes = Objects.requireNonNull(externalFileTypes);
         this.database = Objects.requireNonNull(database);
         this.dialogService = dialogService;
         this.preferencesService = preferencesService;
@@ -68,8 +65,7 @@ public class FileColumn extends MainTableColumn<List<LinkedFile>> {
                                 entry.getEntry(),
                                 database, Globals.TASK_EXECUTOR,
                                 dialogService,
-                                preferencesService,
-                                externalFileTypes);
+                                preferencesService);
                         linkedFileViewModel.open();
                     }
                 })
@@ -81,22 +77,19 @@ public class FileColumn extends MainTableColumn<List<LinkedFile>> {
      */
     public FileColumn(MainTableColumnModel model,
                       BibDatabaseContext database,
-                      ExternalFileTypes externalFileTypes,
                       DialogService dialogService,
                       PreferencesService preferencesService,
                       String fileType) {
         super(model);
-        this.externalFileTypes = Objects.requireNonNull(externalFileTypes);
         this.database = Objects.requireNonNull(database);
         this.dialogService = dialogService;
         this.preferencesService = preferencesService;
 
         setCommonSettings();
 
-        this.setGraphic(externalFileTypes
-                .getExternalFileTypeByName(fileType, preferencesService.getFilePreferences())
-                .map(ExternalFileType::getIcon).orElse(IconTheme.JabRefIcons.FILE)
-                .getGraphicNode());
+        this.setGraphic(ExternalFileTypes.getExternalFileTypeByName(fileType, preferencesService.getFilePreferences())
+                                         .map(ExternalFileType::getIcon).orElse(IconTheme.JabRefIcons.FILE)
+                                         .getGraphicNode());
 
         new ValueTableCellFactory<BibEntryTableViewModel, List<LinkedFile>>()
                 .withGraphic(linkedFiles -> createFileIcon(linkedFiles.stream().filter(linkedFile ->
@@ -131,8 +124,7 @@ public class FileColumn extends MainTableColumn<List<LinkedFile>> {
                     database,
                     Globals.TASK_EXECUTOR,
                     dialogService,
-                    preferencesService,
-                    externalFileTypes);
+                    preferencesService);
 
             MenuItem menuItem = new MenuItem(linkedFileViewModel.getTruncatedDescriptionAndLink(),
                     linkedFileViewModel.getTypeIcon().getGraphicNode());
@@ -147,7 +139,7 @@ public class FileColumn extends MainTableColumn<List<LinkedFile>> {
         if (linkedFiles.size() > 1) {
             return IconTheme.JabRefIcons.FILE_MULTIPLE.getGraphicNode();
         } else if (linkedFiles.size() == 1) {
-            return externalFileTypes.getExternalFileTypeByLinkedFile(linkedFiles.get(0), true, preferencesService.getFilePreferences())
+            return ExternalFileTypes.getExternalFileTypeByLinkedFile(linkedFiles.get(0), true, preferencesService.getFilePreferences())
                                     .map(ExternalFileType::getIcon)
                                     .orElse(IconTheme.JabRefIcons.FILE)
                                     .getGraphicNode();

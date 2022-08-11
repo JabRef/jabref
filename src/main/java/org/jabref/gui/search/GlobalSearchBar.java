@@ -47,7 +47,6 @@ import org.jabref.gui.autocompleter.AutoCompleteFirstNameMode;
 import org.jabref.gui.autocompleter.AutoCompletionTextInputBinding;
 import org.jabref.gui.autocompleter.PersonNameStringConverter;
 import org.jabref.gui.autocompleter.SuggestionProvider;
-import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.keyboard.KeyBindingRepository;
@@ -239,7 +238,7 @@ public class GlobalSearchBar extends HBox {
         initSearchModifierButton(openGlobalSearchButton);
         openGlobalSearchButton.setOnAction(evt -> {
             globalSearchActive.setValue(true);
-            globalSearchResultDialog = new GlobalSearchResultDialog(ExternalFileTypes.getInstance(), undoManager);
+            globalSearchResultDialog = new GlobalSearchResultDialog(undoManager);
             performSearch();
             globalSearchResultDialog.showAndWait();
             globalSearchActive.setValue(false);

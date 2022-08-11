@@ -31,7 +31,6 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
-import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.BaseDialog;
@@ -106,7 +105,7 @@ public class UnlinkedFilesDialogView extends BaseDialog<Void> {
 
     @FXML
     private void initialize() {
-        viewModel = new UnlinkedFilesDialogViewModel(dialogService, ExternalFileTypes.getInstance(), undoManager, fileUpdateMonitor, preferencesService, stateManager, taskExecutor);
+        viewModel = new UnlinkedFilesDialogViewModel(dialogService, undoManager, fileUpdateMonitor, preferencesService, stateManager, taskExecutor);
 
         progressDisplay.progressProperty().bind(viewModel.progressValueProperty());
         progressText.textProperty().bind(viewModel.progressTextProperty());

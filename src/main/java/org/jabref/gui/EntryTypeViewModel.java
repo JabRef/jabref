@@ -15,7 +15,6 @@ import javafx.concurrent.Task;
 import javafx.concurrent.Worker;
 
 import org.jabref.gui.externalfiles.ImportHandler;
-import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.importer.NewEntryAction;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.IdBasedFetcher;
@@ -159,7 +158,6 @@ public class EntryTypeViewModel {
 
                 ImportHandler handler = new ImportHandler(
                         libraryTab.getBibDatabaseContext(),
-                        ExternalFileTypes.getInstance(),
                         preferencesService,
                         Globals.getFileUpdateMonitor(),
                         libraryTab.getUndoManager(),

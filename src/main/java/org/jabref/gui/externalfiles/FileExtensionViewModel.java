@@ -17,13 +17,11 @@ public class FileExtensionViewModel {
 
     private final String description;
     private final List<String> extensions;
-    private final ExternalFileTypes externalFileTypes;
     private final FilePreferences filePreferences;
 
-    FileExtensionViewModel(FileType fileType, ExternalFileTypes externalFileTypes, FilePreferences filePreferences) {
+    FileExtensionViewModel(FileType fileType, FilePreferences filePreferences) {
         this.description = Localization.lang("%0 file", fileType.getName());
         this.extensions = fileType.getExtensionsWithDot();
-        this.externalFileTypes = externalFileTypes;
         this.filePreferences = filePreferences;
     }
 
@@ -32,7 +30,7 @@ public class FileExtensionViewModel {
     }
 
     public JabRefIcon getIcon() {
-        return externalFileTypes.getExternalFileTypeByExt(extensions.get(0), filePreferences)
+        return ExternalFileTypes.getExternalFileTypeByExt(extensions.get(0), filePreferences)
                                 .map(ExternalFileType::getIcon)
                                 .orElse(null);
     }

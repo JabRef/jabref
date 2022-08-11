@@ -26,14 +26,12 @@ public class ExternalFilesEntryLinker {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ExternalFilesEntryLinker.class);
 
-    private final ExternalFileTypes externalFileTypes;
     private final FilePreferences filePreferences;
     private final BibDatabaseContext bibDatabaseContext;
     private final MoveFilesCleanup moveFilesCleanup;
     private final RenamePdfCleanup renameFilesCleanup;
 
-    public ExternalFilesEntryLinker(ExternalFileTypes externalFileTypes, FilePreferences filePreferences, BibDatabaseContext bibDatabaseContext) {
-        this.externalFileTypes = externalFileTypes;
+    public ExternalFilesEntryLinker(FilePreferences filePreferences, BibDatabaseContext bibDatabaseContext) {
         this.filePreferences = filePreferences;
         this.bibDatabaseContext = bibDatabaseContext;
         this.moveFilesCleanup = new MoveFilesCleanup(bibDatabaseContext, filePreferences);
@@ -62,7 +60,7 @@ public class ExternalFilesEntryLinker {
     public void addFilesToEntry(BibEntry entry, List<Path> files) {
         for (Path file : files) {
             FileUtil.getFileExtension(file).ifPresent(ext -> {
-                ExternalFileType type = externalFileTypes.getExternalFileTypeByExt(ext, filePreferences)
+                ExternalFileType type = ExternalFileTypes.getExternalFileTypeByExt(ext, filePreferences)
                                                          .orElse(new UnknownExternalFileType(ext));
                 Path relativePath = FileUtil.relativize(file, bibDatabaseContext.getFileDirectories(filePreferences));
                 LinkedFile linkedfile = new LinkedFile("", relativePath, type.getName());

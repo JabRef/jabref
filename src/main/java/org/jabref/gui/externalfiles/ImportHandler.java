@@ -15,7 +15,6 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.Globals;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.duplicationFinder.DuplicateResolverDialog;
-import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.undo.UndoableInsertEntries;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.DefaultTaskExecutor;
@@ -51,7 +50,6 @@ public class ImportHandler {
     private final DialogService dialogService;
 
     public ImportHandler(BibDatabaseContext database,
-                         ExternalFileTypes externalFileTypes,
                          PreferencesService preferencesService,
                          FileUpdateMonitor fileupdateMonitor,
                          UndoManager undoManager,
@@ -64,7 +62,7 @@ public class ImportHandler {
         this.stateManager = stateManager;
         this.dialogService = dialogService;
 
-        this.linker = new ExternalFilesEntryLinker(externalFileTypes, preferencesService.getFilePreferences(), database);
+        this.linker = new ExternalFilesEntryLinker(preferencesService.getFilePreferences(), database);
         this.contentImporter = new ExternalFilesContentImporter(
                 preferencesService.getGeneralPreferences(),
                 preferencesService.getImporterPreferences(),

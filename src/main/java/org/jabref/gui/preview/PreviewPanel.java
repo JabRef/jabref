@@ -61,7 +61,7 @@ public class PreviewPanel extends VBox {
         this.stateManager = stateManager;
         this.previewPreferences = preferences.getPreviewPreferences();
         this.indexingTaskManager = indexingTaskManager;
-        this.fileLinker = new ExternalFilesEntryLinker(externalFileTypes, preferences.getFilePreferences(), database);
+        this.fileLinker = new ExternalFilesEntryLinker(preferences.getFilePreferences(), database);
 
         PreviewPreferences previewPreferences = preferences.getPreviewPreferences();
         previewView = new PreviewViewer(database, dialogService, stateManager, themeManager);

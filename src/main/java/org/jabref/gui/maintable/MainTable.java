@@ -32,7 +32,6 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.edit.EditAction;
 import org.jabref.gui.externalfiles.ImportHandler;
-import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.maintable.columns.LibraryColumn;
@@ -73,7 +72,6 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                      PreferencesService preferencesService,
                      DialogService dialogService,
                      StateManager stateManager,
-                     ExternalFileTypes externalFileTypes,
                      KeyBindingRepository keyBindingRepository) {
         super();
 
@@ -86,7 +84,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         MainTablePreferences mainTablePreferences = preferencesService.getMainTablePreferences();
 
         importHandler = new ImportHandler(
-                database, externalFileTypes,
+                database,
                 preferencesService,
                 Globals.getFileUpdateMonitor(),
                 undoManager,
@@ -103,7 +101,6 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                         database,
                         preferencesService,
                         preferencesService.getColumnPreferences(),
-                        externalFileTypes,
                         libraryTab.getUndoManager(),
                         dialogService,
                         stateManager).createColumns());

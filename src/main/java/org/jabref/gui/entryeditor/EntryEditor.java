@@ -113,7 +113,7 @@ public class EntryEditor extends BorderPane {
 
     private final List<EntryEditorTab> entryEditorTabs = new LinkedList<>();
 
-    public EntryEditor(LibraryTab libraryTab, ExternalFileTypes externalFileTypes) {
+    public EntryEditor(LibraryTab libraryTab) {
         this.libraryTab = libraryTab;
         this.databaseContext = libraryTab.getBibDatabaseContext();
 
@@ -122,8 +122,7 @@ public class EntryEditor extends BorderPane {
                   .load();
 
         this.entryEditorPreferences = preferencesService.getEntryEditorPreferences();
-        this.fileLinker = new ExternalFilesEntryLinker(externalFileTypes, preferencesService.getFilePreferences(),
-                databaseContext);
+        this.fileLinker = new ExternalFilesEntryLinker(preferencesService.getFilePreferences(), databaseContext);
 
         EasyBind.subscribe(tabbed.getSelectionModel().selectedItemProperty(), tab -> {
             EntryEditorTab activeTab = (EntryEditorTab) tab;
