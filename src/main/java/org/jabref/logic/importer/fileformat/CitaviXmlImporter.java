@@ -20,6 +20,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -363,16 +364,22 @@ public class CitaviXmlImporter extends Importer implements Parser {
     }
 
     private String getKnowledgeItem(CitaviExchangeData.References.Reference data) {
-        Optional<KnowledgeItem> knowledgeItem = knowledgeItems.getKnowledgeItem().stream().filter(p -> data.getId().equals(p.getReferenceID())).findFirst();
-
         StringBuilder comment = new StringBuilder();
-        Optional<String> title = knowledgeItem.map(item -> item.getCoreStatement());
-        title.ifPresent(t -> comment.append("# ").append(t).append("\n\n"));
-        Optional<String> text = knowledgeItem.map(item -> item.getText());
-        text.ifPresent(t -> comment.append(t).append("\n\n"));
-        Optional<Integer> pages = knowledgeItem.map(item -> item.getPageRangeNumber()).filter(range -> range != -1);
-        pages.ifPresent(p -> comment.append("page range: ").append(p));
+        List<KnowledgeItem> foundItems = knowledgeItems.getKnowledgeItem().stream().filter(p -> data.getId().equals(p.getReferenceID())).toList();
 
+        int i = 0;
+        for (KnowledgeItem knowledgeItem : foundItems) {
+            i++;
+            Optional<String> title = Optional.ofNullable(knowledgeItem.getCoreStatement()).filter(Predicate.not(String::isEmpty));
+            title.ifPresent(t -> comment.append("# ").append(t).append("\n\n"));
+            Optional<String> text = Optional.ofNullable(knowledgeItem.getText()).filter(Predicate.not(String::isEmpty));
+            text.ifPresent(t -> comment.append(t).append("\n\n"));
+            Optional<Integer> pages = Optional.ofNullable(knowledgeItem.getPageRangeNumber()).filter(range -> range != -1);
+            pages.ifPresent(p -> comment.append("page range: ").append(p));
+            if (i < foundItems.size()) {
+                comment.append("\n\n");
+            }
+        }
         return comment.toString();
     }
 
@@ -455,6 +462,7 @@ public class CitaviXmlImporter extends Importer implements Parser {
     private String clean(String input) {
         return StringUtil.unifyLineBreaks(input, " ")
                          .trim()
-                         .replaceAll(" +", " ");
+                         .replaceAll(" +", " ")
+                         .replaceAll("&quot;", "\"");
     }
 }
