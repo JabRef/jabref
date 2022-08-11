@@ -62,6 +62,7 @@ public class NumericFieldComparator implements Comparator<String> {
 
         return true;
     }
+
     public boolean isNumberMethodPublic(String number){
         return isNumber(number);
     }

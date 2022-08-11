@@ -75,50 +75,74 @@ public class NumericFieldComparatorTest {
 
     // CT1
     @Test
-    public void numberIsNull(){ assertFalse(comparator.isNumberMethodPublic(null)); }
+    public void numberIsNull(){ 
+        assertFalse(comparator.isNumberMethodPublic(null)); 
+    }
 
     // CT2
     @Test
-    public void numberIsEmpty(){ assertFalse(comparator.isNumberMethodPublic("")); }
+    public void numberIsEmpty(){ 
+        assertFalse(comparator.isNumberMethodPublic("")); 
+    }
 
     // CT3
     @Test
-    public void numberIsMinusChar(){ assertFalse(comparator.isNumberMethodPublic("-")); }
+    public void numberIsMinusChar(){ 
+        assertFalse(comparator.isNumberMethodPublic("-")); 
+    }
 
     // CT4
     @Test
-    public void numberIsPlusChar(){ assertFalse(comparator.isNumberMethodPublic("+")); }
+    public void numberIsPlusChar(){ 
+        assertFalse(comparator.isNumberMethodPublic("+")); 
+    }
 
     // CT5
     @Test
-    public void numberIsAOneCharNumber(){ assertTrue(comparator.isNumberMethodPublic("1")); }
+    public void numberIsAOneCharNumber(){ 
+        assertTrue(comparator.isNumberMethodPublic("1")); 
+    }
 
     // CT6
     @Test
-    public void numberIsAOneCharLetter(){ assertFalse(comparator.isNumberMethodPublic("a")); }
+    public void numberIsAOneCharLetter(){ 
+        assertFalse(comparator.isNumberMethodPublic("a")); 
+    }
 
     // CT7
     @Test
-    public void numberBeginsWithMinusCharAndIsNumber(){ assertTrue(comparator.isNumberMethodPublic("-1")); }
+    public void numberBeginsWithMinusCharAndIsNumber(){ 
+        assertTrue(comparator.isNumberMethodPublic("-1")); 
+    }
 
     // CT8
     @Test
-    public void numberBeginsWithPlusCharAndIsNumber(){ assertTrue(comparator.isNumberMethodPublic("-1")); }
+    public void numberBeginsWithPlusCharAndIsNumber(){ 
+        assertTrue(comparator.isNumberMethodPublic("-1")); 
+    }
 
     // CT9
     @Test
-    public void numberBeginsWithMinusCharAndHasDigit(){ assertFalse(comparator.isNumberMethodPublic("-12a3")); }
+    public void numberBeginsWithMinusCharAndHasDigit(){ 
+        assertFalse(comparator.isNumberMethodPublic("-12a3")); 
+    }
 
     // CT10
     @Test
-    public void numberBeginsWithPlusCharAndHasDigit(){ assertFalse(comparator.isNumberMethodPublic("+12a3")); }
+    public void numberBeginsWithPlusCharAndHasDigit(){ 
+        assertFalse(comparator.isNumberMethodPublic("+12a3")); 
+    }
 
     // CT11
     @Test
-    public void numberHasDigit(){ assertFalse(comparator.isNumberMethodPublic("12a3")); }
+    public void numberHasDigit(){ 
+        assertFalse(comparator.isNumberMethodPublic("12a3"));
+    }
 
     // CT12
     @Test
-    public void numberIsNumber(){ assertTrue(comparator.isNumberMethodPublic("11")); }
+    public void numberIsNumber(){ 
+        assertTrue(comparator.isNumberMethodPublic("11")); 
+    }
 
 }
