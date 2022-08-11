@@ -57,7 +57,7 @@ public class BackupManager {
         this.bibDatabaseContext = bibDatabaseContext;
         this.entryTypesManager = entryTypesManager;
         this.preferences = preferences;
-        this.throttler = new DelayTaskThrottler(15000);
+        this.throttler = new DelayTaskThrottler(15_000);
 
         changeFilter = new CoarseChangeFilter(bibDatabaseContext);
         changeFilter.registerListener(this);
@@ -134,13 +134,13 @@ public class BackupManager {
     }
 
     private void performBackup(Path backupPath) {
-        try {
-            Charset charset = bibDatabaseContext.getMetaData().getEncoding().orElse(StandardCharsets.UTF_8);
-            GeneralPreferences generalPreferences = preferences.getGeneralPreferences();
-            SavePreferences savePreferences = preferences.getSavePreferences()
-                                                         .withMakeBackup(false);
-            Writer writer = new AtomicFileWriter(backupPath, charset);
-            BibWriter bibWriter = new BibWriter(writer, OS.NEWLINE);
+        // code similar to org.jabref.gui.exporter.SaveDatabaseAction.saveDatabase
+        GeneralPreferences generalPreferences = preferences.getGeneralPreferences();
+        SavePreferences savePreferences = preferences.getSavePreferences()
+                                                     .withMakeBackup(false);
+        Charset encoding = bibDatabaseContext.getMetaData().getEncoding().orElse(StandardCharsets.UTF_8);
+        try (AtomicFileWriter fileWriter = new AtomicFileWriter(backupPath, encoding)) {
+            BibWriter bibWriter = new BibWriter(fileWriter, bibDatabaseContext.getDatabase().getNewLineSeparator());
             new BibtexDatabaseWriter(bibWriter, generalPreferences, savePreferences, entryTypesManager)
                     .saveDatabase(bibDatabaseContext);
         } catch (IOException e) {
