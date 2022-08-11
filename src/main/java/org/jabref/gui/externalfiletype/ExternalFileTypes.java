@@ -25,7 +25,7 @@ public enum ExternalFileTypes {
     // modifications, in order to indicate a removed default file type:
     private static final String FILE_TYPE_REMOVED_FLAG = "REMOVED";
 
-    private final ExternalFileType HTML_FALLBACK_TYPE = StandardExternalFileType.URL;
+    private static final ExternalFileType HTML_FALLBACK_TYPE = StandardExternalFileType.URL;
 
     /**
      * @deprecated use {@link FilePreferences#getExternalFileTypes()} instead.
@@ -53,7 +53,7 @@ public enum ExternalFileTypes {
      * @param name The file type name.
      * @return The ExternalFileType registered, or null if none.
      */
-    public Optional<ExternalFileType> getExternalFileTypeByName(String name, FilePreferences filePreferences) {
+    public static Optional<ExternalFileType> getExternalFileTypeByName(String name, FilePreferences filePreferences) {
         Optional<ExternalFileType> externalFileType = filePreferences.getExternalFileTypes().stream().filter(type -> type.getName().equals(name)).findFirst();
         if (externalFileType.isPresent()) {
             return externalFileType;
@@ -68,7 +68,7 @@ public enum ExternalFileTypes {
      * @param extension The file extension.
      * @return The ExternalFileType registered, or null if none.
      */
-    public Optional<ExternalFileType> getExternalFileTypeByExt(String extension, FilePreferences filePreferences) {
+    public static Optional<ExternalFileType> getExternalFileTypeByExt(String extension, FilePreferences filePreferences) {
         String extensionCleaned = extension.replace(".", "").replace("*", "");
         return filePreferences.getExternalFileTypes().stream().filter(type -> type.getExtension().equalsIgnoreCase(extensionCleaned)).findFirst();
     }
@@ -79,7 +79,7 @@ public enum ExternalFileTypes {
      * @param extension The file extension.
      * @return true if an ExternalFileType with the extension exists, false otherwise
      */
-    public boolean isExternalFileTypeByExt(String extension, FilePreferences filePreferences) {
+    public static boolean isExternalFileTypeByExt(String extension, FilePreferences filePreferences) {
         return filePreferences.getExternalFileTypes().stream().anyMatch(type -> type.getExtension().equalsIgnoreCase(extension));
     }
 
@@ -89,7 +89,7 @@ public enum ExternalFileTypes {
      * @param filename The name of the file whose type to look up.
      * @return The ExternalFileType registered, or null if none.
      */
-    public Optional<ExternalFileType> getExternalFileTypeForName(String filename, FilePreferences filePreferences) {
+    public static Optional<ExternalFileType> getExternalFileTypeForName(String filename, FilePreferences filePreferences) {
         int longestFound = -1;
         ExternalFileType foundType = null;
         for (ExternalFileType type : filePreferences.getExternalFileTypes()) {
@@ -109,7 +109,7 @@ public enum ExternalFileTypes {
      * @return The ExternalFileType registered, or null if none. For the mime type "text/html", a valid file type is
      *         guaranteed to be returned.
      */
-    public Optional<ExternalFileType> getExternalFileTypeByMimeType(String mimeType, FilePreferences filePreferences) {
+    public static Optional<ExternalFileType> getExternalFileTypeByMimeType(String mimeType, FilePreferences filePreferences) {
         // Ignores parameters according to link: (https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types)
         if (mimeType.indexOf(';') != -1) {
             mimeType = mimeType.substring(0, mimeType.indexOf(';')).trim();
@@ -126,13 +126,13 @@ public enum ExternalFileTypes {
         }
     }
 
-    public Optional<ExternalFileType> getExternalFileTypeByFile(Path file, FilePreferences filePreferences) {
+    public static Optional<ExternalFileType> getExternalFileTypeByFile(Path file, FilePreferences filePreferences) {
         final String filePath = file.toString();
         final Optional<String> extension = FileHelper.getFileExtension(filePath);
-        return extension.flatMap(ext -> this.getExternalFileTypeByExt(ext, filePreferences));
+        return extension.flatMap(ext -> getExternalFileTypeByExt(ext, filePreferences));
     }
 
-    public Optional<ExternalFileType> getExternalFileTypeByLinkedFile(LinkedFile linkedFile, boolean deduceUnknownType, FilePreferences filePreferences) {
+    public static Optional<ExternalFileType> getExternalFileTypeByLinkedFile(LinkedFile linkedFile, boolean deduceUnknownType, FilePreferences filePreferences) {
         Optional<ExternalFileType> type = getExternalFileTypeByName(linkedFile.getFileType(), filePreferences);
         boolean isUnknownType = type.isEmpty() || (type.get() instanceof UnknownExternalFileType);
 
@@ -145,7 +145,7 @@ public enum ExternalFileTypes {
 
             // No type could be found from mime type. Try based on the extension:
             return FileHelper.getFileExtension(linkedFile.getLink())
-                             .flatMap(extension -> this.getExternalFileTypeByExt(extension, filePreferences));
+                             .flatMap(extension -> getExternalFileTypeByExt(extension, filePreferences));
         } else {
             return type;
         }
