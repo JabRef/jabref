@@ -15,7 +15,7 @@ public class OSX implements NativeDesktop {
 
     @Override
     public void openFile(String filePath, String fileType) throws IOException {
-        Optional<ExternalFileType> type = ExternalFileTypes.getInstance().getExternalFileTypeByExt(fileType, Globals.prefs.getFilePreferences());
+        Optional<ExternalFileType> type = ExternalFileTypes.getExternalFileTypeByExt(fileType, Globals.prefs.getFilePreferences());
         if (type.isPresent() && !type.get().getOpenWithApplication().isEmpty()) {
             openFileWithApplication(filePath, type.get().getOpenWithApplication());
         } else {

@@ -19,7 +19,6 @@ import javafx.scene.layout.VBox;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.externalfiles.ExternalFilesEntryLinker;
-import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.keyboard.KeyBindingRepository;
@@ -50,7 +49,6 @@ public class PreviewPanel extends VBox {
 
     public PreviewPanel(BibDatabaseContext database,
                         DialogService dialogService,
-                        ExternalFileTypes externalFileTypes,
                         KeyBindingRepository keyBindingRepository,
                         PreferencesService preferences,
                         StateManager stateManager,

@@ -106,7 +106,7 @@ public class URLUtil {
         } else {
             suffix = strippedLink.substring(strippedLinkIndex + 1);
         }
-        if (!ExternalFileTypes.getInstance().isExternalFileTypeByExt(suffix, filePreferences)) {
+        if (!ExternalFileTypes.isExternalFileTypeByExt(suffix, filePreferences)) {
             // If the suffix doesn't seem to give any reasonable file type, try
             // with the non-stripped link:
             int index = link.lastIndexOf('.');

@@ -49,7 +49,7 @@ public class Linux implements NativeDesktop {
 
     @Override
     public void openFile(String filePath, String fileType) throws IOException {
-        Optional<ExternalFileType> type = ExternalFileTypes.getInstance().getExternalFileTypeByExt(fileType, Globals.prefs.getFilePreferences());
+        Optional<ExternalFileType> type = ExternalFileTypes.getExternalFileTypeByExt(fileType, Globals.prefs.getFilePreferences());
         String viewer;
 
         if (type.isPresent() && !type.get().getOpenWithApplication().isEmpty()) {

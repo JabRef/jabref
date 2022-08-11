@@ -17,21 +17,14 @@ import org.jabref.model.util.FileHelper;
 import org.jabref.preferences.FilePreferences;
 
 // Do not make this class final, as it otherwise can't be mocked for tests
-public enum ExternalFileTypes {
-    INSTANCE;
+public class ExternalFileTypes {
 
     // This String is used in the encoded list in prefs of external file type
     // modifications, in order to indicate a removed default file type:
     private static final String FILE_TYPE_REMOVED_FLAG = "REMOVED";
-
     private static final ExternalFileType HTML_FALLBACK_TYPE = StandardExternalFileType.URL;
 
-    /**
-     * @deprecated use {@link FilePreferences#getExternalFileTypes()} instead.
-     */
-    @Deprecated
-    public static ExternalFileTypes getInstance() {
-        return INSTANCE;
+    private ExternalFileTypes() {
     }
 
     public static List<ExternalFileType> getDefaultExternalFileTypes() {
