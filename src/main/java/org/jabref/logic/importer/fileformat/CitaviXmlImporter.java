@@ -371,13 +371,20 @@ public class CitaviXmlImporter extends Importer implements Parser {
         List<KnowledgeItem> foundItems = knowledgeItems.getKnowledgeItem().stream().filter(p -> data.getId().equals(p.getReferenceID())).toList();
         for (KnowledgeItem knowledgeItem : foundItems) {
             Optional<String> title = Optional.ofNullable(knowledgeItem.getCoreStatement()).filter(Predicate.not(String::isEmpty));
-            title.ifPresent(t -> comment.add("# " + t));
+            title.ifPresent(t -> comment.add("# " + removeSpacesBeforeLineBreak(t)));
+
             Optional<String> text = Optional.ofNullable(knowledgeItem.getText()).filter(Predicate.not(String::isEmpty));
-            text.ifPresent(t -> comment.add(t));
+            text.ifPresent(t -> comment.add(removeSpacesBeforeLineBreak(t)));
+
             Optional<Integer> pages = Optional.ofNullable(knowledgeItem.getPageRangeNumber()).filter(range -> range != -1);
-            pages.ifPresent(p -> comment.add("page range: " + (p)));
+            pages.ifPresent(p -> comment.add("page range: " + p));
         }
         return comment.toString();
+    }
+
+    private String removeSpacesBeforeLineBreak(String string) {
+        return string.replaceAll(" +\r\n", "\r\n")
+              .replaceAll(" +\n", "\n");
     }
 
     private void initUnmarshaller() throws JAXBException {
