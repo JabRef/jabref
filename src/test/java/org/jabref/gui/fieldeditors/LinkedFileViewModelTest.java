@@ -75,10 +75,6 @@ class LinkedFileViewModelTest {
         dialogService = mock(DialogService.class);
 
         when(filePreferences.getExternalFileTypes()).thenReturn(FXCollections.observableSet(new TreeSet<>(ExternalFileTypes.getDefaultExternalFileTypes())));
-//        when(ExternalFileTypes.getExternalFileTypeByMimeType("application/pdf", filePreferences)).thenReturn(Optional.of(StandardExternalFileType.PDF));
-//        when(ExternalFileTypes.getExternalFileTypeByMimeType(contains("text/html"), eq(filePreferences))).thenReturn(Optional.of(StandardExternalFileType.URL));
-//        when(ExternalFileTypes.getExternalFileTypeByExt("pdf", filePreferences)).thenReturn(Optional.of(StandardExternalFileType.PDF));
-//        when(ExternalFileTypes.getExternalFileTypeByExt("html", filePreferences)).thenReturn(Optional.of(StandardExternalFileType.URL));
         when(preferences.getFilePreferences()).thenReturn(filePreferences);
         when(preferences.getXmpPreferences()).thenReturn(mock(XmpPreferences.class));
         tempFile = tempFolder.resolve("temporaryFile");
