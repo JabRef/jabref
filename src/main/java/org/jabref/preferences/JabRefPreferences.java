@@ -2339,19 +2339,13 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public void storeCustomImportFormats(Set<CustomImporter> importers) {
-        purgeCustomImportFormats();
+        purgeSeries(CUSTOM_IMPORT_FORMAT, 0);
         CustomImporter[] importersArray = importers.toArray(new CustomImporter[0]);
         for (int i = 0; i < importersArray.length; i++) {
             putStringList(CUSTOM_IMPORT_FORMAT + i, importersArray[i].getAsStringList());
         }
 
         this.customImporters = importers;
-    }
-
-    private void purgeCustomImportFormats() {
-        for (int i = 0; !(getStringList(CUSTOM_IMPORT_FORMAT + i).isEmpty()); i++) {
-            remove(CUSTOM_IMPORT_FORMAT + i);
-        }
     }
 
     @Override
@@ -2384,7 +2378,7 @@ public class JabRefPreferences implements PreferencesService {
     @Override
     public void storeCustomExportFormats(List<TemplateExporter> exporters) {
         if (exporters.isEmpty()) {
-            purgeCustomExportFormats(0);
+            purgeSeries(CUSTOM_EXPORT_FORMAT, 0);
         } else {
             for (int i = 0; i < exporters.size(); i++) {
                 List<String> exporterData = new ArrayList<>();
@@ -2394,15 +2388,7 @@ public class JabRefPreferences implements PreferencesService {
                 exporterData.add(EXPORTER_EXTENSION_INDEX, exporters.get(i).getFileType().getExtensions().get(0));
                 putStringList(CUSTOM_EXPORT_FORMAT + i, exporterData);
             }
-            purgeCustomExportFormats(exporters.size());
-        }
-    }
-
-    private void purgeCustomExportFormats(int from) {
-        int i = from;
-        while (!getStringList(CUSTOM_EXPORT_FORMAT + i).isEmpty()) {
-            remove(CUSTOM_EXPORT_FORMAT + i);
-            i++;
+            purgeSeries(CUSTOM_EXPORT_FORMAT, exporters.size());
         }
     }
 
