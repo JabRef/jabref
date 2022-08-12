@@ -30,7 +30,6 @@ import javafx.scene.control.TreeItem;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
-import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.gui.util.FileDialogConfiguration;
@@ -82,7 +81,6 @@ public class UnlinkedFilesDialogViewModel {
     private final FunctionBasedValidator<String> scanDirectoryValidator;
 
     public UnlinkedFilesDialogViewModel(DialogService dialogService,
-                                        ExternalFileTypes externalFileTypes,
                                         UndoManager undoManager,
                                         FileUpdateMonitor fileUpdateMonitor,
                                         PreferencesService preferences,
@@ -95,7 +93,6 @@ public class UnlinkedFilesDialogViewModel {
         this.bibDatabase = stateManager.getActiveDatabase().orElseThrow(() -> new NullPointerException("Database null"));
         importHandler = new ImportHandler(
                 bibDatabase,
-                externalFileTypes,
                 preferences,
                 fileUpdateMonitor,
                 undoManager,
@@ -104,9 +101,9 @@ public class UnlinkedFilesDialogViewModel {
                 importFormatReader);
 
         this.fileFilterList = FXCollections.observableArrayList(
-                new FileExtensionViewModel(StandardFileType.ANY_FILE, externalFileTypes),
-                new FileExtensionViewModel(StandardFileType.BIBTEX_DB, externalFileTypes),
-                new FileExtensionViewModel(StandardFileType.PDF, externalFileTypes));
+                new FileExtensionViewModel(StandardFileType.ANY_FILE, preferences.getFilePreferences()),
+                new FileExtensionViewModel(StandardFileType.BIBTEX_DB, preferences.getFilePreferences()),
+                new FileExtensionViewModel(StandardFileType.PDF, preferences.getFilePreferences()));
 
         this.dateFilterList = FXCollections.observableArrayList(DateRange.values());
 
