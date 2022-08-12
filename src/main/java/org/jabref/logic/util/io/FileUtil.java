@@ -193,7 +193,7 @@ public class FileUtil {
      *
      * @param fromFile The source filename to rename
      * @param toFile   The target fileName
-     * @return True if the rename was successful, false if an exception occurred
+     * @return True if rename was successful, false if an exception occurred
      */
     public static boolean renameFile(Path fromFile, Path toFile) {
         return renameFile(fromFile, toFile, false);
@@ -204,8 +204,8 @@ public class FileUtil {
      *
      * @param fromFile        The source filename to rename
      * @param toFile          The target fileName
-     * @param replaceExisting Wether to replace existing files or not
-     * @return True if the rename was successful, false if an exception occurred
+     * @param replaceExisting Whether to replace existing files or not
+     * @return True if rename was successful, false if an exception occurred
      * @deprecated Use {@link Files#move(Path, Path, CopyOption...)} instead and handle exception properly
      */
     @Deprecated
