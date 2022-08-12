@@ -14,7 +14,6 @@ import javafx.util.StringConverter;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.externalfiletype.ExternalFileType;
-import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.maintable.ColumnPreferences;
 import org.jabref.gui.maintable.MainTableColumnModel;
 import org.jabref.gui.maintable.MainTableNameFormatPreferences;
@@ -180,10 +179,10 @@ public class TableTabViewModel implements PreferenceTabViewModel {
     }
 
     private void insertExtraFileColumns() {
-        ExternalFileTypes.getInstance().getExternalFileTypeSelection().stream()
-                         .map(ExternalFileType::getName)
-                         .map(name -> new MainTableColumnModel(MainTableColumnModel.Type.EXTRAFILE, name))
-                         .forEach(item -> availableColumnsProperty.getValue().add(item));
+        preferences.getFilePreferences().getExternalFileTypes().stream()
+                   .map(ExternalFileType::getName)
+                   .map(name -> new MainTableColumnModel(MainTableColumnModel.Type.EXTRAFILE, name))
+                   .forEach(item -> availableColumnsProperty.getValue().add(item));
     }
 
     private void removeExtraFileColumns() {

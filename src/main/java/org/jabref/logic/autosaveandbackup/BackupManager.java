@@ -1,7 +1,6 @@
 package org.jabref.logic.autosaveandbackup;
 
 import java.io.IOException;
-import java.io.Writer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -20,7 +19,6 @@ import org.jabref.logic.exporter.BibtexDatabaseWriter;
 import org.jabref.logic.exporter.SavePreferences;
 import org.jabref.logic.util.CoarseChangeFilter;
 import org.jabref.logic.util.DelayTaskThrottler;
-import org.jabref.logic.util.OS;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.event.BibDatabaseContextChangedEvent;
@@ -57,7 +55,7 @@ public class BackupManager {
         this.bibDatabaseContext = bibDatabaseContext;
         this.entryTypesManager = entryTypesManager;
         this.preferences = preferences;
-        this.throttler = new DelayTaskThrottler(15000);
+        this.throttler = new DelayTaskThrottler(15_000);
 
         changeFilter = new CoarseChangeFilter(bibDatabaseContext);
         changeFilter.registerListener(this);
@@ -134,13 +132,13 @@ public class BackupManager {
     }
 
     private void performBackup(Path backupPath) {
-        try {
-            Charset charset = bibDatabaseContext.getMetaData().getEncoding().orElse(StandardCharsets.UTF_8);
-            GeneralPreferences generalPreferences = preferences.getGeneralPreferences();
-            SavePreferences savePreferences = preferences.getSavePreferences()
-                                                         .withMakeBackup(false);
-            Writer writer = new AtomicFileWriter(backupPath, charset);
-            BibWriter bibWriter = new BibWriter(writer, OS.NEWLINE);
+        // code similar to org.jabref.gui.exporter.SaveDatabaseAction.saveDatabase
+        GeneralPreferences generalPreferences = preferences.getGeneralPreferences();
+        SavePreferences savePreferences = preferences.getSavePreferences()
+                                                     .withMakeBackup(false);
+        Charset encoding = bibDatabaseContext.getMetaData().getEncoding().orElse(StandardCharsets.UTF_8);
+        try (AtomicFileWriter fileWriter = new AtomicFileWriter(backupPath, encoding)) {
+            BibWriter bibWriter = new BibWriter(fileWriter, bibDatabaseContext.getDatabase().getNewLineSeparator());
             new BibtexDatabaseWriter(bibWriter, generalPreferences, savePreferences, entryTypesManager)
                     .saveDatabase(bibDatabaseContext);
         } catch (IOException e) {
@@ -157,7 +155,7 @@ public class BackupManager {
 
         // do not print errors in field values into the log during autosave
         if (!isErrorInField) {
-            LOGGER.error("Error while saving to file" + backupPath, e);
+            LOGGER.error("Error while saving to file {}", backupPath, e);
         }
     }
 

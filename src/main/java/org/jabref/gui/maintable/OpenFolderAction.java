@@ -5,7 +5,6 @@ import org.jabref.gui.Globals;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
-import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.fieldeditors.LinkedFileViewModel;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
@@ -49,9 +48,7 @@ public class OpenFolderAction extends SimpleCommand {
                                 databaseContext,
                                 Globals.TASK_EXECUTOR,
                                 dialogService,
-                                preferencesService,
-                                ExternalFileTypes.getInstance()
-                        );
+                                preferencesService);
                         linkedFileViewModel.openFolder();
                     });
                 } else {
@@ -61,9 +58,7 @@ public class OpenFolderAction extends SimpleCommand {
                             databaseContext,
                             Globals.TASK_EXECUTOR,
                             dialogService,
-                            preferencesService,
-                            ExternalFileTypes.getInstance()
-                    );
+                            preferencesService);
                     linkedFileViewModel.openFolder();
                 }
             });
