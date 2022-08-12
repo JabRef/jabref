@@ -237,8 +237,6 @@ public class CitaviXmlImporter extends Importer implements Parser {
         };
     }
 
-
-
     private String getPages(CitaviExchangeData.References.Reference data) {
         String tmpStr = "";
         if ((data.getPageCount() != null) && (data.getPageRange() == null)) {
