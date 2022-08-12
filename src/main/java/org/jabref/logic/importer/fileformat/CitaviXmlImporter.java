@@ -391,7 +391,6 @@ public class CitaviXmlImporter extends Importer implements Parser {
 
             Optional<Short> quotationIndex = Optional.ofNullable(knowledgeItem.getQuotationIndex());
             quotationIndex.ifPresent(index -> comment.add(String.format("quotation index: %d", index)));
-
         }
         return comment.toString();
     }
