@@ -14,6 +14,7 @@ import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -62,6 +63,7 @@ public class CitaviXmlImporter extends Importer implements Parser {
     private static final Logger LOGGER = LoggerFactory.getLogger(CitaviXmlImporter.class);
     private static final byte UUID_LENGTH = 36;
     private static final byte UUID_SEMICOLON_OFFSET_INDEX = 37;
+    private static final EnumSet<QuotationTypeMapping> QUOTATION_TYPES = EnumSet.allOf(QuotationTypeMapping.class);
     private final HtmlToLatexFormatter htmlToLatexFormatter = new HtmlToLatexFormatter();
     private final NormalizePagesFormatter pagesFormatter = new NormalizePagesFormatter();
 
@@ -235,6 +237,8 @@ public class CitaviXmlImporter extends Importer implements Parser {
         };
     }
 
+
+
     private String getPages(CitaviExchangeData.References.Reference data) {
         String tmpStr = "";
         if ((data.getPageCount() != null) && (data.getPageRange() == null)) {
@@ -378,6 +382,16 @@ public class CitaviXmlImporter extends Importer implements Parser {
 
             Optional<Integer> pages = Optional.ofNullable(knowledgeItem.getPageRangeNumber()).filter(range -> range != -1);
             pages.ifPresent(p -> comment.add("page range: " + p));
+
+            Optional<String> quotationTypeDesc = Optional.ofNullable(knowledgeItem.getQuotationType()).flatMap(type ->
+                                                                    this.QUOTATION_TYPES.stream()
+                                                                    .filter(qt -> type == qt.getCitaviIndexType())
+                                                                    .map(QuotationTypeMapping::getName).findFirst());
+            quotationTypeDesc.ifPresent(qt -> comment.add(String.format("quotation type: %s", qt)));
+
+            Optional<Short> quotationIndex = Optional.ofNullable(knowledgeItem.getQuotationIndex());
+            quotationIndex.ifPresent(index -> comment.add(String.format("quotation index: %d", index)));
+
         }
         return comment.toString();
     }
@@ -475,5 +489,31 @@ public class CitaviXmlImporter extends Importer implements Parser {
                          .trim()
                          .replaceAll(" +", " ");
         return htmlToLatexFormatter.format(result);
+    }
+
+    enum QuotationTypeMapping {
+        IMAGE_QUOTATION(0, "Image quotation"),
+        DIRECT_QUOTATION(1, "Direct quotation"),
+        INDIRECT_QUOTATION(2, "Indirect quotation"),
+        SUMMARY(3, "Summary"),
+        COMMENT(4, "Comment"),
+        HIGHLIGHT(5, "Highlight"),
+        HIGHLIGHT_RED(6, "Highlight in red");
+
+        int citaviType;
+        String name;
+
+        QuotationTypeMapping(int citaviType, String name) {
+            this.name = name;
+            this.citaviType = citaviType;
+        }
+
+        String getName() {
+            return name;
+        }
+
+        int getCitaviIndexType() {
+            return citaviType;
+        }
     }
 }
