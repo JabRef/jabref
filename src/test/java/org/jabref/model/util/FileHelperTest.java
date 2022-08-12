@@ -1,5 +1,6 @@
 package org.jabref.model.util;
 
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
 
@@ -38,7 +39,29 @@ class FileHelperTest {
     }
 
     @Test
-    public void testPathWithSubDirectories(@TempDir Path temp) throws Exception {
-        // TODO
+    public void testFindsFileInDirectory(@TempDir Path temp) throws Exception {
+        Path firstFilePath = temp.resolve("files");
+        Files.createDirectories(firstFilePath);
+        Path firstFile = Files.createFile(firstFilePath.resolve("test.pdf"));
+
+        assertEquals(Optional.of(firstFile), FileHelper.find("test.pdf", temp.resolve("files")));
+    }
+
+    @Test
+    public void testFindsFileStartingWithTheSameDirectory(@TempDir Path temp) throws Exception {
+        Path firstFilePath = temp.resolve("files");
+        Files.createDirectories(firstFilePath);
+        Path firstFile = Files.createFile(firstFilePath.resolve("test.pdf"));
+
+        assertEquals(Optional.of(firstFile), FileHelper.find("files/test.pdf", temp.resolve("files")));
+    }
+
+    @Test
+    public void testDoesNotFindsFileStartingWithTheSameDirectoryHasASubdirectory(@TempDir Path temp) throws Exception {
+        Path firstFilePath = temp.resolve("files");
+        Path secondFilesPath = firstFilePath.resolve("files");
+        Files.createDirectories(secondFilesPath);
+        Path firstFile = Files.createFile(secondFilesPath.resolve("test.pdf"));
+        assertEquals(Optional.empty(), FileHelper.find("files/test.pdf", temp.resolve("files")));
     }
 }
