@@ -1,4 +1,4 @@
-package org.jabref.gui.externalfiletype;
+package org.jabref.gui.preferences.externalfiletypes;
 
 import javax.inject.Inject;
 
@@ -35,11 +35,12 @@ public class EditExternalFileTypeEntryDialog extends BaseDialog<Void> {
     private final NativeDesktop nativeDesktop = JabRefDesktop.getNativeDesktop();
     private final FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder().withInitialDirectory(nativeDesktop.getApplicationDirectory()).build();
 
-    private EditExternalFileTypeViewModel viewModel;
-    private CustomExternalFileType entry;
+    private final ExternalFileTypeItemViewModel item;
 
-    public EditExternalFileTypeEntryDialog(CustomExternalFileType entry, String dialogTitle) {
-        this.entry = entry;
+    private EditExternalFileTypeViewModel viewModel;
+
+    public EditExternalFileTypeEntryDialog(ExternalFileTypeItemViewModel item, String dialogTitle) {
+        this.item = item;
 
         this.setTitle(dialogTitle);
 
@@ -57,7 +58,7 @@ public class EditExternalFileTypeEntryDialog extends BaseDialog<Void> {
 
     @FXML
     public void initialize() {
-        viewModel = new EditExternalFileTypeViewModel(entry);
+        viewModel = new EditExternalFileTypeViewModel(item);
 
         icon.setGraphic(viewModel.getIcon());
 
