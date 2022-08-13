@@ -21,7 +21,7 @@ public class FileExtensionViewModel {
 
     FileExtensionViewModel(FileType fileType, FilePreferences filePreferences) {
         this.description = Localization.lang("%0 file", fileType.getName());
-        this.extensions = fileType.getExtensionsWithDot();
+        this.extensions = fileType.getExtensionsWithAsteriskAndDot();
         this.filePreferences = filePreferences;
     }
 
