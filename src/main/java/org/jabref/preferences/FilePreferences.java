@@ -1,7 +1,10 @@
 package org.jabref.preferences;
 
 import java.nio.file.Path;
+import java.util.Comparator;
 import java.util.Optional;
+import java.util.Set;
+import java.util.TreeSet;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
@@ -9,7 +12,10 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableSet;
 
+import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.model.strings.StringUtil;
 
 public class FilePreferences {
@@ -24,6 +30,7 @@ public class FilePreferences {
     private final BooleanProperty downloadLinkedFiles = new SimpleBooleanProperty();
     private final BooleanProperty fulltextIndexLinkedFiles = new SimpleBooleanProperty();
     private final ObjectProperty<Path> workingDirectory = new SimpleObjectProperty<>();
+    private final ObservableSet<ExternalFileType> externalFileTypes = FXCollections.observableSet(new TreeSet<>(Comparator.comparing(ExternalFileType::getName)));
 
     public FilePreferences(String user,
                            String mainFileDirectory,
@@ -32,7 +39,8 @@ public class FilePreferences {
                            String fileDirectoryPattern,
                            boolean downloadLinkedFiles,
                            boolean fulltextIndexLinkedFiles,
-                           Path workingDirectory) {
+                           Path workingDirectory,
+                           Set<ExternalFileType> externalFileTypes) {
         this.user.setValue(user);
         this.mainFileDirectory.setValue(mainFileDirectory);
         this.storeFilesRelativeToBibFile.setValue(storeFilesRelativeToBibFile);
@@ -41,6 +49,7 @@ public class FilePreferences {
         this.downloadLinkedFiles.setValue(downloadLinkedFiles);
         this.fulltextIndexLinkedFiles.setValue(fulltextIndexLinkedFiles);
         this.workingDirectory.setValue(workingDirectory);
+        this.externalFileTypes.addAll(externalFileTypes);
     }
 
     public String getUser() { // Read only
@@ -133,5 +142,9 @@ public class FilePreferences {
 
     public void setWorkingDirectory(Path workingDirectory) {
         this.workingDirectory.set(workingDirectory);
+    }
+
+    public ObservableSet<ExternalFileType> getExternalFileTypes() {
+        return this.externalFileTypes;
     }
 }

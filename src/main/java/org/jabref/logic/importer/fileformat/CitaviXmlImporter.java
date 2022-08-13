@@ -14,12 +14,15 @@ import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.StringJoiner;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -28,6 +31,7 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
+import org.jabref.logic.formatter.bibtexfields.HtmlToLatexFormatter;
 import org.jabref.logic.formatter.bibtexfields.NormalizePagesFormatter;
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.Parser;
@@ -59,6 +63,8 @@ public class CitaviXmlImporter extends Importer implements Parser {
     private static final Logger LOGGER = LoggerFactory.getLogger(CitaviXmlImporter.class);
     private static final byte UUID_LENGTH = 36;
     private static final byte UUID_SEMICOLON_OFFSET_INDEX = 37;
+    private static final EnumSet<QuotationTypeMapping> QUOTATION_TYPES = EnumSet.allOf(QuotationTypeMapping.class);
+    private final HtmlToLatexFormatter htmlToLatexFormatter = new HtmlToLatexFormatter();
     private final NormalizePagesFormatter pagesFormatter = new NormalizePagesFormatter();
 
     private final Map<String, Author> knownPersons = new HashMap<>();
@@ -363,17 +369,40 @@ public class CitaviXmlImporter extends Importer implements Parser {
     }
 
     private String getKnowledgeItem(CitaviExchangeData.References.Reference data) {
-        Optional<KnowledgeItem> knowledgeItem = knowledgeItems.getKnowledgeItem().stream().filter(p -> data.getId().equals(p.getReferenceID())).findFirst();
+        StringJoiner comment = new StringJoiner("\n\n");
+        List<KnowledgeItem> foundItems = knowledgeItems.getKnowledgeItem().stream().filter(p -> data.getId().equals(p.getReferenceID())).toList();
+        for (KnowledgeItem knowledgeItem : foundItems) {
+            Optional<String> title = Optional.ofNullable(knowledgeItem.getCoreStatement()).filter(Predicate.not(String::isEmpty));
+            title.ifPresent(t -> comment.add("# " + cleanUpText(t)));
 
-        StringBuilder comment = new StringBuilder();
-        Optional<String> title = knowledgeItem.map(item -> item.getCoreStatement());
-        title.ifPresent(t -> comment.append("# ").append(t).append("\n\n"));
-        Optional<String> text = knowledgeItem.map(item -> item.getText());
-        text.ifPresent(t -> comment.append(t).append("\n\n"));
-        Optional<Integer> pages = knowledgeItem.map(item -> item.getPageRangeNumber()).filter(range -> range != -1);
-        pages.ifPresent(p -> comment.append("page range: ").append(p));
+            Optional<String> text = Optional.ofNullable(knowledgeItem.getText()).filter(Predicate.not(String::isEmpty));
+            text.ifPresent(t -> comment.add(cleanUpText(t)));
 
+            Optional<Integer> pages = Optional.ofNullable(knowledgeItem.getPageRangeNumber()).filter(range -> range != -1);
+            pages.ifPresent(p -> comment.add("page range: " + p));
+
+            Optional<String> quotationTypeDesc = Optional.ofNullable(knowledgeItem.getQuotationType()).flatMap(type ->
+                                                                    this.QUOTATION_TYPES.stream()
+                                                                    .filter(qt -> type == qt.getCitaviIndexType())
+                                                                    .map(QuotationTypeMapping::getName).findFirst());
+            quotationTypeDesc.ifPresent(qt -> comment.add(String.format("quotation type: %s", qt)));
+
+            Optional<Short> quotationIndex = Optional.ofNullable(knowledgeItem.getQuotationIndex());
+            quotationIndex.ifPresent(index -> comment.add(String.format("quotation index: %d", index)));
+        }
         return comment.toString();
+    }
+
+    String cleanUpText(String text) {
+        String result = removeSpacesBeforeLineBreak(text);
+        result = result.replaceAll("(?<!\\\\)\\{", "\\\\{");
+        result = result.replaceAll("(?<!\\\\)}", "\\\\}");
+        return result;
+    }
+
+    private String removeSpacesBeforeLineBreak(String string) {
+        return string.replaceAll(" +\r\n", "\r\n")
+              .replaceAll(" +\n", "\n");
     }
 
     private void initUnmarshaller() throws JAXBException {
@@ -453,8 +482,35 @@ public class CitaviXmlImporter extends Importer implements Parser {
     }
 
     private String clean(String input) {
-        return StringUtil.unifyLineBreaks(input, " ")
+        String result = StringUtil.unifyLineBreaks(input, " ")
                          .trim()
                          .replaceAll(" +", " ");
+        return htmlToLatexFormatter.format(result);
+    }
+
+    enum QuotationTypeMapping {
+        IMAGE_QUOTATION(0, "Image quotation"),
+        DIRECT_QUOTATION(1, "Direct quotation"),
+        INDIRECT_QUOTATION(2, "Indirect quotation"),
+        SUMMARY(3, "Summary"),
+        COMMENT(4, "Comment"),
+        HIGHLIGHT(5, "Highlight"),
+        HIGHLIGHT_RED(6, "Highlight in red");
+
+        int citaviType;
+        String name;
+
+        QuotationTypeMapping(int citaviType, String name) {
+            this.name = name;
+            this.citaviType = citaviType;
+        }
+
+        String getName() {
+            return name;
+        }
+
+        int getCitaviIndexType() {
+            return citaviType;
+        }
     }
 }
