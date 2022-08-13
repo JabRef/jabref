@@ -77,8 +77,8 @@ public class JabRefGUI {
         if (guiPreferences.isWindowMaximised()) {
             mainStage.setMaximized(true);
         } else if ((Screen.getScreens().size() == 1) && isWindowPositionOutOfBounds()) {
-            // corrects the Window, if its outside of the mainscreen
-            LOGGER.debug("The Jabref Window is outside the Main Monitor\n");
+            // corrects the Window, if it is outside the mainscreen
+            LOGGER.debug("The Jabref window is outside the main screen\n");
             mainStage.setX(0);
             mainStage.setY(0);
             mainStage.setWidth(1024);

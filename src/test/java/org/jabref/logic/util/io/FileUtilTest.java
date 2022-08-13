@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.jabref.logic.layout.LayoutFormatterPreferences;
+import org.jabref.logic.util.BackupFileType;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.util.FileHelper;
@@ -20,6 +21,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Answers;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -395,10 +398,36 @@ class FileUtilTest {
     }
 
     @Test
-    void testFindinListofPath() {
+    void testFindInListOfPath() {
         List<Path> paths = List.of(existingTestFile, otherExistingTestFile, rootDir);
         List<Path> resultPaths = List.of(existingTestFile, existingTestFile);
         List<Path> result = FileUtil.find("existingTestFile.txt", paths);
         assertEquals(resultPaths, result);
+    }
+
+    @Test
+    void uniqueFilePrefix() {
+        // The number "7001d6e0" is "random"
+        assertEquals("7001d6e0", FileUtil.getUniqueFilePrefix(Path.of("/tmp/test.bib")));
+    }
+
+    @Test
+    void getPathOfBackupFileAndCreateDirectoryReturnsAppDirectoryInCaseOfNoError() {
+        String start = FileUtil.getAppDataBackupDir().toString();
+        String result = FileUtil.getPathForNewBackupFileAndCreateDirectory(Path.of("/tmp/test.bib"), BackupFileType.BACKUP).toString();
+        // We just check the prefix
+        assertEquals(start, result.substring(0, start.length()));
+    }
+
+    @Test
+    void getPathOfBackupFileAndCreateDirectoryReturnsSameDirectoryInCaseOfException() {
+        try (MockedStatic<Files> files = Mockito.mockStatic(Files.class, Answers.RETURNS_DEEP_STUBS)) {
+            files.when(() -> Files.createDirectories(FileUtil.getAppDataBackupDir()))
+                    .thenThrow(new IOException());
+            Path testPath = Path.of("tmp", "test.bib");
+            Path result = FileUtil.getPathForNewBackupFileAndCreateDirectory(testPath, BackupFileType.BACKUP);
+            // We just check the prefix
+            assertEquals(Path.of("tmp", "test.bib.bak"), result);
+        }
     }
 }
