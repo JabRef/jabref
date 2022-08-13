@@ -8,6 +8,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.Queue;
 import java.util.Set;
@@ -160,7 +161,8 @@ public class BackupManager {
      * @param backupPath the path where the library should be backed up to
      */
     private void performBackup(Path backupPath) {
-        if (backupFilesQueue.size() >= MAXIMUM_BACKUP_FILE_COUNT) {
+        // We opted for "while" to delete backups in case there are more than 10
+        while (backupFilesQueue.size() >= MAXIMUM_BACKUP_FILE_COUNT) {
             Path lessRecentBackupFile = backupFilesQueue.poll();
             try {
                 Files.delete(lessRecentBackupFile);
@@ -205,8 +207,30 @@ public class BackupManager {
     }
 
     private void startBackupTask() {
+        fillQueue();
+
         // We need to determine the backup path on each action, because the user might have saved the file to a different location
         throttler.schedule(() -> determineBackupPathForNewBackup().ifPresent(this::performBackup));
+    }
+
+    private void fillQueue() {
+        Path backupDir = FileUtil.getAppDataBackupDir();
+        if (!Files.exists(backupDir)) {
+            return;
+        }
+        bibDatabaseContext.getDatabasePath().ifPresent(databasePath -> {
+            // code similar to {@link org.jabref.logic.util.io.FileUtil.getPathOfLatestExisingBackupFile}
+            final String prefix = FileUtil.getUniqueFilePrefix(databasePath) + "--" + databasePath.getFileName();
+            try {
+                List<Path> allSavFiles = Files.list(backupDir)
+                                              // just list the .sav belonging to the given targetFile
+                                              .filter(p -> p.getFileName().toString().startsWith(prefix))
+                                              .sorted().toList();
+                backupFilesQueue.addAll(allSavFiles);
+            } catch (IOException e) {
+                LOGGER.error("Could not determine most recent file", e);
+            }
+        });
     }
 
     /**

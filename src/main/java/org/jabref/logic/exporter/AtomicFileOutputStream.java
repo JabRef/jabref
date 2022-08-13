@@ -12,6 +12,7 @@ import java.nio.file.attribute.PosixFilePermission;
 import java.util.EnumSet;
 import java.util.Set;
 
+import org.jabref.logic.util.BackupFileType;
 import org.jabref.logic.util.io.FileUtil;
 
 import org.slf4j.Logger;
@@ -47,7 +48,7 @@ public class AtomicFileOutputStream extends FilterOutputStream {
     private static final Logger LOGGER = LoggerFactory.getLogger(AtomicFileOutputStream.class);
 
     private static final String TEMPORARY_EXTENSION = ".tmp";
-    private static final String BACKUP_EXTENSION = ".bak";
+    private static final String SAVE_EXTENSION = BackupFileType.SAVE.getExtensions().get(0);
 
     /**
      * The file we want to create/replace.
@@ -76,7 +77,7 @@ public class AtomicFileOutputStream extends FilterOutputStream {
 
         this.targetFile = path;
         this.temporaryFile = getPathOfTemporaryFile(path);
-        this.backupFile = getPathOfBackupFile(path);
+        this.backupFile = getPathOfSaveBackupFile(path);
         this.keepBackup = keepBackup;
 
         try {
@@ -104,8 +105,8 @@ public class AtomicFileOutputStream extends FilterOutputStream {
         return FileUtil.addExtension(targetFile, TEMPORARY_EXTENSION);
     }
 
-    private static Path getPathOfBackupFile(Path targetFile) {
-        return FileUtil.addExtension(targetFile, BACKUP_EXTENSION);
+    private static Path getPathOfSaveBackupFile(Path targetFile) {
+        return FileUtil.addExtension(targetFile, SAVE_EXTENSION);
     }
 
     /**
