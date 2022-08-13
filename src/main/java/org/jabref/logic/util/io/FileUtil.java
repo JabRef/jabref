@@ -109,6 +109,8 @@ public class FileUtil {
      * Adds an extension to the given file name. The original extension is not replaced. That means, "demo.bib", ".sav"
      * gets "demo.bib.sav" and not "demo.sav"
      *
+     * <emph>Warning! If "ext" is passed, this is literally added. Thus addExtension("tmp.txt", "ext") leads to "tmp.txtext"</emph>
+     *
      * @param path      the path to add the extension to
      * @param extension the extension to add
      * @return the with the modified file name
@@ -128,7 +130,7 @@ public class FileUtil {
                               .map(part -> part.substring(0, part.lastIndexOf(File.separator)));
     }
 
-    private static Path getAppDataBackupDir() {
+    static Path getAppDataBackupDir() {
         Path directory = Path.of(AppDirsFactory.getInstance().getUserDataDir(
                                      "jabref",
                                      new BuildInfo().version.toString(),
@@ -153,7 +155,7 @@ public class FileUtil {
      * </p>
      */
     public static Path getPathOfBackupFileAndCreateDirectory(Path targetFile, BackupFileType fileType) {
-        String extension = fileType.getExtensionsWithDot().get(0);
+        String extension = "." + fileType.getExtensions().get(0);
 
         // We choose the data directory, because a ".bak" file should survive cache cleanups
         Path directory = getAppDataBackupDir();
@@ -164,7 +166,7 @@ public class FileUtil {
             LOGGER.warn("Could not create bib writing directory {}, using {} as file", directory, result, e);
             return result;
         }
-        Path fileName = addExtension(Path.of(getUniqueFilePrefix(targetFile) + "-" + targetFile), extension);
+        Path fileName = addExtension(Path.of(getUniqueFilePrefix(targetFile) + "-" + targetFile.getFileName()), extension);
         return directory.resolve(fileName);
     }
 
