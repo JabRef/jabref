@@ -122,7 +122,7 @@ public class BackupManager {
         }
 
         try {
-            return !Files.isSameFile(originalPath, backupPath.get());
+            return Files.mismatch(originalPath, backupPath.get()) != -1L;
         } catch (IOException e) {
             LOGGER.debug("Could not compare original file and backup file.", e);
             // User has to investigate in this case
