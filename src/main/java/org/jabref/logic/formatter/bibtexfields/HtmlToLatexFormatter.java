@@ -44,7 +44,12 @@ public class HtmlToLatexFormatter extends Formatter implements LayoutFormatter {
             int c = result.charAt(i);
 
             if (c == '<') {
+                int oldI = i;
                 i = readTag(result, i);
+                if (oldI == i) {
+                    // just a single <, which needs to be kept
+                    sb.append('<');
+                }
             } else {
                 sb.append((char) c);
             }
