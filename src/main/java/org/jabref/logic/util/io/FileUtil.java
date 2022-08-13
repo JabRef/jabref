@@ -10,6 +10,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
+import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -130,7 +133,7 @@ public class FileUtil {
                               .map(part -> part.substring(0, part.lastIndexOf(File.separator)));
     }
 
-    static Path getAppDataBackupDir() {
+    public static Path getAppDataBackupDir() {
         Path directory = Path.of(AppDirsFactory.getInstance().getUserDataDir(
                                      "jabref",
                                      new BuildInfo().version.toString(),
@@ -143,7 +146,8 @@ public class FileUtil {
      * Determines the path of the backup file (using the given extension)
      *
      * <p>
-     *     As default, a directory inside the user temporary dir is used
+     *     As default, a directory inside the user temporary dir is used.<br>
+     *     In case a AUTOSAVE backup is requested, a timestamp is added
      * </p>
      * <p>
      *     <em>SIDE EFFECT</em>: Creates the directory.
@@ -156,6 +160,7 @@ public class FileUtil {
      */
     public static Path getPathOfBackupFileAndCreateDirectory(Path targetFile, BackupFileType fileType) {
         String extension = "." + fileType.getExtensions().get(0);
+        String timeSuffix = ZonedDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd--HH.mm.ss"));
 
         // We choose the data directory, because a ".bak" file should survive cache cleanups
         Path directory = getAppDataBackupDir();
@@ -166,7 +171,8 @@ public class FileUtil {
             LOGGER.warn("Could not create bib writing directory {}, using {} as file", directory, result, e);
             return result;
         }
-        Path fileName = addExtension(Path.of(getUniqueFilePrefix(targetFile) + "-" + targetFile.getFileName()), extension);
+        String baseFileName = getUniqueFilePrefix(targetFile) + "--" + targetFile.getFileName() + "--" + timeSuffix;
+        Path fileName = addExtension(Path.of(baseFileName), extension);
         return directory.resolve(fileName);
     }
 

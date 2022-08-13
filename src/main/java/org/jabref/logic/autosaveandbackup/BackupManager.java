@@ -7,11 +7,15 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashSet;
 import java.util.Optional;
+import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import org.jabref.logic.bibtex.InvalidFieldValueException;
 import org.jabref.logic.exporter.BibWriter;
@@ -41,6 +45,8 @@ public class BackupManager {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BackupManager.class);
 
+    private static final int MAXIMUM_BACKUP_FILE_COUNT = 10;
+
     private static Set<BackupManager> runningInstances = new HashSet<>();
 
     private final BibDatabaseContext bibDatabaseContext;
@@ -48,6 +54,11 @@ public class BackupManager {
     private final DelayTaskThrottler throttler;
     private final CoarseChangeFilter changeFilter;
     private final BibEntryTypesManager entryTypesManager;
+
+
+    // Contains a list of all backup paths
+    // During a write, the less recent backup file is deleted
+    private final Queue<Path> backupFilesQueue = new LinkedBlockingQueue<>();
 
     private BackupManager(BibDatabaseContext bibDatabaseContext, BibEntryTypesManager entryTypesManager, PreferencesService preferences) {
         this.bibDatabaseContext = bibDatabaseContext;
@@ -59,7 +70,21 @@ public class BackupManager {
         changeFilter.registerListener(this);
     }
 
-    static Path getBackupPath(Path originalPath) {
+    /**
+     * Determines the most recent backup file name
+     */
+    static Path getBackupPathForNewBackup(Path originalPath) {
+        return FileUtil.getPathOfBackupFileAndCreateDirectory(originalPath, BackupFileType.BACKUP);
+    }
+
+    /**
+     * Determines the most recent existing backup file name
+     */
+    static Path getLatestBackupPath(Path originalPath) {
+        // TODO timestamp
+
+        String timeSuffix = LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+
         return FileUtil.getPathOfBackupFileAndCreateDirectory(originalPath, BackupFileType.BACKUP);
     }
 
@@ -97,7 +122,7 @@ public class BackupManager {
      * the user checks the output.
      */
     public static boolean backupFileDiffers(Path originalPath) {
-        Path backupPath = getBackupPath(originalPath);
+        Path backupPath = getLatestBackupPath(originalPath);
         if (!Files.exists(backupPath) || Files.isDirectory(backupPath)) {
             return false;
         }
@@ -117,7 +142,7 @@ public class BackupManager {
      * @param originalPath Path to the file which should be equalized to the backup file.
      */
     public static void restoreBackup(Path originalPath) {
-        Path backupPath = getBackupPath(originalPath);
+        Path backupPath = getLatestBackupPath(originalPath);
         try {
             Files.copy(backupPath, originalPath, StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
@@ -125,11 +150,27 @@ public class BackupManager {
         }
     }
 
-    private Optional<Path> determineBackupPath() {
-        return bibDatabaseContext.getDatabasePath().map(BackupManager::getBackupPath);
+    private Optional<Path> determineBackupPathForLatestBackup() {
+        return bibDatabaseContext.getDatabasePath().map(BackupManager::getBackupPathForNewBackup);
     }
 
+    /**
+     * This method is called as soon as the scheduler says: "Do the backup"
+     *
+     * <em>SIDE EFFECT: Deletes oldest backup file</em>
+     *
+     * @param backupPath the path where the library should be backed up to
+     */
     private void performBackup(Path backupPath) {
+        if (backupFilesQueue.size() >= MAXIMUM_BACKUP_FILE_COUNT) {
+            Path lessRecentBackupFile = backupFilesQueue.poll();
+            try {
+                Files.delete(lessRecentBackupFile);
+            } catch (IOException e) {
+                LOGGER.error("Could not delete backup file {}", lessRecentBackupFile, e);
+            }
+        }
+
         // code similar to org.jabref.gui.exporter.SaveDatabaseAction.saveDatabase
         GeneralPreferences generalPreferences = preferences.getGeneralPreferences();
         SavePreferences savePreferences = preferences.getSavePreferences()
@@ -139,6 +180,7 @@ public class BackupManager {
             BibWriter bibWriter = new BibWriter(writer, bibDatabaseContext.getDatabase().getNewLineSeparator());
             new BibtexDatabaseWriter(bibWriter, generalPreferences, savePreferences, entryTypesManager)
                     .saveDatabase(bibDatabaseContext);
+            backupFilesQueue.add(backupPath);
         } catch (IOException e) {
             logIfCritical(backupPath, e);
         }
@@ -166,7 +208,7 @@ public class BackupManager {
 
     private void startBackupTask() {
         // We need to determine the backup path on each action, because the user might have saved the file to a different location
-        throttler.schedule(() -> determineBackupPath().ifPresent(this::performBackup));
+        throttler.schedule(() -> determineBackupPathForLatestBackup().ifPresent(this::performBackup));
     }
 
     /**
@@ -177,16 +219,5 @@ public class BackupManager {
         changeFilter.unregisterListener(this);
         changeFilter.shutdown();
         throttler.shutdown();
-        determineBackupPath().ifPresent(this::deleteBackupFile);
-    }
-
-    private void deleteBackupFile(Path backupPath) {
-        try {
-            if (Files.exists(backupPath) && !Files.isDirectory(backupPath)) {
-                Files.delete(backupPath);
-            }
-        } catch (IOException e) {
-            LOGGER.error("Error while deleting the backup file.", e);
-        }
     }
 }
