@@ -7,6 +7,7 @@ import java.nio.file.FileSystem;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import org.jabref.logic.util.BackupFileType;
 import org.jabref.logic.util.io.FileUtil;
 
 import com.google.common.base.Strings;
@@ -51,6 +52,6 @@ class AtomicFileOutputStreamTest {
     @Test
     void tempAndBackupDifferentPaths() {
         Path testFile = Path.of("test.bib");
-        assertNotEquals(AtomicFileOutputStream.getPathOfTemporaryFile(testFile), FileUtil.getPathOfBackupFile(testFile, AtomicFileOutputStream.BACKUP_EXTENSION));
+        assertNotEquals(AtomicFileOutputStream.getPathOfTemporaryFile(testFile), FileUtil.getPathOfBackupFileAndCreateDirectory(testFile, BackupFileType.BACKUP));
     }
 }

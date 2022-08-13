@@ -25,16 +25,22 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.jabref.logic.citationkeypattern.BracketedPattern;
+import org.jabref.logic.util.BackupFileType;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.util.FileHelper;
 import org.jabref.model.util.OptionalUtil;
 
 import net.harawata.appdirs.AppDirsFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * This class is the "successor" of {@link FileHelper}. In case you miss something here,
+ * please look at {@link FileHelper} and migrate the functionality to here.
+ */
 public class FileUtil {
 
     public static final boolean IS_POSIX_COMPLIANT = FileSystems.getDefault().supportedFileAttributeViews().contains("posix");
@@ -122,12 +128,12 @@ public class FileUtil {
                               .map(part -> part.substring(0, part.lastIndexOf(File.separator)));
     }
 
-    private static Path getDataDir() {
+    private static Path getAppDataBackupDir() {
         Path directory = Path.of(AppDirsFactory.getInstance().getUserDataDir(
                                      "jabref",
                                      new BuildInfo().version.toString(),
                                      "org.jabref"))
-                             .resolve("bibs");
+                             .resolve("backups");
         return directory;
     }
 
@@ -138,7 +144,7 @@ public class FileUtil {
      *     As default, a directory inside the user temporary dir is used
      * </p>
      * <p>
-     *     SIDE EFFECT: Creates the directory.
+     *     <em>SIDE EFFECT</em>: Creates the directory.
      *     In case that fails, the return path of the .bak file is set to be next to the .bib file
      * </p>
      * <p>
@@ -146,9 +152,11 @@ public class FileUtil {
      *     (and configured in the preferences as "make backups")
      * </p>
      */
-    public static Path getPathOfBackupFile(Path targetFile, String extension) {
+    public static Path getPathOfBackupFileAndCreateDirectory(Path targetFile, BackupFileType fileType) {
+        String extension = fileType.getExtensionsWithDot().get(0);
+
         // We choose the data directory, because a ".bak" file should survive cache cleanups
-        Path directory = getDataDir();
+        Path directory = getAppDataBackupDir();
         try {
             Files.createDirectories(directory);
         } catch (IOException e) {
@@ -171,7 +179,7 @@ public class FileUtil {
      *     Thus, we need to create a unique prefix to distinguish these files.
      * </p>
      */
-    private static String getUniqueFilePrefix(Path targetFile) {
+    static String getUniqueFilePrefix(Path targetFile) {
         // Idea: use the hash code and convert it to hex
         // Thereby, use positive values only and use length 4
         int positiveCode = Math.abs(targetFile.hashCode());

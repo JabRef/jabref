@@ -395,10 +395,16 @@ class FileUtilTest {
     }
 
     @Test
-    void testFindinListofPath() {
+    void testFindInListOfPath() {
         List<Path> paths = List.of(existingTestFile, otherExistingTestFile, rootDir);
         List<Path> resultPaths = List.of(existingTestFile, existingTestFile);
         List<Path> result = FileUtil.find("existingTestFile.txt", paths);
         assertEquals(resultPaths, result);
+    }
+
+    @Test
+    void uniqueFilePrefix() {
+        // The number "7001d6e0" is "random"
+        assertEquals("7001d6e0", FileUtil.getUniqueFilePrefix(Path.of("/tmp/test.bib")));
     }
 }

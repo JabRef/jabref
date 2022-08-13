@@ -12,6 +12,7 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
 
+import org.jabref.logic.util.BackupFileType;
 import org.jabref.logic.util.io.FileUtil;
 
 import org.slf4j.Logger;
@@ -78,7 +79,7 @@ public class AtomicFileOutputStream extends FilterOutputStream {
 
         this.targetFile = path;
         this.temporaryFile = getPathOfTemporaryFile(path);
-        this.backupFile = FileUtil.getPathOfBackupFile(path, BACKUP_EXTENSION);
+        this.backupFile = FileUtil.getPathOfBackupFileAndCreateDirectory(path, BackupFileType.BACKUP);
 
         if (Files.exists(targetFile)) {
             // Make a backup of the original file

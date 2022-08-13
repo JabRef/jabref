@@ -1,6 +1,7 @@
 package org.jabref.logic.autosaveandbackup;
 
 import java.io.IOException;
+import java.io.Writer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -13,10 +14,10 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 
 import org.jabref.logic.bibtex.InvalidFieldValueException;
-import org.jabref.logic.exporter.AtomicFileWriter;
 import org.jabref.logic.exporter.BibWriter;
 import org.jabref.logic.exporter.BibtexDatabaseWriter;
 import org.jabref.logic.exporter.SavePreferences;
+import org.jabref.logic.util.BackupFileType;
 import org.jabref.logic.util.CoarseChangeFilter;
 import org.jabref.logic.util.DelayTaskThrottler;
 import org.jabref.logic.util.io.FileUtil;
@@ -40,9 +41,6 @@ public class BackupManager {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BackupManager.class);
 
-    // This differs from org.jabref.logic.exporter.AtomicFileOutputStream.BACKUP_EXTENSION, which is used for copying the .bib away before overwriting on save.
-    private static final String AUTOSAVE_FILE_EXTENSION = ".sav";
-
     private static Set<BackupManager> runningInstances = new HashSet<>();
 
     private final BibDatabaseContext bibDatabaseContext;
@@ -62,7 +60,7 @@ public class BackupManager {
     }
 
     static Path getBackupPath(Path originalPath) {
-        return FileUtil.addExtension(originalPath, AUTOSAVE_FILE_EXTENSION);
+        return FileUtil.getPathOfBackupFileAndCreateDirectory(originalPath, BackupFileType.BACKUP);
     }
 
     /**
@@ -137,8 +135,8 @@ public class BackupManager {
         SavePreferences savePreferences = preferences.getSavePreferences()
                                                      .withMakeBackup(false);
         Charset encoding = bibDatabaseContext.getMetaData().getEncoding().orElse(StandardCharsets.UTF_8);
-        try (AtomicFileWriter fileWriter = new AtomicFileWriter(backupPath, encoding)) {
-            BibWriter bibWriter = new BibWriter(fileWriter, bibDatabaseContext.getDatabase().getNewLineSeparator());
+        try (Writer writer = Files.newBufferedWriter(backupPath, encoding)) {
+            BibWriter bibWriter = new BibWriter(writer, bibDatabaseContext.getDatabase().getNewLineSeparator());
             new BibtexDatabaseWriter(bibWriter, generalPreferences, savePreferences, entryTypesManager)
                     .saveDatabase(bibDatabaseContext);
         } catch (IOException e) {
@@ -167,6 +165,7 @@ public class BackupManager {
     }
 
     private void startBackupTask() {
+        // We need to determine the backup path on each action, because the user might have saved the file to a different location
         throttler.schedule(() -> determineBackupPath().ifPresent(this::performBackup));
     }
 
