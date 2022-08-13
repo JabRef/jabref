@@ -31,4 +31,48 @@ public class BibStringDiffTest {
         List<BibStringDiff> result = BibStringDiff.compare(originalDataBase, newDataBase);
         assertEquals(List.of(diff), result);
     }
+
+    @Test
+    void compareTestDefault() throws Exception {
+
+        BibtexString BibStringDiff_that  = new BibtexString("name1", "content1");
+        BibtexString BibStringDiff_other  = new BibtexString("name2", "content2");
+
+        Boolean result = BibStringDiff_that .equals(BibStringDiff_other);
+
+        assertEquals(true, result);
+    }
+    @Test
+    void compareTestNull() throws Exception {
+
+        BibtexString BibStringDiff_that  = new BibtexString("name1", "content1");
+        BibtexString BibStringDiff_other = null;
+
+        Boolean result = BibStringDiff_that.equals(BibStringDiff_other);
+
+        assertEquals(false, result);
+    }
+
+    @Test
+    void compareDiferentTestDefault() throws Exception {
+
+        BibtexString BibStringDiff_that  = new BibtexString("name1", "content1");
+        String BibStringDiff_other = "bora";
+
+        Boolean result = BibStringDiff_that.equals(BibStringDiff_other);
+
+        assertEquals(false, result);
+    }
+
+    @Test
+    void compareSameTestDefault() throws Exception {
+
+      
+        BibtexString BibStringDiff_that  = new BibtexString("name1", "content1");
+        BibtexString BibStringDiff_other  = new BibtexString("name2", "content2");
+
+        Boolean result = BibStringDiff_that.equals(BibStringDiff_other);
+
+        assertEquals(false, result);
+    }
 }
