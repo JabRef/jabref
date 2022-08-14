@@ -96,7 +96,7 @@ public class OpenDatabaseAction extends SimpleCommand {
                 .build();
 
         List<Path> filesToOpen = dialogService.showFileOpenDialogAndGetMultipleFiles(fileDialogConfiguration);
-        openFiles(filesToOpen, true);
+        openFiles(filesToOpen);
     }
 
     /**
@@ -116,8 +116,8 @@ public class OpenDatabaseAction extends SimpleCommand {
      *
      * @param file the file, may be null or not existing
      */
-    public void openFile(Path file, boolean raisePanel) {
-        openFiles(new ArrayList<>(List.of(file)), raisePanel);
+    public void openFile(Path file) {
+        openFiles(new ArrayList<>(List.of(file)));
     }
 
     /**
@@ -125,7 +125,7 @@ public class OpenDatabaseAction extends SimpleCommand {
      *
      * @param filesToOpen the filesToOpen, may be null or not existing
      */
-    public void openFiles(List<Path> filesToOpen, boolean raisePanel) {
+    public void openFiles(List<Path> filesToOpen) {
         LibraryTab toRaise = null;
         int initialCount = filesToOpen.size();
         int removed = 0;
@@ -157,7 +157,7 @@ public class OpenDatabaseAction extends SimpleCommand {
 
             for (Path theFile : theFiles) {
                 // This method will execute the concrete file opening and loading in a background thread
-                openTheFile(theFile, raisePanel);
+                openTheFile(theFile);
             }
 
             for (Path theFile : theFiles) {
@@ -173,7 +173,7 @@ public class OpenDatabaseAction extends SimpleCommand {
     /**
      * @param file the file, may be null or not existing
      */
-    private void openTheFile(Path file, boolean raisePanel) {
+    private void openTheFile(Path file) {
         Objects.requireNonNull(file);
         if (!Files.exists(file)) {
             return;

@@ -212,6 +212,7 @@ public class LibraryTab extends Tab {
         OpenDatabaseAction.performPostOpenActions(this, result);
 
         feedData(context);
+
         // a temporary workaround to update groups pane
         stateManager.activeDatabaseProperty().bind(
                 EasyBind.map(frame.getTabbedPane().getSelectionModel().selectedItemProperty(),

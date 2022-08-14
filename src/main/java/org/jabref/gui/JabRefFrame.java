@@ -257,7 +257,7 @@ public class JabRefFrame extends BorderPane {
                             tabbedPane.getTabs().remove(dndIndicator);
                             List<Path> bibFiles = DragAndDropHelper.getBibFiles(tabDragEvent.getDragboard());
                             OpenDatabaseAction openDatabaseAction = this.getOpenDatabaseAction();
-                            openDatabaseAction.openFiles(bibFiles, true);
+                            openDatabaseAction.openFiles(bibFiles);
                             tabDragEvent.setDropCompleted(true);
                             tabDragEvent.consume();
                         } else {
@@ -280,7 +280,7 @@ public class JabRefFrame extends BorderPane {
                 tabbedPane.getTabs().remove(dndIndicator);
                 List<Path> bibFiles = DragAndDropHelper.getBibFiles(event.getDragboard());
                 OpenDatabaseAction openDatabaseAction = this.getOpenDatabaseAction();
-                openDatabaseAction.openFiles(bibFiles, true);
+                openDatabaseAction.openFiles(bibFiles);
                 event.setDropCompleted(true);
                 event.consume();
             });
@@ -380,8 +380,7 @@ public class JabRefFrame extends BorderPane {
      */
     public void openAction(String filePath) {
         Path file = Path.of(filePath);
-        // all the logic is done in openIt. Even raising an existing panel
-        getOpenDatabaseAction().openFile(file, true);
+        getOpenDatabaseAction().openFile(file);
     }
 
     /**
