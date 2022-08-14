@@ -18,7 +18,7 @@ import org.slf4j.LoggerFactory;
 
 public class BackupFileUtil {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(FileUtil.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(BackupFileUtil.class);
 
     private BackupFileUtil() {
     }
