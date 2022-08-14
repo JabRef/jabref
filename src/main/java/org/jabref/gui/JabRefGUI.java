@@ -21,6 +21,7 @@ import org.jabref.gui.importer.ParserResultWarningDialog;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
 import org.jabref.gui.keyboard.TextInputKeyBindings;
 import org.jabref.gui.shared.SharedDatabaseUIManager;
+import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.autosaveandbackup.BackupManager;
 import org.jabref.logic.importer.OpenDatabase;
 import org.jabref.logic.importer.ParserResult;
@@ -260,6 +261,12 @@ public class JabRefGUI {
                 preferencesService.getGuiPreferences().getPositionY());
     }
 
+    /**
+     * This method is similar to {@link OpenDatabaseAction#loadDatabase(Path)}
+     *
+     * This method restores local databases only (and not remote ones).
+     * The remote ones are handled in {@link org.jabref.gui.JabRefGUI#openDatabases()}.
+     */
     private void openLastEditedDatabases() {
         List<String> lastFiles = preferencesService.getGuiPreferences().getLastFilesOpened();
         if (lastFiles.isEmpty()) {
@@ -274,21 +281,29 @@ public class JabRefGUI {
                 continue;
             }
 
+            DialogService dialogService = mainFrame.getDialogService();
+
             if (BackupManager.backupFileDiffers(dbFile)) {
-                BackupUIManager.showRestoreBackupDialog(mainFrame.getDialogService(), dbFile);
+                BackupUIManager.showRestoreBackupDialog(dialogService, dbFile);
             }
 
-            ParserResult parsedDatabase;
+            ParserResult result;
             try {
-                parsedDatabase = OpenDatabase.loadDatabase(
+                result = OpenDatabase.loadDatabase(
                         dbFile,
                         preferencesService.getImportFormatPreferences(),
                         Globals.getFileUpdateMonitor());
+                if (result.hasWarnings()) {
+                    String content = Localization.lang("Please check your library file for wrong syntax.")
+                            + "\n\n" + result.getErrorMessage();
+                    DefaultTaskExecutor.runInJavaFXThread(() ->
+                            dialogService.showWarningDialogAndWait(Localization.lang("Open library error"), content));
+                }
             } catch (IOException ex) {
                 LOGGER.error("Error opening file '{}'", dbFile, ex);
-                parsedDatabase = ParserResult.fromError(ex);
+                result = ParserResult.fromError(ex);
             }
-            bibDatabases.add(parsedDatabase);
+            bibDatabases.add(result);
         }
     }
 
