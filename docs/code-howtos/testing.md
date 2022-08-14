@@ -2,7 +2,7 @@
 parent: Code Howtos
 nav_order: 12
 ---
-# How to test
+# Testing JabRef
 
 ## Background on Java testing
 

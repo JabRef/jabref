@@ -2,7 +2,7 @@
 parent: Code Howtos
 nav_order: 6
 ---
-# Readings on JavaFX
+# JavaFX
 
 ## FXML
 

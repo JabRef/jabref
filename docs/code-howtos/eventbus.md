@@ -2,7 +2,7 @@
 parent: Code Howtos
 nav_order: 4
 ---
-# Using the EventSystem
+# Event Bus and Event System
 
 ## What the EventSystem is used for
 
