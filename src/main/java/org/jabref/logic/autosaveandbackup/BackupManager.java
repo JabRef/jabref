@@ -60,11 +60,13 @@ public class BackupManager {
     // During a write, the less recent backup file is deleted
     private final Queue<Path> backupFilesQueue = new LinkedBlockingQueue<>();
 
+    private boolean needsBackup = true;
+
     private BackupManager(BibDatabaseContext bibDatabaseContext, BibEntryTypesManager entryTypesManager, PreferencesService preferences) {
         this.bibDatabaseContext = bibDatabaseContext;
         this.entryTypesManager = entryTypesManager;
         this.preferences = preferences;
-        this.throttler = new DelayTaskThrottler(15_000);
+        this.throttler = new DelayTaskThrottler(1_000);
 
         changeFilter = new CoarseChangeFilter(bibDatabaseContext);
         changeFilter.registerListener(this);
@@ -188,6 +190,10 @@ public class BackupManager {
             new BibtexDatabaseWriter(bibWriter, generalPreferences, savePreferences, entryTypesManager)
                     .saveDatabase(bibDatabaseContext);
             backupFilesQueue.add(backupPath);
+
+            // We wrote the file successfully
+            // Thus, we currently do not need any new backup
+            // this.needsBackup = false;
         } catch (IOException e) {
             logIfCritical(backupPath, e);
         }
@@ -209,7 +215,7 @@ public class BackupManager {
     @Subscribe
     public synchronized void listen(@SuppressWarnings("unused") BibDatabaseContextChangedEvent event) {
         if (!event.isFilteredOut()) {
-            startBackupTask();
+            this.needsBackup = true;
         }
     }
 
