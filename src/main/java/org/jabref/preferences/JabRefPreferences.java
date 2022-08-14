@@ -42,6 +42,8 @@ import org.jabref.gui.autocompleter.AutoCompleteFirstNameMode;
 import org.jabref.gui.autocompleter.AutoCompletePreferences;
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.entryeditor.EntryEditorPreferences;
+import org.jabref.gui.externalfiletype.ExternalFileType;
+import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.groups.GroupViewMode;
 import org.jabref.gui.groups.GroupsPreferences;
 import org.jabref.gui.keyboard.KeyBindingRepository;
@@ -2208,7 +2210,8 @@ public class JabRefPreferences implements PreferencesService {
                 get(IMPORT_FILEDIRPATTERN),
                 getBoolean(DOWNLOAD_LINKED_FILES),
                 getBoolean(FULLTEXT_INDEX_LINKED_FILES),
-                Path.of(get(WORKING_DIRECTORY))
+                Path.of(get(WORKING_DIRECTORY)),
+                ExternalFileTypes.fromString(get(EXTERNAL_FILE_TYPES))
         );
 
         EasyBind.listen(filePreferences.mainFileDirectoryProperty(), (obs, oldValue, newValue) -> put(MAIN_FILE_DIRECTORY, newValue));
@@ -2218,6 +2221,8 @@ public class JabRefPreferences implements PreferencesService {
         EasyBind.listen(filePreferences.downloadLinkedFilesProperty(), (obs, oldValue, newValue) -> putBoolean(DOWNLOAD_LINKED_FILES, newValue));
         EasyBind.listen(filePreferences.fulltextIndexLinkedFilesProperty(), (obs, oldValue, newValue) -> putBoolean(FULLTEXT_INDEX_LINKED_FILES, newValue));
         EasyBind.listen(filePreferences.workingDirectoryProperty(), (obs, oldValue, newValue) -> put(WORKING_DIRECTORY, newValue.toString()));
+        filePreferences.getExternalFileTypes().addListener((SetChangeListener<ExternalFileType>) c ->
+                put(EXTERNAL_FILE_TYPES, ExternalFileTypes.toStringList(filePreferences.getExternalFileTypes())));
 
         return filePreferences;
     }
@@ -2757,16 +2762,6 @@ public class JabRefPreferences implements PreferencesService {
     @Override
     public void storeLastPreferencesExportPath(Path exportFile) {
         put(PREFS_EXPORT_PATH, exportFile.toString());
-    }
-
-    @Override
-    public Optional<String> getExternalFileTypes() {
-        return Optional.ofNullable(get(EXTERNAL_FILE_TYPES, null));
-    }
-
-    @Override
-    public void storeExternalFileTypes(String externalFileTypes) {
-        put(EXTERNAL_FILE_TYPES, externalFileTypes);
     }
 
     @Override

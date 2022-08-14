@@ -268,13 +268,6 @@ License: Apache-2.0
 ```
 
 ```yaml
-Id:      org.antlr:antlr-runtime
-Project: ANTLR 3
-URL:     http://www.antlr3.org/
-License: BSD-3-Clause
-```
-
-```yaml
 Id:      org.antlr:antlr4-runtime
 Project: ANTLR 4
 URL:     http://www.antlr.org/
@@ -282,16 +275,9 @@ License: BSD-3-Clause
 ```
 
 ```yaml
-Id:      org.apache.commons:commons-csv
+Id:      org.apache.commons:*
 Project: Apache Commons CSV
-URL:     https://commons.apache.org/proper/commons-csv/
-License: Apache-2.0
-```
-
-```yaml
-Id:      org.apache.commons:commons-lang3
-Project: Apache Commons Lang
-URL:     https://commons.apache.org/proper/commons-lang/
+URL:     https://commons.apache.org/
 License: Apache-2.0
 ```
 
@@ -566,7 +552,7 @@ de.saxsys:mvvmfx:1.8.0
 de.undercouch:citeproc-java:3.0.0-alpha.6
 eu.lestard:doc-annotations:0.2
 info.debatty:java-string-similarity:2.0.0
-io.github.java-diff-utils:java-diff-utils:4.11
+io.github.java-diff-utils:java-diff-utils:4.12
 jakarta.annotation:jakarta.annotation-api:1.3.5
 jakarta.xml.bind:jakarta.xml.bind-api:3.0.1
 net.harawata:appdirs:1.2.1
@@ -574,21 +560,22 @@ net.java.dev.jna:jna-platform:5.6.0
 net.java.dev.jna:jna:5.6.0
 net.jcip:jcip-annotations:1.0
 net.jodah:typetools:0.6.1
-org.antlr:antlr-runtime:3.5.3
 org.antlr:antlr4-runtime:4.9.3
 org.apache.commons:commons-csv:1.9.0
 org.apache.commons:commons-lang3:3.12.0
+org.apache.commons:commons-text:1.9
 org.apache.httpcomponents:httpasyncclient:4.1.5
 org.apache.httpcomponents:httpclient:4.5.13
 org.apache.httpcomponents:httpcore-nio:4.4.13
 org.apache.httpcomponents:httpcore:4.4.13
 org.apache.httpcomponents:httpmime:4.5.13
-org.apache.lucene:lucene-analysis-common:9.2.0
-org.apache.lucene:lucene-core:9.2.0
-org.apache.lucene:lucene-highlighter:9.2.0
-org.apache.lucene:lucene-queries:9.2.0
-org.apache.lucene:lucene-queryparser:9.2.0
-org.apache.lucene:lucene-sandbox:9.2.0
+org.apache.lucene:lucene-analysis-common:9.3.0
+org.apache.lucene:lucene-core:9.3.0
+org.apache.lucene:lucene-highlighter:9.3.0
+org.apache.lucene:lucene-memory:9.3.0
+org.apache.lucene:lucene-queries:9.3.0
+org.apache.lucene:lucene-queryparser:9.3.0
+org.apache.lucene:lucene-sandbox:9.3.0
 org.apache.pdfbox:fontbox:3.0.0-RC1
 org.apache.pdfbox:pdfbox:3.0.0-RC1
 org.apache.pdfbox:xmpbox:3.0.0-RC1
@@ -612,8 +599,8 @@ org.jsoup:jsoup:1.15.1
 org.kordamp.ikonli:ikonli-core:12.3.1
 org.kordamp.ikonli:ikonli-javafx:12.3.1
 org.kordamp.ikonli:ikonli-materialdesign2-pack:12.3.1
-org.libreoffice:libreoffice:7.3.4
-org.libreoffice:unoloader:7.3.4
+org.libreoffice:libreoffice:7.3.5
+org.libreoffice:unoloader:7.3.5
 org.mariadb.jdbc:mariadb-java-client:2.7.6
 org.openjfx:javafx-base:18.0.1
 org.openjfx:javafx-controls:18.0.1

@@ -1,8 +1,6 @@
 package org.jabref.logic.bibtex;
 
-import org.jabref.logic.util.OS;
 import org.jabref.model.entry.field.Field;
-import org.jabref.model.strings.StringUtil;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -204,7 +202,6 @@ public class FieldWriter {
      */
     private void writeStringLabel(StringBuilder stringBuilder, String text, int startPos, int endPos, boolean isFirst, boolean isLast) {
         String line = (isFirst ? "" : " # ") + text.substring(startPos, endPos) + (isLast ? "" : " # ");
-        String wrappedLine = StringUtil.wrap(line, preferences.getLineLength(), OS.NEWLINE);
-        stringBuilder.append(wrappedLine);
+        stringBuilder.append(line);
     }
 }

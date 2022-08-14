@@ -11,6 +11,30 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 
 ### Added
 
+### Changed
+
+- We improved the Citavi Importer to also import so called Knowledge-items into the field `comment` of the corresponding entry [#9025](https://github.com/JabRef/jabref/issues/9025)
+- We removed wrapping of string constants when writing to a `.bib` file.
+- We changed the button label from "Return to JabRef" to "Return to library" to better indicate the purpose of the action.
+
+### Fixed
+
+- The [HtmlToLaTeXFormatter](https://docs.jabref.org/finding-sorting-and-cleaning-entries/saveactions#html-to-latex) keeps single `<` characters.
+- We fixed a performance regression when opening large libraries [#9041](https://github.com/JabRef/jabref/issues/9041)
+
+### Removed
+
+
+
+
+
+
+
+
+## [5.7] - 2022-08-05
+
+### Added
+
 - We added a fetcher for [Biodiversity Heritage Library](https://www.biodiversitylibrary.org/). [8539](https://github.com/JabRef/jabref/issues/8539)
 - We added support for multiple messages in the snackbar. [#7340](https://github.com/JabRef/jabref/issues/7340)
 - We added an extra option in the 'Find Unlinked Files' dialog view to ignore unnecessary files like Thumbs.db, DS_Store, etc. [koppor#373](https://github.com/koppor/jabref/issues/373)
@@ -43,6 +67,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 
 ### Fixed
 
+- We fixed an issue where the user could not rate an entry in the main table when an entry was not yet ranked. [#5842](https://github.com/JabRef/jabref/issues/5842)
 - We fixed an issue that caused JabRef to sometimes open multiple instances when "Remote Operation" is enabled. [#8653](https://github.com/JabRef/jabref/issues/8653)
 - We fixed an issue where linked files with the filetype "application/pdf" in an entry were not shown with the correct PDF-Icon in the main table [8930](https://github.com/JabRef/jabref/issues/8930)
 - We fixed an issue where "open folder" for linked files did not open the folder and did not select the file unter certain Linux desktop environments [#8679](https://github.com/JabRef/jabref/issues/8679), [#8849](https://github.com/JabRef/jabref/issues/8849)
@@ -67,15 +92,6 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 ### Removed
 
 - We removed the social media buttons for our Twitter and Facebook pages. [#8774](https://github.com/JabRef/jabref/issues/8774)
-
-
-
-
-
-
-
-
-
 
 ## [5.6] - 2022-04-25
 
@@ -847,7 +863,8 @@ The changelog of JabRef 4.x is available at the [v4.3.1 tag](https://github.com/
 The changelog of JabRef 3.x is available at the [v3.8.2 tag](https://github.com/JabRef/jabref/blob/v3.8.2/CHANGELOG.md).
 The changelog of JabRef 2.11 and all previous versions is available as [text file in the v2.11.1 tag](https://github.com/JabRef/jabref/blob/v2.11.1/CHANGELOG).
 
-[Unreleased]: https://github.com/JabRef/jabref/compare/v5.6...HEAD
+[Unreleased]: https://github.com/JabRef/jabref/compare/v5.7...HEAD
+[5.7]: https://github.com/JabRef/jabref/compare/v5.6...v5.7
 [5.6]: https://github.com/JabRef/jabref/compare/v5.5...v5.6
 [5.5]: https://github.com/JabRef/jabref/compare/v5.4...v5.5
 [5.4]: https://github.com/JabRef/jabref/compare/v5.3...v5.4

@@ -2,6 +2,7 @@ package org.jabref.logic.importer.fetcher;
 
 import java.util.Optional;
 
+import org.jabref.logic.importer.FetcherClientException;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.InternalField;
@@ -14,6 +15,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 
 @FetcherTest
@@ -88,16 +90,16 @@ public class RfcFetcherTest {
 
     @Test
     public void performSearchByIdFindsNothingWithValidDraftIdentifier() throws Exception {
-        assertEquals(Optional.empty(), fetcher.performSearchById("draft-test-draft-spec"));
+        assertThrows(FetcherClientException.class, () -> fetcher.performSearchById("draft-test-draft-spec"));
     }
 
     @Test
     public void performSearchByIdFindsNothingWithValidIdentifier() throws Exception {
-        assertEquals(Optional.empty(), fetcher.performSearchById("RFC9999"));
+        assertThrows(FetcherClientException.class, () -> fetcher.performSearchById("RFC9999"));
     }
 
     @Test
     public void performSearchByIdFindsNothingWithInvalidIdentifier() throws Exception {
-        assertEquals(Optional.empty(), fetcher.performSearchById("banana"));
+        assertThrows(FetcherClientException.class, () -> fetcher.performSearchById("banana"));
     }
 }

@@ -81,7 +81,6 @@ import org.jabref.gui.exporter.WriteMetadataToPdfAction;
 import org.jabref.gui.externalfiles.AutoLinkFilesAction;
 import org.jabref.gui.externalfiles.DownloadFullTextAction;
 import org.jabref.gui.externalfiles.FindUnlinkedFilesAction;
-import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.help.AboutAction;
 import org.jabref.gui.help.ErrorConsoleAction;
 import org.jabref.gui.help.HelpAction;
@@ -127,6 +126,7 @@ import org.jabref.logic.citationstyle.CitationStyleOutputFormat;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.IdFetcher;
 import org.jabref.logic.importer.ImportCleanup;
+import org.jabref.logic.importer.ImportFormatReader;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.WebFetchers;
 import org.jabref.logic.l10n.Localization;
@@ -183,6 +183,7 @@ public class JabRefFrame extends BorderPane {
     private Subscription dividerSubscription;
 
     private final TaskExecutor taskExecutor;
+    private final ImportFormatReader importFormatReader;
 
     public JabRefFrame(Stage mainStage) {
         this.mainStage = mainStage;
@@ -194,6 +195,7 @@ public class JabRefFrame extends BorderPane {
         this.globalSearchBar = new GlobalSearchBar(this, stateManager, prefs, undoManager);
         this.fileHistory = new FileHistoryMenu(prefs, dialogService, getOpenDatabaseAction());
         this.taskExecutor = Globals.TASK_EXECUTOR;
+        this.importFormatReader = Globals.IMPORT_FORMAT_READER;
         this.setOnKeyTyped(key -> {
             if (this.fileHistory.isShowing()) {
                 if (this.fileHistory.openFileByKey(key)) {
@@ -1140,7 +1142,7 @@ public class JabRefFrame extends BorderPane {
     public LibraryTab addTab(BibDatabaseContext databaseContext, boolean raisePanel) {
         Objects.requireNonNull(databaseContext);
 
-        LibraryTab libraryTab = new LibraryTab(this, prefs, stateManager, themeManager, databaseContext, ExternalFileTypes.getInstance());
+        LibraryTab libraryTab = new LibraryTab(this, prefs, stateManager, themeManager, databaseContext, importFormatReader);
         addTab(libraryTab, raisePanel);
         return libraryTab;
     }
@@ -1185,7 +1187,7 @@ public class JabRefFrame extends BorderPane {
 
         ButtonType saveChanges = new ButtonType(Localization.lang("Save changes"), ButtonBar.ButtonData.YES);
         ButtonType discardChanges = new ButtonType(Localization.lang("Discard changes"), ButtonBar.ButtonData.NO);
-        ButtonType cancel = new ButtonType(Localization.lang("Return to JabRef"), ButtonBar.ButtonData.CANCEL_CLOSE);
+        ButtonType cancel = new ButtonType(Localization.lang("Return to library"), ButtonBar.ButtonData.CANCEL_CLOSE);
 
         Optional<ButtonType> response = dialogService.showCustomButtonDialogAndWait(Alert.AlertType.CONFIRMATION,
                 Localization.lang("Save before closing"),
@@ -1223,7 +1225,7 @@ public class JabRefFrame extends BorderPane {
 
         ButtonType deleteEmptyEntries = new ButtonType(Localization.lang("Delete empty entries"), ButtonBar.ButtonData.YES);
         ButtonType keepEmptyEntries = new ButtonType(Localization.lang("Keep empty entries"), ButtonBar.ButtonData.NO);
-        ButtonType cancel = new ButtonType(Localization.lang("Return to JabRef"), ButtonBar.ButtonData.CANCEL_CLOSE);
+        ButtonType cancel = new ButtonType(Localization.lang("Return to library"), ButtonBar.ButtonData.CANCEL_CLOSE);
 
         Optional<ButtonType> response = dialogService.showCustomButtonDialogAndWait(Alert.AlertType.CONFIRMATION,
                 Localization.lang("Empty entries"),
