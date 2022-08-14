@@ -23,7 +23,7 @@ import org.jabref.logic.exporter.SavePreferences;
 import org.jabref.logic.util.BackupFileType;
 import org.jabref.logic.util.CoarseChangeFilter;
 import org.jabref.logic.util.DelayTaskThrottler;
-import org.jabref.logic.util.io.FileUtil;
+import org.jabref.logic.util.io.BackupFileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.event.BibDatabaseContextChangedEvent;
 import org.jabref.model.entry.BibEntryTypesManager;
@@ -73,14 +73,14 @@ public class BackupManager {
      * Determines the most recent backup file name
      */
     static Path getBackupPathForNewBackup(Path originalPath) {
-        return FileUtil.getPathForNewBackupFileAndCreateDirectory(originalPath, BackupFileType.BACKUP);
+        return BackupFileUtil.getPathForNewBackupFileAndCreateDirectory(originalPath, BackupFileType.BACKUP);
     }
 
     /**
      * Determines the most recent existing backup file name
      */
     static Optional<Path> getLatestBackupPath(Path originalPath) {
-        return FileUtil.getPathOfLatestExisingBackupFile(originalPath, BackupFileType.BACKUP);
+        return BackupFileUtil.getPathOfLatestExisingBackupFile(originalPath, BackupFileType.BACKUP);
     }
 
     /**
@@ -214,13 +214,13 @@ public class BackupManager {
     }
 
     private void fillQueue() {
-        Path backupDir = FileUtil.getAppDataBackupDir();
+        Path backupDir = BackupFileUtil.getAppDataBackupDir();
         if (!Files.exists(backupDir)) {
             return;
         }
         bibDatabaseContext.getDatabasePath().ifPresent(databasePath -> {
-            // code similar to {@link org.jabref.logic.util.io.FileUtil.getPathOfLatestExisingBackupFile}
-            final String prefix = FileUtil.getUniqueFilePrefix(databasePath) + "--" + databasePath.getFileName();
+            // code similar to {@link org.jabref.logic.util.io.BackupFileUtil.getPathOfLatestExisingBackupFile}
+            final String prefix = BackupFileUtil.getUniqueFilePrefix(databasePath) + "--" + databasePath.getFileName();
             try {
                 List<Path> allSavFiles = Files.list(backupDir)
                                               // just list the .sav belonging to the given targetFile
