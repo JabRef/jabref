@@ -36,6 +36,7 @@ public class GrobidServiceTest {
             true,
             false,
             "http://grobid.jabref.org:8070",
+            Collections.emptySet(),
             Collections.emptySet());
     private static ImportFormatPreferences importFormatPreferences;
 
@@ -89,6 +90,7 @@ public class GrobidServiceTest {
                 false,
                 false,
                 "http://grobid.jabref.org:8070",
+                Collections.emptySet(),
                 Collections.emptySet());
         assertThrows(UnsupportedOperationException.class, () -> new GrobidService(importSettingsWithGrobidDisabled));
     }

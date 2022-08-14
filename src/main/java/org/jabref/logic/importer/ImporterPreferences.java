@@ -9,6 +9,7 @@ import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableSet;
 
+import org.jabref.logic.importer.fileformat.CustomImporter;
 import org.jabref.logic.preferences.FetcherApiKey;
 
 public class ImporterPreferences {
@@ -18,16 +19,19 @@ public class ImporterPreferences {
     private final BooleanProperty grobidOptOut;
     private final StringProperty grobidURL;
     private final ObservableSet<FetcherApiKey> apiKeys;
+    private final ObservableSet<CustomImporter> customImportList;
 
     public ImporterPreferences(boolean generateNewKeyOnImport,
                                boolean grobidEnabled,
                                boolean grobidOptOut,
                                String grobidURL,
+                               Set<CustomImporter> customImportList,
                                Set<FetcherApiKey> apiKeys) {
         this.generateNewKeyOnImport = new SimpleBooleanProperty(generateNewKeyOnImport);
         this.grobidEnabled = new SimpleBooleanProperty(grobidEnabled);
         this.grobidOptOut = new SimpleBooleanProperty(grobidOptOut);
         this.grobidURL = new SimpleStringProperty(grobidURL);
+        this.customImportList = FXCollections.observableSet(customImportList);
         this.apiKeys = FXCollections.observableSet(apiKeys);
     }
 
@@ -81,5 +85,9 @@ public class ImporterPreferences {
 
     public ObservableSet<FetcherApiKey> getApiKeys() {
         return apiKeys;
+    }
+
+    public ObservableSet<CustomImporter> getCustomImportList() {
+        return customImportList;
     }
 }

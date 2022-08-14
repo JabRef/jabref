@@ -52,7 +52,10 @@ public class ImportFormatReader {
 
     private ImportFormatPreferences importFormatPreferences;
 
-    public void resetImportFormats(ImporterPreferences importerPreferences, ImportFormatPreferences newImportFormatPreferences, XmpPreferences xmpPreferences, FileUpdateMonitor fileMonitor) {
+    public void resetImportFormats(ImporterPreferences importerPreferences,
+                                   ImportFormatPreferences newImportFormatPreferences,
+                                   XmpPreferences xmpPreferences,
+                                   FileUpdateMonitor fileMonitor) {
         this.importFormatPreferences = newImportFormatPreferences;
 
         formats.clear();
@@ -85,7 +88,7 @@ public class ImportFormatReader {
         formats.add(new CitaviXmlImporter());
 
         // Get custom import formats
-        formats.addAll(importFormatPreferences.getCustomImportList());
+        formats.addAll(importerPreferences.getCustomImportList());
     }
 
     /**

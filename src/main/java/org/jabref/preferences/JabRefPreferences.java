@@ -429,7 +429,6 @@ public class JabRefPreferences implements PreferencesService {
     private List<MainTableColumnModel> searchDialogTableColunns;
     private List<MainTableColumnModel> searchDialogColumnSortOrder;
 
-    private Set<CustomImporter> customImporters;
     private String userName;
 
     private PreviewPreferences previewPreferences;
@@ -2101,7 +2100,6 @@ public class JabRefPreferences implements PreferencesService {
     @Override
     public ImportFormatPreferences getImportFormatPreferences() {
         return new ImportFormatPreferences(
-                getCustomImportFormats(),
                 getKeywordDelimiter(),
                 getCitationKeyPatternPreferences(),
                 getFieldContentParserPreferences(),
@@ -2304,48 +2302,6 @@ public class JabRefPreferences implements PreferencesService {
         EasyBind.listen(importExportPreferences.warnAboutDuplicatesOnImportProperty(), (obs, oldValue, newValue) -> putBoolean(WARN_ABOUT_DUPLICATES_IN_INSPECTION, newValue));
 
         return importExportPreferences;
-    }
-
-    @Override
-    public Set<CustomImporter> getCustomImportFormats() {
-        if (this.customImporters == null) {
-            updateCustomImportFormats();
-        }
-        return this.customImporters;
-    }
-
-    private void updateCustomImportFormats() {
-        Set<CustomImporter> importers = new TreeSet<>();
-        int i = 0;
-
-        List<String> importerString;
-        while (!((importerString = getStringList(CUSTOM_IMPORT_FORMAT + i)).isEmpty())) {
-            try {
-                if (importerString.size() == 2) {
-                    // New format: basePath, className
-                    importers.add(new CustomImporter(importerString.get(0), importerString.get(1)));
-                } else {
-                    // Old format: name, cliId, className, basePath
-                    importers.add(new CustomImporter(importerString.get(3), importerString.get(2)));
-                }
-            } catch (Exception e) {
-                LOGGER.warn("Could not load " + importerString.get(0) + " from preferences. Will ignore.", e);
-            }
-            i++;
-        }
-
-        this.customImporters = importers;
-    }
-
-    @Override
-    public void storeCustomImportFormats(Set<CustomImporter> importers) {
-        purgeSeries(CUSTOM_IMPORT_FORMAT, 0);
-        CustomImporter[] importersArray = importers.toArray(new CustomImporter[0]);
-        for (int i = 0; i < importersArray.length; i++) {
-            putStringList(CUSTOM_IMPORT_FORMAT + i, importersArray[i].getAsStringList());
-        }
-
-        this.customImporters = importers;
     }
 
     @Override
@@ -2810,6 +2766,7 @@ public class JabRefPreferences implements PreferencesService {
                 getBoolean(GROBID_ENABLED),
                 getBoolean(GROBID_OPT_OUT),
                 get(GROBID_URL),
+                getCustomImportFormats(),
                 getFetcherKeys()
         );
 
@@ -2818,8 +2775,40 @@ public class JabRefPreferences implements PreferencesService {
         EasyBind.listen(importerPreferences.grobidOptOutProperty(), (obs, oldValue, newValue) -> putBoolean(GROBID_OPT_OUT, newValue));
         EasyBind.listen(importerPreferences.grobidURLProperty(), (obs, oldValue, newValue) -> put(GROBID_URL, newValue));
         importerPreferences.getApiKeys().addListener((InvalidationListener) c -> storeFetcherKeys(importerPreferences.getApiKeys()));
+        importerPreferences.getCustomImportList().addListener((InvalidationListener) c -> storeCustomImportFormats(importerPreferences.getCustomImportList()));
 
         return importerPreferences;
+    }
+
+    private Set<CustomImporter> getCustomImportFormats() {
+        Set<CustomImporter> importers = new TreeSet<>();
+        int i = 0;
+
+        List<String> importerString;
+        while (!((importerString = getStringList(CUSTOM_IMPORT_FORMAT + i)).isEmpty())) {
+            try {
+                if (importerString.size() == 2) {
+                    // New format: basePath, className
+                    importers.add(new CustomImporter(importerString.get(0), importerString.get(1)));
+                } else {
+                    // Old format: name, cliId, className, basePath
+                    importers.add(new CustomImporter(importerString.get(3), importerString.get(2)));
+                }
+            } catch (Exception e) {
+                LOGGER.warn("Could not load " + importerString.get(0) + " from preferences. Will ignore.", e);
+            }
+            i++;
+        }
+
+        return importers;
+    }
+
+    public void storeCustomImportFormats(Set<CustomImporter> importers) {
+        purgeSeries(CUSTOM_IMPORT_FORMAT, 0);
+        CustomImporter[] importersArray = importers.toArray(new CustomImporter[0]);
+        for (int i = 0; i < importersArray.length; i++) {
+            putStringList(CUSTOM_IMPORT_FORMAT + i, importersArray[i].getAsStringList());
+        }
     }
 
     private Set<FetcherApiKey> getFetcherKeys() {
