@@ -1,8 +1,8 @@
 ---
-nav_order: 4
-parent: Advanced Reading
+parent: Code Howtos
+nav_order: 13
 ---
-# Recommendations for UI design
+# UI Design Recommendations
 
 * [Designing More Efficient Forms: Structure, Inputs, Labels and Actions](https://uxplanet.org/designing-more-efficient-forms-structure-inputs-labels-and-actions-e3a47007114f)
 * [Input form label alignment top or left?](https://ux.stackexchange.com/questions/8480/input-form-label-alignment-top-or-left)
