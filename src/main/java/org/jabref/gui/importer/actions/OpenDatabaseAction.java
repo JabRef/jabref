@@ -22,6 +22,7 @@ import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.dialogs.BackupUIManager;
+import org.jabref.gui.menus.FileHistoryMenu;
 import org.jabref.gui.shared.SharedDatabaseUIManager;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.BackgroundTask;
@@ -47,7 +48,7 @@ public class OpenDatabaseAction extends SimpleCommand {
 
     // List of actions that may need to be called after opening the file. Such as
     // upgrade actions etc. that may depend on the JabRef version that wrote the file:
-    private static final List<GUIPostOpenAction> POST_OPEN_ACTIONS = Arrays.asList(
+    private static final List<GUIPostOpenAction> POST_OPEN_ACTIONS = List.of(
             // Migrations:
             // Warning for migrating the Review into the Comment field
             new MergeReviewIntoCommentAction(),
@@ -112,7 +113,8 @@ public class OpenDatabaseAction extends SimpleCommand {
     }
 
     /**
-     * Opens the given file. If null or 404, nothing happens
+     * Opens the given file. If null or 404, nothing happens.
+     * In case the file is already opened, that panel is raised.
      *
      * @param file the file, may be null or not existing
      */
@@ -121,7 +123,8 @@ public class OpenDatabaseAction extends SimpleCommand {
     }
 
     /**
-     * Opens the given files. If one of it is null or 404, nothing happens
+     * Opens the given files. If one of it is null or 404, nothing happens.
+     * In case the file is already opened, that panel is raised.
      *
      * @param filesToOpen the filesToOpen, may be null or not existing
      */
@@ -153,16 +156,12 @@ public class OpenDatabaseAction extends SimpleCommand {
         // Run the actual open in a thread to prevent the program
         // locking until the file is loaded.
         if (!filesToOpen.isEmpty()) {
-            final List<Path> theFiles = Collections.unmodifiableList(filesToOpen);
-
-            for (Path theFile : theFiles) {
+            FileHistoryMenu fileHistory = frame.getFileHistory();
+            filesToOpen.forEach(theFile -> {
                 // This method will execute the concrete file opening and loading in a background thread
                 openTheFile(theFile);
-            }
-
-            for (Path theFile : theFiles) {
-                frame.getFileHistory().newFile(theFile);
-            }
+                fileHistory.newFile(theFile);
+            });
         } else if (toRaise != null) {
             // If no files are remaining to open, this could mean that a file was
             // already open. If so, we may have to raise the correct tab:
@@ -171,7 +170,9 @@ public class OpenDatabaseAction extends SimpleCommand {
     }
 
     /**
-     * @param file the file, may be null or not existing
+     * This is the real file opening. Should be called via {@link #openFile(Path)}
+     *
+     * @param file the file, may be NOT null, but may not be existing
      */
     private void openTheFile(Path file) {
         Objects.requireNonNull(file);

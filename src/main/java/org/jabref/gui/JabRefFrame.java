@@ -1047,6 +1047,11 @@ public class JabRefFrame extends BorderPane {
         return new Group(indicator);
     }
 
+    /**
+     * Might be called when a user asks JabRef at the command line
+     * i) to import a file or
+     * ii) to open a .bib file
+     */
     public void addParserResult(ParserResult parserResult, boolean focusPanel) {
         if (parserResult.toOpenTab()) {
             // Add the entries to the open tab.
@@ -1058,7 +1063,7 @@ public class JabRefFrame extends BorderPane {
                 addImportedEntries(libraryTab, parserResult);
             }
         } else {
-            // only add tab if DB is not already open
+            // only add tab if library is not already open
             Optional<LibraryTab> libraryTab = getLibraryTabs().stream()
                                                               .filter(p -> p.getBibDatabaseContext()
                                                                             .getDatabasePath()
@@ -1118,17 +1123,6 @@ public class JabRefFrame extends BorderPane {
         }
 
         libraryTab.getUndoManager().registerListener(new UndoRedoEventManager());
-
-        BibDatabaseContext context = libraryTab.getBibDatabaseContext();
-
-        if (readyForAutosave(context)) {
-            AutosaveManager autosaver = AutosaveManager.start(context);
-            autosaver.registerListener(new AutosaveUiManager(libraryTab));
-        }
-
-        BackupManager.start(context, Globals.entryTypesManager, prefs);
-
-        trackOpenNewDatabase(libraryTab);
     }
 
     private void trackOpenNewDatabase(LibraryTab libraryTab) {

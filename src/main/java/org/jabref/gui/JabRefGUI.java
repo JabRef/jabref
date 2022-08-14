@@ -136,6 +136,8 @@ public class JabRefGUI {
             openLastEditedDatabases();
         }
 
+        // From here on, the libraries provided by command line arguments are treated
+
         // Remove invalid databases
         List<ParserResult> invalidDatabases = bibDatabases.stream()
                                                           .filter(ParserResult::isInvalid)
@@ -261,54 +263,14 @@ public class JabRefGUI {
                 preferencesService.getGuiPreferences().getPositionY());
     }
 
-    /**
-     * This method is similar to {@link OpenDatabaseAction#loadDatabase(Path)}
-     *
-     * This method restores local databases only (and not remote ones).
-     * The remote ones are handled in {@link org.jabref.gui.JabRefGUI#openDatabases()}.
-     */
     private void openLastEditedDatabases() {
         List<String> lastFiles = preferencesService.getGuiPreferences().getLastFilesOpened();
         if (lastFiles.isEmpty()) {
             return;
         }
 
-        for (String fileName : lastFiles) {
-            Path dbFile = Path.of(fileName);
-
-            // Already parsed via command line parameter, e.g., "jabref.jar somefile.bib"
-            if (isLoaded(dbFile) || !Files.exists(dbFile)) {
-                continue;
-            }
-
-            DialogService dialogService = mainFrame.getDialogService();
-
-            if (BackupManager.backupFileDiffers(dbFile)) {
-                BackupUIManager.showRestoreBackupDialog(dialogService, dbFile);
-            }
-
-            ParserResult result;
-            try {
-                result = OpenDatabase.loadDatabase(
-                        dbFile,
-                        preferencesService.getImportFormatPreferences(),
-                        Globals.getFileUpdateMonitor());
-                if (result.hasWarnings()) {
-                    String content = Localization.lang("Please check your library file for wrong syntax.")
-                            + "\n\n" + result.getErrorMessage();
-                    DefaultTaskExecutor.runInJavaFXThread(() ->
-                            dialogService.showWarningDialogAndWait(Localization.lang("Open library error"), content));
-                }
-            } catch (IOException ex) {
-                LOGGER.error("Error opening file '{}'", dbFile, ex);
-                result = ParserResult.fromError(ex);
-            }
-            bibDatabases.add(result);
-        }
-    }
-
-    private boolean isLoaded(Path fileToOpen) {
-        return bibDatabases.stream().anyMatch(pr -> pr.getPath().isPresent() && pr.getPath().get().equals(fileToOpen));
+        List<Path> filesToOpen = lastFiles.stream().map(file -> Path.of(file)).collect(Collectors.toList());
+        getMainFrame().getOpenDatabaseAction().openFiles(filesToOpen);
     }
 
     public static JabRefFrame getMainFrame() {
