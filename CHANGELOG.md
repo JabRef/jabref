@@ -12,6 +12,8 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 ### Added
 
 - In case a backup is found, the filename of the backup is shown.
+- We integrated a new three-way merge UI for merging entries in the Entries Merger Dialog, the Duplicate Resolver Dialog, the Entry Importer Dialog, and the External Changes Resolver Dialog. [#8945](https://github.com/JabRef/jabref/pull/8945)
+- We added the ability to merge groups, keywords, comments and files when merging entries. [#9022](https://github.com/JabRef/jabref/pull/9022)
 
 ### Changed
 
@@ -25,6 +27,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 
 - The [HtmlToLaTeXFormatter](https://docs.jabref.org/finding-sorting-and-cleaning-entries/saveactions#html-to-latex) keeps single `<` characters.
 - We fixed a performance regression when opening large libraries [#9041](https://github.com/JabRef/jabref/issues/9041)
+- We fixed a bug where spaces are trimmed when highlighting differences in the Entries merge dialog. [koppor#371](https://github.com/koppor/jabref/issues/371)
 
 ### Removed
 
