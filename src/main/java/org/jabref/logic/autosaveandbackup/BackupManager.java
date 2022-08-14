@@ -88,6 +88,8 @@ public class BackupManager {
      * Starts the BackupManager which is associated with the given {@link BibDatabaseContext}. As long as no database
      * file is present in {@link BibDatabaseContext}, the {@link BackupManager} will do nothing.
      *
+     * This method is not thread-safe. The caller has to ensure that this method is not called in parallel.
+     *
      * @param bibDatabaseContext Associated {@link BibDatabaseContext}
      */
     public static BackupManager start(BibDatabaseContext bibDatabaseContext, BibEntryTypesManager entryTypesManager, PreferencesService preferences) {
@@ -179,6 +181,8 @@ public class BackupManager {
         Charset encoding = bibDatabaseContext.getMetaData().getEncoding().orElse(StandardCharsets.UTF_8);
         // We want to have successful backups only
         // Thus, we do not use a plain "FileWriter", but the "AtomicFileWriter"
+        // Example: What happens if one hard powers off the machine (or kills the jabref process) during the write of the backup?
+        //          This MUST NOT create a broken backup file that then jabref wants to "restore" from?
         try (Writer writer = new AtomicFileWriter(backupPath, encoding, false)) {
             BibWriter bibWriter = new BibWriter(writer, bibDatabaseContext.getDatabase().getNewLineSeparator());
             new BibtexDatabaseWriter(bibWriter, generalPreferences, savePreferences, entryTypesManager)
@@ -212,7 +216,7 @@ public class BackupManager {
     private void startBackupTask() {
         fillQueue();
 
-        // We need to determine the backup path on each action, because the user might have saved the file to a different location
+        // We need to determine the backup path on each action, because we use the timestamp in the filename
         throttler.schedule(() -> determineBackupPathForNewBackup().ifPresent(this::performBackup));
     }
 

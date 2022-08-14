@@ -104,7 +104,7 @@ public class SaveDatabaseAction {
     }
 
     /**
-     * @param file the new file name to save the data base to. This is stored in the database context of the panel upon
+     * @param file the new file name to save the database to. This is stored in the database context of the panel upon
      *             successful save.
      * @return true on successful save
      */
@@ -131,7 +131,7 @@ public class SaveDatabaseAction {
 
         if (saveResult) {
             // we managed to successfully save the file
-            // thus, we can store the store the path into the context
+            // thus, we can store the path into the context
             context.setDatabasePath(file);
             libraryTab.updateTabTitle(false);
 
