@@ -2,7 +2,6 @@ package org.jabref.gui.maintable;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import javafx.beans.property.ObjectProperty;
@@ -20,7 +19,6 @@ import org.jabref.logic.search.SearchQuery;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.groups.GroupTreeNode;
-import org.jabref.model.pdf.search.LuceneSearchResults;
 import org.jabref.model.search.matchers.MatcherSet;
 import org.jabref.model.search.matchers.MatcherSets;
 import org.jabref.preferences.PreferencesService;
