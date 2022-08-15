@@ -61,7 +61,13 @@ public final class LuceneSearcher {
             IndexSearcher searcher = new IndexSearcher(reader);
             String[] fieldsToSearchArray = new String[boosts.size()];
             boosts.keySet().toArray(fieldsToSearchArray);
-            Query luceneQuery = new MultiFieldQueryParser(fieldsToSearchArray, new EnglishStemAnalyzer(), boosts).parse(query.getQuery());
+            String queryString = query.getQuery();
+            if (query.getSearchFlags().contains(SearchRules.SearchFlags.REGULAR_EXPRESSION)) {
+                if (queryString.length() > 0 && !(queryString.startsWith("/") && queryString.endsWith("/"))) {
+                    queryString = "/" + queryString + "/";
+                }
+            }
+            Query luceneQuery = new MultiFieldQueryParser(fieldsToSearchArray, new EnglishStemAnalyzer(), boosts).parse(queryString);
             TopDocs docs = searcher.search(luceneQuery, Integer.MAX_VALUE);
             for (ScoreDoc scoreDoc : docs.scoreDocs) {
                 SearchResult searchResult = new SearchResult(searcher, luceneQuery, scoreDoc);
