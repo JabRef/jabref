@@ -1,5 +1,6 @@
 package org.jabref.gui.collab;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -18,8 +19,13 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 
 import com.tobiasdiez.easybind.EasyBind;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ExternalChangesResolverViewModel extends AbstractViewModel {
+
+    private final static Logger LOGGER = LoggerFactory.getLogger(ExternalChangesResolverViewModel.class);
+
     private final NamedCompound ce = new NamedCompound(Localization.lang("Merged external changes"));
 
     private final BibDatabaseContext databaseContext;
@@ -31,9 +37,7 @@ public class ExternalChangesResolverViewModel extends AbstractViewModel {
      */
     private final ObservableList<DatabaseChangeViewModel> immutableChanges = FXCollections.observableArrayList();
 
-    private final ObservableList<DatabaseChangeViewModel> selectedChanges = FXCollections.observableArrayList();
-
-    private final ObjectProperty<DatabaseChangeViewModel> lastSelectedChange = new SimpleObjectProperty<>();
+    private final ObjectProperty<DatabaseChangeViewModel> selectedChange = new SimpleObjectProperty<>();
 
     private final BooleanBinding areAllChangesResolved;
 
@@ -49,7 +53,7 @@ public class ExternalChangesResolverViewModel extends AbstractViewModel {
         this.databaseContext = databaseContext;
 
         areAllChangesResolved = Bindings.createBooleanBinding(changes::isEmpty, changes);
-        canOpenAdvancedMergeDialog = Bindings.createBooleanBinding(() -> selectedChanges.size() == 1 && lastSelectedChange.get() != null && lastSelectedChange.get().hasAdvancedMergeDialog(), selectedChanges);
+        canOpenAdvancedMergeDialog = Bindings.createBooleanBinding(() -> selectedChange.get() != null && selectedChange.get().hasAdvancedMergeDialog(), selectedChange);
 
         EasyBind.subscribe(areAllChangesResolved, isResolved -> {
             if (isResolved) {
@@ -62,16 +66,12 @@ public class ExternalChangesResolverViewModel extends AbstractViewModel {
         return changes;
     }
 
-    public ObservableList<DatabaseChangeViewModel> getSelectedChanges() {
-        return selectedChanges;
+    public ObjectProperty<DatabaseChangeViewModel> selectedChangeProperty() {
+        return selectedChange;
     }
 
-    public ObjectProperty<DatabaseChangeViewModel> lastSelectedChangeProperty() {
-        return lastSelectedChange;
-    }
-
-    public Optional<DatabaseChangeViewModel> getLastSelectedChange() {
-        return Optional.ofNullable(lastSelectedChangeProperty().get());
+    public Optional<DatabaseChangeViewModel> getSelectedChange() {
+        return Optional.ofNullable(selectedChangeProperty().get());
     }
 
     public BooleanBinding areAllChangesResolvedProperty() {
@@ -86,13 +86,13 @@ public class ExternalChangesResolverViewModel extends AbstractViewModel {
         return canOpenAdvancedMergeDialog;
     }
 
-    public void acceptSelectedChanges() {
-        getSelectedChanges().forEach(DatabaseChangeViewModel::accept);
-        getChanges().removeAll(getSelectedChanges());
+    public void acceptSelectedChanges(List<DatabaseChangeViewModel> selectedChanges) {
+        selectedChanges.forEach(DatabaseChangeViewModel::accept);
+        getChanges().removeAll(new ArrayList<>(selectedChanges));
     }
 
-    public void denySelectedChanges() {
-        getChanges().removeAll(getSelectedChanges());
+    public void denySelectedChanges(List<DatabaseChangeViewModel> selectedChanges) {
+        getChanges().removeAll(new ArrayList<>(selectedChanges));
     }
 
     private void makeChanges() {

@@ -3,6 +3,7 @@ package org.jabref.gui.collab;
 import java.util.ArrayList;
 import java.util.List;
 
+import javafx.beans.binding.Bindings;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.SelectionMode;
@@ -67,18 +68,16 @@ public class ExternalChangesResolverDialog extends BaseDialog<Boolean> {
 
         changeName.setCellValueFactory(data -> data.getValue().nameProperty());
 
-        EasyBind.bindContent(changesTableView.getItems(), viewModel.getChanges());
-        changesTableView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+        Bindings.bindContent(changesTableView.getItems(), viewModel.getChanges());
+
+        changesTableView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
         changesTableView.getSelectionModel().selectFirst();
 
-        EasyBind.bindContent(changesTableView.getItems(), viewModel.getChanges());
-        EasyBind.bindContent(viewModel.getSelectedChanges(), changesTableView.getSelectionModel().getSelectedItems());
+        viewModel.selectedChangeProperty().bind(changesTableView.getSelectionModel().selectedItemProperty());
 
-        viewModel.lastSelectedChangeProperty().bind(changesTableView.getSelectionModel().selectedItemProperty());
-
-        EasyBind.subscribe(viewModel.lastSelectedChangeProperty(), lastSelectedChange -> {
-            if (lastSelectedChange != null) {
-                changeInfoPane.setCenter(lastSelectedChange.description());
+        EasyBind.subscribe(viewModel.selectedChangeProperty(), selectedChange -> {
+            if (selectedChange != null) {
+                changeInfoPane.setCenter(selectedChange.description());
             }
         });
 
@@ -94,17 +93,17 @@ public class ExternalChangesResolverDialog extends BaseDialog<Boolean> {
 
     @FXML
     public void denyChanges() {
-        viewModel.denySelectedChanges();
+        viewModel.denySelectedChanges(changesTableView.getSelectionModel().getSelectedItems());
     }
 
     @FXML
     public void acceptChanges() {
-        viewModel.acceptSelectedChanges();
+        viewModel.acceptSelectedChanges(changesTableView.getSelectionModel().getSelectedItems());
     }
 
     @FXML
     public void openAdvancedMergeDialog() {
-        viewModel.getLastSelectedChange().flatMap(DatabaseChangeViewModel::openAdvancedMergeDialog)
-                 .ifPresent(change -> viewModel.acceptSelectedChanges());
+        viewModel.getSelectedChange().flatMap(DatabaseChangeViewModel::openAdvancedMergeDialog)
+                 .ifPresent(change -> viewModel.acceptSelectedChanges(changesTableView.getSelectionModel().getSelectedItems()));
     }
 }
