@@ -48,7 +48,7 @@ public class BackupManager {
 
     private static final int MAXIMUM_BACKUP_FILE_COUNT = 10;
 
-    private static final int DELAY_BETWEEN_BACKUP_ATTEMPTS_IN_SECONDS = 1;
+    private static final int DELAY_BETWEEN_BACKUP_ATTEMPTS_IN_SECONDS = 20;
 
     private static Set<BackupManager> runningInstances = new HashSet<>();
 
@@ -265,5 +265,8 @@ public class BackupManager {
         changeFilter.unregisterListener(this);
         changeFilter.shutdown();
         executor.shutdown();
+
+        // Ensure that backup is a recent one
+        determineBackupPathForNewBackup().ifPresent(this::performBackup);
     }
 }
