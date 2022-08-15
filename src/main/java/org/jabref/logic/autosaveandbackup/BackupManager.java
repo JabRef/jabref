@@ -169,6 +169,10 @@ public class BackupManager {
      * @param backupPath the path where the library should be backed up to
      */
     private void performBackup(Path backupPath) {
+        if (!needsBackup) {
+            return;
+        }
+
         // We opted for "while" to delete backups in case there are more than 10
         while (backupFilesQueue.size() >= MAXIMUM_BACKUP_FILE_COUNT) {
             Path lessRecentBackupFile = backupFilesQueue.poll();
@@ -196,7 +200,7 @@ public class BackupManager {
 
             // We wrote the file successfully
             // Thus, we currently do not need any new backup
-            // this.needsBackup = false;
+            this.needsBackup = false;
         } catch (IOException e) {
             logIfCritical(backupPath, e);
         }
