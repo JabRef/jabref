@@ -1,6 +1,6 @@
 ---
-nav_order: 3
-parent: Advanced Reading
+parent: Code Howtos
+nav_order: 2
 ---
 # Custom SVG icons
 

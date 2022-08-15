@@ -1,10 +1,56 @@
 ---
-nav_order: 1
-parent: Readings on Coding
+parent: Code Howtos
+nav_order: 6
 ---
-# Readings on JavaFX
+# JavaFX
 
-JabRef's recommendations about JavaFX
+## FXML
+
+The following expressions can be used in FXML attributes, according to the [official documentation](https://docs.oracle.com/javase/8/javafx/api/javafx/fxml/doc-files/introduction\_to\_fxml.html#attributes)
+
+| Type                             | Expression                                       | Value point to                                                         | Remark                                                                                                                                             |
+| -------------------------------- | ------------------------------------------------ | ---------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Location                         | `@image.png`                                     | path relative to the current FXML file                                 |                                                                                                                                                    |
+| Resource                         | `%textToBeTranslated`                            | key in ResourceBundle                                                  |                                                                                                                                                    |
+| Attribute variable               | `$idOfControl` or `$variable`                    | named control or variable in controller (may be path in the namespace) | resolved only once at load time                                                                                                                    |
+| Expression binding               | `${expression}`                                  | expression, for example `textField.text`                               | changes to source are propagated                                                                                                                   |
+| Bidirectional expression binding | `#{expression}`                                  | expression                                                             | changes are propagated in both directions (not yet implemented in JavaFX, see [feature request](https://bugs.openjdk.java.net/browse/JDK-8090665)) |
+| Event handler                    | `#nameOfEventHandler`                            | name of the event handler method in the controller                     |                                                                                                                                                    |
+| Constant                         | `<text><Strings fx:constant="MYSTRING"/></text>` | constant (here `MYSTRING` in the `Strings` class)                      |                                                                                                                                                    |
+
+## JavaFX Radio Buttons example
+
+All radio buttons that should be grouped together need to have a ToggleGroup defined in the FXML code Example:
+
+```markup
+<VBox>
+            <fx:define>
+                <ToggleGroup fx:id="citeToggleGroup"/>
+            </fx:define>
+            <children>
+                <RadioButton fx:id="inPar" minWidth="-Infinity" mnemonicParsing="false"
+                             text="%Cite selected entries between parenthesis" toggleGroup="$citeToggleGroup"/>
+                <RadioButton fx:id="inText" minWidth="-Infinity" mnemonicParsing="false"
+                             text="%Cite selected entries with in-text citation" toggleGroup="$citeToggleGroup"/>
+                <Label minWidth="-Infinity" text="%Extra information (e.g. page number)"/>
+                <TextField fx:id="pageInfo"/>
+            </children>
+</VBox>
+```
+
+## JavaFX Dialogs
+
+All dialogs should be displayed to the user via `DialogService` interface methods. `DialogService` provides methods to display various dialogs (including custom ones) to the user. It also ensures the displayed dialog opens on the correct window via `initOwner()` (for cases where the user has multiple screens). The following code snippet demonstrates how a custom dialog is displayed to the user:
+
+```java
+dialogService.showCustomDialog(new DocumentViewerView());
+```
+
+If an instance of `DialogService` is unavailable within current class/scope in which the dialog needs to be displayed, `DialogService` can be instantiated via the code snippet shown as follows:
+
+```java
+DialogService dialogService = Injector.instantiateModelOrService(DialogService.class);
+```
 
 ## Architecture: Model - View - (Controller) - ViewModel (MV(C)VM)
 

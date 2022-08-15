@@ -1,6 +1,7 @@
 ---
 nav_order: 2
 parent: The LibreOffice Panel
+grand_parent: Code Howtos
 ---
 # Order of appearance of citation groups
 
