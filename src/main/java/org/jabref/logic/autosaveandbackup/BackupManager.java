@@ -15,6 +15,8 @@ import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import org.jabref.logic.bibtex.InvalidFieldValueException;
 import org.jabref.logic.exporter.AtomicFileWriter;
@@ -23,7 +25,6 @@ import org.jabref.logic.exporter.BibtexDatabaseWriter;
 import org.jabref.logic.exporter.SavePreferences;
 import org.jabref.logic.util.BackupFileType;
 import org.jabref.logic.util.CoarseChangeFilter;
-import org.jabref.logic.util.DelayTaskThrottler;
 import org.jabref.logic.util.io.BackupFileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.event.BibDatabaseContextChangedEvent;
@@ -47,11 +48,13 @@ public class BackupManager {
 
     private static final int MAXIMUM_BACKUP_FILE_COUNT = 10;
 
+    private static final int DELAY_BETWEEN_BACKUP_ATTEMPTS_IN_SECONDS = 1;
+
     private static Set<BackupManager> runningInstances = new HashSet<>();
 
     private final BibDatabaseContext bibDatabaseContext;
     private final PreferencesService preferences;
-    private final DelayTaskThrottler throttler;
+    private final ScheduledThreadPoolExecutor executor;
     private final CoarseChangeFilter changeFilter;
     private final BibEntryTypesManager entryTypesManager;
 
@@ -66,7 +69,7 @@ public class BackupManager {
         this.bibDatabaseContext = bibDatabaseContext;
         this.entryTypesManager = entryTypesManager;
         this.preferences = preferences;
-        this.throttler = new DelayTaskThrottler(1_000);
+        this.executor = new ScheduledThreadPoolExecutor(2);
 
         changeFilter = new CoarseChangeFilter(bibDatabaseContext);
         changeFilter.registerListener(this);
@@ -222,8 +225,12 @@ public class BackupManager {
     private void startBackupTask() {
         fillQueue();
 
-        // We need to determine the backup path on each action, because we use the timestamp in the filename
-        throttler.schedule(() -> determineBackupPathForNewBackup().ifPresent(this::performBackup));
+        executor.scheduleAtFixedRate(
+                // We need to determine the backup path on each action, because we use the timestamp in the filename
+                () -> determineBackupPathForNewBackup().ifPresent(this::performBackup),
+                DELAY_BETWEEN_BACKUP_ATTEMPTS_IN_SECONDS,
+                DELAY_BETWEEN_BACKUP_ATTEMPTS_IN_SECONDS,
+                TimeUnit.SECONDS);
     }
 
     private void fillQueue() {
@@ -247,12 +254,12 @@ public class BackupManager {
     }
 
     /**
-     * Unregisters the BackupManager from the eventBus of {@link BibDatabaseContext} and deletes the backup file. This
-     * method should only be used when closing a database/JabRef legally.
+     * Unregisters the BackupManager from the eventBus of {@link BibDatabaseContext}.
+     * This method should only be used when closing a database/JabRef in a normal way.
      */
     private void shutdown() {
         changeFilter.unregisterListener(this);
         changeFilter.shutdown();
-        throttler.shutdown();
+        executor.shutdown();
     }
 }
