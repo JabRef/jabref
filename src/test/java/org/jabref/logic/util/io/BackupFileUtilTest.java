@@ -37,7 +37,7 @@ public class BackupFileUtilTest {
                  .thenThrow(new IOException());
             Path testPath = Path.of("tmp", "test.bib");
             Path result = BackupFileUtil.getPathForNewBackupFileAndCreateDirectory(testPath, BackupFileType.BACKUP);
-            // We just check the prefix
+            // The intended fallback behavior is to put the .bak file in the same directory as the .bib file
             assertEquals(Path.of("tmp", "test.bib.bak"), result);
         }
     }
