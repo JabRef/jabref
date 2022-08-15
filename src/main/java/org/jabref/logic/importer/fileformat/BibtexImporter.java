@@ -4,7 +4,10 @@ import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.nio.charset.Charset;
+import java.nio.charset.CharsetDecoder;
+import java.nio.charset.CodingErrorAction;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Objects;
@@ -79,7 +82,14 @@ public class BibtexImporter extends Importer {
             LOGGER.debug("Encoding used to read the file: {}", encoding);
         }
 
-        try (BufferedReader reader = Files.newBufferedReader(filePath, encoding)) {
+        // We replace unreadable characters
+        // Unfortunately, no warning will be issued to the user
+        // As this is a very seldom case, we accept that
+        CharsetDecoder decoder = encoding.newDecoder();
+        decoder.onMalformedInput(CodingErrorAction.REPLACE);
+
+        try (InputStreamReader inputStreamReader = new InputStreamReader(Files.newInputStream(filePath), decoder);
+             BufferedReader reader = new BufferedReader(inputStreamReader)) {
             ParserResult parserResult = this.importDatabase(reader);
             parserResult.getMetaData().setEncoding(encoding);
             parserResult.getMetaData().setEncodingExplicitlySupplied(encodingExplicitlySupplied);

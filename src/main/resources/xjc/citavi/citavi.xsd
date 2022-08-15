@@ -67,6 +67,57 @@
             </xs:sequence>
           </xs:complexType>
         </xs:element>
+        <xs:element name="Categories">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="Category" maxOccurs="unbounded" minOccurs="0">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element type="xs:string" name="CreatedBy" minOccurs="0" />
+                    <xs:element type="xs:dateTime" name="CreatedOn" minOccurs="0" />
+                    <xs:element type="xs:string" name="ModifiedBy" minOccurs="0" />
+                    <xs:element type="xs:dateTime" name="ModifiedOn" minOccurs="0" />
+                    <xs:element type="xs:string" name="Name" />
+                  </xs:sequence>
+                  <xs:attribute type="xs:string" name="id" use="optional" />
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="CategoryCatgories">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element type="xs:string" name="OnetoN" maxOccurs="unbounded" minOccurs="0" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="ImportGroups">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="ImportGroup" maxOccurs="unbounded" minOccurs="0">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element type="xs:string" name="CreatedBy" />
+                    <xs:element type="xs:dateTime" name="CreatedOn" />
+                    <xs:element type="xs:string" name="ModifiedBy" />
+                    <xs:element type="xs:dateTime" name="ModifiedOn" />
+                    <xs:element type="xs:byte" name="ImportGroupType" />
+                    <xs:element type="xs:string" name="Source" minOccurs="0" />
+                  </xs:sequence>
+                  <xs:attribute type="xs:string" name="id" use="optional" />
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="ImportGroupReferences">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element type="xs:string" name="OnetoN" maxOccurs="unbounded" minOccurs="0" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
         <xs:element name="Keywords">
           <xs:complexType>
             <xs:sequence>
@@ -192,7 +243,7 @@
         <xs:element name="ReferenceGroups">
           <xs:complexType>
             <xs:sequence>
-               <xs:element maxOccurs="unbounded" name="OnetoN" type="xs:string" />
+              <xs:element maxOccurs="unbounded" name="OnetoN" type="xs:string" />
             </xs:sequence>
           </xs:complexType>
         </xs:element>
@@ -282,11 +333,19 @@
                     <xs:element name="StaticIDs" type="xs:string" />
                     <xs:element name="TextSourceTextFormat" type="xs:unsignedByte" />
                     <xs:element minOccurs="0" name="Text" type="xs:string" />
-                    <xs:element name="TextComplexity" type="xs:unsignedByte" />
+                    <xs:element type="xs:string" name="TextIsComplex" />
+                    <xs:element type="xs:string" name="TextFormatted" minOccurs="0" />
                   </xs:sequence>
                   <xs:attribute name="id" type="xs:string" use="required" />
                 </xs:complexType>
               </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="KnowledgeItemCategories">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="OnetoN" maxOccurs="unbounded" type="xs:string" />
             </xs:sequence>
           </xs:complexType>
         </xs:element>

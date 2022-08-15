@@ -245,7 +245,7 @@
       <else-if type="map post-weblog post" match="none">
         <group delimiter=", ">
           <choose>
-            <if variable="event" match="none">
+            <if variable="event event-title" match="none">
               <text variable="genre" prefix="[" suffix="]"/>
             </if>
           </choose>
@@ -298,23 +298,37 @@
     <choose>
       <if variable="container-title" match="none">
         <choose>
-          <if variable="event">
+          <if variable="event event-title" match="any">
             <choose>
               <if variable="genre" match="none">
                 <text term="presented at" text-case="capitalize-first" suffix=" "/>
-                <text variable="event"/>
+                <text macro="event-title"/>
               </if>
               <else>
                 <group delimiter=" ">
                   <text variable="genre" text-case="capitalize-first"/>
                   <text term="presented at"/>
-                  <text variable="event"/>
+                  <text macro="event-title"/>
                 </group>
               </else>
             </choose>
           </if>
         </choose>
       </if>
+    </choose>
+  </macro>
+  <macro name="event-title">
+    <choose>
+      <!-- TODO: We expect "event-title" to be used,
+           but processors and applications may not be updated yet.
+           This macro ensures that either "event" or "event-title" can be accpeted.
+           Remove if procesor logic and application adoption can handle this. -->
+      <if variable="event-title">
+        <text variable="event-title"/>
+      </if>
+      <else>
+        <text variable="event"/>
+      </else>
     </choose>
   </macro>
   <macro name="extra">

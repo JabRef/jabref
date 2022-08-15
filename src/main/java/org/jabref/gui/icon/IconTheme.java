@@ -339,7 +339,13 @@ public class IconTheme {
         KEEP_SEARCH_STRING(MaterialDesignE.EARTH),
         KEEP_ON_TOP(MaterialDesignP.PIN),
         KEEP_ON_TOP_OFF(MaterialDesignP.PIN_OFF_OUTLINE),
-        OPEN_GLOBAL_SEARCH(MaterialDesignO.OPEN_IN_NEW);
+        OPEN_GLOBAL_SEARCH(MaterialDesignO.OPEN_IN_NEW),
+
+        ACCEPT_LEFT(MaterialDesignS.SUBDIRECTORY_ARROW_LEFT),
+
+        ACCEPT_RIGHT(MaterialDesignS.SUBDIRECTORY_ARROW_RIGHT),
+
+        MERGE_GROUPS(MaterialDesignS.SOURCE_MERGE);
 
         private final JabRefIcon icon;
 

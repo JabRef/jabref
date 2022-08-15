@@ -387,8 +387,8 @@ public class BibtexParser implements Parser {
         }
         // strip empty lines
         while ((runningIndex < indexOfAt) &&
-                (context.charAt(runningIndex) == '\r' ||
-                        context.charAt(runningIndex) == '\n')) {
+                ((context.charAt(runningIndex) == '\r') ||
+                        (context.charAt(runningIndex) == '\n'))) {
             runningIndex++;
         }
         return context.substring(runningIndex);
@@ -634,7 +634,7 @@ public class BibtexParser implements Parser {
                 value.append(fieldContentFormatter.format(text, field));
             } else if (character == '{') {
                 // Value is a string enclosed in brackets. There can be pairs
-                // of brackets inside of a field, so we need to count the
+                // of brackets inside a field, so we need to count the
                 // brackets to know when the string is finished.
                 StringBuilder text = parseBracketedTextExactly();
                 value.append(fieldContentFormatter.format(text, field));

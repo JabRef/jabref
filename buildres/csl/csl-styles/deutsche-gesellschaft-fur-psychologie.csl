@@ -33,6 +33,7 @@
       <term name="et-al">et al.</term>
       <term name="retrieved">Zugriff am</term>
       <term name="original-work-published">Original erschienen</term>
+      <term name="no date" form="short">n. d.</term>
     </terms>
     <date form="text">
       <date-part name="year"/>

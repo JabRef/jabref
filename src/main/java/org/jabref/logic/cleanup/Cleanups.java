@@ -67,9 +67,8 @@ public class Cleanups {
         int startIndex = 0;
 
         // first remove all newlines for easier parsing
-        String remainingString = formatterString;
+        String remainingString = StringUtil.unifyLineBreaks(formatterString, "");
 
-        remainingString = StringUtil.unifyLineBreaks(remainingString, "");
         try {
             while (startIndex < formatterString.length()) {
                 // read the field name

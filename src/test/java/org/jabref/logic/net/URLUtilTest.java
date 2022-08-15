@@ -73,4 +73,9 @@ class URLUtilTest {
         assertFalse(URLUtil.isURL("www.google.com"));
         assertFalse(URLUtil.isURL("google.com"));
     }
+
+    @Test
+    void isURLshouldRejectEmbeddedURL() {
+        assertFalse(URLUtil.isURL("dblp computer science bibliography, http://dblp.org"));
+    }
 }

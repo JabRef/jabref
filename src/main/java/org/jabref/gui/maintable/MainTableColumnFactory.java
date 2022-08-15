@@ -23,7 +23,6 @@ import javafx.scene.text.Text;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
-import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.maintable.columns.FieldColumn;
 import org.jabref.gui.maintable.columns.FileColumn;
@@ -54,7 +53,6 @@ public class MainTableColumnFactory {
 
     private final PreferencesService preferencesService;
     private final ColumnPreferences columnPreferences;
-    private final ExternalFileTypes externalFileTypes;
     private final BibDatabaseContext database;
     private final CellFactory cellFactory;
     private final UndoManager undoManager;
@@ -64,16 +62,14 @@ public class MainTableColumnFactory {
     public MainTableColumnFactory(BibDatabaseContext database,
                                   PreferencesService preferencesService,
                                   ColumnPreferences abstractColumnPrefs,
-                                  ExternalFileTypes externalFileTypes,
                                   UndoManager undoManager,
                                   DialogService dialogService,
                                   StateManager stateManager) {
         this.database = Objects.requireNonNull(database);
         this.preferencesService = Objects.requireNonNull(preferencesService);
         this.columnPreferences = abstractColumnPrefs;
-        this.externalFileTypes = Objects.requireNonNull(externalFileTypes);
         this.dialogService = dialogService;
-        this.cellFactory = new CellFactory(externalFileTypes, preferencesService, undoManager);
+        this.cellFactory = new CellFactory(preferencesService, undoManager);
         this.undoManager = undoManager;
         this.stateManager = stateManager;
     }
@@ -233,7 +229,6 @@ public class MainTableColumnFactory {
     private TableColumn<BibEntryTableViewModel, List<LinkedFile>> createFilesColumn(MainTableColumnModel columnModel) {
         return new FileColumn(columnModel,
                 database,
-                externalFileTypes,
                 dialogService,
                 preferencesService);
     }
@@ -244,7 +239,6 @@ public class MainTableColumnFactory {
     private TableColumn<BibEntryTableViewModel, List<LinkedFile>> createExtraFileColumn(MainTableColumnModel columnModel) {
         return new FileColumn(columnModel,
                 database,
-                externalFileTypes,
                 dialogService,
                 preferencesService,
                 columnModel.getQualifier());
