@@ -3,7 +3,6 @@ package org.jabref.gui.maintable;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -15,15 +14,13 @@ import javafx.beans.Observable;
 import javafx.beans.binding.Binding;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.FloatProperty;
-import javafx.beans.property.ReadOnlyFloatProperty;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.beans.property.SimpleFloatProperty;
 import javafx.beans.property.StringProperty;
 import javafx.beans.value.ObservableValue;
-import javafx.collections.FXCollections;
-import javafx.collections.ListChangeListener;
-import javafx.collections.ObservableList;
+import javafx.collections.MapChangeListener;
 
+import org.jabref.gui.StateManager;
 import org.jabref.gui.specialfields.SpecialFieldValueViewModel;
 import org.jabref.gui.util.uithreadaware.UiThreadBinding;
 import org.jabref.logic.importer.util.FileFieldParser;
@@ -36,7 +33,7 @@ import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.groups.AbstractGroup;
 import org.jabref.model.groups.GroupTreeNode;
-import org.jabref.model.pdf.search.SearchResult;
+import org.jabref.model.pdf.search.LuceneSearchResults;
 
 import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.EasyBinding;
@@ -52,10 +49,10 @@ public class BibEntryTableViewModel {
     private final EasyBinding<Map<Field, String>> linkedIdentifiers;
     private final Binding<List<AbstractGroup>> matchedGroups;
     private final BibDatabaseContext bibDatabaseContext;
-    private ObservableList<SearchResult> searchResults = FXCollections.observableArrayList();
-    private FloatProperty searchScore = new SimpleFloatProperty();
 
-    public BibEntryTableViewModel(BibEntry entry, BibDatabaseContext bibDatabaseContext, ObservableValue<MainTableFieldValueFormatter> fieldValueFormatter) {
+    private final FloatProperty searchScore = new SimpleFloatProperty();
+
+    public BibEntryTableViewModel(BibEntry entry, BibDatabaseContext bibDatabaseContext, ObservableValue<MainTableFieldValueFormatter> fieldValueFormatter, StateManager stateManager) {
         this.entry = entry;
         this.fieldValueFormatter = fieldValueFormatter;
 
@@ -64,8 +61,12 @@ public class BibEntryTableViewModel {
         this.matchedGroups = createMatchedGroupsBinding(bibDatabaseContext, entry);
         this.bibDatabaseContext = bibDatabaseContext;
 
-        searchResults.addListener((ListChangeListener<? super SearchResult>) (change) -> {
-            searchScore.setValue(searchResults.stream().map(SearchResult::getLuceneScore).max(Comparator.comparing(Float::valueOf)).orElseGet(() -> (float) 0.0));
+        stateManager.getSearchResults().addListener((MapChangeListener<BibEntry, LuceneSearchResults>) change -> {
+            if (stateManager.getSearchResults().containsKey(entry)) {
+                searchScore.set(stateManager.getSearchResults().get(entry).getSearchScore());
+            } else {
+                searchScore.set(0);
+            }
         });
     }
 
@@ -147,15 +148,11 @@ public class BibEntryTableViewModel {
         return new ReadOnlyStringWrapper(bibDatabaseContext.getDatabasePath().map(Path::toString).orElse(""));
     }
 
-    public void resetSearchResults() {
-        searchResults.clear();
+    public float getSearchScore() {
+        return searchScore.get();
     }
 
-    public void addSearchResults(List<SearchResult> results) {
-        searchResults.addAll(results);
-    }
-
-    public ReadOnlyFloatProperty getSearchScore() {
+    public FloatProperty searchScoreProperty() {
         return searchScore;
     }
 }

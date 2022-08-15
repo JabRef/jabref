@@ -2,20 +2,14 @@ package org.jabref.model.pdf.search;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 
 public final class LuceneSearchResults {
 
-    private final List<SearchResult> searchResults;
-
-    public LuceneSearchResults(List<SearchResult> search) {
-        this.searchResults = Collections.unmodifiableList(search);
-    }
-
-    public LuceneSearchResults() {
-        this.searchResults = Collections.emptyList();
-    }
+    private final List<SearchResult> searchResults = new LinkedList<>();
 
     public List<SearchResult> getSortedByScore() {
         List<SearchResult> sortedList = new ArrayList<>(searchResults);
@@ -43,5 +37,13 @@ public final class LuceneSearchResults {
 
     public int numSearchResults() {
         return this.searchResults.size();
+    }
+
+    public void addResult(SearchResult result) {
+        this.searchResults.add(result);
+    }
+
+    public float getSearchScore() {
+        return this.searchResults.stream().map(SearchResult::getLuceneScore).max(Comparator.comparing(Float::floatValue)).orElse(Float.valueOf(0));
     }
 }

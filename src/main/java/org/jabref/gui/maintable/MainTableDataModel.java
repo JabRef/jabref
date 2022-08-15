@@ -25,7 +25,7 @@ import org.jabref.logic.search.SearchQuery;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.groups.GroupTreeNode;
-import org.jabref.model.pdf.search.SearchResult;
+import org.jabref.model.pdf.search.LuceneSearchResults;
 import org.jabref.model.search.matchers.MatcherSet;
 import org.jabref.model.search.matchers.MatcherSets;
 import org.jabref.preferences.PreferencesService;
@@ -39,6 +39,7 @@ public class MainTableDataModel {
     private final PreferencesService preferencesService;
     private final GroupsPreferences groupsPreferences;
     private final BibDatabaseContext bibDatabaseContext;
+    private final StateManager stateManager;
 
     public MainTableDataModel(BibDatabaseContext context, PreferencesService preferencesService, StateManager stateManager) {
         this.preferencesService = preferencesService;
@@ -49,7 +50,7 @@ public class MainTableDataModel {
 
         ObservableList<BibEntry> allEntries = BindingsHelper.forUI(context.getDatabase().getEntries());
         ObservableList<BibEntryTableViewModel> entriesViewModel = EasyBind.mapBacked(allEntries, entry ->
-                new BibEntryTableViewModel(entry, bibDatabaseContext, fieldValueFormatter));
+                new BibEntryTableViewModel(entry, bibDatabaseContext, fieldValueFormatter, stateManager));
 
         entriesFiltered = new FilteredList<>(entriesViewModel);
         ObjectBinding<Predicate<BibEntryTableViewModel>> filter = Bindings.createObjectBinding(
@@ -57,6 +58,7 @@ public class MainTableDataModel {
         entriesFiltered.predicateProperty().bind(filter);
 
         stateManager.activeSearchQueryProperty().addListener((observable, oldValue, newValue) -> doSearch(newValue));
+        this.stateManager = stateManager;
 
         IntegerProperty resultSize = new SimpleIntegerProperty();
         resultSize.bind(Bindings.size(entriesFiltered));
@@ -66,17 +68,13 @@ public class MainTableDataModel {
     }
 
     private void doSearch(Optional<SearchQuery> query) {
-        for (BibEntryTableViewModel entry : entriesFiltered) {
-            entry.resetSearchResults();
-        }
         if (query.isPresent()) {
             String searchString = query.get().getQuery();
             try {
                 LuceneSearcher searcher = LuceneSearcher.of(bibDatabaseContext);
-                Map<BibEntry, List<SearchResult>> results = searcher.search(query.get());
-                for (Map.Entry<BibEntry, List<SearchResult>> result : results.entrySet()) {
-                    getTableViewModelForEntry(result.getKey()).ifPresent(bibEntryTableViewModel -> bibEntryTableViewModel.addSearchResults(result.getValue()));
-                }
+                Map<BibEntry, LuceneSearchResults> results = searcher.search(query.get());
+                stateManager.getSearchResults().clear();
+                stateManager.getSearchResults().putAll(results);
             } catch (IOException e) {
                 e.printStackTrace();
             }

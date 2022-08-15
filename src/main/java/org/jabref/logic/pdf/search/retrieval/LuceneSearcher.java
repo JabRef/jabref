@@ -3,9 +3,6 @@ package org.jabref.logic.pdf.search.retrieval;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Objects;
 
 import org.jabref.gui.LibraryTab;
 import org.jabref.logic.search.SearchQuery;
@@ -16,7 +13,6 @@ import org.jabref.model.pdf.search.LuceneSearchResults;
 import org.jabref.model.pdf.search.SearchFieldConstants;
 import org.jabref.model.pdf.search.SearchResult;
 import org.jabref.model.search.rules.SearchRules;
-import org.jabref.model.strings.StringUtil;
 
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
@@ -50,47 +46,13 @@ public final class LuceneSearcher {
     /**
      * Search for results matching a query in the Lucene search index
      *
-     * @param searchString a pattern to search for matching entries in the index, must not be null
-     * @param maxHits      number of maximum search results, must be positive
-     * @return a result set of all documents that have matches in any fields
+     * @param query query to search for
+     * @return a result map of all entries that have matches in any fields
      */
-    public LuceneSearchResults search(final String searchString, final int maxHits)
-        throws IOException {
-        Thread.dumpStack();
-        if (StringUtil.isBlank(Objects.requireNonNull(searchString, "The search string was null!"))) {
-            return new LuceneSearchResults();
-        }
-        if (maxHits <= 0) {
-            throw new IllegalArgumentException("Must be called with at least 1 maxHits, was" + maxHits);
-        }
-
-        List<SearchResult> resultDocs = new LinkedList<>();
-
-        if (!DirectoryReader.indexExists(indexDirectory)) {
-            LOGGER.debug("Index directory {} does not yet exist", indexDirectory);
-            return new LuceneSearchResults();
-        }
-
-        try (IndexReader reader = DirectoryReader.open(indexDirectory)) {
-            IndexSearcher searcher = new IndexSearcher(reader);
-            String[] searchable_fields = new String[SearchFieldConstants.searchableBibFields.size()];
-            SearchFieldConstants.searchableBibFields.toArray(searchable_fields);
-            Query query = new MultiFieldQueryParser(searchable_fields, new EnglishStemAnalyzer()).parse(searchString);
-            TopDocs results = searcher.search(query, maxHits);
-            for (ScoreDoc scoreDoc : results.scoreDocs) {
-                resultDocs.add(new SearchResult(searcher, query, scoreDoc));
-            }
-            return new LuceneSearchResults(resultDocs);
-        } catch (ParseException e) {
-            LOGGER.warn("Could not parse query: '{}'!\n{}", searchString, e.getMessage());
-            return new LuceneSearchResults();
-        }
-    }
-
-    public HashMap<BibEntry, List<SearchResult>> search(SearchQuery query) {
-        HashMap<BibEntry, List<SearchResult>> results = new HashMap<>();
-        HashMap<String, Float> boosts = new HashMap<String, Float>();
-        SearchFieldConstants.searchableBibFields.stream().forEach(field -> boosts.put(field, Float.valueOf(4)));
+    public HashMap<BibEntry, LuceneSearchResults> search(SearchQuery query) {
+        HashMap<BibEntry, LuceneSearchResults> results = new HashMap<>();
+        HashMap<String, Float> boosts = new HashMap<>();
+        SearchFieldConstants.searchableBibFields.forEach(field -> boosts.put(field, Float.valueOf(4)));
 
         if (query.getSearchFlags().contains(SearchRules.SearchFlags.FULLTEXT)) {
             Arrays.stream(SearchFieldConstants.PDF_FIELDS).forEach(field -> boosts.put(field, Float.valueOf(1)));
@@ -105,9 +67,9 @@ public final class LuceneSearcher {
                 SearchResult searchResult = new SearchResult(searcher, luceneQuery, scoreDoc);
                 for (BibEntry match : searchResult.getMatchingEntries(databaseContext)) {
                     if (!results.containsKey(match)) {
-                        results.put(match, new LinkedList<>());
+                        results.put(match, new LuceneSearchResults());
                     }
-                    results.get(match).add(searchResult);
+                    results.get(match).addResult(searchResult);
                 }
             }
         } catch (ParseException e) {

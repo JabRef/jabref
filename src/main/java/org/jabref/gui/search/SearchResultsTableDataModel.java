@@ -36,7 +36,7 @@ public class SearchResultsTableDataModel {
         ObservableList<BibEntryTableViewModel> entriesViewModel = FXCollections.observableArrayList();
         for (BibDatabaseContext context : stateManager.getOpenDatabases()) {
             ObservableList<BibEntry> entriesForDb = context.getDatabase().getEntries();
-            List<BibEntryTableViewModel> viewModelForDb = EasyBind.mapBacked(entriesForDb, entry -> new BibEntryTableViewModel(entry, context, fieldValueFormatter));
+            List<BibEntryTableViewModel> viewModelForDb = EasyBind.mapBacked(entriesForDb, entry -> new BibEntryTableViewModel(entry, context, fieldValueFormatter, stateManager));
             entriesViewModel.addAll(viewModelForDb);
         }
 

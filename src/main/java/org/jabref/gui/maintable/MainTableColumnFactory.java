@@ -145,8 +145,7 @@ public class MainTableColumnFactory {
         Tooltip.install(header, new Tooltip(MainTableColumnModel.Type.SCORE.getDisplayName()));
         column.setGraphic(header);
         column.setStyle("-fx-alignment: CENTER-RIGHT;");
-        column.setCellValueFactory(cellData ->
-                cellData.getValue().getSearchScore().asString());
+        column.setCellValueFactory(cellData -> cellData.getValue().searchScoreProperty().asString());
         new ValueTableCellFactory<BibEntryTableViewModel, String>()
                 .withText(text -> text)
                 .install(column);

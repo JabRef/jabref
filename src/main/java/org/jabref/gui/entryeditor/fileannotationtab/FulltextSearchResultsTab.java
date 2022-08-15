@@ -83,7 +83,7 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
             documentViewerView = new DocumentViewerView();
         }
         this.entry = entry;
-        LuceneSearchResults searchResults = stateManager.activeSearchQueryProperty().get().get().getRule().getLuceneResults(stateManager.activeSearchQueryProperty().get().get().getQuery(), entry);
+        LuceneSearchResults searchResults = stateManager.getSearchResults().get(entry);
 
         content.getChildren().clear();
 
