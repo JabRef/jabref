@@ -14,6 +14,7 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.collections.MapChangeListener;
 import javafx.css.PseudoClass;
 import javafx.event.Event;
 import javafx.geometry.Insets;
@@ -59,6 +60,8 @@ import org.jabref.gui.util.TooltipTextUtil;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.search.SearchQuery;
 import org.jabref.model.entry.Author;
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.pdf.search.LuceneSearchResults;
 import org.jabref.model.search.rules.SearchRules;
 import org.jabref.preferences.PreferencesService;
 import org.jabref.preferences.SearchPreferences;
@@ -191,12 +194,12 @@ public class GlobalSearchBar extends HBox {
                 },
                 query -> setSearchTerm(query.map(SearchQuery::getQuery).orElse("")));
 
-        this.stateManager.activeSearchQueryProperty().addListener((obs, oldvalue, newValue) -> newValue.ifPresent(this::updateSearchResultsForQuery));
-        this.stateManager.activeDatabaseProperty().addListener((obs, oldValue, newValue) -> stateManager.activeSearchQueryProperty().get().ifPresent(this::updateSearchResultsForQuery));
+        this.stateManager.activeSearchQueryProperty().addListener((obs, oldValue, newValue) -> newValue.ifPresent(this::updateSearchResultsForQuery));
+        this.stateManager.getSearchResults().addListener((MapChangeListener<? super BibEntry, ? super LuceneSearchResults>) map -> stateManager.activeSearchQueryProperty().get().ifPresent(this::updateSearchResultsForQuery));
     }
 
     private void updateSearchResultsForQuery(SearchQuery query) {
-        updateResults(this.stateManager.getSearchResultSize().intValue(), SearchDescribers.getSearchDescriberFor(query).getDescription(),
+        updateResults(this.stateManager.getSearchResults().size(), SearchDescribers.getSearchDescriberFor(query).getDescription(),
                 query.isGrammarBasedSearch());
     }
 

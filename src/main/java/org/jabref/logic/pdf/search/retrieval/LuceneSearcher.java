@@ -66,10 +66,12 @@ public final class LuceneSearcher {
             for (ScoreDoc scoreDoc : docs.scoreDocs) {
                 SearchResult searchResult = new SearchResult(searcher, luceneQuery, scoreDoc);
                 for (BibEntry match : searchResult.getMatchingEntries(databaseContext)) {
-                    if (!results.containsKey(match)) {
-                        results.put(match, new LuceneSearchResults());
+                    if (searchResult.getLuceneScore() > 0) {
+                        if (!results.containsKey(match)) {
+                            results.put(match, new LuceneSearchResults());
+                        }
+                        results.get(match).addResult(searchResult);
                     }
-                    results.get(match).addResult(searchResult);
                 }
             }
         } catch (ParseException e) {

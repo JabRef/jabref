@@ -7,11 +7,9 @@ import java.util.stream.Collectors;
 
 import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
-import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyListProperty;
 import javafx.beans.property.ReadOnlyListWrapper;
-import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -90,12 +88,6 @@ public class StateManager {
 
     public OptionalObjectProperty<SearchQuery> activeSearchQueryProperty() {
         return activeSearchQuery;
-    }
-
-    public IntegerProperty getSearchResultSize() {
-        IntegerProperty size = new SimpleIntegerProperty();
-        size.bind(Bindings.size(searchResults));
-        return size;
     }
 
     public ReadOnlyListProperty<GroupTreeNode> activeGroupProperty() {
