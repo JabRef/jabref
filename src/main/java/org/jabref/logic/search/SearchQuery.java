@@ -57,9 +57,9 @@ public class SearchQuery implements SearchMatcher {
         abstract String format(String regex);
     }
 
-    private final String query;
-    private EnumSet<SearchRules.SearchFlags> searchFlags;
-    private final SearchRule rule;
+    protected final String query;
+    protected EnumSet<SearchRules.SearchFlags> searchFlags;
+    protected final SearchRule rule;
 
     public SearchQuery(String query, EnumSet<SearchRules.SearchFlags> searchFlags) {
         this.query = Objects.requireNonNull(query);

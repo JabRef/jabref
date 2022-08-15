@@ -37,8 +37,8 @@ public final class SearchResult {
     private final boolean hasFulltextResults;
 
     private final float luceneScore;
-    private List<String> contentResultStringsHtml;
-    private List<String> annotationsResultStringsHtml;
+    private List<String> contentResultStringsHtml = List.of();
+    private List<String> annotationsResultStringsHtml = List.of();
 
     public SearchResult(IndexSearcher searcher, Query query, ScoreDoc scoreDoc) throws IOException {
         this.luceneScore = scoreDoc.score;

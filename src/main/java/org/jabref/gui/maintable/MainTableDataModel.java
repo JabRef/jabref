@@ -19,6 +19,7 @@ import org.jabref.logic.search.SearchQuery;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.groups.GroupTreeNode;
+import org.jabref.model.groups.SearchGroup;
 import org.jabref.model.search.matchers.MatcherSet;
 import org.jabref.model.search.matchers.MatcherSets;
 import org.jabref.preferences.PreferencesService;
@@ -50,12 +51,21 @@ public class MainTableDataModel {
         entriesFiltered.predicateProperty().bind(
                 EasyBind.combine(stateManager.activeGroupProperty(),
                         groupsPreferences.groupViewModeProperty(),
-                        (groups, groupViewMode) -> entry -> isMatchedByGroup(groups, entry))
+                        (groups, groupViewMode) -> {
+                            return entry -> {
+                                updateSearchGroups();
+                                return isMatchedByGroup(groups, entry);
+                            };
+                        })
         );
         stateManager.activeSearchQueryProperty().addListener((observable, oldValue, newValue) -> doSearch(newValue));
 
         // We need to wrap the list since otherwise sorting in the table does not work
         entriesSorted = new SortedList<>(entriesFiltered);
+    }
+
+    private void updateSearchGroups() {
+        stateManager.getSelectedGroup(bibDatabaseContext).stream().map(GroupTreeNode::getGroup).filter(g -> g instanceof SearchGroup).map(g -> ((SearchGroup) g)).forEach(g -> g.updateMatches(bibDatabaseContext));
     }
 
     private void doSearch(Optional<SearchQuery> query) {
