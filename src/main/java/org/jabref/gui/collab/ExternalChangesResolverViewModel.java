@@ -96,6 +96,17 @@ public class ExternalChangesResolverViewModel extends AbstractViewModel {
         getSelectedChange().ifPresent(getChanges()::remove);
     }
 
+    public void acceptMergedChange(DatabaseChangeViewModel mergedChange) {
+        Objects.requireNonNull(mergedChange);
+
+        getSelectedChange().ifPresent(oldChange -> {
+            immutableChanges.remove(oldChange);
+            immutableChanges.add(mergedChange);
+            getChanges().remove(oldChange);
+            mergedChange.accept();
+        });
+    }
+
     private void makeChanges() {
         immutableChanges.stream().filter(DatabaseChangeViewModel::isAccepted).forEach(change -> change.makeChange(databaseContext, ce));
         ce.end();

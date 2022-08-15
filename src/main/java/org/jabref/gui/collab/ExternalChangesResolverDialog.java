@@ -104,6 +104,6 @@ public class ExternalChangesResolverDialog extends BaseDialog<Boolean> {
     @FXML
     public void openAdvancedMergeDialog() {
         viewModel.getSelectedChange().flatMap(DatabaseChangeViewModel::openAdvancedMergeDialog)
-                 .ifPresent(change -> viewModel.acceptChange());
+                 .ifPresent(viewModel::acceptMergedChange);
     }
 }
