@@ -49,9 +49,8 @@ public class MainTableDataModel {
         entriesFiltered = new FilteredList<>(entriesViewModel);
         entriesFiltered.predicateProperty().bind(
                 EasyBind.combine(stateManager.activeGroupProperty(),
-                        stateManager.activeSearchQueryProperty(),
                         groupsPreferences.groupViewModeProperty(),
-                        (groups, query, groupViewMode) -> entry -> isMatchedByGroup(groups, entry))
+                        (groups, groupViewMode) -> entry -> isMatchedByGroup(groups, entry))
         );
         stateManager.activeSearchQueryProperty().addListener((observable, oldValue, newValue) -> doSearch(newValue));
 
