@@ -137,13 +137,7 @@ public class SaveDatabaseAction {
 
             // Reset (here: uninstall and install again) AutosaveManager and BackupManager for the new file name
             libraryTab.resetChangeMonitor();
-            if (readyForAutosave(context)) {
-                AutosaveManager autosaver = AutosaveManager.start(context);
-                autosaver.registerListener(new AutosaveUiManager(libraryTab));
-            }
-            if (readyForBackup(context)) {
-                BackupManager.start(context, entryTypesManager, preferences);
-            }
+            libraryTab.installAutosaveManagerAndBackupManager();
 
             frame.getFileHistory().newFile(file);
         }
@@ -283,16 +277,5 @@ public class SaveDatabaseAction {
                 saveDatabase(file, selectedOnly, newEncoding.get(), saveType);
             }
         }
-    }
-
-    private boolean readyForAutosave(BibDatabaseContext context) {
-        return ((context.getLocation() == DatabaseLocation.SHARED)
-                || ((context.getLocation() == DatabaseLocation.LOCAL)
-                && preferences.getImportExportPreferences().shouldAutoSave()))
-                && context.getDatabasePath().isPresent();
-    }
-
-    private boolean readyForBackup(BibDatabaseContext context) {
-        return (context.getLocation() == DatabaseLocation.LOCAL) && context.getDatabasePath().isPresent();
     }
 }
