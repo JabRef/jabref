@@ -18,13 +18,13 @@ public class BackupFileUtilTest {
     @Test
     void uniqueFilePrefix() {
         // The number "7001d6e0" is "random"
-        assertEquals("7001d6e0", BackupFileUtil.getUniqueFilePrefix(Path.of("/tmp/test.bib")));
+        assertEquals("15b77281", BackupFileUtil.getUniqueFilePrefix(Path.of("test.bib")));
     }
 
     @Test
     void getPathOfBackupFileAndCreateDirectoryReturnsAppDirectoryInCaseOfNoError() {
         String start = BackupFileUtil.getAppDataBackupDir().toString();
-        String result = BackupFileUtil.getPathForNewBackupFileAndCreateDirectory(Path.of("/tmp/test.bib"), BackupFileType.BACKUP).toString();
+        String result = BackupFileUtil.getPathForNewBackupFileAndCreateDirectory(Path.of("test.bib"), BackupFileType.BACKUP).toString();
         // We just check the prefix
         assertEquals(start, result.substring(0, start.length()));
     }
