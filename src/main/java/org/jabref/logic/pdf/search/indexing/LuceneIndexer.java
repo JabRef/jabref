@@ -165,7 +165,6 @@ public class LuceneIndexer {
                 document.add(new StringField(SearchFieldConstants.BIB_ENTRY_ID_HASH, String.valueOf(bibEntry.getLastIndexHash()), org.apache.lucene.document.Field.Store.YES));
                 for (Map.Entry<Field, String> field : bibEntry.getFieldMap().entrySet()) {
                     if (field.getKey() == StandardField.KEYWORDS) {
-                        System.out.println("Indexing keywords " + field.getValue());
                         KeywordList keywords = KeywordList.parse(field.getValue(), preferences.getKeywordDelimiter());
                         for (Keyword keyword : keywords) {
                             document.add(new StringField(field.getKey().getName(), keyword.toString(), org.apache.lucene.document.Field.Store.YES));
