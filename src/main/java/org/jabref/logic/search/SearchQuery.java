@@ -69,7 +69,7 @@ public class SearchQuery implements SearchMatcher {
 
     @Override
     public String toString() {
-        return String.format("\"%s\" (%s, %s)", getQuery(), getCaseSensitiveDescription(), getRegularExpressionDescription());
+        return String.format("\"%s\" (%s)", getQuery(), getRegularExpressionDescription());
     }
 
     @Override
@@ -85,14 +85,6 @@ public class SearchQuery implements SearchMatcher {
         return rule instanceof ContainsBasedSearchRule;
     }
 
-    private String getCaseSensitiveDescription() {
-        if (searchFlags.contains(SearchRules.SearchFlags.CASE_SENSITIVE)) {
-            return "case sensitive";
-        } else {
-            return "case insensitive";
-        }
-    }
-
     private String getRegularExpressionDescription() {
         if (searchFlags.contains(SearchRules.SearchFlags.REGULAR_EXPRESSION)) {
             return "regular expression";
@@ -102,18 +94,9 @@ public class SearchQuery implements SearchMatcher {
     }
 
     public String localize() {
-        return String.format("\"%s\" (%s, %s)",
+        return String.format("\"%s\" (%s)",
                 getQuery(),
-                getLocalizedCaseSensitiveDescription(),
                 getLocalizedRegularExpressionDescription());
-    }
-
-    private String getLocalizedCaseSensitiveDescription() {
-        if (searchFlags.contains(SearchRules.SearchFlags.CASE_SENSITIVE)) {
-            return Localization.lang("case sensitive");
-        } else {
-            return Localization.lang("case insensitive");
-        }
     }
 
     private String getLocalizedRegularExpressionDescription() {
@@ -184,11 +167,7 @@ public class SearchQuery implements SearchMatcher {
         }
         String searchPattern = joiner.collect(Collectors.joining(")|(", "(", ")"));
 
-        if (searchFlags.contains(SearchRules.SearchFlags.CASE_SENSITIVE)) {
-            return Optional.of(Pattern.compile(searchPattern));
-        } else {
-            return Optional.of(Pattern.compile(searchPattern, Pattern.CASE_INSENSITIVE));
-        }
+        return Optional.of(Pattern.compile(searchPattern, Pattern.CASE_INSENSITIVE));
     }
 
     public SearchRule getRule() {

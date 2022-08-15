@@ -89,7 +89,6 @@ public class GlobalSearchBar extends HBox {
     private static final PseudoClass CLASS_RESULTS_FOUND = PseudoClass.getPseudoClass("emptyResult");
 
     private final CustomTextField searchField = SearchTextField.create();
-    private final ToggleButton caseSensitiveButton;
     private final ToggleButton regularExpressionButton;
     private final ToggleButton fulltextButton;
     private final Button openGlobalSearchButton;
@@ -141,7 +140,6 @@ public class GlobalSearchBar extends HBox {
         ClipBoardManager.addX11Support(searchField);
 
         regularExpressionButton = IconTheme.JabRefIcons.REG_EX.asToggleButton();
-        caseSensitiveButton = IconTheme.JabRefIcons.CASE_SENSITIVE.asToggleButton();
         fulltextButton = IconTheme.JabRefIcons.FULLTEXT.asToggleButton();
         openGlobalSearchButton = IconTheme.JabRefIcons.OPEN_GLOBAL_SEARCH.asButton();
         keepSearchString = IconTheme.JabRefIcons.KEEP_SEARCH_STRING.asToggleButton();
@@ -150,7 +148,6 @@ public class GlobalSearchBar extends HBox {
 
         BooleanBinding focusedOrActive = searchField.focusedProperty()
                                                     .or(regularExpressionButton.focusedProperty())
-                                                    .or(caseSensitiveButton.focusedProperty())
                                                     .or(fulltextButton.focusedProperty())
                                                     .or(keepSearchString.focusedProperty())
                                                     .or(searchField.textProperty()
@@ -158,14 +155,12 @@ public class GlobalSearchBar extends HBox {
 
         regularExpressionButton.visibleProperty().unbind();
         regularExpressionButton.visibleProperty().bind(focusedOrActive);
-        caseSensitiveButton.visibleProperty().unbind();
-        caseSensitiveButton.visibleProperty().bind(focusedOrActive);
         fulltextButton.visibleProperty().unbind();
         fulltextButton.visibleProperty().bind(focusedOrActive);
         keepSearchString.visibleProperty().unbind();
         keepSearchString.visibleProperty().bind(focusedOrActive);
 
-        StackPane modifierButtons = new StackPane(new HBox(regularExpressionButton, caseSensitiveButton, fulltextButton, keepSearchString));
+        StackPane modifierButtons = new StackPane(new HBox(regularExpressionButton, fulltextButton, keepSearchString));
         modifierButtons.setAlignment(Pos.CENTER);
         searchField.setRight(new HBox(searchField.getRight(), modifierButtons));
         searchField.getStyleClass().add("search-field");
@@ -209,14 +204,6 @@ public class GlobalSearchBar extends HBox {
         initSearchModifierButton(regularExpressionButton);
         regularExpressionButton.setOnAction(event -> {
             searchPreferences.setSearchFlag(SearchRules.SearchFlags.REGULAR_EXPRESSION, regularExpressionButton.isSelected());
-            performSearch();
-        });
-
-        caseSensitiveButton.setSelected(searchPreferences.isCaseSensitive());
-        caseSensitiveButton.setTooltip(new Tooltip(Localization.lang("Case sensitive")));
-        initSearchModifierButton(caseSensitiveButton);
-        caseSensitiveButton.setOnAction(event -> {
-            searchPreferences.setSearchFlag(SearchRules.SearchFlags.CASE_SENSITIVE, caseSensitiveButton.isSelected());
             performSearch();
         });
 

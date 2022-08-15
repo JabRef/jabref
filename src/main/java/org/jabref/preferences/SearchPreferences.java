@@ -18,14 +18,11 @@ public class SearchPreferences {
     private final ObservableSet<SearchFlags> searchFlags;
     private final BooleanProperty keepWindowOnTop;
 
-    public SearchPreferences(SearchDisplayMode searchDisplayMode, boolean isCaseSensitive, boolean isRegularExpression, boolean isFulltext, boolean isKeepSearchString, boolean keepWindowOnTop) {
+    public SearchPreferences(SearchDisplayMode searchDisplayMode, boolean isRegularExpression, boolean isFulltext, boolean isKeepSearchString, boolean keepWindowOnTop) {
         this.searchDisplayMode = new SimpleObjectProperty<>(searchDisplayMode);
         this.keepWindowOnTop = new SimpleBooleanProperty(keepWindowOnTop);
 
         searchFlags = FXCollections.observableSet(EnumSet.noneOf(SearchFlags.class));
-        if (isCaseSensitive) {
-            searchFlags.add(SearchFlags.CASE_SENSITIVE);
-        }
         if (isRegularExpression) {
             searchFlags.add(SearchFlags.REGULAR_EXPRESSION);
         }
@@ -66,10 +63,6 @@ public class SearchPreferences {
 
     public void setSearchDisplayMode(SearchDisplayMode searchDisplayMode) {
         this.searchDisplayMode.set(searchDisplayMode);
-    }
-
-    public boolean isCaseSensitive() {
-        return searchFlags.contains(SearchFlags.CASE_SENSITIVE);
     }
 
     public void setSearchFlag(SearchFlags flag, boolean value) {

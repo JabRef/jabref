@@ -248,7 +248,6 @@ public class JabRefPreferences implements PreferencesService {
     public static final String MAIN_FILE_DIRECTORY = "fileDirectory";
 
     public static final String SEARCH_DISPLAY_MODE = "searchDisplayMode";
-    public static final String SEARCH_CASE_SENSITIVE = "caseSensitiveSearch";
     public static final String SEARCH_REG_EXP = "regExpSearch";
     public static final String SEARCH_FULLTEXT = "fulltextSearch";
     public static final String SEARCH_KEEP_SEARCH_STRING = "keepSearchString";
@@ -474,7 +473,6 @@ public class JabRefPreferences implements PreferencesService {
         Localization.setLanguage(getLanguage());
 
         defaults.put(SEARCH_DISPLAY_MODE, SearchDisplayMode.FILTER.toString());
-        defaults.put(SEARCH_CASE_SENSITIVE, Boolean.FALSE);
         defaults.put(SEARCH_REG_EXP, Boolean.FALSE);
         defaults.put(SEARCH_FULLTEXT, Boolean.TRUE);
         defaults.put(SEARCH_KEEP_SEARCH_STRING, Boolean.FALSE);
@@ -2638,7 +2636,6 @@ public class JabRefPreferences implements PreferencesService {
 
         searchPreferences = new SearchPreferences(
                 searchDisplayMode,
-                getBoolean(SEARCH_CASE_SENSITIVE),
                 getBoolean(SEARCH_REG_EXP),
                 getBoolean(SEARCH_FULLTEXT),
                 getBoolean(SEARCH_KEEP_SEARCH_STRING),
@@ -2646,7 +2643,6 @@ public class JabRefPreferences implements PreferencesService {
 
         EasyBind.listen(searchPreferences.searchDisplayModeProperty(), (obs, oldValue, newValue) -> put(SEARCH_DISPLAY_MODE, Objects.requireNonNull(searchPreferences.getSearchDisplayMode()).toString()));
         searchPreferences.getObservableSearchFlags().addListener((SetChangeListener<SearchRules.SearchFlags>) c -> {
-            putBoolean(SEARCH_CASE_SENSITIVE, searchPreferences.getObservableSearchFlags().contains(SearchRules.SearchFlags.CASE_SENSITIVE));
             putBoolean(SEARCH_REG_EXP, searchPreferences.getObservableSearchFlags().contains(SearchRules.SearchFlags.REGULAR_EXPRESSION));
             putBoolean(SEARCH_FULLTEXT, searchPreferences.getObservableSearchFlags().contains(SearchRules.SearchFlags.FULLTEXT));
             putBoolean(SEARCH_KEEP_SEARCH_STRING, searchPreferences.getObservableSearchFlags().contains(SearchRules.SearchFlags.KEEP_SEARCH_STRING));

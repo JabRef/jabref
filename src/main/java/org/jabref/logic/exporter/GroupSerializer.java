@@ -70,7 +70,7 @@ public class GroupSerializer {
         sb.append(MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR);
         sb.append(StringUtil.quote(group.getSearchExpression(), MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR, MetadataSerializationConfiguration.GROUP_QUOTE_CHAR));
         sb.append(MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR);
-        sb.append(StringUtil.booleanToBinaryString(group.getSearchFlags().contains(SearchRules.SearchFlags.CASE_SENSITIVE)));
+        sb.append(StringUtil.booleanToBinaryString(false));
         sb.append(MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR);
         sb.append(StringUtil.booleanToBinaryString(group.getSearchFlags().contains(SearchRules.SearchFlags.REGULAR_EXPRESSION)));
         sb.append(MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR);

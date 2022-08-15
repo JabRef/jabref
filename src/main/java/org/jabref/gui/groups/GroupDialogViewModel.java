@@ -49,7 +49,6 @@ import org.jabref.model.groups.SearchGroup;
 import org.jabref.model.groups.TexGroup;
 import org.jabref.model.groups.WordKeywordGroup;
 import org.jabref.model.metadata.MetaData;
-import org.jabref.model.search.rules.SearchRules;
 import org.jabref.model.search.rules.SearchRules.SearchFlags;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.preferences.PreferencesService;
@@ -199,10 +198,6 @@ public class GroupDialogViewModel {
         searchRegexValidator = new FunctionBasedValidator<>(
                 searchGroupSearchTermProperty,
                 input -> {
-                    if (!searchFlagsProperty.getValue().contains(SearchRules.SearchFlags.CASE_SENSITIVE)) {
-                        return true;
-                    }
-
                     if (StringUtil.isNullOrEmpty(input)) {
                         return false;
                     }

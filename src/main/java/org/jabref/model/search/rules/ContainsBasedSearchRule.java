@@ -3,7 +3,6 @@ package org.jabref.model.search.rules;
 import java.util.EnumSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Locale;
 
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
@@ -27,17 +26,10 @@ public class ContainsBasedSearchRule extends FullTextSearchRule {
     @Override
     public boolean applyRule(String query, BibEntry bibEntry) {
         String searchString = query;
-        if (!searchFlags.contains(SearchRules.SearchFlags.CASE_SENSITIVE)) {
-            searchString = searchString.toLowerCase(Locale.ROOT);
-        }
-
         List<String> unmatchedWords = new SentenceAnalyzer(searchString).getWords();
 
         for (Field fieldKey : bibEntry.getFields()) {
             String formattedFieldContent = StringUtil.stripAccents(bibEntry.getLatexFreeField(fieldKey).get());
-            if (!searchFlags.contains(SearchRules.SearchFlags.CASE_SENSITIVE)) {
-                formattedFieldContent = formattedFieldContent.toLowerCase(Locale.ROOT);
-            }
 
             Iterator<String> unmatchedWordsIterator = unmatchedWords.iterator();
             while (unmatchedWordsIterator.hasNext()) {

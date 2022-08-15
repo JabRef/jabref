@@ -28,7 +28,7 @@ public class RegexBasedSearchRule extends FullTextSearchRule {
     @Override
     public boolean validateSearchStrings(String query) {
         try {
-            Pattern.compile(query, searchFlags.contains(SearchRules.SearchFlags.CASE_SENSITIVE) ? 0 : Pattern.CASE_INSENSITIVE);
+            Pattern.compile(query, Pattern.CASE_INSENSITIVE);
         } catch (PatternSyntaxException ex) {
             return false;
         }
@@ -39,7 +39,7 @@ public class RegexBasedSearchRule extends FullTextSearchRule {
     public boolean applyRule(String query, BibEntry bibEntry) {
         Pattern pattern;
         try {
-            pattern = Pattern.compile(StringUtil.stripAccents(query), searchFlags.contains(SearchRules.SearchFlags.CASE_SENSITIVE) ? 0 : Pattern.CASE_INSENSITIVE);
+            pattern = Pattern.compile(StringUtil.stripAccents(query), Pattern.CASE_INSENSITIVE);
         } catch (PatternSyntaxException ex) {
             LOGGER.debug("Could not compile regex {}", query, ex);
             return false;

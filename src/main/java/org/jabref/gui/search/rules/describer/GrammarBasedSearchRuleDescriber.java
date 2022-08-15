@@ -40,9 +40,6 @@ public class GrammarBasedSearchRuleDescriber implements SearchDescriber {
         textFlow.getChildren().add(TooltipTextUtil.createText(String.format("%s ", Localization.lang("This search contains entries in which")), TooltipTextUtil.TextType.NORMAL));
         textFlow.getChildren().addAll(descriptionSearchBaseVisitor.visit(parseTree));
         textFlow.getChildren().add(TooltipTextUtil.createText(". ", TooltipTextUtil.TextType.NORMAL));
-        textFlow.getChildren().add(TooltipTextUtil.createText(searchFlags.contains(SearchRules.SearchFlags.CASE_SENSITIVE) ? Localization
-                .lang("The search is case sensitive.") :
-                Localization.lang("The search is case insensitive."), TooltipTextUtil.TextType.NORMAL));
         return textFlow;
     }
 

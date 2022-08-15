@@ -145,9 +145,8 @@ public class GrammarBasedSearchRule implements SearchRule {
         public Comparator(String field, String value, ComparisonOperator operator, EnumSet<SearchFlags> searchFlags) {
             this.operator = operator;
 
-            int option = searchFlags.contains(SearchRules.SearchFlags.CASE_SENSITIVE) ? 0 : Pattern.CASE_INSENSITIVE;
-            this.fieldPattern = Pattern.compile(searchFlags.contains(SearchRules.SearchFlags.REGULAR_EXPRESSION) ? StringUtil.stripAccents(field) : "\\Q" + StringUtil.stripAccents(field) + "\\E", option);
-            this.valuePattern = Pattern.compile(searchFlags.contains(SearchRules.SearchFlags.REGULAR_EXPRESSION) ? StringUtil.stripAccents(value) : "\\Q" + StringUtil.stripAccents(value) + "\\E", option);
+            this.fieldPattern = Pattern.compile(searchFlags.contains(SearchRules.SearchFlags.REGULAR_EXPRESSION) ? StringUtil.stripAccents(field) : "\\Q" + StringUtil.stripAccents(field) + "\\E", Pattern.CASE_INSENSITIVE);
+            this.valuePattern = Pattern.compile(searchFlags.contains(SearchRules.SearchFlags.REGULAR_EXPRESSION) ? StringUtil.stripAccents(value) : "\\Q" + StringUtil.stripAccents(value) + "\\E", Pattern.CASE_INSENSITIVE);
         }
 
         public boolean compare(BibEntry entry) {
