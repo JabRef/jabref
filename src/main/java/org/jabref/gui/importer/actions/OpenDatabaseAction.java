@@ -15,7 +15,6 @@ import java.util.Optional;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.Globals;
 import org.jabref.gui.JabRefFrame;
-import org.jabref.gui.JabRefGUI;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
@@ -186,7 +185,7 @@ public class OpenDatabaseAction extends SimpleCommand {
     }
 
     /**
-     * This method is similar to {@link JabRefGUI#openLastEditedDatabases()}.
+     * This method is similar to {@link org.jabref.gui.JabRefGUI#openLastEditedDatabases()}.
      * This method also has the capability to open remote shared databases
      */
     private ParserResult loadDatabase(Path file) throws Exception {
