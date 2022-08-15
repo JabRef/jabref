@@ -51,17 +51,6 @@ public class DelayTaskThrottler {
         return scheduledTask;
     }
 
-    // Execute scheduled Runnable early
-    public void execute(Runnable command) {
-        delay = 0;
-        schedule(command);
-    }
-
-    // Cancel scheduled Runnable gracefully
-    public void cancel() {
-        scheduledTask.cancel(false);
-    }
-
     public <T> ScheduledFuture<?> scheduleTask(Callable<?> command) {
         if (scheduledTask != null) {
             cancel();
@@ -72,6 +61,17 @@ public class DelayTaskThrottler {
             LOGGER.debug("Rejecting while another process is already running.");
         }
         return scheduledTask;
+    }
+
+    // Execute scheduled Runnable early
+    public void execute(Runnable command) {
+        delay = 0;
+        schedule(command);
+    }
+
+    // Cancel scheduled Runnable gracefully
+    public void cancel() {
+        scheduledTask.cancel(false);
     }
 
     /**

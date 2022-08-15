@@ -61,9 +61,9 @@ public class AutosaveManager {
      * @param bibDatabaseContext Associated {@link BibDatabaseContext}
      */
     public static AutosaveManager start(BibDatabaseContext bibDatabaseContext) {
-        AutosaveManager autosaver = new AutosaveManager(bibDatabaseContext);
-        runningInstances.add(autosaver);
-        return autosaver;
+        AutosaveManager autosaveManager = new AutosaveManager(bibDatabaseContext);
+        runningInstances.add(autosaveManager);
+        return autosaveManager;
     }
 
     /**

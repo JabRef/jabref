@@ -19,7 +19,6 @@ import javafx.scene.text.Text;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.LibraryTab;
-import org.jabref.gui.dialogs.AutosaveUiManager;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.autosaveandbackup.AutosaveManager;
@@ -104,7 +103,7 @@ public class SaveDatabaseAction {
     }
 
     /**
-     * @param file the new file name to save the data base to. This is stored in the database context of the panel upon
+     * @param file the new file name to save the database to. This is stored in the database context of the panel upon
      *             successful save.
      * @return true on successful save
      */
@@ -131,19 +130,13 @@ public class SaveDatabaseAction {
 
         if (saveResult) {
             // we managed to successfully save the file
-            // thus, we can store the store the path into the context
+            // thus, we can store the path into the context
             context.setDatabasePath(file);
             libraryTab.updateTabTitle(false);
 
             // Reset (here: uninstall and install again) AutosaveManager and BackupManager for the new file name
             libraryTab.resetChangeMonitor();
-            if (readyForAutosave(context)) {
-                AutosaveManager autosaver = AutosaveManager.start(context);
-                autosaver.registerListener(new AutosaveUiManager(libraryTab));
-            }
-            if (readyForBackup(context)) {
-                BackupManager.start(context, entryTypesManager, preferences);
-            }
+            libraryTab.installAutosaveManagerAndBackupManager();
 
             frame.getFileHistory().newFile(file);
         }
@@ -283,16 +276,5 @@ public class SaveDatabaseAction {
                 saveDatabase(file, selectedOnly, newEncoding.get(), saveType);
             }
         }
-    }
-
-    private boolean readyForAutosave(BibDatabaseContext context) {
-        return ((context.getLocation() == DatabaseLocation.SHARED)
-                || ((context.getLocation() == DatabaseLocation.LOCAL)
-                && preferences.getImportExportPreferences().shouldAutoSave()))
-                && context.getDatabasePath().isPresent();
-    }
-
-    private boolean readyForBackup(BibDatabaseContext context) {
-        return (context.getLocation() == DatabaseLocation.LOCAL) && context.getDatabasePath().isPresent();
     }
 }
