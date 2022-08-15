@@ -258,7 +258,8 @@ public class MainTableColumnFactory {
                 database,
                 externalFileTypes,
                 dialogService,
-                preferencesService);
+                preferencesService,
+                stateManager);
     }
 
     /**
@@ -270,6 +271,7 @@ public class MainTableColumnFactory {
                 externalFileTypes,
                 dialogService,
                 preferencesService,
+                stateManager,
                 columnModel.getQualifier());
     }
 

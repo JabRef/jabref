@@ -46,4 +46,8 @@ public final class LuceneSearchResults {
     public float getSearchScore() {
         return this.searchResults.stream().map(SearchResult::getLuceneScore).max(Comparator.comparing(Float::floatValue)).orElse(Float.valueOf(0));
     }
+
+    public boolean hasFulltextResults() {
+        return this.searchResults.stream().map(SearchResult::hasFulltextResults).anyMatch(Boolean::valueOf);
+    }
 }

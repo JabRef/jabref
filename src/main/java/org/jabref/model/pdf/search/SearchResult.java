@@ -34,6 +34,7 @@ public final class SearchResult {
     private final int pageNumber;
     private final long modified;
     private final int hash;
+    private final boolean hasFulltextResults;
 
     private final float luceneScore;
     private List<String> contentResultStringsHtml;
@@ -50,6 +51,7 @@ public final class SearchResult {
 
             String content = getFieldContents(searcher, scoreDoc, CONTENT);
             String annotations = getFieldContents(searcher, scoreDoc, ANNOTATIONS);
+            this.hasFulltextResults = !(content.isEmpty() && annotations.isEmpty());
 
             Highlighter highlighter = new Highlighter(new SimpleHTMLFormatter("<b>", "</b>"), new QueryScorer(query));
 
@@ -71,6 +73,7 @@ public final class SearchResult {
             this.hash = Integer.parseInt(getFieldContents(searcher, scoreDoc, BIB_ENTRY_ID_HASH));
             this.pageNumber = -1;
             this.modified = -1;
+            this.hasFulltextResults = false;
         }
     }
 
@@ -122,5 +125,9 @@ public final class SearchResult {
 
     public int getPageNumber() {
         return pageNumber;
+    }
+
+    public boolean hasFulltextResults() {
+        return this.hasFulltextResults;
     }
 }

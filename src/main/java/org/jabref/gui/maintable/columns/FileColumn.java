@@ -12,6 +12,7 @@ import javafx.scene.input.MouseButton;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.Globals;
+import org.jabref.gui.StateManager;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.fieldeditors.LinkedFileViewModel;
@@ -36,6 +37,7 @@ public class FileColumn extends MainTableColumn<List<LinkedFile>> {
     private final DialogService dialogService;
     private final BibDatabaseContext database;
     private final PreferencesService preferencesService;
+    private final StateManager stateManager;
 
     /**
      * Creates a joined column for all the linked files.
@@ -44,12 +46,14 @@ public class FileColumn extends MainTableColumn<List<LinkedFile>> {
                       BibDatabaseContext database,
                       ExternalFileTypes externalFileTypes,
                       DialogService dialogService,
-                      PreferencesService preferencesService) {
+                      PreferencesService preferencesService,
+                      StateManager stateManager) {
         super(model);
         this.externalFileTypes = Objects.requireNonNull(externalFileTypes);
         this.database = Objects.requireNonNull(database);
         this.dialogService = dialogService;
         this.preferencesService = preferencesService;
+        this.stateManager = stateManager;
 
         setCommonSettings();
 
@@ -84,12 +88,14 @@ public class FileColumn extends MainTableColumn<List<LinkedFile>> {
                       ExternalFileTypes externalFileTypes,
                       DialogService dialogService,
                       PreferencesService preferencesService,
+                      StateManager stateManager,
                       String fileType) {
         super(model);
         this.externalFileTypes = Objects.requireNonNull(externalFileTypes);
         this.database = Objects.requireNonNull(database);
         this.dialogService = dialogService;
         this.preferencesService = preferencesService;
+        this.stateManager = stateManager;
 
         setCommonSettings();
 
@@ -99,7 +105,7 @@ public class FileColumn extends MainTableColumn<List<LinkedFile>> {
                 .getGraphicNode());
 
         new ValueTableCellFactory<BibEntryTableViewModel, List<LinkedFile>>()
-                .withGraphic(linkedFiles -> createFileIcon(linkedFiles.stream().filter(linkedFile ->
+                .withGraphic((entry, linkedFiles) -> createFileIcon(entry, linkedFiles.stream().filter(linkedFile ->
                                 linkedFile.getFileType().equalsIgnoreCase(fileType)).collect(Collectors.toList())))
                 .install(this);
     }
@@ -143,7 +149,10 @@ public class FileColumn extends MainTableColumn<List<LinkedFile>> {
         return contextMenu;
     }
 
-    private Node createFileIcon(List<LinkedFile> linkedFiles) {
+    private Node createFileIcon(BibEntryTableViewModel entry, List<LinkedFile> linkedFiles) {
+        if (linkedFiles.size() > 0 && stateManager.getSearchResults().containsKey(entry.getEntry()) && stateManager.getSearchResults().get(entry.getEntry()).hasFulltextResults()) {
+            return IconTheme.JabRefIcons.FILE_SEARCH.getGraphicNode();
+        }
         if (linkedFiles.size() > 1) {
             return IconTheme.JabRefIcons.FILE_MULTIPLE.getGraphicNode();
         } else if (linkedFiles.size() == 1) {
