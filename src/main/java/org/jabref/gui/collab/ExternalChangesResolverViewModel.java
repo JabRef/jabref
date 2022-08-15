@@ -1,6 +1,5 @@
 package org.jabref.gui.collab;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -86,13 +85,15 @@ public class ExternalChangesResolverViewModel extends AbstractViewModel {
         return canOpenAdvancedMergeDialog;
     }
 
-    public void acceptSelectedChanges(List<DatabaseChangeViewModel> selectedChanges) {
-        selectedChanges.forEach(DatabaseChangeViewModel::accept);
-        getChanges().removeAll(new ArrayList<>(selectedChanges));
+    public void acceptChange() {
+        getSelectedChange().ifPresent(selectedChange -> {
+            selectedChange.accept();
+            getChanges().remove(selectedChange);
+        });
     }
 
-    public void denySelectedChanges(List<DatabaseChangeViewModel> selectedChanges) {
-        getChanges().removeAll(new ArrayList<>(selectedChanges));
+    public void denyChange() {
+        getSelectedChange().ifPresent(getChanges()::remove);
     }
 
     private void makeChanges() {

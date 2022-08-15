@@ -93,17 +93,17 @@ public class ExternalChangesResolverDialog extends BaseDialog<Boolean> {
 
     @FXML
     public void denyChanges() {
-        viewModel.denySelectedChanges(changesTableView.getSelectionModel().getSelectedItems());
+        viewModel.denyChange();
     }
 
     @FXML
     public void acceptChanges() {
-        viewModel.acceptSelectedChanges(changesTableView.getSelectionModel().getSelectedItems());
+        viewModel.acceptChange();
     }
 
     @FXML
     public void openAdvancedMergeDialog() {
         viewModel.getSelectedChange().flatMap(DatabaseChangeViewModel::openAdvancedMergeDialog)
-                 .ifPresent(change -> viewModel.acceptSelectedChanges(changesTableView.getSelectionModel().getSelectedItems()));
+                 .ifPresent(change -> viewModel.acceptChange());
     }
 }
