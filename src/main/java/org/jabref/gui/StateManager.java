@@ -58,7 +58,6 @@ public class StateManager {
     private final ObservableMap<BibDatabaseContext, ObservableList<GroupTreeNode>> selectedGroups = FXCollections.observableHashMap();
     private final OptionalObjectProperty<SearchQuery> activeSearchQuery = OptionalObjectProperty.empty();
     private final ObservableMap<BibEntry, LuceneSearchResults> searchResults = FXCollections.observableHashMap();
-    private final ObservableMap<BibDatabaseContext, IntegerProperty> searchResultMap = FXCollections.observableHashMap();
     private final OptionalObjectProperty<Node> focusOwner = OptionalObjectProperty.empty();
     private final ObservableList<Pair<BackgroundTask, Task<?>>> backgroundTasks = FXCollections.observableArrayList(task -> new Observable[] {task.getValue().progressProperty(), task.getValue().runningProperty()});
     private final EasyBinding<Boolean> anyTaskRunning = EasyBind.reduce(backgroundTasks, tasks -> tasks.map(Pair::getValue).anyMatch(Task::isRunning));
@@ -93,12 +92,10 @@ public class StateManager {
         return activeSearchQuery;
     }
 
-    public void setActiveSearchResultSize(BibDatabaseContext database, IntegerProperty resultSize) {
-        searchResultMap.put(database, resultSize);
-    }
-
     public IntegerProperty getSearchResultSize() {
-        return searchResultMap.getOrDefault(activeDatabase.getValue().orElse(new BibDatabaseContext()), new SimpleIntegerProperty(0));
+        IntegerProperty size = new SimpleIntegerProperty();
+        size.bind(Bindings.size(searchResults));
+        return size;
     }
 
     public ReadOnlyListProperty<GroupTreeNode> activeGroupProperty() {

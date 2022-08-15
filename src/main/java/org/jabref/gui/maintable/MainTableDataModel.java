@@ -5,10 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import javafx.beans.binding.Bindings;
-import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
@@ -60,9 +57,6 @@ public class MainTableDataModel {
         );
         stateManager.activeSearchQueryProperty().addListener((observable, oldValue, newValue) -> doSearch(newValue));
 
-        IntegerProperty resultSize = new SimpleIntegerProperty();
-        resultSize.bind(Bindings.size(entriesFiltered));
-        stateManager.setActiveSearchResultSize(context, resultSize);
         // We need to wrap the list since otherwise sorting in the table does not work
         entriesSorted = new SortedList<>(entriesFiltered);
     }
@@ -71,10 +65,10 @@ public class MainTableDataModel {
         if (query.isPresent()) {
             String searchString = query.get().getQuery();
             try {
-                LuceneSearcher searcher = LuceneSearcher.of(bibDatabaseContext);
-                Map<BibEntry, LuceneSearchResults> results = searcher.search(query.get());
                 stateManager.getSearchResults().clear();
-                stateManager.getSearchResults().putAll(results);
+                for (BibDatabaseContext context : stateManager.getOpenDatabases()) {
+                    stateManager.getSearchResults().putAll(LuceneSearcher.of(context).search(query.get()));
+                }
             } catch (IOException e) {
                 e.printStackTrace();
             }
