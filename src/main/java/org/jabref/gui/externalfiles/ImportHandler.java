@@ -78,7 +78,7 @@ public class ImportHandler {
         this.dialogService = dialogService;
         this.importFormatReader = importFormatReader;
 
-        this.linker = new ExternalFilesEntryLinker(preferencesService.getFilePreferences(), database);
+        this.linker = new ExternalFilesEntryLinker(preferencesService, preferencesService.getFilePreferences(), database);
         this.contentImporter = new ExternalFilesContentImporter(
                 preferencesService.getGeneralPreferences(),
                 preferencesService.getImporterPreferences(),

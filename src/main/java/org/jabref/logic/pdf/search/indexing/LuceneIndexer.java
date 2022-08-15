@@ -15,11 +15,15 @@ import org.jabref.gui.LibraryTab;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.Keyword;
+import org.jabref.model.entry.KeywordList;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.pdf.search.EnglishStemAnalyzer;
 import org.jabref.model.pdf.search.SearchFieldConstants;
 import org.jabref.preferences.FilePreferences;
+import org.jabref.preferences.PreferencesService;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.StringField;
@@ -52,16 +56,18 @@ public class LuceneIndexer {
     private final Directory directoryToIndex;
     private final BibDatabaseContext databaseContext;
 
+    private final PreferencesService preferences;
     private final FilePreferences filePreferences;
 
-    public LuceneIndexer(BibDatabaseContext databaseContext, FilePreferences filePreferences) throws IOException {
+    public LuceneIndexer(BibDatabaseContext databaseContext, PreferencesService preferences, FilePreferences filePreferences) throws IOException {
         this.databaseContext = databaseContext;
         this.directoryToIndex = new NIOFSDirectory(databaseContext.getFulltextIndexPath());
+        this.preferences = preferences;
         this.filePreferences = filePreferences;
     }
 
-    public static LuceneIndexer of(BibDatabaseContext databaseContext, FilePreferences filePreferences) throws IOException {
-        return new LuceneIndexer(databaseContext, filePreferences);
+    public static LuceneIndexer of(BibDatabaseContext databaseContext, PreferencesService preferences, FilePreferences filePreferences) throws IOException {
+        return new LuceneIndexer(databaseContext, preferences, filePreferences);
     }
 
     public BibDatabaseContext getDatabaseContext() {
@@ -158,8 +164,16 @@ public class LuceneIndexer {
                 Document document = new Document();
                 document.add(new StringField(SearchFieldConstants.BIB_ENTRY_ID_HASH, String.valueOf(bibEntry.getLastIndexHash()), org.apache.lucene.document.Field.Store.YES));
                 for (Map.Entry<Field, String> field : bibEntry.getFieldMap().entrySet()) {
-                    document.add(new TextField(field.getKey().getName(), field.getValue(), org.apache.lucene.document.Field.Store.YES));
-                    SearchFieldConstants.searchableBibFields.add(field.getKey().getName());
+                    if (field.getKey() == StandardField.KEYWORDS) {
+                        System.out.println("Indexing keywords " + field.getValue());
+                        KeywordList keywords = KeywordList.parse(field.getValue(), preferences.getKeywordDelimiter());
+                        for (Keyword keyword : keywords) {
+                            document.add(new StringField(field.getKey().getName(), keyword.toString(), org.apache.lucene.document.Field.Store.YES));
+                        }
+                    } else {
+                        document.add(new TextField(field.getKey().getName(), field.getValue(), org.apache.lucene.document.Field.Store.YES));
+                        SearchFieldConstants.searchableBibFields.add(field.getKey().getName());
+                    }
                 }
                 indexWriter.addDocument(document);
                 indexWriter.commit();
