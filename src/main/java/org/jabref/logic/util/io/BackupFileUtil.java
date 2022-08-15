@@ -11,6 +11,7 @@ import java.util.Optional;
 
 import org.jabref.logic.util.BackupFileType;
 import org.jabref.logic.util.BuildInfo;
+import org.jabref.logic.util.OS;
 
 import net.harawata.appdirs.AppDirsFactory;
 import org.slf4j.Logger;
@@ -25,9 +26,9 @@ public class BackupFileUtil {
 
     public static Path getAppDataBackupDir() {
         Path directory = Path.of(AppDirsFactory.getInstance().getUserDataDir(
-                                     "jabref",
+                                     OS.APP_DIR_APP_NAME,
                                      new BuildInfo().version.toString(),
-                                     "org.jabref"))
+                                     OS.APP_DIR_APP_AUTHOR))
                              .resolve("backups");
         return directory;
     }
