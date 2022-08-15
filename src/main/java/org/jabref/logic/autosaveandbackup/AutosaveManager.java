@@ -41,16 +41,12 @@ public class AutosaveManager {
     }
 
     @Subscribe
-    public synchronized void listen(@SuppressWarnings("unused") BibDatabaseContextChangedEvent event) {
+    public void listen(@SuppressWarnings("unused") BibDatabaseContextChangedEvent event) {
         if (!event.isFilteredOut()) {
-            startAutosaveTask();
+            throttler.schedule(() -> {
+                eventBus.post(new AutosaveEvent());
+            });
         }
-    }
-
-    private void startAutosaveTask() {
-        throttler.schedule(() -> {
-            eventBus.post(new AutosaveEvent());
-        });
     }
 
     private void shutdown() {
