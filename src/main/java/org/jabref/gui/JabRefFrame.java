@@ -1140,13 +1140,6 @@ public class JabRefFrame extends BorderPane {
         return libraryTab;
     }
 
-    private boolean readyForAutosave(BibDatabaseContext context) {
-        return ((context.getLocation() == DatabaseLocation.SHARED)
-                || ((context.getLocation() == DatabaseLocation.LOCAL)
-                && prefs.getImportExportPreferences().shouldAutoSave()))
-                && context.getDatabasePath().isPresent();
-    }
-
     /**
      * Opens the import inspection dialog to let the user decide which of the given entries to import.
      *
