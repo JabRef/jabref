@@ -19,9 +19,9 @@ import static org.mockito.Mockito.mock;
 @FetcherTest
 public class DoiFetcherTest {
 
-    private DoiFetcher fetcher = new DoiFetcher(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS));
+    private final DoiFetcher fetcher = new DoiFetcher(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS));
 
-    private BibEntry bibEntryBurd2011 = new BibEntry(StandardEntryType.Book)
+    private final BibEntry bibEntryBurd2011 = new BibEntry(StandardEntryType.Book)
             .withCitationKey("Burd_2011")
             .withField(StandardField.TITLE, "Java{\\textregistered} For Dummies{\\textregistered}")
             .withField(StandardField.PUBLISHER, "Wiley")
@@ -29,7 +29,7 @@ public class DoiFetcherTest {
             .withField(StandardField.AUTHOR, "Barry Burd")
             .withField(StandardField.MONTH, "jul")
             .withField(StandardField.DOI, "10.1002/9781118257517");
-    private BibEntry bibEntryDecker2007 = new BibEntry(StandardEntryType.InProceedings)
+    private final BibEntry bibEntryDecker2007 = new BibEntry(StandardEntryType.InProceedings)
             .withCitationKey("Decker_2007")
             .withField(StandardField.AUTHOR, "Gero Decker and Oliver Kopp and Frank Leymann and Mathias Weske")
             .withField(StandardField.BOOKTITLE, "{IEEE} International Conference on Web Services ({ICWS} 2007)")
@@ -38,7 +38,7 @@ public class DoiFetcherTest {
             .withField(StandardField.TITLE, "{BPEL}4Chor: Extending {BPEL} for Modeling Choreographies")
             .withField(StandardField.YEAR, "2007")
             .withField(StandardField.DOI, "10.1109/icws.2007.59");
-    private BibEntry bibEntryIannarelli2019 = new BibEntry(StandardEntryType.Article)
+    private final BibEntry bibEntryIannarelli2019 = new BibEntry(StandardEntryType.Article)
             .withField(StandardField.AUTHOR,
                     ""
                             + "Iannarelli Riccardo  and "
@@ -55,7 +55,7 @@ public class DoiFetcherTest {
             .withField(StandardField.JOURNAL, "Chemical Engineering Transactions")
             .withField(StandardField.PAGES, "871-876")
             .withField(StandardField.VOLUME, "77");
-    private BibEntry bibEntryStenzel2020 = new BibEntry(StandardEntryType.Article)
+    private final BibEntry bibEntryStenzel2020 = new BibEntry(StandardEntryType.Article)
             .withCitationKey("Stenzel_2020")
             .withField(StandardField.AUTHOR, "L. Stenzel and A. L. C. Hayward and U. Schollwöck and F. Heidrich-Meisner")
             .withField(StandardField.JOURNAL, "Physical Review A")
@@ -99,6 +99,16 @@ public class DoiFetcherTest {
     @Test
     public void testPerformSearchInvalidDOI() {
         assertThrows(FetcherException.class, () -> fetcher.performSearchById("10.1002/9781118257517F"));
+    }
+
+    @Test
+    public void testPerformSearchInvalidDOIClientResultsinFetcherClientException() {
+        assertThrows(FetcherException.class, () -> fetcher.performSearchById("10.1002/9781118257517F"));
+    }
+
+    @Test
+    public void testPerformSearchInvalidDOIClientResultsinFetcherClientException2() {
+        assertThrows(FetcherException.class, () -> fetcher.performSearchById("10.1002/9781517F"));
     }
 
     @Test

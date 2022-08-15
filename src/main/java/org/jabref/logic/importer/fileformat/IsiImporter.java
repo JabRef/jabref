@@ -281,7 +281,7 @@ public class IsiImporter extends Importer {
                     if ("ER".equals(beg) || "EF".equals(beg) || "VR".equals(beg) || "FN".equals(beg)) {
                         continue;
                     }
-                    hm.put(FieldFactory.parseField(beg), value);
+                    hm.put(FieldFactory.parseField(type, beg), value);
                 }
             }
 

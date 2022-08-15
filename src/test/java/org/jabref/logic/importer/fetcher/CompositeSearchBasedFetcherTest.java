@@ -126,7 +126,7 @@ public class CompositeSearchBasedFetcherTest {
             // Only shift i at maximum to its MSB to the right
             for (int j = 0; Math.pow(2, j) <= i; j++) {
                 // Add fetcher j to the list if the j-th bit of i is 1
-                if ((i >> j) % 2 == 1) {
+                if (((i >> j) % 2) == 1) {
                     fetchers.add(list.get(j));
                 }
             }

@@ -4,10 +4,8 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.Predicate;
 
 import javafx.beans.binding.Bindings;
-import javafx.beans.binding.ObjectBinding;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleIntegerProperty;
@@ -45,6 +43,7 @@ public class MainTableDataModel {
         this.preferencesService = preferencesService;
         this.groupsPreferences = preferencesService.getGroupsPreferences();
         this.bibDatabaseContext = context;
+        this.stateManager = stateManager;
         this.fieldValueFormatter = new SimpleObjectProperty<>(
                 new MainTableFieldValueFormatter(preferencesService, bibDatabaseContext));
 
@@ -53,12 +52,13 @@ public class MainTableDataModel {
                 new BibEntryTableViewModel(entry, bibDatabaseContext, fieldValueFormatter, stateManager));
 
         entriesFiltered = new FilteredList<>(entriesViewModel);
-        ObjectBinding<Predicate<BibEntryTableViewModel>> filter = Bindings.createObjectBinding(
-                () -> entry -> isMatchedByGroup(stateManager.activeGroupProperty(), entry), stateManager.activeGroupProperty());
-        entriesFiltered.predicateProperty().bind(filter);
-
+        entriesFiltered.predicateProperty().bind(
+                EasyBind.combine(stateManager.activeGroupProperty(),
+                        stateManager.activeSearchQueryProperty(),
+                        groupsPreferences.groupViewModeProperty(),
+                        (groups, query, groupViewMode) -> entry -> isMatchedByGroup(groups, entry))
+        );
         stateManager.activeSearchQueryProperty().addListener((observable, oldValue, newValue) -> doSearch(newValue));
-        this.stateManager = stateManager;
 
         IntegerProperty resultSize = new SimpleIntegerProperty();
         resultSize.bind(Bindings.size(entriesFiltered));

@@ -56,9 +56,6 @@ public class FieldFormatterCleanup implements CleanupJob {
 
         // Run formatter
         String newValue = formatter.format(oldValue);
-        if (formatter instanceof NormalizeNewlinesFormatter) {
-            newValue = oldValue;
-        }
 
         if (oldValue.equals(newValue)) {
             return Collections.emptyList();
