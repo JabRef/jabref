@@ -9,7 +9,7 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.pdf.search.indexing.LuceneIndexer;
+import org.jabref.logic.search.indexing.LuceneIndexer;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.preferences.FilePreferences;
 import org.jabref.preferences.PreferencesService;

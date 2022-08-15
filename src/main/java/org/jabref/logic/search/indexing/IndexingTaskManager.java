@@ -1,4 +1,4 @@
-package org.jabref.logic.pdf.search.indexing;
+package org.jabref.logic.search.indexing;
 
 import java.util.List;
 import java.util.Set;
