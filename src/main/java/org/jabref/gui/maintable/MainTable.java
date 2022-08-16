@@ -13,6 +13,7 @@ import javax.swing.undo.UndoManager;
 
 import javafx.collections.ListChangeListener;
 import javafx.collections.SetChangeListener;
+import javafx.css.PseudoClass;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
@@ -137,6 +138,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                         Globals.getClipboardManager(),
                         Globals.TASK_EXECUTOR,
                         Globals.entryTypesManager))
+                .withPseudoClass(PseudoClass.getPseudoClass("entry-not-matching-search"), entry -> stateManager.activeSearchQueryProperty().isPresent().and(entry.searchScoreProperty().isEqualTo(0)))
                 .setOnDragDetected(this::handleOnDragDetected)
                 .setOnDragDropped(this::handleOnDragDropped)
                 .setOnDragOver(this::handleOnDragOver)

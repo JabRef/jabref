@@ -50,7 +50,7 @@ public class BibEntryTableViewModel {
     private final Binding<List<AbstractGroup>> matchedGroups;
     private final BibDatabaseContext bibDatabaseContext;
 
-    private final FloatProperty searchScore = new SimpleFloatProperty();
+    private final FloatProperty searchScore = new SimpleFloatProperty(0);
 
     public BibEntryTableViewModel(BibEntry entry, BibDatabaseContext bibDatabaseContext, ObservableValue<MainTableFieldValueFormatter> fieldValueFormatter, StateManager stateManager) {
         this.entry = entry;

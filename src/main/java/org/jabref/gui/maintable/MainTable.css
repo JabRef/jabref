@@ -36,6 +36,11 @@
     -fx-padding: -2 0 0 0;
 }
 
+.table-row-cell:entry-not-matching-search {
+    -fx-background-color: -jr-base;
+    -fx-opacity: 50%;
+}
+
 .rating > .container {
     -fx-spacing: 2;
 }
@@ -57,3 +62,4 @@
 .rating > .container > .button:hover {
     -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.6), 8, 0.0, 0, 0);
 }
+
