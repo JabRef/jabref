@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 import javax.swing.undo.UndoManager;
 
 import javafx.collections.ListChangeListener;
+import javafx.collections.SetChangeListener;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
@@ -50,6 +51,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.event.EntriesAddedEvent;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.search.rules.SearchRules;
 import org.jabref.preferences.PreferencesService;
 
 import com.google.common.eventbus.Subscribe;
@@ -63,6 +65,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     private final LibraryTab libraryTab;
     private final DialogService dialogService;
     private final StateManager stateManager;
+    private final PreferencesService preferencesService;
     private final BibDatabaseContext database;
     private final MainTableDataModel model;
 
@@ -86,6 +89,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         this.libraryTab = libraryTab;
         this.dialogService = dialogService;
         this.stateManager = stateManager;
+        this.preferencesService = preferencesService;
         this.database = Objects.requireNonNull(database);
         this.model = model;
         this.clipBoardManager = clipBoardManager;
@@ -160,11 +164,19 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
             @Override
             public void onChanged(Change<? extends TableColumn<BibEntryTableViewModel, ?>> c) {
                 getSortOrder().removeListener(this);
-                getSortOrder().removeAll(getColumns().get(0));
-                getSortOrder().add(0, getColumns().get(0));
+                updateSortOrder();
                 getSortOrder().addListener(this);
             }
         };
+
+        preferencesService.getSearchPreferences().getObservableSearchFlags().addListener(new SetChangeListener<SearchRules.SearchFlags>() {
+            @Override
+            public void onChanged(Change<? extends SearchRules.SearchFlags> change) {
+                getSortOrder().removeListener(scoreSortOderPrioritizer);
+                updateSortOrder();
+                getSortOrder().addListener(scoreSortOderPrioritizer);
+            }
+        });
 
         // insert score sort order
         this.getSortOrder().add(0, this.getColumns().get(0));
@@ -206,6 +218,13 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         });
 
         database.getDatabase().registerListener(this);
+    }
+
+    private void updateSortOrder() {
+        if (preferencesService.getSearchPreferences().isSortByScore()) {
+            getSortOrder().removeAll(getColumns().get(0));
+            getSortOrder().add(0, getColumns().get(0));
+        }
     }
 
     /**

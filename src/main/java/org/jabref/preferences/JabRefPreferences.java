@@ -253,6 +253,7 @@ public class JabRefPreferences implements PreferencesService {
     public static final String SEARCH_KEEP_SEARCH_STRING = "keepSearchString";
     public static final String SEARCH_KEEP_GLOBAL_WINDOW_ON_TOP = "keepOnTop";
     public static final String SEARCH_FLOATING_MODE = "floatingSearch";
+    public static final String SEARCH_SORT_BY_SCORE = "sortByScore";
 
     public static final String GENERATE_KEY_ON_IMPORT = "generateKeyOnImport";
     public static final String GROBID_ENABLED = "grobidEnabled";
@@ -478,6 +479,7 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(SEARCH_FULLTEXT, Boolean.TRUE);
         defaults.put(SEARCH_KEEP_SEARCH_STRING, Boolean.FALSE);
         defaults.put(SEARCH_KEEP_GLOBAL_WINDOW_ON_TOP, Boolean.TRUE);
+        defaults.put(SEARCH_SORT_BY_SCORE, Boolean.TRUE);
         defaults.put(SEARCH_FLOATING_MODE, Boolean.FALSE);
 
         defaults.put(GENERATE_KEY_ON_IMPORT, Boolean.TRUE);
@@ -2642,6 +2644,7 @@ public class JabRefPreferences implements PreferencesService {
                 getBoolean(SEARCH_FULLTEXT),
                 getBoolean(SEARCH_KEEP_SEARCH_STRING),
                 getBoolean(SEARCH_FLOATING_MODE),
+                getBoolean(SEARCH_SORT_BY_SCORE),
                 getBoolean(SEARCH_KEEP_GLOBAL_WINDOW_ON_TOP));
 
         EasyBind.listen(searchPreferences.searchDisplayModeProperty(), (obs, oldValue, newValue) -> put(SEARCH_DISPLAY_MODE, Objects.requireNonNull(searchPreferences.getSearchDisplayMode()).toString()));
@@ -2650,6 +2653,7 @@ public class JabRefPreferences implements PreferencesService {
             putBoolean(SEARCH_FULLTEXT, searchPreferences.getObservableSearchFlags().contains(SearchRules.SearchFlags.FULLTEXT));
             putBoolean(SEARCH_KEEP_SEARCH_STRING, searchPreferences.getObservableSearchFlags().contains(SearchRules.SearchFlags.KEEP_SEARCH_STRING));
             putBoolean(SEARCH_FLOATING_MODE, searchPreferences.getObservableSearchFlags().contains(SearchRules.SearchFlags.FLOATING_SEARCH));
+            putBoolean(SEARCH_SORT_BY_SCORE, searchPreferences.getObservableSearchFlags().contains(SearchRules.SearchFlags.SORT_BY_SCORE));
         });
         EasyBind.listen(searchPreferences.keepWindowOnTopProperty(), (obs, oldValue, newValue) -> putBoolean(SEARCH_KEEP_GLOBAL_WINDOW_ON_TOP, searchPreferences.shouldKeepWindowOnTop()));
 

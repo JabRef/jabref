@@ -283,6 +283,7 @@ public class IconTheme {
         REG_EX(MaterialDesignR.REGEX),
         FULLTEXT(MaterialDesignF.FILE_EYE),
         FLOATING_MODE(MaterialDesignF.FILTER),
+        SORT_BY_SCORE(MaterialDesignS.SORT_VARIANT),
         CONSOLE(MaterialDesignC.CONSOLE),
         FORUM(MaterialDesignF.FORUM),
         FACEBOOK(MaterialDesignF.FACEBOOK),

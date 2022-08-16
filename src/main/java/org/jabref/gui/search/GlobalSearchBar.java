@@ -94,6 +94,7 @@ public class GlobalSearchBar extends HBox {
     private final Button openGlobalSearchButton;
     private final ToggleButton keepSearchString;
     private final ToggleButton floatingModeButton;
+    private final ToggleButton sortByScoreButton;
     // private final Button searchModeButton;
     private final Tooltip searchFieldTooltip = new Tooltip();
     private final Label currentResults = new Label("");
@@ -145,6 +146,7 @@ public class GlobalSearchBar extends HBox {
         openGlobalSearchButton = IconTheme.JabRefIcons.OPEN_GLOBAL_SEARCH.asButton();
         keepSearchString = IconTheme.JabRefIcons.KEEP_SEARCH_STRING.asToggleButton();
         floatingModeButton = IconTheme.JabRefIcons.FLOATING_MODE.asToggleButton();
+        sortByScoreButton = IconTheme.JabRefIcons.SORT_BY_SCORE.asToggleButton();
 
         initSearchModifierButtons();
 
@@ -153,6 +155,7 @@ public class GlobalSearchBar extends HBox {
                                                     .or(fulltextButton.focusedProperty())
                                                     .or(keepSearchString.focusedProperty())
                                                     .or(floatingModeButton.focusedProperty())
+                                                    .or(sortByScoreButton.focusedProperty())
                                                     .or(searchField.textProperty()
                                                                    .isNotEmpty());
 
@@ -164,8 +167,10 @@ public class GlobalSearchBar extends HBox {
         keepSearchString.visibleProperty().bind(focusedOrActive);
         floatingModeButton.visibleProperty().unbind();
         floatingModeButton.visibleProperty().bind(focusedOrActive);
+        sortByScoreButton.visibleProperty().unbind();
+        sortByScoreButton.visibleProperty().bind(focusedOrActive);
 
-        StackPane modifierButtons = new StackPane(new HBox(regularExpressionButton, fulltextButton, keepSearchString, floatingModeButton));
+        StackPane modifierButtons = new StackPane(new HBox(regularExpressionButton, fulltextButton, keepSearchString, floatingModeButton, sortByScoreButton));
         modifierButtons.setAlignment(Pos.CENTER);
         searchField.setRight(new HBox(searchField.getRight(), modifierButtons));
         searchField.getStyleClass().add("search-field");
@@ -233,6 +238,14 @@ public class GlobalSearchBar extends HBox {
         initSearchModifierButton(floatingModeButton);
         floatingModeButton.setOnAction(event -> {
             searchPreferences.setSearchFlag(SearchRules.SearchFlags.FLOATING_SEARCH, !floatingModeButton.isSelected());
+            performSearch();
+        });
+
+        sortByScoreButton.setSelected(searchPreferences.isSortByScore());
+        sortByScoreButton.setTooltip(new Tooltip(Localization.lang("Always sort by score")));
+        initSearchModifierButton(sortByScoreButton);
+        sortByScoreButton.setOnAction(event -> {
+            searchPreferences.setSearchFlag(SearchRules.SearchFlags.SORT_BY_SCORE, sortByScoreButton.isSelected());
             performSearch();
         });
 
