@@ -34,7 +34,7 @@ public class AutosaveManager {
 
     private AutosaveManager(BibDatabaseContext bibDatabaseContext) {
         this.bibDatabaseContext = bibDatabaseContext;
-        this.throttler = new DelayTaskThrottler(2000);
+        this.throttler = new DelayTaskThrottler(2_000);
         this.eventBus = new EventBus();
         this.changeFilter = new CoarseChangeFilter(bibDatabaseContext);
         changeFilter.registerListener(this);
@@ -88,7 +88,7 @@ public class AutosaveManager {
             eventBus.unregister(listener);
         } catch (IllegalArgumentException e) {
             // occurs if the event source has not been registered, should not prevent shutdown
-            LOGGER.debug("Proble, unregistering", e);
+            LOGGER.debug("Problem unregistering", e);
         }
     }
 }
