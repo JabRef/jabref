@@ -58,7 +58,7 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
             try {
                 fileMonitor.addListenerForFile(path, this);
             } catch (IOException e) {
-                LOGGER.error("Error while trying to monitor " + path, e);
+                LOGGER.error("Error while trying to monitor {}", path, e);
             }
         });
 
@@ -75,16 +75,18 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
 
     @Override
     public void fileUpdated() {
-        // File on disk has changed, thus look for notable changes and notify listeners in case there are such changes
-        ChangeScanner scanner = new ChangeScanner(database, dialogService, preferencesService, stateManager, themeManager);
-        BackgroundTask.wrap(scanner::scanForChanges)
-                      .onSuccess(changes -> {
-                          if (!changes.isEmpty()) {
-                              listeners.forEach(listener -> listener.databaseChanged(changes));
-                          }
-                      })
-                      .onFailure(e -> LOGGER.error("Error while watching for changes", e))
-                      .executeWith(taskExecutor);
+        synchronized (database) {
+            // File on disk has changed, thus look for notable changes and notify listeners in case there are such changes
+            ChangeScanner scanner = new ChangeScanner(database, dialogService, preferencesService, stateManager, themeManager);
+            BackgroundTask.wrap(scanner::scanForChanges)
+                          .onSuccess(changes -> {
+                              if (!changes.isEmpty()) {
+                                  listeners.forEach(listener -> listener.databaseChanged(changes));
+                              }
+                          })
+                          .onFailure(e -> LOGGER.error("Error while watching for changes", e))
+                          .executeWith(taskExecutor);
+        }
     }
 
     public void addListener(DatabaseChangeListener listener) {

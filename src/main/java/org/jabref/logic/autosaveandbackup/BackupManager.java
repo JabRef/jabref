@@ -48,7 +48,7 @@ public class BackupManager {
 
     private static final int MAXIMUM_BACKUP_FILE_COUNT = 10;
 
-    private static final int DELAY_BETWEEN_BACKUP_ATTEMPTS_IN_SECONDS = 20;
+    private static final int DELAY_BETWEEN_BACKUP_ATTEMPTS_IN_SECONDS = 19;
 
     private static Set<BackupManager> runningInstances = new HashSet<>();
 
