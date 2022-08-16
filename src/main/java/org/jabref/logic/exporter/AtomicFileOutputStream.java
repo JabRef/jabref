@@ -3,6 +3,7 @@ package org.jabref.logic.exporter;
 import java.io.FileOutputStream;
 import java.io.FilterOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.channels.FileLock;
 import java.nio.channels.OverlappingFileLockException;
 import java.nio.file.Files;
@@ -73,23 +74,7 @@ public class AtomicFileOutputStream extends FilterOutputStream {
      * @param keepBackup whether to keep the backup file after a successful write process
      */
     public AtomicFileOutputStream(Path path, boolean keepBackup) throws IOException {
-        super(Files.newOutputStream(getPathOfTemporaryFile(path)));
-
-        this.targetFile = path;
-        this.temporaryFile = getPathOfTemporaryFile(path);
-        this.backupFile = getPathOfSaveBackupFile(path);
-        this.keepBackup = keepBackup;
-
-        try {
-            // Lock files (so that at least not another JabRef instance writes at the same time to the same tmp file)
-            if (out instanceof FileOutputStream) {
-                temporaryFileLock = ((FileOutputStream) out).getChannel().lock();
-            } else {
-                temporaryFileLock = null;
-            }
-        } catch (OverlappingFileLockException exception) {
-            throw new IOException("Could not obtain write access to " + temporaryFile + ". Maybe another instance of JabRef is currently writing to the same file?", exception);
-        }
+        this(path, getPathOfTemporaryFile(path), Files.newOutputStream(getPathOfTemporaryFile(path)), keepBackup);
     }
 
     /**
@@ -99,6 +84,30 @@ public class AtomicFileOutputStream extends FilterOutputStream {
      */
     public AtomicFileOutputStream(Path path) throws IOException {
         this(path, false);
+    }
+
+    /**
+     * Required for proper testing
+     */
+    AtomicFileOutputStream(Path path, Path pathOfTemporaryFile, OutputStream temporaryFileOutputStream, boolean keepBackup) throws IOException {
+        super(temporaryFileOutputStream);
+        this.targetFile = path;
+        this.temporaryFile = pathOfTemporaryFile;
+        this.backupFile = getPathOfSaveBackupFile(path);
+        this.keepBackup = keepBackup;
+
+        try {
+            // Lock files (so that at least not another JabRef instance writes at the same time to the same tmp file)
+            if (out instanceof FileOutputStream) {
+                // temporaryFileLock = ((FileOutputStream) out).getChannel().lock();
+                // FIXME: Current implementation leads to a "AccessDeniedException" at "Files.move()"
+                temporaryFileLock = null;
+            } else {
+                temporaryFileLock = null;
+            }
+        } catch (OverlappingFileLockException exception) {
+            throw new IOException("Could not obtain write access to " + temporaryFile + ". Maybe another instance of JabRef is currently writing to the same file?", exception);
+        }
     }
 
     private static Path getPathOfTemporaryFile(Path targetFile) {
@@ -183,7 +192,11 @@ public class AtomicFileOutputStream extends FilterOutputStream {
                     PosixFilePermission.GROUP_WRITE,
                     PosixFilePermission.OTHERS_READ);
             if (Files.exists(targetFile)) {
-                Files.copy(targetFile, backupFile, StandardCopyOption.REPLACE_EXISTING);
+                try {
+                    Files.copy(targetFile, backupFile, StandardCopyOption.REPLACE_EXISTING);
+                } catch (Exception e) {
+                    LOGGER.warn("Could not create backup file {}", backupFile);
+                }
                 if (FileUtil.IS_POSIX_COMPLIANT) {
                     try {
                         oldFilePermissions = Files.getPosixFilePermissions(targetFile);
@@ -193,8 +206,13 @@ public class AtomicFileOutputStream extends FilterOutputStream {
                 }
             }
 
-            // Move temporary file (replace original if it exists)
-            Files.move(temporaryFile, targetFile, StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING);
+            try {
+                // Move temporary file (replace original if it exists)
+                Files.move(temporaryFile, targetFile, StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING);
+            } catch (Exception e) {
+                LOGGER.warn("Could not move temporary file", e);
+                throw e;
+            }
 
             // Restore file permissions
             if (FileUtil.IS_POSIX_COMPLIANT) {
