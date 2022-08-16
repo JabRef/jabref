@@ -46,7 +46,7 @@ public class AtomicFileOutputStream extends FilterOutputStream {
     private static final Logger LOGGER = LoggerFactory.getLogger(AtomicFileOutputStream.class);
 
     private static final String TEMPORARY_EXTENSION = ".tmp";
-    static final String BACKUP_EXTENSION = ".bak";
+    private static final String SAVE_EXTENSION = BackupFileType.SAVE.getExtensions().get(0);
     private static final String OLD_EXTENSION = ".old";
 
     /**
@@ -79,7 +79,7 @@ public class AtomicFileOutputStream extends FilterOutputStream {
 
         this.targetFile = path;
         this.temporaryFile = getPathOfTemporaryFile(path);
-        this.backupFile = FileUtil.getPathOfBackupFileAndCreateDirectory(path, BackupFileType.BACKUP);
+        this.backupFile = FileUtil.getPathOfBackupFileAndCreateDirectory(path, BackupFileType.SAVE);
 
         if (Files.exists(targetFile)) {
             // Make a backup of the original file
@@ -111,6 +111,10 @@ public class AtomicFileOutputStream extends FilterOutputStream {
             return result;
         }
         return tempFile;
+    }
+
+    private static Path getPathOfSaveBackupFile(Path targetFile) {
+        return FileUtil.addExtension(targetFile, SAVE_EXTENSION);
     }
 
     /**

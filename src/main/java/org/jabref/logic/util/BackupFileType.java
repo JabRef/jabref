@@ -5,12 +5,12 @@ import java.util.List;
 
 public enum BackupFileType implements FileType {
 
-    // Used when writing the .bib file. See {@link org.jabref.logic.exporter.AtomicFileWriter}
-    // Used for copying the .bib away before overwriting on save.
+    // Used at BackupManager
     BACKUP("Backup", "bak"),
 
-    // AutoSave, used at BackupManger
-    AUTOSAVE("AutoSaveFile", "sav");
+    // Used when writing the .bib file. See {@link org.jabref.logic.exporter.AtomicFileWriter}
+    // Used for copying the .bib away before overwriting on save.
+    SAVE("AutoSaveFile", "sav");
 
     private final List<String> extensions;
     private final String name;

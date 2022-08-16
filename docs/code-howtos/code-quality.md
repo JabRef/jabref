@@ -1,6 +1,6 @@
 ---
+parent: Code Howtos
 nav_order: 1
-parent: Advanced Reading
 ---
 # Code Quality
 

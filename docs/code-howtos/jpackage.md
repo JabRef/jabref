@@ -1,8 +1,8 @@
 ---
-nav_order: 2
-parent: Advanced Reading
+parent: Code Howtos
+nav_order: 7
 ---
-# Creating a binary and debug it
+# JPackage: Creating a binary and debug it
 
 JabRef uses [jpackage](https://docs.oracle.com/en/java/javase/14/jpackage/) to build binary application bundles and installers for Windows, Linux, and macOS. For Gradle, we use the [Badass JLink Plugin](https://badass-jlink-plugin.beryx.org/releases/latest/).
 
