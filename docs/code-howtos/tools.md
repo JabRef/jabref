@@ -1,6 +1,6 @@
 ---
-nav_order: 2
-parent: Readings on Coding
+parent: Code Howtos
+nav_order: 100
 ---
 # Useful development tooling
 

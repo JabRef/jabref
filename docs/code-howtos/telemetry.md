@@ -1,6 +1,6 @@
 ---
-nav_order: 6
-parent: Advanced Reading
+parent: Code Howtos
+nav_order: 13
 ---
 # Telemetry
 

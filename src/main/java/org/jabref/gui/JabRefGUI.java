@@ -1,7 +1,5 @@
 package org.jabref.gui;
 
-import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -14,15 +12,12 @@ import javafx.scene.input.KeyEvent;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 
-import org.jabref.gui.dialogs.BackupUIManager;
 import org.jabref.gui.help.VersionWorker;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.importer.ParserResultWarningDialog;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
 import org.jabref.gui.keyboard.TextInputKeyBindings;
 import org.jabref.gui.shared.SharedDatabaseUIManager;
-import org.jabref.logic.autosaveandbackup.BackupManager;
-import org.jabref.logic.importer.OpenDatabase;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.shared.DatabaseNotSupportedException;
@@ -77,8 +72,8 @@ public class JabRefGUI {
         if (guiPreferences.isWindowMaximised()) {
             mainStage.setMaximized(true);
         } else if ((Screen.getScreens().size() == 1) && isWindowPositionOutOfBounds()) {
-            // corrects the Window, if its outside of the mainscreen
-            LOGGER.debug("The Jabref Window is outside the Main Monitor\n");
+            // corrects the Window, if it is outside the mainscreen
+            LOGGER.debug("The Jabref window is outside the main screen\n");
             mainStage.setX(0);
             mainStage.setY(0);
             mainStage.setWidth(1024);
@@ -134,6 +129,8 @@ public class JabRefGUI {
         if (!isBlank && preferencesService.getImportExportPreferences().shouldOpenLastEdited()) {
             openLastEditedDatabases();
         }
+
+        // From here on, the libraries provided by command line arguments are treated
 
         // Remove invalid databases
         List<ParserResult> invalidDatabases = bibDatabases.stream()
@@ -266,34 +263,8 @@ public class JabRefGUI {
             return;
         }
 
-        for (String fileName : lastFiles) {
-            Path dbFile = Path.of(fileName);
-
-            // Already parsed via command line parameter, e.g., "jabref.jar somefile.bib"
-            if (isLoaded(dbFile) || !Files.exists(dbFile)) {
-                continue;
-            }
-
-            if (BackupManager.backupFileDiffers(dbFile)) {
-                BackupUIManager.showRestoreBackupDialog(mainFrame.getDialogService(), dbFile);
-            }
-
-            ParserResult parsedDatabase;
-            try {
-                parsedDatabase = OpenDatabase.loadDatabase(
-                        dbFile,
-                        preferencesService.getImportFormatPreferences(),
-                        Globals.getFileUpdateMonitor());
-            } catch (IOException ex) {
-                LOGGER.error("Error opening file '{}'", dbFile, ex);
-                parsedDatabase = ParserResult.fromError(ex);
-            }
-            bibDatabases.add(parsedDatabase);
-        }
-    }
-
-    private boolean isLoaded(Path fileToOpen) {
-        return bibDatabases.stream().anyMatch(pr -> pr.getPath().isPresent() && pr.getPath().get().equals(fileToOpen));
+        List<Path> filesToOpen = lastFiles.stream().map(file -> Path.of(file)).collect(Collectors.toList());
+        getMainFrame().getOpenDatabaseAction().openFiles(filesToOpen);
     }
 
     public static JabRefFrame getMainFrame() {

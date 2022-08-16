@@ -1,6 +1,6 @@
 ---
-nav_order: 5
-parent: Advanced Reading
+parent: Code Howtos
+nav_order: 11
 ---
 # Remote Storage
 

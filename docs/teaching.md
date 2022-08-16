@@ -1,5 +1,5 @@
 ---
-nav_order: 6
+nav_order: 3
 ---
 # JabRef and Software Engineering Training
 

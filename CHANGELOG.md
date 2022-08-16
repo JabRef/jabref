@@ -11,16 +11,24 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 
 ### Added
 
+- In case a backup is found, the filename of the backup is shown.
+- On startup, JabRef notifies the user if there were parsing errors during opening.
+- We integrated a new three-way merge UI for merging entries in the Entries Merger Dialog, the Duplicate Resolver Dialog, the Entry Importer Dialog, and the External Changes Resolver Dialog. [#8945](https://github.com/JabRef/jabref/pull/8945)
+- We added the ability to merge groups, keywords, comments and files when merging entries. [#9022](https://github.com/JabRef/jabref/pull/9022)
+
 ### Changed
 
 - We improved the Citavi Importer to also import so called Knowledge-items into the field `comment` of the corresponding entry [#9025](https://github.com/JabRef/jabref/issues/9025)
 - We removed wrapping of string constants when writing to a `.bib` file.
+- We call backup files `.bak` and temporary writing files now `.sav`.
+- JabRef keeps 10 older versions of a `.bib` file in the [user data dir](https://github.com/harawata/appdirs#supported-directories) (instead of a single `.sav` (now: `.bak`) file in the directory of the `.bib` file)
 - We changed the button label from "Return to JabRef" to "Return to library" to better indicate the purpose of the action.
 
 ### Fixed
 
 - The [HtmlToLaTeXFormatter](https://docs.jabref.org/finding-sorting-and-cleaning-entries/saveactions#html-to-latex) keeps single `<` characters.
 - We fixed a performance regression when opening large libraries [#9041](https://github.com/JabRef/jabref/issues/9041)
+- We fixed a bug where spaces are trimmed when highlighting differences in the Entries merge dialog. [koppor#371](https://github.com/koppor/jabref/issues/371)
 
 ### Removed
 

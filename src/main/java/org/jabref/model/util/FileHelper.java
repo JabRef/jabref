@@ -12,6 +12,7 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 
+import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.preferences.FilePreferences;
 
@@ -26,6 +27,10 @@ import org.apache.tika.parser.AutoDetectParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * @deprecated Please use {@link FileUtil}
+ */
+@Deprecated
 public class FileHelper {
     /**
      * MUST ALWAYS BE A SORTED ARRAY because it is used in a binary search
