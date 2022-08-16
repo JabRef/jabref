@@ -22,6 +22,7 @@ import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.groups.SearchGroup;
 import org.jabref.model.search.matchers.MatcherSet;
 import org.jabref.model.search.matchers.MatcherSets;
+import org.jabref.model.search.rules.SearchRules;
 import org.jabref.preferences.PreferencesService;
 
 import com.tobiasdiez.easybind.EasyBind;
@@ -50,11 +51,12 @@ public class MainTableDataModel {
         entriesFiltered = new FilteredList<>(entriesViewModel);
         entriesFiltered.predicateProperty().bind(
                 EasyBind.combine(stateManager.activeGroupProperty(),
+                        stateManager.activeSearchQueryProperty(),
                         groupsPreferences.groupViewModeProperty(),
-                        (groups, groupViewMode) -> {
+                        (groups, query, groupViewMode) -> {
                             return entry -> {
                                 updateSearchGroups();
-                                return isMatchedByGroup(groups, entry);
+                                return isMatched(groups, query, entry);
                             };
                         })
         );
@@ -84,6 +86,18 @@ public class MainTableDataModel {
 
     private Optional<BibEntryTableViewModel> getTableViewModelForEntry(BibEntry entry) {
         return entriesSorted.stream().filter(viewModel -> viewModel.getEntry().equals(entry)).findFirst();
+    }
+
+    private boolean isMatched(ObservableList<GroupTreeNode> groups, Optional<SearchQuery> query, BibEntryTableViewModel entry) {
+        return isMatchedByGroup(groups, entry) && isMatchedBySearch(query, entry);
+    }
+
+    private boolean isMatchedBySearch(Optional<SearchQuery> query, BibEntryTableViewModel entry) {
+        if (query.isPresent() && query.get().getSearchFlags().contains(SearchRules.SearchFlags.FLOATING_SEARCH)) {
+            return true;
+        }
+        return query.map(matcher -> matcher.isMatch(entry.getEntry()))
+                    .orElse(true);
     }
 
     private boolean isMatchedByGroup(ObservableList<GroupTreeNode> groups, BibEntryTableViewModel entry) {

@@ -44,6 +44,6 @@ public class SearchRules {
     }
 
     public enum SearchFlags {
-        REGULAR_EXPRESSION, FULLTEXT, KEEP_SEARCH_STRING;
+        REGULAR_EXPRESSION, FULLTEXT, KEEP_SEARCH_STRING, FLOATING_SEARCH;
     }
 }

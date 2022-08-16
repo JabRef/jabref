@@ -18,7 +18,7 @@ public class SearchPreferences {
     private final ObservableSet<SearchFlags> searchFlags;
     private final BooleanProperty keepWindowOnTop;
 
-    public SearchPreferences(SearchDisplayMode searchDisplayMode, boolean isRegularExpression, boolean isFulltext, boolean isKeepSearchString, boolean keepWindowOnTop) {
+    public SearchPreferences(SearchDisplayMode searchDisplayMode, boolean isRegularExpression, boolean isFulltext, boolean isKeepSearchString, boolean isFloatingMode, boolean keepWindowOnTop) {
         this.searchDisplayMode = new SimpleObjectProperty<>(searchDisplayMode);
         this.keepWindowOnTop = new SimpleBooleanProperty(keepWindowOnTop);
 
@@ -31,6 +31,9 @@ public class SearchPreferences {
         }
         if (isKeepSearchString) {
             searchFlags.add(SearchFlags.KEEP_SEARCH_STRING);
+        }
+        if (isFloatingMode) {
+            searchFlags.add(SearchFlags.FLOATING_SEARCH);
         }
     }
 
@@ -83,6 +86,10 @@ public class SearchPreferences {
 
     public boolean shouldKeepSearchString() {
         return searchFlags.contains(SearchFlags.KEEP_SEARCH_STRING);
+    }
+
+    public boolean isFloatingMode() {
+        return searchFlags.contains(SearchFlags.FLOATING_SEARCH);
     }
 
     public boolean shouldKeepWindowOnTop() {
