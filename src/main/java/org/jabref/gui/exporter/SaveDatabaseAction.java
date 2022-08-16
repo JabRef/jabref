@@ -235,28 +235,29 @@ public class SaveDatabaseAction {
         SavePreferences savePreferences = this.preferences.getSavePreferences()
                                                       .withSaveType(saveType);
         BibDatabaseContext bibDatabaseContext = libraryTab.getBibDatabaseContext();
-        try (AtomicFileWriter fileWriter = new AtomicFileWriter(file, encoding, savePreferences.shouldMakeBackup())) {
-            BibWriter bibWriter = new BibWriter(fileWriter, bibDatabaseContext.getDatabase().getNewLineSeparator());
-            BibtexDatabaseWriter databaseWriter = new BibtexDatabaseWriter(bibWriter, generalPreferences, savePreferences, entryTypesManager);
+        synchronized (bibDatabaseContext) {
+            try (AtomicFileWriter fileWriter = new AtomicFileWriter(file, encoding, savePreferences.shouldMakeBackup())) {
+                BibWriter bibWriter = new BibWriter(fileWriter, bibDatabaseContext.getDatabase().getNewLineSeparator());
+                BibtexDatabaseWriter databaseWriter = new BibtexDatabaseWriter(bibWriter, generalPreferences, savePreferences, entryTypesManager);
 
-            if (selectedOnly) {
-                databaseWriter.savePartOfDatabase(bibDatabaseContext, libraryTab.getSelectedEntries());
-            } else {
-                databaseWriter.saveDatabase(bibDatabaseContext);
+                if (selectedOnly) {
+                    databaseWriter.savePartOfDatabase(bibDatabaseContext, libraryTab.getSelectedEntries());
+                } else {
+                    databaseWriter.saveDatabase(bibDatabaseContext);
+                }
+
+                libraryTab.registerUndoableChanges(databaseWriter.getSaveActionsFieldChanges());
+
+                if (fileWriter.hasEncodingProblems()) {
+                    saveWithDifferentEncoding(file, selectedOnly, encoding, fileWriter.getEncodingProblems(), saveType);
+                }
+            } catch (UnsupportedCharsetException ex) {
+                throw new SaveException(Localization.lang("Character encoding '%0' is not supported.", encoding.displayName()), ex);
+            } catch (IOException ex) {
+                throw new SaveException("Problems saving: " + ex, ex);
             }
-
-            libraryTab.registerUndoableChanges(databaseWriter.getSaveActionsFieldChanges());
-
-            if (fileWriter.hasEncodingProblems()) {
-                saveWithDifferentEncoding(file, selectedOnly, encoding, fileWriter.getEncodingProblems(), saveType);
-            }
-        } catch (UnsupportedCharsetException ex) {
-            throw new SaveException(Localization.lang("Character encoding '%0' is not supported.", encoding.displayName()), ex);
-        } catch (IOException ex) {
-            throw new SaveException("Problems saving: " + ex, ex);
+            return true;
         }
-
-        return true;
     }
 
     private void saveWithDifferentEncoding(Path file, boolean selectedOnly, Charset encoding, Set<Character> encodingProblems, SavePreferences.DatabaseSaveType saveType) throws SaveException {
