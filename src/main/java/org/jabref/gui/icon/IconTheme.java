@@ -279,7 +279,6 @@ public class IconTheme {
         CHECK(MaterialDesignC.CHECK),
         WARNING(MaterialDesignA.ALERT),
         ERROR(MaterialDesignA.ALERT_CIRCLE),
-        CASE_SENSITIVE(MaterialDesignA.ALPHABETICAL),
         REG_EX(MaterialDesignR.REGEX),
         FULLTEXT(MaterialDesignF.FILE_EYE),
         FLOATING_MODE(MaterialDesignF.FILTER),
