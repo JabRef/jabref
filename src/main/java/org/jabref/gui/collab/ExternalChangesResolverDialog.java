@@ -3,7 +3,6 @@ package org.jabref.gui.collab;
 import java.util.ArrayList;
 import java.util.List;
 
-import javafx.beans.binding.Bindings;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.SelectionMode;
@@ -67,21 +66,18 @@ public class ExternalChangesResolverDialog extends BaseDialog<Boolean> {
         viewModel = new ExternalChangesResolverViewModel(changes, database);
 
         changeName.setCellValueFactory(data -> data.getValue().nameProperty());
+        openAdvancedMergeDialogButton.disableProperty().bind(viewModel.canOpenAdvancedMergeDialogProperty().not());
 
-        Bindings.bindContent(changesTableView.getItems(), viewModel.getChanges());
-
+        changesTableView.setItems(viewModel.getChanges());
         changesTableView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
         changesTableView.getSelectionModel().selectFirst();
 
         viewModel.selectedChangeProperty().bind(changesTableView.getSelectionModel().selectedItemProperty());
-
         EasyBind.subscribe(viewModel.selectedChangeProperty(), selectedChange -> {
             if (selectedChange != null) {
                 changeInfoPane.setCenter(selectedChange.description());
             }
         });
-
-        openAdvancedMergeDialogButton.disableProperty().bind(viewModel.canOpenAdvancedMergeDialogProperty().not());
 
         EasyBind.subscribe(viewModel.areAllChangesResolvedProperty(), isResolved -> {
             if (isResolved) {
