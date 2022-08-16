@@ -2,7 +2,6 @@ package org.jabref.gui.entryeditor;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
-import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.preview.PreviewPanel;
 import org.jabref.gui.theme.ThemeManager;
@@ -19,7 +18,6 @@ public class PreviewTab extends EntryEditorTab {
     private final StateManager stateManager;
     private final ThemeManager themeManager;
     private final IndexingTaskManager indexingTaskManager;
-    private final ExternalFileTypes externalFileTypes;
     private PreviewPanel previewPanel;
 
     public PreviewTab(BibDatabaseContext databaseContext,
@@ -27,15 +25,13 @@ public class PreviewTab extends EntryEditorTab {
                       PreferencesService preferences,
                       StateManager stateManager,
                       ThemeManager themeManager,
-                      IndexingTaskManager indexingTaskManager,
-                      ExternalFileTypes externalFileTypes) {
+                      IndexingTaskManager indexingTaskManager) {
         this.databaseContext = databaseContext;
         this.dialogService = dialogService;
         this.preferences = preferences;
         this.stateManager = stateManager;
         this.themeManager = themeManager;
         this.indexingTaskManager = indexingTaskManager;
-        this.externalFileTypes = externalFileTypes;
 
         setGraphic(IconTheme.JabRefIcons.TOGGLE_ENTRY_PREVIEW.getGraphicNode());
         setText(Localization.lang("Preview"));
@@ -63,7 +59,7 @@ public class PreviewTab extends EntryEditorTab {
     @Override
     protected void bindToEntry(BibEntry entry) {
         if (previewPanel == null) {
-            previewPanel = new PreviewPanel(databaseContext, dialogService, externalFileTypes, preferences.getKeyBindingRepository(), preferences, stateManager, themeManager, indexingTaskManager);
+            previewPanel = new PreviewPanel(databaseContext, dialogService, preferences.getKeyBindingRepository(), preferences, stateManager, themeManager, indexingTaskManager);
             setContent(previewPanel);
         }
 

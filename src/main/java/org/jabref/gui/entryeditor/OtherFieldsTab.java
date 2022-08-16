@@ -14,7 +14,6 @@ import javafx.scene.control.Tooltip;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.autocompleter.SuggestionProviders;
-import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.TaskExecutor;
@@ -44,7 +43,6 @@ public class OtherFieldsTab extends FieldsEditorTab {
                           ThemeManager themeManager,
                           IndexingTaskManager indexingTaskManager,
                           BibEntryTypesManager entryTypesManager,
-                          ExternalFileTypes externalFileTypes,
                           TaskExecutor taskExecutor,
                           JournalAbbreviationRepository journalAbbreviationRepository) {
         super(false,
@@ -55,7 +53,6 @@ public class OtherFieldsTab extends FieldsEditorTab {
                 preferences,
                 stateManager,
                 themeManager,
-                externalFileTypes,
                 taskExecutor,
                 journalAbbreviationRepository,
                 indexingTaskManager);
