@@ -761,6 +761,24 @@ public class JabRefPreferences implements PreferencesService {
         return value.stream().map(val -> StringUtil.quote(val, STRINGLIST_DELIMITER.toString(), '\\')).collect(Collectors.joining(STRINGLIST_DELIMITER.toString()));
     }
 
+    private static List<String> convertStringToList(String toConvert) {
+        if (StringUtil.isBlank(toConvert)) {
+            return Collections.emptyList();
+        }
+
+        StringReader reader = new StringReader(toConvert);
+        List<String> result = new ArrayList<>();
+        Optional<String> rs;
+        try {
+            while ((rs = getNextUnit(reader)).isPresent()) {
+                result.add(rs.get());
+            }
+        } catch (IOException ignored) {
+            // Ignored
+        }
+        return result;
+    }
+
     private static Preferences getPrefsNodeForCustomizedEntryTypes(BibDatabaseMode mode) {
         return switch (mode) {
             case BIBTEX -> PREFS_NODE.node(CUSTOMIZED_BIBTEX_TYPES);
@@ -933,22 +951,7 @@ public class JabRefPreferences implements PreferencesService {
      * Returns a List of Strings containing the chosen columns.
      */
     public List<String> getStringList(String key) {
-        String names = get(key);
-        if (names == null) {
-            return Collections.emptyList();
-        }
-
-        StringReader rd = new StringReader(names);
-        List<String> res = new ArrayList<>();
-        Optional<String> rs;
-        try {
-            while ((rs = getNextUnit(rd)).isPresent()) {
-                res.add(rs.get());
-            }
-        } catch (IOException ignored) {
-            // Ignored
-        }
-        return res;
+        return convertStringToList(get(key));
     }
 
     /**
@@ -1044,6 +1047,20 @@ public class JabRefPreferences implements PreferencesService {
                 }
             }
         }
+    }
+
+    /**
+     * Returns a list of Strings stored by key+N with N being an incrementing number
+     */
+    private List<String> getSeries(String key) {
+        int i = 0;
+        List<String> series = new ArrayList<>();
+        String item;
+        while (!((item = get(key + i)).isEmpty())) {
+            series.add(item);
+            i++;
+        }
+        return series;
     }
 
     /**
@@ -2309,27 +2326,20 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public List<TemplateExporter> getCustomExportFormats(JournalAbbreviationRepository abbreviationRepository) {
-        int i = 0;
-        List<TemplateExporter> formats = new ArrayList<>();
-        String exporterName;
-        String filename;
-        String extension;
         LayoutFormatterPreferences layoutPreferences = getLayoutFormatterPreferences(abbreviationRepository);
         SavePreferences savePreferences = getSavePreferencesForExport();
-        List<String> formatData;
-        while (!((formatData = getStringList(CUSTOM_EXPORT_FORMAT + i)).isEmpty())) {
-            exporterName = formatData.get(EXPORTER_NAME_INDEX);
-            filename = formatData.get(EXPORTER_FILENAME_INDEX);
-            extension = formatData.get(EXPORTER_EXTENSION_INDEX);
+        List<TemplateExporter> formats = new ArrayList<>();
+
+        for (String toImport : getSeries(CUSTOM_EXPORT_FORMAT)) {
+            List<String> formatData = convertStringToList(toImport);
             TemplateExporter format = new TemplateExporter(
-                    exporterName,
-                    filename,
-                    extension,
+                    formatData.get(EXPORTER_NAME_INDEX),
+                    formatData.get(EXPORTER_FILENAME_INDEX),
+                    formatData.get(EXPORTER_EXTENSION_INDEX),
                     layoutPreferences,
                     savePreferences);
             format.setCustomExport(true);
             formats.add(format);
-            i++;
         }
         return formats;
     }
@@ -2779,10 +2789,9 @@ public class JabRefPreferences implements PreferencesService {
 
     private Set<CustomImporter> getCustomImportFormats() {
         Set<CustomImporter> importers = new TreeSet<>();
-        int i = 0;
 
-        List<String> importerString;
-        while (!((importerString = getStringList(CUSTOM_IMPORT_FORMAT + i)).isEmpty())) {
+        for (String toImport : getSeries(CUSTOM_IMPORT_FORMAT)) {
+            List<String> importerString = convertStringToList(toImport);
             try {
                 if (importerString.size() == 2) {
                     // New format: basePath, className
@@ -2794,7 +2803,6 @@ public class JabRefPreferences implements PreferencesService {
             } catch (Exception e) {
                 LOGGER.warn("Could not load " + importerString.get(0) + " from preferences. Will ignore.", e);
             }
-            i++;
         }
 
         return importers;
