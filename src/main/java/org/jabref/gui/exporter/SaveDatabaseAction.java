@@ -192,13 +192,21 @@ public class SaveDatabaseAction {
             dialogService.notify(String.format("%s...", Localization.lang("Saving library")));
         }
 
-        libraryTab.setSaving(true);
+        synchronized (libraryTab) {
+            if (libraryTab.isSaving()) {
+                // if another thread is saving, we do not need to save
+                return true;
+            }
+            libraryTab.setSaving(true);
+        }
+
         try {
             Charset encoding = libraryTab.getBibDatabaseContext()
                                          .getMetaData()
                                          .getEncoding()
                                          .orElse(StandardCharsets.UTF_8);
-            // Make sure to remember which encoding we used.
+
+            // Make sure to remember which encoding we used
             libraryTab.getBibDatabaseContext().getMetaData().setEncoding(encoding, ChangePropagation.DO_NOT_POST_EVENT);
 
             // Save the database
