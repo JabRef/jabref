@@ -13,6 +13,7 @@ import org.jabref.gui.LibraryTab;
 import org.jabref.logic.shared.DatabaseLocation;
 import org.jabref.logic.shared.DatabaseSynchronizer;
 import org.jabref.logic.util.CoarseChangeFilter;
+import org.jabref.logic.util.OS;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.model.pdf.search.SearchFieldConstants;
@@ -28,8 +29,6 @@ import org.slf4j.LoggerFactory;
  */
 @AllowedToUseLogic("because it needs access to shared database features")
 public class BibDatabaseContext {
-
-    public static final String SEARCH_INDEX_BASE_PATH = "JabRef";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LibraryTab.class);
 
@@ -223,7 +222,7 @@ public class BibDatabaseContext {
     }
 
     public static Path getFulltextIndexBasePath() {
-        return Path.of(AppDirsFactory.getInstance().getUserDataDir(SEARCH_INDEX_BASE_PATH, SearchFieldConstants.VERSION, "org.jabref"));
+        return Path.of(AppDirsFactory.getInstance().getUserDataDir(OS.APP_DIR_APP_NAME, SearchFieldConstants.VERSION, OS.APP_DIR_APP_AUTHOR));
     }
 
     public Path getFulltextIndexPath() {

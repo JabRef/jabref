@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.jabref.logic.importer.ImportFormatPreferences;
-import org.jabref.logic.importer.ImporterPreferences;
+import org.jabref.logic.importer.fetcher.GrobidPreferences;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
@@ -27,16 +27,18 @@ import static org.mockito.Mockito.when;
 public class PdfGrobidImporterTest {
 
     private PdfGrobidImporter importer;
-    private ImportFormatPreferences importFormatPreferences;
 
     @BeforeEach
     public void setUp() {
-        ImporterPreferences importerPreferences = mock(ImporterPreferences.class, Answers.RETURNS_DEEP_STUBS);
-        when(importerPreferences.isGrobidEnabled()).thenReturn(true);
-        when(importerPreferences.getGrobidURL()).thenReturn("http://grobid.jabref.org:8070");
-        importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        GrobidPreferences grobidPreferences = mock(GrobidPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        when(grobidPreferences.isGrobidEnabled()).thenReturn(true);
+        when(grobidPreferences.getGrobidURL()).thenReturn("http://grobid.jabref.org:8070");
+
+        ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(importFormatPreferences.getKeywordSeparator()).thenReturn(',');
-        importer = new PdfGrobidImporter(importerPreferences, importFormatPreferences);
+        when(importFormatPreferences.getGrobidPreferences()).thenReturn(grobidPreferences);
+
+        importer = new PdfGrobidImporter(importFormatPreferences);
     }
 
     @Test

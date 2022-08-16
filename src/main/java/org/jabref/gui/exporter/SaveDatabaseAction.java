@@ -19,7 +19,6 @@ import javafx.scene.text.Text;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.LibraryTab;
-import org.jabref.gui.dialogs.AutosaveUiManager;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.autosaveandbackup.AutosaveManager;
@@ -104,7 +103,7 @@ public class SaveDatabaseAction {
     }
 
     /**
-     * @param file the new file name to save the data base to. This is stored in the database context of the panel upon
+     * @param file the new file name to save the database to. This is stored in the database context of the panel upon
      *             successful save.
      * @return true on successful save
      */
@@ -131,19 +130,13 @@ public class SaveDatabaseAction {
 
         if (saveResult) {
             // we managed to successfully save the file
-            // thus, we can store the store the path into the context
+            // thus, we can store the path into the context
             context.setDatabasePath(file);
             libraryTab.updateTabTitle(false);
 
             // Reset (here: uninstall and install again) AutosaveManager and BackupManager for the new file name
             libraryTab.resetChangeMonitor();
-            if (readyForAutosave(context)) {
-                AutosaveManager autosaver = AutosaveManager.start(context);
-                autosaver.registerListener(new AutosaveUiManager(libraryTab));
-            }
-            if (readyForBackup(context)) {
-                BackupManager.start(context, entryTypesManager, preferences);
-            }
+            libraryTab.installAutosaveManagerAndBackupManager();
 
             frame.getFileHistory().newFile(file);
         }
@@ -199,13 +192,21 @@ public class SaveDatabaseAction {
             dialogService.notify(String.format("%s...", Localization.lang("Saving library")));
         }
 
-        libraryTab.setSaving(true);
+        synchronized (libraryTab) {
+            if (libraryTab.isSaving()) {
+                // if another thread is saving, we do not need to save
+                return true;
+            }
+            libraryTab.setSaving(true);
+        }
+
         try {
             Charset encoding = libraryTab.getBibDatabaseContext()
                                          .getMetaData()
                                          .getEncoding()
                                          .orElse(StandardCharsets.UTF_8);
-            // Make sure to remember which encoding we used.
+
+            // Make sure to remember which encoding we used
             libraryTab.getBibDatabaseContext().getMetaData().setEncoding(encoding, ChangePropagation.DO_NOT_POST_EVENT);
 
             // Save the database
@@ -234,28 +235,29 @@ public class SaveDatabaseAction {
         SavePreferences savePreferences = this.preferences.getSavePreferences()
                                                       .withSaveType(saveType);
         BibDatabaseContext bibDatabaseContext = libraryTab.getBibDatabaseContext();
-        try (AtomicFileWriter fileWriter = new AtomicFileWriter(file, encoding, savePreferences.shouldMakeBackup())) {
-            BibWriter bibWriter = new BibWriter(fileWriter, bibDatabaseContext.getDatabase().getNewLineSeparator());
-            BibtexDatabaseWriter databaseWriter = new BibtexDatabaseWriter(bibWriter, generalPreferences, savePreferences, entryTypesManager);
+        synchronized (bibDatabaseContext) {
+            try (AtomicFileWriter fileWriter = new AtomicFileWriter(file, encoding, savePreferences.shouldMakeBackup())) {
+                BibWriter bibWriter = new BibWriter(fileWriter, bibDatabaseContext.getDatabase().getNewLineSeparator());
+                BibtexDatabaseWriter databaseWriter = new BibtexDatabaseWriter(bibWriter, generalPreferences, savePreferences, entryTypesManager);
 
-            if (selectedOnly) {
-                databaseWriter.savePartOfDatabase(bibDatabaseContext, libraryTab.getSelectedEntries());
-            } else {
-                databaseWriter.saveDatabase(bibDatabaseContext);
+                if (selectedOnly) {
+                    databaseWriter.savePartOfDatabase(bibDatabaseContext, libraryTab.getSelectedEntries());
+                } else {
+                    databaseWriter.saveDatabase(bibDatabaseContext);
+                }
+
+                libraryTab.registerUndoableChanges(databaseWriter.getSaveActionsFieldChanges());
+
+                if (fileWriter.hasEncodingProblems()) {
+                    saveWithDifferentEncoding(file, selectedOnly, encoding, fileWriter.getEncodingProblems(), saveType);
+                }
+            } catch (UnsupportedCharsetException ex) {
+                throw new SaveException(Localization.lang("Character encoding '%0' is not supported.", encoding.displayName()), ex);
+            } catch (IOException ex) {
+                throw new SaveException("Problems saving: " + ex, ex);
             }
-
-            libraryTab.registerUndoableChanges(databaseWriter.getSaveActionsFieldChanges());
-
-            if (fileWriter.hasEncodingProblems()) {
-                saveWithDifferentEncoding(file, selectedOnly, encoding, fileWriter.getEncodingProblems(), saveType);
-            }
-        } catch (UnsupportedCharsetException ex) {
-            throw new SaveException(Localization.lang("Character encoding '%0' is not supported.", encoding.displayName()), ex);
-        } catch (IOException ex) {
-            throw new SaveException("Problems saving: " + ex, ex);
+            return true;
         }
-
-        return true;
     }
 
     private void saveWithDifferentEncoding(Path file, boolean selectedOnly, Charset encoding, Set<Character> encodingProblems, SavePreferences.DatabaseSaveType saveType) throws SaveException {
@@ -283,16 +285,5 @@ public class SaveDatabaseAction {
                 saveDatabase(file, selectedOnly, newEncoding.get(), saveType);
             }
         }
-    }
-
-    private boolean readyForAutosave(BibDatabaseContext context) {
-        return ((context.getLocation() == DatabaseLocation.SHARED)
-                || ((context.getLocation() == DatabaseLocation.LOCAL)
-                && preferences.getImportExportPreferences().shouldAutoSave()))
-                && context.getDatabasePath().isPresent();
-    }
-
-    private boolean readyForBackup(BibDatabaseContext context) {
-        return (context.getLocation() == DatabaseLocation.LOCAL) && context.getDatabasePath().isPresent();
     }
 }

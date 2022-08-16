@@ -14,7 +14,6 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @FetcherTest
-@Disabled("CiteSeer is down as of 2022-07-18")
 class CiteSeerTest {
 
     private CiteSeer fetcher = new CiteSeer();

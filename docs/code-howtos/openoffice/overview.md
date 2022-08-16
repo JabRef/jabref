@@ -1,6 +1,7 @@
 ---
 nav_order: 1
 parent: The LibreOffice Panel
+grand_parent: Code Howtos
 ---
 # Overview
 
