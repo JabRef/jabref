@@ -125,7 +125,7 @@ public class FieldRowViewModel {
     }
 
     public void selectRightValue() {
-        if (isIsFieldsMerged()) {
+        if (isFieldsMerged()) {
             selectLeftValue();
         } else {
             setSelection(Selection.RIGHT);
@@ -168,7 +168,7 @@ public class FieldRowViewModel {
         return selectionProperty().get();
     }
 
-    public boolean isIsFieldsMerged() {
+    public boolean isFieldsMerged() {
         return isFieldsMerged.get();
     }
 
