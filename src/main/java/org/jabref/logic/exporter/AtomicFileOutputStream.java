@@ -49,7 +49,7 @@ public class AtomicFileOutputStream extends FilterOutputStream {
     private static final Logger LOGGER = LoggerFactory.getLogger(AtomicFileOutputStream.class);
 
     private static final String TEMPORARY_EXTENSION = ".tmp";
-    private static final String SAVE_EXTENSION = BackupFileType.SAVE.getExtensions().get(0);
+    private static final String SAVE_EXTENSION = "." + BackupFileType.SAVE.getExtensions().get(0);
 
     /**
      * The file we want to create/replace.
@@ -60,12 +60,16 @@ public class AtomicFileOutputStream extends FilterOutputStream {
      * The file to which writes are redirected to.
      */
     private final Path temporaryFile;
+
     private final FileLock temporaryFileLock;
     /**
      * A backup of the target file (if it exists), created when the stream is closed
      */
     private final Path backupFile;
+
     private final boolean keepBackup;
+
+    private boolean errorDuringWrite = false;
 
     /**
      * Creates a new output stream to write to or replace the file at the specified path.
@@ -74,11 +78,13 @@ public class AtomicFileOutputStream extends FilterOutputStream {
      * @param keepBackup whether to keep the backup file after a successful write process
      */
     public AtomicFileOutputStream(Path path, boolean keepBackup) throws IOException {
-        this(path, getPathOfTemporaryFile(path), Files.newOutputStream(getPathOfTemporaryFile(path)), keepBackup);
+        // Files.newOutputStream(getPathOfTemporaryFile(path)) leads to a "sun.nio.ch.ChannelOutputStream", which does not offer "lock"
+        this(path, getPathOfTemporaryFile(path), new FileOutputStream(getPathOfTemporaryFile(path).toFile()), keepBackup);
     }
 
     /**
-     * Creates a new output stream to write to or replace the file at the specified path. The backup file is deleted when the write was successful.
+     * Creates a new output stream to write to or replace the file at the specified path.
+     * The backup file is deleted when write was successful.
      *
      * @param path the path of the file to write to or replace
      */
@@ -99,9 +105,7 @@ public class AtomicFileOutputStream extends FilterOutputStream {
         try {
             // Lock files (so that at least not another JabRef instance writes at the same time to the same tmp file)
             if (out instanceof FileOutputStream) {
-                // temporaryFileLock = ((FileOutputStream) out).getChannel().lock();
-                // FIXME: Current implementation leads to a "AccessDeniedException" at "Files.move()"
-                temporaryFileLock = null;
+                temporaryFileLock = ((FileOutputStream) out).getChannel().lock();
             } else {
                 temporaryFileLock = null;
             }
@@ -126,7 +130,7 @@ public class AtomicFileOutputStream extends FilterOutputStream {
     }
 
     /**
-     * Override for performance reasons.
+     * Overridden because of cleanup actions in case of an error
      */
     @Override
     public void write(byte b[], int off, int len) throws IOException {
@@ -134,6 +138,7 @@ public class AtomicFileOutputStream extends FilterOutputStream {
             out.write(b, off, len);
         } catch (IOException exception) {
             cleanup();
+            errorDuringWrite = true;
             throw exception;
         }
     }
@@ -142,32 +147,36 @@ public class AtomicFileOutputStream extends FilterOutputStream {
      * Closes the write process to the temporary file but does not commit to the target file.
      */
     public void abort() {
+        errorDuringWrite = true;
         try {
             super.close();
             Files.deleteIfExists(temporaryFile);
             Files.deleteIfExists(backupFile);
         } catch (IOException exception) {
-            LOGGER.debug("Unable to abort writing to file " + temporaryFile, exception);
+            LOGGER.debug("Unable to abort writing to file {}", temporaryFile, exception);
         }
     }
 
     private void cleanup() {
         try {
-            Files.deleteIfExists(temporaryFile);
-        } catch (IOException exception) {
-            LOGGER.debug("Unable to delete file " + temporaryFile, exception);
-        }
-
-        try {
             if (temporaryFileLock != null) {
                 temporaryFileLock.release();
             }
         } catch (IOException exception) {
-            LOGGER.warn("Unable to release lock on file " + temporaryFile, exception);
+            // Currently, we always get the exception:
+            // Unable to release lock on file C:\Users\koppor\AppData\Local\Temp\junit11976839611279549873\error-during-save.txt.tmp: java.nio.channels.ClosedChannelException
+            LOGGER.debug("Unable to release lock on file {}", temporaryFile, exception);
+        }
+        try {
+            Files.deleteIfExists(temporaryFile);
+        } catch (IOException exception) {
+            LOGGER.debug("Unable to delete file {}", temporaryFile, exception);
         }
     }
 
-    // perform the final operations to move the temporary file to its final destination
+    /**
+     * perform the final operations to move the temporary file to its final destination
+     */
     @Override
     public void close() throws IOException {
         try {
@@ -183,6 +192,11 @@ public class AtomicFileOutputStream extends FilterOutputStream {
                 throw exception;
             }
             super.close();
+
+            if (errorDuringWrite) {
+                // in case there was an error during write, we do not replace the original file
+                return;
+            }
 
             // We successfully wrote everything to the temporary file, lets copy it to the correct place
             // First, make backup of original file and try to save file permissions to restore them later (by default: 664)
