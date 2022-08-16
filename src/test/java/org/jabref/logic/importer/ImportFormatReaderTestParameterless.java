@@ -4,7 +4,6 @@ import java.nio.file.Path;
 
 import javafx.collections.FXCollections;
 
-import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
 
@@ -26,7 +25,7 @@ class ImportFormatReaderTestParameterless {
         reader = new ImportFormatReader();
         ImporterPreferences importerPreferences = mock(ImporterPreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(importerPreferences.getCustomImportList()).thenReturn(FXCollections.emptyObservableSet());
-        reader.resetImportFormats(importerPreferences, mock(ImportFormatPreferences.class), mock(XmpPreferences.class), fileMonitor);
+        reader.resetImportFormats(importerPreferences, mock(ImportFormatPreferences.class), fileMonitor);
     }
 
     @Test

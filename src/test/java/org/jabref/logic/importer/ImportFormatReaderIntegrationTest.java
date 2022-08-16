@@ -8,7 +8,6 @@ import java.util.stream.Stream;
 
 import javafx.collections.FXCollections;
 
-import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -32,7 +31,6 @@ class ImportFormatReaderIntegrationTest {
         reader.resetImportFormats(
                 mock(ImporterPreferences.class),
                 mock(ImportFormatPreferences.class),
-                mock(XmpPreferences.class),
                 new DummyFileUpdateMonitor());
     }
 

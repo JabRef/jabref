@@ -79,10 +79,7 @@ public class ImportHandler {
         this.importFormatReader = importFormatReader;
 
         this.linker = new ExternalFilesEntryLinker(preferencesService.getFilePreferences(), database);
-        this.contentImporter = new ExternalFilesContentImporter(
-                preferencesService.getGeneralPreferences(),
-                preferencesService.getImporterPreferences(),
-                preferencesService.getImportFormatPreferences());
+        this.contentImporter = new ExternalFilesContentImporter(preferencesService.getImportFormatPreferences());
         this.undoManager = undoManager;
     }
 

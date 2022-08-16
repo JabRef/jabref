@@ -5,7 +5,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.jabref.logic.importer.ImportFormatPreferences;
-import org.jabref.logic.importer.ImporterPreferences;
+import org.jabref.logic.importer.fetcher.GrobidPreferences;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
@@ -27,16 +27,18 @@ import static org.mockito.Mockito.when;
 class PdfMergeMetadataImporterTest {
 
     private PdfMergeMetadataImporter importer;
-    private ImportFormatPreferences importFormatPreferences;
 
     @BeforeEach
     void setUp() {
-        ImporterPreferences importerPreferences = mock(ImporterPreferences.class, Answers.RETURNS_DEEP_STUBS);
-        when(importerPreferences.isGrobidEnabled()).thenReturn(true);
-        when(importerPreferences.getGrobidURL()).thenReturn("http://grobid.jabref.org:8070");
-        importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        GrobidPreferences grobidPreferences = mock(GrobidPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        when(grobidPreferences.isGrobidEnabled()).thenReturn(true);
+        when(grobidPreferences.getGrobidURL()).thenReturn("http://grobid.jabref.org:8070");
+
+        ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(importFormatPreferences.getFieldContentFormatterPreferences().getNonWrappableFields()).thenReturn(List.of());
-        importer = new PdfMergeMetadataImporter(importerPreferences, importFormatPreferences);
+        when(importFormatPreferences.getGrobidPreferences()).thenReturn(grobidPreferences);
+
+        importer = new PdfMergeMetadataImporter(importFormatPreferences);
     }
 
     @Test

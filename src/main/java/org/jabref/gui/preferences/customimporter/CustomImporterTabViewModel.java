@@ -57,7 +57,6 @@ public class CustomImporterTabViewModel implements PreferenceTabViewModel {
         Globals.IMPORT_FORMAT_READER.resetImportFormats(
                 preferences.getImporterPreferences(),
                 preferences.getImportFormatPreferences(),
-                preferences.getXmpPreferences(),
                 Globals.getFileUpdateMonitor());
     }
 

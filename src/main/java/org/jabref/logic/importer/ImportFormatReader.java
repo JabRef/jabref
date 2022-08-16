@@ -34,7 +34,6 @@ import org.jabref.logic.importer.fileformat.RepecNepImporter;
 import org.jabref.logic.importer.fileformat.RisImporter;
 import org.jabref.logic.importer.fileformat.SilverPlatterImporter;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.database.BibDatabases;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.strings.StringUtil;
@@ -54,7 +53,6 @@ public class ImportFormatReader {
 
     public void resetImportFormats(ImporterPreferences importerPreferences,
                                    ImportFormatPreferences newImportFormatPreferences,
-                                   XmpPreferences xmpPreferences,
                                    FileUpdateMonitor fileMonitor) {
         this.importFormatPreferences = newImportFormatPreferences;
 
@@ -71,14 +69,14 @@ public class ImportFormatReader {
         formats.add(new ModsImporter(importFormatPreferences));
         formats.add(new MsBibImporter());
         formats.add(new OvidImporter());
-        formats.add(new PdfMergeMetadataImporter(importerPreferences, importFormatPreferences));
+        formats.add(new PdfMergeMetadataImporter(importFormatPreferences));
         formats.add(new PdfVerbatimBibTextImporter(importFormatPreferences));
         formats.add(new PdfContentImporter(importFormatPreferences));
         formats.add(new PdfEmbeddedBibFileImporter(importFormatPreferences));
-        if (importerPreferences.isGrobidEnabled()) {
-            formats.add(new PdfGrobidImporter(importerPreferences, importFormatPreferences));
+        if (importFormatPreferences.getGrobidPreferences().isGrobidEnabled()) {
+            formats.add(new PdfGrobidImporter(importFormatPreferences));
         }
-        formats.add(new PdfXmpImporter(xmpPreferences));
+        formats.add(new PdfXmpImporter(importFormatPreferences.getXmpPreferences()));
         formats.add(new RepecNepImporter(importFormatPreferences));
         formats.add(new RisImporter());
         formats.add(new SilverPlatterImporter());
