@@ -27,6 +27,7 @@ import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.WebFetchers;
 import org.jabref.logic.importer.fetcher.CustomizableKeyFetcher;
+import org.jabref.logic.importer.fetcher.GrobidPreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.preferences.DOIPreferences;
@@ -61,17 +62,19 @@ public class ImportExportTabViewModel implements PreferenceTabViewModel {
     private final DialogService dialogService;
     private final PreferencesService preferencesService;
     private final DOIPreferences doiPreferences;
+    private final GrobidPreferences grobidPreferences;
     private final ImporterPreferences importerPreferences;
     private final SaveOrderConfig initialExportOrder;
     private final ImportExportPreferences importExportPreferences;
 
-    public ImportExportTabViewModel(PreferencesService preferencesService, DOIPreferences doiPreferences, DialogService dialogService, ImportExportPreferences importExportPreferences) {
+    public ImportExportTabViewModel(PreferencesService preferencesService, DialogService dialogService) {
         this.dialogService = dialogService;
         this.preferencesService = preferencesService;
         this.importerPreferences = preferencesService.getImporterPreferences();
-        this.doiPreferences = doiPreferences;
+        this.grobidPreferences = preferencesService.getGrobidPreferences();
+        this.doiPreferences = preferencesService.getDOIPreferences();
         this.initialExportOrder = preferencesService.getExportSaveOrder();
-        this.importExportPreferences = importExportPreferences;
+        this.importExportPreferences = preferencesService.getImportExportPreferences();
     }
 
     @Override
@@ -95,8 +98,8 @@ public class ImportExportTabViewModel implements PreferenceTabViewModel {
                                                       .map(SortCriterionViewModel::new)
                                                       .toList());
 
-        grobidEnabledProperty.setValue(importerPreferences.isGrobidEnabled());
-        grobidURLProperty.setValue(importerPreferences.getGrobidURL());
+        grobidEnabledProperty.setValue(grobidPreferences.isGrobidEnabled());
+        grobidURLProperty.setValue(grobidPreferences.getGrobidURL());
 
         apiKeys.setValue(FXCollections.observableArrayList(preferencesService.getImporterPreferences().getApiKeys()));
     }
@@ -104,9 +107,9 @@ public class ImportExportTabViewModel implements PreferenceTabViewModel {
     @Override
     public void storeSettings() {
         importerPreferences.setGenerateNewKeyOnImport(generateKeyOnImportProperty.getValue());
-        importerPreferences.setGrobidEnabled(grobidEnabledProperty.getValue());
-        importerPreferences.setGrobidOptOut(importerPreferences.isGrobidOptOut());
-        importerPreferences.setGrobidURL(grobidURLProperty.getValue());
+        grobidPreferences.setGrobidEnabled(grobidEnabledProperty.getValue());
+        grobidPreferences.setGrobidOptOut(grobidPreferences.isGrobidOptOut());
+        grobidPreferences.setGrobidURL(grobidURLProperty.getValue());
 
         doiPreferences.setUseCustom(useCustomDOIProperty.get());
         doiPreferences.setDefaultBaseURI(useCustomDOINameProperty.getValue().trim());

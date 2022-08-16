@@ -25,7 +25,7 @@ import org.jabref.logic.exporter.SavePreferences;
 import org.jabref.logic.exporter.TemplateExporter;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ImporterPreferences;
-import org.jabref.logic.importer.fileformat.CustomImporter;
+import org.jabref.logic.importer.fetcher.GrobidPreferences;
 import org.jabref.logic.journals.JournalAbbreviationPreferences;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Language;
@@ -233,11 +233,9 @@ public interface PreferencesService {
 
     void storeCustomExportFormats(List<TemplateExporter> exporters);
 
-    Set<CustomImporter> getCustomImportFormats();
-
-    void storeCustomImportFormats(Set<CustomImporter> customImporters);
-
     ImporterPreferences getImporterPreferences();
+
+    GrobidPreferences getGrobidPreferences();
 
     //*************************************************************************************************************
     // Preview preferences
