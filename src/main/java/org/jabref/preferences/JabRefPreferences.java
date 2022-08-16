@@ -1056,7 +1056,7 @@ public class JabRefPreferences implements PreferencesService {
         int i = 0;
         List<String> series = new ArrayList<>();
         String item;
-        while (!((item = get(key + i)).isEmpty())) {
+        while (!StringUtil.isBlank(item = get(key + i))) {
             series.add(item);
             i++;
         }
