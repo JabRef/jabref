@@ -37,8 +37,7 @@
 }
 
 .table-row-cell:entry-not-matching-search {
-    -fx-background-color: -jr-base;
-    -fx-opacity: 50%;
+    -fx-opacity: 35%;
 }
 
 .rating > .container {
