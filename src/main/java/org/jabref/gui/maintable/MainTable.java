@@ -180,8 +180,6 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
             }
         });
 
-        // insert score sort order
-        this.getSortOrder().add(0, this.getColumns().get(0));
         mainTablePreferences.getColumnPreferences().getColumnSortOrder().forEach(columnModel ->
                 this.getColumns().stream()
                     .map(column -> (MainTableColumn<?>) column)
