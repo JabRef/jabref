@@ -3,6 +3,7 @@ package org.jabref.gui.mergeentries;
 import java.util.Optional;
 
 import org.jabref.gui.mergeentries.newmergedialog.FieldRowViewModel;
+import org.jabref.gui.mergeentries.newmergedialog.fieldsmerger.FieldMergerFactory;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.Month;
 import org.jabref.model.entry.field.Field;
@@ -16,6 +17,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
 
 public class FieldRowViewModelTest {
 
@@ -25,6 +27,8 @@ public class FieldRowViewModelTest {
     BibEntry mergedEntry;
 
     FieldRowViewModel viewModel;
+
+    FieldMergerFactory fieldMergerFactory = mock(FieldMergerFactory.class);
 
     @BeforeEach
     public void setup() throws ParseException {
@@ -145,6 +149,6 @@ public class FieldRowViewModelTest {
     }
 
     public FieldRowViewModel createViewModelForField(Field field) {
-        return new FieldRowViewModel(field, leftEntry, rightEntry, mergedEntry);
+        return new FieldRowViewModel(field, leftEntry, rightEntry, mergedEntry, fieldMergerFactory);
     }
 }
