@@ -54,7 +54,6 @@ import org.jabref.gui.maintable.MainTableNameFormatPreferences.AbbreviationStyle
 import org.jabref.gui.maintable.MainTableNameFormatPreferences.DisplayStyle;
 import org.jabref.gui.maintable.MainTablePreferences;
 import org.jabref.gui.mergeentries.DiffMode;
-import org.jabref.gui.search.SearchDisplayMode;
 import org.jabref.gui.sidepane.SidePaneType;
 import org.jabref.gui.specialfields.SpecialFieldsPreferences;
 import org.jabref.gui.theme.Theme;
@@ -471,10 +470,9 @@ public class JabRefPreferences implements PreferencesService {
         // Since some of the preference settings themselves use localized strings, we cannot set the language after
         // the initialization of the preferences in main
         // Otherwise that language framework will be instantiated and more importantly, statically initialized preferences
-        // like the SearchDisplayMode will never be translated.
+        //  will never be translated.
         Localization.setLanguage(getLanguage());
 
-        defaults.put(SEARCH_DISPLAY_MODE, SearchDisplayMode.FILTER.toString());
         defaults.put(SEARCH_REG_EXP, Boolean.FALSE);
         defaults.put(SEARCH_FULLTEXT, Boolean.TRUE);
         defaults.put(SEARCH_KEEP_SEARCH_STRING, Boolean.FALSE);
@@ -2630,16 +2628,7 @@ public class JabRefPreferences implements PreferencesService {
             return searchPreferences;
         }
 
-        SearchDisplayMode searchDisplayMode;
-        try {
-            searchDisplayMode = SearchDisplayMode.valueOf(get(SEARCH_DISPLAY_MODE));
-        } catch (IllegalArgumentException ex) {
-            // Should only occur when the searchmode is set directly via preferences.put and the enum was not used
-            searchDisplayMode = SearchDisplayMode.valueOf((String) defaults.get(SEARCH_DISPLAY_MODE));
-        }
-
         searchPreferences = new SearchPreferences(
-                searchDisplayMode,
                 getBoolean(SEARCH_REG_EXP),
                 getBoolean(SEARCH_FULLTEXT),
                 getBoolean(SEARCH_KEEP_SEARCH_STRING),
@@ -2647,7 +2636,6 @@ public class JabRefPreferences implements PreferencesService {
                 getBoolean(SEARCH_SORT_BY_SCORE),
                 getBoolean(SEARCH_KEEP_GLOBAL_WINDOW_ON_TOP));
 
-        EasyBind.listen(searchPreferences.searchDisplayModeProperty(), (obs, oldValue, newValue) -> put(SEARCH_DISPLAY_MODE, Objects.requireNonNull(searchPreferences.getSearchDisplayMode()).toString()));
         searchPreferences.getObservableSearchFlags().addListener((SetChangeListener<SearchRules.SearchFlags>) c -> {
             putBoolean(SEARCH_REG_EXP, searchPreferences.getObservableSearchFlags().contains(SearchRules.SearchFlags.REGULAR_EXPRESSION));
             putBoolean(SEARCH_FULLTEXT, searchPreferences.getObservableSearchFlags().contains(SearchRules.SearchFlags.FULLTEXT));

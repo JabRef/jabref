@@ -3,23 +3,18 @@ package org.jabref.preferences;
 import java.util.EnumSet;
 
 import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableSet;
 
-import org.jabref.gui.search.SearchDisplayMode;
 import org.jabref.model.search.rules.SearchRules.SearchFlags;
 
 public class SearchPreferences {
 
-    private final ObjectProperty<SearchDisplayMode> searchDisplayMode;
     private final ObservableSet<SearchFlags> searchFlags;
     private final BooleanProperty keepWindowOnTop;
 
-    public SearchPreferences(SearchDisplayMode searchDisplayMode, boolean isRegularExpression, boolean isFulltext, boolean isKeepSearchString, boolean isFloatingMode, boolean isSortByScore, boolean keepWindowOnTop) {
-        this.searchDisplayMode = new SimpleObjectProperty<>(searchDisplayMode);
+    public SearchPreferences(boolean isRegularExpression, boolean isFulltext, boolean isKeepSearchString, boolean isFloatingMode, boolean isSortByScore, boolean keepWindowOnTop) {
         this.keepWindowOnTop = new SimpleBooleanProperty(keepWindowOnTop);
 
         searchFlags = FXCollections.observableSet(EnumSet.noneOf(SearchFlags.class));
@@ -40,8 +35,7 @@ public class SearchPreferences {
         }
     }
 
-    public SearchPreferences(SearchDisplayMode searchDisplayMode, EnumSet<SearchFlags> searchFlags, boolean keepWindowOnTop) {
-        this.searchDisplayMode = new SimpleObjectProperty<>(searchDisplayMode);
+    public SearchPreferences(EnumSet<SearchFlags> searchFlags, boolean keepWindowOnTop) {
         this.keepWindowOnTop = new SimpleBooleanProperty(keepWindowOnTop);
 
         this.searchFlags = FXCollections.observableSet(searchFlags);
@@ -57,18 +51,6 @@ public class SearchPreferences {
 
     public ObservableSet<SearchFlags> getObservableSearchFlags() {
         return searchFlags;
-    }
-
-    public SearchDisplayMode getSearchDisplayMode() {
-        return searchDisplayMode.get();
-    }
-
-    public ObjectProperty<SearchDisplayMode> searchDisplayModeProperty() {
-        return searchDisplayMode;
-    }
-
-    public void setSearchDisplayMode(SearchDisplayMode searchDisplayMode) {
-        this.searchDisplayMode.set(searchDisplayMode);
     }
 
     public void setSearchFlag(SearchFlags flag, boolean value) {
