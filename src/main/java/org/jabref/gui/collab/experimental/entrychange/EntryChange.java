@@ -12,16 +12,16 @@ public final class EntryChange extends ExternalChange {
     private final BibEntry oldEntry;
     private final BibEntry newEntry;
 
-    public EntryChange(BibEntry oldEntry, BibEntry newEntry, BibDatabaseContext databaseContext, NamedCompound undoEdit, ExternalChangeResolverFactory externalChangeResolverFactory) {
-        super(databaseContext, undoEdit, externalChangeResolverFactory);
+    public EntryChange(BibEntry oldEntry, BibEntry newEntry, BibDatabaseContext databaseContext, ExternalChangeResolverFactory externalChangeResolverFactory) {
+        super(databaseContext, externalChangeResolverFactory);
         this.oldEntry = oldEntry;
         this.newEntry = newEntry;
         setChangeName(oldEntry.getCitationKey().map(key -> Localization.lang("Modified entry '%0'", key))
                            .orElse(Localization.lang("Modified entry")));
     }
 
-    public EntryChange(BibEntry oldEntry, BibEntry newEntry, BibDatabaseContext databaseContext, NamedCompound undoEdit) {
-        this(oldEntry, newEntry, databaseContext, undoEdit, null);
+    public EntryChange(BibEntry oldEntry, BibEntry newEntry, BibDatabaseContext databaseContext) {
+        this(oldEntry, newEntry, databaseContext, null);
     }
 
     public BibEntry getOldEntry() {
@@ -33,7 +33,7 @@ public final class EntryChange extends ExternalChange {
     }
 
     @Override
-    public void applyChange() {
+    public void applyChange(NamedCompound undoEdit) {
         databaseContext.getDatabase().removeEntry(oldEntry);
         databaseContext.getDatabase().insertEntry(newEntry);
         undoEdit.addEdit(new UndoableInsertEntries(databaseContext.getDatabase(), oldEntry));

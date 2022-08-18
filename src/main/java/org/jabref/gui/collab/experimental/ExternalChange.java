@@ -14,14 +14,12 @@ import org.jabref.model.database.BibDatabaseContext;
 
 public sealed abstract class ExternalChange permits EntryChange {
     protected final BibDatabaseContext databaseContext;
-    protected final NamedCompound undoEdit;
     protected final OptionalObjectProperty<ExternalChangeResolver> externalChangeResolver = OptionalObjectProperty.empty();
     private final BooleanProperty accepted = new SimpleBooleanProperty();
     private final StringProperty name = new SimpleStringProperty();
 
-    protected ExternalChange(BibDatabaseContext databaseContext, NamedCompound undoEdit, ExternalChangeResolverFactory externalChangeResolverFactory) {
+    protected ExternalChange(BibDatabaseContext databaseContext, ExternalChangeResolverFactory externalChangeResolverFactory) {
         this.databaseContext = databaseContext;
-        this.undoEdit = undoEdit;
         setChangeName("Unnamed Change!");
 
         if (externalChangeResolverFactory != null) {
@@ -60,5 +58,5 @@ public sealed abstract class ExternalChange permits EntryChange {
         return externalChangeResolver.get();
     }
 
-    public abstract void applyChange();
+    public abstract void applyChange(NamedCompound undoEdit);
 }
