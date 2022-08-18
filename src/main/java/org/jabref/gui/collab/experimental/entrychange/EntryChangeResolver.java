@@ -1,5 +1,7 @@
 package org.jabref.gui.collab.experimental.entrychange;
 
+import java.util.Optional;
+
 import org.jabref.gui.DialogService;
 import org.jabref.gui.collab.experimental.ExternalChange;
 import org.jabref.gui.collab.experimental.ExternalChangeResolver;
@@ -25,23 +27,21 @@ public final class EntryChangeResolver extends ExternalChangeResolver {
     }
 
     @Override
-    public ExternalChange askUserToResolveChange() {
+    public Optional<ExternalChange> askUserToResolveChange() {
         MergeEntriesDialog mergeEntriesDialog = new MergeEntriesDialog(entryChange.getOldEntry(), entryChange.getNewEntry());
         mergeEntriesDialog.setLeftHeaderText(Localization.lang("On JabRef"));
         mergeEntriesDialog.setRightHeaderText(Localization.lang("On disk"));
         mergeEntriesDialog.configureDiff(new ShowDiffConfig(ThreeWayMergeToolbar.DiffView.SPLIT, DiffHighlighter.DiffMethod.WORDS));
 
         return dialogService.showCustomDialogAndWait(mergeEntriesDialog)
-                            .map(this::mapMergeResultToExternalChange)
-                            .orElseThrow(() -> new IllegalStateException(""));
+                            .map(this::mapMergeResultToExternalChange);
     }
 
     private EntryChange mapMergeResultToExternalChange(EntriesMergeResult entriesMergeResult) {
         return new EntryChange(
                 entryChange.getOldEntry(),
                 entryChange.getNewEntry(),
-                databaseContext,
-                undoEdit
+                databaseContext
         );
     }
 }

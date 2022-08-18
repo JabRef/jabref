@@ -1,5 +1,7 @@
 package org.jabref.gui.collab.experimental;
 
+import java.util.Optional;
+
 import org.jabref.gui.DialogService;
 import org.jabref.gui.collab.experimental.entrychange.EntryChangeResolver;
 
@@ -10,5 +12,5 @@ public sealed abstract class ExternalChangeResolver permits EntryChangeResolver 
         this.dialogService = dialogService;
     }
 
-    public abstract ExternalChange askUserToResolveChange();
+    public abstract Optional<ExternalChange> askUserToResolveChange();
 }
