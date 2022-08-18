@@ -10,20 +10,17 @@ import org.jabref.gui.mergeentries.MergeEntriesDialog;
 import org.jabref.gui.mergeentries.newmergedialog.ShowDiffConfig;
 import org.jabref.gui.mergeentries.newmergedialog.diffhighlighter.DiffHighlighter;
 import org.jabref.gui.mergeentries.newmergedialog.toolbar.ThreeWayMergeToolbar;
-import org.jabref.gui.undo.NamedCompound;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 
 public final class EntryChangeResolver extends ExternalChangeResolver {
     private final EntryChange entryChange;
     private final BibDatabaseContext databaseContext;
-    private final NamedCompound undoEdit;
 
-    public EntryChangeResolver(EntryChange entryChange, DialogService dialogService, BibDatabaseContext databaseContext, NamedCompound undoEdit) {
+    public EntryChangeResolver(EntryChange entryChange, DialogService dialogService, BibDatabaseContext databaseContext) {
         super(dialogService);
         this.entryChange = entryChange;
         this.databaseContext = databaseContext;
-        this.undoEdit = undoEdit;
     }
 
     @Override
