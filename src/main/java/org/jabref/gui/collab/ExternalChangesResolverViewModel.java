@@ -13,7 +13,6 @@ import javafx.collections.ObservableList;
 
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.collab.experimental.ExternalChange;
-import org.jabref.gui.collab.experimental.entrychange.EntryChange;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.logic.l10n.Localization;
 
