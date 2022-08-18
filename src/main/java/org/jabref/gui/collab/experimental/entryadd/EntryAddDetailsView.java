@@ -10,10 +10,7 @@ import org.jabref.preferences.PreferencesService;
 
 public final class EntryAddDetailsView extends ExternalChangeDetailsView {
 
-    private PreferencesService preferencesService;
-
     public EntryAddDetailsView(EntryAdd entryAdd, BibDatabaseContext bibDatabaseContext, DialogService dialogService, StateManager stateManager, ThemeManager themeManager, PreferencesService preferencesService) {
-
         PreviewViewer previewViewer = new PreviewViewer(bibDatabaseContext, dialogService, stateManager, themeManager);
         previewViewer.setLayout(preferencesService.getPreviewPreferences().getSelectedPreviewLayout());
         previewViewer.setEntry(entryAdd.getAddedEntry());

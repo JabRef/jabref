@@ -9,22 +9,8 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.preferences.PreferencesService;
 
 public final class EntryChangeDetailsView extends ExternalChangeDetailsView {
-    private final EntryChange entryChange;
-    private final BibDatabaseContext databaseContext;
-    private final DialogService dialogService;
-    private final StateManager stateManager;
-    private final ThemeManager themeManager;
-
-    private PreferencesService preferencesService;
-
     public EntryChangeDetailsView(EntryChange entryChange, BibDatabaseContext bibDatabaseContext, DialogService dialogService, StateManager stateManager, ThemeManager themeManager, PreferencesService preferencesService) {
-        this.entryChange = entryChange;
-        this.databaseContext = bibDatabaseContext;
-        this.dialogService = dialogService;
-        this.stateManager = stateManager;
-        this.themeManager = themeManager;
-
-        PreviewViewer previewViewer = new PreviewViewer(databaseContext, dialogService, stateManager, themeManager);
+        PreviewViewer previewViewer = new PreviewViewer(bibDatabaseContext, dialogService, stateManager, themeManager);
         previewViewer.setLayout(preferencesService.getPreviewPreferences().getSelectedPreviewLayout());
         previewViewer.setEntry(entryChange.getNewEntry());
 
