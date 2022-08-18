@@ -37,7 +37,7 @@ public final class EntryChangeResolver extends ExternalChangeResolver {
     private EntryChange mapMergeResultToExternalChange(EntriesMergeResult entriesMergeResult) {
         return new EntryChange(
                 entryChange.getOldEntry(),
-                entryChange.getNewEntry(),
+                entriesMergeResult.mergedEntry(),
                 databaseContext
         );
     }

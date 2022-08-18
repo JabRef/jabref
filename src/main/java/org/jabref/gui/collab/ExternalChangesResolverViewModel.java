@@ -13,6 +13,7 @@ import javafx.collections.ObservableList;
 
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.collab.experimental.ExternalChange;
+import org.jabref.gui.collab.experimental.entrychange.EntryChange;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.logic.l10n.Localization;
 
@@ -86,7 +87,10 @@ public class ExternalChangesResolverViewModel extends AbstractViewModel {
 
     public void acceptMergedChange(ExternalChange externalChange) {
         Objects.requireNonNull(externalChange);
-
+        if (externalChange instanceof EntryChange entryChange) {
+            System.out.println("Old entry: " + entryChange.getOldEntry());
+            System.out.println("New entry: " + entryChange.getNewEntry());
+        }
         getSelectedChange().ifPresent(oldChange -> {
             changes.remove(oldChange);
             changes.add(externalChange);
