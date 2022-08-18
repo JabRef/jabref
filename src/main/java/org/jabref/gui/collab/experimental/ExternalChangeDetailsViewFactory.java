@@ -7,7 +7,7 @@ public class ExternalChangeDetailsViewFactory {
 
     public ExternalChangeDetailsView create(ExternalChange externalChange) {
         if (externalChange instanceof EntryChange entryChange) {
-            return new EntryChangeDetailsView(entryChange, null, null, null, null);
+            return new EntryChangeDetailsView(entryChange, null, null, null, null, null);
         }
         throw new UnsupportedOperationException("No implementation found for the given change preview");
     }
