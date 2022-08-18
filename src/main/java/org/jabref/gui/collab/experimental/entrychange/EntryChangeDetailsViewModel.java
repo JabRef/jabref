@@ -1,10 +1,7 @@
 package org.jabref.gui.collab.experimental.entrychange;
 
 import org.jabref.gui.collab.experimental.ExternalChangeDetailsViewModel;
-import org.jabref.model.database.BibDatabaseContext;
 
+// TODO: This view model seems to be useless, as the view as very little state to manage
 public class EntryChangeDetailsViewModel extends ExternalChangeDetailsViewModel {
-    public EntryChangeDetailsViewModel(BibDatabaseContext databaseContext) {
-        super(databaseContext);
-    }
 }
