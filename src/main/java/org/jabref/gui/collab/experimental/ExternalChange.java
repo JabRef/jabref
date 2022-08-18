@@ -15,7 +15,7 @@ import org.jabref.model.database.BibDatabaseContext;
 public sealed abstract class ExternalChange permits EntryChange {
     protected final BibDatabaseContext databaseContext;
     protected final NamedCompound undoEdit;
-    private final OptionalObjectProperty<ExternalChangeResolver> externalChangeResolver = OptionalObjectProperty.empty();
+    protected final OptionalObjectProperty<ExternalChangeResolver> externalChangeResolver = OptionalObjectProperty.empty();
     private final BooleanProperty accepted = new SimpleBooleanProperty();
     private final StringProperty name = new SimpleStringProperty();
 
@@ -23,7 +23,10 @@ public sealed abstract class ExternalChange permits EntryChange {
         this.databaseContext = databaseContext;
         this.undoEdit = undoEdit;
         setChangeName("Unnamed Change!");
-        externalChangeResolver.set(externalChangeResolverFactory.create(this));
+
+        if (externalChangeResolverFactory != null) {
+            externalChangeResolver.set(externalChangeResolverFactory.create(this));
+        }
     }
 
     public boolean isAccepted() {
