@@ -102,6 +102,6 @@ public class ChangeScanner {
             return new EntryDeleteChangeViewModel(diff.getOriginalEntry(), preferencesService);
         }*/
 
-        return new EntryChange(diff.getOriginalEntry(), diff.getNewEntry(), database, new ExternalChangeResolverFactory(dialogService));
+        return new EntryChange(diff.getOriginalEntry(), diff.getNewEntry(), database, new ExternalChangeResolverFactory(dialogService, database));
     }
 }
