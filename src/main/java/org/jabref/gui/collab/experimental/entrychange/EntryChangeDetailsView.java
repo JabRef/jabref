@@ -9,8 +9,6 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.preferences.PreferencesService;
 
 public final class EntryChangeDetailsView extends ExternalChangeDetailsView {
-
-    private EntryChangeDetailsViewModel viewModel;
     private final EntryChange entryChange;
     private final BibDatabaseContext databaseContext;
     private final DialogService dialogService;
@@ -25,8 +23,6 @@ public final class EntryChangeDetailsView extends ExternalChangeDetailsView {
         this.dialogService = dialogService;
         this.stateManager = stateManager;
         this.themeManager = themeManager;
-
-        viewModel = new EntryChangeDetailsViewModel();
 
         PreviewViewer previewViewer = new PreviewViewer(databaseContext, dialogService, stateManager, themeManager);
         previewViewer.setLayout(preferencesService.getPreviewPreferences().getSelectedPreviewLayout());

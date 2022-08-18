@@ -2,6 +2,8 @@ package org.jabref.gui.collab.experimental;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.collab.experimental.entryadd.EntryAdd;
+import org.jabref.gui.collab.experimental.entryadd.EntryAddDetailsView;
 import org.jabref.gui.collab.experimental.entrychange.EntryChange;
 import org.jabref.gui.collab.experimental.entrychange.EntryChangeDetailsView;
 import org.jabref.gui.theme.ThemeManager;
@@ -26,6 +28,8 @@ public class ExternalChangeDetailsViewFactory {
     public ExternalChangeDetailsView create(ExternalChange externalChange) {
         if (externalChange instanceof EntryChange entryChange) {
             return new EntryChangeDetailsView(entryChange, databaseContext, dialogService, stateManager, themeManager, preferencesService);
+        } else if (externalChange instanceof EntryAdd entryAdd) {
+            return new EntryAddDetailsView(entryAdd, databaseContext, dialogService, stateManager, themeManager, preferencesService);
         }
         throw new UnsupportedOperationException("No implementation found for the given change preview");
     }

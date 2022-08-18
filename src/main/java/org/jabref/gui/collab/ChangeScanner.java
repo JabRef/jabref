@@ -9,6 +9,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.collab.experimental.ExternalChange;
 import org.jabref.gui.collab.experimental.ExternalChangeResolverFactory;
+import org.jabref.gui.collab.experimental.entryadd.EntryAdd;
 import org.jabref.gui.collab.experimental.entrychange.EntryChange;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.logic.bibtex.comparator.BibDatabaseDiff;
@@ -94,11 +95,11 @@ public class ChangeScanner {
     }
 
     private ExternalChange createBibEntryDiff(BibEntryDiff diff) {
-   /*     if (diff.getOriginalEntry() == null) {
-            return new EntryAddChangeViewModel(diff.getNewEntry(), preferencesService, dialogService, stateManager, themeManager);
+        if (diff.getOriginalEntry() == null) {
+            return new EntryAdd(diff.getNewEntry(), database, new ExternalChangeResolverFactory(dialogService, database));
         }
 
-        if (diff.getNewEntry() == null) {
+       /* if (diff.getNewEntry() == null) {
             return new EntryDeleteChangeViewModel(diff.getOriginalEntry(), preferencesService);
         }*/
 
