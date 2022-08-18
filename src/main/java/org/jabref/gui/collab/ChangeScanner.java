@@ -7,6 +7,9 @@ import java.util.List;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.collab.experimental.ExternalChange;
+import org.jabref.gui.collab.experimental.ExternalChangeResolverFactory;
+import org.jabref.gui.collab.experimental.entrychange.EntryChange;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.logic.bibtex.comparator.BibDatabaseDiff;
 import org.jabref.logic.bibtex.comparator.BibEntryDiff;
@@ -43,13 +46,13 @@ public class ChangeScanner {
         this.themeManager = themeManager;
     }
 
-    public List<DatabaseChangeViewModel> scanForChanges() {
+    public List<ExternalChange> scanForChanges() {
         if (database.getDatabasePath().isEmpty()) {
             return Collections.emptyList();
         }
 
         try {
-            List<DatabaseChangeViewModel> changes = new ArrayList<>();
+            List<ExternalChange> changes = new ArrayList<>();
 
             // Parse the modified file
             // Important: apply all post-load actions
@@ -60,12 +63,12 @@ public class ChangeScanner {
 
             // Start looking at changes.
             BibDatabaseDiff differences = BibDatabaseDiff.compare(database, databaseOnDisk);
-            differences.getMetaDataDifferences().ifPresent(diff -> {
+         /*   differences.getMetaDataDifferences().ifPresent(diff -> {
                 changes.add(new MetaDataChangeViewModel(diff, preferencesService));
                 diff.getGroupDifferences().ifPresent(groupDiff -> changes.add(new GroupChangeViewModel(groupDiff)));
-            });
-            differences.getPreambleDifferences().ifPresent(diff -> changes.add(new PreambleChangeViewModel(diff)));
-            differences.getBibStringDifferences().forEach(diff -> changes.add(createBibStringDiff(diff)));
+            });*/
+      /*      differences.getPreambleDifferences().ifPresent(diff -> changes.add(new PreambleChangeViewModel(diff)));
+            differences.getBibStringDifferences().forEach(diff -> changes.add(createBibStringDiff(diff)));*/
             differences.getEntryDifferences().forEach(diff -> changes.add(createBibEntryDiff(diff)));
             return changes;
         } catch (IOException e) {
@@ -90,15 +93,15 @@ public class ChangeScanner {
         return new StringNameChangeViewModel(diff.getOriginalString(), diff.getNewString());
     }
 
-    private DatabaseChangeViewModel createBibEntryDiff(BibEntryDiff diff) {
-        if (diff.getOriginalEntry() == null) {
+    private ExternalChange createBibEntryDiff(BibEntryDiff diff) {
+   /*     if (diff.getOriginalEntry() == null) {
             return new EntryAddChangeViewModel(diff.getNewEntry(), preferencesService, dialogService, stateManager, themeManager);
         }
 
         if (diff.getNewEntry() == null) {
             return new EntryDeleteChangeViewModel(diff.getOriginalEntry(), preferencesService);
-        }
+        }*/
 
-        return new EntryChangeViewModel(diff.getOriginalEntry(), diff.getNewEntry(), dialogService, preferencesService, stateManager, themeManager);
+        return new EntryChange(diff.getOriginalEntry(), diff.getNewEntry(), database, new ExternalChangeResolverFactory(dialogService));
     }
 }

@@ -1,7 +1,6 @@
 package org.jabref.gui.collab.experimental.entrychange;
 
 import javafx.fxml.FXML;
-import javafx.scene.layout.AnchorPane;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;

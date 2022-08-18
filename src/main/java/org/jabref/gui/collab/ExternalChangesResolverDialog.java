@@ -43,10 +43,10 @@ public class ExternalChangesResolverDialog extends BaseDialog<Boolean> {
 
     private final ExternalChangeDetailsViewFactory externalChangeDetailsViewFactory;
 
-    public ExternalChangesResolverDialog(BibDatabaseContext database, List<ExternalChange> changes, ExternalChangeDetailsViewFactory externalChangeDetailsViewFactory) {
+    public ExternalChangesResolverDialog(BibDatabaseContext database, List<ExternalChange> changes) {
         this.database = database;
         this.changes = new ArrayList<>(changes);
-        this.externalChangeDetailsViewFactory = externalChangeDetailsViewFactory;
+        this.externalChangeDetailsViewFactory = new ExternalChangeDetailsViewFactory();
 
         ViewLoader.view(this)
                 .load().setAsDialogPane(this);
@@ -102,6 +102,6 @@ public class ExternalChangesResolverDialog extends BaseDialog<Boolean> {
     @FXML
     public void askUserToResolveChange() {
         viewModel.getSelectedChange().flatMap(ExternalChange::getExternalChangeResolver)
-                 .map(ExternalChangeResolver::askUserToResolveChange).ifPresent(viewModel::acceptMergedChange);
+                 .flatMap(ExternalChangeResolver::askUserToResolveChange).ifPresent(viewModel::acceptMergedChange);
     }
 }

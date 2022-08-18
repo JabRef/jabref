@@ -96,7 +96,7 @@ public class ExternalChangesResolverViewModel extends AbstractViewModel {
     }
 
     public void applyChanges() {
-        changes.stream().filter(ExternalChange::isAccepted).forEach(ExternalChange::applyChange);
+        changes.stream().filter(ExternalChange::isAccepted).forEach(change -> change.applyChange(ce));
         ce.end();
     }
 }
