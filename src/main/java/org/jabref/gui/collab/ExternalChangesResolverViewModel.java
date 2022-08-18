@@ -28,13 +28,13 @@ public class ExternalChangesResolverViewModel extends AbstractViewModel {
     private final NamedCompound ce = new NamedCompound(Localization.lang("Merged external changes"));
 
     private final BibDatabaseContext databaseContext;
-    private final ObservableList<DatabaseChangeViewModel> changes = FXCollections.observableArrayList();
+    private final ObservableList<DatabaseChangeViewModel> visibleChanges = FXCollections.observableArrayList();
 
     /**
      * Because the other changes list will be bound to the UI, certain changes can be removed. This list is used to keep
      * track of changes even when they're removed from the UI.
      */
-    private final ObservableList<DatabaseChangeViewModel> immutableChanges = FXCollections.observableArrayList();
+    private final ObservableList<DatabaseChangeViewModel> changes = FXCollections.observableArrayList();
 
     private final ObjectProperty<DatabaseChangeViewModel> selectedChange = new SimpleObjectProperty<>();
 
@@ -47,11 +47,11 @@ public class ExternalChangesResolverViewModel extends AbstractViewModel {
         Objects.requireNonNull(externalChanges);
         assert !externalChanges.isEmpty();
 
+        this.visibleChanges.addAll(externalChanges);
         this.changes.addAll(externalChanges);
-        this.immutableChanges.addAll(externalChanges);
         this.databaseContext = databaseContext;
 
-        areAllChangesResolved = Bindings.createBooleanBinding(changes::isEmpty, changes);
+        areAllChangesResolved = Bindings.createBooleanBinding(visibleChanges::isEmpty, visibleChanges);
         canOpenAdvancedMergeDialog = Bindings.createBooleanBinding(() -> selectedChange.get() != null && selectedChange.get().hasAdvancedMergeDialog(), selectedChange);
 
         EasyBind.subscribe(areAllChangesResolved, isResolved -> {
@@ -61,8 +61,8 @@ public class ExternalChangesResolverViewModel extends AbstractViewModel {
         });
     }
 
-    public ObservableList<DatabaseChangeViewModel> getChanges() {
-        return changes;
+    public ObservableList<DatabaseChangeViewModel> getVisibleChanges() {
+        return visibleChanges;
     }
 
     public ObjectProperty<DatabaseChangeViewModel> selectedChangeProperty() {
@@ -88,27 +88,27 @@ public class ExternalChangesResolverViewModel extends AbstractViewModel {
     public void acceptChange() {
         getSelectedChange().ifPresent(selectedChange -> {
             selectedChange.accept();
-            getChanges().remove(selectedChange);
+            getVisibleChanges().remove(selectedChange);
         });
     }
 
     public void denyChange() {
-        getSelectedChange().ifPresent(getChanges()::remove);
+        getSelectedChange().ifPresent(getVisibleChanges()::remove);
     }
 
     public void acceptMergedChange(DatabaseChangeViewModel mergedChange) {
         Objects.requireNonNull(mergedChange);
 
         getSelectedChange().ifPresent(oldChange -> {
-            immutableChanges.remove(oldChange);
-            immutableChanges.add(mergedChange);
-            getChanges().remove(oldChange);
+            changes.remove(oldChange);
+            changes.add(mergedChange);
+            getVisibleChanges().remove(oldChange);
             mergedChange.accept();
         });
     }
 
     private void makeChanges() {
-        immutableChanges.stream().filter(DatabaseChangeViewModel::isAccepted).forEach(change -> change.makeChange(databaseContext, ce));
+        changes.stream().filter(DatabaseChangeViewModel::isAccepted).forEach(change -> change.makeChange(databaseContext, ce));
         ce.end();
     }
 }

@@ -68,7 +68,7 @@ public class ExternalChangesResolverDialog extends BaseDialog<Boolean> {
         changeName.setCellValueFactory(data -> data.getValue().nameProperty());
         openAdvancedMergeDialogButton.disableProperty().bind(viewModel.canOpenAdvancedMergeDialogProperty().not());
 
-        changesTableView.setItems(viewModel.getChanges());
+        changesTableView.setItems(viewModel.getVisibleChanges());
         changesTableView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
         changesTableView.getSelectionModel().selectFirst();
 
