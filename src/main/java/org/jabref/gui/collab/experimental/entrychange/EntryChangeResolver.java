@@ -3,14 +3,45 @@ package org.jabref.gui.collab.experimental.entrychange;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.collab.experimental.ExternalChange;
 import org.jabref.gui.collab.experimental.ExternalChangeResolver;
+import org.jabref.gui.mergeentries.EntriesMergeResult;
+import org.jabref.gui.mergeentries.MergeEntriesDialog;
+import org.jabref.gui.mergeentries.newmergedialog.ShowDiffConfig;
+import org.jabref.gui.mergeentries.newmergedialog.diffhighlighter.DiffHighlighter;
+import org.jabref.gui.mergeentries.newmergedialog.toolbar.ThreeWayMergeToolbar;
+import org.jabref.gui.undo.NamedCompound;
+import org.jabref.logic.l10n.Localization;
+import org.jabref.model.database.BibDatabaseContext;
 
 public final class EntryChangeResolver extends ExternalChangeResolver {
-    public EntryChangeResolver(DialogService dialogService) {
+    private final EntryChange entryChange;
+    private final BibDatabaseContext databaseContext;
+    private final NamedCompound undoEdit;
+
+    public EntryChangeResolver(EntryChange entryChange, DialogService dialogService, BibDatabaseContext databaseContext, NamedCompound undoEdit) {
         super(dialogService);
+        this.entryChange = entryChange;
+        this.databaseContext = databaseContext;
+        this.undoEdit = undoEdit;
     }
 
     @Override
     public ExternalChange askUserToResolveChange() {
-        return null;
+        MergeEntriesDialog mergeEntriesDialog = new MergeEntriesDialog(entryChange.getOldEntry(), entryChange.getNewEntry());
+        mergeEntriesDialog.setLeftHeaderText(Localization.lang("On JabRef"));
+        mergeEntriesDialog.setRightHeaderText(Localization.lang("On disk"));
+        mergeEntriesDialog.configureDiff(new ShowDiffConfig(ThreeWayMergeToolbar.DiffView.SPLIT, DiffHighlighter.DiffMethod.WORDS));
+
+        return dialogService.showCustomDialogAndWait(mergeEntriesDialog)
+                            .map(this::mapMergeResultToExternalChange)
+                            .orElseThrow(() -> new IllegalStateException(""));
+    }
+
+    private EntryChange mapMergeResultToExternalChange(EntriesMergeResult entriesMergeResult) {
+        return new EntryChange(
+                entryChange.getOldEntry(),
+                entryChange.getNewEntry(),
+                databaseContext,
+                undoEdit
+        );
     }
 }
