@@ -1,7 +1,5 @@
 package org.jabref.gui.collab.experimental.entrychange;
 
-import javafx.fxml.FXML;
-
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.collab.experimental.ExternalChangeDetailsView;
@@ -27,10 +25,7 @@ public final class EntryChangeDetailsView extends ExternalChangeDetailsView {
         this.dialogService = dialogService;
         this.stateManager = stateManager;
         this.themeManager = themeManager;
-    }
 
-    @FXML
-    private void initialize() {
         viewModel = new EntryChangeDetailsViewModel();
 
         PreviewViewer previewViewer = new PreviewViewer(databaseContext, dialogService, stateManager, themeManager);

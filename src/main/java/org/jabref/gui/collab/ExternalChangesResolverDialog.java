@@ -12,11 +12,15 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.layout.BorderPane;
 
+import org.jabref.gui.DialogService;
+import org.jabref.gui.StateManager;
 import org.jabref.gui.collab.experimental.ExternalChange;
 import org.jabref.gui.collab.experimental.ExternalChangeDetailsViewFactory;
 import org.jabref.gui.collab.experimental.ExternalChangeResolver;
+import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
@@ -43,10 +47,10 @@ public class ExternalChangesResolverDialog extends BaseDialog<Boolean> {
 
     private final ExternalChangeDetailsViewFactory externalChangeDetailsViewFactory;
 
-    public ExternalChangesResolverDialog(BibDatabaseContext database, List<ExternalChange> changes) {
-        this.database = database;
+    public ExternalChangesResolverDialog(List<ExternalChange> changes, BibDatabaseContext database, DialogService dialogService, StateManager stateManager, ThemeManager themeManager, PreferencesService preferencesService) {
         this.changes = new ArrayList<>(changes);
-        this.externalChangeDetailsViewFactory = new ExternalChangeDetailsViewFactory();
+        this.database = database;
+        this.externalChangeDetailsViewFactory = new ExternalChangeDetailsViewFactory(database, dialogService, stateManager, themeManager, preferencesService);
 
         ViewLoader.view(this)
                 .load().setAsDialogPane(this);
