@@ -41,6 +41,13 @@ public sealed abstract class ExternalChange permits EntryChange {
         this.accepted.set(accepted);
     }
 
+    /**
+     * Convince method for accepting changes
+     * */
+    public void accept() {
+        setAccepted(true);
+    }
+
     public String getName() {
         return name.get();
     }
