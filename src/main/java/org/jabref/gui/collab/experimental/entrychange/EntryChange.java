@@ -20,6 +20,18 @@ public final class EntryChange extends ExternalChange {
                            .orElse(Localization.lang("Modified entry")));
     }
 
+    public EntryChange(BibEntry oldEntry, BibEntry newEntry, BibDatabaseContext databaseContext, NamedCompound undoEdit) {
+        this(oldEntry, newEntry, databaseContext, undoEdit, null);
+    }
+
+    public BibEntry getOldEntry() {
+        return oldEntry;
+    }
+
+    public BibEntry getNewEntry() {
+        return newEntry;
+    }
+
     @Override
     public void applyChange() {
         databaseContext.getDatabase().removeEntry(oldEntry);
