@@ -3,6 +3,8 @@ package org.jabref.gui.collab;
 import java.util.ArrayList;
 import java.util.List;
 
+import javafx.application.Platform;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.SelectionMode;
@@ -10,13 +12,14 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.layout.BorderPane;
 
+import org.jabref.gui.collab.experimental.ExternalChange;
+import org.jabref.gui.collab.experimental.ExternalChangeDetailsViewFactory;
+import org.jabref.gui.collab.experimental.ExternalChangeResolver;
 import org.jabref.gui.util.BaseDialog;
-import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
-import org.controlsfx.control.MasterDetailPane;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,28 +27,26 @@ public class ExternalChangesResolverDialog extends BaseDialog<Boolean> {
     private final static Logger LOGGER = LoggerFactory.getLogger(ExternalChangesResolverDialog.class);
 
     @FXML
-    public TableView<DatabaseChangeViewModel> changesTableView;
+    private TableView<ExternalChange> changesTableView;
     @FXML
-    public Button openAdvancedMergeDialogButton;
+    private TableColumn<ExternalChange, String> changeName;
     @FXML
-    public MasterDetailPane materDetailPane;
+    private Button askUserToResolveChangeButton;
     @FXML
-    public BorderPane changeInfoPane;
-    @FXML
-    private TableColumn<DatabaseChangeViewModel, String> changeName;
+    private BorderPane changeInfoPane;
 
     private final BibDatabaseContext database;
 
-    private final List<DatabaseChangeViewModel> changes;
+    private final List<ExternalChange> changes;
 
     private ExternalChangesResolverViewModel viewModel;
 
-    public ExternalChangesResolverDialog(BibDatabaseContext database, List<DatabaseChangeViewModel> changes) {
+    private final ExternalChangeDetailsViewFactory externalChangeDetailsViewFactory;
+
+    public ExternalChangesResolverDialog(BibDatabaseContext database, List<ExternalChange> changes, ExternalChangeDetailsViewFactory externalChangeDetailsViewFactory) {
         this.database = database;
         this.changes = new ArrayList<>(changes);
-
-        this.setTitle(Localization.lang("External changes"));
-        this.getDialogPane().setPrefSize(800, 600);
+        this.externalChangeDetailsViewFactory = externalChangeDetailsViewFactory;
 
         ViewLoader.view(this)
                 .load().setAsDialogPane(this);
@@ -55,7 +56,7 @@ public class ExternalChangesResolverDialog extends BaseDialog<Boolean> {
                 LOGGER.info("External changes are resolved successfully");
                 return true;
             } else {
-                LOGGER.info("External changes ARE NOT resolved");
+                LOGGER.info("External changes aren't resolved");
                 return false;
             }
         });
@@ -63,10 +64,10 @@ public class ExternalChangesResolverDialog extends BaseDialog<Boolean> {
 
     @FXML
     private void initialize() {
-        viewModel = new ExternalChangesResolverViewModel(changes, database);
+        viewModel = new ExternalChangesResolverViewModel(changes);
 
-        changeName.setCellValueFactory(data -> data.getValue().nameProperty());
-        openAdvancedMergeDialogButton.disableProperty().bind(viewModel.canOpenAdvancedMergeDialogProperty().not());
+        changeName.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getName()));
+        askUserToResolveChangeButton.disableProperty().bind(viewModel.canAskUserToResolveChangeProperty().not());
 
         changesTableView.setItems(viewModel.getVisibleChanges());
         changesTableView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
@@ -75,14 +76,15 @@ public class ExternalChangesResolverDialog extends BaseDialog<Boolean> {
         viewModel.selectedChangeProperty().bind(changesTableView.getSelectionModel().selectedItemProperty());
         EasyBind.subscribe(viewModel.selectedChangeProperty(), selectedChange -> {
             if (selectedChange != null) {
-                changeInfoPane.setCenter(selectedChange.description());
+                changeInfoPane.setCenter(externalChangeDetailsViewFactory.create(selectedChange));
             }
         });
 
         EasyBind.subscribe(viewModel.areAllChangesResolvedProperty(), isResolved -> {
             if (isResolved) {
-                LOGGER.info("Closing ExternalChangesResolverDialog");
+                Platform.runLater(viewModel::applyChanges);
                 close();
+                LOGGER.info("Closing ExternalChangesResolverDialog");
             }
         });
     }
@@ -98,8 +100,8 @@ public class ExternalChangesResolverDialog extends BaseDialog<Boolean> {
     }
 
     @FXML
-    public void openAdvancedMergeDialog() {
-        viewModel.getSelectedChange().flatMap(DatabaseChangeViewModel::openAdvancedMergeDialog)
-                 .ifPresent(viewModel::acceptMergedChange);
+    public void askUserToResolveChange() {
+        viewModel.getSelectedChange().flatMap(ExternalChange::getExternalChangeResolver)
+                 .map(ExternalChangeResolver::askUserToResolveChange).ifPresent(viewModel::acceptMergedChange);
     }
 }

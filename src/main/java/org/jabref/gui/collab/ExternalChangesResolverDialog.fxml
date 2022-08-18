@@ -2,16 +2,15 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ButtonType?>
 <?import javafx.scene.control.DialogPane?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import org.controlsfx.control.MasterDetailPane?>
-
-<?import javafx.scene.control.ButtonType?>
-<?import javafx.scene.layout.BorderPane?>
 <DialogPane prefHeight="400.0" prefWidth="700.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jabref.gui.collab.ExternalChangesResolverDialog">
     <content>
         <AnchorPane>
@@ -26,7 +25,8 @@
                         <VBox maxHeight="1.7976931348623157E308" maxWidth="Infinity" minHeight="-Infinity" minWidth="-Infinity" spacing="8.0" HBox.hgrow="NEVER">
                             <Button onAction="#acceptChanges" text="Accept" maxWidth="Infinity"/>
                             <Button onAction="#denyChanges" text="Deny" maxWidth="Infinity"/>
-                            <Button fx:id="openAdvancedMergeDialogButton" maxWidth="Infinity" onAction="#openAdvancedMergeDialog" text="Merge.." />
+                            <Button fx:id="askUserToResolveChangeButton"
+                                    maxWidth="Infinity" onAction="#askUserToResolveChange" text="Merge.." />
                             <HBox.margin>
                                 <Insets left="8.0" right="8.0" top="8.0" />
                             </HBox.margin>
