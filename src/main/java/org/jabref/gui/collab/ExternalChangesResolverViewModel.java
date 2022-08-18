@@ -87,10 +87,7 @@ public class ExternalChangesResolverViewModel extends AbstractViewModel {
 
     public void acceptMergedChange(ExternalChange externalChange) {
         Objects.requireNonNull(externalChange);
-        if (externalChange instanceof EntryChange entryChange) {
-            System.out.println("Old entry: " + entryChange.getOldEntry());
-            System.out.println("New entry: " + entryChange.getNewEntry());
-        }
+
         getSelectedChange().ifPresent(oldChange -> {
             changes.remove(oldChange);
             changes.add(externalChange);
