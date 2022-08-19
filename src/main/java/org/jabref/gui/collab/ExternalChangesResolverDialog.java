@@ -2,6 +2,9 @@ package org.jabref.gui.collab;
 
 import java.util.List;
 
+import javax.inject.Inject;
+import javax.swing.undo.UndoManager;
+
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXML;
@@ -42,6 +45,8 @@ public class ExternalChangesResolverDialog extends BaseDialog<Boolean> {
 
     private final ExternalChangeDetailsViewFactory externalChangeDetailsViewFactory;
 
+    @Inject private UndoManager undoManager;
+
     public ExternalChangesResolverDialog(List<ExternalChange> changes, BibDatabaseContext database, DialogService dialogService, StateManager stateManager, ThemeManager themeManager, PreferencesService preferencesService) {
         this.changes = changes;
         this.externalChangeDetailsViewFactory = new ExternalChangeDetailsViewFactory(database, dialogService, stateManager, themeManager, preferencesService);
@@ -64,7 +69,7 @@ public class ExternalChangesResolverDialog extends BaseDialog<Boolean> {
 
     @FXML
     private void initialize() {
-        viewModel = new ExternalChangesResolverViewModel(changes);
+        viewModel = new ExternalChangesResolverViewModel(changes, undoManager);
 
         changeName.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getName()));
         askUserToResolveChangeButton.disableProperty().bind(viewModel.canAskUserToResolveChangeProperty().not());

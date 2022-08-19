@@ -42,6 +42,7 @@ public final class EntryChange extends ExternalChange {
         CompoundEdit changeEntryEdit = new CompoundEdit();
         changeEntryEdit.addEdit(new UndoableRemoveEntries(databaseContext.getDatabase(), oldEntry));
         changeEntryEdit.addEdit(new UndoableInsertEntries(databaseContext.getDatabase(), newEntry));
+        changeEntryEdit.end();
 
         undoEdit.addEdit(changeEntryEdit);
     }

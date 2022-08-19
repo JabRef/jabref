@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+import javax.swing.undo.UndoManager;
+
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.ObjectProperty;
@@ -37,12 +39,15 @@ public class ExternalChangesResolverViewModel extends AbstractViewModel {
 
     private final BooleanBinding canAskUserToResolveChange;
 
-    public ExternalChangesResolverViewModel(List<ExternalChange> externalChanges) {
+    private final UndoManager undoManager;
+
+    public ExternalChangesResolverViewModel(List<ExternalChange> externalChanges, UndoManager undoManager) {
         Objects.requireNonNull(externalChanges);
         assert !externalChanges.isEmpty();
 
         this.visibleChanges.addAll(externalChanges);
         this.changes.addAll(externalChanges);
+        this.undoManager = undoManager;
 
         areAllChangesResolved = Bindings.createBooleanBinding(visibleChanges::isEmpty, visibleChanges);
         canAskUserToResolveChange = Bindings.createBooleanBinding(() -> selectedChange.isNotNull().get() && selectedChange.get().getExternalChangeResolver().isPresent(), selectedChange);
@@ -97,5 +102,6 @@ public class ExternalChangesResolverViewModel extends AbstractViewModel {
     public void applyChanges() {
         changes.stream().filter(ExternalChange::isAccepted).forEach(change -> change.applyChange(ce));
         ce.end();
+        undoManager.addEdit(ce);
     }
 }
