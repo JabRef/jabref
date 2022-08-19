@@ -1,9 +1,12 @@
 package org.jabref.gui.collab.entrychange;
 
+import javax.swing.undo.CompoundEdit;
+
 import org.jabref.gui.collab.ExternalChange;
 import org.jabref.gui.collab.ExternalChangeResolverFactory;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableInsertEntries;
+import org.jabref.gui.undo.UndoableRemoveEntries;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -36,7 +39,10 @@ public final class EntryChange extends ExternalChange {
     public void applyChange(NamedCompound undoEdit) {
         databaseContext.getDatabase().removeEntry(oldEntry);
         databaseContext.getDatabase().insertEntry(newEntry);
-        undoEdit.addEdit(new UndoableInsertEntries(databaseContext.getDatabase(), oldEntry));
-        undoEdit.addEdit(new UndoableInsertEntries(databaseContext.getDatabase(), newEntry));
+        CompoundEdit changeEntryEdit = new CompoundEdit();
+        changeEntryEdit.addEdit(new UndoableRemoveEntries(databaseContext.getDatabase(), oldEntry));
+        changeEntryEdit.addEdit(new UndoableInsertEntries(databaseContext.getDatabase(), newEntry));
+
+        undoEdit.addEdit(changeEntryEdit);
     }
 }
