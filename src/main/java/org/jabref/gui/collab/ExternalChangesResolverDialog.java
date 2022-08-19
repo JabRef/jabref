@@ -13,9 +13,6 @@ import javafx.scene.layout.BorderPane;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
-import org.jabref.gui.collab.experimental.ExternalChange;
-import org.jabref.gui.collab.experimental.ExternalChangeDetailsViewFactory;
-import org.jabref.gui.collab.experimental.ExternalChangeResolver;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.logic.l10n.Localization;
