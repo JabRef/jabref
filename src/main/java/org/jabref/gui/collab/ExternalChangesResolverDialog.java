@@ -1,6 +1,5 @@
 package org.jabref.gui.collab;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javafx.application.Platform;
@@ -19,6 +18,7 @@ import org.jabref.gui.collab.experimental.ExternalChangeDetailsViewFactory;
 import org.jabref.gui.collab.experimental.ExternalChangeResolver;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.BaseDialog;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.preferences.PreferencesService;
 
@@ -39,8 +39,6 @@ public class ExternalChangesResolverDialog extends BaseDialog<Boolean> {
     @FXML
     private BorderPane changeInfoPane;
 
-    private final BibDatabaseContext database;
-
     private final List<ExternalChange> changes;
 
     private ExternalChangesResolverViewModel viewModel;
@@ -48,14 +46,15 @@ public class ExternalChangesResolverDialog extends BaseDialog<Boolean> {
     private final ExternalChangeDetailsViewFactory externalChangeDetailsViewFactory;
 
     public ExternalChangesResolverDialog(List<ExternalChange> changes, BibDatabaseContext database, DialogService dialogService, StateManager stateManager, ThemeManager themeManager, PreferencesService preferencesService) {
-        this.changes = new ArrayList<>(changes);
-        this.database = database;
+        this.changes = changes;
         this.externalChangeDetailsViewFactory = new ExternalChangeDetailsViewFactory(database, dialogService, stateManager, themeManager, preferencesService);
 
+        this.setTitle(Localization.lang("External Changes Resolver"));
         ViewLoader.view(this)
-                .load().setAsDialogPane(this);
+                .load()
+                .setAsDialogPane(this);
 
-        setResultConverter(button -> {
+        this.setResultConverter(button -> {
             if (viewModel.areAllChangesResolved()) {
                 LOGGER.info("External changes are resolved successfully");
                 return true;
