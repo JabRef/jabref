@@ -18,6 +18,7 @@ public final class MetadataChange extends ExternalChange {
 
     @Override
     public void applyChange(NamedCompound undoEdit) {
+        // TODO: Metadata edit should be undoable
         databaseContext.setMetaData(metaDataDiff.getNewMetaData());
         // group change is handled by GroupChange, so we set the groups root to the original value
         // to prevent any inconsistency
