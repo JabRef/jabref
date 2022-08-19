@@ -12,6 +12,8 @@ import org.jabref.gui.collab.experimental.groupchange.GroupChange;
 import org.jabref.gui.collab.experimental.groupchange.GroupChangeDetailsView;
 import org.jabref.gui.collab.experimental.metedatachange.MetadataChange;
 import org.jabref.gui.collab.experimental.metedatachange.MetadataChangeDetailsView;
+import org.jabref.gui.collab.experimental.preamblechange.PreambleChange;
+import org.jabref.gui.collab.experimental.preamblechange.PreambleChangeDetailsView;
 import org.jabref.gui.collab.experimental.stringadd.StringAdd;
 import org.jabref.gui.collab.experimental.stringadd.StringAddDetailsView;
 import org.jabref.gui.collab.experimental.stringchange.StringChange;
@@ -59,6 +61,8 @@ public class ExternalChangeDetailsViewFactory {
             return new MetadataChangeDetailsView(metadataChange, preferencesService);
         } else if (externalChange instanceof GroupChange groupChange) {
             return new GroupChangeDetailsView(groupChange);
+        } else if (externalChange instanceof PreambleChange preambleChange) {
+            return new PreambleChangeDetailsView(preambleChange);
         }
         throw new UnsupportedOperationException("Cannot preview the given change: " + externalChange.getName());
     }

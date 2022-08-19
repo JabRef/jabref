@@ -7,10 +7,11 @@ import org.jabref.gui.collab.experimental.entrychange.EntryChangeDetailsView;
 import org.jabref.gui.collab.experimental.entrydelete.EntryDeleteDetailsView;
 import org.jabref.gui.collab.experimental.groupchange.GroupChangeDetailsView;
 import org.jabref.gui.collab.experimental.metedatachange.MetadataChangeDetailsView;
+import org.jabref.gui.collab.experimental.preamblechange.PreambleChangeDetailsView;
 import org.jabref.gui.collab.experimental.stringadd.StringAddDetailsView;
 import org.jabref.gui.collab.experimental.stringchange.StringChangeDetailsView;
 import org.jabref.gui.collab.experimental.stringdelete.StringDeleteDetailsView;
 import org.jabref.gui.collab.experimental.stringrename.StringRenameDetailsView;
 
-public sealed abstract class ExternalChangeDetailsView extends AnchorPane permits EntryAddDetailsView, EntryChangeDetailsView, EntryDeleteDetailsView, GroupChangeDetailsView, MetadataChangeDetailsView, StringAddDetailsView, StringChangeDetailsView, StringDeleteDetailsView, StringRenameDetailsView {
+public sealed abstract class ExternalChangeDetailsView extends AnchorPane permits EntryAddDetailsView, EntryChangeDetailsView, EntryDeleteDetailsView, GroupChangeDetailsView, MetadataChangeDetailsView, PreambleChangeDetailsView, StringAddDetailsView, StringChangeDetailsView, StringDeleteDetailsView, StringRenameDetailsView {
 }
