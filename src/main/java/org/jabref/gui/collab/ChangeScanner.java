@@ -13,6 +13,7 @@ import org.jabref.gui.collab.experimental.entryadd.EntryAdd;
 import org.jabref.gui.collab.experimental.entrychange.EntryChange;
 import org.jabref.gui.collab.experimental.entrydelete.EntryDelete;
 import org.jabref.gui.collab.experimental.stringadd.StringAdd;
+import org.jabref.gui.collab.experimental.stringchange.StringChange;
 import org.jabref.gui.collab.experimental.stringdelete.StringDelete;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.logic.bibtex.comparator.BibDatabaseDiff;
@@ -93,13 +94,12 @@ public class ChangeScanner {
             return new StringDelete(diff.getOriginalString(), database, externalChangeResolverFactory);
         }
 
-        return null;
-
-       /* if (diff.getOriginalString().getName().equals(diff.getNewString().getName())) {
-            return new StringChangeViewModel(diff.getOriginalString(), diff.getNewString());
+        if (diff.getOriginalString().getName().equals(diff.getNewString().getName())) {
+            return new StringChange(diff.getOriginalString(), diff.getNewString(), database, externalChangeResolverFactory);
         }
 
-        return new StringNameChangeViewModel(diff.getOriginalString(), diff.getNewString());*/
+        return null;
+        // return new StringNameChangeViewModel(diff.getOriginalString(), diff.getNewString());*/
     }
 
     private ExternalChange createBibEntryDiff(BibEntryDiff diff) {
