@@ -12,6 +12,7 @@ import org.jabref.gui.collab.experimental.ExternalChangeResolverFactory;
 import org.jabref.gui.collab.experimental.entryadd.EntryAdd;
 import org.jabref.gui.collab.experimental.entrychange.EntryChange;
 import org.jabref.gui.collab.experimental.entrydelete.EntryDelete;
+import org.jabref.gui.collab.experimental.groupchange.GroupChange;
 import org.jabref.gui.collab.experimental.metedatachange.MetadataChange;
 import org.jabref.gui.collab.experimental.stringadd.StringAdd;
 import org.jabref.gui.collab.experimental.stringchange.StringChange;
@@ -75,7 +76,9 @@ public class ChangeScanner {
             BibDatabaseDiff differences = BibDatabaseDiff.compare(database, databaseOnDisk);
             differences.getMetaDataDifferences().ifPresent(diff -> {
                 changes.add(new MetadataChange(diff, database, externalChangeResolverFactory));
-                // diff.getGroupDifferences().ifPresent(groupDiff -> changes.add(new GroupChangeViewModel(groupDiff)));
+                diff.getGroupDifferences().ifPresent(groupDiff -> changes.add(new GroupChange(
+                        groupDiff, database, externalChangeResolverFactory
+                )));
             });
       /*      differences.getPreambleDifferences().ifPresent(diff -> changes.add(new PreambleChangeViewModel(diff)));*/
             differences.getBibStringDifferences().forEach(diff -> changes.add(createBibStringDiff(diff)));
