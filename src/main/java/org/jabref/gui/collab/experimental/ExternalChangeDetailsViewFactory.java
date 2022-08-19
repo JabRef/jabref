@@ -6,6 +6,8 @@ import org.jabref.gui.collab.experimental.entryadd.EntryAdd;
 import org.jabref.gui.collab.experimental.entryadd.EntryAddDetailsView;
 import org.jabref.gui.collab.experimental.entrychange.EntryChange;
 import org.jabref.gui.collab.experimental.entrychange.EntryChangeDetailsView;
+import org.jabref.gui.collab.experimental.entrydelete.EntryDelete;
+import org.jabref.gui.collab.experimental.entrydelete.EntryDeleteDetailsView;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.preferences.PreferencesService;
@@ -26,11 +28,14 @@ public class ExternalChangeDetailsViewFactory {
     }
 
     public ExternalChangeDetailsView create(ExternalChange externalChange) {
+        // TODO: Use Pattern Matching for switch once it's out of preview
         if (externalChange instanceof EntryChange entryChange) {
             return new EntryChangeDetailsView(entryChange, databaseContext, dialogService, stateManager, themeManager, preferencesService);
         } else if (externalChange instanceof EntryAdd entryAdd) {
             return new EntryAddDetailsView(entryAdd, databaseContext, dialogService, stateManager, themeManager, preferencesService);
+        } else if (externalChange instanceof EntryDelete entryDelete) {
+            return new EntryDeleteDetailsView(entryDelete, databaseContext, dialogService, stateManager, themeManager, preferencesService);
         }
-        throw new UnsupportedOperationException("No implementation found for the given change preview");
+        throw new UnsupportedOperationException("Cannot preview the given change: " + externalChange.getName());
     }
 }

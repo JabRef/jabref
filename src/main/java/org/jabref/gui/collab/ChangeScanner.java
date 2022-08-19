@@ -11,6 +11,7 @@ import org.jabref.gui.collab.experimental.ExternalChange;
 import org.jabref.gui.collab.experimental.ExternalChangeResolverFactory;
 import org.jabref.gui.collab.experimental.entryadd.EntryAdd;
 import org.jabref.gui.collab.experimental.entrychange.EntryChange;
+import org.jabref.gui.collab.experimental.entrydelete.EntryDelete;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.logic.bibtex.comparator.BibDatabaseDiff;
 import org.jabref.logic.bibtex.comparator.BibEntryDiff;
@@ -35,6 +36,8 @@ public class ChangeScanner {
     private final StateManager stateManager;
     private final ThemeManager themeManager;
 
+    private final ExternalChangeResolverFactory externalChangeResolverFactory;
+
     public ChangeScanner(BibDatabaseContext database,
                          DialogService dialogService,
                          PreferencesService preferencesService,
@@ -45,6 +48,7 @@ public class ChangeScanner {
         this.preferencesService = preferencesService;
         this.stateManager = stateManager;
         this.themeManager = themeManager;
+        this.externalChangeResolverFactory = new ExternalChangeResolverFactory(dialogService, database);
     }
 
     public List<ExternalChange> scanForChanges() {
@@ -96,13 +100,13 @@ public class ChangeScanner {
 
     private ExternalChange createBibEntryDiff(BibEntryDiff diff) {
         if (diff.getOriginalEntry() == null) {
-            return new EntryAdd(diff.getNewEntry(), database, new ExternalChangeResolverFactory(dialogService, database));
+            return new EntryAdd(diff.getNewEntry(), database, externalChangeResolverFactory);
         }
 
-       /* if (diff.getNewEntry() == null) {
-            return new EntryDeleteChangeViewModel(diff.getOriginalEntry(), preferencesService);
-        }*/
+        if (diff.getNewEntry() == null) {
+            return new EntryDelete(diff.getOriginalEntry(), database, externalChangeResolverFactory);
+        }
 
-        return new EntryChange(diff.getOriginalEntry(), diff.getNewEntry(), database, new ExternalChangeResolverFactory(dialogService, database));
+        return new EntryChange(diff.getOriginalEntry(), diff.getNewEntry(), database, externalChangeResolverFactory);
     }
 }

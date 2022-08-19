@@ -9,11 +9,12 @@ import javafx.beans.property.StringProperty;
 
 import org.jabref.gui.collab.experimental.entryadd.EntryAdd;
 import org.jabref.gui.collab.experimental.entrychange.EntryChange;
+import org.jabref.gui.collab.experimental.entrydelete.EntryDelete;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.util.OptionalObjectProperty;
 import org.jabref.model.database.BibDatabaseContext;
 
-public sealed abstract class ExternalChange permits EntryAdd, EntryChange {
+public sealed abstract class ExternalChange permits EntryAdd, EntryChange, EntryDelete {
     protected final BibDatabaseContext databaseContext;
     protected final OptionalObjectProperty<ExternalChangeResolver> externalChangeResolver = OptionalObjectProperty.empty();
     private final BooleanProperty accepted = new SimpleBooleanProperty();
