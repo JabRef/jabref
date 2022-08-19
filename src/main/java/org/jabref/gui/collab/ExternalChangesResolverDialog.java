@@ -1,6 +1,8 @@
 package org.jabref.gui.collab;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.inject.Inject;
 import javax.swing.undo.UndoManager;
@@ -29,6 +31,12 @@ import org.slf4j.LoggerFactory;
 
 public class ExternalChangesResolverDialog extends BaseDialog<Boolean> {
     private final static Logger LOGGER = LoggerFactory.getLogger(ExternalChangesResolverDialog.class);
+    /**
+     * Reconstructing the details view to preview an {@link ExternalChange} every time it's selected is a heavy operation.
+     * It is also useless because changes are static and if the change data is static then the view doesn't have to change
+     * either. This cache is used to ensure that we only create the detail view instance once for each {@link ExternalChange}.
+     */
+    private final Map<ExternalChange, ExternalChangeDetailsView> DETAILS_VIEW_CACHE = new HashMap<>();
 
     @FXML
     private TableView<ExternalChange> changesTableView;
@@ -75,13 +83,14 @@ public class ExternalChangesResolverDialog extends BaseDialog<Boolean> {
         askUserToResolveChangeButton.disableProperty().bind(viewModel.canAskUserToResolveChangeProperty().not());
 
         changesTableView.setItems(viewModel.getVisibleChanges());
+        // Think twice before setting this to MULTIPLE...
         changesTableView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
         changesTableView.getSelectionModel().selectFirst();
 
         viewModel.selectedChangeProperty().bind(changesTableView.getSelectionModel().selectedItemProperty());
         EasyBind.subscribe(viewModel.selectedChangeProperty(), selectedChange -> {
             if (selectedChange != null) {
-                changeInfoPane.setCenter(externalChangeDetailsViewFactory.create(selectedChange));
+                changeInfoPane.setCenter(createDetailsViewOrLoadFromCache(selectedChange));
             }
         });
 
@@ -108,5 +117,16 @@ public class ExternalChangesResolverDialog extends BaseDialog<Boolean> {
     public void askUserToResolveChange() {
         viewModel.getSelectedChange().flatMap(ExternalChange::getExternalChangeResolver)
                  .flatMap(ExternalChangeResolver::askUserToResolveChange).ifPresent(viewModel::acceptMergedChange);
+    }
+
+    private ExternalChangeDetailsView createDetailsViewOrLoadFromCache(ExternalChange externalChange) {
+        ExternalChangeDetailsView cachedDetailsView = DETAILS_VIEW_CACHE.get(externalChange);
+        if (cachedDetailsView == null) {
+            ExternalChangeDetailsView newDetailsView = externalChangeDetailsViewFactory.create(externalChange);
+            DETAILS_VIEW_CACHE.put(externalChange, newDetailsView);
+            return newDetailsView;
+        } else {
+            return cachedDetailsView;
+        }
     }
 }
