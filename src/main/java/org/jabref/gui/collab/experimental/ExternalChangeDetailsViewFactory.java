@@ -8,6 +8,8 @@ import org.jabref.gui.collab.experimental.entrychange.EntryChange;
 import org.jabref.gui.collab.experimental.entrychange.EntryChangeDetailsView;
 import org.jabref.gui.collab.experimental.entrydelete.EntryDelete;
 import org.jabref.gui.collab.experimental.entrydelete.EntryDeleteDetailsView;
+import org.jabref.gui.collab.experimental.metedatachange.MetadataChange;
+import org.jabref.gui.collab.experimental.metedatachange.MetadataChangeDetailsView;
 import org.jabref.gui.collab.experimental.stringadd.StringAdd;
 import org.jabref.gui.collab.experimental.stringadd.StringAddDetailsView;
 import org.jabref.gui.collab.experimental.stringchange.StringChange;
@@ -51,6 +53,8 @@ public class ExternalChangeDetailsViewFactory {
             return new StringChangeDetailsView(stringChange);
         } else if (externalChange instanceof StringRename stringRename) {
             return new StringRenameDetailsView(stringRename);
+        } else if (externalChange instanceof MetadataChange metadataChange) {
+            return new MetadataChangeDetailsView(metadataChange, preferencesService);
         }
         throw new UnsupportedOperationException("Cannot preview the given change: " + externalChange.getName());
     }
