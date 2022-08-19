@@ -14,6 +14,8 @@ import org.jabref.gui.collab.experimental.stringchange.StringChange;
 import org.jabref.gui.collab.experimental.stringchange.StringChangeDetailsView;
 import org.jabref.gui.collab.experimental.stringdelete.StringDelete;
 import org.jabref.gui.collab.experimental.stringdelete.StringDeleteDetailsView;
+import org.jabref.gui.collab.experimental.stringrename.StringRename;
+import org.jabref.gui.collab.experimental.stringrename.StringRenameDetailsView;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.preferences.PreferencesService;
@@ -47,6 +49,8 @@ public class ExternalChangeDetailsViewFactory {
             return new StringDeleteDetailsView(stringDelete);
         } else if (externalChange instanceof StringChange stringChange) {
             return new StringChangeDetailsView(stringChange);
+        } else if (externalChange instanceof StringRename stringRename) {
+            return new StringRenameDetailsView(stringRename);
         }
         throw new UnsupportedOperationException("Cannot preview the given change: " + externalChange.getName());
     }

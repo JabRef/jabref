@@ -15,6 +15,7 @@ import org.jabref.gui.collab.experimental.entrydelete.EntryDelete;
 import org.jabref.gui.collab.experimental.stringadd.StringAdd;
 import org.jabref.gui.collab.experimental.stringchange.StringChange;
 import org.jabref.gui.collab.experimental.stringdelete.StringDelete;
+import org.jabref.gui.collab.experimental.stringrename.StringRename;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.logic.bibtex.comparator.BibDatabaseDiff;
 import org.jabref.logic.bibtex.comparator.BibEntryDiff;
@@ -98,8 +99,7 @@ public class ChangeScanner {
             return new StringChange(diff.getOriginalString(), diff.getNewString(), database, externalChangeResolverFactory);
         }
 
-        return null;
-        // return new StringNameChangeViewModel(diff.getOriginalString(), diff.getNewString());*/
+        return new StringRename(diff.getOriginalString(), diff.getNewString(), database, externalChangeResolverFactory);
     }
 
     private ExternalChange createBibEntryDiff(BibEntryDiff diff) {
