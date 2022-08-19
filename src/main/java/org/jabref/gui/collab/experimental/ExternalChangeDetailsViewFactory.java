@@ -8,6 +8,8 @@ import org.jabref.gui.collab.experimental.entrychange.EntryChange;
 import org.jabref.gui.collab.experimental.entrychange.EntryChangeDetailsView;
 import org.jabref.gui.collab.experimental.entrydelete.EntryDelete;
 import org.jabref.gui.collab.experimental.entrydelete.EntryDeleteDetailsView;
+import org.jabref.gui.collab.experimental.stringadd.StringAdd;
+import org.jabref.gui.collab.experimental.stringadd.StringAddDetailsView;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.preferences.PreferencesService;
@@ -35,6 +37,8 @@ public class ExternalChangeDetailsViewFactory {
             return new EntryAddDetailsView(entryAdd, databaseContext, dialogService, stateManager, themeManager, preferencesService);
         } else if (externalChange instanceof EntryDelete entryDelete) {
             return new EntryDeleteDetailsView(entryDelete, databaseContext, dialogService, stateManager, themeManager, preferencesService);
+        } else if (externalChange instanceof StringAdd stringAdd) {
+            return new StringAddDetailsView(stringAdd);
         }
         throw new UnsupportedOperationException("Cannot preview the given change: " + externalChange.getName());
     }

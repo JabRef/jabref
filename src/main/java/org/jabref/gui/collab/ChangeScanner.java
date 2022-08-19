@@ -12,6 +12,7 @@ import org.jabref.gui.collab.experimental.ExternalChangeResolverFactory;
 import org.jabref.gui.collab.experimental.entryadd.EntryAdd;
 import org.jabref.gui.collab.experimental.entrychange.EntryChange;
 import org.jabref.gui.collab.experimental.entrydelete.EntryDelete;
+import org.jabref.gui.collab.experimental.stringadd.StringAdd;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.logic.bibtex.comparator.BibDatabaseDiff;
 import org.jabref.logic.bibtex.comparator.BibEntryDiff;
@@ -72,8 +73,8 @@ public class ChangeScanner {
                 changes.add(new MetaDataChangeViewModel(diff, preferencesService));
                 diff.getGroupDifferences().ifPresent(groupDiff -> changes.add(new GroupChangeViewModel(groupDiff)));
             });*/
-      /*      differences.getPreambleDifferences().ifPresent(diff -> changes.add(new PreambleChangeViewModel(diff)));
-            differences.getBibStringDifferences().forEach(diff -> changes.add(createBibStringDiff(diff)));*/
+      /*      differences.getPreambleDifferences().ifPresent(diff -> changes.add(new PreambleChangeViewModel(diff)));*/
+            differences.getBibStringDifferences().forEach(diff -> changes.add(createBibStringDiff(diff)));
             differences.getEntryDifferences().forEach(diff -> changes.add(createBibEntryDiff(diff)));
             return changes;
         } catch (IOException e) {
@@ -82,11 +83,11 @@ public class ChangeScanner {
         }
     }
 
-    private DatabaseChangeViewModel createBibStringDiff(BibStringDiff diff) {
-        if (diff.getOriginalString() == null) {
-            return new StringAddChangeViewModel(diff.getNewString());
-        }
-
+    private ExternalChange createBibStringDiff(BibStringDiff diff) {
+        // if (diff.getOriginalString() == null) {
+            return new StringAdd(diff.getNewString(), database, externalChangeResolverFactory);
+        //}
+/*
         if (diff.getNewString() == null) {
             return new StringRemoveChangeViewModel(diff.getOriginalString());
         }
@@ -95,7 +96,7 @@ public class ChangeScanner {
             return new StringChangeViewModel(diff.getOriginalString(), diff.getNewString());
         }
 
-        return new StringNameChangeViewModel(diff.getOriginalString(), diff.getNewString());
+        return new StringNameChangeViewModel(diff.getOriginalString(), diff.getNewString());*/
     }
 
     private ExternalChange createBibEntryDiff(BibEntryDiff diff) {
