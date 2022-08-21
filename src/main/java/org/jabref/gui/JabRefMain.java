@@ -15,6 +15,7 @@ import javafx.stage.Stage;
 
 import org.jabref.cli.ArgumentProcessor;
 import org.jabref.cli.JabRefCLI;
+import org.jabref.gui.openoffice.OOBibBaseConnect;
 import org.jabref.gui.remote.JabRefMessageHandler;
 import org.jabref.logic.exporter.ExporterFactory;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
@@ -131,6 +132,7 @@ public class JabRefMain extends Application {
 
     @Override
     public void stop() {
+        OOBibBaseConnect.closeOfficeConnection();
         Globals.stopBackgroundTasks();
         Globals.shutdownThreadPools();
     }
