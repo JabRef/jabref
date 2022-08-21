@@ -31,6 +31,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static com.sun.star.uno.UnoRuntime.queryInterface;
+
 /**
  * Establish connection to a document opened in OpenOffice or LibreOffice.
  */
