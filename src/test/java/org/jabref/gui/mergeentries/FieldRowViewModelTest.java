@@ -10,7 +10,6 @@ import org.jabref.model.entry.Month;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
-import org.jabref.preferences.JabRefPreferences;
 import org.jabref.preferences.PreferencesService;
 
 import org.jbibtex.ParseException;
@@ -66,7 +65,7 @@ public class FieldRowViewModelTest {
                 .withField(StandardField.YEAR, "2012");
 
         mergedEntry = new BibEntry();
-        fieldMergerFactory = new FieldMergerFactory(JabRefPreferences.getInstance());
+        fieldMergerFactory = new FieldMergerFactory(mockedPrefs);
 
         when(mockedPrefs.getGroupsPreferences()).thenReturn(mockedGroupsPrefs);
         when(mockedGroupsPrefs.getKeywordSeparator()).thenReturn(',');
