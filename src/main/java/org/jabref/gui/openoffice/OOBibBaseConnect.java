@@ -95,7 +95,7 @@ public class OOBibBaseConnect {
                 }
             }
         } catch (Exception ex) {
-            LOGGER.error("Exception disposing office process connection bridge:", ex);
+            LOGGER.error("Exception disposing office process connection bridge", ex);
         }
     }
 
