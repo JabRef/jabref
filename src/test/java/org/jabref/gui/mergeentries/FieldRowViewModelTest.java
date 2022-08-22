@@ -180,6 +180,29 @@ public class FieldRowViewModelTest {
         assertThrows(UnsupportedOperationException.class, authorField::mergeFields);
     }
 
+    @Test
+    public void unmergeFieldsShouldBeCorrect() {
+        var groupsField = createViewModelForField(StandardField.GROUPS);
+        var oldLeftGroups = groupsField.getLeftFieldValue();
+        var oldRightGroups = groupsField.getRightFieldValue();
+        groupsField.mergeFields();
+        groupsField.unmergeFields();
+
+        assertEquals(oldLeftGroups, groupsField.getLeftFieldValue());
+        assertEquals(oldRightGroups, groupsField.getRightFieldValue());
+    }
+
+    @Test
+    public void unmergeFieldsShouldDoNothingIfFieldsAreNotMerged() {
+        var groupsField = createViewModelForField(StandardField.GROUPS);
+        var oldLeftGroups = groupsField.getLeftFieldValue();
+        var oldRightGroups = groupsField.getRightFieldValue();
+        groupsField.unmergeFields();
+
+        assertEquals(oldLeftGroups, groupsField.getLeftFieldValue());
+        assertEquals(oldRightGroups, groupsField.getRightFieldValue());
+    }
+
     public FieldRowViewModel createViewModelForField(Field field) {
         return new FieldRowViewModel(field, leftEntry, rightEntry, mergedEntry, fieldMergerFactory);
     }
