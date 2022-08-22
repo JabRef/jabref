@@ -1,6 +1,7 @@
 package org.jabref.gui.mergeentries.newmergedialog.fieldsmerger;
 
 import java.util.Arrays;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.jabref.model.entry.field.StandardField;
@@ -11,6 +12,7 @@ import org.jabref.model.strings.StringUtil;
  * */
 public class GroupMerger implements FieldMerger {
     public static final String GROUPS_SEPARATOR = ", ";
+    public static final Pattern GROUPS_SEPARATOR_REGEX = Pattern.compile("\s*,\s*");
 
     @Override
     public String merge(String groupsA, String groupsB) {
@@ -21,7 +23,7 @@ public class GroupMerger implements FieldMerger {
         } else if (StringUtil.isBlank(groupsB)) {
             return groupsA;
         } else {
-            return Arrays.stream((groupsA + GROUPS_SEPARATOR + groupsB).split("\s*,\s*"))
+            return Arrays.stream((groupsA + GROUPS_SEPARATOR + groupsB).split(GROUPS_SEPARATOR_REGEX.pattern()))
                          .distinct()
                          .collect(Collectors.joining(GROUPS_SEPARATOR));
         }
