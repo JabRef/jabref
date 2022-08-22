@@ -177,7 +177,7 @@ dependencies {
     implementation 'org.jsoup:jsoup:1.15.1'
     implementation 'com.konghq:unirest-java:3.13.10'
 
-    implementation 'org.slf4j:slf4j-api:2.0.0-beta1'
+    implementation 'org.slf4j:slf4j-api:2.0.0'
     implementation "org.tinylog:tinylog-api:2.5.0"
     implementation "org.tinylog:slf4j-tinylog:2.4.1"
     implementation "org.tinylog:tinylog-impl:2.4.1"
