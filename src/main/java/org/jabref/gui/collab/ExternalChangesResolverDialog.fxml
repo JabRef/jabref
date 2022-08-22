@@ -11,10 +11,10 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import org.controlsfx.control.MasterDetailPane?>
-<DialogPane prefHeight="400.0" prefWidth="700.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jabref.gui.collab.ExternalChangesResolverDialog">
+<DialogPane prefHeight="460.0" prefWidth="820.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jabref.gui.collab.ExternalChangesResolverDialog">
     <content>
         <AnchorPane>
-            <MasterDetailPane fx:id="materDetailPane" detailSide="BOTTOM" dividerPosition="0.6" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <MasterDetailPane fx:id="materDetailPane" detailSide="BOTTOM" dividerPosition="0.5" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                 <masterNode>
                     <HBox>
                         <TableView fx:id="changesTableView" layoutX="34.0" layoutY="46.0" maxWidth="Infinity" prefHeight="236.0" HBox.hgrow="ALWAYS">
