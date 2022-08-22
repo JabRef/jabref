@@ -39,17 +39,17 @@ public class FieldRowViewModelTest {
 
     @BeforeEach
     public void setup() throws ParseException {
-        leftEntry = new BibEntry(StandardEntryType.Article);
-        leftEntry.setCitationKey("LajnDiezScheinEtAl2012");
-        leftEntry.setField(StandardField.AUTHOR, "Lajn, A and Diez, T and Schein, F and Frenzel, H and von Wenckstern, H and Grundmann, M");
-        leftEntry.setField(StandardField.TITLE, "Light and temperature stability of fully transparent ZnO-based inverter circuits");
-        leftEntry.setField(StandardField.NUMBER, "4");
-        leftEntry.setField(StandardField.PAGES, "515--517");
-        leftEntry.setField(StandardField.VOLUME, "32");
-        leftEntry.setField(StandardField.GROUPS, "Skimmed");
-        leftEntry.setField(StandardField.JOURNAL, "Electron Device Letters, IEEE");
-        leftEntry.setField(StandardField.PUBLISHER, "IEEE");
-        leftEntry.setField(StandardField.YEAR, "2012");
+        leftEntry = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("LajnDiezScheinEtAl2012")
+                .withField(StandardField.AUTHOR, "Lajn, A and Diez, T and Schein, F and Frenzel, H and von Wenckstern, H and Grundmann, M")
+                .withField(StandardField.TITLE, "Light and temperature stability of fully transparent ZnO-based inverter circuits")
+                .withField(StandardField.NUMBER, "4")
+                .withField(StandardField.PAGES, "515--517")
+                .withField(StandardField.VOLUME, "32")
+                .withField(StandardField.GROUPS, "Skimmed")
+                .withField(StandardField.JOURNAL, "Electron Device Letters, IEEE")
+                .withField(StandardField.PUBLISHER, "IEEE")
+                .withField(StandardField.YEAR, "2012");
 
         rightEntry = new BibEntry(StandardEntryType.Book)
                 .withCitationKey("KolbLenhardWirtz2012")
