@@ -21,7 +21,7 @@ public class GroupMerger implements FieldMerger {
         } else if (StringUtil.isBlank(groupsB)) {
             return groupsA;
         } else {
-            return Arrays.stream((groupsA + GROUPS_SEPARATOR + groupsB).split(GROUPS_SEPARATOR))
+            return Arrays.stream((groupsA + GROUPS_SEPARATOR + groupsB).split("\s*,\s*"))
                          .distinct()
                          .collect(Collectors.joining(GROUPS_SEPARATOR));
         }
