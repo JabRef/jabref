@@ -181,6 +181,14 @@ public class FieldRowViewModelTest {
     }
 
     @Test
+    public void mergeFieldsShouldSelectLeftFieldValue() {
+        var groupsField = createViewModelForField(StandardField.GROUPS);
+        groupsField.mergeFields();
+
+        assertEquals(FieldRowViewModel.Selection.LEFT, groupsField.getSelection());
+    }
+
+    @Test
     public void unmergeFieldsShouldBeCorrect() {
         var groupsField = createViewModelForField(StandardField.GROUPS);
         var oldLeftGroups = groupsField.getLeftFieldValue();
