@@ -2,6 +2,7 @@ package org.jabref.gui.mergeentries;
 
 import java.util.Optional;
 
+import org.jabref.gui.groups.GroupsPreferences;
 import org.jabref.gui.mergeentries.newmergedialog.FieldRowViewModel;
 import org.jabref.gui.mergeentries.newmergedialog.fieldsmerger.FieldMergerFactory;
 import org.jabref.model.entry.BibEntry;
@@ -9,6 +10,8 @@ import org.jabref.model.entry.Month;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
+import org.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.PreferencesService;
 
 import org.jbibtex.ParseException;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,8 +19,10 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class FieldRowViewModelTest {
 
@@ -28,7 +33,10 @@ public class FieldRowViewModelTest {
 
     FieldRowViewModel viewModel;
 
-    FieldMergerFactory fieldMergerFactory = mock(FieldMergerFactory.class);
+    FieldMergerFactory fieldMergerFactory;
+
+    PreferencesService mockedPrefs = mock(PreferencesService.class);
+    GroupsPreferences mockedGroupsPrefs = mock(GroupsPreferences.class);
 
     @BeforeEach
     public void setup() throws ParseException {
@@ -54,9 +62,14 @@ public class FieldRowViewModelTest {
                 .withField(StandardField.ADDRESS, "Oxford, United Kingdom")
                 .withField(StandardField.GROUPS, "By rating, Skimmed")
                 .withMonth(Month.DECEMBER)
+                .withField(StandardField.KEYWORDS, "a, b, c")
                 .withField(StandardField.YEAR, "2012");
 
         mergedEntry = new BibEntry();
+        fieldMergerFactory = new FieldMergerFactory(JabRefPreferences.getInstance());
+
+        when(mockedPrefs.getGroupsPreferences()).thenReturn(mockedGroupsPrefs);
+        when(mockedGroupsPrefs.getKeywordSeparator()).thenReturn(',');
     }
 
     @Test
@@ -146,6 +159,26 @@ public class FieldRowViewModelTest {
 
         var authorFieldViewModel = createViewModelForField(StandardField.AUTHOR);
         assertFalse(authorFieldViewModel.isFieldsMerged());
+    }
+
+    @Test
+    public void mergeFieldsShouldResultInLeftAndRightValuesBeingEqual() {
+        var groupsField = createViewModelForField(StandardField.GROUPS);
+        groupsField.mergeFields();
+        assertEquals(groupsField.getLeftFieldValue(), groupsField.getRightFieldValue());
+    }
+
+    @Test
+    public void mergeFieldsShouldBeCorrectEvenWhenOnOfTheValuesIsEmpty() {
+        var keywordsField = createViewModelForField(StandardField.KEYWORDS);
+        keywordsField.mergeFields();
+        assertEquals(keywordsField.getLeftFieldValue(), keywordsField.getRightFieldValue());
+    }
+
+    @Test
+    public void mergeFieldsShouldThrowUnsupportedOperationExceptionIfTheGivenFieldCanBeMerged() {
+        var authorField = createViewModelForField(StandardField.AUTHOR);
+        assertThrows(UnsupportedOperationException.class, authorField::mergeFields);
     }
 
     public FieldRowViewModel createViewModelForField(Field field) {
