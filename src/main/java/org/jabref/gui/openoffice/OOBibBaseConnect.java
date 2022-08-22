@@ -79,7 +79,7 @@ public class OOBibBaseConnect {
     }
 
     /**
-     *  Close any open office connection, if none exists does nothing
+     * Close any open office connection, if none exists does nothing
      */
     public static void closeOfficeConnection() {
         try {
