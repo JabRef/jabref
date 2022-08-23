@@ -34,14 +34,14 @@ import static org.jabref.gui.mergeentries.newmergedialog.FieldRowViewModel.Selec
  */
 public class FieldRowView {
     private static final Logger LOGGER = LoggerFactory.getLogger(FieldRowView.class);
+
+    protected final FieldRowViewModel viewModel;
     private final FieldNameCell fieldNameCell;
     private final FieldValueCell leftValueCell;
     private final FieldValueCell rightValueCell;
     private final MergedFieldCell mergedValueCell;
 
     private final ToggleGroup toggleGroup = new ToggleGroup();
-
-    private final FieldRowViewModel viewModel;
 
     private final CompoundEdit fieldsMergedEdit = new CompoundEdit();
 
