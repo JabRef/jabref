@@ -23,7 +23,7 @@ public class GroupMerger implements FieldMerger {
         } else if (StringUtil.isBlank(groupsB)) {
             return groupsA;
         } else {
-            return Arrays.stream((groupsA + GROUPS_SEPARATOR + groupsB).split(GROUPS_SEPARATOR_REGEX.pattern()))
+            return Arrays.stream(GROUPS_SEPARATOR_REGEX.split(groupsA + GROUPS_SEPARATOR + groupsB))
                          .distinct()
                          .collect(Collectors.joining(GROUPS_SEPARATOR));
         }
