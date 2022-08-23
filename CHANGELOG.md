@@ -15,7 +15,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - On startup, JabRef notifies the user if there were parsing errors during opening.
 - We integrated a new three-way merge UI for merging entries in the Entries Merger Dialog, the Duplicate Resolver Dialog, the Entry Importer Dialog, and the External Changes Resolver Dialog. [#8945](https://github.com/JabRef/jabref/pull/8945)
 - We added the ability to merge groups, keywords, comments and files when merging entries. [#9022](https://github.com/JabRef/jabref/pull/9022)
-- We added a warning message next to the authors field in the merge dialog to warn users when the authors are the same but formatted differently. [#9088](https://github.com/JabRef/jabref/pull/9088) 
+- We added a warning message next to the authors field in the merge dialog to warn users when the authors are the same but formatted differently. [#8745](https://github.com/JabRef/jabref/issues/8745) 
 
 ### Changed
 
