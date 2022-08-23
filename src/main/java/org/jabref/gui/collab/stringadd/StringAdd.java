@@ -29,7 +29,7 @@ public final class StringAdd extends ExternalChange {
             databaseContext.getDatabase().addString(addedString);
             undoEdit.addEdit(new UndoableInsertString(databaseContext.getDatabase(), addedString));
         } catch (KeyCollisionException ex) {
-            LOGGER.warn("Error: could not add string '" + addedString.getName() + "': " + ex.getMessage(), ex);
+            LOGGER.warn("Error: could not add string '{}': {}", addedString.getName(), ex.getMessage(), ex);
         }
     }
 
