@@ -14,11 +14,11 @@ public final class StringChangeDetailsView extends ExternalChangeDetailsView {
         header.getStyleClass().add("sectionHeader");
         container.getChildren().addAll(
                 header,
-                new Label(Localization.lang("Label") + ": " + stringChange.getOldString().getName()),
-                new Label(Localization.lang("Content") + ": " + stringChange.getNewString().getContent())
+                new Label(Localization.lang("Label: %0", stringChange.getOldString().getName())),
+                new Label(Localization.lang("Content: %0", stringChange.getNewString().getContent()))
         );
 
-        container.getChildren().add(new Label(Localization.lang("Current content") + ": " + stringChange.getOldString().getContent()));
+        container.getChildren().add(new Label(Localization.lang("Current content: %0", stringChange.getOldString().getContent())));
         setLeftAnchor(container, 8d);
         setTopAnchor(container, 8d);
         setRightAnchor(container, 8d);

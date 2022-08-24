@@ -14,8 +14,8 @@ public final class StringAddDetailsView extends ExternalChangeDetailsView {
         header.getStyleClass().add("sectionHeader");
         container.getChildren().addAll(
                 header,
-                new Label(Localization.lang("Label") + ": " + stringAdd.getAddedString().getName()),
-                new Label(Localization.lang("Content") + ": " + stringAdd.getAddedString().getContent())
+                new Label(Localization.lang("Label: %0", stringAdd.getAddedString().getName())),
+                new Label(Localization.lang("Content: %0", stringAdd.getAddedString().getContent()))
         );
         setLeftAnchor(container, 8d);
         setTopAnchor(container, 8d);

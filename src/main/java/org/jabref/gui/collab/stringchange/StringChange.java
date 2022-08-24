@@ -22,7 +22,7 @@ public final class StringChange extends ExternalChange {
         this.oldString = oldString;
         this.newString = newString;
 
-        setChangeName(Localization.lang("Modified string") + ": '" + oldString.getName() + '\'');
+        setChangeName(Localization.lang("Modified string: '%0'", oldString.getName()));
     }
 
     @Override

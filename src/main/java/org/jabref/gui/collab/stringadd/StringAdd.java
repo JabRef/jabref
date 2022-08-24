@@ -20,7 +20,7 @@ public final class StringAdd extends ExternalChange {
     public StringAdd(BibtexString addedString, BibDatabaseContext databaseContext, ExternalChangeResolverFactory externalChangeResolverFactory) {
         super(databaseContext, externalChangeResolverFactory);
         this.addedString = addedString;
-        setChangeName(Localization.lang("Added string") + ": '" + addedString.getName() + '\'');
+        setChangeName(Localization.lang("Added string: '%0'", addedString.getName()));
     }
 
     @Override

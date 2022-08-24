@@ -12,7 +12,7 @@ public final class GroupChangeDetailsView extends ExternalChangeDetailsView {
         if (groupChange.getGroupDiff().getNewGroupRoot() == null) {
             labelValue = groupChange.getName() + '.';
         } else {
-            labelValue = groupChange.getName() + ". " + Localization.lang("Accepting the change replaces the complete groups tree with the externally modified groups tree.");
+            labelValue = Localization.lang("%0. Accepting the change replaces the complete groups tree with the externally modified groups tree.", groupChange.getName());
         }
         Label label = new Label(labelValue);
         setLeftAnchor(label, 8d);

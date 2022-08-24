@@ -22,15 +22,14 @@ public final class StringRename extends ExternalChange {
         this.oldString = oldString;
         this.newString = newString;
 
-        setChangeName(Localization.lang("Renamed string") + ": '" + oldString.getName() + '\'');
+        setChangeName(Localization.lang("Renamed string: '%0'", oldString.getName()));
     }
 
     @Override
     public void applyChange(NamedCompound undoEdit) {
         if (databaseContext.getDatabase().hasStringByName(newString.getName())) {
             // The name to change to is already in the database, so we can't comply.
-            LOGGER.info("Cannot rename string '" + oldString.getName() + "' to '" + newString.getName() + "' because the name "
-                    + "is already in use.");
+            LOGGER.info("Cannot rename string '{}' to '{}' because the name is already in use", oldString.getName(), newString.getName());
         }
 
         String currentName = oldString.getName();

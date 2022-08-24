@@ -20,7 +20,7 @@ public final class StringDelete extends ExternalChange {
         super(databaseContext, externalChangeResolverFactory);
         this.deletedString = deletedString;
         // TODO: pass deleted string parameter to lang()
-        setChangeName(Localization.lang("Deleted string") + ": '" + deletedString.getName() + '\'');
+        setChangeName(Localization.lang("Deleted string: '%0'", deletedString.getName()));
     }
 
     @Override
@@ -29,7 +29,7 @@ public final class StringDelete extends ExternalChange {
             databaseContext.getDatabase().removeString(deletedString.getId());
             undoEdit.addEdit(new UndoableRemoveString(databaseContext.getDatabase(), deletedString));
         } catch (Exception ex) {
-            LOGGER.warn("Error: could not remove string '" + deletedString.getName() + "': " + ex.getMessage(), ex);
+            LOGGER.warn("Error: could not remove string '{}': {}", deletedString.getName(), ex.getMessage(), ex);
         }
     }
 
