@@ -19,7 +19,6 @@ public final class StringDelete extends ExternalChange {
     public StringDelete(BibtexString deletedString, BibDatabaseContext databaseContext, ExternalChangeResolverFactory externalChangeResolverFactory) {
         super(databaseContext, externalChangeResolverFactory);
         this.deletedString = deletedString;
-        // TODO: pass deleted string parameter to lang()
         setChangeName(Localization.lang("Deleted string: '%0'", deletedString.getName()));
     }
 
