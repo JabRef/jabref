@@ -12,7 +12,9 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.ContextMenu;
+import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
+import javafx.scene.control.OverrunStyle;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.SeparatorMenuItem;
@@ -84,7 +86,7 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
                   .load();
 
         ViewModelListCellFactory<LinkedFileViewModel> cellFactory = new ViewModelListCellFactory<LinkedFileViewModel>()
-                .withStringTooltip(LinkedFileViewModel::getDescription)
+                .withStringTooltip(LinkedFileViewModel::getDescriptionAndLink)
                 .withGraphic(this::createFileDisplay)
                 .withContextMenu(this::createContextMenuForFile)
                 .withOnMouseClickedEvent(this::handleItemMouseClick)
@@ -165,10 +167,17 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
         progressIndicator.progressProperty().bind(linkedFile.downloadProgressProperty());
         progressIndicator.visibleProperty().bind(linkedFile.downloadOngoingProperty());
 
+        Label label = new Label();
+        label.graphicProperty().bind(linkedFile.typeIconProperty());
+        label.textProperty().bind(linkedFile.linkProperty());
+        label.getStyleClass().setAll("file-row-text");
+        label.textOverrunProperty().setValue(OverrunStyle.LEADING_ELLIPSIS);
+        EasyBind.subscribe(linkedFile.isAutomaticallyFoundProperty(), found -> label.pseudoClassStateChanged(opacity, found));
+
         HBox info = new HBox(8);
         HBox.setHgrow(info, Priority.ALWAYS);
         info.setStyle("-fx-padding: 0.5em 0 0.5em 0;"); // To align with buttons below which also have 0.5em padding
-        info.getChildren().setAll(icon, link, desc, progressIndicator);
+        info.getChildren().setAll(label, progressIndicator);
 
         Button acceptAutoLinkedFile = IconTheme.JabRefIcons.AUTO_LINKED_FILE.asButton();
         acceptAutoLinkedFile.setTooltip(new Tooltip(Localization.lang("This file was found automatically. Do you want to link it to this entry?")));
@@ -195,9 +204,9 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
         });
         parsePdfMetadata.getStyleClass().setAll("icon-button");
 
-        HBox container = new HBox(10);
+        HBox container = new HBox(2);
         container.setPrefHeight(Double.NEGATIVE_INFINITY);
-
+        container.maxWidthProperty().bind(listView.widthProperty().subtract(20d));
         container.getChildren().addAll(acceptAutoLinkedFile, info, writeMetadataToPdf, parsePdfMetadata);
 
         return container;
