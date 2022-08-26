@@ -12,12 +12,12 @@ import org.jabref.model.entry.BibtexString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public final class StringAdd extends ExternalChange {
-    private static final Logger LOGGER = LoggerFactory.getLogger(StringAdd.class);
+public final class BibTexStringAdd extends ExternalChange {
+    private static final Logger LOGGER = LoggerFactory.getLogger(BibTexStringAdd.class);
 
     private final BibtexString addedString;
 
-    public StringAdd(BibtexString addedString, BibDatabaseContext databaseContext, ExternalChangeResolverFactory externalChangeResolverFactory) {
+    public BibTexStringAdd(BibtexString addedString, BibDatabaseContext databaseContext, ExternalChangeResolverFactory externalChangeResolverFactory) {
         super(databaseContext, externalChangeResolverFactory);
         this.addedString = addedString;
         setChangeName(Localization.lang("Added string: '%0'", addedString.getName()));

@@ -6,9 +6,9 @@ import javafx.scene.layout.VBox;
 import org.jabref.gui.collab.ExternalChangeDetailsView;
 import org.jabref.logic.l10n.Localization;
 
-public final class StringAddDetailsView extends ExternalChangeDetailsView {
+public final class BibTexStringAddDetailsView extends ExternalChangeDetailsView {
 
-    public StringAddDetailsView(StringAdd stringAdd) {
+    public BibTexStringAddDetailsView(BibTexStringAdd stringAdd) {
         VBox container = new VBox();
         Label header = new Label(Localization.lang("Added string"));
         header.getStyleClass().add("sectionHeader");

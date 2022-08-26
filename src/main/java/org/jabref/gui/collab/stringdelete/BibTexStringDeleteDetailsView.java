@@ -6,9 +6,9 @@ import javafx.scene.layout.VBox;
 import org.jabref.gui.collab.ExternalChangeDetailsView;
 import org.jabref.logic.l10n.Localization;
 
-public final class StringDeleteDetailsView extends ExternalChangeDetailsView {
+public final class BibTexStringDeleteDetailsView extends ExternalChangeDetailsView {
 
-    public StringDeleteDetailsView(StringDelete stringDelete) {
+    public BibTexStringDeleteDetailsView(BibTexStringDelete stringDelete) {
         VBox container = new VBox();
         Label header = new Label(Localization.lang("Deleted string"));
         header.getStyleClass().add("sectionHeader");

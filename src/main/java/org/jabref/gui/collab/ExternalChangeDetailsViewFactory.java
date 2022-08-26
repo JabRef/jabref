@@ -14,14 +14,14 @@ import org.jabref.gui.collab.metedatachange.MetadataChange;
 import org.jabref.gui.collab.metedatachange.MetadataChangeDetailsView;
 import org.jabref.gui.collab.preamblechange.PreambleChange;
 import org.jabref.gui.collab.preamblechange.PreambleChangeDetailsView;
-import org.jabref.gui.collab.stringadd.StringAdd;
-import org.jabref.gui.collab.stringadd.StringAddDetailsView;
-import org.jabref.gui.collab.stringchange.StringChange;
-import org.jabref.gui.collab.stringchange.StringChangeDetailsView;
-import org.jabref.gui.collab.stringdelete.StringDelete;
-import org.jabref.gui.collab.stringdelete.StringDeleteDetailsView;
-import org.jabref.gui.collab.stringrename.StringRename;
-import org.jabref.gui.collab.stringrename.StringRenameDetailsView;
+import org.jabref.gui.collab.stringadd.BibTexStringAdd;
+import org.jabref.gui.collab.stringadd.BibTexStringAddDetailsView;
+import org.jabref.gui.collab.stringchange.BibTexStringChange;
+import org.jabref.gui.collab.stringchange.BibTexStringChangeDetailsView;
+import org.jabref.gui.collab.stringdelete.BibTexStringDelete;
+import org.jabref.gui.collab.stringdelete.BibTexStringDeleteDetailsView;
+import org.jabref.gui.collab.stringrename.BibTexStringRename;
+import org.jabref.gui.collab.stringrename.BibTexStringRenameDetailsView;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.preferences.PreferencesService;
@@ -49,14 +49,14 @@ public class ExternalChangeDetailsViewFactory {
             return new EntryAddDetailsView(entryAdd, databaseContext, dialogService, stateManager, themeManager, preferencesService);
         } else if (externalChange instanceof EntryDelete entryDelete) {
             return new EntryDeleteDetailsView(entryDelete, databaseContext, dialogService, stateManager, themeManager, preferencesService);
-        } else if (externalChange instanceof StringAdd stringAdd) {
-            return new StringAddDetailsView(stringAdd);
-        } else if (externalChange instanceof StringDelete stringDelete) {
-            return new StringDeleteDetailsView(stringDelete);
-        } else if (externalChange instanceof StringChange stringChange) {
-            return new StringChangeDetailsView(stringChange);
-        } else if (externalChange instanceof StringRename stringRename) {
-            return new StringRenameDetailsView(stringRename);
+        } else if (externalChange instanceof BibTexStringAdd stringAdd) {
+            return new BibTexStringAddDetailsView(stringAdd);
+        } else if (externalChange instanceof BibTexStringDelete stringDelete) {
+            return new BibTexStringDeleteDetailsView(stringDelete);
+        } else if (externalChange instanceof BibTexStringChange stringChange) {
+            return new BibTexStringChangeDetailsView(stringChange);
+        } else if (externalChange instanceof BibTexStringRename stringRename) {
+            return new BibTexStringRenameDetailsView(stringRename);
         } else if (externalChange instanceof MetadataChange metadataChange) {
             return new MetadataChangeDetailsView(metadataChange, preferencesService);
         } else if (externalChange instanceof GroupChange groupChange) {

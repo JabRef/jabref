@@ -13,15 +13,15 @@ import org.jabref.gui.collab.entrydelete.EntryDelete;
 import org.jabref.gui.collab.groupchange.GroupChange;
 import org.jabref.gui.collab.metedatachange.MetadataChange;
 import org.jabref.gui.collab.preamblechange.PreambleChange;
-import org.jabref.gui.collab.stringadd.StringAdd;
-import org.jabref.gui.collab.stringchange.StringChange;
-import org.jabref.gui.collab.stringdelete.StringDelete;
-import org.jabref.gui.collab.stringrename.StringRename;
+import org.jabref.gui.collab.stringadd.BibTexStringAdd;
+import org.jabref.gui.collab.stringchange.BibTexStringChange;
+import org.jabref.gui.collab.stringdelete.BibTexStringDelete;
+import org.jabref.gui.collab.stringrename.BibTexStringRename;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.util.OptionalObjectProperty;
 import org.jabref.model.database.BibDatabaseContext;
 
-public sealed abstract class ExternalChange permits EntryAdd, EntryChange, EntryDelete, GroupChange, MetadataChange, PreambleChange, StringAdd, StringChange, StringDelete, StringRename {
+public sealed abstract class ExternalChange permits EntryAdd, EntryChange, EntryDelete, GroupChange, MetadataChange, PreambleChange, BibTexStringAdd, BibTexStringChange, BibTexStringDelete, BibTexStringRename {
     protected final BibDatabaseContext databaseContext;
     protected final OptionalObjectProperty<ExternalChangeResolver> externalChangeResolver = OptionalObjectProperty.empty();
     private final BooleanProperty accepted = new SimpleBooleanProperty();

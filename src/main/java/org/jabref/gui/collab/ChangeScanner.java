@@ -13,10 +13,10 @@ import org.jabref.gui.collab.entrydelete.EntryDelete;
 import org.jabref.gui.collab.groupchange.GroupChange;
 import org.jabref.gui.collab.metedatachange.MetadataChange;
 import org.jabref.gui.collab.preamblechange.PreambleChange;
-import org.jabref.gui.collab.stringadd.StringAdd;
-import org.jabref.gui.collab.stringchange.StringChange;
-import org.jabref.gui.collab.stringdelete.StringDelete;
-import org.jabref.gui.collab.stringrename.StringRename;
+import org.jabref.gui.collab.stringadd.BibTexStringAdd;
+import org.jabref.gui.collab.stringchange.BibTexStringChange;
+import org.jabref.gui.collab.stringdelete.BibTexStringDelete;
+import org.jabref.gui.collab.stringrename.BibTexStringRename;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.logic.bibtex.comparator.BibDatabaseDiff;
 import org.jabref.logic.bibtex.comparator.BibEntryDiff;
@@ -91,18 +91,18 @@ public class ChangeScanner {
 
     private ExternalChange createBibStringDiff(BibStringDiff diff) {
          if (diff.getOriginalString() == null) {
-            return new StringAdd(diff.getNewString(), database, externalChangeResolverFactory);
+            return new BibTexStringAdd(diff.getNewString(), database, externalChangeResolverFactory);
         }
 
         if (diff.getNewString() == null) {
-            return new StringDelete(diff.getOriginalString(), database, externalChangeResolverFactory);
+            return new BibTexStringDelete(diff.getOriginalString(), database, externalChangeResolverFactory);
         }
 
         if (diff.getOriginalString().getName().equals(diff.getNewString().getName())) {
-            return new StringChange(diff.getOriginalString(), diff.getNewString(), database, externalChangeResolverFactory);
+            return new BibTexStringChange(diff.getOriginalString(), diff.getNewString(), database, externalChangeResolverFactory);
         }
 
-        return new StringRename(diff.getOriginalString(), diff.getNewString(), database, externalChangeResolverFactory);
+        return new BibTexStringRename(diff.getOriginalString(), diff.getNewString(), database, externalChangeResolverFactory);
     }
 
     private ExternalChange createBibEntryDiff(BibEntryDiff diff) {

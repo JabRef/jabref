@@ -11,12 +11,12 @@ import org.jabref.model.entry.BibtexString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public final class StringDelete extends ExternalChange {
-    private static final Logger LOGGER = LoggerFactory.getLogger(StringDelete.class);
+public final class BibTexStringDelete extends ExternalChange {
+    private static final Logger LOGGER = LoggerFactory.getLogger(BibTexStringDelete.class);
 
     private final BibtexString deletedString;
 
-    public StringDelete(BibtexString deletedString, BibDatabaseContext databaseContext, ExternalChangeResolverFactory externalChangeResolverFactory) {
+    public BibTexStringDelete(BibtexString deletedString, BibDatabaseContext databaseContext, ExternalChangeResolverFactory externalChangeResolverFactory) {
         super(databaseContext, externalChangeResolverFactory);
         this.deletedString = deletedString;
         setChangeName(Localization.lang("Deleted string: '%0'", deletedString.getName()));

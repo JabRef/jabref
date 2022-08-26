@@ -11,13 +11,13 @@ import org.jabref.model.entry.BibtexString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public final class StringRename extends ExternalChange {
-    private static final Logger LOGGER = LoggerFactory.getLogger(StringRename.class);
+public final class BibTexStringRename extends ExternalChange {
+    private static final Logger LOGGER = LoggerFactory.getLogger(BibTexStringRename.class);
 
     private final BibtexString oldString;
     private final BibtexString newString;
 
-    public StringRename(BibtexString oldString, BibtexString newString, BibDatabaseContext databaseContext, ExternalChangeResolverFactory externalChangeResolverFactory) {
+    public BibTexStringRename(BibtexString oldString, BibtexString newString, BibDatabaseContext databaseContext, ExternalChangeResolverFactory externalChangeResolverFactory) {
         super(databaseContext, externalChangeResolverFactory);
         this.oldString = oldString;
         this.newString = newString;
