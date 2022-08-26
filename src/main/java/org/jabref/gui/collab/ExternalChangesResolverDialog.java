@@ -90,7 +90,8 @@ public class ExternalChangesResolverDialog extends BaseDialog<Boolean> {
         viewModel.selectedChangeProperty().bind(changesTableView.getSelectionModel().selectedItemProperty());
         EasyBind.subscribe(viewModel.selectedChangeProperty(), selectedChange -> {
             if (selectedChange != null) {
-                changeInfoPane.setCenter(createDetailsViewOrLoadFromCache(selectedChange));
+                ExternalChangeDetailsView detailsView = DETAILS_VIEW_CACHE.computeIfAbsent(selectedChange, externalChangeDetailsViewFactory::create);
+                changeInfoPane.setCenter(detailsView);
             }
         });
 
@@ -117,16 +118,5 @@ public class ExternalChangesResolverDialog extends BaseDialog<Boolean> {
     public void askUserToResolveChange() {
         viewModel.getSelectedChange().flatMap(ExternalChange::getExternalChangeResolver)
                  .flatMap(ExternalChangeResolver::askUserToResolveChange).ifPresent(viewModel::acceptMergedChange);
-    }
-
-    private ExternalChangeDetailsView createDetailsViewOrLoadFromCache(ExternalChange externalChange) {
-        ExternalChangeDetailsView cachedDetailsView = DETAILS_VIEW_CACHE.get(externalChange);
-        if (cachedDetailsView == null) {
-            ExternalChangeDetailsView newDetailsView = externalChangeDetailsViewFactory.create(externalChange);
-            DETAILS_VIEW_CACHE.put(externalChange, newDetailsView);
-            return newDetailsView;
-        } else {
-            return cachedDetailsView;
-        }
     }
 }
