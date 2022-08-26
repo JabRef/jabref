@@ -27,7 +27,7 @@ public class PersonsNameFieldRowView extends FieldRowView {
     }
 
     private void showPersonsNamesAreTheSameWarning() {
-        WarningButton warningButton = new WarningButton(Localization.lang("The {}s are the same, but the fields are formatted differently.", viewModel.getField().getName()));
+        WarningButton warningButton = new WarningButton(Localization.lang("The {}s are the same. However, the order of field content differs", viewModel.getField().getName()));
         getFieldNameCell().addSideButton(warningButton);
     }
 }
