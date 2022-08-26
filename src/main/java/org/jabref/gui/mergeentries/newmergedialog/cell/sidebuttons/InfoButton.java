@@ -12,14 +12,14 @@ import org.jabref.gui.icon.IconTheme;
 
 import com.tobiasdiez.easybind.EasyBind;
 
-public class WarningButton extends Button {
-    private final StringProperty warningMessage = new SimpleStringProperty();
+public class InfoButton extends Button {
+    private final StringProperty infoMessage = new SimpleStringProperty();
     private final ActionFactory actionFactory = new ActionFactory(Globals.getKeyPrefs());
 
-    public WarningButton(String warningMessage) {
-        setWarningMessage(warningMessage);
+    public InfoButton(String infoMessage) {
+        setInfoMessage(infoMessage);
         configureButton();
-        EasyBind.subscribe(warningMessageProperty(), newWarningMessage -> {
+        EasyBind.subscribe(infoMessageProperty(), newWarningMessage -> {
             configureButton();
         });
     }
@@ -27,7 +27,7 @@ public class WarningButton extends Button {
     private void configureButton() {
         setMaxHeight(Double.MAX_VALUE);
         setFocusTraversable(false);
-        Action mergeAction = new Action.Builder(getWarningMessage()).setIcon(IconTheme.JabRefIcons.WARNING);
+        Action mergeAction = new Action.Builder(getInfoMessage()).setIcon(IconTheme.JabRefIcons.INTEGRITY_INFO);
 
         actionFactory.configureIconButton(mergeAction, new SimpleCommand() {
             @Override
@@ -36,15 +36,15 @@ public class WarningButton extends Button {
         }, this);
     }
 
-    private void setWarningMessage(String warningMessage) {
-        warningMessageProperty().set(warningMessage);
+    private void setInfoMessage(String infoMessage) {
+        infoMessageProperty().set(infoMessage);
     }
 
-    public StringProperty warningMessageProperty() {
-        return warningMessage;
+    public StringProperty infoMessageProperty() {
+        return infoMessage;
     }
 
-    public String getWarningMessage() {
-        return warningMessage.get();
+    public String getInfoMessage() {
+        return infoMessage.get();
     }
 }

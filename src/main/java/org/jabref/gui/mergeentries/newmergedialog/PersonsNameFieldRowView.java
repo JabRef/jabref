@@ -1,6 +1,6 @@
 package org.jabref.gui.mergeentries.newmergedialog;
 
-import org.jabref.gui.mergeentries.newmergedialog.cell.sidebuttons.WarningButton;
+import org.jabref.gui.mergeentries.newmergedialog.cell.sidebuttons.InfoButton;
 import org.jabref.gui.mergeentries.newmergedialog.fieldsmerger.FieldMergerFactory;
 import org.jabref.logic.importer.AuthorListParser;
 import org.jabref.logic.l10n.Localization;
@@ -21,13 +21,13 @@ public class PersonsNameFieldRowView extends FieldRowView {
         leftEntryNames = authorsParser.parse(viewModel.getLeftFieldValue());
         rightEntryNames = authorsParser.parse(viewModel.getRightFieldValue());
 
-        if (leftEntryNames.equals(rightEntryNames)) {
-            showPersonsNamesAreTheSameWarning();
+        if (!leftEntry.equals(rightEntry) && leftEntryNames.equals(rightEntryNames)) {
+            showPersonsNamesAreTheSameInfo();
         }
     }
 
-    private void showPersonsNamesAreTheSameWarning() {
-        WarningButton warningButton = new WarningButton(Localization.lang("The {}s are the same. However, the order of field content differs", viewModel.getField().getName()));
-        getFieldNameCell().addSideButton(warningButton);
+    private void showPersonsNamesAreTheSameInfo() {
+        InfoButton infoButton = new InfoButton(Localization.lang("The %0s are the same. However, the order of field content differs", viewModel.getField().getName()));
+        getFieldNameCell().addSideButton(infoButton);
     }
 }
