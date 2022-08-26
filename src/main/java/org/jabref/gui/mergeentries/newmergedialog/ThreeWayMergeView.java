@@ -17,6 +17,7 @@ import org.jabref.gui.mergeentries.newmergedialog.toolbar.ThreeWayMergeToolbar;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.FieldProperty;
 import org.jabref.model.entry.field.StandardField;
 
 public class ThreeWayMergeView extends VBox {
@@ -121,8 +122,8 @@ public class ThreeWayMergeView extends VBox {
         Field field = getFieldAtIndex(fieldIndex);
 
         FieldRowView fieldRow;
-        if (field == StandardField.AUTHOR) {
-            fieldRow = new AuthorsFieldRowView(getLeftEntry(), getRightEntry(), getMergedEntry(), fieldMergerFactory, fieldIndex);
+        if (field.getProperties().contains(FieldProperty.PERSON_NAMES)) {
+            fieldRow = new PersonsNameFieldRowView(field, getLeftEntry(), getRightEntry(), getMergedEntry(), fieldMergerFactory, fieldIndex);
         } else {
             fieldRow = new FieldRowView(field, getLeftEntry(), getRightEntry(), getMergedEntry(), fieldMergerFactory, fieldIndex);
         }
