@@ -32,6 +32,7 @@ public class InfoButton extends Button {
         actionFactory.configureIconButton(mergeAction, new SimpleCommand() {
             @Override
             public void execute() {
+                // The info button is not meant to be clickable that's why this is empty
             }
         }, this);
     }
