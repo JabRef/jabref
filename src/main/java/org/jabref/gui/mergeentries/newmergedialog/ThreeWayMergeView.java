@@ -18,7 +18,6 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldProperty;
-import org.jabref.model.entry.field.StandardField;
 
 public class ThreeWayMergeView extends VBox {
     public static final int GRID_COLUMN_MIN_WIDTH = 250;
