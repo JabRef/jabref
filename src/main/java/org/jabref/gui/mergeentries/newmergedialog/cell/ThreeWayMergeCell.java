@@ -2,7 +2,6 @@ package org.jabref.gui.mergeentries.newmergedialog.cell;
 
 import javafx.beans.property.StringProperty;
 import javafx.css.PseudoClass;
-import javafx.geometry.Insets;
 import javafx.scene.layout.HBox;
 
 import com.tobiasdiez.easybind.EasyBind;
@@ -28,8 +27,6 @@ public abstract class ThreeWayMergeCell extends HBox {
         EasyBind.subscribe(viewModel.evenProperty(), isEven -> {
             pseudoClassStateChanged(PseudoClass.getPseudoClass(EVEN_PSEUDO_CLASS), isEven);
         });
-
-        setPadding(new Insets(8));
     }
 
     public String getText() {
