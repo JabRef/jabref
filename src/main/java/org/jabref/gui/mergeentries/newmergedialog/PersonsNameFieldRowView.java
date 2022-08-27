@@ -23,6 +23,7 @@ public class PersonsNameFieldRowView extends FieldRowView {
 
         if (!leftEntry.equals(rightEntry) && leftEntryNames.equals(rightEntryNames)) {
             showPersonsNamesAreTheSameInfo();
+            shouldShowDiffs.set(false);
         }
     }
 
