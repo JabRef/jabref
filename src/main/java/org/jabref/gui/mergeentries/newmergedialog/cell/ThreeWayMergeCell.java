@@ -14,7 +14,7 @@ import javafx.scene.layout.HBox;
 public abstract class ThreeWayMergeCell extends HBox {
     public static final String ODD_PSEUDO_CLASS = "odd";
     public static final String EVEN_PSEUDO_CLASS = "even";
-    public static final int NO_ROW_NUMBER = -1;
+    public static final int HEADER_ROW = -1;
     private static final String DEFAULT_STYLE_CLASS = "field-cell";
     private final StringProperty text = new SimpleStringProperty();
     private final BooleanProperty odd = new BooleanPropertyBase() {
@@ -55,7 +55,7 @@ public abstract class ThreeWayMergeCell extends HBox {
 
     public ThreeWayMergeCell(String text, int rowIndex) {
         getStyleClass().add(DEFAULT_STYLE_CLASS);
-        if (rowIndex != NO_ROW_NUMBER) {
+        if (rowIndex != HEADER_ROW) {
             if (rowIndex % 2 == 1) {
                 odd.setValue(true);
             } else {
