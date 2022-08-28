@@ -75,14 +75,28 @@ public final class Word {
     }
 
     public void toUpperFirst() {
+        int dash_sentinela = 0;
         for (int i = 0; i < chars.length; i++) {
             if (!protectedChars[i]) {
-                chars[i] = (i == 0) ?
-                        Character.toUpperCase(chars[i]) :
-                        Character.toLowerCase(chars[i]);
+                if(i == 0){
+                    chars[i] = Character.toUpperCase(chars[i]);
+                }
+                else {
+                        if (chars[i] == '—' || chars[i] == '-') {
+                            dash_sentinela = 1;
+                            chars[i] = Character.toUpperCase(chars[i]);
+                            continue;
+                        }
+                        if (dash_sentinela == 1) {
+                            chars[i] = Character.toUpperCase(chars[i]);
+                            dash_sentinela = 0;
+                            continue;
+                        }
+                        chars[i] = Character.toLowerCase(chars[i]);
+                    }
+                }
             }
         }
-    }
 
     public boolean isSmallerWord() {
         // "word:" is still a small "word"
