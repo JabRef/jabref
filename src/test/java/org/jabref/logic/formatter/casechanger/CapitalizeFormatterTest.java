@@ -43,6 +43,12 @@ public class CapitalizeFormatterTest {
             "UPPER {E}ACH {NOT} FIRST, Upper {E}ach {NOT} First", // multiple words upper case with {}
             "upper each first {NOT} {this}, Upper Each First {NOT} {this}", // multiple words in lower and upper case with {}
             "upper each first {N}OT {t}his, Upper Each First {N}ot {t}his", // multiple words in lower and upper case with {} part 2
+            "upper each first including-this,Upper Each First Including-This", //multiple words in lower including words with a - inside
+            "upper each first including—this,Upper Each First Including—This", //multiple words in lower including words with a — (dash) inside
+            "upper Each first-including-this,Upper Each First-Including-This", // multiple words in lower and upper with multiple hifen and dash in
+            "upper Each first-including—this,Upper Each First-Including—This", // multiple words in lower and upper with multiple hifen and dash in
+            "UPPER Each first-INCLUDING-THIS,Upper Each First-Including-This", // multiple words in lower and upper with multiple dash in
+
     })
     public void testInputs(String input, String expectedResult) {
         String formattedStr = formatter.format(input);
