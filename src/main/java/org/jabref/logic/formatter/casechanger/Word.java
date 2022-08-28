@@ -1,10 +1,8 @@
 package org.jabref.logic.formatter.casechanger;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Locale;
-import java.util.Objects;
-import java.util.Set;
+import com.sun.star.lang.IllegalArgumentException;
+
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -77,9 +75,16 @@ public final class Word {
     public void toUpperFirst() {
         for (int i = 0; i < chars.length; i++) {
             if (!protectedChars[i]) {
-                chars[i] = (i == 0) ?
-                        Character.toUpperCase(chars[i]) :
-                        Character.toLowerCase(chars[i]);
+                if (i == 0) {
+                    chars[i] = Character.toUpperCase(chars[i]);
+                }
+                else if (hasAnyDash(chars[i])) {
+                    chars[i+1] = Character.toUpperCase(chars[i+1]);
+                    i++;
+                }
+                else {
+                    chars[i] = Character.toLowerCase(chars[i]);
+                }
             }
         }
     }
@@ -100,5 +105,19 @@ public final class Word {
 
     public boolean endsWithColon() {
         return this.toString().endsWith(":");
+    }
+
+    public boolean hasAnyDash(char c) {
+        char[] dashes = {'\u002D', '\u058A', '\u05BE', '\u1400', '\u1806', '\u2010',
+                '\u2011', '\u2012', '\u2013', '\u2014', '\u2015', '\u2E17',
+                '\u2E1A', '\u2E3A', '\u2E3B', '\u2E40', '\u301C', '\u3030',
+                '\u30A0', '\uFE31', '\uFE32', '\uFE58', '\uFE63', '\uFF0D'};
+
+        for (char x : dashes) {
+            if (x == c) {
+                return true;
+            }
+        }
+        return false;
     }
 }

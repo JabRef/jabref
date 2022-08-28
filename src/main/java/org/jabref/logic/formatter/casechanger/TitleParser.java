@@ -15,6 +15,14 @@ public final class TitleParser {
     public List<Word> parse(String title) {
         List<Word> words = new LinkedList<>();
 
+        /**
+         * Remove possible zero width unicode characters
+         */
+        title = title.replaceAll("\u200B", "");
+        title = title.replaceAll("\u200C", "");
+        title = title.replaceAll("\u200D", "");
+        title = title.replaceAll("\uFEFF", "");
+
         boolean[] isProtected = determineProtectedChars(title);
 
         reset();
