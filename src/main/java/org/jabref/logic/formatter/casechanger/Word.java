@@ -10,30 +10,42 @@ import java.util.stream.Collectors;
 /**
  * Represents a word in a title of a bibtex entry.
  * <p>
- * A word can have protected chars (enclosed in '{' '}') and may be a small (a, an, the, ...) word.
+ * A word can have protected chars (enclosed in '{' '}') and may be a small (a,
+ * an, the, ...) word.
  */
 public final class Word {
     /**
      * Set containing common lowercase function words
      */
     public static final Set<String> SMALLER_WORDS;
+    public static final Set<Character> DASHES_N_HYPHENS;
     private final char[] chars;
     private final boolean[] protectedChars;
 
     static {
         Set<String> smallerWords = new HashSet<>();
+        Set<Character> dashesAndHyphens = new HashSet<>();
 
         // Articles
         smallerWords.addAll(Arrays.asList("a", "an", "the"));
         // Prepositions
-        smallerWords.addAll(Arrays.asList("above", "about", "across", "against", "along", "among", "around", "at", "before", "behind", "below", "beneath", "beside", "between", "beyond", "by", "down", "during", "except", "for", "from", "in", "inside", "into", "like", "near", "of", "off", "on", "onto", "since", "to", "toward", "through", "under", "until", "up", "upon", "with", "within", "without"));
+        smallerWords.addAll(Arrays.asList("above", "about", "across", "against", "along", "among", "around", "at",
+                "before", "behind", "below", "beneath", "beside", "between", "beyond", "by", "down", "during", "except",
+                "for", "from", "in", "inside", "into", "like", "near", "of", "off", "on", "onto", "since", "to",
+                "toward", "through", "under", "until", "up", "upon", "with", "within", "without"));
         // Conjunctions
         smallerWords.addAll(Arrays.asList("and", "but", "for", "nor", "or", "so", "yet"));
 
+        // Dashes and Hyphens
+        dashesAndHyphens.addAll(Arrays.asList('-', '~', '֊', '־', '᐀', '‐', '‑', '‒', '–', '—', '―', '⁓', '⁻', '₋', '−',
+                '⸗', '⸺', '⸻', '〜', '〰', '゠', '︱', '︲', '﹘', '﹣', '－'));
+
         // unmodifiable for thread safety
         SMALLER_WORDS = smallerWords.stream()
-                            .map(word -> word.toLowerCase(Locale.ROOT))
-                            .collect(Collectors.toUnmodifiableSet());
+                .map(word -> word.toLowerCase(Locale.ROOT))
+                .collect(Collectors.toUnmodifiableSet());
+
+        DASHES_N_HYPHENS = dashesAndHyphens;
     }
 
     public Word(char[] chars, boolean[] protectedChars) {
@@ -46,7 +58,8 @@ public final class Word {
     }
 
     /**
-     * Case-insensitive check against {@link Word#SMALLER_WORDS}. Checks for common function words.
+     * Case-insensitive check against {@link Word#SMALLER_WORDS}. Checks for common
+     * function words.
      */
     public static boolean isSmallerWord(String word) {
         return SMALLER_WORDS.contains(word.toLowerCase(Locale.ROOT));
@@ -77,9 +90,9 @@ public final class Word {
     public void toUpperFirst() {
         for (int i = 0; i < chars.length; i++) {
             if (!protectedChars[i]) {
-                chars[i] = (i == 0) ?
-                        Character.toUpperCase(chars[i]) :
-                        Character.toLowerCase(chars[i]);
+                chars[i] = (i == 0 || DASHES_N_HYPHENS.contains(chars[i - 1]))
+                        ? Character.toUpperCase(chars[i])
+                        : Character.toLowerCase(chars[i]);
             }
         }
     }

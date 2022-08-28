@@ -8,7 +8,8 @@ import org.junit.jupiter.params.provider.CsvSource;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
- * Tests in addition to the general tests from {@link org.jabref.logic.formatter.FormatterTest}
+ * Tests in addition to the general tests from
+ * {@link org.jabref.logic.formatter.FormatterTest}
  */
 public class CapitalizeFormatterTest {
 
@@ -41,8 +42,47 @@ public class CapitalizeFormatterTest {
             "upper each {NOT} first, Upper Each {NOT} First", // multiple words lower case with {}
             "Upper {E}ach {NOT} First, Upper {E}ach {NOT} First", // multiple words correct with {}
             "UPPER {E}ACH {NOT} FIRST, Upper {E}ach {NOT} First", // multiple words upper case with {}
-            "upper each first {NOT} {this}, Upper Each First {NOT} {this}", // multiple words in lower and upper case with {}
-            "upper each first {N}OT {t}his, Upper Each First {N}ot {t}his", // multiple words in lower and upper case with {} part 2
+            "upper each first {NOT} {this}, Upper Each First {NOT} {this}", // multiple words in lower and upper case
+                                                                            // with {}
+            "upper each first {N}OT {t}his, Upper Each First {N}ot {t}his", // multiple words in lower and upper case
+                                                                            // with {} part 2
+            "first-second USING hypheN, First-Second Using Hyphen", // multiple words in lower and upper case using
+                                                                    // hyphen
+            "breaking Your Next TEST-cASE, Breaking Your Next Test-Case", // multiple words in lower and upper case
+                                                                          // using hyphen
+            "THIS looks〰LIKE a daSH, This Looks〰Like A Dash", // dash-like character
+            "one-dash, One-Dash", // testing all dash-like characters
+            "one~dash, One~Dash",
+            "one֊dash, One֊Dash",
+            "one־dash, One־Dash",
+            "one᐀dash, One᐀Dash",
+            "one‐dash, One‐Dash",
+            "one‑dash, One‑Dash",
+            "one‒dash, One‒Dash",
+            "one–dash, One–Dash",
+            "one—dash, One—Dash",
+            "one―dash, One―Dash",
+            "one⁓dash, One⁓Dash",
+            "one⁻dash, One⁻Dash",
+            "one₋dash, One₋Dash",
+            "one−dash, One−Dash",
+            "one⸗dash, One⸗Dash",
+            "one⸺dash, One⸺Dash",
+            "one⸻dash, One⸻Dash",
+            "one〜dash, One〜Dash",
+            "one〰dash, One〰Dash",
+            "one゠dash, One゠Dash",
+            "one︱dash, One︱Dash",
+            "one︲dash, One︲Dash",
+            "one﹘dash, One﹘Dash",
+            "one﹣dash, One﹣Dash",
+            "one－dash, One－Dash",
+            "--, --", // testing weird cases
+            "--this is one sentence, --This Is One Sentence",
+            "-d-o-i-t right-, -D-O-I-T Right-",
+            "testing hy---------------phen, Testing Hy---------------Phen",
+            "its getting cr--a---z-y, Its Getting Cr--A---Z-Y",
+            "does it wor⸻k with cra゠︱zy dashes?, Does It Wor⸻K With Cra゠︱Zy Dashes?",
     })
     public void testInputs(String input, String expectedResult) {
         String formattedStr = formatter.format(input);
