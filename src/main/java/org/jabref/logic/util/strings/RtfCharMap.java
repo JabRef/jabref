@@ -68,6 +68,7 @@ public class RtfCharMap {
         put("DH", "\\u208D"); // "ETH"
 
         put("~N", "\\u209N"); // "Ntilde"
+        put("~n", "\\u210N"); // "ntilde"
 
         put("~O", "\\u213O"); // "Otilde"
         // According to ISO 8859-1 the "\times" symbol should be placed here
