@@ -18,6 +18,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We added an importer for Citavi backup files, support ".ctv5bak" and ".ctv6bak" file formats. [#8322](https://github.com/JabRef/jabref/issues/8322)
 - We added a feature to drag selected entries and drop them to other opened inactive library tabs [koppor521](https://github.com/koppor/jabref/issues/521).
 - We added support for the [biblatex-apa](https://github.com/plk/biblatex-apa) legal entry types `Legislation`, `Legadminmaterial`, `Jurisdiction`, `Constitution` and `Legal` [#8931](https://github.com/JabRef/jabref/issues/8931)
+- We added the capitalization of words with any dashes characters in title. [#9068](https://github.com/JabRef/jabref/issues/9068)
 
 ### Changed
 
@@ -40,6 +41,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We moved the preferences option "Warn about duplicates on import" option from the tab "File" to the tab "Import and Export". [koppor#570](https://github.com/koppor/jabref/issues/570)
 - When JabRef encounters `% Encoding: UTF-8` header, it is kept during writing (and not removed). [#8964](https://github.com/JabRef/jabref/pull/8964)
 - We replace characters which cannot be decoded using the specified encoding by a (probably another) valid character. This happens if JabRef detects the wrong charset (e.g., UTF-8 instead of Windows 1252). One can use the [Integrity Check](https://docs.jabref.org/finding-sorting-and-cleaning-entries/checkintegrity) to find those characters.
+- We changed the file Word.java to solve the issue [#9068](https://github.com/JabRef/jabref/issues/9068)
 
 ### Fixed
 
@@ -63,6 +65,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixed a bug where updating group view mode (intersection or union) requires re-selecting groups to take effect. [#6998](https://github.com/JabRef/jabref/issues/6998)
 - We fixed a bug that prevented external group metadata changes from being merged. [#8873](https://github.com/JabRef/jabref/issues/8873)
 - We fixed the shared database opening dialog to remember autosave folder and tick. [#7516](https://github.com/JabRef/jabref/issues/7516)
+- We fixed an issue where capitalization did not work for words with dashes and covered the zero width spaces. [#9068](https://github.com/JabRef/jabref/issues/9068)
 
 ### Removed
 
