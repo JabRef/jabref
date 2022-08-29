@@ -148,7 +148,7 @@ dependencies {
 
     implementation group: 'org.mariadb.jdbc', name: 'mariadb-java-client', version: '2.7.6'
 
-    implementation 'org.postgresql:postgresql:42.4.2'
+    implementation 'org.postgresql:postgresql:42.5.0'
 
     implementation ('com.oracle.ojdbc:ojdbc10:19.3.0.0') {
         // causing module issues
