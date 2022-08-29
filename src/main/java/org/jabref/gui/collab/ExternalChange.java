@@ -49,7 +49,7 @@ public sealed abstract class ExternalChange permits EntryAdd, EntryChange, Entry
     }
 
     /**
-     * Convince method for accepting changes
+     * Convinience method for accepting changes
      * */
     public void accept() {
         setAccepted(true);
