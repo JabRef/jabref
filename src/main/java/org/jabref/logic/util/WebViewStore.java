@@ -61,7 +61,7 @@ public class WebViewStore {
     private static void addWebViewLater() {
         Platform.runLater(() -> {
             WEB_VIEWS.add(new WebView());
-            LOGGER.info("Cached Web views: {}", WEB_VIEWS.size());
+            LOGGER.debug("Cached Web views: {}", WEB_VIEWS.size());
         });
     }
 

@@ -99,7 +99,7 @@ public class ExternalChangesResolverDialog extends BaseDialog<Boolean> {
             if (isResolved) {
                 Platform.runLater(viewModel::applyChanges);
                 close();
-                LOGGER.info("Closing ExternalChangesResolverDialog");
+                LOGGER.debug("Closing ExternalChangesResolverDialog");
             }
         });
     }
