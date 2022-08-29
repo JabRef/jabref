@@ -19,8 +19,8 @@ public class ExternalChangeResolverFactory {
     public Optional<ExternalChangeResolver> create(ExternalChange change) {
         if (change instanceof EntryChange entryChange) {
             return Optional.of(new EntryChangeResolver(entryChange, dialogService, databaseContext));
-        } else {
-            return Optional.empty();
         }
+
+        return Optional.empty();
     }
 }
