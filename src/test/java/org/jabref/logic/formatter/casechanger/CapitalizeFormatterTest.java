@@ -59,30 +59,30 @@ public class CapitalizeFormatterTest {
             "multiple-{words} with-{h}yphen right-now {people}, Multiple-{words} With-{h}yphen Right-Now {people}", // multiple words lower case with hyphen and {}
             "Multiple-{words} With-{h}yphen Right-Now {people}, Multiple-{words} With-{h}yphen Right-Now {people}", // multiple words correct with hyphen and {}
             "MULTIPLE-{words} WITH-{h}yphen RIGHT-NOW {people}, Multiple-{words} With-{h}yphen Right-Now {people}", // multiple words upper case with hyphen and {}
-            "with\u002Dother dashes, With\u002DOther Dashes", // words with hyphen-minus
-            "with\u058Aother dashes, With\u058AOther Dashes", // words with armenian hyphen
-            "with\u05BEother dashes, With\u05BEOther Dashes", // words with hebrew punctuation maqaf
-            "with\u1400other dashes, With\u1400Other Dashes", // words with canadian syllabics hyphen
-            "with\u1806other dashes, With\u1806Other Dashes", // words with mongolian todo soft hyphen
-            "with\u2010other dashes, With\u2010Other Dashes", // words with hyphen
-            "with\u2011other dashes, With\u2011Other Dashes", // words with non-breaking hyphen
-            "with\u2012other dashes, With\u2012Other Dashes", // words with figure dash
-            "with\u2013other dashes, With\u2013Other Dashes", // words with en dash
-            "with\u2014other dashes, With\u2014Other Dashes", // words with em dash
-            "with\u2015other dashes, With\u2015Other Dashes", // words with horizontal bar
-            "with\u2E17other dashes, With\u2E17Other Dashes", // words with double oblique hyphen
-            "with\u2E1Aother dashes, With\u2E1AOther Dashes", // words with hyphen with diaeresis
-            "with\u2E3Aother dashes, With\u2E3AOther Dashes", // words with two-em dash
-            "with\u2E3Bother dashes, With\u2E3BOther Dashes", // words with three-em dash
-            "with\u2E40other dashes, With\u2E40Other Dashes", // words with double hyphen
-            "with\u301Cother dashes, With\u301COther Dashes", // words with wave dash
-            "with\u3030other dashes, With\u3030Other Dashes", // words with wavy dash
-            "with\u30A0other dashes, With\u30A0Other Dashes", // words with katakana-hiraga double hyphen
-            "with\uFE31other dashes, With\uFE31Other Dashes", // words with vertical em dash
-            "with\uFE32other dashes, With\uFE32Other Dashes", // words with vertical en dash
-            "with\uFE58other dashes, With\uFE58Other Dashes", // words with small em dash
-            "with\uFE63other dashes, With\uFE63Other Dashes", // words with small hyphen-minus
-            "with\uFF0Dother dashes, With\uFF0DOther Dashes", // words with fullwidth hyphen-minus
+            "with-other dashes, With-Other Dashes", // words with hyphen-minus
+            "with֊other dashes, With֊Other Dashes", // words with armenian hyphen
+            "with־other dashes, With־Other Dashes", // words with hebrew punctuation maqaf
+            "with᐀other dashes, With᐀Other Dashes", // words with canadian syllabics hyphen
+            "with᠆other dashes, With᠆Other Dashes", // words with mongolian todo soft hyphen
+            "with‐other dashes, With‐Other Dashes", // words with hyphen
+            "with‑other dashes, With‑Other Dashes", // words with non-breaking hyphen
+            "with‒other dashes, With‒Other Dashes", // words with figure dash
+            "with–other dashes, With–Other Dashes", // words with en dash
+            "with—other dashes, With—Other Dashes", // words with em dash
+            "with―other dashes, With―Other Dashes", // words with horizontal bar
+            "with⸗other dashes, With⸗Other Dashes", // words with double oblique hyphen
+            "with⸚other dashes, With⸚Other Dashes", // words with hyphen with diaeresis
+            "with⸺other dashes, With⸺Other Dashes", // words with two-em dash
+            "with⸻other dashes, With⸻Other Dashes", // words with three-em dash
+            "with⹀other dashes, With⹀Other Dashes", // words with double hyphen
+            "with〜other dashes, With〜Other Dashes", // words with wave dash
+            "with〰other dashes, With〰Other Dashes", // words with wavy dash
+            "with゠other dashes, With゠Other Dashes", // words with katakana-hiraga double hyphen
+            "with︱other dashes, With︱Other Dashes", // words with vertical em dash
+            "with︲other dashes, With︲Other Dashes", // words with vertical en dash
+            "with﹘other dashes, With﹘Other Dashes", // words with small em dash
+            "with﹣other dashes, With﹣Other Dashes", // words with small hyphen-minus
+            "with－other dashes, With－Other Dashes", // words with fullwidth hyphen-minus
             "remove\u200Bzero\u200Bwidth\u200Bspaces\u200B, Removezerowidthspaces", // words with unwelcome zero width spaces
             "remove\u200Czero\u200Cwidth\u200Cspaces\u200C, Removezerowidthspaces", // words with unwelcome zero width spaces
             "remove\u200Dzero\u200Dwidth\u200Dspaces\u200D, Removezerowidthspaces", // words with unwelcome zero width spaces
