@@ -129,7 +129,7 @@ public class CSLAdapter {
                             bibEntry.clearField(StandardField.NUMBER);
                         }
                     );
-                /** TODO: fix tests in CitationStyleGeneratorTest.java using APA style, once APA recognizes a "number" field (and thereby will be able to render the "eid" field)
+                /* TODO: fix tests in CitationStyleGeneratorTest.java using APA style, once APA recognizes a "number" field (and thereby will be able to render the "eid" field)
                  * tracked at https://github.com/citation-style-language/styles/issues/5827
                  *
                  * Further info:
