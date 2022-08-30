@@ -86,7 +86,6 @@ public class FieldValueCell extends ThreeWayMergeCell implements Toggle {
         initializeLabel();
         initializeSelectionBox();
         initializeActions();
-        textProperty().addListener(invalidated -> setUserData(getText()));
         setOnMouseClicked(e -> {
             if (!isDisabled()) {
                 setSelected(true);
@@ -206,16 +205,6 @@ public class FieldValueCell extends ThreeWayMergeCell implements Toggle {
     @Override
     public BooleanProperty selectedProperty() {
         return selected;
-    }
-
-    @Override
-    public void setUserData(Object value) {
-        super.setText((String) value);
-    }
-
-    @Override
-    public Object getUserData() {
-        return super.getText();
     }
 
     public StyleClassedTextArea getStyleClassedLabel() {
