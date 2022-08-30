@@ -431,7 +431,7 @@ class CitationStyleGeneratorTest {
                         "apa-6th-edition.csl"),
 
                 Arguments.of(
-                        /**
+                        /*
                          * Change test once apa-6th-edition.csl supports the CSL "number" field.
                          * Tracked in https://github.com/citation-style-language/styles/issues/5827
                          * Ideal test: "Foo, B. (n.d.). eid + issue. Bib(La)TeX Journal, (9issue), Article 6eid.\n",
