@@ -19,7 +19,7 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.InternalField;
 
-class ThreeWayMergeViewModel extends AbstractViewModel {
+public class ThreeWayMergeViewModel extends AbstractViewModel {
 
     private final ObjectProperty<BibEntry> leftEntry = new SimpleObjectProperty<>();
     private final ObjectProperty<BibEntry> rightEntry = new SimpleObjectProperty<>();
