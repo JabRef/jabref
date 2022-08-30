@@ -128,32 +128,21 @@ public class CSLAdapter {
                             bibEntry.setField(StandardField.ISSUE, number);
                             bibEntry.clearField(StandardField.NUMBER);
                         }
-                    // TODO: Map eid to CSL number, once APA recognizes a "number" field
-                    // www.zotero.org/styles/apa-6th-edition
-                    // https://docs.citationstyles.org/en/stable/specification.html#number-variables
-                    // https://apastyle.apa.org/style-grammar-guidelines/references/examples/journal-article-references#2
-                    // e.g. like this:
-                    //
-                    //                  bibEntry.getField(StandardField.EID).ifPresent(eid -> {
-                    //                   if (!bibEntry.hasField(StandardField.NUMBER)) {
-                    //                       bibEntry.setField(StandardField.NUMBER, eid);
-                    //                       bibEntry.clearField(StandardField.EID);
-                    //                   }
-                    //                   else {
-                    //                       if (!bibEntry.hasField(StandardField.PAGES)) {
-                    //                       bibEntry.setField(StandardField.PAGES, eid);
-                    //                       bibEntry.clearField(StandardField.EID);
-                    //                   }
-                    //               }});
-                    //
-                    // TODO: Remove mapping of eid to pages once eid is mapped to number.
                     );
-                    bibEntry.getField(StandardField.EID).ifPresent(eid -> {
-                        if (!bibEntry.hasField(StandardField.PAGES)) {
-                            bibEntry.setField(StandardField.PAGES, eid);
-                            bibEntry.clearField(StandardField.EID);
-                        }}
-                    );
+                /** TODO: fix tests in CitationStyleGeneratorTest.java using APA style, once APA recognizes a "number" field (and thereby will be able to render the "eid" field)
+                 * tracked at https://github.com/citation-style-language/styles/issues/5827
+                 *
+                 * Further info:
+                 * www.zotero.org/styles/apa-6th-edition
+                 * https://docs.citationstyles.org/en/stable/specification.html#number-variables
+                 * https://apastyle.apa.org/style-grammar-guidelines/references/examples/journal-article-references#2
+                 */
+                  bibEntry.getField(StandardField.EID).ifPresent(eid -> {
+                   if (!bibEntry.hasField(StandardField.NUMBER)) {
+                       bibEntry.setField(StandardField.NUMBER, eid);
+                       bibEntry.clearField(StandardField.EID);
+                        }
+                    });
                 } else {
                     // BibTeX mode
                     bibEntry.getField(StandardField.NUMBER).ifPresent(number -> {

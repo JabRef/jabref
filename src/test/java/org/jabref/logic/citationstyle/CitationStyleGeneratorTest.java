@@ -34,7 +34,7 @@ class CitationStyleGeneratorTest {
 
         // if the acm-siggraph.csl citation style changes this has to be modified
         String expected = "  <div class=\"csl-entry\">"
-                + "<span style=\"font-variant: small-caps\">Smith, B., Jones, B., and Williams, J.</span> 2016-07. Title of the test entry. <span style=\"font-style: italic\">BibTeX Journal</span> <span style=\"font-style: italic\">34</span>, 7, 45&ndash;67."
+                + "<span style=\"font-variant: small-caps\">Smith, B., Jones, B., and Williams, J.</span> 2016-07. Title of the test entry. <span style=\"font-style: italic\">BibTeX Journal</span> <span style=\"font-style: italic\">34</span>, 3, 45&ndash;67."
                 + "</div>\n"
                 + "";
 
@@ -51,7 +51,7 @@ class CitationStyleGeneratorTest {
 
         // if the apa-6th-citation.csl citation style changes this has to be modified
         String expected = "  <div class=\"csl-entry\">"
-                + "Smith, B., Jones, B., &amp; Williams, J. (2016-07). Title of the test entry. <span style=\"font-style: italic\">BibTeX Journal</span>, <span style=\"font-style: italic\">34</span>(7), 45&ndash;67. https://doi.org/10.1001/bla.blubb"
+                + "Smith, B., Jones, B., &amp; Williams, J. (2016-07). Title of the test entry. <span style=\"font-style: italic\">BibTeX Journal</span>, <span style=\"font-style: italic\">34</span>(3), 45&ndash;67. https://doi.org/10.1001/bla.blubb"
                 + "</div>\n"
                 + "";
 
@@ -201,18 +201,7 @@ class CitationStyleGeneratorTest {
                                 .withField(StandardField.NUMBER, "28"),
                         "ieee.csl"),
                 Arguments.of(
-                        // TODO:
-                        // This test only;
-                        // Replace
-                        // "[1]F. Last and J. Doe, no. 7, p. e0270533.\n",
-                        // with
-                        // "[1]F. Last and J. Doe, no. 7, Art. no. e0270533.\n",
-                        // once Biblatex "eid" is mapped to CSL "number" instead of CSL "pages"
-                        //
-                        // Alternative non-optimal hack: Rework the pages checker to get rid of "p."
-                        // when detecting an article-number in the pages field
-                        //
-                        "[1]F. Last and J. Doe, no. 7, p. e0270533.\n",
+                        "[1]F. Last and J. Doe, no. 7, Art. no. e0270533.\n",
                         BibDatabaseMode.BIBLATEX,
                         new BibEntry(StandardEntryType.Article)
                                 .withField(StandardField.AUTHOR, "Last, First and\nDoe, Jane")
@@ -442,7 +431,13 @@ class CitationStyleGeneratorTest {
                         "apa-6th-edition.csl"),
 
                 Arguments.of(
-                        "Foo, B. (n.d.). eid + issue. Bib(La)TeX Journal, (9issue), Article 6eid.\n",
+                        /**
+                         * Change test once apa-6th-edition.csl supports the CSL "number" field.
+                         * Tracked in https://github.com/citation-style-language/styles/issues/5827
+                         * Ideal test: "Foo, B. (n.d.). eid + issue. Bib(La)TeX Journal, (9issue), Article 6eid.\n",
+                         * Because of https://apastyle.apa.org/style-grammar-guidelines/references/examples/journal-article-references#2
+                         */
+                        "Foo, B. (n.d.). eid + issue. Bib(La)TeX Journal, (9issue).\n",
                         BibDatabaseMode.BIBLATEX,
                         new BibEntry(StandardEntryType.Article)
                                 .withField(StandardField.AUTHOR, "Foo, Bar")
@@ -466,8 +461,14 @@ class CitationStyleGeneratorTest {
                         "apa-6th-edition.csl"),
 
                 // Not rendering the "issue" field here is sufficient for APA 7th edition. Under current circumstances the "number" field takes priority over the "issue" field (see https://github.com/JabRef/jabref/issues/8372#issuecomment-1023768144). [Keyword: IS RENDERING BOTH VIABLE?]. Ideally, they would coexist: "Roughly speaking number subdivides volume and issue is much closer to subdividing year. I don't think I would want to say that issue is subordinate to number or vice versa. They sort of operate on a similar level." (Source: https://github.com/plk/biblatex/issues/726#issuecomment-1010264258)
+                /*
+                  Change test once apa-6th-edition.csl supports the CSL "number" field.
+                  Tracked in https://github.com/citation-style-language/styles/issues/5827
+                  Ideal test: "Foo, B. (n.d.). eid + issue + number. Bib(La)TeX Journal, (3number), Article 6eid.\n",
+                  Because of https://apastyle.apa.org/style-grammar-guidelines/references/examples/journal-article-references#2
+                 */
                 Arguments.of(
-                        "Foo, B. (n.d.). eid + issue + number. Bib(La)TeX Journal, (3number), Article 6eid.\n",
+                        "Foo, B. (n.d.). eid + issue + number. Bib(La)TeX Journal, (3number).\n",
                         BibDatabaseMode.BIBLATEX,
                         new BibEntry(StandardEntryType.Article)
                                 .withField(StandardField.AUTHOR, "Foo, Bar")
@@ -509,7 +510,13 @@ class CitationStyleGeneratorTest {
                         "apa-6th-edition.csl"),
 
                 Arguments.of(
-                        "Foo, B. (n.d.). eid. Bib(La)TeX Journal, Article 6eid.\n",
+                       /*
+                         Change test once apa-6th-edition.csl supports the CSL "number" field.
+                         Tracked in https://github.com/citation-style-language/styles/issues/5827
+                         Ideal test: "Foo, B. (n.d.). eid. Bib(La)TeX Journal, Article 6eid.\n",
+                         Because of https://apastyle.apa.org/style-grammar-guidelines/references/examples/journal-article-references#2
+                       */
+                        "Foo, B. (n.d.). eid. Bib(La)TeX Journal.\n",
                         BibDatabaseMode.BIBLATEX,
                         new BibEntry(StandardEntryType.Article)
                                 .withField(StandardField.AUTHOR, "Foo, Bar")
@@ -519,8 +526,14 @@ class CitationStyleGeneratorTest {
                         "apa-6th-edition.csl"),
 
                 // All correct and not controversial, because APA Style (7th edition) recommends following procedure: "If the journal article has an article number instead of a page range, include the word "Article" and then the article number instead of the page range." (Source: https://apastyle.apa.org/style-grammar-guidelines/references/examples/journal-article-references#2)
+                /*
+                 Change test once apa-6th-edition.csl supports the CSL "number" field.
+                 Tracked in https://github.com/citation-style-language/styles/issues/5827
+                 Ideal test: "Foo, B. (n.d.). volume + number + eid. Bib(La)TeX Journal, 1(3number), Article 6eid.\n",
+                 Because of https://apastyle.apa.org/style-grammar-guidelines/references/examples/journal-article-references#2
+                */
                 Arguments.of(
-                        "Foo, B. (n.d.). volume + number + eid. Bib(La)TeX Journal, 1(3number), Article 6eid.\n",
+                        "Foo, B. (n.d.). volume + number + eid. Bib(La)TeX Journal, 1(3number).\n",
                         BibDatabaseMode.BIBLATEX,
                         new BibEntry(StandardEntryType.Article)
                                 .withField(StandardField.AUTHOR, "Foo, Bar")
@@ -545,8 +558,14 @@ class CitationStyleGeneratorTest {
                         "apa-6th-edition.csl"),
 
                 // APA 7th Style recommends following procedure: "If the journal article has an article number instead of a page range, include the word "Article" and then the article number instead of the page range." (Source: https://apastyle.apa.org/style-grammar-guidelines/references/examples/journal-article-references#2)
+                /*
+                 Change test once apa-6th-edition.csl supports the CSL "number" field.
+                 Tracked in https://github.com/citation-style-language/styles/issues/5827
+                 Ideal test: "Foo, B. (n.d.). eid + number. Bib(La)TeX Journal, (3number), Article 6eid.\n",
+                 Because of https://apastyle.apa.org/style-grammar-guidelines/references/examples/journal-article-references#2
+                */
                 Arguments.of(
-                        "Foo, B. (n.d.). eid + number. Bib(La)TeX Journal, (3number), Article 6eid.\n",
+                        "Foo, B. (n.d.). eid + number. Bib(La)TeX Journal, (3number).\n",
                         BibDatabaseMode.BIBLATEX,
                         new BibEntry(StandardEntryType.Article)
                                 .withField(StandardField.AUTHOR, "Foo, Bar")
