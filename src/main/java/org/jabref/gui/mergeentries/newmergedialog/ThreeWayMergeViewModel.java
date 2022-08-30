@@ -1,9 +1,10 @@
 package org.jabref.gui.mergeentries.newmergedialog;
 
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -26,7 +27,7 @@ class ThreeWayMergeViewModel extends AbstractViewModel {
     private final StringProperty leftHeader = new SimpleStringProperty();
     private final StringProperty rightHeader = new SimpleStringProperty();
 
-    private final ObservableList<Field> allFields = FXCollections.observableArrayList();
+    private final ObservableList<Field> visibleFields = FXCollections.observableArrayList();
 
     public ThreeWayMergeViewModel(BibEntry leftEntry, BibEntry rightEntry, String leftHeader, String rightHeader) {
         Objects.requireNonNull(leftEntry, "Left entry is required");
@@ -41,9 +42,9 @@ class ThreeWayMergeViewModel extends AbstractViewModel {
 
         mergedEntry.set(new BibEntry());
 
-        Set<Field> leftAndRightFieldsUnion = new HashSet<>(leftEntry.getFields());
-        leftAndRightFieldsUnion.addAll(rightEntry.getFields());
-        setAllFields(leftAndRightFieldsUnion);
+        setVisibleFields(Stream.concat(
+                leftEntry.getFields().stream(),
+                rightEntry.getFields().stream()).collect(Collectors.toSet()));
     }
 
     public StringProperty leftHeaderProperty() {
@@ -90,26 +91,26 @@ class ThreeWayMergeViewModel extends AbstractViewModel {
         return mergedEntry.get();
     }
 
-    public ObservableList<Field> allFields() {
-        return allFields;
+    public ObservableList<Field> getVisibleFields() {
+        return visibleFields;
     }
 
     /**
      * Convince method to determine the total number of fields in the union of the left and right fields.
      */
-    public int allFieldsSize() {
-        return allFields.size();
+    public int numberOfVisibleFields() {
+        return visibleFields.size();
     }
 
-    private void setAllFields(Set<Field> fields) {
-        allFields.clear();
-        allFields.addAll(fields);
+    private void setVisibleFields(Set<Field> fields) {
+        visibleFields.clear();
+        visibleFields.addAll(fields);
         // Don't show internal fields. See org.jabref.model.entry.field.InternalField
-        allFields.removeIf(FieldFactory::isInternalField);
+        visibleFields.removeIf(FieldFactory::isInternalField);
 
-        allFields.sort(Comparator.comparing(Field::getName));
+        visibleFields.sort(Comparator.comparing(Field::getName));
 
         // Add the entry type field as the first field to display
-        allFields.add(0, InternalField.TYPE_HEADER);
+        visibleFields.add(0, InternalField.TYPE_HEADER);
     }
 }
