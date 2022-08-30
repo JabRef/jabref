@@ -190,7 +190,7 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
         parsePdfMetadata.setTooltip(new Tooltip(Localization.lang("Parse Metadata from PDF.")));
         parsePdfMetadata.visibleProperty().bind(linkedFile.isOfflinePdfProperty());
         parsePdfMetadata.setOnAction(event -> {
-            GrobidOptInDialogHelper.showAndWaitIfUserIsUndecided(dialogService, preferencesService.getImporterPreferences());
+            GrobidOptInDialogHelper.showAndWaitIfUserIsUndecided(dialogService, preferencesService.getGrobidPreferences());
             linkedFile.parsePdfMetadataAndShowMergeDialog();
         });
         parsePdfMetadata.getStyleClass().setAll("icon-button");

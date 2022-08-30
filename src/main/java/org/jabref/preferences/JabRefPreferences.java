@@ -42,6 +42,8 @@ import org.jabref.gui.autocompleter.AutoCompleteFirstNameMode;
 import org.jabref.gui.autocompleter.AutoCompletePreferences;
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.entryeditor.EntryEditorPreferences;
+import org.jabref.gui.externalfiletype.ExternalFileType;
+import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.groups.GroupViewMode;
 import org.jabref.gui.groups.GroupsPreferences;
 import org.jabref.gui.keyboard.KeyBindingRepository;
@@ -72,6 +74,7 @@ import org.jabref.logic.exporter.TemplateExporter;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.fetcher.DoiFetcher;
+import org.jabref.logic.importer.fetcher.GrobidPreferences;
 import org.jabref.logic.importer.fileformat.CustomImporter;
 import org.jabref.logic.journals.JournalAbbreviationPreferences;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
@@ -427,13 +430,13 @@ public class JabRefPreferences implements PreferencesService {
     private List<MainTableColumnModel> searchDialogTableColunns;
     private List<MainTableColumnModel> searchDialogColumnSortOrder;
 
-    private Set<CustomImporter> customImporters;
     private String userName;
 
     private PreviewPreferences previewPreferences;
     private SidePanePreferences sidePanePreferences;
     private AppearancePreferences appearancePreferences;
     private ImporterPreferences importerPreferences;
+    private GrobidPreferences grobidPreferences;
     private ProtectedTermsPreferences protectedTermsPreferences;
     private MrDlibPreferences mrDlibPreferences;
     private EntryEditorPreferences entryEditorPreferences;
@@ -527,7 +530,7 @@ public class JabRefPreferences implements PreferencesService {
 
         // SSL
         defaults.put(TRUSTSTORE_PATH, Path.of(AppDirsFactory.getInstance()
-                                                            .getUserDataDir("JabRef", "ssl", "org.jabref"))
+                                                            .getUserDataDir(OS.APP_DIR_APP_NAME, "ssl", OS.APP_DIR_APP_AUTHOR))
                                           .resolve("truststore.jks").toString());
 
         defaults.put(POS_X, 0);
@@ -758,6 +761,24 @@ public class JabRefPreferences implements PreferencesService {
         return value.stream().map(val -> StringUtil.quote(val, STRINGLIST_DELIMITER.toString(), '\\')).collect(Collectors.joining(STRINGLIST_DELIMITER.toString()));
     }
 
+    private static List<String> convertStringToList(String toConvert) {
+        if (StringUtil.isBlank(toConvert)) {
+            return Collections.emptyList();
+        }
+
+        StringReader reader = new StringReader(toConvert);
+        List<String> result = new ArrayList<>();
+        Optional<String> rs;
+        try {
+            while ((rs = getNextUnit(reader)).isPresent()) {
+                result.add(rs.get());
+            }
+        } catch (IOException ignored) {
+            // Ignored
+        }
+        return result;
+    }
+
     private static Preferences getPrefsNodeForCustomizedEntryTypes(BibDatabaseMode mode) {
         return switch (mode) {
             case BIBTEX -> PREFS_NODE.node(CUSTOMIZED_BIBTEX_TYPES);
@@ -930,22 +951,7 @@ public class JabRefPreferences implements PreferencesService {
      * Returns a List of Strings containing the chosen columns.
      */
     public List<String> getStringList(String key) {
-        String names = get(key);
-        if (names == null) {
-            return Collections.emptyList();
-        }
-
-        StringReader rd = new StringReader(names);
-        List<String> res = new ArrayList<>();
-        Optional<String> rs;
-        try {
-            while ((rs = getNextUnit(rd)).isPresent()) {
-                res.add(rs.get());
-            }
-        } catch (IOException ignored) {
-            // Ignored
-        }
-        return res;
+        return convertStringToList(get(key));
     }
 
     /**
@@ -1041,6 +1047,20 @@ public class JabRefPreferences implements PreferencesService {
                 }
             }
         }
+    }
+
+    /**
+     * Returns a list of Strings stored by key+N with N being an incrementing number
+     */
+    private List<String> getSeries(String key) {
+        int i = 0;
+        List<String> series = new ArrayList<>();
+        String item;
+        while (!StringUtil.isBlank(item = get(key + i))) {
+            series.add(item);
+            i++;
+        }
+        return series;
     }
 
     /**
@@ -1452,24 +1472,17 @@ public class JabRefPreferences implements PreferencesService {
      */
     private void updateEntryEditorTabList() {
         Map<String, Set<Field>> tabs = new LinkedHashMap<>();
-        int i = 0;
-        String name;
-        if (hasKey(CUSTOM_TAB_NAME + 0)) {
-            // The user has modified from the default values:
-            while (hasKey(CUSTOM_TAB_NAME + i)) {
-                name = get(CUSTOM_TAB_NAME + i);
-                Set<Field> entry = FieldFactory.parseFieldList(get(CUSTOM_TAB_FIELDS + i));
-                tabs.put(name, entry);
-                i++;
-            }
-        } else {
-            // Nothing set, so we use the default values:
-            while (get(CUSTOM_TAB_NAME + "_def" + i) != null) {
-                name = get(CUSTOM_TAB_NAME + "_def" + i);
-                Set<Field> entry = FieldFactory.parseFieldList(get(CUSTOM_TAB_FIELDS + "_def" + i));
-                tabs.put(name, entry);
-                i++;
-            }
+        List<String> tabNames = getSeries(CUSTOM_TAB_NAME);
+        List<String> tabFields = getSeries(CUSTOM_TAB_FIELDS);
+
+        if (tabNames.isEmpty() || tabNames.size() != tabFields.size()) {
+            // Nothing set, so we use the default values
+            tabNames = getSeries(CUSTOM_TAB_NAME + "_def");
+            tabFields = getSeries(CUSTOM_TAB_FIELDS + "_def");
+        }
+
+        for (int i = 0; i < tabNames.size(); i++) {
+            tabs.put(tabNames.get(i), FieldFactory.parseFieldList(tabFields.get(i)));
         }
         entryEditorTabList = tabs;
     }
@@ -2099,12 +2112,12 @@ public class JabRefPreferences implements PreferencesService {
     @Override
     public ImportFormatPreferences getImportFormatPreferences() {
         return new ImportFormatPreferences(
-                getCustomImportFormats(),
                 getKeywordDelimiter(),
                 getCitationKeyPatternPreferences(),
                 getFieldContentParserPreferences(),
                 getXmpPreferences(),
-                getDOIPreferences());
+                getDOIPreferences(),
+                getGrobidPreferences());
     }
 
     @Override
@@ -2208,7 +2221,8 @@ public class JabRefPreferences implements PreferencesService {
                 get(IMPORT_FILEDIRPATTERN),
                 getBoolean(DOWNLOAD_LINKED_FILES),
                 getBoolean(FULLTEXT_INDEX_LINKED_FILES),
-                Path.of(get(WORKING_DIRECTORY))
+                Path.of(get(WORKING_DIRECTORY)),
+                ExternalFileTypes.fromString(get(EXTERNAL_FILE_TYPES))
         );
 
         EasyBind.listen(filePreferences.mainFileDirectoryProperty(), (obs, oldValue, newValue) -> put(MAIN_FILE_DIRECTORY, newValue));
@@ -2218,6 +2232,8 @@ public class JabRefPreferences implements PreferencesService {
         EasyBind.listen(filePreferences.downloadLinkedFilesProperty(), (obs, oldValue, newValue) -> putBoolean(DOWNLOAD_LINKED_FILES, newValue));
         EasyBind.listen(filePreferences.fulltextIndexLinkedFilesProperty(), (obs, oldValue, newValue) -> putBoolean(FULLTEXT_INDEX_LINKED_FILES, newValue));
         EasyBind.listen(filePreferences.workingDirectoryProperty(), (obs, oldValue, newValue) -> put(WORKING_DIRECTORY, newValue.toString()));
+        filePreferences.getExternalFileTypes().addListener((SetChangeListener<ExternalFileType>) c ->
+                put(EXTERNAL_FILE_TYPES, ExternalFileTypes.toStringList(filePreferences.getExternalFileTypes())));
 
         return filePreferences;
     }
@@ -2302,76 +2318,21 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     @Override
-    public Set<CustomImporter> getCustomImportFormats() {
-        if (this.customImporters == null) {
-            updateCustomImportFormats();
-        }
-        return this.customImporters;
-    }
-
-    private void updateCustomImportFormats() {
-        Set<CustomImporter> importers = new TreeSet<>();
-        int i = 0;
-
-        List<String> importerString;
-        while (!((importerString = getStringList(CUSTOM_IMPORT_FORMAT + i)).isEmpty())) {
-            try {
-                if (importerString.size() == 2) {
-                    // New format: basePath, className
-                    importers.add(new CustomImporter(importerString.get(0), importerString.get(1)));
-                } else {
-                    // Old format: name, cliId, className, basePath
-                    importers.add(new CustomImporter(importerString.get(3), importerString.get(2)));
-                }
-            } catch (Exception e) {
-                LOGGER.warn("Could not load " + importerString.get(0) + " from preferences. Will ignore.", e);
-            }
-            i++;
-        }
-
-        this.customImporters = importers;
-    }
-
-    @Override
-    public void storeCustomImportFormats(Set<CustomImporter> importers) {
-        purgeCustomImportFormats();
-        CustomImporter[] importersArray = importers.toArray(new CustomImporter[0]);
-        for (int i = 0; i < importersArray.length; i++) {
-            putStringList(CUSTOM_IMPORT_FORMAT + i, importersArray[i].getAsStringList());
-        }
-
-        this.customImporters = importers;
-    }
-
-    private void purgeCustomImportFormats() {
-        for (int i = 0; !(getStringList(CUSTOM_IMPORT_FORMAT + i).isEmpty()); i++) {
-            remove(CUSTOM_IMPORT_FORMAT + i);
-        }
-    }
-
-    @Override
     public List<TemplateExporter> getCustomExportFormats(JournalAbbreviationRepository abbreviationRepository) {
-        int i = 0;
-        List<TemplateExporter> formats = new ArrayList<>();
-        String exporterName;
-        String filename;
-        String extension;
         LayoutFormatterPreferences layoutPreferences = getLayoutFormatterPreferences(abbreviationRepository);
         SavePreferences savePreferences = getSavePreferencesForExport();
-        List<String> formatData;
-        while (!((formatData = getStringList(CUSTOM_EXPORT_FORMAT + i)).isEmpty())) {
-            exporterName = formatData.get(EXPORTER_NAME_INDEX);
-            filename = formatData.get(EXPORTER_FILENAME_INDEX);
-            extension = formatData.get(EXPORTER_EXTENSION_INDEX);
+        List<TemplateExporter> formats = new ArrayList<>();
+
+        for (String toImport : getSeries(CUSTOM_EXPORT_FORMAT)) {
+            List<String> formatData = convertStringToList(toImport);
             TemplateExporter format = new TemplateExporter(
-                    exporterName,
-                    filename,
-                    extension,
+                    formatData.get(EXPORTER_NAME_INDEX),
+                    formatData.get(EXPORTER_FILENAME_INDEX),
+                    formatData.get(EXPORTER_EXTENSION_INDEX),
                     layoutPreferences,
                     savePreferences);
             format.setCustomExport(true);
             formats.add(format);
-            i++;
         }
         return formats;
     }
@@ -2379,7 +2340,7 @@ public class JabRefPreferences implements PreferencesService {
     @Override
     public void storeCustomExportFormats(List<TemplateExporter> exporters) {
         if (exporters.isEmpty()) {
-            purgeCustomExportFormats(0);
+            purgeSeries(CUSTOM_EXPORT_FORMAT, 0);
         } else {
             for (int i = 0; i < exporters.size(); i++) {
                 List<String> exporterData = new ArrayList<>();
@@ -2389,15 +2350,7 @@ public class JabRefPreferences implements PreferencesService {
                 exporterData.add(EXPORTER_EXTENSION_INDEX, exporters.get(i).getFileType().getExtensions().get(0));
                 putStringList(CUSTOM_EXPORT_FORMAT + i, exporterData);
             }
-            purgeCustomExportFormats(exporters.size());
-        }
-    }
-
-    private void purgeCustomExportFormats(int from) {
-        int i = from;
-        while (!getStringList(CUSTOM_EXPORT_FORMAT + i).isEmpty()) {
-            remove(CUSTOM_EXPORT_FORMAT + i);
-            i++;
+            purgeSeries(CUSTOM_EXPORT_FORMAT, exporters.size());
         }
     }
 
@@ -2760,16 +2713,6 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     @Override
-    public Optional<String> getExternalFileTypes() {
-        return Optional.ofNullable(get(EXTERNAL_FILE_TYPES, null));
-    }
-
-    @Override
-    public void storeExternalFileTypes(String externalFileTypes) {
-        put(EXTERNAL_FILE_TYPES, externalFileTypes);
-    }
-
-    @Override
     public MrDlibPreferences getMrDlibPreferences() {
         if (Objects.nonNull(mrDlibPreferences)) {
             return mrDlibPreferences;
@@ -2826,19 +2769,44 @@ public class JabRefPreferences implements PreferencesService {
 
         importerPreferences = new ImporterPreferences(
                 getBoolean(GENERATE_KEY_ON_IMPORT),
-                getBoolean(GROBID_ENABLED),
-                getBoolean(GROBID_OPT_OUT),
-                get(GROBID_URL),
+                getCustomImportFormats(),
                 getFetcherKeys()
         );
 
         EasyBind.listen(importerPreferences.generateNewKeyOnImportProperty(), (obs, oldValue, newValue) -> putBoolean(GENERATE_KEY_ON_IMPORT, newValue));
-        EasyBind.listen(importerPreferences.grobidEnabledProperty(), (obs, oldValue, newValue) -> putBoolean(GROBID_ENABLED, newValue));
-        EasyBind.listen(importerPreferences.grobidOptOutProperty(), (obs, oldValue, newValue) -> putBoolean(GROBID_OPT_OUT, newValue));
-        EasyBind.listen(importerPreferences.grobidURLProperty(), (obs, oldValue, newValue) -> put(GROBID_URL, newValue));
         importerPreferences.getApiKeys().addListener((InvalidationListener) c -> storeFetcherKeys(importerPreferences.getApiKeys()));
+        importerPreferences.getCustomImportList().addListener((InvalidationListener) c -> storeCustomImportFormats(importerPreferences.getCustomImportList()));
 
         return importerPreferences;
+    }
+
+    private Set<CustomImporter> getCustomImportFormats() {
+        Set<CustomImporter> importers = new TreeSet<>();
+
+        for (String toImport : getSeries(CUSTOM_IMPORT_FORMAT)) {
+            List<String> importerString = convertStringToList(toImport);
+            try {
+                if (importerString.size() == 2) {
+                    // New format: basePath, className
+                    importers.add(new CustomImporter(importerString.get(0), importerString.get(1)));
+                } else {
+                    // Old format: name, cliId, className, basePath
+                    importers.add(new CustomImporter(importerString.get(3), importerString.get(2)));
+                }
+            } catch (Exception e) {
+                LOGGER.warn("Could not load " + importerString.get(0) + " from preferences. Will ignore.", e);
+            }
+        }
+
+        return importers;
+    }
+
+    public void storeCustomImportFormats(Set<CustomImporter> importers) {
+        purgeSeries(CUSTOM_IMPORT_FORMAT, 0);
+        CustomImporter[] importersArray = importers.toArray(new CustomImporter[0]);
+        for (int i = 0; i < importersArray.length; i++) {
+            putStringList(CUSTOM_IMPORT_FORMAT + i, importersArray[i].getAsStringList());
+        }
     }
 
     private Set<FetcherApiKey> getFetcherKeys() {
@@ -2873,5 +2841,23 @@ public class JabRefPreferences implements PreferencesService {
         putStringList(FETCHER_CUSTOM_KEY_NAMES, names);
         putStringList(FETCHER_CUSTOM_KEY_USES, uses);
         putStringList(FETCHER_CUSTOM_KEYS, keys);
+    }
+
+    @Override
+    public GrobidPreferences getGrobidPreferences() {
+        if (Objects.nonNull(grobidPreferences)) {
+            return grobidPreferences;
+        }
+
+        grobidPreferences = new GrobidPreferences(
+                getBoolean(GROBID_ENABLED),
+                getBoolean(GROBID_OPT_OUT),
+                get(GROBID_URL));
+
+        EasyBind.listen(grobidPreferences.grobidEnabledProperty(), (obs, oldValue, newValue) -> putBoolean(GROBID_ENABLED, newValue));
+        EasyBind.listen(grobidPreferences.grobidOptOutProperty(), (obs, oldValue, newValue) -> putBoolean(GROBID_OPT_OUT, newValue));
+        EasyBind.listen(grobidPreferences.grobidURLProperty(), (obs, oldValue, newValue) -> put(GROBID_URL, newValue));
+
+        return grobidPreferences;
     }
 }

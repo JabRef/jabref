@@ -130,7 +130,7 @@ public class ExistingStudySearchAction extends SimpleCommand {
                           dialogService.showErrorDialogAndWait(Localization.lang("Error during persistence of crawling results."), e);
                       })
                       .onSuccess(unused -> {
-                          new OpenDatabaseAction(frame, preferencesService, dialogService, stateManager, themeManager).openFile(Path.of(studyDirectory.toString(), "studyResult.bib"), true);
+                          new OpenDatabaseAction(frame, preferencesService, dialogService, stateManager, themeManager).openFile(Path.of(studyDirectory.toString(), "studyResult.bib"));
                           // If  finished reset command object for next use
                           studyDirectory = null;
                       })

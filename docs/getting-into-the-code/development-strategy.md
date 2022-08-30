@@ -1,6 +1,6 @@
 ---
 parent: Getting into the code
-nav_order: 5
+nav_order: 1
 ---
 # JabRef's development strategy
 
@@ -14,7 +14,7 @@ To ensure high code-quality,
 * We document our design decisions using the lightweight architectural decision records [MADR](https://adr.github.io/madr/).
 * We review each external pull request by at least two [JabRef Core Developers](https://github.com/JabRef/jabref/blob/main/MAINTAINERS/README.md).
 
-Read on about our automated quality checks at [Code Quality](../advanced-reading/code-quality.md).
+Read on about our automated quality checks at [Code Quality](../code-howtos/code-quality.md).
 
 ## Continuous integration
 

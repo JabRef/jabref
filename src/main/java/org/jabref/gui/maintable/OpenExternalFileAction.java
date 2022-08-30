@@ -8,7 +8,6 @@ import org.jabref.gui.Globals;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
-import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.fieldeditors.LinkedFileViewModel;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
@@ -68,8 +67,7 @@ public class OpenExternalFileAction extends SimpleCommand {
                                 databaseContext,
                                 Globals.TASK_EXECUTOR,
                                 dialogService,
-                                preferencesService,
-                                ExternalFileTypes.getInstance());
+                                preferencesService);
 
                         linkedFileViewModelList.add(linkedFileViewModel);
                     }
@@ -93,8 +91,7 @@ public class OpenExternalFileAction extends SimpleCommand {
                         databaseContext,
                         Globals.TASK_EXECUTOR,
                         dialogService,
-                        preferencesService,
-                        ExternalFileTypes.getInstance());
+                        preferencesService);
                 linkedFileViewModel.open();
             }
         });

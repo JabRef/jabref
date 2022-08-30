@@ -52,6 +52,7 @@ public interface PagedSearchBasedFetcher extends SearchBasedFetcher {
      * @param luceneQuery the root node of the lucene query
      * @return a list of {@link BibEntry}, which are matched by the query (may be empty)
      */
+    @Override
     default List<BibEntry> performSearch(QueryNode luceneQuery) throws FetcherException {
         return new ArrayList<>(performSearchPaged(luceneQuery, 0).getContent());
     }
