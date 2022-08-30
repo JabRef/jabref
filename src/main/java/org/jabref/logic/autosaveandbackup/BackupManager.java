@@ -7,6 +7,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.nio.file.attribute.FileTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -48,7 +49,7 @@ public class BackupManager {
 
     private static final int MAXIMUM_BACKUP_FILE_COUNT = 10;
 
-    private static final int DELAY_BETWEEN_BACKUP_ATTEMPTS_IN_SECONDS = 20;
+    private static final int DELAY_BETWEEN_BACKUP_ATTEMPTS_IN_SECONDS = 19;
 
     private static Set<BackupManager> runningInstances = new HashSet<>();
 
@@ -117,26 +118,45 @@ public class BackupManager {
 
     /**
      * Checks whether a backup file exists for the given database file. If it exists, it is checked whether it is
-     * different from the original.
+     * newer and different from the original.
      *
      * @param originalPath Path to the file a backup should be checked for. Example: jabref.bib.
+     *
      * @return <code>true</code> if backup file exists AND differs from originalPath. <code>false</code> is the
      * "default" return value in the good case. In the case of an exception <code>true</code> is returned to ensure that
      * the user checks the output.
      */
     public static boolean backupFileDiffers(Path originalPath) {
-        Optional<Path> backupPath = getLatestBackupPath(originalPath);
-        if (backupPath.isEmpty()) {
-            return false;
-        }
-
-        try {
-            return Files.mismatch(originalPath, backupPath.get()) != -1L;
-        } catch (IOException e) {
-            LOGGER.debug("Could not compare original file and backup file.", e);
-            // User has to investigate in this case
-            return true;
-        }
+        return getLatestBackupPath(originalPath).map(latestBackupPath -> {
+            FileTime latestBackupFileLastModifiedTime;
+            try {
+                 latestBackupFileLastModifiedTime = Files.getLastModifiedTime(latestBackupPath);
+            } catch (IOException e) {
+                LOGGER.debug("Could not get timestamp of backup file {}", latestBackupPath, e);
+                // If we cannot get the timestamp, we do show any warning
+                return false;
+            }
+            FileTime currentFileLastModifiedTime;
+            try {
+                currentFileLastModifiedTime = Files.getLastModifiedTime(originalPath);
+            } catch (IOException e) {
+                LOGGER.debug("Could not get timestamp of current file file {}", originalPath, e);
+                // If we cannot get the timestamp, we do show any warning
+                return false;
+            }
+            if (latestBackupFileLastModifiedTime.compareTo(currentFileLastModifiedTime) <= 0) {
+                // Backup is older than current file
+                // We treat the backup as non-different (even if it could differ)
+                return false;
+            }
+            try {
+                return Files.mismatch(originalPath, latestBackupPath) != -1L;
+            } catch (IOException e) {
+                LOGGER.debug("Could not compare original file and backup file.", e);
+                // User has to investigate in this case
+                return true;
+            }
+        }).orElse(false);
     }
 
     /**
