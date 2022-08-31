@@ -17,11 +17,13 @@ public final class Word {
      * Set containing common lowercase function words
      */
     public static final Set<String> SMALLER_WORDS;
+    public static final Set<Character> DASHES;
     private final char[] chars;
     private final boolean[] protectedChars;
 
     static {
         Set<String> smallerWords = new HashSet<>();
+        Set<Character> dashes = new HashSet<>();
 
         // Articles
         smallerWords.addAll(Arrays.asList("a", "an", "the"));
@@ -30,10 +32,20 @@ public final class Word {
         // Conjunctions
         smallerWords.addAll(Arrays.asList("and", "but", "for", "nor", "or", "so", "yet"));
 
+        // Dashes
+        dashes.addAll(Arrays.asList(
+                '-', '~', '⸗', '〰', '᐀', '֊', '־', '‐', '‑', '‒',
+                '–', '—', '―', '⁓', '⁻', '₋', '−', '⸺', '⸻',
+                '〜', '゠', '︱', '︲', '﹘', '﹣', '－'
+        ));
+
+        // unmodifiable for thread safety
+        DASHES = dashes;
+
         // unmodifiable for thread safety
         SMALLER_WORDS = smallerWords.stream()
-                            .map(word -> word.toLowerCase(Locale.ROOT))
-                            .collect(Collectors.toUnmodifiableSet());
+                                    .map(word -> word.toLowerCase(Locale.ROOT))
+                                    .collect(Collectors.toUnmodifiableSet());
     }
 
     public Word(char[] chars, boolean[] protectedChars) {
@@ -77,7 +89,7 @@ public final class Word {
     public void toUpperFirst() {
         for (int i = 0; i < chars.length; i++) {
             if (!protectedChars[i]) {
-                chars[i] = (i == 0) ?
+                chars[i] = (i == 0 || DASHES.contains(chars[i - 1])) ?
                         Character.toUpperCase(chars[i]) :
                         Character.toLowerCase(chars[i]);
             }
