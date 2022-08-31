@@ -1,18 +1,15 @@
 package org.jabref.gui.mergeentries;
 
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 
 import org.jabref.gui.mergeentries.newmergedialog.ThreeWayMergeViewModel;
-import org.jabref.logic.bibtex.comparator.FieldComparator;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
-import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.StandardEntryType;
 
 import com.google.common.collect.Comparators;
