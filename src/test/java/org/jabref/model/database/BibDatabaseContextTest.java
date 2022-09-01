@@ -1,8 +1,8 @@
 package org.jabref.model.database;
 
 import java.nio.file.Path;
-import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.types.IEEETranEntryType;
@@ -70,7 +70,7 @@ class BibDatabaseContextTest {
         BibDatabaseContext database = new BibDatabaseContext();
         database.setDatabasePath(file);
         database.getMetaData().setDefaultFileDirectory("../Literature");
-        assertEquals(Arrays.asList(Path.of("/absolute/Literature").toAbsolutePath(), currentWorkingDir.resolve(file.getParent())),
+        assertEquals(List.of(Path.of("/absolute/Literature").toAbsolutePath()),
                 database.getFileDirectories(fileDirPrefs));
     }
 
@@ -81,7 +81,7 @@ class BibDatabaseContextTest {
         BibDatabaseContext database = new BibDatabaseContext();
         database.setDatabasePath(file);
         database.getMetaData().setDefaultFileDirectory("Literature");
-        assertEquals(Arrays.asList(Path.of("/absolute/subdir/Literature").toAbsolutePath(), currentWorkingDir.resolve(file.getParent())),
+        assertEquals(List.of(Path.of("/absolute/subdir/Literature").toAbsolutePath()),
                 database.getFileDirectories(fileDirPrefs));
     }
 
