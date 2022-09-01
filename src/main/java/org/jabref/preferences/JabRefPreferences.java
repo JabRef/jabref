@@ -1124,7 +1124,7 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     @Override
-    public void storeFileDirforDatabase(List<Path> dirs) {
+    public void storeFileDirForDatabase(List<Path> dirs) {
         this.fileDirForDatabase = dirs;
     }
 

@@ -221,7 +221,7 @@ public interface PreferencesService {
 
     FileLinkPreferences getFileLinkPreferences();
 
-    void storeFileDirforDatabase(List<Path> dirs);
+    void storeFileDirForDatabase(List<Path> dirs);
 
     //*************************************************************************************************************
     // Import/Export preferences
