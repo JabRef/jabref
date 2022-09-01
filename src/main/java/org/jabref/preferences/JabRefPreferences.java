@@ -2795,7 +2795,7 @@ public class JabRefPreferences implements PreferencesService {
                     importers.add(new CustomImporter(importerString.get(3), importerString.get(2)));
                 }
             } catch (Exception e) {
-                LOGGER.warn("Could not load " + importerString.get(0) + " from preferences. Will ignore.", e);
+                LOGGER.warn("Could not load {} from preferences. Will ignore.", importerString.get(0), e);
             }
         }
 
