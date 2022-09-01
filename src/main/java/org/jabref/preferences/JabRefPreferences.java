@@ -33,6 +33,8 @@ import java.util.prefs.Preferences;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import javax.swing.filechooser.FileSystemView;
+
 import javafx.beans.InvalidationListener;
 import javafx.collections.SetChangeListener;
 import javafx.scene.control.TableColumn.SortType;
@@ -2208,6 +2210,25 @@ public class JabRefPreferences implements PreferencesService {
                 getFieldContentParserPreferences());
     }
 
+    /**
+     * Ensures that the main file directory is a non-empty String.
+     * The directory is <emph>NOT</emph> created, because creation of the directory is the task of the respective methods.
+     *
+     * @param originalDirectory the directory as configured
+     */
+    private String determineMainFileDirectory(String originalDirectory) {
+        if (!originalDirectory.isEmpty()) {
+            // A non-empty directory is kept
+            return originalDirectory;
+        }
+        // Property "user.home" might be "difficult" on Windows
+        // See https://stackoverflow.com/a/586917/873282 for a longer discussion
+        // The proposed solution is to use Swing's FileSystemView
+        // See https://stackoverflow.com/a/32914568/873282
+        String userHome = FileSystemView.getFileSystemView().getDefaultDirectory().getPath();
+        return Path.of(userHome, "JabRef").toString();
+    }
+
     @Override
     public FilePreferences getFilePreferences() {
         if (Objects.nonNull(filePreferences)) {
@@ -2216,7 +2237,7 @@ public class JabRefPreferences implements PreferencesService {
 
         filePreferences = new FilePreferences(
                 getInternalPreferences().getUser(),
-                get(MAIN_FILE_DIRECTORY),
+                determineMainFileDirectory(get(MAIN_FILE_DIRECTORY)),
                 getBoolean(STORE_RELATIVE_TO_BIB),
                 get(IMPORT_FILENAMEPATTERN),
                 get(IMPORT_FILEDIRPATTERN),
