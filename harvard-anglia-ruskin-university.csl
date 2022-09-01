@@ -16,7 +16,7 @@
     <category citation-format="author-date"/>
     <category field="generic-base"/>
     <summary>Anglia Ruskin University Harvard style</summary>
-    <updated>2022-01-13T10:42:51+00:00</updated>
+    <updated>2022-08-22T08:06:04+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <macro name="cite-author">
@@ -294,7 +294,7 @@
       <else-if type="book chapter paper-conference manuscript entry-dictionary entry-encyclopedia thesis motion_picture song report" match="any">
         <group suffix=".">
           <text variable="event" suffix=". "/>
-          <group delimiter=".">
+          <group delimiter=". ">
             <text macro="publisher"/>
             <group>
               <label variable="page" form="short"/>
@@ -325,7 +325,7 @@
       <else-if variable="URL">
         <group>
           <text term="available at" text-case="capitalize-first" prefix=" " suffix=": "/>
-          <text variable="URL" prefix="&lt;" suffix=">"/>
+          <text variable="URL" prefix="&lt;" suffix="&gt;"/>
           <group prefix=" [" suffix="].">
             <text term="accessed" text-case="capitalize-first" suffix=" "/>
             <date variable="accessed" delimiter=" ">

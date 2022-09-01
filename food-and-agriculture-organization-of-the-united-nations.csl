@@ -31,7 +31,7 @@
     <category field="science"/>
     <category field="social_science"/>
     <summary>This style is created to meet the citation and bibliographical requirements of FAOSTYLE, and has been tested with Zotero and Mendeley. Last update: February 2022.</summary>
-    <updated>2022-02-02T16:03:38+00:00</updated>
+    <updated>2022-08-02T08:28:31+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <!-- Locale settings for English. Settings for other languages could be added later to this section. -->
@@ -180,6 +180,20 @@
       </else>
     </choose>
   </macro>
+  <macro name="event-title">
+    <choose>
+      <!-- TODO: We expect "event-title" to be used,
+           but processors and applications may not be updated yet.
+           This macro ensures that either "event" or "event-title" can be accpeted.
+           Remove if procesor logic and application adoption can handle this. -->
+      <if variable="event-title">
+        <text variable="event-title"/>
+      </if>
+      <else>
+        <text variable="event"/>
+      </else>
+    </choose>
+  </macro>
   <!-- in-line citation: (author, date) -->
   <citation disambiguate-add-year-suffix="true" collapse="year" et-al-min="4" et-al-use-first="1">
     <sort>
@@ -298,7 +312,7 @@
                 <text variable="title"/>
                 <group delimiter=" ">
                   <text term="presented at"/>
-                  <text variable="event" suffix=","/>
+                  <text macro="event-title" suffix=","/>
                   <date form="text" variable="issued" suffix=","/>
                   <text macro="publisher-and-place"/>
                 </group>
@@ -310,7 +324,7 @@
                 <text macro="in-and-container"/>
                 <text variable="collection-title"/>
                 <group delimiter=", " suffix=".">
-                  <text variable="event"/>
+                  <text macro="event-title"/>
                   <text variable="publisher-place"/>
                   <text variable="publisher"/>
                   <!-- Not using macro "publisher-and-place" here because event date needs to be appended and the suffix "." of the macro would appear. -->
