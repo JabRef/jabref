@@ -410,6 +410,7 @@ public class JabRefPreferences implements PreferencesService {
     // to solve the problem of formatters not having access to any context except for the
     // string to be formatted and possible formatter arguments.
     public List<Path> fileDirForDatabase;
+
     private final Preferences prefs;
 
     /**
@@ -1119,7 +1120,7 @@ public class JabRefPreferences implements PreferencesService {
     @Override
     public FileLinkPreferences getFileLinkPreferences() {
         return new FileLinkPreferences(
-                get(MAIN_FILE_DIRECTORY), // REALLY HERE?
+                getFilePreferences().mainFileDirectoryProperty().get(),
                 fileDirForDatabase);
     }
 
