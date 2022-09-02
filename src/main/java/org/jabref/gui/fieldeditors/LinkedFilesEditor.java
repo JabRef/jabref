@@ -186,7 +186,7 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
         acceptAutoLinkedFile.setOnAction(event -> linkedFile.acceptAsLinked());
         acceptAutoLinkedFile.getStyleClass().setAll("icon-button");
 
-        Button writeMetadataToPdf = IconTheme.JabRefIcons.IMPORT.asButton();
+        Button writeMetadataToPdf = IconTheme.JabRefIcons.PDF_METADATA_WRITE.asButton();
         writeMetadataToPdf.setTooltip(new Tooltip(Localization.lang("Write BibTeXEntry metadata to PDF.")));
         writeMetadataToPdf.visibleProperty().bind(linkedFile.isOfflinePdfProperty());
         writeMetadataToPdf.getStyleClass().setAll("icon-button");
@@ -195,7 +195,7 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
         writeMetadataToPdf.disableProperty().bind(writeMetadataToPdfCommand.executableProperty().not());
         writeMetadataToPdf.setOnAction(event -> writeMetadataToPdfCommand.execute());
 
-        Button parsePdfMetadata = IconTheme.JabRefIcons.FILE_SEARCH.asButton();
+        Button parsePdfMetadata = IconTheme.JabRefIcons.PDF_METADATA_READ.asButton();
         parsePdfMetadata.setTooltip(new Tooltip(Localization.lang("Parse Metadata from PDF.")));
         parsePdfMetadata.visibleProperty().bind(linkedFile.isOfflinePdfProperty());
         parsePdfMetadata.setOnAction(event -> {
@@ -270,7 +270,7 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
 
     @Override
     public double getWeight() {
-        return 2;
+        return 3;
     }
 
     private ContextMenu createContextMenuForFile(LinkedFileViewModel linkedFile) {
