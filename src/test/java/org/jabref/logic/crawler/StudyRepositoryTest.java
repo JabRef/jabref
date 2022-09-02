@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -163,15 +162,6 @@ class StudyRepositoryTest {
         // All Springer results are duplicates for "Quantum"
         assertEquals(expected, getTestStudyRepository().getQueryResultEntries("Quantum").getEntries());
         assertEquals(getSpringerCloudComputingMockResults(), getTestStudyRepository().getQueryResultEntries("Cloud Computing").getEntries());
-    }
-
-    @Test
-    void setsLastSearchDatePersistedCorrectly() throws Exception {
-        List<QueryResult> mockResults = getMockResults();
-
-        studyRepository.persist(mockResults);
-
-        assertEquals(LocalDate.now(), getTestStudyRepository().getStudy().getLastSearchDate());
     }
 
     @Test

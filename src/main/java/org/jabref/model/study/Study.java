@@ -1,6 +1,5 @@
 package org.jabref.model.study;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
 
@@ -12,16 +11,17 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
  *
  * This class defines all aspects of a scientific study relevant to the application. It is a proxy for the file based study definition.
  */
-
-@JsonPropertyOrder({"authors", "title", "last-search-date", "research-questions", "queries", "databases"})
+@JsonPropertyOrder({"authors", "title", "research-questions", "queries", "databases"})
 public class Study {
     private List<String> authors;
+
     private String title;
-    @JsonProperty("last-search-date")
-    private LocalDate lastSearchDate;
+
     @JsonProperty("research-questions")
     private List<String> researchQuestions;
+
     private List<StudyQuery> queries;
+
     private List<StudyDatabase> databases;
 
     public Study(List<String> authors, String title, List<String> researchQuestions, List<StudyQuery> queryEntries, List<StudyDatabase> databases) {
@@ -54,14 +54,6 @@ public class Study {
         this.queries = queries;
     }
 
-    public LocalDate getLastSearchDate() {
-        return lastSearchDate;
-    }
-
-    public void setLastSearchDate(LocalDate date) {
-        lastSearchDate = date;
-    }
-
     public List<StudyDatabase> getDatabases() {
         return databases;
     }
@@ -91,7 +83,6 @@ public class Study {
         return "Study{" +
                 "authors=" + authors +
                 ", studyName='" + title + '\'' +
-                ", lastSearchDate=" + lastSearchDate +
                 ", researchQuestions=" + researchQuestions +
                 ", queries=" + queries +
                 ", libraries=" + databases +
@@ -99,57 +90,21 @@ public class Study {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) {
+    public boolean equals(Object other) {
+        if (this == other) {
             return true;
         }
-        if (o == null || getClass() != o.getClass()) {
+        if (other == null || getClass() != other.getClass()) {
             return false;
         }
 
-        Study study = (Study) o;
+        Study otherStudy = (Study) other;
 
-        if (getAuthors() != null ? !getAuthors().equals(study.getAuthors()) : study.getAuthors() != null) {
-            return false;
-        }
-        if (getTitle() != null ? !getTitle().equals(study.getTitle()) : study.getTitle() != null) {
-            return false;
-        }
-        if (getLastSearchDate() != null ? !getLastSearchDate().equals(study.getLastSearchDate()) : study.getLastSearchDate() != null) {
-            return false;
-        }
-        if (getResearchQuestions() != null ? !getResearchQuestions().equals(study.getResearchQuestions()) : study.getResearchQuestions() != null) {
-            return false;
-        }
-        if (getQueries() != null ? !getQueries().equals(study.getQueries()) : study.getQueries() != null) {
-            return false;
-        }
-        return getDatabases() != null ? getDatabases().equals(study.getDatabases()) : study.getDatabases() == null;
-    }
-
-    public boolean equalsBesideLastSearchDate(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-
-        Study study = (Study) o;
-
-        if (getAuthors() != null ? !getAuthors().equals(study.getAuthors()) : study.getAuthors() != null) {
-            return false;
-        }
-        if (getTitle() != null ? !getTitle().equals(study.getTitle()) : study.getTitle() != null) {
-            return false;
-        }
-        if (getResearchQuestions() != null ? !getResearchQuestions().equals(study.getResearchQuestions()) : study.getResearchQuestions() != null) {
-            return false;
-        }
-        if (getQueries() != null ? !getQueries().equals(study.getQueries()) : study.getQueries() != null) {
-            return false;
-        }
-        return getDatabases() != null ? getDatabases().equals(study.getDatabases()) : study.getDatabases() == null;
+        return Objects.equals(authors, otherStudy.authors) &&
+                Objects.equals(title, otherStudy.title) &&
+                Objects.equals(researchQuestions, otherStudy.researchQuestions) &&
+                Objects.equals(queries, otherStudy.queries) &&
+                Objects.equals(databases, otherStudy.databases);
     }
 
     @Override
