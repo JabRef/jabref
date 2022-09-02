@@ -13,7 +13,6 @@ import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
-import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -29,7 +28,6 @@ import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.gui.util.ValueTableCellFactory;
-import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.study.Study;
 import org.jabref.preferences.PreferencesService;
@@ -45,7 +43,6 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
     @FXML private TextField addAuthor;
     @FXML private TextField addResearchQuestion;
     @FXML private TextField addQuery;
-    @FXML private ComboBox<StudyDatabaseItem> databaseSelector;
     @FXML private TextField studyDirectory;
 
     @FXML private ButtonType saveButtonType;
@@ -66,7 +63,6 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
     @FXML private TableView<StudyDatabaseItem> databaseTable;
     @FXML private TableColumn<StudyDatabaseItem, Boolean> databaseEnabledColumn;
     @FXML private TableColumn<StudyDatabaseItem, String> databaseColumn;
-    @FXML private TableColumn<StudyDatabaseItem, String> databaseActionColumn;
 
     @Inject private DialogService dialogService;
     @Inject private PreferencesService prefs;
@@ -161,11 +157,8 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
     }
 
     private void initDatabasesTab() {
-        new ViewModelListCellFactory<StudyDatabaseItem>().withText(StudyDatabaseItem::getName)
-                                                         .install(databaseSelector);
-        databaseSelector.setItems(viewModel.getNonSelectedDatabases());
-
-        setupCommonPropertiesForTables(databaseSelector, this::addDatabase, databaseColumn, databaseActionColumn);
+        databaseColumn.setReorderable(false);
+        databaseColumn.setCellFactory(TextFieldTableCell.forTableColumn());
 
         databaseEnabledColumn.setResizable(false);
         databaseEnabledColumn.setReorderable(false);
@@ -173,13 +166,6 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
         databaseEnabledColumn.setCellFactory(CheckBoxTableCell.forTableColumn(databaseEnabledColumn));
 
         databaseColumn.setCellValueFactory(param -> param.getValue().nameProperty());
-        databaseActionColumn.setCellValueFactory(param -> param.getValue().nameProperty());
-        new ValueTableCellFactory<org.jabref.gui.slr.StudyDatabaseItem, String>()
-                .withGraphic(item -> IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode())
-                .withTooltip(name -> Localization.lang("Remove"))
-                .withOnMouseClickedEvent(item -> evt ->
-                        viewModel.removeDatabase(item))
-                .install(databaseActionColumn);
 
         databaseTable.setItems(viewModel.getDatabases());
     }
@@ -229,14 +215,6 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
     private void addQuery() {
         viewModel.addQuery(addQuery.getText());
         addQuery.setText("");
-    }
-
-    /**
-     * Add selected entry from combobox, push onto database pop from nonselecteddatabase (combobox)
-     */
-    @FXML
-    private void addDatabase() {
-        viewModel.addDatabase(databaseSelector.getSelectionModel().getSelectedItem());
     }
 
     @FXML

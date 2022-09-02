@@ -2,7 +2,6 @@ package org.jabref.gui.slr;
 
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
-import java.util.Comparator;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -37,7 +36,6 @@ public class ManageStudyDefinitionViewModel {
     private final ObservableList<String> queries = FXCollections.observableArrayList();
     private final ObservableList<StudyDatabaseItem> databases = FXCollections.observableArrayList();
     // Hold the complement of databases for the selector
-    private final ObservableList<StudyDatabaseItem> nonSelectedDatabases = FXCollections.observableArrayList();
     private final SimpleStringProperty directory = new SimpleStringProperty();
     private Study study;
 
@@ -54,6 +52,10 @@ public class ManageStudyDefinitionViewModel {
         authors.addAll(study.getAuthors());
         researchQuestions.addAll(study.getResearchQuestions());
         queries.addAll(study.getQueries().stream().map(StudyQuery::getQuery).toList());
+
+        // Currently, modifying an existing study is not possible. But this code first adds all databases that are
+        // enabled for an existing Study object as enabled entries to the table and afterwards populates the table with
+        // all other available databases.
         databases.addAll(study.getDatabases()
                               .stream()
                               .map(studyDatabase -> new StudyDatabaseItem(studyDatabase.getName(), studyDatabase.isEnabled()))
@@ -65,11 +67,11 @@ public class ManageStudyDefinitionViewModel {
     }
 
     private void computeNonSelectedDatabases(ImportFormatPreferences importFormatPreferences, ImporterPreferences importerPreferences) {
-        nonSelectedDatabases.addAll(WebFetchers.getSearchBasedFetchers(importFormatPreferences, importerPreferences)
-                                               .stream()
-                                               .map(SearchBasedFetcher::getName)
-                                               .map(s -> new StudyDatabaseItem(s, true))
-                                               .filter(studyDatabase -> !databases.contains(studyDatabase)).toList());
+        databases.addAll(WebFetchers.getSearchBasedFetchers(importFormatPreferences, importerPreferences)
+                                    .stream()
+                                    .map(SearchBasedFetcher::getName)
+                                    .map(s -> new StudyDatabaseItem(s, false))
+                                    .filter(studyDatabase -> !databases.contains(studyDatabase)).toList());
     }
 
     public StringProperty getTitle() {
@@ -96,10 +98,6 @@ public class ManageStudyDefinitionViewModel {
         return databases;
     }
 
-    public ObservableList<StudyDatabaseItem> getNonSelectedDatabases() {
-        return nonSelectedDatabases;
-    }
-
     public void addAuthor(String author) {
         if (author.isBlank()) {
             return;
@@ -121,16 +119,6 @@ public class ManageStudyDefinitionViewModel {
         queries.add(query);
     }
 
-    public void addDatabase(StudyDatabaseItem database) {
-        if (Objects.isNull(database)) {
-            return;
-        }
-        nonSelectedDatabases.remove(database);
-        if (!databases.contains(database)) {
-            databases.add(database);
-        }
-    }
-
     public SlrStudyAndDirectory saveStudy() {
         if (Objects.isNull(study)) {
             study = new Study();
@@ -139,11 +127,12 @@ public class ManageStudyDefinitionViewModel {
         study.setAuthors(authors);
         study.setResearchQuestions(researchQuestions);
         study.setQueries(queries.stream().map(StudyQuery::new).collect(Collectors.toList()));
-        study.setDatabases(databases.stream().map(studyDatabaseItem -> new StudyDatabase(studyDatabaseItem.getName(), studyDatabaseItem.isEnabled())).collect(Collectors.toList()));
+        study.setDatabases(databases.stream().map(studyDatabaseItem -> new StudyDatabase(studyDatabaseItem.getName(), studyDatabaseItem.isEnabled())).filter(StudyDatabase::isEnabled).collect(Collectors.toList()));
         Path studyDirectory = null;
         try {
             studyDirectory = Path.of(directory.getValueSafe());
-        } catch (InvalidPathException e) {
+        } catch (
+                InvalidPathException e) {
             LOGGER.error("Invalid path was provided: {}", directory);
         }
         return new SlrStudyAndDirectory(study, studyDirectory);
@@ -151,20 +140,6 @@ public class ManageStudyDefinitionViewModel {
 
     public Property<String> titleProperty() {
         return title;
-    }
-
-    public void removeDatabase(String database) {
-        // If a database is added from the combo box it should be enabled by default
-        Optional<StudyDatabaseItem> correspondingDatabase = databases.stream().filter(studyDatabaseItem -> studyDatabaseItem.getName().equals(database)).findFirst();
-        if (correspondingDatabase.isEmpty()) {
-            return;
-        }
-        StudyDatabaseItem databaseToRemove = correspondingDatabase.get();
-        databases.remove(databaseToRemove);
-        databaseToRemove.setEnabled(true);
-        nonSelectedDatabases.add(databaseToRemove);
-        // Resort list
-        nonSelectedDatabases.sort(Comparator.comparing(StudyDatabaseItem::getName));
     }
 
     public void setStudyDirectory(Optional<Path> studyRepositoryRoot) {
