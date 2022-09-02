@@ -95,7 +95,7 @@ public class VersionWorker {
             }
         } else {
             // notify the user about a newer version
-            if (dialogService.showCustomDialogAndWait(new NewVersionDialog(installedVersion, newerVersion.get())).orElse(true)) {
+            if (dialogService.showCustomDialogAndWait(new NewVersionDialog(installedVersion, newerVersion.get(), dialogService)).orElse(true)) {
                 internalPreferences.setIgnoredVersion(newerVersion.get());
             }
         }

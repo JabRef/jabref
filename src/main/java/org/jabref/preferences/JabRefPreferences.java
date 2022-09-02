@@ -8,7 +8,6 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -43,6 +42,8 @@ import org.jabref.gui.autocompleter.AutoCompleteFirstNameMode;
 import org.jabref.gui.autocompleter.AutoCompletePreferences;
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.entryeditor.EntryEditorPreferences;
+import org.jabref.gui.externalfiletype.ExternalFileType;
+import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.groups.GroupViewMode;
 import org.jabref.gui.groups.GroupsPreferences;
 import org.jabref.gui.keyboard.KeyBindingRepository;
@@ -73,6 +74,7 @@ import org.jabref.logic.exporter.TemplateExporter;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.fetcher.DoiFetcher;
+import org.jabref.logic.importer.fetcher.GrobidPreferences;
 import org.jabref.logic.importer.fileformat.CustomImporter;
 import org.jabref.logic.journals.JournalAbbreviationPreferences;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
@@ -83,9 +85,12 @@ import org.jabref.logic.layout.TextBasedPreviewLayout;
 import org.jabref.logic.layout.format.FileLinkPreferences;
 import org.jabref.logic.layout.format.NameFormatterPreferences;
 import org.jabref.logic.net.ProxyPreferences;
+import org.jabref.logic.net.ssl.SSLPreferences;
+import org.jabref.logic.net.ssl.TrustStoreManager;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
 import org.jabref.logic.openoffice.style.StyleLoader;
 import org.jabref.logic.preferences.DOIPreferences;
+import org.jabref.logic.preferences.FetcherApiKey;
 import org.jabref.logic.preferences.OwnerPreferences;
 import org.jabref.logic.preferences.TimestampPreferences;
 import org.jabref.logic.preview.PreviewLayout;
@@ -113,6 +118,7 @@ import org.jabref.model.search.rules.SearchRules;
 import org.jabref.model.strings.StringUtil;
 
 import com.tobiasdiez.easybind.EasyBind;
+import net.harawata.appdirs.AppDirsFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -211,6 +217,10 @@ public class JabRefPreferences implements PreferencesService {
     public static final String BASE_DOI_URI = "baseDOIURI";
     public static final String USE_CUSTOM_DOI_URI = "useCustomDOIURI";
 
+    public static final String FETCHER_CUSTOM_KEY_NAMES = "fetcherCustomKeyNames";
+    public static final String FETCHER_CUSTOM_KEY_USES = "fetcherCustomKeyUses";
+    public static final String FETCHER_CUSTOM_KEYS = "fetcherCustomKeys";
+
     public static final String USE_OWNER = "useOwner";
     public static final String DEFAULT_OWNER = "defaultOwner";
     public static final String OVERWRITE_OWNER = "overwriteOwner";
@@ -293,16 +303,7 @@ public class JabRefPreferences implements PreferencesService {
     public static final String VALIDATE_IN_ENTRY_EDITOR = "validateInEntryEditor";
 
     /**
-     * The OpenOffice/LibreOffice connection preferences are:
-     * OO_PATH main directory for OO/LO installation, used to detect location on Win/macOS when using manual connect
-     * OO_EXECUTABLE_PATH path to soffice-file
-     * OO_JARS_PATH directory that contains juh.jar, jurt.jar, ridl.jar, unoil.jar
-     * OO_SYNC_WHEN_CITING true if the reference list is updated when adding a new citation
-     * OO_SHOW_PANEL true if the OO panel is shown on startup
-     * OO_USE_ALL_OPEN_DATABASES true if all databases should be used when citing
-     * OO_BIBLIOGRAPHY_STYLE_FILE path to the used style file
-     * OO_EXTERNAL_STYLE_FILES list with paths to external style files
-     * STYLES_*_* size and position of "Select style" dialog
+     * The OpenOffice/LibreOffice connection preferences are: OO_PATH main directory for OO/LO installation, used to detect location on Win/macOS when using manual connect OO_EXECUTABLE_PATH path to soffice-file OO_JARS_PATH directory that contains juh.jar, jurt.jar, ridl.jar, unoil.jar OO_SYNC_WHEN_CITING true if the reference list is updated when adding a new citation OO_SHOW_PANEL true if the OO panel is shown on startup OO_USE_ALL_OPEN_DATABASES true if all databases should be used when citing OO_BIBLIOGRAPHY_STYLE_FILE path to the used style file OO_EXTERNAL_STYLE_FILES list with paths to external style files STYLES_*_* size and position of "Select style" dialog
      */
     public static final String OO_EXECUTABLE_PATH = "ooExecutablePath";
     public static final String OO_PATH = "ooPath";
@@ -350,6 +351,9 @@ public class JabRefPreferences implements PreferencesService {
     private static final String PROXY_USERNAME = "proxyUsername";
     private static final String PROXY_PASSWORD = "proxyPassword";
     private static final String PROXY_USE_AUTHENTICATION = "useProxyAuthentication";
+
+    // SSL
+    private static final String TRUSTSTORE_PATH = "truststorePath";
 
     // Auto completion
     private static final String AUTO_COMPLETE = "autoComplete";
@@ -426,13 +430,13 @@ public class JabRefPreferences implements PreferencesService {
     private List<MainTableColumnModel> searchDialogTableColunns;
     private List<MainTableColumnModel> searchDialogColumnSortOrder;
 
-    private Set<CustomImporter> customImporters;
     private String userName;
 
     private PreviewPreferences previewPreferences;
     private SidePanePreferences sidePanePreferences;
     private AppearancePreferences appearancePreferences;
     private ImporterPreferences importerPreferences;
+    private GrobidPreferences grobidPreferences;
     private ProtectedTermsPreferences protectedTermsPreferences;
     private MrDlibPreferences mrDlibPreferences;
     private EntryEditorPreferences entryEditorPreferences;
@@ -440,6 +444,7 @@ public class JabRefPreferences implements PreferencesService {
     private GuiPreferences guiPreferences;
     private RemotePreferences remotePreferences;
     private ProxyPreferences proxyPreferences;
+    private SSLPreferences sslPreferences;
     private SearchPreferences searchPreferences;
     private AutoLinkPreferences autoLinkPreferences;
     private ImportExportPreferences importExportPreferences;
@@ -522,6 +527,11 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(PROXY_USE_AUTHENTICATION, Boolean.FALSE);
         defaults.put(PROXY_USERNAME, "");
         defaults.put(PROXY_PASSWORD, "");
+
+        // SSL
+        defaults.put(TRUSTSTORE_PATH, Path.of(AppDirsFactory.getInstance()
+                                                            .getUserDataDir(OS.APP_DIR_APP_NAME, "ssl", OS.APP_DIR_APP_AUTHOR))
+                                          .resolve("truststore.jks").toString());
 
         defaults.put(POS_X, 0);
         defaults.put(POS_Y, 0);
@@ -622,6 +632,10 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(OO_EXTERNAL_STYLE_FILES, "");
 
         defaults.put(SPECIALFIELDSENABLED, Boolean.TRUE);
+
+        defaults.put(FETCHER_CUSTOM_KEY_NAMES, "Springer;IEEEXplore;SAO/NASA ADS;ScienceDirect;Biodiversity Heritage");
+        defaults.put(FETCHER_CUSTOM_KEY_USES, "FALSE;FALSE;FALSE;FALSE;FALSE");
+        defaults.put(FETCHER_CUSTOM_KEYS, "");
 
         defaults.put(USE_OWNER, Boolean.FALSE);
         defaults.put(OVERWRITE_OWNER, Boolean.FALSE);
@@ -745,6 +759,24 @@ public class JabRefPreferences implements PreferencesService {
 
     private static String convertListToString(List<String> value) {
         return value.stream().map(val -> StringUtil.quote(val, STRINGLIST_DELIMITER.toString(), '\\')).collect(Collectors.joining(STRINGLIST_DELIMITER.toString()));
+    }
+
+    private static List<String> convertStringToList(String toConvert) {
+        if (StringUtil.isBlank(toConvert)) {
+            return Collections.emptyList();
+        }
+
+        StringReader reader = new StringReader(toConvert);
+        List<String> result = new ArrayList<>();
+        Optional<String> rs;
+        try {
+            while ((rs = getNextUnit(reader)).isPresent()) {
+                result.add(rs.get());
+            }
+        } catch (IOException ignored) {
+            // Ignored
+        }
+        return result;
     }
 
     private static Preferences getPrefsNodeForCustomizedEntryTypes(BibDatabaseMode mode) {
@@ -904,8 +936,7 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     /**
-     * Puts a list of strings into the Preferences, by linking its elements with a STRINGLIST_DELIMITER into a single
-     * string. Escape characters make the process transparent even if strings contains a STRINGLIST_DELIMITER.
+     * Puts a list of strings into the Preferences, by linking its elements with a STRINGLIST_DELIMITER into a single string. Escape characters make the process transparent even if strings contains a STRINGLIST_DELIMITER.
      */
     public void putStringList(String key, List<String> value) {
         if (value == null) {
@@ -920,22 +951,7 @@ public class JabRefPreferences implements PreferencesService {
      * Returns a List of Strings containing the chosen columns.
      */
     public List<String> getStringList(String key) {
-        String names = get(key);
-        if (names == null) {
-            return Collections.emptyList();
-        }
-
-        StringReader rd = new StringReader(names);
-        List<String> res = new ArrayList<>();
-        Optional<String> rs;
-        try {
-            while ((rs = getNextUnit(rd)).isPresent()) {
-                res.add(rs.get());
-            }
-        } catch (IOException ignored) {
-            // Ignored
-        }
-        return res;
+        return convertStringToList(get(key));
     }
 
     /**
@@ -947,8 +963,14 @@ public class JabRefPreferences implements PreferencesService {
     public void clear() throws BackingStoreException {
         clearAllBibEntryTypes();
         clearCitationKeyPatterns();
+        clearTruststoreFromCustomCertificates();
         prefs.clear();
         new SharedDatabasePreferences().clear();
+    }
+
+    private void clearTruststoreFromCustomCertificates() {
+        TrustStoreManager trustStoreManager = new TrustStoreManager(Path.of(defaults.get(TRUSTSTORE_PATH).toString()));
+        trustStoreManager.clearCustomCertificates();
     }
 
     /**
@@ -1028,6 +1050,20 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     /**
+     * Returns a list of Strings stored by key+N with N being an incrementing number
+     */
+    private List<String> getSeries(String key) {
+        int i = 0;
+        List<String> series = new ArrayList<>();
+        String item;
+        while (!StringUtil.isBlank(item = get(key + i))) {
+            series.add(item);
+            i++;
+        }
+        return series;
+    }
+
+    /**
      * Removes all entries keyed by prefix+number, where number is equal to or higher than the given number.
      *
      * @param number or higher.
@@ -1066,8 +1102,7 @@ public class JabRefPreferences implements PreferencesService {
      * Imports Preferences from an XML file.
      *
      * @param file Path of file to import from
-     * @throws JabRefException thrown if importing the preferences failed due to an InvalidPreferencesFormatException or
-     *                         an IOException
+     * @throws JabRefException thrown if importing the preferences failed due to an InvalidPreferencesFormatException or an IOException
      */
     @Override
     public void importPreferences(Path file) throws JabRefException {
@@ -1124,7 +1159,7 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public JournalAbbreviationPreferences getJournalAbbreviationPreferences() {
-        return new JournalAbbreviationPreferences(getStringList(EXTERNAL_JOURNAL_LISTS), getGeneralPreferences().getDefaultEncoding());
+        return new JournalAbbreviationPreferences(getStringList(EXTERNAL_JOURNAL_LISTS), StandardCharsets.UTF_8);
     }
 
     @Override
@@ -1294,14 +1329,12 @@ public class JabRefPreferences implements PreferencesService {
         }
 
         generalPreferences = new GeneralPreferences(
-                Charset.forName(get(DEFAULT_ENCODING)),
                 getBoolean(BIBLATEX_DEFAULT_MODE) ? BibDatabaseMode.BIBLATEX : BibDatabaseMode.BIBTEX,
                 getBoolean(WARN_ABOUT_DUPLICATES_IN_INSPECTION),
                 getBoolean(CONFIRM_DELETE),
                 getBoolean(MEMORY_STICK_MODE),
                 getBoolean(SHOW_ADVANCED_HINTS));
 
-        EasyBind.listen(generalPreferences.defaultEncodingProperty(), (obs, oldValue, newValue) -> put(DEFAULT_ENCODING, newValue.name()));
         EasyBind.listen(generalPreferences.defaultBibDatabaseModeProperty(), (obs, oldValue, newValue) -> putBoolean(BIBLATEX_DEFAULT_MODE, (newValue == BibDatabaseMode.BIBLATEX)));
         EasyBind.listen(generalPreferences.isWarnAboutDuplicatesInInspectionProperty(), (obs, oldValue, newValue) -> putBoolean(WARN_ABOUT_DUPLICATES_IN_INSPECTION, newValue));
         EasyBind.listen(generalPreferences.confirmDeleteProperty(), (obs, oldValue, newValue) -> putBoolean(CONFIRM_DELETE, newValue));
@@ -1439,24 +1472,17 @@ public class JabRefPreferences implements PreferencesService {
      */
     private void updateEntryEditorTabList() {
         Map<String, Set<Field>> tabs = new LinkedHashMap<>();
-        int i = 0;
-        String name;
-        if (hasKey(CUSTOM_TAB_NAME + 0)) {
-            // The user has modified from the default values:
-            while (hasKey(CUSTOM_TAB_NAME + i)) {
-                name = get(CUSTOM_TAB_NAME + i);
-                Set<Field> entry = FieldFactory.parseFieldList(get(CUSTOM_TAB_FIELDS + i));
-                tabs.put(name, entry);
-                i++;
-            }
-        } else {
-            // Nothing set, so we use the default values:
-            while (get(CUSTOM_TAB_NAME + "_def" + i) != null) {
-                name = get(CUSTOM_TAB_NAME + "_def" + i);
-                Set<Field> entry = FieldFactory.parseFieldList(get(CUSTOM_TAB_FIELDS + "_def" + i));
-                tabs.put(name, entry);
-                i++;
-            }
+        List<String> tabNames = getSeries(CUSTOM_TAB_NAME);
+        List<String> tabFields = getSeries(CUSTOM_TAB_FIELDS);
+
+        if (tabNames.isEmpty() || tabNames.size() != tabFields.size()) {
+            // Nothing set, so we use the default values
+            tabNames = getSeries(CUSTOM_TAB_NAME + "_def");
+            tabFields = getSeries(CUSTOM_TAB_FIELDS + "_def");
+        }
+
+        for (int i = 0; i < tabNames.size(); i++) {
+            tabs.put(tabNames.get(i), FieldFactory.parseFieldList(tabFields.get(i)));
         }
         entryEditorTabList = tabs;
     }
@@ -1528,7 +1554,7 @@ public class JabRefPreferences implements PreferencesService {
                 break;
             }
 
-            customFields.addAll(Arrays.stream(fields.split(STRINGLIST_DELIMITER.toString())).map(FieldFactory::parseField).collect(Collectors.toList()));
+            customFields.addAll(Arrays.stream(fields.split(STRINGLIST_DELIMITER.toString())).map(FieldFactory::parseField).toList());
             defNumber++;
         }
         return customFields;
@@ -1605,6 +1631,19 @@ public class JabRefPreferences implements PreferencesService {
         EasyBind.listen(proxyPreferences.passwordProperty(), (obs, oldValue, newValue) -> put(PROXY_PASSWORD, newValue));
 
         return proxyPreferences;
+    }
+
+    @Override
+    public SSLPreferences getSSLPreferences() {
+        if (Objects.nonNull(sslPreferences)) {
+            return sslPreferences;
+        }
+
+        sslPreferences = new SSLPreferences(
+                get(TRUSTSTORE_PATH)
+        );
+
+        return sslPreferences;
     }
 
     //*************************************************************************************************************
@@ -1889,26 +1928,24 @@ public class JabRefPreferences implements PreferencesService {
 
     //*************************************************************************************************************
     // Generic Column Handling
-    //***********************************************s**************************************************************
+    //*************************************************************************************************************
 
-    public List<MainTableColumnModel> updateColumns(String columnNamesList, String columnWidthList, String sortTypeList, double defaultWidth) {
+    private List<MainTableColumnModel> updateColumns(String columnNamesList, String columnWidthList, String sortTypeList, double defaultWidth) {
         List<String> columnNames = getStringList(columnNamesList);
         List<Double> columnWidths = getStringList(columnWidthList)
-                                                                  .stream()
-                                                                  .map(string -> {
-                                                                      try {
-                                                                          return Double.parseDouble(string);
-                                                                      } catch (NumberFormatException e) {
-                                                                          LOGGER.error("Exception while parsing column widths. Choosing default.", e);
-                                                                          return defaultWidth;
-                                                                      }
-                                                                  })
-                                                                  .collect(Collectors.toList());
+                .stream()
+                .map(string -> {
+                    try {
+                        return Double.parseDouble(string);
+                    } catch (NumberFormatException e) {
+                        LOGGER.error("Exception while parsing column widths. Choosing default.", e);
+                        return defaultWidth;
+                    }
+                }).toList();
 
         List<SortType> columnSortTypes = getStringList(sortTypeList)
-                                                                    .stream()
-                                                                    .map(SortType::valueOf)
-                                                                    .collect(Collectors.toList());
+                .stream()
+                .map(SortType::valueOf).toList();
 
         List<MainTableColumnModel> columns = new ArrayList<>();
         for (int i = 0; i < columnNames.size(); i++) {
@@ -1961,8 +1998,8 @@ public class JabRefPreferences implements PreferencesService {
     @Override
     public ColumnPreferences getSearchDialogColumnPreferences() {
         return new ColumnPreferences(
-                                     createSearchDialogColumns(),
-                                     createSearchDialogColumnSortOrder());
+                createSearchDialogColumns(),
+                createSearchDialogColumnSortOrder());
     }
 
     /**
@@ -2075,12 +2112,12 @@ public class JabRefPreferences implements PreferencesService {
     @Override
     public ImportFormatPreferences getImportFormatPreferences() {
         return new ImportFormatPreferences(
-                getCustomImportFormats(),
                 getKeywordDelimiter(),
                 getCitationKeyPatternPreferences(),
                 getFieldContentParserPreferences(),
                 getXmpPreferences(),
-                getDOIPreferences());
+                getDOIPreferences(),
+                getGrobidPreferences());
     }
 
     @Override
@@ -2184,7 +2221,8 @@ public class JabRefPreferences implements PreferencesService {
                 get(IMPORT_FILEDIRPATTERN),
                 getBoolean(DOWNLOAD_LINKED_FILES),
                 getBoolean(FULLTEXT_INDEX_LINKED_FILES),
-                Path.of(get(WORKING_DIRECTORY))
+                Path.of(get(WORKING_DIRECTORY)),
+                ExternalFileTypes.fromString(get(EXTERNAL_FILE_TYPES))
         );
 
         EasyBind.listen(filePreferences.mainFileDirectoryProperty(), (obs, oldValue, newValue) -> put(MAIN_FILE_DIRECTORY, newValue));
@@ -2194,6 +2232,8 @@ public class JabRefPreferences implements PreferencesService {
         EasyBind.listen(filePreferences.downloadLinkedFilesProperty(), (obs, oldValue, newValue) -> putBoolean(DOWNLOAD_LINKED_FILES, newValue));
         EasyBind.listen(filePreferences.fulltextIndexLinkedFilesProperty(), (obs, oldValue, newValue) -> putBoolean(FULLTEXT_INDEX_LINKED_FILES, newValue));
         EasyBind.listen(filePreferences.workingDirectoryProperty(), (obs, oldValue, newValue) -> put(WORKING_DIRECTORY, newValue.toString()));
+        filePreferences.getExternalFileTypes().addListener((SetChangeListener<ExternalFileType>) c ->
+                put(EXTERNAL_FILE_TYPES, ExternalFileTypes.toStringList(filePreferences.getExternalFileTypes())));
 
         return filePreferences;
     }
@@ -2278,76 +2318,21 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     @Override
-    public Set<CustomImporter> getCustomImportFormats() {
-        if (this.customImporters == null) {
-            updateCustomImportFormats();
-        }
-        return this.customImporters;
-    }
-
-    private void updateCustomImportFormats() {
-        Set<CustomImporter> importers = new TreeSet<>();
-        int i = 0;
-
-        List<String> importerString;
-        while (!((importerString = getStringList(CUSTOM_IMPORT_FORMAT + i)).isEmpty())) {
-            try {
-                if (importerString.size() == 2) {
-                    // New format: basePath, className
-                    importers.add(new CustomImporter(importerString.get(0), importerString.get(1)));
-                } else {
-                    // Old format: name, cliId, className, basePath
-                    importers.add(new CustomImporter(importerString.get(3), importerString.get(2)));
-                }
-            } catch (Exception e) {
-                LOGGER.warn("Could not load " + importerString.get(0) + " from preferences. Will ignore.", e);
-            }
-            i++;
-        }
-
-        this.customImporters = importers;
-    }
-
-    @Override
-    public void storeCustomImportFormats(Set<CustomImporter> importers) {
-        purgeCustomImportFormats();
-        CustomImporter[] importersArray = importers.toArray(new CustomImporter[0]);
-        for (int i = 0; i < importersArray.length; i++) {
-            putStringList(CUSTOM_IMPORT_FORMAT + i, importersArray[i].getAsStringList());
-        }
-
-        this.customImporters = importers;
-    }
-
-    private void purgeCustomImportFormats() {
-        for (int i = 0; !(getStringList(CUSTOM_IMPORT_FORMAT + i).isEmpty()); i++) {
-            remove(CUSTOM_IMPORT_FORMAT + i);
-        }
-    }
-
-    @Override
     public List<TemplateExporter> getCustomExportFormats(JournalAbbreviationRepository abbreviationRepository) {
-        int i = 0;
-        List<TemplateExporter> formats = new ArrayList<>();
-        String exporterName;
-        String filename;
-        String extension;
         LayoutFormatterPreferences layoutPreferences = getLayoutFormatterPreferences(abbreviationRepository);
         SavePreferences savePreferences = getSavePreferencesForExport();
-        List<String> formatData;
-        while (!((formatData = getStringList(CUSTOM_EXPORT_FORMAT + i)).isEmpty())) {
-            exporterName = formatData.get(EXPORTER_NAME_INDEX);
-            filename = formatData.get(EXPORTER_FILENAME_INDEX);
-            extension = formatData.get(EXPORTER_EXTENSION_INDEX);
+        List<TemplateExporter> formats = new ArrayList<>();
+
+        for (String toImport : getSeries(CUSTOM_EXPORT_FORMAT)) {
+            List<String> formatData = convertStringToList(toImport);
             TemplateExporter format = new TemplateExporter(
-                    exporterName,
-                    filename,
-                    extension,
+                    formatData.get(EXPORTER_NAME_INDEX),
+                    formatData.get(EXPORTER_FILENAME_INDEX),
+                    formatData.get(EXPORTER_EXTENSION_INDEX),
                     layoutPreferences,
                     savePreferences);
             format.setCustomExport(true);
             formats.add(format);
-            i++;
         }
         return formats;
     }
@@ -2355,7 +2340,7 @@ public class JabRefPreferences implements PreferencesService {
     @Override
     public void storeCustomExportFormats(List<TemplateExporter> exporters) {
         if (exporters.isEmpty()) {
-            purgeCustomExportFormats(0);
+            purgeSeries(CUSTOM_EXPORT_FORMAT, 0);
         } else {
             for (int i = 0; i < exporters.size(); i++) {
                 List<String> exporterData = new ArrayList<>();
@@ -2365,15 +2350,7 @@ public class JabRefPreferences implements PreferencesService {
                 exporterData.add(EXPORTER_EXTENSION_INDEX, exporters.get(i).getFileType().getExtensions().get(0));
                 putStringList(CUSTOM_EXPORT_FORMAT + i, exporterData);
             }
-            purgeCustomExportFormats(exporters.size());
-        }
-    }
-
-    private void purgeCustomExportFormats(int from) {
-        int i = from;
-        while (!getStringList(CUSTOM_EXPORT_FORMAT + i).isEmpty()) {
-            remove(CUSTOM_EXPORT_FORMAT + i);
-            i++;
+            purgeSeries(CUSTOM_EXPORT_FORMAT, exporters.size());
         }
     }
 
@@ -2736,16 +2713,6 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     @Override
-    public Optional<String> getExternalFileTypes() {
-        return Optional.ofNullable(get(EXTERNAL_FILE_TYPES, null));
-    }
-
-    @Override
-    public void storeExternalFileTypes(String externalFileTypes) {
-        put(EXTERNAL_FILE_TYPES, externalFileTypes);
-    }
-
-    @Override
     public MrDlibPreferences getMrDlibPreferences() {
         if (Objects.nonNull(mrDlibPreferences)) {
             return mrDlibPreferences;
@@ -2802,16 +2769,95 @@ public class JabRefPreferences implements PreferencesService {
 
         importerPreferences = new ImporterPreferences(
                 getBoolean(GENERATE_KEY_ON_IMPORT),
-                getBoolean(GROBID_ENABLED),
-                getBoolean(GROBID_OPT_OUT),
-                get(GROBID_URL)
+                getCustomImportFormats(),
+                getFetcherKeys()
         );
 
         EasyBind.listen(importerPreferences.generateNewKeyOnImportProperty(), (obs, oldValue, newValue) -> putBoolean(GENERATE_KEY_ON_IMPORT, newValue));
-        EasyBind.listen(importerPreferences.grobidEnabledProperty(), (obs, oldValue, newValue) -> putBoolean(GROBID_ENABLED, newValue));
-        EasyBind.listen(importerPreferences.grobidOptOutProperty(), (obs, oldValue, newValue) -> putBoolean(GROBID_OPT_OUT, newValue));
-        EasyBind.listen(importerPreferences.grobidURLProperty(), (obs, oldValue, newValue) -> put(GROBID_URL, newValue));
+        importerPreferences.getApiKeys().addListener((InvalidationListener) c -> storeFetcherKeys(importerPreferences.getApiKeys()));
+        importerPreferences.getCustomImportList().addListener((InvalidationListener) c -> storeCustomImportFormats(importerPreferences.getCustomImportList()));
 
         return importerPreferences;
+    }
+
+    private Set<CustomImporter> getCustomImportFormats() {
+        Set<CustomImporter> importers = new TreeSet<>();
+
+        for (String toImport : getSeries(CUSTOM_IMPORT_FORMAT)) {
+            List<String> importerString = convertStringToList(toImport);
+            try {
+                if (importerString.size() == 2) {
+                    // New format: basePath, className
+                    importers.add(new CustomImporter(importerString.get(0), importerString.get(1)));
+                } else {
+                    // Old format: name, cliId, className, basePath
+                    importers.add(new CustomImporter(importerString.get(3), importerString.get(2)));
+                }
+            } catch (Exception e) {
+                LOGGER.warn("Could not load " + importerString.get(0) + " from preferences. Will ignore.", e);
+            }
+        }
+
+        return importers;
+    }
+
+    public void storeCustomImportFormats(Set<CustomImporter> importers) {
+        purgeSeries(CUSTOM_IMPORT_FORMAT, 0);
+        CustomImporter[] importersArray = importers.toArray(new CustomImporter[0]);
+        for (int i = 0; i < importersArray.length; i++) {
+            putStringList(CUSTOM_IMPORT_FORMAT + i, importersArray[i].getAsStringList());
+        }
+    }
+
+    private Set<FetcherApiKey> getFetcherKeys() {
+        Set<FetcherApiKey> fetcherApiKeys = new HashSet<>();
+
+        List<String> names = getStringList(FETCHER_CUSTOM_KEY_NAMES);
+        List<String> uses = getStringList(FETCHER_CUSTOM_KEY_USES);
+        List<String> keys = getStringList(FETCHER_CUSTOM_KEYS);
+
+        for (int i = 0; i < names.size(); i++) {
+            fetcherApiKeys.add(new FetcherApiKey(
+                    names.get(i),
+                    // i < uses.size() ? Boolean.parseBoolean(uses.get(i)) : false
+                    (i < uses.size()) && Boolean.parseBoolean(uses.get(i)),
+                    i < keys.size() ? keys.get(i) : ""));
+        }
+
+        return fetcherApiKeys;
+    }
+
+    private void storeFetcherKeys(Set<FetcherApiKey> fetcherApiKeys) {
+        List<String> names = new ArrayList<>();
+        List<String> uses = new ArrayList<>();
+        List<String> keys = new ArrayList<>();
+
+        for (FetcherApiKey apiKey : fetcherApiKeys) {
+            names.add(apiKey.getName());
+            uses.add(String.valueOf(apiKey.shouldUse()));
+            keys.add(apiKey.getKey());
+        }
+
+        putStringList(FETCHER_CUSTOM_KEY_NAMES, names);
+        putStringList(FETCHER_CUSTOM_KEY_USES, uses);
+        putStringList(FETCHER_CUSTOM_KEYS, keys);
+    }
+
+    @Override
+    public GrobidPreferences getGrobidPreferences() {
+        if (Objects.nonNull(grobidPreferences)) {
+            return grobidPreferences;
+        }
+
+        grobidPreferences = new GrobidPreferences(
+                getBoolean(GROBID_ENABLED),
+                getBoolean(GROBID_OPT_OUT),
+                get(GROBID_URL));
+
+        EasyBind.listen(grobidPreferences.grobidEnabledProperty(), (obs, oldValue, newValue) -> putBoolean(GROBID_ENABLED, newValue));
+        EasyBind.listen(grobidPreferences.grobidOptOutProperty(), (obs, oldValue, newValue) -> putBoolean(GROBID_OPT_OUT, newValue));
+        EasyBind.listen(grobidPreferences.grobidURLProperty(), (obs, oldValue, newValue) -> put(GROBID_URL, newValue));
+
+        return grobidPreferences;
     }
 }

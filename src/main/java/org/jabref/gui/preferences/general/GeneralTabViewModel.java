@@ -71,7 +71,6 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         selectedLanguageProperty.setValue(preferencesService.getLanguage());
 
         encodingsListProperty.setValue(FXCollections.observableArrayList(Encodings.getCharsets()));
-        selectedEncodingProperty.setValue(generalPreferences.getDefaultEncoding());
 
         bibliographyModeListProperty.setValue(FXCollections.observableArrayList(BibDatabaseMode.values()));
         selectedBiblatexModeProperty.setValue(generalPreferences.getDefaultBibDatabaseMode());
@@ -104,7 +103,6 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
                             + " rename or remove the jabref.xml file in the same folder as JabRef."));
         }
 
-        generalPreferences.setDefaultEncoding(selectedEncodingProperty.getValue());
         generalPreferences.setDefaultBibDatabaseMode(selectedBiblatexModeProperty.getValue());
         generalPreferences.setWarnAboutDuplicatesInInspection(inspectionWarningDuplicateProperty.getValue());
         generalPreferences.setConfirmDelete(confirmDeleteProperty.getValue());

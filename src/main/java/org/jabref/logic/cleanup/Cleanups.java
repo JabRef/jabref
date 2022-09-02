@@ -56,7 +56,6 @@ public class Cleanups {
     }
 
     public static List<FieldFormatterCleanup> parse(String formatterString) {
-
         if ((formatterString == null) || formatterString.isEmpty()) {
             // no save actions defined in the meta data
             return new ArrayList<>();
@@ -68,9 +67,8 @@ public class Cleanups {
         int startIndex = 0;
 
         // first remove all newlines for easier parsing
-        String remainingString = formatterString;
+        String remainingString = StringUtil.unifyLineBreaks(formatterString, "");
 
-        remainingString = StringUtil.unifyLineBreaks(remainingString, "");
         try {
             while (startIndex < formatterString.length()) {
                 // read the field name
@@ -109,7 +107,6 @@ public class Cleanups {
     }
 
     public static FieldFormatterCleanups parse(List<String> formatterMetaList) {
-
         if ((formatterMetaList != null) && (formatterMetaList.size() >= 2)) {
             boolean enablementStatus = FieldFormatterCleanups.ENABLED.equals(formatterMetaList.get(0));
             String formatterString = formatterMetaList.get(1);

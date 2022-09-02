@@ -27,6 +27,7 @@ import org.jabref.gui.specialfields.SpecialFieldMenuItemFactory;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.citationstyle.CitationStyleOutputFormat;
 import org.jabref.logic.citationstyle.CitationStylePreviewLayout;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.SpecialField;
 import org.jabref.preferences.PreferencesService;
 import org.jabref.preferences.PreviewPreferences;
@@ -41,7 +42,8 @@ public class RightClickMenu {
                                      PreferencesService preferencesService,
                                      UndoManager undoManager,
                                      ClipBoardManager clipBoardManager,
-                                     TaskExecutor taskExecutor) {
+                                     TaskExecutor taskExecutor,
+                                     BibEntryTypesManager entryTypesManager) {
         ActionFactory factory = new ActionFactory(keyBindingRepository);
         ContextMenu contextMenu = new ContextMenu();
 
@@ -50,7 +52,7 @@ public class RightClickMenu {
                 createCopySubMenu(factory, dialogService, stateManager, preferencesService, clipBoardManager, taskExecutor),
                 factory.createMenuItem(StandardActions.PASTE, new EditAction(StandardActions.PASTE, libraryTab.frame(), stateManager)),
                 factory.createMenuItem(StandardActions.CUT, new EditAction(StandardActions.CUT, libraryTab.frame(), stateManager)),
-                factory.createMenuItem(StandardActions.MERGE_ENTRIES, new MergeEntriesAction(libraryTab.frame(), dialogService, stateManager)),
+                factory.createMenuItem(StandardActions.MERGE_ENTRIES, new MergeEntriesAction(dialogService, stateManager)),
                 factory.createMenuItem(StandardActions.DELETE_ENTRY, new EditAction(StandardActions.DELETE_ENTRY, libraryTab.frame(), stateManager)),
 
                 new SeparatorMenuItem(),
@@ -76,7 +78,7 @@ public class RightClickMenu {
 
                 new SeparatorMenuItem(),
 
-                new ChangeEntryTypeMenu().getChangeEntryTypeMenu(entry.getEntry(), libraryTab.getBibDatabaseContext(), libraryTab.getUndoManager()),
+                new ChangeEntryTypeMenu(libraryTab.getSelectedEntries(), libraryTab.getBibDatabaseContext(), libraryTab.getUndoManager(), keyBindingRepository, entryTypesManager).asSubMenu(),
                 factory.createMenuItem(StandardActions.MERGE_WITH_FETCHED_ENTRY, new MergeWithFetchedEntryAction(libraryTab, dialogService, stateManager))
         );
 

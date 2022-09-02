@@ -2,13 +2,13 @@ package org.jabref.logic.importer.fileformat;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
 
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.BiblatexSoftwareField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.StandardEntryType;
@@ -53,7 +53,7 @@ public class CffImporterTest {
     @Test
     public void testIsRecognizedFormat() throws IOException, URISyntaxException {
         Path file = Path.of(CffImporterTest.class.getResource("CffImporterTestValid.cff").toURI());
-        assertTrue(importer.isRecognizedFormat(file, StandardCharsets.UTF_8));
+        assertTrue(importer.isRecognizedFormat(file));
     }
 
     @Test
@@ -62,14 +62,14 @@ public class CffImporterTest {
 
         for (String string : list) {
             Path file = Path.of(CffImporterTest.class.getResource(string).toURI());
-            assertFalse(importer.isRecognizedFormat(file, StandardCharsets.UTF_8));
+            assertFalse(importer.isRecognizedFormat(file));
         }
     }
 
     @Test
     public void testImportEntriesBasic() throws IOException, URISyntaxException {
         Path file = Path.of(CffImporterTest.class.getResource("CffImporterTestValid.cff").toURI());
-        List<BibEntry> bibEntries = importer.importDatabase(file, StandardCharsets.UTF_8).getDatabase().getEntries();
+        List<BibEntry> bibEntries = importer.importDatabase(file).getDatabase().getEntries();
         BibEntry entry = bibEntries.get(0);
 
         BibEntry expected = getPopulatedEntry().withField(StandardField.AUTHOR, "Joe van Smith");
@@ -80,22 +80,21 @@ public class CffImporterTest {
     @Test
     public void testImportEntriesMultipleAuthors() throws IOException, URISyntaxException {
         Path file = Path.of(CffImporterTest.class.getResource("CffImporterTestValidMultAuthors.cff").toURI());
-        List<BibEntry> bibEntries = importer.importDatabase(file, StandardCharsets.UTF_8).getDatabase().getEntries();
+        List<BibEntry> bibEntries = importer.importDatabase(file).getDatabase().getEntries();
         BibEntry entry = bibEntries.get(0);
 
         BibEntry expected = getPopulatedEntry();
 
         assertEquals(entry, expected);
-
     }
 
     @Test
     public void testImportEntriesSwhIdSelect1() throws IOException, URISyntaxException {
         Path file = Path.of(CffImporterTest.class.getResource("CffImporterTestValidSwhIdSelect1.cff").toURI());
-        List<BibEntry> bibEntries = importer.importDatabase(file, StandardCharsets.UTF_8).getDatabase().getEntries();
+        List<BibEntry> bibEntries = importer.importDatabase(file).getDatabase().getEntries();
         BibEntry entry = bibEntries.get(0);
 
-        BibEntry expected = getPopulatedEntry().withField(StandardField.SWHID, "swh:1:rel:22ece559cc7cc2364edc5e5593d63ae8bd229f9f");
+        BibEntry expected = getPopulatedEntry().withField(BiblatexSoftwareField.SWHID, "swh:1:rel:22ece559cc7cc2364edc5e5593d63ae8bd229f9f");
 
         assertEquals(entry, expected);
     }
@@ -103,10 +102,10 @@ public class CffImporterTest {
     @Test
     public void testImportEntriesSwhIdSelect2() throws IOException, URISyntaxException {
         Path file = Path.of(CffImporterTest.class.getResource("CffImporterTestValidSwhIdSelect2.cff").toURI());
-        List<BibEntry> bibEntries = importer.importDatabase(file, StandardCharsets.UTF_8).getDatabase().getEntries();
+        List<BibEntry> bibEntries = importer.importDatabase(file).getDatabase().getEntries();
         BibEntry entry = bibEntries.get(0);
 
-        BibEntry expected = getPopulatedEntry().withField(StandardField.SWHID, "swh:1:cnt:94a9ed024d3859793618152ea559a168bbcbb5e2");
+        BibEntry expected = getPopulatedEntry().withField(BiblatexSoftwareField.SWHID, "swh:1:cnt:94a9ed024d3859793618152ea559a168bbcbb5e2");
 
         assertEquals(entry, expected);
     }
@@ -114,7 +113,7 @@ public class CffImporterTest {
     @Test
     public void testImportEntriesDataset() throws IOException, URISyntaxException {
         Path file = Path.of(CffImporterTest.class.getResource("CffImporterTestDataset.cff").toURI());
-        List<BibEntry> bibEntries = importer.importDatabase(file, StandardCharsets.UTF_8).getDatabase().getEntries();
+        List<BibEntry> bibEntries = importer.importDatabase(file).getDatabase().getEntries();
         BibEntry entry = bibEntries.get(0);
 
         BibEntry expected = getPopulatedEntry();
@@ -126,7 +125,7 @@ public class CffImporterTest {
     @Test
     public void testImportEntriesDoiSelect() throws IOException, URISyntaxException {
         Path file = Path.of(CffImporterTest.class.getResource("CffImporterTestDoiSelect.cff").toURI());
-        List<BibEntry> bibEntries = importer.importDatabase(file, StandardCharsets.UTF_8).getDatabase().getEntries();
+        List<BibEntry> bibEntries = importer.importDatabase(file).getDatabase().getEntries();
         BibEntry entry = bibEntries.get(0);
 
         BibEntry expected = getPopulatedEntry();
@@ -137,7 +136,7 @@ public class CffImporterTest {
     @Test
     public void testImportEntriesUnknownFields() throws IOException, URISyntaxException {
         Path file = Path.of(CffImporterTest.class.getResource("CffImporterTestUnknownFields.cff").toURI());
-        List<BibEntry> bibEntries = importer.importDatabase(file, StandardCharsets.UTF_8).getDatabase().getEntries();
+        List<BibEntry> bibEntries = importer.importDatabase(file).getDatabase().getEntries();
         BibEntry entry = bibEntries.get(0);
 
         BibEntry expected = getPopulatedEntry().withField(new UnknownField("commit"), "10ad");
@@ -152,12 +151,12 @@ public class CffImporterTest {
         entry.setField(StandardField.AUTHOR, "Joe van Smith and Bob Jones, Jr.");
         entry.setField(StandardField.TITLE, "Test");
         entry.setField(StandardField.URL, "www.google.com");
-        entry.setField(StandardField.REPOSITORY, "www.github.com");
+        entry.setField(BiblatexSoftwareField.REPOSITORY, "www.github.com");
         entry.setField(StandardField.DOI, "10.0000/TEST");
         entry.setField(StandardField.DATE, "2000-07-02");
         entry.setField(StandardField.COMMENT, "Test entry.");
         entry.setField(StandardField.ABSTRACT, "Test abstract.");
-        entry.setField(StandardField.LICENSE, "MIT");
+        entry.setField(BiblatexSoftwareField.LICENSE, "MIT");
         entry.setField(StandardField.VERSION, "1.0");
 
         return entry;

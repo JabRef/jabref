@@ -16,7 +16,7 @@
             <TableColumn fx:id="fileTypesTableIconColumn" minWidth="40.0" maxWidth="40.0"/>
             <TableColumn fx:id="fileTypesTableNameColumn" text="%Name"/>
             <TableColumn fx:id="fileTypesTableExtensionColumn" text="%Extension" prefWidth="120"/>
-            <TableColumn fx:id="fileTypesTableTypeColumn" text="%MIME type" prefWidth="150"/>
+            <TableColumn fx:id="fileTypesTableMimeTypeColumn" text="%MIME type" prefWidth="150"/>
             <TableColumn fx:id="fileTypesTableApplicationColumn" text="%Application" prefWidth="100"/>
             <TableColumn fx:id="fileTypesTableEditColumn" minWidth="40.0" maxWidth="40.0"/>
             <TableColumn fx:id="fileTypesTableDeleteColumn" minWidth="40.0" maxWidth="40.0"/>

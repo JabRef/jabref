@@ -16,7 +16,6 @@ public class FileTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty resolveStringsProperty = new SimpleBooleanProperty();
     private final StringProperty resolveStringsForFieldsProperty = new SimpleStringProperty("");
     private final BooleanProperty alwaysReformatBibProperty = new SimpleBooleanProperty();
-    private final BooleanProperty warnAboutDuplicatesOnImportProperty = new SimpleBooleanProperty();
     private final BooleanProperty autosaveLocalLibraries = new SimpleBooleanProperty();
 
     private final ImportExportPreferences importExportPreferences;
@@ -34,7 +33,6 @@ public class FileTabViewModel implements PreferenceTabViewModel {
         resolveStringsProperty.setValue(importExportPreferences.resolveStrings());
         resolveStringsForFieldsProperty.setValue(importExportPreferences.getResolvableFields());
         alwaysReformatBibProperty.setValue(importExportPreferences.shouldAlwaysReformatOnSave());
-        warnAboutDuplicatesOnImportProperty.setValue(importExportPreferences.shouldWarnAboutDuplicatesOnImport());
         autosaveLocalLibraries.setValue(importExportPreferences.shouldAutoSave());
     }
 
@@ -45,7 +43,6 @@ public class FileTabViewModel implements PreferenceTabViewModel {
         importExportPreferences.setNonWrappableFields(noWrapFilesProperty.getValue().trim());
         importExportPreferences.setResolvableFields(resolveStringsForFieldsProperty.getValue().trim());
         importExportPreferences.setAlwaysReformatOnSave(alwaysReformatBibProperty.getValue());
-        importExportPreferences.setWarnAboutDuplicatesOnImport(warnAboutDuplicatesOnImportProperty.getValue());
         importExportPreferences.setAutoSave(autosaveLocalLibraries.getValue());
     }
 
@@ -75,10 +72,6 @@ public class FileTabViewModel implements PreferenceTabViewModel {
 
     public BooleanProperty alwaysReformatBibProperty() {
         return alwaysReformatBibProperty;
-    }
-
-    public BooleanProperty warnAboutDuplicatesOnImportProperty() {
-        return warnAboutDuplicatesOnImportProperty;
     }
 
     // Autosave

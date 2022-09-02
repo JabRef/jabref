@@ -438,7 +438,7 @@
     "ophthalmic-surgery-lasers-and-imaging": "ophthalmic-surgery-lasers-and-imaging-retina",
     "optical-society-of-america": "the-optical-society",
     "organic-and-medicinal-chemistry-letters": "chemistry-central-journal",
-    "oxford-brookes-university-faculty-of-health-and-life-sciences": "harvard-oxford-brookes-university-faculty-of-health-and-life-sciences",
+    "oxford-brookes-university-faculty-of-health-and-life-sciences": "harvard-cite-them-right",
     "oxford-university-new-south-wales": "oxford-the-university-of-new-south-wales",
     "pedobiologia-international-journal-of-soil-biology": "pedobiologia-journal-of-soil-ecology",
     "pharmacoeconomics-german-research-articles": "springer-vancouver-brackets",
@@ -529,5 +529,10 @@
     "investigaciones-de-historia-economica-economic-history-research": "investigaciones-de-historia-economica",
     "reach-reviews-in-human-space-exploration": "reach",
     "journal-of-oncological-science": "journal-of-oncological-sciences",
-    "harvard-dublin-city-university": "harvard-cite-them-right"
+    "harvard-dublin-city-university": "harvard-cite-them-right",
+    "technische-universitat-dresden-medizin": "apa",
+    "prifysgol-caerdydd-harvard": "cardiff-university-harvard",
+    "harvard-cardiff-university-old":"cardiff-university-harvard",
+    "harvard-oxford-brookes-university-faculty-of-health-and-life-sciences": "harvard-cite-them-right",
+    "bluebook2": "bluebook-law-review"
 }

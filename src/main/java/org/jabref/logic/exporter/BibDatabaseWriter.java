@@ -2,6 +2,7 @@ package org.jabref.logic.exporter;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -27,7 +28,6 @@ import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPattern;
 import org.jabref.logic.cleanup.FieldFormatterCleanup;
 import org.jabref.logic.cleanup.FieldFormatterCleanups;
-import org.jabref.logic.cleanup.NormalizeNewlinesFormatter;
 import org.jabref.logic.formatter.bibtexfields.TrimWhitespaceFormatter;
 import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabase;
@@ -78,9 +78,9 @@ public abstract class BibDatabaseWriter {
             }
         });
 
-        // Run a couple of standard cleanups
+        // Run standard cleanups
         List<FieldFormatterCleanup> preSaveCleanups =
-                Stream.of(new TrimWhitespaceFormatter(), new NormalizeNewlinesFormatter())
+                Stream.of(new TrimWhitespaceFormatter())
                       .map(formatter -> new FieldFormatterCleanup(InternalField.INTERNAL_ALL_FIELD, formatter))
                       .collect(Collectors.toList());
         for (FieldFormatterCleanup formatter : preSaveCleanups) {
@@ -183,7 +183,7 @@ public abstract class BibDatabaseWriter {
 
         // Some file formats write something at the start of the file (like the encoding)
         if (savePreferences.getSaveType() != SavePreferences.DatabaseSaveType.PLAIN_BIBTEX) {
-            Charset charset = bibDatabaseContext.getMetaData().getEncoding().orElse(generalPreferences.getDefaultEncoding());
+            Charset charset = bibDatabaseContext.getMetaData().getEncoding().orElse(StandardCharsets.UTF_8);
             writeProlog(bibDatabaseContext, charset);
         }
 

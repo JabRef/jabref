@@ -13,6 +13,7 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import javafx.concurrent.Task;
+import javafx.geometry.Pos;
 import javafx.print.PrinterJob;
 import javafx.scene.Group;
 import javafx.scene.Node;
@@ -34,19 +35,19 @@ import javafx.stage.Stage;
 import javafx.stage.Window;
 import javafx.util.Duration;
 
+import org.jabref.gui.help.ErrorConsoleAction;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.BaseDialog;
+import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.gui.util.ZipFileChooser;
 import org.jabref.logic.l10n.Localization;
 
-import com.jfoenix.controls.JFXSnackbar;
-import com.jfoenix.controls.JFXSnackbar.SnackbarEvent;
-import com.jfoenix.controls.JFXSnackbarLayout;
 import com.tobiasdiez.easybind.EasyBind;
+import org.controlsfx.control.Notifications;
 import org.controlsfx.control.TaskProgressView;
 import org.controlsfx.dialog.ExceptionDialog;
 import org.controlsfx.dialog.ProgressDialog;
@@ -70,18 +71,15 @@ public class JabRefDialogService implements DialogService {
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefDialogService.class);
 
     private final Window mainWindow;
-    private final JFXSnackbar statusLine;
     private final ThemeManager themeManager;
 
     public JabRefDialogService(Window mainWindow, Pane mainPane, ThemeManager themeManager) {
         this.mainWindow = mainWindow;
         this.themeManager = themeManager;
-        this.statusLine = new JFXSnackbar(mainPane);
     }
 
     private FXDialog createDialog(AlertType type, String title, String content) {
         FXDialog alert = new FXDialog(type, title, true);
-        themeManager.installCss(alert.getDialogPane().getScene());
         alert.setHeaderText(null);
         alert.setContentText(content);
         alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
@@ -99,7 +97,6 @@ public class JabRefDialogService implements DialogService {
         // Create a new dialog pane that has a checkbox instead of the hide/show details button
         // Use the supplied callback for the action of the checkbox
         alert.setDialogPane(new DialogPane() {
-
             @Override
             protected Node createDetailsButton() {
                 CheckBox optOut = new CheckBox();
@@ -115,7 +112,6 @@ public class JabRefDialogService implements DialogService {
 
         // Reset the dialog graphic using the default style
         alert.getDialogPane().setGraphic(graphic);
-        themeManager.installCss(alert.getDialogPane().getScene());
         alert.setHeaderText(null);
         alert.setContentText(content);
         alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
@@ -140,7 +136,6 @@ public class JabRefDialogService implements DialogService {
         choiceDialog.setTitle(title);
         choiceDialog.setContentText(content);
         choiceDialog.initOwner(mainWindow);
-        themeManager.installCss(choiceDialog.getDialogPane().getScene());
         return choiceDialog.showAndWait();
     }
 
@@ -150,7 +145,6 @@ public class JabRefDialogService implements DialogService {
         inputDialog.setHeaderText(title);
         inputDialog.setContentText(content);
         inputDialog.initOwner(mainWindow);
-        themeManager.installCss(inputDialog.getDialogPane().getScene());
         return inputDialog.showAndWait();
     }
 
@@ -160,7 +154,6 @@ public class JabRefDialogService implements DialogService {
         inputDialog.setHeaderText(title);
         inputDialog.setContentText(content);
         inputDialog.initOwner(mainWindow);
-        themeManager.installCss(inputDialog.getDialogPane().getScene());
         return inputDialog.showAndWait();
     }
 
@@ -188,7 +181,6 @@ public class JabRefDialogService implements DialogService {
         exceptionDialog.getDialogPane().setMaxWidth(mainWindow.getWidth() / 2);
         exceptionDialog.setHeaderText(message);
         exceptionDialog.initOwner(mainWindow);
-        themeManager.installCss(exceptionDialog.getDialogPane().getScene());
         exceptionDialog.showAndWait();
     }
 
@@ -198,7 +190,6 @@ public class JabRefDialogService implements DialogService {
         exceptionDialog.setHeaderText(title);
         exceptionDialog.setContentText(content);
         exceptionDialog.initOwner(mainWindow);
-        themeManager.installCss(exceptionDialog.getDialogPane().getScene());
         exceptionDialog.showAndWait();
     }
 
@@ -268,7 +259,6 @@ public class JabRefDialogService implements DialogService {
         alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
         alert.setResizable(true);
         alert.initOwner(mainWindow);
-        themeManager.installCss(alert.getDialogPane().getScene());
         return alert.showAndWait();
     }
 
@@ -296,7 +286,6 @@ public class JabRefDialogService implements DialogService {
             task.cancel();
             progressDialog.close();
         });
-        themeManager.installCss(progressDialog.getDialogPane().getScene());
         progressDialog.initOwner(mainWindow);
         progressDialog.show();
     }
@@ -321,9 +310,8 @@ public class JabRefDialogService implements DialogService {
         alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
         alert.setResizable(true);
         alert.initOwner(mainWindow);
-        themeManager.installCss(alert.getDialogPane().getScene());
 
-        stateManager.getAnyTaskRunning().addListener((observable, oldValue, newValue) -> {
+        stateManager.getAnyTasksThatWillNotBeRecoveredRunning().addListener((observable, oldValue, newValue) -> {
             if (!newValue) {
                 alert.setResult(ButtonType.YES);
                 alert.close();
@@ -336,7 +324,27 @@ public class JabRefDialogService implements DialogService {
     @Override
     public void notify(String message) {
         LOGGER.info(message);
-        statusLine.fireEvent(new SnackbarEvent(new JFXSnackbarLayout(message), TOAST_MESSAGE_DISPLAY_TIME, null));
+
+        DefaultTaskExecutor.runInJavaFXThread(() -> {
+            Notifications.create()
+                         .text(message)
+                         .position(Pos.BOTTOM_CENTER)
+                         .hideAfter(TOAST_MESSAGE_DISPLAY_TIME)
+                         .owner(mainWindow)
+                         .threshold(5,
+                                 Notifications.create()
+                                              .title(Localization.lang("Last notification"))
+                                              // TODO: Change to a notification overview instead of event log when that is available. The event log is not that user friendly (different purpose).
+                                              .text(
+                                                    "(" + Localization.lang("Check the event log to see all notifications") + ")"
+                                                     + "\n\n" + message)
+                                              .onAction((e)-> {
+                                                     ErrorConsoleAction ec = new ErrorConsoleAction();
+                                                     ec.execute();
+                                                 }))
+                         .hideCloseButton()
+                         .show();
+        });
     }
 
     @Override

@@ -198,7 +198,6 @@ public class StringUtil {
         // remove all whitespace at the end of the string, this especially includes \r created when the field content has \r\n as line separator
         addWrappedLine(result, CharMatcher.whitespace().trimTrailingFrom(lines[0]), wrapAmount, newline);
         for (int i = 1; i < lines.length; i++) {
-
             if (lines[i].trim().isEmpty()) {
                 result.append(newline);
                 result.append('\t');
@@ -258,6 +257,7 @@ public class StringUtil {
      * Decodes an encoded double String array back into array form. The array
      * is assumed to be square, and delimited by the characters ';' (first dim) and
      * ':' (second dim).
+     *
      * @param value The encoded String to be decoded.
      * @return The decoded String array.
      */
@@ -311,7 +311,6 @@ public class StringUtil {
      * @return The resulting string after wrapping capitals.
      */
     public static String putBracesAroundCapitals(String s) {
-
         boolean inString = false;
         boolean isBracing = false;
         boolean escaped = false;
@@ -331,14 +330,12 @@ public class StringUtil {
             // See if we should start bracing:
             if ((inBrace == 0) && !isBracing && !inString && Character.isLetter((char) c)
                     && Character.isUpperCase((char) c)) {
-
                 buf.append('{');
                 isBracing = true;
             }
 
             // See if we should close a brace set:
             if (isBracing && !(Character.isLetter((char) c) && Character.isUpperCase((char) c))) {
-
                 buf.append('}');
                 isBracing = false;
             }
@@ -413,6 +410,7 @@ public class StringUtil {
     /**
      * Checks if the given String has exactly one pair of surrounding curly braces <br>
      * Strings with escaped characters in curly braces at the beginning and end are respected, too
+     *
      * @param toCheck The string to check
      * @return True, if the check was succesful. False otherwise.
      */
@@ -705,7 +703,6 @@ public class StringUtil {
         } else {
             return toCapitalize.toUpperCase(Locale.ROOT);
         }
-
     }
 
     /**
@@ -752,5 +749,16 @@ public class StringUtil {
         } else {
             return string;
         }
+    }
+
+    /**
+     * Checks if the given string contains any whitespace characters. The supported whitespace characters
+     * are the set of characters matched by {@code \s} in regular expressions, which are {@code [ \t\n\x0B\f\r]}.
+     *
+     * @param s The string to check
+     * @return {@code True} if the given string does contain at least one whitespace character, {@code False} otherwise
+     * */
+    public static boolean containsWhitespace(String s) {
+        return s.chars().anyMatch(Character::isWhitespace);
     }
 }

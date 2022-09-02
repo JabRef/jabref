@@ -142,7 +142,7 @@ public class DuplicateSearch extends SimpleCommand {
     }
 
     private void askResolveStrategy(DuplicateSearchResult result, BibEntry first, BibEntry second, DuplicateResolverType resolverType) {
-        DuplicateResolverDialog dialog = new DuplicateResolverDialog(first, second, resolverType, frame.getCurrentLibraryTab().getBibDatabaseContext(), stateManager);
+        DuplicateResolverDialog dialog = new DuplicateResolverDialog(first, second, resolverType, frame.getCurrentLibraryTab().getBibDatabaseContext(), stateManager, dialogService);
 
         dialog.titleProperty().bind(Bindings.concat(dialog.getTitle()).concat(" (").concat(duplicateProgress.getValue()).concat("/").concat(duplicateTotal).concat(")"));
 
@@ -152,16 +152,21 @@ public class DuplicateSearch extends SimpleCommand {
         if ((resolverResult == DuplicateResolverResult.KEEP_LEFT)
                 || (resolverResult == DuplicateResolverResult.AUTOREMOVE_EXACT)) {
             result.remove(second);
+            result.replace(first, dialog.getNewLeftEntry());
             if (resolverResult == DuplicateResolverResult.AUTOREMOVE_EXACT) {
                 autoRemoveExactDuplicates.set(true); // Remember choice
             }
         } else if (resolverResult == DuplicateResolverResult.KEEP_RIGHT) {
             result.remove(first);
+            result.replace(second, dialog.getNewRightEntry());
         } else if (resolverResult == DuplicateResolverResult.BREAK) {
             libraryAnalyzed.set(true);
             duplicates.clear();
         } else if (resolverResult == DuplicateResolverResult.KEEP_MERGE) {
             result.replace(first, second, dialog.getMergedEntry());
+        } else if (resolverResult == DuplicateResolverResult.KEEP_BOTH) {
+            result.replace(first, dialog.getNewLeftEntry());
+            result.replace(second, dialog.getNewRightEntry());
         }
     }
 
@@ -223,6 +228,11 @@ public class DuplicateSearch extends SimpleCommand {
             remove(second);
             toAdd.add(replacement);
             duplicates++;
+        }
+
+        public synchronized void replace(BibEntry entry, BibEntry replacement) {
+            remove(entry);
+            getToAdd().add(replacement);
         }
 
         public synchronized boolean isToRemove(BibEntry entry) {

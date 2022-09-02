@@ -135,7 +135,6 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
 
     private boolean openSharedDatabase(DBMSConnectionProperties connectionProperties) {
         if (isSharedDatabaseAlreadyPresent(connectionProperties)) {
-
             dialogService.showWarningDialogAndWait(Localization.lang("Shared database connection"),
                     Localization.lang("You are already connected to a database using entered connection details."));
             return true;
@@ -145,7 +144,6 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
             Path localFilePath = Path.of(folder.getValue());
 
             if (Files.exists(localFilePath) && !Files.isDirectory(localFilePath)) {
-
                 boolean overwriteFilePressed = dialogService.showConfirmationDialogAndWait(Localization.lang("Existing file"),
                         Localization.lang("'%0' exists. Overwrite file?", localFilePath.getFileName().toString()),
                         Localization.lang("Overwrite file"),
@@ -173,7 +171,6 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
 
             return true;
         } catch (SQLException | InvalidDBMSConnectionPropertiesException exception) {
-
             frame.getDialogService().showErrorDialogAndWait(Localization.lang("Connection error"), exception);
         } catch (DatabaseNotSupportedException exception) {
             ButtonType openHelp = new ButtonType("Open Help", ButtonData.OTHER);
@@ -187,7 +184,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
                             Localization.lang("However, a new database was created alongside the pre-3.6 one."),
                     ButtonType.OK, openHelp);
 
-            result.filter(btn -> btn.equals(openHelp)).ifPresent(btn -> HelpAction.openHelpPage(HelpFile.SQL_DATABASE_MIGRATION));
+            result.filter(btn -> btn.equals(openHelp)).ifPresent(btn -> new HelpAction(HelpFile.SQL_DATABASE_MIGRATION, dialogService).execute());
             result.filter(btn -> btn.equals(ButtonType.OK)).ifPresent(btn -> openSharedDatabase(connectionProperties));
         }
         loading.set(false);
@@ -215,6 +212,9 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
         }
 
         sharedDatabasePreferences.setRememberPassword(rememberPassword.get());
+
+        sharedDatabasePreferences.setFolder(folder.getValue());
+        sharedDatabasePreferences.setAutosave(autosave.get());
     }
 
     /**
@@ -228,6 +228,8 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
         Optional<String> sharedDatabaseUser = sharedDatabasePreferences.getUser();
         Optional<String> sharedDatabasePassword = sharedDatabasePreferences.getPassword();
         boolean sharedDatabaseRememberPassword = sharedDatabasePreferences.getRememberPassword();
+        Optional<String> sharedDatabaseFolder = sharedDatabasePreferences.getFolder();
+        boolean sharedDatabaseAutosave = sharedDatabasePreferences.getAutosave();
         Optional<String> sharedDatabaseKeystoreFile = sharedDatabasePreferences.getKeyStoreFile();
 
         if (sharedDatabaseType.isPresent()) {
@@ -251,6 +253,9 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
         }
 
         rememberPassword.set(sharedDatabaseRememberPassword);
+        
+        sharedDatabaseFolder.ifPresent(folder::set);
+        autosave.set(sharedDatabaseAutosave);
     }
 
     private boolean isSharedDatabaseAlreadyPresent(DBMSConnectionProperties connectionProperties) {

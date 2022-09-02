@@ -19,16 +19,24 @@ public abstract class InfixTransformerTest<T extends AbstractQueryTransformer> {
      * Example in the case of ':': <code>"author:"</code>
      */
 
-    protected abstract String getAuthorPrefix();
+    protected String getAuthorPrefix() {
+        return "";
+    }
 
-    protected abstract String getUnFieldedPrefix();
+    protected String getUnFieldedPrefix() {
+        return "";
+    }
 
-    protected abstract String getJournalPrefix();
+    protected String getJournalPrefix() {
+        return "";
+    }
 
-    protected abstract String getTitlePrefix();
+    protected String getTitlePrefix() {
+        return "";
+    }
 
     @Test
-    public void convertAuthorField() throws Exception {
+    public void convertAuthorFieldPrefix() throws Exception {
         String queryString = "author:\"Igor Steinmacher\"";
         QueryNode luceneQuery = new StandardSyntaxParser().parse(queryString, AbstractQueryTransformer.NO_EXPLICIT_FIELD);
         Optional<String> searchQuery = getTransformer().transformLuceneQuery(luceneQuery);
@@ -37,7 +45,7 @@ public abstract class InfixTransformerTest<T extends AbstractQueryTransformer> {
     }
 
     @Test
-    public void convertUnFieldedTerm() throws Exception {
+    public void convertUnFieldedTermPrefix() throws Exception {
         String queryString = "\"default value\"";
         QueryNode luceneQuery = new StandardSyntaxParser().parse(queryString, AbstractQueryTransformer.NO_EXPLICIT_FIELD);
         Optional<String> searchQuery = getTransformer().transformLuceneQuery(luceneQuery);
@@ -46,7 +54,7 @@ public abstract class InfixTransformerTest<T extends AbstractQueryTransformer> {
     }
 
     @Test
-    public void convertExplicitUnFieldedTerm() throws Exception {
+    public void convertExplicitUnFieldedTermPrefix() throws Exception {
         String queryString = "default:\"default value\"";
         QueryNode luceneQuery = new StandardSyntaxParser().parse(queryString, AbstractQueryTransformer.NO_EXPLICIT_FIELD);
         Optional<String> searchQuery = getTransformer().transformLuceneQuery(luceneQuery);
@@ -55,7 +63,7 @@ public abstract class InfixTransformerTest<T extends AbstractQueryTransformer> {
     }
 
     @Test
-    public void convertJournalField() throws Exception {
+    public void convertJournalFieldPrefix() throws Exception {
         String queryString = "journal:Nature";
         QueryNode luceneQuery = new StandardSyntaxParser().parse(queryString, AbstractQueryTransformer.NO_EXPLICIT_FIELD);
         Optional<String> searchQuery = getTransformer().transformLuceneQuery(luceneQuery);
@@ -70,7 +78,7 @@ public abstract class InfixTransformerTest<T extends AbstractQueryTransformer> {
     public abstract void convertYearRangeField() throws Exception;
 
     @Test
-    public void convertMultipleValuesWithTheSameField() throws Exception {
+    public void convertMultipleValuesWithTheSameFieldPrefix() throws Exception {
         String queryString = "author:\"Igor Steinmacher\" author:\"Christoph Treude\"";
         QueryNode luceneQuery = new StandardSyntaxParser().parse(queryString, AbstractQueryTransformer.NO_EXPLICIT_FIELD);
         Optional<String> searchQuery = getTransformer().transformLuceneQuery(luceneQuery);
@@ -79,7 +87,7 @@ public abstract class InfixTransformerTest<T extends AbstractQueryTransformer> {
     }
 
     @Test
-    public void groupedOperations() throws Exception {
+    public void groupedOperationsPrefix() throws Exception {
         String queryString = "(author:\"Igor Steinmacher\" OR author:\"Christoph Treude\" AND author:\"Christoph Freunde\") AND title:test";
         QueryNode luceneQuery = new StandardSyntaxParser().parse(queryString, AbstractQueryTransformer.NO_EXPLICIT_FIELD);
         Optional<String> searchQuery = getTransformer().transformLuceneQuery(luceneQuery);
@@ -88,7 +96,7 @@ public abstract class InfixTransformerTest<T extends AbstractQueryTransformer> {
     }
 
     @Test
-    public void notOperator() throws Exception {
+    public void notOperatorPrefix() throws Exception {
         String queryString = "!(author:\"Igor Steinmacher\" OR author:\"Christoph Treude\")";
         QueryNode luceneQuery = new StandardSyntaxParser().parse(queryString, AbstractQueryTransformer.NO_EXPLICIT_FIELD);
         Optional<String> searchQuery = getTransformer().transformLuceneQuery(luceneQuery);

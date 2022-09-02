@@ -245,7 +245,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
 
             taskExecutor.runInFXThread( () -> bibDatabase.insertEntries(dbmsProcessor.getSharedEntries(entriesToInsertIntoLocalDatabase), EntriesEventSource.SHARED));
             // in case entries should be added into the local database, insert them
-         //   bibDatabase.insertEntries(dbmsProcessor.getSharedEntries(entriesToInsertIntoLocalDatabase), EntriesEventSource.SHARED);
+            bibDatabase.insertEntries(dbmsProcessor.partitionAndGetSharedEntries(entriesToInsertIntoLocalDatabase), EntriesEventSource.SHARED);
         }
     }
 

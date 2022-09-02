@@ -4,6 +4,9 @@
     -jr-selected: -jr-accent;
     -jr-hover: #fff1;
 
+    -jr-row-odd-background: #272b38;
+    -jr-row-even-background: #212330;
+    -jr-accent-alt: -jr-accent;
 
     -jr-red: #b71c1f;
     -jr-light-red: #db1d2b;
@@ -55,6 +58,21 @@
 
     -jr-drag-target: -jr-accent;
     -jr-drag-target-hover: -jr-accent;
+
+    -js-summary-text-color: derive(-fx-light-text-color, 70%);
+    -js-summary-text-color-selected: derive( -fx-dark-text-color, 70%);
+}
+
+.unchanged {
+
+}
+
+.addition {
+    -rtfx-background-color: -jr-green;
+}
+
+.deletion {
+    -rtfx-background-color: -jr-red;
 }
 
 #previewBody {
@@ -77,6 +95,21 @@
 .table-row-cell:hover,
 .tree-table-row-cell:hover {
     -fx-background-color: -jr-hover;
+}
+
+.merge-field-value .action-icon {
+    -fx-blend-mode: none;
+    -fx-opacity: 90%;
+}
+
+.merge-header-cell {
+    -fx-border-width: 0 0 1 0;
+    -fx-border-color: -fx-outer-border;
+    -fx-background-color: -jr-row-odd-background;
+}
+
+.merge-header {
+    -fx-background-color: -jr-row-odd-background;
 }
 
 .table-view .groupColumnBackground {
@@ -124,4 +157,16 @@
     -fx-fill: derive(-fx-light-text-color, 80%);
     -fx-text-fill: derive(-fx-light-text-color, 80%);
     -fx-icon-color: derive(-fx-light-text-color, 80%);
+}
+
+.notification-bar > .pane {
+    -fx-background-color: -fx-light-text-color;
+}
+
+.rating > .container > .button {
+    -fx-icon-color: derive(-fx-light-text-color, -50%);
+}
+
+.rating > .container > .button.strong {
+    -fx-icon-color: -fx-light-text-color;
 }

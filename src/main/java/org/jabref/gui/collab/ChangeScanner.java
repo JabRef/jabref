@@ -7,6 +7,16 @@ import java.util.List;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.collab.entryadd.EntryAdd;
+import org.jabref.gui.collab.entrychange.EntryChange;
+import org.jabref.gui.collab.entrydelete.EntryDelete;
+import org.jabref.gui.collab.groupchange.GroupChange;
+import org.jabref.gui.collab.metedatachange.MetadataChange;
+import org.jabref.gui.collab.preamblechange.PreambleChange;
+import org.jabref.gui.collab.stringadd.BibTexStringAdd;
+import org.jabref.gui.collab.stringchange.BibTexStringChange;
+import org.jabref.gui.collab.stringdelete.BibTexStringDelete;
+import org.jabref.gui.collab.stringrename.BibTexStringRename;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.logic.bibtex.comparator.BibDatabaseDiff;
 import org.jabref.logic.bibtex.comparator.BibEntryDiff;
@@ -31,6 +41,8 @@ public class ChangeScanner {
     private final StateManager stateManager;
     private final ThemeManager themeManager;
 
+    private final ExternalChangeResolverFactory externalChangeResolverFactory;
+
     public ChangeScanner(BibDatabaseContext database,
                          DialogService dialogService,
                          PreferencesService preferencesService,
@@ -41,30 +53,33 @@ public class ChangeScanner {
         this.preferencesService = preferencesService;
         this.stateManager = stateManager;
         this.themeManager = themeManager;
+        this.externalChangeResolverFactory = new ExternalChangeResolverFactory(dialogService, database);
     }
 
-    public List<DatabaseChangeViewModel> scanForChanges() {
+    public List<ExternalChange> scanForChanges() {
         if (database.getDatabasePath().isEmpty()) {
             return Collections.emptyList();
         }
 
         try {
-            List<DatabaseChangeViewModel> changes = new ArrayList<>();
+            List<ExternalChange> changes = new ArrayList<>();
 
             // Parse the modified file
             // Important: apply all post-load actions
             ImportFormatPreferences importFormatPreferences = preferencesService.getImportFormatPreferences();
             GeneralPreferences generalPreferences = preferencesService.getGeneralPreferences();
-            ParserResult result = OpenDatabase.loadDatabase(database.getDatabasePath().get(), generalPreferences, importFormatPreferences, new DummyFileUpdateMonitor());
+            ParserResult result = OpenDatabase.loadDatabase(database.getDatabasePath().get(), importFormatPreferences, new DummyFileUpdateMonitor());
             BibDatabaseContext databaseOnDisk = result.getDatabaseContext();
 
             // Start looking at changes.
             BibDatabaseDiff differences = BibDatabaseDiff.compare(database, databaseOnDisk);
             differences.getMetaDataDifferences().ifPresent(diff -> {
-                changes.add(new MetaDataChangeViewModel(diff, preferencesService));
-                diff.getGroupDifferences().ifPresent(groupDiff -> changes.add(new GroupChangeViewModel(groupDiff)));
+                changes.add(new MetadataChange(diff, database, externalChangeResolverFactory));
+                diff.getGroupDifferences().ifPresent(groupDiff -> changes.add(new GroupChange(
+                        groupDiff, database, externalChangeResolverFactory
+                )));
             });
-            differences.getPreambleDifferences().ifPresent(diff -> changes.add(new PreambleChangeViewModel(diff)));
+            differences.getPreambleDifferences().ifPresent(diff -> changes.add(new PreambleChange(diff, database, externalChangeResolverFactory)));
             differences.getBibStringDifferences().forEach(diff -> changes.add(createBibStringDiff(diff)));
             differences.getEntryDifferences().forEach(diff -> changes.add(createBibEntryDiff(diff)));
             return changes;
@@ -74,31 +89,31 @@ public class ChangeScanner {
         }
     }
 
-    private DatabaseChangeViewModel createBibStringDiff(BibStringDiff diff) {
-        if (diff.getOriginalString() == null) {
-            return new StringAddChangeViewModel(diff.getNewString());
+    private ExternalChange createBibStringDiff(BibStringDiff diff) {
+         if (diff.getOriginalString() == null) {
+            return new BibTexStringAdd(diff.getNewString(), database, externalChangeResolverFactory);
         }
 
         if (diff.getNewString() == null) {
-            return new StringRemoveChangeViewModel(diff.getOriginalString());
+            return new BibTexStringDelete(diff.getOriginalString(), database, externalChangeResolverFactory);
         }
 
         if (diff.getOriginalString().getName().equals(diff.getNewString().getName())) {
-            return new StringChangeViewModel(diff.getOriginalString(), diff.getNewString());
+            return new BibTexStringChange(diff.getOriginalString(), diff.getNewString(), database, externalChangeResolverFactory);
         }
 
-        return new StringNameChangeViewModel(diff.getOriginalString(), diff.getNewString());
+        return new BibTexStringRename(diff.getOriginalString(), diff.getNewString(), database, externalChangeResolverFactory);
     }
 
-    private DatabaseChangeViewModel createBibEntryDiff(BibEntryDiff diff) {
+    private ExternalChange createBibEntryDiff(BibEntryDiff diff) {
         if (diff.getOriginalEntry() == null) {
-            return new EntryAddChangeViewModel(diff.getNewEntry(), preferencesService, dialogService, stateManager, themeManager);
+            return new EntryAdd(diff.getNewEntry(), database, externalChangeResolverFactory);
         }
 
         if (diff.getNewEntry() == null) {
-            return new EntryDeleteChangeViewModel(diff.getOriginalEntry());
+            return new EntryDelete(diff.getOriginalEntry(), database, externalChangeResolverFactory);
         }
 
-        return new EntryChangeViewModel(diff.getOriginalEntry(), diff.getNewEntry());
+        return new EntryChange(diff.getOriginalEntry(), diff.getNewEntry(), database, externalChangeResolverFactory);
     }
 }

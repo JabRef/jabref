@@ -15,6 +15,8 @@ import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.mergeentries.FetchAndMergeEntry;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.TaskExecutor;
+import org.jabref.logic.importer.FetcherClientException;
+import org.jabref.logic.importer.FetcherServerException;
 import org.jabref.logic.importer.WebFetchers;
 import org.jabref.logic.importer.util.IdentifierParser;
 import org.jabref.logic.integrity.FieldCheckers;
@@ -27,8 +29,13 @@ import org.jabref.model.entry.identifier.Identifier;
 import org.jabref.preferences.PreferencesService;
 
 import com.tobiasdiez.easybind.EasyBind;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class IdentifierEditorViewModel extends AbstractEditorViewModel {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(IdentifierEditorViewModel.class);
+
     private final BooleanProperty validIdentifierIsNotPresent = new SimpleBooleanProperty(true);
     private final BooleanProperty identifierLookupInProgress = new SimpleBooleanProperty(false);
     private final BooleanProperty idFetcherAvailable = new SimpleBooleanProperty(true);
@@ -119,8 +126,19 @@ public class IdentifierEditorViewModel extends AbstractEditorViewModel {
                             dialogService.notify(Localization.lang("No %0 found", field.getDisplayName()));
                         }
                     })
-                    .onFailure(dialogService::showErrorDialogAndWait)
-                    .executeWith(taskExecutor);
+                      .onFailure(exception -> {
+                          LOGGER.error("Error while fetching bibliographic information", exception);
+                          if (exception instanceof FetcherClientException) {
+                              dialogService.showInformationDialogAndWait(Localization.lang("Look up %0", idFetcher.getName()), Localization.lang("No data was found for the identifier"));
+                          } else if (exception instanceof FetcherServerException) {
+                              dialogService.showInformationDialogAndWait(Localization.lang("Look up %0", idFetcher.getName()), Localization.lang("Server not available"));
+                          } else if (exception.getCause() != null) {
+                              dialogService.showWarningDialogAndWait(Localization.lang("Look up %0", idFetcher.getName()), Localization.lang("Error occured %0", exception.getCause().getMessage()));
+                          } else {
+                              dialogService.showWarningDialogAndWait(Localization.lang("Look up %0", idFetcher.getName()), Localization.lang("Error occured %0", exception.getCause().getMessage()));
+                          }
+                      })
+                      .executeWith(taskExecutor);
         });
     }
 }

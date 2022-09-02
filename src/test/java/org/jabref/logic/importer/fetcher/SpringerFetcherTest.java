@@ -3,8 +3,10 @@ package org.jabref.logic.importer.fetcher;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
+import javafx.collections.FXCollections;
+
+import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.PagedSearchBasedFetcher;
 import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.model.entry.BibEntry;
@@ -20,15 +22,19 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 @FetcherTest
 class SpringerFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSearchFetcherTest {
 
+    ImporterPreferences importerPreferences = mock(ImporterPreferences.class);
     SpringerFetcher fetcher;
 
     @BeforeEach
     void setUp() {
-        fetcher = new SpringerFetcher();
+        when(importerPreferences.getApiKeys()).thenReturn(FXCollections.emptyObservableSet());
+        fetcher = new SpringerFetcher(importerPreferences);
     }
 
     @Test
@@ -78,21 +84,43 @@ class SpringerFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSear
             .withField(StandardField.TITLE, "How to Find My Task? Chatbot to Assist Newcomers in Choosing Tasks in OSS Projects")
             .withField(StandardField.ABSTRACT, "Open Source Software (OSS) is making a meteoric rise in the software industry since several big companies have entered this market. Unfortunately, newcomers enter these projects and usually lose interest in contributing because of several factors. This paper aims to reduce the problems users face when they walk their first steps into OSS projects: finding the appropriate task. This paper presents a chatbot that filters tasks to help newcomers choose a task that fits their skills. We performed a quantitative and a qualitative study comparing the chatbot with the current GitHub issue tracker interface, which uses labels to categorize and identify tasks. The results show that users perceived the chatbot as easier to use than the GitHub issue tracker. Additionally, users tend to interpret the use of chatbots as situational, helping mainly newcomers and inexperienced contributors.");
 
+        BibEntry fourthArticle = new BibEntry(StandardEntryType.Article)
+            .withField(StandardField.AUTHOR, "Calefato, Fabio and Gerosa, Marco Aurélio and Iaffaldano, Giuseppe and Lanubile, Filippo and Steinmacher, Igor")
+            .withField(StandardField.DATE, "2022-03-19")
+            .withField(StandardField.DOI, "10.1007/s10664-021-10012-6")
+            .withField(StandardField.FILE, ":http\\://link.springer.com/openurl/pdf?id=doi\\:10.1007/s10664-021-10012-6:PDF")
+            .withField(StandardField.ISSN, "1382-3256")
+            .withField(StandardField.JOURNAL, "Empirical Software Engineering")
+            .withField(StandardField.MONTH, "#mar#")
+            .withField(StandardField.NUMBER, "3")
+            .withField(StandardField.PAGES, "1--41")
+            .withField(StandardField.PUBLISHER, "Springer")
+            .withField(StandardField.TITLE, "Will you come back to contribute? Investigating the inactivity of OSS core developers in GitHub")
+            .withField(StandardField.VOLUME, "27")
+            .withField(StandardField.YEAR, "2022")
+            .withField(StandardField.ABSTRACT, "Several Open-Source Software (OSS) projects depend on the continuity of their development communities to remain sustainable. Understanding how developers become inactive or why they take breaks can help communities prevent abandonment and incentivize developers to come back. In this paper, we propose a novel method to identify developers’ inactive periods by analyzing the individual rhythm of contributions to the projects. Using this method, we quantitatively analyze the inactivity of core developers in 18 OSS organizations hosted on GitHub. We also survey core developers to receive their feedback about the identified breaks and transitions. Our results show that our method was effective for identifying developers’ breaks. About 94% of the surveyed core developers agreed with our state model of inactivity; 71% and 79% of them acknowledged their breaks and state transition, respectively. We also show that all core developers take breaks (at least once) and about a half of them (~45%) have completely disengaged from a project for at least one year. We also analyzed the probability of transitions to/from inactivity and found that developers who pause their activity have a ~35 to ~55% chance to return to an active state; yet, if the break lasts for a year or longer, then the probability of resuming activities drops to ~21–26%, with a ~54% chance of complete disengagement. These results may support the creation of policies and mechanisms to make OSS community managers aware of breaks and potential project abandonment.");
+
         List<BibEntry> fetchedEntries = fetcher.performSearch("JabRef Social Barriers Steinmacher");
-        assertEquals(List.of(thirdArticle, firstArticle, secondArticle), fetchedEntries);
+        assertEquals(List.of(fourthArticle, thirdArticle, firstArticle, secondArticle), fetchedEntries);
     }
 
     @Test
     void testSpringerJSONToBibtex() {
-        String jsonString = "{\r\n" + "            \"identifier\":\"doi:10.1007/BF01201962\",\r\n"
-                + "            \"title\":\"Book reviews\",\r\n"
-                + "            \"publicationName\":\"World Journal of Microbiology & Biotechnology\",\r\n"
-                + "            \"issn\":\"1573-0972\",\r\n" + "            \"isbn\":\"\",\r\n"
-                + "            \"doi\":\"10.1007/BF01201962\",\r\n" + "            \"publisher\":\"Springer\",\r\n"
-                + "            \"publicationDate\":\"1992-09-01\",\r\n" + "            \"volume\":\"8\",\r\n"
-                + "            \"number\":\"5\",\r\n" + "            \"startingPage\":\"550\",\r\n"
-                + "            \"url\":\"http://dx.doi.org/10.1007/BF01201962\",\"copyright\":\"©1992 Rapid Communications of Oxford Ltd.\"\r\n"
-                + "        }";
+        String jsonString = """
+                {\r
+                            "identifier":"doi:10.1007/BF01201962",\r
+                            "title":"Book reviews",\r
+                            "publicationName":"World Journal of Microbiology & Biotechnology",\r
+                            "issn":"1573-0972",\r
+                            "isbn":"",\r
+                            "doi":"10.1007/BF01201962",\r
+                            "publisher":"Springer",\r
+                            "publicationDate":"1992-09-01",\r
+                            "volume":"8",\r
+                            "number":"5",\r
+                            "startingPage":"550",\r
+                            "url":"http://dx.doi.org/10.1007/BF01201962","copyright":"©1992 Rapid Communications of Oxford Ltd."\r
+                        }""";
 
         JSONObject jsonObject = new JSONObject(jsonString);
         BibEntry bibEntry = SpringerFetcher.parseSpringerJSONtoBibtex(jsonObject);
@@ -113,13 +141,13 @@ class SpringerFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSear
     @Test
     @Disabled("Year search is currently broken, because the API returns mutliple years.")
     @Override
-    public void supportsYearSearch() throws Exception {
+    public void supportsYearSearch() {
     }
 
     @Test
     @Disabled("Year range search is not natively supported by the API, but can be emulated by multiple single year searches.")
     @Override
-    public void supportsYearRangeSearch() throws Exception {
+    public void supportsYearRangeSearch() {
     }
 
     @Test
@@ -154,8 +182,10 @@ class SpringerFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSear
 
         Assertions.assertTrue(resultJustByAuthor.containsAll(result));
         List<BibEntry> allEntriesFromCSCW = result.stream()
-                                                  .filter(bibEntry -> bibEntry.getField(StandardField.JOURNAL).orElse("").equals("Computer Supported Cooperative Work (CSCW)"))
-                                                  .collect(Collectors.toList());
+                                                  .filter(bibEntry -> bibEntry.getField(StandardField.JOURNAL)
+                                                                              .orElse("")
+                                                                              .equals("Computer Supported Cooperative Work (CSCW)"))
+                                                  .toList();
         allEntriesFromCSCW.stream()
                           .map(bibEntry -> bibEntry.getField(StandardField.AUTHOR))
                           .filter(Optional::isPresent)

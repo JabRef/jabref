@@ -72,7 +72,6 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
                     return new Medra().performSearchById(identifier);
                 }
                 URL doiURL = new URL(doi.get().getURIAsASCIIString());
-
                 // BibTeX data
                 URLDownload download = getUrlDownload(doiURL);
                 download.addHeader("Accept", MediaTypes.APPLICATION_BIBTEX);
@@ -80,8 +79,11 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
                 try {
                     bibtexString = download.asString();
                 } catch (IOException e) {
-                    // an IOException will be thrown if download is unable to download from the doiURL
-                    throw new FetcherException(Localization.lang("No DOI data exists"), e);
+                    // an IOException with a nested FetcherException will be thrown when you encounter a 400x or 500x http status code
+                    if (e.getCause() instanceof FetcherException fe) {
+                        throw fe;
+                    }
+                    throw e;
                 }
 
                 // BibTeX entry

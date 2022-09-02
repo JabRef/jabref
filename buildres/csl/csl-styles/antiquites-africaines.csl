@@ -9,27 +9,26 @@
     <link href="https://journals.openedition.org/antafr/340" rel="documentation"/>
     <author>
       <name>Antonio Mendes da Silva</name>
-      <email>mendes@mmsh.univ-aix.fr</email>
+      <email>antonio.mendes@cnrs.fr</email>
     </author>
     <category citation-format="author-date"/>
     <category field="humanities"/>
     <category field="history"/>
     <issn>0066-4871</issn>
     <eissn>2117-539X</eissn>
-    <summary>Style conçu pour la revue Antiquités africaines. Histoire et archéologie de
-            l’Afrique du Nord, de la protohistoire à la conquête arabe &#8211; History and
-            archaeology of North Africa, from protohistory to the Arab conquests. Centre Camille
-            Jullian, CNRS</summary>
-    <updated>2020-05-04T12:23:43+00:00</updated>
+    <summary>Style conçu pour la revue Antiquités africaines. Histoire et archéologie de l’Afrique
+      du Nord, de la protohistoire à la conquête arabe &#8211; History and archaeology of North
+      Africa, from protohistory to the Arab conquests. Centre Camille Jullian, CNRS</summary>
+    <updated>2020-05-10T04:06:15+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="fr">
     <terms>
-      <term name="no date" form="short">[s.d.]</term>
+      <term name="no date" form="short">s.d.</term>
       <term name="et-al">et alii</term>
       <term name="editor" form="short">
-        <single>dir.</single>
-        <multiple>dirs.</multiple>
+        <single>éd.</single>
+        <multiple>éd.</multiple>
       </term>
     </terms>
   </locale>
@@ -105,7 +104,7 @@
         </names>
       </else-if>
       <else-if type="book">
-        <text variable="title-short"/>
+        <text variable="title-short" font-style="italic"/>
       </else-if>
       <else-if type="map">
         <text variable="title-short"/>
@@ -127,6 +126,14 @@
       </if>
       <else-if variable="editor">
         <names variable="editor" suffix=" ">
+          <name name-as-sort-order="all" and="text" initialize-with=". " delimiter-precedes-last="never" sort-separator=" ">
+            <name-part name="family" font-variant="small-caps"/>
+          </name>
+          <label form="short" prefix=" (" suffix=".)"/>
+        </names>
+      </else-if>
+      <else-if variable="editorial-director">
+        <names variable="editorial-director" suffix=" ">
           <name name-as-sort-order="all" and="text" initialize-with=". " delimiter-precedes-last="never" sort-separator=" ">
             <name-part name="family" font-variant="small-caps"/>
           </name>
@@ -274,7 +281,7 @@
           <choose>
             <if variable="issued">
               <text macro="volume" prefix=", "/>
-              <text variable="issue" prefix="&amp;#160;"/>
+              <text variable="issue" prefix="&#160;"/>
             </if>
             <else>
               <text macro="volume" prefix=", "/>
@@ -343,10 +350,9 @@
   <macro name="collection">
     <choose>
       <if type="motion_picture map entry-dictionary entry-encyclopedia book speech paper-conference chapter" match="any">
-        <group prefix=" (" suffix=")" delimiter=", ">
+        <group prefix=" (" suffix=")">
           <text variable="collection-title"/>
-          <text macro="volume"/>
-          <text variable="collection-number"/>
+          <text variable="collection-number" prefix=" "/>
         </group>
       </if>
       <else-if type="article-journal">
@@ -361,6 +367,7 @@
     <group suffix=", " prefix=" ">
       <choose>
         <if variable="issued">
+          <text macro="originally-published" suffix=" "/>
           <date variable="issued">
             <date-part name="year" form="long"/>
           </date>
@@ -382,6 +389,15 @@
         <text term="no date" form="short"/>
       </else>
     </choose>
+  </macro>
+  <macro name="originally-published">
+    <group delimiter=", " prefix=" [" suffix="]">
+      <date variable="original-date">
+        <date-part name="day" suffix=" "/>
+        <date-part name="month" suffix=" "/>
+        <date-part name="year"/>
+      </date>
+    </group>
   </macro>
   <macro name="page-bib">
     <choose>
@@ -444,7 +460,6 @@
     <group suffix=", ">
       <choose>
         <if is-numeric="volume">
-          <text term="volume" form="short" suffix=". "/>
           <text variable="volume"/>
           <text variable="number-of-volumes" prefix="/"/>
         </if>
@@ -465,19 +480,28 @@
       </names>
     </group>
   </macro>
-  <citation et-al-min="3" et-al-use-first="1" disambiguate-add-year-suffix="true" collapse="year" year-suffix-delimiter=", " after-collapse-delimiter="&amp;#160;; " name-delimiter=", " initialize-with=". " delimiter-precedes-last="never" name-as-sort-order="all" sort-separator=" ">
+  <macro name="archive">
+    <group suffix="." prefix=". ">
+      <group delimiter=", ">
+        <text variable="archive"/>
+        <text variable="archive_location"/>
+        <text variable="call-number"/>
+      </group>
+    </group>
+  </macro>
+  <citation et-al-min="3" et-al-use-first="1" disambiguate-add-year-suffix="true" collapse="year" year-suffix-delimiter=", " after-collapse-delimiter="&#160;; " name-delimiter=", " initialize-with=". " delimiter-precedes-last="never" name-as-sort-order="all" sort-separator=" ">
     <sort>
       <key variable="issued" sort="descending"/>
       <key macro="author-citation"/>
       <key macro="title"/>
     </sort>
-    <layout delimiter="&amp;#160;; ">
-      <group delimiter=",&amp;#160;">
+    <layout delimiter="&#160;; ">
+      <group delimiter=",&#160;">
         <group delimiter=" ">
           <text macro="author-citation"/>
           <text macro="year-date-short"/>
         </group>
-        <group delimiter="&amp;#160;">
+        <group delimiter="&#160;">
           <label variable="locator" form="short"/>
           <text variable="locator"/>
         </group>
@@ -501,6 +525,7 @@
         <text macro="place"/>
         <text macro="collection"/>
         <text macro="page-bib"/>
+        <text macro="archive"/>
       </group>
       <text variable="URL"/>
     </layout>

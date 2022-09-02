@@ -6,6 +6,8 @@ import java.util.Objects;
 import java.util.Optional;
 
 import org.jabref.logic.importer.FulltextFetcher;
+import org.jabref.logic.importer.ImporterPreferences;
+import org.jabref.logic.preferences.FetcherApiKey;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
@@ -22,7 +24,7 @@ import org.slf4j.LoggerFactory;
 /**
  * FulltextFetcher implementation that attempts to find a PDF URL at SpringerLink.
  * <p>
- * Uses Springer API, see @link{https://dev.springer.com}
+ * Uses Springer API, see <a href="https://dev.springer.com">https://dev.springer.com</a>
  */
 public class SpringerLink implements FulltextFetcher {
     private static final Logger LOGGER = LoggerFactory.getLogger(SpringerLink.class);
@@ -30,6 +32,23 @@ public class SpringerLink implements FulltextFetcher {
     private static final String API_URL = "https://api.springer.com/meta/v1/json";
     private static final String API_KEY = new BuildInfo().springerNatureAPIKey;
     private static final String CONTENT_HOST = "link.springer.com";
+    private static final String FETCHER_NAME = "Springer";
+
+    private final ImporterPreferences importerPreferences;
+
+    public SpringerLink(ImporterPreferences importerPreferences) {
+        this.importerPreferences = importerPreferences;
+    }
+
+    private String getApiKey() {
+        return importerPreferences.getApiKeys()
+                                  .stream()
+                                  .filter(key -> key.getName().equalsIgnoreCase(FETCHER_NAME))
+                                  .filter(FetcherApiKey::shouldUse)
+                                  .findFirst()
+                                  .map(FetcherApiKey::getKey)
+                                  .orElse(API_KEY);
+    }
 
     @Override
     public Optional<URL> findFullText(BibEntry entry) throws IOException {
@@ -38,13 +57,13 @@ public class SpringerLink implements FulltextFetcher {
         // Try unique DOI first
         Optional<DOI> doi = entry.getField(StandardField.DOI).flatMap(DOI::parse);
 
-        if (!doi.isPresent()) {
+        if (doi.isEmpty()) {
             return Optional.empty();
         }
         // Available in catalog?
         try {
             HttpResponse<JsonNode> jsonResponse = Unirest.get(API_URL)
-                                                         .queryString("api_key", API_KEY)
+                                                         .queryString("api_key", getApiKey())
                                                          .queryString("q", String.format("doi:%s", doi.get().getDOI()))
                                                          .asJson();
             if (jsonResponse.getBody() != null) {

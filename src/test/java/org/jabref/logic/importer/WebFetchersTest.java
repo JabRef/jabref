@@ -1,6 +1,5 @@
 package org.jabref.logic.importer;
 
-import java.nio.charset.Charset;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
@@ -11,9 +10,9 @@ import org.jabref.logic.importer.fetcher.AbstractIsbnFetcher;
 import org.jabref.logic.importer.fetcher.GoogleScholar;
 import org.jabref.logic.importer.fetcher.GrobidCitationFetcher;
 import org.jabref.logic.importer.fetcher.IsbnViaEbookDeFetcher;
-import org.jabref.logic.importer.fetcher.IsbnViaOttoBibFetcher;
 import org.jabref.logic.importer.fetcher.JstorFetcher;
 import org.jabref.logic.importer.fetcher.MrDLibFetcher;
+import org.jabref.logic.importer.fetcher.OpenLibraryFetcher;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.preferences.FilePreferences;
 
@@ -22,6 +21,7 @@ import io.github.classgraph.ClassInfoList;
 import io.github.classgraph.ScanResult;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
@@ -30,21 +30,22 @@ import static org.mockito.Mockito.when;
 class WebFetchersTest {
 
     private ImportFormatPreferences importFormatPreferences;
+    private ImporterPreferences importerPreferences;
     private final ClassGraph classGraph = new ClassGraph().enableAllInfo().acceptPackages("org.jabref");
 
     @BeforeEach
-    void setUp() throws Exception {
-        importFormatPreferences = mock(ImportFormatPreferences.class);
+    void setUp() {
+        importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        importerPreferences = mock(ImporterPreferences.class);
         FieldContentFormatterPreferences fieldContentFormatterPreferences = mock(FieldContentFormatterPreferences.class);
         when(importFormatPreferences.getFieldContentFormatterPreferences()).thenReturn(fieldContentFormatterPreferences);
     }
 
     @Test
-    void getIdBasedFetchersReturnsAllFetcherDerivingFromIdBasedFetcher() throws Exception {
-        Set<IdBasedFetcher> idFetchers = WebFetchers.getIdBasedFetchers(importFormatPreferences);
+    void getIdBasedFetchersReturnsAllFetcherDerivingFromIdBasedFetcher() {
+        Set<IdBasedFetcher> idFetchers = WebFetchers.getIdBasedFetchers(importFormatPreferences, importerPreferences);
 
         try (ScanResult scanResult = classGraph.scan()) {
-
             ClassInfoList controlClasses = scanResult.getClassesImplementing(IdBasedFetcher.class.getCanonicalName());
             Set<Class<?>> expected = new HashSet<>(controlClasses.loadClasses());
 
@@ -52,8 +53,8 @@ class WebFetchersTest {
             expected.remove(IdBasedParserFetcher.class);
 
             // Remove special ISBN fetcher since we don't want to expose them to the user
+            expected.remove(OpenLibraryFetcher.class);
             expected.remove(IsbnViaEbookDeFetcher.class);
-            expected.remove(IsbnViaOttoBibFetcher.class);
 
             // Remove the following, because they don't work at the moment
             expected.remove(JstorFetcher.class);
@@ -64,8 +65,12 @@ class WebFetchersTest {
     }
 
     @Test
-    void getEntryBasedFetchersReturnsAllFetcherDerivingFromEntryBasedFetcher() throws Exception {
-        Set<EntryBasedFetcher> idFetchers = WebFetchers.getEntryBasedFetchers(mock(ImporterPreferences.class), importFormatPreferences, mock(FilePreferences.class), mock(BibDatabaseContext.class), Charset.defaultCharset());
+    void getEntryBasedFetchersReturnsAllFetcherDerivingFromEntryBasedFetcher() {
+        Set<EntryBasedFetcher> idFetchers = WebFetchers.getEntryBasedFetchers(
+                mock(ImporterPreferences.class),
+                importFormatPreferences,
+                mock(FilePreferences.class),
+                mock(BibDatabaseContext.class));
 
         try (ScanResult scanResult = classGraph.scan()) {
             ClassInfoList controlClasses = scanResult.getClassesImplementing(EntryBasedFetcher.class.getCanonicalName());
@@ -78,8 +83,8 @@ class WebFetchersTest {
     }
 
     @Test
-    void getSearchBasedFetchersReturnsAllFetcherDerivingFromSearchBasedFetcher() throws Exception {
-        Set<SearchBasedFetcher> searchBasedFetchers = WebFetchers.getSearchBasedFetchers(importFormatPreferences);
+    void getSearchBasedFetchersReturnsAllFetcherDerivingFromSearchBasedFetcher() {
+        Set<SearchBasedFetcher> searchBasedFetchers = WebFetchers.getSearchBasedFetchers(importFormatPreferences, importerPreferences);
         try (ScanResult scanResult = classGraph.scan()) {
             ClassInfoList controlClasses = scanResult.getClassesImplementing(SearchBasedFetcher.class.getCanonicalName());
             Set<Class<?>> expected = new HashSet<>(controlClasses.loadClasses());
@@ -102,8 +107,8 @@ class WebFetchersTest {
     }
 
     @Test
-    void getFullTextFetchersReturnsAllFetcherDerivingFromFullTextFetcher() throws Exception {
-        Set<FulltextFetcher> fullTextFetchers = WebFetchers.getFullTextFetchers(importFormatPreferences);
+    void getFullTextFetchersReturnsAllFetcherDerivingFromFullTextFetcher() {
+        Set<FulltextFetcher> fullTextFetchers = WebFetchers.getFullTextFetchers(importFormatPreferences, importerPreferences);
 
         try (ScanResult scanResult = classGraph.scan()) {
             ClassInfoList controlClasses = scanResult.getClassesImplementing(FulltextFetcher.class.getCanonicalName());
@@ -118,7 +123,7 @@ class WebFetchersTest {
     }
 
     @Test
-    void getIdFetchersReturnsAllFetcherDerivingFromIdFetcher() throws Exception {
+    void getIdFetchersReturnsAllFetcherDerivingFromIdFetcher() {
         Set<IdFetcher<?>> idFetchers = WebFetchers.getIdFetchers(importFormatPreferences);
 
         try (ScanResult scanResult = classGraph.scan()) {

@@ -4,21 +4,27 @@ on:
   workflow_dispatch:
     # Allow to run manually
 
+permissions:
+  contents: read
+
 jobs:
   publish:
+    permissions:
+      contents: write  # for peter-evans/create-pull-request to create branch
+      pull-requests: write  # for peter-evans/create-pull-request to create a PR
     name: Refresh Journal List Files
     runs-on: ubuntu-latest
     steps:
       - name: Fetch all history for all tags and branches
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           ref: main
           persist-credentials: false
           fetch-depth: 0
       - name: Set up JDK
-        uses: actions/setup-java@v2
+        uses: actions/setup-java@v3
         with:
-          java-version: 17
+          java-version: 18
           distribution: 'temurin'
           cache: 'gradle'
       - name: Update journal lists
@@ -46,7 +52,7 @@ jobs:
           # create .mv file
           cd $GITHUB_WORKSPACE
           ./gradlew generateJournalAbbreviationList
-      - uses: peter-evans/create-pull-request@v3
+      - uses: peter-evans/create-pull-request@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           branch: update-journallist

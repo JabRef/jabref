@@ -74,7 +74,6 @@ public class IsiImporter extends Importer {
         String str;
         int i = 0;
         while (((str = reader.readLine()) != null) && (i < 50)) {
-
             /*
              * The following line gives false positives for RIS files, so it
              * should not be uncommented. The hypen is a characteristic of the
@@ -92,17 +91,14 @@ public class IsiImporter extends Importer {
     }
 
     public static void processSubSup(Map<Field, String> map) {
-
         Field[] subsup = {StandardField.TITLE, StandardField.ABSTRACT, StandardField.REVIEW, new UnknownField("notes")};
 
         for (Field aSubsup : subsup) {
             if (map.containsKey(aSubsup)) {
-
                 Matcher m = IsiImporter.SUB_SUP_PATTERN.matcher(map.get(aSubsup));
                 StringBuilder sb = new StringBuilder();
 
                 while (m.find()) {
-
                     String group2 = m.group(2);
                     group2 = group2.replaceAll("\\$", "\\\\\\\\\\\\\\$"); // Escaping
                     // insanity!
@@ -123,13 +119,10 @@ public class IsiImporter extends Importer {
     }
 
     private static void processCapitalization(Map<Field, String> map) {
-
         Field[] subsup = {StandardField.TITLE, StandardField.JOURNAL, StandardField.PUBLISHER};
 
         for (Field aSubsup : subsup) {
-
             if (map.containsKey(aSubsup)) {
-
                 String s = map.get(aSubsup);
                 if (s.toUpperCase(Locale.ROOT).equals(s)) {
                     s = new TitleCaseFormatter().format(s);
@@ -288,7 +281,7 @@ public class IsiImporter extends Importer {
                     if ("ER".equals(beg) || "EF".equals(beg) || "VR".equals(beg) || "FN".equals(beg)) {
                         continue;
                     }
-                    hm.put(FieldFactory.parseField(beg), value);
+                    hm.put(FieldFactory.parseField(type, beg), value);
                 }
             }
 
@@ -364,7 +357,6 @@ public class IsiImporter extends Importer {
      * Fixed bug from: http://sourceforge.net/tracker/index.php?func=detail&aid=1542552&group_id=92314&atid=600306
      */
     public static String isiAuthorConvert(String author) {
-
         String[] s = author.split(",");
         if (s.length != 2) {
             return author;
@@ -380,7 +372,6 @@ public class IsiImporter extends Importer {
         String[] firstParts = first.split("\\s+");
 
         for (int i = 0; i < firstParts.length; i++) {
-
             first = firstParts[i];
 
             // Do we have only uppercase chars?
@@ -404,7 +395,6 @@ public class IsiImporter extends Importer {
     }
 
     private static String[] isiAuthorsConvert(String[] authors) {
-
         String[] result = new String[authors.length];
         for (int i = 0; i < result.length; i++) {
             result[i] = IsiImporter.isiAuthorConvert(authors[i]);

@@ -104,7 +104,6 @@ class BibDatabaseDiffTest {
         assertNull(diff.getEntryDifferences().get(0).getNewEntry(), "newEntry is not null");
         assertEquals(entryTwo, diff.getEntryDifferences().get(1).getNewEntry(), "there is another value as newEntry");
         assertNull(diff.getEntryDifferences().get(1).getOriginalEntry(), "originalEntry is not null");
-
     }
 
     @Test

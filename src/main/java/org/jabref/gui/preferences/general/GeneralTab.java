@@ -1,7 +1,5 @@
 package org.jabref.gui.preferences.general;
 
-import java.nio.charset.Charset;
-
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
@@ -28,7 +26,6 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> i
 
     private final ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
     @FXML private ComboBox<Language> language;
-    @FXML private ComboBox<Charset> defaultEncoding;
     @FXML private ComboBox<BibDatabaseMode> biblatexMode;
     @FXML private CheckBox inspectionWarningDuplicate;
     @FXML private CheckBox confirmDelete;
@@ -62,12 +59,6 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> i
         language.itemsProperty().bind(viewModel.languagesListProperty());
         language.valueProperty().bindBidirectional(viewModel.selectedLanguageProperty());
 
-        new ViewModelListCellFactory<Charset>()
-                .withText(Charset::displayName)
-                .install(defaultEncoding);
-        defaultEncoding.itemsProperty().bind(viewModel.encodingsListProperty());
-        defaultEncoding.valueProperty().bindBidirectional(viewModel.selectedEncodingProperty());
-
         new ViewModelListCellFactory<BibDatabaseMode>()
                 .withText(BibDatabaseMode::getFormattedName)
                 .install(biblatexMode);
@@ -90,7 +81,7 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> i
         addModificationDate.selectedProperty().bindBidirectional(viewModel.addModificationDateProperty());
 
         ActionFactory actionFactory = new ActionFactory(Globals.getKeyPrefs());
-        actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.OWNER), markOwnerHelp);
+        actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.OWNER, dialogService), markOwnerHelp);
 
         validationVisualizer.setDecoration(new IconValidationDecorator());
     }

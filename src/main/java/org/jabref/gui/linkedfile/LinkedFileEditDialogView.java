@@ -11,8 +11,9 @@ import javafx.scene.control.TextField;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.externalfiletype.ExternalFileType;
-import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.util.BaseDialog;
+import org.jabref.gui.util.ViewModelListCellFactory;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.preferences.PreferencesService;
 
@@ -32,17 +33,17 @@ public class LinkedFileEditDialogView extends BaseDialog<LinkedFile> {
     private LinkedFilesEditDialogViewModel viewModel;
 
     private final LinkedFile linkedFile;
-    private final ExternalFileTypes externalFileTypes;
 
     public LinkedFileEditDialogView(LinkedFile linkedFile) {
         this.linkedFile = linkedFile;
 
-        this.externalFileTypes = ExternalFileTypes.getInstance();
         ViewLoader.view(this)
                   .load()
                   .setAsContent(this.getDialogPane());
 
         this.getDialogPane().getButtonTypes().addAll(ButtonType.APPLY, ButtonType.CANCEL);
+        this.setResizable(false);
+        this.setTitle(Localization.lang("Edit file link"));
 
         this.setResultConverter(button -> {
             if (button == ButtonType.APPLY) {
@@ -55,9 +56,13 @@ public class LinkedFileEditDialogView extends BaseDialog<LinkedFile> {
 
     @FXML
     private void initialize() {
-
-        viewModel = new LinkedFilesEditDialogViewModel(linkedFile, stateManager.getActiveDatabase().get(), dialogService, preferences.getFilePreferences(), externalFileTypes);
+        viewModel = new LinkedFilesEditDialogViewModel(linkedFile, stateManager.getActiveDatabase().get(), dialogService, preferences.getFilePreferences());
         fileType.itemsProperty().bindBidirectional(viewModel.externalFileTypeProperty());
+        new ViewModelListCellFactory<ExternalFileType>()
+                .withIcon(ExternalFileType::getIcon)
+                .withText(ExternalFileType::getName)
+                .install(fileType);
+
         description.textProperty().bindBidirectional(viewModel.descriptionProperty());
         link.textProperty().bindBidirectional(viewModel.linkProperty());
         fileType.valueProperty().bindBidirectional(viewModel.selectedExternalFileTypeProperty());

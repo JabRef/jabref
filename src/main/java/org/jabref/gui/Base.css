@@ -1,4 +1,13 @@
+
+
 .root {
+    -jr-row-odd-background: -fx-control-inner-background-alt;
+    -jr-row-even-background: -fx-control-inner-background;
+    /*
+    On light theme, the text is hard to see when it's on top of the accent color. This is an alternative lighter accent color
+    for better text visibility.
+    */
+    -jr-accent-alt: derive(-jr-accent, 15%);
 
     /*
     The theme color and some derived colors from it are used for icons, tab-headers, marking of selected inputs and
@@ -9,6 +18,7 @@
     /* This theme is the original JabRef dark blue color */
     -jr-theme: #50618F;
     -jr-accent: #a3b7e6;
+    -jr-transparent-accent: rgba(163, 183, 230, 0.16);
     -jr-selected: -jr-accent;
     -jr-checked: -jr-theme;
     -jr-hover: #0002;
@@ -97,6 +107,9 @@
     /* For drag and drop actions */
     -jr-drag-target: -jr-purple;
     -jr-drag-target-hover: derive(-jr-purple, 80%);
+
+    -js-summary-text-color: #000000;
+    -js-summary-text-color-selected: #000000;
 
     /*
      Here are redefinitions of the default properties of modena. They should in principle all be derived from the
@@ -241,6 +254,23 @@
     /* Consistent size for headers of tab-pane and side-panels*/
     -jr-header-height: 3em;
 }
+
+.unchanged {
+    -rtfx-background-color:#0000;
+}
+
+.updated {
+    -rtfx-background-color: rgba(41, 166, 236, 0.66);
+}
+
+.addition {
+    -rtfx-background-color: rgba(29, 209, 161, 0.5);
+}
+
+.deletion {
+    -rtfx-background-color: rgba(255, 107, 107, 0.55);
+}
+
 
 #frame {
     -fx-background-color: -jr-background-alt;
@@ -413,7 +443,7 @@ TextFlow > .tooltip-text-monospaced {
 }
 
 .progress-indicatorToolbar .percentage {
-    -fx-fill:null;
+    -fx-fill: null;
 }
 
 .check-box {
@@ -604,6 +634,27 @@ TextFlow > .tooltip-text-monospaced {
     -fx-background-insets: 0;
 }
 
+.merge-field-value .action-icon {
+    -fx-blend-mode: multiply;
+    -fx-opacity: 69%;
+    -fx-icon-size: 14;
+    -fx-icon-color: -fx-text-background-color;
+}
+
+.merge-field-value:disabled .action-icon {
+    -fx-opacity: 0%;
+}
+
+.merge-header-cell {
+    -fx-border-width: 0 0 1 0;
+    -fx-border-color: -jr-gray-1;
+    -fx-background-color: -jr-row-even-background;
+}
+
+.merge-header {
+    -fx-background-color: -jr-row-even-background;
+}
+
 .table-view .groupColumnBackground {
     -fx-stroke: -jr-gray-2;
 }
@@ -650,11 +701,11 @@ TextFlow > .tooltip-text-monospaced {
     -fx-background-color: -jr-warn;
 }
 
-.file-row-text{
+.file-row-text {
     -fx-fill: -jr-search-text;
 }
 
-.file-row-text:opacity{
+.file-row-text:opacity {
     -fx-fill: derive(-jr-search-text, 70%);
 }
 
@@ -706,9 +757,9 @@ TextFlow > .tooltip-text-monospaced {
     -fx-padding: 0;
 }
 
-.accordion .titled-pane  {
-   -fx-skin: "org.jabref.gui.util.CustomTitledPaneSkin";
-   -fx-arrow-side: right;
+.accordion .titled-pane {
+    -fx-skin: "org.jabref.gui.util.CustomTitledPaneSkin";
+    -fx-arrow-side: right;
 }
 
 .accordion .titled-pane .title {
@@ -1100,15 +1151,40 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-background-color: -jr-sidepane-background;
 }
 
-.jfx-snackbar-content {
+.notification-bar > .pane {
     -fx-background-color: -jr-gray-3;
     -fx-background-radius: 4px;
-    -fx-padding: 0ex 0ex 0ex 0ex;
 }
 
-.jfx-snackbar-toast {
-    -fx-text-fill: -fx-light-text-color;
-    -fx-padding: -1ex -0.5ex -1ex -0.5ex;
+.notification-bar > .pane > .title,
+.notification-bar > .pane > .label,
+.notification-bar > .pane > .button-bar > .container > .action {
+    -fx-text-fill: -jr-base;
+    -fx-padding: 1ex 1ex 1ex 1ex;
+}
+
+.notification-bar > .pane {
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.3), 9, 0, 0, 2);
+    -fx-padding: 6px 7px 6px 32px;
+    -fx-background-radius: 0px;
+    -fx-border-radius: 0px;
+}
+
+.notification-bar > .pane > .button-bar > .container {
+    -fx-padding: 0px 24px 0px 0px;
+}
+
+.notification-bar > .pane > .label {
+    -fx-graphic-text-gap: 8px;
+}
+
+.notification-pane .notification-bar > .pane .close-button > .graphic {
+    -fx-background-color: -jr-base;
+}
+
+.notification-bar > .pane > .label > .ikonli-font-icon {
+    -fx-icon-size: 16px;
+    -fx-icon-color: -jr-base;
 }
 
 .progress-bar > .bar {
@@ -1270,10 +1346,23 @@ TextFlow * {
     -fx-fill: -fx-mid-text-color;
 }
 
-.fontsizeSpinner{
+.fontsizeSpinner {
     -fx-pref-width: 5em;
 }
 
 .text-field:invalid {
     -fx-background-color: rgba(240, 128, 128, 0.5);
+}
+
+.rating {
+    -fx-skin: "org.jabref.gui.util.CustomRatingSkin";
+    -fx-padding: 0.5em 0px 0px 0px;
+}
+
+.rating > .container > .button {
+    -fx-icon-color: derive(-fx-text-base-color, 85%);
+}
+
+.rating > .container > .button.strong {
+    -fx-icon-color: -fx-text-base-color;
 }

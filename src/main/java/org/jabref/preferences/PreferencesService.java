@@ -3,7 +3,6 @@ package org.jabref.preferences;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.prefs.BackingStoreException;
 
@@ -26,7 +25,7 @@ import org.jabref.logic.exporter.SavePreferences;
 import org.jabref.logic.exporter.TemplateExporter;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ImporterPreferences;
-import org.jabref.logic.importer.fileformat.CustomImporter;
+import org.jabref.logic.importer.fetcher.GrobidPreferences;
 import org.jabref.logic.journals.JournalAbbreviationPreferences;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Language;
@@ -34,6 +33,7 @@ import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.layout.format.FileLinkPreferences;
 import org.jabref.logic.layout.format.NameFormatterPreferences;
 import org.jabref.logic.net.ProxyPreferences;
+import org.jabref.logic.net.ssl.SSLPreferences;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
 import org.jabref.logic.preferences.DOIPreferences;
 import org.jabref.logic.preferences.OwnerPreferences;
@@ -155,6 +155,8 @@ public interface PreferencesService {
 
     ProxyPreferences getProxyPreferences();
 
+    SSLPreferences getSSLPreferences();
+
     //*************************************************************************************************************
     // CitationKeyPatternPreferences
     //*************************************************************************************************************
@@ -231,11 +233,9 @@ public interface PreferencesService {
 
     void storeCustomExportFormats(List<TemplateExporter> exporters);
 
-    Set<CustomImporter> getCustomImportFormats();
-
-    void storeCustomImportFormats(Set<CustomImporter> customImporters);
-
     ImporterPreferences getImporterPreferences();
+
+    GrobidPreferences getGrobidPreferences();
 
     //*************************************************************************************************************
     // Preview preferences
@@ -275,12 +275,7 @@ public interface PreferencesService {
 
     void storeLastPreferencesExportPath(Path exportFile);
 
-    Optional<String> getExternalFileTypes();
-
-    void storeExternalFileTypes(String externalFileTypes);
-
     MrDlibPreferences getMrDlibPreferences();
 
     ProtectedTermsPreferences getProtectedTermsPreferences();
-
 }

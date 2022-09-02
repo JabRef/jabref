@@ -13,6 +13,7 @@ import org.jabref.model.entry.field.FieldPriority;
 import org.jabref.model.entry.field.OrFields;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
+import org.jabref.model.entry.types.BiblatexAPAEntryTypeDefinitions;
 import org.jabref.model.entry.types.BiblatexEntryTypeDefinitions;
 import org.jabref.model.entry.types.BiblatexSoftwareEntryTypeDefinitions;
 import org.jabref.model.entry.types.BibtexEntryTypeDefinitions;
@@ -74,6 +75,7 @@ class BibEntryTypesManagerTest {
     void allTypesBiblatexAreCorrect() {
         TreeSet<BibEntryType> defaultTypes = new TreeSet<>(BiblatexEntryTypeDefinitions.ALL);
         defaultTypes.addAll(BiblatexSoftwareEntryTypeDefinitions.ALL);
+        defaultTypes.addAll(BiblatexAPAEntryTypeDefinitions.ALL);
 
         assertEquals(defaultTypes, entryTypesManager.getAllTypes(BibDatabaseMode.BIBLATEX));
     }
@@ -162,7 +164,6 @@ class BibEntryTypesManagerTest {
     @ParameterizedTest
     @MethodSource("mode")
     void testsModifyingArticle(BibDatabaseMode mode) {
-
         overwrittenStandardType = new BibEntryType(
                                                    StandardEntryType.Article,
                                                    List.of(new BibField(StandardField.TITLE, FieldPriority.IMPORTANT),
@@ -172,13 +173,12 @@ class BibEntryTypesManagerTest {
                                                    Collections.emptySet());
 
         entryTypesManager.addCustomOrModifiedType(overwrittenStandardType, mode);
-        assertEquals(Collections.singletonList(overwrittenStandardType), entryTypesManager.getAllTypes(mode).stream().filter(t->t.getType().getName().equals("article")).collect(Collectors.toList()));
+        assertEquals(Collections.singletonList(overwrittenStandardType), entryTypesManager.getAllTypes(mode).stream().filter(t -> t.getType().getName().equals("article")).collect(Collectors.toList()));
     }
 
     @ParameterizedTest
     @MethodSource("mode")
     void testsModifyingArticleWithParsing(BibDatabaseMode mode) {
-
         overwrittenStandardType = new BibEntryType(
                                                    StandardEntryType.Article,
                                                    List.of(new BibField(StandardField.TITLE, FieldPriority.IMPORTANT),
@@ -197,7 +197,6 @@ class BibEntryTypesManagerTest {
     @ParameterizedTest
     @MethodSource("mode")
     void testsModifyingArticleWithParsingKeepsListOrder(BibDatabaseMode mode) {
-
         overwrittenStandardType = new BibEntryType(
                                                    StandardEntryType.Article,
                                                    List.of(new BibField(StandardField.TITLE, FieldPriority.IMPORTANT),

@@ -112,21 +112,27 @@ public class GroupTreeView extends BorderPane {
 
         mainColumn = new TreeTableColumn<>();
         mainColumn.setId("mainColumn");
+        mainColumn.setResizable(true);
         numberColumn = new TreeTableColumn<>();
         numberColumn.getStyleClass().add("numberColumn");
-        numberColumn.setMinWidth(50d);
-        numberColumn.setMaxWidth(70d);
-        numberColumn.setPrefWidth(60d);
+        numberColumn.setMinWidth(40d);
+        numberColumn.setMaxWidth(40d);
+        numberColumn.setPrefWidth(40d);
+        numberColumn.setResizable(false);
         expansionNodeColumn = new TreeTableColumn<>();
         expansionNodeColumn.getStyleClass().add("expansionNodeColumn");
-        expansionNodeColumn.setMaxWidth(25d);
-        expansionNodeColumn.setMinWidth(25d);
+        expansionNodeColumn.setMaxWidth(20d);
+        expansionNodeColumn.setMinWidth(20d);
+        expansionNodeColumn.setPrefWidth(20d);
+        expansionNodeColumn.setResizable(false);
 
         groupTree = new TreeTableView<>();
         groupTree.setId("groupTree");
         groupTree.setColumnResizePolicy(TreeTableView.CONSTRAINED_RESIZE_POLICY);
         groupTree.getColumns().addAll(List.of(mainColumn, numberColumn, expansionNodeColumn));
         this.setCenter(groupTree);
+
+        mainColumn.prefWidthProperty().bind(groupTree.widthProperty().subtract(60d).subtract(15));
 
         addNewGroup = new Button(Localization.lang("Add group"));
         addNewGroup.setId("addNewGroup");
@@ -263,6 +269,10 @@ public class GroupTreeView extends BorderPane {
                 if (event.getButton() == MouseButton.SECONDARY) {
                     // Prevent right-click to select group
                     event.consume();
+                } else if (event.getTarget() instanceof StackPane pane) {
+                    if (pane.getStyleClass().contains("arrow") || pane.getStyleClass().contains("tree-disclosure-node")) {
+                        event.consume();
+                    }
                 }
             });
 
@@ -392,7 +402,6 @@ public class GroupTreeView extends BorderPane {
     }
 
     private ContextMenu createContextMenuForGroup(GroupNodeViewModel group) {
-
         ContextMenu menu = new ContextMenu();
         Menu removeGroup = new Menu(Localization.lang("Remove group"));
 

@@ -6,11 +6,13 @@ import java.io.InputStream;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 
+import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.preferences.FilePreferences;
 
@@ -22,8 +24,31 @@ import org.apache.tika.mime.MediaType;
 import org.apache.tika.mime.MimeType;
 import org.apache.tika.mime.MimeTypeException;
 import org.apache.tika.parser.AutoDetectParser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+/**
+ * @deprecated Please use {@link FileUtil}
+ */
+@Deprecated
 public class FileHelper {
+    /**
+     * MUST ALWAYS BE A SORTED ARRAY because it is used in a binary search
+     */
+    // @formatter:off
+    private static final int[] ILLEGAL_CHARS = {
+            0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
+            10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
+            20, 21, 22, 23, 24, 25, 26, 27, 28, 29,
+            30, 31, 34,
+            42,
+            58,
+            60, 62, 63,
+            123, 124, 125
+    };
+    // @formatter:on
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(FileHelper.class);
 
     /**
      * Returns the extension of a file or Optional.empty() if the file does not have one (no . in name).
@@ -106,15 +131,38 @@ public class FileHelper {
     }
 
     /**
+     * Detect illegal characters in given filename.
+     *
+     * @param fileName the fileName to detect
+     * @return Boolean whether there is a illegal name.
+     */
+    public static boolean detectBadFileName(String fileName) {
+        for (int i = 0; i < fileName.length(); i++) {
+            char c = fileName.charAt(i);
+            if (!isCharLegal(c)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static boolean isCharLegal(char c) {
+        return Arrays.binarySearch(ILLEGAL_CHARS, c) < 0;
+    }
+
+    /**
      * Converts a relative filename to an absolute one, if necessary. Returns
      * an empty optional if the file does not exist.
      */
     public static Optional<Path> find(String fileName, Path directory) {
         Objects.requireNonNull(fileName);
         Objects.requireNonNull(directory);
-
         // Explicitly check for an empty String, as File.exists returns true on that empty path, because it maps to the default jar location
         // if we then call toAbsoluteDir, it would always return the jar-location folder. This is not what we want here
+        if (detectBadFileName(fileName)) {
+            LOGGER.error("Invalid characters in path for file {} ", fileName);
+            return Optional.empty();
+        }
         if (fileName.isEmpty()) {
             return Optional.of(directory);
         }

@@ -12,30 +12,35 @@ import java.util.stream.Collectors;
 import org.jabref.model.openoffice.style.CitationType;
 
 /**
- *  How and what is encoded in reference mark names under JabRef 5.2.
- *
- *  - pageInfo does not appear here. It is not encoded in the mark name.
+ * How and what is encoded in reference mark names under JabRef 5.2.
+ * <p>
+ * - pageInfo does not appear here. It is not encoded in the mark name.
  */
 class Codec52 {
     private static final String BIB_CITATION = "JR_cite";
     private static final Pattern CITE_PATTERN =
-        // Pattern.compile(BIB_CITATION + "(\\d*)_(\\d*)_(.*)");
-        // citationType is always "1" "2" or "3"
-        Pattern.compile(BIB_CITATION + "(\\d*)_([123])_(.*)");
+            // Pattern.compile(BIB_CITATION + "(\\d*)_(\\d*)_(.*)");
+            // citationType is always "1" "2" or "3"
+            Pattern.compile(BIB_CITATION + "(\\d*)_([123])_(.*)");
 
     private Codec52() {
-        /**/
     }
 
     /**
      * This is what we get back from parsing a refMarkName.
      */
     public static class ParsedMarkName {
-        /**  "", "0", "1" ... */
+        /**
+         * "", "0", "1" ...
+         */
         public final String index;
-        /** in-text-citation type */
+        /**
+         * in-text-citation type
+         */
         public final CitationType citationType;
-        /** Citation keys embedded in the reference mark. */
+        /**
+         * Citation keys embedded in the reference mark.
+         */
         public final List<String> citationKeys;
 
         ParsedMarkName(String index, CitationType citationType, List<String> citationKeys) {
@@ -64,21 +69,19 @@ class Codec52 {
             case AUTHORYEAR_PAR -> 1;
             case AUTHORYEAR_INTEXT -> 2;
             case INVISIBLE_CIT -> 3;
-            default -> throw new IllegalArgumentException("Invalid CitationType");
         };
     }
 
     /**
-     * Produce a reference mark name for JabRef for the given citationType and list citation keys that
-     * does not yet appear among the reference marks of the document.
+     * Produce a reference mark name for JabRef for the given citationType and list citation keys that does not yet appear among the reference marks of the document.
      *
      * @param usedNames    Reference mark names already in use.
      * @param citationKeys Identifies the cited sources.
      * @param citationType Encodes the effect of withText and inParenthesis options.
-     *
-     * The first occurrence of citationKeys gets no serial number, the second gets 0, the third 1 ...
-     *
-     * Or the first unused in this series, after removals.
+     *                     <p>
+     *                     The first occurrence of citationKeys gets no serial number, the second gets 0, the third 1 ...
+     *                     <p>
+     *                     Or the first unused in this series, after removals.
      */
     public static String getUniqueMarkName(Set<String> usedNames,
                                            List<String> citationKeys,
@@ -100,10 +103,8 @@ class Codec52 {
      * Parse a JabRef (reference) mark name.
      *
      * @return Optional.empty() on failure.
-     *
      */
     public static Optional<ParsedMarkName> parseMarkName(String refMarkName) {
-
         Matcher citeMatcher = CITE_PATTERN.matcher(refMarkName);
         if (!citeMatcher.find()) {
             return Optional.empty();
@@ -117,8 +118,7 @@ class Codec52 {
     }
 
     /**
-     * @return true if name matches the pattern used for JabRef
-     * reference mark names.
+     * @return true if name matches the pattern used for JabRef reference mark names.
      */
     public static boolean isJabRefReferenceMarkName(String name) {
         return (CITE_PATTERN.matcher(name).find());

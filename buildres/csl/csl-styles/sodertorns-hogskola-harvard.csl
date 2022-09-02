@@ -118,7 +118,7 @@
               <date variable="accessed" delimiter="-">
                 <date-part name="year"/>
                 <date-part name="month" form="numeric-leading-zeros" strip-periods="true"/>
-                <date-part name="day"/>
+                <date-part name="day" form="numeric-leading-zeros"/>
               </date>
             </group>
           </if>

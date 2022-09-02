@@ -10,27 +10,36 @@ import org.jabref.model.openoffice.util.OOPair;
 
 public class Citation implements ComparableCitation, CitationMarkerEntry, CitationMarkerNumericEntry {
 
-    /** key in database */
+    /**
+     * key in database
+     */
     public final String citationKey;
 
-    /** Result from database lookup. Optional.empty() if not found. */
+    /**
+     * Result from database lookup. Optional.empty() if not found.
+     */
     private Optional<CitationLookupResult> db;
 
-    /** The number used for numbered citation styles . */
+    /**
+     * The number used for numbered citation styles .
+     */
     private Optional<Integer> number;
 
-    /** Letter that makes the in-text citation unique. */
+    /**
+     * Letter that makes the in-text citation unique.
+     */
     private Optional<String> uniqueLetter;
 
-    /** pageInfo */
+    /**
+     * pageInfo
+     */
     private Optional<OOText> pageInfo;
 
-    /** isFirstAppearanceOfSource */
+    /**
+     * isFirstAppearanceOfSource
+     */
     private boolean isFirstAppearanceOfSource;
 
-    /**
-     *
-     */
     public Citation(String citationKey) {
         this.citationKey = citationKey;
         this.db = Optional.empty();
@@ -57,9 +66,7 @@ public class Citation implements ComparableCitation, CitationMarkerEntry, Citati
 
     @Override
     public Optional<BibEntry> getBibEntry() {
-        return (db.isPresent()
-                ? Optional.of(db.get().entry)
-                : Optional.empty());
+        return db.map(citationLookupResult -> citationLookupResult.entry);
     }
 
     public static Optional<CitationLookupResult> lookup(BibDatabase database, String key) {
@@ -70,10 +77,10 @@ public class Citation implements ComparableCitation, CitationMarkerEntry, Citati
 
     public static Optional<CitationLookupResult> lookup(List<BibDatabase> databases, String key) {
         return (databases.stream()
-                .map(database -> Citation.lookup(database, key))
-                .filter(Optional::isPresent)
-                .map(Optional::get)
-                .findFirst());
+                         .map(database -> Citation.lookup(database, key))
+                         .filter(Optional::isPresent)
+                         .map(Optional::get)
+                         .findFirst());
     }
 
     public void lookupInDatabases(List<BibDatabase> databases) {
@@ -129,18 +136,17 @@ public class Citation implements ComparableCitation, CitationMarkerEntry, Citati
      * Setters for CitationGroups.distribute()
      */
     public static void setLookupResult(OOPair<Citation, Optional<CitationLookupResult>> pair) {
-        Citation cit = pair.a;
-        cit.db = pair.b;
+        Citation citation = pair.a;
+        citation.db = pair.b;
     }
 
     public static void setNumber(OOPair<Citation, Optional<Integer>> pair) {
-        Citation cit = pair.a;
-        cit.number = pair.b;
+        Citation citation = pair.a;
+        citation.number = pair.b;
     }
 
     public static void setUniqueLetter(OOPair<Citation, Optional<String>> pair) {
-        Citation cit = pair.a;
-        cit.uniqueLetter = pair.b;
+        Citation citation = pair.a;
+        citation.uniqueLetter = pair.b;
     }
-
 }

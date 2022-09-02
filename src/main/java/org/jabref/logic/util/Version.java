@@ -23,11 +23,10 @@ import org.slf4j.LoggerFactory;
 public class Version {
 
     public static final String JABREF_DOWNLOAD_URL = "https://downloads.jabref.org";
-    private static final Logger LOGGER = LoggerFactory.getLogger(Version.class);
 
     private static final Version UNKNOWN_VERSION = new Version();
 
-    private final static Pattern VERSION_PATTERN = Pattern.compile("(?<major>\\d+)(\\.(?<minor>\\d+))?(\\.(?<patch>\\d+))?(?<stage>-alpha|-beta)?(?<dev>-?dev)?.*");
+    private final static Pattern VERSION_PATTERN = Pattern.compile("(?<major>\\d+)(\\.(?<minor>\\d+))?(\\.(?<patch>\\d+))?(?<stage>-alpha|-beta)?(?<num>\\d+)?(?<dev>-?dev)?.*");
     private final static Pattern CI_SUFFIX_PATTERN = Pattern.compile("-ci\\.\\d+");
 
     private static final String JABREF_GITHUB_RELEASES = "https://api.github.com/repos/JabRef/JabRef/releases";
@@ -37,12 +36,21 @@ public class Version {
     private int minor = -1;
     private int patch = -1;
     private DevelopmentStage developmentStage = DevelopmentStage.UNKNOWN;
+    private int developmentNum = -1;
     private boolean isDevelopmentVersion;
 
     /**
      * Dummy constructor to create a local object (and  {@link Version#UNKNOWN_VERSION})
      */
     private Version() {
+    }
+
+    /**
+     * Tinylog does not allow for altering existing loging configuraitons after the logger was initialized .
+     * Lazy initialization to enable tinylog writing to a file (and also still enabling loggin in this class)
+     */
+    private static Logger getLogger() {
+        return LoggerFactory.getLogger(Version.class);
     }
 
     /**
@@ -75,16 +83,20 @@ public class Version {
 
                 String versionStageString = matcher.group("stage");
                 parsedVersion.developmentStage = versionStageString == null ? DevelopmentStage.STABLE : DevelopmentStage.parse(versionStageString);
+
+                String stageNumString = matcher.group("num");
+                parsedVersion.developmentNum = stageNumString == null ? 0 : Integer.parseInt(stageNumString);
+
                 parsedVersion.isDevelopmentVersion = matcher.group("dev") != null;
             } catch (NumberFormatException e) {
-                LOGGER.warn("Invalid version string used: " + version, e);
+                getLogger().warn("Invalid version string used: {}", version, e);
                 return UNKNOWN_VERSION;
             } catch (IllegalArgumentException e) {
-                LOGGER.warn("Invalid version pattern is used", e);
+                getLogger().warn("Invalid version pattern is used", e);
                 return UNKNOWN_VERSION;
             }
         } else {
-            LOGGER.warn("Version could not be recognized by the pattern");
+            getLogger().warn("Version could not be recognized by the pattern");
             return UNKNOWN_VERSION;
         }
         return parsedVersion;
@@ -138,8 +150,13 @@ public class Version {
                     if (this.developmentStage.isMoreStableThan(otherVersion.developmentStage)) {
                         return true;
                     } else if (this.developmentStage == otherVersion.developmentStage) {
-                        // if the stage is equal check if this version is in development and the other is not
-                        return !this.isDevelopmentVersion && otherVersion.isDevelopmentVersion;
+                        // if the development stage are equal compare the development number
+                        if (this.getDevelopmentNum() > otherVersion.getDevelopmentNum()) {
+                            return true;
+                        } else if (this.getDevelopmentNum() == otherVersion.getDevelopmentNum()) {
+                            // if the stage is equal check if this version is in development and the other is not
+                            return !this.isDevelopmentVersion && otherVersion.isDevelopmentVersion;
+                        }
                     }
                 }
             }
@@ -148,8 +165,7 @@ public class Version {
     }
 
     /**
-     * Checks if this version should be updated to one of the given ones.
-     * Ignoring the other Version if this one is Stable and the other one is not.
+     * Checks if this version should be updated to one of the given ones. Ignoring the other Version if this one is Stable and the other one is not.
      *
      * @return The version this one should be updated to, or an empty Optional
      */
@@ -165,8 +181,7 @@ public class Version {
     }
 
     /**
-     * Checks if this version should be updated to the given one.
-     * Ignoring the other Version if this one is Stable and the other one is not.
+     * Checks if this version should be updated to the given one. Ignoring the other Version if this one is Stable and the other one is not.
      *
      * @return True if this version should be updated to the given one
      */
@@ -197,6 +212,10 @@ public class Version {
         return patch;
     }
 
+    public int getDevelopmentNum() {
+        return developmentNum;
+    }
+
     public boolean isDevelopmentVersion() {
         return isDevelopmentVersion;
     }
@@ -206,7 +225,7 @@ public class Version {
      */
     public String getChangelogUrl() {
         if (isDevelopmentVersion) {
-            return "https://github.com/JabRef/jabref/blob/master/CHANGELOG.md#unreleased";
+            return "https://github.com/JabRef/jabref/blob/main/CHANGELOG.md#unreleased";
         } else {
             StringBuilder changelogLink = new StringBuilder()
                     .append("https://github.com/JabRef/jabref/blob/v")
@@ -221,8 +240,14 @@ public class Version {
             }
 
             changelogLink
-                    .append(this.developmentStage.stage)
-                    .append("/CHANGELOG.md");
+                    .append(this.developmentStage.stage);
+
+            if (this.getDevelopmentNum() != 0) {
+                changelogLink
+                        .append(this.getDevelopmentNum());
+            }
+
+            changelogLink.append("/CHANGELOG.md");
 
             return changelogLink.toString();
         }
@@ -270,7 +295,7 @@ public class Version {
 
         public static DevelopmentStage parse(String stage) {
             if (stage == null) {
-                LOGGER.warn("The stage cannot be null");
+                getLogger().warn("The stage cannot be null");
                 return UNKNOWN;
             } else if (stage.equals(STABLE.stage)) {
                 return STABLE;
@@ -279,7 +304,7 @@ public class Version {
             } else if (stage.equals(BETA.stage)) {
                 return BETA;
             }
-            LOGGER.warn("Unknown development stage: {}", stage);
+            getLogger().warn("Unknown development stage: {}", stage);
             return UNKNOWN;
         }
 

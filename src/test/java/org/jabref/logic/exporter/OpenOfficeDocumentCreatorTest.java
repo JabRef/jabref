@@ -81,7 +81,7 @@ public class OpenOfficeDocumentCreatorTest {
     void testPerformExportForSingleEntry(@TempDir Path testFolder) throws Exception {
         Path zipPath = testFolder.resolve("OpenOfficeRandomNamedFile");
 
-        exporter.export(databaseContext, zipPath, charset, entries);
+        exporter.export(databaseContext, zipPath, entries);
 
         Path unzipFolder = testFolder.resolve("unzipFolder");
         unzipContentXml(zipPath, testFolder.resolve(unzipFolder));
@@ -89,6 +89,10 @@ public class OpenOfficeDocumentCreatorTest {
 
         Input.Builder control = Input.from(Files.newInputStream(xmlFile));
         Input.Builder test = Input.from(Files.newInputStream(contentXmlPath));
+
+        // for debugging purposes
+       // Path testPath = xmlFile.resolveSibling("test.xml");
+       // Files.copy(Files.newInputStream(contentXmlPath), testPath, StandardCopyOption.REPLACE_EXISTING);
 
         assertThat(test, CompareMatcher.isSimilarTo(control)
                                        .normalizeWhitespace()

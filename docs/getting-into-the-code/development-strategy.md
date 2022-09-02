@@ -1,3 +1,7 @@
+---
+parent: Getting into the code
+nav_order: 1
+---
 # JabRef's development strategy
 
 We aim to keep up to high-quality code standards and use code quality tools wherever possible.
@@ -8,9 +12,9 @@ To ensure high code-quality,
 * We follow the principles of [Effective Java](https://www.oreilly.com/library/view/effective-java-3rd/9780134686097/).
 * We use [Design Patterns](https://java-design-patterns.com/patterns/) when applicable.
 * We document our design decisions using the lightweight architectural decision records [MADR](https://adr.github.io/madr/).
-* We review each external pull request by at least two [JabRef Core Developers](../../MAINTAINERS).
+* We review each external pull request by at least two [JabRef Core Developers](https://github.com/JabRef/jabref/blob/main/MAINTAINERS/README.md).
 
-Read on about our automated quality checks at [Code Quality](../advanced-reading/code-quality.md).
+Read on about our automated quality checks at [Code Quality](../code-howtos/code-quality.md).
 
 ## Continuous integration
 

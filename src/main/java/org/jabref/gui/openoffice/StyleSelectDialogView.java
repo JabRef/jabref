@@ -36,6 +36,7 @@ public class StyleSelectDialogView extends BaseDialog<OOBibStyle> {
     private final MenuItem edit = new MenuItem(Localization.lang("Edit"));
     private final MenuItem reload = new MenuItem(Localization.lang("Reload"));
     private final StyleLoader loader;
+
     @FXML private TableColumn<StyleSelectItemViewModel, String> colName;
     @FXML private TableView<StyleSelectItemViewModel> tvStyles;
     @FXML private TableColumn<StyleSelectItemViewModel, String> colJournals;
@@ -54,7 +55,6 @@ public class StyleSelectDialogView extends BaseDialog<OOBibStyle> {
     private PreviewViewer previewBook;
 
     public StyleSelectDialogView(StyleLoader loader) {
-
         this.loader = loader;
 
         ViewLoader.view(this)

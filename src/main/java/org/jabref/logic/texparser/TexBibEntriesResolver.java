@@ -48,7 +48,7 @@ public class TexBibEntriesResolver {
         Map<Path, BibDatabase> bibDatabases = resolverResult.getBibFiles().values().stream().distinct().collect(Collectors.toMap(
                 Function.identity(), path -> {
                     try {
-                        return OpenDatabase.loadDatabase(path, generalPreferences, importFormatPreferences, fileMonitor).getDatabase();
+                        return OpenDatabase.loadDatabase(path, importFormatPreferences, fileMonitor).getDatabase();
                     } catch (IOException e) {
                         LOGGER.error("Error opening file '{}'", path, e);
                         return ParserResult.fromError(e).getDatabase();

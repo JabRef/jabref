@@ -2,13 +2,13 @@ package org.jabref.logic.crawler;
 
 import java.io.IOException;
 import java.net.URL;
-import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+
+import javafx.collections.FXCollections;
 
 import org.jabref.logic.bibtex.FieldContentFormatterPreferences;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
@@ -18,6 +18,7 @@ import org.jabref.logic.database.DatabaseMerger;
 import org.jabref.logic.exporter.SavePreferences;
 import org.jabref.logic.git.SlrGitHandler;
 import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.preferences.TimestampPreferences;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabase;
@@ -39,6 +40,7 @@ import org.mockito.Answers;
 
 import static org.jabref.logic.citationkeypattern.CitationKeyGenerator.DEFAULT_UNWANTED_CHARACTERS;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -49,6 +51,7 @@ class StudyRepositoryTest {
     CitationKeyPatternPreferences citationKeyPatternPreferences;
     GeneralPreferences generalPreferences;
     ImportFormatPreferences importFormatPreferences;
+    ImporterPreferences importerPreferences;
     SavePreferences savePreferences;
     TimestampPreferences timestampPreferences;
     BibEntryTypesManager entryTypesManager;
@@ -68,6 +71,7 @@ class StudyRepositoryTest {
         generalPreferences = mock(GeneralPreferences.class, Answers.RETURNS_DEEP_STUBS);
         savePreferences = mock(SavePreferences.class, Answers.RETURNS_DEEP_STUBS);
         importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        importerPreferences = mock(ImporterPreferences.class);
         timestampPreferences = mock(TimestampPreferences.class);
         citationKeyPatternPreferences = new CitationKeyPatternPreferences(
                 false,
@@ -79,10 +83,10 @@ class StudyRepositoryTest {
                 DEFAULT_UNWANTED_CHARACTERS,
                 GlobalCitationKeyPattern.fromPattern("[auth][year]"),
                 ',');
-        when(generalPreferences.getDefaultEncoding()).thenReturn(Charset.defaultCharset());
         when(savePreferences.getSaveOrder()).thenReturn(new SaveOrderConfig());
         when(savePreferences.takeMetadataSaveOrderInAccount()).thenReturn(true);
         when(savePreferences.getCitationKeyPatternPreferences()).thenReturn(citationKeyPatternPreferences);
+        when(importerPreferences.getApiKeys()).thenReturn(FXCollections.emptyObservableSet());
         when(importFormatPreferences.getKeywordSeparator()).thenReturn(',');
         when(importFormatPreferences.getFieldContentFormatterPreferences()).thenReturn(new FieldContentFormatterPreferences());
         when(timestampPreferences.getTimestampField()).then(invocation -> StandardField.TIMESTAMP);
@@ -94,15 +98,22 @@ class StudyRepositoryTest {
     void providePathToNonExistentRepositoryThrowsException() {
         Path nonExistingRepositoryDirectory = tempRepositoryDirectory.resolve(NON_EXISTING_DIRECTORY);
 
-        assertThrows(IOException.class, () -> new StudyRepository(nonExistingRepositoryDirectory, gitHandler, generalPreferences, importFormatPreferences, new DummyFileUpdateMonitor(), savePreferences, entryTypesManager));
+        assertThrows(IOException.class, () -> new StudyRepository(
+                nonExistingRepositoryDirectory,
+                gitHandler,
+                generalPreferences,
+                importFormatPreferences,
+                importerPreferences,
+                new DummyFileUpdateMonitor(),
+                savePreferences,
+                entryTypesManager));
     }
 
     /**
      * Tests whether the file structure of the repository is created correctly from the study definitions file.
      */
     @Test
-    void repositoryStructureCorrectlyCreated() throws Exception {
-
+    void repositoryStructureCorrectlyCreated() {
         // When repository is instantiated the directory structure is created
         assertTrue(Files.exists(Path.of(tempRepositoryDirectory.toString(), hashCodeQuantum + " - Quantum")));
         assertTrue(Files.exists(Path.of(tempRepositoryDirectory.toString(), hashCodeCloudComputing + " - Cloud Computing")));
@@ -113,9 +124,9 @@ class StudyRepositoryTest {
         assertTrue(Files.exists(Path.of(tempRepositoryDirectory.toString(), hashCodeQuantum + " - Quantum", "Springer.bib")));
         assertTrue(Files.exists(Path.of(tempRepositoryDirectory.toString(), hashCodeCloudComputing + " - Cloud Computing", "Springer.bib")));
         assertTrue(Files.exists(Path.of(tempRepositoryDirectory.toString(), hashCodeSoftwareEngineering + " - Software Engineering", "Springer.bib")));
-        assertTrue(Files.notExists(Path.of(tempRepositoryDirectory.toString(), hashCodeQuantum + " - Quantum", "IEEEXplore.bib")));
-        assertTrue(Files.notExists(Path.of(tempRepositoryDirectory.toString(), hashCodeCloudComputing + " - Cloud Computing", "IEEEXplore.bib")));
-        assertTrue(Files.notExists(Path.of(tempRepositoryDirectory.toString(), hashCodeSoftwareEngineering + " - Software Engineering", "IEEEXplore.bib")));
+        assertFalse(Files.exists(Path.of(tempRepositoryDirectory.toString(), hashCodeQuantum + " - Quantum", "IEEEXplore.bib")));
+        assertFalse(Files.exists(Path.of(tempRepositoryDirectory.toString(), hashCodeCloudComputing + " - Cloud Computing", "IEEEXplore.bib")));
+        assertFalse(Files.exists(Path.of(tempRepositoryDirectory.toString(), hashCodeSoftwareEngineering + " - Software Engineering", "IEEEXplore.bib")));
     }
 
     /**
@@ -155,26 +166,23 @@ class StudyRepositoryTest {
     }
 
     @Test
-    void setsLastSearchDatePersistedCorrectly() throws Exception {
-        List<QueryResult> mockResults = getMockResults();
-
-        studyRepository.persist(mockResults);
-
-        assertEquals(LocalDate.now(), getTestStudyRepository().getStudy().getLastSearchDate());
-    }
-
-    @Test
     void studyResultsPersistedCorrectly() throws Exception {
         List<QueryResult> mockResults = getMockResults();
-
         studyRepository.persist(mockResults);
-
         assertEquals(new HashSet<>(getNonDuplicateBibEntryResult().getEntries()), new HashSet<>(getTestStudyRepository().getStudyResultEntries().getEntries()));
     }
 
     private StudyRepository getTestStudyRepository() throws Exception {
         setUpTestStudyDefinitionFile();
-        studyRepository = new StudyRepository(tempRepositoryDirectory, gitHandler, generalPreferences, importFormatPreferences, new DummyFileUpdateMonitor(), savePreferences, entryTypesManager);
+        studyRepository = new StudyRepository(
+                tempRepositoryDirectory,
+                gitHandler,
+                generalPreferences,
+                importFormatPreferences,
+                importerPreferences,
+                new DummyFileUpdateMonitor(),
+                savePreferences,
+                entryTypesManager);
         return studyRepository;
     }
 

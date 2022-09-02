@@ -2,7 +2,6 @@ package org.jabref.logic.importer.fileformat;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -41,15 +40,15 @@ public class ImporterTestEngine {
     }
 
     public static void testIsRecognizedFormat(Importer importer, String fileName) throws IOException {
-        Assertions.assertTrue(importer.isRecognizedFormat(getPath(fileName), StandardCharsets.UTF_8));
+        Assertions.assertTrue(importer.isRecognizedFormat(getPath(fileName)));
     }
 
     public static void testIsNotRecognizedFormat(Importer importer, String fileName) throws IOException {
-        Assertions.assertFalse(importer.isRecognizedFormat(getPath(fileName), StandardCharsets.UTF_8));
+        Assertions.assertFalse(importer.isRecognizedFormat(getPath(fileName)));
     }
 
     public static void testImportEntries(Importer importer, String fileName, String fileType) throws IOException, ImportException {
-        ParserResult parserResult = importer.importDatabase(getPath(fileName), StandardCharsets.UTF_8);
+        ParserResult parserResult = importer.importDatabase(getPath(fileName));
         if (parserResult.isInvalid()) {
             throw new ImportException(parserResult.getErrorMessage());
         }
@@ -67,7 +66,7 @@ public class ImporterTestEngine {
     }
 
     public static void testImportMalformedFiles(Importer importer, String fileName) throws IOException {
-        List<BibEntry> entries = importer.importDatabase(getPath(fileName), StandardCharsets.UTF_8).getDatabase()
+        List<BibEntry> entries = importer.importDatabase(getPath(fileName)).getDatabase()
                                          .getEntries();
         assertEquals(entries, new ArrayList<BibEntry>());
     }

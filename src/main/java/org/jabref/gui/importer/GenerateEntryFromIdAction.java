@@ -7,13 +7,13 @@ import org.jabref.gui.Globals;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
+import org.jabref.gui.externalfiles.ImportHandler;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.TaskExecutor;
-import org.jabref.logic.JabRefException;
-import org.jabref.logic.database.DuplicateCheck;
 import org.jabref.logic.importer.CompositeIdFetcher;
+import org.jabref.logic.importer.FetcherClientException;
 import org.jabref.logic.importer.FetcherException;
-import org.jabref.logic.importer.ImportCleanup;
+import org.jabref.logic.importer.FetcherServerException;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.types.StandardEntryType;
@@ -31,7 +31,13 @@ public class GenerateEntryFromIdAction extends SimpleCommand {
     private final PopOver entryFromIdPopOver;
     private final StateManager stateManager;
 
-    public GenerateEntryFromIdAction(LibraryTab libraryTab, DialogService dialogService, PreferencesService preferencesService, TaskExecutor taskExecutor, PopOver entryFromIdPopOver, String identifier, StateManager stateManager) {
+    public GenerateEntryFromIdAction(LibraryTab libraryTab,
+                                     DialogService dialogService,
+                                     PreferencesService preferencesService,
+                                     TaskExecutor taskExecutor,
+                                     PopOver entryFromIdPopOver,
+                                     String identifier,
+                                     StateManager stateManager) {
         this.libraryTab = libraryTab;
         this.dialogService = dialogService;
         this.preferencesService = preferencesService;
@@ -47,57 +53,48 @@ public class GenerateEntryFromIdAction extends SimpleCommand {
         backgroundTask.titleProperty().set(Localization.lang("Import by ID"));
         backgroundTask.showToUser(true);
         backgroundTask.onRunning(() -> dialogService.notify("%s".formatted(backgroundTask.messageProperty().get())));
-        backgroundTask.onFailure((e) -> {
-            // When unable to import by ID, present the user options to cancel or add entry manually
-            boolean addEntryFlag = dialogService.showConfirmationDialogAndWait(Localization.lang("Failed to import by ID"),
-                                    e.getMessage(),
-                                   Localization.lang("Add entry manually"));
+        backgroundTask.onFailure((exception) -> {
+            String fetcherExceptionMessage = exception.getMessage();
+
+            boolean addEntryFlag;
+            if (exception instanceof FetcherClientException) {
+                addEntryFlag = dialogService.showConfirmationDialogAndWait(Localization.lang("Failed to import by ID"), Localization.lang("Bibliographic data not found. Cause is likely the client side. Please check connection and identifier for correctness.") + "\n" + fetcherExceptionMessage, Localization.lang("Add entry manually"));
+            } else if (exception instanceof FetcherServerException) {
+                addEntryFlag = dialogService.showConfirmationDialogAndWait(Localization.lang("Failed to import by ID"), Localization.lang("Bibliographic data not found. Cause is likely the server side. Please try agan later.") + "\n" + fetcherExceptionMessage, Localization.lang("Add entry manually"));
+            } else {
+                addEntryFlag = dialogService.showConfirmationDialogAndWait(Localization.lang("Failed to import by ID"), Localization.lang("Error message %0", fetcherExceptionMessage), Localization.lang("Add entry manually"));
+            }
             if (addEntryFlag) {
                 // add entry manually
                 new NewEntryAction(libraryTab.frame(), StandardEntryType.Article, dialogService,
-                                    preferencesService, stateManager).execute();
+                                   preferencesService, stateManager).execute();
             }
         });
-        backgroundTask.onSuccess((bibEntry) -> bibEntry.ifPresentOrElse((entry) -> {
-                libraryTab.insertEntry(entry);
-                entryFromIdPopOver.hide();
-                dialogService.notify(Localization.lang("Imported one entry"));
-                },
-                () -> dialogService.notify(Localization.lang("Import canceled"))
-        ));
+        backgroundTask.onSuccess((bibEntry) -> {
+            Optional<BibEntry> result = bibEntry;
+            if (result.isPresent()) {
+                final BibEntry entry = result.get();
+                ImportHandler handler = new ImportHandler(libraryTab.getBibDatabaseContext(), preferencesService, Globals.getFileUpdateMonitor(), libraryTab.getUndoManager(), stateManager, dialogService, null);
+                handler.importEntryWithDuplicateCheck(libraryTab.getBibDatabaseContext(), entry);
+            } else {
+                dialogService.notify("No entry found or import canceled");
+            }
+
+            entryFromIdPopOver.hide();
+        });
         backgroundTask.executeWith(taskExecutor);
     }
 
     private BackgroundTask<Optional<BibEntry>> searchAndImportEntryInBackground() {
         return new BackgroundTask<>() {
             @Override
-            protected Optional<BibEntry> call() throws JabRefException {
+            protected Optional<BibEntry> call() throws FetcherException {
                 if (isCanceled()) {
                     return Optional.empty();
                 }
-
                 updateMessage(Localization.lang("Searching..."));
-                try {
-                    Optional<BibEntry> result = new CompositeIdFetcher(preferencesService.getImportFormatPreferences()).performSearchById(identifier);
-                    if (result.isPresent()) {
-                        final BibEntry entry = result.get();
-                        ImportCleanup cleanup = new ImportCleanup(libraryTab.getBibDatabaseContext().getMode());
-                        cleanup.doPostCleanup(entry);
-                        // DuplicateCheck only covers DOI and ISBN at the moment.
-                        Optional<BibEntry> duplicate = new DuplicateCheck(Globals.entryTypesManager).containsDuplicate(libraryTab.getDatabase(), entry, libraryTab.getBibDatabaseContext().getMode());
-                        if (duplicate.isPresent()) {
-                            throw new JabRefException(Localization.lang("Entry already exists"));
-                        }
-                    } else {
-                        throw new JabRefException(Localization.lang("Could not find any bibliographic information."));
-                    }
-                    updateMessage(Localization.lang("Imported one entry"));
-                    return result;
-                } catch (FetcherException fetcherException) {
-                    throw new JabRefException("Fetcher error: %s".formatted(fetcherException.getMessage()));
-                }
+                return new CompositeIdFetcher(preferencesService.getImportFormatPreferences()).performSearchById(identifier);
             }
         };
     }
-
 }
