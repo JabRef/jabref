@@ -23,14 +23,19 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We call backup files `.bak` and temporary writing files now `.sav`.
 - JabRef keeps 10 older versions of a `.bib` file in the [user data dir](https://github.com/harawata/appdirs#supported-directories) (instead of a single `.sav` (now: `.bak`) file in the directory of the `.bib` file)
 - We changed the button label from "Return to JabRef" to "Return to library" to better indicate the purpose of the action.
+- We reworked the External Changes Resolver dialog. [#9021](https://github.com/JabRef/jabref/pull/9021)
+
 
 ### Fixed
 
+- We fixed the display of issue, number, eid and pages fields in the entry preview. [#8607](https://github.com/JabRef/jabref/pull/8607), [#8372](https://github.com/JabRef/jabref/issues/8372), [Koppor#514](https://github.com/koppor/jabref/issues/514), [forum#2390](https://discourse.jabref.org/t/unable-to-edit-my-bibtex-file-that-i-used-before-vers-5-1/2390), [forum#3462](https://discourse.jabref.org/t/jabref-5-6-need-help-with-export-from-jabref-to-microsoft-word-entry-preview-of-apa-7-not-rendering-correctly/3462)
+- We fixed the page ranges checker to detect article numbers in the pages field (used at [Check Integrity](https://docs.jabref.org/finding-sorting-and-cleaning-entries/checkintegrity)). [#8607](https://github.com/JabRef/jabref/pull/8607)
 - The [HtmlToLaTeXFormatter](https://docs.jabref.org/finding-sorting-and-cleaning-entries/saveactions#html-to-latex) keeps single `<` characters.
 - We fixed a performance regression when opening large libraries [#9041](https://github.com/JabRef/jabref/issues/9041)
 - We fixed a bug where spaces are trimmed when highlighting differences in the Entries merge dialog. [koppor#371](https://github.com/koppor/jabref/issues/371)
-- We fixed several bugs regarding the manual and the autosave of library files that sometimes lead to exceptions or data loss. [#8448](https://github.com/JabRef/jabref/issues/8484), [#8746](https://github.com/JabRef/jabref/issues/8746), [#6684](https://github.com/JabRef/jabref/issues/6684), [#6644](https://github.com/JabRef/jabref/issues/6644), [#6102](https://github.com/JabRef/jabref/issues/6102), [#6002](https://github.com/JabRef/jabref/issues/6000)
+- We fixed several bugs regarding the manual and the autosave of library files that sometimes lead to exceptions or data loss. [#9067](https://github.com/JabRef/jabref/pull/9067), [#8448](https://github.com/JabRef/jabref/issues/8484), [#8746](https://github.com/JabRef/jabref/issues/8746), [#6684](https://github.com/JabRef/jabref/issues/6684), [#6644](https://github.com/JabRef/jabref/issues/6644), [#6102](https://github.com/JabRef/jabref/issues/6102), [#6002](https://github.com/JabRef/jabref/issues/6000)
 - We fixed an issue where applied save actions on saving the library file would lead to the dialog "The libary has been modified by another program" popping up [#4877](https://github.com/JabRef/jabref/issues/4877)
+- We fixed an issue where title case didn't capitalize words after en-dash characters [#9068]
 - We fixed an issue where JabRef would not exit when a connection to a LibreOffice document was established previously and the document is still open [#9075](https://github.com/JabRef/jabref/issues/9075)
 
 ### Removed

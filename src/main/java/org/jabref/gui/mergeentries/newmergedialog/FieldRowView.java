@@ -21,6 +21,7 @@ import org.jabref.gui.mergeentries.newmergedialog.fieldsmerger.FieldMergerFactor
 import org.jabref.gui.mergeentries.newmergedialog.toolbar.ThreeWayMergeToolbar;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.strings.StringUtil;
 
 import com.tobiasdiez.easybind.EasyBind;
 import org.fxmisc.richtext.StyleClassedTextArea;
@@ -150,7 +151,7 @@ public class FieldRowView {
     }
 
     public void showDiff(ShowDiffConfig diffConfig) {
-        if (!rightValueCell.isVisible()) {
+        if (!rightValueCell.isVisible() || StringUtil.isNullOrEmpty(viewModel.getLeftFieldValue()) || StringUtil.isNullOrEmpty(viewModel.getRightFieldValue())) {
             return;
         }
         LOGGER.debug("Showing diffs...");
@@ -212,6 +213,9 @@ public class FieldRowView {
     }
 
     public class UnmergeCommand extends SimpleCommand {
+
+        public UnmergeCommand() { }
+
         @Override
         public void execute() {
             if (fieldsMergedEdit.canUndo()) {
