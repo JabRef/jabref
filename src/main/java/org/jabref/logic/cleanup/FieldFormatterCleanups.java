@@ -66,28 +66,6 @@ public class FieldFormatterCleanups {
         return Collections.unmodifiableList(actions);
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if ((o == null) || (getClass() != o.getClass())) {
-            return false;
-        }
-
-        FieldFormatterCleanups that = (FieldFormatterCleanups) o;
-
-        if (enabled != that.enabled) {
-            return false;
-        }
-        return actions.equals(that.actions);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(actions, enabled);
-    }
-
     public List<FieldChange> applySaveActions(BibEntry entry) {
         if (enabled) {
             return applyAllActions(entry);
