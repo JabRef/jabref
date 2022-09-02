@@ -1152,7 +1152,7 @@ class BibtexParserTest {
         Collection<BibEntry> parsedEntries = result.getDatabase().getEntries();
         BibEntry parsedEntry = parsedEntries.iterator().next();
 
-        assertEquals(Optional.of("ups " + OS.NEWLINE + "sala"), parsedEntry.getField(StandardField.ABSTRACT));
+        assertEquals(Optional.of("ups \nsala"), parsedEntry.getField(StandardField.ABSTRACT));
     }
 
     @Test
