@@ -196,8 +196,10 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
             return;
         }
 
-        List<BibEntry> localEntries = bibDatabase.getEntries();
+        List<BibEntry> localEntries = new ArrayList<>(bibDatabase.getEntries());
         Map<Integer, Integer> idVersionMap = dbmsProcessor.getSharedIDVersionMapping();
+
+        List<BibEntry> entriesToUpdates = new ArrayList<>();
 
         // remove old entries locally
         removeNotSharedEntries(localEntries, idVersionMap.keySet());
@@ -212,12 +214,10 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
                         Optional<BibEntry> sharedEntry = dbmsProcessor.getSharedEntry(idVersionEntry.getKey());
                         if (sharedEntry.isPresent()) {
                             // update fields
+
                             localEntry.setType(sharedEntry.get().getType(), EntriesEventSource.SHARED);
                             localEntry.getSharedBibEntryData()
                                       .setVersion(sharedEntry.get().getSharedBibEntryData().getVersion());
-
-
-                            taskExecutor.runInFXThread(()-> {
 
 
                             sharedEntry.get().getFieldMap().forEach(
@@ -231,9 +231,9 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
                                       .forEach(
                                               field -> localEntry.clearField(field, EntriesEventSource.SHARED)
                                       );
-                            });
                         }
                     }
+                    entriesToUpdates.add(localEntry);
                 }
 
             if (!remoteEntryMatchingOneLocalEntryFound) {
@@ -241,11 +241,13 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
             }
         }
 
+        // TODO: Update at once? or wrap whole method again in taskExecutor?
+
+
         if (!entriesToInsertIntoLocalDatabase.isEmpty()) {
 
-            taskExecutor.runInFXThread( () -> bibDatabase.insertEntries(dbmsProcessor.getSharedEntries(entriesToInsertIntoLocalDatabase), EntriesEventSource.SHARED));
+            taskExecutor.runInFXThread( () -> bibDatabase.insertEntries(dbmsProcessor.partitionAndGetSharedEntries(entriesToInsertIntoLocalDatabase), EntriesEventSource.SHARED)  );
             // in case entries should be added into the local database, insert them
-            bibDatabase.insertEntries(dbmsProcessor.partitionAndGetSharedEntries(entriesToInsertIntoLocalDatabase), EntriesEventSource.SHARED);
         }
     }
 
