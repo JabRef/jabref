@@ -65,7 +65,6 @@ import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPattern;
 import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.citationstyle.CitationStylePreviewLayout;
-import org.jabref.logic.cleanup.CleanupPreferences;
 import org.jabref.logic.cleanup.CleanupPreset;
 import org.jabref.logic.cleanup.Cleanups;
 import org.jabref.logic.cleanup.FieldFormatterCleanups;
@@ -1159,13 +1158,6 @@ public class JabRefPreferences implements PreferencesService {
     @Override
     public JournalAbbreviationPreferences getJournalAbbreviationPreferences() {
         return new JournalAbbreviationPreferences(getStringList(EXTERNAL_JOURNAL_LISTS), StandardCharsets.UTF_8);
-    }
-
-    @Override
-    public CleanupPreferences getCleanupPreferences(JournalAbbreviationRepository abbreviationRepository) {
-        return new CleanupPreferences(
-                getLayoutFormatterPreferences(abbreviationRepository),
-                getFilePreferences());
     }
 
     @Override
