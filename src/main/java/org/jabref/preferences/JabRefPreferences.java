@@ -2225,8 +2225,10 @@ public class JabRefPreferences implements PreferencesService {
         // See https://stackoverflow.com/a/586917/873282 for a longer discussion
         // The proposed solution is to use Swing's FileSystemView
         // See https://stackoverflow.com/a/32914568/873282
-        String userHome = FileSystemView.getFileSystemView().getDefaultDirectory().getPath();
-        return Path.of(userHome, "JabRef").toString();
+        // As of 2022, System.getProperty("user.home") returns "c:\Users\username" on Windows 10, whereas
+        // the FileSystemView returns "C:\Users\username\Documents", which is the "better" directory
+        String documentsHome = FileSystemView.getFileSystemView().getDefaultDirectory().getPath();
+        return Path.of(documentsHome, "JabRef").toString();
     }
 
     @Override
