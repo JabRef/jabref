@@ -51,35 +51,35 @@ public class CleanupWorker {
     }
 
     private CleanupJob toJob(CleanupPreset.CleanupStep action) {
-        switch (action) {
-            case CLEAN_UP_DOI:
-                return new DoiCleanup();
-            case CLEANUP_EPRINT:
-                return new EprintCleanup();
-            case MAKE_PATHS_RELATIVE:
-                return new RelativePathsCleanup(databaseContext, filePreferences);
-            case RENAME_PDF:
-                return new RenamePdfCleanup(false, databaseContext, filePreferences);
-            case RENAME_PDF_ONLY_RELATIVE_PATHS:
-                return new RenamePdfCleanup(true, databaseContext, filePreferences);
-            case CLEAN_UP_UPGRADE_EXTERNAL_LINKS:
-                return new UpgradePdfPsToFileCleanup();
-            case CONVERT_TO_BIBLATEX:
-                return new ConvertToBiblatexCleanup();
-            case CONVERT_TO_BIBTEX:
-                return new ConvertToBibtexCleanup();
-            case CONVERT_TIMESTAMP_TO_CREATIONDATE:
-                return new TimeStampToCreationDate(timestampPreferences);
-            case CONVERT_TIMESTAMP_TO_MODIFICATIONDATE:
-                return new TimeStampToModificationDate(timestampPreferences);
-            case MOVE_PDF:
-                return new MoveFilesCleanup(databaseContext, filePreferences);
-            case FIX_FILE_LINKS:
-                return new FileLinksCleanup();
-            case CLEAN_UP_ISSN:
-                return new ISSNCleanup();
-            default:
-                throw new UnsupportedOperationException(action.name());
-        }
+        return switch (action) {
+            case CLEAN_UP_DOI ->
+                    new DoiCleanup();
+            case CLEANUP_EPRINT ->
+                    new EprintCleanup();
+            case MAKE_PATHS_RELATIVE ->
+                    new RelativePathsCleanup(databaseContext, filePreferences);
+            case RENAME_PDF ->
+                    new RenamePdfCleanup(false, databaseContext, filePreferences);
+            case RENAME_PDF_ONLY_RELATIVE_PATHS ->
+                    new RenamePdfCleanup(true, databaseContext, filePreferences);
+            case CLEAN_UP_UPGRADE_EXTERNAL_LINKS ->
+                    new UpgradePdfPsToFileCleanup();
+            case CONVERT_TO_BIBLATEX ->
+                    new ConvertToBiblatexCleanup();
+            case CONVERT_TO_BIBTEX ->
+                    new ConvertToBibtexCleanup();
+            case CONVERT_TIMESTAMP_TO_CREATIONDATE ->
+                    new TimeStampToCreationDate(timestampPreferences);
+            case CONVERT_TIMESTAMP_TO_MODIFICATIONDATE ->
+                    new TimeStampToModificationDate(timestampPreferences);
+            case MOVE_PDF ->
+                    new MoveFilesCleanup(databaseContext, filePreferences);
+            case FIX_FILE_LINKS ->
+                    new FileLinksCleanup();
+            case CLEAN_UP_ISSN ->
+                    new ISSNCleanup();
+            default ->
+                    throw new UnsupportedOperationException(action.name());
+        };
     }
 }
