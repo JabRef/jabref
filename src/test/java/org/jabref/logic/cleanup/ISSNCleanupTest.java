@@ -2,7 +2,6 @@ package org.jabref.logic.cleanup;
 
 import java.util.Optional;
 
-import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.preferences.TimestampPreferences;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -21,8 +20,10 @@ public class ISSNCleanupTest {
 
     @BeforeEach
     public void setUp() {
-        worker = new CleanupWorker(mock(BibDatabaseContext.class),
-                new CleanupPreferences(mock(LayoutFormatterPreferences.class), mock(FilePreferences.class)), mock(TimestampPreferences.class));
+        worker = new CleanupWorker(
+                mock(BibDatabaseContext.class),
+                mock(FilePreferences.class),
+                mock(TimestampPreferences.class));
     }
 
     @Test

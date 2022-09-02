@@ -16,9 +16,9 @@ public class CleanupWorker {
     private final FilePreferences filePreferences;
     private final TimestampPreferences timestampPreferences;
 
-    public CleanupWorker(BibDatabaseContext databaseContext, CleanupPreferences cleanupPreferences, TimestampPreferences timestampPreferences) {
+    public CleanupWorker(BibDatabaseContext databaseContext, FilePreferences filePreferences, TimestampPreferences timestampPreferences) {
         this.databaseContext = databaseContext;
-        this.filePreferences = cleanupPreferences.getFilePreferences();
+        this.filePreferences = filePreferences;
         this.timestampPreferences = timestampPreferences;
     }
 
