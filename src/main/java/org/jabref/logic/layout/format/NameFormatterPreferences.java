@@ -1,9 +1,9 @@
 package org.jabref.logic.layout.format;
 
+import java.util.List;
+
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-
-import java.util.List;
 
 public class NameFormatterPreferences {
 
