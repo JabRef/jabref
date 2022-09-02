@@ -18,6 +18,12 @@ import org.jabref.logic.citationkeypattern.GlobalCitationKeyPattern;
 import org.jabref.logic.cleanup.FieldFormatterCleanup;
 import org.jabref.logic.cleanup.FieldFormatterCleanups;
 import org.jabref.logic.exporter.SavePreferences;
+import org.jabref.logic.formatter.bibtexfields.EscapeAmpersandsFormatter;
+import org.jabref.logic.formatter.bibtexfields.EscapeDollarSignFormatter;
+import org.jabref.logic.formatter.bibtexfields.EscapeUnderscoresFormatter;
+import org.jabref.logic.formatter.bibtexfields.LatexCleanupFormatter;
+import org.jabref.logic.formatter.bibtexfields.NormalizeMonthFormatter;
+import org.jabref.logic.formatter.bibtexfields.NormalizePagesFormatter;
 import org.jabref.logic.formatter.casechanger.LowerCaseFormatter;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParseException;
@@ -30,6 +36,7 @@ import org.jabref.model.entry.BibtexString;
 import org.jabref.model.entry.Date;
 import org.jabref.model.entry.Month;
 import org.jabref.model.entry.field.BibField;
+import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldPriority;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.OrFields;
@@ -1333,6 +1340,48 @@ class BibtexParserTest {
         assertTrue(saveActions.isEnabled());
         assertEquals(List.of(new FieldFormatterCleanup(StandardField.TITLE, new LowerCaseFormatter())),
                 saveActions.getConfiguredActions());
+    }
+
+    @Test
+    void parserKeepsSaveActions() throws IOException {
+        ParserResult parserResult = parser.parse(
+                new StringReader("""
+                        @InProceedings{6055279,
+                          Title                    = {Educational session 1},
+                          Booktitle                = {Custom Integrated Circuits Conference (CICC), 2011 IEEE},
+                          Year                     = {2011},
+                          Month                    = {Sept},
+                          Pages                    = {1-7},
+                          Abstract                 = {Start of the above-titled section of the conference proceedings record.},
+                          DOI                      = {10.1109/CICC.2011.6055279},
+                          ISSN                     = {0886-5930}
+                        }
+
+                        @Comment{jabref-meta: saveActions:enabled;
+                        month[normalize_month]
+                        pages[normalize_page_numbers]
+                        title[escapeAmpersands,escapeDollarSign,escapeUnderscores,latex_cleanup]
+                        booktitle[escapeAmpersands,escapeDollarSign,escapeUnderscores,latex_cleanup]
+                        publisher[escapeAmpersands,escapeDollarSign,escapeUnderscores,latex_cleanup]
+                        journal[escapeAmpersands,escapeDollarSign,escapeUnderscores,latex_cleanup]
+                        abstract[escapeAmpersands,escapeDollarSign,escapeUnderscores,latex_cleanup]
+                        ;}
+                        """));
+
+        FieldFormatterCleanups saveActions = parserResult.getMetaData().getSaveActions().get();
+
+        assertTrue(saveActions.isEnabled());
+
+        List<FieldFormatterCleanup> expected = new ArrayList<>(30);
+        expected.add(new FieldFormatterCleanup(StandardField.MONTH, new NormalizeMonthFormatter()));
+        expected.add(new FieldFormatterCleanup(StandardField.PAGES, new NormalizePagesFormatter()));
+        for (Field field : List.of(StandardField.TITLE, StandardField.BOOKTITLE, StandardField.PUBLISHER, StandardField.JOURNAL, StandardField.ABSTRACT)) {
+            expected.add(new FieldFormatterCleanup(field, new EscapeAmpersandsFormatter()));
+            expected.add(new FieldFormatterCleanup(field, new EscapeDollarSignFormatter()));
+            expected.add(new FieldFormatterCleanup(field, new EscapeUnderscoresFormatter()));
+            expected.add(new FieldFormatterCleanup(field, new LatexCleanupFormatter()));
+        }
+        assertEquals(expected, saveActions.getConfiguredActions());
     }
 
     @Test
