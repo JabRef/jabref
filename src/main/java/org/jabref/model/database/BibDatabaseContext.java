@@ -160,8 +160,7 @@ public class BibDatabaseContext {
     /**
      * Returns the first existing file directory from  {@link #getFileDirectories(FilePreferences)}
      *
-     * @param preferences The FilePreferences
-     * @return Optional of Path
+     * @return the path - or an empty optional, if none of the directories exists
      */
     public Optional<Path> getFirstExistingFileDir(FilePreferences preferences) {
         return getFileDirectories(preferences).stream().filter(Files::exists).findFirst();
