@@ -23,7 +23,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We call backup files `.bak` and temporary writing files now `.sav`.
 - JabRef keeps 10 older versions of a `.bib` file in the [user data dir](https://github.com/harawata/appdirs#supported-directories) (instead of a single `.sav` (now: `.bak`) file in the directory of the `.bib` file)
 - We changed the button label from "Return to JabRef" to "Return to library" to better indicate the purpose of the action.
-- We removed "last-search-date" from the SLR feature, because the last-search-date can be detucted from the git logs.
+- We removed "last-search-date" from the SLR feature, because the last-search-date can be deducted from the git logs.
 - We reworked the External Changes Resolver dialog. [#9021](https://github.com/JabRef/jabref/pull/9021)
 
 
