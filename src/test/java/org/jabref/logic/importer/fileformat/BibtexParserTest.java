@@ -1171,7 +1171,7 @@ class BibtexParserTest {
     }
 
     /**
-     * Test for #669
+     * Test for <a href="https://github.com/JabRef/jabref/issues/669">#669</a>
      */
     @Test
     void parsePreambleAndEntryWithoutNewLine() throws IOException {
