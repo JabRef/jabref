@@ -91,7 +91,7 @@ class BibtexParserTest {
         expected.setCitationKey("test");
         expected.setField(StandardField.AUTHOR, "Ed von Test");
 
-        assertEquals(Collections.singletonList(expected), parsed);
+        assertEquals(List.of(expected), parsed);
     }
 
     @Test
@@ -345,7 +345,7 @@ class BibtexParserTest {
         BibEntry expected = new BibEntry(StandardEntryType.Article).withField(InternalField.KEY_FIELD, "test")
                                                                    .withField(StandardField.AUTHOR, "Ed von T@st");
 
-        assertEquals(Collections.singletonList(expected), parsed);
+        assertEquals(List.of(expected), parsed);
     }
 
     @Test
@@ -361,7 +361,7 @@ class BibtexParserTest {
         ParserResult result = parser.parse(new StringReader(entryWithComment));
         List<BibEntry> parsed = result.getDatabase().getEntries();
 
-        assertEquals(Collections.singletonList(expected), parsed);
+        assertEquals(List.of(expected), parsed);
         assertEquals(expected.getUserComments(), parsed.get(0).getUserComments());
     }
 
@@ -658,7 +658,7 @@ class BibtexParserTest {
         Collection<BibEntry> parsed = result.getDatabase().getEntries();
 
         assertFalse(result.hasWarnings());
-        assertEquals(Collections.singletonList(expected), parsed);
+        assertEquals(List.of(expected), parsed);
     }
 
     @Test
@@ -1124,7 +1124,7 @@ class BibtexParserTest {
     @Test
     void parsePreservesMultipleSpacesInNonWrappableField() throws IOException {
         when(importFormatPreferences.getFieldContentFormatterPreferences().getNonWrappableFields())
-                .thenReturn(Collections.singletonList(StandardField.FILE));
+                .thenReturn(List.of(StandardField.FILE));
         BibtexParser parser = new BibtexParser(importFormatPreferences, fileMonitor);
         ParserResult result = parser
                 .parse(new StringReader("@article{canh05,file = {ups  sala}}"));
@@ -1331,7 +1331,7 @@ class BibtexParserTest {
         FieldFormatterCleanups saveActions = parserResult.getMetaData().getSaveActions().get();
 
         assertTrue(saveActions.isEnabled());
-        assertEquals(Collections.singletonList(new FieldFormatterCleanup(StandardField.TITLE, new LowerCaseFormatter())),
+        assertEquals(List.of(new FieldFormatterCleanup(StandardField.TITLE, new LowerCaseFormatter())),
                 saveActions.getConfiguredActions());
     }
 
@@ -1369,7 +1369,7 @@ class BibtexParserTest {
         FieldFormatterCleanups saveActions = parserResult.getMetaData().getSaveActions().get();
 
         assertTrue(saveActions.isEnabled());
-        assertEquals(Collections.singletonList(new FieldFormatterCleanup(StandardField.TITLE, new LowerCaseFormatter())),
+        assertEquals(List.of(new FieldFormatterCleanup(StandardField.TITLE, new LowerCaseFormatter())),
                 saveActions.getConfiguredActions());
     }
 
@@ -1520,7 +1520,7 @@ class BibtexParserTest {
         expectedEntry.setCitationKey("test");
         expectedEntry.setField(StandardField.COMMENT, "testentry");
 
-        assertEquals(Collections.singletonList(expectedEntry), entries);
+        assertEquals(List.of(expectedEntry), entries);
     }
 
     @Test
@@ -1536,7 +1536,7 @@ class BibtexParserTest {
         expectedEntry.setCitationKey("test");
         expectedEntry.setField(StandardField.COMMENT, "testentry");
 
-        assertEquals(Collections.singletonList(expectedEntry), entries);
+        assertEquals(List.of(expectedEntry), entries);
     }
 
     @Test
@@ -1663,7 +1663,7 @@ class BibtexParserTest {
         List<BibEntry> parsed = parser
                 .parseEntries("@article{test,author={" + SavePreferences.ENCODING_PREFIX + "}}");
 
-        assertEquals(Collections.singletonList(expected), parsed);
+        assertEquals(List.of(expected), parsed);
     }
 
     @Test
