@@ -62,7 +62,7 @@ public class StudyDatabaseItem {
             return false;
         }
         StudyDatabaseItem that = (StudyDatabaseItem) o;
-        return getName().equals(that.getName()) && (isEnabled() == (that.isEnabled()));
+        return Object.equals(getName(),that.getName()) && Object.equals(isEnabled(), that.isEnabled());
     }
 
     @Override
