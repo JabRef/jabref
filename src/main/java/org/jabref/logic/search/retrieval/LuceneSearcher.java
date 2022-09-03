@@ -3,6 +3,7 @@ package org.jabref.logic.search.retrieval;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.stream.Collectors;
 
 import org.jabref.gui.LibraryTab;
 import org.jabref.logic.search.SearchQuery;
@@ -67,7 +68,12 @@ public final class LuceneSearcher {
                     queryString = "/" + queryString + "/";
                 }
             }
-            Query luceneQuery = new MultiFieldQueryParser(fieldsToSearchArray, new EnglishStemAnalyzer(), boosts).parse(queryString);
+            MultiFieldQueryParser queryParser = new MultiFieldQueryParser(fieldsToSearchArray, new EnglishStemAnalyzer(), boosts);
+            queryParser.setAllowLeadingWildcard(true);
+            if (!queryString.contains("\"") && !queryString.contains(":") && !queryString.contains("*") && !queryString.contains("~")) {
+                queryString = Arrays.stream(queryString.split(" ")).map(s -> "*" + s + "*").collect(Collectors.joining(" "));
+            }
+            Query luceneQuery = queryParser.parse(queryString);
             TopDocs docs = searcher.search(luceneQuery, Integer.MAX_VALUE);
             for (ScoreDoc scoreDoc : docs.scoreDocs) {
                 SearchResult searchResult = new SearchResult(searcher, luceneQuery, scoreDoc);
