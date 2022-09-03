@@ -33,8 +33,6 @@ import java.util.prefs.Preferences;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import javax.swing.filechooser.FileSystemView;
-
 import javafx.beans.InvalidationListener;
 import javafx.collections.SetChangeListener;
 import javafx.scene.control.TableColumn.SortType;
@@ -1478,7 +1476,7 @@ public class JabRefPreferences implements PreferencesService {
         List<String> tabNames = getSeries(CUSTOM_TAB_NAME);
         List<String> tabFields = getSeries(CUSTOM_TAB_FIELDS);
 
-        if (tabNames.isEmpty() || tabNames.size() != tabFields.size()) {
+        if (tabNames.isEmpty() || (tabNames.size() != tabFields.size())) {
             // Nothing set, so we use the default values
             tabNames = getSeries(CUSTOM_TAB_NAME + "_def");
             tabFields = getSeries(CUSTOM_TAB_FIELDS + "_def");
@@ -2221,14 +2219,7 @@ public class JabRefPreferences implements PreferencesService {
             // A non-empty directory is kept
             return originalDirectory;
         }
-        // Property "user.home" might be "difficult" on Windows
-        // See https://stackoverflow.com/a/586917/873282 for a longer discussion
-        // The proposed solution is to use Swing's FileSystemView
-        // See https://stackoverflow.com/a/32914568/873282
-        // As of 2022, System.getProperty("user.home") returns c:\Users\USERNAME on Windows 10, whereas
-        // the FileSystemView returns C:\Users\USERNAME\Documents, which is the "better" directory
-        String documentsHome = FileSystemView.getFileSystemView().getDefaultDirectory().getPath();
-        return Path.of(documentsHome, "JabRef").toString();
+        return Path.of(JabRefDesktop.getDefaultFileChooserDirectory(), "JabRef").toString();
     }
 
     @Override
