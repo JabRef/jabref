@@ -3,6 +3,7 @@ package org.jabref.logic.crawler;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
+import java.nio.charset.StandardCharsets;
 import java.nio.charset.UnsupportedCharsetException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -14,6 +15,7 @@ import java.util.stream.Collectors;
 
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.database.DatabaseMerger;
+import org.jabref.logic.exporter.AtomicFileWriter;
 import org.jabref.logic.exporter.BibWriter;
 import org.jabref.logic.exporter.BibtexDatabaseWriter;
 import org.jabref.logic.exporter.SaveException;
@@ -419,34 +421,31 @@ public class StudyRepository {
         targetEntries.getEntries().stream().filter(bibEntry -> !bibEntry.hasCitationKey()).forEach(citationKeyGenerator::generateAndSetKey);
     }
 
-    private void writeResultToFile(Path pathToFile, BibDatabase entries) throws IOException, SaveException {
-        if (!Files.exists(pathToFile)) {
-            Files.createFile(pathToFile);
-        }
-        try (Writer fileWriter = new FileWriter(pathToFile.toFile())) {
+    private void writeResultToFile(Path pathToFile, BibDatabase entries) throws SaveException {
+        try (AtomicFileWriter fileWriter = new AtomicFileWriter(pathToFile, StandardCharsets.UTF_8)) {
             BibWriter bibWriter = new BibWriter(fileWriter, OS.NEWLINE);
             BibtexDatabaseWriter databaseWriter = new BibtexDatabaseWriter(bibWriter, generalPreferences, savePreferences, bibEntryTypesManager);
             databaseWriter.saveDatabase(new BibDatabaseContext(entries));
         } catch (UnsupportedCharsetException ex) {
             throw new SaveException(Localization.lang("Character encoding UTF-8 is not supported.", ex));
         } catch (IOException ex) {
-            throw new SaveException("Problems saving: " + ex, ex);
+            throw new SaveException("Problems saving", ex);
         }
     }
 
     private Path getPathToFetcherResultFile(String query, String fetcherName) {
-        return Path.of(repositoryPath.toString(), trimNameAndAddID(query), FileNameCleaner.cleanFileName(fetcherName) + ".bib");
+        return repositoryPath.resolve(trimNameAndAddID(query)).resolve(FileNameCleaner.cleanFileName(fetcherName) + ".bib");
     }
 
     private Path getPathToQueryResultFile(String query) {
-        return Path.of(repositoryPath.toString(), trimNameAndAddID(query), "result.bib");
+        return repositoryPath.resolve(trimNameAndAddID(query)).resolve("result.bib");
     }
 
     private Path getPathToStudyResultFile() {
-        return Path.of(repositoryPath.toString(), "studyResult.bib");
+        return repositoryPath.resolve(Crawler.FILENAME_STUDY_RESULT_BIB);
     }
 
     private Path getPathToQueryDirectory(String query) {
-        return Path.of(repositoryPath.toString(), trimNameAndAddID(query));
+        return repositoryPath.resolve(trimNameAndAddID(query));
     }
 }
