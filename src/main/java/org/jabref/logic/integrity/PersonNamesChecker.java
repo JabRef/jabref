@@ -1,14 +1,14 @@
 package org.jabref.logic.integrity;
 
+import java.util.Locale;
+import java.util.Optional;
+
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.format.RemoveBrackets;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.strings.StringUtil;
-
-import java.util.Locale;
-import java.util.Optional;
 
 public class PersonNamesChecker implements ValueChecker {
 
@@ -37,7 +37,6 @@ public class PersonNamesChecker implements ValueChecker {
         //  Last, First and ...
         //  First Last and ...
         AuthorList authorList = AuthorList.parse(value);
-
         if (!authorList.getAsLastFirstNamesWithAnd(false).equals(value)
                 && !authorList.getAsFirstLastNamesWithAnd().equals(value)) {
             return Optional.of(Localization.lang("Names are not in the standard %0 format.", bibMode.getFormattedName()));

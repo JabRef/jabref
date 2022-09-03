@@ -93,4 +93,11 @@ public class PersonNamesCheckerTest {
                                       ", and Kurt Cobain and A. Einstein", "Donald E. Knuth and Kurt Cobain and ,",
                          "and Kurt Cobain and A. Einstein", "Donald E. Knuth and Kurt Cobain and");
     }
+
+    @Test
+    public void validTildeInName() throws Exception {
+        String name = "hugo Para{\\~n}os";
+
+        assertEquals(Optional.empty(), checker.checkValue(name));
+    }
 }
