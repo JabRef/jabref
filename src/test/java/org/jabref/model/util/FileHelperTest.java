@@ -4,6 +4,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
 
+import org.jabref.logic.util.OS;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -68,8 +70,17 @@ class FileHelperTest {
         assertEquals(Optional.of(testFile.toAbsolutePath()), FileHelper.find("files/test.pdf", firstFilesPath));
     }
 
+    public void testCTemp() {
+        String fileName = "c:\\temp.pdf";
+        if (OS.WINDOWS) {
+            assertFalse(FileHelper.detectBadFileName(fileName));
+        } else {
+            assertTrue(FileHelper.detectBadFileName(fileName));
+        }
+    }
+
     @ParameterizedTest
-    @ValueSource(strings = {"c:\\temp.pdf", "/mnt/tmp/test.pdf"})
+    @ValueSource(strings = {"/mnt/tmp/test.pdf"})
     public void legalPaths(String fileName) {
         assertFalse(FileHelper.detectBadFileName(fileName));
     }
