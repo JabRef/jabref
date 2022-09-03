@@ -85,8 +85,8 @@ public class DuplicateResolverDialog extends BaseDialog<DuplicateResolverResult>
                 threeWayMerge = new ThreeWayMergeView(one, two);
             }
             case IMPORT_CHECK -> {
-                first = new ButtonType(Localization.lang("Keep from import"), ButtonData.LEFT);
-                second = new ButtonType(Localization.lang("Keep old entry"), ButtonData.LEFT);
+                first = new ButtonType(Localization.lang("Keep old entry"), ButtonData.LEFT);
+                second = new ButtonType(Localization.lang("Keep from import"), ButtonData.LEFT);
                 both = new ButtonType(Localization.lang("Keep both"), ButtonData.LEFT);
                 threeWayMerge = new ThreeWayMergeView(one, two, Localization.lang("Old entry"),
                         Localization.lang("From import"));
