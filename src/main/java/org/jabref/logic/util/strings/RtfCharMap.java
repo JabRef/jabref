@@ -4,7 +4,7 @@ import java.util.HashMap;
 
 public class RtfCharMap {
 
-    private HashMap<String, String> rtfMap = new HashMap<>();
+    private final HashMap<String, String> rtfMap = new HashMap<>();
 
     public RtfCharMap() {
         put("`a", "\\'e0");

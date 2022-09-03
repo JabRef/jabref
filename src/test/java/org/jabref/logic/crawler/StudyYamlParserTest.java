@@ -18,6 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class StudyYamlParserTest {
     @TempDir
     static Path testDirectory;
+
     Study expectedStudy;
 
     @BeforeEach
@@ -46,6 +47,17 @@ class StudyYamlParserTest {
     public void writeStudyFileSuccessfully() throws Exception {
         new StudyYamlParser().writeStudyYamlFile(expectedStudy, testDirectory.resolve("study.yml"));
         Study study = new StudyYamlParser().parseStudyYamlFile(testDirectory.resolve("study.yml"));
+        assertEquals(expectedStudy, study);
+    }
+
+    @Test
+    public void readsJabRef57StudySuccessfully() throws Exception {
+        // The field "last-search-date" was removed
+        // If the field is "just" removed from the datamodel, one gets following exception:
+        //   com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException: Unrecognized field "last-search-date" (class org.jabref.model.study.Study), not marked as ignorable (5 known properties: "authors", "research-questions", "queries", "title", "databases"])
+        // This tests ensures that this exception does not occur
+        URL studyDefinition = StudyYamlParser.class.getResource("study-jabref-5.7.yml");
+        Study study = new StudyYamlParser().parseStudyYamlFile(Path.of(studyDefinition.toURI()));
         assertEquals(expectedStudy, study);
     }
 }
