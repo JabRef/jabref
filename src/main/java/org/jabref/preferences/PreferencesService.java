@@ -103,6 +103,8 @@ public interface PreferencesService {
 
     CleanupPreset getCleanupPreset();
 
+    CleanupPreset getDefaultCleanupPreset();
+
     void setCleanupPreset(CleanupPreset cleanupPreset);
 
     @Deprecated

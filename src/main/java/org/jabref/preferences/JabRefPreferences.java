@@ -66,7 +66,6 @@ import org.jabref.logic.citationkeypattern.GlobalCitationKeyPattern;
 import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.citationstyle.CitationStylePreviewLayout;
 import org.jabref.logic.cleanup.CleanupPreset;
-import org.jabref.logic.cleanup.Cleanups;
 import org.jabref.logic.cleanup.FieldFormatterCleanups;
 import org.jabref.logic.exporter.SavePreferences;
 import org.jabref.logic.exporter.TemplateExporter;
@@ -287,7 +286,8 @@ public class JabRefPreferences implements PreferencesService {
     public static final String CUSTOM_TAB_FIELDS = "customTabFields_";
     public static final String ASK_AUTO_NAMING_PDFS_AGAIN = "AskAutoNamingPDFsAgain";
     public static final String CLEANUP_JOBS = "CleanUpJobs";
-    public static final String CLEANUP_FORMATTERS = "CleanUpFormatters";
+    public static final String CLEANUP_FIELD_FORMATTERS_ENABLED = "CleanUpFormattersEnabled";
+    public static final String CLEANUP_FIELD_FORMATTERS = "CleanUpFormatters";
     public static final String IMPORT_FILENAMEPATTERN = "importFileNamePattern";
     public static final String IMPORT_FILEDIRPATTERN = "importFileDirPattern";
     public static final String NAME_FORMATTER_VALUE = "nameFormatterFormats";
@@ -686,7 +686,9 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(ALREADY_ASKED_TO_COLLECT_TELEMETRY, Boolean.FALSE);
 
         defaults.put(ASK_AUTO_NAMING_PDFS_AGAIN, Boolean.TRUE);
-        insertDefaultCleanupPreset(defaults);
+        defaults.put(CLEANUP_JOBS, convertListToString(getDefaultCleanupJobs().stream().map(Enum::name).toList()));
+        defaults.put(CLEANUP_FIELD_FORMATTERS_ENABLED, Boolean.FALSE);
+        defaults.put(CLEANUP_FIELD_FORMATTERS, FieldFormatterCleanups.getMetaDataString(FieldFormatterCleanups.DEFAULT_SAVE_ACTIONS, STRINGLIST_DELIMITER.toString()));
 
         // use citation key appended with filename as default pattern
         defaults.put(IMPORT_FILENAMEPATTERN, FilePreferences.DEFAULT_FILENAME_PATTERNS[1]);
@@ -827,19 +829,6 @@ public class JabRefPreferences implements PreferencesService {
         } else {
             return Optional.of("");
         }
-    }
-
-    private static void insertDefaultCleanupPreset(Map<String, Object> storage) {
-        EnumSet<CleanupPreset.CleanupStep> activeJobs = EnumSet.allOf(CleanupPreset.CleanupStep.class);
-        activeJobs.removeAll(EnumSet.of(
-                CleanupPreset.CleanupStep.CLEAN_UP_UPGRADE_EXTERNAL_LINKS,
-                CleanupPreset.CleanupStep.MOVE_PDF,
-                CleanupPreset.CleanupStep.RENAME_PDF_ONLY_RELATIVE_PATHS,
-                CleanupPreset.CleanupStep.CONVERT_TO_BIBLATEX,
-                CleanupPreset.CleanupStep.CONVERT_TO_BIBTEX));
-
-        storage.put(CLEANUP_JOBS, convertListToString(activeJobs.stream().map(Enum::name).toList()));
-        storage.put(CLEANUP_FORMATTERS, convertListToString(Cleanups.DEFAULT_SAVE_ACTIONS.getAsStringList(OS.NEWLINE)));
     }
 
     public void setLanguageDependentDefaultValues() {
@@ -1165,7 +1154,7 @@ public class JabRefPreferences implements PreferencesService {
         Set<CleanupPreset.CleanupStep> activeJobs = getStringList(CLEANUP_JOBS).stream()
                                                                                .map(CleanupPreset.CleanupStep::valueOf)
                                                                                .collect(Collectors.toSet());
-        FieldFormatterCleanups formatterCleanups = Cleanups.parse(getStringList(CLEANUP_FORMATTERS));
+        FieldFormatterCleanups formatterCleanups = FieldFormatterCleanups.parse(getStringList(CLEANUP_FIELD_FORMATTERS));
 
         return new CleanupPreset(activeJobs, formatterCleanups);
     }
@@ -1173,7 +1162,30 @@ public class JabRefPreferences implements PreferencesService {
     @Override
     public void setCleanupPreset(CleanupPreset cleanupPreset) {
         putStringList(CLEANUP_JOBS, cleanupPreset.getActiveJobs().stream().map(Enum::name).collect(Collectors.toList()));
-        putStringList(CLEANUP_FORMATTERS, cleanupPreset.getFormatterCleanups().getAsStringList(OS.NEWLINE));
+
+        FieldFormatterCleanups fieldFormatters = cleanupPreset.getFormatterCleanups();
+        putBoolean(CLEANUP_FIELD_FORMATTERS_ENABLED, fieldFormatters.isEnabled());
+        put(CLEANUP_FIELD_FORMATTERS, FieldFormatterCleanups.getMetaDataString(fieldFormatters.getConfiguredActions(), STRINGLIST_DELIMITER.toString()));
+    }
+
+    @Override
+    public CleanupPreset getDefaultCleanupPreset() {
+        return new CleanupPreset(
+                getDefaultCleanupJobs(),
+                new FieldFormatterCleanups(
+                        (Boolean) defaults.get(CLEANUP_FIELD_FORMATTERS_ENABLED),
+                        FieldFormatterCleanups.parse((String) defaults.get(CLEANUP_FIELD_FORMATTERS))));
+    }
+
+    private static EnumSet<CleanupPreset.CleanupStep> getDefaultCleanupJobs() {
+        EnumSet<CleanupPreset.CleanupStep> activeJobs = EnumSet.allOf(CleanupPreset.CleanupStep.class);
+        activeJobs.removeAll(EnumSet.of(
+                CleanupPreset.CleanupStep.CLEAN_UP_UPGRADE_EXTERNAL_LINKS,
+                CleanupPreset.CleanupStep.MOVE_PDF,
+                CleanupPreset.CleanupStep.RENAME_PDF_ONLY_RELATIVE_PATHS,
+                CleanupPreset.CleanupStep.CONVERT_TO_BIBLATEX,
+                CleanupPreset.CleanupStep.CONVERT_TO_BIBTEX));
+        return activeJobs;
     }
 
     @Override
