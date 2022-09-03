@@ -21,6 +21,7 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.input.KeyCode;
+import javafx.scene.input.MouseButton;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.icon.IconTheme;
@@ -28,6 +29,7 @@ import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.gui.util.ValueTableCellFactory;
+import org.jabref.gui.util.ViewModelTableRowFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.study.Study;
 import org.jabref.preferences.PreferencesService;
@@ -164,17 +166,35 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
     }
 
     private void initDatabasesTab() {
+        new ViewModelTableRowFactory<StudyDatabaseItem>()
+                .withOnMouseClickedEvent((entry, event) -> {
+                    if (event.getButton() == MouseButton.PRIMARY) {
+                        entry.setEnabled(!entry.isEnabled());
+                    }
+                })
+                .install(databaseTable);
+
         databaseColumn.setReorderable(false);
         databaseColumn.setCellFactory(TextFieldTableCell.forTableColumn());
 
         databaseEnabledColumn.setResizable(false);
         databaseEnabledColumn.setReorderable(false);
-        databaseEnabledColumn.setCellValueFactory(param -> param.getValue().enabledProperty());
         databaseEnabledColumn.setCellFactory(CheckBoxTableCell.forTableColumn(databaseEnabledColumn));
+        databaseEnabledColumn.setCellValueFactory(param -> param.getValue().enabledProperty());
 
+        databaseColumn.setEditable(false);
         databaseColumn.setCellValueFactory(param -> param.getValue().nameProperty());
 
         databaseTable.setItems(viewModel.getDatabases());
+
+        /*
+        databaseTable.getSelectionModel().selectedItemProperty().addListener(
+                (obs, oldSelection, newSelection) -> {
+                    if (newSelection != null) {
+                        newSelection.setEnabled(!newSelection.isEnabled());
+                    }
+                }
+        );*/
     }
 
     private void setupCommonPropertiesForTables(Node addControl,
