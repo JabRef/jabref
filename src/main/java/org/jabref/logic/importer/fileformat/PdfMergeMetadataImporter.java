@@ -15,7 +15,6 @@ import org.jabref.logic.importer.EntryBasedFetcher;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.Importer;
-import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fetcher.DoiFetcher;
 import org.jabref.logic.importer.fetcher.IsbnFetcher;
@@ -41,13 +40,13 @@ public class PdfMergeMetadataImporter extends Importer {
     private final List<Importer> metadataImporters;
     private final ImportFormatPreferences importFormatPreferences;
 
-    public PdfMergeMetadataImporter(ImporterPreferences importerPreferences, ImportFormatPreferences importFormatPreferences) {
+    public PdfMergeMetadataImporter(ImportFormatPreferences importFormatPreferences) {
         this.importFormatPreferences = importFormatPreferences;
         this.metadataImporters = new ArrayList<>();
         this.metadataImporters.add(new PdfVerbatimBibTextImporter(importFormatPreferences));
         this.metadataImporters.add(new PdfEmbeddedBibFileImporter(importFormatPreferences));
-        if (importerPreferences.isGrobidEnabled()) {
-            this.metadataImporters.add(new PdfGrobidImporter(importerPreferences, importFormatPreferences));
+        if (importFormatPreferences.getGrobidPreferences().isGrobidEnabled()) {
+            this.metadataImporters.add(new PdfGrobidImporter(importFormatPreferences));
         }
         this.metadataImporters.add(new PdfXmpImporter(importFormatPreferences.getXmpPreferences()));
         this.metadataImporters.add(new PdfContentImporter(importFormatPreferences));
@@ -149,8 +148,8 @@ public class PdfMergeMetadataImporter extends Importer {
         private final FilePreferences filePreferences;
         private final BibDatabaseContext databaseContext;
 
-        public EntryBasedFetcherWrapper(ImporterPreferences importerPreferences, ImportFormatPreferences importFormatPreferences, FilePreferences filePreferences, BibDatabaseContext context) {
-            super(importerPreferences, importFormatPreferences);
+        public EntryBasedFetcherWrapper(ImportFormatPreferences importFormatPreferences, FilePreferences filePreferences, BibDatabaseContext context) {
+            super(importFormatPreferences);
             this.filePreferences = filePreferences;
             this.databaseContext = context;
         }

@@ -8,7 +8,6 @@ import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.externalfiles.ImportHandler;
-import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.importer.CompositeIdFetcher;
@@ -32,7 +31,13 @@ public class GenerateEntryFromIdAction extends SimpleCommand {
     private final PopOver entryFromIdPopOver;
     private final StateManager stateManager;
 
-    public GenerateEntryFromIdAction(LibraryTab libraryTab, DialogService dialogService, PreferencesService preferencesService, TaskExecutor taskExecutor, PopOver entryFromIdPopOver, String identifier, StateManager stateManager) {
+    public GenerateEntryFromIdAction(LibraryTab libraryTab,
+                                     DialogService dialogService,
+                                     PreferencesService preferencesService,
+                                     TaskExecutor taskExecutor,
+                                     PopOver entryFromIdPopOver,
+                                     String identifier,
+                                     StateManager stateManager) {
         this.libraryTab = libraryTab;
         this.dialogService = dialogService;
         this.preferencesService = preferencesService;
@@ -69,7 +74,7 @@ public class GenerateEntryFromIdAction extends SimpleCommand {
             Optional<BibEntry> result = bibEntry;
             if (result.isPresent()) {
                 final BibEntry entry = result.get();
-                ImportHandler handler = new ImportHandler(libraryTab.getBibDatabaseContext(), ExternalFileTypes.getInstance(), preferencesService, Globals.getFileUpdateMonitor(), libraryTab.getUndoManager(), stateManager, dialogService, null);
+                ImportHandler handler = new ImportHandler(libraryTab.getBibDatabaseContext(), preferencesService, Globals.getFileUpdateMonitor(), libraryTab.getUndoManager(), stateManager, dialogService, null);
                 handler.importEntryWithDuplicateCheck(libraryTab.getBibDatabaseContext(), entry);
             } else {
                 dialogService.notify("No entry found or import canceled");

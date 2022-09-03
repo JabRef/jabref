@@ -4,7 +4,7 @@ import org.jabref.model.database.event.BibDatabaseContextChangedEvent;
 import org.jabref.model.metadata.MetaData;
 
 /**
- * {@link MetaDataChangedEvent} is fired when a tuple of meta data has been put or removed.
+ * {@link MetaDataChangedEvent} is fired when a tuple of metadata has been put or removed.
  */
 public class MetaDataChangedEvent extends BibDatabaseContextChangedEvent {
 

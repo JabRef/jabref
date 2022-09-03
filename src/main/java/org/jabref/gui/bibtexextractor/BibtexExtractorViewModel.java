@@ -13,7 +13,6 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.Globals;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.externalfiles.ImportHandler;
-import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.importer.FetcherException;
@@ -52,7 +51,6 @@ public class BibtexExtractorViewModel {
         this.taskExecutor = taskExecutor;
         this.importHandler = new ImportHandler(
                 bibdatabaseContext,
-                ExternalFileTypes.getInstance(),
                 preferencesService,
                 fileUpdateMonitor,
                 undoManager,
@@ -66,7 +64,7 @@ public class BibtexExtractorViewModel {
     }
 
     public void startParsing() {
-        if (preferencesService.getImporterPreferences().isGrobidEnabled()) {
+        if (preferencesService.getGrobidPreferences().isGrobidEnabled()) {
             parseUsingGrobid();
         } else {
             parseUsingBibtexExtractor();
@@ -80,7 +78,7 @@ public class BibtexExtractorViewModel {
     }
 
     private void parseUsingGrobid() {
-        GrobidCitationFetcher grobidCitationFetcher = new GrobidCitationFetcher(preferencesService.getImporterPreferences(), preferencesService.getImportFormatPreferences());
+        GrobidCitationFetcher grobidCitationFetcher = new GrobidCitationFetcher(preferencesService.getGrobidPreferences(), preferencesService.getImportFormatPreferences());
         BackgroundTask.wrap(() -> grobidCitationFetcher.performSearch(inputTextProperty.getValue()))
                       .onRunning(() -> dialogService.notify(Localization.lang("Your text is being parsed...")))
                       .onFailure((e) -> {
