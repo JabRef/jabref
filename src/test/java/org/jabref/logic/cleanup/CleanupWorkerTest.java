@@ -1,6 +1,5 @@
 package org.jabref.logic.cleanup;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -48,19 +47,21 @@ class CleanupWorkerTest {
     private final CleanupPreset emptyPreset = new CleanupPreset(EnumSet.noneOf(CleanupPreset.CleanupStep.class));
     private CleanupWorker worker;
 
-    // Ensure that the folder stays the same for all tests. By default @TempDir creates a new folder for each usage
+    // Ensure that the folder stays the same for all tests.
+    // By default, @TempDir creates a new folder for each usage
     private Path bibFolder;
+
+    // Currently, this directory is created below the bibFolder
+    private Path pdfPath;
 
     @BeforeEach
     void setUp(@TempDir Path bibFolder) throws IOException {
-
         this.bibFolder = bibFolder;
-        Path path = bibFolder.resolve("ARandomlyNamedFolder");
-        Files.createDirectory(path);
-        File pdfFolder = path.toFile();
+        pdfPath = bibFolder.resolve("ARandomlyNamedFolder");
+        Files.createDirectory(pdfPath);
 
         MetaData metaData = new MetaData();
-        metaData.setDefaultFileDirectory(pdfFolder.getAbsolutePath());
+        metaData.setDefaultFileDirectory(pdfPath.toAbsolutePath().toString());
         BibDatabaseContext context = new BibDatabaseContext(new BibDatabase(), metaData);
         Files.createFile(bibFolder.resolve("test.bib"));
         context.setDatabasePath(bibFolder.resolve("test.bib"));
@@ -239,7 +240,7 @@ class CleanupWorkerTest {
     void cleanupRelativePathsConvertAbsoluteToRelativePath() throws IOException {
         CleanupPreset preset = new CleanupPreset(CleanupPreset.CleanupStep.MAKE_PATHS_RELATIVE);
 
-        Path path = bibFolder.resolve("AnotherRandomlyNamedFile");
+        Path path = pdfPath.resolve("AnotherRandomlyNamedFile");
         Files.createFile(path);
         BibEntry entry = new BibEntry();
         LinkedFile fileField = new LinkedFile("", path.toAbsolutePath(), "");
@@ -254,10 +255,10 @@ class CleanupWorkerTest {
     void cleanupRenamePdfRenamesRelativeFile() throws IOException {
         CleanupPreset preset = new CleanupPreset(CleanupPreset.CleanupStep.RENAME_PDF);
 
-        Path path = bibFolder.resolve("AnotherRandomlyNamedFile.tmp");
+        Path path = pdfPath.resolve("AnotherRandomlyNamedFile.tmp");
         Files.createFile(path);
-        BibEntry entry = new BibEntry();
-        entry.setCitationKey("Toot");
+        BibEntry entry = new BibEntry()
+                .withCitationKey("Toot");
         LinkedFile fileField = new LinkedFile("", path.toAbsolutePath(), "");
         entry.setField(StandardField.FILE, FileFieldWriter.getStringRepresentation(fileField));
 
