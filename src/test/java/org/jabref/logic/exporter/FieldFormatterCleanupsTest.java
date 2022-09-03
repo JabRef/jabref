@@ -147,7 +147,6 @@ public class FieldFormatterCleanupsTest {
         assertEquals(Optional.empty(), entry.getField(StandardField.MONTH));
     }
 
-
     @Test
     void parserKeepsSaveActions() {
         List<FieldFormatterCleanup> fieldFormatterCleanups = FieldFormatterCleanups.parse("""
