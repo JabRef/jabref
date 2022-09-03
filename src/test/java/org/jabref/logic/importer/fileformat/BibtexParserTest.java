@@ -139,12 +139,9 @@ class BibtexParserTest {
     @Test
     void singleFromStringRecognizesEntryInMultiple() throws ParseException {
         Optional<BibEntry> parsed = BibtexParser.singleFromString("""
-                        @article{canh05,
-                            author = {Crowston, K. and Annabi, H.},
-                            title = {Title A}
-                            }
-                        @inProceedings{foo,  author={Norton Bar}}
-                        """,
+                        @article{canh05, author = {Crowston, K. and Annabi, H.},
+                            title = {Title A}}
+                        @inProceedings{foo,  author={Norton Bar}}""",
                 importFormatPreferences, fileMonitor);
 
         assertTrue(parsed.get().getCitationKey().equals(Optional.of("canh05"))
