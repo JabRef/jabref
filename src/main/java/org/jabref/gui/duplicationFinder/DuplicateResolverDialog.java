@@ -1,6 +1,5 @@
 package org.jabref.gui.duplicationFinder;
 
-import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
@@ -55,7 +54,7 @@ public class DuplicateResolverDialog extends BaseDialog<DuplicateResolverResult>
         ButtonType help = new ButtonType(Localization.lang("Help"), ButtonData.HELP);
 
         ButtonType cancel = ButtonType.CANCEL;
-        ButtonType merge = new ButtonType(Localization.lang("Keep merged entry only"), ButtonData.APPLY);
+        ButtonType merge = new ButtonType(Localization.lang("Keep merged"), ButtonData.OK_DONE);
 
         ButtonBar options = new ButtonBar();
         ButtonType both;
@@ -66,38 +65,40 @@ public class DuplicateResolverDialog extends BaseDialog<DuplicateResolverResult>
 
         switch (type) {
             case DUPLICATE_SEARCH -> {
-                first = new ButtonType(Localization.lang("Keep left"), ButtonData.APPLY);
-                second = new ButtonType(Localization.lang("Keep right"), ButtonData.APPLY);
-                both = new ButtonType(Localization.lang("Keep both"), ButtonData.APPLY);
+                first = new ButtonType(Localization.lang("Keep left"), ButtonData.LEFT);
+                second = new ButtonType(Localization.lang("Keep right"), ButtonData.LEFT);
+                both = new ButtonType(Localization.lang("Keep both"), ButtonData.LEFT);
                 threeWayMerge = new ThreeWayMergeView(one, two);
             }
             case INSPECTION -> {
-                first = new ButtonType(Localization.lang("Remove old entry"), ButtonData.APPLY);
-                second = new ButtonType(Localization.lang("Remove entry from import"), ButtonData.APPLY);
-                both = new ButtonType(Localization.lang("Keep both"), ButtonData.APPLY);
+                first = new ButtonType(Localization.lang("Keep imported"), ButtonData.LEFT);
+                second = new ButtonType(Localization.lang("Keep old entry"), ButtonData.LEFT);
+                both = new ButtonType(Localization.lang("Keep both"), ButtonData.LEFT);
                 threeWayMerge = new ThreeWayMergeView(one, two, Localization.lang("Old entry"),
                         Localization.lang("From import"));
             }
             case DUPLICATE_SEARCH_WITH_EXACT -> {
-                first = new ButtonType(Localization.lang("Keep left"), ButtonData.APPLY);
-                second = new ButtonType(Localization.lang("Keep right"), ButtonData.APPLY);
-                both = new ButtonType(Localization.lang("Keep both"), ButtonData.APPLY);
+                first = new ButtonType(Localization.lang("Keep left"), ButtonData.LEFT);
+                second = new ButtonType(Localization.lang("Keep right"), ButtonData.LEFT);
+                both = new ButtonType(Localization.lang("Keep both"), ButtonData.LEFT);
                 removeExactVisible = true;
                 threeWayMerge = new ThreeWayMergeView(one, two);
             }
-            default -> {
-                first = new ButtonType(Localization.lang("Import and remove old entry"), ButtonData.APPLY);
-                second = new ButtonType(Localization.lang("Do not import entry"), ButtonData.APPLY);
-                both = new ButtonType(Localization.lang("Import and keep old entry"), ButtonData.APPLY);
+            case IMPORT_CHECK -> {
+                first = new ButtonType(Localization.lang("Keep from import"), ButtonData.LEFT);
+                second = new ButtonType(Localization.lang("Keep old entry"), ButtonData.LEFT);
+                both = new ButtonType(Localization.lang("Keep both"), ButtonData.LEFT);
                 threeWayMerge = new ThreeWayMergeView(one, two, Localization.lang("Old entry"),
                         Localization.lang("From import"));
             }
+            default -> throw new IllegalStateException("Switch expression should be exhaustive");
         }
         if (removeExactVisible) {
             this.getDialogPane().getButtonTypes().add(removeExact);
         }
 
-        this.getDialogPane().getButtonTypes().addAll(first, second, both, merge, cancel, help);
+        this.getDialogPane().getButtonTypes().addAll(first, second, both, merge, cancel);
+        this.getDialogPane().setFocusTraversable(false);
 
         // Retrieves the previous window state and sets the new dialog window size and position to match it
         DialogWindowState state = stateManager.getDialogWindowState(getClass().getSimpleName());
@@ -129,8 +130,8 @@ public class DuplicateResolverDialog extends BaseDialog<DuplicateResolverResult>
         });
 
         getDialogPane().setContent(borderPane);
-        Button helpButton = (Button) this.getDialogPane().lookupButton(help);
-        helpButton.setOnAction(evt -> helpCommand.execute());
+/*        Button helpButton = (Button) this.getDialogPane().lookupButton(help);
+        helpButton.setOnAction(evt -> helpCommand.execute());*/
     }
 
     public BibEntry getMergedEntry() {
