@@ -39,8 +39,9 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixed some visual glitches with the linked files editor field in the entry editor and increased its height. [#8823](https://github.com/JabRef/jabref/issues/8823)
 - We fixed several bugs regarding the manual and the autosave of library files that sometimes lead to exceptions or data loss. [#9067](https://github.com/JabRef/jabref/pull/9067), [#8448](https://github.com/JabRef/jabref/issues/8484), [#8746](https://github.com/JabRef/jabref/issues/8746), [#6684](https://github.com/JabRef/jabref/issues/6684), [#6644](https://github.com/JabRef/jabref/issues/6644), [#6102](https://github.com/JabRef/jabref/issues/6102), [#6002](https://github.com/JabRef/jabref/issues/6000)
 - We fixed an issue where applied save actions on saving the library file would lead to the dialog "The libary has been modified by another program" popping up [#4877](https://github.com/JabRef/jabref/issues/4877)
-- We fixed an issue where title case didn't capitalize words after en-dash characters [#9068]
-- We fixed an issue where JabRef would not exit when a connection to a LibreOffice document was established previously and the document is still open [#9075](https://github.com/JabRef/jabref/issues/9075)
+- We fixed issues with save actions not correctly loaded when opening the library. [#9122](https://github.com/JabRef/jabref/pull/9122)
+- We fixed an issue where title case didn't capitalize words after en-dash characters. [#9068](https://github.com/JabRef/jabref/pull/9068)
+- We fixed an issue where JabRef would not exit when a connection to a LibreOffice document was established previously and the document is still open. [#9075](https://github.com/JabRef/jabref/issues/9075)
 
 ### Removed
 
