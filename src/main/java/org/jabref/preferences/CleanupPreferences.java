@@ -1,7 +1,6 @@
-package org.jabref.logic.cleanup;
+package org.jabref.preferences;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Set;
 
@@ -10,10 +9,12 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableSet;
 
+import org.jabref.logic.cleanup.FieldFormatterCleanups;
+
 public class CleanupPreferences {
 
     private final ObservableSet<CleanupStep> activeJobs;
-    private final ObjectProperty<FieldFormatterCleanups> formatterCleanups;
+    private final ObjectProperty<FieldFormatterCleanups> fieldFormatterCleanups;
 
     public CleanupPreferences(EnumSet<CleanupStep> activeJobs) {
         this(activeJobs, new FieldFormatterCleanups(false, new ArrayList<>()));
@@ -29,23 +30,48 @@ public class CleanupPreferences {
 
     public CleanupPreferences(EnumSet<CleanupStep> activeJobs, FieldFormatterCleanups formatterCleanups) {
         this.activeJobs = FXCollections.observableSet(activeJobs);
-        this.formatterCleanups = new SimpleObjectProperty<>(formatterCleanups);
+        this.fieldFormatterCleanups = new SimpleObjectProperty<>(formatterCleanups);
     }
 
-    public Set<CleanupStep> getActiveJobs() {
-        return Collections.unmodifiableSet(activeJobs);
+    public EnumSet<CleanupStep> getActiveJobs() {
+        if (activeJobs.isEmpty()) {
+            return EnumSet.noneOf(CleanupStep.class);
+        }
+
+        return EnumSet.copyOf(activeJobs);
     }
 
-    public boolean isRenamePDFActive() {
-        return isActive(CleanupStep.RENAME_PDF) || isActive(CleanupStep.RENAME_PDF_ONLY_RELATIVE_PATHS);
+    public void setActive(CleanupStep job, boolean value) {
+        if (activeJobs.contains(job) && !value) {
+            activeJobs.remove(job);
+        } else if (!activeJobs.contains(job) && value) {
+            activeJobs.add(job);
+        }
+    }
+
+    protected ObservableSet<CleanupStep> getObservableActiveJobs() {
+        return activeJobs;
+    }
+
+    public void setActiveJobs(Set<CleanupStep> jobs) {
+        activeJobs.clear();
+        activeJobs.addAll(jobs);
     }
 
     public Boolean isActive(CleanupStep step) {
         return activeJobs.contains(step);
     }
 
-    public FieldFormatterCleanups getFormatterCleanups() {
-        return formatterCleanups.get();
+    public FieldFormatterCleanups getFieldFormatterCleanups() {
+        return fieldFormatterCleanups.get();
+    }
+
+    protected ObjectProperty<FieldFormatterCleanups> fieldFormatterCleanupsProperty() {
+        return fieldFormatterCleanups;
+    }
+
+    public void setFieldFormatterCleanups(FieldFormatterCleanups fieldFormatters) {
+        fieldFormatterCleanups.setValue(fieldFormatters);
     }
 
     public enum CleanupStep {

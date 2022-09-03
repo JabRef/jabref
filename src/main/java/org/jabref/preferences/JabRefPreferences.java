@@ -65,7 +65,6 @@ import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPattern;
 import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.citationstyle.CitationStylePreviewLayout;
-import org.jabref.logic.cleanup.CleanupPreferences;
 import org.jabref.logic.cleanup.FieldFormatterCleanups;
 import org.jabref.logic.exporter.SavePreferences;
 import org.jabref.logic.exporter.TemplateExporter;
@@ -453,6 +452,7 @@ public class JabRefPreferences implements PreferencesService {
     private GroupsPreferences groupsPreferences;
     private XmpPreferences xmpPreferences;
     private AutoCompletePreferences autoCompletePreferences;
+    private CleanupPreferences cleanupPreferences;
 
     // The constructor is made private to enforce this as a singleton class:
     private JabRefPreferences() {
@@ -1147,45 +1147,6 @@ public class JabRefPreferences implements PreferencesService {
     @Override
     public JournalAbbreviationPreferences getJournalAbbreviationPreferences() {
         return new JournalAbbreviationPreferences(getStringList(EXTERNAL_JOURNAL_LISTS), StandardCharsets.UTF_8);
-    }
-
-    @Override
-    public CleanupPreferences getCleanupPreset() {
-        Set<CleanupPreferences.CleanupStep> activeJobs = getStringList(CLEANUP_JOBS).stream()
-                                                                                    .map(CleanupPreferences.CleanupStep::valueOf)
-                                                                                    .collect(Collectors.toSet());
-        FieldFormatterCleanups formatterCleanups = FieldFormatterCleanups.parse(getStringList(CLEANUP_FIELD_FORMATTERS));
-
-        return new CleanupPreferences(EnumSet.copyOf(activeJobs), formatterCleanups);
-    }
-
-    @Override
-    public void setCleanupPreset(CleanupPreferences cleanupPreferences) {
-        putStringList(CLEANUP_JOBS, cleanupPreferences.getActiveJobs().stream().map(Enum::name).collect(Collectors.toList()));
-
-        FieldFormatterCleanups fieldFormatters = cleanupPreferences.getFormatterCleanups();
-        putBoolean(CLEANUP_FIELD_FORMATTERS_ENABLED, fieldFormatters.isEnabled());
-        put(CLEANUP_FIELD_FORMATTERS, FieldFormatterCleanups.getMetaDataString(fieldFormatters.getConfiguredActions(), STRINGLIST_DELIMITER.toString()));
-    }
-
-    @Override
-    public CleanupPreferences getDefaultCleanupPreset() {
-        return new CleanupPreferences(
-                getDefaultCleanupJobs(),
-                new FieldFormatterCleanups(
-                        (Boolean) defaults.get(CLEANUP_FIELD_FORMATTERS_ENABLED),
-                        FieldFormatterCleanups.parse((String) defaults.get(CLEANUP_FIELD_FORMATTERS))));
-    }
-
-    private static EnumSet<CleanupPreferences.CleanupStep> getDefaultCleanupJobs() {
-        EnumSet<CleanupPreferences.CleanupStep> activeJobs = EnumSet.allOf(CleanupPreferences.CleanupStep.class);
-        activeJobs.removeAll(EnumSet.of(
-                CleanupPreferences.CleanupStep.CLEAN_UP_UPGRADE_EXTERNAL_LINKS,
-                CleanupPreferences.CleanupStep.MOVE_PDF,
-                CleanupPreferences.CleanupStep.RENAME_PDF_ONLY_RELATIVE_PATHS,
-                CleanupPreferences.CleanupStep.CONVERT_TO_BIBLATEX,
-                CleanupPreferences.CleanupStep.CONVERT_TO_BIBTEX));
-        return activeJobs;
     }
 
     @Override
@@ -2493,6 +2454,53 @@ public class JabRefPreferences implements PreferencesService {
 
         putStringList(SIDE_PANE_COMPONENT_NAMES, names);
         putStringList(SIDE_PANE_COMPONENT_PREFERRED_POSITIONS, positions);
+    }
+
+    //*************************************************************************************************************
+    // Cleanup preferences
+    //*************************************************************************************************************
+
+    @Override
+    public CleanupPreferences getCleanupPreferences() {
+        if (Objects.nonNull(cleanupPreferences)) {
+            return cleanupPreferences;
+        }
+
+        cleanupPreferences = new CleanupPreferences(
+                EnumSet.copyOf(getStringList(CLEANUP_JOBS).stream()
+                                                          .map(CleanupPreferences.CleanupStep::valueOf)
+                                                          .collect(Collectors.toSet())),
+                FieldFormatterCleanups.parse(getStringList(CLEANUP_FIELD_FORMATTERS)));
+
+        cleanupPreferences.getObservableActiveJobs().addListener((SetChangeListener<CleanupPreferences.CleanupStep>) c ->
+                putStringList(CLEANUP_JOBS, cleanupPreferences.getActiveJobs().stream().map(Enum::name).collect(Collectors.toList())));
+
+        EasyBind.listen(cleanupPreferences.fieldFormatterCleanupsProperty(), (fieldFormatters, oldValue, newValue) -> {
+            putBoolean(CLEANUP_FIELD_FORMATTERS_ENABLED, newValue.isEnabled());
+            put(CLEANUP_FIELD_FORMATTERS, FieldFormatterCleanups.getMetaDataString(newValue.getConfiguredActions(), STRINGLIST_DELIMITER.toString()));
+        });
+
+        return cleanupPreferences;
+    }
+
+    @Override
+    public CleanupPreferences getDefaultCleanupPreset() {
+        return new CleanupPreferences(
+                getDefaultCleanupJobs(),
+                new FieldFormatterCleanups(
+                        (Boolean) defaults.get(CLEANUP_FIELD_FORMATTERS_ENABLED),
+                        FieldFormatterCleanups.parse((String) defaults.get(CLEANUP_FIELD_FORMATTERS))));
+    }
+
+    private static EnumSet<CleanupPreferences.CleanupStep> getDefaultCleanupJobs() {
+        EnumSet<CleanupPreferences.CleanupStep> activeJobs = EnumSet.allOf(CleanupPreferences.CleanupStep.class);
+        activeJobs.removeAll(EnumSet.of(
+                CleanupPreferences.CleanupStep.CLEAN_UP_UPGRADE_EXTERNAL_LINKS,
+                CleanupPreferences.CleanupStep.MOVE_PDF,
+                CleanupPreferences.CleanupStep.RENAME_PDF_ONLY_RELATIVE_PATHS,
+                CleanupPreferences.CleanupStep.CONVERT_TO_BIBLATEX,
+                CleanupPreferences.CleanupStep.CONVERT_TO_BIBTEX));
+        return activeJobs;
     }
 
     //*************************************************************************************************************

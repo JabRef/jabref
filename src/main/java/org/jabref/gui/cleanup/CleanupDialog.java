@@ -3,9 +3,9 @@ package org.jabref.gui.cleanup;
 import javafx.scene.control.ButtonType;
 
 import org.jabref.gui.util.BaseDialog;
-import org.jabref.logic.cleanup.CleanupPreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.preferences.CleanupPreferences;
 import org.jabref.preferences.FilePreferences;
 
 public class CleanupDialog extends BaseDialog<CleanupPreferences> {

@@ -12,12 +12,12 @@ import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.gui.util.BackgroundTask;
-import org.jabref.logic.cleanup.CleanupPreferences;
 import org.jabref.logic.cleanup.CleanupWorker;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.preferences.CleanupPreferences;
 import org.jabref.preferences.PreferencesService;
 
 public class CleanupAction extends SimpleCommand {
@@ -58,14 +58,14 @@ public class CleanupAction extends SimpleCommand {
 
         CleanupDialog cleanupDialog = new CleanupDialog(
                 stateManager.getActiveDatabase().get(),
-                preferences.getCleanupPreset(),
+                preferences.getCleanupPreferences(),
                 preferences.getFilePreferences()
         );
 
         Optional<CleanupPreferences> chosenPreset = dialogService.showCustomDialogAndWait(cleanupDialog);
 
         chosenPreset.ifPresent(preset -> {
-            if (preset.isRenamePDFActive() && preferences.getAutoLinkPreferences().shouldAskAutoNamingPdfs()) {
+            if (preset.isActive(CleanupPreferences.CleanupStep.RENAME_PDF) && preferences.getAutoLinkPreferences().shouldAskAutoNamingPdfs()) {
                 boolean confirmed = dialogService.showConfirmationDialogWithOptOutAndWait(Localization.lang("Autogenerate PDF Names"),
                         Localization.lang("Auto-generating PDF-Names does not support undo. Continue?"),
                         Localization.lang("Autogenerate PDF Names"),
@@ -78,7 +78,8 @@ public class CleanupAction extends SimpleCommand {
                 }
             }
 
-            preferences.setCleanupPreset(preset);
+            preferences.getCleanupPreferences().setActiveJobs(preset.getActiveJobs());
+            preferences.getCleanupPreferences().setFieldFormatterCleanups(preset.getFieldFormatterCleanups());
 
             BackgroundTask.wrap(() -> cleanup(stateManager.getActiveDatabase().get(), preset))
                           .onSuccess(result -> showResults())
@@ -124,8 +125,6 @@ public class CleanupAction extends SimpleCommand {
     }
 
     private void cleanup(BibDatabaseContext databaseContext, CleanupPreferences cleanupPreferences) {
-        preferences.setCleanupPreset(cleanupPreferences);
-
         for (BibEntry entry : stateManager.getSelectedEntries()) {
             // undo granularity is on entry level
             NamedCompound ce = new NamedCompound(Localization.lang("Cleanup entry"));
