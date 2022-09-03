@@ -221,8 +221,8 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     }
 
     private void updateSortOrder() {
+        getSortOrder().removeAll(getColumns().get(0));
         if (preferencesService.getSearchPreferences().isSortByScore()) {
-            getSortOrder().removeAll(getColumns().get(0));
             getSortOrder().add(0, getColumns().get(0));
         }
     }
