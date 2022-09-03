@@ -65,35 +65,33 @@ public class DuplicateResolverDialog extends BaseDialog<DuplicateResolverResult>
         boolean removeExactVisible = false;
 
         switch (type) {
-            case DUPLICATE_SEARCH:
+            case DUPLICATE_SEARCH -> {
                 first = new ButtonType(Localization.lang("Keep left"), ButtonData.APPLY);
                 second = new ButtonType(Localization.lang("Keep right"), ButtonData.APPLY);
                 both = new ButtonType(Localization.lang("Keep both"), ButtonData.APPLY);
                 threeWayMerge = new ThreeWayMergeView(one, two);
-                break;
-            case INSPECTION:
+            }
+            case INSPECTION -> {
                 first = new ButtonType(Localization.lang("Remove old entry"), ButtonData.APPLY);
                 second = new ButtonType(Localization.lang("Remove entry from import"), ButtonData.APPLY);
                 both = new ButtonType(Localization.lang("Keep both"), ButtonData.APPLY);
                 threeWayMerge = new ThreeWayMergeView(one, two, Localization.lang("Old entry"),
-                                                      Localization.lang("From import"));
-                break;
-            case DUPLICATE_SEARCH_WITH_EXACT:
+                        Localization.lang("From import"));
+            }
+            case DUPLICATE_SEARCH_WITH_EXACT -> {
                 first = new ButtonType(Localization.lang("Keep left"), ButtonData.APPLY);
                 second = new ButtonType(Localization.lang("Keep right"), ButtonData.APPLY);
                 both = new ButtonType(Localization.lang("Keep both"), ButtonData.APPLY);
-
                 removeExactVisible = true;
-
                 threeWayMerge = new ThreeWayMergeView(one, two);
-                break;
-            default:
+            }
+            default -> {
                 first = new ButtonType(Localization.lang("Import and remove old entry"), ButtonData.APPLY);
                 second = new ButtonType(Localization.lang("Do not import entry"), ButtonData.APPLY);
                 both = new ButtonType(Localization.lang("Import and keep old entry"), ButtonData.APPLY);
                 threeWayMerge = new ThreeWayMergeView(one, two, Localization.lang("Old entry"),
-                                                      Localization.lang("From import"));
-                break;
+                        Localization.lang("From import"));
+            }
         }
         if (removeExactVisible) {
             this.getDialogPane().getButtonTypes().add(removeExact);
