@@ -884,14 +884,12 @@ public class HTMLUnicodeConversionMaps {
         }
         // Manually added values which are killed by cleanLaTeX
         LATEX_HTML_CONVERSION_MAP.put("$", "&dollar;");
-        LATEX_HTML_CONVERSION_MAP.put("~", "&tilde;");
         LATEX_UNICODE_CONVERSION_MAP.put("$", "$");
 
         // Manual corrections
         LATEX_HTML_CONVERSION_MAP.put("AA", "&Aring;"); // Overwritten by &angst; which is less supported
         LATEX_UNICODE_CONVERSION_MAP.put("AA", "Å"); // Overwritten by Ångstrom symbol
         LATEX_UNICODE_CONVERSION_MAP.put("'n", "ń");
-        LATEX_UNICODE_CONVERSION_MAP.put("~n","abc");
 
         // Manual additions
         // Support relax to the extent that it is simply removed
