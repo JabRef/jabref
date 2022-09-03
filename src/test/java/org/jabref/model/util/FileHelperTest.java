@@ -10,6 +10,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class FileHelperTest {
 
@@ -64,5 +66,17 @@ class FileHelperTest {
         Path testFile = secondFilesPath.resolve("test.pdf");
         Files.createFile(testFile);
         assertEquals(Optional.of(testFile.toAbsolutePath()), FileHelper.find("files/test.pdf", firstFilesPath));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"c:\\temp.pdf", "/mnt/tmp/test.pdf"})
+    public void legalPaths(String fileName) {
+        assertFalse(FileHelper.detectBadFileName(fileName));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"te{}mp.pdf"})
+    public void illegalPaths(String fileName) {
+        assertTrue(FileHelper.detectBadFileName(fileName));
     }
 }
