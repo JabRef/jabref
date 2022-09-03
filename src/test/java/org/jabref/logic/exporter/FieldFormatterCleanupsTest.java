@@ -27,17 +27,16 @@ public class FieldFormatterCleanupsTest {
 
     @BeforeEach
     public void setUp() {
-        entry = new BibEntry();
-        entry.setType(StandardEntryType.InProceedings);
-        entry.setCitationKey("6055279");
-        entry.setField(StandardField.TITLE, "Educational session 1");
-        entry.setField(StandardField.BOOKTITLE, "Custom Integrated Circuits Conference (CICC), 2011 IEEE");
-        entry.setField(StandardField.YEAR, "2011");
-        entry.setField(StandardField.MONTH, "Sept.");
-        entry.setField(StandardField.PAGES, "1-7");
-        entry.setField(StandardField.ABSTRACT, "Start of the above-titled section of the conference proceedings record.");
-        entry.setField(StandardField.DOI, "10.1109/CICC.2011.6055279");
-        entry.setField(StandardField.ISSN, "0886-5930");
+        entry = new BibEntry(StandardEntryType.InProceedings)
+                .withCitationKey("6055279")
+                .withField(StandardField.TITLE, "Educational session 1")
+                .withField(StandardField.BOOKTITLE, "Custom Integrated Circuits Conference (CICC), 2011 IEEE")
+                .withField(StandardField.YEAR, "2011")
+                .withField(StandardField.MONTH, "Sept.")
+                .withField(StandardField.PAGES, "1-7")
+                .withField(StandardField.ABSTRACT, "Start of the above-titled section of the conference proceedings record.")
+                .withField(StandardField.DOI, "10.1109/CICC.2011.6055279")
+                .withField(StandardField.ISSN, "0886-5930");
     }
 
     @Test
