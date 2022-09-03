@@ -48,9 +48,10 @@ import org.slf4j.LoggerFactory;
  * the structured persistence of the crawling results for the study within the file based repository,
  * as well as the sharing, and versioning of results using git.
  */
-class StudyRepository {
+public class StudyRepository {
     // Tests work with study.yml
-    private static final String STUDY_DEFINITION_FILE_NAME = "study.yml";
+    public static final String STUDY_DEFINITION_FILE_NAME = "study.yml";
+
     private static final Logger LOGGER = LoggerFactory.getLogger(StudyRepository.class);
     private static final Pattern MATCHCOLON = Pattern.compile(":");
     private static final Pattern MATCHILLEGALCHARACTERS = Pattern.compile("[^A-Za-z0-9_.\\s=-]");

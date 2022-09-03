@@ -23,8 +23,8 @@ class StudyYamlParserTest {
 
     @BeforeEach
     void setupStudy() throws Exception {
-        Path destination = testDirectory.resolve("study.yml");
-        URL studyDefinition = StudyYamlParser.class.getResource("study.yml");
+        Path destination = testDirectory.resolve(StudyRepository.STUDY_DEFINITION_FILE_NAME);
+        URL studyDefinition = StudyYamlParser.class.getResource(StudyRepository.STUDY_DEFINITION_FILE_NAME);
         FileUtil.copyFile(Path.of(studyDefinition.toURI()), destination, true);
 
         List<String> authors = List.of("Jab Ref");
@@ -39,14 +39,14 @@ class StudyYamlParserTest {
 
     @Test
     public void parseStudyFileSuccessfully() throws Exception {
-        Study study = new StudyYamlParser().parseStudyYamlFile(testDirectory.resolve("study.yml"));
+        Study study = new StudyYamlParser().parseStudyYamlFile(testDirectory.resolve(StudyRepository.STUDY_DEFINITION_FILE_NAME));
         assertEquals(expectedStudy, study);
     }
 
     @Test
     public void writeStudyFileSuccessfully() throws Exception {
-        new StudyYamlParser().writeStudyYamlFile(expectedStudy, testDirectory.resolve("study.yml"));
-        Study study = new StudyYamlParser().parseStudyYamlFile(testDirectory.resolve("study.yml"));
+        new StudyYamlParser().writeStudyYamlFile(expectedStudy, testDirectory.resolve(StudyRepository.STUDY_DEFINITION_FILE_NAME));
+        Study study = new StudyYamlParser().parseStudyYamlFile(testDirectory.resolve(StudyRepository.STUDY_DEFINITION_FILE_NAME));
         assertEquals(expectedStudy, study);
     }
 

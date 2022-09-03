@@ -8,6 +8,7 @@ import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.TaskExecutor;
+import org.jabref.logic.crawler.StudyRepository;
 import org.jabref.logic.crawler.StudyYamlParser;
 import org.jabref.model.study.Study;
 import org.jabref.model.util.FileUpdateMonitor;
@@ -25,7 +26,7 @@ public class StartNewStudyAction extends ExistingStudySearchAction {
     @Override
     protected void setupRepository(Path studyRepositoryRoot) throws IOException, GitAPIException {
         StudyYamlParser studyYAMLParser = new StudyYamlParser();
-        studyYAMLParser.writeStudyYamlFile(newStudy, studyRepositoryRoot.resolve("study.yml"));
+        studyYAMLParser.writeStudyYamlFile(newStudy, studyRepositoryRoot.resolve(StudyRepository.STUDY_DEFINITION_FILE_NAME));
     }
 
     @Override
