@@ -5,6 +5,7 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import javafx.beans.property.Property;
@@ -17,6 +18,11 @@ import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.logic.importer.WebFetchers;
+import org.jabref.logic.importer.fetcher.ACMPortalFetcher;
+import org.jabref.logic.importer.fetcher.CompositeSearchBasedFetcher;
+import org.jabref.logic.importer.fetcher.DBLPFetcher;
+import org.jabref.logic.importer.fetcher.IEEE;
+import org.jabref.logic.importer.fetcher.SpringerFetcher;
 import org.jabref.model.study.Study;
 import org.jabref.model.study.StudyDatabase;
 import org.jabref.model.study.StudyQuery;
@@ -31,31 +37,43 @@ import org.slf4j.LoggerFactory;
 public class ManageStudyDefinitionViewModel {
     private static final Logger LOGGER = LoggerFactory.getLogger(ManageStudyDefinitionViewModel.class);
 
-    private static final List<StudyDatabaseItem> DEFAULT_SELECTION = List.of(new StudyDatabaseItem("ACM Portal", false), new StudyDatabaseItem("IEEEXplore", false), new StudyDatabaseItem("Springer", false), new StudyDatabaseItem("DBLP", false));
+    private static final Set<String> DEFAULT_SELECTION = Set.of(
+            ACMPortalFetcher.FETCHER_NAME,
+            IEEE.FETCHER_NAME,
+            SpringerFetcher.FETCHER_NAME,
+            DBLPFetcher.FETCHER_NAME);
+
 
     private final StringProperty title = new SimpleStringProperty();
     private final ObservableList<String> authors = FXCollections.observableArrayList();
     private final ObservableList<String> researchQuestions = FXCollections.observableArrayList();
     private final ObservableList<String> queries = FXCollections.observableArrayList();
     private final ObservableList<StudyDatabaseItem> databases = FXCollections.observableArrayList();
+
     // Hold the complement of databases for the selector
     private final SimpleStringProperty directory = new SimpleStringProperty();
+
     private Study study;
+
+    public ManageStudyDefinitionViewModel(ImportFormatPreferences importFormatPreferences,
+                                          ImporterPreferences importerPreferences) {
+        databases.addAll(WebFetchers.getSearchBasedFetchers(importFormatPreferences, importerPreferences)
+                                    .stream()
+                                    .map(SearchBasedFetcher::getName)
+                                    // The user wants to select specific fetchers
+                                    // The fetcher summarizing ALL fetchers can be emulated by selecting ALL fetchers (which happens rarely when doing an SLR)
+                                    .filter(name -> !name.equals(CompositeSearchBasedFetcher.FETCHER_NAME))
+                                    .map(name -> {
+                                        boolean enabled = DEFAULT_SELECTION.contains(name);
+                                        return new StudyDatabaseItem(name, enabled);
+                                    })
+                                    .toList());
+    }
 
     public ManageStudyDefinitionViewModel(Study study,
                                           Path studyDirectory,
                                           ImportFormatPreferences importFormatPreferences,
                                           ImporterPreferences importerPreferences) {
-        if (Objects.isNull(study)) {
-            // Add databases that are selected by default first.
-            databases.addAll(DEFAULT_SELECTION
-                    .stream()
-                    .map(studyDatabase -> new StudyDatabaseItem(studyDatabase.getName(), true))
-                    .toList());
-
-            computeNonSelectedDatabases(importFormatPreferences, importerPreferences);
-            return;
-        }
         this.study = study;
         title.setValue(study.getTitle());
         authors.addAll(study.getAuthors());
@@ -80,7 +98,8 @@ public class ManageStudyDefinitionViewModel {
                                     .stream()
                                     .map(SearchBasedFetcher::getName)
                                     .map(s -> new StudyDatabaseItem(s, false))
-                                    .filter(studyDatabase -> !databases.contains(studyDatabase)).toList());
+                                    .filter(studyDatabase -> !databases.contains(studyDatabase))
+                                    .toList());
     }
 
     public StringProperty getTitle() {

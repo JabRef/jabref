@@ -33,12 +33,16 @@ import org.jabref.model.study.Study;
 import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class controls the user interface of the study definition management dialog. The UI elements and their layout
  * are defined in the FXML file.
  */
 public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ManageStudyDefinitionView.class);
+
     @FXML private TextField studyTitle;
     @FXML private TextField addAuthor;
     @FXML private TextField addResearchQuestion;
@@ -76,7 +80,7 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
     /**
      * This can be used to either create new study objects or edit existing ones.
      *
-     * @param study          null if a new study is created. Otherwise the study object to edit.
+     * @param study          null if a new study is created. Otherwise, the study object to edit.
      * @param studyDirectory the directory where the study to edit is located (null if a new study is created)
      */
     public ManageStudyDefinitionView(Study study, Path studyDirectory, Path workingDirectory) {
@@ -114,11 +118,14 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
 
     @FXML
     private void initialize() {
-        viewModel = new ManageStudyDefinitionViewModel(
-                study,
-                workingDirectory,
-                prefs.getImportFormatPreferences(),
-                prefs.getImporterPreferences());
+        if (Objects.isNull(study)) {
+            viewModel = new ManageStudyDefinitionViewModel(
+                    prefs.getImportFormatPreferences(),
+                    prefs.getImporterPreferences());
+        } else {
+            LOGGER.error("Not yet implemented");
+            return;
+        }
 
         // Listen whether any databases are removed from selection -> Add back to the database selector
         studyTitle.textProperty().bindBidirectional(viewModel.titleProperty());
