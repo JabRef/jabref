@@ -30,6 +30,17 @@ public class Cleanups {
     public static final FieldFormatterCleanups RECOMMEND_BIBTEX_ACTIONS;
     public static final FieldFormatterCleanups RECOMMEND_BIBLATEX_ACTIONS;
 
+    /**
+     * This parses the key/list map of fields and clean up actions for the field.
+     *
+     * General format for one key/list map: <code>...[...]</code> - <code>field[formatter1,formatter2,...]</code>
+     * Multiple are written as <code>...[...]...[...]...[...]</code>
+     *   <code>field1[formatter1,formatter2,...]field2[formatter3,formatter4,...]</code>
+     *
+     * The idea is that characters are field names until <code>[</code> is reached and that formatter lists are terminated by <code>]</code>
+     *
+     * Example: <code>pages[normalize_page_numbers]title[escapeAmpersands,escapeDollarSign,escapeUnderscores,latex_cleanup]</code>
+     */
     private static final Pattern FIELD_FORMATTER_CLEANUP_PATTERN = Pattern.compile("([^\\[]+)\\[([^\\]]+)\\]");
 
     static {
