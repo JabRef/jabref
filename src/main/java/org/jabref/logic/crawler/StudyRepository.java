@@ -217,11 +217,8 @@ class StudyRepository {
      */
     public void persist(List<QueryResult> crawlResults) throws IOException, GitAPIException, SaveException {
         updateWorkAndSearchBranch();
-        persistStudy();
-        gitHandler.createCommitOnCurrentBranch("Update search date", true);
         gitHandler.checkoutBranch(SEARCH_BRANCH);
         persistResults(crawlResults);
-        persistStudy();
         try {
             // First commit changes to search branch and update remote
             String commitMessage = "Conducted search: " + LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS);
@@ -245,10 +242,15 @@ class StudyRepository {
      */
     private void updateRemoteSearchAndWorkBranch() throws IOException, GitAPIException {
         String currentBranch = gitHandler.getCurrentlyCheckedOutBranch();
+
+        // update remote search branch
         gitHandler.checkoutBranch(SEARCH_BRANCH);
         gitHandler.pushCommitsToRemoteRepository();
+
+        // update remote work branch
         gitHandler.checkoutBranch(WORK_BRANCH);
         gitHandler.pushCommitsToRemoteRepository();
+
         gitHandler.checkoutBranch(currentBranch);
     }
 
@@ -258,15 +260,16 @@ class StudyRepository {
      */
     private void updateWorkAndSearchBranch() throws IOException, GitAPIException {
         String currentBranch = gitHandler.getCurrentlyCheckedOutBranch();
+
+        // update search branch
         gitHandler.checkoutBranch(SEARCH_BRANCH);
         gitHandler.pullOnCurrentBranch();
+
+        // update work branch
         gitHandler.checkoutBranch(WORK_BRANCH);
         gitHandler.pullOnCurrentBranch();
-        gitHandler.checkoutBranch(currentBranch);
-    }
 
-    private void persistStudy() throws IOException {
-        new StudyYamlParser().writeStudyYamlFile(study, studyDefinitionFile);
+        gitHandler.checkoutBranch(currentBranch);
     }
 
     /**
