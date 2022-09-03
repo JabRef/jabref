@@ -130,6 +130,11 @@ public class BibDatabase {
         return FXCollections.unmodifiableObservableList(entries);
     }
 
+    public ObservableList<BibEntry> getEntriesModifieable() {
+        return entries;
+    }
+
+
     /**
      * Returns a set of Strings, that contains all field names that are visible. This means that the fields
      * are not internal fields. Internal fields are fields, that are starting with "_".
