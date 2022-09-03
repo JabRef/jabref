@@ -58,10 +58,11 @@ class FileHelperTest {
 
     @Test
     public void testDoesNotFindsFileStartingWithTheSameDirectoryHasASubdirectory(@TempDir Path temp) throws Exception {
-        Path firstFilePath = temp.resolve("files");
-        Path secondFilesPath = firstFilePath.resolve("files");
+        Path firstFilesPath = temp.resolve("files");
+        Path secondFilesPath = firstFilesPath.resolve("files");
         Files.createDirectories(secondFilesPath);
-        Path firstFile = Files.createFile(secondFilesPath.resolve("test.pdf"));
-        assertEquals(Optional.empty(), FileHelper.find("files/test.pdf", temp.resolve("files")));
+        Path testFile = secondFilesPath.resolve("test.pdf");
+        Files.createFile(testFile);
+        assertEquals(Optional.of(testFile.toAbsolutePath()), FileHelper.find("files/test.pdf", firstFilesPath));
     }
 }

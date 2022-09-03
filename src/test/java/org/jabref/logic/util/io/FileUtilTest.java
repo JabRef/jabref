@@ -395,7 +395,7 @@ class FileUtilTest {
     }
 
     @Test
-    void testFindinListofPath() {
+    void testFindInListOfPath() {
         List<Path> paths = List.of(existingTestFile, otherExistingTestFile, rootDir);
         List<Path> resultPaths = List.of(existingTestFile, existingTestFile);
         List<Path> result = FileUtil.find("existingTestFile.txt", paths);

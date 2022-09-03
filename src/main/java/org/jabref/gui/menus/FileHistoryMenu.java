@@ -92,6 +92,6 @@ public class FileHistoryMenu extends Menu {
             setItems();
             return;
         }
-        openDatabaseAction.openFile(file, true);
+        openDatabaseAction.openFile(file);
     }
 }

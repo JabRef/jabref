@@ -12,6 +12,7 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 
+import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.preferences.FilePreferences;
 
@@ -26,6 +27,10 @@ import org.apache.tika.parser.AutoDetectParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * @deprecated Please use {@link FileUtil}
+ */
+@Deprecated
 public class FileHelper {
     /**
      * MUST ALWAYS BE A SORTED ARRAY because it is used in a binary search
@@ -146,8 +151,12 @@ public class FileHelper {
     }
 
     /**
-     * Converts a relative filename to an absolute one, if necessary. Returns
-     * an empty optional if the file does not exist.
+     * Converts a relative filename to an absolute one, if necessary.
+     *
+     * @param fileName the filename (e.g., a .pdf file), may contain path separators
+     * @param directory the directory which should be search starting point
+     *
+     * @returns an empty optional if the file does not exist, otherwise, the absolute path
      */
     public static Optional<Path> find(String fileName, Path directory) {
         Objects.requireNonNull(fileName);
@@ -161,11 +170,15 @@ public class FileHelper {
         if (fileName.isEmpty()) {
             return Optional.of(directory);
         }
+
+        Path resolvedFile = directory.resolve(fileName);
+        if (Files.exists(resolvedFile)) {
+            return Optional.of(resolvedFile);
+        }
+
         // get the furthest path element from root and check if our filename starts with the same name
         // workaround for old JabRef behavior
         String furthestDirFromRoot = directory.getFileName().toString();
-        Path resolvedFile = directory.resolve(fileName);
-
         if (fileName.startsWith(furthestDirFromRoot)) {
             resolvedFile = directory.resolveSibling(fileName);
         }

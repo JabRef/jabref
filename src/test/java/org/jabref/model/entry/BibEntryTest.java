@@ -1,5 +1,6 @@
 package org.jabref.model.entry;
 
+import java.net.URL;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -19,8 +20,6 @@ import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.StandardEntryType;
 
 import com.google.common.collect.Sets;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
 
@@ -34,17 +33,7 @@ import static org.junit.jupiter.api.parallel.ExecutionMode.CONCURRENT;
 
 @Execution(CONCURRENT)
 class BibEntryTest {
-    private BibEntry entry;
-
-    @BeforeEach
-    void setUp() {
-        entry = new BibEntry();
-    }
-
-    @AfterEach
-    void tearDown() {
-        entry = null;
-    }
+    private BibEntry entry = new BibEntry();
 
     @Test
     void testDefaultConstructor() {
@@ -258,6 +247,18 @@ class BibEntryTest {
         files.add(new LinkedFile("", Path.of(""), ""));
         entry.setFiles(files);
         assertEquals(Arrays.asList(new LinkedFile("", Path.of(""), "")), entry.getFiles());
+    }
+
+    @Test
+    void replaceOfLinkWorks() throws Exception {
+        List<LinkedFile> files = new ArrayList<>();
+        String urlAsString = "https://www.example.org/file.pdf";
+        files.add(new LinkedFile(new URL(urlAsString), ""));
+        entry.setFiles(files);
+
+        LinkedFile linkedFile = new LinkedFile("", Path.of("file.pdf", ""), "");
+        entry.replaceDownloadedFile(urlAsString, linkedFile);
+        assertEquals(List.of(linkedFile), entry.getFiles());
     }
 
     @Test
