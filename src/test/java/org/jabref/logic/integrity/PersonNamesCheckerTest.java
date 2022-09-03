@@ -37,7 +37,7 @@ public class PersonNamesCheckerTest {
 
     private static Stream<String> provideValidNames() {
         return Stream.of(
-                "Kolb, Stefan",                 // single [Name, Firstname]
+                "Kolb, Stefan",                     // single [Name, Firstname]
                 "Kolb, Stefan and Harrer, Simon",   // multiple [Name, Firstname]
                 "Stefan Kolb",                      // single [Firstname Name]
                 "Stefan Kolb and Simon Harrer",     // multiple [Firstname Name]
