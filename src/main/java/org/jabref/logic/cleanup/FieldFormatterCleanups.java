@@ -143,6 +143,7 @@ public class FieldFormatterCleanups {
         return result;
     }
 
+    // ToDo: This should reside in MetaDataSerializer
     public List<String> getAsStringList(String delimiter) {
         List<String> stringRepresentation = new ArrayList<>();
 
@@ -184,6 +185,7 @@ public class FieldFormatterCleanups {
         return result;
     }
 
+    // ToDo: This should reside in MetaDataParser
     public static FieldFormatterCleanups parse(List<String> formatterMetaList) {
         if ((formatterMetaList != null) && (formatterMetaList.size() >= 2)) {
             boolean enablementStatus = FieldFormatterCleanups.ENABLED.equals(formatterMetaList.get(0));

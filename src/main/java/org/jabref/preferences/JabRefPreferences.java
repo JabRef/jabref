@@ -2470,7 +2470,8 @@ public class JabRefPreferences implements PreferencesService {
                 EnumSet.copyOf(getStringList(CLEANUP_JOBS).stream()
                                                           .map(CleanupPreferences.CleanupStep::valueOf)
                                                           .collect(Collectors.toSet())),
-                FieldFormatterCleanups.parse(getStringList(CLEANUP_FIELD_FORMATTERS)));
+                new FieldFormatterCleanups(getBoolean(CLEANUP_FIELD_FORMATTERS_ENABLED),
+                        FieldFormatterCleanups.parse(get(CLEANUP_FIELD_FORMATTERS).replace(";", ""))));
 
         cleanupPreferences.getObservableActiveJobs().addListener((SetChangeListener<CleanupPreferences.CleanupStep>) c ->
                 putStringList(CLEANUP_JOBS, cleanupPreferences.getActiveJobs().stream().map(Enum::name).collect(Collectors.toList())));
