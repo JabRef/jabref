@@ -2,6 +2,7 @@ package org.jabref.migrations;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -18,9 +19,13 @@ import org.jabref.gui.Globals;
 import org.jabref.gui.maintable.ColumnPreferences;
 import org.jabref.gui.maintable.MainTableColumnModel;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPattern;
+import org.jabref.logic.cleanup.FieldFormatterCleanups;
+import org.jabref.logic.util.OS;
 import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.EntryTypeFactory;
+import org.jabref.model.strings.StringUtil;
+import org.jabref.preferences.CleanupPreferences;
 import org.jabref.preferences.JabRefPreferences;
 
 import org.slf4j.Logger;
@@ -55,6 +60,7 @@ public class PreferencesMigrations {
         upgradeColumnPreferences(Globals.prefs);
         restoreVariablesForBackwardCompatibility(Globals.prefs);
         upgradePreviewStyleAllowMarkdown(Globals.prefs);
+        upgradeCleanups(Globals.prefs);
     }
 
     /**
@@ -438,6 +444,61 @@ public class PreferencesMigrations {
             preferences.putInt(JabRefPreferences.MAIN_FONT_SIZE, fontSizeAsInt);
         } catch (ClassCastException e) {
             // already an integer
+        }
+    }
+
+    /**
+     * In version 6.0 the formatting of the CleanUps preferences changed. Instead of using several keys that have have a variable name a single preference key is introduced containing just the active cleanup jobs. Also instead of a combined field for the field formatters and the enabled status of all of them, they are split for easier parsing.
+     * <p>
+     * <h3>Changes:</h3>
+     * <table>
+     * <tr> <td>                key                     </td> <td>  value </td> </tr>
+     * <tr> <td colspan="2">    CLEANUP - old format:   </td> </tr>
+     * <tr> <td> CleanUpCLEAN_UP_DOI    </td> <td>  enabled </td> </tr>
+     * <tr> <td> CleanUpRENAME_PDF      </td> <td>  disabled </td> </tr>
+     * <tr> <td> CleanUpMOVE_PDF        </td> <td>  enabled<br>
+     * <tr> <td colspan="2"> ... </td> </tr>
+     * <tr> <td> &nbsp; </td> </tr>
+     * <tr> <td colspan="2"> CLEANUP_JOBS - new format: </td> </tr>
+     * <tr> <td> CleanUpJobs            </td> <td> CLEAN_UP_DOI;RENAME_PDF;MOVE_PDF </td> </tr>
+     * <tr> <td> &nbsp; </td> </tr>
+     * <tr> <td colspan="2"> CLEANUP_FORMATTERS - old format: </td> </tr>
+     * <tr> <td> CleanUpFormatters     </td> <td> ENABLED\nfield[formatter,formatter...]\nfield[...]\nfield[...]... </td> </tr>
+     * <tr> <td> &nbsp; </td> </tr>
+     * <tr> <td colspan="2"> CLEANUP_FORMATTERS - new format: </td> </tr>
+     * <tr> <td> CleanUpFormattersEnabled </td> <td> TRUE </td> </tr>
+     * <tr> <td> CleanUpFormatters        </td> <td> field[formatter,formatter...]\nfield[...]\nfield[...]... </td> </tr>
+     * </table>
+     */
+    private static void upgradeCleanups(JabRefPreferences prefs) {
+        final String CLEANUP = "CleanUp";
+        final String CLEANUP_JOBS = "CleanUpJobs";
+
+        final String CLEANUP_FIELD_FORMATTERS = "CleanUpFormatters";
+        final String CLEANUP_FIELD_FORMATTERS_ENABLED = "CleanUpFormattersEnabled";
+
+        List<String> activeJobs = new ArrayList<>();
+        for (CleanupPreferences.CleanupStep action : EnumSet.allOf(CleanupPreferences.CleanupStep.class)) {
+            if (prefs.hasKey(CLEANUP + action.name()) && prefs.getBoolean(CLEANUP + action.name())) {
+                activeJobs.add(action.name());
+                // prefs.deleteKey(CLEANUP + action.name());
+            }
+        }
+        if (!activeJobs.isEmpty()) {
+            prefs.put(CLEANUP_JOBS, String.join(";", activeJobs));
+        }
+
+        List<String> formatterCleanups = List.of(StringUtil.unifyLineBreaks(prefs.get(CLEANUP_FIELD_FORMATTERS), "\n")
+                                                           .split("\n"));
+
+        if (formatterCleanups.size() >= 2
+                && (formatterCleanups.get(0).equals(FieldFormatterCleanups.ENABLED)
+                || formatterCleanups.get(0).equals(FieldFormatterCleanups.DISABLED))) {
+            prefs.putBoolean(CLEANUP_FIELD_FORMATTERS_ENABLED, formatterCleanups.get(0).equals(FieldFormatterCleanups.ENABLED)
+                    ? Boolean.TRUE
+                    : Boolean.FALSE);
+
+            prefs.put(CLEANUP_FIELD_FORMATTERS, String.join(OS.NEWLINE, formatterCleanups.subList(1, formatterCleanups.size() - 1)));
         }
     }
 }
