@@ -35,7 +35,7 @@ public class Study {
     /**
      * Used for Jackson deserialization
      */
-    public Study() {
+    private Study() {
     }
 
     public List<String> getAuthors() {

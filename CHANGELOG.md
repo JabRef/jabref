@@ -26,12 +26,12 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We changed the button label from "Return to JabRef" to "Return to library" to better indicate the purpose of the action.
 - We removed "last-search-date" from the SLR feature, because the last-search-date can be deducted from the git logs.
 - We reworked the External Changes Resolver dialog. [#9021](https://github.com/JabRef/jabref/pull/9021)
-
+- We reworked the Define study parameters dialog. [#9123](https://github.com/JabRef/jabref/pull/9123)
 
 ### Fixed
 
 - We fixed an issue where author names with tilde accents (for example ñ) were marked as "Names are not in the standard BibTex format" [#8071](https://github.com/JabRef/jabref/issues/8071)
-- We fixed an issue where the possibilty to generate a subdatabase from an aux file was writing empty files when called from the commandline [#9115](https://github.com/JabRef/jabref/issues/9115), [forum#3516](https://discourse.jabref.org/t/export-subdatabase-from-aux-file-on-macos-command-line/3516)
+- We fixed an issue where the possibility to generate a subdatabase from an aux file was writing empty files when called from the commandline [#9115](https://github.com/JabRef/jabref/issues/9115), [forum#3516](https://discourse.jabref.org/t/export-subdatabase-from-aux-file-on-macos-command-line/3516)
 - We fixed the display of issue, number, eid and pages fields in the entry preview. [#8607](https://github.com/JabRef/jabref/pull/8607), [#8372](https://github.com/JabRef/jabref/issues/8372), [Koppor#514](https://github.com/koppor/jabref/issues/514), [forum#2390](https://discourse.jabref.org/t/unable-to-edit-my-bibtex-file-that-i-used-before-vers-5-1/2390), [forum#3462](https://discourse.jabref.org/t/jabref-5-6-need-help-with-export-from-jabref-to-microsoft-word-entry-preview-of-apa-7-not-rendering-correctly/3462)
 - We fixed the page ranges checker to detect article numbers in the pages field (used at [Check Integrity](https://docs.jabref.org/finding-sorting-and-cleaning-entries/checkintegrity)). [#8607](https://github.com/JabRef/jabref/pull/8607)
 - The [HtmlToLaTeXFormatter](https://docs.jabref.org/finding-sorting-and-cleaning-entries/saveactions#html-to-latex) keeps single `<` characters.
@@ -40,8 +40,9 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixed some visual glitches with the linked files editor field in the entry editor and increased its height. [#8823](https://github.com/JabRef/jabref/issues/8823)
 - We fixed several bugs regarding the manual and the autosave of library files that sometimes lead to exceptions or data loss. [#9067](https://github.com/JabRef/jabref/pull/9067), [#8448](https://github.com/JabRef/jabref/issues/8484), [#8746](https://github.com/JabRef/jabref/issues/8746), [#6684](https://github.com/JabRef/jabref/issues/6684), [#6644](https://github.com/JabRef/jabref/issues/6644), [#6102](https://github.com/JabRef/jabref/issues/6102), [#6002](https://github.com/JabRef/jabref/issues/6000)
 - We fixed an issue where applied save actions on saving the library file would lead to the dialog "The libary has been modified by another program" popping up [#4877](https://github.com/JabRef/jabref/issues/4877)
-- We fixed an issue where title case didn't capitalize words after en-dash characters [#9068]
-- We fixed an issue where JabRef would not exit when a connection to a LibreOffice document was established previously and the document is still open [#9075](https://github.com/JabRef/jabref/issues/9075)
+- We fixed issues with save actions not correctly loaded when opening the library. [#9122](https://github.com/JabRef/jabref/pull/9122)
+- We fixed an issue where title case didn't capitalize words after en-dash characters. [#9068](https://github.com/JabRef/jabref/pull/9068)
+- We fixed an issue where JabRef would not exit when a connection to a LibreOffice document was established previously and the document is still open. [#9075](https://github.com/JabRef/jabref/issues/9075)
 
 ### Removed
 

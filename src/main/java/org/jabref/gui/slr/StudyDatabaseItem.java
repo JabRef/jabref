@@ -1,16 +1,23 @@
 package org.jabref.gui.slr;
 
+import java.util.Objects;
+
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
+import org.jabref.model.study.StudyDatabase;
+
+/**
+ * View representation of {@link StudyDatabase}
+ */
 public class StudyDatabaseItem {
     private final StringProperty name;
     private final BooleanProperty enabled;
 
     public StudyDatabaseItem(String name, boolean enabled) {
-        this.name = new SimpleStringProperty(name);
+        this.name = new SimpleStringProperty(Objects.requireNonNull(name));
         this.enabled = new SimpleBooleanProperty(enabled);
     }
 
@@ -39,6 +46,14 @@ public class StudyDatabaseItem {
     }
 
     @Override
+    public String toString() {
+        return "StudyDatabaseItem{" +
+                "name=" + name.get() +
+                ", enabled=" + enabled.get() +
+                '}';
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) {
             return true;
@@ -46,19 +61,12 @@ public class StudyDatabaseItem {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-
         StudyDatabaseItem that = (StudyDatabaseItem) o;
-
-        if (isEnabled() != that.isEnabled()) {
-            return false;
-        }
-        return getName() != null ? getName().equals(that.getName()) : that.getName() == null;
+        return Object.equals(getName(),that.getName()) && Object.equals(isEnabled(), that.isEnabled());
     }
 
     @Override
     public int hashCode() {
-        int result = getName() != null ? getName().hashCode() : 0;
-        result = 31 * result + (isEnabled() ? 1 : 0);
-        return result;
+        return Objects.hash(getName(), isEnabled());
     }
 }
