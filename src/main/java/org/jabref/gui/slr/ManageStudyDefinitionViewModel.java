@@ -2,6 +2,7 @@ package org.jabref.gui.slr;
 
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -30,6 +31,8 @@ import org.slf4j.LoggerFactory;
 public class ManageStudyDefinitionViewModel {
     private static final Logger LOGGER = LoggerFactory.getLogger(ManageStudyDefinitionViewModel.class);
 
+    private static final List<StudyDatabaseItem> DEFAULT_SELECTION = List.of(new StudyDatabaseItem("ACM Portal", false), new StudyDatabaseItem("IEEEXplore", false), new StudyDatabaseItem("Springer", false), new StudyDatabaseItem("DBLP", false));
+
     private final StringProperty title = new SimpleStringProperty();
     private final ObservableList<String> authors = FXCollections.observableArrayList();
     private final ObservableList<String> researchQuestions = FXCollections.observableArrayList();
@@ -44,6 +47,12 @@ public class ManageStudyDefinitionViewModel {
                                           ImportFormatPreferences importFormatPreferences,
                                           ImporterPreferences importerPreferences) {
         if (Objects.isNull(study)) {
+            // Add databases that are selected by default first.
+            databases.addAll(DEFAULT_SELECTION
+                    .stream()
+                    .map(studyDatabase -> new StudyDatabaseItem(studyDatabase.getName(), true))
+                    .toList());
+
             computeNonSelectedDatabases(importFormatPreferences, importerPreferences);
             return;
         }
