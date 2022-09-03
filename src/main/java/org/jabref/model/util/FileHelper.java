@@ -151,8 +151,12 @@ public class FileHelper {
     }
 
     /**
-     * Converts a relative filename to an absolute one, if necessary. Returns
-     * an empty optional if the file does not exist.
+     * Converts a relative filename to an absolute one, if necessary.
+     *
+     * @param fileName the filename (e.g., a .pdf file), may contain path separators
+     * @param directory the directory which should be search starting point
+     *
+     * @returns an empty optional if the file does not exist, otherwise, the absolute path
      */
     public static Optional<Path> find(String fileName, Path directory) {
         Objects.requireNonNull(fileName);
@@ -168,6 +172,17 @@ public class FileHelper {
         }
 
         Path resolvedFile = directory.resolve(fileName);
+        if (Files.exists(resolvedFile)) {
+            return Optional.of(resolvedFile);
+        }
+
+        // get the furthest path element from root and check if our filename starts with the same name
+        // workaround for old JabRef behavior
+        String furthestDirFromRoot = directory.getFileName().toString();
+        if (fileName.startsWith(furthestDirFromRoot)) {
+            resolvedFile = directory.resolveSibling(fileName);
+        }
+
         if (Files.exists(resolvedFile)) {
             return Optional.of(resolvedFile);
         } else {
