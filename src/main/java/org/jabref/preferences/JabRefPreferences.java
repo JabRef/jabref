@@ -374,7 +374,7 @@ public class JabRefPreferences implements PreferencesService {
     private static final String PROTECTED_TERMS_DISABLED_INTERNAL = "protectedTermsDisabledInternal";
 
     // GroupViewMode
-    private static final String GROUP_INTERSECT_UNION_VIEW_MODE = "groupIntersectUnionViewModes";
+    private static final String GROUP_VIEW_INTERSECTION = "groupIntersection";
 
     // Dialog states
     private static final String PREFS_EXPORT_PATH = "prefsExportPath";
@@ -598,7 +598,7 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(AUTOCOMPLETER_COMPLETE_FIELDS, "author;editor;title;journal;publisher;keywords;crossref;related;entryset");
         defaults.put(AUTO_ASSIGN_GROUP, Boolean.TRUE);
         defaults.put(DISPLAY_GROUP_COUNT, Boolean.TRUE);
-        defaults.put(GROUP_INTERSECT_UNION_VIEW_MODE, GroupViewMode.INTERSECTION.name());
+        defaults.put(GROUP_VIEW_INTERSECTION, Boolean.TRUE);
         defaults.put(KEYWORD_SEPARATOR, ", ");
         defaults.put(DEFAULT_ENCODING, StandardCharsets.UTF_8.name());
         defaults.put(DEFAULT_OWNER, System.getProperty("user.name"));
@@ -1419,13 +1419,18 @@ public class JabRefPreferences implements PreferencesService {
         }
 
         groupsPreferences = new GroupsPreferences(
-                GroupViewMode.valueOf(get(GROUP_INTERSECT_UNION_VIEW_MODE)),
+                getBoolean(GROUP_VIEW_INTERSECTION),
                 getBoolean(AUTO_ASSIGN_GROUP),
                 getBoolean(DISPLAY_GROUP_COUNT),
                 getInternalPreferences().keywordSeparatorProperty()
         );
 
-        EasyBind.listen(groupsPreferences.groupViewModeProperty(), (obs, oldValue, newValue) -> put(GROUP_INTERSECT_UNION_VIEW_MODE, newValue.name()));
+        groupsPreferences.groupViewModeProperty().addListener(new SetChangeListener<GroupViewMode>() {
+            @Override
+            public void onChanged(Change<? extends GroupViewMode> change) {
+                putBoolean(GROUP_VIEW_INTERSECTION, groupsPreferences.groupViewModeProperty().contains(GroupViewMode.INTERSECTION));
+            }
+        });
         EasyBind.listen(groupsPreferences.autoAssignGroupProperty(), (obs, oldValue, newValue) -> putBoolean(AUTO_ASSIGN_GROUP, newValue));
         EasyBind.listen(groupsPreferences.displayGroupCountProperty(), (obs, oldValue, newValue) -> putBoolean(DISPLAY_GROUP_COUNT, newValue));
         // KeywordSeparator is handled by JabRefPreferences::getInternalPreferences

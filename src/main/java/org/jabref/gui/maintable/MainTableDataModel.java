@@ -112,7 +112,7 @@ public class MainTableDataModel {
         }
 
         final MatcherSet searchRules = MatcherSets.build(
-                groupsPreferences.getGroupViewMode() == GroupViewMode.INTERSECTION
+                groupsPreferences.getGroupViewMode().contains(GroupViewMode.INTERSECTION)
                         ? MatcherSets.MatcherType.AND
                         : MatcherSets.MatcherType.OR);
 

@@ -1,5 +1,8 @@
 package org.jabref.gui.sidepane;
 
+import java.util.EnumSet;
+
+import javafx.collections.SetChangeListener;
 import javafx.scene.control.Button;
 
 import org.jabref.gui.DialogService;
@@ -9,8 +12,6 @@ import org.jabref.gui.groups.GroupViewMode;
 import org.jabref.gui.groups.GroupsPreferences;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.logic.l10n.Localization;
-
-import com.tobiasdiez.easybind.EasyBind;
 
 public class GroupsSidePaneComponent extends SidePaneComponent {
     private final GroupsPreferences groupsPreferences;
@@ -28,8 +29,8 @@ public class GroupsSidePaneComponent extends SidePaneComponent {
         this.dialogService = dialogService;
         setupIntersectionUnionToggle();
 
-        EasyBind.subscribe(groupsPreferences.groupViewModeProperty(), mode -> {
-            GroupModeViewModel modeViewModel = new GroupModeViewModel(mode);
+        groupsPreferences.groupViewModeProperty().addListener((SetChangeListener<GroupViewMode>) change -> {
+            GroupModeViewModel modeViewModel = new GroupModeViewModel(groupsPreferences.groupViewModeProperty());
             intersectionUnionToggle.setGraphic(modeViewModel.getUnionIntersectionGraphic());
             intersectionUnionToggle.setTooltip(modeViewModel.getUnionIntersectionTooltip());
         });
@@ -44,13 +45,13 @@ public class GroupsSidePaneComponent extends SidePaneComponent {
 
         @Override
         public void execute() {
-            GroupViewMode mode = groupsPreferences.getGroupViewMode();
+            EnumSet<GroupViewMode> mode = groupsPreferences.getGroupViewMode();
 
-            if (mode == GroupViewMode.UNION) {
-                groupsPreferences.setGroupViewMode(GroupViewMode.INTERSECTION);
+            if (mode.contains(GroupViewMode.INTERSECTION)) {
+                groupsPreferences.setGroupViewMode(GroupViewMode.INTERSECTION, false);
                 dialogService.notify(Localization.lang("Group view mode set to intersection"));
-            } else if (mode == GroupViewMode.INTERSECTION) {
-                groupsPreferences.setGroupViewMode(GroupViewMode.UNION);
+            } else {
+                groupsPreferences.setGroupViewMode(GroupViewMode.INTERSECTION, true);
                 dialogService.notify(Localization.lang("Group view mode set to union"));
             }
         }
