@@ -51,7 +51,7 @@ public class FieldFormatterCleanups {
      *
      * Example: <code>pages[normalize_page_numbers]title[escapeAmpersands,escapeDollarSign,escapeUnderscores,latex_cleanup]</code>
      */
-    private static final Pattern FIELD_FORMATTER_CLEANUP_PATTERN = Pattern.compile("([^\\[]+)\\[([^\\]]+)\\]");
+    private static final Pattern FIELD_FORMATTER_CLEANUP_PATTERN = Pattern.compile("([^\\[]+)\\[([^]]+)]");
 
     static {
         DEFAULT_SAVE_ACTIONS = List.of(
@@ -164,10 +164,10 @@ public class FieldFormatterCleanups {
             return Collections.emptyList();
         }
 
+        List<FieldFormatterCleanup> result = new ArrayList<>();
+
         // first remove all newlines for easier parsing
         String formatterStringWithoutLineBreaks = StringUtil.unifyLineBreaks(formatterString, "");
-
-        List<FieldFormatterCleanup> result = new ArrayList<>();
 
         Matcher matcher = FIELD_FORMATTER_CLEANUP_PATTERN.matcher(formatterStringWithoutLineBreaks);
         while (matcher.find()) {
@@ -190,6 +190,7 @@ public class FieldFormatterCleanups {
         if ((formatterMetaList != null) && (formatterMetaList.size() >= 2)) {
             boolean enablementStatus = FieldFormatterCleanups.ENABLED.equals(formatterMetaList.get(0));
             String formatterString = formatterMetaList.get(1);
+
             return new FieldFormatterCleanups(enablementStatus, parse(formatterString));
         } else {
             // return default actions
