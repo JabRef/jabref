@@ -41,9 +41,9 @@ Diagram showing aspects of groups: [Groups.uml](https://github.com/JabRef/jabref
 
 ## Architectural Decision Records
 
-[Architectural decisions for JabRef](adr.md) are recorded.
+[Architectural decisions for JabRef](https://devdocs.jabref.org/decisions/) are recorded.
 
-For new ADRs, please use [template.md](https://github.com/JabRef/jabref/tree/3b3716b1e05a0d3273c886e102a8efe5e96472e0/docs/adr/template.md) as basis. More information on MADR is available at [https://adr.github.io/madr/](https://adr.github.io/madr/). General information about architectural decision records is available at [https://adr.github.io/](https://adr.github.io). Add them to the [list of architectural decision records](adr.md).
+For new ADRs, please use [template.md](https://github.com/JabRef/jabref/tree/3b3716b1e05a0d3273c886e102a8efe5e96472e0/docs/adr/template.md) as basis. More information on MADR is available at [https://adr.github.io/madr/](https://adr.github.io/madr/). General information about architectural decision records is available at [https://adr.github.io/](https://adr.github.io). Add them to the [list of architectural decision records](https://devdocs.jabref.org/decisions/).
 
 ## FAQ
 
