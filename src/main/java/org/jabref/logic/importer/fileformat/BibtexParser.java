@@ -288,14 +288,13 @@ public class BibtexParser implements Parser {
     }
 
     private void parseJabRefComment(Map<String, String> meta) {
-        StringBuilder buffer = null;
+        StringBuilder buffer;
         try {
             buffer = parseBracketedTextExactly();
         } catch (IOException e) {
-            /* if we get an IO Exception here, than we have an unbracketed comment,
-             * which means that we should just return and the comment will be picked up as arbitrary text
-             *  by the parser
-             */
+            // if we get an IO Exception here, then we have an unbracketed comment,
+            // which means that we should just return and the comment will be picked up as arbitrary text
+            // by the parser
             LOGGER.info("Found unbracketed comment");
             return;
         }

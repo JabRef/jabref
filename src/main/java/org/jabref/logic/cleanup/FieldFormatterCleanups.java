@@ -27,6 +27,9 @@ public class FieldFormatterCleanups {
         this.actions = Objects.requireNonNull(actions);
     }
 
+    /**
+     * Note: String parsing is done at {@link Cleanups#parse(String)}
+     */
     private static String getMetaDataString(List<FieldFormatterCleanup> actionList, String newLineSeparator) {
         // first, group all formatters by the field for which they apply
         Map<Field, List<String>> groupedByField = new TreeMap<>(Comparator.comparing(Field::getName));
@@ -52,7 +55,7 @@ public class FieldFormatterCleanups {
 
             StringJoiner joiner = new StringJoiner(",", "[", "]" + newLineSeparator);
             entry.getValue().forEach(joiner::add);
-            result.append(joiner.toString());
+            result.append(joiner);
         }
 
         return result.toString();
