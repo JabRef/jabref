@@ -136,7 +136,7 @@ public class MainTableColumnFactory {
      */
     private TableColumn<BibEntryTableViewModel, String> createScoreColumn(MainTableColumnModel columnModel) {
         TableColumn<BibEntryTableViewModel, String> column = new MainTableColumn<>(columnModel);
-        Node header = new Text("Score");
+        Node header = new Text(Localization.lang("Score"));
         header.getStyleClass().add("mainTable-header");
         Tooltip.install(header, new Tooltip(MainTableColumnModel.Type.SCORE.getDisplayName()));
         column.setGraphic(header);
