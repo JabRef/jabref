@@ -13,7 +13,7 @@ import javafx.collections.FXCollections;
 
 import org.jabref.gui.commonfxcontrols.SortCriterionViewModel;
 import org.jabref.gui.libraryproperties.PropertiesTabViewModel;
-import org.jabref.logic.cleanup.CleanupPreset;
+import org.jabref.logic.cleanup.CleanupPreferences;
 import org.jabref.logic.cleanup.FieldFormatterCleanup;
 import org.jabref.logic.cleanup.FieldFormatterCleanups;
 import org.jabref.model.database.BibDatabaseContext;
@@ -79,7 +79,7 @@ public class SavingPropertiesViewModel implements PropertiesTabViewModel {
             cleanupsDisableProperty.setValue(!value.isEnabled());
             cleanupsProperty.setValue(FXCollections.observableArrayList(value.getConfiguredActions()));
         }, () -> {
-            CleanupPreset defaultPreset = preferencesService.getDefaultCleanupPreset();
+            CleanupPreferences defaultPreset = preferencesService.getDefaultCleanupPreset();
             cleanupsDisableProperty.setValue(!defaultPreset.getFormatterCleanups().isEnabled());
             cleanupsProperty.setValue(FXCollections.observableArrayList(defaultPreset.getFormatterCleanups().getConfiguredActions()));
         });

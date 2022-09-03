@@ -3,29 +3,33 @@ package org.jabref.logic.cleanup;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumSet;
-import java.util.Objects;
 import java.util.Set;
 
-public class CleanupPreset {
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableSet;
 
-    private final Set<CleanupStep> activeJobs;
-    private final FieldFormatterCleanups formatterCleanups;
+public class CleanupPreferences {
 
-    public CleanupPreset(Set<CleanupStep> activeJobs) {
+    private final ObservableSet<CleanupStep> activeJobs;
+    private final ObjectProperty<FieldFormatterCleanups> formatterCleanups;
+
+    public CleanupPreferences(EnumSet<CleanupStep> activeJobs) {
         this(activeJobs, new FieldFormatterCleanups(false, new ArrayList<>()));
     }
 
-    public CleanupPreset(CleanupStep activeJob) {
+    public CleanupPreferences(CleanupStep activeJob) {
         this(EnumSet.of(activeJob));
     }
 
-    public CleanupPreset(FieldFormatterCleanups formatterCleanups) {
+    public CleanupPreferences(FieldFormatterCleanups formatterCleanups) {
         this(EnumSet.noneOf(CleanupStep.class), formatterCleanups);
     }
 
-    public CleanupPreset(Set<CleanupStep> activeJobs, FieldFormatterCleanups formatterCleanups) {
-        this.activeJobs = activeJobs;
-        this.formatterCleanups = Objects.requireNonNull(formatterCleanups);
+    public CleanupPreferences(EnumSet<CleanupStep> activeJobs, FieldFormatterCleanups formatterCleanups) {
+        this.activeJobs = FXCollections.observableSet(activeJobs);
+        this.formatterCleanups = new SimpleObjectProperty<>(formatterCleanups);
     }
 
     public Set<CleanupStep> getActiveJobs() {
@@ -41,7 +45,7 @@ public class CleanupPreset {
     }
 
     public FieldFormatterCleanups getFormatterCleanups() {
-        return formatterCleanups;
+        return formatterCleanups.get();
     }
 
     public enum CleanupStep {

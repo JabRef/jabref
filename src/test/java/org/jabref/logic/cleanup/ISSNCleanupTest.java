@@ -28,7 +28,7 @@ public class ISSNCleanupTest {
 
     @Test
     public void cleanupISSNReturnsCorrectISSN() {
-        CleanupPreset preset = new CleanupPreset(CleanupPreset.CleanupStep.CLEAN_UP_ISSN);
+        CleanupPreferences preset = new CleanupPreferences(CleanupPreferences.CleanupStep.CLEAN_UP_ISSN);
         BibEntry entry = new BibEntry();
         entry.setField(StandardField.ISSN, "0123-4567");
 
@@ -38,7 +38,7 @@ public class ISSNCleanupTest {
 
     @Test
     public void cleanupISSNAddsMissingDash() {
-        CleanupPreset preset = new CleanupPreset(CleanupPreset.CleanupStep.CLEAN_UP_ISSN);
+        CleanupPreferences preset = new CleanupPreferences(CleanupPreferences.CleanupStep.CLEAN_UP_ISSN);
         BibEntry entry = new BibEntry();
         entry.setField(StandardField.ISSN, "01234567");
 
@@ -48,7 +48,7 @@ public class ISSNCleanupTest {
 
     @Test
     public void cleanupISSNJunkStaysJunk() {
-        CleanupPreset preset = new CleanupPreset(CleanupPreset.CleanupStep.CLEAN_UP_ISSN);
+        CleanupPreferences preset = new CleanupPreferences(CleanupPreferences.CleanupStep.CLEAN_UP_ISSN);
         BibEntry entry = new BibEntry();
         entry.setField(StandardField.ISSN, "Banana");
 

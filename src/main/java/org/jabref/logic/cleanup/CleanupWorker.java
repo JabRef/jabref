@@ -22,7 +22,7 @@ public class CleanupWorker {
         this.timestampPreferences = timestampPreferences;
     }
 
-    public List<FieldChange> cleanup(CleanupPreset preset, BibEntry entry) {
+    public List<FieldChange> cleanup(CleanupPreferences preset, BibEntry entry) {
         Objects.requireNonNull(preset);
         Objects.requireNonNull(entry);
 
@@ -36,10 +36,10 @@ public class CleanupWorker {
         return changes;
     }
 
-    private List<CleanupJob> determineCleanupActions(CleanupPreset preset) {
+    private List<CleanupJob> determineCleanupActions(CleanupPreferences preset) {
         List<CleanupJob> jobs = new ArrayList<>();
 
-        for (CleanupPreset.CleanupStep action : preset.getActiveJobs()) {
+        for (CleanupPreferences.CleanupStep action : preset.getActiveJobs()) {
             jobs.add(toJob(action));
         }
 
@@ -50,7 +50,7 @@ public class CleanupWorker {
         return jobs;
     }
 
-    private CleanupJob toJob(CleanupPreset.CleanupStep action) {
+    private CleanupJob toJob(CleanupPreferences.CleanupStep action) {
         return switch (action) {
             case CLEAN_UP_DOI ->
                     new DoiCleanup();

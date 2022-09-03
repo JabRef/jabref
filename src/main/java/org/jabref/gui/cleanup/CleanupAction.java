@@ -12,7 +12,7 @@ import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.gui.util.BackgroundTask;
-import org.jabref.logic.cleanup.CleanupPreset;
+import org.jabref.logic.cleanup.CleanupPreferences;
 import org.jabref.logic.cleanup.CleanupWorker;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.FieldChange;
@@ -62,7 +62,7 @@ public class CleanupAction extends SimpleCommand {
                 preferences.getFilePreferences()
         );
 
-        Optional<CleanupPreset> chosenPreset = dialogService.showCustomDialogAndWait(cleanupDialog);
+        Optional<CleanupPreferences> chosenPreset = dialogService.showCustomDialogAndWait(cleanupDialog);
 
         chosenPreset.ifPresent(preset -> {
             if (preset.isRenamePDFActive() && preferences.getAutoLinkPreferences().shouldAskAutoNamingPdfs()) {
@@ -89,7 +89,7 @@ public class CleanupAction extends SimpleCommand {
     /**
      * Runs the cleanup on the entry and records the change.
      */
-    private void doCleanup(BibDatabaseContext databaseContext, CleanupPreset preset, BibEntry entry, NamedCompound ce) {
+    private void doCleanup(BibDatabaseContext databaseContext, CleanupPreferences preset, BibEntry entry, NamedCompound ce) {
         // Create and run cleaner
         CleanupWorker cleaner = new CleanupWorker(
                 databaseContext,
@@ -123,14 +123,14 @@ public class CleanupAction extends SimpleCommand {
         }
     }
 
-    private void cleanup(BibDatabaseContext databaseContext, CleanupPreset cleanupPreset) {
-        preferences.setCleanupPreset(cleanupPreset);
+    private void cleanup(BibDatabaseContext databaseContext, CleanupPreferences cleanupPreferences) {
+        preferences.setCleanupPreset(cleanupPreferences);
 
         for (BibEntry entry : stateManager.getSelectedEntries()) {
             // undo granularity is on entry level
             NamedCompound ce = new NamedCompound(Localization.lang("Cleanup entry"));
 
-            doCleanup(databaseContext, cleanupPreset, entry, ce);
+            doCleanup(databaseContext, cleanupPreferences, entry, ce);
 
             ce.end();
             if (ce.hasEdits()) {
