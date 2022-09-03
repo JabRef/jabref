@@ -1,7 +1,11 @@
 package org.jabref.logic.cleanup;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.jabref.logic.formatter.Formatters;
 import org.jabref.logic.formatter.IdentityFormatter;
@@ -14,6 +18,7 @@ import org.jabref.logic.formatter.bibtexfields.OrdinalsToSuperscriptFormatter;
 import org.jabref.logic.formatter.bibtexfields.UnicodeToLatexFormatter;
 import org.jabref.logic.layout.format.LatexToUnicodeFormatter;
 import org.jabref.logic.layout.format.ReplaceUnicodeLigaturesFormatter;
+import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.StandardField;
@@ -24,6 +29,8 @@ public class Cleanups {
     public static final FieldFormatterCleanups DEFAULT_SAVE_ACTIONS;
     public static final FieldFormatterCleanups RECOMMEND_BIBTEX_ACTIONS;
     public static final FieldFormatterCleanups RECOMMEND_BIBLATEX_ACTIONS;
+
+    private static final Pattern FIELD_FORMATTER_CLEANUP_PATTERN = Pattern.compile("([^\\[]+)\\[([^\\]]+)\\]");
 
     static {
         List<FieldFormatterCleanup> defaultFormatters = new ArrayList<>();
@@ -58,52 +65,28 @@ public class Cleanups {
     public static List<FieldFormatterCleanup> parse(String formatterString) {
         if ((formatterString == null) || formatterString.isEmpty()) {
             // no save actions defined in the meta data
-            return new ArrayList<>();
+            return Collections.emptyList();
         }
-
-        List<FieldFormatterCleanup> actions = new ArrayList<>();
-
-        // read concrete actions
-        int startIndex = 0;
 
         // first remove all newlines for easier parsing
-        String remainingString = StringUtil.unifyLineBreaks(formatterString, "");
+        String formatterStringWithoutLineBreaks = StringUtil.unifyLineBreaks(formatterString, "");
 
-        try {
-            while (startIndex < formatterString.length()) {
-                // read the field name
-                int currentIndex = remainingString.indexOf('[');
-                String fieldKey = remainingString.substring(0, currentIndex);
-                int endIndex = remainingString.indexOf(']');
-                startIndex += endIndex + 1;
+        List<FieldFormatterCleanup> result = new ArrayList<>();
 
-                // read each formatter
-                int tokenIndex = remainingString.indexOf(',');
-                do {
-                    boolean doBreak = false;
-                    if ((tokenIndex == -1) || (tokenIndex > endIndex)) {
-                        tokenIndex = remainingString.indexOf(']');
-                        doBreak = true;
-                    }
+        Matcher matcher = FIELD_FORMATTER_CLEANUP_PATTERN.matcher(formatterStringWithoutLineBreaks);
+        while (matcher.find()) {
+            String fieldKey = matcher.group(1);
+            Field field = FieldFactory.parseField(fieldKey);
 
-                    String formatterKey = remainingString.substring(currentIndex + 1, tokenIndex);
-                    actions.add(new FieldFormatterCleanup(FieldFactory.parseField(fieldKey), getFormatterFromString(formatterKey)));
+            String fieldString = matcher.group(2);
 
-                    remainingString = remainingString.substring(tokenIndex + 1);
-                    if (remainingString.startsWith("]") || doBreak) {
-                        break;
-                    }
-                    tokenIndex = remainingString.indexOf(',');
-
-                    currentIndex = -1;
-                } while (true);
-            }
-        } catch (StringIndexOutOfBoundsException ignore) {
-            // if this exception occurs, the remaining part of the save actions string is invalid.
-            // Thus we stop parsing and take what we have parsed until now
-            return actions;
+            List<FieldFormatterCleanup> fieldFormatterCleanups = Arrays.stream(fieldString.split(","))
+                                                                       .map(formatterKey -> getFormatterFromString(formatterKey))
+                                                                       .map(formatter -> new FieldFormatterCleanup(field, formatter))
+                                                                       .toList();
+            result.addAll(fieldFormatterCleanups);
         }
-        return actions;
+        return result;
     }
 
     public static FieldFormatterCleanups parse(List<String> formatterMetaList) {
