@@ -93,7 +93,7 @@ public class MainTableDataModel {
     }
 
     private boolean isMatchedBySearch(Optional<SearchQuery> query, BibEntryTableViewModel entry) {
-        if (query.isPresent() && query.get().getSearchFlags().contains(SearchRules.SearchFlags.FLOATING_SEARCH)) {
+        if (query.isPresent() && query.get().getSearchFlags().contains(SearchRules.SearchFlags.FILTERING_SEARCH)) {
             return true;
         }
         return query.map(matcher -> matcher.isMatch(entry.getEntry()))

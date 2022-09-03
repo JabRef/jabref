@@ -281,7 +281,7 @@ public class IconTheme {
         ERROR(MaterialDesignA.ALERT_CIRCLE),
         REG_EX(MaterialDesignR.REGEX),
         FULLTEXT(MaterialDesignF.FILE_EYE),
-        FLOATING_MODE(MaterialDesignF.FILTER),
+        FILTER(MaterialDesignF.FILTER),
         SORT_BY_SCORE(MaterialDesignS.SORT_VARIANT),
         CONSOLE(MaterialDesignC.CONSOLE),
         FORUM(MaterialDesignF.FORUM),

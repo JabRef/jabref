@@ -14,7 +14,7 @@ public class SearchPreferences {
     private final ObservableSet<SearchFlags> searchFlags;
     private final BooleanProperty keepWindowOnTop;
 
-    public SearchPreferences(boolean isRegularExpression, boolean isFulltext, boolean isKeepSearchString, boolean isFloatingMode, boolean isSortByScore, boolean keepWindowOnTop) {
+    public SearchPreferences(boolean isRegularExpression, boolean isFulltext, boolean isKeepSearchString, boolean isFilteringMode, boolean isSortByScore, boolean keepWindowOnTop) {
         this.keepWindowOnTop = new SimpleBooleanProperty(keepWindowOnTop);
 
         searchFlags = FXCollections.observableSet(EnumSet.noneOf(SearchFlags.class));
@@ -27,8 +27,8 @@ public class SearchPreferences {
         if (isKeepSearchString) {
             searchFlags.add(SearchFlags.KEEP_SEARCH_STRING);
         }
-        if (isFloatingMode) {
-            searchFlags.add(SearchFlags.FLOATING_SEARCH);
+        if (isFilteringMode) {
+            searchFlags.add(SearchFlags.FILTERING_SEARCH);
         }
         if (isSortByScore) {
             searchFlags.add(SearchFlags.SORT_BY_SCORE);
@@ -73,8 +73,8 @@ public class SearchPreferences {
         return searchFlags.contains(SearchFlags.KEEP_SEARCH_STRING);
     }
 
-    public boolean isFloatingMode() {
-        return searchFlags.contains(SearchFlags.FLOATING_SEARCH);
+    public boolean isFilteringMode() {
+        return searchFlags.contains(SearchFlags.FILTERING_SEARCH);
     }
 
     public boolean isSortByScore() {
