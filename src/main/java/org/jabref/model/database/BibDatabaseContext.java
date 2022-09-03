@@ -145,7 +145,7 @@ public class BibDatabaseContext {
                 .ifPresent(metaDataDirectory -> fileDirs.add(getFileDirectoryPath(metaDataDirectory)));
 
         // 3. BIB file directory or Main file directory
-        if (preferences.shouldStoreFilesRelativeToBibFile()) {
+        if (fileDirs.isEmpty() && preferences.shouldStoreFilesRelativeToBibFile()) {
             getDatabasePath().ifPresent(dbPath -> {
                 Path parentPath = dbPath.getParent();
                 if (parentPath == null) {
