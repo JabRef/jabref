@@ -294,6 +294,7 @@ public class JabRefDesktop {
 
     /**
      * Get the user's default file chooser directory
+     *
      * @return The path to the directory
      */
     public static String getDefaultFileChooserDirectory() {
