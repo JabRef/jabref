@@ -410,6 +410,7 @@ public class JabRefPreferences implements PreferencesService {
     // to solve the problem of formatters not having access to any context except for the
     // string to be formatted and possible formatter arguments.
     public List<Path> fileDirForDatabase;
+
     private final Preferences prefs;
 
     /**
@@ -1119,12 +1120,12 @@ public class JabRefPreferences implements PreferencesService {
     @Override
     public FileLinkPreferences getFileLinkPreferences() {
         return new FileLinkPreferences(
-                get(MAIN_FILE_DIRECTORY), // REALLY HERE?
+                getFilePreferences().mainFileDirectoryProperty().get(),
                 fileDirForDatabase);
     }
 
     @Override
-    public void storeFileDirforDatabase(List<Path> dirs) {
+    public void storeFileDirForDatabase(List<Path> dirs) {
         this.fileDirForDatabase = dirs;
     }
 
@@ -1475,7 +1476,7 @@ public class JabRefPreferences implements PreferencesService {
         List<String> tabNames = getSeries(CUSTOM_TAB_NAME);
         List<String> tabFields = getSeries(CUSTOM_TAB_FIELDS);
 
-        if (tabNames.isEmpty() || tabNames.size() != tabFields.size()) {
+        if (tabNames.isEmpty() || (tabNames.size() != tabFields.size())) {
             // Nothing set, so we use the default values
             tabNames = getSeries(CUSTOM_TAB_NAME + "_def");
             tabFields = getSeries(CUSTOM_TAB_FIELDS + "_def");
@@ -2207,6 +2208,20 @@ public class JabRefPreferences implements PreferencesService {
                 getFieldContentParserPreferences());
     }
 
+    /**
+     * Ensures that the main file directory is a non-empty String.
+     * The directory is <emph>NOT</emph> created, because creation of the directory is the task of the respective methods.
+     *
+     * @param originalDirectory the directory as configured
+     */
+    private String determineMainFileDirectory(String originalDirectory) {
+        if (!originalDirectory.isEmpty()) {
+            // A non-empty directory is kept
+            return originalDirectory;
+        }
+        return Path.of(JabRefDesktop.getDefaultFileChooserDirectory(), "JabRef").toString();
+    }
+
     @Override
     public FilePreferences getFilePreferences() {
         if (Objects.nonNull(filePreferences)) {
@@ -2215,7 +2230,7 @@ public class JabRefPreferences implements PreferencesService {
 
         filePreferences = new FilePreferences(
                 getInternalPreferences().getUser(),
-                get(MAIN_FILE_DIRECTORY),
+                determineMainFileDirectory(get(MAIN_FILE_DIRECTORY)),
                 getBoolean(STORE_RELATIVE_TO_BIB),
                 get(IMPORT_FILENAMEPATTERN),
                 get(IMPORT_FILEDIRPATTERN),
@@ -2794,7 +2809,7 @@ public class JabRefPreferences implements PreferencesService {
                     importers.add(new CustomImporter(importerString.get(3), importerString.get(2)));
                 }
             } catch (Exception e) {
-                LOGGER.warn("Could not load " + importerString.get(0) + " from preferences. Will ignore.", e);
+                LOGGER.warn("Could not load {} from preferences. Will ignore.", importerString.get(0), e);
             }
         }
 
