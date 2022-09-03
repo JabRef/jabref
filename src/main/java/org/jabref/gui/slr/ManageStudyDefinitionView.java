@@ -186,15 +186,6 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
         databaseColumn.setCellValueFactory(param -> param.getValue().nameProperty());
 
         databaseTable.setItems(viewModel.getDatabases());
-
-        /*
-        databaseTable.getSelectionModel().selectedItemProperty().addListener(
-                (obs, oldSelection, newSelection) -> {
-                    if (newSelection != null) {
-                        newSelection.setEnabled(!newSelection.isEnabled());
-                    }
-                }
-        );*/
     }
 
     private void setupCommonPropertiesForTables(Node addControl,
