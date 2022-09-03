@@ -58,7 +58,7 @@ class StudyDatabaseToFetcherConverterTest {
 
     @Test
     public void getActiveFetcherInstances() throws Exception {
-        Path studyDefinition = tempRepositoryDirectory.resolve("study.yml");
+        Path studyDefinition = tempRepositoryDirectory.resolve(StudyRepository.STUDY_DEFINITION_FILE_NAME);
         copyTestStudyDefinitionFileIntoDirectory(studyDefinition);
 
         StudyRepository studyRepository = new StudyRepository(
@@ -83,7 +83,7 @@ class StudyDatabaseToFetcherConverterTest {
     }
 
     private void copyTestStudyDefinitionFileIntoDirectory(Path destination) throws Exception {
-        URL studyDefinition = this.getClass().getResource("study.yml");
+        URL studyDefinition = this.getClass().getResource(StudyRepository.STUDY_DEFINITION_FILE_NAME);
         FileUtil.copyFile(Path.of(studyDefinition.toURI()), destination, false);
     }
 }

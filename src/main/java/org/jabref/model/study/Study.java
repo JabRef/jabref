@@ -3,6 +3,7 @@ package org.jabref.model.study;
 import java.util.List;
 import java.util.Objects;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
@@ -12,6 +13,8 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
  * This class defines all aspects of a scientific study relevant to the application. It is a proxy for the file based study definition.
  */
 @JsonPropertyOrder({"authors", "title", "research-questions", "queries", "databases"})
+// The user might add arbitrary content to the YAML
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Study {
     private List<String> authors;
 
@@ -35,7 +38,7 @@ public class Study {
     /**
      * Used for Jackson deserialization
      */
-    public Study() {
+    private Study() {
     }
 
     public List<String> getAuthors() {

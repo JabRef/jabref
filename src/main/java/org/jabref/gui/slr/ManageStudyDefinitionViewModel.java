@@ -2,9 +2,10 @@ package org.jabref.gui.slr;
 
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
-import java.util.Comparator;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import javafx.beans.property.Property;
@@ -17,6 +18,11 @@ import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.logic.importer.WebFetchers;
+import org.jabref.logic.importer.fetcher.ACMPortalFetcher;
+import org.jabref.logic.importer.fetcher.CompositeSearchBasedFetcher;
+import org.jabref.logic.importer.fetcher.DBLPFetcher;
+import org.jabref.logic.importer.fetcher.IEEE;
+import org.jabref.logic.importer.fetcher.SpringerFetcher;
 import org.jabref.model.study.Study;
 import org.jabref.model.study.StudyDatabase;
 import org.jabref.model.study.StudyQuery;
@@ -31,45 +37,69 @@ import org.slf4j.LoggerFactory;
 public class ManageStudyDefinitionViewModel {
     private static final Logger LOGGER = LoggerFactory.getLogger(ManageStudyDefinitionViewModel.class);
 
+    private static final Set<String> DEFAULT_SELECTION = Set.of(
+            ACMPortalFetcher.FETCHER_NAME,
+            IEEE.FETCHER_NAME,
+            SpringerFetcher.FETCHER_NAME,
+            DBLPFetcher.FETCHER_NAME);
+
+
     private final StringProperty title = new SimpleStringProperty();
     private final ObservableList<String> authors = FXCollections.observableArrayList();
     private final ObservableList<String> researchQuestions = FXCollections.observableArrayList();
     private final ObservableList<String> queries = FXCollections.observableArrayList();
     private final ObservableList<StudyDatabaseItem> databases = FXCollections.observableArrayList();
-    // Hold the complement of databases for the selector
-    private final ObservableList<StudyDatabaseItem> nonSelectedDatabases = FXCollections.observableArrayList();
-    private final SimpleStringProperty directory = new SimpleStringProperty();
-    private Study study;
 
+    // Hold the complement of databases for the selector
+    private final SimpleStringProperty directory = new SimpleStringProperty();
+
+    /**
+     * Constructor for a new study
+     */
+    public ManageStudyDefinitionViewModel(ImportFormatPreferences importFormatPreferences,
+                                          ImporterPreferences importerPreferences) {
+        databases.addAll(WebFetchers.getSearchBasedFetchers(importFormatPreferences, importerPreferences)
+                                    .stream()
+                                    .map(SearchBasedFetcher::getName)
+                                    // The user wants to select specific fetchers
+                                    // The fetcher summarizing ALL fetchers can be emulated by selecting ALL fetchers (which happens rarely when doing an SLR)
+                                    .filter(name -> !name.equals(CompositeSearchBasedFetcher.FETCHER_NAME))
+                                    .map(name -> {
+                                        boolean enabled = DEFAULT_SELECTION.contains(name);
+                                        return new StudyDatabaseItem(name, enabled);
+                                    })
+                                    .toList());
+    }
+
+    /**
+     * Constructor for an existing study
+     *
+     * @param study The study to initialize the UI from
+     * @param studyDirectory The path where the study resides
+     */
     public ManageStudyDefinitionViewModel(Study study,
                                           Path studyDirectory,
                                           ImportFormatPreferences importFormatPreferences,
                                           ImporterPreferences importerPreferences) {
-        if (Objects.isNull(study)) {
-            computeNonSelectedDatabases(importFormatPreferences, importerPreferences);
-            return;
-        }
-        this.study = study;
+        // copy the content of the study object into the UI fields
+        authors.addAll(Objects.requireNonNull(study).getAuthors());
         title.setValue(study.getTitle());
-        authors.addAll(study.getAuthors());
         researchQuestions.addAll(study.getResearchQuestions());
         queries.addAll(study.getQueries().stream().map(StudyQuery::getQuery).toList());
-        databases.addAll(study.getDatabases()
-                              .stream()
-                              .map(studyDatabase -> new StudyDatabaseItem(studyDatabase.getName(), studyDatabase.isEnabled()))
-                              .toList());
-        computeNonSelectedDatabases(importFormatPreferences, importerPreferences);
-        if (!Objects.isNull(studyDirectory)) {
-            this.directory.set(studyDirectory.toString());
-        }
-    }
+        List<StudyDatabase> studyDatabases = study.getDatabases();
+        databases.addAll(WebFetchers.getSearchBasedFetchers(importFormatPreferences, importerPreferences)
+                                    .stream()
+                                    .map(SearchBasedFetcher::getName)
+                                    // The user wants to select specific fetchers
+                                    // The fetcher summarizing ALL fetchers can be emulated by selecting ALL fetchers (which happens rarely when doing an SLR)
+                                    .filter(name -> !name.equals(CompositeSearchBasedFetcher.FETCHER_NAME))
+                                    .map(name -> {
+                                        boolean enabled = studyDatabases.contains(new StudyDatabase(name, true));
+                                        return new StudyDatabaseItem(name, enabled);
+                                    })
+                                    .toList());
 
-    private void computeNonSelectedDatabases(ImportFormatPreferences importFormatPreferences, ImporterPreferences importerPreferences) {
-        nonSelectedDatabases.addAll(WebFetchers.getSearchBasedFetchers(importFormatPreferences, importerPreferences)
-                                               .stream()
-                                               .map(SearchBasedFetcher::getName)
-                                               .map(s -> new StudyDatabaseItem(s, true))
-                                               .filter(studyDatabase -> !databases.contains(studyDatabase)).toList());
+        this.directory.set(Objects.requireNonNull(studyDirectory).toString());
     }
 
     public StringProperty getTitle() {
@@ -96,10 +126,6 @@ public class ManageStudyDefinitionViewModel {
         return databases;
     }
 
-    public ObservableList<StudyDatabaseItem> getNonSelectedDatabases() {
-        return nonSelectedDatabases;
-    }
-
     public void addAuthor(String author) {
         if (author.isBlank()) {
             return;
@@ -121,29 +147,18 @@ public class ManageStudyDefinitionViewModel {
         queries.add(query);
     }
 
-    public void addDatabase(StudyDatabaseItem database) {
-        if (Objects.isNull(database)) {
-            return;
-        }
-        nonSelectedDatabases.remove(database);
-        if (!databases.contains(database)) {
-            databases.add(database);
-        }
-    }
-
     public SlrStudyAndDirectory saveStudy() {
-        if (Objects.isNull(study)) {
-            study = new Study();
-        }
-        study.setTitle(title.getValueSafe());
-        study.setAuthors(authors);
-        study.setResearchQuestions(researchQuestions);
-        study.setQueries(queries.stream().map(StudyQuery::new).collect(Collectors.toList()));
-        study.setDatabases(databases.stream().map(studyDatabaseItem -> new StudyDatabase(studyDatabaseItem.getName(), studyDatabaseItem.isEnabled())).collect(Collectors.toList()));
+        Study study = new Study(
+                authors,
+                title.getValueSafe(),
+                researchQuestions,
+                queries.stream().map(StudyQuery::new).collect(Collectors.toList()),
+                databases.stream().map(studyDatabaseItem -> new StudyDatabase(studyDatabaseItem.getName(), studyDatabaseItem.isEnabled())).filter(StudyDatabase::isEnabled).collect(Collectors.toList()));
         Path studyDirectory = null;
         try {
             studyDirectory = Path.of(directory.getValueSafe());
-        } catch (InvalidPathException e) {
+        } catch (
+                InvalidPathException e) {
             LOGGER.error("Invalid path was provided: {}", directory);
         }
         return new SlrStudyAndDirectory(study, studyDirectory);
@@ -151,20 +166,6 @@ public class ManageStudyDefinitionViewModel {
 
     public Property<String> titleProperty() {
         return title;
-    }
-
-    public void removeDatabase(String database) {
-        // If a database is added from the combo box it should be enabled by default
-        Optional<StudyDatabaseItem> correspondingDatabase = databases.stream().filter(studyDatabaseItem -> studyDatabaseItem.getName().equals(database)).findFirst();
-        if (correspondingDatabase.isEmpty()) {
-            return;
-        }
-        StudyDatabaseItem databaseToRemove = correspondingDatabase.get();
-        databases.remove(databaseToRemove);
-        databaseToRemove.setEnabled(true);
-        nonSelectedDatabases.add(databaseToRemove);
-        // Resort list
-        nonSelectedDatabases.sort(Comparator.comparing(StudyDatabaseItem::getName));
     }
 
     public void setStudyDirectory(Optional<Path> studyRepositoryRoot) {
