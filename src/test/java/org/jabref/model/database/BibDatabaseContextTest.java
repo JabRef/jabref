@@ -91,7 +91,6 @@ class BibDatabaseContextTest {
                 database.getFileDirectories(fileDirPrefs));
     }
 
-
     @Test
     void getUserFileDirectoryIfAllAreEmpty() {
         when(fileDirPrefs.shouldStoreFilesRelativeToBibFile()).thenReturn(false);
@@ -103,7 +102,6 @@ class BibDatabaseContextTest {
         database.setDatabasePath(Path.of("biblio.bib"));
         assertEquals(Collections.singletonList(userDirJabRef), database.getFileDirectories(fileDirPrefs));
     }
-
 
     @Test
     void testTypeBasedOnDefaultBiblatex() {
