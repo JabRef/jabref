@@ -388,7 +388,7 @@ public class FileUtil {
     }
 
     /**
-     * @return Path of current panel database directory or the standard working directory in case the datbase was not saved yet
+     * @return Path of current panel database directory or the standard working directory in case the database was not saved yet
      */
     public static Path getInitialDirectory(BibDatabaseContext databaseContext, Path workingDirectory) {
         return databaseContext.getDatabasePath().map(Path::getParent).orElse(workingDirectory);

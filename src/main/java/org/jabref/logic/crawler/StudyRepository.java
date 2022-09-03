@@ -1,8 +1,6 @@
 package org.jabref.logic.crawler;
 
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.nio.charset.UnsupportedCharsetException;
 import java.nio.file.Files;
@@ -55,8 +53,10 @@ public class StudyRepository {
     public static final String STUDY_DEFINITION_FILE_NAME = "study.yml";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(StudyRepository.class);
-    private static final Pattern MATCHCOLON = Pattern.compile(":");
-    private static final Pattern MATCHILLEGALCHARACTERS = Pattern.compile("[^A-Za-z0-9_.\\s=-]");
+
+    private static final Pattern MATCH_COLON = Pattern.compile(":");
+    private static final Pattern MATCH_ILLEGAL_CHARACTERS = Pattern.compile("[^A-Za-z0-9_.\\s=-]");
+
     // Currently we make assumptions about the configuration: the remotes, work and search branch names
     private static final String REMOTE = "origin";
     private static final String WORK_BRANCH = "work";
@@ -355,8 +355,8 @@ public class StudyRepository {
      */
     private String trimNameAndAddID(String query) {
         // Replace all field: with field= for folder name
-        String trimmedNamed = MATCHCOLON.matcher(query).replaceAll("=");
-        trimmedNamed = MATCHILLEGALCHARACTERS.matcher(trimmedNamed).replaceAll("");
+        String trimmedNamed = MATCH_COLON.matcher(query).replaceAll("=");
+        trimmedNamed = MATCH_ILLEGAL_CHARACTERS.matcher(trimmedNamed).replaceAll("");
         String id = computeIDForQuery(query);
         // Whole path has to be shorter than 260
         int remainingPathLength = 220 - studyDefinitionFile.toString().length() - id.length();

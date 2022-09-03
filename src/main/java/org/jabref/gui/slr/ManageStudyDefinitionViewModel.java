@@ -14,6 +14,7 @@ import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
+import org.jabref.gui.DialogService;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.SearchBasedFetcher;
@@ -23,6 +24,7 @@ import org.jabref.logic.importer.fetcher.CompositeSearchBasedFetcher;
 import org.jabref.logic.importer.fetcher.DBLPFetcher;
 import org.jabref.logic.importer.fetcher.IEEE;
 import org.jabref.logic.importer.fetcher.SpringerFetcher;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.model.study.Study;
 import org.jabref.model.study.StudyDatabase;
 import org.jabref.model.study.StudyQuery;
@@ -53,11 +55,14 @@ public class ManageStudyDefinitionViewModel {
     // Hold the complement of databases for the selector
     private final SimpleStringProperty directory = new SimpleStringProperty();
 
+    private final DialogService dialogService;
+
     /**
      * Constructor for a new study
      */
     public ManageStudyDefinitionViewModel(ImportFormatPreferences importFormatPreferences,
-                                          ImporterPreferences importerPreferences) {
+                                          ImporterPreferences importerPreferences,
+                                          DialogService dialogService) {
         databases.addAll(WebFetchers.getSearchBasedFetchers(importFormatPreferences, importerPreferences)
                                     .stream()
                                     .map(SearchBasedFetcher::getName)
@@ -69,6 +74,7 @@ public class ManageStudyDefinitionViewModel {
                                         return new StudyDatabaseItem(name, enabled);
                                     })
                                     .toList());
+        this.dialogService = Objects.requireNonNull(dialogService);
     }
 
     /**
@@ -80,7 +86,8 @@ public class ManageStudyDefinitionViewModel {
     public ManageStudyDefinitionViewModel(Study study,
                                           Path studyDirectory,
                                           ImportFormatPreferences importFormatPreferences,
-                                          ImporterPreferences importerPreferences) {
+                                          ImporterPreferences importerPreferences,
+                                          DialogService dialogService) {
         // copy the content of the study object into the UI fields
         authors.addAll(Objects.requireNonNull(study).getAuthors());
         title.setValue(study.getTitle());
@@ -100,6 +107,7 @@ public class ManageStudyDefinitionViewModel {
                                     .toList());
 
         this.directory.set(Objects.requireNonNull(studyDirectory).toString());
+        this.dialogService = Objects.requireNonNull(dialogService);
     }
 
     public StringProperty getTitle() {
@@ -154,12 +162,16 @@ public class ManageStudyDefinitionViewModel {
                 researchQuestions,
                 queries.stream().map(StudyQuery::new).collect(Collectors.toList()),
                 databases.stream().map(studyDatabaseItem -> new StudyDatabase(studyDatabaseItem.getName(), studyDatabaseItem.isEnabled())).filter(StudyDatabase::isEnabled).collect(Collectors.toList()));
-        Path studyDirectory = null;
+        Path studyDirectory;
         try {
             studyDirectory = Path.of(directory.getValueSafe());
-        } catch (
-                InvalidPathException e) {
-            LOGGER.error("Invalid path was provided: {}", directory);
+        } catch (InvalidPathException e) {
+            LOGGER.error("Invalid path was provided: {}", directory.getValueSafe());
+            // This will appear very seldom, thus we accept that we use "file path" instead of "directory"
+            dialogService.notify(Localization.lang("Please enter a valid file path.") +
+                    ": " + directory.getValueSafe());
+            // We do not assume another path - we return that there is an invalid object.
+            return null;
         }
         return new SlrStudyAndDirectory(study, studyDirectory);
     }
