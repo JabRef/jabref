@@ -53,8 +53,9 @@ public class ManageStudyDefinitionViewModel {
     // Hold the complement of databases for the selector
     private final SimpleStringProperty directory = new SimpleStringProperty();
 
-    private Study study;
-
+    /**
+     * Constructor for a new study
+     */
     public ManageStudyDefinitionViewModel(ImportFormatPreferences importFormatPreferences,
                                           ImporterPreferences importerPreferences) {
         databases.addAll(WebFetchers.getSearchBasedFetchers(importFormatPreferences, importerPreferences)
@@ -70,36 +71,35 @@ public class ManageStudyDefinitionViewModel {
                                     .toList());
     }
 
+    /**
+     * Constructor for an existing study
+     *
+     * @param study The study to initialize the UI from
+     * @param studyDirectory The path where the study resides
+     */
     public ManageStudyDefinitionViewModel(Study study,
                                           Path studyDirectory,
                                           ImportFormatPreferences importFormatPreferences,
                                           ImporterPreferences importerPreferences) {
-        this.study = study;
+        // copy the content of the study object into the UI fields
+        authors.addAll(Objects.requireNonNull(study).getAuthors());
         title.setValue(study.getTitle());
-        authors.addAll(study.getAuthors());
         researchQuestions.addAll(study.getResearchQuestions());
         queries.addAll(study.getQueries().stream().map(StudyQuery::getQuery).toList());
-
-        // Currently, modifying an existing study is not possible. But this code first adds all databases that are
-        // enabled for an existing Study object as enabled entries to the table and afterwards populates the table with
-        // all other available databases.
-        databases.addAll(study.getDatabases()
-                              .stream()
-                              .map(studyDatabase -> new StudyDatabaseItem(studyDatabase.getName(), studyDatabase.isEnabled()))
-                              .toList());
-        computeNonSelectedDatabases(importFormatPreferences, importerPreferences);
-        if (!Objects.isNull(studyDirectory)) {
-            this.directory.set(studyDirectory.toString());
-        }
-    }
-
-    private void computeNonSelectedDatabases(ImportFormatPreferences importFormatPreferences, ImporterPreferences importerPreferences) {
+        List<StudyDatabase> studyDatabases = study.getDatabases();
         databases.addAll(WebFetchers.getSearchBasedFetchers(importFormatPreferences, importerPreferences)
                                     .stream()
                                     .map(SearchBasedFetcher::getName)
-                                    .map(s -> new StudyDatabaseItem(s, false))
-                                    .filter(studyDatabase -> !databases.contains(studyDatabase))
+                                    // The user wants to select specific fetchers
+                                    // The fetcher summarizing ALL fetchers can be emulated by selecting ALL fetchers (which happens rarely when doing an SLR)
+                                    .filter(name -> !name.equals(CompositeSearchBasedFetcher.FETCHER_NAME))
+                                    .map(name -> {
+                                        boolean enabled = studyDatabases.contains(new StudyDatabase(name, true));
+                                        return new StudyDatabaseItem(name, enabled);
+                                    })
                                     .toList());
+
+        this.directory.set(Objects.requireNonNull(studyDirectory).toString());
     }
 
     public StringProperty getTitle() {
@@ -148,14 +148,12 @@ public class ManageStudyDefinitionViewModel {
     }
 
     public SlrStudyAndDirectory saveStudy() {
-        if (Objects.isNull(study)) {
-            study = new Study();
-        }
-        study.setTitle(title.getValueSafe());
-        study.setAuthors(authors);
-        study.setResearchQuestions(researchQuestions);
-        study.setQueries(queries.stream().map(StudyQuery::new).collect(Collectors.toList()));
-        study.setDatabases(databases.stream().map(studyDatabaseItem -> new StudyDatabase(studyDatabaseItem.getName(), studyDatabaseItem.isEnabled())).filter(StudyDatabase::isEnabled).collect(Collectors.toList()));
+        Study study = new Study(
+                authors,
+                title.getValueSafe(),
+                researchQuestions,
+                queries.stream().map(StudyQuery::new).collect(Collectors.toList()),
+                databases.stream().map(studyDatabaseItem -> new StudyDatabase(studyDatabaseItem.getName(), studyDatabaseItem.isEnabled())).filter(StudyDatabase::isEnabled).collect(Collectors.toList()));
         Path studyDirectory = null;
         try {
             studyDirectory = Path.of(directory.getValueSafe());

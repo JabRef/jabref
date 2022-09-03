@@ -7,6 +7,11 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
+import org.jabref.model.study.StudyDatabase;
+
+/**
+ * View representation of {@link StudyDatabase}
+ */
 public class StudyDatabaseItem {
     private final StringProperty name;
     private final BooleanProperty enabled;
