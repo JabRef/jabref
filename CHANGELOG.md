@@ -16,7 +16,8 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We integrated a new three-way merge UI for merging entries in the Entries Merger Dialog, the Duplicate Resolver Dialog, the Entry Importer Dialog, and the External Changes Resolver Dialog. [#8945](https://github.com/JabRef/jabref/pull/8945)
 - We added the ability to merge groups, keywords, comments and files when merging entries. [#9022](https://github.com/JabRef/jabref/pull/9022)
 - We added a warning message next to the authors field in the merge dialog to warn users when the authors are the same but formatted differently. [#8745](https://github.com/JabRef/jabref/issues/8745)
-- The properties of an existing systematic literature review can be edited.
+- The properties of an existing systematic literature review can be edited. [#9131](https://github.com/JabRef/jabref/pull/9131)
+- An SLR can now be started from the SLR itself. [#9131](https://github.com/JabRef/jabref/pull/9131)
 
 ### Changed
 
@@ -29,6 +30,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - A user can now add arbitrary data into `study.yml`. JabRef just ignores this data. [#9124](https://github.com/JabRef/jabref/pull/9124)
 - We reworked the External Changes Resolver dialog. [#9021](https://github.com/JabRef/jabref/pull/9021)
 - We reworked the Define study parameters dialog. [#9123](https://github.com/JabRef/jabref/pull/9123)
+
 
 ### Fixed
 
