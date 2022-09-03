@@ -15,7 +15,36 @@ import org.slf4j.LoggerFactory;
 public class FileFieldParser {
     private static final Logger LOGGER = LoggerFactory.getLogger(FileFieldParser.class);
 
+    private final String value;
+
+    private StringBuilder charactersOfCurrentElement;
+    private boolean windowsPath;
+
+    public FileFieldParser(String value) {
+        this.value = value;
+    }
+
+    /**
+     * Converts the string representation of LinkedFileData to a List of LinkedFile
+     *
+     * The syntax of one element is description:path:type
+     * Multiple elements are concatenated with ;
+     *
+     * The main challenges of the implementation are:
+     *
+     * <ul>
+     *     <li>that XML characters might be included (thus one cannot simply split on ";")</li>
+     *     <li>some characters might be escaped</li>
+     *     <li>Windows absolute paths might be included without escaping</li>
+     * </ul>
+     */
     public static List<LinkedFile> parse(String value) {
+        // We need state to have a more clean code. Thus, we instantiate the class and then return the result
+        FileFieldParser fileFieldParser = new FileFieldParser(value);
+        return fileFieldParser.parse();
+    }
+
+    public List<LinkedFile> parse() {
         List<LinkedFile> files = new ArrayList<>();
 
         if ((value == null) || value.trim().isEmpty()) {
@@ -32,49 +61,70 @@ public class FileFieldParser {
             }
         }
 
+        // data of each LinkedFile as split string
         List<String> linkedFileData = new ArrayList<>();
-        StringBuilder sb = new StringBuilder();
+
+        resetDataStructuresForNextElement();
         boolean inXmlChar = false;
         boolean escaped = false;
 
         for (int i = 0; i < value.length(); i++) {
             char c = value.charAt(i);
             if (!escaped && (c == '\\')) {
-                escaped = true;
-                continue;
+                if (windowsPath) {
+                    charactersOfCurrentElement.append(c);
+                    continue;
+                } else {
+                    escaped = true;
+                    continue;
+                }
             } else if (!escaped && (c == '&') && !inXmlChar) {
                 // Check if we are entering an XML special character construct such
                 // as "&#44;", because we need to know in order to ignore the semicolon.
-                sb.append(c);
+                charactersOfCurrentElement.append(c);
                 if ((value.length() > (i + 1)) && (value.charAt(i + 1) == '#')) {
                     inXmlChar = true;
                 }
             } else if (!escaped && inXmlChar && (c == ';')) {
                 // Check if we are exiting an XML special character construct:
-                sb.append(c);
+                charactersOfCurrentElement.append(c);
                 inXmlChar = false;
             } else if (!escaped && (c == ':')) {
-                // We are in the next LinkedFile data element
-                linkedFileData.add(sb.toString());
-                sb = new StringBuilder();
+                if ((linkedFileData.size() == 1) && // we already parsed the description
+                        (charactersOfCurrentElement.length() == 1)) { // we parsed one character
+                    // special case of Windows paths
+                    // Example: ":c:\test.pdf:PDF"
+                    // We are at the second : (position 3 in the example) and "just" add it to the current element
+                    charactersOfCurrentElement.append(c);
+                    windowsPath = true;
+                } else {
+                    // We are in the next LinkedFile data element
+                    linkedFileData.add(charactersOfCurrentElement.toString());
+                    resetDataStructuresForNextElement();
+                }
             } else if (!escaped && (c == ';') && !inXmlChar) {
-                linkedFileData.add(sb.toString());
+                linkedFileData.add(charactersOfCurrentElement.toString());
                 files.add(convert(linkedFileData));
 
                 // next iteration
-                sb = new StringBuilder();
+                resetDataStructuresForNextElement();
             } else {
-                sb.append(c);
+                charactersOfCurrentElement.append(c);
             }
             escaped = false;
         }
-        if (sb.length() > 0) {
-            linkedFileData.add(sb.toString());
+        if (charactersOfCurrentElement.length() > 0) {
+            linkedFileData.add(charactersOfCurrentElement.toString());
         }
         if (!linkedFileData.isEmpty()) {
             files.add(convert(linkedFileData));
         }
         return files;
+    }
+
+    private void resetDataStructuresForNextElement() {
+        charactersOfCurrentElement = new StringBuilder();
+        windowsPath = false;
     }
 
     /**

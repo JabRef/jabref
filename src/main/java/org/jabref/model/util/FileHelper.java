@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.nio.file.Files;
+import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
@@ -42,7 +43,7 @@ public class FileHelper {
             20, 21, 22, 23, 24, 25, 26, 27, 28, 29,
             30, 31, 34,
             42,
-            58,
+            58, // ":"
             60, 62, 63,
             123, 124, 125
     };
@@ -133,10 +134,22 @@ public class FileHelper {
     /**
      * Detect illegal characters in given filename.
      *
+     * See also {@link org.jabref.logic.util.io.FileNameCleaner#cleanFileName}
+     *
      * @param fileName the fileName to detect
-     * @return Boolean whether there is a illegal name.
+     * @return Boolean whether there is an illegal name.
      */
     public static boolean detectBadFileName(String fileName) {
+        // fileName could be a path, we want to check the fileName only (and don't care about the path)
+        // Reason: Handling of "c:\temp.pdf" is difficult, because ":" is an illegal character in the file name,
+        //         but a perfectly legal one in the path at this position
+        try {
+            fileName = Path.of(fileName).getFileName().toString();
+        } catch (InvalidPathException e) {
+            // in case the internal method cannot parse the path, it is surely illegal
+            return true;
+        }
+
         for (int i = 0; i < fileName.length(); i++) {
             char c = fileName.charAt(i);
             if (!isCharLegal(c)) {
@@ -161,12 +174,14 @@ public class FileHelper {
     public static Optional<Path> find(String fileName, Path directory) {
         Objects.requireNonNull(fileName);
         Objects.requireNonNull(directory);
-        // Explicitly check for an empty String, as File.exists returns true on that empty path, because it maps to the default jar location
-        // if we then call toAbsoluteDir, it would always return the jar-location folder. This is not what we want here
+
         if (detectBadFileName(fileName)) {
             LOGGER.error("Invalid characters in path for file {} ", fileName);
             return Optional.empty();
         }
+
+        // Explicitly check for an empty string, as File.exists returns true on that empty path, because it maps to the default jar location.
+        // If we then call toAbsoluteDir, it would always return the jar-location folder. This is not what we want here.
         if (fileName.isEmpty()) {
             return Optional.of(directory);
         }
