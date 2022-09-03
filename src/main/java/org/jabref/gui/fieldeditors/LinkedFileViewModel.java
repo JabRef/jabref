@@ -454,13 +454,12 @@ public class LinkedFileViewModel extends AbstractViewModel {
                 }
 
                 if (!isDuplicate) {
+                    // we need to call LinkedFileViewModel#fromFile, because we need to make the path relative to the configured directories
                     LinkedFile newLinkedFile = LinkedFilesEditorViewModel.fromFile(
                             destination,
                             databaseContext.getFileDirectories(preferences.getFilePreferences()),
                             preferences.getFilePreferences());
-                    List<LinkedFile> linkedFiles = entry.getFiles();
-
-                    entry.addLinkedFile(entry, linkedFile, newLinkedFile, linkedFiles);
+                    entry.replaceDownloadedFile(linkedFile.getLink(), newLinkedFile);
 
                     // Notify in bar when the file type is HTML.
                     if (newLinkedFile.getFileType().equals(StandardExternalFileType.URL.getName())) {
