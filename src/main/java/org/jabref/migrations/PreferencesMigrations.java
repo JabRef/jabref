@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.UnaryOperator;
 import java.util.prefs.BackingStoreException;
@@ -471,34 +472,35 @@ public class PreferencesMigrations {
      * </table>
      */
     private static void upgradeCleanups(JabRefPreferences prefs) {
-        final String CLEANUP = "CleanUp";
-        final String CLEANUP_JOBS = "CleanUpJobs";
+        final String V5_8_CLEANUP = "CleanUp";
+        final String V6_0_CLEANUP_JOBS = "CleanUpJobs";
 
-        final String CLEANUP_FIELD_FORMATTERS = "CleanUpFormatters";
-        final String CLEANUP_FIELD_FORMATTERS_ENABLED = "CleanUpFormattersEnabled";
+        final String V5_8_CLEANUP_FIELD_FORMATTERS = "CleanUpFormatters";
+        final String V6_0_CLEANUP_FIELD_FORMATTERS = "CleanUpFormatters";
+        final String V6_0_CLEANUP_FIELD_FORMATTERS_ENABLED = "CleanUpFormattersEnabled";
 
         List<String> activeJobs = new ArrayList<>();
         for (CleanupPreferences.CleanupStep action : EnumSet.allOf(CleanupPreferences.CleanupStep.class)) {
-            if (prefs.hasKey(CLEANUP + action.name()) && prefs.getBoolean(CLEANUP + action.name())) {
+            Optional<String> job = prefs.getAsOptional(V5_8_CLEANUP + action.name());
+            if (job.isPresent() && Boolean.parseBoolean(job.get())) {
                 activeJobs.add(action.name());
-                // prefs.deleteKey(CLEANUP + action.name());
+                // prefs.deleteKey(V5_8_CLEANUP + action.name()); // for backward compatibility in comments
             }
         }
         if (!activeJobs.isEmpty()) {
-            prefs.put(CLEANUP_JOBS, String.join(";", activeJobs));
+            prefs.put(V6_0_CLEANUP_JOBS, String.join(";", activeJobs));
         }
 
-        List<String> formatterCleanups = List.of(StringUtil.unifyLineBreaks(prefs.get(CLEANUP_FIELD_FORMATTERS), "\n")
+        List<String> formatterCleanups = List.of(StringUtil.unifyLineBreaks(prefs.get(V5_8_CLEANUP_FIELD_FORMATTERS), "\n")
                                                            .split("\n"));
-
         if (formatterCleanups.size() >= 2
                 && (formatterCleanups.get(0).equals(FieldFormatterCleanups.ENABLED)
                 || formatterCleanups.get(0).equals(FieldFormatterCleanups.DISABLED))) {
-            prefs.putBoolean(CLEANUP_FIELD_FORMATTERS_ENABLED, formatterCleanups.get(0).equals(FieldFormatterCleanups.ENABLED)
+            prefs.putBoolean(V6_0_CLEANUP_FIELD_FORMATTERS_ENABLED, formatterCleanups.get(0).equals(FieldFormatterCleanups.ENABLED)
                     ? Boolean.TRUE
                     : Boolean.FALSE);
 
-            prefs.put(CLEANUP_FIELD_FORMATTERS, String.join(OS.NEWLINE, formatterCleanups.subList(1, formatterCleanups.size() - 1)));
+            prefs.put(V6_0_CLEANUP_FIELD_FORMATTERS, String.join(OS.NEWLINE, formatterCleanups.subList(1, formatterCleanups.size() - 1)));
         }
     }
 }
