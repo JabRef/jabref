@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -168,6 +169,11 @@ public class LuceneIndexer {
                         KeywordList keywords = KeywordList.parse(field.getValue(), preferences.getKeywordDelimiter());
                         for (Keyword keyword : keywords) {
                             document.add(new StringField(field.getKey().getName(), keyword.toString(), org.apache.lucene.document.Field.Store.YES));
+                        }
+                    } else if (field.getKey() == StandardField.GROUPS) {
+                        List<String> groups = Arrays.stream(field.getValue().split(preferences.getKeywordDelimiter().toString())).map(String::trim).toList();
+                        for (String group : groups) {
+                            document.add(new StringField(field.getKey().getName(), group, org.apache.lucene.document.Field.Store.YES));
                         }
                     } else {
                         document.add(new TextField(field.getKey().getName(), field.getValue(), org.apache.lucene.document.Field.Store.YES));
