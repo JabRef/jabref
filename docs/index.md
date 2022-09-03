@@ -19,7 +19,7 @@ After you successfully cloned and build JabRef, you are invited to continue read
 
 ## Teaching Exercises
 
-We are very happy that JabRef is part of [Software Engineering](https://en.wikipedia.org/wiki/Software\_engineering) trainings. Please head to [Teaching](teaching.md) for more information on using JabRef as a teaching object and on previous courses where JabRef was used.
+We are very happy that JabRef is part of [Software Engineering](https://en.wikipedia.org/wiki/Software_engineering) trainings. Please head to [Teaching](teaching.md) for more information on using JabRef as a teaching object and on previous courses where JabRef was used.
 
 ## Miscellaneous Hints
 
