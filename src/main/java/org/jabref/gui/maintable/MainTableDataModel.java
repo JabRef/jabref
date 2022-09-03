@@ -54,13 +54,13 @@ public class MainTableDataModel {
                         stateManager.activeSearchQueryProperty(),
                         groupsPreferences.groupViewModeProperty(),
                         (groups, query, groupViewMode) -> {
+                            doSearch(query);
                             return entry -> {
                                 updateSearchGroups();
                                 return isMatched(groups, query, entry);
                             };
                         })
         );
-        stateManager.activeSearchQueryProperty().addListener((observable, oldValue, newValue) -> doSearch(newValue));
 
         // We need to wrap the list since otherwise sorting in the table does not work
         entriesSorted = new SortedList<>(entriesFiltered);
@@ -93,11 +93,10 @@ public class MainTableDataModel {
     }
 
     private boolean isMatchedBySearch(Optional<SearchQuery> query, BibEntryTableViewModel entry) {
-        if (query.isPresent() && query.get().getSearchFlags().contains(SearchRules.SearchFlags.FILTERING_SEARCH)) {
+        if (!query.isPresent() || !query.get().getSearchFlags().contains(SearchRules.SearchFlags.FILTERING_SEARCH)) {
             return true;
         }
-        return query.map(matcher -> matcher.isMatch(entry.getEntry()))
-                    .orElse(true);
+        return stateManager.getSearchResults().containsKey(entry.getEntry());
     }
 
     private boolean isMatchedByGroup(ObservableList<GroupTreeNode> groups, BibEntryTableViewModel entry) {

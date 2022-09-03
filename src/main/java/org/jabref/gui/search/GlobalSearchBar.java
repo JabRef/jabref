@@ -232,11 +232,11 @@ public class GlobalSearchBar extends HBox {
             performSearch();
         });
 
-        filterModeButton.setSelected(!searchPreferences.isFilteringMode());
+        filterModeButton.setSelected(searchPreferences.isFilteringMode());
         filterModeButton.setTooltip(new Tooltip(Localization.lang("Filter search results")));
         initSearchModifierButton(filterModeButton);
         filterModeButton.setOnAction(event -> {
-            searchPreferences.setSearchFlag(SearchRules.SearchFlags.FILTERING_SEARCH, !filterModeButton.isSelected());
+            searchPreferences.setSearchFlag(SearchRules.SearchFlags.FILTERING_SEARCH, filterModeButton.isSelected());
             performSearch();
         });
 
