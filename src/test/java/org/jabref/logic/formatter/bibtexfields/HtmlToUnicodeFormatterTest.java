@@ -39,6 +39,8 @@ public class HtmlToUnicodeFormatterTest {
         assertEquals("ä", formatter.format("&auml;"));
         assertEquals("ä", formatter.format("&#228;"));
         assertEquals("ä", formatter.format("&#xe4;"));
+        assertEquals("ñ", formatter.format("&#241;"));
+
     }
 
     @Test
