@@ -6,7 +6,7 @@ import org.jabref.logic.cleanup.Formatter;
 import org.jabref.logic.l10n.Localization;
 
 /**
- * Trim all whitespace characters(defined in java) in the string.
+ * Trim all whitespace characters (as defined in Java) in the beginning and at the end of the string.
  */
 public class TrimWhitespaceFormatter extends Formatter {
 

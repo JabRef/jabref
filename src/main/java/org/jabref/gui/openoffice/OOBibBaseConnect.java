@@ -15,6 +15,8 @@ import org.jabref.model.openoffice.uno.UnoCast;
 import org.jabref.model.openoffice.uno.UnoTextDocument;
 import org.jabref.model.openoffice.util.OOResult;
 
+import com.sun.star.bridge.XBridge;
+import com.sun.star.bridge.XBridgeFactory;
 import com.sun.star.comp.helper.BootstrapException;
 import com.sun.star.container.NoSuchElementException;
 import com.sun.star.container.XEnumeration;
@@ -25,11 +27,17 @@ import com.sun.star.lang.XComponent;
 import com.sun.star.lang.XMultiComponentFactory;
 import com.sun.star.text.XTextDocument;
 import com.sun.star.uno.XComponentContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import static com.sun.star.uno.UnoRuntime.queryInterface;
 
 /**
  * Establish connection to a document opened in OpenOffice or LibreOffice.
  */
-class OOBibBaseConnect {
+public class OOBibBaseConnect {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(OOBibBaseConnect.class);
 
     private final DialogService dialogService;
     private final XDesktop xDesktop;
@@ -68,6 +76,27 @@ class OOBibBaseConnect {
             throw new CreationException(e.getMessage());
         }
         return UnoCast.cast(XDesktop.class, desktop).get();
+    }
+
+    /**
+     * Close any open office connection, if none exists does nothing
+     */
+    public static void closeOfficeConnection() {
+        try {
+            // get the bridge factory from the local service manager
+            XBridgeFactory bridgeFactory = queryInterface(XBridgeFactory.class,
+                                                          org.jabref.gui.openoffice.Bootstrap.createSimpleServiceManager()
+                    .createInstance("com.sun.star.bridge.BridgeFactory"));
+
+            if (bridgeFactory != null) {
+                for (XBridge bridge : bridgeFactory.getExistingBridges()) {
+                    // dispose of this bridge after closing its connection
+                    queryInterface(XComponent.class, bridge).dispose();
+                }
+            }
+        } catch (Exception ex) {
+            LOGGER.error("Exception disposing office process connection bridge", ex);
+        }
     }
 
     private static List<XTextDocument> getTextDocuments(XDesktop desktop)
@@ -125,15 +154,15 @@ class OOBibBaseConnect {
         // auto-detecting instances, so we need to show dialog in FX
         // thread
         Optional<DocumentTitleViewModel> selectedDocument =
-                (dialogService
+                dialogService
                         .showChoiceDialogAndWait(Localization.lang("Select document"),
                                 Localization.lang("Found documents:"),
                                 Localization.lang("Use selected document"),
-                                viewModel));
+                                viewModel);
 
-        return (selectedDocument
+        return selectedDocument
                 .map(DocumentTitleViewModel::getXtextDocument)
-                .orElse(null));
+                .orElse(null);
     }
 
     /**
@@ -157,7 +186,7 @@ class OOBibBaseConnect {
         List<XTextDocument> textDocumentList = getTextDocuments(this.xDesktop);
         if (textDocumentList.isEmpty()) {
             throw new NoDocumentFoundException("No Writer documents found");
-        } else if (textDocumentList.size() == 1 && autoSelectForSingle) {
+        } else if ((textDocumentList.size() == 1) && autoSelectForSingle) {
             selected = textDocumentList.get(0); // Get the only one
         } else { // Bring up a dialog
             selected = OOBibBaseConnect.selectDocumentDialog(textDocumentList,
@@ -233,4 +262,4 @@ class OOBibBaseConnect {
             return UnoTextDocument.getFrameTitle(this.xTextDocument);
         }
     }
-} // end of OOBibBaseConnect
+}
