@@ -17,6 +17,7 @@ import org.jabref.gui.mergeentries.newmergedialog.toolbar.ThreeWayMergeToolbar;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.FieldProperty;
 
 public class ThreeWayMergeView extends VBox {
     public static final int GRID_COLUMN_MIN_WIDTH = 250;
@@ -119,7 +120,12 @@ public class ThreeWayMergeView extends VBox {
     private void addRow(int fieldIndex) {
         Field field = getFieldAtIndex(fieldIndex);
 
-        FieldRowView fieldRow = new FieldRowView(field, getLeftEntry(), getRightEntry(), getMergedEntry(), fieldMergerFactory, fieldIndex);
+        FieldRowView fieldRow;
+        if (field.getProperties().contains(FieldProperty.PERSON_NAMES)) {
+            fieldRow = new PersonsNameFieldRowView(field, getLeftEntry(), getRightEntry(), getMergedEntry(), fieldMergerFactory, fieldIndex);
+        } else {
+            fieldRow = new FieldRowView(field, getLeftEntry(), getRightEntry(), getMergedEntry(), fieldMergerFactory, fieldIndex);
+        }
 
         fieldRows.add(fieldIndex, fieldRow);
 

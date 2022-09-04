@@ -16,11 +16,14 @@ import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLSocketFactory;
 
 import javafx.beans.Observable;
+import javafx.beans.binding.Bindings;
+import javafx.beans.binding.ObjectBinding;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.StringProperty;
+import javafx.scene.Node;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
@@ -82,6 +85,8 @@ public class LinkedFileViewModel extends AbstractViewModel {
     private final TaskExecutor taskExecutor;
     private final PreferencesService preferences;
     private final LinkedFileHandler linkedFileHandler;
+
+    private ObjectBinding<Node> linkedFileIconBinding;
 
     private final Validator fileExistsValidator;
 
@@ -176,6 +181,14 @@ public class LinkedFileViewModel extends AbstractViewModel {
         return ExternalFileTypes.getExternalFileTypeByLinkedFile(linkedFile, false, preferences.getFilePreferences())
                                 .map(ExternalFileType::getIcon)
                                 .orElse(IconTheme.JabRefIcons.FILE);
+    }
+
+    public ObjectBinding<Node> typeIconProperty() {
+        if (linkedFileIconBinding == null) {
+            linkedFileIconBinding = Bindings.createObjectBinding(() -> this.getTypeIcon().getGraphicNode(), linkedFile.fileTypeProperty());
+        }
+
+        return linkedFileIconBinding;
     }
 
     public void markAsAutomaticallyFound() {
@@ -441,13 +454,12 @@ public class LinkedFileViewModel extends AbstractViewModel {
                 }
 
                 if (!isDuplicate) {
+                    // we need to call LinkedFileViewModel#fromFile, because we need to make the path relative to the configured directories
                     LinkedFile newLinkedFile = LinkedFilesEditorViewModel.fromFile(
                             destination,
                             databaseContext.getFileDirectories(preferences.getFilePreferences()),
                             preferences.getFilePreferences());
-                    List<LinkedFile> linkedFiles = entry.getFiles();
-
-                    entry.addLinkedFile(entry, linkedFile, newLinkedFile, linkedFiles);
+                    entry.replaceDownloadedFile(linkedFile.getLink(), newLinkedFile);
 
                     // Notify in bar when the file type is HTML.
                     if (newLinkedFile.getFileType().equals(StandardExternalFileType.URL.getName())) {
