@@ -25,6 +25,7 @@ import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.treewalk.CanonicalTreeParser;
 
 public class SlrGitHandler extends GitHandler {
+
     /**
      * Initialize the handler for the given repository
      *

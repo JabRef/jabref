@@ -26,6 +26,8 @@ From the user perspective, the combination of the pull request needs to be teste
 - We integrated a new three-way merge UI for merging entries in the Entries Merger Dialog, the Duplicate Resolver Dialog, the Entry Importer Dialog, and the External Changes Resolver Dialog. [#8945](https://github.com/JabRef/jabref/pull/8945)
 - We added the ability to merge groups, keywords, comments and files when merging entries. [#9022](https://github.com/JabRef/jabref/pull/9022)
 - We added a warning message next to the authors field in the merge dialog to warn users when the authors are the same but formatted differently. [#8745](https://github.com/JabRef/jabref/issues/8745)
+- The properties of an existing systematic literature review can be edited. [koppor#604](https://github.com/koppor/jabref/issues/604)
+- An SLR can now be started from the SLR itself. [#9131](https://github.com/JabRef/jabref/pull/9131), [koppor#601](https://github.com/koppor/jabref/issues/601)
 
 ### Changed
 
@@ -40,6 +42,7 @@ From the user perspective, the combination of the pull request needs to be teste
 - The fallback directory of the file folder now is the general file directory. In case there was a directory configured for a library and this directory was not found, JabRef placed the PDF next to the .bib file and not into the general file directory.
 - The global default directory for storing PDFs is now the subdirectory "JabRef" in the user's home.
 - We reworked the Define study parameters dialog. [#9123](https://github.com/JabRef/jabref/pull/9123)
+
 
 ### Fixed
 
