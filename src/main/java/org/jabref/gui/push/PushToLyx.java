@@ -6,8 +6,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
 
-import javafx.beans.property.ObjectProperty;
-
 import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefExecutorService;
 import org.jabref.gui.icon.IconTheme;
@@ -55,7 +53,7 @@ public class PushToLyx extends AbstractPushToApplication {
     }
 
     @Override
-    public PushToApplicationSettings getSettings(PushToApplication application, ObjectProperty<PushToApplicationPreferences> preferences) {
+    public PushToApplicationSettings getSettings(PushToApplication application, PushToApplicationPreferences preferences) {
         return new PushToLyxSettings(application, dialogService, preferencesService.getFilePreferences(), preferences);
     }
 

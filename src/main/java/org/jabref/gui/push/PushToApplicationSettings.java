@@ -2,7 +2,6 @@ package org.jabref.gui.push;
 
 import java.util.Map;
 
-import javafx.beans.property.ObjectProperty;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
@@ -23,13 +22,13 @@ public class PushToApplicationSettings {
     protected final Label commandLabel;
     protected final TextField path;
     protected final GridPane settingsPane;
-    protected final ObjectProperty<PushToApplicationPreferences> preferences;
+    protected final PushToApplicationPreferences preferences;
     protected final AbstractPushToApplication application;
 
     public PushToApplicationSettings(PushToApplication application,
                                      DialogService dialogService,
                                      FilePreferences filePreferences,
-                                     ObjectProperty<PushToApplicationPreferences> preferences) {
+                                     PushToApplicationPreferences preferences) {
         this.application = (AbstractPushToApplication) application;
         this.preferences = preferences;
 
@@ -57,7 +56,7 @@ public class PushToApplicationSettings {
         commandLabel.setText(commandLine.toString());
         settingsPane.add(commandLabel, 0, 0);
 
-        path.setText(preferences.get().getCommandPaths().get(this.application.getDisplayName()));
+        path.setText(preferences.getCommandPaths().get(this.application.getDisplayName()));
         settingsPane.add(path, 1, 0);
 
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
@@ -80,9 +79,9 @@ public class PushToApplicationSettings {
      * state of the widgets in the settings panel to Globals.prefs.
      */
     public void storeSettings() {
-        Map<String, String> commandPaths = preferences.get().getCommandPaths();
+        Map<String, String> commandPaths = preferences.getCommandPaths();
         commandPaths.put(application.getDisplayName(), path.getText());
-        preferences.get().setCommandPaths(commandPaths);
+        preferences.setCommandPaths(commandPaths);
     }
 
     public GridPane getSettingsPane() {

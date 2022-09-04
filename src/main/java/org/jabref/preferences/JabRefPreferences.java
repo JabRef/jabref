@@ -1759,16 +1759,23 @@ public class JabRefPreferences implements PreferencesService {
 
         EasyBind.listen(pushToApplicationPreferences.activeApplicationNameProperty(), (obs, oldValue, newValue) -> put(PUSH_TO_APPLICATION, newValue));
 
-        // TODO: Empty command paths
-
-        pushToApplicationPreferences.getCommandPaths().addListener((InvalidationListener) listener -> {
-            put(PUSH_EMACS_PATH, pushToApplicationPreferences.getCommandPaths().get(PushToApplications.EMACS));
-            put(PUSH_LYXPIPE, pushToApplicationPreferences.getCommandPaths().get(PushToApplications.LYX));
-            put(PUSH_TEXMAKER_PATH, pushToApplicationPreferences.getCommandPaths().get(PushToApplications.TEXMAKER));
-            put(PUSH_TEXSTUDIO_PATH, pushToApplicationPreferences.getCommandPaths().get(PushToApplications.TEXSTUDIO));
-            put(PUSH_VIM, pushToApplicationPreferences.getCommandPaths().get(PushToApplications.VIM));
-            put(PUSH_WINEDT_PATH, pushToApplicationPreferences.getCommandPaths().get(PushToApplications.WIN_EDT));
-        });
+        pushToApplicationPreferences.getCommandPaths().addListener((obs, oldValue, newValue) ->
+                newValue.forEach((key, value) -> {
+                    switch (key) {
+                        case PushToApplications.EMACS ->
+                                put(PUSH_EMACS_PATH, value);
+                        case PushToApplications.LYX ->
+                                put(PUSH_LYXPIPE, value);
+                        case PushToApplications.TEXMAKER ->
+                                put(PUSH_TEXMAKER_PATH, value);
+                        case PushToApplications.TEXSTUDIO ->
+                                put(PUSH_TEXSTUDIO_PATH, value);
+                        case PushToApplications.VIM ->
+                                put(PUSH_VIM, value);
+                        case PushToApplications.WIN_EDT ->
+                                put(PUSH_WINEDT_PATH, value);
+                    }
+                }));
 
         EasyBind.listen(pushToApplicationPreferences.emacsArgumentsProperty(), (obs, oldValue, newValue) -> put(PUSH_EMACS_ADDITIONAL_PARAMETERS, newValue));
         EasyBind.listen(pushToApplicationPreferences.vimServerProperty(), (obs, oldValue, newValue) -> put(PUSH_VIM_SERVER, newValue));

@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
-import javafx.beans.property.ObjectProperty;
-
 import org.jabref.gui.DialogService;
 import org.jabref.gui.actions.Action;
 import org.jabref.gui.icon.IconTheme;
@@ -147,7 +145,7 @@ public abstract class AbstractPushToApplication implements PushToApplication {
         return preferencesService.getExternalApplicationsPreferences().getCiteCommand();
     }
 
-    public PushToApplicationSettings getSettings(PushToApplication application, ObjectProperty<PushToApplicationPreferences> preferences) {
+    public PushToApplicationSettings getSettings(PushToApplication application, PushToApplicationPreferences preferences) {
         return new PushToApplicationSettings(application, dialogService, preferencesService.getFilePreferences(), preferences);
     }
 

@@ -1,6 +1,5 @@
 package org.jabref.gui.push;
 
-import javafx.beans.property.ObjectProperty;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 
@@ -16,17 +15,17 @@ public class PushToVimSettings extends PushToApplicationSettings {
     public PushToVimSettings(PushToApplication application,
                              DialogService dialogService,
                              FilePreferences filePreferences,
-                             ObjectProperty<PushToApplicationPreferences> preferences) {
+                             PushToApplicationPreferences preferences) {
         super(application, dialogService, filePreferences, preferences);
 
         settingsPane.add(new Label(Localization.lang("Vim server name") + ":"), 0, 1);
         settingsPane.add(vimServer, 1, 1);
-        vimServer.setText(preferences.get().getVimServer());
+        vimServer.setText(preferences.getVimServer());
     }
 
     @Override
     public void storeSettings() {
         super.storeSettings();
-        preferences.get().setVimServer(vimServer.getText());
+        preferences.setVimServer(vimServer.getText());
     }
 }

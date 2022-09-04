@@ -2,8 +2,6 @@ package org.jabref.gui.push;
 
 import java.util.List;
 
-import javafx.beans.property.ObjectProperty;
-
 import org.jabref.gui.actions.Action;
 import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.model.database.BibDatabaseContext;
@@ -42,5 +40,5 @@ public interface PushToApplication {
 
     Action getAction();
 
-    PushToApplicationSettings getSettings(PushToApplication application, ObjectProperty<PushToApplicationPreferences> preferences);
+    PushToApplicationSettings getSettings(PushToApplication application, PushToApplicationPreferences pushToApplicationPreferences);
 }

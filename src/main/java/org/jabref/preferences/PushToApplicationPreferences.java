@@ -2,14 +2,15 @@ package org.jabref.preferences;
 
 import java.util.Map;
 
+import javafx.beans.property.MapProperty;
+import javafx.beans.property.SimpleMapProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableMap;
 
 public class PushToApplicationPreferences {
     private final StringProperty activeApplicationName;
-    private final ObservableMap<String, String> commandPaths;
+    private final MapProperty<String, String> commandPaths;
     private final StringProperty emacsArguments;
     private final StringProperty vimServer;
 
@@ -18,7 +19,7 @@ public class PushToApplicationPreferences {
                                         String emacsArguments,
                                         String vimServer) {
         this.activeApplicationName = new SimpleStringProperty(activeApplicationName);
-        this.commandPaths = FXCollections.observableMap(commandPaths);
+        this.commandPaths = new SimpleMapProperty<>(FXCollections.observableMap(commandPaths));
         this.emacsArguments = new SimpleStringProperty(emacsArguments);
         this.vimServer = new SimpleStringProperty(vimServer);
     }
@@ -35,7 +36,7 @@ public class PushToApplicationPreferences {
         this.activeApplicationName.set(activeApplicationName);
     }
 
-    public ObservableMap<String, String> getCommandPaths() {
+    public MapProperty<String, String> getCommandPaths() {
         return commandPaths;
     }
 

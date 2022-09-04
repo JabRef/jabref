@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
-import javafx.beans.property.ObjectProperty;
-
 import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefExecutorService;
 import org.jabref.gui.icon.IconTheme;
@@ -40,7 +38,7 @@ public class PushToVim extends AbstractPushToApplication {
     }
 
     @Override
-    public PushToApplicationSettings getSettings(PushToApplication application, ObjectProperty<PushToApplicationPreferences> preferences) {
+    public PushToApplicationSettings getSettings(PushToApplication application, PushToApplicationPreferences preferences) {
         return new PushToVimSettings(application, dialogService, preferencesService.getFilePreferences(), preferences);
     }
 

@@ -1,5 +1,7 @@
 package org.jabref.gui.preferences.external;
 
+import java.util.HashMap;
+
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
@@ -55,7 +57,7 @@ public class ExternalTabViewModel implements PreferenceTabViewModel {
 
     private final ExternalApplicationsPreferences initialExternalApplicationPreferences;
     private final PushToApplicationPreferences initialPushToApplicationPreferences;
-    private final ObjectProperty<PushToApplicationPreferences> workingPushToApplicationPreferences;
+    private final PushToApplicationPreferences workingPushToApplicationPreferences;
 
     public ExternalTabViewModel(StateManager stateManager, DialogService dialogService, PreferencesService preferencesService) {
         this.dialogService = dialogService;
@@ -63,7 +65,11 @@ public class ExternalTabViewModel implements PreferenceTabViewModel {
         this.stateManager = stateManager;
         this.initialExternalApplicationPreferences = preferences.getExternalApplicationsPreferences();
         this.initialPushToApplicationPreferences = preferences.getPushToApplicationPreferences();
-        this.workingPushToApplicationPreferences = new SimpleObjectProperty<>(preferencesService.getPushToApplicationPreferences());
+        this.workingPushToApplicationPreferences = new PushToApplicationPreferences(
+                initialPushToApplicationPreferences.getActiveApplicationName(),
+                new HashMap<>(initialPushToApplicationPreferences.getCommandPaths()),
+                initialPushToApplicationPreferences.getEmacsArguments(),
+                initialPushToApplicationPreferences.getVimServer());
 
         terminalCommandValidator = new FunctionBasedValidator<>(
                 customTerminalCommandProperty,
@@ -111,9 +117,9 @@ public class ExternalTabViewModel implements PreferenceTabViewModel {
 
         PushToApplicationPreferences pushPreferences = preferences.getPushToApplicationPreferences();
         pushPreferences.setActiveApplicationName(selectedPushToApplicationProperty.getValue().getDisplayName());
-        pushPreferences.setCommandPaths(workingPushToApplicationPreferences.get().getCommandPaths());
-        pushPreferences.setEmacsArguments(workingPushToApplicationPreferences.get().getEmacsArguments());
-        pushPreferences.setVimServer(workingPushToApplicationPreferences.get().getVimServer());
+        pushPreferences.setCommandPaths(workingPushToApplicationPreferences.getCommandPaths());
+        pushPreferences.setEmacsArguments(workingPushToApplicationPreferences.getEmacsArguments());
+        pushPreferences.setVimServer(workingPushToApplicationPreferences.getVimServer());
 
         stateManager.getPushToApplicationCommand().setApplication(selectedPushToApplicationProperty.getValue());
     }
