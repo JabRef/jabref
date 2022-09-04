@@ -190,22 +190,30 @@ public class GroupTreeViewModel extends AbstractViewModel {
     }
 
     private boolean checkGroupFieldsForModificationsDialogNecessary(AbstractGroup oldGroup, AbstractGroup newGroup) {
-        if (oldGroup instanceof WordKeywordGroup oldWordKeywordGroup && newGroup instanceof WordKeywordGroup newWordKeywordGroup) {
+
+        if (oldGroup.getClass() == WordKeywordGroup.class) {
+            WordKeywordGroup oldWordKeywordGroup = (WordKeywordGroup) oldGroup;
+            WordKeywordGroup newWordKeywordGroup = (WordKeywordGroup) newGroup;
+
             return oldWordKeywordGroup.getSearchField().getName().equals(newWordKeywordGroup.getSearchField().getName())
                                                                          || oldWordKeywordGroup.getSearchExpression().equals(newWordKeywordGroup.getSearchExpression())
                                                                          || (oldWordKeywordGroup.isCaseSensitive() == newWordKeywordGroup.isCaseSensitive());
 
-        } else if (oldGroup instanceof RegexKeywordGroup oldRegexKeywordGroup && newGroup instanceof RegexKeywordGroup newRegexKeywordGroup) {
+        } else if (oldGroup.getClass() == RegexKeywordGroup.class) {
+            RegexKeywordGroup oldRegexKeywordGroup = (RegexKeywordGroup) oldGroup;
+            RegexKeywordGroup newRegexKeywordGroup = (RegexKeywordGroup) newGroup;
+
             return oldRegexKeywordGroup.getSearchField().getName().equals(newRegexKeywordGroup.getSearchField().getName())
                    || oldRegexKeywordGroup.getSearchExpression().equals(newRegexKeywordGroup.getSearchExpression())
                    ||  (oldRegexKeywordGroup.isCaseSensitive() == newRegexKeywordGroup.isCaseSensitive());
 
-        } else if ((oldGroup instanceof SearchGroup oldSearchGroup) && newGroup instanceof SearchGroup newSearchGroup) {
+        } else if ((oldGroup.getClass() == SearchGroup.class)) {
+            SearchGroup oldSearchGroup = (SearchGroup) oldGroup;
+            SearchGroup newSearchGroup = (SearchGroup) newGroup;
+
             return oldSearchGroup.getSearchExpression().equals(newSearchGroup.getSearchExpression()) ||
                 oldSearchGroup.getSearchFlags().equals(newSearchGroup.getSearchFlags());
 
-        } else if (oldGroup.getClass() == ExplicitGroup.class) {
-            return true; //TOOD unsure
         } else if (oldGroup instanceof AutomaticKeywordGroup oldAutomaticKeywordGroup && newGroup instanceof AutomaticKeywordGroup newAutomaticKeywordGroup) {
             return oldAutomaticKeywordGroup.getKeywordDelimiter().toString().equals(newAutomaticKeywordGroup.getKeywordDelimiter().toString()) ||
                 oldAutomaticKeywordGroup.getKeywordHierarchicalDelimiter().toString().equals(newAutomaticKeywordGroup.getKeywordHierarchicalDelimiter().toString())
@@ -235,7 +243,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
                     oldGroup.getGroupNode().setGroup(
                          group,
                          true,
-                         false,
+                         true, // TODO Not sure
                          database.getEntries());
 
                     writeGroupChangesToMetaData();
