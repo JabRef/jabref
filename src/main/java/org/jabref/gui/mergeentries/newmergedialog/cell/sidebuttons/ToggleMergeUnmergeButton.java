@@ -73,19 +73,7 @@ public class ToggleMergeUnmergeButton extends Button {
 
     private class ToggleMergeCommand extends SimpleCommand {
 
-        @Override
-        public void execute() {
-            if (fieldStateProperty().get() == FieldState.MERGED) {
-                setFieldState(FieldState.UNMERGED);
-                configureMergeButton();
-            } else {
-                setFieldState(FieldState.MERGED);
-                configureUnmergeButton();
-            }
-        }
-
         private final Action mergeAction = new Action() {
-
             @Override
             public Optional<JabRefIcon> getIcon() {
                 return Optional.of(IconTheme.JabRefIcons.MERGE_GROUPS);
@@ -98,7 +86,6 @@ public class ToggleMergeUnmergeButton extends Button {
         };
 
         private final Action unmergeAction = new Action() {
-
             @Override
             public Optional<JabRefIcon> getIcon() {
                 return Optional.of(IconTheme.JabRefIcons.UNDO);
@@ -109,6 +96,17 @@ public class ToggleMergeUnmergeButton extends Button {
                 return Localization.lang("Unmerge %0", field.getDisplayName());
             }
         };
+
+        @Override
+        public void execute() {
+            if (fieldStateProperty().get() == FieldState.MERGED) {
+                setFieldState(FieldState.UNMERGED);
+                configureMergeButton();
+            } else {
+                setFieldState(FieldState.MERGED);
+                configureUnmergeButton();
+            }
+        }
     }
 
     public enum FieldState {
