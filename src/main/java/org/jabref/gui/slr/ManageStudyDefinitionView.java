@@ -52,7 +52,7 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
     @FXML private TextField studyDirectory;
     @FXML private Button selectStudyDirectory;
 
-    @FXML private ButtonType saveButtonType;
+    @FXML private ButtonType saveSurveyButtonType;
     @FXML private Label helpIcon;
 
     @FXML private TableView<String> authorTableView;
@@ -99,7 +99,7 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
                   .load()
                   .setAsDialogPane(this);
 
-        setupSaveButton();
+        setupSaveSurveyButton(false);
 
         themeManager.updateFontStyle(getDialogPane().getScene());
     }
@@ -119,15 +119,19 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
                   .load()
                   .setAsDialogPane(this);
 
-        setupSaveButton();
+        setupSaveSurveyButton(true);
 
         themeManager.updateFontStyle(getDialogPane().getScene());
     }
 
-    private void setupSaveButton() {
-        Button saveButton = ((Button) this.getDialogPane().lookupButton(saveButtonType));
+    private void setupSaveSurveyButton(boolean isEdit) {
+        Button saveSurveyButton = ((Button) this.getDialogPane().lookupButton(saveSurveyButtonType));
 
-        saveButton.disableProperty().bind(Bindings.or(Bindings.or(Bindings.or(Bindings.or(
+        if (!isEdit) {
+            saveSurveyButton.setText(Localization.lang("Start survey"));
+        }
+
+        saveSurveyButton.disableProperty().bind(Bindings.or(Bindings.or(Bindings.or(Bindings.or(
                                 Bindings.isEmpty(viewModel.getQueries()),
                                 Bindings.isEmpty(viewModel.getDatabases())),
                                 Bindings.isEmpty(viewModel.getAuthors())),
@@ -135,7 +139,7 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
                                 viewModel.getDirectory().isEmpty()));
 
         setResultConverter(button -> {
-            if (button == saveButtonType) {
+            if (button == saveSurveyButtonType) {
                 return viewModel.saveStudy();
             }
             // Cancel button will return null

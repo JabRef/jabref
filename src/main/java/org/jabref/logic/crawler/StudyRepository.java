@@ -77,7 +77,7 @@ public class StudyRepository {
      * Creates a study repository.
      *
      * @param pathToRepository Where the repository root is located.
-     * @param gitHandler       The git handler that managages any interaction with the remote repository
+     * @param gitHandler       The git handler that manages any interaction with the remote repository
      * @throws IllegalArgumentException If the repository root directory does not exist, or the root directory does not
      *                                  contain the study definition file.
      * @throws IOException              Thrown if the given repository does not exists, or the study definition file
@@ -116,17 +116,20 @@ public class StudyRepository {
         }
         study = parseStudyFile();
         try {
+            final String updateRepositoryStructureMessage = "Update repository structure";
+
             // Update repository structure on work branch in case of changes
-            setUpRepositoryStructure();
-            gitHandler.createCommitOnCurrentBranch("Setup/Update Repository Structure", false);
+            setUpRepositoryStructureForQueriesAndFetchers();
+            gitHandler.createCommitOnCurrentBranch(updateRepositoryStructureMessage, false);
+
             gitHandler.checkoutBranch(SEARCH_BRANCH);
             // If study definition does not exist on this branch or was changed on work branch, copy it from work
             boolean studyDefinitionDoesNotExistOrChanged = !(Files.exists(studyDefinitionFile) && new StudyYamlParser().parseStudyYamlFile(studyDefinitionFile).equals(study));
             if (studyDefinitionDoesNotExistOrChanged) {
                 new StudyYamlParser().writeStudyYamlFile(study, studyDefinitionFile);
             }
-            this.setUpRepositoryStructure();
-            gitHandler.createCommitOnCurrentBranch("Setup/Update Repository Structure", false);
+            setUpRepositoryStructureForQueriesAndFetchers();
+            gitHandler.createCommitOnCurrentBranch(updateRepositoryStructureMessage, false);
         } catch (GitAPIException e) {
             LOGGER.error("Could not checkout search branch.");
         }
@@ -220,6 +223,7 @@ public class StudyRepository {
      */
     public void persist(List<QueryResult> crawlResults) throws IOException, GitAPIException, SaveException {
         updateWorkAndSearchBranch();
+
         gitHandler.checkoutBranch(SEARCH_BRANCH);
         persistResults(crawlResults);
         try {
@@ -278,7 +282,7 @@ public class StudyRepository {
     /**
      * Create for each query a folder, and for each fetcher a bib file in the query folder to store its results.
      */
-    private void setUpRepositoryStructure() throws IOException {
+    private void setUpRepositoryStructureForQueriesAndFetchers() throws IOException {
         // Cannot use stream here since IOException has to be thrown
         StudyDatabaseToFetcherConverter converter = new StudyDatabaseToFetcherConverter(
                 this.getActiveLibraryEntries(),
@@ -349,6 +353,8 @@ public class StudyRepository {
      *
      * Input: '"test driven"' as a query entry with id 12348765
      * Output: '12348765 - test driven'
+     *
+     * Note that this method might be similar to {@link org.jabref.logic.util.io.FileUtil#getValidFileName(String)} or {@link org.jabref.logic.util.io.FileNameCleaner#cleanFileName(String)}
      *
      * @param query that is trimmed and combined with its query id
      * @return a unique folder name for any query.

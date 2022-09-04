@@ -2,8 +2,6 @@ package org.jabref.gui.slr;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.Objects;
-import java.util.Optional;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefFrame;
@@ -13,7 +11,6 @@ import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.BackgroundTask;
-import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.crawler.Crawler;
 import org.jabref.logic.exporter.SavePreferences;
@@ -22,7 +19,6 @@ import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.FileUpdateMonitor;
@@ -114,12 +110,8 @@ public class ExistingStudySearchAction extends SimpleCommand {
     }
 
     protected void crawl() {
-        // We hard close the tab
-        // Future work: Properly close the tab (with saving, ...)
-        frame.closeCurrentTab();
-
         try {
-            setupRepository(this.studyDirectory);
+            crawlPreparation(this.studyDirectory);
         } catch (IOException | GitAPIException e) {
             dialogService.showErrorDialogAndWait(Localization.lang("Study repository could not be created"), e);
             return;
@@ -159,9 +151,15 @@ public class ExistingStudySearchAction extends SimpleCommand {
     }
 
     /**
-     * Hook for setting up the repository
+     * Hook for setting up the crawl phase (e.g., initialization the repository)
      */
-    protected void setupRepository(Path studyRepositoryRoot) throws IOException, GitAPIException {
-        // Do nothing as repository is already setup
+    protected void crawlPreparation(Path studyRepositoryRoot) throws IOException, GitAPIException {
+        // Do nothing with the repository as repository is already setup
+
+        // The user focused an SLR
+        // We hard close the tab
+        // Future work: Properly close the tab (with saving, ...)
+        frame.closeCurrentTab();
+
     }
 }

@@ -89,8 +89,10 @@ public class FileUtil {
 
     /**
      * Returns a valid filename for most operating systems.
-     * <p>
-     * Currently, only the length is restricted to 255 chars, see MAXIMUM_FILE_NAME_LENGTH.
+     *
+     * Note that currently the length only is restricted, there is no check for illegal characters.
+     *
+     * For "real" cleaning, {@link FileNameCleaner#cleanFileName(String)} should be used.
      */
     public static String getValidFileName(String fileName) {
         String nameWithoutExtension = getBaseName(fileName);

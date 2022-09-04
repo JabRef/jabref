@@ -89,7 +89,7 @@ public enum StandardActions implements Action {
     WRITE_METADATA_TO_PDF(Localization.lang("Write metadata to PDF files"), Localization.lang("Will write metadata to the PDFs linked from selected entries."), KeyBinding.WRITE_METADATA_TO_PDF),
 
     START_NEW_STUDY(Localization.lang("Start new systematic literature review")),
-    UPDATE_SEARCH_RESULTS_OF_STUDY(Localization.lang("Perform search for existing systematic literature review")),
+    UPDATE_SEARCH_RESULTS_OF_STUDY(Localization.lang("Update study search results")),
     EDIT_EXISTING_STUDY(Localization.lang("Manage study definition")),
 
     OPEN_DATABASE_FOLDER(Localization.lang("Reveal in file explorer")),

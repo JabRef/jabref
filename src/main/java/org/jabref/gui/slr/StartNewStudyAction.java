@@ -7,12 +7,11 @@ import java.util.Optional;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.theme.ThemeManager;
-import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.crawler.StudyRepository;
 import org.jabref.logic.crawler.StudyYamlParser;
+import org.jabref.logic.git.GitHandler;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.study.Study;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.PreferencesService;
@@ -30,7 +29,7 @@ import org.slf4j.LoggerFactory;
  *
  * Needs to inherit {@link ExistingStudySearchAction}, because that action implements the real crawling.
  *
- * There is the hook {@link StartNewStudyAction#setupRepository(Path)}, which is used by {@link ExistingStudySearchAction#crawl()}.
+ * There is the hook {@link StartNewStudyAction#crawlPreparation(Path)}, which is used by {@link ExistingStudySearchAction#crawl()}.
  */
 public class StartNewStudyAction extends ExistingStudySearchAction {
     private static final Logger LOGGER = LoggerFactory.getLogger(StartNewStudyAction.class);
@@ -42,9 +41,15 @@ public class StartNewStudyAction extends ExistingStudySearchAction {
     }
 
     @Override
-    protected void setupRepository(Path studyRepositoryRoot) throws IOException, GitAPIException {
+    protected void crawlPreparation(Path studyRepositoryRoot) throws IOException, GitAPIException {
         StudyYamlParser studyYAMLParser = new StudyYamlParser();
         studyYAMLParser.writeStudyYamlFile(newStudy, studyRepositoryRoot.resolve(StudyRepository.STUDY_DEFINITION_FILE_NAME));
+
+        // When execution reaches this point, the user created a new study.
+        // The GitHandler is already called to initialize the repository with one single commit "Initial commit".
+        // The "Initial commit" should also contain the created YAML.
+        // Thus, we append to that commit.
+        new GitHandler(studyRepositoryRoot).createCommitOnCurrentBranch("Initial commit", true);
     }
 
     @Override
