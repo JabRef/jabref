@@ -1,7 +1,11 @@
 package org.jabref.logic.formatter.bibtexfields;
 
+import java.util.stream.Stream;
+
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -9,52 +13,28 @@ public class HtmlToUnicodeFormatterTest {
 
     private HtmlToUnicodeFormatter formatter;
 
+    private static Stream<Arguments> data() {
+        return Stream.of(
+                         Arguments.of("abc", "abc"),
+                         Arguments.of("åäö", "&aring;&auml;&ouml;"),
+                         Arguments.of("í", "i&#x301;"),
+                         Arguments.of("Ε", "&Epsilon;"),
+                         Arguments.of("ä", "&auml;"),
+                         Arguments.of("ä", "&#228;"),
+                         Arguments.of("ä", "&#xe4;"),
+                         Arguments.of("ñ", "&#241;"),
+                         Arguments.of("aaa", "<p>aaa</p>"),
+                         Arguments.of("bread & butter", "<b>bread</b> &amp; butter"));
+    }
+
     @BeforeEach
     public void setUp() {
         formatter = new HtmlToUnicodeFormatter();
     }
 
-    @Test
-    public void formatWithoutHtmlCharactersReturnsSameString() {
-        assertEquals("abc", formatter.format("abc"));
-    }
-
-    @Test
-    public void formatMultipleHtmlCharacters() {
-        assertEquals("åäö", formatter.format("&aring;&auml;&ouml;"));
-    }
-
-    @Test
-    public void formatCombinedAccent() {
-        assertEquals("í", formatter.format("i&#x301;"));
-    }
-
-    @Test
-    public void testBasic() {
-        assertEquals("aaa", formatter.format("aaa"));
-    }
-
-    @Test
-    public void testUmlauts() {
-        assertEquals("ä", formatter.format("&auml;"));
-        assertEquals("ä", formatter.format("&#228;"));
-        assertEquals("ä", formatter.format("&#xe4;"));
-    }
-
-    @Test
-    public void testGreekLetter() {
-        assertEquals("Ε", formatter.format("&Epsilon;"));
-    }
-
-    @Test
-    public void testHTMLRemoveTags() {
-        assertEquals("aaa", formatter.format("<p>aaa</p>"));
-    }
-
-    @Test
-    public void formatExample() {
-        assertEquals("bread & butter", formatter.format(formatter.getExampleInput()));
+    @ParameterizedTest
+    @MethodSource("data")
+    void testFormatterWorksCorrectly(String expected, String input) {
+        assertEquals(expected, formatter.format(input));
     }
 }
-
-

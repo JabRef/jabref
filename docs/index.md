@@ -19,7 +19,7 @@ After you successfully cloned and build JabRef, you are invited to continue read
 
 ## Teaching Exercises
 
-We are very happy that JabRef is part of [Software Engineering](https://en.wikipedia.org/wiki/Software\_engineering) trainings. Please head to [Teaching](teaching.md) for more information on using JabRef as a teaching object and on previous courses where JabRef was used.
+We are very happy that JabRef is part of [Software Engineering](https://en.wikipedia.org/wiki/Software_engineering) trainings. Please head to [Teaching](teaching.md) for more information on using JabRef as a teaching object and on previous courses where JabRef was used.
 
 ## Miscellaneous Hints
 
@@ -41,9 +41,11 @@ Diagram showing aspects of groups: [Groups.uml](https://github.com/JabRef/jabref
 
 ## Architectural Decision Records
 
-[Architectural decisions for JabRef](adr.md) are recorded.
+[Architectural decisions for JabRef](https://devdocs.jabref.org/decisions/) are recorded.
 
-For new ADRs, please use [template.md](https://github.com/JabRef/jabref/tree/3b3716b1e05a0d3273c886e102a8efe5e96472e0/docs/adr/template.md) as basis. More information on MADR is available at [https://adr.github.io/madr/](https://adr.github.io/madr/). General information about architectural decision records is available at [https://adr.github.io/](https://adr.github.io). Add them to the [list of architectural decision records](adr.md).
+For new ADRs, please use [adr-template.md](https://github.com/JabRef/jabref/blob/main/docs/decisions/adr-template.md) as basis.
+More information on MADR is available at <https://adr.github.io/madr/>.
+General information about architectural decision records is available at <https://adr.github.io/>.
 
 ## FAQ
 
@@ -52,5 +54,3 @@ For new ADRs, please use [template.md](https://github.com/JabRef/jabref/tree/3b3
     A: You have to ignore `buildSrc/src/main` as source directory in IntelliJ as indicated in our [setup guide](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace).
 
     Also filed as IntelliJ issue [IDEA-240250](https://youtrack.jetbrains.com/issue/IDEA-240250).
-*   Q: I get `Execution failed for task ':buildSrc:jar'. Entry org/jabref/build/JournalAbbreviationConverter$_convert_closure1$_closure2.class is a duplicate but no duplicate handling strategy has been set. Please refer to https://docs.gradle.org/7.4.2/dsl/org.gradle.api.tasks.Copy.html#org.gradle.api.tasks.Copy:duplicatesStrategy for details.` What can I do?\
-    A: You have to delete directory `buildSrc/build`.

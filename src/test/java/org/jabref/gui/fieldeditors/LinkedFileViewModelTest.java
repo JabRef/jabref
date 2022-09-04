@@ -8,6 +8,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -68,8 +69,9 @@ class LinkedFileViewModelTest {
 
     @BeforeEach
     void setUp(@TempDir Path tempFolder) throws Exception {
-        entry = new BibEntry();
-        entry.setCitationKey("asdf");
+        entry = new BibEntry()
+                .withCitationKey("asdf");
+
         databaseContext = new BibDatabaseContext();
         taskExecutor = mock(TaskExecutor.class);
         dialogService = mock(DialogService.class);
@@ -80,7 +82,7 @@ class LinkedFileViewModelTest {
         tempFile = tempFolder.resolve("temporaryFile");
         Files.createFile(tempFile);
 
-        // Check if there exists a system wide cookie handler
+        // Check if there exists a system-wide cookie handler
         if (CookieHandler.getDefault() == null) {
             cookieManager = new CookieManager();
             CookieHandler.setDefault(cookieManager);
@@ -197,8 +199,27 @@ class LinkedFileViewModelTest {
         verify(dialogService, atLeastOnce()).notify("Downloaded website as an HTML file.");
     }
 
+    @FetcherTest
     @Test
-    void downloadDoesNotOverwriteFileTypeExtension() throws MalformedURLException {
+    void downloadOfFileReplacesLink(@TempDir Path tempFolder) throws Exception {
+        linkedFile = new LinkedFile(new URL("http://arxiv.org/pdf/1207.0408v1"), "");
+        entry.setFiles(new ArrayList<>(List.of(linkedFile)));
+
+        databaseContext = mock(BibDatabaseContext.class);
+        when(databaseContext.getFirstExistingFileDir(any())).thenReturn(Optional.of(tempFolder));
+
+        when(filePreferences.getFileNamePattern()).thenReturn("[citationkey]");
+        when(filePreferences.getFileDirectoryPattern()).thenReturn("");
+
+        LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, new CurrentThreadTaskExecutor(), dialogService, preferences);
+        viewModel.download();
+
+        assertEquals(List.of(new LinkedFile("", tempFolder.resolve("asdf.pdf"), "PDF")), entry.getFiles());
+    }
+
+    @FetcherTest
+    @Test
+    void downloadDoesNotOverwriteFileTypeExtension() throws Exception {
         linkedFile = new LinkedFile(new URL("http://arxiv.org/pdf/1207.0408v1"), "");
 
         databaseContext = mock(BibDatabaseContext.class);
@@ -220,7 +241,7 @@ class LinkedFileViewModelTest {
     @FetcherTest
     @Test
     void downloadHtmlWhenLinkedFilePointsToHtml() throws MalformedURLException {
-        // use google as test url, wiley is protected by clooudfare
+        // use google as test url, wiley is protected by CloudFlare
         String url = "https://google.com";
         String fileType = StandardExternalFileType.URL.getName();
         linkedFile = new LinkedFile(new URL(url), fileType);

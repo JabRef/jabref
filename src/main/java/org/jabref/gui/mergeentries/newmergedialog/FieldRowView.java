@@ -1,6 +1,8 @@
 package org.jabref.gui.mergeentries.newmergedialog;
 
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ReadOnlyStringProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.GridPane;
 
@@ -14,6 +16,7 @@ import org.jabref.gui.mergeentries.newmergedialog.fieldsmerger.FieldMergerFactor
 import org.jabref.gui.mergeentries.newmergedialog.toolbar.ThreeWayMergeToolbar;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.strings.StringUtil;
 
 import com.tobiasdiez.easybind.EasyBind;
 import org.fxmisc.richtext.StyleClassedTextArea;
@@ -27,14 +30,16 @@ import static org.jabref.gui.mergeentries.newmergedialog.FieldRowViewModel.Selec
  */
 public class FieldRowView {
     private static final Logger LOGGER = LoggerFactory.getLogger(FieldRowView.class);
+
+    protected final FieldRowViewModel viewModel;
+
+    protected final BooleanProperty shouldShowDiffs = new SimpleBooleanProperty(true);
     private final FieldNameCell fieldNameCell;
     private final FieldValueCell leftValueCell;
     private final FieldValueCell rightValueCell;
     private final MergedFieldCell mergedValueCell;
 
     private final ToggleGroup toggleGroup = new ToggleGroup();
-
-    private final FieldRowViewModel viewModel;
 
     public FieldRowView(Field field, BibEntry leftEntry, BibEntry rightEntry, BibEntry mergedEntry, FieldMergerFactory fieldMergerFactory, int rowIndex) {
         viewModel = new FieldRowViewModel(field, leftEntry, rightEntry, mergedEntry, fieldMergerFactory);
@@ -141,7 +146,7 @@ public class FieldRowView {
     }
 
     public void showDiff(ShowDiffConfig diffConfig) {
-        if (!rightValueCell.isVisible()) {
+        if (!rightValueCell.isVisible() || StringUtil.isNullOrEmpty(viewModel.getLeftFieldValue()) || StringUtil.isNullOrEmpty(viewModel.getRightFieldValue())) {
             return;
         }
         LOGGER.debug("Showing diffs...");
@@ -150,10 +155,12 @@ public class FieldRowView {
         StyleClassedTextArea rightLabel = rightValueCell.getStyleClassedLabel();
         // Clearing old diff styles based on previous diffConfig
         hideDiff();
-        if (diffConfig.diffView() == ThreeWayMergeToolbar.DiffView.UNIFIED) {
-            new UnifiedDiffHighlighter(leftLabel, rightLabel, diffConfig.diffHighlightingMethod()).highlight();
-        } else {
-            new SplitDiffHighlighter(leftLabel, rightLabel, diffConfig.diffHighlightingMethod()).highlight();
+        if (shouldShowDiffs.get()) {
+            if (diffConfig.diffView() == ThreeWayMergeToolbar.DiffView.UNIFIED) {
+                new UnifiedDiffHighlighter(leftLabel, rightLabel, diffConfig.diffHighlightingMethod()).highlight();
+            } else {
+                new SplitDiffHighlighter(leftLabel, rightLabel, diffConfig.diffHighlightingMethod()).highlight();
+            }
         }
     }
 

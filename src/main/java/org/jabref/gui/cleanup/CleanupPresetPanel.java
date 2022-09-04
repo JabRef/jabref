@@ -4,7 +4,6 @@ import java.nio.file.Path;
 import java.util.EnumSet;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
 
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
@@ -13,11 +12,11 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 
 import org.jabref.gui.commonfxcontrols.FieldFormatterCleanupsPanel;
-import org.jabref.logic.cleanup.CleanupPreset;
 import org.jabref.logic.cleanup.FieldFormatterCleanups;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.preferences.CleanupPreferences;
 import org.jabref.preferences.FilePreferences;
 
 import com.airhacks.afterburner.views.ViewLoader;
@@ -40,7 +39,7 @@ public class CleanupPresetPanel extends VBox {
     @FXML private CheckBox cleanUpTimestampToModificationDate;
     @FXML private FieldFormatterCleanupsPanel formatterCleanupsPanel;
 
-    public CleanupPresetPanel(BibDatabaseContext databaseContext, CleanupPreset cleanupPreset, FilePreferences filePreferences) {
+    public CleanupPresetPanel(BibDatabaseContext databaseContext, CleanupPreferences cleanupPreferences, FilePreferences filePreferences) {
         this.databaseContext = Objects.requireNonNull(databaseContext);
 
         // Load FXML
@@ -48,10 +47,10 @@ public class CleanupPresetPanel extends VBox {
                   .root(this)
                   .load();
 
-        init(cleanupPreset, filePreferences);
+        init(cleanupPreferences, filePreferences);
     }
 
-    private void init(CleanupPreset cleanupPreset, FilePreferences filePreferences) {
+    private void init(CleanupPreferences cleanupPreferences, FilePreferences filePreferences) {
         Optional<Path> firstExistingDir = databaseContext.getFirstExistingFileDir(filePreferences);
         if (firstExistingDir.isPresent()) {
             cleanUpMovePDF.setText(Localization.lang("Move linked files to default file directory %0", firstExistingDir.get().toString()));
@@ -95,73 +94,73 @@ public class CleanupPresetPanel extends VBox {
                         cleanUpTimestampToCreationDate.selectedProperty().setValue(false);
                     }
                 });
-        updateDisplay(cleanupPreset);
+        updateDisplay(cleanupPreferences);
     }
 
-    private void updateDisplay(CleanupPreset preset) {
-        cleanUpDOI.setSelected(preset.isActive(CleanupPreset.CleanupStep.CLEAN_UP_DOI));
-        cleanUpEprint.setSelected(preset.isActive(CleanupPreset.CleanupStep.CLEANUP_EPRINT));
+    private void updateDisplay(CleanupPreferences preset) {
+        cleanUpDOI.setSelected(preset.isActive(CleanupPreferences.CleanupStep.CLEAN_UP_DOI));
+        cleanUpEprint.setSelected(preset.isActive(CleanupPreferences.CleanupStep.CLEANUP_EPRINT));
         if (!cleanUpMovePDF.isDisabled()) {
-            cleanUpMovePDF.setSelected(preset.isActive(CleanupPreset.CleanupStep.MOVE_PDF));
+            cleanUpMovePDF.setSelected(preset.isActive(CleanupPreferences.CleanupStep.MOVE_PDF));
         }
-        cleanUpMakePathsRelative.setSelected(preset.isActive(CleanupPreset.CleanupStep.MAKE_PATHS_RELATIVE));
-        cleanUpRenamePDF.setSelected(preset.isRenamePDFActive());
-        cleanUpRenamePDFonlyRelativePaths.setSelected(preset.isActive(CleanupPreset.CleanupStep.RENAME_PDF_ONLY_RELATIVE_PATHS));
-        cleanUpUpgradeExternalLinks.setSelected(preset.isActive(CleanupPreset.CleanupStep.CLEAN_UP_UPGRADE_EXTERNAL_LINKS));
-        cleanUpBiblatex.setSelected(preset.isActive(CleanupPreset.CleanupStep.CONVERT_TO_BIBLATEX));
-        cleanUpBibtex.setSelected(preset.isActive(CleanupPreset.CleanupStep.CONVERT_TO_BIBTEX));
-        cleanUpTimestampToCreationDate.setSelected(preset.isActive(CleanupPreset.CleanupStep.CONVERT_TIMESTAMP_TO_CREATIONDATE));
-        cleanUpTimestampToModificationDate.setSelected(preset.isActive(CleanupPreset.CleanupStep.CONVERT_TIMESTAMP_TO_MODIFICATIONDATE));
-        cleanUpTimestampToModificationDate.setSelected(preset.isActive(CleanupPreset.CleanupStep.DO_NOT_CONVERT_TIMESTAMP));
-        cleanUpISSN.setSelected(preset.isActive(CleanupPreset.CleanupStep.CLEAN_UP_ISSN));
-        formatterCleanupsPanel.cleanupsDisableProperty().setValue(!preset.getFormatterCleanups().isEnabled());
-        formatterCleanupsPanel.cleanupsProperty().setValue(FXCollections.observableArrayList(preset.getFormatterCleanups().getConfiguredActions()));
+        cleanUpMakePathsRelative.setSelected(preset.isActive(CleanupPreferences.CleanupStep.MAKE_PATHS_RELATIVE));
+        cleanUpRenamePDF.setSelected(preset.isActive(CleanupPreferences.CleanupStep.RENAME_PDF));
+        cleanUpRenamePDFonlyRelativePaths.setSelected(preset.isActive(CleanupPreferences.CleanupStep.RENAME_PDF_ONLY_RELATIVE_PATHS));
+        cleanUpUpgradeExternalLinks.setSelected(preset.isActive(CleanupPreferences.CleanupStep.CLEAN_UP_UPGRADE_EXTERNAL_LINKS));
+        cleanUpBiblatex.setSelected(preset.isActive(CleanupPreferences.CleanupStep.CONVERT_TO_BIBLATEX));
+        cleanUpBibtex.setSelected(preset.isActive(CleanupPreferences.CleanupStep.CONVERT_TO_BIBTEX));
+        cleanUpTimestampToCreationDate.setSelected(preset.isActive(CleanupPreferences.CleanupStep.CONVERT_TIMESTAMP_TO_CREATIONDATE));
+        cleanUpTimestampToModificationDate.setSelected(preset.isActive(CleanupPreferences.CleanupStep.CONVERT_TIMESTAMP_TO_MODIFICATIONDATE));
+        cleanUpTimestampToModificationDate.setSelected(preset.isActive(CleanupPreferences.CleanupStep.DO_NOT_CONVERT_TIMESTAMP));
+        cleanUpISSN.setSelected(preset.isActive(CleanupPreferences.CleanupStep.CLEAN_UP_ISSN));
+        formatterCleanupsPanel.cleanupsDisableProperty().setValue(!preset.getFieldFormatterCleanups().isEnabled());
+        formatterCleanupsPanel.cleanupsProperty().setValue(FXCollections.observableArrayList(preset.getFieldFormatterCleanups().getConfiguredActions()));
     }
 
-    public CleanupPreset getCleanupPreset() {
-        Set<CleanupPreset.CleanupStep> activeJobs = EnumSet.noneOf(CleanupPreset.CleanupStep.class);
+    public CleanupPreferences getCleanupPreset() {
+        EnumSet<CleanupPreferences.CleanupStep> activeJobs = EnumSet.noneOf(CleanupPreferences.CleanupStep.class);
 
         if (cleanUpMovePDF.isSelected()) {
-            activeJobs.add(CleanupPreset.CleanupStep.MOVE_PDF);
+            activeJobs.add(CleanupPreferences.CleanupStep.MOVE_PDF);
         }
         if (cleanUpDOI.isSelected()) {
-            activeJobs.add(CleanupPreset.CleanupStep.CLEAN_UP_DOI);
+            activeJobs.add(CleanupPreferences.CleanupStep.CLEAN_UP_DOI);
         }
         if (cleanUpEprint.isSelected()) {
-            activeJobs.add(CleanupPreset.CleanupStep.CLEANUP_EPRINT);
+            activeJobs.add(CleanupPreferences.CleanupStep.CLEANUP_EPRINT);
         }
         if (cleanUpISSN.isSelected()) {
-            activeJobs.add(CleanupPreset.CleanupStep.CLEAN_UP_ISSN);
+            activeJobs.add(CleanupPreferences.CleanupStep.CLEAN_UP_ISSN);
         }
         if (cleanUpMakePathsRelative.isSelected()) {
-            activeJobs.add(CleanupPreset.CleanupStep.MAKE_PATHS_RELATIVE);
+            activeJobs.add(CleanupPreferences.CleanupStep.MAKE_PATHS_RELATIVE);
         }
         if (cleanUpRenamePDF.isSelected()) {
             if (cleanUpRenamePDFonlyRelativePaths.isSelected()) {
-                activeJobs.add(CleanupPreset.CleanupStep.RENAME_PDF_ONLY_RELATIVE_PATHS);
+                activeJobs.add(CleanupPreferences.CleanupStep.RENAME_PDF_ONLY_RELATIVE_PATHS);
             } else {
-                activeJobs.add(CleanupPreset.CleanupStep.RENAME_PDF);
+                activeJobs.add(CleanupPreferences.CleanupStep.RENAME_PDF);
             }
         }
         if (cleanUpUpgradeExternalLinks.isSelected()) {
-            activeJobs.add(CleanupPreset.CleanupStep.CLEAN_UP_UPGRADE_EXTERNAL_LINKS);
+            activeJobs.add(CleanupPreferences.CleanupStep.CLEAN_UP_UPGRADE_EXTERNAL_LINKS);
         }
         if (cleanUpBiblatex.isSelected()) {
-            activeJobs.add(CleanupPreset.CleanupStep.CONVERT_TO_BIBLATEX);
+            activeJobs.add(CleanupPreferences.CleanupStep.CONVERT_TO_BIBLATEX);
         }
         if (cleanUpBibtex.isSelected()) {
-            activeJobs.add(CleanupPreset.CleanupStep.CONVERT_TO_BIBTEX);
+            activeJobs.add(CleanupPreferences.CleanupStep.CONVERT_TO_BIBTEX);
         }
         if (cleanUpTimestampToCreationDate.isSelected()) {
-            activeJobs.add(CleanupPreset.CleanupStep.CONVERT_TIMESTAMP_TO_CREATIONDATE);
+            activeJobs.add(CleanupPreferences.CleanupStep.CONVERT_TIMESTAMP_TO_CREATIONDATE);
         }
         if (cleanUpTimestampToModificationDate.isSelected()) {
-            activeJobs.add(CleanupPreset.CleanupStep.CONVERT_TIMESTAMP_TO_MODIFICATIONDATE);
+            activeJobs.add(CleanupPreferences.CleanupStep.CONVERT_TIMESTAMP_TO_MODIFICATIONDATE);
         }
 
-        activeJobs.add(CleanupPreset.CleanupStep.FIX_FILE_LINKS);
+        activeJobs.add(CleanupPreferences.CleanupStep.FIX_FILE_LINKS);
 
-        return new CleanupPreset(activeJobs, new FieldFormatterCleanups(
+        return new CleanupPreferences(activeJobs, new FieldFormatterCleanups(
                 !formatterCleanupsPanel.cleanupsDisableProperty().getValue(),
                 formatterCleanupsPanel.cleanupsProperty()));
     }

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" and="text" et-al-min="3" et-al-use-first="1" demote-non-dropping-particle="sort-only" default-locale="en-GB">
+<style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" and="text" demote-non-dropping-particle="sort-only" default-locale="en-GB">
   <info>
     <title>University for the Creative Arts - Harvard</title>
     <title-short>UCA</title-short>
@@ -14,7 +14,7 @@
     <category citation-format="author-date"/>
     <category field="generic-base"/>
     <summary>University for the Creative Arts Harvard style</summary>
-    <updated>2020-04-02T11:12:33+00:00</updated>
+    <updated>2022-06-22T13:41:19+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale>
@@ -30,7 +30,7 @@
       </if>
       <else>
         <names variable="author">
-          <name and="text" delimiter-precedes-last="never" et-al-min="3" et-al-use-first="1" initialize-with=". " name-as-sort-order="all"/>
+          <name and="text" delimiter-precedes-last="never" initialize-with=". " name-as-sort-order="all"/>
           <label form="short" prefix=" "/>
           <et-al font-style="italic"/>
           <substitute>
@@ -156,12 +156,20 @@
         </group>
         <text variable="archive" prefix=": " suffix="."/>
       </else-if>
-      <else-if type="speech personal_communication" match="any">
-        <group delimiter=" " prefix="[" suffix="].">
-          <names variable="recipient" prefix="Email sent to ">
-            <name and="text" delimiter-precedes-last="never" et-al-min="3" et-al-use-first="1" initialize-with="." name-as-sort-order="all"/>
-          </names>
+      <else-if type="personal_communication" match="any">
+        <group delimiter=" " suffix=".">
           <text variable="genre" suffix=" "/>
+          <text variable="event-place"/>
+          <date delimiter="/" variable="issued">
+            <date-part name="day" form="numeric-leading-zeros"/>
+            <date-part name="month" form="numeric-leading-zeros"/>
+            <date-part name="year"/>
+          </date>
+        </group>
+      </else-if>
+      <else-if type="speech" match="any">
+        <group delimiter=" " prefix="[" suffix="].">
+          <text variable="genre"/>
           <text variable="event-place"/>
           <date delimiter="/" variable="issued">
             <date-part name="day" form="numeric-leading-zeros"/>
@@ -188,8 +196,7 @@
   <macro name="translator">
     <names variable="translator">
       <label form="verb" text-case="capitalize-first"/>
-      <name delimiter=". " prefix=" " suffix="." and="text" delimiter-precedes-last="never" et-al-min="3" et-al-use-first="1" initialize-with="." name-as-sort-order="all"/>
-      <et-al font-style="italic"/>
+      <name delimiter=". " prefix=" " and="text" delimiter-precedes-last="never" initialize-with=". " name-as-sort-order="all"/>
     </names>
   </macro>
   <macro name="bill-detail">
@@ -272,8 +279,7 @@
           </if>
         </choose>
         <names variable="author" prefix="Directed by ">
-          <name suffix="." and="text" delimiter-precedes-last="never" et-al-min="3" et-al-use-first="1" initialize-with="." name-as-sort-order="all"/>
-          <et-al font-style="italic"/>
+          <name suffix="." and="text" delimiter-precedes-last="never" initialize-with="." name-as-sort-order="all"/>
         </names>
         <text variable="medium" prefix=" [" suffix="] "/>
       </else-if>
@@ -426,9 +432,8 @@
   </macro>
   <macro name="editor">
     <names variable="editor" delimiter="," suffix=" ">
-      <name and="text" delimiter-precedes-last="never" et-al-min="3" et-al-use-first="1" initialize-with="." name-as-sort-order="all"/>
+      <name and="text" delimiter-precedes-last="never" initialize-with=". " name-as-sort-order="all"/>
       <label form="short" prefix=" (" suffix=")"/>
-      <et-al font-style="italic"/>
     </names>
   </macro>
   <citation disambiguate-add-year-suffix="true" collapse="year-suffix" et-al-min="3" et-al-use-first="1">
@@ -463,7 +468,7 @@
       <group delimiter=" ">
         <text macro="primary-title"/>
         <text macro="genre-online-marker"/>
-        <group delimiter=". " prefix=" ">
+        <group delimiter=" " prefix=" ">
           <text macro="translator"/>
           <text macro="bill-detail"/>
           <text macro="container"/>
