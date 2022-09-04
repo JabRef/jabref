@@ -26,15 +26,25 @@ import org.jabref.logic.citationkeypattern.BracketedPattern;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.util.FileHelper;
 import org.jabref.model.util.OptionalUtil;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * The idea of this class is to add general functionality that could possibly even in the
+ * <a href="https://en.wikipedia.org/wiki/Non-blocking_I/O_(Java)">Java NIO package</a>,
+ * such as getting/adding file extension etc.
+ *
+ * This class is the "successor" of {@link FileHelper}. In case you miss something here,
+ * please look at {@link FileHelper} and migrate the functionality to here.
+ */
 public class FileUtil {
 
     public static final boolean IS_POSIX_COMPLIANT = FileSystems.getDefault().supportedFileAttributeViews().contains("posix");
     public static final int MAXIMUM_FILE_NAME_LENGTH = 255;
+
     private static final Logger LOGGER = LoggerFactory.getLogger(FileUtil.class);
 
     private FileUtil() {
@@ -81,6 +91,8 @@ public class FileUtil {
      * Returns a valid filename for most operating systems.
      * <p>
      * Currently, only the length is restricted to 255 chars, see MAXIMUM_FILE_NAME_LENGTH.
+     *
+     * See also {@link FileHelper#detectBadFileName(String)} and {@link FileNameCleaner#cleanFileName(String)}
      */
     public static String getValidFileName(String fileName) {
         String nameWithoutExtension = getBaseName(fileName);
@@ -98,6 +110,8 @@ public class FileUtil {
     /**
      * Adds an extension to the given file name. The original extension is not replaced. That means, "demo.bib", ".sav"
      * gets "demo.bib.sav" and not "demo.sav"
+     *
+     * <emph>Warning! If "ext" is passed, this is literally added. Thus addExtension("tmp.txt", "ext") leads to "tmp.txtext"</emph>
      *
      * @param path      the path to add the extension to
      * @param extension the extension to add

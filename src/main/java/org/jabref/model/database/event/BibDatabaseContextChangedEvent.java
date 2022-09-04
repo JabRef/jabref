@@ -5,9 +5,10 @@ import org.jabref.model.groups.event.GroupUpdatedEvent;
 import org.jabref.model.metadata.event.MetaDataChangedEvent;
 
 /**
- * This Event is automatically fired at the same time as {@link EntriesEvent}, {@link GroupUpdatedEvent} or {@link MetaDataChangedEvent}.
+ * This event is automatically fired at the same time as {@link EntriesEvent}, {@link GroupUpdatedEvent}, or {@link MetaDataChangedEvent},
+ * because all three inherit from this class.
  */
-public class BibDatabaseContextChangedEvent {
+public abstract class BibDatabaseContextChangedEvent {
     // If the event has been filtered out
     private boolean filteredOut;
 

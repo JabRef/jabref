@@ -80,8 +80,6 @@ public class ImportHandler {
 
         this.linker = new ExternalFilesEntryLinker(preferencesService, preferencesService.getFilePreferences(), database);
         this.contentImporter = new ExternalFilesContentImporter(
-                preferencesService.getGeneralPreferences(),
-                preferencesService.getImporterPreferences(),
                 preferencesService.getImportFormatPreferences());
         this.undoManager = undoManager;
     }

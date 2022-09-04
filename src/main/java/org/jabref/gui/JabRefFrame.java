@@ -61,7 +61,6 @@ import org.jabref.gui.contentselector.ManageContentSelectorAction;
 import org.jabref.gui.copyfiles.CopyFilesAction;
 import org.jabref.gui.customentrytypes.CustomizeEntryAction;
 import org.jabref.gui.desktop.JabRefDesktop;
-import org.jabref.gui.dialogs.AutosaveUiManager;
 import org.jabref.gui.documentviewer.ShowDocumentViewerAction;
 import org.jabref.gui.duplicationFinder.DuplicateSearch;
 import org.jabref.gui.edit.CopyMoreAction;
@@ -257,7 +256,7 @@ public class JabRefFrame extends BorderPane {
                             tabbedPane.getTabs().remove(dndIndicator);
                             List<Path> bibFiles = DragAndDropHelper.getBibFiles(tabDragEvent.getDragboard());
                             OpenDatabaseAction openDatabaseAction = this.getOpenDatabaseAction();
-                            openDatabaseAction.openFiles(bibFiles, true);
+                            openDatabaseAction.openFiles(bibFiles);
                             tabDragEvent.setDropCompleted(true);
                             tabDragEvent.consume();
                         } else {
@@ -280,7 +279,7 @@ public class JabRefFrame extends BorderPane {
                 tabbedPane.getTabs().remove(dndIndicator);
                 List<Path> bibFiles = DragAndDropHelper.getBibFiles(event.getDragboard());
                 OpenDatabaseAction openDatabaseAction = this.getOpenDatabaseAction();
-                openDatabaseAction.openFiles(bibFiles, true);
+                openDatabaseAction.openFiles(bibFiles);
                 event.setDropCompleted(true);
                 event.consume();
             });
@@ -380,8 +379,7 @@ public class JabRefFrame extends BorderPane {
      */
     public void openAction(String filePath) {
         Path file = Path.of(filePath);
-        // all the logic is done in openIt. Even raising an existing panel
-        getOpenDatabaseAction().openFile(file, true);
+        getOpenDatabaseAction().openFile(file);
     }
 
     /**
@@ -643,12 +641,7 @@ public class JabRefFrame extends BorderPane {
         openDatabaseList = EasyBind.map(filteredTabs, tab -> ((LibraryTab) tab).getBibDatabaseContext());
         EasyBind.bindContent(stateManager.getOpenDatabases(), openDatabaseList);
 
-        stateManager.activeDatabaseProperty().bind(
-                EasyBind.map(tabbedPane.getSelectionModel().selectedItemProperty(),
-                        selectedTab -> Optional.ofNullable(selectedTab)
-                                               .filter(tab -> tab instanceof LibraryTab)
-                                               .map(tab -> (LibraryTab) tab)
-                                               .map(LibraryTab::getBibDatabaseContext)));
+        // the binding for stateManager.activeDatabaseProperty() is at org.jabref.gui.LibraryTab.onDatabaseLoadingSucceed
 
         // Subscribe to the search
         EasyBind.subscribe(stateManager.activeSearchQueryProperty(),
@@ -667,10 +660,11 @@ public class JabRefFrame extends BorderPane {
         // Wait for the scene to be created, otherwise focusOwnerProperty is not provided
         Platform.runLater(() -> stateManager.focusOwnerProperty().bind(
                 EasyBind.map(mainStage.getScene().focusOwnerProperty(), Optional::ofNullable)));
+
         /*
          * The following state listener makes sure focus is registered with the
          * correct database when the user switches tabs. Without this,
-         * cut/paste/copy operations would some times occur in the wrong tab.
+         * cut/paste/copy operations would sometimes occur in the wrong tab.
          */
         EasyBind.subscribe(tabbedPane.getSelectionModel().selectedItemProperty(), tab -> {
             if (!(tab instanceof LibraryTab libraryTab)) {
@@ -829,7 +823,7 @@ public class JabRefFrame extends BorderPane {
 
         quality.getItems().addAll(
                 factory.createMenuItem(StandardActions.FIND_DUPLICATES, new DuplicateSearch(this, dialogService, stateManager)),
-                factory.createMenuItem(StandardActions.MERGE_ENTRIES, new MergeEntriesAction(this, dialogService, stateManager)),
+                factory.createMenuItem(StandardActions.MERGE_ENTRIES, new MergeEntriesAction(dialogService, stateManager)),
                 factory.createMenuItem(StandardActions.CHECK_INTEGRITY, new IntegrityCheckAction(this, stateManager, Globals.TASK_EXECUTOR)),
                 factory.createMenuItem(StandardActions.CLEANUP_ENTRIES, new CleanupAction(this, this.prefs, dialogService, stateManager)),
 
@@ -1048,6 +1042,11 @@ public class JabRefFrame extends BorderPane {
         return new Group(indicator);
     }
 
+    /**
+     * Might be called when a user asks JabRef at the command line
+     * i) to import a file or
+     * ii) to open a .bib file
+     */
     public void addParserResult(ParserResult parserResult, boolean focusPanel) {
         if (parserResult.toOpenTab()) {
             // Add the entries to the open tab.
@@ -1059,7 +1058,7 @@ public class JabRefFrame extends BorderPane {
                 addImportedEntries(libraryTab, parserResult);
             }
         } else {
-            // only add tab if DB is not already open
+            // only add tab if library is not already open
             Optional<LibraryTab> libraryTab = getLibraryTabs().stream()
                                                               .filter(p -> p.getBibDatabaseContext()
                                                                             .getDatabasePath()
@@ -1119,17 +1118,6 @@ public class JabRefFrame extends BorderPane {
         }
 
         libraryTab.getUndoManager().registerListener(new UndoRedoEventManager());
-
-        BibDatabaseContext context = libraryTab.getBibDatabaseContext();
-
-        if (readyForAutosave(context)) {
-            AutosaveManager autosaver = AutosaveManager.start(context);
-            autosaver.registerListener(new AutosaveUiManager(libraryTab));
-        }
-
-        BackupManager.start(context, Globals.entryTypesManager, prefs);
-
-        trackOpenNewDatabase(libraryTab);
     }
 
     private void trackOpenNewDatabase(LibraryTab libraryTab) {
@@ -1145,13 +1133,6 @@ public class JabRefFrame extends BorderPane {
         LibraryTab libraryTab = new LibraryTab(this, prefs, stateManager, themeManager, databaseContext, importFormatReader);
         addTab(libraryTab, raisePanel);
         return libraryTab;
-    }
-
-    private boolean readyForAutosave(BibDatabaseContext context) {
-        return ((context.getLocation() == DatabaseLocation.SHARED)
-                || ((context.getLocation() == DatabaseLocation.LOCAL)
-                && prefs.getImportExportPreferences().shouldAutoSave()))
-                && context.getDatabasePath().isPresent();
     }
 
     /**

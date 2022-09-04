@@ -212,6 +212,7 @@ public class LibraryTab extends Tab {
         OpenDatabaseAction.performPostOpenActions(this, result);
 
         feedData(context);
+
         // a temporary workaround to update groups pane
         stateManager.activeDatabaseProperty().bind(
                 EasyBind.map(frame.getTabbedPane().getSelectionModel().selectedItemProperty(),
@@ -261,12 +262,17 @@ public class LibraryTab extends Tab {
                     updateTabTitle(changedProperty.getValue()));
         });
 
-        if (isDatabaseReadyForAutoSave(bibDatabaseContext)) {
-            AutosaveManager autoSaver = AutosaveManager.start(bibDatabaseContext);
-            autoSaver.registerListener(new AutosaveUiManager(this));
-        }
+        installAutosaveManagerAndBackupManager();
+    }
 
-        BackupManager.start(this.bibDatabaseContext, Globals.entryTypesManager, preferencesService);
+    public void installAutosaveManagerAndBackupManager() {
+        if (isDatabaseReadyForAutoSave(bibDatabaseContext)) {
+            AutosaveManager autosaveManager = AutosaveManager.start(bibDatabaseContext);
+            autosaveManager.registerListener(new AutosaveUiManager(this));
+        }
+        if (isDatabaseReadyForBackup(bibDatabaseContext)) {
+            BackupManager.start(bibDatabaseContext, Globals.entryTypesManager, preferencesService);
+        }
     }
 
     private boolean isDatabaseReadyForAutoSave(BibDatabaseContext context) {
@@ -274,6 +280,10 @@ public class LibraryTab extends Tab {
                 || ((context.getLocation() == DatabaseLocation.LOCAL)
                 && preferencesService.getImportExportPreferences().shouldAutoSave()))
                 && context.getDatabasePath().isPresent();
+    }
+
+    private boolean isDatabaseReadyForBackup(BibDatabaseContext context) {
+        return (context.getLocation() == DatabaseLocation.LOCAL) && context.getDatabasePath().isPresent();
     }
 
     /**

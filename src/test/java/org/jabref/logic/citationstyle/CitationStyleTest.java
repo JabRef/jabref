@@ -28,7 +28,7 @@ class CitationStyleTest {
 
         // if the default citation style changes this has to be modified
         String expected = "  <div class=\"csl-entry\">\n"
-                          + "    <div class=\"csl-left-margin\">[1]</div><div class=\"csl-right-inline\">B. Smith, B. Jones, and J. Williams, &ldquo;Title of the test entry,&rdquo; <span style=\"font-style: italic\">BibTeX Journal</span>, vol. 34, no. 7, Art. no. 3, 2016-07, doi: 10.1001/bla.blubb.</div>\n"
+                          + "    <div class=\"csl-left-margin\">[1]</div><div class=\"csl-right-inline\">B. Smith, B. Jones, and J. Williams, &ldquo;Title of the test entry,&rdquo; <span style=\"font-style: italic\">BibTeX Journal</span>, vol. 34, no. 3, pp. 45&ndash;67, 2016-07, doi: 10.1001/bla.blubb.</div>\n"
                           + "  </div>\n"
                           + "";
 

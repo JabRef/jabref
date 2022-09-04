@@ -102,7 +102,7 @@
             <group delimiter=" ">
               <text variable="volume"/>
               <text macro="container"/>
-              <text variable="page"/>
+              <text variable="page-first"/>
             </group>
             <text variable="locator"/>
           </group>
@@ -117,7 +117,7 @@
           </group>
           <text macro="container"/>
           <group delimiter=", ">
-            <text variable="page"/>
+            <text variable="page-first"/>
             <text variable="locator"/>
           </group>
           <text macro="issuance" prefix="(" suffix=")"/>
@@ -133,7 +133,7 @@
           <text macro="issuance"/>
           <group delimiter=" ">
             <text value="at"/>
-            <text variable="page"/>
+            <text variable="page-first"/>
           </group>
         </group>
       </else-if>
@@ -143,13 +143,12 @@
           <text variable="volume"/>
           <text macro="container"/>
         </group>
-        <text variable="page"/>
+        <text variable="page-first"/>
         <text variable="locator" prefix=", "/>
         <text macro="issuance" prefix=" (" suffix=")"/>
       </else-if>
       <else-if type="book" match="any">
         <text variable="title" font-variant="small-caps"/>
-        <text variable="page" prefix=" "/>
         <text variable="locator" prefix=" "/>
         <text macro="issuance" prefix=" (" suffix=")"/>
       </else-if>
@@ -159,7 +158,7 @@
           <group delimiter=" ">
             <text variable="volume"/>
             <text macro="container"/>
-            <text variable="page"/>
+            <text variable="page-first"/>
             <text variable="locator"/>
             <text macro="issuance" prefix="(" suffix=")"/>
           </group>

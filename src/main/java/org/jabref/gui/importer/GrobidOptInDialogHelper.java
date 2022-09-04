@@ -1,7 +1,7 @@
 package org.jabref.gui.importer;
 
 import org.jabref.gui.DialogService;
-import org.jabref.logic.importer.ImporterPreferences;
+import org.jabref.logic.importer.fetcher.GrobidPreferences;
 import org.jabref.logic.l10n.Localization;
 
 /**
@@ -18,7 +18,7 @@ public class GrobidOptInDialogHelper {
      * @param dialogService the DialogService to use
      * @return if the user enabled Grobid, either in the past or after being asked by the dialog.
      */
-    public static boolean showAndWaitIfUserIsUndecided(DialogService dialogService, ImporterPreferences preferences) {
+    public static boolean showAndWaitIfUserIsUndecided(DialogService dialogService, GrobidPreferences preferences) {
         if (preferences.isGrobidEnabled()) {
             return true;
         }

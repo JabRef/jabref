@@ -118,9 +118,6 @@ public class LinkedFile implements Serializable {
 
     /**
      * Writes serialized object to ObjectOutputStream, automatically called
-     *
-     * @param out {@link ObjectOutputStream}
-     * @throws IOException
      */
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeUTF(getFileType());
@@ -131,9 +128,6 @@ public class LinkedFile implements Serializable {
 
     /**
      * Reads serialized object from ObjectInputStreamm, automatically called
-     *
-     * @param in {@link ObjectInputStream}
-     * @throws IOException
      */
     private void readObject(ObjectInputStream in) throws IOException {
         fileType = new SimpleStringProperty(in.readUTF());

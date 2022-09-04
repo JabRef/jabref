@@ -136,14 +136,14 @@ jobs:
   
     - name: Bump version and push tag
       id: tag_version
-      uses: mathieudutour/github-tag-action@v5.6
+      uses: mathieudutour/github-tag-action@v6.0
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         default_bump: patch
       if: github.event_name == 'push' && hashFiles('composer.json') != '' && (steps.update.outputs.updated == 'true' || steps.update.outputs.deleted == 'true')
   
     - name: Create a GitHub release
-      uses: softprops/action-gh-release@v0.1.14
+      uses: softprops/action-gh-release@v1
       env:
         github_token: ${{ secrets.GITHUB_TOKEN }}
       with:
