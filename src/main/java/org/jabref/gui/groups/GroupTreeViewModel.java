@@ -190,14 +190,13 @@ public class GroupTreeViewModel extends AbstractViewModel {
     }
 
     /**
-     * Check if it is necessary to show a group modified, reassign entry dialog </br>
+     * Check if it is necessary to show a group modified, reassign entry dialog <br>
      * Although group name change is relevant, we silently take it as a rename and do not bother the user
      * @param oldGroup Original Group
      * @param newGroup Edited group
      * @return true if just trivial modifications (e.g. color or description) or the relevant group properties are equal, false otherwise
      */
     boolean checkGroupFieldsForModificationsDialogNotNecessary(AbstractGroup oldGroup, AbstractGroup newGroup) {
-
         // we need to use getclass here because we have different subclass inheritance e.g. ExplicitGroup is a subclass of WordKeyWordGroup
         if (oldGroup.getClass() == WordKeywordGroup.class) {
             WordKeywordGroup oldWordKeywordGroup = (WordKeywordGroup) oldGroup;
@@ -219,7 +218,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
 
             return oldSearchGroup.getSearchExpression().equals(newSearchGroup.getSearchExpression())
                 && oldSearchGroup.getSearchFlags().equals(newSearchGroup.getSearchFlags());
-        } else if (oldGroup.getClass() ==  AutomaticKeywordGroup.class) {
+        } else if (oldGroup.getClass() == AutomaticKeywordGroup.class) {
             AutomaticKeywordGroup oldAutomaticKeywordGroup = (AutomaticKeywordGroup) oldGroup;
             AutomaticKeywordGroup newAutomaticKeywordGroup = (AutomaticKeywordGroup) oldGroup;
 
@@ -231,9 +230,9 @@ public class GroupTreeViewModel extends AbstractViewModel {
             AutomaticPersonsGroup newAutomaticPersonsGroup = (AutomaticPersonsGroup) newGroup;
 
             return oldAutomaticPersonsGroup.getField().getName().equals(newAutomaticPersonsGroup.getField().getName());
-        } else if (oldGroup.getClass() ==  TexGroup.class) {
-                TexGroup oldTexGroup = (TexGroup) oldGroup;
-                TexGroup newTexGroup = (TexGroup) newGroup;
+        } else if (oldGroup.getClass() == TexGroup.class) {
+            TexGroup oldTexGroup = (TexGroup) oldGroup;
+            TexGroup newTexGroup = (TexGroup) newGroup;
             return oldTexGroup.getFilePath().toString().equals(newTexGroup.getFilePath().toString());
         }
         return true;

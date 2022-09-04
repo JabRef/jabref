@@ -116,7 +116,6 @@ class GroupTreeViewModelTest {
         assertTrue(model.checkGroupFieldsForModificationsDialogNotNecessary(oldGroup, newGroup));
     }
 
-
     @Test
     void shouldShowDialogWhenKeywordDiffers() {
         AbstractGroup oldGroup = new WordKeywordGroup("group", GroupHierarchyType.INCLUDING, StandardField.KEYWORDS, "keywordTest", true, ',', true);
